@@ -1,5 +1,6 @@
 #pragma once
 #include "../Hook.h"
+#include "../../../FlarialGUI/FlarialWidgets.cpp"
 
 struct FrameContext {
 	ID3D12CommandAllocator* commandAllocator = nullptr;

@@ -204,6 +204,7 @@
   <ItemGroup>
     <ClCompile Include="Client\Client.cpp" />
     <ClCompile Include="Client\Config\Config.cpp" />
+    <ClCompile Include="Client\FlarialGUI\FlarialWidgets.cpp" />
     <ClCompile Include="Client\ImGui\imgui.cpp" />
     <ClCompile Include="Client\ImGui\imgui_demo.cpp" />
     <ClCompile Include="Client\ImGui\imgui_draw.cpp" />

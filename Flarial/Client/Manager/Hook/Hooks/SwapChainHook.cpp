@@ -67,14 +67,31 @@ static long __stdcall PresentDetour(IDXGISwapChain* pSwapChain, UINT syncInterva
 
 		Manager::onRender();
 
-        RenderUtils::D2DC->BeginDraw();
-        D2D1_RECT_F rect = D2D1::RectF(50.0f, 50.0f, 200.0f, 150.0f);
+        
 
-        ID2D1SolidColorBrush* brush = NULL;
-        RenderUtils::D2DC->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &brush);
-        RenderUtils::D2DC->DrawRectangle(rect, brush);
-        brush->Release();
-        RenderUtils::D2DC->EndDraw();
+		/*D2D1_RECT_F rect = D2D1::RectF(50.0f, 50.0f, 200.0f, 150.0f);
+
+		ID2D1SolidColorBrush* brush = NULL;
+		RenderUtils::D2DC->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &brush);
+		RenderUtils::D2DC->DrawRectangle(rect, brush);
+		brush->Release();
+		 */
+		
+
+		/*RenderUtils::D2DC->BeginDraw();
+		D2D_RECT_F rect = D2D1::RectF(50.0f, 50.0f, 200.0f, 150.0f);
+		ID2D1SolidColorBrush* brush;
+		RenderUtils::D2DC->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &brush);
+		RenderUtils::D2DC->FillRectangle(rect, brush);
+		brush->Release();
+		RenderUtils::D2DC->EndDraw();*/
+
+		RenderUtils::D2DC->BeginDraw();
+		FlarialGUI::Button(50.0f, 100.0f, D2D1::ColorF(0));
+		RenderUtils::D2DC->EndDraw();
+
+		
+        
 
 		ImGui::EndFrame();
 		ImGui::Render();
