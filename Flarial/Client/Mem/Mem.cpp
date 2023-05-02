@@ -14,7 +14,6 @@ HMODULE Mem::getDll() {
 
 uintptr_t Mem::findSig(const char* signature) {
 	static auto pattern_to_byte = [](const char* pattern) {
-
 		auto bytes = std::vector<std::optional<uint8_t>>{};
 		auto start = const_cast<char*>(pattern);
 		auto end = const_cast<char*>(pattern) + strlen(pattern);
@@ -30,10 +29,8 @@ uintptr_t Mem::findSig(const char* signature) {
 			else bytes.push_back((uint8_t)strtoul(current, &current, 16));
 		}
 		return bytes;
-
 	};
-
-	auto gameModule = (unsigned long long)(GetModuleHandleA("Minecraft.Windows.exe"));
+	auto gameModule = (uintptr_t)GetModuleHandleA("Minecraft.Windows.exe");
 	auto* const scanBytes = reinterpret_cast<uint8_t*>(gameModule);
 	auto* const dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(gameModule);
 	auto* const ntHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(scanBytes + dosHeader->e_lfanew);
@@ -41,18 +38,13 @@ uintptr_t Mem::findSig(const char* signature) {
 
 	const auto pattern = pattern_to_byte(signature);
 	const auto end = scanBytes + sizeOfCode;
-
 	auto it = std::search(
 		scanBytes, end,
 		pattern.cbegin(), pattern.cend(),
 		[](auto byte, auto opt) {
 			return !opt.has_value() || *opt == byte;
 		});
-
-	auto ret = it != end ? (unsigned long long)it : 0u;
-	if (!ret)
-		return 0;
-
+	auto ret = it != end ? (uintptr_t)it : 0u;
 	return ret;
 };
 
