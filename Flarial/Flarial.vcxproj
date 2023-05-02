@@ -143,6 +143,7 @@
     <ClInclude Include="Client\Client.h" />
     <ClInclude Include="Client\Config\Config.h" />
     <ClInclude Include="Client\Config\json\json.hpp" />
+    <ClInclude Include="Client\FlarialGUI\FlarialWidgets.h" />
     <ClInclude Include="Client\ImGui\Fonts\Minecraft.h" />
     <ClInclude Include="Client\ImGui\Fonts\ProductSans.h" />
     <ClInclude Include="Client\ImGui\Fonts\tahoma.h" />
