@@ -9,6 +9,7 @@ public:
 	static int16_t fps;
 	static int16_t rcps;
 	static int16_t lcps;
+	static inline Vec2<float> mousepos;
 public:
 	static ClientInstance* clientInstance;
 	static LoopbackPacketSender* packetSender;

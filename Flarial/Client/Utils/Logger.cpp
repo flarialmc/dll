@@ -4,6 +4,7 @@
 #include <format>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 
 std::string Logger::file = Utils::getRoamPath() + "\\Flarial\\Output.txt";
 
@@ -32,36 +33,36 @@ void Logger::init() {
 
 void Logger::debug(std::string str) {
 	std::string log = std::format("[DEBUG]: {}", str);
-
+	std::cout << str  << std::endl;
 	writeToFile(log);
 }
 
 void Logger::info(std::string str) {
 	std::string log = std::format("[INFO]: {}", str);
-
+	std::cout << str << std::endl;
 	writeToFile(log);
 }
 
 void Logger::warn(std::string str) {
 	std::string log = std::format("[WARN]: {}", str);
-
+	std::cout << str << std::endl;
 	writeToFile(log);
 }
 
 void Logger::error(std::string str) {
 	std::string log = std::format("[ERROR]: {}", str);
-
+	std::cout << str << std::endl;
 	writeToFile(log);
 }
 
 void Logger::fatal(std::string str) {
 	std::string log = std::format("[FATAL]: {}", str);
-
+	std::cout << str << std::endl;
 	writeToFile(log);
 }
 
 void Logger::trace(std::string str) {
 	std::string log = std::format("[TRACE]: {}", str);
-
+	std::cout << str << std::endl;
 	writeToFile(log);
 }

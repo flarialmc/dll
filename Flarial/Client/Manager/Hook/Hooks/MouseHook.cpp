@@ -18,9 +18,9 @@ void MouseDetour(void* a1, MouseAction action, int8_t held, int16_t mouseX, int1
 			io.MouseWheel = held < 0 ? -0.5f : 0.5f;
 		}
 	}
-
+	MC::mousepos.x = mouseX;
+	MC::mousepos.y = mouseY;
 	Manager::onMouse(action, cancel);
-
 	if (!cancel) {
 		return oMouse(a1, action, held, mouseX, mouseY, a6, a7, a8);
 	}
