@@ -10,7 +10,8 @@ void GameModeTickDetour(GameMode* gm) {
 }
 
 GameModeHook::GameModeHook() : Hook() {
-	uintptr_t sigOffset = Mem::findSig(Signatures::GameMode);
-
-	Mem::HookVFunc<9>(sigOffset, (void*)GameModeTickDetour, (void**)&oTick, "GameModeTick");
+	uintptr_t sig = Mem::findSig(Signatures::GameMode);
+	int offset = *reinterpret_cast<int*>(sig + 3);
+	uintptr_t** gameModeVtable = reinterpret_cast<uintptr_t**>(sig + offset + 7);
+	Mem::hookFunc((void*)gameModeVtable[9], (void*)GameModeTickDetour, (void**)&oTick, "Gamemode Tick");
 }
