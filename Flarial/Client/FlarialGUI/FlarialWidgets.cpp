@@ -9,13 +9,15 @@ static bool CursorInRect(float rectX, float rectY, float width, float height) {
     }
     return false;
 }
- void FlarialGUI::Button(const float x, const float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width, const float height) {
+ bool FlarialGUI::Button(const float x, const float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width, const float height) {
+    
         ID2D1SolidColorBrush* brush;
+    
         if(CursorInRect(x, y, width, height))
             RenderUtils::D2DC->CreateSolidColorBrush(D2D1::ColorF(color.r - darkenAmount,color.g - darkenAmount,color.b - darkenAmount,color.a), &brush); 
         else
             RenderUtils::D2DC->CreateSolidColorBrush(color, &brush);
-        
+
         D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
         RenderUtils::D2DC->FillRectangle(rect, brush);
 
@@ -37,10 +39,21 @@ static bool CursorInRect(float rectX, float rectY, float width, float height) {
         textBrush->Release();
         writeFactory->Release();
         textFormat->Release();
+
+    if(CursorInRect(x, y, width, height) && MC::mouseaction == MouseAction::Left && !MC::held)
+    {
+        MC::mouseaction = MouseAction::None;
+        return true;
+    } else
+    {
+        MC::mouseaction = MouseAction::None;
+        return false;
+    }
  }
 
-  void FlarialGUI::RoundedButton(const float x, const float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width, const float height,float radiusX, float radiusY) {
-      ID2D1SolidColorBrush* brush;
+  bool FlarialGUI::RoundedButton(const float x, const float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width, const float height,float radiusX, float radiusY) {
+
+    ID2D1SolidColorBrush* brush;
       if(CursorInRect(x, y, width, height))
             RenderUtils::D2DC->CreateSolidColorBrush(D2D1::ColorF(color.r - darkenAmount,color.g - darkenAmount,color.b - darkenAmount,color.a), &brush); 
         else
@@ -65,5 +78,14 @@ static bool CursorInRect(float rectX, float rectY, float width, float height) {
     textBrush->Release();
     writeFactory->Release();
     textFormat->Release();
-    
+
+    if(CursorInRect(x, y, width, height) && MC::mouseaction == MouseAction::Left && !MC::held)
+    {
+        MC::mouseaction = MouseAction::None;
+        return true;
+    } else
+    {
+        MC::mouseaction = MouseAction::None;
+        return false;
+    }
   }

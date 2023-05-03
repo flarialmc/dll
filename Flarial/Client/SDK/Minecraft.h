@@ -10,6 +10,8 @@ public:
 	static int16_t rcps;
 	static int16_t lcps;
 	static inline Vec2<float> mousepos;
+	static inline MouseAction mouseaction;
+	static inline bool held;
 public:
 	static ClientInstance* clientInstance;
 	static LoopbackPacketSender* packetSender;
