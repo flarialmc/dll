@@ -87,7 +87,7 @@ static long __stdcall PresentDetour(IDXGISwapChain* pSwapChain, UINT syncInterva
 		RenderUtils::D2DC->EndDraw();*/
 
 		RenderUtils::D2DC->BeginDraw();
-		FlarialGUI::RoundedButton(50.0f, 100.0f, D2D1::ColorF(D2D1::ColorF::Red), D2D1::ColorF(D2D1::ColorF::White), L"AmongUs");
+		FlarialGUI::VersionCard(50.0f, 100.0f);
 		RenderUtils::D2DC->EndDraw();
 
 		
