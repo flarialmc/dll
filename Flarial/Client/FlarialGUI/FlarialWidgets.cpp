@@ -91,12 +91,10 @@ static bool CursorInRect(float rectX, float rectY, float width, float height) {
     }
   }
 
- void FlarialGUI::VersionCard(const float x, const float y, const float width, const float height)
+ void FlarialGUI::ModCard(const float x, const float y, const float width, const float height)
 {    
-    
     RoundedRect(x, y + 10, D2D1::ColorF(47.0f/255.0f, 32.0f/255.0f, 34.0f/255.0f));
     RoundedRectOnlyTopCorner(x, y, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f));
-    
  }
 
 void FlarialGUI::RoundedRect(const float x, const float y, const D2D_COLOR_F color, const float width, const float height,float radiusX, float radiusY) {

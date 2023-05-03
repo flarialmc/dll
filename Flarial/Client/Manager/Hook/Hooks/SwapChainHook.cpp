@@ -87,7 +87,7 @@ static long __stdcall PresentDetour(IDXGISwapChain* pSwapChain, UINT syncInterva
 		RenderUtils::D2DC->EndDraw();*/
 
 		RenderUtils::D2DC->BeginDraw();
-		FlarialGUI::VersionCard(50.0f, 100.0f);
+		FlarialGUI::ModCard(50.0f, 100.0f);
 		RenderUtils::D2DC->EndDraw();
 
 		
