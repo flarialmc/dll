@@ -21,7 +21,6 @@ void MouseDetour(void* a1, MouseAction action, int8_t held, int16_t mouseX, int1
 	MC::mousepos.x = mouseX;
 	MC::mousepos.y = mouseY;
 
-	if(MC::mouseaction == MouseAction::None) Logger::debug("None");
 	MC::mouseaction = action;
 	MC::held = held;
 
