@@ -96,7 +96,7 @@ static bool CursorInRect(float rectX, float rectY, float width, float height) {
     RoundedRectOnlyTopCorner(x, y, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), 150, 75);
     RoundedRectWithImageAndText(x + 10, y + 80, width, height, D2D1::ColorF(112.0f / 255.0f, 93.0f / 255.0f, 96.0f / 255.0f), L"gear.png", width, height, L"");
     if(RoundedButton(x + 42, y + 80, D2D1::ColorF(26.0f / 255.0f, 193.0f / 255.0f, 63.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Enabled", 102.2f, 26.5f, 6, 6)) Logger::debug("clicked");
-
+//
     DrawFlarialText(x, y, modname, D2D1::ColorF(D2D1::ColorF::White), 100, height);
  }
 
