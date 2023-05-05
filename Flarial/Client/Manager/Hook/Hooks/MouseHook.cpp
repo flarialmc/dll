@@ -31,6 +31,7 @@ void MouseDetour(void* a1, MouseAction action, int8_t held, int16_t mouseX, int1
 	}
 	
 	MC::mouseaction = action;
+	if(action != MouseAction::None)
 	MC::held = held;
 	
 	Manager::onMouse(action, cancel);

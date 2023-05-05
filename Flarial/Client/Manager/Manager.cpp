@@ -23,11 +23,16 @@
 #include "Hook/Hooks/EntityHook.h"
 #include "Hook/Hooks/MouseHook.h"
 #include "Hook/Hooks/KeyHook.h"
+#include <iostream>
+#include<Windows.h>
+#pragma comment(lib, "urlmon.lib")
 
 std::vector<Hook*> Manager::hooks;
 std::vector<Module*> Manager::modules;
 
 void Manager::init() {
+
+	
 	hooks.push_back(new RenderContextHook);
 	hooks.push_back(new PacketSenderHook);
 	hooks.push_back(new PacketHandlerHook);
@@ -40,11 +45,11 @@ void Manager::init() {
 	MH_EnableHook(MH_ALL_HOOKS);
 
 	modules.push_back(new FpsCounter);
-	/*modules.push_back(new AutoSprint);
+	modules.push_back(new AutoSprint);
 	modules.push_back(new AutoGG);
 	modules.push_back(new ClickGui);
 	modules.push_back(new TestMod);
-	modules.push_back(new Uninject);*/
+	modules.push_back(new Uninject);
 }
 
 void Manager::onKey(uintptr_t key, bool held, bool& cancel) {

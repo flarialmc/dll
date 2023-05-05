@@ -95,27 +95,8 @@ static bool CursorInRect(float rectX, float rectY, float width, float height) {
     }
   }
 
- void FlarialGUI::ModCard(const float x, const float y, Module* mod, const float width, const float height)
-{
-    
-    RoundedRect(x, y + 35, D2D1::ColorF(47.0f/255.0f, 32.0f/255.0f, 34.0f/255.0f), 150.6f);
-    RoundedRectOnlyTopCorner(x, y, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), 150, 75);
-    RoundedRectWithImageAndText(x + 10, y + 80, width, height, D2D1::ColorF(112.0f / 255.0f, 93.0f / 255.0f, 96.0f / 255.0f), L"gear.png", width, height, L"");
-    std::string text = "Enabled";
-    text = mod->enabled ? "Enabled" : "Disabled";
-    D2D1_COLOR_F color = D2D1::ColorF(26.0f / 255.0f, 193.0f / 255.0f, 63.0f / 255.0f);
-    color = mod->enabled ? D2D1::ColorF(26.0f / 255.0f, 193.0f / 255.0f, 63.0f / 255.0f) : D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f);
-    if(RoundedButton(x + 42, y + 80, color, D2D1::ColorF(D2D1::ColorF::White), to_wide(text).c_str(), 102.2f, 26.5f, 6, 6))
-    {
-        mod->enabled = !mod->enabled;
-        mod->enabled ? D2D1::ColorF(26.0f / 255.0f, 193.0f / 255.0f, 63.0f / 255.0f) : D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f);
-        Logger::debug(std::to_string(mod->enabled));
-    }
+void FlarialGUI::RoundedRect(float x, float y, const D2D_COLOR_F color, const float width, const float height,float radiusX, float radiusY) {
 
-    FlarialText(x, y, to_wide(mod->name).c_str(), D2D1::ColorF(D2D1::ColorF::White), 100, height);
- }
-
-void FlarialGUI::RoundedRect(const float x, float y, const D2D_COLOR_F color, const float width, const float height,float radiusX, float radiusY) {
     
     if(isInScrollView && y + scrollpos < y) y += scrollpos;
     
@@ -126,7 +107,7 @@ void FlarialGUI::RoundedRect(const float x, float y, const D2D_COLOR_F color, co
     brush->Release();
 }
 
- void FlarialGUI::RoundedRectOnlyTopCorner(const float x, float y, D2D_COLOR_F color, const float width, const float height)
+ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, const float width, const float height)
  {
     
     if(isInScrollView && y + scrollpos > y) y += scrollpos;
@@ -330,6 +311,47 @@ void FlarialGUI::ScrollBar(float x, float y, float width, float height, float ra
     D2D1_ROUNDED_RECT whiteRect = D2D1::RoundedRect(D2D1::RectF(x, whiteY, x + width, whiteY + (height * 69.5/100)), radius, radius);
     RenderUtils::D2DC->FillRoundedRectangle(&whiteRect, whitebrush);
     whitebrush->Release();
+}
+
+void FlarialGUI::SetWindowRect(float x, float y, float width, float height)
+{
+    isInWindowRect = true;
+
+    if(hasBeenMoved)
+    {
+        x = movedX;
+        y = movedY;
+    }
+    
+    if(CursorInRect(x, y, width, height) && MC::held)
+    {
+        Logger::debug("yes");
+        isMovingElement = true;
+        hasBeenMoved = true;
+        movedX = MC::mousepos.x - width / 2.0f;
+        movedY = MC::mousepos.y - height / 2.0f;
+    } else if(MC::held && isMovingElement)
+    {
+        Logger::debug("technically yes");
+        isMovingElement = true;
+        hasBeenMoved = true;
+        movedX = MC::mousepos.x - width / 2.0f;
+        movedY = MC::mousepos.y - height / 2.0f;
+        
+    }
+
+    if(MC::mouseaction == MouseAction::None && !MC::held || MC::mouseaction == MouseAction::Left && !MC::held)
+    {
+        isMovingElement = false;
+    }
+
+    
+    RoundedRectOnlyTopCorner(x, y, D2D1::ColorF(D2D1::ColorF::LightGray), width, height);
+}
+    
+void FlarialGUI::UnsetWindowRect()
+{
+    isInWindowRect = false;
 }
 
 

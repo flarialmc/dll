@@ -195,6 +195,9 @@
     <ClInclude Include="Client\Client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Client\FlarialGUI\FlarialWidgets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client\Config\Config.cpp">
@@ -297,6 +300,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Flarial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Client\FlarialGUI\FlarialWidgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

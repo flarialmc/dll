@@ -1,4 +1,6 @@
 #include "SwapChainHook.h"
+
+
 #include "../../../ImGui/Fonts/Minecraft.h"
 
 static std::chrono::high_resolution_clock fpsclock;
@@ -89,7 +91,16 @@ static long __stdcall PresentDetour(IDXGISwapChain* pSwapChain, UINT syncInterva
 		RenderUtils::D2DC->BeginDraw();
 		Vec2<float> center = FlarialGUI::GetCenterXY(160.0f, 160.0f);
 
-		for (Module* mod : Manager::modules)
+		FlarialGUI::SetWindowRect(center.x - 120, center.y, 40, 8);
+		ClickGUIElements::ModCard(50.0f, 100.0f, Manager::modules.front(), 25.0f, 25.0f);
+		FlarialGUI::UnsetWindowRect();
+		
+		/*if(MC::held) Logger::debug("held " + std::to_string(MC::mouseaction));
+		else Logger::debug(std::to_string(MC::mouseaction));*/
+		
+		FlarialGUI::RoundedRect(center.x + 120, center.y + 120, D2D1::ColorF(D2D1::ColorF::White));
+		
+		/*for (Module* mod : Manager::modules)
 		{
 
 			FlarialGUI::ModCard(50.0f, 100.0f, mod, 25.0f, 25.0f);
@@ -97,7 +108,7 @@ static long __stdcall PresentDetour(IDXGISwapChain* pSwapChain, UINT syncInterva
 		}
 		
 		 
-		/*FlarialGUI::SetScrollView(center.x, center.y, 160.0f, 160.0f);
+		FlarialGUI::SetScrollView(center.x, center.y, 160.0f, 160.0f);
 		FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(D2D1::ColorF::LightGray), 160.0f, 160.0f);
 		FlarialGUI::UnsetScrollView(); 
 		FlarialGUI::ScrollBar(center.x + 300, center.y, 10, 160, 2);*/

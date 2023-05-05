@@ -128,8 +128,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;FLARIAL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -143,6 +144,7 @@
     <ClInclude Include="Client\Client.h" />
     <ClInclude Include="Client\Config\Config.h" />
     <ClInclude Include="Client\Config\json\json.hpp" />
+    <ClInclude Include="Client\FlarialGUI\ClickGUIElements.h" />
     <ClInclude Include="Client\FlarialGUI\FlarialWidgets.h" />
     <ClInclude Include="Client\ImGui\Fonts\Minecraft.h" />
     <ClInclude Include="Client\ImGui\Fonts\ProductSans.h" />
@@ -205,6 +207,7 @@
   <ItemGroup>
     <ClCompile Include="Client\Client.cpp" />
     <ClCompile Include="Client\Config\Config.cpp" />
+    <ClCompile Include="Client\FlarialGUI\ClickGUIElements.cpp" />
     <ClCompile Include="Client\FlarialGUI\FlarialWidgets.cpp" />
     <ClCompile Include="Client\ImGui\imgui.cpp" />
     <ClCompile Include="Client\ImGui\imgui_demo.cpp" />
