@@ -40,11 +40,11 @@ void Manager::init() {
 	MH_EnableHook(MH_ALL_HOOKS);
 
 	modules.push_back(new FpsCounter);
-	modules.push_back(new AutoSprint);
+	/*modules.push_back(new AutoSprint);
 	modules.push_back(new AutoGG);
 	modules.push_back(new ClickGui);
 	modules.push_back(new TestMod);
-	modules.push_back(new Uninject);
+	modules.push_back(new Uninject);*/
 }
 
 void Manager::onKey(uintptr_t key, bool held, bool& cancel) {

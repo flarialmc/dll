@@ -1,7 +1,9 @@
 ﻿
 #include "FlarialWidgets.h"
 
-    // TO DO: VERSION CARD
+#include "../Manager/Module/Module.h"
+
+// TO DO: VERSION CARD
 static bool CursorInRect(float rectX, float rectY, float width, float height) {
     if (MC::mousepos.x >= rectX && MC::mousepos.x <= rectX + width && MC::mousepos.y >= rectY && MC::mousepos.y <= rectY + height) {
         return true;
@@ -93,15 +95,24 @@ static bool CursorInRect(float rectX, float rectY, float width, float height) {
     }
   }
 
- void FlarialGUI::ModCard(const float x, const float y, const wchar_t* modname, const float width, const float height)
+ void FlarialGUI::ModCard(const float x, const float y, Module* mod, const float width, const float height)
 {
     
     RoundedRect(x, y + 35, D2D1::ColorF(47.0f/255.0f, 32.0f/255.0f, 34.0f/255.0f), 150.6f);
     RoundedRectOnlyTopCorner(x, y, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), 150, 75);
     RoundedRectWithImageAndText(x + 10, y + 80, width, height, D2D1::ColorF(112.0f / 255.0f, 93.0f / 255.0f, 96.0f / 255.0f), L"gear.png", width, height, L"");
-    if(RoundedButton(x + 42, y + 80, D2D1::ColorF(26.0f / 255.0f, 193.0f / 255.0f, 63.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Enabled", 102.2f, 26.5f, 6, 6)) Logger::debug("clicked");
-//
-    FlarialText(x, y, modname, D2D1::ColorF(D2D1::ColorF::White), 100, height);
+    std::string text = "Enabled";
+    text = mod->enabled ? "Enabled" : "Disabled";
+    D2D1_COLOR_F color = D2D1::ColorF(26.0f / 255.0f, 193.0f / 255.0f, 63.0f / 255.0f);
+    color = mod->enabled ? D2D1::ColorF(26.0f / 255.0f, 193.0f / 255.0f, 63.0f / 255.0f) : D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f);
+    if(RoundedButton(x + 42, y + 80, color, D2D1::ColorF(D2D1::ColorF::White), to_wide(text).c_str(), 102.2f, 26.5f, 6, 6))
+    {
+        mod->enabled = !mod->enabled;
+        mod->enabled ? D2D1::ColorF(26.0f / 255.0f, 193.0f / 255.0f, 63.0f / 255.0f) : D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f);
+        Logger::debug(std::to_string(mod->enabled));
+    }
+
+    FlarialText(x, y, to_wide(mod->name).c_str(), D2D1::ColorF(D2D1::ColorF::White), 100, height);
  }
 
 void FlarialGUI::RoundedRect(const float x, float y, const D2D_COLOR_F color, const float width, const float height,float radiusX, float radiusY) {
