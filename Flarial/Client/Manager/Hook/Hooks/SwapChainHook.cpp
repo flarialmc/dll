@@ -88,16 +88,16 @@ static long __stdcall PresentDetour(IDXGISwapChain* pSwapChain, UINT syncInterva
 
 		RenderUtils::D2DC->BeginDraw();
 		Vec2<float> center = FlarialGUI::GetCenterXY(160.0f, 160.0f);
+		FlarialGUI::ModCard(50.0f, 100.0f, L"FPS", 25.0f, 25.0f);
+		
 		FlarialGUI::SetScrollView(center.x, center.y, 160.0f, 160.0f);
-		FlarialGUI::RoundedRect(center.x, center.y + FlarialGUI::scrollpos, D2D1::ColorF(D2D1::ColorF::LightGray), 160.0f, 160.0f);
-		
-		//FlarialGUI::ModCard(50.0f, 100.0f, L"FPS", 25.0f, 25.0f);
-		
+		FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(D2D1::ColorF::LightGray), 160.0f, 160.0f);
 		FlarialGUI::UnsetScrollView();
+		
 		RenderUtils::D2DC->EndDraw();
 
 		
-        
+        //+ scrollpos
 
 		ImGui::EndFrame();
 		ImGui::Render();
