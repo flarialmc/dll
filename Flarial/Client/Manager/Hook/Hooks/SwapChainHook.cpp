@@ -93,6 +93,8 @@ static long __stdcall PresentDetour(IDXGISwapChain* pSwapChain, UINT syncInterva
 		FlarialGUI::SetScrollView(center.x, center.y, 160.0f, 160.0f);
 		FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(D2D1::ColorF::LightGray), 160.0f, 160.0f);
 		FlarialGUI::UnsetScrollView();
+
+		FlarialGUI::DrawScrollBar(center.x + 300, center.y, 10, 160, 2);
 		
 		RenderUtils::D2DC->EndDraw();
 

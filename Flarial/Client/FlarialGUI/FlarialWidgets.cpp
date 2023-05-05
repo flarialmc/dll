@@ -285,23 +285,23 @@ Vec2<float> FlarialGUI::GetCenterXY(float rectWidth, float rectHeight)
     return xy;
 }
 
-void RenderUtils::DrawScrollBar(float x, float y, float width, float height, float radius, D2D1::ColorF fillColor, D2D1::ColorF borderColor)
+void FlarialGUI::DrawScrollBar(float x, float y, float width, float height, float radius)
 {
-    // Calculate the size and position of the white bar
-    float whiteBarWidth = width / 4.0f;
-    float whiteBarHeight = (height / maxscrollpos) * height;
-    float whiteBarX = x + (width / 2.0f) - (whiteBarWidth / 2.0f);
-    float whiteBarY = y + ((height - whiteBarHeight) * (scrollpos / maxscrollpos));
-
+    float whiteY = y + scrollpos;
+    if(whiteY < y) whiteY = y;
+    if(whiteY > y + (height * 30/100)) whiteY = y + (height * 30/100);
     // Draw the gray bar
+    ID2D1SolidColorBrush* graybrush;
+    RenderUtils::D2DC->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gray), &graybrush);
     D2D1_ROUNDED_RECT grayRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radius, radius);
-    D2DC->FillRoundedRectangle(&grayRect, D2D1::ColorF(D2D1::ColorF::LightGray));
-    D2DC->DrawRoundedRectangle(&grayRect, borderColor, 1.0f);
-
+    RenderUtils::D2DC->FillRoundedRectangle(&grayRect, graybrush);
+    graybrush->Release();
     // Draw the white bar
-    D2D1_ROUNDED_RECT whiteRect = D2D1::RoundedRect(D2D1::RectF(whiteBarX, whiteBarY, whiteBarX + whiteBarWidth, whiteBarY + whiteBarHeight), radius, radius);
-    D2DC->FillRoundedRectangle(&whiteRect, fillColor);
-    D2DC->DrawRoundedRectangle(&whiteRect, borderColor, 1.0f);
+    ID2D1SolidColorBrush* whitebrush;
+    RenderUtils::D2DC->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &whitebrush);
+    D2D1_ROUNDED_RECT whiteRect = D2D1::RoundedRect(D2D1::RectF(x, whiteY, x + width, whiteY + (height * 70/100)), radius, radius);
+    RenderUtils::D2DC->FillRoundedRectangle(&whiteRect, whitebrush);
+    whitebrush->Release();
 }
 
 
