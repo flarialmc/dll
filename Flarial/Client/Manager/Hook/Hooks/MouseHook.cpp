@@ -25,13 +25,13 @@ void MouseDetour(void* a1, MouseAction action, int8_t held, int16_t mouseX, int1
 
 	if(action == Scroll)
 	{
-		FlarialGUI::scrollpos += held < 0 ? -10.5f : 10.5f;
+		FlarialGUI::scrollpos += held < 0 ? 0 - FlarialGUI::scrollposmodifier : FlarialGUI::scrollposmodifier;
 		FlarialGUI::barscrollpos += held < 0 ? 0 - FlarialGUI::barscrollposmodifier : FlarialGUI::barscrollposmodifier;
+		Logger::debug(std::to_string(FlarialGUI::scrollpos));
 	}
 	
 	MC::mouseaction = action;
 	MC::held = held;
-
 	
 	Manager::onMouse(action, cancel);
 	if (!cancel) {

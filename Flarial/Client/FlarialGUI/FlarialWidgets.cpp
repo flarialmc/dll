@@ -105,9 +105,9 @@ static bool CursorInRect(float rectX, float rectY, float width, float height) {
  }
 
 void FlarialGUI::RoundedRect(const float x, float y, const D2D_COLOR_F color, const float width, const float height,float radiusX, float radiusY) {
-
     
     if(isInScrollView && y + scrollpos < y) y += scrollpos;
+    
     ID2D1SolidColorBrush* brush;
     RenderUtils::D2DC->CreateSolidColorBrush(color, &brush);
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
@@ -284,7 +284,6 @@ Vec2<float> FlarialGUI::GetCenterXY(float rectWidth, float rectHeight)
     Vec2<float> xy;
     xy.x = (RenderUtils::D2DC->GetSize().width - rectWidth)/ 2.0f;
     xy.y = (RenderUtils::D2DC->GetSize().height - rectHeight) / 2.0f;
-    Logger::debug(std::to_string(xy.x) + " " + std::to_string(xy.y));
     return xy;
 }
 
@@ -292,10 +291,20 @@ void FlarialGUI::DrawScrollBar(float x, float y, float width, float height, floa
 {
     float whiteY;
     
-    if(y - barscrollpos < y + (height * 30/100)) whiteY = y - (barscrollpos);
-    else whiteY = y + (height * 30/100);
+    if(y - barscrollpos < y + (height * 30.5/100)) whiteY = y - (barscrollpos);
+    else
+    {
+        whiteY = y + (height * 30.5/100);
+        barscrollpos += barscrollposmodifier;
+        scrollpos += scrollposmodifier;
+    }
 
-    if(y + barscrollpos > y) whiteY = y;
+    if(y + barscrollpos > y)
+    {
+        whiteY = y;
+        barscrollpos = 0;
+        scrollpos = 0;
+    }
 
      
     // Draw the gray bar
@@ -307,7 +316,7 @@ void FlarialGUI::DrawScrollBar(float x, float y, float width, float height, floa
     // Draw the white bar
     ID2D1SolidColorBrush* whitebrush;
     RenderUtils::D2DC->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &whitebrush);
-    D2D1_ROUNDED_RECT whiteRect = D2D1::RoundedRect(D2D1::RectF(x, whiteY, x + width, whiteY + (height * 70/100)), radius, radius);
+    D2D1_ROUNDED_RECT whiteRect = D2D1::RoundedRect(D2D1::RectF(x, whiteY, x + width, whiteY + (height * 69.5/100)), radius, radius);
     RenderUtils::D2DC->FillRoundedRectangle(&whiteRect, whitebrush);
     whitebrush->Release();
 }
