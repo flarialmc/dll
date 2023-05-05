@@ -127,7 +127,6 @@ void FlarialGUI::RoundedRect(const float x, const float y, const D2D_COLOR_F col
 
     D2D1_POINT_2F startPoint = D2D1::Point2F(rect.left + radiusX, rect.top);
     D2D1_POINT_2F topRightArcEndPoint = D2D1::Point2F(rect.right - radiusX, rect.top);
-    D2D1_POINT_2F topLeftArcEndPoint = D2D1::Point2F(rect.left, rect.top + radiusY);
     D2D1_POINT_2F endPoint = D2D1::Point2F(rect.right, rect.bottom);
 
     sink->BeginFigure(startPoint, D2D1_FIGURE_BEGIN_FILLED);
