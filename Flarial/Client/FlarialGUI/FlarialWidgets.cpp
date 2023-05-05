@@ -13,7 +13,7 @@ static bool CursorInRect(float rectX, float rectY, float width, float height) {
 
  bool FlarialGUI::Button(const float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width, const float height) {
 
-        if(isInScrollView) y += scrollpos;
+        if(isInScrollView && y + scrollpos < y) y += scrollpos;
     
         ID2D1SolidColorBrush* brush;
         if(CursorInRect(x, y, width, height))
@@ -56,7 +56,7 @@ static bool CursorInRect(float rectX, float rectY, float width, float height) {
 
   bool FlarialGUI::RoundedButton(const float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width, const float height,float radiusX, float radiusY) {
 
-    if(isInScrollView) y += scrollpos;
+    if(isInScrollView && y + scrollpos > y) y += scrollpos;
     ID2D1SolidColorBrush* brush;
       if(CursorInRect(x, y, width, height))
             RenderUtils::D2DC->CreateSolidColorBrush(D2D1::ColorF(color.r - darkenAmount,color.g - darkenAmount,color.b - darkenAmount,color.a), &brush); 
@@ -95,6 +95,7 @@ static bool CursorInRect(float rectX, float rectY, float width, float height) {
 
  void FlarialGUI::ModCard(const float x, const float y, const wchar_t* modname, const float width, const float height)
 {
+    
     RoundedRect(x, y + 35, D2D1::ColorF(47.0f/255.0f, 32.0f/255.0f, 34.0f/255.0f), 150.6f);
     RoundedRectOnlyTopCorner(x, y, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), 150, 75);
     RoundedRectWithImageAndText(x + 10, y + 80, width, height, D2D1::ColorF(112.0f / 255.0f, 93.0f / 255.0f, 96.0f / 255.0f), L"gear.png", width, height, L"");
@@ -105,7 +106,8 @@ static bool CursorInRect(float rectX, float rectY, float width, float height) {
 
 void FlarialGUI::RoundedRect(const float x, float y, const D2D_COLOR_F color, const float width, const float height,float radiusX, float radiusY) {
 
-    if(isInScrollView) y += scrollpos;
+    
+    if(isInScrollView && y + scrollpos < y) y += scrollpos;
     ID2D1SolidColorBrush* brush;
     RenderUtils::D2DC->CreateSolidColorBrush(color, &brush);
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
@@ -115,7 +117,8 @@ void FlarialGUI::RoundedRect(const float x, float y, const D2D_COLOR_F color, co
 
  void FlarialGUI::RoundedRectOnlyTopCorner(const float x, float y, D2D_COLOR_F color, const float width, const float height)
  {
-    if(isInScrollView) y += scrollpos;
+    
+    if(isInScrollView && y + scrollpos > y) y += scrollpos;
     D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
     
     ID2D1Factory* factory;
@@ -181,7 +184,7 @@ void FlarialGUI::RoundedRect(const float x, float y, const D2D_COLOR_F color, co
 
 void FlarialGUI::RoundedRectWithImageAndText(const float x, float y, const float width, const float height, const D2D1_COLOR_F color, const wchar_t* imagePath, const int imageWidth, const int imageHeight, const wchar_t* text) {
 
-    if(isInScrollView) y += scrollpos;
+    if(isInScrollView && y + scrollpos > y) y += scrollpos;
     ID2D1SolidColorBrush* brush;
     RenderUtils::D2DC->CreateSolidColorBrush(color, &brush);
 
@@ -219,7 +222,7 @@ void FlarialGUI::DrawImage(const std::string imageName, const D2D1_RECT_F rect, 
 
 void FlarialGUI::DrawFlarialText(const float x, float y, const wchar_t* text, D2D1_COLOR_F color, const float width, const float height)
 {
-    if(isInScrollView) y += scrollpos;
+    if(isInScrollView && y + scrollpos > y) y += scrollpos;
     ID2D1SolidColorBrush* brush;
     RenderUtils::D2DC->CreateSolidColorBrush(color, &brush);
 
@@ -287,9 +290,14 @@ Vec2<float> FlarialGUI::GetCenterXY(float rectWidth, float rectHeight)
 
 void FlarialGUI::DrawScrollBar(float x, float y, float width, float height, float radius)
 {
-    float whiteY = y + scrollpos;
-    if(whiteY < y) whiteY = y;
-    if(whiteY > y + (height * 30/100)) whiteY = y + (height * 30/100);
+    float whiteY;
+    
+    if(y - scrollpos < y + (height * 30/100)) whiteY = y - scrollpos;
+    else whiteY = y + (height * 30/100);
+
+    if(y + scrollpos > y) whiteY = y;
+
+     
     // Draw the gray bar
     ID2D1SolidColorBrush* graybrush;
     RenderUtils::D2DC->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gray), &graybrush);

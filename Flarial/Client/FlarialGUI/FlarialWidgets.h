@@ -10,7 +10,7 @@ public:
 	static const float inline darkenAmount = 0.2f;
 	static bool inline isInScrollView = false;
 	static float inline scrollpos = 0;
-	static float inline maxscrollpos = 80;
+	static int inline allheight = 0;
 	static bool Button(const float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width = 100.0f, const float height = 160.0f);
 	static bool RoundedButton(const float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width = 160.0f, const float height = 100.0f, const float radiusX = 10.0f, const float radiusY = 10.0f);
 	static void ModCard(const float x, float y, const wchar_t* modname, const float width = 160, const float height = 100);
