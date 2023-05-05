@@ -292,10 +292,10 @@ void FlarialGUI::DrawScrollBar(float x, float y, float width, float height, floa
 {
     float whiteY;
     
-    if(y - scrollpos < y + (height * 30/100)) whiteY = y - scrollpos;
+    if(y - barscrollpos < y + (height * 30/100)) whiteY = y - (barscrollpos);
     else whiteY = y + (height * 30/100);
 
-    if(y + scrollpos > y) whiteY = y;
+    if(y + barscrollpos > y) whiteY = y;
 
      
     // Draw the gray bar

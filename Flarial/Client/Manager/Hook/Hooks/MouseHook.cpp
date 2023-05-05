@@ -24,7 +24,10 @@ void MouseDetour(void* a1, MouseAction action, int8_t held, int16_t mouseX, int1
 	MC::mousepos.y = mouseY;
 
 	if(action == Scroll)
-	FlarialGUI::scrollpos += held < 0 ? -10.5f : 10.5f;
+	{
+		FlarialGUI::scrollpos += held < 0 ? -10.5f : 10.5f;
+		FlarialGUI::barscrollpos += held < 0 ? 0 - FlarialGUI::barscrollposmodifier : FlarialGUI::barscrollposmodifier;
+	}
 	
 	MC::mouseaction = action;
 	MC::held = held;
