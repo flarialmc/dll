@@ -101,7 +101,7 @@ static bool CursorInRect(float rectX, float rectY, float width, float height) {
     RoundedRectWithImageAndText(x + 10, y + 80, width, height, D2D1::ColorF(112.0f / 255.0f, 93.0f / 255.0f, 96.0f / 255.0f), L"gear.png", width, height, L"");
     if(RoundedButton(x + 42, y + 80, D2D1::ColorF(26.0f / 255.0f, 193.0f / 255.0f, 63.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Enabled", 102.2f, 26.5f, 6, 6)) Logger::debug("clicked");
 //
-    DrawFlarialText(x, y, modname, D2D1::ColorF(D2D1::ColorF::White), 100, height);
+    FlarialText(x, y, modname, D2D1::ColorF(D2D1::ColorF::White), 100, height);
  }
 
 void FlarialGUI::RoundedRect(const float x, float y, const D2D_COLOR_F color, const float width, const float height,float radiusX, float radiusY) {
@@ -192,7 +192,7 @@ void FlarialGUI::RoundedRectWithImageAndText(const float x, float y, const float
 
     RenderUtils::D2DC->FillRoundedRectangle(roundedRect, brush);
 
-    DrawImage("gear.png", roundedRect.rect, imageWidth, imageHeight);
+    Image("gear.png", roundedRect.rect, imageWidth, imageHeight);
 
     // Draw text
     IDWriteFactory* writeFactory;
@@ -206,7 +206,7 @@ void FlarialGUI::RoundedRectWithImageAndText(const float x, float y, const float
     RenderUtils::D2DC->DrawTextW(text, (UINT32)wcslen(text), textFormat, textRect, brush);
 }
 
-void FlarialGUI::DrawImage(const std::string imageName, const D2D1_RECT_F rect, const int imageWidth, const int imageHeight)
+void FlarialGUI::Image(const std::string imageName, const D2D1_RECT_F rect, const int imageWidth, const int imageHeight)
 {
     ID2D1Bitmap* bitmap;
     std::string among = Utils::getRoamPath() + "\\" + imageName;
@@ -220,7 +220,7 @@ void FlarialGUI::DrawImage(const std::string imageName, const D2D1_RECT_F rect, 
     RenderUtils::D2DC->DrawBitmap(bitmap, imageRect);
 }
 
-void FlarialGUI::DrawFlarialText(const float x, float y, const wchar_t* text, D2D1_COLOR_F color, const float width, const float height)
+void FlarialGUI::FlarialText(const float x, float y, const wchar_t* text, D2D1_COLOR_F color, const float width, const float height)
 {
     if(isInScrollView && y + scrollpos > y) y += scrollpos;
     ID2D1SolidColorBrush* brush;
@@ -287,7 +287,7 @@ Vec2<float> FlarialGUI::GetCenterXY(float rectWidth, float rectHeight)
     return xy;
 }
 
-void FlarialGUI::DrawScrollBar(float x, float y, float width, float height, float radius)
+void FlarialGUI::ScrollBar(float x, float y, float width, float height, float radius)
 {
     float whiteY;
     

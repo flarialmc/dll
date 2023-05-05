@@ -21,10 +21,10 @@ public:
 	static void LoadImageFromFile(const wchar_t* filename, ID2D1Bitmap** bitmap);
 	static void RoundedRectWithImageAndText(const float x, float y, const float width, const float height, const D2D1_COLOR_F color, const wchar_t* imagePath, const int imageWidth, const int imageHeight, const wchar_t* text);
 	static std::wstring to_wide(const std::string &multi);
-	static void DrawImage(const std::string imageName, const D2D1_RECT_F rect, const int imageWidth, const int imageHeight);
-	static void DrawFlarialText(const float x, float y, const wchar_t* text, D2D1_COLOR_F color, const float width, const float height);
+	static void Image(const std::string imageName, const D2D1_RECT_F rect, const int imageWidth, const int imageHeight);
+	static void FlarialText(const float x, float y, const wchar_t* text, D2D1_COLOR_F color, const float width, const float height);
 	static void SetScrollView(float x, float y, float width, float height);
 	static void UnsetScrollView();
 	static Vec2<float> GetCenterXY(float rectWidth = 160.0f, float rectHeight = 75.0f);
-	static void DrawScrollBar(float x, float y, float width, float height, float radius);
+	static void ScrollBar(float x, float y, float width, float height, float radius);
 };
