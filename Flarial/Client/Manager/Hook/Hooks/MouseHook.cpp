@@ -1,5 +1,7 @@
 #include "MouseHook.h"
 
+#include "../../../FlarialGUI/FlarialWidgets.h"
+
 typedef void(__fastcall* onMouse)(void*, MouseAction, int8_t, short, short, void*, void*, void*);
 onMouse oMouse;
 
@@ -21,6 +23,9 @@ void MouseDetour(void* a1, MouseAction action, int8_t held, int16_t mouseX, int1
 	MC::mousepos.x = mouseX;
 	MC::mousepos.y = mouseY;
 
+	if(action == Scroll)
+	FlarialGUI::scrollpos += held < 0 ? -10.5f : 10.5f;
+	
 	MC::mouseaction = action;
 	MC::held = held;
 

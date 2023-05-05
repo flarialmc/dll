@@ -102,6 +102,7 @@ static bool CursorInRect(float rectX, float rectY, float width, float height) {
 
 void FlarialGUI::RoundedRect(const float x, const float y, const D2D_COLOR_F color, const float width, const float height,float radiusX, float radiusY) {
 
+    
     ID2D1SolidColorBrush* brush;
     RenderUtils::D2DC->CreateSolidColorBrush(color, &brush);
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
@@ -254,6 +255,29 @@ void FlarialGUI::LoadImageFromFile(const wchar_t* filename, ID2D1Bitmap** bitmap
 
     
 }
+
+void FlarialGUI::SetScrollView(float x, float y, float width, float height)
+{
+    isInScrollView = true;
+    D2D1_RECT_F clipRect = D2D1::RectF(x, y, x + width, y + height);
+    RenderUtils::D2DC->PushAxisAlignedClip(&clipRect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+}
+
+void FlarialGUI::UnsetScrollView()
+{
+    isInScrollView = false;
+    RenderUtils::D2DC->PopAxisAlignedClip();
+}
+
+Vec2<float> FlarialGUI::GetCenterXY(float rectWidth, float rectHeight)
+{
+    Vec2<float> xy;
+    xy.x = (RenderUtils::D2DC->GetSize().width - rectWidth)/ 2.0f;
+    xy.y = (RenderUtils::D2DC->GetSize().height - rectHeight) / 2.0f;
+    Logger::debug(std::to_string(xy.x) + " " + std::to_string(xy.y));
+    return xy;
+}
+
 
 std::wstring FlarialGUI::to_wide (const std::string &multi) {
     std::wstring wide; wchar_t w; mbstate_t mb {};

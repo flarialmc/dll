@@ -87,7 +87,13 @@ static long __stdcall PresentDetour(IDXGISwapChain* pSwapChain, UINT syncInterva
 		RenderUtils::D2DC->EndDraw();*/
 
 		RenderUtils::D2DC->BeginDraw();
-		FlarialGUI::ModCard(50.0f, 100.0f, L"Fps", 25.0f, 25.0f);
+		Vec2<float> center = FlarialGUI::GetCenterXY(160.0f, 160.0f);
+		FlarialGUI::SetScrollView(center.x, center.y, 160.0f, 160.0f);
+		FlarialGUI::RoundedRect(center.x, center.y + FlarialGUI::scrollpos, D2D1::ColorF(D2D1::ColorF::LightGray), 160.0f, 160.0f);
+		
+		//FlarialGUI::ModCard(50.0f, 100.0f, L"FPS", 25.0f, 25.0f);
+		
+		FlarialGUI::UnsetScrollView();
 		RenderUtils::D2DC->EndDraw();
 
 		
@@ -156,7 +162,9 @@ static long __stdcall ResizeBuffersDetour(IDXGISwapChain* pSwapChain, UINT buffe
 		init = false;
 	}
 
+	Logger::debug("resized " + std::to_string(width) + std::to_string(height));
 	MC::windowSize = Vec2<int16_t>(width, height);
+	
 
 	return oResizeBuffers(pSwapChain, bufferCount, width, height, newFormat, flags);
 }
