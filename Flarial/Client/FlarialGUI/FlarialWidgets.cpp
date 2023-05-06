@@ -360,6 +360,17 @@ void FlarialGUI::UnsetWindowRect()
     isInWindowRect = false;
 }
 
+Vec2<float> FlarialGUI::CalculateMovedXY(float &x, float &y)
+{
+    if(isInWindowRect && WindowRects[1].hasBeenMoved)
+    {
+        x = WindowRects[1].movedX;
+        y = WindowRects[1].movedY;
+    }
+
+    return Vec2(x, y);
+}
+
 
 std::wstring FlarialGUI::to_wide (const std::string &multi) {
     std::wstring wide; wchar_t w; mbstate_t mb {};

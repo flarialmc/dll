@@ -1,11 +1,10 @@
 ﻿#include "ClickGUIElements.h"
 void ClickGUIElements::ModCard(float x, float y, Module* mod, const int currentNum, const float width, const float height)
 {
-    if(FlarialGUI::isInWindowRect && FlarialGUI::WindowRects[currentNum].hasBeenMoved)
-    {
-        x = FlarialGUI::WindowRects[currentNum].movedX;
-        y = FlarialGUI::WindowRects[currentNum].movedY;
-    }
+
+    Vec2<float> vec = FlarialGUI::CalculateMovedXY(x, y);
+    x = vec.x;
+    y = vec.y;
     FlarialGUI::RoundedRect(x, y + 35, D2D1::ColorF(47.0f/255.0f, 32.0f/255.0f, 34.0f/255.0f), 150.6f);
     FlarialGUI::RoundedRectOnlyTopCorner(x, y, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), 150, 75);
     FlarialGUI::RoundedRectWithImageAndText(x + 10, y + 80, width, height, D2D1::ColorF(112.0f / 255.0f, 93.0f / 255.0f, 96.0f / 255.0f), L"gear.png", width, height, L"");

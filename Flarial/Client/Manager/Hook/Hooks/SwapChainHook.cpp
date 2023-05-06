@@ -100,13 +100,8 @@ static long __stdcall PresentDetour(IDXGISwapChain* pSwapChain, UINT syncInterva
 
 		float x = center.x + 120;
 		float y = center.y + 50;
-
-		if(FlarialGUI::isInWindowRect && FlarialGUI::WindowRects[1].hasBeenMoved)
-		{
-			x = FlarialGUI::WindowRects[1].movedX;
-			y = FlarialGUI::WindowRects[1].movedY;
-		}
-		FlarialGUI::RoundedRect(x, y, D2D1::ColorF(D2D1::ColorF::Black));
+		Vec2<float> vec = FlarialGUI::CalculateMovedXY(x, y);
+		FlarialGUI::RoundedRect(vec.x, vec.y, D2D1::ColorF(D2D1::ColorF::Black));
 
 		
 		FlarialGUI::UnsetWindowRect();

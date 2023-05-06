@@ -41,4 +41,5 @@ public:
 	static void ScrollBar(float x, float y, float width, float height, float radius);
 	static void SetWindowRect(float x, float y, float width, float height, int currentNum);
 	static void UnsetWindowRect();
+	static Vec2<float> FlarialGUI::CalculateMovedXY(float &x, float &y);
 };
