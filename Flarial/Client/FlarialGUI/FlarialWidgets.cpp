@@ -360,12 +360,12 @@ void FlarialGUI::UnsetWindowRect()
     isInWindowRect = false;
 }
 
-Vec2<float> FlarialGUI::CalculateMovedXY(float &x, float &y)
+Vec2<float> FlarialGUI::CalculateMovedXY(float &x, float &y, int num)
 {
-    if(isInWindowRect && WindowRects[1].hasBeenMoved)
+    if(isInWindowRect && WindowRects[num].hasBeenMoved)
     {
-        x = WindowRects[1].movedX;
-        y = WindowRects[1].movedY;
+        x = WindowRects[num].movedX;
+        y = WindowRects[num].movedY;
     }
 
     return Vec2(x, y);

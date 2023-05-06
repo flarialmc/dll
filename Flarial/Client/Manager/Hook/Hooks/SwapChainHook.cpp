@@ -100,7 +100,7 @@ static long __stdcall PresentDetour(IDXGISwapChain* pSwapChain, UINT syncInterva
 
 		float x = center.x + 120;
 		float y = center.y + 50;
-		Vec2<float> vec = FlarialGUI::CalculateMovedXY(x, y);
+		Vec2<float> vec = FlarialGUI::CalculateMovedXY(x, y, 1);
 		FlarialGUI::RoundedRect(vec.x, vec.y, D2D1::ColorF(D2D1::ColorF::Black));
 
 		

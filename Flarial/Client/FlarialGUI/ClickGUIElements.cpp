@@ -2,7 +2,7 @@
 void ClickGUIElements::ModCard(float x, float y, Module* mod, const int currentNum, const float width, const float height)
 {
 
-    Vec2<float> vec = FlarialGUI::CalculateMovedXY(x, y);
+    Vec2<float> vec = FlarialGUI::CalculateMovedXY(x, y, 0);
     x = vec.x;
     y = vec.y;
     FlarialGUI::RoundedRect(x, y + 35, D2D1::ColorF(47.0f/255.0f, 32.0f/255.0f, 34.0f/255.0f), 150.6f);
