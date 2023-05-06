@@ -145,7 +145,6 @@ static long __stdcall ResizeBuffersDetour(IDXGISwapChain* pSwapChain, UINT buffe
 
 	
 	MC::windowSize = Vec2<int16_t>(width, height);
-	Logger::debug("resized " + std::to_string(width) + " " + std::to_string(height));
 	return oResizeBuffers(pSwapChain, bufferCount, width, height, newFormat, flags);
 }
 
