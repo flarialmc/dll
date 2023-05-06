@@ -313,39 +313,45 @@ void FlarialGUI::ScrollBar(float x, float y, float width, float height, float ra
     whitebrush->Release();
 }
 
-void FlarialGUI::SetWindowRect(float x, float y, float width, float height)
+void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int currentNum)
 {
     isInWindowRect = true;
-
-    if(hasBeenMoved)
+    if(!WindowRects[currentNum].madeRect)
     {
-        x = movedX;
-        y = movedY;
+        Logger::debug(std::to_string(WindowRects[currentNum].madeRect));
+        WindowRects[currentNum] = WindowRect();
+        WindowRects[currentNum].madeRect = true;
     }
-    
+
+    if(WindowRects[currentNum].hasBeenMoved)
+    {
+        x = WindowRects[currentNum].movedX;
+        y = WindowRects[currentNum].movedY;
+    }
+
     if(CursorInRect(x, y, width, height) && MC::held)
     {
         Logger::debug("yes");
-        isMovingElement = true;
-        hasBeenMoved = true;
-        movedX = MC::mousepos.x - width / 2.0f;
-        movedY = MC::mousepos.y - height / 2.0f;
-    } else if(MC::held && isMovingElement)
+        Logger::debug(std::to_string(currentNum));
+        WindowRects[currentNum].isMovingElement = true;
+        WindowRects[currentNum].hasBeenMoved = true;
+        WindowRects[currentNum].movedX = MC::mousepos.x - width / 2.0f;
+        WindowRects[currentNum].movedY = MC::mousepos.y - height / 2.0f;
+    } 
+    else if(MC::held && WindowRects[currentNum].isMovingElement)
     {
         Logger::debug("technically yes");
-        isMovingElement = true;
-        hasBeenMoved = true;
-        movedX = MC::mousepos.x - width / 2.0f;
-        movedY = MC::mousepos.y - height / 2.0f;
-        
+        WindowRects[currentNum].isMovingElement = true;
+        WindowRects[currentNum].hasBeenMoved = true;
+        WindowRects[currentNum].movedX = MC::mousepos.x - width / 2.0f;
+        WindowRects[currentNum].movedY = MC::mousepos.y - height / 2.0f;
     }
 
     if(MC::mouseaction == MouseAction::None && !MC::held || MC::mouseaction == MouseAction::Left && !MC::held)
     {
-        isMovingElement = false;
+        WindowRects[currentNum].isMovingElement = false;
     }
 
-    
     RoundedRectOnlyTopCorner(x, y, D2D1::ColorF(D2D1::ColorF::LightGray), width, height);
 }
     

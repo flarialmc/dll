@@ -4,7 +4,16 @@
 #include "../SDK/Minecraft.h"
 #include <wincodec.h>
 
-class Module;
+
+
+class WindowRect {
+public:
+	bool isMovingElement = false;
+	bool hasBeenMoved = false;
+	float movedX = 0;
+	float movedY = 0;
+	bool madeRect = false;
+};
 
 class FlarialGUI
 {
@@ -15,11 +24,8 @@ public:
 	static float inline scrollposmodifier = 10.5f;
 	static float inline barscrollpos = 0;
 	static float inline barscrollposmodifier = 3.0f;
+	static inline WindowRect WindowRects[10];
 	static bool inline isInWindowRect = false;
-	static bool inline isMovingElement = false;
-	static bool inline hasBeenMoved = false;
-	static float inline movedX = 0;
-	static float inline movedY = 0;
 	static bool Button(const float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width = 100.0f, const float height = 160.0f);
 	static bool RoundedButton(const float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width = 160.0f, const float height = 100.0f, const float radiusX = 10.0f, const float radiusY = 10.0f);
 	static void RoundedRectOnlyTopCorner(const float x, float y, D2D_COLOR_F color, const float width = 160, const float height = 100);
@@ -33,6 +39,6 @@ public:
 	static void UnsetScrollView();
 	static Vec2<float> GetCenterXY(float rectWidth = 160.0f, float rectHeight = 75.0f);
 	static void ScrollBar(float x, float y, float width, float height, float radius);
-	static void SetWindowRect(float x, float y, float width, float height);
+	static void SetWindowRect(float x, float y, float width, float height, int currentNum);
 	static void UnsetWindowRect();
 };

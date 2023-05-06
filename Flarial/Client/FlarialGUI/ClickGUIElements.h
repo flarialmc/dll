@@ -5,5 +5,5 @@
 class ClickGUIElements
 {
 public:
-    static void ModCard(const float x, float y, Module* mod, const float width = 160, const float height = 100);
+    static void ModCard(const float x, float y, Module* mod, const int currentNum, const float width = 160, const float height = 100);
 };

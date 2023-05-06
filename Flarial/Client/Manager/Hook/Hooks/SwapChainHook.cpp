@@ -91,14 +91,25 @@ static long __stdcall PresentDetour(IDXGISwapChain* pSwapChain, UINT syncInterva
 		RenderUtils::D2DC->BeginDraw();
 		Vec2<float> center = FlarialGUI::GetCenterXY(160.0f, 160.0f);
 
-		FlarialGUI::SetWindowRect(center.x - 120, center.y, 40, 8);
-		ClickGUIElements::ModCard(50.0f, 100.0f, Manager::modules.front(), 25.0f, 25.0f);
+		FlarialGUI::SetWindowRect(center.x - 120, center.y, 40, 8, 0);
+		ClickGUIElements::ModCard(50.0f, 100.0f, Manager::modules.front(), 0, 25.0f, 25.0f);
 		FlarialGUI::UnsetWindowRect();
 		
-		/*if(MC::held) Logger::debug("held " + std::to_string(MC::mouseaction));
-		else Logger::debug(std::to_string(MC::mouseaction));*/
+
+		FlarialGUI::SetWindowRect(center.x + 120, center.y + 120, 40, 8, 1);
+
+		float x = center.x + 120;
+		float y = center.y + 50;
+
+		if(FlarialGUI::isInWindowRect && FlarialGUI::WindowRects[1].hasBeenMoved)
+		{
+			x = FlarialGUI::WindowRects[1].movedX;
+			y = FlarialGUI::WindowRects[1].movedY;
+		}
+		FlarialGUI::RoundedRect(x, y, D2D1::ColorF(D2D1::ColorF::Black));
+
 		
-		FlarialGUI::RoundedRect(center.x + 120, center.y + 120, D2D1::ColorF(D2D1::ColorF::White));
+		FlarialGUI::UnsetWindowRect();
 		
 		/*for (Module* mod : Manager::modules)
 		{
