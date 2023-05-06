@@ -69,55 +69,7 @@ static long __stdcall PresentDetour(IDXGISwapChain* pSwapChain, UINT syncInterva
 
 		Manager::onRender();
 
-        
-
-		/*D2D1_RECT_F rect = D2D1::RectF(50.0f, 50.0f, 200.0f, 150.0f);
-
-		ID2D1SolidColorBrush* brush = NULL;
-		RenderUtils::D2DC->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &brush);
-		RenderUtils::D2DC->DrawRectangle(rect, brush);
-		brush->Release();
-		 */
-		
-
-		/*RenderUtils::D2DC->BeginDraw();
-		D2D_RECT_F rect = D2D1::RectF(50.0f, 50.0f, 200.0f, 150.0f);
-		ID2D1SolidColorBrush* brush;
-		RenderUtils::D2DC->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &brush);
-		RenderUtils::D2DC->FillRectangle(rect, brush);
-		brush->Release();
-		RenderUtils::D2DC->EndDraw();*/
-
 		RenderUtils::D2DC->BeginDraw();
-		Vec2<float> center = FlarialGUI::GetCenterXY(160.0f, 160.0f);
-
-		FlarialGUI::SetWindowRect(center.x - 120, center.y, 40, 8, 0);
-		ClickGUIElements::ModCard(50.0f, 100.0f, Manager::modules.front(), 0, 25.0f, 25.0f);
-		FlarialGUI::UnsetWindowRect();
-		
-
-		FlarialGUI::SetWindowRect(center.x + 120, center.y + 120, 40, 8, 1);
-
-		float x = center.x + 120;
-		float y = center.y + 50;
-		Vec2<float> vec = FlarialGUI::CalculateMovedXY(x, y, 1);
-		FlarialGUI::RoundedRect(vec.x, vec.y, D2D1::ColorF(D2D1::ColorF::Black));
-
-		
-		FlarialGUI::UnsetWindowRect();
-		
-		/*for (Module* mod : Manager::modules)
-		{
-
-			FlarialGUI::ModCard(50.0f, 100.0f, mod, 25.0f, 25.0f);
-			
-		}
-		
-		 
-		FlarialGUI::SetScrollView(center.x, center.y, 160.0f, 160.0f);
-		FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(D2D1::ColorF::LightGray), 160.0f, 160.0f);
-		FlarialGUI::UnsetScrollView(); 
-		FlarialGUI::ScrollBar(center.x + 300, center.y, 10, 160, 2);*/
 		
 		RenderUtils::D2DC->EndDraw();
 
@@ -166,7 +118,9 @@ static long __stdcall PresentDetour(IDXGISwapChain* pSwapChain, UINT syncInterva
 			ImGui_ImplDX11_Init(DX11Interface::d3d11device, DX11Interface::context);
 
 			setImGuiStyle();
-
+			
+			Mem::SafeRelease<IDXGISurface>(&eBackBuffer);
+			Mem::SafeRelease<ID3D11Texture2D>(&pBackBuffer);
 			init = true;
 		}
 	}
@@ -183,14 +137,15 @@ static long __stdcall ResizeBuffersDetour(IDXGISwapChain* pSwapChain, UINT buffe
 		Mem::SafeRelease<ID3D11RenderTargetView>(&DX11Interface::mainRenderTargetView);
 		Mem::SafeRelease<ID3D11Device>(&DX11Interface::d3d11device);
 		Mem::SafeRelease<ID3D11DeviceContext>(&DX11Interface::context);
+		Mem::SafeRelease<ID2D1DeviceContext>(&RenderUtils::D2DC);
+		Mem::SafeRelease<ID3D12Device>(&DX12Interface::d3d12device);
 
 		init = false;
 	}
 
-	Logger::debug("resized " + std::to_string(width) + std::to_string(height));
-	MC::windowSize = Vec2<int16_t>(width, height);
 	
-
+	MC::windowSize = Vec2<int16_t>(width, height);
+	Logger::debug("resized " + std::to_string(width) + " " + std::to_string(height));
 	return oResizeBuffers(pSwapChain, bufferCount, width, height, newFormat, flags);
 }
 
