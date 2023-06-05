@@ -2,13 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f25d8f06-7a29-4140-83a4-ce3b1fd14b6d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Flarial/src/Utils/Memory.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Flarial/Flarial.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/Flarial.vcxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Flarial/Flarial.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/Flarial.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2QmsqJniKSozaVtzOyMUNlaBPIn" />
   <component name="ProjectViewState">
@@ -40,7 +42,7 @@
       <option name="presentableId" value="Default" />
       <updated>1685970286093</updated>
       <workItem from="1685970287113" duration="247000" />
-      <workItem from="1685988465325" duration="506000" />
+      <workItem from="1685988465325" duration="842000" />
     </task>
     <servers />
   </component>

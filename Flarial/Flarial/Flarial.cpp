@@ -2,10 +2,11 @@
 
 #include "src/Client/Client.h"
 
-Client client;
+Client* client;
 
-void initialize(LPVOID lparam)
+void initialize()
 {
+    client->initialize();
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
@@ -13,7 +14,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)initialize, new Client(), 0, nullptr);
+        client = new Client();
+        CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)initialize, nullptr, 0, nullptr);
         break;
     }
 

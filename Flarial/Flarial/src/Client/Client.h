@@ -6,10 +6,10 @@
 class Client
 {
 public:
-    static HooksManager* HooksManager;
-    static FrontendManager* FrontendManager;
-    static ModulesManager* ModulesManager;
+    HooksManager* HooksManager;
+    FrontendManager* FrontendManager;
+    ModulesManager* ModulesManager;
 
 public:
-    static void initialize();
+    void initialize();
 };
