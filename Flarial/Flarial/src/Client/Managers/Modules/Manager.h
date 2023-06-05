@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "../BaseManager.h"
 
-class FrontendManager : public BaseManager
+class ModulesManager : public BaseManager
 {
 public:
     

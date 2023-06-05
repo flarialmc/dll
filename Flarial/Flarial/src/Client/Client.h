@@ -1,13 +1,15 @@
 ﻿#pragma once
-#include "Managers/Backend/Manager.h"
+#include "Managers/Hooks/Manager.h"
 #include "Managers/Frontend/Manager.h"
+#include "Managers/Modules/Manager.h"
 
 class Client
 {
 public:
-    static BackendManager* BackendManager;
+    static HooksManager* HooksManager;
     static FrontendManager* FrontendManager;
+    static ModulesManager* ModulesManager;
+
 public:
     static void initialize();
-    
 };
