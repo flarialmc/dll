@@ -3,5 +3,6 @@
 class BaseManager
 {
 public:
-    void initialize();
+    virtual ~BaseManager() = default;
+    virtual void initialize();
 };
