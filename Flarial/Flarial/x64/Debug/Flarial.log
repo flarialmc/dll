@@ -1,0 +1,13 @@
+﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(1101,5): warning MSB8027: Two or more files with the name of Manager.cpp will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are src\Client\Managers\Backend\Manager.cpp, src\Client\Managers\Frontend\Manager.cpp.
+  Flarial.cpp
+  Client.cpp
+  Manager.cpp
+  Manager.cpp
+  Logger.cpp
+C:\Users\User\Documents\GitHub\dll\Flarial\Flarial\src\Utils\Utils.h(3,1): error C2236: unexpected token 'class'. Did you forget a ';'?
+C:\Users\User\Documents\GitHub\dll\Flarial\Flarial\src\Utils\Utils.h(4,1): error C2059: syntax error: '{'
+C:\Users\User\Documents\GitHub\dll\Flarial\Flarial\src\Utils\Utils.h(4,1): error C2143: syntax error: missing ';' before '{'
+C:\Users\User\Documents\GitHub\dll\Flarial\Flarial\src\Utils\Utils.h(4,1): error C2447: '{': missing function header (old-style formal list?)
+C:\Users\User\Documents\GitHub\dll\Flarial\Flarial\src\Utils\Logger.cpp(62): fatal  error C1075: '{': no matching token found
+  Utils.cpp
+  Generating Code...

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="f25d8f06-7a29-4140-83a4-ce3b1fd14b6d" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Flarial/src/Client/Client.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Flarial/src/Client/Client.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Flarial/src/Client/Managers/Backend/Manager.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Flarial/src/Client/Managers/Backend/Manager.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Flarial/src/Client/Managers/Frontend/Manager.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Flarial/src/Client/Managers/Frontend/Manager.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Flarial/src/Utils/Logger.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Flarial/src/Utils/Logger.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Flarial/src/Utils/Utils.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Flarial/src/Utils/Utils.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Flarial/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Flarial/.idea/discord.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Flarial/.idea/discord.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Flarial/.idea/indexLayout.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Flarial/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Flarial/Flarial.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/Flarial.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Flarial/Flarial.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/Flarial.vcxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Flarial/Flarial.vcxproj.filters" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/Flarial.vcxproj.filters" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ProjectId" id="2QmsqJniKSozaVtzOyMUNlaBPIn" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "settings.editor.selected.configurable": "reference.settings.ide.settings.new.ui",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "rider.external.source.directories": [
+      "C:\\Users\\User\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
+      "C:\\Users\\User\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
+      "C:\\Users\\User\\AppData\\Local\\Symbols\\src"
+    ]
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f25d8f06-7a29-4140-83a4-ce3b1fd14b6d" name="Changes" comment="" />
+      <created>1685970286093</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1685970286093</updated>
+      <workItem from="1685970287113" duration="247000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+</project>
