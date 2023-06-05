@@ -10,7 +10,7 @@ private:
     static void writeToFile(std::string);
 
 public:
-    static void init();
+    static void initialize();
 
 public:
     static void debug(std::string);

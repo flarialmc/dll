@@ -4,4 +4,5 @@
 class HooksManager: public BaseManager
 {
 public:
+    
 };

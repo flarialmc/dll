@@ -159,21 +159,23 @@
   <ItemGroup>
     <ClCompile Include="Flarial.cpp" />
     <ClCompile Include="src\Client\Client.cpp" />
-    <ClCompile Include="src\Client\Managers\Hooks\Manager.cpp" />
+    <ClCompile Include="src\Client\Managers\Hook\Manager.cpp" />
     <ClCompile Include="src\Client\Managers\Frontend\Manager.cpp" />
-    <ClCompile Include="src\Client\Managers\Modules\Manager.cpp" />
+    <ClCompile Include="src\Client\Managers\Module\Manager.cpp" />
     <ClCompile Include="src\Utils\Logger.cpp" />
     <ClCompile Include="src\Utils\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="src\Client\Managers\Hook\Hooks" />
+    <Folder Include="src\Client\Managers\Module\Modules" />
     <Folder Include="src\SDK" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Client\Client.h" />
     <ClInclude Include="src\Client\Managers\BaseManager.h" />
-    <ClInclude Include="src\Client\Managers\Hooks\Manager.h" />
+    <ClInclude Include="src\Client\Managers\Hook\Manager.h" />
     <ClInclude Include="src\Client\Managers\Frontend\Manager.h" />
-    <ClInclude Include="src\Client\Managers\Modules\Manager.h" />
+    <ClInclude Include="src\Client\Managers\Module\Manager.h" />
     <ClInclude Include="src\Utils\Logger.h" />
     <ClInclude Include="src\Utils\Memory.h" />
     <ClInclude Include="src\Utils\Utils.h" />

@@ -28,7 +28,7 @@ void Logger::writeToFile(std::string str)
     }
 }
 
-void Logger::init()
+void Logger::initialize()
 {
     if (std::filesystem::exists(file))
     {
