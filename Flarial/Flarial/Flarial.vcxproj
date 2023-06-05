@@ -175,6 +175,7 @@
     <ClInclude Include="src\Client\Managers\Frontend\Manager.h" />
     <ClInclude Include="src\Client\Managers\Modules\Manager.h" />
     <ClInclude Include="src\Utils\Logger.h" />
+    <ClInclude Include="src\Utils\Memory.h" />
     <ClInclude Include="src\Utils\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

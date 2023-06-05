@@ -2,23 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f25d8f06-7a29-4140-83a4-ce3b1fd14b6d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Flarial/src/Client/Client.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Flarial/src/Client/Client.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Flarial/src/Client/Managers/Backend/Manager.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Flarial/src/Client/Managers/Backend/Manager.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Flarial/src/Client/Managers/Frontend/Manager.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Flarial/src/Client/Managers/Frontend/Manager.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Flarial/src/Utils/Logger.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Flarial/src/Utils/Logger.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Flarial/src/Utils/Utils.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Flarial/src/Utils/Utils.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Flarial/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Flarial/.idea/discord.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Flarial/.idea/discord.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Flarial/.idea/indexLayout.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Flarial/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Flarial/Flarial.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/Flarial.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Flarial/src/Utils/Memory.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Flarial/Flarial.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/Flarial.vcxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Flarial/Flarial.vcxproj.filters" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/Flarial.vcxproj.filters" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,22 +15,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "settings.editor.selected.configurable": "reference.settings.ide.settings.new.ui",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.ide.settings.new.ui&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "rider.external.source.directories": [
-      "C:\\Users\\User\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
-      "C:\\Users\\User\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
-      "C:\\Users\\User\\AppData\\Local\\Symbols\\src"
+  &quot;keyToStringList&quot;: {
+    &quot;rider.external.source.directories&quot;: [
+      &quot;C:\\Users\\User\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache&quot;,
+      &quot;C:\\Users\\User\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache&quot;,
+      &quot;C:\\Users\\User\\AppData\\Local\\Symbols\\src&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -55,6 +40,7 @@
       <option name="presentableId" value="Default" />
       <updated>1685970286093</updated>
       <workItem from="1685970287113" duration="247000" />
+      <workItem from="1685988465325" duration="506000" />
     </task>
     <servers />
   </component>
