@@ -2,15 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f25d8f06-7a29-4140-83a4-ce3b1fd14b6d" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Flarial/src/Client/Managers/Hook/BaseHook.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Flarial/src/Client/Managers/Hook/Hooks/KeyHook.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Flarial/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Flarial/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Flarial/Flarial.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/Flarial.vcxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Flarial/src/Client/Client.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/src/Client/Client.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Flarial/src/Client/Client.h" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/src/Client/Client.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Flarial/src/Client/Managers/Hooks/Manager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/src/Client/Managers/Hook/Manager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Flarial/src/Client/Managers/Hooks/Manager.h" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/src/Client/Managers/Hook/Manager.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Flarial/src/Client/Managers/Modules/Manager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/src/Client/Managers/Module/Manager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Flarial/src/Client/Managers/Modules/Manager.h" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/src/Client/Managers/Module/Manager.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Flarial/src/Utils/Logger.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/src/Utils/Logger.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Flarial/src/Utils/Logger.h" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/src/Utils/Logger.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Flarial/src/Client/Managers/Hook/Manager.h" beforeDir="false" afterPath="$PROJECT_DIR$/Flarial/src/Client/Managers/Hook/Manager.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +46,7 @@
       <option name="presentableId" value="Default" />
       <updated>1685970286093</updated>
       <workItem from="1685970287113" duration="247000" />
-      <workItem from="1685988465325" duration="1203000" />
+      <workItem from="1685988465325" duration="1892000" />
     </task>
     <servers />
   </component>

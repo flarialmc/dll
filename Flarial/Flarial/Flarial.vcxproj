@@ -166,13 +166,15 @@
     <ClCompile Include="src\Utils\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src\Client\Managers\Hook\Hooks" />
-    <Folder Include="src\Client\Managers\Module\Modules" />
+    <Folder Include="src\Client\Managers\Frontend\stuff" />
+    <Folder Include="src\Client\Managers\Module\stuff" />
     <Folder Include="src\SDK" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Client\Client.h" />
     <ClInclude Include="src\Client\Managers\BaseManager.h" />
+    <ClInclude Include="src\Client\Managers\Hook\BaseHook.h" />
+    <ClInclude Include="src\Client\Managers\Hook\stuff\KeyHook.h" />
     <ClInclude Include="src\Client\Managers\Hook\Manager.h" />
     <ClInclude Include="src\Client\Managers\Frontend\Manager.h" />
     <ClInclude Include="src\Client\Managers\Module\Manager.h" />
