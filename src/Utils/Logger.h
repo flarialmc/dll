@@ -19,4 +19,4 @@ public:
     static void error(std::string);
     static void fatal(std::string);
     static void trace(std::string);
-}
+};
