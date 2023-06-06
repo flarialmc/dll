@@ -14,10 +14,11 @@ endif()
 file(GLOB sources
 		"main.cpp",
 		"src/**/*.cpp",
-		"src/**/*.hpp"
+		"src/**/*.hpp",
+		"src/Client/GUI/**/*.hpp"
 		)
 
-add_library(Flarial SHARED ${sources})
+add_library(Flarial SHARED ${sources} src/Client/GUI/RenderUtils.hpp src/Client/GUI/RenderUtils.hpp src/Client/GUI/Engine/Constraints.cpp src/Client/GUI/Engine/Engine.cpp src/Client/GUI/Elements/ClickGUIElements.cpp)
 
 # target_include_directories(Floral PRIVATE "${CMAKE_CURRENT_LIST_DIR}/Lib/include/")
 target_link_libraries(Flarial PRIVATE version)
