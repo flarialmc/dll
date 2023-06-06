@@ -15,3 +15,8 @@ Debug/
 bin/
 obj/
 build/
+.vs/
+.vscode/
+.idea/
+cmake-build-debug/
+cmake-build-release-visual-studio/
