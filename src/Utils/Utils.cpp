@@ -1,7 +1,5 @@
 ﻿#include "Utils.hpp"
 
-enum MouseAction { None = 0, Left = 1, Right = 2, Middle = 3, Scroll = 4 };
-
 std::string Utils::getRoamingPath()
 {
     char* path = nullptr;
