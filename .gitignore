@@ -11,6 +11,7 @@ x64
 /.vs
 out/
 Release/
+Debug/
 bin/
 obj/
 build/
