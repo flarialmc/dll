@@ -11,4 +11,8 @@ public:
     ModulesManager* ModulesManager;
     
     void initialize();
+
+    class HooksManager getHooksManager() const;
+    class FrontendManager getFrontendManager() const;
+    class ModulesManager getModulesManager() const;
 };

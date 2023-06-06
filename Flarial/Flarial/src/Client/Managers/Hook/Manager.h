@@ -2,9 +2,10 @@
 #include <vector>
 
 #include "../BaseManager.h"
+#include "BaseHook.h"
 
 class HooksManager: public BaseManager
 {
 public:
-    std::vector<Hook*> hooks;
+    std::vector<BaseHook*> hooks;
 };

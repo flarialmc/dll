@@ -10,3 +10,18 @@ void Client::initialize()
 
     Logger::initialize();
 }
+
+HooksManager Client::getHooksManager() const
+{
+    return *HooksManager;
+}
+
+FrontendManager Client::getFrontendManager() const
+{
+    return *FrontendManager;
+}
+
+ModulesManager Client::getModulesManager() const
+{
+    return *ModulesManager;
+}
