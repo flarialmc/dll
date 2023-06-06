@@ -17,7 +17,7 @@ file(GLOB sources
 		"src/**/*.hpp"
 		)
 
-add_library(Flarial SHARED ${sources} src/Client/Managers/Module/Module.hpp)
+add_library(Flarial SHARED ${sources} src/Client/Managers/Module/Module.hpp src/Utils/Logger/Logger.cpp)
 
 # target_include_directories(Floral PRIVATE "${CMAKE_CURRENT_LIST_DIR}/Lib/include/")
 target_link_libraries(Flarial PRIVATE version)
