@@ -1,6 +1,6 @@
 ﻿#include "Client.hpp"
 
-#include "../Utils/Logger.hpp"
+#include "../Utils/Logger/Logger.hpp"
 
 void Client::initialize()
 {

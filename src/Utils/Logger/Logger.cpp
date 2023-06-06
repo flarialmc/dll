@@ -1,5 +1,5 @@
 ﻿#include "Logger.hpp"
-#include "Utils.hpp"
+#include "../Utils.hpp"
 #include <Windows.h>
 #include <format>
 #include <filesystem>

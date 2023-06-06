@@ -4,5 +4,5 @@
 class ModulesManager : public BaseManager
 {
 public:
-    
+
 };
