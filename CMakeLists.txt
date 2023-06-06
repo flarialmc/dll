@@ -12,9 +12,9 @@ add_compile_options(
 endif()
 
 file(GLOB sources
-    "main.cpp",
-    "src/**/*.cpp"
-)
+		"main.cpp",
+		"src/**/*.cpp"
+		)
 
 add_library(Flarial SHARED ${sources})
 

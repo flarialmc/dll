@@ -1,6 +1,6 @@
 #include <windows.h>
 
-#include "src/Client/Client.h"
+#include "src/Client/Client.hpp"
 
 Client* client;
 

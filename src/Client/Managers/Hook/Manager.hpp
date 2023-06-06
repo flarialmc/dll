@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include <vector>
 
-#include "../BaseManager.h"
-#include "BaseHook.h"
+#include "../BaseManager.hpp"
+#include "BaseHook.hpp"
 
 class HooksManager: public BaseManager
 {

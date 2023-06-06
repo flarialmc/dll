@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include "Managers/Hook/Manager.h"
-#include "Managers/Frontend/Manager.h"
-#include "Managers/Module/Manager.h"
+#include "Managers/Hook/Manager.hpp"
+#include "Managers/Frontend/Manager.hpp"
+#include "Managers/Module/Manager.hpp"
 
 class Client
 {

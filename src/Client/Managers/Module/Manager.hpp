@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "../BaseManager.h"
+#include "../BaseManager.hpp"
 
 class ModulesManager : public BaseManager
 {

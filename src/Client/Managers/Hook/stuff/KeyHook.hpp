@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "../BaseHook.h"
+#include "../BaseHook.hpp"
 
 class KeyHook : BaseHook
 {
