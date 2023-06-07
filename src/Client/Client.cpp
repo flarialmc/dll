@@ -4,18 +4,8 @@
 
 void Client::initialize()
 {
-    HooksManager = new class HooksManager();
-    ModulesManager = new class ModulesManager();
+    HookManager::initialize();
+    ModuleManager::initialize();
 
     Logger::initialize();
-}
-
-HooksManager Client::getHooksManager() const
-{
-    return *HooksManager;
-}
-
-ModulesManager Client::getModulesManager() const
-{
-    return *ModulesManager;
 }

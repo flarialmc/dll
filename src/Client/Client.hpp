@@ -1,15 +1,8 @@
 ﻿#pragma once
-#include "Managers/Hook/Manager.hpp"
-#include "Managers/Module/Manager.hpp"
+#include "Hook/Manager.hpp"
+#include "Module/Manager.hpp"
 
-class Client
+namespace Client
 {
-public:
-    HooksManager* HooksManager;
-    ModulesManager* ModulesManager;
-    
     void initialize();
-
-    class HooksManager getHooksManager() const;
-    class ModulesManager getModulesManager() const;
 };
