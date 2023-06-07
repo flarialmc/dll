@@ -12,6 +12,7 @@ x64
 out/
 Release/
 Debug/
+Debug/*.pdb
 bin/
 obj/
 build/

@@ -20,5 +20,4 @@ file(GLOB_RECURSE sources
 
 add_library(Flarial SHARED ${sources} src/Client/GUI/GUIMouseListener.hpp)
 target_include_directories(Flarial PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/")
-target_link_libraries(Flarial PRIVATE version)
-target_link_libraries(Flarial PRIVATE dwrite)
+target_link_libraries(Flarial PRIVATE dwrite.lib d3d12.lib dxgi.lib d3d11.lib version)

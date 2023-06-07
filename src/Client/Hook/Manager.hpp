@@ -4,6 +4,7 @@
 #include "Hooks/Hook.hpp"
 #include "Hooks/Input/KeyHook.hpp"
 #include "Hooks/Input/MouseHook.hpp"
+#include "Hooks/Render/SwapchainHook.hpp"
 
 #include "MinHook.h"
 
