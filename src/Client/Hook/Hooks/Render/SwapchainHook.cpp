@@ -51,15 +51,17 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain *pSwapChain, UINT syncInter
             D2D1CreateDeviceContext(eBackBuffer, properties, &d2dContext);
             D2D::context = d2dContext;
 
-            MC::windowSize = *new Vec2<float>(500.f, 200.f);
+            MC::windowSize = *new Vec2<float>(d2dContext->GetSize().width, d2dContext->GetSize().height);
 
             eBackBuffer->Release();
 
             init = true;
         }
     } else {
+            D2D::context->BeginDraw();
             RenderEvent event;
             EventHandler::onRender(event);
+            D2D::context->EndDraw();
     }
 
     // Render Shit

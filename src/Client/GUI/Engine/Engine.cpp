@@ -1,10 +1,7 @@
-﻿
-#include "Engine.hpp"
-
+﻿#include "Engine.hpp"
 #include "Constraints.hpp"
 #include "../../Module/Modules/Module.hpp"
 
-// improve following code
 static bool CursorInRect(float rectX, float rectY, float width, float height)
 {
     if (MC::mousepos.x >= rectX && MC::mousepos.x <= rectX + width && MC::mousepos.y >= rectY && MC::mousepos.y <= rectY + height)
@@ -130,12 +127,10 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
 void FlarialGUI::RoundedRect(float x, float y, const D2D_COLOR_F color, const float width, const float height, float radiusX, float radiusY)
 {
 
-    if (isInScrollView)
-        y += scrollpos;
-
     ID2D1SolidColorBrush *brush;
     D2D::context->CreateSolidColorBrush(color, &brush);
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
+
     D2D::context->FillRoundedRectangle(roundedRect, brush);
     brush->Release();
 }

@@ -3,7 +3,6 @@
 #include "../D2D.hpp"
 #include <wincodec.h>
 #include <stack>
-#include <d2d1_1.h>
 
 class WindowRect
 {
@@ -15,8 +14,6 @@ public:
     bool madeRect = false;
     float percentageX = 0;
     float percentageY = 0;
-    float width = 0;
-    float height = 0;
 };
 
 class Dimension

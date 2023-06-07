@@ -18,18 +18,16 @@ class ClickGUIRenderer : public Listener {
 
 
         if(enabled) {
-            Logger::info("E");
-            Vec2<float> center = Constraints::CenterConstraint(50, 50, "x", 1, 1);
+            Vec2<float> center = Constraints::CenterConstraint(50, 50, "r", 1, 1);
 
-            FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(D2D1::ColorF::Black));
-            Logger::info("Sports");
+            FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(D2D1::ColorF::Black), 50, 50);
         }
 
     }
 
     void onKey(KeyEvent &event) override {
 
-        if(event.GetKey() == module->keybind && event.GetAction() == ActionType::RELEASED) enabled = !enabled;
+        if(event.GetKey() == module->keybind && event.GetAction() == ActionType::PRESSED) enabled = !enabled;
     }
 
 public:

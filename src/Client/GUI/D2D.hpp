@@ -3,7 +3,7 @@
 #include <dxgi.h>
 #include <d3d11.h>
 #include <d3d12.h>
-#include <d2d1_1.h>
+#include <d2d1.h>
 #include <dxgi1_4.h>
 #include <dwrite_1.h>
 #include <initguid.h>
@@ -16,7 +16,7 @@ public:
     static ID3D11Device* device;
     static ID3D11RenderTargetView* renderTarget;
 
-    void terminate();
+    static void terminate();
 };
 
 namespace MC {
