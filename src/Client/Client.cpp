@@ -3,8 +3,6 @@
 #include "../Utils/Logger/Logger.hpp"
 #include <kiero.h>
 
-bool disable = false;
-
 void Client::initialize()
 {
     Logger::initialize();
