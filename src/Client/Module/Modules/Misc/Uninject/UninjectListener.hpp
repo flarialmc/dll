@@ -10,7 +10,7 @@ public:
 
     void onKey(KeyEvent& event) override {
 
-        if (event.GetKey() == module->keybind && event.GetAction() == ActionType::RELEASED) {
+        if (event.GetKey() == 'P' && event.GetAction() == ActionType::RELEASED) {
             ModuleManager::terminate();
             Client::disable = true;
         }
@@ -22,5 +22,3 @@ public:
         this->module = module;
     }
 };
-
-}

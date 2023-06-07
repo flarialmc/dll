@@ -39,8 +39,6 @@ void Logger::initialize()
     SetConsoleTitleA("Flarial");
     FILE* fp;
     freopen_s(&fp, "CONOUT$", "w", stdout); // output only
-
-    Logger::info("Initializing Client");
 }
 
 void Logger::debug(std::string str)

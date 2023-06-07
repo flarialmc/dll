@@ -8,7 +8,11 @@ class Uninject : public Module {
 
 public:
 
-    Uninject() : Module("Uninject", "Disables the client.", "", 'P') {};
+    Uninject() : Module("Uninject", "Disables the client.", "", 'P') {
+
+        onEnable();
+
+    };
 
     void onEnable() override {
 

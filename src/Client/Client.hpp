@@ -2,8 +2,9 @@
 #include "Hook/Manager.hpp"
 #include "Module/Manager.hpp"
 
-namespace Client
+class Client
 {
-    void initialize();
+public:
+    static void initialize();
     static bool disable;
 };

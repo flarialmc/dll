@@ -3,11 +3,6 @@
 #include "../../../Utils/Utils.hpp"
 #include <string>
 
-struct ModuleEvent
-{
-    bool isEnabled, isTicking;
-};
-
 class Module
 {
 public:
@@ -16,11 +11,14 @@ public:
     std::string icon;
     int keybind;
 
+    Module(const std::string& ename, const std::string& edescription, const std::string& eicon, int ekey) {
+        name = ename;
+        description = edescription;
+        icon = eicon;
+        keybind = ekey;
+    }
 public:
     bool enabled = false;
-
-public:
-    Module(std::string, std::string, std::string, uint64_t);
 
 public:
 

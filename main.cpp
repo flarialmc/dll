@@ -1,5 +1,5 @@
+#pragma once
 #include <windows.h>
-
 #include "src/Client/Client.hpp"
 #include "src/Client/Events/EventHandler.hpp"
 
@@ -11,19 +11,23 @@ DWORD WINAPI init()
     Client::initialize();
     Logger::info("Initializing Client");
 
-    while(true) {
-        if(Client::disable) {
-            Logger::info("this ran");
+    while (true) {
+        if (Client::disable) {
             break;
+        } else {
+            Sleep(50);
         }
     }
 
+    FreeConsole();
     Logger::info("Uninitializing Client");
     EventHandler::unregisterAll();
-    FreeConsole();
+    ModuleManager::terminate();
+    HookManager::terminate();
     MH_DisableHook(MH_ALL_HOOKS);
     MH_Uninitialize();
 
+    Sleep(100);
     FreeLibraryAndExitThread(real, 1);
 }
 
