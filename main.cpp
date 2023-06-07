@@ -2,7 +2,7 @@
 #include <windows.h>
 #include "src/Client/Client.hpp"
 #include "src/Client/Events/EventHandler.hpp"
-
+#include "src/Client/GUI/D2D.hpp"
 #include <kiero.h>
 
 HMODULE real = nullptr;
@@ -23,8 +23,7 @@ DWORD WINAPI init()
 
     Logger::info("Uninitializing Client");
 
-
-
+    D2D::terminate();
     EventHandler::unregisterAll();
     ModuleManager::terminate();
     HookManager::terminate();

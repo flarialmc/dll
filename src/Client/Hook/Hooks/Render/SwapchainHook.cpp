@@ -13,26 +13,22 @@ void SwapchainHook::enableHook()
 }
 
 bool init = false;
+
 void SwapchainHook::swapchainCallback(IDXGISwapChain *pSwapChain, UINT syncInterval, UINT flags)
 {
 
     if(!init) {
-
-        ID3D12Device *device;
+        ID3D12Device5 *device;
         if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&device)))) {
 
-            static_cast<ID3D12Device5 *>(device)->RemoveDevice();
+            device->RemoveDevice();
+            init = true;
         }
 
-
         ID3D11Device *d3d11device = nullptr;
-        ID3D11DeviceContext *context = nullptr;
         ID3D11RenderTargetView *mainRenderTargetView = nullptr;
 
         if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void **) &d3d11device))) {
-            d3d11device->GetImmediateContext(&context);
-
-            HWND window = FindWindowA(nullptr, "Minecraft");
 
             ID3D11Texture2D *pBackBuffer;
             pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void **) &pBackBuffer);
@@ -45,27 +41,31 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain *pSwapChain, UINT syncInter
                             D2D1_DEVICE_CONTEXT_OPTIONS_NONE
                     };
 
-            ID2D1DeviceContext *d2dContext = NULL;
+
+            ID2D1DeviceContext *d2dContext;
+
             IDXGISurface *eBackBuffer;
             pSwapChain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
             D2D1CreateDeviceContext(eBackBuffer, properties, &d2dContext);
             D2D::context = d2dContext;
 
-            MC::windowSize = *new Vec2<float>(d2dContext->GetSize().width, d2dContext->GetSize().height);
+            MC::windowSize.x = D2D::context->GetSize().width;
+            MC::windowSize.y = D2D::context->GetSize().height;
 
             eBackBuffer->Release();
-
-            init = true;
+            pBackBuffer->Release();
+            eBackBuffer = nullptr;
+            pBackBuffer = nullptr;
+            d3d11device->Release();
+            mainRenderTargetView->Release();
+            d3d11device = nullptr;
+            mainRenderTargetView = nullptr;
         }
-    } else {
-            D2D::context->BeginDraw();
-            RenderEvent event;
-            EventHandler::onRender(event);
-            D2D::context->EndDraw();
+
     }
 
     // Render Shit
-
     return func_original(pSwapChain, syncInterval, flags);
+
 
 }
