@@ -8,6 +8,7 @@ bool disable = false;
 void Client::initialize()
 {
     Logger::initialize();
+    disable = false;
     kiero::init(kiero::RenderType::D3D12);
     HookManager::initialize();
     ModuleManager::initialize();
