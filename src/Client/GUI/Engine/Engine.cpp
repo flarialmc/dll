@@ -43,12 +43,18 @@ bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COL
     if (isInScrollView)
         y += scrollpos;
 
+
+
     ID2D1SolidColorBrush *brush;
     D2D1_COLOR_F buttonColor = CursorInRect(x, y, width, height) ? D2D1::ColorF(color.r - darkenAmount, color.g - darkenAmount, color.b - darkenAmount, color.a) : color;
     D2D::context->CreateSolidColorBrush(buttonColor, &brush);
     D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
+
+
     D2D::context->FillRectangle(rect, brush);
     brush->Release();
+
+
 
     IDWriteTextFormat *textFormat;
     IDWriteFactory *writeFactory;

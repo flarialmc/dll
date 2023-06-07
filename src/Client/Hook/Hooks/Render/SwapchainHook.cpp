@@ -2,6 +2,7 @@
 #include "../../../GUI/D2D.hpp"
 #include "../../../Events/Render/RenderEvent.hpp"
 #include "../../../Events/EventHandler.hpp"
+#include "d2d1_1.h"
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", "") {}
 
@@ -12,45 +13,57 @@ void SwapchainHook::enableHook()
 }
 
 bool init = false;
-void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags)
+void SwapchainHook::swapchainCallback(IDXGISwapChain *pSwapChain, UINT syncInterval, UINT flags)
 {
 
-    if (!init)
-    {
-        ID3D12Device5 *d3d12device = nullptr;
-        if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device))))
-        {
-            Logger::debug("Removing D3D12Device");
+    if(!init) {
 
-            d3d12device->RemoveDevice();
+        ID3D12Device *device;
+        if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&device)))) {
+
+            static_cast<ID3D12Device5 *>(device)->RemoveDevice();
         }
+
+
         ID3D11Device *d3d11device = nullptr;
-        if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d11device))))
-        {
+        ID3D11DeviceContext *context = nullptr;
+        ID3D11RenderTargetView *mainRenderTargetView = nullptr;
 
-            ID3D11DeviceContext *context = nullptr;
-            ID3D11Texture2D *back_buffer;
-            ID3D11RenderTargetView *mainRenderTargetView = nullptr;
+        if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void **) &d3d11device))) {
             d3d11device->GetImmediateContext(&context);
-            pSwapChain->GetBuffer(0, IID_PPV_ARGS(&back_buffer));
-            d3d11device->CreateRenderTargetView(back_buffer, NULL, &mainRenderTargetView);
 
-            // TODO: Create d2d resources
-            D2D::context = reinterpret_cast<ID2D1DeviceContext *>(context);
-            D2D::device = d3d11device;
-            D2D::renderTarget = mainRenderTargetView;
+            HWND window = FindWindowA(nullptr, "Minecraft");
 
-            back_buffer->Release();
+            ID3D11Texture2D *pBackBuffer;
+            pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void **) &pBackBuffer);
+            d3d11device->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView);
+
+            const D2D1_CREATION_PROPERTIES properties
+                    {
+                            D2D1_THREADING_MODE_SINGLE_THREADED,
+                            D2D1_DEBUG_LEVEL_NONE,
+                            D2D1_DEVICE_CONTEXT_OPTIONS_NONE
+                    };
+
+            ID2D1DeviceContext *d2dContext = NULL;
+            IDXGISurface *eBackBuffer;
+            pSwapChain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
+            D2D1CreateDeviceContext(eBackBuffer, properties, &d2dContext);
+            D2D::context = d2dContext;
+
+            MC::windowSize = *new Vec2<float>(500.f, 200.f);
+
+            eBackBuffer->Release();
 
             init = true;
         }
     } else {
-
-        RenderEvent event;
-        EventHandler::onRender(event);
+            RenderEvent event;
+            EventHandler::onRender(event);
     }
 
     // Render Shit
 
     return func_original(pSwapChain, syncInterval, flags);
+
 }

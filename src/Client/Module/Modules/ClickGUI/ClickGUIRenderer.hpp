@@ -11,22 +11,25 @@
 
 class ClickGUIRenderer : public Listener {
 
-    bool enabled;
+    bool enabled = false;
     Module* module;
 
     void onRender(RenderEvent &event) override {
 
-        Logger::info("E");
+
         if(enabled) {
-            Vec2<float> center = Constraints::CenterConstraint(50, 50, "e", 1, 1);
-            FlarialGUI::Button(center.x, center.y, D2D1::ColorF(D2D1::ColorF::Black), D2D1::ColorF(D2D1::ColorF::White), L"hi", 50, 50);
+            Logger::info("E");
+            Vec2<float> center = Constraints::CenterConstraint(50, 50, "x", 1, 1);
+
+            FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(D2D1::ColorF::Black));
+            Logger::info("Sports");
         }
 
     }
 
     void onKey(KeyEvent &event) override {
 
-        if(event.GetKey() == module->keybind) enabled = !enabled;
+        if(event.GetKey() == module->keybind && event.GetAction() == ActionType::RELEASED) enabled = !enabled;
     }
 
 public:

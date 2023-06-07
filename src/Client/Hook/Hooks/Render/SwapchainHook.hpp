@@ -12,10 +12,10 @@
 class SwapchainHook : public Hook
 {
 private:
-    static void swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags);
+    static void swapchainCallback(IDXGISwapChain *pSwapChain, UINT syncInterval, UINT flags);
 
 public:
-    typedef void(__thiscall *SwapchainOriginal)(IDXGISwapChain3 *, UINT, UINT);
+    typedef void(__thiscall *SwapchainOriginal)(IDXGISwapChain *, UINT, UINT);
     static inline SwapchainOriginal func_original = 0;
 
     SwapchainHook();

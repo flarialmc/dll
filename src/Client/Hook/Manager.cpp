@@ -8,6 +8,7 @@ void HookManager::initialize()
 
     hooks.push_back(new KeyHook());
     hooks.push_back(new MouseHook());
+    hooks.push_back(new SwapchainHook());
 
     for (auto hook : hooks)
         hook->enableHook();

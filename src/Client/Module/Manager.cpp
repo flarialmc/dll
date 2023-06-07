@@ -16,6 +16,7 @@ void ModuleManager::initialize()
     EventHandler::registerListener(new TestListener("test"));
 
     modules.push_back(new Uninject());
+    modules.push_back(new ClickGUI());
 
 }
 

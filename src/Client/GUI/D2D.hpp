@@ -10,13 +10,14 @@
 #include "../../Utils/Utils.hpp"
 #include "../Events/Input/MouseEvent.hpp"
 
-namespace D2D {
+class D2D {
+public:
     static ID2D1DeviceContext* context;
     static ID3D11Device* device;
     static ID3D11RenderTargetView* renderTarget;
 
     void terminate();
-}
+};
 
 namespace MC {
 
