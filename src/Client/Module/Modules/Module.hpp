@@ -3,25 +3,29 @@
 #include "../../../Utils/Utils.hpp"
 #include <string>
 
-struct ModuleEvent {
+struct ModuleEvent
+{
     bool isEnabled, isTicking;
 };
 
-class Module {
+class Module
+{
 public:
     std::string name;
     std::string description;
     std::string icon;
     uint64_t keybind;
+
 public:
     bool enabled = false;
+
 public:
     Module(std::string, std::string, std::string, uint64_t);
 
 public:
     virtual void onKey(uintptr_t key, bool held, bool &cancel) {}
 
-    virtual void onMouse(MouseAction action, bool &cancel) {}
+    virtual void onMouse(int action, bool &cancel) {}
 
     // TODO: This shit
 
@@ -32,5 +36,4 @@ public:
     virtual void onTick(GameMode *gm) {} */
 
     virtual void onRender() {}
-
 };

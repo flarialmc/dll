@@ -11,13 +11,13 @@ add_compile_options(
 )
 endif()
 
-file(GLOB sources
-		"main.cpp",
-		"src/**/*.cpp",
-		"src/**/*.hpp"
-		)
+file(GLOB_RECURSE sources
+	"main.cpp",
+	"src/**/*.cpp",
+	"src/**/*.hpp"
+	"lib/**/*.cpp",
+)
 
 add_library(Flarial SHARED ${sources})
-
-# target_include_directories(Floral PRIVATE "${CMAKE_CURRENT_LIST_DIR}/Lib/include/")
+target_include_directories(Flarial PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/")
 target_link_libraries(Flarial PRIVATE version)

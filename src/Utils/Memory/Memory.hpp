@@ -11,7 +11,7 @@
 class Memory
 {
 public:
-    static uintptr_t sig(const char *pattern)
+    static uintptr_t findSig(const char *pattern)
     {
         MODULEINFO info;
         GetModuleInformation(GetCurrentProcess(), GetModuleHandleA("Minecraft.Windows.exe"), &info, sizeof(MODULEINFO));
@@ -66,7 +66,7 @@ public:
         return 0;
     }
 
-    static uintptr_t FindDMAAddy(uintptr_t ptr, std::vector<unsigned int> offsets)
+    static uintptr_t findDMAAddy(uintptr_t ptr, std::vector<unsigned int> offsets)
     {
         uintptr_t addr = ptr;
 
