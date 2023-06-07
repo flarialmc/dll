@@ -3,6 +3,7 @@
 
 #include "Hooks/Hook.hpp"
 #include "Hooks/Input/KeyHook.hpp"
+#include "Hooks/Input/MouseHook.hpp"
 
 #include "MinHook.h"
 

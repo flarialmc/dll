@@ -6,6 +6,7 @@ void HookManager::initialize()
     hooks = std::vector<Hook *>();
 
     hooks.push_back(new KeyHook());
+    hooks.push_back(new MouseHook());
 
     for (auto hook : hooks)
         hook->enableHook();
