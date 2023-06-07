@@ -14,11 +14,12 @@ public:
     static void registerListener(Listener *listener);
     static void unregisterListener(std::string name);
 public:
+    static void onRender(RenderEvent &event);
     static void onKey(KeyEvent &event);
     static void onMouse(MouseEvent &event);
 
     static void unregisterAll();
 
-    static void onRender(RenderEvent &event);
+
 };
 

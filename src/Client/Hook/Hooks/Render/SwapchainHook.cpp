@@ -46,8 +46,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
         }
     } else {
 
-
-
+        RenderEvent event;
+        EventHandler::onRender(event);
     }
 
     // Render Shit
