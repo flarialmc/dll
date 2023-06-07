@@ -6,6 +6,7 @@
 #include <dxgi1_4.h>
 #include <dwrite_1.h>
 #include <initguid.h>
+#include "../../Utils/Utils.hpp"
 
 namespace DX11Interface {
     ID3D11Device* d3d11device = nullptr;
@@ -13,11 +14,18 @@ namespace DX11Interface {
     ID3D11RenderTargetView* mainRenderTargetView = nullptr;
 }
 
-class RenderUtils {
+namespace D2D {
 
 public:
     static ID2D1DeviceContext* context;
-    ID3D11Device* device;
-    ID3D11RenderTargetView* renderTarget;
+    static ID3D11Device* device;
+    static ID3D11RenderTargetView* renderTarget;
+
+};
+
+namespace GUIInfo {
+
+    static Vec2<float> mousepos;
+    static Vec2<float> windowSize;
 
 };

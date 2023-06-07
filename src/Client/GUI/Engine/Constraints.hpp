@@ -1,7 +1,7 @@
 ﻿
 /*#include "d2d1.h"
-#include "../Utils/RenderUtils.h"
-#include "../Utils/Utils.h"
+#include "../D2D/D2D.h"
+#include "../D2D/D2D.h"
 #pragma once
 
 class Constraints

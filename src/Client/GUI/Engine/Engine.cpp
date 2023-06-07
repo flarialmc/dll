@@ -45,15 +45,15 @@ bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COL
 
     ID2D1SolidColorBrush *brush;
     D2D1_COLOR_F buttonColor = CursorInRect(x, y, width, height) ? D2D1::ColorF(color.r - darkenAmount, color.g - darkenAmount, color.b - darkenAmount, color.a) : color;
-    RenderUtils::context->CreateSolidColorBrush(buttonColor, &brush);
+    D2D::context->CreateSolidColorBrush(buttonColor, &brush);
     D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
-    RenderUtils::context->FillRectangle(rect, brush);
+    D2D::context->FillRectangle(rect, brush);
     brush->Release();
 
     IDWriteTextFormat *textFormat;
     IDWriteFactory *writeFactory;
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
-    writeFactory->CreateTextFormat(L"Arial", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-US", &textFormat); ID2D1SolidColorBrush *textBrush; RenderUtils::context->CreateSolidColorBrush(textColor, &textBrush); textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER); textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER); RenderUtils::context->DrawTextW(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush); textBrush->Release(); textFormat->Release();
+    writeFactory->CreateTextFormat(L"Arial", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-US", &textFormat); ID2D1SolidColorBrush *textBrush; D2D::context->CreateSolidColorBrush(textColor, &textBrush); textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER); textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER); D2D::context->DrawTextW(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush); textBrush->Release(); textFormat->Release();
 
     if (CursorInRect(x, y, width, height) && MC::mouseaction == MouseAction::Left && !MC::held)
     {
@@ -83,7 +83,7 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     static ID2D1SolidColorBrush* textBrush = nullptr;
     if (!textBrush)
     {
-        RenderUtils::context->CreateSolidColorBrush(textColor, &textBrush);
+        D2D::context->CreateSolidColorBrush(textColor, &textBrush);
     }
 
     static IDWriteTextFormat* textFormat = nullptr;
@@ -108,12 +108,12 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     {
         buttonColor = D2D1::ColorF(color.r - darkenAmount, color.g - darkenAmount, color.b - darkenAmount, color.a);
     }
-    RenderUtils::context->CreateSolidColorBrush(buttonColor, &brush);
+    D2D::context->CreateSolidColorBrush(buttonColor, &brush);
 
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
-    RenderUtils::context->FillRoundedRectangle(roundedRect, brush);
+    D2D::context->FillRoundedRectangle(roundedRect, brush);
 
-    RenderUtils::context->DrawTextW(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
+    D2D::context->DrawTextW(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
 
     brush->Release();
     return false;
@@ -126,9 +126,9 @@ void FlarialGUI::RoundedRect(float x, float y, const D2D_COLOR_F color, const fl
         y += scrollpos;
 
     ID2D1SolidColorBrush *brush;
-    RenderUtils::context->CreateSolidColorBrush(color, &brush);
+    D2D::context->CreateSolidColorBrush(color, &brush);
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
-    RenderUtils::context->FillRoundedRectangle(roundedRect, brush);
+    D2D::context->FillRoundedRectangle(roundedRect, brush);
     brush->Release();
 }
 
@@ -140,7 +140,7 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
     D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
 
     ID2D1Factory *factory;
-    RenderUtils::context->GetFactory(&factory);
+    D2D::context->GetFactory(&factory);
 
     ID2D1PathGeometry *geometry = nullptr;
     factory->CreatePathGeometry(&geometry);
@@ -191,9 +191,9 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
     sink->Close();
 
     ID2D1SolidColorBrush *brush;
-    RenderUtils::context->CreateSolidColorBrush(color, &brush);
+    D2D::context->CreateSolidColorBrush(color, &brush);
 
-    RenderUtils::context->FillGeometry(geometry, brush);
+    D2D::context->FillGeometry(geometry, brush);
 
     factory->Release();
     sink->Release();
@@ -206,11 +206,11 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
     if (isInScrollView)
         y += scrollpos;
     ID2D1SolidColorBrush *brush;
-    RenderUtils::context->CreateSolidColorBrush(color, &brush);
+    D2D::context->CreateSolidColorBrush(color, &brush);
 
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), 5, 5);
 
-    RenderUtils::context->FillRoundedRectangle(roundedRect, brush);
+    D2D::context->FillRoundedRectangle(roundedRect, brush);
 
     Image(imagePath, roundedRect.rect, imageWidth, imageHeight);
 
@@ -223,7 +223,7 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
     D2D1_RECT_F textRect = D2D1::RectF(x + height + 10, y, x + width, y + height);
-    RenderUtils::context->DrawTextW(text, (UINT32)wcslen(text), textFormat, textRect, brush);
+    D2D::context->DrawTextW(text, (UINT32)wcslen(text), textFormat, textRect, brush);
 
     brush->Release();
     textFormat->Release();
@@ -235,12 +235,12 @@ void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect, const int 
     if (isInScrollView)
         rect.top += scrollpos;
     ID2D1Bitmap *bitmap;
-    std::string among = Utils::getRoamingPath() + "\\" + imageName;
+    std::string among = D2D::getRoamingPath() + "\\" + imageName;
     LoadImageFromFile(to_wide(among).c_str(), &bitmap);
 
     // Draw image
     D2D1_RECT_F imageRect = D2D1::RectF(rect.left, rect.top, rect.right, rect.bottom);
-    RenderUtils::context->DrawBitmap(bitmap, imageRect);
+    D2D::context->DrawBitmap(bitmap, imageRect);
     bitmap->Release();
 }
 
@@ -250,7 +250,7 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F
     if (isInScrollView)
         y += scrollpos;
     ID2D1SolidColorBrush *brush;
-    RenderUtils::context->CreateSolidColorBrush(color, &brush);
+    D2D::context->CreateSolidColorBrush(color, &brush);
 
     IDWriteFactory *writeFactory;
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
@@ -260,7 +260,7 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
     D2D1_RECT_F textRect = D2D1::RectF(x + height + 10, y, x + width, y + height);
-    RenderUtils::context->DrawTextW(text, (UINT32)wcslen(text), textFormat, textRect, brush);
+    D2D::context->DrawTextW(text, (UINT32)wcslen(text), textFormat, textRect, brush);
 
     writeFactory->Release();
     textFormat->Release();
@@ -290,7 +290,7 @@ void FlarialGUI::LoadImageFromFile(const wchar_t *filename, ID2D1Bitmap **bitmap
     formatConverter->Initialize(frame, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.0, WICBitmapPaletteTypeMedianCut);
 
     // Create bitmap
-    RenderUtils::context->CreateBitmapFromWicBitmap(formatConverter, nullptr, bitmap);
+    D2D::context->CreateBitmapFromWicBitmap(formatConverter, nullptr, bitmap);
 
     bitmapDecoder->Release();
     frame->Release();
@@ -303,13 +303,13 @@ void FlarialGUI::SetScrollView(float x, float y, float width, float height)
 
     FlarialGUI::isInScrollView = true;
     D2D1_RECT_F clipRect = D2D1::RectF(x, y, x + width, y + height);
-    RenderUtils::context->PushAxisAlignedClip(&clipRect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+    D2D::context->PushAxisAlignedClip(&clipRect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 }
 
 void FlarialGUI::UnsetScrollView()
 {
     FlarialGUI::isInScrollView = false;
-    RenderUtils::context->PopAxisAlignedClip();
+    D2D::context->PopAxisAlignedClip();
 }
 
 void FlarialGUI::ScrollBar(float x, float y, float width, float height, float radius)
@@ -335,15 +335,15 @@ void FlarialGUI::ScrollBar(float x, float y, float width, float height, float ra
 
     // Draw the gray bar
     ID2D1SolidColorBrush *graybrush;
-    RenderUtils::context->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gray), &graybrush);
+    D2D::context->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gray), &graybrush);
     D2D1_ROUNDED_RECT grayRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radius, radius);
-    RenderUtils::context->FillRoundedRectangle(&grayRect, graybrush);
+    D2D::context->FillRoundedRectangle(&grayRect, graybrush);
     graybrush->Release();
     // Draw the white bar
     ID2D1SolidColorBrush *whitebrush;
-    RenderUtils::context->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &whitebrush);
+    D2D::context->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &whitebrush);
     D2D1_ROUNDED_RECT whiteRect = D2D1::RoundedRect(D2D1::RectF(x, whiteY, x + width, whiteY + (height * 69.5 / 100)), radius, radius);
-    RenderUtils::context->FillRoundedRectangle(&whiteRect, whitebrush);
+    D2D::context->FillRoundedRectangle(&whiteRect, whitebrush);
     whitebrush->Release();
 }
 
@@ -426,8 +426,8 @@ Vec2<float> FlarialGUI::CalculateMovedXY(float x, float y, int num)
 Vec2<float> FlarialGUI::GetCenterXY(float rectWidth, float rectHeight)
 {
     Vec2<float> xy;
-    xy.x = (RenderUtils::context->GetSize().width - rectWidth) / 2.0f;
-    xy.y = (RenderUtils::context->GetSize().height - rectHeight) / 2.0f;
+    xy.x = (D2D::context->GetSize().width - rectWidth) / 2.0f;
+    xy.y = (D2D::context->GetSize().height - rectHeight) / 2.0f;
     return xy;
 }
 

@@ -1,7 +1,7 @@
 /*
-#include "../../../Utils/Logger/Logger.hpp"
-#include "../../../Utils/Utils.hpp"
-#include "../RenderUtils.hpp"
+#include "../../../D2D/Logger/Logger.hpp"
+#include "../../../D2D/D2D.hpp"
+#include "../D2D.hpp"
 #include "../SDK/Minecraft.h"
 #include <wincodec.h>
 #include <stack>

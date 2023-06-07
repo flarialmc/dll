@@ -18,6 +18,6 @@ file(GLOB_RECURSE sources
 	"lib/**/*.cpp",
 )
 
-add_library(Flarial SHARED ${sources})
+add_library(Flarial SHARED ${sources} src/Client/GUI/GUIMouseListener.hpp)
 target_include_directories(Flarial PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/")
 target_link_libraries(Flarial PRIVATE version)
