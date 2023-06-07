@@ -7,6 +7,7 @@
 #include <iostream>
 
 std::string Logger::file = Utils::getRoamingPath() + "\\Flarial\\logs\\latest.log";
+FILE* Logger::fp = nullptr;
 
 void Logger::writeToFile(std::string str)
 {
@@ -34,11 +35,6 @@ void Logger::initialize()
     {
         std::filesystem::remove(file);
     }
-
-    AllocConsole();
-    SetConsoleTitleA("Flarial");
-    FILE* fp;
-    freopen_s(&fp, "CONOUT$", "w", stdout); // output only
 }
 
 void Logger::debug(std::string str)

@@ -5,7 +5,7 @@ class Logger
 {
 public:
     static std::string file;
-
+    static FILE* fp;
 private:
     static void writeToFile(std::string);
 

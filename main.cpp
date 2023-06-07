@@ -22,7 +22,9 @@ DWORD WINAPI init()
     }
 
     Logger::info("Uninitializing Client");
-    FreeConsole();
+
+
+
     EventHandler::unregisterAll();
     ModuleManager::terminate();
     HookManager::terminate();
