@@ -1,10 +1,9 @@
-/*
-#include "../../../D2D/Logger/Logger.hpp"
-#include "../../../D2D/D2D.hpp"
+#include "../../../Utils/Logger/Logger.hpp"
+#include "../../../Utils/Utils.hpp"
 #include "../D2D.hpp"
-#include "../SDK/Minecraft.h"
 #include <wincodec.h>
 #include <stack>
+#include <d2d1_1.h>
 
 class WindowRect
 {
@@ -64,5 +63,3 @@ namespace FlarialGUI
     void UpdateWindowRects();
     
 };
-
-*/

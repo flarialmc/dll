@@ -6,7 +6,7 @@
 void ModuleManager::initialize()
 {
     EventHandler::registerListener(new TestListener("test"));
-    EventHandler::registerListener(new GUIMouseListener("GUIMouse"))
+    EventHandler::registerListener(new GUIMouseListener("GUIMouse"));
 }
 
 void ModuleManager::terminate()

@@ -1,8 +1,8 @@
-﻿/*
+﻿
 #include "Engine.hpp"
 
 #include "Constraints.hpp"
-#include "../Manager/Module/Module.h"
+#include "../../Module/Modules/Module.hpp"
 
 // improve following code
 static bool CursorInRect(float rectX, float rectY, float width, float height)
@@ -53,16 +53,16 @@ bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COL
     IDWriteTextFormat *textFormat;
     IDWriteFactory *writeFactory;
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
-    writeFactory->CreateTextFormat(L"Arial", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-US", &textFormat); ID2D1SolidColorBrush *textBrush; D2D::context->CreateSolidColorBrush(textColor, &textBrush); textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER); textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER); D2D::context->DrawTextW(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush); textBrush->Release(); textFormat->Release();
+    writeFactory->CreateTextFormat(L"Arial", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-US", &textFormat); ID2D1SolidColorBrush *textBrush; D2D::context->CreateSolidColorBrush(textColor, &textBrush); textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER); textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER); D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush); textBrush->Release(); textFormat->Release();
 
-    if (CursorInRect(x, y, width, height) && MC::mouseaction == MouseAction::Left && !MC::held)
+    if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
-        MC::mouseaction = MouseAction::None;
+        MC::mousebutton = MouseButton::None;
         return true;
     }
     else
     {
-        MC::mouseaction = MouseAction::None;
+        MC::mousebutton = MouseButton::None;
         return false;
     }
 }
@@ -96,11 +96,13 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
 
     const float darkenAmount = 0.1f;
 
-    if (CursorInRect(x, y, width, height) && MC::mouseaction == MouseAction::Left && !MC::held)
+    if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
-        MC::mouseaction = MouseAction::None;
+        MC::mousebutton = MouseButton::None;
         return true;
     }
+
+
 
     ID2D1SolidColorBrush* brush = nullptr;
     D2D1_COLOR_F buttonColor = color;
@@ -113,7 +115,7 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
     D2D::context->FillRoundedRectangle(roundedRect, brush);
 
-    D2D::context->DrawTextW(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
+    D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
 
     brush->Release();
     return false;
@@ -223,7 +225,7 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
     D2D1_RECT_F textRect = D2D1::RectF(x + height + 10, y, x + width, y + height);
-    D2D::context->DrawTextW(text, (UINT32)wcslen(text), textFormat, textRect, brush);
+    D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
 
     brush->Release();
     textFormat->Release();
@@ -235,7 +237,7 @@ void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect, const int 
     if (isInScrollView)
         rect.top += scrollpos;
     ID2D1Bitmap *bitmap;
-    std::string among = D2D::getRoamingPath() + "\\" + imageName;
+    std::string among = Utils::getRoamingPath() + "\\" + imageName;
     LoadImageFromFile(to_wide(among).c_str(), &bitmap);
 
     // Draw image
@@ -260,7 +262,7 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
     D2D1_RECT_F textRect = D2D1::RectF(x + height + 10, y, x + width, y + height);
-    D2D::context->DrawTextW(text, (UINT32)wcslen(text), textFormat, textRect, brush);
+    D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
 
     writeFactory->Release();
     textFormat->Release();
@@ -382,7 +384,7 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
         WindowRects[currentNum].percentageY = WindowRects[currentNum].movedY / MC::windowSize.y;
     }
 
-    if (MC::mouseaction == MouseAction::None && !MC::held || MC::mouseaction == MouseAction::Left && !MC::held)
+    if (MC::mousebutton == MouseButton::None && !MC::held || MC::mousebutton == MouseButton::Left && !MC::held)
     {
         WindowRects[currentNum].isMovingElement = false;
     }
@@ -458,4 +460,3 @@ std::wstring FlarialGUI::to_wide(const std::string &multi)
     }
     return wide;
 }
-*/

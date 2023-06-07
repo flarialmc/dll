@@ -1,8 +1,8 @@
-﻿/*#include "ClickGUIElements.hpp"
-
-
+﻿
+#include "ClickGUIElements.hpp"
 #include "../Engine/Constraints.hpp"
 #include "../Engine/Engine.hpp"
+#include <d2d1_1.h>
 
 void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string iconpath, const float width, const float height)
 {
@@ -39,4 +39,3 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 
 }
 
-*/

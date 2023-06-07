@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include <string>
+#include <cstdlib>
+#include <cmath>
 
 class Utils
 {
@@ -72,7 +74,7 @@ public:
     };
 
     auto floor() -> Vec3<T> {
-        return Vec3<T>(std::floorf(this->x), std::floorf(this->y), std::floorf(this->z));
+        return Vec3<T>(std::floor(this->x), std::floor(this->y), std::floor(this->z));
     };
 
     auto div(T x, T y, T z) -> Vec3<T> {

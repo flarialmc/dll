@@ -1,3 +1,4 @@
+#pragma once
 #include "d2d1_1.h"
 #include <dxgi.h>
 #include <d3d11.h>
@@ -7,25 +8,22 @@
 #include <dwrite_1.h>
 #include <initguid.h>
 #include "../../Utils/Utils.hpp"
-
-namespace DX11Interface {
-    ID3D11Device* d3d11device = nullptr;
-    ID3D11DeviceContext* context = nullptr;
-    ID3D11RenderTargetView* mainRenderTargetView = nullptr;
-}
+#include "../Events/Input/MouseEvent.hpp"
 
 namespace D2D {
-
-public:
     static ID2D1DeviceContext* context;
     static ID3D11Device* device;
     static ID3D11RenderTargetView* renderTarget;
 
 };
 
-namespace GUIInfo {
+namespace MC {
 
     static Vec2<float> mousepos;
     static Vec2<float> windowSize;
+    static MouseAction mouseaction;
+    static MouseButton mousebutton;
+    static bool held;
+    static inline bool hasResized = false;
 
 };

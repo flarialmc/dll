@@ -1,8 +1,6 @@
 ﻿
-/*#include "Constraints.hpp"
-
+#include "Constraints.hpp"
 #include "Engine.hpp"
-#include "../SDK/Minecraft.h"
 
 float Constraints::PercentageConstraint(float percentage, const std::string& edge, bool ignore_stack)
 {
@@ -132,6 +130,5 @@ Vec2<float> Constraints::RoundingConstraint(float radiusX, float radiusY, bool i
     float scaledRadiusY = radiusY * minDimension / 1080.0f;
 
     // Return the scaled radii as a Vec2
-    return Vec2<float>(scaledRadiusX, scaledRadiusY);
+    return {scaledRadiusX, scaledRadiusY};
 }
-*/
