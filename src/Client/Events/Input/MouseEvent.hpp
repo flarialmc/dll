@@ -9,7 +9,7 @@ enum class MouseAction {
     SCROLL_DOWN
 };
 
-enum MouseButton { None = 0, Left = 1, Right = 2, Middle = 3, Scroll = 4 };
+enum MouseButton { None = 0, Left = 1, Right = 2, Middle = 3, Scroll = 4, Button5 = 5, Button6 = 6};
 
 class MouseEvent : public Event, public Cancellable {
 
