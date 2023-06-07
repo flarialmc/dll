@@ -3,6 +3,8 @@
 #include "src/Client/Client.hpp"
 #include "src/Client/Events/EventHandler.hpp"
 
+#include <kiero.h>
+
 HMODULE real = nullptr;
 
 DWORD WINAPI init()
@@ -19,16 +21,16 @@ DWORD WINAPI init()
         }
     }
 
-    FreeConsole();
     Logger::info("Uninitializing Client");
+    FreeConsole();
     EventHandler::unregisterAll();
     ModuleManager::terminate();
     HookManager::terminate();
+    kiero::shutdown();
 
     MH_DisableHook(MH_ALL_HOOKS);
     MH_Uninitialize();
 
-    Sleep(100);
     FreeLibraryAndExitThread(real, 1);
 }
 
