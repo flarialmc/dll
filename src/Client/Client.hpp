@@ -5,4 +5,5 @@
 namespace Client
 {
     void initialize();
+    static bool disable;
 };

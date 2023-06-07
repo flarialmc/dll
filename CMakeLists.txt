@@ -18,6 +18,6 @@ file(GLOB_RECURSE sources
 	"lib/**/*.cpp",
 )
 
-add_library(Flarial SHARED ${sources} src/Client/GUI/GUIMouseListener.hpp)
+add_library(Flarial SHARED ${sources} src/Client/Module/Modules/Misc/Uninject/UninjectListener.hpp)
 target_include_directories(Flarial PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/")
 target_link_libraries(Flarial PRIVATE dwrite.lib d3d12.lib dxgi.lib d3d11.lib version)

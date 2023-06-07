@@ -17,15 +17,13 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
         ID3D12Device5 *d3d12device = nullptr;
         if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device))))
         {
-            Logger::debug("Deleting D3D12Device");
+            Logger::debug("Removing D3D12Device");
 
             d3d12device->RemoveDevice();
         }
         ID3D11Device *d3d11device = nullptr;
         if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d11device))))
         {
-
-            Logger::debug("Deleting D3D12Device");
 
             ID3D11DeviceContext *context = nullptr;
             ID3D11Texture2D *back_buffer;
@@ -37,7 +35,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
             // TODO: Create d2d resources
 
             back_buffer->Release();
-            back_buffer = nullptr;
 
             init = true;
         }

@@ -1,3 +1,4 @@
+#pragma once
 #include <vector>
 #include <string>
 #include "Listener.hpp"
@@ -14,5 +15,7 @@ public:
 public:
     static void onKey(KeyEvent &event);
     static void onMouse(MouseEvent &event);
+
+    static void unregisterAll();
 };
 

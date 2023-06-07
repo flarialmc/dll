@@ -1,7 +1,7 @@
 //
 // Created by User on 6/7/2023.
 //
-
+#pragma once
 #include "EventHandler.hpp"
 
 void EventHandler::registerListener(Listener *listener) {
@@ -15,6 +15,12 @@ void EventHandler::unregisterListener(std::string name) {
     if (it != listeners.end()) {
         listeners.erase(it);
     }
+
+}
+
+void EventHandler::unregisterAll() {
+
+    listeners.clear();
 
 }
 

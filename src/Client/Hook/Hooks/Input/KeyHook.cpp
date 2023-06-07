@@ -19,5 +19,5 @@ void KeyHook::keyCallback(int key, int state)
     EventHandler::onKey(event);
 
     if (!event.isCancelled())
-        return func_original(event.GetKey(), event.GetAction());
+        return func_original(event.GetKey(), static_cast<int>(event.GetAction()));
 }
