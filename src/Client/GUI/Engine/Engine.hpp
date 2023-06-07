@@ -1,4 +1,4 @@
-
+/*
 #include "../../../Utils/Logger/Logger.hpp"
 #include "../../../Utils/Utils.hpp"
 #include "../RenderUtils.hpp"
@@ -64,3 +64,5 @@ namespace FlarialGUI
     void UpdateWindowRects();
     
 };
+
+*/

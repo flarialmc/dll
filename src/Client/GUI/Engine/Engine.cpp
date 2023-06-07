@@ -1,4 +1,4 @@
-﻿
+﻿/*
 #include "Engine.hpp"
 
 #include "Constraints.hpp"
@@ -458,3 +458,4 @@ std::wstring FlarialGUI::to_wide(const std::string &multi)
     }
     return wide;
 }
+*/

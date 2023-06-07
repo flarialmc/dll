@@ -1,4 +1,5 @@
-﻿#include "Constraints.hpp"
+﻿
+/*#include "Constraints.hpp"
 
 #include "Engine.hpp"
 #include "../SDK/Minecraft.h"
@@ -133,3 +134,4 @@ Vec2<float> Constraints::RoundingConstraint(float radiusX, float radiusY, bool i
     // Return the scaled radii as a Vec2
     return Vec2<float>(scaledRadiusX, scaledRadiusY);
 }
+*/

@@ -4,8 +4,8 @@
 
 void Client::initialize()
 {
+    Logger::initialize();
+
     HookManager::initialize();
     ModuleManager::initialize();
-
-    Logger::initialize();
 }

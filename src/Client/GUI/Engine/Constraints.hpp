@@ -1,4 +1,5 @@
-﻿#include "d2d1.h"
+﻿
+/*#include "d2d1.h"
 #include "../Utils/RenderUtils.h"
 #include "../Utils/Utils.h"
 #pragma once
@@ -11,3 +12,5 @@ public:
     static Vec2<float> CenterConstraint(float width, float height, std::string axis, float xmodifier, float ymodifier, bool ignore_stack = false);
     static Vec2<float> RoundingConstraint(float radiusX, float radiusY, bool ignore_stack = false);
 };
+
+*/

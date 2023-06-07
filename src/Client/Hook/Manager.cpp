@@ -9,6 +9,7 @@ void HookManager::initialize()
 
     for (auto hook : hooks)
         hook->enableHook();
+
 }
 
 void HookManager::terminate()
