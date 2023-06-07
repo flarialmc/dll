@@ -3,6 +3,7 @@
 //
 #pragma once
 #include "EventHandler.hpp"
+#include "Render/RenderEvent.hpp"
 
 void EventHandler::registerListener(Listener *listener) {
     listeners.push_back(listener);
@@ -40,4 +41,14 @@ void EventHandler::onMouse(MouseEvent &event) {
         listener->onMouse(event);
 
     }
+}
+
+void EventHandler::onRender(RenderEvent &event) {
+
+    for (auto &listener: listeners) {
+
+        listener->onRender(event);
+
+    }
+
 }

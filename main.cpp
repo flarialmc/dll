@@ -24,6 +24,7 @@ DWORD WINAPI init()
     EventHandler::unregisterAll();
     ModuleManager::terminate();
     HookManager::terminate();
+
     MH_DisableHook(MH_ALL_HOOKS);
     MH_Uninitialize();
 

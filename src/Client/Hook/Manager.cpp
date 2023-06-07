@@ -1,9 +1,10 @@
 ﻿#include "Manager.hpp"
 
+std::vector<Hook *> HookManager::hooks;
+
 void HookManager::initialize()
 {
     MH_Initialize();
-    hooks = std::vector<Hook *>();
 
     hooks.push_back(new KeyHook());
     hooks.push_back(new MouseHook());
@@ -15,8 +16,6 @@ void HookManager::initialize()
 
 void HookManager::terminate()
 {
-    MH_DisableHook(MH_ALL_HOOKS);
-    MH_Uninitialize();
 
     for (auto hook : hooks)
         delete hook;

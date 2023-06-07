@@ -1,4 +1,7 @@
 #include "SwapchainHook.hpp"
+#include "../../../GUI/D2D.hpp"
+#include "../../../Events/Render/RenderEvent.hpp"
+#include "../../../Events/EventHandler.hpp"
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", "") {}
 
@@ -33,11 +36,19 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
             d3d11device->CreateRenderTargetView(back_buffer, NULL, &mainRenderTargetView);
 
             // TODO: Create d2d resources
+            D2D::context = reinterpret_cast<ID2D1DeviceContext *>(context);
+            D2D::device = d3d11device;
+            D2D::renderTarget = mainRenderTargetView;
 
             back_buffer->Release();
 
             init = true;
         }
+    } else {
+
+        RenderEvent event;
+        EventHandler::onRender(event);
+
     }
 
     // Render Shit

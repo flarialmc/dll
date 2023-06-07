@@ -15,7 +15,8 @@ namespace D2D {
     static ID3D11Device* device;
     static ID3D11RenderTargetView* renderTarget;
 
-};
+    void terminate();
+}
 
 namespace MC {
 

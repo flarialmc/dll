@@ -4,6 +4,7 @@
 #include "Listener.hpp"
 #include "Input/KeyEvent.hpp"
 #include "Input/MouseEvent.hpp"
+#include "Render/RenderEvent.hpp"
 
 class EventHandler {
 
@@ -17,5 +18,7 @@ public:
     static void onMouse(MouseEvent &event);
 
     static void unregisterAll();
+
+    static void onRender(RenderEvent &event);
 };
 

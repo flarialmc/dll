@@ -2,8 +2,9 @@
 #include "Manager.hpp"
 #include "../Events/EventHandler.hpp"
 #include "Modules/Input/TestListener.hpp"
-#include "../GUI/GUIMouseListener.hpp"
+#include "Modules/ClickGUI/GUIMouseListener.hpp"
 #include "Modules/Misc/Uninject/Uninject.hpp"
+#include "Modules/ClickGUI/ClickGUI.hpp"
 
 namespace ModuleManager {
     std::vector<Module*> modules;
@@ -13,10 +14,8 @@ void ModuleManager::initialize()
 {
     // Test stuff
     EventHandler::registerListener(new TestListener("test"));
-    EventHandler::registerListener(new GUIMouseListener("GUIMouse"));
 
     modules.push_back(new Uninject());
-
 
 }
 

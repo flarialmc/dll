@@ -1,0 +1,28 @@
+#pragma once
+
+#include "../Module.hpp"
+#include "../../../Events/EventHandler.hpp"
+#include "ClickGUIRenderer.hpp"
+
+class ClickGUI : public Module {
+
+public:
+
+    ClickGUI() : Module("ClickGUI", "What do you think it is?", "", 'K') {
+
+        onEnable();
+
+    };
+
+    void onEnable() override {
+
+        EventHandler::registerListener(new ClickGUIRenderer("ClickGUI", this));
+
+    }
+
+    void onDisable() override {
+
+        EventHandler::unregisterListener("ClickGUI");
+
+    }
+};

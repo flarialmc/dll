@@ -8,9 +8,10 @@
 
 #include "MinHook.h"
 
-namespace HookManager
+class HookManager
 {
-    inline std::vector<Hook *> hooks;
-    void initialize();
-    void terminate();
+public:
+    static std::vector<Hook *> hooks;
+    static void initialize();
+    static void terminate();
 };
