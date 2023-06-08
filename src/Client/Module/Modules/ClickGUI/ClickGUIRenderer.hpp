@@ -19,7 +19,7 @@ class ClickGUIRenderer : public Listener {
 
         if(enabled) {
 
-            //FlarialGUI::RoundedButton(center.x, center.y);
+            /* Base Rectangle Start */
 
             float baseWidth = Constraints::RelativeConstraint(0.78);
             float baseHeight = Constraints::RelativeConstraint(0.7);
@@ -28,6 +28,30 @@ class ClickGUIRenderer : public Listener {
             Vec2<float> round = Constraints::RoundingConstraint(50, 50);
 
             FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), baseWidth, baseHeight, round.x, round.x);
+            FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
+
+             /* Base Rectangle End */
+
+
+             /* Nav Bar Start */
+
+            float navigationBarWidth = Constraints::RelativeConstraint(1.097f);
+            float navigationBarHeight = Constraints::RelativeConstraint(0.118f);
+            float navx = Constraints::PercentageConstraint(0.008f, "left");
+            float navy = Constraints::PercentageConstraint(0.007f, "top");
+            round = Constraints::RoundingConstraint(45, 45);
+
+            FlarialGUI::RoundedRect(navx, navy, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), navigationBarWidth, navigationBarHeight, round.x ,round.x);
+
+
+            FlarialGUI::PushSize(navx, navy, navigationBarWidth, navigationBarHeight);
+
+             /* Nav Bar End */
+
+            FlarialGUI::PopSize();
+
+            FlarialGUI::PopSize();
+
         }
 
     }
