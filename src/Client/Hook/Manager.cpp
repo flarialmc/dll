@@ -1,4 +1,5 @@
 ﻿#include "Manager.hpp"
+#include "Hooks/Render/ResizeHook.hpp"
 
 std::vector<Hook *> HookManager::hooks;
 
@@ -9,6 +10,7 @@ void HookManager::initialize()
     hooks.push_back(new KeyHook());
     hooks.push_back(new MouseHook());
     hooks.push_back(new SwapchainHook());
+    hooks.push_back(new ResizeHook());
 
     for (auto hook : hooks)
         hook->enableHook();

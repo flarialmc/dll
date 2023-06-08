@@ -356,7 +356,6 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
     isInWindowRect = true;
     if (!WindowRects[currentNum].madeRect)
     {
-        Logger::debug(std::to_string(WindowRects[currentNum].madeRect));
         WindowRects[currentNum] = WindowRect();
         WindowRects[currentNum].madeRect = true;
     }

@@ -47,8 +47,9 @@ float Constraints::PercentageConstraint(float percentage, const std::string& edg
 float Constraints::RelativeConstraint(float percent, std::string dimension, bool ignore_stack)
 {
     float length = 0.0f;
-    float screenWidth = 0;
-    float screenHeight = 0;
+    float screenWidth;
+    float screenHeight;
+
     if (ignore_stack || FlarialGUI::dimension_stack.empty())
     {
         screenWidth = MC::windowSize.x;
@@ -60,7 +61,7 @@ float Constraints::RelativeConstraint(float percent, std::string dimension, bool
         screenHeight = FlarialGUI::dimension_stack.top().height;
     }
 
-    Logger::debug(std::to_string(static_cast<int>(screenWidth)) + " " + std::to_string(static_cast<int>(screenHeight)));
+
     
     if (dimension == "width")
     {
@@ -73,6 +74,7 @@ float Constraints::RelativeConstraint(float percent, std::string dimension, bool
         length = screenHeight * percent;
     }
 
+    Logger::debug(std::to_string(length));
     return length;
 }
 

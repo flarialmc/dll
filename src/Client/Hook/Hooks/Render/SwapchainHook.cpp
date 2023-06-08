@@ -18,12 +18,12 @@ void SwapchainHook::enableHook()
     this->manualHook(swapchain_ptr, swapchainCallback, (void **)&func_original);
 }
 
-bool init = false;
+bool SwapchainHook::init = false;
 
 void SwapchainHook::swapchainCallback(IDXGISwapChain *pSwapChain, UINT syncInterval, UINT flags)
 {
 
-    if(!init) {
+    if(!SwapchainHook::init) {
 
         ID3D12Device5 *device;
         if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&device)))) {
@@ -55,7 +55,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain *pSwapChain, UINT syncInter
 
             factory->Release();
             factory = nullptr;
-            init = true;
+            SwapchainHook::init = true;
         }
 
     } else {
