@@ -9,10 +9,8 @@ void Client::initialize()
 {
     Logger::initialize();
 
-    if(GetModuleHandle("d3d12.dll") != NULL)
-    kiero::init(kiero::RenderType::D3D12);
 
-    if (kiero::getRenderType() == kiero::RenderType::None)
+    if(kiero::init(kiero::RenderType::D3D12) != kiero::Status::Success)
     kiero::init(kiero::RenderType::D3D11);
 
     HookManager::initialize();

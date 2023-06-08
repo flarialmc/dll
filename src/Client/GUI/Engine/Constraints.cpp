@@ -65,16 +65,13 @@ float Constraints::RelativeConstraint(float percent, std::string dimension, bool
     
     if (dimension == "width")
     {
-        if(static_cast<int>(screenHeight) > static_cast<int>(screenWidth) && FlarialGUI::dimension_stack.empty() || static_cast<int>(screenHeight) > static_cast<int>(screenWidth) && ignore_stack)
-            length = screenWidth * (percent + .25f);
-        else length = screenWidth * percent;
+        length = screenWidth * percent;
     }
     else if (dimension == "height")
     {
         length = screenHeight * percent;
     }
 
-    Logger::debug(std::to_string(length));
     return length;
 }
 
