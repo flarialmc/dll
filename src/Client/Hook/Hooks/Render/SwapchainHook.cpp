@@ -13,58 +13,63 @@ void SwapchainHook::enableHook()
 }
 
 bool init = false;
+bool d2d = false;
 
 void SwapchainHook::swapchainCallback(IDXGISwapChain *pSwapChain, UINT syncInterval, UINT flags)
 {
 
     if(!init) {
+
         ID3D12Device5 *device;
         if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&device)))) {
 
+            Logger::debug("Removing D3D12 Device");
             device->RemoveDevice();
+            device->Release();
+            device = nullptr;
+        }
+
+
+        ID3D11Device *d3d11device = nullptr;
+
+        if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d11device)))) {
+
+            // Create the D2D factory
+            ID2D1Factory* factory;
+            D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &factory);
+
+            // Set up the D2D render target using the back buffer
+            IDXGISurface* dxgiBackbuffer;
+            pSwapChain->GetBuffer(0, IID_PPV_ARGS(&dxgiBackbuffer));
+            factory->CreateDxgiSurfaceRenderTarget(dxgiBackbuffer, D2D1::RenderTargetProperties(
+                    D2D1_RENDER_TARGET_TYPE_DEFAULT, D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED)), &D2D::context);
+
+
+            dxgiBackbuffer->Release();
+            dxgiBackbuffer = nullptr;
+
+            factory->Release();
+            factory = nullptr;
+
             init = true;
         }
 
-        ID3D11Device *d3d11device = nullptr;
-        ID3D11RenderTargetView *mainRenderTargetView = nullptr;
+    } else {
 
-        if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void **) &d3d11device))) {
-
-            ID3D11Texture2D *pBackBuffer;
-            pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void **) &pBackBuffer);
-            d3d11device->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView);
-
-            const D2D1_CREATION_PROPERTIES properties
-                    {
-                            D2D1_THREADING_MODE_SINGLE_THREADED,
-                            D2D1_DEBUG_LEVEL_NONE,
-                            D2D1_DEVICE_CONTEXT_OPTIONS_NONE
-                    };
-
-
-            ID2D1DeviceContext *d2dContext;
-
-            IDXGISurface *eBackBuffer;
-            pSwapChain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
-            D2D1CreateDeviceContext(eBackBuffer, properties, &d2dContext);
-            D2D::context = d2dContext;
+        if(D2D::context != nullptr) {
 
             MC::windowSize.x = D2D::context->GetSize().width;
             MC::windowSize.y = D2D::context->GetSize().height;
 
-            eBackBuffer->Release();
-            pBackBuffer->Release();
-            eBackBuffer = nullptr;
-            pBackBuffer = nullptr;
-            d3d11device->Release();
-            mainRenderTargetView->Release();
-            d3d11device = nullptr;
-            mainRenderTargetView = nullptr;
+            D2D::context->BeginDraw();
+            RenderEvent event;
+            EventHandler::onRender(event);
+            D2D::context->EndDraw();
         }
 
     }
 
-    // Render Shit
+
     return func_original(pSwapChain, syncInterval, flags);
 
 

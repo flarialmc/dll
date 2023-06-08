@@ -23,10 +23,17 @@ DWORD WINAPI init()
 
     Logger::info("Uninitializing Client");
 
-    D2D::terminate();
     EventHandler::unregisterAll();
+
+    if(D2D::context != nullptr) {
+        D2D::context->Release();
+        D2D::context = nullptr;
+        Logger::debug("isreal");
+    }
+
     ModuleManager::terminate();
     HookManager::terminate();
+
     kiero::shutdown();
 
     MH_DisableHook(MH_ALL_HOOKS);

@@ -9,14 +9,11 @@
 #include <initguid.h>
 #include "../../Utils/Utils.hpp"
 #include "../Events/Input/MouseEvent.hpp"
+#include "../../Utils/Logger/Logger.hpp"
 
-class D2D {
-public:
-    static ID2D1DeviceContext* context;
-    static ID3D11Device* device;
-    static ID3D11RenderTargetView* renderTarget;
+namespace D2D {
 
-    static void terminate();
+    inline ID2D1RenderTarget* context;
 };
 
 namespace MC {
