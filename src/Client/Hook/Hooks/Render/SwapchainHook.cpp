@@ -29,13 +29,11 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain *pSwapChain, UINT syncInter
         if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&device)))) {
 
             device->RemoveDevice();
-            device->Release();
-            device = nullptr;
 
         }
 
 
-        ID3D11Device *d3d11device = nullptr;
+        ID3D11Device *d3d11device;
 
         if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d11device)))) {
 
