@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "../../Module/Modules/Module.hpp"
+#include "../../Module.hpp"
 
 class ClickGUIElements
 {

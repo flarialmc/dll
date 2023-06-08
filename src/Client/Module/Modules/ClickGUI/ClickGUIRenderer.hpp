@@ -48,9 +48,22 @@ class ClickGUIRenderer : public Listener {
 
              /* Nav Bar End */
 
-            FlarialGUI::PopSize();
+            /* Logo Start */
 
-            FlarialGUI::PopSize();
+
+            float logoWidth = 69;
+            float logoHeight = 69;
+
+            float logoX = navx;
+            float logoY = navy + navigationBarHeight / 2.0f - logoHeight / 2.0f;
+
+            FlarialGUI::Image("\\Flarial\\assets\\logo.png", D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoHeight), logoWidth , logoHeight);
+
+            FlarialGUI::PopSize(); // Pops nav bar
+
+            /* Logo End */
+
+            FlarialGUI::PopSize(); // Pops base rect
 
         }
 
