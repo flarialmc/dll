@@ -7,10 +7,10 @@
 #include <iostream>
 
 std::string Logger::file = Utils::getRoamingPath() + "\\Flarial\\logs\\latest.log";
-FILE* Logger::fp = nullptr;
 
 void Logger::writeToFile(std::string str)
 {
+
     if (std::filesystem::exists(file))
     {
         std::filesystem::path p(file);

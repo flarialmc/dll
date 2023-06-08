@@ -5,9 +5,7 @@
 #include "src/Client/GUI/D2D.hpp"
 #include <kiero.h>
 
-HMODULE real = nullptr;
-
-DWORD WINAPI init()
+DWORD WINAPI init(HMODULE real)
 {
 
     Client::initialize();
@@ -25,30 +23,33 @@ DWORD WINAPI init()
 
     EventHandler::unregisterAll();
 
-    if(D2D::context != nullptr) {
+
         D2D::context->Release();
         D2D::context = nullptr;
-        Logger::debug("isreal");
-    }
+        Logger::debug("Freed context.");
 
     ModuleManager::terminate();
     HookManager::terminate();
 
     kiero::shutdown();
 
+    Logger::debug("Shut down Kiero.");
+
+
     MH_DisableHook(MH_ALL_HOOKS);
     MH_Uninitialize();
+
+    Logger::debug("Freeing Library.");
 
     FreeLibraryAndExitThread(real, 1);
 }
 
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
+BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        real = hModule;
-        CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)init, nullptr, 0, nullptr);
+        CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)init, instance, 0, nullptr);
         break;
     }
 

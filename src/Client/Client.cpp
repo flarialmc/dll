@@ -9,7 +9,7 @@ void Client::initialize()
 {
     Logger::initialize();
 
-    if(GetModuleHandle(reinterpret_cast<LPCSTR>("d3d12.dll")) != NULL)
+    if(GetModuleHandle("d3d12.dll") != NULL)
     kiero::init(kiero::RenderType::D3D12);
 
     if (kiero::getRenderType() == kiero::RenderType::None)
