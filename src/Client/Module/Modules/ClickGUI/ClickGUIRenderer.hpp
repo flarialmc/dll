@@ -21,12 +21,13 @@ class ClickGUIRenderer : public Listener {
 
             //FlarialGUI::RoundedButton(center.x, center.y);
 
-            float baseWidth = Constraints::RelativeConstraint(0.6);
+            float baseWidth = Constraints::RelativeConstraint(0.78);
             float baseHeight = Constraints::RelativeConstraint(0.7);
 
             Vec2<float> center = Constraints::CenterConstraint(baseWidth, baseHeight, "r", 1, 1);
+            Vec2<float> round = Constraints::RoundingConstraint(50, 50);
 
-            FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(D2D1::ColorF::Black), baseWidth, baseHeight);
+            FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), baseWidth, baseHeight, round.x, round.x);
         }
 
     }

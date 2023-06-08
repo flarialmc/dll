@@ -41,6 +41,8 @@ DWORD WINAPI init(HMODULE real)
 
     Logger::debug("Freeing Library.");
 
+    Sleep(100);
+
     FreeLibraryAndExitThread(real, 1);
 }
 
