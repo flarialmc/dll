@@ -9,8 +9,6 @@ bool Client::disable = false;
 
 void Client::initialize()
 {
-
-    
     std::filesystem::path folder_path(Utils::getRoamingPath() + "\\Flarial");
     if (!exists(folder_path))
     {
@@ -53,12 +51,7 @@ void Client::initialize()
     std::string savepath6 = Utils::getRoamingPath() + "\\Flarial\\assets\\clickgui.png";
     URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL6).c_str(), FlarialGUI::to_wide(savepath6).c_str(), 0, NULL);
 
-
     Logger::initialize();
-
-
-    if(kiero::init(kiero::RenderType::D3D12) != kiero::Status::Success || kiero::getRenderType() == kiero::RenderType::None)
-    kiero::init(kiero::RenderType::D3D11);
 
     HookManager::initialize();
     ModuleManager::initialize();

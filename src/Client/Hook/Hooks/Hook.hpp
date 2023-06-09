@@ -20,4 +20,6 @@ public:
 
   bool autoHook(void *callback_ptr, void **func_original);
   bool manualHook(void *hook_addr, void *callback_ptr, void **func_original);
+
+    void disableHook();
 };
