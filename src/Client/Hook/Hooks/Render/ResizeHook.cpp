@@ -25,11 +25,12 @@ ResizeHook::ResizeHook() : Hook("ResizeHook", "") {}
 void ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT width, UINT height, DXGI_FORMAT newFormat, UINT flags)
 {
 
-    if(D2D::context != nullptr)
-    D2D::context->Release();
-    D2D::context = nullptr;
+    if(SwapchainHook::init) {
+        D2D::context->Release();
+        D2D::context = nullptr;
 
-    SwapchainHook::init = false;
+        SwapchainHook::init = false;
+    }
 
     return func_original(pSwapChain, bufferCount, width, height, newFormat, flags);
 

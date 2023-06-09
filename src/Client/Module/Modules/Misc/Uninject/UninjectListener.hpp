@@ -10,7 +10,7 @@ public:
 
     void onKey(KeyEvent& event) override {
 
-        if (event.GetKey() == 'P' && event.GetAction() == ActionType::RELEASED) {
+        if (event.GetKey() == 'P' && static_cast<ActionType>(event.GetAction()) == ActionType::RELEASED) {
             ModuleManager::terminate();
             Client::disable = true;
         }

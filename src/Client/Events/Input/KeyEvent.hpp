@@ -12,26 +12,27 @@ class KeyEvent : public Event, public Cancellable {
 
 public:
     int key;
-    ActionType action;
+    int action;
 
     KeyEvent(int key, int action) : Event() {
         this->key = key;
-        this->action = (ActionType)action;
+        this->action = action;
     };
 
-    int GetKey() const{
-        return this->key;
+
+    [[nodiscard]] int GetKey() const {
+        return key;
     }
 
     void SetKey(int e) {
         this->key = e;
     }
 
-    ActionType GetAction() const {
+    [[nodiscard]] int GetAction() {
         return this->action;
     }
 
-    int SetAction(ActionType e) {
+    int SetAction(int e) {
         this->action = e;
     }
 };

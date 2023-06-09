@@ -108,7 +108,7 @@ class ClickGUIRenderer : public Listener {
 
     void onKey(KeyEvent &event) override {
 
-        if(event.GetKey() == module->keybind && event.GetAction() == ActionType::PRESSED) module->enabled = !module->enabled;
+        if(event.GetKey() == module->keybind && static_cast<ActionType>(event.GetAction()) == ActionType::PRESSED) module->enabled = !module->enabled;
     }
 
 public:
