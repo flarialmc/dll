@@ -59,8 +59,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain *pSwapChain, UINT syncInter
             factory->Release();
             factory = nullptr;
 
-            Logger::debug(std::to_string(MC::windowSize.x));
-
             SwapchainHook::init = true;
 
         } else {
@@ -74,6 +72,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain *pSwapChain, UINT syncInter
 
             MC::windowSize.x = D2D::context->GetSize().width;
             MC::windowSize.y = D2D::context->GetSize().height;
+
+            Logger::debug(std::to_string(MC::windowSize.x));
 
             D2D::context->BeginDraw();
             RenderEvent event;
