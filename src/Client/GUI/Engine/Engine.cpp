@@ -77,25 +77,16 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     if (isInScrollView)
         y += scrollpos;
 
-    static IDWriteFactory* writeFactory = nullptr;
-    if (!writeFactory)
-    {
-        DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
-    }
+    static IDWriteFactory* writeFactory;
+    DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
 
-    static ID2D1SolidColorBrush* textBrush = nullptr;
-    if (!textBrush)
-    {
-        D2D::context->CreateSolidColorBrush(textColor, &textBrush);
-    }
+    static ID2D1SolidColorBrush* textBrush;
+    D2D::context->CreateSolidColorBrush(textColor, &textBrush);
 
-    static IDWriteTextFormat* textFormat = nullptr;
-    if (!textFormat)
-    {
-        writeFactory->CreateTextFormat(L"Arial", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-US", &textFormat);
-        textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-        textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-    }
+    static IDWriteTextFormat* textFormat;
+    writeFactory->CreateTextFormat(L"Arial", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width, height), L"en-US", &textFormat);
+    textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+    textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
     const float darkenAmount = 0.1f;
 
@@ -121,6 +112,9 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
 
     brush->Release();
+    writeFactory->Release();
+    textFormat->Release();
+    textBrush->Release();
     return false;
 }
 
@@ -259,7 +253,7 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F
     IDWriteFactory *writeFactory;
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
     IDWriteTextFormat *textFormat;
-    writeFactory->CreateTextFormat(L"Arial", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"", &textFormat);
+    writeFactory->CreateTextFormat(L"Arial", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width, height), L"", &textFormat);
     textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 

@@ -8,6 +8,7 @@
 #include "../Module.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
 #include "../../../GUI/Engine/Constraints.hpp"
+#include "Elements/ClickGUIElements.hpp"
 
 class ClickGUIRenderer : public Listener {
 
@@ -17,7 +18,7 @@ class ClickGUIRenderer : public Listener {
     void onRender(RenderEvent &event) override {
 
 
-        if(enabled) {
+        if(module->enabled) {
 
             /* Base Rectangle Start */
 
@@ -30,13 +31,13 @@ class ClickGUIRenderer : public Listener {
             FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), baseWidth, baseHeight, round.x, round.x);
             FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
 
-             /* Base Rectangle End */
+            /* Base Rectangle End */
 
 
-             /* Nav Bar Start */
+            /* Nav Bar Start */
 
             float navigationBarWidth = Constraints::RelativeConstraint(1.097f);
-            float navigationBarHeight = Constraints::RelativeConstraint(0.118f);
+            float navigationBarHeight = Constraints::RelativeConstraint(0.106f);
             float navx = Constraints::PercentageConstraint(0.008f, "left");
             float navy = Constraints::PercentageConstraint(0.007f, "top");
             round = Constraints::RoundingConstraint(45, 45);
@@ -46,24 +47,48 @@ class ClickGUIRenderer : public Listener {
 
             FlarialGUI::PushSize(navx, navy, navigationBarWidth, navigationBarHeight);
 
-             /* Nav Bar End */
+            /* Nav Bar End */
 
             /* Logo Start */
 
 
-            float logoWidth = 69;
-            float logoHeight = 69;
+            float logoWidth = Constraints::RelativeConstraint(1);
 
             float logoX = navx;
-            float logoY = navy + navigationBarHeight / 2.0f - logoHeight / 2.0f;
+            float logoY = navy + navigationBarHeight / 2.0f - logoWidth / 2.0f;
 
-            FlarialGUI::Image("\\Flarial\\assets\\logo.png", D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoHeight), logoWidth , logoHeight);
+            FlarialGUI::Image("\\Flarial\\assets\\logo.png", D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth), logoWidth , logoWidth);
 
             FlarialGUI::PopSize(); // Pops nav bar
 
             /* Logo End */
 
+            /* Mod Card Start */
+
+            float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
+            float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
+
+            Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.71, -0.65);
+
+            float xModifier = 0.0f;
+            float yModifier = 0.0f;
+
+            for (size_t i = 0; i < ModuleManager::modules.size(); i++) {
+                Module* real = ModuleManager::modules[i];
+                ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real, real->icon);
+
+                xModifier += Constraints::SpacingConstraint(1.09, modWidth);
+                if ((i + 1) % 3 == 0) {
+                    yModifier += Constraints::SpacingConstraint(0.1, D2D::context->GetSize().height);
+                    xModifier = 0.0f;
+                }
+            }
+
+            //ClickGUIElements::ModCard(modcenter.x, modcenter.y, ModuleManager::modules.front(), "");
+
             FlarialGUI::PopSize(); // Pops base rect
+
+            /* Mod Card End */
 
         }
 
@@ -71,7 +96,7 @@ class ClickGUIRenderer : public Listener {
 
     void onKey(KeyEvent &event) override {
 
-        if(event.GetKey() == module->keybind && event.GetAction() == ActionType::PRESSED) enabled = !enabled;
+        if(event.GetKey() == module->keybind && event.GetAction() == ActionType::PRESSED) module->enabled = !module->enabled;
     }
 
 public:

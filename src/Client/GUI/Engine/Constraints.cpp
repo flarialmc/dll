@@ -19,7 +19,7 @@ float Constraints::PercentageConstraint(float percentage, const std::string& edg
         y = top.y;
     }
 
-    float position = 0.0f;
+    float position;
 
     if (edge == "top")
     {
@@ -29,7 +29,7 @@ float Constraints::PercentageConstraint(float percentage, const std::string& edg
     else if (edge == "bottom")
     {
         position = screenHeight - (percentage * screenHeight);
-        position -= y;
+        position += y;
     }
     else if (edge == "left") {
         position = percentage * screenWidth;
@@ -38,15 +38,15 @@ float Constraints::PercentageConstraint(float percentage, const std::string& edg
     else if (edge == "right")
     {
         position = screenWidth - (percentage * screenWidth);
-        position -= x;
+        position += x;
     }
 
     return position;
 }
 
-float Constraints::RelativeConstraint(float percent, std::string dimension, bool ignore_stack)
+float Constraints::RelativeConstraint(float percent, const std::string& dimension, bool ignore_stack)
 {
-    float length = 0.0f;
+    float length;
     float screenWidth;
     float screenHeight;
 
@@ -75,12 +75,15 @@ float Constraints::RelativeConstraint(float percent, std::string dimension, bool
     return length;
 }
 
-Vec2<float> Constraints::CenterConstraint(float width, float height, std::string axis, float xmodifier, float ymodifier, bool ignore_stack)
+Vec2<float> Constraints::CenterConstraint(float width, float height, const std::string& axis, float xmodifier, float ymodifier, bool ignore_stack)
 {
     Vec2<float> xy;
 
     float screenWidth;
     float screenHeight;
+    float parentX;
+    float parentY;
+
     if (ignore_stack || FlarialGUI::dimension_stack.empty())
     {
         screenWidth = static_cast<float>(MC::windowSize.x);
@@ -90,10 +93,12 @@ Vec2<float> Constraints::CenterConstraint(float width, float height, std::string
     {
         screenWidth = FlarialGUI::dimension_stack.top().width;
         screenHeight = FlarialGUI::dimension_stack.top().height;
+        parentX = FlarialGUI::dimension_stack.top().x;
+        parentY = FlarialGUI::dimension_stack.top().y;
     }
 
-    xy.x = (screenWidth - width) / 2.0f;
-    xy.y = (screenHeight - height) / 2.0f;
+    xy.x = (screenWidth - width) / 2.0f + parentX;
+    xy.y = (screenHeight - height) / 2.0f + parentY;
 
     if (axis == "x")
     {
@@ -130,4 +135,23 @@ Vec2<float> Constraints::RoundingConstraint(float radiusX, float radiusY, bool i
 
     // Return the scaled radii as a Vec2
     return {scaledRadiusX, scaledRadiusY};
+}
+
+float Constraints::FontScaler(float width, float height) {
+
+    // Define the initial font size
+    float initialFontSize = 14.0f;
+
+// Calculate the scaling factor based on the new window dimensions
+    float scalingFactor = width / 90;
+
+// Calculate the new font size
+    return initialFontSize * scalingFactor;
+
+}
+
+float Constraints::SpacingConstraint(float percentage, float dimension) {
+
+    return dimension * percentage;
+
 }

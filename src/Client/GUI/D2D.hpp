@@ -16,13 +16,14 @@ namespace D2D {
     inline ID2D1RenderTarget* context;
 };
 
-namespace MC {
+class MC {
 
-    inline Vec2<float> mousepos;
-    inline Vec2<float> windowSize;
-    inline MouseAction mouseaction;
-    inline MouseButton mousebutton;
-    inline bool held;
-    inline bool hasResized = false;
+public:
+    static inline Vec2<float> mousepos;
+    static inline Vec2<float> windowSize;
+    static inline MouseAction mouseaction;
+    static inline MouseButton mousebutton;
+    static inline bool held;
+    static inline bool hasResized = false;
 
 };
