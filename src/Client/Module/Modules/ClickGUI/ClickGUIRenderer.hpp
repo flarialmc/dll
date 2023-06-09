@@ -65,10 +65,19 @@ class ClickGUIRenderer : public Listener {
 
             /* Mod Card Start */
 
+
+
             float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
             float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
 
             Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.71, -0.65);
+
+
+            float scrollWidth = Constraints::RelativeConstraint(0.90);
+            float scrollHeight = Constraints::RelativeConstraint(0.75);
+            Vec2<float> scrollcenter = Constraints::CenterConstraint(scrollWidth, scrollHeight);
+
+            FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
 
             float xModifier = 0.0f;
             float yModifier = 0.0f;
@@ -79,10 +88,13 @@ class ClickGUIRenderer : public Listener {
 
                 xModifier += Constraints::SpacingConstraint(1.09, modWidth);
                 if ((i + 1) % 3 == 0) {
-                    yModifier += Constraints::SpacingConstraint(0.1, D2D::context->GetSize().height);
+                    yModifier += Constraints::SpacingConstraint(0.8, modWidth);
                     xModifier = 0.0f;
                 }
             }
+
+            FlarialGUI::UnsetScrollView();
+            FlarialGUI::ScrollBar(120, 120, 10, 160, 2);
 
             //ClickGUIElements::ModCard(modcenter.x, modcenter.y, ModuleManager::modules.front(), "");
 

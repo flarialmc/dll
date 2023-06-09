@@ -120,7 +120,8 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
 
 void FlarialGUI::RoundedRect(float x, float y, const D2D_COLOR_F color, const float width, const float height, float radiusX, float radiusY)
 {
-
+    if (isInScrollView)
+        y += scrollpos;
 
     ID2D1SolidColorBrush *brush;
     D2D::context->CreateSolidColorBrush(color, &brush);
@@ -298,7 +299,6 @@ void FlarialGUI::LoadImageFromFile(const wchar_t *filename, ID2D1Bitmap **bitmap
 
 void FlarialGUI::SetScrollView(float x, float y, float width, float height)
 {
-
     FlarialGUI::isInScrollView = true;
     D2D1_RECT_F clipRect = D2D1::RectF(x, y, x + width, y + height);
     D2D::context->PushAxisAlignedClip(&clipRect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);

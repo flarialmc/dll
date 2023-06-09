@@ -5,6 +5,7 @@
 #include "../../../Events/Input/MouseEvent.hpp"
 #include "../../../../Utils/Logger/Logger.hpp"
 #include "../../../GUI/D2D.hpp"
+#include "../../../GUI/Engine/Engine.hpp"
 
 class GUIMouseListener : public Listener {
 
@@ -17,6 +18,12 @@ class GUIMouseListener : public Listener {
 
        if(event.GetButton() != MouseButton::None && event.GetAction() == MouseAction::PRESS) MC::held = true;
         if(event.GetButton() != MouseButton::None && event.GetAction() == MouseAction::RELEASE) MC::held = false;
+
+        if(event.GetButton() == MouseButton::Scroll)
+        {
+            FlarialGUI::scrollpos += (event.GetAction() == MouseAction::SCROLL_UP) ? FlarialGUI::scrollposmodifier : -FlarialGUI::scrollposmodifier;
+            FlarialGUI::barscrollpos += (event.GetAction() == MouseAction::SCROLL_UP) ? FlarialGUI::barscrollposmodifier : -FlarialGUI::barscrollposmodifier;
+        }
 
     };
 

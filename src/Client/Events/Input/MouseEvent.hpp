@@ -16,6 +16,7 @@ class MouseEvent : public Event, public Cancellable {
 public:
     MouseButton button;
     MouseAction action;
+    int actionRaw;
     short mouseX;
     short mouseY;
 public:
@@ -23,6 +24,7 @@ public:
         this->button = (MouseButton)button;
         this->action = (MouseAction)action;
         this->SetActionFromChar(action);
+        this->actionRaw = action;
         this->mouseX = mouseX;
         this->mouseY = mouseY;
     };
@@ -36,6 +38,11 @@ public:
     auto GetAction() -> MouseAction {
         return this->action;
     }
+
+    auto GetActionRaw() -> int {
+        return this->actionRaw;
+    }
+
     auto GetActionAsChar() -> char {
         switch(this->action) {
             case MouseAction::RELEASE: return 0;

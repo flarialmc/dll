@@ -1,3 +1,4 @@
+#pragma once
 #include "../../../Utils/Logger/Logger.hpp"
 #include "../../../Utils/Utils.hpp"
 #include "../D2D.hpp"
