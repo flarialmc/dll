@@ -17,12 +17,12 @@ void ModuleManager::initialize()
     EventHandler::registerListener(new TestListener("test"));
 
 
-    modules.push_back(new Module("test", "woah", "woahhhhhh", 1));
-    modules.push_back(new Module("test", "woah", "woahhhhhh", 1));
-    modules.push_back(new Module("test", "woah", "woahhhhhh", 1));
-    modules.push_back(new Module("test", "woah", "woahhhhhh", 1));
-    modules.push_back(new Module("test", "woah", "woahhhhhh", 1));
-    modules.push_back(new Module("test", "woah", "woahhhhhh", 1));
+    modules.push_back(new Module("test", "woah", "", 1));
+    modules.push_back(new Module("test", "woah", "", 1));
+    modules.push_back(new Module("test", "woah", "", 1));
+    modules.push_back(new Module("test", "woah", "", 1));
+    modules.push_back(new Module("test", "woah", "", 1));
+    modules.push_back(new Module("test", "woah", "", 1));
     modules.push_back(new Uninject());
     modules.push_back(new ClickGUI());
 

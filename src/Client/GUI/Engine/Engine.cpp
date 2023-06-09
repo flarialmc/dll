@@ -239,7 +239,7 @@ void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect, const int 
 
     // Draw image
     D2D1_RECT_F imageRect = D2D1::RectF(rect.left, rect.top, rect.right, rect.bottom);
-    D2D::context->DrawBitmap(bitmap, imageRect);
+    D2D::context->DrawBitmap(bitmap, imageRect, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
     bitmap->Release();
 }
 

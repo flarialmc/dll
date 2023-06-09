@@ -8,7 +8,7 @@ class ClickGUI : public Module {
 
 public:
 
-    ClickGUI() : Module("ClickGUI", "What do you think it is?", "", 'K') {
+    ClickGUI() : Module("ClickGUI", "What do you think it is?", "\\Flarial\\assets\\clickgui.png", 'K') {
 
         onEnable();
 
