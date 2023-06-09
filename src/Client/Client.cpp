@@ -16,10 +16,16 @@ void Client::initialize()
         create_directory(folder_path);
     }
 
-    std::filesystem::path folder_path2(Utils::getRoamingath() + "\\Flarial\\assets");
+    std::filesystem::path folder_path2(Utils::getRoamingPath() + "\\Flarial\\assets");
     if (!exists(folder_path2))
     {
         create_directory(folder_path2);
+    }
+
+    std::filesystem::path folder_path3(Utils::getRoamingPath() + "\\Flarial\\logs");
+    if (!exists(folder_path3))
+    {
+        create_directory(folder_path3);
     }
 
     std::string dwnld_URL = "https://cdn.flarial.net/assets/gear.png";
