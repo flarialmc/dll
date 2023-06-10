@@ -6,9 +6,6 @@
 #include "../../../Client.hpp"
 #include <d3d11on12.h>
 #include <wrl/client.h>
-#include <amp_short_vectors.h>
-
-ID3D12CommandQueue* SwapchainHook::queue;
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", "") {}
 
@@ -23,58 +20,59 @@ void SwapchainHook::enableHook()
 
 bool SwapchainHook::init = false;
 
-void SwapchainHook::swapchainCallback(IDXGISwapChain *pSwapChain, UINT syncInterval, UINT flags)
+void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags)
 {
 
     if(!SwapchainHook::init) {
 
         Logger::debug("Running initial proceedures");
 
-        ID3D12Device5 *device;
+        ID3D12Device *device;
         if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&device))) && kiero::getRenderType() == kiero::RenderType::D3D12 && SwapchainHook::queue != nullptr) {
 
-           ID3D11Device* d3d11device;
-           ID3D11DeviceContext* context;
+            ID3D11Device* d3d11device;
+            ID3D11DeviceContext* context;
+            D3D11On12CreateDevice(
+                    device,
+                    D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_SINGLETHREADED |
+                    D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT,
+                    nullptr,
+                    0,
+                    (IUnknown**)&SwapchainHook::queue,
+                    1,
+                    0,
+                    &d3d11device,
+                    &context,
+                    nullptr
+            );
 
-                D3D11On12CreateDevice(
-                        device,
-                        D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_SINGLETHREADED
-                        | D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT,
-                        nullptr,
-                        0,
-                        (IUnknown**)&SwapchainHook::queue,
-                        1,
-                        0,
-                        &d3d11device,
-                        &context,
-                        nullptr);
-
-            ID3D11On12Device* d3d11On12Device;
-            d3d11device->QueryInterface(IID_PPV_ARGS(&d3d11On12Device));
+            d3d11device->QueryInterface(IID_PPV_ARGS(&SwapchainHook::d3d11On12Device));
 
             D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_NONE;
-            ID2D1Factory3* d2dFactory;
-            D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &d2dFactory);
+            ID2D1Factory7* d2dFactory; // Update to ID2D1Factory7
+            D2D1_FACTORY_OPTIONS factoryOptions {}; // Add factoryOptions
+            D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory7), &factoryOptions, (void**)&d2dFactory); // Update to ID2D1Factory7
 
             IDXGIDevice* dxgiDevice;
-            d3d11On12Device->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&dxgiDevice));
+            SwapchainHook::d3d11On12Device->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice); // Update to ID2D1Factory7
 
-            ID2D1Device2* device2;
+            ID2D1Device6* device2;
             d2dFactory->CreateDevice(dxgiDevice, &device2);
 
             device2->CreateDeviceContext(deviceOptions, &D2D::context);
 
-            DXGI_SWAP_CHAIN_DESC swapChainDescription;
-            pSwapChain->GetDesc(&swapChainDescription);
+            DXGI_SWAP_CHAIN_DESC1 swapChainDescription;
+            pSwapChain->GetDesc1(&swapChainDescription);
 
-            int bufferCount = swapChainDescription.BufferCount;
-            float dpi = GetDpiForSystem();
+            uintptr_t bufferCount = swapChainDescription.BufferCount;
+            auto dpi = (float)GetDpiForSystem();
 
-            D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_IGNORE), dpi, dpi);
-
-
-
-            // DESCRIPTOR HEAP FOR RTVHANDLE
+            D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(
+                    D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
+                    D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_IGNORE),
+                    dpi,
+                    dpi
+            );
 
             D3D12_DESCRIPTOR_HEAP_DESC heapDescriptorBackBuffers = {};
             heapDescriptorBackBuffers.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
@@ -84,22 +82,44 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain *pSwapChain, UINT syncInter
 
             device->CreateDescriptorHeap(&heapDescriptorBackBuffers, IID_PPV_ARGS(&SwapchainHook::D3D12DescriptorHeap));
 
-            unsigned int rtvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+            uintptr_t rtvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
             D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = SwapchainHook::D3D12DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
-
+            Logger::debug("this ran 1");
 
             for (int i = 0; i < bufferCount; i++) {
+                ID3D12Resource* backBufferPtr;
+                pSwapChain->GetBuffer(i, IID_PPV_ARGS(&backBufferPtr));
+                device->CreateRenderTargetView(backBufferPtr, nullptr, rtvHandle);
+                rtvHandle.ptr += rtvDescriptorSize;
 
-            ID3D12Resource* backBufferPtr;
-            pSwapChain->GetBuffer(i, IID_PPV_ARGS(&backBufferPtr));
+                Logger::debug("this ran 2");
 
-            D2D::context->CreateBitmapFromDxgiSurface(
-            &SwapchainHook::DXGISurfaces[i], props, &SwapchainHook::D2D1Bitmaps[i]);
+                D3D11_RESOURCE_FLAGS d3d11_flags = { D3D11_BIND_RENDER_TARGET };
+                if(!SUCCEEDED(SwapchainHook::d3d11On12Device->CreateWrappedResource(backBufferPtr, &d3d11_flags, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT, IID_PPV_ARGS(&SwapchainHook::D3D11Resources[i])))) Logger::debug("didnt succeed");
 
+                Logger::debug("this ran 3");
+
+                if(SwapchainHook::D3D11Resources[i] == nullptr) Logger::debug("Resources is nullptr");
+                if(SwapchainHook::DXGISurfaces[i] == nullptr) Logger::debug("DXGISurface is nullptr");
+
+
+                SwapchainHook::D3D11Resources[i]->QueryInterface(&SwapchainHook::DXGISurfaces[i]);
+
+                Logger::debug("this ran 4");
+
+                SwapchainHook::D2D1Bitmaps[i] = nullptr; // Initialize to nullptr
+
+                D2D::context->CreateBitmapFromDxgiSurface(
+                        SwapchainHook::DXGISurfaces[i],
+                        props,
+                        &(SwapchainHook::D2D1Bitmaps[i])
+                );
             }
 
-            if(D2D::context != nullptr) Logger::debug("success");
+            if (D2D::context != nullptr) {
+                Logger::debug("success");
+            }
 
             SwapchainHook::init = true;
         }
@@ -142,6 +162,13 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain *pSwapChain, UINT syncInter
 
             Logger::debug("omw");
 
+            int i = pSwapChain->GetCurrentBackBufferIndex();
+
+            ID3D11Resource* resource = SwapchainHook::D3D11Resources[i];
+            SwapchainHook::d3d11On12Device->AcquireWrappedResources(&resource, 1);
+
+            D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[i]);
+
             MC::windowSize.x = D2D::context->GetSize().width;
             MC::windowSize.y = D2D::context->GetSize().height;
 
@@ -151,6 +178,9 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain *pSwapChain, UINT syncInter
             RenderEvent event;
             EventHandler::onRender(event);
             D2D::context->EndDraw();
+
+            SwapchainHook::d3d11On12Device->ReleaseWrappedResources(&resource, 1);
+
         }
 
     }

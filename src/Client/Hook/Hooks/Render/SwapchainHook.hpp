@@ -6,6 +6,7 @@
 #include <d2d1_3.h>
 #include <d3d12.h>
 #include <d3d11.h>
+#include <d3d11on12.h>
 
 #include "kiero.h"
 
@@ -21,9 +22,9 @@ public:
     SwapchainHook();
     void enableHook() override;
     static inline ID3D12CommandQueue* queue;
-    static inline std::vector<IDXGISurface1> DXGISurfaces;
+    static inline std::vector<IDXGISurface1*> DXGISurfaces;
     static inline std::vector<ID2D1Bitmap1*> D2D1Bitmaps;
+    static inline std::vector<ID3D11Resource*> D3D11Resources;
     static inline ID3D12DescriptorHeap* D3D12DescriptorHeap;
-    static inline std::vector<ID3D11RenderTargetView*> RenderTargetViews;
-
+    static inline ID3D11On12Device* d3d11On12Device;
 };

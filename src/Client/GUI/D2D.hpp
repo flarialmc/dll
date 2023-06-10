@@ -12,7 +12,7 @@
 
 namespace D2D {
 
-    inline ID2D1DeviceContext2* context;
+    inline ID2D1DeviceContext6* context;
 };
 
 class MC {
