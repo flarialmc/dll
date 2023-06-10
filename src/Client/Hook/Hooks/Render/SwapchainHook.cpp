@@ -60,10 +60,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 MC::windowSize.x = (float) D2D::context->GetSize().width;
                 MC::windowSize.y = (float) D2D::context->GetSize().height;
 
-                pBackBuffer->Release();
-                eBackBuffer->Release();
-
-                d3d11device->Release();
+                Memory::SafeRelease(pBackBuffer);
+                Memory::SafeRelease(eBackBuffer);
 
                 SwapchainHook::init = true;
 
@@ -95,6 +93,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
             device2->CreateDeviceContext(deviceOptions, &D2D::context);
 
+            Logger::debug("okay so far");
+
             DXGI_SWAP_CHAIN_DESC1 swapChainDescription;
             pSwapChain->GetDesc1(&swapChainDescription);
 
@@ -125,10 +125,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 device->CreateRenderTargetView(backBufferPtr, nullptr, rtvHandle);
                 rtvHandle.ptr += rtvDescriptorSize;
 
-                D3D12_RESOURCE_DESC backBufferDescriptor = backBufferPtr->GetDesc();
-                MC::windowSize.x = (float)backBufferDescriptor.Width;
-                MC::windowSize.y = (float)backBufferDescriptor.Height;
-
                 D3D11_RESOURCE_FLAGS d3d11_flags = { D3D11_BIND_RENDER_TARGET };
 
                 SwapchainHook::d3d11On12Device->CreateWrappedResource(backBufferPtr, &d3d11_flags, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT, IID_PPV_ARGS(&SwapchainHook::D3D11Resources[i]));
@@ -137,24 +133,14 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 SwapchainHook::D2D1Bitmaps[i] = nullptr; // Initialize to nullptr
 
                 D2D::context->CreateBitmapFromDxgiSurface(SwapchainHook::DXGISurfaces[i], props, &(SwapchainHook::D2D1Bitmaps[i]));
-                backBufferPtr->Release();
+                Memory::SafeRelease(backBufferPtr);
             }
 
-            d2dFactory->Release();
-            d2dFactory = nullptr;
-
-            dxgiDevice->Release();
-            dxgiDevice = nullptr;
-
-            d3d11device->Release();
-            d3d11device = nullptr;
-
-            device2->Release();
-            device2 = nullptr;
-
-            device->Release();
-            device = nullptr;
-
+            Memory::SafeRelease(device);
+            Memory::SafeRelease(device2);
+            Memory::SafeRelease(d3d11device);
+            Memory::SafeRelease(dxgiDevice);
+            Memory::SafeRelease(d2dFactory);
 
             SwapchainHook::init = true;
         }
@@ -172,6 +158,9 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 SwapchainHook::d3d11On12Device->AcquireWrappedResources(&resource, 1);
 
                 D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[i]);
+
+                MC::windowSize.x = D2D::context->GetSize().width;
+                MC::windowSize.y = D2D::context->GetSize().height;
 
                 D2D::context->BeginDraw();
                 RenderEvent event;

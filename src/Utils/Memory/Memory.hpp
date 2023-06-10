@@ -66,6 +66,16 @@ public:
         return 0;
     }
 
+    template<typename T>
+    static void SafeRelease(T*& pPtr)
+    {
+        if (pPtr != nullptr)
+        {
+            pPtr->Release();
+            pPtr = nullptr;
+        }
+    }
+
     static uintptr_t findDMAAddy(uintptr_t ptr, std::vector<unsigned int> offsets)
     {
         uintptr_t addr = ptr;
