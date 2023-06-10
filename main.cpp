@@ -26,55 +26,38 @@ DWORD WINAPI init(HMODULE real)
 
     if(SwapchainHook::init && SwapchainHook::d3d11On12Device != nullptr) {
 
-        Logger::debug("Releasing d3d12 resources");
+        Memory::SafeRelease(SwapchainHook::queue);
 
-        SwapchainHook::queue->Release();
-        SwapchainHook::queue = nullptr;
-
-        SwapchainHook::D3D12DescriptorHeap->Release();
-        SwapchainHook::D3D12DescriptorHeap = nullptr;
-
+        Memory::SafeRelease(SwapchainHook::D3D12DescriptorHeap);
 
         for (ID2D1Bitmap1* bitmap : SwapchainHook::D2D1Bitmaps)
         {
-            bitmap->Release();
-            bitmap = nullptr;
+            Memory::SafeRelease(bitmap);
         }
 
         for (ID3D11Resource* resource : SwapchainHook::D3D11Resources)
         {
-            SwapchainHook::d3d11On12Device->ReleaseWrappedResources(&resource, 1);
-            resource->Release();
-            resource = nullptr;
+            Memory::SafeRelease(resource);
         }
 
         for (IDXGISurface1* surface : SwapchainHook::DXGISurfaces)
         {
-            surface->Release();
-            surface = nullptr;
+            Memory::SafeRelease(surface);
         }
 
         SwapchainHook::D2D1Bitmaps.clear();
         SwapchainHook::D3D11Resources.clear();
         SwapchainHook::DXGISurfaces.clear();
 
-
-        SwapchainHook::d3d11On12Device->Release();
-        SwapchainHook::d3d11On12Device = nullptr;
-
         SwapchainHook::context->Flush();
-        SwapchainHook::context->Release();
-        SwapchainHook::context = nullptr;
+        Memory::SafeRelease(SwapchainHook::context);
 
 
     }
 
     if(SwapchainHook::init) {
 
-        Logger::debug("Clearing normal stuff");
-
-        D2D::context->Release();
-        D2D::context = nullptr;
+        Memory::SafeRelease(D2D::context);
 
         SwapchainHook::init = false;
     }
