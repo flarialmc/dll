@@ -24,6 +24,13 @@ DWORD WINAPI init(HMODULE real)
 
     EventHandler::unregisterAll();
 
+    ModuleManager::terminate();
+    HookManager::terminate();
+
+    kiero::shutdown();
+
+    Logger::debug("Shut down Kiero.");
+
     if(SwapchainHook::init && SwapchainHook::d3d11On12Device != nullptr) {
 
         Memory::SafeRelease(SwapchainHook::queue);
@@ -37,6 +44,7 @@ DWORD WINAPI init(HMODULE real)
 
         for (ID3D11Resource* resource : SwapchainHook::D3D11Resources)
         {
+            SwapchainHook::d3d11On12Device->ReleaseWrappedResources(&resource, 1);
             Memory::SafeRelease(resource);
         }
 
@@ -51,6 +59,7 @@ DWORD WINAPI init(HMODULE real)
 
         SwapchainHook::context->Flush();
         Memory::SafeRelease(SwapchainHook::context);
+        Memory::SafeRelease(SwapchainHook::d3d11On12Device);
 
 
     }
@@ -59,16 +68,7 @@ DWORD WINAPI init(HMODULE real)
 
         Memory::SafeRelease(D2D::context);
 
-        SwapchainHook::init = false;
     }
-
-    ModuleManager::terminate();
-    HookManager::terminate();
-
-    kiero::shutdown();
-
-    Logger::debug("Shut down Kiero.");
-
 
     MH_DisableHook(MH_ALL_HOOKS);
     MH_Uninitialize();
