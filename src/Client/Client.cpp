@@ -51,6 +51,8 @@ void Client::initialize()
     std::string savepath6 = Utils::getRoamingPath() + "\\Flarial\\assets\\clickgui.png";
     URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL6).c_str(), FlarialGUI::to_wide(savepath6).c_str(), 0, NULL);
 
+    kiero::init(kiero::RenderType::D3D12);
+
     Logger::initialize();
 
     HookManager::initialize();

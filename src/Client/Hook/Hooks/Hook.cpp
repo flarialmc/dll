@@ -34,7 +34,7 @@ bool Hook::manualHook(void *hook_addr, void *callback_ptr, void **func_original)
         Logger::error(std::format("[Hook] Failed to hook {}", this->name));
         return false;
     } else {
-        Logger::info(std::format("[Hook] Successfully hooked at address: {}", hook_addr));
+        Logger::info(std::format("[Hook] Successfully hooked {} at address: {}", this->name, hook_addr));
     }
 
     return true;

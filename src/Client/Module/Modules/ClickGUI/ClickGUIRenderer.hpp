@@ -12,7 +12,6 @@
 
 class ClickGUIRenderer : public Listener {
 
-    bool enabled = false;
     Module* module;
 
     void onRender(RenderEvent &event) override {
