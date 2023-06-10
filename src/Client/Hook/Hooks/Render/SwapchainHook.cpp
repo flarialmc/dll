@@ -31,6 +31,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
         if(SwapchainHook::queue == nullptr) {
 
+            Logger::debug("not a DX12 device, running dx11 procedures");
+
             ID3D12Device5 *device;
             if(SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&device)))) {
                 Logger::debug("yes");
@@ -53,8 +55,12 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 IDXGISurface* eBackBuffer;
                 pSwapChain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
-                D2D1CreateDeviceContext(eBackBuffer, properties, reinterpret_cast<ID2D1DeviceContext **>(&D2D::context));
+                D2D1CreateDeviceContext(eBackBuffer, properties, &D2D::context);
 
+                MC::windowSize.x = (float) D2D::context->GetSize().width;
+                MC::windowSize.y = (float) D2D::context->GetSize().height;
+
+                Logger::debug(std::to_string(MC::windowSize.x));
                 pBackBuffer->Release();
                 eBackBuffer->Release();
 
