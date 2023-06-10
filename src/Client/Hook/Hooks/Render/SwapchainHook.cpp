@@ -27,7 +27,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
     if(!SwapchainHook::init) {
 
-
+        Logger::debug("gonna run");
 
         if(SwapchainHook::queue == nullptr) {
 
@@ -36,6 +36,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
             ID3D12Device5 *device;
             if(SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&device)))) {
                 device->RemoveDevice();
+                device = nullptr;
             }
 
             ID3D11Device *d3d11device;
@@ -59,9 +60,10 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 MC::windowSize.x = (float) D2D::context->GetSize().width;
                 MC::windowSize.y = (float) D2D::context->GetSize().height;
 
-                Logger::debug(std::to_string(MC::windowSize.x));
                 pBackBuffer->Release();
                 eBackBuffer->Release();
+
+                d3d11device->Release();
 
                 SwapchainHook::init = true;
 
@@ -72,81 +74,91 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
         }
 
-            ID3D12Device5 *device;
+        ID3D12Device5* device;
 
-            if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&device))) && kiero::getRenderType() == kiero::RenderType::D3D12) {
+        if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&device))) && kiero::getRenderType() == kiero::RenderType::D3D12) {
+            ID3D11Device* d3d11device;
+            D3D11On12CreateDevice(device, D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_SINGLETHREADED | D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0, (IUnknown**)&SwapchainHook::queue, 1, 0, &d3d11device, &SwapchainHook::context, nullptr);
 
-                ID3D11Device *d3d11device;
-                D3D11On12CreateDevice(device,D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_SINGLETHREADED |D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT,nullptr,0,(IUnknown **) &SwapchainHook::queue,1,0,&d3d11device,&SwapchainHook::context,nullptr);
+            d3d11device->QueryInterface(IID_PPV_ARGS(&SwapchainHook::d3d11On12Device));
 
-                d3d11device->QueryInterface(IID_PPV_ARGS(&SwapchainHook::d3d11On12Device));
+            D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS;
+            ID2D1Factory7* d2dFactory;
+            D2D1_FACTORY_OPTIONS factoryOptions{};
+            D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, __uuidof(ID2D1Factory7), &factoryOptions, (void**)&d2dFactory);
 
-                D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS;
-                ID2D1Factory7 *d2dFactory;
-                D2D1_FACTORY_OPTIONS factoryOptions{};
-                D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, __uuidof(ID2D1Factory7), &factoryOptions,(void **) &d2dFactory);
+            IDXGIDevice* dxgiDevice;
+            SwapchainHook::d3d11On12Device->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice);
 
-                IDXGIDevice *dxgiDevice;
-                SwapchainHook::d3d11On12Device->QueryInterface(__uuidof(IDXGIDevice),(void **) &dxgiDevice);
+            ID2D1Device6* device2;
+            d2dFactory->CreateDevice(dxgiDevice, &device2);
 
-                ID2D1Device6 *device2;
-                d2dFactory->CreateDevice(dxgiDevice, &device2);
+            device2->CreateDeviceContext(deviceOptions, &D2D::context);
 
-                device2->CreateDeviceContext(deviceOptions, &D2D::context);
+            DXGI_SWAP_CHAIN_DESC1 swapChainDescription;
+            pSwapChain->GetDesc1(&swapChainDescription);
 
-                DXGI_SWAP_CHAIN_DESC1 swapChainDescription;
-                pSwapChain->GetDesc1(&swapChainDescription);
+            SwapchainHook::bufferCount = swapChainDescription.BufferCount;
 
-                SwapchainHook::bufferCount = swapChainDescription.BufferCount;
+            SwapchainHook::DXGISurfaces.resize(SwapchainHook::bufferCount, nullptr);
+            SwapchainHook::D3D11Resources.resize(SwapchainHook::bufferCount, nullptr);
+            SwapchainHook::D2D1Bitmaps.resize(SwapchainHook::bufferCount, nullptr);
 
-                SwapchainHook::DXGISurfaces.resize(bufferCount);
-                SwapchainHook::D3D11Resources.resize(bufferCount);
-                D2D1Bitmaps.resize(bufferCount);
+            auto dpi = (float)GetDpiForSystem();
 
-                auto dpi = (float) GetDpiForSystem();
+            D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW, D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_IGNORE), dpi, dpi);
 
-                D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_IGNORE),dpi,dpi);
+            D3D12_DESCRIPTOR_HEAP_DESC heapDescriptorBackBuffers = {};
+            heapDescriptorBackBuffers.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+            heapDescriptorBackBuffers.NumDescriptors = SwapchainHook::bufferCount;
+            heapDescriptorBackBuffers.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+            heapDescriptorBackBuffers.NodeMask = 1;
 
-                D3D12_DESCRIPTOR_HEAP_DESC heapDescriptorBackBuffers = {};
-                heapDescriptorBackBuffers.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-                heapDescriptorBackBuffers.NumDescriptors = bufferCount;
-                heapDescriptorBackBuffers.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-                heapDescriptorBackBuffers.NodeMask = 1;
+            device->CreateDescriptorHeap(&heapDescriptorBackBuffers, IID_PPV_ARGS(&SwapchainHook::D3D12DescriptorHeap));
 
-                device->CreateDescriptorHeap(&heapDescriptorBackBuffers,
-                                             IID_PPV_ARGS(&SwapchainHook::D3D12DescriptorHeap));
+            uintptr_t rtvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+            D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = SwapchainHook::D3D12DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
-                uintptr_t rtvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-                D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = SwapchainHook::D3D12DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+            for (int i = 0; i < SwapchainHook::bufferCount; i++) {
+                ID3D12Resource* backBufferPtr;
+                pSwapChain->GetBuffer(i, IID_PPV_ARGS(&backBufferPtr));
+                device->CreateRenderTargetView(backBufferPtr, nullptr, rtvHandle);
+                rtvHandle.ptr += rtvDescriptorSize;
 
-                for (int i = 0; i < bufferCount; i++) {
-                    ID3D12Resource *backBufferPtr;
-                    pSwapChain->GetBuffer(i, IID_PPV_ARGS(&backBufferPtr));
-                    device->CreateRenderTargetView(backBufferPtr, nullptr, rtvHandle);
-                    rtvHandle.ptr += rtvDescriptorSize;
+                D3D12_RESOURCE_DESC backBufferDescriptor = backBufferPtr->GetDesc();
+                MC::windowSize.x = (float)backBufferDescriptor.Width;
+                MC::windowSize.y = (float)backBufferDescriptor.Height;
 
-                    D3D12_RESOURCE_DESC backBufferDescriptor = backBufferPtr->GetDesc();
-                    MC::windowSize.x = (float) backBufferDescriptor.Width;
-                    MC::windowSize.y = (float) backBufferDescriptor.Height;
+                D3D11_RESOURCE_FLAGS d3d11_flags = { D3D11_BIND_RENDER_TARGET };
 
-                    D3D11_RESOURCE_FLAGS d3d11_flags = {D3D11_BIND_RENDER_TARGET};
+                SwapchainHook::d3d11On12Device->CreateWrappedResource(backBufferPtr, &d3d11_flags, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT, IID_PPV_ARGS(&SwapchainHook::D3D11Resources[i]));
+                SwapchainHook::D3D11Resources[i]->QueryInterface(&SwapchainHook::DXGISurfaces[i]);
 
-                    SwapchainHook::d3d11On12Device->CreateWrappedResource(backBufferPtr, &d3d11_flags,D3D12_RESOURCE_STATE_RENDER_TARGET,D3D12_RESOURCE_STATE_PRESENT,IID_PPV_ARGS(&SwapchainHook::D3D11Resources[i]));
-                    SwapchainHook::D3D11Resources[i]->QueryInterface(&SwapchainHook::DXGISurfaces[i]);
+                SwapchainHook::D2D1Bitmaps[i] = nullptr; // Initialize to nullptr
 
-                    SwapchainHook::D2D1Bitmaps[i] = nullptr; // Initialize to nullptr
-
-                    D2D::context->CreateBitmapFromDxgiSurface(
-                            SwapchainHook::DXGISurfaces[i],
-                            props,
-                            &(SwapchainHook::D2D1Bitmaps[i])
-                    );
-                }
-
-
-
-                SwapchainHook::init = true;
+                D2D::context->CreateBitmapFromDxgiSurface(SwapchainHook::DXGISurfaces[i], props, &(SwapchainHook::D2D1Bitmaps[i]));
+                backBufferPtr->Release();
             }
+
+            d2dFactory->Release();
+            d2dFactory = nullptr;
+
+            dxgiDevice->Release();
+            dxgiDevice = nullptr;
+
+            d3d11device->Release();
+            d3d11device = nullptr;
+
+            device2->Release();
+            device2 = nullptr;
+
+            device->Release();
+            device = nullptr;
+
+
+            SwapchainHook::init = true;
+        }
+
 
     } else {
 
@@ -165,6 +177,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 RenderEvent event;
                 EventHandler::onRender(event);
                 D2D::context->EndDraw();
+
+                D2D::context->SetTarget(nullptr);
 
                 SwapchainHook::d3d11On12Device->ReleaseWrappedResources(&resource, 1);
                 SwapchainHook::context->Flush();
