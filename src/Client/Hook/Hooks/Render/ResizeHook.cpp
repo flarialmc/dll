@@ -8,8 +8,6 @@
 
 void ResizeHook::enableHook() {
 
-    Logger::debug(std::to_string(kiero::getRenderType()));
-
     auto ResizePtr = (void *)kiero::getMethodsTable()[145];
 
     if(kiero::getRenderType() == kiero::RenderType::D3D11)

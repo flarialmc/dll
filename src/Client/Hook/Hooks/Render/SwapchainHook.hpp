@@ -12,7 +12,7 @@
 class SwapchainHook : public Hook
 {
 private:
-    static void swapchainCallback(IDXGISwapChain *pSwapChain, UINT syncInterval, UINT flags);
+    static void swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags);
 
 public:
     typedef void(__thiscall *SwapchainOriginal)(IDXGISwapChain *, UINT, UINT);
@@ -20,4 +20,10 @@ public:
     static bool init;
     SwapchainHook();
     void enableHook() override;
+    static inline ID3D12CommandQueue* queue;
+    static inline std::vector<IDXGISurface1> DXGISurfaces;
+    static inline std::vector<ID2D1Bitmap1*> D2D1Bitmaps;
+    static inline ID3D12DescriptorHeap* D3D12DescriptorHeap;
+    static inline std::vector<ID3D11RenderTargetView*> RenderTargetViews;
+
 };
