@@ -64,7 +64,12 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
             DXGI_SWAP_CHAIN_DESC1 swapChainDescription;
             pSwapChain->GetDesc1(&swapChainDescription);
 
-            uintptr_t bufferCount = swapChainDescription.BufferCount;
+            SwapchainHook::bufferCount = swapChainDescription.BufferCount;
+
+            SwapchainHook::DXGISurfaces.resize(bufferCount);
+            SwapchainHook::D3D11Resources.resize(bufferCount);
+            SwapchainHook:D2D1Bitmaps.resize(bufferCount);
+
             auto dpi = (float)GetDpiForSystem();
 
             D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(
@@ -99,10 +104,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 if(!SUCCEEDED(SwapchainHook::d3d11On12Device->CreateWrappedResource(backBufferPtr, &d3d11_flags, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT, IID_PPV_ARGS(&SwapchainHook::D3D11Resources[i])))) Logger::debug("didnt succeed");
 
                 Logger::debug("this ran 3");
-
-                if(SwapchainHook::D3D11Resources[i] == nullptr) Logger::debug("Resources is nullptr");
-                if(SwapchainHook::DXGISurfaces[i] == nullptr) Logger::debug("DXGISurface is nullptr");
-
 
                 SwapchainHook::D3D11Resources[i]->QueryInterface(&SwapchainHook::DXGISurfaces[i]);
 
@@ -160,8 +161,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
         if(D2D::context != nullptr && !Client::disable) {
 
-            Logger::debug("omw");
-
             int i = pSwapChain->GetCurrentBackBufferIndex();
 
             ID3D11Resource* resource = SwapchainHook::D3D11Resources[i];
@@ -171,8 +170,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
             MC::windowSize.x = D2D::context->GetSize().width;
             MC::windowSize.y = D2D::context->GetSize().height;
-
-            Logger::debug(std::to_string(MC::windowSize.x));
 
             D2D::context->BeginDraw();
             RenderEvent event;

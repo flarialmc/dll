@@ -27,4 +27,5 @@ public:
     static inline std::vector<ID3D11Resource*> D3D11Resources;
     static inline ID3D12DescriptorHeap* D3D12DescriptorHeap;
     static inline ID3D11On12Device* d3d11On12Device;
+    static inline uintptr_t bufferCount;
 };
