@@ -25,4 +25,6 @@ public:
     static  bool held;
     static  bool hasResized;
 
+    static inline int frames;
+    static inline int fps;
 };

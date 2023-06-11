@@ -11,6 +11,9 @@ SwapchainHook::SwapchainHook() : Hook("swapchain_hook", "") {}
 
 ID3D12CommandQueue* SwapchainHook::queue = nullptr;
 
+static std::chrono::high_resolution_clock fpsclock;
+static std::chrono::steady_clock::time_point start = fpsclock.now();
+
 void SwapchainHook::enableHook()
 {
     void* swapchain_ptr;
@@ -24,6 +27,18 @@ bool SwapchainHook::init = false;
 
 void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags)
 {
+
+    std::chrono::duration<float> elapsed = fpsclock.now() - start;
+    MC::frames += 1;
+
+    if (elapsed.count() >= 0.1f) {
+        // Calculate frame rate based on elapsed time
+        MC::fps = static_cast<int>(MC::frames / elapsed.count());
+        Logger::debug(std::to_string(MC::fps));
+        // Reset frame counter and update start time
+        MC::frames = 0;
+        start = fpsclock.now();
+    }
 
     if(!SwapchainHook::init) {
 
