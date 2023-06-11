@@ -34,7 +34,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
     if (elapsed.count() >= 0.5f) {
         // Calculate frame rate based on elapsed time
         MC::fps = static_cast<int>(MC::frames / elapsed.count());
-        Logger::debug(std::to_string(MC::fps));
         // Reset frame counter and update start time
         MC::frames = 0;
         start = fpsclock.now();

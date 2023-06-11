@@ -21,3 +21,4 @@ build/
 .idea/
 cmake-build-debug-visual-studio/
 cmake-build-release-visual-studio/
+*.zip
