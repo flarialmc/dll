@@ -384,7 +384,7 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
         WindowRects[currentNum].isMovingElement = false;
     }
 
-    RoundedRectOnlyTopCorner(x, y, D2D1::ColorF(D2D1::ColorF::LightGray), width, height);
+    RoundedRectOnlyTopCorner(x, y, D2D1::ColorF(D2D1::ColorF::LightGray, 0.0), width, height);
 }
 
 void FlarialGUI::UnsetWindowRect()

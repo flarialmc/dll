@@ -29,7 +29,7 @@ class FPSListener : public Listener {
 
             float realspacing = Constraints::SpacingConstraint(0.34, textWidth);
 
-            FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, 50, 50, 0);
+            FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, 0);
 
             std::to_string(realcenter.x);
 
