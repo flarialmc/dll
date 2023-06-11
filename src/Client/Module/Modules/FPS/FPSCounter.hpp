@@ -18,11 +18,14 @@ public:
 
         EventHandler::registerListener(new FPSListener("FPS", this));
 
+        Module::onEnable();
     }
 
     void onDisable() override {
 
         EventHandler::unregisterListener("FPS");
+
+        Module::onDisable();
 
     }
 };

@@ -89,7 +89,7 @@ public:
         return jsonData.dump(4);
     }
 
-    void FromJson(const std::string& jsonString) {
+    void FromJson(const std::string& jsonString) const {
         try {
             json jsonData = json::parse(jsonString);
             for (const auto& item : jsonData) {
@@ -102,7 +102,7 @@ public:
                 }
             }
         } catch (const std::exception& e) {
-            Logger::debug(e.what());
+            Logger::error(e.what());
         }
     }
 

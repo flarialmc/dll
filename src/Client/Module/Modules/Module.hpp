@@ -5,6 +5,7 @@
 #include "../../../Config/Settings.hpp"
 #include <fstream>
 #include <iostream>
+#include <collection.h>
 
 class Module
 {
@@ -30,27 +31,66 @@ public:
 
 public:
 
-void SaveSettings() {
+void SaveSettings() const {
     try {
-        // Open the file for writing
+
         std::ofstream outputFile(settingspath);
 
 
         json jsonData = settings.ToJson();
         if (outputFile.is_open()) {
-            // Write the JSON to the file
-            outputFile << settings.ToJson();  // Indent with 4 spaces for readability
+
+            outputFile << settings.ToJson();
             outputFile.close();
         } else {
-            std::cerr << "Failed to open file: " << settingsPath << std::endl;
+            Logger::error("Failed to open file. Maybe it doesn't exist?: " + settingspath);
         }
     } catch (const std::exception& ex) {
-        std::cerr << "Exception occurred while saving settings: " << ex.what() << std::endl;
+        Logger::error(ex.what());
     }
 }
 
+    void LoadSettings() const {
+        std::ifstream inputFile(settingspath);
+        std::string settingstring;
 
-virtual void onEnable() {}
+        if (inputFile.is_open()) {
+            std::string line;
+
+            while (std::getline(inputFile, line)) {
+                settingstring += line;
+            }
+
+            settings.FromJson(settingstring);
+
+            inputFile.close();
+        } else {
+            Logger::error("File could not be opened. Maybe it doesn't exist?: " + settingspath);
+        }
+
+
+    }
+
+    void CheckSettingsFile() const {
+
+        std::filesystem::path filePath(settingspath);
+
+        if (!std::filesystem::exists(filePath)) {
+            std::ofstream outputFile(filePath);
+            if (!outputFile.is_open()) {
+                // Handle file creation error
+                return;
+            }
+            outputFile.close();
+        }
+    }
+
+
+   virtual void onEnable() {
+
+    CheckSettingsFile();
+
+}
 
     virtual void onDisable() {
 

@@ -16,12 +16,16 @@ public:
 
     void onEnable() override {
 
+        Module::onEnable();
+
         EventHandler::registerListener(new ClickGUIRenderer("ClickGUI", this));
         EventHandler::registerListener(new GUIMouseListener("GUIMouse"));
 
     }
 
     void onDisable() override {
+
+        Module::onDisable();
 
         EventHandler::unregisterListener("ClickGUI");
         EventHandler::unregisterListener("GUIMouse");
