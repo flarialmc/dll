@@ -42,8 +42,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
     if(!SwapchainHook::init) {
 
-        Logger::debug("gonna run");
-
         if(SwapchainHook::queue == nullptr) {
 
             Logger::debug("not a DX12 device, running dx11 procedures");
@@ -74,6 +72,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 Memory::SafeRelease(pBackBuffer);
                 Memory::SafeRelease(eBackBuffer);
+
+                MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
                 SwapchainHook::init = true;
 
