@@ -31,44 +31,7 @@ DWORD WINAPI init(HMODULE real)
 
     Logger::debug("Shut down Kiero.");
 
-    if(SwapchainHook::init && SwapchainHook::d3d11On12Device != nullptr) {
-
-        Memory::SafeRelease(SwapchainHook::queue);
-
-        Memory::SafeRelease(SwapchainHook::D3D12DescriptorHeap);
-
-        for (ID2D1Bitmap1* bitmap : SwapchainHook::D2D1Bitmaps)
-        {
-            Memory::SafeRelease(bitmap);
-        }
-
-        for (ID3D11Resource* resource : SwapchainHook::D3D11Resources)
-        {
-            SwapchainHook::d3d11On12Device->ReleaseWrappedResources(&resource, 1);
-            Memory::SafeRelease(resource);
-        }
-
-        for (IDXGISurface1* surface : SwapchainHook::DXGISurfaces)
-        {
-            Memory::SafeRelease(surface);
-        }
-
-        SwapchainHook::D2D1Bitmaps.clear();
-        SwapchainHook::D3D11Resources.clear();
-        SwapchainHook::DXGISurfaces.clear();
-
-        SwapchainHook::context->Flush();
-        Memory::SafeRelease(SwapchainHook::context);
-        Memory::SafeRelease(SwapchainHook::d3d11On12Device);
-
-
-    }
-
-    if(SwapchainHook::init) {
-
-        Memory::SafeRelease(D2D::context);
-
-    }
+    ResizeHook::CleanShit();
 
     MH_DisableHook(MH_ALL_HOOKS);
     MH_Uninitialize();

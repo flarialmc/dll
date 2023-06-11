@@ -22,6 +22,16 @@ void ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UI
     MC::windowSize.x = (float) width;
     MC::windowSize.y = (float) height;
 
+    ResizeHook::CleanShit(true);
+
+    SwapchainHook::init = false;
+
+    return func_original(pSwapChain, bufferCount, width, height, newFormat, flags);
+
+}
+
+void ResizeHook::CleanShit(bool isResize) {
+
     if(SwapchainHook::init && SwapchainHook::d3d11On12Device != nullptr) {
 
         Memory::SafeRelease(SwapchainHook::queue);
@@ -35,7 +45,10 @@ void ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UI
 
         for (ID3D11Resource* resource : SwapchainHook::D3D11Resources)
         {
-                Memory::SafeRelease(resource);
+            if(!isResize)
+            SwapchainHook::d3d11On12Device->ReleaseWrappedResources(&resource, 1);
+
+            Memory::SafeRelease(resource);
         }
 
         for (IDXGISurface1* surface : SwapchainHook::DXGISurfaces)
@@ -50,6 +63,9 @@ void ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UI
         SwapchainHook::context->Flush();
         Memory::SafeRelease(SwapchainHook::context);
 
+        if(!isResize)
+        Memory::SafeRelease(SwapchainHook::d3d11On12Device);
+
 
     }
 
@@ -57,11 +73,6 @@ void ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UI
 
         Memory::SafeRelease(D2D::context);
 
-        SwapchainHook::init = false;
     }
-
-    Sleep(100);
-
-    return func_original(pSwapChain, bufferCount, width, height, newFormat, flags);
 
 }

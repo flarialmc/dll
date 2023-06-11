@@ -13,4 +13,6 @@ public:
 
     ResizeHook();
     void enableHook() override;
+
+    static void CleanShit(bool isResize = false);
 };
