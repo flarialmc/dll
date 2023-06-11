@@ -31,7 +31,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
     std::chrono::duration<float> elapsed = fpsclock.now() - start;
     MC::frames += 1;
 
-    if (elapsed.count() >= 0.1f) {
+    if (elapsed.count() >= 0.5f) {
         // Calculate frame rate based on elapsed time
         MC::fps = static_cast<int>(MC::frames / elapsed.count());
         Logger::debug(std::to_string(MC::fps));
