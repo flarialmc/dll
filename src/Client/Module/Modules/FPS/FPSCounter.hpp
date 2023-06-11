@@ -8,7 +8,7 @@ class FPSCounter : public Module {
 
 public:
 
-    FPSCounter() : Module("FPS Counter", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\fps.png", 'L') {
+    FPSCounter() : Module("FPS", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\fps.png", 'L') {
 
         onEnable();
 
