@@ -20,7 +20,7 @@ void ModuleManager::initialize()
 
     modules.push_back(new Uninject());
     modules.push_back(new ClickGUI());
-    modules.push_back(new FPSCounter());
+   // modules.push_back(new FPSCounter());
     modules.push_back(new Module("test", "woah", "", 1));
     modules.push_back(new Module("test", "woah", "", 1));
     modules.push_back(new Module("test", "woah", "", 1));

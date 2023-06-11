@@ -75,6 +75,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 Memory::SafeRelease(pBackBuffer);
                 Memory::SafeRelease(eBackBuffer);
 
+                MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
                 SwapchainHook::init = true;
 
             } else {
@@ -188,10 +189,13 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 D2D::context->SetTarget(nullptr);
 
                 SwapchainHook::d3d11On12Device->ReleaseWrappedResources(&resource, 1);
+             
                 SwapchainHook::context->Flush();
             } else {
 
                 D2D::context->BeginDraw();
+
+                std::to_string(MC::windowSize.x);
                 RenderEvent event;
                 EventHandler::onRender(event);
                 D2D::context->EndDraw();
