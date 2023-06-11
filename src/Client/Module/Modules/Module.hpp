@@ -5,7 +5,8 @@
 #include "../../../Config/Settings.hpp"
 #include <fstream>
 #include <iostream>
-#include <collection.h>
+#include <Windows.h>
+#include <filesystem>
 
 class Module
 {
@@ -24,7 +25,8 @@ public:
         icon = eicon;
         keybind = ekey;
         settings = Settings();
-        settingspath = Utils::getRoamingPath() + "\\Config\\" + name + ".flarial";
+        settingspath = Utils::getRoamingPath() + "\\Flarial\\Config\\" + name + ".flarial";
+        settings.addSetting("sussy", 0);
     }
 public:
     bool enabled = false;
@@ -73,21 +75,31 @@ void SaveSettings() const {
 
     void CheckSettingsFile() const {
 
-        std::filesystem::path filePath(settingspath);
+        if (!std::filesystem::exists(settingspath)) {
 
-        if (!std::filesystem::exists(filePath)) {
-            std::ofstream outputFile(filePath);
-            if (!outputFile.is_open()) {
-                // Handle file creation error
+            std::filesystem::path filePath(settingspath);
+            std::filesystem::create_directories(filePath.parent_path());
+
+            HANDLE fileHandle = CreateFileA(settingspath.c_str(), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                                            OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+
+            if (fileHandle == INVALID_HANDLE_VALUE) {
+                Logger::debug("Failed to create file: " + settingspath);
                 return;
             }
-            outputFile.close();
+
+            CloseHandle(fileHandle);
+        } else {
+
+            Logger::debug("Exists");
+
         }
     }
 
 
    virtual void onEnable() {
 
+    Logger::debug(settingspath);
     CheckSettingsFile();
 
 }

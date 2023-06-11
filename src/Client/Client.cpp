@@ -27,6 +27,12 @@ void Client::initialize()
         create_directory(folder_path3);
     }
 
+    std::filesystem::path folder_path4(Utils::getRoamingPath() + "\\Flarial\\Config");
+    if (!exists(folder_path4))
+    {
+        create_directory(folder_path4);
+    }
+
     std::string dwnld_URL = "https://cdn.flarial.net/assets/gear.png";
     std::string savepath = Utils::getRoamingPath() + "\\Flarial\\assets\\gear.png";
     URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL).c_str(), FlarialGUI::to_wide(savepath).c_str(), 0, NULL);
