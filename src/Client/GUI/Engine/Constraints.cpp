@@ -4,8 +4,8 @@
 
 float Constraints::PercentageConstraint(float percentage, const std::string& edge, bool ignore_stack)
 {
-    float screenWidth = static_cast<float>(MC::windowSize.x);
-    float screenHeight = static_cast<float>(MC::windowSize.y);
+    float screenWidth = MC::windowSize.x;
+    float screenHeight = MC::windowSize.y;
     float x = 0;
     float y = 0;
 
@@ -86,8 +86,8 @@ Vec2<float> Constraints::CenterConstraint(float width, float height, const std::
 
     if (ignore_stack || FlarialGUI::dimension_stack.empty())
     {
-        screenWidth = static_cast<float>(MC::windowSize.x);
-        screenHeight = static_cast<float>(MC::windowSize.y);
+        screenWidth = MC::windowSize.x;
+        screenHeight = MC::windowSize.y;
     }
     else
     {
@@ -124,8 +124,8 @@ Vec2<float> Constraints::RoundingConstraint(float radiusX, float radiusY, bool i
     float screenWidth;
     float screenHeight;
 
-    screenWidth = static_cast<float>(MC::windowSize.x);
-    screenHeight = static_cast<float>(MC::windowSize.y);
+    screenWidth = MC::windowSize.x;
+    screenHeight = MC::windowSize.y;
 
 
     float minDimension = min(screenWidth, screenHeight);

@@ -26,6 +26,8 @@ void ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UI
 
     SwapchainHook::init = false;
 
+    SwapchainHook::hasResized = true;
+
     return func_original(pSwapChain, bufferCount, width, height, newFormat, flags);
 
 }

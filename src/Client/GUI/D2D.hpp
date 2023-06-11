@@ -18,12 +18,12 @@ namespace D2D {
 class MC {
 
 public:
-    static  Vec2<float> mousepos;
-    static  Vec2<float> windowSize;
-    static  MouseAction mouseaction;
-    static  MouseButton mousebutton;
-    static  bool held;
-    static  bool hasResized;
+    static inline Vec2<float> mousepos;
+    static inline Vec2<float> windowSize;
+    static inline MouseAction mouseaction;
+    static inline MouseButton mousebutton;
+    static inline bool held;
+    static inline bool hasResized;
 
     static inline int frames;
     static inline int fps;

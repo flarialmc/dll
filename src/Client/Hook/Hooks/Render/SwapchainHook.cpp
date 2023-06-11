@@ -24,6 +24,7 @@ void SwapchainHook::enableHook()
 }
 
 bool SwapchainHook::init = false;
+bool SwapchainHook::hasResized = false;
 
 void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags)
 {
@@ -70,9 +71,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 IDXGISurface* eBackBuffer;
                 pSwapChain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
                 D2D1CreateDeviceContext(eBackBuffer, properties, &D2D::context);
-
-                MC::windowSize.x = (float) D2D::context->GetSize().width;
-                MC::windowSize.y = (float) D2D::context->GetSize().height;
 
                 Memory::SafeRelease(pBackBuffer);
                 Memory::SafeRelease(eBackBuffer);
@@ -134,10 +132,13 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
             D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = SwapchainHook::D3D12DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
             for (int i = 0; i < SwapchainHook::bufferCount; i++) {
+
                 ID3D12Resource* backBufferPtr;
                 pSwapChain->GetBuffer(i, IID_PPV_ARGS(&backBufferPtr));
                 device->CreateRenderTargetView(backBufferPtr, nullptr, rtvHandle);
                 rtvHandle.ptr += rtvDescriptorSize;
+
+
 
                 D3D11_RESOURCE_FLAGS d3d11_flags = { D3D11_BIND_RENDER_TARGET };
 
@@ -148,6 +149,10 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 D2D::context->CreateBitmapFromDxgiSurface(SwapchainHook::DXGISurfaces[i], props, &(SwapchainHook::D2D1Bitmaps[i]));
                 Memory::SafeRelease(backBufferPtr);
+
+                if(!SwapchainHook::hasResized)
+                    MC::windowSize = Vec2<float>(SwapchainHook::D2D1Bitmaps[i]->GetSize().width, SwapchainHook::D2D1Bitmaps[i]->GetSize().height);
+
             }
 
             Memory::SafeRelease(device);
@@ -173,8 +178,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[i]);
 
-                MC::windowSize.x = D2D::context->GetSize().width;
-                MC::windowSize.y = D2D::context->GetSize().height;
+                std::to_string(MC::windowSize.x);
 
                 D2D::context->BeginDraw();
                 RenderEvent event;
