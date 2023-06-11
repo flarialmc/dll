@@ -14,7 +14,7 @@ void HookManager::initialize()
 
     hooks.push_back(new SwapchainHook());
     hooks.push_back(new ResizeHook());
-
+    hooks.push_back(new getFovHook());
 
     for (auto hook : hooks)
         hook->enableHook();
@@ -29,3 +29,4 @@ void HookManager::terminate()
 
     hooks.clear();
 }
+

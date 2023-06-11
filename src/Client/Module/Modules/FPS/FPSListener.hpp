@@ -21,6 +21,7 @@ class FPSListener : public Listener {
             float textWidth = Constraints::RelativeConstraint(0.3);
             float textHeight = Constraints::RelativeConstraint(0.1);
 
+
             Vec2<float> realcenter = Constraints::CenterConstraint(textWidth, textHeight);
 
             float rectWidth = Constraints::RelativeConstraint(0.215);
