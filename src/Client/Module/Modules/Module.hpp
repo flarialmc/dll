@@ -7,6 +7,8 @@
 #include <iostream>
 #include <Windows.h>
 #include <filesystem>
+#include <sstream>
+
 
 class Module
 {
@@ -26,50 +28,42 @@ public:
         keybind = ekey;
         settings = Settings();
         settingspath = Utils::getRoamingPath() + "\\Flarial\\Config\\" + name + ".flarial";
+        LoadSettings();
     }
 public:
     bool enabled = false;
 
 public:
 
-void SaveSettings() const {
-    try {
-
-        std::ofstream outputFile(settingspath);
-
-
-        json jsonData = settings.ToJson();
-        if (outputFile.is_open()) {
-
-            outputFile << settings.ToJson();
-            outputFile.close();
-        } else {
-            Logger::error("Failed to open file. Maybe it doesn't exist?: " + settingspath);
+    void SaveSettings() const {
+        try {
+            std::ofstream outputFile(settingspath);
+            if (outputFile.is_open()) {
+                std::string jsonString = settings.ToJson();
+                outputFile << jsonString;
+                outputFile.close();
+            } else {
+                Logger::error("Failed to open file. Maybe it doesn't exist?: " + settingspath);
+            }
+        } catch (const std::exception& ex) {
+            Logger::error(ex.what());
         }
-    } catch (const std::exception& ex) {
-        Logger::error(ex.what());
     }
-}
 
-    void LoadSettings() const {
+    void LoadSettings() {
         std::ifstream inputFile(settingspath);
-        std::string settingstring;
+        std::stringstream ss;
 
         if (inputFile.is_open()) {
-            std::string line;
-
-            while (std::getline(inputFile, line)) {
-                settingstring += line;
-            }
-
-            settings.FromJson(settingstring);
-
+            ss << inputFile.rdbuf();
             inputFile.close();
         } else {
             Logger::error("File could not be opened. Maybe it doesn't exist?: " + settingspath);
+            return;
         }
 
-
+        std::string settingstring = ss.str();
+        settings.FromJson(settingstring);
     }
 
     void CheckSettingsFile() const {
@@ -83,24 +77,18 @@ void SaveSettings() const {
                                             OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
             if (fileHandle == INVALID_HANDLE_VALUE) {
-                Logger::debug("Failed to create file: " + settingspath);
+                Logger::error("Failed to create file: " + settingspath);
                 return;
             }
 
             CloseHandle(fileHandle);
-        } else {
-
-            Logger::debug("Exists");
-
         }
     }
 
 
    virtual void onEnable() {
 
-    Logger::debug(settingspath);
     CheckSettingsFile();
-
 }
 
     virtual void onDisable() {

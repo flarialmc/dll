@@ -90,16 +90,25 @@ public:
         return jsonData.dump(4);
     }
 
-    void FromJson(const std::string& jsonString) const {
+    void FromJson(const std::string& jsonString) {
         try {
             json jsonData = json::parse(jsonString);
             for (const auto& item : jsonData) {
                 std::string name = item["name"].get<std::string>();
-                for (auto& setting : settings) {
-                    if (setting->ToJson()["name"].get<std::string>() == name) {
-                        setting->FromJson(item);
-                        break;
-                    }
+
+                if (item["value"].is_number()) {
+                    float value = item["value"].get<float>();
+                    addSetting(name, value);
+                } else if (item["value"].is_string()) {
+                    std::string value = item["value"].get<std::string>();
+                    addSetting(name, value);
+                } else if (item["value"].is_boolean()) {
+                    bool value = item["value"].get<bool>();
+                    addSetting(name, value);
+                } else if (item["value"].is_null()) {
+                    // Handle null value if needed
+                } else {
+                    // Handle unsupported value type
                 }
             }
         } catch (const std::exception& e) {

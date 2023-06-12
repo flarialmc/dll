@@ -418,7 +418,7 @@ Vec2<float> FlarialGUI::CalculateMovedXY(float x, float y, int num)
         y = Constraints::PercentageConstraint(WindowRects[num].percentageY, "top");
     }
 
-    return Vec2(x, y);
+    return {x, y};
 }
 
 Vec2<float> FlarialGUI::GetCenterXY(float rectWidth, float rectHeight)

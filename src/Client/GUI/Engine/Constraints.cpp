@@ -155,8 +155,9 @@ Vec2<float> Constraints::CalculatePercentage(float x, float y) {
     float containerWidth = MC::windowSize.x;
     float containerHeight = MC::windowSize.y;
 
-    float percentageX = (x / containerWidth) * 100.0f;
-    float percentageY = (y / containerHeight) * 100.0f;
+    float percentageX = x / containerWidth;
+    float percentageY = y / containerHeight;
+
     return { percentageX, percentageY };
 }
 

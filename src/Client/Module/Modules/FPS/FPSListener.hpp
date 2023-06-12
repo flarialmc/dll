@@ -22,7 +22,14 @@ class FPSListener : public Listener {
             float textHeight = Constraints::RelativeConstraint(0.1);
 
 
-            Vec2<float> realcenter = Constraints::CenterConstraint(textWidth, textHeight);
+            Vec2<float> settingperc = Vec2<float>(this->module->settings.getSettingByName<float>("percentageX")->value, this->module->settings.getSettingByName<float>("percentageY")->value);
+
+            Vec2<float> realcenter;
+
+            if(settingperc.x != 0)
+               realcenter = Vec2<float>(Constraints::PercentageConstraint(settingperc.x, "left"), Constraints::PercentageConstraint(settingperc.y, "top"));
+            else
+            realcenter = Constraints::CenterConstraint(textWidth, textHeight);
 
             float rectWidth = Constraints::RelativeConstraint(0.215);
             Vec2<float> rounde = Constraints::RoundingConstraint(40, 40);
@@ -35,6 +42,7 @@ class FPSListener : public Listener {
 
             realcenter.x = vec2.x;
             realcenter.y = vec2.y;
+
 
             Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y);
 
