@@ -64,6 +64,7 @@ public:
 
     template<typename T>
     SettingType<T>* getSettingByName(const std::string& name) {
+
         for (auto& setting : settings) {
             auto typedSetting = dynamic_cast<TypedSetting<T>*>(setting.get());
             if (typedSetting && typedSetting->setting.name == name) {

@@ -12,4 +12,6 @@ public:
     static float SpacingConstraint(float percentage, float dimension);
 
     static float FontScaler(float width, float height);
+
+    static Vec2<float> CalculatePercentage(float x, float y);
 };

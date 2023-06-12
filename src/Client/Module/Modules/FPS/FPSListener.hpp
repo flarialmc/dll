@@ -31,12 +31,18 @@ class FPSListener : public Listener {
 
             FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, 0);
 
-            std::to_string(realcenter.x);
-
             Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, 0);
 
             realcenter.x = vec2.x;
             realcenter.y = vec2.y;
+
+            Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y);
+
+            this->module->settings.setValue("percentageX", percentages.x);
+            this->module->settings.setValue("percentageY", percentages.y);
+
+            //FIND NEW WORKAROUND LATER!!!!!!
+            std::to_string(realcenter.x);
 
             FlarialGUI::RoundedRect(realcenter.x, realcenter.y,
                                     D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), rectWidth, textHeight,

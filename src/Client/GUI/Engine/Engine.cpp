@@ -375,6 +375,7 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
         WindowRects[currentNum].hasBeenMoved = true;
         WindowRects[currentNum].movedX = MC::mousepos.x - width / 2.0f;
         WindowRects[currentNum].movedY = MC::mousepos.y - height / 2.0f;
+
         WindowRects[currentNum].percentageX = WindowRects[currentNum].movedX / MC::windowSize.x;
         WindowRects[currentNum].percentageY = WindowRects[currentNum].movedY / MC::windowSize.y;
     }
@@ -413,8 +414,8 @@ Vec2<float> FlarialGUI::CalculateMovedXY(float x, float y, int num)
 {
     if (isInWindowRect && WindowRects[num].hasBeenMoved)
     {
-        x = WindowRects[num].movedX;
-        y = WindowRects[num].movedY;
+        x = Constraints::PercentageConstraint(WindowRects[num].percentageX, "left");
+        y = Constraints::PercentageConstraint(WindowRects[num].percentageY, "top");
     }
 
     return Vec2(x, y);

@@ -16,6 +16,11 @@ public:
 
     void onEnable() override {
 
+        if(settings.getSettingByName<float>("percentageX") == nullptr) {
+            settings.addSetting("percentageX", 0.0f);
+            settings.addSetting("percentageY", 0.0f);
+        }
+
         EventHandler::registerListener(new FPSListener("FPS", this));
 
         Module::onEnable();

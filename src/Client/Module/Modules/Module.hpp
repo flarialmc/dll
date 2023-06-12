@@ -26,7 +26,6 @@ public:
         keybind = ekey;
         settings = Settings();
         settingspath = Utils::getRoamingPath() + "\\Flarial\\Config\\" + name + ".flarial";
-        settings.addSetting("sussy", 0);
     }
 public:
     bool enabled = false;
