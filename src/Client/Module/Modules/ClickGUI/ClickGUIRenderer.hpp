@@ -21,7 +21,7 @@ class ClickGUIRenderer : public Listener {
 
             /* Base Rectangle Start */
 
-            float baseWidth = Constraints::RelativeConstraint(0.9);
+            float baseWidth = Constraints::RelativeConstraint(0.85);
             float baseHeight = Constraints::RelativeConstraint(0.64);
 
             Vec2<float> center = Constraints::CenterConstraint(baseWidth, baseHeight, "r", 1, 1);
@@ -35,7 +35,7 @@ class ClickGUIRenderer : public Listener {
 
             /* Nav Bar Start */
 
-            float navigationBarWidth = Constraints::RelativeConstraint(1.384f);
+            float navigationBarWidth = Constraints::RelativeConstraint(1.309f);
             float navigationBarHeight = Constraints::RelativeConstraint(0.14f);
             float navx = Constraints::PercentageConstraint(0.008f, "left");
             float navy = Constraints::PercentageConstraint(0.009f, "top");
@@ -56,7 +56,7 @@ class ClickGUIRenderer : public Listener {
             float logoX = navx - Constraints::SpacingConstraint(0.05, logoWidth);
             float logoY = (navy + navigationBarHeight / 2.0f - logoWidth / 2.0f);
 
-            FlarialGUI::Image("\\Flarial\\assets\\logo.png", D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth), logoWidth , logoWidth);
+            FlarialGUI::Image("\\Flarial\\assets\\logo.png", D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth));
 
             FlarialGUI::PopSize(); // Pops nav bar
 
@@ -69,7 +69,7 @@ class ClickGUIRenderer : public Listener {
             float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
             float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
 
-            Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.55, -0.52);
+            Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.60, -0.52);
 
 
             float scrollWidth = Constraints::RelativeConstraint(1.12);

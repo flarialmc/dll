@@ -199,7 +199,7 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
     geometry->Release();
 }
 
-void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width, const float height, const D2D1_COLOR_F color, const std::string imagePath, const int imageWidth, const int imageHeight, const wchar_t *text)
+void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width, const float height, const D2D1_COLOR_F color, const std::string imagePath, const float imageWidth, const float imageHeight, const wchar_t *text)
 {
 
     if (isInScrollView)
@@ -211,13 +211,18 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
 
     D2D::context->FillRoundedRectangle(roundedRect, brush);
 
-    Image(imagePath, roundedRect.rect, imageWidth, imageHeight);
+    x = x + (width - imageWidth) / 2.0f;
+    y = y + (height - imageHeight) / 2.0f;
+
+    D2D1_RECT_F  imagerect = D2D1::RectF(x, y, x + imageWidth, y + imageHeight);
+
+    Image(imagePath, imagerect);
 
     // Draw text
     IDWriteFactory *writeFactory;
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
     IDWriteTextFormat *textFormat;
-    writeFactory->CreateTextFormat(L"Segoe UI", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"", &textFormat);
+    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"", &textFormat);
     textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
@@ -229,7 +234,7 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
     writeFactory->Release();
 }
 
-void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect, const int imageWidth, const int imageHeight)
+void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
 {
     if (isInScrollView) {
         rect.top += scrollpos;

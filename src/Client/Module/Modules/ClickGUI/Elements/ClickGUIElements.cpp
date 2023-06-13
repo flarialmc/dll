@@ -26,8 +26,6 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 
     FlarialGUI::PushSize(x, y, BottomRoundedWidth, BottomRoundedHeight);
 
-    // Settings Rect
-
     // Mod Name
     float textx = Constraints::PercentageConstraint(0.11, "left");
     float texty = Constraints::PercentageConstraint(0.415, "top");
@@ -49,7 +47,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
     modicony = Constraints::PercentageConstraint(0.15, "top");
     if(iconpath != "")
     {
-        FlarialGUI::Image(iconpath, D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize), paddingSize, paddingSize);
+        FlarialGUI::Image(iconpath, D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize));
     }
 
     // enabled / disabled button
@@ -61,12 +59,28 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
     float buttonWidth = Constraints::RelativeConstraint(0.97);
     float buttonHeight = Constraints::RelativeConstraint(0.27);
 
-    float buttonx = Constraints::PercentageConstraint(0.04, "right") - buttonWidth;
-    float buttony = Constraints::PercentageConstraint(0.05, "bottom") - buttonHeight;
+    float buttonx = Constraints::PercentageConstraint(0.04, "right") ;
+    float buttony = Constraints::PercentageConstraint(0.05, "bottom") ;
 
     round = Constraints::RoundingConstraint(26, 26);
 
-    if(FlarialGUI::RoundedButton(buttonx, buttony, color, D2D1::ColorF(D2D1::ColorF::White), FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, round.x, round.x)) mod->enabled = !mod->enabled;
+    if(FlarialGUI::RoundedButton(buttonx - buttonWidth, buttony - buttonHeight, color, D2D1::ColorF(D2D1::ColorF::White), FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, round.x, round.x)) mod->enabled = !mod->enabled;
+
+    // Settings Button
+    float settingswidth = Constraints::RelativeConstraint(0.2);
+    float iconwidth = Constraints::RelativeConstraint(0.12);
+    float settingspacing = Constraints::SpacingConstraint(6.14, settingswidth);
+    float settingsheightspac = Constraints::SpacingConstraint(0.21, settingswidth);
+
+    float paddingwidth = Constraints::RelativeConstraint(0.26);
+    float paddingspacing = Constraints::SpacingConstraint(4.84, paddingwidth);
+    float paddingheightspac = Constraints::SpacingConstraint(0.05, paddingwidth);
+
+    round = Constraints::RoundingConstraint(20, 20);
+
+    FlarialGUI::RoundedRect(buttonx - paddingspacing, (buttony - paddingwidth) - paddingheightspac, D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), paddingwidth, paddingwidth, round.x, round.x);
+    FlarialGUI::RoundedRectWithImageAndText(buttonx - settingspacing, (buttony - settingswidth) - settingsheightspac, settingswidth, settingswidth, D2D1::ColorF(112.0f / 255.0f, 93.0f / 255.0f, 96.0f / 255.0f), "\\Flarial\\assets\\gear.png", iconwidth, iconwidth, L"");
+
 
     FlarialGUI::PopSize();
 
