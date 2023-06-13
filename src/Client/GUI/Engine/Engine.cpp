@@ -202,8 +202,13 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
 void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width, const float height, const D2D1_COLOR_F color, const std::string imagePath, const float imageWidth, const float imageHeight, const wchar_t *text)
 {
 
+    float imageY = y;
+
     if (isInScrollView)
         y += scrollpos;
+
+
+
     ID2D1SolidColorBrush *brush;
     D2D::context->CreateSolidColorBrush(color, &brush);
 
@@ -212,9 +217,9 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
     D2D::context->FillRoundedRectangle(roundedRect, brush);
 
     x = x + (width - imageWidth) / 2.0f;
-    y = y + (height - imageHeight) / 2.0f;
+    imageY = imageY + (height - imageHeight) / 2.0f;
 
-    D2D1_RECT_F  imagerect = D2D1::RectF(x, y, x + imageWidth, y + imageHeight);
+    D2D1_RECT_F  imagerect = D2D1::RectF(x, imageY, x + imageWidth, imageY + imageHeight);
 
     Image(imagePath, imagerect);
 
@@ -340,13 +345,13 @@ void FlarialGUI::ScrollBar(float x, float y, float width, float height, float ra
 
     // Draw the gray bar
     ID2D1SolidColorBrush *graybrush;
-    D2D::context->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gray), &graybrush);
+    D2D::context->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gray, 0.0), &graybrush);
     D2D1_ROUNDED_RECT grayRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radius, radius);
     D2D::context->FillRoundedRectangle(&grayRect, graybrush);
     graybrush->Release();
     // Draw the white bar
     ID2D1SolidColorBrush *whitebrush;
-    D2D::context->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &whitebrush);
+    D2D::context->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White, 0.0), &whitebrush);
     D2D1_ROUNDED_RECT whiteRect = D2D1::RoundedRect(D2D1::RectF(x, whiteY, x + width, whiteY + (height * 69.5 / 100)), radius, radius);
     D2D::context->FillRoundedRectangle(&whiteRect, whitebrush);
     whitebrush->Release();

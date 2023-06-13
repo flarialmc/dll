@@ -67,10 +67,10 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
     if(FlarialGUI::RoundedButton(buttonx - buttonWidth, buttony - buttonHeight, color, D2D1::ColorF(D2D1::ColorF::White), FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, round.x, round.x)) mod->enabled = !mod->enabled;
 
     // Settings Button
-    float settingswidth = Constraints::RelativeConstraint(0.2);
-    float iconwidth = Constraints::RelativeConstraint(0.12);
-    float settingspacing = Constraints::SpacingConstraint(6.14, settingswidth);
-    float settingsheightspac = Constraints::SpacingConstraint(0.21, settingswidth);
+    float settingswidth = Constraints::RelativeConstraint(0.17);
+    float iconwidth = Constraints::RelativeConstraint(0.10);
+    float settingspacing = Constraints::SpacingConstraint(7.12, settingswidth);
+    float settingsheightspac = Constraints::SpacingConstraint(0.31, settingswidth);
 
     float paddingwidth = Constraints::RelativeConstraint(0.26);
     float paddingspacing = Constraints::SpacingConstraint(4.84, paddingwidth);
