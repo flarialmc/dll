@@ -4,6 +4,7 @@
 #include "GUI/Engine/Engine.hpp"
 #include <kiero.h>
 #include <filesystem>
+#include <wingdi.h>
 
 bool Client::disable = false;
 
@@ -37,6 +38,10 @@ void Client::initialize()
     std::string savepath = Utils::getRoamingPath() + "\\Flarial\\assets\\gear.png";
     URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL).c_str(), FlarialGUI::to_wide(savepath).c_str(), 0, NULL);
 
+    std::string dwnld_URL3131 = "https://cdn.flarial.net/assets/font.ttf";
+    std::string savepath3131 = Utils::getRoamingPath() + "\\Flarial\\assets\\font.ttf";
+    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL3131).c_str(), FlarialGUI::to_wide(savepath3131).c_str(), 0, NULL);
+
     std::string dwnld_URL2 = "https://cdn.flarial.net/assets/logo.png";
     std::string savepath2 = Utils::getRoamingPath() + "\\Flarial\\assets\\logo.png";
     URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL2).c_str(), FlarialGUI::to_wide(savepath2).c_str(), 0, NULL);
@@ -59,6 +64,9 @@ void Client::initialize()
 
     if(GetModuleHandle("d3d12.dll") == NULL) Logger::debug("module handle is null");
     kiero::init(kiero::RenderType::D3D12);
+
+    std::string fontpath = Utils::getRoamingPath() + "\\Flarial\\assets\\font.ttf";
+    AddFontResource(fontpath.c_str());
 
     Logger::initialize();
 

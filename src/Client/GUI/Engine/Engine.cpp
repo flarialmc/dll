@@ -84,7 +84,7 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     D2D::context->CreateSolidColorBrush(textColor, &textBrush);
 
     static IDWriteTextFormat* textFormat;
-    writeFactory->CreateTextFormat(L"Arial", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width, height), L"en-US", &textFormat);
+    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width, height), L"en-US", &textFormat);
     textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
@@ -231,8 +231,10 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
 
 void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect, const int imageWidth, const int imageHeight)
 {
-    if (isInScrollView)
+    if (isInScrollView) {
         rect.top += scrollpos;
+        rect.bottom += scrollpos;
+    }
     ID2D1Bitmap *bitmap;
     std::string among = Utils::getRoamingPath() + "\\" + imageName;
     LoadImageFromFile(to_wide(among).c_str(), &bitmap);
@@ -254,7 +256,7 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F
     IDWriteFactory *writeFactory;
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
     IDWriteTextFormat *textFormat;
-    writeFactory->CreateTextFormat(L"Arial", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width, height), L"", &textFormat);
+    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width, height), L"", &textFormat);
     textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 

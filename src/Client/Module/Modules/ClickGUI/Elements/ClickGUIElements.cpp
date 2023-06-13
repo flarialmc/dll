@@ -57,7 +57,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
     std::string text = "Enabled";
     text = mod->enabled ? "Enabled" : "Disabled";
     D2D1_COLOR_F color = D2D1::ColorF(26.0f / 255.0f, 193.0f / 255.0f, 63.0f / 255.0f);
-    color = mod->enabled ? D2D1::ColorF(26.0f / 255.0f, 193.0f / 255.0f, 63.0f / 255.0f) : D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f);
+    color = mod->enabled ? D2D1::ColorF(24.0f / 255.0f, 136.0f / 255.0f, 48.0f / 255.0f) : D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f);
     float buttonWidth = Constraints::RelativeConstraint(0.97);
     float buttonHeight = Constraints::RelativeConstraint(0.27);
 

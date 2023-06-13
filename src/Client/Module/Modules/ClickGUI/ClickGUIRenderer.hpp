@@ -21,8 +21,8 @@ class ClickGUIRenderer : public Listener {
 
             /* Base Rectangle Start */
 
-            float baseWidth = Constraints::RelativeConstraint(0.78);
-            float baseHeight = Constraints::RelativeConstraint(0.7);
+            float baseWidth = Constraints::RelativeConstraint(0.9);
+            float baseHeight = Constraints::RelativeConstraint(0.64);
 
             Vec2<float> center = Constraints::CenterConstraint(baseWidth, baseHeight, "r", 1, 1);
             Vec2<float> round = Constraints::RoundingConstraint(50, 50);
@@ -35,11 +35,11 @@ class ClickGUIRenderer : public Listener {
 
             /* Nav Bar Start */
 
-            float navigationBarWidth = Constraints::RelativeConstraint(1.097f);
-            float navigationBarHeight = Constraints::RelativeConstraint(0.106f);
+            float navigationBarWidth = Constraints::RelativeConstraint(1.384f);
+            float navigationBarHeight = Constraints::RelativeConstraint(0.14f);
             float navx = Constraints::PercentageConstraint(0.008f, "left");
-            float navy = Constraints::PercentageConstraint(0.007f, "top");
-            round = Constraints::RoundingConstraint(45, 45);
+            float navy = Constraints::PercentageConstraint(0.009f, "top");
+            round = Constraints::RoundingConstraint(50, 50);
 
             FlarialGUI::RoundedRect(navx, navy, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), navigationBarWidth, navigationBarHeight, round.x ,round.x);
 
@@ -51,10 +51,10 @@ class ClickGUIRenderer : public Listener {
             /* Logo Start */
 
 
-            float logoWidth = Constraints::RelativeConstraint(1);
+            float logoWidth = Constraints::RelativeConstraint(1.21);
 
-            float logoX = navx;
-            float logoY = navy + navigationBarHeight / 2.0f - logoWidth / 2.0f;
+            float logoX = navx - Constraints::SpacingConstraint(0.05, logoWidth);
+            float logoY = (navy + navigationBarHeight / 2.0f - logoWidth / 2.0f);
 
             FlarialGUI::Image("\\Flarial\\assets\\logo.png", D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth), logoWidth , logoWidth);
 
@@ -69,12 +69,12 @@ class ClickGUIRenderer : public Listener {
             float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
             float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
 
-            Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.71, -0.65);
+            Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.55, -0.52);
 
 
-            float scrollWidth = Constraints::RelativeConstraint(0.90);
-            float scrollHeight = Constraints::RelativeConstraint(0.75);
-            Vec2<float> scrollcenter = Constraints::CenterConstraint(scrollWidth, scrollHeight);
+            float scrollWidth = Constraints::RelativeConstraint(1.12);
+            float scrollHeight = Constraints::RelativeConstraint(0.84);
+            Vec2<float> scrollcenter = Constraints::CenterConstraint(scrollWidth, scrollHeight, "y", 0.0, 1);
 
             FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
 
