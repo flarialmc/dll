@@ -94,6 +94,24 @@ class ClickGUIRenderer : public Listener {
 
 
 
+            radioX = navx - Constraints::SpacingConstraint(-0.85, logoWidth);
+            radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
+
+            round = Constraints::RoundingConstraint(30, 30);
+            radioX += Constraints::SpacingConstraint(15, logoWidth);
+            if(FlarialGUI::RoundedRadioButton(radioX, radioY, D2D1::ColorF(255.0f/255.0f, 36.0f/255.0f, 56.0f/255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Settings", RadioButtonWidth, RadioButtonHeight, round.x, round.x, "settings", curr)) this->curr = "settings";
+
+            radioX -= Constraints::SpacingConstraint(-0.53, logoWidth);
+            radioY -= Constraints::SpacingConstraint(-0.53, logoWidth);
+
+            round = Constraints::RoundingConstraint(15, 15);
+
+            FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15, logoWidth), radioY + Constraints::SpacingConstraint(-0.12, logoWidth), D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f), shit, shit, round.x, round.x);
+
+            radioX -= Constraints::SpacingConstraint(-0.125, logoWidth);
+            radioY -= Constraints::SpacingConstraint(-0.15, logoWidth);
+            FlarialGUI::Image("\\Flarial\\assets\\gear.png", D2D1::RectF(radioX , radioY, radioX + logoWidth, radioY + logoWidth));
+
             /* tab buttons end */
 
             FlarialGUI::PopSize(); // Pops nav bar
