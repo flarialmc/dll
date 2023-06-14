@@ -120,10 +120,12 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     return false;
 }
 
-bool FlarialGUI::RoundedRadioButton(float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width, const float height, float radiusX, float radiusY, int radioNum, int currentNum)
+bool FlarialGUI::RoundedRadioButton(float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width, const float height, float radiusX, float radiusY, const std::string& radioNum, const std::string currentNum)
 {
     if (isInScrollView)
         y += scrollpos;
+
+    std::cout << currentNum << std::endl;
 
     static IDWriteFactory* writeFactory;
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
@@ -132,7 +134,7 @@ bool FlarialGUI::RoundedRadioButton(float x, float y, const D2D_COLOR_F color, c
     D2D::context->CreateSolidColorBrush(textColor, &textBrush);
 
     static IDWriteTextFormat* textFormat;
-    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width, height), L"en-US", &textFormat);
+    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width * 0.64, height * 0.64), L"en-US", &textFormat);
     textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
@@ -148,10 +150,6 @@ bool FlarialGUI::RoundedRadioButton(float x, float y, const D2D_COLOR_F color, c
 
     ID2D1SolidColorBrush* brush = nullptr;
     D2D1_COLOR_F buttonColor = color;
-    if (CursorInRect(x, y, width, height))
-    {
-        buttonColor = D2D1::ColorF(color.r - darkenAmount, color.g - darkenAmount, color.b - darkenAmount, color.a);
-    }
 
     if(radioNum != currentNum) buttonColor = D2D1::ColorF(D2D1::ColorF::White, 0);
 

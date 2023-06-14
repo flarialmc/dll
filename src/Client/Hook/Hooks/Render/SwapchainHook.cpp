@@ -178,7 +178,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[i]);
 
-                std::to_string(MC::windowSize.x);
+                std::cout << std::to_string(MC::windowSize.x) << std::endl;
+                std::cout << std::to_string(MC::windowSize.y) << std::endl;
 
                 D2D::context->BeginDraw();
                 RenderEvent event;

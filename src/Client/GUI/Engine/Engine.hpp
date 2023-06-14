@@ -69,5 +69,5 @@ namespace FlarialGUI
     void UpdateWindowRects();
 
     bool RoundedRadioButton(float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text,
-                            const float width, const float height, float radiusX, float radiusY, int radioNum, int currentNum);
+                            const float width, const float height, float radiusX, float radiusY, const std::string& radioName, std::string currentRadio);
 };
