@@ -14,6 +14,8 @@ ID3D12CommandQueue* SwapchainHook::queue = nullptr;
 static std::chrono::high_resolution_clock fpsclock;
 static std::chrono::steady_clock::time_point start = fpsclock.now();
 
+int SwapchainHook::currentBitmap;
+
 void SwapchainHook::enableHook()
 {
     void* swapchain_ptr;
@@ -28,6 +30,9 @@ bool SwapchainHook::hasResized = false;
 
 void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags)
 {
+
+
+    pSwapChain->GetBuffer(0, IID_PPV_ARGS(&D2D::surface));
 
     std::chrono::duration<float> elapsed = fpsclock.now() - start;
     MC::frames += 1;
@@ -171,15 +176,14 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
             if(SwapchainHook::queue != nullptr) {
 
-                int i = pSwapChain->GetCurrentBackBufferIndex();
+                SwapchainHook::currentBitmap = pSwapChain->GetCurrentBackBufferIndex();
 
-                ID3D11Resource *resource = SwapchainHook::D3D11Resources[i];
+                ID3D11Resource *resource = SwapchainHook::D3D11Resources[SwapchainHook::currentBitmap];
                 SwapchainHook::d3d11On12Device->AcquireWrappedResources(&resource, 1);
 
-                D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[i]);
+                D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
 
                 std::cout << std::to_string(MC::windowSize.x) << std::endl;
-                std::cout << std::to_string(MC::windowSize.y) << std::endl;
 
                 D2D::context->BeginDraw();
                 RenderEvent event;

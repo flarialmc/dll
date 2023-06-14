@@ -1,6 +1,7 @@
 ﻿#include "Engine.hpp"
 #include "Constraints.hpp"
 #include "../../Module/Modules/Module.hpp"
+#include "../../Hook/Hooks/Render/SwapchainHook.hpp"
 
 std::map<std::string, ID2D1Bitmap*> ImagesClass::eimages;
 
@@ -509,6 +510,26 @@ Vec2<float> FlarialGUI::CalculateResizedXY(float x, float y, float width, float 
 
     return Vec2(x, y);
 }
+
+void FlarialGUI::ApplyGaussianBlur(float blurIntensity)
+{
+    // Create Gaussian blur effect
+    ID2D1Effect* pGaussianBlurEffect = nullptr;
+    if(!SUCCEEDED(D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &pGaussianBlurEffect))) Logger::debug("sussy!");
+
+    // Set input bitmap
+    pGaussianBlurEffect->SetInput(0, SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
+
+    // Set blur intensity
+    pGaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, blurIntensity);
+
+    // Draw the image with the Gaussian blur effect
+    D2D::context->DrawImage(pGaussianBlurEffect);
+
+    // Release the effect (but not the image)
+    pGaussianBlurEffect->Release();
+}
+
 
 std::wstring FlarialGUI::to_wide(const std::string &multi)
 {

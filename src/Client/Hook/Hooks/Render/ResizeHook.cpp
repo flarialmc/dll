@@ -80,6 +80,7 @@ void ResizeHook::CleanShit(bool isResize) {
 
         SwapchainHook::context->Flush();
         Memory::SafeRelease(SwapchainHook::context);
+        Memory::SafeRelease(D2D::surface);
 
         if(!isResize)
         Memory::SafeRelease(SwapchainHook::d3d11On12Device);

@@ -31,4 +31,5 @@ public:
     static inline ID3D11DeviceContext* context;
     static inline uintptr_t bufferCount;
     static bool hasResized;
+    static int currentBitmap;
 };

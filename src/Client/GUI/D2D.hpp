@@ -13,6 +13,7 @@
 namespace D2D {
 
     inline ID2D1DeviceContext* context;
+    inline IDXGISurface* surface;
 };
 
 class MC {

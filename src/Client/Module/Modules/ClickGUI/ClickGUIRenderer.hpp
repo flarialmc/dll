@@ -20,7 +20,11 @@ class ClickGUIRenderer : public Listener {
         std::cout << this->curr << std::endl;
         this->curr = this->curr;
 
+
+
         if(module->enabled && SwapchainHook::init) {
+
+
 
             /* Base Rectangle Start */
 
