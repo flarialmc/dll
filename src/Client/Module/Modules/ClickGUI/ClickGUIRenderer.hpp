@@ -17,6 +17,8 @@ class ClickGUIRenderer : public Listener {
 
     void onRender(RenderEvent &event) override {
 
+        std::cout << this->curr << std::endl;
+        this->curr = this->curr;
 
         if(module->enabled && SwapchainHook::init) {
 
@@ -59,12 +61,40 @@ class ClickGUIRenderer : public Listener {
 
             FlarialGUI::Image("\\Flarial\\assets\\logo.png", D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth));
 
-            FlarialGUI::PopSize(); // Pops nav bar
-
             /* Logo End */
 
+            /* tab buttons start */
 
-              this->curr = curr;
+
+            float RadioButtonWidth = Constraints::RelativeConstraint(0.24, "width");
+            float RadioButtonHeight = Constraints::RelativeConstraint(0.5);
+
+            float radioX = navx - Constraints::SpacingConstraint(-0.85, logoWidth);
+            float radioY (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
+
+            round = Constraints::RoundingConstraint(30, 30);
+
+            if(FlarialGUI::RoundedRadioButton(radioX, radioY, D2D1::ColorF(255.0f/255.0f, 36.0f/255.0f, 56.0f/255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Modules", RadioButtonWidth, RadioButtonHeight, round.x, round.x, "no", this->curr)) this->curr = "no";
+
+
+            /*
+            logoWidth = Constraints::RelativeConstraint(0.21);
+
+            radioX -= Constraints::SpacingConstraint(-0.53, logoWidth);
+            radioY -= Constraints::SpacingConstraint(-0.43, logoWidth);
+
+            float shit = Constraints::RelativeConstraint(0.33);
+            round = Constraints::RoundingConstraint(15, 15);
+
+            FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15, logoWidth), radioY + Constraints::SpacingConstraint(-0.12, logoWidth), D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f), shit, shit, round.x, round.x);
+
+            FlarialGUI::Image("\\Flarial\\assets\\modules.png", D2D1::RectF(radioX , radioY, radioX + logoWidth, radioY + logoWidth));
+
+            */
+
+            /* tab buttons end */
+
+            FlarialGUI::PopSize(); // Pops nav bar
 
                 /* Mod Card Start */
 
@@ -98,13 +128,11 @@ class ClickGUIRenderer : public Listener {
 
                     FlarialGUI::UnsetScrollView();
                     FlarialGUI::ScrollBar(120, 120, 10, 160, 2);
-
-                    FlarialGUI::PopSize(); // Pops base rect
                 }
 
                 /* Mod Card End */
 
-
+            FlarialGUI::PopSize(); // Pops base rect
 
 
         }

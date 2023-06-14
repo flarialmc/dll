@@ -45,7 +45,7 @@ void EventHandler::onMouse(MouseEvent &event) {
 
 void EventHandler::onRender(RenderEvent &event) {
 
-    for (auto &listener: listeners) {
+    for (Listener* &listener: listeners) {
 
         listener->onRender(event);
 
