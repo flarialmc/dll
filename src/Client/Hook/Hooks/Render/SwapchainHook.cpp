@@ -92,10 +92,10 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
             d3d11device->QueryInterface(IID_PPV_ARGS(&SwapchainHook::d3d11On12Device));
 
-            D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS;
+            D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_NONE;
             ID2D1Factory7* d2dFactory;
             D2D1_FACTORY_OPTIONS factoryOptions{};
-            D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, __uuidof(ID2D1Factory7), &factoryOptions, (void**)&d2dFactory);
+            D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory7), &factoryOptions, (void**)&d2dFactory);
 
             IDXGIDevice* dxgiDevice;
             SwapchainHook::d3d11On12Device->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice);

@@ -59,5 +59,7 @@ namespace FlarialGUI
     Vec2<float> CalculateMovedXY(float x, float y, int num);
     Vec2<float> CalculateResizedXY(float x, float y, float width, float height);
     void UpdateWindowRects();
-    
+
+    bool RoundedRadioButton(float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text,
+                            const float width, const float height, float radiusX, float radiusY, int radioNum, int currentNum);
 };

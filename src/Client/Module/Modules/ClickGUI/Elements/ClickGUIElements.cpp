@@ -4,6 +4,8 @@
 #include "../../../../GUI/Engine/Engine.hpp"
 #include <d2d1_1.h>
 
+std::map<std::string, ID2D1Bitmap*> images;
+
 void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string iconpath, const float width, const float height)
 {
 
@@ -17,7 +19,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
     float BottomRoundedWidth = Constraints::RelativeConstraint(0.19f, "height", true);
     float BottomRoundedHeight = Constraints::RelativeConstraint(0.141f, "height", true);
     FlarialGUI::RoundedRect(x, y, D2D1::ColorF(47.0f/255.0f, 32.0f/255.0f, 34.0f/255.0f), BottomRoundedWidth, BottomRoundedHeight, round.x, round.x);
-    
+
 
     // Top rounded rect
 
@@ -45,16 +47,27 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
     paddingSize = Constraints::RelativeConstraint(0.20);
     modiconx = Constraints::PercentageConstraint(0.43, "left");
     modicony = Constraints::PercentageConstraint(0.15, "top");
-    if(iconpath != "")
-    {
-        FlarialGUI::Image(iconpath, D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize));
+
+
+    if (!iconpath.empty() && images[mod->name] == nullptr) {
+
+        std::string among = Utils::getRoamingPath() + "\\" + iconpath;
+        FlarialGUI::LoadImageFromFile(FlarialGUI::to_wide(among).c_str(), &images[mod->name]);
+
+    } else if (images[mod->name] != nullptr) {
+
+        if (FlarialGUI::isInScrollView) {
+            modicony += FlarialGUI::scrollpos;
+        }
+        D2D::context->DrawBitmap(images[mod->name], D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize));
+
     }
 
     // enabled / disabled button
 
-    std::string text = "Enabled";
+    std::string text;
     text = mod->enabled ? "Enabled" : "Disabled";
-    D2D1_COLOR_F color = D2D1::ColorF(26.0f / 255.0f, 193.0f / 255.0f, 63.0f / 255.0f);
+    D2D1_COLOR_F color;
     color = mod->enabled ? D2D1::ColorF(24.0f / 255.0f, 136.0f / 255.0f, 48.0f / 255.0f) : D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f);
     float buttonWidth = Constraints::RelativeConstraint(0.97);
     float buttonHeight = Constraints::RelativeConstraint(0.27);

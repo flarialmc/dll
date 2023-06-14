@@ -2,6 +2,8 @@
 #include "Constraints.hpp"
 #include "../../Module/Modules/Module.hpp"
 
+std::map<std::string, ID2D1Bitmap*> eimages;
+
 static bool CursorInRect(float rectX, float rectY, float width, float height)
 {
     if (MC::mousepos.x >= rectX && MC::mousepos.x <= rectX + width && MC::mousepos.y >= rectY && MC::mousepos.y <= rectY + height)
@@ -118,6 +120,56 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     return false;
 }
 
+bool FlarialGUI::RoundedRadioButton(float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width, const float height, float radiusX, float radiusY, int radioNum, int currentNum)
+{
+    if (isInScrollView)
+        y += scrollpos;
+
+    static IDWriteFactory* writeFactory;
+    DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
+
+    static ID2D1SolidColorBrush* textBrush;
+    D2D::context->CreateSolidColorBrush(textColor, &textBrush);
+
+    static IDWriteTextFormat* textFormat;
+    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width, height), L"en-US", &textFormat);
+    textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+    textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+    const float darkenAmount = 0.1f;
+
+    if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
+    {
+        MC::mousebutton = MouseButton::None;
+        return true;
+    }
+
+
+
+    ID2D1SolidColorBrush* brush = nullptr;
+    D2D1_COLOR_F buttonColor = color;
+    if (CursorInRect(x, y, width, height))
+    {
+        buttonColor = D2D1::ColorF(color.r - darkenAmount, color.g - darkenAmount, color.b - darkenAmount, color.a);
+    }
+
+    if(radioNum != currentNum) buttonColor = D2D1::ColorF(D2D1::ColorF::White, 0);
+
+
+    D2D::context->CreateSolidColorBrush(buttonColor, &brush);
+
+    D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
+    D2D::context->FillRoundedRectangle(roundedRect, brush);
+
+    D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
+
+    brush->Release();
+    writeFactory->Release();
+    textFormat->Release();
+    textBrush->Release();
+    return false;
+}
+
 void FlarialGUI::RoundedRect(float x, float y, const D2D_COLOR_F color, const float width, const float height, float radiusX, float radiusY)
 {
     if (isInScrollView)
@@ -204,8 +256,10 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
 
     float imageY = y;
 
-    if (isInScrollView)
+    if (isInScrollView) {
         y += scrollpos;
+        imageY += scrollpos;
+    }
 
 
 
@@ -221,7 +275,15 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
 
     D2D1_RECT_F  imagerect = D2D1::RectF(x, imageY, x + imageWidth, imageY + imageHeight);
 
-    Image(imagePath, imagerect);
+    if (eimages[imagePath] == nullptr) {
+
+        std::string among = Utils::getRoamingPath() + "\\" + imagePath;
+        FlarialGUI::LoadImageFromFile(to_wide(among).c_str(), &eimages[imagePath]);
+
+    } else if (eimages[imagePath] != nullptr) {
+        D2D::context->DrawBitmap(eimages[imagePath], imagerect);
+
+    }
 
     // Draw text
     IDWriteFactory *writeFactory;
@@ -239,21 +301,6 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
     writeFactory->Release();
 }
 
-void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
-{
-    if (isInScrollView) {
-        rect.top += scrollpos;
-        rect.bottom += scrollpos;
-    }
-    ID2D1Bitmap *bitmap;
-    std::string among = Utils::getRoamingPath() + "\\" + imageName;
-    LoadImageFromFile(to_wide(among).c_str(), &bitmap);
-
-    // Draw image
-    D2D1_RECT_F imageRect = D2D1::RectF(rect.left, rect.top, rect.right, rect.bottom);
-    D2D::context->DrawBitmap(bitmap, imageRect, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
-    bitmap->Release();
-}
 
 void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F color, const float width, const float height)
 {
@@ -276,6 +323,22 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F
     writeFactory->Release();
     textFormat->Release();
     brush->Release();
+}
+
+void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
+{
+    if (isInScrollView) {
+        rect.top += scrollpos;
+        rect.bottom += scrollpos;
+    }
+    ID2D1Bitmap *bitmap;
+    std::string among = Utils::getRoamingPath() + "\\" + imageName;
+    LoadImageFromFile(to_wide(among).c_str(), &bitmap);
+
+    // Draw image
+    D2D1_RECT_F imageRect = D2D1::RectF(rect.left, rect.top, rect.right, rect.bottom);
+    D2D::context->DrawBitmap(bitmap, imageRect, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+    bitmap->Release();
 }
 
 void FlarialGUI::LoadImageFromFile(const wchar_t *filename, ID2D1Bitmap **bitmap)
