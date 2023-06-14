@@ -13,7 +13,7 @@
 class ClickGUIRenderer : public Listener {
 
     Module* module;
-    std::string curr = "modules";
+    std::string curr;
 
     void onRender(RenderEvent &event) override {
 
@@ -74,23 +74,25 @@ class ClickGUIRenderer : public Listener {
 
             round = Constraints::RoundingConstraint(30, 30);
 
-            if(FlarialGUI::RoundedRadioButton(radioX, radioY, D2D1::ColorF(255.0f/255.0f, 36.0f/255.0f, 56.0f/255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Modules", RadioButtonWidth, RadioButtonHeight, round.x, round.x, "no", this->curr)) this->curr = "no";
+            if(FlarialGUI::RoundedRadioButton(radioX, radioY, D2D1::ColorF(255.0f/255.0f, 36.0f/255.0f, 56.0f/255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Modules", RadioButtonWidth, RadioButtonHeight, round.x, round.x, "modules", curr)) this->curr = "modules";
 
 
-            /*
+
             logoWidth = Constraints::RelativeConstraint(0.21);
 
             radioX -= Constraints::SpacingConstraint(-0.53, logoWidth);
-            radioY -= Constraints::SpacingConstraint(-0.43, logoWidth);
+            radioY -= Constraints::SpacingConstraint(-0.53, logoWidth);
 
             float shit = Constraints::RelativeConstraint(0.33);
             round = Constraints::RoundingConstraint(15, 15);
 
             FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15, logoWidth), radioY + Constraints::SpacingConstraint(-0.12, logoWidth), D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f), shit, shit, round.x, round.x);
 
+            radioX -= Constraints::SpacingConstraint(-0.125, logoWidth);
+            radioY -= Constraints::SpacingConstraint(-0.15, logoWidth);
             FlarialGUI::Image("\\Flarial\\assets\\modules.png", D2D1::RectF(radioX , radioY, radioX + logoWidth, radioY + logoWidth));
 
-            */
+
 
             /* tab buttons end */
 

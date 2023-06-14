@@ -120,12 +120,10 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     return false;
 }
 
-bool FlarialGUI::RoundedRadioButton(float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width, const float height, float radiusX, float radiusY, const std::string& radioNum, const std::string currentNum)
+bool FlarialGUI::RoundedRadioButton(float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width, const float height, float radiusX, float radiusY, const std::string& radioNum, const std::string& currentNum)
 {
     if (isInScrollView)
         y += scrollpos;
-
-    std::cout << currentNum << std::endl;
 
     static IDWriteFactory* writeFactory;
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
