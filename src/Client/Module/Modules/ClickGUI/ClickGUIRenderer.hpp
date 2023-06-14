@@ -13,7 +13,7 @@
 class ClickGUIRenderer : public Listener {
 
     Module* module;
-    int e = 0;
+    std::string curr = "modules";
 
     void onRender(RenderEvent &event) override {
 
@@ -64,45 +64,48 @@ class ClickGUIRenderer : public Listener {
             /* Logo End */
 
 
+              this->curr = curr;
 
                 /* Mod Card Start */
 
+                if(this->curr == "modules") {
+
+                    float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
+                    float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
+
+                    Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.60, -0.52);
 
 
-                float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
-                float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
+                    float scrollWidth = Constraints::RelativeConstraint(1.12);
+                    float scrollHeight = Constraints::RelativeConstraint(0.84);
+                    Vec2<float> scrollcenter = Constraints::CenterConstraint(scrollWidth, scrollHeight, "y", 0.0, 1);
 
-                Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.60, -0.52);
+                    FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
 
+                    float xModifier = 0.0f;
+                    float yModifier = 0.0f;
 
-                float scrollWidth = Constraints::RelativeConstraint(1.12);
-                float scrollHeight = Constraints::RelativeConstraint(0.84);
-                Vec2<float> scrollcenter = Constraints::CenterConstraint(scrollWidth, scrollHeight, "y", 0.0, 1);
+                    int i = 0;
+                    for (Module *real: ModuleManager::modules) {
+                        ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real, real->icon);
 
-                FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
-
-                float xModifier = 0.0f;
-                float yModifier = 0.0f;
-
-                int i = 0;
-                for (Module* real : ModuleManager::modules) {
-                    ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real, real->icon);
-
-                    xModifier += Constraints::SpacingConstraint(1.09, modWidth);
-                    if ((++i % 3) == 0) {
-                        yModifier += Constraints::SpacingConstraint(0.8, modWidth);
-                        xModifier = 0.0f;
+                        xModifier += Constraints::SpacingConstraint(1.09, modWidth);
+                        if ((++i % 3) == 0) {
+                            yModifier += Constraints::SpacingConstraint(0.8, modWidth);
+                            xModifier = 0.0f;
+                        }
                     }
-                }
 
-                FlarialGUI::UnsetScrollView();
-                FlarialGUI::ScrollBar(120, 120, 10, 160, 2);
+                    FlarialGUI::UnsetScrollView();
+                    FlarialGUI::ScrollBar(120, 120, 10, 160, 2);
 
-                //ClickGUIElements::ModCard(modcenter.x, modcenter.y, ModuleManager::modules.front(), "");
+                    FlarialGUI::PopSize(); // Pops base rect
+                     }
+
                 /* Mod Card End */
 
 
-            FlarialGUI::PopSize(); // Pops base rect
+
 
         }
     }
@@ -116,5 +119,6 @@ public:
     explicit ClickGUIRenderer(const char string[5], Module *emodule) {
         this->name = string;
         this->module = emodule;
+        this->curr = "modules";
     }
 };
