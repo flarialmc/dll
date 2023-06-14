@@ -520,14 +520,54 @@ void FlarialGUI::ApplyGaussianBlur(float blurIntensity)
         D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &FlarialGUI::blur);
     }
 
-    FlarialGUI::blur->SetInput(0, SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
+
+    ID2D1Bitmap* bitmap = nullptr;
+    FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap], &bitmap);
+
+    FlarialGUI::blur->SetInput(0, bitmap);
     // Set blur intensity
-    FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_SOFT);
+    FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
     FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, blurIntensity);
     // Draw the image with the Gaussian blur effect
     D2D::context->DrawImage(FlarialGUI::blur);
 
+    bitmap->Release();
+}
 
+void FlarialGUI::CopyBitmap(ID2D1Bitmap1* from, ID2D1Bitmap** to)
+{
+    if (from == nullptr)
+    {
+        Logger::debug("from is nullptr");
+        return;  // Handle the case where 'from' is nullptr
+    }
+
+    if (*to == nullptr)
+    {
+        D2D1_BITMAP_PROPERTIES props = D2D1::BitmapProperties(from->GetPixelFormat());
+        HRESULT hr = D2D::context->CreateBitmap(from->GetPixelSize(), props, to);
+        if (FAILED(hr))
+        {
+            Logger::debug("Failed to create bitmap");
+            return;  // Handle the failure to create the bitmap
+        }
+    }
+    else if (from->GetPixelSize() != (*to)->GetPixelSize())
+    {
+        (*to)->Release();
+        D2D1_BITMAP_PROPERTIES props = D2D1::BitmapProperties(from->GetPixelFormat());
+        HRESULT hr = D2D::context->CreateBitmap(from->GetPixelSize(), props, to);
+        if (FAILED(hr))
+        {
+            Logger::debug("Failed to create bitmap");
+            return;  // Handle the failure to create the bitmap
+        }
+    }
+
+    D2D1_POINT_2U destPoint = { 0, 0 };
+    D2D1_SIZE_U size = from->GetPixelSize();
+    D2D1_RECT_U rect = { 0, 0, size.width, size.height };
+    (*to)->CopyFromBitmap(&destPoint, from, &rect);
 }
 
 

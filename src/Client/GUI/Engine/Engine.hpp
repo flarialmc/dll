@@ -77,4 +77,5 @@ namespace FlarialGUI
     void ApplyGaussianBlur(float blurIntensity);
 
 
+    void CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to);
 };

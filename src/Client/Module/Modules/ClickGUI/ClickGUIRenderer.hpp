@@ -25,7 +25,7 @@ class ClickGUIRenderer : public Listener {
         if(module->enabled && SwapchainHook::init) {
 
             /* Base Rectangle Start */
-            FlarialGUI::ApplyGaussianBlur(3.0);
+            FlarialGUI::ApplyGaussianBlur(6.0);
 
             float baseWidth = Constraints::RelativeConstraint(0.85);
             float baseHeight = Constraints::RelativeConstraint(0.64);
