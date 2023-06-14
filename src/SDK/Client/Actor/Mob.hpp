@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Actor.h"
+#include "Actor.hpp"
 
 class Mob : public Actor {
 

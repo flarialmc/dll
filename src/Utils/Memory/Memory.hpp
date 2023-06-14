@@ -3,14 +3,43 @@
 #include <Windows.h>
 #include <Psapi.h>
 #include <vector>
+#include <type_traits>
 
 #define in_range(x, a, b) (x >= a && x <= b)
 #define get_bits(x) (in_range((x & (~0x20)), 'A', 'F') ? ((x & (~0x20)) - 'A' + 0xa) : (in_range(x, '0', '9') ? x - '0' : 0))
 #define get_byte(x) (get_bits(x[0]) << 4 | get_bits(x[1]))
 
+
+template <typename Ret, typename Type> Ret& direct_access(Type* type, size_t offset) {
+    union {
+        size_t raw;
+        Type* source;
+        Ret* target;
+    } u;
+    u.source = type;
+    u.raw += offset;
+    return *u.target;
+}
+
+#define AS_FIELD(type, name, fn) __declspec(property(get = fn, put = set##name)) type name
+#define DEF_FIELD_RW(type, name) __declspec(property(get = get##name, put = set##name)) type name
+
+#define FAKE_FIELD(type, name)                                                                                       \
+AS_FIELD(type, name, get##name);                                                                                     \
+type get##name()
+
+#define BUILD_ACCESS(ptr, type, name, offset)                                                                        \
+AS_FIELD(type, name, get##name);                                                                                     \
+type get##name() const { return direct_access<type>(ptr, offset); }												     \
+void set##name(type v) const { direct_access<type>(ptr, offset) = v; }
+
+
+
 class Memory
 {
 public:
+  
+
     static uintptr_t findSig(const char *pattern)
     {
         MODULEINFO info;

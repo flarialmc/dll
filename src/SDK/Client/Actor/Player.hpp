@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Mob.h"
+#include "Mob.hpp"
 
 
 class Player : public Mob {

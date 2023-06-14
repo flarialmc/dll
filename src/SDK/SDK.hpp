@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Client/Core/ClientInstance.h"
+#include "Client/Core/ClientInstance.hpp"
 
 
 namespace SDK {
