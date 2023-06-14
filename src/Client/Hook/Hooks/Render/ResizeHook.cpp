@@ -5,6 +5,8 @@
 #include "ResizeHook.hpp"
 #include "../../../GUI/D2D.hpp"
 #include "SwapchainHook.hpp"
+#include "../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
+#include "../../../GUI/Engine/Engine.hpp"
 
 void ResizeHook::enableHook() {
 
@@ -33,6 +35,20 @@ void ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UI
 }
 
 void ResizeHook::CleanShit(bool isResize) {
+
+
+    for (const auto& i : ClickGUIElements::images) {
+
+
+        ClickGUIElements::images[i.first] = nullptr;
+
+    }
+
+    for (const auto& i : ImagesClass::eimages) {
+
+        ImagesClass::eimages[i.first] = nullptr;
+
+    }
 
     if(SwapchainHook::init && SwapchainHook::d3d11On12Device != nullptr) {
 
@@ -76,5 +92,6 @@ void ResizeHook::CleanShit(bool isResize) {
         Memory::SafeRelease(D2D::context);
 
     }
+
 
 }

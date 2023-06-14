@@ -100,7 +100,7 @@ class ClickGUIRenderer : public Listener {
                     FlarialGUI::ScrollBar(120, 120, 10, 160, 2);
 
                     FlarialGUI::PopSize(); // Pops base rect
-                     }
+                }
 
                 /* Mod Card End */
 

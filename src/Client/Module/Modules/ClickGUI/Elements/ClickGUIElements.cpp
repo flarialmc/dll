@@ -4,7 +4,7 @@
 #include "../../../../GUI/Engine/Engine.hpp"
 #include <d2d1_1.h>
 
-std::map<std::string, ID2D1Bitmap*> images;
+std::map<std::string, ID2D1Bitmap*> ClickGUIElements::images;
 
 void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string iconpath, const float width, const float height)
 {

@@ -4,6 +4,7 @@
 #include "../D2D.hpp"
 #include <wincodec.h>
 #include <stack>
+#include <map>
 
 class WindowRect
 {
@@ -26,6 +27,12 @@ public:
     float width = 0;
 };
 
+class ImagesClass
+{
+public:
+    static std::map<std::string, ID2D1Bitmap*> eimages;
+};
+
 namespace FlarialGUI
 {
     std::stack<Dimension> inline dimension_stack;
@@ -37,6 +44,7 @@ namespace FlarialGUI
     float inline barscrollposmodifier = 3.0f;
     inline WindowRect WindowRects[10];
     bool inline isInWindowRect = false;
+
 
     void PushSize(float x, float y, float width, float height);
     void PopSize();

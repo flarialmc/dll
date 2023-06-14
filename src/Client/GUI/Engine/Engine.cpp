@@ -2,7 +2,7 @@
 #include "Constraints.hpp"
 #include "../../Module/Modules/Module.hpp"
 
-std::map<std::string, ID2D1Bitmap*> eimages;
+std::map<std::string, ID2D1Bitmap*> ImagesClass::eimages;
 
 static bool CursorInRect(float rectX, float rectY, float width, float height)
 {
@@ -275,14 +275,13 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
 
     D2D1_RECT_F  imagerect = D2D1::RectF(x, imageY, x + imageWidth, imageY + imageHeight);
 
-    if (eimages[imagePath] == nullptr) {
+    if (ImagesClass::eimages[imagePath] == nullptr) {
 
         std::string among = Utils::getRoamingPath() + "\\" + imagePath;
-        FlarialGUI::LoadImageFromFile(to_wide(among).c_str(), &eimages[imagePath]);
+        FlarialGUI::LoadImageFromFile(to_wide(among).c_str(), &ImagesClass::eimages[imagePath]);
 
-    } else if (eimages[imagePath] != nullptr) {
-        D2D::context->DrawBitmap(eimages[imagePath], imagerect);
-
+    } else if (ImagesClass::eimages[imagePath] != nullptr) {
+        D2D::context->DrawBitmap(ImagesClass::eimages[imagePath], imagerect);
     }
 
     // Draw text
