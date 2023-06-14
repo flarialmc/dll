@@ -513,21 +513,21 @@ Vec2<float> FlarialGUI::CalculateResizedXY(float x, float y, float width, float 
 
 void FlarialGUI::ApplyGaussianBlur(float blurIntensity)
 {
+
     // Create Gaussian blur effect
-    ID2D1Effect* pGaussianBlurEffect = nullptr;
-    if(!SUCCEEDED(D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &pGaussianBlurEffect))) Logger::debug("sussy!");
+    if(FlarialGUI::blur == nullptr) {
 
-    // Set input bitmap
-    pGaussianBlurEffect->SetInput(0, SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
+        D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &FlarialGUI::blur);
+    }
 
+    FlarialGUI::blur->SetInput(0, SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
     // Set blur intensity
-    pGaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, blurIntensity);
-
+    FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_SOFT);
+    FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, blurIntensity);
     // Draw the image with the Gaussian blur effect
-    D2D::context->DrawImage(pGaussianBlurEffect);
+    D2D::context->DrawImage(FlarialGUI::blur);
 
-    // Release the effect (but not the image)
-    pGaussianBlurEffect->Release();
+
 }
 
 

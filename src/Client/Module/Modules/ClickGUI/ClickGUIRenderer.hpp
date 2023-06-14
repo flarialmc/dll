@@ -24,9 +24,8 @@ class ClickGUIRenderer : public Listener {
 
         if(module->enabled && SwapchainHook::init) {
 
-
-
             /* Base Rectangle Start */
+            FlarialGUI::ApplyGaussianBlur(3.0);
 
             float baseWidth = Constraints::RelativeConstraint(0.85);
             float baseHeight = Constraints::RelativeConstraint(0.64);
@@ -119,7 +118,6 @@ class ClickGUIRenderer : public Listener {
             /* tab buttons end */
 
             FlarialGUI::PopSize(); // Pops nav bar
-
                 /* Mod Card Start */
 
                 if(this->curr == "modules") {

@@ -31,8 +31,7 @@ bool SwapchainHook::hasResized = false;
 void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags)
 {
 
-
-    pSwapChain->GetBuffer(0, IID_PPV_ARGS(&D2D::surface));
+    if(D2D::surface == nullptr) Logger::debug("hi");
 
     std::chrono::duration<float> elapsed = fpsclock.now() - start;
     MC::frames += 1;

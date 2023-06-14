@@ -69,7 +69,7 @@ void ResizeHook::CleanShit(bool isResize) {
             Memory::SafeRelease(resource);
         }
 
-        for (IDXGISurface1* surface : SwapchainHook::DXGISurfaces)
+        for (IDXGISurface* surface : SwapchainHook::DXGISurfaces)
         {
             Memory::SafeRelease(surface);
         }

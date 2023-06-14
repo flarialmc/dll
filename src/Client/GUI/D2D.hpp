@@ -5,6 +5,7 @@
 #include <dxgi1_4.h>
 #include <dwrite_1.h>
 #include <initguid.h>
+#include <d2d1.h>
 #include <d2d1_3.h>
 #include "../../Utils/Utils.hpp"
 #include "../Events/Input/MouseEvent.hpp"
@@ -13,7 +14,7 @@
 namespace D2D {
 
     inline ID2D1DeviceContext* context;
-    inline IDXGISurface* surface;
+    inline IDXGISurface1* surface = nullptr;
 };
 
 class MC {

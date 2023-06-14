@@ -45,6 +45,9 @@ namespace FlarialGUI
     inline WindowRect WindowRects[10];
     bool inline isInWindowRect = false;
 
+    inline ID2D1Effect* blur = nullptr;
+
+
 
     void PushSize(float x, float y, float width, float height);
     void PopSize();
@@ -72,4 +75,6 @@ namespace FlarialGUI
                             const float width, const float height, float radiusX, float radiusY, const std::string& radioName, const std::string& currentRadio);
 
     void ApplyGaussianBlur(float blurIntensity);
+
+
 };
