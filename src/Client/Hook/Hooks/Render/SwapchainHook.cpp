@@ -72,9 +72,11 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 pSwapChain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
                 D2D1CreateDeviceContext(eBackBuffer, properties, &D2D::context);
 
-                D2D1_BITMAP_PROPERTIES1* props = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW, D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_IGNORE), dpi, dpi);
+                auto dpi = (float)GetDpiForSystem();
 
-                D2D::context->CreateBitmapFromDxgiSurface(eBackBuffer, *props, &SwapchainHook::D2D1Bitmaps[0]);
+                D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW, D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_IGNORE), dpi, dpi);
+
+                D2D::context->CreateBitmapFromDxgiSurface(eBackBuffer, props, &SwapchainHook::D2D1Bitmaps[0]);
 
                 Memory::SafeRelease(pBackBuffer);
                 Memory::SafeRelease(eBackBuffer);
