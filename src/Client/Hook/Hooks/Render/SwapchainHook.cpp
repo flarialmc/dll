@@ -158,8 +158,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 D2D::context->CreateBitmapFromDxgiSurface(SwapchainHook::DXGISurfaces[i], props, &(SwapchainHook::D2D1Bitmaps[i]));
                 Memory::SafeRelease(backBufferPtr);
 
-                if(!SwapchainHook::hasResized)
-                    MC::windowSize = Vec2<float>(SwapchainHook::D2D1Bitmaps[i]->GetSize().width, SwapchainHook::D2D1Bitmaps[i]->GetSize().height);
+
+                MC::windowSize = Vec2<float>(SwapchainHook::D2D1Bitmaps[i]->GetSize().width, SwapchainHook::D2D1Bitmaps[i]->GetSize().height);
 
             }
 
@@ -186,7 +186,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
 
-                std::cout << std::to_string(MC::windowSize.x) << std::endl;
+                std::to_string(MC::windowSize.x);
+                std::to_string(MC::windowSize.y);
 
                 D2D::context->BeginDraw();
                 RenderEvent event;

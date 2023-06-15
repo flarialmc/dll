@@ -259,7 +259,6 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
     }
 
 
-
     ID2D1SolidColorBrush *brush;
     D2D::context->CreateSolidColorBrush(color, &brush);
 
@@ -535,6 +534,16 @@ void FlarialGUI::ApplyGaussianBlur(float blurIntensity)
 
         bitmap->Release();
 
+    }
+}
+
+void FlarialGUI::ModifyFloatUntilMax(float* value, float max, float modifier)
+{
+    while (*value < max)
+    {
+        *value += modifier;
+        if (*value > max)
+            *value = max;
     }
 }
 

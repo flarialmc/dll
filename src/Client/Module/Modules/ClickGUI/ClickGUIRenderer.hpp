@@ -18,9 +18,6 @@ class ClickGUIRenderer : public Listener {
     void onRender(RenderEvent &event) override {
 
         std::cout << this->curr << std::endl;
-        this->curr = this->curr;
-
-
 
         if(module->enabled && SwapchainHook::init) {
 
@@ -132,6 +129,8 @@ class ClickGUIRenderer : public Listener {
                     float scrollHeight = Constraints::RelativeConstraint(0.84);
                     Vec2<float> scrollcenter = Constraints::CenterConstraint(scrollWidth, scrollHeight, "y", 0.0, 1);
 
+                    FlarialGUI::ScrollBar(120, 120, 10, 160, 2);
+
                     FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
 
                     float xModifier = 0.0f;
@@ -149,7 +148,6 @@ class ClickGUIRenderer : public Listener {
                     }
 
                     FlarialGUI::UnsetScrollView();
-                    FlarialGUI::ScrollBar(120, 120, 10, 160, 2);
                 }
 
                 /* Mod Card End */
