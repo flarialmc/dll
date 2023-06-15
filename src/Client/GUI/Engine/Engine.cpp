@@ -550,6 +550,8 @@ void FlarialGUI::ApplyGaussianBlur(float blurIntensity)
         // Draw the image with the Gaussian blur effect
         D2D::context->DrawImage(FlarialGUI::blur);
 
+        Memory::SafeRelease(bitmap);
+
     }
 }
 
