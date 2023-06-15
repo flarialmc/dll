@@ -88,6 +88,8 @@ void ResizeHook::CleanShit(bool isResize) {
 
     }
 
+    Memory::SafeRelease(FlarialGUI::blur);
+
     if(SwapchainHook::init) {
 
         Memory::SafeRelease(D2D::context);
