@@ -38,6 +38,8 @@ namespace FlarialGUI
 {
     std::stack<Dimension> inline dimension_stack;
     std::vector<float> inline darkenAmounts;
+    std::vector<float> inline opacityAmounts;
+
     inline bool isInScrollView = false;
     float inline scrollpos = 0;
     float inline scrollposmodifier = 16.5f;

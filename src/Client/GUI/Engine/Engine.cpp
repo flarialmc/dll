@@ -83,10 +83,11 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     if (isInScrollView)
         y += scrollpos;
 
+
     size_t requiredSize = x + y + 1;
     if (darkenAmounts.size() < requiredSize)
     {
-        darkenAmounts.resize(requiredSize, 0.0f);
+        darkenAmounts.resize(10000, 0.0f);
     }
 
     static IDWriteFactory* writeFactory;
@@ -110,15 +111,16 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     }
 
     ID2D1SolidColorBrush* brush = nullptr;
-    D2D1_COLOR_F buttonColor = color;
+    D2D1_COLOR_F buttonColor;
+
 
     if (CursorInRect(x, y, width, height))
     {
-        buttonColor = D2D1::ColorF(color.r - darkenAmounts[x+y], color.g - darkenAmounts[x+y], color.b - darkenAmounts[x+y], color.a);
+        buttonColor = D2D1::ColorF(color.r - darkenAmounts[x + y], color.g - darkenAmounts[x + y], color.b - darkenAmounts[x + y], color.a);
         FadeEffect::ApplyFadeInEffect(0.01, maxDarkenAmount, darkenAmounts[x+y]);
     } else {
-        buttonColor = D2D1::ColorF(color.r - darkenAmounts[x+y], color.g - darkenAmounts[x+y], color.b - darkenAmounts[x+y], color.a);
-        FadeEffect::ApplyFadeOutEffect(0.01, darkenAmounts[x+y]);
+        buttonColor = D2D1::ColorF(color.r - darkenAmounts[x + y], color.g - darkenAmounts[x + y], color.b - darkenAmounts[x + y], color.a);
+        FadeEffect::ApplyFadeOutEffect(0.01, darkenAmounts[x + y]);
 
     }
 
@@ -140,6 +142,13 @@ bool FlarialGUI::RoundedRadioButton(float x, float y, const D2D_COLOR_F color, c
 {
     if (isInScrollView)
         y += scrollpos;
+
+
+    size_t requiredSize = x / y + 1;
+    if (opacityAmounts.size() < requiredSize)
+    {
+        opacityAmounts.resize(10000, 0.0f);
+    }
 
     static IDWriteFactory* writeFactory;
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
@@ -163,7 +172,15 @@ bool FlarialGUI::RoundedRadioButton(float x, float y, const D2D_COLOR_F color, c
     ID2D1SolidColorBrush* brush = nullptr;
     D2D1_COLOR_F buttonColor = color;
 
-    if(radioNum != currentNum) buttonColor = D2D1::ColorF(D2D1::ColorF::White, 0);
+
+    if(radioNum != currentNum) {
+        FadeEffect::ApplyFadeInEffect(0.1, 1, opacityAmounts[x / y]);
+        buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[x / y]);
+    }
+    else {
+        FadeEffect::ApplyFadeOutEffect(0.1, opacityAmounts[x / y]);
+        buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[x / y]);
+    }
 
 
     D2D::context->CreateSolidColorBrush(buttonColor, &brush);
