@@ -16,8 +16,6 @@ namespace ModuleManager {
 
 void ModuleManager::initialize()
 {
-    // Test stuff
-    EventHandler::registerListener(new TestListener("test"));
 
 
     modules.push_back(new Uninject());

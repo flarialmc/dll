@@ -27,7 +27,7 @@ void EventHandler::unregisterAll() {
 
 void EventHandler::onKey(KeyEvent &event) {
 
-    for (auto &listener: listeners) {
+    for (Listener* &listener: listeners) {
 
         listener->onKey(event);
 
@@ -36,7 +36,7 @@ void EventHandler::onKey(KeyEvent &event) {
 
 void EventHandler::onMouse(MouseEvent &event) {
 
-    for (auto &listener: listeners) {
+    for (Listener* &listener: listeners) {
 
         listener->onMouse(event);
 

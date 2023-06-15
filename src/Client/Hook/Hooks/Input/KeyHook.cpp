@@ -1,3 +1,4 @@
+#include <iostream>
 #include "KeyHook.hpp"
 #include "../../../Events/EventHandler.hpp"
 
@@ -12,11 +13,10 @@ void KeyHook::enableHook()
 
 void KeyHook::keyCallback(int key, int state)
 {
-    // Sets the key state
-    keys[key] = state;
 
     KeyEvent event(key, state);
     EventHandler::onKey(event);
 
-    return func_original(key, state);
+    std::cout << std::to_string(event.GetAction()) << std::endl;
+    return func_original(event.GetKey(), event.GetAction());
 }
