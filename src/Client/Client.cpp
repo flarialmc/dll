@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Client.hpp"
-#include "../Utils/Logger/Logger.hpp"
 #include "GUI/Engine/Engine.hpp"
 #include <kiero.h>
 #include <filesystem>

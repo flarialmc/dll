@@ -83,13 +83,6 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     if (isInScrollView)
         y += scrollpos;
 
-
-    size_t requiredSize = x + y + 1;
-    if (darkenAmounts.size() < requiredSize)
-    {
-        darkenAmounts.resize(10000, 0.0f);
-    }
-
     static IDWriteFactory* writeFactory;
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
 
@@ -142,13 +135,6 @@ bool FlarialGUI::RoundedRadioButton(float x, float y, const D2D_COLOR_F color, c
 {
     if (isInScrollView)
         y += scrollpos;
-
-
-    size_t requiredSize = x / y + 1;
-    if (opacityAmounts.size() < requiredSize)
-    {
-        opacityAmounts.resize(10000, 0.0f);
-    }
 
     static IDWriteFactory* writeFactory;
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
@@ -554,16 +540,15 @@ void FlarialGUI::ApplyGaussianBlur(float blurIntensity)
 
         ID2D1Bitmap *bitmap = nullptr;
         if(SwapchainHook::queue != nullptr) FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap], &bitmap);
-        else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[0], &bitmap);
+        else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap, &bitmap);
 
         FlarialGUI::blur->SetInput(0, bitmap);
+
         // Set blur intensity
         FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
         FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, blurIntensity);
         // Draw the image with the Gaussian blur effect
         D2D::context->DrawImage(FlarialGUI::blur);
-
-        bitmap->Release();
 
     }
 }
