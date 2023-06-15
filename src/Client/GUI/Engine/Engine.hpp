@@ -5,6 +5,7 @@
 #include <wincodec.h>
 #include <stack>
 #include <map>
+#include <vector>
 
 class WindowRect
 {
@@ -36,10 +37,10 @@ public:
 namespace FlarialGUI
 {
     std::stack<Dimension> inline dimension_stack;
-    const float inline darkenAmount = 0.2f;
+    std::vector<float> inline darkenAmounts;
     inline bool isInScrollView = false;
     float inline scrollpos = 0;
-    float inline scrollposmodifier = 10.5f;
+    float inline scrollposmodifier = 16.5f;
     float inline barscrollpos = 0;
     float inline barscrollposmodifier = 3.0f;
     inline WindowRect WindowRects[10];

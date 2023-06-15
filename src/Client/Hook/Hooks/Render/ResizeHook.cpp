@@ -21,9 +21,6 @@ ResizeHook::ResizeHook() : Hook("ResizeHook", "") {}
 void ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT width, UINT height, DXGI_FORMAT newFormat, UINT flags)
 {
 
-    MC::windowSize.x = (float) width;
-    MC::windowSize.y = (float) height;
-
     ResizeHook::CleanShit(true);
 
     SwapchainHook::init = false;

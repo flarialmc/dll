@@ -2,8 +2,11 @@
 #include "Constraints.hpp"
 #include "../../Module/Modules/Module.hpp"
 #include "../../Hook/Hooks/Render/SwapchainHook.hpp"
+#include "animations/fadeinout.hpp"
 
 std::map<std::string, ID2D1Bitmap*> ImagesClass::eimages;
+
+float maxDarkenAmount = 0.1;
 
 static bool CursorInRect(float rectX, float rectY, float width, float height)
 {
@@ -46,7 +49,7 @@ bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COL
 
 
     ID2D1SolidColorBrush *brush;
-    D2D1_COLOR_F buttonColor = CursorInRect(x, y, width, height) ? D2D1::ColorF(color.r - darkenAmount, color.g - darkenAmount, color.b - darkenAmount, color.a) : color;
+    D2D1_COLOR_F buttonColor = CursorInRect(x, y, width, height) ? D2D1::ColorF(color.r - darkenAmounts[x+y], color.g - darkenAmounts[x+y], color.b - darkenAmounts[x+y], color.a) : color;
     D2D::context->CreateSolidColorBrush(buttonColor, &brush);
     D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
 
@@ -80,6 +83,12 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     if (isInScrollView)
         y += scrollpos;
 
+    size_t requiredSize = x + y + 1;
+    if (darkenAmounts.size() < requiredSize)
+    {
+        darkenAmounts.resize(requiredSize, 0.0f);
+    }
+
     static IDWriteFactory* writeFactory;
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
 
@@ -91,22 +100,28 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
-    const float darkenAmount = 0.1f;
+
 
     if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
         MC::mousebutton = MouseButton::None;
         return true;
+
     }
-
-
 
     ID2D1SolidColorBrush* brush = nullptr;
     D2D1_COLOR_F buttonColor = color;
+
     if (CursorInRect(x, y, width, height))
     {
-        buttonColor = D2D1::ColorF(color.r - darkenAmount, color.g - darkenAmount, color.b - darkenAmount, color.a);
+        buttonColor = D2D1::ColorF(color.r - darkenAmounts[x+y], color.g - darkenAmounts[x+y], color.b - darkenAmounts[x+y], color.a);
+        FadeEffect::ApplyFadeInEffect(0.01, maxDarkenAmount, darkenAmounts[x+y]);
+    } else {
+        buttonColor = D2D1::ColorF(color.r - darkenAmounts[x+y], color.g - darkenAmounts[x+y], color.b - darkenAmounts[x+y], color.a);
+        FadeEffect::ApplyFadeOutEffect(0.01, darkenAmounts[x+y]);
+
     }
+
     D2D::context->CreateSolidColorBrush(buttonColor, &brush);
 
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
@@ -136,8 +151,6 @@ bool FlarialGUI::RoundedRadioButton(float x, float y, const D2D_COLOR_F color, c
     writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width * 0.64, height * 0.64), L"en-US", &textFormat);
     textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-
-    const float darkenAmount = 0.1f;
 
     if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
@@ -280,6 +293,7 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
         D2D::context->DrawBitmap(ImagesClass::eimages[imagePath], imagerect);
     }
 
+    /*
     // Draw text
     IDWriteFactory *writeFactory;
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
@@ -289,11 +303,11 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
     D2D1_RECT_F textRect = D2D1::RectF(x + height + 10, y, x + width, y + height);
-    D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
+    D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);*/
 
-    brush->Release();
+    brush->Release();/*
     textFormat->Release();
-    writeFactory->Release();
+    writeFactory->Release();*/
 }
 
 

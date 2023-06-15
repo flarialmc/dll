@@ -18,6 +18,6 @@ file(GLOB_RECURSE sources
 	"lib/**/*.cpp",
 )
 
-add_library(Flarial SHARED ${sources})
+add_library(Flarial SHARED ${sources} src/Client/GUI/Engine/animations/fadeinout.hpp)
 target_include_directories(Flarial PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/")
 target_link_libraries(Flarial PRIVATE windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib version)

@@ -186,9 +186,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
 
-                std::to_string(MC::windowSize.x);
-                std::to_string(MC::windowSize.y);
-
                 D2D::context->BeginDraw();
                 RenderEvent event;
                 EventHandler::onRender(event);
@@ -202,8 +199,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
             } else {
 
                 D2D::context->BeginDraw();
-
-                std::to_string(MC::windowSize.x);
                 RenderEvent event;
                 EventHandler::onRender(event);
                 D2D::context->EndDraw();

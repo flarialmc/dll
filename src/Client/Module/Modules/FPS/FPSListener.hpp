@@ -49,8 +49,6 @@ class FPSListener : public Listener {
             this->module->settings.setValue("percentageX", percentages.x);
             this->module->settings.setValue("percentageY", percentages.y);
 
-            //FIND NEW WORKAROUND LATER!!!!!!
-            std::to_string(realcenter.x);
 
             FlarialGUI::RoundedRect(realcenter.x, realcenter.y,
                                     D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), rectWidth, textHeight,
