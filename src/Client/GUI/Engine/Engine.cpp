@@ -94,15 +94,6 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
-
-
-    if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
-    {
-        MC::mousebutton = MouseButton::None;
-        return true;
-
-    }
-
     ID2D1SolidColorBrush* brush = nullptr;
     D2D1_COLOR_F buttonColor;
 
@@ -128,6 +119,14 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     writeFactory->Release();
     textFormat->Release();
     textBrush->Release();
+
+    if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
+    {
+        MC::mousebutton = MouseButton::None;
+        return true;
+
+    }
+
     return false;
 }
 
@@ -147,24 +146,16 @@ bool FlarialGUI::RoundedRadioButton(float x, float y, const D2D_COLOR_F color, c
     textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
-    if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
-    {
-        MC::mousebutton = MouseButton::None;
-        return true;
-    }
-
-
-
     ID2D1SolidColorBrush* brush = nullptr;
     D2D1_COLOR_F buttonColor = color;
 
 
     if(radioNum != currentNum) {
-        FadeEffect::ApplyFadeInEffect(0.1, 1, opacityAmounts[x / y]);
+        FadeEffect::ApplyFadeInEffect(0.05, 1, opacityAmounts[x / y]);
         buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[x / y]);
     }
     else {
-        FadeEffect::ApplyFadeOutEffect(0.1, opacityAmounts[x / y]);
+        FadeEffect::ApplyFadeOutEffect(0.05, opacityAmounts[x / y]);
         buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[x / y]);
     }
 
@@ -180,6 +171,13 @@ bool FlarialGUI::RoundedRadioButton(float x, float y, const D2D_COLOR_F color, c
     writeFactory->Release();
     textFormat->Release();
     textBrush->Release();
+
+    if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
+    {
+        MC::mousebutton = MouseButton::None;
+        return true;
+    }
+
     return false;
 }
 
