@@ -42,18 +42,22 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
         start = fpsclock.now();
     }
 
+    SwapchainHook::queue = nullptr;
+
+    ID3D12Device* d3d12device3;
+
+    if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device3)))) {
+
+        static_cast<ID3D12Device5*>(d3d12device3)->RemoveDevice();
+        SwapchainHook::queue = nullptr;
+
+        return func_original(pSwapChain, syncInterval, flags);
+    }
+
     if (!SwapchainHook::init) {
 
 
         if (SwapchainHook::queue == nullptr) {
-
-            ID3D12Device* d3d12device3;
-
-            if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device3)))) {
-
-                static_cast<ID3D12Device5*>(d3d12device3)->RemoveDevice();
-                return func_original(pSwapChain, syncInterval, flags);
-            }
 
             Logger::debug("not a DX12 device, running dx11 procedures");
 
@@ -73,8 +77,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                     D2D::context->CreateBitmapFromDxgiSurface(eBackBuffer, props, &SwapchainHook::D2D1Bitmap);
 
                     Memory::SafeRelease(eBackBuffer);
-
-                    MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
                     SwapchainHook::init = true;
 
@@ -203,7 +205,10 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 SwapchainHook::context->Flush();
 
             } else {
+
                 D2D::context->BeginDraw();
+
+                MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
                 RenderEvent event;
                 EventHandler::onRender(event);
                 D2D::context->EndDraw();

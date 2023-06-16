@@ -81,8 +81,8 @@ Vec2<float> Constraints::CenterConstraint(float width, float height, const std::
 
     float screenWidth;
     float screenHeight;
-    float parentX;
-    float parentY;
+    float parentX = 0;
+    float parentY = 0;
 
     if (ignore_stack || FlarialGUI::dimension_stack.empty())
     {
