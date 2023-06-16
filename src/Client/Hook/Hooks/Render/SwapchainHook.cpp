@@ -42,22 +42,20 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
         start = fpsclock.now();
     }
 
-    SwapchainHook::queue = nullptr;
-
-    ID3D12Device* d3d12device3;
-
-    if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device3)))) {
-
-        static_cast<ID3D12Device5*>(d3d12device3)->RemoveDevice();
-        SwapchainHook::queue = nullptr;
-
-        return func_original(pSwapChain, syncInterval, flags);
-    }
-
     if (!SwapchainHook::init) {
 
 
         if (SwapchainHook::queue == nullptr) {
+
+            ID3D12Device* d3d12device3;
+
+            if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device3)))) {
+
+                static_cast<ID3D12Device5*>(d3d12device3)->RemoveDevice();
+                SwapchainHook::queue = nullptr;
+
+                return func_original(pSwapChain, syncInterval, flags);
+            }
 
             Logger::debug("not a DX12 device, running dx11 procedures");
 
