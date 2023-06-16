@@ -1,4 +1,5 @@
 #pragma once
+
 #include <format>
 #include "../../../Events/Listener.hpp"
 #include "../../../Events/Input/KeyEvent.hpp"
@@ -18,49 +19,8 @@ class FPSListener : public Listener {
     void onRender(RenderEvent &event) override {
 
         if(this->module->enabled){
-            float textWidth = Constraints::RelativeConstraint(0.3);
-            float textHeight = Constraints::RelativeConstraint(0.1);
 
-
-            Vec2<float> settingperc = Vec2<float>(this->module->settings.getSettingByName<float>("percentageX")->value, this->module->settings.getSettingByName<float>("percentageY")->value);
-
-            Vec2<float> realcenter;
-
-            if(settingperc.x != 0)
-               realcenter = Vec2<float>(Constraints::PercentageConstraint(settingperc.x, "left"), Constraints::PercentageConstraint(settingperc.y, "top"));
-            else
-            realcenter = Constraints::CenterConstraint(textWidth, textHeight);
-
-            float rectWidth = Constraints::RelativeConstraint(0.215);
-            Vec2<float> rounde = Constraints::RoundingConstraint(40, 40);
-
-            float realspacing = Constraints::SpacingConstraint(0.34, textWidth);
-
-            FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, 0);
-
-            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, 0);
-
-            realcenter.x = vec2.x;
-            realcenter.y = vec2.y;
-
-            realcenter = realcenter;
-
-
-            Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y);
-
-            this->module->settings.setValue("percentageX", percentages.x);
-            this->module->settings.setValue("percentageY", percentages.y);
-
-
-            FlarialGUI::RoundedRect(realcenter.x, realcenter.y,
-                                    D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), rectWidth, textHeight,
-                                    rounde.x, rounde.x);
-            FlarialGUI::FlarialText(realcenter.x - realspacing, realcenter.y,
-                                    FlarialGUI::to_wide(std::format("FPS: {}", MC::fps)).c_str(),
-                                    D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), textWidth,
-                                    textHeight);
-
-            FlarialGUI::UnsetWindowRect();
+            this->module->NormalRender();
 
         }
 
