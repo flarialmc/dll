@@ -6,6 +6,7 @@
 #include "../../../Client.hpp"
 #include <d3d11on12.h>
 #include <wrl/client.h>
+#include <algorithm>
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", "") {}
 
@@ -13,6 +14,7 @@ ID3D12CommandQueue* SwapchainHook::queue = nullptr;
 
 static std::chrono::high_resolution_clock fpsclock;
 static std::chrono::steady_clock::time_point start = fpsclock.now();
+static std::chrono::steady_clock::time_point previousFrameTime = fpsclock.now();
 
 int SwapchainHook::currentBitmap;
 
@@ -42,16 +44,31 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
         start = fpsclock.now();
     }
 
+    constexpr float targetFrameRate = 60.0f;
+
+// Measure the elapsed frame time
+    std::chrono::duration<float> frameTime = fpsclock.now() - previousFrameTime;
+    previousFrameTime = fpsclock.now();
+
+// Calculate the current frame rate
+    float currentFrameRate = 1.0f / frameTime.count();
+
+// Calculate the frame factor as a percentage
+    FlarialGUI::frameFactor = targetFrameRate / currentFrameRate;
+
+// Limit the frame factor to a maximum of 1.0
+    FlarialGUI::frameFactor = min(FlarialGUI::frameFactor, 1.0f);
+
     if (!SwapchainHook::init) {
 
 
         if (SwapchainHook::queue == nullptr) {
 
-            ID3D12Device* d3d12device3;
+            ID3D12Device5* d3d12device3;
 
             if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device3)))) {
 
-                static_cast<ID3D12Device5*>(d3d12device3)->RemoveDevice();
+                d3d12device3->RemoveDevice();
                 SwapchainHook::queue = nullptr;
 
                 return func_original(pSwapChain, syncInterval, flags);
@@ -176,13 +193,14 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
         if(D2D::context != nullptr && !Client::disable) {
 
-
             if(SwapchainHook::queue != nullptr) {
 
                 SwapchainHook::currentBitmap = pSwapChain->GetCurrentBackBufferIndex();
 
                 ID3D11Resource *resource = SwapchainHook::D3D11Resources[SwapchainHook::currentBitmap];
                 SwapchainHook::d3d11On12Device->AcquireWrappedResources(&resource, 1);
+
+                if(D2D::context == nullptr) Logger::debug("nullptr xd xd xd");
 
                 D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
 

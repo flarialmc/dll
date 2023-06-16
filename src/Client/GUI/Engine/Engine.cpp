@@ -97,14 +97,13 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     ID2D1SolidColorBrush* brush = nullptr;
     D2D1_COLOR_F buttonColor;
 
-
     if (CursorInRect(x, y, width, height))
     {
         buttonColor = D2D1::ColorF(color.r - darkenAmounts[x + y], color.g - darkenAmounts[x + y], color.b - darkenAmounts[x + y], color.a);
-        FadeEffect::ApplyFadeInEffect(0.01, maxDarkenAmount, darkenAmounts[x+y]);
+        FadeEffect::ApplyFadeInEffect(0.005 * FlarialGUI::frameFactor, maxDarkenAmount, darkenAmounts[x+y]);
     } else {
         buttonColor = D2D1::ColorF(color.r - darkenAmounts[x + y], color.g - darkenAmounts[x + y], color.b - darkenAmounts[x + y], color.a);
-        FadeEffect::ApplyFadeOutEffect(0.01, darkenAmounts[x + y]);
+        FadeEffect::ApplyFadeOutEffect(0.005 * FlarialGUI::frameFactor, darkenAmounts[x + y]);
 
     }
 
@@ -151,11 +150,11 @@ bool FlarialGUI::RoundedRadioButton(float x, float y, const D2D_COLOR_F color, c
 
 
     if(radioNum != currentNum) {
-        FadeEffect::ApplyFadeInEffect(0.05, 1, opacityAmounts[x / y]);
+        FadeEffect::ApplyFadeInEffect(0.03 * FlarialGUI::frameFactor, 1, opacityAmounts[x / y]);
         buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[x / y]);
     }
     else {
-        FadeEffect::ApplyFadeOutEffect(0.05, opacityAmounts[x / y]);
+        FadeEffect::ApplyFadeOutEffect(0.03 * FlarialGUI::frameFactor, opacityAmounts[x / y]);
         buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[x / y]);
     }
 
