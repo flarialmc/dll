@@ -97,7 +97,7 @@ class ClickGUIRenderer : public Listener {
 
             round = Constraints::RoundingConstraint(30, 30);
             radioX += Constraints::SpacingConstraint(15, logoWidth);
-            if(FlarialGUI::RoundedRadioButton(radioX, radioY, D2D1::ColorF(255.0f/255.0f, 36.0f/255.0f, 56.0f/255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Settings", RadioButtonWidth, RadioButtonHeight, round.x, round.x, "settings", curr)) this->curr = "settings";
+            if(FlarialGUI::RoundedRadioButton(radioX, radioY, D2D1::ColorF(255.0f/255.0f, 36.0f/255.0f, 56.0f/255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Settings", RadioButtonWidth, RadioButtonHeight, round.x, round.x, "settings", this->curr)) this->curr = "settings";
 
             radioX -= Constraints::SpacingConstraint(-0.53, logoWidth);
             radioY -= Constraints::SpacingConstraint(-0.53, logoWidth);
@@ -115,7 +115,9 @@ class ClickGUIRenderer : public Listener {
             FlarialGUI::PopSize(); // Pops nav bar
                 /* Mod Card Start */
 
-                if(this->curr == "modules") {
+                std::string e = this->curr;
+
+                if(e == "modules") {
 
                     float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
                     float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);

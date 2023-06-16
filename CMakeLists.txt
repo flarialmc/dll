@@ -8,17 +8,9 @@ add_compile_options(
 		$<$<CONFIG:>:/MT> 
 		$<$<CONFIG:Debug>:/MTd> 
 		$<$<CONFIG:Release>:/MT>
-		/O2
-		/Ob2
-		/Oi
-		/Ot
+		/fp:precise
 )
 endif()
-
-# Set compiler security flags
-add_compile_options(/GS)
-add_link_options(/NXCompat)
-add_compile_options(/guard:cf)
 
 file(GLOB_RECURSE sources
 	"main.cpp",

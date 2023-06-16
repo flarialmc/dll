@@ -30,14 +30,14 @@ private:
 	}
 
 public:
-    typedef float(__fastcall* getFovOriginal)(void*, float, void*, void*);
-    static inline getFovOriginal func_original;
+    typedef void(__thiscall* getFovOriginal)(void*, void*, void*, void*);
+    static inline getFovOriginal func_original = nullptr;
 
     getFovHook() : Hook("getFovHook", "48 8B ? 48 89 ? ? 48 89 ? ? 57 48 81 EC ? ? ? ? 0F 29 ? ? 0F 29 ? ? 44 0F ? ? ? 44 0F ? ? ? 48 8B ? ? ? ? ? 48 33 ? 48 89 ? ? ? 41 0F") {}
-    
-	void enableHook() override {
-		this->autoHook(getFovCallback, (void**)&func_original);
-	}
+
+    void enableHook() override {
+        this->autoHook(getFovCallback, (void**)&func_original);
+    }
 };
 
 
