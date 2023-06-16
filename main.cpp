@@ -1,5 +1,8 @@
 #pragma once
+
 #include <windows.h>
+#include <algorithm>
+
 #include "src/Client/Client.hpp"
 #include "src/Client/Events/EventHandler.hpp"
 #include "src/Client/GUI/D2D.hpp"
