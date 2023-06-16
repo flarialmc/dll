@@ -12,6 +12,7 @@ add_compile_options(
 		/Ob2
 		/Oi
 		/Ot
+		/fp:precise
 )
 endif()
 

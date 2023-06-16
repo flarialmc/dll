@@ -190,8 +190,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
-                std::cout << std::to_string(MC::windowSize.x) << std::endl;
-
                 RenderEvent event;
                 EventHandler::onRender(event);
 

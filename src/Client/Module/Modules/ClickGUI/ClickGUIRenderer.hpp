@@ -17,6 +17,8 @@ class ClickGUIRenderer : public Listener {
 
     void onRender(RenderEvent &event) override {
 
+        this->curr = this->curr;
+
         if(module->enabled && SwapchainHook::init) {
 
             /* Base Rectangle Start */

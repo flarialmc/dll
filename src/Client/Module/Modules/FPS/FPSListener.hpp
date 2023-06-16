@@ -43,6 +43,8 @@ class FPSListener : public Listener {
             realcenter.x = vec2.x;
             realcenter.y = vec2.y;
 
+            realcenter = realcenter;
+
 
             Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y);
 
