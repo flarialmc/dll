@@ -26,6 +26,7 @@ public:
     bool hasBeenMoved = false;
     float movedX = 0;
     float movedY = 0;
+    float percentageX = 0;
 };
 
 class Dimension
@@ -57,7 +58,7 @@ namespace FlarialGUI
     float inline barscrollpos = 0;
     float inline barscrollposmodifier = 3.0f;
     inline WindowRect WindowRects[10];
-    inline SliderRect SliderRects[100];
+    inline SliderRect SliderRects[10];
     bool inline isInWindowRect = false;
 
     inline ID2D1Effect* blur = nullptr;
@@ -96,7 +97,7 @@ namespace FlarialGUI
 
     bool Toggle(float x, float y, D2D1_COLOR_F color, D2D1_COLOR_F circleColor, bool isEnabled);
 
-    float Slider(float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor,
+    float Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor,
            const D2D1_COLOR_F circleColor);
 
     void Circle(float x, float y, const D2D1_COLOR_F &color, float radius);

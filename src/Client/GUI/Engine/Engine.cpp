@@ -313,7 +313,7 @@ bool FlarialGUI::Toggle(float x, float y, const D2D1_COLOR_F color, const D2D1_C
     return false;
 }
 
-float FlarialGUI::Slider(float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor) {
+float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor) {
 
     // Define the total slider rect width and height
     const float totalWidth = Constraints::RelativeConstraint(0.2);
@@ -329,11 +329,18 @@ float FlarialGUI::Slider(float x, float y, const D2D1_COLOR_F color, const D2D1_
     float circleX = x + totalWidth / 2.0f;
     float circleY = y + height / 2.0f;
 
+    float rectangleLeft = farLeftX;
+    float rectangleWidth = farRightX - farLeftX;
 
-    int index = (int) (circleX + circleY);
+    float maxValue = 100.0f; // Maximum value (e.g., 100%)
+    float minValue = 0.0f;   // Minimum value (e.g., 0%)
+
 
     if(SliderRects[index].hasBeenMoved) {
-        circleX = SliderRects[index].movedX;
+
+
+        circleX = (SliderRects[index].percentageX - minValue) * (rectangleWidth / (maxValue - minValue)) + rectangleLeft;
+
     }
 
     // Calculate the position and width of the enabled portion rect
@@ -348,6 +355,13 @@ float FlarialGUI::Slider(float x, float y, const D2D1_COLOR_F color, const D2D1_
     RoundedRect(farLeftX, y, color, enabledWidth, height, round.x, round.x);
     // Draw the circle in the middle
 
+    FlarialGUI::Circle(circleX, circleY, circleColor, circleRadius);
+
+    // Calculate the percentage
+    float percentage = ((circleX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
+
+    if(percentage > 0) percentage = 0;
+
     if (CursorInEllipse(circleX, circleY, circleRadius, circleRadius) && MC::held) {
         if(MC::mousepos.x > farLeftX && MC::mousepos.x < farRightX) {
 
@@ -355,6 +369,13 @@ float FlarialGUI::Slider(float x, float y, const D2D1_COLOR_F color, const D2D1_
             SliderRects[index].hasBeenMoved = true;
             SliderRects[index].isMovingElement = true;
         }
+
+        if(MC::mousepos.x < farLeftX) SliderRects[index].movedX = farLeftX;
+        else if(MC::mousepos.x > farRightX) SliderRects[index].movedX = farRightX;
+
+        percentage = ((SliderRects[index].movedX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
+        SliderRects[index].percentageX = percentage;
+
     } else if (MC::held && SliderRects[index].isMovingElement) {
 
         if(MC::mousepos.x > farLeftX && MC::mousepos.x < farRightX) {
@@ -362,27 +383,19 @@ float FlarialGUI::Slider(float x, float y, const D2D1_COLOR_F color, const D2D1_
             SliderRects[index].movedX = MC::mousepos.x - circleRadius / 2.0f;
             SliderRects[index].hasBeenMoved = true;
             SliderRects[index].isMovingElement = true;
-
         }
+
+        if(MC::mousepos.x < farLeftX) SliderRects[index].movedX = farLeftX;
+        else if(MC::mousepos.x > farRightX) SliderRects[index].movedX = farRightX;
+
+        percentage = ((SliderRects[index].movedX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
+        SliderRects[index].percentageX = percentage;
     }
 
     if (MC::mousebutton == MouseButton::None && !MC::held || MC::mousebutton == MouseButton::Left && !MC::held)
     {
         SliderRects[index].isMovingElement = false;
     }
-
-    FlarialGUI::Circle(circleX, circleY, circleColor, circleRadius);
-
-    float rectangleLeft = farLeftX;
-    float rectangleWidth = farRightX - farLeftX;
-
-    float maxValue = 100.0f; // Maximum value (e.g., 100%)
-    float minValue = 0.0f;   // Minimum value (e.g., 0%)
-
-    // Calculate the percentage
-    float percentage = ((circleX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
-
-    if(percentage > 0) percentage = 0;
 
     return percentage;
 
