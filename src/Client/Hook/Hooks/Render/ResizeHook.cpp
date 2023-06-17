@@ -6,7 +6,6 @@
 #include "../../../GUI/D2D.hpp"
 #include "SwapchainHook.hpp"
 #include "../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
-#include "../../../GUI/Engine/Engine.hpp"
 
 void ResizeHook::enableHook() {
 
@@ -25,13 +24,13 @@ void ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UI
 
     SwapchainHook::init = false;
 
-    SwapchainHook::hasResized = true;
-
     return func_original(pSwapChain, bufferCount, width, height, newFormat, flags);
 
 }
 
 void ResizeHook::CleanShit(bool isResize) {
+
+    D2D::context->EndDraw();
 
 
     for (auto& i : ClickGUIElements::images) {
@@ -88,8 +87,6 @@ void ResizeHook::CleanShit(bool isResize) {
 
 
     }
-
-    Memory::SafeRelease(FlarialGUI::blur);
 
     if(SwapchainHook::init) {
 

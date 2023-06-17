@@ -207,18 +207,18 @@ void FlarialGUI::RoundedRect(float x, float y, const D2D_COLOR_F color, const fl
 
 void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, float width, float height, float radiusX, float radiusY)
 {
-
     if (isInScrollView)
         y += scrollpos;
+
     D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
 
     ID2D1Factory *factory;
     D2D::context->GetFactory(&factory);
 
-    ID2D1PathGeometry *geometry = nullptr;
+    ID2D1PathGeometry* geometry = nullptr;
     factory->CreatePathGeometry(&geometry);
 
-    ID2D1GeometrySink *sink = nullptr;
+    ID2D1GeometrySink* sink = nullptr;
     geometry->Open(&sink);
 
     D2D1_POINT_2F startPoint = D2D1::Point2F(rect.left + radiusX, rect.top);
@@ -263,15 +263,17 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
     sink->EndFigure(D2D1_FIGURE_END_CLOSED);
     sink->Close();
 
-    ID2D1SolidColorBrush *brush;
+    ID2D1SolidColorBrush* brush;
     D2D::context->CreateSolidColorBrush(color, &brush);
 
     D2D::context->FillGeometry(geometry, brush);
 
-    factory->Release();
-    sink->Release();
-    geometry->Release();
+    Memory::SafeRelease(brush);
+    Memory::SafeRelease(sink);
+    Memory::SafeRelease(geometry);
+    Memory::SafeRelease(factory);
 }
+
 
 bool FlarialGUI::Toggle(float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F circleColor, bool isEnabled) {
 
@@ -598,11 +600,6 @@ void FlarialGUI::ScrollBar(float x, float y, float width, float height, float ra
 void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int currentNum)
 {
     isInWindowRect = true;
-    if (!WindowRects[currentNum].madeRect)
-    {
-        WindowRects[currentNum] = WindowRect();
-        WindowRects[currentNum].madeRect = true;
-    }
 
     if (WindowRects[currentNum].hasBeenMoved)
     {
@@ -634,8 +631,6 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
     {
         WindowRects[currentNum].isMovingElement = false;
     }
-
-    RoundedRectOnlyTopCorner(x, y, D2D1::ColorF(D2D1::ColorF::LightGray, 0.0), width, height);
 }
 
 void FlarialGUI::UnsetWindowRect()
@@ -714,7 +709,7 @@ void FlarialGUI::ApplyGaussianBlur(float blurIntensity)
         D2D::context->DrawImage(FlarialGUI::blur);
 
         Memory::SafeRelease(bitmap);
-
+        Memory::SafeRelease(FlarialGUI::blur);
     }
 }
 
