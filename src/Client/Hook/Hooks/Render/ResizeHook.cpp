@@ -30,9 +30,6 @@ void ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UI
 
 void ResizeHook::CleanShit(bool isResize) {
 
-    D2D::context->EndDraw();
-
-
     for (auto& i : ClickGUIElements::images) {
 
         Memory::SafeRelease(i.second);
