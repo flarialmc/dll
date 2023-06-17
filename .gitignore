@@ -22,4 +22,6 @@ build/
 cmake-build-debug-visual-studio/
 cmake-build-release-visual-studio/
 cmake-build-minsizerel-visual-studio/
+clion/
+clion-ninja/
 *.zip

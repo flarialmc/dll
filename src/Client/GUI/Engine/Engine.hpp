@@ -39,6 +39,7 @@ namespace FlarialGUI
     std::stack<Dimension> inline dimension_stack;
     std::vector<float> inline darkenAmounts(10000);
     std::vector<float> inline opacityAmounts(10000);
+    std::vector<float> inline toggleSpacings(10000);
     float inline frameFactor = 1;
 
     inline bool isInScrollView = false;
@@ -83,5 +84,5 @@ namespace FlarialGUI
 
     void CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to);
 
-    void ModifyFloatUntilMax(float *value, float max, float modifier);
+    bool Toggle(float x, float y, D2D1_COLOR_F color, D2D1_COLOR_F circleColor, bool isEnabled);
 };

@@ -14,6 +14,7 @@ class ClickGUIRenderer : public Listener {
 
     Module* module;
     std::string curr;
+    bool TestToggle = false;
 
     void onRender(RenderEvent &event) override {
 
@@ -148,6 +149,16 @@ class ClickGUIRenderer : public Listener {
                     }
 
                     FlarialGUI::UnsetScrollView();
+                } else if (e == "settings") {
+
+                    D2D1_COLOR_F color = D2D1::ColorF(255.0f / 255.0f,35.0f / 255.0f,58.0f / 255.0f);
+
+                    if(!this->TestToggle) {
+                        color = D2D1::ColorF(112.0f / 255.0f,75.0f / 255.0f,82.0f / 255.0f);
+                    }
+
+                    if(FlarialGUI::Toggle(130, 130, color, D2D1::ColorF(D2D1::ColorF::White), this->TestToggle)) this->TestToggle = !this->TestToggle;
+
                 }
 
                 /* Mod Card End */

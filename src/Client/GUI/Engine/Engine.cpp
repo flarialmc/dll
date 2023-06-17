@@ -261,6 +261,46 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
     geometry->Release();
 }
 
+bool FlarialGUI::Toggle(float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F circleColor, bool isEnabled) {
+
+    float rectWidth = Constraints::RelativeConstraint(0.062);
+    float rectHeight = Constraints::RelativeConstraint(0.03);
+
+    Vec2<float> round = Constraints::RoundingConstraint(18, 18);
+
+    FlarialGUI::RoundedRect(x, y, color, rectWidth, rectHeight, round.x, round.x);
+
+    // the circle (I KNOW IM USING A RECT LOL)
+
+    float circleWidth = Constraints::RelativeConstraint(0.0202);
+    float circleHeight = Constraints::RelativeConstraint(0.02);
+
+
+    float ySpacing = Constraints::SpacingConstraint(0.2, circleHeight);
+    float xSpacing = Constraints::SpacingConstraint(0.2, circleWidth);
+    round = Constraints::RoundingConstraint(23, 23);
+
+    float enabledSpacing;
+
+    if(isEnabled) {
+        FadeEffect::ApplyFadeInEffect(2.4 * FlarialGUI::frameFactor, Constraints::SpacingConstraint(1.6, circleWidth), FlarialGUI::toggleSpacings[x+y]);
+        enabledSpacing =  FlarialGUI::toggleSpacings[x+y];
+    } else {
+        FadeEffect::ApplyFadeOutEffect(2.4 * FlarialGUI::frameFactor, FlarialGUI::toggleSpacings[x+y]);
+        enabledSpacing =  FlarialGUI::toggleSpacings[x+y];
+    }
+
+    FlarialGUI::RoundedRect(x + xSpacing + enabledSpacing, y + ySpacing, circleColor, circleWidth, circleHeight, round.x, round.x);
+
+    if (CursorInRect(x, y, rectWidth, rectHeight) && MC::mousebutton == MouseButton::Left && !MC::held)
+    {
+        MC::mousebutton = MouseButton::None;
+        return true;
+    }
+
+    return false;
+}
+
 void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width, const float height, const D2D1_COLOR_F color, const std::string imagePath, const float imageWidth, const float imageHeight, const wchar_t *text)
 {
 
@@ -549,16 +589,6 @@ void FlarialGUI::ApplyGaussianBlur(float blurIntensity)
 
         Memory::SafeRelease(bitmap);
 
-    }
-}
-
-void FlarialGUI::ModifyFloatUntilMax(float* value, float max, float modifier)
-{
-    while (*value < max)
-    {
-        *value += modifier;
-        if (*value > max)
-            *value = max;
     }
 }
 
