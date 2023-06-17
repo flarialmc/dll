@@ -506,14 +506,14 @@ void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
         rect.top += scrollpos;
         rect.bottom += scrollpos;
     }
-    ID2D1Bitmap *bitmap;
     std::string among = Utils::getRoamingPath() + "\\" + imageName;
-    LoadImageFromFile(to_wide(among).c_str(), &bitmap);
+
+    if(ImagesClass::eimages[imageName] == nullptr)
+    LoadImageFromFile(to_wide(among).c_str(), &ImagesClass::eimages[imageName]);
 
     // Draw image
     D2D1_RECT_F imageRect = D2D1::RectF(rect.left, rect.top, rect.right, rect.bottom);
-    D2D::context->DrawBitmap(bitmap, imageRect, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
-    bitmap->Release();
+    D2D::context->DrawBitmap(ImagesClass::eimages[imageName], imageRect, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
 }
 
 void FlarialGUI::LoadImageFromFile(const wchar_t *filename, ID2D1Bitmap **bitmap)
