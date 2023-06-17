@@ -34,18 +34,21 @@ void ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UI
 void ResizeHook::CleanShit(bool isResize) {
 
 
-    for (const auto& i : ClickGUIElements::images) {
+    for (auto& i : ClickGUIElements::images) {
 
+        Memory::SafeRelease(i.second);
 
-        ClickGUIElements::images[i.first] = nullptr;
+    }
+
+    ClickGUIElements::images.clear();
+
+    for (auto& i : ImagesClass::eimages) {
+
+        Memory::SafeRelease(i.second);
 
     }
 
-    for (const auto& i : ImagesClass::eimages) {
-
-        ImagesClass::eimages[i.first] = nullptr;
-
-    }
+    ImagesClass::eimages.clear();
 
     if(SwapchainHook::init && SwapchainHook::d3d11On12Device != nullptr) {
 
@@ -58,11 +61,13 @@ void ResizeHook::CleanShit(bool isResize) {
             Memory::SafeRelease(bitmap);
         }
 
+        if (!isResize) {
+            SwapchainHook::d3d11On12Device->ReleaseWrappedResources(SwapchainHook::D3D11Resources.data(),
+                                                                    static_cast<UINT>(SwapchainHook::D3D11Resources.size()));
+        }
+
         for (ID3D11Resource* resource : SwapchainHook::D3D11Resources)
         {
-            if(!isResize)
-            SwapchainHook::d3d11On12Device->ReleaseWrappedResources(&resource, 1);
-
             Memory::SafeRelease(resource);
         }
 
@@ -79,7 +84,6 @@ void ResizeHook::CleanShit(bool isResize) {
         Memory::SafeRelease(SwapchainHook::context);
         Memory::SafeRelease(D2D::surface);
 
-        if(!isResize)
         Memory::SafeRelease(SwapchainHook::d3d11On12Device);
 
 

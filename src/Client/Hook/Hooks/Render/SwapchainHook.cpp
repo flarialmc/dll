@@ -28,8 +28,6 @@ void SwapchainHook::enableHook()
 }
 
 bool SwapchainHook::init = false;
-bool SwapchainHook::hasResized = false;
-bool e = false;
 
 void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
 
@@ -199,8 +197,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 ID3D11Resource *resource = SwapchainHook::D3D11Resources[SwapchainHook::currentBitmap];
                 SwapchainHook::d3d11On12Device->AcquireWrappedResources(&resource, 1);
-
-                if(D2D::context == nullptr) Logger::debug("nullptr xd xd xd");
 
                 D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
 

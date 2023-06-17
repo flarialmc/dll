@@ -17,7 +17,7 @@ private:
 
 
 public:
-    typedef void(__thiscall *SwapchainOriginal)(IDXGISwapChain *, UINT, UINT);
+    typedef void(__thiscall *SwapchainOriginal)(IDXGISwapChain3*, UINT, UINT);
     static inline SwapchainOriginal func_original = 0;
     static bool init;
     SwapchainHook();
