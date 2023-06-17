@@ -17,6 +17,18 @@ static bool CursorInRect(float rectX, float rectY, float width, float height)
     return false;
 }
 
+static bool CursorInEllipse(float ellipseX, float ellipseY, float radiusX, float radiusY)
+{
+    float mouseX = MC::mousepos.x;
+    float mouseY = MC::mousepos.y;
+
+    float normalizedX = (mouseX - ellipseX) / radiusX;
+    float normalizedY = (mouseY - ellipseY) / radiusY;
+
+    return (normalizedX * normalizedX + normalizedY * normalizedY) <= 1.0f;
+}
+
+
 void FlarialGUI::PushSize(float x, float y, float width, float height)
 {
     Dimension size;
@@ -300,6 +312,107 @@ bool FlarialGUI::Toggle(float x, float y, const D2D1_COLOR_F color, const D2D1_C
 
     return false;
 }
+
+float FlarialGUI::Slider(float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor) {
+
+    // Define the total slider rect width and height
+    const float totalWidth = Constraints::RelativeConstraint(0.2);
+    const float height = Constraints::RelativeConstraint(0.015);
+
+    // Calculate the farLeftX and farRightX
+    const float farLeftX = x;
+    float farRightX = x + totalWidth;
+
+    // Calculate the position of the circle in the middle of the slider rect
+    const float circleRadius = Constraints::RelativeConstraint(0.015);
+
+    float circleX = x + totalWidth / 2.0f;
+    float circleY = y + height / 2.0f;
+
+
+    int index = (int) (circleX + circleY);
+
+    if(SliderRects[index].hasBeenMoved) {
+        circleX = SliderRects[index].movedX;
+    }
+
+    // Calculate the position and width of the enabled portion rect
+    const float enabledWidth = circleX - farLeftX;
+
+    Vec2<float> round = Constraints::RoundingConstraint(9, 9);
+
+    // Draw the disabled portion rect
+    RoundedRect(farLeftX, y, disabledColor, totalWidth, height, round.x,round.x);
+
+    // Draw the enabled portion rect
+    RoundedRect(farLeftX, y, color, enabledWidth, height, round.x, round.x);
+    // Draw the circle in the middle
+
+    if (CursorInEllipse(circleX, circleY, circleRadius, circleRadius) && MC::held) {
+        if(MC::mousepos.x > farLeftX && MC::mousepos.x < farRightX) {
+
+            SliderRects[index].movedX = MC::mousepos.x - circleRadius / 2.0f;
+            SliderRects[index].hasBeenMoved = true;
+            SliderRects[index].isMovingElement = true;
+        }
+    } else if (MC::held && SliderRects[index].isMovingElement) {
+
+        if(MC::mousepos.x > farLeftX && MC::mousepos.x < farRightX) {
+
+            SliderRects[index].movedX = MC::mousepos.x - circleRadius / 2.0f;
+            SliderRects[index].hasBeenMoved = true;
+            SliderRects[index].isMovingElement = true;
+
+        }
+    }
+
+    if (MC::mousebutton == MouseButton::None && !MC::held || MC::mousebutton == MouseButton::Left && !MC::held)
+    {
+        SliderRects[index].isMovingElement = false;
+    }
+
+    FlarialGUI::Circle(circleX, circleY, circleColor, circleRadius);
+
+    float rectangleLeft = farLeftX;
+    float rectangleWidth = farRightX - farLeftX;
+
+    float maxValue = 100.0f; // Maximum value (e.g., 100%)
+    float minValue = 0.0f;   // Minimum value (e.g., 0%)
+
+    // Calculate the percentage
+    float percentage = ((circleX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
+
+    if(percentage > 0) percentage = 0;
+
+    return percentage;
+
+}
+
+void FlarialGUI::Circle(float x, float y, const D2D1_COLOR_F& color, float radius) {
+    // Assuming D2D::context is the ID2D1DeviceContext object
+
+    // Create a brush using the specified color
+    ID2D1SolidColorBrush* brush;
+    D2D::context->CreateSolidColorBrush(color, &brush);
+
+    // Create an ellipse with the specified parameters
+    D2D1_ELLIPSE ellipse;
+    ellipse.point = D2D1::Point2F(x, y);
+    ellipse.radiusX = radius;
+    ellipse.radiusY = radius;
+
+    // Draw the ellipse using the device context and brush
+    D2D::context->FillEllipse(ellipse, brush);
+
+    // Release the brush
+    brush->Release();
+
+    // Rest of your code...
+}
+
+
+
+
 
 void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width, const float height, const D2D1_COLOR_F color, const std::string imagePath, const float imageWidth, const float imageHeight, const wchar_t *text)
 {

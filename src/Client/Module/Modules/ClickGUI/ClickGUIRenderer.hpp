@@ -151,6 +151,8 @@ class ClickGUIRenderer : public Listener {
                     FlarialGUI::UnsetScrollView();
                 } else if (e == "settings") {
 
+                    /*
+
                     D2D1_COLOR_F color = D2D1::ColorF(255.0f / 255.0f,35.0f / 255.0f,58.0f / 255.0f);
 
                     if(!this->TestToggle) {
@@ -158,6 +160,10 @@ class ClickGUIRenderer : public Listener {
                     }
 
                     if(FlarialGUI::Toggle(130, 130, color, D2D1::ColorF(D2D1::ColorF::White), this->TestToggle)) this->TestToggle = !this->TestToggle;
+                    */
+
+
+                    Logger::debug(std::to_string(FlarialGUI::Slider(150, 150, D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f), D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White))));
 
                 }
 
