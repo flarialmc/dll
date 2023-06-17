@@ -12,16 +12,17 @@ private:
 	static float getFovCallback(void* a1, float f, void* a3, void* a4) {
 		float fov = func_original(a1, f, a3, a4);
 
-		constexpr float zoomValue = 0.75f;
+		constexpr float zoomValue = 0.5f;
 		static float animValue = 0.0f;
 
 		if (ModuleManager::getModule("Zoom") != nullptr) {
 			auto zom = reinterpret_cast<Zoom*>(ModuleManager::getModule("Zoom"));
+
 			if (zom->enabled) {
-				animValue = (std::min)(animValue + (f * 0.1f), 1.0f);
+				animValue = min(animValue + (f * 0.1f), 1.0f);
 			}
 			else {
-				animValue = (std::max)(animValue - (f * 0.1f), 0.0f);
+				animValue = max(animValue - (f * 0.1f), 0.0f);
 			}
 		}
 		
@@ -30,7 +31,7 @@ private:
 	}
 
 public:
-    typedef void(__thiscall* getFovOriginal)(void*, void*, void*, void*);
+    typedef float(__thiscall* getFovOriginal)(void*, float, void*, void*);
     static inline getFovOriginal func_original = nullptr;
 
     getFovHook() : Hook("getFovHook", "48 8B ? 48 89 ? ? 48 89 ? ? 57 48 81 EC ? ? ? ? 0F 29 ? ? 0F 29 ? ? 44 0F ? ? ? 44 0F ? ? ? 48 8B ? ? ? ? ? 48 33 ? 48 89 ? ? ? 41 0F") {}

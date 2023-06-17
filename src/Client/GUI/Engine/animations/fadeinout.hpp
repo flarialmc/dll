@@ -10,10 +10,11 @@ public:
         if (darkenAmount > maxDarkenAmount)
             darkenAmount = maxDarkenAmount;
     }
-    static void ApplyFadeOutEffect(float darkenModifier, float& darkenAmount)
+    static void ApplyFadeOutEffect(float darkenModifier, float& darkenAmount, float leastAmount = 0.0)
     {
+        if(darkenAmount < leastAmount) darkenAmount = leastAmount;
+        else
         darkenAmount -= darkenModifier;
-        if(darkenAmount < 0.0) darkenAmount = 0.0;
     }
 };
 
