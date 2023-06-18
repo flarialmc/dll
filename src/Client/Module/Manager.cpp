@@ -28,6 +28,7 @@ void ModuleManager::initialize()
     modules.push_back(new Module("test", "woah", "", 1));
     modules.push_back(new Module("test", "woah", "", 1));
     modules.push_back(new Module("test", "woah", "", 1));
+    EventHandler::registerListener(new TestListener("E"));
 
 
 }

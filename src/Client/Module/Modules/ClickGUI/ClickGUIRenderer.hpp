@@ -163,8 +163,10 @@ class ClickGUIRenderer : public Listener {
                     */
 
 
-                    FlarialGUI::Slider(0, Constraints::PercentageConstraint(0.5, "left"), Constraints::PercentageConstraint(0.5, "top"), D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f), D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White));
+                    // FlarialGUI::Slider(0, Constraints::PercentageConstraint(0.5, "left"), Constraints::PercentageConstraint(0.5, "top"), D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f), D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White));
 
+
+                    FlarialGUI::TextBox(0, 150, 150, 150, 150);
                 }
 
                 /* Mod Card End */

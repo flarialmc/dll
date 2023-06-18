@@ -8,7 +8,12 @@ class TestListener : public Listener {
 
     void onKey(KeyEvent &event) override {
 
-    if(event.GetKey() == 'A') Logger::info("This shit also work");
+        for (auto& box : FlarialGUI::TextBoxes) {
+
+            if(box.isActive && event.GetAction() == (int)ActionType::PRESSED)
+                box.text += event.GetKeyAsString();
+        }
+
     };
 
 public:

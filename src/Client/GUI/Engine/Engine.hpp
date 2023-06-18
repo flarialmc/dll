@@ -7,9 +7,8 @@
 #include <map>
 #include <vector>
 
-class WindowRect
+struct WindowRect
 {
-public:
     bool isMovingElement = false;
     bool hasBeenMoved = false;
     float movedX = 0;
@@ -19,15 +18,21 @@ public:
     float percentageY = 0;
 };
 
-class SliderRect
+struct SliderRect
 {
-public:
     bool isMovingElement = false;
     bool hasBeenMoved = false;
     float movedX = 0;
     float movedY = 0;
     float percentageX = 0;
 };
+
+struct TextBox
+{
+    std::string text;
+    bool isActive;
+};
+
 
 class Dimension
 {
@@ -59,6 +64,7 @@ namespace FlarialGUI
     float inline barscrollposmodifier = 3.0f;
     inline WindowRect WindowRects[10];
     inline SliderRect SliderRects[10];
+    inline TextBox TextBoxes[10];
     bool inline isInWindowRect = false;
 
     inline ID2D1Effect* blur = nullptr;
@@ -101,4 +107,6 @@ namespace FlarialGUI
            const D2D1_COLOR_F circleColor);
 
     void Circle(float x, float y, const D2D1_COLOR_F &color, float radius);
+
+    std::string TextBox(int index, float x, float y, float width, float height);
 };

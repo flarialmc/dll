@@ -4,8 +4,6 @@
 class KeyHook : public Hook
 {
 private:
-    static inline bool keys[256] = {false};
-
     static void keyCallback(int key, int state);
 
 public:

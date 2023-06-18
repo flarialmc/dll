@@ -315,6 +315,13 @@ bool FlarialGUI::Toggle(float x, float y, const D2D1_COLOR_F color, const D2D1_C
     return false;
 }
 
+std::string FlarialGUI::TextBox(int index, float x, float y, float width, float height) {
+
+    Logger::debug(FlarialGUI::TextBoxes[index].text);
+    FlarialGUI::TextBoxes[index].isActive = true;
+    return FlarialGUI::TextBoxes[index].text;
+}
+
 float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor) {
 
     // Define the total slider rect width and height
