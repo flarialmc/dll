@@ -8,7 +8,7 @@ std::map<std::string, ID2D1Bitmap*> ImagesClass::eimages;
 
 float maxDarkenAmount = 0.1;
 
-static bool CursorInRect(float rectX, float rectY, float width, float height)
+bool FlarialGUI::CursorInRect(float rectX, float rectY, float width, float height)
 {
     if (MC::mousepos.x >= rectX && MC::mousepos.x <= rectX + width && MC::mousepos.y >= rectY && MC::mousepos.y <= rectY + height)
     {

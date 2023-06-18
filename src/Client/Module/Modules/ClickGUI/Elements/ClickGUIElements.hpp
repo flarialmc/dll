@@ -1,7 +1,7 @@
 ﻿#pragma once
-
 #include <d2d1.h>
 #include "../../Module.hpp"
+
 
 class ClickGUIElements
 {

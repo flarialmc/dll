@@ -1,8 +1,5 @@
-﻿
-#include "ClickGUIElements.hpp"
-#include "../../../../GUI/Engine/Constraints.hpp"
-#include "../../../../GUI/Engine/Engine.hpp"
-#include <d2d1_1.h>
+﻿#pragma once
+#include "../ClickGUIRenderer.hpp"
 
 std::map<std::string, ID2D1Bitmap*> ClickGUIElements::images;
 
@@ -94,6 +91,12 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
     FlarialGUI::RoundedRect(buttonx - paddingspacing, (buttony - paddingwidth) - paddingheightspac, D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), paddingwidth, paddingwidth, round.x, round.x);
     FlarialGUI::RoundedRectWithImageAndText(buttonx - settingspacing, (buttony - settingswidth) - settingsheightspac, settingswidth, settingswidth, D2D1::ColorF(112.0f / 255.0f, 93.0f / 255.0f, 96.0f / 255.0f), "\\Flarial\\assets\\gear.png", iconwidth, iconwidth, L"");
 
+    if (FlarialGUI::CursorInRect(buttonx - paddingspacing, (buttony - paddingwidth) - paddingheightspac,  paddingwidth, paddingwidth) && MC::mousebutton == MouseButton::Left && !MC::held)
+    {
+        MC::mousebutton = MouseButton::None;
+        ClickGUIRenderer::page.type = "settings";
+        ClickGUIRenderer::page.module = mod->name;
+    }
 
     FlarialGUI::PopSize();
 

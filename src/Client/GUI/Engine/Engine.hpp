@@ -114,4 +114,6 @@ namespace FlarialGUI
     float HueToRGB(float p, float q, float t);
 
     void HSLToRGB(float h, float s, float l, float &r, float &g, float &b);
+
+    bool CursorInRect(float rectX, float rectY, float width, float height);
 };

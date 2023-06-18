@@ -29,6 +29,8 @@ public:
         keybind = ekey;
         settings = Settings();
         settingspath = Utils::getRoamingPath() + "\\Flarial\\Config\\" + name + ".flarial";
+
+        CheckSettingsFile();
         LoadSettings();
     }
 public:
@@ -89,7 +91,6 @@ public:
 
    virtual void onEnable() {
 
-    CheckSettingsFile();
 }
 
     virtual void onDisable() {
@@ -147,5 +148,7 @@ public:
         FlarialGUI::UnsetWindowRect();
 
     }
+
+    virtual void SettingsRender() {}
 
 };

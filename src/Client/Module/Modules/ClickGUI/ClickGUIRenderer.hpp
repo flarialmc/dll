@@ -9,6 +9,13 @@
 #include "../../../GUI/Engine/Engine.hpp"
 #include "../../../GUI/Engine/Constraints.hpp"
 #include "Elements/ClickGUIElements.hpp"
+#include "../../../Hook/Hooks/Render/SwapchainHook.hpp"
+#include "../../Manager.hpp"
+
+struct PageType {
+    std::string type = "normal";
+    std::string module;
+};
 
 class ClickGUIRenderer : public Listener {
 
@@ -118,58 +125,74 @@ class ClickGUIRenderer : public Listener {
 
                 std::string e = this->curr;
 
-                if(e == "modules") {
+                if(ClickGUIRenderer::page.type == "normal") {
 
-                    float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
-                    float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
+                    if (e == "modules") {
 
-                    Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.60, -0.52);
+                        float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
+                        float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
+
+                        Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.60,
+                                                                              -0.52);
 
 
-                    float scrollWidth = Constraints::RelativeConstraint(1.12);
-                    float scrollHeight = Constraints::RelativeConstraint(0.84);
-                    Vec2<float> scrollcenter = Constraints::CenterConstraint(scrollWidth, scrollHeight, "y", 0.0, 1);
+                        float scrollWidth = Constraints::RelativeConstraint(1.12);
+                        float scrollHeight = Constraints::RelativeConstraint(0.84);
+                        Vec2<float> scrollcenter = Constraints::CenterConstraint(scrollWidth, scrollHeight, "y", 0.0,
+                                                                                 1);
 
-                    FlarialGUI::ScrollBar(120, 120, 10, 160, 2);
+                        FlarialGUI::ScrollBar(120, 120, 10, 160, 2);
 
-                    FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
+                        FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
 
-                    float xModifier = 0.0f;
-                    float yModifier = 0.0f;
+                        float xModifier = 0.0f;
+                        float yModifier = 0.0f;
 
-                    int i = 0;
-                    for (Module *real: ModuleManager::modules) {
-                        ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real, real->icon);
+                        int i = 0;
+                        for (Module *real: ModuleManager::modules) {
+                            ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
+                                                      real->icon);
 
-                        xModifier += Constraints::SpacingConstraint(1.09, modWidth);
-                        if ((++i % 3) == 0) {
-                            yModifier += Constraints::SpacingConstraint(0.8, modWidth);
-                            xModifier = 0.0f;
+                            xModifier += Constraints::SpacingConstraint(1.09, modWidth);
+                            if ((++i % 3) == 0) {
+                                yModifier += Constraints::SpacingConstraint(0.8, modWidth);
+                                xModifier = 0.0f;
+                            }
                         }
+
+                        FlarialGUI::UnsetScrollView();
+                    } else if (e == "settings") {
+
+                        D2D1_COLOR_F color = D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f);
+
+                        if (!this->TestToggle) {
+                            color = D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f);
+                        }
+
+                        if (FlarialGUI::Toggle(Constraints::PercentageConstraint(0.2, "left"),
+                                               Constraints::PercentageConstraint(0.3, "top"), color,
+                                               D2D1::ColorF(D2D1::ColorF::White), this->TestToggle))
+                            this->TestToggle = !this->TestToggle;
+
+
+                        FlarialGUI::Slider(0, Constraints::PercentageConstraint(0.5, "left"),
+                                           Constraints::PercentageConstraint(0.5, "top"),
+                                           D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                           D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+                                           D2D1::ColorF(D2D1::ColorF::White));
+
+
+                        //FlarialGUI::TextBox(0, 150, 150, 150, 150);
+
+                        //FlarialGUI::ColorWheel(300, 300, 100);
                     }
 
-                    FlarialGUI::UnsetScrollView();
-                } else if (e == "settings") {
+                    /* Mod Card End */
+                } else if (ClickGUIRenderer::page.type == "settings") {
 
-                    D2D1_COLOR_F color = D2D1::ColorF(255.0f / 255.0f,35.0f / 255.0f,58.0f / 255.0f);
+                    ModuleManager::getModule(ClickGUIRenderer::page.module)->SettingsRender();
 
-                    if(!this->TestToggle) {
-                        color = D2D1::ColorF(112.0f / 255.0f,75.0f / 255.0f,82.0f / 255.0f);
-                    }
-
-                    if(FlarialGUI::Toggle(Constraints::PercentageConstraint(0.2, "left"), Constraints::PercentageConstraint(0.3, "top"), color, D2D1::ColorF(D2D1::ColorF::White), this->TestToggle)) this->TestToggle = !this->TestToggle;
-
-
-
-                    FlarialGUI::Slider(0, Constraints::PercentageConstraint(0.5, "left"), Constraints::PercentageConstraint(0.5, "top"), D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f), D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White));
-
-
-                    //FlarialGUI::TextBox(0, 150, 150, 150, 150);
-
-                    //FlarialGUI::ColorWheel(300, 300, 100);
                 }
-
-                /* Mod Card End */
 
             FlarialGUI::PopSize(); // Pops base rect
 
@@ -188,4 +211,6 @@ public:
         this->module = emodule;
         this->curr = "modules";
     }
+
+    static inline PageType page;
 };
