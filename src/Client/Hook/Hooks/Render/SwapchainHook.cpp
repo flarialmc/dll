@@ -57,18 +57,18 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 // Limit the frame factor to a maximum of 1.0
     FlarialGUI::frameFactor = min(FlarialGUI::frameFactor, 1.0f);
 
+
     if (!SwapchainHook::init) {
 
 
         if (SwapchainHook::queue == nullptr) {
 
+
             ID3D12Device5* d3d12device3;
 
             if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device3)))) {
-
+                Logger::debug("Removed d3d12 device");
                 d3d12device3->RemoveDevice();
-                SwapchainHook::queue = nullptr;
-
                 return func_original(pSwapChain, syncInterval, flags);
             }
 

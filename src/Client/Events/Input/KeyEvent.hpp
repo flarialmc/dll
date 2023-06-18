@@ -32,9 +32,6 @@ public:
         return this->action;
     }
 
-#include <iostream>
-#include <string>
-
     std::string GetKeyAsString(bool isCapital) {
 
         if (this->key == 32) { // Spacebar key
@@ -105,17 +102,6 @@ public:
 
         // Return empty string for unsupported key codes or non-alphabetic keys
         return "";
-    }
-
-    int main() {
-        int keyCode = 65; // Example key code for 'A'
-        bool isCapital = true; // Example: capital letter
-
-        std::string keyString = GetKeyAsString(keyCode, isCapital);
-
-        std::cout << "Key String: " << keyString << std::endl;
-
-        return 0;
     }
 
 

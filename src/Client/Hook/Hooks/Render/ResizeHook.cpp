@@ -24,6 +24,7 @@ void ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UI
 
     SwapchainHook::init = false;
 
+
     return func_original(pSwapChain, bufferCount, width, height, newFormat, flags);
 
 }
@@ -57,7 +58,7 @@ void ResizeHook::CleanShit(bool isResize) {
             Memory::SafeRelease(bitmap);
         }
 
-        if (!isResize) {
+        if (!isResize && SwapchainHook::queue != nullptr) {
             SwapchainHook::d3d11On12Device->ReleaseWrappedResources(SwapchainHook::D3D11Resources.data(),
                                                                     static_cast<UINT>(SwapchainHook::D3D11Resources.size()));
         }
@@ -82,8 +83,9 @@ void ResizeHook::CleanShit(bool isResize) {
 
         Memory::SafeRelease(SwapchainHook::d3d11On12Device);
 
-
     }
+
+    Memory::SafeRelease(SwapchainHook::D2D1Bitmap);
 
     if(SwapchainHook::init) {
 
