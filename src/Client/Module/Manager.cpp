@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "Manager.hpp"
 #include "../Events/EventHandler.hpp"
-#include "Modules/Input/TestListener.hpp"
+#include "Modules/Input/GUIKeyListener.hpp"
 #include "Modules/ClickGUI/GUIMouseListener.hpp"
 #include "Modules/Misc/Uninject/Uninject.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
@@ -28,7 +28,7 @@ void ModuleManager::initialize()
     modules.push_back(new Module("test", "woah", "", 1));
     modules.push_back(new Module("test", "woah", "", 1));
     modules.push_back(new Module("test", "woah", "", 1));
-    EventHandler::registerListener(new TestListener("E"));
+    EventHandler::registerListener(new GUIKeyListener("E"));
 
 
 }
