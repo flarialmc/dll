@@ -49,8 +49,6 @@ void ResizeHook::CleanShit(bool isResize) {
 
     if(SwapchainHook::init && SwapchainHook::d3d11On12Device != nullptr) {
 
-        Memory::SafeRelease(SwapchainHook::queue);
-
         Memory::SafeRelease(SwapchainHook::D3D12DescriptorHeap);
 
         for (ID2D1Bitmap1* bitmap : SwapchainHook::D2D1Bitmaps)
@@ -82,6 +80,8 @@ void ResizeHook::CleanShit(bool isResize) {
         Memory::SafeRelease(D2D::surface);
 
         Memory::SafeRelease(SwapchainHook::d3d11On12Device);
+
+        if(!isResize) Memory::SafeRelease(SwapchainHook::queue);
 
     }
 

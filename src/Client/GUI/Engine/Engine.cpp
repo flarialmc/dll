@@ -318,11 +318,7 @@ bool FlarialGUI::Toggle(float x, float y, const D2D1_COLOR_F color, const D2D1_C
 void FlarialGUI::ColorWheel(float x, float y, float radius)
 {
     // Calculate the center of the color wheel
-    D2D1_POINT_2F center = D2D1::Point2F(x, y);
-
-    // Calculate the start and end angles for the color wheel gradient
-    float startAngle = 0.0f;
-    float endAngle = 360.0f;
+    D2D1_POINT_2F center = D2D1::Point2F(x - radius / 2.0f, y - radius / 2.0f);
 
     // Create the color stops for the gradient
     D2D1_GRADIENT_STOP gradientStops[7];
@@ -330,19 +326,19 @@ void FlarialGUI::ColorWheel(float x, float y, float radius)
     gradientStops[0].position = 0.0f;   // Red
     gradientStops[0].color = D2D1::ColorF(D2D1::ColorF::Red);
 
-    gradientStops[1].position = 0.166f; // Yellow
+    gradientStops[1].position = 1.0f / 6.0f; // Yellow
     gradientStops[1].color = D2D1::ColorF(D2D1::ColorF::Yellow);
 
-    gradientStops[2].position = 0.333f; // Green
+    gradientStops[2].position = 2.0f / 6.0f; // Green
     gradientStops[2].color = D2D1::ColorF(D2D1::ColorF::Green);
 
-    gradientStops[3].position = 0.5f;   // Cyan
+    gradientStops[3].position = 3.0f / 6.0f; // Cyan
     gradientStops[3].color = D2D1::ColorF(D2D1::ColorF::Cyan);
 
-    gradientStops[4].position = 0.666f; // Blue
+    gradientStops[4].position = 4.0f / 6.0f; // Blue
     gradientStops[4].color = D2D1::ColorF(D2D1::ColorF::Blue);
 
-    gradientStops[5].position = 0.833f; // Magenta
+    gradientStops[5].position = 5.0f / 6.0f; // Magenta
     gradientStops[5].color = D2D1::ColorF(D2D1::ColorF::Magenta);
 
     gradientStops[6].position = 1.0f;   // Red
@@ -358,20 +354,57 @@ void FlarialGUI::ColorWheel(float x, float y, float radius)
             &gradientStopCollection
     );
 
+    // Create the radial gradient brush with appropriate properties
     ID2D1RadialGradientBrush* radialBrush = nullptr;
     D2D::context->CreateRadialGradientBrush(
-            D2D1::RadialGradientBrushProperties(center, center, radius, radius),
+            D2D1::RadialGradientBrushProperties(D2D1::Point2F(x, y), center, radius, radius),
             gradientStopCollection,
             &radialBrush
     );
 
     // Draw the color wheel
-    D2D::context->FillEllipse(D2D1::Ellipse(center, radius, radius), radialBrush);
+    D2D::context->FillEllipse(D2D1::Ellipse(D2D1::Point2F(x, y), radius, radius), radialBrush);
+
+    FlarialGUI::RoundedRect(x, y, D2D1::ColorF(D2D1::ColorF::White), radius, radius);
+    FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(D2D1::ColorF::Black), radius, radius);
 
     // Release resources
     gradientStopCollection->Release();
     radialBrush->Release();
 }
+
+
+
+void FlarialGUI::HSLToRGB(float h, float s, float l, float& r, float& g, float& b)
+{
+    if (s == 0.0f)
+    {
+        r = g = b = l;
+    }
+    else
+    {
+        float q = (l < 0.5f) ? l * (1.0f + s) : l + s - l * s;
+        float p = 2.0f * l - q;
+
+        r = HueToRGB(p, q, h + 1.0f / 3.0f);
+        g = HueToRGB(p, q, h);
+        b = HueToRGB(p, q, h - 1.0f / 3.0f);
+    }
+}
+
+float FlarialGUI::HueToRGB(float p, float q, float t)
+{
+    if (t < 0.0f) t += 1.0f;
+    if (t > 1.0f) t -= 1.0f;
+
+    if (t < 1.0f / 6.0f) return p + (q - p) * 6.0f * t;
+    if (t < 1.0f / 2.0f) return q;
+    if (t < 2.0f / 3.0f) return p + (q - p) * (2.0f / 3.0f - t) * 6.0f;
+
+    return p;
+}
+
+
 
 
 std::string FlarialGUI::TextBox(int index, float x, float y, float width, float height) {

@@ -151,24 +151,22 @@ class ClickGUIRenderer : public Listener {
                     FlarialGUI::UnsetScrollView();
                 } else if (e == "settings") {
 
-                    /*
-
                     D2D1_COLOR_F color = D2D1::ColorF(255.0f / 255.0f,35.0f / 255.0f,58.0f / 255.0f);
 
                     if(!this->TestToggle) {
                         color = D2D1::ColorF(112.0f / 255.0f,75.0f / 255.0f,82.0f / 255.0f);
                     }
 
-                    if(FlarialGUI::Toggle(130, 130, color, D2D1::ColorF(D2D1::ColorF::White), this->TestToggle)) this->TestToggle = !this->TestToggle;
-                    */
+                    if(FlarialGUI::Toggle(Constraints::PercentageConstraint(0.2, "left"), Constraints::PercentageConstraint(0.3, "top"), color, D2D1::ColorF(D2D1::ColorF::White), this->TestToggle)) this->TestToggle = !this->TestToggle;
 
 
-                    // FlarialGUI::Slider(0, Constraints::PercentageConstraint(0.5, "left"), Constraints::PercentageConstraint(0.5, "top"), D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f), D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White));
+
+                    FlarialGUI::Slider(0, Constraints::PercentageConstraint(0.5, "left"), Constraints::PercentageConstraint(0.5, "top"), D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f), D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White));
 
 
                     //FlarialGUI::TextBox(0, 150, 150, 150, 150);
 
-                    FlarialGUI::ColorWheel(150, 150, 150);
+                    //FlarialGUI::ColorWheel(300, 300, 100);
                 }
 
                 /* Mod Card End */

@@ -110,4 +110,8 @@ namespace FlarialGUI
     std::string TextBox(int index, float x, float y, float width, float height);
 
     void ColorWheel(float x, float y, float radius);
+
+    float HueToRGB(float p, float q, float t);
+
+    void HSLToRGB(float h, float s, float l, float &r, float &g, float &b);
 };
