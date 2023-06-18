@@ -108,4 +108,6 @@ namespace FlarialGUI
     void Circle(float x, float y, const D2D1_COLOR_F &color, float radius);
 
     std::string TextBox(int index, float x, float y, float width, float height);
+
+    void ColorWheel(float x, float y, float radius);
 };
