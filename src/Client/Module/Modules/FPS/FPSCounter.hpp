@@ -52,7 +52,7 @@ public:
 
         if(FlarialGUI::Toggle(0, toggleX, toggleY, color, D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("border")->value)) this->settings.getSettingByName<bool>("border")->value = !this->settings.getSettingByName<bool>("border")->value;
 
-        float percent = FlarialGUI::Slider(0, toggleX,
+        float percent = FlarialGUI::Slider(1, toggleX,
                            toggleY + Constraints::SpacingConstraint(0.35, Constraints::RelativeConstraint(0.6)),
                            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
                            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
