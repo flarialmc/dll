@@ -1,9 +1,12 @@
 ﻿#pragma once
 #include "../ClickGUIRenderer.hpp"
+#include "ClickGUIElements.hpp"
+
 
 std::map<std::string, ID2D1Bitmap*> ClickGUIElements::images;
+std::vector<D2D1_MATRIX_3X2_F> ClickGUIElements::matrixes;
 
-void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string iconpath, const float width, const float height)
+void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string iconpath, const int index)
 {
 
     Vec2<float> vec = FlarialGUI::CalculateMovedXY(x, y, 0);
@@ -45,21 +48,6 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
     modiconx = Constraints::PercentageConstraint(0.43, "left");
     modicony = Constraints::PercentageConstraint(0.15, "top");
 
-
-    if (!iconpath.empty() && images[mod->name] == nullptr) {
-
-        std::string among = Utils::getRoamingPath() + "\\" + iconpath;
-        FlarialGUI::LoadImageFromFile(FlarialGUI::to_wide(among).c_str(), &images[mod->name]);
-
-    } else if (images[mod->name] != nullptr) {
-
-        if (FlarialGUI::isInScrollView) {
-            modicony += FlarialGUI::scrollpos;
-        }
-        D2D::context->DrawBitmap(images[mod->name], D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize));
-
-    }
-
     // enabled / disabled button
 
     std::string text;
@@ -91,6 +79,24 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
     FlarialGUI::RoundedRect(buttonx - paddingspacing, (buttony - paddingwidth) - paddingheightspac, D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), paddingwidth, paddingwidth, round.x, round.x);
     FlarialGUI::RoundedRectWithImageAndText(buttonx - settingspacing, (buttony - settingswidth) - settingsheightspac, settingswidth, settingswidth, D2D1::ColorF(112.0f / 255.0f, 93.0f / 255.0f, 96.0f / 255.0f), "\\Flarial\\assets\\gear.png", iconwidth, iconwidth, L"");
 
+
+    if (!iconpath.empty() && images[mod->name] == nullptr) {
+
+        std::string among = Utils::getRoamingPath() + "\\" + iconpath;
+        FlarialGUI::LoadImageFromFile(FlarialGUI::to_wide(among).c_str(), &images[mod->name]);
+
+    } else if (images[mod->name] != nullptr) {
+
+        if (FlarialGUI::isInScrollView) {
+            modicony += FlarialGUI::scrollpos;
+        }
+
+        D2D::context->DrawBitmap(images[mod->name], D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize));
+    }
+
+    if(FlarialGUI::isInScrollView)
+        buttony += FlarialGUI::scrollpos;
+
     if (FlarialGUI::CursorInRect(buttonx - paddingspacing, (buttony - paddingwidth) - paddingheightspac,  paddingwidth, paddingwidth) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
         MC::mousebutton = MouseButton::None;
@@ -100,5 +106,30 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 
     FlarialGUI::PopSize();
 
+}
+
+void ClickGUIElements::convertImageToBitmap(ID2D1Image* pImg, D2D1_SIZE_U size)
+{
+    ID2D1Image* oldTarget = NULL;
+    ID2D1Bitmap1* targetBitmap = NULL;
+
+    //Create a Bitmap with "D2D1_BITMAP_OPTIONS_TARGET"
+    D2D1_BITMAP_PROPERTIES1 bitmapProperties =
+            D2D1::BitmapProperties1(
+                    D2D1_BITMAP_OPTIONS_TARGET,
+                    D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED)
+            );
+    D2D::context->CreateBitmap(size, 0, 0, bitmapProperties, &targetBitmap);
+
+
+
+    //Save current Target, replace by ID2D1Bitmap
+    D2D::context->GetTarget(&oldTarget);
+    D2D::context->SetTarget(targetBitmap);
+    //Draw Image on Target (if currently not drawing also call Begin/EndDraw)
+    D2D::context->DrawImage(pImg);
+
+    //Set previous Target
+    D2D::context->SetTarget(oldTarget);
 }
 

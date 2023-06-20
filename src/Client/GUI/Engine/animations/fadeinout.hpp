@@ -6,15 +6,12 @@ class FadeEffect
 public:
     static void ApplyFadeInEffect(float darkenModifier, float maxDarkenAmount, float& darkenAmount)
     {
-        darkenAmount += darkenModifier;
-        if (darkenAmount > maxDarkenAmount)
-            darkenAmount = maxDarkenAmount;
+
+        if (darkenAmount < maxDarkenAmount) darkenAmount += darkenModifier;
     }
     static void ApplyFadeOutEffect(float darkenModifier, float& darkenAmount, float leastAmount = 0.0)
     {
-        if(darkenAmount < leastAmount) darkenAmount = leastAmount;
-        else
-        darkenAmount -= darkenModifier;
+        if(darkenAmount - darkenModifier > leastAmount) darkenAmount -= darkenModifier;
     }
 };
 

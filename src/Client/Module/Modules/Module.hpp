@@ -101,7 +101,7 @@ public:
 
     virtual void NormalRender() {
 
-        float textWidth = Constraints::RelativeConstraint(0.3);
+        float textWidth = Constraints::RelativeConstraint(0.33);
         float textHeight = Constraints::RelativeConstraint(0.1);
 
 
@@ -116,10 +116,10 @@ public:
         else
             realcenter = Constraints::CenterConstraint(textWidth, textHeight);
 
-        float rectWidth = Constraints::RelativeConstraint(0.215);
+        float rectWidth = Constraints::RelativeConstraint(0.225);
         Vec2<float> rounde = Constraints::RoundingConstraint(40, 40);
 
-        float realspacing = Constraints::SpacingConstraint(0.34, textWidth);
+        float realspacing = Constraints::SpacingConstraint(0.33, textWidth);
 
         FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, 0);
 
@@ -137,6 +137,7 @@ public:
         this->settings.setValue("percentageY", percentages.y);
 
 
+
         FlarialGUI::RoundedRect(realcenter.x, realcenter.y,
                                 D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), rectWidth, textHeight,
                                 rounde.x, rounde.x);
@@ -144,6 +145,12 @@ public:
                                 FlarialGUI::to_wide(std::format("FPS: {}", MC::fps)).c_str(),
                                 D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), textWidth,
                                 textHeight);
+
+        if(this->settings.getSettingByName<bool>("border")->value) {
+            FlarialGUI::RoundedHollowRect(realcenter.x, realcenter.y, this->settings.getSettingByName<float>("borderWidth")->value,
+                                    D2D1::ColorF(D2D1::ColorF::Black), rectWidth, textHeight,
+                                    rounde.x, rounde.x);
+        }
 
         FlarialGUI::UnsetWindowRect();
 

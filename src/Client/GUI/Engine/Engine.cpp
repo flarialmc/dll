@@ -141,7 +141,7 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     return false;
 }
 
-bool FlarialGUI::RoundedRadioButton(float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width, const float height, float radiusX, float radiusY, const std::string& radioNum, const std::string& currentNum)
+bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width, const float height, float radiusX, float radiusY, const std::string& radioNum, const std::string& currentNum)
 {
     if (isInScrollView)
         y += scrollpos;
@@ -158,16 +158,15 @@ bool FlarialGUI::RoundedRadioButton(float x, float y, const D2D_COLOR_F color, c
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
     ID2D1SolidColorBrush* brush = nullptr;
-    D2D1_COLOR_F buttonColor = color;
-
+    D2D1_COLOR_F buttonColor;
 
     if(radioNum != currentNum) {
-        FadeEffect::ApplyFadeInEffect(0.03 * FlarialGUI::frameFactor, 1, opacityAmounts[x / y]);
-        buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[x / y]);
+        FadeEffect::ApplyFadeInEffect(0.03 * FlarialGUI::frameFactor, 1, opacityAmounts[index]);
+        buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[index]);
     }
     else {
-        FadeEffect::ApplyFadeOutEffect(0.03 * FlarialGUI::frameFactor, opacityAmounts[x / y]);
-        buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[x / y]);
+        FadeEffect::ApplyFadeOutEffect(0.03 * FlarialGUI::frameFactor, opacityAmounts[index]);
+        buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[index]);
     }
 
 
@@ -202,6 +201,19 @@ void FlarialGUI::RoundedRect(float x, float y, const D2D_COLOR_F color, const fl
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
 
     D2D::context->FillRoundedRectangle(roundedRect, brush);
+    brush->Release();
+}
+
+void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2D_COLOR_F color, const float width, const float height, float radiusX, float radiusY)
+{
+    if (isInScrollView)
+        y += scrollpos;
+
+    ID2D1SolidColorBrush *brush;
+    D2D::context->CreateSolidColorBrush(color, &brush);
+    D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
+
+    D2D::context->DrawRoundedRectangle(roundedRect, brush, borderWidth);
     brush->Release();
 }
 
@@ -275,19 +287,19 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
 }
 
 
-bool FlarialGUI::Toggle(float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F circleColor, bool isEnabled) {
+bool FlarialGUI::Toggle(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F circleColor, bool isEnabled) {
 
-    float rectWidth = Constraints::RelativeConstraint(0.062);
-    float rectHeight = Constraints::RelativeConstraint(0.03);
+    float rectWidth = Constraints::RelativeConstraint(0.062, "height", true);
+    float rectHeight = Constraints::RelativeConstraint(0.03, "height", true);
 
-    Vec2<float> round = Constraints::RoundingConstraint(18, 18);
+    Vec2<float> round = Constraints::RoundingConstraint(30, 30);
 
     FlarialGUI::RoundedRect(x, y, color, rectWidth, rectHeight, round.x, round.x);
 
     // the circle (I KNOW IM USING A RECT LOL)
 
-    float circleWidth = Constraints::RelativeConstraint(0.0202);
-    float circleHeight = Constraints::RelativeConstraint(0.02);
+    float circleWidth = Constraints::RelativeConstraint(0.0202, "height", true);
+    float circleHeight = Constraints::RelativeConstraint(0.02, "height", true);
 
 
     float ySpacing = Constraints::SpacingConstraint(0.2, circleHeight);
@@ -297,11 +309,11 @@ bool FlarialGUI::Toggle(float x, float y, const D2D1_COLOR_F color, const D2D1_C
     float enabledSpacing;
 
     if(isEnabled) {
-        FadeEffect::ApplyFadeInEffect(2.4 * FlarialGUI::frameFactor, Constraints::SpacingConstraint(1.6, circleWidth), FlarialGUI::toggleSpacings[x+y]);
-        enabledSpacing =  FlarialGUI::toggleSpacings[x+y];
+        FadeEffect::ApplyFadeInEffect(2.4 * FlarialGUI::frameFactor, Constraints::SpacingConstraint(1.6, circleWidth), FlarialGUI::toggleSpacings[index]);
+        enabledSpacing =  FlarialGUI::toggleSpacings[index];
     } else {
-        FadeEffect::ApplyFadeOutEffect(2.4 * FlarialGUI::frameFactor, FlarialGUI::toggleSpacings[x+y]);
-        enabledSpacing =  FlarialGUI::toggleSpacings[x+y];
+        FadeEffect::ApplyFadeOutEffect(2.4 * FlarialGUI::frameFactor, FlarialGUI::toggleSpacings[index]);
+        enabledSpacing =  FlarialGUI::toggleSpacings[index];
     }
 
     FlarialGUI::RoundedRect(x + xSpacing + enabledSpacing, y + ySpacing, circleColor, circleWidth, circleHeight, round.x, round.x);
@@ -412,18 +424,18 @@ std::string FlarialGUI::TextBox(int index, float x, float y, float width, float 
     return FlarialGUI::TextBoxes[index].text;
 }
 
-float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor) {
+float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor, const float startingPoint) {
 
     // Define the total slider rect width and height
-    const float totalWidth = Constraints::RelativeConstraint(0.2);
-    const float height = Constraints::RelativeConstraint(0.015);
+    const float totalWidth = Constraints::RelativeConstraint(0.15, "height", true);
+    const float height = Constraints::RelativeConstraint(0.0065, "height", true);
 
     // Calculate the farLeftX and farRightX
     const float farLeftX = x;
     float farRightX = x + totalWidth;
 
     // Calculate the position of the circle in the middle of the slider rect
-    const float circleRadius = Constraints::RelativeConstraint(0.015);
+    const float circleRadius = Constraints::RelativeConstraint(0.008, "height", true);
 
     float circleX = x + totalWidth / 2.0f;
     float circleY = y + height / 2.0f;
@@ -440,12 +452,14 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
         circleX = (SliderRects[index].percentageX - minValue) * (rectangleWidth / (maxValue - minValue)) + rectangleLeft;
 
+    } else if (startingPoint != 50.0f && !SliderRects[index].hasBeenMoved) {
+        circleX = (startingPoint - minValue) * (rectangleWidth / (maxValue - minValue)) + rectangleLeft;
     }
 
     // Calculate the position and width of the enabled portion rect
     const float enabledWidth = circleX - farLeftX;
 
-    Vec2<float> round = Constraints::RoundingConstraint(9, 9);
+    Vec2<float> round = Constraints::RoundingConstraint(6, 6);
 
     // Draw the disabled portion rect
     RoundedRect(farLeftX, y, disabledColor, totalWidth, height, round.x,round.x);
@@ -458,8 +472,7 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
     // Calculate the percentage
     float percentage = ((circleX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
-
-    if(percentage > 0) percentage = 0;
+    SliderRects[index].percentageX = percentage;
 
     if (CursorInEllipse(circleX, circleY, circleRadius, circleRadius) && MC::held) {
         if(MC::mousepos.x > farLeftX && MC::mousepos.x < farRightX) {
@@ -494,6 +507,7 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
     if (MC::mousebutton == MouseButton::None && !MC::held || MC::mousebutton == MouseButton::Left && !MC::held)
     {
         SliderRects[index].isMovingElement = false;
+        percentage = SliderRects[index].percentageX;
     }
 
     return percentage;
@@ -547,7 +561,7 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
     x = x + (width - imageWidth) / 2.0f;
     imageY = imageY + (height - imageHeight) / 2.0f;
 
-    D2D1_RECT_F  imagerect = D2D1::RectF(x, imageY, x + imageWidth, imageY + imageHeight);
+    D2D1_RECT_F  imagerectf = D2D1::RectF(x, imageY, x + imageWidth, imageY + imageHeight);
 
     if (ImagesClass::eimages[imagePath] == nullptr) {
 
@@ -555,7 +569,22 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
         FlarialGUI::LoadImageFromFile(to_wide(among).c_str(), &ImagesClass::eimages[imagePath]);
 
     } else if (ImagesClass::eimages[imagePath] != nullptr) {
-        D2D::context->DrawBitmap(ImagesClass::eimages[imagePath], imagerect);
+
+        ID2D1Effect* affineTransformEffect = nullptr;
+        D2D::context->CreateEffect(CLSID_D2D12DAffineTransform, &affineTransformEffect);
+
+
+        affineTransformEffect->SetInput(0, ImagesClass::eimages[imagePath]);
+
+        D2D1_MATRIX_3X2_F matrix = D2D1::Matrix3x2F(0.9f, -0.1f, 0.1f, 0.9f, 8.0f, 45.0f);
+        affineTransformEffect->SetValue(D2D1_2DAFFINETRANSFORM_PROP_TRANSFORM_MATRIX, matrix);
+
+        ID2D1Image* image;
+        affineTransformEffect->GetOutput(&image);
+
+        D2D::context->DrawBitmap(ImagesClass::eimages[imagePath], imagerectf, 1.0, D2D1_INTERPOLATION_MODE_ANISOTROPIC);
+        affineTransformEffect->Release();
+        image->Release();
     }
 
     /*
@@ -575,8 +604,37 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
     writeFactory->Release();*/
 }
 
+D2D1::ColorF FlarialGUI::HexToColorF(uint32_t hex)
+{
+    // Extract the individual color components from the hex value
+    uint8_t red = (hex >> 16) & 0xFF;
+    uint8_t green = (hex >> 8) & 0xFF;
+    uint8_t blue = hex & 0xFF;
 
-void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F color, const float width, const float height)
+    // Normalize the color components to the range [0.0, 1.0]
+    float normalizedRed = static_cast<float>(red) / 255.0f;
+    float normalizedGreen = static_cast<float>(green) / 255.0f;
+    float normalizedBlue = static_cast<float>(blue) / 255.0f;
+
+    // Return the D2D1::ColorF struct
+    return {normalizedRed, normalizedGreen, normalizedBlue};
+}
+
+uint32_t FlarialGUI::ColorFToHex(const D2D1::ColorF& color)
+{
+    // Convert the color components from the range [0.0, 1.0] to [0, 255]
+    auto red = static_cast<uint8_t>(std::round(color.r * 255));
+    auto green = static_cast<uint8_t>(std::round(color.g * 255));
+    auto blue = static_cast<uint8_t>(std::round(color.b * 255));
+
+    // Combine the color components into a 32-bit unsigned integer
+    uint32_t hex = (red << 16) | (green << 8) | blue;
+
+    return hex;
+}
+
+
+void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F color, const float width, const float height, const DWRITE_TEXT_ALIGNMENT alignment)
 {
 
     if (isInScrollView)
@@ -588,7 +646,7 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
     IDWriteTextFormat *textFormat;
     writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width, height), L"", &textFormat);
-    textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+    textFormat->SetTextAlignment(alignment);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
     D2D1_RECT_F textRect = D2D1::RectF(x + height + 10, y, x + width, y + height);

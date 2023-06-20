@@ -52,8 +52,8 @@ namespace FlarialGUI
 {
     std::stack<Dimension> inline dimension_stack;
     std::vector<float> inline darkenAmounts(10000);
-    std::vector<float> inline opacityAmounts(10000);
-    std::vector<float> inline toggleSpacings(10000);
+    std::vector<float> inline opacityAmounts(20);
+    std::vector<float> inline toggleSpacings(20);
     float inline frameFactor = 1;
 
     inline bool isInScrollView = false;
@@ -81,7 +81,7 @@ namespace FlarialGUI
     void RoundedRectWithImageAndText(const float x, float y, const float width, const float height, const D2D1_COLOR_F color, const std::string imagePath, const float imageWidth, const float imageHeight, const wchar_t *text);
     std::wstring to_wide(const std::string &multi);
     void Image(const std::string imageName, const D2D1_RECT_F rect);
-    void FlarialText(const float x, float y, const wchar_t *text, D2D1_COLOR_F color, const float width, const float height);
+    void FlarialText(const float x, float y, const wchar_t *text, D2D1_COLOR_F color, const float width, const float height, DWRITE_TEXT_ALIGNMENT alignment = DWRITE_TEXT_ALIGNMENT_CENTER);
     void SetScrollView(float x, float y, float width, float height);
     void UnsetScrollView();
     Vec2<float> GetCenterXY(float rectWidth = 160.0f, float rectHeight = 75.0f);
@@ -92,7 +92,7 @@ namespace FlarialGUI
     Vec2<float> CalculateResizedXY(float x, float y, float width, float height);
     void UpdateWindowRects();
 
-    bool RoundedRadioButton(float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text,
+    bool RoundedRadioButton(int index, float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text,
                             const float width, const float height, float radiusX, float radiusY, const std::string& radioName, const std::string& currentRadio);
 
     void ApplyGaussianBlur(float blurIntensity);
@@ -100,10 +100,10 @@ namespace FlarialGUI
 
     void CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to);
 
-    bool Toggle(float x, float y, D2D1_COLOR_F color, D2D1_COLOR_F circleColor, bool isEnabled);
+    bool Toggle(int index, float x, float y, D2D1_COLOR_F color, D2D1_COLOR_F circleColor, bool isEnabled);
 
     float Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor,
-           const D2D1_COLOR_F circleColor);
+           const D2D1_COLOR_F circleColor, const float startingPoint = 50.0f);
 
     void Circle(float x, float y, const D2D1_COLOR_F &color, float radius);
 
@@ -116,4 +116,12 @@ namespace FlarialGUI
     void HSLToRGB(float h, float s, float l, float &r, float &g, float &b);
 
     bool CursorInRect(float rectX, float rectY, float width, float height);
+
+    D2D1::ColorF HexToColorF(uint32_t hex);
+
+    uint32_t ColorFToHex(const D2D1::ColorF &color);
+
+    void
+    RoundedHollowRect(float x, float y, float borderWidth, const D2D_COLOR_F color, const float width, const float height, float radiusX,
+                      float radiusY);
 };
