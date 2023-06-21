@@ -7,7 +7,7 @@ public:
     static void ApplyFadeInEffect(float darkenModifier, float maxDarkenAmount, float& darkenAmount)
     {
 
-        if (darkenAmount < maxDarkenAmount) darkenAmount += darkenModifier;
+        if (darkenAmount + darkenModifier < maxDarkenAmount) darkenAmount += darkenModifier;
     }
     static void ApplyFadeOutEffect(float darkenModifier, float& darkenAmount, float leastAmount = 0.0)
     {
