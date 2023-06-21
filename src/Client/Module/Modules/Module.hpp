@@ -119,7 +119,7 @@ public:
         float rectWidth = Constraints::RelativeConstraint(0.225);
         Vec2<float> rounde = Constraints::RoundingConstraint(40, 40);
 
-        float realspacing = Constraints::SpacingConstraint(0.33, textWidth);
+        float realspacing = Constraints::SpacingConstraint(0.33f, textWidth);
 
         FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, 0);
 

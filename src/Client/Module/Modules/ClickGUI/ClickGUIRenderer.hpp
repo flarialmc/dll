@@ -20,12 +20,21 @@ struct PageType {
 
 class ClickGUIRenderer : public Listener {
 
+    template <typename T>
+    void lerp(T& a, const T& b, float t)
+    {
+        // Perform linear interpolation between a and b based on t
+        a = a + (b - a) * t;
+    }
+
     Module* module;
     std::string curr;
     bool TestToggle = false;
-    float baseHeightReal = 0.64;
+    float baseHeightReal = 0.64f;
 
     void onRender(RenderEvent &event) override {
+
+
 
         if(module->enabled && SwapchainHook::init) {
 
@@ -35,9 +44,11 @@ class ClickGUIRenderer : public Listener {
             float baseWidth = Constraints::RelativeConstraint(0.85);
 
             if(ClickGUIRenderer::page.type == "settings") {
-                FadeEffect::ApplyFadeOutEffect(0.015 * FlarialGUI::frameFactor, baseHeightReal, 0.35);
+                lerp(baseHeightReal, 0.35f, 0.1f);
+                //FadeEffect::ApplyFadeOutEffect(0.015f * FlarialGUI::frameFactor, baseHeightReal, 0.35f);
             } else {
-                FadeEffect::ApplyFadeInEffect(0.015 * FlarialGUI::frameFactor, 0.64, baseHeightReal);
+                lerp(baseHeightReal, 0.64f, 0.1f);
+                //FadeEffect::ApplyFadeInEffect(0.015f * FlarialGUI::frameFactor, 0.64f, baseHeightReal);
             }
 
             float baseHeight = Constraints::RelativeConstraint(baseHeightReal);
@@ -46,7 +57,7 @@ class ClickGUIRenderer : public Listener {
             Vec2<float> round = Constraints::RoundingConstraint(50, 50);
 
             FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), baseWidth, baseHeight, round.x, round.x);
-            FlarialGUI::PushSize(center.x, center.y, baseWidth, Constraints::RelativeConstraint(0.64));
+            FlarialGUI::PushSize(center.x, center.y, baseWidth, Constraints::RelativeConstraint(0.64f));
 
             /* Base Rectangle End */
 
@@ -97,38 +108,38 @@ class ClickGUIRenderer : public Listener {
 
 
 
-            logoWidth = Constraints::RelativeConstraint(0.21);
+            logoWidth = Constraints::RelativeConstraint(0.21f);
 
-            radioX -= Constraints::SpacingConstraint(-0.53, logoWidth);
-            radioY -= Constraints::SpacingConstraint(-0.53, logoWidth);
+            radioX -= Constraints::SpacingConstraint(-0.53f, logoWidth);
+            radioY -= Constraints::SpacingConstraint(-0.53f, logoWidth);
 
-            float shit = Constraints::RelativeConstraint(0.33);
+            float shit = Constraints::RelativeConstraint(0.33f);
             round = Constraints::RoundingConstraint(15, 15);
 
-            FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15, logoWidth), radioY + Constraints::SpacingConstraint(-0.12, logoWidth), D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f), shit, shit, round.x, round.x);
+            FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15f, logoWidth), radioY + Constraints::SpacingConstraint(-0.12f, logoWidth), D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f), shit, shit, round.x, round.x);
 
-            radioX -= Constraints::SpacingConstraint(-0.125, logoWidth);
-            radioY -= Constraints::SpacingConstraint(-0.15, logoWidth);
+            radioX -= Constraints::SpacingConstraint(-0.125f, logoWidth);
+            radioY -= Constraints::SpacingConstraint(-0.15f, logoWidth);
             FlarialGUI::Image("\\Flarial\\assets\\modules.png", D2D1::RectF(radioX , radioY, radioX + logoWidth, radioY + logoWidth));
 
 
 
-            radioX = navx - Constraints::SpacingConstraint(-0.85, logoWidth);
+            radioX = navx - Constraints::SpacingConstraint(-0.85f, logoWidth);
             radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
 
             round = Constraints::RoundingConstraint(30, 30);
-            radioX += Constraints::SpacingConstraint(15, logoWidth);
+            radioX += Constraints::SpacingConstraint(15.f, logoWidth);
             if(FlarialGUI::RoundedRadioButton(0, radioX, radioY, D2D1::ColorF(255.0f/255.0f, 36.0f/255.0f, 56.0f/255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Settings", RadioButtonWidth, RadioButtonHeight, round.x, round.x, "settings", this->curr)) this->curr = "settings";;
 
-            radioX -= Constraints::SpacingConstraint(-0.53, logoWidth);
-            radioY -= Constraints::SpacingConstraint(-0.53, logoWidth);
+            radioX -= Constraints::SpacingConstraint(-0.53f, logoWidth);
+            radioY -= Constraints::SpacingConstraint(-0.53f, logoWidth);
 
             round = Constraints::RoundingConstraint(15, 15);
 
-            FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15, logoWidth), radioY + Constraints::SpacingConstraint(-0.12, logoWidth), D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f), shit, shit, round.x, round.x);
+            FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15f, logoWidth), radioY + Constraints::SpacingConstraint(-0.12f, logoWidth), D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f), shit, shit, round.x, round.x);
 
-            radioX -= Constraints::SpacingConstraint(-0.125, logoWidth);
-            radioY -= Constraints::SpacingConstraint(-0.15, logoWidth);
+            radioX -= Constraints::SpacingConstraint(-0.125f, logoWidth);
+            radioY -= Constraints::SpacingConstraint(-0.15f, logoWidth);
             FlarialGUI::Image("\\Flarial\\assets\\gear.png", D2D1::RectF(radioX , radioY, radioX + logoWidth, radioY + logoWidth));
 
             /* tab buttons end */
@@ -220,11 +231,11 @@ class ClickGUIRenderer : public Listener {
                     FlarialGUI::RoundedRect(rectX, rectY, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), anotherRectWidth, anotherRectHeight, round.x, round.x);
 
                     round = Constraints::RoundingConstraint(45, 45);
-                    FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.007, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectWidth, rectHeight, round.x, round.x);
+                    FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectWidth, rectHeight, round.x, round.x);
 
                     FlarialGUI::PopSize();
 
-                    FlarialGUI::PushSize(rectX, rectY, anotherRectWidth, anotherRectHeight);
+                    FlarialGUI::PushSize(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
 
                     ModuleManager::getModule(ClickGUIRenderer::page.module)->SettingsRender();
 

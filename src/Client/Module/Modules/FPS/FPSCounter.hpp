@@ -41,8 +41,8 @@ public:
 
     void SettingsRender() override {
 
-        float toggleX = Constraints::PercentageConstraint(0.02, "left");
-        float toggleY = Constraints::PercentageConstraint(0.05, "top");
+        float toggleX = Constraints::PercentageConstraint(0.019, "left");
+        float toggleY = Constraints::PercentageConstraint(0.12, "top");
 
         D2D1_COLOR_F color = D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f);
 
@@ -52,8 +52,14 @@ public:
 
         if(FlarialGUI::Toggle(0, toggleX, toggleY, color, D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("border")->value)) this->settings.getSettingByName<bool>("border")->value = !this->settings.getSettingByName<bool>("border")->value;
 
-        float percent = FlarialGUI::Slider(1, toggleX,
-                           toggleY + Constraints::SpacingConstraint(0.35, Constraints::RelativeConstraint(0.6)),
+        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
+
+        FlarialGUI::FlarialText(toggleX + Constraints::SpacingConstraint(0.39, textWidth / 2.0f), toggleY, L"Border", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
+
+
+        float percent = FlarialGUI::Slider(1, toggleX + Constraints::SpacingConstraint(1.2, textWidth) ,
+                           toggleY,
                            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
                            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
                            D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("borderWidth")->value);

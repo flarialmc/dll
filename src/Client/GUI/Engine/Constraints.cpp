@@ -137,13 +137,13 @@ Vec2<float> Constraints::RoundingConstraint(float radiusX, float radiusY, bool i
     return {scaledRadiusX, scaledRadiusY};
 }
 
-float Constraints::FontScaler(float width, float height) {
+float Constraints::FontScaler(float dimension) {
 
     // Define the initial font size
     float initialFontSize = 14.0f;
 
 // Calculate the scaling factor based on the new window dimensions
-    float scalingFactor = width / 95;
+    float scalingFactor = dimension / 95.0f;
 
 // Calculate the new font size
     return initialFontSize * scalingFactor;

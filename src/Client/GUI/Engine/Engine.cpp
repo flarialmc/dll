@@ -102,7 +102,7 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     D2D::context->CreateSolidColorBrush(textColor, &textBrush);
 
     static IDWriteTextFormat* textFormat;
-    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width, height), L"en-US", &textFormat);
+    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width), L"en-US", &textFormat);
     textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
@@ -112,10 +112,10 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     if (CursorInRect(x, y, width, height))
     {
         buttonColor = D2D1::ColorF(color.r - darkenAmounts[x + y], color.g - darkenAmounts[x + y], color.b - darkenAmounts[x + y], color.a);
-        FadeEffect::ApplyFadeInEffect(0.005 * FlarialGUI::frameFactor, maxDarkenAmount, darkenAmounts[x+y]);
+        FadeEffect::ApplyFadeInEffect(0.005f * FlarialGUI::frameFactor, maxDarkenAmount, darkenAmounts[x+y]);
     } else {
         buttonColor = D2D1::ColorF(color.r - darkenAmounts[x + y], color.g - darkenAmounts[x + y], color.b - darkenAmounts[x + y], color.a);
-        FadeEffect::ApplyFadeOutEffect(0.005 * FlarialGUI::frameFactor, darkenAmounts[x + y]);
+        FadeEffect::ApplyFadeOutEffect(0.005f * FlarialGUI::frameFactor, darkenAmounts[x + y]);
 
     }
 
@@ -153,7 +153,7 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
     D2D::context->CreateSolidColorBrush(textColor, &textBrush);
 
     static IDWriteTextFormat* textFormat;
-    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width * 0.64, height * 0.64), L"en-US", &textFormat);
+    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width * 0.64f), L"en-US", &textFormat);
     textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
@@ -161,11 +161,11 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
     D2D1_COLOR_F buttonColor;
 
     if(radioNum != currentNum) {
-        FadeEffect::ApplyFadeInEffect(0.03 * FlarialGUI::frameFactor, 1, opacityAmounts[index]);
+        FadeEffect::ApplyFadeInEffect(0.03f * FlarialGUI::frameFactor, 1, opacityAmounts[index]);
         buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[index]);
     }
     else {
-        FadeEffect::ApplyFadeOutEffect(0.03 * FlarialGUI::frameFactor, opacityAmounts[index]);
+        FadeEffect::ApplyFadeOutEffect(0.03f * FlarialGUI::frameFactor, opacityAmounts[index]);
         buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[index]);
     }
 
@@ -430,6 +430,19 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
     const float totalWidth = Constraints::RelativeConstraint(0.15, "height", true);
     const float height = Constraints::RelativeConstraint(0.0065, "height", true);
 
+    Vec2<float> round = Constraints::RoundingConstraint(12, 12);
+
+    const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+    const float percWidth = Constraints::RelativeConstraint(0.046, "height", true);
+    const float percHeight = Constraints::RelativeConstraint(0.029, "height", true);
+
+    FlarialGUI::RoundedRect(x, y, disabledColor, percWidth, percHeight, round.x, round.x);
+
+    FlarialGUI::FlarialText(x - Constraints::SpacingConstraint(0.95, textWidth / 2.0f), y, to_wide(std::to_string((int)startingPoint)).c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
+
+    x += Constraints::SpacingConstraint(1.2, percWidth);
+    y += Constraints::SpacingConstraint(0.8, percHeight / 2.0f);
+
     // Calculate the farLeftX and farRightX
     const float farLeftX = x;
     float farRightX = x + totalWidth;
@@ -459,7 +472,7 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
     // Calculate the position and width of the enabled portion rect
     const float enabledWidth = circleX - farLeftX;
 
-    Vec2<float> round = Constraints::RoundingConstraint(6, 6);
+    round = Constraints::RoundingConstraint(6, 6);
 
     // Draw the disabled portion rect
     RoundedRect(farLeftX, y, disabledColor, totalWidth, height, round.x,round.x);
@@ -645,7 +658,7 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F
     IDWriteFactory *writeFactory;
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
     IDWriteTextFormat *textFormat;
-    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width, height), L"", &textFormat);
+    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width), L"", &textFormat);
     textFormat->SetTextAlignment(alignment);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
