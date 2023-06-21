@@ -43,7 +43,7 @@ class ClickGUIRenderer : public Listener {
 
             float baseWidth = Constraints::RelativeConstraint(0.85);
 
-            if(ClickGUIRenderer::page.type == "settings") {
+            if(ClickGUIRenderer::page.type == "settings" || curr == "settings") {
                 lerp(baseHeightReal, 0.35f, 0.1f);
                 //FadeEffect::ApplyFadeOutEffect(0.015f * FlarialGUI::frameFactor, baseHeightReal, 0.35f);
             } else {
@@ -188,28 +188,24 @@ class ClickGUIRenderer : public Listener {
                         FlarialGUI::UnsetScrollView();
                     } else if (e == "settings") {
 
-                        D2D1_COLOR_F color = D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f);
+                        FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
 
-                        if (!this->TestToggle) {
-                            color = D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f);
-                        }
+                        float rectX = Constraints::PercentageConstraint(0.01, "left");
+                        float rectY = Constraints::PercentageConstraint(0.32, "top");
+                        float rectWidth = Constraints::RelativeConstraint(0.965, "width");
+                        float rectHeight = Constraints::RelativeConstraint(0.55);
+                        round = Constraints::RoundingConstraint(50, 50);
 
-                        if (FlarialGUI::Toggle(1, Constraints::PercentageConstraint(0.2, "left"),
-                                               Constraints::PercentageConstraint(0.3, "top"), color,
-                                               D2D1::ColorF(D2D1::ColorF::White), this->TestToggle))
-                            this->TestToggle = !this->TestToggle;
+                        float anotherRectHeight = Constraints::RelativeConstraint(0.60);
+                        float anotherRectWidth = Constraints::RelativeConstraint(0.981, "width");
 
+                        FlarialGUI::RoundedRect(rectX, rectY, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), anotherRectWidth, anotherRectHeight, round.x, round.x);
 
-                        FlarialGUI::Slider(0, Constraints::PercentageConstraint(0.5, "left"),
-                                           Constraints::PercentageConstraint(0.5, "top"),
-                                           D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
-                                           D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
-                                           D2D1::ColorF(D2D1::ColorF::White));
+                        round = Constraints::RoundingConstraint(45, 45);
+                        FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectWidth, rectHeight, round.x, round.x);
 
+                        FlarialGUI::PopSize();
 
-                        //FlarialGUI::TextBox(0, 150, 150, 150, 150);
-
-                        //FlarialGUI::ColorWheel(300, 300, 100);
                     }
 
                     /* Mod Card End */
