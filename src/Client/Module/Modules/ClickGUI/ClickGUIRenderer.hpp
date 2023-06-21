@@ -24,7 +24,13 @@ class ClickGUIRenderer : public Listener {
     void lerp(T& a, const T& b, float t)
     {
         // Perform linear interpolation between a and b based on t
-        a = a + (b - a) * t;
+        float interpolatedValue = a + (b - a) * t;
+
+        // Round up the interpolated value to three decimal places
+        float roundedValue = std::ceilf(interpolatedValue * 1000.0f) / 1000.0f;
+
+        // Assign the rounded value back to 'a'
+        a = roundedValue;
     }
 
     Module* module;
@@ -44,10 +50,11 @@ class ClickGUIRenderer : public Listener {
             float baseWidth = Constraints::RelativeConstraint(0.85);
 
             if(ClickGUIRenderer::page.type == "settings" || curr == "settings") {
-                lerp(baseHeightReal, 0.35f, 0.1f);
+
+                lerp(baseHeightReal, 0.35f, 0.10f * FlarialGUI::frameFactor);
                 //FadeEffect::ApplyFadeOutEffect(0.015f * FlarialGUI::frameFactor, baseHeightReal, 0.35f);
             } else {
-                lerp(baseHeightReal, 0.64f, 0.1f);
+                lerp(baseHeightReal, 0.64f, 0.10f * FlarialGUI::frameFactor);
                 //FadeEffect::ApplyFadeInEffect(0.015f * FlarialGUI::frameFactor, 0.64f, baseHeightReal);
             }
 

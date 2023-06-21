@@ -48,6 +48,7 @@ public:
         float toggleX = Constraints::PercentageConstraint(0.019, "left");
         float toggleY = Constraints::PercentageConstraint(0.12, "top");
 
+
         D2D1_COLOR_F color = D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f);
 
         if (!this->settings.getSettingByName<bool>("border")->value) {
