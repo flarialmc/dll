@@ -117,7 +117,7 @@ public:
             realcenter = Constraints::CenterConstraint(textWidth, textHeight);
 
         float rectWidth = Constraints::RelativeConstraint(0.225);
-        Vec2<float> rounde = Constraints::RoundingConstraint(40, 40);
+        Vec2<float> rounde = Constraints::RoundingConstraint(this->settings.getSettingByName<float>("rounding")->value, this->settings.getSettingByName<float>("rounding")->value);
 
         float realspacing = Constraints::SpacingConstraint(0.33f, textWidth);
 

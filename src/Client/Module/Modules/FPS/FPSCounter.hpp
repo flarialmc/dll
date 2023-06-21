@@ -28,6 +28,8 @@ public:
             settings.addSetting("borderWidth", 5.0f);
         }
 
+        if(settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 40.0f);
+
         EventHandler::registerListener(new FPSListener("FPS", this));
     }
 
@@ -40,6 +42,8 @@ public:
     }
 
     void SettingsRender() override {
+
+        /* Border Start */
 
         float toggleX = Constraints::PercentageConstraint(0.019, "left");
         float toggleY = Constraints::PercentageConstraint(0.12, "top");
@@ -65,6 +69,23 @@ public:
                            D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("borderWidth")->value);
 
         this->settings.getSettingByName<float>("borderWidth")->value = percent;
+
+        /* Border End */
+
+        /* Rounding Start */
+
+        toggleX -= Constraints::SpacingConstraint(0.25, textWidth);
+        FlarialGUI::FlarialText(toggleX , toggleY + Constraints::SpacingConstraint(0.35, textWidth), L"Rounding", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
+
+        percent = FlarialGUI::Slider(2, toggleX + Constraints::SpacingConstraint(1, textWidth),
+                                           toggleY + Constraints::SpacingConstraint(0.35, textWidth),
+                                           D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                           D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+                                           D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("rounding")->value);
+
+        this->settings.getSettingByName<float>("rounding")->value = percent;
+
+        /* Rounding End */
 
     }
 };
