@@ -74,10 +74,10 @@ public:
 
         /* Rounding Start */
 
-        toggleX -= Constraints::SpacingConstraint(0.25, textWidth);
-        FlarialGUI::FlarialText(toggleX , toggleY + Constraints::SpacingConstraint(0.35, textWidth), L"Rounding", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
+        toggleX -= Constraints::SpacingConstraint(0.325, textWidth);
+        FlarialGUI::FlarialText(toggleX , toggleY + Constraints::SpacingConstraint(0.35, textWidth), L"Rounding", D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.05f, textHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
 
-        percent = FlarialGUI::Slider(2, toggleX + Constraints::SpacingConstraint(1, textWidth),
+        percent = FlarialGUI::Slider(2, toggleX + Constraints::SpacingConstraint(1.15, textWidth),
                                            toggleY + Constraints::SpacingConstraint(0.35, textWidth),
                                            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
                                            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),

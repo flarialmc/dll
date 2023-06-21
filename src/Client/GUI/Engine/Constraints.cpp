@@ -143,7 +143,7 @@ float Constraints::FontScaler(float dimension) {
     float initialFontSize = 14.0f;
 
 // Calculate the scaling factor based on the new window dimensions
-    float scalingFactor = dimension / 95.0f;
+    float scalingFactor = dimension / 100.0f;
 
 // Calculate the new font size
     return initialFontSize * scalingFactor;
