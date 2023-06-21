@@ -53,6 +53,8 @@ BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReser
     case DLL_PROCESS_ATTACH:
         CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)init, instance, 0, nullptr);
         break;
+    case DLL_PROCESS_DETACH:
+        ModuleManager::terminate();
     }
 
     return TRUE;

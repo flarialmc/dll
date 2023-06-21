@@ -41,7 +41,7 @@ float Constraints::PercentageConstraint(float percentage, const std::string& edg
         position += x;
     }
 
-    return position;
+    return std::ceilf(position * 10000.0f) / 10000.0f;
 }
 
 float Constraints::RelativeConstraint(float percent, const std::string& dimension, bool ignore_stack)

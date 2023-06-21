@@ -27,7 +27,7 @@ class ClickGUIRenderer : public Listener {
         float interpolatedValue = a + (b - a) * t;
 
         // Round up the interpolated value to three decimal places
-        float roundedValue = std::ceilf(interpolatedValue * 1000.0f) / 1000.0f;
+        float roundedValue = interpolatedValue;
 
         // Assign the rounded value back to 'a'
         a = roundedValue;
@@ -51,10 +51,10 @@ class ClickGUIRenderer : public Listener {
 
             if(ClickGUIRenderer::page.type == "settings" || curr == "settings") {
 
-                lerp(baseHeightReal, 0.35f, 0.10f * FlarialGUI::frameFactor);
+                lerp(baseHeightReal, 0.35f, 0.15f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
                 //FadeEffect::ApplyFadeOutEffect(0.015f * FlarialGUI::frameFactor, baseHeightReal, 0.35f);
             } else {
-                lerp(baseHeightReal, 0.64f, 0.10f * FlarialGUI::frameFactor);
+                lerp(baseHeightReal, 0.64f, 0.15f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
                 //FadeEffect::ApplyFadeInEffect(0.015f * FlarialGUI::frameFactor, 0.64f, baseHeightReal);
             }
 
