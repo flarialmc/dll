@@ -42,7 +42,7 @@ class ClickGUIRenderer : public Listener {
 
 
 
-        if(module->enabled && SwapchainHook::init) {
+        if(module->settings.getSettingByName<bool>("enabled")->value && SwapchainHook::init) {
 
             /* Base Rectangle Start */
             FlarialGUI::ApplyGaussianBlur(6.0);
@@ -254,7 +254,7 @@ class ClickGUIRenderer : public Listener {
 
     void onKey(KeyEvent &event) override {
 
-        if(event.GetKey() == module->keybind && static_cast<ActionType>(event.GetAction()) == ActionType::PRESSED) module->enabled = !module->enabled;
+        if(event.GetKey() == module->keybind && static_cast<ActionType>(event.GetAction()) == ActionType::PRESSED) module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value;
     }
 
 public:

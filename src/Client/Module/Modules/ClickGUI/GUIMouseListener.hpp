@@ -25,7 +25,7 @@ class GUIMouseListener : public Listener {
             FlarialGUI::barscrollpos += (event.GetAction() == MouseAction::SCROLL_UP) ? FlarialGUI::barscrollposmodifier : -FlarialGUI::barscrollposmodifier;
         }
 
-        if(ModuleManager::getModule("ClickGUI")->enabled) event.setCancelled(true);
+        if(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) event.setCancelled(true);
 
     };
 

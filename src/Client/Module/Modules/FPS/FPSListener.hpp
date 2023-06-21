@@ -13,12 +13,12 @@ class FPSListener : public Listener {
 
     void onKey(KeyEvent &event) override {
 
-        if(event.GetKey() == this->module->keybind) { this->module->enabled = !this->module->enabled; }
+        if(event.GetKey() == this->module->keybind) { module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value; }
     };
 
     void onRender(RenderEvent &event) override {
 
-        if(this->module->enabled){
+        if(module->settings.getSettingByName<bool>("enabled")->value){
 
             this->module->NormalRender();
 

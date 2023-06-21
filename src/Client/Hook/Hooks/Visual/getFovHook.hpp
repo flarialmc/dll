@@ -18,7 +18,7 @@ private:
 		if (ModuleManager::getModule("Zoom") != nullptr) {
 			auto zom = reinterpret_cast<Zoom*>(ModuleManager::getModule("Zoom"));
 
-			if (zom->enabled) {
+			if (zom->settings.getSettingByName<bool>("enabled")->value) {
 				animValue = min(animValue + (f * 0.1f), 1.0f);
 			}
 			else {

@@ -25,6 +25,8 @@ public:
 
     void onDisable() override {
 
+        this->settings.getSettingByName<bool>("enabled")->value = false;
+
         Module::onDisable();
 
         EventHandler::unregisterListener("ClickGUI");

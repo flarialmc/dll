@@ -11,7 +11,7 @@ class ZoomListener : public Listener {
 
     void onKey(KeyEvent &event) override {
 
-        if(event.GetKey() == module->keybind) module->enabled = !module->enabled;
+        if(event.GetKey() == module->keybind) module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value;
     };
 
 public:

@@ -32,6 +32,12 @@ public:
 
         CheckSettingsFile();
         LoadSettings();
+
+        if(settings.getSettingByName<bool>("enabled") == nullptr) {
+            settings.addSetting("enabled", false);
+        }
+
+        enabled = settings.getSettingByName<bool>("enabled");
     }
 public:
     bool enabled = false;
