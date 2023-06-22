@@ -964,7 +964,7 @@ static void FlarialGUI::lerp(T& a, const T& b, float t)
     float interpolatedValue = a + (b - a) * t;
 
     // Round up the interpolated value to three decimal places
-    float roundedValue = interpolatedValue;
+    float roundedValue = std::ceilf(interpolatedValue * 1000.0f) / 1000.0f;
 
     // Assign the rounded value back to 'a'
     a = roundedValue;

@@ -49,10 +49,10 @@ class ClickGUIRenderer : public Listener {
 
             if(ClickGUIRenderer::page.type == "settings" || curr == "settings") {
 
-                lerp(baseHeightReal, 0.35f, 0.152f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+                lerp(baseHeightReal, 0.35f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
                 //FadeEffect::ApplyFadeOutEffect(0.015f * FlarialGUI::frameFactor, baseHeightReal, 0.35f);
             } else {
-                lerp(baseHeightReal, 0.64f, 0.152f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
+                lerp(baseHeightReal, 0.64f, 0.28f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
                 //FadeEffect::ApplyFadeInEffect(0.015f * FlarialGUI::frameFactor, 0.64f, baseHeightReal);
             }
 
@@ -257,6 +257,10 @@ class ClickGUIRenderer : public Listener {
     void onKey(KeyEvent &event) override {
 
         if(event.GetKey() == module->keybind && static_cast<ActionType>(event.GetAction()) == ActionType::PRESSED) module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value;
+
+        if(module->settings.getSettingByName<bool>("enabled")->value) event.setCancelled(true);
+
+        if(event.GetKey() == VK_ESCAPE) module->settings.getSettingByName<bool>("enabled")->value = false;
     }
 
 public:
