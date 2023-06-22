@@ -58,7 +58,7 @@ namespace FlarialGUI
 
     inline bool isInScrollView = false;
     float inline scrollpos = 0;
-    float inline scrollposmodifier = 65.5f;
+    float inline scrollposmodifier = 0.f;
     float inline barscrollpos = 0;
     float inline barscrollposmodifier = 10.0f;
     inline WindowRect WindowRects[10];

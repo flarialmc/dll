@@ -40,9 +40,6 @@ class ClickGUIRenderer : public Listener {
 
     void onRender(RenderEvent &event) override {
 
-
-
-
         if(module->settings.getSettingByName<bool>("enabled")->value && SwapchainHook::init) {
 
             /* Base Rectangle Start */
@@ -66,6 +63,10 @@ class ClickGUIRenderer : public Listener {
 
             FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), baseWidth, baseHeight, round.x, round.x);
             FlarialGUI::PushSize(center.x, center.y, baseWidth, Constraints::RelativeConstraint(0.64f));
+
+            if(FlarialGUI::scrollposmodifier == 0) {
+                FlarialGUI::scrollposmodifier = Constraints::RelativeConstraint(0.1f);
+            }
 
             /* Base Rectangle End */
 
