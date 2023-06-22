@@ -42,6 +42,7 @@ class ClickGUIRenderer : public Listener {
 
 
 
+
         if(module->settings.getSettingByName<bool>("enabled")->value && SwapchainHook::init) {
 
             /* Base Rectangle Start */
@@ -51,10 +52,10 @@ class ClickGUIRenderer : public Listener {
 
             if(ClickGUIRenderer::page.type == "settings" || curr == "settings") {
 
-                lerp(baseHeightReal, 0.35f, 0.15f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+                lerp(baseHeightReal, 0.35f, 0.152f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
                 //FadeEffect::ApplyFadeOutEffect(0.015f * FlarialGUI::frameFactor, baseHeightReal, 0.35f);
             } else {
-                lerp(baseHeightReal, 0.64f, 0.15f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
+                lerp(baseHeightReal, 0.64f, 0.152f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
                 //FadeEffect::ApplyFadeInEffect(0.015f * FlarialGUI::frameFactor, 0.64f, baseHeightReal);
             }
 

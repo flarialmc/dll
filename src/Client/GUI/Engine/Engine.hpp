@@ -58,9 +58,9 @@ namespace FlarialGUI
 
     inline bool isInScrollView = false;
     float inline scrollpos = 0;
-    float inline scrollposmodifier = 16.5f;
+    float inline scrollposmodifier = 65.5f;
     float inline barscrollpos = 0;
-    float inline barscrollposmodifier = 3.0f;
+    float inline barscrollposmodifier = 10.0f;
     inline WindowRect WindowRects[10];
     inline SliderRect SliderRects[10];
     inline TextBoxStruct TextBoxes[10];
@@ -124,4 +124,7 @@ namespace FlarialGUI
     void
     RoundedHollowRect(float x, float y, float borderWidth, const D2D_COLOR_F color, const float width, const float height, float radiusX,
                       float radiusY);
+
+    template <typename T>
+    void lerp(T &a, const T &b, float t);
 };

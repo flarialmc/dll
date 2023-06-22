@@ -3,6 +3,7 @@
 #include "../../Module/Modules/Module.hpp"
 #include "../../Hook/Hooks/Render/SwapchainHook.hpp"
 #include "animations/fadeinout.hpp"
+#include "../../Module/Modules/ClickGUI/GUIMouseListener.hpp"
 
 std::map<std::string, ID2D1Bitmap*> ImagesClass::eimages;
 
@@ -528,8 +529,9 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
 }
 
+
+
 void FlarialGUI::Circle(float x, float y, const D2D1_COLOR_F& color, float radius) {
-    // Assuming D2D::context is the ID2D1DeviceContext object
 
     // Create a brush using the specified color
     ID2D1SolidColorBrush* brush;
@@ -546,8 +548,6 @@ void FlarialGUI::Circle(float x, float y, const D2D1_COLOR_F& color, float radiu
 
     // Release the brush
     brush->Release();
-
-    // Rest of your code...
 }
 
 
@@ -723,6 +723,7 @@ void FlarialGUI::SetScrollView(float x, float y, float width, float height)
     FlarialGUI::isInScrollView = true;
     D2D1_RECT_F clipRect = D2D1::RectF(x, y, x + width, y + height);
     D2D::context->PushAxisAlignedClip(&clipRect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+
 }
 
 void FlarialGUI::UnsetScrollView()
@@ -736,21 +737,24 @@ void FlarialGUI::ScrollBar(float x, float y, float width, float height, float ra
 
     float whiteY;
 
-    if (y - barscrollpos < y + (height * 30.5 / 100))
-        whiteY = y - (barscrollpos);
+    if (y - GUIMouseListener::accumilatedBarPos < y + (height * 30.5 / 100))
+        whiteY = y - (GUIMouseListener::accumilatedBarPos);
     else
     {
         whiteY = y + (height * 30.5 / 100);
-        barscrollpos += barscrollposmodifier;
-        scrollpos += scrollposmodifier;
+        GUIMouseListener::accumilatedBarPos += barscrollposmodifier;
+        GUIMouseListener::accumilatedPos += scrollposmodifier;
     }
 
-    if (y + barscrollpos > y)
+    if (y + GUIMouseListener::accumilatedBarPos > y)
     {
         whiteY = y;
-        barscrollpos = 0;
-        scrollpos = 0;
+        GUIMouseListener::accumilatedBarPos = 0;
+        GUIMouseListener::accumilatedPos = 0;
     }
+
+    FlarialGUI::lerp(FlarialGUI::scrollpos, GUIMouseListener::accumilatedPos, 0.30f * FlarialGUI::frameFactor);
+    FlarialGUI::lerp(FlarialGUI::barscrollpos, GUIMouseListener::accumilatedBarPos, 0.30f * FlarialGUI::frameFactor);
 
     // Draw the gray bar
     ID2D1SolidColorBrush *graybrush;
@@ -934,4 +938,17 @@ std::wstring FlarialGUI::to_wide(const std::string &multi)
         wide += w;
     }
     return wide;
+}
+
+template <typename T>
+static void FlarialGUI::lerp(T& a, const T& b, float t)
+{
+    // Perform linear interpolation between a and b based on t
+    float interpolatedValue = a + (b - a) * t;
+
+    // Round up the interpolated value to three decimal places
+    float roundedValue = interpolatedValue;
+
+    // Assign the rounded value back to 'a'
+    a = roundedValue;
 }

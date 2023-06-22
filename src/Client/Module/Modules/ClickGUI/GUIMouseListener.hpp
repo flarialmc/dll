@@ -6,6 +6,7 @@
 #include "../../../../Utils/Logger/Logger.hpp"
 #include "../../../GUI/D2D.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
+#include "../../../Module/Manager.hpp"
 
 class GUIMouseListener : public Listener {
 
@@ -21,8 +22,8 @@ class GUIMouseListener : public Listener {
 
         if(event.GetButton() == MouseButton::Scroll)
         {
-            FlarialGUI::scrollpos += (event.GetAction() == MouseAction::SCROLL_UP) ? FlarialGUI::scrollposmodifier : -FlarialGUI::scrollposmodifier;
-            FlarialGUI::barscrollpos += (event.GetAction() == MouseAction::SCROLL_UP) ? FlarialGUI::barscrollposmodifier : -FlarialGUI::barscrollposmodifier;
+            accumilatedPos += (event.GetAction() == MouseAction::SCROLL_UP) ? FlarialGUI::scrollposmodifier : -FlarialGUI::scrollposmodifier;
+            accumilatedBarPos += (event.GetAction() == MouseAction::SCROLL_UP) ? FlarialGUI::barscrollposmodifier : -FlarialGUI::barscrollposmodifier;
         }
 
         if(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) event.setCancelled(true);
@@ -30,6 +31,9 @@ class GUIMouseListener : public Listener {
     };
 
 public:
+
+    static float inline accumilatedPos = 1;
+    static float inline accumilatedBarPos = 1;
     explicit GUIMouseListener(const char string[5]) {
         this->name = string;
     }
