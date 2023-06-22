@@ -49,13 +49,7 @@ public:
         float toggleY = Constraints::PercentageConstraint(0.12, "top");
 
 
-        D2D1_COLOR_F color = D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f);
-
-        if (!this->settings.getSettingByName<bool>("border")->value) {
-            color = D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f);
-        }
-
-        if(FlarialGUI::Toggle(0, toggleX, toggleY, color, D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("border")->value)) this->settings.getSettingByName<bool>("border")->value = !this->settings.getSettingByName<bool>("border")->value;
+        if(FlarialGUI::Toggle(0, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("border")->value)) this->settings.getSettingByName<bool>("border")->value = !this->settings.getSettingByName<bool>("border")->value;
 
         const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);

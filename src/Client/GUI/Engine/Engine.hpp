@@ -54,6 +54,9 @@ namespace FlarialGUI
     std::vector<float> inline darkenAmounts(10000);
     std::vector<float> inline opacityAmounts(20);
     std::vector<float> inline toggleSpacings(20);
+    std::vector<D2D1_COLOR_F> inline toggleColors(20, D2D1::ColorF(D2D1::ColorF::White));
+    std::vector<D2D1_COLOR_F> inline buttonColors(20, D2D1::ColorF(D2D1::ColorF::Red));
+
     float inline frameFactor = 1;
 
     inline bool isInScrollView = false;
@@ -100,10 +103,10 @@ namespace FlarialGUI
 
     void CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to);
 
-    bool Toggle(int index, float x, float y, D2D1_COLOR_F color, D2D1_COLOR_F circleColor, bool isEnabled);
+    bool Toggle(int index, float x, float y, const D2D1_COLOR_F enabledColor, const D2D1_COLOR_F disabledColor, D2D1_COLOR_F circleColor, bool isEnabled);
 
     float Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor,
-           const D2D1_COLOR_F circleColor, const float startingPoint = 50.0f);
+           const D2D1_COLOR_F circleColor, const float startingPoint = 50.0f, const float maxValue = 100.0f);
 
     void Circle(float x, float y, const D2D1_COLOR_F &color, float radius);
 
@@ -127,4 +130,6 @@ namespace FlarialGUI
 
     template <typename T>
     void lerp(T &a, const T &b, float t);
+
+    D2D_COLOR_F LerpColor(D2D_COLOR_F color1, D2D_COLOR_F color2, float percentage);
 };

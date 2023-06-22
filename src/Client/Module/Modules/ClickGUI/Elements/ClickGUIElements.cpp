@@ -52,8 +52,19 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 
     std::string text;
     text = mod->settings.getSettingByName<bool>("enabled")->value ? "Enabled" : "Disabled";
-    D2D1_COLOR_F color;
-    color = mod->settings.getSettingByName<bool>("enabled")->value ? D2D1::ColorF(24.0f / 255.0f, 136.0f / 255.0f, 48.0f / 255.0f) : D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f);
+    D2D1_COLOR_F enabledColor = D2D1::ColorF(24.0f / 255.0f, 136.0f / 255.0f, 48.0f / 255.0f);
+    D2D1_COLOR_F disabledColor = D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f);
+
+    if(mod->settings.getSettingByName<bool>("enabled")->value) {
+
+        FlarialGUI::buttonColors[index] = FlarialGUI::LerpColor(FlarialGUI::buttonColors[index], enabledColor, 0.15f * FlarialGUI::frameFactor);
+
+    } else {
+
+        FlarialGUI::buttonColors[index] = FlarialGUI::LerpColor(FlarialGUI::buttonColors[index],  disabledColor, 0.15f * FlarialGUI::frameFactor);
+
+    }
+
     float buttonWidth = Constraints::RelativeConstraint(0.97);
     float buttonHeight = Constraints::RelativeConstraint(0.27);
 
@@ -62,7 +73,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 
     round = Constraints::RoundingConstraint(26, 26);
 
-    if(FlarialGUI::RoundedButton(buttonx - buttonWidth, buttony - buttonHeight, color, D2D1::ColorF(D2D1::ColorF::White), FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, round.x, round.x)) mod->settings.getSettingByName<bool>("enabled")->value = !mod->settings.getSettingByName<bool>("enabled")->value;
+    if(FlarialGUI::RoundedButton(buttonx - buttonWidth, buttony - buttonHeight, FlarialGUI::buttonColors[index], D2D1::ColorF(D2D1::ColorF::White), FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, round.x, round.x)) mod->settings.getSettingByName<bool>("enabled")->value = !mod->settings.getSettingByName<bool>("enabled")->value;
 
     // Settings Button
     float settingswidth = Constraints::RelativeConstraint(0.17);

@@ -288,14 +288,20 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
 }
 
 
-bool FlarialGUI::Toggle(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F circleColor, bool isEnabled) {
+bool FlarialGUI::Toggle(int index, float x, float y, const D2D1_COLOR_F enabledColor, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor, bool isEnabled) {
 
     float rectWidth = Constraints::RelativeConstraint(0.062, "height", true);
     float rectHeight = Constraints::RelativeConstraint(0.03, "height", true);
 
     Vec2<float> round = Constraints::RoundingConstraint(30, 30);
 
-    FlarialGUI::RoundedRect(x, y, color, rectWidth, rectHeight, round.x, round.x);
+    if(isEnabled) {
+        toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], enabledColor, 0.10f * FlarialGUI::frameFactor);
+    } else {
+        toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index],  disabledColor, 0.10f * FlarialGUI::frameFactor);
+    }
+
+    FlarialGUI::RoundedRect(x, y, toggleColors[index], rectWidth, rectHeight, round.x, round.x);
 
     // the circle (I KNOW IM USING A RECT LOL)
 
@@ -329,6 +335,16 @@ bool FlarialGUI::Toggle(int index, float x, float y, const D2D1_COLOR_F color, c
     return false;
 }
 
+D2D_COLOR_F FlarialGUI::LerpColor(D2D_COLOR_F color1, D2D_COLOR_F color2, float t)
+{
+    // Interpolate each color channel separately
+    float r = color1.r + (color2.r - color1.r) * t;
+    float g = color1.g + (color2.g - color1.g) * t;
+    float b = color1.b + (color2.b - color1.b) * t;
+    float a = color1.a + (color2.a - color1.a) * t;
+
+    return D2D1::ColorF(r, g, b, a);
+}
 void FlarialGUI::ColorWheel(float x, float y, float radius)
 {
     // Calculate the center of the color wheel
@@ -426,7 +442,9 @@ std::string FlarialGUI::TextBox(int index, float x, float y, float width, float 
     return FlarialGUI::TextBoxes[index].text;
 }
 
-float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor, const float startingPoint) {
+
+
+float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor, const float startingPoint, const float maxValue) {
 
     // Define the total slider rect width and height
     const float totalWidth = Constraints::RelativeConstraint(0.15, "height", true);
@@ -458,7 +476,6 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
     float rectangleLeft = farLeftX;
     float rectangleWidth = farRightX - farLeftX;
 
-    float maxValue = 100.0f; // Maximum value (e.g., 100%)
     float minValue = 0.0f;   // Minimum value (e.g., 0%)
 
 
