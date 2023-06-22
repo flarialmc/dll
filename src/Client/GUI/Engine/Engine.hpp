@@ -33,6 +33,12 @@ struct TextBoxStruct
     bool isActive;
 };
 
+struct ColorPicker
+{
+    uint32_t oldHex;
+    uint32_t newHex;
+};
+
 class Dimension
 {
 public:
@@ -67,6 +73,7 @@ namespace FlarialGUI
     inline WindowRect WindowRects[10];
     inline SliderRect SliderRects[10];
     inline TextBoxStruct TextBoxes[10];
+    inline ColorPicker ColorPickers[20];
     bool inline isInWindowRect = false;
 
     inline ID2D1Effect* blur = nullptr;
@@ -132,4 +139,8 @@ namespace FlarialGUI
     void lerp(T &a, const T &b, float t);
 
     D2D_COLOR_F LerpColor(D2D_COLOR_F color1, D2D_COLOR_F color2, float percentage);
+
+    void ColorPicker(int index, float x, float y, std::string name, uint32_t &hex);
+
+    void ColorPickerWindow(int index, uint32_t &hex);
 };

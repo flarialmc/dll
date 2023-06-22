@@ -635,6 +635,45 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
     writeFactory->Release();*/
 }
 
+void FlarialGUI::ColorPicker(int index, float x, float y, std::string name, uint32_t &hex) {
+
+    // Accepts hex, so for e.g. fps counter bg color wants to be changed then you'd have to give a modifyable hex value
+    // Preferably save every color in config as a hex (string)
+    // before rendering just convert the config's color to hex and yeah do it dat way.
+    // the Hex parameter in this function should be a pointer directly to the .value of the config
+    // change the LoadSettings, see if the config name contains "color" and see if the value is 6 characters long, if so,
+    // then load the setting as uint32_t instead of string
+    // but when saving, it should be converted to string.
+
+
+    // rounded rect showcasing this hex, if clicked then ColorPickerWindow
+
+    // text next to rounded rect showing the thing
+
+}
+
+void FlarialGUI::ColorPickerWindow(int index, uint32_t &hex) {
+
+    // 50% opacity black rect
+
+    // rect containing shit
+
+    // saves this hex to ColorPickers[index].oldHex
+
+    // have 4 sliders for R G B A (converts hex -> d2d1colorf, sets the rgba sliders starting point accordingly)
+
+    // e.g. float r = Slider(...)
+
+    // converts to hex, saves to ColorPickers[index].newHex
+
+    // big rect that show the current hex color (newHex)
+
+    // revert button (reverts to oldHex)
+
+    // save button (converts rgba -> hex, saves to &hex)
+
+}
+
 D2D1::ColorF FlarialGUI::HexToColorF(uint32_t hex)
 {
     // Extract the individual color components from the hex value
