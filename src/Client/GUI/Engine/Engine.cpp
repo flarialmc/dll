@@ -637,7 +637,7 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
     writeFactory->Release();*/
 }
 
-void FlarialGUI::ColorPicker(const int index, const float x, const float y, const std::string& name, std::string &hex) {
+void FlarialGUI::ColorPicker(const int index, float x, const float y, std::string &hex) {
 
     // Accepts hex, so for e.g. fps counter bg color wants to be changed then you'd have to give a modifyable hex value
     // Preferably save every color in config as a hex (string)
@@ -647,24 +647,21 @@ void FlarialGUI::ColorPicker(const int index, const float x, const float y, cons
     // then load the setting as uint32_t instead of string
     // but when saving, it should be converted to string.
 
-    float s = Constraints::RelativeConstraint(0.035, "height", true);
     Vec2<float> round = Constraints::RoundingConstraint(13, 13);
 
-    FlarialGUI::FlarialTextWithFont(x - s * 1.35f, y , FlarialGUI::to_wide(name).c_str(), D2D1::ColorF(D2D1::ColorF::White), s * 4.5f, s * 1.1f, DWRITE_TEXT_ALIGNMENT_LEADING, s * 3.5f);
+    float s = Constraints::RelativeConstraint(0.0285, "height", true);
 
-    s = Constraints::RelativeConstraint(0.0285, "height", true);
-
-    FlarialGUI::RoundedRect(x + s * 3.85f, y + s * 0.15f, D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), s * 4.2f, s, round.x, round.x);
+    FlarialGUI::RoundedRect(x , y + s * 0.15f, D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), s * 4.125f, s, round.x, round.x);
 
     round = Constraints::RoundingConstraint(10, 10);
-    FlarialGUI::RoundedRect(x + s * 3.96f, y + s * 0.21f, FlarialGUI::HexToColorF(hex), s * 0.85f, s * 0.85f, round.x, round.x);
+    FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, FlarialGUI::HexToColorF(hex), s * 0.85f, s * 0.85f, round.x, round.x);
 
     round = Constraints::RoundingConstraint(11.5, 11.5);
-    FlarialGUI::RoundedRect(x + s * 4.943f, y + s * 0.23f, D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f), s * 3.f, s * 0.82f, round.x, round.x);
+    FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f), s * 3.f, s * 0.82f, round.x, round.x);
 
-    FlarialGUI::FlarialTextWithFont(x + s * 3.65f, y * 1.006f, FlarialGUI::to_wide("#" + hex).c_str(), D2D1::ColorF(D2D1::ColorF::White), s * 4.3f, s * 1.1f, DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.5f);
+    FlarialGUI::FlarialTextWithFont(x - Constraints::SpacingConstraint(0.22, s), y * 1.006f, FlarialGUI::to_wide("#" + hex).c_str(), D2D1::ColorF(D2D1::ColorF::White), s * 4.3f, s * 1.1f, DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.5f);
 
-    if (CursorInRect(x, y, s, s) && MC::mousebutton == MouseButton::Left && !MC::held)
+    if (CursorInRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, s * 0.85f, s * 0.85f) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
         MC::mousebutton = MouseButton::None;
         FlarialGUI::ColorPickerWindow(index, hex);

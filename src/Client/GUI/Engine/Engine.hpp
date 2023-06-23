@@ -138,7 +138,7 @@ namespace FlarialGUI
 
     D2D_COLOR_F LerpColor(D2D_COLOR_F color1, D2D_COLOR_F color2, float percentage);
 
-    void ColorPicker(int index, float x, float y, const std::string& name, std::string &hex);
+    void ColorPicker(int index, float x, float y, std::string &hex);
 
     void ColorPickerWindow(int index, std::string &hex);
 

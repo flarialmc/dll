@@ -95,7 +95,7 @@ public:
         toggleX = Constraints::PercentageConstraint(0.019, "left");
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::ColorPicker(0, toggleX, toggleY, "Background", settings.getSettingByName<std::string>("textColor")->value);
+        FlarialGUI::ColorPicker(0, toggleX, toggleY, settings.getSettingByName<std::string>("textColor")->value);
 
         /* Color Pickers End */
 
