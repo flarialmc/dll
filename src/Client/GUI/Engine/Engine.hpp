@@ -37,6 +37,7 @@ struct ColorPicker
 {
     std::string oldHex;
     std::string newHex;
+    bool isActive = false;
 };
 
 class Dimension

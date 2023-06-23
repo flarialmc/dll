@@ -216,13 +216,13 @@ void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2
 
     // Calculate the adjusted dimensions for the border rounded rectangle
     D2D1_RECT_F borderRect = D2D1::RectF(
-            rect.left - borderWidth / 2,
-            rect.top - borderWidth / 2,
-            rect.right + borderWidth / 2,
-            rect.bottom + borderWidth / 2
+            rect.left - borderWidth / 2.025f,
+            rect.top - borderWidth / 2.05f,
+            rect.right + borderWidth / 2.025f,
+            rect.bottom + borderWidth / 2.0f
     );
 
-    radiusX += borderWidth / 2.0f;
+    radiusX += borderWidth / 2.028f;
     radiusY += borderWidth / 2.0f;
 
 
@@ -677,10 +677,10 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
     if (CursorInRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, s * 0.85f, s * 0.85f) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
         MC::mousebutton = MouseButton::None;
-        FlarialGUI::ColorPickerWindow(index, hex);
+        ColorPickers[index].isActive = !ColorPickers[index].isActive;
     }
 
-
+    FlarialGUI::ColorPickerWindow(index, hex);
     // rounded rect showcasing this hex, if clicked then ColorPickerWindow
 
     // text next to rounded rect showing the thing
@@ -689,25 +689,29 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 
 void FlarialGUI::ColorPickerWindow(int index, std::string &hex) {
 
-    // 50% opacity black rect
+    if(ColorPickers[index].isActive) {
+        // 50% opacity black rect
+        FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black, 0.35),
+                                Constraints::RelativeConstraint(1.5, "width", true),
+                                Constraints::RelativeConstraint(1.5, "height", true), 0, 0);
 
-    // rect containing shit
+        // rect containing shit
 
-    // saves this hex to ColorPickers[index].oldHex
+        // saves this hex to ColorPickers[index].oldHex
 
-    // have 4 sliders for R G B A (converts hex -> d2d1colorf, sets the rgba sliders starting point accordingly)
+        // have 4 sliders for R G B A (converts hex -> d2d1colorf, sets the rgba sliders starting point accordingly)
 
-    // e.g. float r = Slider(...)
+        // e.g. float r = Slider(...)
 
-    // converts to hex, saves to ColorPickers[index].newHex
+        // converts to hex, saves to ColorPickers[index].newHex
 
-    // big rect that show the current hex color (newHex)
+        // big rect that show the current hex color (newHex)
 
-    // revert button (reverts to oldHex)
+        // revert button (reverts to oldHex)
 
-    // save button (converts rgba -> hex, saves to &hex)
+        // save button (converts rgba -> hex, saves to &hex)
 
-
+    }
 }
 
 D2D1::ColorF FlarialGUI::HexToColorF(const std::string& hexString)
