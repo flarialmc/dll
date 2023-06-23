@@ -212,9 +212,22 @@ void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2
 
     ID2D1SolidColorBrush *brush;
     D2D::context->CreateSolidColorBrush(color, &brush);
-    D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
+    D2D1_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
 
-    D2D::context->DrawRoundedRectangle(roundedRect, brush, borderWidth);
+    // Calculate the adjusted dimensions for the border rounded rectangle
+    D2D1_RECT_F borderRect = D2D1::RectF(
+            rect.left - borderWidth / 2,
+            rect.top - borderWidth / 2,
+            rect.right + borderWidth / 2,
+            rect.bottom + borderWidth / 2
+    );
+
+    radiusX += borderWidth / 2.0f;
+    radiusY += borderWidth / 2.0f;
+
+
+
+    D2D::context->DrawRoundedRectangle(D2D1::RoundedRect(borderRect, radiusX, radiusY), brush, borderWidth);
     brush->Release();
 }
 

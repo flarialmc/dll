@@ -146,6 +146,10 @@ public:
         D2D1_COLOR_F textColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textColor")->value);
         D2D1_COLOR_F borderColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
 
+        bgColor.a = settings.getSettingByName<float>("bgOpacity")->value;
+        textColor.a = settings.getSettingByName<float>("textOpacity")->value;
+        borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
+
         FlarialGUI::RoundedRect(realcenter.x, realcenter.y,
                                 bgColor, rectWidth, textHeight,
                                 rounde.x, rounde.x);

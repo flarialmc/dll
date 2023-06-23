@@ -60,9 +60,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
     if (!SwapchainHook::init) {
 
-
         if (SwapchainHook::queue == nullptr) {
-
 
             ID3D12Device5* d3d12device3;
 
@@ -219,8 +217,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
             } else {
 
                 D2D::context->BeginDraw();
-
-                D2D::context->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
                 MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
                 RenderEvent event;
                 EventHandler::onRender(event);
