@@ -614,6 +614,8 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
         affineTransformEffect->GetOutput(&image);
 
         D2D::context->DrawBitmap(ImagesClass::eimages[imagePath], imagerectf, 1.0, D2D1_INTERPOLATION_MODE_ANISOTROPIC);
+
+        //D2D::context->DrawImage(image);
         affineTransformEffect->Release();
         image->Release();
     }
@@ -635,7 +637,7 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
     writeFactory->Release();*/
 }
 
-void FlarialGUI::ColorPicker(int index, float x, float y, std::string name, uint32_t &hex) {
+void FlarialGUI::ColorPicker(const int index, const float x, const float y, const std::string& name, std::string &hex) {
 
     // Accepts hex, so for e.g. fps counter bg color wants to be changed then you'd have to give a modifyable hex value
     // Preferably save every color in config as a hex (string)
@@ -645,6 +647,29 @@ void FlarialGUI::ColorPicker(int index, float x, float y, std::string name, uint
     // then load the setting as uint32_t instead of string
     // but when saving, it should be converted to string.
 
+    float s = Constraints::RelativeConstraint(0.035, "height", true);
+    Vec2<float> round = Constraints::RoundingConstraint(13, 13);
+
+    FlarialGUI::FlarialTextWithFont(x - s * 1.35f, y , FlarialGUI::to_wide(name).c_str(), D2D1::ColorF(D2D1::ColorF::White), s * 4.5f, s * 1.1f, DWRITE_TEXT_ALIGNMENT_LEADING, s * 3.5f);
+
+    s = Constraints::RelativeConstraint(0.0285, "height", true);
+
+    FlarialGUI::RoundedRect(x + s * 3.85f, y + s * 0.15f, D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), s * 4.2f, s, round.x, round.x);
+
+    round = Constraints::RoundingConstraint(10, 10);
+    FlarialGUI::RoundedRect(x + s * 3.96f, y + s * 0.21f, FlarialGUI::HexToColorF(hex), s * 0.85f, s * 0.85f, round.x, round.x);
+
+    round = Constraints::RoundingConstraint(11.5, 11.5);
+    FlarialGUI::RoundedRect(x + s * 4.943f, y + s * 0.23f, D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f), s * 3.f, s * 0.82f, round.x, round.x);
+
+    FlarialGUI::FlarialTextWithFont(x + s * 3.65f, y * 1.006f, FlarialGUI::to_wide("#" + hex).c_str(), D2D1::ColorF(D2D1::ColorF::White), s * 4.3f, s * 1.1f, DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.5f);
+
+    if (CursorInRect(x, y, s, s) && MC::mousebutton == MouseButton::Left && !MC::held)
+    {
+        MC::mousebutton = MouseButton::None;
+        FlarialGUI::ColorPickerWindow(index, hex);
+    }
+
 
     // rounded rect showcasing this hex, if clicked then ColorPickerWindow
 
@@ -652,7 +677,7 @@ void FlarialGUI::ColorPicker(int index, float x, float y, std::string name, uint
 
 }
 
-void FlarialGUI::ColorPickerWindow(int index, uint32_t &hex) {
+void FlarialGUI::ColorPickerWindow(int index, std::string &hex) {
 
     // 50% opacity black rect
 
@@ -672,10 +697,17 @@ void FlarialGUI::ColorPickerWindow(int index, uint32_t &hex) {
 
     // save button (converts rgba -> hex, saves to &hex)
 
+
 }
 
-D2D1::ColorF FlarialGUI::HexToColorF(uint32_t hex)
+D2D1::ColorF FlarialGUI::HexToColorF(const std::string& hexString)
 {
+    // Convert the hex string to an integer value
+    uint32_t hex;
+    std::stringstream ss;
+    ss << std::hex << hexString;
+    ss >> hex;
+
     // Extract the individual color components from the hex value
     uint8_t red = (hex >> 16) & 0xFF;
     uint8_t green = (hex >> 8) & 0xFF;
@@ -690,17 +722,19 @@ D2D1::ColorF FlarialGUI::HexToColorF(uint32_t hex)
     return {normalizedRed, normalizedGreen, normalizedBlue};
 }
 
-uint32_t FlarialGUI::ColorFToHex(const D2D1::ColorF& color)
+std::string FlarialGUI::ColorFToHex(const D2D1::ColorF& color)
 {
     // Convert the color components from the range [0.0, 1.0] to [0, 255]
     auto red = static_cast<uint8_t>(std::round(color.r * 255));
     auto green = static_cast<uint8_t>(std::round(color.g * 255));
     auto blue = static_cast<uint8_t>(std::round(color.b * 255));
 
-    // Combine the color components into a 32-bit unsigned integer
-    uint32_t hex = (red << 16) | (green << 8) | blue;
+    // Combine the color components into a hex string
+    std::stringstream ss;
+    ss << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(red)
+       << std::setw(2) << static_cast<int>(green) << std::setw(2) << static_cast<int>(blue);
 
-    return hex;
+    return ss.str();
 }
 
 
@@ -716,6 +750,29 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
     IDWriteTextFormat *textFormat;
     writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width), L"", &textFormat);
+    textFormat->SetTextAlignment(alignment);
+    textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+    D2D1_RECT_F textRect = D2D1::RectF(x + height + 10, y, x + width, y + height);
+    D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
+
+    writeFactory->Release();
+    textFormat->Release();
+    brush->Release();
+}
+
+void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, D2D1_COLOR_F color, const float width, const float height, const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize)
+{
+
+    if (isInScrollView)
+        y += scrollpos;
+    ID2D1SolidColorBrush *brush;
+    D2D::context->CreateSolidColorBrush(color, &brush);
+
+    IDWriteFactory *writeFactory;
+    DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
+    IDWriteTextFormat *textFormat;
+    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(fontSize), L"", &textFormat);
     textFormat->SetTextAlignment(alignment);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 

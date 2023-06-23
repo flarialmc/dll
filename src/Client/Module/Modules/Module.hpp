@@ -142,19 +142,21 @@ public:
         this->settings.setValue("percentageX", percentages.x);
         this->settings.setValue("percentageY", percentages.y);
 
-
+        D2D1_COLOR_F bgColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
+        D2D1_COLOR_F textColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textColor")->value);
+        D2D1_COLOR_F borderColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
 
         FlarialGUI::RoundedRect(realcenter.x, realcenter.y,
-                                D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), rectWidth, textHeight,
+                                bgColor, rectWidth, textHeight,
                                 rounde.x, rounde.x);
         FlarialGUI::FlarialText(realcenter.x - realspacing, realcenter.y,
                                 FlarialGUI::to_wide(std::format("FPS: {}", MC::fps)).c_str(),
-                                D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), textWidth,
+                                textColor, textWidth,
                                 textHeight);
 
         if(this->settings.getSettingByName<bool>("border")->value) {
             FlarialGUI::RoundedHollowRect(realcenter.x, realcenter.y, this->settings.getSettingByName<float>("borderWidth")->value,
-                                    D2D1::ColorF(D2D1::ColorF::Black), rectWidth, textHeight,
+                                          borderColor, rectWidth, textHeight,
                                     rounde.x, rounde.x);
         }
 

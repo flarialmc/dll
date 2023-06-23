@@ -35,8 +35,8 @@ struct TextBoxStruct
 
 struct ColorPicker
 {
-    uint32_t oldHex;
-    uint32_t newHex;
+    std::string oldHex;
+    std::string newHex;
 };
 
 class Dimension
@@ -127,9 +127,7 @@ namespace FlarialGUI
 
     bool CursorInRect(float rectX, float rectY, float width, float height);
 
-    D2D1::ColorF HexToColorF(uint32_t hex);
-
-    uint32_t ColorFToHex(const D2D1::ColorF &color);
+    std::string ColorFToHex(const D2D1::ColorF &color);
 
     void
     RoundedHollowRect(float x, float y, float borderWidth, const D2D_COLOR_F color, const float width, const float height, float radiusX,
@@ -140,7 +138,14 @@ namespace FlarialGUI
 
     D2D_COLOR_F LerpColor(D2D_COLOR_F color1, D2D_COLOR_F color2, float percentage);
 
-    void ColorPicker(int index, float x, float y, std::string name, uint32_t &hex);
+    void ColorPicker(int index, float x, float y, const std::string& name, std::string &hex);
 
-    void ColorPickerWindow(int index, uint32_t &hex);
+    void ColorPickerWindow(int index, std::string &hex);
+
+    D2D1::ColorF HexToColorF(const std::string &hexString);
+
+    void
+    FlarialTextWithFont(float x, float y, const wchar_t *text, D2D1_COLOR_F color, const float width,
+                        const float height,
+                        const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize);
 };
