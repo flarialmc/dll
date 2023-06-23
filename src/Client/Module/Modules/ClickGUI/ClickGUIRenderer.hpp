@@ -37,36 +37,48 @@ class ClickGUIRenderer : public Listener {
     std::string curr;
     bool TestToggle = false;
     float baseHeightReal = 0.64f;
+    float baseHeightActual = 0.00001f;
 
     void onRender(RenderEvent &event) override {
 
-        if(module->settings.getSettingByName<bool>("enabled")->value && SwapchainHook::init) {
+        if(FlarialGUI::scrollposmodifier == 0) {
+            FlarialGUI::scrollposmodifier = Constraints::RelativeConstraint(0.1f);
+        }
+
+        if(module->settings.getSettingByName<bool>("enabled")->value) {
+
+            FlarialGUI::ApplyGaussianBlur(6.0);
+            lerp(baseHeightActual, 0.64f, 0.18f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
+
+        } else {
+            lerp(baseHeightReal, 0.01f, 0.18f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
+            lerp(baseHeightActual, 0.00001f, 0.18f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
+        }
+
+        if(SwapchainHook::init && baseHeightActual > 0.01) {
 
             /* Base Rectangle Start */
-            FlarialGUI::ApplyGaussianBlur(6.0);
 
             float baseWidth = Constraints::RelativeConstraint(0.85);
 
-            if(ClickGUIRenderer::page.type == "settings" || curr == "settings") {
+            if(module->settings.getSettingByName<bool>("enabled")->value){
+                if (ClickGUIRenderer::page.type == "settings" || curr == "settings") {
 
-                lerp(baseHeightReal, 0.35f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
-                //FadeEffect::ApplyFadeOutEffect(0.015f * FlarialGUI::frameFactor, baseHeightReal, 0.35f);
-            } else {
-                lerp(baseHeightReal, 0.64f, 0.28f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
-                //FadeEffect::ApplyFadeInEffect(0.015f * FlarialGUI::frameFactor, 0.64f, baseHeightReal);
+                    lerp(baseHeightReal, 0.35f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+                    //FadeEffect::ApplyFadeOutEffect(0.015f * FlarialGUI::frameFactor, baseHeightReal, 0.35f);
+                } else {
+                    lerp(baseHeightReal, 0.64f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+                    //FadeEffect::ApplyFadeInEffect(0.015f * FlarialGUI::frameFactor, 0.64f, baseHeightReal);
+                }
             }
 
             float baseHeight = Constraints::RelativeConstraint(baseHeightReal);
 
-            Vec2<float> center = Constraints::CenterConstraint(baseWidth, baseHeight, "r", 1, 1);
+            Vec2<float> center = Constraints::CenterConstraint(baseWidth, Constraints::RelativeConstraint(baseHeightReal), "r", 1, 1);
             Vec2<float> round = Constraints::RoundingConstraint(50, 50);
 
-            FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), baseWidth, baseHeight, round.x, round.x);
-            FlarialGUI::PushSize(center.x, center.y, baseWidth, Constraints::RelativeConstraint(0.64f));
-
-            if(FlarialGUI::scrollposmodifier == 0) {
-                FlarialGUI::scrollposmodifier = Constraints::RelativeConstraint(0.1f);
-            }
+            FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), baseWidth, Constraints::RelativeConstraint(baseHeightReal), round.x, round.x);
+            FlarialGUI::PushSize(center.x, center.y, baseWidth, Constraints::RelativeConstraint(baseHeightActual));
 
             /* Base Rectangle End */
 
@@ -154,73 +166,48 @@ class ClickGUIRenderer : public Listener {
             /* tab buttons end */
 
             FlarialGUI::PopSize(); // Pops nav bar
-                /* Mod Card Start */
+            /* Mod Card Start */
 
-                std::string e = this->curr;
+            std::string e = this->curr;
 
-                if(ClickGUIRenderer::page.type == "normal") {
+            if(ClickGUIRenderer::page.type == "normal") {
 
-                    if (e == "modules") {
+                if (e == "modules") {
 
-                        float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
-                        float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
+                    float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
+                    float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
 
-                        Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.60,-0.52);
+                    Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.60,-0.52);
 
-                        FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
+                    FlarialGUI::PushSize(center.x, center.y, baseWidth, Constraints::RelativeConstraint(std::ceilf(baseHeightReal * 100.0f) / 100.0f, "height", true));
 
-                        float scrollWidth = Constraints::RelativeConstraint(1.12);
-                        float scrollHeight = Constraints::RelativeConstraint(0.84);
-                        Vec2<float> scrollcenter = Constraints::CenterConstraint(scrollWidth, scrollHeight, "y", 0.0, 1);
+                    float scrollWidth = Constraints::RelativeConstraint(1.12);
+                    float scrollHeight = Constraints::RelativeConstraint(0.84);
+                    Vec2<float> scrollcenter = Constraints::CenterConstraint(scrollWidth, scrollHeight, "y", 0.0, 1);
 
-                        FlarialGUI::PopSize();
+                    FlarialGUI::PopSize();
 
-                        FlarialGUI::ScrollBar(120, 120, 10, 160, 2);
+                    FlarialGUI::ScrollBar(120, 120, 10, 160, 2);
 
-                        FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
+                    FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
 
-                        float xModifier = 0.0f;
-                        float yModifier = 0.0f;
+                    float xModifier = 0.0f;
+                    float yModifier = 0.0f;
 
-                        int i = 0;
-                        for (Module *real: ModuleManager::modules) {
-                            ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
-                                                      real->icon, i);
+                    int i = 0;
+                    for (Module *real: ModuleManager::modules) {
+                        ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
+                                                  real->icon, i);
 
-                            xModifier += Constraints::SpacingConstraint(1.09, modWidth);
-                            if ((++i % 3) == 0) {
-                                yModifier += Constraints::SpacingConstraint(0.8, modWidth);
-                                xModifier = 0.0f;
-                            }
+                        xModifier += Constraints::SpacingConstraint(1.09, modWidth);
+                        if ((++i % 3) == 0) {
+                            yModifier += Constraints::SpacingConstraint(0.8, modWidth);
+                            xModifier = 0.0f;
                         }
-
-                        FlarialGUI::UnsetScrollView();
-                    } else if (e == "settings") {
-
-                        FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
-
-                        float rectX = Constraints::PercentageConstraint(0.01, "left");
-                        float rectY = Constraints::PercentageConstraint(0.32, "top");
-                        float rectWidth = Constraints::RelativeConstraint(0.965, "width");
-                        float rectHeight = Constraints::RelativeConstraint(0.55);
-                        round = Constraints::RoundingConstraint(50, 50);
-
-                        float anotherRectHeight = Constraints::RelativeConstraint(0.60);
-                        float anotherRectWidth = Constraints::RelativeConstraint(0.981, "width");
-
-                        FlarialGUI::RoundedRect(rectX, rectY, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), anotherRectWidth, anotherRectHeight, round.x, round.x);
-
-                        round = Constraints::RoundingConstraint(45, 45);
-                        FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectWidth, rectHeight, round.x, round.x);
-
-                        FlarialGUI::PopSize();
-
                     }
 
-                    /* Mod Card End */
-                } else if (ClickGUIRenderer::page.type == "settings") {
-
-                    this->curr = "settings";
+                    FlarialGUI::UnsetScrollView();
+                } else if (e == "settings") {
 
                     FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
 
@@ -240,13 +227,42 @@ class ClickGUIRenderer : public Listener {
 
                     FlarialGUI::PopSize();
 
-                    FlarialGUI::PushSize(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
-
-                    ModuleManager::getModule(ClickGUIRenderer::page.module)->SettingsRender();
-
-                    FlarialGUI::PopSize();
-
                 }
+
+                /* Mod Card End */
+            } else if (ClickGUIRenderer::page.type == "settings") {
+
+                this->curr = "settings";
+
+                FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
+
+                float rectX = Constraints::PercentageConstraint(0.01, "left");
+                float rectY = Constraints::PercentageConstraint(0.32, "top");
+                float rectWidth = Constraints::RelativeConstraint(0.965, "width");
+                float rectHeight = Constraints::RelativeConstraint(0.55);
+                round = Constraints::RoundingConstraint(50, 50);
+
+                float anotherRectHeight = Constraints::RelativeConstraint(0.60);
+                float anotherRectWidth = Constraints::RelativeConstraint(0.981, "width");
+
+                FlarialGUI::RoundedRect(rectX, rectY, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), anotherRectWidth, anotherRectHeight, round.x, round.x);
+
+                round = Constraints::RoundingConstraint(45, 45);
+                FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectWidth, rectHeight, round.x, round.x);
+
+                FlarialGUI::PopSize();
+
+                FlarialGUI::PushSize(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
+
+                FlarialGUI::SetScrollView(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
+
+                ModuleManager::getModule(ClickGUIRenderer::page.module)->SettingsRender();
+
+                FlarialGUI::UnsetScrollView();
+
+                FlarialGUI::PopSize();
+
+            }
 
             FlarialGUI::PopSize(); // Pops base rect
 
