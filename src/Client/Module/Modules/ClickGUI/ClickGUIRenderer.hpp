@@ -272,11 +272,22 @@ class ClickGUIRenderer : public Listener {
 
     void onKey(KeyEvent &event) override {
 
-        if(event.GetKey() == module->keybind && static_cast<ActionType>(event.GetAction()) == ActionType::PRESSED) module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value;
+        if(event.GetKey() == module->keybind && static_cast<ActionType>(event.GetAction()) == ActionType::PRESSED) {
 
+            module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>(
+                    "enabled")->value;
+
+
+            ClickGUIRenderer::page.type = "normal";
+            ClickGUIRenderer::curr = "modules";
+        }
         if(module->settings.getSettingByName<bool>("enabled")->value) event.setCancelled(true);
 
-        if(event.GetKey() == VK_ESCAPE) module->settings.getSettingByName<bool>("enabled")->value = false;
+        if(event.GetKey() == VK_ESCAPE) {
+            module->settings.getSettingByName<bool>("enabled")->value = false;
+            ClickGUIRenderer::page.type = "normal";
+            ClickGUIRenderer::curr = "modules";
+        }
     }
 
 public:

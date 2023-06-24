@@ -29,7 +29,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
     FlarialGUI::PushSize(x, y, BottomRoundedWidth, BottomRoundedHeight);
 
     // Mod Name
-    float textx = Constraints::PercentageConstraint(0.11, "left");
+    float textx = Constraints::PercentageConstraint(0.213, "left");
     float texty = Constraints::PercentageConstraint(0.415, "top");
     float textWidth = Constraints::RelativeConstraint(0.8);
     float textHeight = Constraints::RelativeConstraint(0.2);

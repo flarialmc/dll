@@ -482,7 +482,7 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
 
 
-    FlarialGUI::FlarialText(x - Constraints::SpacingConstraint(0.95, textWidth / 2.0f), y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
+    FlarialGUI::FlarialText(x - Constraints::SpacingConstraint(0.62, textWidth / 2.0f), y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
 
     x += Constraints::SpacingConstraint(1.2, percWidth);
     y += Constraints::SpacingConstraint(0.8, percHeight / 2.0f);
@@ -699,15 +699,13 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
     round = Constraints::RoundingConstraint(11.5, 11.5);
     FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f), s * 3.f, s * 0.82f, round.x, round.x);
 
-    FlarialGUI::FlarialTextWithFont(x - Constraints::SpacingConstraint(0.22, s), y * 1.006f, FlarialGUI::to_wide("#" + hex).c_str(), D2D1::ColorF(D2D1::ColorF::White), s * 4.3f, s * 1.1f, DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.5f);
+    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.006f, FlarialGUI::to_wide("#" + hex).c_str(), D2D1::ColorF(D2D1::ColorF::White), s * 4.3f, s * 1.1f, DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f);
 
     if (CursorInRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, s * 0.85f, s * 0.85f) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
         MC::mousebutton = MouseButton::None;
         ColorPickers[index].isActive = !ColorPickers[index].isActive;
     }
-
-    FlarialGUI::ColorPickerWindow(index, hex, opacity);
     // rounded rect showcasing this hex, if clicked then ColorPickerWindow
 
     // text next to rounded rect showing the thing
@@ -718,11 +716,13 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float& opacity) 
 
     if(ColorPickers[index].isActive) {
 
-        D2D1_COLOR_F color = FlarialGUI::HexToColorF(hex);
+
         // 50% opacity black rect
         FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black, 0.75),
                                 Constraints::RelativeConstraint(1.5, "width", true),
                                 Constraints::RelativeConstraint(1.5, "height", true), 0, 0);
+
+        D2D1_COLOR_F color = FlarialGUI::HexToColorF(hex);
 
         float rectwidth = Constraints::RelativeConstraint(0.35, "height", true);
         float rectheight = Constraints::RelativeConstraint(0.25, "height", true);
@@ -744,7 +744,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float& opacity) 
         float y = Constraints::PercentageConstraint(0.20, "top");
         float spacing = Constraints::SpacingConstraint(0.15, rectheight);
 
-        FlarialGUI::FlarialTextWithFont(x - spacing * 1.15, y - spacing * 1.45, L"Color Sliders", D2D1::ColorF(D2D1::ColorF::White), Constraints::RelativeConstraint(1, "width"), Constraints::RelativeConstraint(0.2, "width"), DWRITE_TEXT_ALIGNMENT_JUSTIFIED, Constraints::RelativeConstraint(0.5, "width"));
+        FlarialGUI::FlarialTextWithFont(x + spacing, y - spacing * 1.45, L"Color Sliders", D2D1::ColorF(D2D1::ColorF::White), Constraints::RelativeConstraint(1, "width"), Constraints::RelativeConstraint(0.2, "width"), DWRITE_TEXT_ALIGNMENT_JUSTIFIED, Constraints::RelativeConstraint(0.5, "width"));
 
         spacing *= 0.90f;
 
@@ -871,7 +871,7 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F
     textFormat->SetTextAlignment(alignment);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
-    D2D1_RECT_F textRect = D2D1::RectF(x + height + 10, y, x + width, y + height);
+    D2D1_RECT_F textRect = D2D1::RectF(x, y, x + width, y + height);
     D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
 
     writeFactory->Release();
@@ -894,7 +894,7 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, D2D1
     textFormat->SetTextAlignment(alignment);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
-    D2D1_RECT_F textRect = D2D1::RectF(x + height + 10, y, x + width, y + height);
+    D2D1_RECT_F textRect = D2D1::RectF(x, y, x + width, y + height);
     D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
 
     writeFactory->Release();
