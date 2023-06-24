@@ -72,9 +72,9 @@ namespace FlarialGUI
     float inline scrollposmodifier = 0.f;
     float inline barscrollpos = 0;
     float inline barscrollposmodifier = 10.0f;
-    inline WindowRect WindowRects[10];
-    inline SliderRect SliderRects[10];
-    inline TextBoxStruct TextBoxes[10];
+    inline WindowRect WindowRects[100];
+    inline SliderRect SliderRects[250];
+    inline TextBoxStruct TextBoxes[100];
     inline ColorPicker ColorPickers[20];
     bool inline isInWindowRect = false;
 
@@ -129,7 +129,7 @@ namespace FlarialGUI
 
     bool CursorInRect(float rectX, float rectY, float width, float height);
 
-    std::string ColorFToHex(const D2D1::ColorF &color);
+    std::string ColorFToHex(const D2D1_COLOR_F &color);
 
     void
     RoundedHollowRect(float x, float y, float borderWidth, const D2D_COLOR_F color, const float width, const float height, float radiusX,
@@ -140,9 +140,9 @@ namespace FlarialGUI
 
     D2D_COLOR_F LerpColor(D2D_COLOR_F color1, D2D_COLOR_F color2, float percentage);
 
-    void ColorPicker(int index, float x, float y, std::string &hex);
+    void ColorPicker(int index, float x, float y, std::string &hex, float &opacity);
 
-    void ColorPickerWindow(int index, std::string &hex);
+    void ColorPickerWindow(int index, std::string &hex, float &opacity);
 
     D2D1::ColorF HexToColorF(const std::string &hexString);
 

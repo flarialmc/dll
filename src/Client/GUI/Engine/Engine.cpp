@@ -471,7 +471,18 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
     FlarialGUI::RoundedRect(x, y, disabledColor, percWidth, percHeight, round.x, round.x);
 
-    FlarialGUI::FlarialText(x - Constraints::SpacingConstraint(0.95, textWidth / 2.0f), y, to_wide(std::to_string((int)startingPoint)).c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
+    std::string text;
+
+    if(startingPoint < 1.0f) {
+        std::stringstream stream;
+        stream << std::fixed << std::setprecision(2) << startingPoint;
+        text = stream.str();
+    }
+    else text = std::to_string((int)startingPoint);
+
+
+
+    FlarialGUI::FlarialText(x - Constraints::SpacingConstraint(0.95, textWidth / 2.0f), y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
 
     x += Constraints::SpacingConstraint(1.2, percWidth);
     y += Constraints::SpacingConstraint(0.8, percHeight / 2.0f);
@@ -517,12 +528,13 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
     // Calculate the percentage
     float percentage = ((circleX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
+
     SliderRects[index].percentageX = percentage;
 
     if (CursorInEllipse(circleX, circleY, circleRadius, circleRadius) && MC::held) {
         if(MC::mousepos.x > farLeftX && MC::mousepos.x < farRightX) {
 
-            SliderRects[index].movedX = MC::mousepos.x - circleRadius / 2.0f;
+            SliderRects[index].movedX = MC::mousepos.x;
             SliderRects[index].hasBeenMoved = true;
             SliderRects[index].isMovingElement = true;
         }
@@ -537,7 +549,7 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
         if(MC::mousepos.x > farLeftX && MC::mousepos.x < farRightX) {
 
-            SliderRects[index].movedX = MC::mousepos.x - circleRadius / 2.0f;
+            SliderRects[index].movedX = MC::mousepos.x;
             SliderRects[index].hasBeenMoved = true;
             SliderRects[index].isMovingElement = true;
         }
@@ -661,7 +673,7 @@ void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const 
     writeFactory->Release();*/
 }
 
-void FlarialGUI::ColorPicker(const int index, float x, const float y, std::string &hex) {
+void FlarialGUI::ColorPicker(const int index, float x, const float y, std::string &hex, float &opacity) {
 
     // Accepts hex, so for e.g. fps counter bg color wants to be changed then you'd have to give a modifyable hex value
     // Preferably save every color in config as a hex (string)
@@ -678,7 +690,10 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
     FlarialGUI::RoundedRect(x , y + s * 0.15f, D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), s * 4.125f, s, round.x, round.x);
 
     round = Constraints::RoundingConstraint(10, 10);
-    FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, FlarialGUI::HexToColorF(hex), s * 0.85f, s * 0.85f, round.x, round.x);
+
+    D2D1_COLOR_F color = FlarialGUI::HexToColorF(hex);
+    color.a = opacity;
+    FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, color, s * 0.85f, s * 0.85f, round.x, round.x);
 
     round = Constraints::RoundingConstraint(11.5, 11.5);
     FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f), s * 3.f, s * 0.82f, round.x, round.x);
@@ -691,20 +706,75 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
         ColorPickers[index].isActive = !ColorPickers[index].isActive;
     }
 
-    FlarialGUI::ColorPickerWindow(index, hex);
+    FlarialGUI::ColorPickerWindow(index, hex, opacity);
     // rounded rect showcasing this hex, if clicked then ColorPickerWindow
 
     // text next to rounded rect showing the thing
 
 }
 
-void FlarialGUI::ColorPickerWindow(int index, std::string &hex) {
+void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float& opacity) {
 
     if(ColorPickers[index].isActive) {
+
+        D2D1_COLOR_F color = FlarialGUI::HexToColorF(hex);
         // 50% opacity black rect
         FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black, 0.75),
                                 Constraints::RelativeConstraint(1.5, "width", true),
                                 Constraints::RelativeConstraint(1.5, "height", true), 0, 0);
+
+        float rectwidth = Constraints::RelativeConstraint(0.35, "height", true);
+        float rectheight = Constraints::RelativeConstraint(0.25, "height", true);
+        Vec2<float> center = Constraints::CenterConstraint(rectwidth, rectheight);
+        Vec2<float> round = Constraints::RoundingConstraint(25, 25);
+
+        FlarialGUI::SetWindowRect(center.x, center.y - Constraints::RelativeConstraint(0.03, "height", true), rectwidth, Constraints::RelativeConstraint(0.03, "height", true), index + 50);
+
+        Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(center.x, center.y, index + 50);
+        center.x = vec2.x;
+        center.y = vec2.y;
+
+        FlarialGUI::RoundedHollowRect(center.x, center.y, Constraints::RelativeConstraint(0.01, "height", true), D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), rectwidth, rectheight, round.x, round.x);
+        FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectwidth, rectheight, round.x, round.x);
+
+        FlarialGUI::PushSize(center.x, center.y, rectwidth, rectheight);
+
+        float x = Constraints::PercentageConstraint(0.18, "left");
+        float y = Constraints::PercentageConstraint(0.15, "top");
+
+        float spacing = Constraints::SpacingConstraint(0.15, rectheight);
+
+        float percentR = FlarialGUI::Slider(index + 50, x, y,
+                                            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+                                            D2D1::ColorF(D2D1::ColorF::White), color.r * 255.0f, 255.0f);
+
+        float percentG = FlarialGUI::Slider(index + 100, x, y + spacing,
+                                            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+                                            D2D1::ColorF(D2D1::ColorF::White), color.g * 255.0f, 255.0f);
+
+        float percentB = FlarialGUI::Slider(index + 150, x, y + spacing * 2,
+                                            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+                                            D2D1::ColorF(D2D1::ColorF::White), color.b * 255.0f, 255.0f);
+
+        opacity = FlarialGUI::Slider(index + 200, x, y + spacing * 3,
+                                     D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f, opacity),
+                                     D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f, opacity),
+                                     D2D1::ColorF(D2D1::ColorF::White), opacity, 1.0);
+
+
+
+        color.r = percentR / 255.0f;
+        color.g = percentG / 255.0f;
+        color.b = percentB / 255.0f;
+
+        hex = FlarialGUI::ColorFToHex(color);
+
+        FlarialGUI::PopSize();
+
+        FlarialGUI::UnsetWindowRect();
 
         // rect containing shit
 
@@ -727,27 +797,42 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex) {
 
 D2D1::ColorF FlarialGUI::HexToColorF(const std::string& hexString)
 {
-    // Convert the hex string to an integer value
-    uint32_t hex;
-    std::stringstream ss;
-    ss << std::hex << hexString;
-    ss >> hex;
+    if (hexString.length() != 6)
+    {
+        // Return black if the string length is not 6
+        return D2D1::ColorF(0.0f, 0.0f, 0.0f);
+    }
 
-    // Extract the individual color components from the hex value
-    uint8_t red = (hex >> 16) & 0xFF;
-    uint8_t green = (hex >> 8) & 0xFF;
-    uint8_t blue = hex & 0xFF;
+    try
+    {
+        // Convert the hex string to an integer value
+        uint32_t hex;
+        std::stringstream ss;
+        ss << std::hex << hexString;
+        ss >> hex;
 
-    // Normalize the color components to the range [0.0, 1.0]
-    float normalizedRed = static_cast<float>(red) / 255.0f;
-    float normalizedGreen = static_cast<float>(green) / 255.0f;
-    float normalizedBlue = static_cast<float>(blue) / 255.0f;
+        // Extract the individual color components from the hex value
+        uint8_t red = (hex >> 16) & 0xFF;
+        uint8_t green = (hex >> 8) & 0xFF;
+        uint8_t blue = hex & 0xFF;
 
-    // Return the D2D1::ColorF struct
-    return {normalizedRed, normalizedGreen, normalizedBlue};
+        // Normalize the color components to the range [0.0, 1.0]
+        float normalizedRed = static_cast<float>(red) / 255.0f;
+        float normalizedGreen = static_cast<float>(green) / 255.0f;
+        float normalizedBlue = static_cast<float>(blue) / 255.0f;
+
+        // Return the D2D1::ColorF struct
+        return D2D1::ColorF(normalizedRed, normalizedGreen, normalizedBlue);
+    }
+    catch (const std::exception&)
+    {
+        // Return black if the conversion fails
+        return D2D1::ColorF(0.0f, 0.0f, 0.0f);
+    }
 }
 
-std::string FlarialGUI::ColorFToHex(const D2D1::ColorF& color)
+
+std::string FlarialGUI::ColorFToHex(const D2D1_COLOR_F& color)
 {
     // Convert the color components from the range [0.0, 1.0] to [0, 255]
     auto red = static_cast<uint8_t>(std::round(color.r * 255));
@@ -914,8 +999,8 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 
     if (WindowRects[currentNum].hasBeenMoved)
     {
-        x = Constraints::PercentageConstraint(WindowRects[currentNum].percentageX, "left");
-        y = Constraints::PercentageConstraint(WindowRects[currentNum].percentageY, "top");
+        x = Constraints::PercentageConstraint(WindowRects[currentNum].percentageX, "left", true);
+        y = Constraints::PercentageConstraint(WindowRects[currentNum].percentageY, "top", true);
     }
 
     if (CursorInRect(x, y, width, height) && MC::held)
@@ -970,8 +1055,8 @@ Vec2<float> FlarialGUI::CalculateMovedXY(float x, float y, int num)
 {
     if (isInWindowRect && WindowRects[num].hasBeenMoved)
     {
-        x = Constraints::PercentageConstraint(WindowRects[num].percentageX, "left");
-        y = Constraints::PercentageConstraint(WindowRects[num].percentageY, "top");
+        x = Constraints::PercentageConstraint(WindowRects[num].percentageX, "left", true);
+        y = Constraints::PercentageConstraint(WindowRects[num].percentageY, "top", true);
     }
 
     return {x, y};
