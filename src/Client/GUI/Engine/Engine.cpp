@@ -584,7 +584,7 @@ void FlarialGUI::Circle(float x, float y, const D2D1_COLOR_F& color, float radiu
 
 
 
-void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width, const float height, const D2D1_COLOR_F color, const std::string imagePath, const float imageWidth, const float imageHeight, const wchar_t *text)
+void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const float width, const float height, const D2D1_COLOR_F color, const std::string imagePath, const float imageWidth, const float imageHeight, const wchar_t *text)
 {
 
     float imageY = y;
@@ -593,6 +593,9 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
         y += scrollpos;
         imageY += scrollpos;
     }
+
+    float fakeX = x;
+    float fakeY = y;
 
 
     ID2D1SolidColorBrush *brush;
@@ -614,23 +617,31 @@ void FlarialGUI::RoundedRectWithImageAndText(float x, float y, const float width
 
     } else if (ImagesClass::eimages[imagePath] != nullptr) {
 
-        ID2D1Effect* affineTransformEffect = nullptr;
-        D2D::context->CreateEffect(CLSID_D2D12DAffineTransform, &affineTransformEffect);
+        D2D1_MATRIX_3X2_F oldTransform;
+        D2D::context->GetTransform(&oldTransform);
+
+        if(CursorInRect(x, y, width, height)) {
+
+            FlarialGUI::lerp(rotationAngles[index], rotationAngles[index] + 15, 0.5f * FlarialGUI::frameFactor);
+        }
 
 
-        affineTransformEffect->SetInput(0, ImagesClass::eimages[imagePath]);
+        float rotationAngle = rotationAngles[index];// Specify the rotation angle in degrees
+        D2D1_POINT_2F rotationCenter = D2D1::Point2F(imagerectf.left + imageWidth / 2.0f, imagerectf.top +
+                                                                                          imageHeight /
+                                                                                          2.0f);  // Specify the rotation center
+        D2D1_MATRIX_3X2_F rotationMatrix = D2D1::Matrix3x2F::Rotation(rotationAngle, rotationCenter);
 
-        D2D1_MATRIX_3X2_F matrix = D2D1::Matrix3x2F(0.9f, -0.1f, 0.1f, 0.9f, 8.0f, 45.0f);
-        affineTransformEffect->SetValue(D2D1_2DAFFINETRANSFORM_PROP_TRANSFORM_MATRIX, matrix);
+        D2D1_MATRIX_3X2_F translationMatrix = D2D1::Matrix3x2F::Translation(x, imageY);
+        D2D1_MATRIX_3X2_F combinedMatrix = translationMatrix * rotationMatrix;
 
-        ID2D1Image* image;
-        affineTransformEffect->GetOutput(&image);
+        D2D::context->SetTransform(combinedMatrix);
+
+        imagerectf = D2D1::RectF(0, 0, imageWidth, imageHeight);
 
         D2D::context->DrawBitmap(ImagesClass::eimages[imagePath], imagerectf, 1.0, D2D1_INTERPOLATION_MODE_ANISOTROPIC);
 
-        //D2D::context->DrawImage(image);
-        affineTransformEffect->Release();
-        image->Release();
+        D2D::context->SetTransform(oldTransform);
     }
 
     /*
@@ -691,7 +702,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex) {
 
     if(ColorPickers[index].isActive) {
         // 50% opacity black rect
-        FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black, 0.35),
+        FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black, 0.75),
                                 Constraints::RelativeConstraint(1.5, "width", true),
                                 Constraints::RelativeConstraint(1.5, "height", true), 0, 0);
 
@@ -997,6 +1008,7 @@ void FlarialGUI::ApplyGaussianBlur(float blurIntensity)
     if(SwapchainHook::init) {
 
         ID2D1Bitmap *bitmap = nullptr;
+
         if(SwapchainHook::queue != nullptr) FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap], &bitmap);
         else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap, &bitmap);
 

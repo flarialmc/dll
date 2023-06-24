@@ -61,6 +61,7 @@ namespace FlarialGUI
     std::vector<float> inline darkenAmounts(10000);
     std::vector<float> inline opacityAmounts(20);
     std::vector<float> inline toggleSpacings(20);
+    std::vector<float> inline rotationAngles(40, 45);
     std::vector<D2D1_COLOR_F> inline toggleColors(20, D2D1::ColorF(D2D1::ColorF::White));
     std::vector<D2D1_COLOR_F> inline buttonColors(20, D2D1::ColorF(D2D1::ColorF::Red));
 
@@ -89,7 +90,7 @@ namespace FlarialGUI
     void RoundedRectOnlyTopCorner(const float x, float y, D2D_COLOR_F color, const float width = 160, const float height = 100, const float radiusX = 10, const float radiusY = 10);
     void RoundedRect(const float x, float y, const D2D_COLOR_F color, float width = 160.0f, const float height = 75, const float radiusX = 10.0f, const float radiusY = 10.0f);
     void LoadImageFromFile(const wchar_t *filename, ID2D1Bitmap **bitmap);
-    void RoundedRectWithImageAndText(const float x, float y, const float width, const float height, const D2D1_COLOR_F color, const std::string imagePath, const float imageWidth, const float imageHeight, const wchar_t *text);
+    void RoundedRectWithImageAndText(int index, const float x, float y, const float width, const float height, const D2D1_COLOR_F color, const std::string imagePath, const float imageWidth, const float imageHeight, const wchar_t *text);
     std::wstring to_wide(const std::string &multi);
     void Image(const std::string imageName, const D2D1_RECT_F rect);
     void FlarialText(const float x, float y, const wchar_t *text, D2D1_COLOR_F color, const float width, const float height, DWRITE_TEXT_ALIGNMENT alignment = DWRITE_TEXT_ALIGNMENT_CENTER);

@@ -254,11 +254,11 @@ class ClickGUIRenderer : public Listener {
 
                 FlarialGUI::PushSize(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
 
-                FlarialGUI::SetScrollView(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
+                if(!module->settings.getSettingByName<bool>("enabled")->value) FlarialGUI::SetScrollView(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
 
                 ModuleManager::getModule(ClickGUIRenderer::page.module)->SettingsRender();
 
-                FlarialGUI::UnsetScrollView();
+                if(!module->settings.getSettingByName<bool>("enabled")->value) FlarialGUI::UnsetScrollView();
 
                 FlarialGUI::PopSize();
 

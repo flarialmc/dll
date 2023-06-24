@@ -88,7 +88,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
     round = Constraints::RoundingConstraint(20, 20);
 
     FlarialGUI::RoundedRect(buttonx - paddingspacing, (buttony - paddingwidth) - paddingheightspac, D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), paddingwidth, paddingwidth, round.x, round.x);
-    FlarialGUI::RoundedRectWithImageAndText(buttonx - settingspacing, (buttony - settingswidth) - settingsheightspac, settingswidth, settingswidth, D2D1::ColorF(112.0f / 255.0f, 93.0f / 255.0f, 96.0f / 255.0f), "\\Flarial\\assets\\gear.png", iconwidth, iconwidth, L"");
+    FlarialGUI::RoundedRectWithImageAndText(index, buttonx - settingspacing, (buttony - settingswidth) - settingsheightspac, settingswidth, settingswidth, D2D1::ColorF(112.0f / 255.0f, 93.0f / 255.0f, 96.0f / 255.0f), "\\Flarial\\assets\\gear.png", iconwidth, iconwidth, L"");
 
 
     if (!iconpath.empty() && images[mod->name] == nullptr) {
