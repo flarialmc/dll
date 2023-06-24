@@ -8,7 +8,7 @@ class Uninject : public Module {
 
 public:
 
-    Uninject() : Module("Uninject", "Disables the client.", "", 'P') {
+    Uninject() : Module("Uninject", "Disables the client.", "", VK_F8) {
 
         onEnable();
 

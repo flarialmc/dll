@@ -107,8 +107,8 @@ public:
 
     virtual void NormalRender() {
 
-        float textWidth = Constraints::RelativeConstraint(0.33);
-        float textHeight = Constraints::RelativeConstraint(0.1);
+        float textWidth = Constraints::RelativeConstraint(0.33f * settings.getSettingByName<float>("uiscale")->value);
+        float textHeight = Constraints::RelativeConstraint(0.1f * settings.getSettingByName<float>("uiscale")->value);
 
 
         Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
@@ -122,8 +122,8 @@ public:
         else
             realcenter = Constraints::CenterConstraint(textWidth, textHeight);
 
-        float rectWidth = Constraints::RelativeConstraint(0.225);
-        Vec2<float> rounde = Constraints::RoundingConstraint(this->settings.getSettingByName<float>("rounding")->value, this->settings.getSettingByName<float>("rounding")->value);
+        float rectWidth = Constraints::RelativeConstraint(0.225f * settings.getSettingByName<float>("uiscale")->value);
+        Vec2<float> rounde = Constraints::RoundingConstraint(this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value, this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value);
 
         float realspacing = Constraints::SpacingConstraint(0.33f, textWidth);
 
@@ -159,7 +159,7 @@ public:
                                 textHeight);
 
         if(this->settings.getSettingByName<bool>("border")->value) {
-            FlarialGUI::RoundedHollowRect(realcenter.x, realcenter.y, this->settings.getSettingByName<float>("borderWidth")->value,
+            FlarialGUI::RoundedHollowRect(realcenter.x, realcenter.y, this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value,
                                           borderColor, rectWidth, textHeight,
                                     rounde.x, rounde.x);
         }

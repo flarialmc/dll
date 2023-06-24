@@ -11,7 +11,7 @@ public:
     
     float fov = 30.0f;
 
-    Zoom() : Module("Zoom", "chike wi!", "\\Flarial\\assets\\fps.png", 'C') {
+    Zoom() : Module("Zoom", "chike wi!", "\\Flarial\\assets\\fps.png", 'V') {
 
         onEnable();
 

@@ -567,6 +567,8 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
         percentage = SliderRects[index].percentageX;
     }
 
+    if(percentage < 0.02) percentage = 0.01;
+
     return percentage;
 
 }
@@ -692,7 +694,6 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
     round = Constraints::RoundingConstraint(10, 10);
 
     D2D1_COLOR_F color = FlarialGUI::HexToColorF(hex);
-    color.a = opacity;
     FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, color, s * 0.85f, s * 0.85f, round.x, round.x);
 
     round = Constraints::RoundingConstraint(11.5, 11.5);
@@ -726,7 +727,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float& opacity) 
         float rectwidth = Constraints::RelativeConstraint(0.35, "height", true);
         float rectheight = Constraints::RelativeConstraint(0.25, "height", true);
         Vec2<float> center = Constraints::CenterConstraint(rectwidth, rectheight);
-        Vec2<float> round = Constraints::RoundingConstraint(25, 25);
+        Vec2<float> round = Constraints::RoundingConstraint(45, 45);
 
         FlarialGUI::SetWindowRect(center.x, center.y - Constraints::RelativeConstraint(0.03, "height", true), rectwidth, Constraints::RelativeConstraint(0.03, "height", true), index + 50);
 
@@ -740,22 +741,25 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float& opacity) 
         FlarialGUI::PushSize(center.x, center.y, rectwidth, rectheight);
 
         float x = Constraints::PercentageConstraint(0.18, "left");
-        float y = Constraints::PercentageConstraint(0.15, "top");
-
+        float y = Constraints::PercentageConstraint(0.20, "top");
         float spacing = Constraints::SpacingConstraint(0.15, rectheight);
 
+        FlarialGUI::FlarialTextWithFont(x - spacing * 1.15, y - spacing * 1.45, L"Color Sliders", D2D1::ColorF(D2D1::ColorF::White), Constraints::RelativeConstraint(1, "width"), Constraints::RelativeConstraint(0.2, "width"), DWRITE_TEXT_ALIGNMENT_JUSTIFIED, Constraints::RelativeConstraint(0.5, "width"));
+
+        spacing *= 0.90f;
+
         float percentR = FlarialGUI::Slider(index + 50, x, y,
-                                            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                            D2D1::ColorF(D2D1::ColorF::Red),
                                             D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
                                             D2D1::ColorF(D2D1::ColorF::White), color.r * 255.0f, 255.0f);
 
         float percentG = FlarialGUI::Slider(index + 100, x, y + spacing,
-                                            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                            D2D1::ColorF(D2D1::ColorF::Green),
                                             D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
                                             D2D1::ColorF(D2D1::ColorF::White), color.g * 255.0f, 255.0f);
 
         float percentB = FlarialGUI::Slider(index + 150, x, y + spacing * 2,
-                                            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                            D2D1::ColorF(D2D1::ColorF::Blue),
                                             D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
                                             D2D1::ColorF(D2D1::ColorF::White), color.b * 255.0f, 255.0f);
 
@@ -763,6 +767,10 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float& opacity) 
                                      D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f, opacity),
                                      D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f, opacity),
                                      D2D1::ColorF(D2D1::ColorF::White), opacity, 1.0);
+
+        float buttonWidth = Constraints::RelativeConstraint(0.35f, "width");
+        float buttonHeight = Constraints::RelativeConstraint(0.20f, "height");
+        if(FlarialGUI::RoundedButton(x + spacing * 1.45f, y + spacing * 4.12f, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Close", buttonWidth, buttonHeight, round.x, round.x)) ColorPickers[index].isActive = false;
 
 
 

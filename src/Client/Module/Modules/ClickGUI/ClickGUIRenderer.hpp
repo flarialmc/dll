@@ -51,8 +51,8 @@ class ClickGUIRenderer : public Listener {
             lerp(baseHeightActual, 0.64f, 0.18f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
 
         } else {
-            lerp(baseHeightReal, 0.01f, 0.18f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
-            lerp(baseHeightActual, 0.00001f, 0.18f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
+            lerp(baseHeightReal, 0.01f, 0.22f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
+            lerp(baseHeightActual, 0.00001f, 0.30f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
         }
 
         if(SwapchainHook::init && baseHeightActual > 0.01) {
