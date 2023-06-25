@@ -4,6 +4,7 @@
 #include "../../../Events/EventHandler.hpp"
 #include "d2d1.h"
 #include "../../../Client.hpp"
+#include "../../../Module/Modules/CPS/CPSListener.hpp"
 #include <d3d11on12.h>
 #include <wrl/client.h>
 #include <algorithm>
@@ -33,6 +34,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
     std::chrono::duration<float> elapsed = fpsclock.now() - start;
     MC::frames += 1;
+
 
     if (elapsed.count() >= 0.5f) {
         // Calculate frame rate based on elapsed time

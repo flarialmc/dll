@@ -7,6 +7,7 @@
 #include "../../../GUI/D2D.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
 #include "../../../Module/Manager.hpp"
+#include "../CPS/CPSCounter.hpp"
 
 class GUIMouseListener : public Listener {
 

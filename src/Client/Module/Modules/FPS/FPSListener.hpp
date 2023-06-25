@@ -20,7 +20,7 @@ class FPSListener : public Listener {
 
         if(module->settings.getSettingByName<bool>("enabled")->value){
 
-            this->module->NormalRender();
+            this->module->NormalRender(0, "FPS", std::to_string(MC::fps));
 
         }
 

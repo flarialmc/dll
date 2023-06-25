@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "../../../Events/EventHandler.hpp"
 #include "ClickGUIRenderer.hpp"
+#include "GUIMouseListener.hpp"
 
 class ClickGUI : public Module {
 

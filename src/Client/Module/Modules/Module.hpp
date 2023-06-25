@@ -105,7 +105,7 @@ public:
 
    }
 
-    virtual void NormalRender() {
+    virtual void NormalRender(int index, std::string text, std::string value) {
 
         float textWidth = Constraints::RelativeConstraint(0.33f * settings.getSettingByName<float>("uiscale")->value);
         float textHeight = Constraints::RelativeConstraint(0.1f * settings.getSettingByName<float>("uiscale")->value);
@@ -127,9 +127,9 @@ public:
 
         float realspacing = Constraints::SpacingConstraint(0.155f, textWidth);
 
-        FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, 0);
+        FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, index);
 
-        Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, 0, rectWidth, textHeight);
+        Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, rectWidth, textHeight);
 
         realcenter.x = vec2.x;
         realcenter.y = vec2.y;
@@ -154,7 +154,7 @@ public:
                                 bgColor, rectWidth, textHeight,
                                 rounde.x, rounde.x);
         FlarialGUI::FlarialText(realcenter.x - realspacing, realcenter.y,
-                                FlarialGUI::to_wide(std::format("FPS: {}", MC::fps)).c_str(),
+                                FlarialGUI::to_wide(std::format("{}: {}", text, value)).c_str(),
                                 textColor, textWidth,
                                 textHeight);
 
