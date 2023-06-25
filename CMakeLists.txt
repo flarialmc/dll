@@ -9,7 +9,7 @@ endif()
 
 file(GLOB_RECURSE sources "main.cpp" "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp")
 
-add_library(Flarial SHARED ${sources} src/Client/Module/Modules/CPS/CPSCounter.hpp src/Client/Module/Modules/CPS/CPSListener.hpp)
+add_library(Flarial SHARED ${sources})
 
 target_include_directories(Flarial PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/")
 add_library(sussy SHARED IMPORTED GLOBAL)
