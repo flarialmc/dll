@@ -117,8 +117,8 @@ public:
         Vec2<float> realcenter;
 
         if (settingperc.x != 0)
-            realcenter = Vec2<float>(Constraints::PercentageConstraint(settingperc.x, "left"),
-                                     Constraints::PercentageConstraint(settingperc.y, "top"));
+            realcenter = Vec2<float>(settingperc.x * MC::windowSize.x,
+                                     settingperc.y * MC::windowSize.y);
         else
             realcenter = Constraints::CenterConstraint(textWidth, textHeight);
 
@@ -129,7 +129,7 @@ public:
 
         FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, 0);
 
-        Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, 0);
+        Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, 0, rectWidth, textHeight);
 
         realcenter.x = vec2.x;
         realcenter.y = vec2.y;

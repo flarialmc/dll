@@ -1,4 +1,6 @@
 ﻿#include "Engine.hpp"
+
+#include <utility>
 #include "Constraints.hpp"
 #include "../../Module/Modules/Module.hpp"
 #include "../../Hook/Hooks/Render/SwapchainHook.hpp"
@@ -450,8 +452,26 @@ float FlarialGUI::HueToRGB(float p, float q, float t)
 
 
 
-std::string FlarialGUI::TextBox(int index, float x, float y, float width, float height) {
-    FlarialGUI::TextBoxes[index].isActive = true;
+std::string FlarialGUI::TextBox(int index, std::string text, int limit, float x, float y, float width, float height) {
+
+    if(CursorInRect(x, y, width, height) && MC::mouseaction == MouseAction::PRESS && MC::mousebutton == MouseButton::Left) {
+
+        FlarialGUI::TextBoxes[index].isActive = true;
+
+    } else if (!CursorInRect(x, y, width, height) && MC::mouseaction == MouseAction::PRESS && MC::mousebutton == MouseButton::Left) {
+
+        FlarialGUI::TextBoxes[index].isActive = false;
+        FlarialGUI::TextBoxes[index].text = text;
+
+    }
+
+    if(FlarialGUI::TextBoxes[index].text.empty() && FlarialGUI::TextBoxes[index].firstTime) {
+        FlarialGUI::TextBoxes[index].firstTime = false;
+        FlarialGUI::TextBoxes[index].text = text;
+    }
+
+    FlarialGUI::TextBoxes[index].text = FlarialGUI::TextBoxes[index].text.substr(0, limit);
+
     return FlarialGUI::TextBoxes[index].text;
 }
 
@@ -699,7 +719,14 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
     round = Constraints::RoundingConstraint(11.5, 11.5);
     FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f), s * 3.f, s * 0.82f, round.x, round.x);
 
-    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.006f, FlarialGUI::to_wide("#" + hex).c_str(), D2D1::ColorF(D2D1::ColorF::White), s * 4.3f, s * 1.1f, DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f);
+    std::string text;
+    hex = FlarialGUI::TextBox(index, hex, 6, x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, s * 3.f, s * 0.82f);
+    if (hex.length() > 6) {
+    hex = hex.substr(0, 6);
+    }
+    text = "#" + hex;
+
+    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.006f, FlarialGUI::to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), s * 4.3f, s * 1.1f, DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f);
 
     if (CursorInRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, s * 0.85f, s * 0.85f) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
@@ -1029,6 +1056,7 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 
         WindowRects[currentNum].percentageX = WindowRects[currentNum].movedX / MC::windowSize.x;
         WindowRects[currentNum].percentageY = WindowRects[currentNum].movedY / MC::windowSize.y;
+
     }
 
     if (MC::mousebutton == MouseButton::None && !MC::held || MC::mousebutton == MouseButton::Left && !MC::held)
@@ -1059,12 +1087,12 @@ void FlarialGUI::UpdateWindowRects()
     }
 }
 
-Vec2<float> FlarialGUI::CalculateMovedXY(float x, float y, int num)
+Vec2<float> FlarialGUI::CalculateMovedXY(float x, float y, int num, float rectWidth, float rectHeight)
 {
     if (isInWindowRect && WindowRects[num].hasBeenMoved)
     {
-        x = Constraints::PercentageConstraint(WindowRects[num].percentageX, "left", true);
-        y = Constraints::PercentageConstraint(WindowRects[num].percentageY, "top", true);
+        x = (WindowRects[num].percentageX * MC::windowSize.x);
+        y = (WindowRects[num].percentageY * MC::windowSize.y);
     }
 
     return {x, y};

@@ -16,6 +16,7 @@ struct WindowRect
     bool madeRect = false;
     float percentageX = 0;
     float percentageY = 0;
+    float ratio = 0;
 };
 
 struct SliderRect
@@ -31,6 +32,7 @@ struct TextBoxStruct
 {
     std::string text;
     bool isActive;
+    bool firstTime = true;
 };
 
 struct ColorPicker
@@ -100,7 +102,7 @@ namespace FlarialGUI
     void ScrollBar(float x, float y, float width, float height, float radius);
     void SetWindowRect(float x, float y, float width, float height, int currentNum);
     void UnsetWindowRect();
-    Vec2<float> CalculateMovedXY(float x, float y, int num);
+    Vec2<float> CalculateMovedXY(float x, float y, int num, float rectWidth = 0.0f, float rectHeight = 0.0f);
     Vec2<float> CalculateResizedXY(float x, float y, float width, float height);
     void UpdateWindowRects();
 
@@ -119,7 +121,7 @@ namespace FlarialGUI
 
     void Circle(float x, float y, const D2D1_COLOR_F &color, float radius);
 
-    std::string TextBox(int index, float x, float y, float width, float height);
+    std::string TextBox(int index, std::string text, int limit, float x, float y, float width, float height);
 
     void ColorWheel(float x, float y, float radius);
 

@@ -10,12 +10,29 @@ class GUIKeyListener : public Listener {
 
     void onKey(KeyEvent &event) override {
 
-        if(event.GetKey() == 20) isCapital = !isCapital;
+        if(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")) {
 
-        for (auto& box : FlarialGUI::TextBoxes) {
+            if (event.GetKey() == 20) isCapital = !isCapital;
 
-            if(box.isActive && event.GetAction() == (int)ActionType::PRESSED)
-                box.text += event.GetKeyAsString(isCapital);
+            for (auto &box: FlarialGUI::TextBoxes) {
+
+                if (box.isActive && event.GetAction() == (int) ActionType::PRESSED)
+                    if (event.GetKey() != VK_BACK)
+                        box.text += event.GetKeyAsString(isCapital);
+                    else {
+                        if (!box.text.empty()) {
+                            box.text.erase(box.text.length() - 1);  // Erase the last character
+                        }
+                    }
+            }
+        } else {
+
+            for (auto &box: FlarialGUI::TextBoxes) {
+
+                box.isActive = false;
+
+            }
+
         }
 
     };
