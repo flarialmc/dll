@@ -73,6 +73,10 @@ void Client::initialize()
     std::string savepath9 = Utils::getRoamingPath() + "\\Flarial\\assets\\magnify.png";
     URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL9).c_str(), FlarialGUI::to_wide(savepath9).c_str(), 0, NULL);
 
+    std::string dwnld_URL10 = "https://cdn.flarial.net/assets/time.png";
+    std::string savepath10 = Utils::getRoamingPath() + "\\Flarial\\assets\\time.png";
+    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL10).c_str(), FlarialGUI::to_wide(savepath10).c_str(), 0, NULL);
+
     if(GetModuleHandle("d3d12.dll") == NULL) Logger::debug("module handle is null");
     kiero::init(kiero::RenderType::D3D12);
 
