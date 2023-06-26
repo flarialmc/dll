@@ -8,10 +8,8 @@
 class Zoom : public Module {
 
 public:
-    
-    float fov = 30.0f;
 
-    Zoom() : Module("Zoom", "chike wi!", "\\Flarial\\assets\\fps.png", 'V') {
+    Zoom() : Module("Zoom", "chike wi!", "\\Flarial\\assets\\magnify.png", 'C') {
 
         onEnable();
 

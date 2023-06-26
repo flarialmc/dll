@@ -12,6 +12,7 @@
 #include "../../../Hook/Hooks/Render/SwapchainHook.hpp"
 #include "../../Manager.hpp"
 #include "../../../GUI/Engine/animations/fadeinout.hpp"
+#include "GUIMouseListener.hpp"
 
 struct PageType {
     std::string type = "normal";
@@ -274,9 +275,12 @@ class ClickGUIRenderer : public Listener {
 
         if(event.GetKey() == module->keybind && static_cast<ActionType>(event.GetAction()) == ActionType::PRESSED) {
 
-            module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>(
-                    "enabled")->value;
+            module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value;
 
+            if(module->settings.getSettingByName<bool>("enabled")->value) {
+                GUIMouseListener::accumilatedPos = 0;
+                GUIMouseListener::accumilatedBarPos = 0;
+            }
 
             ClickGUIRenderer::page.type = "normal";
             ClickGUIRenderer::curr = "modules";

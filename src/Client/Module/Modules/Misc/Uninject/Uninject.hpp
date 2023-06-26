@@ -16,7 +16,7 @@ public:
 
     void onEnable() override {
 
-        EventHandler::registerListener(new UninjectListener("Uninject", this));
+        EventHandler::registerListener(new UninjectListener("Uninject"));
 
     }
 
