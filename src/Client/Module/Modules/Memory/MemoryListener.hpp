@@ -12,7 +12,7 @@ class MemoryListener : public Listener {
     Module* module;
 
     void onRender(RenderEvent& event) override {
-        if (module->settings.getSettingByName<bool>("enabled")) {
+        if (module->settings.getSettingByName<bool>("enabled")->value) {
 
 
             MEMORYSTATUSEX memory_status;
