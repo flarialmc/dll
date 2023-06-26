@@ -17,19 +17,12 @@ namespace ModuleManager {
 void ModuleManager::initialize()
 {
 
-
-    modules.push_back(new Uninject());
     modules.push_back(new ClickGUI());
     modules.push_back(new Zoom());
     modules.push_back(new FPSCounter());
     modules.push_back(new CPSCounter());
-    modules.push_back(new Module("test", "woah", "", 1));
-    modules.push_back(new Module("test", "woah", "", 1));
-    modules.push_back(new Module("test", "woah", "", 1));
-    modules.push_back(new Module("test", "woah", "", 1));
-    modules.push_back(new Module("test", "woah", "", 1));
-    modules.push_back(new Module("test", "woah", "", 1));
     EventHandler::registerListener(new GUIKeyListener("E"));
+    EventHandler::registerListener(new UninjectListener("Uninject"));
 
 
 }

@@ -17,8 +17,7 @@ public:
     }
 
 public:
-    explicit UninjectListener(const char string[5], Module* module) {
+    explicit UninjectListener(const char string[5]) {
         this->name = string;
-        this->module = module;
     }
 };
