@@ -23,12 +23,13 @@ class CPSListener : public Listener {
 
 private:
     std::vector<ClickData> leftClickList;
+    std::vector<ClickData> rightClickList;
     Module* module;
 
     void onMouse(MouseEvent &event) override {
 
         if(event.GetButton() == MouseButton::Left && !MC::held) AddLeftClick();
-        //if(event.GetButton() == MouseButton::Right && !MC::held) AddRightClick();
+        if(event.GetButton() == MouseButton::Right && !MC::held) AddRightClick();
 
     }
 
@@ -40,8 +41,9 @@ private:
     void onRender(RenderEvent &event) override {
 
         if(module->settings.getSettingByName<bool>("enabled")->value){
-
+            if(!module->settings.getSettingByName<bool>("rightcps")->value)
             this->module->NormalRender(1, "CPS", std::to_string(GetLeftCPS()));
+            else this->module->NormalRender(1, "CPS", std::to_string(GetLeftCPS()) + " | " + std::to_string(GetRightCPS()));
 
         }
 
@@ -63,6 +65,16 @@ public:
         }
     }
 
+    void AddRightClick() {
+        ClickData click{};
+        click.timestamp = Microtime();
+        rightClickList.insert(rightClickList.begin(), click);
+
+        if (rightClickList.size() >= 100) {
+            rightClickList.pop_back();
+        }
+    }
+
     [[nodiscard]] int GetLeftCPS() const {
         if (leftClickList.empty()) {
             return 0;
@@ -72,6 +84,19 @@ public:
         int count = std::count_if(leftClickList.begin(), leftClickList.end(), [currentMicros](const ClickData& click) {
             return (currentMicros - click.timestamp <= 1.0);
         });
+
+        return (int)std::round(count);
+    }
+
+    [[nodiscard]] int GetRightCPS() const {
+        if (rightClickList.empty()) {
+            return 0;
+        }
+
+        double currentMicros = Microtime();
+        int count = std::count_if(rightClickList.begin(), rightClickList.end(), [currentMicros](const ClickData& click) {
+            return (currentMicros - click.timestamp <= 1.0);
+            });
 
         return (int)std::round(count);
     }
