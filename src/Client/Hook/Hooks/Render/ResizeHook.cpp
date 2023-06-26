@@ -9,7 +9,13 @@
 
 void ResizeHook::enableHook() {
 
-    auto ResizePtr = (void *)kiero::getMethodsTable()[145];
+    int index;
+
+    if(kiero::getRenderType() == kiero::RenderType::D3D12)
+        index = 145;
+    else index = 13;
+
+    auto ResizePtr = (void *)kiero::getMethodsTable()[index];
 
     this->manualHook(ResizePtr, resizeCallback, (void **)&func_original);
 
