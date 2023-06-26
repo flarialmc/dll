@@ -20,6 +20,10 @@ public:
 
         Module::onEnable();
 
+        if (settings.getSettingByName<bool>("rightcps") == nullptr) {
+            settings.addSetting("rightcps", false);
+        }
+
         if(settings.getSettingByName<float>("percentageX") == nullptr) {
             settings.addSetting("percentageX", 0.0f);
             settings.addSetting("percentageY", 0.0f);
@@ -113,12 +117,17 @@ public:
 
         this->settings.getSettingByName<float>("rounding")->value = percent;
 
+        toggleY += Constraints::SpacingConstraint(0.30, textWidth);
+        toggleX = Constraints::PercentageConstraint(0.019, "left");
+
+        if (FlarialGUI::Toggle(2, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("rightcps")->value)) this->settings.getSettingByName<bool>("rightcps")->value = !this->settings.getSettingByName<bool>("rightcps")->value;
+
         /* Rounding End */
 
         /* Color Pickers Start*/
 
-        toggleX = Constraints::PercentageConstraint(0.019, "left");
-        toggleY += Constraints::SpacingConstraint(0.30, textWidth);
+        toggleX = Constraints::PercentageConstraint(0.55, "left");
+        toggleY -= Constraints::SpacingConstraint(0.30, textWidth);
 
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Background").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
         FlarialGUI::ColorPicker(3, toggleX + Constraints::SpacingConstraint(0.95, textWidth), toggleY - Constraints::SpacingConstraint(0.017, textWidth), settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value);
