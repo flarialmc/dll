@@ -10,7 +10,7 @@ class Time : public Module {
 public:
 
 
-    Time() : Module("Time", "oAnshul==bari", "\\Flarial\\assets\\cursor.png", 'o') {
+    Time() : Module("Time", "oAnshul==bari", "\\Flarial\\assets\\time.png", 'o') {
 
         onEnable();
 
