@@ -8,6 +8,7 @@
 #include "Modules/FPS/FPSCounter.hpp"
 #include "Modules/CPS/CPSCounter.hpp"
 #include "Modules/Zoom/Zoom.hpp"
+#include "Modules/Time/Time.hpp"
 
 
 namespace ModuleManager {
@@ -23,7 +24,7 @@ void ModuleManager::initialize()
     modules.push_back(new CPSCounter());
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));
-
+    modules.push_back(new Time());
 
 }
 
