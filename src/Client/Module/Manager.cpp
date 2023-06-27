@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include "Manager.hpp"
 #include "../Events/EventHandler.hpp"
 #include "Modules/Input/GUIKeyListener.hpp"

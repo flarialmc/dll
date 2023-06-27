@@ -1,4 +1,5 @@
-﻿#include "Manager.hpp"
+﻿#pragma once
+#include "Manager.hpp"
 #include "Hooks/Render/ResizeHook.hpp"
 #include "Hooks/Render/CommandListHook.hpp"
 #include "Hooks/Render/SetupAndRenderHook.hpp"

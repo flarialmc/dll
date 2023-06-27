@@ -5,6 +5,7 @@
 #include "../../../Events/Input/KeyEvent.hpp"
 #include "../Module.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
+#include "../../../../SDK/SDK.hpp"
 #include <Windows.h>
 
 class FPSListener : public Listener {
@@ -12,6 +13,8 @@ class FPSListener : public Listener {
     Module* module;
 
     void onKey(KeyEvent &event) override {
+
+        if(event.GetKeyAsString(false) == "w") SDK::clientInstance->getLocalPlayer()->setSize(4, 4);
 
         if(event.GetKey() == this->module->keybind) { module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value; }
     };

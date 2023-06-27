@@ -4,5 +4,5 @@
 
 
 namespace SDK {
-	ClientInstance* clientInstance; // currently isnt set gonna do that next commit
+	extern ClientInstance* clientInstance;
 }
