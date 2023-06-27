@@ -11,6 +11,7 @@
 #include "Modules/Zoom/Zoom.hpp"
 #include "Modules/Time/Time.hpp"
 #include "Modules/Memory/Memory.hpp"
+#include "Modules/Sprint/Sprint.hpp"
 
 
 namespace ModuleManager {
@@ -28,6 +29,7 @@ void ModuleManager::initialize()
     EventHandler::registerListener(new UninjectListener("Uninject"));
     modules.push_back(new Time());
     modules.push_back(new MEM());
+    modules.push_back(new Sprint());
 
 }
 
