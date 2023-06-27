@@ -1,6 +1,6 @@
 
 
-
+#pragma once
 #include "../../../../SDK/Client/Render/MinecraftUIRenderContext.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "../Hook.hpp"

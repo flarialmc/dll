@@ -38,6 +38,12 @@ void set##name(type v) const { direct_access<type>(ptr, offset) = v; }
 class Memory
 {
 public:
+
+    template <unsigned int IIdx, typename TRet, typename... TArgs>
+    static inline auto CallVFunc(void* thisptr, TArgs... argList) -> TRet {
+        using Fn = TRet(__thiscall*)(void*, decltype(argList)...);
+        return (*static_cast<Fn**>(thisptr))[IIdx](thisptr, argList...);
+    }
   
 
     static uintptr_t findSig(const char *pattern)
