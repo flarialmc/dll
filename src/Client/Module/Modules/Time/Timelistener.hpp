@@ -42,6 +42,11 @@ class TimeListener : public Listener {
             if (hour - 12 < 0) {
                 meridiem = "AM";
             }
+            else if (hour == 0) {
+                hour = 12;
+                meridiem = "AM";
+            }
+
             else {
                 meridiem = "PM";
                 hour -= 12;
