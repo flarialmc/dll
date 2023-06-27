@@ -14,7 +14,7 @@ class FPSListener : public Listener {
 
     void onKey(KeyEvent &event) override {
 
-        if(event.GetKeyAsString(false) == "w") SDK::clientInstance->getLocalPlayer()->setSize(4, 4);
+        SDK::clientInstance->getLocalPlayer()->setSize(4, 4);
 
         if(event.GetKey() == this->module->keybind) { module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value; }
     };
