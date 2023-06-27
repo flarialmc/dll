@@ -23,7 +23,12 @@ void SwapchainHook::enableHook()
 {
     void* swapchain_ptr;
 
-    swapchain_ptr = (void *)kiero::getMethodsTable()[140];
+    int index;
+    if(kiero::getRenderType() == kiero::RenderType::D3D12)
+        index = 140;
+    else index = 8;
+
+    swapchain_ptr = (void *)kiero::getMethodsTable()[index];
 
     this->manualHook(swapchain_ptr, swapchainCallback, (void **)&func_original);
 }
