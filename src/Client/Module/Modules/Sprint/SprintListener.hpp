@@ -20,25 +20,25 @@ class SprintListener : public Listener {
             }            
         }
 
-
-
         if (event.GetKey() == this->module->keybind) { module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value; }
     };
 
     void onRender(RenderEvent& event) override {
-        if (SDK::clientInstance != nullptr) {
-            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                if (SDK::clientInstance->getLocalPlayer()->getActorFlag(34) and !SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) {
-                    if (module->settings.getSettingByName<bool>("enabled")->value) {
+        if (module->settings.getSettingByName<bool>("enabled")->value) {
+            if (SDK::clientInstance != nullptr) {
+                if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                    if (SDK::clientInstance->getLocalPlayer()->getActorFlag(34) and !SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) {
                         if (module->settings.getSettingByName<bool>("always")->value) {
                             SDK::clientInstance->getLocalPlayer()->setSprinting(true);
                         }
                         else if (module->settings.getSettingByName<bool>("toggled")->value) {
                             SDK::clientInstance->getLocalPlayer()->setSprinting(module->settings.getSettingByName<bool>("toggled")->value);
                         }
-
                     }
-
+                    if (SDK::clientInstance->getLocalPlayer()->getActorFlag(1)) { this->module->NormalRender(5, "", "Sneaking"); }
+                    else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) { this->module->NormalRender(5, "", "Sprinting"); }
+                    else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(34)) { this->module->NormalRender(5, "", "Walking"); }
+                    else { this->module->NormalRender(5, "", "Standing"); }
                 }
             }
         }
