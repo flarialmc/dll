@@ -78,10 +78,14 @@ void Client::initialize()
     URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL11).c_str(), FlarialGUI::to_wide(savepath11).c_str(), 0, NULL);
 
     std::string dwnld_URL10 = "https://cdn.flarial.net/assets/time.png";
-    std::string savepath10 = Utils::getRoamingPath() + "\\Flarial\\assets\\time.png";
+    std::string savepath10 = Utils::getRoamingPath() + "\\Flarial\\assets\\autosprint.png";
     URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL10).c_str(), FlarialGUI::to_wide(savepath10).c_str(), 0, NULL);
 
-    if(GetModuleHandle("d3d12.dll") == NULL) Logger::debug("module handle is null");
+    std::string dwnld_URL12 = "https://cdn.flarial.net/assets/auto_sprint.png";
+    std::string savepath12 = Utils::getRoamingPath() + "\\Flarial\\assets\\auto_sprint.png";
+    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL12).c_str(), FlarialGUI::to_wide(savepath12).c_str(), 0, NULL);
+
+    if (GetModuleHandle("d3d12.dll") == NULL) Logger::debug("module handle is null");
 
 
 
