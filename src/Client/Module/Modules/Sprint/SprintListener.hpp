@@ -15,9 +15,15 @@ class SprintListener : public Listener {
     void onKey(KeyEvent& event) override {
 
         if (module->settings.getSettingByName<bool>("enabled")->value) {
+            if (event.GetKey() == 'W' && event.GetAction() == 1) {
+                module->settings.getSettingByName<bool>("moving")->value = true;
+            }
+            else if (event.GetKey() == 'W' && event.GetAction() == 0) {
+                module->settings.getSettingByName<bool>("moving")->value = false;
+            }
             
-                if (event.GetKey() == 'N' && event.GetAction() == 0) {
-                    module->settings.getSettingByName<bool>("toggled")->value = !module->settings.getSettingByName<bool>("toggled")->value;
+            if (event.GetKey() == 'N' && event.GetAction() == 0) {
+                module->settings.getSettingByName<bool>("toggled")->value = !module->settings.getSettingByName<bool>("toggled")->value;
             }            
         }
 
@@ -29,16 +35,18 @@ class SprintListener : public Listener {
     void onRender(RenderEvent& event) override {
         if (SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                if (module->settings.getSettingByName<bool>("enabled")->value) {
-                    if (module->settings.getSettingByName<bool>("always")->value) {
-                        SDK::clientInstance->getLocalPlayer()->setSprinting(true);
-                    }
-                    else if (module->settings.getSettingByName<bool>("toggled")->value) {
-                        SDK::clientInstance->getLocalPlayer()->setSprinting(module->settings.getSettingByName<bool>("toggled")->value);
+                if (module->settings.getSettingByName<bool>("moving")->value and !SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) {
+                    if (module->settings.getSettingByName<bool>("enabled")->value) {
+                        if (module->settings.getSettingByName<bool>("always")->value) {
+                            SDK::clientInstance->getLocalPlayer()->setSprinting(true);
+                        }
+                        else if (module->settings.getSettingByName<bool>("toggled")->value) {
+                            SDK::clientInstance->getLocalPlayer()->setSprinting(module->settings.getSettingByName<bool>("toggled")->value);
+                        }
+
                     }
 
                 }
-
             }
         }
     }

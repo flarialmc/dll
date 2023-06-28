@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Actor.hpp"
+#include "../../../Utils/Logger/Logger.hpp"
 #include "../../../Utils/Memory/Memory.hpp"
 
 class Mob : public Actor {
