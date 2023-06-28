@@ -27,17 +27,19 @@ class SprintListener : public Listener {
     };
 
     void onRender(RenderEvent& event) override {
-        if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-            if (module->settings.getSettingByName<bool>("enabled")->value) {
-                if (module->settings.getSettingByName<bool>("always")->value) {
-                    SDK::clientInstance->getLocalPlayer()->setSprinting(true);
-                }
-                else if (module->settings.getSettingByName<bool>("toggled")->value) {
-                    SDK::clientInstance->getLocalPlayer()->setSprinting(module->settings.getSettingByName<bool>("toggled")->value);
+        if (SDK::clientInstance != nullptr) {
+            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                if (module->settings.getSettingByName<bool>("enabled")->value) {
+                    if (module->settings.getSettingByName<bool>("always")->value) {
+                        SDK::clientInstance->getLocalPlayer()->setSprinting(true);
+                    }
+                    else if (module->settings.getSettingByName<bool>("toggled")->value) {
+                        SDK::clientInstance->getLocalPlayer()->setSprinting(module->settings.getSettingByName<bool>("toggled")->value);
+                    }
+
                 }
 
             }
-
         }
     }
 
