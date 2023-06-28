@@ -27,7 +27,7 @@ void ModuleManager::initialize()
     modules.push_back(new CPSCounter());
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));
-    //modules.push_back(new Time());
+    modules.push_back(new Time());
     modules.push_back(new MEM());
     modules.push_back(new Sprint());
 

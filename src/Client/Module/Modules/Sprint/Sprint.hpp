@@ -24,10 +24,6 @@ public:
             settings.addSetting("toggled", false);
         }
 
-        if (settings.getSettingByName<bool>("moving") == nullptr) {
-            settings.addSetting("moving", false);
-        }
-
         if (settings.getSettingByName<bool>("always") == nullptr) {
             settings.addSetting("always", false);
         }
