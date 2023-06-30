@@ -4,6 +4,7 @@
 #include <string>
 #include "../../../Utils/Memory/Memory.hpp"
 #include "../../../Utils/Logger/Logger.hpp"
+#include "../../../Utils/Utils.hpp"
 
 class Actor {
     enum ActorFlags
@@ -126,10 +127,18 @@ class Actor {
 public:
     uintptr_t** VTable;
 
-    bool getActorFlag(int flag) {
-        bool yes = Memory::CallVFunc<0, bool, int>(this, flag);
-        return yes;
+    template <unsigned int IIdx, typename TRet, typename... TArgs>
+    TRet CallVFunc(TArgs... args) {
+        using Fn = TRet(__thiscall*)(void*, TArgs...);
+        return (*reinterpret_cast<Fn**>(this))[IIdx](this, args...);
+    }
 
+    bool getActorFlag(int flag) {
+        return CallVFunc<0, bool, int>(flag);
+    }
+
+    Vec3<float> getpos() {
+        return CallVFunc<22, Vec3<float>>(this);
     }
 
 };
