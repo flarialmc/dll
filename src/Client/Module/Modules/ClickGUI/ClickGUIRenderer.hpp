@@ -13,6 +13,7 @@
 #include "../../Manager.hpp"
 #include "../../../GUI/Engine/animations/fadeinout.hpp"
 #include "GUIMouseListener.hpp"
+#include "../../../../SDK/SDK.hpp"
 
 struct PageType {
     std::string type = "normal";
@@ -277,6 +278,8 @@ class ClickGUIRenderer : public Listener {
 
             module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value;
 
+            if(!module->settings.getSettingByName<bool>("enabled")->value == false) SDK::clientInstance->grabMouse();
+
             if(module->settings.getSettingByName<bool>("enabled")->value) {
                 GUIMouseListener::accumilatedPos = 0;
                 GUIMouseListener::accumilatedBarPos = 0;
@@ -285,12 +288,19 @@ class ClickGUIRenderer : public Listener {
             ClickGUIRenderer::page.type = "normal";
             ClickGUIRenderer::curr = "modules";
         }
-        if(module->settings.getSettingByName<bool>("enabled")->value) event.setCancelled(true);
 
-        if(event.GetKey() == VK_ESCAPE) {
+
+        if(event.GetKey() == VK_ESCAPE && module->settings.getSettingByName<bool>("enabled")->value) {
+
+            SDK::clientInstance->grabMouse();
             module->settings.getSettingByName<bool>("enabled")->value = false;
             ClickGUIRenderer::page.type = "normal";
             ClickGUIRenderer::curr = "modules";
+        }
+
+        if(module->settings.getSettingByName<bool>("enabled")->value) {
+            SDK::clientInstance->releaseMouse();
+            event.setCancelled(true);
         }
     }
 

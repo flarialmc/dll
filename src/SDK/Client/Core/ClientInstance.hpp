@@ -2,6 +2,7 @@
 
 #include "../Actor/LocalPlayer.hpp"
 #include <cstdint>
+#include "../../../Utils/Memory/Memory.hpp"
 
 class ClientInstance {
 public:
@@ -13,4 +14,15 @@ public:
 		auto getLocalPlayerFunc = reinterpret_cast<LocalPlayer*(__fastcall*)(ClientInstance*)> (this->VTable[27]);
 		return getLocalPlayerFunc(this);
 	}
+    void grabMouse() {
+        return Memory::CallVFunc<304, void>(this);
+    }
+
+    void releaseMouse() {
+        return Memory::CallVFunc<305, void>(this);
+    }
+
+    void refocusMouse() {
+        return Memory::CallVFunc<306, void>(this);
+    }
 };
