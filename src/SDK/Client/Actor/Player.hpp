@@ -6,5 +6,4 @@
 class Player : public Mob {
 
 
-
 };

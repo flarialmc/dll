@@ -278,7 +278,7 @@ class ClickGUIRenderer : public Listener {
 
             module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value;
 
-            if(!module->settings.getSettingByName<bool>("enabled")->value == false) SDK::clientInstance->grabMouse();
+            if(!module->settings.getSettingByName<bool>("enabled")->value) SDK::clientInstance->grabMouse();
 
             if(module->settings.getSettingByName<bool>("enabled")->value) {
                 GUIMouseListener::accumilatedPos = 0;
@@ -293,6 +293,7 @@ class ClickGUIRenderer : public Listener {
         if(event.GetKey() == VK_ESCAPE && module->settings.getSettingByName<bool>("enabled")->value) {
 
             SDK::clientInstance->grabMouse();
+            Logger::debug(std::to_string(reinterpret_cast<uintptr_t>(SDK::clientInstance->getLocalPlayer()->getMoveInputHandler())));
             module->settings.getSettingByName<bool>("enabled")->value = false;
             ClickGUIRenderer::page.type = "normal";
             ClickGUIRenderer::curr = "modules";
