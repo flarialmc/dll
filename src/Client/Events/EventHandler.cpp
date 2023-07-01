@@ -4,6 +4,7 @@
 #pragma once
 #include "EventHandler.hpp"
 #include "Render/RenderEvent.hpp"
+#include "../../SDK/SDK.hpp"
 
 void EventHandler::registerListener(Listener *listener) {
     listeners.push_back(listener);
@@ -22,6 +23,18 @@ void EventHandler::unregisterListener(std::string name) {
 void EventHandler::unregisterAll() {
 
     listeners.clear();
+
+}
+
+void EventHandler::onTick(TickEvent &event) {
+
+    for (Listener* &listener: listeners) {
+
+        if(event.getActor() == SDK::clientInstance->getLocalPlayer())
+        listener->onLocalTick(event);
+        else listener->onTick(event);
+
+    }
 
 }
 

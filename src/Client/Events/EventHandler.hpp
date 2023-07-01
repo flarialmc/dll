@@ -5,6 +5,7 @@
 #include "Input/KeyEvent.hpp"
 #include "Input/MouseEvent.hpp"
 #include "Render/RenderEvent.hpp"
+#include "Game/TickEvent.hpp"
 
 class EventHandler {
 
@@ -17,6 +18,7 @@ public:
     static void onRender(RenderEvent &event);
     static void onKey(KeyEvent &event);
     static void onMouse(MouseEvent &event);
+    static void onTick(TickEvent &event);
 
     static void unregisterAll();
 

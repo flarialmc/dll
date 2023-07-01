@@ -24,6 +24,7 @@ class SprintListener : public Listener {
     };
 
     void onRender(RenderEvent& event) override {
+
         if (module->settings.getSettingByName<bool>("enabled")->value) {
             if (SDK::clientInstance != nullptr) {
                 if (SDK::clientInstance->getLocalPlayer() != nullptr) {
@@ -42,6 +43,12 @@ class SprintListener : public Listener {
                 }
             }
         }
+    }
+
+    void onLocalTick(TickEvent &event) override {
+
+        //Logger::debug("Xd!");
+
     }
 
 public:

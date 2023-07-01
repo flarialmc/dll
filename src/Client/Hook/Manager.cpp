@@ -3,6 +3,7 @@
 #include "Hooks/Render/ResizeHook.hpp"
 #include "Hooks/Render/CommandListHook.hpp"
 #include "Hooks/Render/SetupAndRenderHook.hpp"
+#include "Hooks/Game/ActorNormalTick.hpp"
 
 std::vector<Hook *> HookManager::hooks;
 
@@ -20,6 +21,7 @@ void HookManager::initialize()
     hooks.push_back(new SwapchainHook());
     hooks.push_back(new ResizeHook());
     hooks.push_back(new getFovHook());
+    hooks.push_back(new ActorNormalTick());
 
     for (auto hook : hooks)
         hook->enableHook();

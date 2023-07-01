@@ -147,7 +147,7 @@ public:
         return Memory::CallVFunc<0, bool, int>(this, flag);
     }
 
-    Vec3<float> getpos() {
+    Vec3<float> getPos() {
         return Memory::CallVFunc<22, Vec3<float>>(this);
     }
 
