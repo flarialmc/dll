@@ -152,4 +152,6 @@ namespace FlarialGUI
     FlarialTextWithFont(float x, float y, const wchar_t *text, D2D1_COLOR_F color, const float width,
                         const float height,
                         const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize);
+
+    void ResetShit();
 };

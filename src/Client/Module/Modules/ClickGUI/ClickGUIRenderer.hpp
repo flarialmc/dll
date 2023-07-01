@@ -127,6 +127,7 @@ class ClickGUIRenderer : public Listener {
             {
                 this->curr = "modules";
                 ClickGUIRenderer::page.type = "normal";
+                FlarialGUI::ResetShit();
             }
 
 

@@ -1117,6 +1117,32 @@ Vec2<float> FlarialGUI::CalculateResizedXY(float x, float y, float width, float 
     return Vec2(x, y);
 }
 
+void FlarialGUI::ResetShit() {
+
+    // Reset the variables to their initial values or desired values here
+    for (int i = 0; i < 100; ++i) {
+        WindowRects[i] = WindowRect();
+    }
+
+    for (int i = 0; i < 250; ++i) {
+        SliderRects[i] = SliderRect();
+    }
+
+    for (int i = 0; i < 100; ++i) {
+        TextBoxes[i] = TextBoxStruct();
+    }
+
+    for (int i = 0; i < 20; ++i) {
+        ColorPickers[i] = ::ColorPicker();
+    }
+
+
+}
+
+
+
+
+
 void FlarialGUI::ApplyGaussianBlur(float blurIntensity)
 {
 
