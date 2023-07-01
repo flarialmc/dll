@@ -144,7 +144,7 @@ public:
     }
 
     bool getActorFlag(int flag) {
-        return Memory::CallVFunc<0, bool, int>(flag);
+        return Memory::CallVFunc<0, bool, int>(this, flag);
     }
 
     Vec3<float> getpos() {
