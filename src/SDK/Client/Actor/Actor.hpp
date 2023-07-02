@@ -8,7 +8,7 @@
 #include "../../../Utils/Utils.hpp"
 
 class Actor {
-    enum ActorFlags
+    enum ActorFlags // this couldfuck up padding please move it out of the class (im not sure)
     {
         FLAG_ONFIRE = 0,
         FLAG_SNEAKING = 1,
