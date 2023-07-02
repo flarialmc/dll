@@ -6,7 +6,7 @@ struct MoveInputComponent {
     BUILD_ACCESS(this, bool, right, 0x0D);
 
     BUILD_ACCESS(this, bool, sneaking, 0x20);
-    BUILD_ACCESS(this, bool, sprinting, 0x26);
-    BUILD_ACCESS(this, bool, jumping, 0x27);
+    BUILD_ACCESS(this, bool, jumping, 0x26);
+    BUILD_ACCESS(this, bool, sprinting, 0x27);
 
 };
