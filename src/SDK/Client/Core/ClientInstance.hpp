@@ -9,10 +9,7 @@ public:
 	uintptr_t** VTable;
 
 	LocalPlayer* getLocalPlayer() {
-		//here we call on getLocalPlayer through the virtual function table by getting its addr
-		//then casting it into a function signature LocalPlayer*(__fastcall*)(ClientInstance*))
-		auto getLocalPlayerFunc = reinterpret_cast<LocalPlayer*(__fastcall*)(ClientInstance*)> (this->VTable[27]);
-		return getLocalPlayerFunc(this);
+	return Memory::CallVFunc<27, LocalPlayer*>(this);
 	}
     void grabMouse() {
         return Memory::CallVFunc<304, void>(this);
