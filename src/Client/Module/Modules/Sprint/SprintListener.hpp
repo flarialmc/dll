@@ -17,7 +17,7 @@ class SprintListener : public Listener {
         if (module->settings.getSettingByName<bool>("enabled")->value) {
             if (event.GetKey() == 'N' && event.GetAction() == 0) {
                 module->settings.getSettingByName<bool>("toggled")->value = !module->settings.getSettingByName<bool>("toggled")->value;
-            }            
+            }
         }
 
         if (event.GetKey() == this->module->keybind) { module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value; }
@@ -26,32 +26,28 @@ class SprintListener : public Listener {
     void onRender(RenderEvent& event) override {
 
         if (module->settings.getSettingByName<bool>("enabled")->value) {
-            if (SDK::clientInstance != nullptr) {
-                if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                    if (SDK::clientInstance->getLocalPlayer()->getActorFlag(34) and !SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) {
-                        if (module->settings.getSettingByName<bool>("always")->value) {
-                            SDK::clientInstance->getLocalPlayer()->setSprinting(true);
-                        }
-                        else if (module->settings.getSettingByName<bool>("toggled")->value) {
-                            SDK::clientInstance->getLocalPlayer()->setSprinting(module->settings.getSettingByName<bool>("toggled")->value);
-                        }
-                    }
+
                     if (SDK::clientInstance->getLocalPlayer()->getActorFlag(1)) { this->module->NormalRender(5, "", "Sneaking"); }
                     else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) { this->module->NormalRender(5, "", "Sprinting"); }
                     else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(34)) { this->module->NormalRender(5, "", "Walking"); }
                     else { this->module->NormalRender(5, "", "Standing"); }
-                }
-            }
         }
     }
 
     void onLocalTick(TickEvent &event) override {
 
-        if(SDK::clientInstance->getLocalPlayer()->getMoveInputHandler()->forward) {
-            Logger::debug("yessir!");
-            SDK::clientInstance->getLocalPlayer()->setSprinting(true);
-        }
+        MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
+        if (SDK::clientInstance != nullptr) {
+            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+
+                if (module->settings.getSettingByName<bool>("always")->value) {
+                    handler->jumping = true;
+                }  else {
+                    handler->jumping = module->settings.getSettingByName<bool>("toggled")->value;
+                }
+            }
+        }
     }
 
 public:
