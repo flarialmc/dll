@@ -47,7 +47,10 @@ class SprintListener : public Listener {
 
     void onLocalTick(TickEvent &event) override {
 
-        //Logger::debug("Xd!");
+        if(SDK::clientInstance->getLocalPlayer()->getMoveInputHandler()->forward) {
+            Logger::debug("yessir!");
+            SDK::clientInstance->getLocalPlayer()->setSprinting(true);
+        }
 
     }
 

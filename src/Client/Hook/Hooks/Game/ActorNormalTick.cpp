@@ -17,7 +17,6 @@ ActorNormalTick::ActorNormalTick() : Hook("ActorNormalTickHook", "48 8D 05 ???? 
 
 void ActorNormalTick::callback(Actor *xd) {
 
-
     if(xd != nullptr) {
 
         TickEvent event(xd);

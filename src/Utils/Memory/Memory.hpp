@@ -44,7 +44,7 @@ public:
         using Fn = TRet(__thiscall*)(void*, decltype(argList)...);
         return (*static_cast<Fn**>(thisptr))[IIdx](thisptr, argList...);
     }
-  
+
 
     static uintptr_t findSig(const char *pattern)
     {
@@ -58,9 +58,6 @@ public:
         auto start = (uintptr_t)GetModuleHandleA("Minecraft.Windows.exe");
         auto end = start + info.SizeOfImage;
         auto pat = pattern;
-
-        /*BYTE patByte = get_byte(pat);
-        const char *oldPat = pat;*/
 
         for (uintptr_t i = start; i < end; i++)
         {
