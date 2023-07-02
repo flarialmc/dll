@@ -1070,23 +1070,6 @@ void FlarialGUI::UnsetWindowRect()
     isInWindowRect = false;
 }
 
-void FlarialGUI::UpdateWindowRects()
-{
-    for (int i = 0; i < static_cast<int>(sizeof WindowRects); i++)
-    {
-        WindowRect &rect = WindowRects[i];
-        if (rect.hasBeenMoved)
-        {
-            rect.movedX = Constraints::PercentageConstraint(rect.percentageX, "left");
-            rect.movedY = Constraints::PercentageConstraint(rect.percentageY, "top");
-        }
-        else
-        {
-            return;
-        }
-    }
-}
-
 Vec2<float> FlarialGUI::CalculateMovedXY(float x, float y, int num, float rectWidth, float rectHeight)
 {
     if (isInWindowRect && WindowRects[num].hasBeenMoved)
@@ -1106,16 +1089,6 @@ Vec2<float> FlarialGUI::GetCenterXY(float rectWidth, float rectHeight)
     return xy;
 }
 
-Vec2<float> FlarialGUI::CalculateResizedXY(float x, float y, float width, float height)
-{
-    if (MC::hasResized)
-    {
-        x = (MC::windowSize.x - width) / 2;
-        y = (MC::windowSize.y - height) / 2;
-    }
-
-    return Vec2(x, y);
-}
 
 void FlarialGUI::ResetShit() {
 

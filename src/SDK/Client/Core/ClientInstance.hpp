@@ -11,6 +11,7 @@ public:
 	LocalPlayer* getLocalPlayer() {
 	return Memory::CallVFunc<27, LocalPlayer*>(this);
 	}
+
     void grabMouse() {
         return Memory::CallVFunc<304, void>(this);
     }
