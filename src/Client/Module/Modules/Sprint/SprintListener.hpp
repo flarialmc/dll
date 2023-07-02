@@ -36,10 +36,12 @@ class SprintListener : public Listener {
 
     void onLocalTick(TickEvent &event) override {
 
-        MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
+
 
         if (SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+
+                MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
                 if (module->settings.getSettingByName<bool>("always")->value) {
                     handler->jumping = true;
