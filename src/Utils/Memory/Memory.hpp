@@ -4,6 +4,9 @@
 #include <Psapi.h>
 #include <vector>
 #include <type_traits>
+#include <optional>
+#include <future>
+#include <execution>
 
 #define in_range(x, a, b) (x >= a && x <= b)
 #define get_bits(x) (in_range((x & (~0x20)), 'A', 'F') ? ((x & (~0x20)) - 'A' + 0xa) : (in_range(x, '0', '9') ? x - '0' : 0))
@@ -46,57 +49,48 @@ public:
     }
 
 
-    static uintptr_t findSig(const char *pattern)
+
+    static auto findSig(const char* signature)
     {
-        MODULEINFO info;
-        GetModuleInformation(GetCurrentProcess(), GetModuleHandleA("Minecraft.Windows.exe"), &info, sizeof(MODULEINFO));
 
-        MEMORY_BASIC_INFORMATION mbi{0};
-        uintptr_t protectFlags = (PAGE_GUARD | PAGE_NOCACHE | PAGE_NOACCESS);
+        static auto pattern_to_byte = [](const char* pattern) {
+            auto bytes = std::vector<std::optional<uint8_t>>{};
+            auto start = const_cast<char*>(pattern);
+            auto end = const_cast<char*>(pattern) + strlen(pattern);
+            bytes.reserve(strlen(pattern) / 2);
 
-        uintptr_t firstMatch = 0;
-        auto start = (uintptr_t)GetModuleHandleA("Minecraft.Windows.exe");
-        auto end = start + info.SizeOfImage;
-        auto pat = pattern;
-
-        for (uintptr_t i = start; i < end; i++)
-        {
-            if (VirtualQuery((LPCVOID)i, &mbi, sizeof(mbi)))
-            {
-                if (mbi.Protect & protectFlags || !(mbi.State & MEM_COMMIT))
-                {
-                    i += mbi.RegionSize;
-                    continue;
+            for (auto current = start; current < end; ++current) {
+                if (*current == '?') {
+                    ++current;
+                    if (*current == '?')
+                        ++current;
+                    bytes.push_back(std::nullopt);
                 }
-                for (uintptr_t j = (uintptr_t)mbi.BaseAddress; j < (uintptr_t)mbi.BaseAddress + mbi.RegionSize; j++)
-                {
-                    if (!*pat)
-                    {
-                        return firstMatch;
-                    }
-                    if (*(PBYTE)pat == '\?' || *(BYTE *)j == get_byte(pat))
-                    {
-                        if (!firstMatch)
-                            firstMatch = j;
-                        if (!pat[2])
-                        {
-                            return firstMatch;
-                        }
-                        if (*(PWORD)pat == '\?\?' || *(PBYTE)pat != '\?')
-                            pat += 3;
-                        else
-                            pat += 2;
-                    }
-                    else
-                    {
-                        pat = pattern;
-                        firstMatch = 0;
-                    }
-                }
+                else bytes.push_back((uint8_t)strtoul(current, &current, 16));
             }
-        }
-        return 0;
+            return bytes;
+        };
+
+        // ...
+
+        auto gameModule = GetModuleHandleA("Minecraft.Windows.exe");
+        auto* const scanBytes = reinterpret_cast<uint8_t*>(gameModule);
+        auto* const dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(gameModule);
+        auto* const ntHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(scanBytes + dosHeader->e_lfanew);
+        const auto sizeOfCode = ntHeaders->OptionalHeader.SizeOfImage;
+
+        const auto pattern = pattern_to_byte(signature);
+        const auto end = scanBytes + sizeOfCode;
+
+        auto it = std::search(std::execution::par, scanBytes, end, pattern.cbegin(), pattern.cend(),
+                              [](auto byte, auto opt) {
+                                  return !opt.has_value() || *opt == byte;
+                              });
+
+        auto ret = it != end ? (uintptr_t)it : 0u;
+        return ret;
     }
+
 
     template<typename T>
     static void SafeRelease(T*& pPtr)
