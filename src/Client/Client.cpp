@@ -9,6 +9,11 @@ bool Client::disable = false;
 
 void Client::initialize()
 {
+    Logger::initialize();
+
+    HookManager::initialize();
+    ModuleManager::initialize();
+
     std::filesystem::path folder_path(Utils::getRoamingPath() + "\\Flarial");
     if (!exists(folder_path))
     {
@@ -91,16 +96,8 @@ void Client::initialize()
 
     if (GetModuleHandle("d3d12.dll") == NULL) Logger::debug("module handle is null");
 
-    AllocConsole();
-    SetConsoleTitleA("Flarial");
-    FILE* fp;
-    freopen_s(&fp, "CONOUT$", "w", stdout); // output only
-
     std::string fontpath = Utils::getRoamingPath() + "\\Flarial\\assets\\font.ttf";
     AddFontResource(fontpath.c_str());
 
-    Logger::initialize();
 
-    HookManager::initialize();
-    ModuleManager::initialize();
 }
