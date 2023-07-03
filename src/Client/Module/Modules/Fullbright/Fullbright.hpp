@@ -8,7 +8,7 @@ class Fullbright : public Module {
 
 public:
 
-    Fullbright() : Module("Fullbright", "chike wi!", "\\Flarial\\assets\\magnify.png", 'C') {
+    Fullbright() : Module("Fullbright", "chike wi!", "\\Flarial\\assets\\fullbright.png", 'C') {
 
         onEnable();
 
