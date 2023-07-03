@@ -12,6 +12,7 @@
 #include "Modules/Time/Time.hpp"
 #include "Modules/Memory/Memory.hpp"
 #include "Modules/Sprint/Sprint.hpp"
+#include "Modules/Fullbright/Fullbright.hpp"
 
 
 namespace ModuleManager {
@@ -21,7 +22,6 @@ namespace ModuleManager {
 void ModuleManager::initialize()
 {
 
-    modules.push_back(new ClickGUI());
     modules.push_back(new Zoom());
     modules.push_back(new FPSCounter());
     modules.push_back(new CPSCounter());
@@ -29,6 +29,8 @@ void ModuleManager::initialize()
     modules.push_back(new Time());
     modules.push_back(new MEM());
     modules.push_back(new Sprint());
+    modules.push_back(new Fullbright());
+    modules.push_back(new ClickGUI());
 
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));

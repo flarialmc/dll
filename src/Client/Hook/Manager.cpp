@@ -4,6 +4,7 @@
 #include "Hooks/Render/CommandListHook.hpp"
 #include "Hooks/Render/SetupAndRenderHook.hpp"
 #include "Hooks/Game/ActorNormalTick.hpp"
+#include "Hooks/Visual/getGammaHook.hpp"
 
 std::vector<Hook *> HookManager::hooks;
 
@@ -22,6 +23,7 @@ void HookManager::initialize()
     hooks.push_back(new ResizeHook());
     hooks.push_back(new getFovHook());
     hooks.push_back(new ActorNormalTick());
+    hooks.push_back(new getGammaHook());
 
     for (auto hook : hooks)
         hook->enableHook();

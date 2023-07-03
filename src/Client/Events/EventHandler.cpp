@@ -60,8 +60,6 @@ void EventHandler::onRender(RenderEvent &event) {
 
     for (Listener* &listener: listeners) {
 
-        listener->onRender(event);
-
     }
 
 }

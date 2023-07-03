@@ -40,16 +40,18 @@ class SprintListener : public Listener {
         }
     }
 
-    void onLocalTick(TickEvent &event) override {
+    void onLocalTick(TickEvent& event) override {
+        if (module->settings.getSettingByName<bool>("enabled")->value) {
+            if (SDK::clientInstance != nullptr) {
+                if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                    MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
-        if (SDK::clientInstance != nullptr) {
-            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
-
-                if (module->settings.getSettingByName<bool>("always")->value) {
-                    handler->sprinting = true;
-                }  else {
-                    handler->sprinting = module->settings.getSettingByName<bool>("toggled")->value;
+                    if (module->settings.getSettingByName<bool>("always")->value) {
+                        handler->sprinting = true;
+                    }
+                    else {
+                        handler->sprinting = module->settings.getSettingByName<bool>("toggled")->value;
+                    }
                 }
             }
         }
