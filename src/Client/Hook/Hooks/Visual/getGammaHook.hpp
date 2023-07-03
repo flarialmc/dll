@@ -11,19 +11,19 @@ class getGammaHook : public Hook
 {
 private:
 
-	static float getGammaCallback(uintptr_t a1, uintptr_t f, float a3, int a4) {
-		Logger::debug(std::to_string(func_original(a1, f, a3, a4)));
+	static float getGammaCallback(uintptr_t a1) {
+        
 		auto fb = reinterpret_cast<Fullbright*>(ModuleManager::getModule("Fullbright"));
 		if (fb->settings.getSettingByName<bool>("enabled")->value) return 4.0;
-		else return func_original(a1, f, a3, a4);
+		else return func_original(a1);
 		
 	}
 
 public:
-	typedef float(__thiscall* getGammaOriginal)(uintptr_t, uintptr_t, float, int);
+	typedef float(__thiscall* getGammaOriginal)(uintptr_t);
 	static inline getGammaOriginal func_original = nullptr;
 
-	getGammaHook() : Hook("getGammaHook", "48 89 4C 24 08 53 48 83 EC 20 4C 8B C2 48 8B D9 44 89 09") {}
+	getGammaHook() : Hook("getGammaHook", "48 83 EC 28 80 B9 48 14 00 00 00 48 8D 54 24 30 48 8B 01 48 8B 40 60 74 38 41 B8 16 01 00 00") {}
 
 	void enableHook() override {
 		this->autoHook(getGammaCallback, (void**)&func_original);
