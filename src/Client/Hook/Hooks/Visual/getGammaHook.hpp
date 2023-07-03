@@ -12,7 +12,7 @@ class getGammaHook : public Hook
 private:
 
 	static float getGammaCallback(uintptr_t a1) {
-        
+
 		auto fb = reinterpret_cast<Fullbright*>(ModuleManager::getModule("Fullbright"));
 		if (fb->settings.getSettingByName<bool>("enabled")->value) return 4.0;
 		else return func_original(a1);

@@ -25,7 +25,7 @@ public:
 
         if(settings.getSettingByName<bool>("border") == nullptr) {
             settings.addSetting("border", true);
-            settings.addSetting("borderWidth", 5.0f);
+            settings.addSetting("borderWidth", 1.0f);
         }
 
         if(settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 40.0f);
@@ -91,7 +91,7 @@ public:
                            toggleY,
                            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
                            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
-                           D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("borderWidth")->value);
+                           D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("borderWidth")->value, 4);
 
         this->settings.getSettingByName<float>("borderWidth")->value = percent;
 

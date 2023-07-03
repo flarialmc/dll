@@ -159,7 +159,7 @@ public:
                                 textHeight);
 
         if(this->settings.getSettingByName<bool>("border")->value) {
-            FlarialGUI::RoundedHollowRect(realcenter.x, realcenter.y, this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value,
+            FlarialGUI::RoundedHollowRect(realcenter.x, realcenter.y, Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100, "height", true),
                                           borderColor, rectWidth, textHeight,
                                     rounde.x, rounde.x);
         }
