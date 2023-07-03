@@ -27,10 +27,17 @@ class SprintListener : public Listener {
 
         if (module->settings.getSettingByName<bool>("enabled")->value) {
 
-            if (SDK::clientInstance != nullptr) {
+            if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
 
                 if (SDK::clientInstance->getLocalPlayer() != nullptr) {
 
+                    if (SDK::clientInstance->getLocalPlayer()->getActorFlag(1)) {
+                        this->module->NormalRender(5, "", "Sneaking");
+                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) {
+                        this->module->NormalRender(5, "", "Sprinting");
+                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(34)) {
+                        this->module->NormalRender(5, "", "Walking");
+                    } else { this->module->NormalRender(5, "", "Standing"); }
 
                 }
 
@@ -38,18 +45,16 @@ class SprintListener : public Listener {
         }
     }
 
-    void onLocalTick(TickEvent& event) override {
-        if (module->settings.getSettingByName<bool>("enabled")->value) {
-            if (SDK::clientInstance != nullptr) {
-                if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                    MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
+    void onLocalTick(TickEvent &event) override {
 
-                    if (module->settings.getSettingByName<bool>("always")->value) {
-                        handler->sprinting = true;
-                    }
-                    else {
-                        handler->sprinting = module->settings.getSettingByName<bool>("toggled")->value;
-                    }
+        if (SDK::clientInstance != nullptr) {
+            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
+
+                if (module->settings.getSettingByName<bool>("always")->value) {
+                    handler->sprinting = true;
+                }  else {
+                    handler->sprinting = module->settings.getSettingByName<bool>("toggled")->value;
                 }
             }
         }

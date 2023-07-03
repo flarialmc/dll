@@ -10,11 +10,9 @@ class SetUpAndRenderHook : public Hook
 {
 private:
     static void SetUpAndRenderCallback(void* screenview, MinecraftUIRenderContext* muirc) {
-        SDK::clientInstance = muirc->clientInstance;
 
-        if (muirc->clientInstance->getLocalPlayer() != nullptr) {
-       
-        }
+        SDK::hasInstanced = true;
+        SDK::clientInstance = muirc->getclientInstance();
         func_original(screenview, muirc);
     }
 

@@ -5,4 +5,5 @@
 
 namespace SDK {
 	extern ClientInstance* clientInstance;
+    extern bool hasInstanced;
 }
