@@ -51,6 +51,8 @@ class SprintListener : public Listener {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                 MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
+                Logger::debug(std::to_string(SDK::clientInstance->getLocalPlayer()->getPosition()->y));
+
                 if (module->settings.getSettingByName<bool>("always")->value) {
                     handler->sprinting = true;
                 }  else {

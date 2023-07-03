@@ -267,8 +267,8 @@ public:
         return Memory::CallVFunc<0, bool, int>(this, flag);
     }
 
-    Vec3<uintptr_t> getPosition() {
-        return Memory::CallVFunc<22, Vec3<uintptr_t>>(this);
+    Vec3<float>* getPosition() {
+        return Memory::CallVFunc<22, Vec3<float>*>(this);
     }
 
 };
