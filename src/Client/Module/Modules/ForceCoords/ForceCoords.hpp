@@ -165,6 +165,38 @@ public:
 
         float realspacing = Constraints::SpacingConstraint(0.05f, textWidth);
 
+        IDWriteFactory *writeFactory;
+
+        DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
+                            reinterpret_cast<IUnknown **>(&writeFactory));
+        IDWriteTextFormat *textFormat;
+        writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(textSize), L"", &textFormat);
+        textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+        textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+        IDWriteTextLayout *textLayout;
+
+        writeFactory->CreateTextLayout(
+                FlarialGUI::to_wide(value).c_str(),
+                wcslen(FlarialGUI::to_wide(value).c_str()),
+                textFormat,
+                textWidth,
+                textHeight,
+                &textLayout
+        );
+
+        DWRITE_TEXT_METRICS textMetrics;
+        textLayout->GetMetrics(&textMetrics);
+
+        textLayout->Release();
+        writeFactory->Release();
+        textFormat->Release();
+
+
+
+
+        rectWidth = Constraints::SpacingConstraint(1.10, textMetrics.width + realspacing);
+
         FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, index);
 
         Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, rectWidth, textHeight);
@@ -187,40 +219,6 @@ public:
         bgColor.a = settings.getSettingByName<float>("bgOpacity")->value;
         textColor.a = settings.getSettingByName<float>("textOpacity")->value;
         borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
-
-
-
-        IDWriteFactory *writeFactory;
-
-        DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
-                            reinterpret_cast<IUnknown **>(&writeFactory));
-            IDWriteTextFormat *textFormat;
-            writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(textSize), L"", &textFormat);
-            textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
-            textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-
-            IDWriteTextLayout *textLayout;
-
-            writeFactory->CreateTextLayout(
-                    FlarialGUI::to_wide(value).c_str(),
-                    wcslen(FlarialGUI::to_wide(value).c_str()),
-                    textFormat,
-                    textWidth,
-                    textHeight,
-                    &textLayout
-            );
-
-            DWRITE_TEXT_METRICS textMetrics;
-            textLayout->GetMetrics(&textMetrics);
-
-            textLayout->Release();
-            writeFactory->Release();
-            textFormat->Release();
-
-
-
-
-            rectWidth = Constraints::SpacingConstraint(1.10, textMetrics.width + realspacing);
 
                     FlarialGUI::RoundedRect(realcenter.x, realcenter.y,
             bgColor, rectWidth, textHeight,
