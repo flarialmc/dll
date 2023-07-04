@@ -195,7 +195,7 @@ public:
 
 
 
-        rectWidth = Constraints::SpacingConstraint(1.10, textMetrics.width + realspacing);
+        rectWidth = textMetrics.width + Constraints::SpacingConstraint(1.15, realspacing);
 
         FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, index);
 
