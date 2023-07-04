@@ -14,6 +14,7 @@
 #include "Modules/Sprint/Sprint.hpp"
 #include "Modules/Fullbright/Fullbright.hpp"
 #include "Modules/Deepfry/Deepfry.hpp"
+#include "Modules/ForceCoords/ForceCoords.hpp"
 
 
 namespace ModuleManager {
@@ -32,6 +33,7 @@ void ModuleManager::initialize()
     modules.push_back(new MEM());
     modules.push_back(new Sprint());
     modules.push_back(new Fullbright());
+    modules.push_back(new ForceCoords());
 
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));
