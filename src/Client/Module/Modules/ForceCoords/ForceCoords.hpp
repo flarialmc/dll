@@ -158,10 +158,12 @@ public:
         else
             realcenter = Constraints::CenterConstraint(textWidth, textHeight);
 
-        float rectWidth = Constraints::RelativeConstraint(0.225f * settings.getSettingByName<float>("uiscale")->value);
+        float rectWidth = Constraints::RelativeConstraint(0.120f * settings.getSettingByName<float>("uiscale")->value);
         Vec2<float> rounde = Constraints::RoundingConstraint(this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value, this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value);
 
-        float realspacing = Constraints::SpacingConstraint(0.155f, textWidth);
+        float textSize = Constraints::SpacingConstraint(2.3f, rectWidth);
+
+        float realspacing = Constraints::SpacingConstraint(0.05f, textWidth);
 
         FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, index);
 
@@ -186,13 +188,48 @@ public:
         textColor.a = settings.getSettingByName<float>("textOpacity")->value;
         borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
 
-        FlarialGUI::RoundedRect(realcenter.x, realcenter.y,
+
+
+        IDWriteFactory *writeFactory;
+
+        DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
+                            reinterpret_cast<IUnknown **>(&writeFactory));
+            IDWriteTextFormat *textFormat;
+            writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(textSize), L"", &textFormat);
+            textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+            textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+            IDWriteTextLayout *textLayout;
+
+            writeFactory->CreateTextLayout(
+                    FlarialGUI::to_wide(value).c_str(),
+                    wcslen(FlarialGUI::to_wide(value).c_str()),
+                    textFormat,
+                    textWidth,
+                    textHeight,
+                    &textLayout
+            );
+
+            DWRITE_TEXT_METRICS textMetrics;
+            textLayout->GetMetrics(&textMetrics);
+
+            textLayout->Release();
+            writeFactory->Release();
+            textFormat->Release();
+
+
+
+        
+            rectWidth = Constraints::SpacingConstraint(1.10, textMetrics.width);
+
+                    FlarialGUI::RoundedRect(realcenter.x, realcenter.y,
             bgColor, rectWidth, textHeight,
             rounde.x, rounde.x);
-        FlarialGUI::FlarialText(realcenter.x - realspacing, realcenter.y,
+
+        FlarialGUI::FlarialTextWithFont(realcenter.x + realspacing, realcenter.y,
             FlarialGUI::to_wide(value).c_str(),
             textColor, textWidth,
-            textHeight);
+            textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, textSize);
 
         if (this->settings.getSettingByName<bool>("border")->value) {
             FlarialGUI::RoundedHollowRect(realcenter.x, realcenter.y, Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
