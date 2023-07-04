@@ -97,6 +97,10 @@ void Client::initialize()
     std::string savepath13 = Utils::getRoamingPath() + "\\Flarial\\assets\\fullbright.png";
     URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL13).c_str(), FlarialGUI::to_wide(savepath13).c_str(), 0, NULL);
 
+    std::string dwnld_URL14 = "https://cdn.flarial.net/assets/frying-pan.png";
+    std::string savepath14 = Utils::getRoamingPath() + "\\Flarial\\assets\\frying-pan.png";
+    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL14).c_str(), FlarialGUI::to_wide(savepath14).c_str(), 0, NULL);
+
     if (GetModuleHandle("d3d12.dll") == NULL) Logger::debug("module handle is null");
 
     std::string fontpath = Utils::getRoamingPath() + "\\Flarial\\assets\\font.ttf";

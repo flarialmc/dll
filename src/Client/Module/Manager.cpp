@@ -13,6 +13,7 @@
 #include "Modules/Memory/Memory.hpp"
 #include "Modules/Sprint/Sprint.hpp"
 #include "Modules/Fullbright/Fullbright.hpp"
+#include "Modules/Deepfry/Deepfry.hpp"
 
 
 namespace ModuleManager {
@@ -21,7 +22,7 @@ namespace ModuleManager {
 
 void ModuleManager::initialize()
 {
-
+    modules.push_back(new Deepfry());
     modules.push_back(new ClickGUI());
     modules.push_back(new Zoom());
     modules.push_back(new FPSCounter());

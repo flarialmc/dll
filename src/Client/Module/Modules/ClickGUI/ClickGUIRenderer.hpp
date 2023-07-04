@@ -55,7 +55,6 @@ class ClickGUIRenderer : public Listener {
         } else {
             lerp(baseHeightReal, 0.01f, 0.22f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
             lerp(baseHeightActual, 0.00001f, 0.30f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
-            FlarialGUI::ApplyCombinedDeepFry();
         }
 
         if(SwapchainHook::init && baseHeightActual > 0.01) {
