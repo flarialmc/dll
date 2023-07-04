@@ -111,6 +111,11 @@ namespace FlarialGUI
 
     void ApplyGaussianBlur(float blurIntensity);
 
+    void ApplyPaintEffect(float blurIntensity);
+    void ApplyAestheticDeepFry();
+    void ApplyDeepFry(float intensity);
+    void ApplyCombinedDeepFry();
+
 
     void CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to);
 
