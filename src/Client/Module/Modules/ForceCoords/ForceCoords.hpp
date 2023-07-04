@@ -219,8 +219,8 @@ public:
 
 
 
-        
-            rectWidth = Constraints::SpacingConstraint(1.10, textMetrics.width);
+
+            rectWidth = Constraints::SpacingConstraint(1.10, textMetrics.width + realspacing);
 
                     FlarialGUI::RoundedRect(realcenter.x, realcenter.y,
             bgColor, rectWidth, textHeight,
