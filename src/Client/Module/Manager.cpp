@@ -15,6 +15,7 @@
 #include "Modules/Fullbright/Fullbright.hpp"
 #include "Modules/Deepfry/Deepfry.hpp"
 #include "Modules/ForceCoords/ForceCoords.hpp"
+#include "Modules/Keystrokes/Keystrokes.hpp"
 
 
 namespace ModuleManager {
@@ -35,6 +36,7 @@ void ModuleManager::initialize()
     modules.push_back(new Sprint());
     modules.push_back(new Fullbright());
     modules.push_back(new ForceCoords());
+    modules.push_back(new Keystrokes());
 
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));
