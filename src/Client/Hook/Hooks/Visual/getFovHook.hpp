@@ -11,26 +11,21 @@ class getFovHook : public Hook
 {
 private:
 
+    static inline float currentZoomVal = 0.0f;
+
 	static float getFovCallback(void* a1, float f, void* a3, void* a4) {
 		float fov = func_original(a1, f, a3, a4);
-
-		static float animValue = 0.0f;
 
 
 		if (ModuleManager::getModule("Zoom") != nullptr) {
 
-            auto zom = reinterpret_cast<Zoom*>(ModuleManager::getModule("Zoom"));
+            auto zom = reinterpret_cast<Zoom *>(ModuleManager::getModule("Zoom"));
+            if(zom->settings.getSettingByName<bool>("enabled")->value) currentZoomVal = std::lerp(currentZoomVal, ZoomListener::zoomValue, 0.05f);
+            else currentZoomVal = std::lerp(currentZoomVal, fov, 0.05f);
+        }
 
-			if (zom->settings.getSettingByName<bool>("enabled")->value) {
-				animValue = min(animValue + (f * 0.1f), 1.0f);
-			}
-			else {
-				animValue = max(animValue - (f * 0.1f), 0.0f);
-			}
-		}
 
-		fov -= (animValue * animValue * ZoomListener::zoomValue * fov);
-		return fov;
+		return currentZoomVal;
 	}
 
 public:

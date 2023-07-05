@@ -1271,6 +1271,60 @@ void FlarialGUI::ApplyGaussianBlur(float blurIntensity)
     }
 }
 
+
+void FlarialGUI::AddShadowRect(const D2D1_POINT_2F& obj_min, const D2D1_POINT_2F& obj_max, D2D1_COLOR_F shadow_col, float shadow_thickness, const D2D1_POINT_2F& shadow_offset, float obj_rounding)
+{
+    if (shadow_col.a == 0)
+        return;
+
+    D2D1_RECT_F inner_rect; // Rectangle used for inner shape (with rounded corners)
+    bool has_inner_rect = false;
+
+    // Generate a path describing the inner rectangle and copy it to our buffer
+    const bool is_rounded = (obj_rounding > 0.0f);
+    if (is_rounded)
+    {
+        inner_rect.left = obj_min.x + shadow_thickness;
+        inner_rect.top = obj_min.y + shadow_thickness;
+        inner_rect.right = obj_max.x - shadow_thickness;
+        inner_rect.bottom = obj_max.y - shadow_thickness;
+        has_inner_rect = true;
+    }
+
+    // Draw the relevant chunks of the texture (the texture is split into a 3x3 grid)
+    for (int x = 0; x < 3; x++)
+    {
+        for (int y = 0; y < 3; y++)
+        {
+            const int uv_index = x + (y + y + y); // y*3 formatted so as to ensure the compiler avoids an actual multiply
+
+            D2D1_RECT_F draw_rect;
+            switch (x)
+            {
+                case 0: draw_rect.left = obj_min.x - shadow_thickness; draw_rect.right = obj_min.x; break;
+                case 1: draw_rect.left = obj_min.x; draw_rect.right = obj_max.x; break;
+                case 2: draw_rect.left = obj_max.x; draw_rect.right = obj_max.x + shadow_thickness; break;
+            }
+            switch (y)
+            {
+                case 0: draw_rect.top = obj_min.y - shadow_thickness; draw_rect.bottom = obj_min.y; break;
+                case 1: draw_rect.top = obj_min.y; draw_rect.bottom = obj_max.y; break;
+                case 2: draw_rect.top = obj_max.y; draw_rect.bottom = obj_max.y + shadow_thickness; break;
+            }
+
+            ID2D1SolidColorBrush* _shadowBrush;
+            D2D::context->CreateSolidColorBrush(shadow_col, &_shadowBrush);
+
+            if (has_inner_rect)
+                D2D::context->FillRectangle(&draw_rect, _shadowBrush); // No clipping path (draw entire shadow)
+            else if (is_rounded)
+                D2D::context->FillRoundedRectangle(D2D1::RoundedRect(draw_rect, obj_rounding, obj_rounding), _shadowBrush); // Complex path for rounded rectangles
+            else
+                D2D::context->FillRectangle(&draw_rect, _shadowBrush); // Simple fast path for non-rounded rectangles
+        }
+    }
+}
+
 void FlarialGUI::CopyBitmap(ID2D1Bitmap1* from, ID2D1Bitmap** to)
 {
     if (from == nullptr)
@@ -1326,7 +1380,7 @@ std::wstring FlarialGUI::to_wide(const std::string &multi)
 }
 
 template <typename T>
-static void FlarialGUI::lerp(T& a, const T& b, float t)
+void FlarialGUI::lerp(T& a, const T& b, float t)
 {
     // Perform linear interpolation between a and b based on t
     float interpolatedValue = a + (b - a) * t;
