@@ -15,7 +15,11 @@ private:
         SDK::hasInstanced = true;
         SDK::clientInstance = muirc->getclientInstance();
         SDK::screenView = pScreenView;
-        Logger::debug(SDK::screenView->VisualTree->root->LayerName);
+
+        std::string layer = SDK::screenView->VisualTree->root->LayerName;
+        if(layer != "debug_screen" && layer != "toast_screen")
+            SDK::CurrentScreen = layer;
+
         func_original(pScreenView, muirc);
     }
 

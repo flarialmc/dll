@@ -16,6 +16,7 @@ private:
 	static float getFovCallback(void* a1, float f, void* a3, void* a4) {
 		float fov = func_original(a1, f, a3, a4);
 
+        if(fov > 100.0) fov -= 10.0;
 
 		if (ModuleManager::getModule("Zoom") != nullptr && fov != 70.00f) {
 
@@ -24,7 +25,6 @@ private:
             else currentZoomVal = std::lerp(currentZoomVal, fov, 0.05f);
 
         }
-
 
 		return currentZoomVal;
 	}
