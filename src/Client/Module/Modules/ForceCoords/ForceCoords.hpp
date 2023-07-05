@@ -194,7 +194,9 @@ public:
 
 
 
-
+        if(textMetrics.lineCount == 2)
+            textWidth += Constraints::RelativeConstraint(0.05f * settings.getSettingByName<float>("uiscale")->value);
+        
         rectWidth = textMetrics.width + Constraints::SpacingConstraint(2.0, realspacing);
 
         FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, index);
