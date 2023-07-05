@@ -126,12 +126,10 @@ Vec2<float> Constraints::RoundingConstraint(float radiusX, float radiusY, bool i
 
     screenWidth = MC::windowSize.x;
     screenHeight = MC::windowSize.y;
-
-
-    float minDimension = min(screenWidth, screenHeight);
+    
     // Calculate the scaled radii
-    float scaledRadiusX = radiusX * minDimension / 1920.0f;
-    float scaledRadiusY = radiusY * minDimension / 1080.0f;
+    float scaledRadiusX = radiusX * screenHeight / 1920.0f;
+    float scaledRadiusY = radiusY * screenHeight / 1080.0f;
 
     // Return the scaled radii as a Vec2
     return {scaledRadiusX, scaledRadiusY};
