@@ -27,5 +27,5 @@ void MouseHook::mouseCallback(void *parm_1, char button, char action, short mous
     EventHandler::onMouse(event);
 
     if (!event.isCancelled())
-        return func_original(parm_1, button, action, mouse_x, mouse_y, parm_6, parm_7, parm_8);
+        return func_original(parm_1, event.GetButton(), event.GetActionAsChar(), mouse_x, mouse_y, parm_6, parm_7, parm_8);
 }

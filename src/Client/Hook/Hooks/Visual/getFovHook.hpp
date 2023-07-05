@@ -17,11 +17,12 @@ private:
 		float fov = func_original(a1, f, a3, a4);
 
 
-		if (ModuleManager::getModule("Zoom") != nullptr) {
+		if (ModuleManager::getModule("Zoom") != nullptr && fov != 70.00f) {
 
             auto zom = reinterpret_cast<Zoom *>(ModuleManager::getModule("Zoom"));
             if(zom->settings.getSettingByName<bool>("enabled")->value) currentZoomVal = std::lerp(currentZoomVal, ZoomListener::zoomValue, 0.05f);
             else currentZoomVal = std::lerp(currentZoomVal, fov, 0.05f);
+            
         }
 
 

@@ -22,8 +22,10 @@ class ZoomListener : public Listener {
             if(zoomValue < 1) zoomValue = 1;
             else if (zoomValue > 90.0f) zoomValue = 90.0f;
 
-            if(event.GetAction() == MouseAction::SCROLL_UP || event.GetAction() != MouseAction::SCROLL_UP && event.GetButton() == MouseButton::Scroll)
-            event.SetButton(MouseButton::None);
+            if(event.GetAction() == MouseAction::SCROLL_UP || event.GetAction() != MouseAction::SCROLL_UP && event.GetButton() == MouseButton::Scroll) {
+                event.SetButton(MouseButton::None);
+                event.SetAction(MouseAction::RELEASE);
+            }
         }
         
     }
