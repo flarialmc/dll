@@ -1,5 +1,6 @@
 #include "ActorNormalTick.hpp"
 #include "../../../Events/EventHandler.hpp"
+#include "../../../../SDK/SDK.hpp"
 
 void ActorNormalTick::enableHook() {
 
@@ -8,7 +9,7 @@ void ActorNormalTick::enableHook() {
     int xd = *reinterpret_cast<int*>(vft + 3);
     uintptr_t** vftREAL = reinterpret_cast<uintptr_t**>(vft + xd + 7);
 
-    this->manualHook(vftREAL[49], callback, (void**)xed);
+    this->manualHook(vftREAL[49], callback, (void**)&xed);
 
 
 }
@@ -18,10 +19,12 @@ ActorNormalTick::ActorNormalTick() : Hook("ActorNormalTickHook", "48 8D 05 ???? 
 void ActorNormalTick::callback(Actor *xd) {
 
     if(xd != nullptr) {
-
+        xed(xd);
         TickEvent event(xd);
         EventHandler::onTick(event);
     }
+
+    
 
 }
 
