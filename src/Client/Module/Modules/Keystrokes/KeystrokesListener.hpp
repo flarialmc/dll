@@ -14,6 +14,8 @@ class KeystrokesListener : public Listener {
     Module* module;
 
     void onRender(RenderEvent& event) override {
+
+        if(SDK::CurrentScreen == "hud_screen")
         if (module->settings.getSettingByName<bool>("enabled")->value) {
 
             this->module->NormalRender(7, "", "");

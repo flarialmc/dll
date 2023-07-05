@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../../../SDK/SDK.hpp"
 #include <format>
 #include "../../../Events/Listener.hpp"
 #include "../../../Events/Input/KeyEvent.hpp"
@@ -29,6 +30,7 @@ class TimeListener : public Listener {
 
     void onRender(RenderEvent& event) override {
 
+        if(SDK::CurrentScreen == "hud_screen")
         if (module->settings.getSettingByName<bool>("enabled")->value) {
             const std::time_t now = std::time(nullptr);
             const std::tm calendar_time = localtime_xp(now);

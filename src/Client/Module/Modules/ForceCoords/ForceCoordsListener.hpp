@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../../../SDK/SDK.hpp"
 #include <format>
 #include "../../../Events/Listener.hpp"
 #include "../../../Events/Input/KeyEvent.hpp"
@@ -14,6 +15,8 @@ class ForceCoordsListener : public Listener {
     Module* module;
 
     void onRender(RenderEvent& event) override {
+
+        if(SDK::CurrentScreen == "hud_screen")
         if (module->settings.getSettingByName<bool>("enabled")->value) {
 
             if (SDK::hasInstanced && SDK::clientInstance != nullptr) {

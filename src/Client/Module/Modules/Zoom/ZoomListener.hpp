@@ -4,6 +4,7 @@
 #include "../../../Events/Input/KeyEvent.hpp"
 #include "../../../../Utils/Logger/Logger.hpp"
 #include "../Module.hpp"
+#include "../../../../SDK/SDK.hpp"
 #include <Windows.h>
 
 class ZoomListener : public Listener {
@@ -12,7 +13,7 @@ class ZoomListener : public Listener {
 
     void onMouse(MouseEvent &event) override {
 
-
+        if(SDK::CurrentScreen == "hud_screen")
         if(this->module->settings.getSettingByName<bool>("enabled")->value){
 
             if (event.GetAction() == MouseAction::SCROLL_UP) zoomValue -= 10;
@@ -32,6 +33,7 @@ class ZoomListener : public Listener {
 
     void onKey(KeyEvent &event) override {
 
+        if(SDK::CurrentScreen == "hud_screen")
         if(event.GetKey() == module->keybind) module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value;
 
     };

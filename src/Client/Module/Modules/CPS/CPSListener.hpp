@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../../../SDK/SDK.hpp"
 #include <format>
 #include "../../../Events/Listener.hpp"
 #include "../../../Events/Input/KeyEvent.hpp"
@@ -35,11 +36,13 @@ private:
 
     void onKey(KeyEvent &event) override {
 
+        if(SDK::CurrentScreen == "hud_screen")
         if(event.GetKey() == this->module->keybind) { module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value; }
     };
 
     void onRender(RenderEvent &event) override {
 
+        if(SDK::CurrentScreen == "hud_screen")
         if(module->settings.getSettingByName<bool>("enabled")->value){
             if(!module->settings.getSettingByName<bool>("rightcps")->value)
             this->module->NormalRender(1, "CPS", std::to_string(GetLeftCPS()));

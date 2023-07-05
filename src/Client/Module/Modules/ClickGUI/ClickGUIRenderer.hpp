@@ -1,4 +1,6 @@
 #pragma once
+
+#include "../../../../SDK/SDK.hpp"
 #include <format>
 #include <Windows.h>
 #include "../../../Events/Listener.hpp"
@@ -279,12 +281,15 @@ class ClickGUIRenderer : public Listener {
 
             module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value;
 
-            if(!module->settings.getSettingByName<bool>("enabled")->value) SDK::clientInstance->grabMouse();
+            if(!module->settings.getSettingByName<bool>("enabled")->value && SDK::CurrentScreen == "hud_screen") SDK::clientInstance->grabMouse();
 
             if(module->settings.getSettingByName<bool>("enabled")->value) {
                 GUIMouseListener::accumilatedPos = 0;
                 GUIMouseListener::accumilatedBarPos = 0;
             }
+
+            if(SDK::CurrentScreen != "hud_screen" && SDK::CurrentScreen != "pause_screen")
+             module->settings.getSettingByName<bool>("enabled")->value = false;
 
             ClickGUIRenderer::page.type = "normal";
             ClickGUIRenderer::curr = "modules";
@@ -293,6 +298,7 @@ class ClickGUIRenderer : public Listener {
 
         if(event.GetKey() == VK_ESCAPE && module->settings.getSettingByName<bool>("enabled")->value) {
 
+            if(SDK::CurrentScreen == "hud_screen")
             SDK::clientInstance->grabMouse();
 
             module->settings.getSettingByName<bool>("enabled")->value = false;
@@ -301,6 +307,8 @@ class ClickGUIRenderer : public Listener {
         }
 
         if(module->settings.getSettingByName<bool>("enabled")->value) {
+
+            if(SDK::CurrentScreen == "hud_screen")
             SDK::clientInstance->releaseMouse();
             event.setCancelled(true);
         }
