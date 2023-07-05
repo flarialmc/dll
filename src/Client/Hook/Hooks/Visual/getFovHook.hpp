@@ -16,17 +16,18 @@ private:
 	static float getFovCallback(void* a1, float f, void* a3, void* a4) {
 		float fov = func_original(a1, f, a3, a4);
 
-        if(fov > 100.0) fov -= 10.0;
+        if(fov > 100.0) fov -= 10.0f;
 
 		if (ModuleManager::getModule("Zoom") != nullptr && fov != 70.00f) {
 
             auto zom = reinterpret_cast<Zoom *>(ModuleManager::getModule("Zoom"));
             if(zom->settings.getSettingByName<bool>("enabled")->value) currentZoomVal = std::lerp(currentZoomVal, ZoomListener::zoomValue, 0.05f);
             else currentZoomVal = std::lerp(currentZoomVal, fov, 0.05f);
+            return currentZoomVal;
 
-        }
+        } else return fov;
 
-		return currentZoomVal;
+
 	}
 
 public:

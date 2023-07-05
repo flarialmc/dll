@@ -9,7 +9,7 @@ class Zoom : public Module {
 
 public:
 
-    Zoom() : Module("Zoom", "chike wi!", "\\Flarial\\assets\\magnify.png", 'C') {
+    Zoom() : Module("Zoom", "chike wi!", "\\Flarial\\assets\\magnify.png", VK_MENU) {
 
         onEnable();
 
