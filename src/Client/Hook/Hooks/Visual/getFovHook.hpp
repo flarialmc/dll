@@ -22,7 +22,7 @@ private:
             auto zom = reinterpret_cast<Zoom *>(ModuleManager::getModule("Zoom"));
             if(zom->settings.getSettingByName<bool>("enabled")->value) currentZoomVal = std::lerp(currentZoomVal, ZoomListener::zoomValue, 0.05f);
             else currentZoomVal = std::lerp(currentZoomVal, fov, 0.05f);
-            
+
         }
 
 

@@ -9,7 +9,7 @@ endif()
 
 file(GLOB_RECURSE sources "main.cpp" "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp")
 
-add_library(Flarial SHARED ${sources} src/SDK/SDK.cpp src/Client/Events/Game/TickEvent.hpp src/Client/Hook/Hooks/Game/ActorNormalTick.cpp src/Client/Hook/Hooks/Game/ActorNormalTick.hpp)
+add_library(Flarial SHARED ${sources} src/SDK/SDK.cpp src/Client/Events/Game/TickEvent.hpp src/Client/Hook/Hooks/Game/ActorNormalTick.cpp src/Client/Hook/Hooks/Game/ActorNormalTick.hpp src/SDK/Client/Render/ScreenView/ScreenView.hpp src/SDK/Client/Render/ScreenView/VisualTree.hpp src/SDK/Client/Render/ScreenView/UIControl.hpp)
 
 target_include_directories(Flarial PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/")
 add_library(sussy SHARED IMPORTED GLOBAL)

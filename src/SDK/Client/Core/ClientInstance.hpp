@@ -23,4 +23,8 @@ public:
     void refocusMouse() {
         return Memory::CallVFunc<306, void>(this);
     }
+
+    std::string getTopScreenName() {
+        return SDK::screenView->VisualTree->root->LayerName;
+    }
 };

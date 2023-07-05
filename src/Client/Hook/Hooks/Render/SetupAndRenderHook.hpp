@@ -2,6 +2,7 @@
 
 #pragma once
 #include "../../../../SDK/Client/Render/MinecraftUIRenderContext.hpp"
+#include "../../../../SDK/Client/Render/ScreenView/ScreenView.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "../Hook.hpp"
 #include <format>
@@ -9,11 +10,13 @@
 class SetUpAndRenderHook : public Hook
 {
 private:
-    static void SetUpAndRenderCallback(void* screenview, MinecraftUIRenderContext* muirc) {
+    static void SetUpAndRenderCallback(ScreenView* pScreenView, MinecraftUIRenderContext* muirc) {
 
         SDK::hasInstanced = true;
         SDK::clientInstance = muirc->getclientInstance();
-        func_original(screenview, muirc);
+        SDK::screenView = pScreenView;
+        Logger::debug(SDK::screenView->VisualTree->root->LayerName);
+        func_original(pScreenView, muirc);
     }
 
 
