@@ -16,6 +16,9 @@ class GUIKeyListener : public Listener {
         std::chrono::steady_clock::time_point currentOnKeyTime = std::chrono::steady_clock::now();
         auto timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(currentOnKeyTime - lastOnKeyTime);
 
+        if(timeDifference.count() > 5000)
+            lastOnKeyTime = currentOnKeyTime;
+
         if(!Client::disable) {
 
             if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")) {
