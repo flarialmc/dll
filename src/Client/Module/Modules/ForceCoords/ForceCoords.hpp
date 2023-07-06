@@ -20,6 +20,8 @@ public:
 
         Module::onEnable();
 
+        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value}");
+
         if (settings.getSettingByName<float>("percentageX") == nullptr) {
             settings.addSetting("percentageX", 0.0f);
             settings.addSetting("percentageY", 0.0f);
@@ -143,6 +145,18 @@ public:
 
     void NormalRender(int index, std::string text, std::string value) override {
 
+        std::string uppercaseSentence;
+        std::string search = "{VALUE}";
+
+        for (char c : text) {
+            uppercaseSentence += std::toupper(c);
+        }
+
+        size_t pos = uppercaseSentence.find(search);
+        if (pos != std::string::npos) {
+            text.replace(pos, search.length(), value);
+        }
+
         float textWidth = Constraints::RelativeConstraint(0.7f * settings.getSettingByName<float>("uiscale")->value);
         float textHeight = Constraints::RelativeConstraint(0.1f * settings.getSettingByName<float>("uiscale")->value);
 
@@ -177,8 +191,8 @@ public:
         IDWriteTextLayout *textLayout;
 
         writeFactory->CreateTextLayout(
-                FlarialGUI::to_wide(value).c_str(),
-                wcslen(FlarialGUI::to_wide(value).c_str()),
+                FlarialGUI::to_wide(text).c_str(),
+                wcslen(FlarialGUI::to_wide(text).c_str()),
                 textFormat,
                 textWidth,
                 textHeight,
@@ -222,7 +236,7 @@ public:
             rounde.x, rounde.x);
 
         FlarialGUI::FlarialTextWithFont(realcenter.x + realspacing, realcenter.y,
-            FlarialGUI::to_wide(value).c_str(),
+            FlarialGUI::to_wide(text).c_str(),
             textColor, textWidth,
             textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, textSize);
 

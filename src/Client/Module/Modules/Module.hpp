@@ -111,6 +111,18 @@ public:
 
     virtual void NormalRender(int index, std::string text, std::string value) {
 
+        std::string uppercaseSentence;
+        std::string search = "{VALUE}";
+
+        for (char c : text) {
+            uppercaseSentence += std::toupper(c);
+        }
+
+        size_t pos = uppercaseSentence.find(search);
+        if (pos != std::string::npos) {
+            text.replace(pos, search.length(), value);
+        }
+
         float textWidth = Constraints::RelativeConstraint(0.33f * settings.getSettingByName<float>("uiscale")->value);
         float textHeight = Constraints::RelativeConstraint(0.1f * settings.getSettingByName<float>("uiscale")->value);
 
@@ -158,7 +170,7 @@ public:
                                 bgColor, rectWidth, textHeight,
                                 rounde.x, rounde.x);
         FlarialGUI::FlarialText(realcenter.x - realspacing, realcenter.y,
-                                FlarialGUI::to_wide(std::format("{}: {}", text, value)).c_str(),
+                                FlarialGUI::to_wide(text).c_str(),
                                 textColor, textWidth,
                                 textHeight);
 

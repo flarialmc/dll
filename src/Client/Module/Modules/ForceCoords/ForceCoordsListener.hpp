@@ -26,7 +26,7 @@ class ForceCoordsListener : public Listener {
                     Vec3<float>* Pos = SDK::clientInstance->getLocalPlayer()->getPosition();
 
                     std::string cords = std::to_string(static_cast<int>(Pos->x)) + ", " + std::to_string(static_cast<int>(Pos->y)) + ", " + std::to_string(static_cast<int>(Pos->z)); 
-                    this->module->NormalRender(6, "", cords);
+                    this->module->NormalRender(6, module->settings.getSettingByName<std::string>("text")->value, cords);
 
                 }
 

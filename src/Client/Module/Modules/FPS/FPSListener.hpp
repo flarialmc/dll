@@ -24,7 +24,7 @@ class FPSListener : public Listener {
         if(SDK::CurrentScreen == "hud_screen")
         if(module->settings.getSettingByName<bool>("enabled")->value){
 
-            this->module->NormalRender(0, "FPS", std::to_string(MC::fps));
+            this->module->NormalRender(0, module->settings.getSettingByName<std::string>("text")->value, std::to_string(MC::fps));
 
         }
 

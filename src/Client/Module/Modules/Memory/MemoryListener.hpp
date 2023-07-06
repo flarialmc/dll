@@ -27,7 +27,7 @@ class MemoryListener : public Listener {
 
             int sussymem = static_cast<int>((used_memory * 100) / total_memory);
 
-            this->module->NormalRender(4, "Mem", std::to_string(sussymem) + "%");
+            this->module->NormalRender(4, module->settings.getSettingByName<std::string>("text")->value, std::to_string(sussymem) + "%");
 
         }
     }

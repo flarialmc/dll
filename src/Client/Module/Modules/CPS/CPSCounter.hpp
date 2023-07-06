@@ -20,6 +20,8 @@ public:
 
         Module::onEnable();
 
+        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"CPS: {value}");
+
         if (settings.getSettingByName<bool>("rightcps") == nullptr) {
             settings.addSetting("rightcps", false);
         }

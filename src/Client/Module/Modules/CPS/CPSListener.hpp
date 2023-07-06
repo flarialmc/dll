@@ -45,8 +45,8 @@ private:
         if(SDK::CurrentScreen == "hud_screen")
         if(module->settings.getSettingByName<bool>("enabled")->value){
             if(!module->settings.getSettingByName<bool>("rightcps")->value)
-            this->module->NormalRender(1, "CPS", std::to_string(GetLeftCPS()));
-            else this->module->NormalRender(1, "CPS", std::to_string(GetLeftCPS()) + " | " + std::to_string(GetRightCPS()));
+            this->module->NormalRender(1, module->settings.getSettingByName<std::string>("text")->value, std::to_string(GetLeftCPS()));
+            else this->module->NormalRender(1, module->settings.getSettingByName<std::string>("text")->value, std::to_string(GetLeftCPS()) + " | " + std::to_string(GetRightCPS()));
 
         }
 

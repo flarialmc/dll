@@ -18,6 +18,8 @@ public:
 
         Module::onEnable();
 
+        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"FPS: {value}");
+
         if(settings.getSettingByName<float>("percentageX") == nullptr) {
             settings.addSetting("percentageX", 0.0f);
             settings.addSetting("percentageY", 0.0f);

@@ -34,12 +34,12 @@ class SprintListener : public Listener {
                 if (SDK::clientInstance->getLocalPlayer() != nullptr) {
 
                     if (SDK::clientInstance->getLocalPlayer()->getActorFlag(1)) {
-                        this->module->NormalRender(5, "", "Sneaking");
+                        this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Sneaking");
                     } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) {
-                        this->module->NormalRender(5, "", "Sprinting");
+                        this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Sprinting");
                     } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(34)) {
-                        this->module->NormalRender(5, "", "Walking");
-                    } else { this->module->NormalRender(5, "", "Standing"); }
+                        this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Walking");
+                    } else { this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Standing"); }
 
                 }
 
