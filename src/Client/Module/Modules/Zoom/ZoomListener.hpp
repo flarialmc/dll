@@ -34,7 +34,8 @@ class ZoomListener : public Listener {
     void onKey(KeyEvent &event) override {
 
         if(SDK::CurrentScreen == "hud_screen")
-        if(event.GetKey() == module->keybind) module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value;
+        if(module->IsKeybind(event.keys) && module->IsKeyPartOfKeybind(event.key)) module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value;
+        if(!module->IsKeybind(event.keys)) module->settings.getSettingByName<bool>("enabled")->value = false;
 
     };
 

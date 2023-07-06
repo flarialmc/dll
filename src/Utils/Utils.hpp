@@ -2,11 +2,19 @@
 #include <string>
 #include <cstdlib>
 #include <cmath>
+#include <vector>
 
 class Utils
 {
 public:
     static std::string getRoamingPath();
+
+    static std::string GetKeyAsString(int key, bool isCapital = false);
+
+    static int GetStringAsKey(const std::string &str);
+
+    static std::vector<int> GetStringAsKeys(const std::string str);
+
 };
 
 template<typename T>

@@ -1,7 +1,10 @@
 
 #pragma once
+
+#include <array>
 #include "../Event.hpp"
 #include "../Cancellable.hpp"
+#include "../../../Utils/Utils.hpp"
 
 enum class ActionType {
     RELEASED = 0,
@@ -13,10 +16,12 @@ class KeyEvent : public Event, public Cancellable {
 public:
     int key;
     int action;
+    std::array<bool, 256> keys;
 
-    KeyEvent(int key, int action) : Event() {
+    KeyEvent(int key, int action, const std::array<bool, 256>& keys) : Event() {
         this->key = key;
         this->action = action;
+        this->keys = keys;
     };
 
 
@@ -127,6 +132,31 @@ public:
 
     int SetAction(int e) {
         this->action = e;
+    }
+
+    std::string GetPressedKeysAsString() {
+
+        std::string result;
+        int i = 0;
+
+        for(bool b : keys) {
+
+            if (b) {
+                if (!result.empty()) {
+                    result += " + ";
+                }
+                result += Utils::GetKeyAsString(i);
+            }
+
+            i++;
+        }
+
+        return result;
+
+    }
+
+    std::array<bool, 256> GetPressedKeysAsArray() {
+        return this->keys;
     }
 };
 

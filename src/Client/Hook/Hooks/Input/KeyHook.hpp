@@ -1,9 +1,12 @@
 ﻿#pragma once
+
+#include <array>
 #include "../Hook.hpp"
 
 class KeyHook : public Hook
 {
 private:
+    static inline std::array<bool, 256> keys;
     static void keyCallback(int key, int state);
 
 public:

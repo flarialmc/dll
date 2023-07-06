@@ -20,6 +20,8 @@ public:
         EventHandler::registerListener(new ZoomListener("Zoom", this));
 
         Module::onEnable();
+
+        if(settings.getSettingByName<std::string>("keybind")->value == (std::string)"") settings.getSettingByName<std::string>("keybind")->value = "C";
     }
 
     

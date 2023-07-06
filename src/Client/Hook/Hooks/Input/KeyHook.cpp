@@ -14,7 +14,11 @@ void KeyHook::enableHook()
 void KeyHook::keyCallback(int key, int state)
 {
 
-    KeyEvent event(key, state);
+    Logger::debug(std::to_string(key));
+    if(state == (int)ActionType::PRESSED) keys[key] = true;
+    else keys[key] = false;
+
+    KeyEvent event(key, state, keys);
     EventHandler::onKey(event);
 
     std::to_string(event.GetKey());
