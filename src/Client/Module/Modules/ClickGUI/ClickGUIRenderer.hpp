@@ -130,6 +130,11 @@ class ClickGUIRenderer : public Listener {
                 this->curr = "modules";
                 ClickGUIRenderer::page.type = "normal";
                 FlarialGUI::ResetShit();
+
+                FlarialGUI::scrollpos = 0;
+                FlarialGUI::barscrollpos = 0;
+                GUIMouseListener::accumilatedPos = 0;
+                GUIMouseListener::accumilatedBarPos = 0;
             }
 
 

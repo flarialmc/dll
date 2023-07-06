@@ -34,7 +34,12 @@ public:
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
 
+        FlarialGUI::ScrollBar(x, y, 140, 40, 2);
+        FlarialGUI::SetScrollView(x, y, Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(1.0, "height"));
+
         FlarialGUI::KeybindSelector(0, x, y, settings.getSettingByName<std::string>("keybind")->value);
+
+        FlarialGUI::UnsetScrollView();
 
     }
 };

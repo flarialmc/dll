@@ -515,7 +515,7 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
     const float circleRadius = Constraints::RelativeConstraint(0.008, "height", true);
 
     float circleX = x + totalWidth / 2.0f;
-    float circleY = y + height / 2.0f;
+    float circleY = (y + scrollpos) + height / 2.0f;
 
     float rectangleLeft = farLeftX;
     float rectangleWidth = farRightX - farLeftX;
@@ -773,11 +773,6 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
     {
         MC::mousebutton = MouseButton::None;
         ColorPickers[index].isActive = !ColorPickers[index].isActive;
-    }
-    if (!CursorInRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, s * 0.85f, s * 0.85f) && MC::mousebutton == MouseButton::Left && !MC::held)
-    {
-        MC::mousebutton = MouseButton::None;
-        ColorPickers[index].isActive = false;
     }
 
 }
