@@ -28,4 +28,13 @@ public:
     void onDisable() override {
         Module::onDisable();
     }
+
+    void SettingsRender() override {
+
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
+
+        FlarialGUI::KeybindSelector(0, x, y, settings.getSettingByName<std::string>("keybind")->value);
+
+    }
 };

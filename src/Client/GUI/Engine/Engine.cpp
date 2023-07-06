@@ -695,6 +695,38 @@ void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const 
     writeFactory->Release();*/
 }
 
+void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string &keybind) {
+
+    Vec2<float> round = Constraints::RoundingConstraint(13, 13);
+
+    float s = Constraints::RelativeConstraint(0.0285, "height", true);
+
+    FlarialGUI::RoundedRect(x , y + s * 0.15f, D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), s * 4.125f, s, round.x, round.x);
+
+    round = Constraints::RoundingConstraint(11.5, 11.5);
+    FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f), s * 3.f, s * 0.82f, round.x, round.x);
+
+    std::string text;
+    if(KeybindSelectors[index].isActive) { KeybindSelectors[index].oldShi = keybind; keybind = FlarialGUI::currentKeybind; KeybindSelectors[index].newShi = keybind; }
+
+    text = keybind;
+
+    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.006f, FlarialGUI::to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), s * 4.3f, s * 1.1f, DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f);
+
+    if (CursorInRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, s * 0.85f, s * 0.85f) && MC::mousebutton == MouseButton::Left && !MC::held)
+    {
+        MC::mousebutton = MouseButton::None;
+        KeybindSelectors[index].isActive = !KeybindSelectors[index].isActive;
+    }
+
+    if (!CursorInRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, s * 0.85f, s * 0.85f) && MC::mousebutton == MouseButton::Left && !MC::held)
+    {
+        MC::mousebutton = MouseButton::None;
+        KeybindSelectors[index].isActive = false;
+    }
+
+}
+
 void FlarialGUI::ColorPicker(const int index, float x, const float y, std::string &hex, float &opacity) {
 
     // Accepts hex, so for e.g. fps counter bg color wants to be changed then you'd have to give a modifyable hex value
@@ -733,9 +765,11 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
         MC::mousebutton = MouseButton::None;
         ColorPickers[index].isActive = !ColorPickers[index].isActive;
     }
-    // rounded rect showcasing this hex, if clicked then ColorPickerWindow
-
-    // text next to rounded rect showing the thing
+    if (!CursorInRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, s * 0.85f, s * 0.85f) && MC::mousebutton == MouseButton::Left && !MC::held)
+    {
+        MC::mousebutton = MouseButton::None;
+        ColorPickers[index].isActive = false;
+    }
 
 }
 

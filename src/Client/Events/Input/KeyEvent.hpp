@@ -138,10 +138,12 @@ public:
 
         std::string result;
         int i = 0;
+        bool found = false;
 
         for(bool b : keys) {
 
             if (b) {
+                found = true;
                 if (!result.empty()) {
                     result += "+";
                 }
@@ -151,7 +153,9 @@ public:
             i++;
         }
 
+        if(found)
         return result;
+        else return "no";
 
     }
 

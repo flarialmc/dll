@@ -42,6 +42,13 @@ struct ColorPicker
     bool isActive = false;
 };
 
+struct KeybindSelectorer
+{
+    std::string oldShi;
+    std::string newShi;
+    bool isActive = false;
+};
+
 class Dimension
 {
 public:
@@ -78,6 +85,8 @@ namespace FlarialGUI
     inline SliderRect SliderRects[250];
     inline TextBoxStruct TextBoxes[100];
     inline ColorPicker ColorPickers[20];
+    inline KeybindSelectorer KeybindSelectors[20];
+    inline std::string currentKeybind;
     bool inline isInWindowRect = false;
 
     inline ID2D1Effect* blur = nullptr;
@@ -162,4 +171,6 @@ namespace FlarialGUI
 
     void AddShadowRect(const D2D1_POINT_2F &obj_min, const D2D1_POINT_2F &obj_max, D2D1_COLOR_F shadow_col,
                        float shadow_thickness, const D2D1_POINT_2F &shadow_offset, float obj_rounding);
+
+    void KeybindSelector(const int index, float x, float y, std::string &keybind);
 };

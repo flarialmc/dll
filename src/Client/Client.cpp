@@ -73,7 +73,7 @@ void Client::initialize()
 
     // Wait for all threads to finish
     for (std::thread& thread : threads) {
-        thread.join();
+        thread.detach();
     }
 
     if (GetModuleHandle("d3d12.dll") == NULL) Logger::debug("module handle is null");
