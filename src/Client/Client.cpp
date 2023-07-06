@@ -46,7 +46,7 @@ void Client::initialize()
         create_directory(folder_path4);
     }
 
-    std::string Path = Utils::getRoamingPath() + "\\Flarial\\assets\\gear.png";
+    std::string Path = Utils::getRoamingPath() + "\\Flarial\\assets\\";
 
     std::pair<std::string, std::string> fileData[] = {
         { "https://cdn.flarial.net/assets/gear.png", Path + "gear.png" },
