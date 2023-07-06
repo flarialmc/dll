@@ -233,6 +233,23 @@ void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2
     brush->Release();
 }
 
+void FlarialGUI::Notify(std::string text) {
+
+    float startX = Constraints::PercentageConstraint(-0.20, "right", true);
+    float x = Constraints::PercentageConstraint(0.20, "right", true);
+
+    float y = Constraints::PercentageConstraint(0.1, "bottom", true);
+
+    float rectWidth = Constraints::RelativeConstraint(0.25, "height", true);
+    float rectHeight = Constraints::RelativeConstraint(0.10, "height", true);
+
+    Vec2<float> rounding = Constraints::RoundingConstraint(30, 30);
+    D2D1_ROUNDED_RECT rect = D2D1::RoundedRect(D2D1::RectF(x, y, x + rectWidth, x + rectHeight), rounding.x, rounding.x);
+
+    FlarialGUI::BlurRect(rect);
+
+}
+
 void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, float width, float height, float radiusX, float radiusY)
 {
     if (isInScrollView)
@@ -1307,6 +1324,50 @@ void FlarialGUI::ApplyGaussianBlur(float blurIntensity)
         Memory::SafeRelease(bitmap);
         Memory::SafeRelease(FlarialGUI::blur);
     }
+}
+
+void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect) {
+
+    if(SwapchainHook::init) {
+
+        ID2D1Bitmap *bitmap = nullptr;
+        ID2D1Effect* effect;
+
+        D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &effect);
+
+        if(SwapchainHook::queue != nullptr) FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap], &bitmap);
+        else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap, &bitmap);
+
+        effect->SetInput(0, bitmap);
+
+        // Set blur intensity
+        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 6.0);
+
+        ID2D1Image* image;
+        effect->GetOutput(&image);
+
+        ID2D1ImageBrush* brush;
+        D2D1_IMAGE_BRUSH_PROPERTIES props = D2D1::ImageBrushProperties(D2D1::RectF(0, 0, MC::windowSize.x, MC::windowSize.y));
+        D2D::context->CreateImageBrush(image, props, &brush);
+
+        ID2D1Factory* factory;
+        D2D::context->GetFactory(&factory);
+
+        ID2D1RoundedRectangleGeometry* geo;
+        factory->CreateRoundedRectangleGeometry(rect, &geo);
+
+
+        D2D::context->FillGeometry(geo, brush);
+
+        Memory::SafeRelease(brush);
+        Memory::SafeRelease(image);
+        Memory::SafeRelease(bitmap);
+        Memory::SafeRelease(effect);
+        Memory::SafeRelease(factory);
+        Memory::SafeRelease(geo);
+    }
+
 }
 
 

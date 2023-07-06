@@ -45,6 +45,8 @@ class ClickGUIRenderer : public Listener {
 
     void onRender(RenderEvent &event) override {
 
+        FlarialGUI::Notify("hi");
+
         if(FlarialGUI::scrollposmodifier == 0) {
             FlarialGUI::scrollposmodifier = Constraints::RelativeConstraint(0.1f);
         }

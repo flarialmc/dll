@@ -173,4 +173,10 @@ namespace FlarialGUI
                        float shadow_thickness, const D2D1_POINT_2F &shadow_offset, float obj_rounding);
 
     void KeybindSelector(const int index, float x, float y, std::string &keybind);
+
+    void Notify(std::string text);
+
+    void BlurRect(D2D1_ROUNDED_RECT rect);
+
+    void ApplyGaussianBlurToTarget(ID2D1BitmapRenderTarget *target, float blurIntensity);
 };
