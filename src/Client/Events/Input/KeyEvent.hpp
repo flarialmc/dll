@@ -143,7 +143,7 @@ public:
 
             if (b) {
                 if (!result.empty()) {
-                    result += " + ";
+                    result += "+";
                 }
                 result += Utils::GetKeyAsString(i);
             }
