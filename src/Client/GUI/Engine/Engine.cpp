@@ -707,7 +707,16 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
     FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f), s * 3.f, s * 0.82f, round.x, round.x);
 
     std::string text;
-    if(KeybindSelectors[index].isActive) { KeybindSelectors[index].oldShi = keybind; keybind = FlarialGUI::currentKeybind; KeybindSelectors[index].newShi = keybind; }
+    if(KeybindSelectors[index].isActive) {
+
+        if(FlarialGUI::currentKeybind != "nothing") {
+
+            KeybindSelectors[index].oldShi = keybind;
+            keybind = FlarialGUI::currentKeybind;
+            KeybindSelectors[index].newShi = keybind;
+
+        }
+    }
 
     text = keybind;
 

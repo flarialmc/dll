@@ -23,10 +23,11 @@ class GUIKeyListener : public Listener {
                 if (event.GetKey() == 20) isCapital = !isCapital;
 
                 for(auto& shi : FlarialGUI::KeybindSelectors)
-                    if(shi.isActive && timeDifference.count() > 500) shi.isActive = false;
+                    if(shi.isActive && timeDifference.count() > 1000) shi.isActive = false;
 
                 if(event.GetPressedKeysAsString() != "no")
                 FlarialGUI::currentKeybind = event.GetPressedKeysAsString();
+                else FlarialGUI::currentKeybind = "nothing";
 
                 for (auto &box: FlarialGUI::TextBoxes) {
 
