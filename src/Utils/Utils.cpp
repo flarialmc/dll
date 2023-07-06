@@ -1,5 +1,6 @@
 ﻿#include <Windows.h>
 #include "Utils.hpp"
+#include "Logger/Logger.hpp"
 #include <sstream>
 
 std::string Utils::getRoamingPath()
@@ -20,6 +21,11 @@ std::string Utils::GetKeyAsString(int key, bool isCapital) {
     if (key == 32) { // Spacebar key
         return " ";
     }
+
+    if(key == 18) return "ALT";
+    if(key == 17) return "CTRL";
+    if(key == 16) return "SHIFT";
+
 
     if (isCapital) {
         switch (key) {
@@ -107,35 +113,16 @@ std::string Utils::GetKeyAsString(int key, bool isCapital) {
 };
 
 int Utils::GetStringAsKey(const std::string& str) {
-    if (str.length() != 1) {
-        // Invalid input: string must be of length 1
-        return -1;
-    }
+
+
+    if(str == "ALT" || str == "alt") return 18;
+    if(str == "CTRL" || str == "ctrl") return 17;
+    if(str == "SHIFT" || str == "shift") return 16;
+    if(str == " ") return 32;
 
     char c = str[0];
-    if (c == ' ') {
-        // Spacebar key
-        return 32;
-    }
 
-    if(str == "ALT") return VK_MENU;
-    if(str == "CTRL") return VK_CONTROL;
-    if(str == "SHIFT") return VK_SHIFT;
-
-    if (c >= '0' && c <= '9') {
-        // Digits 0-9
-        return static_cast<int>(c);
-    }
-
-    if (c >= 'A' && c <= 'Z') {
-        // Uppercase letters A-Z
-        return static_cast<int>(c);
-    }
-
-    if (c >= 'a' && c <= 'z') {
-        // Lowercase letters a-z
-        return static_cast<int>(c);
-    }
+    return static_cast<int>(std::toupper(c));
 
     // Unsupported character or non-alphabetic key
     return -1;
@@ -146,21 +133,6 @@ int Utils::GetStringAsKey(const std::string& str) {
 
     if (str.empty()) {
         // Empty string
-        return keys;
-    }
-
-    if (str == "ALT") {
-        keys.push_back(VK_MENU);
-        return keys;
-    }
-
-    if (str == "CTRL") {
-        keys.push_back(VK_CONTROL);
-        return keys;
-    }
-
-    if (str == "SHIFT") {
-        keys.push_back(VK_SHIFT);
         return keys;
     }
 

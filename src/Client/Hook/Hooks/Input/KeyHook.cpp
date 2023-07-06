@@ -13,8 +13,6 @@ void KeyHook::enableHook()
 
 void KeyHook::keyCallback(int key, int state)
 {
-
-    Logger::debug(std::to_string(key));
     if(state == (int)ActionType::PRESSED) keys[key] = true;
     else keys[key] = false;
 

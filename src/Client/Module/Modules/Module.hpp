@@ -37,7 +37,7 @@ public:
             settings.addSetting("enabled", false);
         }
 
-        if(settings.getSettingByName<bool>("keybind") == nullptr) {
+        if(settings.getSettingByName<std::string>("keybind") == nullptr) {
             settings.addSetting("keybind", (std::string)"");
         }
 
