@@ -218,14 +218,14 @@ void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2
 
     // Calculate the adjusted dimensions for the border rounded rectangle
     D2D1_RECT_F borderRect = D2D1::RectF(
-            rect.left - borderWidth / 2.00f,
-            rect.top - borderWidth / 2.00f,
-            rect.right + borderWidth / 2.00f,
-            rect.bottom + borderWidth / 2.00f
+            rect.left - borderWidth / 2.0,
+            rect.top - borderWidth / 2.0,
+            rect.right + borderWidth / 2.0,
+            rect.bottom + borderWidth / 2.0
     );
 
-    radiusX += borderWidth / 2.00f;
-    radiusY += borderWidth / 2.00f;
+    radiusX += borderWidth / 2.0;
+    radiusY += borderWidth / 2.0;
 
 
 

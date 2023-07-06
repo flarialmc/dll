@@ -143,7 +143,7 @@ public:
 
     void NormalRender(int index, std::string text, std::string value) override {
 
-        float textWidth = Constraints::RelativeConstraint(0.35f * settings.getSettingByName<float>("uiscale")->value);
+        float textWidth = Constraints::RelativeConstraint(0.7f * settings.getSettingByName<float>("uiscale")->value);
         float textHeight = Constraints::RelativeConstraint(0.1f * settings.getSettingByName<float>("uiscale")->value);
 
 
@@ -192,11 +192,6 @@ public:
         writeFactory->Release();
         textFormat->Release();
 
-
-
-        if(textMetrics.lineCount == 2)
-            textWidth += Constraints::RelativeConstraint(0.05f * settings.getSettingByName<float>("uiscale")->value);
-        
         rectWidth = textMetrics.width + Constraints::SpacingConstraint(2.0, realspacing);
 
         FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, index);
