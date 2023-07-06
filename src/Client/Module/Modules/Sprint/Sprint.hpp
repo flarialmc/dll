@@ -20,6 +20,8 @@ public:
 
         Module::onEnable();
 
+        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value}");
+
         if (settings.getSettingByName<bool>("toggled") == nullptr) {
             settings.addSetting("toggled", false);
         }
@@ -152,68 +154,6 @@ public:
         FlarialGUI::ColorPickerWindow(4, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value);
         FlarialGUI::ColorPickerWindow(5, settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value);
         /* Color Pickers End */
-
-    }
-    void NormalRender(int index, std::string text, std::string value) override {
-
-        float textWidth = Constraints::RelativeConstraint(0.33f * settings.getSettingByName<float>("uiscale")->value);
-        float textHeight = Constraints::RelativeConstraint(0.1f * settings.getSettingByName<float>("uiscale")->value);
-
-
-        Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
-            this->settings.getSettingByName<float>("percentageY")->value);
-
-        Vec2<float> realcenter;
-
-        if (settingperc.x != 0)
-            realcenter = Vec2<float>(settingperc.x * MC::windowSize.x,
-                settingperc.y * MC::windowSize.y);
-        else
-            realcenter = Constraints::CenterConstraint(textWidth, textHeight);
-
-        float rectWidth = Constraints::RelativeConstraint(0.225f * settings.getSettingByName<float>("uiscale")->value);
-        Vec2<float> rounde = Constraints::RoundingConstraint(this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value, this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value);
-
-        float realspacing = Constraints::SpacingConstraint(0.155f, textWidth);
-
-        FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, index);
-
-        Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, rectWidth, textHeight);
-
-        realcenter.x = vec2.x;
-        realcenter.y = vec2.y;
-
-        realcenter = realcenter;
-
-
-        Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y);
-
-        this->settings.setValue("percentageX", percentages.x);
-        this->settings.setValue("percentageY", percentages.y);
-
-        D2D1_COLOR_F bgColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
-        D2D1_COLOR_F textColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textColor")->value);
-        D2D1_COLOR_F borderColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
-
-        bgColor.a = settings.getSettingByName<float>("bgOpacity")->value;
-        textColor.a = settings.getSettingByName<float>("textOpacity")->value;
-        borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
-
-        FlarialGUI::RoundedRect(realcenter.x, realcenter.y,
-            bgColor, rectWidth, textHeight,
-            rounde.x, rounde.x);
-        FlarialGUI::FlarialText(realcenter.x - realspacing, realcenter.y,
-            FlarialGUI::to_wide(value).c_str(),
-            textColor, textWidth,
-            textHeight);
-
-        if (this->settings.getSettingByName<bool>("border")->value) {
-            FlarialGUI::RoundedHollowRect(realcenter.x, realcenter.y, Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
-                borderColor, rectWidth, textHeight,
-                rounde.x, rounde.x);
-        }
-
-        FlarialGUI::UnsetWindowRect();
 
     }
 };

@@ -67,7 +67,7 @@ class TimeListener : public Listener {
 
             const std::string time = std::to_string(hour) + seperator + std::to_string(minute) + " " + meridiem;
 
-            this->module->NormalRender(3, "", time);
+            this->module->NormalRender(3, module->settings.getSettingByName<std::string>("text")->value, time);
 
         }
 
