@@ -3,7 +3,12 @@
 #include "GUI/Engine/Engine.hpp"
 #include <kiero.h>
 #include <filesystem>
+#include <thread>
 #include <wingdi.h>
+
+void DownloadAndSave(std::string url, std::string path) {
+    URLDownloadToFileW(NULL, FlarialGUI::to_wide(url).c_str(), FlarialGUI::to_wide(path).c_str(), 0, NULL);
+}
 
 bool Client::disable = false;
 
@@ -41,65 +46,35 @@ void Client::initialize()
         create_directory(folder_path4);
     }
 
-    std::string dwnld_URL = "https://cdn.flarial.net/assets/gear.png";
-    std::string savepath = Utils::getRoamingPath() + "\\Flarial\\assets\\gear.png";
-    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL).c_str(), FlarialGUI::to_wide(savepath).c_str(), 0, NULL);
+    std::string Path = Utils::getRoamingPath() + "\\Flarial\\assets\\gear.png";
 
-    std::string dwnld_URL3131 = "https://cdn.flarial.net/assets/font.ttf";
-    std::string savepath3131 = Utils::getRoamingPath() + "\\Flarial\\assets\\font.ttf";
-    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL3131).c_str(), FlarialGUI::to_wide(savepath3131).c_str(), 0, NULL);
+    std::pair<std::string, std::string> fileData[] = {
+        { "https://cdn.flarial.net/assets/gear.png", Path + "gear.png" },
+        { "https://cdn.flarial.net/assets/font.ttf", Path + "font.png" },
+        { "https://cdn.flarial.net/assets/logo.png", Path + "logo.png" },
+        { "https://cdn.flarial.net/assets/fps.png", Path + "fps.png" },
+        { "https://cdn.flarial.net/assets/autogg.png", Path + "autogg.png" },
+        { "https://cdn.flarial.net/assets/auto_sprint.png", Path + "auto_sprint.png" },
+        { "https://cdn.flarial.net/assets/clickgui.png", Path + "clickgui.png" },
+        { "https://cdn.flarial.net/assets/modules.png", Path + "modules.png" },
+        { "https://cdn.flarial.net/assets/cursor.png", Path + "cursor.png" },
+        { "https://cdn.flarial.net/assets/magnify.png", Path + "magnify.png" },
+        { "https://cdn.flarial.net/assets/memory.png", Path + "memory.png" },
+        { "https://cdn.flarial.net/assets/time.png", Path + "time.png" },
+        { "https://cdn.flarial.net/assets/fullbright.png", Path + "fullbright.png" },
+        { "https://cdn.flarial.net/assets/frying-pan.png", Path + "frying-pan.png" },
+    };
 
-    std::string dwnld_URL2 = "https://cdn.flarial.net/assets/logo.png";
-    std::string savepath2 = Utils::getRoamingPath() + "\\Flarial\\assets\\logo.png";
-    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL2).c_str(), FlarialGUI::to_wide(savepath2).c_str(), 0, NULL);
+    // Create threads to download the files
+    std::vector<std::thread> threads;
+    for (const auto& data : fileData) {
+        threads.emplace_back(DownloadAndSave, data.first, data.second);
+    }
 
-    std::string dwnld_URL3 = "https://cdn.flarial.net/assets/fps.png";
-    std::string savepath3 = Utils::getRoamingPath() + "\\Flarial\\assets\\fps.png";
-    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL3).c_str(), FlarialGUI::to_wide(savepath3).c_str(), 0, NULL);
-
-    std::string dwnld_URL4 = "https://cdn.flarial.net/assets/autogg.png";
-    std::string savepath4 = Utils::getRoamingPath() + "\\Flarial\\assets\\autogg.png";
-    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL4).c_str(), FlarialGUI::to_wide(savepath4).c_str(), 0, NULL);
-
-    std::string dwnld_URL5 = "https://cdn.flarial.net/assets/autosprint.png";
-    std::string savepath5 = Utils::getRoamingPath() + "\\Flarial\\assets\\autosprint.png";
-    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL5).c_str(), FlarialGUI::to_wide(savepath5).c_str(), 0, NULL);
-
-    std::string dwnld_URL6 = "https://cdn.flarial.net/assets/clickgui.png";
-    std::string savepath6 = Utils::getRoamingPath() + "\\Flarial\\assets\\clickgui.png";
-    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL6).c_str(), FlarialGUI::to_wide(savepath6).c_str(), 0, NULL);
-
-    std::string dwnld_URL7 = "https://cdn.flarial.net/assets/modules.png";
-    std::string savepath7 = Utils::getRoamingPath() + "\\Flarial\\assets\\modules.png";
-    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL7).c_str(), FlarialGUI::to_wide(savepath7).c_str(), 0, NULL);
-
-    std::string dwnld_URL8 = "https://cdn.flarial.net/assets/cursor.png";
-    std::string savepath8 = Utils::getRoamingPath() + "\\Flarial\\assets\\cursor.png";
-    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL8).c_str(), FlarialGUI::to_wide(savepath8).c_str(), 0, NULL);
-
-    std::string dwnld_URL9 = "https://cdn.flarial.net/assets/magnify.png";
-    std::string savepath9 = Utils::getRoamingPath() + "\\Flarial\\assets\\magnify.png";
-    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL9).c_str(), FlarialGUI::to_wide(savepath9).c_str(), 0, NULL);
-
-    std::string dwnld_URL11 = "https://cdn.flarial.net/assets/memory.png";
-    std::string savepath11 = Utils::getRoamingPath() + "\\Flarial\\assets\\memory.png";
-    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL11).c_str(), FlarialGUI::to_wide(savepath11).c_str(), 0, NULL);
-
-    std::string dwnld_URL10 = "https://cdn.flarial.net/assets/time.png";
-    std::string savepath10 = Utils::getRoamingPath() + "\\Flarial\\assets\\time.png";
-    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL10).c_str(), FlarialGUI::to_wide(savepath10).c_str(), 0, NULL);
-
-    std::string dwnld_URL12 = "https://cdn.flarial.net/assets/auto_sprint.png";
-    std::string savepath12 = Utils::getRoamingPath() + "\\Flarial\\assets\\auto_sprint.png";
-    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL12).c_str(), FlarialGUI::to_wide(savepath12).c_str(), 0, NULL);
-
-    std::string dwnld_URL13 = "https://cdn.flarial.net/assets/fullbright.png";
-    std::string savepath13 = Utils::getRoamingPath() + "\\Flarial\\assets\\fullbright.png";
-    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL13).c_str(), FlarialGUI::to_wide(savepath13).c_str(), 0, NULL);
-
-    std::string dwnld_URL14 = "https://cdn.flarial.net/assets/frying-pan.png";
-    std::string savepath14 = Utils::getRoamingPath() + "\\Flarial\\assets\\frying-pan.png";
-    URLDownloadToFileW(NULL, FlarialGUI::to_wide(dwnld_URL14).c_str(), FlarialGUI::to_wide(savepath14).c_str(), 0, NULL);
+    // Wait for all threads to finish
+    for (std::thread& thread : threads) {
+        thread.join();
+    }
 
     if (GetModuleHandle("d3d12.dll") == NULL) Logger::debug("module handle is null");
 
