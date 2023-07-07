@@ -1341,13 +1341,12 @@ void FlarialGUI::Notify(std::string text) {
     e.text = text;
     e.finished = false;
     e.currentPos = Constraints::PercentageConstraint(0.01, "right", true);
+    e.currentPosY = Constraints::PercentageConstraint(0.25, "bottom", true);
     notifications.push_back(e);
 
 }
 
 void FlarialGUI::NotifyHeartbeat() {
-
-
 
 
     float rectWidth = Constraints::RelativeConstraint(0.45, "height", true);
@@ -1362,32 +1361,34 @@ void FlarialGUI::NotifyHeartbeat() {
 
     for (auto& notif : FlarialGUI::notifications) {
 
+        FlarialGUI::lerp(notif.currentPosY, y, 0.20f * FlarialGUI::frameFactor);
+
         if(!notif.arrived) {
 
             D2D1_ROUNDED_RECT rect = D2D1::RoundedRect(
-                    D2D1::RectF(notif.currentPos, y, notif.currentPos + rectWidth, y + rectHeight), rounding.x,
+                    D2D1::RectF(notif.currentPos, notif.currentPosY, notif.currentPos + rectWidth, notif.currentPosY + rectHeight), rounding.x,
                     rounding.x);
 
             D2D1_COLOR_F col = FlarialGUI::HexToColorF("110F10");
             col.a = 0.75;
 
             FlarialGUI::BlurRect(rect, 7.0f);
-            FlarialGUI::RoundedRect(notif.currentPos, y,
+            FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
                                     col, rectWidth,
                                     rectHeight, rounding.x, rounding.x);
 
-            D2D1_RECT_F cutoutrect = D2D1::RectF(notif.currentPos, y, notif.currentPos + Constraints::SpacingConstraint(0.0127, rectWidth), y + rectHeight);
+            D2D1_RECT_F cutoutrect = D2D1::RectF(notif.currentPos, notif.currentPosY, notif.currentPos + Constraints::SpacingConstraint(0.0127, rectWidth), notif.currentPosY + rectHeight);
 
             D2D::context->PushAxisAlignedClip(cutoutrect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
             col = FlarialGUI::HexToColorF("FE2438");
-            FlarialGUI::RoundedRect(notif.currentPos, y,
+            FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
                                     col, rectWidth,
                                     rectHeight, rounding.x, rounding.x);
 
             D2D::context->PopAxisAlignedClip();
 
-            FlarialGUI::PushSize(notif.currentPos, y, rectWidth, rectHeight);
+            FlarialGUI::PushSize(notif.currentPos, notif.currentPosY, rectWidth, rectHeight);
 
             float logoX = Constraints::PercentageConstraint(0.01, "left") - Constraints::SpacingConstraint(0.18, rectHeight);
             float logoY = Constraints::PercentageConstraint(0.01, "top") - Constraints::SpacingConstraint(0.10, rectHeight);
@@ -1426,29 +1427,29 @@ void FlarialGUI::NotifyHeartbeat() {
             }
 
             D2D1_ROUNDED_RECT rect = D2D1::RoundedRect(
-                    D2D1::RectF(notif.currentPos, y, notif.currentPos + rectWidth, y + rectHeight), rounding.x,
+                    D2D1::RectF(notif.currentPos, notif.currentPosY, notif.currentPos + rectWidth, notif.currentPosY + rectHeight), rounding.x,
                     rounding.x);
 
             D2D1_COLOR_F col = FlarialGUI::HexToColorF("110F10");
             col.a = 0.75;
 
             FlarialGUI::BlurRect(rect, 7.0f);
-            FlarialGUI::RoundedRect(notif.currentPos, y,
+            FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
                                     col, rectWidth,
                                     rectHeight, rounding.x, rounding.x);
 
-            D2D1_RECT_F cutoutrect = D2D1::RectF(notif.currentPos, y, notif.currentPos + Constraints::SpacingConstraint(0.0127, rectWidth), y + rectHeight);
+            D2D1_RECT_F cutoutrect = D2D1::RectF(notif.currentPos, notif.currentPosY, notif.currentPos + Constraints::SpacingConstraint(0.0127, rectWidth), notif.currentPosY + rectHeight);
 
             D2D::context->PushAxisAlignedClip(cutoutrect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
             col = FlarialGUI::HexToColorF("FE2438");
-            FlarialGUI::RoundedRect(notif.currentPos, y,
+            FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
                                     col, rectWidth,
                                     rectHeight, rounding.x, rounding.x);
 
             D2D::context->PopAxisAlignedClip();
 
-            FlarialGUI::PushSize(notif.currentPos, y, rectWidth, rectHeight);
+            FlarialGUI::PushSize(notif.currentPos, notif.currentPosY, rectWidth, rectHeight);
 
             float logoX = Constraints::PercentageConstraint(0.01, "left") - Constraints::SpacingConstraint(0.18, rectHeight);
             float logoY = Constraints::PercentageConstraint(0.01, "top") - Constraints::SpacingConstraint(0.10, rectHeight);

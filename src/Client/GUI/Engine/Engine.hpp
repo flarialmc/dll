@@ -64,6 +64,7 @@ class Notification
 {
 public:
     float currentPos = 0;
+    float currentPosY = 0;
     std::string text;
     bool finished = false;
     bool arrived = false;
