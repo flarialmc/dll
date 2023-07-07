@@ -85,7 +85,7 @@ public:
                 case 37: return "%";
                 case 91: return "{";
                 case 93: return "}";
-                case 18: return "\\";
+                case 220: return "|";
                 case 191: return "?";
                 case 186: return ":";
                 case 187: return "+";
@@ -132,10 +132,10 @@ public:
                 case 90: return "z";
                 case 219: return "[";
                 case 221: return "]";
-                case 18: return "|";
-                case 186: (std::string)";";
+                case 220: return "\\";
                 case 191: return "/";
                 case 187: return "=";
+                case 186: return (std::string)";";
             }
         }
 
