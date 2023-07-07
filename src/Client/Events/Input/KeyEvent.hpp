@@ -38,24 +38,22 @@ public:
     }
 
     std::string GetKeyAsString(bool isCapital) {
-
         if (this->key == 32) { // Spacebar key
             return " ";
         }
 
         if (isCapital) {
             switch (this->key) {
-                // A - Z
-                case 48: return "0";
-                case 49: return "1";
-                case 50: return "2";
-                case 51: return "3";
-                case 52: return "4";
-                case 53: return "5";
-                case 54: return "6";
-                case 55: return "7";
-                case 56: return "8";
-                case 57: return "9";
+                case 48: return ")";
+                case 49: return "!";
+                case 50: return "@";
+                case 51: return "#";
+                case 52: return "$";
+                case 53: return "%";
+                case 54: return "^";
+                case 55: return "&";
+                case 56: return "*";
+                case 57: return "(";
                 case 65: return "A";
                 case 66: return "B";
                 case 67: return "C";
@@ -82,10 +80,20 @@ public:
                 case 88: return "X";
                 case 89: return "Y";
                 case 90: return "Z";
+                case 40: return "(";
+                case 41: return ")";
+                case 37: return "%";
+                case 91: return "{";
+                case 93: return "}";
+                case 18: return "\\";
+                case 191: return "?";
+                case 186: return ":";
+                case 187: return "+";
+                case 219: return "{";
+                case 221: return "}";
             }
         } else {
             switch (this->key) {
-                // a - z
                 case 48: return "0";
                 case 49: return "1";
                 case 50: return "2";
@@ -96,32 +104,38 @@ public:
                 case 55: return "7";
                 case 56: return "8";
                 case 57: return "9";
-                case 65: return "a";
-                case 66: return "b";
-                case 67: return "c";
-                case 68: return "d";
-                case 69: return "e";
-                case 70: return "f";
-                case 71: return "g";
-                case 72: return "h";
-                case 73: return "i";
-                case 74: return "j";
-                case 75: return "k";
-                case 76: return "l";
-                case 77: return "m";
-                case 78: return "n";
-                case 79: return "o";
-                case 80: return "p";
-                case 81: return "q";
-                case 82: return "r";
-                case 83: return "s";
-                case 84: return "t";
-                case 85: return "u";
-                case 86: return "v";
-                case 87: return "w";
-                case 88: return "x";
-                case 89: return "y";
-                case 90: return "z";
+                case 97: return "a";
+                case 98: return "b";
+                case 99: return "c";
+                case 219: return "[";
+                case 221: return "]";
+                case 100: return "d";
+                case 101: return "e";
+                case 102: return "f";
+                case 103: return "g";
+                case 104: return "h";
+                case 105: return "i";
+                case 106: return "j";
+                case 107: return "k";
+                case 108: return "l";
+                case 109: return "m";
+                case 110: return "n";
+                case 111: return "o";
+                case 112: return "p";
+                case 113: return "q";
+                case 114: return "r";
+                case 115: return "s";
+                case 116: return "t";
+                case 117: return "u";
+                case 118: return "v";
+                case 119: return "w";
+                case 120: return "x";
+                case 121: return "y";
+                case 122: return "z";
+                case 18: return "|";
+                case 186: (std::string)";";
+                case 191: return "/";
+                case 187: return "=";
             }
         }
 

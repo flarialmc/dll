@@ -17,7 +17,8 @@ class GUIKeyListener : public Listener {
 
             if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")) {
 
-                if (event.GetKey() == 20) isCapital = !isCapital;
+                if (event.GetKey() == 20 && event.GetAction() == (int)ActionType::PRESSED || event.GetKey() == VK_SHIFT) isCapital = !isCapital;
+                else Logger::debug(std::to_string(event.GetKey()));
 
                 for(auto& shi : FlarialGUI::KeybindSelectors) {
                     shi.currentOnKeyTime = std::chrono::steady_clock::now();

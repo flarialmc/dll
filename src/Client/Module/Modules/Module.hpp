@@ -112,7 +112,7 @@ public:
     virtual void NormalRender(int index, std::string text, std::string value) {
 
         std::string uppercaseSentence;
-        std::string search = "{VALUE}";
+        std::string search = "VALUE";
 
         for (char c : text) {
             uppercaseSentence += std::toupper(c);
