@@ -11,7 +11,7 @@
 
 DWORD WINAPI init(HMODULE real)
 {
-    //
+
     Client::initialize();
     Logger::info("Initializing Client");
 
