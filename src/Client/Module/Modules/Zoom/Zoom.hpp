@@ -21,6 +21,8 @@ public:
 
         Module::onEnable();
 
+        if (settings.getSettingByName<float>("modifier") == nullptr) settings.addSetting("modifier", 10.0f);
+
         if(settings.getSettingByName<std::string>("keybind")->value == (std::string)"") settings.getSettingByName<std::string>("keybind")->value = "C";
     }
 
@@ -31,6 +33,8 @@ public:
 
     void SettingsRender() override {
 
+        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
 
@@ -38,6 +42,17 @@ public:
         FlarialGUI::SetScrollView(x, y, Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(0.90, "height"));
 
         FlarialGUI::KeybindSelector(0, x, y, settings.getSettingByName<std::string>("keybind")->value);
+
+        y += Constraints::SpacingConstraint(0.35, textWidth);
+
+        float percent = FlarialGUI::Slider(7, x,
+            y,
+            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+            D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("modifier")->value, 30);
+
+        this->settings.getSettingByName<float>("modifier")->value = percent;
+        
 
         FlarialGUI::UnsetScrollView();
 

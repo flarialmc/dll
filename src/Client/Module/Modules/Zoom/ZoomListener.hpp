@@ -16,9 +16,10 @@ class ZoomListener : public Listener {
         if(SDK::CurrentScreen == "hud_screen")
         if(this->module->settings.getSettingByName<bool>("enabled")->value){
 
-            if (event.GetAction() == MouseAction::SCROLL_UP) zoomValue -= 10;
+            if (event.GetAction() == MouseAction::SCROLL_UP) zoomValue -= this->module->settings.getSettingByName<float>("modifier")->value;
             if (event.GetAction() != MouseAction::SCROLL_UP && event.GetButton() == MouseButton::Scroll)
-                zoomValue += 10;
+                zoomValue += this->module->settings.getSettingByName<float>("modifier")->value;
+
 
             if(zoomValue < 1) zoomValue = 1;
             else if (zoomValue > 90.0f) zoomValue = 90.0f;
@@ -26,6 +27,7 @@ class ZoomListener : public Listener {
             if(event.GetAction() == MouseAction::SCROLL_UP || event.GetAction() != MouseAction::SCROLL_UP && event.GetButton() == MouseButton::Scroll) {
                 event.SetButton(MouseButton::None);
                 event.SetAction(MouseAction::RELEASE);
+
             }
         }
         
