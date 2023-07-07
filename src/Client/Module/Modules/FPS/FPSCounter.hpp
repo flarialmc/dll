@@ -135,13 +135,16 @@ public:
             this->settings.getSettingByName<float>("BlurIntensity")->value = percent;
         }
 
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        FlarialGUI::TextBoxVisual(5, settings.getSettingByName<std::string>("text")->value, 16, Constraints::PercentageConstraint(0.019, "left"), toggleY);
+
 
         /* Rounding End */
 
         /* Color Pickers Start*/
 
         toggleX = Constraints::PercentageConstraint(0.55, "left");
-        toggleY -= Constraints::SpacingConstraint(0.37, textWidth);
+        toggleY -= Constraints::SpacingConstraint(0.72, textWidth);
 
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Background").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
         FlarialGUI::ColorPicker(0, toggleX + Constraints::SpacingConstraint(0.95, textWidth), toggleY - Constraints::SpacingConstraint(0.017, textWidth), settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value);

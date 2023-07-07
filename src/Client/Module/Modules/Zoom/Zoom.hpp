@@ -22,7 +22,7 @@ public:
         Module::onEnable();
 
         if (settings.getSettingByName<float>("modifier") == nullptr) settings.addSetting("modifier", 10.0f);
-
+        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"real");
         if(settings.getSettingByName<std::string>("keybind")->value == (std::string)"") settings.getSettingByName<std::string>("keybind")->value = "C";
     }
 
@@ -52,7 +52,6 @@ public:
             D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("modifier")->value, 30);
 
         this->settings.getSettingByName<float>("modifier")->value = percent;
-        
 
         FlarialGUI::UnsetScrollView();
 

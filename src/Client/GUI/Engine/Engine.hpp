@@ -51,6 +51,7 @@ struct KeybindSelectorer
     std::chrono::steady_clock::time_point currentOnKeyTime = std::chrono::steady_clock::now();
 };
 
+
 class Dimension
 {
 public:
@@ -196,4 +197,6 @@ namespace FlarialGUI
     void ApplyGaussianBlurToTarget(ID2D1BitmapRenderTarget *target, float blurIntensity);
 
     void NotifyHeartbeat();
+
+    std::string TextBoxVisual(int index, std::string& text, int limit, float x, float y);
 };

@@ -451,9 +451,32 @@ float FlarialGUI::HueToRGB(float p, float q, float t)
 }
 
 
+std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, float x, float y) {
+
+    D2D1_COLOR_F col;
+
+    Vec2<float> round = Constraints::RoundingConstraint(13, 13);
+
+    const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+    const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
+
+    text = FlarialGUI::TextBox(index, text, 16, x, y, textWidth, percHeight);
+
+    if(TextBoxes[index].isActive) col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
+    else col = D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f);
+
+
+    FlarialGUI::RoundedRect(x, y, col, Constraints::SpacingConstraint(1.55, textWidth), percHeight, round.x, round.x);
+
+    FlarialGUI::FlarialTextWithFont(x, y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_CENTER, 110);
+    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, to_wide("Text Format").c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_LEADING, 110);
+
+}
 
 
 std::string FlarialGUI::TextBox(int index, std::string text, int limit, float x, float y, float width, float height) {
+
+    if(isInScrollView) y += scrollpos;
 
     if(CursorInRect(x, y, width, height) && MC::mouseaction == MouseAction::PRESS && MC::mousebutton == MouseButton::Left) {
 
