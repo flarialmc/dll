@@ -470,8 +470,6 @@ void FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, float x,
 
     FlarialGUI::FlarialTextWithFont(x, y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_CENTER, 110);
     FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, to_wide("Text Format").c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_LEADING, 110);
-
-    return "";
 }
 
 
