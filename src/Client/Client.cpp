@@ -43,7 +43,7 @@ void Client::initialize()
 
     std::pair<std::string, std::string> fileData[] = {
         { "https://cdn.flarial.net/assets/gear.png", Path + "gear.png" },
-        { "https://cdn.flarial.net/assets/font.ttf", Path + "font.png" },
+        { "https://cdn.flarial.net/assets/font.ttf", Path + "font.ttf" },
         { "https://cdn.flarial.net/assets/logo.png", Path + "logo.png" },
         { "https://cdn.flarial.net/assets/fps.png", Path + "fps.png" },
         { "https://cdn.flarial.net/assets/autogg.png", Path + "autogg.png" },

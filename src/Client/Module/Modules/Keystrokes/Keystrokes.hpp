@@ -170,6 +170,9 @@ public:
         FlarialGUI::ColorPicker(5, toggleX + Constraints::SpacingConstraint(0.63, textWidth), toggleY * 0.99f,
                                 settings.getSettingByName<std::string>("enabledColor")->value,
                                 settings.getSettingByName<float>("enabledColor")->value);
+        /* Color Pickers End */
+
+        FlarialGUI::UnsetScrollView();
 
         FlarialGUI::ColorPickerWindow(3, settings.getSettingByName<std::string>("bgColor")->value,
                                       settings.getSettingByName<float>("bgOpacity")->value);
@@ -177,9 +180,6 @@ public:
                                       settings.getSettingByName<float>("textOpacity")->value);
         FlarialGUI::ColorPickerWindow(5, settings.getSettingByName<std::string>("enabledColor")->value,
                                       settings.getSettingByName<float>("enabledOpacity")->value);
-        /* Color Pickers End */
-
-        FlarialGUI::UnsetScrollView();
 
     }
 

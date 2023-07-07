@@ -515,7 +515,12 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
     const float circleRadius = Constraints::RelativeConstraint(0.008, "height", true);
 
     float circleX = x + totalWidth / 2.0f;
-    float circleY = (y + scrollpos) + height / 2.0f;
+
+    float circleY;
+
+    if(FlarialGUI::isInScrollView)
+    circleY = (y + scrollpos) + height / 2.0f;
+    else  circleY = y + height / 2.0f;
 
     float rectangleLeft = farLeftX;
     float rectangleWidth = farRightX - farLeftX;

@@ -153,12 +153,13 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Border").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
         FlarialGUI::ColorPicker(5, toggleX + Constraints::SpacingConstraint(0.55, textWidth), toggleY * 0.99f, settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value);
 
+        FlarialGUI::UnsetScrollView();
+
         FlarialGUI::ColorPickerWindow(3, settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value);
         FlarialGUI::ColorPickerWindow(4, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value);
         FlarialGUI::ColorPickerWindow(5, settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value);
         /* Color Pickers End */
 
-        FlarialGUI::UnsetScrollView();
     }
 };
 
