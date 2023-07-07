@@ -6,6 +6,7 @@
 #include <stack>
 #include <map>
 #include <vector>
+#include <chrono>
 
 struct WindowRect
 {
@@ -58,6 +59,16 @@ public:
     float width = 0;
 };
 
+class Notification
+{
+public:
+    float currentPos = 0;
+    std::string text;
+    bool finished = false;
+    bool arrived = false;
+    std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
+};
+
 class ImagesClass
 {
 public:
@@ -74,6 +85,7 @@ namespace FlarialGUI
     std::vector<D2D1_COLOR_F> inline toggleColors(20, D2D1::ColorF(D2D1::ColorF::White));
     std::vector<D2D1_COLOR_F> inline buttonColors(20, D2D1::ColorF(D2D1::ColorF::Red));
 
+
     float inline frameFactor = 1;
 
     inline bool isInScrollView = false;
@@ -87,6 +99,7 @@ namespace FlarialGUI
     inline ColorPicker ColorPickers[20];
     inline KeybindSelectorer KeybindSelectors[20];
     inline std::string currentKeybind;
+    std::vector<Notification> inline notifications;
     bool inline isInWindowRect = false;
 
     inline ID2D1Effect* blur = nullptr;
@@ -179,4 +192,6 @@ namespace FlarialGUI
     void BlurRect(D2D1_ROUNDED_RECT rect);
 
     void ApplyGaussianBlurToTarget(ID2D1BitmapRenderTarget *target, float blurIntensity);
+
+    void NotifyHeartbeat();
 };

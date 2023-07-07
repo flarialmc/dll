@@ -233,23 +233,6 @@ void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2
     brush->Release();
 }
 
-void FlarialGUI::Notify(std::string text) {
-
-    float startX = Constraints::PercentageConstraint(-0.20, "right", true);
-    float x = Constraints::PercentageConstraint(0.20, "right", true);
-
-    float y = Constraints::PercentageConstraint(0.1, "bottom", true);
-
-    float rectWidth = Constraints::RelativeConstraint(0.25, "height", true);
-    float rectHeight = Constraints::RelativeConstraint(0.10, "height", true);
-
-    Vec2<float> rounding = Constraints::RoundingConstraint(30, 30);
-    D2D1_ROUNDED_RECT rect = D2D1::RoundedRect(D2D1::RectF(x, y, x + rectWidth, x + rectHeight), rounding.x, rounding.x);
-
-    FlarialGUI::BlurRect(rect);
-
-}
-
 void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, float width, float height, float radiusX, float radiusY)
 {
     if (isInScrollView)
@@ -1323,6 +1306,87 @@ void FlarialGUI::ApplyGaussianBlur(float blurIntensity)
 
         Memory::SafeRelease(bitmap);
         Memory::SafeRelease(FlarialGUI::blur);
+    }
+}
+
+void FlarialGUI::Notify(std::string text) {
+
+    Notification e;
+    e.text = text;
+    e.finished = false;
+    e.currentPos = Constraints::PercentageConstraint(0.01, "right", true);
+    notifications.push_back(e);
+
+}
+
+void FlarialGUI::NotifyHeartbeat() {
+
+
+
+    float x = Constraints::PercentageConstraint(0.20, "right", true);
+    float y = Constraints::PercentageConstraint(0.25, "bottom", true);
+
+    float rectWidth = Constraints::RelativeConstraint(0.25, "width", true);
+    float rectHeight = Constraints::RelativeConstraint(0.10, "height", true);
+
+    Vec2<float> rounding = Constraints::RoundingConstraint(30, 30);
+
+    int i = 0;
+
+    for (auto& notif : FlarialGUI::notifications) {
+
+        if(!notif.arrived) {
+
+            D2D1_ROUNDED_RECT rect = D2D1::RoundedRect(
+                    D2D1::RectF(notif.currentPos, y, notif.currentPos + rectWidth, y + rectHeight), rounding.x,
+                    rounding.x);
+
+            D2D1_COLOR_F col = FlarialGUI::HexToColorF("110F10");
+            col.a = 0.75;
+
+            FlarialGUI::BlurRect(rect);
+            FlarialGUI::RoundedRect(notif.currentPos, y,
+                                    col, rectWidth,
+                                    rectHeight, rounding.x, rounding.x);
+
+            FlarialGUI::lerp(notif.currentPos, x - 3, 0.12f * FlarialGUI::frameFactor);
+
+            if(notif.currentPos < x || notif.currentPos == x) {
+                notif.arrived = true;
+                notif.time = std::chrono::steady_clock::now();
+            }
+
+            i++;
+
+        } else {
+
+            std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
+            auto timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(current - notif.time);
+
+            if(timeDifference.count() > 5000) {
+
+                FlarialGUI::lerp(notif.currentPos, Constraints::PercentageConstraint(0.01, "right", true) + 50, 0.12f * FlarialGUI::frameFactor);
+
+            }
+
+            D2D1_ROUNDED_RECT rect = D2D1::RoundedRect(
+                    D2D1::RectF(notif.currentPos, y, notif.currentPos + rectWidth, y + rectHeight), rounding.x,
+                    rounding.x);
+
+            D2D1_COLOR_F col = FlarialGUI::HexToColorF("110F10");
+            col.a = 0.75;
+
+            FlarialGUI::BlurRect(rect);
+            FlarialGUI::RoundedRect(notif.currentPos, y,
+                                    col, rectWidth,
+                                    rectHeight, rounding.x, rounding.x);
+
+            if(notif.currentPos > Constraints::PercentageConstraint(0.01, "right", true)) notif.finished = true;
+
+        }
+
+        y -= Constraints::SpacingConstraint(1.25, rectHeight);
+        if(notif.finished) FlarialGUI::notifications.erase(std::next(FlarialGUI::notifications.begin(), i));
     }
 }
 

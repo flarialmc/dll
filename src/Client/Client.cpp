@@ -22,6 +22,9 @@ void Client::initialize()
 
     HookManager::initialize();
 
+    FlarialGUI::Notify("Injected");
+    FlarialGUI::Notify("Injected");
+
     std::filesystem::path folder_path(Utils::getRoamingPath() + "\\Flarial");
     if (!exists(folder_path))
     {
