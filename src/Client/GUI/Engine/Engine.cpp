@@ -451,7 +451,7 @@ float FlarialGUI::HueToRGB(float p, float q, float t)
 }
 
 
-void FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, float x, float y) {
+std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, float x, float y) {
 
     D2D1_COLOR_F col;
 

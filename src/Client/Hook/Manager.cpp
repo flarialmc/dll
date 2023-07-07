@@ -5,6 +5,7 @@
 #include "Hooks/Render/SetupAndRenderHook.hpp"
 #include "Hooks/Game/ActorNormalTick.hpp"
 #include "Hooks/Visual/getGammaHook.hpp"
+#include "Hooks/Game/GameModeAttack.hpp"
 
 std::vector<Hook *> HookManager::hooks;
 
@@ -19,6 +20,7 @@ void HookManager::initialize()
     hooks.push_back(new MouseHook());
     hooks.push_back(new CommandListHook());
     hooks.push_back(new SetUpAndRenderHook());
+    hooks.push_back(new GameModeAttackHook());
     hooks.push_back(new SwapchainHook());
     hooks.push_back(new ResizeHook());
     hooks.push_back(new getFovHook());

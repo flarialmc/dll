@@ -198,5 +198,5 @@ namespace FlarialGUI
 
     void NotifyHeartbeat();
 
-    void TextBoxVisual(int index, std::string& text, int limit, float x, float y);
+    std::string TextBoxVisual(int index, std::string& text, int limit, float x, float y);
 };
