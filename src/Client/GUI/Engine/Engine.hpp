@@ -178,7 +178,7 @@ namespace FlarialGUI
     void
     FlarialTextWithFont(float x, float y, const wchar_t *text, D2D1_COLOR_F color, const float width,
                         const float height,
-                        const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize);
+                        const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize, const DWRITE_FONT_WEIGHT weight = DWRITE_FONT_WEIGHT_REGULAR);
 
     void ResetShit();
 

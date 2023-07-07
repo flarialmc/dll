@@ -14,16 +14,6 @@ bool Client::disable = false;
 
 void Client::initialize()
 {
-    Logger::initialize();
-
-    ModuleManager::initialize();
-
-    Sleep(1000);
-
-    HookManager::initialize();
-
-    FlarialGUI::Notify("Injected");
-    FlarialGUI::Notify("Injected");
 
     std::filesystem::path folder_path(Utils::getRoamingPath() + "\\Flarial");
     if (!exists(folder_path))
@@ -66,6 +56,7 @@ void Client::initialize()
         { "https://cdn.flarial.net/assets/time.png", Path + "time.png" },
         { "https://cdn.flarial.net/assets/fullbright.png", Path + "fullbright.png" },
         { "https://cdn.flarial.net/assets/frying-pan.png", Path + "frying-pan.png" },
+        { "https://cdn.flarial.net/assets/font_bold.ttf", Path + "font_bold.ttf" },
     };
 
     // Create threads to download the files
@@ -76,12 +67,26 @@ void Client::initialize()
 
     // Wait for all threads to finish
     for (std::thread& thread : threads) {
-        thread.detach();
+        thread.join();
     }
 
     if (GetModuleHandle("d3d12.dll") == NULL) Logger::debug("module handle is null");
 
     std::string fontpath = Utils::getRoamingPath() + "\\Flarial\\assets\\font.ttf";
     AddFontResource(fontpath.c_str());
+
+    fontpath = Utils::getRoamingPath() + "\\Flarial\\assets\\font_bold.ttf";
+    AddFontResource(fontpath.c_str());
+
+    Logger::initialize();
+
+    ModuleManager::initialize();
+
+    Sleep(1000);
+
+    HookManager::initialize();
+
+    FlarialGUI::Notify("Injected");
+    FlarialGUI::Notify("Injected");
 
 }
