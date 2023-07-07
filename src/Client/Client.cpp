@@ -87,6 +87,5 @@ void Client::initialize()
     HookManager::initialize();
 
     FlarialGUI::Notify("Injected");
-    FlarialGUI::Notify("Injected");
 
 }
