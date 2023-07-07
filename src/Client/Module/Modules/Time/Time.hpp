@@ -134,17 +134,20 @@ public:
 
         if (FlarialGUI::Toggle(2, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("24")->value)) this->settings.getSettingByName<bool>("24")->value = !this->settings.getSettingByName<bool>("24")->value;
 
-        toggleY += Constraints::SpacingConstraint(0.30, textWidth);
+        toggleY += Constraints::SpacingConstraint(0.45, textWidth);
 
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, FlarialGUI::to_wide("Translucency").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
 
-        if (FlarialGUI::Toggle(3, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("BlurEffect")->value)) this->settings.getSettingByName<bool>("BlurEffect")->value = !this->settings.getSettingByName<bool>("BlurEffect")->value;
+        if (FlarialGUI::Toggle(4, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("BlurEffect")->value)) this->settings.getSettingByName<bool>("BlurEffect")->value = !this->settings.getSettingByName<bool>("BlurEffect")->value;
+        if (this->settings.getSettingByName<bool>("BlurEffect")->value) {
+            percent = FlarialGUI::Slider(7, toggleX + Constraints::SpacingConstraint(1.3, textWidth),
+                toggleY,
+                D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+                D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("BlurIntensity")->value, 25);
 
-        percent = FlarialGUI::Slider(7, toggleX + Constraints::SpacingConstraint(1.2, textWidth),
-            toggleY,
-            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
-            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
-            D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("BlurIntensity")->value, 25);
+            this->settings.getSettingByName<float>("BlurIntensity")->value = percent;
+        }
 
         /* Rounding End */
 

@@ -34,6 +34,11 @@ public:
 
         Module::onEnable();
 
+        if (settings.getSettingByName<bool>("BlurEffect") == nullptr) {
+            settings.addSetting("BlurEffect", false);
+            settings.addSetting("BlurIntensity", 7.5f);
+        }
+
         if (settings.getSettingByName<bool>("cps") == nullptr) {
             settings.addSetting("cps", false);
         }

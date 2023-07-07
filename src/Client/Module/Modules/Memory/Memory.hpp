@@ -20,6 +20,11 @@ public:
 
         Module::onEnable();
 
+        if (settings.getSettingByName<bool>("BlurEffect") == nullptr) {
+            settings.addSetting("BlurEffect", false);
+            settings.addSetting("BlurIntensity", 7.5f);
+        }
+
         if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"Mem: {value}");
 
         if (settings.getSettingByName<float>("percentageX") == nullptr) {
