@@ -22,6 +22,11 @@ public:
 
         if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value}");
 
+        if (settings.getSettingByName<bool>("BlurEffect") == nullptr) {
+            settings.addSetting("BlurEffect", false);
+            settings.addSetting("BlurIntensity", 7.5f);
+        }
+
         if (settings.getSettingByName<bool>("24") == nullptr) {
             settings.addSetting("24", false);
         }
@@ -128,6 +133,18 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, FlarialGUI::to_wide("24 Hour").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
 
         if (FlarialGUI::Toggle(2, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("24")->value)) this->settings.getSettingByName<bool>("24")->value = !this->settings.getSettingByName<bool>("24")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.30, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, FlarialGUI::to_wide("Translucency").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+
+        if (FlarialGUI::Toggle(3, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("BlurEffect")->value)) this->settings.getSettingByName<bool>("BlurEffect")->value = !this->settings.getSettingByName<bool>("BlurEffect")->value;
+
+        percent = FlarialGUI::Slider(7, toggleX + Constraints::SpacingConstraint(1.2, textWidth),
+            toggleY,
+            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+            D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("BlurIntensity")->value, 25);
 
         /* Rounding End */
 

@@ -1350,7 +1350,7 @@ void FlarialGUI::NotifyHeartbeat() {
             D2D1_COLOR_F col = FlarialGUI::HexToColorF("110F10");
             col.a = 0.75;
 
-            FlarialGUI::BlurRect(rect);
+            FlarialGUI::BlurRect(rect, 7.0f);
             FlarialGUI::RoundedRect(notif.currentPos, y,
                                     col, rectWidth,
                                     rectHeight, rounding.x, rounding.x);
@@ -1411,7 +1411,7 @@ void FlarialGUI::NotifyHeartbeat() {
             D2D1_COLOR_F col = FlarialGUI::HexToColorF("110F10");
             col.a = 0.75;
 
-            FlarialGUI::BlurRect(rect);
+            FlarialGUI::BlurRect(rect, 7.0f);
             FlarialGUI::RoundedRect(notif.currentPos, y,
                                     col, rectWidth,
                                     rectHeight, rounding.x, rounding.x);
@@ -1455,7 +1455,7 @@ void FlarialGUI::NotifyHeartbeat() {
     }
 }
 
-void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect) {
+void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect, float intensity) {
 
     if(SwapchainHook::init) {
 
@@ -1471,7 +1471,7 @@ void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect) {
 
         // Set blur intensity
         effect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
-        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 6.0);
+        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, intensity);
 
         ID2D1Image* image;
         effect->GetOutput(&image);

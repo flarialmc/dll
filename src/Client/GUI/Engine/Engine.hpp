@@ -189,7 +189,7 @@ namespace FlarialGUI
 
     void Notify(std::string text);
 
-    void BlurRect(D2D1_ROUNDED_RECT rect);
+    void BlurRect(D2D1_ROUNDED_RECT rect, float intensity);
 
     void ApplyGaussianBlurToTarget(ID2D1BitmapRenderTarget *target, float blurIntensity);
 
