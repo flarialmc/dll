@@ -13,20 +13,15 @@ class GUIKeyListener : public Listener {
 
     void onKey(KeyEvent &event) override {
 
-        std::chrono::steady_clock::time_point currentOnKeyTime = std::chrono::steady_clock::now();
-        auto timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(currentOnKeyTime - lastOnKeyTime);
-
-        if(timeDifference.count() > 5000)
-            lastOnKeyTime = currentOnKeyTime;
-
         if(!Client::disable) {
 
             if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")) {
 
                 if (event.GetKey() == 20) isCapital = !isCapital;
 
-                for(auto& shi : FlarialGUI::KeybindSelectors)
-                    if(shi.isActive && timeDifference.count() > 1000) shi.isActive = false;
+                for(auto& shi : FlarialGUI::KeybindSelectors) {
+                    shi.currentOnKeyTime = std::chrono::steady_clock::now();
+                }
 
                 if(event.GetPressedKeysAsString() != "no")
                 FlarialGUI::currentKeybind = event.GetPressedKeysAsString();
@@ -54,8 +49,6 @@ class GUIKeyListener : public Listener {
 
             }
         }
-
-        lastOnKeyTime = currentOnKeyTime;
 
     };
 

@@ -48,6 +48,7 @@ struct KeybindSelectorer
     std::string oldShi;
     std::string newShi;
     bool isActive = false;
+    std::chrono::steady_clock::time_point currentOnKeyTime = std::chrono::steady_clock::now();
 };
 
 class Dimension

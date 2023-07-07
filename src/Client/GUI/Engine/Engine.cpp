@@ -341,6 +341,7 @@ bool FlarialGUI::Toggle(int index, float x, float y, const D2D1_COLOR_F enabledC
 
     FlarialGUI::RoundedRect(x + xSpacing + enabledSpacing, y + ySpacing, circleColor, circleWidth, circleHeight, round.x, round.x);
 
+    if(isInScrollView) y += FlarialGUI::scrollpos;
     if (CursorInRect(x, y, rectWidth, rectHeight) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
         MC::mousebutton = MouseButton::None;
@@ -706,10 +707,24 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
 
     float s = Constraints::RelativeConstraint(0.0285, "height", true);
 
-    FlarialGUI::RoundedRect(x , y + s * 0.15f, D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), s * 4.125f, s, round.x, round.x);
+    const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+    const float percWidth = Constraints::RelativeConstraint(0.069, "height", true);
+    const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
 
-    round = Constraints::RoundingConstraint(11.5, 11.5);
-    FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f), s * 3.f, s * 0.82f, round.x, round.x);
+
+    D2D1_COLOR_F col;
+
+    if(KeybindSelectors[index].isActive) {
+        col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
+
+        std::chrono::steady_clock::time_point currentOnKeyTime = std::chrono::steady_clock::now();
+        auto timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(currentOnKeyTime - KeybindSelectors[index].currentOnKeyTime);
+
+        if(timeDifference.count() > 2000) KeybindSelectors[index].isActive = false;
+    }
+    else col = D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f);
+
+    FlarialGUI::RoundedRect(x, y, col, percWidth, percHeight, round.x, round.x);
 
     std::string text;
     if(KeybindSelectors[index].isActive) {
@@ -720,20 +735,26 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
             keybind = FlarialGUI::currentKeybind;
             KeybindSelectors[index].newShi = keybind;
 
+        } else {
+            FlarialGUI::currentKeybind = "";
+            keybind = "";
         }
     }
 
     text = keybind;
 
-    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.006f, FlarialGUI::to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), s * 4.3f, s * 1.1f, DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f);
+    FlarialGUI::FlarialText(x - Constraints::SpacingConstraint(0.42, textWidth / 2.0f), y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
 
-    if (CursorInRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, s * 0.85f, s * 0.85f) && MC::mousebutton == MouseButton::Left && !MC::held)
+    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.15, textWidth / 2.0f), y, to_wide("Keybind (2 seconds)").c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_CENTER, 120);
+
+    if (CursorInRect(x, y, percWidth, percHeight) && MC::mousebutton == MouseButton::Left && !MC::held && !KeybindSelectors[index].isActive)
     {
         MC::mousebutton = MouseButton::None;
         KeybindSelectors[index].isActive = !KeybindSelectors[index].isActive;
+        KeybindSelectors[index].currentOnKeyTime = std::chrono::steady_clock::now();
     }
 
-    if (!CursorInRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, s * 0.85f, s * 0.85f) && MC::mousebutton == MouseButton::Left && !MC::held)
+    if (!CursorInRect(x, y, percWidth, percHeight) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
         MC::mousebutton = MouseButton::None;
         KeybindSelectors[index].isActive = false;

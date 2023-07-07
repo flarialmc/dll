@@ -94,7 +94,7 @@ public:
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
         FlarialGUI::ScrollBar(toggleX, toggleY, 140, 40, 2);
-        FlarialGUI::SetScrollView(toggleX, toggleY, Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(1.0, "height"));
+        FlarialGUI::SetScrollView(toggleX, toggleY, Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(0.90, "height"));
 
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"UI Scale", D2D1::ColorF(D2D1::ColorF::White), textWidth,
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
