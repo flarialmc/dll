@@ -34,12 +34,6 @@ private:
 
     }
 
-    void onKey(KeyEvent &event) override {
-
-        if(SDK::CurrentScreen == "hud_screen")
-        if(event.GetKey() == this->module->keybind) { module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value; }
-    };
-
     void onRender(RenderEvent &event) override {
 
         if(SDK::CurrentScreen == "hud_screen")
