@@ -14,6 +14,10 @@ public:
 
     };
 
+    void NormalRender(int index, std::string text, std::string value) override {
+
+    }
+
     void onEnable() override {
         Module::onEnable();
     }

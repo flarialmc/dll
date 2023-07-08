@@ -284,7 +284,7 @@ class ClickGUIRenderer : public Listener {
 
     void onKey(KeyEvent &event) override {
 
-        if(event.GetKey() == module->keybind && static_cast<ActionType>(event.GetAction()) == ActionType::PRESSED) {
+        if(module->IsKeybind(event.keys) && module->IsKeyPartOfKeybind(event.key)) {
 
             module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value;
 
@@ -300,6 +300,8 @@ class ClickGUIRenderer : public Listener {
 
             ClickGUIRenderer::page.type = "normal";
             ClickGUIRenderer::curr = "modules";
+
+            if(!module->settings.getSettingByName<bool>("enabled")->value) FlarialGUI::ResetShit();
         }
 
 
@@ -307,6 +309,8 @@ class ClickGUIRenderer : public Listener {
 
             if(SDK::CurrentScreen == "hud_screen")
             SDK::clientInstance->grabMouse();
+
+            FlarialGUI::ResetShit();
 
             module->settings.getSettingByName<bool>("enabled")->value = false;
             ClickGUIRenderer::page.type = "normal";

@@ -36,4 +36,24 @@ public:
         EventHandler::unregisterListener("GUIMouse");
 
     }
+
+    void SettingsRender() override {
+
+        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
+
+        FlarialGUI::ScrollBar(x, y, 140, 40, 2);
+        FlarialGUI::SetScrollView(x, y, Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(0.90, "height"));
+
+        FlarialGUI::KeybindSelector(0, x, y, settings.getSettingByName<std::string>("keybind")->value);
+
+        y += Constraints::SpacingConstraint(0.35, textWidth);
+
+        // next element
+
+        FlarialGUI::UnsetScrollView();
+
+    }
 };

@@ -9,6 +9,10 @@ class Deepfry : public Module {
 
 public:
 
+    void NormalRender(int index, std::string text, std::string value) override {
+
+    }
+
     Deepfry() : Module("Deepfry", "chike wi!", "\\Flarial\\assets\\frying-pan.png", 'b') {
 
         onEnable();

@@ -26,6 +26,10 @@ public:
         if(settings.getSettingByName<std::string>("keybind")->value == (std::string)"") settings.getSettingByName<std::string>("keybind")->value = "C";
     }
 
+    void NormalRender(int index, std::string text, std::string value) override {
+
+    }
+
     
     void onDisable() override {
         Module::onDisable();

@@ -64,6 +64,8 @@ public:
             settings.addSetting("uiscale", 0.65f);
         }
 
+        if(settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.75);
+
         EventHandler::registerListener(new SprintListener("Sprint", this));
     }
 
@@ -159,6 +161,17 @@ public:
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::TextBoxVisual(7, settings.getSettingByName<std::string>("text")->value, 16, Constraints::PercentageConstraint(0.019, "left"), toggleY);
+
+        FlarialGUI::FlarialText(toggleX , toggleY + Constraints::SpacingConstraint(0.35, textWidth), L"Text Scale", D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.05f, textHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
+
+
+        percent = FlarialGUI::Slider(8, toggleX + Constraints::SpacingConstraint(0.95, textWidth),
+                                     toggleY + Constraints::SpacingConstraint(0.35, textWidth),
+                                     D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                     D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+                                     D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("textscale")->value, 1.15);
+
+        this->settings.getSettingByName<float>("textscale")->value = percent;
 
         /* Color Pickers Start*/
 
