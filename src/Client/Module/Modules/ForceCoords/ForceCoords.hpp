@@ -10,7 +10,7 @@ class ForceCoords : public Module {
 public:
 
 
-    ForceCoords() : Module("Coordinates", "oAnshul==bari", "\\Flarial\\assets\\memory.png", 'o') {
+    ForceCoords() : Module("Coordinates", "oAnshul==bari", "\\Flarial\\assets\\coordinates.png", 'o') {
 
         onEnable();
 

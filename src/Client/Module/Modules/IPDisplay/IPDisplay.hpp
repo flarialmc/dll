@@ -10,7 +10,7 @@ class IPDisplay : public Module{
 public:
 
 
-    IPDisplay() : Module("IP Display", "oAnshul==bari", "\\Flarial\\assets\\memory.png", NULL) {
+    IPDisplay() : Module("IP Display", "oAnshul==bari", "\\Flarial\\assets\\server-ip.png", NULL) {
 
         onEnable();
 

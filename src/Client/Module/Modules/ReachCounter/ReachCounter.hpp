@@ -8,7 +8,7 @@ class ReachCounter : public Module {
 
 public:
 
-    ReachCounter() : Module("Reach", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\fps.png", 'Y') {
+    ReachCounter() : Module("Reach", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\reach.png", 'Y') {
 
         onEnable();
 

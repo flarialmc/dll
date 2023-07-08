@@ -8,7 +8,7 @@ class ComboCounter : public Module {
 
 public:
 
-    ComboCounter() : Module("Combo", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\fps.png", 'Y') {
+    ComboCounter() : Module("Combo", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\combo.png", 'Y') {
 
         onEnable();
 

@@ -21,7 +21,7 @@ public:
 
     std::vector<D2D1_COLOR_F> states;
 
-    Keystrokes() : Module("Keystrokes", "yes br", "\\Flarial\\assets\\auto_sprint.png", 'M') {
+    Keystrokes() : Module("Keystrokes", "yes br", "\\Flarial\\assets\\keyboard.png", 'M') {
 
 
         onEnable();

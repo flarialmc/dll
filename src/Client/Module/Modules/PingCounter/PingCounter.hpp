@@ -8,7 +8,7 @@ class PingCounter : public Module {
 
 public:
 
-    PingCounter() : Module("Ping Counter", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\fps.png", 'Y') {
+    PingCounter() : Module("Ping Counter", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\ping.png", 'Y') {
 
         onEnable();
 
@@ -17,7 +17,7 @@ public:
     void onEnable() override {
 
         Module::onEnable();
-        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"Ping: {value}");
+        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value} Ping");
 
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
         EventHandler::registerListener(new PingListener("Ping", this));
