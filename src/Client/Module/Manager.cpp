@@ -18,6 +18,8 @@
 #include "Modules/Keystrokes/Keystrokes.hpp"
 #include "Modules/ReachCounter/ReachCounter.hpp"
 #include "Modules/ComboCounter/ComboCounter.hpp"
+#include "Modules/IPDisplay/IPDisplay.hpp"
+
 
 namespace ModuleManager {
     std::vector<Module*> modules;
@@ -31,6 +33,7 @@ void ModuleManager::initialize()
     modules.push_back(new ClickGUI());
     modules.push_back(new FPSCounter());
     modules.push_back(new CPSCounter());
+    modules.push_back(new IPDisplay());
     modules.push_back(new ReachCounter());
     modules.push_back(new ComboCounter());
 
