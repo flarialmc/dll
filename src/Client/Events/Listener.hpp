@@ -3,6 +3,7 @@
 #include "Input/MouseEvent.hpp"
 #include "Render/RenderEvent.hpp"
 #include "Game/TickEvent.hpp"
+#include "Game/AttackEvent.hpp"
 
 class Listener {
 public:
@@ -13,4 +14,5 @@ public:
     virtual void onRender(RenderEvent &event) {};
     virtual void onLocalTick(TickEvent &event) {};
     virtual void onTick(TickEvent &event) {};
+    virtual void onAttack(AttackEvent& event) {};
 };

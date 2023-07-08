@@ -16,6 +16,7 @@
 #include "Modules/Deepfry/Deepfry.hpp"
 #include "Modules/ForceCoords/ForceCoords.hpp"
 #include "Modules/Keystrokes/Keystrokes.hpp"
+#include "Modules/ReachCounter/ReachCounter.hpp"
 
 
 namespace ModuleManager {
@@ -30,6 +31,7 @@ void ModuleManager::initialize()
     modules.push_back(new ClickGUI());
     modules.push_back(new FPSCounter());
     modules.push_back(new CPSCounter());
+    modules.push_back(new ReachCounter());
 
     modules.push_back(new Time());
     modules.push_back(new MEM());

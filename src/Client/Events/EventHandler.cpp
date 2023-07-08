@@ -47,6 +47,17 @@ void EventHandler::onKey(KeyEvent &event) {
     }
 }
 
+void EventHandler::onAttack(AttackEvent& event) {
+
+    for (Listener*& listener : listeners) {
+        
+        listener->onAttack(event);
+
+    }
+
+
+}
+
 void EventHandler::onMouse(MouseEvent &event) {
 
     for (Listener* &listener: listeners) {
