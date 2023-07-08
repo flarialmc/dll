@@ -5,6 +5,7 @@
 #include "../../../Utils/Memory/Memory.hpp"
 #include "../../../Utils/Logger/Logger.hpp"
 #include "Components/MoveInputComponent.hpp"
+#include "Components/MobHurtTimeComponent.hpp"
 #include "../../../Utils/Utils.hpp"
 
 enum ActorFlags
@@ -247,9 +248,9 @@ public:
 public:
 
 
-//create a cached signatures namespace or something :)
- 
 
+ 
+    BUILD_ACCESS(this, MobHurtTimeComponent*, mobHurtTimeComponent, 0x660);
 
     MoveInputComponent* getMoveInputHandler() {
 

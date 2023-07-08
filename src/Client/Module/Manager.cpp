@@ -17,7 +17,7 @@
 #include "Modules/ForceCoords/ForceCoords.hpp"
 #include "Modules/Keystrokes/Keystrokes.hpp"
 #include "Modules/ReachCounter/ReachCounter.hpp"
-
+#include "Modules/ComboCounter/ComboCounter.hpp"
 
 namespace ModuleManager {
     std::vector<Module*> modules;
@@ -32,6 +32,8 @@ void ModuleManager::initialize()
     modules.push_back(new FPSCounter());
     modules.push_back(new CPSCounter());
     modules.push_back(new ReachCounter());
+    modules.push_back(new ComboCounter());
+
 
     modules.push_back(new Time());
     modules.push_back(new MEM());
