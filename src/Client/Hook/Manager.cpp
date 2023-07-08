@@ -7,6 +7,9 @@
 #include "Hooks/Visual/getGammaHook.hpp"
 #include "Hooks/Game/GameModeAttack.hpp"
 
+
+
+
 std::vector<Hook *> HookManager::hooks;
 
 void HookManager::initialize()
@@ -25,6 +28,7 @@ void HookManager::initialize()
     hooks.push_back(new ResizeHook());
     hooks.push_back(new getFovHook());
     hooks.push_back(new ActorNormalTick());
+    hooks.push_back(new OnSuspendHook());
     hooks.push_back(new getGammaHook());
 
     for (auto hook : hooks)

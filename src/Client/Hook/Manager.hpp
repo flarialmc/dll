@@ -6,7 +6,7 @@
 #include "Hooks/Input/MouseHook.hpp"
 #include "Hooks/Render/SwapchainHook.hpp"
 #include "Hooks/Visual/getFovHook.hpp"
-
+#include "Hooks/Game/OnSuspend.hpp"
 #include "MinHook.h"
 
 class HookManager
