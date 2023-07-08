@@ -21,15 +21,19 @@ public:
 
         Module::onEnable();
 
-        if (settings.getSettingByName<float>("modifier") == nullptr) settings.addSetting("modifier", 10.0f);
-        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"real");
-        if(settings.getSettingByName<std::string>("keybind")->value == (std::string)"") settings.getSettingByName<std::string>("keybind")->value = "C";
     }
 
     void NormalRender(int index, std::string text, std::string value) override {
 
     }
 
+    virtual void DefaultConfig() override {
+
+        if (settings.getSettingByName<float>("modifier") == nullptr) settings.addSetting("modifier", 10.0f);
+        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"real");
+        if(settings.getSettingByName<std::string>("keybind")->value == (std::string)"") settings.getSettingByName<std::string>("keybind")->value = "C";
+
+    }
     
     void onDisable() override {
         Module::onDisable();

@@ -23,6 +23,7 @@ public:
 
     Keystrokes() : Module("Keystrokes", "yes br", "\\Flarial\\assets\\auto_sprint.png", 'M') {
 
+
         onEnable();
         D2D1_COLOR_F d = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
         d.a = settings.getSettingByName<float>("bgOpacity")->value;
@@ -32,7 +33,10 @@ public:
 
     void onEnable() override {
 
-        Module::onEnable();
+        if (settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 11.0f);
+
+        if(settings.getSettingByName<bool>("enabled") == nullptr)
+            settings.addSetting("enabled", false);
 
         if (settings.getSettingByName<bool>("BlurEffect") == nullptr) {
             settings.addSetting("BlurEffect", false);
@@ -53,25 +57,21 @@ public:
             settings.addSetting("borderWidth", 1.0f);
         }
 
-        if (settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 11.0f);
-
         if (settings.getSettingByName<std::string>("bgColor") == nullptr) {
-            settings.addSetting("bgColor", (std::string) "120e0f");
-            settings.addSetting("textColor", (std::string) "3f2a2d");
             settings.addSetting("enabledColor", (std::string) "fafafa");
 
         }
 
         if (settings.getSettingByName<float>("bgOpacity") == nullptr) {
-            settings.addSetting("bgOpacity", 1.0f);
-            settings.addSetting("textOpacity", 1.0f);
-            settings.addSetting("enabledOpacity", 1.0f);
+            settings.addSetting("enabledOpacity", 0.55f);
         }
 
         if (settings.getSettingByName<float>("uiscale") == nullptr) {
 
             settings.addSetting("uiscale", 1.0f);
         }
+
+        Module::onEnable();
 
         EventHandler::registerListener(new KeystrokesListener("Keystrok", this));
     }
@@ -189,6 +189,7 @@ public:
     }
 
     void NormalRender(int index, std::string text, std::string value) override {
+
 
         if (SDK::hasInstanced) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
