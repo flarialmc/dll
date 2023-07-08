@@ -16,13 +16,6 @@ class ReachListener : public Listener {
     float Reach = 0.0f;
     Module* module;
 
-    void onKey(KeyEvent& event) override {
-
-        if (SDK::CurrentScreen == "hud_screen")
-            if (event.GetKey() == this->module->keybind) { module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value; }
-    };
-
-
     void onAttack(AttackEvent& event) override {
         Vec3<float> *LPPos = SDK::clientInstance->getLocalPlayer()->getPosition();
         Vec3<float> *TargetPos = event.getActor()->getPosition();

@@ -16,14 +16,6 @@ class ComboListener : public Listener {
     int Combo = 0;
     Module* module;
 
-
-    void onKey(KeyEvent& event) override {
-
-        if (SDK::CurrentScreen == "hud_screen")
-            if (event.GetKey() == this->module->keybind) { module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value; }
-    };
-
-
     void onAttack(AttackEvent& event) override {
         Combo++;
     }
