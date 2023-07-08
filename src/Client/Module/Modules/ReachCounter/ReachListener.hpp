@@ -40,7 +40,7 @@ class ReachListener : public Listener {
                 oss << std::fixed << std::setprecision(2) << Reach;
                 std::string reachString = oss.str();
 
-                this->module->NormalRender(6, module->settings.getSettingByName<std::string>("text")->value, reachString);
+                this->module->NormalRender(9, module->settings.getSettingByName<std::string>("text")->value, reachString);
 
             }
 
