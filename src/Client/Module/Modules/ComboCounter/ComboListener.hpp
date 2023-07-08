@@ -39,7 +39,7 @@ class ComboListener : public Listener {
         if (SDK::CurrentScreen == "hud_screen")
             if (module->settings.getSettingByName<bool>("enabled")->value) {
 
-                this->module->NormalRender(0, module->settings.getSettingByName<std::string>("text")->value, std::to_string(Combo));
+                this->module->NormalRender(8, module->settings.getSettingByName<std::string>("text")->value, std::to_string(Combo));
 
             }
 
