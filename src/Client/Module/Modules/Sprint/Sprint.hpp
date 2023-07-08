@@ -20,12 +20,11 @@ public:
 
         Module::onEnable();
 
-        if (settings.getSettingByName<bool>("BlurEffect") == nullptr) {
-            settings.addSetting("BlurEffect", false);
-            settings.addSetting("BlurIntensity", 7.5f);
-        }
-
         if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value}");
+
+
+
+        if(settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
 
         if (settings.getSettingByName<bool>("toggled") == nullptr) {
             settings.addSetting("toggled", false);
@@ -34,37 +33,6 @@ public:
         if (settings.getSettingByName<bool>("always") == nullptr) {
             settings.addSetting("always", false);
         }
-
-        if (settings.getSettingByName<float>("percentageX") == nullptr) {
-            settings.addSetting("percentageX", 0.0f);
-            settings.addSetting("percentageY", 0.0f);
-        }
-
-        if (settings.getSettingByName<bool>("border") == nullptr) {
-            settings.addSetting("border", true);
-            settings.addSetting("borderWidth", 1.0f);
-        }
-
-        if (settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 40.0f);
-
-        if (settings.getSettingByName<std::string>("bgColor") == nullptr) {
-            settings.addSetting("bgColor", (std::string)"120e0f");
-            settings.addSetting("textColor", (std::string)"3f2a2d");
-            settings.addSetting("borderColor", (std::string)"000000");
-        }
-
-        if (settings.getSettingByName<float>("bgOpacity") == nullptr) {
-            settings.addSetting("bgOpacity", 1.0f);
-            settings.addSetting("textOpacity", 1.0f);
-            settings.addSetting("borderOpacity", 1.0f);
-        }
-
-        if (settings.getSettingByName<float>("uiscale") == nullptr) {
-
-            settings.addSetting("uiscale", 0.65f);
-        }
-
-        if(settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.75f);
 
         EventHandler::registerListener(new SprintListener("Sprint", this));
     }
