@@ -56,7 +56,7 @@ public:
             settings.addSetting("uiscale", 0.65f);
         }
 
-        if(settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.65);
+        if(settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.65f);
 
         EventHandler::registerListener(new MemoryListener("Memory", this));
     }

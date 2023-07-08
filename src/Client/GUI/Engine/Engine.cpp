@@ -216,16 +216,16 @@ void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2
     D2D::context->CreateSolidColorBrush(color, &brush);
     D2D1_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
 
-    // Calculate the adjusted dimensions for the border rounded rectangle
+    // Make the border extend from the outside only
     D2D1_RECT_F borderRect = D2D1::RectF(
-            rect.left - borderWidth / 2.00f,
-            rect.top - borderWidth / 2.00f,
-            rect.right + borderWidth / 2.00f,
-            rect.bottom + borderWidth / 2.00f
+            rect.left - borderWidth / 1.80f,
+            rect.top - borderWidth / 1.80f,
+            rect.right + borderWidth / 1.80f,
+            rect.bottom + borderWidth / 1.80f
     );
 
-    radiusX += borderWidth;
-    radiusY += borderWidth;
+    radiusX += borderWidth / 1.80f;
+    radiusY += borderWidth / 1.80f;
 
 
 

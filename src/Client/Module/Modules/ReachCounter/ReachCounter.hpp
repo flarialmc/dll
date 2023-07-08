@@ -55,7 +55,7 @@ public:
         //new FPSListener("FPS", this)
         EventHandler::registerListener(new ReachListener("Reach",this));
 
-        if(settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.60);
+        if(settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.60f);
     }
 
     void onDisable() override {

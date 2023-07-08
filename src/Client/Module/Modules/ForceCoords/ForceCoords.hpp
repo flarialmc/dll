@@ -56,7 +56,7 @@ public:
             settings.addSetting("uiscale", 0.65f);
         }
 
-        if(settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.0);
+        if(settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.0f);
 
         EventHandler::registerListener(new ForceCoordsListener("ForceCoords", this));
     }

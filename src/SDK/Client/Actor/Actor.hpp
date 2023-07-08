@@ -271,4 +271,9 @@ public:
         return Memory::CallVFunc<22, Vec3<float>*>(this);
     }
 
+    bool wasHurt() {
+        return Memory::CallVFunc<229,bool>(this);
+    }
+
+
 };
