@@ -240,7 +240,9 @@ public:
         textColor.a = settings.getSettingByName<float>("textOpacity")->value;
         borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
 
-                    FlarialGUI::RoundedRect(realcenter.x, realcenter.y,
+        if(settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + rectWidth, realcenter.y + textHeight), rounde.x, rounde.x), settings.getSettingByName<float>("BlurIntensity")->value);
+
+        FlarialGUI::RoundedRect(realcenter.x, realcenter.y,
             bgColor, rectWidth, textHeight,
             rounde.x, rounde.x);
 

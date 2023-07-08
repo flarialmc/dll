@@ -22,10 +22,8 @@ class  IPDisplayListener : public Listener {
             if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
 
                 if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-
                     
                     auto IP = SDK::raknetConnector->JoinedIp;
-                    
 
                     this->module->NormalRender(10, module->settings.getSettingByName<std::string>("text")->value, IP);
 
