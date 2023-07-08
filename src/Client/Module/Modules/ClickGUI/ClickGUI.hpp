@@ -24,6 +24,8 @@ public:
 
         if(settings.getSettingByName<std::string>("keybind")->value.empty()) settings.getSettingByName<std::string>("keybind")->value = "K";
 
+        settings.getSettingByName<bool>("enabled")->value = false;
+
     }
 
     void onDisable() override {
