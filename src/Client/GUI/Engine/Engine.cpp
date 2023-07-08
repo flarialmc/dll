@@ -1120,36 +1120,46 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 {
     isInWindowRect = true;
 
-    if (WindowRects[currentNum].hasBeenMoved)
-    {
-        x = Constraints::PercentageConstraint(WindowRects[currentNum].percentageX, "left", true);
-        y = Constraints::PercentageConstraint(WindowRects[currentNum].percentageY, "top", true);
+    int i = 0;
+    bool ye = false;
+    for(auto& rect : WindowRects) {
+
+        if(rect.isMovingElement && i != currentNum) {
+            ye = true;
+            break;
+        }
+
+        i++;
     }
 
-    if (CursorInRect(x, y, width, height) && MC::held)
-    {
-        WindowRects[currentNum].isMovingElement = true;
-        WindowRects[currentNum].hasBeenMoved = true;
-        WindowRects[currentNum].movedX = MC::mousepos.x - width / 2.0f;
-        WindowRects[currentNum].movedY = MC::mousepos.y - height / 2.0f;
-        WindowRects[currentNum].percentageX = WindowRects[currentNum].movedX / MC::windowSize.x;
-        WindowRects[currentNum].percentageY = WindowRects[currentNum].movedY / MC::windowSize.y;
-    }
-    else if (MC::held && WindowRects[currentNum].isMovingElement)
-    {
-        WindowRects[currentNum].isMovingElement = true;
-        WindowRects[currentNum].hasBeenMoved = true;
-        WindowRects[currentNum].movedX = MC::mousepos.x - width / 2.0f;
-        WindowRects[currentNum].movedY = MC::mousepos.y - height / 2.0f;
+    if(!ye) {
 
-        WindowRects[currentNum].percentageX = WindowRects[currentNum].movedX / MC::windowSize.x;
-        WindowRects[currentNum].percentageY = WindowRects[currentNum].movedY / MC::windowSize.y;
+        if (WindowRects[currentNum].hasBeenMoved) {
+            x = Constraints::PercentageConstraint(WindowRects[currentNum].percentageX, "left", true);
+            y = Constraints::PercentageConstraint(WindowRects[currentNum].percentageY, "top", true);
+        }
 
-    }
+        if (CursorInRect(x, y, width, height) && MC::held) {
+            WindowRects[currentNum].isMovingElement = true;
+            WindowRects[currentNum].hasBeenMoved = true;
+            WindowRects[currentNum].movedX = MC::mousepos.x - width / 2.0f;
+            WindowRects[currentNum].movedY = MC::mousepos.y - height / 2.0f;
+            WindowRects[currentNum].percentageX = WindowRects[currentNum].movedX / MC::windowSize.x;
+            WindowRects[currentNum].percentageY = WindowRects[currentNum].movedY / MC::windowSize.y;
+        } else if (MC::held && WindowRects[currentNum].isMovingElement) {
+            WindowRects[currentNum].isMovingElement = true;
+            WindowRects[currentNum].hasBeenMoved = true;
+            WindowRects[currentNum].movedX = MC::mousepos.x - width / 2.0f;
+            WindowRects[currentNum].movedY = MC::mousepos.y - height / 2.0f;
 
-    if (MC::mousebutton == MouseButton::None && !MC::held || MC::mousebutton == MouseButton::Left && !MC::held)
-    {
-        WindowRects[currentNum].isMovingElement = false;
+            WindowRects[currentNum].percentageX = WindowRects[currentNum].movedX / MC::windowSize.x;
+            WindowRects[currentNum].percentageY = WindowRects[currentNum].movedY / MC::windowSize.y;
+
+        }
+
+        if (MC::mousebutton == MouseButton::None && !MC::held || MC::mousebutton == MouseButton::Left && !MC::held) {
+            WindowRects[currentNum].isMovingElement = false;
+        }
     }
 }
 

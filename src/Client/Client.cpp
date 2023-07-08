@@ -63,6 +63,7 @@ void Client::initialize()
         { "https://cdn.flarial.net/assets/fullbright.png", Path + "fullbright.png" },
         { "https://cdn.flarial.net/assets/frying-pan.png", Path + "frying-pan.png" },
         { "https://cdn.flarial.net/assets/font_bold.ttf", Path + "font_bold.ttf" },
+        { "https://cdn.flarial.net/assets/flarial-title.png", Path + "flarial-title.png" }
     };
 
     // Create threads to download the files
