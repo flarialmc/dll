@@ -176,10 +176,10 @@ public:
         FlarialGUI::FlarialTextWithFont(realcenter.x - realspacing, realcenter.y,
                                 FlarialGUI::to_wide(text).c_str(),
                                 textColor, textWidth,
-                                textHeight, DWRITE_TEXT_ALIGNMENT_CENTER, 190 * settings.getSettingByName<float>("textscale")->value * settings.getSettingByName<float>("uiscale")->value );
+                                textHeight, DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::SpacingConstraint(2.4f, textHeight) * this->settings.getSettingByName<float>("textscale")->value);
 
         if(this->settings.getSettingByName<bool>("border")->value) {
-            FlarialGUI::RoundedHollowRect(realcenter.x, realcenter.y, Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100, "height", true),
+            FlarialGUI::RoundedHollowRect(realcenter.x, realcenter.y, Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
                                           borderColor, rectWidth, textHeight,
                                     rounde.x, rounde.x);
         }
