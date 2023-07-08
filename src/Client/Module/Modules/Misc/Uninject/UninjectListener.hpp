@@ -1,7 +1,6 @@
 #pragma once
 #include "../../../../Events/Listener.hpp"
 #include "../../../../Client.hpp"
-
 class UninjectListener : public Listener {
 
 public:
@@ -9,11 +8,20 @@ public:
     Module* module;
 
     void onKey(KeyEvent& event) override {
+      
+            if (event.GetKey() == VK_F8 && static_cast<ActionType>(event.GetAction()) == ActionType::RELEASED) {
+                if (SDK::clientInstance->getLocalPlayer() == nullptr) {
+                    ModuleManager::terminate();
+                    Client::disable = true;
+                }
+                 else {
 
-        if (event.GetKey() == VK_F8 && static_cast<ActionType>(event.GetAction()) == ActionType::RELEASED) {
-            ModuleManager::terminate();
-            Client::disable = true;
-        }
+                     FlarialGUI::Notify("Cannot eject in a world");
+
+                 }
+            }
+   
+       
     }
 
 public:
