@@ -62,16 +62,24 @@ public:
         settings.emplace_back(new TypedSetting<T>(name, defaultValue));
     }
 
-    template<typename T>
-    SettingType<T>* getSettingByName(const std::string& name) {
 
+    template <typename T>
+    struct Tag {};
+
+    template<typename T>
+    SettingType<T>* getSettingByNameImpl(const std::string& name, Tag<T>) {
         for (auto& setting : settings) {
-            auto typedSetting = dynamic_cast<TypedSetting<T>*>(setting.get());
+            auto typedSetting = static_cast<TypedSetting<T>*>(setting.get());
             if (typedSetting && typedSetting->setting.name == name) {
                 return &(typedSetting->setting);
             }
         }
         return nullptr;
+    }
+
+    template<typename T>
+    SettingType<T>* getSettingByName(const std::string& name) {
+        return getSettingByNameImpl(name, Tag<T>{});
     }
 
     template<typename T>
