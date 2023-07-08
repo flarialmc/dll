@@ -13,7 +13,7 @@
 class  IPDisplayListener : public Listener {
 
     Module* module;
-
+    std::string IP = "";
     void onRender(RenderEvent& event) override {
 
         if(SDK::CurrentScreen == "hud_screen")
@@ -23,12 +23,19 @@ class  IPDisplayListener : public Listener {
 
                 if (SDK::clientInstance->getLocalPlayer() != nullptr) {
 
-                    
-                    auto IP = SDK::raknetConnector->JoinedIp;
-                    
+                    if (SDK::raknetConnector != nullptr) {
+                         IP = SDK::raknetConnector->JoinedIp;
 
-                    this->module->NormalRender(6, module->settings.getSettingByName<std::string>("text")->value, IP);
+                         if (IP == "") {
+                             IP = "localhost";
+                         }
+                             this->module->NormalRender(6, module->settings.getSettingByName<std::string>("text")->value, IP);
+                         
+                    }
 
+                    else {
+                        this->module->NormalRender(6, module->settings.getSettingByName<std::string>("text")->value, "localhost");
+                    }
                 }
 
             }

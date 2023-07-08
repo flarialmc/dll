@@ -19,6 +19,7 @@
 #include "Modules/ReachCounter/ReachCounter.hpp"
 #include "Modules/ComboCounter/ComboCounter.hpp"
 #include "Modules/IPDisplay/IPDisplay.hpp"
+#include "Modules/PingCounter/PingCounter.hpp"
 
 
 namespace ModuleManager {
@@ -36,7 +37,7 @@ void ModuleManager::initialize()
     modules.push_back(new IPDisplay());
     modules.push_back(new ReachCounter());
     modules.push_back(new ComboCounter());
-
+    modules.push_back(new PingCounter());
 
     modules.push_back(new Time());
     modules.push_back(new MEM());
