@@ -218,14 +218,14 @@ void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2
 
     // Calculate the adjusted dimensions for the border rounded rectangle
     D2D1_RECT_F borderRect = D2D1::RectF(
-            rect.left - borderWidth / 2.0,
-            rect.top - borderWidth / 2.0,
-            rect.right + borderWidth / 2.0,
-            rect.bottom + borderWidth / 2.0
+            rect.left - borderWidth / 2.0f,
+            rect.top - borderWidth / 2.0f,
+            rect.right + borderWidth / 2.0f,
+            rect.bottom + borderWidth / 2.0f
     );
 
-    radiusX += borderWidth / 2.0;
-    radiusY += borderWidth / 2.0;
+    radiusX += borderWidth / 2.0f;
+    radiusY += borderWidth / 2.0f;
 
 
 
@@ -1181,20 +1181,20 @@ Vec2<float> FlarialGUI::GetCenterXY(float rectWidth, float rectHeight)
 void FlarialGUI::ResetShit() {
 
     // Reset the variables to their initial values or desired values here
-    for (int i = 0; i < 100; ++i) {
-        WindowRects[i] = WindowRect();
+    for (auto & i : WindowRects) {
+        i = WindowRect();
     }
 
-    for (int i = 0; i < 250; ++i) {
-        SliderRects[i] = SliderRect();
+    for (auto & i : SliderRects) {
+        i = SliderRect();
     }
 
-    for (int i = 0; i < 100; ++i) {
-        TextBoxes[i] = TextBoxStruct();
+    for (auto & TextBoxe : TextBoxes) {
+        TextBoxe = TextBoxStruct();
     }
 
-    for (int i = 0; i < 20; ++i) {
-        ColorPickers[i] = ::ColorPicker();
+    for (auto & i : ColorPickers) {
+        i = ::ColorPicker();
     }
 
 
