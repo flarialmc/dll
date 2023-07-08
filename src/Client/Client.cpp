@@ -69,6 +69,7 @@ void Client::initialize()
         { "https://cdn.flarial.net/assets/keyboard.png", Path + "keyboard.png" },
         { "https://cdn.flarial.net/assets/server-ip.png", Path + "server-ip.png" },
         { "https://cdn.flarial.net/assets/coordinates.png", Path + "coordinates.png" },
+        { "https://cdn.flarial.net/assets/ping.png", Path + "ping.png" },
 
     };
 
