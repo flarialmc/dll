@@ -47,7 +47,7 @@ class ClickGUIRenderer : public Listener {
 
         float allahu = Constraints::RelativeConstraint(0.65);
         float akbar = Constraints::RelativeConstraint(0.25);
-        Vec2<float> allahuakbar = Constraints::CenterConstraint(allahu, akbar, "both", 1.175, 1.175);
+        Vec2<float> allahuakbar = Constraints::CenterConstraint(allahu, akbar, "y", 1.175, 1.175);
 
         // watermark
         if(SDK::clientInstance->getTopScreenName() == "inventory_screen" || SDK::clientInstance->getTopScreenName().find("chest") != std::string::npos)
