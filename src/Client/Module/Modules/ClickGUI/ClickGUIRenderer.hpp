@@ -45,6 +45,14 @@ class ClickGUIRenderer : public Listener {
 
     void onRender(RenderEvent &event) override {
 
+        float allahu = Constraints::RelativeConstraint(0.65);
+        float akbar = Constraints::RelativeConstraint(0.25);
+        Vec2<float> allahuakbar = Constraints::CenterConstraint(allahu, akbar, "y", 1.0, 1.05);
+
+        // watermark
+        if(SDK::clientInstance->getTopScreenName() == "inventory_screen" || SDK::clientInstance->getTopScreenName() == "chest_screen")
+            FlarialGUI::Image("\\Flarial\\assets\\flarial-title.png", D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu, allahuakbar.y + akbar));
+
         FlarialGUI::NotifyHeartbeat();
 
         if(FlarialGUI::scrollposmodifier == 0) {
