@@ -27,7 +27,7 @@ class  IPDisplayListener : public Listener {
                     auto IP = SDK::raknetConnector->JoinedIp;
                     
 
-                    this->module->NormalRender(6, module->settings.getSettingByName<std::string>("text")->value, IP);
+                    this->module->NormalRender(10, module->settings.getSettingByName<std::string>("text")->value, IP);
 
                 }
 
