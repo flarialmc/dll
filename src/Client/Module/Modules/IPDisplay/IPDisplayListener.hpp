@@ -8,6 +8,7 @@
 #include "../../../GUI/Engine/Engine.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "../../../../Utils/Utils.hpp"
+#include "../../../Hook/Hooks/Game/RaknetTick.hpp"
 #include <Windows.h>
 
 class  IPDisplayListener : public Listener {
@@ -27,14 +28,13 @@ class  IPDisplayListener : public Listener {
                          IP = SDK::raknetConnector->JoinedIp;
 
                          if (IP == "") {
-                             IP = "localhost";
+                             IP = "world";
                          }
-                             this->module->NormalRender(6, module->settings.getSettingByName<std::string>("text")->value, IP);
-                         
+                             this->module->NormalRender(10, module->settings.getSettingByName<std::string>("text")->value, IP);
                     }
 
                     else {
-                        this->module->NormalRender(6, module->settings.getSettingByName<std::string>("text")->value, "localhost");
+                        this->module->NormalRender(10, module->settings.getSettingByName<std::string>("text")->value, "world");
                     }
                 }
 

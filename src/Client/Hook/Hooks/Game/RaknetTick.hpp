@@ -7,6 +7,8 @@ private:
     static void callback(RaknetConnector*);
 
 public:
+    static std::string towriteip;
+
     typedef void(__thiscall* original)(RaknetConnector*);
 
     static inline original raknetTickOriginal = nullptr;

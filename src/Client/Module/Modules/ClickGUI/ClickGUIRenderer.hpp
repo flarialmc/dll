@@ -47,10 +47,10 @@ class ClickGUIRenderer : public Listener {
 
         float allahu = Constraints::RelativeConstraint(0.65);
         float akbar = Constraints::RelativeConstraint(0.25);
-        Vec2<float> allahuakbar = Constraints::CenterConstraint(allahu, akbar, "y", 1.0, 1.05);
+        Vec2<float> allahuakbar = Constraints::CenterConstraint(allahu, akbar, "both", 1.175, 1.175);
 
         // watermark
-        if(SDK::clientInstance->getTopScreenName() == "inventory_screen" || SDK::clientInstance->getTopScreenName() == "chest_screen")
+        if(SDK::clientInstance->getTopScreenName() == "inventory_screen" || SDK::clientInstance->getTopScreenName().find("chest") != std::string::npos)
             FlarialGUI::Image("\\Flarial\\assets\\flarial-title.png", D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu, allahuakbar.y + akbar));
 
         FlarialGUI::NotifyHeartbeat();
