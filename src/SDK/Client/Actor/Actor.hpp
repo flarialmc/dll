@@ -252,13 +252,15 @@ public:
  
     BUILD_ACCESS(this, MobHurtTimeComponent*, mobHurtTimeComponent, 0x660);
 
+    static inline uintptr_t sig = Memory::findSig("40 53 48 83 EC 20 48 8B DA BA 2E");
+
     MoveInputComponent* getMoveInputHandler() {
 
         auto a1 = **(uintptr_t ***) (this + 0x8);
         auto a2 = *(uintptr_t *) (this + 0x10);
 
         using efunc = MoveInputComponent *(__thiscall *)(uintptr_t, uintptr_t *);
-        auto func = reinterpret_cast<efunc>(Memory::findSig("40 53 48 83 EC 20 48 8B DA BA 2E"));
+        auto func = reinterpret_cast<efunc>(sig);
         return func(reinterpret_cast<uintptr_t>(a1), &a2);
 
     }
