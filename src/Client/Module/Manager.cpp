@@ -20,8 +20,8 @@
 #include "Modules/ComboCounter/ComboCounter.hpp"
 #include "Modules/IPDisplay/IPDisplay.hpp"
 #include "Modules/PingCounter/PingCounter.hpp"
-
-
+#include "Modules/PotCounter/PotCounter.hpp"
+#include "Modules/ArrowCounter/ArrowCounter.hpp"
 namespace ModuleManager {
     std::vector<Module*> modules;
 }
@@ -38,6 +38,8 @@ void ModuleManager::initialize()
     modules.push_back(new ReachCounter());
     modules.push_back(new ComboCounter());
     modules.push_back(new PingCounter());
+    modules.push_back(new PotCounter());
+    modules.push_back(new ArrowCounter());
 
     modules.push_back(new Time());
     modules.push_back(new MEM());
