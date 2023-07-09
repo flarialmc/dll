@@ -38,10 +38,7 @@ public:
         if(settings.getSettingByName<bool>("enabled") == nullptr)
             settings.addSetting("enabled", false);
 
-        if (settings.getSettingByName<bool>("BlurEffect") == nullptr) {
-            settings.addSetting("BlurEffect", false);
-            settings.addSetting("BlurIntensity", 7.5f);
-        }
+
 
         if (settings.getSettingByName<bool>("cps") == nullptr) {
             settings.addSetting("cps", false);

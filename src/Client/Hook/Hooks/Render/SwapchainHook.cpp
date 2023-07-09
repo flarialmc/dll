@@ -204,8 +204,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
         if(D2D::context != nullptr && !Client::disable) {
 
-            MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
-
             if(SwapchainHook::queue != nullptr) {
 
                 SwapchainHook::currentBitmap = pSwapChain->GetCurrentBackBufferIndex();
@@ -218,28 +216,31 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 /* Blur Stuff */
 
                 ID2D1Bitmap *bitmap = nullptr;
-                ID2D1Effect* effect;
 
-                D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &effect);
+                if(FlarialGUI::blur == nullptr) {
+                    D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &FlarialGUI::blur);
+                }
 
                 if(SwapchainHook::queue != nullptr) FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap], &bitmap);
                 else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap, &bitmap);
 
-                effect->SetInput(0, bitmap);
+                FlarialGUI::blur->SetInput(0, bitmap);
 
                 // Set blur intensity
-                effect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
-                effect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, Client::settings.getSettingByName<float>("blurintensity")->value);
-                effect->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_SPEED);
+                FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+                FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, Client::settings.getSettingByName<float>("blurintensity")->value);
+                FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_SPEED);
 
                 ID2D1Image* image;
-                effect->GetOutput(&image);
+                FlarialGUI::blur->GetOutput(&image);
                 D2D1_IMAGE_BRUSH_PROPERTIES props = D2D1::ImageBrushProperties(D2D1::RectF(0, 0, MC::windowSize.x, MC::windowSize.y));
                 D2D::context->CreateImageBrush(image, props, &FlarialGUI::blurbrush);
 
                 /* Blur End */
 
                 D2D::context->BeginDraw();
+
+                MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
                 RenderEvent event;
                 EventHandler::onRender(event);
@@ -255,42 +256,44 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 Memory::SafeRelease(image);
                 Memory::SafeRelease(bitmap);
-                Memory::SafeRelease(effect);
 
             } else {
 
                 /* Blur Stuff */
 
                 ID2D1Bitmap *bitmap = nullptr;
-                ID2D1Effect* effect;
 
-                D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &effect);
+                if(FlarialGUI::blur == nullptr) {
+                    D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &FlarialGUI::blur);
+                }
 
                 if(SwapchainHook::queue != nullptr) FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap], &bitmap);
                 else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap, &bitmap);
 
-                effect->SetInput(0, bitmap);
+                FlarialGUI::blur->SetInput(0, bitmap);
 
                 // Set blur intensity
-                effect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
-                effect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, Client::settings.getSettingByName<float>("blurintensity")->value);
-                effect->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_SPEED);
+                FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+                FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, Client::settings.getSettingByName<float>("BlurIntensity")->value);
+                FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_SPEED);
 
                 ID2D1Image* image;
-                effect->GetOutput(&image);
+                FlarialGUI::blur->GetOutput(&image);
                 D2D1_IMAGE_BRUSH_PROPERTIES props = D2D1::ImageBrushProperties(D2D1::RectF(0, 0, MC::windowSize.x, MC::windowSize.y));
                 D2D::context->CreateImageBrush(image, props, &FlarialGUI::blurbrush);
 
                 /* Blur End */
 
                 D2D::context->BeginDraw();
+
+                MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
+
                 RenderEvent event;
                 EventHandler::onRender(event);
                 D2D::context->EndDraw();
 
                 Memory::SafeRelease(image);
                 Memory::SafeRelease(bitmap);
-                Memory::SafeRelease(effect);
             }
 
             Memory::SafeRelease(FlarialGUI::blurbrush);

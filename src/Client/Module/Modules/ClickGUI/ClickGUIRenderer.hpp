@@ -208,7 +208,7 @@ class ClickGUIRenderer : public Listener {
 
                     FlarialGUI::PopSize();
 
-                    FlarialGUI::ScrollBar(120, 120, 10, 160, 2);
+                    FlarialGUI::ScrollBar(120, 120, 10, 190, 2);
 
                     FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
 

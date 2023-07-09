@@ -55,6 +55,8 @@ void ResizeHook::CleanShit(bool isResize) {
         Memory::SafeRelease(i.second);
     }
 
+    FlarialGUI::brushCache.clear();
+
     ImagesClass::eimages.clear();
 
     if(SwapchainHook::init && SwapchainHook::d3d11On12Device != nullptr) {
@@ -88,6 +90,7 @@ void ResizeHook::CleanShit(bool isResize) {
         SwapchainHook::context->Flush();
         Memory::SafeRelease(SwapchainHook::context);
         Memory::SafeRelease(D2D::surface);
+        Memory::SafeRelease(FlarialGUI::blur);
 
         Memory::SafeRelease(SwapchainHook::d3d11On12Device);
 
