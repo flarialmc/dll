@@ -61,6 +61,22 @@ void ModuleManager::terminate()
     modules.clear();
 }
 
+bool ModuleManager::doesAnyModuleHave(std::string settingName) {
+
+    bool result = false;
+
+    for (Module* mod : modules) {
+        if(mod->settings.getSettingByName<bool>(settingName) != nullptr)
+            if(mod->settings.getSettingByName<bool>(settingName)->value){
+                result = true;
+                break;
+            }
+    }
+
+    return result;
+
+}
+
 Module* ModuleManager::getModule(std::string name)
 {
     for (Module* mod : modules) {
