@@ -9,6 +9,7 @@
 
 std::map<std::string, ID2D1Bitmap*> ImagesClass::eimages;
 IDWriteFactory *FlarialGUI::writeFactory;
+ID2D1ImageBrush* FlarialGUI::blurbrush;
 std::unordered_map<std::string, ID2D1SolidColorBrush*> FlarialGUI::brushCache;
 
 float maxDarkenAmount = 0.1;
@@ -1507,41 +1508,14 @@ void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect, float intensity) {
 
     if(SwapchainHook::init) {
 
-        ID2D1Bitmap *bitmap = nullptr;
-        ID2D1Effect* effect;
-
-        D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &effect);
-
-        if(SwapchainHook::queue != nullptr) FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap], &bitmap);
-        else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap, &bitmap);
-
-        effect->SetInput(0, bitmap);
-
-        // Set blur intensity
-        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
-        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, intensity);
-        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_SPEED);
-
-        ID2D1Image* image;
-        effect->GetOutput(&image);
-
-        ID2D1ImageBrush* brush;
-        D2D1_IMAGE_BRUSH_PROPERTIES props = D2D1::ImageBrushProperties(D2D1::RectF(0, 0, MC::windowSize.x, MC::windowSize.y));
-        D2D::context->CreateImageBrush(image, props, &brush);
-
         ID2D1Factory* factory;
         D2D::context->GetFactory(&factory);
 
         ID2D1RoundedRectangleGeometry* geo;
         factory->CreateRoundedRectangleGeometry(rect, &geo);
 
+        D2D::context->FillGeometry(geo, blurbrush);
 
-        D2D::context->FillGeometry(geo, brush);
-
-        Memory::SafeRelease(image);
-        Memory::SafeRelease(bitmap);
-        Memory::SafeRelease(brush);
-        Memory::SafeRelease(effect);
         Memory::SafeRelease(factory);
         Memory::SafeRelease(geo);
     }

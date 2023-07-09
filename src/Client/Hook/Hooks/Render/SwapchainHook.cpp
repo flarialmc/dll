@@ -195,12 +195,16 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
     } else {
 
+
         if(FlarialGUI::writeFactory == nullptr) {
             DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
                                 reinterpret_cast<IUnknown **>(&FlarialGUI::writeFactory));
         }
 
+
         if(D2D::context != nullptr && !Client::disable) {
+
+            MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
             if(SwapchainHook::queue != nullptr) {
 
@@ -211,9 +215,31 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
 
-                D2D::context->BeginDraw();
+                /* Blur Stuff */
 
-                MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
+                ID2D1Bitmap *bitmap = nullptr;
+                ID2D1Effect* effect;
+
+                D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &effect);
+
+                if(SwapchainHook::queue != nullptr) FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap], &bitmap);
+                else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap, &bitmap);
+
+                effect->SetInput(0, bitmap);
+
+                // Set blur intensity
+                effect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+                effect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, Client::settings.getSettingByName<float>("blurintensity")->value);
+                effect->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_SPEED);
+
+                ID2D1Image* image;
+                effect->GetOutput(&image);
+                D2D1_IMAGE_BRUSH_PROPERTIES props = D2D1::ImageBrushProperties(D2D1::RectF(0, 0, MC::windowSize.x, MC::windowSize.y));
+                D2D::context->CreateImageBrush(image, props, &FlarialGUI::blurbrush);
+
+                /* Blur End */
+
+                D2D::context->BeginDraw();
 
                 RenderEvent event;
                 EventHandler::onRender(event);
@@ -227,16 +253,52 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 SwapchainHook::context->Flush();
 
+                Memory::SafeRelease(image);
+                Memory::SafeRelease(bitmap);
+                Memory::SafeRelease(effect);
+
             } else {
 
+                /* Blur Stuff */
+
+                ID2D1Bitmap *bitmap = nullptr;
+                ID2D1Effect* effect;
+
+                D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &effect);
+
+                if(SwapchainHook::queue != nullptr) FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap], &bitmap);
+                else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap, &bitmap);
+
+                effect->SetInput(0, bitmap);
+
+                // Set blur intensity
+                effect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+                effect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, Client::settings.getSettingByName<float>("blurintensity")->value);
+                effect->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_SPEED);
+
+                ID2D1Image* image;
+                effect->GetOutput(&image);
+                D2D1_IMAGE_BRUSH_PROPERTIES props = D2D1::ImageBrushProperties(D2D1::RectF(0, 0, MC::windowSize.x, MC::windowSize.y));
+                D2D::context->CreateImageBrush(image, props, &FlarialGUI::blurbrush);
+
+                /* Blur End */
+
                 D2D::context->BeginDraw();
-                MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
                 RenderEvent event;
                 EventHandler::onRender(event);
                 D2D::context->EndDraw();
+
+                Memory::SafeRelease(image);
+                Memory::SafeRelease(bitmap);
+                Memory::SafeRelease(effect);
             }
 
+            Memory::SafeRelease(FlarialGUI::blurbrush);
+
+
         }
+
+
 
     }
 

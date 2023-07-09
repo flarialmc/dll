@@ -204,4 +204,6 @@ namespace FlarialGUI
     ID2D1SolidColorBrush* getBrush(D2D1_COLOR_F color);
 
     extern IDWriteFactory *writeFactory;
+
+    extern ID2D1ImageBrush* blurbrush;
 };
