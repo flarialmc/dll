@@ -257,7 +257,7 @@ class ClickGUIRenderer : public Listener {
 
                     FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left"), Constraints::PercentageConstraint(0.40, "top"), FlarialGUI::to_wide("Blur Intensity").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
 
-                    float percent = FlarialGUI::Slider(7, Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(1.10, textWidth),
+                    float percent = FlarialGUI::Slider(7, Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(1.06, textWidth),
                                                        Constraints::PercentageConstraint(0.40, "top"),
                                                  D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
                                                  D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),

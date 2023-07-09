@@ -285,7 +285,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                     // Set blur intensity
                     FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
                     FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION,
-                                               Client::settings.getSettingByName<float>("BlurIntensity")->value);
+                                               Client::settings.getSettingByName<float>("blurintensity")->value);
                     FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION,
                                                D2D1_GAUSSIANBLUR_OPTIMIZATION_SPEED);
 
