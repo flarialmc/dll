@@ -199,7 +199,7 @@ class ClickGUIRenderer : public Listener {
 
                     Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.60,-0.52);
 
-                    FlarialGUI::PushSize(center.x, center.y, baseWidth, Constraints::RelativeConstraint(std::ceilf(baseHeightReal * 100.0f) / 100.0f, "height", true));
+                    FlarialGUI::PushSize(center.x, center.y, baseWidth, Constraints::RelativeConstraint(baseHeightReal, "height", true));
 
                     float scrollWidth = Constraints::RelativeConstraint(1.12);
                     float scrollHeight = Constraints::RelativeConstraint(0.84);
