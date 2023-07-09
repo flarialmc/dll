@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../../Client.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include <format>
 #include <Windows.h>
@@ -244,6 +245,13 @@ class ClickGUIRenderer : public Listener {
 
                     round = Constraints::RoundingConstraint(45, 45);
                     FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectWidth, rectHeight, round.x, round.x);
+
+                    FlarialGUI::PopSize();
+
+                    FlarialGUI::PushSize(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
+
+                    FlarialGUI::TextBoxVisual(0, Client::settings.getSettingByName<std::string>("fontname")->value, 26, Constraints::PercentageConstraint(0.019, "left"), Constraints::PercentageConstraint(0.10, "top"), "Font (Anything installed in your system)");
+
 
                     FlarialGUI::PopSize();
 

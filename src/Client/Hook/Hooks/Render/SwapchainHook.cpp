@@ -74,7 +74,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
             if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device3)))) {
                 Logger::debug("Removed d3d12 device");
                 d3d12device3->RemoveDevice();
-                return func_original(pSwapChain, syncInterval, flags);
+
+                return func_original(pSwapChain, 0, flags);
             }
 
             Logger::debug("not a DX12 device, running dx11 procedures");
@@ -194,6 +195,11 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
     } else {
 
+        if(FlarialGUI::writeFactory == nullptr) {
+            DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
+                                reinterpret_cast<IUnknown **>(&FlarialGUI::writeFactory));
+        }
+
         if(D2D::context != nullptr && !Client::disable) {
 
             if(SwapchainHook::queue != nullptr) {
@@ -235,7 +241,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
     }
 
 
-    return func_original(pSwapChain, syncInterval, flags);
+    return func_original(pSwapChain, 0, flags);
 
 
 }

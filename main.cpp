@@ -23,6 +23,8 @@ DWORD WINAPI init(HMODULE real)
         }
     }
 
+    Client::SaveSettings();
+
     Logger::info("Uninitializing Client");
 
     EventHandler::unregisterAll();

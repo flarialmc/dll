@@ -7,6 +7,7 @@
 #include <map>
 #include <vector>
 #include <chrono>
+#include <unordered_map>
 
 struct WindowRect
 {
@@ -106,7 +107,7 @@ namespace FlarialGUI
     bool inline isInWindowRect = false;
 
     inline ID2D1Effect* blur = nullptr;
-
+    extern std::unordered_map<std::string, ID2D1SolidColorBrush*> brushCache;
 
 
     void PushSize(float x, float y, float width, float height);
@@ -198,5 +199,9 @@ namespace FlarialGUI
 
     void NotifyHeartbeat();
 
-    std::string TextBoxVisual(int index, std::string& text, int limit, float x, float y);
+    std::string TextBoxVisual(int index, std::string& text, int limit, float x, float y, std::string real = "Text Format");
+
+    ID2D1SolidColorBrush* getBrush(D2D1_COLOR_F color);
+
+    extern IDWriteFactory *writeFactory;
 };

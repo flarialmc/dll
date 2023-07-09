@@ -7,6 +7,9 @@
 #include <wingdi.h>
 #include <wininet.h>
 
+std::string Client::settingspath = Utils::getRoamingPath() + "\\Flarial\\Config\\main.flarial";
+Settings Client::settings = Settings();
+
 void DownloadAndSave(std::string url, std::string path) {
 
     char test[256];
@@ -70,8 +73,14 @@ void Client::initialize()
         { "https://cdn.flarial.net/assets/server-ip.png", Path + "server-ip.png" },
         { "https://cdn.flarial.net/assets/coordinates.png", Path + "coordinates.png" },
         { "https://cdn.flarial.net/assets/ping.png", Path + "ping.png" },
-
+        { "https://cdn.flarial.net/assets/minecraftia.ttf", Path + "minecraftia.ttf" }
     };
+
+    Client::CheckSettingsFile();
+    Client::LoadSettings();
+
+    if(Client::settings.getSettingByName<std::string>("fontname") == nullptr)
+        Client::settings.addSetting("fontname", (std::string)"Space Grotesk");
 
     // Create threads to download the files
     std::vector<std::thread> threads;
@@ -90,6 +99,9 @@ void Client::initialize()
     AddFontResource(fontpath.c_str());
 
     fontpath = Utils::getRoamingPath() + "\\Flarial\\assets\\font_bold.ttf";
+    AddFontResource(fontpath.c_str());
+
+    fontpath = Utils::getRoamingPath() + "\\Flarial\\assets\\minecraftia.ttf";
     AddFontResource(fontpath.c_str());
 
     Logger::initialize();

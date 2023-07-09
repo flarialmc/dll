@@ -1,5 +1,5 @@
 ﻿#include "Engine.hpp"
-
+#include "../../Client.hpp"
 #include <utility>
 #include "Constraints.hpp"
 #include "../../Module/Modules/Module.hpp"
@@ -8,6 +8,8 @@
 #include "../../Module/Modules/ClickGUI/GUIMouseListener.hpp"
 
 std::map<std::string, ID2D1Bitmap*> ImagesClass::eimages;
+IDWriteFactory *FlarialGUI::writeFactory;
+std::unordered_map<std::string, ID2D1SolidColorBrush*> FlarialGUI::brushCache;
 
 float maxDarkenAmount = 0.1;
 
@@ -65,19 +67,23 @@ bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COL
 
     ID2D1SolidColorBrush *brush;
     D2D1_COLOR_F buttonColor = CursorInRect(x, y, width, height) ? D2D1::ColorF(color.r - darkenAmounts[x+y], color.g - darkenAmounts[x+y], color.b - darkenAmounts[x+y], color.a) : color;
-    D2D::context->CreateSolidColorBrush(buttonColor, &brush);
+    brush = FlarialGUI::getBrush(buttonColor);
     D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
 
 
     D2D::context->FillRectangle(rect, brush);
-    brush->Release();
-
 
 
     IDWriteTextFormat *textFormat;
-    IDWriteFactory *writeFactory;
-    DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
-    writeFactory->CreateTextFormat(L"Arial", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-US", &textFormat); ID2D1SolidColorBrush *textBrush; D2D::context->CreateSolidColorBrush(textColor, &textBrush); textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER); textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER); D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush); textBrush->Release(); textFormat->Release();
+    writeFactory->CreateTextFormat(L"Arial", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-US", &textFormat);
+    ID2D1SolidColorBrush *textBrush;
+    textBrush = FlarialGUI::getBrush(textColor);
+    textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+    textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+    D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat,
+    D2D1::RectF(x, y, x + width, y + height), textBrush);
+
+     textFormat->Release();
 
     if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
@@ -98,14 +104,11 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
     if (isInScrollView)
         y += scrollpos;
 
-    static IDWriteFactory* writeFactory;
-    DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
-
     static ID2D1SolidColorBrush* textBrush;
-    D2D::context->CreateSolidColorBrush(textColor, &textBrush);
+    textBrush = FlarialGUI::getBrush(textColor);
 
     static IDWriteTextFormat* textFormat;
-    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width), L"en-US", &textFormat);
+    writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width), L"en-US", &textFormat);
     textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
@@ -122,17 +125,15 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
 
     }
 
-    D2D::context->CreateSolidColorBrush(buttonColor, &brush);
+
+    brush = FlarialGUI::getBrush(buttonColor);
 
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
     D2D::context->FillRoundedRectangle(roundedRect, brush);
 
     D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
 
-    brush->Release();
-    writeFactory->Release();
     textFormat->Release();
-    textBrush->Release();
 
     if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
@@ -149,14 +150,13 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
     if (isInScrollView)
         y += scrollpos;
 
-    static IDWriteFactory* writeFactory;
-    DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
 
     static ID2D1SolidColorBrush* textBrush;
-    D2D::context->CreateSolidColorBrush(textColor, &textBrush);
+
+    textBrush = FlarialGUI::getBrush(textColor);
 
     static IDWriteTextFormat* textFormat;
-    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width * 0.64f), L"en-US", &textFormat);
+    writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width * 0.64f), L"en-US", &textFormat);
     textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
@@ -173,17 +173,14 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
     }
 
 
-    D2D::context->CreateSolidColorBrush(buttonColor, &brush);
+    brush = FlarialGUI::getBrush(buttonColor);
 
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
     D2D::context->FillRoundedRectangle(roundedRect, brush);
 
     D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
 
-    brush->Release();
-    writeFactory->Release();
     textFormat->Release();
-    textBrush->Release();
 
     if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
@@ -200,11 +197,10 @@ void FlarialGUI::RoundedRect(float x, float y, const D2D_COLOR_F color, const fl
         y += scrollpos;
 
     ID2D1SolidColorBrush *brush;
-    D2D::context->CreateSolidColorBrush(color, &brush);
+    brush = FlarialGUI::getBrush(color);
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
 
     D2D::context->FillRoundedRectangle(roundedRect, brush);
-    brush->Release();
 }
 
 void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2D_COLOR_F color, const float width, const float height, float radiusX, float radiusY)
@@ -213,7 +209,7 @@ void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2
         y += scrollpos;
 
     ID2D1SolidColorBrush *brush;
-    D2D::context->CreateSolidColorBrush(color, &brush);
+    brush = FlarialGUI::getBrush(color);
     D2D1_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
 
     // Make the border extend from the outside only
@@ -230,7 +226,6 @@ void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2
 
 
     D2D::context->DrawRoundedRectangle(D2D1::RoundedRect(borderRect, radiusX, radiusY), brush, borderWidth);
-    brush->Release();
 }
 
 void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, float width, float height, float radiusX, float radiusY)
@@ -292,11 +287,11 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
     sink->Close();
 
     ID2D1SolidColorBrush* brush;
-    D2D::context->CreateSolidColorBrush(color, &brush);
+
+    brush = FlarialGUI::getBrush(color);
 
     D2D::context->FillGeometry(geometry, brush);
 
-    Memory::SafeRelease(brush);
     Memory::SafeRelease(sink);
     Memory::SafeRelease(geometry);
     Memory::SafeRelease(factory);
@@ -451,7 +446,7 @@ float FlarialGUI::HueToRGB(float p, float q, float t)
 }
 
 
-std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, float x, float y) {
+std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, float x, float y, std::string real) {
 
     D2D1_COLOR_F col;
 
@@ -469,7 +464,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
     FlarialGUI::RoundedRect(x, y, col, Constraints::SpacingConstraint(1.55, textWidth), percHeight, round.x, round.x);
 
     FlarialGUI::FlarialTextWithFont(x, y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_CENTER, 110);
-    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, to_wide("Text Format").c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_LEADING, 110);
+    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, to_wide(real).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_LEADING, 110);
 
     return "";
 }
@@ -629,7 +624,8 @@ void FlarialGUI::Circle(float x, float y, const D2D1_COLOR_F& color, float radiu
 
     // Create a brush using the specified color
     ID2D1SolidColorBrush* brush;
-    D2D::context->CreateSolidColorBrush(color, &brush);
+
+    brush = FlarialGUI::getBrush(color);
 
     // Create an ellipse with the specified parameters
     D2D1_ELLIPSE ellipse;
@@ -639,9 +635,6 @@ void FlarialGUI::Circle(float x, float y, const D2D1_COLOR_F& color, float radiu
 
     // Draw the ellipse using the device context and brush
     D2D::context->FillEllipse(ellipse, brush);
-
-    // Release the brush
-    brush->Release();
 }
 
 
@@ -663,7 +656,8 @@ void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const 
 
 
     ID2D1SolidColorBrush *brush;
-    D2D::context->CreateSolidColorBrush(color, &brush);
+
+    brush = FlarialGUI::getBrush(color);
 
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), 5, 5);
 
@@ -713,14 +707,14 @@ void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const 
     IDWriteFactory *writeFactory;
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
     IDWriteTextFormat *textFormat;
-    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"", &textFormat);
+    writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"", &textFormat);
     textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
     D2D1_RECT_F textRect = D2D1::RectF(x + height + 10, y, x + width, y + height);
     D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);*/
 
-    brush->Release();/*
+    /*
     textFormat->Release();
     writeFactory->Release();*/
 }
@@ -977,21 +971,19 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F
     if (isInScrollView)
         y += scrollpos;
     ID2D1SolidColorBrush *brush;
-    D2D::context->CreateSolidColorBrush(color, &brush);
 
-    IDWriteFactory *writeFactory;
-    DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
+    brush = FlarialGUI::getBrush(color);
+
     IDWriteTextFormat *textFormat;
-    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width), L"", &textFormat);
+    writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width), L"", &textFormat);
     textFormat->SetTextAlignment(alignment);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
     D2D1_RECT_F textRect = D2D1::RectF(x, y, x + width, y + height);
     D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
 
-    writeFactory->Release();
     textFormat->Release();
-    brush->Release();
+
 }
 
 void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, D2D1_COLOR_F color, const float width, const float height, const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize, const DWRITE_FONT_WEIGHT weight)
@@ -1000,21 +992,19 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, D2D1
     if (isInScrollView)
         y += scrollpos;
     ID2D1SolidColorBrush *brush;
-    D2D::context->CreateSolidColorBrush(color, &brush);
 
-    IDWriteFactory *writeFactory;
-    DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
+    brush = FlarialGUI::getBrush(color);
+
+
     IDWriteTextFormat *textFormat;
-    writeFactory->CreateTextFormat(L"Space Grotesk", NULL, weight, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(fontSize), L"", &textFormat);
+    writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, weight, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(fontSize), L"", &textFormat);
     textFormat->SetTextAlignment(alignment);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
     D2D1_RECT_F textRect = D2D1::RectF(x, y, x + width, y + height);
     D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
 
-    writeFactory->Release();
     textFormat->Release();
-    brush->Release();
 }
 
 void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
@@ -1102,6 +1092,7 @@ void FlarialGUI::ScrollBar(float x, float y, float width, float height, float ra
     FlarialGUI::lerp(FlarialGUI::scrollpos, GUIMouseListener::accumilatedPos, 0.30f * FlarialGUI::frameFactor);
     FlarialGUI::lerp(FlarialGUI::barscrollpos, GUIMouseListener::accumilatedBarPos, 0.30f * FlarialGUI::frameFactor);
 
+    /*
     // Draw the gray bar
     ID2D1SolidColorBrush *graybrush;
     D2D::context->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gray, 0.0), &graybrush);
@@ -1114,6 +1105,7 @@ void FlarialGUI::ScrollBar(float x, float y, float width, float height, float ra
     D2D1_ROUNDED_RECT whiteRect = D2D1::RoundedRect(D2D1::RectF(x, whiteY, x + width, whiteY + (height * 69.5 / 100)), radius, radius);
     D2D::context->FillRoundedRectangle(&whiteRect, whitebrush);
     whitebrush->Release();
+     */
 }
 
 void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int currentNum)
@@ -1404,9 +1396,9 @@ void FlarialGUI::NotifyHeartbeat() {
                     rounding.x);
 
             D2D1_COLOR_F col = FlarialGUI::HexToColorF("110F10");
-            col.a = 0.75;
+            col.a = 0.60;
 
-            FlarialGUI::BlurRect(rect, 7.0f);
+            FlarialGUI::BlurRect(rect, 6.0f);
             FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
                                     col, rectWidth,
                                     rectHeight, rounding.x, rounding.x);
@@ -1465,9 +1457,9 @@ void FlarialGUI::NotifyHeartbeat() {
                     rounding.x);
 
             D2D1_COLOR_F col = FlarialGUI::HexToColorF("110F10");
-            col.a = 0.75;
+            col.a = 0.60;
 
-            FlarialGUI::BlurRect(rect, 7.0f);
+            FlarialGUI::BlurRect(rect, 6.0f);
             FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
                                     col, rectWidth,
                                     rectHeight, rounding.x, rounding.x);
@@ -1528,6 +1520,7 @@ void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect, float intensity) {
         // Set blur intensity
         effect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
         effect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, intensity);
+        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_SPEED);
 
         ID2D1Image* image;
         effect->GetOutput(&image);
@@ -1545,9 +1538,9 @@ void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect, float intensity) {
 
         D2D::context->FillGeometry(geo, brush);
 
-        Memory::SafeRelease(brush);
         Memory::SafeRelease(image);
         Memory::SafeRelease(bitmap);
+        Memory::SafeRelease(brush);
         Memory::SafeRelease(effect);
         Memory::SafeRelease(factory);
         Memory::SafeRelease(geo);
@@ -1674,4 +1667,27 @@ void FlarialGUI::lerp(T& a, const T& b, float t)
 
     // Assign the rounded value back to 'a'
     a = roundedValue;
+}
+
+ID2D1SolidColorBrush* FlarialGUI::getBrush(D2D1_COLOR_F color) {
+    std::string key = std::to_string(color.r) + std::to_string(color.g) + std::to_string(color.b) + std::to_string(color.a);
+
+
+    auto it = brushCache.find(key);
+    if (it != brushCache.end())
+    {
+
+        return it->second;
+    }
+    else
+    {
+
+        ID2D1SolidColorBrush* brush;
+
+        D2D::context->CreateSolidColorBrush(color, &brush);
+
+        brushCache[key] = brush;
+
+        return brush;
+    }
 }
