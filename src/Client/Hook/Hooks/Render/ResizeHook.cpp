@@ -91,6 +91,7 @@ void ResizeHook::CleanShit(bool isResize) {
         Memory::SafeRelease(SwapchainHook::context);
         Memory::SafeRelease(D2D::surface);
         Memory::SafeRelease(FlarialGUI::blur);
+        Memory::SafeRelease(FlarialGUI::factory);
 
         Memory::SafeRelease(SwapchainHook::d3d11On12Device);
 

@@ -8,7 +8,7 @@ class PotCounter : public Module {
 
 public:
 
-    PotCounter() : Module("Pot Counter", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\ping.png", 'Y') {
+    PotCounter() : Module("Pot Counter", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\potion.png", 'Y') {
 
         onEnable();
 

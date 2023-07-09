@@ -8,7 +8,7 @@ class ArrowCounter : public Module {
 
 public:
 
-    ArrowCounter() : Module("Arrow Counter", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\ping.png", 'Y') {
+    ArrowCounter() : Module("Arrow Counter", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\arrow.png", 'Y') {
 
         onEnable();
 

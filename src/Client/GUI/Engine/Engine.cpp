@@ -2,14 +2,13 @@
 #include "../../Client.hpp"
 #include <utility>
 #include "Constraints.hpp"
-#include "../../Module/Modules/Module.hpp"
-#include "../../Hook/Hooks/Render/SwapchainHook.hpp"
 #include "animations/fadeinout.hpp"
 #include "../../Module/Modules/ClickGUI/GUIMouseListener.hpp"
 
 std::map<std::string, ID2D1Bitmap*> ImagesClass::eimages;
 IDWriteFactory *FlarialGUI::writeFactory;
 ID2D1ImageBrush* FlarialGUI::blurbrush;
+ID2D1Factory* FlarialGUI::factory;
 std::unordered_map<std::string, ID2D1SolidColorBrush*> FlarialGUI::brushCache;
 
 float maxDarkenAmount = 0.1;
@@ -236,7 +235,7 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
 
     D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
 
-    ID2D1Factory *factory;
+    if(factory == nullptr)
     D2D::context->GetFactory(&factory);
 
     ID2D1PathGeometry* geometry = nullptr;
@@ -1506,15 +1505,16 @@ void FlarialGUI::NotifyHeartbeat() {
 
 void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect, float intensity) {
 
-    if(SwapchainHook::init) {
 
-        ID2D1Factory* factory;
+    if(SwapchainHook::init && FlarialGUI::blurbrush != nullptr) {
+
+        if(factory == nullptr)
         D2D::context->GetFactory(&factory);
 
         ID2D1RoundedRectangleGeometry* geo;
         factory->CreateRoundedRectangleGeometry(rect, &geo);
 
-        D2D::context->FillGeometry(geo, blurbrush);
+        D2D::context->FillGeometry(geo, FlarialGUI::blurbrush);
 
         Memory::SafeRelease(factory);
         Memory::SafeRelease(geo);

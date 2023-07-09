@@ -206,4 +206,5 @@ namespace FlarialGUI
     extern IDWriteFactory *writeFactory;
 
     extern ID2D1ImageBrush* blurbrush;
+    extern ID2D1Factory* factory;
 };

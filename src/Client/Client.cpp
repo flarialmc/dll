@@ -73,6 +73,8 @@ void Client::initialize()
         { "https://cdn.flarial.net/assets/server-ip.png", Path + "server-ip.png" },
         { "https://cdn.flarial.net/assets/coordinates.png", Path + "coordinates.png" },
         { "https://cdn.flarial.net/assets/ping.png", Path + "ping.png" },
+        { "https://cdn.flarial.net/assets/arrow.png", Path + "arrow.png" },
+        { "https://cdn.flarial.net/assets/potion.png", Path + "potion.png" },
         { "https://cdn.flarial.net/assets/minecraftia.ttf", Path + "minecraftia.ttf" }
     };
 
