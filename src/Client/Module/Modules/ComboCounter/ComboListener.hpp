@@ -26,13 +26,9 @@ class ComboListener : public Listener {
     void onLocalTick(TickEvent& event) override {
          if (event.getActor()->mobHurtTimeComponent->HurtTime >= 1) {
                Combo = 0;
+         std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_hit;
+         if (duration.count() >= 15) Combo = 0;
          }
-    }
-
-    void onLocalTick(TickEvent& event) override {
-        std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_hit;
-        if (duration.count() >= 15) Combo = 0;
-
     }
 
     void onRender(RenderEvent& event) override {
