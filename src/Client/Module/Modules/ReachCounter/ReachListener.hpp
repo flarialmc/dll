@@ -9,11 +9,13 @@
 #include "../../../GUI/Engine/Engine.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include <Windows.h>
+#include <chrono>
 
 class ReachListener : public Listener {
 
 
     float Reach = 0.0f;
+    std::chrono::time_point<std::chrono::high_resolution_clock> last_hit;
     Module* module;
 
     void onAttack(AttackEvent& event) override {
@@ -21,8 +23,14 @@ class ReachListener : public Listener {
         Vec3<float> *TargetPos = event.getActor()->getPosition();
 
         Reach = LPPos->dist(*TargetPos);
+        last_hit = std::chrono::high_resolution_clock::now();
     }
 
+    void onLocalTick(TickEvent& event) override {
+        std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_hit;
+        if (duration.count() >= 15) Reach = 0.0f;
+
+    }
 
     void onRender(RenderEvent& event) override {
 
