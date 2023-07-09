@@ -236,6 +236,9 @@ class ClickGUIRenderer : public Listener {
                     float rectY = Constraints::PercentageConstraint(0.32, "top");
                     float rectWidth = Constraints::RelativeConstraint(0.965, "width");
                     float rectHeight = Constraints::RelativeConstraint(0.55);
+
+                    const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+                    const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
                     round = Constraints::RoundingConstraint(50, 50);
 
                     float anotherRectHeight = Constraints::RelativeConstraint(0.60);
@@ -251,6 +254,16 @@ class ClickGUIRenderer : public Listener {
                     FlarialGUI::PushSize(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
 
                     FlarialGUI::TextBoxVisual(0, Client::settings.getSettingByName<std::string>("fontname")->value, 26, Constraints::PercentageConstraint(0.019, "left"), Constraints::PercentageConstraint(0.10, "top"), "Font (Anything installed in your system)");
+
+                    FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left"), Constraints::PercentageConstraint(0.40, "top"), FlarialGUI::to_wide("Blur Intensity").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+
+                    float percent = FlarialGUI::Slider(7, Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(1.10, textWidth),
+                                                       Constraints::PercentageConstraint(0.40, "top"),
+                                                 D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                                 D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+                                                 D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<float>("blurintensity")->value, 25);
+
+                    Client::settings.getSettingByName<float>("blurintensity")->value = percent;
 
 
                     FlarialGUI::PopSize();

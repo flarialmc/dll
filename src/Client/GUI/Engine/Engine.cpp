@@ -1508,8 +1508,7 @@ void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect, float intensity) {
 
     if(SwapchainHook::init && FlarialGUI::blurbrush != nullptr) {
 
-        if(factory == nullptr)
-        D2D::context->GetFactory(&factory);
+        if(factory == nullptr) D2D::context->GetFactory(&factory);
 
         ID2D1RoundedRectangleGeometry* geo;
         factory->CreateRoundedRectangleGeometry(rect, &geo);
