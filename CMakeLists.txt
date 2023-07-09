@@ -4,10 +4,9 @@ project(Flarial VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 
 if(MSVC)
-    add_compile_options(/GS /MP)
+    add_compile_options(/MD /MP)
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG")
 
 file(GLOB_RECURSE sources "main.cpp" "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp")
 
