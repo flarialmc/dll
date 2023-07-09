@@ -20,6 +20,12 @@ private:
         if(layer != "debug_screen" && layer != "toast_screen")
             SDK::CurrentScreen = layer;
 
+
+        if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+            //Logger::debug(SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(0)->item->name);
+        }
+
+
         func_original(pScreenView, muirc);
     }
 
