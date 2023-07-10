@@ -5,6 +5,7 @@
 
 std::map<std::string, ID2D1Bitmap*> ClickGUIElements::images;
 std::vector<D2D1_MATRIX_3X2_F> ClickGUIElements::matrixes;
+std::vector<Vec2<float>> sizes;
 
 void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string iconpath, const int index)
 {
@@ -15,15 +16,51 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 
     Vec2<float> round = Constraints::RoundingConstraint(34, 34);
 
+
+    if(index > sizes.size() - 1 || index == 0) {
+        float nigga = Constraints::RelativeConstraint(0.19f, "height", true);
+        float gaynigga = Constraints::RelativeConstraint(0.141f, "height", true);
+
+        sizes.emplace_back(nigga, gaynigga);
+    }
+
     // Bottom rounded rect
-    float BottomRoundedWidth = Constraints::RelativeConstraint(0.19f, "height", true);
-    float BottomRoundedHeight = Constraints::RelativeConstraint(0.141f, "height", true);
+    float BottomRoundedWidth = sizes[index].x;
+    float BottomRoundedHeight = sizes[index].y;
+
+    float realY = y;
+    float diffX = 0;
+    float diffY = 0;
+
+    if(FlarialGUI::isInScrollView) realY += FlarialGUI::scrollpos;
+
+    if(FlarialGUI::CursorInRect(x, realY, BottomRoundedWidth, BottomRoundedHeight)) {
+        FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.198f, "height", true),
+                         0.15f * FlarialGUI::frameFactor);
+        FlarialGUI::lerp(sizes[index].y, Constraints::RelativeConstraint(0.149f, "height", true), 0.15f * FlarialGUI::frameFactor);
+
+         diffX = (sizes[index].x - Constraints::RelativeConstraint(0.19f, "height", true)) / 2.0f;
+         diffY = (sizes[index].y - Constraints::RelativeConstraint(0.141f, "height", true)) / 2.0f;
+    } else {
+        FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.19f, "height", true),
+                         0.15f * FlarialGUI::frameFactor);
+        FlarialGUI::lerp(sizes[index].y, Constraints::RelativeConstraint(0.141f, "height", true), 0.15f * FlarialGUI::frameFactor);
+
+        diffX = (sizes[index].x - Constraints::RelativeConstraint(0.19f, "height", true)) / 2.0f;
+        diffY = (sizes[index].y - Constraints::RelativeConstraint(0.141f, "height", true)) / 2.0f;
+    }
+
+
+
+    x -= diffX;
+    y -= diffY;
+
     FlarialGUI::RoundedRect(x, y, D2D1::ColorF(47.0f/255.0f, 32.0f/255.0f, 34.0f/255.0f), BottomRoundedWidth, BottomRoundedHeight, round.x, round.x);
 
 
     // Top rounded rect
 
-    float TopRoundedHeight = Constraints::RelativeConstraint(0.089f, "height", true);
+    float TopRoundedHeight = Constraints::SpacingConstraint(sizes[index].y, 0.635f);
     FlarialGUI::RoundedRectOnlyTopCorner(x, y, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), BottomRoundedWidth, TopRoundedHeight, round.x, round.x);
 
     FlarialGUI::PushSize(x, y, BottomRoundedWidth, BottomRoundedHeight);
@@ -65,11 +102,11 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 
     }
 
-    float buttonWidth = Constraints::RelativeConstraint(0.97);
+    float buttonWidth = Constraints::RelativeConstraint(0.71, "width");
     float buttonHeight = Constraints::RelativeConstraint(0.27);
 
-    float buttonx = Constraints::PercentageConstraint(0.04, "right") ;
-    float buttony = Constraints::PercentageConstraint(0.05, "bottom") ;
+    float buttonx = Constraints::PercentageConstraint(0.04, "right");
+    float buttony = Constraints::PercentageConstraint(0.05, "bottom");
 
     round = Constraints::RoundingConstraint(26, 26);
 
@@ -78,7 +115,6 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
     // Settings Button
     float settingswidth = Constraints::RelativeConstraint(0.17);
     float iconwidth = Constraints::RelativeConstraint(0.10);
-    float settingspacing = Constraints::SpacingConstraint(7.12, settingswidth);
     float settingsheightspac = Constraints::SpacingConstraint(0.31, settingswidth);
 
     float paddingwidth = Constraints::RelativeConstraint(0.26);
@@ -87,8 +123,11 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 
     round = Constraints::RoundingConstraint(20, 20);
 
-    FlarialGUI::RoundedRect(buttonx - paddingspacing, (buttony - paddingwidth) - paddingheightspac, D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), paddingwidth, paddingwidth, round.x, round.x);
-    FlarialGUI::RoundedRectWithImageAndText(index, buttonx - settingspacing, (buttony - settingswidth) - settingsheightspac, settingswidth, settingswidth, D2D1::ColorF(112.0f / 255.0f, 93.0f / 255.0f, 96.0f / 255.0f), "\\Flarial\\assets\\gear.png", iconwidth, iconwidth, L"");
+    float settingx = Constraints::PercentageConstraint(0.025, "left");
+    float settingx2 = Constraints::PercentageConstraint(0.059, "left");
+
+    FlarialGUI::RoundedRect(settingx, (buttony - paddingwidth) - paddingheightspac, D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), paddingwidth, paddingwidth, round.x, round.x);
+    FlarialGUI::RoundedRectWithImageAndText(index, settingx2, (buttony - settingswidth) - settingsheightspac, settingswidth, settingswidth, D2D1::ColorF(112.0f / 255.0f, 93.0f / 255.0f, 96.0f / 255.0f), "\\Flarial\\assets\\gear.png", iconwidth, iconwidth, L"");
 
 
     if (!iconpath.empty() && images[mod->name] == nullptr) {
