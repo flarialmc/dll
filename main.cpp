@@ -8,11 +8,8 @@
 #include "src/Client/GUI/D2D.hpp"
 #include "src/Client/Hook/Hooks/Render/ResizeHook.hpp"
 #include <kiero.h>
-#include "src/Utils/Memory/Indetour/Indetour.hpp"
 
-void wow() {
-    Logger::debug("gaming");
-}
+
 
 DWORD WINAPI init(HMODULE real)
 {
@@ -20,9 +17,7 @@ DWORD WINAPI init(HMODULE real)
     Client::initialize();
     Logger::info("Initializing Client");
 
-    //Indetour indetour;
-
-   // indetour.hook((void*)Memory::findSig("48 8B ? 55 53 56 57 41 ? 41 ? 48 8D ? ? ? ? ? 48 81 EC ? ? ? ? 0F 29 ? ? 0F 29 ? ? 44 0F ? ? ? 44 0F ? ? ? 44 0F ? ? ? ? ? ? 44 0F ? ? ? ? ? ? 44 0F ? ? ? ? ? ? 44 0F ? ? ? ? ? ? 44 0F ? ? ? ? ? ? 44 0F ? ? ? ? ? ? 48 8B ? ? ? ? ? 48 33 ? 48 89 ? ? 4D 8B"), &wow);
+   
     
     while (true) {
         if (Client::disable) {
