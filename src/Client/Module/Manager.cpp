@@ -22,6 +22,8 @@
 #include "Modules/PingCounter/PingCounter.hpp"
 #include "Modules/PotCounter/PotCounter.hpp"
 #include "Modules/ArrowCounter/ArrowCounter.hpp"
+#include "Modules/ThirdPersonNametag/ThirdPerson.hpp"
+
 namespace ModuleManager {
     std::vector<Module*> modules;
 }
@@ -47,6 +49,7 @@ void ModuleManager::initialize()
     modules.push_back(new Fullbright());
     modules.push_back(new ForceCoords());
     modules.push_back(new Keystrokes());
+    modules.push_back(new ThirdPerson());
 
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));
