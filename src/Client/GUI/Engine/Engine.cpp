@@ -1548,7 +1548,7 @@ void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect, float intensity) {
 
 void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect) {
     // Create a unique identifier for the rect
-    std::string uniqueIdentifier = "rect_" + std::to_string(rect.rect.left) + "_" + std::to_string(rect.rect.top) + "_" + std::to_string(rect.rect.right) + "_" + std::to_string(rect.rect.bottom);
+    std::string uniqueIdentifier = "rect_" + std::to_string((int)rect.rect.left) + "_" + std::to_string((int)rect.rect.top) + "_" + std::to_string((int)rect.rect.right) + "_" + std::to_string((int)rect.rect.bottom);
     bool shouldntDo = false;
     // Check if the cached bitmap for the rect already exists
     if (cachedBitmaps.find(uniqueIdentifier) == cachedBitmaps.end()) {
@@ -1577,6 +1577,9 @@ void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect) {
             ID2D1Image *out;
             effect->GetOutput(&out);
 
+            // Set the rendering target to the main bitmap
+            D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
+
             // Cache the bitmap using the unique identifier
             cachedBitmaps[uniqueIdentifier] = out;
 
@@ -1590,9 +1593,6 @@ void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect) {
     if(!shouldntDo) {
         // Retrieve the cached bitmap for the rect
         ID2D1Image *cachedOut = cachedBitmaps[uniqueIdentifier];
-
-        // Set the rendering target to the main bitmap
-        D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
         D2D::context->DrawImage(cachedOut);
     }
 }
