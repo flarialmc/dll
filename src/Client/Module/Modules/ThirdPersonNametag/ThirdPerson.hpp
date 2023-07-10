@@ -36,6 +36,7 @@ public:
     }
 
     void onDisable() override {
+        ThirdPersonListener::unpatch();
         Module::onDisable();
     }
 

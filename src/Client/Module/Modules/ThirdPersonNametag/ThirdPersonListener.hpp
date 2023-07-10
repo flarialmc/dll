@@ -11,9 +11,9 @@ class ThirdPersonListener : public Listener {
 
     Module* module;
     bool enabled;
-    std::vector<uint8_t> Original;
-    std::vector<uint8_t> Patched;
-    uintptr_t real = Memory::findSig("0F 84 ? ? ? ? 49 ? ? 49 ? ? E8 ? ? ? ? 84 ? 0F 84");
+    static inline std::vector<uint8_t> Original;
+    static inline std::vector<uint8_t> Patched;
+    static inline uintptr_t real = Memory::findSig("0F 84 ? ? ? ? 49 ? ? 49 ? ? E8 ? ? ? ? 84 ? 0F 84");
 
 
     void onLocalTick(TickEvent& event) override {
@@ -35,20 +35,12 @@ class ThirdPersonListener : public Listener {
 
     }
 
-    void unpatch() {
-
-        DWORD oldProtect;
-        VirtualProtect((LPVOID)real, Original.size(), PAGE_EXECUTE_READWRITE, &oldProtect);
-        memcpy((LPVOID)real, Original.data(), Original.size());
-        VirtualProtect((LPVOID)real, Original.size(), oldProtect, &oldProtect);
-
-    }
-
 public:
     explicit ThirdPersonListener(const char string[5], Module* module, std::vector<uint8_t> Original) {
         this->name = string;
         this->module = module;
         this->Original = Original;
+        this->Patched = std::vector<uint8_t>();
 
         Patched.push_back(0x90);
         Patched.push_back(0x90);
@@ -56,6 +48,15 @@ public:
         Patched.push_back(0x90);
         Patched.push_back(0x90);
         Patched.push_back(0x90);
+
+    }
+
+    static void unpatch() {
+
+        DWORD oldProtect;
+        VirtualProtect((LPVOID)real, Original.size(), PAGE_EXECUTE_READWRITE, &oldProtect);
+        memcpy((LPVOID)real, Original.data(), Original.size());
+        VirtualProtect((LPVOID)real, Original.size(), oldProtect, &oldProtect);
 
     }
 };
