@@ -26,8 +26,8 @@ private:
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
 
            
-            BaseActorRenderContext barc(muirc->screenContext, muirc->clientInstance, muirc->clientInstance->mcgame);
-            barc.itemRenderer->renderGuiItemNew(&barc, SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(0), 0, 50.0f, 50.0f, 1.0f, 12.0f, false);
+          //  BaseActorRenderContext barc(muirc->screenContext, muirc->clientInstance, muirc->clientInstance->mcgame);
+          //  barc.itemRenderer->renderGuiItemNew(&barc, SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(0), 0, 50.0f, 50.0f, 1.0f, 12.0f, false);
 
             //Logger::debug(std::format("dn {}", &barc));
             //Logger::debug(SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(0)->item->name);
