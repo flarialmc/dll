@@ -8,8 +8,10 @@
 std::map<std::string, ID2D1Bitmap*> ImagesClass::eimages;
 IDWriteFactory *FlarialGUI::writeFactory;
 ID2D1ImageBrush* FlarialGUI::blurbrush;
+ID2D1ImageBrush* FlarialGUI::shadowbrush;
 ID2D1Factory* FlarialGUI::factory;
 std::unordered_map<std::string, ID2D1SolidColorBrush*> FlarialGUI::brushCache;
+std::unordered_map<std::string, ID2D1Image*> FlarialGUI::cachedBitmaps;
 
 float maxDarkenAmount = 0.1;
 
@@ -1361,6 +1363,30 @@ void FlarialGUI::ApplyGaussianBlur(float blurIntensity)
     }
 }
 
+void FlarialGUI::ApplySusGaussianBlur(float blurIntensity)
+{
+
+    ID2D1Effect* effect;
+    D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &effect);
+
+    if(SwapchainHook::init) {
+
+        ID2D1Image* input;
+        D2D::context->GetTarget(&input);
+
+        effect->SetInput(0, input);
+
+        // Set blur intensity
+        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, blurIntensity);
+        // Draw the image with the Gaussian blur effect
+        D2D::context->DrawImage(effect);
+
+        Memory::SafeRelease(input);
+        Memory::SafeRelease(effect);
+    }
+}
+
 void FlarialGUI::Notify(std::string text) {
 
     Notification e;
@@ -1491,7 +1517,6 @@ void FlarialGUI::NotifyHeartbeat() {
             logoY += Constraints::SpacingConstraint(0.185, logoWidth);
             FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide(notif.text).c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, 125);
 
-
             FlarialGUI::PopSize();
 
             if(notif.currentPos > Constraints::PercentageConstraint(0.01, "right", true)) notif.finished = true;
@@ -1521,58 +1546,49 @@ void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect, float intensity) {
 
 }
 
+void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect) {
+    // Create a unique identifier for the rect
+    std::string uniqueIdentifier = "rect_" + std::to_string(rect.rect.left) + "_" + std::to_string(rect.rect.top) + "_" + std::to_string(rect.rect.right) + "_" + std::to_string(rect.rect.bottom);
 
-void FlarialGUI::AddShadowRect(const D2D1_POINT_2F& obj_min, const D2D1_POINT_2F& obj_max, D2D1_COLOR_F shadow_col, float shadow_thickness, const D2D1_POINT_2F& shadow_offset, float obj_rounding)
-{
-    if (shadow_col.a == 0)
-        return;
+    // Check if the cached bitmap for the rect already exists
+    if (cachedBitmaps.find(uniqueIdentifier) == cachedBitmaps.end()) {
+        // Create a new blank bitmap
+        ID2D1Bitmap1* newLayer = nullptr;
+        D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]->GetPixelFormat());
+        D2D::context->CreateBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
 
-    D2D1_RECT_F inner_rect; // Rectangle used for inner shape (with rounded corners)
-    bool has_inner_rect = false;
+        D2D::context->SetTarget(newLayer);
+        D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
 
-    // Generate a path describing the inner rectangle and copy it to our buffer
-    const bool is_rounded = (obj_rounding > 0.0f);
-    if (is_rounded)
-    {
-        inner_rect.left = obj_min.x + shadow_thickness;
-        inner_rect.top = obj_min.y + shadow_thickness;
-        inner_rect.right = obj_max.x - shadow_thickness;
-        inner_rect.bottom = obj_max.y - shadow_thickness;
-        has_inner_rect = true;
+        ID2D1SolidColorBrush* colorBrush = nullptr;
+        D2D::context->CreateSolidColorBrush(D2D1::ColorF(0, 0, 0, 0.75f), &colorBrush);
+        D2D::context->FillRectangle(rect.rect, colorBrush);
+
+        colorBrush->Release();
+
+        ID2D1Effect* effect;
+        D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &effect);
+
+        effect->SetInput(0, newLayer);
+        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 10.0f);
+
+        ID2D1Image* out;
+        effect->GetOutput(&out);
+
+        // Cache the bitmap using the unique identifier
+        cachedBitmaps[uniqueIdentifier] = out;
+
+        newLayer->Release();
+        effect->Release();
     }
 
-    // Draw the relevant chunks of the texture (the texture is split into a 3x3 grid)
-    for (int x = 0; x < 3; x++)
-    {
-        for (int y = 0; y < 3; y++)
-        {
-            const int uv_index = x + (y + y + y); // y*3 formatted so as to ensure the compiler avoids an actual multiply
+    // Retrieve the cached bitmap for the rect
+    ID2D1Image* cachedOut = cachedBitmaps[uniqueIdentifier];
 
-            D2D1_RECT_F draw_rect;
-            switch (x)
-            {
-                case 0: draw_rect.left = obj_min.x - shadow_thickness; draw_rect.right = obj_min.x; break;
-                case 1: draw_rect.left = obj_min.x; draw_rect.right = obj_max.x; break;
-                case 2: draw_rect.left = obj_max.x; draw_rect.right = obj_max.x + shadow_thickness; break;
-            }
-            switch (y)
-            {
-                case 0: draw_rect.top = obj_min.y - shadow_thickness; draw_rect.bottom = obj_min.y; break;
-                case 1: draw_rect.top = obj_min.y; draw_rect.bottom = obj_max.y; break;
-                case 2: draw_rect.top = obj_max.y; draw_rect.bottom = obj_max.y + shadow_thickness; break;
-            }
-
-            ID2D1SolidColorBrush* _shadowBrush;
-            D2D::context->CreateSolidColorBrush(shadow_col, &_shadowBrush);
-
-            if (has_inner_rect)
-                D2D::context->FillRectangle(&draw_rect, _shadowBrush); // No clipping path (draw entire shadow)
-            else if (is_rounded)
-                D2D::context->FillRoundedRectangle(D2D1::RoundedRect(draw_rect, obj_rounding, obj_rounding), _shadowBrush); // Complex path for rounded rectangles
-            else
-                D2D::context->FillRectangle(&draw_rect, _shadowBrush); // Simple fast path for non-rounded rectangles
-        }
-    }
+    // Set the rendering target to the main bitmap
+    D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
+    D2D::context->DrawImage(cachedOut);
 }
 
 void FlarialGUI::CopyBitmap(ID2D1Bitmap1* from, ID2D1Bitmap** to)

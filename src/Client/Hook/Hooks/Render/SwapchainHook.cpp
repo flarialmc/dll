@@ -37,6 +37,8 @@ bool SwapchainHook::init = false;
 
 void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
 
+
+
     std::chrono::duration<float> elapsed = fpsclock.now() - start;
     MC::frames += 1;
 
@@ -65,8 +67,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
     FlarialGUI::frameFactor = min(FlarialGUI::frameFactor, 1.0f);
 
 
-    if (!SwapchainHook::init) {
 
+    if (!SwapchainHook::init) {
         if (SwapchainHook::queue == nullptr) {
 
             ID3D12Device5* d3d12device3;
@@ -92,7 +94,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                     D2D1CreateDeviceContext(eBackBuffer, properties, &D2D::context);
 
-                    D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW, D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_IGNORE), 96.0, 96.0);
+                    D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW, D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED), 96.0, 96.0);
                     D2D::context->CreateBitmapFromDxgiSurface(eBackBuffer, props, &SwapchainHook::D2D1Bitmap);
 
                     Memory::SafeRelease(eBackBuffer);
@@ -143,7 +145,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(
                         D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
-                        D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_IGNORE), dpi, dpi);
+                        D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED), dpi, dpi);
 
                 D3D12_DESCRIPTOR_HEAP_DESC heapDescriptorBackBuffers = {};
                 heapDescriptorBackBuffers.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
