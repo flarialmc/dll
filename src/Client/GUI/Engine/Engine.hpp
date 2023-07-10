@@ -207,4 +207,9 @@ namespace FlarialGUI
 
     extern ID2D1ImageBrush* blurbrush;
     extern ID2D1Factory* factory;
+    extern ID2D1ImageBrush* shadowbrush;
+
+    void ShadowRect(D2D1_ROUNDED_RECT rect);
+
+    void ApplySusGaussianBlur(float blurIntensity);
 };
