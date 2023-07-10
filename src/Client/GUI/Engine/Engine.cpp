@@ -1549,7 +1549,7 @@ void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect, float intensity) {
 void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect) {
     // Create a unique identifier for the rect
     std::string uniqueIdentifier = "rect_" + std::to_string(rect.rect.left) + "_" + std::to_string(rect.rect.top) + "_" + std::to_string(rect.rect.right) + "_" + std::to_string(rect.rect.bottom);
-
+    bool shouldntDo = false;
     // Check if the cached bitmap for the rect already exists
     if (cachedBitmaps.find(uniqueIdentifier) == cachedBitmaps.end()) {
         // Create a new blank bitmap
@@ -1557,38 +1557,44 @@ void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect) {
         D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]->GetPixelFormat());
         D2D::context->CreateBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
 
-        D2D::context->SetTarget(newLayer);
-        D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
+        if(newLayer != nullptr) {
+            D2D::context->SetTarget(newLayer);
+            D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
 
-        ID2D1SolidColorBrush* colorBrush = nullptr;
-        D2D::context->CreateSolidColorBrush(D2D1::ColorF(0, 0, 0, 0.75f), &colorBrush);
-        D2D::context->FillRectangle(rect.rect, colorBrush);
+            ID2D1SolidColorBrush *colorBrush = nullptr;
+            D2D::context->CreateSolidColorBrush(D2D1::ColorF(0, 0, 0, 0.75f), &colorBrush);
+            D2D::context->FillRectangle(rect.rect, colorBrush);
 
-        colorBrush->Release();
+            colorBrush->Release();
 
-        ID2D1Effect* effect;
-        D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &effect);
+            ID2D1Effect *effect;
+            D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &effect);
 
-        effect->SetInput(0, newLayer);
-        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
-        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 10.0f);
+            effect->SetInput(0, newLayer);
+            effect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+            effect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 10.0f);
 
-        ID2D1Image* out;
-        effect->GetOutput(&out);
+            ID2D1Image *out;
+            effect->GetOutput(&out);
 
-        // Cache the bitmap using the unique identifier
-        cachedBitmaps[uniqueIdentifier] = out;
+            // Cache the bitmap using the unique identifier
+            cachedBitmaps[uniqueIdentifier] = out;
 
-        newLayer->Release();
-        effect->Release();
+            newLayer->Release();
+            effect->Release();
+        } else {
+            shouldntDo = true;
+        }
     }
 
-    // Retrieve the cached bitmap for the rect
-    ID2D1Image* cachedOut = cachedBitmaps[uniqueIdentifier];
+    if(!shouldntDo) {
+        // Retrieve the cached bitmap for the rect
+        ID2D1Image *cachedOut = cachedBitmaps[uniqueIdentifier];
 
-    // Set the rendering target to the main bitmap
-    D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
-    D2D::context->DrawImage(cachedOut);
+        // Set the rendering target to the main bitmap
+        D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
+        D2D::context->DrawImage(cachedOut);
+    }
 }
 
 void FlarialGUI::CopyBitmap(ID2D1Bitmap1* from, ID2D1Bitmap** to)
