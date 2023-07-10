@@ -43,6 +43,12 @@ void ResizeHook::CleanShit(bool isResize) {
 
     }
 
+    for (auto& entry : FlarialGUI::cachedBitmaps) {
+        ID2D1Image* bitmap = entry.second;
+        Memory::SafeRelease(bitmap);
+    }
+    FlarialGUI::cachedBitmaps.clear();
+
     ClickGUIElements::images.clear();
 
     for (auto& i : ImagesClass::eimages) {
