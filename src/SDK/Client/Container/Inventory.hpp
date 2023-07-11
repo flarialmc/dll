@@ -1,10 +1,8 @@
 #pragma once
 
-#include "../Item/ItemStack.h"
+#include "../Item/ItemStack.hpp"
 
 class Inventory {
 public:
-    ItemStack* getItem(int slot) {
-        return Memory::CallVFunc<5, ItemStack*>(this, slot);
-    }
+    ItemStack* getItem(int slot);
 };
