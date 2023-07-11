@@ -30,6 +30,11 @@ void SwapchainHook::enableHook()
 
     swapchain_ptr = (void *)kiero::getMethodsTable()[index];
 
+    if(Client::settings.getSettingByName<bool>("killdx")->value) {
+        Logger::debug("ye");
+        SwapchainHook::queue = nullptr;
+    }
+
     this->manualHook(swapchain_ptr, swapchainCallback, (void **)&func_original);
 }
 
@@ -65,9 +70,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
 // Limit the frame factor to a maximum of 1.0
     FlarialGUI::frameFactor = min(FlarialGUI::frameFactor, 1.0f);
-
-    if(Client::settings.getSettingByName<bool>("killdx")->value)
-    SwapchainHook::queue = nullptr;
 
     if (!SwapchainHook::init) {
         if (SwapchainHook::queue == nullptr) {
