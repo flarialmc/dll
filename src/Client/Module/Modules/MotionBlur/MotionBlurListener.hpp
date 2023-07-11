@@ -42,7 +42,7 @@ public:
             for (ID2D1Bitmap* frame : previousFrames)
             {
                 D2D::context->DrawBitmap(frame, D2D1::RectF(0.f, 0.f, MC::windowSize.x, MC::windowSize.y), alpha, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
-                alpha *= 0.7f;
+                alpha *= module->settings.getSettingByName<float>("intensity")->value;
             }
         }
 
