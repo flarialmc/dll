@@ -10,7 +10,7 @@ endif()
 
 file(GLOB_RECURSE sources "main.cpp" "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp")
 
-add_library(Flarial SHARED ${sources} src/Client/Module/Modules/Module.cpp src/Client/Module/Modules/ThirdPersonNametag/ThirdPerson.hpp src/Client/Module/Modules/ThirdPersonNametag/ThirdPersonListener.hpp)
+add_library(Flarial SHARED ${sources})
 
 target_include_directories(Flarial PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/")
 

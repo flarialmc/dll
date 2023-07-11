@@ -23,6 +23,7 @@
 #include "Modules/PotCounter/PotCounter.hpp"
 #include "Modules/ArrowCounter/ArrowCounter.hpp"
 #include "Modules/ThirdPersonNametag/ThirdPerson.hpp"
+#include "Modules/MotionBlur/MotionBlur.hpp"
 
 namespace ModuleManager {
     std::vector<Module*> modules;
@@ -31,6 +32,7 @@ namespace ModuleManager {
 void ModuleManager::initialize()
 {
 
+    modules.push_back(new MotionBlur());
     modules.push_back(new Zoom());
     modules.push_back(new Deepfry());
     modules.push_back(new ClickGUI());
