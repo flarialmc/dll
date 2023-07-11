@@ -4,7 +4,7 @@
 #include "../Core/ClientInstance.hpp"
 #include "../../../Utils/Memory/Memory.hpp"
 
-class ItemRenderer;
+FK(ItemRenderer)
 
 class BaseActorRenderContext {
 private:
