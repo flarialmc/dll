@@ -73,7 +73,7 @@ private:
 
             //Logger::debug(std::format("dn {}", &barc));
             //std::format("[Hook] Successfully hooked {} at address: {}", this->name
-            Logger::debug(format("found hurt {}", SDK::clientInstance->getLocalPlayer()->mobHurtTimeComponent));
+            //Logger::debug(format("found hurt {}", SDK::clientInstance->getLocalPlayer()->mobHurtTimeComponent));
             //Logger::debug(format("Found Item address at: {}", SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(0)));
         }
 
