@@ -7,7 +7,6 @@
 #include "Hooks/Visual/getGammaHook.hpp"
 #include "Hooks/Game/GameModeAttack.hpp"
 #include "Hooks/Game/RaknetTick.hpp"
-#include "Hooks/Game/GameModeAttack.hpp"
 #include "Hooks/Game/getViewPerspective.hpp"
 #include "../Client.hpp"
 
