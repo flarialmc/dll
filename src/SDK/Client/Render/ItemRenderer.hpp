@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BaseActorRenderContext.hpp"
-#include "../Item/ItemStack.h"
+#include "../Item/ItemStack.hpp"
 
 class ItemRenderer {
 public:
