@@ -1,6 +1,6 @@
 #include "../Hook.hpp"
-#include "../../../../SDK/Client/Actor/GameMode.hpp"
 #include "../../../../SDK/Client/Actor/Actor.hpp"
+#include "../../../../SDK/Client/Actor/Gamemode.hpp"
 
 class GameModeAttackHook : public Hook {
 

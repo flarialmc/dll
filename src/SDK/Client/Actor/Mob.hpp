@@ -5,16 +5,7 @@
 #include "../../../Utils/Memory/Memory.hpp"
 
 class Mob : public Actor {
-
 public:
-    uintptr_t** VTable;
-
-
-    void setSprinting(bool state) {
-
-        Memory::CallVFunc<270, void, bool>(this, state);
-
-    }
-
-
+    BUILD_ACCESS(this, MobHurtTimeComponent*, mobHurtTimeComponent, 0x660);
+    void setSprinting(bool state);
 };

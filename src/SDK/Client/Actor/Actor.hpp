@@ -6,6 +6,7 @@
 #include "../../../Utils/Logger/Logger.hpp"
 #include "Components/MoveInputComponent.hpp"
 #include "Components/MobHurtTimeComponent.hpp"
+#include "../Level/Level.h"
 #include "../../../Utils/Utils.hpp"
 
 enum ActorFlags
@@ -128,37 +129,14 @@ enum ActorFlags
 
 class Actor {
 public:
-public:
 
+    BUILD_ACCESS(this, Level*, level, 0x260);
 
+    template <typename Component>
+    Component* tryGet(uintptr_t addr);
 
- 
-    BUILD_ACCESS(this, MobHurtTimeComponent*, mobHurtTimeComponent, 0x660);
-
-    static inline uintptr_t sig = Memory::findSig("40 53 48 83 EC 20 48 8B DA BA 2E");
-
-    MoveInputComponent* getMoveInputHandler() {
-
-        auto a1 = **(uintptr_t ***) (this + 0x8);
-        auto a2 = *(uintptr_t *) (this + 0x10);
-
-        using efunc = MoveInputComponent *(__thiscall *)(uintptr_t, uintptr_t *);
-        auto func = reinterpret_cast<efunc>(sig);
-        return func(reinterpret_cast<uintptr_t>(a1), &a2);
-
-    }
-
-    bool getActorFlag(int flag) {
-        return Memory::CallVFunc<0, bool, int>(this, flag);
-    }
-
-    Vec3<float>* getPosition() {
-        return Memory::CallVFunc<22, Vec3<float>*>(this);
-    }
-
-    bool wasHurt() {
-        return Memory::CallVFunc<229,bool>(this);
-    }
-
-
+    MoveInputComponent* getMoveInputHandler();
+    bool getActorFlag(int flag);
+    Vec3<float>* getPosition();
+    bool wasHurt();
 };

@@ -8,6 +8,7 @@ void GameModeAttackHook::callback(Gamemode* gamemode, Actor* actor) {
     //  Combo counter and reach counter logic will be done here in the next commit.
     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() == gamemode->player) {
+ 
             AttackEvent eventLOL(actor);
             EventHandler::onAttack(eventLOL);
         }
