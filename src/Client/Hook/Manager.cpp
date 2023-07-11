@@ -7,7 +7,7 @@
 #include "Hooks/Visual/getGammaHook.hpp"
 #include "Hooks/Game/GameModeAttack.hpp"
 #include "Hooks/Game/RaknetTick.hpp"
-
+#include "Hooks/Game/getViewPerspective.hpp"
 
 
 
@@ -20,6 +20,7 @@ void HookManager::initialize()
 
     MH_Initialize();
 
+    hooks.push_back(new getViewPerspectiveHook());
     hooks.push_back(new KeyHook());
     hooks.push_back(new MouseHook());
     hooks.push_back(new CommandListHook());
@@ -28,6 +29,7 @@ void HookManager::initialize()
     hooks.push_back(new GameModeAttackHook());
     hooks.push_back(new SwapchainHook());
     hooks.push_back(new ResizeHook());
+
     hooks.push_back(new getFovHook());
     hooks.push_back(new ActorNormalTick());
     hooks.push_back(new OnSuspendHook());

@@ -22,6 +22,7 @@
 #include "Modules/PingCounter/PingCounter.hpp"
 #include "Modules/PotCounter/PotCounter.hpp"
 #include "Modules/ArrowCounter/ArrowCounter.hpp"
+#include "Modules/SnapLook/SnapLook.hpp"
 #include "Modules/ThirdPersonNametag/ThirdPerson.hpp"
 #include "Modules/MotionBlur/MotionBlur.hpp"
 
@@ -52,7 +53,7 @@ void ModuleManager::initialize()
     modules.push_back(new ForceCoords());
     modules.push_back(new Keystrokes());
     modules.push_back(new ThirdPerson());
-
+    modules.push_back(new SnapLook());
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));
 }
