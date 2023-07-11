@@ -86,7 +86,7 @@ void Client::initialize()
         Client::settings.addSetting("fontname", (std::string)"Space Grotesk");
 
     if(Client::settings.getSettingByName<float>("blurintensity") == nullptr)
-        Client::settings.addSetting("blurintensity", 7.0f);
+        Client::settings.addSetting("blurintensity", 18.0f);
 
     // Create threads to download the files
     std::vector<std::thread> threads;
