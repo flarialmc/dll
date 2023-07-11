@@ -7,8 +7,7 @@
 #include "Hooks/Visual/getGammaHook.hpp"
 #include "Hooks/Game/GameModeAttack.hpp"
 #include "Hooks/Game/RaknetTick.hpp"
-#include "Hooks/Game/getViewPerspective.hpp"
-
+#include "../Client.hpp"
 
 
 std::vector<Hook *> HookManager::hooks;
@@ -20,16 +19,21 @@ void HookManager::initialize()
 
     MH_Initialize();
 
-    hooks.push_back(new getViewPerspectiveHook());
+
+    kiero::init(kiero::RenderType::D3D12);
+
     hooks.push_back(new KeyHook());
     hooks.push_back(new MouseHook());
+
+    if(!Client::settings.getSettingByName<bool>("killdx")->value)
     hooks.push_back(new CommandListHook());
+
+
     hooks.push_back(new RaknetTickHook());
     hooks.push_back(new SetUpAndRenderHook());
     hooks.push_back(new GameModeAttackHook());
     hooks.push_back(new SwapchainHook());
     hooks.push_back(new ResizeHook());
-
     hooks.push_back(new getFovHook());
     hooks.push_back(new ActorNormalTick());
     hooks.push_back(new OnSuspendHook());

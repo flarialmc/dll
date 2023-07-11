@@ -76,7 +76,9 @@ void Client::initialize()
         { "https://cdn.flarial.net/assets/arrow.png", Path + "arrow.png" },
         { "https://cdn.flarial.net/assets/potion.png", Path + "potion.png" },
         { "https://cdn.flarial.net/assets/nametag.png", Path + "nametag.png" },
-        { "https://cdn.flarial.net/assets/minecraftia.ttf", Path + "minecraftia.ttf" }
+        { "https://cdn.flarial.net/assets/minecraftia.ttf", Path + "minecraftia.ttf" },
+        { "https://cdn.flarial.net/assets/blur.png", Path + "blur.png" },
+        { "https://cdn.flarial.net/assets/eye.png", Path + "eye.png" }
     };
 
     Client::CheckSettingsFile();
@@ -87,6 +89,9 @@ void Client::initialize()
 
     if(Client::settings.getSettingByName<float>("blurintensity") == nullptr)
         Client::settings.addSetting("blurintensity", 18.0f);
+
+    if(Client::settings.getSettingByName<bool>("killdx") == nullptr)
+        Client::settings.addSetting("killdx", false);
 
     // Create threads to download the files
     std::vector<std::thread> threads;

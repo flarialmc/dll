@@ -23,8 +23,7 @@ public:
 
         int maxFrames = (int)module->settings.getSettingByName<float>("intensity2")->value;
 
-        if(module->settings.getSettingByName<bool>("enabled")->value) {
-
+        if(module->settings.getSettingByName<bool>("enabled")->value && SDK::clientInstance->getTopScreenName() == "hud_screen") {
 
             if (previousFrames.size() >= static_cast<size_t>(maxFrames)) {
                 // Remove excess frames if maxFrames is reduced
