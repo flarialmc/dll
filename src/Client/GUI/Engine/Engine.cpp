@@ -1578,7 +1578,8 @@ void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect) {
             effect->GetOutput(&out);
 
             // Set the rendering target to the main bitmap
-            D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
+            if(SwapchainHook::queue != nullptr) D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
+            else D2D::context->SetTarget(SwapchainHook::D2D1Bitmap);
 
             // Cache the bitmap using the unique identifier
             cachedBitmaps[uniqueIdentifier] = out;
