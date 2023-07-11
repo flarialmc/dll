@@ -6,6 +6,6 @@
 
 class Mob : public Actor {
 public:
-    BUILD_ACCESS(this, MobHurtTimeComponent*, mobHurtTimeComponent, 0x660);
+    BUILD_ACCESS(this, MobHurtTimeComponent*, mobHurtTimeComponent, 0x608);
     void setSprinting(bool state);
 };

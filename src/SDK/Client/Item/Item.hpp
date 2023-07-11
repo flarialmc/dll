@@ -5,6 +5,6 @@
 class Item {
 public:
 	BUILD_ACCESS(this, std::string, AtlasTextureFile, 0x8); 
-	BUILD_ACCESS(this, std::string, Namespace, 0x118); 
-	BUILD_ACCESS(this, std::string, name, 0x0C0); 
+	BUILD_ACCESS(this, std::string, Namespace, 0xF8);
+	BUILD_ACCESS(this, std::string, name, 0xD0);
 };

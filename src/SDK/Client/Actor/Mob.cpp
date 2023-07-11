@@ -2,5 +2,5 @@
 
 
 void Mob::setSprinting(bool state) {
-    Memory::CallVFunc<270, void, bool>(this, state);
+    Memory::CallVFunc<256, void, bool>(this, state);
 }   

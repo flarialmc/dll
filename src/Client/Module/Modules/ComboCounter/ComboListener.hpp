@@ -25,7 +25,8 @@ class ComboListener : public Listener {
 
     void onLocalTick(TickEvent& event) override {
         auto LP = reinterpret_cast<LocalPlayer*>(event.getActor());
-         if (LP->mobHurtTimeComponent->HurtTime >= 1) Combo = 0;
+         if (LP->mobHurtTimeComponent->HurtTime != 0) 
+             Combo = 0;
          std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_hit;
          if (duration.count() >= 15) Combo = 0;
     }

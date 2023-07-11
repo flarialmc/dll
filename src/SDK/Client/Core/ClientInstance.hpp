@@ -15,15 +15,15 @@ public:
 	}
 
     void grabMouse() {
-        return Memory::CallVFunc<304, void>(this);
+        return Memory::CallVFunc<306, void>(this);
     }
 
     void releaseMouse() {
-        return Memory::CallVFunc<305, void>(this);
+        return Memory::CallVFunc<307, void>(this);
     }
 
     void refocusMouse() {
-        return Memory::CallVFunc<306, void>(this);
+        return Memory::CallVFunc<308, void>(this);
     }
 
     std::string getTopScreenName() ;

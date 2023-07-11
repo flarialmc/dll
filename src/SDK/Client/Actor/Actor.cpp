@@ -19,7 +19,7 @@ Vec3<float>* Actor::getPosition() {
 }
 
 bool Actor::wasHurt() {
-    return Memory::CallVFunc<229, bool>(this);
+    return Memory::CallVFunc<215, bool>(this);
 }
 
 MoveInputComponent* Actor::getMoveInputHandler() {
