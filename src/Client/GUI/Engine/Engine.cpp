@@ -457,7 +457,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
     const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
     const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
 
-    text = FlarialGUI::TextBox(index, text, 16, x, y, textWidth, percHeight);
+    text = FlarialGUI::TextBox(index, text, 16, x, y, Constraints::SpacingConstraint(1.55, textWidth), percHeight);
 
     if(TextBoxes[index].isActive) col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
     else col = D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f);

@@ -163,6 +163,9 @@ public:
                 return false;
             }
         }
+
+        for(TextBoxStruct i : FlarialGUI::TextBoxes)
+            if(i.isActive) return false;
         // All keys in the keybind are being held down
         return true;
     }
