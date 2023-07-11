@@ -1554,8 +1554,8 @@ void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect) {
     if (cachedBitmaps.find(uniqueIdentifier) == cachedBitmaps.end()) {
         // Create a new blank bitmap
         ID2D1Bitmap1* newLayer = nullptr;
-        D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]->GetPixelFormat());
-        D2D::context->CreateBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
+        D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, D2D::context->GetPixelFormat());
+        D2D::context->CreateBitmap(D2D::context->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
 
         if(newLayer != nullptr) {
             D2D::context->SetTarget(newLayer);
