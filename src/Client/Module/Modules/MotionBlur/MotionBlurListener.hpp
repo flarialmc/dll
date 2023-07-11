@@ -11,7 +11,6 @@ class MotionBlurListener : public Listener {
 
     Module* module;
     std::vector<ID2D1Bitmap*> previousFrames;
-    const size_t maxFrames = 5; // Maximum number of frames to store
 
 public:
     explicit MotionBlurListener(const char string[5], Module* module) {
@@ -22,13 +21,18 @@ public:
 
     void onRender(RenderEvent& event) override {
 
+        int maxFrames = (int)module->settings.getSettingByName<float>("intensity2")->value;
+
         if(module->settings.getSettingByName<bool>("enabled")->value) {
 
 
-            if (previousFrames.size() >= maxFrames)
-            {
-                previousFrames[0]->Release();
-                previousFrames.erase(previousFrames.begin());
+            if (previousFrames.size() >= static_cast<size_t>(maxFrames)) {
+                // Remove excess frames if maxFrames is reduced
+                size_t framesToRemove = previousFrames.size() - static_cast<size_t>(maxFrames);
+                for (size_t i = 0; i < framesToRemove; ++i) {
+                    previousFrames[i]->Release();
+                }
+                previousFrames.erase(previousFrames.begin(), previousFrames.begin() + framesToRemove);
             }
 
             ID2D1Bitmap* currentFrame = nullptr;
