@@ -88,6 +88,9 @@ void Client::initialize()
     if(Client::settings.getSettingByName<float>("blurintensity") == nullptr)
         Client::settings.addSetting("blurintensity", 18.0f);
 
+    if(Client::settings.getSettingByName<bool>("killdx") == nullptr)
+        Client::settings.addSetting("killdx", false);
+
     // Create threads to download the files
     std::vector<std::thread> threads;
     for (const auto& data : fileData) {
