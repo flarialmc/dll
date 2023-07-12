@@ -26,6 +26,7 @@
 #include "Modules/ThirdPersonNametag/ThirdPerson.hpp"
 #include "Modules/MotionBlur/MotionBlur.hpp"
 #include "Modules/ArmorHUD/ArmorHUD.hpp"
+#include "Modules/PatarHD/PatarHD.hpp"
 
 namespace ModuleManager {
     std::vector<Module*> modules;
@@ -37,6 +38,7 @@ void ModuleManager::initialize()
     modules.push_back(new MotionBlur());
     modules.push_back(new Zoom());
     modules.push_back(new Deepfry());
+    modules.push_back(new PatarHD());
     modules.push_back(new ClickGUI());
     modules.push_back(new FPSCounter());
     modules.push_back(new CPSCounter());
@@ -56,6 +58,7 @@ void ModuleManager::initialize()
     modules.push_back(new ThirdPerson());
     modules.push_back(new SnapLook());
     modules.push_back(new ArmorHUD());
+
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));
 }
