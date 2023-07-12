@@ -25,6 +25,7 @@
 #include "Modules/SnapLook/SnapLook.hpp"
 #include "Modules/ThirdPersonNametag/ThirdPerson.hpp"
 #include "Modules/MotionBlur/MotionBlur.hpp"
+#include "Modules/ArmorHUD/ArmorHUD.hpp"
 
 namespace ModuleManager {
     std::vector<Module*> modules;
@@ -54,6 +55,7 @@ void ModuleManager::initialize()
     modules.push_back(new Keystrokes());
     modules.push_back(new ThirdPerson());
     modules.push_back(new SnapLook());
+    modules.push_back(new ArmorHUD());
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));
 }

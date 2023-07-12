@@ -78,7 +78,8 @@ void Client::initialize()
         { "https://cdn.flarial.net/assets/nametag.png", Path + "nametag.png" },
         { "https://cdn.flarial.net/assets/minecraftia.ttf", Path + "minecraftia.ttf" },
         { "https://cdn.flarial.net/assets/blur.png", Path + "blur.png" },
-        { "https://cdn.flarial.net/assets/eye.png", Path + "eye.png" }
+        { "https://cdn.flarial.net/assets/eye.png", Path + "eye.png" },
+        { "https://cdn.flarial.net/assets/chestplate.png", Path + "chestplate.png" }
     };
 
     Client::CheckSettingsFile();
