@@ -6,7 +6,5 @@
 class ActorMovementProxy {
 public:
 	//D60                 dq offset ?setRotation@?$DirectActorProxyImpl@UIMobMovementProxy@@@@UEAAXAEBVVec2@@@Z ; DirectActorProxyImpl<IMobMovementProxy>::setRotation(Vec2 const &)
-	void SetRotation(Vec2<float>& rot);
-	void SetYHeadRotation(float rotY);
-	//74
+	void SetRotation(Vec2<float>* rot);
 };
