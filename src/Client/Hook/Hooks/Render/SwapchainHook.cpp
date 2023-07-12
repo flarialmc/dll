@@ -277,8 +277,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 if(ModuleManager::doesAnyModuleHave("BlurEffect") || !FlarialGUI::notifications.empty() || ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) {
                     ID2D1Bitmap *bitmap = nullptr;
 
-                    Logger::debug("ight");
-
                     if (FlarialGUI::blur == nullptr) {
                         D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &FlarialGUI::blur);
                     }
