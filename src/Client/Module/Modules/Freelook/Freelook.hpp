@@ -32,6 +32,7 @@ public:
     }
 
     void onDisable() override {
+        LookListener::unpatch();
         Module::onDisable();
     }
 
