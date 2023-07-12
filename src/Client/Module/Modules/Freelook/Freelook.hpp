@@ -8,7 +8,7 @@ class FreeLook : public Module {
 
 public:
 
-    FreeLook() : Module("FreeLook", "snap", "\\Flarial\\assets\\eye.png", 'F') {
+    FreeLook() : Module("FreeLook", "snap", "\\Flarial\\assets\\freelook.png", 'F') {
 
         onEnable();
 
@@ -32,6 +32,7 @@ public:
     }
 
     void onDisable() override {
+        LookListener::unpatch();
         Module::onDisable();
     }
 
