@@ -54,27 +54,27 @@ void Logger::info(std::string str)
 void Logger::warn(std::string str)
 {
     std::string log = std::format("[WARN]: {}", str);
-    std::cout << str << std::endl;
+    std::cout << log << std::endl;
     writeToFile(log);
 }
 
 void Logger::error(std::string str)
 {
     std::string log = std::format("[ERROR]: {}", str);
-    std::cout << str << std::endl;
+    std::cout << log << std::endl;
     writeToFile(log);
 }
 
 void Logger::fatal(std::string str)
 {
     std::string log = std::format("[FATAL]: {}", str);
-    std::cout << str << std::endl;
+    std::cout << log << std::endl;
     writeToFile(log);
 }
 
 void Logger::trace(std::string str)
 {
     std::string log = std::format("[TRACE]: {}", str);
-    std::cout << str << std::endl;
+    std::cout << log << std::endl;
     writeToFile(log);
 }
