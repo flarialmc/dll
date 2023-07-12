@@ -82,6 +82,7 @@ void Client::initialize()
         { "https://cdn.flarial.net/assets/chestplate.png", Path + "chestplate.png" },
         { "https://cdn.flarial.net/assets/patar.jpg", Path + "patar.jpg" },
         { "https://cdn.flarial.net/assets/skull.png", Path + "skull.png" },
+        { "https://cdn.flarial.net/assets/freelook.png", Path + "freelook.png" }
     };
 
     Client::CheckSettingsFile();
