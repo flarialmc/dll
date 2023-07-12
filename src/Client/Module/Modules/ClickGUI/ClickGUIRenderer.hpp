@@ -273,7 +273,7 @@ class ClickGUIRenderer : public Listener {
                         Client::settings.getSettingByName<bool>("killdx")->value = !Client::settings.getSettingByName<bool>("killdx")->value;
                     }
 
-                    FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.80, textWidth / 2.0f), rectY, L"Better Frames and Input Lag (No RTX) (Restart required)", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(3.1, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::SpacingConstraint(0.95, textWidth));
+                    FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.40, textWidth / 2.0f), rectY, L"Better Frames and Input Lag (No RTX) (Restart required)", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::SpacingConstraint(0.95, textWidth));
 
 
                     FlarialGUI::PopSize();
