@@ -67,7 +67,8 @@ private:
 
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
 
-           
+            //muirc->clientInstance->getLocalPlayer()->getMovementProxyComponent()->movementProxy->SetYHeadRotation(3.0f);
+            //Logger::debug(format("lp {}", muirc->clientInstance->getLocalPlayer()));
           //  BaseActorRenderContext barc(muirc->screenContext, muirc->clientInstance, muirc->clientInstance->mcgame);
           //  barc.itemRenderer->renderGuiItemNew(&barc, SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(0), 0, 50.0f, 50.0f, 1.0f, 12.0f, false);
 
