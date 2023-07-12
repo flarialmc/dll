@@ -21,9 +21,8 @@ public:
     static void onAttack(AttackEvent& event);
     static void onMouse(MouseEvent &event);
     static void onTick(TickEvent &event);
+    static void onSetupAndRender(SetupAndRenderEvent &event);
 
     static void unregisterAll();
-
-
 };
 

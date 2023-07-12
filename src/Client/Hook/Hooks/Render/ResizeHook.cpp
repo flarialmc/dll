@@ -6,6 +6,7 @@
 #include "../../../GUI/D2D.hpp"
 #include "SwapchainHook.hpp"
 #include "../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
+#include "../../../Module/Modules/MotionBlur/MotionBlurListener.hpp"
 
 void ResizeHook::enableHook() {
 
@@ -50,6 +51,12 @@ void ResizeHook::CleanShit(bool isResize) {
     FlarialGUI::cachedBitmaps.clear();
 
     ClickGUIElements::images.clear();
+
+    for(ID2D1Bitmap* bitmap : MotionBlurListener::previousFrames) {
+        Memory::SafeRelease(bitmap);
+    }
+
+    MotionBlurListener::previousFrames.clear();
 
     for (auto& i : ImagesClass::eimages) {
 

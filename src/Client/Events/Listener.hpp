@@ -4,6 +4,7 @@
 #include "Render/RenderEvent.hpp"
 #include "Game/TickEvent.hpp"
 #include "Game/AttackEvent.hpp"
+#include "Render/SetupAndRenderEvent.hpp"
 
 class Listener {
 public:
@@ -15,4 +16,5 @@ public:
     virtual void onLocalTick(TickEvent &event) {};
     virtual void onTick(TickEvent &event) {};
     virtual void onAttack(AttackEvent& event) {};
+    virtual void onSetupAndRender(SetupAndRenderEvent& event) {};
 };

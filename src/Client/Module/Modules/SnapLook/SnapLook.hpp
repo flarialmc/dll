@@ -8,7 +8,7 @@ class SnapLook : public Module {
 
 public:
 
-    SnapLook() : Module("SnapLook", "snap", "\\Flarial\\assets\\magnify.png", 'V') {
+    SnapLook() : Module("SnapLook", "snap", "\\Flarial\\assets\\eye.png", 'V') {
 
         onEnable();
 
