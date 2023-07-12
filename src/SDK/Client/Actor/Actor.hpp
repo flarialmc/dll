@@ -5,6 +5,8 @@
 #include "../../../Utils/Memory/Memory.hpp"
 #include "../../../Utils/Logger/Logger.hpp"
 #include "Components/MoveInputComponent.hpp"
+#include "Components/ActorMovementPorxyComponent.hpp"
+#include "Components/ActorRotationComponent.hpp"
 #include "Components/MobHurtTimeComponent.hpp"
 #include "../Level/Level.h"
 #include "../../../Utils/Utils.hpp"
@@ -131,10 +133,13 @@ class Actor {
 public:
 
     BUILD_ACCESS(this, Level*, level, 0x260);
+    BUILD_ACCESS(this, ActorRotationComponent*, actorRotationComponent, 0x2B0);
+
 
     template <typename Component>
     Component* tryGet(uintptr_t addr);
-
+  
+    ActorMovementProxyComponent* getMovementProxyComponent();
     MoveInputComponent* getMoveInputHandler();
     bool getActorFlag(int flag);
     Vec3<float>* getPosition();
