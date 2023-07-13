@@ -101,7 +101,7 @@ bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COL
 
 
 
-bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width, const float height, float radiusX, float radiusY)
+bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width, const float height, float radiusX, float radiusY)
 {
     if (isInScrollView)
         y += scrollpos;
@@ -119,11 +119,11 @@ bool FlarialGUI::RoundedButton(float x, float y, const D2D_COLOR_F color, const 
 
     if (CursorInRect(x, y, width, height))
     {
-        buttonColor = D2D1::ColorF(color.r - darkenAmounts[x + y], color.g - darkenAmounts[x + y], color.b - darkenAmounts[x + y], color.a);
-        FadeEffect::ApplyFadeInEffect(0.005f * FlarialGUI::frameFactor, maxDarkenAmount, darkenAmounts[x+y]);
+        buttonColor = D2D1::ColorF(color.r - darkenAmounts[index], color.g - darkenAmounts[index], color.b - darkenAmounts[index], color.a);
+        FadeEffect::ApplyFadeInEffect(0.005f * FlarialGUI::frameFactor, maxDarkenAmount, darkenAmounts[index]);
     } else {
-        buttonColor = D2D1::ColorF(color.r - darkenAmounts[x + y], color.g - darkenAmounts[x + y], color.b - darkenAmounts[x + y], color.a);
-        FadeEffect::ApplyFadeOutEffect(0.005f * FlarialGUI::frameFactor, darkenAmounts[x + y]);
+        buttonColor = D2D1::ColorF(color.r - darkenAmounts[index], color.g - darkenAmounts[index], color.b - darkenAmounts[index], color.a);
+        FadeEffect::ApplyFadeOutEffect(0.005f * FlarialGUI::frameFactor, darkenAmounts[index]);
 
     }
 
@@ -881,7 +881,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float& opacity) 
 
         float buttonWidth = Constraints::RelativeConstraint(0.35f, "width");
         float buttonHeight = Constraints::RelativeConstraint(0.20f, "height");
-        if(FlarialGUI::RoundedButton(x + spacing * 1.45f, y + spacing * 4.12f, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Close", buttonWidth, buttonHeight, round.x, round.x)) ColorPickers[index].isActive = false;
+        if(FlarialGUI::RoundedButton(0, x + spacing * 1.45f, y + spacing * 4.12f, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Close", buttonWidth, buttonHeight, round.x, round.x)) ColorPickers[index].isActive = false;
 
 
 

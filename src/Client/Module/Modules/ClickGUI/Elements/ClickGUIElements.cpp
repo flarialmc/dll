@@ -112,7 +112,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 
     round = Constraints::RoundingConstraint(26, 26);
 
-    if(FlarialGUI::RoundedButton(buttonx - buttonWidth, buttony - buttonHeight, FlarialGUI::buttonColors[index], D2D1::ColorF(D2D1::ColorF::White), FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, round.x, round.x)) mod->settings.getSettingByName<bool>("enabled")->value = !mod->settings.getSettingByName<bool>("enabled")->value;
+    if(FlarialGUI::RoundedButton(index, buttonx - buttonWidth, buttony - buttonHeight, FlarialGUI::buttonColors[index], D2D1::ColorF(D2D1::ColorF::White), FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, round.x, round.x)) mod->settings.getSettingByName<bool>("enabled")->value = !mod->settings.getSettingByName<bool>("enabled")->value;
 
     // Settings Button
     float settingswidth = Constraints::RelativeConstraint(0.17);
