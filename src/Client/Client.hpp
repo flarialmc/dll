@@ -7,6 +7,9 @@ class Client
 public:
     static void initialize();
     static bool disable;
+    static int deviceType;
+    // 0 = DX11 1 = DX12 2 = Not Set
+
 
     static std::string settingspath;
     static Settings settings;
