@@ -26,10 +26,6 @@ public:
 
         if(settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
 
-        if (settings.getSettingByName<bool>("toggled") == nullptr) {
-            settings.addSetting("toggled", false);
-        }
-
         if (settings.getSettingByName<bool>("always") == nullptr) {
             settings.addSetting("always", false);
         }
