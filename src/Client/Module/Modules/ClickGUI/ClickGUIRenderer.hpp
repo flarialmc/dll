@@ -47,8 +47,10 @@ class ClickGUIRenderer : public Listener {
 
     void onRender(RenderEvent &event) override {
 
-        if(SDK::raknetConnector != nullptr)
-        if(SDK::raknetConnector->JoinedIp != "") {
+        FlarialGUI::NotifyHeartbeat();
+
+        if(SDK::clientInstance != nullptr && SDK::raknetConnector != nullptr)
+        if(SDK::clientInstance->getLocalPlayer() != nullptr) {
         if(SDK::clientInstance->getTopScreenName() != "hud_screen" && SDK::clientInstance->getTopScreenName() != "pause_screen")
             module->settings.getSettingByName<bool>("enabled")->value = false;
 
@@ -60,7 +62,7 @@ class ClickGUIRenderer : public Listener {
         if(SDK::clientInstance->getTopScreenName() == "inventory_screen" || SDK::clientInstance->getTopScreenName().find("chest") != std::string::npos)
             FlarialGUI::Image("\\Flarial\\assets\\flarial-title.png", D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu, allahuakbar.y + akbar));
 
-        FlarialGUI::NotifyHeartbeat();
+        
 
         if(FlarialGUI::scrollposmodifier == 0) {
             FlarialGUI::scrollposmodifier = Constraints::RelativeConstraint(0.1f);
