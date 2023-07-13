@@ -30,7 +30,9 @@ public:
 
     void DefaultConfig() override {
 
+        if (settings.getSettingByName<bool>("enabled") == nullptr) settings.addSetting("enabled", false);
         if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 2.0f);
+        if (settings.getSettingByName<float>("percentageX") == nullptr) { settings.addSetting("percentageX", 0.0f); settings.addSetting("percentageY", 0.0f);}
     }
 
     void SettingsRender() override {

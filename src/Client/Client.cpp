@@ -9,6 +9,7 @@
 
 std::string Client::settingspath = Utils::getRoamingPath() + "\\Flarial\\Config\\main.flarial";
 Settings Client::settings = Settings();
+int Client::deviceType = 2;
 
 void DownloadAndSave(std::string url, std::string path) {
 
@@ -96,6 +97,12 @@ void Client::initialize()
 
     if(Client::settings.getSettingByName<bool>("killdx") == nullptr)
         Client::settings.addSetting("killdx", false);
+
+    if (Client::settings.getSettingByName<bool>("vsync") == nullptr)
+        Client::settings.addSetting("vsync", false);
+
+
+
 
     // Create threads to download the files
     std::vector<std::thread> threads;

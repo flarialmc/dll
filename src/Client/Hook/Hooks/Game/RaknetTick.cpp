@@ -29,6 +29,7 @@ void RaknetTickHook::callback(RaknetConnector* raknet)  {
         CloseHandle(fileHandle);
     }
 
+    if(SDK::clientInstance != nullptr)
     if(towriteip != ip && SDK::clientInstance->getLocalPlayer() != nullptr) {
 
         std::ofstream outputFile(settingspath);

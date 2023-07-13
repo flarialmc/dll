@@ -85,6 +85,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
             Logger::debug("not a DX12 device, running dx11 procedures");
 
+            Client::deviceType = 0;
+
                     const D2D1_CREATION_PROPERTIES properties
                             {
                                     D2D1_THREADING_MODE_SINGLE_THREADED,
@@ -108,6 +110,9 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
         } else {
 
             ID3D12Device5 *device;
+
+
+            Client::deviceType = 1;
 
             if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&device))) &&
                 kiero::getRenderType() == kiero::RenderType::D3D12) {
@@ -326,8 +331,19 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
     }
 
+    if (Client::deviceType == 0) {
+        if (Client::settings.getSettingByName<bool>("vsync") != nullptr) {
 
-    return func_original(pSwapChain, 0, flags);
+            auto option = Client::settings.getSettingByName<bool>("vsync");
+            if (option->value == true) {
+
+                return func_original(pSwapChain, 0, flags);
+            }
+        }
+    }
+
+    return func_original(pSwapChain, syncInterval, flags);
+
 
 
 }
