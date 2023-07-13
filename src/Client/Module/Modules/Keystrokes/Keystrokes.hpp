@@ -24,8 +24,6 @@ public:
     };
 
     std::vector<D2D1_COLOR_F> states;
-    std::vector<ClickData> leftClickList;
-    std::vector<ClickData> rightClickList;
     
 
     Keystrokes() : Module("Keystrokes", "yes br", "\\Flarial\\assets\\keyboard.png", 'M') {
@@ -285,13 +283,14 @@ public:
                 else
                     states[Strokes::SPACEBAR] = FlarialGUI::LerpColor(states[Strokes::SPACEBAR], disabledColor,
                                                                       0.15f * FlarialGUI::frameFactor);
-                if (rrightClickHeld)
+
+                if (CPSListener::GetRightCPS() > 0)
                     states[Strokes::RMB] = FlarialGUI::LerpColor(states[Strokes::RMB], enabledColor,
                         0.15f * FlarialGUI::frameFactor);
                 else
                     states[Strokes::RMB] = FlarialGUI::LerpColor(states[Strokes::RMB], disabledColor,
                         0.15f * FlarialGUI::frameFactor);
-                if (lleftClickHeld)
+                if (CPSListener::GetLeftCPS() > 0)
                     states[Strokes::LMB] = FlarialGUI::LerpColor(states[Strokes::LMB], enabledColor,
                         0.15f * FlarialGUI::frameFactor);
                 else
@@ -336,26 +335,21 @@ public:
                 float spacebarHeight = 0.55f * (keycardSize);
                 realcenter.x -= 2 * (keycardSize + spacing);
 
-                std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-                const std::wstring rcps = converter.from_bytes(rRightCPS);
-                const std::wstring lcps = converter.from_bytes(lLeftCPS);
-
-
                 if (!settings.getSettingByName<bool>("cps")->value) realcenter.y += (keycardSize + spacing);
                 else {
                     // A
                     FlarialGUI::RoundedRect(realcenter.x, realcenter.y += (keycardSize + spacing), states[Strokes::LMB], keycardSize + (keycardSize / 2), keycardSize,
-                                            rounde.x,
-                                            rounde.x);
-                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, lcps.c_str(), textColor, keycardSize + (keycardSize / 2), keycardSize,
-                                                    DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
+                        rounde.x,
+                        rounde.x);
+                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(std::to_string(CPSListener::GetLeftCPS())).c_str(), textColor, keycardSize + (keycardSize / 2), keycardSize,
+                        DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
 
                     // D
                     FlarialGUI::RoundedRect(realcenter.x += 1.5f * (keycardSize + spacing), realcenter.y, states[Strokes::RMB], keycardSize + (keycardSize / 2), keycardSize,
-                                            rounde.x,
-                                            rounde.x);
-                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, rcps.c_str(), textColor, keycardSize + (keycardSize / 2), keycardSize,
-                                                    DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
+                        rounde.x,
+                        rounde.x);
+                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(std::to_string(CPSListener::GetRightCPS())).c_str(), textColor, keycardSize + (keycardSize / 2), keycardSize,
+                        DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
                     realcenter.y += (keycardSize + spacing);
                     realcenter.x -= 1.5f * (keycardSize + spacing);
                 }
