@@ -11,13 +11,14 @@
 class SprintListener : public Listener {
 
     Module* module;
+    bool ToggleSprinting = false;
 
     void onKey(KeyEvent& event) override {
 
         if(SDK::CurrentScreen == "hud_screen")
         if (module->settings.getSettingByName<bool>("enabled")->value) {
             if (event.GetKey() == 'N' && event.GetAction() == 0) {
-                module->settings.getSettingByName<bool>("toggled")->value = !module->settings.getSettingByName<bool>("toggled")->value;
+                ToggleSprinting = !ToggleSprinting;
             }
         }
 
@@ -49,14 +50,16 @@ class SprintListener : public Listener {
 
     void onLocalTick(TickEvent &event) override {
 
-        if (SDK::clientInstance != nullptr) {
-            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
-
-                if (module->settings.getSettingByName<bool>("always")->value) {
-                    handler->sprinting = true;
-                }  else {
-                    handler->sprinting = module->settings.getSettingByName<bool>("toggled")->value;
+        if (module->settings.getSettingByName<bool>("enabled")->value) {
+            if (SDK::clientInstance != nullptr) {
+                if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                    MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
+                    if (module->settings.getSettingByName<bool>("always")->value) {
+                        handler->sprinting = true;
+                    }
+                    else {
+                        handler->sprinting = ToggleSprinting;
+                    }
                 }
             }
         }

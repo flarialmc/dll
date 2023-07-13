@@ -7,39 +7,9 @@
 #include "../../../GUI/Engine/Engine.hpp"
 #include <Windows.h>
 #include "KeystrokesListener.hpp"
-
+#include <codecvt>
 
 class Keystrokes : public Module {
-
-private:
-    [[nodiscard]] double Microtime() const {
-        return (double(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) / double(1000000));
-    }
-
-    void onMouse(MouseEvent& event) {
-
-        if (event.GetButton() == MouseButton::Left) {
-            if (MC::held) {
-                leftClickHeld = true;
-            }
-            else
-            {
-                leftClickHeld = false;
-                AddLeftClick();
-            }
-        }
-        if (event.GetButton() == MouseButton::Right) {
-            if (MC::held) {
-                rightClickHeld = true;
-            }
-            else
-            {
-                rightClickHeld = false;
-                AddRightClick();
-            }
-        }
-
-    }
 
 public:
 
@@ -56,8 +26,7 @@ public:
     std::vector<D2D1_COLOR_F> states;
     std::vector<ClickData> leftClickList;
     std::vector<ClickData> rightClickList;
-    bool rightClickHeld;
-    bool leftClickHeld;
+    
 
     Keystrokes() : Module("Keystrokes", "yes br", "\\Flarial\\assets\\keyboard.png", 'M') {
 
@@ -117,52 +86,6 @@ public:
 
         Module::onDisable();
 
-    }
-
-    void AddLeftClick() {
-        ClickData click{};
-        click.timestamp = Microtime();
-        leftClickList.insert(leftClickList.begin(), click);
-
-        if (leftClickList.size() >= 100) {
-            leftClickList.pop_back();
-        }
-    }
-
-    void AddRightClick() {
-        ClickData click{};
-        click.timestamp = Microtime();
-        rightClickList.insert(rightClickList.begin(), click);
-
-        if (rightClickList.size() >= 100) {
-            rightClickList.pop_back();
-        }
-    }
-
-    [[nodiscard]] int GetLeftCPS() const {
-        if (leftClickList.empty()) {
-            return 0;
-        }
-
-        double currentMicros = Microtime();
-        int count = std::count_if(leftClickList.begin(), leftClickList.end(), [currentMicros](const ClickData& click) {
-            return (currentMicros - click.timestamp <= 1.0);
-            });
-
-        return (int)std::round(count);
-    }
-
-    [[nodiscard]] int GetRightCPS() const {
-        if (rightClickList.empty()) {
-            return 0;
-        }
-
-        double currentMicros = Microtime();
-        int count = std::count_if(rightClickList.begin(), rightClickList.end(), [currentMicros](const ClickData& click) {
-            return (currentMicros - click.timestamp <= 1.0);
-            });
-
-        return (int)std::round(count);
     }
 
     void SettingsRender() override {
@@ -271,7 +194,6 @@ public:
 
     void NormalRender(int index, std::string text, std::string value) override {
 
-
         if (SDK::hasInstanced) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
 
@@ -363,13 +285,13 @@ public:
                 else
                     states[Strokes::SPACEBAR] = FlarialGUI::LerpColor(states[Strokes::SPACEBAR], disabledColor,
                                                                       0.15f * FlarialGUI::frameFactor);
-                if (rightClickHeld)
+                if (rrightClickHeld)
                     states[Strokes::RMB] = FlarialGUI::LerpColor(states[Strokes::RMB], enabledColor,
                         0.15f * FlarialGUI::frameFactor);
                 else
                     states[Strokes::RMB] = FlarialGUI::LerpColor(states[Strokes::RMB], disabledColor,
                         0.15f * FlarialGUI::frameFactor);
-                if (leftClickHeld)
+                if (lleftClickHeld)
                     states[Strokes::LMB] = FlarialGUI::LerpColor(states[Strokes::LMB], enabledColor,
                         0.15f * FlarialGUI::frameFactor);
                 else
@@ -414,20 +336,25 @@ public:
                 float spacebarHeight = 0.55f * (keycardSize);
                 realcenter.x -= 2 * (keycardSize + spacing);
 
+                std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+                const std::wstring rcps = converter.from_bytes(rRightCPS);
+                const std::wstring lcps = converter.from_bytes(lLeftCPS);
+
+
                 if (!settings.getSettingByName<bool>("cps")->value) realcenter.y += (keycardSize + spacing);
                 else {
                     // A
-                    FlarialGUI::RoundedRect(realcenter.x, realcenter.y += (keycardSize + spacing), states[Strokes::RMB], keycardSize + (keycardSize / 2), keycardSize,
+                    FlarialGUI::RoundedRect(realcenter.x, realcenter.y += (keycardSize + spacing), states[Strokes::LMB], keycardSize + (keycardSize / 2), keycardSize,
                                             rounde.x,
                                             rounde.x);
-                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, L"RMB", textColor, keycardSize + (keycardSize / 2), keycardSize,
+                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, lcps.c_str(), textColor, keycardSize + (keycardSize / 2), keycardSize,
                                                     DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
 
                     // D
-                    FlarialGUI::RoundedRect(realcenter.x += 1.5f * (keycardSize + spacing), realcenter.y, states[Strokes::LMB], keycardSize + (keycardSize / 2), keycardSize,
+                    FlarialGUI::RoundedRect(realcenter.x += 1.5f * (keycardSize + spacing), realcenter.y, states[Strokes::RMB], keycardSize + (keycardSize / 2), keycardSize,
                                             rounde.x,
                                             rounde.x);
-                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, L"LMB", textColor, keycardSize + (keycardSize / 2), keycardSize,
+                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, rcps.c_str(), textColor, keycardSize + (keycardSize / 2), keycardSize,
                                                     DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
                     realcenter.y += (keycardSize + spacing);
                     realcenter.x -= 1.5f * (keycardSize + spacing);
