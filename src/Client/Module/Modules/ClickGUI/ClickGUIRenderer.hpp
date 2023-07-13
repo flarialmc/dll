@@ -210,7 +210,14 @@ class ClickGUIRenderer : public Listener {
 
                     FlarialGUI::PopSize();
 
-                    FlarialGUI::ScrollBar(120, 120, 10, 220, 2);
+                    int i2 = 0;
+
+                    for(auto& adsasda : ModuleManager::modules)
+                        i2++;
+
+                    i2 = i2 % 3;
+
+                    FlarialGUI::ScrollBar(120, scrollcenter.y, 10, Constraints::SpacingConstraint(0.30, scrollHeight * i2), 2);
 
                     FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
 
@@ -273,7 +280,7 @@ class ClickGUIRenderer : public Listener {
                         Client::settings.getSettingByName<bool>("killdx")->value = !Client::settings.getSettingByName<bool>("killdx")->value;
                     }
 
-                    FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.80, textWidth / 2.0f), rectY, L"Better Frames and Input Lag (No RTX) (Restart required)", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(3.1, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::SpacingConstraint(0.95, textWidth));
+                    FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.40, textWidth / 2.0f), rectY, L"Better Frames and Input Lag (No RTX) (Restart required)", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::SpacingConstraint(0.95, textWidth));
 
 
                     FlarialGUI::PopSize();

@@ -2,13 +2,13 @@
 
 #include "../Module.hpp"
 #include "../../../Events/EventHandler.hpp"
-#include "SnapLookListener.hpp"
+#include "LookListener.hpp"
 
-class SnapLook : public Module {
+class FreeLook : public Module {
 
 public:
 
-    SnapLook() : Module("SnapLook", "snap", "\\Flarial\\assets\\eye.png", 'V') {
+    FreeLook() : Module("FreeLook", "snap", "\\Flarial\\assets\\freelook.png", 'F') {
 
         onEnable();
 
@@ -16,7 +16,7 @@ public:
 
     void onEnable() override {
 
-        EventHandler::registerListener(new SnapListener("Snap", this));
+        EventHandler::registerListener(new LookListener("Look", this));
 
         Module::onEnable();
 
@@ -27,11 +27,12 @@ public:
     }
 
     virtual void DefaultConfig() override {
-        if (settings.getSettingByName<std::string>("keybind")->value == (std::string)"") settings.getSettingByName<std::string>("keybind")->value = "V";
+        if (settings.getSettingByName<std::string>("keybind")->value == (std::string)"") settings.getSettingByName<std::string>("keybind")->value = "F";
 
     }
 
     void onDisable() override {
+        LookListener::unpatch();
         Module::onDisable();
     }
 

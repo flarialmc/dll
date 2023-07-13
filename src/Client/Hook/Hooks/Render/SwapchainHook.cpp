@@ -317,6 +317,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
             }
 
             Memory::SafeRelease(FlarialGUI::blurbrush);
+            Memory::SafeRelease(FlarialGUI::blur);
 
 
         }

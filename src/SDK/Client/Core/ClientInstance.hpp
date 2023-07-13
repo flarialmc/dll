@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Actor/LocalPlayer.hpp"
+#include "../Render/GuiData.hpp"
 #include "MinecraftGame.hpp"
 #include "../Block/BlockSource.hpp"
 
@@ -12,6 +13,7 @@ class ClientInstance {
 public:
 
     BUILD_ACCESS(this, MinecraftGame*, mcgame, 0x0C8);
+    BUILD_ACCESS(this, GuiData*, guiData, 0x540);
 
     LocalPlayer* getLocalPlayer();
     BlockSource* getBlockSource();

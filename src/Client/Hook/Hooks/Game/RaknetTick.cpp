@@ -29,13 +29,11 @@ void RaknetTickHook::callback(RaknetConnector* raknet)  {
         CloseHandle(fileHandle);
     }
 
-    if(towriteip != ip) {
-
-        Logger::debug("ye");
+    if(towriteip != ip && SDK::clientInstance->getLocalPlayer() != nullptr) {
 
         std::ofstream outputFile(settingspath);
         if (outputFile.is_open()) {
-            outputFile << raknet->JoinedIp;
+            outputFile << raknet->JoinedIp + " " + SDK::clientInstance->getLocalPlayer()->playerName;
             outputFile.close();
         }
 

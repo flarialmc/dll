@@ -10,7 +10,6 @@
 class MotionBlurListener : public Listener {
 
     Module* module;
-    std::vector<ID2D1Bitmap*> previousFrames;
 
 public:
     explicit MotionBlurListener(const char string[5], Module* module) {
@@ -18,6 +17,9 @@ public:
         this->module = module;
 
     }
+
+
+    static inline std::vector<ID2D1Bitmap*> previousFrames;
 
     void onRender(RenderEvent& event) override {
 
@@ -47,6 +49,14 @@ public:
                 D2D::context->DrawBitmap(frame, D2D1::RectF(0.f, 0.f, MC::windowSize.x, MC::windowSize.y), alpha, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
                 alpha *= module->settings.getSettingByName<float>("intensity")->value;
             }
+        } else {
+
+            for(ID2D1Bitmap* bitmap : MotionBlurListener::previousFrames) {
+                Memory::SafeRelease(bitmap);
+            }
+
+            MotionBlurListener::previousFrames.clear();
+
         }
 
     }

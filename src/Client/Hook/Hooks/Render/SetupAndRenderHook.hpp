@@ -67,15 +67,12 @@ private:
 
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
 
-           
-          //  BaseActorRenderContext barc(muirc->screenContext, muirc->clientInstance, muirc->clientInstance->mcgame);
-          //  barc.itemRenderer->renderGuiItemNew(&barc, SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(0), 0, 50.0f, 50.0f, 1.0f, 12.0f, false);
 
-            //Logger::debug(std::format("dn {}", &barc));
-            //std::format("[Hook] Successfully hooked {} at address: {}", this->name
-            //Logger::debug(format("found hurt {}", SDK::clientInstance->getLocalPlayer()->mobHurtTimeComponent));
-            //Logger::debug(format("Found Item address at: {}", SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(0)));
         }
+
+        SetupAndRenderEvent event;
+        event.muirc = muirc;
+        EventHandler::onSetupAndRender(event);
 
 
         func_original(pScreenView, muirc);

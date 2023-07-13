@@ -58,9 +58,10 @@ int getViewPerspectiveHook::callback(uintptr_t* a1) {
 
 
     auto mod = ModuleManager::getModule("SnapLook");
+    auto freemod = ModuleManager::getModule("FreeLook");
 
-    if (mod != nullptr) {
-        if (mod->settings.getSettingByName<bool>("enabled")->value) {
+    if (mod != nullptr && freemod != nullptr) {
+        if (mod->settings.getSettingByName<bool>("enabled")->value || freemod->settings.getSettingByName<bool>("enabled")->value) {
             return 2;
         }
     

@@ -22,6 +22,21 @@ bool Actor::wasHurt() {
     return Memory::CallVFunc<215, bool>(this);
 }
 
+ItemStack* Actor::getArmor(int slot) {
+    return Memory::CallVFunc<137, ItemStack*>(this, slot);
+}
+
+ActorMovementProxyComponent* Actor::getMovementProxyComponent() {
+    static  uintptr_t sig;
+
+    if (sig == NULL) {
+        sig = Memory::findSig("40 53 48 83 EC 20 48 8B DA BA 18 0C BD EC");
+    }
+
+    return tryGet<ActorMovementProxyComponent>(sig);
+
+}
+
 MoveInputComponent* Actor::getMoveInputHandler() {
 
     static  uintptr_t sig;

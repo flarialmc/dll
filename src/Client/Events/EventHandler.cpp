@@ -74,3 +74,11 @@ void EventHandler::onRender(RenderEvent &event) {
     }
 
 }
+
+void EventHandler::onSetupAndRender(SetupAndRenderEvent &event) {
+
+    for (Listener* &listener: listeners) {
+        listener->onSetupAndRender(event);
+    }
+
+}

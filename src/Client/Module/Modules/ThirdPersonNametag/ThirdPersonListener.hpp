@@ -13,7 +13,7 @@ class ThirdPersonListener : public Listener {
     bool enabled;
     static inline std::vector<uint8_t> Original;
     static inline std::vector<uint8_t> Patched;
-    static inline uintptr_t real = Memory::findSig("0F 84 ? ? ? ? 49 ? ? 49 ? ? E8 ? ? ? ? 84 ? 0F 84");
+    static inline uintptr_t real = Memory::findSig("0F 84 ? ? ? ? 49 8B D7 48 8B CE E8 ? ? ? ? 84 C0");
 
 
     void onLocalTick(TickEvent& event) override {
