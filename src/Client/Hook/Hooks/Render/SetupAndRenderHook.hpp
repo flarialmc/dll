@@ -64,12 +64,6 @@ private:
         if(layer != "debug_screen" && layer != "toast_screen")
             SDK::CurrentScreen = layer;
 
-
-        if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-
-
-        }
-
         SetupAndRenderEvent event;
         event.muirc = muirc;
         EventHandler::onSetupAndRender(event);
