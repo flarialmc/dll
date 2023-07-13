@@ -1524,7 +1524,7 @@ void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect, float intensity) {
 
 void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect) {
     // Create a unique identifier for the rect
-    std::string uniqueIdentifier = "rect_" + std::to_string((int)rect.rect.left) + "_" + std::to_string((int)rect.rect.top) + "_" + std::to_string((int)rect.rect.right) + "_" + std::to_string((int)rect.rect.bottom);
+    std::string uniqueIdentifier = std::to_string(ceilf(rect.rect.left + rect.rect.right + rect.rect.top + rect.rect.bottom));
     bool shouldntDo = false;
     // Check if the cached bitmap for the rect already exists
     if (cachedBitmaps.find(uniqueIdentifier) == cachedBitmaps.end()) {

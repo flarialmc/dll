@@ -82,7 +82,7 @@ public:
 namespace FlarialGUI
 {
     std::stack<Dimension> inline dimension_stack;
-    std::vector<float> inline darkenAmounts(10000);
+    std::vector<float> inline darkenAmounts(20);
     std::vector<float> inline opacityAmounts(20);
     std::vector<float> inline toggleSpacings(20);
     std::vector<float> inline rotationAngles(40, 0);
