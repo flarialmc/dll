@@ -134,8 +134,9 @@ void Client::initialize()
 
     HookManager::initialize();
 
-    Sleep(1000);
+    Sleep(5000);
 
-    FlarialGUI::Notify("Injected");
+    FlarialGUI::Notify("Be sure to report crashes or bugs at https://flarial.net/discord!");
+    FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("keybind")->value + " to open the menu in-game.")
 
 }
