@@ -21,8 +21,6 @@ void RaknetTickHook::callback(RaknetConnector* raknet)  {
         else ip = "world";
     }
 
-    Logger::debug(ip);
-
     std::string settingspath = Utils::getRoamingPath() + "\\Flarial\\serverip.txt";
 
     if (!std::filesystem::exists(settingspath)) {

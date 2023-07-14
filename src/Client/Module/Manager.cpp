@@ -59,7 +59,6 @@ void ModuleManager::initialize()
     modules.push_back(new ThirdPerson());
     modules.push_back(new SnapLook());
     modules.push_back(new FreeLook());
-    modules.push_back(new ArmorHUD());
 
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));

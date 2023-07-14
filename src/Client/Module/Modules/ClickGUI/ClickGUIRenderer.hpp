@@ -49,7 +49,7 @@ class ClickGUIRenderer : public Listener {
 
         FlarialGUI::NotifyHeartbeat();
 
-        if(SDK::clientInstance != nullptr && SDK::raknetConnector != nullptr)
+        if(SDK::clientInstance != nullptr)
         if(SDK::clientInstance->getLocalPlayer() != nullptr) {
         if(SDK::clientInstance->getTopScreenName() != "hud_screen" && SDK::clientInstance->getTopScreenName() != "pause_screen")
             module->settings.getSettingByName<bool>("enabled")->value = false;
@@ -225,7 +225,7 @@ class ClickGUIRenderer : public Listener {
 
                     i2 = i2 % 3;
 
-                    FlarialGUI::ScrollBar(120, scrollcenter.y, 10, Constraints::SpacingConstraint(0.30, scrollHeight * i2), 2);
+                    FlarialGUI::ScrollBar(120, scrollcenter.y, 10, Constraints::SpacingConstraint(0.50, scrollHeight * i2), 2);
 
                     FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
 
