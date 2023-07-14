@@ -5,7 +5,6 @@
 #include <filesystem>
 #include <thread>
 #include <wingdi.h>
-#include <wininet.h>
 
 std::string Client::settingspath = Utils::getRoamingPath() + "\\Flarial\\Config\\main.flarial";
 Settings Client::settings = Settings();
@@ -14,8 +13,6 @@ int Client::deviceType = 2;
 void DownloadAndSave(std::string url, std::string path) {
 
     char test[256];
-    strcpy(test, "https://google.com/");
-    if(InternetCheckConnectionA(test, FLAG_ICC_FORCE_CONNECTION, 0))
     URLDownloadToFileW(NULL, FlarialGUI::to_wide(url).c_str(), FlarialGUI::to_wide(path).c_str(), 0, NULL);
 
 }
