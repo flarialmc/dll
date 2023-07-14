@@ -17,7 +17,7 @@ class SprintListener : public Listener {
 
         if(SDK::CurrentScreen == "hud_screen")
         if (module->settings.getSettingByName<bool>("enabled")->value) {
-            if (module->IsKeybind(event.keys) && module->IsKeyPartOfKeybind(event.key) && event.GetAction() == 0) {
+            if (module->IsKeybind(event.keys) && module->IsKeyPartOfKeybind(event.key)) {
                 ToggleSprinting = !ToggleSprinting;
             }
         }

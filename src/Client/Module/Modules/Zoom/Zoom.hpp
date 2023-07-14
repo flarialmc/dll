@@ -28,7 +28,7 @@ public:
     }
 
     virtual void DefaultConfig() override {
-
+        if (settings.getSettingByName<bool>("SaveModifier") == nullptr) settings.addSetting("SaveModifier", true);
         if (settings.getSettingByName<float>("modifier") == nullptr) settings.addSetting("modifier", 10.0f);
         if (settings.getSettingByName<float>("anim") == nullptr) settings.addSetting("anim", 0.05f);
         if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"real");
@@ -80,6 +80,12 @@ public:
                                            D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("anim")->value, 0.40);
 
         this->settings.getSettingByName<float>("anim")->value = percent;
+
+        y += Constraints::SpacingConstraint(0.25, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.38, textWidth), y, L"Save Modifier", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+
+        if (FlarialGUI::Toggle(1, Constraints::PercentageConstraint(0.019, "left"), y, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("SaveModifier")->value)) this->settings.getSettingByName<bool>("SaveModifier")->value = !this->settings.getSettingByName<bool>("SaveModifier")->value;
 
         FlarialGUI::UnsetScrollView();
 
