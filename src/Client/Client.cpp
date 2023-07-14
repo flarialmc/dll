@@ -137,6 +137,6 @@ void Client::initialize()
     Sleep(5000);
 
     FlarialGUI::Notify("Be sure to report crashes or bugs at https://flarial.net/discord!");
-    FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("keybind")->value + " to open the menu in-game.")
+    FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("keybind")->value + " to open the menu in-game.");
 
 }
