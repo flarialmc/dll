@@ -101,7 +101,7 @@ class ClickGUIRenderer : public Listener {
             Vec2<float> center = Constraints::CenterConstraint(baseWidth, Constraints::RelativeConstraint(baseHeightReal), "r", 1, 1);
             Vec2<float> round = Constraints::RoundingConstraint(50, 50);
 
-            FlarialGUI::ShadowRect(D2D1::RoundedRect(D2D1::RectF(center.x, center.y, center.x + Constraints::SpacingConstraint(1.02f, baseWidth), center.y + Constraints::RelativeConstraint(baseHeightReal * 1.02f)), round.x, round.x));
+            FlarialGUI::ShadowRect(center.x, center.y, Constraints::SpacingConstraint(1.02f, baseWidth), Constraints::RelativeConstraint(baseHeightReal * 1.02f));
             FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), baseWidth, Constraints::RelativeConstraint(baseHeightReal), round.x, round.x);
             FlarialGUI::PushSize(center.x, center.y, baseWidth, Constraints::RelativeConstraint(baseHeightActual));
 
