@@ -767,19 +767,19 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
 
     FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.25, textWidth / 2.0f), y, to_wide("Keybind (2 seconds)").c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(2.2, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_LEADING, 120);
 
+    float amount = 0;
     if(FlarialGUI::isInScrollView)
-        y += scrollpos;
+        amount += scrollpos;
 
-    if (CursorInRect(x, y, percWidth, percHeight) && MC::mousebutton == MouseButton::Left && !MC::held && !KeybindSelectors[index].isActive)
+    if (CursorInRect(x, y + amount, percWidth, percHeight) && MC::mousebutton == MouseButton::Left && !MC::held && !KeybindSelectors[index].isActive)
     {
         MC::mousebutton = MouseButton::None;
         KeybindSelectors[index].isActive = !KeybindSelectors[index].isActive;
         KeybindSelectors[index].currentOnKeyTime = std::chrono::steady_clock::now();
     }
 
-    if (!CursorInRect(x, y, percWidth, percHeight) && MC::mousebutton == MouseButton::Left && !MC::held)
+    if (!CursorInRect(x, y + amount, percWidth, percHeight) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
-        MC::mousebutton = MouseButton::None;
         KeybindSelectors[index].isActive = false;
     }
 

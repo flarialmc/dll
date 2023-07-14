@@ -55,9 +55,9 @@ void ResizeHook::CleanShit(bool isResize) {
     for(ID2D1Bitmap* bitmap : MotionBlurListener::previousFrames) {
         Memory::SafeRelease(bitmap);
     }
-
+    if(!MotionBlurListener::previousFrames.empty())
     MotionBlurListener::previousFrames.clear();
-
+     
     for (auto& i : ImagesClass::eimages) {
 
         Memory::SafeRelease(i.second);
