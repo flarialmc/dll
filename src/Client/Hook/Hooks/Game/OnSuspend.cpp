@@ -1,3 +1,4 @@
+#pragma once
 #include "OnSuspend.hpp"
 #include "../../../Module/Manager.hpp"
 #include "../../../Client.hpp"
