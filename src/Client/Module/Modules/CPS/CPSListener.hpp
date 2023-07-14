@@ -25,12 +25,26 @@ class CPSListener : public Listener {
 private:
     static inline std::vector<ClickData> leftClickList;
     static inline std::vector<ClickData> rightClickList;
+    static inline bool rightClickHeld;
+    static inline bool leftClickHeld;
     Module* module;
 
     void onMouse(MouseEvent &event) override {
 
-        if(event.GetButton() == MouseButton::Left && !MC::held) AddLeftClick();
-        if(event.GetButton() == MouseButton::Right && !MC::held) AddRightClick();
+        if (event.GetButton() == MouseButton::Left) {
+            if (!MC::held) {
+                AddLeftClick();
+                leftClickHeld = false;
+            }
+            else leftClickHeld = true;
+        }
+        if (event.GetButton() == MouseButton::Right) {
+            if (!MC::held) {
+                AddRightClick();
+                rightClickHeld = false;
+            }
+            else rightClickHeld = true;
+        }
 
     }
 
@@ -96,6 +110,13 @@ public:
             });
 
         return (int)std::round(count);
+    }
+
+    [[nodiscard]] static bool GetLeftHeld() {
+        return leftClickHeld;
+    }
+    [[nodiscard]] static bool GetRightHeld() {
+        return rightClickHeld;
     }
 
 private:
