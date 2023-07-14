@@ -17,33 +17,35 @@ class SprintListener : public Listener {
 
         if(SDK::CurrentScreen == "hud_screen")
         if (module->settings.getSettingByName<bool>("enabled")->value) {
-            if (event.GetKey() == 'N' && event.GetAction() == 0) {
+            if (module->IsKeybind(event.keys) && module->IsKeyPartOfKeybind(event.key) && event.GetAction() == 0) {
                 ToggleSprinting = !ToggleSprinting;
             }
         }
-
-        if (event.GetKey() == this->module->keybind) { module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value; }
     };
 
     void onRender(RenderEvent& event) override {
 
         if(SDK::CurrentScreen == "hud_screen")
         if (module->settings.getSettingByName<bool>("enabled")->value) {
+            if (module->settings.getSettingByName<bool>("status")->value) {
+                if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
 
-            if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
+                    if (SDK::clientInstance->getLocalPlayer() != nullptr) {
 
-                if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                        if (SDK::clientInstance->getLocalPlayer()->getActorFlag(1)) {
+                            this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Sneaking");
+                        }
+                        else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) {
+                            this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Sprinting");
+                        }
+                        else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(34)) {
+                            this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Walking");
+                        }
+                        else { this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Standing"); }
 
-                    if (SDK::clientInstance->getLocalPlayer()->getActorFlag(1)) {
-                        this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Sneaking");
-                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) {
-                        this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Sprinting");
-                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(34)) {
-                        this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Walking");
-                    } else { this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Standing"); }
+                    }
 
                 }
-
             }
         }
     }
