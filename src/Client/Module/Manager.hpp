@@ -8,6 +8,7 @@ namespace ModuleManager
     extern std::vector<Module*> modules;
     void initialize();
     void terminate();
+    void SaveModulesConfig(); 
     bool doesAnyModuleHave(std::string settingName);
     Module* getModule(std::string name);
 };
