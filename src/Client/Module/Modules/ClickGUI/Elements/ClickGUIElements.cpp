@@ -42,7 +42,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
          diffX = (sizes[index].x - Constraints::RelativeConstraint(0.19f, "height", true)) / 2.0f;
          diffY = (sizes[index].y - Constraints::RelativeConstraint(0.141f, "height", true)) / 2.0f;
 
-         FlarialGUI::ShadowRect(D2D1::RoundedRect(D2D1::RectF(x, realY, x + BottomRoundedWidth, realY + BottomRoundedHeight), round.x, round.x));
+         FlarialGUI::ShadowRect(x, y, BottomRoundedWidth, BottomRoundedHeight);
     } else {
         FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.19f, "height", true),
                          0.15f * FlarialGUI::frameFactor);

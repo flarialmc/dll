@@ -17,8 +17,6 @@ void OnSuspendHook::callback(void* a1, void* a2, void* a3, void* a4) {
 }
 
 
-
-
 void OnSuspendHook::enableHook() {
 
 	this->autoHook(callback, (void**)&suspendOriginal);

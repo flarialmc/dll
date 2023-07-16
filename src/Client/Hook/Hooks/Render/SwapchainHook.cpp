@@ -279,7 +279,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 /* Blur Stuff */
 
-                if(ModuleManager::doesAnyModuleHave("BlurEffect") || !FlarialGUI::notifications.empty() || ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) {
+                if (ModuleManager::doesAnyModuleHave("BlurEffect") || !FlarialGUI::notifications.empty() ||
+                    ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) {
                     ID2D1Bitmap *bitmap = nullptr;
 
                     if (FlarialGUI::blur == nullptr) {
@@ -306,7 +307,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                     D2D::context->CreateImageBrush(image, props, &FlarialGUI::blurbrush);
 
 
-
                     Memory::SafeRelease(image);
                     Memory::SafeRelease(bitmap);
                 }
@@ -321,13 +321,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 D2D::context->EndDraw();
             }
 
-            Memory::SafeRelease(FlarialGUI::blurbrush);
-            Memory::SafeRelease(FlarialGUI::blur);
-
-
         }
-
-
 
     }
 
@@ -341,6 +335,9 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
             }
         }
     }
+
+    Memory::SafeRelease(FlarialGUI::blurbrush);
+    Memory::SafeRelease(FlarialGUI::blur);
 
     return func_original(pSwapChain, syncInterval, flags);
 

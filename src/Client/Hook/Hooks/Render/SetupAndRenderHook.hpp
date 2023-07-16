@@ -63,12 +63,7 @@ private:
         std::string layer = SDK::screenView->VisualTree->root->LayerName;
         if(layer != "debug_screen" && layer != "toast_screen")
             SDK::CurrentScreen = layer;
-
-        SetupAndRenderEvent event;
-        event.muirc = muirc;
-        EventHandler::onSetupAndRender(event);
-
-
+         
         func_original(pScreenView, muirc);
     }
 
