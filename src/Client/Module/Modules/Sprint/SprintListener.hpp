@@ -55,12 +55,14 @@ class SprintListener : public Listener {
         if (module->settings.getSettingByName<bool>("enabled")->value) {
             if (SDK::clientInstance != nullptr) {
                 if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                    MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
-                    if (module->settings.getSettingByName<bool>("always")->value) {
-                        handler->sprinting = true;
-                    }
-                    else {
-                        handler->sprinting = ToggleSprinting;
+                    if (!SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) {
+                        MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
+                        if (module->settings.getSettingByName<bool>("always")->value) {
+                            handler->sprinting = true;
+                        }
+                        else {
+                            handler->sprinting = ToggleSprinting;
+                        }
                     }
                 }
             }
