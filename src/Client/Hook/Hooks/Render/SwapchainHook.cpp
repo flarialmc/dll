@@ -31,7 +31,6 @@ void SwapchainHook::enableHook()
     swapchain_ptr = (void *)kiero::getMethodsTable()[index];
 
     if(Client::settings.getSettingByName<bool>("killdx")->value) {
-        Logger::debug("ye");
         SwapchainHook::queue = nullptr;
     }
 

@@ -1,3 +1,4 @@
+#pragma once
 #include "../Hook.hpp"
 #include "../../../Events/EventHandler.hpp"
 #include "../../../../SDK/SDK.hpp"

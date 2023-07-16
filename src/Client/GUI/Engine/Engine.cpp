@@ -1523,55 +1523,43 @@ void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect, float intensity) {
 }
 
 void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect) {
-    // Create a unique identifier for the rect
-    std::string uniqueIdentifier = "rect_" + std::to_string((int)rect.rect.left) + "_" + std::to_string((int)rect.rect.top) + "_" + std::to_string((int)rect.rect.right) + "_" + std::to_string((int)rect.rect.bottom);
-    bool shouldntDo = false;
-    // Check if the cached bitmap for the rect already exists
-    if (cachedBitmaps.find(uniqueIdentifier) == cachedBitmaps.end()) {
-        // Create a new blank bitmap
-        ID2D1Bitmap1* newLayer = nullptr;
-        D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, D2D::context->GetPixelFormat());
-        D2D::context->CreateBitmap(D2D::context->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
 
-        if(newLayer != nullptr) {
-            D2D::context->SetTarget(newLayer);
-            D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
+    
+    // Create a new blank bitmap
+    ID2D1Bitmap1* newLayer = nullptr;
+    D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, D2D::context->GetPixelFormat());
+    D2D::context->CreateBitmap(D2D::context->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
 
-            ID2D1SolidColorBrush *colorBrush = nullptr;
-            D2D::context->CreateSolidColorBrush(D2D1::ColorF(0, 0, 0, 0.75f), &colorBrush);
-            D2D::context->FillRectangle(rect.rect, colorBrush);
+    if(newLayer != nullptr && FlarialGUI::blur != nullptr) {
+        D2D::context->SetTarget(newLayer);
+        D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
 
-            colorBrush->Release();
+        ID2D1SolidColorBrush *colorBrush = nullptr;
+        D2D::context->CreateSolidColorBrush(D2D1::ColorF(0, 0, 0, 0.75f), &colorBrush);
+        D2D::context->FillRectangle(rect.rect, colorBrush);
 
-            ID2D1Effect *effect;
-            D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &effect);
+        colorBrush->Release();
 
-            effect->SetInput(0, newLayer);
-            effect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
-            effect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 10.0f);
+        FlarialGUI::blur->SetInput(0, newLayer);
+        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 10.0f);
 
-            ID2D1Image *out;
-            effect->GetOutput(&out);
+        ID2D1Image *out;
+        FlarialGUI::blur->GetOutput(&out);
 
-            // Set the rendering target to the main bitmap
-            if(SwapchainHook::queue != nullptr) D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
-            else D2D::context->SetTarget(SwapchainHook::D2D1Bitmap);
+        // Set the rendering target to the main bitmap
+        if (SwapchainHook::queue != nullptr)
+            D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
+        else D2D::context->SetTarget(SwapchainHook::D2D1Bitmap);
 
-            // Cache the bitmap using the unique identifier
-            cachedBitmaps[uniqueIdentifier] = out;
 
-            newLayer->Release();
-            effect->Release();
-        } else {
-            shouldntDo = true;
-        }
+        D2D::context->DrawImage(out);
+
+        Memory::SafeRelease(newLayer);
+        Memory::SafeRelease(out);
     }
 
-    if(!shouldntDo) {
-        // Retrieve the cached bitmap for the rect
-        ID2D1Image *cachedOut = cachedBitmaps[uniqueIdentifier];
-        D2D::context->DrawImage(cachedOut);
-    }
+    Memory::SafeRelease(newLayer);
 }
 
 void FlarialGUI::CopyBitmap(ID2D1Bitmap1* from, ID2D1Bitmap** to)
@@ -1642,19 +1630,17 @@ void FlarialGUI::lerp(T& a, const T& b, float t)
 }
 
 ID2D1SolidColorBrush* FlarialGUI::getBrush(D2D1_COLOR_F color) {
-    std::string key = std::to_string(color.r) + std::to_string(color.g) + std::to_string(color.b) + std::to_string(color.a);
+    std::string key =
+            std::to_string(color.r) + std::to_string(color.g) + std::to_string(color.b) + std::to_string(color.a);
 
 
     auto it = brushCache.find(key);
-    if (it != brushCache.end())
-    {
+    if (it != brushCache.end()) {
 
         return it->second;
-    }
-    else
-    {
+    } else {
 
-        ID2D1SolidColorBrush* brush;
+        ID2D1SolidColorBrush *brush;
 
         D2D::context->CreateSolidColorBrush(color, &brush);
 

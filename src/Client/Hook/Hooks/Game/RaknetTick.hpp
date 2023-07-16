@@ -1,3 +1,4 @@
+#pragma once
 #include "../Hook.hpp"
 #include "../../../../SDK/Client/Network/Raknet/RaknetConnector.hpp"
 

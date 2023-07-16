@@ -22,6 +22,8 @@ void HookManager::initialize()
 
     kiero::init(kiero::RenderType::D3D12);
 
+    if(kiero::getRenderType() == 0) kiero::init(kiero::RenderType::D3D11);
+
     hooks.push_back(new KeyHook());
     hooks.push_back(new MouseHook());
 
