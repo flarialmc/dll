@@ -11,16 +11,6 @@ void RaknetTickHook::callback(RaknetConnector* raknet)  {
 
     std::string ip = raknet->JoinedIp;
 
-    if (ip == "" && SDK::clientInstance == nullptr) {
-		ip = "none";
-    }
-
-    if (ip == "" && SDK::clientInstance != nullptr) {
-        if (SDK::clientInstance->getLocalPlayer() == nullptr)
-            ip = "none";
-        else ip = "world";
-    }
-
     std::string settingspath = Utils::getRoamingPath() + "\\Flarial\\serverip.txt";
 
     if (!std::filesystem::exists(settingspath)) {
@@ -39,20 +29,15 @@ void RaknetTickHook::callback(RaknetConnector* raknet)  {
         CloseHandle(fileHandle);
     }
 
-    std::string username = "";
-
-    if (SDK::clientInstance != nullptr)
-        if (SDK::clientInstance->getLocalPlayer() != nullptr)
-            username = SDK::clientInstance->getLocalPlayer()->playerName;
-    if(towriteip != ip) {
+    if(towriteip != ip && SDK::clientInstance->getLocalPlayer() != nullptr) {
 
         std::ofstream outputFile(settingspath);
         if (outputFile.is_open()) {
-            outputFile << ip + " " + username;
+            outputFile << raknet->JoinedIp + " " + SDK::clientInstance->getLocalPlayer()->playerName;
             outputFile.close();
         }
 
-        towriteip = ip;
+        towriteip = raknet->JoinedIp;
     }
 }
 

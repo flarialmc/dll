@@ -21,8 +21,8 @@ private:
 		if (ModuleManager::getModule("Zoom") != nullptr && fov != 70.00f) {
 
             auto zom = reinterpret_cast<Zoom *>(ModuleManager::getModule("Zoom"));
-            if(zom->settings.getSettingByName<bool>("enabled")->value) currentZoomVal = std::lerp(currentZoomVal, ZoomListener::zoomValue, zom->settings.getSettingByName<float>("anim")->value * FlarialGUI::frameFactor);
-            else currentZoomVal = std::lerp(currentZoomVal, fov, zom->settings.getSettingByName<float>("anim")->value * FlarialGUI::frameFactor);
+            if(zom->settings.getSettingByName<bool>("enabled")->value) currentZoomVal = std::lerp(currentZoomVal, ZoomListener::zoomValue, zom->settings.getSettingByName<float>("anim")->value);
+            else currentZoomVal = std::lerp(currentZoomVal, fov, zom->settings.getSettingByName<float>("anim")->value);
             return currentZoomVal;
 
         } else return fov;

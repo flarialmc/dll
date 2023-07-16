@@ -85,8 +85,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
             Logger::debug("not a DX12 device, running dx11 procedures");
 
-            Client::deviceType = 0;
-
                     const D2D1_CREATION_PROPERTIES properties
                             {
                                     D2D1_THREADING_MODE_SINGLE_THREADED,
@@ -110,9 +108,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
         } else {
 
             ID3D12Device5 *device;
-
-
-            Client::deviceType = 1;
 
             if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&device))) &&
                 kiero::getRenderType() == kiero::RenderType::D3D12) {
@@ -279,8 +274,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 /* Blur Stuff */
 
-                if (ModuleManager::doesAnyModuleHave("BlurEffect") || !FlarialGUI::notifications.empty() ||
-                    ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) {
+                if(ModuleManager::doesAnyModuleHave("BlurEffect") || !FlarialGUI::notifications.empty() || ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) {
                     ID2D1Bitmap *bitmap = nullptr;
 
                     if (FlarialGUI::blur == nullptr) {
@@ -307,6 +301,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                     D2D::context->CreateImageBrush(image, props, &FlarialGUI::blurbrush);
 
 
+
                     Memory::SafeRelease(image);
                     Memory::SafeRelease(bitmap);
                 }
@@ -321,26 +316,18 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 D2D::context->EndDraw();
             }
 
+            Memory::SafeRelease(FlarialGUI::blurbrush);
+            Memory::SafeRelease(FlarialGUI::blur);
+
+
         }
+
+
 
     }
 
-    if (Client::deviceType == 0) {
-        if (Client::settings.getSettingByName<bool>("vsync") != nullptr) {
 
-            auto option = Client::settings.getSettingByName<bool>("vsync");
-            if (option->value == true) {
-
-                return func_original(pSwapChain, 0, flags);
-            }
-        }
-    }
-
-    Memory::SafeRelease(FlarialGUI::blurbrush);
-    Memory::SafeRelease(FlarialGUI::blur);
-
-    return func_original(pSwapChain, syncInterval, flags);
-
+    return func_original(pSwapChain, 0, flags);
 
 
 }

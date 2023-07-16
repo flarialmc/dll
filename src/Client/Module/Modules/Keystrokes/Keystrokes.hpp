@@ -1,13 +1,9 @@
 #pragma once
 
-#include "../../../../SDK/SDK.hpp"
-#include <format>
-#include "../../../Events/Listener.hpp"
 #include "../Module.hpp"
-#include "../../../GUI/Engine/Engine.hpp"
-#include <Windows.h>
+#include "../../../Events/EventHandler.hpp"
 #include "KeystrokesListener.hpp"
-#include <codecvt>
+
 
 class Keystrokes : public Module {
 
@@ -24,7 +20,6 @@ public:
     };
 
     std::vector<D2D1_COLOR_F> states;
-    
 
     Keystrokes() : Module("Keystrokes", "yes br", "\\Flarial\\assets\\keyboard.png", 'M') {
 
@@ -192,6 +187,7 @@ public:
 
     void NormalRender(int index, std::string text, std::string value) override {
 
+
         if (SDK::hasInstanced) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
 
@@ -284,19 +280,6 @@ public:
                     states[Strokes::SPACEBAR] = FlarialGUI::LerpColor(states[Strokes::SPACEBAR], disabledColor,
                                                                       0.15f * FlarialGUI::frameFactor);
 
-                if (CPSListener::GetRightHeld())
-                    states[Strokes::RMB] = FlarialGUI::LerpColor(states[Strokes::RMB], enabledColor,
-                        0.15f * FlarialGUI::frameFactor);
-                else
-                    states[Strokes::RMB] = FlarialGUI::LerpColor(states[Strokes::RMB], disabledColor,
-                        0.15f * FlarialGUI::frameFactor);
-                if (CPSListener::GetLeftHeld())
-                    states[Strokes::LMB] = FlarialGUI::LerpColor(states[Strokes::LMB], enabledColor,
-                        0.15f * FlarialGUI::frameFactor);
-                else
-                    states[Strokes::LMB] = FlarialGUI::LerpColor(states[Strokes::LMB], disabledColor,
-                        0.15f * FlarialGUI::frameFactor);
-
 
 
                 // W
@@ -336,23 +319,7 @@ public:
                 realcenter.x -= 2 * (keycardSize + spacing);
 
                 if (!settings.getSettingByName<bool>("cps")->value) realcenter.y += (keycardSize + spacing);
-                else {
-                    // LMB
-                    FlarialGUI::RoundedRect(realcenter.x, realcenter.y += (keycardSize + spacing), states[Strokes::LMB], keycardSize + (keycardSize / 2), keycardSize - (keycardSize * 0.05),
-                        rounde.x,
-                        rounde.x);
-                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y - Constraints::SpacingConstraint(0.06, keycardSize), FlarialGUI::to_wide(std::to_string(CPSListener::GetLeftCPS())).c_str(), textColor, keycardSize + (keycardSize / 2), keycardSize,
-                        DWRITE_TEXT_ALIGNMENT_CENTER, fontSize + Constraints::SpacingConstraint(0.48, keycardSize));
-
-                    // RMB
-                    FlarialGUI::RoundedRect(realcenter.x += 1.5f * (keycardSize + spacing), realcenter.y, states[Strokes::RMB], keycardSize + (keycardSize / 2), keycardSize - (keycardSize * 0.05),
-                        rounde.x,
-                        rounde.x);
-                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y - Constraints::SpacingConstraint(0.06, keycardSize), FlarialGUI::to_wide(std::to_string(CPSListener::GetRightCPS())).c_str(), textColor, keycardSize + (keycardSize / 2), keycardSize,
-                        DWRITE_TEXT_ALIGNMENT_CENTER, fontSize + Constraints::SpacingConstraint(0.48, keycardSize));
-                    realcenter.y += (keycardSize + spacing);
-                    realcenter.x -= 1.5f * (keycardSize + spacing);
-                }
+                else realcenter.y += 1.25f * (keycardSize + spacing);
 
                 FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::SPACEBAR], spacebarWidth,
                                         spacebarHeight, rounde.x, rounde.x);

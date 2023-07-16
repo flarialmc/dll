@@ -23,7 +23,7 @@ public:
 
 
         if(settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
-        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"Mem: {value}");
+        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value}");
 
         EventHandler::registerListener(new MemoryListener("Memory", this));
     }

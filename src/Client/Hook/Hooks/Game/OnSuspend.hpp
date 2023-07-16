@@ -1,8 +1,6 @@
-#pragma once
 #include "../Hook.hpp"
 #include "../../../Events/EventHandler.hpp"
 #include "../../../../SDK/SDK.hpp"
-
 class OnSuspendHook : public Hook {
 
 private:

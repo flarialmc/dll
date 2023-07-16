@@ -22,10 +22,6 @@ bool Actor::wasHurt() {
     return Memory::CallVFunc<215, bool>(this);
 }
 
-ItemStack* Actor::getArmor(int slot) {
-    return Memory::CallVFunc<137, ItemStack*>(this, slot);
-}
-
 ActorMovementProxyComponent* Actor::getMovementProxyComponent() {
     static  uintptr_t sig;
 

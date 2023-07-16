@@ -10,8 +10,8 @@
 
 namespace CPS {
 
-    static int inline leftcps = 0;
-    static int inline rightcps = 0;
+    int inline leftcps = 0;
+    int inline rightcps = 0;
 };
 
 class ClickData {
@@ -23,28 +23,14 @@ public:
 class CPSListener : public Listener {
 
 private:
-    static inline std::vector<ClickData> leftClickList;
-    static inline std::vector<ClickData> rightClickList;
-    static inline bool rightClickHeld;
-    static inline bool leftClickHeld;
+    std::vector<ClickData> leftClickList;
+    std::vector<ClickData> rightClickList;
     Module* module;
 
     void onMouse(MouseEvent &event) override {
 
-        if (event.GetButton() == MouseButton::Left) {
-            if (!MC::held) {
-                AddLeftClick();
-                leftClickHeld = false;
-            }
-            else leftClickHeld = true;
-        }
-        if (event.GetButton() == MouseButton::Right) {
-            if (!MC::held) {
-                AddRightClick();
-                rightClickHeld = false;
-            }
-            else rightClickHeld = true;
-        }
+        if(event.GetButton() == MouseButton::Left && !MC::held) AddLeftClick();
+        if(event.GetButton() == MouseButton::Right && !MC::held) AddRightClick();
 
     }
 
@@ -86,7 +72,7 @@ public:
         }
     }
 
-    [[nodiscard]] static int GetLeftCPS()  {
+    [[nodiscard]] int GetLeftCPS() const {
         if (leftClickList.empty()) {
             return 0;
         }
@@ -99,7 +85,7 @@ public:
         return (int)std::round(count);
     }
 
-    [[nodiscard]] static int GetRightCPS()  {
+    [[nodiscard]] int GetRightCPS() const {
         if (rightClickList.empty()) {
             return 0;
         }
@@ -112,15 +98,8 @@ public:
         return (int)std::round(count);
     }
 
-    [[nodiscard]] static bool GetLeftHeld() {
-        return leftClickHeld;
-    }
-    [[nodiscard]] static bool GetRightHeld() {
-        return rightClickHeld;
-    }
-
 private:
-    [[nodiscard]] static double Microtime()  {
+    [[nodiscard]] double Microtime() const {
         return (double(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) / double(1000000));
     }
 

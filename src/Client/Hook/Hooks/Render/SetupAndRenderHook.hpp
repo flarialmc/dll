@@ -63,7 +63,18 @@ private:
         std::string layer = SDK::screenView->VisualTree->root->LayerName;
         if(layer != "debug_screen" && layer != "toast_screen")
             SDK::CurrentScreen = layer;
-         
+
+
+        if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+
+
+        }
+
+        SetupAndRenderEvent event;
+        event.muirc = muirc;
+        EventHandler::onSetupAndRender(event);
+
+
         func_original(pScreenView, muirc);
     }
 

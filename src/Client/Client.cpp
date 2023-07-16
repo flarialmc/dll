@@ -5,14 +5,16 @@
 #include <filesystem>
 #include <thread>
 #include <wingdi.h>
+#include <wininet.h>
 
 std::string Client::settingspath = Utils::getRoamingPath() + "\\Flarial\\Config\\main.flarial";
 Settings Client::settings = Settings();
-int Client::deviceType = 2;
 
 void DownloadAndSave(std::string url, std::string path) {
 
     char test[256];
+    strcpy(test, "https://google.com/");
+    if(InternetCheckConnectionA(test, FLAG_ICC_FORCE_CONNECTION, 0))
     URLDownloadToFileW(NULL, FlarialGUI::to_wide(url).c_str(), FlarialGUI::to_wide(path).c_str(), 0, NULL);
 
 }
@@ -95,12 +97,6 @@ void Client::initialize()
     if(Client::settings.getSettingByName<bool>("killdx") == nullptr)
         Client::settings.addSetting("killdx", false);
 
-    if (Client::settings.getSettingByName<bool>("vsync") == nullptr)
-        Client::settings.addSetting("vsync", false);
-
-
-
-
     // Create threads to download the files
     std::vector<std::thread> threads;
     for (const auto& data : fileData) {
@@ -131,9 +127,8 @@ void Client::initialize()
 
     HookManager::initialize();
 
-    Sleep(5000);
+    Sleep(1000);
 
-    FlarialGUI::Notify("Report bugs at https://flarial.net/discord!");
-    FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("keybind")->value + " to open the menu in-game.");
+    FlarialGUI::Notify("Injected");
 
 }
