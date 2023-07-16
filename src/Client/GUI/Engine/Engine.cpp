@@ -881,7 +881,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float& opacity) 
 
         float buttonWidth = Constraints::RelativeConstraint(0.35f, "width");
         float buttonHeight = Constraints::RelativeConstraint(0.20f, "height");
-        if(FlarialGUI::RoundedButton(0, x + spacing * 1.45f, y + spacing * 4.12f, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Close", buttonWidth, buttonHeight, round.x, round.x)) ColorPickers[index].isActive = false;
+        if(FlarialGUI::RoundedButton(x + spacing * 1.45f, y + spacing * 4.12f, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Close", buttonWidth, buttonHeight, round.x, round.x)) ColorPickers[index].isActive = false;
 
 
 
@@ -1618,51 +1618,7 @@ std::wstring FlarialGUI::to_wide(const std::string &multi)
 
 template <typename T>
 void FlarialGUI::lerp(T& a, const T& b, float t)
-{bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width, const float height, float radiusX, float radiusY)
-    {
-        if (isInScrollView)
-            y += scrollpos;
-
-        static ID2D1SolidColorBrush* textBrush;
-        textBrush = FlarialGUI::getBrush(textColor);
-
-        static IDWriteTextFormat* textFormat;
-        writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width), L"en-US", &textFormat);
-        textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-        textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-
-        ID2D1SolidColorBrush* brush = nullptr;
-        D2D1_COLOR_F buttonColor;
-
-        if (CursorInRect(x, y, width, height))
-        {
-            buttonColor = D2D1::ColorF(color.r - darkenAmounts[index], color.g - darkenAmounts[index], color.b - darkenAmounts[index], color.a);
-            FadeEffect::ApplyFadeInEffect(0.005f * FlarialGUI::frameFactor, maxDarkenAmount, darkenAmounts[index]);
-        } else {
-            buttonColor = D2D1::ColorF(color.r - darkenAmounts[index], color.g - darkenAmounts[index], color.b - darkenAmounts[index], color.a);
-            FadeEffect::ApplyFadeOutEffect(0.005f * FlarialGUI::frameFactor, darkenAmounts[index]);
-
-        }
-
-
-        brush = FlarialGUI::getBrush(buttonColor);
-
-        D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
-        D2D::context->FillRoundedRectangle(roundedRect, brush);
-
-        D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
-
-        textFormat->Release();
-
-        if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
-        {
-            MC::mousebutton = MouseButton::None;
-            return true;
-
-        }
-
-        return false;
-    }
+{
     // Perform linear interpolation between a and b based on t
     float interpolatedValue = a + (b - a) * t;
 
