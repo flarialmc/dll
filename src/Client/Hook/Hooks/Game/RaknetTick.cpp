@@ -27,13 +27,20 @@ void RaknetTickHook::callback(RaknetConnector* raknet)  {
         }
 
         CloseHandle(fileHandle);
+
     }
 
-    if(towriteip != ip && SDK::clientInstance->getLocalPlayer() != nullptr) {
+    std::string username = "";
+    if (SDK::clientInstance != nullptr)
+        if (SDK::clientInstance->getLocalPlayer() != nullptr)
+            if (!SDK::clientInstance->getLocalPlayer()->playerName.empty())
+                username = SDK::clientInstance->getLocalPlayer()->playerName;
+
+    if(towriteip != ip) {
 
         std::ofstream outputFile(settingspath);
         if (outputFile.is_open()) {
-            outputFile << raknet->JoinedIp + " " + SDK::clientInstance->getLocalPlayer()->playerName;
+            outputFile << raknet->JoinedIp + " " + username;
             outputFile.close();
         }
 

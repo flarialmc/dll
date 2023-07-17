@@ -881,7 +881,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float& opacity) 
 
         float buttonWidth = Constraints::RelativeConstraint(0.35f, "width");
         float buttonHeight = Constraints::RelativeConstraint(0.20f, "height");
-        if(FlarialGUI::RoundedButton(x + spacing * 1.45f, y + spacing * 4.12f, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Close", buttonWidth, buttonHeight, round.x, round.x)) ColorPickers[index].isActive = false;
+        if(FlarialGUI::RoundedButton(0, x + spacing * 1.45f, y + spacing * 4.12f, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Close", buttonWidth, buttonHeight, round.x, round.x)) ColorPickers[index].isActive = false;
 
 
 
