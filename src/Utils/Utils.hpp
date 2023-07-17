@@ -109,11 +109,8 @@ public:
         return Vec3<T>(this->x * v, this->y * v, this->z * v);
     };
 public:
-    auto dist(const Vec3<T> v) -> float {
-        auto dX = this->x - v.x;
-        auto dZ = this->z - v.z;
-
-        return sqrt(dX * dX + dZ * dZ);
+    auto dist(const Vec3<T> pos) -> float {
+        return sqrt((std::pow(this->x - pos.x, 2)) + (std::pow(this->y - pos.y, 2)) + (std::pow(this->z - pos.z, 2)));
     };
 };
 
