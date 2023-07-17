@@ -41,7 +41,6 @@ class ClickGUIRenderer : public Listener {
 
     Module* module;
     std::string curr;
-    bool TestToggle = false;
     float baseHeightReal = 0.64f;
     float baseHeightActual = 0.00001f;
 
@@ -49,14 +48,13 @@ class ClickGUIRenderer : public Listener {
 
         FlarialGUI::NotifyHeartbeat();
 
-        if(SDK::CurrentScreen == "hud_screen") {
             float allahu = Constraints::RelativeConstraint(0.65);
             float akbar = Constraints::RelativeConstraint(0.25);
             Vec2<float> allahuakbar = Constraints::CenterConstraint(allahu, akbar, "y", 1.175, 1.175);
 
             // watermark
             if (SDK::clientInstance->getTopScreenName() == "inventory_screen" ||
-                SDK::clientInstance->getTopScreenName().find("chest") != std::string::npos)
+                SDK::CurrentScreen.find("chest") != std::string::npos)
                 FlarialGUI::Image("\\Flarial\\assets\\flarial-title.png",
                                   D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
                                               allahuakbar.y + akbar));
@@ -239,15 +237,10 @@ class ClickGUIRenderer : public Listener {
 
                         FlarialGUI::PopSize();
 
-                        int i2 = 0;
-
-                        for (auto &adsasda: ModuleManager::modules)
-                            i2++;
-
-                        i2 = i2 % 3;
+                        int i2 = ModuleManager::modules.size() % 3;
 
                         FlarialGUI::ScrollBar(120, scrollcenter.y, 10,
-                                              Constraints::SpacingConstraint(1.8, modHeight * i2) +
+                                              Constraints::SpacingConstraint(5.0, modHeight * i2) +
                                               (Constraints::SpacingConstraint(0.8, modWidth) * i2), 2);
 
                         FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
@@ -396,7 +389,6 @@ class ClickGUIRenderer : public Listener {
 
 
             }
-        }
     }
 
     void onKey(KeyEvent &event) override {
@@ -427,6 +419,7 @@ class ClickGUIRenderer : public Listener {
             module->settings.getSettingByName<bool>("enabled")->value = false;
             ClickGUIRenderer::page.type = "normal";
             ClickGUIRenderer::curr = "modules";
+            event.cancel();
         }
 
         if(module->settings.getSettingByName<bool>("enabled")->value) {

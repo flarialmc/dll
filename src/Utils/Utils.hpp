@@ -111,10 +111,9 @@ public:
 public:
     auto dist(const Vec3<T> v) -> float {
         auto dX = this->x - v.x;
-        auto dY = this->y - v.y;
         auto dZ = this->z - v.z;
 
-        return sqrt(dX * dX + dY * dY + dZ * dZ);
+        return sqrt(dX * dX + dZ * dZ);
     };
 };
 

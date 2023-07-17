@@ -44,7 +44,7 @@ public:
 
     }
 
-    void patch() {
+    static void patch() {
 
         DWORD oldProtect;
         VirtualProtect((LPVOID)yaw1, PatchedYaw1.size(), PAGE_EXECUTE_READWRITE, &oldProtect);
