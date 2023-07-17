@@ -4,6 +4,7 @@
 #include "../Events/EventHandler.hpp"
 #include "Modules/Input/GUIKeyListener.hpp"
 #include "Modules/Misc/Uninject/Uninject.hpp"
+#include "Modules/Misc/SaveConfig/SaveConfig.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/Module.hpp"
 #include "Modules/FPS/FPSCounter.hpp"
@@ -62,6 +63,7 @@ void ModuleManager::initialize()
 
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));
+    EventHandler::registerListener(new SaveConfigListener("SaveConfig"));
 }
 
 void ModuleManager::terminate()
@@ -71,6 +73,12 @@ void ModuleManager::terminate()
     }
 
     modules.clear();
+}
+
+void ModuleManager::SaveModulesConfig() {
+    for (Module* module : modules) {
+        module->SaveSettings();
+    }
 }
 
 bool ModuleManager::doesAnyModuleHave(std::string settingName) {
