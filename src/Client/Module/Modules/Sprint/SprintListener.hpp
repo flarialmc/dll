@@ -11,52 +11,59 @@
 class SprintListener : public Listener {
 
     Module* module;
+    bool ToggleSprinting = false;
 
     void onKey(KeyEvent& event) override {
 
-        if(SDK::CurrentScreen == "hud_screen")
-        if (module->settings.getSettingByName<bool>("enabled")->value) {
-            if (event.GetKey() == 'N' && event.GetAction() == 0) {
-                module->settings.getSettingByName<bool>("toggled")->value = !module->settings.getSettingByName<bool>("toggled")->value;
+        if (SDK::CurrentScreen == "hud_screen")
+            if (module->settings.getSettingByName<bool>("enabled")->value) {
+                if (module->IsKeybind(event.keys) && module->IsKeyPartOfKeybind(event.key)) {
+                    ToggleSprinting = !ToggleSprinting;
+                }
             }
-        }
-
-        if (event.GetKey() == this->module->keybind) { module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value; }
     };
 
     void onRender(RenderEvent& event) override {
 
-        if(SDK::CurrentScreen == "hud_screen")
-        if (module->settings.getSettingByName<bool>("enabled")->value) {
+        if (SDK::CurrentScreen == "hud_screen")
+            if (module->settings.getSettingByName<bool>("enabled")->value) {
+                if (module->settings.getSettingByName<bool>("status")->value) {
+                    if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
 
-            if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
+                        if (SDK::clientInstance->getLocalPlayer() != nullptr) {
 
-                if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                            if (SDK::clientInstance->getLocalPlayer()->getActorFlag(1)) {
+                                this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Sneaking");
+                            }
+                            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) {
+                                this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Sprinting");
+                            }
+                            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(34)) {
+                                this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Walking");
+                            }
+                            else { this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Standing"); }
 
-                    if (SDK::clientInstance->getLocalPlayer()->getActorFlag(1)) {
-                        this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Sneaking");
-                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) {
-                        this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Sprinting");
-                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(34)) {
-                        this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Walking");
-                    } else { this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Standing"); }
+                        }
 
+                    }
                 }
-
             }
-        }
     }
 
-    void onLocalTick(TickEvent &event) override {
+    void onLocalTick(TickEvent& event) override {
 
-        if (SDK::clientInstance != nullptr) {
-            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
-
-                if (module->settings.getSettingByName<bool>("always")->value) {
-                    handler->sprinting = true;
-                }  else {
-                    handler->sprinting = module->settings.getSettingByName<bool>("toggled")->value;
+        if (module->settings.getSettingByName<bool>("enabled")->value) {
+            if (SDK::clientInstance != nullptr) {
+                if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                    if (!SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) {
+                        MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
+                        if (module->settings.getSettingByName<bool>("always")->value) {
+                            handler->sprinting = true;
+                        }
+                        else {
+                            if(ToggleSprinting) handler->sprinting = ToggleSprinting;
+                        }
+                    }
                 }
             }
         }
