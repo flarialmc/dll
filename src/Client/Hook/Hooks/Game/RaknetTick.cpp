@@ -30,7 +30,7 @@ void RaknetTickHook::callback(RaknetConnector* raknet)  {
 
     }
 
-    std::string username = "";
+    std::string username;
     if (SDK::clientInstance != nullptr)
         if (SDK::clientInstance->getLocalPlayer() != nullptr)
             if (!SDK::clientInstance->getLocalPlayer()->playerName.empty())

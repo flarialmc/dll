@@ -47,197 +47,312 @@ class ClickGUIRenderer : public Listener {
 
     void onRender(RenderEvent &event) override {
 
-        float allahu = Constraints::RelativeConstraint(0.65);
-        float akbar = Constraints::RelativeConstraint(0.25);
-        Vec2<float> allahuakbar = Constraints::CenterConstraint(allahu, akbar, "y", 1.175, 1.175);
-
-        // watermark
-        if(SDK::clientInstance->getTopScreenName() == "inventory_screen" || SDK::clientInstance->getTopScreenName().find("chest") != std::string::npos)
-            FlarialGUI::Image("\\Flarial\\assets\\flarial-title.png", D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu, allahuakbar.y + akbar));
-
         FlarialGUI::NotifyHeartbeat();
 
-        if(FlarialGUI::scrollposmodifier == 0) {
-            FlarialGUI::scrollposmodifier = Constraints::RelativeConstraint(0.1f);
-        }
+        if(SDK::CurrentScreen == "hud_screen") {
+            float allahu = Constraints::RelativeConstraint(0.65);
+            float akbar = Constraints::RelativeConstraint(0.25);
+            Vec2<float> allahuakbar = Constraints::CenterConstraint(allahu, akbar, "y", 1.175, 1.175);
 
-        if(module->settings.getSettingByName<bool>("enabled")->value) {
+            // watermark
+            if (SDK::clientInstance->getTopScreenName() == "inventory_screen" ||
+                SDK::clientInstance->getTopScreenName().find("chest") != std::string::npos)
+                FlarialGUI::Image("\\Flarial\\assets\\flarial-title.png",
+                                  D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
+                                              allahuakbar.y + akbar));
 
-            FlarialGUI::ApplyGaussianBlur(6.0);
-            lerp(baseHeightActual, 0.64f, 0.18f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
 
-        } else {
-            lerp(baseHeightReal, 0.01f, 0.22f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
-            lerp(baseHeightActual, 0.00001f, 0.30f * floorf(FlarialGUI::frameFactor* 100.0f) / 100.0f);
-        }
+            if (FlarialGUI::scrollposmodifier == 0) {
+                FlarialGUI::scrollposmodifier = Constraints::RelativeConstraint(0.1f);
+            }
 
-        if(SwapchainHook::init && baseHeightActual > 0.01) {
+            if (module->settings.getSettingByName<bool>("enabled")->value) {
 
-            /* Base Rectangle Start */
+                FlarialGUI::ApplyGaussianBlur(6.0);
+                lerp(baseHeightActual, 0.64f, 0.18f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
 
-            float baseWidth = Constraints::RelativeConstraint(0.85);
+            } else {
+                lerp(baseHeightReal, 0.01f, 0.22f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+                lerp(baseHeightActual, 0.00001f, 0.30f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+            }
 
-            if(module->settings.getSettingByName<bool>("enabled")->value){
-                if (ClickGUIRenderer::page.type == "settings" || curr == "settings") {
+            if (SwapchainHook::init && baseHeightActual > 0.01) {
 
-                    lerp(baseHeightReal, 0.35f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
-                    //FadeEffect::ApplyFadeOutEffect(0.015f * FlarialGUI::frameFactor, baseHeightReal, 0.35f);
-                } else {
-                    lerp(baseHeightReal, 0.64f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
-                    //FadeEffect::ApplyFadeInEffect(0.015f * FlarialGUI::frameFactor, 0.64f, baseHeightReal);
+                /* Base Rectangle Start */
+
+                float baseWidth = Constraints::RelativeConstraint(0.85);
+
+                if (module->settings.getSettingByName<bool>("enabled")->value){
+                    if (ClickGUIRenderer::page.type == "settings" || curr == "settings") {
+
+                        lerp(baseHeightReal, 0.35f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+                        //FadeEffect::ApplyFadeOutEffect(0.015f * FlarialGUI::frameFactor, baseHeightReal, 0.35f);
+                    } else {
+                        lerp(baseHeightReal, 0.64f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+                        //FadeEffect::ApplyFadeInEffect(0.015f * FlarialGUI::frameFactor, 0.64f, baseHeightReal);
+                    }
                 }
-            }
 
-            float baseHeight = Constraints::RelativeConstraint(baseHeightReal);
+                float baseHeight = Constraints::RelativeConstraint(baseHeightReal);
 
-            Vec2<float> center = Constraints::CenterConstraint(baseWidth, Constraints::RelativeConstraint(baseHeightReal), "r", 1, 1);
-            Vec2<float> round = Constraints::RoundingConstraint(50, 50);
+                Vec2<float> center = Constraints::CenterConstraint(baseWidth,
+                                                                   Constraints::RelativeConstraint(baseHeightReal), "r",
+                                                                   1, 1);
+                Vec2<float> round = Constraints::RoundingConstraint(50, 50);
 
-            FlarialGUI::ShadowRect(D2D1::RoundedRect(D2D1::RectF(center.x, center.y, center.x + Constraints::SpacingConstraint(1.02f, baseWidth), center.y + Constraints::RelativeConstraint(baseHeightReal * 1.02f)), round.x, round.x));
-            FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), baseWidth, Constraints::RelativeConstraint(baseHeightReal), round.x, round.x);
-            FlarialGUI::PushSize(center.x, center.y, baseWidth, Constraints::RelativeConstraint(baseHeightActual));
+                FlarialGUI::ShadowRect(D2D1::RoundedRect(
+                        D2D1::RectF(center.x, center.y, center.x + Constraints::SpacingConstraint(1.02f, baseWidth),
+                                    center.y + Constraints::RelativeConstraint(baseHeightReal * 1.02f)), round.x,
+                        round.x));
+                FlarialGUI::RoundedRect(center.x, center.y,
+                                        D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), baseWidth,
+                                        Constraints::RelativeConstraint(baseHeightReal), round.x, round.x);
+                FlarialGUI::PushSize(center.x, center.y, baseWidth, Constraints::RelativeConstraint(baseHeightActual));
 
-            /* Base Rectangle End */
-
-
-            /* Nav Bar Start */
-
-            float navigationBarWidth = Constraints::RelativeConstraint(1.309f);
-            float navigationBarHeight = Constraints::RelativeConstraint(0.14f);
-            float navx = Constraints::PercentageConstraint(0.008f, "left");
-            float navy = Constraints::PercentageConstraint(0.009f, "top");
-            round = Constraints::RoundingConstraint(50, 50);
-
-            FlarialGUI::RoundedRect(navx, navy, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), navigationBarWidth, navigationBarHeight, round.x ,round.x);
+                /* Base Rectangle End */
 
 
-            FlarialGUI::PushSize(navx, navy, navigationBarWidth, navigationBarHeight);
+                /* Nav Bar Start */
 
-            /* Nav Bar End */
+                float navigationBarWidth = Constraints::RelativeConstraint(1.309f);
+                float navigationBarHeight = Constraints::RelativeConstraint(0.14f);
+                float navx = Constraints::PercentageConstraint(0.008f, "left");
+                float navy = Constraints::PercentageConstraint(0.009f, "top");
+                round = Constraints::RoundingConstraint(50, 50);
 
-            /* Logo Start */
-
-
-            float logoWidth = Constraints::RelativeConstraint(1.21);
-
-            float logoX = navx - Constraints::SpacingConstraint(0.05, logoWidth);
-            float logoY = (navy + navigationBarHeight / 2.0f - logoWidth / 2.0f);
-
-            FlarialGUI::Image("\\Flarial\\assets\\logo.png", D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth));
-
-            /* Logo End */
-
-            /* tab buttons start */
+                FlarialGUI::RoundedRect(navx, navy, D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f),
+                                        navigationBarWidth, navigationBarHeight, round.x, round.x);
 
 
-            float RadioButtonWidth = Constraints::RelativeConstraint(0.24, "width");
-            float RadioButtonHeight = Constraints::RelativeConstraint(0.5);
+                FlarialGUI::PushSize(navx, navy, navigationBarWidth, navigationBarHeight);
 
-            float radioX = navx - Constraints::SpacingConstraint(-0.85, logoWidth);
-            float radioY (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
+                /* Nav Bar End */
 
-            round = Constraints::RoundingConstraint(30, 30);
-
-            if(FlarialGUI::RoundedRadioButton(1, radioX, radioY, D2D1::ColorF(255.0f/255.0f, 36.0f/255.0f, 56.0f/255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Modules", RadioButtonWidth, RadioButtonHeight, round.x, round.x, "modules", curr))
-            {
-                this->curr = "modules";
-                ClickGUIRenderer::page.type = "normal";
-                FlarialGUI::ResetShit();
-
-                FlarialGUI::scrollpos = 0;
-                FlarialGUI::barscrollpos = 0;
-                GUIMouseListener::accumilatedPos = 0;
-                GUIMouseListener::accumilatedBarPos = 0;
-            }
+                /* Logo Start */
 
 
+                float logoWidth = Constraints::RelativeConstraint(1.21);
 
-            logoWidth = Constraints::RelativeConstraint(0.21f);
+                float logoX = navx - Constraints::SpacingConstraint(0.05, logoWidth);
+                float logoY = (navy + navigationBarHeight / 2.0f - logoWidth / 2.0f);
 
-            radioX -= Constraints::SpacingConstraint(-0.53f, logoWidth);
-            radioY -= Constraints::SpacingConstraint(-0.53f, logoWidth);
+                FlarialGUI::Image("\\Flarial\\assets\\logo.png",
+                                  D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth));
 
-            float shit = Constraints::RelativeConstraint(0.33f);
-            round = Constraints::RoundingConstraint(15, 15);
+                /* Logo End */
 
-            FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15f, logoWidth), radioY + Constraints::SpacingConstraint(-0.12f, logoWidth), D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f), shit, shit, round.x, round.x);
-
-            radioX -= Constraints::SpacingConstraint(-0.125f, logoWidth);
-            radioY -= Constraints::SpacingConstraint(-0.15f, logoWidth);
-            FlarialGUI::Image("\\Flarial\\assets\\modules.png", D2D1::RectF(radioX , radioY, radioX + logoWidth, radioY + logoWidth));
+                /* tab buttons start */
 
 
+                float RadioButtonWidth = Constraints::RelativeConstraint(0.24, "width");
+                float RadioButtonHeight = Constraints::RelativeConstraint(0.5);
 
-            radioX = navx - Constraints::SpacingConstraint(-0.85f, logoWidth);
-            radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
+                float radioX = navx - Constraints::SpacingConstraint(-0.85, logoWidth);
+                float radioY(navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
 
-            round = Constraints::RoundingConstraint(30, 30);
-            radioX += Constraints::SpacingConstraint(15.f, logoWidth);
-            if(FlarialGUI::RoundedRadioButton(0, radioX, radioY, D2D1::ColorF(255.0f/255.0f, 36.0f/255.0f, 56.0f/255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Settings", RadioButtonWidth, RadioButtonHeight, round.x, round.x, "settings", this->curr)) this->curr = "settings";;
+                round = Constraints::RoundingConstraint(30, 30);
 
-            radioX -= Constraints::SpacingConstraint(-0.53f, logoWidth);
-            radioY -= Constraints::SpacingConstraint(-0.53f, logoWidth);
+                if (FlarialGUI::RoundedRadioButton(1, radioX, radioY,
+                                                   D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                                   D2D1::ColorF(D2D1::ColorF::White), L"Modules", RadioButtonWidth,
+                                                   RadioButtonHeight, round.x, round.x, "modules", curr)) {
+                    this->curr = "modules";
+                    ClickGUIRenderer::page.type = "normal";
+                    FlarialGUI::ResetShit();
 
-            round = Constraints::RoundingConstraint(15, 15);
+                    FlarialGUI::scrollpos = 0;
+                    FlarialGUI::barscrollpos = 0;
+                    GUIMouseListener::accumilatedPos = 0;
+                    GUIMouseListener::accumilatedBarPos = 0;
+                }
 
-            FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15f, logoWidth), radioY + Constraints::SpacingConstraint(-0.12f, logoWidth), D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f), shit, shit, round.x, round.x);
 
-            radioX -= Constraints::SpacingConstraint(-0.125f, logoWidth);
-            radioY -= Constraints::SpacingConstraint(-0.15f, logoWidth);
-            FlarialGUI::Image("\\Flarial\\assets\\gear.png", D2D1::RectF(radioX , radioY, radioX + logoWidth, radioY + logoWidth));
+                logoWidth = Constraints::RelativeConstraint(0.21f);
 
-            /* tab buttons end */
+                radioX -= Constraints::SpacingConstraint(-0.53f, logoWidth);
+                radioY -= Constraints::SpacingConstraint(-0.53f, logoWidth);
 
-            FlarialGUI::PopSize(); // Pops nav bar
-            /* Mod Card Start */
+                float shit = Constraints::RelativeConstraint(0.33f);
+                round = Constraints::RoundingConstraint(15, 15);
 
-            std::string e = this->curr;
+                FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15f, logoWidth),
+                                        radioY + Constraints::SpacingConstraint(-0.12f, logoWidth),
+                                        D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f), shit, shit,
+                                        round.x, round.x);
 
-            if(ClickGUIRenderer::page.type == "normal") {
+                radioX -= Constraints::SpacingConstraint(-0.125f, logoWidth);
+                radioY -= Constraints::SpacingConstraint(-0.15f, logoWidth);
+                FlarialGUI::Image("\\Flarial\\assets\\modules.png",
+                                  D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
 
-                if (e == "modules") {
 
-                    float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
-                    float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
+                radioX = navx - Constraints::SpacingConstraint(-0.85f, logoWidth);
+                radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
 
-                    Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.60,-0.52);
+                round = Constraints::RoundingConstraint(30, 30);
+                radioX += Constraints::SpacingConstraint(15.f, logoWidth);
+                if (FlarialGUI::RoundedRadioButton(0, radioX, radioY,
+                                                   D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                                   D2D1::ColorF(D2D1::ColorF::White), L"Settings", RadioButtonWidth,
+                                                   RadioButtonHeight, round.x, round.x, "settings", this->curr))
+                    this->curr = "settings";;
 
-                    FlarialGUI::PushSize(center.x, center.y, baseWidth, Constraints::RelativeConstraint(baseHeightReal, "height", true));
+                radioX -= Constraints::SpacingConstraint(-0.53f, logoWidth);
+                radioY -= Constraints::SpacingConstraint(-0.53f, logoWidth);
 
-                    float scrollWidth = Constraints::RelativeConstraint(1.12);
-                    float scrollHeight = Constraints::RelativeConstraint(0.84);
-                    Vec2<float> scrollcenter = Constraints::CenterConstraint(scrollWidth, scrollHeight, "y", 0.0, 1);
+                round = Constraints::RoundingConstraint(15, 15);
 
-                    FlarialGUI::PopSize();
+                FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15f, logoWidth),
+                                        radioY + Constraints::SpacingConstraint(-0.12f, logoWidth),
+                                        D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f), shit, shit,
+                                        round.x, round.x);
 
-                    int i2 = 0;
+                radioX -= Constraints::SpacingConstraint(-0.125f, logoWidth);
+                radioY -= Constraints::SpacingConstraint(-0.15f, logoWidth);
+                FlarialGUI::Image("\\Flarial\\assets\\gear.png",
+                                  D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
 
-                    for(auto& adsasda : ModuleManager::modules)
-                        i2++;
+                /* tab buttons end */
 
-                    i2 = i2 % 3;
+                FlarialGUI::PopSize(); // Pops nav bar
+                /* Mod Card Start */
 
-                    FlarialGUI::ScrollBar(120, scrollcenter.y, 10, Constraints::SpacingConstraint(1.7, modHeight * i2) + (Constraints::SpacingConstraint(0.8, modWidth) * i2), 2);
+                std::string e = this->curr;
 
-                    FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
+                if (ClickGUIRenderer::page.type == "normal") {
 
-                    float xModifier = 0.0f;
-                    float yModifier = 0.0f;
+                    if (e == "modules") {
 
-                    int i = 0;
-                    for (Module *real: ModuleManager::modules) {
-                        ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
-                                                  real->icon, i);
+                        float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
+                        float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
 
-                        xModifier += Constraints::SpacingConstraint(1.09, modWidth);
-                        if ((++i % 3) == 0) {
-                            yModifier += Constraints::SpacingConstraint(0.8, modWidth);
-                            xModifier = 0.0f;
+                        Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.60,
+                                                                              -0.52);
+
+                        FlarialGUI::PushSize(center.x, center.y, baseWidth,
+                                             Constraints::RelativeConstraint(baseHeightReal, "height", true));
+
+                        float scrollWidth = Constraints::RelativeConstraint(1.12);
+                        float scrollHeight = Constraints::RelativeConstraint(0.84);
+                        Vec2<float> scrollcenter = Constraints::CenterConstraint(scrollWidth, scrollHeight, "y", 0.0,
+                                                                                 1);
+
+                        FlarialGUI::PopSize();
+
+                        int i2 = 0;
+
+                        for (auto &adsasda: ModuleManager::modules)
+                            i2++;
+
+                        i2 = i2 % 3;
+
+                        FlarialGUI::ScrollBar(120, scrollcenter.y, 10,
+                                              Constraints::SpacingConstraint(1.8, modHeight * i2) +
+                                              (Constraints::SpacingConstraint(0.8, modWidth) * i2), 2);
+
+                        FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
+
+                        float xModifier = 0.0f;
+                        float yModifier = 0.0f;
+
+                        int i = 0;
+                        for (Module *real: ModuleManager::modules) {
+                            ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
+                                                      real->icon, i);
+
+                            xModifier += Constraints::SpacingConstraint(1.09, modWidth);
+                            if ((++i % 3) == 0) {
+                                yModifier += Constraints::SpacingConstraint(0.8, modWidth);
+                                xModifier = 0.0f;
+                            }
                         }
+
+                        FlarialGUI::UnsetScrollView();
+                    } else if (e == "settings") {
+
+                        FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
+
+                        float rectX = Constraints::PercentageConstraint(0.01, "left");
+                        float rectY = Constraints::PercentageConstraint(0.32, "top");
+                        float rectWidth = Constraints::RelativeConstraint(0.965, "width");
+                        float rectHeight = Constraints::RelativeConstraint(0.55);
+
+                        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+                        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
+                        round = Constraints::RoundingConstraint(50, 50);
+
+                        float anotherRectHeight = Constraints::RelativeConstraint(0.60);
+                        float anotherRectWidth = Constraints::RelativeConstraint(0.981, "width");
+
+                        FlarialGUI::RoundedRect(rectX, rectY,
+                                                D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f),
+                                                anotherRectWidth, anotherRectHeight, round.x, round.x);
+
+                        round = Constraints::RoundingConstraint(45, 45);
+                        FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth),
+                                                rectY + Constraints::SpacingConstraint(0.01, rectWidth),
+                                                D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectWidth,
+                                                rectHeight, round.x, round.x);
+
+                        FlarialGUI::PopSize();
+
+                        FlarialGUI::PushSize(rectX + Constraints::SpacingConstraint(0.0085, rectWidth),
+                                             rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth,
+                                             rectHeight);
+
+                        FlarialGUI::TextBoxVisual(0, Client::settings.getSettingByName<std::string>("fontname")->value,
+                                                  26, Constraints::PercentageConstraint(0.019, "left"),
+                                                  Constraints::PercentageConstraint(0.10, "top"),
+                                                  "Font (Anything installed in your system)");
+
+                        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left"),
+                                                        Constraints::PercentageConstraint(0.40, "top"),
+                                                        FlarialGUI::to_wide("Blur Intensity").c_str(),
+                                                        D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight,
+                                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth));
+
+                        float percent = FlarialGUI::Slider(7, Constraints::PercentageConstraint(0.019, "left") +
+                                                              Constraints::SpacingConstraint(1.06, textWidth),
+                                                           Constraints::PercentageConstraint(0.40, "top"),
+                                                           D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f,
+                                                                        56.0f / 255.0f),
+                                                           D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f,
+                                                                        114.0f / 255.0f),
+                                                           D2D1::ColorF(D2D1::ColorF::White),
+                                                           Client::settings.getSettingByName<float>(
+                                                                   "blurintensity")->value, 25);
+
+                        Client::settings.getSettingByName<float>("blurintensity")->value = percent;
+
+                        rectY += Constraints::SpacingConstraint(1.2, textWidth);
+                        if (FlarialGUI::Toggle(0, Constraints::PercentageConstraint(0.019, "left"), rectY,
+                                               D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f),
+                                               D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f),
+                                               D2D1::ColorF(D2D1::ColorF::White),
+                                               Client::settings.getSettingByName<bool>("killdx")->value)) {
+
+                            Client::settings.getSettingByName<bool>(
+                                    "killdx")->value = !Client::settings.getSettingByName<bool>("killdx")->value;
+                        }
+
+                        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") +
+                                                        Constraints::SpacingConstraint(0.40, textWidth / 2.0f), rectY,
+                                                        L"Better Frames and Input Lag (No RTX) (Restart required)",
+                                                        D2D1::ColorF(D2D1::ColorF::White),
+                                                        Constraints::SpacingConstraint(4.5, textWidth), textHeight,
+                                                        DWRITE_TEXT_ALIGNMENT_CENTER,
+                                                        Constraints::SpacingConstraint(0.95, textWidth));
+
+
+                        FlarialGUI::PopSize();
+
                     }
 
-                    FlarialGUI::UnsetScrollView();
-                } else if (e == "settings") {
+                    /* Mod Card End */
+                } else if (ClickGUIRenderer::page.type == "settings") {
+
+                    this->curr = "settings";
 
                     FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
 
@@ -245,86 +360,42 @@ class ClickGUIRenderer : public Listener {
                     float rectY = Constraints::PercentageConstraint(0.32, "top");
                     float rectWidth = Constraints::RelativeConstraint(0.965, "width");
                     float rectHeight = Constraints::RelativeConstraint(0.55);
-
-                    const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-                    const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
                     round = Constraints::RoundingConstraint(50, 50);
 
                     float anotherRectHeight = Constraints::RelativeConstraint(0.60);
                     float anotherRectWidth = Constraints::RelativeConstraint(0.981, "width");
 
-                    FlarialGUI::RoundedRect(rectX, rectY, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), anotherRectWidth, anotherRectHeight, round.x, round.x);
+                    FlarialGUI::RoundedRect(rectX, rectY, D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f),
+                                            anotherRectWidth, anotherRectHeight, round.x, round.x);
 
                     round = Constraints::RoundingConstraint(45, 45);
-                    FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectWidth, rectHeight, round.x, round.x);
+                    FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth),
+                                            rectY + Constraints::SpacingConstraint(0.01, rectWidth),
+                                            D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectWidth,
+                                            rectHeight, round.x, round.x);
 
                     FlarialGUI::PopSize();
 
-                    FlarialGUI::PushSize(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
+                    FlarialGUI::PushSize(rectX + Constraints::SpacingConstraint(0.0085, rectWidth),
+                                         rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth,
+                                         rectHeight);
 
-                    FlarialGUI::TextBoxVisual(0, Client::settings.getSettingByName<std::string>("fontname")->value, 26, Constraints::PercentageConstraint(0.019, "left"), Constraints::PercentageConstraint(0.10, "top"), "Font (Anything installed in your system)");
+                    if (!module->settings.getSettingByName<bool>("enabled")->value) FlarialGUI::SetScrollView(
+                            rectX + Constraints::SpacingConstraint(0.0085, rectWidth),
+                            rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
 
-                    FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left"), Constraints::PercentageConstraint(0.40, "top"), FlarialGUI::to_wide("Blur Intensity").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+                    ModuleManager::getModule(ClickGUIRenderer::page.module)->SettingsRender();
 
-                    float percent = FlarialGUI::Slider(7, Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(1.06, textWidth),
-                                                       Constraints::PercentageConstraint(0.40, "top"),
-                                                 D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
-                                                 D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
-                                                 D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<float>("blurintensity")->value, 25);
-
-                    Client::settings.getSettingByName<float>("blurintensity")->value = percent;
-
-                    rectY += Constraints::SpacingConstraint(1.2, textWidth);
-                    if (FlarialGUI::Toggle(0, Constraints::PercentageConstraint(0.019, "left"), rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("killdx")->value)) {
-
-                        Client::settings.getSettingByName<bool>("killdx")->value = !Client::settings.getSettingByName<bool>("killdx")->value;
-                    }
-
-                    FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.40, textWidth / 2.0f), rectY, L"Better Frames and Input Lag (No RTX) (Restart required)", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::SpacingConstraint(0.95, textWidth));
-
+                    if (!module->settings.getSettingByName<bool>("enabled")->value) FlarialGUI::UnsetScrollView();
 
                     FlarialGUI::PopSize();
 
                 }
 
-                /* Mod Card End */
-            } else if (ClickGUIRenderer::page.type == "settings") {
+                FlarialGUI::PopSize(); // Pops base rect
 
-                this->curr = "settings";
-
-                FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
-
-                float rectX = Constraints::PercentageConstraint(0.01, "left");
-                float rectY = Constraints::PercentageConstraint(0.32, "top");
-                float rectWidth = Constraints::RelativeConstraint(0.965, "width");
-                float rectHeight = Constraints::RelativeConstraint(0.55);
-                round = Constraints::RoundingConstraint(50, 50);
-
-                float anotherRectHeight = Constraints::RelativeConstraint(0.60);
-                float anotherRectWidth = Constraints::RelativeConstraint(0.981, "width");
-
-                FlarialGUI::RoundedRect(rectX, rectY, D2D1::ColorF(32.0f/255.0f, 26.0f/255.0f, 27.0f/255.0f), anotherRectWidth, anotherRectHeight, round.x, round.x);
-
-                round = Constraints::RoundingConstraint(45, 45);
-                FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectWidth, rectHeight, round.x, round.x);
-
-                FlarialGUI::PopSize();
-
-                FlarialGUI::PushSize(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
-
-                if(!module->settings.getSettingByName<bool>("enabled")->value) FlarialGUI::SetScrollView(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
-
-                ModuleManager::getModule(ClickGUIRenderer::page.module)->SettingsRender();
-
-                if(!module->settings.getSettingByName<bool>("enabled")->value) FlarialGUI::UnsetScrollView();
-
-                FlarialGUI::PopSize();
 
             }
-
-            FlarialGUI::PopSize(); // Pops base rect
-
-
         }
     }
 
@@ -346,17 +417,12 @@ class ClickGUIRenderer : public Listener {
 
             ClickGUIRenderer::page.type = "normal";
             ClickGUIRenderer::curr = "modules";
-
-            if(!module->settings.getSettingByName<bool>("enabled")->value) FlarialGUI::ResetShit();
         }
 
 
         if(event.GetKey() == VK_ESCAPE && module->settings.getSettingByName<bool>("enabled")->value) {
 
-            if(SDK::CurrentScreen == "hud_screen")
-            SDK::clientInstance->grabMouse();
-
-            FlarialGUI::ResetShit();
+            if(SDK::CurrentScreen == "hud_screen") SDK::clientInstance->grabMouse();
 
             module->settings.getSettingByName<bool>("enabled")->value = false;
             ClickGUIRenderer::page.type = "normal";
@@ -365,10 +431,11 @@ class ClickGUIRenderer : public Listener {
 
         if(module->settings.getSettingByName<bool>("enabled")->value) {
 
-            if(SDK::CurrentScreen == "hud_screen")
-            SDK::clientInstance->releaseMouse();
+            if(SDK::CurrentScreen == "hud_screen") SDK::clientInstance->releaseMouse();
             event.setCancelled(true);
         }
+
+        if(!module->settings.getSettingByName<bool>("enabled")->value) FlarialGUI::ResetShit();
     }
 
 public:
