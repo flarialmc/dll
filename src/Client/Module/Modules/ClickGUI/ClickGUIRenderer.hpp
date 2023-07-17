@@ -217,7 +217,7 @@ class ClickGUIRenderer : public Listener {
 
                     i2 = i2 % 3;
 
-                    FlarialGUI::ScrollBar(120, scrollcenter.y, 10, Constraints::SpacingConstraint(0.30, scrollHeight * i2), 2);
+                    FlarialGUI::ScrollBar(120, scrollcenter.y, 10, Constraints::SpacingConstraint(1.7, modHeight * i2) + (Constraints::SpacingConstraint(0.8, modWidth) * i2), 2);
 
                     FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
 

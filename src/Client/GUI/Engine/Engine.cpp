@@ -1075,24 +1075,16 @@ void FlarialGUI::ScrollBar(float x, float y, float width, float height, float ra
 
     float whiteY;
 
-    if (y - GUIMouseListener::accumilatedBarPos < y + (height * 30.5 / 100))
-        whiteY = y - (GUIMouseListener::accumilatedBarPos);
-    else
-    {
-        whiteY = y + (height * 30.5 / 100);
-        GUIMouseListener::accumilatedBarPos += barscrollposmodifier;
+    if (y - GUIMouseListener::accumilatedPos > y + height) {
         GUIMouseListener::accumilatedPos += scrollposmodifier;
     }
 
-    if (y + GUIMouseListener::accumilatedBarPos > y)
+    if (y + GUIMouseListener::accumilatedPos > y)
     {
-        whiteY = y;
-        GUIMouseListener::accumilatedBarPos = 0;
         GUIMouseListener::accumilatedPos = 0;
     }
 
     FlarialGUI::lerp(FlarialGUI::scrollpos, GUIMouseListener::accumilatedPos, 0.30f * FlarialGUI::frameFactor);
-    FlarialGUI::lerp(FlarialGUI::barscrollpos, GUIMouseListener::accumilatedBarPos, 0.30f * FlarialGUI::frameFactor);
 
     /*
     // Draw the gray bar
@@ -1426,10 +1418,10 @@ void FlarialGUI::NotifyHeartbeat() {
 
             logoX += Constraints::SpacingConstraint(0.85, logoWidth);
             logoY -= Constraints::SpacingConstraint(0.105, logoWidth);
-            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide("Notification").c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, 150, DWRITE_FONT_WEIGHT_BOLD);
+            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide("Notification").c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.45, rectWidth), DWRITE_FONT_WEIGHT_BOLD);
 
             logoY += Constraints::SpacingConstraint(0.185, logoWidth);
-            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide(notif.text).c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, 125);
+            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide(notif.text).c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.3, rectWidth));
 
 
             FlarialGUI::PopSize();
@@ -1488,10 +1480,10 @@ void FlarialGUI::NotifyHeartbeat() {
             logoX += Constraints::SpacingConstraint(0.85, logoWidth);
 
             logoY -= Constraints::SpacingConstraint(0.105, logoWidth);
-            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide("Notification").c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, 150, DWRITE_FONT_WEIGHT_BOLD);
+            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide("Notification").c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.45, rectWidth), DWRITE_FONT_WEIGHT_BOLD);
 
             logoY += Constraints::SpacingConstraint(0.185, logoWidth);
-            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide(notif.text).c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, 125);
+            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide(notif.text).c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.3, rectWidth));
 
             FlarialGUI::PopSize();
 

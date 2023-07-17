@@ -120,5 +120,6 @@ void ResizeHook::CleanShit(bool isResize) {
 
     }
 
+    FlarialGUI::scrollposmodifier = 0;
 
 }
