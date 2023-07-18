@@ -337,11 +337,11 @@ class ClickGUIRenderer : public Listener {
                         }
 
                         FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") +
-                                                        Constraints::SpacingConstraint(0.40, textWidth / 2.0f), rectY,
+                                                        Constraints::SpacingConstraint(0.60, textWidth / 2.0f), rectY,
                                                         L"Better Frames and Input Lag (No RTX) (Restart required)",
                                                         D2D1::ColorF(D2D1::ColorF::White),
                                                         Constraints::SpacingConstraint(4.5, textWidth), textHeight,
-                                                        DWRITE_TEXT_ALIGNMENT_CENTER,
+                                                        DWRITE_TEXT_ALIGNMENT_LEADING,
                                                         Constraints::SpacingConstraint(0.95, textWidth));
 
 
