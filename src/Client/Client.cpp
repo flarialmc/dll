@@ -97,6 +97,9 @@ void Client::initialize()
     if(Client::settings.getSettingByName<bool>("killdx") == nullptr)
         Client::settings.addSetting("killdx", false);
 
+    if (Client::settings.getSettingByName<bool>("vsync") == nullptr)
+        Client::settings.addSetting("vsync", false);
+
     // Create threads to download the files
     std::vector<std::thread> threads;
     for (const auto& data : fileData) {

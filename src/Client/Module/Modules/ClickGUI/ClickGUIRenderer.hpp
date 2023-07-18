@@ -261,7 +261,8 @@ class ClickGUIRenderer : public Listener {
                         }
 
                         FlarialGUI::UnsetScrollView();
-                    } else if (e == "settings") {
+                    }
+                    else if (e == "settings") {
 
                         FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
 
@@ -269,6 +270,9 @@ class ClickGUIRenderer : public Listener {
                         float rectY = Constraints::PercentageConstraint(0.32, "top");
                         float rectWidth = Constraints::RelativeConstraint(0.965, "width");
                         float rectHeight = Constraints::RelativeConstraint(0.55);
+                        float scrollWidth = Constraints::RelativeConstraint(1.12);
+                        float scrollHeight = Constraints::RelativeConstraint(1.3);
+                        Vec2<float> scrollcenter = Constraints::CenterConstraint(scrollWidth, scrollHeight, "y", 0.0, 1);
 
                         const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
                         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
@@ -277,70 +281,50 @@ class ClickGUIRenderer : public Listener {
                         float anotherRectHeight = Constraints::RelativeConstraint(0.60);
                         float anotherRectWidth = Constraints::RelativeConstraint(0.981, "width");
 
-                        FlarialGUI::RoundedRect(rectX, rectY,
-                                                D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f),
-                                                anotherRectWidth, anotherRectHeight, round.x, round.x);
+                        FlarialGUI::RoundedRect(rectX, rectY, D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f), anotherRectWidth, anotherRectHeight, round.x, round.x);
 
                         round = Constraints::RoundingConstraint(45, 45);
-                        FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth),
-                                                rectY + Constraints::SpacingConstraint(0.01, rectWidth),
-                                                D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectWidth,
-                                                rectHeight, round.x, round.x);
+                        FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectWidth, rectHeight, round.x, round.x);
 
                         FlarialGUI::PopSize();
 
-                        FlarialGUI::PushSize(rectX + Constraints::SpacingConstraint(0.0085, rectWidth),
-                                             rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth,
-                                             rectHeight);
+                        FlarialGUI::PushSize(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
 
-                        FlarialGUI::TextBoxVisual(0, Client::settings.getSettingByName<std::string>("fontname")->value,
-                                                  26, Constraints::PercentageConstraint(0.019, "left"),
-                                                  Constraints::PercentageConstraint(0.10, "top"),
-                                                  "Font (Anything installed in your system)");
+                        FlarialGUI::ScrollBar(scrollWidth, scrollHeight, 140, 100, 2);
+                        FlarialGUI::SetScrollView(scrollWidth, scrollHeight, Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(0.90, "height"));
 
-                        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left"),
-                                                        Constraints::PercentageConstraint(0.40, "top"),
-                                                        FlarialGUI::to_wide("Blur Intensity").c_str(),
-                                                        D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight,
-                                                        DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                        Constraints::SpacingConstraint(1.05, textWidth));
+                        FlarialGUI::TextBoxVisual(0, Client::settings.getSettingByName<std::string>("fontname")->value, 26, Constraints::PercentageConstraint(0.019, "left"), Constraints::PercentageConstraint(0.10, "top"), "Font (Anything installed in your system)");
 
-                        float percent = FlarialGUI::Slider(7, Constraints::PercentageConstraint(0.019, "left") +
-                                                              Constraints::SpacingConstraint(1.06, textWidth),
-                                                           Constraints::PercentageConstraint(0.40, "top"),
-                                                           D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f,
-                                                                        56.0f / 255.0f),
-                                                           D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f,
-                                                                        114.0f / 255.0f),
-                                                           D2D1::ColorF(D2D1::ColorF::White),
-                                                           Client::settings.getSettingByName<float>(
-                                                                   "blurintensity")->value, 25);
+                        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left"), Constraints::PercentageConstraint(0.40, "top"), FlarialGUI::to_wide("Blur Intensity").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+
+                        float percent = FlarialGUI::Slider(7, Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(1.06, textWidth),
+                            Constraints::PercentageConstraint(0.40, "top"),
+                            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+                            D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<float>("blurintensity")->value, 25);
 
                         Client::settings.getSettingByName<float>("blurintensity")->value = percent;
 
                         rectY += Constraints::SpacingConstraint(1.2, textWidth);
-                        if (FlarialGUI::Toggle(0, Constraints::PercentageConstraint(0.019, "left"), rectY,
-                                               D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f),
-                                               D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f),
-                                               D2D1::ColorF(D2D1::ColorF::White),
-                                               Client::settings.getSettingByName<bool>("killdx")->value)) {
+                        if (FlarialGUI::Toggle(0, Constraints::PercentageConstraint(0.019, "left"), rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("killdx")->value)) {
 
-                            Client::settings.getSettingByName<bool>(
-                                    "killdx")->value = !Client::settings.getSettingByName<bool>("killdx")->value;
+                            Client::settings.getSettingByName<bool>("killdx")->value = !Client::settings.getSettingByName<bool>("killdx")->value;
                         }
 
-                        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") +
-                                                        Constraints::SpacingConstraint(0.60, textWidth / 2.0f), rectY,
-                                                        L"Better Frames and Input Lag (No RTX) (Restart required)",
-                                                        D2D1::ColorF(D2D1::ColorF::White),
-                                                        Constraints::SpacingConstraint(4.5, textWidth), textHeight,
-                                                        DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                        Constraints::SpacingConstraint(0.95, textWidth));
+                        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.60, textWidth / 2.0f), rectY, L"Better Frames and Input Lag (No RTX) (Restart required)", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
 
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        if (FlarialGUI::Toggle(1, Constraints::PercentageConstraint(0.019, "left"), rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("vsync")->value)) {
+
+                            Client::settings.getSettingByName<bool>("vsync")->value = !Client::settings.getSettingByName<bool>("vsync")->value;
+                        }
+
+                        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.60, textWidth), rectY, L"Vsync", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
+
+                        FlarialGUI::UnsetScrollView();
 
                         FlarialGUI::PopSize();
-
-                    }
+                }
 
                     /* Mod Card End */
                 } else if (ClickGUIRenderer::page.type == "settings") {

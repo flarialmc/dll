@@ -325,8 +325,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
     }
 
-
-    return func_original(pSwapChain, 0, flags);
-
+    if (Client::settings.getSettingByName<bool>("vsync")->value) return func_original(pSwapChain, 0, flags);
+    else return func_original(pSwapChain, syncInterval, flags);
 
 }
