@@ -465,8 +465,8 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 
     FlarialGUI::RoundedRect(x, y, col, Constraints::SpacingConstraint(1.55, textWidth), percHeight, round.x, round.x);
 
-    FlarialGUI::FlarialTextWithFont(x, y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_CENTER, 110);
-    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, to_wide(real).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_LEADING, 110);
+    FlarialGUI::FlarialTextWithFont(x, y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::SpacingConstraint(1.0, textWidth));
+    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, to_wide(real).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(3, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.00, textWidth));
 
     return "";
 }
@@ -1362,6 +1362,28 @@ void FlarialGUI::Notify(std::string text) {
     e.finished = false;
     e.currentPos = Constraints::PercentageConstraint(0.01, "right", true);
     e.currentPosY = Constraints::PercentageConstraint(0.25, "bottom", true);
+
+    IDWriteTextFormat *textFormat;
+    writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(Constraints::SpacingConstraint(0.3, Constraints::RelativeConstraint(0.45, "height", true))), L"", &textFormat);
+    textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+    textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+    IDWriteTextLayout *textLayout;
+
+    writeFactory->CreateTextLayout(
+            FlarialGUI::to_wide(text).c_str(),
+            wcslen(FlarialGUI::to_wide(text).c_str()),
+            textFormat,
+            Constraints::RelativeConstraint(0.45, "height", true),
+            Constraints::RelativeConstraint(0.10, "height", true),
+            &textLayout
+    );
+
+    DWRITE_TEXT_METRICS textMetrics;
+    textLayout->GetMetrics(&textMetrics);
+
+    e.width = textMetrics.width + Constraints::RelativeConstraint(0.20, "height", true);
+
     notifications.push_back(e);
 
 }
@@ -1369,10 +1391,8 @@ void FlarialGUI::Notify(std::string text) {
 void FlarialGUI::NotifyHeartbeat() {
 
 
-    float rectWidth = Constraints::RelativeConstraint(0.45, "height", true);
     float rectHeight = Constraints::RelativeConstraint(0.10, "height", true);
 
-    float x = Constraints::PercentageConstraint(0.01, "right", true) - Constraints::SpacingConstraint(0.85, rectWidth);
     float y = Constraints::PercentageConstraint(0.25, "bottom", true);
 
     Vec2<float> rounding = Constraints::RoundingConstraint(20, 20);
@@ -1380,6 +1400,9 @@ void FlarialGUI::NotifyHeartbeat() {
     int i = 0;
 
     for (auto& notif : FlarialGUI::notifications) {
+
+        float rectWidth = notif.width;
+        float x = Constraints::PercentageConstraint(0.01, "right", true) - Constraints::SpacingConstraint(0.85, rectWidth);
 
         FlarialGUI::lerp(notif.currentPosY, y, 0.20f * FlarialGUI::frameFactor);
 
@@ -1397,7 +1420,7 @@ void FlarialGUI::NotifyHeartbeat() {
                                     col, rectWidth,
                                     rectHeight, rounding.x, rounding.x);
 
-            D2D1_RECT_F cutoutrect = D2D1::RectF(notif.currentPos, notif.currentPosY, notif.currentPos + Constraints::SpacingConstraint(0.0127, rectWidth), notif.currentPosY + rectHeight);
+            D2D1_RECT_F cutoutrect = D2D1::RectF(notif.currentPos, notif.currentPosY, notif.currentPos + Constraints::SpacingConstraint(0.0127, Constraints::RelativeConstraint(0.45, "height", true)), notif.currentPosY + rectHeight);
 
             D2D::context->PushAxisAlignedClip(cutoutrect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
@@ -1418,10 +1441,10 @@ void FlarialGUI::NotifyHeartbeat() {
 
             logoX += Constraints::SpacingConstraint(0.85, logoWidth);
             logoY -= Constraints::SpacingConstraint(0.105, logoWidth);
-            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide("Notification").c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.45, rectWidth), DWRITE_FONT_WEIGHT_BOLD);
+            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide("Notification").c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.45, Constraints::RelativeConstraint(0.45, "height", true)), DWRITE_FONT_WEIGHT_BOLD);
 
             logoY += Constraints::SpacingConstraint(0.185, logoWidth);
-            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide(notif.text).c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.3, rectWidth));
+            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide(notif.text).c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.3, Constraints::RelativeConstraint(0.45, "height", true)));
 
 
             FlarialGUI::PopSize();
@@ -1458,7 +1481,7 @@ void FlarialGUI::NotifyHeartbeat() {
                                     col, rectWidth,
                                     rectHeight, rounding.x, rounding.x);
 
-            D2D1_RECT_F cutoutrect = D2D1::RectF(notif.currentPos, notif.currentPosY, notif.currentPos + Constraints::SpacingConstraint(0.0127, rectWidth), notif.currentPosY + rectHeight);
+            D2D1_RECT_F cutoutrect = D2D1::RectF(notif.currentPos, notif.currentPosY, notif.currentPos + Constraints::SpacingConstraint(0.0127, Constraints::RelativeConstraint(0.45, "height", true)), notif.currentPosY + rectHeight);
 
             D2D::context->PushAxisAlignedClip(cutoutrect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
@@ -1480,10 +1503,10 @@ void FlarialGUI::NotifyHeartbeat() {
             logoX += Constraints::SpacingConstraint(0.85, logoWidth);
 
             logoY -= Constraints::SpacingConstraint(0.105, logoWidth);
-            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide("Notification").c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.45, rectWidth), DWRITE_FONT_WEIGHT_BOLD);
+            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide("Notification").c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.45, Constraints::RelativeConstraint(0.45, "height", true)), DWRITE_FONT_WEIGHT_BOLD);
 
             logoY += Constraints::SpacingConstraint(0.185, logoWidth);
-            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide(notif.text).c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.3, rectWidth));
+            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide(notif.text).c_str(), D2D1::ColorF(D2D1::ColorF::White), rectWidth, logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.3, Constraints::RelativeConstraint(0.45, "height", true)));
 
             FlarialGUI::PopSize();
 

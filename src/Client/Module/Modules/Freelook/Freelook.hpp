@@ -26,7 +26,7 @@ public:
 
     }
 
-    virtual void DefaultConfig() override {
+    void DefaultConfig() override {
         if (settings.getSettingByName<std::string>("keybind")->value == (std::string)"") settings.getSettingByName<std::string>("keybind")->value = "F";
 
     }
@@ -44,7 +44,7 @@ public:
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
 
-        FlarialGUI::ScrollBar(x, y, 140, 40, 2);
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, textWidth), 2);
         FlarialGUI::SetScrollView(x, y, Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(0.90, "height"));
 
         FlarialGUI::KeybindSelector(0, x, y, settings.getSettingByName<std::string>("keybind")->value);

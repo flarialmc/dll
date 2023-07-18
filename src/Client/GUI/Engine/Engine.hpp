@@ -70,6 +70,7 @@ public:
     std::string text;
     bool finished = false;
     bool arrived = false;
+    float width = 0;
     std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
 };
 
@@ -87,7 +88,7 @@ namespace FlarialGUI
     std::vector<float> inline toggleSpacings(20);
     std::vector<float> inline rotationAngles(40, 0);
     std::vector<D2D1_COLOR_F> inline toggleColors(20, D2D1::ColorF(D2D1::ColorF::White));
-    std::vector<D2D1_COLOR_F> inline buttonColors(20, D2D1::ColorF(D2D1::ColorF::Red));
+    std::vector<D2D1_COLOR_F> inline buttonColors(30, D2D1::ColorF(D2D1::ColorF::Red));
 
 
     float inline frameFactor = 1;

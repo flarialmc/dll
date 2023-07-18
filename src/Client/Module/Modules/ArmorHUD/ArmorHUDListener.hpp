@@ -22,21 +22,6 @@ public:
 
     }
 
-    void onSetupAndRender(SetupAndRenderEvent& event) override {
-
-        if(SDK::clientInstance->getTopScreenName() == "hud_screen") {
-
-            /*
-            BaseActorRenderContext barc(event.muirc->screenContext, event.muirc->clientInstance, event.muirc->clientInstance->mcgame);
-
-            barc.itemRenderer->renderGuiItemNew(&barc,SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(0), 0, 50.0f, 50.0f, 1.0f, module->settings.getSettingByName<float>("uiscale")->value, false);
-
-            */
-        }
-
-
-    }
-
     void onRender(RenderEvent& event) override {
 
     }
