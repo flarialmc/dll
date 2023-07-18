@@ -70,6 +70,7 @@ public:
     std::string text;
     bool finished = false;
     bool arrived = false;
+    float width = 0;
     std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
 };
 
