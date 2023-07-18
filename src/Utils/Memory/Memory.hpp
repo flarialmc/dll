@@ -7,6 +7,9 @@
 #include <optional>
 #include <future>
 #include <execution>
+#include <format>
+#include "../Logger/Logger.hpp"
+#include "MinHook.h"
 
 #define in_range(x, a, b) (x >= a && x <= b)
 #define get_bits(x) (in_range((x & (~0x20)), 'A', 'F') ? ((x & (~0x20)) - 'A' + 0xa) : (in_range(x, '0', '9') ? x - '0' : 0))
@@ -53,6 +56,27 @@ public:
         return (*static_cast<Fn**>(thisptr))[IIdx](thisptr, argList...);
     }
 
+    static void hookFunc(void* pTarget, void* pDetour, void** ppOriginal, std::string name) {
+
+        if (pTarget == NULL) {
+            Logger::error(std::format("{} has invalid address", name));
+            return;
+        }
+
+        if (MH_CreateHook(pTarget, pDetour, ppOriginal) != MH_OK) {
+            Logger::error(std::format("Failed to hook {} function", name));
+            return;
+        }
+
+        Logger::info(std::format("Successfully hooked {} function at {}", name, pTarget));
+    }
+
+    template <unsigned int index>
+    static void HookVFunc(uintptr_t sigOffset, void* pDetour, void** ppOriginal, std::string name) {
+        uintptr_t** vTable = reinterpret_cast<uintptr_t**>(sigOffset + 3 + 7);
+
+        hookFunc(vTable[index], pDetour, ppOriginal, name);
+    }
 
 
     static auto findSig(const char* signature)

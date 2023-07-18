@@ -776,7 +776,6 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
 
     if (!CursorInRect(x, y, percWidth, percHeight) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
-        MC::mousebutton = MouseButton::None;
         KeybindSelectors[index].isActive = false;
     }
 
