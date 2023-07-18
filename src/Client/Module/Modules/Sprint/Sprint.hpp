@@ -22,7 +22,7 @@ public:
 
         if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value}");
 
-        if (settings.getSettingByName<std::string>("keybind")->value == (std::string)"") settings.getSettingByName<std::string>("keybind")->value = "C";
+        if (settings.getSettingByName<std::string>("keybind")->value == (std::string)"") settings.getSettingByName<std::string>("keybind")->value = "CTRL";
 
         if (settings.getSettingByName<bool>("status") == nullptr) settings.addSetting("status", false);
 
