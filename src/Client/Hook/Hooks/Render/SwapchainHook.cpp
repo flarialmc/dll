@@ -79,7 +79,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 Logger::debug("Removed d3d12 device");
                 d3d12device3->RemoveDevice();
 
-                return func_original(pSwapChain, 0, flags);
+                return func_original(pSwapChain, syncInterval, flags);
             }
 
             Logger::debug("not a DX12 device, running dx11 procedures");
@@ -320,9 +320,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
 
         }
-
-
-
     }
 
     if (Client::settings.getSettingByName<bool>("vsync")->value) return func_original(pSwapChain, 0, flags);
