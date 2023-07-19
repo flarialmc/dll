@@ -291,7 +291,7 @@ class ClickGUIRenderer : public Listener {
                         FlarialGUI::PushSize(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
 
                         FlarialGUI::ScrollBar(scrollWidth, scrollHeight, 140, 100, 2);
-                        FlarialGUI::SetScrollView(scrollWidth, scrollHeight, Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(0.90, "height"));
+                        FlarialGUI::SetScrollView(rectX, rectY + Constraints::SpacingConstraint(0.01, rectWidth), Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(1.0, "height"));
 
                         FlarialGUI::TextBoxVisual(0, Client::settings.getSettingByName<std::string>("fontname")->value, 26, Constraints::PercentageConstraint(0.019, "left"), Constraints::PercentageConstraint(0.10, "top"), "Font (Anything installed in your system)");
 
