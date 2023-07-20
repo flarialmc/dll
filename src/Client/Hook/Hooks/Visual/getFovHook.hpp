@@ -14,9 +14,8 @@ private:
     static inline float currentZoomVal = 0.0f;
 
 	static float getFovCallback(void* a1, float f, void* a3, void* a4) {
-		float fov = func_original(a1, f, a3, a4);
 
-        if(fov > 100.0) fov -= 10.0f;
+		float fov = func_original(a1, f, a3, a4);
 
 		if (ModuleManager::getModule("Zoom") != nullptr && fov != 70.00f) {
 
