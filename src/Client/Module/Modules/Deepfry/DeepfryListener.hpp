@@ -15,9 +15,9 @@ class DeepfryListener : public Listener {
     void onRender(RenderEvent& event) override {
 
         if (module->settings.getSettingByName<bool>("enabled")->value) {
-
-            FlarialGUI::ApplyCombinedDeepFry();
-
+            if (module->settings.getSettingByName<bool>("paint")->value) FlarialGUI::ApplyPaintEffect(10.0f);
+            else FlarialGUI::ApplyCombinedDeepFry();
+            
         }
 
     }
