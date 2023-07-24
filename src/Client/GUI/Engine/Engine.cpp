@@ -1549,10 +1549,10 @@ void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect) {
         D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
 
         ID2D1SolidColorBrush *colorBrush = nullptr;
-        D2D::context->CreateSolidColorBrush(D2D1::ColorF(0, 0, 0, 0.75f), &colorBrush);
+        colorBrush = FlarialGUI::getBrush(D2D1::ColorF(0, 0, 0, 0.75f));
         D2D::context->FillRectangle(rect.rect, colorBrush);
 
-        colorBrush->Release();
+        
 
         FlarialGUI::blur->SetInput(0, newLayer);
         FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
