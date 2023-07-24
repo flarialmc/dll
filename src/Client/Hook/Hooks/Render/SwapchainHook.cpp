@@ -86,9 +86,9 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                     const D2D1_CREATION_PROPERTIES properties
                             {
-                                    D2D1_THREADING_MODE_SINGLE_THREADED,
+                                    D2D1_THREADING_MODE_MULTI_THREADED,
                                     D2D1_DEBUG_LEVEL_NONE,
-                                    D2D1_DEVICE_CONTEXT_OPTIONS_NONE
+                                    D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS
                             };
 
                     IDXGISurface1 *eBackBuffer;
@@ -111,17 +111,17 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
             if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&device))) &&
                 kiero::getRenderType() == kiero::RenderType::D3D12) {
                 ID3D11Device *d3d11device;
-                D3D11On12CreateDevice(device, D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_SINGLETHREADED |
+                D3D11On12CreateDevice(device,
                                               D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
                                       (IUnknown **) &SwapchainHook::queue, 1, 0, &d3d11device, &SwapchainHook::context,
                                       nullptr);
 
                 d3d11device->QueryInterface(IID_PPV_ARGS(&SwapchainHook::d3d11On12Device));
 
-                D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_NONE;
+                D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS;
                 ID2D1Factory7 *d2dFactory;
                 D2D1_FACTORY_OPTIONS factoryOptions{};
-                D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory7), &factoryOptions,
+                D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, __uuidof(ID2D1Factory7), &factoryOptions,
                                   (void **) &d2dFactory);
 
                 IDXGIDevice *dxgiDevice;
