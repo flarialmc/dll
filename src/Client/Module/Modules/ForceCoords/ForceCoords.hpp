@@ -179,15 +179,18 @@ public:
 
         float realspacing = Constraints::SpacingConstraint(0.05f, textWidth);
 
+        IDWriteFactory *writeFactory;
 
+        DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
+                            reinterpret_cast<IUnknown **>(&writeFactory));
         IDWriteTextFormat *textFormat;
-        FlarialGUI::writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(textSize), L"", &textFormat);
+        writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(textSize), L"", &textFormat);
         textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
         textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
         IDWriteTextLayout *textLayout;
 
-        FlarialGUI::writeFactory->CreateTextLayout(
+        writeFactory->CreateTextLayout(
                 FlarialGUI::to_wide(text).c_str(),
                 wcslen(FlarialGUI::to_wide(text).c_str()),
                 textFormat,
@@ -200,7 +203,7 @@ public:
         textLayout->GetMetrics(&textMetrics);
 
         textLayout->Release();
-        FlarialGUI::writeFactory->Release();
+        writeFactory->Release();
         textFormat->Release();
 
         rectWidth = textMetrics.width + Constraints::SpacingConstraint(2.0, realspacing);
