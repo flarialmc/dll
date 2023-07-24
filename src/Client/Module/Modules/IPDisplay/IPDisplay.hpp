@@ -232,7 +232,6 @@ public:
         textLayout->GetMetrics(&textMetrics);
 
         textLayout->Release();
-        FlarialGUI::writeFactory->Release();
         textFormat->Release();
 
         rectWidth = textMetrics.width + Constraints::SpacingConstraint(2.0, realspacing);
