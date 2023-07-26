@@ -27,6 +27,12 @@ public:
 
     void onLocalTick(TickEvent& event) override {
 
+        if (module->settings.getSettingByName<bool>("enabled")->value && SDK::raknetConnector->JoinedIp.find("hive") !=  std::string::npos) {
+            FlarialGUI::Notify("Can't use freelook on " + SDK::raknetConnector->JoinedIp);
+            module->settings.getSettingByName<bool>("enabled")->value = false;
+        }
+
+
         if (module->settings.getSettingByName<bool>("enabled")->value) {
             event.getActor()->getMovementProxyComponent()->movementProxy->SetRotation(&oldRotations);
       //      event.getActor()->getMovementProxyComponent()->movementProxy->SetYHeadRotation(oldRotations.y);
