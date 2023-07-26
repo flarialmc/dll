@@ -57,13 +57,24 @@ uintptr_t findSig(const char* pattern) {
 int getViewPerspectiveHook::callback(uintptr_t* a1) {
 
 
+
     auto mod = ModuleManager::getModule("SnapLook");
     auto freemod = ModuleManager::getModule("FreeLook");
 
-    if (mod != nullptr && freemod != nullptr && SDK::CurrentScreen == "hud_screen") {
-        if (mod->settings.getSettingByName<bool>("enabled")->value || freemod->settings.getSettingByName<bool>("enabled")->value) {
-            return 2;
+    if (freemod->settings.getSettingByName<bool>("enabled")->value && SDK::raknetConnector->JoinedIp.find("hive") !=  std::string::npos) {
+        FlarialGUI::Notify("Can't use freelook on " + SDK::raknetConnector->JoinedIp);
+        freemod->settings.getSettingByName<bool>("enabled")->value = false;
+    }
+
+        if (mod != nullptr && freemod != nullptr && SDK::CurrentScreen == "hud_screen") {
+
+        if (mod->settings.getSettingByName<bool>("enabled")->value) {
+            return 1;
         }
+
+            if (freemod->settings.getSettingByName<bool>("enabled")->value) {
+                return 2;
+            }
     
     }
 	return getViewPerspectiveOriginal(a1);
