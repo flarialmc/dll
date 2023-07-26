@@ -69,11 +69,11 @@ int getViewPerspectiveHook::callback(uintptr_t* a1) {
         if (mod != nullptr && freemod != nullptr && SDK::CurrentScreen == "hud_screen") {
 
         if (mod->settings.getSettingByName<bool>("enabled")->value) {
-            return 1;
+            return 2;
         }
 
             if (freemod->settings.getSettingByName<bool>("enabled")->value) {
-                return 2;
+                return 1;
             }
     
     }
