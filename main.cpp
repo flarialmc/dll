@@ -13,12 +13,10 @@
 
 DWORD WINAPI init(HMODULE real)
 {
-#ifdef _DEBUG
     AllocConsole();
     SetConsoleTitleA("Flarial-Debugger");
     FILE* out;
     freopen_s(&out, ("CONOUT$"), ("w"), stdout);
-#endif
 
     Client::initialize();
     Logger::info("Initializing Client");

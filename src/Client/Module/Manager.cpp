@@ -29,6 +29,7 @@
 #include "Modules/MotionBlur/MotionBlur.hpp"
 #include "Modules/ArmorHUD/ArmorHUD.hpp"
 #include "Modules/PatarHD/PatarHD.hpp"
+#include "Modules/HurtColor/HurtColor.hpp"
 
 namespace ModuleManager {
     std::vector<Module*> modules;
@@ -60,6 +61,7 @@ void ModuleManager::initialize()
     modules.push_back(new ThirdPerson());
     modules.push_back(new FreeLook());
     modules.push_back(new SnapLook());
+    modules.push_back(new HurtColor());
 
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));

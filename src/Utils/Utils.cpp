@@ -16,6 +16,8 @@ std::string Utils::getRoamingPath()
     return std::string(path) + "\\..\\Local\\Packages\\Microsoft.MinecraftUWP_8wekyb3d8bbwe\\RoamingState";
 };
 
+
+
 std::string Utils::GetKeyAsString(int key, bool isCapital) {
 
     if (key == 32) { // Spacebar key

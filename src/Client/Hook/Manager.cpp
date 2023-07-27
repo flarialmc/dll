@@ -9,6 +9,7 @@
 #include "Hooks/Game/RaknetTick.hpp"
 #include "Hooks/Game/getViewPerspective.hpp"
 #include "../Client.hpp"
+#include "Hooks/Visual/HurtColorHook.hpp"
 
 std::vector<Hook *> HookManager::hooks;
 
@@ -40,6 +41,7 @@ void HookManager::initialize()
     hooks.push_back(new ActorNormalTick());
     hooks.push_back(new OnSuspendHook());
     hooks.push_back(new getGammaHook());
+    hooks.push_back(new HurtColorHook());
 
     for (auto hook : hooks)
         hook->enableHook();
