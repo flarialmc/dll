@@ -4,5 +4,4 @@
 
 struct ActorRotationComponent {
 	Vec2<float> Rotation;
-	Vec2<float> oldRotation;
 };
