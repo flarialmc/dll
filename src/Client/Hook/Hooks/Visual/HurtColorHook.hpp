@@ -12,26 +12,25 @@ class HurtColorHook : public Hook
 {
 private:
 
-	static float* HurtColorCallback(void* a1, MCCColor* color, void* a3) {
+	static MCCColor* HurtColorCallback(void* a1, MCCColor* color, void* a3) {
 
 
 
-		if (ModuleManager::getModule("Hurt Color") != nullptr) {
+		if (ModuleManager::getModule("Hurt Color") != nullptr ) {
+            if(ModuleManager::getModule("Hurt Color")->settings.getSettingByName<bool>("enabled")->value) {
 
-            D2D1_COLOR_F color2 = FlarialGUI::HexToColorF(ModuleManager::getModule("Hurt Color")->settings.getSettingByName<std::string>("color")->value);
-            color->r = color2.r;
-            color->g = color2.g;
-            color->b = color2.b;
-            color->a = ModuleManager::getModule("Hurt Color")->settings.getSettingByName<float>("colorOpacity")->value;
-
-            return MCCColor();
-
-        } else {
-
-            Logger::debug("amongus");
+                D2D1_COLOR_F color2 = FlarialGUI::HexToColorF(
+                        ModuleManager::getModule("Hurt Color")->settings.getSettingByName<std::string>("color")->value);
+                color->r = color2.r;
+                color->g = color2.g;
+                color->b = color2.b;
+                color->a = ModuleManager::getModule("Hurt Color")->settings.getSettingByName<float>(
+                        "colorOpacity")->value;
+            }
 
         }
 
+        return color;
 
 	}
 
@@ -43,11 +42,11 @@ public:
 
     void enableHook() override {
 
-        auto RefAddr = Memory::findSig("E8 ? ? ? ? E9 ? ? ? ? 8B 83 ? ? ? ? D1 E8 A8 01");
+        auto RefAddr = Memory::findSig("E8 ? ? ? ? E9 ? ? ? ? 48 8B ? ? 48 8B ? 8B 43 ? 89 44 ? ? 48 8D ? ? ? E8 ? ? ? ? 48 8B ? 48 85 ? 0F 84 ? ? ? ? 48 8B");
         auto RealFunc = RefAddr + 1 + 4 + *reinterpret_cast<int*>(RefAddr + 1);
 
 
-        this->manualHook(&RealFunc, HurtColorCallback, (void**)&func_original);
+        this->manualHook((void*) RealFunc, HurtColorCallback, (void**)&func_original);
     }
 };
 
