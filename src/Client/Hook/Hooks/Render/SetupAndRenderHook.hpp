@@ -22,6 +22,11 @@ private:
         if(layer != "debug_screen" && layer != "toast_screen")
             SDK::CurrentScreen = layer;
 
+        SetupAndRenderEvent e;
+        e.muirc = muirc;
+
+        EventHandler::onSetupAndRender(e);
+
         func_original(pScreenView, muirc);
     }
 

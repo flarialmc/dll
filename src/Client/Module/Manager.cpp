@@ -62,6 +62,9 @@ void ModuleManager::initialize()
     modules.push_back(new FreeLook());
     modules.push_back(new SnapLook());
     modules.push_back(new HurtColor());
+    modules.push_back(new ArmorHUD());
+    modules.push_back(new Module("test", "test", "", 'c'));
+
 
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));
