@@ -17,6 +17,7 @@ private:
 
 
 		if (ModuleManager::getModule("Hurt Color") != nullptr ) {
+
             if(ModuleManager::getModule("Hurt Color")->settings.getSettingByName<bool>("enabled")->value) {
 
                 D2D1_COLOR_F color2 = FlarialGUI::HexToColorF(
@@ -26,16 +27,19 @@ private:
                 color->b = color2.b;
                 color->a = ModuleManager::getModule("Hurt Color")->settings.getSettingByName<float>(
                         "colorOpacity")->value;
+                return color;
+            } else {
+                return func_original(a1, color, a3);
             }
 
         }
 
-        return color;
+
 
 	}
 
 public:
-    typedef float(__thiscall* HurtColorOriginal)(void* a1, MCCColor* color, void* a3);
+    typedef MCCColor*(__thiscall* HurtColorOriginal)(void* a1, MCCColor* color, void* a3);
     static inline HurtColorOriginal func_original = nullptr;
 
     HurtColorHook() : Hook("Hurt Color Hook", "") {}
