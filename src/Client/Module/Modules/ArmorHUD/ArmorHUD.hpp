@@ -36,6 +36,8 @@ public:
             settings.addSetting("percentageX", 0.0f);
             settings.addSetting("percentageY", 0.0f);
         }
+        if (settings.getSettingByName<bool>("vertical") == nullptr) settings.addSetting("vertical", false);
+
     }
 
     void SettingsRender() override {
