@@ -21,6 +21,7 @@ void KeyHook::keyCallback(int key, int state)
 
     std::to_string(event.GetKey());
     std::to_string(event.GetAction());
+    std::to_string(event.isCancelled());
 
     if(!event.isCancelled())
     func_original(event.GetKey(), event.GetAction());

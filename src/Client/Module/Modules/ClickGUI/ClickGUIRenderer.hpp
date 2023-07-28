@@ -417,8 +417,6 @@ class ClickGUIRenderer : public Listener {
                 module->settings.getSettingByName<bool>("enabled")->value = true;
             }
 
-            if(module->settings.getSettingByName<bool>("enabled")->value || editmenu)
-            event.cancel();
         }
 
         if(module->settings.getSettingByName<bool>("enabled")->value) {
@@ -444,6 +442,8 @@ class ClickGUIRenderer : public Listener {
 
         if(!module->settings.getSettingByName<bool>("enabled")->value) FlarialGUI::ResetShit();
 
+        if(module->settings.getSettingByName<bool>("enabled")->value || editmenu)
+        event.setCancelled(true);
 
     }
 
