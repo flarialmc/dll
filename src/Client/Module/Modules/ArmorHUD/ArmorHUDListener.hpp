@@ -18,6 +18,7 @@ public:
 
     Module* module;
     Vec2<float> currentPos;
+    bool enabled = false;
 
 
     void onLocalTick(TickEvent& event) override {
@@ -35,7 +36,13 @@ public:
 
     void onRender(RenderEvent& event) override {
 
-        if(SDK::clientInstance->getTopScreenName() == "hud_screen" && module->settings.getSettingByName<bool>("enabled")->value) {
+
+        if(SDK::clientInstance->getTopScreenName() == "hud_screen" && module->settings.getSettingByName<bool>("enabled")->value || SDK::clientInstance->getTopScreenName() == "pause_screen" && module->settings.getSettingByName<bool>("enabled")->value) {
+
+            if(!enabled) {
+                FlarialGUI::Notify("To change the position of ArmorHUD, Please click L.     \u200E");
+                enabled = true;
+            }
 
             float s = Constraints::RelativeConstraint(0.1, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
 
@@ -64,6 +71,8 @@ public:
             module->settings.setValue("percentageY", percentages.y);
 
             FlarialGUI::UnsetWindowRect();
+        } else {
+            enabled = false;
         }
     }
 

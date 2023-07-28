@@ -43,10 +43,9 @@ class ClickGUIRenderer : public Listener {
     std::string curr;
     float baseHeightReal = 0.64f;
     float baseHeightActual = 0.00001f;
+    bool editmenu = false;
 
     void onRender(RenderEvent &event) override {
-
-        FlarialGUI::NotifyHeartbeat();
 
             float allahu = Constraints::RelativeConstraint(0.65);
             float akbar = Constraints::RelativeConstraint(0.25);
@@ -373,6 +372,8 @@ class ClickGUIRenderer : public Listener {
 
 
             }
+
+        FlarialGUI::NotifyHeartbeat();
     }
 
     void onKey(KeyEvent &event) override {
@@ -396,23 +397,49 @@ class ClickGUIRenderer : public Listener {
         }
 
 
-        if(event.GetKey() == VK_ESCAPE && module->settings.getSettingByName<bool>("enabled")->value) {
+        if(event.GetKey() == VK_ESCAPE && event.GetAction() == (int)ActionType::RELEASED) {
 
-            if(SDK::CurrentScreen == "hud_screen") SDK::clientInstance->grabMouse();
+            if(!editmenu) {
+                if(module->settings.getSettingByName<bool>("enabled")->value){
+                    if (SDK::CurrentScreen == "hud_screen") SDK::clientInstance->grabMouse();
 
-            module->settings.getSettingByName<bool>("enabled")->value = false;
-            ClickGUIRenderer::page.type = "normal";
-            ClickGUIRenderer::curr = "modules";
+                    module->settings.getSettingByName<bool>("enabled")->value = false;
+                    ClickGUIRenderer::page.type = "normal";
+                    ClickGUIRenderer::curr = "modules";
+                }
+            } else {
+                editmenu = false;
+                module->settings.getSettingByName<bool>("enabled")->value = true;
+            }
+
+            if(module->settings.getSettingByName<bool>("enabled")->value)
             event.cancel();
         }
 
         if(module->settings.getSettingByName<bool>("enabled")->value) {
 
             if(SDK::CurrentScreen == "hud_screen") SDK::clientInstance->releaseMouse();
-            event.setCancelled(true);
+
+            if(event.GetKeyAsString(true) == "L" && event.GetAction() == (int)ActionType::RELEASED) {
+
+                if(!editmenu) {
+                    module->settings.getSettingByName<bool>("enabled")->value = false;
+                    FlarialGUI::Notify("To disable this menu press ESC or L.    ");
+                    editmenu = true;
+                }
+
+            }
+
+        } else if (editmenu && event.GetKeyAsString(true) == "L" && event.GetAction() == (int)ActionType::RELEASED) {
+
+            editmenu = false;
+            module->settings.getSettingByName<bool>("enabled")->value = true;
+
         }
 
         if(!module->settings.getSettingByName<bool>("enabled")->value) FlarialGUI::ResetShit();
+
+
     }
 
 public:
