@@ -807,7 +807,12 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
     FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, color, s * 0.85f, s * 0.85f, round.x, round.x);
 
     round = Constraints::RoundingConstraint(11.5, 11.5);
-    FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f), s * 3.f, s * 0.82f, round.x, round.x);
+
+    D2D1_COLOR_F col = D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f);
+
+    if(TextBoxes[index].isActive) col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
+
+    FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, col, s * 3.f, s * 0.82f, round.x, round.x);
 
     std::string text;
     hex = FlarialGUI::TextBox(index, hex, 6, x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, s * 3.f, s * 0.82f);
