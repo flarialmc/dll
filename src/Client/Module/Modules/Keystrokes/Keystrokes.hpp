@@ -73,6 +73,10 @@ public:
             settings.addSetting("uiscale", 1.0f);
         }
 
+        if (settings.getSettingByName<bool>("BlurEffect") == nullptr) {
+            settings.addSetting("BlurEffect", false);
+        }
+
         Module::onEnable();
 
         EventHandler::registerListener(new KeystrokesListener("Keystrok", this));
@@ -146,10 +150,16 @@ public:
 
         /* Rounding End */
 
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, FlarialGUI::to_wide("Translucency").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+
+        if (FlarialGUI::Toggle(4, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("BlurEffect")->value)) this->settings.getSettingByName<bool>("BlurEffect")->value = !this->settings.getSettingByName<bool>("BlurEffect")->value;
+
         /* Color Pickers Start*/
 
         toggleX = Constraints::PercentageConstraint(0.55, "left");
-        toggleY -= Constraints::SpacingConstraint(0.30, textWidth);
+        toggleY -= Constraints::SpacingConstraint(0.65, textWidth);
 
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Unpressed").c_str(),
             D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight,
@@ -300,6 +310,9 @@ public:
 
 
                 // W
+                if(settings.getSettingByName<bool>("BlurEffect") != nullptr)
+                    if(settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize, realcenter.y + keycardSize), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
+
                 FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::W], keycardSize, keycardSize,
                     rounde.x,
                     rounde.x);
@@ -307,7 +320,12 @@ public:
                     DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
 
                 // S
+
                 realcenter.y += (keycardSize + spacing);
+
+                if(settings.getSettingByName<bool>("BlurEffect") != nullptr)
+                    if(settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize, realcenter.y + keycardSize), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
+
                 FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::S], keycardSize, keycardSize,
                     rounde.x,
                     rounde.x);
@@ -316,6 +334,9 @@ public:
                     DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
                 // A
                 realcenter.x -= (keycardSize + spacing);
+
+                if(settings.getSettingByName<bool>("BlurEffect") != nullptr)
+                    if(settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize, realcenter.y + keycardSize), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
                 FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::A], keycardSize, keycardSize,
                     rounde.x,
                     rounde.x);
@@ -324,6 +345,10 @@ public:
 
                 // D
                 realcenter.x += 2 * (keycardSize + spacing);
+
+                if(settings.getSettingByName<bool>("BlurEffect") != nullptr)
+                    if(settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize, realcenter.y + keycardSize), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
+
                 FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::D], keycardSize, keycardSize,
                     rounde.x,
                     rounde.x);
@@ -334,17 +359,28 @@ public:
                 float spacebarWidth = 3 * (keycardSize)+2 * spacing;
                 float spacebarHeight = 0.55f * (keycardSize);
                 realcenter.x -= 2 * (keycardSize + spacing);
+
+
                 if (!settings.getSettingByName<bool>("cps")->value) realcenter.y += (keycardSize + spacing);
                 else {
+
+                    realcenter.y += (keycardSize + spacing);
                     // LMB
-                    FlarialGUI::RoundedRect(realcenter.x, realcenter.y += (keycardSize + spacing), states[Strokes::LMB], keycardSize + (keycardSize / 2), keycardSize - (keycardSize * 0.05),
+                    if(settings.getSettingByName<bool>("BlurEffect") != nullptr)
+                        if(settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize + (keycardSize / 2), realcenter.y + keycardSize - (keycardSize * 0.05)), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
+
+                    FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::LMB], keycardSize + (keycardSize / 2), keycardSize - (keycardSize * 0.05),
                         rounde.x,
                         rounde.x);
                     FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y - Constraints::SpacingConstraint(0.06, keycardSize), FlarialGUI::to_wide(std::to_string(CPSListener::GetLeftCPS())).c_str(), textColor, keycardSize + (keycardSize / 2), keycardSize,
                         DWRITE_TEXT_ALIGNMENT_CENTER, fontSize + Constraints::SpacingConstraint(0.48, keycardSize));
 
                     // RMB
-                    FlarialGUI::RoundedRect(realcenter.x += 1.5f * (keycardSize + spacing), realcenter.y, states[Strokes::RMB], keycardSize + (keycardSize / 2), keycardSize - (keycardSize * 0.05),
+                    realcenter.x += 1.5f * (keycardSize + spacing);
+
+                    if(settings.getSettingByName<bool>("BlurEffect") != nullptr)
+                        if(settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize + (keycardSize / 2), realcenter.y + keycardSize - (keycardSize * 0.05)), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
+                    FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::RMB], keycardSize + (keycardSize / 2), keycardSize - (keycardSize * 0.05),
                         rounde.x,
                         rounde.x);
                     FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y - Constraints::SpacingConstraint(0.06, keycardSize), FlarialGUI::to_wide(std::to_string(CPSListener::GetRightCPS())).c_str(), textColor, keycardSize + (keycardSize / 2), keycardSize,
@@ -353,6 +389,8 @@ public:
                     realcenter.x -= 1.5f * (keycardSize + spacing);
                 }
 
+                if(settings.getSettingByName<bool>("BlurEffect") != nullptr)
+                    if(settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + spacebarWidth, realcenter.y + spacebarHeight), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
                 FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::SPACEBAR], spacebarWidth,
                     spacebarHeight, rounde.x, rounde.x);
                 FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, L"-------", textColor, spacebarWidth,
