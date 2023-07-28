@@ -43,7 +43,8 @@ class ClickGUIRenderer : public Listener {
     std::string curr;
     float baseHeightReal = 0.64f;
     float baseHeightActual = 0.00001f;
-    bool editmenu = false;
+public:
+    static inline bool editmenu = false;
 
     void onRender(RenderEvent &event) override {
 

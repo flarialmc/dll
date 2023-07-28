@@ -57,6 +57,7 @@ public:
             else
                 currentPos = Constraints::CenterConstraint(s * 4 + spacing * 4, s);
 
+            if(ClickGUIRenderer::editmenu)
             FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, s * 4 + spacing * 4, s, 18);
 
             Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x , currentPos.y, 18, s * 4 + spacing * 4, s);
@@ -72,6 +73,7 @@ public:
             module->settings.setValue("percentageX", percentages.x);
             module->settings.setValue("percentageY", percentages.y);
 
+            if(ClickGUIRenderer::editmenu)
             FlarialGUI::UnsetWindowRect();
         } else {
             enabled = false;
