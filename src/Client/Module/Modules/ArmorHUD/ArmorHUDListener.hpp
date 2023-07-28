@@ -39,8 +39,8 @@ public:
 
         if(SDK::clientInstance->getTopScreenName() == "hud_screen" && module->settings.getSettingByName<bool>("enabled")->value || SDK::clientInstance->getTopScreenName() == "pause_screen" && module->settings.getSettingByName<bool>("enabled")->value) {
 
-            if(!enabled) {
-                FlarialGUI::Notify("To change the position of ArmorHUD, Please click L.     \u200E");
+            if(!enabled && ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) {
+                FlarialGUI::Notify("To change the position of ArmorHUD, Please click L.");
                 enabled = true;
             }
 
@@ -91,6 +91,8 @@ public:
 
             float spacing = Constraints::SpacingConstraint(1.2f, s);
 
+            Vec2<float> oldPos = currentPos;
+
             for (int i = 0; i < 4; i++) {
 
                 if(module->settings.getSettingByName<bool>("vertical")->value) currentPos.x += spacing;
@@ -98,7 +100,7 @@ public:
 
             }
 
-
+            currentPos = oldPos;
         }
     }
 
