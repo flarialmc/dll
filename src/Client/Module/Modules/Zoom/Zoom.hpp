@@ -30,7 +30,7 @@ public:
     virtual void DefaultConfig() override {
         if (settings.getSettingByName<bool>("SaveModifier") == nullptr) settings.addSetting("SaveModifier", true);
         if (settings.getSettingByName<float>("modifier") == nullptr) settings.addSetting("modifier", 10.0f);
-        if (settings.getSettingByName<float>("anim") == nullptr) settings.addSetting("anim", 0.05f);
+        if (settings.getSettingByName<float>("anim") == nullptr) settings.addSetting("anim", 0.20f);
         if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"real");
         if (settings.getSettingByName<std::string>("keybind")->value == (std::string)"") settings.getSettingByName<std::string>("keybind")->value = "C";
 
