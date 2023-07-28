@@ -26,7 +26,6 @@ private:
         e.muirc = muirc;
 
         EventHandler::onSetupAndRender(e);
-        std::cout << muirc->clientInstance->getLocalPlayer()->gamemode << std::endl;
         func_original(pScreenView, muirc);
     }
 

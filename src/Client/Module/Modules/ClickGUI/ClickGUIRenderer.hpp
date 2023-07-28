@@ -425,17 +425,17 @@ class ClickGUIRenderer : public Listener {
 
             if(SDK::CurrentScreen == "hud_screen") SDK::clientInstance->releaseMouse();
 
-            if(event.GetKeyAsString(true) == "L" && event.GetAction() == (int)ActionType::RELEASED) {
+            if(module->IsAllahKeybind(event.keys, module->settings.getSettingByName<std::string>("editmenubind")->value) && module->IsKeyPartOfAllahKeybind(event.key, module->settings.getSettingByName<std::string>("editmenubind")->value)) {
 
                 if(!editmenu) {
                     module->settings.getSettingByName<bool>("enabled")->value = false;
-                    FlarialGUI::Notify("To disable this menu press ESC or L.    ");
+                    FlarialGUI::Notify("To disable this menu press ESC or " + module->settings.getSettingByName<std::string>("editmenubind")->value);
                     editmenu = true;
                 }
 
             }
 
-        } else if (editmenu && event.GetKeyAsString(true) == "L" && event.GetAction() == (int)ActionType::RELEASED || editmenu && module->IsKeybind(event.keys) && event.GetAction() == (int)ActionType::RELEASED) {
+        } else if (editmenu && module->IsAllahKeybind(event.keys, module->settings.getSettingByName<std::string>("editmenubind")->value) && module->IsKeyPartOfAllahKeybind(event.key, module->settings.getSettingByName<std::string>("editmenubind")->value) || editmenu && module->IsKeybind(event.keys) && module->IsKeyPartOfAllahKeybind(event.key, module->settings.getSettingByName<std::string>("editmenubind")->value)) {
 
             editmenu = false;
             module->settings.getSettingByName<bool>("enabled")->value = true;

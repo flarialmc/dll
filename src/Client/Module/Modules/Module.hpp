@@ -169,8 +169,30 @@ public:
         return true;
     }
 
+    bool IsAllahKeybind(const std::array<bool, 256>& keys, std::string bind) {
+
+        std::vector<int> keyCodes = Utils::GetStringAsKeys(bind);
+
+        for (int keyCode : keyCodes) {
+            if (!keys[keyCode]) {
+
+                // Key is not being held down
+                return false;
+            }
+        }
+
+        for(TextBoxStruct i : FlarialGUI::TextBoxes) if(i.isActive) return false;
+        // All keys in the keybind are being held down
+        return true;
+    }
+
     bool IsKeyPartOfKeybind(int keyCode) {
         std::vector<int> keyCodes = Utils::GetStringAsKeys(settings.getSettingByName<std::string>("keybind")->value);
+        return std::find(keyCodes.begin(), keyCodes.end(), keyCode) != keyCodes.end();
+    }
+
+    bool IsKeyPartOfAllahKeybind(int keyCode, std::string bind) {
+        std::vector<int> keyCodes = Utils::GetStringAsKeys(bind);
         return std::find(keyCodes.begin(), keyCodes.end(), keyCode) != keyCodes.end();
     }
 
