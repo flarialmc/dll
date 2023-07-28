@@ -4,11 +4,11 @@
 #include "../../../Events/EventHandler.hpp"
 
 
-class HurtColor : public Module {
+class FogColor : public Module {
 
 public:
 
-    HurtColor() : Module("Hurt Color", "chike wi!", "\\Flarial\\assets\\hurt.png", 'C') {
+    FogColor() : Module("Fog Color", "chike wi!", "\\Flarial\\assets\\smoke.png", 'C') {
 
         onEnable();
 

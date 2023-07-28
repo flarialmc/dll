@@ -30,6 +30,7 @@
 #include "Modules/ArmorHUD/ArmorHUD.hpp"
 #include "Modules/PatarHD/PatarHD.hpp"
 #include "Modules/HurtColor/HurtColor.hpp"
+#include "Modules/FogColor/FogColor.hpp"
 
 namespace ModuleManager {
     std::vector<Module*> modules;
@@ -62,6 +63,7 @@ void ModuleManager::initialize()
     modules.push_back(new FreeLook());
     modules.push_back(new SnapLook());
     modules.push_back(new HurtColor());
+    modules.push_back(new FogColor());
     modules.push_back(new ArmorHUD());
     modules.push_back(new Module("test", "test", "", 'c'));
 

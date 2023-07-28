@@ -10,6 +10,7 @@
 #include "Hooks/Game/getViewPerspective.hpp"
 #include "../Client.hpp"
 #include "Hooks/Visual/HurtColorHook.hpp"
+#include "Hooks/Visual/FogColorHook.hpp"
 
 std::vector<Hook *> HookManager::hooks;
 
@@ -42,6 +43,7 @@ void HookManager::initialize()
     hooks.push_back(new OnSuspendHook());
     hooks.push_back(new getGammaHook());
     hooks.push_back(new HurtColorHook());
+    hooks.push_back(new FogColorHook());
 
     for (auto hook : hooks)
         hook->enableHook();
