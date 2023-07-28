@@ -46,6 +46,8 @@ public:
 
             float s = Constraints::RelativeConstraint(0.1, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
 
+            float spacing = Constraints::SpacingConstraint(0.6f, s);
+
             Vec2<float> settingperc = Vec2<float>(module->settings.getSettingByName<float>("percentageX")->value,
             module->settings.getSettingByName<float>("percentageY")->value);
 
@@ -53,11 +55,11 @@ public:
                 currentPos = Vec2<float>(settingperc.x * MC::windowSize.x,
                                          settingperc.y * MC::windowSize.y);
             else
-                currentPos = Constraints::CenterConstraint(s, s);
+                currentPos = Constraints::CenterConstraint(s * 4 + spacing * 4, s);
 
-            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, s, s, 15);
+            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, s * 4 + spacing * 4, s, 18);
 
-            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 15, s, s);
+            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 18, s, s);
 
 
             currentPos.x = vec2.x;
