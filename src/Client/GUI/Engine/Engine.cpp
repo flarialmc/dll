@@ -485,7 +485,11 @@ std::string FlarialGUI::TextBox(int index, std::string text, int limit, float x,
         FlarialGUI::TextBoxes[index].isActive = false;
         FlarialGUI::TextBoxes[index].text = text;
 
+    } else if (!FlarialGUI::TextBoxes[index].isActive) {
+
+        FlarialGUI::TextBoxes[index].text = text;
     }
+
 
     if(FlarialGUI::TextBoxes[index].text.empty() && FlarialGUI::TextBoxes[index].firstTime) {
         FlarialGUI::TextBoxes[index].firstTime = false;
@@ -807,9 +811,7 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 
     std::string text;
     hex = FlarialGUI::TextBox(index, hex, 6, x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, s * 3.f, s * 0.82f);
-    if (hex.length() > 6) {
-    hex = hex.substr(0, 6);
-    }
+
     text = "#" + hex;
 
     FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.006f, FlarialGUI::to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), s * 4.3f, s * 1.1f, DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f);
@@ -824,6 +826,10 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 
 void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float& opacity) {
 
+    int i = 1;
+    for (auto picker : ColorPickers)
+        if(i != index && picker.isActive) picker.isActive = false;
+
     if(ColorPickers[index].isActive) {
 
 
@@ -832,6 +838,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float& opacity) 
                                 Constraints::RelativeConstraint(1.5, "width", true),
                                 Constraints::RelativeConstraint(1.5, "height", true), 0, 0);
 
+        std::cout << hex << std::endl;
         D2D1_COLOR_F color = FlarialGUI::HexToColorF(hex);
 
         float rectwidth = Constraints::RelativeConstraint(0.35, "height", true);
@@ -858,17 +865,17 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float& opacity) 
 
         spacing *= 0.90f;
 
-        float percentR = FlarialGUI::Slider(index + 50, x, y,
+        float percentR = FlarialGUI::Slider(index + 10, x, y,
                                             D2D1::ColorF(D2D1::ColorF::Red),
                                             D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
                                             D2D1::ColorF(D2D1::ColorF::White), color.r * 255.0f, 255.0f);
 
-        float percentG = FlarialGUI::Slider(index + 100, x, y + spacing,
+        float percentG = FlarialGUI::Slider(index + 11, x, y + spacing,
                                             D2D1::ColorF(D2D1::ColorF::Green),
                                             D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
                                             D2D1::ColorF(D2D1::ColorF::White), color.g * 255.0f, 255.0f);
 
-        float percentB = FlarialGUI::Slider(index + 150, x, y + spacing * 2,
+        float percentB = FlarialGUI::Slider(index + 12, x, y + spacing * 2,
                                             D2D1::ColorF(D2D1::ColorF::Blue),
                                             D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
                                             D2D1::ColorF(D2D1::ColorF::White), color.b * 255.0f, 255.0f);
