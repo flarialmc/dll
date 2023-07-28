@@ -11,6 +11,7 @@
 #include "../Client.hpp"
 #include "Hooks/Visual/HurtColorHook.hpp"
 #include "Hooks/Visual/FogColorHook.hpp"
+#include "Hooks/Visual/TimeChangerHook.hpp"
 
 std::vector<Hook *> HookManager::hooks;
 
@@ -46,6 +47,7 @@ void HookManager::initialize()
     hooks.push_back(new getGammaHook());
     hooks.push_back(new HurtColorHook());
     hooks.push_back(new FogColorHook());
+    hooks.push_back(new TimeChangerHook());
 
     for (auto hook : hooks)
         hook->enableHook();

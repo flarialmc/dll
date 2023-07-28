@@ -31,6 +31,7 @@
 #include "Modules/PatarHD/PatarHD.hpp"
 #include "Modules/HurtColor/HurtColor.hpp"
 #include "Modules/FogColor/FogColor.hpp"
+#include "Modules/TimeChanger/TimeChanger.hpp"
 
 namespace ModuleManager {
     std::vector<Module*> modules;
@@ -65,6 +66,7 @@ void ModuleManager::initialize()
     modules.push_back(new HurtColor());
     modules.push_back(new FogColor());
     modules.push_back(new ArmorHUD());
+    modules.push_back(new TimeChanger());
 
 
     EventHandler::registerListener(new GUIKeyListener("E"));
