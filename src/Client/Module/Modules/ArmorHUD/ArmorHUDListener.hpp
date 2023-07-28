@@ -92,23 +92,26 @@ public:
             //2 = leggings
             //3 = boots
 
-            if (LP->getArmor(0)->getItem() != nullptr) {
-                //if it isnt null then the player is wearing something and we should draw it
-            }
+
             if(LP->playerInventory->inventory->getItem(0)->getItem() != nullptr)
             barc.itemRenderer->renderGuiItemNew(&barc, SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(0), 0, convert.x, convert.y, 1.0f, module->settings.getSettingByName<float>("uiscale")->value, false);
 
             float s = Constraints::RelativeConstraint(0.1, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
 
-            float spacing = Constraints::SpacingConstraint(1.2f, s);
+            float spacing = Constraints::SpacingConstraint(0.6f, s);
 
             Vec2<float> oldPos = currentPos;
 
             for (int i = 0; i < 4; i++) {
 
-                if(module->settings.getSettingByName<bool>("vertical")->value) currentPos.x += spacing;
-                else currentPos.y += spacing;
+                if (LP->getArmor(i)->getItem() != nullptr) {
 
+                    if(module->settings.getSettingByName<bool>("vertical")->value) currentPos.x += spacing;
+                    else currentPos.y += spacing;
+                    convert = this->convert();
+                    barc.itemRenderer->renderGuiItemNew(&barc, LP->getArmor(i), 0, convert.x, convert.y, 1.0f, module->settings.getSettingByName<float>("uiscale")->value, false);
+
+                }
             }
 
             currentPos = oldPos;
