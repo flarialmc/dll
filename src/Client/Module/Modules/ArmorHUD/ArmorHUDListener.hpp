@@ -93,8 +93,8 @@ public:
             //3 = boots
 
 
-            if(LP->playerInventory->inventory->getItem(0)->getItem() != nullptr)
-            barc.itemRenderer->renderGuiItemNew(&barc, SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(0), 0, convert.x, convert.y, 1.0f, module->settings.getSettingByName<float>("uiscale")->value, false);
+            if(LP->playerInventory->inventory->getItem(LP->playerInventory->SelectedSlot)->getItem() != nullptr)
+            barc.itemRenderer->renderGuiItemNew(&barc, SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(LP->playerInventory->SelectedSlot), 0, convert.x, convert.y, 1.0f, module->settings.getSettingByName<float>("uiscale")->value, false);
 
             float s = Constraints::RelativeConstraint(0.1, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
 
