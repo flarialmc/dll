@@ -435,7 +435,7 @@ class ClickGUIRenderer : public Listener {
 
             }
 
-        } else if (editmenu && event.GetKeyAsString(true) == "L" && event.GetAction() == (int)ActionType::RELEASED) {
+        } else if (editmenu && event.GetKeyAsString(true) == "L" && event.GetAction() == (int)ActionType::RELEASED || editmenu && module->IsKeybind(event.keys) && event.GetAction() == (int)ActionType::RELEASED) {
 
             editmenu = false;
             module->settings.getSettingByName<bool>("enabled")->value = true;
