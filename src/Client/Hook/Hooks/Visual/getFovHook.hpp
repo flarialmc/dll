@@ -22,9 +22,11 @@ private:
             auto zom = reinterpret_cast<Zoom *>(ModuleManager::getModule("Zoom"));
             if(zom->settings.getSettingByName<bool>("enabled")->value) currentZoomVal = std::lerp(currentZoomVal, ZoomListener::zoomValue, zom->settings.getSettingByName<float>("anim")->value * FlarialGUI::frameFactor);
             else currentZoomVal = std::lerp(currentZoomVal, fov, zom->settings.getSettingByName<float>("anim")->value * FlarialGUI::frameFactor);
-            return currentZoomVal;
+            fov = currentZoomVal;
 
-        } else return fov;
+        }
+
+        return fov;
 
 
 	}

@@ -844,7 +844,6 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float& opacity) 
                                 Constraints::RelativeConstraint(1.5, "width", true),
                                 Constraints::RelativeConstraint(1.5, "height", true), 0, 0);
 
-        std::cout << hex << std::endl;
         D2D1_COLOR_F color = FlarialGUI::HexToColorF(hex);
 
         float rectwidth = Constraints::RelativeConstraint(0.35, "height", true);

@@ -29,8 +29,8 @@ public:
 
     virtual void DefaultConfig() override {
 
-        if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 0.7f);
-        if (settings.getSettingByName<float>("intensity2") == nullptr) settings.addSetting("intensity2", 7.0f);
+        if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 0.65f);
+        if (settings.getSettingByName<float>("intensity2") == nullptr) settings.addSetting("intensity2", 3.0f);
     }
 
     void onDisable() override {
@@ -67,9 +67,10 @@ public:
                                      y,
                                      D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
                                      D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
-                                     D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("intensity2")->value, 15);
+                                     D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("intensity2")->value, 30);
 
-        this->settings.getSettingByName<float>("intensity2")->value = (int)ceilf(percent);
+
+        this->settings.getSettingByName<float>("intensity2")->value = percent;
 
         FlarialGUI::UnsetScrollView();
 
