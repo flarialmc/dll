@@ -9,6 +9,8 @@
 #include "../../../../SDK/Client/Render/ItemRenderer.hpp"
 #include <format>
 
+bool sendoncethx = false;
+
 class SetUpAndRenderHook : public Hook
 {
 private:
@@ -19,8 +21,22 @@ private:
         SDK::screenView = pScreenView;
 
         std::string layer = SDK::screenView->VisualTree->root->LayerName;
-        if(layer != "debug_screen" && layer != "toast_screen")
+        if (layer != "debug_screen" && layer != "toast_screen") {
             SDK::CurrentScreen = layer;
+            
+           // if (!sendoncethx) {
+               // sendoncethx = true;
+
+               // SDK::screenView->VisualTree->root->forEachControl([](std::shared_ptr<UIControl>& control) {
+                   // if (control->LayerName == "chat_panel") {
+                    //    std::cout << control << std::endl;
+                      //  control->x = 400.0f;
+                       // control->y = 200.0f;
+                    //}
+                //});
+            //}
+          
+        }
 
         SetupAndRenderEvent e;
         e.muirc = muirc;

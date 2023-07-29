@@ -28,6 +28,7 @@
 #include "Modules/ThirdPersonNametag/ThirdPerson.hpp"
 #include "Modules/MotionBlur/MotionBlur.hpp"
 #include "Modules/ArmorHUD/ArmorHUD.hpp"
+#include "Modules/PaperDoll/PaperDoll.hpp"
 #include "Modules/PatarHD/PatarHD.hpp"
 #include "Modules/HurtColor/HurtColor.hpp"
 #include "Modules/FogColor/FogColor.hpp"
@@ -66,6 +67,7 @@ void ModuleManager::initialize()
     modules.push_back(new HurtColor());
     modules.push_back(new FogColor());
     modules.push_back(new ArmorHUD());
+    modules.push_back(new PaperDoll());
     modules.push_back(new TimeChanger());
 
 
