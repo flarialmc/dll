@@ -27,14 +27,12 @@ private:
                 color->a = ModuleManager::getModule("Fog Color")->settings.getSettingByName<float>("colorOpacity")->value;
                 return color->arr;
 
-            } else {
-                return func_original(a1, a2, a3, a4);
             }
         }
 
+        return func_original(a1, a2, a3, a4);
 
-
-	}
+    }
 
 public:
     typedef float*(__thiscall* FogColorOriginal)(void*, void*, void*, void*);

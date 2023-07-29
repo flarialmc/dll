@@ -84,7 +84,9 @@ void Client::initialize()
         { "https://cdn.flarial.net/assets/skull.png", Path + "skull.png" },
         { "https://cdn.flarial.net/assets/freelook.png", Path + "freelook.png" },
         { "https://cdn.flarial.net/assets/hurt.png", Path + "hurt.png" },
-        { "https://cdn.flarial.net/assets/smoke.png", Path + "smoke.png" }
+        { "https://cdn.flarial.net/assets/smoke.png", Path + "smoke.png" },
+        { "https://cdn.flarial.net/assets/renderoptions.png", Path + "renderoptions.png" }
+
 
     };
 

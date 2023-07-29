@@ -23,7 +23,7 @@ public:
 
     void onRender(RenderEvent& event) override {
 
-        int maxFrames = (int)module->settings.getSettingByName<float>("intensity2")->value;
+        int maxFrames = module->settings.getSettingByName<float>("intensity2")->value;
 
         if(module->settings.getSettingByName<bool>("enabled")->value && SDK::CurrentScreen == "hud_screen") {
 

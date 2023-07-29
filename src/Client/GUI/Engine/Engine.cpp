@@ -771,9 +771,10 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
 
     FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.25, textWidth / 2.0f), y, to_wide("Keybind (Hold for 2 seconds)").c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(2.2, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.0, textWidth));
 
+    if(isInScrollView) y += scrollpos;
+
     if (CursorInRect(x, y, percWidth, percHeight) && MC::mousebutton == MouseButton::Left && !MC::held && !KeybindSelectors[index].isActive)
     {
-        MC::mousebutton = MouseButton::None;
         KeybindSelectors[index].isActive = !KeybindSelectors[index].isActive;
         KeybindSelectors[index].currentOnKeyTime = std::chrono::steady_clock::now();
     }
@@ -843,7 +844,6 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float& opacity) 
                                 Constraints::RelativeConstraint(1.5, "width", true),
                                 Constraints::RelativeConstraint(1.5, "height", true), 0, 0);
 
-        std::cout << hex << std::endl;
         D2D1_COLOR_F color = FlarialGUI::HexToColorF(hex);
 
         float rectwidth = Constraints::RelativeConstraint(0.35, "height", true);
@@ -978,7 +978,7 @@ std::string FlarialGUI::ColorFToHex(const D2D1_COLOR_F& color)
 }
 
 
-void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F color, const float width, const float height, const DWRITE_TEXT_ALIGNMENT alignment)
+void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F color, float width, const float height, const DWRITE_TEXT_ALIGNMENT alignment)
 {
 
     if (isInScrollView)

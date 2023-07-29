@@ -28,15 +28,13 @@ private:
                 color->a = ModuleManager::getModule("Hurt Color")->settings.getSettingByName<float>(
                         "colorOpacity")->value;
                 return color;
-            } else {
-                return func_original(a1, color, a3);
             }
 
         }
 
+        return func_original(a1, color, a3);
 
-
-	}
+    }
 
 public:
     typedef MCCColor*(__thiscall* HurtColorOriginal)(void* a1, MCCColor* color, void* a3);
