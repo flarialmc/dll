@@ -978,7 +978,7 @@ std::string FlarialGUI::ColorFToHex(const D2D1_COLOR_F& color)
 }
 
 
-void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F color, const float width, const float height, const DWRITE_TEXT_ALIGNMENT alignment)
+void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F color, float width, const float height, const DWRITE_TEXT_ALIGNMENT alignment)
 {
 
     if (isInScrollView)
@@ -992,6 +992,7 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F
     textFormat->SetTextAlignment(alignment);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
+    width *= 1.2f;
     D2D1_RECT_F textRect = D2D1::RectF(x, y, x + width, y + height);
     D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
 
