@@ -28,7 +28,7 @@ public:
           
 
             Vec2<float> oldPos = currentPos;
-            Vec2<float> convert = this->convert();
+           // Vec2<float> convert = this->convert();
            
             SDK::screenView->VisualTree->root->forEachControl([convert](std::shared_ptr<UIControl> control) {
 
