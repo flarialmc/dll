@@ -37,7 +37,7 @@ public:
 
     void SettingsRender() override {
 
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+        const float textWidth = Constraints::RelativeConstraint(0.2, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
         float x = Constraints::PercentageConstraint(0.019, "left");
@@ -47,37 +47,37 @@ public:
         FlarialGUI::SetScrollView(x, y, Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(0.90, "height"));
 
 
-        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.60, textWidth), y, L"Chunk Borders", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.365, textWidth), y, L"Chunk Borders", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
 
         if (FlarialGUI::Toggle(1, Constraints::PercentageConstraint(0.019, "left"), y, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("chunkborders")->value)) this->settings.getSettingByName<bool>("chunkborders")->value = !this->settings.getSettingByName<bool>("chunkborders")->value;
 
-        y += Constraints::SpacingConstraint(0.35, textWidth);
+        y += Constraints::SpacingConstraint(0.20, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.60, textWidth), y, L"Render Sky", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.365, textWidth), y, L"Render Sky", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
 
         if (FlarialGUI::Toggle(2, Constraints::PercentageConstraint(0.019, "left"), y, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("sky")->value)) this->settings.getSettingByName<bool>("sky")->value = !this->settings.getSettingByName<bool>("sky")->value;
 
-        y += Constraints::SpacingConstraint(0.35, textWidth);
+        y += Constraints::SpacingConstraint(0.20, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.60, textWidth), y, L"Render Entities", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.365, textWidth), y, L"Render Entities", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
 
         if (FlarialGUI::Toggle(3, Constraints::PercentageConstraint(0.019, "left"), y, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("entity")->value)) this->settings.getSettingByName<bool>("entity")->value = !this->settings.getSettingByName<bool>("entity")->value;
 
-        y += Constraints::SpacingConstraint(0.35, textWidth);
+        y += Constraints::SpacingConstraint(0.20, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.60, textWidth), y, L"Render Block Entities", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.365, textWidth), y, L"Render Block Entities", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
 
         if (FlarialGUI::Toggle(4, Constraints::PercentageConstraint(0.019, "left"), y, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("blockentity")->value)) this->settings.getSettingByName<bool>("blockentity")->value = !this->settings.getSettingByName<bool>("blockentity")->value;
 
-        y += Constraints::SpacingConstraint(0.35, textWidth);
+        y += Constraints::SpacingConstraint(0.20, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.60, textWidth), y, L"Render Particles", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.365, textWidth), y, L"Render Particles", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
 
         if (FlarialGUI::Toggle(5, Constraints::PercentageConstraint(0.019, "left"), y, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("particles")->value)) this->settings.getSettingByName<bool>("particles")->value = !this->settings.getSettingByName<bool>("particles")->value;
 
-        y += Constraints::SpacingConstraint(0.35, textWidth);
+        y += Constraints::SpacingConstraint(0.20, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.60, textWidth), y, L"Render Weather", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.365, textWidth), y, L"Render Weather", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
 
         if (FlarialGUI::Toggle(6, Constraints::PercentageConstraint(0.019, "left"), y, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("weather")->value)) this->settings.getSettingByName<bool>("weather")->value = !this->settings.getSettingByName<bool>("weather")->value;
 
