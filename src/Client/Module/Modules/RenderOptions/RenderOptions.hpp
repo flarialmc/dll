@@ -12,7 +12,7 @@ public:
 
     }
 
-    RenderOptions() : Module("Render Options", "chike wi!", "\\Flarial\\assets\\frying-pan.png", 'b') {
+    RenderOptions() : Module("Render Options", "chike wi!", "\\Flarial\\assets\\renderoptions.png", 'b') {
 
         onEnable();
 
