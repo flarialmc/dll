@@ -27,6 +27,9 @@ public:
         if (settings.getSettingByName<std::string>("color") == nullptr) settings.addSetting("color", (std::string)"FFFFFF");
         if (settings.getSettingByName<float>("colorOpacity") == nullptr) settings.addSetting("colorOpacity", 0.65);
 
+        if (settings.getSettingByName<bool>("rgb") == nullptr) {
+            settings.addSetting("rgb", false);
+        }
     }
 
     void onDisable() override {
@@ -44,7 +47,7 @@ public:
         FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide("Color").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
         FlarialGUI::ColorPicker(3, x + Constraints::SpacingConstraint(0.95, textWidth), y - Constraints::SpacingConstraint(0.017, textWidth), settings.getSettingByName<std::string>("color")->value, settings.getSettingByName<float>("colorOpacity")->value);
 
-        FlarialGUI::ColorPickerWindow(3, settings.getSettingByName<std::string>("color")->value, settings.getSettingByName<float>("colorOpacity")->value);
+        FlarialGUI::ColorPickerWindow(3, settings.getSettingByName<std::string>("color")->value, settings.getSettingByName<float>("colorOpacity")->value, settings.getSettingByName<bool>("rgb")->value);
 
     }
 };

@@ -191,12 +191,10 @@ public:
 
         FlarialGUI::UnsetScrollView();
 
-        FlarialGUI::ColorPickerWindow(3, settings.getSettingByName<std::string>("bgColor")->value,
-            settings.getSettingByName<float>("bgOpacity")->value);
-        FlarialGUI::ColorPickerWindow(4, settings.getSettingByName<std::string>("textColor")->value,
-            settings.getSettingByName<float>("textOpacity")->value);
-        FlarialGUI::ColorPickerWindow(5, settings.getSettingByName<std::string>("enabledColor")->value,
-            settings.getSettingByName<float>("enabledOpacity")->value);
+  FlarialGUI::ColorPickerWindow(3, settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value,  settings.getSettingByName<bool>("rgb")->value);
+        FlarialGUI::ColorPickerWindow(4, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value,  settings.getSettingByName<bool>("rgb")->value);
+        FlarialGUI::ColorPickerWindow(5, settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value,  settings.getSettingByName<bool>("rgb")->value);
+
 
     }
 

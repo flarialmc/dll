@@ -6,6 +6,9 @@
     std::string uppercaseSentence;
     std::string search = "{VALUE}";
 
+    if(settings.getSettingByName<bool>("rgb")->value)
+        FlarialGUI::RGBHeartbeat();
+
     for (char c : text) {
         uppercaseSentence += std::toupper(c);
     }

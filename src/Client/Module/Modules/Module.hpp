@@ -149,6 +149,10 @@ public:
            settings.addSetting("BlurEffect", false);
        }
 
+       if (settings.getSettingByName<bool>("rgb") == nullptr) {
+           settings.addSetting("rgb", false);
+       }
+
     }
 
     virtual void SettingsRender() {}
