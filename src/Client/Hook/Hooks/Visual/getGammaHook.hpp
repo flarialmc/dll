@@ -58,7 +58,7 @@ private:
                 }
 
                 if (*translateName == "options.vsync")
-                    if (Client::settings.getSettingByName<bool>("vsync")->value)optionsPtr->setvalue(false);
+                    if (Client::settings.getSettingByName<bool>("vsync")->value) optionsPtr->setvalue(false);
 
 
             }

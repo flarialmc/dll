@@ -11,6 +11,7 @@ public:
       
             if (event.GetKey() == VK_F7 && static_cast<ActionType>(event.GetAction()) == ActionType::RELEASED) {
                 ModuleManager::SaveModulesConfig();
+                Client::SaveSettings();
                 FlarialGUI::Notify("Config Saved");
 
             }
