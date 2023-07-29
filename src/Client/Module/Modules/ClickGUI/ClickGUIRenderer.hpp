@@ -441,7 +441,13 @@ public:
 
         }
 
-        if(!module->settings.getSettingByName<bool>("enabled")->value) FlarialGUI::ResetShit();
+        if(!module->settings.getSettingByName<bool>("enabled")->value) {
+
+            FlarialGUI::ResetShit();
+            ModuleManager::SaveModulesConfig();
+            Client::SaveSettings();
+
+        }
 
         if(module->settings.getSettingByName<bool>("enabled")->value || editmenu)
         event.setCancelled(true);
