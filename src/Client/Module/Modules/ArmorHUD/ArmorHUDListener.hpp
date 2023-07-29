@@ -46,7 +46,7 @@ public:
 
             float s = Constraints::RelativeConstraint(0.1, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
 
-            float spacing = Constraints::RelativeConstraint(0.0135, "width", true) * module->settings.getSettingByName<float>("uiscale")->value;
+            float spacing = Constraints::RelativeConstraint(0.0135, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
 
             Vec2<float> settingperc = Vec2<float>(module->settings.getSettingByName<float>("percentageX")->value,
             module->settings.getSettingByName<float>("percentageY")->value);
@@ -89,20 +89,20 @@ public:
             Vec2<float> convert = this->convert();
 
 
-            if( SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem( SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot)->getItem() != nullptr)
+            if(SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem( SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot)->getItem() != nullptr)
             barc.itemRenderer->renderGuiItemNew(&barc, SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem( SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot), 0, convert.x, convert.y, 1.0f, module->settings.getSettingByName<float>("uiscale")->value, false);
 
             float s = Constraints::RelativeConstraint(0.1, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
 
-            float spacing = Constraints::RelativeConstraint(0.0135, "width", true) * module->settings.getSettingByName<float>("uiscale")->value;
+            float spacing = 16;
 
             float xmodifier = 0.0f;
             float ymodifier = 0.0f;
 
             for (int i = 0; i < 4; i++) {
 
-                if(module->settings.getSettingByName<bool>("vertical")->value) xmodifier += spacing;
-                else ymodifier += spacing;
+                if(module->settings.getSettingByName<bool>("vertical")->value) ymodifier += spacing;
+                else xmodifier += spacing;
 
                 if (SDK::clientInstance->getLocalPlayer()->getArmor(i)->getItem() != nullptr) {
 
