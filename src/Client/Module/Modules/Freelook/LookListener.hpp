@@ -12,7 +12,7 @@ class LookListener : public Listener {
     Module* module;
 private:
     Vec2<float> oldRotations;
-    bool enabled;
+    bool enabled = false;
     static inline uintptr_t yaw1 = Memory::findSig("F3 0F 11 30 F3 ? ? 78 ? 49 8B CE");
     static inline uintptr_t yaw2 = Memory::findSig("F3 0F 11 38 F3 ? ? 70 ? 48 8B 8C");
     static inline uintptr_t pitch = Memory::findSig("F3 0F 11 0E 48 89 9C");

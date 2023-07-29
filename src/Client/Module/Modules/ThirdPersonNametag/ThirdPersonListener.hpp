@@ -10,7 +10,7 @@
 class ThirdPersonListener : public Listener {
 
     Module* module;
-    bool enabled;
+    bool enabled = false;
     static inline std::vector<uint8_t> Original;
     static inline std::vector<uint8_t> Patched;
     static inline uintptr_t real = Memory::findSig("0F 84 ? ? ? ? 49 8B D7 48 8B CE E8 ? ? ? ? 84 C0");
