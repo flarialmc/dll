@@ -23,20 +23,15 @@ public:
     void onSetupAndRender(SetupAndRenderEvent& event) override {
 
 
-        if(SDK::screenView->VisualTree->root->LayerName == "hud_screen" && module->settings.getSettingByName<bool>("enabled")->value) {
-
-          
-
-            Vec2<float> oldPos = currentPos;
-           // Vec2<float> convert = this->convert();
+        if(SDK::screenView->VisualTree->root->LayerName == "hud_screen") {
            
-            SDK::screenView->VisualTree->root->forEachControl([](std::shared_ptr<UIControl> control) {
+            SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl> control) {
 
-               
-
-                if (control->LayerName == "hud_player") {
+                if (control->LayerName == "hud_player" && module->settings.getSettingByName<bool>("enabled")->value) {
+                std::cout << control << std::endl;
                     control->x = 40.0f;
                     control->y = 40.0f;
+                    control->scale = module->settings.getSettingByName<float>("uiscale")->value;
 
                     return; // dont go through other controls
                 }

@@ -31,7 +31,7 @@ public:
     void DefaultConfig() override {
 
         if (settings.getSettingByName<bool>("enabled") == nullptr) settings.addSetting("enabled", false);
-        if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 2.0f);
+        if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 21.0f);
         if (settings.getSettingByName<float>("percentageX") == nullptr) {
             settings.addSetting("percentageX", 0.0f);
             settings.addSetting("percentageY", 0.0f);
@@ -63,16 +63,9 @@ public:
             D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
             D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
             D2D1::ColorF(D2D1::ColorF::White),
-            this->settings.getSettingByName<float>("uiscale")->value, 3.0f);
+            this->settings.getSettingByName<float>("uiscale")->value, 40.0f);
 
         this->settings.getSettingByName<float>("uiscale")->value = percent;
-
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, FlarialGUI::to_wide("Vertical").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
-
-        if (FlarialGUI::Toggle(2, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("vertical")->value)) this->settings.getSettingByName<bool>("vertical")->value = !this->settings.getSettingByName<bool>("vertical")->value;
-
 
         FlarialGUI::UnsetScrollView();
     }
