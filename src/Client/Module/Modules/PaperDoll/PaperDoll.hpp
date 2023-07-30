@@ -8,7 +8,7 @@ class PaperDoll : public Module {
 
 public:
 
-    PaperDoll() : Module("PaperDoll", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\chestplate.png", 'Y') {
+    PaperDoll() : Module("Movable Paperdoll", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\man.png", 'Y') {
 
         onEnable();
 

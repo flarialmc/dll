@@ -20,11 +20,6 @@ public:
     Vec2<float> currentPos;
     bool enabled = false;
 
-
-    void onLocalTick(TickEvent& event) override {
-
-    }
-
     Vec2<float> convert() {
 
         auto e = SDK::clientInstance->guiData;
@@ -93,6 +88,8 @@ public:
             barc.itemRenderer->renderGuiItemNew(&barc, SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem( SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot), 0, convert.x, convert.y, 1.0f, module->settings.getSettingByName<float>("uiscale")->value, false);
 
             float s = Constraints::RelativeConstraint(0.1, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
+
+            std::cout << s << std::endl;
 
             float spacing = 16;
 

@@ -61,6 +61,7 @@ private:
                     if (Client::settings.getSettingByName<bool>("vsync")->value) optionsPtr->setvalue(false);
 
 
+
             }
         }
 
