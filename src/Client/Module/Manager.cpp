@@ -34,6 +34,7 @@
 #include "Modules/FogColor/FogColor.hpp"
 #include "Modules/TimeChanger/TimeChanger.hpp"
 #include "Modules/RenderOptions/RenderOptions.hpp"
+#include "Modules/MovableChat/MovableChat.hpp"
 
 namespace ModuleManager {
     std::vector<Module*> modules;
@@ -68,9 +69,9 @@ void ModuleManager::initialize()
     modules.push_back(new HurtColor());
     modules.push_back(new FogColor());
     modules.push_back(new ArmorHUD());
-    modules.push_back(new PaperDoll());
     modules.push_back(new TimeChanger());
     modules.push_back(new RenderOptions());
+    modules.push_back(new PaperDoll());
 
 
     EventHandler::registerListener(new GUIKeyListener("E"));

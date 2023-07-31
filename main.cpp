@@ -14,7 +14,7 @@
 DWORD WINAPI init(HMODULE real)
 {
 #ifdef _DEBUG
-   
+
 #endif
 
     AllocConsole();

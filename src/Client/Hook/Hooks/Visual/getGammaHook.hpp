@@ -30,36 +30,37 @@ private:
                 if (*translateName == "options.dev_showChunkMap") {
                     optionsPtr->setvalue(ModuleManager::getModule("Render Options")->settings.getSettingByName<bool>(
                             "chunkborders")->value);
-                }
+                } else
 
                 if (*translateName == "options.dev_disableRenderSky") {
                     optionsPtr->setvalue(
                             !ModuleManager::getModule("Render Options")->settings.getSettingByName<bool>("sky")->value);
-                }
+                } else
 
                 if (*translateName == "options.dev_disableRenderWeather") {
                     optionsPtr->setvalue(!ModuleManager::getModule("Render Options")->settings.getSettingByName<bool>(
                             "weather")->value);
-                }
+                } else
 
                 if (*translateName == "options.dev_disableRenderEntities") {
                     optionsPtr->setvalue(!ModuleManager::getModule("Render Options")->settings.getSettingByName<bool>(
                             "entity")->value);
-                }
+                } else
 
                 if (*translateName == "options.dev_disableRenderBlockEntities") {
                     optionsPtr->setvalue(!ModuleManager::getModule("Render Options")->settings.getSettingByName<bool>(
                             "blockentity")->value);
-                }
+                } else
 
                 if (*translateName == "options.dev_disableRenderParticles") {
                     optionsPtr->setvalue(!ModuleManager::getModule("Render Options")->settings.getSettingByName<bool>(
                             "particles")->value);
-                }
+                } else
 
-                if (*translateName == "options.vsync")
+                if (*translateName == "options.vsync") {
                     if (Client::settings.getSettingByName<bool>("vsync")->value) optionsPtr->setvalue(false);
-
+                    break;
+                }
 
 
             }

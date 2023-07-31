@@ -31,6 +31,7 @@ public:
 
     void onRender(RenderEvent& event) override {
 
+        if(!module->settings.getSettingByName<bool>("enabled")->value) enabled = false;
 
         if(SDK::clientInstance->getTopScreenName() == "hud_screen" && module->settings.getSettingByName<bool>("enabled")->value || SDK::clientInstance->getTopScreenName() == "pause_screen" && module->settings.getSettingByName<bool>("enabled")->value) {
 
@@ -88,8 +89,6 @@ public:
             barc.itemRenderer->renderGuiItemNew(&barc, SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem( SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot), 0, convert.x, convert.y, 1.0f, module->settings.getSettingByName<float>("uiscale")->value, false);
 
             float s = Constraints::RelativeConstraint(0.1, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
-
-            std::cout << s << std::endl;
 
             float spacing = 16;
 
