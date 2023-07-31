@@ -1388,7 +1388,7 @@ void FlarialGUI::Notify(std::string text) {
     DWRITE_TEXT_METRICS textMetrics;
     textLayout->GetMetrics(&textMetrics);
 
-    e.width = textMetrics.width + Constraints::RelativeConstraint(0.20, "height", true);
+    e.width = textMetrics.width + Constraints::SpacingConstraint(0.65f, textMetrics.width);
 
     notifications.push_back(e);
 
