@@ -142,6 +142,8 @@ public:
     ItemStack* getArmor(int slot);
     ActorMovementProxyComponent* getMovementProxyComponent();
     MoveInputComponent* getMoveInputHandler();
+    bool isAlive();
+    std::string* getXuid(std::string* str);
     bool getActorFlag(int flag);
     Vec3<float>* getPosition();
     bool wasHurt();

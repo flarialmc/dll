@@ -7,6 +7,7 @@
 #include "Hooks/Visual/getGammaHook.hpp"
 #include "Hooks/Game/GameModeAttack.hpp"
 #include "Hooks/Game/RaknetTick.hpp"
+#include "Hooks/Game/SendPacket.hpp"
 #include "Hooks/Game/getViewPerspective.hpp"
 #include "../Client.hpp"
 #include "Hooks/Visual/HurtColorHook.hpp"
@@ -48,6 +49,7 @@ void HookManager::initialize()
     hooks.push_back(new HurtColorHook());
     hooks.push_back(new FogColorHook());
     hooks.push_back(new TimeChangerHook());
+    hooks.push_back(new SendPacketHook());
 
     for (auto hook : hooks)
         hook->enableHook();

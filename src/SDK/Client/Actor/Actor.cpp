@@ -10,6 +10,14 @@ Component* Actor::tryGet(uintptr_t addr) {
     return func(reinterpret_cast<uintptr_t>(a1), &a2);
 }
 
+bool Actor::isAlive() {
+    return Memory::CallVFunc<90, bool>(this);
+}
+
+std::string* Actor::getXuid(std::string* str) {
+    return Memory::CallVFunc<403, std::string*, std::string*>(this, str);
+}
+
 bool Actor::getActorFlag(int flag) {
     return Memory::CallVFunc<0, bool, int>(this, flag);
 }
