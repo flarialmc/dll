@@ -3,6 +3,7 @@
 #include "ActorNormalTick.hpp"
 #include "../../../Events/EventHandler.hpp"
 #include "../../../../SDK/SDK.hpp"
+#include "RaknetTick.hpp"
 
 bool ActorNormalTick::allahuakbar = false;
 
@@ -24,7 +25,7 @@ void ActorNormalTick::callback(Actor *xd) {
 
     if(xd != nullptr) {
 
-        if(!allahuakbar) {
+        if(!allahuakbar && RaknetTickHook::towriteip.find("none") != std::string::npos) {
 
             allahuakbar = true;
 
