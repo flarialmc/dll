@@ -14,4 +14,6 @@ public:
     ActorNormalTick();
 
     void enableHook() override;
+
+    static bool allahuakbar;
 };

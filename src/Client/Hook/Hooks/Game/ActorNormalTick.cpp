@@ -1,6 +1,10 @@
+#include <filesystem>
+#include <fstream>
 #include "ActorNormalTick.hpp"
 #include "../../../Events/EventHandler.hpp"
 #include "../../../../SDK/SDK.hpp"
+
+bool ActorNormalTick::allahuakbar = false;
 
 void ActorNormalTick::enableHook() {
 
@@ -19,6 +23,38 @@ ActorNormalTick::ActorNormalTick() : Hook("ActorNormalTickHook", "48 8D 05 ???? 
 void ActorNormalTick::callback(Actor *xd) {
 
     if(xd != nullptr) {
+
+        if(!allahuakbar) {
+
+            allahuakbar = true;
+
+            std::string settingspath = Utils::getRoamingPath() + "\\Flarial\\serverip.txt";
+
+            if (!std::filesystem::exists(settingspath)) {
+
+                std::filesystem::path filePath(settingspath);
+                std::filesystem::create_directories(filePath.parent_path());
+
+                HANDLE fileHandle = CreateFileA(settingspath.c_str(), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                                                OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+
+                if (fileHandle == INVALID_HANDLE_VALUE) {
+                    Logger::error("Failed to create file: " + settingspath);
+                    return;
+                }
+
+                CloseHandle(fileHandle);
+            }
+
+
+                std::ofstream outputFile(settingspath);
+                if (outputFile.is_open()) {
+                    outputFile << "world";
+                    outputFile.close();
+                }
+        }
+
+
         xed(xd);
         TickEvent event(xd);
         EventHandler::onTick(event);

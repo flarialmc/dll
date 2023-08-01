@@ -1,15 +1,28 @@
 #include "RaknetTick.hpp"
 #include "../../../../SDK/SDK.hpp"
+#include "ActorNormalTick.hpp"
 #include <filesystem>
 #include <fstream>
 
- std::string RaknetTickHook::towriteip = "";
+std::string RaknetTickHook::towriteip = "";
 
 void RaknetTickHook::callback(RaknetConnector* raknet)  {
 
-	SDK::raknetConnector = raknet;
+    SDK::raknetConnector = raknet;
 
     std::string ip = raknet->JoinedIp;
+
+    if (ip.empty() && SDK::clientInstance == nullptr) {
+        ip = "none";
+    }
+
+    if (ip.empty() && SDK::clientInstance != nullptr) {
+
+        if (SDK::clientInstance->getLocalPlayer() == nullptr) {
+            ip = "none";
+            ActorNormalTick::allahuakbar = false;
+        }
+    }
 
     std::string settingspath = Utils::getRoamingPath() + "\\Flarial\\serverip.txt";
 
@@ -27,29 +40,22 @@ void RaknetTickHook::callback(RaknetConnector* raknet)  {
         }
 
         CloseHandle(fileHandle);
-
     }
-
-    std::string username;
-    if (SDK::clientInstance != nullptr)
-        if (SDK::clientInstance->getLocalPlayer() != nullptr)
-            if (!SDK::clientInstance->getLocalPlayer()->playerName.empty())
-                username = SDK::clientInstance->getLocalPlayer()->playerName;
 
     if(towriteip != ip) {
 
         std::ofstream outputFile(settingspath);
         if (outputFile.is_open()) {
-            outputFile << raknet->JoinedIp + " " + username;
+            outputFile << ip;
             outputFile.close();
         }
 
-        towriteip = raknet->JoinedIp;
+        towriteip = ip;
     }
 }
 
 
 
 void RaknetTickHook::enableHook() {
-	this->autoHook(callback, (void**)raknetTickOriginal);
+    this->autoHook(callback, (void**)raknetTickOriginal);
 }
