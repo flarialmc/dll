@@ -8,6 +8,7 @@
 #include "Hooks/Game/GameModeAttack.hpp"
 #include "Hooks/Game/RaknetTick.hpp"
 #include "Hooks/Game/SendPacket.hpp"
+#include "Hooks/Visual/RenderActor.hpp"
 #include "Hooks/Game/getViewPerspective.hpp"
 #include "../Client.hpp"
 #include "Hooks/Visual/HurtColorHook.hpp"
@@ -36,6 +37,7 @@ void HookManager::initialize()
     if(!Client::settings.getSettingByName<bool>("killdx")->value) hooks.push_back(new CommandListHook());
 
     hooks.push_back(new getViewPerspectiveHook());
+    hooks.push_back(new RenderActorHook());
     hooks.push_back(new RaknetTickHook());
     hooks.push_back(new SetUpAndRenderHook());
     hooks.push_back(new GameModeAttackHook());

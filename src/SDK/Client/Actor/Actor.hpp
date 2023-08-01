@@ -8,7 +8,7 @@
 #include "Components/ActorMovementPorxyComponent.hpp"
 #include "Components/ActorRotationComponent.hpp"
 #include "Components/MobHurtTimeComponent.hpp"
-#include "../Level/Level.h"
+#include "../Level/Level.hpp"
 #include "../Container/Inventory.hpp"
 #include "../../../Utils/Utils.hpp"
 
@@ -140,6 +140,7 @@ public:
     template <typename Component>
     Component* tryGet(uintptr_t addr);
     ItemStack* getArmor(int slot);
+    int getEntityTypeId();
     ActorMovementProxyComponent* getMovementProxyComponent();
     MoveInputComponent* getMoveInputHandler();
     bool isAlive();

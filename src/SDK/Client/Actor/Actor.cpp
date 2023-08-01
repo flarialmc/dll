@@ -18,6 +18,10 @@ std::string* Actor::getXuid(std::string* str) {
     return Memory::CallVFunc<403, std::string*, std::string*>(this, str);
 }
 
+int Actor::getEntityTypeId() {
+    return Memory::CallVFunc<153, int>(this);
+}
+
 bool Actor::getActorFlag(int flag) {
     return Memory::CallVFunc<0, bool, int>(this, flag);
 }

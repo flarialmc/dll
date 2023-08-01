@@ -30,6 +30,9 @@ private:
         SetupAndRenderEvent e;
         e.muirc = muirc;
 
+       // SDK::clientInstance->getBlockSource()->dimension->weather->rainLevel = 1.0f;
+       // SDK::clientInstance->getBlockSource()->dimension->weather->lightingLevel = 1.0f;
+
         EventHandler::onSetupAndRender(e);
         func_original(pScreenView, muirc);
     }
