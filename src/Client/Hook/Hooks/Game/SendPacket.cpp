@@ -4,7 +4,7 @@
 
 void SendPacketHook::callback(LoopbackPacketSender* pSender, Packet* pPacket) {
 
-	if (SDK::clientInstance != nullptr) {
+	/*if (SDK::clientInstance != nullptr) {
 		if (SDK::clientInstance->getLocalPlayer() != nullptr) {
 
 			auto player = SDK::clientInstance->getLocalPlayer();
@@ -30,6 +30,7 @@ void SendPacketHook::callback(LoopbackPacketSender* pSender, Packet* pPacket) {
 			}
 		}
 	}
+	*/
 
 
 	sendPacketkOriginal(pSender, pPacket);
