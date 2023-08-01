@@ -103,7 +103,7 @@ public:
                     control->scale = module->settings.getSettingByName<float>("uiscale")->value;
 
 
-                    if (module->settings.getSettingByName<bool>("alwaysshow")->value) {
+                    if (module->settings.getSettingByName<bool>("alwaysshow")->value || ClickGUIRenderer::editmenu) {
                         auto component = reinterpret_cast<CustomRenderComponent*>(control->components[4].get());
                         component->renderer->state = 1.0f;
                     }
