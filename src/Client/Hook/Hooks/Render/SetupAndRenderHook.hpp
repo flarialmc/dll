@@ -23,16 +23,7 @@ private:
         std::string layer = SDK::screenView->VisualTree->root->LayerName;
         if (layer != "debug_screen" && layer != "toast_screen") {
             SDK::CurrentScreen = layer;
-        
-             
-
-                SDK::screenView->VisualTree->root->forEachControl([](std::shared_ptr<UIControl>& control) {
-                    if (control->LayerName == "hud_player") {
-                       auto component = reinterpret_cast<CustomRenderComponent*>(control->components[4].get());
-                       component->renderer->state = 1.0f;
-                         return;
-                    }
-                });
+  
           
         }
 

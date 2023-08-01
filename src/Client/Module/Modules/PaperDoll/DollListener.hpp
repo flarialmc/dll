@@ -102,6 +102,12 @@ public:
 
                     control->scale = module->settings.getSettingByName<float>("uiscale")->value;
 
+
+                    if (module->settings.getSettingByName<bool>("alwaysshow")->value) {
+                        auto component = reinterpret_cast<CustomRenderComponent*>(control->components[4].get());
+                        component->renderer->state = 1.0f;
+                    }
+
                     return; // dont go through other controls
                 }
 
