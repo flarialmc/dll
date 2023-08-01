@@ -32,8 +32,7 @@ void HookManager::initialize()
     hooks.push_back(new KeyHook());
     hooks.push_back(new MouseHook());
 
-    if(!Client::settings.getSettingByName<bool>("killdx")->value)
-    hooks.push_back(new CommandListHook());
+    if(!Client::settings.getSettingByName<bool>("killdx")->value) hooks.push_back(new CommandListHook());
 
     hooks.push_back(new getViewPerspectiveHook());
     hooks.push_back(new RaknetTickHook());
