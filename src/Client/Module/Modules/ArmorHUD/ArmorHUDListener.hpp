@@ -20,11 +20,6 @@ public:
     Vec2<float> currentPos;
     bool enabled = false;
 
-
-    void onLocalTick(TickEvent& event) override {
-
-    }
-
     Vec2<float> convert() {
 
         auto e = SDK::clientInstance->guiData;
@@ -36,6 +31,7 @@ public:
 
     void onRender(RenderEvent& event) override {
 
+        if(!module->settings.getSettingByName<bool>("enabled")->value) enabled = false;
 
         if(SDK::clientInstance->getTopScreenName() == "hud_screen" && module->settings.getSettingByName<bool>("enabled")->value || SDK::clientInstance->getTopScreenName() == "pause_screen" && module->settings.getSettingByName<bool>("enabled")->value) {
 

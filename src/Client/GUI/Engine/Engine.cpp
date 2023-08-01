@@ -935,13 +935,8 @@ D2D1::ColorF FlarialGUI::HexToColorF(const std::string& hexString)
 
     try
     {
-        // Convert the hex string to an integer value
-        uint32_t hex;
-        std::stringstream ss;
-        ss << std::hex << hexString;
-        ss >> hex;
-
-        // Extract the individual color components from the hex value
+        // Convert the hex string to individual color components
+        uint32_t hex = std::stoul(hexString, nullptr, 16);
         uint8_t red = (hex >> 16) & 0xFF;
         uint8_t green = (hex >> 8) & 0xFF;
         uint8_t blue = hex & 0xFF;
@@ -962,19 +957,19 @@ D2D1::ColorF FlarialGUI::HexToColorF(const std::string& hexString)
 }
 
 
+
 std::string FlarialGUI::ColorFToHex(const D2D1_COLOR_F& color)
 {
     // Convert the color components from the range [0.0, 1.0] to [0, 255]
-    auto red = static_cast<uint8_t>(std::round(color.r * 255));
-    auto green = static_cast<uint8_t>(std::round(color.g * 255));
-    auto blue = static_cast<uint8_t>(std::round(color.b * 255));
+    uint8_t red = static_cast<uint8_t>(color.r * 255.0f);
+    uint8_t green = static_cast<uint8_t>(color.g * 255.0f);
+    uint8_t blue = static_cast<uint8_t>(color.b * 255.0f);
 
     // Combine the color components into a hex string
-    std::stringstream ss;
-    ss << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(red)
-       << std::setw(2) << static_cast<int>(green) << std::setw(2) << static_cast<int>(blue);
+    char hexString[7];
+    sprintf(hexString, "%02x%02x%02x", red, green, blue);
 
-    return ss.str();
+    return std::string(hexString);
 }
 
 
@@ -1393,7 +1388,7 @@ void FlarialGUI::Notify(std::string text) {
     DWRITE_TEXT_METRICS textMetrics;
     textLayout->GetMetrics(&textMetrics);
 
-    e.width = textMetrics.width + Constraints::RelativeConstraint(0.20, "height", true);
+    e.width = textMetrics.width + Constraints::SpacingConstraint(0.65f, textMetrics.width);
 
     notifications.push_back(e);
 

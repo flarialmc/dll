@@ -4,7 +4,35 @@ project(Flarial VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 
 if(MSVC)
-    add_compile_options(/MD /MP)
+    add_compile_options(/MT /MP)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+endif()
+
+
+
+# Default to statically-linked runtime.
+if("${MSVC_RUNTIME}" STREQUAL "")
+    set(MSVC_RUNTIME "static")
+
+    if(${MSVC_RUNTIME} STREQUAL "static")
+        message(STATUS
+                "MSVC -> forcing use of statically-linked runtime."
+                )
+    foreach(variable ${variables})
+        if(${variable} MATCHES "/MD")
+            string(REGEX REPLACE "/MD" "/MT" ${variable} "${${variable}}")
+        endif()
+    endforeach()
+else()
+    message(STATUS
+            "MSVC -> forcing use of dynamically-linked runtime."
+            )
+    foreach(variable ${variables})
+        if(${variable} MATCHES "/MT")
+            string(REGEX REPLACE "/MT" "/MD" ${variable} "${${variable}}")
+        endif()
+    endforeach()
+endif()
 endif()
 
 

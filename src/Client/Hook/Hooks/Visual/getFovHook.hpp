@@ -17,7 +17,8 @@ private:
 
 		float fov = func_original(a1, f, a3, a4);
 
-		if (ModuleManager::getModule("Zoom") != nullptr && fov != 70.00f) {
+
+        if (ModuleManager::getModule("Zoom") != nullptr && fov != 70) {
 
             auto zom = reinterpret_cast<Zoom *>(ModuleManager::getModule("Zoom"));
             if(zom->settings.getSettingByName<bool>("enabled")->value) currentZoomVal = std::lerp(currentZoomVal, ZoomListener::zoomValue, zom->settings.getSettingByName<float>("anim")->value * FlarialGUI::frameFactor);
@@ -29,7 +30,8 @@ private:
         return fov;
 
 
-	}
+
+    }
 
 public:
     typedef float(__thiscall* getFovOriginal)(void*, float, void*, void*);

@@ -85,7 +85,9 @@ void Client::initialize()
         { "https://cdn.flarial.net/assets/freelook.png", Path + "freelook.png" },
         { "https://cdn.flarial.net/assets/hurt.png", Path + "hurt.png" },
         { "https://cdn.flarial.net/assets/smoke.png", Path + "smoke.png" },
-        { "https://cdn.flarial.net/assets/renderoptions.png", Path + "renderoptions.png" }
+        { "https://cdn.flarial.net/assets/renderoptions.png", Path + "renderoptions.png" },
+        { "https://cdn.flarial.net/assets/man.png", Path + "man.png" }
+
 
 
     };
@@ -115,8 +117,6 @@ void Client::initialize()
     for (std::thread& thread : threads) {
         thread.join();
     }
-
-    if (GetModuleHandle("d3d12.dll") == NULL) Logger::debug("module handle is null");
 
     std::string fontpath = Utils::getRoamingPath() + "\\Flarial\\assets\\font.ttf";
     AddFontResource(fontpath.c_str());

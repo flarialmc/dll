@@ -2,13 +2,13 @@
 
 #include "../Module.hpp"
 #include "../../../Events/EventHandler.hpp"
-#include "DollListener.hpp"
+#include "MovableChatListener.hpp"
 
-class PaperDoll : public Module {
+class MovableChat : public Module {
 
 public:
 
-    PaperDoll() : Module("Movable Paperdoll", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\man.png", 'Y') {
+    MovableChat() : Module("Movable Chat", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\man.png", 'Y') {
 
         onEnable();
 
@@ -17,12 +17,12 @@ public:
     void onEnable() override {
 
         Module::onEnable();
-        EventHandler::registerListener(new DollListener("Doll", this));
+        EventHandler::registerListener(new MovableChatListener("MovableChat", this));
     }
 
     void onDisable() override {
 
-        EventHandler::unregisterListener("PaperDoll");
+        EventHandler::unregisterListener("MovableChat");
 
         Module::onDisable();
 

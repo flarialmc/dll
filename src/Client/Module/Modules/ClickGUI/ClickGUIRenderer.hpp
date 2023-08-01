@@ -413,6 +413,14 @@ public:
 
             ClickGUIRenderer::page.type = "normal";
             ClickGUIRenderer::curr = "modules";
+
+            if(!module->settings.getSettingByName<bool>("enabled")->value) {
+
+                FlarialGUI::ResetShit();
+                ModuleManager::SaveModulesConfig();
+                Client::SaveSettings();
+
+            }
         }
 
 
@@ -429,6 +437,14 @@ public:
             } else {
                 editmenu = false;
                 module->settings.getSettingByName<bool>("enabled")->value = true;
+            }
+
+            if(!module->settings.getSettingByName<bool>("enabled")->value && !editmenu) {
+
+                FlarialGUI::ResetShit();
+                ModuleManager::SaveModulesConfig();
+                Client::SaveSettings();
+
             }
 
         }
@@ -451,14 +467,6 @@ public:
 
             editmenu = false;
             module->settings.getSettingByName<bool>("enabled")->value = true;
-
-        }
-
-        if(!module->settings.getSettingByName<bool>("enabled")->value) {
-
-            FlarialGUI::ResetShit();
-            ModuleManager::SaveModulesConfig();
-            Client::SaveSettings();
 
         }
 
