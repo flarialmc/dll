@@ -13,7 +13,7 @@ Settings Client::settings = Settings();
 void DownloadAndSave(std::string url, std::string path) {
 
     char test[256];
-    strcpy(test, "https://google.com/");
+    strcpy(test, "https://cdn.flarial.net/");
     if(InternetCheckConnectionA(test, FLAG_ICC_FORCE_CONNECTION, 0))
     URLDownloadToFileW(NULL, FlarialGUI::to_wide(url).c_str(), FlarialGUI::to_wide(path).c_str(), 0, NULL);
 
