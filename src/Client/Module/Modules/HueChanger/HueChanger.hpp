@@ -13,7 +13,7 @@ public:
 
     }
 
-    HueChanger() : Module("Hue Changer", "chike wi!", "\\Flarial\\assets\\frying-pan.png", 'b') {
+    HueChanger() : Module("Saturation", "chike wi!", "\\Flarial\\assets\\fullbright.png", 'b') {
 
         onEnable();
 
@@ -40,7 +40,7 @@ public:
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
 
-        FlarialGUI::FlarialTextWithFont(x, y, L"Hue Intensity", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        FlarialGUI::FlarialTextWithFont(x, y, L"Saturation Intensity", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
 
         float percent = FlarialGUI::Slider(3, x + Constraints::SpacingConstraint(0.65, textWidth),
             y,

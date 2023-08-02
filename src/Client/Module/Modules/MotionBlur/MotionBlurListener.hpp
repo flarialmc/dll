@@ -59,5 +59,7 @@ public:
 
         }
 
+        D2D::context->Flush();
+
     }
 };
