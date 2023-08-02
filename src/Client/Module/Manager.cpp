@@ -35,6 +35,7 @@
 #include "Modules/TimeChanger/TimeChanger.hpp"
 #include "Modules/RenderOptions/RenderOptions.hpp"
 #include "Modules/MovableChat/MovableChat.hpp"
+#include "Modules/HueChanger/HueChanger.hpp"
 
 namespace ModuleManager {
     std::vector<Module*> modules;
@@ -72,7 +73,7 @@ void ModuleManager::initialize()
     modules.push_back(new TimeChanger());
     modules.push_back(new RenderOptions());
     modules.push_back(new PaperDoll());
-
+    modules.push_back(new HueChanger());
 
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));

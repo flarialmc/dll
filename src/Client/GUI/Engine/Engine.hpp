@@ -139,6 +139,7 @@ namespace FlarialGUI
 
     void ApplyPaintEffect(float blurIntensity);
     void ApplyAestheticDeepFry();
+    void ApplyHue(float Hue);
     void ApplyDeepFry(float intensity);
     void ApplyCombinedDeepFry();
 
