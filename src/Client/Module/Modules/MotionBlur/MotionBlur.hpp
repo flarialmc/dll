@@ -29,8 +29,8 @@ public:
 
     virtual void DefaultConfig() override {
 
-        if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 0.65f);
-        if (settings.getSettingByName<float>("intensity2") == nullptr) settings.addSetting("intensity2", 3.0f);
+        if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 0.88f);
+        if (settings.getSettingByName<float>("intensity2") == nullptr) settings.addSetting("intensity2", 6.0f);
     }
 
     void onDisable() override {
