@@ -24,17 +24,17 @@ bool Hook::manualHook(void *hook_addr, void *callback_ptr, void **func_original)
 {
     if (hook_addr == 0)
     {
-        Logger::error(std::format("Failed to find address of {}, the sig is: {}", this->name, this->signature));
+        Logger::error(std::format("Failed to find address of {}", this->name));
         return false;
     }
 
     MH_CreateHook(hook_addr, callback_ptr, func_original);
     if (MH_EnableHook(hook_addr) != MH_OK)
     {
-        Logger::error(std::format("Failed to find address of {}, the sig is: {}", this->name, this->signature));
+        Logger::error(std::format("Failed to find address of {}", this->name));
         return false;
     } else {
-        Logger::info(std::format("[Hook] Successfully hooked {} at address: {}", this->name, hook_addr));
+        Logger::info(std::format("[Hook] Successfully hooked {}", this->name));
     }
 
     return true;
