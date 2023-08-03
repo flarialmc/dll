@@ -21,7 +21,7 @@ public:
 
     void onEnable() override {
 
-        if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 100.0f);
+        if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 0.5f);
 
         EventHandler::registerListener(new HueListener("Hue", this));
         Module::onEnable();
@@ -47,7 +47,7 @@ public:
             D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
             D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
             D2D1::ColorF(D2D1::ColorF::White),
-            this->settings.getSettingByName<float>("intensity")->value, 200.0f);
+            this->settings.getSettingByName<float>("intensity")->value, 3.0f);
 
         this->settings.getSettingByName<float>("intensity")->value = percent;
 
