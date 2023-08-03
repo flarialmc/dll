@@ -120,7 +120,10 @@ public:
                 }
             }
         } catch (const std::exception& e) {
+
+            if(!jsonString.empty())
             Logger::error(e.what());
+            
         }
     }
 

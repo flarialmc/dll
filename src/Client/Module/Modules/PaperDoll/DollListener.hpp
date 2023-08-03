@@ -18,7 +18,7 @@ public:
 
     Module* module;
     Vec2<float> currentPos;
-    bool enabled = true;
+    bool enabled = false;
     static inline Vec2<float> oriXY = {0.0f, 0.0f};
 
 
@@ -33,8 +33,6 @@ public:
     }
 
     void onRender(RenderEvent& event) override {
-
-        if(!module->settings.getSettingByName<bool>("enabled")->value) enabled = false;
 
         if(SDK::clientInstance->getTopScreenName() == "hud_screen" && module->settings.getSettingByName<bool>("enabled")->value || SDK::clientInstance->getTopScreenName() == "pause_screen" && module->settings.getSettingByName<bool>("enabled")->value) {
 

@@ -15,6 +15,7 @@ class HueListener : public Listener {
     void onRender(RenderEvent& event) override {
 
         if (module->settings.getSettingByName<bool>("enabled")->value) {
+
             FlarialGUI::ApplyHue(module->settings.getSettingByName<float>("intensity")->value);
 
         }

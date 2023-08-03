@@ -34,7 +34,6 @@
 #include "Modules/FogColor/FogColor.hpp"
 #include "Modules/TimeChanger/TimeChanger.hpp"
 #include "Modules/RenderOptions/RenderOptions.hpp"
-#include "Modules/MovableChat/MovableChat.hpp"
 #include "Modules/HueChanger/HueChanger.hpp"
 
 namespace ModuleManager {
@@ -47,6 +46,7 @@ void ModuleManager::initialize()
     modules.push_back(new MotionBlur());
     modules.push_back(new Zoom());
     modules.push_back(new Deepfry());
+    modules.push_back(new HueChanger());
     modules.push_back(new PatarHD());
     modules.push_back(new ClickGUI());
     modules.push_back(new FPSCounter());
@@ -73,7 +73,6 @@ void ModuleManager::initialize()
     modules.push_back(new TimeChanger());
     modules.push_back(new RenderOptions());
     modules.push_back(new PaperDoll());
-    modules.push_back(new HueChanger());
 
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));
