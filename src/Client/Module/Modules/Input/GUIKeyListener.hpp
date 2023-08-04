@@ -39,7 +39,7 @@ class GUIKeyListener : public Listener {
                     if (box.isActive && event.GetAction() == (int) ActionType::PRESSED)
 
                         if (event.GetKey() != VK_BACK && event.GetPressedKeysAsString() != "CTRL+V") box.text += event.GetKeyAsString(isCapital);
-                        else {
+                        else if (event.GetKey() == VK_BACK) {
 
                             if(event.GetAction() == (int)ActionType::PRESSED) {
 
