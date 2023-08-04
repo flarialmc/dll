@@ -37,7 +37,8 @@ class GUIKeyListener : public Listener {
                         }
 
                     if (box.isActive && event.GetAction() == (int) ActionType::PRESSED)
-                        if (event.GetKey() != VK_BACK)box.text += event.GetKeyAsString(isCapital);
+
+                        if (event.GetKey() != VK_BACK && event.GetPressedKeysAsString() != "CTRL+V") box.text += event.GetKeyAsString(isCapital);
                         else {
 
                             if(event.GetAction() == (int)ActionType::PRESSED) {
@@ -67,6 +68,23 @@ class GUIKeyListener : public Listener {
                             if (!box.text.empty()) {
                                 box.text.erase(box.text.length() - 1);  // Erase the last character
                             }
+                        }
+
+                        if (box.isActive && event.GetPressedKeysAsString() == "CTRL+V") {
+
+                            if (OpenClipboard(NULL)) {
+                                HANDLE hData = GetClipboardData(CF_TEXT);
+                                if (hData != NULL) {
+                                    char* clipboardText = static_cast<char*>(GlobalLock(hData));
+                                    if (clipboardText != NULL) {
+                                        box.text += clipboardText;
+                                        GlobalUnlock(hData);
+                                    }
+                                }
+                                CloseClipboard();
+                            }
+
+
                         }
                 }
 
