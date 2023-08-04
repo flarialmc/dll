@@ -158,7 +158,7 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
     textBrush = FlarialGUI::getBrush(textColor);
 
     static IDWriteTextFormat* textFormat;
-    FlarialGUI::writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width * 0.64f), L"en-US", &textFormat);
+    FlarialGUI::writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width * 0.84f), L"en-US", &textFormat);
     textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
@@ -180,6 +180,7 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
     D2D::context->FillRoundedRectangle(roundedRect, brush);
 
+    x += Constraints::SpacingConstraint(0.077, width);
     D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
 
     textFormat->Release();

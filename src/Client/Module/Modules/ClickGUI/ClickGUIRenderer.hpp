@@ -142,7 +142,7 @@ public:
                 /* tab buttons start */
 
 
-                float RadioButtonWidth = Constraints::RelativeConstraint(0.24, "width");
+                float RadioButtonWidth = Constraints::RelativeConstraint(0.185, "width");
                 float RadioButtonHeight = Constraints::RelativeConstraint(0.5);
 
                 float radioX = navx - Constraints::SpacingConstraint(-0.85, logoWidth);
@@ -188,7 +188,7 @@ public:
                 radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
 
                 round = Constraints::RoundingConstraint(30, 30);
-                radioX += Constraints::SpacingConstraint(15.f, logoWidth);
+                radioX += Constraints::SpacingConstraint(13.f, logoWidth);
                 if (FlarialGUI::RoundedRadioButton(0, radioX, radioY,
                                                    D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
                                                    D2D1::ColorF(D2D1::ColorF::White), L"Settings", RadioButtonWidth,
