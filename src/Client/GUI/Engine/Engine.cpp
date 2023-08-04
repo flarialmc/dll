@@ -746,6 +746,7 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
 
         if(timeDifference.count() > 2000) KeybindSelectors[index].isActive = false;
     }
+
     else col = D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f);
 
     FlarialGUI::RoundedRect(x, y, col, percWidth, percHeight, round.x, round.x);

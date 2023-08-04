@@ -123,7 +123,7 @@ public:
 
             if(!jsonString.empty())
             Logger::error(e.what());
-            
+
         }
     }
 

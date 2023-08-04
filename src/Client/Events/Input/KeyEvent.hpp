@@ -161,7 +161,7 @@ public:
                 if (!result.empty()) {
                     result += "+";
                 }
-                result += Utils::GetKeyAsString(i);
+                result += Utils::GetKeyAsString(i, true);
             }
 
             i++;

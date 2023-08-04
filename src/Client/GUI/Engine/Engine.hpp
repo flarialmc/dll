@@ -35,6 +35,7 @@ struct TextBoxStruct
     std::string text;
     bool isActive;
     bool firstTime = true;
+    bool isDeleting = false;
 };
 
 struct ColorPicker

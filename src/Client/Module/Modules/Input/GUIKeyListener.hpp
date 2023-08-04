@@ -31,10 +31,39 @@ class GUIKeyListener : public Listener {
 
                     if(event.GetKey() == VK_ESCAPE || ModuleManager::getModule("ClickGUI")->IsKeybind(event.keys) && ModuleManager::getModule("ClickGUI")->IsKeyPartOfKeybind(event.key)) box.isActive = false;
 
+                    if (event.GetKey() == VK_BACK)
+                        if (event.GetAction() == (int)ActionType::RELEASED) {
+                            box.isDeleting = false;
+                        }
+
                     if (box.isActive && event.GetAction() == (int) ActionType::PRESSED)
-                        if (event.GetKey() != VK_BACK)
-                            box.text += event.GetKeyAsString(isCapital);
+                        if (event.GetKey() != VK_BACK)box.text += event.GetKeyAsString(isCapital);
                         else {
+
+                            if(event.GetAction() == (int)ActionType::PRESSED) {
+
+                                std::thread t([&box]() {
+
+                                    bool firstTime = true;
+                                    while (box.isDeleting) {
+
+                                        if (!box.text.empty() && !firstTime) {
+                                            box.text.erase(box.text.length() - 1);  // Erase the last character
+                                        }
+
+                                        if(firstTime) { std::this_thread::sleep_for(std::chrono::milliseconds(400)); firstTime = false; }
+                                        else {
+                                            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                                        }
+                                    }
+                                });
+
+                                t.detach();
+
+                                box.isDeleting = true;
+
+                            }
+
                             if (!box.text.empty()) {
                                 box.text.erase(box.text.length() - 1);  // Erase the last character
                             }
