@@ -6,8 +6,6 @@
 std::map<std::string, ID2D1Bitmap*> ClickGUIElements::images;
 std::vector<D2D1_MATRIX_3X2_F> ClickGUIElements::matrixes;
 std::vector<Vec2<float>> sizes;
-std::vector<Vec2<float>> shadowSizes;
-
 
 void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string iconpath, const int index)
 {
@@ -21,10 +19,6 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
                 sizes.emplace_back(nigga, gaynigga);
             }
 
-    if (index > shadowSizes.size() - 1 || index == 0) {
-        shadowSizes.emplace_back(0.01, 0.01);
-    }
-
             // Bottom rounded rect
             float BottomRoundedWidth = sizes[index].x;
             float BottomRoundedHeight = sizes[index].y;
@@ -36,7 +30,6 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
             if (FlarialGUI::isInScrollView) realY += FlarialGUI::scrollpos;
 
             if (FlarialGUI::CursorInRect(x, realY, BottomRoundedWidth, BottomRoundedHeight)) {
-
                 FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.198f, "height", true),
                                  0.15f * FlarialGUI::frameFactor);
                 FlarialGUI::lerp(sizes[index].y, Constraints::RelativeConstraint(0.149f, "height", true),
@@ -45,34 +38,17 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
                 diffX = (sizes[index].x - Constraints::RelativeConstraint(0.19f, "height", true)) / 2.0f;
                 diffY = (sizes[index].y - Constraints::RelativeConstraint(0.141f, "height", true)) / 2.0f;
 
-                FlarialGUI::lerp(shadowSizes[index].x, BottomRoundedWidth,0.25f * FlarialGUI::frameFactor);
-                FlarialGUI::lerp(shadowSizes[index].y, BottomRoundedHeight,0.25f * FlarialGUI::frameFactor);
-
+                FlarialGUI::ShadowRect(D2D1::RoundedRect(D2D1::RectF(x, realY, x + BottomRoundedWidth, realY + BottomRoundedHeight), round.x, round.x));
             } else {
-
                 FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.19f, "height", true),
                                  0.15f * FlarialGUI::frameFactor);
                 FlarialGUI::lerp(sizes[index].y, Constraints::RelativeConstraint(0.141f, "height", true),
                                  0.15f * FlarialGUI::frameFactor);
 
-                FlarialGUI::lerp(shadowSizes[index].x, 0.01f, 0.01f * FlarialGUI::frameFactor);
-                FlarialGUI::lerp(shadowSizes[index].y, 0.01f, 0.01f * FlarialGUI::frameFactor);
-
                 diffX = (sizes[index].x - Constraints::RelativeConstraint(0.19f, "height", true)) / 2.0f;
                 diffY = (sizes[index].y - Constraints::RelativeConstraint(0.141f, "height", true)) / 2.0f;
-
             }
 
-            
-            if(shadowSizes[index].x > 10) {
-
-                float diffX2 = (shadowSizes[index].x - BottomRoundedWidth) / 2.0f;
-                float diffY2 = (shadowSizes[index].y - BottomRoundedHeight) / 2.0f;
-                
-                FlarialGUI::ShadowRect(
-                        D2D1::RoundedRect(D2D1::RectF((x - diffX2) , (y - diffY2) , (x - diffX2)  + shadowSizes[index].x, (y - diffY2)  + shadowSizes[index].y),
-                                          round.x, round.x));
-            }
 
             x -= diffX;
             y -= diffY;
