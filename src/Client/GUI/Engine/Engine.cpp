@@ -519,14 +519,12 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
     std::string text;
 
-    if(startingPoint < 1.0f) {
+    if(startingPoint < 10.0f) {
         std::stringstream stream;
         stream << std::fixed << std::setprecision(2) << startingPoint;
         text = stream.str();
     }
     else text = std::to_string((int)startingPoint);
-
-
 
     FlarialGUI::FlarialText(x - Constraints::SpacingConstraint(0.62, textWidth / 2.0f), y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
 
