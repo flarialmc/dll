@@ -35,6 +35,11 @@
 #include "Modules/TimeChanger/TimeChanger.hpp"
 #include "Modules/RenderOptions/RenderOptions.hpp"
 #include "Modules/HueChanger/HueChanger.hpp"
+#include <algorithm>
+
+bool compareNames( Module*& obj1,  Module*& obj2) {
+    return obj1->name < obj2->name;
+}
 
 namespace ModuleManager {
     std::vector<Module*> modules;
@@ -74,6 +79,9 @@ void ModuleManager::initialize()
     modules.push_back(new RenderOptions());
     modules.push_back(new PaperDoll());
 
+
+    std::sort(modules.begin(), modules.end(), compareNames);
+
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));
     EventHandler::registerListener(new SaveConfigListener("SaveConfig"));
@@ -99,6 +107,7 @@ bool ModuleManager::doesAnyModuleHave(std::string settingName) {
     bool result = false;
 
     for (Module* mod : modules) {
+
         if(mod->settings.getSettingByName<bool>(settingName) != nullptr)
             if(mod->settings.getSettingByName<bool>(settingName)->value){
                 result = true;
