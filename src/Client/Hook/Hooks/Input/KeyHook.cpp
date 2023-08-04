@@ -19,7 +19,7 @@ void KeyHook::keyCallback(int key, int state)
     KeyEvent event(key, state, keys);
     EventHandler::onKey(event);
 
-    std::cout << std::to_string(event.GetKey()) << std::endl;
+    std::to_string(event.GetKey());
     std::to_string(event.GetAction());
     std::to_string(event.isCancelled());
 
