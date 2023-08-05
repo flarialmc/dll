@@ -127,10 +127,10 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
     if (CursorInRect(x, y, width, height))
     {
         buttonColor = D2D1::ColorF(color.r - darkenAmounts[index], color.g - darkenAmounts[index], color.b - darkenAmounts[index], color.a);
-        FadeEffect::ApplyFadeInEffect(0.002f * FlarialGUI::frameFactor, maxDarkenAmount, darkenAmounts[index]);
+        FadeEffect::ApplyFadeInEffect(0.0055f * FlarialGUI::frameFactor, maxDarkenAmount, darkenAmounts[index]);
     } else {
         buttonColor = D2D1::ColorF(color.r - darkenAmounts[index], color.g - darkenAmounts[index], color.b - darkenAmounts[index], color.a);
-        FadeEffect::ApplyFadeOutEffect(0.002f * FlarialGUI::frameFactor, darkenAmounts[index]);
+        FadeEffect::ApplyFadeOutEffect(0.0055f * FlarialGUI::frameFactor, darkenAmounts[index]);
 
     }
 
