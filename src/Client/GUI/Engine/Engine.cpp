@@ -1616,7 +1616,7 @@ void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect) {
 
         ID2D1SolidColorBrush *colorBrush = nullptr;
         colorBrush = FlarialGUI::getBrush(D2D1::ColorF(0, 0, 0, 0.75f));
-        D2D::context->FillRectangle(rect.rect, colorBrush);
+        D2D::context->FillRoundedRectangle(rect, colorBrush);
 
         
 
