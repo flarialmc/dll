@@ -412,7 +412,7 @@ public:
                 FlarialGUI::PopSize(); // Pops base rect
 
 
-                FlarialGUI::InnerShadowRect(D2D1::RoundedRect(D2D1::RectF(center.x, center.y, center.x + baseWidth, center.y + Constraints::RelativeConstraint(baseHeightReal)), round.x, round.x), 2.0, D2D1::ColorF(D2D1::ColorF::White, 0.85f));
+                FlarialGUI::InnerShadowRect(D2D1::RoundedRect(D2D1::RectF(center.x, center.y, center.x + baseWidth, center.y + Constraints::RelativeConstraint(baseHeightReal)), round.x, round.x), 2.0, D2D1::ColorF(D2D1::ColorF::Black, 0.75f));
 
             }
 

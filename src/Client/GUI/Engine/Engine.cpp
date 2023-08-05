@@ -108,7 +108,7 @@ bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COL
 
 
 
-bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width, const float height, float radiusX, float radiusY)
+bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width, const float height, float radiusX, float radiusY, bool glow)
 {
     if (isInScrollView)
         y += scrollpos;
@@ -127,10 +127,10 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
     if (CursorInRect(x, y, width, height))
     {
         buttonColor = D2D1::ColorF(color.r - darkenAmounts[index], color.g - darkenAmounts[index], color.b - darkenAmounts[index], color.a);
-        FadeEffect::ApplyFadeInEffect(0.005f * FlarialGUI::frameFactor, maxDarkenAmount, darkenAmounts[index]);
+        FadeEffect::ApplyFadeInEffect(0.002f * FlarialGUI::frameFactor, maxDarkenAmount, darkenAmounts[index]);
     } else {
         buttonColor = D2D1::ColorF(color.r - darkenAmounts[index], color.g - darkenAmounts[index], color.b - darkenAmounts[index], color.a);
-        FadeEffect::ApplyFadeOutEffect(0.005f * FlarialGUI::frameFactor, darkenAmounts[index]);
+        FadeEffect::ApplyFadeOutEffect(0.002f * FlarialGUI::frameFactor, darkenAmounts[index]);
 
     }
 
@@ -139,6 +139,27 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
 
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
     D2D::context->FillRoundedRectangle(roundedRect, brush);
+
+
+    if(CursorInRect(x, y, width, height) && glow) {
+
+        FadeEffect::ApplyFadeInEffect(0.09f * FlarialGUI::frameFactor, 1.0f, glowAlphas[index]);
+
+    } else {
+
+        FadeEffect::ApplyFadeOutEffect(0.09f * FlarialGUI::frameFactor, glowAlphas[index]);
+
+    }
+
+        D2D1_COLOR_F allahColor = FlarialGUI::buttonColors[index];
+        allahColor.r += 0.15f;
+        allahColor.g += 0.15f;
+        allahColor.b += 0.15f;
+        allahColor.a = glowAlphas[index];
+
+        FlarialGUI::InnerShadowRect(D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY), 10,
+                                    allahColor);
+
 
     D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
 
@@ -1663,14 +1684,14 @@ void FlarialGUI::InnerShadowRect(D2D1_ROUNDED_RECT rect, float howbig, D2D1_COLO
         ID2D1SolidColorBrush *colorBrush = nullptr;
         colorBrush = FlarialGUI::getBrush(color);
         D2D::context->DrawRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(
-                rect.rect.left + (6 * howbig),
-                rect.rect.top + (6 * howbig),
-                rect.rect.right - (6 * howbig),
-                rect.rect.bottom - (6 * howbig)), rect.radiusX + (6 * howbig), rect.radiusY + (6 * howbig)), colorBrush, howbig);
+                rect.rect.left + howbig,
+                rect.rect.top + howbig,
+                rect.rect.right - howbig,
+                rect.rect.bottom - howbig), rect.radiusX + howbig, rect.radiusY + howbig), colorBrush, howbig);
 
         FlarialGUI::blur->SetInput(0, newLayer);
         FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
-        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 10.0f);
+        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 20.0f);
 
         ID2D1Image *out;
         FlarialGUI::blur->GetOutput(&out);
