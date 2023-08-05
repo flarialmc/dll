@@ -27,7 +27,8 @@ public:
     }
 
     void DefaultConfig() override {
-        if (settings.getSettingByName<std::string>("keybind")->value == (std::string)"") settings.getSettingByName<std::string>("keybind")->value = "F";
+
+        if (settings.getSettingByName<std::string>("keybind") == nullptr) settings.addSetting("keybind", (std::string)"F");
 
     }
 

@@ -751,6 +751,7 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
     FlarialGUI::RoundedRect(x, y, col, percWidth, percHeight, round.x, round.x);
 
     std::string text;
+
     if(KeybindSelectors[index].isActive) {
 
         if(FlarialGUI::currentKeybind != "nothing") {
