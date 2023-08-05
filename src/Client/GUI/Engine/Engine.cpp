@@ -1583,18 +1583,21 @@ void FlarialGUI::AllahBlur(float intensity) {
         ID2D1Bitmap *bitmap = nullptr;
         if(SwapchainHook::queue != nullptr) FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap], &bitmap);
         else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap, &bitmap);
+        
+        ID2D1Effect* effect;
+        D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &effect);
 
-        FlarialGUI::blur->SetInput(0, bitmap);
+        effect->SetInput(0, bitmap);
 
         // Set blur intensity
-        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
-        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_QUALITY);
-        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, intensity);
+        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_QUALITY);
+        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, intensity);
         // Draw the image with the Gaussian blur effect
-        D2D::context->DrawImage(FlarialGUI::blur);
+        D2D::context->DrawImage(effect);
 
         Memory::SafeRelease(bitmap);
-        Memory::SafeRelease(FlarialGUI::blur);
+        Memory::SafeRelease(effect);
     }
 
 }

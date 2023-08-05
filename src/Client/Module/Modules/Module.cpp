@@ -1,7 +1,8 @@
 #include "Module.hpp"
 #include "../../Client.hpp"
+#include "ClickGUI/ClickGUIRenderer.hpp"
 
- void Module::NormalRender(int index, std::string text, std::string value) {
+void Module::NormalRender(int index, std::string text, std::string value) {
 
     std::string uppercaseSentence;
     std::string search = "{VALUE}";
