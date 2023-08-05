@@ -107,15 +107,21 @@ void Client::initialize()
     if (Client::settings.getSettingByName<bool>("vsync") == nullptr)
         Client::settings.addSetting("vsync", false);
 
-    // Create threads to download the files
-    std::vector<std::thread> threads;
-    for (const auto& data : fileData) {
-        threads.emplace_back(DownloadAndSave, data.first, data.second);
-    }
+    if (Client::settings.getSettingByName<bool>("dlassets") == nullptr)
+        Client::settings.addSetting("dlassets", true);
 
-    // Wait for all threads to finish
-    for (std::thread& thread : threads) {
-        thread.join();
+
+    if(Client::settings.getSettingByName<bool>("dlassets")->value) {
+        // Create threads to download the files
+        std::vector<std::thread> threads;
+        for (const auto &data: fileData) {
+            threads.emplace_back(DownloadAndSave, data.first, data.second);
+        }
+
+        // Wait for all threads to finish
+        for (std::thread &thread: threads) {
+            thread.join();
+        }
     }
 
     std::string fontpath = Utils::getRoamingPath() + "\\Flarial\\assets\\font.ttf";
