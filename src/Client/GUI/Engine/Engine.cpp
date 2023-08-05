@@ -1042,6 +1042,7 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, D2D1
 
 void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
 {
+
     if (isInScrollView) {
         rect.top += scrollpos;
         rect.bottom += scrollpos;
@@ -1671,48 +1672,7 @@ void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect, D2D1_COLOR_F color) {
 
 void FlarialGUI::InnerShadowRect(D2D1_ROUNDED_RECT rect, float howbig, D2D1_COLOR_F color) {
 
-    if(!Client::settings.getSettingByName<bool>("noshadows")->value) {
 
-        // Create a new blank bitmap
-        ID2D1Bitmap1 *newLayer = nullptr;
-        D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET,
-                                                                        D2D::context->GetPixelFormat());
-        D2D::context->CreateBitmap(D2D::context->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
-
-        if (newLayer != nullptr && FlarialGUI::blur != nullptr) {
-            D2D::context->SetTarget(newLayer);
-            D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
-
-            ID2D1SolidColorBrush *colorBrush = nullptr;
-            colorBrush = FlarialGUI::getBrush(color);
-
-            D2D::context->DrawRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(
-                    rect.rect.left + howbig / 2.0f,
-                    rect.rect.top + howbig / 2.0f,
-                    rect.rect.right - howbig / 2.0f,
-                    rect.rect.bottom - howbig / 2.0f), rect.radiusX + howbig / 2.0f, rect.radiusY + howbig / 2.0f), colorBrush, howbig);
-
-            FlarialGUI::blur->SetInput(0, newLayer);
-            FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_SOFT);
-            FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 8.0f);
-
-            ID2D1Image *out;
-            FlarialGUI::blur->GetOutput(&out);
-
-            // Set the rendering target to the main bitmap
-            if (SwapchainHook::queue != nullptr)
-                D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
-            else D2D::context->SetTarget(SwapchainHook::D2D1Bitmap);
-
-
-            D2D::context->DrawImage(out);
-
-            Memory::SafeRelease(newLayer);
-            Memory::SafeRelease(out);
-        }
-
-        Memory::SafeRelease(newLayer);
-    }
 }
 
 void FlarialGUI::CopyBitmap(ID2D1Bitmap1* from, ID2D1Bitmap** to)
