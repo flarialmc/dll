@@ -211,7 +211,6 @@ void FlarialGUI::RoundedRect(float x, float y, const D2D_COLOR_F color, const fl
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
 
     D2D::context->FillRoundedRectangle(roundedRect, brush);
-    D2D::context->Flush();
 }
 
 void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2D_COLOR_F color, const float width, const float height, float radiusX, float radiusY)
@@ -234,9 +233,9 @@ void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2
     radiusX += borderWidth / 1.80f;
     radiusY += borderWidth / 1.80f;
 
-    D2D::context->DrawRoundedRectangle(D2D1::RoundedRect(borderRect, radiusX, radiusY), brush, borderWidth);
-    D2D::context->Flush();
 
+
+    D2D::context->DrawRoundedRectangle(D2D1::RoundedRect(borderRect, radiusX, radiusY), brush, borderWidth);
 }
 
 void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, float width, float height, float radiusX, float radiusY)
@@ -994,7 +993,6 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F
 
     D2D1_RECT_F textRect = D2D1::RectF(x, y, x + width, y + height);
     D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
-    D2D::context->Flush();
 
     textFormat->Release();
 
@@ -1018,7 +1016,6 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, D2D1
     D2D1_RECT_F textRect = D2D1::RectF(x, y, x + width, y + height);
     D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
 
-    D2D::context->Flush();
     textFormat->Release();
 }
 
@@ -1037,8 +1034,6 @@ void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
     // Draw image
     D2D1_RECT_F imageRect = D2D1::RectF(rect.left, rect.top, rect.right, rect.bottom);
     D2D::context->DrawBitmap(ImagesClass::eimages[imageName], imageRect, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
-    D2D::context->Flush();
-
 }
 
 void FlarialGUI::LoadImageFromFile(const wchar_t *filename, ID2D1Bitmap **bitmap)
