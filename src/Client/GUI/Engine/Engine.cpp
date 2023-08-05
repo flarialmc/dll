@@ -152,12 +152,12 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
     }
 
         D2D1_COLOR_F allahColor = FlarialGUI::buttonColors[index];
-        allahColor.r += 0.15f;
-        allahColor.g += 0.15f;
-        allahColor.b += 0.15f;
+        allahColor.r += 0.02f;
+        allahColor.g += 0.02f;
+        allahColor.b += 0.02f;
         allahColor.a = glowAlphas[index];
 
-        FlarialGUI::InnerShadowRect(D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY), 10,
+        FlarialGUI::InnerShadowRect(D2D1::RoundedRect(D2D1::RectF(x, y, x + width * 1.035f, y + height), radiusX, radiusY), 25,
                                     allahColor);
 
 
@@ -1685,15 +1685,16 @@ void FlarialGUI::InnerShadowRect(D2D1_ROUNDED_RECT rect, float howbig, D2D1_COLO
 
             ID2D1SolidColorBrush *colorBrush = nullptr;
             colorBrush = FlarialGUI::getBrush(color);
+
             D2D::context->DrawRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(
-                    rect.rect.left + howbig,
-                    rect.rect.top + howbig,
-                    rect.rect.right - howbig,
-                    rect.rect.bottom - howbig), rect.radiusX + howbig, rect.radiusY + howbig), colorBrush, howbig);
+                    rect.rect.left + howbig / 2.0f,
+                    rect.rect.top + howbig / 2.0f,
+                    rect.rect.right - howbig / 2.0f,
+                    rect.rect.bottom - howbig / 2.0f), rect.radiusX + howbig / 2.0f, rect.radiusY + howbig / 2.0f), colorBrush, howbig);
 
             FlarialGUI::blur->SetInput(0, newLayer);
             FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_SOFT);
-            FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 20.0f);
+            FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 8.0f);
 
             ID2D1Image *out;
             FlarialGUI::blur->GetOutput(&out);

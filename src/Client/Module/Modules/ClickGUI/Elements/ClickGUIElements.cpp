@@ -8,6 +8,7 @@ std::vector<D2D1_MATRIX_3X2_F> ClickGUIElements::matrixes;
 std::vector<Vec2<float>> sizes;
 std::vector<Vec2<float>> shadowSizes;
 std::vector<float> searchBarSizes;
+std::vector<float> searchCutOutHeights;
 
 std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit, float x, float y) {
 
@@ -15,40 +16,68 @@ std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit,
 
         D2D1_COLOR_F col;
 
-        Vec2<float> round = Constraints::RoundingConstraint(17.5, 17.5);
+        Vec2<float> round = Constraints::RoundingConstraint(19, 19);
 
         if (index > searchBarSizes.size() - 1 || index == 0) {
-            float nigga = Constraints::RelativeConstraint(0.243, "height");
+            float nigga = Constraints::RelativeConstraint(0.42, "height");
 
             searchBarSizes.emplace_back(nigga);
         }
 
-        const float textWidth = searchBarSizes[index];
-        const float percHeight = Constraints::RelativeConstraint(0.38, "height");
+        if (index > searchCutOutHeights.size() - 1 || index == 0) {
+            float nigga = Constraints::RelativeConstraint(0.38, "height");
 
-        text = FlarialGUI::TextBox(index, text, limit, x - Constraints::SpacingConstraint(1.55, textWidth), y, Constraints::SpacingConstraint(1.55, textWidth),
+            searchCutOutHeights.emplace_back(nigga);
+        }
+
+        const float textWidth = searchBarSizes[index];
+        const float percHeight = Constraints::RelativeConstraint(0.42, "height");
+
+        text = FlarialGUI::TextBox(index, text, limit, x - textWidth, y, textWidth,
                                    percHeight);
 
         if (FlarialGUI::TextBoxes[index].isActive) {
 
-            FlarialGUI::lerp(searchBarSizes[index], Constraints::RelativeConstraint(0.7, "height"),
+            FlarialGUI::lerp(searchBarSizes[index], Constraints::RelativeConstraint(2.7f, "height"),
                              0.12f * FlarialGUI::frameFactor);
+
+            FlarialGUI::lerp(searchCutOutHeights[index], Constraints::RelativeConstraint(0.395, "height"), 0.12f * FlarialGUI::frameFactor);
+
 
             col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
+
         } else {
 
-            FlarialGUI::lerp(searchBarSizes[index], Constraints::RelativeConstraint(0.243, "height"),
+            FlarialGUI::lerp(searchBarSizes[index], Constraints::RelativeConstraint(0.42, "height"),
                              0.12f * FlarialGUI::frameFactor);
+
+            FlarialGUI::lerp(searchCutOutHeights[index], -0.5f, 0.12f * FlarialGUI::frameFactor);
 
             col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
         }
 
-        FlarialGUI::RoundedRect(x - Constraints::SpacingConstraint(1.55, textWidth), y, col, Constraints::SpacingConstraint(1.55, textWidth), percHeight, round.x,
+        FlarialGUI::RoundedRect(x - textWidth, y, FlarialGUI::HexToColorF("1c1616"), textWidth, percHeight, round.x,
                                 round.x);
 
-        FlarialGUI::FlarialTextWithFont(x - Constraints::SpacingConstraint(1.55, textWidth), y, FlarialGUI::to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White),
-                                        Constraints::SpacingConstraint(1.55, textWidth), percHeight,
-                                        DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::SpacingConstraint(1.0, textWidth));
+        //if(searchBarSizes[index] > Constraints::RelativeConstraint(0.45, "height")) FlarialGUI::InnerShadowRect(D2D1::RoundedRect(D2D1::RectF(x - textWidth, y, (x - textWidth) + textWidth, y + percHeight), round.x, round.x), 0.25f, D2D1::ColorF(D2D1::ColorF::White, 1.0f));
+
+
+        D2D::context->PushAxisAlignedClip(D2D1::RectF(x - textWidth, y + percHeight, (x - textWidth) + textWidth, y + searchCutOutHeights[index]), D2D1_ANTIALIAS_MODE_ALIASED);
+        FlarialGUI::RoundedRect(x - textWidth, y, col, textWidth, percHeight, round.x,
+                                round.x);
+        D2D::context->PopAxisAlignedClip();
+
+
+        if(searchBarSizes[index] > Constraints::RelativeConstraint(0.45, "height")) {
+            FlarialGUI::FlarialTextWithFont(x - textWidth, y, FlarialGUI::to_wide(text).c_str(),
+                                            D2D1::ColorF(D2D1::ColorF::White),
+                                            textWidth, percHeight,
+                                            DWRITE_TEXT_ALIGNMENT_CENTER,
+                                            Constraints::SpacingConstraint(0.60f, textWidth));
+
+        }
+
+        FlarialGUI::Image("\\Flarial\\assets\\search.png", D2D1::RectF((x - textWidth) + Constraints::RelativeConstraint(0.245, "height") / 2.0f, y + Constraints::RelativeConstraint(0.245, "height") / 2.0f, ((x - textWidth) + Constraints::RelativeConstraint(0.18, "height") / 2.0f) + Constraints::RelativeConstraint(0.22, "height"), (y + Constraints::RelativeConstraint(0.18, "height") / 2.0f) + Constraints::RelativeConstraint(0.22, "height")));
         return "";
     } else {
         return "";

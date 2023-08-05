@@ -212,7 +212,7 @@ public:
                                                    RadioButtonHeight, round.x, round.x, "settings", this->curr))
                     this->curr = "settings";
 
-                const float h = Constraints::RelativeConstraint(0.38, "height");
+                const float h = Constraints::RelativeConstraint(0.42, "height");
                 const float allahY = (navy + navigationBarHeight / 2.0f - h / 2.0f);
                 ClickGUIElements::SearchBar(0, searchBarString, 12, Constraints::PercentageConstraint(0.022, "right"), allahY);
 
@@ -278,13 +278,45 @@ public:
 
                         int i = 0;
                         for (Module *real: ModuleManager::modules) {
-                            ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
-                                                      real->icon, i);
 
-                            xModifier += Constraints::SpacingConstraint(1.09, modWidth);
-                            if ((++i % 3) == 0) {
-                                yModifier += Constraints::SpacingConstraint(0.8, modWidth);
-                                xModifier = 0.0f;
+                            if(!searchBarString.empty()) {
+
+                                std::string name = real->name;
+
+                                for (char& c : name) {
+                                    c = std::tolower(c);
+                                }
+
+                                std::string search = searchBarString;
+
+                                for (char& c : search) {
+                                    c = std::tolower(c);
+                                }
+
+                                if (name.starts_with(search) ||
+                                    name.find(search) != std::string::npos) {
+
+                                    ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
+                                                              real->icon, i);
+
+                                    xModifier += Constraints::SpacingConstraint(1.09, modWidth);
+                                    if ((++i % 3) == 0) {
+                                        yModifier += Constraints::SpacingConstraint(0.8, modWidth);
+                                        xModifier = 0.0f;
+                                    }
+                                }
+
+                            } else {
+
+                                ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
+                                                          real->icon, i);
+
+                                xModifier += Constraints::SpacingConstraint(1.09, modWidth);
+                                if ((++i % 3) == 0) {
+                                    yModifier += Constraints::SpacingConstraint(0.8, modWidth);
+                                    xModifier = 0.0f;
+                                }
+
                             }
                         }
 
