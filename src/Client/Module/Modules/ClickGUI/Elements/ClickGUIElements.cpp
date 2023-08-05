@@ -70,7 +70,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
                 float diffY2 = (shadowSizes[index].y - BottomRoundedHeight) / 2.0f;
                 
                 FlarialGUI::ShadowRect(
-                        D2D1::RoundedRect(D2D1::RectF((x - diffX2) , (y - diffY2) , (x - diffX2)  + shadowSizes[index].x, (y - diffY2)  + shadowSizes[index].y),
+                        D2D1::RoundedRect(D2D1::RectF(x - diffX2, y - diffY2, (x - diffX2)  + shadowSizes[index].x, (y - diffY2)  + shadowSizes[index].y),
                                           round.x, round.x));
             }
 
