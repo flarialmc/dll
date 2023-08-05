@@ -108,7 +108,7 @@ public:
                 Vec2<float> round = Constraints::RoundingConstraint(50, 50);
 
                 FlarialGUI::ShadowRect(D2D1::RoundedRect(
-                        D2D1::RectF(center.x, center.y, center.x + Constraints::SpacingConstraint(1.02f, baseWidth),
+                        D2D1::RectF(center.x, center.y + Constraints::SpacingConstraint(0.05f, baseWidth), center.x + Constraints::SpacingConstraint(1.02f, baseWidth),
                                     center.y + Constraints::RelativeConstraint(baseHeightReal * 1.02f)), round.x * 1.02f,
                         round.x * 1.02f));
                 FlarialGUI::RoundedRect(center.x, center.y,
