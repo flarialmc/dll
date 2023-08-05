@@ -24,6 +24,7 @@ void SwapchainHook::enableHook()
     void* swapchain_ptr;
 
     int index;
+
     if(kiero::getRenderType() == kiero::RenderType::D3D12)
         index = 140;
     else index = 8;
