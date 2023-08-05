@@ -1630,85 +1630,88 @@ void FlarialGUI::AllahBlur(float intensity) {
 
 void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect, D2D1_COLOR_F color) {
 
-    
-    // Create a new blank bitmap
-    ID2D1Bitmap1* newLayer = nullptr;
-    D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, D2D::context->GetPixelFormat());
-    D2D::context->CreateBitmap(D2D::context->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
+    if(!Client::settings.getSettingByName<bool>("noshadows")->value) {
+        // Create a new blank bitmap
+        ID2D1Bitmap1 *newLayer = nullptr;
+        D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET,
+                                                                        D2D::context->GetPixelFormat());
+        D2D::context->CreateBitmap(D2D::context->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
 
-    if(newLayer != nullptr && FlarialGUI::blur != nullptr) {
-        D2D::context->SetTarget(newLayer);
-        D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
+        if (newLayer != nullptr && FlarialGUI::blur != nullptr) {
+            D2D::context->SetTarget(newLayer);
+            D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
 
-        ID2D1SolidColorBrush *colorBrush = nullptr;
-        colorBrush = FlarialGUI::getBrush(color);
-        D2D::context->FillRoundedRectangle(rect, colorBrush);
-
-        
-
-        FlarialGUI::blur->SetInput(0, newLayer);
-        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
-        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 10.0f);
-
-        ID2D1Image *out;
-        FlarialGUI::blur->GetOutput(&out);
-
-        // Set the rendering target to the main bitmap
-        if (SwapchainHook::queue != nullptr)
-            D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
-        else D2D::context->SetTarget(SwapchainHook::D2D1Bitmap);
+            ID2D1SolidColorBrush *colorBrush = nullptr;
+            colorBrush = FlarialGUI::getBrush(color);
+            D2D::context->FillRoundedRectangle(rect, colorBrush);
 
 
-        D2D::context->DrawImage(out);
+            FlarialGUI::blur->SetInput(0, newLayer);
+            FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+            FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 10.0f);
+
+            ID2D1Image *out;
+            FlarialGUI::blur->GetOutput(&out);
+
+            // Set the rendering target to the main bitmap
+            if (SwapchainHook::queue != nullptr)
+                D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
+            else D2D::context->SetTarget(SwapchainHook::D2D1Bitmap);
+
+
+            D2D::context->DrawImage(out);
+
+            Memory::SafeRelease(newLayer);
+            Memory::SafeRelease(out);
+        }
 
         Memory::SafeRelease(newLayer);
-        Memory::SafeRelease(out);
     }
-
-    Memory::SafeRelease(newLayer);
 }
 
 void FlarialGUI::InnerShadowRect(D2D1_ROUNDED_RECT rect, float howbig, D2D1_COLOR_F color) {
 
+    if(!Client::settings.getSettingByName<bool>("noshadows")->value) {
+
+        // Create a new blank bitmap
+        ID2D1Bitmap1 *newLayer = nullptr;
+        D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET,
+                                                                        D2D::context->GetPixelFormat());
+        D2D::context->CreateBitmap(D2D::context->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
+
+        if (newLayer != nullptr && FlarialGUI::blur != nullptr) {
+            D2D::context->SetTarget(newLayer);
+            D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
+
+            ID2D1SolidColorBrush *colorBrush = nullptr;
+            colorBrush = FlarialGUI::getBrush(color);
+            D2D::context->DrawRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(
+                    rect.rect.left + howbig,
+                    rect.rect.top + howbig,
+                    rect.rect.right - howbig,
+                    rect.rect.bottom - howbig), rect.radiusX + howbig, rect.radiusY + howbig), colorBrush, howbig);
+
+            FlarialGUI::blur->SetInput(0, newLayer);
+            FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_SOFT);
+            FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 20.0f);
+
+            ID2D1Image *out;
+            FlarialGUI::blur->GetOutput(&out);
+
+            // Set the rendering target to the main bitmap
+            if (SwapchainHook::queue != nullptr)
+                D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
+            else D2D::context->SetTarget(SwapchainHook::D2D1Bitmap);
 
 
-    // Create a new blank bitmap
-    ID2D1Bitmap1* newLayer = nullptr;
-    D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, D2D::context->GetPixelFormat());
-    D2D::context->CreateBitmap(D2D::context->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
+            D2D::context->DrawImage(out);
 
-    if(newLayer != nullptr && FlarialGUI::blur != nullptr) {
-        D2D::context->SetTarget(newLayer);
-        D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
-
-        ID2D1SolidColorBrush *colorBrush = nullptr;
-        colorBrush = FlarialGUI::getBrush(color);
-        D2D::context->DrawRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(
-                rect.rect.left + howbig,
-                rect.rect.top + howbig,
-                rect.rect.right - howbig,
-                rect.rect.bottom - howbig), rect.radiusX + howbig, rect.radiusY + howbig), colorBrush, howbig);
-
-        FlarialGUI::blur->SetInput(0, newLayer);
-        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
-        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 20.0f);
-
-        ID2D1Image *out;
-        FlarialGUI::blur->GetOutput(&out);
-
-        // Set the rendering target to the main bitmap
-        if (SwapchainHook::queue != nullptr)
-            D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
-        else D2D::context->SetTarget(SwapchainHook::D2D1Bitmap);
-
-
-        D2D::context->DrawImage(out);
+            Memory::SafeRelease(newLayer);
+            Memory::SafeRelease(out);
+        }
 
         Memory::SafeRelease(newLayer);
-        Memory::SafeRelease(out);
     }
-
-    Memory::SafeRelease(newLayer);
 }
 
 void FlarialGUI::CopyBitmap(ID2D1Bitmap1* from, ID2D1Bitmap** to)

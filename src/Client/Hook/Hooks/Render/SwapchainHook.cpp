@@ -42,8 +42,6 @@ bool SwapchainHook::init = false;
 
 void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
 
-    SetCursorPos(40, 40);
-
     std::chrono::duration<float> elapsed = fpsclock.now() - start;
     MC::frames += 1;
 
@@ -220,7 +218,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 /* Blur Stuff */
 
-                if(ModuleManager::doesAnyModuleHave("BlurEffect") || !FlarialGUI::notifications.empty() || ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) {
+                if(ModuleManager::doesAnyModuleHave("BlurEffect") || !FlarialGUI::notifications.empty() || ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value && Client::settings.getSettingByName<float>("blurintensity")->value > 1) {
                     ID2D1Bitmap *bitmap = nullptr;
 
                     if (FlarialGUI::blur == nullptr) {
@@ -274,7 +272,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 /* Blur Stuff */
 
-                if(ModuleManager::doesAnyModuleHave("BlurEffect") || !FlarialGUI::notifications.empty() || ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) {
+                if(ModuleManager::doesAnyModuleHave("BlurEffect") || !FlarialGUI::notifications.empty() || ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value && Client::settings.getSettingByName<float>("blurintensity")->value > 1) {
                     ID2D1Bitmap *bitmap = nullptr;
 
                     if (FlarialGUI::blur == nullptr) {

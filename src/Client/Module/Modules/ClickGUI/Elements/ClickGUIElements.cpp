@@ -7,28 +7,52 @@ std::map<std::string, ID2D1Bitmap*> ClickGUIElements::images;
 std::vector<D2D1_MATRIX_3X2_F> ClickGUIElements::matrixes;
 std::vector<Vec2<float>> sizes;
 std::vector<Vec2<float>> shadowSizes;
+std::vector<float> searchBarSizes;
 
-std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit, float x, float y, std::string real) {
+std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit, float x, float y) {
 
-    D2D1_COLOR_F col;
+    if(ClickGUIRenderer::page.type == "normal" && ClickGUIRenderer::curr == "modules") {
 
-    Vec2<float> round = Constraints::RoundingConstraint(13, 13);
+        D2D1_COLOR_F col;
 
-    const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-    const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
+        Vec2<float> round = Constraints::RoundingConstraint(17.5, 17.5);
 
-    text = FlarialGUI::TextBox(index, text, limit, x, y, Constraints::SpacingConstraint(1.55, textWidth), percHeight);
+        if (index > searchBarSizes.size() - 1 || index == 0) {
+            float nigga = Constraints::RelativeConstraint(0.243, "height");
 
-    if(FlarialGUI::TextBoxes[index].isActive) col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
-    else col = D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f);
+            searchBarSizes.emplace_back(nigga);
+        }
 
+        const float textWidth = searchBarSizes[index];
+        const float percHeight = Constraints::RelativeConstraint(0.38, "height");
 
-    FlarialGUI::RoundedRect(x, y, col, Constraints::SpacingConstraint(1.55, textWidth), percHeight, round.x, round.x);
+        text = FlarialGUI::TextBox(index, text, limit, x - Constraints::SpacingConstraint(1.55, textWidth), y, Constraints::SpacingConstraint(1.55, textWidth),
+                                   percHeight);
 
-    FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::SpacingConstraint(1.0, textWidth));
-    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, FlarialGUI::to_wide(real).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(3, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.00, textWidth));
+        if (FlarialGUI::TextBoxes[index].isActive) {
 
-    return "";
+            FlarialGUI::lerp(searchBarSizes[index], Constraints::RelativeConstraint(0.7, "height"),
+                             0.12f * FlarialGUI::frameFactor);
+
+            col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
+        } else {
+
+            FlarialGUI::lerp(searchBarSizes[index], Constraints::RelativeConstraint(0.243, "height"),
+                             0.12f * FlarialGUI::frameFactor);
+
+            col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
+        }
+
+        FlarialGUI::RoundedRect(x - Constraints::SpacingConstraint(1.55, textWidth), y, col, Constraints::SpacingConstraint(1.55, textWidth), percHeight, round.x,
+                                round.x);
+
+        FlarialGUI::FlarialTextWithFont(x - Constraints::SpacingConstraint(1.55, textWidth), y, FlarialGUI::to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White),
+                                        Constraints::SpacingConstraint(1.55, textWidth), percHeight,
+                                        DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::SpacingConstraint(1.0, textWidth));
+        return "";
+    } else {
+        return "";
+    }
 }
 
 
@@ -176,6 +200,8 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
             FlarialGUI::RoundedRect(settingx, (buttony - paddingwidth) - paddingheightspac,
                                     D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), paddingwidth,
                                     paddingwidth, round.x, round.x);
+
+            if(!Client::settings.getSettingByName<bool>("noicons")->value)
             FlarialGUI::RoundedRectWithImageAndText(index, settingx2, (buttony - settingswidth) - settingsheightspac,
                                                     settingswidth, settingswidth,
                                                     D2D1::ColorF(112.0f / 255.0f, 93.0f / 255.0f, 96.0f / 255.0f),
@@ -193,6 +219,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
                     modicony += FlarialGUI::scrollpos;
                 }
 
+                if(!Client::settings.getSettingByName<bool>("noicons")->value)
                 D2D::context->DrawBitmap(images[mod->name], D2D1::RectF(modiconx, modicony, modiconx + paddingSize,
                                                                         modicony + paddingSize));
             }

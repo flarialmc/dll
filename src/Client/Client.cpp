@@ -110,6 +110,12 @@ void Client::initialize()
     if (Client::settings.getSettingByName<bool>("dlassets") == nullptr)
         Client::settings.addSetting("dlassets", true);
 
+    if (Client::settings.getSettingByName<bool>("noicons") == nullptr)
+        Client::settings.addSetting("noicons", false);
+
+    if (Client::settings.getSettingByName<bool>("noshadows") == nullptr)
+        Client::settings.addSetting("noshadows", false);
+
 
     if(Client::settings.getSettingByName<bool>("dlassets")->value) {
         // Create threads to download the files
