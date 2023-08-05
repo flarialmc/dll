@@ -1,29 +1,13 @@
 #pragma once
 
-#include <vector>
 #include <string>
-#include <sstream>
-#include <iostream>
 #include <unordered_map>
+#include <typeindex>
 #include "json/json.hpp"
 #include "../Utils/Logger/Logger.hpp"
 
 using json = nlohmann::json;
 
-// Forward declaration
-class Setting;
-
-// Customizable Setting type
-template<typename T>
-class SettingType {
-public:
-    SettingType(const std::string& name, const T& defaultValue) : name(name), value(defaultValue) {}
-
-    std::string name;
-    T value;
-};
-
-// Base Setting class
 class Setting {
 public:
     virtual ~Setting() = default;
@@ -31,55 +15,41 @@ public:
     virtual void FromJson(const json& jsonData) = 0;
 };
 
-// Template specialization for SettingType<T>
 template<typename T>
-class TypedSetting : public Setting {
+class SettingType : public Setting {
 public:
-    TypedSetting(const std::string& name, const T& defaultValue) : setting(name, defaultValue) {}
+    SettingType(const T& defaultValue) : value(defaultValue) {}
 
     json ToJson() const override {
         json jsonData;
-        jsonData["name"] = setting.name;
-        jsonData["value"] = setting.value;
+        jsonData["value"] = value;
         return jsonData;
     }
 
     void FromJson(const json& jsonData) override {
-        if (jsonData.is_object() && jsonData.contains("name") && jsonData.contains("value")) {
-            setting.name = jsonData["name"].get<std::string>();
-            setting.value = jsonData["value"].get<T>();
+        if (jsonData.contains("value")) {
+            value = jsonData["value"].get<T>();
         }
     }
 
-    SettingType<T> setting;
+    T value;
 };
 
-// Settings container
 class Settings {
 public:
     template<typename T>
     void addSetting(const std::string& name, const T& defaultValue) {
-        settings.emplace_back(new TypedSetting<T>(name, defaultValue));
-    }
-
-
-    template <typename T>
-    struct Tag {};
-
-    template<typename T>
-    SettingType<T>* getSettingByNameImpl(const std::string& name, Tag<T>) {
-        for (auto& setting : settings) {
-            auto typedSetting = static_cast<TypedSetting<T>*>(setting.get());
-            if (typedSetting && typedSetting->setting.name == name) {
-                return &(typedSetting->setting);
-            }
-        }
-        return nullptr;
+        settings[name] = std::make_unique<SettingType<T>>(defaultValue);
     }
 
     template<typename T>
     SettingType<T>* getSettingByName(const std::string& name) {
-        return getSettingByNameImpl(name, Tag<T>{});
+
+        auto it = settings.find(name);
+        if (it != settings.end()) {
+            return static_cast<SettingType<T>*>(it->second.get());
+        }
+        return nullptr;
     }
 
     template<typename T>
@@ -92,8 +62,8 @@ public:
 
     std::string ToJson() const {
         json jsonData;
-        for (const auto& setting : settings) {
-            jsonData.push_back(setting->ToJson());
+        for (const auto& settingPair : settings) {
+            jsonData[settingPair.first] = settingPair.second->ToJson();
         }
         return jsonData.dump(4);
     }
@@ -101,32 +71,37 @@ public:
     void FromJson(const std::string& jsonString) {
         try {
             json jsonData = json::parse(jsonString);
-            for (const auto& item : jsonData) {
-                std::string name = item["name"].get<std::string>();
+            for (const auto& item : jsonData.items()) {
+                std::string name = item.key();
+                const json& valueData = item.value();
 
-                if (item["value"].is_number()) {
-                    float value = item["value"].get<float>();
-                    addSetting(name, value);
-                } else if (item["value"].is_string()) {
-                    std::string value = item["value"].get<std::string>();
-                    addSetting(name, value);
-                } else if (item["value"].is_boolean()) {
-                    bool value = item["value"].get<bool>();
-                    addSetting(name, value);
-                } else if (item["value"].is_null()) {
-                    // Handle null value if needed
-                } else {
-                    // Handle unsupported value type
+                if (valueData.is_object()) {
+                    if (valueData.contains("value")) {
+                        const json& value = valueData["value"];
+                        if (value.is_number()) {
+                            float floatValue = value.get<float>();
+                            addSetting(name, floatValue);
+                        } else if (value.is_string()) {
+                            std::string stringValue = value.get<std::string>();
+                            addSetting(name, stringValue);
+                        } else if (value.is_boolean()) {
+                            bool boolValue = value.get<bool>();
+                            addSetting(name, boolValue);
+                        } else if (value.is_null()) {
+                            // Handle null value if needed
+                        } else {
+                            // Handle unsupported value type
+                        }
+                    }
                 }
             }
         } catch (const std::exception& e) {
-
-            if(!jsonString.empty())
-            Logger::error(e.what());
-
+            if (!jsonString.empty()) {
+                Logger::error(e.what());
+            }
         }
     }
 
 private:
-    std::vector<std::unique_ptr<Setting>> settings;
+    std::unordered_map<std::string, std::unique_ptr<Setting>> settings;
 };
