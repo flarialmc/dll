@@ -24,7 +24,7 @@ bool FlarialGUI::CursorInRect(float rectX, float rectY, float width, float heigh
     return false;
 }
 
-bool isRectInRect(const D2D1_RECT_F& outer, const D2D1_RECT_F& inner) {
+bool FlarialGUI::isRectInRect(const D2D1_RECT_F& outer, const D2D1_RECT_F& inner) {
     return (inner.left >= outer.left &&
             inner.top >= outer.top &&
             inner.right <= outer.right &&
@@ -1055,7 +1055,15 @@ void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
 
     // Draw image
     D2D1_RECT_F imageRect = D2D1::RectF(rect.left, rect.top, rect.right, rect.bottom);
-    D2D::context->DrawBitmap(ImagesClass::eimages[imageName], imageRect, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+
+    if(isInScrollView) {
+        if(isRectInRect(ScrollViewRect, rect))
+        D2D::context->DrawBitmap(ImagesClass::eimages[imageName], imageRect, 1.0f,
+                                 D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+    } else {
+        D2D::context->DrawBitmap(ImagesClass::eimages[imageName], imageRect, 1.0f,
+                                 D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+    }
 }
 
 void FlarialGUI::LoadImageFromFile(const wchar_t *filename, ID2D1Bitmap **bitmap)

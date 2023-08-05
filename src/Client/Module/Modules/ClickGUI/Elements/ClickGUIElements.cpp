@@ -140,7 +140,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
             }
 
             
-            if(shadowSizes[index].x > Constraints::RelativeConstraint(0.108f, "height")) {
+            if(shadowSizes[index].x > Constraints::RelativeConstraint(0.19f, "height")) {
 
                 float diffX2 = (shadowSizes[index].x - BottomRoundedWidth) / 2.0f;
                 float diffY2 = (shadowSizes[index].y - BottomRoundedHeight) / 2.0f;
@@ -248,7 +248,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
                     modicony += FlarialGUI::scrollpos;
                 }
 
-                if(!Client::settings.getSettingByName<bool>("noicons")->value)
+                if(!Client::settings.getSettingByName<bool>("noicons")->value && FlarialGUI::isRectInRect(FlarialGUI::ScrollViewRect, D2D1::RectF(modiconx, modicony, modiconx + paddingSize,modicony + paddingSize)))
                 D2D::context->DrawBitmap(images[mod->name], D2D1::RectF(modiconx, modicony, modiconx + paddingSize,
                                                                         modicony + paddingSize));
             }

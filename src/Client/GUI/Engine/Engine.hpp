@@ -222,4 +222,6 @@ namespace FlarialGUI
     void AllahBlur(float intensity);
 
     void InnerShadowRect(D2D1_ROUNDED_RECT rect, float howbig, D2D1_COLOR_F color = D2D1::ColorF(0, 0, 0, 0.75f));
+
+    bool isRectInRect(const D2D1_RECT_F &outer, const D2D1_RECT_F &inner);
 };
