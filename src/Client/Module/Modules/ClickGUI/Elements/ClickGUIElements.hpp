@@ -13,4 +13,6 @@ public:
     static std::vector<D2D1_MATRIX_3X2_F> matrixes;
 
     static void convertImageToBitmap(ID2D1Image *pImg, D2D1_SIZE_U size);
+
+    std::string SearchBar(int index, std::string &text, int limit, float x, float y, std::string real);
 };

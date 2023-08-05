@@ -213,9 +213,11 @@ namespace FlarialGUI
     extern ID2D1ImageBrush* shadowbrush;
     extern std::unordered_map<std::string, ID2D1Image*> cachedBitmaps;
 
-    void ShadowRect(D2D1_ROUNDED_RECT rect);
+    void ShadowRect(D2D1_ROUNDED_RECT rect, D2D1_COLOR_F color = D2D1::ColorF(0, 0, 0, 0.75f));
 
     void ApplySusGaussianBlur(float blurIntensity);
 
     void AllahBlur(float intensity);
+
+    void InnerShadowRect(D2D1_ROUNDED_RECT rect, float howbig, D2D1_COLOR_F color = D2D1::ColorF(0, 0, 0, 0.75f));
 };

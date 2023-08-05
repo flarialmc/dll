@@ -465,7 +465,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
     const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
     const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
 
-    text = FlarialGUI::TextBox(index, text, 16, x, y, Constraints::SpacingConstraint(1.55, textWidth), percHeight);
+    text = FlarialGUI::TextBox(index, text, limit, x, y, Constraints::SpacingConstraint(1.55, textWidth), percHeight);
 
     if(TextBoxes[index].isActive) col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
     else col = D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f);
@@ -1607,7 +1607,7 @@ void FlarialGUI::AllahBlur(float intensity) {
 
 }
 
-void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect) {
+void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect, D2D1_COLOR_F color) {
 
     
     // Create a new blank bitmap
@@ -1620,10 +1620,53 @@ void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect) {
         D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
 
         ID2D1SolidColorBrush *colorBrush = nullptr;
-        colorBrush = FlarialGUI::getBrush(D2D1::ColorF(0, 0, 0, 0.75f));
+        colorBrush = FlarialGUI::getBrush(color);
         D2D::context->FillRoundedRectangle(rect, colorBrush);
 
         
+
+        FlarialGUI::blur->SetInput(0, newLayer);
+        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 10.0f);
+
+        ID2D1Image *out;
+        FlarialGUI::blur->GetOutput(&out);
+
+        // Set the rendering target to the main bitmap
+        if (SwapchainHook::queue != nullptr)
+            D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
+        else D2D::context->SetTarget(SwapchainHook::D2D1Bitmap);
+
+
+        D2D::context->DrawImage(out);
+
+        Memory::SafeRelease(newLayer);
+        Memory::SafeRelease(out);
+    }
+
+    Memory::SafeRelease(newLayer);
+}
+
+void FlarialGUI::InnerShadowRect(D2D1_ROUNDED_RECT rect, float howbig, D2D1_COLOR_F color) {
+
+
+
+    // Create a new blank bitmap
+    ID2D1Bitmap1* newLayer = nullptr;
+    D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, D2D::context->GetPixelFormat());
+    D2D::context->CreateBitmap(D2D::context->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
+
+    if(newLayer != nullptr && FlarialGUI::blur != nullptr) {
+        D2D::context->SetTarget(newLayer);
+        D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
+
+        ID2D1SolidColorBrush *colorBrush = nullptr;
+        colorBrush = FlarialGUI::getBrush(color);
+        D2D::context->DrawRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(
+                rect.rect.left + (6 * howbig),
+                rect.rect.top + (6 * howbig),
+                rect.rect.right - (6 * howbig),
+                rect.rect.bottom - (6 * howbig)), rect.radiusX + (6 * howbig), rect.radiusY + (6 * howbig)), colorBrush, howbig);
 
         FlarialGUI::blur->SetInput(0, newLayer);
         FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);

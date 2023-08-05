@@ -8,6 +8,29 @@ std::vector<D2D1_MATRIX_3X2_F> ClickGUIElements::matrixes;
 std::vector<Vec2<float>> sizes;
 std::vector<Vec2<float>> shadowSizes;
 
+std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit, float x, float y, std::string real) {
+
+    D2D1_COLOR_F col;
+
+    Vec2<float> round = Constraints::RoundingConstraint(13, 13);
+
+    const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+    const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
+
+    text = FlarialGUI::TextBox(index, text, limit, x, y, Constraints::SpacingConstraint(1.55, textWidth), percHeight);
+
+    if(FlarialGUI::TextBoxes[index].isActive) col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
+    else col = D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f);
+
+
+    FlarialGUI::RoundedRect(x, y, col, Constraints::SpacingConstraint(1.55, textWidth), percHeight, round.x, round.x);
+
+    FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::SpacingConstraint(1.0, textWidth));
+    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, FlarialGUI::to_wide(real).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(3, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.00, textWidth));
+
+    return "";
+}
+
 
 void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string iconpath, const int index)
 {
@@ -87,7 +110,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
             FlarialGUI::RoundedRectOnlyTopCorner(x, y, D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f),
                                                  BottomRoundedWidth, TopRoundedHeight, round.x, round.x);
 
-            FlarialGUI::PushSize(x, y, BottomRoundedWidth, BottomRoundedHeight);
+    FlarialGUI::PushSize(x, y, BottomRoundedWidth, BottomRoundedHeight);
 
             // Mod Name
             float textx = Constraints::PercentageConstraint(0.1405, "left");
@@ -188,7 +211,6 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
                 GUIMouseListener::accumilatedPos = 0;
                 GUIMouseListener::accumilatedBarPos = 0;
             }
-
             FlarialGUI::PopSize();
 }
 

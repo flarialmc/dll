@@ -111,9 +111,13 @@ public:
                         D2D1::RectF(center.x, center.y + Constraints::SpacingConstraint(0.05f, baseWidth), center.x + Constraints::SpacingConstraint(1.02f, baseWidth),
                                     center.y + Constraints::RelativeConstraint(baseHeightReal * 1.02f)), round.x * 1.02f,
                         round.x * 1.02f));
+
+
                 FlarialGUI::RoundedRect(center.x, center.y,
                                         D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), baseWidth,
                                         Constraints::RelativeConstraint(baseHeightReal), round.x, round.x);
+
+
                 FlarialGUI::PushSize(center.x, center.y, baseWidth, Constraints::RelativeConstraint(baseHeightActual));
 
                 /* Base Rectangle End */
@@ -407,6 +411,8 @@ public:
 
                 FlarialGUI::PopSize(); // Pops base rect
 
+
+                FlarialGUI::InnerShadowRect(D2D1::RoundedRect(D2D1::RectF(center.x, center.y, center.x + baseWidth, center.y + Constraints::RelativeConstraint(baseHeightReal)), round.x, round.x), 2.0, D2D1::ColorF(D2D1::ColorF::White, 0.85f));
 
             }
 
