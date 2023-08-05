@@ -35,6 +35,7 @@
 
     float realspacing = Constraints::SpacingConstraint(0.155f, textWidth);
 
+     if(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
     FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, index);
 
     Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, rectWidth, textHeight);
@@ -75,6 +76,7 @@
                                       rounde.x, rounde.x);
     }
 
-    FlarialGUI::UnsetWindowRect();
+     if(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
+     FlarialGUI::UnsetWindowRect();
 
 }
