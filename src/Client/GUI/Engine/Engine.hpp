@@ -95,6 +95,7 @@ namespace FlarialGUI
     float inline frameFactor = 1;
 
     inline bool isInScrollView = false;
+    inline D2D1_RECT_F ScrollViewRect = D2D1::RectF();
     float inline scrollpos = 0;
     float inline scrollposmodifier = 0.f;
     float inline barscrollpos = 0;

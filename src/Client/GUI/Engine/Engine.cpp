@@ -24,6 +24,13 @@ bool FlarialGUI::CursorInRect(float rectX, float rectY, float width, float heigh
     return false;
 }
 
+bool isRectInRect(const D2D1_RECT_F& outer, const D2D1_RECT_F& inner) {
+    return (inner.left >= outer.left &&
+            inner.top >= outer.top &&
+            inner.right <= outer.right &&
+            inner.bottom <= outer.bottom);
+}
+
 static bool CursorInEllipse(float ellipseX, float ellipseY, float radiusX, float radiusY)
 {
     float mouseX = MC::mousepos.x;
@@ -657,10 +664,6 @@ void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const 
         imageY += scrollpos;
     }
 
-    float fakeX = x;
-    float fakeY = y;
-
-
     ID2D1SolidColorBrush *brush;
 
     brush = FlarialGUI::getBrush(color);
@@ -1025,6 +1028,7 @@ void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
         rect.top += scrollpos;
         rect.bottom += scrollpos;
     }
+
     std::string among = Utils::getRoamingPath() + "\\" + imageName;
 
     if(ImagesClass::eimages[imageName] == nullptr)
@@ -1072,6 +1076,7 @@ void FlarialGUI::SetScrollView(float x, float y, float width, float height)
 {
     FlarialGUI::isInScrollView = true;
     D2D1_RECT_F clipRect = D2D1::RectF(x, y, x + width, y + height);
+    ScrollViewRect = clipRect;
     D2D::context->PushAxisAlignedClip(&clipRect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
 }
