@@ -215,4 +215,6 @@ namespace FlarialGUI
     void ShadowRect(D2D1_ROUNDED_RECT rect);
 
     void ApplySusGaussianBlur(float blurIntensity);
+
+    void AllahBlur(float intensity);
 };

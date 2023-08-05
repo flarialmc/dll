@@ -1570,6 +1570,35 @@ void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect, float intensity) {
 
 }
 
+void FlarialGUI::AllahBlur(float intensity) {
+
+    // Create Gaussian blur effect
+    if(FlarialGUI::blur == nullptr) {
+
+        D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &FlarialGUI::blur);
+    }
+
+    if(SwapchainHook::init) {
+
+        ID2D1Bitmap *bitmap = nullptr;
+        if(SwapchainHook::queue != nullptr) FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap], &bitmap);
+        else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap, &bitmap);
+
+        FlarialGUI::blur->SetInput(0, bitmap);
+
+        // Set blur intensity
+        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_QUALITY);
+        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, intensity);
+        // Draw the image with the Gaussian blur effect
+        D2D::context->DrawImage(FlarialGUI::blur);
+
+        Memory::SafeRelease(bitmap);
+        Memory::SafeRelease(FlarialGUI::blur);
+    }
+
+}
+
 void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect) {
 
     

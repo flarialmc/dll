@@ -43,6 +43,7 @@ class ClickGUIRenderer : public Listener {
     std::string curr;
     float baseHeightReal = 0.64f;
     float baseHeightActual = 0.00001f;
+    float realBlurAmount = 0.00001f;
 public:
     static inline bool editmenu = false;
 
@@ -66,15 +67,23 @@ public:
 
             if (module->settings.getSettingByName<bool>("enabled")->value) {
 
-                FlarialGUI::ApplyGaussianBlur(6.0);
+
                 lerp(baseHeightActual, 0.64f, 0.18f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+                lerp(realBlurAmount, Client::settings.getSettingByName<float>("blurintensity")->value, 0.15f * FlarialGUI::frameFactor);
 
             } else {
+
                 lerp(baseHeightReal, 0.01f, 0.22f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
                 lerp(baseHeightActual, 0.00001f, 0.30f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
-            }
+                lerp(realBlurAmount, 0.00001f, 0.15f * FlarialGUI::frameFactor);
+
+        }
+
+            if(realBlurAmount > 0.01) FlarialGUI::AllahBlur(realBlurAmount);
 
             if (SwapchainHook::init && baseHeightActual > 0.01) {
+
+
 
                 /* Base Rectangle Start */
 
