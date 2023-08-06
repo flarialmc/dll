@@ -37,7 +37,7 @@ public:
         if(SDK::clientInstance->getTopScreenName() == "hud_screen" && module->settings.getSettingByName<bool>("enabled")->value || SDK::clientInstance->getTopScreenName() == "pause_screen" && module->settings.getSettingByName<bool>("enabled")->value) {
 
             if(!enabled && ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) {
-                FlarialGUI::Notify("To change the position of the Paperdoll, Please click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("editmenubind")->value);
+                FlarialGUI::Notify("To change the position of the Paperdoll, Please click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("editmenubind")->value + " in the settings tab.");
                 enabled = true;
             }
 
@@ -95,7 +95,7 @@ public:
 
                     Vec2<float> convert = this->convert();
 
-                    control->x = convert.x + 5;
+                    control->x = convert.x + 7;
                     control->y = convert.y;
 
                     control->scale = module->settings.getSettingByName<float>("uiscale")->value;

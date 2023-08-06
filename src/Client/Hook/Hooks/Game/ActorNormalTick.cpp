@@ -49,6 +49,7 @@ void ActorNormalTick::callback(Actor *xd) {
 
 
                 std::ofstream outputFile(settingspath);
+
                 if (outputFile.is_open()) {
                     outputFile << "world";
                     outputFile.close();

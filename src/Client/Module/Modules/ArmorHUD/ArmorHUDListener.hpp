@@ -36,7 +36,7 @@ public:
         if(SDK::clientInstance->getTopScreenName() == "hud_screen" && module->settings.getSettingByName<bool>("enabled")->value || SDK::clientInstance->getTopScreenName() == "pause_screen" && module->settings.getSettingByName<bool>("enabled")->value) {
 
             if(!enabled && ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) {
-                FlarialGUI::Notify("To change the position of ArmorHUD, Please click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("editmenubind")->value);
+                FlarialGUI::Notify("To change the position of ArmorHUD, Please click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("editmenubind")->value + " in the settings tab.");
                 enabled = true;
             }
 
@@ -51,12 +51,12 @@ public:
                 currentPos = Vec2<float>(settingperc.x * MC::windowSize.x,
                                          settingperc.y * MC::windowSize.y);
             else
-                currentPos = Constraints::CenterConstraint(s * 4 + spacing * 4, s);
+                currentPos = Constraints::CenterConstraint(s, s);
 
             if(ClickGUIRenderer::editmenu)
-            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, s * 4 + spacing * 4, s, 18);
+            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, s, s, 18);
 
-            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x , currentPos.y, 18, s * 4 + spacing * 4, s);
+            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x , currentPos.y, 18, s, s);
 
 
             currentPos.x = vec2.x;
@@ -90,7 +90,7 @@ public:
 
             float s = Constraints::RelativeConstraint(0.1, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
 
-            float spacing = 16;
+            float spacing = 15 * module->settings.getSettingByName<float>("uiscale")->value;
 
             float xmodifier = 0.0f;
             float ymodifier = 0.0f;
