@@ -481,6 +481,20 @@ public:
 
     void onKey(KeyEvent &event) override {
 
+        if(ClickGUIRenderer::page.type == "normal" && ClickGUIRenderer::curr == "modules" &&  module->settings.getSettingByName<bool>("enabled")->value && event.GetAction() == (int)ActionType::PRESSED) {
+
+            FlarialGUI::TextBoxes[0].isActive = true;
+
+            if(FlarialGUI::TextBoxes[0].isActive) {
+
+                FlarialGUI::scrollpos = 0;
+                FlarialGUI::barscrollpos = 0;
+                GUIMouseListener::accumilatedPos = 0;
+                GUIMouseListener::accumilatedBarPos = 0;
+
+            }
+        }
+
         if(module->IsKeybind(event.keys) && module->IsKeyPartOfKeybind(event.key)) {
 
             module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value;
