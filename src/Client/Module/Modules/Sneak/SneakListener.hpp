@@ -12,6 +12,7 @@ class SneakListener : public Listener {
 
     Module* module;
     bool ToggleSneaking = false;
+    bool toggled = false;
 
     void onKey(KeyEvent& event) override {
 
@@ -29,7 +30,14 @@ class SneakListener : public Listener {
             if (SDK::clientInstance != nullptr) {
                 if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                     MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
-                    handler->sneaking = ToggleSneaking;
+                    if (ToggleSneaking) {
+                        handler->sneaking = true;
+                        toggled = true;
+                    }
+                    if (!ToggleSneaking and toggled) {
+                        handler->sneaking = false;
+                        toggled = false;
+                    }
                 }
             }
         }
