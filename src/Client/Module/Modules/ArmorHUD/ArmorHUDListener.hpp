@@ -36,7 +36,7 @@ public:
         if(SDK::clientInstance->getTopScreenName() == "hud_screen" && module->settings.getSettingByName<bool>("enabled")->value || SDK::clientInstance->getTopScreenName() == "pause_screen" && module->settings.getSettingByName<bool>("enabled")->value) {
 
             if(!enabled && ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) {
-                FlarialGUI::Notify("To change the position of ArmorHUD, Please click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("editmenubind")->value);
+                FlarialGUI::Notify("To change the position of ArmorHUD, Please click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("editmenubind")->value + " in the settings tab.");
                 enabled = true;
             }
 
@@ -90,7 +90,7 @@ public:
 
             float s = Constraints::RelativeConstraint(0.1, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
 
-            float spacing = 16;
+            float spacing = 15 * module->settings.getSettingByName<float>("uiscale")->value;
 
             float xmodifier = 0.0f;
             float ymodifier = 0.0f;

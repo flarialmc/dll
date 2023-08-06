@@ -1455,15 +1455,15 @@ void FlarialGUI::Notify(std::string text) {
             FlarialGUI::to_wide(text).c_str(),
             wcslen(FlarialGUI::to_wide(text).c_str()),
             textFormat,
-            Constraints::RelativeConstraint(0.45, "height", true),
-            Constraints::RelativeConstraint(0.10, "height", true),
+            Constraints::RelativeConstraint(5.0, "height", true),
+            Constraints::RelativeConstraint(5.0, "height", true),
             &textLayout
     );
 
     DWRITE_TEXT_METRICS textMetrics;
     textLayout->GetMetrics(&textMetrics);
 
-    e.width = textMetrics.width + Constraints::SpacingConstraint(0.65f, textMetrics.width);
+    e.width = textMetrics.width + Constraints::SpacingConstraint(0.60, textMetrics.width);
 
     notifications.push_back(e);
 

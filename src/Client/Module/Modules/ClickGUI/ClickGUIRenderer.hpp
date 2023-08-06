@@ -68,7 +68,6 @@ public:
 
             if (module->settings.getSettingByName<bool>("enabled")->value) {
 
-
                 lerp(baseHeightActual, 0.64f, 0.18f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
                 lerp(realBlurAmount, Client::settings.getSettingByName<float>("blurintensity")->value, 0.15f * FlarialGUI::frameFactor);
 
@@ -481,7 +480,7 @@ public:
 
     void onKey(KeyEvent &event) override {
 
-        if(ClickGUIRenderer::page.type == "normal" && ClickGUIRenderer::curr == "modules" &&  module->settings.getSettingByName<bool>("enabled")->value && event.GetAction() == (int)ActionType::PRESSED) {
+        if(ClickGUIRenderer::page.type == "normal" && ClickGUIRenderer::curr == "modules" &&  module->settings.getSettingByName<bool>("enabled")->value && event.GetAction() == (int)ActionType::PRESSED ) {
 
             FlarialGUI::TextBoxes[0].isActive = true;
 

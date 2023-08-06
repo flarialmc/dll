@@ -21,6 +21,7 @@ private:
         SDK::screenView = pScreenView;
 
         std::string layer = SDK::screenView->VisualTree->root->LayerName;
+
         if (layer != "debug_screen" && layer != "toast_screen") {
             SDK::CurrentScreen = layer;
   
