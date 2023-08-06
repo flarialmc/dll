@@ -25,10 +25,11 @@ bool FlarialGUI::CursorInRect(float rectX, float rectY, float width, float heigh
 }
 
 bool FlarialGUI::isRectInRect(const D2D1_RECT_F& outer, const D2D1_RECT_F& inner) {
-    return (inner.left >= outer.left &&
-            inner.top >= outer.top &&
-            inner.right <= outer.right &&
-            inner.bottom <= outer.bottom);
+
+    return (inner.left <= outer.right &&
+            inner.right >= outer.left &&
+            inner.top <= outer.bottom &&
+            inner.bottom >= outer.top);
 }
 
 static bool CursorInEllipse(float ellipseX, float ellipseY, float radiusX, float radiusY)
@@ -112,6 +113,8 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
 {
     if (isInScrollView)
         y += scrollpos;
+
+    if(isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return false;
 
     static ID2D1SolidColorBrush* textBrush;
     textBrush = FlarialGUI::getBrush(textColor);
@@ -227,6 +230,8 @@ void FlarialGUI::RoundedRect(float x, float y, const D2D_COLOR_F color, const fl
     if (isInScrollView)
         y += scrollpos;
 
+    if(isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
+
     ID2D1SolidColorBrush *brush;
     brush = FlarialGUI::getBrush(color);
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
@@ -263,6 +268,8 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
 {
     if (isInScrollView)
         y += scrollpos;
+
+    if(isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
 
     D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
 
@@ -1003,6 +1010,9 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F
 
     if (isInScrollView)
         y += scrollpos;
+
+    if(isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
+
     ID2D1SolidColorBrush *brush;
 
     brush = FlarialGUI::getBrush(color);
@@ -1024,6 +1034,9 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, D2D1
 
     if (isInScrollView)
         y += scrollpos;
+
+    if(isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
+
     ID2D1SolidColorBrush *brush;
 
     brush = FlarialGUI::getBrush(color);
