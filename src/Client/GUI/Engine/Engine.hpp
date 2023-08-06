@@ -35,6 +35,7 @@ struct TextBoxStruct
     std::string text;
     bool isActive;
     bool firstTime = true;
+    bool isDeleting = false;
 };
 
 struct ColorPicker
@@ -84,6 +85,7 @@ namespace FlarialGUI
 {
     std::stack<Dimension> inline dimension_stack;
     std::vector<float> inline darkenAmounts(10000);
+    std::vector<float> inline glowAlphas(10000);
     std::vector<float> inline opacityAmounts(20);
     std::vector<float> inline toggleSpacings(20);
     std::vector<float> inline rotationAngles(40, 0);
@@ -94,6 +96,7 @@ namespace FlarialGUI
     float inline frameFactor = 1;
 
     inline bool isInScrollView = false;
+    inline D2D1_RECT_F ScrollViewRect = D2D1::RectF();
     float inline scrollpos = 0;
     float inline scrollposmodifier = 0.f;
     float inline barscrollpos = 0;
@@ -115,7 +118,8 @@ namespace FlarialGUI
     void PopSize();
     void PopAllStack();
     bool Button(const float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width = 100.0f, const float height = 160.0f);
-    bool RoundedButton(const int index, const float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width = 160.0f, const float height = 100.0f, const float radiusX = 10.0f, const float radiusY = 10.0f);    void RoundedRectOnlyTopCorner(const float x, float y, D2D_COLOR_F color, const float width = 160, const float height = 100, const float radiusX = 10, const float radiusY = 10);
+    bool RoundedButton(const int index, const float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width = 160.0f, const float height = 100.0f, const float radiusX = 10.0f, const float radiusY = 10.0f, bool glow = false);
+    void RoundedRectOnlyTopCorner(const float x, float y, D2D_COLOR_F color, const float width = 160, const float height = 100, const float radiusX = 10, const float radiusY = 10);
     void RoundedRect(const float x, float y, const D2D_COLOR_F color, float width = 160.0f, const float height = 75, const float radiusX = 10.0f, const float radiusY = 10.0f);
     void LoadImageFromFile(const wchar_t *filename, ID2D1Bitmap **bitmap);
     void RoundedRectWithImageAndText(int index, const float x, float y, const float width, const float height, const D2D1_COLOR_F color, const std::string imagePath, const float imageWidth, const float imageHeight, const wchar_t *text);
@@ -211,7 +215,13 @@ namespace FlarialGUI
     extern ID2D1ImageBrush* shadowbrush;
     extern std::unordered_map<std::string, ID2D1Image*> cachedBitmaps;
 
-    void ShadowRect(D2D1_ROUNDED_RECT rect);
+    void ShadowRect(D2D1_ROUNDED_RECT rect, D2D1_COLOR_F color = D2D1::ColorF(0, 0, 0, 0.75f));
 
     void ApplySusGaussianBlur(float blurIntensity);
+
+    void AllahBlur(float intensity);
+
+    void InnerShadowRect(D2D1_ROUNDED_RECT rect, float howbig, D2D1_COLOR_F color = D2D1::ColorF(0, 0, 0, 0.75f));
+
+    bool isRectInRect(const D2D1_RECT_F &outer, const D2D1_RECT_F &inner);
 };

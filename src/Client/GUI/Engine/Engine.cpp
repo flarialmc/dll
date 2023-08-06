@@ -24,6 +24,14 @@ bool FlarialGUI::CursorInRect(float rectX, float rectY, float width, float heigh
     return false;
 }
 
+bool FlarialGUI::isRectInRect(const D2D1_RECT_F& outer, const D2D1_RECT_F& inner) {
+
+    return (inner.left <= outer.right &&
+            inner.right >= outer.left &&
+            inner.top <= outer.bottom &&
+            inner.bottom >= outer.top);
+}
+
 static bool CursorInEllipse(float ellipseX, float ellipseY, float radiusX, float radiusY)
 {
     float mouseX = MC::mousepos.x;
@@ -101,10 +109,12 @@ bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COL
 
 
 
-bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width, const float height, float radiusX, float radiusY)
+bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text, const float width, const float height, float radiusX, float radiusY, bool glow)
 {
     if (isInScrollView)
         y += scrollpos;
+
+    if(isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return false;
 
     static ID2D1SolidColorBrush* textBrush;
     textBrush = FlarialGUI::getBrush(textColor);
@@ -120,10 +130,10 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
     if (CursorInRect(x, y, width, height))
     {
         buttonColor = D2D1::ColorF(color.r - darkenAmounts[index], color.g - darkenAmounts[index], color.b - darkenAmounts[index], color.a);
-        FadeEffect::ApplyFadeInEffect(0.005f * FlarialGUI::frameFactor, maxDarkenAmount, darkenAmounts[index]);
+        FadeEffect::ApplyFadeInEffect(0.0055f * FlarialGUI::frameFactor, maxDarkenAmount, darkenAmounts[index]);
     } else {
         buttonColor = D2D1::ColorF(color.r - darkenAmounts[index], color.g - darkenAmounts[index], color.b - darkenAmounts[index], color.a);
-        FadeEffect::ApplyFadeOutEffect(0.005f * FlarialGUI::frameFactor, darkenAmounts[index]);
+        FadeEffect::ApplyFadeOutEffect(0.0055f * FlarialGUI::frameFactor, darkenAmounts[index]);
 
     }
 
@@ -132,6 +142,27 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
 
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
     D2D::context->FillRoundedRectangle(roundedRect, brush);
+
+
+    if(CursorInRect(x, y, width, height) && glow) {
+
+        FadeEffect::ApplyFadeInEffect(0.09f * FlarialGUI::frameFactor, 1.0f, glowAlphas[index]);
+
+    } else {
+
+        FadeEffect::ApplyFadeOutEffect(0.09f * FlarialGUI::frameFactor, glowAlphas[index]);
+
+    }
+
+        D2D1_COLOR_F allahColor = FlarialGUI::buttonColors[index];
+        allahColor.r += 0.02f;
+        allahColor.g += 0.02f;
+        allahColor.b += 0.02f;
+        allahColor.a = glowAlphas[index];
+
+        FlarialGUI::InnerShadowRect(D2D1::RoundedRect(D2D1::RectF(x, y, x + width * 1.035f, y + height), radiusX, radiusY), 25,
+                                    allahColor);
+
 
     D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
 
@@ -158,7 +189,7 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
     textBrush = FlarialGUI::getBrush(textColor);
 
     static IDWriteTextFormat* textFormat;
-    FlarialGUI::writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width * 0.64f), L"en-US", &textFormat);
+    FlarialGUI::writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(width * 0.84f), L"en-US", &textFormat);
     textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
     textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
@@ -180,6 +211,7 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
     D2D::context->FillRoundedRectangle(roundedRect, brush);
 
+    x += Constraints::SpacingConstraint(0.077, width);
     D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
 
     textFormat->Release();
@@ -197,6 +229,8 @@ void FlarialGUI::RoundedRect(float x, float y, const D2D_COLOR_F color, const fl
 {
     if (isInScrollView)
         y += scrollpos;
+
+    if(isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
 
     ID2D1SolidColorBrush *brush;
     brush = FlarialGUI::getBrush(color);
@@ -234,6 +268,8 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
 {
     if (isInScrollView)
         y += scrollpos;
+
+    if(isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
 
     D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
 
@@ -457,7 +493,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
     const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
     const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
 
-    text = FlarialGUI::TextBox(index, text, 16, x, y, Constraints::SpacingConstraint(1.55, textWidth), percHeight);
+    text = FlarialGUI::TextBox(index, text, limit, x, y, Constraints::SpacingConstraint(1.55, textWidth), percHeight);
 
     if(TextBoxes[index].isActive) col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
     else col = D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f);
@@ -519,14 +555,12 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
     std::string text;
 
-    if(startingPoint < 1.0f) {
+    if(startingPoint < 10.0f) {
         std::stringstream stream;
         stream << std::fixed << std::setprecision(2) << startingPoint;
         text = stream.str();
     }
     else text = std::to_string((int)startingPoint);
-
-
 
     FlarialGUI::FlarialText(x - Constraints::SpacingConstraint(0.62, textWidth / 2.0f), y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
 
@@ -657,10 +691,6 @@ void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const 
         imageY += scrollpos;
     }
 
-    float fakeX = x;
-    float fakeY = y;
-
-
     ID2D1SolidColorBrush *brush;
 
     brush = FlarialGUI::getBrush(color);
@@ -746,11 +776,13 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
 
         if(timeDifference.count() > 2000) KeybindSelectors[index].isActive = false;
     }
+
     else col = D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f);
 
     FlarialGUI::RoundedRect(x, y, col, percWidth, percHeight, round.x, round.x);
 
     std::string text;
+
     if(KeybindSelectors[index].isActive) {
 
         if(FlarialGUI::currentKeybind != "nothing") {
@@ -978,6 +1010,9 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, D2D1_COLOR_F
 
     if (isInScrollView)
         y += scrollpos;
+
+    if(isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
+
     ID2D1SolidColorBrush *brush;
 
     brush = FlarialGUI::getBrush(color);
@@ -999,6 +1034,9 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, D2D1
 
     if (isInScrollView)
         y += scrollpos;
+
+    if(isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
+
     ID2D1SolidColorBrush *brush;
 
     brush = FlarialGUI::getBrush(color);
@@ -1017,10 +1055,12 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, D2D1
 
 void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
 {
+
     if (isInScrollView) {
         rect.top += scrollpos;
         rect.bottom += scrollpos;
     }
+
     std::string among = Utils::getRoamingPath() + "\\" + imageName;
 
     if(ImagesClass::eimages[imageName] == nullptr)
@@ -1028,7 +1068,15 @@ void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
 
     // Draw image
     D2D1_RECT_F imageRect = D2D1::RectF(rect.left, rect.top, rect.right, rect.bottom);
-    D2D::context->DrawBitmap(ImagesClass::eimages[imageName], imageRect, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+
+    if(isInScrollView) {
+        if(isRectInRect(ScrollViewRect, rect))
+        D2D::context->DrawBitmap(ImagesClass::eimages[imageName], imageRect, 1.0f,
+                                 D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+    } else {
+        D2D::context->DrawBitmap(ImagesClass::eimages[imageName], imageRect, 1.0f,
+                                 D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+    }
 }
 
 void FlarialGUI::LoadImageFromFile(const wchar_t *filename, ID2D1Bitmap **bitmap)
@@ -1066,6 +1114,7 @@ void FlarialGUI::SetScrollView(float x, float y, float width, float height)
 {
     FlarialGUI::isInScrollView = true;
     D2D1_RECT_F clipRect = D2D1::RectF(x, y, x + width, y + height);
+    ScrollViewRect = clipRect;
     D2D::context->PushAxisAlignedClip(&clipRect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
 }
@@ -1569,44 +1618,82 @@ void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect, float intensity) {
 
 }
 
-void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect) {
+void FlarialGUI::AllahBlur(float intensity) {
 
-    
-    // Create a new blank bitmap
-    ID2D1Bitmap1* newLayer = nullptr;
-    D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, D2D::context->GetPixelFormat());
-    D2D::context->CreateBitmap(D2D::context->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
+    // Create Gaussian blur effect
+    if(FlarialGUI::blur == nullptr) {
 
-    if(newLayer != nullptr && FlarialGUI::blur != nullptr) {
-        D2D::context->SetTarget(newLayer);
-        D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
-
-        ID2D1SolidColorBrush *colorBrush = nullptr;
-        colorBrush = FlarialGUI::getBrush(D2D1::ColorF(0, 0, 0, 0.75f));
-        D2D::context->FillRectangle(rect.rect, colorBrush);
-
-        
-
-        FlarialGUI::blur->SetInput(0, newLayer);
-        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
-        FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 10.0f);
-
-        ID2D1Image *out;
-        FlarialGUI::blur->GetOutput(&out);
-
-        // Set the rendering target to the main bitmap
-        if (SwapchainHook::queue != nullptr)
-            D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
-        else D2D::context->SetTarget(SwapchainHook::D2D1Bitmap);
-
-
-        D2D::context->DrawImage(out);
-
-        Memory::SafeRelease(newLayer);
-        Memory::SafeRelease(out);
+        D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &FlarialGUI::blur);
     }
 
-    Memory::SafeRelease(newLayer);
+    if(SwapchainHook::init) {
+
+        ID2D1Bitmap *bitmap = nullptr;
+        if(SwapchainHook::queue != nullptr) FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap], &bitmap);
+        else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap, &bitmap);
+        
+        ID2D1Effect* effect;
+        D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &effect);
+
+        effect->SetInput(0, bitmap);
+
+        // Set blur intensity
+        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_QUALITY);
+        effect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, intensity);
+        // Draw the image with the Gaussian blur effect
+        D2D::context->DrawImage(effect);
+
+        Memory::SafeRelease(bitmap);
+        Memory::SafeRelease(effect);
+    }
+
+}
+
+void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect, D2D1_COLOR_F color) {
+
+    if(!Client::settings.getSettingByName<bool>("noshadows")->value) {
+        // Create a new blank bitmap
+        ID2D1Bitmap1 *newLayer = nullptr;
+        D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET,
+                                                                        D2D::context->GetPixelFormat());
+        D2D::context->CreateBitmap(D2D::context->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
+
+        if (newLayer != nullptr && FlarialGUI::blur != nullptr) {
+            D2D::context->SetTarget(newLayer);
+            D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
+
+            ID2D1SolidColorBrush *colorBrush = nullptr;
+            colorBrush = FlarialGUI::getBrush(color);
+            D2D::context->FillRoundedRectangle(rect, colorBrush);
+
+
+            FlarialGUI::blur->SetInput(0, newLayer);
+            FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+            FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 10.0f);
+
+            ID2D1Image *out;
+            FlarialGUI::blur->GetOutput(&out);
+
+            // Set the rendering target to the main bitmap
+            if (SwapchainHook::queue != nullptr)
+                D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
+            else D2D::context->SetTarget(SwapchainHook::D2D1Bitmap);
+
+
+            D2D::context->DrawImage(out);
+
+            Memory::SafeRelease(newLayer);
+            Memory::SafeRelease(out);
+        }
+
+        Memory::SafeRelease(newLayer);
+    }
+}
+
+void FlarialGUI::InnerShadowRect(D2D1_ROUNDED_RECT rect, float howbig, D2D1_COLOR_F color) {
+
+
 }
 
 void FlarialGUI::CopyBitmap(ID2D1Bitmap1* from, ID2D1Bitmap** to)

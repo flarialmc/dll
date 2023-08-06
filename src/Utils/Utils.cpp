@@ -68,6 +68,13 @@ std::string Utils::GetKeyAsString(int key, bool isCapital) {
             case 88: return "X";
             case 89: return "Y";
             case 90: return "Z";
+            case 45: return "INS";
+            case 46: return "DEL";
+            case 36: return "HOME";
+            case 35: return "END";
+            case 33: return "PG UP";
+            case 34: return "PG DOWN";
+            case 192: return "~";
         }
     } else {
         switch (key) {
@@ -108,6 +115,13 @@ std::string Utils::GetKeyAsString(int key, bool isCapital) {
             case 88: return "x";
             case 89: return "y";
             case 90: return "z";
+            case 192: return "`";
+            case 45: return "INS";
+            case 46: return "DEL";
+            case 36: return "HOME";
+            case 35: return "END";
+            case 33: return "PG UP";
+            case 34: return "PG DOWN";
         }
     }
     // Return empty string for unsupported key codes or non-alphabetic keys
@@ -120,6 +134,12 @@ int Utils::GetStringAsKey(const std::string& str) {
     if(str == "ALT" || str == "alt") return 18;
     if(str == "CTRL" || str == "ctrl") return 17;
     if(str == "SHIFT" || str == "shift") return 16;
+    if(str == "INS" || str == "ins") return 45;
+    if(str == "DEL" || str == "del") return 46;
+    if(str == "HOME" || str == "home") return 36;
+    if(str == "PG UP" || str == "pg up") return 33;
+    if(str == "PG DOWN" || str == "pg down") return 34;
+    if(str == "`" || str == "~") return 192;
     if(str == " ") return 32;
 
     char c = str[0];

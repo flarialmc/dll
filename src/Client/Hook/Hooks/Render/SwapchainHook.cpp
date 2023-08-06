@@ -24,6 +24,7 @@ void SwapchainHook::enableHook()
     void* swapchain_ptr;
 
     int index;
+
     if(kiero::getRenderType() == kiero::RenderType::D3D12)
         index = 140;
     else index = 8;
@@ -40,8 +41,6 @@ void SwapchainHook::enableHook()
 bool SwapchainHook::init = false;
 
 void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
-
-
 
     std::chrono::duration<float> elapsed = fpsclock.now() - start;
     MC::frames += 1;
@@ -219,7 +218,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 /* Blur Stuff */
 
-                if(ModuleManager::doesAnyModuleHave("BlurEffect") || !FlarialGUI::notifications.empty() || ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) {
+                if(ModuleManager::doesAnyModuleHave("BlurEffect") || !FlarialGUI::notifications.empty() || ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value && Client::settings.getSettingByName<float>("blurintensity")->value > 1) {
                     ID2D1Bitmap *bitmap = nullptr;
 
                     if (FlarialGUI::blur == nullptr) {
@@ -236,8 +235,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                     FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
                     FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION,
                                                Client::settings.getSettingByName<float>("blurintensity")->value);
-                    FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION,
-                                               D2D1_GAUSSIANBLUR_OPTIMIZATION_SPEED);
+                    FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_QUALITY);
+
 
                     ID2D1Image *image;
                     FlarialGUI::blur->GetOutput(&image);
@@ -273,7 +272,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 /* Blur Stuff */
 
-                if(ModuleManager::doesAnyModuleHave("BlurEffect") || !FlarialGUI::notifications.empty() || ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) {
+                if(ModuleManager::doesAnyModuleHave("BlurEffect") || !FlarialGUI::notifications.empty() || ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value && Client::settings.getSettingByName<float>("blurintensity")->value > 1) {
                     ID2D1Bitmap *bitmap = nullptr;
 
                     if (FlarialGUI::blur == nullptr) {
@@ -290,8 +289,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                     FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
                     FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION,
                                                Client::settings.getSettingByName<float>("blurintensity")->value);
-                    FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION,
-                                               D2D1_GAUSSIANBLUR_OPTIMIZATION_SPEED);
+                    FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_QUALITY);
+
 
                     ID2D1Image *image;
                     FlarialGUI::blur->GetOutput(&image);

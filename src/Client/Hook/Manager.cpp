@@ -29,6 +29,8 @@ void HookManager::initialize()
 
     if(kiero::getRenderType() == 0) kiero::init(kiero::RenderType::D3D11);
 
+    if(kiero::getRenderType() == 0) { kiero::init(kiero::RenderType::D3D10); Logger::debug("trying d3d10"); }
+
     Logger::debug(std::to_string(kiero::getRenderType()));
 
     hooks.push_back(new KeyHook());

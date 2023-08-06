@@ -1,7 +1,8 @@
 #include "Module.hpp"
 #include "../../Client.hpp"
+#include "ClickGUI/ClickGUIRenderer.hpp"
 
- void Module::NormalRender(int index, std::string text, std::string value) {
+void Module::NormalRender(int index, std::string text, std::string value) {
 
     std::string uppercaseSentence;
     std::string search = "{VALUE}";
@@ -35,6 +36,7 @@
 
     float realspacing = Constraints::SpacingConstraint(0.155f, textWidth);
 
+     if(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
     FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, index);
 
     Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, rectWidth, textHeight);
@@ -75,6 +77,7 @@
                                       rounde.x, rounde.x);
     }
 
-    FlarialGUI::UnsetWindowRect();
+     if(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
+     FlarialGUI::UnsetWindowRect();
 
 }

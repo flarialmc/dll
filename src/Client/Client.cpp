@@ -86,9 +86,8 @@ void Client::initialize()
         { "https://cdn-c6f.pages.dev/assets/hurt.png", Path + "hurt.png" },
         { "https://cdn-c6f.pages.dev/assets/smoke.png", Path + "smoke.png" },
         { "https://cdn-c6f.pages.dev/assets/renderoptions.png", Path + "renderoptions.png" },
-        { "https://cdn-c6f.pages.dev/assets/man.png", Path + "man.png" }
-
-
+        { "https://cdn-c6f.pages.dev/assets/man.png", Path + "man.png" },
+        { "https://cdn-c6f.pages.dev/assets/search.png", Path + "search.png" }
 
     };
 
@@ -107,15 +106,30 @@ void Client::initialize()
     if (Client::settings.getSettingByName<bool>("vsync") == nullptr)
         Client::settings.addSetting("vsync", false);
 
-    // Create threads to download the files
-    std::vector<std::thread> threads;
-    for (const auto& data : fileData) {
-        threads.emplace_back(DownloadAndSave, data.first, data.second);
-    }
+    if (Client::settings.getSettingByName<bool>("dlassets") == nullptr)
+        Client::settings.addSetting("dlassets", true);
 
-    // Wait for all threads to finish
-    for (std::thread& thread : threads) {
-        thread.join();
+    if (Client::settings.getSettingByName<bool>("noicons") == nullptr)
+        Client::settings.addSetting("noicons", false);
+
+    if (Client::settings.getSettingByName<bool>("noshadows") == nullptr)
+        Client::settings.addSetting("noshadows", false);
+
+    if (Client::settings.getSettingByName<bool>("watermark") == nullptr)
+        Client::settings.addSetting("watermark", true);
+
+
+    if(Client::settings.getSettingByName<bool>("dlassets")->value) {
+        // Create threads to download the files
+        std::vector<std::thread> threads;
+        for (const auto &data: fileData) {
+            threads.emplace_back(DownloadAndSave, data.first, data.second);
+        }
+
+        // Wait for all threads to finish
+        for (std::thread &thread: threads) {
+            thread.join();
+        }
     }
 
     std::string fontpath = Utils::getRoamingPath() + "\\Flarial\\assets\\font.ttf";

@@ -6,6 +6,84 @@
 std::map<std::string, ID2D1Bitmap*> ClickGUIElements::images;
 std::vector<D2D1_MATRIX_3X2_F> ClickGUIElements::matrixes;
 std::vector<Vec2<float>> sizes;
+std::vector<Vec2<float>> shadowSizes;
+std::vector<float> searchBarSizes;
+std::vector<float> searchCutOutHeights;
+
+std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit, float x, float y) {
+
+    if(ClickGUIRenderer::page.type == "normal" && ClickGUIRenderer::curr == "modules") {
+
+        D2D1_COLOR_F col;
+
+        Vec2<float> round = Constraints::RoundingConstraint(19, 19);
+
+        if (index > searchBarSizes.size() - 1 || index == 0) {
+            float nigga = Constraints::RelativeConstraint(0.42, "height");
+
+            searchBarSizes.emplace_back(nigga);
+        }
+
+        if (index > searchCutOutHeights.size() - 1 || index == 0) {
+            float nigga = Constraints::RelativeConstraint(0.38, "height");
+
+            searchCutOutHeights.emplace_back(nigga);
+        }
+
+        const float textWidth = searchBarSizes[index];
+        const float percHeight = Constraints::RelativeConstraint(0.42, "height");
+
+        text = FlarialGUI::TextBox(index, text, limit, x - textWidth, y, textWidth,
+                                   percHeight);
+
+        if (FlarialGUI::TextBoxes[index].isActive) {
+
+            FlarialGUI::lerp(searchBarSizes[index], Constraints::RelativeConstraint(2.7f, "height"),
+                             0.12f * FlarialGUI::frameFactor);
+
+            FlarialGUI::lerp(searchCutOutHeights[index], Constraints::RelativeConstraint(0.395, "height"), 0.12f * FlarialGUI::frameFactor);
+
+
+            col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
+
+        } else {
+
+            FlarialGUI::lerp(searchBarSizes[index], Constraints::RelativeConstraint(0.42, "height"),
+                             0.12f * FlarialGUI::frameFactor);
+
+            FlarialGUI::lerp(searchCutOutHeights[index], -0.5f, 0.12f * FlarialGUI::frameFactor);
+
+            col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
+        }
+
+        FlarialGUI::RoundedRect(x - textWidth, y, FlarialGUI::HexToColorF("1c1616"), textWidth, percHeight, round.x,
+                                round.x);
+
+        //if(searchBarSizes[index] > Constraints::RelativeConstraint(0.45, "height")) FlarialGUI::InnerShadowRect(D2D1::RoundedRect(D2D1::RectF(x - textWidth, y, (x - textWidth) + textWidth, y + percHeight), round.x, round.x), 0.25f, D2D1::ColorF(D2D1::ColorF::White, 1.0f));
+
+
+        D2D::context->PushAxisAlignedClip(D2D1::RectF(x - textWidth, y + percHeight, (x - textWidth) + textWidth, y + searchCutOutHeights[index]), D2D1_ANTIALIAS_MODE_ALIASED);
+        FlarialGUI::RoundedRect(x - textWidth, y, col, textWidth, percHeight, round.x,
+                                round.x);
+        D2D::context->PopAxisAlignedClip();
+
+
+        if(searchBarSizes[index] > Constraints::RelativeConstraint(0.45, "height")) {
+            FlarialGUI::FlarialTextWithFont(x - textWidth, y, FlarialGUI::to_wide(text).c_str(),
+                                            D2D1::ColorF(D2D1::ColorF::White),
+                                            textWidth, percHeight,
+                                            DWRITE_TEXT_ALIGNMENT_CENTER,
+                                            Constraints::SpacingConstraint(0.60f, textWidth));
+
+        }
+
+        FlarialGUI::Image("\\Flarial\\assets\\search.png", D2D1::RectF((x - textWidth) + Constraints::RelativeConstraint(0.245, "height") / 2.0f, y + Constraints::RelativeConstraint(0.245, "height") / 2.0f, ((x - textWidth) + Constraints::RelativeConstraint(0.18, "height") / 2.0f) + Constraints::RelativeConstraint(0.22, "height"), (y + Constraints::RelativeConstraint(0.18, "height") / 2.0f) + Constraints::RelativeConstraint(0.22, "height")));
+        return "";
+    } else {
+        return "";
+    }
+}
+
 
 void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string iconpath, const int index)
 {
@@ -19,6 +97,10 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
                 sizes.emplace_back(nigga, gaynigga);
             }
 
+    if (index > shadowSizes.size() - 1 || index == 0) {
+        shadowSizes.emplace_back(0.01, 0.01);
+    }
+
             // Bottom rounded rect
             float BottomRoundedWidth = sizes[index].x;
             float BottomRoundedHeight = sizes[index].y;
@@ -30,6 +112,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
             if (FlarialGUI::isInScrollView) realY += FlarialGUI::scrollpos;
 
             if (FlarialGUI::CursorInRect(x, realY, BottomRoundedWidth, BottomRoundedHeight)) {
+
                 FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.198f, "height", true),
                                  0.15f * FlarialGUI::frameFactor);
                 FlarialGUI::lerp(sizes[index].y, Constraints::RelativeConstraint(0.149f, "height", true),
@@ -38,17 +121,34 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
                 diffX = (sizes[index].x - Constraints::RelativeConstraint(0.19f, "height", true)) / 2.0f;
                 diffY = (sizes[index].y - Constraints::RelativeConstraint(0.141f, "height", true)) / 2.0f;
 
-                FlarialGUI::ShadowRect(D2D1::RoundedRect(D2D1::RectF(x, realY, x + BottomRoundedWidth, realY + BottomRoundedHeight), round.x, round.x));
+                FlarialGUI::lerp(shadowSizes[index].x, BottomRoundedWidth,0.25f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(shadowSizes[index].y, BottomRoundedHeight,0.25f * FlarialGUI::frameFactor);
+
             } else {
+
                 FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.19f, "height", true),
                                  0.15f * FlarialGUI::frameFactor);
                 FlarialGUI::lerp(sizes[index].y, Constraints::RelativeConstraint(0.141f, "height", true),
                                  0.15f * FlarialGUI::frameFactor);
 
+                FlarialGUI::lerp(shadowSizes[index].x, 0.01f, 0.01f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(shadowSizes[index].y, 0.01f, 0.01f * FlarialGUI::frameFactor);
+
                 diffX = (sizes[index].x - Constraints::RelativeConstraint(0.19f, "height", true)) / 2.0f;
                 diffY = (sizes[index].y - Constraints::RelativeConstraint(0.141f, "height", true)) / 2.0f;
+
             }
 
+            
+            if(shadowSizes[index].x > Constraints::RelativeConstraint(0.19f, "height")) {
+
+                float diffX2 = (shadowSizes[index].x - BottomRoundedWidth) / 2.0f;
+                float diffY2 = (shadowSizes[index].y - BottomRoundedHeight) / 2.0f;
+
+                FlarialGUI::ShadowRect(
+                        D2D1::RoundedRect(D2D1::RectF(x - diffX2, realY - diffY2, (x - diffX2)  + shadowSizes[index].x, (realY - diffY2)  + shadowSizes[index].y),
+                                          round.x, round.x));
+            }
 
             x -= diffX;
             y -= diffY;
@@ -63,7 +163,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
             FlarialGUI::RoundedRectOnlyTopCorner(x, y, D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f),
                                                  BottomRoundedWidth, TopRoundedHeight, round.x, round.x);
 
-            FlarialGUI::PushSize(x, y, BottomRoundedWidth, BottomRoundedHeight);
+    FlarialGUI::PushSize(x, y, BottomRoundedWidth, BottomRoundedHeight);
 
             // Mod Name
             float textx = Constraints::PercentageConstraint(0.1405, "left");
@@ -110,8 +210,8 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
                                           FlarialGUI::buttonColors[index], D2D1::ColorF(D2D1::ColorF::White),
                                           FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, round.x,
                                           round.x))
-                mod->settings.getSettingByName<bool>("enabled")->value = !mod->settings.getSettingByName<bool>(
-                        "enabled")->value;
+                mod->settings.getSettingByName<bool>("enabled")->value = !mod->settings.getSettingByName<bool>("enabled")->value;
+
             // Settings Button
             float settingswidth = Constraints::RelativeConstraint(0.17);
             float iconwidth = Constraints::RelativeConstraint(0.10);
@@ -129,6 +229,8 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
             FlarialGUI::RoundedRect(settingx, (buttony - paddingwidth) - paddingheightspac,
                                     D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), paddingwidth,
                                     paddingwidth, round.x, round.x);
+
+            if(!Client::settings.getSettingByName<bool>("noicons")->value)
             FlarialGUI::RoundedRectWithImageAndText(index, settingx2, (buttony - settingswidth) - settingsheightspac,
                                                     settingswidth, settingswidth,
                                                     D2D1::ColorF(112.0f / 255.0f, 93.0f / 255.0f, 96.0f / 255.0f),
@@ -146,6 +248,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
                     modicony += FlarialGUI::scrollpos;
                 }
 
+                if(!Client::settings.getSettingByName<bool>("noicons")->value && FlarialGUI::isRectInRect(FlarialGUI::ScrollViewRect, D2D1::RectF(modiconx, modicony, modiconx + paddingSize,modicony + paddingSize)))
                 D2D::context->DrawBitmap(images[mod->name], D2D1::RectF(modiconx, modicony, modiconx + paddingSize,
                                                                         modicony + paddingSize));
             }
@@ -164,7 +267,6 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
                 GUIMouseListener::accumilatedPos = 0;
                 GUIMouseListener::accumilatedBarPos = 0;
             }
-
             FlarialGUI::PopSize();
 }
 

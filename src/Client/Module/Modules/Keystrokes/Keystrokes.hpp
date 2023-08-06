@@ -229,7 +229,9 @@ public:
 
                 float totalWidth = keycardSize * 3 + spacing * 2;
 
-                FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, totalWidth, totalWidth, index);
+                if(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
+
+                    FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, totalWidth, totalWidth, index);
 
                 Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, totalWidth,
                     totalWidth);
@@ -396,7 +398,9 @@ public:
                 FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, L"-------", textColor, spacebarWidth,
                     spacebarHeight, DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
 
-                FlarialGUI::UnsetWindowRect();
+                if(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
+
+                    FlarialGUI::UnsetWindowRect();
 
             }
         }

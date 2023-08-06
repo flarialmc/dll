@@ -40,9 +40,10 @@ class ClickGUIRenderer : public Listener {
     }
 
     Module* module;
-    std::string curr;
     float baseHeightReal = 0.64f;
     float baseHeightActual = 0.00001f;
+    float realBlurAmount = 0.00001f;
+    std::string searchBarString;
 public:
     static inline bool editmenu = false;
 
@@ -55,6 +56,7 @@ public:
             // watermark
             if (SDK::clientInstance->getTopScreenName() == "inventory_screen" ||
                 SDK::CurrentScreen.find("chest") != std::string::npos)
+                if(Client::settings.getSettingByName<bool>("watermark")->value)
                 FlarialGUI::Image("\\Flarial\\assets\\flarial-title.png",
                                   D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
                                               allahuakbar.y + akbar));
@@ -66,15 +68,23 @@ public:
 
             if (module->settings.getSettingByName<bool>("enabled")->value) {
 
-                FlarialGUI::ApplyGaussianBlur(6.0);
+
                 lerp(baseHeightActual, 0.64f, 0.18f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+                lerp(realBlurAmount, Client::settings.getSettingByName<float>("blurintensity")->value, 0.15f * FlarialGUI::frameFactor);
 
             } else {
+
                 lerp(baseHeightReal, 0.01f, 0.22f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
                 lerp(baseHeightActual, 0.00001f, 0.30f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
-            }
+                lerp(realBlurAmount, 0.00001f, 0.15f * FlarialGUI::frameFactor);
+
+        }
+
+            if(realBlurAmount > 0.01) FlarialGUI::AllahBlur(realBlurAmount);
 
             if (SwapchainHook::init && baseHeightActual > 0.01) {
+
+
 
                 /* Base Rectangle Start */
 
@@ -98,13 +108,12 @@ public:
                                                                    1, 1);
                 Vec2<float> round = Constraints::RoundingConstraint(50, 50);
 
-                FlarialGUI::ShadowRect(D2D1::RoundedRect(
-                        D2D1::RectF(center.x, center.y, center.x + Constraints::SpacingConstraint(1.02f, baseWidth),
-                                    center.y + Constraints::RelativeConstraint(baseHeightReal * 1.02f)), round.x,
-                        round.x));
+
                 FlarialGUI::RoundedRect(center.x, center.y,
                                         D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), baseWidth,
                                         Constraints::RelativeConstraint(baseHeightReal), round.x, round.x);
+
+
                 FlarialGUI::PushSize(center.x, center.y, baseWidth, Constraints::RelativeConstraint(baseHeightActual));
 
                 /* Base Rectangle End */
@@ -134,6 +143,7 @@ public:
                 float logoX = navx - Constraints::SpacingConstraint(0.05, logoWidth);
                 float logoY = (navy + navigationBarHeight / 2.0f - logoWidth / 2.0f);
 
+                if(!Client::settings.getSettingByName<bool>("noicons")->value)
                 FlarialGUI::Image("\\Flarial\\assets\\logo.png",
                                   D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth));
 
@@ -142,7 +152,7 @@ public:
                 /* tab buttons start */
 
 
-                float RadioButtonWidth = Constraints::RelativeConstraint(0.24, "width");
+                float RadioButtonWidth = Constraints::RelativeConstraint(0.185, "width");
                 float RadioButtonHeight = Constraints::RelativeConstraint(0.5);
 
                 float radioX = navx - Constraints::SpacingConstraint(-0.85, logoWidth);
@@ -180,6 +190,8 @@ public:
 
                 radioX -= Constraints::SpacingConstraint(-0.125f, logoWidth);
                 radioY -= Constraints::SpacingConstraint(-0.15f, logoWidth);
+
+                if(!Client::settings.getSettingByName<bool>("noicons")->value)
                 FlarialGUI::Image("\\Flarial\\assets\\modules.png",
                                   D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
 
@@ -188,12 +200,16 @@ public:
                 radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
 
                 round = Constraints::RoundingConstraint(30, 30);
-                radioX += Constraints::SpacingConstraint(15.f, logoWidth);
+                radioX += Constraints::SpacingConstraint(13.f, logoWidth);
                 if (FlarialGUI::RoundedRadioButton(0, radioX, radioY,
                                                    D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
                                                    D2D1::ColorF(D2D1::ColorF::White), L"Settings", RadioButtonWidth,
                                                    RadioButtonHeight, round.x, round.x, "settings", this->curr))
-                    this->curr = "settings";;
+                    this->curr = "settings";
+
+                const float h = Constraints::RelativeConstraint(0.42, "height");
+                const float allahY = (navy + navigationBarHeight / 2.0f - h / 2.0f);
+                ClickGUIElements::SearchBar(0, searchBarString, 12, Constraints::PercentageConstraint(0.022, "right"), allahY);
 
                 radioX -= Constraints::SpacingConstraint(-0.53f, logoWidth);
                 radioY -= Constraints::SpacingConstraint(-0.53f, logoWidth);
@@ -207,6 +223,8 @@ public:
 
                 radioX -= Constraints::SpacingConstraint(-0.125f, logoWidth);
                 radioY -= Constraints::SpacingConstraint(-0.15f, logoWidth);
+
+                if(!Client::settings.getSettingByName<bool>("noicons")->value)
                 FlarialGUI::Image("\\Flarial\\assets\\gear.png",
                                   D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
 
@@ -255,13 +273,45 @@ public:
 
                         int i = 0;
                         for (Module *real: ModuleManager::modules) {
-                            ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
-                                                      real->icon, i);
 
-                            xModifier += Constraints::SpacingConstraint(1.09, modWidth);
-                            if ((++i % 3) == 0) {
-                                yModifier += Constraints::SpacingConstraint(0.8, modWidth);
-                                xModifier = 0.0f;
+                            if(!searchBarString.empty()) {
+
+                                std::string name = real->name;
+
+                                for (char& c : name) {
+                                    c = std::tolower(c);
+                                }
+
+                                std::string search = searchBarString;
+
+                                for (char& c : search) {
+                                    c = std::tolower(c);
+                                }
+
+                                if (name.starts_with(search) ||
+                                    name.find(search) != std::string::npos) {
+
+                                    ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
+                                                              real->icon, i);
+
+                                    xModifier += Constraints::SpacingConstraint(1.09, modWidth);
+                                    if ((++i % 3) == 0) {
+                                        yModifier += Constraints::SpacingConstraint(0.8, modWidth);
+                                        xModifier = 0.0f;
+                                    }
+                                }
+
+                            } else {
+
+                                ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
+                                                          real->icon, i);
+
+                                xModifier += Constraints::SpacingConstraint(1.09, modWidth);
+                                if ((++i % 3) == 0) {
+                                    yModifier += Constraints::SpacingConstraint(0.8, modWidth);
+                                    xModifier = 0.0f;
+                                }
+
                             }
                         }
 
@@ -295,7 +345,7 @@ public:
 
                         FlarialGUI::PushSize(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
 
-                        FlarialGUI::ScrollBar(scrollWidth, scrollHeight, 140, 100, 2);
+                        FlarialGUI::ScrollBar(scrollWidth, scrollHeight, 270, 300, 2);
                         FlarialGUI::SetScrollView(rectX, rectY + Constraints::SpacingConstraint(0.01, rectWidth), Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(1.0, "height"));
 
                         FlarialGUI::TextBoxVisual(0, Client::settings.getSettingByName<std::string>("fontname")->value, 26, Constraints::PercentageConstraint(0.019, "left"), Constraints::PercentageConstraint(0.10, "top"), "Font (Anything installed in your system)");
@@ -325,6 +375,42 @@ public:
                         }
 
                         FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.60, textWidth), rectY, L"Vsync Disabler (Experimental)", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        if (FlarialGUI::Toggle(2, Constraints::PercentageConstraint(0.019, "left"), rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("watermark")->value)) {
+
+                            Client::settings.getSettingByName<bool>("watermark")->value = !Client::settings.getSettingByName<bool>("watermark")->value;
+                        }
+
+                        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.60, textWidth), rectY, L"Watermark In Inventories", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
+
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        if (FlarialGUI::Toggle(3, Constraints::PercentageConstraint(0.019, "left"), rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("dlassets")->value)) {
+
+                            Client::settings.getSettingByName<bool>("dlassets")->value = !Client::settings.getSettingByName<bool>("dlassets")->value;
+                        }
+
+                        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.60, textWidth), rectY, L"Re-Download Assets Every Restart (Recommended)", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        if (FlarialGUI::Toggle(4, Constraints::PercentageConstraint(0.019, "left"), rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("noicons")->value)) {
+
+                            Client::settings.getSettingByName<bool>("noicons")->value = !Client::settings.getSettingByName<bool>("noicons")->value;
+                        }
+
+                        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.60, textWidth), rectY, L"No Icons", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
+
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        if (FlarialGUI::Toggle(5, Constraints::PercentageConstraint(0.019, "left"), rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("noshadows")->value)) {
+
+                            Client::settings.getSettingByName<bool>("noshadows")->value = !Client::settings.getSettingByName<bool>("noshadows")->value;
+                        }
+
+                        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.60, textWidth), rectY, L"No Shadows", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
+
+
 
                         rectY += Constraints::SpacingConstraint(0.35, textWidth);
 
@@ -388,14 +474,26 @@ public:
                 }
 
                 FlarialGUI::PopSize(); // Pops base rect
-
-
             }
 
         FlarialGUI::NotifyHeartbeat();
     }
 
     void onKey(KeyEvent &event) override {
+
+        if(ClickGUIRenderer::page.type == "normal" && ClickGUIRenderer::curr == "modules" &&  module->settings.getSettingByName<bool>("enabled")->value && event.GetAction() == (int)ActionType::PRESSED) {
+
+            FlarialGUI::TextBoxes[0].isActive = true;
+
+            if(FlarialGUI::TextBoxes[0].isActive) {
+
+                FlarialGUI::scrollpos = 0;
+                FlarialGUI::barscrollpos = 0;
+                GUIMouseListener::accumilatedPos = 0;
+                GUIMouseListener::accumilatedBarPos = 0;
+
+            }
+        }
 
         if(module->IsKeybind(event.keys) && module->IsKeyPartOfKeybind(event.key)) {
 
@@ -475,7 +573,15 @@ public:
 
     }
 
+    void onMouse(MouseEvent &event) override {
+
+        if(module->settings.getSettingByName<bool>("enabled")->value || editmenu)
+        event.setCancelled(true);
+
+    }
+
 public:
+
     explicit ClickGUIRenderer(const char string[5], Module *emodule) {
         this->name = string;
         this->module = emodule;
@@ -483,4 +589,6 @@ public:
     }
 
     static inline PageType page;
+    static inline std::string curr;
+
 };
