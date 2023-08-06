@@ -35,6 +35,7 @@
 #include "Modules/TimeChanger/TimeChanger.hpp"
 #include "Modules/RenderOptions/RenderOptions.hpp"
 #include "Modules/HueChanger/HueChanger.hpp"
+#include "Modules/Sneak/Sneak.hpp"
 #include <algorithm>
 
 bool compareNames( Module*& obj1,  Module*& obj2) {
@@ -78,6 +79,7 @@ void ModuleManager::initialize()
     modules.push_back(new TimeChanger());
     modules.push_back(new RenderOptions());
     modules.push_back(new PaperDoll());
+    modules.push_back(new Sneak());
 
 
     std::sort(modules.begin(), modules.end(), compareNames);
