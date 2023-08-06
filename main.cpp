@@ -18,6 +18,8 @@ std::string replaceAll(std::string subject, const std::string& search,
 
 std::string DownloadString(std::string URL);
 
+std::string removeColorCodes(const std::string& input);
+
 DWORD WINAPI init(HMODULE real)
 {
 /*
@@ -48,7 +50,7 @@ DWORD WINAPI init(HMODULE real)
                             std::cout << DownloadString(std::format("https://api.flarial.net/heartbeat/{}/{}",
                                                                     SDK::clientInstance->getLocalPlayer()->playerName,
                                                                     RaknetTickHook::towriteip)) + " " + std::format("https://api.flarial.net/heartbeat/{}/{}",
-                                                                                                                    SDK::clientInstance->getLocalPlayer()->playerName,
+                                                                                                                    removeColorCodes(SDK::clientInstance->getLocalPlayer()->playerName),
                                                                                                                     RaknetTickHook::towriteip) << std::endl;
                             lastBeatTime = now;
                         }
@@ -59,7 +61,7 @@ DWORD WINAPI init(HMODULE real)
                         if(elapsed >= std::chrono::seconds(60)) {
 
                         std::cout << DownloadString(std::format("https://api.flarial.net/heartbeat/{}/is.singleplayer",
-                                                                SDK::clientInstance->getLocalPlayer()->playerName)) + " " + std::format("https://api.flarial.net/heartbeat/{}/is.singleplayer",
+                                                                removeColorCodes(SDK::clientInstance->getLocalPlayer()->playerName))) + " " + std::format("https://api.flarial.net/heartbeat/{}/is.singleplayer",
                                                                                                                                         SDK::clientInstance->getLocalPlayer()->playerName) << std::endl;
 
                         lastBeatTime = now;
@@ -156,4 +158,21 @@ std::string replaceAll(std::string subject, const std::string& search,
         pos += replace.length();
     }
     return subject;
+}
+
+std::string removeColorCodes(const std::string& input) {
+    std::string result;
+    bool skipNext = false;
+
+    for (char c : input) {
+        if (skipNext) {
+            skipNext = false;
+        } else if (c == L'§') {
+            skipNext = true;
+        } else {
+            result += c;
+        }
+    }
+
+    return result;
 }
