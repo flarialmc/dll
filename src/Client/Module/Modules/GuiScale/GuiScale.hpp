@@ -9,7 +9,7 @@ class GuiScale : public Module {
 
 public:
 
-    GuiScale() : Module("GUI Scale", "chike wi!", "\\Flarial\\assets\\nametag.png", 'C') {
+    GuiScale() : Module("MC GUI Scale", "chike wi!", "\\Flarial\\assets\\nametag.png", 'C') {
 
         onEnable();
 
