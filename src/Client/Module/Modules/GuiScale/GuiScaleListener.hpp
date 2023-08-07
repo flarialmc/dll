@@ -65,6 +65,10 @@ public:
         memcpy((LPVOID)real, &floatValue, sizeof(float));
         VirtualProtect((LPVOID)real, sizeof(float), oldProtect, &oldProtect);
 
+        isPatched = false;
+        Logger::debug("patched");
+
+
     }
 
     static void unpatch() {
@@ -74,5 +78,9 @@ public:
         memcpy((LPVOID)real, Original.data(), Original.size());
         VirtualProtect((LPVOID)real, Original.size(), oldProtect, &oldProtect);
 
+        isPatched = false;
+
     }
+
+    static inline bool isPatched = false;
 };
