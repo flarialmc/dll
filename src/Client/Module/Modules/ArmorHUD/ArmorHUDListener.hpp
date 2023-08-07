@@ -78,33 +78,35 @@ public:
 
     void onSetupAndRender(SetupAndRenderEvent& event) override {
 
-        if(SDK::clientInstance->getTopScreenName() == "hud_screen" && module->settings.getSettingByName<bool>("enabled")->value) {
+        if (SDK::clientInstance->getTopScreenName() == "hud_screen" && module->settings.getSettingByName<bool>("enabled")->value) {
 
             BaseActorRenderContext barc(event.muirc->screenContext, event.muirc->clientInstance, event.muirc->clientInstance->mcgame);
 
             Vec2<float> convert = this->convert();
 
+            if(SDK::clientInstance->getLocalPlayer() != nullptr)
+            if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
+                if (SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot)->getItem() != nullptr)
+                    barc.itemRenderer->renderGuiItemNew(&barc, SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot), 0, convert.x, convert.y, 1.0f, module->settings.getSettingByName<float>("uiscale")->value, false);
 
-            if(SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem( SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot)->getItem() != nullptr)
-            barc.itemRenderer->renderGuiItemNew(&barc, SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem( SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot), 0, convert.x, convert.y, 1.0f, module->settings.getSettingByName<float>("uiscale")->value, false);
+                float s = Constraints::RelativeConstraint(0.1, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
 
-            float s = Constraints::RelativeConstraint(0.1, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
+                float spacing = 15 * module->settings.getSettingByName<float>("uiscale")->value;
 
-            float spacing = 15 * module->settings.getSettingByName<float>("uiscale")->value;
+                float xmodifier = 0.0f;
+                float ymodifier = 0.0f;
 
-            float xmodifier = 0.0f;
-            float ymodifier = 0.0f;
+                for (int i = 0; i < 4; i++) {
 
-            for (int i = 0; i < 4; i++) {
+                    if (module->settings.getSettingByName<bool>("vertical")->value) ymodifier += spacing;
+                    else xmodifier += spacing;
 
-                if(module->settings.getSettingByName<bool>("vertical")->value) ymodifier += spacing;
-                else xmodifier += spacing;
+                    if (SDK::clientInstance->getLocalPlayer()->getArmor(i)->getItem() != nullptr) {
 
-                if (SDK::clientInstance->getLocalPlayer()->getArmor(i)->getItem() != nullptr) {
+                        convert = this->convert();
+                        barc.itemRenderer->renderGuiItemNew(&barc, SDK::clientInstance->getLocalPlayer()->getArmor(i), 0, convert.x + xmodifier, convert.y + ymodifier, 1.0f, module->settings.getSettingByName<float>("uiscale")->value, false);
 
-                    convert = this->convert();
-                    barc.itemRenderer->renderGuiItemNew(&barc,  SDK::clientInstance->getLocalPlayer()->getArmor(i), 0, convert.x + xmodifier, convert.y + ymodifier, 1.0f, module->settings.getSettingByName<float>("uiscale")->value, false);
-
+                    }
                 }
             }
         }
