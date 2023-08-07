@@ -12,10 +12,12 @@ Settings Client::settings = Settings();
 
 void DownloadAndSave(std::string url, std::string path) {
 
-    char test[256];
-    strcpy(test, "https://cdn-c6f.pages.dev/");
-    if(InternetCheckConnectionA(test, FLAG_ICC_FORCE_CONNECTION, 0))
-    URLDownloadToFileW(NULL, FlarialGUI::to_wide(url).c_str(), FlarialGUI::to_wide(path).c_str(), 0, NULL);
+    if(Client::settings.getSettingByName<bool>("dlassets")->value || !std::filesystem::exists(path)) {
+        char test[256];
+        strcpy(test, "https://cdn-c6f.pages.dev/");
+        if (InternetCheckConnectionA(test, FLAG_ICC_FORCE_CONNECTION, 0))
+            URLDownloadToFileW(NULL, FlarialGUI::to_wide(url).c_str(), FlarialGUI::to_wide(path).c_str(), 0, NULL);
+    }
 
 }
 
@@ -121,7 +123,7 @@ void Client::initialize()
         Client::settings.addSetting("watermark", true);
 
 
-    if(Client::settings.getSettingByName<bool>("dlassets")->value) {
+
         // Create threads to download the files
         std::vector<std::thread> threads;
         for (const auto &data: fileData) {
@@ -132,7 +134,6 @@ void Client::initialize()
         for (std::thread &thread: threads) {
             thread.join();
         }
-    }
 
     std::string fontpath = Utils::getRoamingPath() + "\\Flarial\\assets\\font.ttf";
     AddFontResource(fontpath.c_str());
@@ -150,10 +151,6 @@ void Client::initialize()
     Sleep(1000);
 
     HookManager::initialize();
-
-    Sleep(1000);
-
-    Logger::debug("reached this point");
 
     FlarialGUI::Notify("Report bugs at https://flarial.net/discord!");
     FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("keybind")->value + " to open the menu in-game.");
