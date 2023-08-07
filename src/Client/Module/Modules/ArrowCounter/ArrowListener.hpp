@@ -28,35 +28,38 @@ public:
 
 
         if (SDK::CurrentScreen == "hud_screen")
-            if (module->settings.getSettingByName<bool>("enabled")->value) {
+            if (module->settings.getSettingByName<bool>("enabled")->value && SDK::clientInstance->getLocalPlayer() != nullptr) {
 
-                auto inventory = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory;
+                if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
 
-                //dosent count offhand yet.
+                    auto inventory = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory;
+
+                    //dosent count offhand yet.
 
 
-                for (int i = 0; i < 36; i++) {
-                    auto item = inventory->getItem(i);
+                    for (int i = 0; i < 36; i++) {
+                        auto item = inventory->getItem(i);
 
-                    if (item->getItem() != NULL) {
-                        if (item->getItem()->name == "arrow") {
-                       
+                        if (item->getItem() != NULL) {
+                            if (item->getItem()->name == "arrow") {
 
-                            int counte = item->count;
-                            if (counte != 16908288) {
-                                auto countagain = 0;
-                                countagain = counte / 65536 - 258;
-                                arrows = arrows + countagain + 2;
+
+                                int counte = item->count;
+                                if (counte != 16908288) {
+                                    auto countagain = 0;
+                                    countagain = counte / 65536 - 258;
+                                    arrows = arrows + countagain + 2;
+                                }
                             }
+
                         }
-
                     }
+
+
+                    this->module->NormalRender(13, module->settings.getSettingByName<std::string>("text")->value, std::to_string(arrows));
+
+                    arrows = 0;
                 }
-
-
-                this->module->NormalRender(13, module->settings.getSettingByName<std::string>("text")->value, std::to_string(arrows));
-
-                arrows = 0;
             }
     }
 

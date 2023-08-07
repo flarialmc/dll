@@ -28,25 +28,28 @@ public:
        
 
         if (SDK::CurrentScreen == "hud_screen")
-            if (module->settings.getSettingByName<bool>("enabled")->value) {
+            if (module->settings.getSettingByName<bool>("enabled")->value && SDK::clientInstance->getLocalPlayer() != nullptr) {
 
-                auto inventory = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory;
+                if(SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
+                    auto inventory = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory;
 
-                for (int i = 0; i < 36; i++) {
-                    auto item = inventory->getItem(i);
+                    for (int i = 0; i < 36; i++) {
+                        auto item = inventory->getItem(i);
 
-                    if (item->getItem() != NULL) {
-                        if (item->getItem()->name == "splash_potion") {
-                            pots++;
+                        if (item->getItem() != NULL) {
+                            if (item->getItem()->name == "splash_potion") {
+                                pots++;
+                            }
                         }
                     }
+
+
+                    this->module->NormalRender(14, module->settings.getSettingByName<std::string>(
+                            "text")->value, std::to_string(pots));
+
+                    pots = 0;
                 }
-
-
-                this->module->NormalRender(14, module->settings.getSettingByName<std::string>("text")->value, std::to_string(pots));
-
-                pots = 0;
-            }
+        }
     }
 
 public:
