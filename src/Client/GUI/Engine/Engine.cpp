@@ -1496,6 +1496,7 @@ void FlarialGUI::NotifyHeartbeat() {
             D2D1_COLOR_F col = FlarialGUI::HexToColorF("110F10");
             col.a = 0.60;
 
+            if(!ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value)
             FlarialGUI::BlurRect(rect, 6.0f);
             FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
                                     col, rectWidth,
@@ -1557,6 +1558,7 @@ void FlarialGUI::NotifyHeartbeat() {
             D2D1_COLOR_F col = FlarialGUI::HexToColorF("110F10");
             col.a = 0.60;
 
+            if(!ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value)
             FlarialGUI::BlurRect(rect, 6.0f);
             FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
                                     col, rectWidth,

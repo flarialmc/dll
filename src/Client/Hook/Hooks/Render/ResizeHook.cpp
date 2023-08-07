@@ -7,6 +7,8 @@
 #include "SwapchainHook.hpp"
 #include "../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
 #include "../../../Module/Modules/MotionBlur/MotionBlurListener.hpp"
+#include "../../../Module/Manager.hpp"
+#include "../../../Module/Modules/GuiScale/GuiScaleListener.hpp"
 
 void ResizeHook::enableHook() {
 
@@ -30,6 +32,13 @@ void ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UI
     ResizeHook::CleanShit(true);
 
     SwapchainHook::init = false;
+
+    if(ModuleManager::getModule("GUI Scale")->settings.getSettingByName<bool>("enabled")->value) {
+
+        GuiScaleListener::unpatch();
+        GuiScaleListener::patch();
+
+    }
 
 
     return func_original(pSwapChain, bufferCount, width, height, newFormat, flags);

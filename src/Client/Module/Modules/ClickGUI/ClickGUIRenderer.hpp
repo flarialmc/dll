@@ -409,21 +409,6 @@ public:
 
                         FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.60, textWidth), rectY, L"No Shadows", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
 
-
-
-                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
-
-                        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left"), rectY, FlarialGUI::to_wide("MC GUI Scale").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
-
-                        percent = FlarialGUI::Slider(8, Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(1.06, textWidth),
-                                                           rectY,
-                                                           D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
-                                                           D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
-                                                           D2D1::ColorF(D2D1::ColorF::White), SDK::clientInstance->guiData->GuiScale, 5);
-
-                        SDK::clientInstance->guiData->GuiScale = percent;
-
-
                         FlarialGUI::UnsetScrollView();
 
                         FlarialGUI::PopSize();
