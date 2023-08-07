@@ -9,7 +9,7 @@ class Utils
 public:
     static std::string getRoamingPath();
 
-    static std::string GetKeyAsString(int key, bool isCapital = false);
+    static std::string GetKeyAsString(int key, bool isCapital = false, bool isKeybind = true);
 
     static int GetStringAsKey(const std::string &str);
 

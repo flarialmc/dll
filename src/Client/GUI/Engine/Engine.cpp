@@ -759,8 +759,6 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
 
     Vec2<float> round = Constraints::RoundingConstraint(13, 13);
 
-    float s = Constraints::RelativeConstraint(0.0285, "height", true);
-
     const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
     const float percWidth = Constraints::RelativeConstraint(0.069, "height", true);
     const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
@@ -774,6 +772,7 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
         std::chrono::steady_clock::time_point currentOnKeyTime = std::chrono::steady_clock::now();
         auto timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(currentOnKeyTime - KeybindSelectors[index].currentOnKeyTime);
 
+        std::cout << timeDifference.count() << std::endl;
         if(timeDifference.count() > 2000) KeybindSelectors[index].isActive = false;
     }
 
@@ -807,13 +806,15 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
 
     if (CursorInRect(x, y, percWidth, percHeight) && MC::mousebutton == MouseButton::Left && !MC::held && !KeybindSelectors[index].isActive)
     {
-        KeybindSelectors[index].isActive = !KeybindSelectors[index].isActive;
+        KeybindSelectors[index].isActive = true;
         KeybindSelectors[index].currentOnKeyTime = std::chrono::steady_clock::now();
+        MC::mousebutton = MouseButton::None;
     }
 
     if (!CursorInRect(x, y, percWidth, percHeight) && MC::mousebutton == MouseButton::Left && !MC::held)
     {
         KeybindSelectors[index].isActive = false;
+
     }
 
 }

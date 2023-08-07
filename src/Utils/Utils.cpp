@@ -18,16 +18,24 @@ std::string Utils::getRoamingPath()
 
 
 
-std::string Utils::GetKeyAsString(int key, bool isCapital) {
+std::string Utils::GetKeyAsString(int key, bool isCapital, bool isKeybind) {
 
     if (key == 32) { // Spacebar key
         return " ";
     }
 
-    if(key == 18) return "ALT";
-    if(key == 17) return "CTRL";
-    if(key == 16) return "SHIFT";
-
+    if(isKeybind) {
+        if (key == 18) return "ALT";
+        if (key == 17) return "CTRL";
+        if (key == 16) return "SHIFT";
+        if (key == 9) return "TAB";
+        if (key == 45) return "INS";
+        if (key == 46) return "DEL";
+        if (key == 36) return "HOME";
+        if (key == 35) return "END";
+        if (key == 33) return "PG UP";
+        if (key == 34) return "PG DOWN";
+    }
 
     if (isCapital) {
         switch (key) {
@@ -68,13 +76,18 @@ std::string Utils::GetKeyAsString(int key, bool isCapital) {
             case 88: return "X";
             case 89: return "Y";
             case 90: return "Z";
-            case 45: return "INS";
-            case 46: return "DEL";
-            case 36: return "HOME";
-            case 35: return "END";
-            case 33: return "PG UP";
-            case 34: return "PG DOWN";
             case 192: return "~";
+            case 40: return "(";
+            case 41: return ")";
+            case 37: return "%";
+            case 91: return "{";
+            case 93: return "}";
+            case 220: return "|";
+            case 191: return "?";
+            case 186: return ":";
+            case 187: return "+";
+            case 219: return "{";
+            case 221: return "}";
         }
     } else {
         switch (key) {
@@ -116,12 +129,12 @@ std::string Utils::GetKeyAsString(int key, bool isCapital) {
             case 89: return "y";
             case 90: return "z";
             case 192: return "`";
-            case 45: return "INS";
-            case 46: return "DEL";
-            case 36: return "HOME";
-            case 35: return "END";
-            case 33: return "PG UP";
-            case 34: return "PG DOWN";
+            case 219: return "[";
+            case 221: return "]";
+            case 220: return "\\";
+            case 191: return "/";
+            case 187: return "=";
+            case 186: return (std::string)";";
         }
     }
     // Return empty string for unsupported key codes or non-alphabetic keys
@@ -139,6 +152,13 @@ int Utils::GetStringAsKey(const std::string& str) {
     if(str == "HOME" || str == "home") return 36;
     if(str == "PG UP" || str == "pg up") return 33;
     if(str == "PG DOWN" || str == "pg down") return 34;
+    if(str == "TAB") return 9;
+    if(str == "{") return 219;
+    if(str == "}") return 221;
+    if(str == "+") return 187;
+    if(str == ":") return 186;
+    if(str == "?") return 191;
+    if(str == "|") return 220;
     if(str == "`" || str == "~") return 192;
     if(str == " ") return 32;
 
