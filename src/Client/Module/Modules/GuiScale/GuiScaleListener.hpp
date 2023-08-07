@@ -56,7 +56,6 @@ public:
     static void patch() {
 
         float floatValue = module->settings.getSettingByName<float>("guiscale")->value; // Replace with your desired float value
-        Logger::debug(std::to_string(floatValue));
         unsigned char aob[sizeof(float)];
 
         floatToAOB(floatValue, aob);

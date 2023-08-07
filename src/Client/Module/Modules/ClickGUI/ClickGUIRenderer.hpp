@@ -77,6 +77,8 @@ public:
                 lerp(baseHeightActual, 0.00001f, 0.30f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
                 lerp(realBlurAmount, 0.00001f, 0.15f * FlarialGUI::frameFactor);
 
+                for(auto& box : FlarialGUI::TextBoxes) box.isActive = false;
+
         }
 
             if(realBlurAmount > 0.01) FlarialGUI::AllahBlur(realBlurAmount);

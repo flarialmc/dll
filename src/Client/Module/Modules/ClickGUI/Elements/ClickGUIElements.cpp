@@ -92,9 +92,9 @@ std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit,
                                           Constraints::RelativeConstraint(0.22, "height")));
             return "";
         }
-    } else {
-        return "";
     }
+
+    return "";
 }
 
 
