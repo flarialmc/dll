@@ -15,6 +15,8 @@ public:
 
     static std::vector<int> GetStringAsKeys(const std::string str);
 
+    std::string removeNonAlphanumeric(const std::string& input);
+
 };
 
 struct MCCColor {
