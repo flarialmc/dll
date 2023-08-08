@@ -218,7 +218,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 /* Blur Stuff */
 
-                if(ModuleManager::doesAnyModuleHave("BlurEffect") || !FlarialGUI::notifications.empty() || ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value && Client::settings.getSettingByName<float>("blurintensity")->value > 1) {
+                if(ModuleManager::doesAnyModuleHave("BlurEffect") && Client::settings.getSettingByName<float>("blurintensity")->value > 1 || !FlarialGUI::notifications.empty() && Client::settings.getSettingByName<float>("blurintensity")->value > 1) {
                     ID2D1Bitmap *bitmap = nullptr;
 
                     if (FlarialGUI::blur == nullptr) {
@@ -272,7 +272,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 /* Blur Stuff */
 
-                if(ModuleManager::doesAnyModuleHave("BlurEffect") || !FlarialGUI::notifications.empty() || ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value && Client::settings.getSettingByName<float>("blurintensity")->value > 1) {
+                if(ModuleManager::doesAnyModuleHave("BlurEffect") && Client::settings.getSettingByName<float>("blurintensity")->value > 1 || !FlarialGUI::notifications.empty() && Client::settings.getSettingByName<float>("blurintensity")->value > 1) {
                     ID2D1Bitmap *bitmap = nullptr;
 
                     if (FlarialGUI::blur == nullptr) {
