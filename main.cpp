@@ -22,13 +22,13 @@ std::string removeColorCodes(const std::string& input);
 
 DWORD WINAPI init(HMODULE real)
 {
-/*
+
     AllocConsole();
     SetConsoleTitleA("Flarial-Debugger");
     FILE* out;
     freopen_s(&out, ("CONOUT$"), ("w"), stdout);
 
-    */
+
 
     Client::initialize();
     Logger::info("Initializing Client");

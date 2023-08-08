@@ -2,6 +2,7 @@
 #include "Utils.hpp"
 #include "Logger/Logger.hpp"
 #include <sstream>
+#include <algorithm>
 
 std::string Utils::getRoamingPath()
 {
@@ -16,7 +17,14 @@ std::string Utils::getRoamingPath()
     return std::string(path) + "\\..\\Local\\Packages\\Microsoft.MinecraftUWP_8wekyb3d8bbwe\\RoamingState";
 };
 
-
+std::string Utils::removeNonAlphanumeric(const std::string& input)
+{
+    std::string result;
+    std::copy_if(input.begin(), input.end(), std::back_inserter(result), [](char c) {
+        return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_';
+    });
+    return result;
+}
 
 std::string Utils::GetKeyAsString(int key, bool isCapital, bool isKeybind) {
 
