@@ -24,6 +24,9 @@ public:
 
         if (settings.getSettingByName<float>("lighting") == nullptr) settings.addSetting("lighting", 0.00f);
 
+        if (settings.getSettingByName<bool>("snow") == nullptr) settings.addSetting("snow", false);
+
+
         EventHandler::registerListener(new WeatherListener("Weather", this));
     }
 
@@ -66,6 +69,10 @@ public:
             D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("lighting")->value, 10.0f);
 
         this->settings.getSettingByName<float>("lighting")->value = percent;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        if (FlarialGUI::Toggle(0, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("snow")->value)) this->settings.getSettingByName<bool>("snow")->value = !this->settings.getSettingByName<bool>("snow")->value;
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(1.15, textWidth / 2.0f), toggleY, L"Snow (intensity depends on rain)", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
 
     }
 };
