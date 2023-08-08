@@ -63,10 +63,19 @@ DWORD WINAPI init(HMODULE real)
                         std::cout << DownloadString(std::format("https://api.flarial.net/heartbeat/{}/is.singleplayer",
                                                                 removeColorCodes(SDK::clientInstance->getLocalPlayer()->playerName))) + " " + std::format("https://api.flarial.net/heartbeat/{}/is.singleplayer",
                                                                                                                                         SDK::clientInstance->getLocalPlayer()->playerName) << std::endl;
-
                         lastBeatTime = now;
                     }
 
+                    } else if (SDK::clientInstance->getLocalPlayer() != nullptr &&
+                                RaknetTickHook::towriteip.find("none") != std::string::npos) {
+
+                        if(elapsed >= std::chrono::seconds(60)) {
+
+                            std::cout << DownloadString(std::format("https://api.flarial.net/heartbeat/{}/is.singleplayer",
+                                                                    removeColorCodes(SDK::clientInstance->getLocalPlayer()->playerName))) + " " + std::format("https://api.flarial.net/heartbeat/{}/is.singleplayer",
+                                                                                                                                                              SDK::clientInstance->getLocalPlayer()->playerName) << std::endl;
+                            lastBeatTime = now;
+                        }
                     }
                 }
                 Sleep(50);
