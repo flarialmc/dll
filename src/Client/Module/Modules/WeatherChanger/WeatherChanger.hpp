@@ -29,7 +29,7 @@ public:
 
     void onDisable() override {
 
-        EventHandler::unregisterListener("Time");
+        EventHandler::unregisterListener("Weather");
 
         Module::onDisable();
 
