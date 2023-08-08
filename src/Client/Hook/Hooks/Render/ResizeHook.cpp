@@ -79,6 +79,12 @@ void ResizeHook::CleanShit(bool isResize) {
 
     FlarialGUI::brushCache.clear();
 
+    for(auto& i : FlarialGUI::textFormatCache) {
+        Memory::SafeRelease(i.second);
+    }
+
+    FlarialGUI::textFormatCache.clear();
+
     ImagesClass::eimages.clear();
 
     if(SwapchainHook::init && SwapchainHook::d3d11On12Device != nullptr) {

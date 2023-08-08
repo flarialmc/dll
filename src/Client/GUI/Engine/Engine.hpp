@@ -112,6 +112,8 @@ namespace FlarialGUI
 
     inline ID2D1Effect* blur = nullptr;
     extern std::unordered_map<std::string, ID2D1SolidColorBrush*> brushCache;
+    extern std::unordered_map<std::string, IDWriteTextFormat*> textFormatCache;
+
 
 
     void PushSize(float x, float y, float width, float height);
@@ -224,4 +226,7 @@ namespace FlarialGUI
     void InnerShadowRect(D2D1_ROUNDED_RECT rect, float howbig, D2D1_COLOR_F color = D2D1::ColorF(0, 0, 0, 0.75f));
 
     bool isRectInRect(const D2D1_RECT_F &outer, const D2D1_RECT_F &inner);
+
+    IDWriteTextFormat *getTextFormat(const std::string &fontFamily, FLOAT fontSize, DWRITE_FONT_WEIGHT fontWeight,
+                                     DWRITE_FONT_STYLE fontStyle, DWRITE_FONT_STRETCH fontStretch, DWRITE_TEXT_ALIGNMENT alignment);
 };

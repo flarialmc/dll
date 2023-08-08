@@ -66,8 +66,6 @@ public:
         VirtualProtect((LPVOID)real, sizeof(float), oldProtect, &oldProtect);
 
         isPatched = false;
-        Logger::debug("patched");
-
 
     }
 
