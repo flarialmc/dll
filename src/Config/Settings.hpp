@@ -18,20 +18,23 @@ public:
 template<typename T>
 class SettingType : public Setting {
 public:
-    SettingType(const T& defaultValue) : value(defaultValue) {}
+    SettingType(std::string name, const T& defaultValue) : value(defaultValue), name(name) {}
 
     json ToJson() const override {
         json jsonData;
+        jsonData["name"] = name;
         jsonData["value"] = value;
         return jsonData;
     }
 
     void FromJson(const json& jsonData) override {
-        if (jsonData.contains("value")) {
+        if (jsonData.is_object() && jsonData.contains("name") && jsonData.contains("value")) {
+            name = jsonData["name"].get<std::string>();
             value = jsonData["value"].get<T>();
         }
     }
 
+    std::string name;
     T value;
 };
 
@@ -39,7 +42,7 @@ class Settings {
 public:
     template<typename T>
     void addSetting(const std::string& name, const T& defaultValue) {
-        settings[name] = std::make_unique<SettingType<T>>(defaultValue);
+        settings[name] = std::make_unique<SettingType<T>>(name, defaultValue);
     }
 
     template<typename T>
@@ -63,7 +66,7 @@ public:
     std::string ToJson() const {
         json jsonData;
         for (const auto& settingPair : settings) {
-            jsonData[settingPair.first] = settingPair.second->ToJson();
+            jsonData.push_back(settingPair.second->ToJson());
         }
         return jsonData.dump(4);
     }
@@ -71,34 +74,28 @@ public:
     void FromJson(const std::string& jsonString) {
         try {
             json jsonData = json::parse(jsonString);
-            for (const auto& item : jsonData.items()) {
-                std::string name = item.key();
-                const json& valueData = item.value();
+            for (const auto& item : jsonData) {
+                std::string name = item["name"].get<std::string>();
 
-                if (valueData.is_object()) {
-                    if (valueData.contains("value")) {
-                        const json& value = valueData["value"];
-                        if (value.is_number()) {
-                            float floatValue = value.get<float>();
-                            addSetting(name, floatValue);
-                        } else if (value.is_string()) {
-                            std::string stringValue = value.get<std::string>();
-                            addSetting(name, stringValue);
-                        } else if (value.is_boolean()) {
-                            bool boolValue = value.get<bool>();
-                            addSetting(name, boolValue);
-                        } else if (value.is_null()) {
-                            // Handle null value if needed
-                        } else {
-                            // Handle unsupported value type
-                        }
-                    }
+                if (item["value"].is_number()) {
+                    float value = item["value"].get<float>();
+                    addSetting(name, value);
+                } else if (item["value"].is_string()) {
+                    std::string value = item["value"].get<std::string>();
+                    addSetting(name, value);
+                } else if (item["value"].is_boolean()) {
+                    bool value = item["value"].get<bool>();
+                    addSetting(name, value);
+                } else if (item["value"].is_null()) {
+                    // Handle null value if needed
+                } else {
+                    // Handle unsupported value type
                 }
             }
         } catch (const std::exception& e) {
-            if (!jsonString.empty()) {
+
+            if(!jsonString.empty())
                 Logger::error(e.what());
-            }
         }
     }
 
