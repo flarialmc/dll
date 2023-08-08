@@ -205,8 +205,10 @@ public:
                 if (FlarialGUI::RoundedRadioButton(0, radioX, radioY,
                                                    D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
                                                    D2D1::ColorF(D2D1::ColorF::White), L"Settings", RadioButtonWidth,
-                                                   RadioButtonHeight, round.x, round.x, "settings", this->curr))
+                                                   RadioButtonHeight, round.x, round.x, "settings", this->curr)) {
+                    FlarialGUI::TextBoxes[0].isActive = false;
                     this->curr = "settings";
+                }
 
                 const float h = Constraints::RelativeConstraint(0.42, "height");
                 const float allahY = (navy + navigationBarHeight / 2.0f - h / 2.0f);
