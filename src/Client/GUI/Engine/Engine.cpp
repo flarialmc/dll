@@ -332,7 +332,6 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
 
     Memory::SafeRelease(sink);
     Memory::SafeRelease(geometry);
-    Memory::SafeRelease(factory);
 }
 
 
@@ -1615,7 +1614,6 @@ void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect, float intensity) {
 
         D2D::context->FillGeometry(geo, FlarialGUI::blurbrush);
 
-        Memory::SafeRelease(factory);
         Memory::SafeRelease(geo);
     }
 
@@ -1656,41 +1654,54 @@ void FlarialGUI::AllahBlur(float intensity) {
 void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect, D2D1_COLOR_F color) {
 
     if(!Client::settings.getSettingByName<bool>("noshadows")->value) {
-        // Create a new blank bitmap
-        ID2D1Bitmap1 *newLayer = nullptr;
-        D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET,
-                                                                        D2D::context->GetPixelFormat());
-        D2D::context->CreateBitmap(D2D::context->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
 
-        if (newLayer != nullptr && FlarialGUI::blur != nullptr) {
-            D2D::context->SetTarget(newLayer);
-            D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
+        if(FlarialGUI::shadowbrush == nullptr) {
+            // Create a new blank bitmap
+            ID2D1Bitmap1 *newLayer = nullptr;
+            D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET,
+                                                                            D2D::context->GetPixelFormat());
+            D2D::context->CreateBitmap(D2D::context->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
 
-            ID2D1SolidColorBrush *colorBrush = nullptr;
-            colorBrush = FlarialGUI::getBrush(color);
-            D2D::context->FillRoundedRectangle(rect, colorBrush);
+            if (newLayer != nullptr && FlarialGUI::blur != nullptr) {
+                D2D::context->SetTarget(newLayer);
+                D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
 
-
-            FlarialGUI::blur->SetInput(0, newLayer);
-            FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
-            FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 10.0f);
-
-            ID2D1Image *out;
-            FlarialGUI::blur->GetOutput(&out);
-
-            // Set the rendering target to the main bitmap
-            if (SwapchainHook::queue != nullptr)
-                D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
-            else D2D::context->SetTarget(SwapchainHook::D2D1Bitmap);
+                ID2D1SolidColorBrush *colorBrush = nullptr;
+                colorBrush = FlarialGUI::getBrush(color);
+                D2D::context->FillRoundedRectangle(rect, colorBrush);
 
 
-            D2D::context->DrawImage(out);
+                FlarialGUI::blur->SetInput(0, newLayer);
+                FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+                FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 10.0f);
+
+                ID2D1Image *out;
+                FlarialGUI::blur->GetOutput(&out);
+
+                // Set the rendering target to the main bitmap
+                if (SwapchainHook::queue != nullptr)
+                    D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
+                else D2D::context->SetTarget(SwapchainHook::D2D1Bitmap);
+
+
+                D2D1_IMAGE_BRUSH_PROPERTIES props = D2D1::ImageBrushProperties(D2D1::RectF(rect.rect.left, rect.rect.top, rect.rect.right, rect.rect.bottom));
+                D2D::context->CreateImageBrush(out, props, &FlarialGUI::shadowbrush);
+
+                Memory::SafeRelease(newLayer);
+                Memory::SafeRelease(out);
+            }
 
             Memory::SafeRelease(newLayer);
-            Memory::SafeRelease(out);
         }
 
-        Memory::SafeRelease(newLayer);
+        if(FlarialGUI::shadowbrush != nullptr) {
+            ID2D1RoundedRectangleGeometry *geo;
+            factory->CreateRoundedRectangleGeometry(rect, &geo);
+
+            D2D::context->FillGeometry(geo, FlarialGUI::shadowbrush);
+
+            Memory::SafeRelease(geo);
+        }
     }
 }
 
