@@ -85,7 +85,6 @@ void ModuleManager::initialize()
     modules.push_back(new Sneak());
     modules.push_back(new GuiScale());
     modules.push_back(new WeatherChanger());
-    modules.push_back(new TabList());
 
 
     std::sort(modules.begin(), modules.end(), compareNames);
