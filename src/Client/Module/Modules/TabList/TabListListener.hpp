@@ -12,6 +12,16 @@ class TabListListener : public Listener {
 
     Module* module;
 
+    void onRender(RenderEvent& event) override {
+
+        if (SDK::CurrentScreen == "hud_screen")
+            if (module->settings.getSettingByName<bool>("enabled")->value) {
+
+                this->module->NormalRender(11, "", "");
+
+            }
+    }
+
 public:
     explicit TabListListener(const char string[5], Module* module) {
         this->name = string;
