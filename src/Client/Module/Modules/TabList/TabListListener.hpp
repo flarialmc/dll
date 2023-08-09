@@ -22,6 +22,17 @@ class TabListListener : public Listener {
             }
     }
 
+    void onKey(KeyEvent& event) override {
+
+        if (SDK::CurrentScreen == "hud_screen")
+            if (module->IsKeybind(event.keys) && module->IsKeyPartOfKeybind(event.key)) {
+            module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value;
+        }
+
+        if (!module->IsKeybind(event.keys)) module->settings.getSettingByName<bool>("enabled")->value = false;
+
+    };
+
 public:
     explicit TabListListener(const char string[5], Module* module) {
         this->name = string;
