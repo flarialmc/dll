@@ -93,9 +93,21 @@ public:
                     rounde.x,
                     rounde.x);
 
+                int i = 0;
+
                 for (const auto& pair : SDK::clientInstance->getLocalPlayer()->getlevel()->playermap) {
-                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(pair.second.name).c_str(), textColor, keycardSize*5, keycardSize,
-                        DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
+
+                    i++;
+                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(Utils::removeNonAlphanumeric(Utils::removeColorCodes(pair.second.name))).c_str(), textColor, keycardSize*5, keycardSize,
+                        DWRITE_TEXT_ALIGNMENT_LEADING, fontSize);
+
+                    realcenter.y += Constraints::SpacingConstraint(0.70, keycardSize);
+
+                    if(i % 8 == 0) {
+                        realcenter.y = vec2.y;
+                        realcenter.x += Constraints::SpacingConstraint(5.0, keycardSize);
+                    }
+
                 }
 
 

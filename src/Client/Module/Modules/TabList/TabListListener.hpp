@@ -17,7 +17,7 @@ class TabListListener : public Listener {
         if (SDK::CurrentScreen == "hud_screen")
             if (module->settings.getSettingByName<bool>("enabled")->value) {
 
-                this->module->NormalRender(11, "", "");
+                this->module->NormalRender(20, "", "");
 
             }
     }

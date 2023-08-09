@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include "../../../Utils/Memory/Memory.hpp"
+#include "../Network/Packet/LoopbackPacketSender.hpp"
 
 
 class ClientInstance {
@@ -21,4 +22,9 @@ public:
     void releaseMouse();
     void refocusMouse();
     std::string getTopScreenName();
+
+    LoopbackPacketSender* getPacketSender()
+    {
+        return *reinterpret_cast<LoopbackPacketSender**>((uintptr_t)this + 0xF0);
+    }
 };

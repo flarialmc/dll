@@ -1,6 +1,7 @@
 ﻿#include <Windows.h>
 #include "Utils.hpp"
 #include "Logger/Logger.hpp"
+#include "../Client/GUI/Engine/Engine.hpp"
 #include <sstream>
 #include <algorithm>
 
@@ -17,11 +18,29 @@ std::string Utils::getRoamingPath()
     return std::string(path) + "\\..\\Local\\Packages\\Microsoft.MinecraftUWP_8wekyb3d8bbwe\\RoamingState";
 };
 
+
+std::string Utils::removeColorCodes(const std::string& input) {
+    std::string result;
+    bool skipNext = false;
+
+    for (wchar_t c : FlarialGUI::to_wide(input)) {
+        if (skipNext) {
+            skipNext = false;
+        } else if (c == L'§') {
+            skipNext = true;
+        } else {
+            result += c;
+        }
+    }
+
+    return result;
+}
+
 std::string Utils::removeNonAlphanumeric(const std::string& input)
 {
     std::string result;
     std::copy_if(input.begin(), input.end(), std::back_inserter(result), [](char c) {
-        return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_';
+        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' || c == ' ' || c == '-';
     });
     return result;
 }

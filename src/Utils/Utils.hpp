@@ -13,9 +13,11 @@ public:
 
     static int GetStringAsKey(const std::string &str);
 
+    static std::string removeColorCodes(const std::string& input);
+
     static std::vector<int> GetStringAsKeys(const std::string str);
 
-    std::string removeNonAlphanumeric(const std::string& input);
+    static std::string removeNonAlphanumeric(const std::string& input);
 
 };
 
