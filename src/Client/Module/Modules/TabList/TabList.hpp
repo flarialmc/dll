@@ -79,7 +79,7 @@ public:
                 this->settings.setValue("percentageX", percentages.x);
                 this->settings.setValue("percentageY", percentages.y);
 
-                float fontSize = Constraints::SpacingConstraint(3, keycardSize);
+                float fontSize = Constraints::SpacingConstraint(3.0, keycardSize);
 
                 D2D1_COLOR_F disabledColor = FlarialGUI::HexToColorF(
                     settings.getSettingByName<std::string>("bgColor")->value);
@@ -92,10 +92,23 @@ public:
                 FlarialGUI::RoundedRect(realcenter.x, realcenter.y, disabledColor, 15 * keycardSize, 7.5f * keycardSize,
                     rounde.x,
                     rounde.x);
-
+                int count = 0;
+                float originalY = realcenter.y;
                 for (const auto& pair : SDK::clientInstance->getLocalPlayer()->getlevel()->playermap) {
-                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(pair.second.name).c_str(), textColor, keycardSize*5, keycardSize,
-                        DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
+                    if (count <= 11) {
+                        FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(pair.second.name).c_str(), textColor, keycardSize * 5, keycardSize,
+                            DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
+                        realcenter.y += Constraints::PercentageConstraint(0.02, "top");
+                        count++;
+                    }
+                    else {
+                        realcenter.y = originalY;
+                        realcenter.x += Constraints::PercentageConstraint(0.08, "left");
+                        FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(pair.second.name).c_str(), textColor, keycardSize * 5, keycardSize,
+                            DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
+                        realcenter.y += Constraints::PercentageConstraint(0.02, "top");
+                        count = 1;
+                    }
                 }
 
 
