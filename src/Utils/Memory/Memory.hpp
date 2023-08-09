@@ -68,6 +68,8 @@ public:
             return;
         }
 
+        MH_EnableHook(pTarget);
+
         Logger::info(std::format("Successfully hooked {} function at {}", name, pTarget));
     }
 

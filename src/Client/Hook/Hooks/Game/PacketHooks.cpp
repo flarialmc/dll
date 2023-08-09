@@ -1,4 +1,5 @@
-#include "SendPacket.hpp"
+#include <iostream>
+#include "PacketHooks.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "../../../../SDK/Client/Network/Packet/TextPacket.hpp"
 
@@ -36,6 +37,17 @@ void SendPacketHook::callback(LoopbackPacketSender* pSender, Packet* pPacket) {
 	sendPacketkOriginal(pSender, pPacket);
 }
 
+void SendPacketHook::receiveCallback(const float* a1, const float* networkIdentifier, const float* netEventCallback, std::shared_ptr<Packet> packet) {
+
+    std::string amongus;
+    std::cout <<  *packet->getName(&amongus) << std::endl;
+
+    return receivePacketkOriginal(a1, networkIdentifier, netEventCallback, packet);
+}
+
 void SendPacketHook::enableHook() {
+
+    std::shared_ptr<Packet> packet = SDK::createPacket((int)MinecraftPacketIds::Text);
+    Memory::hookFunc((void*) packet->packetHandler->vTable[1], receiveCallback, (void**)&receivePacketkOriginal, "ReceivePacketHook");
 	this->autoHook(callback, (void**)&sendPacketkOriginal);
 }

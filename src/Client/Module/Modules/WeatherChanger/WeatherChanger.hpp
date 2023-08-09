@@ -20,7 +20,7 @@ public:
 
         Module::onEnable();
 
-        if (settings.getSettingByName<float>("rain") == nullptr) settings.addSetting("rain", 0.00f);
+        if (settings.getSettingByName<float>("rain") == nullptr) settings.addSetting("rain", 1.00f);
 
         if (settings.getSettingByName<float>("lighting") == nullptr) settings.addSetting("lighting", 0.00f);
 
