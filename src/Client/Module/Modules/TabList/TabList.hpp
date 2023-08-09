@@ -10,7 +10,7 @@ class TabList : public Module {
 public:
 
 
-    TabList() : Module("Tab List", "oAnshul==bari", "\\Flarial\\assets\\cloudy.png", 'o') {
+    TabList() : Module("Tab List", "oAnshul==bari", "\\Flarial\\assets\\list.png", 'o') {
 
         onEnable();
 
@@ -21,7 +21,46 @@ public:
         Module::onEnable();
         EventHandler::registerListener(new TabListListener("TabList", this));
         if (settings.getSettingByName<std::string>("keybind")->value == (std::string)"") settings.getSettingByName<std::string>("keybind")->value = "TAB";
-        if (settings.getSettingByName<bool>("alphaOrder") == nullptr) settings.addSetting<bool>("alphaOrder", false);
+        if (settings.getSettingByName<bool>("alphaOrder") == nullptr) settings.addSetting<bool>("alphaOrder", true);
+    }
+
+    void DefaultConfig() override {
+
+        if(settings.getSettingByName<float>("percentageX") == nullptr) {
+            settings.addSetting("percentageX", 0.0f);
+            settings.addSetting("percentageY", 0.0f);
+        }
+
+        if(settings.getSettingByName<bool>("border") == nullptr) {
+            settings.addSetting("border", false);
+            settings.addSetting("borderWidth", 1.0f);
+        }
+
+        if(settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 32.0f);
+
+        if(settings.getSettingByName<std::string>("bgColor") == nullptr) {
+            settings.addSetting("bgColor", (std::string)"000000");
+            settings.addSetting("textColor", (std::string)"fafafa");
+            settings.addSetting("borderColor", (std::string)"000000");
+        }
+
+        if(settings.getSettingByName<float>("bgOpacity") == nullptr) {
+            settings.addSetting("bgOpacity", 0.55f);
+            settings.addSetting("textOpacity", 1.0f);
+            settings.addSetting("borderOpacity", 1.0f);
+        }
+
+        if(settings.getSettingByName<float>("uiscale") == nullptr) {
+
+            settings.addSetting("uiscale", 0.65f);
+        }
+
+
+
+        if (settings.getSettingByName<bool>("BlurEffect") == nullptr) {
+            settings.addSetting("BlurEffect", true);
+        }
+
     }
 
     void onDisable() override {
@@ -129,8 +168,6 @@ public:
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                 float keycardSize = Constraints::RelativeConstraint(
                     0.05f * this->settings.getSettingByName<float>("uiscale")->value, "height", true);
-                float spacing = Constraints::RelativeConstraint(
-                    0.0015f * this->settings.getSettingByName<float>("uiscale")->value, "height", true);
 
                 Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
                     this->settings.getSettingByName<float>("percentageY")->value);
@@ -169,7 +206,7 @@ public:
                     if (i3 % 10 == 1) {
                         i2 += 4.85;
                         count++;
-                        
+
                         if(count != 1)
                         fakex -= ((5.f * keycardSize) / 2.0f);
                     }
@@ -216,27 +253,69 @@ public:
 
                 int i = 0;
 
-                for (const auto& pair : SDK::clientInstance->getLocalPlayer()->getlevel()->playermap) {
+                bool yes = settings.getSettingByName<bool>("alphaOrder")->value;
 
-                    i++;
-                    FlarialGUI::FlarialTextWithFont(fakex + Constraints::SpacingConstraint(0.5, keycardSize), realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize), FlarialGUI::to_wide(Utils::removeNonAlphanumeric(Utils::removeColorCodes(pair.second.name))).c_str(), textColor, keycardSize*5, keycardSize,
-                        DWRITE_TEXT_ALIGNMENT_LEADING, fontSize);
+                if(yes) {
 
-                    realcenter.y += Constraints::SpacingConstraint(0.70, keycardSize);
+                    auto vecmap = copyMapInAlphabeticalOrder(SDK::clientInstance->getLocalPlayer()->getlevel()->playermap);
+                    for (const auto &pair: vecmap) {
 
-                    if(i % 10 == 0) {
-                        realcenter.y = vec2.y;
-                        fakex += Constraints::SpacingConstraint(5.0, keycardSize);
+                        i++;
+                        FlarialGUI::FlarialTextWithFont(fakex + Constraints::SpacingConstraint(0.5, keycardSize),
+                                                        realcenter.y +
+                                                        Constraints::SpacingConstraint(0.12, keycardSize),
+                                                        FlarialGUI::to_wide(Utils::removeNonAlphanumeric(
+                                                                Utils::removeColorCodes(pair.second.name))).c_str(),
+                                                        textColor, keycardSize * 5, keycardSize,
+                                                        DWRITE_TEXT_ALIGNMENT_LEADING, fontSize);
+
+                        realcenter.y += Constraints::SpacingConstraint(0.70, keycardSize);
+
+                        if (i % 10 == 0) {
+                            realcenter.y = vec2.y;
+                            fakex += Constraints::SpacingConstraint(5.0, keycardSize);
+                        }
+
                     }
 
-                }
+                } else {
+                    for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getlevel()->playermap) {
 
+                        i++;
+                        FlarialGUI::FlarialTextWithFont(fakex + Constraints::SpacingConstraint(0.5, keycardSize),
+                                                        realcenter.y +
+                                                        Constraints::SpacingConstraint(0.12, keycardSize),
+                                                        FlarialGUI::to_wide(Utils::removeNonAlphanumeric(
+                                                                Utils::removeColorCodes(pair.second.name))).c_str(),
+                                                        textColor, keycardSize * 5, keycardSize,
+                                                        DWRITE_TEXT_ALIGNMENT_LEADING, fontSize);
+
+                        realcenter.y += Constraints::SpacingConstraint(0.70, keycardSize);
+
+                        if (i % 10 == 0) {
+                            realcenter.y = vec2.y;
+                            fakex += Constraints::SpacingConstraint(5.0, keycardSize);
+                        }
+
+                    }
+                }
 
                 if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
 
                     FlarialGUI::UnsetWindowRect();
             }
         }
+    }
+
+    std::vector<std::pair<mcUUID, PlayerListEntry>> copyMapInAlphabeticalOrder(const std::unordered_map<mcUUID, PlayerListEntry>& sourceMap) {
+        std::vector<std::pair<mcUUID, PlayerListEntry>> sortedPairs(sourceMap.begin(), sourceMap.end());
+
+        // Sort the vector based on the 'name' field
+        std::sort(sortedPairs.begin(), sortedPairs.end(), [](const auto& a, const auto& b) {
+            return a.second.name < b.second.name;
+        });
+
+        return sortedPairs;
     }
 };
 

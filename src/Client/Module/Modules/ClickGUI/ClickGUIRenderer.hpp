@@ -421,7 +421,10 @@ public:
                     /* Mod Card End */
                 } else if (ClickGUIRenderer::page.type == "settings") {
 
-                    this->curr = "settings";
+                    if(curr != "settings") {
+                        this->curr = "settings";
+                        FlarialGUI::TextBoxes[0].isActive = false;
+                    }
 
                     FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
 
