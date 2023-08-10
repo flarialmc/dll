@@ -3,9 +3,8 @@
 #include "Packet.hpp"
 
 class LoopbackPacketSender {
-private:
-    virtual void destructor();
 public:
-    virtual void send(Packet*);
-    virtual void sendToServer(Packet*);
+    virtual ~LoopbackPacketSender();
+    virtual void send(Packet* packet);
+    virtual void sendToServer(Packet* packet);
 };

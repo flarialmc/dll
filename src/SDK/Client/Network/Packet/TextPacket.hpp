@@ -21,10 +21,15 @@ enum class TextPacketType {
 
 class TextPacket : public Packet {
 public:
-    BUILD_ACCESS(this, TextPacketType, type, 0x8);
-    BUILD_ACCESS(this, std::string, author, 0x38);
-    BUILD_ACCESS(this, std::string, message, 0x58);
-    BUILD_ACCESS(this, bool, translationNeeded, 0x90);
-    BUILD_ACCESS(this, std::string, xuid, 0x98);
-    BUILD_ACCESS(this, std::string, platformId, 0x0B8);
+    TextPacket();
+
+    TextPacketType type;  // 0x28
+
+    std::string name;           // 0x30
+    std::string message;              // 0x50
+    std::vector<std::string> mParams;   // 0x70
+    bool translationNeeded = false;  // 0x88
+
+    std::string xuid;
+    std::string platformId;
 };
