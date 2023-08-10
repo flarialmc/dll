@@ -23,6 +23,7 @@ class ReachListener : public Listener {
         Vec3<float> *TargetPos = event.getActor()->getPosition();
 
         Reach = LPPos->dist(*TargetPos);
+        if(Reach > 3.0f) Reach = 3.0f;
         last_hit = std::chrono::high_resolution_clock::now();
     }
 
