@@ -86,11 +86,11 @@ namespace FlarialGUI
     std::stack<Dimension> inline dimension_stack;
     std::vector<float> inline darkenAmounts(10000);
     std::vector<float> inline glowAlphas(10000);
-    std::vector<float> inline opacityAmounts(20);
-    std::vector<float> inline toggleSpacings(20);
-    std::vector<float> inline rotationAngles(40, 0);
-    std::vector<D2D1_COLOR_F> inline toggleColors(20, D2D1::ColorF(D2D1::ColorF::White));
-    std::vector<D2D1_COLOR_F> inline buttonColors(30, D2D1::ColorF(D2D1::ColorF::Red));
+    std::vector<float> inline opacityAmounts(100);
+    std::vector<float> inline toggleSpacings(100);
+    std::vector<float> inline rotationAngles(100, 0);
+    std::vector<D2D1_COLOR_F> inline toggleColors(100, D2D1::ColorF(D2D1::ColorF::White));
+    std::vector<D2D1_COLOR_F> inline buttonColors(100, D2D1::ColorF(D2D1::ColorF::Red));
 
 
     float inline frameFactor = 1;

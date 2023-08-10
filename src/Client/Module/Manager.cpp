@@ -87,7 +87,6 @@ void ModuleManager::initialize()
     modules.push_back(new GuiScale());
     modules.push_back(new WeatherChanger());
     modules.push_back(new TabList());
-    modules.push_back(new AutoGG());
 
 
     std::sort(modules.begin(), modules.end(), compareNames);

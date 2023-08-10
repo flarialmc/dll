@@ -14,16 +14,16 @@ class AutoGGListener : public Listener {
     Module* module;
 
     void onPacketReceive(PacketEvent& event) override {
-        TextPacket* pkt = reinterpret_cast<TextPacket*>(event.getPacket().get());
-        std::string amongus;
-        if (*pkt->getName(&amongus) == (std::string)"TextPacket") {
-            TextPacket* akbar = reinterpret_cast<TextPacket*>(SDK::createPacket(0x9).get());
-            akbar->setmessage((std::string)"Hello");
 
-            SDK::clientInstance->getPacketSender()->sendToServer(reinterpret_cast<Packet*>(akbar));
-        }
+
 
     }
+    void onPacketSend(PacketEvent& event) override {
+
+
+
+    }
+
 
 public:
     explicit AutoGGListener(const char string[5], Module* module) {
