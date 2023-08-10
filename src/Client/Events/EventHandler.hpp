@@ -7,6 +7,7 @@
 #include "Render/RenderEvent.hpp"
 #include "Game/TickEvent.hpp"
 #include "Game/AttackEvent.hpp"
+#include "Network/PacketEvent.hpp"
 
 class EventHandler {
 
@@ -24,5 +25,8 @@ public:
     static void onSetupAndRender(SetupAndRenderEvent &event);
 
     static void unregisterAll();
+
+    static void onPacketSend(PacketEvent &event);
+    static void onPacketReceive(PacketEvent &event);
 };
 

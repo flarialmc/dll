@@ -2,8 +2,14 @@
 #include "PacketHooks.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "../../../../SDK/Client/Network/Packet/TextPacket.hpp"
+#include "../../../Events/Network/PacketEvent.hpp"
+#include "../../../Events/EventHandler.hpp"
 
 void SendPacketHook::callback(LoopbackPacketSender* pSender, Packet* pPacket) {
+
+    std::shared_ptr<Packet> packet = std::make_shared<Packet>(*pPacket);
+    PacketEvent event(packet);
+    EventHandler::onPacketSend(event);
 
 	/*if (SDK::clientInstance != nullptr) {
 		if (SDK::clientInstance->getLocalPlayer() != nullptr) {
@@ -39,8 +45,8 @@ void SendPacketHook::callback(LoopbackPacketSender* pSender, Packet* pPacket) {
 
 void SendPacketHook::receiveCallback(const float* a1, const float* networkIdentifier, const float* netEventCallback, std::shared_ptr<Packet> packet) {
 
-    std::string amongus;
-    std::cout <<  *packet->getName(&amongus) << std::endl;
+    PacketEvent event(packet);
+    EventHandler::onPacketReceive(event);
 
     return receivePacketkOriginal(a1, networkIdentifier, netEventCallback, packet);
 }

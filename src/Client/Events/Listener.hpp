@@ -5,6 +5,7 @@
 #include "Game/TickEvent.hpp"
 #include "Game/AttackEvent.hpp"
 #include "Render/SetupAndRenderEvent.hpp"
+#include "Network/PacketEvent.hpp"
 
 class Listener {
 public:
@@ -17,4 +18,7 @@ public:
     virtual void onTick(TickEvent &event) {};
     virtual void onAttack(AttackEvent& event) {};
     virtual void onSetupAndRender(SetupAndRenderEvent& event) {};
+    virtual void onPacketSend(PacketEvent &event) {};
+    virtual void onPacketReceive(PacketEvent &event) {};
+
 };

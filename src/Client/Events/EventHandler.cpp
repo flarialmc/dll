@@ -5,6 +5,7 @@
 #include "EventHandler.hpp"
 #include "Render/RenderEvent.hpp"
 #include "../../SDK/SDK.hpp"
+#include "Network/PacketEvent.hpp"
 
 void EventHandler::registerListener(Listener *listener) {
     listeners.push_back(listener);
@@ -33,6 +34,26 @@ void EventHandler::onTick(TickEvent &event) {
         if(event.getActor() == SDK::clientInstance->getLocalPlayer())
         listener->onLocalTick(event);
         else listener->onTick(event);
+
+    }
+
+}
+
+void EventHandler::onPacketSend(PacketEvent &event) {
+
+    for (Listener* &listener: listeners) {
+
+        listener->onPacketSend(event);
+
+    }
+
+}
+
+void EventHandler::onPacketReceive(PacketEvent &event) {
+
+    for (Listener* &listener: listeners) {
+
+        listener->onPacketReceive(event);
 
     }
 
