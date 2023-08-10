@@ -1436,15 +1436,15 @@ void FlarialGUI::Notify(std::string text) {
             FlarialGUI::to_wide(text).c_str(),
             wcslen(FlarialGUI::to_wide(text).c_str()),
             textFormat,
-            Constraints::RelativeConstraint(5.0, "height", true),
-            Constraints::RelativeConstraint(5.0, "height", true),
+            Constraints::RelativeConstraint(100.0, "height", true),
+            Constraints::RelativeConstraint(100.0, "height", true),
             &textLayout
     );
 
     DWRITE_TEXT_METRICS textMetrics;
     textLayout->GetMetrics(&textMetrics);
 
-    e.width = textMetrics.width + Constraints::SpacingConstraint(0.60, textMetrics.width);
+    e.width = textMetrics.width + textMetrics.width * 0.60f;
 
     notifications.push_back(e);
 
@@ -1466,7 +1466,7 @@ void FlarialGUI::NotifyHeartbeat() {
     for (auto& notif : FlarialGUI::notifications) {
 
         float rectWidth = notif.width;
-        float x = Constraints::PercentageConstraint(0.01, "right", true) - Constraints::SpacingConstraint(0.85, rectWidth);
+        float x = Constraints::PercentageConstraint(0.01, "right", true) - rectWidth;
 
         FlarialGUI::lerp(notif.currentPosY, y, 0.20f * FlarialGUI::frameFactor);
 
