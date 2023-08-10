@@ -40,7 +40,7 @@ public:
                 enabled = true;
             }
 
-            float s = Constraints::RelativeConstraint(0.1, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
+            float s = Constraints::RelativeConstraint(0.05, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
 
             float spacing = Constraints::RelativeConstraint(0.0135, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
 
@@ -89,7 +89,6 @@ public:
                 if (SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot)->getItem() != nullptr)
                     barc.itemRenderer->renderGuiItemNew(&barc, SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot), 0, convert.x, convert.y, 1.0f, module->settings.getSettingByName<float>("uiscale")->value, false);
 
-                float s = Constraints::RelativeConstraint(0.1, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
 
                 float spacing = 15 * module->settings.getSettingByName<float>("uiscale")->value;
 
