@@ -29,7 +29,7 @@ class AutoGGListener : public Listener {
 
                 std::string allahuakbar = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pkt->message));
 
-                if (allahuakbar.find("Congratulations, you win!") != std::string::npos || allahuakbar.find("We have found a game") != std::string::npos) {
+                if (allahuakbar.find("won the game") != std::string::npos) {
 
                     innanillah = true;
 
