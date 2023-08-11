@@ -6,21 +6,21 @@
 
 enum SetTitleType {
 
-    Clear = 0x0,
-    Reset_0 = 0x1,
-    Title = 0x2,
-    Subtitle = 0x3,
-    Actionbar = 0x4,
-    Times = 0x5,
-    TitleTextObject = 0x6,
-    SubtitleTextObject = 0x7,
-    ActionbarTextObject = 0x8,
+    Clear,
+    Reset_0,
+    Title,
+    Subtitle,
+    Actionbar,
+    Times,
+    TitleTextObject,
+    SubtitleTextObject,
+    ActionbarTextObject,
 
 };
 
 
 class SetTitlePacket : public Packet {
-    
+
 public:
     SetTitlePacket();
 
