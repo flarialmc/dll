@@ -20,6 +20,8 @@ public:
 
         Module::onEnable();
 
+        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"GG");
+
         EventHandler::registerListener(new AutoGGListener("AutoGG", this));
     }
 
@@ -32,6 +34,15 @@ public:
     }
 
     void SettingsRender() override {
+
+        float toggleX = Constraints::PercentageConstraint(0.019, "left");
+        float toggleY = Constraints::PercentageConstraint(0.10, "top");
+
+        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
+
+        FlarialGUI::TextBoxVisual(5, settings.getSettingByName<std::string>("text")->value, 16, toggleX, toggleY);
+
     }
 };
 
