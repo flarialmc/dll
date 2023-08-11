@@ -531,7 +531,7 @@ std::string FlarialGUI::TextBox(int index, std::string text, int limit, float x,
 
 
 
-float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor, const float startingPoint, const float maxValue) {
+float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor, float startingPoint, const float maxValue) {
 
     // Define the total slider rect width and height
     const float totalWidth = Constraints::RelativeConstraint(0.15, "height", true);
@@ -543,8 +543,6 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
     const float percWidth = Constraints::RelativeConstraint(0.046, "height", true);
     const float percHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
-    FlarialGUI::RoundedRect(x, y, disabledColor, percWidth, percHeight, round.x, round.x);
-
     std::string text;
 
     if(startingPoint < 10.0f) {
@@ -553,6 +551,24 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
         text = stream.str();
     }
     else text = std::to_string((int)startingPoint);
+
+    if(!TextBoxes[30 + index].isActive)
+    FlarialGUI::RoundedRect(x, y, disabledColor, percWidth, percHeight, round.x, round.x);
+    else FlarialGUI::RoundedRect(x, y, color, percWidth, percHeight, round.x, round.x);
+
+
+    text = FlarialGUI::TextBox(30 + index, text, 4, x, y, percWidth, percHeight);
+
+    text = Utils::remomveNonNumeric(text);
+
+    if(!text.empty())
+    startingPoint = std::stof(text);
+    else startingPoint = 0;
+
+    if(startingPoint > maxValue) {
+        startingPoint = maxValue;
+        text = std::to_string(startingPoint);
+    }
 
     FlarialGUI::FlarialText(x - Constraints::SpacingConstraint(0.62, textWidth / 2.0f), y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
 

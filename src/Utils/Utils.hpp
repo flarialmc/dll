@@ -19,6 +19,7 @@ public:
 
     static std::string removeNonAlphanumeric(const std::string& input);
 
+    static std::string remomveNonNumeric(const std::string &input);
 };
 
 struct MCCColor {

@@ -4,6 +4,7 @@
 #include "../Client/GUI/Engine/Engine.hpp"
 #include <sstream>
 #include <algorithm>
+#include <iostream>
 
 std::string Utils::getRoamingPath()
 {
@@ -45,7 +46,17 @@ std::string Utils::removeNonAlphanumeric(const std::string& input)
     return result;
 }
 
+std::string Utils::remomveNonNumeric(const std::string& input)
+{
+    std::string result;
+    std::copy_if(input.begin(), input.end(), std::back_inserter(result), [](char c) {
+        return (c >= '0' && c <= '9') || c == '.';
+    });
+    return result;
+}
+
 std::string Utils::GetKeyAsString(int key, bool isCapital, bool isKeybind) {
+
 
     if (key == 32) { // Spacebar key
         return " ";
@@ -103,6 +114,8 @@ std::string Utils::GetKeyAsString(int key, bool isCapital, bool isKeybind) {
             case 88: return "X";
             case 89: return "Y";
             case 90: return "Z";
+            case 188: return "<";
+            case 190: return ">";
             case 192: return "~";
             case 40: return "(";
             case 41: return ")";
@@ -155,6 +168,8 @@ std::string Utils::GetKeyAsString(int key, bool isCapital, bool isKeybind) {
             case 88: return "x";
             case 89: return "y";
             case 90: return "z";
+            case 188: return ",";
+            case 190: return ".";
             case 192: return "`";
             case 219: return "[";
             case 221: return "]";
