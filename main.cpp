@@ -95,7 +95,6 @@ DWORD WINAPI init(HMODULE real)
             break;
         } else {
 
-
             Sleep(50);
         }
     }

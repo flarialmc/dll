@@ -22,6 +22,20 @@ class AutoGGListener : public Listener {
 
         bool innanillah = false;
 
+            if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
+
+                TextPacket *pkt = reinterpret_cast<TextPacket *>(event.getPacket().get());
+                std::string amongus;
+
+                std::string allahuakbar = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pkt->message));
+
+                if (allahuakbar.find("Congratulations, you win!") != std::string::npos || allahuakbar.find("We have found a game") != std::string::npos) {
+
+                    innanillah = true;
+
+                }
+            }
+
             if (event.getPacket()->getId() == MinecraftPacketIds::SetTitle) {
 
                 SetTitlePacket *pkt = reinterpret_cast<SetTitlePacket *>(event.getPacket().get());
@@ -29,7 +43,7 @@ class AutoGGListener : public Listener {
 
                 std::string allahuakbar = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pkt->text));
 
-                if (allahuakbar.find("won") != std::string::npos || allahuakbar.find("lost") != std::string::npos || allahuakbar.find("spectator") != std::string::npos || allahuakbar.find("last") != std::string::npos || allahuakbar.find("Over") != std::string::npos) {
+                if (allahuakbar.find("won") != std::string::npos || allahuakbar.find("lost") != std::string::npos || allahuakbar.find("specta") != std::string::npos || allahuakbar.find("last") != std::string::npos || allahuakbar.find("Over") != std::string::npos) {
 
                     innanillah = true;
 

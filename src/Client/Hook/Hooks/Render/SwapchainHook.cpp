@@ -42,6 +42,7 @@ bool SwapchainHook::init = false;
 
 void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
 
+
     SwapchainHook::swapchain = pSwapChain;
     SwapchainHook::flagsreal = flags;
 
