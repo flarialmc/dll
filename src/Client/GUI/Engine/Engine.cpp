@@ -562,6 +562,7 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
     text = Utils::remomveNonNumeric(text);
 
 
+    if(!text.empty())
     startingPoint = std::stof(text);
 
     if(startingPoint > maxValue) {

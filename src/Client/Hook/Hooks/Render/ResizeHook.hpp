@@ -15,4 +15,6 @@ public:
     void enableHook() override;
 
     static void CleanShit(bool isResize = false);
+
+    static void call();
 };

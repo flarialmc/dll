@@ -26,6 +26,27 @@ void ResizeHook::enableHook() {
 
 ResizeHook::ResizeHook() : Hook("ResizeHook", "") {}
 
+void ResizeHook::call() {
+
+
+    /*
+    int index;
+
+    if(kiero::getRenderType() == kiero::RenderType::D3D12)
+        index = 145;
+    else index = 13;
+
+    auto ResizePtr = (void *)kiero::getMethodsTable()[index];
+
+    using efunc = void(__cdecl*)(IDXGISwapChain*, UINT bufferCount, UINT width, UINT height, DXGI_FORMAT newFormat, UINT flags);
+    auto func = reinterpret_cast<efunc>(ResizePtr);
+
+
+   func(SwapchainHook::swapchain, 0, MC::windowSize.x, MC::windowSize.y, DXGI_FORMAT_UNKNOWN, SwapchainHook::flagsreal);
+     */
+
+}
+
 void ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT width, UINT height, DXGI_FORMAT newFormat, UINT flags)
 {
 

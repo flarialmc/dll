@@ -42,6 +42,9 @@ bool SwapchainHook::init = false;
 
 void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
 
+    SwapchainHook::swapchain = pSwapChain;
+    SwapchainHook::flagsreal = flags;
+
     std::chrono::duration<float> elapsed = fpsclock.now() - start;
     MC::frames += 1;
 

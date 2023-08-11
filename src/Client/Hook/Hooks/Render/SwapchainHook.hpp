@@ -26,6 +26,7 @@ public:
     static inline std::vector<IDXGISurface1*> DXGISurfaces;
     static inline std::vector<ID2D1Bitmap1*> D2D1Bitmaps;
     static inline std::vector<ID3D11Resource*> D3D11Resources;
+    static inline IDXGISwapChain3* swapchain;
     static inline ID3D12DescriptorHeap* D3D12DescriptorHeap;
     static inline ID3D11On12Device* d3d11On12Device;
     static inline ID2D1Bitmap1* D2D1Bitmap;
@@ -33,4 +34,5 @@ public:
     static inline uintptr_t bufferCount;
     static bool hasResized;
     static int currentBitmap;
+    static inline UINT flagsreal;
 };
