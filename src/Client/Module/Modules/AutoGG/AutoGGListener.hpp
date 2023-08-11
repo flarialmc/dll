@@ -14,30 +14,30 @@ class AutoGGListener : public Listener {
     Module* module;
 
     void onPacketReceive(PacketEvent& event) override {
-
+        if (module->settings.getSettingByName<bool>("enabled")){
 
         TextPacket *pkt = reinterpret_cast<TextPacket *>(event.getPacket().get());
         std::string amongus;
 
-        if (*pkt->getName(&amongus) == (std::string) "TextPacket") {
+        if (*pkt->getName(&amongus) == (std::string)"TextPacket") {
+            std::string allahuakbar = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pkt->message));
+            if (allahuakbar == (std::string)"Queued Use the bed to return to lobby" or allahuakbar == (std::string)"Game OVER") {
+                auto player = SDK::clientInstance->getLocalPlayer();
+                std::string xuid = *player->getXuid(&xuid);
+                std::shared_ptr<Packet> packet = SDK::createPacket(9);
+                TextPacket* akbar = reinterpret_cast<TextPacket*>(packet.get());
 
-            /*
-            auto player = SDK::clientInstance->getLocalPlayer();
-            std::string xuid = *player->getXuid(&xuid);
+                akbar->type = TextPacketType::CHAT;
+                akbar->message = module->settings.getSettingByName<std::string>("text")->value;
+                akbar->platformId = "";
+                akbar->translationNeeded = false;
+                akbar->xuid = xuid;
+                akbar->name = player->playerName;
 
-            std::shared_ptr<Packet> packet = SDK::createPacket(9);
-            TextPacket* akbar = reinterpret_cast<TextPacket *>(packet.get());
+                SDK::clientInstance->getPacketSender()->sendToServer(akbar);
 
-            akbar->type = TextPacketType::CHAT;
-            akbar->message = "hello";
-            akbar->platformId = "";
-            akbar->translationNeeded = false;
-            akbar->xuid = xuid;
-            akbar->name = player->playerName;
-
-            SDK::clientInstance->getPacketSender()->sendToServer(akbar);
-             */
-
+            }
+        }
         }
     }
 
