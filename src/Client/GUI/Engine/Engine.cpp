@@ -561,9 +561,8 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
     text = Utils::remomveNonNumeric(text);
 
-    if(!text.empty())
+
     startingPoint = std::stof(text);
-    else startingPoint = 0;
 
     if(startingPoint > maxValue) {
 
@@ -1201,17 +1200,33 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
         }
 
         if (CursorInRect(x, y, width, height) && MC::held) {
+
             WindowRects[currentNum].isMovingElement = true;
             WindowRects[currentNum].hasBeenMoved = true;
             WindowRects[currentNum].movedX = MC::mousepos.x - width / 2.0f;
             WindowRects[currentNum].movedY = MC::mousepos.y - height / 2.0f;
+
+            if(WindowRects[currentNum].movedX < 0) WindowRects[currentNum].movedX = 0;
+            if(WindowRects[currentNum].movedY < 0) WindowRects[currentNum].movedY = 0;
+
+            if(WindowRects[currentNum].movedX + width > MC::windowSize.x) WindowRects[currentNum].movedX = MC::windowSize.x - width;
+            if(WindowRects[currentNum].movedY + height > MC::windowSize.y ) WindowRects[currentNum].movedY = MC::windowSize.y - height;
+
             WindowRects[currentNum].percentageX = WindowRects[currentNum].movedX / MC::windowSize.x;
             WindowRects[currentNum].percentageY = WindowRects[currentNum].movedY / MC::windowSize.y;
+
         } else if (MC::held && WindowRects[currentNum].isMovingElement) {
+
             WindowRects[currentNum].isMovingElement = true;
             WindowRects[currentNum].hasBeenMoved = true;
             WindowRects[currentNum].movedX = MC::mousepos.x - width / 2.0f;
             WindowRects[currentNum].movedY = MC::mousepos.y - height / 2.0f;
+
+            if(WindowRects[currentNum].movedX < 0) WindowRects[currentNum].movedX = 0;
+            if(WindowRects[currentNum].movedY < 0) WindowRects[currentNum].movedY = 0;
+
+            if(WindowRects[currentNum].movedX + width > MC::windowSize.x) WindowRects[currentNum].movedX = MC::windowSize.x - width;
+            if(WindowRects[currentNum].movedY + height > MC::windowSize.y ) WindowRects[currentNum].movedY = MC::windowSize.y - height;
 
             WindowRects[currentNum].percentageX = WindowRects[currentNum].movedX / MC::windowSize.x;
             WindowRects[currentNum].percentageY = WindowRects[currentNum].movedY / MC::windowSize.y;
