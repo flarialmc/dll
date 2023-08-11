@@ -132,7 +132,7 @@ namespace FlarialGUI
     void UnsetScrollView();
     Vec2<float> GetCenterXY(float rectWidth = 160.0f, float rectHeight = 75.0f);
     void ScrollBar(float x, float y, float width, float height, float radius);
-    void SetWindowRect(float x, float y, float width, float height, int currentNum);
+    void SetWindowRect(float x, float y, float width, float height, int currentNum, float fixer = 0);
     void UnsetWindowRect();
     Vec2<float> CalculateMovedXY(float x, float y, int num, float rectWidth = 0.0f, float rectHeight = 0.0f);
     Vec2<float> CalculateResizedXY(float x, float y, float width, float height);

@@ -42,8 +42,8 @@ public:
                 enabled = true;
             }
 
-            float width = Constraints::RelativeConstraint(0.0080, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
-            float height = Constraints::RelativeConstraint(0.0090, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
+            float width = Constraints::RelativeConstraint(0.0052, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
+            float height = Constraints::RelativeConstraint(0.0040, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
 
 
             Vec2<float> settingperc = Vec2<float>(module->settings.getSettingByName<float>("percentageX")->value,

@@ -198,6 +198,7 @@ public:
                 int count = 0;
 
                 float fakex = realcenter.x;
+                float fixer = 0;
 
                 for (const auto& pair : SDK::clientInstance->getLocalPlayer()->getlevel()->playermap) {
 
@@ -207,8 +208,10 @@ public:
                         i2 += 4.85;
                         count++;
 
-                        if(count != 1)
-                        fakex -= ((5.f * keycardSize) / 2.0f);
+                        if(count != 1) {
+                            fakex -= ((5.f * keycardSize) / 2.0f);
+                            fixer += ((5.f * keycardSize) / 2.0f);
+                        }
                     }
 
                 }
@@ -222,7 +225,7 @@ public:
                 float totalWidth = i2 * keycardSize;
 
                 if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
-                    FlarialGUI::SetWindowRect(fakex, realcenter.y, totalWidth, keycardSize * 7.5f, index);
+                    FlarialGUI::SetWindowRect(fakex, realcenter.y, totalWidth, keycardSize * 7.5f, index, fixer);
 
                 Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, totalWidth,keycardSize * 7.5f);
 
@@ -247,7 +250,7 @@ public:
                 textColor.a = settings.getSettingByName<float>("textOpacity")->value;
                 if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
                     if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(fakex, realcenter.y, fakex + (i2 * keycardSize), realcenter.y + (7.5*keycardSize)), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value); 
-                FlarialGUI::RoundedRect(fakex, realcenter.y, disabledColor, i2 * keycardSize, 7.5f * keycardSize,
+                FlarialGUI::RoundedRect(fakex, realcenter.y, disabledColor, totalWidth, 7.5f * keycardSize,
                     rounde.x,
                     rounde.x);
 

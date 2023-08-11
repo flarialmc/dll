@@ -1177,7 +1177,7 @@ void FlarialGUI::ScrollBar(float x, float y, float width, float height, float ra
      */
 }
 
-void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int currentNum)
+void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int currentNum, float fixer)
 {
     isInWindowRect = true;
 
@@ -1195,22 +1195,17 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 
     if(!ye) {
 
-        if (WindowRects[currentNum].hasBeenMoved) {
-            x = Constraints::PercentageConstraint(WindowRects[currentNum].percentageX, "left", true);
-            y = Constraints::PercentageConstraint(WindowRects[currentNum].percentageY, "top", true);
-        }
-
         if (CursorInRect(x, y, width, height) && MC::held) {
 
             WindowRects[currentNum].isMovingElement = true;
             WindowRects[currentNum].hasBeenMoved = true;
-            WindowRects[currentNum].movedX = MC::mousepos.x - width / 2.0f;
-            WindowRects[currentNum].movedY = MC::mousepos.y - height / 2.0f;
+            WindowRects[currentNum].movedX = (MC::mousepos.x - width / 2.0f) + fixer;
+            WindowRects[currentNum].movedY = (MC::mousepos.y - height / 2.0f);
 
-            if(WindowRects[currentNum].movedX < 0) WindowRects[currentNum].movedX = 0;
+            if(WindowRects[currentNum].movedX - fixer < 0) WindowRects[currentNum].movedX = 0.001 + fixer;
             if(WindowRects[currentNum].movedY < 0) WindowRects[currentNum].movedY = 0;
 
-            if(WindowRects[currentNum].movedX + width > MC::windowSize.x) WindowRects[currentNum].movedX = MC::windowSize.x - width;
+            if(WindowRects[currentNum].movedX + width - fixer > MC::windowSize.x) WindowRects[currentNum].movedX = MC::windowSize.x - width + fixer;
             if(WindowRects[currentNum].movedY + height > MC::windowSize.y ) WindowRects[currentNum].movedY = MC::windowSize.y - height;
 
             WindowRects[currentNum].percentageX = WindowRects[currentNum].movedX / MC::windowSize.x;
@@ -1220,14 +1215,15 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 
             WindowRects[currentNum].isMovingElement = true;
             WindowRects[currentNum].hasBeenMoved = true;
-            WindowRects[currentNum].movedX = MC::mousepos.x - width / 2.0f;
-            WindowRects[currentNum].movedY = MC::mousepos.y - height / 2.0f;
+            WindowRects[currentNum].movedX = (MC::mousepos.x - width / 2.0f) + fixer;
+            WindowRects[currentNum].movedY = (MC::mousepos.y - height / 2.0f);
 
-            if(WindowRects[currentNum].movedX < 0) WindowRects[currentNum].movedX = 0;
+            if(WindowRects[currentNum].movedX - fixer < 0) WindowRects[currentNum].movedX = 0.001 + fixer;
             if(WindowRects[currentNum].movedY < 0) WindowRects[currentNum].movedY = 0;
 
-            if(WindowRects[currentNum].movedX + width > MC::windowSize.x) WindowRects[currentNum].movedX = MC::windowSize.x - width;
+            if(WindowRects[currentNum].movedX + width - fixer > MC::windowSize.x) WindowRects[currentNum].movedX = MC::windowSize.x - width + fixer;
             if(WindowRects[currentNum].movedY + height > MC::windowSize.y ) WindowRects[currentNum].movedY = MC::windowSize.y - height;
+
 
             WindowRects[currentNum].percentageX = WindowRects[currentNum].movedX / MC::windowSize.x;
             WindowRects[currentNum].percentageY = WindowRects[currentNum].movedY / MC::windowSize.y;

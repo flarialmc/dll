@@ -40,7 +40,7 @@ public:
                 enabled = true;
             }
 
-            float s = Constraints::RelativeConstraint(0.05, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
+            float s = Constraints::RelativeConstraint(0.04, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
 
             float spacing = Constraints::RelativeConstraint(0.0135, "height", true) * module->settings.getSettingByName<float>("uiscale")->value;
 
@@ -51,12 +51,12 @@ public:
                 currentPos = Vec2<float>(settingperc.x * MC::windowSize.x,
                                          settingperc.y * MC::windowSize.y);
             else
-                currentPos = Constraints::CenterConstraint(s * 4 + spacing * 4, s);
+                currentPos = Constraints::CenterConstraint(s * 3 + spacing * 3, s);
 
             if(ClickGUIRenderer::editmenu)
-            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, s * 4 + spacing * 4, s, 18);
+            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, s * 3 + spacing * 3, s, 18);
 
-            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x , currentPos.y, 18, s * 4 + spacing * 4, s);
+            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x , currentPos.y, 18, s * 3 + spacing * 3, s);
 
 
             currentPos.x = vec2.x;
