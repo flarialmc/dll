@@ -61,21 +61,24 @@ int getViewPerspectiveHook::callback(uintptr_t* a1) {
     auto mod = ModuleManager::getModule("SnapLook");
     auto freemod = ModuleManager::getModule("FreeLook");
 
-    if (freemod->settings.getSettingByName<bool>("enabled")->value && SDK::raknetConnector->JoinedIp.find("hive") !=  std::string::npos) {
-        FlarialGUI::Notify("Can't use freelook on " + SDK::raknetConnector->JoinedIp);
-        freemod->settings.getSettingByName<bool>("enabled")->value = false;
+    if(freemod != nullptr) {
+        if (freemod->settings.getSettingByName<bool>("enabled")->value &&
+            SDK::raknetConnector->JoinedIp.find("hive") != std::string::npos) {
+            FlarialGUI::Notify("Can't use freelook on " + SDK::raknetConnector->JoinedIp);
+            freemod->settings.getSettingByName<bool>("enabled")->value = false;
+        }
     }
 
-        if (mod != nullptr && freemod != nullptr && SDK::CurrentScreen == "hud_screen") {
+        if (mod != nullptr && SDK::CurrentScreen == "hud_screen") {
 
         if (mod->settings.getSettingByName<bool>("enabled")->value) {
             return 2;
         }
 
+        if(freemod != nullptr)
             if (freemod->settings.getSettingByName<bool>("enabled")->value) {
                 return 1;
             }
-    
     }
 	return getViewPerspectiveOriginal(a1);
 }

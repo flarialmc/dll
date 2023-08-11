@@ -57,7 +57,7 @@ void Client::initialize()
         { "https://cdn-c6f.pages.dev/assets/font.ttf", Path + "font.ttf" },
         { "https://cdn-c6f.pages.dev/assets/logo.png", Path + "logo.png" },
         { "https://cdn-c6f.pages.dev/assets/fps.png", Path + "fps.png" },
-        { "https://cdn-c6f.pages.dev/assets/autogg.png", Path + "autogg.png" },
+        { "https://cdn-c6f.pages.dev/assets/like.png", Path + "like.png" },
         { "https://cdn-c6f.pages.dev/assets/auto_sprint.png", Path + "auto_sprint.png" },
         { "https://cdn-c6f.pages.dev/assets/clickgui.png", Path + "clickgui.png" },
         { "https://cdn-c6f.pages.dev/assets/modules.png", Path + "modules.png" },

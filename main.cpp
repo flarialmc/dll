@@ -23,12 +23,14 @@ std::string removeColorCodes(const std::string& input);
 DWORD WINAPI init(HMODULE real)
 {
 
-    /*
-    AllocConsole();
-    SetConsoleTitleA("Flarial-Debugger");
-    FILE* out;
-    freopen_s(&out, ("CONOUT$"), ("w"), stdout);
-     */
+
+    if(GetConsoleWindow() == nullptr) {
+        AllocConsole();
+        SetConsoleTitleA("Flarial-Debugger");
+        FILE *out;
+        freopen_s(&out, ("CONOUT$"), ("w"), stdout);
+    }
+
 
 
 

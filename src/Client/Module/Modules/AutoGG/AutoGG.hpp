@@ -10,7 +10,7 @@ class AutoGG : public Module {
 public:
 
 
-    AutoGG() : Module("Auto GG", "oAnshul==bari", "\\Flarial\\assets\\time.png", 'o') {
+    AutoGG() : Module("Auto GG", "oAnshul==bari", "\\Flarial\\assets\\like.png", 'o') {
 
         onEnable();
 
