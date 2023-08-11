@@ -608,7 +608,20 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
     SliderRects[index].percentageX = percentage;
 
+    if(CursorInRect(farLeftX, y, totalWidth, height) && MC::held) {
+
+        SliderRects[index].movedX = MC::mousepos.x;
+        SliderRects[index].hasBeenMoved = true;
+        SliderRects[index].isMovingElement = true;
+
+        percentage = ((SliderRects[index].movedX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
+        SliderRects[index].percentageX = percentage;
+
+    }
+
+
     if (CursorInEllipse(circleX, circleY, circleRadius, circleRadius) && MC::held) {
+
         if(MC::mousepos.x > farLeftX && MC::mousepos.x < farRightX) {
 
             SliderRects[index].movedX = MC::mousepos.x;
