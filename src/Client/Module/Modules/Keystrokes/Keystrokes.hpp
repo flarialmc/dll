@@ -59,12 +59,12 @@ public:
             settings.addSetting("borderWidth", 1.0f);
         }
 
-        if (settings.getSettingByName<std::string>("bgColor") == nullptr) {
+        if (settings.getSettingByName<std::string>("enabledColor") == nullptr) {
             settings.addSetting("enabledColor", (std::string)"fafafa");
 
         }
 
-        if (settings.getSettingByName<float>("bgOpacity") == nullptr) {
+        if (settings.getSettingByName<float>("enabledOpacity") == nullptr) {
             settings.addSetting("enabledOpacity", 0.55f);
         }
 
@@ -156,47 +156,28 @@ public:
 
         if (FlarialGUI::Toggle(4, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("BlurEffect")->value)) this->settings.getSettingByName<bool>("BlurEffect")->value = !this->settings.getSettingByName<bool>("BlurEffect")->value;
 
-        /* Color Pickers Start*/
-
-        toggleX = Constraints::PercentageConstraint(0.55, "left");
-        toggleY -= Constraints::SpacingConstraint(0.65, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Unpressed").c_str(),
-            D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight,
-            DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
-        FlarialGUI::ColorPicker(3, toggleX + Constraints::SpacingConstraint(0.79, textWidth),
-            toggleY - Constraints::SpacingConstraint(0.017, textWidth),
-            settings.getSettingByName<std::string>("bgColor")->value,
-            settings.getSettingByName<float>("bgOpacity")->value);
-
         toggleX = Constraints::PercentageConstraint(0.55, "left");
         toggleY = Constraints::PercentageConstraint(0.10, "top");
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Text").c_str(),
-            D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight,
-            DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
-        FlarialGUI::ColorPicker(4, toggleX + Constraints::SpacingConstraint(0.40, textWidth), toggleY * 0.99f,
-            settings.getSettingByName<std::string>("textColor")->value,
-            settings.getSettingByName<float>("textOpacity")->value);
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Background").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+        FlarialGUI::ColorPicker(0, toggleX + Constraints::SpacingConstraint(0.95, textWidth), toggleY - Constraints::SpacingConstraint(0.017, textWidth), settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value);
 
-        toggleY += Constraints::SpacingConstraint(0.70, textWidth);
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Pressed").c_str(),
-            D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight,
-            DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
-        FlarialGUI::ColorPicker(5, toggleX + Constraints::SpacingConstraint(0.63, textWidth), toggleY * 0.99f,
-            settings.getSettingByName<std::string>("enabledColor")->value,
-            settings.getSettingByName<float>("enabledColor")->value);
-        /* Color Pickers End */
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Text").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+        FlarialGUI::ColorPicker(1, toggleX + Constraints::SpacingConstraint(0.40, textWidth), toggleY * 0.99f, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value);
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Pressed").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+        FlarialGUI::ColorPicker(2, toggleX + Constraints::SpacingConstraint(0.65, textWidth), toggleY * 0.99f, settings.getSettingByName<std::string>("enabledColor")->value, settings.getSettingByName<float>("enabledOpacity")->value);
 
         FlarialGUI::UnsetScrollView();
 
-        FlarialGUI::ColorPickerWindow(3, settings.getSettingByName<std::string>("bgColor")->value,
-            settings.getSettingByName<float>("bgOpacity")->value);
-        FlarialGUI::ColorPickerWindow(4, settings.getSettingByName<std::string>("textColor")->value,
-            settings.getSettingByName<float>("textOpacity")->value);
-        FlarialGUI::ColorPickerWindow(5, settings.getSettingByName<std::string>("enabledColor")->value,
-            settings.getSettingByName<float>("enabledOpacity")->value);
+        FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value);
+        FlarialGUI::ColorPickerWindow(1, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value);
+        FlarialGUI::ColorPickerWindow(2, settings.getSettingByName<std::string>("enabledColor")->value, settings.getSettingByName<float>("enabledOpacity")->value);
+        /* Color Pickers End */
 
     }
 
