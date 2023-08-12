@@ -96,6 +96,22 @@ public:
 
         this->settings.getSettingByName<float>("uiscale")->value = percent;
 
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        if (FlarialGUI::Toggle(0, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("border")->value)) this->settings.getSettingByName<bool>("border")->value = !this->settings.getSettingByName<bool>("border")->value;
+
+
+
+        FlarialGUI::FlarialText(toggleX + Constraints::SpacingConstraint(0.75, textWidth / 2.0f), toggleY, L"Border", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
+
+
+        percent = FlarialGUI::Slider(5, toggleX + Constraints::SpacingConstraint(1.2, textWidth),
+            toggleY,
+            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+            D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("borderWidth")->value, 4);
+
+        this->settings.getSettingByName<float>("borderWidth")->value = percent;
+
         /* Rounding Start */
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         toggleX -= Constraints::SpacingConstraint(0.175, textWidth);
@@ -112,7 +128,7 @@ public:
 
         this->settings.getSettingByName<float>("rounding")->value = percent;
 
-        toggleY += Constraints::SpacingConstraint(0.30, textWidth);
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         toggleX = Constraints::PercentageConstraint(0.019, "left");
 
         FlarialGUI::KeybindSelector(0, Constraints::PercentageConstraint(0.019, "left"), toggleY, settings.getSettingByName<std::string>("keybind")->value);
@@ -142,23 +158,26 @@ public:
         /* Color Pickers Start*/
 
         toggleX = Constraints::PercentageConstraint(0.55, "left");
-        toggleY -= Constraints::SpacingConstraint(0.72, textWidth);
+        toggleY = Constraints::PercentageConstraint(0.10, "top");
 
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Background").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
         FlarialGUI::ColorPicker(0, toggleX + Constraints::SpacingConstraint(0.95, textWidth), toggleY - Constraints::SpacingConstraint(0.017, textWidth), settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value);
 
-        toggleX = Constraints::PercentageConstraint(0.55, "left");
-        toggleY = Constraints::PercentageConstraint(0.10, "top");
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Text").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
         FlarialGUI::ColorPicker(1, toggleX + Constraints::SpacingConstraint(0.40, textWidth), toggleY * 0.99f, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Border").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+        FlarialGUI::ColorPicker(2, toggleX + Constraints::SpacingConstraint(0.55, textWidth), toggleY * 0.99f, settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value);
+
         FlarialGUI::UnsetScrollView();
 
         FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value);
         FlarialGUI::ColorPickerWindow(1, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value);
+        FlarialGUI::ColorPickerWindow(2, settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value);
 
     }
 
@@ -245,11 +264,19 @@ public:
                     settings.getSettingByName<std::string>("bgColor")->value);
                 D2D1_COLOR_F textColor = FlarialGUI::HexToColorF(
                     settings.getSettingByName<std::string>("textColor")->value);
+                D2D1_COLOR_F borderColor = FlarialGUI::HexToColorF(
+                    settings.getSettingByName<std::string>("borderColor")->value);
 
                 disabledColor.a = settings.getSettingByName<float>("bgOpacity")->value;
                 textColor.a = settings.getSettingByName<float>("textOpacity")->value;
+                borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
                 if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
                     if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(fakex, realcenter.y, fakex + (i2 * keycardSize), realcenter.y + (7.5*keycardSize)), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value); 
+                if (this->settings.getSettingByName<bool>("border")->value) {
+                    FlarialGUI::RoundedHollowRect(realcenter.x, realcenter.y, Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * (settings.getSettingByName<float>("uiscale")->value) / 100.0f), "height", true),
+                        borderColor, totalWidth, 7.5f * keycardSize,
+                        rounde.x, rounde.x);
+                }
                 FlarialGUI::RoundedRect(fakex, realcenter.y, disabledColor, totalWidth, 7.5f * keycardSize,
                     rounde.x,
                     rounde.x);
