@@ -54,7 +54,7 @@ void ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UI
 
     SwapchainHook::init = false;
 
-    if(ModuleManager::getModule("MC GUI Scale")->settings.getSettingByName<bool>("enabled")->value && GuiScaleListener::isPatched) {
+    if(ModuleManager::getModule("MC GUI Scale")->settings.getSettingByName<bool>("enabled")->value) {
 
         GuiScaleListener::unpatch();
         GuiScaleListener::patch();

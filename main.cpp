@@ -95,7 +95,6 @@ DWORD WINAPI init(HMODULE real)
             break;
         } else {
 
-
             Sleep(50);
         }
     }
@@ -140,7 +139,7 @@ BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReser
 }
 
 std::string DownloadString(std::string URL) {
-    HINTERNET interwebs = InternetOpenA("Mozilla/5.0", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, NULL);
+    HINTERNET interwebs = InternetOpenA("Samsung Smart Fridge", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, NULL);
     HINTERNET urlFile;
     std::string rtn;
     if (interwebs) {
