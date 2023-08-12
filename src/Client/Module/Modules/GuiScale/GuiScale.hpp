@@ -56,6 +56,8 @@ public:
                                            D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("guiscale")->value, 4.0f);
 
         this->settings.getSettingByName<float>("guiscale")->value = percent;
+        SDK::clientInstance->guiData.GuiScale = percent;
+        SDK::clientInstance->guiData.ScreenResScaled = { MC::windowSize.x * 1 / percent, MC::windowSize.y * 1 / percent };
        
 
     }
