@@ -13,13 +13,12 @@
 class AutoGGListener : public Listener {
 
     Module* module;
+    bool prevPacketSent = false;
 
     void onPacketReceive(PacketEvent &event) override {
 
 
         if (module->settings.getSettingByName<bool>("enabled")->value) {
-
-
             bool innanillah = false;
 
             if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
@@ -54,32 +53,48 @@ class AutoGGListener : public Listener {
             }
 
             if (innanillah) {
-
-                auto player = SDK::clientInstance->getLocalPlayer();
-                std::string xuid = *player->getXuid(&xuid);
-                std::shared_ptr<Packet> packet = SDK::createPacket(9);
-                TextPacket *akbar = reinterpret_cast<TextPacket *>(packet.get());
-
                 std::string stringToSendYessir = module->settings.getSettingByName<std::string>("text")->value;
-
-                akbar->type = TextPacketType::CHAT;
-                akbar->message = stringToSendYessir;
-                akbar->platformId = "";
-                akbar->translationNeeded = false;
-                akbar->xuid = xuid;
-                akbar->name = player->playerName;
-
                 if (!stringToSendYessir.empty()) {
+                    if (prevPacketSent) {
+                        prevPacketSent = false;
+                        return;
+                    }
+
+                    std::cout << "bing chilling lol gg" << std::endl;
+
+                    prevPacketSent = true;
+
+                    auto player = SDK::clientInstance->getLocalPlayer();
+                    std::string xuid = *player->getXuid(&xuid);
+                    std::shared_ptr<Packet> packet = SDK::createPacket(9);
+                    TextPacket *akbar = reinterpret_cast<TextPacket *>(packet.get());
+
+
+                    akbar->type = TextPacketType::CHAT;
+                    akbar->message = stringToSendYessir;
+                    akbar->platformId = "";
+                    akbar->translationNeeded = false;
+                    akbar->xuid = xuid;
+                    akbar->name = player->playerName;
+
                     SDK::clientInstance->getPacketSender()->sendToServer(akbar);
                 }
-
             }
         }
     }
 
     void onPacketSend(PacketEvent &event) override {
-
-
+//        if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
+//            TextPacket *pkt = reinterpret_cast<TextPacket *>(event.getPacket().get());
+//            std::string allahuakbar = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pkt->message));
+//            std::string stringToSendYessir = module->settings.getSettingByName<std::string>("text")->value;
+//
+//            std::cout << allahuakbar << std::endl;
+//
+//            if (allahuakbar == stringToSendYessir) {
+//
+//            }
+//        }
     }
 
 
