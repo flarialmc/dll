@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "GuiScaleListener.hpp"
 #include "../../../Events/EventHandler.hpp"
 
 
@@ -17,13 +16,7 @@ public:
 
     void onEnable() override {
 
-        std::vector<uint8_t> original;
-        original.resize(4);
-        memcpy(original.data(), (LPVOID)Memory::findSig("00 00 ? ? 00 00 A0 40 00 00 C0 40"), 4);
-
-        EventHandler::registerListener(new GuiScaleListener("GuiScaleListener", this, original));
-
-        if(settings.getSettingByName<float>("guiscale") == nullptr) settings.addSetting("guiscale", 2.0f);
+                if(settings.getSettingByName<float>("guiscale") == nullptr) settings.addSetting("guiscale", 2.0f);
 
 
         Module::onEnable();
@@ -41,7 +34,7 @@ public:
     }
 
     void onDisable() override {
-        GuiScaleListener::unpatch();
+        
         Module::onDisable();
     }
 
@@ -63,6 +56,7 @@ public:
                                            D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("guiscale")->value, 4.0f);
 
         this->settings.getSettingByName<float>("guiscale")->value = percent;
+       
 
     }
 };
