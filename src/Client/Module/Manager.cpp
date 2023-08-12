@@ -40,6 +40,7 @@
 #include "Modules/WeatherChanger/WeatherChanger.hpp"
 #include "Modules/TabList/TabList.hpp"
 #include "Modules/AutoGG/AutoGG.hpp"
+#include "Modules/TextHotkey/TextHotkey.hpp"
 #include <algorithm>
 
 bool compareNames( Module*& obj1,  Module*& obj2) {
@@ -87,6 +88,7 @@ void ModuleManager::initialize()
     modules.push_back(new WeatherChanger());
     modules.push_back(new TabList());
     modules.push_back(new AutoGG());
+    modules.push_back(new TextHotkey());
 
 
     std::sort(modules.begin(), modules.end(), compareNames);
