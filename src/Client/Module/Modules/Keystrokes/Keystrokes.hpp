@@ -212,7 +212,7 @@ public:
 
                 if(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
 
-                    FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, totalWidth, totalWidth, index);
+                    FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, totalWidth, totalWidth, index, keycardSize + spacing);
 
                 Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, totalWidth,
                     totalWidth);
