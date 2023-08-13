@@ -102,17 +102,20 @@ void Client::initialize()
     Client::CheckSettingsFile();
     Client::LoadSettings();
 
-    if(Client::settings.getSettingByName<std::string>("fontname") == nullptr)
+    if (Client::settings.getSettingByName<std::string>("fontname") == nullptr)
         Client::settings.addSetting("fontname", (std::string)"Space Grotesk");
 
-    if(Client::settings.getSettingByName<float>("blurintensity") == nullptr)
+    if (Client::settings.getSettingByName<float>("blurintensity") == nullptr)
         Client::settings.addSetting("blurintensity", 18.0f);
 
-    if(Client::settings.getSettingByName<bool>("killdx") == nullptr)
+    if (Client::settings.getSettingByName<bool>("killdx") == nullptr)
         Client::settings.addSetting("killdx", false);
 
     if (Client::settings.getSettingByName<bool>("vsync") == nullptr)
         Client::settings.addSetting("vsync", false);
+
+    if (Client::settings.getSettingByName<bool>("anonymousApi") == nullptr)
+        Client::settings.addSetting("anonymousApi", false);
 
     if (Client::settings.getSettingByName<bool>("dlassets") == nullptr)
         Client::settings.addSetting("dlassets", true);

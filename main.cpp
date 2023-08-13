@@ -25,12 +25,12 @@ DWORD WINAPI init(HMODULE real)
 
 
 
-//    if(GetConsoleWindow() == nullptr) {
-//        AllocConsole();
-//        SetConsoleTitleA("Flarial-Debugger");
-//        FILE *out;
-//        freopen_s(&out, ("CONOUT$"), ("w"), stdout);
-//    }
+    if(GetConsoleWindow() == nullptr) {
+        AllocConsole();
+        SetConsoleTitleA("Flarial-Debugger");
+        FILE *out;
+        freopen_s(&out, ("CONOUT$"), ("w"), stdout);
+    }
 
 
 
@@ -46,43 +46,26 @@ DWORD WINAPI init(HMODULE real)
 
             if(!Client::disable) {
                 if(SDK::hasInstanced) {
-
-                    if (SDK::clientInstance->getLocalPlayer() != nullptr &&
-                        RaknetTickHook::towriteip.find("none") != std::string::npos) {
-
+                    if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                         if(elapsed >= std::chrono::seconds(60)) {
+                            std::string ipToSend;
 
-                            std::cout << DownloadString(std::format("https://api.flarial.net/heartbeat/{}/is.singleplayer",
-                                                                    removeColorCodes(SDK::clientInstance->getLocalPlayer()->playerName))) + " " + std::format("https://api.flarial.net/heartbeat/{}/is.singleplayer",
-                                                                                                                                                              SDK::clientInstance->getLocalPlayer()->playerName) << std::endl;
-                            lastBeatTime = now;
-                        }
-                    }
+                            std::cout << "watermark? " << Client::settings.getSettingByName<bool>("watermark")->value << std::endl;
+                            std::cout << "anonymous? " << Client::settings.getSettingByName<bool>("anonymousApi")->value << std::endl;
+                            if (!Client::settings.getSettingByName<bool>("anonymousApi")->value) {
+                                if (RaknetTickHook::towriteip.find("none") != std::string::npos) ipToSend = "in.singleplayer";
+                                else if (!RaknetTickHook::towriteip.empty()) ipToSend = RaknetTickHook::towriteip;
+                                else ipToSend = "in.singleplayer";
+                            } else ipToSend = "is.anonymous";
 
-                    else if (SDK::clientInstance->getLocalPlayer() != nullptr &&
-                        !RaknetTickHook::towriteip.empty()) {
-
-                        if(elapsed >= std::chrono::seconds(60)) {
-
+                            // send thing
                             std::cout << DownloadString(std::format("https://api.flarial.net/heartbeat/{}/{}",
                                                                     SDK::clientInstance->getLocalPlayer()->playerName,
-                                                                    RaknetTickHook::towriteip)) + " " + std::format("https://api.flarial.net/heartbeat/{}/{}",
+                                                                    ipToSend)) + " " + std::format("https://api.flarial.net/heartbeat/{}/{}",
                                                                                                                     removeColorCodes(SDK::clientInstance->getLocalPlayer()->playerName),
-                                                                                                                    RaknetTickHook::towriteip) << std::endl;
+                                                                                                                    ipToSend) << std::endl;
                             lastBeatTime = now;
                         }
-
-                    } else if (SDK::clientInstance->getLocalPlayer() != nullptr &&
-                            RaknetTickHook::towriteip.empty()) {
-
-                        if(elapsed >= std::chrono::seconds(60)) {
-
-                        std::cout << DownloadString(std::format("https://api.flarial.net/heartbeat/{}/is.singleplayer",
-                                                                removeColorCodes(SDK::clientInstance->getLocalPlayer()->playerName))) + " " + std::format("https://api.flarial.net/heartbeat/{}/is.singleplayer",
-                                                                                                                                        SDK::clientInstance->getLocalPlayer()->playerName) << std::endl;
-                        lastBeatTime = now;
-                    }
-
                     }
                 }
                 Sleep(50);
@@ -91,7 +74,7 @@ DWORD WINAPI init(HMODULE real)
         }
     });
     statusThread.detach();
-    
+
     while (true) {
         if (Client::disable) {
             break;
