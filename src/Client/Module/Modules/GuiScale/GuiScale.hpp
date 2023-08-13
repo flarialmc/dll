@@ -58,7 +58,7 @@ public:
         this->settings.getSettingByName<float>("guiscale")->value = percent;
         SDK::clientInstance->guiData->GuiScale = percent;
         SDK::clientInstance->guiData->ScreenSizeScaled = { SDK::clientInstance->guiData->ScreenSize.x * 1 / percent, SDK::clientInstance->guiData->ScreenSize.y * 1 / percent };
-       
+        SDK::clientInstance->guiData->scalingMultiplier = 1 / percent;
 
     }
 };
