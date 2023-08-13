@@ -53,11 +53,11 @@ public:
             else
                 currentPos = Constraints::CenterConstraint(s * 3 + spacing * 3, s);
 
-            if(ClickGUIRenderer::editmenu)
+            if(ClickGUIRenderer::editmenu) {
                 if (!module->settings.getSettingByName<bool>("vertical")->value)
-                 FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, s * 3 + spacing * 3, s, 18);
+                    FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, s * 3 + spacing * 3, s, 18);
                 else FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, s, s * 3 + spacing * 3, 18);
-
+            }
 
             Vec2<float> vec2;
             
@@ -80,6 +80,8 @@ public:
         } else {
             enabled = false;
         }
+
+        if (SDK::CurrentScreen != "hud_screen") ClickGUIRenderer::editmenu = false;
     }
 
     void onSetupAndRender(SetupAndRenderEvent& event) override {
