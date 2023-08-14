@@ -8,10 +8,16 @@
 #include <cstdint>
 #include "../../../Utils/Memory/Memory.hpp"
 #include "../Network/Packet/LoopbackPacketSender.hpp"
+#include "Minecraft.hpp"
 
 
 class ClientInstance {
 public:
+
+    Minecraft* getMinecraft()
+    {
+        return *reinterpret_cast<Minecraft**>((uintptr_t)this + 0xD0);
+    }
 
     BUILD_ACCESS(this, MinecraftGame*, mcgame, 0x0C8);
     BUILD_ACCESS(this, GuiData*, guiData, 0x540);

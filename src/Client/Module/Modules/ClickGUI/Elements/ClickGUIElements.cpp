@@ -272,6 +272,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
             if (FlarialGUI::CursorInRect(buttonx - paddingspacing, (buttony - paddingwidth) - paddingheightspac,
                                          paddingwidth, paddingwidth) && MC::mousebutton == MouseButton::Left &&
                 !MC::held) {
+                FlarialGUI::TextBoxes[0].isActive = false;
                 MC::mousebutton = MouseButton::None;
                 ClickGUIRenderer::page.type = "settings";
                 ClickGUIRenderer::page.module = mod->name;
