@@ -9,7 +9,7 @@ class NickModule : public Module {
 
 public:
 
-    NickModule() : Module("Nick", "lets you change your username in chat.", "\\Flarial\\assets\\skull.png", 'C') {
+    NickModule() : Module("Nick", "lets you change your username in chat.", "\\Flarial\\assets\\icognito.png", 'C') {
 
         onEnable();
 
