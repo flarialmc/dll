@@ -12,6 +12,7 @@
 #include "../Level/Level.hpp"
 #include "../Container/Inventory.hpp"
 #include "../../../Utils/Utils.hpp"
+#include "Components/StateVectorComponent.hpp"
 
 enum ActorFlags
 {
@@ -136,6 +137,7 @@ public:
 
     BUILD_ACCESS(this, Level*, level, 0x260);
     BUILD_ACCESS(this, ActorRotationComponent*, actorRotationComponent, 0x2B0);
+    BUILD_ACCESS(this, StateVectorComponent*, stateVector, 0x2A0);
    
 
     template <typename Component>
