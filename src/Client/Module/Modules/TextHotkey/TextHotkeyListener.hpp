@@ -27,7 +27,7 @@ class TextHotkeyListener : public Listener {
                         std::shared_ptr<Packet> packet = SDK::createPacket(9);
                         TextPacket* akbar = reinterpret_cast<TextPacket*>(packet.get());
 
-                        akbar->type = TextPacketType::RAW;
+                        akbar->type = TextPacketType::CHAT;
                         akbar->message = module->settings.getSettingByName<std::string>("text")->value;
                         akbar->platformId = "";
                         akbar->translationNeeded = false;
