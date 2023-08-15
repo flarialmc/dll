@@ -60,7 +60,7 @@ class SprintListener : public Listener {
     }
 
     void onLocalTick(TickEvent& event) override {
-
+        std::cout << SDK::clientInstance->getLocalPlayer()->getBodyRotationComponent() << std::endl;
         if (module->settings.getSettingByName<bool>("enabled")->value) {
             if (SDK::clientInstance != nullptr) {
                 if (SDK::clientInstance->getLocalPlayer() != nullptr) {

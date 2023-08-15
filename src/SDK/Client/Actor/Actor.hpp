@@ -8,6 +8,7 @@
 #include "Components/ActorMovementPorxyComponent.hpp"
 #include "Components/ActorRotationComponent.hpp"
 #include "Components/MobHurtTimeComponent.hpp"
+#include "Components/MobBodyRotationComponent.hpp"
 #include "../Level/Level.hpp"
 #include "../Container/Inventory.hpp"
 #include "../../../Utils/Utils.hpp"
