@@ -31,6 +31,8 @@ public:
     void onRender(RenderEvent& event) override {
         
         Module* gui = ModuleManager::getModule("MC GUI Scale");
+        if(gui != nullptr) if(SDK::CurrentScreen == "hud_screen")
+            if(SDK::clientInstance->guiData != nullptr)
         if (gui->settings.getSettingByName<bool>("enabled")->value){
         float percent = gui->settings.getSettingByName<float>("guiscale")->value;
         SDK::clientInstance->guiData->GuiScale = percent;
