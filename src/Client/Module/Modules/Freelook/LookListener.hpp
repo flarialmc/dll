@@ -28,7 +28,19 @@ private:
     static inline std::vector<uint8_t> PatchedRot;
 public:
 
+    void onRender(RenderEvent& event) override {
+
+        Module* gui = ModuleManager::getModule("MC GUI Scale");
+        float percent = gui->settings.getSettingByName<float>("guiscale")->value;
+        SDK::clientInstance->guiData->GuiScale = percent;
+        SDK::clientInstance->guiData->ScreenSizeScaled = { SDK::clientInstance->guiData->ScreenSize.x * 1 / percent, SDK::clientInstance->guiData->ScreenSize.y * 1 / percent };
+        SDK::clientInstance->guiData->scalingMultiplier = 1 / percent;
+
+    }
+
     void onLocalTick(TickEvent& event) override {
+
+
 
         if (enabled != module->settings.getSettingByName<bool>("enabled")->value) {
             enabled = module->settings.getSettingByName<bool>("enabled")->value;

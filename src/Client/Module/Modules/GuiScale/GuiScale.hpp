@@ -25,6 +25,8 @@ public:
 
     void NormalRender(int index, std::string text, std::string value) override {
 
+
+
     }
 
     virtual void DefaultConfig() override {
@@ -56,9 +58,6 @@ public:
                                            D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("guiscale")->value, 4.0f);
 
         this->settings.getSettingByName<float>("guiscale")->value = percent;
-        SDK::clientInstance->guiData->GuiScale = percent;
-        SDK::clientInstance->guiData->ScreenSizeScaled = { SDK::clientInstance->guiData->ScreenSize.x * 1 / percent, SDK::clientInstance->guiData->ScreenSize.y * 1 / percent };
-        SDK::clientInstance->guiData->scalingMultiplier = 1 / percent;
 
     }
 };
