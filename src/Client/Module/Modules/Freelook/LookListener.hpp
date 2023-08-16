@@ -16,7 +16,7 @@ private:
     static inline uintptr_t yaw1 = Memory::findSig("F3 0F 11 30 F3 ? ? 78 ? 49 8B CE");
     static inline uintptr_t yaw2 = Memory::findSig("F3 0F 11 38 F3 ? ? 70 ? 48 8B 8C");
     static inline uintptr_t pitch = Memory::findSig("F3 0F 11 0E 48 89 9C");
-    //static inline uintptr_t rot = Memory::findSig("40 53 48 83 EC 20 48 8B DA BA 2F B8 31 03");
+    static inline uintptr_t rot = Memory::findSig("F3 0F ? ? 48 8D ? ? F3 0F ? ? ? ? F3 0F");
 
     static inline std::vector<uint8_t> OriginalYaw1;
     static inline std::vector<uint8_t> PatchedYaw1;
@@ -24,16 +24,11 @@ private:
     static inline std::vector<uint8_t> PatchedYaw2;
     static inline std::vector<uint8_t> OriginalPitch;
     static inline std::vector<uint8_t> PatchedPitch;
-    //static inline std::vector<uint8_t> OriginalRot;
-    //static inline std::vector<uint8_t> PatchedRot;
+    static inline std::vector<uint8_t> OriginalRot;
+    static inline std::vector<uint8_t> PatchedRot;
 public:
-    Vec2<float> savedRotations = {};
 
     void onLocalTick(TickEvent& event) override {
-        
-        //Vec2<float> allahuakbar = SDK::clientInstance->getLocalPlayer()->rotations;
-
-        //std::cout << &(SDK::clientInstance->getLocalPlayer()->actorRotationComponent->Rotation) << std::endl;
 
         if (enabled != module->settings.getSettingByName<bool>("enabled")->value) {
             enabled = module->settings.getSettingByName<bool>("enabled")->value;
@@ -46,9 +41,7 @@ public:
         }
 
         if (module->settings.getSettingByName<bool>("enabled")->value) {
-            // SDK::clientInstance->getLocalPlayer()->rotations = savedRotations;
-            // event.getActor()->getMovementProxyComponent()->movementProxy->SetRotation(&oldRotations);
-            // event.getActor()->getMovementProxyComponent()->movementProxy->SetYHeadRotation(oldRotations.y);
+             event.getActor()->getMovementProxyComponent()->movementProxy->SetRotation(&oldRotations);
         }
         else {
             oldRotations = event.getActor()->actorRotationComponent->Rotation;
@@ -73,10 +66,10 @@ public:
         VirtualProtect((LPVOID)pitch, PatchedPitch.size(), oldProtect, &oldProtect3);
 
 
-        //DWORD oldProtect4;
-        //VirtualProtect((LPVOID)rot, PatchedRot.size(), PAGE_EXECUTE_READWRITE, &oldProtect4);
-        //memcpy((LPVOID)rot, PatchedRot.data(), PatchedRot.size());
-        //VirtualProtect((LPVOID)rot, PatchedRot.size(), oldProtect, &oldProtect4);
+        DWORD oldProtect4;
+        VirtualProtect((LPVOID)rot, PatchedRot.size(), PAGE_EXECUTE_READWRITE, &oldProtect4);
+        memcpy((LPVOID)rot, PatchedRot.data(), PatchedRot.size());
+        VirtualProtect((LPVOID)rot, PatchedRot.size(), oldProtect, &oldProtect4);
     }
 
     void onKey(KeyEvent& event) override {
@@ -104,8 +97,8 @@ public:
         OriginalPitch.resize(4);
         memcpy(OriginalPitch.data(), (LPVOID)pitch, 4);
 
-        //OriginalRot.resize(4);
-        //memcpy(OriginalRot.data(), (LPVOID)rot, 4);
+        OriginalRot.resize(4);
+        memcpy(OriginalRot.data(), (LPVOID)rot, 4);
 
         PatchedYaw1.push_back(0x90);
         PatchedYaw1.push_back(0x90);
@@ -122,10 +115,10 @@ public:
         PatchedPitch.push_back(0x90);
         PatchedPitch.push_back(0x90);
 
-        //PatchedRot.push_back(0x90);
-        //PatchedRot.push_back(0x90);
-        //PatchedRot.push_back(0x90);
-        //PatchedRot.push_back(0x90);
+        PatchedRot.push_back(0x90);
+        PatchedRot.push_back(0x90);
+        PatchedRot.push_back(0x90);
+        PatchedRot.push_back(0x90);
 
     }
 
@@ -146,9 +139,9 @@ public:
         memcpy((LPVOID)pitch, OriginalPitch.data(), OriginalPitch.size());
         VirtualProtect((LPVOID)pitch, OriginalPitch.size(), oldProtect, &oldProtect3);
 
-        //DWORD oldProtect4;
-        //VirtualProtect((LPVOID)rot, OriginalRot.size(), PAGE_EXECUTE_READWRITE, &oldProtect4);
-        //memcpy((LPVOID)rot, OriginalRot.data(), OriginalRot.size());
-        //VirtualProtect((LPVOID)rot, OriginalRot.size(), oldProtect, &oldProtect4);
+        DWORD oldProtect4;
+        VirtualProtect((LPVOID)rot, OriginalRot.size(), PAGE_EXECUTE_READWRITE, &oldProtect4);
+        memcpy((LPVOID)rot, OriginalRot.data(), OriginalRot.size());
+        VirtualProtect((LPVOID)rot, OriginalRot.size(), oldProtect, &oldProtect4);
     }
 };

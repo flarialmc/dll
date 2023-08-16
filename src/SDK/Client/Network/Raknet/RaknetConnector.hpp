@@ -2,6 +2,8 @@
 
 
 #include "RakPeer.h"
+#include <string>
+#include <vector>
 
 
 class RaknetConnector {
