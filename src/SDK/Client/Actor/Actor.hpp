@@ -12,6 +12,7 @@
 #include "../Container/Inventory.hpp"
 #include "../../../Utils/Utils.hpp"
 #include "Components/StateVectorComponent.hpp"
+#include "Components/ActorHeadRotationComponent.hpp"
 
 enum ActorFlags
 {
@@ -137,6 +138,7 @@ public:
     BUILD_ACCESS(this, Level*, level, 0x260);
     BUILD_ACCESS(this, ActorRotationComponent*, actorRotationComponent, 0x2B0);
     BUILD_ACCESS(this, StateVectorComponent*, stateVector, 0x2A0);
+    BUILD_ACCESS(this, Vec2<float>, rotations, 0x2B0);
    
 
     template <typename Component>
@@ -150,4 +152,5 @@ public:
     bool getActorFlag(int flag);
     Vec3<float>* getPosition();
     bool wasHurt();
+    ActorHeadRotationComponent* getActorHeadRotationComponent();
 };

@@ -60,3 +60,15 @@ MoveInputComponent* Actor::getMoveInputHandler() {
     return tryGet<MoveInputComponent>(sig);
 
 }
+
+ActorHeadRotationComponent* Actor::getActorHeadRotationComponent() {
+
+    static  uintptr_t sig;
+
+    if (sig == NULL) {
+        sig = Memory::findSig("40 53 48 83 EC 20 48 8B DA BA 1C 58 40 E9");
+    }
+
+    return tryGet<ActorHeadRotationComponent>(sig);
+
+}

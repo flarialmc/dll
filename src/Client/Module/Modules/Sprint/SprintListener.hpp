@@ -24,7 +24,6 @@ class SprintListener : public Listener {
     };
 
     void onRender(RenderEvent& event) override {
-
         if (SDK::CurrentScreen == "hud_screen")
             if (module->settings.getSettingByName<bool>("enabled")->value) {
                 if (module->settings.getSettingByName<bool>("status")->value) {
@@ -60,6 +59,7 @@ class SprintListener : public Listener {
     }
 
     void onLocalTick(TickEvent& event) override {
+        //std::cout << SDK::clientInstance->getLocalPlayer()->getActorHeadRotationComponent() << std::endl;
         if (module->settings.getSettingByName<bool>("enabled")->value) {
             if (SDK::clientInstance != nullptr) {
                 if (SDK::clientInstance->getLocalPlayer() != nullptr) {

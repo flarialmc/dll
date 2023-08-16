@@ -91,7 +91,7 @@ void ModuleManager::initialize()
     modules.push_back(new AutoGG());
     modules.push_back(new TextHotkey());
     modules.push_back(new NickModule());
-    // modules.push_back(new FreeLook());
+    modules.push_back(new FreeLook());
 
 
     std::sort(modules.begin(), modules.end(), compareNames);
