@@ -1,6 +1,7 @@
 #include "getViewPerspective.hpp"
 #include "../../../Module/Manager.hpp"
 #include "../../../Module/Modules/SnapLook/SnapLook.hpp"
+#include "RaknetTick.hpp"
 
 
 uintptr_t findSig(const char* pattern) {
@@ -62,9 +63,10 @@ int getViewPerspectiveHook::callback(uintptr_t* a1) {
     auto freemod = ModuleManager::getModule("FreeLook");
 
     if(freemod != nullptr) {
-        if (freemod->settings.getSettingByName<bool>("enabled")->value &&
-            SDK::raknetConnector->JoinedIp.find("hive") != std::string::npos) {
-            FlarialGUI::Notify("Can't use freelook on " + SDK::raknetConnector->JoinedIp);
+
+
+        if (freemod->settings.getSettingByName<bool>("enabled")->value && RaknetTickHook::towriteip.find("hive") != std::string::npos ) {
+            FlarialGUI::Notify("Can't use freelook on " + RaknetTickHook::towriteip);
             freemod->settings.getSettingByName<bool>("enabled")->value = false;
         }
     }
