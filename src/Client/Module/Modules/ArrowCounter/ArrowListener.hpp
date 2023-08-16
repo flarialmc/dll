@@ -24,18 +24,24 @@ public:
     }
 
     void onRender(RenderEvent& event) override {
-
-
-
         if (SDK::CurrentScreen == "hud_screen")
             if (module->settings.getSettingByName<bool>("enabled")->value && SDK::clientInstance->getLocalPlayer() != nullptr) {
 
                 if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
 
                     auto inventory = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory;
+                    auto offhandItem = SDK::clientInstance->getLocalPlayer()->getOffhandSlot();
 
-                    //dosent count offhand yet.
-
+                    if (offhandItem->getItem() != NULL) {
+                        if (offhandItem->getItem()->name == "arrow") {
+                            int counte = offhandItem->count;
+                            if (counte != 16908288) {
+                                auto countagain = 0;
+                                countagain = counte / 65536 - 258;
+                                arrows = arrows + countagain + 2;
+                            }
+                        }
+                    }
 
                     for (int i = 0; i < 36; i++) {
                         auto item = inventory->getItem(i);
