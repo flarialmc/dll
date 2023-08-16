@@ -72,3 +72,14 @@ ActorHeadRotationComponent* Actor::getActorHeadRotationComponent() {
     return tryGet<ActorHeadRotationComponent>(sig);
 
 }
+
+ItemStack* Actor::getOffhandSlot() {
+    static uintptr_t sig;
+
+    if (sig == NULL) {
+        sig = Memory::findSig("48 8B 89 30 04 00 00 BA 01 00 00 00");
+    }
+
+    auto fn = reinterpret_cast<ItemStack * (__thiscall*)(Actor*)>(sig);
+    return fn(this);
+}

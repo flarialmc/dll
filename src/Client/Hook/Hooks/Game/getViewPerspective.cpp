@@ -55,9 +55,6 @@ uintptr_t findSig(const char* pattern) {
 }
 //if (module->settings.getSettingByName<bool>("enabled")->value) {
 int getViewPerspectiveHook::callback(uintptr_t* a1) {
-
-
-
     auto mod = ModuleManager::getModule("SnapLook");
     auto freemod = ModuleManager::getModule("FreeLook");
 

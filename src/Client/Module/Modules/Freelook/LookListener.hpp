@@ -33,7 +33,7 @@ public:
         
         //Vec2<float> allahuakbar = SDK::clientInstance->getLocalPlayer()->rotations;
 
-        std::cout << &(SDK::clientInstance->getLocalPlayer()->actorRotationComponent->Rotation) << std::endl;
+        //std::cout << &(SDK::clientInstance->getLocalPlayer()->actorRotationComponent->Rotation) << std::endl;
 
         if (enabled != module->settings.getSettingByName<bool>("enabled")->value) {
             enabled = module->settings.getSettingByName<bool>("enabled")->value;
@@ -46,9 +46,9 @@ public:
         }
 
         if (module->settings.getSettingByName<bool>("enabled")->value) {
-            //SDK::clientInstance->getLocalPlayer()->rotations = savedRotations;
+            // SDK::clientInstance->getLocalPlayer()->rotations = savedRotations;
             // event.getActor()->getMovementProxyComponent()->movementProxy->SetRotation(&oldRotations);
-            //      event.getActor()->getMovementProxyComponent()->movementProxy->SetYHeadRotation(oldRotations.y);
+            // event.getActor()->getMovementProxyComponent()->movementProxy->SetYHeadRotation(oldRotations.y);
         }
         else {
             oldRotations = event.getActor()->actorRotationComponent->Rotation;

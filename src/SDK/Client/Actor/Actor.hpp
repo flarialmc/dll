@@ -139,7 +139,6 @@ public:
     BUILD_ACCESS(this, ActorRotationComponent*, actorRotationComponent, 0x2B0);
     BUILD_ACCESS(this, StateVectorComponent*, stateVector, 0x2A0);
     BUILD_ACCESS(this, Vec2<float>, rotations, 0x2B0);
-   
 
     template <typename Component>
     Component* tryGet(uintptr_t addr);
@@ -153,4 +152,5 @@ public:
     Vec3<float>* getPosition();
     bool wasHurt();
     ActorHeadRotationComponent* getActorHeadRotationComponent();
+    ItemStack* getOffhandSlot();
 };
