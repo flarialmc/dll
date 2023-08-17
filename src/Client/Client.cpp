@@ -74,6 +74,7 @@ void Client::initialize()
         { "https://cdn-c6f.pages.dev/assets/keyboard.png", Path + "keyboard.png" },
         { "https://cdn-c6f.pages.dev/assets/server-ip.png", Path + "server-ip.png" },
         { "https://cdn-c6f.pages.dev/assets/coordinates.png", Path + "coordinates.png" },
+        { "https://cdn-c6f.pages.dev/assets/speed.png", Path + "speed.png" },
         { "https://cdn-c6f.pages.dev/assets/ping.png", Path + "ping.png" },
         { "https://cdn-c6f.pages.dev/assets/arrow.png", Path + "arrow.png" },
         { "https://cdn-c6f.pages.dev/assets/potion.png", Path + "potion.png" },

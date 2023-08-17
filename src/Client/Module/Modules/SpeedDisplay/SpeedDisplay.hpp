@@ -10,7 +10,7 @@ class SpeedDisplay : public Module {
 public:
 
 
-    SpeedDisplay() : Module("SpeedDisplay", "toes", "\\Flarial\\assets\\coordinates.png", 'o') {
+    SpeedDisplay() : Module("Speed Display", "toes", "\\Flarial\\assets\\speed.png", 'o') {
 
         onEnable();
 
@@ -20,7 +20,7 @@ public:
 
         Module::onEnable();
 
-        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value}");
+        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value} m/s");
 
 
 

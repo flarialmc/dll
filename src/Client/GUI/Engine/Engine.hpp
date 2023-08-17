@@ -101,11 +101,11 @@ namespace FlarialGUI
     float inline scrollposmodifier = 0.f;
     float inline barscrollpos = 0;
     float inline barscrollposmodifier = 10.0f;
-    inline WindowRect WindowRects[100];
-    inline SliderRect SliderRects[250];
-    inline TextBoxStruct TextBoxes[100];
-    inline ColorPicker ColorPickers[20];
-    inline KeybindSelectorer KeybindSelectors[20];
+    inline WindowRect WindowRects[1000];
+    inline SliderRect SliderRects[2500];
+    inline TextBoxStruct TextBoxes[1000];
+    inline ColorPicker ColorPickers[2000];
+    inline KeybindSelectorer KeybindSelectors[2000];
     inline std::string currentKeybind;
     std::vector<Notification> inline notifications;
     bool inline isInWindowRect = false;
