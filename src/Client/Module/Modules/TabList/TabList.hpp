@@ -273,7 +273,7 @@ public:
                 if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
                     if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(fakex, realcenter.y, fakex + (i2 * keycardSize), realcenter.y + (7.5*keycardSize)), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value); 
                 if (this->settings.getSettingByName<bool>("border")->value) {
-                    FlarialGUI::RoundedHollowRect(realcenter.x, realcenter.y, Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * (settings.getSettingByName<float>("uiscale")->value) / 100.0f), "height", true),
+                    FlarialGUI::RoundedHollowRect(fakex, realcenter.y, Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * (settings.getSettingByName<float>("uiscale")->value) / 100.0f), "height", true),
                         borderColor, totalWidth, 7.5f * keycardSize,
                         rounde.x, rounde.x);
                 }
