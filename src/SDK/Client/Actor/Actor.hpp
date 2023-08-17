@@ -13,9 +13,9 @@
 #include "../../../Utils/Utils.hpp"
 #include "Components/StateVectorComponent.hpp"
 #include "Components/ActorHeadRotationComponent.hpp"
+#include "EntityContext.hpp"
 
-enum ActorFlags
-{
+enum ActorFlags {
     FLAG_ONFIRE = 0,
     FLAG_SNEAKING = 1,
     FLAG_RIDING = 2,
@@ -154,4 +154,6 @@ public:
     bool wasHurt();
     ActorHeadRotationComponent* getActorHeadRotationComponent();
     ItemStack* getOffhandSlot();
+    EntityContext* GetEntityContext();
+    float getSpeedInMetersPerSecond();
 };
