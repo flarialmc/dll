@@ -38,15 +38,6 @@ class ForceCoordsListener : public Listener {
             }
         }
     }
-    Vec3<float> PrevPoss;
-    void onLocalTick(TickEvent& event) override {
-        Vec3<float> Pos = SDK::clientInstance->getLocalPlayer()->stateVector->Pos;
-        float* timer = SDK::clientInstance->getMinecraft()->timer;
-
-        
-        std::cout << std::to_string(Pos.dist(PrevPoss) * 20) << std::endl;
-        PrevPoss = Pos;
-    }
 
 public:
     explicit ForceCoordsListener(const char string[5], Module* module) {

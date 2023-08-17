@@ -59,13 +59,6 @@ class SprintListener : public Listener {
     }
 
     void onLocalTick(TickEvent& event) override {
-        // Vec3<float> Vel = SDK::clientInstance->getLocalPlayer()->stateVector->velocity;
-        //auto entityCtx = SDK::clientInstance->getLocalPlayer()->GetEntityContext();
-        auto Pos = SDK::clientInstance->getLocalPlayer()->stateVector->posDelta;
-        std::string cords = std::to_string(static_cast<float>(Pos.x)) + ", " + std::to_string(static_cast<float>(Pos.y)) + ", " + std::to_string(static_cast<float>(Pos.z));
-
-        std::cout << cords << std::endl;
-
         if (module->settings.getSettingByName<bool>("enabled")->value) {
             if (SDK::clientInstance != nullptr) {
                 if (SDK::clientInstance->getLocalPlayer() != nullptr) {
