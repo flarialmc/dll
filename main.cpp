@@ -50,8 +50,6 @@ DWORD WINAPI init(HMODULE real)
                         if(elapsed >= std::chrono::seconds(60)) {
                             std::string ipToSend;
 
-                            std::cout << "watermark? " << Client::settings.getSettingByName<bool>("watermark")->value << std::endl;
-                            std::cout << "anonymous? " << Client::settings.getSettingByName<bool>("anonymousApi")->value << std::endl;
                             if (!Client::settings.getSettingByName<bool>("anonymousApi")->value) {
                                 if (RaknetTickHook::towriteip.find("none") != std::string::npos) ipToSend = "in.singleplayer";
                                 else if (!RaknetTickHook::towriteip.empty()) ipToSend = RaknetTickHook::towriteip;
