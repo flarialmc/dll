@@ -209,7 +209,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
         }
 
 
-        if(D2D::context != nullptr && !Client::disable) {
+        if(D2D::context != nullptr && !Client::disable && SwapchainHook::init && FlarialGUI::writeFactory != nullptr) {
 
             if(SwapchainHook::queue != nullptr) {
 

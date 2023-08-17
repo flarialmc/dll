@@ -1469,34 +1469,36 @@ void FlarialGUI::ApplySusGaussianBlur(float blurIntensity)
 }
 
 void FlarialGUI::Notify(std::string text) {
+     
+    if (SwapchainHook::init && FlarialGUI::writeFactory != nullptr) {
+        Notification e;
+        e.text = text;
+        e.finished = false;
+        e.currentPos = Constraints::PercentageConstraint(0.01, "right", true);
+        e.currentPosY = Constraints::PercentageConstraint(0.25, "bottom", true);
 
-    Notification e;
-    e.text = text;
-    e.finished = false;
-    e.currentPos = Constraints::PercentageConstraint(0.01, "right", true);
-    e.currentPosY = Constraints::PercentageConstraint(0.25, "bottom", true);
+        IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, Constraints::FontScaler(Constraints::SpacingConstraint(0.3, Constraints::RelativeConstraint(0.45, "height", true))), DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_LEADING);
 
-    IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, Constraints::FontScaler(Constraints::SpacingConstraint(0.3, Constraints::RelativeConstraint(0.45, "height", true))), DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_LEADING);
+        IDWriteTextLayout* textLayout;
 
-    IDWriteTextLayout *textLayout;
-
-    FlarialGUI::writeFactory->CreateTextLayout(
+        FlarialGUI::writeFactory->CreateTextLayout(
             FlarialGUI::to_wide(text).c_str(),
             wcslen(FlarialGUI::to_wide(text).c_str()),
             textFormat,
             Constraints::RelativeConstraint(100.0, "height", true),
             Constraints::RelativeConstraint(100.0, "height", true),
             &textLayout
-    );
+        );
 
-    DWRITE_TEXT_METRICS textMetrics;
-    textLayout->GetMetrics(&textMetrics);
+        DWRITE_TEXT_METRICS textMetrics;
+        textLayout->GetMetrics(&textMetrics);
 
-    e.width = textMetrics.width + textMetrics.width * 0.60f;
+        e.width = textMetrics.width + textMetrics.width * 0.60f;
 
-    notifications.push_back(e);
+        notifications.push_back(e);
 
-    textLayout->Release();
+        textLayout->Release();
+    }
 
 }
 

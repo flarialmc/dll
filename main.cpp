@@ -58,9 +58,9 @@ DWORD WINAPI init(HMODULE real)
 
                             // send thing
                             std::cout << DownloadString(std::format("https://api.flarial.net/heartbeat/{}/{}",
-                                                                    SDK::clientInstance->getLocalPlayer()->playerName,
+                                                                    Utils::removeColorCodes(SDK::clientInstance->getLocalPlayer()->playerName),
                                                                     ipToSend)) + " " + std::format("https://api.flarial.net/heartbeat/{}/{}",
-                                                                                                                    removeColorCodes(SDK::clientInstance->getLocalPlayer()->playerName),
+                                                                                                                    Utils::removeColorCodes(SDK::clientInstance->getLocalPlayer()->playerName),
                                                                                                                     ipToSend) << std::endl;
                             lastBeatTime = now;
                         }
