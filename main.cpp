@@ -23,9 +23,10 @@ std::string removeColorCodes(const std::string& input);
 DWORD WINAPI init(HMODULE real)
 {
 
-    
 
-    if(GetConsoleWindow() == nullptr and false) {
+    bool showConsole = false;
+    
+    if(GetConsoleWindow() == nullptr && showConsole) {
         AllocConsole();
         SetConsoleTitleA("Flarial-Debugger");
         FILE *out;
