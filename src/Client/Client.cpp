@@ -25,7 +25,6 @@ bool Client::disable = false;
 
 void Client::initialize()
 {
-
     std::filesystem::path folder_path(Utils::getRoamingPath() + "\\Flarial");
     if (!exists(folder_path))
     {
