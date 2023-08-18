@@ -60,7 +60,7 @@ class AutoGGListener : public Listener {
                         return;
                     }
 
-                    std::cout << "bing chilling lol gg" << std::endl;
+                    //std::cout << "bing chilling lol gg" << std::endl;
 
                     prevPacketSent = true;
 

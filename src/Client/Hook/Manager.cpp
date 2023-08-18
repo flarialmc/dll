@@ -14,6 +14,7 @@
 #include "Hooks/Visual/HurtColorHook.hpp"
 #include "Hooks/Visual/FogColorHook.hpp"
 #include "Hooks/Visual/TimeChangerHook.hpp"
+#include "Hooks/Game/getSensHook.hpp"
 
 std::vector<Hook *> HookManager::hooks;
 
@@ -53,6 +54,7 @@ void HookManager::initialize()
     hooks.push_back(new FogColorHook());
     hooks.push_back(new TimeChangerHook());
     hooks.push_back(new SendPacketHook());
+    hooks.push_back(new getSensHook());
 
     for (auto hook : hooks)
         hook->enableHook();

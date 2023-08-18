@@ -24,6 +24,7 @@ public:
     };
 
     std::vector<D2D1_COLOR_F> states;
+    std::vector<D2D1_COLOR_F> textStates;
 
 
     Keystrokes() : Module("Keystrokes", "yes br", "\\Flarial\\assets\\keyboard.png", 'M') {
@@ -31,8 +32,12 @@ public:
 
         onEnable();
         D2D1_COLOR_F d = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
+        D2D1_COLOR_F e = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textColor")->value);
         d.a = settings.getSettingByName<float>("bgOpacity")->value;
+        e.a = settings.getSettingByName<float>("textOpacity")->value;
+
         states = std::vector<D2D1_COLOR_F>(7, d);
+        textStates = std::vector<D2D1_COLOR_F>(7, e);
 
     };
 
@@ -61,15 +66,21 @@ public:
 
         if (settings.getSettingByName<std::string>("enabledColor") == nullptr) {
             settings.addSetting("enabledColor", (std::string)"fafafa");
+        }
 
+        if (settings.getSettingByName<std::string>("textEnabledColor") == nullptr) {
+            settings.addSetting("textEnabledColor", (std::string)"ffffff");
         }
 
         if (settings.getSettingByName<float>("enabledOpacity") == nullptr) {
             settings.addSetting("enabledOpacity", 0.55f);
         }
 
-        if (settings.getSettingByName<float>("uiscale") == nullptr) {
+        if (settings.getSettingByName<float>("textEnabledOpacity") == nullptr) {
+            settings.addSetting("textEnabledOpacity", 0.55f);
+        }
 
+        if (settings.getSettingByName<float>("uiscale") == nullptr) {
             settings.addSetting("uiscale", 1.0f);
         }
 
@@ -169,14 +180,20 @@ public:
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Pressed").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
-        FlarialGUI::ColorPicker(2, toggleX + Constraints::SpacingConstraint(0.65, textWidth), toggleY * 0.99f, settings.getSettingByName<std::string>("enabledColor")->value, settings.getSettingByName<float>("enabledOpacity")->value);
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("BG Pressed").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+        FlarialGUI::ColorPicker(2, toggleX + Constraints::SpacingConstraint(0.90, textWidth), toggleY * 0.99f, settings.getSettingByName<std::string>("enabledColor")->value, settings.getSettingByName<float>("enabledOpacity")->value);
 
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Text Pressed").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+        FlarialGUI::ColorPicker(3, toggleX + Constraints::SpacingConstraint(1.00, textWidth), toggleY * 0.99f, settings.getSettingByName<std::string>("textEnabledColor")->value, settings.getSettingByName<float>("textEnabledOpacity")->value);
+        
         FlarialGUI::UnsetScrollView();
 
         FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value);
         FlarialGUI::ColorPickerWindow(1, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value);
         FlarialGUI::ColorPickerWindow(2, settings.getSettingByName<std::string>("enabledColor")->value, settings.getSettingByName<float>("enabledOpacity")->value);
+        FlarialGUI::ColorPickerWindow(3, settings.getSettingByName<std::string>("textEnabledColor")->value, settings.getSettingByName<float>("textEnabledOpacity")->value);
         /* Color Pickers End */
 
     }
@@ -236,60 +253,107 @@ public:
                     settings.getSettingByName<std::string>("bgColor")->value);
                 D2D1_COLOR_F textColor = FlarialGUI::HexToColorF(
                     settings.getSettingByName<std::string>("textColor")->value);
+                D2D1_COLOR_F textEnabledColor = FlarialGUI::HexToColorF(
+                    settings.getSettingByName<std::string>("textEnabledColor")->value);
 
                 disabledColor.a = settings.getSettingByName<float>("bgOpacity")->value;
                 textColor.a = settings.getSettingByName<float>("textOpacity")->value;
                 enabledColor.a = settings.getSettingByName<float>("enabledOpacity")->value;
+                textEnabledColor.a = settings.getSettingByName<float>("textEnabledOpacity")->value;
 
                 MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
-                if (handler->forward)
+                if (handler->forward) {
                     states[Strokes::W] = FlarialGUI::LerpColor(states[Strokes::W], enabledColor,
                         0.15f * FlarialGUI::frameFactor);
-                else
+                    textStates[Strokes::W] = FlarialGUI::LerpColor(textStates[Strokes::W], textEnabledColor,
+                        0.15f * FlarialGUI::frameFactor);
+                }
+                else {
                     states[Strokes::W] = FlarialGUI::LerpColor(states[Strokes::W], disabledColor,
                         0.15f * FlarialGUI::frameFactor);
+                    textStates[Strokes::W] = FlarialGUI::LerpColor(textStates[Strokes::W], textColor,
+                        0.15f * FlarialGUI::frameFactor);
+                }
 
-                if (handler->backward)
+                if (handler->backward) {
                     states[Strokes::S] = FlarialGUI::LerpColor(states[Strokes::S], enabledColor,
                         0.15f * FlarialGUI::frameFactor);
-                else
+                    textStates[Strokes::S] = FlarialGUI::LerpColor(textStates[Strokes::S], textEnabledColor,
+                        0.15f * FlarialGUI::frameFactor);
+                }
+                else {
                     states[Strokes::S] = FlarialGUI::LerpColor(states[Strokes::S], disabledColor,
                         0.15f * FlarialGUI::frameFactor);
-
-                if (handler->left)
+                    textStates[Strokes::S] = FlarialGUI::LerpColor(textStates[Strokes::S], textColor,
+                        0.15f * FlarialGUI::frameFactor);
+                }
+                    
+                if (handler->left) {
                     states[Strokes::A] = FlarialGUI::LerpColor(states[Strokes::A], enabledColor,
                         0.15f * FlarialGUI::frameFactor);
-                else
+                    textStates[Strokes::A] = FlarialGUI::LerpColor(textStates[Strokes::A], textEnabledColor,
+                        0.15f * FlarialGUI::frameFactor);
+                }
+                else {
                     states[Strokes::A] = FlarialGUI::LerpColor(states[Strokes::A], disabledColor,
                         0.15f * FlarialGUI::frameFactor);
-
-                if (handler->right)
+                    textStates[Strokes::A] = FlarialGUI::LerpColor(textStates[Strokes::A], textColor,
+                        0.15f * FlarialGUI::frameFactor);
+                }
+                    
+                if (handler->right) {
                     states[Strokes::D] = FlarialGUI::LerpColor(states[Strokes::D], enabledColor,
                         0.15f * FlarialGUI::frameFactor);
-                else
+                    textStates[Strokes::D] = FlarialGUI::LerpColor(textStates[Strokes::D], textEnabledColor,
+                        0.15f * FlarialGUI::frameFactor);
+                }
+                else {
                     states[Strokes::D] = FlarialGUI::LerpColor(states[Strokes::D], disabledColor,
                         0.15f * FlarialGUI::frameFactor);
-
-                if (handler->jumping)
+                    textStates[Strokes::D] = FlarialGUI::LerpColor(textStates[Strokes::D], textColor,
+                        0.15f * FlarialGUI::frameFactor);
+                }
+                   
+                if (handler->jumping) {
                     states[Strokes::SPACEBAR] = FlarialGUI::LerpColor(states[Strokes::SPACEBAR], enabledColor,
                         0.15f * FlarialGUI::frameFactor);
-                else
+                    textStates[Strokes::SPACEBAR] = FlarialGUI::LerpColor(textStates[Strokes::SPACEBAR], textEnabledColor,
+                        0.15f * FlarialGUI::frameFactor);
+                }
+                else {
                     states[Strokes::SPACEBAR] = FlarialGUI::LerpColor(states[Strokes::SPACEBAR], disabledColor,
                         0.15f * FlarialGUI::frameFactor);
-
-                if (CPSListener::GetRightHeld())
+                    textStates[Strokes::SPACEBAR] = FlarialGUI::LerpColor(textStates[Strokes::SPACEBAR], textColor,
+                        0.15f * FlarialGUI::frameFactor);
+                }
+                    
+                if (CPSListener::GetRightHeld()) {
                     states[Strokes::RMB] = FlarialGUI::LerpColor(states[Strokes::RMB], enabledColor,
                         0.15f * FlarialGUI::frameFactor);
-                else
+                    textStates[Strokes::RMB] = FlarialGUI::LerpColor(textStates[Strokes::RMB], textEnabledColor,
+                        0.15f * FlarialGUI::frameFactor);
+                } 
+                else {
                     states[Strokes::RMB] = FlarialGUI::LerpColor(states[Strokes::RMB], disabledColor,
                         0.15f * FlarialGUI::frameFactor);
-                if (CPSListener::GetLeftHeld())
+                    textStates[Strokes::RMB] = FlarialGUI::LerpColor(textStates[Strokes::RMB], textColor,
+                        0.15f * FlarialGUI::frameFactor);
+                }
+                    
+                if (CPSListener::GetLeftHeld()) {
                     states[Strokes::LMB] = FlarialGUI::LerpColor(states[Strokes::LMB], enabledColor,
                         0.15f * FlarialGUI::frameFactor);
-                else
+                    textStates[Strokes::LMB] = FlarialGUI::LerpColor(textStates[Strokes::LMB], textEnabledColor,
+                        0.15f * FlarialGUI::frameFactor);
+                }
+                else {
                     states[Strokes::LMB] = FlarialGUI::LerpColor(states[Strokes::LMB], disabledColor,
                         0.15f * FlarialGUI::frameFactor);
+                    textStates[Strokes::LMB] = FlarialGUI::LerpColor(textStates[Strokes::LMB], textColor,
+                        0.15f * FlarialGUI::frameFactor);
+                }
+                    
 
 
 
@@ -300,7 +364,7 @@ public:
                 FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::W], keycardSize, keycardSize,
                     rounde.x,
                     rounde.x);
-                FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, L"W", textColor, keycardSize, keycardSize,
+                FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, L"W", textStates[Strokes::W], keycardSize, keycardSize,
                     DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
 
                 // S
@@ -314,7 +378,7 @@ public:
                     rounde.x,
                     rounde.x);
 
-                FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, L"S", textColor, keycardSize, keycardSize,
+                FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, L"S", textStates[Strokes::S], keycardSize, keycardSize,
                     DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
                 // A
                 realcenter.x -= (keycardSize + spacing);
@@ -324,7 +388,7 @@ public:
                 FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::A], keycardSize, keycardSize,
                     rounde.x,
                     rounde.x);
-                FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, L"A", textColor, keycardSize, keycardSize,
+                FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, L"A", textStates[Strokes::A], keycardSize, keycardSize,
                     DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
 
                 // D
@@ -336,7 +400,7 @@ public:
                 FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::D], keycardSize, keycardSize,
                     rounde.x,
                     rounde.x);
-                FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, L"D", textColor, keycardSize, keycardSize,
+                FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, L"D", textStates[Strokes::D], keycardSize, keycardSize,
                     DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
 
                 // SPACEBAR
@@ -356,7 +420,7 @@ public:
                     FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::LMB], keycardSize + (keycardSize / 2), keycardSize - (keycardSize * 0.05),
                         rounde.x,
                         rounde.x);
-                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y - Constraints::SpacingConstraint(0.06, keycardSize), FlarialGUI::to_wide(std::to_string(CPSListener::GetLeftCPS())).c_str(), textColor, keycardSize + (keycardSize / 2), keycardSize,
+                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y - Constraints::SpacingConstraint(0.06, keycardSize), FlarialGUI::to_wide(std::to_string(CPSListener::GetLeftCPS())).c_str(), textStates[Strokes::LMB], keycardSize + (keycardSize / 2), keycardSize,
                         DWRITE_TEXT_ALIGNMENT_CENTER, fontSize + Constraints::SpacingConstraint(0.48, keycardSize));
 
                     // RMB
@@ -367,7 +431,7 @@ public:
                     FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::RMB], keycardSize + (keycardSize / 2), keycardSize - (keycardSize * 0.05),
                         rounde.x,
                         rounde.x);
-                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y - Constraints::SpacingConstraint(0.06, keycardSize), FlarialGUI::to_wide(std::to_string(CPSListener::GetRightCPS())).c_str(), textColor, keycardSize + (keycardSize / 2), keycardSize,
+                    FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y - Constraints::SpacingConstraint(0.06, keycardSize), FlarialGUI::to_wide(std::to_string(CPSListener::GetRightCPS())).c_str(), textStates[Strokes::RMB], keycardSize + (keycardSize / 2), keycardSize,
                         DWRITE_TEXT_ALIGNMENT_CENTER, fontSize + Constraints::SpacingConstraint(0.48, keycardSize));
                     realcenter.y += (keycardSize + spacing);
                     realcenter.x -= 1.5f * (keycardSize + spacing);
@@ -377,7 +441,7 @@ public:
                     if(settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + spacebarWidth, realcenter.y + spacebarHeight), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
                 FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::SPACEBAR], spacebarWidth,
                     spacebarHeight, rounde.x, rounde.x);
-                FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, L"-------", textColor, spacebarWidth,
+                FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, L"-------", textStates[Strokes::SPACEBAR], spacebarWidth,
                     spacebarHeight, DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
 
                 if(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)

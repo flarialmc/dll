@@ -419,8 +419,6 @@ public:
                         if (FlarialGUI::Toggle(6, Constraints::PercentageConstraint(0.019, "left"), rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("anonymousApi")->value)) {
 
                             Client::settings.getSettingByName<bool>("anonymousApi")->value = !Client::settings.getSettingByName<bool>("anonymousApi")->value;
-
-                            std::cout << "value: " << Client::settings.getSettingByName<bool>("anonymousApi")->value << std::endl;
                         }
 
                         FlarialGUI::UnsetScrollView();

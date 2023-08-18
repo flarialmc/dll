@@ -800,7 +800,7 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
         std::chrono::steady_clock::time_point currentOnKeyTime = std::chrono::steady_clock::now();
         auto timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(currentOnKeyTime - KeybindSelectors[index].currentOnKeyTime);
 
-        std::cout << timeDifference.count() << std::endl;
+        //std::cout << timeDifference.count() << std::endl;
         if(timeDifference.count() > 2000) KeybindSelectors[index].isActive = false;
     }
 
