@@ -43,6 +43,7 @@
 #include "Modules/TextHotkey/TextHotkey.hpp"
 #include "Modules/Nick/NickModule.hpp"
 #include "Modules/SpeedDisplay/SpeedDisplay.hpp"
+#include "Modules/Misc/CentreCursor/CentreCursor.hpp"
 #include <algorithm>
 
 bool compareNames( Module*& obj1,  Module*& obj2) {
@@ -101,6 +102,7 @@ void ModuleManager::initialize()
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));
     EventHandler::registerListener(new SaveConfigListener("SaveConfig"));
+    EventHandler::registerListener(new CentreCursorListener("CentreCursor"));
 }
 
 void ModuleManager::terminate()

@@ -131,6 +131,9 @@ void Client::initialize()
     if (Client::settings.getSettingByName<bool>("watermark") == nullptr)
         Client::settings.addSetting("watermark", true);
 
+    if (Client::settings.getSettingByName<bool>("centreCursor") == nullptr)
+        Client::settings.addSetting("centreCursor", true);
+
 
 
         // Create threads to download the files
