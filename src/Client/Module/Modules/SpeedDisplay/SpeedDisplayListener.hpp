@@ -8,13 +8,18 @@
 #include "../../../GUI/Engine/Engine.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "../../../../Utils/Utils.hpp"
+#include "../../../Client.hpp"
 #include <Windows.h>
+#include <thread>
 
 class SpeedDisplayListener : public Listener {
 
 	Module* module;
 
 	Vec3<float> PrevPos;
+	std::string speed;
+	bool toes = false;
+	int interval = 100; //ms
 
 	void onRender(RenderEvent& event) override {
 		if (
@@ -22,23 +27,33 @@ class SpeedDisplayListener : public Listener {
 			module->settings.getSettingByName<bool>("enabled")->value &&
 			SDK::hasInstanced && SDK::clientInstance != nullptr &&
 			SDK::clientInstance->getLocalPlayer() != nullptr
-			) {
-
-			std::string speed = std::format("{:.2f}", SDK::clientInstance->getLocalPlayer()->stateVector->Pos.dist(PrevPos) * 20);
-
-			this->module->NormalRender(15, module->settings.getSettingByName<std::string>("text")->value, speed);
-
-		}
+			) this->module->NormalRender(15, module->settings.getSettingByName<std::string>("text")->value, speed);
 	}
 
-	void onLocalTick(TickEvent& event) override {
+	void update() {
 		if (
 			SDK::CurrentScreen == "hud_screen" &&
 			module->settings.getSettingByName<bool>("enabled")->value &&
 			SDK::hasInstanced && SDK::clientInstance != nullptr &&
 			SDK::clientInstance->getLocalPlayer() != nullptr
-			)
-			PrevPos = SDK::clientInstance->getLocalPlayer()->stateVector->Pos;
+			) {
+
+			speed = std::format("{:.2f}", SDK::clientInstance->getLocalPlayer()->stateVector->Pos.dist(PrevPos) * 20);
+		}
+	};
+
+	void onLocalTick(TickEvent& event) override {
+		if (!toes) {
+			toes = true;
+			std::thread lol([&]() {
+				while (!Client::disable) {
+					update();
+					Sleep(interval);
+				}
+			});
+			lol.detach();
+		}
+		PrevPos = SDK::clientInstance->getLocalPlayer()->stateVector->Pos;
 	}
 
 public:
@@ -46,6 +61,5 @@ public:
 		this->name = string;
 		this->module = module;
 	}
-
 };
 

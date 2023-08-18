@@ -27,7 +27,7 @@ class ZoomListener : public Listener {
                 if (event.GetAction() == MouseAction::SCROLL_UP || event.GetAction() != MouseAction::SCROLL_UP && event.GetButton() == MouseButton::Scroll) {
                     event.SetButton(MouseButton::None);
                     event.SetAction(MouseAction::RELEASE);
-
+                    
                 }
             }
 
