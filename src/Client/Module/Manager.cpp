@@ -102,7 +102,7 @@ void ModuleManager::initialize()
     EventHandler::registerListener(new GUIKeyListener("E"));
     EventHandler::registerListener(new UninjectListener("Uninject"));
     EventHandler::registerListener(new SaveConfigListener("SaveConfig"));
-    //EventHandler::registerListener(new CentreCursorListener("CentreCursor"));
+    EventHandler::registerListener(new CentreCursorListener("CentreCursor"));
 }
 
 void ModuleManager::terminate()

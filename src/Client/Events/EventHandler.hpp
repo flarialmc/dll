@@ -29,4 +29,3 @@ public:
     static void onPacketSend(PacketEvent &event);
     static void onPacketReceive(PacketEvent &event);
 };
-

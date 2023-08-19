@@ -131,7 +131,7 @@ void Client::initialize()
         Client::settings.addSetting("watermark", true);
 
     if (Client::settings.getSettingByName<bool>("centreCursor") == nullptr)
-        Client::settings.addSetting("centreCursor", true);
+        Client::settings.addSetting("centreCursor", false);
 
 
 

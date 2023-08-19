@@ -58,11 +58,10 @@ class SprintListener : public Listener {
             }
     }
 
-    void onLocalTick(TickEvent& event) override {        
+    void onLocalTick(TickEvent& event) override {
         if (module->settings.getSettingByName<bool>("enabled")->value) {
             if (SDK::clientInstance != nullptr) {
                 if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-
                     MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
                     if (handler->forward) {

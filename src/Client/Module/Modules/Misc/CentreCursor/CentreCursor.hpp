@@ -8,7 +8,7 @@ class CentreCursor : public Module {
 
 public:
 
-    CentreCursor() : Module("CentreCursor", "Disables the client.", "", VK_F7) {
+    CentreCursor() : Module("CentreCursor", "Center your cursor on GUI open.", "", VK_F7) {
 
         onEnable();
 
