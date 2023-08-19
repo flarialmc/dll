@@ -44,6 +44,7 @@
 #include "Modules/Nick/NickModule.hpp"
 #include "Modules/SpeedDisplay/SpeedDisplay.hpp"
 #include "Modules/Misc/CentreCursor/CentreCursor.hpp"
+#include "Modules/CPSLimiter/CPSLimiter.hpp"
 #include <algorithm>
 
 bool compareNames( Module*& obj1,  Module*& obj2) {
@@ -95,6 +96,7 @@ void ModuleManager::initialize()
     modules.push_back(new NickModule());
     modules.push_back(new FreeLook());
     modules.push_back(new SpeedDisplay());
+    modules.push_back(new CPSLimiter());
 
 
     std::sort(modules.begin(), modules.end(), compareNames);

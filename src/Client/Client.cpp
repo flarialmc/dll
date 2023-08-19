@@ -94,9 +94,8 @@ void Client::initialize()
         { "https://cdn-c6f.pages.dev/assets/cloudy.png", Path + "cloudy.png" },
         { "https://cdn-c6f.pages.dev/assets/list.png", Path + "list.png" },
         { "https://cdn-c6f.pages.dev/assets/text-box.png", Path + "text-box.png" },
-        { "https://cdn-c6f.pages.dev/assets/icognito.png", Path + "icognito.png" }
-
-
+        { "https://cdn-c6f.pages.dev/assets/icognito.png", Path + "icognito.png" },
+        { "https://cdn-c6f.pages.dev/assets/stop.png", Path + "stop.png" }
 
     };
 

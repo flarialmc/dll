@@ -6,7 +6,9 @@
 #include "../../../Events/Input/KeyEvent.hpp"
 #include "../Module.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
+#include "../../Manager.hpp"
 #include <Windows.h>
+#include <chrono>
 
 namespace CPS {
 
@@ -27,23 +29,49 @@ private:
     static inline std::vector<ClickData> rightClickList;
     static inline bool rightClickHeld;
     static inline bool leftClickHeld;
+    static inline std::chrono::time_point<std::chrono::high_resolution_clock> lastRightClick;
+    static inline std::chrono::time_point<std::chrono::high_resolution_clock> lastLeftClick;
     Module* module;
 
     void onMouse(MouseEvent& event) override {
-
+        Module* limiter = ModuleManager::getModule("CPS Limiter");
         if (event.GetButton() == MouseButton::Left) {
             if (!MC::held) {
-                AddLeftClick();
                 leftClickHeld = false;
             }
-            else leftClickHeld = true;
+            else {
+                leftClickHeld = true;
+                if (limiter->settings.getSettingByName<bool>("enabled")) {
+                    std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - lastLeftClick;
+                    float LT = 1 / limiter->settings.getSettingByName<float>("Left")->value;
+                    if (duration.count() < LT) {
+                        MC::held = !MC::held;
+                        event.cancel();
+                        return;
+                    }
+                }
+                AddLeftClick();
+                lastLeftClick = std::chrono::high_resolution_clock::now();
+            }
         }
         if (event.GetButton() == MouseButton::Right) {
             if (!MC::held) {
-                AddRightClick();
                 rightClickHeld = false;
             }
-            else rightClickHeld = true;
+            else {
+                rightClickHeld = true;
+                if (limiter->settings.getSettingByName<bool>("enabled")) {
+                    std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - lastRightClick;
+                    float RT = 1 / limiter->settings.getSettingByName<float>("Right")->value;
+                    if (duration.count() < RT) {
+                        MC::held = !MC::held;
+                        event.cancel();
+                        return;
+                    }
+                }
+                AddRightClick();
+                lastRightClick = std::chrono::high_resolution_clock::now();
+            }
         }
 
     }
