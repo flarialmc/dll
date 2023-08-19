@@ -7,6 +7,7 @@ class Client
 public:
     static void initialize();
     static bool disable;
+    static void centerCursor();
 
     static std::string settingspath;
     static Settings settings;

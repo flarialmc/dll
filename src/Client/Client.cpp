@@ -168,3 +168,51 @@ void Client::initialize()
     FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("keybind")->value + " to open the menu in-game.");
 
 }
+
+std::string window = "Minecraft";
+
+HWND hWnd = FindWindow(nullptr, window.c_str());
+RECT currentRect = { 0 };
+RECT clientRect = { 0 };
+RECT previousRect = { 0 };
+bool InHudScreen = false;
+
+bool toes = false;
+
+void Client::centerCursor() {
+    if (hWnd != NULL && Client::settings.getSettingByName<bool>("centreCursor")->value) {
+        if (!toes) {
+            toes = true;
+            std::thread wow([&]() {
+                while (!Client::disable && Client::settings.getSettingByName<bool>("centreCursor")->value) {
+                    GetWindowRect(hWnd, &currentRect);
+                    GetClientRect(hWnd, &clientRect);
+
+                    if (memcmp(&currentRect, &previousRect, sizeof(RECT)) != 0) {
+                        previousRect = currentRect;
+                    }
+                    Sleep(1000);
+                };
+                if (Client::disable && !Client::settings.getSettingByName<bool>("centreCursor")->value) toes = false;
+                });
+
+            wow.detach();
+        }
+
+        
+        if ((SDK::CurrentScreen != "hud_screen" && InHudScreen) || (SDK::CurrentScreen == "hud_screen" && !InHudScreen))  {
+            GetWindowRect(hWnd, &currentRect);
+            GetClientRect(hWnd, &clientRect);
+
+            int windowX = currentRect.left;
+            int windowY = currentRect.top;
+
+            int centerX = windowX + (clientRect.right) / 2;
+            int centerY = windowY + (clientRect.bottom) / 2;
+
+            SetCursorPos(centerX, centerY);
+
+            InHudScreen = !InHudScreen;
+        }
+    }
+}
