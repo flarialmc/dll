@@ -15,6 +15,7 @@ private:
 
 	static float getGammaCallback(uintptr_t a1) {
 
+        if (Client::disable) return 6.9f;
 
         if(ModuleManager::getModule("Render Options")->settings.getSettingByName<bool>("enabled")->value) {
             auto **list = (uintptr_t **) a1;

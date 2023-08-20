@@ -95,8 +95,8 @@ void Client::initialize()
         { "https://cdn-c6f.pages.dev/assets/list.png", Path + "list.png" },
         { "https://cdn-c6f.pages.dev/assets/text-box.png", Path + "text-box.png" },
         { "https://cdn-c6f.pages.dev/assets/icognito.png", Path + "icognito.png" },
-        { "https://cdn-c6f.pages.dev/assets/stop.png", Path + "stop.png" }
-
+        { "https://cdn-c6f.pages.dev/assets/stop.png", Path + "stop.png" },
+        { "https://cdn-c6f.pages.dev/assets/block_break_indicator.png", Path + "block_break_indicator.png" }
     };
 
     Client::CheckSettingsFile();
@@ -164,9 +164,10 @@ void Client::initialize()
 
     Sleep(2500);
 
-    FlarialGUI::Notify("Report bugs at https://flarial.net/discord!");
-    FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("keybind")->value + " to open the menu in-game.");
-
+    if (!Client::disable) {
+        FlarialGUI::Notify("Report bugs at https://flarial.net/discord!");
+        FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("keybind")->value + " to open the menu in-game.");
+    }
 }
 
 std::string window = "Minecraft";
