@@ -156,4 +156,5 @@ public:
     ItemStack* getOffhandSlot();
     EntityContext* GetEntityContext();
     float getSpeedInMetersPerSecond();
+    void setNametag(std::string* name);
 };

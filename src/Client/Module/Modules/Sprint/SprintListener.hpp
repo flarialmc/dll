@@ -7,6 +7,7 @@
 #include "../../../GUI/Engine/Engine.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include <Windows.h>
+#include "../../../../SDK/Client/Actor/Gamemode.hpp"
 
 class SprintListener : public Listener {
 
@@ -59,6 +60,7 @@ class SprintListener : public Listener {
     }
 
     void onLocalTick(TickEvent& event) override {
+        //std::cout << (*SDK::clientInstance->getLocalPlayer()->getgamemode()).lastBreakProgress << std::endl;
         if (module->settings.getSettingByName<bool>("enabled")->value) {
             if (SDK::clientInstance != nullptr) {
                 if (SDK::clientInstance->getLocalPlayer() != nullptr) {

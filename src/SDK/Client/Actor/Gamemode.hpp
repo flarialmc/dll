@@ -1,8 +1,7 @@
 #pragma once
 
 #include "../../src/Utils/Memory/Memory.hpp"
-
-FK(Player)
+#include "Player.hpp"
 
 class Gamemode {
 public:
