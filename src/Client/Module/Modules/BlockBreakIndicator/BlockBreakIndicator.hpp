@@ -10,7 +10,7 @@ class BlockBreakIndicator : public Module {
 public:
 
 
-    BlockBreakIndicator() : Module("Block Break Indicator", "toes x2", "\\Flarial\\assets\\block_break_indicator.png", 'o') {
+    BlockBreakIndicator() : Module("Break Progress", "toes x2", "\\Flarial\\assets\\block_break_indicator.png", 'o') {
 
         onEnable();
 
