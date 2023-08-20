@@ -20,28 +20,22 @@ public:
         if(enabled != module->settings.getSettingByName<bool>("enabled")->value) {
             enabled = module->settings.getSettingByName<bool>("enabled")->value;
 
-            if(enabled) {
 
-                std::string val = module->settings.getSettingByName<std::string>("nick")->value;
-                SDK::clientInstance->getLocalPlayer()->setNametag(&val);
-                SDK::clientInstance->getLocalPlayer()->playerName = val;
-
-            } else {
-
-                std::string val = original;
-                SDK::clientInstance->getLocalPlayer()->setNametag(&val);
-                SDK::clientInstance->getLocalPlayer()->playerName =  val;
-
-            }
         }
 
-        if(enabled && SDK::clientInstance->getLocalPlayer()->playerName != module->settings.getSettingByName<std::string>("nick")->value) {
+        if(enabled) {
 
             std::string val = module->settings.getSettingByName<std::string>("nick")->value;
             SDK::clientInstance->getLocalPlayer()->setNametag(&val);
             SDK::clientInstance->getLocalPlayer()->playerName = val;
 
+        } else {
+
+            std::string val = original;
+            SDK::clientInstance->getLocalPlayer()->setNametag(&val);
+            SDK::clientInstance->getLocalPlayer()->playerName =  val;
         }
+
     }
 
     explicit NickListener(const char string[5], Module* module) {
