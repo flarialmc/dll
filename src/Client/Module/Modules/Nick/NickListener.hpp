@@ -34,6 +34,14 @@ public:
 
             }
         }
+
+        if(enabled && SDK::clientInstance->getLocalPlayer()->playerName != module->settings.getSettingByName<std::string>("nick")->value) {
+
+            std::string val = module->settings.getSettingByName<std::string>("nick")->value;
+            SDK::clientInstance->getLocalPlayer()->setNametag(&val);
+            SDK::clientInstance->getLocalPlayer()->playerName = val;
+
+        }
     }
 
     explicit NickListener(const char string[5], Module* module) {
