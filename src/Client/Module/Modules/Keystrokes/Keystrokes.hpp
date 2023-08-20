@@ -69,7 +69,7 @@ public:
 		}
 
 		if (settings.getSettingByName<std::string>("textEnabledColor") == nullptr) {
-			settings.addSetting("textEnabledColor", (std::string)"000000");
+			settings.addSetting("textEnabledColor", (std::string)"fafafa");
 		}
 
 		if (settings.getSettingByName<float>("enabledOpacity") == nullptr) {

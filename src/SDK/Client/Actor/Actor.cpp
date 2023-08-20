@@ -90,5 +90,5 @@ EntityContext* Actor::GetEntityContext() {
 }
 
 void Actor::setNametag(std::string* name) {
-    Memory::CallVFunc<61, bool>(this, name);
+    Memory::CallVFunc<61, void>(this, name);
 }
