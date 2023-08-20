@@ -159,24 +159,29 @@ public:
 		float textWidth = Constraints::RelativeConstraint(0.7f * settings.getSettingByName<float>("uiscale")->value);
 		float textHeight = Constraints::RelativeConstraint(0.1f * settings.getSettingByName<float>("uiscale")->value);
 
+
 		Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
 			this->settings.getSettingByName<float>("percentageY")->value);
 
 		Vec2<float> realcenter;
 
-		if (settingperc.x != 0) realcenter = Vec2<float>(settingperc.x * MC::windowSize.x, settingperc.y * MC::windowSize.y);
-		else realcenter = Constraints::CenterConstraint(textWidth, textHeight);
+		if (settingperc.x != 0)
+			realcenter = Vec2<float>(settingperc.x * MC::windowSize.x,
+				settingperc.y * MC::windowSize.y);
+		else
+			realcenter = Constraints::CenterConstraint(textWidth, textHeight);
 
 		float rectWidth = Constraints::RelativeConstraint(0.120f * settings.getSettingByName<float>("uiscale")->value);
 		Vec2<float> rounde = Constraints::RoundingConstraint(this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value, this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value);
 
-		float textSize = Constraints::SpacingConstraint(3.2f, textHeight) * settings.getSettingByName<float>("textscale")->value;
+		float textSize = Constraints::SpacingConstraint(2.3f, rectWidth);
 
-		float realspacing = Constraints::SpacingConstraint(0.155f, textWidth);
+		float realspacing = Constraints::SpacingConstraint(0.05f, textWidth);
+
 
 		IDWriteTextFormat* textFormat;
 		FlarialGUI::writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(textSize), L"", &textFormat);
-		textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+		textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 		textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 		IDWriteTextLayout* textLayout;
@@ -196,7 +201,7 @@ public:
 		textLayout->Release();
 		textFormat->Release();
 
-		rectWidth = textMetrics.width;
+		rectWidth = textMetrics.width + Constraints::SpacingConstraint(2.0, realspacing);
 
 		if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
 			FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, textHeight, index);
@@ -207,6 +212,7 @@ public:
 		realcenter.y = vec2.y;
 
 		realcenter = realcenter;
+
 
 		Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y);
 
@@ -223,16 +229,14 @@ public:
 
 		if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + rectWidth, realcenter.y + textHeight), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
 
-		float center = realcenter.x - realspacing;
-
-		FlarialGUI::RoundedRect(center + (rectWidth/2), realcenter.y,
+		FlarialGUI::RoundedRect(realcenter.x, realcenter.y,
 			bgColor, rectWidth, textHeight,
 			rounde.x, rounde.x);
 
-		FlarialGUI::FlarialTextWithFont(center, realcenter.y,
+		FlarialGUI::FlarialTextWithFont(realcenter.x + realspacing, realcenter.y,
 			FlarialGUI::to_wide(text).c_str(),
 			textColor, textWidth,
-			textHeight, DWRITE_TEXT_ALIGNMENT_CENTER, textSize);
+			textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, textSize);
 
 		if (this->settings.getSettingByName<bool>("border")->value) {
 			FlarialGUI::RoundedHollowRect(realcenter.x, realcenter.y, Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
