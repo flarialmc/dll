@@ -95,7 +95,7 @@ public:
                     if (ClickGUIRenderer::page.type == "settings" || curr == "settings") {
 
                         lerp(baseHeightReal, 0.35f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
-                        FlarialGUI::TextBoxes[0].isActive = false;
+
                         //FadeEffect::ApplyFadeOutEffect(0.015f * FlarialGUI::frameFactor, baseHeightReal, 0.35f);
                     } else {
                         lerp(baseHeightReal, 0.64f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
@@ -322,7 +322,7 @@ public:
                         FlarialGUI::UnsetScrollView();
                     }
                     else if (e == "settings") {
-                        FlarialGUI::TextBoxes[0].isActive = false;
+
                         FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
 
                         float rectX = Constraints::PercentageConstraint(0.01, "left");
