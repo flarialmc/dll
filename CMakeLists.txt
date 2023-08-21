@@ -38,7 +38,7 @@ endif()
 
 file(GLOB_RECURSE sources "main.cpp" "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp")
 
-add_library(Flarial SHARED ${sources} src/SDK/Client/Network/Packet/Packet.cpp src/SDK/Client/Actor/Components/MobBodyRotationComponent.hpp  "src/SDK/Client/Actor/Player.cpp" "src/Client/Module/Modules/Compact Chat/CompactChat.hpp")
+add_library(Flarial SHARED ${sources})
 
 target_include_directories(Flarial PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/")
 
