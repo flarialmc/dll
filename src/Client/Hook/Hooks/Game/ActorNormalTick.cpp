@@ -4,6 +4,7 @@
 #include "../../../Events/EventHandler.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "RaknetTick.hpp"
+#include "../../../Client.hpp"
 
 bool ActorNormalTick::allahuakbar = false;
 
@@ -22,6 +23,8 @@ void ActorNormalTick::enableHook() {
 ActorNormalTick::ActorNormalTick() : Hook("ActorNormalTickHook", "48 8D 05 ???? ?? ?? 48 89 01 49 88 00 48 89 41 08"){}
 
 void ActorNormalTick::callback(Actor *xd) {
+
+    if (Client::disable) return;
 
     if(xd != nullptr) {
 

@@ -7,25 +7,41 @@
 #include "../../../../SDK/SDK.hpp"
 #include "../Hook.hpp"
 #include "../../../../SDK/Client/Render/ItemRenderer.hpp"
+#include "../../../Module/Modules/CompactChat/CompactChatListener.hpp"
 #include <format>
 
 bool sendoncethx = false;
+std::string actualName = "";
+
 
 class SetUpAndRenderHook : public Hook
 {
 private:
 
     static void drawTextCallback(MinecraftUIRenderContext* ctx, void* font, float* pos, std::string* text, float* color, float alpha, unsigned int textAlignment, void* textMeasureData, void* caretMeasureData) {
-
         if (SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                if(actualName.empty()) actualName = SDK::clientInstance->getLocalPlayer()->playerName;
                 if (ModuleManager::getModule("Nick") != nullptr) {
-                    auto  module = ModuleManager::getModule("Nick");
+                    auto module = ModuleManager::getModule("Nick");
                     if (module->settings.getSettingByName<bool>("enabled")->value) {
-                        std::string localPlayerName = SDK::clientInstance->getLocalPlayer()->playerName;
-                        size_t found = text->find(localPlayerName);
-                        if (found != std::string::npos) {
-                            *text = module->settings.getSettingByName<std::string>("nick")->value + text->substr(found + localPlayerName.length());
+                        std::string localPlayerName = actualName;
+                        size_t pos = text->find(localPlayerName);
+                        if (pos != std::string::npos) {
+                            std::string faketxt = *text;
+                            faketxt.replace(pos, localPlayerName.length(), module->settings.getSettingByName<std::string>("nick")->value);
+                            *text = faketxt;
+                        }
+                    }
+                } 
+                if (ModuleManager::getModule("CompactChat") != nullptr) {
+                    auto module = ModuleManager::getModule("CompactChat");
+                    if (module->settings.getSettingByName<bool>("enabled")->value) {
+                        size_t pos = text->find(CompactChatListener::dups.back().first);
+                        if (pos != std::string::npos) {
+                            std::string newtxt = *text;
+                            newtxt.replace(pos, CompactChatListener::dups.back().first.length(), std::format("{} [x{}]", CompactChatListener::dups.back().first, CompactChatListener::dups.back().second));
+                            *text = newtxt;
                         }
                     }
                 }

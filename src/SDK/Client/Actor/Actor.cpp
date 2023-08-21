@@ -89,19 +89,6 @@ EntityContext* Actor::GetEntityContext() {
     return reinterpret_cast<EntityContext*>(address + 8);
 }
 
-float Actor::getSpeedInMetersPerSecond() {
-    static uintptr_t sig;
-    //static uintptr_t realAddr;
-
-    if (sig == NULL) {
-        sig = Memory::findSig("48 89 5C 24 08 57 48 83 EC 20 48 8B 01 48 8B D9 48 8B 80 B0 00 00 00 FF 15 ?? ?? ?? ?? 48 8B 13 48 8B CB 48 8B F8 48 8B 82 B8 00 00 00 FF 15");
-
-    }
-
-    //if (realAddr == NULL) {
-    //    realAddr = sig + 1 + *reinterpret_cast<float*>(sig + 1);
-    //}
-
-    auto fn = reinterpret_cast<float (__thiscall*)(Actor*)>(sig);
-    return fn(this);
+void Actor::setNametag(std::string* name) {
+    Memory::CallVFunc<61, void>(this, name);
 }

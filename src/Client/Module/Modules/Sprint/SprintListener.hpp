@@ -7,6 +7,8 @@
 #include "../../../GUI/Engine/Engine.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include <Windows.h>
+#include "../../../../SDK/Client/Actor/Gamemode.hpp"
+#include "../../Manager.hpp"
 
 class SprintListener : public Listener {
 

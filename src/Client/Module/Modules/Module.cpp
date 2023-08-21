@@ -46,7 +46,6 @@ void Module::NormalRender(int index, std::string text, std::string value) {
 
     realcenter = realcenter;
 
-
     Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y);
 
     this->settings.setValue("percentageX", percentages.x);

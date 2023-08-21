@@ -10,15 +10,18 @@ public:
     void onKey(KeyEvent& event) override {
       
             if (event.GetKey() == VK_F8 && static_cast<ActionType>(event.GetAction()) == ActionType::RELEASED) {
-                if (SDK::clientInstance->getLocalPlayer() == nullptr) {
-                    ModuleManager::terminate();
-                    Client::disable = true;
-                }
-                 else {
+                ModuleManager::terminate();
+                Client::disable = true;
 
-                     FlarialGUI::Notify("Cannot eject in a world");
-
-                 }
+                //if (SDK::clientInstance->getLocalPlayer() == nullptr) {
+                //    ModuleManager::terminate();
+                //    Client::disable = true;
+                //}
+                //else {
+                //
+                //     FlarialGUI::Notify("Cannot eject in a world");
+                //
+                //}
             }
    
        

@@ -276,6 +276,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
                 MC::mousebutton = MouseButton::None;
                 ClickGUIRenderer::page.type = "settings";
                 ClickGUIRenderer::page.module = mod->name;
+                FlarialGUI::TextBoxes[0].isActive = false;
                 FlarialGUI::scrollpos = 0;
                 FlarialGUI::barscrollpos = 0;
                 GUIMouseListener::accumilatedPos = 0;
