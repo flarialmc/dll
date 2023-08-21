@@ -9,7 +9,9 @@
 
 class NickListener : public Listener {
     Module* module;
-    bool enabled = false;
+public:
+    static inline bool enabled = false;
+    static inline bool forceDisable = false;
     std::string original;
 public:
 
@@ -23,7 +25,7 @@ public:
 
         }
 
-        if(enabled) {
+        if (enabled && !forceDisable) {
 
             std::string val = module->settings.getSettingByName<std::string>("nick")->value;
             SDK::clientInstance->getLocalPlayer()->setNametag(&val);
@@ -33,7 +35,7 @@ public:
 
             std::string val = original;
             SDK::clientInstance->getLocalPlayer()->setNametag(&val);
-            SDK::clientInstance->getLocalPlayer()->playerName =  val;
+            SDK::clientInstance->getLocalPlayer()->playerName = val;
         }
 
     }

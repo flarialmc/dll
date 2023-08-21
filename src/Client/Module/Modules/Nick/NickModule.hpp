@@ -39,6 +39,9 @@ public:
     }
 
     void onDisable() override {
+
+        NickListener::forceDisable = true;
+
         Module::onDisable();
     }
 
