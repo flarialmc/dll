@@ -47,6 +47,8 @@
 #include "Modules/CPSLimiter/CPSLimiter.hpp"
 #include "Modules/BlockBreakIndicator/BlockBreakIndicator.hpp"
 #include "Modules/CompactChat/CompactChat.hpp"
+#include "Modules/MovableChat/MovableChat.hpp"
+#include "Modules/FOVChanger/FOVChanger.hpp"
 #include <algorithm>
 
 bool compareNames( Module*& obj1,  Module*& obj2) {
@@ -100,6 +102,8 @@ void ModuleManager::initialize()
     modules.push_back(new SpeedDisplay());
     modules.push_back(new CPSLimiter());
     modules.push_back(new BlockBreakIndicator());
+    //modules.push_back(new MovableChat());
+    modules.push_back(new FOVChanger());
     //modules.push_back(new CompactChat());
 
     std::sort(modules.begin(), modules.end(), compareNames);

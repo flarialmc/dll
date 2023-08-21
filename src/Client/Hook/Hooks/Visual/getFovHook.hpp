@@ -6,42 +6,57 @@
 #include "../../../Module/Modules/Zoom/Zoom.hpp"
 #include "../../../Module/Modules/Zoom/ZoomListener.hpp"
 #include "../../../Module/Manager.hpp"
+#include "../Game/RaknetTick.hpp"
+#include "../../../Client.hpp"
 
 class getFovHook : public Hook
 {
 private:
 
-    static inline float currentZoomVal = 0.0f;
+	static inline float currentZoomVal = 0.0f;
 
 	static float getFovCallback(void* a1, float f, void* a3, void* a4) {
 
 		float fov = func_original(a1, f, a3, a4);
 
+		if (ModuleManager::getModule("FOV Changer") != nullptr) {
+			auto fovchanger = ModuleManager::getModule("FOV Changer");
+			if (fovchanger->settings.getSettingByName<bool>("enabled")->value) {
+				bool inserver;
 
-        if (ModuleManager::getModule("Zoom") != nullptr && fov != 70) {
+				if (RaknetTickHook::towriteip.find("none") != std::string::npos) inserver = false;
+				else if (!RaknetTickHook::towriteip.empty()) inserver = true;
+				else inserver = false;
 
-            auto zom = reinterpret_cast<Zoom *>(ModuleManager::getModule("Zoom"));
-            if(zom->settings.getSettingByName<bool>("enabled")->value) currentZoomVal = std::lerp(currentZoomVal, ZoomListener::zoomValue, zom->settings.getSettingByName<float>("anim")->value * FlarialGUI::frameFactor);
-            else currentZoomVal = std::lerp(currentZoomVal, fov, zom->settings.getSettingByName<float>("anim")->value * FlarialGUI::frameFactor);
-            fov = currentZoomVal;
+				if (inserver) {
+					FlarialGUI::Notify("Can't use FOV Changer on servers");
+					fovchanger->settings.getSettingByName<bool>("enabled")->value = false;
+				} else fov = fovchanger->settings.getSettingByName<float>("fovvalue")->value;
+			}
+		}
 
-        }
+		if (ModuleManager::getModule("Zoom") != nullptr && fov != 70) {
 
-        return fov;
+			auto zom = reinterpret_cast<Zoom*>(ModuleManager::getModule("Zoom"));
+			if (zom->settings.getSettingByName<bool>("enabled")->value) currentZoomVal = std::lerp(currentZoomVal, ZoomListener::zoomValue, zom->settings.getSettingByName<float>("anim")->value * FlarialGUI::frameFactor);
+			else currentZoomVal = std::lerp(currentZoomVal, fov, zom->settings.getSettingByName<float>("anim")->value * FlarialGUI::frameFactor);
+			fov = currentZoomVal;
 
+		}
 
+		return fov;
 
-    }
+	}
 
 public:
-    typedef float(__thiscall* getFovOriginal)(void*, float, void*, void*);
-    static inline getFovOriginal func_original = nullptr;
+	typedef float(__thiscall* getFovOriginal)(void*, float, void*, void*);
+	static inline getFovOriginal func_original = nullptr;
 
-    getFovHook() : Hook("getFovHook", "48 8B ? 48 89 ? ? 48 89 ? ? 57 48 81 EC ? ? ? ? 0F 29 ? ? 0F 29 ? ? 44 0F ? ? ? 44 0F ? ? ? 48 8B ? ? ? ? ? 48 33 ? 48 89 ? ? ? 41 0F") {}
+	getFovHook() : Hook("getFovHook", "48 8B ? 48 89 ? ? 48 89 ? ? 57 48 81 EC ? ? ? ? 0F 29 ? ? 0F 29 ? ? 44 0F ? ? ? 44 0F ? ? ? 48 8B ? ? ? ? ? 48 33 ? 48 89 ? ? ? 41 0F") {}
 
-    void enableHook() override {
-        this->autoHook(getFovCallback, (void**)&func_original);
-    }
+	void enableHook() override {
+		this->autoHook(getFovCallback, (void**)&func_original);
+	}
 };
 
 

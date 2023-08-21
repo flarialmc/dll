@@ -26,7 +26,7 @@ DWORD WINAPI init(HMODULE real)
 
     bool showConsole = false;
     
-    if(GetConsoleWindow() == nullptr && showConsole) {
+    if (GetConsoleWindow() == nullptr && showConsole) {
         AllocConsole();
         SetConsoleTitleA("Flarial-Debugger");
         FILE *out;
