@@ -214,8 +214,8 @@ kiero::Status::Enum kiero::init(RenderType::Enum _renderType)
 				swapChainDesc.BufferCount = 1;
 				swapChainDesc.OutputWindow = window;
 				swapChainDesc.Windowed = 1;
-				swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-				swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING ;
+				swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+				swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 				IDXGISwapChain *swapChain;
 				ID3D10Device *device;
@@ -277,7 +277,7 @@ kiero::Status::Enum kiero::init(RenderType::Enum _renderType)
 				}
 
 				D3D_FEATURE_LEVEL featureLevel;
-				const D3D_FEATURE_LEVEL featureLevels[] = {D3D_FEATURE_LEVEL_10_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_11_0};
+				const D3D_FEATURE_LEVEL featureLevels[] = {D3D_FEATURE_LEVEL_10_0,D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_11_1};
 
 				DXGI_RATIONAL refreshRate;
 				refreshRate.Numerator = 60;
@@ -302,8 +302,8 @@ kiero::Status::Enum kiero::init(RenderType::Enum _renderType)
 				swapChainDesc.BufferCount = 1;
 				swapChainDesc.OutputWindow = window;
 				swapChainDesc.Windowed = 1;
-                swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-                swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING ;
+				swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+				swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 				IDXGISwapChain *swapChain;
 				ID3D11Device *device;
@@ -459,8 +459,8 @@ kiero::Status::Enum kiero::init(RenderType::Enum _renderType)
 				swapChainDesc.BufferCount = 2;
 				swapChainDesc.OutputWindow = window;
 				swapChainDesc.Windowed = 1;
-                swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-                swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+				swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+				swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 				IDXGISwapChain *swapChain;
 				if (factory->CreateSwapChain(commandQueue, &swapChainDesc, &swapChain) < 0)
