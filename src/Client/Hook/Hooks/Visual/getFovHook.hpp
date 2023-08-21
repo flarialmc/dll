@@ -34,10 +34,14 @@ private:
 			else inserver = false;
 
 			if (inserver) {
-				FlarialGUI::Notify("Can't use FOV Changer on servers");
-				fovchanger->settings.getSettingByName<bool>("enabled")->value = false;
+				if (fovchanger->settings.getSettingByName<float>("fovvalue")->value > 150) {
+					FlarialGUI::Notify("FOV Changer has been limmited to 150 on servers.");
+					fovchanger->settings.getSettingByName<float>("fovvalue")->value = 150;
+				}
+				// fovchanger->settings.getSettingByName<bool>("enabled")->value = false;
 			}
-			else fov = fovchanger->settings.getSettingByName<float>("fovvalue")->value;
+			
+			fov = fovchanger->settings.getSettingByName<float>("fovvalue")->value;
 		}
 
 		if (zom != nullptr && fov != 70) {

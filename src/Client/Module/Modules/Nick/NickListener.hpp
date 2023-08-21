@@ -44,7 +44,7 @@ public:
             if(original2 == module->settings.getSettingByName<std::string>("nick")->value) original2 = backupOri;
             val2 = original2;
 
-            std::cout << original2 << std::endl;
+            //std::cout << original2 << std::endl;
 
             SDK::clientInstance->getLocalPlayer()->setNametag(&val2);
             SDK::clientInstance->getLocalPlayer()->playerName =  val;
