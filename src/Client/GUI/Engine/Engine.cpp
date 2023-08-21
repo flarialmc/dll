@@ -531,7 +531,7 @@ std::string FlarialGUI::TextBox(int index, std::string text, int limit, float x,
 
 
 
-float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor, float startingPoint, const float maxValue) {
+float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor, float startingPoint, const float maxValue, const float minValue) {
 
     // Define the total slider rect width and height
     const float totalWidth = Constraints::RelativeConstraint(0.15, "height", true);
@@ -599,9 +599,6 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
     float rectangleLeft = farLeftX;
     float rectangleWidth = farRightX - farLeftX;
-
-    float minValue = 0.0f;   // Minimum value (e.g., 0%)
-
 
     if(SliderRects[index].hasBeenMoved) {
 
