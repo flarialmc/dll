@@ -43,7 +43,7 @@ private:
                 leftClickHeld = true;
                 if (limiter->settings.getSettingByName<bool>("enabled")) {
                     std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - lastLeftClick;
-                    float LT = 1 / limiter->settings.getSettingByName<float>("Left")->value;
+                    float LT = 1.3 / limiter->settings.getSettingByName<float>("Left")->value;
                     if (duration.count() < LT and limiter->settings.getSettingByName<bool>("enabled")->value) {
                         MC::held = !MC::held;
                         event.cancel();
