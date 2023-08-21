@@ -65,7 +65,7 @@ public:
 		VirtualProtect((LPVOID)option, patched_option.size(), oldProtect, &oldProtect);
 	};
 
-	void unpatch() {
+	static void unpatch() {
 		DWORD oldProtect;
 		VirtualProtect((LPVOID)option, original_option.size(), PAGE_EXECUTE_READWRITE, &oldProtect);
 		memcpy((LPVOID)option, original_option.data(), original_option.size());
