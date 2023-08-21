@@ -49,6 +49,7 @@
 #include "Modules/CompactChat/CompactChat.hpp"
 #include "Modules/MovableChat/MovableChat.hpp"
 #include "Modules/FOVChanger/FOVChanger.hpp"
+#include "Modules/UpsideDown/UpsideDown.hpp"
 #include <algorithm>
 
 bool compareNames( Module*& obj1,  Module*& obj2) {
@@ -105,6 +106,7 @@ void ModuleManager::initialize()
     //modules.push_back(new MovableChat());
     modules.push_back(new FOVChanger());
     //modules.push_back(new CompactChat());
+    modules.push_back(new UpsideDown());
 
     std::sort(modules.begin(), modules.end(), compareNames);
 
