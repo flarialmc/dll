@@ -30,6 +30,7 @@ public:
 	}
 
 	void onDisable() override {
+		ForceCoordsListener::unpatch();
 
 		EventHandler::unregisterListener("ForceCoords");
 
