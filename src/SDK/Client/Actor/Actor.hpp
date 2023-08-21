@@ -157,5 +157,5 @@ public:
     EntityContext* GetEntityContext();
     float getSpeedInMetersPerSecond();
     void setNametag(std::string* name);
-    void getNametag();
+    std::string* getNametag();
 };
