@@ -13,6 +13,8 @@ class getFovHook : public Hook
 {
 private:
 
+	static inline bool notified150FOV = false;
+
 	static inline float currentZoomVal = 0.0f;
 
 	static float getFovCallback(void* a1, float f, void* a3, void* a4) {
@@ -35,7 +37,10 @@ private:
 
 			if (inserver) {
 				if (fovchanger->settings.getSettingByName<float>("fovvalue")->value > 150) {
-					FlarialGUI::Notify("FOV Changer has been limmited to 150 on servers.");
+					if (!notified150FOV) {
+						FlarialGUI::Notify("FOV Changer has been limmited to 150 on servers.");
+						notified150FOV = true;
+					}
 					fovchanger->settings.getSettingByName<float>("fovvalue")->value = 150;
 				}
 				// fovchanger->settings.getSettingByName<bool>("enabled")->value = false;
