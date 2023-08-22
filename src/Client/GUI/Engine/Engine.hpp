@@ -53,6 +53,13 @@ struct KeybindSelectorer
     std::chrono::steady_clock::time_point currentOnKeyTime = std::chrono::steady_clock::now();
 };
 
+struct Dropdown
+{
+    std::string selected;
+    std::vector<std::string> options;
+    bool isActive = false;
+    bool isAnimating = false;
+};
 
 class Dimension
 {
@@ -105,6 +112,7 @@ namespace FlarialGUI
     inline SliderRect SliderRects[2500];
     inline TextBoxStruct TextBoxes[1000];
     inline ColorPicker ColorPickers[2000];
+    inline Dropdown DropDownMenus[2000];
     inline KeybindSelectorer KeybindSelectors[2000];
     inline std::string currentKeybind;
     std::vector<Notification> inline notifications;
@@ -156,6 +164,10 @@ namespace FlarialGUI
 
     float Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor,
            const D2D1_COLOR_F circleColor, float startingPoint = 50.0f, const float maxValue = 100.0f, const float minValue = 0.0f);
+
+    std::string Dropdown(int index, float x, float y, const D2D1_COLOR_F enabledColor, const D2D1_COLOR_F disabledColor, const std::vector<std::string> options, std::string &value, std::string label);
+
+    void DropdownChild(std::string value, int index, float x, float y);
 
     void Circle(float x, float y, const D2D1_COLOR_F &color, float radius);
 
