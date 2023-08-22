@@ -56,7 +56,8 @@ public:
             settings.addSetting("uiscale", 0.65f);
         }
 
-        if(settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.0f);
+        if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.0f);
+        if (settings.getSettingByName<std::string>("textalignment") == nullptr) settings.addSetting("textalignment", (std::string)"Left");
 
         EventHandler::registerListener(new IPDisplayListener("IPDisplay", this));
     }
@@ -147,16 +148,17 @@ public:
         this->settings.getSettingByName<float>("textscale")->value = percent;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-        std::string defop = "Left";
 
-        FlarialGUI::Dropdown(0,
-            Constraints::PercentageConstraint(0.019, "left"), toggleY,
-            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
-            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
-            std::vector<std::string>{"Left", "Center", "Right"},
-            defop,
-            "Text Alignment"
-        );
+        //std::string txtAlignment = FlarialGUI::Dropdown(0,
+        //    Constraints::PercentageConstraint(0.019, "left"), toggleY,
+        //    D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+        //    D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+        //    std::vector<std::string>{"Left", "Center", "Right"},
+        //    this->settings.getSettingByName<std::string>("textalignment")->value,
+        //    "Text Alignment"
+        //);
+        //
+        //this->settings.getSettingByName<std::string>("textalignment")->value = txtAlignment;
 
 
         /* Rounding End */

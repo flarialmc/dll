@@ -58,7 +58,8 @@ struct Dropdown
     std::string selected;
     std::vector<std::string> options;
     bool isActive = false;
-    bool isAnimating = false;
+    bool firstTime = true;
+    float rotation = 0.0f;
 };
 
 class Dimension

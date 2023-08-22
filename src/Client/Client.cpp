@@ -99,6 +99,7 @@ void Client::initialize()
         { "https://cdn-c6f.pages.dev/assets/block_break_indicator.png", Path + "block_break_indicator.png" },
         { "https://cdn-c6f.pages.dev/assets/field-of-view.png", Path + "field-of-view.png" },
         { "https://cdn-c6f.pages.dev/assets/upside-down.png", Path + "upside-down.png" },
+        { "https://cdn-c6f.pages.dev/assets/down.png", Path + "down.png" },
     };
 
     Client::CheckSettingsFile();

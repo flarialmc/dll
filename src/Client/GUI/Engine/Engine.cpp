@@ -541,9 +541,9 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
 	// Define the total slider rect width and height
 	const float totalWidth = Constraints::RelativeConstraint(0.15, "height", true);
-	const float height = Constraints::RelativeConstraint(0.0065, "height", true);
+	const float height = Constraints::RelativeConstraint(0.0045, "height", true);
 
-	Vec2<float> round = Constraints::RoundingConstraint(12, 12);
+	Vec2<float> round = Constraints::RoundingConstraint(13, 13);
 
 	const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
 	const float percWidth = Constraints::RelativeConstraint(0.046, "height", true);
@@ -620,16 +620,19 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 	// Calculate the position and width of the enabled portion rect
 	const float enabledWidth = circleX - farLeftX;
 
-	round = Constraints::RoundingConstraint(6, 6);
+	round = Constraints::RoundingConstraint(4, 4);
 
 	// Draw the disabled portion rect
 	RoundedRect(farLeftX, y, disabledColor, totalWidth, height, round.x, round.x);
 
 	// Draw the enabled portion rect
 	RoundedRect(farLeftX, y, color, enabledWidth, height, round.x, round.x);
-	// Draw the circle in the middle
 
-	FlarialGUI::Circle(circleX, circleY, circleColor, circleRadius);
+	round = Constraints::RoundingConstraint(13, 13);
+
+	// Draw the circle in the middle
+	FlarialGUI::Circle(circleX, circleY, color, Constraints::SpacingConstraint(circleRadius, 1.1));
+	FlarialGUI::Circle(circleX, circleY, circleColor, Constraints::SpacingConstraint(circleRadius, 0.55));
 
 	// Calculate the percentage
 	float percentage = ((circleX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
@@ -712,7 +715,7 @@ void FlarialGUI::Circle(float x, float y, const D2D1_COLOR_F& color, float radiu
 }
 
 
-std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F enabledColor, const D2D1_COLOR_F disabledColor, const std::vector<std::string> options, std::string &value, std::string label) {
+std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F enabledColor, const D2D1_COLOR_F disabledColor, const std::vector<std::string> options, std::string& value, std::string label) {
 	D2D1_COLOR_F col;
 
 	Vec2<float> round = Constraints::RoundingConstraint(13, 13);
@@ -734,48 +737,118 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F
 	else if (!CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.55, textWidth), percHeight + maxHeight) && MC::mouseaction == MouseAction::PRESS && MC::mousebutton == MouseButton::Left) {
 		FlarialGUI::DropDownMenus[index].isActive = false;
 		value = FlarialGUI::DropDownMenus[index].selected;
+		FlarialGUI::lerp(
+			FlarialGUI::DropDownMenus[index].rotation,
+			0.0f,
+			0.15 * FlarialGUI::frameFactor
+		);
 	}
 	else if (!FlarialGUI::DropDownMenus[index].isActive) {
+		if (FlarialGUI::DropDownMenus[index].firstTime) {
+			FlarialGUI::DropDownMenus[index].selected = value;
+			FlarialGUI::DropDownMenus[index].firstTime = false;
+		}
 		value = FlarialGUI::DropDownMenus[index].selected;
 	}
-	
-	D2D1_COLOR_F unselectedChildCol = D2D1::ColorF(41.0f / 255.0f, 41.0f / 255.0f, 41.0f / 255.0f);
-	D2D1_COLOR_F hoveredChildCol = D2D1::ColorF(135.0f / 96.0f, 135.0f / 255.0f, 135.0f / 255.0f);
+
+	if (FlarialGUI::DropDownMenus[index].isActive) FlarialGUI::lerp(
+		FlarialGUI::DropDownMenus[index].rotation,
+		180.0f,
+		0.5 * FlarialGUI::frameFactor
+	);
+
+	else FlarialGUI::lerp(
+		FlarialGUI::DropDownMenus[index].rotation,
+		0.0f,
+		0.5 * FlarialGUI::frameFactor
+	);
+
+	D2D1_COLOR_F unselectedChildCol = disabledColor;
+	D2D1_COLOR_F hoveredChildCol = D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f);
 
 	if (FlarialGUI::DropDownMenus[index].isActive) {
-
 		int counter = 1;
+
+		float curTextWidth = Constraints::RelativeConstraint(0.1175, "height", true);
+		float offset = textWidth - curTextWidth -1;
+
 		for (const std::string& op : options) {
 			if (op == FlarialGUI::DropDownMenus[index].selected) continue;
 
-			float curY = y + (counter * childHeights) + 2;
+			float curY = y + (counter * childHeights) + 2 - (counter*0.25);
 			float curClickingY = clickingY + (counter * childHeights) + 2;
+			float lastChildHeight = childHeights - 8;
 
-			if (CursorInRect(x, curClickingY, Constraints::SpacingConstraint(1.55, textWidth), childHeights)) {
+			if (counter == options.size() - 1) {
+				FlarialGUI::RoundedRect(x + offset, curY, unselectedChildCol, Constraints::SpacingConstraint(1.55, curTextWidth), childHeights, round.x, round.y);
+			}
+
+			if (CursorInRect(x + offset, curClickingY, Constraints::SpacingConstraint(1.55, curTextWidth), childHeights)) {
 				if (MC::mouseaction == MouseAction::PRESS && MC::mousebutton == MouseButton::Left) {
-					value = op;
 					FlarialGUI::DropDownMenus[index].isActive = false;
+					value = op;
 				}
-				FlarialGUI::RoundedRect(x, curY, hoveredChildCol, Constraints::SpacingConstraint(1.55, textWidth), childHeights, 0, 0);
+				if (counter == options.size() - 1) {
+					FlarialGUI::RoundedRect(x + offset, curY, hoveredChildCol, Constraints::SpacingConstraint(1.55, curTextWidth), lastChildHeight, 0, 0);
+					FlarialGUI::RoundedRect(x + offset, curY, hoveredChildCol, Constraints::SpacingConstraint(1.55, curTextWidth), childHeights, round.x, round.y);
+				}
+				else FlarialGUI::RoundedRect(x + offset, curY, hoveredChildCol, Constraints::SpacingConstraint(1.55, curTextWidth), childHeights, 0, 0);
+				
 			}
 			else {
-				FlarialGUI::RoundedRect(x, curY, unselectedChildCol, Constraints::SpacingConstraint(1.55, textWidth), childHeights, 0, 0);
+				if (counter == options.size() - 1) {
+					FlarialGUI::RoundedRect(x + offset, curY, unselectedChildCol, Constraints::SpacingConstraint(1.55, curTextWidth), lastChildHeight, 0, 0);
+					FlarialGUI::RoundedRect(x + offset, curY, unselectedChildCol, Constraints::SpacingConstraint(1.55, curTextWidth), childHeights, round.x, round.y);
+				}
+				else FlarialGUI::RoundedRect(x + offset, curY, unselectedChildCol, Constraints::SpacingConstraint(1.55, curTextWidth), childHeights, 0, 0);
 			}
 
-			FlarialGUI::FlarialTextWithFont(x, curY, to_wide(op).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), childHeights, DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::SpacingConstraint(1.0, textWidth));
-		
+			FlarialGUI::FlarialTextWithFont(x + offset + Constraints::SpacingConstraint(0.1, curTextWidth), counter == options.size() - 1 ? curY -2.5f : curY, to_wide(op).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, curTextWidth), percHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.0, curTextWidth));
+
 			counter++;
 		}
 
-		col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
+		col = enabledColor;
 	}
-	else col = D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f);
+	else col = disabledColor;
 
 	FlarialGUI::RoundedRect(x, y, col, Constraints::SpacingConstraint(1.55, textWidth), percHeight, round.x, round.x);
 
-	FlarialGUI::FlarialTextWithFont(x, y, to_wide(value).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::SpacingConstraint(1.0, textWidth));
+	FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.1, textWidth), y, to_wide(value).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.0, textWidth));
 	FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, to_wide(label).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(3, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.00, textWidth));
+	
+	float is = percHeight / 2;
+	float ix = x + Constraints::SpacingConstraint(1.5, textWidth) - is * 1.2;
+	float iy = y + Constraints::SpacingConstraint(0.28, percHeight);
 
+	std::string imageName = "\\Flarial\\assets\\down.png";
+	
+	if (ImagesClass::eimages[imageName] == nullptr) {
+		std::string among = Utils::getRoamingPath() + "\\" + imageName;
+		LoadImageFromFile(to_wide(among).c_str(), &ImagesClass::eimages[imageName]);
+	};
+
+	D2D1_MATRIX_3X2_F oldTransform;
+	D2D::context->GetTransform(&oldTransform);
+
+	auto rectf = D2D1::RectF(ix, iy, ix + is, iy + is);
+
+	if (isInScrollView) {
+		rectf.top += scrollpos;
+		rectf.bottom += scrollpos;
+	}
+
+	D2D1_POINT_2F rotationCenter = D2D1::Point2F(rectf.left + is / 2, rectf.top + is / 2);
+	D2D1_MATRIX_3X2_F rotationMatrix = D2D1::Matrix3x2F::Rotation(FlarialGUI::DropDownMenus[index].rotation, rotationCenter);
+
+	D2D::context->SetTransform(rotationMatrix);
+
+	D2D::context->DrawBitmap(ImagesClass::eimages[imageName], rectf, 1.0f, D2D1_INTERPOLATION_MODE_ANISOTROPIC);
+
+	D2D::context->SetTransform(oldTransform);
+
+	FlarialGUI::RoundedRect(ix - 8, iy - 5, FlarialGUI::DropDownMenus[index].isActive ? D2D1::ColorF(D2D1::ColorF::White) : D2D1::ColorF(192.0f / 255.0f, 133.0f / 255.0f, 142.0f / 255.0f), 1, is + 8, 0, 0);
+	
 	FlarialGUI::DropDownMenus[index].selected = value;
 
 	return FlarialGUI::DropDownMenus[index].selected;
