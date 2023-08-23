@@ -10,6 +10,7 @@
 #include "../../../../Utils/Utils.hpp"
 #include "../../../Client.hpp"
 #include <Windows.h>
+#include <string>
 
 class BlockBreakIndicatorListener : public Listener {
 
@@ -25,6 +26,7 @@ class BlockBreakIndicatorListener : public Listener {
 
 			std::string progress = std::format("{:.0f}%", (*SDK::clientInstance->getLocalPlayer()->getgamemode()).lastBreakProgress*100);
 			this->module->NormalRender(16, module->settings.getSettingByName<std::string>("text")->value, progress);
+
 		}
 	}
 

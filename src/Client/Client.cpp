@@ -98,6 +98,8 @@ void Client::initialize()
         { "https://cdn-c6f.pages.dev/assets/stop.png", Path + "stop.png" },
         { "https://cdn-c6f.pages.dev/assets/block_break_indicator.png", Path + "block_break_indicator.png" },
         { "https://cdn-c6f.pages.dev/assets/field-of-view.png", Path + "field-of-view.png" },
+        { "https://cdn-c6f.pages.dev/assets/Shanki.jpg", Path + "Shanki.jpg" },
+        { "https://cdn-c6f.pages.dev/assets/shankismoll.png", Path + "shankismoll.png" }
     };
 
     Client::CheckSettingsFile();

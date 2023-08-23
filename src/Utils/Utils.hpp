@@ -102,13 +102,17 @@ public:
     auto mul(const Vec2<T>& v) -> Vec2<T> {
         return Vec2<T>(this->x * v.x, this->y * v.y);
     };
-public:
     auto dist(const Vec2<T>& v) -> float {
         auto dX = this->x - v.x;
         auto dY = this->y - v.y;
 
         return sqrt(dX * dX + dY * dY);
     };
+    auto ToInt() {
+        int x = this->x;
+        int y = this->y;
+        return Vec2<int>(x, y);
+    }
 };
 
 template<typename T>
@@ -119,7 +123,14 @@ public:
     Vec3(T x = 0, T y = 0, T z = 0) : Vec2<T>(x, y) {
         this->z = z;
     };
-public:
+
+    auto ToFloat() {
+        float x = this->x;
+        float y = this->y;
+        float z = this->z;
+        return Vec3<float>(x, y, z);
+    }
+
     auto add(T x, T y, T z) -> Vec3<T> {
         return Vec3<T>(this->x + x, this->y + y, this->z + z);
     };
@@ -184,5 +195,24 @@ public:
 public:
     Vec4(T x = 0, T y = 0, T z = 0, T w = 0) : Vec3<T>(x, y, z) {
         this->w = w;
+    };
+};
+
+#pragma once
+
+struct CaretMeasureData
+{
+    int Position;
+    bool isSingleline;// false|insert
+
+    CaretMeasureData()
+    {
+        CaretMeasureData(0xFFFFFFFF, true);
+    };
+
+    CaretMeasureData(int position, bool singlelines)
+    {
+        this->Position = position;
+        this->isSingleline = singlelines;
     };
 };
