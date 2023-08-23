@@ -15,6 +15,7 @@ void KeyHook::enableHook()
 
 void KeyHook::keyCallback(int key, int state)
 {
+	if (Client::disable) return;
 	if (state == (int)ActionType::PRESSED) keys[key] = true;
 	else keys[key] = false;
 

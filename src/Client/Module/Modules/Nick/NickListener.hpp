@@ -11,16 +11,22 @@ class NickListener : public Listener {
     Module* module;
     bool enabled = false;
     std::string original;
+    std::string original2;
+    std::string backupOri;
+
 public:
 
     void onLocalTick(TickEvent &event) override {
 
         if(original.empty()) original = SDK::clientInstance->getLocalPlayer()->playerName;
+        if(original2.empty()) original2 = *SDK::clientInstance->getLocalPlayer()->getNametag();
+        if(backupOri.empty()) backupOri = *SDK::clientInstance->getLocalPlayer()->getNametag();
+
 
         if(enabled != module->settings.getSettingByName<bool>("enabled")->value) {
             enabled = module->settings.getSettingByName<bool>("enabled")->value;
 
-
+            if(!enabled) original2 = *SDK::clientInstance->getLocalPlayer()->getNametag();
         }
 
         if(enabled) {
@@ -32,8 +38,17 @@ public:
         } else {
 
             std::string val = original;
-            SDK::clientInstance->getLocalPlayer()->setNametag(&val);
+            std::string val2;
+
+            if(original2 != *SDK::clientInstance->getLocalPlayer()->getNametag()) { original2 = *SDK::clientInstance->getLocalPlayer()->getNametag(); backupOri = *SDK::clientInstance->getLocalPlayer()->getNametag(); }
+            if(original2 == module->settings.getSettingByName<std::string>("nick")->value) original2 = backupOri;
+            val2 = original2;
+
+            //std::cout << original2 << std::endl;
+
+            SDK::clientInstance->getLocalPlayer()->setNametag(&val2);
             SDK::clientInstance->getLocalPlayer()->playerName =  val;
+
         }
 
     }

@@ -19,7 +19,7 @@ class SpeedDisplayListener : public Listener {
 	Vec3<float> PrevPos;
 	std::string speed;
 	bool toes = false;
-	int interval = 100; //ms
+	int interval = 50; //ms
 
 	void onRender(RenderEvent& event) override {
 		if (

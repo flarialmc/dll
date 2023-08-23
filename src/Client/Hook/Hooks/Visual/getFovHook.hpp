@@ -13,39 +13,62 @@ class getFovHook : public Hook
 {
 private:
 
+	static inline bool notified150FOV = false;
+
 	static inline float currentZoomVal = 0.0f;
 
 	static float getFovCallback(void* a1, float f, void* a3, void* a4) {
 
 		float fov = func_original(a1, f, a3, a4);
 
-		if (ModuleManager::getModule("FOV Changer") != nullptr) {
-			auto fovchanger = ModuleManager::getModule("FOV Changer");
-			if (fovchanger->settings.getSettingByName<bool>("enabled")->value) {
-				bool inserver;
+		auto fovchanger = ModuleManager::getModule("FOV Changer");
+		auto zom = reinterpret_cast<Zoom*>(ModuleManager::getModule("Zoom"));
+		auto upsidedown = ModuleManager::getModule("Upside Down");
 
-				if (RaknetTickHook::towriteip.find("none") != std::string::npos) inserver = false;
-				else if (!RaknetTickHook::towriteip.empty()) inserver = true;
-				else inserver = false;
+		if (upsidedown != nullptr && upsidedown->settings.getSettingByName<bool>("enabled")->value) {
+			fov = 360 - upsidedown->settings.getSettingByName<float>("fovvalue")->value;
+		}
+		else if (fovchanger != nullptr && fovchanger->settings.getSettingByName<bool>("enabled")->value) {
+			bool inserver;
 
-				if (inserver) {
-					FlarialGUI::Notify("Can't use FOV Changer on servers");
-					fovchanger->settings.getSettingByName<bool>("enabled")->value = false;
-				} else fov = fovchanger->settings.getSettingByName<float>("fovvalue")->value;
+			if (RaknetTickHook::towriteip.find("none") != std::string::npos) inserver = false;
+			else if (!RaknetTickHook::towriteip.empty()) inserver = true;
+			else inserver = false;
+
+			if (inserver) {
+				if (fovchanger->settings.getSettingByName<float>("fovvalue")->value > 150) {
+					if (!notified150FOV) {
+						FlarialGUI::Notify("FOV Changer has been limmited to 150 on servers.");
+						notified150FOV = true;
+					}
+					fovchanger->settings.getSettingByName<float>("fovvalue")->value = 150;
+				}
+				// fovchanger->settings.getSettingByName<bool>("enabled")->value = false;
 			}
+			
+			fov = fovchanger->settings.getSettingByName<float>("fovvalue")->value;
 		}
 
-		if (ModuleManager::getModule("Zoom") != nullptr && fov != 70) {
-
-			auto zom = reinterpret_cast<Zoom*>(ModuleManager::getModule("Zoom"));
-			if (zom->settings.getSettingByName<bool>("enabled")->value) currentZoomVal = std::lerp(currentZoomVal, ZoomListener::zoomValue, zom->settings.getSettingByName<float>("anim")->value * FlarialGUI::frameFactor);
-			else currentZoomVal = std::lerp(currentZoomVal, fov, zom->settings.getSettingByName<float>("anim")->value * FlarialGUI::frameFactor);
+		if (zom != nullptr && fov != 70) {
+			float animspeed = zom->settings.getSettingByName<float>("anim")->value;
+			if (zom->settings.getSettingByName<bool>("disableanim")->value) {
+				if (zom->settings.getSettingByName<bool>("enabled")->value) {
+					if (fov > 180) currentZoomVal = fov + ZoomListener::zoomValue;
+					else currentZoomVal = ZoomListener::zoomValue;
+				}
+				else currentZoomVal = fov;
+			}
+			else {
+				if (zom->settings.getSettingByName<bool>("enabled")->value) {
+					if (fov > 180) currentZoomVal = std::lerp(currentZoomVal, fov + ZoomListener::zoomValue, animspeed * FlarialGUI::frameFactor);
+					else currentZoomVal = std::lerp(currentZoomVal, ZoomListener::zoomValue, animspeed * FlarialGUI::frameFactor);
+				}
+				else currentZoomVal = std::lerp(currentZoomVal, fov, zom->settings.getSettingByName<float>("anim")->value * FlarialGUI::frameFactor);
+			}
 			fov = currentZoomVal;
-
 		}
 
 		return fov;
-
 	}
 
 public:
@@ -58,5 +81,3 @@ public:
 		this->autoHook(getFovCallback, (void**)&func_original);
 	}
 };
-
-

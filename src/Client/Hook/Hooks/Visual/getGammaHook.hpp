@@ -11,74 +11,97 @@
 
 class getGammaHook : public Hook
 {
+public:
+	static inline Options* hidehudPtr;
+	static inline Options* hidehandPtr;
+	static inline Options* showChunkMapPtr;
+	static inline Options* disableSkyPtr;
+	static inline Options* disableWeatherPtr;
+	static inline Options* disableEntitiesPtr;
+	static inline Options* disableBlockEntitiesPtr;
+	static inline Options* disableParticlesPtr;
+	static inline Options* vsyncPtr;
 private:
+	static inline bool fetchedPtrs = false;
+	static inline bool handhidden = false;
+	static inline bool shouldhidehand = true;
 
 	static float getGammaCallback(uintptr_t a1) {
 
-        if (Client::disable) return 6.9f;
+		if (Client::disable) return 6.9f;
+		auto** list = (uintptr_t**)a1;
 
-        if(ModuleManager::getModule("Render Options")->settings.getSettingByName<bool>("enabled")->value) {
-            auto **list = (uintptr_t **) a1;
+		if (!fetchedPtrs) {
+			for (uint16_t i = 3; i < 450; i++) {
+				if (list[i] == nullptr) continue;
+				Option* info = *(Option**)((uintptr_t)list[i] + 8);
+				if (info == nullptr) continue;
 
-            int i2 = 0;
-            for (uint16_t i = 3; i < 450; i++) {
-                if (list[i] == nullptr) continue;
-                Option *info = *(Option **) ((uintptr_t) list[i] + 8);
-                if (info == nullptr) continue;
+				auto* optionsPtr = (Options*)list[i];
+				auto* translateName = (std::string*)((uintptr_t)info + 0x158);
 
-                auto *optionsPtr = (Options *) list[i];
-                auto *translateName = (std::string *) ((uintptr_t) info + 0x158);
+				if (*translateName == "options.hidehud")
+					hidehudPtr = optionsPtr;
 
-                if (*translateName == "options.dev_showChunkMap") {
-                    i2++;
-                    optionsPtr->setvalue(ModuleManager::getModule("Render Options")->settings.getSettingByName<bool>(
-                            "chunkborders")->value);
-                }
+				if (*translateName == "options.hidehand")
+					hidehandPtr = optionsPtr;
 
-                if (*translateName == "options.dev_disableRenderSky") {
-                    i2++;
-                    optionsPtr->setvalue(
-                            !ModuleManager::getModule("Render Options")->settings.getSettingByName<bool>("sky")->value);
-                }
+				if (*translateName == "options.dev_showChunkMap")
+					showChunkMapPtr = optionsPtr;
 
-                if (*translateName == "options.dev_disableRenderWeather") {
-                    i2++;
-                    optionsPtr->setvalue(!ModuleManager::getModule("Render Options")->settings.getSettingByName<bool>(
-                            "weather")->value);
-                }
+				if (*translateName == "options.dev_disableRenderSky")
+					disableSkyPtr = optionsPtr;
 
-                if (*translateName == "options.dev_disableRenderEntities") {
-                    i2++;
-                    optionsPtr->setvalue(!ModuleManager::getModule("Render Options")->settings.getSettingByName<bool>(
-                            "entity")->value);
-                }
+				if (*translateName == "options.dev_disableRenderWeather")
+					disableWeatherPtr = optionsPtr;
 
-                if (*translateName == "options.dev_disableRenderBlockEntities") {
-                    i2++;
-                    optionsPtr->setvalue(!ModuleManager::getModule("Render Options")->settings.getSettingByName<bool>(
-                            "blockentity")->value);
-                }
+				if (*translateName == "options.dev_disableRenderEntities")
+					disableEntitiesPtr = optionsPtr;
 
-                if (*translateName == "options.dev_disableRenderParticles") {
-                    i2++;
-                    optionsPtr->setvalue(!ModuleManager::getModule("Render Options")->settings.getSettingByName<bool>(
-                            "particles")->value);
-                }
+				if (*translateName == "options.dev_disableRenderBlockEntities")
+					disableBlockEntitiesPtr = optionsPtr;
 
-                if (*translateName == "options.vsync") {
-                    i2++;
-                    if (Client::settings.getSettingByName<bool>("vsync")->value) optionsPtr->setvalue(false);
-                }
+				if (*translateName == "options.dev_disableRenderParticles")
+					disableParticlesPtr = optionsPtr;
 
-                if(i2 >= 7) break;
+				if (*translateName == "options.vsync")
+					vsyncPtr = optionsPtr;
+			}
 
-            }
-        }
+			fetchedPtrs = true;
+		}
 
-        auto fb = reinterpret_cast<Fullbright*>(ModuleManager::getModule("Fullbright"));
-        if (fb->settings.getSettingByName<bool>("enabled")->value) return 25.0;
-        else return func_original(a1);
-		
+		if (ModuleManager::getModule("Zoom") != nullptr && ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("hidehand")->value) {
+			if (!handhidden && shouldhidehand && ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("enabled")->value) {
+				if (hidehandPtr->getvalue() == true) {
+					shouldhidehand = false;
+				}
+				hidehandPtr->setvalue(true);
+				handhidden = true;
+			}
+			else if (handhidden && shouldhidehand && !ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("enabled")->value) {
+				hidehandPtr->setvalue(false);
+				handhidden = false;
+			}
+		}
+
+		auto renderops = ModuleManager::getModule("Render Options");
+		if (renderops->settings.getSettingByName<bool>("enabled")->value) {
+			showChunkMapPtr->setvalue(renderops->settings.getSettingByName<bool>("chunkborders")->value);
+			disableSkyPtr->setvalue(!renderops->settings.getSettingByName<bool>("sky")->value);
+			disableWeatherPtr->setvalue(!renderops->settings.getSettingByName<bool>("weather")->value);
+			disableEntitiesPtr->setvalue(!renderops->settings.getSettingByName<bool>("entity")->value);
+			disableBlockEntitiesPtr->setvalue(!renderops->settings.getSettingByName<bool>("blockentity")->value);
+			disableParticlesPtr->setvalue(!renderops->settings.getSettingByName<bool>("particles")->value);
+		}
+
+		auto vsyncsetting = Client::settings.getSettingByName<bool>("vsync");
+		if (vsyncsetting->value && vsyncPtr->getvalue()) vsyncPtr->setvalue(false);
+		else if (!vsyncsetting->value && !vsyncPtr->getvalue()) vsyncPtr->setvalue(true);
+
+		auto fb = reinterpret_cast<Fullbright*>(ModuleManager::getModule("Fullbright"));
+		if (fb->settings.getSettingByName<bool>("enabled")->value) return 25.0;
+		else return func_original(a1);
 	}
 
 public:
@@ -91,5 +114,3 @@ public:
 		this->autoHook(getGammaCallback, (void**)&func_original);
 	}
 };
-
-

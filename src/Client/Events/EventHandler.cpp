@@ -6,6 +6,7 @@
 #include "Render/RenderEvent.hpp"
 #include "../../SDK/SDK.hpp"
 #include "Network/PacketEvent.hpp"
+#include "../Client.hpp"
 
 void EventHandler::registerListener(Listener *listener) {
     listeners.push_back(listener);
@@ -29,6 +30,8 @@ void EventHandler::unregisterAll() {
 
 void EventHandler::onTick(TickEvent &event) {
 
+    if (Client::disable) return;
+
     for (Listener* &listener: listeners) {
 
         if(event.getActor() == SDK::clientInstance->getLocalPlayer())
@@ -40,6 +43,8 @@ void EventHandler::onTick(TickEvent &event) {
 }
 
 void EventHandler::onPacketSend(PacketEvent &event) {
+
+    if (Client::disable) return;
 
     for (Listener* &listener: listeners) {
 
@@ -61,6 +66,8 @@ void EventHandler::onPacketReceive(PacketEvent &event) {
 
 void EventHandler::onKey(KeyEvent &event) {
 
+    if (Client::disable) return;
+
     for (Listener* &listener: listeners) {
 
         listener->onKey(event);
@@ -69,6 +76,8 @@ void EventHandler::onKey(KeyEvent &event) {
 }
 
 void EventHandler::onAttack(AttackEvent& event) {
+
+    if (Client::disable) return;
 
     for (Listener*& listener : listeners) {
         
@@ -81,6 +90,8 @@ void EventHandler::onAttack(AttackEvent& event) {
 
 void EventHandler::onMouse(MouseEvent &event) {
 
+    if (Client::disable) return;
+
     for (Listener* &listener: listeners) {
 
         listener->onMouse(event);
@@ -90,6 +101,8 @@ void EventHandler::onMouse(MouseEvent &event) {
 
 void EventHandler::onRender(RenderEvent &event) {
 
+    if (Client::disable) return;
+
     for (Listener* &listener: listeners) {
         listener->onRender(event);
     }
@@ -97,6 +110,8 @@ void EventHandler::onRender(RenderEvent &event) {
 }
 
 void EventHandler::onSetupAndRender(SetupAndRenderEvent &event) {
+
+    if (Client::disable) return;
 
     for (Listener* &listener: listeners) {
         listener->onSetupAndRender(event);
