@@ -50,11 +50,21 @@ private:
 		}
 
 		if (zom != nullptr && fov != 70) {
-			if (zom->settings.getSettingByName<bool>("enabled")->value) {
-				if (fov > 180) currentZoomVal = std::lerp(currentZoomVal, fov + ZoomListener::zoomValue, zom->settings.getSettingByName<float>("anim")->value * FlarialGUI::frameFactor);
-				else currentZoomVal = std::lerp(currentZoomVal, ZoomListener::zoomValue, zom->settings.getSettingByName<float>("anim")->value * FlarialGUI::frameFactor);
+			float animspeed = zom->settings.getSettingByName<float>("anim")->value;
+			if (zom->settings.getSettingByName<bool>("disableanim")->value) {
+				if (zom->settings.getSettingByName<bool>("enabled")->value) {
+					if (fov > 180) currentZoomVal = fov + ZoomListener::zoomValue;
+					else currentZoomVal = ZoomListener::zoomValue;
+				}
+				else currentZoomVal = fov;
 			}
-			else currentZoomVal = std::lerp(currentZoomVal, fov, zom->settings.getSettingByName<float>("anim")->value * FlarialGUI::frameFactor);
+			else {
+				if (zom->settings.getSettingByName<bool>("enabled")->value) {
+					if (fov > 180) currentZoomVal = std::lerp(currentZoomVal, fov + ZoomListener::zoomValue, animspeed * FlarialGUI::frameFactor);
+					else currentZoomVal = std::lerp(currentZoomVal, ZoomListener::zoomValue, animspeed * FlarialGUI::frameFactor);
+				}
+				else currentZoomVal = std::lerp(currentZoomVal, fov, zom->settings.getSettingByName<float>("anim")->value * FlarialGUI::frameFactor);
+			}
 			fov = currentZoomVal;
 		}
 

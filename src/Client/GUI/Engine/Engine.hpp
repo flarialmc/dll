@@ -51,15 +51,25 @@ struct KeybindSelectorer
     std::string newShi;
     bool isActive = false;
     std::chrono::steady_clock::time_point currentOnKeyTime = std::chrono::steady_clock::now();
+    D2D1_COLOR_F curColor;
+    bool curColorDone = false;
 };
 
-struct Dropdown
+struct DropdownStruct
 {
     std::string selected;
     std::vector<std::string> options;
     bool isActive = false;
     bool firstTime = true;
     float rotation = 0.0f;
+    float yHover = 0.0f;
+    int hoveredIndex = 0;
+    float opacityHover = 0.0f;
+    D2D1_COLOR_F curColor;
+    bool curColorDone = false;
+    float yChilds = 0.0f;
+    bool offsettedQ = false;
+    float offsetted = 0.0f;
 };
 
 class Dimension
@@ -102,9 +112,12 @@ namespace FlarialGUI
 
 
     float inline frameFactor = 1;
+    bool inline shouldAdditionalY = false;
+    float inline additionalY = 0.0f;
 
     inline bool isInScrollView = false;
     inline D2D1_RECT_F ScrollViewRect = D2D1::RectF();
+
     float inline scrollpos = 0;
     float inline scrollposmodifier = 0.f;
     float inline barscrollpos = 0;
@@ -113,7 +126,7 @@ namespace FlarialGUI
     inline SliderRect SliderRects[2500];
     inline TextBoxStruct TextBoxes[1000];
     inline ColorPicker ColorPickers[2000];
-    inline Dropdown DropDownMenus[2000];
+    inline DropdownStruct DropDownMenus[2000];
     inline KeybindSelectorer KeybindSelectors[2000];
     inline std::string currentKeybind;
     std::vector<Notification> inline notifications;
@@ -167,8 +180,6 @@ namespace FlarialGUI
            const D2D1_COLOR_F circleColor, float startingPoint = 50.0f, const float maxValue = 100.0f, const float minValue = 0.0f);
 
     std::string Dropdown(int index, float x, float y, const D2D1_COLOR_F enabledColor, const D2D1_COLOR_F disabledColor, const std::vector<std::string> options, std::string &value, std::string label);
-
-    void DropdownChild(std::string value, int index, float x, float y);
 
     void Circle(float x, float y, const D2D1_COLOR_F &color, float radius);
 
@@ -242,4 +253,7 @@ namespace FlarialGUI
 
     IDWriteTextFormat *getTextFormat(const std::string &fontFamily, FLOAT fontSize, DWRITE_FONT_WEIGHT fontWeight,
                                      DWRITE_FONT_STYLE fontStyle, DWRITE_FONT_STRETCH fontStretch, DWRITE_TEXT_ALIGNMENT alignment);
+
+    void SetIsInAdditionalYMode();
+    void UnSetIsInAdditionalYMode();
 };

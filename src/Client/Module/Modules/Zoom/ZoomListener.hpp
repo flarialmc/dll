@@ -14,7 +14,7 @@ class ZoomListener : public Listener {
 
 	void onMouse(MouseEvent& event) override {
 
-		if (SDK::CurrentScreen == "hud_screen")
+		if (SDK::CurrentScreen == "hud_screen" || SDK::CurrentScreen == "f1_screen" || SDK::CurrentScreen == "zoom_screen")
 			if (this->module->settings.getSettingByName<bool>("enabled")->value) {
 				auto fovchanger = ModuleManager::getModule("FOV Changer");
 				auto upsidedown = ModuleManager::getModule("Upside Down");
