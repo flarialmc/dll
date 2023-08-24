@@ -112,9 +112,8 @@ namespace FlarialGUI
 
 
     float inline frameFactor = 1;
-    inline int additionalYIndex = 0;
-    inline bool shouldAddY = false;
-    extern std::unordered_map<int, float> additionalY;
+    bool inline shouldAdditionalY = false;
+    float inline additionalY = 0.0f;
 
     inline bool isInScrollView = false;
     inline D2D1_RECT_F ScrollViewRect = D2D1::RectF();
@@ -255,6 +254,6 @@ namespace FlarialGUI
     IDWriteTextFormat *getTextFormat(const std::string &fontFamily, FLOAT fontSize, DWRITE_FONT_WEIGHT fontWeight,
                                      DWRITE_FONT_STYLE fontStyle, DWRITE_FONT_STRETCH fontStretch, DWRITE_TEXT_ALIGNMENT alignment);
 
-    void SetAdditionalYIndex(int index);
-    void UnSetAdditionalYIndex();
+    void SetIsInAdditionalYMode();
+    void UnSetIsInAdditionalYMode();
 };

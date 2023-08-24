@@ -160,7 +160,7 @@ public:
         
         this->settings.getSettingByName<std::string>("textalignment")->value = txtAlignment;
 
-        FlarialGUI::SetAdditionalYIndex(1);
+        FlarialGUI::SetIsInAdditionalYMode();
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
@@ -179,11 +179,9 @@ public:
             "Test"
         );
 
-        FlarialGUI::SetAdditionalYIndex(2);
-
         this->settings.getSettingByName<std::string>("texttest")->value = txtAlignment;
 
-        FlarialGUI::UnSetAdditionalYIndex();
+        FlarialGUI::UnSetIsInAdditionalYMode();
         /* Rounding End */
 
         /* Color Pickers Start*/

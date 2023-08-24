@@ -115,7 +115,7 @@ kiero::Status::Enum kiero::init(RenderType::Enum _renderType)
 				params.AutoDepthStencilFormat = D3DFMT_UNKNOWN;
 				params.Flags = NULL;
 				params.FullScreen_RefreshRateInHz = 0;
-				params.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+				params.PresentationInterval = 0;
 
 				LPDIRECT3DDEVICE9 device;
 				if (direct3D9->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_NULLREF, window, D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_DISABLE_DRIVER_MANAGEMENT, &params, &device) < 0)

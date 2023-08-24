@@ -13,8 +13,7 @@ ID2D1Factory* FlarialGUI::factory;
 std::unordered_map<std::string, ID2D1SolidColorBrush*> FlarialGUI::brushCache;
 std::unordered_map<std::string, ID2D1Image*> FlarialGUI::cachedBitmaps;
 std::unordered_map<std::string, IDWriteTextFormat*> FlarialGUI::textFormatCache;
-std::unordered_map<int, float> FlarialGUI::additionalY;
-bool shouldAddY = false;
+
 
 float maxDarkenAmount = 0.1;
 
@@ -74,11 +73,9 @@ void FlarialGUI::PopAllStack()
 bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width, const float height)
 {
 	if (isInScrollView) y += scrollpos;
-	if (shouldAddY) y += additionalY[additionalYIndex];
+	if (shouldAdditionalY) y += additionalY;
 
-	const int oriYIndex = additionalYIndex;
-
-	SetAdditionalYIndex(0);
+	const bool isAdditionalY = shouldAdditionalY;
 
 	ID2D1SolidColorBrush* brush;
 	D2D1_COLOR_F buttonColor = CursorInRect(x, y, width, height) ? D2D1::ColorF(color.r - darkenAmounts[x + y], color.g - darkenAmounts[x + y], color.b - darkenAmounts[x + y], color.a) : color;
@@ -100,8 +97,6 @@ bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COL
 
 	textFormat->Release();
 
-	SetAdditionalYIndex(oriYIndex);
-
 	if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
 	{
 		MC::mousebutton = MouseButton::None;
@@ -119,11 +114,11 @@ bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COL
 bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width, const float height, float radiusX, float radiusY, bool glow)
 {
 	if (isInScrollView) y += scrollpos;
-	if (shouldAddY) y += additionalY[additionalYIndex];
+	if (shouldAdditionalY) y += additionalY;
 
-	const int oriYIndex = additionalYIndex;
+	const bool isAdditionalY = shouldAdditionalY;
 
-	SetAdditionalYIndex(0);
+	if (isAdditionalY) UnSetIsInAdditionalYMode();
 
 	if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return false;
 
@@ -176,7 +171,7 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
 
 	D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
 
-	SetAdditionalYIndex(oriYIndex);
+	if (isAdditionalY) SetIsInAdditionalYMode();
 
 	if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
 	{
@@ -190,12 +185,12 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
 
 bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width, const float height, float radiusX, float radiusY, const std::string& radioNum, const std::string& currentNum)
 {
+	if (shouldAdditionalY) y += additionalY;
 	if (isInScrollView) y += scrollpos;
-	if (shouldAddY) y += additionalY[additionalYIndex];
 
-	const int oriYIndex = additionalYIndex;
+	const bool isAdditionalY = shouldAdditionalY;
 
-	SetAdditionalYIndex(0);
+	if (isAdditionalY) UnSetIsInAdditionalYMode();
 
 	static ID2D1SolidColorBrush* textBrush;
 
@@ -224,7 +219,7 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
 	x += Constraints::SpacingConstraint(0.077, width);
 	D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
 
-	SetAdditionalYIndex(oriYIndex);
+	if (isAdditionalY) SetIsInAdditionalYMode();
 
 	if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
 	{
@@ -273,11 +268,11 @@ void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2
 void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, float width, float height, float radiusX, float radiusY)
 {
 	if (isInScrollView) y += scrollpos;
-	if (shouldAddY) y += additionalY[additionalYIndex];
+	if (shouldAdditionalY) y += additionalY;
 
-	const int oriYIndex = additionalYIndex;
-
-	SetAdditionalYIndex(0);
+	const bool isAdditionalY = shouldAdditionalY;
+	
+	if (isAdditionalY) UnSetIsInAdditionalYMode();
 
 	if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
 
@@ -344,23 +339,20 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
 	Memory::SafeRelease(geometry);
 	Memory::SafeRelease(factory);
 
-	SetAdditionalYIndex(oriYIndex);
+	if (isAdditionalY) SetIsInAdditionalYMode();
 }
 
 
 bool FlarialGUI::Toggle(int index, float x, float y, const D2D1_COLOR_F enabledColor, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor, bool isEnabled) {
+	if (shouldAdditionalY) y += additionalY;
+
+	const bool isAdditionalY = shouldAdditionalY;
 	float rectWidth = Constraints::RelativeConstraint(0.062, "height", true);
 	float rectHeight = Constraints::RelativeConstraint(0.03, "height", true);
 
 	Vec2<float> round = Constraints::RoundingConstraint(30, 30);
 
-	y += additionalY[additionalYIndex];
-
-	const int oriYIndex = additionalYIndex;
-
-	std::cout << shouldAddY << std::endl;
-
-	SetAdditionalYIndex(0);
+	if (isAdditionalY) UnSetIsInAdditionalYMode();
 
 	if (isEnabled) {
 		toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], enabledColor, 0.10f * FlarialGUI::frameFactor);
@@ -395,7 +387,7 @@ bool FlarialGUI::Toggle(int index, float x, float y, const D2D1_COLOR_F enabledC
 
 	FlarialGUI::RoundedRect(x + xSpacing + enabledSpacing, y + ySpacing, circleColor, circleWidth, circleHeight, round.x, round.x);
 
-	SetAdditionalYIndex(oriYIndex);
+	if (isAdditionalY) SetIsInAdditionalYMode();
 
 	if (isInScrollView) y += FlarialGUI::scrollpos;
 	if (CursorInRect(x, y, rectWidth, rectHeight) && MC::mousebutton == MouseButton::Left && !MC::held)
@@ -508,18 +500,17 @@ float FlarialGUI::HueToRGB(float p, float q, float t)
 
 
 std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, float x, float y, std::string real) {
+	if (shouldAdditionalY) y += additionalY;
+
 	D2D1_COLOR_F col;
 
 	Vec2<float> round = Constraints::RoundingConstraint(13, 13);
 
+	const bool isAdditionalY = shouldAdditionalY;
 	const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
 	const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
 
-	if (shouldAddY) y += additionalY[additionalYIndex];
-
-	const int oriYIndex = additionalYIndex;
-
-	SetAdditionalYIndex(0);
+	if (isAdditionalY) UnSetIsInAdditionalYMode();
 
 	text = FlarialGUI::TextBox(index, text, limit, x, y, Constraints::SpacingConstraint(1.55, textWidth), percHeight);
 
@@ -532,7 +523,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 	FlarialGUI::FlarialTextWithFont(x, y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(1.55, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::SpacingConstraint(1.0, textWidth));
 	FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, to_wide(real).c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(3, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.00, textWidth));
 
-	SetAdditionalYIndex(oriYIndex);
+	if (isAdditionalY) SetIsInAdditionalYMode();
 
 	return "";
 }
@@ -571,8 +562,10 @@ std::string FlarialGUI::TextBox(int index, std::string text, int limit, float x,
 
 
 float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor, float startingPoint, const float maxValue, const float minValue) {
+	if (shouldAdditionalY) y += additionalY;
 	
 	// Define the total slider rect width and height
+	const bool isAdditionalY = shouldAdditionalY;
 	const float totalWidth = Constraints::RelativeConstraint(0.15, "height", true);
 	const float height = Constraints::RelativeConstraint(0.0045, "height", true);
 
@@ -584,11 +577,7 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
 	std::string text;
 
-	if (shouldAddY) y += additionalY[additionalYIndex];
-
-	const int oriYIndex = additionalYIndex;
-
-	SetAdditionalYIndex(0);
+	if (isAdditionalY) UnSetIsInAdditionalYMode();
 
 	if (startingPoint < 10.0f) {
 		std::stringstream stream;
@@ -730,7 +719,7 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
 	if (percentage < 0.02) percentage = 0.01;
 
-	SetAdditionalYIndex(oriYIndex);
+	if (isAdditionalY) SetIsInAdditionalYMode();
 
 	return percentage;
 }
@@ -759,6 +748,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F
 	D2D1_COLOR_F col;
 
 	Vec2<float> round = Constraints::RoundingConstraint(13, 13);
+	const bool isAdditionalY = shouldAdditionalY;
 	const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
 	const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
 	float childHeights = Constraints::RelativeConstraint(0.030, "height", true);
@@ -768,11 +758,9 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F
 	float clickingY = y;
 
 	if (isInScrollView) clickingY += scrollpos;
-	if (shouldAddY) y += additionalY[additionalYIndex];
+	if (shouldAdditionalY) y += additionalY;
 
-	const int oriYIndex = additionalYIndex;
-
-	SetAdditionalYIndex(0);
+	std::cout << additionalY << std::endl;
 
 	float originalY = y;
 	if (!FlarialGUI::DropDownMenus[index].curColorDone) {
@@ -813,7 +801,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F
 		if (FlarialGUI::DropDownMenus[index].offsettedQ == false) {
 			//FlarialGUI::DropDownMenus[index].offsetted = additionalY + addYVal;
 			FlarialGUI::DropDownMenus[index].offsettedQ = true;
-			additionalY[additionalYIndex] += addYVal;
+			additionalY += addYVal;
 		}
 		FlarialGUI::lerp(y, originalY, 0.25f * FlarialGUI::frameFactor);
 		FlarialGUI::DropDownMenus[index].curColor = FlarialGUI::LerpColor(FlarialGUI::DropDownMenus[index].curColor, enabledColor, 0.1f * FlarialGUI::frameFactor);
@@ -827,7 +815,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F
 		//y = originalY - maxHeight;
 		
 		if (FlarialGUI::DropDownMenus[index].offsettedQ == true) {
-			additionalY[additionalYIndex] -= addYVal;
+			additionalY -= addYVal;
 			//FlarialGUI::DropDownMenus[index].offsetted = additionalY - addYVal;
 			FlarialGUI::DropDownMenus[index].offsettedQ = false;
 		}
@@ -852,7 +840,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F
 	float offset = textWidth - curTextWidth - 1;
 	float lastChildHeight = childHeights - 8;
 
-	SetAdditionalYIndex(oriYIndex);
+	if (isAdditionalY) UnSetIsInAdditionalYMode();
 
 	for (const std::string& op : options) {
 		if (op == FlarialGUI::DropDownMenus[index].selected) continue;
@@ -960,7 +948,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F
 
 	FlarialGUI::DropDownMenus[index].selected = value;
 
-	SetAdditionalYIndex(oriYIndex);
+	if (isAdditionalY) SetIsInAdditionalYMode();
 
 	return FlarialGUI::DropDownMenus[index].selected;
 };
@@ -1041,16 +1029,14 @@ void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const 
 }
 
 void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string& keybind) {
+
+	if (shouldAdditionalY) y += additionalY;
+
 	Vec2<float> round = Constraints::RoundingConstraint(13, 13);
+	const bool isAdditionalY = shouldAdditionalY;
 	const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
 	const float percWidth = Constraints::RelativeConstraint(0.069, "height", true);
 	const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
-
-	if (shouldAddY) y += additionalY[additionalYIndex];
-
-	const int oriYIndex = additionalYIndex;
-
-	SetAdditionalYIndex(0);
 
 	if (!KeybindSelectors[index].curColorDone) {
 		KeybindSelectors[index].curColor = D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f);
@@ -1088,13 +1074,14 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string&
 
 	text = keybind;
 
+	if (isAdditionalY) UnSetIsInAdditionalYMode();
 	FlarialGUI::RoundedRect(x, y, KeybindSelectors[index].curColor, percWidth, percHeight, round.x, round.x);
 
 	FlarialGUI::FlarialText(x - Constraints::SpacingConstraint(0.42, textWidth / 2.0f), y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
 
 	FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.25, textWidth / 2.0f), y, to_wide("Keybind (Hold for 2 seconds)").c_str(), D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(2.2, textWidth), percHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.0, textWidth));
 
-	SetAdditionalYIndex(oriYIndex);
+	if (isAdditionalY) SetIsInAdditionalYMode();
 
 	if (isInScrollView) y += scrollpos;
 
@@ -1304,11 +1291,7 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t* text, D2D1_COLOR_F
 {
 
 	if (isInScrollView) y += scrollpos;
-	if (shouldAddY) y += additionalY[additionalYIndex];
-
-	const int oriYIndex = additionalYIndex;
-
-	SetAdditionalYIndex(0);
+	if (shouldAdditionalY) y += additionalY;
 
 	if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
 
@@ -1321,18 +1304,12 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t* text, D2D1_COLOR_F
 	D2D1_RECT_F textRect = D2D1::RectF(x, y, x + width, y + height);
 	D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
 
-	SetAdditionalYIndex(oriYIndex);
 }
 
 void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* text, D2D1_COLOR_F color, const float width, const float height, const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize, const DWRITE_FONT_WEIGHT weight)
 {
+	if (shouldAdditionalY) y += additionalY;
 	if (isInScrollView) y += scrollpos;
-	std::cout << additionalYIndex << std::endl;
-	if (shouldAddY) y += additionalY[additionalYIndex];
-
-	const int oriYIndex = additionalYIndex;
-
-	SetAdditionalYIndex(0);
 
 	if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
 
@@ -1340,12 +1317,12 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* text, D2D1
 
 	brush = FlarialGUI::getBrush(color);
 
+
 	IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, Constraints::FontScaler(fontSize), weight, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, alignment);
 
 	D2D1_RECT_F textRect = D2D1::RectF(x, y, x + width, y + height);
 	D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
 
-	SetAdditionalYIndex(oriYIndex);
 }
 
 void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
@@ -1355,15 +1332,10 @@ void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
 		rect.top += scrollpos;
 		rect.bottom += scrollpos;
 	}
-	if (shouldAddY) {
-		rect.top += additionalY[additionalYIndex];
-		rect.bottom += additionalY[additionalYIndex];
+	if (shouldAdditionalY) {
+		rect.top += additionalY;
+		rect.bottom += additionalY;
 	}
-	
-
-	const int oriYIndex = additionalYIndex;
-
-	SetAdditionalYIndex(0);
 
 	std::string among = Utils::getRoamingPath() + "\\" + imageName;
 
@@ -1382,8 +1354,6 @@ void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
 		D2D::context->DrawBitmap(ImagesClass::eimages[imageName], imageRect, 1.0f,
 			D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
 	}
-
-	SetAdditionalYIndex(oriYIndex);
 }
 
 void FlarialGUI::LoadImageFromFile(const wchar_t* filename, ID2D1Bitmap** bitmap)
@@ -1571,7 +1541,6 @@ void FlarialGUI::ResetShit() {
 		i = ::DropdownStruct();
 	}
 
-	additionalY.clear();
 }
 
 void FlarialGUI::ApplyCombinedDeepFry()
@@ -2141,15 +2110,12 @@ IDWriteTextFormat* FlarialGUI::getTextFormat(const std::string& fontFamily, FLOA
 	}
 }
 
-void FlarialGUI::SetAdditionalYIndex(int index)
+void FlarialGUI::SetIsInAdditionalYMode()
 {
-	additionalYIndex = index;
-	shouldAddY = true;
+	shouldAdditionalY = true;
 }
 
-void FlarialGUI::UnSetAdditionalYIndex() 
+void FlarialGUI::UnSetIsInAdditionalYMode()
 {
-	additionalYIndex = 0;
-	additionalY.clear();
-	shouldAddY = false;
-};
+	shouldAdditionalY = false;
+}

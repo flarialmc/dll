@@ -96,7 +96,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                     IDXGISurface1 *eBackBuffer;
                     pSwapChain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
-                    
+
                     D2D1CreateDeviceContext(eBackBuffer, properties, &D2D::context);
 
                     D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW, D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED), 96.0, 96.0);
@@ -129,7 +129,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 IDXGIDevice *dxgiDevice;
                 SwapchainHook::d3d11On12Device->QueryInterface(__uuidof(IDXGIDevice), (void **) &dxgiDevice);
-                
+
                 ID2D1Device6 *device2;
                 d2dFactory->CreateDevice(dxgiDevice, &device2);
 
