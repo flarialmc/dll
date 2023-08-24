@@ -109,11 +109,13 @@ namespace FlarialGUI
     std::vector<float> inline rotationAngles(100, 0);
     std::vector<D2D1_COLOR_F> inline toggleColors(100, D2D1::ColorF(D2D1::ColorF::White));
     std::vector<D2D1_COLOR_F> inline buttonColors(100, D2D1::ColorF(D2D1::ColorF::Red));
+    extern std::unordered_map<int, float> additionalY;
 
 
     float inline frameFactor = 1;
     bool inline shouldAdditionalY = false;
-    float inline additionalY = 0.0f;
+    int inline additionalIndex = 0;
+    int inline highestAddIndexes = 0;
 
     inline bool isInScrollView = false;
     inline D2D1_RECT_F ScrollViewRect = D2D1::RectF();

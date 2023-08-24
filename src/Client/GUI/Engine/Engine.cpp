@@ -13,6 +13,7 @@ ID2D1Factory* FlarialGUI::factory;
 std::unordered_map<std::string, ID2D1SolidColorBrush*> FlarialGUI::brushCache;
 std::unordered_map<std::string, ID2D1Image*> FlarialGUI::cachedBitmaps;
 std::unordered_map<std::string, IDWriteTextFormat*> FlarialGUI::textFormatCache;
+std::unordered_map<int, float> FlarialGUI::additionalY;
 
 
 float maxDarkenAmount = 0.1;
@@ -73,7 +74,7 @@ void FlarialGUI::PopAllStack()
 bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width, const float height)
 {
 	if (isInScrollView) y += scrollpos;
-	if (shouldAdditionalY) y += additionalY;
+	if (shouldAdditionalY) y +=  additionalY[additionalIndex];
 
 	const bool isAdditionalY = shouldAdditionalY;
 
@@ -114,7 +115,12 @@ bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COL
 bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width, const float height, float radiusX, float radiusY, bool glow)
 {
 	if (isInScrollView) y += scrollpos;
-	if (shouldAdditionalY) y += additionalY;
+	if (shouldAdditionalY){
+        for(int i = 0; i < highestAddIndexes + 1; i++) {
+            if(FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
+                y += additionalY[i];
+            }
+        } }
 
 	const bool isAdditionalY = shouldAdditionalY;
 
@@ -185,7 +191,12 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
 
 bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width, const float height, float radiusX, float radiusY, const std::string& radioNum, const std::string& currentNum)
 {
-	if (shouldAdditionalY) y += additionalY;
+	if (shouldAdditionalY){
+        for(int i = 0; i < highestAddIndexes + 1; i++) {
+            if(FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
+                y += additionalY[i];
+            }
+        } }
 	if (isInScrollView) y += scrollpos;
 
 	const bool isAdditionalY = shouldAdditionalY;
@@ -268,7 +279,12 @@ void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2
 void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, float width, float height, float radiusX, float radiusY)
 {
 	if (isInScrollView) y += scrollpos;
-	if (shouldAdditionalY) y += additionalY;
+	if (shouldAdditionalY){
+        for(int i = 0; i < highestAddIndexes + 1; i++) {
+            if(FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
+                y += additionalY[i];
+            }
+        } }
 
 	const bool isAdditionalY = shouldAdditionalY;
 	
@@ -344,7 +360,15 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
 
 
 bool FlarialGUI::Toggle(int index, float x, float y, const D2D1_COLOR_F enabledColor, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor, bool isEnabled) {
-	if (shouldAdditionalY) y += additionalY;
+
+	if (shouldAdditionalY){
+
+        for(int i = 0; i < highestAddIndexes + 1; i++) {
+            if(FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
+                y += additionalY[i];
+            }
+        }
+    }
 
 	const bool isAdditionalY = shouldAdditionalY;
 	float rectWidth = Constraints::RelativeConstraint(0.062, "height", true);
@@ -500,7 +524,12 @@ float FlarialGUI::HueToRGB(float p, float q, float t)
 
 
 std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, float x, float y, std::string real) {
-	if (shouldAdditionalY) y += additionalY;
+	if (shouldAdditionalY){
+        for(int i = 0; i < highestAddIndexes + 1; i++) {
+            if(FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
+                y += additionalY[i];
+            }
+        } }
 
 	D2D1_COLOR_F col;
 
@@ -562,7 +591,12 @@ std::string FlarialGUI::TextBox(int index, std::string text, int limit, float x,
 
 
 float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor, float startingPoint, const float maxValue, const float minValue) {
-	if (shouldAdditionalY) y += additionalY;
+	if (shouldAdditionalY){
+        for(int i = 0; i < highestAddIndexes + 1; i++) {
+            if(FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
+                y += additionalY[i];
+            }
+        } }
 	
 	// Define the total slider rect width and height
 	const bool isAdditionalY = shouldAdditionalY;
@@ -754,13 +788,21 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F
 	float childHeights = Constraints::RelativeConstraint(0.030, "height", true);
 	float maxHeight = (options.size() - 1) * childHeights + 2;
 	float addYVal = maxHeight + Constraints::SpacingConstraint(0.05, textWidth);
-
 	float clickingY = y;
 
 	if (isInScrollView) clickingY += scrollpos;
-	if (shouldAdditionalY) y += additionalY;
 
-	std::cout << additionalY << std::endl;
+	if (shouldAdditionalY) {
+        for(int i = 0; i < highestAddIndexes + 1; i++) {
+            if(i != index && FlarialGUI::DropDownMenus[i].isActive) {
+                y += additionalY[i];
+            }
+        }
+    }
+
+
+    if(index >= highestAddIndexes) { highestAddIndexes = index; std::cout << highestAddIndexes << std::endl; }
+    additionalIndex = index;
 
 	float originalY = y;
 	if (!FlarialGUI::DropDownMenus[index].curColorDone) {
@@ -801,7 +843,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F
 		if (FlarialGUI::DropDownMenus[index].offsettedQ == false) {
 			//FlarialGUI::DropDownMenus[index].offsetted = additionalY + addYVal;
 			FlarialGUI::DropDownMenus[index].offsettedQ = true;
-			additionalY += addYVal;
+			 additionalY[additionalIndex] += addYVal;
 		}
 		FlarialGUI::lerp(y, originalY, 0.25f * FlarialGUI::frameFactor);
 		FlarialGUI::DropDownMenus[index].curColor = FlarialGUI::LerpColor(FlarialGUI::DropDownMenus[index].curColor, enabledColor, 0.1f * FlarialGUI::frameFactor);
@@ -815,7 +857,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F
 		//y = originalY - maxHeight;
 		
 		if (FlarialGUI::DropDownMenus[index].offsettedQ == true) {
-			additionalY -= addYVal;
+			additionalY[additionalIndex] -= addYVal;
 			//FlarialGUI::DropDownMenus[index].offsetted = additionalY - addYVal;
 			FlarialGUI::DropDownMenus[index].offsettedQ = false;
 		}
@@ -1030,7 +1072,12 @@ void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const 
 
 void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string& keybind) {
 
-	if (shouldAdditionalY) y += additionalY;
+	if (shouldAdditionalY){
+        for(int i = 0; i < highestAddIndexes + 1; i++) {
+            if(FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
+                y += additionalY[i];
+            }
+        } }
 
 	Vec2<float> round = Constraints::RoundingConstraint(13, 13);
 	const bool isAdditionalY = shouldAdditionalY;
@@ -1291,7 +1338,12 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t* text, D2D1_COLOR_F
 {
 
 	if (isInScrollView) y += scrollpos;
-	if (shouldAdditionalY) y += additionalY;
+	if (shouldAdditionalY){
+        for(int i = 0; i < highestAddIndexes + 1; i++) {
+            if(FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
+                y += additionalY[i];
+            }
+        } }
 
 	if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
 
@@ -1308,7 +1360,13 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t* text, D2D1_COLOR_F
 
 void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* text, D2D1_COLOR_F color, const float width, const float height, const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize, const DWRITE_FONT_WEIGHT weight)
 {
-	if (shouldAdditionalY) y += additionalY;
+	if (shouldAdditionalY){
+        for(int i = 0; i < highestAddIndexes + 1; i++) {
+            if(FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
+                y += additionalY[i];
+            }
+        }
+    }
 	if (isInScrollView) y += scrollpos;
 
 	if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
@@ -1333,8 +1391,8 @@ void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
 		rect.bottom += scrollpos;
 	}
 	if (shouldAdditionalY) {
-		rect.top += additionalY;
-		rect.bottom += additionalY;
+		rect.top += additionalY[additionalIndex];
+		rect.bottom += additionalY[additionalIndex];
 	}
 
 	std::string among = Utils::getRoamingPath() + "\\" + imageName;
