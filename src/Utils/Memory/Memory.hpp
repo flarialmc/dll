@@ -73,6 +73,12 @@ public:
         Logger::info(std::format("Successfully hooked {} function at {}", name, pTarget));
     }
 
+    template <typename R, typename... Args>
+    static inline R CallFunc(void* func, Args... args)
+    {
+        return ((R(*)(Args...))func)(args...);
+    }
+
     template <unsigned int index>
     static void HookVFunc(uintptr_t sigOffset, void* pDetour, void** ppOriginal, std::string name) {
         uintptr_t** vTable = reinterpret_cast<uintptr_t**>(sigOffset + 3 + 7);
