@@ -14,9 +14,11 @@ void MouseHook::enableHook()
 	this->autoHook(mouseCallback, (void**)&func_original);
 }
 
-void MouseHook::mouseCallback(void* parm_1, char button, char action, short mouse_x, short mouse_y, short parm_6,
-	short parm_7, char parm_8)
+void MouseHook::mouseCallback(void* MouseDevice, char button, char action, short mouse_x, short mouse_y, short relativeMouseX,
+	short relativeMouseY, bool isScrolling)
 {
+
+    std::cout << MouseDevice << std::endl;
 
 	// eventemitter here
 
@@ -30,8 +32,10 @@ void MouseHook::mouseCallback(void* parm_1, char button, char action, short mous
 	MouseEvent event(button, action, mouse_x, mouse_y);
 	EventHandler::onMouse(event);
 
+    std::cout << isScrolling << std::endl;
+
 	if (!event.isCancelled()) {
 		
-		return func_original(parm_1, event.GetButton(), event.GetActionAsChar(), mouse_x, mouse_y, parm_6, parm_7, parm_8);
+		return func_original(MouseDevice, event.GetButton(), event.GetActionAsChar(), mouse_x, mouse_y, relativeMouseX, relativeMouseY, isScrolling);
 	}
 }
