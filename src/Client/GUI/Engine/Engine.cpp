@@ -539,7 +539,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 		if (FlarialGUI::TextBoxes[index].isAt1) FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, -1.0f, 0.05f * FlarialGUI::frameFactor);
 		else FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, 2.0f, 0.05f * FlarialGUI::frameFactor);
 	}
-	else FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, -1.0f, 0.05f * FlarialGUI::frameFactor);
+	else FlarialGUI::TextBoxes[index].cursorOpac = 0;
 
 	if (FlarialGUI::TextBoxes[index].cursorOpac > 1) FlarialGUI::TextBoxes[index].isAt1 = true;
 	if (FlarialGUI::TextBoxes[index].cursorOpac < 0) FlarialGUI::TextBoxes[index].isAt1 = false;
@@ -643,6 +643,8 @@ std::string FlarialGUI::TextBox(int index, std::string text, int limit, float x,
 
 
 float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor, float startingPoint, const float maxValue, const float minValue) {
+
+
 	if (shouldAdditionalY) {
 		for (int i = 0; i < highestAddIndexes + 1; i++) {
 			if (FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
@@ -678,26 +680,22 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 	else FlarialGUI::RoundedRect(x, y, color, percWidth, percHeight, round.x, round.x);
 
 
-	text = FlarialGUI::TextBox(30 + index, text, 4, x, y, percWidth, percHeight);
+    int limit = 4;
+    if(text.find('-') != std::string::npos) limit = 5;
+	text = FlarialGUI::TextBox(30 + index, text, limit, x, y, percWidth, percHeight);
 
 	text = Utils::remomveNonNumeric(text);
 
 
-	if (!text.empty())
-		startingPoint = std::stof(text);
-
 	if (startingPoint > maxValue) {
 
 		startingPoint = maxValue;
+	} else {
 
-		if (startingPoint < 10.0f) {
-			std::stringstream stream2;
-			stream2 << std::fixed << std::setprecision(2) << startingPoint;
-			text = stream2.str();
-		}
-		else text = std::to_string((int)startingPoint);
+        if (!text.empty())
+            startingPoint = std::stof(text);
 
-	}
+    }
 
 	FlarialGUI::FlarialText(x - Constraints::SpacingConstraint(0.62, textWidth / 2.0f), y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
 
@@ -724,12 +722,14 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
 	if (SliderRects[index].hasBeenMoved) {
 
-
-		circleX = (SliderRects[index].percentageX - minValue) * (rectangleWidth / (maxValue - minValue)) + rectangleLeft;
+        if(!TextBoxes[30 + index].isActive) circleX = (SliderRects[index].percentageX - minValue) * (rectangleWidth / (maxValue - minValue)) + rectangleLeft;
+        else circleX = (startingPoint - minValue) * (rectangleWidth / (maxValue - minValue)) + rectangleLeft;
 
 	}
 	else if (startingPoint != 50.0f && !SliderRects[index].hasBeenMoved) {
+
 		circleX = (startingPoint - minValue) * (rectangleWidth / (maxValue - minValue)) + rectangleLeft;
+
 	}
 
 	// Calculate the position and width of the enabled portion rect
@@ -754,6 +754,10 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
 	SliderRects[index].percentageX = percentage;
 
+    if(isInScrollView) {
+        y += scrollpos;
+        circleY += scrollpos;
+    }
 	if (CursorInRect(farLeftX, y, totalWidth, height) && MC::held) {
 
 		SliderRects[index].movedX = MC::mousepos.x;
@@ -803,8 +807,6 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 		SliderRects[index].isMovingElement = false;
 		percentage = SliderRects[index].percentageX;
 	}
-
-	if (percentage < 0.02) percentage = 0.01;
 
 	if (isAdditionalY) SetIsInAdditionalYMode();
 
@@ -1218,7 +1220,7 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 		if (FlarialGUI::TextBoxes[index].isAt1) FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, -1.0f, 0.05f * FlarialGUI::frameFactor);
 		else FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, 2.0f, 0.05f * FlarialGUI::frameFactor);
 	}
-	else FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, -1.0f, 0.05f * FlarialGUI::frameFactor);
+	else FlarialGUI::TextBoxes[index].cursorOpac = 0;
 
 	if (FlarialGUI::TextBoxes[index].cursorOpac > 1) FlarialGUI::TextBoxes[index].isAt1 = true;
 	if (FlarialGUI::TextBoxes[index].cursorOpac < 0) FlarialGUI::TextBoxes[index].isAt1 = false;
