@@ -18,8 +18,6 @@ void MouseHook::mouseCallback(void* MouseDevice, char button, char action, short
 	short relativeMouseY, bool isScrolling)
 {
 
-    std::cout << MouseDevice << std::endl;
-
 	// eventemitter here
 
 	// BUTTON
@@ -31,8 +29,6 @@ void MouseHook::mouseCallback(void* MouseDevice, char button, char action, short
 
 	MouseEvent event(button, action, mouse_x, mouse_y);
 	EventHandler::onMouse(event);
-
-    std::cout << isScrolling << std::endl;
 
 	if (!event.isCancelled()) {
 		
