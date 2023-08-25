@@ -817,13 +817,15 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F
 	D2D1_COLOR_F hoveredChildCol = D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f);
 
 	if (CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.55, textWidth), percHeight + maxHeight)) {
-		if (MC::mouseaction == MouseAction::PRESS && MC::mousebutton == MouseButton::Left && CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.55, textWidth), percHeight)) {
+		if (MC::mousebutton == MouseButton::Left && CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.55, textWidth), percHeight)) {
+			//MC::mousebutton = MouseButton::None;
 			FlarialGUI::DropDownMenus[index].isActive = true;
 			value = FlarialGUI::DropDownMenus[index].selected;
 		}
 	}
 	else if (!CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.55, textWidth), percHeight + maxHeight)) {
-		if (MC::mouseaction == MouseAction::PRESS && MC::mousebutton == MouseButton::Left) {
+		if (MC::mousebutton == MouseButton::Left) {
+			//MC::mousebutton = MouseButton::None;
 			FlarialGUI::DropDownMenus[index].isActive = false;
 			value = FlarialGUI::DropDownMenus[index].selected;
 		}
@@ -907,7 +909,8 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F
 		else FlarialGUI::RoundedRect(x + offset, curY, unselectedChildCol, Constraints::SpacingConstraint(1.55, curTextWidth), childHeights, 0, 0);
 
 		if (CursorInRect(x + offset, curClickingY, Constraints::SpacingConstraint(1.55, curTextWidth), childHeights)) {
-			if (MC::mouseaction == MouseAction::PRESS && MC::mousebutton == MouseButton::Left) {
+			if (MC::mousebutton == MouseButton::Left) {
+				MC::mousebutton = MouseButton::None;
 				FlarialGUI::DropDownMenus[index].isActive = false;
 				FlarialGUI::DropDownMenus[index].opacityHover = 0.0f;
 				value = op;
@@ -1509,36 +1512,22 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 
 	if (!ye) {
 
-		if (CursorInRect(x, y, width, height) && MC::held) {
+		if ((CursorInRect(x, y, width, height) || WindowRects[currentNum].isMovingElement) && MC::held) {
 
-			WindowRects[currentNum].isMovingElement = true;
+			if (!WindowRects[currentNum].isMovingElement) {
+				WindowRects[currentNum].oriMouseX = (MC::mousepos.x - ((x + width / 2.0f)));
+				WindowRects[currentNum].oriMouseY = (MC::mousepos.y - ((y + height / 2.0f)));
+				WindowRects[currentNum].isMovingElement = true;
+			}
 			WindowRects[currentNum].hasBeenMoved = true;
-			WindowRects[currentNum].movedX = (MC::mousepos.x - width / 2.0f) + fixer;
-			WindowRects[currentNum].movedY = (MC::mousepos.y - height / 2.0f);
+			WindowRects[currentNum].movedX = ((MC::mousepos.x - WindowRects[currentNum].oriMouseX) - width / 2.0f) + fixer;
+			WindowRects[currentNum].movedY = ((MC::mousepos.y - WindowRects[currentNum].oriMouseY) - height / 2.0f);
 
 			if (WindowRects[currentNum].movedX - fixer < 0) WindowRects[currentNum].movedX = 0.001 + fixer;
 			if (WindowRects[currentNum].movedY < 0) WindowRects[currentNum].movedY = 0;
 
 			if (WindowRects[currentNum].movedX + width - fixer > MC::windowSize.x) WindowRects[currentNum].movedX = MC::windowSize.x - width + fixer;
 			if (WindowRects[currentNum].movedY + height > MC::windowSize.y) WindowRects[currentNum].movedY = MC::windowSize.y - height;
-
-			WindowRects[currentNum].percentageX = WindowRects[currentNum].movedX / MC::windowSize.x;
-			WindowRects[currentNum].percentageY = WindowRects[currentNum].movedY / MC::windowSize.y;
-
-		}
-		else if (MC::held && WindowRects[currentNum].isMovingElement) {
-
-			WindowRects[currentNum].isMovingElement = true;
-			WindowRects[currentNum].hasBeenMoved = true;
-			WindowRects[currentNum].movedX = (MC::mousepos.x - width / 2.0f) + fixer;
-			WindowRects[currentNum].movedY = (MC::mousepos.y - height / 2.0f);
-
-			if (WindowRects[currentNum].movedX - fixer < 0) WindowRects[currentNum].movedX = 0.001 + fixer;
-			if (WindowRects[currentNum].movedY < 0) WindowRects[currentNum].movedY = 0;
-
-			if (WindowRects[currentNum].movedX + width - fixer > MC::windowSize.x) WindowRects[currentNum].movedX = MC::windowSize.x - width + fixer;
-			if (WindowRects[currentNum].movedY + height > MC::windowSize.y) WindowRects[currentNum].movedY = MC::windowSize.y - height;
-
 
 			WindowRects[currentNum].percentageX = WindowRects[currentNum].movedX / MC::windowSize.x;
 			WindowRects[currentNum].percentageY = WindowRects[currentNum].movedY / MC::windowSize.y;
@@ -1547,6 +1536,8 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 
 		if (MC::mousebutton == MouseButton::None && !MC::held || MC::mousebutton == MouseButton::Left && !MC::held) {
 			WindowRects[currentNum].isMovingElement = false;
+			WindowRects[currentNum].oriMouseX = -1;
+			WindowRects[currentNum].oriMouseY = -1;
 		}
 	}
 }
@@ -1560,6 +1551,9 @@ Vec2<float> FlarialGUI::CalculateMovedXY(float x, float y, int num, float rectWi
 {
 	if (isInWindowRect && WindowRects[num].hasBeenMoved)
 	{
+		WindowRects[num].percentageX = WindowRects[num].movedX / MC::windowSize.x;
+		WindowRects[num].percentageY = WindowRects[num].movedY / MC::windowSize.y;
+		
 		x = (WindowRects[num].percentageX * MC::windowSize.x);
 		y = (WindowRects[num].percentageY * MC::windowSize.y);
 	}
