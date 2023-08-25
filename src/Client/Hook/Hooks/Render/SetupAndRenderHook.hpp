@@ -72,6 +72,7 @@ private:
 		Vec2<float>& UvSize
 	)
 	{
+		if (Client::disable) return;
 		Module* mod = ModuleManager::getModule("Animations");
 		if (mod->settings.getSettingByName<bool>("enabled")->value)
 		if (strcmp(texturePtr->GetFilePath().getText(), "textures/ui/selected_hotbar_slot") == 0)

@@ -38,6 +38,9 @@ struct TextBoxStruct
     bool isActive;
     bool firstTime = true;
     bool isDeleting = false;
+    float cursorOpac = 1.0f;
+    float cursorX = 0.0f;
+    bool isAt1 = false;
 };
 
 struct ColorPicker
@@ -45,6 +48,9 @@ struct ColorPicker
     std::string oldHex;
     std::string newHex;
     bool isActive = false;
+    float cursorOpac = 1.0f;
+    float cursorX = 0.0f;
+    bool isAt1 = false;
 };
 
 struct KeybindSelectorer

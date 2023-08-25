@@ -267,9 +267,6 @@ public:
 
 		DWRITE_TEXT_METRICS textMetrics;
 		textLayout->GetMetrics(&textMetrics);
-
-		// std::cout << textMetrics.left << std::endl;
-
 		textLayout->Release();
 		textFormat->Release();
 
