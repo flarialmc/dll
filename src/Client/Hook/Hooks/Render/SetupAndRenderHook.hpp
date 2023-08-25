@@ -9,11 +9,22 @@
 #include "../../../../SDK/Client/Render/ItemRenderer.hpp"
 #include "../../../Module/Modules/CompactChat/CompactChatListener.hpp"
 #include "../Visual/getGammaHook.hpp"
+#include "../../../Module/Manager.hpp"
 #include <format>
 
 bool sendoncethx = false;
 std::string actualName = "";
 
+__int64* __o__DrawImage = nullptr;
+
+inline static float animate(float endPoint, float current, float speed) {
+	if (speed < 0.0) speed = 0.0;
+	else if (speed > 1.0) speed = 1.0;
+
+	float dif = (((endPoint) > (current)) ? (endPoint) : (current)) - (((endPoint) < (current)) ? (endPoint) : (current));
+	float factor = dif * speed;
+	return current + (endPoint > current ? factor : -factor);
+}
 
 class SetUpAndRenderHook : public Hook
 {
@@ -50,6 +61,35 @@ private:
 		}
 
 		func_originalText(ctx, font, pos, text, color, alpha, textAlignment, textMeasureData, caretMeasureData);
+	}
+
+	static void DrawImageDetour(
+		MinecraftUIRenderContext* _this,
+		TextureData* texturePtr,
+		Vec2<float>& imagePos,
+		Vec2<float>& imageDimension,
+		Vec2<float>& UvPos,
+		Vec2<float>& UvSize
+	)
+	{
+		Module* mod = ModuleManager::getModule("Animations");
+		if (mod->settings.getSettingByName<bool>("enabled")->value)
+		if (strcmp(texturePtr->GetFilePath().getText(), "textures/ui/selected_hotbar_slot") == 0)
+		{
+			static float lerpedPos = imagePos.x;
+			lerpedPos = animate(imagePos.x, lerpedPos, 0.016f * mod->settings.getSettingByName<float>("hotbarSpeed")->value);
+			imagePos.x = lerpedPos;
+		}
+		Memory mem;
+		mem.CallFunc<void*, MinecraftUIRenderContext*, TextureData*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(
+			__o__DrawImage,
+			_this,
+			texturePtr,
+			imagePos,
+			imageDimension,
+			UvPos,
+			UvSize
+		);
 	}
 
 	static inline bool usedFreelookHideHud = false;
@@ -96,9 +136,11 @@ private:
 			else SDK::CurrentScreen = layer;
 		}
 
+		auto VTable = *(uintptr_t**)muirc;
+
 		if (func_originalText == nullptr) {
 
-			auto VTable = *(uintptr_t**)muirc;
+			
 
 			MH_CreateHook((void*)VTable[5], drawTextCallback, (LPVOID*)&func_originalText);
 			if (MH_EnableHook((void*)VTable[5]) != MH_OK)
@@ -109,6 +151,10 @@ private:
 				Logger::info(std::format("[Hook] Successfully hooked {}", "drawText"));
 			}
 
+		}
+
+		if (__o__DrawImage == nullptr) {
+			Memory::hookFunc((void*)VTable[7], (void*)DrawImageDetour, (void**)&__o__DrawImage, "DrawImage");
 		}
 
 		SetupAndRenderEvent e;
