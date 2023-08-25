@@ -30,13 +30,21 @@ std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit,
             searchCutOutHeights.emplace_back(nigga);
         }
 
+        if (FlarialGUI::TextBoxes[index].isActive) {
+            if (FlarialGUI::TextBoxes[index].isAt1) FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, -1.0f, 0.05f * FlarialGUI::frameFactor);
+            else FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, 2.0f, 0.05f * FlarialGUI::frameFactor);
+        }
+        else FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, -1.0f, 0.05f * FlarialGUI::frameFactor);
+
+        if (FlarialGUI::TextBoxes[index].cursorOpac > 1) FlarialGUI::TextBoxes[index].isAt1 = true;
+        if (FlarialGUI::TextBoxes[index].cursorOpac < 0) FlarialGUI::TextBoxes[index].isAt1 = false;
+
         if(index <= searchBarSizes.size()) {
 
             const float textWidth = searchBarSizes[index];
             const float percHeight = Constraints::RelativeConstraint(0.42, "height");
 
-            text = FlarialGUI::TextBox(index, text, limit, x - textWidth, y, textWidth,
-                                       percHeight);
+            text = FlarialGUI::TextBox(index, text, limit, x - textWidth, y, textWidth, percHeight);
 
             if (!text.empty()) FlarialGUI::TextBoxes[index].isActive = true;
 
@@ -73,12 +81,56 @@ std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit,
                                     round.x);
             D2D::context->PopAxisAlignedClip();
 
+            IDWriteTextFormat* textFormat;
+            FlarialGUI::writeFactory->CreateTextFormat(
+                FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), 
+                NULL, 
+                DWRITE_FONT_WEIGHT_REGULAR, 
+                DWRITE_FONT_STYLE_NORMAL,
+                DWRITE_FONT_STRETCH_NORMAL, 
+                Constraints::FontScaler(Constraints::SpacingConstraint(0.60f, textWidth)),
+                L"", 
+                &textFormat
+            );
+            textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+            textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+
+            IDWriteTextLayout* textLayout;
+
+            FlarialGUI::writeFactory->CreateTextLayout(
+                FlarialGUI::to_wide(text).c_str(),
+                wcslen(FlarialGUI::to_wide(text).c_str()),
+                textFormat,
+                textWidth,
+                percHeight,
+                &textLayout
+            );
+
+            size_t trailingSpaces = 0;
+            size_t textLength = wcslen(FlarialGUI::to_wide(text).c_str());
+            while (textLength > 0 && text[textLength - 1] == L' ') {
+                trailingSpaces++;
+                textLength--;
+            }
+
+            DWRITE_TEXT_METRICS textMetrics;
+            textLayout->GetMetrics(&textMetrics);
+            textLayout->Release();
+            textFormat->Release();
+
+            D2D1_COLOR_F cursorCol = D2D1::ColorF(D2D1::ColorF::White);
+
+            cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
+
+            FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorX, (x - textWidth) + Constraints::RelativeConstraint(0.38, "height") + textMetrics.width + (Constraints::RelativeConstraint(0.08f) * trailingSpaces), 0.420f * FlarialGUI::frameFactor);
+
+            FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX, y + Constraints::RelativeConstraint(0.2f) / 2.0f, cursorCol, Constraints::RelativeConstraint(0.025f), percHeight / 1.9f, 0, 0);
 
             if (searchBarSizes[index] > Constraints::RelativeConstraint(0.45, "height")) {
-                FlarialGUI::FlarialTextWithFont(x - textWidth, y, FlarialGUI::to_wide(text).c_str(),
+                FlarialGUI::FlarialTextWithFont((x - textWidth) + Constraints::RelativeConstraint(0.38, "height"), y, FlarialGUI::to_wide(text).c_str(),
                                                 D2D1::ColorF(D2D1::ColorF::White),
                                                 textWidth, percHeight,
-                                                DWRITE_TEXT_ALIGNMENT_CENTER,
+                                                DWRITE_TEXT_ALIGNMENT_LEADING,
                                                 Constraints::SpacingConstraint(0.60f, textWidth));
 
             }
