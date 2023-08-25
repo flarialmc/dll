@@ -54,7 +54,7 @@ public:
 		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 0.65f);
 		if (settings.getSettingByName<bool>("padding") == nullptr) settings.addSetting("padding", false);
 		if (settings.getSettingByName<float>("padx") == nullptr) settings.addSetting("padx", 1.0f);
-		if (settings.getSettingByName<float>("pady") == nullptr) settings.addSetting("pady", 1.0f);
+		if (settings.getSettingByName<float>("rectwidth") == nullptr) settings.addSetting("pady", 1.0f);
 		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.0f);
 		if (settings.getSettingByName<std::string>("textalignment") == nullptr) settings.addSetting("textalignment", (std::string)"Left");
 		if (settings.getSettingByName<std::string>("texttest") == nullptr) settings.addSetting("texttest", (std::string)"Test");
@@ -180,15 +180,15 @@ public:
 
 		toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-		FlarialGUI::FlarialText(toggleX, toggleY, L"Padding Y", D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.05f, textHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
+		FlarialGUI::FlarialText(toggleX + Constraints::SpacingConstraint(0.02f, textWidth), toggleY, L"Rect Width", D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.1f, textHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
 
-		percent = FlarialGUI::Slider(5, toggleX + Constraints::SpacingConstraint(0.95, textWidth),
+		percent = FlarialGUI::Slider(5, toggleX + Constraints::SpacingConstraint(1.05f, textWidth),
 			toggleY,
 			D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
 			D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
-			D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("pady")->value, 25.0f);
+			D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("rectwidth")->value, 3.0f);
 
-		this->settings.getSettingByName<float>("pady")->value = percent;
+		this->settings.getSettingByName<float>("rectwidth")->value = percent;
 
 		FlarialGUI::UnSetIsInAdditionalYMode();
 		/* Rounding End */
@@ -276,7 +276,7 @@ public:
 		);
 
 		float realspacing = Constraints::SpacingConstraint(0.05f, textWidth);
-		float rectWidth = textMetrics.width + Constraints::SpacingConstraint(2.0, realspacing);
+		float rectWidth = (textMetrics.width + Constraints::SpacingConstraint(2.0, realspacing)) * this->settings.getSettingByName<float>("rectwidth")->value;
 
 		Vec2<float> realcenter;
 
