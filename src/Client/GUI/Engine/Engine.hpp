@@ -19,6 +19,8 @@ struct WindowRect
     float percentageX = 0;
     float percentageY = 0;
     float ratio = 0;
+    float oriMouseX = -1;
+    float oriMouseY = -1;
 };
 
 struct SliderRect

@@ -196,6 +196,5 @@ public:
         return std::find(keyCodes.begin(), keyCodes.end(), keyCode) != keyCodes.end();
     }
 
-
     virtual void NormalRender(int index, std::string text, std::string value);
 };

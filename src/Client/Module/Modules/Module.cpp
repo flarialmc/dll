@@ -19,7 +19,6 @@ void Module::NormalRender(int index, std::string text, std::string value) {
     float textWidth = Constraints::RelativeConstraint(0.33f * settings.getSettingByName<float>("uiscale")->value);
     float textHeight = Constraints::RelativeConstraint(0.1f * settings.getSettingByName<float>("uiscale")->value);
 
-
     Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
                                           this->settings.getSettingByName<float>("percentageY")->value);
 

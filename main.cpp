@@ -24,7 +24,7 @@ DWORD WINAPI init(HMODULE real)
 {
 
 
-    bool showConsole = true;
+    bool showConsole = false;
     
     if (GetConsoleWindow() == nullptr && showConsole) {
         AllocConsole();

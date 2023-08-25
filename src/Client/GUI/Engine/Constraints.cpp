@@ -145,14 +145,7 @@ float Constraints::FontScaler(float dimension) {
 }
 
 Vec2<float> Constraints::CalculatePercentage(float x, float y) {
-
-    float containerWidth = MC::windowSize.x;
-    float containerHeight = MC::windowSize.y;
-
-    float percentageX = x / containerWidth;
-    float percentageY = y / containerHeight;
-
-    return { percentageX, percentageY };
+    return { x / MC::windowSize.x, y / MC::windowSize.y };
 }
 
 float Constraints::SpacingConstraint(float percentage, float dimension) {
