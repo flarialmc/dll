@@ -304,12 +304,12 @@ public:
 					this->settings.getSettingByName<float>("rounding")->value *
 					settings.getSettingByName<float>("uiscale")->value);
 
-				float totalWidth = keycardSize * 3 + spacing * 2;
+				float totalWidth = keycardSize * 3 + spacing;
 				float totalHeight = keycardSize * 2.0f + keycardSize / 2.0f + spacing * 2;
 
 				if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
 
-					FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, totalWidth, totalHeight, index, keycardSize + spacing);
+					FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, totalWidth, totalHeight, index, keycardSize);
 
 				Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, totalWidth,
 					totalWidth);
