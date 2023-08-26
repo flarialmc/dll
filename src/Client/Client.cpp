@@ -138,7 +138,7 @@ void Client::initialize()
         Client::settings.addSetting("centreCursor", false);
 
     if (Client::settings.getSettingByName<std::string>("ejectKeybind") == nullptr)
-        Client::settings.addSetting("ejectKeybind", (std::string)"F8");
+        Client::settings.addSetting("ejectKeybind", (std::string)"");
 
         // Create threads to download the files
         std::vector<std::thread> threads;
