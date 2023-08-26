@@ -58,6 +58,8 @@ void Module::NormalRender(int index, std::string text, std::string value) {
         textLayout->Release();
         textFormat->Release();
 
+        if(!responsivewidth) textMetrics.left = 0;
+
         Vec2<float> settingperc = Vec2<float>(
                 this->settings.getSettingByName<float>("percentageX")->value,
                 this->settings.getSettingByName<float>("percentageY")->value
@@ -65,7 +67,7 @@ void Module::NormalRender(int index, std::string text, std::string value) {
 
         float realspacing = Constraints::SpacingConstraint(0.05f, textWidth);
         float rectWidth = (!responsivewidth
-                ? (Constraints::RelativeConstraint(0.225f * settings.getSettingByName<float>("uiscale")->value))
+                ? (Constraints::RelativeConstraint(0.225f * settings.getSettingByName<float>("uiscale")->value)  * this->settings.getSettingByName<float>("rectwidth")->value)
                 : (textMetrics.width + Constraints::SpacingConstraint(2.0, realspacing)) * this->settings.getSettingByName<float>("rectwidth")->value);
 
         Vec2<float> realcenter;
@@ -99,6 +101,7 @@ void Module::NormalRender(int index, std::string text, std::string value) {
         textColor.a = settings.getSettingByName<float>("textOpacity")->value;
         borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
 
+
         if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x + textMetrics.left, realcenter.y, realcenter.x + rectWidth + textMetrics.left, realcenter.y + (textHeight) * this->settings.getSettingByName<float>("rectheight")->value), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
 
         FlarialGUI::RoundedRect(
@@ -112,11 +115,11 @@ void Module::NormalRender(int index, std::string text, std::string value) {
         );
 
         FlarialGUI::FlarialTextWithFont(
-                realcenter.x + realspacing + Constraints::SpacingConstraint(paddingX, textWidth),
+                realcenter.x + Constraints::SpacingConstraint(paddingX, textWidth) + textMetrics.left,
                 realcenter.y + Constraints::SpacingConstraint(paddingY, textWidth),
                 FlarialGUI::to_wide(text).c_str(),
                 textColor,
-                textWidth,
+                rectWidth,
                 textHeight,
                 alignment,
                 textSize

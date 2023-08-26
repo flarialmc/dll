@@ -770,7 +770,7 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 	}
 
 
-	if (CursorInEllipse(circleX, circleY, circleRadius, circleRadius) && MC::held) {
+	if (CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.1), Constraints::SpacingConstraint(circleRadius, 1.1)) && MC::held) {
 
 		if (MC::mousepos.x > farLeftX && MC::mousepos.x < farRightX) {
 
@@ -1637,15 +1637,6 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 			WindowRects[currentNum].movedX = ((MC::mousepos.x - WindowRects[currentNum].oriMouseX) - width / 2.0f) + fixer;
 			WindowRects[currentNum].movedY = ((MC::mousepos.y - WindowRects[currentNum].oriMouseY) - height / 2.0f);
 
-			if (WindowRects[currentNum].movedX - fixer < 0) WindowRects[currentNum].movedX = 0.001 + fixer;
-			if (WindowRects[currentNum].movedY < 0) WindowRects[currentNum].movedY = 0;
-
-			if (WindowRects[currentNum].movedX + width - fixer > MC::windowSize.x) WindowRects[currentNum].movedX = MC::windowSize.x - width + fixer;
-			if (WindowRects[currentNum].movedY + height > MC::windowSize.y) WindowRects[currentNum].movedY = MC::windowSize.y - height;
-
-			WindowRects[currentNum].percentageX = WindowRects[currentNum].movedX / MC::windowSize.x;
-			WindowRects[currentNum].percentageY = WindowRects[currentNum].movedY / MC::windowSize.y;
-
 		}
 
 		if (MC::mousebutton == MouseButton::None && !MC::held || MC::mousebutton == MouseButton::Left && !MC::held) {
@@ -1654,6 +1645,17 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 			WindowRects[currentNum].oriMouseY = -1;
 		}
 	}
+
+    // check if outside of mc
+
+    if (WindowRects[currentNum].movedX - fixer < 0) WindowRects[currentNum].movedX = 0.001 + fixer;
+    if (WindowRects[currentNum].movedY < 0) WindowRects[currentNum].movedY = 0;
+
+    if (WindowRects[currentNum].movedX + width - fixer > MC::windowSize.x) WindowRects[currentNum].movedX = MC::windowSize.x - width + fixer;
+    if (WindowRects[currentNum].movedY + height > MC::windowSize.y) WindowRects[currentNum].movedY = MC::windowSize.y - height;
+
+    WindowRects[currentNum].percentageX = WindowRects[currentNum].movedX / MC::windowSize.x;
+    WindowRects[currentNum].percentageY = WindowRects[currentNum].movedY / MC::windowSize.y;
 }
 
 void FlarialGUI::UnsetWindowRect()
@@ -1670,6 +1672,8 @@ Vec2<float> FlarialGUI::CalculateMovedXY(float x, float y, int num, float rectWi
 
 		x = (WindowRects[num].percentageX * MC::windowSize.x);
 		y = (WindowRects[num].percentageY * MC::windowSize.y);
+
+
 	}
 
 	return { x, y };
