@@ -23,5 +23,4 @@ MobBodyRotationComponent* Mob::getBodyRotationComponent() {
     }
 
     return tryGetAllah<MobBodyRotationComponent>(sig);
-
 }

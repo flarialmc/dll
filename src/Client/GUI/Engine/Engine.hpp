@@ -187,7 +187,7 @@ namespace FlarialGUI
     bool Toggle(int index, float x, float y, const D2D1_COLOR_F enabledColor, const D2D1_COLOR_F disabledColor, D2D1_COLOR_F circleColor, bool isEnabled);
 
     float Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor,
-           const D2D1_COLOR_F circleColor, float startingPoint = 50.0f, const float maxValue = 100.0f, const float minValue = 0.0f);
+           const D2D1_COLOR_F circleColor, float startingPoint = 50.0f, const float maxValue = 100.0f, const float minValue = 0.0f, const bool zerosafe = true);
 
     std::string Dropdown(int index, float x, float y, const D2D1_COLOR_F enabledColor, const D2D1_COLOR_F disabledColor, const std::vector<std::string> options, std::string &value, std::string label);
 

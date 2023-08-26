@@ -642,7 +642,7 @@ std::string FlarialGUI::TextBox(int index, std::string text, int limit, float x,
 
 
 
-float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor, float startingPoint, const float maxValue, const float minValue) {
+float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor, const D2D1_COLOR_F circleColor, float startingPoint, const float maxValue, const float minValue, const bool zerosafe) {
 
 
 	if (shouldAdditionalY) {
@@ -808,7 +808,7 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 		percentage = SliderRects[index].percentageX;
 	}
 
-    if (percentage < 0.02) percentage = 0.01;
+    if (percentage < 0.02 && zerosafe) percentage = 0.01;
 
 	if (isAdditionalY) SetIsInAdditionalYMode();
 

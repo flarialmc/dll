@@ -113,7 +113,6 @@ public:
    }
 
    virtual void DefaultConfig() {
-
        if(settings.getSettingByName<float>("percentageX") == nullptr) {
            settings.addSetting("percentageX", 0.0f);
            settings.addSetting("percentageY", 0.0f);
@@ -123,6 +122,15 @@ public:
            settings.addSetting("border", false);
            settings.addSetting("borderWidth", 1.0f);
        }
+
+       if (settings.getSettingByName<bool>("reversepaddingx") == nullptr) settings.addSetting("reversepaddingx", false);
+       if (settings.getSettingByName<bool>("reversepaddingy") == nullptr) settings.addSetting("reversepaddingy", false);
+       if (settings.getSettingByName<float>("padx") == nullptr) settings.addSetting("padx", 0.0f);
+       if (settings.getSettingByName<float>("pady") == nullptr) settings.addSetting("pady", 0.0f);
+       if (settings.getSettingByName<float>("rectwidth") == nullptr) settings.addSetting("rectwidth", 1.0f);
+       if (settings.getSettingByName<float>("rectheight") == nullptr) settings.addSetting("rectheight", 1.0f);
+       if (settings.getSettingByName<bool>("responsivewidth") == nullptr) settings.addSetting("responsivewidth", false);
+       if (settings.getSettingByName<std::string>("textalignment") == nullptr) settings.addSetting("textalignment", (std::string)"Left");
 
        if(settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 32.0f);
 

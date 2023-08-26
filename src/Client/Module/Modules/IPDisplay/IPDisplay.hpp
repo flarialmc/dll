@@ -52,10 +52,6 @@ public:
 		}
 
 		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 0.65f);
-		if (settings.getSettingByName<bool>("reversepadding") == nullptr) settings.addSetting("reversepadding", false);
-		if (settings.getSettingByName<float>("padx") == nullptr) settings.addSetting("padx", 0.0f);
-		if (settings.getSettingByName<float>("rectwidth") == nullptr) settings.addSetting("rectwidth", 1.0f);
-        if (settings.getSettingByName<float>("rectheight") == nullptr) settings.addSetting("rectheight", 1.0f);
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.0f);
 		if (settings.getSettingByName<std::string>("textalignment") == nullptr) settings.addSetting("textalignment", (std::string)"Left");
 		if (settings.getSettingByName<std::string>("texttest") == nullptr) settings.addSetting("texttest", (std::string)"Test");
@@ -95,7 +91,6 @@ public:
 
 		this->settings.getSettingByName<float>("uiscale")->value = percent;
 
-
 		toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 		if (FlarialGUI::Toggle(0, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("border")->value)) this->settings.getSettingByName<bool>("border")->value = !this->settings.getSettingByName<bool>("border")->value;
 		FlarialGUI::FlarialText(toggleX + Constraints::SpacingConstraint(0.75, textWidth / 2.0f), toggleY, L"Border", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
@@ -125,18 +120,18 @@ public:
 
 		this->settings.getSettingByName<float>("rounding")->value = percent;
 
-		//toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-		//
-		//FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.60, textWidth), toggleY, FlarialGUI::to_wide("Translucency").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
-		//
-		//if (FlarialGUI::Toggle(4, Constraints::PercentageConstraint(0.019, "left"), toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("BlurEffect")->value)) this->settings.getSettingByName<bool>("BlurEffect")->value = !this->settings.getSettingByName<bool>("BlurEffect")->value;
+		toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+		FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.60, textWidth), toggleY, FlarialGUI::to_wide("Translucency").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+
+		if (FlarialGUI::Toggle(5, Constraints::PercentageConstraint(0.019, "left"), toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("BlurEffect")->value)) this->settings.getSettingByName<bool>("BlurEffect")->value = !this->settings.getSettingByName<bool>("BlurEffect")->value;
 
 		toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 		FlarialGUI::TextBoxVisual(7, settings.getSettingByName<std::string>("text")->value, 16, Constraints::PercentageConstraint(0.019, "left"), toggleY);
 
-		FlarialGUI::FlarialText(toggleX + Constraints::SpacingConstraint(0.01, textWidth), toggleY + Constraints::SpacingConstraint(0.35, textWidth), L"Text Scale", D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.05f, textHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-		toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+		FlarialGUI::FlarialText(toggleX + Constraints::SpacingConstraint(0.01, textWidth), toggleY, L"Text Scale", D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.05f, textHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
 
 		percent = FlarialGUI::Slider(8, toggleX + Constraints::SpacingConstraint(0.95, textWidth),
 			toggleY,
@@ -163,27 +158,46 @@ public:
 
 		toggleY += Constraints::SpacingConstraint(0.40, textWidth);
 
-		FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.60, textWidth), toggleY, FlarialGUI::to_wide("Reverse Padding").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+		FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.60, textWidth), toggleY, FlarialGUI::to_wide("Reverse Padding X").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
 
-		if (FlarialGUI::Toggle(4, Constraints::PercentageConstraint(0.019, "left"), toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("reversepadding")->value)) this->settings.getSettingByName<bool>("reversepadding")->value = !this->settings.getSettingByName<bool>("reversepadding")->value;
+		if (FlarialGUI::Toggle(4, Constraints::PercentageConstraint(0.019, "left"), toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("reversepaddingx")->value)) this->settings.getSettingByName<bool>("reversepaddingx")->value = !this->settings.getSettingByName<bool>("reversepaddingx")->value;
 
-		toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        toggleY += Constraints::SpacingConstraint(0.40, textWidth);
 
-		FlarialGUI::FlarialText(toggleX, toggleY, L"Padding X", D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.05f, textHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
+        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.60, textWidth), toggleY, FlarialGUI::to_wide("Reverse Padding Y").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
 
-		percent = FlarialGUI::Slider(4, toggleX + Constraints::SpacingConstraint(0.95, textWidth),
+        if (FlarialGUI::Toggle(6, Constraints::PercentageConstraint(0.019, "left"), toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("reversepaddingy")->value)) this->settings.getSettingByName<bool>("reversepaddingy")->value = !this->settings.getSettingByName<bool>("reversepaddingy")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        toggleX += Constraints::RelativeConstraint(0.1f);
+
+		FlarialGUI::FlarialText(toggleX, toggleY, L"Padding X", D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.05f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING);
+
+		percent = FlarialGUI::Slider(4, toggleX + Constraints::SpacingConstraint(0.92, textWidth),
 			toggleY,
 			D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
 			D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
-			D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("padx")->value, 0.53f);
+			D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("padx")->value, 0.53f, 0.0f, false);
 
 		this->settings.getSettingByName<float>("padx")->value = percent;
 
-		toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-		FlarialGUI::FlarialText(toggleX + Constraints::SpacingConstraint(0.05f, textWidth), toggleY, L"Rect Width", D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.1f, textHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
+        FlarialGUI::FlarialText(toggleX, toggleY, L"Padding Y", D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.05f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING);
 
-		percent = FlarialGUI::Slider(5, toggleX + Constraints::SpacingConstraint(1.05f, textWidth),
+        percent = FlarialGUI::Slider(6, toggleX + Constraints::SpacingConstraint(0.92, textWidth),
+                                     toggleY,
+                                     D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                     D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+                                     D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("pady")->value, 0.53f, 0.0f, false);
+
+        this->settings.getSettingByName<float>("pady")->value = percent;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+		FlarialGUI::FlarialText(toggleX, toggleY, L"Rect Width", D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.1f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING);
+
+		percent = FlarialGUI::Slider(5, toggleX + Constraints::SpacingConstraint(1.02f, textWidth),
 			toggleY,
 			D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
 			D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
@@ -193,9 +207,9 @@ public:
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::FlarialText(toggleX + Constraints::SpacingConstraint(0.05f, textWidth), toggleY, L"Rect Height", D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.1f, textHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
+        FlarialGUI::FlarialText(toggleX, toggleY, L"Rect Height", D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.1f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING);
 
-        percent = FlarialGUI::Slider(10, toggleX + Constraints::SpacingConstraint(1.05f, textWidth),
+        percent = FlarialGUI::Slider(10, toggleX + Constraints::SpacingConstraint(1.02f, textWidth),
                                      toggleY,
                                      D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
                                      D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
@@ -203,7 +217,13 @@ public:
 
         this->settings.getSettingByName<float>("rectheight")->value = percent;
 
-		FlarialGUI::UnSetIsInAdditionalYMode();
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(0.60, textWidth), toggleY, FlarialGUI::to_wide("Responsive Width").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+
+        if (FlarialGUI::Toggle(7, Constraints::PercentageConstraint(0.019, "left"), toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("responsivewidth")->value)) this->settings.getSettingByName<bool>("responsivewidth")->value = !this->settings.getSettingByName<bool>("responsivewidth")->value;
+
+        FlarialGUI::UnSetIsInAdditionalYMode();
 		/* Rounding End */
 
 		/* Color Pickers Start*/
@@ -232,135 +252,6 @@ public:
 		FlarialGUI::ColorPickerWindow(2, settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value);
 		/* Color Pickers End */
 
-	}
-
-	std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {
-		{"Left", DWRITE_TEXT_ALIGNMENT_LEADING},
-		{"Center", DWRITE_TEXT_ALIGNMENT_CENTER},
-		{"Right", DWRITE_TEXT_ALIGNMENT_TRAILING}
-	};
-
-	void NormalRender(int index, std::string text, std::string value) override {
-		DWRITE_TEXT_ALIGNMENT alignment = alignments[this->settings.getSettingByName<std::string>("textalignment")->value];
-		float paddingX = this->settings.getSettingByName<float>("padx")->value;
-
-        if(this->settings.getSettingByName<bool>("reversepadding")->value) paddingX = -(this->settings.getSettingByName<float>("padx")->value);
-
-		std::string uppercaseSentence;
-		std::string search = "{VALUE}";
-
-		for (char c : text) {
-			uppercaseSentence += std::toupper(c);
-		}
-
-		size_t pos = uppercaseSentence.find(search);
-		if (pos != std::string::npos) {
-			text.replace(pos, search.length(), value);
-		}
-
-		float textWidth = Constraints::RelativeConstraint(0.7f * settings.getSettingByName<float>("uiscale")->value);
-		float textHeight = Constraints::RelativeConstraint(0.1f * settings.getSettingByName<float>("uiscale")->value);
-
-		float textSize = Constraints::SpacingConstraint(3.2f, textHeight) * this->settings.getSettingByName<float>("textscale")->value;
-
-		IDWriteTextFormat* textFormat;
-		FlarialGUI::writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(textSize), L"", &textFormat);
-		textFormat->SetTextAlignment(alignment);
-		textFormat->SetParagraphAlignment((DWRITE_PARAGRAPH_ALIGNMENT)alignment);
-
-		IDWriteTextLayout* textLayout;
-
-		FlarialGUI::writeFactory->CreateTextLayout(
-			FlarialGUI::to_wide(text).c_str(),
-			wcslen(FlarialGUI::to_wide(text).c_str()),
-			textFormat,
-			textWidth,
-			textHeight,
-			&textLayout
-		);
-
-		DWRITE_TEXT_METRICS textMetrics;
-		textLayout->GetMetrics(&textMetrics);
-		textLayout->Release();
-		textFormat->Release();
-
-		Vec2<float> settingperc = Vec2<float>(
-			this->settings.getSettingByName<float>("percentageX")->value,
-			this->settings.getSettingByName<float>("percentageY")->value
-		);
-
-		float realspacing = Constraints::SpacingConstraint(0.05f, textWidth);
-		float rectWidth = (textMetrics.width + Constraints::SpacingConstraint(2.0, realspacing)) * this->settings.getSettingByName<float>("rectwidth")->value;
-
-		Vec2<float> realcenter;
-
-		if (settingperc.x != 0) realcenter = Vec2<float>(settingperc.x * MC::windowSize.x, settingperc.y * MC::windowSize.y);
-		else realcenter = Constraints::CenterConstraint(rectWidth, textHeight);
-
-		if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu) {
-			FlarialGUI::SetWindowRect(realcenter.x + textMetrics.left, realcenter.y, rectWidth, textHeight, index, -textMetrics.left);
-
-			Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, rectWidth, textHeight);
-
-			realcenter.x = vec2.x;
-			realcenter.y = vec2.y;
-
-			realcenter = realcenter;
-
-			Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y);
-
-			this->settings.setValue("percentageX", percentages.x);
-			this->settings.setValue("percentageY", percentages.y);
-		}
-
-		Vec2<float> rounde = Constraints::RoundingConstraint(this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value, this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value);
-
-		D2D1_COLOR_F bgColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
-		D2D1_COLOR_F textColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textColor")->value);
-		D2D1_COLOR_F borderColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
-
-		bgColor.a = settings.getSettingByName<float>("bgOpacity")->value;
-		textColor.a = settings.getSettingByName<float>("textOpacity")->value;
-		borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
-
-		if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + rectWidth, realcenter.y + (textHeight) * this->settings.getSettingByName<float>("rectheight")->value), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
-
-		FlarialGUI::RoundedRect(
-			realcenter.x + textMetrics.left,
-			realcenter.y,
-			bgColor,
-			rectWidth,
-			textHeight * this->settings.getSettingByName<float>("rectheight")->value,
-			rounde.x,
-			rounde.x
-		);
-
-		FlarialGUI::FlarialTextWithFont(
-			realcenter.x + realspacing + Constraints::SpacingConstraint(paddingX, textWidth),
-			realcenter.y ,
-			FlarialGUI::to_wide(text).c_str(),
-			textColor,
-			textWidth,
-			textHeight,
-			alignment,
-			textSize
-		);
-
-		if (this->settings.getSettingByName<bool>("border")->value) {
-			FlarialGUI::RoundedHollowRect(
-				realcenter.x + textMetrics.left,
-				realcenter.y,
-				Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
-				borderColor,
-				rectWidth,
-				textHeight * this->settings.getSettingByName<float>("rectheight")->value,
-				rounde.x,
-				rounde.x
-			);
-		}
-
-		if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
-			FlarialGUI::UnsetWindowRect();
 	}
 };
 
