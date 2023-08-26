@@ -97,11 +97,11 @@ public:
         }
 
         if (settings.getSettingByName<float>("spacebarHeight") == nullptr) {
-            settings.addSetting("spacebarHeight", 0.3f);
+            settings.addSetting("spacebarHeight", 0.9f);
         }
 
         if (settings.getSettingByName<float>("keySpacing") == nullptr) {
-            settings.addSetting("keySpacing", 5.0f);
+            settings.addSetting("keySpacing", 1.63f);
         }
 
 		Module::onEnable();
