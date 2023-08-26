@@ -1649,7 +1649,7 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 	}
 
     // check if outside of mc
-
+    WindowRects[currentNum].fixer = fixer;
     if (WindowRects[currentNum].movedX - fixer < 0) WindowRects[currentNum].movedX = 0.001 + fixer;
     if (WindowRects[currentNum].movedY < 0) WindowRects[currentNum].movedY = 0;
 
@@ -1669,14 +1669,20 @@ Vec2<float> FlarialGUI::CalculateMovedXY(float x, float y, int num, float rectWi
 {
 	if (isInWindowRect && WindowRects[num].hasBeenMoved)
 	{
+
 		WindowRects[num].percentageX = WindowRects[num].movedX / MC::windowSize.x;
 		WindowRects[num].percentageY = WindowRects[num].movedY / MC::windowSize.y;
 
 		x = (WindowRects[num].percentageX * MC::windowSize.x);
 		y = (WindowRects[num].percentageY * MC::windowSize.y);
 
-
 	}
+
+    if (x - WindowRects[num].fixer < 0) x = 0.001 - WindowRects[num].fixer;
+    if (y < 0) y = 0;
+
+    if (x + rectWidth - WindowRects[num].fixer > MC::windowSize.x) x = MC::windowSize.x - rectWidth - WindowRects[num].fixer;
+    if (y + rectHeight > MC::windowSize.y) y = MC::windowSize.y - rectHeight;
 
 	return { x, y };
 }

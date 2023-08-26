@@ -21,6 +21,7 @@ struct WindowRect
     float ratio = 0;
     float oriMouseX = -1;
     float oriMouseY = -1;
+    float fixer = 0;
 };
 
 struct SliderRect
