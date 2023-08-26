@@ -23,6 +23,7 @@ void DownloadAndSave(std::string url, std::string path) {
 
 bool Client::disable = false;
 
+
 void Client::initialize()
 {
     std::filesystem::path folder_path(Utils::getRoamingPath() + "\\Flarial");
@@ -136,7 +137,8 @@ void Client::initialize()
     if (Client::settings.getSettingByName<bool>("centreCursor") == nullptr)
         Client::settings.addSetting("centreCursor", false);
 
-
+    if (Client::settings.getSettingByName<std::string>("ejectKeybind") == nullptr)
+        Client::settings.addSetting("ejectKeybind", (std::string)"F8");
 
         // Create threads to download the files
         std::vector<std::thread> threads;

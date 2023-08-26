@@ -354,17 +354,24 @@ public:
 
                         FlarialGUI::TextBoxVisual(1, Client::settings.getSettingByName<std::string>("fontname")->value, 26, Constraints::PercentageConstraint(0.019, "left"), Constraints::PercentageConstraint(0.10, "top"), "Font (Anything installed in your system)");
 
-                        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left"), Constraints::PercentageConstraint(0.40, "top"), FlarialGUI::to_wide("Blur Intensity").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.4f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+                        rectY = Constraints::PercentageConstraint(0.34, "top");
+
+                        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left"), rectY, FlarialGUI::to_wide("Eject keybind").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+                        FlarialGUI::KeybindSelector(0, Constraints::PercentageConstraint(0.17, "left"), rectY, Client::settings.getSettingByName<std::string>("ejectKeybind")->value);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+
+                        FlarialGUI::FlarialTextWithFont(Constraints::PercentageConstraint(0.019, "left"), rectY, FlarialGUI::to_wide("Blur Intensity").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
 
                         float percent = FlarialGUI::Slider(7, Constraints::PercentageConstraint(0.019, "left") + Constraints::SpacingConstraint(1.06, textWidth),
-                            Constraints::PercentageConstraint(0.40, "top"),
+                            rectY,
                             D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
                             D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
                             D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<float>("blurintensity")->value, 25);
 
                         Client::settings.getSettingByName<float>("blurintensity")->value = percent;
 
-                        rectY += Constraints::SpacingConstraint(1.0, textWidth);
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
                         if (FlarialGUI::Toggle(0, Constraints::PercentageConstraint(0.019, "left"), rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("killdx")->value)) {
 
                             Client::settings.getSettingByName<bool>("killdx")->value = !Client::settings.getSettingByName<bool>("killdx")->value;

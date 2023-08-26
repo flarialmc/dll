@@ -858,7 +858,9 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F
 	}
 
 
-	if (index >= highestAddIndexes) { highestAddIndexes = index; std::cout << highestAddIndexes << std::endl; }
+	if (index >= highestAddIndexes) {
+        highestAddIndexes = index; 
+    }
 	additionalIndex = index;
 
 	float originalY = y;

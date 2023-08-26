@@ -104,8 +104,6 @@ private:
 		std::string layer = SDK::screenView->VisualTree->root->LayerName;
 
 		if (layer != "debug_screen" && layer != "toast_screen") {
-			if (getGammaHook::hidehudPtr != nullptr && getGammaHook::hidehudPtr->getvalue())
-				SDK::CurrentScreen = "f1_screen";
 			if (ModuleManager::getModule("Zoom") != nullptr && ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("enabled")->value) {
 				bool mask = false;
 				if (ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("hidemodules")->value) {
@@ -132,9 +130,11 @@ private:
 				getGammaHook::hidehandPtr->setvalue(false);
 				usedFreelookHideHud = false;
 				SDK::CurrentScreen = layer;
-			}
-			
-			else SDK::CurrentScreen = layer;
+			} else SDK::CurrentScreen = layer;
+
+            if (getGammaHook::hidehudPtr != nullptr && getGammaHook::hidehudPtr->getvalue()) {
+                SDK::CurrentScreen = "f1_screen";
+            }
 		}
 
 		auto VTable = *(uintptr_t**)muirc;

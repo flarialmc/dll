@@ -62,17 +62,31 @@ std::string Utils::GetKeyAsString(int key, bool isCapital, bool isKeybind) {
         return " ";
     }
 
-    if(isKeybind) {
-        if (key == 18) return "ALT";
-        if (key == 17) return "CTRL";
-        if (key == 16) return "SHIFT";
-        if (key == 9) return "TAB";
-        if (key == 45) return "INS";
-        if (key == 46) return "DEL";
-        if (key == 36) return "HOME";
-        if (key == 35) return "END";
-        if (key == 33) return "PG UP";
-        if (key == 34) return "PG DOWN";
+    if (isKeybind) {
+        switch (key) {
+            case 18: return "ALT";
+            case 17: return "CTRL";
+            case 16: return "SHIFT";
+            case 9: return "TAB";
+            case 45: return "INS";
+            case 46: return "DEL";
+            case 36: return "HOME";
+            case 35: return "END";
+            case 33: return "PG UP";
+            case 34: return "PG DOWN";
+            case 112: return "F1";
+            case 113: return "F2";
+            case 114: return "F3";
+            case 115: return "F4";
+            case 116: return "F5";
+            case 117: return "F6";
+            case 118: return "F7";
+            case 119: return "F8";
+            case 120: return "F9";
+            case 121: return "F10";
+            case 122: return "F11";
+            case 123: return "F12";
+        }
     }
 
     if (isCapital) {
@@ -184,8 +198,6 @@ std::string Utils::GetKeyAsString(int key, bool isCapital, bool isKeybind) {
 };
 
 int Utils::GetStringAsKey(const std::string& str) {
-
-
     if(str == "ALT" || str == "alt") return 18;
     if(str == "CTRL" || str == "ctrl") return 17;
     if(str == "SHIFT" || str == "shift") return 16;
@@ -203,6 +215,18 @@ int Utils::GetStringAsKey(const std::string& str) {
     if(str == "|") return 220;
     if(str == "`" || str == "~") return 192;
     if(str == " ") return 32;
+    if(str == "F1" || str == "f1") return 112;
+    if(str == "F2" || str == "f2") return 113;
+    if(str == "F3" || str == "f3") return 114;
+    if(str == "F4" || str == "f4") return 115;
+    if(str == "F5" || str == "f5") return 116;
+    if(str == "F6" || str == "f6") return 117;
+    if(str == "F7" || str == "f7") return 118;
+    if(str == "F8" || str == "f8") return 119;
+    if(str == "F9" || str == "f9") return 120;
+    if(str == "F10" || str == "f10") return 121;
+    if(str == "F11" || str == "f11") return 122;
+    if(str == "F12" || str == "f12") return 123;
 
     char c = str[0];
 
