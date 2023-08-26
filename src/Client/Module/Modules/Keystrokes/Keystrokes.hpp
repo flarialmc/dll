@@ -132,7 +132,7 @@ public:
 		toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 		toggleX -= Constraints::SpacingConstraint(0.175, textWidth);
 
-		FlarialGUI::FlarialText(toggleX, toggleY, L"Rounding", D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.05f,
+		FlarialGUI::FlarialText(toggleX, toggleY, L"Rounding", D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.069f,
 			textHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
 
 		percent = FlarialGUI::Slider(6, toggleX + Constraints::SpacingConstraint(0.95, textWidth),
