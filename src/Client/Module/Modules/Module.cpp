@@ -10,7 +10,7 @@ std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {
 
 void Module::NormalRender(int index, std::string text, std::string value) {
 
-    if(settings.getSettingByName<bool>("enabled")->value) {
+    if(settings.getSettingByName<bool>("enabled")->value && SDK::CurrentScreen == "hud_screen") {
         DWRITE_TEXT_ALIGNMENT alignment = alignments[this->settings.getSettingByName<std::string>("textalignment")->value];
         bool responsivewidth = this->settings.getSettingByName<bool>("responsivewidth")->value;
         float paddingX = this->settings.getSettingByName<float>("padx")->value;

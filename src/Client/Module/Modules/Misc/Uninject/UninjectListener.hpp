@@ -6,25 +6,17 @@ class UninjectListener : public Listener {
 public:
 
     Module* module;
+    std::string curKeybind = Client::settings.getSettingByName<std::string>("ejectKeybind")->value;
 
     void onKey(KeyEvent& event) override {
-      
-            if (event.GetKey() == VK_F8 && static_cast<ActionType>(event.GetAction()) == ActionType::RELEASED) {
-                ModuleManager::terminate();
-                Client::disable = true;
-
-                //if (SDK::clientInstance->getLocalPlayer() == nullptr) {
-                //    ModuleManager::terminate();
-                //    Client::disable = true;
-                //}
-                //else {
-                //
-                //     FlarialGUI::Notify("Cannot eject in a world");
-                //
-                //}
-            }
-   
-       
+        if (curKeybind != Client::settings.getSettingByName<std::string>("ejectKeybind")->value) {
+            curKeybind = Client::settings.getSettingByName<std::string>("ejectKeybind")->value;
+            return;
+        }
+        if (event.GetKey() == Utils::GetStringAsKey(Client::settings.getSettingByName<std::string>("ejectKeybind")->value) && static_cast<ActionType>(event.GetAction()) == ActionType::RELEASED) {
+            ModuleManager::terminate();
+            Client::disable = true;
+        }
     }
 
 public:
