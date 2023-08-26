@@ -808,6 +808,8 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 		percentage = SliderRects[index].percentageX;
 	}
 
+    if (percentage < 0.02) percentage = 0.01;
+
 	if (isAdditionalY) SetIsInAdditionalYMode();
 
 	return percentage;

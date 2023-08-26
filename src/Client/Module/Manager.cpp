@@ -140,7 +140,7 @@ bool ModuleManager::doesAnyModuleHave(std::string settingName) {
     for (Module* mod : modules) {
 
         if(mod->settings.getSettingByName<bool>(settingName) != nullptr)
-            if(mod->settings.getSettingByName<bool>(settingName)->value){
+            if(mod->settings.getSettingByName<bool>(settingName)->value && mod->settings.getSettingByName<bool>("enabled")->value){
                 result = true;
                 break;
             }
