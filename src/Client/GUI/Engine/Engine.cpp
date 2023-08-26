@@ -653,6 +653,20 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 		}
 	}
 
+    int i = 0;
+    bool ye = false;
+
+    /*
+    for (auto& rect : SliderRects) {
+
+        if (rect.isMovingElement && i != index) {
+            ye = true;
+            break;
+        }
+
+        i++;
+    }*/
+
 	// Define the total slider rect width and height
 	const bool isAdditionalY = shouldAdditionalY;
 	const float totalWidth = Constraints::RelativeConstraint(0.15, "height", true);
@@ -754,6 +768,7 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
 	SliderRects[index].percentageX = percentage;
 
+
     if(isInScrollView) {
         y += scrollpos;
         circleY += scrollpos;
@@ -770,43 +785,45 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 	}
 
 
-	if (CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.1), Constraints::SpacingConstraint(circleRadius, 1.1)) && MC::held) {
 
-		if (MC::mousepos.x > farLeftX && MC::mousepos.x < farRightX) {
+        if (CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.2),
+                            Constraints::SpacingConstraint(circleRadius, 1.2)) && MC::held) {
 
-			SliderRects[index].movedX = MC::mousepos.x;
-			SliderRects[index].hasBeenMoved = true;
-			SliderRects[index].isMovingElement = true;
-		}
+            if (MC::mousepos.x > farLeftX && MC::mousepos.x < farRightX) {
 
-		if (MC::mousepos.x < farLeftX) SliderRects[index].movedX = farLeftX;
-		else if (MC::mousepos.x > farRightX) SliderRects[index].movedX = farRightX;
+                SliderRects[index].movedX = MC::mousepos.x;
+                SliderRects[index].hasBeenMoved = true;
+                SliderRects[index].isMovingElement = true;
+            }
 
-		percentage = ((SliderRects[index].movedX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
-		SliderRects[index].percentageX = percentage;
+            if (MC::mousepos.x < farLeftX) SliderRects[index].movedX = farLeftX;
+            else if (MC::mousepos.x > farRightX) SliderRects[index].movedX = farRightX;
 
-	}
-	else if (MC::held && SliderRects[index].isMovingElement) {
+            percentage =
+                    ((SliderRects[index].movedX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
+            SliderRects[index].percentageX = percentage;
 
-		if (MC::mousepos.x > farLeftX && MC::mousepos.x < farRightX) {
+        } else if (MC::held && SliderRects[index].isMovingElement) {
 
-			SliderRects[index].movedX = MC::mousepos.x;
-			SliderRects[index].hasBeenMoved = true;
-			SliderRects[index].isMovingElement = true;
-		}
+            if (MC::mousepos.x > farLeftX && MC::mousepos.x < farRightX) {
 
-		if (MC::mousepos.x < farLeftX) SliderRects[index].movedX = farLeftX;
-		else if (MC::mousepos.x > farRightX) SliderRects[index].movedX = farRightX;
+                SliderRects[index].movedX = MC::mousepos.x;
+                SliderRects[index].hasBeenMoved = true;
+                SliderRects[index].isMovingElement = true;
+            }
 
-		percentage = ((SliderRects[index].movedX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
-		SliderRects[index].percentageX = percentage;
-	}
+            if (MC::mousepos.x < farLeftX) SliderRects[index].movedX = farLeftX;
+            else if (MC::mousepos.x > farRightX) SliderRects[index].movedX = farRightX;
 
-	if (MC::mousebutton == MouseButton::None && !MC::held || MC::mousebutton == MouseButton::Left && !MC::held)
-	{
-		SliderRects[index].isMovingElement = false;
-		percentage = SliderRects[index].percentageX;
-	}
+            percentage =
+                    ((SliderRects[index].movedX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
+            SliderRects[index].percentageX = percentage;
+        }
+
+        if (MC::mousebutton == MouseButton::None && !MC::held || MC::mousebutton == MouseButton::Left && !MC::held) {
+            SliderRects[index].isMovingElement = false;
+            percentage = SliderRects[index].percentageX;
+        }
 
     if (percentage < 0.02 && zerosafe) percentage = 0.01;
 
@@ -1681,7 +1698,7 @@ Vec2<float> FlarialGUI::CalculateMovedXY(float x, float y, int num, float rectWi
     if (x - WindowRects[num].fixer < 0) x = 0.001 - WindowRects[num].fixer;
     if (y < 0) y = 0;
 
-    if (x + rectWidth - WindowRects[num].fixer > MC::windowSize.x) x = MC::windowSize.x - rectWidth - WindowRects[num].fixer;
+    if (x + rectWidth - WindowRects[num].fixer > MC::windowSize.x) x = MC::windowSize.x - rectWidth + WindowRects[num].fixer;
     if (y + rectHeight > MC::windowSize.y) y = MC::windowSize.y - rectHeight;
 
 	return { x, y };

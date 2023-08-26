@@ -38,25 +38,27 @@ void Module::NormalRender(int index, std::string text, std::string value) {
 
         DWRITE_TEXT_METRICS textMetrics;
 
-        IDWriteTextFormat* textFormat;
-        FlarialGUI::writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(textSize), L"", &textFormat);
-        textFormat->SetTextAlignment(alignment);
-        textFormat->SetParagraphAlignment((DWRITE_PARAGRAPH_ALIGNMENT)alignment);
+        if(responsivewidth) {
 
-        IDWriteTextLayout* textLayout;
+            IDWriteTextFormat *textFormat = FlarialGUI::getTextFormat(
+                    Client::settings.getSettingByName<std::string>("fontname")->value,
+                    Constraints::FontScaler(textSize), DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL,
+                    DWRITE_FONT_STRETCH_NORMAL, alignment);
 
-        FlarialGUI::writeFactory->CreateTextLayout(
-                FlarialGUI::to_wide(text).c_str(),
-                wcslen(FlarialGUI::to_wide(text).c_str()),
-                textFormat,
-                textWidth,
-                textHeight,
-                &textLayout
-        );
+            IDWriteTextLayout *textLayout;
 
-        textLayout->GetMetrics(&textMetrics);
-        textLayout->Release();
-        textFormat->Release();
+            FlarialGUI::writeFactory->CreateTextLayout(
+                    FlarialGUI::to_wide(text).c_str(),
+                    wcslen(FlarialGUI::to_wide(text).c_str()),
+                    textFormat,
+                    textWidth,
+                    textHeight,
+                    &textLayout
+            );
+
+            textLayout->GetMetrics(&textMetrics);
+            textLayout->Release();
+        }
 
         if(!responsivewidth) textMetrics.left = 0;
 
