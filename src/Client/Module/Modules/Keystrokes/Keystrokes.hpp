@@ -113,8 +113,9 @@ public:
         if (settings.getSettingByName<float>("spacebarWidth") == nullptr)
             settings.addSetting("spacebarWidth", 0.5f);
 
-        if (settings.getSettingByName<float>("spacebarHeight") == nullptr)
-            settings.addSetting("spacebarHeight", 0.1f);
+        if (settings.getSettingByName<float>("spacebarHeight") == nullptr) {
+            settings.addSetting("spacebarHeight", 0.09f);
+        }
 
         if (settings.getSettingByName<float>("keySpacing") == nullptr) {
             settings.addSetting("keySpacing", 1.63f);
