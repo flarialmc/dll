@@ -13,6 +13,7 @@ public:
     virtual ~Setting() = default;
     virtual json ToJson() const = 0;
     virtual void FromJson(const json& jsonData) = 0;
+    virtual std::unique_ptr<Setting> clone() const = 0;
 };
 
 template<typename T>
@@ -34,6 +35,10 @@ public:
         }
     }
 
+    std::unique_ptr<Setting> clone() const override {
+        return std::make_unique<SettingType<T>>(name, value);
+    }
+
     std::string name;
     T value;
 };
@@ -44,6 +49,23 @@ public:
     void addSetting(const std::string& name, const T& defaultValue) {
         settings[name] = std::make_unique<SettingType<T>>(name, defaultValue);
     }
+
+    void reset() {
+        settings.clear();
+    }
+
+    void copyFrom(const Settings& from) {
+
+        for (const auto& settingPair : from.settings) {
+            const std::string& name = settingPair.first;
+            const std::unique_ptr<Setting>& sourceSetting = settingPair.second;
+
+
+            settings[name] = sourceSetting->clone();
+        }
+        
+    }
+
 
     template<typename T>
     SettingType<T>* getSettingByName(const std::string& name) {

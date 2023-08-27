@@ -779,8 +779,8 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
 
 
-        if (CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.35),
-                            Constraints::SpacingConstraint(circleRadius, 1.35)) && MC::held) {
+        if (CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.5f),
+                            Constraints::SpacingConstraint(circleRadius, 1.5f)) && MC::held) {
 
             if (MC::mousepos.x > farLeftX && MC::mousepos.x < farRightX) {
 
