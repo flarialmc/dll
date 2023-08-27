@@ -7,6 +7,7 @@
 #include "src/Client/Events/EventHandler.hpp"
 #include "src/Client/Hook/Hooks/Render/ResizeHook.hpp"
 #include "src/Client/Hook/Hooks/Game/RaknetTick.hpp"
+#include "src/Client/Module/Modules/Nick/NickListener.hpp"
 #include <kiero.h>
 #include <wininet.h>
 
@@ -57,12 +58,21 @@ DWORD WINAPI init(HMODULE real)
                                 else ipToSend = "in.singleplayer";
                             } else ipToSend = "is.anonymous";
 
+                            std::string name = SDK::clientInstance->getLocalPlayer()->playerName;
+
+                            auto module = ModuleManager::getModule("Nick");
+
+                            if(SDK::clientInstance != nullptr)
+                            if(SDK::clientInstance->getLocalPlayer() != nullptr)
+                            if (module->settings.getSettingByName<bool>("enabled")->value) {
+                                name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickListener::original));
+                            }
                             // send thing
-                            std::cout << DownloadString(std::format("https://api.flarial.net/heartbeat/{}/{}",
-                                                                    Utils::removeColorCodes(SDK::clientInstance->getLocalPlayer()->playerName),
-                                                                    ipToSend)) + " " + std::format("https://api.flarial.net/heartbeat/{}/{}",
-                                                                                                                    Utils::removeColorCodes(SDK::clientInstance->getLocalPlayer()->playerName),
-                                                                                                                    ipToSend) << std::endl;
+                            std::cout << DownloadString(std::format("https://api.flarial.net/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend))
+
+                            + " " + std::format("https://api.flarial.net/heartbeat/{}/{}",
+                              Utils::removeColorCodes(name),
+                                ipToSend) << std::endl;
                             lastBeatTime = now;
                         }
                     }
