@@ -11,10 +11,15 @@ std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {
 void Module::NormalRender(int index, std::string text, std::string value) {
 
     if(settings.getSettingByName<bool>("enabled")->value && SDK::CurrentScreen == "hud_screen") {
+        D2D1_MATRIX_3X2_F oldTransform;
+        D2D::context->GetTransform(&oldTransform);
+        D2D1_POINT_2F rotationCenter;
+
         DWRITE_TEXT_ALIGNMENT alignment = alignments[this->settings.getSettingByName<std::string>("textalignment")->value];
         bool responsivewidth = this->settings.getSettingByName<bool>("responsivewidth")->value;
         float paddingX = this->settings.getSettingByName<float>("padx")->value;
         float paddingY = this->settings.getSettingByName<float>("pady")->value;
+        float rotation = this->settings.getSettingByName<float>("rotation")->value;
 
         if (this->settings.getSettingByName<bool>("reversepaddingx")->value) paddingX = -(this->settings.getSettingByName<float>("padx")->value);
         if (this->settings.getSettingByName<bool>("reversepaddingy")->value) paddingY = -(this->settings.getSettingByName<float>("pady")->value);
@@ -103,6 +108,10 @@ void Module::NormalRender(int index, std::string text, std::string value) {
         textColor.a = settings.getSettingByName<float>("textOpacity")->value;
         borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
 
+        rotationCenter = D2D1::Point2F(realcenter.x + textMetrics.left + rectWidth / 2.0f, realcenter.y + textHeight * this->settings.getSettingByName<float>("rectheight")->value / 2.0);
+
+        D2D1_MATRIX_3X2_F rotationMatrix = D2D1::Matrix3x2F::Rotation(rotation, rotationCenter);
+        D2D::context->SetTransform(rotationMatrix);
 
         if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x + textMetrics.left, realcenter.y, realcenter.x + rectWidth + textMetrics.left, realcenter.y + (textHeight) * this->settings.getSettingByName<float>("rectheight")->value), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
 
@@ -139,6 +148,8 @@ void Module::NormalRender(int index, std::string text, std::string value) {
                     rounde.x
             );
         }
+
+        D2D::context->SetTransform(oldTransform);
 
         if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
             FlarialGUI::UnsetWindowRect();

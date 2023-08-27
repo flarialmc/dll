@@ -179,6 +179,16 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, FlarialGUI::to_wide("Responsive Rectangle (Moves with the Text)").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 5.f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
         if (FlarialGUI::Toggle(17, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("responsivewidth")->value)) this->settings.getSettingByName<bool>("responsivewidth")->value = !this->settings.getSettingByName<bool>("responsivewidth")->value;
 
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Rotation", D2D1::ColorF(D2D1::ColorF::White), textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        percent = FlarialGUI::Slider(19, toggleX + FlarialGUI::SettingsTextWidth("Rotation "),
+                                     toggleY,
+                                     D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                     D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+                                     D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("rotation")->value, 359.0f, 0.0f, false);
+
+        this->settings.getSettingByName<float>("rotation")->value = percent;
+
         FlarialGUI::UnSetIsInAdditionalYMode();
 
         /* Rounding End */

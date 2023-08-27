@@ -151,7 +151,9 @@ public:
            settings.addSetting("uiscale", 0.65f);
        }
 
-
+        if (settings.getSettingByName<float>("rotation") == nullptr) {
+            settings.addSetting("rotation", 0.0f);
+        }
 
        if (settings.getSettingByName<bool>("BlurEffect") == nullptr) {
            settings.addSetting("BlurEffect", false);
