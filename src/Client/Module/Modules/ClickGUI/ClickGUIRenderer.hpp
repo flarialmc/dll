@@ -325,7 +325,7 @@ public:
 
                         FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
 
-                        float rectX = Constraints::PercentageConstraint(0.019, "left");
+                        float rectX = Constraints::PercentageConstraint(0.01, "left");
                         float rectY = Constraints::PercentageConstraint(0.32, "top");
                         float rectWidth = Constraints::RelativeConstraint(0.965, "width");
                         float rectHeight = Constraints::RelativeConstraint(0.55);
