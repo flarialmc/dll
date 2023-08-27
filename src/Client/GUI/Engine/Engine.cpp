@@ -681,7 +681,7 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
             std::stringstream stream;
             stream << std::fixed << std::setprecision(3) << startingPoint;
             text = stream.str();
-        } else text = std::to_string((int) startingPoint);
+        } else text = std::to_string(int(startingPoint));
     }
 
 	if (!TextBoxes[30 + index].isActive)
