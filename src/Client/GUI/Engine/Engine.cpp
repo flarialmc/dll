@@ -668,27 +668,29 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 	Vec2<float> round = Constraints::RoundingConstraint(13, 13);
 
 	const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-	const float percWidth = Constraints::RelativeConstraint(0.046, "height", true);
+	const float percWidth = Constraints::RelativeConstraint(0.056, "height", true);
 	const float percHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
 	std::string text;
 
 	if (isAdditionalY) UnSetIsInAdditionalYMode();
 
-	if (startingPoint < 10.0f) {
-		std::stringstream stream;
-		stream << std::fixed << std::setprecision(2) << startingPoint;
-		text = stream.str();
-	}
-	else text = std::to_string((int)startingPoint);
+
+    if(!TextBoxes[30 + index].isActive) {
+        if (startingPoint < 10.0f) {
+            std::stringstream stream;
+            stream << std::fixed << std::setprecision(3) << startingPoint;
+            text = stream.str();
+        } else text = std::to_string((int) startingPoint);
+    }
 
 	if (!TextBoxes[30 + index].isActive)
 		FlarialGUI::RoundedRect(x, y, disabledColor, percWidth, percHeight, round.x, round.x);
 	else FlarialGUI::RoundedRect(x, y, color, percWidth, percHeight, round.x, round.x);
 
 
-    int limit = 4;
-    if(text.find('-') != std::string::npos) limit = 5;
+    int limit = 5;
+    if(text.find('-') != std::string::npos) limit = 6;
 	text = FlarialGUI::TextBox(30 + index, text, limit, x, y, percWidth, percHeight);
 
 	text = Utils::remomveNonNumeric(text);
@@ -697,14 +699,15 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 	if (startingPoint > maxValue) {
 
 		startingPoint = maxValue;
+        TextBoxes[30 + index].text = std::to_string(startingPoint);
+
 	} else {
 
-        if (!text.empty())
-            startingPoint = std::stof(text);
+        if (!text.empty()) startingPoint = std::stof(text);
 
     }
 
-	FlarialGUI::FlarialText(x - Constraints::SpacingConstraint(0.62, textWidth / 2.0f), y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
+	FlarialGUI::FlarialTextWithFont(x, y, to_wide(text).c_str(), D2D1::ColorF(D2D1::ColorF::White), percWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::FontScaler(percWidth * 14.5f));
 
 	x += Constraints::SpacingConstraint(1.2, percWidth);
 	y += Constraints::SpacingConstraint(0.8, percHeight / 2.0f);
