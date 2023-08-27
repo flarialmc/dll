@@ -25,6 +25,7 @@ public:
 
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.00f);
         if (settings.getSettingByName<bool>("pbmode") == nullptr) settings.addSetting("pbmode", true);
+        if (settings.getSettingByName<bool>("onlyShowWhileBreaking") == nullptr) settings.addSetting("onlyShowWhileBreaking", false);
         if (settings.getSettingByName<std::string>("orientation") == nullptr) settings.addSetting("orientation", (std::string)"Vertical");
         if (settings.getSettingByName<float>("pbwidth") == nullptr) settings.addSetting("pbwidth", 0.91f);
         if (settings.getSettingByName<float>("pbheight") == nullptr) settings.addSetting("pbheight", 0.82f);
@@ -194,6 +195,10 @@ public:
         if (FlarialGUI::Toggle(18, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("pbmode")->value)) this->settings.getSettingByName<bool>("pbmode")->value = !this->settings.getSettingByName<bool>("pbmode")->value;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, FlarialGUI::to_wide("Only Show Bar only when breaking").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 5.f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+        if (FlarialGUI::Toggle(19, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("onlyShowWhileBreaking")->value)) this->settings.getSettingByName<bool>("onlyShowWhileBreaking")->value = !this->settings.getSettingByName<bool>("onlyShowWhileBreaking")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
         std::string orientation = FlarialGUI::Dropdown(2,
                                                         toggleX, toggleY,
@@ -281,6 +286,8 @@ public:
         if (!CPSListener::GetLeftHeld()) value = "0%";
 
         if (settings.getSettingByName<bool>("pbmode")->value) {
+            if (settings.getSettingByName<bool>("onlyShowWhileBreaking")->value && value == "0%") return;
+
             value.pop_back();
             float percent;
             std::istringstream(value) >> percent;
