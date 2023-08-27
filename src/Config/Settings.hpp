@@ -63,7 +63,7 @@ public:
 
             settings[name] = sourceSetting->clone();
         }
-        
+
     }
 
 

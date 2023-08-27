@@ -75,7 +75,7 @@ public:
             toggleY,
             D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
             D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
-            D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("rounding")->value);
+            D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("rounding")->value, 100.0f, 0.0f, false);
 
         this->settings.getSettingByName<float>("rounding")->value = percent;
 

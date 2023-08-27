@@ -25,9 +25,9 @@ public:
 
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.00f);
         if (settings.getSettingByName<bool>("pbmode") == nullptr) settings.addSetting("pbmode", true);
-        if (settings.getSettingByName<std::string>("orientation") == nullptr) settings.addSetting("orientation", (std::string)"Horizontal");
-        if (settings.getSettingByName<float>("pbwidth") == nullptr) settings.addSetting("pbwidth", 0.5f);
-        if (settings.getSettingByName<float>("pbheight") == nullptr) settings.addSetting("pbheight", 1.5f);
+        if (settings.getSettingByName<std::string>("orientation") == nullptr) settings.addSetting("orientation", (std::string)"Vertical");
+        if (settings.getSettingByName<float>("pbwidth") == nullptr) settings.addSetting("pbwidth", 0.91f);
+        if (settings.getSettingByName<float>("pbheight") == nullptr) settings.addSetting("pbheight", 0.82f);
 
         if (settings.getSettingByName<std::string>("barFill") == nullptr) settings.addSetting("barFill", (std::string)"a83232");
         if (settings.getSettingByName<float>("barFillOpacity") == nullptr) settings.addSetting("barFillOpacity", 1.0f);
@@ -335,7 +335,7 @@ public:
 
             float filledHeight = (orientation == "Horizontal" ? pbwidth : pbheight) * percent;
 
-            FlarialGUI::lerp(currentHeight, filledHeight, 0.5f * FlarialGUI::frameFactor);
+            FlarialGUI::lerp(currentHeight, filledHeight * 1.15f, 0.5f * FlarialGUI::frameFactor);
 
             if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(coord.x, coord.y, coord.x + pbwidth, coord.y + pbheight), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
 
