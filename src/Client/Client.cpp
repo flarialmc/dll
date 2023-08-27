@@ -140,6 +140,9 @@ void Client::initialize()
     if (Client::settings.getSettingByName<std::string>("ejectKeybind") == nullptr)
         Client::settings.addSetting("ejectKeybind", (std::string)"");
 
+    if (Client::settings.getSettingByName<bool>("enabledModulesOnTop") == nullptr)
+        Client::settings.addSetting("enabledModulesOnTop", true);
+
         // Create threads to download the files
         std::vector<std::thread> threads;
         for (const auto &data: fileData) {
