@@ -106,23 +106,15 @@ std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit,
                 &textLayout
             );
 
-            size_t trailingSpaces = 0;
-            size_t textLength = wcslen(FlarialGUI::to_wide(text).c_str());
-            while (textLength > 0 && text[textLength - 1] == L' ') {
-                trailingSpaces++;
-                textLength--;
-            }
-
             DWRITE_TEXT_METRICS textMetrics;
             textLayout->GetMetrics(&textMetrics);
             textLayout->Release();
-            textFormat->Release();
 
             D2D1_COLOR_F cursorCol = D2D1::ColorF(D2D1::ColorF::White);
 
             cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
 
-            FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorX, (x - textWidth) + Constraints::RelativeConstraint(0.38, "height") + textMetrics.width + (Constraints::RelativeConstraint(0.08f) * trailingSpaces), 0.420f * FlarialGUI::frameFactor);
+            FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorX, (x - textWidth) + Constraints::RelativeConstraint(0.38, "height") + textMetrics.widthIncludingTrailingWhitespace, 0.420f * FlarialGUI::frameFactor);
 
             FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX, y + Constraints::RelativeConstraint(0.2f) / 2.0f, cursorCol, Constraints::RelativeConstraint(0.025f), percHeight / 1.9f, 0, 0);
 

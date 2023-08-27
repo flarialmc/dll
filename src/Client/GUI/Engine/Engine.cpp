@@ -581,13 +581,6 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 		&textLayout
 	);
 
-	size_t trailingSpaces = 0;
-	size_t textLength = wcslen(FlarialGUI::to_wide(text).c_str());
-	while (textLength > 0 && text[textLength - 1] == L' ') {
-		trailingSpaces++;
-		textLength--;
-	}
-
 	DWRITE_TEXT_METRICS textMetrics;
 	textLayout->GetMetrics(&textMetrics);
 	textLayout->Release();
@@ -597,7 +590,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 
 	cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
 
-	FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorX, x + textMetrics.width + (Constraints::RelativeConstraint(0.03f) * trailingSpaces) + Constraints::RelativeConstraint(0.055f), 0.420f * FlarialGUI::frameFactor);
+	FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorX, x + textMetrics.widthIncludingTrailingWhitespace + Constraints::RelativeConstraint(0.055f), 0.420f * FlarialGUI::frameFactor);
 
 	if (FlarialGUI::TextBoxes[index].cursorX > x)
 		FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX, y + Constraints::RelativeConstraint(0.069f) / 2.0f, cursorCol, Constraints::RelativeConstraint(0.01f), percHeight - Constraints::RelativeConstraint(0.069f), 0, 0);
@@ -786,8 +779,8 @@ float FlarialGUI::Slider(int index, float x, float y, const D2D1_COLOR_F color, 
 
 
 
-        if (CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.2),
-                            Constraints::SpacingConstraint(circleRadius, 1.2)) && MC::held) {
+        if (CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.35),
+                            Constraints::SpacingConstraint(circleRadius, 1.35)) && MC::held) {
 
             if (MC::mousepos.x > farLeftX && MC::mousepos.x < farRightX) {
 
@@ -2314,3 +2307,23 @@ void FlarialGUI::UnSetIsInAdditionalYMode()
 {
 	shouldAdditionalY = false;
 }
+
+float FlarialGUI::SettingsTextWidth(std::string text) {
+    IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, Constraints::FontScaler(Constraints::SpacingConstraint(1.05, Constraints::RelativeConstraint(0.12, "height", true))), DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_LEADING);
+    DWRITE_TEXT_METRICS textMetrics;
+    IDWriteTextLayout *textLayout;
+
+    FlarialGUI::writeFactory->CreateTextLayout(
+            FlarialGUI::to_wide(text).c_str(),
+            wcslen(FlarialGUI::to_wide(text).c_str()),
+            textFormat,
+            Constraints::PercentageConstraint(1.0f, "left"),
+            Constraints::RelativeConstraint(0.029, "height", true),
+            &textLayout
+    );
+
+    textLayout->GetMetrics(&textMetrics);
+    textLayout->Release();
+
+    return textMetrics.widthIncludingTrailingWhitespace;
+};

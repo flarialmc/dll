@@ -48,68 +48,62 @@ public:
         float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
-        float x = Constraints::PercentageConstraint(0.019, "left");
-        float y = Constraints::PercentageConstraint(0.10, "top");
+        float toggleX = Constraints::PercentageConstraint(0.019, "left");
+        float toggleY = Constraints::PercentageConstraint(0.10, "top");
 
-        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, textWidth), 2);
-        FlarialGUI::SetScrollView(x, y, Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(0.90, "height"));
+        FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(5.5, textWidth), 2);
+        FlarialGUI::SetScrollView(toggleX, toggleY, Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(0.90, "height"));
 
-        FlarialGUI::KeybindSelector(0, x, y, settings.getSettingByName<std::string>("keybind")->value);
+        FlarialGUI::KeybindSelector(0, toggleX, toggleY, settings.getSettingByName<std::string>("keybind")->value);
 
-        y += Constraints::SpacingConstraint(0.35, textWidth);
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(x, y, L"Modifier", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Modifier", D2D1::ColorF(D2D1::ColorF::White), textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
 
 
-        float percent = FlarialGUI::Slider(7, x + Constraints::SpacingConstraint(0.65, textWidth),
-            y,
-            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
-            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
-            D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("modifier")->value, 30);
+        float percent = FlarialGUI::Slider(7, toggleX + FlarialGUI::SettingsTextWidth("Modifier "),
+                                           toggleY,
+                                           D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                           D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+                                           D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("modifier")->value, 30);
 
         this->settings.getSettingByName<float>("modifier")->value = percent;
 
-        y += Constraints::SpacingConstraint(0.35, textWidth);
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
         textWidth *= 1.5f;
 
-        FlarialGUI::FlarialTextWithFont(x, y, L"Animation Speed", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Animation Speed", D2D1::ColorF(D2D1::ColorF::White), textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
 
 
-        percent = FlarialGUI::Slider(8, x + Constraints::SpacingConstraint(0.85, textWidth),
-            y,
-            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
-            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
-            D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("anim")->value, 0.40);
+        percent = FlarialGUI::Slider(8, toggleX + FlarialGUI::SettingsTextWidth("Animation Speed "),
+                                     toggleY,
+                                     D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                     D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+                                     D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("anim")->value, 0.40);
 
         this->settings.getSettingByName<float>("anim")->value = percent;
 
-        y += Constraints::SpacingConstraint(0.25, textWidth);
+        toggleY += Constraints::SpacingConstraint(0.25, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.38, textWidth), y, L"Save Modifier", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
-        if (FlarialGUI::Toggle(1, Constraints::PercentageConstraint(0.019, "left"), y, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("SaveModifier")->value)) this->settings.getSettingByName<bool>("SaveModifier")->value = !this->settings.getSettingByName<bool>("SaveModifier")->value;
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.38, textWidth), toggleY, L"Save Modifier", D2D1::ColorF(D2D1::ColorF::White), textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        if (FlarialGUI::Toggle(1, Constraints::PercentageConstraint(0.019, "left"), toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("SaveModifier")->value)) this->settings.getSettingByName<bool>("SaveModifier")->value = !this->settings.getSettingByName<bool>("SaveModifier")->value;
 
-        x = Constraints::PercentageConstraint(0.55, "left");
-        y = Constraints::PercentageConstraint(0.10, "top");
+        toggleX = Constraints::PercentageConstraint(0.55, "left");
+        toggleY = Constraints::PercentageConstraint(0.10, "top");
 
-        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.38, textWidth), y, L"Hide hand", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
-        if (FlarialGUI::Toggle(2, x, y, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("hidehand")->value)) this->settings.getSettingByName<bool>("hidehand")->value = !this->settings.getSettingByName<bool>("hidehand")->value;
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, L"Hide hand", D2D1::ColorF(D2D1::ColorF::White), textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        if (FlarialGUI::Toggle(2, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("hidehand")->value)) this->settings.getSettingByName<bool>("hidehand")->value = !this->settings.getSettingByName<bool>("hidehand")->value;
 
-        y += Constraints::SpacingConstraint(0.25, textWidth);
+        toggleY += Constraints::SpacingConstraint(0.25, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.38, textWidth), y, L"Hide modules", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
-        if (FlarialGUI::Toggle(3, x, y, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("hidemodules")->value)) this->settings.getSettingByName<bool>("hidemodules")->value = !this->settings.getSettingByName<bool>("hidemodules")->value;
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, L"Hide modules", D2D1::ColorF(D2D1::ColorF::White), textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        if (FlarialGUI::Toggle(3, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("hidemodules")->value)) this->settings.getSettingByName<bool>("hidemodules")->value = !this->settings.getSettingByName<bool>("hidemodules")->value;
 
-        y += Constraints::SpacingConstraint(0.25, textWidth);
+        toggleY += Constraints::SpacingConstraint(0.25, textWidth);
         
-        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.38, textWidth), y, L"Disable animation", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
-        if (FlarialGUI::Toggle(4, x, y, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("disableanim")->value)) this->settings.getSettingByName<bool>("disableanim")->value = !this->settings.getSettingByName<bool>("disableanim")->value;
-        
-        
-        //y += Constraints::SpacingConstraint(0.25, textWidth);
-        //
-        //FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.38, textWidth), y, L"Hide hud", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
-        //if (FlarialGUI::Toggle(4, x, y, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("hidehud")->value)) this->settings.getSettingByName<bool>("hidehud")->value = !this->settings.getSettingByName<bool>("hidehud")->value;
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, L"Disable animation", D2D1::ColorF(D2D1::ColorF::White), textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        if (FlarialGUI::Toggle(4, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("disableanim")->value)) this->settings.getSettingByName<bool>("disableanim")->value = !this->settings.getSettingByName<bool>("disableanim")->value;
 
         FlarialGUI::UnsetScrollView();
 

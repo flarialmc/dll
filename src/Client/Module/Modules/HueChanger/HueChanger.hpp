@@ -40,9 +40,9 @@ public:
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
 
-        FlarialGUI::FlarialTextWithFont(x, y, L"Saturation Intensity", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        FlarialGUI::FlarialTextWithFont(x, y, L"Saturation Intensity", D2D1::ColorF(D2D1::ColorF::White), textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
 
-        float percent = FlarialGUI::Slider(3, x + Constraints::SpacingConstraint(0.7f, textWidth),
+        float percent = FlarialGUI::Slider(3, x + FlarialGUI::SettingsTextWidth("Saturation Intensity "),
             y,
             D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
             D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),

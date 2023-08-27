@@ -40,9 +40,9 @@ public:
 		FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(5.5, textWidth), 2);
 		FlarialGUI::SetScrollView(toggleX, toggleY, Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(0.90, "height"));
 
-		FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"FOV Value", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+		FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"FOV Value", D2D1::ColorF(D2D1::ColorF::White), textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
 
-		float percent = FlarialGUI::Slider(0, toggleX + Constraints::SpacingConstraint(0.7, textWidth),
+		float percent = FlarialGUI::Slider(0, toggleX + FlarialGUI::SettingsTextWidth("FOV Value "),
 			toggleY,
 			D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
 			D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),

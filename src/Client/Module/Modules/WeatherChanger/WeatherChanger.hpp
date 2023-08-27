@@ -48,9 +48,9 @@ public:
         const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Rain", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Rain", D2D1::ColorF(D2D1::ColorF::White), textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
 
-        float percent = FlarialGUI::Slider(4, toggleX + Constraints::SpacingConstraint(0.65, textWidth),
+        float percent = FlarialGUI::Slider(4, toggleX + FlarialGUI::SettingsTextWidth("Rain "),
             toggleY,
             D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
             D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
@@ -60,9 +60,9 @@ public:
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Lightning", D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Lightning", D2D1::ColorF(D2D1::ColorF::White), textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
 
-        percent = FlarialGUI::Slider(5, toggleX + Constraints::SpacingConstraint(0.65, textWidth),
+        percent = FlarialGUI::Slider(5, toggleX + FlarialGUI::SettingsTextWidth("Lightning "),
             toggleY,
             D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
             D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
@@ -72,7 +72,7 @@ public:
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         if (FlarialGUI::Toggle(0, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("snow")->value)) this->settings.getSettingByName<bool>("snow")->value = !this->settings.getSettingByName<bool>("snow")->value;
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(1.15, textWidth / 2.0f), toggleY, L"Snow (intensity depends on rain)", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth / 2.0f), toggleY, L"Snow (intensity depends on rain)", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
 
     }
 };

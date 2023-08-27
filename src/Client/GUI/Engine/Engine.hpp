@@ -267,4 +267,6 @@ namespace FlarialGUI
 
     void SetIsInAdditionalYMode();
     void UnSetIsInAdditionalYMode();
+
+    float SettingsTextWidth(std::string text);
 };
