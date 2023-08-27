@@ -10,11 +10,9 @@
 class NickListener : public Listener {
     Module* module;
     bool enabled = false;
-    std::string original;
-    std::string original2;
-    std::string backupOri;
 
 public:
+    static inline std::string backupOri;
 
     void onLocalTick(TickEvent &event) override {
 
@@ -57,4 +55,6 @@ public:
         this->name = string;
         this->module = module;
     }
+    static inline std::string original2;
+    static inline std::string original;
 };

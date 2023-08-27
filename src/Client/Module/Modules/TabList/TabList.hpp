@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "../../../Events/EventHandler.hpp"
 #include "TabListListener.hpp"
+#include "../Nick/NickListener.hpp"
 
 
 class TabList : public Module {
@@ -293,7 +294,7 @@ public:
 
                         auto module = ModuleManager::getModule("Nick");
 
-                        if (module->settings.getSettingByName<bool>("enabled")->value) {
+                        if (module->settings.getSettingByName<bool>("enabled")->value && name == NickListener::backupOri) {
                             name = module->settings.getSettingByName<std::string>("nick")->value;
                         }
 
@@ -324,7 +325,7 @@ public:
 
                         auto module = ModuleManager::getModule("Nick");
 
-                        if (module->settings.getSettingByName<bool>("enabled")->value) {
+                        if (module->settings.getSettingByName<bool>("enabled")->value && name == NickListener::backupOri) {
                             name = module->settings.getSettingByName<std::string>("nick")->value;
                         }
 
