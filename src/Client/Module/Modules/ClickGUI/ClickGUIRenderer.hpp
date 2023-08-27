@@ -276,7 +276,14 @@ public:
                         float yModifier = 0.0f;
 
                         int i = 0;
-                        for (Module *real: ModuleManager::modules) {
+
+                        std::vector<Module*> modules = ModuleManager::modules;
+
+                        if(Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value)
+                        std::sort(modules.begin(), modules.end(), compareEnabled);
+
+
+                        for (Module *real: modules) {
 
                             if(!searchBarString.empty()) {
 
@@ -601,6 +608,10 @@ public:
         if(module->settings.getSettingByName<bool>("enabled")->value || editmenu)
         event.setCancelled(true);
 
+    }
+
+    static bool compareEnabled(Module*& obj1, Module*& obj2) {
+        return obj1->settings.getSettingByName<bool>("enabled")->value > obj2->settings.getSettingByName<bool>("enabled")->value;
     }
 
 public:
