@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "../../../Events/EventHandler.hpp"
 #include "TabListListener.hpp"
+#include "../Nick/NickListener.hpp"
 
 
 class TabList : public Module {
@@ -293,15 +294,14 @@ public:
 
                         auto module = ModuleManager::getModule("Nick");
 
-                        if (module->settings.getSettingByName<bool>("enabled")->value) {
+                        if (module->settings.getSettingByName<bool>("enabled")->value && name == Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickListener::original))) {
                             name = module->settings.getSettingByName<std::string>("nick")->value;
                         }
 
                         FlarialGUI::FlarialTextWithFont(fakex + Constraints::SpacingConstraint(0.5, keycardSize),
                                                         realcenter.y +
                                                         Constraints::SpacingConstraint(0.12, keycardSize),
-                                                        FlarialGUI::to_wide(Utils::removeNonAlphanumeric(
-                                                                Utils::removeColorCodes(name))).c_str(),
+                                                        FlarialGUI::to_wide(Utils::removeNonAlphanumeric(Utils::removeColorCodes(name))).c_str(),
                                                         textColor, keycardSize * 5, keycardSize,
                                                         DWRITE_TEXT_ALIGNMENT_LEADING, fontSize);
 
@@ -324,7 +324,7 @@ public:
 
                         auto module = ModuleManager::getModule("Nick");
 
-                        if (module->settings.getSettingByName<bool>("enabled")->value) {
+                        if (module->settings.getSettingByName<bool>("enabled")->value && name == NickListener::backupOri) {
                             name = module->settings.getSettingByName<std::string>("nick")->value;
                         }
 
