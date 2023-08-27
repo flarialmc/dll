@@ -194,5 +194,6 @@ public:
         FlarialGUI::ColorPickerWindow(2, settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value);
         /* Color Pickers End */
 
+
     }
 };
