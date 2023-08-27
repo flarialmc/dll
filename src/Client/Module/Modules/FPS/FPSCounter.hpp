@@ -66,7 +66,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, L"Border", D2D1::ColorF(D2D1::ColorF::White), textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
 
 
-        percent = FlarialGUI::Slider(1, toggleX + FlarialGUI::SettingsTextWidth("Border "),
+        percent = FlarialGUI::Slider(1, toggleX + Constraints::SpacingConstraint(0.60, textWidth) + FlarialGUI::SettingsTextWidth("Border "),
                            toggleY,
                            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
                            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
