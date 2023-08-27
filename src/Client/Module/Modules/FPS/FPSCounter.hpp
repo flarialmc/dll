@@ -20,8 +20,8 @@ public:
 
         if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"FPS: {value}");
 
-
-        if(settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
+        if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
+        if (settings.getSettingByName<float>("fpsSpoofer") == nullptr) settings.addSetting("fpsSpoofer", 1.0f);
 
         EventHandler::registerListener(new FPSListener("FPS", this));
     }
@@ -79,7 +79,6 @@ public:
         /* Rounding Start */
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Rounding", D2D1::ColorF(D2D1::ColorF::White), textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
 
         percent = FlarialGUI::Slider(2, toggleX + FlarialGUI::SettingsTextWidth("Rounding "),
@@ -89,6 +88,19 @@ public:
                                            D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("rounding")->value);
 
         this->settings.getSettingByName<float>("rounding")->value = percent;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"FPS Spoofer", D2D1::ColorF(D2D1::ColorF::White), textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+
+        percent = FlarialGUI::Slider(69, toggleX + FlarialGUI::SettingsTextWidth("FPS Spoofer "),
+                                     toggleY,
+                                     D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
+                                     D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
+                                     D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<float>("fpsSpoofer")->value);
+
+        this->settings.getSettingByName<float>("fpsSpoofer")->value = percent;
+
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
