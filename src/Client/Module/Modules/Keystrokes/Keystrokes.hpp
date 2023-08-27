@@ -302,25 +302,26 @@ public:
 					this->settings.getSettingByName<float>("rounding")->value *
 					settings.getSettingByName<float>("uiscale")->value);
 
-				float totalWidth = keycardSize * 3 + spacing;
+				float totalWidth = keycardSize * 3 + spacing * 2;
 				float totalHeight = keycardSize * 2.0f + keycardSize / 2.0f + spacing * 2;
 
-				if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
+                if (settings.getSettingByName<bool>("cps")->value) totalHeight += keycardSize + spacing;
 
-					FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, totalWidth, totalHeight, index, keycardSize);
+				if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu) {
+                    FlarialGUI::SetWindowRect(realcenter.x - (keycardSize + spacing), realcenter.y, totalWidth, totalHeight, index, keycardSize + spacing);
 
-				Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, totalWidth,
-					totalWidth);
+                    Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, totalWidth, totalHeight);
 
-				realcenter.x = vec2.x;
-				realcenter.y = vec2.y;
+                    realcenter.x = vec2.x;
+                    realcenter.y = vec2.y;
 
-				realcenter = realcenter;
+                    realcenter = realcenter;
 
-				Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y);
+                    Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y);
 
-				this->settings.setValue("percentageX", percentages.x);
-				this->settings.setValue("percentageY", percentages.y);
+                    this->settings.setValue("percentageX", percentages.x);
+                    this->settings.setValue("percentageY", percentages.y);
+                }
 
 				float fontSize = Constraints::SpacingConstraint(textSize * 3.0f, keycardSize);
 
@@ -492,23 +493,23 @@ public:
 					realcenter.y += (keycardSize + spacing);
 					// LMB
 					if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
-						if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize + (keycardSize / 2), realcenter.y + keycardSize - (keycardSize * 0.05)), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
+						if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize + (keycardSize / 2.0f) + spacing / 2.0f, realcenter.y + keycardSize - (keycardSize * 0.05)), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
 
-					FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::LMB], keycardSize + (keycardSize / 2), keycardSize - (keycardSize * 0.05),
+					FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::LMB], keycardSize + (keycardSize / 2.0f) + spacing / 2.0f, keycardSize - (keycardSize * 0.05),
 						rounde.x,
 						rounde.x);
-					FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y - Constraints::SpacingConstraint(0.06, keycardSize), FlarialGUI::to_wide(std::to_string(CPSListener::GetLeftCPS())).c_str(), textStates[Strokes::LMB], keycardSize + (keycardSize / 2), keycardSize,
+					FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(std::to_string(CPSListener::GetLeftCPS())).c_str(), textStates[Strokes::LMB], keycardSize + (keycardSize / 2.0f) + spacing / 2.0f, keycardSize - (keycardSize * 0.05),
 						DWRITE_TEXT_ALIGNMENT_CENTER, fontSize + Constraints::SpacingConstraint(0.48, keycardSize));
 
 					// RMB
 					realcenter.x += 1.5f * (keycardSize + spacing);
 
 					if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
-						if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize + (keycardSize / 2), realcenter.y + keycardSize - (keycardSize * 0.05)), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
-					FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::RMB], keycardSize + (keycardSize / 2), keycardSize - (keycardSize * 0.05),
+						if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize + (keycardSize / 2.0f) + spacing / 2.0f, realcenter.y + keycardSize - (keycardSize * 0.05)), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
+					FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::RMB], keycardSize + (keycardSize / 2) + spacing / 2.0f, keycardSize - (keycardSize * 0.05),
 						rounde.x,
 						rounde.x);
-					FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y - Constraints::SpacingConstraint(0.06, keycardSize), FlarialGUI::to_wide(std::to_string(CPSListener::GetRightCPS())).c_str(), textStates[Strokes::RMB], keycardSize + (keycardSize / 2), keycardSize,
+					FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(std::to_string(CPSListener::GetRightCPS())).c_str(), textStates[Strokes::RMB], keycardSize + (keycardSize / 2.0f) + spacing / 2.0f, keycardSize - (keycardSize * 0.05),
 						DWRITE_TEXT_ALIGNMENT_CENTER, fontSize + Constraints::SpacingConstraint(0.48, keycardSize));
 					realcenter.y += keycardSize - keycardSize * 0.05 + spacing;
 					realcenter.x -= 1.5f * (keycardSize + spacing);
