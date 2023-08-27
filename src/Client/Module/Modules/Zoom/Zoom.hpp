@@ -87,7 +87,7 @@ public:
         toggleY += Constraints::SpacingConstraint(0.25, textWidth);
 
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.38, textWidth), toggleY, L"Save Modifier", D2D1::ColorF(D2D1::ColorF::White), textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
-        if (FlarialGUI::Toggle(1, Constraints::PercentageConstraint(0.019, "left"), toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("SaveModifier")->value)) this->settings.getSettingByName<bool>("SaveModifier")->value = !this->settings.getSettingByName<bool>("SaveModifier")->value;
+        if (FlarialGUI::Toggle(1, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("SaveModifier")->value)) this->settings.getSettingByName<bool>("SaveModifier")->value = !this->settings.getSettingByName<bool>("SaveModifier")->value;
 
         toggleX = Constraints::PercentageConstraint(0.55, "left");
         toggleY = Constraints::PercentageConstraint(0.10, "top");

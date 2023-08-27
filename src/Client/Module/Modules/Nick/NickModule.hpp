@@ -51,6 +51,6 @@ public:
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-        FlarialGUI::TextBoxVisual(5, settings.getSettingByName<std::string>("nick")->value, 16, Constraints::PercentageConstraint(0.019, "left"), toggleY);
+        FlarialGUI::TextBoxVisual(5, settings.getSettingByName<std::string>("nick")->value, 16, toggleX, toggleY);
     }
 };

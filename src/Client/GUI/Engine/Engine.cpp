@@ -941,8 +941,6 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F
 		);
 	};
 
-	//FlarialGUI::lerp(additionalY, FlarialGUI::DropDownMenus[index].offsetted, 0.25 * FlarialGUI::frameFactor);
-
 	if (!FlarialGUI::DropDownMenus[index].hoveredIndex) FlarialGUI::DropDownMenus[index].hoveredIndex = 1;
 
 	FlarialGUI::DropDownMenus[index].yChilds = y;
@@ -978,7 +976,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const D2D1_COLOR_F
 		else FlarialGUI::RoundedRect(x + offset, curY, unselectedChildCol, Constraints::SpacingConstraint(1.55, curTextWidth), childHeights, 0, 0);
 
 		if (CursorInRect(x + offset, curClickingY, Constraints::SpacingConstraint(1.55, curTextWidth), childHeights)) {
-			if (MC::mousebutton == MouseButton::Left) {
+			if (MC::mousebutton == MouseButton::Left && FlarialGUI::DropDownMenus[index].isActive) {
 				MC::mousebutton = MouseButton::None;
 				FlarialGUI::DropDownMenus[index].isActive = false;
 				FlarialGUI::DropDownMenus[index].opacityHover = 0.0f;

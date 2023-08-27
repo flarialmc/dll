@@ -103,7 +103,7 @@ public:
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::KeybindSelector(0, Constraints::PercentageConstraint(0.019, "left"), toggleY, settings.getSettingByName<std::string>("keybind")->value);
+        FlarialGUI::KeybindSelector(0, toggleX, toggleY, settings.getSettingByName<std::string>("keybind")->value);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
@@ -128,7 +128,7 @@ public:
         if (FlarialGUI::Toggle(4, toggleX, toggleY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), this->settings.getSettingByName<bool>("BlurEffect")->value)) this->settings.getSettingByName<bool>("BlurEffect")->value = !this->settings.getSettingByName<bool>("BlurEffect")->value;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-        FlarialGUI::TextBoxVisual(7, settings.getSettingByName<std::string>("text")->value, 16, Constraints::PercentageConstraint(0.019, "left"), toggleY);
+        FlarialGUI::TextBoxVisual(7, settings.getSettingByName<std::string>("text")->value, 16, toggleX, toggleY);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
@@ -146,7 +146,7 @@ public:
 
 
         std::string txtAlignment = FlarialGUI::Dropdown(1,
-                                                        Constraints::PercentageConstraint(0.019, "left"), toggleY,
+                                                        toggleX, toggleY,
                                                         D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
                                                         D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
                                                         std::vector<std::string>{"Left", "Center", "Right"},

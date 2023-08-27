@@ -129,7 +129,7 @@ public:
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::KeybindSelector(0, Constraints::PercentageConstraint(0.019, "left"), toggleY, settings.getSettingByName<std::string>("keybind")->value);
+        FlarialGUI::KeybindSelector(0, toggleX, toggleY, settings.getSettingByName<std::string>("keybind")->value);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
