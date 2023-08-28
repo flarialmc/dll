@@ -81,7 +81,7 @@ public:
 
 
         percent = FlarialGUI::Slider(8, toggleX + FlarialGUI::SettingsTextWidth("Animation Speed "),
-                                     toggleY, this->settings.getSettingByName<float>("anim")->value, 0.40, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("anim")->value, 0.40);
 
         this->settings.getSettingByName<float>("anim")->value = percent;
 

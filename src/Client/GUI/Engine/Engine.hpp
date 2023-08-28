@@ -188,8 +188,8 @@ namespace FlarialGUI
 
     bool Toggle(int index, float x, float y, bool isEnabled);
 
-    float Slider(int index, float x, float y, float startingPoint, const float maxValue, const float minValue,
-                 const bool zerosafe);
+    float Slider(int index, float x, float y, float startingPoint = 50.0f, float maxValue = 100.0f, const float minValue = 0.0f,
+                 bool zerosafe = true);
 
     std::string Dropdown(int index, float x, float y, const std::vector<std::string> options, std::string &value,
                          std::string label);

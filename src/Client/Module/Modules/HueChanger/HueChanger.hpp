@@ -47,7 +47,7 @@ public:
 
         float percent = FlarialGUI::Slider(3, x + FlarialGUI::SettingsTextWidth("Saturation Intensity "),
                                            y,
-                                           this->settings.getSettingByName<float>("intensity")->value, 3.0f, 0, 0);
+                                           this->settings.getSettingByName<float>("intensity")->value, 3.0f);
 
         this->settings.getSettingByName<float>("intensity")->value = percent;
 

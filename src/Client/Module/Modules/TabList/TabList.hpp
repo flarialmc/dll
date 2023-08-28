@@ -91,7 +91,7 @@ public:
 
         float percent = FlarialGUI::Slider(4, toggleX + Constraints::SpacingConstraint(0.65, textWidth),
                                            toggleY,
-                                           this->settings.getSettingByName<float>("uiscale")->value, 2.0f, 0, 0);
+                                           this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
 
         this->settings.getSettingByName<float>("uiscale")->value = percent;
 
@@ -108,7 +108,7 @@ public:
 
         percent = FlarialGUI::Slider(5, toggleX + Constraints::SpacingConstraint(0.60, textWidth) +
                                         FlarialGUI::SettingsTextWidth("Border "),
-                                     toggleY, this->settings.getSettingByName<float>("borderWidth")->value, 4, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("borderWidth")->value, 4);
 
         this->settings.getSettingByName<float>("borderWidth")->value = percent;
 
@@ -123,7 +123,7 @@ public:
 
         percent = FlarialGUI::Slider(6, toggleX + FlarialGUI::SettingsTextWidth("Rounding "),
                                      toggleY,
-                                     this->settings.getSettingByName<float>("rounding")->value, 0, 0, 0);
+                                     this->settings.getSettingByName<float>("rounding")->value);
 
         this->settings.getSettingByName<float>("rounding")->value = percent;
 

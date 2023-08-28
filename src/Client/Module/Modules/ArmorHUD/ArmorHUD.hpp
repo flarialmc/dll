@@ -61,7 +61,7 @@ public:
 
         float percent = FlarialGUI::Slider(3, toggleX + FlarialGUI::SettingsTextWidth("UI Scale "),
                                            toggleY,
-                                           this->settings.getSettingByName<float>("uiscale")->value, 3.0f, 0, 0);
+                                           this->settings.getSettingByName<float>("uiscale")->value, 3.0f);
 
         this->settings.getSettingByName<float>("uiscale")->value = percent;
 

@@ -64,7 +64,7 @@ public:
                 "border")->value)) this->settings.getSettingByName<bool>("border")->value = !this->settings.getSettingByName<bool>("border")->value;
         percent = FlarialGUI::Slider(1, toggleX + FlarialGUI::SettingsTextWidth("Border ") +
                                         Constraints::SpacingConstraint(0.60, textWidth),
-                                     toggleY, this->settings.getSettingByName<float>("borderWidth")->value, 4, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("borderWidth")->value, 4);
 
         this->settings.getSettingByName<float>("borderWidth")->value = percent;
 
@@ -101,7 +101,7 @@ public:
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
         percent = FlarialGUI::Slider(8, toggleX + FlarialGUI::SettingsTextWidth("Text Scale "),
-                                     toggleY, this->settings.getSettingByName<float>("textscale")->value, 2.00, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("textscale")->value, 2.00);
 
         this->settings.getSettingByName<float>("textscale")->value = percent;
 
@@ -163,7 +163,7 @@ public:
                                         Constraints::RelativeConstraint(0.12, "height", true),
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
         percent = FlarialGUI::Slider(17, toggleX + FlarialGUI::SettingsTextWidth("Rect Width "),
-                                     toggleY, this->settings.getSettingByName<float>("rectwidth")->value, 3.0f, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("rectwidth")->value, 3.0f);
 
         this->settings.getSettingByName<float>("rectwidth")->value = percent;
 
@@ -173,7 +173,7 @@ public:
                                         Constraints::RelativeConstraint(0.12, "height", true),
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
         percent = FlarialGUI::Slider(18, toggleX + FlarialGUI::SettingsTextWidth("Rect Height "),
-                                     toggleY, this->settings.getSettingByName<float>("rectheight")->value, 3.0f, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("rectheight")->value, 3.0f);
 
         this->settings.getSettingByName<float>("rectheight")->value = percent;
 

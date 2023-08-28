@@ -153,7 +153,7 @@ public:
 
 		float percent = FlarialGUI::Slider(4, toggleX + FlarialGUI::SettingsTextWidth("UI Scale "),
                                            toggleY,
-                                           this->settings.getSettingByName<float>("uiscale")->value, 2.0f, 0, 0);
+                                           this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
 
 		this->settings.getSettingByName<float>("uiscale")->value = percent;
 
@@ -167,7 +167,7 @@ public:
 
 		percent = FlarialGUI::Slider(6, toggleX + FlarialGUI::SettingsTextWidth("Rounding "),
                                      toggleY,
-                                     this->settings.getSettingByName<float>("rounding")->value, 0, 0, 0);
+                                     this->settings.getSettingByName<float>("rounding")->value);
 
 		this->settings.getSettingByName<float>("rounding")->value = percent;
 
@@ -192,7 +192,7 @@ public:
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
         percent = FlarialGUI::Slider(8, toggleX + FlarialGUI::SettingsTextWidth("WASD Text Scale "),
-                                     toggleY, this->settings.getSettingByName<float>("textscale")->value, 2.00, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("textscale")->value, 2.00);
 
 
         this->settings.getSettingByName<float>("textscale")->value = percent;
@@ -205,7 +205,7 @@ public:
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
         percent = FlarialGUI::Slider(12, toggleX + FlarialGUI::SettingsTextWidth("CPS Text Scale "),
-                                     toggleY, this->settings.getSettingByName<float>("textscale2")->value, 2.00, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("textscale2")->value, 2.00);
 
 
         this->settings.getSettingByName<float>("textscale2")->value = percent;
@@ -256,7 +256,7 @@ public:
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
         percent = FlarialGUI::Slider(11, toggleX + FlarialGUI::SettingsTextWidth("Key Spacing "),
-                                     toggleY, this->settings.getSettingByName<float>("keySpacing")->value, 10.00, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("keySpacing")->value, 10.00);
 
         this->settings.getSettingByName<float>("keySpacing")->value = percent;
 
@@ -691,7 +691,7 @@ public:
                 float childHeight = Constraints::SpacingConstraint(this->settings.getSettingByName<float>("spacebarHeight")->value, spacebarHeight);
                 float childWidth = Constraints::SpacingConstraint(this->settings.getSettingByName<float>("spacebarWidth")->value, spacebarWidth);
                 std::pair<float, float> centeredChild = centerChildRectangle(spacebarWidth, spacebarHeight, childWidth, childHeight);
-                FlarialGUI::RoundedRect(realcenter.x + centeredChild.first, realcenter.y + centeredChild.second, textStates[Strokes::SPACEBAR], childWidth, childHeight, 0, 0);
+                FlarialGUI::RoundedRect(realcenter.x + centeredChild.first, realcenter.y + centeredChild.second, textStates[Strokes::SPACEBAR], childWidth, childHeight);
 
 				if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
 

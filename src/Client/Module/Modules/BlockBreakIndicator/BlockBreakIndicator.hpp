@@ -54,7 +54,7 @@ public:
         const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
-        FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(5.5, textWidth), 2);
+        FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(7.5, textWidth), 2);
         FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"), Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(1.0f, "height"));
 
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"UI Scale", textWidth * 3.0f, textHeight,
@@ -82,7 +82,7 @@ public:
 
         percent = FlarialGUI::Slider(1, toggleX + FlarialGUI::SettingsTextWidth("Border ") +
                                         Constraints::SpacingConstraint(0.60, textWidth),
-                                     toggleY, this->settings.getSettingByName<float>("borderWidth")->value, 4, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("borderWidth")->value, 4);
 
         this->settings.getSettingByName<float>("borderWidth")->value = percent;
 
@@ -98,7 +98,7 @@ public:
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
         percent = FlarialGUI::Slider(2, toggleX + FlarialGUI::SettingsTextWidth("Rounding "),
-                                     toggleY, this->settings.getSettingByName<float>("rounding")->value, 0, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("rounding")->value);
 
         this->settings.getSettingByName<float>("rounding")->value = percent;
 
@@ -124,7 +124,7 @@ public:
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
         percent = FlarialGUI::Slider(8, toggleX + FlarialGUI::SettingsTextWidth("Text Scale "),
-                                     toggleY, this->settings.getSettingByName<float>("textscale")->value, 2.00, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("textscale")->value, 2.00);
 
         this->settings.getSettingByName<float>("textscale")->value = percent;
 
@@ -187,7 +187,7 @@ public:
                                         Constraints::RelativeConstraint(0.12, "height", true),
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
         percent = FlarialGUI::Slider(17, toggleX + FlarialGUI::SettingsTextWidth("Rect Width "),
-                                     toggleY, this->settings.getSettingByName<float>("rectwidth")->value, 3.0f, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("rectwidth")->value, 3.0f);
 
         this->settings.getSettingByName<float>("rectwidth")->value = percent;
 
@@ -197,7 +197,7 @@ public:
                                         Constraints::RelativeConstraint(0.12, "height", true),
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
         percent = FlarialGUI::Slider(18, toggleX + FlarialGUI::SettingsTextWidth("Rect Height "),
-                                     toggleY, this->settings.getSettingByName<float>("rectheight")->value, 3.0f, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("rectheight")->value, 3.0f);
 
         this->settings.getSettingByName<float>("rectheight")->value = percent;
 
@@ -245,7 +245,7 @@ public:
                                         Constraints::RelativeConstraint(0.12, "height", true),
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
         percent = FlarialGUI::Slider(19, toggleX + FlarialGUI::SettingsTextWidth("Bar width "),
-                                     toggleY, this->settings.getSettingByName<float>("pbwidth")->value, 2.0f, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("pbwidth")->value, 2.0f);
 
         this->settings.getSettingByName<float>("pbwidth")->value = percent;
 
@@ -255,7 +255,7 @@ public:
                                         Constraints::RelativeConstraint(0.12, "height", true),
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
         percent = FlarialGUI::Slider(20, toggleX + FlarialGUI::SettingsTextWidth("Bar height "),
-                                     toggleY, this->settings.getSettingByName<float>("pbheight")->value, 2.0f, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("pbheight")->value, 2.0f);
 
         this->settings.getSettingByName<float>("pbheight")->value = percent;
 

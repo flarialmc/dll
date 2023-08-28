@@ -54,7 +54,7 @@ public:
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
         float percent = FlarialGUI::Slider(4, toggleX + FlarialGUI::SettingsTextWidth("Rain "),
-                                           toggleY, this->settings.getSettingByName<float>("rain")->value, 10.0f, 0, 0);
+                                           toggleY, this->settings.getSettingByName<float>("rain")->value, 10.0f);
 
         this->settings.getSettingByName<float>("rain")->value = percent;
 
@@ -66,7 +66,7 @@ public:
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
         percent = FlarialGUI::Slider(5, toggleX + FlarialGUI::SettingsTextWidth("Lightning "),
-                                     toggleY, this->settings.getSettingByName<float>("lighting")->value, 10.0f, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("lighting")->value, 10.0f);
 
         this->settings.getSettingByName<float>("lighting")->value = percent;
 

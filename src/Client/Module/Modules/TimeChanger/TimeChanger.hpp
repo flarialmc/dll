@@ -50,7 +50,7 @@ public:
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
         float percent = FlarialGUI::Slider(4, toggleX + FlarialGUI::SettingsTextWidth("Time Slider "),
-                                           toggleY, this->settings.getSettingByName<float>("time")->value, 1.0f, 0, 0);
+                                           toggleY, this->settings.getSettingByName<float>("time")->value, 1.0f);
 
         this->settings.getSettingByName<float>("time")->value = percent;
 

@@ -73,7 +73,7 @@ public:
             module->settings.setValue("percentageX", percentages.x);
             module->settings.setValue("percentageY", percentages.y);
 
-            FlarialGUI::RoundedRect(currentPos.x, currentPos.y, D2D1::ColorF(D2D1::ColorF::White, 0.4f), width, height, 0, 0);
+            FlarialGUI::RoundedRect(currentPos.x, currentPos.y, D2D1::ColorF(D2D1::ColorF::White, 0.4f), width, height);
 
             if(ClickGUIRenderer::editmenu)
                 FlarialGUI::UnsetWindowRect();

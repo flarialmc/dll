@@ -68,7 +68,7 @@ public:
 
 
         percent = FlarialGUI::Slider(8, toggleX + FlarialGUI::SettingsTextWidth("Intensity "),
-                                     toggleY, this->settings.getSettingByName<float>("intensity2")->value, 30, 0, 0);
+                                     toggleY, this->settings.getSettingByName<float>("intensity2")->value, 30);
 
 
         this->settings.getSettingByName<float>("intensity2")->value = percent;
