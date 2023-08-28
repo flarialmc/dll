@@ -2,6 +2,29 @@
 #include "../ClickGUIRenderer.hpp"
 #include "ClickGUIElements.hpp"
 
+#define colors_primary1 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_primary1")->value)
+#define o_colors_primary1 Client::settings.getSettingByName<float>("o_colors_primary1")->value
+
+#define colors_secondary4 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary4")->value)
+#define o_colors_secondary4 Client::settings.getSettingByName<float>("o_colors_secondary4")->value
+
+#define colors_enabled FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_enabled")->value)
+#define o_colors_enabled Client::settings.getSettingByName<float>("o_colors_enabled")->value
+
+#define colors_disabled FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_disabled")->value)
+#define o_colors_disabled Client::settings.getSettingByName<float>("o_colors_disabled")->value
+
+#define colors_mod1 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_mod1")->value)
+#define o_colors_mod1 Client::settings.getSettingByName<float>("o_colors_mod1")->value
+
+#define colors_mod2 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_mod2")->value)
+#define o_colors_mod2 Client::settings.getSettingByName<float>("o_colors_mod2")->value
+
+#define colors_mod3 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_mod3")->value)
+#define o_colors_mod3 Client::settings.getSettingByName<float>("o_colors_mod3")->value
+
+#define colors_mod4 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_mod4")->value)
+#define o_colors_mod4 Client::settings.getSettingByName<float>("o_colors_mod4")->value
 
 std::map<std::string, ID2D1Bitmap*> ClickGUIElements::images;
 std::vector<D2D1_MATRIX_3X2_F> ClickGUIElements::matrixes;
@@ -55,25 +78,22 @@ std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit,
 
                 FlarialGUI::lerp(searchCutOutHeights[index], Constraints::RelativeConstraint(0.395, "height"),
                                  0.12f * FlarialGUI::frameFactor);
-
-
-                col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
-
             } else {
 
                 FlarialGUI::lerp(searchBarSizes[index], Constraints::RelativeConstraint(0.42, "height"),
                                  0.12f * FlarialGUI::frameFactor);
 
                 FlarialGUI::lerp(searchCutOutHeights[index], -0.5f, 0.12f * FlarialGUI::frameFactor);
-
-                col = D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f);
             }
 
-            FlarialGUI::RoundedRect(x - textWidth, y, FlarialGUI::HexToColorF("1c1616"), textWidth, percHeight, round.x,
+            col = colors_primary1;
+            col.a = o_colors_primary1;
+
+            D2D1_COLOR_F searchbg = colors_secondary4;
+            searchbg.a = o_colors_secondary4;
+
+            FlarialGUI::RoundedRect(x - textWidth, y, searchbg, textWidth, percHeight, round.x,
                                     round.x);
-
-            //if(searchBarSizes[index] > Constraints::RelativeConstraint(0.45, "height")) FlarialGUI::InnerShadowRect(D2D1::RoundedRect(D2D1::RectF(x - textWidth, y, (x - textWidth) + textWidth, y + percHeight), round.x, round.x), 0.25f, D2D1::ColorF(D2D1::ColorF::White, 1.0f));
-
 
             D2D::context->PushAxisAlignedClip(D2D1::RectF(x - textWidth, y + percHeight, (x - textWidth) + textWidth,
                                                           y + searchCutOutHeights[index]), D2D1_ANTIALIAS_MODE_ALIASED);
@@ -119,11 +139,12 @@ std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit,
             FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX, y + Constraints::RelativeConstraint(0.2f) / 2.0f, cursorCol, Constraints::RelativeConstraint(0.025f), percHeight / 1.9f, 0, 0);
 
             if (searchBarSizes[index] > Constraints::RelativeConstraint(0.45, "height")) {
-                FlarialGUI::FlarialTextWithFont((x - textWidth) + Constraints::RelativeConstraint(0.38, "height"), y, FlarialGUI::to_wide(text).c_str(),
-                                                D2D1::ColorF(D2D1::ColorF::White),
+                FlarialGUI::FlarialTextWithFont((x - textWidth) + Constraints::RelativeConstraint(0.38, "height"), y,
+                                                FlarialGUI::to_wide(text).c_str(),
                                                 textWidth, percHeight,
                                                 DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                Constraints::SpacingConstraint(0.60f, textWidth));
+                                                Constraints::SpacingConstraint(0.60f, textWidth),
+                                                DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
             }
 
@@ -210,6 +231,12 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
             x -= diffX;
             y -= diffY;
 
+            D2D1_COLOR_F mod1Col = colors_mod1;
+            mod1Col.a = o_colors_mod1;
+
+            D2D1_COLOR_F mod2Col = colors_mod2;
+            mod2Col.a = o_colors_mod2;
+
             FlarialGUI::RoundedRect(x, y, D2D1::ColorF(47.0f / 255.0f, 32.0f / 255.0f, 34.0f / 255.0f),
                                     BottomRoundedWidth, BottomRoundedHeight, round.x, round.x);
 
@@ -217,7 +244,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
             // Top rounded rect
 
             float TopRoundedHeight = Constraints::SpacingConstraint(sizes[index].y, 0.635f);
-            FlarialGUI::RoundedRectOnlyTopCorner(x, y, D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f),
+            FlarialGUI::RoundedRectOnlyTopCorner(x, y, mod1Col,
                                                  BottomRoundedWidth, TopRoundedHeight, round.x, round.x);
 
     FlarialGUI::PushSize(x, y, BottomRoundedWidth, BottomRoundedHeight);
@@ -228,16 +255,21 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
             float textWidth = Constraints::RelativeConstraint(1.0);
             float textHeight = Constraints::RelativeConstraint(0.2);
 
-            FlarialGUI::FlarialTextWithFont(textx, texty, FlarialGUI::to_wide(mod->name).c_str(),
-                                    D2D1::ColorF(D2D1::ColorF::White), textWidth, textHeight, DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::SpacingConstraint(0.8, textWidth));
+    FlarialGUI::FlarialTextWithFont(textx, texty, FlarialGUI::to_wide(mod->name).c_str(), textWidth, textHeight,
+                                    DWRITE_TEXT_ALIGNMENT_CENTER,
+                                    Constraints::SpacingConstraint(0.8, textWidth),
+                                    DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
             // Mod icon
+
+            D2D1_COLOR_F mod3Col = colors_mod3;
+            mod3Col.a = o_colors_mod3;
 
             float modiconx = Constraints::PercentageConstraint(0.40, "left");
             float modicony = Constraints::PercentageConstraint(0.11, "top");
 
             float paddingSize = Constraints::RelativeConstraint(0.28);
-            FlarialGUI::RoundedRect(modiconx, modicony, D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f),
+            FlarialGUI::RoundedRect(modiconx, modicony, mod3Col,
                                     paddingSize, paddingSize, 7.5, 7.5);
 
             paddingSize = Constraints::RelativeConstraint(0.20);
@@ -248,8 +280,11 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 
             std::string text;
             text = mod->settings.getSettingByName<bool>("enabled")->value ? "Enabled" : "Disabled";
-            D2D1_COLOR_F enabledColor = D2D1::ColorF(24.0f / 255.0f, 136.0f / 255.0f, 48.0f / 255.0f);
-            D2D1_COLOR_F disabledColor = D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f);
+            D2D1_COLOR_F enabledColor = colors_enabled;
+            D2D1_COLOR_F disabledColor = colors_disabled;
+
+            enabledColor.a = o_colors_enabled;
+            disabledColor.a = o_colors_disabled;
 
             D2D1_COLOR_F to = text == "Enabled" ? enabledColor : disabledColor;
             if(FlarialGUI::buttonColors.size() >= index)  FlarialGUI::buttonColors[index] = FlarialGUI::LerpColor(FlarialGUI::buttonColors[index],to,0.15f * FlarialGUI::frameFactor);
@@ -284,13 +319,16 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
             float settingx2 = Constraints::PercentageConstraint(0.059, "left");
 
             FlarialGUI::RoundedRect(settingx, (buttony - paddingwidth) - paddingheightspac,
-                                    D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), paddingwidth,
+                                    mod3Col, paddingwidth,
                                     paddingwidth, round.x, round.x);
+
+            D2D1_COLOR_F mod4Col = colors_mod4;
+            mod4Col.a = o_colors_mod4;
 
             if(!Client::settings.getSettingByName<bool>("noicons")->value)
             FlarialGUI::RoundedRectWithImageAndText(index, settingx2, (buttony - settingswidth) - settingsheightspac,
                                                     settingswidth, settingswidth,
-                                                    D2D1::ColorF(112.0f / 255.0f, 93.0f / 255.0f, 96.0f / 255.0f),
+                                                    mod4Col,
                                                     "\\Flarial\\assets\\gear.png", iconwidth, iconwidth, L"");
 
 

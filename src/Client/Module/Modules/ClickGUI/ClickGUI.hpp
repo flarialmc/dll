@@ -58,7 +58,9 @@ public:
 
         y += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(x, y, L"Edit Menu", D2D1::ColorF(D2D1::ColorF::White), textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.12, "height", true));
+        FlarialGUI::FlarialTextWithFont(x, y, L"Edit Menu", textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        Constraints::RelativeConstraint(0.12, "height", true),
+                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
         FlarialGUI::KeybindSelector(1, x + Constraints::SpacingConstraint(0.8, textWidth), y, settings.getSettingByName<std::string>("editmenubind")->value);
 

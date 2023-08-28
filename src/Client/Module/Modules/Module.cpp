@@ -132,12 +132,10 @@ void Module::NormalRender(int index, std::string text, std::string value) {
                 realcenter.x + Constraints::SpacingConstraint(paddingX, textWidth) + textMetrics.left,
                 realcenter.y + Constraints::SpacingConstraint(paddingY, textWidth),
                 FlarialGUI::to_wide(text).c_str(),
-                textColor,
                 rectWidth,
                 textHeight,
                 alignment,
-                textSize
-        );
+                textSize, DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
         if (this->settings.getSettingByName<bool>("border")->value) {
             FlarialGUI::RoundedHollowRect(

@@ -143,7 +143,89 @@ void Client::initialize()
     if (Client::settings.getSettingByName<bool>("enabledModulesOnTop") == nullptr)
         Client::settings.addSetting("enabledModulesOnTop", false);
 
-        // Create threads to download the files
+    // color customization
+
+    if (Client::settings.getSettingByName<std::string>("colors_text") == nullptr)
+        Client::settings.addSetting("colors_text", (std::string)"ffffff");
+    if (Client::settings.getSettingByName<float>("o_colors_text") == nullptr)
+        Client::settings.addSetting("o_colors_text", 1.0f);
+
+    if (Client::settings.getSettingByName<std::string>("colors_enabled") == nullptr)
+        Client::settings.addSetting("colors_enabled", (std::string)"188830");
+    if (Client::settings.getSettingByName<float>("o_colors_enabled") == nullptr)
+        Client::settings.addSetting("o_colors_enabled", 1.0f);
+
+    if (Client::settings.getSettingByName<std::string>("colors_disabled") == nullptr)
+        Client::settings.addSetting("colors_disabled", (std::string)"7d1820");
+    if (Client::settings.getSettingByName<float>("o_colors_disabled") == nullptr)
+        Client::settings.addSetting("o_colors_disabled", 1.0f);
+
+    if (Client::settings.getSettingByName<std::string>("colors_primary1") == nullptr)
+        Client::settings.addSetting("colors_primary1", (std::string)"ff233a");
+    if (Client::settings.getSettingByName<float>("o_colors_primary1") == nullptr)
+        Client::settings.addSetting("o_colors_primary1", 1.0f);
+
+    if (Client::settings.getSettingByName<std::string>("colors_primary2") == nullptr)
+        Client::settings.addSetting("colors_primary2", (std::string)"ffffff");
+    if (Client::settings.getSettingByName<float>("o_colors_primary2") == nullptr)
+        Client::settings.addSetting("o_colors_primary2", 1.0f);
+
+    if (Client::settings.getSettingByName<std::string>("colors_primary3") == nullptr)
+        Client::settings.addSetting("colors_primary3", (std::string)"9a6b72");
+    if (Client::settings.getSettingByName<float>("o_colors_primary3") == nullptr)
+        Client::settings.addSetting("o_colors_primary3", 1.0f);
+
+    if (Client::settings.getSettingByName<std::string>("colors_primary4") == nullptr)
+        Client::settings.addSetting("colors_primary4", (std::string)"704b52");
+    if (Client::settings.getSettingByName<float>("o_colors_primary4") == nullptr)
+        Client::settings.addSetting("o_colors_primary4", 1.0f);
+
+    if (Client::settings.getSettingByName<std::string>("colors_secondary1") == nullptr)
+        Client::settings.addSetting("colors_secondary1", (std::string)"3f2a2d");
+    if (Client::settings.getSettingByName<float>("o_colors_secondary1") == nullptr)
+        Client::settings.addSetting("o_colors_secondary1", 1.0f);
+
+    if (Client::settings.getSettingByName<std::string>("colors_secondary2") == nullptr)
+        Client::settings.addSetting("colors_secondary2", (std::string)"201a1b");
+    if (Client::settings.getSettingByName<float>("o_colors_secondary2") == nullptr)
+        Client::settings.addSetting("o_colors_secondary2", 1.0f);
+
+    if (Client::settings.getSettingByName<std::string>("colors_secondary3") == nullptr)
+        Client::settings.addSetting("colors_secondary3", (std::string)"120e0f");
+    if (Client::settings.getSettingByName<float>("o_colors_secondary3") == nullptr)
+        Client::settings.addSetting("o_colors_secondary3", 1.0f);
+
+    if (Client::settings.getSettingByName<std::string>("colors_secondary4") == nullptr)
+        Client::settings.addSetting("colors_secondary4", (std::string)"1c1616");
+    if (Client::settings.getSettingByName<float>("o_colors_secondary4") == nullptr)
+        Client::settings.addSetting("o_colors_secondary4", 1.0f);
+
+    if (Client::settings.getSettingByName<std::string>("colors_secondary5") == nullptr)
+        Client::settings.addSetting("colors_secondary5", (std::string)"8b1b25");
+    if (Client::settings.getSettingByName<float>("o_colors_secondary5") == nullptr)
+        Client::settings.addSetting("o_colors_secondary5", 1.0f);
+
+    if (Client::settings.getSettingByName<std::string>("colors_mod1") == nullptr)
+        Client::settings.addSetting("colors_mod1", (std::string)"201a1b");
+    if (Client::settings.getSettingByName<float>("o_colors_mod1") == nullptr)
+        Client::settings.addSetting("o_colors_mod1", 1.0f);
+
+    if (Client::settings.getSettingByName<std::string>("colors_mod2") == nullptr)
+        Client::settings.addSetting("colors_mod2", (std::string)"2f2022");
+    if (Client::settings.getSettingByName<float>("o_colors_mod2") == nullptr)
+        Client::settings.addSetting("o_colors_mod2", 1.0f);
+
+    if (Client::settings.getSettingByName<std::string>("colors_mod3") == nullptr)
+        Client::settings.addSetting("colors_mod3", (std::string)"3f2a2d");
+    if (Client::settings.getSettingByName<float>("o_colors_mod3") == nullptr)
+        Client::settings.addSetting("o_colors_mod3", 1.0f);
+
+    if (Client::settings.getSettingByName<std::string>("colors_mod4") == nullptr)
+        Client::settings.addSetting("colors_mod4", (std::string)"705d60");
+    if (Client::settings.getSettingByName<float>("o_colors_mod4") == nullptr)
+        Client::settings.addSetting("o_colors_mod4", 1.0f);
+
+    // Create threads to download the files
         std::vector<std::thread> threads;
         for (const auto &data: fileData) {
             threads.emplace_back(DownloadAndSave, data.first, data.second);

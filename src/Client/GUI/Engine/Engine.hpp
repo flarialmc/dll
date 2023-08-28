@@ -160,7 +160,8 @@ namespace FlarialGUI
     void RoundedRectWithImageAndText(int index, const float x, float y, const float width, const float height, const D2D1_COLOR_F color, const std::string imagePath, const float imageWidth, const float imageHeight, const wchar_t *text);
     std::wstring to_wide(const std::string &multi);
     void Image(const std::string imageName, const D2D1_RECT_F rect);
-    void FlarialText(const float x, float y, const wchar_t *text, D2D1_COLOR_F color, const float width, const float height, DWRITE_TEXT_ALIGNMENT alignment = DWRITE_TEXT_ALIGNMENT_CENTER);
+    void FlarialText(float x, float y, const wchar_t *text, float width, const float height,
+                     const DWRITE_TEXT_ALIGNMENT alignment);
     void SetScrollView(float x, float y, float width, float height);
     void UnsetScrollView();
     Vec2<float> GetCenterXY(float rectWidth = 160.0f, float rectHeight = 75.0f);
@@ -185,12 +186,13 @@ namespace FlarialGUI
 
     void CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to);
 
-    bool Toggle(int index, float x, float y, const D2D1_COLOR_F enabledColor, const D2D1_COLOR_F disabledColor, D2D1_COLOR_F circleColor, bool isEnabled);
+    bool Toggle(int index, float x, float y, bool isEnabled);
 
-    float Slider(int index, float x, float y, const D2D1_COLOR_F color, const D2D1_COLOR_F disabledColor,
-           const D2D1_COLOR_F circleColor, float startingPoint = 50.0f, const float maxValue = 100.0f, const float minValue = 0.0f, const bool zerosafe = true);
+    float Slider(int index, float x, float y, float startingPoint, const float maxValue, const float minValue,
+                 const bool zerosafe);
 
-    std::string Dropdown(int index, float x, float y, const D2D1_COLOR_F enabledColor, const D2D1_COLOR_F disabledColor, const std::vector<std::string> options, std::string &value, std::string label);
+    std::string Dropdown(int index, float x, float y, const std::vector<std::string> options, std::string &value,
+                         std::string label);
 
     void Circle(float x, float y, const D2D1_COLOR_F &color, float radius);
 
@@ -222,9 +224,9 @@ namespace FlarialGUI
     D2D1::ColorF HexToColorF(const std::string &hexString);
 
     void
-    FlarialTextWithFont(float x, float y, const wchar_t *text, D2D1_COLOR_F color, const float width,
-                        const float height,
-                        const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize, DWRITE_FONT_WEIGHT weight = DWRITE_FONT_WEIGHT_REGULAR);
+    FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
+                        const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
+                        const DWRITE_FONT_WEIGHT weight);
 
     void ResetShit();
 

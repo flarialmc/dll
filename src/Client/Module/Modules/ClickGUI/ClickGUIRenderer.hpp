@@ -19,6 +19,18 @@
 #include "../../../../SDK/SDK.hpp"
 #include "../../../Hook/Hooks/Render/ResizeHook.hpp"
 
+#define colors_secondary1 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary1")->value)
+#define o_colors_secondary1 Client::settings.getSettingByName<float>("o_colors_secondary1")->value
+
+#define colors_secondary2 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary2")->value)
+#define o_colors_secondary2 Client::settings.getSettingByName<float>("o_colors_secondary2")->value
+
+#define colors_secondary3 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary3")->value)
+#define o_colors_secondary3 Client::settings.getSettingByName<float>("o_colors_secondary3")->value
+
+#define colors_secondary5 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary5")->value)
+#define o_colors_secondary5 Client::settings.getSettingByName<float>("o_colors_secondary5")->value
+
 struct PageType {
     std::string type = "normal";
     std::string module;
@@ -110,9 +122,11 @@ public:
                                                                    1, 1);
                 Vec2<float> round = Constraints::RoundingConstraint(50, 50);
 
+                D2D1_COLOR_F basebaseRectangleColor = colors_secondary3;
+                basebaseRectangleColor.a = o_colors_secondary3;
 
                 FlarialGUI::RoundedRect(center.x, center.y,
-                                        D2D1::ColorF(18.0f / 255.0f, 14.0f / 255.0f, 15.0f / 255.0f), baseWidth,
+                                        basebaseRectangleColor, baseWidth,
                                         Constraints::RelativeConstraint(baseHeightReal), round.x, round.x);
 
 
@@ -129,7 +143,10 @@ public:
                 float navy = Constraints::PercentageConstraint(0.009f, "top");
                 round = Constraints::RoundingConstraint(50, 50);
 
-                FlarialGUI::RoundedRect(navx, navy, D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f),
+                D2D1_COLOR_F navColor = colors_secondary2;
+                navColor.a = o_colors_secondary2;
+
+                FlarialGUI::RoundedRect(navx, navy, navColor,
                                         navigationBarWidth, navigationBarHeight, round.x, round.x);
 
 
@@ -185,9 +202,12 @@ public:
                 float shit = Constraints::RelativeConstraint(0.33f);
                 round = Constraints::RoundingConstraint(15, 15);
 
+                D2D1_COLOR_F tabBgCol = colors_secondary5;
+                tabBgCol.a = o_colors_secondary5;
+
                 FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15f, logoWidth),
                                         radioY + Constraints::SpacingConstraint(-0.12f, logoWidth),
-                                        D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f), shit, shit,
+                                        tabBgCol, shit, shit,
                                         round.x, round.x);
 
                 radioX -= Constraints::SpacingConstraint(-0.125f, logoWidth);
@@ -222,7 +242,7 @@ public:
 
                 FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15f, logoWidth),
                                         radioY + Constraints::SpacingConstraint(-0.12f, logoWidth),
-                                        D2D1::ColorF(139.0f / 255.0f, 27.0f / 255.0f, 37.0f / 255.0f), shit, shit,
+                                        tabBgCol, shit, shit,
                                         round.x, round.x);
 
                 radioX -= Constraints::SpacingConstraint(-0.125f, logoWidth);
@@ -347,10 +367,16 @@ public:
                         float anotherRectHeight = Constraints::RelativeConstraint(0.60);
                         float anotherRectWidth = Constraints::RelativeConstraint(0.981, "width");
 
-                        FlarialGUI::RoundedRect(rectX, rectY, D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f), anotherRectWidth, anotherRectHeight, round.x, round.x);
+                        D2D1_COLOR_F iRanOutOfNamesToCallTheseColors = colors_secondary2;
+                        iRanOutOfNamesToCallTheseColors.a = o_colors_secondary2;
+
+                        FlarialGUI::RoundedRect(rectX, rectY, iRanOutOfNamesToCallTheseColors, anotherRectWidth, anotherRectHeight, round.x, round.x);
+
+                        D2D1_COLOR_F wtfCol = colors_secondary1;
+                        wtfCol.a = o_colors_secondary1;
 
                         round = Constraints::RoundingConstraint(45, 45);
-                        FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectWidth, rectHeight, round.x, round.x);
+                        FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth), rectY + Constraints::SpacingConstraint(0.01, rectWidth), wtfCol, rectWidth, rectHeight, round.x, round.x);
 
                         FlarialGUI::PopSize();
 
@@ -365,96 +391,284 @@ public:
 
                         rectY = Constraints::PercentageConstraint(0.35, "top");
 
-                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Eject keybind").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Eject keybind").c_str(),
+                                                        textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
                         FlarialGUI::KeybindSelector(0, rectX + FlarialGUI::SettingsTextWidth("Eject keybind "), rectY, Client::settings.getSettingByName<std::string>("ejectKeybind")->value);
 
                         rectY += Constraints::SpacingConstraint(0.35, textWidth);
 
-                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Blur Intensity").c_str(), D2D1::ColorF(D2D1::ColorF::White), textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth));
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Blur Intensity").c_str(),
+                                                        textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
                         float percent = FlarialGUI::Slider(7, rectX + FlarialGUI::SettingsTextWidth("Blur Intensity "),
-                            rectY,
-                            D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
-                            D2D1::ColorF(154.0f / 255.0f, 107.0f / 255.0f, 114.0f / 255.0f),
-                            D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<float>("blurintensity")->value, 25);
+                                                           rectY, Client::settings.getSettingByName<float>(
+                                        "blurintensity")->value, 25, 0, 0);
 
                         Client::settings.getSettingByName<float>("blurintensity")->value = percent;
 
                         rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                        if (FlarialGUI::Toggle(0, rectX, rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("killdx")->value)) {
+                        if (FlarialGUI::Toggle(0, rectX, rectY,
+                                               Client::settings.getSettingByName<bool>("killdx")->value)) {
 
                             Client::settings.getSettingByName<bool>("killdx")->value = !Client::settings.getSettingByName<bool>("killdx")->value;
                         }
 
-                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(1.2f, textWidth / 2.0f), rectY, L"Better Frames and less Input Lag (No RTX) (Restart required)", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
+                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(1.2f, textWidth / 2.0f),
+                                                        rectY,
+                                                        L"Better Frames (No RTX) (Restart required)",
+                                                        Constraints::SpacingConstraint(4.5, textWidth), textHeight,
+                                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(0.95, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
                         rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                        if (FlarialGUI::Toggle(1, rectX, rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("vsync")->value)) {
+                        if (FlarialGUI::Toggle(1, rectX, rectY,
+                                               Client::settings.getSettingByName<bool>("vsync")->value)) {
 
                             Client::settings.getSettingByName<bool>("vsync")->value = !Client::settings.getSettingByName<bool>("vsync")->value;
                         }
 
-                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY, L"Vsync Disabler (Experimental)", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
+                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
+                                                        L"Vsync Disabler (Experimental)",
+                                                        Constraints::SpacingConstraint(4.5, textWidth), textHeight,
+                                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(0.95, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
                         rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                        if (FlarialGUI::Toggle(2, rectX, rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("watermark")->value)) {
+                        if (FlarialGUI::Toggle(2, rectX, rectY,
+                                               Client::settings.getSettingByName<bool>("watermark")->value)) {
 
                             Client::settings.getSettingByName<bool>("watermark")->value = !Client::settings.getSettingByName<bool>("watermark")->value;
                         }
-                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY, L"Watermark In Inventories", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
+                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
+                                                        L"Watermark In Inventories",
+                                                        Constraints::SpacingConstraint(4.5, textWidth), textHeight,
+                                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(0.95, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
 
                         rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                        if (FlarialGUI::Toggle(8, rectX, rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value)) {
+                        if (FlarialGUI::Toggle(8, rectX, rectY,
+                                               Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value)) {
 
                             Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value = !Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value;
                         }
-                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY, L"Enabled Modules on Top", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
+                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
+                                                        L"Enabled Modules on Top",
+                                                        Constraints::SpacingConstraint(4.5, textWidth), textHeight,
+                                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(0.95, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
                         rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                        if (FlarialGUI::Toggle(7, rectX, rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("centreCursor")->value)) {
+                        if (FlarialGUI::Toggle(7, rectX, rectY,
+                                               Client::settings.getSettingByName<bool>("centreCursor")->value)) {
 
                             Client::settings.getSettingByName<bool>("centreCursor")->value = !Client::settings.getSettingByName<bool>("centreCursor")->value;
                         }
 
-                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY, L"Centre Cursor", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
+                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
+                                                        L"Centre Cursor",
+                                                        Constraints::SpacingConstraint(4.5, textWidth), textHeight,
+                                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(0.95, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
                         
 
                         rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                        if (FlarialGUI::Toggle(3, rectX, rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("dlassets")->value)) {
+                        if (FlarialGUI::Toggle(3, rectX, rectY,
+                                               Client::settings.getSettingByName<bool>("dlassets")->value)) {
 
                             Client::settings.getSettingByName<bool>("dlassets")->value = !Client::settings.getSettingByName<bool>("dlassets")->value;
                         }
 
-                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY, L"Re-Download Assets Every Restart (Recommended)", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
+                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
+                                                        L"Re-Download Assets Every Restart",
+                                                        Constraints::SpacingConstraint(4.5, textWidth), textHeight,
+                                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(0.95, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
                         rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                        if (FlarialGUI::Toggle(4, rectX, rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("noicons")->value)) {
+                        if (FlarialGUI::Toggle(4, rectX, rectY,
+                                               Client::settings.getSettingByName<bool>("noicons")->value)) {
 
                             Client::settings.getSettingByName<bool>("noicons")->value = !Client::settings.getSettingByName<bool>("noicons")->value;
                         }
 
-                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY, L"No Icons", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
+                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
+                                                        L"No Icons", Constraints::SpacingConstraint(4.5, textWidth),
+                                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(0.95, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
                         rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                        if (FlarialGUI::Toggle(5, rectX, rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("noshadows")->value)) {
+                        if (FlarialGUI::Toggle(5, rectX, rectY,
+                                               Client::settings.getSettingByName<bool>("noshadows")->value)) {
 
                             Client::settings.getSettingByName<bool>("noshadows")->value = !Client::settings.getSettingByName<bool>("noshadows")->value;
                         }
 
-                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY, L"No Shadows", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
+                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
+                                                        L"No Shadows", Constraints::SpacingConstraint(4.5, textWidth),
+                                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(0.95, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
                         rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY, L"Anonymous Telemetry", D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(4.5, textWidth), textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth));
+                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
+                                                        L"Anonymous Telemetry",
+                                                        Constraints::SpacingConstraint(4.5, textWidth), textHeight,
+                                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(0.95, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
-                        if (FlarialGUI::Toggle(6, rectX, rectY, D2D1::ColorF(255.0f / 255.0f, 35.0f / 255.0f, 58.0f / 255.0f), D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), Client::settings.getSettingByName<bool>("anonymousApi")->value)) {
+                        if (FlarialGUI::Toggle(6, rectX, rectY,
+                                               Client::settings.getSettingByName<bool>("anonymousApi")->value)) {
 
                             Client::settings.getSettingByName<bool>("anonymousApi")->value = !Client::settings.getSettingByName<bool>("anonymousApi")->value;
                         }
 
-                        FlarialGUI::UnsetScrollView();
+                        rectY = Constraints::PercentageConstraint(0.35, "top");
+                        rectX = Constraints::PercentageConstraint(0.55, "left");
 
+                        rectY += Constraints::SpacingConstraint(0.7, textWidth);
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Text Color").c_str(),
+                                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                        FlarialGUI::ColorPicker(10, rectX + FlarialGUI::SettingsTextWidth("Text Color "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_text")->value, Client::settings.getSettingByName<float>("o_colors_text")->value);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Enabled Color").c_str(),
+                                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                        FlarialGUI::ColorPicker(11, rectX + FlarialGUI::SettingsTextWidth("Enabled Color "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_enabled")->value, Client::settings.getSettingByName<float>("o_colors_enabled")->value);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Disabled Color").c_str(),
+                                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                        FlarialGUI::ColorPicker(12, rectX + FlarialGUI::SettingsTextWidth("Disabled Color "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_disabled")->value, Client::settings.getSettingByName<float>("o_colors_disabled")->value);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Primary 1").c_str(),
+                                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                        FlarialGUI::ColorPicker(13, rectX + FlarialGUI::SettingsTextWidth("Primary 1 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_primary1")->value, Client::settings.getSettingByName<float>("o_colors_primary1")->value);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Primary 2").c_str(),
+                                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                        FlarialGUI::ColorPicker(14, rectX + FlarialGUI::SettingsTextWidth("Primary 2 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_primary2")->value, Client::settings.getSettingByName<float>("o_colors_primary2")->value);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Primary 3").c_str(),
+                                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                        FlarialGUI::ColorPicker(15, rectX + FlarialGUI::SettingsTextWidth("Primary 3 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_primary3")->value, Client::settings.getSettingByName<float>("o_colors_primary3")->value);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Primary 4").c_str(),
+                                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                        FlarialGUI::ColorPicker(16, rectX + FlarialGUI::SettingsTextWidth("Primary 4 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_primary4")->value, Client::settings.getSettingByName<float>("o_colors_primary4")->value);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Secondary 1").c_str(),
+                                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                        FlarialGUI::ColorPicker(17, rectX + FlarialGUI::SettingsTextWidth("Secondary 1 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_secondary1")->value, Client::settings.getSettingByName<float>("o_colors_secondary1")->value);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Secondary 2").c_str(),
+                                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                        FlarialGUI::ColorPicker(18, rectX + FlarialGUI::SettingsTextWidth("Secondary 2 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_secondary2")->value, Client::settings.getSettingByName<float>("o_colors_secondary2")->value);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Secondary 3").c_str(),
+                                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                        FlarialGUI::ColorPicker(19, rectX + FlarialGUI::SettingsTextWidth("Secondary 3 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_secondary3")->value, Client::settings.getSettingByName<float>("o_colors_secondary3")->value);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Secondary 4").c_str(),
+                                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                        FlarialGUI::ColorPicker(20, rectX + FlarialGUI::SettingsTextWidth("Secondary 4 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_secondary4")->value, Client::settings.getSettingByName<float>("o_colors_secondary4")->value);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Secondary 5").c_str(),
+                                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                        FlarialGUI::ColorPicker(21, rectX + FlarialGUI::SettingsTextWidth("Secondary 5 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_secondary5")->value, Client::settings.getSettingByName<float>("o_colors_secondary5")->value);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("ModCard 1").c_str(),
+                                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                        FlarialGUI::ColorPicker(22, rectX + FlarialGUI::SettingsTextWidth("ModCard 1 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_mod1")->value, Client::settings.getSettingByName<float>("o_colors_mod1")->value);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("ModCard 2").c_str(),
+                                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                        FlarialGUI::ColorPicker(23, rectX + FlarialGUI::SettingsTextWidth("ModCard 2 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_mod2")->value, Client::settings.getSettingByName<float>("o_colors_mod2")->value);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("ModCard 3").c_str(),
+                                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                        FlarialGUI::ColorPicker(24, rectX + FlarialGUI::SettingsTextWidth("ModCard 3 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_mod3")->value, Client::settings.getSettingByName<float>("o_colors_mod3")->value);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("ModCard 4").c_str(),
+                                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                        FlarialGUI::ColorPicker(25, rectX + FlarialGUI::SettingsTextWidth("ModCard 4 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_mod4")->value, Client::settings.getSettingByName<float>("o_colors_mod4")->value);
+
+                        FlarialGUI::UnsetScrollView();
                         FlarialGUI::PopSize();
+
+                        FlarialGUI::ColorPickerWindow(10, Client::settings.getSettingByName<std::string>("colors_text")->value, Client::settings.getSettingByName<float>("o_colors_text")->value);
+                        FlarialGUI::ColorPickerWindow(11, Client::settings.getSettingByName<std::string>("colors_enabled")->value, Client::settings.getSettingByName<float>("o_colors_enabled")->value);
+                        FlarialGUI::ColorPickerWindow(12, Client::settings.getSettingByName<std::string>("colors_disabled")->value, Client::settings.getSettingByName<float>("o_colors_disabled")->value);
+                        FlarialGUI::ColorPickerWindow(13, Client::settings.getSettingByName<std::string>("colors_primary1")->value, Client::settings.getSettingByName<float>("o_colors_primary1")->value);
+                        FlarialGUI::ColorPickerWindow(14, Client::settings.getSettingByName<std::string>("colors_primary2")->value, Client::settings.getSettingByName<float>("o_colors_primary2")->value);
+                        FlarialGUI::ColorPickerWindow(15, Client::settings.getSettingByName<std::string>("colors_primary3")->value, Client::settings.getSettingByName<float>("o_colors_primary3")->value);
+                        FlarialGUI::ColorPickerWindow(16, Client::settings.getSettingByName<std::string>("colors_primary4")->value, Client::settings.getSettingByName<float>("o_colors_primary4")->value);
+                        FlarialGUI::ColorPickerWindow(17, Client::settings.getSettingByName<std::string>("colors_secondary1")->value, Client::settings.getSettingByName<float>("o_colors_secondary1")->value);
+                        FlarialGUI::ColorPickerWindow(18, Client::settings.getSettingByName<std::string>("colors_secondary2")->value, Client::settings.getSettingByName<float>("o_colors_secondary2")->value);
+                        FlarialGUI::ColorPickerWindow(19, Client::settings.getSettingByName<std::string>("colors_secondary3")->value, Client::settings.getSettingByName<float>("o_colors_secondary3")->value);
+                        FlarialGUI::ColorPickerWindow(20, Client::settings.getSettingByName<std::string>("colors_secondary4")->value, Client::settings.getSettingByName<float>("o_colors_secondary4")->value);
+                        FlarialGUI::ColorPickerWindow(21, Client::settings.getSettingByName<std::string>("colors_secondary5")->value, Client::settings.getSettingByName<float>("o_colors_secondary5")->value);
+                        FlarialGUI::ColorPickerWindow(22, Client::settings.getSettingByName<std::string>("colors_mod1")->value, Client::settings.getSettingByName<float>("o_colors_mod1")->value);
+                        FlarialGUI::ColorPickerWindow(23, Client::settings.getSettingByName<std::string>("colors_mod2")->value, Client::settings.getSettingByName<float>("o_colors_mod2")->value);
+                        FlarialGUI::ColorPickerWindow(24, Client::settings.getSettingByName<std::string>("colors_mod3")->value, Client::settings.getSettingByName<float>("o_colors_mod3")->value);
+                        FlarialGUI::ColorPickerWindow(25, Client::settings.getSettingByName<std::string>("colors_mod4")->value, Client::settings.getSettingByName<float>("o_colors_mod4")->value);
                 }
 
                     /* Mod Card End */
@@ -476,13 +690,19 @@ public:
                     float anotherRectHeight = Constraints::RelativeConstraint(0.60);
                     float anotherRectWidth = Constraints::RelativeConstraint(0.981, "width");
 
+                    D2D1_COLOR_F colorThing = colors_secondary2;
+                    colorThing.a = o_colors_secondary2;
+
                     FlarialGUI::RoundedRect(rectX, rectY, D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f),
                                             anotherRectWidth, anotherRectHeight, round.x, round.x);
+
+                    D2D1_COLOR_F bruv = colors_secondary1;
+                    bruv.a = o_colors_secondary1;
 
                     round = Constraints::RoundingConstraint(45, 45);
                     FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth),
                                             rectY + Constraints::SpacingConstraint(0.01, rectWidth),
-                                            D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectWidth,
+                                            bruv, rectWidth,
                                             rectHeight, round.x, round.x);
 
                     FlarialGUI::PopSize();
