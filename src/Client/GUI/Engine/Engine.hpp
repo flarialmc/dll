@@ -44,13 +44,24 @@ struct TextBoxStruct
     bool isAt1 = false;
 };
 
+struct FlarialGradientStops
+{
+    float position;
+    D2D1_COLOR_F color;
+};
+
 struct ColorPicker
 {
     std::string oldHex;
     std::string newHex;
     bool isActive = false;
     float cursorOpac = 1.0f;
-    float cursorX = 0.0f;
+    float hueX = 0.0f;
+    bool movingHueX = false;
+    float opacX = 0.0f;
+    bool movingOpacX = false;
+    Vec2<float> shade = {0,0};
+    bool movingShade = false;
     bool isAt1 = false;
 };
 
@@ -216,6 +227,7 @@ namespace FlarialGUI
     void lerp(T &a, const T &b, float t);
 
     D2D_COLOR_F LerpColor(D2D_COLOR_F color1, D2D_COLOR_F color2, float percentage);
+    D2D1::ColorF HSVtoColorF(float H, float s, float v);
 
     void ColorPicker(int index, float x, float y, std::string &hex, float &opacity);
 
@@ -271,4 +283,5 @@ namespace FlarialGUI
     void UnSetIsInAdditionalYMode();
 
     float SettingsTextWidth(std::string text);
+    D2D1_COLOR_F getGradientColor(D2D1_GRADIENT_STOP gradientStops[10], float position);
 };
