@@ -9,6 +9,12 @@
 #include <chrono>
 #include <unordered_map>
 
+struct HSV {
+    float hue;
+    float saturation;
+    float value;
+};
+
 struct WindowRect
 {
     bool isMovingElement = false;
@@ -60,7 +66,7 @@ struct ColorPicker
     bool movingHueX = false;
     float opacX = 0.0f;
     bool movingOpacX = false;
-    Vec2<float> shade = {0,0};
+    Vec2<float> shade = {-1,-1};
     bool movingShade = false;
     bool isAt1 = false;
 };
@@ -212,6 +218,8 @@ namespace FlarialGUI
     void ColorWheel(float x, float y, float radius);
 
     float HueToRGB(float p, float q, float t);
+
+    HSV RGBtoHSV(D2D1_COLOR_F rgb);
 
     void HSLToRGB(float h, float s, float l, float &r, float &g, float &b);
 

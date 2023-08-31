@@ -1382,6 +1382,53 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 
 }
 
+HSV FlarialGUI::RGBtoHSV(D2D1_COLOR_F rgb) {
+    float r = rgb.r;
+    float g = rgb.g;
+    float b = rgb.b;
+
+    HSV         out;
+    double      min, max, delta;
+
+    min = r < g ? r : g;
+    min = min  < b ? min  : b;
+
+    max = r > g ? r : g;
+    max = max > b ? max : b;
+
+    out.value = max;                                // v
+    delta = max - min;
+    if (delta < 0.00001)
+    {
+        out.saturation = 0;
+        out.hue = 0; // undefined, maybe nan?
+        return out;
+    }
+    if( max > 0.0 ) { // NOTE: if Max is == 0, this divide would cause a crash
+        out.saturation = (delta / max);                  // s
+    } else {
+        // if max is 0, then r = g = b = 0
+        // s = 0, h is undefined
+        out.saturation = 0.0;
+        out.hue = NAN;                            // its now undefined
+        return out;
+    }
+    if( r >= max )                           // > is bogus, just keeps compilor happy
+        out.hue = ( g - b ) / delta;        // between yellow & magenta
+    else
+    if( g >= max )
+        out.hue = 2.0 + ( b - r ) / delta;  // between cyan & yellow
+    else
+        out.hue = 4.0 + ( r - g ) / delta;  // between magenta & cyan
+
+    out.hue *= 60.0;                              // degrees
+
+    if( out.hue < 0.0 )
+        out.hue += 360.0;
+
+    return out;
+};
+
 D2D1::ColorF FlarialGUI::HSVtoColorF(float H, float s, float v){
     if(H>360 || H<0 || s>1 || s<0 || v>1 || v<0){
         return D2D1::ColorF(0, 0, 0);
@@ -1414,22 +1461,23 @@ D2D1::ColorF FlarialGUI::HSVtoColorF(float H, float s, float v){
 
 void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity) {
 
-	int i = 1;
-	for (auto picker : ColorPickers)
-		if (i != index && picker.isActive) picker.isActive = false;
+    int counter = 0;
+	for (auto picker : ColorPickers) {
+        if (counter != index && picker.isActive) picker.isActive = false;
+        counter++;
+    }
 
 	if (ColorPickers[index].isActive) {
-
-
 		// 75% opacity black rect
 		FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black, 0.75),
 			Constraints::RelativeConstraint(1.5, "width", true),
 			Constraints::RelativeConstraint(1.5, "height", true), 0, 0);
 
-		D2D1_COLOR_F color = FlarialGUI::HexToColorF(hex);
+		D2D1_COLOR_F color = HexToColorF(hex);
+        HSV hsv_color = RGBtoHSV(color);
 
 		float rectwidth = Constraints::RelativeConstraint(0.55, "height", true);
-		float rectheight = Constraints::RelativeConstraint(0.35, "height", true);
+		float rectheight = Constraints::RelativeConstraint(0.45, "height", true);
 		Vec2<float> center = Constraints::CenterConstraint(rectwidth, rectheight);
 		Vec2<float> round = Constraints::RoundingConstraint(45, 45);
 
@@ -1447,18 +1495,23 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity) 
 		float x = Constraints::PercentageConstraint(0.07, "left");
 		float y = Constraints::PercentageConstraint(0.10, "top");
 		float spacing = Constraints::SpacingConstraint(0.15, rectheight);
-        float hexPreviewSize = Constraints::SpacingConstraint(0.3, rectheight);
+        float hexPreviewSize = Constraints::SpacingConstraint(0.265, rectheight);
         Vec2<float> hexPreviewRound = Constraints::RoundingConstraint(10, 10);
-
-        // color preview square
-        FlarialGUI::RoundedRect(x, y, FlarialGUI::HexToColorF(hex), hexPreviewSize, hexPreviewSize, hexPreviewRound.x, hexPreviewRound.y);
-
-        // previous color preview square
-        FlarialGUI::RoundedRect(x, y + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize), FlarialGUI::HexToColorF(ColorPickers[index].oldHex), hexPreviewSize, hexPreviewSize, hexPreviewRound.x, hexPreviewRound.y);
 
         // hue line and opacity line
         float hlwidth = Constraints::SpacingConstraint(0.85f, rectwidth);
         float gap2L = Constraints::SpacingConstraint(0.3f, hexPreviewSize);
+
+        ColorPickers[index].opacX = opacity * hlwidth;
+
+        D2D1_COLOR_F previewHexCode = HexToColorF(hex);
+        previewHexCode.a = ColorPickers[index].opacX / hlwidth;
+
+        // color preview square
+        FlarialGUI::RoundedRect(x, y, previewHexCode, hexPreviewSize, hexPreviewSize, hexPreviewRound.x, hexPreviewRound.y);
+
+        // previous color preview square
+        FlarialGUI::RoundedRect(x, y + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize), FlarialGUI::HexToColorF(ColorPickers[index].oldHex), hexPreviewSize, hexPreviewSize, hexPreviewRound.x, hexPreviewRound.y);
 
         ID2D1GradientStopCollection *pGradientStops;
 
@@ -1553,8 +1606,14 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity) 
 
         y = Constraints::PercentageConstraint(0.10, "top");
         float shadePickerHeight = hexPreviewSize * 2.0f + Constraints::SpacingConstraint(0.1, hexPreviewSize);
-        float shadePickerWidth = rectwidth - (hexPreviewSize * 1.96);
+        float shadePickerWidth = rectwidth - (hexPreviewSize * 1.86);
         float originalY = y;
+
+        if (ColorPickers[index].shade.x == -1 && ColorPickers[index].shade.y == -1) {
+            ColorPickers[index].hueX = (hsv_color.hue / 360.0f) * hlwidth;
+            ColorPickers[index].shade.x = hsv_color.saturation * shadePickerWidth;
+            ColorPickers[index].shade.y = (1.0f - hsv_color.value) * shadePickerHeight;
+        }
 
         // shade picker
         while (y <= originalY + shadePickerHeight) {
@@ -1608,12 +1667,11 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity) 
         float circleY = y + hexPreviewSize * 2 + Constraints::SpacingConstraint(0.35f, hexPreviewSize);
 
         Circle(circleX, circleY, hueSelectorerOutline, Constraints::SpacingConstraint(0.125f, hexPreviewSize));
-        Circle(circleX, circleY, FlarialGUI::HexToColorF(hex), Constraints::SpacingConstraint(0.08f, hexPreviewSize));
-
-        circleX = x + ColorPickers[index].opacX;
-        circleY += gap2L;
-
-        FlarialGUI::Circle(circleX, circleY, D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(0.125f, hexPreviewSize));
+        Circle(circleX, circleY, HSVtoColorF(
+                (ColorPickers[index].hueX / hlwidth) * 360,
+                1.0f,
+                1.0f
+        ), Constraints::SpacingConstraint(0.08f, hexPreviewSize));
 
         if (
                 (CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(0.15f, hexPreviewSize), Constraints::SpacingConstraint(0.15f, hexPreviewSize)) &&
@@ -1631,13 +1689,16 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity) 
 
         y += gap2L;
         circleY += gap2L;
+        circleX = x + ColorPickers[index].opacX;
+
+        Circle(circleX, circleY, D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(0.125f, hexPreviewSize));
 
         if (
                 (CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(0.15f, hexPreviewSize), Constraints::SpacingConstraint(0.15f, hexPreviewSize)) &&
                  MC::held) || (ColorPickers[index].movingOpacX && MC::held) ||
                 (MC::held && CursorInRect(
                         x,
-                        y + hexPreviewSize * 2 + Constraints::SpacingConstraint(0.3f, hexPreviewSize) + gap2L,
+                        y + hexPreviewSize * 2 + Constraints::SpacingConstraint(0.3f, hexPreviewSize),
                         hlwidth,
                         Constraints::SpacingConstraint(0.1f, hexPreviewSize))) &&
                 !ColorPickers[index].movingHueX && !ColorPickers[index].movingShade
@@ -1667,12 +1728,15 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity) 
                 1.0f - ColorPickers[index].shade.y / shadePickerHeight
         );
 
-        newColorLol.a = ColorPickers[index].opacX / hlwidth;
-
         Circle(ColorPickers[index].shade.x + originalX, ColorPickers[index].shade.y + originalY, D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(0.125f, hexPreviewSize));
         Circle(ColorPickers[index].shade.x + originalX, ColorPickers[index].shade.y + originalY, newColorLol, Constraints::SpacingConstraint(0.08f, hexPreviewSize));
 
         hex = ColorFToHex(newColorLol);
+        opacity = ColorPickers[index].opacX / hlwidth;
+
+        float buttonWidth = Constraints::RelativeConstraint(0.25f, "width");
+        float buttonHeight = Constraints::RelativeConstraint(0.13f, "height");
+        if (RoundedButton(0, x + spacing * 2.39f, y + spacing * 4.95f, D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Close", buttonWidth, buttonHeight, round.x, round.x)) ColorPickers[index].isActive = false;
 
         /*
         for (int j = 0; j < hlwidth - 1; ++j) {
