@@ -179,7 +179,7 @@ public:
 
                 round = Constraints::RoundingConstraint(30, 30);
 
-                if (FlarialGUI::RoundedRadioButton(1, radioX, radioY,
+                if (!FlarialGUI::activeColorPickerWindows && FlarialGUI::RoundedRadioButton(1, radioX, radioY,
                                                    D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
                                                    D2D1::ColorF(D2D1::ColorF::White), L"Modules", RadioButtonWidth,
                                                    RadioButtonHeight, round.x, round.x, "modules", curr)) {
@@ -223,7 +223,7 @@ public:
 
                 round = Constraints::RoundingConstraint(30, 30);
                 radioX += Constraints::SpacingConstraint(13.f, logoWidth);
-                if (FlarialGUI::RoundedRadioButton(0, radioX, radioY,
+                if (!FlarialGUI::activeColorPickerWindows && FlarialGUI::RoundedRadioButton(0, radioX, radioY,
                                                    D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
                                                    D2D1::ColorF(D2D1::ColorF::White), L"Settings", RadioButtonWidth,
                                                    RadioButtonHeight, round.x, round.x, "settings", this->curr)) {

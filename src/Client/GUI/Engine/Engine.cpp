@@ -441,7 +441,7 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled) {
 	if (isAdditionalY) SetIsInAdditionalYMode();
 
 	if (isInScrollView) y += FlarialGUI::scrollpos;
-	if (CursorInRect(x, y, rectWidth, rectHeight) && MC::mousebutton == MouseButton::Left && !MC::held)
+	if (CursorInRect(x, y, rectWidth, rectHeight) && MC::mousebutton == MouseButton::Left && !MC::held && !activeColorPickerWindows)
 	{
 		MC::mousebutton = MouseButton::None;
 		return true;
@@ -642,7 +642,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 std::string FlarialGUI::TextBox(int index, std::string text, int limit, float x, float y, float width, float height) {
 	if (isInScrollView) y += scrollpos;
 
-	if (CursorInRect(x, y, width, height) && MC::mouseaction == MouseAction::PRESS && MC::mousebutton == MouseButton::Left) {
+	if (CursorInRect(x, y, width, height) && MC::mouseaction == MouseAction::PRESS && MC::mousebutton == MouseButton::Left && !activeColorPickerWindows) {
 
 		FlarialGUI::TextBoxes[index].isActive = true;
 
@@ -653,7 +653,7 @@ std::string FlarialGUI::TextBox(int index, std::string text, int limit, float x,
 		FlarialGUI::TextBoxes[index].text = text;
 
 	}
-	else if (!FlarialGUI::TextBoxes[index].isActive) {
+	else if (!FlarialGUI::TextBoxes[index].isActive && !activeColorPickerWindows) {
 
 		FlarialGUI::TextBoxes[index].text = text;
 	}
@@ -772,6 +772,8 @@ float FlarialGUI::Slider(int index, float x, float y, float startingPoint, const
 
 	float rectangleLeft = farLeftX;
 	float rectangleWidth = farRightX - farLeftX;
+
+    if (activeColorPickerWindows) activeSliders = 1;
 
 	if (SliderRects[index].hasBeenMoved) {
 
@@ -937,7 +939,7 @@ FlarialGUI::Dropdown(int index, float x, float y, const std::vector<std::string>
 	D2D1_COLOR_F unselectedChildCol = colors_primary3;
 	D2D1_COLOR_F hoveredChildCol = D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f);
 
-	if (CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.55, textWidth), percHeight + maxHeight)) {
+	if (!activeColorPickerWindows && CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.55, textWidth), percHeight + maxHeight)) {
 		if (MC::mousebutton == MouseButton::Left && CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.55, textWidth), percHeight)) {
 			//MC::mousebutton = MouseButton::None;
 			FlarialGUI::DropDownMenus[index].isActive = true;
@@ -1269,7 +1271,7 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string&
 
 	if (isInScrollView) y += scrollpos;
 
-	if (CursorInRect(x, y, percWidth, percHeight) && MC::mousebutton == MouseButton::Left && !MC::held && !KeybindSelectors[index].isActive)
+	if (!activeColorPickerWindows && CursorInRect(x, y, percWidth, percHeight) && MC::mousebutton == MouseButton::Left && !MC::held && !KeybindSelectors[index].isActive)
 	{
 		KeybindSelectors[index].isActive = true;
 		KeybindSelectors[index].currentOnKeyTime = std::chrono::steady_clock::now();
@@ -1381,7 +1383,7 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 	if (CursorInRect(x + Constraints::SpacingConstraint(0.1, s), clickingY + s * 0.21f, s * 0.85f, s * 0.85f) && MC::mousebutton == MouseButton::Left && !MC::held)
 	{
 		MC::mousebutton = MouseButton::None;
-        if (activeColorPickerWindows == 0) {
+        if (!activeColorPickerWindows) {
             ColorPickers[index].isActive = true;
             activeColorPickerWindows++;
         }
