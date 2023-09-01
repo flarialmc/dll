@@ -59,7 +59,9 @@ struct FlarialGradientStops
 struct ColorPicker
 {
     std::string oldHex;
+    float oldOpac;
     std::string newHex;
+    float newOpac;
     bool isActive = false;
     float cursorOpac = 1.0f;
     float hueX = 0.0f;
