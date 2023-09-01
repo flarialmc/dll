@@ -101,7 +101,8 @@ void Client::initialize()
         { "https://cdn-c6f.pages.dev/assets/field-of-view.png", Path + "field-of-view.png" },
         { "https://cdn-c6f.pages.dev/assets/upside-down.png", Path + "upside-down.png" },
         { "https://cdn-c6f.pages.dev/assets/down.png", Path + "down.png" },
-        { "https://cdn-c6f.pages.dev/assets/Animations.png", Path + "Animations.png" }
+        { "https://cdn-c6f.pages.dev/assets/Animations.png", Path + "Animations.png" },
+        { "https://cdn-c6f.pages.dev/assets/transparent.png", Path + "transparent.png" }
     };
 
     Client::CheckSettingsFile();

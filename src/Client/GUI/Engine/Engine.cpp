@@ -1517,11 +1517,28 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity) 
         if (ColorPickers[index].oldHex.empty()) ColorPickers[index].oldHex = hex;
         if (ColorPickers[index].oldOpac == NULL) ColorPickers[index].oldOpac = opacity;
 
+        D2D1_COLOR_F oldColor = HexToColorF(ColorPickers[index].oldHex);
+        oldColor.a = ColorPickers[index].oldOpac;
+
         // color preview square
-        FlarialGUI::RoundedRect(x, y, color, hexPreviewSize, hexPreviewSize, hexPreviewRound.x, hexPreviewRound.y);
+
+        FlarialGUI::Image("\\Flarial\\assets\\transparent.png", D2D1::RectF(
+                x + 1,
+                y + 1,
+                x + hexPreviewSize - 1,
+                y - 1 + hexPreviewSize - 1
+        ));
+        RoundedRect(x, y, color, hexPreviewSize, hexPreviewSize, 0, 0);
 
         // previous color preview square
-        FlarialGUI::RoundedRect(x, y + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize), FlarialGUI::HexToColorF(ColorPickers[index].oldHex), hexPreviewSize, hexPreviewSize, hexPreviewRound.x, hexPreviewRound.y);
+
+        FlarialGUI::Image("\\Flarial\\assets\\transparent.png", D2D1::RectF(
+                x + 1,
+                y + 1 + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize),
+                x + hexPreviewSize - 1,
+                y - 1 + hexPreviewSize * 2 + Constraints::SpacingConstraint(0.1, hexPreviewSize) - 1
+        ));
+        RoundedRect(x, y + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize), oldColor, hexPreviewSize, hexPreviewSize, 0, 0);
 
         ID2D1GradientStopCollection *pGradientStops;
 
@@ -1943,15 +1960,18 @@ void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
 
 	// Draw image
 	D2D1_RECT_F imageRect = D2D1::RectF(rect.left, rect.top, rect.right, rect.bottom);
+    D2D1_BITMAP_INTERPOLATION_MODE interpolationMode = D2D1_BITMAP_INTERPOLATION_MODE_LINEAR;
+
+    if (imageName == "\\Flarial\\assets\\transparent.png") interpolationMode = D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR;
 
 	if (isInScrollView) {
 		if (isRectInRect(ScrollViewRect, rect))
 			D2D::context->DrawBitmap(ImagesClass::eimages[imageName], imageRect, 1.0f,
-				D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+                                     interpolationMode);
 	}
 	else {
 		D2D::context->DrawBitmap(ImagesClass::eimages[imageName], imageRect, 1.0f,
-			D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+                                 interpolationMode);
 	}
 }
 
