@@ -1377,7 +1377,10 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 	if (CursorInRect(x + Constraints::SpacingConstraint(0.1, s), clickingY + s * 0.21f, s * 0.85f, s * 0.85f) && MC::mousebutton == MouseButton::Left && !MC::held)
 	{
 		MC::mousebutton = MouseButton::None;
-		ColorPickers[index].isActive = !ColorPickers[index].isActive;
+        if (activeColorPickerWindows == 0) {
+            ColorPickers[index].isActive = true;
+            activeColorPickerWindows++;
+        }
 	}
 
 }
@@ -1460,13 +1463,6 @@ D2D1::ColorF FlarialGUI::HSVtoColorF(float H, float s, float v){
 }
 
 void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity) {
-
-    int counter = 0;
-	for (auto picker : ColorPickers) {
-        if (counter != index && picker.isActive) picker.isActive = false;
-        counter++;
-    }
-
 	if (ColorPickers[index].isActive) {
 		// 75% opacity black rect
 		FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black, 0.75),
@@ -1736,7 +1732,10 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity) 
 
         float buttonWidth = Constraints::RelativeConstraint(0.25f, "width");
         float buttonHeight = Constraints::RelativeConstraint(0.13f, "height");
-        if (RoundedButton(0, x + spacing * 2.39f, y + spacing * 4.95f, D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Close", buttonWidth, buttonHeight, round.x, round.x)) ColorPickers[index].isActive = false;
+        if (RoundedButton(0, x + spacing * 2.41f, y + spacing * 4.95f, D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Close", buttonWidth, buttonHeight, round.x, round.x)) {
+            ColorPickers[index].isActive = false;
+            activeColorPickerWindows--;
+        }
 
         /*
         for (int j = 0; j < hlwidth - 1; ++j) {
@@ -2128,6 +2127,8 @@ void FlarialGUI::ResetShit() {
 	for (auto& i : DropDownMenus) {
 		i = ::DropdownStruct();
 	}
+
+    activeColorPickerWindows = 0;
 
 }
 
