@@ -143,6 +143,7 @@ namespace FlarialGUI
     int inline additionalIndex = 0;
     int inline highestAddIndexes = 0;
     int inline activeColorPickerWindows = 0;
+    int inline activeSliders = 0;
 
     inline bool isInScrollView = false;
     inline D2D1_RECT_F ScrollViewRect = D2D1::RectF();

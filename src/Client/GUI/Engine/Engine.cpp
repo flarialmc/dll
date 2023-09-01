@@ -807,32 +807,34 @@ float FlarialGUI::Slider(int index, float x, float y, float startingPoint, const
 
 	SliderRects[index].percentageX = percentage;
 
-
     if(isInScrollView) {
         y += scrollpos;
         circleY += scrollpos;
     }
-	if (CursorInRect(farLeftX, y, totalWidth, height) && MC::held) {
+
+	if (CursorInRect(farLeftX, y, totalWidth, height) && MC::held && (SliderRects[index].isMovingElement || activeSliders == 0)) {
 
 		SliderRects[index].movedX = MC::mousepos.x;
 		SliderRects[index].hasBeenMoved = true;
 		SliderRects[index].isMovingElement = true;
+
+        activeSliders = 1;
 
 		percentage = ((SliderRects[index].movedX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
 		SliderRects[index].percentageX = percentage;
 
 	}
 
-
-
         if (CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.5f),
-                            Constraints::SpacingConstraint(circleRadius, 1.5f)) && MC::held) {
+                            Constraints::SpacingConstraint(circleRadius, 1.5f)) && MC::held && (activeSliders == 0 || SliderRects[index].isMovingElement)) {
 
             if (MC::mousepos.x > farLeftX && MC::mousepos.x < farRightX) {
 
                 SliderRects[index].movedX = MC::mousepos.x;
                 SliderRects[index].hasBeenMoved = true;
                 SliderRects[index].isMovingElement = true;
+
+                activeSliders = 1;
             }
 
             if (MC::mousepos.x < farLeftX) SliderRects[index].movedX = farLeftX;
@@ -849,6 +851,7 @@ float FlarialGUI::Slider(int index, float x, float y, float startingPoint, const
                 SliderRects[index].movedX = MC::mousepos.x;
                 SliderRects[index].hasBeenMoved = true;
                 SliderRects[index].isMovingElement = true;
+
             }
 
             if (MC::mousepos.x < farLeftX) SliderRects[index].movedX = farLeftX;
@@ -861,6 +864,7 @@ float FlarialGUI::Slider(int index, float x, float y, float startingPoint, const
 
         if (MC::mousebutton == MouseButton::None && !MC::held || MC::mousebutton == MouseButton::Left && !MC::held) {
             SliderRects[index].isMovingElement = false;
+            activeSliders = 0;
             percentage = SliderRects[index].percentageX;
         }
 
