@@ -657,6 +657,9 @@ public:
 
 				FlarialGUI::PopSize();
 
+                if(!FlarialGUI::activeColorPickerWindows)
+                {
+
 				float childHeight = Constraints::SpacingConstraint(0.5, rectHeight);
 				float childWidth = Constraints::SpacingConstraint(0.45, rectWidth);
 				std::pair<float, float> centered = centerChildRectangle(rectWidth, rectHeight, childWidth, childHeight);
@@ -672,18 +675,28 @@ public:
 
 				std::pair<float, float> thingYes = centerChildRectangle(childWidth, childHeight, buttonWidth, buttonHeight);
 
-				if (FlarialGUI::RoundedButton(0, spacingX + centered.first + rectX, thingYes.second + rectHeight + rectY + centered.second + Constraints::RelativeConstraint(0.035), colorThing, textCol, L"Reset", buttonWidth, buttonHeight, round.x, round.x)) {
-					ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.reset();
-                    FlarialGUI::ResetShit();
-					ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("enabled", false);
-					ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("keybind", (std::string)"");
-					ModuleManager::getModule(ClickGUIRenderer::page.module)->onEnable();
-				}
 
 
-				if (FlarialGUI::RoundedButton(1, -spacingX + centered.first + rectX + childWidth - buttonWidth, thingYes.second + rectHeight + rectY + centered.second + Constraints::RelativeConstraint(0.035), colorThing, textCol, L"Copy From", buttonWidth, buttonHeight, round.x, round.x)) {
+                    if (FlarialGUI::RoundedButton(0, spacingX + centered.first + rectX,
+                                                  thingYes.second + rectHeight + rectY + centered.second +
+                                                  Constraints::RelativeConstraint(0.035), colorThing, textCol, L"Reset",
+                                                  buttonWidth, buttonHeight, round.x, round.x)) {
+                        ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.reset();
+                        FlarialGUI::ResetShit();
+                        ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("enabled", false);
+                        ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("keybind",
+                                                                                                     (std::string) "");
+                        ModuleManager::getModule(ClickGUIRenderer::page.module)->onEnable();
+                    }
 
-				}
+
+                    if (FlarialGUI::RoundedButton(1, -spacingX + centered.first + rectX + childWidth - buttonWidth,
+                                                  thingYes.second + rectHeight + rectY + centered.second +
+                                                  Constraints::RelativeConstraint(0.035), colorThing, textCol,
+                                                  L"Copy From", buttonWidth, buttonHeight, round.x, round.x)) {
+
+                    }
+                }
 			}
 
 			FlarialGUI::PopSize(); // Pops base rect
