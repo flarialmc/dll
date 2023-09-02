@@ -397,6 +397,19 @@ public:
                         Client::settings.getSettingByName<float>("blurintensity")->value = percent;
 
                         rectY += Constraints::SpacingConstraint(0.35, textWidth);
+
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Chroma Speed").c_str(),
+                                                        textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+
+                        percent = FlarialGUI::Slider(8, rectX + FlarialGUI::SettingsTextWidth("Chroma Speed "),
+                                                           rectY, Client::settings.getSettingByName<float>(
+                                        "rgb_speed")->value, 10);
+
+                        Client::settings.getSettingByName<float>("rgb_speed")->value = percent;
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
                         if (FlarialGUI::Toggle(0, rectX, rectY,
                                                Client::settings.getSettingByName<bool>("killdx")->value)) {
 

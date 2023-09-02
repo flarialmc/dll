@@ -139,6 +139,8 @@ namespace FlarialGUI
     std::vector<D2D1_COLOR_F> inline buttonColors(100, D2D1::ColorF(D2D1::ColorF::Red));
     extern std::unordered_map<int, float> additionalY;
 
+    D2D1_COLOR_F inline rgbColor;
+    float inline rgbHue = 0.0f;
 
     float inline frameFactor = 1;
     bool inline shouldAdditionalY = false;
@@ -208,6 +210,7 @@ namespace FlarialGUI
     void CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to);
 
     bool Toggle(int index, float x, float y, bool isEnabled);
+    bool Toggle(int index, float x, float y, bool isEnabled, bool rgb);
 
     float Slider(int index, float x, float y, float startingPoint = 50.0f, float maxValue = 100.0f, const float minValue = 0.0f,
                  bool zerosafe = true);
@@ -301,4 +304,5 @@ namespace FlarialGUI
 
     float SettingsTextWidth(std::string text);
     D2D1_COLOR_F getGradientColor(D2D1_GRADIENT_STOP gradientStops[10], float position);
+    void RGBController();
 };

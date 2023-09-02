@@ -443,12 +443,83 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled) {
 	if (isInScrollView) y += FlarialGUI::scrollpos;
 	if (CursorInRect(x, y, rectWidth, rectHeight) && MC::mousebutton == MouseButton::Left && !MC::held && (!activeColorPickerWindows || index == 123))
 	{
-        std::cout << "hello" << std::endl;
 		MC::mousebutton = MouseButton::None;
 		return true;
 	}
 
 	return false;
+}
+
+bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb) {
+
+    D2D1_COLOR_F disabledColor = colors_primary3;
+    D2D1_COLOR_F enabledColor = colors_primary1;
+    D2D1_COLOR_F circleColor = colors_primary2;
+
+    disabledColor.a = o_colors_primary3;
+    enabledColor.a = o_colors_primary1;
+    circleColor.a = o_colors_primary2;
+
+    if (shouldAdditionalY) {
+
+        for (int i = 0; i < highestAddIndexes + 1; i++) {
+            if (FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
+                y += additionalY[i];
+            }
+        }
+    }
+
+    const bool isAdditionalY = shouldAdditionalY;
+    float rectWidth = Constraints::RelativeConstraint(0.062, "height", true);
+    float rectHeight = Constraints::RelativeConstraint(0.03, "height", true);
+
+    Vec2<float> round = Constraints::RoundingConstraint(30, 30);
+
+    if (isAdditionalY) UnSetIsInAdditionalYMode();
+
+    if (isEnabled) {
+        toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], enabledColor, 0.10f * FlarialGUI::frameFactor);
+    }
+    else {
+        toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], disabledColor, 0.10f * FlarialGUI::frameFactor);
+    }
+
+    FlarialGUI::RoundedRect(x, y, rgb ? rgbColor : toggleColors[index], rectWidth, rectHeight, round.x, round.x);
+
+    // the circle (I KNOW IM USING A RECT LOL)
+
+    float circleWidth = Constraints::RelativeConstraint(0.0202, "height", true);
+    float circleHeight = Constraints::RelativeConstraint(0.02, "height", true);
+
+
+    float ySpacing = Constraints::SpacingConstraint(0.2, circleHeight);
+    float xSpacing = Constraints::SpacingConstraint(0.2, circleWidth);
+    round = Constraints::RoundingConstraint(23, 23);
+
+    float enabledSpacing;
+
+    if (isEnabled) {
+        FadeEffect::ApplyFadeInEffect(2.4 * FlarialGUI::frameFactor, Constraints::SpacingConstraint(1.6, circleWidth), FlarialGUI::toggleSpacings[index]);
+        enabledSpacing = FlarialGUI::toggleSpacings[index];
+        if (enabledSpacing > Constraints::SpacingConstraint(1.6, circleWidth)) enabledSpacing = Constraints::SpacingConstraint(1.6, circleWidth);
+    }
+    else {
+        FadeEffect::ApplyFadeOutEffect(2.4 * FlarialGUI::frameFactor, FlarialGUI::toggleSpacings[index]);
+        enabledSpacing = FlarialGUI::toggleSpacings[index];
+    }
+
+    FlarialGUI::RoundedRect(x + xSpacing + enabledSpacing, y + ySpacing, circleColor, circleWidth, circleHeight, round.x, round.x);
+
+    if (isAdditionalY) SetIsInAdditionalYMode();
+
+    if (isInScrollView) y += FlarialGUI::scrollpos;
+    if (CursorInRect(x, y, rectWidth, rectHeight) && MC::mousebutton == MouseButton::Left && !MC::held && (!activeColorPickerWindows || index == 123))
+    {
+        MC::mousebutton = MouseButton::None;
+        return true;
+    }
+
+    return false;
 }
 
 D2D_COLOR_F FlarialGUI::LerpColor(D2D_COLOR_F color1, D2D_COLOR_F color2, float t)
@@ -1781,7 +1852,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
 
         x = Constraints::PercentageConstraint(0.04, "left");
 
-        if (Toggle(123, x, y, rgb)) rgb = !rgb;
+        if (Toggle(123, x, y, rgb, true)) rgb = !rgb;
         FlarialTextWithFont(x + Constraints::SpacingConstraint(0.60, Constraints::RelativeConstraint(0.12, "height", true)), y, L"Chroma",
                             Constraints::RelativeConstraint(0.12, "height", true) * 3.0f, Constraints::RelativeConstraint(0.029, "height", true), DWRITE_TEXT_ALIGNMENT_LEADING,
                             Constraints::RelativeConstraint(0.12, "height", true),

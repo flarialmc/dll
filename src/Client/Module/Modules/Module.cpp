@@ -118,10 +118,17 @@ void Module::NormalRender(int index, std::string text, std::string value) {
 
         if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x + textMetrics.left, realcenter.y, realcenter.x + rectWidth + textMetrics.left, realcenter.y + (textHeight) * this->settings.getSettingByName<float>("rectheight")->value), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
 
+        D2D1_COLOR_F borderRGB = FlarialGUI::rgbColor;
+        borderRGB.a = settings.getSettingByName<float>("borderOpacity")->value;
+        D2D1_COLOR_F textRGB = FlarialGUI::rgbColor;
+        textRGB.a = settings.getSettingByName<float>("textOpacity")->value;
+        D2D1_COLOR_F bgRGB = FlarialGUI::rgbColor;
+        bgRGB.a = settings.getSettingByName<float>("bgOpacity")->value;
+
         FlarialGUI::RoundedRect(
                 realcenter.x + textMetrics.left,
                 realcenter.y,
-                bgColor,
+                this->settings.getSettingByName<float>("bgRGB")->value ? bgRGB : bgColor,
                 rectWidth,
                 textHeight * this->settings.getSettingByName<float>("rectheight")->value,
                 rounde.x,
@@ -136,15 +143,15 @@ void Module::NormalRender(int index, std::string text, std::string value) {
                 textHeight,
                 alignment,
                 textSize, DWRITE_FONT_WEIGHT_EXTRA_LIGHT,
-                textColor
-                );
+                this->settings.getSettingByName<float>("textRGB")->value ? FlarialGUI::rgbColor : textColor
+        );
 
         if (this->settings.getSettingByName<bool>("border")->value) {
             FlarialGUI::RoundedHollowRect(
                     realcenter.x + textMetrics.left,
                     realcenter.y,
                     Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
-                    borderColor,
+                    this->settings.getSettingByName<float>("borderRGB")->value ? borderRGB : borderColor,
                     rectWidth,
                     textHeight * this->settings.getSettingByName<float>("rectheight")->value,
                     rounde.x,

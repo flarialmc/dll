@@ -5,6 +5,7 @@
 #include "Modules/Input/GUIKeyListener.hpp"
 #include "Modules/Misc/Uninject/Uninject.hpp"
 #include "Modules/Misc/SaveConfig/SaveConfig.hpp"
+#include "Modules/Misc/RGB/rgb.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/Module.hpp"
 #include "Modules/FPS/FPSCounter.hpp"
@@ -116,6 +117,7 @@ void ModuleManager::initialize()
     EventHandler::registerListener(new UninjectListener("Uninject"));
     EventHandler::registerListener(new SaveConfigListener("SaveConfig"));
     EventHandler::registerListener(new CentreCursorListener("CentreCursor"));
+    EventHandler::registerListener(new rgbListener("RGB Controller"));
 }
 
 void ModuleManager::terminate()

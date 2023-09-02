@@ -262,6 +262,9 @@ void Client::initialize()
     if (Client::settings.getSettingByName<bool>("colors_mod4_rgb") == nullptr)
         Client::settings.addSetting("colors_mod4_rgb", false);
 
+    if (Client::settings.getSettingByName<float>("rgb_speed") == nullptr)
+        Client::settings.addSetting("rgb_speed", 1.0f);
+
     // Create threads to download the files
         std::vector<std::thread> threads;
         for (const auto &data: fileData) {
