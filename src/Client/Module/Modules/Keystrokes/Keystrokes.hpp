@@ -428,14 +428,21 @@ public:
                 float fontSize = Constraints::SpacingConstraint(textSize * 3.0f, keycardSize);
                 float fontSize2 = Constraints::SpacingConstraint(textSize2 * 3.0f, keycardSize);
 
-				D2D1_COLOR_F enabledColor = FlarialGUI::HexToColorF(
-					settings.getSettingByName<std::string>("enabledColor")->value);
-				D2D1_COLOR_F disabledColor = FlarialGUI::HexToColorF(
-					settings.getSettingByName<std::string>("bgColor")->value);
-				D2D1_COLOR_F textColor = FlarialGUI::HexToColorF(
-					settings.getSettingByName<std::string>("textColor")->value);
-				D2D1_COLOR_F textEnabledColor = FlarialGUI::HexToColorF(
-					settings.getSettingByName<std::string>("textEnabledColor")->value);
+				D2D1_COLOR_F enabledColor;
+                if (settings.getSettingByName<bool>("enabledRGB")->value) enabledColor = FlarialGUI::rgbColor;
+                else enabledColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("enabledColor")->value);
+
+				D2D1_COLOR_F disabledColor;
+                if (settings.getSettingByName<bool>("bgRGB")->value) disabledColor = FlarialGUI::rgbColor;
+                else disabledColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
+
+				D2D1_COLOR_F textColor;
+                if (settings.getSettingByName<bool>("textRGB")->value) textColor = FlarialGUI::rgbColor;
+                else textColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textColor")->value);
+
+				D2D1_COLOR_F textEnabledColor;
+                if (settings.getSettingByName<bool>("textEnabledRGB")->value) textEnabledColor = FlarialGUI::rgbColor;
+                else textEnabledColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textEnabledColor")->value);
 
 				disabledColor.a = settings.getSettingByName<float>("bgOpacity")->value;
 				textColor.a = settings.getSettingByName<float>("textOpacity")->value;
@@ -534,9 +541,6 @@ public:
 					textStates[Strokes::LMB] = FlarialGUI::LerpColor(textStates[Strokes::LMB], textColor,
 						0.15f * FlarialGUI::frameFactor);
 				}
-
-
-
 
 				// W
 				if (settings.getSettingByName<bool>("BlurEffect") != nullptr)

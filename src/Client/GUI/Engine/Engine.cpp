@@ -1766,7 +1766,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
         hueSelectorerOutline.a = o_colors_primary2;
 
         float circleX = x + ColorPickers[index].oldHueX;
-        float circleY = y + hexPreviewSize * 2 + Constraints::SpacingConstraint(0.35f, hexPreviewSize);
+        float circleY = y +hexPreviewSize * 2 + Constraints::SpacingConstraint(0.35f, hexPreviewSize);
 
         Circle(circleX, circleY, hueSelectorerOutline, Constraints::SpacingConstraint(0.125f, hexPreviewSize));
         Circle(circleX, circleY, HSVtoColorF(

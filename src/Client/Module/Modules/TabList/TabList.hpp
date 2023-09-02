@@ -51,6 +51,12 @@ public:
             settings.addSetting("borderOpacity", 1.0f);
         }
 
+        if (settings.getSettingByName<bool>("bgRGB") == nullptr) {
+            settings.addSetting("bgRGB", false);
+            settings.addSetting("textRGB", false);
+            settings.addSetting("borderRGB", false);
+        }
+
         if(settings.getSettingByName<float>("uiscale") == nullptr) {
 
             settings.addSetting("uiscale", 0.65f);
@@ -270,12 +276,17 @@ public:
 
                 float fontSize = Constraints::SpacingConstraint(3, keycardSize);
 
-                D2D1_COLOR_F disabledColor = FlarialGUI::HexToColorF(
-                    settings.getSettingByName<std::string>("bgColor")->value);
-                D2D1_COLOR_F textColor = FlarialGUI::HexToColorF(
-                    settings.getSettingByName<std::string>("textColor")->value);
-                D2D1_COLOR_F borderColor = FlarialGUI::HexToColorF(
-                    settings.getSettingByName<std::string>("borderColor")->value);
+                D2D1_COLOR_F disabledColor;
+                if (settings.getSettingByName<bool>("bgRGB")->value) disabledColor = FlarialGUI::rgbColor;
+                else disabledColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
+
+                D2D1_COLOR_F textColor;
+                if (settings.getSettingByName<bool>("textRGB")->value) textColor = FlarialGUI::rgbColor;
+                else textColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textColor")->value);
+
+                D2D1_COLOR_F borderColor;
+                if (settings.getSettingByName<bool>("borderRGB")->value) borderColor = FlarialGUI::rgbColor;
+                else borderColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
 
                 disabledColor.a = settings.getSettingByName<float>("bgOpacity")->value;
                 textColor.a = settings.getSettingByName<float>("textOpacity")->value;
