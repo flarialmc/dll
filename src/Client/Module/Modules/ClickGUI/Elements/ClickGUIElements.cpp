@@ -2,6 +2,9 @@
 #include "../ClickGUIRenderer.hpp"
 #include "ClickGUIElements.hpp"
 
+#define colors_text FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_text")->value)
+#define o_colors_text Client::settings.getSettingByName<float>("o_colors_text")->value
+
 #define colors_primary1 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_primary1")->value)
 #define o_colors_primary1 Client::settings.getSettingByName<float>("o_colors_primary1")->value
 
@@ -237,9 +240,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
             D2D1_COLOR_F mod2Col = colors_mod2;
             mod2Col.a = o_colors_mod2;
 
-            FlarialGUI::RoundedRect(x, y, D2D1::ColorF(47.0f / 255.0f, 32.0f / 255.0f, 34.0f / 255.0f),
-                                    BottomRoundedWidth, BottomRoundedHeight, round.x, round.x);
-
+            FlarialGUI::RoundedRect(x, y, mod2Col, BottomRoundedWidth, BottomRoundedHeight, round.x, round.x);
 
             // Top rounded rect
 
@@ -298,8 +299,11 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 
             round = Constraints::RoundingConstraint(26, 26);
 
+            D2D1_COLOR_F textCol = colors_text;
+            textCol.a = o_colors_text;
+
             if (FlarialGUI::RoundedButton(index, buttonx - buttonWidth, buttony - buttonHeight,
-                                          FlarialGUI::buttonColors[index], D2D1::ColorF(D2D1::ColorF::White),
+                                          FlarialGUI::buttonColors[index], textCol,
                                           FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, round.x,
                                           round.x))
                 mod->settings.getSettingByName<bool>("enabled")->value = !mod->settings.getSettingByName<bool>("enabled")->value;

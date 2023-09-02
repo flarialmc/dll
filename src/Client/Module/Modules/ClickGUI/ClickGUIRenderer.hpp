@@ -19,6 +19,9 @@
 #include "../../../../SDK/SDK.hpp"
 #include "../../../Hook/Hooks/Render/ResizeHook.hpp"
 
+#define colors_text FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_text")->value)
+#define o_colors_text Client::settings.getSettingByName<float>("o_colors_text")->value
+
 #define colors_secondary1 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary1")->value)
 #define o_colors_secondary1 Client::settings.getSettingByName<float>("o_colors_secondary1")->value
 
@@ -30,6 +33,9 @@
 
 #define colors_secondary5 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary5")->value)
 #define o_colors_secondary5 Client::settings.getSettingByName<float>("o_colors_secondary5")->value
+
+#define colors_secondary6 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary6")->value)
+#define o_colors_secondary6 Client::settings.getSettingByName<float>("o_colors_secondary6")->value
 
 struct PageType {
     std::string type = "normal";
@@ -165,9 +171,14 @@ public:
 
                 round = Constraints::RoundingConstraint(30, 30);
 
-                if (!FlarialGUI::activeColorPickerWindows && FlarialGUI::RoundedRadioButton(1, radioX, radioY,
-                                                   D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
-                                                   D2D1::ColorF(D2D1::ColorF::White), L"Modules", RadioButtonWidth,
+                D2D1_COLOR_F modTextCol = colors_text;
+                modTextCol.a = o_colors_text;
+
+                D2D1_COLOR_F mod6Col = colors_secondary6;
+                mod6Col.a = o_colors_secondary6;
+
+                if (!FlarialGUI::activeColorPickerWindows && FlarialGUI::RoundedRadioButton(1, radioX, radioY, mod6Col,
+                                                   modTextCol, L"Modules", RadioButtonWidth,
                                                    RadioButtonHeight, round.x, round.x, "modules", curr)) {
                     this->curr = "modules";
                     ClickGUIRenderer::page.type = "normal";
@@ -210,8 +221,8 @@ public:
                 round = Constraints::RoundingConstraint(30, 30);
                 radioX += Constraints::SpacingConstraint(13.f, logoWidth);
                 if (!FlarialGUI::activeColorPickerWindows && FlarialGUI::RoundedRadioButton(0, radioX, radioY,
-                                                   D2D1::ColorF(255.0f / 255.0f, 36.0f / 255.0f, 56.0f / 255.0f),
-                                                   D2D1::ColorF(D2D1::ColorF::White), L"Settings", RadioButtonWidth,
+                                                   mod6Col,
+                                                   modTextCol, L"Settings", RadioButtonWidth,
                                                    RadioButtonHeight, round.x, round.x, "settings", this->curr)) {
                     FlarialGUI::TextBoxes[0].isActive = false;
                     this->curr = "settings";
