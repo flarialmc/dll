@@ -57,6 +57,10 @@ class ClickGUIRenderer : public Listener {
 public:
 	static inline bool editmenu = false;
 
+	std::pair<float, float> centerChildRectangle(float parentWidth, float parentHeight, float childWidth, float childHeight) {
+		return std::make_pair((parentWidth - childWidth) / 2, (parentHeight - childHeight) / 2);
+	}
+
 	void onRender(RenderEvent& event) override {
 
 		float allahu = Constraints::RelativeConstraint(0.65);
@@ -626,6 +630,9 @@ public:
 				D2D1_COLOR_F bruv = colors_secondary1_rgb ? FlarialGUI::rgbColor : colors_secondary1;
 				bruv.a = o_colors_secondary1;
 
+				D2D1_COLOR_F textCol = colors_text_rgb ? FlarialGUI::rgbColor : colors_text;
+				textCol.a = o_colors_text;
+
 				round = Constraints::RoundingConstraint(45, 45);
 				FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth),
 					rectY + Constraints::SpacingConstraint(0.01, rectWidth),
@@ -648,6 +655,32 @@ public:
 
 				FlarialGUI::PopSize();
 
+				float childHeight = Constraints::SpacingConstraint(0.5, rectHeight);
+				float childWidth = Constraints::SpacingConstraint(0.45, rectWidth);
+				std::pair<float, float> centered = centerChildRectangle(rectWidth, rectHeight, childWidth, childHeight);
+
+				round = Constraints::RoundingConstraint(25, 25);
+
+				FlarialGUI::RoundedRect(centered.first + rectX, rectHeight + rectY + centered.second + Constraints::RelativeConstraint(0.035), bruv, childWidth, childHeight, round.x, round.x);
+				FlarialGUI::RoundedHollowRect(centered.first + rectX, rectHeight + rectY + centered.second + Constraints::RelativeConstraint(0.035), Constraints::RelativeConstraint(0.01, "height", true), colorThing, childWidth, childHeight, round.x, round.x);
+
+				float buttonWidth = Constraints::RelativeConstraint(0.19f, "width");
+				float buttonHeight = Constraints::RelativeConstraint(0.1f, "height");
+				float spacingX = Constraints::RelativeConstraint(0.03);
+
+				std::pair<float, float> thingYes = centerChildRectangle(childWidth, childHeight, buttonWidth, buttonHeight);
+
+				if (FlarialGUI::RoundedButton(0, spacingX + centered.first + rectX, thingYes.second + rectHeight + rectY + centered.second + Constraints::RelativeConstraint(0.035), colorThing, textCol, L"Reset", buttonWidth, buttonHeight, round.x, round.x)) {
+					ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.reset();
+					ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("enabled", false);
+					ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("keybind", (std::string)"");
+					ModuleManager::getModule(ClickGUIRenderer::page.module)->DefaultConfig();
+				}
+
+
+				if (FlarialGUI::RoundedButton(1, -spacingX + centered.first + rectX + childWidth - buttonWidth, thingYes.second + rectHeight + rectY + centered.second + Constraints::RelativeConstraint(0.035), colorThing, textCol, L"Copy From", buttonWidth, buttonHeight, round.x, round.x)) {
+
+				}
 			}
 
 			FlarialGUI::PopSize(); // Pops base rect
