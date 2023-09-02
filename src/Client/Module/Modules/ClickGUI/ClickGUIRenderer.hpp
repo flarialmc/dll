@@ -674,9 +674,10 @@ public:
 
 				if (FlarialGUI::RoundedButton(0, spacingX + centered.first + rectX, thingYes.second + rectHeight + rectY + centered.second + Constraints::RelativeConstraint(0.035), colorThing, textCol, L"Reset", buttonWidth, buttonHeight, round.x, round.x)) {
 					ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.reset();
+                    FlarialGUI::ResetShit();
 					ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("enabled", false);
 					ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("keybind", (std::string)"");
-					ModuleManager::getModule(ClickGUIRenderer::page.module)->DefaultConfig();
+					ModuleManager::getModule(ClickGUIRenderer::page.module)->onEnable();
 				}
 
 

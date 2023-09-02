@@ -101,7 +101,6 @@ public:
 
    virtual void onEnable() {
 
-
        DefaultConfig();
 
 }
