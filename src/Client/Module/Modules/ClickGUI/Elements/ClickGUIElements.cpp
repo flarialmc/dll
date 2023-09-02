@@ -4,30 +4,39 @@
 
 #define colors_text FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_text")->value)
 #define o_colors_text Client::settings.getSettingByName<float>("o_colors_text")->value
+#define colors_text_rgb Client::settings.getSettingByName<bool>("colors_text_rgb")->value
 
 #define colors_primary1 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_primary1")->value)
 #define o_colors_primary1 Client::settings.getSettingByName<float>("o_colors_primary1")->value
+#define colors_primary1_rgb Client::settings.getSettingByName<bool>("colors_primary1_rgb")->value
 
 #define colors_secondary4 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary4")->value)
 #define o_colors_secondary4 Client::settings.getSettingByName<float>("o_colors_secondary4")->value
+#define colors_secondary4_rgb Client::settings.getSettingByName<bool>("colors_secondary4_rgb")->value
 
 #define colors_enabled FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_enabled")->value)
 #define o_colors_enabled Client::settings.getSettingByName<float>("o_colors_enabled")->value
+#define colors_enabled_rgb Client::settings.getSettingByName<bool>("colors_enabled_rgb")->value
 
 #define colors_disabled FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_disabled")->value)
 #define o_colors_disabled Client::settings.getSettingByName<float>("o_colors_disabled")->value
+#define colors_disabled_rgb Client::settings.getSettingByName<bool>("colors_disabled_rgb")->value
 
 #define colors_mod1 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_mod1")->value)
 #define o_colors_mod1 Client::settings.getSettingByName<float>("o_colors_mod1")->value
+#define colors_mod1_rgb Client::settings.getSettingByName<bool>("colors_mod1_rgb")->value
 
 #define colors_mod2 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_mod2")->value)
 #define o_colors_mod2 Client::settings.getSettingByName<float>("o_colors_mod2")->value
+#define colors_mod2_rgb Client::settings.getSettingByName<bool>("colors_mod2_rgb")->value
 
 #define colors_mod3 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_mod3")->value)
 #define o_colors_mod3 Client::settings.getSettingByName<float>("o_colors_mod3")->value
+#define colors_mod3_rgb Client::settings.getSettingByName<bool>("colors_mod3_rgb")->value
 
 #define colors_mod4 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_mod4")->value)
 #define o_colors_mod4 Client::settings.getSettingByName<float>("o_colors_mod4")->value
+#define colors_mod4_rgb Client::settings.getSettingByName<bool>("colors_mod4_rgb")->value
 
 std::map<std::string, ID2D1Bitmap*> ClickGUIElements::images;
 std::vector<D2D1_MATRIX_3X2_F> ClickGUIElements::matrixes;
@@ -89,10 +98,10 @@ std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit,
                 FlarialGUI::lerp(searchCutOutHeights[index], -0.5f, 0.12f * FlarialGUI::frameFactor);
             }
 
-            col = colors_primary1;
+            col = colors_primary1_rgb ? FlarialGUI::rgbColor : colors_primary1;
             col.a = o_colors_primary1;
 
-            D2D1_COLOR_F searchbg = colors_secondary4;
+            D2D1_COLOR_F searchbg = colors_secondary4_rgb ? FlarialGUI::rgbColor : colors_secondary4;
             searchbg.a = o_colors_secondary4;
 
             FlarialGUI::RoundedRect(x - textWidth, y, searchbg, textWidth, percHeight, round.x,
@@ -221,7 +230,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
             }
 
             
-            if(shadowSizes[index].x > Constraints::RelativeConstraint(0.19f, "height")) {
+            if(shadowSizes[index].x > 0/*Constraints::RelativeConstraint(0.19f, "height")*/) {
 
                 float diffX2 = (shadowSizes[index].x - BottomRoundedWidth) / 2.0f;
                 float diffY2 = (shadowSizes[index].y - BottomRoundedHeight) / 2.0f;
@@ -234,10 +243,10 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
             x -= diffX;
             y -= diffY;
 
-            D2D1_COLOR_F mod1Col = colors_mod1;
+            D2D1_COLOR_F mod1Col = colors_mod1_rgb ? FlarialGUI::rgbColor : colors_mod1;
             mod1Col.a = o_colors_mod1;
 
-            D2D1_COLOR_F mod2Col = colors_mod2;
+            D2D1_COLOR_F mod2Col = colors_mod2_rgb ? FlarialGUI::rgbColor : colors_mod2;
             mod2Col.a = o_colors_mod2;
 
             FlarialGUI::RoundedRect(x, y, mod2Col, BottomRoundedWidth, BottomRoundedHeight, round.x, round.x);
@@ -263,7 +272,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 
             // Mod icon
 
-            D2D1_COLOR_F mod3Col = colors_mod3;
+            D2D1_COLOR_F mod3Col = colors_mod3_rgb ? FlarialGUI::rgbColor : colors_mod3;
             mod3Col.a = o_colors_mod3;
 
             float modiconx = Constraints::PercentageConstraint(0.40, "left");
@@ -281,8 +290,8 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 
             std::string text;
             text = mod->settings.getSettingByName<bool>("enabled")->value ? "Enabled" : "Disabled";
-            D2D1_COLOR_F enabledColor = colors_enabled;
-            D2D1_COLOR_F disabledColor = colors_disabled;
+            D2D1_COLOR_F enabledColor = colors_enabled_rgb ? FlarialGUI::rgbColor : colors_enabled;
+            D2D1_COLOR_F disabledColor = colors_disabled_rgb ? FlarialGUI::rgbColor : colors_disabled;
 
             enabledColor.a = o_colors_enabled;
             disabledColor.a = o_colors_disabled;
@@ -299,7 +308,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 
             round = Constraints::RoundingConstraint(26, 26);
 
-            D2D1_COLOR_F textCol = colors_text;
+            D2D1_COLOR_F textCol = colors_text_rgb ? FlarialGUI::rgbColor : colors_text;
             textCol.a = o_colors_text;
 
             if (FlarialGUI::RoundedButton(index, buttonx - buttonWidth, buttony - buttonHeight,
@@ -326,7 +335,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
                                     mod3Col, paddingwidth,
                                     paddingwidth, round.x, round.x);
 
-            D2D1_COLOR_F mod4Col = colors_mod4;
+            D2D1_COLOR_F mod4Col = colors_mod4_rgb ? FlarialGUI::rgbColor : colors_mod4;
             mod4Col.a = o_colors_mod4;
 
             if(!Client::settings.getSettingByName<bool>("noicons")->value)
