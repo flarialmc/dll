@@ -135,7 +135,9 @@ void Module::NormalRender(int index, std::string text, std::string value) {
                 rectWidth,
                 textHeight,
                 alignment,
-                textSize, DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                textSize, DWRITE_FONT_WEIGHT_EXTRA_LIGHT,
+                textColor
+                );
 
         if (this->settings.getSettingByName<bool>("border")->value) {
             FlarialGUI::RoundedHollowRect(

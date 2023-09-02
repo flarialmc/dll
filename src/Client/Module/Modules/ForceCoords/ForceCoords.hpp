@@ -72,7 +72,7 @@ public:
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
 
 
-		percent = FlarialGUI::Slider(1, toggleX + FlarialGUI::SettingsTextWidth("Border "),
+		percent = FlarialGUI::Slider(1, toggleX + FlarialGUI::SettingsTextWidth("Border ") + Constraints::SpacingConstraint(0.60, textWidth),
                                      toggleY, this->settings.getSettingByName<float>("borderWidth")->value, 4);
 
 		this->settings.getSettingByName<float>("borderWidth")->value = percent;

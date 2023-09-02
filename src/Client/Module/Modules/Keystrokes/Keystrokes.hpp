@@ -547,7 +547,7 @@ public:
 					rounde.x);
                 FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
                                                         settings.getSettingByName<std::string>("wText")->value).c_str(), keycardSize, keycardSize,
-                                                DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                                DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_EXTRA_LIGHT, textStates[Strokes::W]);
 
 				// S
 
@@ -562,7 +562,7 @@ public:
 
                 FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
                                                         settings.getSettingByName<std::string>("sText")->value).c_str(), keycardSize, keycardSize,
-                                                DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                                DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_EXTRA_LIGHT, textStates[Strokes::S]);
 				// A
 				realcenter.x -= (keycardSize + spacing);
 
@@ -573,7 +573,7 @@ public:
 					rounde.x);
                 FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
                                                         settings.getSettingByName<std::string>("aText")->value).c_str(), keycardSize, keycardSize,
-                                                DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                                DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_EXTRA_LIGHT, textStates[Strokes::A]);
 
 				// D
 				realcenter.x += 2 * (keycardSize + spacing);
@@ -586,7 +586,7 @@ public:
 					rounde.x);
                 FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
                                                         settings.getSettingByName<std::string>("dText")->value).c_str(), keycardSize, keycardSize,
-                                                DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                                DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_EXTRA_LIGHT, textStates[Strokes::D]);
 
 				// SPACEBAR
 				float spacebarWidth = 3 * (keycardSize)+2 * spacing;
@@ -615,7 +615,7 @@ public:
                                                                                        (keycardSize * 0.05)),
                                                         DWRITE_TEXT_ALIGNMENT_CENTER,
                                                         fontSize2 + Constraints::SpacingConstraint(0.48, keycardSize),
-                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT, textStates[Strokes::LMB]);
                         if (!hideCPS)
                             FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y +
                                                                           Constraints::SpacingConstraint(0.55,
@@ -632,7 +632,7 @@ public:
                                                                                           Constraints::SpacingConstraint(
                                                                                                   -0.96f,
                                                                                                   keycardSize),
-                                                            DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                                            DWRITE_FONT_WEIGHT_EXTRA_LIGHT, textStates[Strokes::LMB]);
                     } else
                         FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
                                                                 std::to_string(CPSListener::GetLeftCPS())).c_str(),
@@ -641,7 +641,7 @@ public:
                                                         DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 +
                                                                                       Constraints::SpacingConstraint(
                                                                                               0.48, keycardSize),
-                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT, textStates[Strokes::LMB]);
 
 					// RMB
 					realcenter.x += 1.5f * (keycardSize + spacing);
@@ -659,7 +659,7 @@ public:
                                                                                        (keycardSize * 0.05)),
                                                         DWRITE_TEXT_ALIGNMENT_CENTER,
                                                         fontSize2 + Constraints::SpacingConstraint(0.48, keycardSize),
-                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT, textStates[Strokes::RMB]);
                         if (!hideCPS)
                             FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y +
                                                                           Constraints::SpacingConstraint(0.55,
@@ -676,7 +676,7 @@ public:
                                                                                           Constraints::SpacingConstraint(
                                                                                                   -0.96f,
                                                                                                   keycardSize),
-                                                            DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                                            DWRITE_FONT_WEIGHT_EXTRA_LIGHT, textStates[Strokes::RMB]);
                     } else
                         FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
                                                                 std::to_string(CPSListener::GetRightCPS())).c_str(),
@@ -685,7 +685,7 @@ public:
                                                         DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 +
                                                                                       Constraints::SpacingConstraint(
                                                                                               0.48, keycardSize),
-                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT, textStates[Strokes::RMB]);
                     realcenter.y += keycardSize - keycardSize * 0.05 + spacing;
 					realcenter.x -= 1.5f * (keycardSize + spacing);
 				}
@@ -694,8 +694,6 @@ public:
 					if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + spacebarWidth, realcenter.y + spacebarHeight), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
 				FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::SPACEBAR], spacebarWidth,
 					spacebarHeight, rounde.x, rounde.x);
-//				FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, L"-------", textStates[Strokes::SPACEBAR], spacebarWidth,
-//					spacebarHeight, DWRITE_TEXT_ALIGNMENT_CENTER, fontSize);
                 float childHeight = Constraints::SpacingConstraint(this->settings.getSettingByName<float>("spacebarHeight")->value, spacebarHeight);
                 float childWidth = Constraints::SpacingConstraint(this->settings.getSettingByName<float>("spacebarWidth")->value, spacebarWidth);
                 std::pair<float, float> centeredChild = centerChildRectangle(spacebarWidth, spacebarHeight, childWidth, childHeight);
