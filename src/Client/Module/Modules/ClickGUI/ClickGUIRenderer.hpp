@@ -81,7 +81,7 @@ public:
 
             if(realBlurAmount > 0.01) FlarialGUI::AllahBlur(realBlurAmount);
 
-            if (SwapchainHook::init && baseHeightActual > 0.1) {
+            if (SwapchainHook::init && baseHeightActual > 0.01) {
 
 
 

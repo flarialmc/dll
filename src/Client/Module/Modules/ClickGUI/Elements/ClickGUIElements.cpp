@@ -218,7 +218,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
             }
 
             
-            if(shadowSizes[index].x > Constraints::RelativeConstraint(0.19f, "height")) {
+            if(shadowSizes[index].x > Constraints::RelativeConstraint(0.255f, "height")) {
 
                 float diffX2 = (shadowSizes[index].x - BottomRoundedWidth) / 2.0f;
                 float diffY2 = (shadowSizes[index].y - BottomRoundedHeight) / 2.0f;
