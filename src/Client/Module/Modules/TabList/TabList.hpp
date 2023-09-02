@@ -328,7 +328,7 @@ public:
                                                                 Utils::removeColorCodes(name))).c_str(),
                                                         keycardSize * 5, keycardSize,
                                                         DWRITE_TEXT_ALIGNMENT_LEADING, fontSize,
-                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT, textColor);
 
                         realcenter.y += Constraints::SpacingConstraint(0.70, keycardSize);
 
@@ -360,7 +360,7 @@ public:
                                                                 Utils::removeColorCodes(name))).c_str(),
                                                         keycardSize * 5, keycardSize,
                                                         DWRITE_TEXT_ALIGNMENT_LEADING, fontSize,
-                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT, textColor);
 
                         realcenter.y += Constraints::SpacingConstraint(0.70, keycardSize);
 
