@@ -234,6 +234,13 @@ void Client::initialize()
     if (Client::settings.getSettingByName<bool>("colors_secondary5_rgb") == nullptr)
         Client::settings.addSetting("colors_secondary5_rgb", false);
 
+    if (Client::settings.getSettingByName<std::string>("colors_secondary6") == nullptr)
+        Client::settings.addSetting("colors_secondary6", (std::string)"ff2438");
+    if (Client::settings.getSettingByName<float>("o_colors_secondary6") == nullptr)
+        Client::settings.addSetting("o_colors_secondary6", 1.0f);
+    if (Client::settings.getSettingByName<bool>("colors_secondary6_rgb") == nullptr)
+        Client::settings.addSetting("colors_secondary6_rgb", false);
+
     if (Client::settings.getSettingByName<std::string>("colors_mod1") == nullptr)
         Client::settings.addSetting("colors_mod1", (std::string)"201a1b");
     if (Client::settings.getSettingByName<float>("o_colors_mod1") == nullptr)

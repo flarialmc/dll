@@ -55,7 +55,7 @@ public:
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.0f);
 
 		if (settings.getSettingByName<std::string>("texttest") == nullptr)  settings.addSetting("texttest", (std::string)"Test");
-        if (settings.getSettingByName<std::string>("textalignment") == nullptr) settings.addSetting("textalignment", (std::string)"Center");
+        if (settings.getSettingByName<std::string>("textalignment") == nullptr) settings.addSetting("textalignment", (std::string)"Left");
 		if (settings.getSettingByName<std::string>("texttest2") == nullptr) settings.addSetting("texttest2", (std::string)"Test");
 
 		EventHandler::registerListener(new IPDisplayListener("IPDisplay", this));

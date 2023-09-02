@@ -65,6 +65,7 @@ struct ColorPicker
     bool isActive = false;
     float cursorOpac = 1.0f;
     float hueX = 0.0f;
+    float oldHueX = 0.0f;
     bool movingHueX = false;
     float opacX = 0.0f;
     bool movingOpacX = false;

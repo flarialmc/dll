@@ -1765,12 +1765,12 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
         D2D1_COLOR_F hueSelectorerOutline = colors_primary2;
         hueSelectorerOutline.a = o_colors_primary2;
 
-        float circleX = x + ColorPickers[index].hueX;
-        float circleY = y + hexPreviewSize * 2 + Constraints::SpacingConstraint(0.35f, hexPreviewSize);
+        float circleX = x + ColorPickers[index].oldHueX;
+        float circleY = y +hexPreviewSize * 2 + Constraints::SpacingConstraint(0.35f, hexPreviewSize);
 
         Circle(circleX, circleY, hueSelectorerOutline, Constraints::SpacingConstraint(0.125f, hexPreviewSize));
         Circle(circleX, circleY, HSVtoColorF(
-                (ColorPickers[index].hueX / hlwidth) * 360,
+                (ColorPickers[index].oldHueX / hlwidth) * 360,
                 1.0f,
                 1.0f
         ), Constraints::SpacingConstraint(0.08f, hexPreviewSize));
@@ -1785,9 +1785,12 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
                         Constraints::SpacingConstraint(0.1f, hexPreviewSize)))) &&
                 !ColorPickers[index].movingOpacX && !ColorPickers[index].movingShade
         ) {
-            ColorPickers[index].hueX = MC::mousepos.x > (x + hlwidth) ? hlwidth : (MC::mousepos.x < x ? 0.0f : MC::mousepos.x - x);
+            ColorPickers[index].oldHueX = MC::mousepos.x > (x + hlwidth) ? hlwidth : (MC::mousepos.x < x ? 0.0f : MC::mousepos.x - x);
             ColorPickers[index].movingHueX = true;
-        } else ColorPickers[index].movingHueX = false;
+        } else {
+            ColorPickers[index].movingHueX = false;
+            ColorPickers[index].hueX = ColorPickers[index].oldHueX;
+        }
 
         y += gap2L;
         circleY += gap2L;
@@ -1828,7 +1831,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
                 (ColorPickers[index].hueX / hlwidth) * 360,
                 ColorPickers[index].shade.x / shadePickerWidth,
                 1.0f - ColorPickers[index].shade.y / shadePickerHeight
-        );
+                );
 
         hex = ColorFToHex(newColorLol);
         opacity = ColorPickers[index].opacX / hlwidth;

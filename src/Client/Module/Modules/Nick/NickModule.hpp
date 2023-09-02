@@ -45,14 +45,15 @@ public:
         std::string val = NickListener::original;
         std::string val2;
 
-        if(NickListener::original2 != *SDK::clientInstance->getLocalPlayer()->getNametag()) { NickListener::original2 = *SDK::clientInstance->getLocalPlayer()->getNametag(); NickListener::backupOri = *SDK::clientInstance->getLocalPlayer()->getNametag(); }
-        if(NickListener::original2 == this->settings.getSettingByName<std::string>("nick")->value) NickListener::original2 = NickListener::backupOri;
-        val2 = NickListener::original2;
+        if (SDK::clientInstance) if (SDK::clientInstance->getLocalPlayer() != NULL) {
+            if (NickListener::original2 != *SDK::clientInstance->getLocalPlayer()->getNametag()) { NickListener::original2 = *SDK::clientInstance->getLocalPlayer()->getNametag(); NickListener::backupOri = *SDK::clientInstance->getLocalPlayer()->getNametag(); }
+            if (NickListener::original2 == this->settings.getSettingByName<std::string>("nick")->value) NickListener::original2 = NickListener::backupOri;
+            
+            val2 = NickListener::original2;
 
-        //std::cout << original2 << std::endl;
-
-        SDK::clientInstance->getLocalPlayer()->setNametag(&val2);
-        SDK::clientInstance->getLocalPlayer()->playerName =  val;
+            SDK::clientInstance->getLocalPlayer()->setNametag(&val2);
+            SDK::clientInstance->getLocalPlayer()->playerName = val;
+        }
     }
 
     void SettingsRender() override {

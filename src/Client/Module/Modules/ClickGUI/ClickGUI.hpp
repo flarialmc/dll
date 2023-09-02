@@ -154,6 +154,13 @@ public:
         FlarialGUI::ColorPicker(21, rectX + FlarialGUI::SettingsTextWidth("Secondary 5 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_secondary5")->value, Client::settings.getSettingByName<float>("o_colors_secondary5")->value, Client::settings.getSettingByName<bool>("colors_secondary5_rgb")->value);
 
         rectY += Constraints::SpacingConstraint(0.35, textWidth);
+        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Secondary 6").c_str(),
+                                        textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+        FlarialGUI::ColorPicker(26, rectX + FlarialGUI::SettingsTextWidth("Secondary 6 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), Client::settings.getSettingByName<std::string>("colors_secondary6")->value, Client::settings.getSettingByName<float>("o_colors_secondary6")->value, Client::settings.getSettingByName<bool>("colors_secondary6_rgb")->value);
+
+        rectY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("ModCard 1").c_str(),
                                         textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
@@ -198,6 +205,7 @@ public:
         FlarialGUI::ColorPickerWindow(19, Client::settings.getSettingByName<std::string>("colors_secondary3")->value, Client::settings.getSettingByName<float>("o_colors_secondary3")->value, Client::settings.getSettingByName<bool>("colors_secondary3_rgb")->value);
         FlarialGUI::ColorPickerWindow(20, Client::settings.getSettingByName<std::string>("colors_secondary4")->value, Client::settings.getSettingByName<float>("o_colors_secondary4")->value, Client::settings.getSettingByName<bool>("colors_secondary4_rgb")->value);
         FlarialGUI::ColorPickerWindow(21, Client::settings.getSettingByName<std::string>("colors_secondary5")->value, Client::settings.getSettingByName<float>("o_colors_secondary5")->value, Client::settings.getSettingByName<bool>("colors_secondary5_rgb")->value);
+        FlarialGUI::ColorPickerWindow(26, Client::settings.getSettingByName<std::string>("colors_secondary6")->value, Client::settings.getSettingByName<float>("o_colors_secondary6")->value, Client::settings.getSettingByName<bool>("colors_secondary6_rgb")->value);
         FlarialGUI::ColorPickerWindow(22, Client::settings.getSettingByName<std::string>("colors_mod1")->value, Client::settings.getSettingByName<float>("o_colors_mod1")->value, Client::settings.getSettingByName<bool>("colors_mod1_rgb")->value);
         FlarialGUI::ColorPickerWindow(23, Client::settings.getSettingByName<std::string>("colors_mod2")->value, Client::settings.getSettingByName<float>("o_colors_mod2")->value, Client::settings.getSettingByName<bool>("colors_mod2_rgb")->value);
         FlarialGUI::ColorPickerWindow(24, Client::settings.getSettingByName<std::string>("colors_mod3")->value, Client::settings.getSettingByName<float>("o_colors_mod3")->value, Client::settings.getSettingByName<bool>("colors_mod3_rgb")->value);
