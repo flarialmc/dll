@@ -169,6 +169,9 @@ namespace FlarialGUI
     inline ID2D1Effect* blur = nullptr;
     extern std::unordered_map<std::string, ID2D1SolidColorBrush*> brushCache;
     extern std::unordered_map<std::string, IDWriteTextFormat*> textFormatCache;
+    extern std::unordered_map<std::string, ID2D1GradientStopCollection*> gradientStopCache;
+    extern std::unordered_map<std::string, ID2D1LinearGradientBrush*> gradientBrushCache;
+
 
 
 
@@ -305,4 +308,7 @@ namespace FlarialGUI
     float SettingsTextWidth(std::string text);
     D2D1_COLOR_F getGradientColor(D2D1_GRADIENT_STOP gradientStops[10], float position);
     void RGBController();
+
+    ID2D1LinearGradientBrush *getLinearGradientBrush(float x, float hexPreviewSize, float shadePickerWidth,
+                                                     ID2D1GradientStopCollection *pGradientStops, std::string susKey);
 };

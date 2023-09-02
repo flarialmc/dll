@@ -30,6 +30,9 @@ std::unordered_map<std::string, ID2D1SolidColorBrush*> FlarialGUI::brushCache;
 std::unordered_map<std::string, ID2D1Image*> FlarialGUI::cachedBitmaps;
 std::unordered_map<std::string, IDWriteTextFormat*> FlarialGUI::textFormatCache;
 std::unordered_map<int, float> FlarialGUI::additionalY;
+std::unordered_map<std::string, ID2D1GradientStopCollection*> FlarialGUI::gradientStopCache;
+std::unordered_map<std::string, ID2D1LinearGradientBrush*> FlarialGUI::gradientBrushCache;
+
 
 
 float maxDarkenAmount = 0.1;
@@ -1722,6 +1725,11 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
         while (y <= originalY + shadePickerHeight) {
             memset(gradientStops, 0, sizeof(gradientStops));
 
+            std::string firstHSV = std::to_string((ColorPickers[index].hueX / hlwidth)) + std::to_string(1.0f - ((y - originalY) / shadePickerHeight));
+            std::string secondHSV = std::to_string((ColorPickers[index].hueX / hlwidth)) + std::to_string(1.0f - ((y - originalY) / shadePickerHeight)) + std::to_string(1.0f);
+
+            std::string totalKey = firstHSV + secondHSV;
+
             gradientStops[0].color = HSVtoColorF((ColorPickers[index].hueX / hlwidth) * 360, 0.0f, 1.0f - ((y - originalY) / shadePickerHeight));
             gradientStops[0].position = 0.0f;
             gradientStops[1].color = HSVtoColorF((ColorPickers[index].hueX / hlwidth) * 360, 1.0f, 1.0f - ((y - originalY) / shadePickerHeight));
@@ -1735,15 +1743,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
                     &pGradientStops
             );
 
-            D2D::context->CreateLinearGradientBrush(
-                    D2D1::LinearGradientBrushProperties(
-                            D2D1::Point2F(x + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize), 0),
-                            D2D1::Point2F(x + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize) + shadePickerWidth, 0)
-                    ),
-                    D2D1::BrushProperties(),
-                    pGradientStops,
-                    &gBrush
-            );
+            gBrush = getLinearGradientBrush(x, hexPreviewSize, shadePickerWidth, pGradientStops, totalKey);
 
             D2D::context->FillRectangle(
                  D2D1::RectF(
@@ -1755,7 +1755,6 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
                  gBrush
             );
 
-            gBrush->Release();
             pGradientStops->Release();
 
             y++;
@@ -2873,6 +2872,33 @@ IDWriteTextFormat* FlarialGUI::getTextFormat(const std::string& fontFamily, FLOA
 
 		return textFormat;
 	}
+}
+
+ID2D1LinearGradientBrush* FlarialGUI::getLinearGradientBrush(float x, float hexPreviewSize, float shadePickerWidth, ID2D1GradientStopCollection* pGradientStops, std::string susKey) {
+    // Include gradient stop colors in the cache key
+    std::string key = std::to_string(x) + std::to_string(hexPreviewSize) + std::to_string(shadePickerWidth) + susKey;
+
+
+    auto it = gradientBrushCache.find(key);
+    if (it != gradientBrushCache.end()) {
+        return it->second;
+    }
+    else {
+        ID2D1LinearGradientBrush* gBrush;
+
+        D2D::context->CreateLinearGradientBrush(
+                D2D1::LinearGradientBrushProperties(
+                        D2D1::Point2F(x + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize), 0),
+                        D2D1::Point2F(x + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize) + shadePickerWidth, 0)
+                ),
+                D2D1::BrushProperties(),
+                pGradientStops,
+                &gBrush
+        );
+
+        gradientBrushCache[key] = gBrush;
+        return gBrush;
+    }
 }
 
 void FlarialGUI::SetIsInAdditionalYMode()
