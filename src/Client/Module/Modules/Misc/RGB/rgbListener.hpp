@@ -10,7 +10,7 @@ public:
     void onLocalTick(TickEvent& event) override {
         if (FlarialGUI::rgbHue > 359 - Client::settings.getSettingByName<float>("rgb_speed")->value) FlarialGUI::rgbHue = 0;
         else FlarialGUI::rgbHue += Client::settings.getSettingByName<float>("rgb_speed")->value;
-        FlarialGUI::rgbColor = FlarialGUI::HSVtoColorF(FlarialGUI::rgbHue, 1.0f, 1.0f);
+        FlarialGUI::rgbColor = FlarialGUI::HSVtoColorF(FlarialGUI::rgbHue, Client::settings.getSettingByName<float>("rgb_saturation")->value, Client::settings.getSettingByName<float>("rgb_value")->value);
     }
 
 public:

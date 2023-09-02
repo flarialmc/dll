@@ -410,6 +410,32 @@ public:
                         Client::settings.getSettingByName<float>("rgb_speed")->value = percent;
 
                         rectY += Constraints::SpacingConstraint(0.35, textWidth);
+
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Chroma Saturation").c_str(),
+                                                        textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+
+                        percent = FlarialGUI::Slider(9, rectX + FlarialGUI::SettingsTextWidth("Chroma Saturation "),
+                                                     rectY, Client::settings.getSettingByName<float>(
+                                        "rgb_saturation")->value, 1);
+
+                        Client::settings.getSettingByName<float>("rgb_saturation")->value = percent;
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+
+                        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Chroma Value").c_str(),
+                                                        textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(1.05, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+
+                        percent = FlarialGUI::Slider(10, rectX + FlarialGUI::SettingsTextWidth("Chroma Value "),
+                                                     rectY, Client::settings.getSettingByName<float>(
+                                        "rgb_value")->value, 1);
+
+                        Client::settings.getSettingByName<float>("rgb_value")->value = percent;
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
                         if (FlarialGUI::Toggle(0, rectX, rectY,
                                                Client::settings.getSettingByName<bool>("killdx")->value)) {
 
