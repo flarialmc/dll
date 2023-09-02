@@ -15,6 +15,7 @@
 #include "Hooks/Visual/FogColorHook.hpp"
 #include "Hooks/Visual/TimeChangerHook.hpp"
 #include "Hooks/Game/getSensHook.hpp"
+#include "Hooks/Game/getCurrentSwingDuration.hpp"
 
 std::vector<Hook *> HookManager::hooks;
 
@@ -55,6 +56,7 @@ void HookManager::initialize()
     hooks.push_back(new TimeChangerHook());
     hooks.push_back(new SendPacketHook());
     hooks.push_back(new getSensHook());
+    hooks.push_back(new getCurrentSwingDuration());
 
     for (auto hook : hooks)
         hook->enableHook();

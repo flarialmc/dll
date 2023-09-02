@@ -37,20 +37,6 @@ struct PageType {
 };
 
 class ClickGUIRenderer : public Listener {
-
-    template <typename T>
-    void lerp(T& a, const T& b, float t)
-    {
-        // Perform linear interpolation between a and b based on t
-        float interpolatedValue = a + (b - a) * t;
-
-        // Round up the interpolated value to three decimal places
-        float roundedValue = interpolatedValue;
-
-        // Assign the rounded value back to 'a'
-        a = roundedValue;
-    }
-
     Module* module;
     float baseHeightReal = 0.64f;
     float baseHeightActual = 0.00001f;
@@ -80,14 +66,14 @@ public:
 
             if (module->settings.getSettingByName<bool>("enabled")->value) {
 
-                lerp(baseHeightActual, 0.64f, 0.18f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
-                lerp(realBlurAmount, Client::settings.getSettingByName<float>("blurintensity")->value, 0.15f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(baseHeightActual, 0.64f, 0.18f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+                FlarialGUI::lerp(realBlurAmount, Client::settings.getSettingByName<float>("blurintensity")->value, 0.15f * FlarialGUI::frameFactor);
 
             } else {
 
-                lerp(baseHeightReal, 0.01f, 0.22f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
-                lerp(baseHeightActual, 0.00001f, 0.30f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
-                lerp(realBlurAmount, 0.00001f, 0.15f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(baseHeightReal, 0.01f, 0.22f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+                FlarialGUI::lerp(baseHeightActual, 0.00001f, 0.30f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+                FlarialGUI::lerp(realBlurAmount, 0.00001f, 0.15f * FlarialGUI::frameFactor);
 
                 for(auto& box : FlarialGUI::TextBoxes) box.isActive = false;
 
@@ -106,11 +92,11 @@ public:
                 if (module->settings.getSettingByName<bool>("enabled")->value){
                     if (ClickGUIRenderer::page.type == "settings" || curr == "settings") {
 
-                        lerp(baseHeightReal, 0.35f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+                        FlarialGUI::lerp(baseHeightReal, 0.35f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
 
                         //FadeEffect::ApplyFadeOutEffect(0.015f * FlarialGUI::frameFactor, baseHeightReal, 0.35f);
                     } else {
-                        lerp(baseHeightReal, 0.64f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+                        FlarialGUI::lerp(baseHeightReal, 0.64f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
                         //FadeEffect::ApplyFadeInEffect(0.015f * FlarialGUI::frameFactor, 0.64f, baseHeightReal);
                     }
                 }
@@ -434,6 +420,19 @@ public:
 
                         FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
                                                         L"Vsync Disabler (Experimental)",
+                                                        Constraints::SpacingConstraint(4.5, textWidth), textHeight,
+                                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        Constraints::SpacingConstraint(0.95, textWidth),
+                                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+
+                        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                        if (FlarialGUI::Toggle(9, rectX, rectY,
+                                               Client::settings.getSettingByName<bool>("disableanims")->value)) {
+
+                            Client::settings.getSettingByName<bool>("disableanims")->value = !Client::settings.getSettingByName<bool>("disableanims")->value;
+                        }
+                        FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
+                                                        L"Disable Animations",
                                                         Constraints::SpacingConstraint(4.5, textWidth), textHeight,
                                                         DWRITE_TEXT_ALIGNMENT_LEADING,
                                                         Constraints::SpacingConstraint(0.95, textWidth),

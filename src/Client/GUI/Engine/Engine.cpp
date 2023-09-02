@@ -452,13 +452,15 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled) {
 
 D2D_COLOR_F FlarialGUI::LerpColor(D2D_COLOR_F color1, D2D_COLOR_F color2, float t)
 {
-	// Interpolate each color channel separately
-	float r = color1.r + (color2.r - color1.r) * t;
-	float g = color1.g + (color2.g - color1.g) * t;
-	float b = color1.b + (color2.b - color1.b) * t;
-	float a = color1.a + (color2.a - color1.a) * t;
+    if (!Client::settings.getSettingByName<bool>("disableanims")->value) {
+        // Interpolate each color channel separately
+        float r = color1.r + (color2.r - color1.r) * t;
+        float g = color1.g + (color2.g - color1.g) * t;
+        float b = color1.b + (color2.b - color1.b) * t;
+        float a = color1.a + (color2.a - color1.a) * t;
 
-	return D2D1::ColorF(r, g, b, a);
+        return D2D1::ColorF(r, g, b, a);
+    } else return color2;
 }
 void FlarialGUI::ColorWheel(float x, float y, float radius)
 {
@@ -2693,14 +2695,16 @@ std::wstring FlarialGUI::to_wide(const std::string& multi)
 template <typename T>
 void FlarialGUI::lerp(T& a, const T& b, float t)
 {
-	// Perform linear interpolation between a and b based on t
-	float interpolatedValue = a + (b - a) * t;
+    if (!Client::settings.getSettingByName<bool>("disableanims")->value) {
+        // Perform linear interpolation between a and b based on t
+        float interpolatedValue = a + (b - a) * t;
 
-	// Round up the interpolated value to three decimal places
-	float roundedValue = std::ceilf(interpolatedValue * 1000.0f) / 1000.0f;
+        // Round up the interpolated value to three decimal places
+        float roundedValue = std::ceilf(interpolatedValue * 1000.0f) / 1000.0f;
 
-	// Assign the rounded value back to 'a'
-	a = roundedValue;
+        // Assign the rounded value back to 'a'
+        a = roundedValue;
+    } else a = b;
 }
 
 ID2D1SolidColorBrush* FlarialGUI::getBrush(D2D1_COLOR_F color) {

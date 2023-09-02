@@ -120,6 +120,9 @@ void Client::initialize()
     if (Client::settings.getSettingByName<bool>("vsync") == nullptr)
         Client::settings.addSetting("vsync", false);
 
+    if (Client::settings.getSettingByName<bool>("disableanims") == nullptr)
+        Client::settings.addSetting("disableanims", false);
+
     if (Client::settings.getSettingByName<bool>("anonymousApi") == nullptr)
         Client::settings.addSetting("anonymousApi", false);
 
