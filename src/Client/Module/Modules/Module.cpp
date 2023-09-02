@@ -128,7 +128,7 @@ void Module::NormalRender(int index, std::string text, std::string value) {
         FlarialGUI::RoundedRect(
                 realcenter.x + textMetrics.left,
                 realcenter.y,
-                this->settings.getSettingByName<float>("bgRGB")->value ? bgRGB : bgColor,
+                this->settings.getSettingByName<bool>("bgRGB")->value ? bgRGB : bgColor,
                 rectWidth,
                 textHeight * this->settings.getSettingByName<float>("rectheight")->value,
                 rounde.x,
@@ -143,7 +143,7 @@ void Module::NormalRender(int index, std::string text, std::string value) {
                 textHeight,
                 alignment,
                 textSize, DWRITE_FONT_WEIGHT_EXTRA_LIGHT,
-                this->settings.getSettingByName<float>("textRGB")->value ? FlarialGUI::rgbColor : textColor
+                this->settings.getSettingByName<bool>("textRGB")->value ? textRGB : textColor
         );
 
         if (this->settings.getSettingByName<bool>("border")->value) {
@@ -151,7 +151,7 @@ void Module::NormalRender(int index, std::string text, std::string value) {
                     realcenter.x + textMetrics.left,
                     realcenter.y,
                     Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
-                    this->settings.getSettingByName<float>("borderRGB")->value ? borderRGB : borderColor,
+                    this->settings.getSettingByName<bool>("borderRGB")->value ? borderRGB : borderColor,
                     rectWidth,
                     textHeight * this->settings.getSettingByName<float>("rectheight")->value,
                     rounde.x,
