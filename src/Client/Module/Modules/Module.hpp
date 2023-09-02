@@ -132,18 +132,24 @@ public:
        if (settings.getSettingByName<bool>("responsivewidth") == nullptr) settings.addSetting("responsivewidth", false);
        if (settings.getSettingByName<std::string>("textalignment") == nullptr) settings.addSetting("textalignment", (std::string)"Center");
 
-       if(settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 32.0f);
+       if (settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 32.0f);
 
-       if(settings.getSettingByName<std::string>("bgColor") == nullptr) {
+       if (settings.getSettingByName<std::string>("bgColor") == nullptr) {
            settings.addSetting("bgColor", (std::string)"000000");
            settings.addSetting("textColor", (std::string)"fafafa");
            settings.addSetting("borderColor", (std::string)"000000");
        }
 
-       if(settings.getSettingByName<float>("bgOpacity") == nullptr) {
+       if (settings.getSettingByName<float>("bgOpacity") == nullptr) {
            settings.addSetting("bgOpacity", 0.55f);
            settings.addSetting("textOpacity", 1.0f);
            settings.addSetting("borderOpacity", 1.0f);
+       }
+
+       if (settings.getSettingByName<bool>("bgRGB") == nullptr) {
+           settings.addSetting("bgRGB", false);
+           settings.addSetting("textRGB", false);
+           settings.addSetting("borderRGB", false);
        }
 
        if(settings.getSettingByName<float>("uiscale") == nullptr) {

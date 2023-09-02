@@ -64,14 +64,22 @@ public:
 
 		if (settings.getSettingByName<std::string>("enabledColor") == nullptr)
 			settings.addSetting("enabledColor", (std::string)"fafafa");
+        if (settings.getSettingByName<bool>("enabledRGB") == nullptr)
+            settings.addSetting("enabledRGB", false);
+        if (settings.getSettingByName<float>("enabledRGBSpeed") == nullptr)
+            settings.addSetting("enabledRGBSpeed", 1.0f);
 
-		if (settings.getSettingByName<std::string>("textEnabledColor") == nullptr)
+        if (settings.getSettingByName<std::string>("textEnabledColor") == nullptr)
 			settings.addSetting("textEnabledColor", (std::string)"fafafa");
+        if (settings.getSettingByName<bool>("textEnabledRGB") == nullptr)
+            settings.addSetting("textEnabledRGB", false);
+        if (settings.getSettingByName<float>("textEnabledRGBSpeed") == nullptr)
+            settings.addSetting("textEnabledRGBSpeed", 1.0f);
 
 		if (settings.getSettingByName<float>("enabledOpacity") == nullptr)
 			settings.addSetting("enabledOpacity", 0.55f);
 
-		if (settings.getSettingByName<float>("textEnabledOpacity") == nullptr)
+        if (settings.getSettingByName<float>("textEnabledOpacity") == nullptr)
 			settings.addSetting("textEnabledOpacity", 0.55f);
 
 		if (settings.getSettingByName<float>("uiscale") == nullptr)
@@ -308,7 +316,7 @@ public:
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
-		FlarialGUI::ColorPicker(0, toggleX + FlarialGUI::SettingsTextWidth("Background "), toggleY - Constraints::SpacingConstraint(0.017, textWidth), settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value);
+		FlarialGUI::ColorPicker(0, toggleX + FlarialGUI::SettingsTextWidth("Background "), toggleY - Constraints::SpacingConstraint(0.017, textWidth), settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
 
 		toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
@@ -316,7 +324,7 @@ public:
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
-		FlarialGUI::ColorPicker(1, toggleX + FlarialGUI::SettingsTextWidth("Text "), toggleY * 0.99f, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value);
+		FlarialGUI::ColorPicker(1, toggleX + FlarialGUI::SettingsTextWidth("Text "), toggleY * 0.99f, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
 
 		toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
@@ -324,7 +332,7 @@ public:
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
-		FlarialGUI::ColorPicker(2, toggleX + FlarialGUI::SettingsTextWidth("BG Pressed "), toggleY * 0.99f, settings.getSettingByName<std::string>("enabledColor")->value, settings.getSettingByName<float>("enabledOpacity")->value);
+		FlarialGUI::ColorPicker(2, toggleX + FlarialGUI::SettingsTextWidth("BG Pressed "), toggleY * 0.99f, settings.getSettingByName<std::string>("enabledColor")->value, settings.getSettingByName<float>("enabledOpacity")->value, settings.getSettingByName<bool>("enabledRGB")->value);
 
 		toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
@@ -332,14 +340,14 @@ public:
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
-		FlarialGUI::ColorPicker(3, toggleX + FlarialGUI::SettingsTextWidth("Text Pressed "), toggleY * 0.99f, settings.getSettingByName<std::string>("textEnabledColor")->value, settings.getSettingByName<float>("textEnabledOpacity")->value);
+		FlarialGUI::ColorPicker(3, toggleX + FlarialGUI::SettingsTextWidth("Text Pressed "), toggleY * 0.99f, settings.getSettingByName<std::string>("textEnabledColor")->value, settings.getSettingByName<float>("textEnabledOpacity")->value, settings.getSettingByName<bool>("textEnabledRGB")->value);
 
 		FlarialGUI::UnsetScrollView();
 
-		FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value);
-		FlarialGUI::ColorPickerWindow(1, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value);
-		FlarialGUI::ColorPickerWindow(2, settings.getSettingByName<std::string>("enabledColor")->value, settings.getSettingByName<float>("enabledOpacity")->value);
-		FlarialGUI::ColorPickerWindow(3, settings.getSettingByName<std::string>("textEnabledColor")->value, settings.getSettingByName<float>("textEnabledOpacity")->value);
+		FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
+		FlarialGUI::ColorPickerWindow(1, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
+		FlarialGUI::ColorPickerWindow(2, settings.getSettingByName<std::string>("enabledColor")->value, settings.getSettingByName<float>("enabledOpacity")->value, settings.getSettingByName<bool>("enabledRGB")->value);
+		FlarialGUI::ColorPickerWindow(3, settings.getSettingByName<std::string>("textEnabledColor")->value, settings.getSettingByName<float>("textEnabledOpacity")->value, settings.getSettingByName<bool>("textEnabledRGB")->value);
 		/* Color Pickers End */
 
 	}

@@ -441,8 +441,9 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled) {
 	if (isAdditionalY) SetIsInAdditionalYMode();
 
 	if (isInScrollView) y += FlarialGUI::scrollpos;
-	if (CursorInRect(x, y, rectWidth, rectHeight) && MC::mousebutton == MouseButton::Left && !MC::held && !activeColorPickerWindows)
+	if (CursorInRect(x, y, rectWidth, rectHeight) && MC::mousebutton == MouseButton::Left && !MC::held && (!activeColorPickerWindows || index == 123))
 	{
+        std::cout << "hello" << std::endl;
 		MC::mousebutton = MouseButton::None;
 		return true;
 	}
@@ -1288,7 +1289,7 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string&
 
 }
 
-void FlarialGUI::ColorPicker(const int index, float x, const float y, std::string& hex, float& opacity) {
+void FlarialGUI::ColorPicker(const int index, float x, const float y, std::string& hex, float& opacity, bool& rgb) {
 
 	// Accepts hex, so for e.g. fps counter bg color wants to be changed then you'd have to give a modifyable hex value
 	// Preferably save every color in config as a hex (string)
@@ -1318,8 +1319,20 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 
 	round = Constraints::RoundingConstraint(10, 10);
 
-	D2D1_COLOR_F color = FlarialGUI::HexToColorF(hex);
-	FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, color, s * 0.85f, s * 0.85f, round.x, round.x);
+    if (rgb) {
+        FlarialGUI::Image(
+                "\\Flarial\\assets\\rgb.png",
+                D2D1::RectF(
+                        x + Constraints::SpacingConstraint(0.1, s),
+                        y + s * 0.21f,
+                        x + Constraints::SpacingConstraint(0.1, s) + s * 0.85f,
+                        y + s * 0.21f + s * 0.85f
+                )
+        );
+    } else {
+        D2D1_COLOR_F color = FlarialGUI::HexToColorF(hex);
+        FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, color, s * 0.85f, s * 0.85f, round.x, round.x);
+    }
 
 	round = Constraints::RoundingConstraint(11.5, 11.5);
 
@@ -1382,13 +1395,11 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
     float clickingY = y;
     if (isInScrollView) clickingY += scrollpos;
 
-	if (CursorInRect(x + Constraints::SpacingConstraint(0.1, s), clickingY + s * 0.21f, s * 0.85f, s * 0.85f) && MC::mousebutton == MouseButton::Left && !MC::held)
+	if (!activeColorPickerWindows && CursorInRect(x + Constraints::SpacingConstraint(0.1, s), clickingY + s * 0.21f, s * 0.85f, s * 0.85f) && MC::mousebutton == MouseButton::Left && !MC::held)
 	{
 		MC::mousebutton = MouseButton::None;
-        if (!activeColorPickerWindows) {
-            ColorPickers[index].isActive = true;
-            activeColorPickerWindows++;
-        }
+        ColorPickers[index].isActive = true;
+        activeColorPickerWindows++;
 	}
 
 }
@@ -1470,7 +1481,7 @@ D2D1::ColorF FlarialGUI::HSVtoColorF(float H, float s, float v){
     return D2D1::ColorF(r+m, g+m, b+m);
 }
 
-void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity) {
+void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, bool& rgb) {
 	if (ColorPickers[index].isActive) {
 		// 75% opacity black rect
 		FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black, 0.75),
@@ -1481,12 +1492,6 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity) 
 		float rectheight = Constraints::RelativeConstraint(0.45, "height", true);
 		Vec2<float> center = Constraints::CenterConstraint(rectwidth, rectheight);
 		Vec2<float> round = Constraints::RoundingConstraint(45, 45);
-
-		//FlarialGUI::SetWindowRect(center.x, center.y - Constraints::RelativeConstraint(0.03, "height", true), rectwidth, Constraints::RelativeConstraint(0.03, "height", true), index + 50);
-
-		//Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(center.x, center.y, index + 50);
-		//center.x = vec2.x;
-		//center.y = vec2.y;
 
 		FlarialGUI::RoundedHollowRect(center.x, center.y, Constraints::RelativeConstraint(0.01, "height", true), D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f), rectwidth, rectheight, round.x, round.x);
 		FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectwidth, rectheight, round.x, round.x);
@@ -1761,14 +1766,28 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity) 
         Circle(ColorPickers[index].shade.x + originalX, ColorPickers[index].shade.y + originalY, D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(0.125f, hexPreviewSize));
         Circle(ColorPickers[index].shade.x + originalX, ColorPickers[index].shade.y + originalY, newColorLol, Constraints::SpacingConstraint(0.08f, hexPreviewSize));
 
+        y += spacing * 4.95f;
+
         float buttonWidth = Constraints::RelativeConstraint(0.25f, "width");
         float buttonHeight = Constraints::RelativeConstraint(0.13f, "height");
-        if (RoundedButton(0, x + spacing * 2.41f, y + spacing * 4.95f, D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Close", buttonWidth, buttonHeight, round.x, round.x)) {
+        if (RoundedButton(0, Constraints::PercentageConstraint(0.07, "right") - buttonWidth, y, D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Close", buttonWidth, buttonHeight, round.x, round.x)) {
             ColorPickers[index].isActive = false;
             ColorPickers[index].oldHex = ColorFToHex(newColorLol);
             ColorPickers[index].oldOpac = ColorPickers[index].opacX / hlwidth;
             activeColorPickerWindows--;
         }
+
+        y += spacing * 0.3f;
+
+        x = Constraints::PercentageConstraint(0.04, "left");
+
+        if (Toggle(123, x, y, rgb)) rgb = !rgb;
+        FlarialTextWithFont(x + Constraints::SpacingConstraint(0.60, Constraints::RelativeConstraint(0.12, "height", true)), y, L"Chroma",
+                            Constraints::RelativeConstraint(0.12, "height", true) * 3.0f, Constraints::RelativeConstraint(0.029, "height", true), DWRITE_TEXT_ALIGNMENT_LEADING,
+                            Constraints::RelativeConstraint(0.12, "height", true),
+                            DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+
+
         /*
         for (int j = 0; j < hlwidth - 1; ++j) {
             ID2D1LinearGradientBrush* gbrush;
