@@ -100,6 +100,12 @@ void ResizeHook::CleanShit(bool isResize) {
 
     FlarialGUI::brushCache.clear();
 
+    for(auto& i : FlarialGUI::gradientBrushCache) {
+        Memory::SafeRelease(i.second);
+    }
+
+    FlarialGUI::gradientBrushCache.clear();
+
     for(auto& i : FlarialGUI::textFormatCache) {
         Memory::SafeRelease(i.second);
     }
