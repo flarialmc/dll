@@ -21,6 +21,14 @@
 #define colors_primary4 HexToColorF(Client::settings.getSettingByName<std::string>("colors_primary4")->value)
 #define o_colors_primary4 Client::settings.getSettingByName<float>("o_colors_primary4")->value
 
+#define colors_secondary1 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary1")->value)
+#define o_colors_secondary1 Client::settings.getSettingByName<float>("o_colors_secondary1")->value
+#define colors_secondary1_rgb Client::settings.getSettingByName<bool>("colors_secondary1_rgb")->value
+
+#define colors_secondary2 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary2")->value)
+#define o_colors_secondary2 Client::settings.getSettingByName<float>("o_colors_secondary2")->value
+#define colors_secondary2_rgb Client::settings.getSettingByName<bool>("colors_secondary2_rgb")->value
+
 std::map<std::string, ID2D1Bitmap*> ImagesClass::eimages;
 IDWriteFactory* FlarialGUI::writeFactory;
 ID2D1ImageBrush* FlarialGUI::blurbrush;
@@ -1567,8 +1575,17 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
 		Vec2<float> center = Constraints::CenterConstraint(rectwidth, rectheight);
 		Vec2<float> round = Constraints::RoundingConstraint(45, 45);
 
-		FlarialGUI::RoundedHollowRect(center.x, center.y, Constraints::RelativeConstraint(0.01, "height", true), D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f), rectwidth, rectheight, round.x, round.x);
-		FlarialGUI::RoundedRect(center.x, center.y, D2D1::ColorF(63.0f / 255.0f, 42.0f / 255.0f, 45.0f / 255.0f), rectwidth, rectheight, round.x, round.x);
+		D2D1_COLOR_F colorThing = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
+		colorThing.a = o_colors_secondary2;
+
+		D2D1_COLOR_F anotherColor = colors_secondary1_rgb ? FlarialGUI::rgbColor : colors_secondary1;
+		anotherColor.a = o_colors_secondary1;
+
+		D2D1_COLOR_F textCol = colors_text;
+		textCol.a = o_colors_text;
+
+		FlarialGUI::RoundedHollowRect(center.x, center.y, Constraints::RelativeConstraint(0.01, "height", true), colorThing, rectwidth, rectheight, round.x, round.x);
+		FlarialGUI::RoundedRect(center.x, center.y, anotherColor, rectwidth, rectheight, round.x, round.x);
 
 		FlarialGUI::PushSize(center.x, center.y, rectwidth, rectheight);
 
@@ -1843,7 +1860,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
 
         float buttonWidth = Constraints::RelativeConstraint(0.25f, "width");
         float buttonHeight = Constraints::RelativeConstraint(0.13f, "height");
-        if (RoundedButton(0, Constraints::PercentageConstraint(0.07, "right") - buttonWidth, y, D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f), D2D1::ColorF(D2D1::ColorF::White), L"Close", buttonWidth, buttonHeight, round.x, round.x)) {
+        if (RoundedButton(0, Constraints::PercentageConstraint(0.07, "right") - buttonWidth, y, colorThing, textCol, L"Close", buttonWidth, buttonHeight, round.x, round.x)) {
             ColorPickers[index].isActive = false;
             ColorPickers[index].oldHex = ColorFToHex(newColorLol);
             ColorPickers[index].oldOpac = ColorPickers[index].opacX / hlwidth;
