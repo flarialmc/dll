@@ -43,7 +43,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Left", textWidth * 3.0f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         float percent = FlarialGUI::Slider(4, toggleX + FlarialGUI::SettingsTextWidth("Left "),
                                            toggleY, this->settings.getSettingByName<float>("Left")->value, 100.0f,
@@ -56,7 +56,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Right", textWidth * 3.0f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         percent = FlarialGUI::Slider(5, toggleX + FlarialGUI::SettingsTextWidth("Right "),
                                      toggleY, this->settings.getSettingByName<float>("Right")->value, 100.0f, 1.00f, 0);

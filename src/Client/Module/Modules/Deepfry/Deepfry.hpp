@@ -43,7 +43,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
                                         L"Paint Effect", textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         if (FlarialGUI::Toggle(1, toggleX, toggleY, this->settings.getSettingByName<bool>(
                 "paint")->value)) this->settings.getSettingByName<bool>("paint")->value = !this->settings.getSettingByName<bool>("paint")->value;

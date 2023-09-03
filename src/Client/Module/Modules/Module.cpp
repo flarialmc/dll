@@ -135,7 +135,7 @@ void Module::NormalRender(int index, std::string text, std::string value) {
                 rectWidth,
                 textHeight,
                 alignment,
-                textSize, DWRITE_FONT_WEIGHT_EXTRA_LIGHT,
+                textSize, DWRITE_FONT_WEIGHT_NORMAL,
                 textColor
         );
 

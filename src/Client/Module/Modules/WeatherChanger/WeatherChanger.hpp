@@ -51,7 +51,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Rain", textWidth * 3.0f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         float percent = FlarialGUI::Slider(4, toggleX + FlarialGUI::SettingsTextWidth("Rain "),
                                            toggleY, this->settings.getSettingByName<float>("rain")->value, 10.0f);
@@ -63,7 +63,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Lightning", textWidth * 3.0f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         percent = FlarialGUI::Slider(5, toggleX + FlarialGUI::SettingsTextWidth("Lightning "),
                                      toggleY, this->settings.getSettingByName<float>("lighting")->value, 10.0f);
@@ -77,7 +77,7 @@ public:
                                         L"Snow (intensity depends on rain)",
                                         Constraints::SpacingConstraint(4.5, textWidth), textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
     }
 };

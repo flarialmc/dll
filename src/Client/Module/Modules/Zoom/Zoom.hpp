@@ -61,7 +61,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Modifier", textWidth * 3.0f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
 
         float percent = FlarialGUI::Slider(7, toggleX + FlarialGUI::SettingsTextWidth("Modifier "),
@@ -77,7 +77,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Animation Speed", textWidth * 3.0f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
 
         percent = FlarialGUI::Slider(8, toggleX + FlarialGUI::SettingsTextWidth("Animation Speed "),
@@ -90,7 +90,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.38, textWidth), toggleY,
                                         L"Save Modifier", textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
         if (FlarialGUI::Toggle(1, toggleX, toggleY, this->settings.getSettingByName<bool>(
                 "SaveModifier")->value)) this->settings.getSettingByName<bool>("SaveModifier")->value = !this->settings.getSettingByName<bool>("SaveModifier")->value;
 
@@ -100,7 +100,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
                                         L"Hide hand", textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
         if (FlarialGUI::Toggle(2, toggleX, toggleY, this->settings.getSettingByName<bool>(
                 "hidehand")->value)) this->settings.getSettingByName<bool>("hidehand")->value = !this->settings.getSettingByName<bool>("hidehand")->value;
 
@@ -109,7 +109,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
                                         L"Hide modules", textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
         if (FlarialGUI::Toggle(3, toggleX, toggleY, this->settings.getSettingByName<bool>(
                 "hidemodules")->value)) this->settings.getSettingByName<bool>("hidemodules")->value = !this->settings.getSettingByName<bool>("hidemodules")->value;
 
@@ -119,7 +119,7 @@ public:
                                         L"Disable animation", textWidth * 3.0f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
         if (FlarialGUI::Toggle(4, toggleX, toggleY, this->settings.getSettingByName<bool>(
                 "disableanim")->value)) this->settings.getSettingByName<bool>("disableanim")->value = !this->settings.getSettingByName<bool>("disableanim")->value;
 

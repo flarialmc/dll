@@ -47,7 +47,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Time Slider", textWidth * 3.0f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         float percent = FlarialGUI::Slider(4, toggleX + FlarialGUI::SettingsTextWidth("Time Slider "),
                                            toggleY, this->settings.getSettingByName<float>("time")->value, 1.0f);

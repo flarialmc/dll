@@ -43,7 +43,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"FOV Value", textWidth * 3.0f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
 		float percent = FlarialGUI::Slider(0, toggleX + FlarialGUI::SettingsTextWidth("FOV Value "),
                                            toggleY, this->settings.getSettingByName<float>("fovvalue")->value, 110.0f,

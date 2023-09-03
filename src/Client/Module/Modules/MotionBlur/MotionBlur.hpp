@@ -51,7 +51,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Bleed Factor", textWidth * 3.0f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         float percent = FlarialGUI::Slider(7, toggleX + FlarialGUI::SettingsTextWidth("Bleed Factor "),
                                            toggleY, this->settings.getSettingByName<float>("intensity")->value, 1.0f, 0,
@@ -64,7 +64,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Intensity", textWidth * 3.0f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
 
         percent = FlarialGUI::Slider(8, toggleX + FlarialGUI::SettingsTextWidth("Intensity "),

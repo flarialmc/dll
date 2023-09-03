@@ -96,10 +96,10 @@ public:
 
 		}
 
-		if (realBlurAmount > 0.01) FlarialGUI::AllahBlur(realBlurAmount);
+		if (realBlurAmount > 0.1) FlarialGUI::AllahBlur(realBlurAmount);
 
 
-		if (SwapchainHook::init && baseHeightActual > 0.01) {
+		if (SwapchainHook::init && baseHeightActual > 0.1) {
 
 
 
@@ -408,7 +408,7 @@ public:
 					FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Eject keybind").c_str(),
 						textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
 						Constraints::SpacingConstraint(1.05, textWidth),
-						DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+						DWRITE_FONT_WEIGHT_NORMAL);
 					FlarialGUI::KeybindSelector(0, rectX + FlarialGUI::SettingsTextWidth("Eject keybind "), rectY, Client::settings.getSettingByName<std::string>("ejectKeybind")->value);
 
 					rectY += Constraints::SpacingConstraint(0.35, textWidth);
@@ -416,7 +416,7 @@ public:
 					FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Blur Intensity").c_str(),
 						textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
 						Constraints::SpacingConstraint(1.05, textWidth),
-						DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+						DWRITE_FONT_WEIGHT_NORMAL);
 
 					float percent = FlarialGUI::Slider(7, rectX + FlarialGUI::SettingsTextWidth("Blur Intensity "),
 						rectY, Client::settings.getSettingByName<float>(
@@ -429,7 +429,7 @@ public:
 					FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Chroma Speed").c_str(),
 						textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
 						Constraints::SpacingConstraint(1.05, textWidth),
-						DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+						DWRITE_FONT_WEIGHT_NORMAL);
 
 					percent = FlarialGUI::Slider(8, rectX + FlarialGUI::SettingsTextWidth("Chroma Speed "),
 						rectY, Client::settings.getSettingByName<float>(
@@ -442,7 +442,7 @@ public:
 					FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Chroma Saturation").c_str(),
 						textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
 						Constraints::SpacingConstraint(1.05, textWidth),
-						DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+						DWRITE_FONT_WEIGHT_NORMAL);
 
 					percent = FlarialGUI::Slider(9, rectX + FlarialGUI::SettingsTextWidth("Chroma Saturation "),
 						rectY, Client::settings.getSettingByName<float>(
@@ -455,7 +455,7 @@ public:
 					FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Chroma Value").c_str(),
 						textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
 						Constraints::SpacingConstraint(1.05, textWidth),
-						DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+						DWRITE_FONT_WEIGHT_NORMAL);
 
 					percent = FlarialGUI::Slider(10, rectX + FlarialGUI::SettingsTextWidth("Chroma Value "),
 						rectY, Client::settings.getSettingByName<float>(
@@ -476,7 +476,7 @@ public:
 						Constraints::SpacingConstraint(4.5, textWidth), textHeight,
 						DWRITE_TEXT_ALIGNMENT_LEADING,
 						Constraints::SpacingConstraint(0.95, textWidth),
-						DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+						DWRITE_FONT_WEIGHT_NORMAL);
 
 					rectY += Constraints::SpacingConstraint(0.35, textWidth);
 					if (FlarialGUI::Toggle(1, rectX, rectY,
@@ -490,7 +490,7 @@ public:
 						Constraints::SpacingConstraint(4.5, textWidth), textHeight,
 						DWRITE_TEXT_ALIGNMENT_LEADING,
 						Constraints::SpacingConstraint(0.95, textWidth),
-						DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+						DWRITE_FONT_WEIGHT_NORMAL);
 
 					rectY += Constraints::SpacingConstraint(0.35, textWidth);
 					if (FlarialGUI::Toggle(9, rectX, rectY,
@@ -503,7 +503,7 @@ public:
 						Constraints::SpacingConstraint(4.5, textWidth), textHeight,
 						DWRITE_TEXT_ALIGNMENT_LEADING,
 						Constraints::SpacingConstraint(0.95, textWidth),
-						DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+						DWRITE_FONT_WEIGHT_NORMAL);
 
 					rectY += Constraints::SpacingConstraint(0.35, textWidth);
 					if (FlarialGUI::Toggle(2, rectX, rectY,
@@ -516,7 +516,7 @@ public:
 						Constraints::SpacingConstraint(4.5, textWidth), textHeight,
 						DWRITE_TEXT_ALIGNMENT_LEADING,
 						Constraints::SpacingConstraint(0.95, textWidth),
-						DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+						DWRITE_FONT_WEIGHT_NORMAL);
 
 
 					rectY += Constraints::SpacingConstraint(0.35, textWidth);
@@ -530,7 +530,7 @@ public:
 						Constraints::SpacingConstraint(4.5, textWidth), textHeight,
 						DWRITE_TEXT_ALIGNMENT_LEADING,
 						Constraints::SpacingConstraint(0.95, textWidth),
-						DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+						DWRITE_FONT_WEIGHT_NORMAL);
 
 					rectY += Constraints::SpacingConstraint(0.35, textWidth);
 					if (FlarialGUI::Toggle(7, rectX, rectY,
@@ -544,7 +544,7 @@ public:
 						Constraints::SpacingConstraint(4.5, textWidth), textHeight,
 						DWRITE_TEXT_ALIGNMENT_LEADING,
 						Constraints::SpacingConstraint(0.95, textWidth),
-						DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+						DWRITE_FONT_WEIGHT_NORMAL);
 
 
 					rectY += Constraints::SpacingConstraint(0.35, textWidth);
@@ -559,7 +559,7 @@ public:
 						Constraints::SpacingConstraint(4.5, textWidth), textHeight,
 						DWRITE_TEXT_ALIGNMENT_LEADING,
 						Constraints::SpacingConstraint(0.95, textWidth),
-						DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+						DWRITE_FONT_WEIGHT_NORMAL);
 
 					rectY += Constraints::SpacingConstraint(0.35, textWidth);
 					if (FlarialGUI::Toggle(4, rectX, rectY,
@@ -572,7 +572,7 @@ public:
 						L"No Icons", Constraints::SpacingConstraint(4.5, textWidth),
 						textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
 						Constraints::SpacingConstraint(0.95, textWidth),
-						DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+						DWRITE_FONT_WEIGHT_NORMAL);
 
 					rectY += Constraints::SpacingConstraint(0.35, textWidth);
 					if (FlarialGUI::Toggle(5, rectX, rectY,
@@ -585,7 +585,7 @@ public:
 						L"No Shadows", Constraints::SpacingConstraint(4.5, textWidth),
 						textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
 						Constraints::SpacingConstraint(0.95, textWidth),
-						DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+						DWRITE_FONT_WEIGHT_NORMAL);
 
 					rectY += Constraints::SpacingConstraint(0.35, textWidth);
 					FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
@@ -593,7 +593,7 @@ public:
 						Constraints::SpacingConstraint(4.5, textWidth), textHeight,
 						DWRITE_TEXT_ALIGNMENT_LEADING,
 						Constraints::SpacingConstraint(0.95, textWidth),
-						DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+						DWRITE_FONT_WEIGHT_NORMAL);
 
 					if (FlarialGUI::Toggle(6, rectX, rectY,
 						Client::settings.getSettingByName<bool>("anonymousApi")->value)) {

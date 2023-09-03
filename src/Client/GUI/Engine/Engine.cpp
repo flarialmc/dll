@@ -691,7 +691,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 
     FlarialGUI::FlarialTextWithFont(x + Constraints::RelativeConstraint(0.05f), y, to_wide(text).c_str(),
                                     Constraints::SpacingConstraint(1.55, textWidth), percHeight,
-                                    DWRITE_TEXT_ALIGNMENT_LEADING, textSize, DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                    DWRITE_TEXT_ALIGNMENT_LEADING, textSize, DWRITE_FONT_WEIGHT_NORMAL);
 
 	IDWriteTextFormat* textFormat;
 	FlarialGUI::writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(textSize), L"", &textFormat);
@@ -726,7 +726,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
     FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, to_wide(real).c_str(),
                                     Constraints::SpacingConstraint(3, textWidth), percHeight,
                                     DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.00, textWidth),
-                                    DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                    DWRITE_FONT_WEIGHT_NORMAL);
 
 	if (isAdditionalY) SetIsInAdditionalYMode();
 
@@ -845,7 +845,7 @@ float FlarialGUI::Slider(int index, float x, float y, float startingPoint, const
     }
 
     FlarialGUI::FlarialTextWithFont(x, y, to_wide(text).c_str(), percWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER,
-                                    Constraints::FontScaler(percWidth * 14.5f), DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                    Constraints::FontScaler(percWidth * 14.5f), DWRITE_FONT_WEIGHT_NORMAL);
 
 	x += Constraints::SpacingConstraint(1.2, percWidth);
 	y += Constraints::SpacingConstraint(0.8, percHeight / 2.0f);
@@ -1172,7 +1172,7 @@ FlarialGUI::Dropdown(int index, float x, float y, const std::vector<std::string>
                                         Constraints::SpacingConstraint(1.55, curTextWidth), percHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.0, curTextWidth),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
 		counter++;
 	}
@@ -1186,11 +1186,11 @@ FlarialGUI::Dropdown(int index, float x, float y, const std::vector<std::string>
     FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.1, textWidth), y, to_wide(value).c_str(),
                                     Constraints::SpacingConstraint(1.55, textWidth), percHeight,
                                     DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.0, textWidth),
-                                    DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                    DWRITE_FONT_WEIGHT_NORMAL);
     FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, to_wide(label).c_str(),
                                     Constraints::SpacingConstraint(3, textWidth), percHeight,
                                     DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.00, textWidth),
-                                    DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                    DWRITE_FONT_WEIGHT_NORMAL);
 
 	float is = percHeight / 2;
 	float ix = x + Constraints::SpacingConstraint(1.5, textWidth) - is * 1.2;
@@ -1360,13 +1360,13 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string&
 	if (isAdditionalY) UnSetIsInAdditionalYMode();
 	FlarialGUI::RoundedRect(x, y, KeybindSelectors[index].curColor, percWidth, percHeight, round.x, round.x);
 
-    FlarialGUI::FlarialTextWithFont(x, y, to_wide(text).c_str(), percWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER, textWidth, DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+    FlarialGUI::FlarialTextWithFont(x, y, to_wide(text).c_str(), percWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER, textWidth, DWRITE_FONT_WEIGHT_NORMAL);
 
     FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.25, textWidth / 2.0f), y,
                                     to_wide("Keybind (Hold for 2 seconds)").c_str(),
                                     Constraints::SpacingConstraint(6.9f, textWidth), percHeight,
                                     DWRITE_TEXT_ALIGNMENT_LEADING, textWidth,
-                                    DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                    DWRITE_FONT_WEIGHT_NORMAL);
 
 	if (isAdditionalY) SetIsInAdditionalYMode();
 
@@ -1488,7 +1488,7 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 
     FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.006f,
                                     FlarialGUI::to_wide(text).c_str(), s * 4.3f, s * 1.1f,
-                                    DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f, DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                    DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f, DWRITE_FONT_WEIGHT_NORMAL);
 
     float clickingY = y;
     if (isInScrollView) clickingY += scrollpos;
@@ -1896,7 +1896,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
         FlarialTextWithFont(x + Constraints::SpacingConstraint(0.60, Constraints::RelativeConstraint(0.12, "height", true)), y, L"Chroma",
                             Constraints::RelativeConstraint(0.12, "height", true) * 3.0f, Constraints::RelativeConstraint(0.029, "height", true), DWRITE_TEXT_ALIGNMENT_LEADING,
                             Constraints::RelativeConstraint(0.12, "height", true),
-                            DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                            DWRITE_FONT_WEIGHT_NORMAL);
 
 
         /*
@@ -1919,7 +1919,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
         FlarialGUI::FlarialTextWithFont(x + spacing, y - spacing * 1.45, L"Color Sliders",
                                         Constraints::RelativeConstraint(1, "width"),
                                         Constraints::RelativeConstraint(0.2, "width"), DWRITE_TEXT_ALIGNMENT_JUSTIFIED,
-                                        Constraints::RelativeConstraint(0.5, "width"), DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        Constraints::RelativeConstraint(0.5, "width"), DWRITE_FONT_WEIGHT_NORMAL);
 
 		spacing *= 0.90f;
 
@@ -2612,7 +2612,7 @@ void FlarialGUI::NotifyHeartbeat() {
                                                                                                                   0.45,
                                                                                                                   "height",
                                                                                                                   true)),
-                                            DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                            DWRITE_FONT_WEIGHT_NORMAL);
 
 
 			FlarialGUI::PopSize();
@@ -2688,7 +2688,7 @@ void FlarialGUI::NotifyHeartbeat() {
                                                                                                                   0.45,
                                                                                                                   "height",
                                                                                                                   true)),
-                                            DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                            DWRITE_FONT_WEIGHT_NORMAL);
 
 			FlarialGUI::PopSize();
 

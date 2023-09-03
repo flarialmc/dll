@@ -157,7 +157,7 @@ std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit,
 					textWidth, percHeight,
 					DWRITE_TEXT_ALIGNMENT_LEADING,
 					Constraints::SpacingConstraint(0.60f, textWidth),
-					DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+					DWRITE_FONT_WEIGHT_NORMAL);
 
 			}
 
@@ -271,7 +271,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 	FlarialGUI::FlarialTextWithFont(textx, texty, FlarialGUI::to_wide(mod->name).c_str(), textWidth, textHeight,
 		DWRITE_TEXT_ALIGNMENT_CENTER,
 		Constraints::SpacingConstraint(0.8, textWidth),
-		DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+		DWRITE_FONT_WEIGHT_NORMAL);
 
 	// Mod icon
 

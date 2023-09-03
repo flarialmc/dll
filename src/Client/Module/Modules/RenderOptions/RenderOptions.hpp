@@ -49,7 +49,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
                                         L"Chunk Borders", textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         if (FlarialGUI::Toggle(1, toggleX, toggleY, this->settings.getSettingByName<bool>(
                 "chunkborders")->value)) this->settings.getSettingByName<bool>("chunkborders")->value = !this->settings.getSettingByName<bool>("chunkborders")->value;
@@ -59,7 +59,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
                                         L"Render Sky", textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         if (FlarialGUI::Toggle(2, toggleX, toggleY, this->settings.getSettingByName<bool>(
                 "sky")->value)) this->settings.getSettingByName<bool>("sky")->value = !this->settings.getSettingByName<bool>("sky")->value;
@@ -69,7 +69,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
                                         L"Render Entities", textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         if (FlarialGUI::Toggle(3, toggleX, toggleY, this->settings.getSettingByName<bool>(
                 "entity")->value)) this->settings.getSettingByName<bool>("entity")->value = !this->settings.getSettingByName<bool>("entity")->value;
@@ -80,7 +80,7 @@ public:
                                         L"Render Block Entities", textWidth * 3.0f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         if (FlarialGUI::Toggle(4, toggleX, toggleY, this->settings.getSettingByName<bool>(
                 "blockentity")->value)) this->settings.getSettingByName<bool>("blockentity")->value = !this->settings.getSettingByName<bool>("blockentity")->value;
@@ -91,7 +91,7 @@ public:
                                         L"Render Particles", textWidth * 3.0f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         if (FlarialGUI::Toggle(5, toggleX, toggleY, this->settings.getSettingByName<bool>(
                 "particles")->value)) this->settings.getSettingByName<bool>("particles")->value = !this->settings.getSettingByName<bool>("particles")->value;
@@ -101,7 +101,7 @@ public:
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
                                         L"Render Weather", textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         if (FlarialGUI::Toggle(6, toggleX, toggleY, this->settings.getSettingByName<bool>(
                 "weather")->value)) this->settings.getSettingByName<bool>("weather")->value = !this->settings.getSettingByName<bool>("weather")->value;
