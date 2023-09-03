@@ -3018,7 +3018,7 @@ void FlarialGUI::Tooltip(std::string id, float x, float y, std::string text, flo
 		std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
 		auto timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(current - Tooltips[id].time);
 
-		if (timeDifference.count() > 1000) {
+		if (timeDifference.count() > 999) {
 			if (!Tooltips[id].hovering) {
 				Tooltips[id].hovering = true;
 				Tooltips[id].hoverX = MC::mousepos.x;
