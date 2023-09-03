@@ -35,6 +35,10 @@
 #define o_colors_secondary2 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary2")->value
 #define colors_secondary2_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
 
+#define colors_secondary7 FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary7")->value)
+#define o_colors_secondary7 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary7")->value
+#define colors_secondary7_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
+
 std::map<std::string, ID2D1Bitmap*> ImagesClass::eimages;
 IDWriteFactory* FlarialGUI::writeFactory;
 ID2D1ImageBrush* FlarialGUI::blurbrush;
@@ -2994,9 +2998,11 @@ void FlarialGUI::Tooltip(std::string id, float x, float y, std::string text, flo
 	textLayout->Release();
 
 	D2D1_COLOR_F bgCol = colors_secondary2_rgb ? rgbColor : colors_secondary2;
-	bgCol.a = o_colors_secondary2;
-	D2D1_COLOR_F outlineCol = colors_primary2_rgb ? rgbColor : colors_primary2;
-	outlineCol.a = o_colors_primary2;
+	bgCol.a = o_colors_secondary2 * Tooltips[id].opac;
+	D2D1_COLOR_F outlineCol = colors_secondary7_rgb ? rgbColor : colors_secondary7;
+	outlineCol.a = o_colors_secondary7 * Tooltips[id].opac;
+	D2D1_COLOR_F textCol = colors_text_rgb ? rgbColor : colors_text;
+	textCol.a = o_colors_text * Tooltips[id].opac;
 
 	float spacing = Constraints::SpacingConstraint(0.2f, textMetrics.height);
 	float rectWidth = textMetrics.width + spacing * 2;
@@ -3025,25 +3031,28 @@ void FlarialGUI::Tooltip(std::string id, float x, float y, std::string text, flo
             }
 
 			display = true;
+			lerp(Tooltips[id].opac, 1.0f, 0.35 * frameFactor);
 		}
 	}
 	else if (Tooltips[id].hovering && CursorInRect(Tooltips[id].hoverX, Tooltips[id].hoverY, rectWidth, rectHeight)) {
 		display = true;
 		Tooltips[id].in = true;
+		lerp(Tooltips[id].opac, 1.0f, 0.35 * frameFactor);
 	}
 	else {
 		Tooltips[id].hovering = false;
 		Tooltips[id].in = false;
+		lerp(Tooltips[id].opac, 0.0f, 0.35 * frameFactor);
 	}
 
-	if (display) {
+	if (Tooltips[id].opac > 0.0f) {
 		Vec2<float> round = Constraints::RoundingConstraint(10, 10);
 
 		float offset = Constraints::RelativeConstraint(0.015, "height", true);
 
 		RoundedRect(Tooltips[id].hoverX + offset, Tooltips[id].hoverY - offset, bgCol, rectWidth, rectHeight, round.x, round.x);
 		RoundedHollowRect(Tooltips[id].hoverX + offset, Tooltips[id].hoverY - offset, Constraints::RelativeConstraint(0.001, "height", true), outlineCol, rectWidth, rectHeight, round.x, round.x);
-		FlarialTextWithFont(spacing + Tooltips[id].hoverX + offset, Tooltips[id].hoverY - offset, FlarialGUI::to_wide(text).c_str(), textMetrics.width * 6.9, rectHeight, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize1, DWRITE_FONT_WEIGHT_REGULAR);
+		FlarialTextWithFont(spacing + Tooltips[id].hoverX + offset, Tooltips[id].hoverY - offset, FlarialGUI::to_wide(text).c_str(), textMetrics.width * 6.9, rectHeight, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize1, DWRITE_FONT_WEIGHT_REGULAR, textCol);
 	}
 
 

@@ -117,6 +117,13 @@ public:
         if (settings.getSettingByName<bool>("colors_secondary6_rgb") == nullptr)
             settings.addSetting("colors_secondary6_rgb", false);
 
+        if (settings.getSettingByName<std::string>("colors_secondary7") == nullptr)
+            settings.addSetting("colors_secondary7", (std::string)"943c3c");
+        if (settings.getSettingByName<float>("o_colors_secondary7") == nullptr)
+            settings.addSetting("o_colors_secondary7", 1.0f);
+        if (settings.getSettingByName<bool>("colors_secondary7_rgb") == nullptr)
+            settings.addSetting("colors_secondary7_rgb", false);
+
         if (settings.getSettingByName<std::string>("colors_mod1") == nullptr)
             settings.addSetting("colors_mod1", (std::string)"201a1b");
         if (settings.getSettingByName<float>("o_colors_mod1") == nullptr)
@@ -282,6 +289,13 @@ public:
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
         FlarialGUI::ColorPicker(26, rectX + FlarialGUI::SettingsTextWidth("Secondary 6 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary6")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary6")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary6_rgb")->value);
+        
+        rectY += Constraints::SpacingConstraint(0.35, textWidth);
+        FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Secondary 7").c_str(),
+            textWidth * 6.9f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+            Constraints::SpacingConstraint(1.05, textWidth),
+            DWRITE_FONT_WEIGHT_EXTRA_LIGHT);
+        FlarialGUI::ColorPicker(27, rectX + FlarialGUI::SettingsTextWidth("Secondary 7 "), rectY - Constraints::SpacingConstraint(0.017, textWidth), ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary7")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary7")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary7_rgb")->value);
 
         rectY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("ModCard 1").c_str(),
@@ -329,6 +343,7 @@ public:
         FlarialGUI::ColorPickerWindow(20, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary4")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary4")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary4_rgb")->value);
         FlarialGUI::ColorPickerWindow(21, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary5")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary5")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary5_rgb")->value);
         FlarialGUI::ColorPickerWindow(26, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary6")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary6")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary6_rgb")->value);
+        FlarialGUI::ColorPickerWindow(27, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary7")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary7")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary7_rgb")->value);
         FlarialGUI::ColorPickerWindow(22, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_mod1")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_mod1")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_mod1_rgb")->value);
         FlarialGUI::ColorPickerWindow(23, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_mod2")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_mod2")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_mod2_rgb")->value);
         FlarialGUI::ColorPickerWindow(24, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_mod3")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_mod3")->value, ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_mod3_rgb")->value);
