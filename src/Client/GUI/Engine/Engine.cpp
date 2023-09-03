@@ -3043,8 +3043,7 @@ void FlarialGUI::Tooltip(std::string id, float x, float y, std::string text, flo
 		FlarialTextWithFont(Constraints::SpacingConstraint(0.2f, textMetrics.height) + Tooltips[id].hoverX, Tooltips[id].hoverY, FlarialGUI::to_wide(text).c_str(), textMetrics.width * 6.9, Constraints::SpacingConstraint(1.1, textMetrics.height), DWRITE_TEXT_ALIGNMENT_LEADING, fontSize1, DWRITE_FONT_WEIGHT_REGULAR);
 	}
 
-	textLayout->GetMetrics(&textMetrics);
-	textLayout->Release();
+
 }
 
 void FlarialGUI::displayToolTips() {
