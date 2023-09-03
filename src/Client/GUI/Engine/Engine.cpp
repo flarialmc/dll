@@ -3009,7 +3009,7 @@ void FlarialGUI::Tooltip(std::string id, float x, float y, std::string text, flo
 	D2D1_COLOR_F textCol = colors_text_rgb ? rgbColor : colors_text;
 	textCol.a = o_colors_text * Tooltips[id].opac;
 
-	float spacing = Constraints::SpacingConstraint(0.2f, textMetrics.height);
+	float spacing = Constraints::SpacingConstraint(0.35f, textMetrics.height);
 	float rectWidth = textMetrics.width + spacing * 2;
 	float rectHeight = textMetrics.height + spacing * 2;
 
