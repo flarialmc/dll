@@ -172,6 +172,8 @@ public:
 				FlarialGUI::Image("\\Flarial\\assets\\logo.png",
 					D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth));
 
+			FlarialGUI::Tooltip(0, logoX, logoY, "Never gonna give you up", logoWidth, logoWidth);
+
 			/* Logo End */
 
 			/* tab buttons start */
@@ -700,6 +702,8 @@ public:
 			}
 
 			FlarialGUI::PopSize(); // Pops base rect
+
+			FlarialGUI::displayToolTips();
 		}
 
 		FlarialGUI::NotifyHeartbeat();

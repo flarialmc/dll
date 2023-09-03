@@ -101,6 +101,25 @@ struct DropdownStruct
     float offsetted = 0.0f;
 };
 
+struct ToolTipStruct
+{
+    std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
+    bool hovering = false;
+    float hoverX;
+    float hoverY;
+    bool in = false;
+};
+
+struct ToolTipParams
+{
+    int index;
+    float x;
+    float y;
+    std::string text;
+    float width;
+    float height;
+};
+
 class Dimension
 {
 public:
@@ -163,6 +182,7 @@ namespace FlarialGUI
     inline ColorPicker ColorPickers[2000];
     inline DropdownStruct DropDownMenus[2000];
     inline KeybindSelectorer KeybindSelectors[2000];
+    inline ToolTipStruct Tooltips[2000];
     inline std::string currentKeybind;
     std::vector<Notification> inline notifications;
     bool inline isInWindowRect = false;
@@ -172,9 +192,6 @@ namespace FlarialGUI
     extern std::unordered_map<std::string, IDWriteTextFormat*> textFormatCache;
     extern std::unordered_map<std::string, ID2D1GradientStopCollection*> gradientStopCache;
     extern std::unordered_map<std::string, ID2D1LinearGradientBrush*> gradientBrushCache;
-
-
-
 
     void PushSize(float x, float y, float width, float height);
     void PopSize();
@@ -312,4 +329,7 @@ namespace FlarialGUI
 
     ID2D1LinearGradientBrush *getLinearGradientBrush(float x, float hexPreviewSize, float shadePickerWidth,
                                                      ID2D1GradientStopCollection *pGradientStops, std::string susKey);
+
+    void Tooltip(int index, float x, float y, std::string text, float width, float height, bool push = true);
+    void displayToolTips();
 };

@@ -2,6 +2,7 @@
 #include "../../Client.hpp"
 #include <utility>
 #include <cmath>
+#include <variant>
 #include "Constraints.hpp"
 #include "animations/fadeinout.hpp"
 #include "../../Module/Modules/ClickGUI/GUIMouseListener.hpp"
@@ -706,7 +707,6 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 	DWRITE_TEXT_METRICS textMetrics;
 	textLayout->GetMetrics(&textMetrics);
 	textLayout->Release();
-	textFormat->Release();
 
 	D2D1_COLOR_F cursorCol = colors_primary2_rgb ? rgbColor : colors_primary2;
     cursorCol.a = o_colors_primary2;
@@ -2963,3 +2963,91 @@ float FlarialGUI::SettingsTextWidth(std::string text) {
 
     return textMetrics.widthIncludingTrailingWhitespace;
 };
+
+std::vector<ToolTipParams> tooltipsList;
+bool resized = false;
+
+void FlarialGUI::Tooltip(int index, float x, float y, std::string text, float width, float height, bool push) {
+	if (!resized) tooltipsList.resize(1000);
+
+	if (push) {
+		tooltipsList.push_back(ToolTipParams{ index, x, y, text, width, height });
+		return;
+	}
+
+	float fontSize1 = Constraints::RelativeConstraint(0.12, "height", true);
+	float fontSize = Constraints::FontScaler(fontSize1);
+	IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, fontSize, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_LEADING);
+	DWRITE_TEXT_METRICS textMetrics;
+	IDWriteTextLayout* textLayout;
+
+	FlarialGUI::writeFactory->CreateTextLayout(
+		FlarialGUI::to_wide(text).c_str(),
+		wcslen(FlarialGUI::to_wide(text).c_str()),
+		textFormat,
+		Constraints::PercentageConstraint(1.0f, "left"),
+		Constraints::RelativeConstraint(0.029, "height", true),
+		&textLayout
+	);
+
+	textLayout->GetMetrics(&textMetrics);
+	textLayout->Release();
+
+	D2D1_COLOR_F bgCol = colors_secondary2_rgb ? rgbColor : colors_secondary2;
+	bgCol.a = o_colors_secondary2;
+	D2D1_COLOR_F outlineCol = colors_primary2_rgb ? rgbColor : colors_primary2;
+	outlineCol.a = o_colors_primary2;
+
+	float rectWidth = textMetrics.width + Constraints::SpacingConstraint(0.2f, textMetrics.height) * 2;
+	float rectHeight = Constraints::SpacingConstraint(1.1, textMetrics.height);
+
+	bool display = false;
+
+	if (CursorInRect(x, y, width, height)) {
+		if (!Tooltips[index].in) {
+			Tooltips[index].in = true;
+			Tooltips[index].time = std::chrono::steady_clock::now();
+		}
+		std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
+		auto timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(current - Tooltips[index].time);
+
+		if (timeDifference.count() > 1000) {
+			if (!Tooltips[index].hovering) {
+				Tooltips[index].hovering = true;
+				Tooltips[index].hoverX = MC::mousepos.x;
+				Tooltips[index].hoverY = MC::mousepos.y;
+			}
+
+			display = true;
+		}
+	}
+	else if (Tooltips[index].hovering && CursorInRect(Tooltips[index].hoverX, Tooltips[index].hoverY, rectWidth, rectHeight)) {
+		display = true;
+		Tooltips[index].in = true;
+	}
+	else {
+		Tooltips[index].hovering = false;
+		Tooltips[index].in = false;
+	}
+
+	if (display) {
+		Vec2<float> round = Constraints::RoundingConstraint(10, 10);
+
+		RoundedRect(Tooltips[index].hoverX, Tooltips[index].hoverY, bgCol, rectWidth, rectHeight, round.x, round.x);
+		RoundedHollowRect(Tooltips[index].hoverX, Tooltips[index].hoverY, Constraints::RelativeConstraint(0.001, "height", true), outlineCol, rectWidth, rectHeight, round.x, round.x);
+		FlarialTextWithFont(Constraints::SpacingConstraint(0.2f, textMetrics.height) + Tooltips[index].hoverX, Tooltips[index].hoverY, FlarialGUI::to_wide(text).c_str(), textMetrics.width * 6.9, Constraints::SpacingConstraint(1.1, textMetrics.height), DWRITE_TEXT_ALIGNMENT_LEADING, fontSize1, DWRITE_FONT_WEIGHT_REGULAR);
+	}
+
+	textLayout->GetMetrics(&textMetrics);
+	textLayout->Release();
+}
+
+void FlarialGUI::displayToolTips() {
+	for (ToolTipParams i : tooltipsList) {
+		if (!i.text.empty()) {
+			Tooltip(i.index, i.x, i.y, i.text, i.width, i.height, false);
+		}
+	}
+
+	tooltipsList.clear();
+}
