@@ -101,9 +101,9 @@ void Module::NormalRender(int index, std::string text, std::string value) {
 
         Vec2<float> rounde = Constraints::RoundingConstraint(this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value, this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value);
 
-        D2D1_COLOR_F bgColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
-        D2D1_COLOR_F textColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textColor")->value);
-        D2D1_COLOR_F borderColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
+        D2D1_COLOR_F bgColor = settings.getSettingByName<bool>("bgRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
+        D2D1_COLOR_F textColor = settings.getSettingByName<bool>("textRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textColor")->value);
+        D2D1_COLOR_F borderColor = settings.getSettingByName<bool>("borderRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
 
         bgColor.a = settings.getSettingByName<float>("bgOpacity")->value;
         textColor.a = settings.getSettingByName<float>("textOpacity")->value;
@@ -118,17 +118,10 @@ void Module::NormalRender(int index, std::string text, std::string value) {
 
         if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x + textMetrics.left, realcenter.y, realcenter.x + rectWidth + textMetrics.left, realcenter.y + (textHeight) * this->settings.getSettingByName<float>("rectheight")->value), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
 
-        D2D1_COLOR_F borderRGB = FlarialGUI::rgbColor;
-        borderRGB.a = settings.getSettingByName<float>("borderOpacity")->value;
-        D2D1_COLOR_F textRGB = FlarialGUI::rgbColor;
-        textRGB.a = settings.getSettingByName<float>("textOpacity")->value;
-        D2D1_COLOR_F bgRGB = FlarialGUI::rgbColor;
-        bgRGB.a = settings.getSettingByName<float>("bgOpacity")->value;
-
         FlarialGUI::RoundedRect(
                 realcenter.x + textMetrics.left,
                 realcenter.y,
-                this->settings.getSettingByName<bool>("bgRGB")->value ? bgRGB : bgColor,
+                bgColor,
                 rectWidth,
                 textHeight * this->settings.getSettingByName<float>("rectheight")->value,
                 rounde.x,
@@ -143,7 +136,7 @@ void Module::NormalRender(int index, std::string text, std::string value) {
                 textHeight,
                 alignment,
                 textSize, DWRITE_FONT_WEIGHT_EXTRA_LIGHT,
-                this->settings.getSettingByName<bool>("textRGB")->value ? textRGB : textColor
+                textColor
         );
 
         if (this->settings.getSettingByName<bool>("border")->value) {
@@ -151,7 +144,7 @@ void Module::NormalRender(int index, std::string text, std::string value) {
                     realcenter.x + textMetrics.left,
                     realcenter.y,
                     Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
-                    this->settings.getSettingByName<bool>("borderRGB")->value ? borderRGB : borderColor,
+                    borderColor,
                     rectWidth,
                     textHeight * this->settings.getSettingByName<float>("rectheight")->value,
                     rounde.x,

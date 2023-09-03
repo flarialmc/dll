@@ -6,33 +6,33 @@
 #include "animations/fadeinout.hpp"
 #include "../../Module/Modules/ClickGUI/GUIMouseListener.hpp"
 
-#define colors_text HexToColorF(Client::settings.getSettingByName<std::string>("colors_text")->value)
-#define o_colors_text Client::settings.getSettingByName<float>("o_colors_text")->value
-#define colors_text_rgb Client::settings.getSettingByName<bool>("colors_text_rgb")->value
+#define colors_text HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_text")->value)
+#define o_colors_text ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_text")->value
+#define colors_text_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_text_rgb")->value
 
-#define colors_primary1 HexToColorF(Client::settings.getSettingByName<std::string>("colors_primary1")->value)
-#define o_colors_primary1 Client::settings.getSettingByName<float>("o_colors_primary1")->value
-#define colors_primary1_rgb Client::settings.getSettingByName<bool>("colors_primary1_rgb")->value
+#define colors_primary1 HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_primary1")->value)
+#define o_colors_primary1 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_primary1")->value
+#define colors_primary1_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_primary1_rgb")->value
 
-#define colors_primary2 HexToColorF(Client::settings.getSettingByName<std::string>("colors_primary2")->value)
-#define o_colors_primary2 Client::settings.getSettingByName<float>("o_colors_primary2")->value
-#define colors_primary2_rgb Client::settings.getSettingByName<bool>("colors_primary2_rgb")->value
+#define colors_primary2 HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_primary2")->value)
+#define o_colors_primary2 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_primary2")->value
+#define colors_primary2_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_primary2_rgb")->value
 
-#define colors_primary3 HexToColorF(Client::settings.getSettingByName<std::string>("colors_primary3")->value)
-#define o_colors_primary3 Client::settings.getSettingByName<float>("o_colors_primary3")->value
-#define colors_primary3_rgb Client::settings.getSettingByName<bool>("colors_primary3_rgb")->value
+#define colors_primary3 HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_primary3")->value)
+#define o_colors_primary3 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_primary3")->value
+#define colors_primary3_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_primary3_rgb")->value
 
-#define colors_primary4 HexToColorF(Client::settings.getSettingByName<std::string>("colors_primary4")->value)
-#define o_colors_primary4 Client::settings.getSettingByName<float>("o_colors_primary4")->value
-#define colors_primary4_rgb Client::settings.getSettingByName<bool>("colors_primary4_rgb")->value
+#define colors_primary4 HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_primary4")->value)
+#define o_colors_primary4 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_primary4")->value
+#define colors_primary4_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_primary4_rgb")->value
 
-#define colors_secondary1 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary1")->value)
-#define o_colors_secondary1 Client::settings.getSettingByName<float>("o_colors_secondary1")->value
-#define colors_secondary1_rgb Client::settings.getSettingByName<bool>("colors_secondary1_rgb")->value
+#define colors_secondary1 FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary1")->value)
+#define o_colors_secondary1 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary1")->value
+#define colors_secondary1_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary1_rgb")->value
 
-#define colors_secondary2 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary2")->value)
-#define o_colors_secondary2 Client::settings.getSettingByName<float>("o_colors_secondary2")->value
-#define colors_secondary2_rgb Client::settings.getSettingByName<bool>("colors_secondary2_rgb")->value
+#define colors_secondary2 FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary2")->value)
+#define o_colors_secondary2 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary2")->value
+#define colors_secondary2_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
 
 std::map<std::string, ID2D1Bitmap*> ImagesClass::eimages;
 IDWriteFactory* FlarialGUI::writeFactory;
@@ -1824,7 +1824,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
         circleY += gap2L;
         circleX = x + ColorPickers[index].opacX;
 
-        Circle(circleX, circleY, D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(0.125f, hexPreviewSize));
+        Circle(circleX, circleY, hueSelectorerOutline, Constraints::SpacingConstraint(0.125f, hexPreviewSize));
 
         if (
                 ((CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(0.15f, hexPreviewSize), Constraints::SpacingConstraint(0.15f, hexPreviewSize)) &&
@@ -1864,7 +1864,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
         hex = ColorFToHex(newColorLol);
         opacity = ColorPickers[index].opacX / hlwidth;
 
-        Circle(ColorPickers[index].shade.x + originalX, ColorPickers[index].shade.y + originalY, D2D1::ColorF(D2D1::ColorF::White), Constraints::SpacingConstraint(0.125f, hexPreviewSize));
+        Circle(ColorPickers[index].shade.x + originalX, ColorPickers[index].shade.y + originalY, hueSelectorerOutline, Constraints::SpacingConstraint(0.125f, hexPreviewSize));
         Circle(ColorPickers[index].shade.x + originalX, ColorPickers[index].shade.y + originalY, newColorLol, Constraints::SpacingConstraint(0.08f, hexPreviewSize));
 
         y += spacing * 4.95f;
@@ -2570,7 +2570,8 @@ void FlarialGUI::NotifyHeartbeat() {
 
 			D2D::context->PushAxisAlignedClip(cutoutrect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
-			col = FlarialGUI::HexToColorF("FE2438");
+			col = colors_primary1_rgb ? rgbColor : colors_primary1;
+			col.a = o_colors_primary1;
 			FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
 				col, rectWidth,
 				rectHeight, rounding.x, rounding.x);
@@ -2644,7 +2645,8 @@ void FlarialGUI::NotifyHeartbeat() {
 
 			D2D::context->PushAxisAlignedClip(cutoutrect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
-			col = FlarialGUI::HexToColorF("FE2438");
+			col = colors_primary1_rgb ? rgbColor : colors_primary1;
+			col.a = o_colors_primary1;
 			FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
 				col, rectWidth,
 				rectHeight, rounding.x, rounding.x);

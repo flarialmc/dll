@@ -2,41 +2,41 @@
 #include "../ClickGUIRenderer.hpp"
 #include "ClickGUIElements.hpp"
 
-#define colors_text FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_text")->value)
-#define o_colors_text Client::settings.getSettingByName<float>("o_colors_text")->value
-#define colors_text_rgb Client::settings.getSettingByName<bool>("colors_text_rgb")->value
+#define colors_text FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_text")->value)
+#define o_colors_text ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_text")->value
+#define colors_text_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_text_rgb")->value
 
-#define colors_primary1 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_primary1")->value)
-#define o_colors_primary1 Client::settings.getSettingByName<float>("o_colors_primary1")->value
-#define colors_primary1_rgb Client::settings.getSettingByName<bool>("colors_primary1_rgb")->value
+#define colors_primary1 FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_primary1")->value)
+#define o_colors_primary1 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_primary1")->value
+#define colors_primary1_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_primary1_rgb")->value
 
-#define colors_secondary4 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary4")->value)
-#define o_colors_secondary4 Client::settings.getSettingByName<float>("o_colors_secondary4")->value
-#define colors_secondary4_rgb Client::settings.getSettingByName<bool>("colors_secondary4_rgb")->value
+#define colors_secondary4 FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary4")->value)
+#define o_colors_secondary4 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary4")->value
+#define colors_secondary4_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary4_rgb")->value
 
-#define colors_enabled FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_enabled")->value)
-#define o_colors_enabled Client::settings.getSettingByName<float>("o_colors_enabled")->value
-#define colors_enabled_rgb Client::settings.getSettingByName<bool>("colors_enabled_rgb")->value
+#define colors_enabled FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_enabled")->value)
+#define o_colors_enabled ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_enabled")->value
+#define colors_enabled_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_enabled_rgb")->value
 
-#define colors_disabled FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_disabled")->value)
-#define o_colors_disabled Client::settings.getSettingByName<float>("o_colors_disabled")->value
-#define colors_disabled_rgb Client::settings.getSettingByName<bool>("colors_disabled_rgb")->value
+#define colors_disabled FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_disabled")->value)
+#define o_colors_disabled ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_disabled")->value
+#define colors_disabled_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_disabled_rgb")->value
 
-#define colors_mod1 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_mod1")->value)
-#define o_colors_mod1 Client::settings.getSettingByName<float>("o_colors_mod1")->value
-#define colors_mod1_rgb Client::settings.getSettingByName<bool>("colors_mod1_rgb")->value
+#define colors_mod1 FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_mod1")->value)
+#define o_colors_mod1 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_mod1")->value
+#define colors_mod1_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_mod1_rgb")->value
 
-#define colors_mod2 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_mod2")->value)
-#define o_colors_mod2 Client::settings.getSettingByName<float>("o_colors_mod2")->value
-#define colors_mod2_rgb Client::settings.getSettingByName<bool>("colors_mod2_rgb")->value
+#define colors_mod2 FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_mod2")->value)
+#define o_colors_mod2 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_mod2")->value
+#define colors_mod2_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_mod2_rgb")->value
 
-#define colors_mod3 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_mod3")->value)
-#define o_colors_mod3 Client::settings.getSettingByName<float>("o_colors_mod3")->value
-#define colors_mod3_rgb Client::settings.getSettingByName<bool>("colors_mod3_rgb")->value
+#define colors_mod3 FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_mod3")->value)
+#define o_colors_mod3 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_mod3")->value
+#define colors_mod3_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_mod3_rgb")->value
 
-#define colors_mod4 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_mod4")->value)
-#define o_colors_mod4 Client::settings.getSettingByName<float>("o_colors_mod4")->value
-#define colors_mod4_rgb Client::settings.getSettingByName<bool>("colors_mod4_rgb")->value
+#define colors_mod4 FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_mod4")->value)
+#define o_colors_mod4 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_mod4")->value
+#define colors_mod4_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_mod4_rgb")->value
 
 std::map<std::string, ID2D1Bitmap*> ClickGUIElements::images;
 std::vector<D2D1_MATRIX_3X2_F> ClickGUIElements::matrixes;

@@ -19,29 +19,29 @@
 #include "../../../../SDK/SDK.hpp"
 #include "../../../Hook/Hooks/Render/ResizeHook.hpp"
 
-#define colors_text FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_text")->value)
-#define o_colors_text Client::settings.getSettingByName<float>("o_colors_text")->value
-#define colors_text_rgb Client::settings.getSettingByName<bool>("colors_text_rgb")->value
+#define colors_text FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_text")->value)
+#define o_colors_text ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_text")->value
+#define colors_text_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_text_rgb")->value
 
-#define colors_secondary1 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary1")->value)
-#define o_colors_secondary1 Client::settings.getSettingByName<float>("o_colors_secondary1")->value
-#define colors_secondary1_rgb Client::settings.getSettingByName<bool>("colors_secondary1_rgb")->value
+#define colors_secondary1 FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary1")->value)
+#define o_colors_secondary1 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary1")->value
+#define colors_secondary1_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary1_rgb")->value
 
-#define colors_secondary2 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary2")->value)
-#define o_colors_secondary2 Client::settings.getSettingByName<float>("o_colors_secondary2")->value
-#define colors_secondary2_rgb Client::settings.getSettingByName<bool>("colors_secondary2_rgb")->value
+#define colors_secondary2 FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary2")->value)
+#define o_colors_secondary2 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary2")->value
+#define colors_secondary2_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
 
-#define colors_secondary3 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary3")->value)
-#define o_colors_secondary3 Client::settings.getSettingByName<float>("o_colors_secondary3")->value
-#define colors_secondary3_rgb Client::settings.getSettingByName<bool>("colors_secondary3_rgb")->value
+#define colors_secondary3 FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary3")->value)
+#define o_colors_secondary3 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary3")->value
+#define colors_secondary3_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary3_rgb")->value
 
-#define colors_secondary5 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary5")->value)
-#define o_colors_secondary5 Client::settings.getSettingByName<float>("o_colors_secondary5")->value
-#define colors_secondary5_rgb Client::settings.getSettingByName<bool>("colors_secondary5_rgb")->value
+#define colors_secondary5 FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary5")->value)
+#define o_colors_secondary5 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary5")->value
+#define colors_secondary5_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary5_rgb")->value
 
-#define colors_secondary6 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary6")->value)
-#define o_colors_secondary6 Client::settings.getSettingByName<float>("o_colors_secondary6")->value
-#define colors_secondary6_rgb Client::settings.getSettingByName<bool>("colors_secondary6_rgb")->value
+#define colors_secondary6 FlarialGUI::HexToColorF(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary6")->value)
+#define o_colors_secondary6 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary6")->value
+#define colors_secondary6_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary6_rgb")->value
 
 struct PageType {
 	std::string type = "normal";
@@ -99,7 +99,7 @@ public:
 		if (realBlurAmount > 0.01) FlarialGUI::AllahBlur(realBlurAmount);
 
 
-            if (SwapchainHook::init && baseHeightActual > 0.01) {
+		if (SwapchainHook::init && baseHeightActual > 0.01) {
 
 
 
@@ -657,46 +657,46 @@ public:
 
 				FlarialGUI::PopSize();
 
-                if(!FlarialGUI::activeColorPickerWindows)
-                {
+				if (!FlarialGUI::activeColorPickerWindows)
+				{
 
-				float childHeight = Constraints::SpacingConstraint(0.5, rectHeight);
-				float childWidth = Constraints::SpacingConstraint(0.45, rectWidth);
-				std::pair<float, float> centered = centerChildRectangle(rectWidth, rectHeight, childWidth, childHeight);
+					float childHeight = Constraints::SpacingConstraint(0.5, rectHeight);
+					float childWidth = Constraints::SpacingConstraint(0.45, rectWidth);
+					std::pair<float, float> centered = centerChildRectangle(rectWidth, rectHeight, childWidth, childHeight);
 
-				round = Constraints::RoundingConstraint(25, 25);
+					round = Constraints::RoundingConstraint(25, 25);
 
-				FlarialGUI::RoundedRect(centered.first + rectX, rectHeight + rectY + centered.second + Constraints::RelativeConstraint(0.035), bruv, childWidth, childHeight, round.x, round.x);
-				FlarialGUI::RoundedHollowRect(centered.first + rectX, rectHeight + rectY + centered.second + Constraints::RelativeConstraint(0.035), Constraints::RelativeConstraint(0.01, "height", true), colorThing, childWidth, childHeight, round.x, round.x);
+					FlarialGUI::RoundedRect(centered.first + rectX, rectHeight + rectY + centered.second + Constraints::RelativeConstraint(0.035), bruv, childWidth, childHeight, round.x, round.x);
+					FlarialGUI::RoundedHollowRect(centered.first + rectX, rectHeight + rectY + centered.second + Constraints::RelativeConstraint(0.035), Constraints::RelativeConstraint(0.01, "height", true), colorThing, childWidth, childHeight, round.x, round.x);
 
-				float buttonWidth = Constraints::RelativeConstraint(0.19f, "width");
-				float buttonHeight = Constraints::RelativeConstraint(0.1f, "height");
-				float spacingX = Constraints::RelativeConstraint(0.03);
+					float buttonWidth = Constraints::RelativeConstraint(0.19f, "width");
+					float buttonHeight = Constraints::RelativeConstraint(0.1f, "height");
+					float spacingX = Constraints::RelativeConstraint(0.03);
 
-				std::pair<float, float> thingYes = centerChildRectangle(childWidth, childHeight, buttonWidth, buttonHeight);
-
-
-
-                    if (FlarialGUI::RoundedButton(0, spacingX + centered.first + rectX,
-                                                  thingYes.second + rectHeight + rectY + centered.second +
-                                                  Constraints::RelativeConstraint(0.035), colorThing, textCol, L"Reset",
-                                                  buttonWidth, buttonHeight, round.x, round.x)) {
-                        ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.reset();
-                        FlarialGUI::ResetShit();
-                        ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("enabled", false);
-                        ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("keybind",
-                                                                                                     (std::string) "");
-                        ModuleManager::getModule(ClickGUIRenderer::page.module)->onEnable();
-                    }
+					std::pair<float, float> thingYes = centerChildRectangle(childWidth, childHeight, buttonWidth, buttonHeight);
 
 
-                    if (FlarialGUI::RoundedButton(1, -spacingX + centered.first + rectX + childWidth - buttonWidth,
-                                                  thingYes.second + rectHeight + rectY + centered.second +
-                                                  Constraints::RelativeConstraint(0.035), colorThing, textCol,
-                                                  L"Copy From", buttonWidth, buttonHeight, round.x, round.x)) {
 
-                    }
-                }
+					if (FlarialGUI::RoundedButton(0, spacingX + centered.first + rectX,
+						thingYes.second + rectHeight + rectY + centered.second +
+						Constraints::RelativeConstraint(0.035), colorThing, textCol, L"Reset",
+						buttonWidth, buttonHeight, round.x, round.x)) {
+						ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.reset();
+						FlarialGUI::ResetShit();
+						ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("enabled", ClickGUIRenderer::page.module == "ClickGUI" ? true : false);
+						ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("keybind",
+							(std::string)"");
+						ModuleManager::getModule(ClickGUIRenderer::page.module)->onEnable();
+					}
+
+
+					if (FlarialGUI::RoundedButton(1, -spacingX + centered.first + rectX + childWidth - buttonWidth,
+						thingYes.second + rectHeight + rectY + centered.second +
+						Constraints::RelativeConstraint(0.035), colorThing, textCol,
+						L"Copy From", buttonWidth, buttonHeight, round.x, round.x)) {
+
+					}
+				}
 			}
 
 			FlarialGUI::PopSize(); // Pops base rect
