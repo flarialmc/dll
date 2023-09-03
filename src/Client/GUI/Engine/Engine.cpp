@@ -1617,13 +1617,24 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
         float shadePickerHeight = hexPreviewSize * 2.0f + Constraints::SpacingConstraint(0.1, hexPreviewSize);
         float shadePickerWidth = rectwidth - (hexPreviewSize * 1.86);
 
+		HSV hsv_color;
+
+		if (ColorPickers[index].shade.x == -1 && ColorPickers[index].shade.y == -1) {
+			hsv_color = RGBtoHSV(HexToColorF(hex));
+
+			ColorPickers[index].hueX = (hsv_color.hue / 360.0f) * hlwidth;
+			ColorPickers[index].oldHueX = (hsv_color.hue / 360.0f) * hlwidth;
+			ColorPickers[index].shade.x = hsv_color.saturation * shadePickerWidth;
+			ColorPickers[index].shade.y = (1.0f - hsv_color.value) * shadePickerHeight;
+		}
+
         D2D1_COLOR_F color = HSVtoColorF(
                 (ColorPickers[index].hueX / hlwidth) * 360,
                 ColorPickers[index].shade.x / shadePickerWidth,
                 1.0f - ColorPickers[index].shade.y / shadePickerHeight
         );
 
-        HSV hsv_color = RGBtoHSV(color);
+        hsv_color = RGBtoHSV(color);
 
         color.a = ColorPickers[index].opacX / hlwidth;
         ColorPickers[index].opacX = opacity * hlwidth;
@@ -1747,12 +1758,6 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
 
         y = Constraints::PercentageConstraint(0.10, "top");
         float originalY = y;
-
-        if (ColorPickers[index].shade.x == -1 && ColorPickers[index].shade.y == -1) {
-            ColorPickers[index].hueX = (hsv_color.hue / 360.0f) * hlwidth;
-            ColorPickers[index].shade.x = hsv_color.saturation * shadePickerWidth;
-            ColorPickers[index].shade.y = (1.0f - hsv_color.value) * shadePickerHeight;
-        }
 
         // shade picker
         while (y <= originalY + shadePickerHeight) {
