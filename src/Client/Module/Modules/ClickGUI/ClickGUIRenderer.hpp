@@ -688,6 +688,7 @@ public:
 						ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("enabled", ClickGUIRenderer::page.module == "ClickGUI" ? true : false);
 						ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("keybind",
 							(std::string)"");
+                        ModuleManager::getModule(ClickGUIRenderer::page.module)->onDisable();
 						ModuleManager::getModule(ClickGUIRenderer::page.module)->onEnable();
 					}
 
