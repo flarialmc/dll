@@ -104,9 +104,11 @@ void EventHandler::onRender(RenderEvent &event) {
     if (Client::disable) return;
 
     for (Listener* &listener: listeners) {
-        listener->onRender(event);
-    }
 
+        listener->onRender(event);
+
+        FlarialGUI::displayToolTips();
+    }
 }
 
 void EventHandler::onSetupAndRender(SetupAndRenderEvent &event) {

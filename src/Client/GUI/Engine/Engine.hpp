@@ -112,7 +112,7 @@ struct ToolTipStruct
 
 struct ToolTipParams
 {
-    int index;
+    std::string id;
     float x;
     float y;
     std::string text;
@@ -182,12 +182,12 @@ namespace FlarialGUI
     inline ColorPicker ColorPickers[2000];
     inline DropdownStruct DropDownMenus[2000];
     inline KeybindSelectorer KeybindSelectors[2000];
-    inline ToolTipStruct Tooltips[2000];
     inline std::string currentKeybind;
     std::vector<Notification> inline notifications;
     bool inline isInWindowRect = false;
 
     inline ID2D1Effect* blur = nullptr;
+    extern std::unordered_map<std::string, ToolTipStruct> Tooltips;
     extern std::unordered_map<std::string, ID2D1SolidColorBrush*> brushCache;
     extern std::unordered_map<std::string, IDWriteTextFormat*> textFormatCache;
     extern std::unordered_map<std::string, ID2D1GradientStopCollection*> gradientStopCache;
@@ -330,6 +330,6 @@ namespace FlarialGUI
     ID2D1LinearGradientBrush *getLinearGradientBrush(float x, float hexPreviewSize, float shadePickerWidth,
                                                      ID2D1GradientStopCollection *pGradientStops, std::string susKey);
 
-    void Tooltip(int index, float x, float y, std::string text, float width, float height, bool push = true);
+    void Tooltip(std::string id, float x, float y, std::string text, float width, float height, bool push = true);
     void displayToolTips();
 };

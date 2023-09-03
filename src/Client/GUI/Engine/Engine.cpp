@@ -40,6 +40,7 @@ IDWriteFactory* FlarialGUI::writeFactory;
 ID2D1ImageBrush* FlarialGUI::blurbrush;
 ID2D1ImageBrush* FlarialGUI::shadowbrush;
 ID2D1Factory* FlarialGUI::factory;
+std::unordered_map<std::string, ToolTipStruct> FlarialGUI::Tooltips;
 std::unordered_map<std::string, ID2D1SolidColorBrush*> FlarialGUI::brushCache;
 std::unordered_map<std::string, ID2D1Image*> FlarialGUI::cachedBitmaps;
 std::unordered_map<std::string, IDWriteTextFormat*> FlarialGUI::textFormatCache;
@@ -2967,11 +2968,11 @@ float FlarialGUI::SettingsTextWidth(std::string text) {
 std::vector<ToolTipParams> tooltipsList;
 bool resized = false;
 
-void FlarialGUI::Tooltip(int index, float x, float y, std::string text, float width, float height, bool push) {
+void FlarialGUI::Tooltip(std::string id, float x, float y, std::string text, float width, float height, bool push) {
 	if (!resized) tooltipsList.resize(1000);
 
 	if (push) {
-		tooltipsList.push_back(ToolTipParams{ index, x, y, text, width, height });
+		tooltipsList.push_back(ToolTipParams{ id, x, y, text, width, height });
 		return;
 	}
 
@@ -3004,38 +3005,38 @@ void FlarialGUI::Tooltip(int index, float x, float y, std::string text, float wi
 	bool display = false;
 
 	if (CursorInRect(x, y, width, height)) {
-		if (!Tooltips[index].in) {
-			Tooltips[index].in = true;
-			Tooltips[index].time = std::chrono::steady_clock::now();
+		if (!Tooltips[id].in) {
+			Tooltips[id].in = true;
+			Tooltips[id].time = std::chrono::steady_clock::now();
 		}
 		std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
-		auto timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(current - Tooltips[index].time);
+		auto timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(current - Tooltips[id].time);
 
 		if (timeDifference.count() > 1000) {
-			if (!Tooltips[index].hovering) {
-				Tooltips[index].hovering = true;
-				Tooltips[index].hoverX = MC::mousepos.x;
-				Tooltips[index].hoverY = MC::mousepos.y;
+			if (!Tooltips[id].hovering) {
+				Tooltips[id].hovering = true;
+				Tooltips[id].hoverX = MC::mousepos.x;
+				Tooltips[id].hoverY = MC::mousepos.y;
 			}
 
 			display = true;
 		}
 	}
-	else if (Tooltips[index].hovering && CursorInRect(Tooltips[index].hoverX, Tooltips[index].hoverY, rectWidth, rectHeight)) {
+	else if (Tooltips[id].hovering && CursorInRect(Tooltips[id].hoverX, Tooltips[id].hoverY, rectWidth, rectHeight)) {
 		display = true;
-		Tooltips[index].in = true;
+		Tooltips[id].in = true;
 	}
 	else {
-		Tooltips[index].hovering = false;
-		Tooltips[index].in = false;
+		Tooltips[id].hovering = false;
+		Tooltips[id].in = false;
 	}
 
 	if (display) {
 		Vec2<float> round = Constraints::RoundingConstraint(10, 10);
 
-		RoundedRect(Tooltips[index].hoverX, Tooltips[index].hoverY, bgCol, rectWidth, rectHeight, round.x, round.x);
-		RoundedHollowRect(Tooltips[index].hoverX, Tooltips[index].hoverY, Constraints::RelativeConstraint(0.001, "height", true), outlineCol, rectWidth, rectHeight, round.x, round.x);
-		FlarialTextWithFont(Constraints::SpacingConstraint(0.2f, textMetrics.height) + Tooltips[index].hoverX, Tooltips[index].hoverY, FlarialGUI::to_wide(text).c_str(), textMetrics.width * 6.9, Constraints::SpacingConstraint(1.1, textMetrics.height), DWRITE_TEXT_ALIGNMENT_LEADING, fontSize1, DWRITE_FONT_WEIGHT_REGULAR);
+		RoundedRect(Tooltips[id].hoverX, Tooltips[id].hoverY, bgCol, rectWidth, rectHeight, round.x, round.x);
+		RoundedHollowRect(Tooltips[id].hoverX, Tooltips[id].hoverY, Constraints::RelativeConstraint(0.001, "height", true), outlineCol, rectWidth, rectHeight, round.x, round.x);
+		FlarialTextWithFont(Constraints::SpacingConstraint(0.2f, textMetrics.height) + Tooltips[id].hoverX, Tooltips[id].hoverY, FlarialGUI::to_wide(text).c_str(), textMetrics.width * 6.9, Constraints::SpacingConstraint(1.1, textMetrics.height), DWRITE_TEXT_ALIGNMENT_LEADING, fontSize1, DWRITE_FONT_WEIGHT_REGULAR);
 	}
 
 	textLayout->GetMetrics(&textMetrics);
@@ -3044,10 +3045,12 @@ void FlarialGUI::Tooltip(int index, float x, float y, std::string text, float wi
 
 void FlarialGUI::displayToolTips() {
 	for (ToolTipParams i : tooltipsList) {
-		if (!i.text.empty()) {
-			Tooltip(i.index, i.x, i.y, i.text, i.width, i.height, false);
+		if (!i.id.empty()) {
+			std::cout << i.id << std::endl;
+			Tooltip(i.id, i.x, i.y, i.text, i.width, i.height, false);
 		}
 	}
 
+	std::cout << "-----------" << std::endl;
 	tooltipsList.clear();
 }
