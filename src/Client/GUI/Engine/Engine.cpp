@@ -2965,14 +2965,13 @@ float FlarialGUI::SettingsTextWidth(std::string text) {
     return textMetrics.widthIncludingTrailingWhitespace;
 };
 
-std::vector<ToolTipParams> tooltipsList;
+std::unordered_map<std::string, ToolTipParams> tooltipsList;
 bool resized = false;
 
 void FlarialGUI::Tooltip(std::string id, float x, float y, std::string text, float width, float height, bool push) {
-	if (!resized) tooltipsList.resize(1000);
 
 	if (push) {
-		tooltipsList.push_back(ToolTipParams{ id, x, y, text, width, height });
+		tooltipsList[id] = ToolTipParams{ x, y, text, width, height };
 		return;
 	}
 
@@ -3019,6 +3018,11 @@ void FlarialGUI::Tooltip(std::string id, float x, float y, std::string text, flo
 				Tooltips[id].hoverY = MC::mousepos.y;
 			}
 
+            if(Tooltips[id].hovering && CursorInRect(x, y, width, height)) {
+                Tooltips[id].hoverX = MC::mousepos.x;
+                Tooltips[id].hoverY = MC::mousepos.y;
+            }
+
 			display = true;
 		}
 	}
@@ -3044,13 +3048,13 @@ void FlarialGUI::Tooltip(std::string id, float x, float y, std::string text, flo
 }
 
 void FlarialGUI::displayToolTips() {
-	for (ToolTipParams i : tooltipsList) {
-		if (!i.id.empty()) {
-			std::cout << i.id << std::endl;
-			Tooltip(i.id, i.x, i.y, i.text, i.width, i.height, false);
+
+	for (std::pair<const std::basic_string<char>, ToolTipParams> i : tooltipsList) {
+		if (!i.first.empty()) {
+			std::cout << i.first << std::endl;
+			Tooltip(i.first, i.second.x, i.second.y, i.second.text, i.second.width, i.second.height, false);
 		}
 	}
 
-	std::cout << "-----------" << std::endl;
 	tooltipsList.clear();
 }

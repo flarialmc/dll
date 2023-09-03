@@ -262,9 +262,6 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 		BottomRoundedWidth, TopRoundedHeight, round.x, round.x);
 
 	FlarialGUI::PushSize(x, y, BottomRoundedWidth, BottomRoundedHeight);
-
-	FlarialGUI::Tooltip("mod_" + std::to_string(index), x, y, mod->description, BottomRoundedWidth, TopRoundedHeight + BottomRoundedHeight);
-
 	// Mod Name
 	float textx = Constraints::PercentageConstraint(0.1405, "left");
 	float texty = Constraints::PercentageConstraint(0.415, "top");
@@ -285,7 +282,10 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 	float modicony = Constraints::PercentageConstraint(0.11, "top");
 
 	float paddingSize = Constraints::RelativeConstraint(0.28);
-	FlarialGUI::RoundedRect(modiconx, modicony, mod3Col,
+
+    FlarialGUI::Tooltip("mod_" + std::to_string(index), modiconx, modicony, mod->description, modiconx + paddingSize, modicony + paddingSize);
+
+    FlarialGUI::RoundedRect(modiconx, modicony, mod3Col,
 		paddingSize, paddingSize, 7.5, 7.5);
 
 	paddingSize = Constraints::RelativeConstraint(0.20);

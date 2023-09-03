@@ -112,7 +112,6 @@ struct ToolTipStruct
 
 struct ToolTipParams
 {
-    std::string id;
     float x;
     float y;
     std::string text;
