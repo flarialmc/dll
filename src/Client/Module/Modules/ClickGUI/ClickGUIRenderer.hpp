@@ -128,7 +128,7 @@ public:
 				1, 1);
 			Vec2<float> round = Constraints::RoundingConstraint(50, 50);
 
-			D2D1_COLOR_F basebaseRectangleColor = colors_secondary3;
+			D2D1_COLOR_F basebaseRectangleColor = colors_secondary3_rgb ? FlarialGUI::rgbColor : colors_secondary3;
 			basebaseRectangleColor.a = o_colors_secondary3;
 
 			FlarialGUI::RoundedRect(center.x, center.y,
@@ -379,7 +379,7 @@ public:
 					float anotherRectHeight = Constraints::RelativeConstraint(0.60);
 					float anotherRectWidth = Constraints::RelativeConstraint(0.981, "width");
 
-					D2D1_COLOR_F iRanOutOfNamesToCallTheseColors = colors_secondary2;
+					D2D1_COLOR_F iRanOutOfNamesToCallTheseColors = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
 					iRanOutOfNamesToCallTheseColors.a = o_colors_secondary2;
 
 					FlarialGUI::RoundedRect(rectX, rectY, iRanOutOfNamesToCallTheseColors, anotherRectWidth, anotherRectHeight, round.x, round.x);

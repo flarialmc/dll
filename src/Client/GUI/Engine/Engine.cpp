@@ -8,18 +8,23 @@
 
 #define colors_text HexToColorF(Client::settings.getSettingByName<std::string>("colors_text")->value)
 #define o_colors_text Client::settings.getSettingByName<float>("o_colors_text")->value
+#define colors_text_rgb Client::settings.getSettingByName<bool>("colors_text_rgb")->value
 
 #define colors_primary1 HexToColorF(Client::settings.getSettingByName<std::string>("colors_primary1")->value)
 #define o_colors_primary1 Client::settings.getSettingByName<float>("o_colors_primary1")->value
+#define colors_primary1_rgb Client::settings.getSettingByName<bool>("colors_primary1_rgb")->value
 
 #define colors_primary2 HexToColorF(Client::settings.getSettingByName<std::string>("colors_primary2")->value)
 #define o_colors_primary2 Client::settings.getSettingByName<float>("o_colors_primary2")->value
+#define colors_primary2_rgb Client::settings.getSettingByName<bool>("colors_primary2_rgb")->value
 
 #define colors_primary3 HexToColorF(Client::settings.getSettingByName<std::string>("colors_primary3")->value)
 #define o_colors_primary3 Client::settings.getSettingByName<float>("o_colors_primary3")->value
+#define colors_primary3_rgb Client::settings.getSettingByName<bool>("colors_primary3_rgb")->value
 
 #define colors_primary4 HexToColorF(Client::settings.getSettingByName<std::string>("colors_primary4")->value)
 #define o_colors_primary4 Client::settings.getSettingByName<float>("o_colors_primary4")->value
+#define colors_primary4_rgb Client::settings.getSettingByName<bool>("colors_primary4_rgb")->value
 
 #define colors_secondary1 FlarialGUI::HexToColorF(Client::settings.getSettingByName<std::string>("colors_secondary1")->value)
 #define o_colors_secondary1 Client::settings.getSettingByName<float>("o_colors_secondary1")->value
@@ -391,9 +396,9 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
 
 bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled) {
 
-    D2D1_COLOR_F disabledColor = colors_primary3;
-    D2D1_COLOR_F enabledColor = colors_primary1;
-    D2D1_COLOR_F circleColor = colors_primary2;
+    D2D1_COLOR_F disabledColor = colors_primary3_rgb ? rgbColor : colors_primary3;
+    D2D1_COLOR_F enabledColor = colors_primary1_rgb ? rgbColor : colors_primary1;
+	D2D1_COLOR_F circleColor = colors_primary2_rgb ? rgbColor : colors_primary2;
 
     disabledColor.a = o_colors_primary3;
     enabledColor.a = o_colors_primary1;
@@ -703,7 +708,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 	textLayout->Release();
 	textFormat->Release();
 
-	D2D1_COLOR_F cursorCol = colors_primary2;
+	D2D1_COLOR_F cursorCol = colors_primary2_rgb ? rgbColor : colors_primary2;
     cursorCol.a = o_colors_primary2;
 
 	cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
@@ -758,9 +763,9 @@ std::string FlarialGUI::TextBox(int index, std::string text, int limit, float x,
 
 float FlarialGUI::Slider(int index, float x, float y, float startingPoint, const float maxValue, const float minValue,
                          const bool zerosafe) {
-    D2D1_COLOR_F color = colors_primary1;
-    D2D1_COLOR_F disabledColor = colors_primary3;
-    D2D1_COLOR_F circleColor = colors_primary2;
+    D2D1_COLOR_F color = colors_primary1_rgb ? rgbColor : colors_primary1;
+    D2D1_COLOR_F disabledColor = colors_primary3_rgb ? rgbColor : colors_primary3;
+    D2D1_COLOR_F circleColor = colors_primary2_rgb ? rgbColor : colors_primary2;
 
     color.a = o_colors_primary1;
     disabledColor.a = o_colors_primary3;
@@ -1012,17 +1017,23 @@ FlarialGUI::Dropdown(int index, float x, float y, const std::vector<std::string>
     }
 	additionalIndex = index;
 
+	D2D1_COLOR_F unselectedChildCol = colors_primary3_rgb ? rgbColor : colors_primary3;
+	unselectedChildCol.a = o_colors_primary3;
+
+	D2D1_COLOR_F selectedCol = colors_primary1_rgb ? rgbColor : colors_primary1;
+	selectedCol.a = o_colors_primary1;
+
 	float originalY = y;
 	if (!FlarialGUI::DropDownMenus[index].curColorDone) {
-		FlarialGUI::DropDownMenus[index].curColor = colors_primary3;
+		FlarialGUI::DropDownMenus[index].curColor = unselectedChildCol;
 		y = y - maxHeight;
 		FlarialGUI::DropDownMenus[index].yChilds = y;
 		FlarialGUI::DropDownMenus[index].curColorDone = true;
 	}
 	else y = FlarialGUI::DropDownMenus[index].yChilds;
-
-	D2D1_COLOR_F unselectedChildCol = colors_primary3;
-	D2D1_COLOR_F hoveredChildCol = D2D1::ColorF(112.0f / 255.0f, 75.0f / 255.0f, 82.0f / 255.0f);
+	
+	D2D1_COLOR_F hoveredChildCol = colors_primary4_rgb ? rgbColor : colors_primary4;
+	hoveredChildCol.a = o_colors_primary4;
 
 	if (!activeColorPickerWindows && CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.55, textWidth), percHeight + maxHeight)) {
 		if (MC::mousebutton == MouseButton::Left && CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.55, textWidth), percHeight)) {
@@ -1056,7 +1067,7 @@ FlarialGUI::Dropdown(int index, float x, float y, const std::vector<std::string>
 			additionalY[additionalIndex] += addYVal;
 		}
 		FlarialGUI::lerp(y, originalY, 0.25f * FlarialGUI::frameFactor);
-		FlarialGUI::DropDownMenus[index].curColor = FlarialGUI::LerpColor(FlarialGUI::DropDownMenus[index].curColor, colors_primary1, 0.1f * FlarialGUI::frameFactor);
+		FlarialGUI::DropDownMenus[index].curColor = FlarialGUI::LerpColor(FlarialGUI::DropDownMenus[index].curColor, selectedCol, 0.1f * FlarialGUI::frameFactor);
 		FlarialGUI::lerp(
 			FlarialGUI::DropDownMenus[index].rotation,
 			180.0f,
@@ -1072,7 +1083,7 @@ FlarialGUI::Dropdown(int index, float x, float y, const std::vector<std::string>
 			FlarialGUI::DropDownMenus[index].offsettedQ = false;
 		}
 		FlarialGUI::lerp(y, originalY - maxHeight, 0.25f * FlarialGUI::frameFactor);
-		FlarialGUI::DropDownMenus[index].curColor = FlarialGUI::LerpColor(FlarialGUI::DropDownMenus[index].curColor, colors_primary3, 0.1f * FlarialGUI::frameFactor);
+		FlarialGUI::DropDownMenus[index].curColor = FlarialGUI::LerpColor(FlarialGUI::DropDownMenus[index].curColor, unselectedChildCol, 0.1f * FlarialGUI::frameFactor);
 		FlarialGUI::lerp(
 			FlarialGUI::DropDownMenus[index].rotation,
 			0.0f,
@@ -1311,7 +1322,7 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string&
 		KeybindSelectors[index].curColorDone = true;
 	}
 
-	D2D1_COLOR_F col = KeybindSelectors[index].isActive ? colors_primary1 : colors_primary3;
+	D2D1_COLOR_F col = KeybindSelectors[index].isActive ? (colors_primary1_rgb ? rgbColor : colors_primary1) : (colors_primary3_rgb ? rgbColor : colors_primary3);
     col.a = KeybindSelectors[index].isActive ? o_colors_primary1 : o_colors_primary3;
 
 	if (KeybindSelectors[index].isActive) {
@@ -1394,7 +1405,7 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 
 	float s = Constraints::RelativeConstraint(0.0285, "height", true);
 
-    D2D1_COLOR_F baseColor = colors_primary4;
+    D2D1_COLOR_F baseColor = colors_primary4_rgb ? rgbColor : colors_primary4;
     baseColor.a = o_colors_primary4;
 
 	FlarialGUI::RoundedRect(x, y + s * 0.15f, baseColor, s * 4.125f, s, round.x, round.x);
@@ -1418,9 +1429,9 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 
 	round = Constraints::RoundingConstraint(11.5, 11.5);
 
-	D2D1_COLOR_F col = colors_primary3;
+	D2D1_COLOR_F col = colors_primary3_rgb ? rgbColor : colors_primary3;
 
-	if (TextBoxes[index].isActive) col = colors_primary1;
+	if (TextBoxes[index].isActive) col = colors_primary1_rgb ? rgbColor : colors_primary1;
 
     col.a = TextBoxes[index].isActive ? o_colors_primary1 : o_colors_primary3;
 
@@ -1460,7 +1471,7 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 	textLayout->GetMetrics(&textMetrics);
 	textLayout->Release();
 
-	D2D1_COLOR_F cursorCol = colors_primary2;
+	D2D1_COLOR_F cursorCol = colors_primary2_rgb ? rgbColor : colors_primary2;
     cursorCol.a = o_colors_primary2;
 
 	cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
@@ -1575,13 +1586,13 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
 		Vec2<float> center = Constraints::CenterConstraint(rectwidth, rectheight);
 		Vec2<float> round = Constraints::RoundingConstraint(45, 45);
 
-		D2D1_COLOR_F colorThing = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
+		D2D1_COLOR_F colorThing = colors_secondary2_rgb ? rgbColor : colors_secondary2;
 		colorThing.a = o_colors_secondary2;
 
-		D2D1_COLOR_F anotherColor = colors_secondary1_rgb ? FlarialGUI::rgbColor : colors_secondary1;
+		D2D1_COLOR_F anotherColor = colors_secondary1_rgb ? rgbColor : colors_secondary1;
 		anotherColor.a = o_colors_secondary1;
 
-		D2D1_COLOR_F textCol = colors_text;
+		D2D1_COLOR_F textCol = colors_text_rgb ? rgbColor : colors_text;
 		textCol.a = o_colors_text;
 
 		FlarialGUI::RoundedHollowRect(center.x, center.y, Constraints::RelativeConstraint(0.01, "height", true), colorThing, rectwidth, rectheight, round.x, round.x);
@@ -1779,7 +1790,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
 
         y = Constraints::PercentageConstraint(0.10, "top");
 
-        D2D1_COLOR_F hueSelectorerOutline = colors_primary2;
+        D2D1_COLOR_F hueSelectorerOutline = colors_primary2_rgb ? rgbColor : colors_primary2;
         hueSelectorerOutline.a = o_colors_primary2;
 
         float circleX = x + ColorPickers[index].oldHueX;
@@ -1997,7 +2008,7 @@ std::string FlarialGUI::ColorFToHex(const D2D1_COLOR_F& color)
 void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, float width, const float height,
                              const DWRITE_TEXT_ALIGNMENT alignment)
 {
-    D2D1_COLOR_F color = colors_text;
+    D2D1_COLOR_F color = colors_text_rgb ? rgbColor : colors_text;
     color.a = o_colors_text;
 
 	if (isInScrollView) y += scrollpos;
@@ -2026,7 +2037,7 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
                                      const DWRITE_FONT_WEIGHT weight)
 {
-    D2D1_COLOR_F color = colors_text;
+    D2D1_COLOR_F color = colors_text_rgb ? rgbColor : colors_text;
     color.a = o_colors_text;
 
 	if (shouldAdditionalY) {
