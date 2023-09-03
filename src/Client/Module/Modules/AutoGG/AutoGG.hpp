@@ -10,7 +10,7 @@ class AutoGG : public Module {
 public:
 
 
-    AutoGG() : Module("Auto GG", "oAnshul==bari", "\\Flarial\\assets\\like.png", 'o') {
+    AutoGG() : Module("Auto GG", "Automatically sends a message when you\nwin a game. (Doesn't work everywhere)", "\\Flarial\\assets\\like.png", 'o') {
 
         onEnable();
 

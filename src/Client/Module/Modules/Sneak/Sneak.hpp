@@ -10,7 +10,7 @@ class Sneak : public Module {
 public:
 
 
-    Sneak() : Module("Toggle Sneak", "Automatically sprints for you!!!", "\\Flarial\\assets\\slowly.png", 'M') {
+    Sneak() : Module("Toggle Sneak", "No need to hold down your sneak key.", "\\Flarial\\assets\\slowly.png", 'M') {
 
         onEnable();
 

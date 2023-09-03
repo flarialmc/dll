@@ -12,7 +12,7 @@ public:
 
     }
 
-    RenderOptions() : Module("Render Options", "chike wi!", "\\Flarial\\assets\\renderoptions.png", 'b') {
+    RenderOptions() : Module("Render Options", "Change the way how the game is rendered.", "\\Flarial\\assets\\renderoptions.png", 'b') {
 
         onEnable();
 

@@ -8,7 +8,7 @@ class Fullbright : public Module {
 
 public:
 
-    Fullbright() : Module("Fullbright", "chike wi!", "\\Flarial\\assets\\fullbright.png", 'C') {
+    Fullbright() : Module("Fullbright", "No need for torches!\nProvides consistent and constant illumination.\nEffectively removing darkness and shadows.", "\\Flarial\\assets\\fullbright.png", 'C') {
 
         onEnable();
 

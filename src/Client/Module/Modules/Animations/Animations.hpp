@@ -8,7 +8,7 @@ class Animations : public Module {
 
 public:
 
-    Animations() : Module("Animations", "chike wi!", "\\Flarial\\assets\\Animations.png", 'C') {
+    Animations() : Module("Animations", "Animate your selected slot square\nwhile you switch slots.", "\\Flarial\\assets\\Animations.png", 'C') {
 
         onEnable();
 

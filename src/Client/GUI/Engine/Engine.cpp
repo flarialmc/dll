@@ -2998,8 +2998,9 @@ void FlarialGUI::Tooltip(std::string id, float x, float y, std::string text, flo
 	D2D1_COLOR_F outlineCol = colors_primary2_rgb ? rgbColor : colors_primary2;
 	outlineCol.a = o_colors_primary2;
 
-	float rectWidth = textMetrics.width + Constraints::SpacingConstraint(0.2f, textMetrics.height) * 2;
-	float rectHeight = Constraints::SpacingConstraint(1.1, textMetrics.height);
+	float spacing = Constraints::SpacingConstraint(0.2f, textMetrics.height);
+	float rectWidth = textMetrics.width + spacing * 2;
+	float rectHeight = textMetrics.height + spacing * 2;
 
 	bool display = false;
 
@@ -3038,9 +3039,11 @@ void FlarialGUI::Tooltip(std::string id, float x, float y, std::string text, flo
 	if (display) {
 		Vec2<float> round = Constraints::RoundingConstraint(10, 10);
 
-		RoundedRect(Tooltips[id].hoverX, Tooltips[id].hoverY, bgCol, rectWidth, rectHeight, round.x, round.x);
-		RoundedHollowRect(Tooltips[id].hoverX, Tooltips[id].hoverY, Constraints::RelativeConstraint(0.001, "height", true), outlineCol, rectWidth, rectHeight, round.x, round.x);
-		FlarialTextWithFont(Constraints::SpacingConstraint(0.2f, textMetrics.height) + Tooltips[id].hoverX, Tooltips[id].hoverY, FlarialGUI::to_wide(text).c_str(), textMetrics.width * 6.9, Constraints::SpacingConstraint(1.1, textMetrics.height), DWRITE_TEXT_ALIGNMENT_LEADING, fontSize1, DWRITE_FONT_WEIGHT_REGULAR);
+		float offset = Constraints::RelativeConstraint(0.015, "height", true);
+
+		RoundedRect(Tooltips[id].hoverX + offset, Tooltips[id].hoverY - offset, bgCol, rectWidth, rectHeight, round.x, round.x);
+		RoundedHollowRect(Tooltips[id].hoverX + offset, Tooltips[id].hoverY - offset, Constraints::RelativeConstraint(0.001, "height", true), outlineCol, rectWidth, rectHeight, round.x, round.x);
+		FlarialTextWithFont(spacing + Tooltips[id].hoverX + offset, Tooltips[id].hoverY - offset, FlarialGUI::to_wide(text).c_str(), textMetrics.width * 6.9, rectHeight, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize1, DWRITE_FONT_WEIGHT_REGULAR);
 	}
 
 
@@ -3050,7 +3053,6 @@ void FlarialGUI::displayToolTips() {
 
 	for (std::pair<const std::basic_string<char>, ToolTipParams> i : tooltipsList) {
 		if (!i.first.empty()) {
-			std::cout << i.first << std::endl;
 			Tooltip(i.first, i.second.x, i.second.y, i.second.text, i.second.width, i.second.height, false);
 		}
 	}

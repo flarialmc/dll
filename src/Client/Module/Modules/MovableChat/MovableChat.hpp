@@ -8,7 +8,7 @@ class MovableChat : public Module {
 
 public:
 
-    MovableChat() : Module("Movable Chat", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\man.png", 'Y') {
+    MovableChat() : Module("Movable Chat", "Makes the Minecraft chat movable.", "\\Flarial\\assets\\man.png", 'Y') {
 
         onEnable();
 

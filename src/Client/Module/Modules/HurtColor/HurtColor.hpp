@@ -8,7 +8,7 @@ class HurtColor : public Module {
 
 public:
 
-    HurtColor() : Module("Hurt Color", "chike wi!", "\\Flarial\\assets\\hurt.png", 'C') {
+    HurtColor() : Module("Hurt Color", "Change the color when you hit entities.", "\\Flarial\\assets\\hurt.png", 'C') {
 
         onEnable();
 

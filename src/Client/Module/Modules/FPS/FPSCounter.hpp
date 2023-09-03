@@ -8,7 +8,7 @@ class FPSCounter : public Module {
 
 public:
 
-    FPSCounter() : Module("FPS", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\fps.png", 'L') {
+    FPSCounter() : Module("FPS", "Shows how much Frames Per Second (FPS)\nyour device is rendering.", "\\Flarial\\assets\\fps.png", 'L') {
 
         onEnable();
 

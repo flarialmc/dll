@@ -8,7 +8,7 @@ class PingCounter : public Module {
 
 public:
 
-    PingCounter() : Module("Ping Counter", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\ping.png", 'Y') {
+    PingCounter() : Module("Ping Counter", "Displays your current latency to the server.", "\\Flarial\\assets\\ping.png", 'Y') {
 
         onEnable();
 

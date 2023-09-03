@@ -8,7 +8,7 @@ class ReachCounter : public Module {
 
 public:
 
-    ReachCounter() : Module("Reach Counter", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\reach.png", 'Y') {
+    ReachCounter() : Module("Reach Counter", "Displays your last hit range in blocks.", "\\Flarial\\assets\\reach.png", 'Y') {
 
         onEnable();
 

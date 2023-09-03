@@ -9,7 +9,7 @@ class ThirdPerson : public Module {
 
 public:
 
-    ThirdPerson() : Module("Nametag", "chike wi!", "\\Flarial\\assets\\nametag.png", 'C') {
+    ThirdPerson() : Module("Nametag", "Shows your nametag for you while\nin 3rd person mode.", "\\Flarial\\assets\\nametag.png", 'C') {
 
         onEnable();
 

@@ -11,7 +11,7 @@ class TabList : public Module {
 public:
 
 
-    TabList() : Module("Tab List", "oAnshul==bari", "\\Flarial\\assets\\list.png", 'o') {
+    TabList() : Module("Tab List", "Java-like tab list.\nLists the current online players on the server.", "\\Flarial\\assets\\list.png", 'o') {
 
         onEnable();
 

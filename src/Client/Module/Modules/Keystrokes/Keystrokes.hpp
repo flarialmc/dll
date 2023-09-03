@@ -27,7 +27,7 @@ public:
 	std::vector<D2D1_COLOR_F> textStates;
 
 
-	Keystrokes() : Module("Keystrokes", "yes br", "\\Flarial\\assets\\keyboard.png", 'M') {
+	Keystrokes() : Module("Keystrokes", "Displays real-time information about your\nWASD and mouse inputs.", "\\Flarial\\assets\\keyboard.png", 'M') {
 
 
 		onEnable();

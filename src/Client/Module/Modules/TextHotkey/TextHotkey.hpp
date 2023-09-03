@@ -10,7 +10,7 @@ class TextHotkey : public Module {
 public:
     
 
-    TextHotkey() : Module("Text Hotkey", "oAnshul==bari", "\\Flarial\\assets\\text-box.png", 'o') {
+    TextHotkey() : Module("Text Hotkey", "Send something in chat with a\nclick of a button!", "\\Flarial\\assets\\text-box.png", 'o') {
 
         onEnable();
 

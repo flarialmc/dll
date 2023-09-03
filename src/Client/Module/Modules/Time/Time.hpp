@@ -10,7 +10,7 @@ class Time : public Module {
 public:
 
 
-    Time() : Module("IRL Time", "oAnshul==bari", "\\Flarial\\assets\\time.png", 'o') {
+    Time() : Module("IRL Time", "Displays your current local time.", "\\Flarial\\assets\\time.png", 'o') {
 
         onEnable();
 

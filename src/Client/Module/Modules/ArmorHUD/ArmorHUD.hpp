@@ -8,7 +8,7 @@ class ArmorHUD : public Module {
 
 public:
 
-    ArmorHUD() : Module("ArmorHUD", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\chestplate.png", 'Y') {
+    ArmorHUD() : Module("ArmorHUD", "Displays the armor you're\ncurrently wearing.", "\\Flarial\\assets\\chestplate.png", 'Y') {
 
         onEnable();
 

@@ -9,7 +9,7 @@ class PatarHD : public Module {
 
 public:
 
-    PatarHD() : Module("PatarHD", "chike wi!", "\\Flarial\\assets\\skull.png", 'C') {
+    PatarHD() : Module("PatarHD", "Who is this now?", "\\Flarial\\assets\\skull.png", 'C') {
 
         onEnable();
 

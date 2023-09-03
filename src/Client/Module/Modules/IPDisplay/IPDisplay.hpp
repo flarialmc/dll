@@ -11,7 +11,7 @@ class IPDisplay : public Module {
 public:
 
 
-	IPDisplay() : Module("IP Display", "oAnshul==bari", "\\Flarial\\assets\\server-ip.png", NULL) {
+	IPDisplay() : Module("IP Display", "Displays the current server IP you're playing on.", "\\Flarial\\assets\\server-ip.png", NULL) {
 
 		onEnable();
 

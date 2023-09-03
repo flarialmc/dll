@@ -8,7 +8,7 @@ class CPSLimiter : public Module {
 public:
 
 
-    CPSLimiter() : Module("CPS Limiter", "oAnshul==bari", "\\Flarial\\assets\\stop.png", 'o') {
+    CPSLimiter() : Module("CPS Limiter", "Limit how many clicks you can\nregister per second.", "\\Flarial\\assets\\stop.png", 'o') {
 
         onEnable();
 

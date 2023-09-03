@@ -8,7 +8,7 @@ class ArrowCounter : public Module {
 
 public:
 
-    ArrowCounter() : Module("Arrow Counter", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\arrow.png", 'Y') {
+    ArrowCounter() : Module("Arrow Counter", "Counts how many arrows you have\nin your inventory.", "\\Flarial\\assets\\arrow.png", 'Y') {
 
         onEnable();
 

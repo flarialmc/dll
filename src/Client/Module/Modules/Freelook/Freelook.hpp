@@ -8,7 +8,7 @@ class FreeLook : public Module {
 
 public:
 
-    FreeLook() : Module("FreeLook", "snap", "\\Flarial\\assets\\freelook.png", 'F') {
+    FreeLook() : Module("FreeLook", "Freely move your camera in 3rd person mode\nwhile keeping the player rotation the same.", "\\Flarial\\assets\\freelook.png", 'F') {
 
         onEnable();
 

@@ -10,7 +10,7 @@ class CPSCounter : public Module {
 public:
 
 
-    CPSCounter() : Module("CPS", "hiasdashgadhduaidhyahydasdjasdasjdas", "\\Flarial\\assets\\cursor.png", 'L') {
+    CPSCounter() : Module("CPS", "Counts your Clicks per second.", "\\Flarial\\assets\\cursor.png", 'L') {
 
         onEnable();
 

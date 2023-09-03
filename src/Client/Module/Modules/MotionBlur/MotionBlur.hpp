@@ -9,7 +9,7 @@ class MotionBlur : public Module {
 
 public:
 
-    MotionBlur() : Module("Motion Blur", "chike wi!", "\\Flarial\\assets\\blur.png", 'C') {
+    MotionBlur() : Module("Motion Blur", "Make fast movements appear smoother and more realistic by\nblurring the image slightly in the direction of motion.", "\\Flarial\\assets\\blur.png", 'C') {
 
         onEnable();
 

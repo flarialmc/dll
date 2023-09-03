@@ -10,7 +10,7 @@ class MEM : public Module {
 public:
 
 
-    MEM() : Module("Memory", "oAnshul==bari", "\\Flarial\\assets\\memory.png", 'o') {
+    MEM() : Module("Memory", "Shows your current system RAM usage.", "\\Flarial\\assets\\memory.png", 'o') {
 
         onEnable();
 

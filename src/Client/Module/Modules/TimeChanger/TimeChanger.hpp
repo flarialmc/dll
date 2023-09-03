@@ -8,7 +8,7 @@ class TimeChanger : public Module {
 
 public:
 
-    TimeChanger() : Module("Time Changer", "chike wi!", "\\Flarial\\assets\\time.png", 'C') {
+    TimeChanger() : Module("Time Changer", "Changes the ingame time.", "\\Flarial\\assets\\time.png", 'C') {
 
         onEnable();
 

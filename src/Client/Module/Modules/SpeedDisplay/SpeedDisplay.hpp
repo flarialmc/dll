@@ -10,7 +10,7 @@ class SpeedDisplay : public Module {
 public:
 
 
-    SpeedDisplay() : Module("Speed Display", "toes", "\\Flarial\\assets\\speed.png", 'o') {
+    SpeedDisplay() : Module("Speed Display", "Displays your current travel speed in blocks/second.", "\\Flarial\\assets\\speed.png", 'o') {
 
         onEnable();
 
