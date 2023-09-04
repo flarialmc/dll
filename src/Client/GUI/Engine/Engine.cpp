@@ -2050,27 +2050,7 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
     D2D1_COLOR_F color = colors_text_rgb ? rgbColor : colors_text;
     color.a = o_colors_text;
 
-	if (shouldAdditionalY) {
-		for (int i = 0; i < highestAddIndexes + 1; i++) {
-			if (FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
-				y += additionalY[i];
-			}
-		}
-	}
-	if (isInScrollView) y += scrollpos;
-
-	if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
-
-	ID2D1SolidColorBrush* brush;
-
-	brush = FlarialGUI::getBrush(color);
-
-
-	IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, Constraints::FontScaler(fontSize), weight, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, alignment);
-
-	D2D1_RECT_F textRect = D2D1::RectF(x, y, x + width, y + height);
-	D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
-
+	FlarialTextWithFont(x, y, text, width, height, alignment, fontSize, weight, color);
 }
 
 void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
