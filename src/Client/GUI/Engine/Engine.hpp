@@ -118,6 +118,7 @@ struct ToolTipParams
     std::string text;
     float width;
     float height;
+    bool relative;
 };
 
 class Dimension
@@ -274,12 +275,12 @@ namespace FlarialGUI
     void
     FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                         const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
-                        const DWRITE_FONT_WEIGHT weight);
+                        const DWRITE_FONT_WEIGHT weight, bool moduleFont = false);
 
     void
     FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                         const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
-                        const DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color);
+                        const DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont = false);
 
     void ResetShit();
 
@@ -330,6 +331,6 @@ namespace FlarialGUI
     ID2D1LinearGradientBrush *getLinearGradientBrush(float x, float hexPreviewSize, float shadePickerWidth,
                                                      ID2D1GradientStopCollection *pGradientStops, std::string susKey);
 
-    void Tooltip(std::string id, float x, float y, std::string text, float width, float height, bool push = true);
+    void Tooltip(std::string id, float x, float y, std::string text, float width, float height, bool push = true, bool relative = false);
     void displayToolTips();
 };

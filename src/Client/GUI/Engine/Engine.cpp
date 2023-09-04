@@ -704,7 +704,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 		FlarialGUI::to_wide(text).c_str(),
 		wcslen(FlarialGUI::to_wide(text).c_str()),
 		textFormat,
-		textWidth + 100,
+		Constraints::SpacingConstraint(textWidth, 6.9f),
 		percHeight,
 		&textLayout
 	);
@@ -724,7 +724,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 		FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX, y + Constraints::RelativeConstraint(0.069f) / 2.0f, cursorCol, Constraints::RelativeConstraint(0.01f), percHeight - Constraints::RelativeConstraint(0.069f), 0, 0);
 
     FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, to_wide(real).c_str(),
-                                    Constraints::SpacingConstraint(3, textWidth), percHeight,
+                                    Constraints::SpacingConstraint(6.9, textWidth), percHeight,
                                     DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.00, textWidth),
                                     DWRITE_FONT_WEIGHT_NORMAL);
 
@@ -2045,17 +2045,17 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, float width,
 
 void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
-                                     const DWRITE_FONT_WEIGHT weight)
+                                     const DWRITE_FONT_WEIGHT weight, bool moduleFont)
 {
     D2D1_COLOR_F color = colors_text_rgb ? rgbColor : colors_text;
     color.a = o_colors_text;
 
-	FlarialTextWithFont(x, y, text, width, height, alignment, fontSize, weight, color);
+	FlarialTextWithFont(x, y, text, width, height, alignment, fontSize, weight, color, moduleFont);
 }
 
 void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
-                                     const DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color)
+                                     const DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont)
 {
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
@@ -2073,7 +2073,7 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
     brush = FlarialGUI::getBrush(color);
 
 
-    IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, Constraints::FontScaler(fontSize), weight, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, alignment);
+    IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>(moduleFont ? "mod_fontname" : "fontname")->value, Constraints::FontScaler(fontSize), weight, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, alignment);
 
     D2D1_RECT_F textRect = D2D1::RectF(x, y, x + width, y + height);
     D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
@@ -2957,10 +2957,11 @@ float FlarialGUI::SettingsTextWidth(std::string text) {
 std::unordered_map<std::string, ToolTipParams> tooltipsList;
 bool resized = false;
 
-void FlarialGUI::Tooltip(std::string id, float x, float y, std::string text, float width, float height, bool push) {
+void FlarialGUI::Tooltip(std::string id, float x, float y, std::string text, float width, float height, bool push, bool relative) {
 
+	if (relative && isInScrollView) y += scrollpos;
 	if (push) {
-		tooltipsList[id] = ToolTipParams{ x, y, text, width, height };
+		tooltipsList[id] = ToolTipParams{ x, y, text, width, height, relative };
 		return;
 	}
 
@@ -2989,7 +2990,7 @@ void FlarialGUI::Tooltip(std::string id, float x, float y, std::string text, flo
 	D2D1_COLOR_F textCol = colors_text_rgb ? rgbColor : colors_text;
 	textCol.a = o_colors_text * Tooltips[id].opac;
 
-	float spacing = Constraints::SpacingConstraint(0.35f, textMetrics.height);
+	float spacing = Constraints::RelativeConstraint(0.01f, "height", true);
 	float rectWidth = textMetrics.width + spacing * 2;
 	float rectHeight = textMetrics.height + spacing * 2;
 
@@ -3047,7 +3048,7 @@ void FlarialGUI::displayToolTips() {
 
 	for (std::pair<const std::basic_string<char>, ToolTipParams> i : tooltipsList) {
 		if (!i.first.empty()) {
-			Tooltip(i.first, i.second.x, i.second.y, i.second.text, i.second.width, i.second.height, false);
+			Tooltip(i.first, i.second.x, i.second.y, i.second.text, i.second.width, i.second.height, false, i.second.relative);
 		}
 	}
 
