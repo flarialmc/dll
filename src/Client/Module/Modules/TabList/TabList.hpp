@@ -95,7 +95,7 @@ public:
                                         Constraints::RelativeConstraint(0.12, "height", true),
                                         DWRITE_FONT_WEIGHT_NORMAL);
 
-        float percent = FlarialGUI::Slider(4, toggleX + Constraints::SpacingConstraint(0.65, textWidth),
+        float percent = FlarialGUI::Slider(4, toggleX + FlarialGUI::SettingsTextWidth("UI Scale "),
                                            toggleY,
                                            this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
 
@@ -122,7 +122,7 @@ public:
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Rounding", textWidth * 3.0f, textHeight,
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Rounding", textWidth * 6.9f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::RelativeConstraint(0.12, "height", true),
                                         DWRITE_FONT_WEIGHT_NORMAL);
@@ -328,7 +328,7 @@ public:
                                                                 Utils::removeColorCodes(name))).c_str(),
                                                         keycardSize * 5, keycardSize,
                                                         DWRITE_TEXT_ALIGNMENT_LEADING, fontSize,
-                                                        DWRITE_FONT_WEIGHT_NORMAL, textColor);
+                                                        DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
 
                         realcenter.y += Constraints::SpacingConstraint(0.70, keycardSize);
 
@@ -360,7 +360,7 @@ public:
                                                                 Utils::removeColorCodes(name))).c_str(),
                                                         keycardSize * 5, keycardSize,
                                                         DWRITE_TEXT_ALIGNMENT_LEADING, fontSize,
-                                                        DWRITE_FONT_WEIGHT_NORMAL, textColor);
+                                                        DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
 
                         realcenter.y += Constraints::SpacingConstraint(0.70, keycardSize);
 

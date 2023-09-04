@@ -58,7 +58,7 @@ public:
                                         Constraints::RelativeConstraint(0.12, "height", true),
                                         DWRITE_FONT_WEIGHT_NORMAL);
 
-        float percent = FlarialGUI::Slider(4, toggleX + Constraints::SpacingConstraint(0.65, textWidth),
+        float percent = FlarialGUI::Slider(4, toggleX + FlarialGUI::SettingsTextWidth("UI Scale "),
                                            toggleY, this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
 
         this->settings.getSettingByName<float>("uiscale")->value = percent;
@@ -91,7 +91,7 @@ public:
                                         Constraints::RelativeConstraint(0.12, "height", true),
                                         DWRITE_FONT_WEIGHT_NORMAL);
 
-        percent = FlarialGUI::Slider(6, toggleX + Constraints::SpacingConstraint(0.95, textWidth),
+        percent = FlarialGUI::Slider(6, toggleX + FlarialGUI::SettingsTextWidth("Rounding "),
                                      toggleY, this->settings.getSettingByName<float>("rounding")->value);
 
         this->settings.getSettingByName<float>("rounding")->value = percent;
