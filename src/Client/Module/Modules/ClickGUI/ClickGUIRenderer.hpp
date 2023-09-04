@@ -401,9 +401,15 @@ public:
 					FlarialGUI::ScrollBar(scrollWidth, scrollHeight, 270, 800, 2);
 					FlarialGUI::SetScrollView(rectX, rectY + Constraints::SpacingConstraint(0.01, rectWidth), Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(1.0, "height"));
 
-					FlarialGUI::TextBoxVisual(1, Client::settings.getSettingByName<std::string>("fontname")->value, 26, rectX, Constraints::PercentageConstraint(0.10, "top"), "Font (Anything installed in your system)");
+					rectY = Constraints::PercentageConstraint(0.10, "top");
 
-					rectY = Constraints::PercentageConstraint(0.35, "top");
+					FlarialGUI::TextBoxVisual(1, Client::settings.getSettingByName<std::string>("fontname")->value, 26, rectX, rectY, "Click GUI Font (Anything installed in your system)");
+
+					rectY += Constraints::SpacingConstraint(0.35, textWidth);
+
+					FlarialGUI::TextBoxVisual(2, Client::settings.getSettingByName<std::string>("mod_fontname")->value, 26, rectX, rectY, "Modules Font (Anything installed in your system)");
+
+					rectY += Constraints::SpacingConstraint(0.35, textWidth);
 
 					FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Eject keybind").c_str(),
 						textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
@@ -683,9 +689,10 @@ public:
 						thingYes.second + rectHeight + rectY + centered.second +
 						Constraints::RelativeConstraint(0.035), colorThing, textCol, L"Reset",
 						buttonWidth, buttonHeight, round.x, round.x)) {
+						bool wasEnabled = ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.getSettingByName<bool>("enabled")->value;
 						ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.reset();
 						FlarialGUI::ResetShit();
-						ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("enabled", ClickGUIRenderer::page.module == "ClickGUI" ? true : false);
+						ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("enabled", wasEnabled);
 						ModuleManager::getModule(ClickGUIRenderer::page.module)->settings.addSetting("keybind",
 							(std::string)"");
                         ModuleManager::getModule(ClickGUIRenderer::page.module)->onDisable();
