@@ -265,6 +265,37 @@ public:
 				FlarialGUI::Image("\\Flarial\\assets\\gear.png",
 					D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
 
+			radioX = navx - Constraints::SpacingConstraint(-0.85f, logoWidth);
+			radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
+			radioX += Constraints::SpacingConstraint(21.69f, logoWidth);
+			round = Constraints::RoundingConstraint(30, 30);
+
+			if (!FlarialGUI::activeColorPickerWindows && FlarialGUI::RoundedRadioButton(2, radioX, radioY,
+				mod6Col,
+				modTextCol, L"Edit Menu", RadioButtonWidth,
+				RadioButtonHeight, round.x, round.x, "editmenu", this->curr)) {
+				module->settings.getSettingByName<bool>("enabled")->value = false;
+				FlarialGUI::Notify("To disable this menu press ESC or " + module->settings.getSettingByName<std::string>("editmenubind")->value);
+				editmenu = true;
+			}
+
+			radioX -= Constraints::SpacingConstraint(-0.53f, logoWidth);
+			radioY -= Constraints::SpacingConstraint(-0.53f, logoWidth);
+
+			round = Constraints::RoundingConstraint(15, 15);
+
+			FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15f, logoWidth),
+				radioY + Constraints::SpacingConstraint(-0.12f, logoWidth),
+				tabBgCol, shit, shit,
+				round.x, round.x);
+
+			radioX -= Constraints::SpacingConstraint(-0.125f, logoWidth);
+			radioY -= Constraints::SpacingConstraint(-0.15f, logoWidth);
+
+			if (!Client::settings.getSettingByName<bool>("noicons")->value)
+				FlarialGUI::Image("\\Flarial\\assets\\pencil.png",
+					D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+
 			/* tab buttons end */
 
 			FlarialGUI::PopSize(); // Pops nav bar
