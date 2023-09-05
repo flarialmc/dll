@@ -55,8 +55,7 @@ public:
                                         DWRITE_FONT_WEIGHT_NORMAL);
 
         float percent = FlarialGUI::Slider(4, toggleX + FlarialGUI::SettingsTextWidth("UI Scale "),
-                                           toggleY, this->settings.getSettingByName<float>("uiscale")->value, 2.0f, 0,
-                                           0);
+                                           toggleY, this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
 
         this->settings.getSettingByName<float>("uiscale")->value = percent;
 
