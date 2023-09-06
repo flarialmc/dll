@@ -61,6 +61,61 @@ public:
 		EventHandler::registerListener(new IPDisplayListener("IPDisplay", this));
 	}
 
+    void DefaultConfig() {
+        if(settings.getSettingByName<float>("percentageX") == nullptr) {
+            settings.addSetting("percentageX", 0.0f);
+            settings.addSetting("percentageY", 0.0f);
+        }
+
+        if(settings.getSettingByName<bool>("border") == nullptr) {
+            settings.addSetting("border", false);
+            settings.addSetting("borderWidth", 1.0f);
+        }
+
+        if (settings.getSettingByName<bool>("reversepaddingx") == nullptr) settings.addSetting("reversepaddingx", false);
+        if (settings.getSettingByName<bool>("reversepaddingy") == nullptr) settings.addSetting("reversepaddingy", false);
+        if (settings.getSettingByName<float>("padx") == nullptr) settings.addSetting("padx", 0.0f);
+        if (settings.getSettingByName<float>("pady") == nullptr) settings.addSetting("pady", 0.0f);
+        if (settings.getSettingByName<float>("rectwidth") == nullptr) settings.addSetting("rectwidth", 1.0f);
+        if (settings.getSettingByName<float>("rectheight") == nullptr) settings.addSetting("rectheight", 1.0f);
+        if (settings.getSettingByName<bool>("responsivewidth") == nullptr) settings.addSetting("responsivewidth", true);
+        if (settings.getSettingByName<std::string>("textalignment") == nullptr) settings.addSetting("textalignment", (std::string)"Center");
+
+        if (settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 32.0f);
+
+        if (settings.getSettingByName<std::string>("bgColor") == nullptr) {
+            settings.addSetting("bgColor", (std::string)"000000");
+            settings.addSetting("textColor", (std::string)"fafafa");
+            settings.addSetting("borderColor", (std::string)"000000");
+        }
+
+        if (settings.getSettingByName<float>("bgOpacity") == nullptr) {
+            settings.addSetting("bgOpacity", 0.55f);
+            settings.addSetting("textOpacity", 1.0f);
+            settings.addSetting("borderOpacity", 1.0f);
+        }
+
+        if (settings.getSettingByName<bool>("bgRGB") == nullptr) {
+            settings.addSetting("bgRGB", false);
+            settings.addSetting("textRGB", false);
+            settings.addSetting("borderRGB", false);
+        }
+
+        if(settings.getSettingByName<float>("uiscale") == nullptr) {
+
+            settings.addSetting("uiscale", 0.65f);
+        }
+
+        if (settings.getSettingByName<float>("rotation") == nullptr) {
+            settings.addSetting("rotation", 0.0f);
+        }
+
+        if (settings.getSettingByName<bool>("BlurEffect") == nullptr) {
+            settings.addSetting("BlurEffect", false);
+        }
+
+    }
+
 	void onDisable() override {
 
 		EventHandler::unregisterListener("IPDisplay");
