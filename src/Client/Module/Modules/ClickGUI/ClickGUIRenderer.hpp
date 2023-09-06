@@ -101,9 +101,6 @@ public:
 
 		if (SwapchainHook::init && baseHeightActual > 0.1) {
 
-
-
-
 			/* Base Rectangle Start */
 
 			float baseWidth = Constraints::RelativeConstraint(0.85);
