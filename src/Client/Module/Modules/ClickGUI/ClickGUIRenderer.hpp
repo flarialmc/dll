@@ -101,9 +101,6 @@ public:
 
 		if (SwapchainHook::init && baseHeightActual > 0.1) {
 
-
-
-
 			/* Base Rectangle Start */
 
 			float baseWidth = Constraints::RelativeConstraint(0.85);
@@ -429,7 +426,7 @@ public:
 
 					rectX = Constraints::PercentageConstraint(0.019, "left");
 
-					FlarialGUI::ScrollBar(scrollWidth, scrollHeight, 270, 800, 2);
+					FlarialGUI::ScrollBar(scrollWidth, scrollHeight, 270, 1000, 2);
 					FlarialGUI::SetScrollView(rectX, rectY + Constraints::SpacingConstraint(0.01, rectWidth), Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(1.0, "height"));
 
 					rectY = Constraints::PercentageConstraint(0.10, "top");
