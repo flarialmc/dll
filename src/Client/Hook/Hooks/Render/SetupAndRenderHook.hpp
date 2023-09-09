@@ -93,6 +93,7 @@ private:
 		);
 	}
 
+
 	static inline bool usedFreelookHideHud = false;
 
 	static void SetUpAndRenderCallback(ScreenView* pScreenView, MinecraftUIRenderContext* muirc) {
@@ -100,6 +101,8 @@ private:
 		SDK::hasInstanced = true;
 		SDK::clientInstance = muirc->getclientInstance();
 		SDK::screenView = pScreenView;
+
+		//Logger::info(std::f
 
 		std::string layer = SDK::screenView->VisualTree->root->LayerName;
 
