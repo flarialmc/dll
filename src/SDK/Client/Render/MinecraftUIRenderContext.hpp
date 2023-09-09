@@ -4,7 +4,6 @@
 #include "../Core/ClientInstance.hpp"
 #include "../../../Utils/Memory/Memory.hpp"
 #include "ScreenContext.hpp"
-#include "textHolder.hpp"
 #include <cstdint>
 #include <string>
 #include "../../../Utils/Memory/Memory.hpp"
