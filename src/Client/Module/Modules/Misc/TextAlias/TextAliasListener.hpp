@@ -21,6 +21,8 @@ public:
             D2D::context->SetTextAntialiasMode(aliases[curAliasMode]);
             return;
         }
+
+        if (aliases[curAliasMode] != D2D::context->GetTextAntialiasMode()) D2D::context->SetTextAntialiasMode(aliases[curAliasMode]);   
     }
 
 public:
