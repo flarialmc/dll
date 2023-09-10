@@ -439,6 +439,11 @@ public:
 
 					rectY += Constraints::SpacingConstraint(0.35, textWidth);
 
+					FlarialGUI::Dropdown(0, rectX, rectY, std::vector<std::string>{"Default", "Cleartype", "Grayscale", "Aliased"}, Client::settings.getSettingByName<std::string>("aliasingMode")->value, "Text Aliasing");
+					FlarialGUI::SetIsInAdditionalYMode();
+
+					rectY += Constraints::SpacingConstraint(0.35, textWidth);
+
 					FlarialGUI::FlarialTextWithFont(rectX, rectY, FlarialGUI::to_wide("Eject keybind").c_str(),
 						textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
 						Constraints::SpacingConstraint(1.05, textWidth),
@@ -635,6 +640,7 @@ public:
 						Client::settings.getSettingByName<bool>("anonymousApi")->value = !Client::settings.getSettingByName<bool>("anonymousApi")->value;
 					}
 
+					FlarialGUI::UnSetIsInAdditionalYMode();
 					FlarialGUI::UnsetScrollView();
 					FlarialGUI::PopSize();
 				}

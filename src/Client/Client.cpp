@@ -146,6 +146,9 @@ void Client::initialize()
     if (Client::settings.getSettingByName<bool>("centreCursor") == nullptr)
         Client::settings.addSetting("centreCursor", false);
 
+    if (Client::settings.getSettingByName<std::string>("aliasingMode") == nullptr)
+        Client::settings.addSetting("aliasingMode", (std::string)"Default");
+
     if (Client::settings.getSettingByName<std::string>("ejectKeybind") == nullptr)
         Client::settings.addSetting("ejectKeybind", (std::string)"");
 
