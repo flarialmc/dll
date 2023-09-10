@@ -13,7 +13,7 @@ public:
         {"Grayscale", D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE},
         {"Aliased", D2D1_TEXT_ANTIALIAS_MODE_ALIASED}
     };
-    std::string curAliasMode = Client::settings.getSettingByName<std::string>("aliasingMode")->value;
+    std::string curAliasMode;
 
     void onLocalTick(TickEvent& event) override {
         if (curAliasMode != Client::settings.getSettingByName<std::string>("aliasingMode")->value) {
