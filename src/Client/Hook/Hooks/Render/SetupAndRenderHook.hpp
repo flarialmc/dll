@@ -75,7 +75,7 @@ private:
 		if (Client::disable) return;
 		Module* mod = ModuleManager::getModule("Animations");
 		if (mod->settings.getSettingByName<bool>("enabled")->value)
-		if (strcmp(texturePtr->GetFilePath().getText(), "textures/ui/selected_hotbar_slot") == 0)
+		if (strcmp(texturePtr->GetFilePath().c_str(), "textures/ui/selected_hotbar_slot") == 0)
 		{
 			static float lerpedPos = imagePos.x;
 			lerpedPos = animate(imagePos.x, lerpedPos, (0.016f * mod->settings.getSettingByName<float>("hotbarSpeed")->value) * FlarialGUI::frameFactor);
@@ -93,6 +93,7 @@ private:
 		);
 	}
 
+
 	static inline bool usedFreelookHideHud = false;
 
 	static void SetUpAndRenderCallback(ScreenView* pScreenView, MinecraftUIRenderContext* muirc) {
@@ -100,6 +101,8 @@ private:
 		SDK::hasInstanced = true;
 		SDK::clientInstance = muirc->getclientInstance();
 		SDK::screenView = pScreenView;
+
+		//Logger::info(std::f
 
 		std::string layer = SDK::screenView->VisualTree->root->LayerName;
 
