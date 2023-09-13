@@ -20,7 +20,7 @@ class FPSListener : public Listener {
 
 
 
-            this->module->NormalRender(0, module->settings.getSettingByName<std::string>("text")->value, std::to_string(MC::fps * (int)module->settings.getSettingByName<float>("fpsSpoofer")->value));
+            this->module->NormalRender(0, module->settings.getSettingByName<std::string>("text")->value, std::to_string((int)(MC::fps * round(module->settings.getSettingByName<float>("fpsSpoofer")->value))));
 
         }
 

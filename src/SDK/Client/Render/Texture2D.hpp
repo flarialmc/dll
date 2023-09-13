@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 class TextureData
 {
 private:
@@ -7,12 +9,12 @@ private:
 	struct PathStruct
 	{
 		char pad_0x0[0x18];
-		TextHolder filePath;
+		std::string filePath;
 	}*ptrToPath;
 	char pad_0x0038[0x20];
 
 public:
-	TextHolder GetFilePath() const
+	std::string GetFilePath() const
 	{
 		return ptrToPath->filePath;
 	}
@@ -38,80 +40,30 @@ public:
 	char FontPath[32];
 };
 
-class StringHasher {
-public:
-	uint64_t hash;
-	TextHolder text;
-	const StringHasher* unk;
-
-	StringHasher(uint64_t inputhash, std::string inputtext) {
-		memset(this, 0x0, sizeof(StringHasher));
-		this->hash = inputhash;
-		this->text.setText(inputtext);
-	}
-
-	StringHasher(const std::string& text) {
-		memset(this, 0x0, sizeof(StringHasher));
-		this->text.setText(text);
-		this->computeHash();
-	}
-
-	void computeHash() {
-		hash = 0xCBF29CE484222325i64;
-		if (this->text.getTextLength() <= 0)
-			return;
-		char* textP = this->text.getText();
-		auto c = *textP;
-
-		do {
-			hash = c ^ 0x100000001B3i64 * hash;
-			c = *++textP;
-		} while (*textP);
-	}
-
-	bool operator==(StringHasher& rhs) {
-		if (this->text.getText() == rhs.text.getText()) {
-			return ((this->unk == &rhs) && (rhs.unk == this));
-		}
-		return false;
-	}
-	bool operator!=(StringHasher& rhs) {
-		return !(*this == rhs);
-	}
-	bool operator<(StringHasher& rhs) {
-		if (this->hash < rhs.hash) {
-			return true;
-		}
-		if (this->hash <= rhs.hash) {
-			return (strcmp(this->text.getText(), rhs.text.getText()) < 0);
-		}
-		return false;
-	}
-};
 
 class HashedString {
 public:
 	uint64_t hash;
-	TextHolder text;
+	std::string text;
 	const HashedString* unk;
 
 	HashedString(uint64_t inputhash, std::string inputtext) {
 		memset(this, 0x0, sizeof(HashedString));
 		this->hash = inputhash;
-		this->text.setText(inputtext);
+		this->text = inputtext;
 	}
 
 	HashedString(const std::string& text) {
 		memset(this, 0x0, sizeof(HashedString));
-		this->text.setText(text);
+		this->text = text;
 		this->computeHash();
 	}
 
 	void computeHash() {
 		hash = 0xCBF29CE484222325i64;
-		if (this->text.getTextLength() <= 0)
+		if (this->text.length() <= 0)
 			return;
-		char* textP = this->text.getText();
+		char* textP = const_cast<char*>(this->text.c_str());
 		auto c = *textP;
 
 		do {
@@ -121,7 +73,7 @@ public:
 	}
 
 	bool operator==(HashedString& rhs) {
-		if (this->text.getText() == rhs.text.getText()) {
+		if (this->text == rhs.text) {
 			return ((this->unk == &rhs) && (rhs.unk == this));
 		}
 		return false;
@@ -134,7 +86,7 @@ public:
 			return true;
 		}
 		if (this->hash <= rhs.hash) {
-			return (strcmp(this->text.getText(), rhs.text.getText()) < 0);
+			return (strcmp(this->text.c_str(), rhs.text.c_str()) < 0);
 		}
 		return false;
 	}

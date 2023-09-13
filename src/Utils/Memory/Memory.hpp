@@ -56,6 +56,12 @@ public:
         return (*static_cast<Fn**>(thisptr))[IIdx](thisptr, argList...);
     }
 
+    template <typename TRet, typename... TArgs>
+    static inline auto CallVFuncI(void* thisptr, int index, TArgs... argList) -> TRet {
+        using Fn = TRet(__thiscall*)(void*, decltype(argList)...);
+        return (*static_cast<Fn**>(thisptr))[index](thisptr, argList...);
+    }
+
     static void hookFunc(void* pTarget, void* pDetour, void** ppOriginal, std::string name) {
 
         if (pTarget == NULL) {

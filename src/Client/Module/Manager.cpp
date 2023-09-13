@@ -6,6 +6,7 @@
 #include "Modules/Misc/Uninject/Uninject.hpp"
 #include "Modules/Misc/SaveConfig/SaveConfig.hpp"
 #include "Modules/Misc/RGB/rgb.hpp"
+#include "Modules/Misc/TextAlias/TextAlias.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/Module.hpp"
 #include "Modules/FPS/FPSCounter.hpp"
@@ -118,6 +119,7 @@ void ModuleManager::initialize()
     EventHandler::registerListener(new SaveConfigListener("SaveConfig"));
     EventHandler::registerListener(new CentreCursorListener("CentreCursor"));
     EventHandler::registerListener(new rgbListener("RGB Controller"));
+    EventHandler::registerListener(new TextAliasListener("TextAlias"));
 }
 
 void ModuleManager::terminate()

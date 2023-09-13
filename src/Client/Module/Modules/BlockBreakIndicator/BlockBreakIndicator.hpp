@@ -336,9 +336,9 @@ public:
             float barheight = Constraints::RelativeConstraint(0.5f * settings.getSettingByName<float>("uiscale")->value);
             float barwidth = Constraints::RelativeConstraint(0.05f * settings.getSettingByName<float>("uiscale")->value);
 
-            D2D1_COLOR_F bgColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
-            D2D1_COLOR_F barFill = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("barFill")->value);
-            D2D1_COLOR_F outline = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
+            D2D1_COLOR_F bgColor = settings.getSettingByName<bool>("bgRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
+            D2D1_COLOR_F barFill = settings.getSettingByName<bool>("barFillRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("barFill")->value);
+            D2D1_COLOR_F outline = settings.getSettingByName<bool>("borderRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
 
             std::string orientation = settings.getSettingByName<std::string>("orientation")->value;
 
