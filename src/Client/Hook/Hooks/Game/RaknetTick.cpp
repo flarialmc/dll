@@ -52,6 +52,8 @@ void RaknetTickHook::callback(RaknetConnector* raknet)  {
 
         towriteip = ip;
     }
+
+    raknetTickOriginal(raknet);
 }
 
 
