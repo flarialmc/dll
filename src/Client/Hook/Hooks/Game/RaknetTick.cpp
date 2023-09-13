@@ -59,5 +59,5 @@ void RaknetTickHook::callback(RaknetConnector* raknet)  {
 
 
 void RaknetTickHook::enableHook() {
-    this->autoHook(callback, (void**)raknetTickOriginal);
+    this->autoHook(callback, (void**)&raknetTickOriginal);
 }
