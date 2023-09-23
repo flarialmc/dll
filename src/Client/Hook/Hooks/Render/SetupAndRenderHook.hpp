@@ -146,7 +146,7 @@ private:
 
 			
 
-			//MH_CreateHook((void*)VTable[5], drawTextCallback, (LPVOID*)&func_originalText);
+			MH_CreateHook((void*)VTable[5], drawTextCallback, (LPVOID*)&func_originalText);
 			if (MH_EnableHook((void*)VTable[5]) != MH_OK)
 			{
 				Logger::error(std::format("Failed to find address of {}", "drawText"));
@@ -158,7 +158,7 @@ private:
 		}
 
 		if (__o__DrawImage == nullptr) {
-			//Memory::hookFunc((void*)VTable[7], (void*)DrawImageDetour, (void**)&__o__DrawImage, "DrawImage");
+			Memory::hookFunc((void*)VTable[7], (void*)DrawImageDetour, (void**)&__o__DrawImage, "DrawImage");
 		}
 
 		SetupAndRenderEvent e;

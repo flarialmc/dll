@@ -192,7 +192,11 @@ void Client::initialize()
 
     HookManager::initialize();
 
+    Logger::debug("Sleeping");
+
     Sleep(2500);
+
+    Logger::debug("Sending");
 
     if (!Client::disable) {
         FlarialGUI::Notify("Report bugs at https://flarial.net/discord!");

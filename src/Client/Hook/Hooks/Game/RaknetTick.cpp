@@ -6,6 +6,7 @@
 
 std::string RaknetTickHook::towriteip = "";
 
+//not updated
 void RaknetTickHook::callback(RaknetConnector* raknet)  {
 
     static bool  once = false;

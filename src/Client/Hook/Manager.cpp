@@ -42,7 +42,7 @@ void HookManager::initialize()
 
   //  hooks.push_back(new getViewPerspectiveHook());
     hooks.push_back(new RenderActorHook());
-  //  hooks.push_back(new RaknetTickHook());
+    hooks.push_back(new RaknetTickHook());
     hooks.push_back(new SetUpAndRenderHook());
     hooks.push_back(new GameModeAttackHook());
     hooks.push_back(new SwapchainHook());

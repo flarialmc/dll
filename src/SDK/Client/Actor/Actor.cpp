@@ -27,7 +27,7 @@ bool Actor::getActorFlag(int flag) {
 }
 
 Vec3<float>* Actor::getPosition() {
-    return Memory::CallVFunc<24, Vec3<float>*>(this);
+    return Memory::CallVFunc<22, Vec3<float>*>(this);
 }
 
 bool Actor::wasHurt() {
