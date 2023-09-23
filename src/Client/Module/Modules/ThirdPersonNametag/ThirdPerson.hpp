@@ -19,7 +19,7 @@ public:
 
         std::vector<uint8_t> original;
         original.resize(6);
-        memcpy(original.data(), (LPVOID)Memory::findSig("0F 84 ? ? ? ? 49 8B D7 48 8B CE E8 ? ? ? ? 84 C0"), 6);
+        memcpy(original.data(), (LPVOID)Memory::findSig("? ? ? ? ? ? 49 8B ? 48 8B ? E8 ? ? ? ? 84 C0 ? ? ? ? ? ? 49 8B ? 49 8b ? ? ? ? ? 49"), 6);
 
         EventHandler::registerListener(new ThirdPersonListener("ThirdPersonListener", this, original));
 

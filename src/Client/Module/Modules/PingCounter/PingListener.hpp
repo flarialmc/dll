@@ -26,7 +26,7 @@ class PingListener : public Listener {
                     }
 
                     else {
-                        ping = SDK::raknetConnector->getPeer()->getPing();
+                      //  ping = SDK::raknetConnector->getPeer()->getPing();
 
                     }
 

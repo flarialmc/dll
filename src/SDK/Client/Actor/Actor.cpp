@@ -11,15 +11,15 @@ Component* Actor::tryGet(uintptr_t addr) {
 }
 
 bool Actor::isAlive() {
-    return Memory::CallVFunc<90, bool>(this);
+    return Memory::CallVFunc<89, bool>(this);
 }
 
 std::string* Actor::getXuid(std::string* str) {
-    return Memory::CallVFunc<403, std::string*, std::string*>(this, str);
+    return Memory::CallVFunc<396, std::string*, std::string*>(this, str);
 }
 
 int Actor::getEntityTypeId() {
-    return Memory::CallVFunc<153, int>(this);
+    return Memory::CallVFunc<151, int>(this);
 }
 
 bool Actor::getActorFlag(int flag) {
@@ -27,15 +27,15 @@ bool Actor::getActorFlag(int flag) {
 }
 
 Vec3<float>* Actor::getPosition() {
-    return Memory::CallVFunc<22, Vec3<float>*>(this);
+    return Memory::CallVFunc<24, Vec3<float>*>(this);
 }
 
 bool Actor::wasHurt() {
-    return Memory::CallVFunc<215, bool>(this);
+    return Memory::CallVFunc<211, bool>(this);
 }
 
 ItemStack* Actor::getArmor(int slot) {
-    return Memory::CallVFunc<137, ItemStack*, int>(this, slot);
+    return Memory::CallVFunc<139, ItemStack*, int>(this, slot);
 }
 
 ActorMovementProxyComponent* Actor::getMovementProxyComponent() {
@@ -90,9 +90,9 @@ EntityContext* Actor::GetEntityContext() {
 }
 
 void Actor::setNametag(std::string* name) {
-    Memory::CallVFunc<61, void>(this, name);
+    Memory::CallVFunc<55, void>(this, name);
 }
 
 std::string* Actor::getNametag() {
-    return Memory::CallVFunc<57, std::string*>(this);
+    return Memory::CallVFunc<56, std::string*>(this);
 }

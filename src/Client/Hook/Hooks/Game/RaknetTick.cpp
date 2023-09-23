@@ -8,49 +8,60 @@ std::string RaknetTickHook::towriteip = "";
 
 void RaknetTickHook::callback(RaknetConnector* raknet)  {
 
-    SDK::raknetConnector = raknet;
+    static bool  once = false;
 
-    std::string ip = raknet->JoinedIp;
+    if (SDK::clientInstance != nullptr) {
+        if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+            if (!once) {
+                Logger::debug(std::format("nigger {}", (void*)raknet));
+                once = true;
+            }
 
-    if (ip.empty() && SDK::clientInstance == nullptr) {
-        ip = "none";
-    }
+            SDK::raknetConnector = raknet;
 
-    if (ip.empty() && SDK::clientInstance != nullptr) {
+            std::string ip = raknet->JoinedIp;
 
-        if (SDK::clientInstance->getLocalPlayer() == nullptr) {
-            ip = "none";
-            ActorNormalTick::allahuakbar = false;
+            if (ip.empty() && SDK::clientInstance == nullptr) {
+                ip = "none";
+            }
+
+            if (ip.empty() && SDK::clientInstance != nullptr) {
+
+                if (SDK::clientInstance->getLocalPlayer() == nullptr) {
+                    ip = "none";
+                    ActorNormalTick::allahuakbar = false;
+                }
+            }
+
+            std::string settingspath = Utils::getRoamingPath() + "\\Flarial\\serverip.txt";
+
+            if (!std::filesystem::exists(settingspath)) {
+
+                std::filesystem::path filePath(settingspath);
+                std::filesystem::create_directories(filePath.parent_path());
+
+                HANDLE fileHandle = CreateFileA(settingspath.c_str(), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                    OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+
+                if (fileHandle == INVALID_HANDLE_VALUE) {
+                    Logger::error("Failed to create file: " + settingspath);
+                    return;
+                }
+
+                CloseHandle(fileHandle);
+            }
+
+            if (towriteip != ip) {
+
+                std::ofstream outputFile(settingspath);
+                if (outputFile.is_open()) {
+                    outputFile << ip;
+                    outputFile.close();
+                }
+
+                towriteip = ip;
+            }
         }
-    }
-
-    std::string settingspath = Utils::getRoamingPath() + "\\Flarial\\serverip.txt";
-
-    if (!std::filesystem::exists(settingspath)) {
-
-        std::filesystem::path filePath(settingspath);
-        std::filesystem::create_directories(filePath.parent_path());
-
-        HANDLE fileHandle = CreateFileA(settingspath.c_str(), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                                        OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-
-        if (fileHandle == INVALID_HANDLE_VALUE) {
-            Logger::error("Failed to create file: " + settingspath);
-            return;
-        }
-
-        CloseHandle(fileHandle);
-    }
-
-    if(towriteip != ip) {
-
-        std::ofstream outputFile(settingspath);
-        if (outputFile.is_open()) {
-            outputFile << ip;
-            outputFile.close();
-        }
-
-        towriteip = ip;
     }
 
     raknetTickOriginal(raknet);

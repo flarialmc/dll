@@ -2,15 +2,7 @@
 #include "../../SDK.hpp"
 
 LocalPlayer* ClientInstance::getLocalPlayer() {
-    static uintptr_t indexRef;
-
-    if (indexRef == 0) {
-        indexRef = Memory::findSig(
-            "49 8B 00 49 8B C8 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 48 85 C0 0F 84 ? ? ? ? 0F 57 C0 0F 11 85 ? ? ? ? 66 0F 7F 44 24 ? 48 8B 05 ? ? ? ? 48 85 C0 74 04");
-    }
-
-    int index = *reinterpret_cast<int*>(indexRef + 9) / 8;
-    return Memory::CallVFuncI<LocalPlayer*>(this, index);
+    return Memory::CallVFunc<27,LocalPlayer*>(this);
 }
 
 BlockSource* ClientInstance::getBlockSource() {

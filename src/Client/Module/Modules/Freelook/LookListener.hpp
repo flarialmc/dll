@@ -64,7 +64,7 @@ public:
     }
 
     static void patch() {
-
+        /*
         DWORD oldProtect;
         VirtualProtect((LPVOID)yaw1, PatchedYaw1.size(), PAGE_EXECUTE_READWRITE, &oldProtect);
         memcpy((LPVOID)yaw1, PatchedYaw1.data(), PatchedYaw1.size());
@@ -85,6 +85,7 @@ public:
         VirtualProtect((LPVOID)rot, PatchedRot.size(), PAGE_EXECUTE_READWRITE, &oldProtect4);
         memcpy((LPVOID)rot, PatchedRot.data(), PatchedRot.size());
         VirtualProtect((LPVOID)rot, PatchedRot.size(), oldProtect, &oldProtect4);
+        */
     }
 
     void onKey(KeyEvent& event) override {
@@ -103,7 +104,7 @@ public:
         this->name = string;
         this->module = module;
 
-        OriginalYaw1.resize(4);
+        /*OriginalYaw1.resize(4);
         memcpy(OriginalYaw1.data(), (LPVOID)yaw1, 4);
 
         OriginalYaw2.resize(4);
@@ -134,6 +135,7 @@ public:
         PatchedRot.push_back(0x90);
         PatchedRot.push_back(0x90);
         PatchedRot.push_back(0x90);
+        */
 
     }
 

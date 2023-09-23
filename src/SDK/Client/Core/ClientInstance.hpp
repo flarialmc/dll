@@ -23,8 +23,8 @@ public:
     }
 
     BUILD_ACCESS(this, MinecraftGame*, mcgame, 0x0C8);
-    BUILD_ACCESS(this, GuiData*, guiData, 0x540);
-    BUILD_ACCESS(this, Vec2<float>, mousePos, 0x498);
+    BUILD_ACCESS(this, GuiData*, guiData, 0x560);
+    //BUILD_ACCESS(this, Vec2<float>, mousePos, 0x498);
 
     LocalPlayer* getLocalPlayer();
     BlockSource* getBlockSource();
