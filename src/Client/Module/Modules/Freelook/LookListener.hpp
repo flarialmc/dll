@@ -16,7 +16,8 @@ private:
     static inline uintptr_t yaw1 = Memory::findSig("F3 0F 11 30 F3 ? ? 78 ? 49 8B CE");
     static inline uintptr_t yaw2 = Memory::findSig("F3 0F 11 ? F3 0F 11 ? ? 48 8B 4D");
     static inline uintptr_t pitch = Memory::findSig("F3 0F 11 0E 48 89 9C");
-    static inline uintptr_t rot = Memory::findSig("F3 0F ? ? 48 8D ? ? F3 0F ? ? ? ? F3 0F");
+    static inline uintptr_t rot = Memory::findSig("F3 0F 11 38 ? ? 7C 24 ? 48 81 C4");
+    static inline uintptr_t movement = Memory::findSig("F3 0F 11 01 48 8D 56");
 
     static inline std::vector<uint8_t> OriginalYaw1;
     static inline std::vector<uint8_t> PatchedYaw1;
@@ -26,6 +27,9 @@ private:
     static inline std::vector<uint8_t> PatchedPitch;
     static inline std::vector<uint8_t> OriginalRot;
     static inline std::vector<uint8_t> PatchedRot;
+
+    static inline std::vector<uint8_t> Originalmovement;
+    static inline std::vector<uint8_t> Patchedmovement;
 public:
 
     void onRender(RenderEvent& event) override {
@@ -42,8 +46,6 @@ public:
     }
 
     void onLocalTick(TickEvent& event) override {
-
-
 
         if (enabled != module->settings.getSettingByName<bool>("enabled")->value) {
             enabled = module->settings.getSettingByName<bool>("enabled")->value;
@@ -64,7 +66,7 @@ public:
     }
 
     static void patch() {
-        
+
         DWORD oldProtect;
         VirtualProtect((LPVOID)yaw1, PatchedYaw1.size(), PAGE_EXECUTE_READWRITE, &oldProtect);
         memcpy((LPVOID)yaw1, PatchedYaw1.data(), PatchedYaw1.size());
@@ -85,6 +87,11 @@ public:
         VirtualProtect((LPVOID)rot, PatchedRot.size(), PAGE_EXECUTE_READWRITE, &oldProtect4);
         memcpy((LPVOID)rot, PatchedRot.data(), PatchedRot.size());
         VirtualProtect((LPVOID)rot, PatchedRot.size(), oldProtect, &oldProtect4);
+
+        DWORD oldProtect5;
+        VirtualProtect((LPVOID)movement, Patchedmovement.size(), PAGE_EXECUTE_READWRITE, &oldProtect5);
+        memcpy((LPVOID)movement, Patchedmovement.data(), Patchedmovement.size());
+        VirtualProtect((LPVOID)movement, Patchedmovement.size(), oldProtect, &oldProtect5);
         
     }
 
@@ -116,6 +123,9 @@ public:
         OriginalRot.resize(4);
         memcpy(OriginalRot.data(), (LPVOID)rot, 4);
 
+        Originalmovement.resize(4);
+        memcpy(Originalmovement.data(), (LPVOID)movement, 4);
+
         PatchedYaw1.push_back(0x90);
         PatchedYaw1.push_back(0x90);
         PatchedYaw1.push_back(0x90);
@@ -135,6 +145,11 @@ public:
         PatchedRot.push_back(0x90);
         PatchedRot.push_back(0x90);
         PatchedRot.push_back(0x90);
+
+        Patchedmovement.push_back(0x90);
+        Patchedmovement.push_back(0x90);
+        Patchedmovement.push_back(0x90);
+        Patchedmovement.push_back(0x90);
         
 
     }
@@ -160,5 +175,10 @@ public:
         VirtualProtect((LPVOID)rot, OriginalRot.size(), PAGE_EXECUTE_READWRITE, &oldProtect4);
         memcpy((LPVOID)rot, OriginalRot.data(), OriginalRot.size());
         VirtualProtect((LPVOID)rot, OriginalRot.size(), oldProtect, &oldProtect4);
+
+        DWORD oldProtect5;
+        VirtualProtect((LPVOID)movement, Originalmovement.size(), PAGE_EXECUTE_READWRITE, &oldProtect5);
+        memcpy((LPVOID)movement, Originalmovement.data(), Originalmovement.size());
+        VirtualProtect((LPVOID)movement, Originalmovement.size(), oldProtect, &oldProtect5);
     }
 };
