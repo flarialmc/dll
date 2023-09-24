@@ -14,7 +14,7 @@ void RaknetTickHook::callback(RaknetConnector* raknet)  {
     if (SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             if (!once) {
-                Logger::debug(std::format("nigger {}", (void*)raknet));
+               // Logger::debug(std::format("nigger {}", (void*)raknet));
                 once = true;
             }
 
