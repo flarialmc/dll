@@ -1,5 +1,5 @@
 #include "ActorMovementProxy.hpp"
 
 void ActorMovementProxy::SetRotation(Vec2<float>* rot) {
-	return Memory::CallVFunc<74, void>(this, rot);
+	return Memory::CallVFunc<57, void>(this, rot);
 }

@@ -14,7 +14,7 @@ private:
     Vec2<float> oldRotations;
     bool enabled = false;
     static inline uintptr_t yaw1 = Memory::findSig("F3 0F 11 30 F3 ? ? 78 ? 49 8B CE");
-    static inline uintptr_t yaw2 = Memory::findSig("F3 0F 11 38 F3 ? ? 70 ? 48 8B 8C");
+    static inline uintptr_t yaw2 = Memory::findSig("F3 0F 11 ? F3 0F 11 ? ? 48 8B 4D");
     static inline uintptr_t pitch = Memory::findSig("F3 0F 11 0E 48 89 9C");
     static inline uintptr_t rot = Memory::findSig("F3 0F ? ? 48 8D ? ? F3 0F ? ? ? ? F3 0F");
 
@@ -64,7 +64,7 @@ public:
     }
 
     static void patch() {
-        /*
+        
         DWORD oldProtect;
         VirtualProtect((LPVOID)yaw1, PatchedYaw1.size(), PAGE_EXECUTE_READWRITE, &oldProtect);
         memcpy((LPVOID)yaw1, PatchedYaw1.data(), PatchedYaw1.size());
@@ -85,7 +85,7 @@ public:
         VirtualProtect((LPVOID)rot, PatchedRot.size(), PAGE_EXECUTE_READWRITE, &oldProtect4);
         memcpy((LPVOID)rot, PatchedRot.data(), PatchedRot.size());
         VirtualProtect((LPVOID)rot, PatchedRot.size(), oldProtect, &oldProtect4);
-        */
+        
     }
 
     void onKey(KeyEvent& event) override {
@@ -104,7 +104,7 @@ public:
         this->name = string;
         this->module = module;
 
-        /*OriginalYaw1.resize(4);
+        OriginalYaw1.resize(4);
         memcpy(OriginalYaw1.data(), (LPVOID)yaw1, 4);
 
         OriginalYaw2.resize(4);
@@ -135,7 +135,7 @@ public:
         PatchedRot.push_back(0x90);
         PatchedRot.push_back(0x90);
         PatchedRot.push_back(0x90);
-        */
+        
 
     }
 
