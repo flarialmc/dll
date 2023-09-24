@@ -25,8 +25,6 @@ private:
     static inline std::vector<uint8_t> PatchedYaw2;
     static inline std::vector<uint8_t> OriginalPitch;
     static inline std::vector<uint8_t> PatchedPitch;
-    static inline std::vector<uint8_t> OriginalRot;
-    static inline std::vector<uint8_t> PatchedRot;
 
     static inline std::vector<uint8_t> Originalmovement;
     static inline std::vector<uint8_t> Patchedmovement;
@@ -83,10 +81,7 @@ public:
         VirtualProtect((LPVOID)pitch, PatchedPitch.size(), oldProtect, &oldProtect3);
 
 
-        DWORD oldProtect4;
-        VirtualProtect((LPVOID)rot, PatchedRot.size(), PAGE_EXECUTE_READWRITE, &oldProtect4);
-        memcpy((LPVOID)rot, PatchedRot.data(), PatchedRot.size());
-        VirtualProtect((LPVOID)rot, PatchedRot.size(), oldProtect, &oldProtect4);
+
 
         DWORD oldProtect5;
         VirtualProtect((LPVOID)movement, Patchedmovement.size(), PAGE_EXECUTE_READWRITE, &oldProtect5);
@@ -120,9 +115,6 @@ public:
         OriginalPitch.resize(4);
         memcpy(OriginalPitch.data(), (LPVOID)pitch, 4);
 
-        OriginalRot.resize(4);
-        memcpy(OriginalRot.data(), (LPVOID)rot, 4);
-
         Originalmovement.resize(4);
         memcpy(Originalmovement.data(), (LPVOID)movement, 4);
 
@@ -140,11 +132,6 @@ public:
         PatchedPitch.push_back(0x90);
         PatchedPitch.push_back(0x90);
         PatchedPitch.push_back(0x90);
-
-        PatchedRot.push_back(0x90);
-        PatchedRot.push_back(0x90);
-        PatchedRot.push_back(0x90);
-        PatchedRot.push_back(0x90);
 
         Patchedmovement.push_back(0x90);
         Patchedmovement.push_back(0x90);
@@ -170,12 +157,7 @@ public:
         VirtualProtect((LPVOID)pitch, OriginalPitch.size(), PAGE_EXECUTE_READWRITE, &oldProtect3);
         memcpy((LPVOID)pitch, OriginalPitch.data(), OriginalPitch.size());
         VirtualProtect((LPVOID)pitch, OriginalPitch.size(), oldProtect, &oldProtect3);
-
-        DWORD oldProtect4;
-        VirtualProtect((LPVOID)rot, OriginalRot.size(), PAGE_EXECUTE_READWRITE, &oldProtect4);
-        memcpy((LPVOID)rot, OriginalRot.data(), OriginalRot.size());
-        VirtualProtect((LPVOID)rot, OriginalRot.size(), oldProtect, &oldProtect4);
-
+        
         DWORD oldProtect5;
         VirtualProtect((LPVOID)movement, Originalmovement.size(), PAGE_EXECUTE_READWRITE, &oldProtect5);
         memcpy((LPVOID)movement, Originalmovement.data(), Originalmovement.size());
