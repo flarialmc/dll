@@ -8,7 +8,7 @@
 
 class RaknetConnector {
 public:
-	BUILD_ACCESS(this, std::string, JoinedIp, 0x418);
+	BUILD_ACCESS(this, std::string, JoinedIp, 0x438);
 
 
 	virtual void Destructor();
