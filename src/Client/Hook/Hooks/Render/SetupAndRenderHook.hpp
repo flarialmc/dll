@@ -107,6 +107,10 @@ private:
 
 		//std::cout << MobEffect::getEffects() << std::endl;
 
+		//if (SDK::clientInstance->getLocalPlayer()) {
+			//s//td::cout << SDK::clientInstance->getLocalPlayer()->getEffect(MobEffect::getEffects()[1].get());
+	//	}
+
 		std::string layer = SDK::screenView->VisualTree->root->LayerName;
 
 		if (layer != "debug_screen" && layer != "toast_screen") {

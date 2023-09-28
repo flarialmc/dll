@@ -22,6 +22,12 @@ int Actor::getEntityTypeId() {
     return Memory::CallVFunc<151, int>(this);
 }
 
+MobEffectInstance* Actor::getEffect(MobEffect* effect) {
+    static uintptr_t addr = Memory::findSig("40 53 48 83 EC 20 48 8B 41 08 4C 8B C1 8B 5A 08 48 8D 54 24 ? 48 8B 08 41 8B 40 10 89 44 24 30 E8 ? ? ? ?");
+    auto fn = reinterpret_cast<MobEffectInstance * (__cdecl*)(Actor*, MobEffect*)>(addr);
+    return fn(this, effect);
+}
+
 bool Actor::getActorFlag(int flag) {
     return Memory::CallVFunc<0, bool, int>(this, flag);
 }
