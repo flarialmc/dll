@@ -104,6 +104,7 @@ void Client::initialize()
         { "https://cdn-c6f.pages.dev/assets/Animations.png", Path + "Animations.png" },
         { "https://cdn-c6f.pages.dev/assets/transparent.png", Path + "transparent.png" },
         { "https://cdn-c6f.pages.dev/assets/rgb.png", Path + "rgb.png" },
+        { "https://cdn-c6f.pages.dev/assets/pencil.png", Path + "pencil.png" },
         { "https://cdn-c6f.pages.dev/assets/dvdlogo-01.png", Path + "dvdlogo-01.png" },
         { "https://cdn-c6f.pages.dev/assets/dvdlogo-02.png", Path + "dvdlogo-02.png" },
         { "https://cdn-c6f.pages.dev/assets/dvdlogo-03.png", Path + "dvdlogo-03.png" },
