@@ -1,15 +1,15 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "PatarHDListener.hpp"
+#include "dvdListener.hpp"
 #include "../../../Events/EventHandler.hpp"
 
 
-class PatarHD : public Module {
+class DVD : public Module {
 
 public:
 
-    PatarHD() : Module("PatarHD", "Who is this now?", "\\Flarial\\assets\\skull.png", 'C') {
+    DVD() : Module("DVD Screen", "Overlays the DVD Screensaver", "\\Flarial\\assets\\skull.png", 'C') {
 
         onEnable();
 
@@ -17,7 +17,7 @@ public:
 
     void onEnable() override {
 
-        EventHandler::registerListener(new PatarHDListener("PatarHDListener", this));
+        EventHandler::registerListener(new dvdListener("dvdListener", this));
 
         Module::onEnable();
 
@@ -32,14 +32,13 @@ public:
 
         if (settings.getSettingByName<bool>("enabled") == nullptr)
             settings.addSetting("enabled", false);
-        if (settings.getSettingByName<bool>("dvdmode") == nullptr)
-            settings.addSetting("dvdmode", true);
         if (settings.getSettingByName<float>("xveloc") == nullptr)
             settings.addSetting("xveloc", 1.0f);
         if (settings.getSettingByName<float>("yveloc") == nullptr)
             settings.addSetting("yveloc", 0.69f);
         if (settings.getSettingByName<float>("scale") == nullptr)
             settings.addSetting("scale", 1.0f);
+
     }
 
     void onDisable() override {
@@ -47,6 +46,7 @@ public:
     }
 
     void SettingsRender() override {
+
 
         float toggleX = Constraints::PercentageConstraint(0.019, "left");
         float toggleY = Constraints::PercentageConstraint(0.10, "top");
@@ -56,16 +56,6 @@ public:
 
         FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(7.5, textWidth), 2);
         FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"), Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(1.0f, "height"));
-        
-        if (FlarialGUI::Toggle(0, toggleX, toggleY, this->settings.getSettingByName<bool>(
-            "dvdmode")->value)) this->settings.getSettingByName<bool>("dvdmode")->value = !this->settings.getSettingByName<bool>("dvdmode")->value;
-
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, L"DVD Mode", textWidth * 3.0f, textHeight,
-            DWRITE_TEXT_ALIGNMENT_LEADING,
-            Constraints::RelativeConstraint(0.12, "height", true),
-            DWRITE_FONT_WEIGHT_NORMAL);
-
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"X Velocity", textWidth * 3.0f, textHeight,
             DWRITE_TEXT_ALIGNMENT_LEADING,
@@ -78,7 +68,7 @@ public:
         this->settings.getSettingByName<float>("xveloc")->value = percent;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
+        
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Y Velocity", textWidth * 3.0f, textHeight,
             DWRITE_TEXT_ALIGNMENT_LEADING,
             Constraints::RelativeConstraint(0.12, "height", true),

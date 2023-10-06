@@ -668,7 +668,7 @@ public:
 				D2D1_COLOR_F colorThing = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
 				colorThing.a = o_colors_secondary2;
 
-				FlarialGUI::RoundedRect(rectX, rectY, D2D1::ColorF(32.0f / 255.0f, 26.0f / 255.0f, 27.0f / 255.0f),
+				FlarialGUI::RoundedRect(rectX, rectY, colorThing,
 					anotherRectWidth, anotherRectHeight, round.x, round.x);
 
 				D2D1_COLOR_F bruv = colors_secondary1_rgb ? FlarialGUI::rgbColor : colors_secondary1;

@@ -14,6 +14,7 @@
 #include "Components/StateVectorComponent.hpp"
 #include "Components/ActorHeadRotationComponent.hpp"
 #include "EntityContext.hpp"
+#include "MobEffect.h"
 
 enum ActorFlags {
     FLAG_ONFIRE = 0,
@@ -145,6 +146,7 @@ public:
     Component* tryGet(uintptr_t addr);
     ItemStack* getArmor(int slot);
     int getEntityTypeId();
+    MobEffectInstance* getEffect(MobEffect* effect);
     ActorMovementProxyComponent* getMovementProxyComponent();
     MoveInputComponent* getMoveInputHandler();
     bool isAlive();

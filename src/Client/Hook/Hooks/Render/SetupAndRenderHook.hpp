@@ -11,6 +11,7 @@
 #include "../Visual/getGammaHook.hpp"
 #include "../../../Module/Manager.hpp"
 #include <format>
+//#include "../../../../SDK/Client/Actor/MobEffect.h"
 
 bool sendoncethx = false;
 std::string actualName = "";
@@ -103,6 +104,12 @@ private:
 		SDK::screenView = pScreenView;
 
 		//Logger::info(std::f
+
+		//std::cout << MobEffect::getEffects() << std::endl;
+
+		//if (SDK::clientInstance->getLocalPlayer()) {
+			//s//td::cout << SDK::clientInstance->getLocalPlayer()->getEffect(MobEffect::getEffects()[1].get());
+	//	}
 
 		std::string layer = SDK::screenView->VisualTree->root->LayerName;
 
