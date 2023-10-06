@@ -54,13 +54,6 @@ public:
             }
             else unpatch();
         }
-
-        if (module->settings.getSettingByName<bool>("enabled")->value) {
-             event.getActor()->getMovementProxyComponent()->movementProxy->SetRotation(&oldRotations);
-        }
-        else {
-            oldRotations = event.getActor()->actorRotationComponent->Rotation;
-        }
     }
 
     static void patch() {
