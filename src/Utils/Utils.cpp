@@ -25,10 +25,10 @@ GLMatrix* getMatrixCorrection()
     GLMatrix toReturn = GLMatrix();
 
     for (int i = 0; i < 4; i++) {
-        toReturn.matrix[i * 4 + 0] = Matrix1.matrix[0 + i];
-        toReturn.matrix[i * 4 + 1] = Matrix1.matrix[4 + i];
-        toReturn.matrix[i * 4 + 2] = Matrix1.matrix[8 + i];
-        toReturn.matrix[i * 4 + 3] = Matrix1.matrix[12 + i];
+        toReturn.matrix[i * 4 + 0] = SDK::clientInstance->Matrix1.matrix[0 + i];
+        toReturn.matrix[i * 4 + 1] = SDK::clientInstance->Matrix1.matrix[4 + i];
+        toReturn.matrix[i * 4 + 2] = SDK::clientInstance->Matrix1.matrix[8 + i];
+        toReturn.matrix[i * 4 + 3] = SDK::clientInstance->Matrix1.matrix[12 + i];
     }
 
     return &toReturn;
@@ -58,7 +58,7 @@ bool Utils::WorldToScreen(Vec3<float> pos, Vec2<float>& screen)
     Vec2<float> displaySize = MC::windowSize;
 
     Vec3<float> origin = *SDK::clientInstance->getLocalPlayer()->getPosition();
-    Vec2<float> fov = getFovHook::currentFov;
+    Vec2<float> fov = SDK::clientInstance->getFov();
 
     pos.x -= origin.x;
     pos.y -= origin.y;
