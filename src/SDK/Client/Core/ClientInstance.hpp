@@ -39,21 +39,21 @@ public:
 		return *reinterpret_cast<LevelRender**>(address + 0xE0);
 	}
 
-    /*
+
 	float* getFovX()
 	{
-		return reinterpret_cast<float*>((uintptr_t)(this) + 0x6A0);
+		return reinterpret_cast<float*>((uintptr_t)(this) + 0x6F8);
 	};
 
 	float* getFovY()
 	{
-		return reinterpret_cast<float*>((uintptr_t)(this) + 0x6B4);
+		return reinterpret_cast<float*>((uintptr_t)(this) + 0x70C);
 	};
 
 	Vec2<float> getFov()
 	{
 		return Vec2(*getFovX(), *getFovY());
-	};*/
+	};
 
     LoopbackPacketSender* getPacketSender()
     {

@@ -198,13 +198,7 @@ public:
 
     static std::string remomveNonNumeric(const std::string &input);
 
-    float transformx(const Vec3<float> &p);
-
-    float transformy(const Vec3<float> &p);
-
-    float transformz(const Vec3<float> &p);
-
-    bool WorldToScreen(Vec3<float> pos, Vec2<float> &screen);
+    static bool WorldToScreen(Vec3<float> pos, Vec2<float> &screen);
 };
 
 #pragma once

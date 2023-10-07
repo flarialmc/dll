@@ -58,11 +58,13 @@ bool Utils::WorldToScreen(Vec3<float> pos, Vec2<float>& screen)
     Vec2<float> displaySize = MC::windowSize;
 
     Vec3<float> origin = *SDK::clientInstance->getLocalPlayer()->getPosition();
+
     Vec2<float> fov = SDK::clientInstance->getFov();
 
     pos.x -= origin.x;
     pos.y -= origin.y;
     pos.z -= origin.z;
+
 
     float x = transformx(pos);
     float y = transformy(pos);
@@ -73,10 +75,10 @@ bool Utils::WorldToScreen(Vec3<float> pos, Vec2<float>& screen)
     float mX = (float)displaySize.x / 2.0F;
     float mY = (float)displaySize.y / 2.0F;
 
-    /*
+
     screen.x = mX + (mX * x / -z * fov.x);
     screen.y = mY - (mY * y / -z * fov.y);
-    */
+
 
     return true;
 }

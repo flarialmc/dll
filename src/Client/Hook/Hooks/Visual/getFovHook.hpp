@@ -68,6 +68,8 @@ private:
 			fov = currentZoomVal;
 		}
 
+        currentFov = fov;
+
 		return fov;
 	}
 
@@ -80,4 +82,6 @@ public:
 	void enableHook() override {
 		this->autoHook(getFovCallback, (void**)&func_original);
 	}
+
+    static inline float currentFov = 0.0f;
 };
