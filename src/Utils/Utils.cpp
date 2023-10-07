@@ -56,7 +56,7 @@ bool Utils::WorldToScreen(Vec3<float> pos, Vec2<float>& screen)
 { // pos = pos 2 w2s, screen = output screen coords
 
     Vec2<float> displaySize = MC::windowSize;
-    
+
     Vec3<float> origin = *SDK::clientInstance->getLocalPlayer()->getPosition();
     Vec2<float> fov = getFovHook::currentFov;
 
