@@ -24,7 +24,7 @@ public:
 
     BUILD_ACCESS(this, MinecraftGame*, mcgame, 0x0C8);
     BUILD_ACCESS(this, GuiData*, guiData, 0x560);
-    BUILD_ACCESS(this, GLMatrix, Matrix1, 0x0300);
+    BUILD_ACCESS(this, GLMatrix, Matrix1, 0x0330);
 
     LocalPlayer* getLocalPlayer();
     BlockSource* getBlockSource();
@@ -39,6 +39,7 @@ public:
 		return *reinterpret_cast<LevelRender**>(address + 0xE0);
 	}
 
+    /*
 	float* getFovX()
 	{
 		return reinterpret_cast<float*>((uintptr_t)(this) + 0x6A0);
@@ -52,7 +53,7 @@ public:
 	Vec2<float> getFov()
 	{
 		return Vec2(*getFovX(), *getFovY());
-	};
+	};*/
 
     LoopbackPacketSender* getPacketSender()
     {
