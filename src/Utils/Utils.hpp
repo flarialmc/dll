@@ -4,24 +4,6 @@
 #include <cmath>
 #include <vector>
 
-class Utils
-{
-public:
-    static std::string getRoamingPath();
-
-    static std::string GetKeyAsString(int key, bool isCapital = false, bool isKeybind = true);
-
-    static int GetStringAsKey(const std::string &str);
-
-    static std::string removeColorCodes(const std::string& input);
-
-    static std::vector<int> GetStringAsKeys(const std::string str);
-
-    static std::string removeNonAlphanumeric(const std::string& input);
-
-    static std::string remomveNonNumeric(const std::string &input);
-};
-
 struct MCCColor {
     union {
         struct {
@@ -196,6 +178,33 @@ public:
     Vec4(T x = 0, T y = 0, T z = 0, T w = 0) : Vec3<T>(x, y, z) {
         this->w = w;
     };
+};
+
+
+class Utils
+{
+public:
+    static std::string getRoamingPath();
+
+    static std::string GetKeyAsString(int key, bool isCapital = false, bool isKeybind = true);
+
+    static int GetStringAsKey(const std::string &str);
+
+    static std::string removeColorCodes(const std::string& input);
+
+    static std::vector<int> GetStringAsKeys(const std::string str);
+
+    static std::string removeNonAlphanumeric(const std::string& input);
+
+    static std::string remomveNonNumeric(const std::string &input);
+
+    float transformx(const Vec3<float> &p);
+
+    float transformy(const Vec3<float> &p);
+
+    float transformz(const Vec3<float> &p);
+
+    bool WorldToScreen(Vec3<float> pos, Vec2<float> &screen);
 };
 
 #pragma once

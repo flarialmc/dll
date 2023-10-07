@@ -17,7 +17,7 @@ private:
 
 	static inline float currentZoomVal = 0.0f;
 
-	static float getFovCallback(void* a1, float f, void* a3, void* a4) {
+    static float getFovCallback(void* a1, float f, void* a3, void* a4) {
 
 		float fov = func_original(a1, f, a3, a4);
 
@@ -68,6 +68,8 @@ private:
 			fov = currentZoomVal;
 		}
 
+        currentFov = fov;
+
 		return fov;
 	}
 
@@ -80,4 +82,6 @@ public:
 	void enableHook() override {
 		this->autoHook(getFovCallback, (void**)&func_original);
 	}
+
+    static inline float currentFov = 0.0f;
 };

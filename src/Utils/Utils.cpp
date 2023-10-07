@@ -2,6 +2,7 @@
 #include "Utils.hpp"
 #include "Logger/Logger.hpp"
 #include "../Client/GUI/Engine/Engine.hpp"
+#include "../Client/Hook/Hooks/Visual/getFovHook.hpp"
 #include <sstream>
 #include <algorithm>
 #include <iostream>
@@ -19,6 +20,64 @@ std::string Utils::getRoamingPath()
     return std::string(path) + "\\..\\Local\\Packages\\Microsoft.MinecraftUWP_8wekyb3d8bbwe\\RoamingState";
 };
 
+GLMatrix* getMatrixCorrection()
+{
+    GLMatrix toReturn = GLMatrix();
+
+    for (int i = 0; i < 4; i++) {
+        toReturn.matrix[i * 4 + 0] = Matrix1.matrix[0 + i];
+        toReturn.matrix[i * 4 + 1] = Matrix1.matrix[4 + i];
+        toReturn.matrix[i * 4 + 2] = Matrix1.matrix[8 + i];
+        toReturn.matrix[i * 4 + 3] = Matrix1.matrix[12 + i];
+    }
+
+    return &toReturn;
+};
+
+__forceinline float transformx(const Vec3<float>& p)
+{
+    auto matrix = getMatrixCorrection()->matrix;
+    return p.x * matrix[0] + p.y * matrix[4] + p.z * matrix[8] + matrix[12];
+}
+
+__forceinline float transformy(const Vec3<float>& p)
+{
+    auto matrix = getMatrixCorrection()->matrix;
+    return p.x * matrix[1] + p.y * matrix[5] + p.z * matrix[9] + matrix[13];
+}
+
+__forceinline float transformz(const Vec3<float>& p)
+{
+    auto matrix = getMatrixCorrection()->matrix;
+    return p.x * matrix[2] + p.y * matrix[6] + p.z * matrix[10] + matrix[14];
+}
+
+bool Utils::WorldToScreen(Vec3<float> pos, Vec2<float>& screen)
+{ // pos = pos 2 w2s, screen = output screen coords
+
+    Vec2<float> displaySize = MC::windowSize;
+    
+    Vec3<float> origin = *SDK::clientInstance->getLocalPlayer()->getPosition();
+    Vec2<float> fov = getFovHook::currentFov;
+
+    pos.x -= origin.x;
+    pos.y -= origin.y;
+    pos.z -= origin.z;
+
+    float x = transformx(pos);
+    float y = transformy(pos);
+    float z = transformz(pos);
+
+    if (z > 0) return false;
+
+    float mX = (float)displaySize.x / 2.0F;
+    float mY = (float)displaySize.y / 2.0F;
+
+    screen.x = mX + (mX * x / -z * fov.x);
+    screen.y = mY - (mY * y / -z * fov.y);
+
+    return true;
+}
 
 std::string Utils::removeColorCodes(const std::string& input) {
     std::string result;
