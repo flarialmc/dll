@@ -53,18 +53,17 @@ __forceinline float transformz(const Vec3<float>& p)
 }
 
 bool Utils::WorldToScreen(Vec3<float> pos, Vec2<float>& screen)
-{ // pos = pos 2 w2s, screen = output screen coords
+{
 
     Vec2<float> displaySize = MC::windowSize;
 
-    Vec3<float> origin = *SDK::clientInstance->getLocalPlayer()->getPosition();
+    Vec3<float> origin = SDK::clientInstance->getLevelRender()->getOrigin();
 
     Vec2<float> fov = SDK::clientInstance->getFov();
 
     pos.x -= origin.x;
-    pos.y -= origin.y;
+    pos.y -= (origin.y);
     pos.z -= origin.z;
-
 
     float x = transformx(pos);
     float y = transformy(pos);

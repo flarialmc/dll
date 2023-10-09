@@ -40,3 +40,8 @@ std::string ClientInstance::getTopScreenName() {
     return SDK::CurrentScreen;
 }
 
+LevelRender* ClientInstance::getLevelRender()
+{
+    uintptr_t address = reinterpret_cast<uintptr_t>(this);
+    return *reinterpret_cast<LevelRender**>(address + 0xE0);
+}

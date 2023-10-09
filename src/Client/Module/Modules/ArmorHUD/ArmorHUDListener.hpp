@@ -40,7 +40,7 @@ public:
                 brush = FlarialGUI::getBrush(D2D1::ColorF(0));
 
                 Vec3<float> worldFrom = {0, -60, 0};
-                Vec3<float> worldTo = { 20, -30, 0};
+                Vec3<float> worldTo = { 20, -60, 0};
                 Vec2<float> screenFrom;
                 Vec2<float> screenTo;
 
@@ -52,7 +52,7 @@ public:
 
                 D2D::context->DrawLine(D2D1::Point2F(screenFrom.x, screenFrom.y),
                                        D2D1::Point2F(screenTo.x,
-                                                     screenTo.y), brush, 5);
+                                                     screenTo.y), brush, 1);
 
             }
 

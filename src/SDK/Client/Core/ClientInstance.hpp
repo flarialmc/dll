@@ -4,12 +4,12 @@
 #include "MinecraftGame.hpp"
 #include "../Block/BlockSource.hpp"
 #include "../Render/GuiData.hpp"
-#include "LevelRender.hpp"
 #include <cstdint>
 #include "../../../Utils/Memory/Memory.hpp"
 #include "../Network/Packet/LoopbackPacketSender.hpp"
 #include "Minecraft.hpp"
 #include "../Render/GLMatrix.hpp"
+#include "../Level/LevelRender/LevelRender.hpp"
 
 
 class ClientInstance {
@@ -33,11 +33,7 @@ public:
     void refocusMouse();
     std::string getTopScreenName();
 
-	LevelRender* getLevelRender()
-	{
-		uintptr_t address = reinterpret_cast<uintptr_t>(this);
-		return *reinterpret_cast<LevelRender**>(address + 0xE0);
-	}
+	LevelRender* getLevelRender();
 
 
 	float* getFovX()

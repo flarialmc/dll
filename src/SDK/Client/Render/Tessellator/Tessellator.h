@@ -7,6 +7,8 @@
 
 class ScreenContext;
 
+class HashedString;
+
 class Tessellator 
 {
 private:
