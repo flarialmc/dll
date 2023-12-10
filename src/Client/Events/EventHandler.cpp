@@ -34,9 +34,7 @@ void EventHandler::onTick(TickEvent &event) {
 
     for (Listener* &listener: listeners) {
 
-        if(event.getActor() == SDK::clientInstance->getLocalPlayer())
         listener->onLocalTick(event);
-        else listener->onTick(event);
 
     }
 

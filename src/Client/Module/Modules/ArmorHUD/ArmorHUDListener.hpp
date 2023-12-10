@@ -31,31 +31,6 @@ public:
 
     void onRender(RenderEvent& event) override {
 
-
-        if(SDK::clientInstance)
-            if(SDK::clientInstance->getLocalPlayer()) {
-
-
-                ID2D1SolidColorBrush* brush;
-                brush = FlarialGUI::getBrush(D2D1::ColorF(0));
-
-                Vec3<float> worldFrom = {0, -60, 0};
-                Vec3<float> worldTo = { 20, -60, 0};
-                Vec2<float> screenFrom;
-                Vec2<float> screenTo;
-
-
-
-                Utils::WorldToScreen(worldFrom, screenFrom);
-                Utils::WorldToScreen(worldTo, screenTo);
-
-
-                D2D::context->DrawLine(D2D1::Point2F(screenFrom.x, screenFrom.y),
-                                       D2D1::Point2F(screenTo.x,
-                                                     screenTo.y), brush, 1);
-
-            }
-
         if(!module->settings.getSettingByName<bool>("enabled")->value) enabled = false;
 
         if(SDK::clientInstance->getTopScreenName() == "hud_screen" && module->settings.getSettingByName<bool>("enabled")->value || SDK::clientInstance->getTopScreenName() == "pause_screen" && module->settings.getSettingByName<bool>("enabled")->value) {

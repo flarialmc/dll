@@ -1,7 +1,7 @@
 #include "../Hook.hpp"
 #include "../../../../SDK/Client/Actor/Actor.hpp"
 
-class ActorNormalTick : public Hook {
+class ActorBaseTick : public Hook {
 
 private:
     static void callback(Actor *actor);
@@ -11,7 +11,7 @@ public:
 
     static inline original xed = nullptr;
 
-    ActorNormalTick();
+    ActorBaseTick();
 
     void enableHook() override;
 

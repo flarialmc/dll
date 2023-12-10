@@ -1,6 +1,6 @@
 #include "RaknetTick.hpp"
 #include "../../../../SDK/SDK.hpp"
-#include "ActorNormalTick.hpp"
+#include "ActorBaseTick.hpp"
 #include <filesystem>
 #include <fstream>
 
@@ -30,7 +30,7 @@ void RaknetTickHook::callback(RaknetConnector* raknet)  {
 
                 if (SDK::clientInstance->getLocalPlayer() == nullptr) {
                     ip = "none";
-                    ActorNormalTick::allahuakbar = false;
+                    ActorBaseTick::allahuakbar = false;
                 }
             }
 
