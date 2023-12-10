@@ -24,6 +24,9 @@ class ComboListener : public Listener {
     }
 
     void onLocalTick(TickEvent& event) override {
+        if (!SDK::clientInstance->getLocalPlayer())
+            return;
+
         auto LP = reinterpret_cast<LocalPlayer*>(event.getActor());
          if (LP->hurtTime != 0)
              Combo = 0;

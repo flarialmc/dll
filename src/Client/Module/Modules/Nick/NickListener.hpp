@@ -15,6 +15,8 @@ public:
     static inline std::string backupOri;
 
     void onLocalTick(TickEvent &event) override {
+        if (!SDK::clientInstance->getLocalPlayer())
+            return;
 
         if(original.empty()) original = SDK::clientInstance->getLocalPlayer()->playerName;
         if(original2.empty()) original2 = *SDK::clientInstance->getLocalPlayer()->getNametag();

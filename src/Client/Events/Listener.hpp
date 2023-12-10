@@ -15,7 +15,6 @@ public:
     virtual void onMouse(MouseEvent &event) {};
     virtual void onRender(RenderEvent &event) {};
     virtual void onLocalTick(TickEvent &event) {};
-    virtual void onTick(TickEvent &event) {};
     virtual void onAttack(AttackEvent& event) {};
     virtual void onSetupAndRender(SetupAndRenderEvent& event) {};
     virtual void onPacketSend(PacketEvent &event) {};
