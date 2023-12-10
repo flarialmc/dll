@@ -32,8 +32,8 @@ public:
     void onRender(RenderEvent& event) override {
 
 
-        if(SDK::clientInstance)
-            if(SDK::clientInstance->getLocalPlayer()) {
+        if(SDK::clientInstance && module->settings.getSettingByName<bool>("enabled")->value)
+            if(SDK::clientInstance->getLocalPlayer() && SDK::clientInstance->getLevelRender()) {
 
 
                 ID2D1SolidColorBrush* brush;
