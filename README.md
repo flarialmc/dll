@@ -1,0 +1,1 @@
+This base is really shit and contains a lot of shit code as a result of being me, Shane, and Anshul's first C++ project. Thank you for everyone who has joined me and my friends on this journey, it has been great! Maybe the readme will be updated in the future. Pull requests are welcomed.
