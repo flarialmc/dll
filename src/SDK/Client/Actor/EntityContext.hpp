@@ -1,10 +1,16 @@
 #pragma once
 
-struct EntityId {
-	int id;
+using EntityId = uint32_t;
+
+class EntityRegistry {
+	char pad0x0[0x30];
+public:
+	uintptr_t& registry;
 };
 
 class EntityContext {
-	uintptr_t* registry;
+public:
+	EntityRegistry& registry;
+	uintptr_t& basicReg;
 	EntityId id;
 };

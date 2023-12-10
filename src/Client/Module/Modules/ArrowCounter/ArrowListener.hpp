@@ -34,12 +34,7 @@ public:
 
                     if (offhandItem->getItem() != NULL) {
                         if (offhandItem->getItem()->name == "arrow") {
-                            int counte = offhandItem->count;
-                            if (counte != 16908288) {
-                                auto countagain = 0;
-                                countagain = counte / 65536 - 258;
-                                arrows = arrows + countagain + 2;
-                            }
+                            arrows = offhandItem->count;
                         }
                     }
 
@@ -49,13 +44,7 @@ public:
                         if (item->getItem() != NULL) {
                             if (item->getItem()->name == "arrow") {
 
-
-                                int counte = item->count;
-                                if (counte != 16908288) {
-                                    auto countagain = 0;
-                                    countagain = counte / 65536 - 258;
-                                    arrows = arrows + countagain + 2;
-                                }
+                                arrows = item->count;
                             }
 
                         }

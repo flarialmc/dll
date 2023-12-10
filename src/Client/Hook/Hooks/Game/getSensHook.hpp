@@ -42,7 +42,7 @@ public:
 	typedef float(__thiscall* getSensOriginal)(unsigned int*, unsigned int);
 	static inline getSensOriginal func_original = nullptr;
 
-	getSensHook() : Hook("getSensHook", "48 83 EC 28 80 B9 88 14 00 00 00 48 8D 54 24 30 48 8B 01 48 8B 40 60 74 38 41 B8 17 01 00 00") {}
+	getSensHook() : Hook("getSensHook", "48 83 EC ? 48 8B 01 48 8D 54 24 ? 41 B8 17 01 00 00") {}
 
 	void enableHook() override {
 		this->autoHook(getSensCallback, (void**)&func_original);

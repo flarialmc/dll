@@ -2,29 +2,40 @@
 
 template <typename Component>
 Component* Actor::tryGet(uintptr_t addr) {
-    auto a1 = **(uintptr_t***)(this + 0x8);
-    auto a2 = *(uintptr_t*)(this + 0x10);
+    auto ctx = GetEntityContext();
 
-    using efunc = Component* (__thiscall*)(uintptr_t, uintptr_t*);
+    using efunc = Component* (__thiscall*)(uintptr_t*, const EntityId&);
     auto func = reinterpret_cast<efunc>(addr);
-    return func(reinterpret_cast<uintptr_t>(a1), &a2);
+    return func(&ctx->basicReg, ctx->id);
 }
 
 bool Actor::isAlive() {
-    return Memory::CallVFunc<89, bool>(this);
+    return Memory::CallVFunc<57, bool>(this);
 }
 
 std::string* Actor::getXuid(std::string* str) {
-    return Memory::CallVFunc<396, std::string*, std::string*>(this, str);
+    return Memory::CallVFunc<268, std::string*, std::string*>(this, str);
 }
 
+ActorTypeComponent* Actor::getActorTypeComponent() {
+    static uintptr_t sig;
+
+    if (sig == NULL) {
+        sig = Memory::findSig("40 53 48 83 EC 20 48 8B DA BA 14 AD F3 51");
+    }
+
+    return tryGet<ActorTypeComponent>(sig);
+}
+
+
 int Actor::getEntityTypeId() {
-    return Memory::CallVFunc<151, int>(this);
+    return getActorTypeComponent()->type;
 }
 
 MobEffectInstance* Actor::getEffect(MobEffect* effect) {
-    static uintptr_t addr = Memory::findSig("40 53 48 83 EC 20 48 8B 41 08 4C 8B C1 8B 5A 08 48 8D 54 24 ? 48 8B 08 41 8B 40 10 89 44 24 30 E8 ? ? ? ?");
-    auto fn = reinterpret_cast<MobEffectInstance * (__cdecl*)(Actor*, MobEffect*)>(addr);
+    static uintptr_t addr = Memory::findSig("E8 ? ? ? ? 8B 78 14");
+    static auto realAddr = addr + 1 + 4 + *reinterpret_cast<int*>(addr + 1);
+    auto fn = reinterpret_cast<MobEffectInstance * (__cdecl*)(Actor*, MobEffect*)>(realAddr);
     return fn(this, effect);
 }
 
@@ -33,26 +44,18 @@ bool Actor::getActorFlag(int flag) {
 }
 
 Vec3<float>* Actor::getPosition() {
-    return Memory::CallVFunc<22, Vec3<float>*>(this);
-}
-
-bool Actor::wasHurt() {
-    return Memory::CallVFunc<211, bool>(this);
+    return &this->stateVector->Pos;
 }
 
 ItemStack* Actor::getArmor(int slot) {
-    return Memory::CallVFunc<135, ItemStack*, int>(this, slot);
-}
-
-ActorMovementProxyComponent* Actor::getMovementProxyComponent() {
-    static  uintptr_t sig;
+    static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig("40 53 48 83 EC 20 48 8B DA BA 18 0C BD EC");
+        sig = Memory::findSig("48 8B 89 50 04 00 00 48 8B 01 48 8B 40 28 48");
     }
 
-    return tryGet<ActorMovementProxyComponent>(sig);
-
+    auto fn = reinterpret_cast<ItemStack* (__thiscall*)(Actor*, int)>(sig);
+    return fn(this, slot);
 }
 
 MoveInputComponent* Actor::getMoveInputHandler() {
@@ -83,7 +86,7 @@ ItemStack* Actor::getOffhandSlot() {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig("48 8B 89 30 04 00 00 BA 01 00 00 00");
+        sig = Memory::findSig("48 8B 89 ? ? ? ? BA ? ? ? ? 48 8B 01 48 8B 40 ? 48 FF 25");
     }
 
     auto fn = reinterpret_cast<ItemStack * (__thiscall*)(Actor*)>(sig);
@@ -96,9 +99,23 @@ EntityContext* Actor::GetEntityContext() {
 }
 
 void Actor::setNametag(std::string* name) {
-    Memory::CallVFunc<55, void>(this, name);
+    static uintptr_t sig;
+
+    if (sig == NULL) {
+        sig = Memory::findSig("48 89 5C 24 ? 57 48 83 EC ? 48 8B D9 48 8B FA 48 8B 89 ? ? ? ? 48 85 C9 0F 84");
+    }
+
+    auto fn = reinterpret_cast<void (__thiscall*)(Actor*, std::string*)>(sig);
+    return fn(this, name);
 }
 
 std::string* Actor::getNametag() {
-    return Memory::CallVFunc<56, std::string*>(this);
+    static uintptr_t sig;
+
+    if (sig == NULL) {
+        sig = Memory::findSig("48 83 EC ? 48 8B 81 ? ? ? ? 48 85 C0 74 3B 48 8B 08 BA ? ? ? ? 48 8B 40 ? 48 2B C1 48 C1 F8 ? 66 3B D0 73 17");
+    }
+
+    auto fn = reinterpret_cast<std::string* (__thiscall*)(Actor*)>(sig);
+    return fn(this);
 }

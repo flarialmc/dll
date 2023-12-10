@@ -17,6 +17,6 @@ public:
 
 class Level {
 public:
-    char pad_0000[0x2608]; //0x0000
-    std::unordered_map<mcUUID, PlayerListEntry> playermap; //0x3048
+    char pad_0000[0x1EA8]; //0x0000
+    std::unordered_map<mcUUID, PlayerListEntry> playermap; //0x1EA8
 };

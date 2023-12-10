@@ -12,8 +12,8 @@ class HashedString;
 class Tessellator 
 {
 private:
-	char pad_0000[0x128];
-	Vec3<float> transformOffset; // 0x128
+	char pad_0000[0x184];
+	Vec3<float> transformOffset; // 0x184
 
 public:
 	void addPostTransformOffset(int x, int y, int z) 
@@ -28,13 +28,13 @@ public:
 	inline void begin(VertextFormat format, int reservedVerticies = 0) 
 	{
 		using tess_begin_t = void(__fastcall*)(Tessellator*, VertextFormat, bool);
-		static tess_begin_t tess_begin = reinterpret_cast<tess_begin_t>(Memory::findSig("48 89 5c 24 ? 55 48 83 ec ? 80 b9 ? ? ? ? ? 45 0f b6 d1"));
+		static tess_begin_t tess_begin = reinterpret_cast<tess_begin_t>(Memory::findSig("48 89 5C 24 ? 56 48 83 EC ? 80 B9 ? ? ? ? ? 45 0F B6"));
 		tess_begin(this, format, reservedVerticies);
 	}
 	inline void vertex(float x, float y, float z) 
 	{
 		using tess_vertex_t = void(__fastcall*)(Tessellator*, float, float, float);
-		static tess_vertex_t tess_vertex = reinterpret_cast<tess_vertex_t>(Memory::findSig("40 57 48 81 ec ? ? ? ? 0f 29 7C 24"));
+		static tess_vertex_t tess_vertex = reinterpret_cast<tess_vertex_t>(Memory::findSig("40 57 48 81 EC ? ? ? ? 0F 29 7C ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 8B 81"));
 		tess_vertex(this, x, y, z);
 	}
 	inline void color(float r, float g, float b, float a) 
@@ -46,7 +46,7 @@ public:
 	inline void setRotation(float angle, Vec3<float> pivot)
 	{
 		using tess_setRotation_t = void(__fastcall*)(Tessellator*, float, Vec3<float>);
-		static tess_setRotation_t tess_setRotation = reinterpret_cast<tess_setRotation_t>(Memory::findSig("40 53 48 81 ec ? ? ? ? f3 41 0f 10 ?"));
+		static tess_setRotation_t tess_setRotation = reinterpret_cast<tess_setRotation_t>(Memory::findSig("48 89 5C 24 ? 57 48 81 EC ? ? ? ? F3 41 0F 10"));
 		tess_setRotation(this, angle, pivot);
 	}
 	inline void resetTransform(bool a1) 
