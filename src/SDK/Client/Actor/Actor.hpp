@@ -5,7 +5,6 @@
 #include "../../../Utils/Memory/Memory.hpp"
 #include "../../../Utils/Logger/Logger.hpp"
 #include "Components/MoveInputComponent.hpp"
-#include "Components/ActorMovementPorxyComponent.hpp"
 #include "Components/ActorRotationComponent.hpp"
 #include "Components/MobHurtTimeComponent.hpp"
 #include "../Level/Level.hpp"
@@ -13,6 +12,7 @@
 #include "../../../Utils/Utils.hpp"
 #include "Components/StateVectorComponent.hpp"
 #include "Components/ActorHeadRotationComponent.hpp"
+#include "Components/ActorTypeComponent.hpp"
 #include "EntityContext.hpp"
 #include "MobEffect.h"
 
@@ -136,24 +136,25 @@ enum ActorFlags {
 class Actor {
 public:
 
-    BUILD_ACCESS(this, Level*, level, 0x260);
-    BUILD_ACCESS(this, ActorRotationComponent*, actorRotationComponent, 0x2B0);
-    BUILD_ACCESS(this, StateVectorComponent*, stateVector, 0x2A0);
-    BUILD_ACCESS(this, Vec2<float>, rotations, 0x2B0);
+    BUILD_ACCESS(this, int16_t, hurtTime, 0x22C);
+    BUILD_ACCESS(this, Level*, level, 0x288);
+    BUILD_ACCESS(this, ActorRotationComponent*, actorRotationComponent, 0x2D8);
+    BUILD_ACCESS(this, StateVectorComponent*, stateVector, 0x2C8);
+    BUILD_ACCESS(this, Vec2<float>, rotations, 0x2D8);
+    BUILD_ACCESS(this, bool, wasHurt, 0x236);
    
 
     template <typename Component>
     Component* tryGet(uintptr_t addr);
     ItemStack* getArmor(int slot);
+    ActorTypeComponent* getActorTypeComponent();
     int getEntityTypeId();
     MobEffectInstance* getEffect(MobEffect* effect);
-    ActorMovementProxyComponent* getMovementProxyComponent();
     MoveInputComponent* getMoveInputHandler();
     bool isAlive();
     std::string* getXuid(std::string* str);
     bool getActorFlag(int flag);
     Vec3<float>* getPosition();
-    bool wasHurt();
     ActorHeadRotationComponent* getActorHeadRotationComponent();
     ItemStack* getOffhandSlot();
     EntityContext* GetEntityContext();

@@ -1,5 +1,7 @@
 #pragma once
 
-struct ActorHeadRotationComponent {
+#include "../../../../Utils/Utils.hpp"
 
+struct ActorHeadRotationComponent {
+    Vec2<float> rotation;
 };

@@ -15,7 +15,7 @@ void ActorNormalTick::enableHook() {
     int xd = *reinterpret_cast<int*>(vft + 3);
     uintptr_t** vftREAL = reinterpret_cast<uintptr_t**>(vft + xd + 7);
 
-    this->manualHook(vftREAL[44], callback, (void**)&xed);
+    this->manualHook(vftREAL[29], callback, (void**)&xed);
 
 
 }

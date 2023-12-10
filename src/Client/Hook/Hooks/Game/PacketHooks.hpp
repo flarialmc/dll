@@ -22,7 +22,7 @@ public:
     static inline receive receivePacketkOriginal = nullptr;
     static inline receive receivePacketkOriginal2 = nullptr;
 
-    SendPacketHook() : Hook("sendPacket", "48 89 5C 24 ? 57 48 83 EC 20 48 8B D9 48 8B FA 48 8B 49 20 E8 ? ? ? ? 4C 8B 03 48 8B D7") {}
+    SendPacketHook() : Hook("sendPacket", "48 83 EC ? 48 0F BE ? ? 48 83 C0 ? 74 27") {}
 
     void enableHook() override;
 

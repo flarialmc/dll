@@ -7,5 +7,5 @@
 class ItemStack {
 public:
 	Item* getItem(void);
-	BUILD_ACCESS(this, int, count, 0x20);
+	BUILD_ACCESS(this, char, count, 0x22);
 };

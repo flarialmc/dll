@@ -13,7 +13,7 @@ class LookListener : public Listener {
 private:
     Vec2<float> oldRotations;
     bool enabled = false;
-    static inline uintptr_t yaw1 = Memory::findSig("F3 0F 11 30 F3 ? ? 78 ? 49 8B CE");
+    static inline uintptr_t yaw1 = Memory::findSig("F3 0F 11 ? F3 0F 11 ? ? 48 8B CE");
     static inline uintptr_t yaw2 = Memory::findSig("F3 0F 11 ? F3 0F 11 ? ? 48 8B 4D");
     static inline uintptr_t pitch = Memory::findSig("F3 0F 11 0E 48 89 9C");
     static inline uintptr_t rot = Memory::findSig("F3 0F 11 38 ? ? 7C 24 ? 48 81 C4");
