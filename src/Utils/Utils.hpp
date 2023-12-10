@@ -197,8 +197,6 @@ public:
     static std::string removeNonAlphanumeric(const std::string& input);
 
     static std::string remomveNonNumeric(const std::string &input);
-
-    static bool WorldToScreen(Vec3<float> pos, Vec2<float> &screen);
 };
 
 #pragma once

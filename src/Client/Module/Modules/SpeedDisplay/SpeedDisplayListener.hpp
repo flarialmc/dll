@@ -43,6 +43,9 @@ class SpeedDisplayListener : public Listener {
 	};
 
 	void onLocalTick(TickEvent& event) override {
+		if (!SDK::clientInstance->getLocalPlayer())
+			return;
+
 		if (!toes) {
 			toes = true;
 			std::thread lol([&]() {

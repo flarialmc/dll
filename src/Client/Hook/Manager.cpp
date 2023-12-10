@@ -3,7 +3,7 @@
 #include "Hooks/Render/ResizeHook.hpp"
 #include "Hooks/Render/CommandListHook.hpp"
 #include "Hooks/Render/SetupAndRenderHook.hpp"
-#include "Hooks/Game/ActorNormalTick.hpp"
+#include "Hooks/Game/ActorBaseTick.hpp"
 #include "Hooks/Visual/getGammaHook.hpp"
 #include "Hooks/Game/GameModeAttack.hpp"
 #include "Hooks/Game/RaknetTick.hpp"
@@ -48,7 +48,7 @@ void HookManager::initialize()
     hooks.push_back(new SwapchainHook());
     hooks.push_back(new ResizeHook());
     hooks.push_back(new getFovHook());
-    hooks.push_back(new ActorNormalTick());
+    hooks.push_back(new ActorBaseTick());
     hooks.push_back(new OnSuspendHook());
     hooks.push_back(new getGammaHook());
     hooks.push_back(new HurtColorHook());

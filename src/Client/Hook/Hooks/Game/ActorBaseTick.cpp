@@ -1,28 +1,28 @@
 #include <filesystem>
 #include <fstream>
-#include "ActorNormalTick.hpp"
+#include "ActorBaseTick.hpp"
 #include "../../../Events/EventHandler.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "RaknetTick.hpp"
 #include "../../../Client.hpp"
 
-bool ActorNormalTick::allahuakbar = false;
+bool ActorBaseTick::allahuakbar = false;
 
-void ActorNormalTick::enableHook() {
+void ActorBaseTick::enableHook() {
 
 
-    auto vft = Memory::findSig("48 8D 05 ?? ?? ?? ?? 48 89 01 49 8B 00 48 89 41 08");
+    auto vft = Memory::findSig("48 8D 05 ? ? ? ? 48 89 01 B8 ? ? ? ? 8D 50 FA 44 8D 48 ? 44 8D 40 ? 66 89 44 ? ? E8 ? ? ? ? 48 8B 8B"); // Player vtable
     int xd = *reinterpret_cast<int*>(vft + 3);
     uintptr_t** vftREAL = reinterpret_cast<uintptr_t**>(vft + xd + 7);
 
-    this->manualHook(vftREAL[29], callback, (void**)&xed);
+    this->manualHook(vftREAL[30], callback, (void**)&xed);
 
 
 }
 
-ActorNormalTick::ActorNormalTick() : Hook("ActorNormalTickHook", "48 8D 05 ???? ?? ?? 48 89 01 49 88 00 48 89 41 08"){}
+ActorBaseTick::ActorBaseTick() : Hook("ActorBaseTick", "48 8D 05 ???? ? ? 48 89 01 B8 ? ? ? ? 8D 50 FA 44 8D 48 ? 44 8D 40 ? 66 89 44 ? ? E8 ? ? ? ? 48 8B 8B"){}
 
-void ActorNormalTick::callback(Actor *xd) {
+void ActorBaseTick::callback(Actor *xd) {
 
     if (Client::disable) return;
 
@@ -61,8 +61,11 @@ void ActorNormalTick::callback(Actor *xd) {
 
 
         xed(xd);
-        TickEvent event(xd);
-        EventHandler::onTick(event);
+
+        if (xd == SDK::clientInstance->getLocalPlayer()) {
+            TickEvent event(xd);
+            EventHandler::onTick(event);
+        }
     }
 
     

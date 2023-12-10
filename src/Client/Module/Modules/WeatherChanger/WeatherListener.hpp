@@ -13,6 +13,9 @@ class WeatherListener : public Listener {
     Module* module;
 
     void onLocalTick(TickEvent& event) override {
+        if (!SDK::clientInstance->getBlockSource())
+            return;
+
         if (module->settings.getSettingByName<bool>("enabled")->value) {
             if (module->settings.getSettingByName<float>("rain")->value > 0.02f) SDK::clientInstance->getBlockSource()->dimension->weather->rainLevel = module->settings.getSettingByName<float>("rain")->value;
             else SDK::clientInstance->getBlockSource()->dimension->weather->rainLevel = 0.0f;
