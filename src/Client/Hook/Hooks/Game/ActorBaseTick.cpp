@@ -61,8 +61,11 @@ void ActorBaseTick::callback(Actor *xd) {
 
 
         xed(xd);
-        TickEvent event(xd);
-        EventHandler::onTick(event);
+
+        if (xd == SDK::clientInstance->getLocalPlayer()) {
+            TickEvent event(xd);
+            EventHandler::onTick(event);
+        }
     }
 
     
