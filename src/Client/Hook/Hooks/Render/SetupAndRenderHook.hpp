@@ -10,6 +10,7 @@
 #include "../../../Module/Modules/CompactChat/CompactChatListener.hpp"
 #include "../Visual/getGammaHook.hpp"
 #include "../../../Module/Manager.hpp"
+#include "../../../../Utils/Render/DrawUtils.hpp"
 #include <format>
 //#include "../../../../SDK/Client/Actor/MobEffect.h"
 
@@ -100,8 +101,12 @@ private:
 	static void SetUpAndRenderCallback(ScreenView* pScreenView, MinecraftUIRenderContext* muirc) {
 
 		SDK::hasInstanced = true;
-		SDK::clientInstance = muirc->getclientInstance();
+		//SDK::clientInstance = muirc->getclientInstance();
 		SDK::screenView = pScreenView;
+		SDK::setCI();
+
+		if (SDK::clientInstance == nullptr)
+			SDK::clientInstance = muirc->clientInstance;
 
 		//Logger::info(std::f
 
@@ -168,6 +173,10 @@ private:
 			Memory::hookFunc((void*)VTable[7], (void*)DrawImageDetour, (void**)&__o__DrawImage, "DrawImage");
 		}
 
+		DrawUtils::setCtx(muirc, SDK::clientInstance->guiData);
+
+		func_original(pScreenView, muirc);
+
 		SetupAndRenderEvent e;
 		e.muirc = muirc;
 
@@ -175,7 +184,6 @@ private:
 		// SDK::clientInstance->getBlockSource()->dimension->weather->lightingLevel = 1.0f;
 
 		EventHandler::onSetupAndRender(e);
-		func_original(pScreenView, muirc);
 	}
 
 

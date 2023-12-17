@@ -112,7 +112,8 @@ void Client::initialize()
         { "https://cdn-c6f.pages.dev/assets/dvdlogo-05.png", Path + "dvdlogo-05.png" },
         { "https://cdn-c6f.pages.dev/assets/dvdlogo-06.png", Path + "dvdlogo-06.png" },
         { "https://cdn-c6f.pages.dev/assets/dvdlogo-07.png", Path + "dvdlogo-07.png" },
-        { "https://cdn-c6f.pages.dev/assets/dvdlogo-08.png", Path + "dvdlogo-08.png" }
+        { "https://cdn-c6f.pages.dev/assets/dvdlogo-08.png", Path + "dvdlogo-08.png" },
+        { "https://cdn-c6f.pages.dev/assets/block.png", Path + "block.png" }
     };
 
     Client::CheckSettingsFile();

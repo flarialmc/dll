@@ -268,7 +268,7 @@ int Utils::GetStringAsKey(const std::string& str) {
     return -1;
 }
 
- std::vector<int> Utils::GetStringAsKeys(const std::string str) {
+std::vector<int> Utils::GetStringAsKeys(const std::string str) {
     std::vector<int> keys;
 
     if (str.empty()) {
