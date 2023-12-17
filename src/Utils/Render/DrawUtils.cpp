@@ -29,7 +29,8 @@ void DrawUtils::setCtx(MinecraftUIRenderContext* ctx, GuiData* gui) {
 	if (SDK::clientInstance->getLevelRender() != nullptr)
 		origin = SDK::clientInstance->getLevelRender()->getOrigin();
 
-	uiMaterial = renderCtx->getUIMaterial();
+	if (uiMaterial == nullptr)
+		uiMaterial = MaterialPtr::createMaterial(HashedString("ui_fill_color"));
 }
 
 void DrawUtils::setGameRenderContext(class ScreenContext* ctx) {

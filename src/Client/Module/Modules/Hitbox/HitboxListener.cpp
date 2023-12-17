@@ -32,7 +32,7 @@ void HitboxListener::onSetupAndRender(SetupAndRenderEvent& event) {
 	if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->mcgame->mouseGrabbed || !SDK::clientInstance->getLocalPlayer()->level)
 		return;
 
-	auto player = SDK::clientInstance->getLocalPlayer();
+	auto player = event.muirc->clientInstance->getLocalPlayer();
 
 	DrawUtils::setColor(1.f, 1.f, 1.f, 1.f);
 
