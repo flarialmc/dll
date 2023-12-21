@@ -11,15 +11,16 @@
 #include <kiero.h>
 #include <wininet.h>
 
+using namespace std;
 
-std::chrono::steady_clock::time_point lastBeatTime;
+chrono::steady_clock::time_point lastBeatTime;
 
-std::string replaceAll(std::string subject, const std::string& search,
-                       const std::string& replace);
+string replaceAll(string subject, const string& search,
+                       const string& replace);
 
-std::string DownloadString(std::string URL);
+string DownloadString(string URL);
 
-std::string removeColorCodes(const std::string& input);
+string removeColorCodes(const string& input);
 
 DWORD WINAPI init(HMODULE real)
 {
@@ -40,25 +41,25 @@ DWORD WINAPI init(HMODULE real)
     Client::initialize();
     Logger::info("Initializing Client");
 
-    std::thread statusThread([]() {
+    thread statusThread([]() {
         while (true) {
 
-            auto now = std::chrono::steady_clock::now();
-            auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastBeatTime);
+            auto now = chrono::steady_clock::now();
+            auto elapsed = chrono::duration_cast<chrono::seconds>(now - lastBeatTime);
 
             if(!Client::disable) {
                 if(SDK::hasInstanced && SDK::clientInstance != nullptr) {
                     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                        if(elapsed >= std::chrono::seconds(60)) {
-                            std::string ipToSend;
+                        if(elapsed >= chrono::seconds(60)) {
+                            string ipToSend;
 
                             if (!Client::settings.getSettingByName<bool>("anonymousApi")->value) {
-                                if (RaknetTickHook::towriteip.find("none") != std::string::npos) ipToSend = "in.singleplayer";
+                                if (RaknetTickHook::towriteip.find("none") != string::npos) ipToSend = "in.singleplayer";
                                 else if (!RaknetTickHook::towriteip.empty()) ipToSend = RaknetTickHook::towriteip;
                                 else ipToSend = "in.singleplayer";
                             } else ipToSend = "is.anonymous";
 
-                            std::string name = SDK::clientInstance->getLocalPlayer()->playerName;
+                            string name = SDK::clientInstance->getLocalPlayer()->playerName;
 
                             auto module = ModuleManager::getModule("Nick");
 
@@ -68,11 +69,11 @@ DWORD WINAPI init(HMODULE real)
                                 name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickListener::original));
                             }
                             // send thing
-                            std::cout << DownloadString(std::format("https://api.flarial.net/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend))
+                            cout << DownloadString(format("https://api.flarial.net/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend))
 
-                            + " " + std::format("https://api.flarial.net/heartbeat/{}/{}",
+                            + " " + format("https://api.flarial.net/heartbeat/{}/{}",
                               Utils::removeColorCodes(name),
-                                ipToSend) << std::endl;
+                                ipToSend) << endl;
                             lastBeatTime = now;
                         }
                     }
@@ -132,10 +133,10 @@ BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReser
     return TRUE;
 }
 
-std::string DownloadString(std::string URL) {
+string DownloadString(string URL) {
     HINTERNET interwebs = InternetOpenA("Samsung Smart Fridge", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, NULL);
     HINTERNET urlFile;
-    std::string rtn;
+    string rtn;
     if (interwebs) {
         urlFile = InternetOpenUrlA(interwebs, URL.c_str(), NULL, NULL, NULL, NULL);
         if (urlFile) {
@@ -148,27 +149,27 @@ std::string DownloadString(std::string URL) {
             } while (bytesRead);
             InternetCloseHandle(interwebs);
             InternetCloseHandle(urlFile);
-            std::string p = replaceAll(rtn, "|n", "\r\n");
+            string p = replaceAll(rtn, "|n", "\r\n");
             return p;
         }
     }
     InternetCloseHandle(interwebs);
-    std::string p = replaceAll(rtn, "|n", "\r\n");
+    string p = replaceAll(rtn, "|n", "\r\n");
     return p;
 }
 
-std::string replaceAll(std::string subject, const std::string& search,
-                       const std::string& replace) {
+string replaceAll(string subject, const string& search,
+                       const string& replace) {
     size_t pos = 0;
-    while ((pos = subject.find(search, pos)) != std::string::npos) {
+    while ((pos = subject.find(search, pos)) != string::npos) {
         subject.replace(pos, search.length(), replace);
         pos += replace.length();
     }
     return subject;
 }
 
-std::string removeColorCodes(const std::string& input) {
-    std::string result;
+string removeColorCodes(const string& input) {
+    string result;
     bool skipNext = false;
 
     for (char c : input) {
