@@ -7,12 +7,14 @@
 #include <wingdi.h>
 #include <wininet.h>
 
-std::string Client::settingspath = Utils::getRoamingPath() + "\\Flarial\\Config\\main.flarial";
+using namespace std;
+
+string Client::settingspath = Utils::getRoamingPath() + "\\Flarial\\Config\\main.flarial";
 Settings Client::settings = Settings();
 
-void DownloadAndSave(std::string url, std::string path) {
+void DownloadAndSave(string url, string path) {
 
-    if(Client::settings.getSettingByName<bool>("dlassets")->value || !std::filesystem::exists(path)) {
+    if(Client::settings.getSettingByName<bool>("dlassets")->value || !filesystem::exists(path)) {
         char test[256];
         strcpy(test, "https://cdn-c6f.pages.dev/");
         if (InternetCheckConnectionA(test, FLAG_ICC_FORCE_CONNECTION, 0))
@@ -26,33 +28,33 @@ bool Client::disable = false;
 
 void Client::initialize()
 {
-    std::filesystem::path folder_path(Utils::getRoamingPath() + "\\Flarial");
+    filesystem::path folder_path(Utils::getRoamingPath() + "\\Flarial");
     if (!exists(folder_path))
     {
         create_directory(folder_path);
     }
 
-    std::filesystem::path folder_path2(Utils::getRoamingPath() + "\\Flarial\\assets");
+    filesystem::path folder_path2(Utils::getRoamingPath() + "\\Flarial\\assets");
     if (!exists(folder_path2))
     {
         create_directory(folder_path2);
     }
 
-    std::filesystem::path folder_path3(Utils::getRoamingPath() + "\\Flarial\\logs");
+    filesystem::path folder_path3(Utils::getRoamingPath() + "\\Flarial\\logs");
     if (!exists(folder_path3))
     {
         create_directory(folder_path3);
     }
 
-    std::filesystem::path folder_path4(Utils::getRoamingPath() + "\\Flarial\\Config");
+    filesystem::path folder_path4(Utils::getRoamingPath() + "\\Flarial\\Config");
     if (!exists(folder_path4))
     {
         create_directory(folder_path4);
     }
 
-    std::string Path = Utils::getRoamingPath() + "\\Flarial\\assets\\";
+    string Path = Utils::getRoamingPath() + "\\Flarial\\assets\\";
 
-    std::pair<std::string, std::string> fileData[] = {
+    pair<string, string> fileData[] = {
         { "https://cdn-c6f.pages.dev/assets/gear.png", Path + "gear.png" },
         { "https://cdn-c6f.pages.dev/assets/font.ttf", Path + "font.ttf" },
         { "https://cdn-c6f.pages.dev/assets/logo.png", Path + "logo.png" },
@@ -119,11 +121,11 @@ void Client::initialize()
     Client::CheckSettingsFile();
     Client::LoadSettings();
 
-    if (Client::settings.getSettingByName<std::string>("fontname") == nullptr)
-        Client::settings.addSetting("fontname", (std::string)"Space Grotesk");
+    if (Client::settings.getSettingByName<string>("fontname") == nullptr)
+        Client::settings.addSetting("fontname", (string)"Space Grotesk");
 
-    if (Client::settings.getSettingByName<std::string>("mod_fontname") == nullptr)
-        Client::settings.addSetting("mod_fontname", (std::string)"Space Grotesk");
+    if (Client::settings.getSettingByName<string>("mod_fontname") == nullptr)
+        Client::settings.addSetting("mod_fontname", (string)"Space Grotesk");
 
     if (Client::settings.getSettingByName<float>("blurintensity") == nullptr)
         Client::settings.addSetting("blurintensity", 18.0f);
@@ -155,11 +157,11 @@ void Client::initialize()
     if (Client::settings.getSettingByName<bool>("centreCursor") == nullptr)
         Client::settings.addSetting("centreCursor", false);
 
-    if (Client::settings.getSettingByName<std::string>("aliasingMode") == nullptr)
-        Client::settings.addSetting("aliasingMode", (std::string)"Default");
+    if (Client::settings.getSettingByName<string>("aliasingMode") == nullptr)
+        Client::settings.addSetting("aliasingMode", (string)"Default");
 
-    if (Client::settings.getSettingByName<std::string>("ejectKeybind") == nullptr)
-        Client::settings.addSetting("ejectKeybind", (std::string)"");
+    if (Client::settings.getSettingByName<string>("ejectKeybind") == nullptr)
+        Client::settings.addSetting("ejectKeybind", (string)"");
 
     if (Client::settings.getSettingByName<bool>("enabledModulesOnTop") == nullptr)
         Client::settings.addSetting("enabledModulesOnTop", false);
@@ -174,17 +176,17 @@ void Client::initialize()
         Client::settings.addSetting("rgb_value", 1.0f);
 
     // Create threads to download the files
-        std::vector<std::thread> threads;
+        vector<std::thread> threads;
         for (const auto &data: fileData) {
             threads.emplace_back(DownloadAndSave, data.first, data.second);
         }
 
         // Wait for all threads to finish
-        for (std::thread &thread: threads) {
+        for (thread &thread: threads) {
             thread.join();
         }
 
-    std::string fontpath = Utils::getRoamingPath() + "\\Flarial\\assets\\font.ttf";
+    string fontpath = Utils::getRoamingPath() + "\\Flarial\\assets\\font.ttf";
     AddFontResource(fontpath.c_str());
 
     fontpath = Utils::getRoamingPath() + "\\Flarial\\assets\\font_bold.ttf";
@@ -209,7 +211,7 @@ void Client::initialize()
 
     if (!Client::disable) {
         FlarialGUI::Notify("Report bugs at https://flarial.net/discord!");
-        FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("keybind")->value + " to open the menu in-game.");
+        FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<string>("keybind")->value + " to open the menu in-game.");
     }
 }
 
@@ -227,7 +229,7 @@ void Client::centerCursor() {
     if (hWnd != NULL && Client::settings.getSettingByName<bool>("centreCursor")->value) {
         if (!toes) {
             toes = true;
-            std::thread wow([&]() {
+            thread wow([&]() {
                 while (!Client::disable && Client::settings.getSettingByName<bool>("centreCursor")->value) {
                     GetWindowRect(hWnd, &currentRect);
                     GetClientRect(hWnd, &clientRect);
