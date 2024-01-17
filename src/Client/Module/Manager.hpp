@@ -11,4 +11,5 @@ namespace ModuleManager
     void SaveModulesConfig();
     bool doesAnyModuleHave(std::string settingName);
     Module* getModule(std::string name);
+    extern std::vector<std::string> OnlineUsers;
 };

@@ -208,7 +208,6 @@ void Client::initialize()
     Logger::debug("Sending");
 
     if (!Client::disable) {
-        FlarialGUI::Notify("Report bugs at https://flarial.net/discord!");
         FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("keybind")->value + " to open the menu in-game.");
     }
 }

@@ -64,6 +64,7 @@ bool compareNames( Module*& obj1,  Module*& obj2) {
 
 namespace ModuleManager {
     std::vector<Module*> modules;
+    std::vector<std::string> OnlineUsers;
 }
 
 void ModuleManager::initialize()

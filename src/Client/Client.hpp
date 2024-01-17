@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Hook/Manager.hpp"
 #include "Module/Manager.hpp"
+#include <vector>
 
 class Client
 {

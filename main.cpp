@@ -25,7 +25,7 @@ DWORD WINAPI init(HMODULE real)
 {
 
 
-    bool showConsole = false;
+    bool showConsole = true;
     
     if (GetConsoleWindow() == nullptr && showConsole) {
         AllocConsole();
@@ -50,6 +50,27 @@ DWORD WINAPI init(HMODULE real)
                 if(SDK::hasInstanced) {
                     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                         if(elapsed >= std::chrono::seconds(60)) {
+                            ModuleManager::OnlineUsers.clear();
+                            std::string name = SDK::clientInstance->getLocalPlayer()->playerName;
+                            ModuleManager::OnlineUsers.push_back(Utils::removeColorCodes(name));
+                            std::string pp = DownloadString("https://api.flarial.net/users");
+
+                            json playersDict = json::parse(pp);
+
+                            int totalPlaytime = 0;
+                            int numberOfPlayers = 0;
+
+                            for (const auto& player : playersDict.items()) {
+
+                                std::time_t unixTimestamp = player.value()["lastbeat"];
+                                std::chrono::time_point<std::chrono::system_clock> timePoint = std::chrono::system_clock::from_time_t(unixTimestamp);
+ 
+                                ModuleManager::OnlineUsers.push_back(Utils::removeNonAlphanumeric(player.key()));
+                               
+                                //std::cout << Utils::removeNonAlphanumeric(player.key()) << std::endl;
+                      
+                            }
+
                             std::string ipToSend;
 
                             if (!Client::settings.getSettingByName<bool>("anonymousApi")->value) {
@@ -57,8 +78,6 @@ DWORD WINAPI init(HMODULE real)
                                 else if (!RaknetTickHook::towriteip.empty()) ipToSend = RaknetTickHook::towriteip;
                                 else ipToSend = "in.singleplayer";
                             } else ipToSend = "is.anonymous";
-
-                            std::string name = SDK::clientInstance->getLocalPlayer()->playerName;
 
                             auto module = ModuleManager::getModule("Nick");
 
@@ -73,6 +92,7 @@ DWORD WINAPI init(HMODULE real)
                             + " " + std::format("https://api.flarial.net/heartbeat/{}/{}",
                               Utils::removeColorCodes(name),
                                 ipToSend) << std::endl;
+
                             lastBeatTime = now;
                         }
                     }
