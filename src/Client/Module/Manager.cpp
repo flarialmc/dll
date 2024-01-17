@@ -117,7 +117,7 @@ void ModuleManager::initialize()
     modules.push_back(new Animations());
     modules.push_back(new DVD());
     modules.push_back(new BlockOutline());
-    //modules.push_back(new Hitbox());
+    modules.push_back(new Hitbox());
 
     std::sort(modules.begin(), modules.end(), compareNames);
 
