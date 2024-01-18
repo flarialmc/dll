@@ -40,8 +40,9 @@ void HitboxListener::onSetupAndRender(SetupAndRenderEvent& event) {
 
 	tess->begin(VertextFormat::TRIANGLE_LIST);
 
+
+
 	for (const auto& ent : player->level->getRuntimeActorList()) {
-		if (ent != nullptr && ent->isPlayer() && ent->hasCategory(ActorCategory::Player))
 			renderBox(reinterpret_cast<Player*>(ent));
 	}
 

@@ -103,7 +103,6 @@ private:
 		SDK::hasInstanced = true;
 		//SDK::clientInstance = muirc->getclientInstance();
 		SDK::screenView = pScreenView;
-		SDK::setCI();
 
 		if (SDK::clientInstance == nullptr)
 			SDK::clientInstance = muirc->clientInstance;
@@ -116,11 +115,46 @@ private:
 			//s//td::cout << SDK::clientInstance->getLocalPlayer()->getEffect(MobEffect::getEffects()[1].get());
 	//	}
 
-		std::string layer = SDK::screenView->VisualTree->root->LayerName;
+		std::string layer = pScreenView->VisualTree->root->LayerName;
+        const std::string& realLayer = layer;
 
-		static bool shouldRender;
+        static bool shouldRender;
 		static std::string currentScreenName;
 		shouldRender = false;
+
+        if (realLayer != "debug_screen" && realLayer != "toast_screen") {
+            if (ModuleManager::getModule("Zoom") != nullptr && ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("enabled")->value) {
+                bool mask = false;
+                if (ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("hidemodules")->value) {
+                    SDK::CurrentScreen = "zoom_screen";
+                    mask = true;
+                }
+                if (ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("hidehud")->value) {
+                    SDK::CurrentScreen = "zoom_screen";
+                    mask = true;
+                    usedFreelookHideHud = true;
+                    if (getGammaHook::hidehudPtr != nullptr) getGammaHook::hidehudPtr->setvalue(true);
+                    if (getGammaHook::hidehandPtr != nullptr) getGammaHook::hidehandPtr->setvalue(true);
+                }
+                if (!mask) SDK::CurrentScreen = realLayer;
+            }
+            else if (
+                    ModuleManager::getModule("Zoom") != nullptr &&
+                    ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("hidehud")->value &&
+                    getGammaHook::hidehudPtr != nullptr &&
+                    getGammaHook::hidehudPtr->getvalue() &&
+                    usedFreelookHideHud
+                    ) {
+                getGammaHook::hidehudPtr->setvalue(false);
+                getGammaHook::hidehandPtr->setvalue(false);
+                usedFreelookHideHud = false;
+                SDK::CurrentScreen = realLayer;
+            } else SDK::CurrentScreen = realLayer;
+
+            if (getGammaHook::hidehudPtr != nullptr && getGammaHook::hidehudPtr->getvalue()) {
+                SDK::CurrentScreen = "f1_screen";
+            }
+        }
 
 		if (!shouldRender) {
 			shouldRender = (layer == "debug_screen");
@@ -139,41 +173,8 @@ private:
 			return;
 		}
 
-		if (layer != "debug_screen" && layer != "toast_screen") {
-			if (ModuleManager::getModule("Zoom") != nullptr && ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("enabled")->value) {
-				bool mask = false;
-				if (ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("hidemodules")->value) {
-					SDK::CurrentScreen = "zoom_screen";
-					mask = true;
-				}
-				if (ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("hidehud")->value) {
-					SDK::CurrentScreen = "zoom_screen";
-					mask = true;
-					usedFreelookHideHud = true;
-					if (getGammaHook::hidehudPtr != nullptr) getGammaHook::hidehudPtr->setvalue(true);
-					if (getGammaHook::hidehandPtr != nullptr) getGammaHook::hidehandPtr->setvalue(true);
-				}
-				if (!mask) SDK::CurrentScreen = layer;
-			}
-			else if (
-				ModuleManager::getModule("Zoom") != nullptr &&
-				ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("hidehud")->value &&
-				getGammaHook::hidehudPtr != nullptr &&
-				getGammaHook::hidehudPtr->getvalue() &&
-				usedFreelookHideHud
-				) {
-				getGammaHook::hidehudPtr->setvalue(false);
-				getGammaHook::hidehandPtr->setvalue(false);
-				usedFreelookHideHud = false;
-				SDK::CurrentScreen = layer;
-			} else SDK::CurrentScreen = layer;
 
-            if (getGammaHook::hidehudPtr != nullptr && getGammaHook::hidehudPtr->getvalue()) {
-                SDK::CurrentScreen = "f1_screen";
-            }
-		}
-
-		func_original(pScreenView, muirc);
+        func_original(pScreenView, muirc);
 
 		auto VTable = *(uintptr_t**)muirc;
 
