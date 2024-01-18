@@ -320,12 +320,14 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
             Memory::SafeRelease(FlarialGUI::blurbrush);
             Memory::SafeRelease(FlarialGUI::blur);
-
-
         }
     }
 
-    if (Client::settings.getSettingByName<bool>("vsync")->value) return func_original(pSwapChain, 0, DXGI_PRESENT_DO_NOT_WAIT);
+
+
+    if (Client::settings.getSettingByName<bool>("vsync")->value) {
+        return func_original(pSwapChain, 1, DXGI_PRESENT_DO_NOT_WAIT);
+    }
     else return func_original(pSwapChain, syncInterval, flags);
 
 }
