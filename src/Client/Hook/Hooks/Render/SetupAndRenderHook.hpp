@@ -173,7 +173,6 @@ private:
 			return;
 		}
 
-
         func_original(pScreenView, muirc);
 
 		auto VTable = *(uintptr_t**)muirc;
