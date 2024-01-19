@@ -12,7 +12,7 @@ class HitboxListener : public Listener {
 	Module* module;
 public:
 
-	void onSetupAndRender(SetupAndRenderEvent& event) override;
+	void onRender(RenderEvent& event) override;
 
 	explicit HitboxListener(const char string[5], Module* module) {
 		this->name = string;

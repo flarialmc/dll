@@ -71,7 +71,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
     FlarialGUI::frameFactor = targetFrameRate / currentFrameRate;
 
 // Limit the frame factor to a maximum of 1.0
-    FlarialGUI::frameFactor = min(FlarialGUI::frameFactor, 1.0f);
+    FlarialGUI::frameFactor = std::min(FlarialGUI::frameFactor, 1.0f);
 
     if (!SwapchainHook::init) {
         if (SwapchainHook::queue == nullptr) {

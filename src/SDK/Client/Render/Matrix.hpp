@@ -9,13 +9,13 @@ struct Matrix {
 public:
 	glm::mat4x4 matrix;
 
-	inline Matrix correct() const {
-		Matrix ret;
+	[[nodiscard]] inline Matrix correct() const {
+		Matrix ret{};
 		ret.matrix = glm::transpose(this->matrix);
 		return ret;
 	}
 
-	inline bool OWorldToScreen(Vec3<float> origin, Vec3<float> pos, Vec2<float>& screen, Matrix projectionMatrix, Vec2<float> clientUIScreenSize) {
+	inline bool OWorldToScreen(Vec3<float> origin, Vec3<float> pos, Vec2<float>& screen, Matrix projectionMatrix, Vec2<float> clientUIScreenSize) const {
 		pos = pos.sub(origin);
 
 		glm::vec4 transformedPos = this->matrix * glm::vec4(pos.x, pos.y, pos.z, 1.0f);
