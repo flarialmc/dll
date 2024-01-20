@@ -23,6 +23,15 @@ void DrawUtils::setCtx(MinecraftUIRenderContext* ctx, GuiData* gui) {
 }
 
 void DrawUtils::addLine(Vec2<float> start, Vec2<float> end, float lineWidth, D2D_COLOR_F color) {
+
+    if (start.x < 0 || start.x > SDK::clientInstance->guiData->ScreenSize.x || start.y < 0 || start.y > SDK::clientInstance->guiData->ScreenSize.y) {
+        return;
+    }
+
+    if (end.x < 0 || end.x > SDK::clientInstance->guiData->ScreenSize.x || end.y < 0 || end.y > SDK::clientInstance->guiData->ScreenSize.y) {
+        return;
+    }
+
     D2D::context->DrawLine(D2D1::Point2F(start.x, start.y), D2D1::Point2F(end.x, end.y), FlarialGUI::getBrush(color), lineWidth);
 
 }
@@ -54,14 +63,16 @@ void DrawUtils::addBox(Vec3<float> lower, Vec3<float> upper, float lineWidth, in
     if (mode == 1 || mode == 2) {
         // Convert the vertices to screen coordinates
         std::vector<std::tuple<int, Vec2<float>>> screenCords;
-
+        bool real = false;
         for (int i = 0; i < 8; i++) {
             Vec2<float> screen;
 
             if (viewMatrix.WorldToScreen(vertices[i], screen))
                 screenCords.emplace_back(mode == 2 ? (int) screenCords.size() : i, screen);
+            else real = true;
         }
 
+        if(real) return;
         // Return if there are less than two points to draw lines between
         if (screenCords.size() < 2)
             return;
