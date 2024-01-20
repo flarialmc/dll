@@ -12,6 +12,7 @@ class HitboxListener : public Listener {
 	Module* module;
 public:
 
+    static inline std::unordered_map<std::string*, bool> canSeeArrXD;
 	void onRender(RenderEvent& event) override;
 
 	explicit HitboxListener(const char string[5], Module* module) {

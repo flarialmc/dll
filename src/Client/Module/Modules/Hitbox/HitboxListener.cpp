@@ -11,10 +11,9 @@ void renderBox(Player* player) {
 	else color2 = FlarialGUI::HexToColorF(box->settings.getSettingByName<std::string>("color")->value);
 
 	auto localPlayer = SDK::clientInstance->getLocalPlayer();
-
     if(player == nullptr) return;
 	// This may let through some entites
-	if (player == localPlayer || !player || !player->isAlive() || !localPlayer->isValidTarget(player) || !localPlayer->canSee(*player))
+	if (player == localPlayer || !player || !player->isAlive() || !localPlayer->isValidTarget(player) || !HitboxListener::canSeeArrXD[player->getNametag()])
 		return;
 
     DrawUtils::addEntityBox(player, (float)fmax(0.5f, 1 / (float)fmax(1, localPlayer->getRenderPositionComponent()->renderPos.dist(player->getRenderPositionComponent()->renderPos))), color2);}

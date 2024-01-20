@@ -11,6 +11,7 @@
 #include "../Visual/getGammaHook.hpp"
 #include "../../../Module/Manager.hpp"
 #include "../../../../Utils/Render/DrawUtils.hpp"
+#include "../../../Module/Modules/Hitbox/HitboxListener.hpp"
 #include <format>
 //#include "../../../../SDK/Client/Actor/MobEffect.h"
 
@@ -104,6 +105,15 @@ private:
 		//SDK::clientInstance = muirc->getclientInstance();
 		SDK::screenView = pScreenView;
         SDK::setCI();
+
+        auto player = SDK::clientInstance->getLocalPlayer();
+
+        if(player != nullptr && player->level && SDK::CurrentScreen == "hud_screen") {
+            for (const auto& ent: player->level->getRuntimeActorList()) {
+                if (ent != nullptr && ent->isPlayer() && ent->hasCategory(ActorCategory::Player))
+                    HitboxListener::canSeeArrXD[ent->getNametag()] = player->canSee(reinterpret_cast<Player const&>(*ent));
+            }
+        }
 
 		//Logger::info(std::f
 
