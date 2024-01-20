@@ -1,8 +1,8 @@
 #pragma once
 
 #include <glm/mat4x4.hpp>
-
 #include "../../../Utils/Utils.hpp"
+#include "GLMatrix.hpp"
 
 // By Intop
 struct Matrix {
@@ -31,4 +31,14 @@ public:
 		
 		return true;
 	}
+
+    bool WorldToScreen(Vec3<float> pos, Vec2<float> &screen);
+
+    GLMatrix *getMatrixCorrection();
+
+    float transformz(const Vec3<float> &p);
+
+    float transformy(const Vec3<float> &p);
+
+    float transformx(const Vec3<float> &p);
 };

@@ -207,6 +207,5 @@ public:
     bool isPlayer();
     bool hasCategory(ActorCategory category);
     RenderPositionComponent* getRenderPositionComponent();
-    bool canSee(Actor* actor);
     bool isValidTarget(Actor* actor);
 };

@@ -1,8 +1,8 @@
 #include <iostream>
 #include "DrawUtils.hpp"
 
-#include "../../SDK/SDK.hpp"
 #include "../../Client/GUI/Engine/Engine.hpp"
+#include "../../SDK/SDK.hpp"
 
 GuiData* guiData;
 Matrix viewMatrix;
@@ -23,12 +23,6 @@ void DrawUtils::setCtx(MinecraftUIRenderContext* ctx, GuiData* gui) {
 }
 
 void DrawUtils::addLine(Vec2<float> start, Vec2<float> end, float lineWidth, D2D_COLOR_F color) {
-
-    std::to_string(start.y);
-    std::to_string(end.x);
-    std::to_string(end.y);
-    std::to_string(lineWidth);
-
     D2D::context->DrawLine(D2D1::Point2F(start.x, start.y), D2D1::Point2F(end.x, end.y), FlarialGUI::getBrush(color), lineWidth);
 
 }
@@ -48,6 +42,15 @@ void DrawUtils::addBox(Vec3<float> lower, Vec3<float> upper, float lineWidth, in
     vertices[6] = Vec3<float>(lower.x, lower.y + diff.y, lower.z + diff.z);
     vertices[7] = Vec3<float>(lower.x + diff.x, lower.y + diff.y, lower.z + diff.z);
 
+    /*
+    Vec3<float> start;
+    Vec3<float> end;
+    viewMatrix.WorldToScreen(Vec3<float>(0, -60, 0), start);
+    viewMatrix.WorldToScreen(Vec3<float>(15, -60, 0), end);
+    std::cout << start.x << std::endl;
+    D2D::context->DrawLine(D2D1::Point2F(start.x, start.y), D2D1::Point2F(end.x, end.y), FlarialGUI::getBrush(color), lineWidth);
+*/
+
     if (mode == 1 || mode == 2) {
         // Convert the vertices to screen coordinates
         std::vector<std::tuple<int, Vec2<float>>> screenCords;
@@ -55,7 +58,7 @@ void DrawUtils::addBox(Vec3<float> lower, Vec3<float> upper, float lineWidth, in
         for (int i = 0; i < 8; i++) {
             Vec2<float> screen;
 
-            if (viewMatrix.OWorldToScreen(origin, vertices[i], screen, projMatrix, screenSize))
+            if (viewMatrix.WorldToScreen(vertices[i], screen))
                 screenCords.emplace_back(mode == 2 ? (int) screenCords.size() : i, screen);
         }
 

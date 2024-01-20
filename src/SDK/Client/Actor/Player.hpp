@@ -13,4 +13,6 @@ public:
 	BUILD_ACCESS(this, Gamemode*, gamemode, 0xF10);
 
 	float getBreakprogress(Block block);
+
+    bool canSee(const Player &actor);
 };

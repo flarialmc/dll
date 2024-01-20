@@ -103,9 +103,7 @@ private:
 		SDK::hasInstanced = true;
 		//SDK::clientInstance = muirc->getclientInstance();
 		SDK::screenView = pScreenView;
-
-		if (SDK::clientInstance == nullptr)
-			SDK::clientInstance = muirc->clientInstance;
+        SDK::setCI();
 
 		//Logger::info(std::f
 

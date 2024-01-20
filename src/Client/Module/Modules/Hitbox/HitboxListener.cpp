@@ -14,7 +14,7 @@ void renderBox(Player* player) {
 
     if(player == nullptr) return;
 	// This may let through some entites
-	if (player == localPlayer || player == nullptr || !player->isAlive() || !localPlayer->isValidTarget(player))
+	if (player == localPlayer || !player || !player->isAlive() || !localPlayer->isValidTarget(player) || !localPlayer->canSee(*player))
 		return;
 
     DrawUtils::addEntityBox(player, (float)fmax(0.5f, 1 / (float)fmax(1, localPlayer->getRenderPositionComponent()->renderPos.dist(player->getRenderPositionComponent()->renderPos))), color2);}
@@ -29,9 +29,9 @@ void HitboxListener::onRender(RenderEvent& event) {
 	auto player = SDK::clientInstance->getLocalPlayer();
 
     if(player != nullptr) {
-        for (const auto &ent: player->level->getRuntimeActorList()) {
+        for (const auto& ent: player->level->getRuntimeActorList()) {
             if (ent != nullptr && ent->isPlayer() && ent->hasCategory(ActorCategory::Player))
-                renderBox(reinterpret_cast<Player *>(ent));
+                renderBox((Player*)ent);
         }
     }
 }

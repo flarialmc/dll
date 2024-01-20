@@ -138,12 +138,6 @@ RenderPositionComponent* Actor::getRenderPositionComponent() {
     return tryGet<RenderPositionComponent>(sig);
 }
 
-bool Actor::canSee(Actor* actor) {
-    using canSeeFunc = bool(__fastcall*)(Actor*, Actor*);
-    static canSeeFunc canSee = reinterpret_cast<canSeeFunc>(Memory::offsetFromSig(Memory::findSig("E8 ? ? ? ? 84 C0 74 1C 48 8B 4F 48"), 1));
-    return canSee(this, actor);
-}
-
 bool Actor::isValidTarget(Actor* actor) {
     return Memory::CallVFunc<65, bool, Actor*>(this, actor);
 }
