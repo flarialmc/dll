@@ -18,7 +18,7 @@ private:
         newcolor.g = 8;
         newcolor.b = 4;
         
-        func_original(_this, screenContext, txt, x, y, newcolor, angle, s, centered, maxWidth);
+        func_original(_this, screenContext, splashText, x, y, newcolor, angle, s, centered, maxWidth);
 
     }
 
