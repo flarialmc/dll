@@ -12,11 +12,7 @@ private:
 
         std::string splashText("Flarial on top!");
 
-        auto newcolor = MCCColor();
-
-        newcolor.r = 125;
-        newcolor.g = 8;
-        newcolor.b = 4;
+        auto newcolor = MCCColor(125, 8, 4);
         
         func_original(_this, screenContext, splashText, x, y, newcolor, angle, s, centered, maxWidth);
 
