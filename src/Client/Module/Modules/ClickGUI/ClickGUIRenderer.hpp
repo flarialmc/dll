@@ -362,27 +362,34 @@ public:
 
 							if (name.starts_with(search) ||
 								name.find(search) != std::string::npos) {
-
-								ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
-									real->icon, i);
-
+								// only render cards that you can see (some times causes a crash)
+								if ((modcenter.y + yModifier + FlarialGUI::scrollpos > center.y) && (modcenter.y + yModifier + FlarialGUI::scrollpos - 150) < center.y + Constraints::RelativeConstraint(baseHeightReal)) {
+												ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
+																real->icon, i);
+												
+								}
+								//if crashes then prb here when 0 cards being drawn
 								xModifier += Constraints::SpacingConstraint(1.09, modWidth);
 								if ((++i % 3) == 0) {
-									yModifier += Constraints::SpacingConstraint(0.8, modWidth);
-									xModifier = 0.0f;
+												yModifier += Constraints::SpacingConstraint(0.8, modWidth);
+												xModifier = 0.0f;
 								}
 							}
 
 						}
 						else {
+							// only render cards that you can see (some times causes a crash)
+							if ((modcenter.y + yModifier + FlarialGUI::scrollpos > center.y) && (modcenter.y + yModifier + FlarialGUI::scrollpos - 150) < center.y + Constraints::RelativeConstraint(baseHeightReal)) {
+								ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
+												real->icon, i);
 
-							ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
-								real->icon, i);
-
+											
+							}
+							//if crashes then prb here when 0 cards being drawn
 							xModifier += Constraints::SpacingConstraint(1.09, modWidth);
 							if ((++i % 3) == 0) {
-								yModifier += Constraints::SpacingConstraint(0.8, modWidth);
-								xModifier = 0.0f;
+											yModifier += Constraints::SpacingConstraint(0.8, modWidth);
+											xModifier = 0.0f;
 							}
 
 						}
