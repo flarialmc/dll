@@ -39,7 +39,7 @@ DWORD WINAPI init(HMODULE real)
 
     Client::initialize();
     Logger::info("Initializing Client");
-
+    /* API unavalible, crashes
     std::thread statusThread([]() {
         while (true) {
 
@@ -103,7 +103,7 @@ DWORD WINAPI init(HMODULE real)
         }
     });
     statusThread.detach();
-
+    */
     while (true) {
         if (Client::disable) {
             break;
