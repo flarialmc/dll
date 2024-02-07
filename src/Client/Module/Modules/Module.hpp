@@ -10,6 +10,7 @@
 #include <sstream>
 #include "../../GUI/Engine/Engine.hpp"
 #include "../../GUI/Engine/Constraints.hpp"
+#include "../../../SDK/SDK.hpp"
 
 class Module
 {
@@ -87,7 +88,7 @@ public:
             std::filesystem::create_directories(filePath.parent_path());
 
             HANDLE fileHandle = CreateFileA(settingspath.c_str(), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                                            OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+                OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
             if (fileHandle == INVALID_HANDLE_VALUE) {
                 Logger::error("Failed to create file: " + settingspath);
@@ -99,70 +100,70 @@ public:
     }
 
 
-   virtual void onEnable() {
+    virtual void onEnable() {
 
-       DefaultConfig();
+        DefaultConfig();
 
-}
+    }
 
     virtual void onDisable() {
 
         SaveSettings();
 
-   }
+    }
 
-   virtual void DefaultConfig() {
+    virtual void DefaultConfig() {
        if(settings.getSettingByName<float>("percentageX") == nullptr) {
-           settings.addSetting("percentageX", 0.0f);
-           settings.addSetting("percentageY", 0.0f);
-       }
+            settings.addSetting("percentageX", 0.0f);
+            settings.addSetting("percentageY", 0.0f);
+        }
 
        if(settings.getSettingByName<bool>("border") == nullptr) {
-           settings.addSetting("border", false);
-           settings.addSetting("borderWidth", 1.0f);
-       }
+            settings.addSetting("border", false);
+            settings.addSetting("borderWidth", 1.0f);
+        }
 
-       if (settings.getSettingByName<bool>("reversepaddingx") == nullptr) settings.addSetting("reversepaddingx", false);
-       if (settings.getSettingByName<bool>("reversepaddingy") == nullptr) settings.addSetting("reversepaddingy", false);
-       if (settings.getSettingByName<float>("padx") == nullptr) settings.addSetting("padx", 0.0f);
-       if (settings.getSettingByName<float>("pady") == nullptr) settings.addSetting("pady", 0.0f);
-       if (settings.getSettingByName<float>("rectwidth") == nullptr) settings.addSetting("rectwidth", 1.0f);
-       if (settings.getSettingByName<float>("rectheight") == nullptr) settings.addSetting("rectheight", 1.0f);
-       if (settings.getSettingByName<bool>("responsivewidth") == nullptr) settings.addSetting("responsivewidth", false);
-       if (settings.getSettingByName<std::string>("textalignment") == nullptr) settings.addSetting("textalignment", (std::string)"Center");
+        if (settings.getSettingByName<bool>("reversepaddingx") == nullptr) settings.addSetting("reversepaddingx", false);
+        if (settings.getSettingByName<bool>("reversepaddingy") == nullptr) settings.addSetting("reversepaddingy", false);
+        if (settings.getSettingByName<float>("padx") == nullptr) settings.addSetting("padx", 0.0f);
+        if (settings.getSettingByName<float>("pady") == nullptr) settings.addSetting("pady", 0.0f);
+        if (settings.getSettingByName<float>("rectwidth") == nullptr) settings.addSetting("rectwidth", 1.0f);
+        if (settings.getSettingByName<float>("rectheight") == nullptr) settings.addSetting("rectheight", 1.0f);
+        if (settings.getSettingByName<bool>("responsivewidth") == nullptr) settings.addSetting("responsivewidth", false);
+        if (settings.getSettingByName<std::string>("textalignment") == nullptr) settings.addSetting("textalignment", (std::string)"Center");
 
-       if (settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 32.0f);
+        if (settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 32.0f);
 
-       if (settings.getSettingByName<std::string>("bgColor") == nullptr) {
-           settings.addSetting("bgColor", (std::string)"000000");
-           settings.addSetting("textColor", (std::string)"fafafa");
-           settings.addSetting("borderColor", (std::string)"000000");
-       }
+        if (settings.getSettingByName<std::string>("bgColor") == nullptr) {
+            settings.addSetting("bgColor", (std::string)"000000");
+            settings.addSetting("textColor", (std::string)"fafafa");
+            settings.addSetting("borderColor", (std::string)"000000");
+        }
 
-       if (settings.getSettingByName<float>("bgOpacity") == nullptr) {
-           settings.addSetting("bgOpacity", 0.55f);
-           settings.addSetting("textOpacity", 1.0f);
-           settings.addSetting("borderOpacity", 1.0f);
-       }
+        if (settings.getSettingByName<float>("bgOpacity") == nullptr) {
+            settings.addSetting("bgOpacity", 0.55f);
+            settings.addSetting("textOpacity", 1.0f);
+            settings.addSetting("borderOpacity", 1.0f);
+        }
 
-       if (settings.getSettingByName<bool>("bgRGB") == nullptr) {
-           settings.addSetting("bgRGB", false);
-           settings.addSetting("textRGB", false);
-           settings.addSetting("borderRGB", false);
-       }
+        if (settings.getSettingByName<bool>("bgRGB") == nullptr) {
+            settings.addSetting("bgRGB", false);
+            settings.addSetting("textRGB", false);
+            settings.addSetting("borderRGB", false);
+        }
 
        if(settings.getSettingByName<float>("uiscale") == nullptr) {
 
-           settings.addSetting("uiscale", 0.65f);
-       }
+            settings.addSetting("uiscale", 0.65f);
+        }
 
         if (settings.getSettingByName<float>("rotation") == nullptr) {
             settings.addSetting("rotation", 0.0f);
         }
 
-       if (settings.getSettingByName<bool>("BlurEffect") == nullptr) {
-           settings.addSetting("BlurEffect", false);
-       }
+        if (settings.getSettingByName<bool>("BlurEffect") == nullptr) {
+            settings.addSetting("BlurEffect", false);
+        }
 
     }
 
@@ -178,8 +179,8 @@ public:
                 return false;
             }
         }
-
-        for(TextBoxStruct i : FlarialGUI::TextBoxes) if(i.isActive) return false;
+        if (FlarialGUI::inMenu) return false;
+        for (TextBoxStruct& i : FlarialGUI::TextBoxes) if (i.isActive) return false;
         if (SDK::CurrentScreen == "chat_screen") return false;
         // All keys in the keybind are being held down
         return true;
@@ -197,7 +198,8 @@ public:
             }
         }
 
-        for(TextBoxStruct i : FlarialGUI::TextBoxes) if(i.isActive) return false;
+        if (FlarialGUI::inMenu) return false;
+        for (TextBoxStruct& i : FlarialGUI::TextBoxes) if (i.isActive) return false;
         // All keys in the keybind are being held down
         if (SDK::CurrentScreen == "chat_screen") return false;
         return true;

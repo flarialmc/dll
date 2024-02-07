@@ -9,8 +9,8 @@ std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {
 };
 
 void Module::NormalRender(int index, std::string text, std::string value) {
-
-	if (settings.getSettingByName<bool>("enabled")->value && SDK::CurrentScreen == "hud_screen") {
+	FlarialGUI::inMenu = ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value;
+	if (FlarialGUI::inMenu && SDK::CurrentScreen == "hud_screen") {
 		float rotation = this->settings.getSettingByName<float>("rotation")->value;
 		D2D1_MATRIX_3X2_F oldTransform;
 		D2D1_POINT_2F rotationCenter;
