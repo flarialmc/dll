@@ -12,8 +12,7 @@ public:
 
     static inline original suspendOriginal = nullptr;
 
-    // Dead
-    OnSuspendHook() : Hook("OnSuspendHook", "48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 4C 8B F9 4C 8D B1") {}
+    OnSuspendHook() : Hook("OnSuspendHook", "48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 4C 8B E9 45 33 F6") {}
 
     void enableHook() override;
 };
