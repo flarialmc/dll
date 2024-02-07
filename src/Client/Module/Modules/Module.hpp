@@ -180,6 +180,7 @@ public:
         }
 
         for(TextBoxStruct i : FlarialGUI::TextBoxes) if(i.isActive) return false;
+        if (SDK::CurrentScreen == "chat_screen") return false;
         // All keys in the keybind are being held down
         return true;
     }
@@ -198,6 +199,7 @@ public:
 
         for(TextBoxStruct i : FlarialGUI::TextBoxes) if(i.isActive) return false;
         // All keys in the keybind are being held down
+        if (SDK::CurrentScreen == "chat_screen") return false;
         return true;
     }
 
