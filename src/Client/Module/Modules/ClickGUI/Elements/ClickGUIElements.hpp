@@ -6,7 +6,7 @@
 class ClickGUIElements
 {
 public:
-    static void ModCard(const float x, float y, Module* mod, const std::string iconpath, const int index);
+    static void ModCard(const float x, float y, Module* mod, const std::string iconpath, const int index, bool visible = true);
 
     static std::map<std::string, ID2D1Bitmap*> images;
     static std::vector<float> angles;

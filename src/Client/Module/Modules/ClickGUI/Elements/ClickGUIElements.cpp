@@ -176,7 +176,7 @@ std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit,
 }
 
 
-void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string iconpath, const int index)
+void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string iconpath, const int index, bool visible)
 {
 	Vec2<float> round = Constraints::RoundingConstraint(34, 34);
 
@@ -191,6 +191,9 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 	if (index > shadowSizes.size() - 1 || index == 0) {
 		shadowSizes.emplace_back(0.01, 0.01);
 	}
+
+	if (!visible)
+		return;
 
 	// Bottom rounded rect
 	float BottomRoundedWidth = sizes[index].x;
