@@ -46,6 +46,7 @@ public:
 
     void enableHook() override {
 
+        // Dead
         auto RefAddr = Memory::findSig("E8 ? ? ? ? E9 ? ? ? ? 8B 43 18 89 44 24 ? 48 8D 54 24 ? 48 8B 4B ? E8 ? ? ? ? 48 8B F8");
         auto RealFunc = RefAddr + 1 + 4 + *reinterpret_cast<int*>(RefAddr + 1);
 

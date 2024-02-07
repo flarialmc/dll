@@ -32,11 +32,11 @@ class Level {
 
 public:
     troll& getPlayerMap() {
-        return direct_access<troll>(this, 0x1EA8);
+        return direct_access<troll>(this, 0x1E98);
     }
 
 	std::vector<Actor*> getRuntimeActorList() {
-        static uintptr_t sig = Memory::findSig("40 53 48 83 EC 30 48 81 C1 D8 1C 00 00");
+        static uintptr_t sig = Memory::findSig("40 53 48 83 EC 30 48 81 C1 C8 1C 00 00");
         static auto getRuntimeActorList= *(decltype(&Level::getRuntimeActorList)*)&sig;
         return (this->*getRuntimeActorList)();
 	}

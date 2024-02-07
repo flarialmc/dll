@@ -158,7 +158,7 @@ public:
 
 	int getPing() {
 		if (this->NumberOfConnections() == 0)
-			return 1;
+			return -1;
 
 		RakNetGUID guid = this->GetGUIDFromIndex(0);
 		SystemAddress sysAddr = this->GetSystemAddressFromIndex(0);

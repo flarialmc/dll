@@ -177,14 +177,14 @@ struct AABBShapeComponent {
 class Actor {
 public:
 
-    BUILD_ACCESS(this, int16_t, hurtTime, 0x22C);
-    BUILD_ACCESS(this, Level*, level, 0x288);
-    BUILD_ACCESS(this, ActorCategory, categories, 0x2C0);
-    BUILD_ACCESS(this, ActorRotationComponent*, actorRotationComponent, 0x2D8);
-    BUILD_ACCESS(this, AABBShapeComponent*, aabb, 0x2D0);
-    BUILD_ACCESS(this, StateVectorComponent*, stateVector, 0x2C8);
-    BUILD_ACCESS(this, Vec2<float>, rotations, 0x2D8);
-    BUILD_ACCESS(this, bool, wasHurt, 0x236);
+    BUILD_ACCESS(this, int16_t, hurtTime, 0x234);
+    BUILD_ACCESS(this, Level*, level, 0x290);
+    BUILD_ACCESS(this, ActorCategory, categories, 0x2C8);
+    BUILD_ACCESS(this, ActorRotationComponent*, actorRotationComponent, 0x2E0);
+    BUILD_ACCESS(this, AABBShapeComponent*, aabb, 0x2D8);
+    BUILD_ACCESS(this, StateVectorComponent*, stateVector, 0x2D0);
+    BUILD_ACCESS(this, Vec2<float>, rotations, 0x2E0);
+    BUILD_ACCESS(this, bool, wasHurt, 0x23E);
    
 
     template <typename Component>

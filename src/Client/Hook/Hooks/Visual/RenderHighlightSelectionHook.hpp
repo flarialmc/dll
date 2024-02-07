@@ -47,7 +47,7 @@ public:
     typedef void(__thiscall* RenderHighlightSelectionOriginal)(LevelRendererPlayer*, ScreenContext&, Block const&, BlockSource&, Vec3<int> const&);
     static inline RenderHighlightSelectionOriginal func_original = nullptr;
 
-    RenderHighlightSelectionHook() : Hook("renderHighlightSelection Hook", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 B4 ? ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 49 8B F9 4C 89 4D ? 4D 8B E0") {}
+    RenderHighlightSelectionHook() : Hook("renderHighlightSelection Hook", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 B4 24 ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 49 8B F9 4C 89 4C 24") {}
 
     void enableHook() override {
 

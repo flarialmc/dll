@@ -24,10 +24,10 @@ public:
     }
 
     BUILD_ACCESS(this, MinecraftGame*, mcgame, 0x0C8);
-    BUILD_ACCESS(this, GuiData*, guiData, 0x560);
+    BUILD_ACCESS(this, GuiData*, guiData, 0x558);
     BUILD_ACCESS(this, Camera, camera, 0x270);
     BUILD_ACCESS(this, GLMatrix, Matrix1, 0x0330);
-    BUILD_ACCESS(this, ClientHMDState, HMDState, 0x5B0);
+    BUILD_ACCESS(this, ClientHMDState, HMDState, 0x5A8);
 
     LocalPlayer* getLocalPlayer();
     BlockSource* getBlockSource();
@@ -41,12 +41,12 @@ public:
 
 	float* getFovX()
 	{
-		return reinterpret_cast<float*>((uintptr_t)(this) + 0x6F8);
+		return reinterpret_cast<float*>((uintptr_t)(this) + 0x6F0);
 	};
 
 	float* getFovY()
 	{
-		return reinterpret_cast<float*>((uintptr_t)(this) + 0x70C);
+		return reinterpret_cast<float*>((uintptr_t)(this) + 0x704);
 	};
 
 	Vec2<float> getFov()

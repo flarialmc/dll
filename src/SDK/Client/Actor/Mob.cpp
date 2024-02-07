@@ -2,7 +2,7 @@
 #include "Actor.hpp"
 
 void Mob::setSprinting(bool state) {
-    Memory::CallVFunc<252, void, bool>(this, state);
+    Memory::CallVFunc<165, void, bool>(this, state);
 }
 
 template <typename Component>

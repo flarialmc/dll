@@ -34,7 +34,7 @@ void ClientInstance::releaseMouse() {
 }
 
 void ClientInstance::refocusMouse() {
-    return Memory::CallVFunc<328, void>(this);
+    return Memory::CallVFunc<329, void>(this);
 }
 std::string ClientInstance::getTopScreenName() {
     return SDK::CurrentScreen;
