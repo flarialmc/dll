@@ -50,8 +50,8 @@ Vec3<float>* Actor::getPosition() {
 ItemStack* Actor::getArmor(int slot) {
     static uintptr_t sig;
 
-    if (sig == NULL) { // Dead
-        sig = Memory::findSig("48 8B 89 50 04 00 00 48 8B 01 48 8B 40 28 48");
+    if (sig == NULL) {
+        sig = Memory::findSig("48 8B 89 58 04 00 00 48 8B 01 48 8B 40 28 48");
     }
 
     auto fn = reinterpret_cast<ItemStack* (__thiscall*)(Actor*, int)>(sig);
