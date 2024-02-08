@@ -21,8 +21,8 @@ public:
             D2D::context->SetTextAntialiasMode(aliases[curAliasMode]);
             return;
         }
-
-        if (D2D::context != nullptr && aliases[curAliasMode] != D2D::context->GetTextAntialiasMode()) D2D::context->SetTextAntialiasMode(aliases[curAliasMode]);
+        //crash fix from freezeengine   works smh 
+        //if (D2D::context != nullptr && aliases[curAliasMode] != D2D::context->GetTextAntialiasMode()) D2D::context->SetTextAntialiasMode(aliases[curAliasMode]);
     }
 
 public:
