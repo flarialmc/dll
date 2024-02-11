@@ -35,6 +35,7 @@ public:
 	virtual bool isConnected(struct NetworkIdentifier const&);
 	virtual __int64 closeNetworkConnection(struct NetworkIdentifier const&);
 	virtual NetworkIdentifier* getNetworkIdentifier(void);
+	virtual void setApplicationHandshakeCompleted(NetworkIdentifier const &);
 	virtual RakPeer* getPeer(void);
 	virtual RakPeer* getPeerConst(void);
 	virtual void _onDisable(void);

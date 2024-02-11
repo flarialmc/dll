@@ -24,8 +24,8 @@ class  IPDisplayListener : public Listener {
 
                 if (SDK::clientInstance->getLocalPlayer() != nullptr) {
 
-                    if (SDK::raknetConnector != nullptr) {
-                         IP = SDK::raknetConnector->JoinedIp;
+                    if (SDK::clientInstance->getRakNetConnector() != nullptr) {
+                         IP = SDK::clientInstance->getRakNetConnector()->JoinedIp;
 
                          if (IP == "") {
                              IP = "world";

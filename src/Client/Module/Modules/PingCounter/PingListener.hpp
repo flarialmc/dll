@@ -20,13 +20,13 @@ class PingListener : public Listener {
 
         if (SDK::CurrentScreen == "hud_screen")
             if (module->settings.getSettingByName<bool>("enabled")->value) {
-                if (SDK::raknetConnector != nullptr) {
-                    if (SDK::raknetConnector->JoinedIp == "") {
+                if (SDK::clientInstance->getRakNetConnector() != nullptr) {
+                    if (SDK::clientInstance->getRakNetConnector()->JoinedIp == "") {
                         ping = 0;
                     }
 
                     else {
-                        ping = SDK::raknetConnector->getPeer()->getPing();
+                        ping = SDK::clientInstance->getRakNetConnector()->getPeer()->getPing();
 
                     }
 

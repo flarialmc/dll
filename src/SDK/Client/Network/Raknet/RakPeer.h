@@ -35,11 +35,12 @@ private:
 	virtual void destructor();
 
 public:
+	virtual void InitializeConfiguration(std::unique_ptr<__int64>);
 	virtual __int64 Startup(uint32_t, __int64*, uint32_t, int);
+	virtual bool hasGetStrictParsingVersion(void);
 
 private:
-	virtual void TryroFunc_FlagVil2();  // 2
-	virtual void TryroFunc_FlagVil3();  // 3
+	virtual void TryroFunc_FlagVil3();  // 4
 
 public:
 	virtual void AddToSecurityExceptionList(char const*);
@@ -53,6 +54,7 @@ public:
 	virtual __int64 Connect(char const*, uint16_t, char const*, int, __int64*, uint32_t, uint32_t, uint32_t, uint32_t);
 	virtual __int64 ConnectWithSocket(char const*, uint16_t, char const*, int, __int64*, __int64*, uint32_t, uint32_t, uint32_t);
 	virtual void Shutdown(uint32_t, unsigned char, __int64);
+	virtual void SetApplicationHandshakeCompleted(AddressOrGUID);
 	virtual bool IsActive(void);
 	virtual bool GetConnectionList(__int64*, uint16_t*);
 	virtual uint32_t GetNextSendReceipt(void);
@@ -94,11 +96,7 @@ public:
 	virtual SystemAddress GetMyBoundAddress(int);
 	virtual RakNetGUID GetGuidFromSystemAddress(SystemAddress);
 	virtual SystemAddress GetSystemAddressFromGuid(RakNetGUID);
-
-private:
-	virtual void TryroFunc_FlagVil56();  // 56
-
-public:
+	virtual bool hasGetStrictParsingVersion2(void);
 	virtual void SetTimeoutTime(uint32_t, __int64);
 	virtual uint32_t GetTimeoutTime(__int64);
 	virtual int GetMTUSize(__int64);
@@ -130,11 +128,7 @@ private:
 
 public:
 	virtual void SetPerConnectionOutgoingBandwidthLimit(uint32_t);
-
-private:
-	virtual void TryroFunc_FlagVil84();  // 84
-
-public:
+	virtual bool hasGetStrictParsingVersion3(void);
 	virtual bool GetStatistics(uint32_t, __int64*);
 	virtual __int64 GetStatistics(__int64, __int64*);
 	virtual void GetStatisticsList(__int64&, __int64&, __int64&);

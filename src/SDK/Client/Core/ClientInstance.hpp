@@ -12,6 +12,7 @@
 #include "../Level/LevelRender/LevelRender.hpp"
 #include "Camera.hpp"
 #include "ClientHMDState.hpp"
+#include "../Network/Raknet/RaknetConnector.hpp"
 
 class ClientInstance {
 public:
@@ -57,6 +58,13 @@ public:
     LoopbackPacketSender* getPacketSender()
     {
         return *reinterpret_cast<LoopbackPacketSender**>((uintptr_t)this + 0xF0);
+    }
+
+	RaknetConnector* getRakNetConnector() {
+	    if (getPacketSender() == nullptr)
+	    	return nullptr;
+
+    	return getPacketSender()->networkSystem->remoteConnectorComposite->rakNetConnector;
     }
 
     Matrix const& getProjectionMatrix() {

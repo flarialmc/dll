@@ -21,7 +21,7 @@ ActorTypeComponent* Actor::getActorTypeComponent() {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig("40 53 48 83 EC 20 48 8B DA BA 14 AD F3 51");
+        sig = Memory::findSig("48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 14 AD F3 51");
     }
 
     return tryGet<ActorTypeComponent>(sig);
@@ -63,7 +63,7 @@ MoveInputComponent* Actor::getMoveInputHandler() {
     static  uintptr_t sig;
 
     if (sig == NULL) {
-       sig = Memory::findSig("40 53 48 83 EC 20 48 8B DA BA 2E");
+       sig = Memory::findSig("48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 2E CD 8B 46");
     }
 
     return tryGet<MoveInputComponent>(sig);
@@ -75,7 +75,7 @@ ActorHeadRotationComponent* Actor::getActorHeadRotationComponent() {
     static  uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig("40 53 48 83 EC 20 48 8B DA BA 1C 58 40 E9");
+        sig = Memory::findSig("48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 1C 58 40 E9");
     }
 
     return tryGet<ActorHeadRotationComponent>(sig);
@@ -132,7 +132,7 @@ RenderPositionComponent* Actor::getRenderPositionComponent() {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig("40 53 48 83 EC 20 48 8B DA BA 6E F3 E8 D4");
+        sig = Memory::findSig("48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 6E F3 E8 D4");
     }
 
     return tryGet<RenderPositionComponent>(sig);

@@ -18,8 +18,6 @@ void RaknetTickHook::callback(RaknetConnector* raknet)  {
                 once = true;
             }
 
-            SDK::raknetConnector = raknet;
-
             std::string ip = raknet->JoinedIp;
 
             if (ip.empty() && SDK::clientInstance == nullptr) {

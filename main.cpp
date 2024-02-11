@@ -24,8 +24,8 @@ std::string removeColorCodes(const std::string& input);
 DWORD WINAPI init(HMODULE real)
 {
 
-
-    bool showConsole = true;
+#ifndef NDEBUG
+    bool showConsole = false;
     
     if (GetConsoleWindow() == nullptr && showConsole) {
         AllocConsole();
@@ -33,6 +33,7 @@ DWORD WINAPI init(HMODULE real)
         FILE *out;
         freopen_s(&out, ("CONOUT$"), ("w"), stdout);
     }
+#endif
     
 
 
