@@ -16,13 +16,15 @@ public:
     std::string curAliasMode;
 
     void onLocalTick(TickEvent& event) override {
-        if (D2D::context != nullptr && curAliasMode != Client::settings.getSettingByName<std::string>("aliasingMode")->value) {
-            curAliasMode = Client::settings.getSettingByName<std::string>("aliasingMode")->value;
-            D2D::context->SetTextAntialiasMode(aliases[curAliasMode]);
-            return;
-        }
+        if (!SwapchainHook::init) {
+            if (D2D::context != nullptr && curAliasMode != Client::settings.getSettingByName<std::string>("aliasingMode")->value) {
+                curAliasMode = Client::settings.getSettingByName<std::string>("aliasingMode")->value;
+                D2D::context->SetTextAntialiasMode(aliases[curAliasMode]);
+                return;
+            }
 
-        if (D2D::context != nullptr && aliases[curAliasMode] != D2D::context->GetTextAntialiasMode()) D2D::context->SetTextAntialiasMode(aliases[curAliasMode]);
+            if (D2D::context != nullptr && aliases[curAliasMode] != D2D::context->GetTextAntialiasMode()) D2D::context->SetTextAntialiasMode(aliases[curAliasMode]);
+        }
     }
 
 public:
