@@ -176,7 +176,7 @@ std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit,
 }
 
 
-void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string iconpath, const int index)
+void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string iconpath, const int index, bool visible)
 {
 	Vec2<float> round = Constraints::RoundingConstraint(34, 34);
 
@@ -191,6 +191,9 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 	if (index > shadowSizes.size() - 1 || index == 0) {
 		shadowSizes.emplace_back(0.01, 0.01);
 	}
+
+	if (!visible)
+		return;
 
 	// Bottom rounded rect
 	float BottomRoundedWidth = sizes[index].x;
@@ -252,7 +255,7 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 
 	D2D1_COLOR_F mod2Col = colors_mod2_rgb ? FlarialGUI::rgbColor : colors_mod2;
 	mod2Col.a = o_colors_mod2;
-	
+
 	FlarialGUI::RoundedRect(x, y, mod2Col, BottomRoundedWidth, BottomRoundedHeight, round.x, round.x);
 
 	// Top rounded rect
@@ -283,9 +286,9 @@ void ClickGUIElements::ModCard(float x, float y, Module* mod, const std::string 
 
 	float paddingSize = Constraints::RelativeConstraint(0.28);
 
-    FlarialGUI::Tooltip("mod_" + std::to_string(index), x, realY, mod->description, BottomRoundedWidth, TopRoundedHeight);
+	FlarialGUI::Tooltip("mod_" + std::to_string(index), x, realY, mod->description, BottomRoundedWidth, TopRoundedHeight);
 
-    FlarialGUI::RoundedRect(modiconx, modicony, mod3Col,
+	FlarialGUI::RoundedRect(modiconx, modicony, mod3Col,
 		paddingSize, paddingSize, 7.5, 7.5);
 
 	paddingSize = Constraints::RelativeConstraint(0.20);
@@ -411,4 +414,3 @@ void ClickGUIElements::convertImageToBitmap(ID2D1Image* pImg, D2D1_SIZE_U size)
 	//Set previous Target
 	D2D::context->SetTarget(oldTarget);
 }
-
