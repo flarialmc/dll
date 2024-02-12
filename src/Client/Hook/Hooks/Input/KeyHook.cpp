@@ -22,6 +22,8 @@ void KeyHook::keyCallback(int key, int state)
 	KeyEvent event(key, state, keys);
 	EventHandler::onKey(event);
 
+	Sleep(0);
+
 	if (!event.isCancelled())
 		func_original(event.GetKey(), event.GetAction());
 }
