@@ -38,9 +38,9 @@ endif()
 
 file(GLOB_RECURSE sources "main.cpp" "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp")
 
-add_library(Flarial SHARED ${sources})
+add_library(Flarial SHARED ${sources} src/SDK/Client/Render/Matrix.cpp)
 
-target_include_directories(Flarial PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/")
+target_include_directories(Flarial PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/" "${CMAKE_CURRENT_LIST_DIR}/lib/glm/")
 
 # Disable RTTI
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

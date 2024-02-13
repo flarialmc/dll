@@ -71,7 +71,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
     FlarialGUI::frameFactor = targetFrameRate / currentFrameRate;
 
 // Limit the frame factor to a maximum of 1.0
-    FlarialGUI::frameFactor = min(FlarialGUI::frameFactor, 1.0f);
+    FlarialGUI::frameFactor = std::min(FlarialGUI::frameFactor, 1.0f);
 
     if (!SwapchainHook::init) {
         if (SwapchainHook::queue == nullptr) {
@@ -320,12 +320,14 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
             Memory::SafeRelease(FlarialGUI::blurbrush);
             Memory::SafeRelease(FlarialGUI::blur);
-
-
         }
     }
 
-    if (Client::settings.getSettingByName<bool>("vsync")->value) return func_original(pSwapChain, 0, DXGI_PRESENT_DO_NOT_WAIT);
+
+
+    if (Client::settings.getSettingByName<bool>("vsync")->value) {
+        return func_original(pSwapChain, 0, DXGI_PRESENT_DO_NOT_WAIT);
+    }
     else return func_original(pSwapChain, syncInterval, flags);
 
 }

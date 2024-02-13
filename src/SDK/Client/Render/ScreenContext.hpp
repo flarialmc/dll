@@ -4,8 +4,8 @@
 
 class ScreenContext {
 public:
-    inline float* getColorHolder() {
-        return *reinterpret_cast<float**>((uintptr_t)(this) + 0x30);
+    inline MCCColor* getColorHolder() {
+        return *reinterpret_cast<MCCColor**>((uintptr_t)(this) + 0x30);
     }
 
     inline Tessellator* getTessellator() {

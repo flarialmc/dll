@@ -210,7 +210,7 @@ public:
                 int i3 = 0;
                 float i2 = 0;
 
-                for (const auto& pair : SDK::clientInstance->getLocalPlayer()->getlevel()->playermap) {
+                for (const auto& pair : SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap()) {
 
                     i3++;
 
@@ -235,7 +235,7 @@ public:
                 float fakex = realcenter.x;
                 float fixer = 0;
 
-                for (const auto& pair : SDK::clientInstance->getLocalPlayer()->getlevel()->playermap) {
+                for (const auto& pair : SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap()) {
 
                     i3++;
 
@@ -308,12 +308,17 @@ public:
 
                 if(yes) {
 
-                    auto vecmap = copyMapInAlphabeticalOrder(SDK::clientInstance->getLocalPlayer()->getlevel()->playermap);
+                    auto vecmap = copyMapInAlphabeticalOrder(SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap());
                     for (const auto &pair: vecmap) {
 
                         i++;
-                        std::string name = pair.second.name;
+                        std::string name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pair.second.name));
+                        
 
+                        auto it = std::find(ModuleManager::OnlineUsers.begin(), ModuleManager::OnlineUsers.end(), name);
+
+                        // Check if the string was found
+                        
 
                         auto module = ModuleManager::getModule("Nick");
 
@@ -321,11 +326,21 @@ public:
                             name = module->settings.getSettingByName<std::string>("nick")->value;
                         }
 
-                        FlarialGUI::FlarialTextWithFont(fakex + Constraints::SpacingConstraint(0.5, keycardSize),
+                        float xx = 0;
+
+                        if (it != ModuleManager::OnlineUsers.end()) {
+                            FlarialGUI::Image("\\Flarial\\assets\\logo.png", D2D1::RectF(fakex + Constraints::SpacingConstraint(0.2, keycardSize), realcenter.y +
+                                Constraints::SpacingConstraint(0.12, keycardSize), fakex + Constraints::SpacingConstraint(1.1, keycardSize), realcenter.y +
+                                Constraints::SpacingConstraint(1.22, keycardSize)));
+
+                            xx = Constraints::SpacingConstraint(0.5, keycardSize);
+
+                        }
+
+                        FlarialGUI::FlarialTextWithFont(fakex +xx+ Constraints::SpacingConstraint(0.5, keycardSize),
                                                         realcenter.y +
                                                         Constraints::SpacingConstraint(0.12, keycardSize),
-                                                        FlarialGUI::to_wide(Utils::removeNonAlphanumeric(
-                                                                Utils::removeColorCodes(name))).c_str(),
+                                                        FlarialGUI::to_wide(name).c_str(),
                                                         keycardSize * 5, keycardSize,
                                                         DWRITE_TEXT_ALIGNMENT_LEADING, fontSize,
                                                         DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
@@ -340,12 +355,18 @@ public:
                     }
 
                 } else {
-                    for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getlevel()->playermap) {
+                    for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap()) {
 
                         i++;
 
                         std::string name = pair.second.name;
 
+                        auto it = std::find(ModuleManager::OnlineUsers.begin(), ModuleManager::OnlineUsers.end(), name);
+
+                        // Check if the string was found
+                        if (it != ModuleManager::OnlineUsers.end()) {
+                            name = "[F] " + name;
+                        }
 
                         auto module = ModuleManager::getModule("Nick");
 

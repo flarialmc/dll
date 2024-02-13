@@ -180,6 +180,52 @@ public:
     };
 };
 
+struct AABB {
+    Vec3<float> lower;
+    Vec3<float> upper;
+
+    AABB() {}
+    AABB(Vec3<float> l, Vec3<float> h) : lower(l), upper(h) {};
+    AABB(const AABB& aabb) {
+        lower = Vec3<float>(aabb.lower);
+        upper = Vec3<float>(aabb.upper);
+    }
+    AABB(Vec3<float> lower, float width, float height, float eyeHeight) {
+        lower = lower.sub(Vec3<float>(width, eyeHeight * 2, width).div(2));
+        this->lower = lower;
+        this->upper = { lower.x + width, lower.y + height, lower.z + width };
+    }
+
+    bool isFullBlock() {
+        auto diff = lower.sub(upper);
+        return fabsf(diff.y) == 1 && fabsf(diff.x) == 1 && fabsf(diff.z) == 1;
+    }
+
+    AABB expanded(float amount) {
+        return AABB(lower.sub(amount), upper.add(amount));
+    }
+
+    AABB expandedXZ(float amount) {
+        return AABB(lower.sub(amount, 0.f, amount), upper.add(amount, 0.f, amount));
+    }
+
+    Vec3<float> centerPoint() {
+        Vec3<float> diff = upper.sub(lower);
+        return lower.add(diff.mul(0.5f));
+    }
+
+    bool intersects(AABB aabb) {
+        return aabb.upper.x > lower.x && upper.x > aabb.lower.x &&
+            aabb.upper.y > lower.y && upper.y > aabb.lower.y &&
+            aabb.upper.z > lower.z && upper.z > aabb.lower.z;
+    }
+
+    bool intersectsXZ(AABB aabb) {
+        return aabb.upper.x > lower.x && upper.x > aabb.lower.x &&
+            aabb.upper.z > lower.z && upper.z > aabb.lower.z;
+    }
+};
+
 
 class Utils
 {

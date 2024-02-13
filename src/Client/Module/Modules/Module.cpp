@@ -46,24 +46,15 @@ void Module::NormalRender(int index, std::string text, std::string value) {
 
 		if (responsivewidth) {
 
-			IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(
-				Client::settings.getSettingByName<std::string>("mod_fontname")->value,
-				Constraints::FontScaler(textSize), DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL,
-				DWRITE_FONT_STRETCH_NORMAL, alignment);
+			//IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(
+			//	Client::settings.getSettingByName<std::string>("mod_fontname")->value,
+			//	Constraints::FontScaler(textSize), DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL,
+			//	DWRITE_FONT_STRETCH_NORMAL, alignment);
 
-			IDWriteTextLayout* textLayout;
-
-			FlarialGUI::writeFactory->CreateTextLayout(
-				FlarialGUI::to_wide(text).c_str(),
-				wcslen(FlarialGUI::to_wide(text).c_str()),
-				textFormat,
-				textWidth,
-				textHeight,
-				&textLayout
-			);
+			IDWriteTextLayout* textLayout = FlarialGUI::GetTextLayout(FlarialGUI::to_wide(text).c_str(), alignment, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, textSize, DWRITE_FONT_WEIGHT_REGULAR, textWidth, textHeight);
 
 			textLayout->GetMetrics(&textMetrics);
-			textLayout->Release();
+			//textLayout->Release();
 		}
 
 		if (!responsivewidth) textMetrics.left = 0;

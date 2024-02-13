@@ -10,6 +10,8 @@
 #include "../../../Module/Modules/CompactChat/CompactChatListener.hpp"
 #include "../Visual/getGammaHook.hpp"
 #include "../../../Module/Manager.hpp"
+#include "../../../../Utils/Render/DrawUtils.hpp"
+#include "../../../Module/Modules/Hitbox/HitboxListener.hpp"
 #include <format>
 //#include "../../../../SDK/Client/Actor/MobEffect.h"
 
@@ -100,8 +102,18 @@ private:
 	static void SetUpAndRenderCallback(ScreenView* pScreenView, MinecraftUIRenderContext* muirc) {
 
 		SDK::hasInstanced = true;
-		SDK::clientInstance = muirc->getclientInstance();
+		//SDK::clientInstance = muirc->getclientInstance();
 		SDK::screenView = pScreenView;
+        SDK::setCI();
+
+        auto player = SDK::clientInstance->getLocalPlayer();
+
+        if(player != nullptr && player->level && SDK::CurrentScreen == "hud_screen") {
+            for (const auto& ent: player->level->getRuntimeActorList()) {
+                if (ent != nullptr && ent->isPlayer() && ent->hasCategory(ActorCategory::Player))
+                    HitboxListener::canSeeArrXD[ent->getNametag()] = player->canSee(reinterpret_cast<Player const&>(*ent));
+            }
+        }
 
 		//Logger::info(std::f
 
@@ -111,41 +123,65 @@ private:
 			//s//td::cout << SDK::clientInstance->getLocalPlayer()->getEffect(MobEffect::getEffects()[1].get());
 	//	}
 
-		std::string layer = SDK::screenView->VisualTree->root->LayerName;
+		std::string layer = pScreenView->VisualTree->root->LayerName;
+        const std::string& realLayer = layer;
 
-		if (layer != "debug_screen" && layer != "toast_screen") {
-			if (ModuleManager::getModule("Zoom") != nullptr && ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("enabled")->value) {
-				bool mask = false;
-				if (ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("hidemodules")->value) {
-					SDK::CurrentScreen = "zoom_screen";
-					mask = true;
-				}
-				if (ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("hidehud")->value) {
-					SDK::CurrentScreen = "zoom_screen";
-					mask = true;
-					usedFreelookHideHud = true;
-					if (getGammaHook::hidehudPtr != nullptr) getGammaHook::hidehudPtr->setvalue(true);
-					if (getGammaHook::hidehandPtr != nullptr) getGammaHook::hidehandPtr->setvalue(true);
-				}
-				if (!mask) SDK::CurrentScreen = layer;
-			}
-			else if (
-				ModuleManager::getModule("Zoom") != nullptr &&
-				ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("hidehud")->value &&
-				getGammaHook::hidehudPtr != nullptr &&
-				getGammaHook::hidehudPtr->getvalue() &&
-				usedFreelookHideHud
-				) {
-				getGammaHook::hidehudPtr->setvalue(false);
-				getGammaHook::hidehandPtr->setvalue(false);
-				usedFreelookHideHud = false;
-				SDK::CurrentScreen = layer;
-			} else SDK::CurrentScreen = layer;
+        static bool shouldRender;
+		static std::string currentScreenName;
+		shouldRender = false;
+
+        if (realLayer != "debug_screen" && realLayer != "toast_screen") {
+            if (ModuleManager::getModule("Zoom") != nullptr && ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("enabled")->value) {
+                bool mask = false;
+                if (ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("hidemodules")->value) {
+                    SDK::CurrentScreen = "zoom_screen";
+                    mask = true;
+                }
+                if (ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("hidehud")->value) {
+                    SDK::CurrentScreen = "zoom_screen";
+                    mask = true;
+                    usedFreelookHideHud = true;
+                    if (getGammaHook::hidehudPtr != nullptr) getGammaHook::hidehudPtr->setvalue(true);
+                    if (getGammaHook::hidehandPtr != nullptr) getGammaHook::hidehandPtr->setvalue(true);
+                }
+                if (!mask) SDK::CurrentScreen = realLayer;
+            }
+            else if (
+                    ModuleManager::getModule("Zoom") != nullptr &&
+                    ModuleManager::getModule("Zoom")->settings.getSettingByName<bool>("hidehud")->value &&
+                    getGammaHook::hidehudPtr != nullptr &&
+                    getGammaHook::hidehudPtr->getvalue() &&
+                    usedFreelookHideHud
+                    ) {
+                getGammaHook::hidehudPtr->setvalue(false);
+                getGammaHook::hidehandPtr->setvalue(false);
+                usedFreelookHideHud = false;
+                SDK::CurrentScreen = realLayer;
+            } else SDK::CurrentScreen = realLayer;
 
             if (getGammaHook::hidehudPtr != nullptr && getGammaHook::hidehudPtr->getvalue()) {
                 SDK::CurrentScreen = "f1_screen";
             }
+        }
+
+		if (!shouldRender) {
+			shouldRender = (layer == "debug_screen");
+			if (!shouldRender)
+				currentScreenName = layer;
 		}
+
+		if (!shouldRender) {
+			shouldRender = (currentScreenName == "hud_screen" || currentScreenName == "start_screen");
+		}
+
+		DrawUtils::setCtx(muirc, SDK::clientInstance->guiData);
+
+		if (!shouldRender) {
+			func_original(pScreenView, muirc);
+			return;
+		}
+
+        func_original(pScreenView, muirc);
 
 		auto VTable = *(uintptr_t**)muirc;
 
@@ -175,7 +211,6 @@ private:
 		// SDK::clientInstance->getBlockSource()->dimension->weather->lightingLevel = 1.0f;
 
 		EventHandler::onSetupAndRender(e);
-		func_original(pScreenView, muirc);
 	}
 
 

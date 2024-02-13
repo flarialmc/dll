@@ -12,4 +12,5 @@ namespace SDK {
     extern std::string CurrentScreen;
     extern RaknetConnector* raknetConnector;
     extern std::shared_ptr<Packet> createPacket(int id);
+    extern void setCI();
 }

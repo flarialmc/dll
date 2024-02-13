@@ -157,4 +157,15 @@ public:
         return addr;
     }
     
+    static void patchBytes(void* dst, void* src, unsigned int size) {
+        DWORD oldprotect;
+        VirtualProtect(dst, size, PAGE_EXECUTE_READWRITE, &oldprotect);
+        memcpy(dst, src, size);
+        VirtualProtect(dst, size, oldprotect, &oldprotect);
+    }
+
+    static inline uintptr_t offsetFromSig(uintptr_t sig, int offset) {
+        return sig + offset + 4 + *reinterpret_cast<int*>(sig + offset);
+    }
+
 };

@@ -119,3 +119,25 @@ std::string* Actor::getNametag() {
     auto fn = reinterpret_cast<std::string* (__thiscall*)(Actor*)>(sig);
     return fn(this);
 }
+
+bool Actor::isPlayer() {
+    return Memory::CallVFunc<62, bool>(this);
+}
+
+bool Actor::hasCategory(ActorCategory category) {
+    return ((int)this->categories & (int)category) != 0;
+}
+
+RenderPositionComponent* Actor::getRenderPositionComponent() {
+    static uintptr_t sig;
+
+    if (sig == NULL) {
+        sig = Memory::findSig("40 53 48 83 EC 20 48 8B DA BA 6E F3 E8 D4");
+    }
+
+    return tryGet<RenderPositionComponent>(sig);
+}
+
+bool Actor::isValidTarget(Actor* actor) {
+    return Memory::CallVFunc<65, bool, Actor*>(this, actor);
+}

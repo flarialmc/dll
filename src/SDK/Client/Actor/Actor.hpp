@@ -13,6 +13,7 @@
 #include "Components/StateVectorComponent.hpp"
 #include "Components/ActorHeadRotationComponent.hpp"
 #include "Components/ActorTypeComponent.hpp"
+#include "Components/RenderPositionComponent.hpp"
 #include "EntityContext.hpp"
 #include "MobEffect.h"
 
@@ -133,12 +134,54 @@ enum ActorFlags {
     FLAG_SEARCHING = 113
 };
 
+enum class ActorCategory {
+    NoCategory = 0,
+    Player = 1 << 0,
+    Mob = 1 << 1,
+    Monster = 1 << 2,
+    Humanoid = 1 << 3,
+    Animal = 1 << 4,
+    WaterSpawning = 1 << 5,
+    Pathable = 1 << 6,
+    Tamable = 1 << 7,
+    Ridable = 1 << 8,
+    UNUSED9 = 1 << 9,
+    Item = 1 << 10,
+    Ambient = 1 << 11,
+    Villager = 1 << 12,
+    Arthropod = 1 << 13,
+    Undead = 1 << 14,
+    Zombie = 1 << 15,
+    Minecart = 1 << 16,
+    Boat = 1 << 17,
+    NonTargetable = 1 << 18,
+    Predictable = 1 << 19,
+
+    BoatRideable = Boat | Ridable,
+    MinecartRidable = Minecart | Ridable,
+    HumanoidMonster = Humanoid | Monster,
+    WaterAnimal = WaterSpawning | Animal,
+    TamableAnimal = Tamable | Animal,
+    UndeadMob = Undead | Monster,
+    ZombieMonster = Zombie | Monster,
+    EvocationIllagerMonster = Villager | HumanoidMonster,
+};
+
+class Level;
+
+struct AABBShapeComponent {
+    AABB aabb;
+    Vec2<float> size;
+};
+
 class Actor {
 public:
 
     BUILD_ACCESS(this, int16_t, hurtTime, 0x22C);
     BUILD_ACCESS(this, Level*, level, 0x288);
+    BUILD_ACCESS(this, ActorCategory, categories, 0x2C0);
     BUILD_ACCESS(this, ActorRotationComponent*, actorRotationComponent, 0x2D8);
+    BUILD_ACCESS(this, AABBShapeComponent*, aabb, 0x2D0);
     BUILD_ACCESS(this, StateVectorComponent*, stateVector, 0x2C8);
     BUILD_ACCESS(this, Vec2<float>, rotations, 0x2D8);
     BUILD_ACCESS(this, bool, wasHurt, 0x236);
@@ -161,4 +204,8 @@ public:
     float getSpeedInMetersPerSecond();
     void setNametag(std::string* name);
     std::string* getNametag();
+    bool isPlayer();
+    bool hasCategory(ActorCategory category);
+    RenderPositionComponent* getRenderPositionComponent();
+    bool isValidTarget(Actor* actor);
 };

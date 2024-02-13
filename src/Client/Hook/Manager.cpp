@@ -11,8 +11,12 @@
 #include "Hooks/Visual/RenderActor.hpp"
 #include "Hooks/Game/getViewPerspective.hpp"
 #include "../Client.hpp"
+#include "Hooks/Visual/FontDrawTransformedHook.hpp"
 #include "Hooks/Visual/HurtColorHook.hpp"
-#include "Hooks/Visual/FogColorHook.hpp"
+#include "Hooks/Visual/DimensionFogColorHook.hpp"
+#include "Hooks/Visual/OverworldFogColorHook.hpp"
+#include "Hooks/Visual/RenderHighlightSelectionHook.hpp"
+#include "Hooks/Visual/RenderOutlineSelectionHook.hpp"
 #include "Hooks/Visual/TimeChangerHook.hpp"
 #include "Hooks/Game/getSensHook.hpp"
 #include "Hooks/Game/getCurrentSwingDuration.hpp"
@@ -51,8 +55,12 @@ void HookManager::initialize()
     hooks.push_back(new ActorBaseTick());
     hooks.push_back(new OnSuspendHook());
     hooks.push_back(new getGammaHook());
+    hooks.push_back(new FontDrawTransformedHook());
     hooks.push_back(new HurtColorHook());
-    hooks.push_back(new FogColorHook());
+    hooks.push_back(new DimensionFogColorHook());
+    hooks.push_back(new OverworldFogColorHook());
+    hooks.push_back(new RenderHighlightSelectionHook());
+    hooks.push_back(new RenderOutlineSelectionHook());
     hooks.push_back(new TimeChangerHook());
     hooks.push_back(new SendPacketHook());
     hooks.push_back(new getSensHook());

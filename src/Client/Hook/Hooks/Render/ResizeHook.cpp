@@ -26,7 +26,6 @@ void ResizeHook::enableHook() {
 ResizeHook::ResizeHook() : Hook("ResizeHook", "") {}
 
 void ResizeHook::call() {
-	
 }
 
 void ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UINT width, UINT height, DXGI_FORMAT newFormat, UINT flags)
@@ -37,7 +36,6 @@ void ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UI
 	SwapchainHook::init = false;
 
 	if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) SDK::clientInstance->releaseMouse();
-	
 	return func_original(pSwapChain, bufferCount, width, height, newFormat, flags);
 }
 
@@ -50,7 +48,7 @@ void ResizeHook::CleanShit(bool isResize) {
 	}
 
 	for (auto& entry : FlarialGUI::cachedBitmaps) {
-		ID2D1Image* bitmap = entry.second;
+		ID2D1Image* bitmap = entry.second.get();
 		Memory::SafeRelease(bitmap);
 	}
 	FlarialGUI::cachedBitmaps.clear();
@@ -68,23 +66,24 @@ void ResizeHook::CleanShit(bool isResize) {
 		Memory::SafeRelease(i.second);
 
 	}
-
+	/*
 	for (auto& i : FlarialGUI::brushCache) {
 		Memory::SafeRelease(i.second);
 	}
+	*/
 
 	FlarialGUI::brushCache.clear();
-
+	/*
 	for (auto& i : FlarialGUI::gradientBrushCache) {
 		Memory::SafeRelease(i.second);
 	}
-
+	*/
 	FlarialGUI::gradientBrushCache.clear();
-
+	/*
 	for (auto& i : FlarialGUI::textFormatCache) {
 		Memory::SafeRelease(i.second);
 	}
-
+	*/
 	FlarialGUI::textFormatCache.clear();
 
 	ImagesClass::eimages.clear();
