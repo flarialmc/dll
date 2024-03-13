@@ -2864,14 +2864,11 @@ void FlarialGUI::CopyBitmap(ID2D1Bitmap1* from, ID2D1Bitmap** to)
 }
 
 std::wstring FlarialGUI::to_wide(const std::string& str) {
-	std::wstring wstr;
-	wstr.reserve(str.length());
-
-	for (char ch : str) {
-		wstr.push_back(static_cast<wchar_t>(ch));
-	}
-
-	return wstr;
+	int wchars_num = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL, 0);
+	std::wstring wide;
+	wide.resize(wchars_num);
+	MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, &wide[0], wchars_num);
+	return wide;
 }
 /*
 std::wstring Lconst std::string& str)
