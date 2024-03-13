@@ -180,8 +180,8 @@ public:
     BUILD_ACCESS(this, int16_t, hurtTime, 0x1FC);
     BUILD_ACCESS(this, Level*, level, 0x258);
     BUILD_ACCESS(this, ActorCategory, categories, 0x290);
-    BUILD_ACCESS(this, ActorRotationComponent*, actorRotationComponent, 0x2A0);
-    BUILD_ACCESS(this, AABBShapeComponent*, aabb, 0x2A8);
+    BUILD_ACCESS(this, ActorRotationComponent*, actorRotationComponent, 0x2A8);
+    BUILD_ACCESS(this, AABBShapeComponent*, aabb, 0x2A0);
     BUILD_ACCESS(this, StateVectorComponent*, stateVector, 0x298);
     BUILD_ACCESS(this, Vec2<float>, rotations, 0x2A0);
     BUILD_ACCESS(this, bool, wasHurt, 0x206);
