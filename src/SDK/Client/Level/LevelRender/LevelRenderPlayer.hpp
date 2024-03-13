@@ -5,5 +5,5 @@
 class LevelRendererPlayer
 {
 public:
-    BUILD_ACCESS(this, Vec3<float>, cameraPos, 0x5E4);
+    BUILD_ACCESS(this, Vec3<float>, cameraPos, 0x5FC);
 };

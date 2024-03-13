@@ -2,11 +2,11 @@
 #include "../../SDK.hpp"
 
 LocalPlayer* ClientInstance::getLocalPlayer() {
-    return Memory::CallVFunc<28,LocalPlayer*>(this);
+    return Memory::CallVFunc<29,LocalPlayer*>(this);
 }
 
 BlockSource* ClientInstance::getBlockSource() {
-    return Memory::CallVFunc<27, BlockSource*>(this);
+    return Memory::CallVFunc<28, BlockSource*>(this);
 }
 void ClientInstance::grabMouse() {
 
@@ -34,7 +34,7 @@ void ClientInstance::releaseMouse() {
 }
 
 void ClientInstance::refocusMouse() {
-    return Memory::CallVFunc<329, void>(this);
+    return Memory::CallVFunc<333, void>(this);
 }
 std::string ClientInstance::getTopScreenName() {
     return SDK::CurrentScreen;

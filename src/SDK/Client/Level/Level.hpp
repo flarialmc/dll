@@ -36,7 +36,7 @@ public:
     }
 
 	std::vector<Actor*> getRuntimeActorList() {
-        static uintptr_t sig = Memory::findSig("40 53 48 83 EC 30 48 81 C1 C8 1C 00 00");
+        static uintptr_t sig = Memory::findSig("40 53 48 83 EC 30 48 81 C1 E0 1C 00 00");
         static auto getRuntimeActorList= *(decltype(&Level::getRuntimeActorList)*)&sig;
         return (this->*getRuntimeActorList)();
 	}

@@ -2,7 +2,7 @@
 #include "Actor.hpp"
 
 void Mob::setSprinting(bool state) {
-    Memory::CallVFunc<165, void, bool>(this, state);
+    Memory::CallVFunc<159, void, bool>(this, state);
 }
 
 template <typename Component>
@@ -19,7 +19,7 @@ MobBodyRotationComponent* Mob::getBodyRotationComponent() {
     static  uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig("40 53 48 83 EC 20 48 8B DA BA 2F B8 31 03");
+        sig = Memory::findSig("48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 2F B8 31 03");
     }
 
     return tryGetAllah<MobBodyRotationComponent>(sig);

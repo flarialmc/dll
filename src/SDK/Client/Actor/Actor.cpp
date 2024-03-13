@@ -10,11 +10,11 @@ Component* Actor::tryGet(uintptr_t addr) {
 }
 
 bool Actor::isAlive() {
-    return Memory::CallVFunc<54, bool>(this);
+    return Memory::CallVFunc<53, bool>(this);
 }
 
 std::string* Actor::getXuid(std::string* str) {
-    return Memory::CallVFunc<260, std::string*, std::string*>(this, str);
+    return Memory::CallVFunc<253, std::string*, std::string*>(this, str);
 }
 
 ActorTypeComponent* Actor::getActorTypeComponent() {
@@ -51,7 +51,7 @@ ItemStack* Actor::getArmor(int slot) {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig("48 8B 89 58 04 00 00 48 8B 01 48 8B 40 28 48");
+        sig = Memory::findSig("48 8B 89 20 04 00 00 48 8B 01 48 8B 40 28 48");
     }
 
     auto fn = reinterpret_cast<ItemStack* (__thiscall*)(Actor*, int)>(sig);
@@ -121,7 +121,7 @@ std::string* Actor::getNametag() {
 }
 
 bool Actor::isPlayer() {
-    return Memory::CallVFunc<59, bool>(this);
+    return Memory::CallVFunc<58, bool>(this);
 }
 
 bool Actor::hasCategory(ActorCategory category) {
@@ -139,5 +139,5 @@ RenderPositionComponent* Actor::getRenderPositionComponent() {
 }
 
 bool Actor::isValidTarget(Actor* actor) {
-    return Memory::CallVFunc<62, bool, Actor*>(this, actor);
+    return Memory::CallVFunc<61, bool, Actor*>(this, actor);
 }
