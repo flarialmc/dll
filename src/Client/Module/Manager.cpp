@@ -49,79 +49,96 @@
 #include "Modules/CPSLimiter/CPSLimiter.hpp"
 #include "Modules/BlockBreakIndicator/BlockBreakIndicator.hpp"
 #include "Modules/CompactChat/CompactChat.hpp"
-#include "Modules/MovableChat/MovableChat.hpp"
 #include "Modules/FOVChanger/FOVChanger.hpp"
 #include "Modules/UpsideDown/UpsideDown.hpp"
 #include "Modules/Animations/Animations.hpp"
 #include "Modules/DVD Screen/dvd.hpp"
 #include "Modules/BlockOutline/BlockOutline.hpp"
 #include "Modules/Hitbox/Hitbox.hpp"
+#include "Modules/InventoryHUD//InventoryHUD.hpp"
+#include "Modules/NoHurtCam/NoHurtCam.hpp"
+#include "Modules/CommandHotkey/CommandHotkey.hpp"
+#include "Modules/Misc/DiscordRPC/DiscordRPCListener.hpp"
 #include <algorithm>
 
-bool compareNames( Module*& obj1,  Module*& obj2) {
-    return obj1->name < obj2->name;
-}
-
 namespace ModuleManager {
-    std::vector<Module*> modules;
-    std::vector<std::string> OnlineUsers;
+    std::unordered_map<size_t, Module*> moduleMap;
+    std::vector<std::string> onlineUsers;
 }
 
-void ModuleManager::initialize()
-{
+void ModuleManager::addModule(Module* module) {
+    size_t hash = std::hash<std::string>{}(module->name);
+    moduleMap[hash] = module;
+}
 
-    modules.push_back(new MotionBlur());
-    modules.push_back(new Zoom());
-    modules.push_back(new Deepfry());
-    modules.push_back(new HueChanger());
-    modules.push_back(new PatarHD());
-    modules.push_back(new ClickGUI());
-    modules.push_back(new FPSCounter());
-    modules.push_back(new CPSCounter());
-    modules.push_back(new IPDisplay());
-    modules.push_back(new ReachCounter());
-    modules.push_back(new ComboCounter());
-    modules.push_back(new PingCounter());
-    modules.push_back(new PotCounter());
-    modules.push_back(new ArrowCounter());
+std::vector<Module*> ModuleManager::getModules() {
+    std::vector<Module*> modulesVector;
+    for (const auto& pair : moduleMap) {
+        modulesVector.push_back(pair.second);
+    }
+    return modulesVector;
+}
 
-    modules.push_back(new Time());
-    modules.push_back(new MEM());
-    modules.push_back(new Sprint());
-    modules.push_back(new Fullbright());
-    modules.push_back(new ForceCoords());
-    modules.push_back(new Keystrokes());
-    modules.push_back(new ThirdPerson());
-    modules.push_back(new SnapLook());
-    modules.push_back(new HurtColor());
-    modules.push_back(new FogColor());
-    modules.push_back(new ArmorHUD());
-    modules.push_back(new TimeChanger());
-    modules.push_back(new RenderOptions());
-    modules.push_back(new PaperDoll());
-    modules.push_back(new Sneak());
-    modules.push_back(new GuiScale());
-    modules.push_back(new WeatherChanger());
-    modules.push_back(new TabList());
-    modules.push_back(new AutoGG());
-    modules.push_back(new TextHotkey());
-    modules.push_back(new NickModule());
-    modules.push_back(new FreeLook());
-    modules.push_back(new SpeedDisplay());
-    modules.push_back(new CPSLimiter());
-    modules.push_back(new BlockBreakIndicator());
-    //modules.push_back(new MovableChat());
-    modules.push_back(new FOVChanger());
-    //modules.push_back(new CompactChat());
-    modules.push_back(new UpsideDown());
-    modules.push_back(new Animations());
-    modules.push_back(new DVD());
-    modules.push_back(new BlockOutline());
-    modules.push_back(new Hitbox());
+void ModuleManager::initialize() {
+    ModuleManager::addModule(new MotionBlur());
 
-    std::sort(modules.begin(), modules.end(), compareNames);
+    // Screen effects
+    ModuleManager::addModule(new Deepfry());
+    ModuleManager::addModule(new HueChanger());
+    ModuleManager::addModule(new PatarHD());
+    ModuleManager::addModule(new DVD());
 
-    EventHandler::registerListener(new GUIKeyListener("E"));
+    // FOV Changers
+    ModuleManager::addModule(new FOVChanger()); //1
+    ModuleManager::addModule(new Zoom()); //2
+    ModuleManager::addModule(new UpsideDown()); //3
+
+    ModuleManager::addModule(new ClickGUI());
+
+    ModuleManager::addModule(new FPSCounter());
+    ModuleManager::addModule(new CPSCounter());
+    ModuleManager::addModule(new IPDisplay());
+    ModuleManager::addModule(new ReachCounter());
+    ModuleManager::addModule(new ComboCounter());
+    ModuleManager::addModule(new PingCounter());
+    ModuleManager::addModule(new PotCounter());
+    ModuleManager::addModule(new ArrowCounter());
+    ModuleManager::addModule(new Time());
+    ModuleManager::addModule(new MEM());
+    ModuleManager::addModule(new Sprint());
+    ModuleManager::addModule(new Fullbright());
+    ModuleManager::addModule(new ForceCoords());
+    ModuleManager::addModule(new Keystrokes());
+    ModuleManager::addModule(new ThirdPerson());
+    ModuleManager::addModule(new SnapLook());
+    ModuleManager::addModule(new HurtColor());
+    ModuleManager::addModule(new FogColor());
+    ModuleManager::addModule(new ArmorHUD());
+    ModuleManager::addModule(new TimeChanger());
+    ModuleManager::addModule(new RenderOptions());
+    ModuleManager::addModule(new PaperDoll());
+    ModuleManager::addModule(new Sneak());
+    ModuleManager::addModule(new GuiScale());
+    ModuleManager::addModule(new WeatherChanger());
+    ModuleManager::addModule(new TabList());
+    ModuleManager::addModule(new AutoGG());
+    ModuleManager::addModule(new TextHotkey());
+    ModuleManager::addModule(new NickModule());
+    ModuleManager::addModule(new FreeLook());
+    ModuleManager::addModule(new SpeedDisplay());
+    ModuleManager::addModule(new CPSLimiter());
+    ModuleManager::addModule(new BlockBreakIndicator());
+    ModuleManager::addModule(new Animations());
+    ModuleManager::addModule(new BlockOutline());
+    ModuleManager::addModule(new Hitbox());
+    ModuleManager::addModule(new CommandHotkey());
+    ModuleManager::addModule(new NoHurtCam());
+    ModuleManager::addModule(new InventoryHUD());
+    //ModuleManager::addModule(new MovableChat());
+    //ModuleManager::addModule(new CompactChat());
+
+    EventHandler::registerListener(new GUIKeyListener("GuiKeyListener"));
+    EventHandler::registerListener(new DiscordRPCListener("DiscordRPC"));
     EventHandler::registerListener(new UninjectListener("Uninject"));
     EventHandler::registerListener(new SaveConfigListener("SaveConfig"));
     EventHandler::registerListener(new CentreCursorListener("CentreCursor"));
@@ -129,29 +146,28 @@ void ModuleManager::initialize()
     EventHandler::registerListener(new TextAliasListener("TextAlias"));
 }
 
-void ModuleManager::terminate()
-{
-    for (Module* module : modules) {
-        module->onDisable();
+void ModuleManager::terminate() {
+    for (const auto& pair : ModuleManager::moduleMap) {
+        pair.second->terminate();
     }
-
-    modules.clear();
+    moduleMap.clear();
 }
 
 void ModuleManager::SaveModulesConfig() {
-    for (Module* module : modules) {
-        module->SaveSettings();
+    for (const auto& pair : ModuleManager::moduleMap) {
+        pair.second->saveSettings();
     }
 }
-
-bool ModuleManager::doesAnyModuleHave(std::string settingName) {
+// TODO: use enums?
+bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {
 
     bool result = false;
 
-    for (Module* mod : modules) {
+    for (const auto& pair : ModuleManager::moduleMap) {
 
-        if(mod->settings.getSettingByName<bool>(settingName) != nullptr)
-            if(mod->settings.getSettingByName<bool>(settingName)->value && mod->settings.getSettingByName<bool>("enabled")->value){
+        if (pair.second->settings.getSettingByName<bool>(settingName) != nullptr)
+            if (pair.second->settings.getSettingByName<bool>(settingName)->value &&
+                pair.second->isEnabled()) {
                 result = true;
                 break;
             }
@@ -161,13 +177,12 @@ bool ModuleManager::doesAnyModuleHave(std::string settingName) {
 
 }
 
-Module* ModuleManager::getModule(std::string name)
-{
-    for (Module* mod : modules) {
-        if (mod->name == name) {
-            return mod;
+Module* ModuleManager::getModule(const std::string& name) {
+    size_t hash = std::hash<std::string>{}(name);
 
-        }
+    auto it = moduleMap.find(hash);
+    if (it != moduleMap.end()) {
+        return it->second;
     }
 
     return nullptr;
