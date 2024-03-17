@@ -1,18 +1,22 @@
 #pragma once
+
 class Cancellable {
-    bool cancelled;
+private:
+    bool _cancelled;
 public:
     Cancellable() {
-        this->cancelled = false;
+        this->_cancelled = false;
     }
 
-    bool isCancelled() {
-        return this->cancelled;
+    [[nodiscard]] bool isCancelled() const {
+        return this->_cancelled;
     }
+
     void setCancelled(bool cancelled) {
-        this->cancelled = cancelled;
+        this->_cancelled = cancelled;
     }
+
     void cancel() {
-        this->cancelled = true;
+        this->_cancelled = true;
     }
 };

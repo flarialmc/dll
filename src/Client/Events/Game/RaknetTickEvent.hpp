@@ -4,5 +4,5 @@
 #include "../Event.hpp"
 #include "../Cancellable.hpp"
 
-class RenderEvent : public Event {
+class RaknetTickEvent : public Event {
 };

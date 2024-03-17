@@ -1,84 +1,108 @@
 #pragma once
+
 #include "../Event.hpp"
 #include "../Cancellable.hpp"
 
 enum class MouseAction {
-    PRESS,
-    RELEASE,
-    SCROLL_UP,
-    SCROLL_DOWN
+    Press,
+    Release,
+    ScrollUp,
+    ScrollDown
 };
 
-enum MouseButton { None = 0, Left = 1, Right = 2, Middle = 3, Scroll = 4, Button5 = 5, Button6 = 6};
+enum MouseButton {
+    None = 0, Left = 1, Right = 2, Middle = 3, Scroll = 4, Button5 = 5, Button6 = 6
+};
 
 class MouseEvent : public Event, public Cancellable {
 
-public:
+private:
     MouseButton button;
     MouseAction action;
-    int actionRaw;
+    char actionRaw;
     short mouseX;
     short mouseY;
 public:
+
     MouseEvent(char button, char action, short mouseX, short mouseY) : Event() {
-        this->button = (MouseButton)button;
-        this->action = (MouseAction)action;
-        this->SetActionFromChar(action);
+        this->button = (MouseButton) button;
+        this->action = (MouseAction) action;
+        this->setActionFromChar(action);
         this->actionRaw = action;
         this->mouseX = mouseX;
         this->mouseY = mouseY;
     };
 
-    auto GetButton() -> MouseButton {
+    [[nodiscard]] auto getButton() const -> MouseButton {
         return this->button;
     }
-    void SetButton(MouseButton button) {
-        this->button = button;
+
+    void setButton(MouseButton newButton) {
+        this->button = newButton;
     }
-    auto GetAction() -> MouseAction {
+
+    [[nodiscard]] auto getAction() const -> MouseAction {
         return this->action;
     }
 
-    auto GetActionRaw() -> int {
+    [[nodiscard]] auto getActionRaw() const -> int {
         return this->actionRaw;
     }
 
-    auto GetActionAsChar() -> char {
-        switch(this->action) {
-            case MouseAction::RELEASE: return 0;
-            case MouseAction::PRESS: return 1;
-            case MouseAction::SCROLL_UP: return 0x78;
-            case MouseAction::SCROLL_DOWN: return 0x80;
-            default: return (char)this->action;
-        }
-    }
-    void SetAction(MouseAction action) {
-        this->action = action;
-    }
-    void SetActionFromChar(char action) {
-        switch(action) {
-            case 0: this->action = MouseAction::RELEASE; break;
-            case 1: this->action = MouseAction::PRESS; break;
-            case 0x78: this->action = MouseAction::SCROLL_UP; break;
-            case 0x7F: this->action = MouseAction::SCROLL_UP; break;
-            case 0x80: this->action = MouseAction::SCROLL_DOWN; break;
-            case 0x88: this->action = MouseAction::SCROLL_DOWN; break;
-            default: this->action = (MouseAction)action; break;
+    [[nodiscard]] auto getActionAsChar() const -> char {
+        switch (this->action) {
+            case MouseAction::Release:
+                return (char)0;
+            case MouseAction::Press:
+                return (char)1;
+            case MouseAction::ScrollUp:
+                return (char)0x78;
+            case MouseAction::ScrollDown:
+                return (char)0x80;
+            default:
+                return (char) this->action;
         }
     }
 
-    short GetMouseX() const {
+    void setAction(MouseAction newAction) {
+        this->action = newAction;
+    }
+
+    void setActionFromChar(char newAction) {
+        switch (newAction) {
+            case 0:
+                this->action = MouseAction::Release;
+                break;
+            case 1:
+                this->action = MouseAction::Press;
+                break;
+            case 0x7F:
+            case 0x78:
+                this->action = MouseAction::ScrollUp;
+                break;
+            case 0x80:
+            case 0x88:
+                this->action = MouseAction::ScrollDown;
+                break;
+            default:
+                this->action = (MouseAction) newAction;
+                break;
+        }
+    }
+
+    [[nodiscard]] auto getMouseX() const {
         return this->mouseX;
     }
-    void SetMouseX(short mouseX) {
-        this->mouseX = mouseX;
+
+    void setMouseX(short newMouseY) {
+        this->mouseX = newMouseY;
     }
-    short GetMouseY() const {
+
+    [[nodiscard]] auto getMouseY() const {
         return this->mouseY;
     }
-    void SetMouseY(short mouseY) {
-        this->mouseY = mouseY;
+
+    void setMouseY(short newMouseY) {
+        this->mouseY = newMouseY;
     }
-
-
 };
