@@ -1,4 +1,5 @@
 #pragma once
+
 #include <format>
 #include <Windows.h>
 #include "../../../Events/Listener.hpp"
@@ -10,13 +11,13 @@ class GUIMouseListener : public Listener {
 
     void onMouse(MouseEvent &event) override {
 
-       MC::mousepos.x = event.mouseX;
-       MC::mousepos.y = event.mouseY;
-       MC::mousebutton = event.GetButton();
-       MC::mouseaction = event.GetAction();
+        MC::mousePos.x = event.getMouseX();
+        MC::mousePos.y = event.getMouseY();
+        MC::mouseButton = event.getButton();
+        MC::mouseAction = event.getAction();
 
-       if(event.GetButton() != MouseButton::None && event.GetAction() == MouseAction::PRESS) MC::held = true;
-        if(event.GetButton() != MouseButton::None && event.GetAction() == MouseAction::RELEASE) MC::held = false;
+        if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Press) MC::held = true;
+        if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Release) MC::held = false;
 
     };
 

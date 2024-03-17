@@ -10,41 +10,34 @@
 
 class SneakListener : public Listener {
 
-    Module* module;
-    bool ToggleSneaking = false;
+    Module *module;
+    bool toggleSneaking = false;
     bool toggled = false;
 
-    void onKey(KeyEvent& event) override {
-
-        if (SDK::CurrentScreen == "hud_screen")
-            if (module->settings.getSettingByName<bool>("enabled")->value) {
-                if (module->IsKeybind(event.keys) && module->IsKeyPartOfKeybind(event.key)) {
-                    ToggleSneaking = !ToggleSneaking;
-                }
-            }
+    void onKey(KeyEvent &event) override { // TODO: it lets sneak key up through (flickers sneak once)
+        if (module->isKeybind(event.keys) && module->isKeyPartOfKeybind(event.key)) {
+            toggleSneaking = !toggleSneaking;
+        }
     };
 
-    void onLocalTick(TickEvent& event) override {
-
-        if (module->settings.getSettingByName<bool>("enabled")->value) {
-            if (SDK::clientInstance != nullptr) {
-                if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                    MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
-                    if (ToggleSneaking) {
-                        handler->sneaking = true;
-                        toggled = true;
-                    }
-                    if (!ToggleSneaking and toggled) {
-                        handler->sneaking = false;
-                        toggled = false;
-                    }
+    void onTick(TickEvent &event) override {
+        if (SDK::clientInstance != nullptr) {
+            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                MoveInputComponent *handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
+                if (toggleSneaking) {
+                    handler->sneaking = true;
+                    toggled = true;
+                }
+                if (!toggleSneaking and toggled) {
+                    handler->sneaking = false;
+                    toggled = false;
                 }
             }
         }
     }
 
 public:
-    explicit SneakListener(const char string[5], Module* module) {
+    explicit SneakListener(const char string[5], Module *module) {
         this->name = string;
         this->module = module;
     }

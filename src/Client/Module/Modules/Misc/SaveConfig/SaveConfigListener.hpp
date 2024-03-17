@@ -1,22 +1,20 @@
 #pragma once
+
 #include "../../../../Events/Listener.hpp"
 #include "../../../../Client.hpp"
+
 class SaveConfigListener : public Listener {
 
 public:
 
-    Module* module;
+    Module *module{};
 
-    void onKey(KeyEvent& event) override {
-      
-            if (event.GetKey() == VK_F7 && static_cast<ActionType>(event.GetAction()) == ActionType::RELEASED) {
-                ModuleManager::SaveModulesConfig();
-                Client::SaveSettings();
-                FlarialGUI::Notify("Config Saved");
-
-            }
-   
-       
+    void onKey(KeyEvent &event) override {
+        if (event.getKey() == VK_F7 && static_cast<ActionType>(event.getAction()) == ActionType::Released) {
+            ModuleManager::SaveModulesConfig();
+            Client::SaveSettings();
+            FlarialGUI::Notify("Config Saved");
+        }
     }
 
 public:
