@@ -2,8 +2,7 @@
 #include "../../SDK.hpp"
 
 
-GLMatrix* Matrix::getMatrixCorrection()
-{
+GLMatrix *Matrix::getMatrixCorrection() {
     GLMatrix toReturn = GLMatrix();
 
     for (int i = 0; i < 4; i++) {
@@ -14,32 +13,28 @@ GLMatrix* Matrix::getMatrixCorrection()
     }
 
     return &toReturn;
-};
+}
 
-float Matrix::transformx(const Vec3<float>& p)
-{
+float Matrix::transformx(const Vec3<float> &p) {
     auto matrix = Matrix::getMatrixCorrection()->matrix;
     return p.x * matrix[0] + p.y * matrix[4] + p.z * matrix[8] + matrix[12];
 
 }
 
-float Matrix::transformy(const Vec3<float>& p)
-{
+float Matrix::transformy(const Vec3<float> &p) {
     auto matrix = Matrix::getMatrixCorrection()->matrix;
     return p.x * matrix[1] + p.y * matrix[5] + p.z * matrix[9] + matrix[13];
 }
 
-float Matrix::transformz(const Vec3<float>& p)
-{
+float Matrix::transformz(const Vec3<float> &p) {
     auto matrix = Matrix::getMatrixCorrection()->matrix;
     return p.x * matrix[2] + p.y * matrix[6] + p.z * matrix[10] + matrix[14];
 }
 
-bool Matrix::WorldToScreen(Vec3<float> pos, Vec2<float>& screen)
-{ // pos = pos 2 w2s, screen = output screen coords
+bool Matrix::WorldToScreen(Vec3<float> pos, Vec2<float> &screen) { // pos = pos 2 w2s, screen = output screen coords
 
     Vec2<float> displaySize = SDK::clientInstance->guiData->ScreenSize;
-    LevelRender* lr = SDK::clientInstance->getLevelRender();
+    LevelRender *lr = SDK::clientInstance->getLevelRender();
     Vec3<float> origin = lr->getLevelRendererPlayer()->cameraPos;
     Vec2<float> fov = SDK::clientInstance->getFov();
 
@@ -53,8 +48,8 @@ bool Matrix::WorldToScreen(Vec3<float> pos, Vec2<float>& screen)
 
     if (z > 0) return false;
 
-    float mX = (float)displaySize.x / 2.0F;
-    float mY = (float)displaySize.y / 2.0F;
+    float mX = (float) displaySize.x / 2.0F;
+    float mY = (float) displaySize.y / 2.0F;
 
     screen.x = mX + (mX * x / -z * fov.x);
     screen.y = mY - (mY * y / -z * fov.y);

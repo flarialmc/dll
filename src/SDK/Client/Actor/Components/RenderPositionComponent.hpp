@@ -3,5 +3,5 @@
 #include "../../../../Utils/Utils.hpp"
 
 struct RenderPositionComponent {
-	Vec3<float> renderPos;
+    Vec3<float> renderPos;
 };
