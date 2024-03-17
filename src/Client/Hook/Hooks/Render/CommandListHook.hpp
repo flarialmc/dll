@@ -6,13 +6,13 @@
 #include "kiero.h"
 #include "../Hook.hpp"
 
-class CommandListHook : public Hook
-{
+class CommandListHook : public Hook {
 private:
-    static void listCallback(ID3D12CommandQueue* queue, UINT numCommandLists, const ID3D12CommandList** ppCommandLists);
+    static void listCallback(ID3D12CommandQueue *queue, UINT numCommandLists, const ID3D12CommandList **ppCommandLists);
 
 public:
 
     CommandListHook();
+
     void enableHook() override;
 };

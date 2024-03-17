@@ -2,17 +2,18 @@
 
 #include "../Hook.hpp"
 
-class MouseHook : public Hook
-{
+class MouseHook : public Hook {
 private:
-    static void mouseCallback(void *parm_1, char button, char state, short mouse_x, short mouse_y, short movement_x,
-                              short movement_y, bool isScrolling);
+    static void mouseCallback(void *mouseDevice, char button, char state, short mouseX, short mouseY, short movementX,
+                              short movementY, char a8);
 
 public:
-    typedef void(__thiscall *MouseOriginal)(void *a1, char mouseButton, char isDown, short mouseX, short mouseY,
+    typedef void(__thiscall *mouseOriginal)(void *mouseDevice, char mouseButton, char isDown, short mouseX, short mouseY,
                                             short relativeMovementX, short relativeMovementY, char a8);
-    static inline MouseOriginal func_original = 0;
+
+    static inline mouseOriginal funcOriginal = nullptr;
 
     MouseHook();
+
     void enableHook() override;
 };
