@@ -5,5 +5,5 @@
 
 class Biome {
 public:
-	BUILD_ACCESS(this, float, temparature, 0x40);
+    BUILD_ACCESS(this, float, temparature, 0x40);
 };

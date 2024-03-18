@@ -1,8 +1,8 @@
 #pragma once
+
 #include "../../../../Utils/Utils.hpp"
 
-class StateVectorComponent
-{
+class StateVectorComponent {
 public:
     BUILD_ACCESS(this, Vec3<float>, pos, 0x0);
     BUILD_ACCESS(this, Vec3<float>, posDelta, 0x18);

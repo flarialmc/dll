@@ -7,9 +7,11 @@ class LoopbackPacketSender {
 public:
     BUILD_ACCESS(this, class NetworkSystem*, networkSystem, 0x20);
 
-    virtual ~LoopbackPacketSender();
-    virtual void send(Packet* packet);
-    virtual void sendToServer(Packet* packet);
+    virtual ~LoopbackPacketSender() = 0;
+
+    virtual void send(Packet *packet);
+
+    virtual void sendToServer(Packet *packet);
 };
 
 class NetworkSystem {

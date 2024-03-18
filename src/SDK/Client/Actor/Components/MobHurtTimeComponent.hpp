@@ -1,3 +1,3 @@
 struct MobHurtTimeComponent {
-	int HurtTime;
+    int HurtTime;
 };

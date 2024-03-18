@@ -10,36 +10,31 @@ class AutoGG : public Module {
 public:
 
 
-    AutoGG() : Module("Auto GG", "Automatically sends a message when you\nwin a game. (Doesn't work everywhere)", "\\Flarial\\assets\\like.png", 'o') {
+    AutoGG() : Module("Auto GG", "Automatically sends a message when you\nwin a game. (Doesn't work everywhere)",
+                      R"(\Flarial\assets\like.png)", "") {
 
-        onEnable();
+        Module::setup();
 
     };
 
     void onEnable() override {
-
-        Module::onEnable();
-
-        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"GG");
-
         EventHandler::registerListener(new AutoGGListener("AutoGG", this));
+        Module::onEnable();
     }
 
     void onDisable() override {
-
         EventHandler::unregisterListener("AutoGG");
-
         Module::onDisable();
-
     }
 
-    void SettingsRender() override {
+    void defaultConfig() override {
+        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string) "GG");
+    }
+
+    void settingsRender() override {
 
         float toggleX = Constraints::PercentageConstraint(0.019, "left");
         float toggleY = Constraints::PercentageConstraint(0.10, "top");
-
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
         FlarialGUI::TextBoxVisual(5, settings.getSettingByName<std::string>("text")->value, 50, toggleX, toggleY);
 

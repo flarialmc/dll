@@ -7,19 +7,18 @@
 #include "../../../Utils/Logger/Logger.hpp"
 #include "../../../Utils/Memory/Memory.hpp"
 
-class Hook
-{
+class Hook {
 public:
-  std::string signature;
-  std::string name;
+    std::string signature;
+    std::string name;
 
-  Hook(std::string name, std::string signature);
-  virtual ~Hook();
+    Hook(std::string name, std::string signature);
 
-  virtual void enableHook();
+    virtual ~Hook();
 
-  bool autoHook(void *callback_ptr, void **func_original);
-  bool manualHook(void *hook_addr, void *callback_ptr, void **func_original);
+    virtual void enableHook();
 
-    void disableHook();
+    bool autoHook(void *callbackPtr, void **funcOriginal);
+
+    bool manualHook(void *hookAddr, void *callbackPtr, void **funcOriginal);
 };

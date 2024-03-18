@@ -9,40 +9,23 @@ class ThirdPerson : public Module {
 
 public:
 
-    ThirdPerson() : Module("Nametag", "Shows your nametag for you while\nin 3rd person mode.", "\\Flarial\\assets\\nametag.png", 'C') {
+    ThirdPerson() : Module("Nametag", "Shows your nametag for you while\nin 3rd person mode.",
+                           R"(\Flarial\assets\nametag.png)", "") {
 
-        onEnable();
+        Module::setup();
 
     };
 
     void onEnable() override {
 
-        std::vector<uint8_t> original;
-        original.resize(6);
-        memcpy(original.data(), (LPVOID)Memory::findSig("0F 84 ? ? ? ? 49 8B D6 48 8B CE E8 ? ? ? ? 84 C0 0F 84"), 6);
-
-        EventHandler::registerListener(new ThirdPersonListener("ThirdPersonListener", this, original));
-
+        EventHandler::registerListener(new ThirdPersonListener("ThirdPersonListener", this));
         Module::onEnable();
-
-    }
-
-    void NormalRender(int index, std::string text, std::string value) override {
-
-    }
-
-    virtual void DefaultConfig() override {
 
     }
 
     void onDisable() override {
         ThirdPersonListener::unpatch();
+        EventHandler::unregisterListener("ThirdPersonListener");
         Module::onDisable();
-    }
-
-    void SettingsRender() override {
-
-
-
     }
 };

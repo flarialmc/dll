@@ -4,35 +4,38 @@
 #include "../../Client/GUI/Engine/Engine.hpp"
 #include "../../SDK/SDK.hpp"
 
-GuiData* guiData;
+GuiData *guiData;
 Matrix viewMatrix;
 Matrix projMatrix;
-MCCColor* colorHolder;
+MCCColor *colorHolder;
 Vec2<float> screenSize;
 Vec3<float> origin;
 
-void DrawUtils::setCtx(MinecraftUIRenderContext* ctx, GuiData* gui) {
-	guiData = gui;
-	viewMatrix = SDK::clientInstance->camera.viewMatrix.correct();
-	projMatrix = SDK::clientInstance->getProjectionMatrix();
-	screenSize.x = gui->ScreenSizeScaled.x;
-	screenSize.y = gui->ScreenSizeScaled.y;
+void DrawUtils::setCtx(MinecraftUIRenderContext *ctx, GuiData *gui) {
+    guiData = gui;
+    viewMatrix = SDK::clientInstance->camera.viewMatrix.correct();
+    projMatrix = SDK::clientInstance->getProjectionMatrix();
+    screenSize.x = gui->ScreenSizeScaled.x;
+    screenSize.y = gui->ScreenSizeScaled.y;
 
-	if (SDK::clientInstance->getLevelRender() != nullptr)
-		origin = SDK::clientInstance->getLevelRender()->getOrigin();
+    if (SDK::clientInstance->getLevelRender() != nullptr)
+        origin = SDK::clientInstance->getLevelRender()->getOrigin();
 }
 
 void DrawUtils::addLine(Vec2<float> start, Vec2<float> end, float lineWidth, D2D_COLOR_F color) {
 
-    if (start.x < 0 || start.x > SDK::clientInstance->guiData->ScreenSize.x || start.y < 0 || start.y > SDK::clientInstance->guiData->ScreenSize.y) {
+    if (start.x < 0 || start.x > SDK::clientInstance->guiData->ScreenSize.x || start.y < 0 ||
+        start.y > SDK::clientInstance->guiData->ScreenSize.y) {
         return;
     }
 
-    if (end.x < 0 || end.x > SDK::clientInstance->guiData->ScreenSize.x || end.y < 0 || end.y > SDK::clientInstance->guiData->ScreenSize.y) {
+    if (end.x < 0 || end.x > SDK::clientInstance->guiData->ScreenSize.x || end.y < 0 ||
+        end.y > SDK::clientInstance->guiData->ScreenSize.y) {
         return;
     }
 
-    D2D::context->DrawLine(D2D1::Point2F(start.x, start.y), D2D1::Point2F(end.x, end.y), FlarialGUI::getBrush(color), lineWidth);
+    D2D::context->DrawLine(D2D1::Point2F(start.x, start.y), D2D1::Point2F(end.x, end.y), FlarialGUI::getBrush(color),
+                           lineWidth);
 
 }
 
@@ -72,7 +75,7 @@ void DrawUtils::addBox(Vec3<float> lower, Vec3<float> upper, float lineWidth, in
             else real = true;
         }
 
-        if(real) return;
+        if (real) return;
         // Return if there are less than two points to draw lines between
         if (screenCords.size() < 2)
             return;
@@ -80,25 +83,8 @@ void DrawUtils::addBox(Vec3<float> lower, Vec3<float> upper, float lineWidth, in
         switch (mode) {
             case 1: {
                 // Draw lines between all pairs of vertices
-                for (auto it = screenCords.begin(); it != screenCords.end(); it++) {
-                    auto from = *it;
+                for (auto from : screenCords) {
                     auto fromOrig = vertices[std::get<0>(from)];
-
-                    for (auto to: screenCords) {
-                        auto toOrig = vertices[std::get<0>(to)];
-
-                        // Determine if the line should be drawn based on the relative positions of the vertices
-                        bool shouldDraw = false;
-                        // X direction
-                        shouldDraw |= fromOrig.y == toOrig.y && fromOrig.z == toOrig.z && fromOrig.x < toOrig.x;
-                        // Y direction
-                        shouldDraw |= fromOrig.x == toOrig.x && fromOrig.z == toOrig.z && fromOrig.y < toOrig.y;
-                        // Z direction
-                        shouldDraw |= fromOrig.x == toOrig.x && fromOrig.y == toOrig.y && fromOrig.z < toOrig.z;
-
-                        if (shouldDraw)
-                            DrawUtils::addLine(std::get<1>(from), std::get<1>(to), lineWidth, color);
-                    }
                 }
             }
             case 2: {
@@ -174,24 +160,25 @@ void DrawUtils::addBox(Vec3<float> lower, Vec3<float> upper, float lineWidth, in
     }
 }
 
+// TODO let choose between outline and full box mode
+void DrawUtils::addEntityBox(Actor* ent, float lineWidth, D2D_COLOR_F color) {
 
-    void DrawUtils::addEntityBox(Player *ent, float lineWidth, D2D_COLOR_F color) {
+    Vec3<float> end = ent->getRenderPositionComponent()->renderPos;
+    AABB render;
 
-        Vec3<float> end = ent->getRenderPositionComponent()->renderPos;
-        AABB render;
+    if (ent->isPlayer()) {
+        render = AABB(end, ent->aabb->size.x, ent->aabb->size.y, 1.8);
+        render.upper.y += 0.2f;
+        render.lower.y += 0.2f;
+    } else
+        render = AABB(end, ent->aabb->size.x, ent->aabb->size.y, 0);
 
-        if (ent->isPlayer()) {
-            render = AABB(end, ent->aabb->size.x, ent->aabb->size.y, ent->aabb->size.y);
-            render.upper.y += 0.2f;
-            render.lower.y += 0.2f;
-        }
-        else
-            render = AABB(end, ent->aabb->size.x, ent->aabb->size.y, 0);
+    render.upper.y += 0.1f;
 
-        render.upper.y += 0.1f;
+    if(lineWidth == 0)
+        lineWidth = (float) fmax(0.5f, 1 / (float) fmax(1,
+                                                         (float) SDK::clientInstance->getLocalPlayer()->getRenderPositionComponent()->renderPos.dist(
+                                                                 end)));
 
-        auto LineWidth = (float) fmax(0.5f, 1 / (float) fmax(1,
-                                                              (float) SDK::clientInstance->getLocalPlayer()->getRenderPositionComponent()->renderPos.dist(
-                                                                      end)));
-        DrawUtils::addBox(render.lower, render.upper, lineWidth == 0 ? LineWidth : lineWidth, 1, color);
-    }
+    DrawUtils::addBox(render.lower, render.upper, lineWidth, 1, color);
+}

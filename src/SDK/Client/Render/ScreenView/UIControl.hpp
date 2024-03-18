@@ -21,7 +21,7 @@ public:
         }
     }
 
-    void forEachControl(std::function<void(std::shared_ptr<UIControl>&)> func) {
+    void forEachControl(std::function<void(std::shared_ptr<UIControl>&)>&& func) {
 
         std::vector<std::shared_ptr<UIControl>> writeList;
         this->getAllControls(writeList);

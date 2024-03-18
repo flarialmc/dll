@@ -1,19 +1,21 @@
 #pragma once
+
 #include "../Event.hpp"
 #include "../Cancellable.hpp"
 #include "../../../SDK/Client/Network/Packet/Packet.hpp"
 #include <memory>
 
-class PacketEvent : public Event {
+class PacketEvent : public Event, public Cancellable {
 
-    std::shared_ptr<Packet> packet;
+    Packet *packet;
 
 public:
-    std::shared_ptr<Packet> getPacket() {
+
+    Packet *getPacket() {
         return this->packet;
     }
 
-    explicit PacketEvent(std::shared_ptr<Packet> e) {
+    explicit PacketEvent(Packet *e) {
         this->packet = e;
     }
 };

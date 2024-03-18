@@ -1,29 +1,35 @@
 #pragma once
+
 #include <format>
 #include "../../../Events/Listener.hpp"
 #include "../../../Events/Input/KeyEvent.hpp"
 #include "../../../../Utils/Logger/Logger.hpp"
 #include "../Module.hpp"
 #include "../../../../SDK/SDK.hpp"
-#include <Windows.h>
+#include <windows.h>
 
 class SnapListener : public Listener {
 
-    Module* module;
+    Module *module;
 
-   
-    void onKey(KeyEvent& event) override {
+    // TODO: make it togglable
+    void onKey(KeyEvent &event) override {
 
-        if (SDK::CurrentScreen == "hud_screen")
-            if (module->IsKeybind(event.keys) && module->IsKeyPartOfKeybind(event.key)) module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value;
+        if (module->isKeybind(event.keys) && module->isKeyPartOfKeybind(event.key))
+            module->active = !module->active;
 
 
-        if (!module->IsKeybind(event.keys)) module->settings.getSettingByName<bool>("enabled")->value = false;
+        if (!module->isKeybind(event.keys)) module->active = false;
 
     };
 
+    void onGetViewPerspective(PerspectiveEvent &event) override {
+        if (module->active)
+            event.setPerspective(Perspective::ThirdPersonFront);
+    }
+
 public:
-    explicit SnapListener(const char string[5], Module* module) {
+    explicit SnapListener(const char string[5], Module *module) {
         this->name = string;
         this->module = module;
     }

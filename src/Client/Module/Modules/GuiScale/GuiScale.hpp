@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GuiScaleListener.hpp"
 #include "../Module.hpp"
 #include "../../../Events/EventHandler.hpp"
 
@@ -8,39 +9,28 @@ class GuiScale : public Module {
 
 public:
 
-    GuiScale() : Module("MC GUI Scale", "Change your GUI Scale beyond\nMinecraft's restrictions.", "\\Flarial\\assets\\nametag.png", 'C') {
+    GuiScale() : Module("MC GUI Scale", "Change your GUI Scale beyond\nMinecraft's restrictions.",
+                        R"(\Flarial\assets\nametag.png)", "") {
 
-        onEnable();
-
+        Module::setup();
     };
 
     void onEnable() override {
-
-                if(settings.getSettingByName<float>("guiscale") == nullptr) settings.addSetting("guiscale", 2.0f);
-
-
+        EventHandler::registerListener(new GuiScaleListener("GUIScale", this));
         Module::onEnable();
 
     }
 
-    void NormalRender(int index, std::string text, std::string value) override {
-
-
-
-    }
-
-    virtual void DefaultConfig() override {
-
-        if(settings.getSettingByName<float>("guiscale") == nullptr) settings.addSetting("guiscale", 2.0f);
-
-    }
-
     void onDisable() override {
-        
+        EventHandler::unregisterListener("GUIScale");
         Module::onDisable();
     }
 
-    void SettingsRender() override {
+    void defaultConfig() override {
+        if (settings.getSettingByName<float>("guiscale") == nullptr) settings.addSetting("guiscale", 2.0f);
+    }
+
+    void settingsRender() override {
 
         float toggleX = Constraints::PercentageConstraint(0.019, "left");
         float toggleY = Constraints::PercentageConstraint(0.10, "top");
