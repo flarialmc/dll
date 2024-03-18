@@ -9,9 +9,11 @@ class NickModule : public Module {
 
 public:
 
-    NickModule() : Module("Nick", "Hides your username and replace it with something else.\nWorks everywhere (chat, pause, third person, etc)\nOther people will not be able to see your nick.", "\\Flarial\\assets\\icognito.png", 'C') {
+    NickModule() : Module("Nick",
+                          "Hides your username and replace it with something else.\nWorks everywhere (chat, pause, third person, etc)\nOther people will not be able to see your nick.",
+                          R"(\Flarial\assets\icognito.png)", "") {
 
-        onEnable();
+        Module::setup();
 
     };
 
@@ -23,45 +25,40 @@ public:
 
     }
 
-    void NormalRender(int index, std::string text, std::string value) override {
+    void onDisable() override {
+        std::string val = NickListener::original;
+        std::string val2;
 
+        if (SDK::clientInstance)
+            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                if (NickListener::original2 != *SDK::clientInstance->getLocalPlayer()->getNametag()) {
+                    NickListener::original2 = *SDK::clientInstance->getLocalPlayer()->getNametag();
+                    NickListener::backupOri = *SDK::clientInstance->getLocalPlayer()->getNametag();
+                }
+                if (NickListener::original2 == this->settings.getSettingByName<std::string>("nick")->value)
+                    NickListener::original2 = NickListener::backupOri;
+
+                val2 = NickListener::original2;
+
+                SDK::clientInstance->getLocalPlayer()->setNametag(&val2);
+                SDK::clientInstance->getLocalPlayer()->playerName = val;
+            }
+        EventHandler::unregisterListener("NickListener");
+        Module::onDisable();
     }
 
-    virtual void DefaultConfig() override {
-
-
-        if (settings.getSettingByName<bool>("enabled") == nullptr)
-            settings.addSetting("enabled", false);
+    void defaultConfig() override {
 
         if (settings.getSettingByName<std::string>("nick") == nullptr)
             settings.addSetting<std::string>("nick", "Flarial User");
 
     }
 
-    void onDisable() override {
-
-        Module::onDisable();
-
-        std::string val = NickListener::original;
-        std::string val2;
-
-        if (SDK::clientInstance) if (SDK::clientInstance->getLocalPlayer() != NULL) {
-            if (NickListener::original2 != *SDK::clientInstance->getLocalPlayer()->getNametag()) { NickListener::original2 = *SDK::clientInstance->getLocalPlayer()->getNametag(); NickListener::backupOri = *SDK::clientInstance->getLocalPlayer()->getNametag(); }
-            if (NickListener::original2 == this->settings.getSettingByName<std::string>("nick")->value) NickListener::original2 = NickListener::backupOri;
-            
-            val2 = NickListener::original2;
-
-            SDK::clientInstance->getLocalPlayer()->setNametag(&val2);
-            SDK::clientInstance->getLocalPlayer()->playerName = val;
-        }
-    }
-
-    void SettingsRender() override {
+    void settingsRender() override {
         float toggleX = Constraints::PercentageConstraint(0.019, "left");
         float toggleY = Constraints::PercentageConstraint(0.10, "top");
 
         const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::TextBoxVisual(5, settings.getSettingByName<std::string>("nick")->value, 16, toggleX, toggleY);

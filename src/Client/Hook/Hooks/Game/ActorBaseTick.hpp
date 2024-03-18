@@ -9,11 +9,11 @@ private:
 public:
     typedef void(__thiscall *original)(Actor *actor);
 
-    static inline original xed = nullptr;
+    static inline original funcOriginal = nullptr;
 
     ActorBaseTick();
 
     void enableHook() override;
 
-    static bool allahuakbar;
+    static inline bool writeIP;
 };

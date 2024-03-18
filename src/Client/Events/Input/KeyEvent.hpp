@@ -7,8 +7,8 @@
 #include "../../../Utils/Utils.hpp"
 
 enum class ActionType {
-    RELEASED = 0,
-    PRESSED = 1
+    Released = 0,
+    Pressed = 1
 };
 
 class KeyEvent : public Event, public Cancellable {
@@ -16,64 +16,64 @@ class KeyEvent : public Event, public Cancellable {
 public:
     int key;
     int action;
-    std::array<bool, 256> keys;
+    std::array<bool, 256> keys{};
 
-    KeyEvent(int key, int action, const std::array<bool, 256>& keys) : Event() {
+    KeyEvent(int key, int action, const std::array<bool, 256> &keys) : Event() {
         this->key = key;
         this->action = action;
         this->keys = keys;
     };
 
 
-    [[nodiscard]] int GetKey() const {
+    [[nodiscard]] int getKey() const {
         return key;
     }
 
-    void SetKey(int e) {
+    void setKey(int e) {
         this->key = e;
     }
 
-    [[nodiscard]] int GetAction() const {
+    [[nodiscard]] int getAction() const {
         return this->action;
     }
 
-    std::string GetKeyAsString(bool isCapital) {
+    [[nodiscard]] std::string getKeyAsString(bool isCapital) const {
 
-        return Utils::GetKeyAsString(key, isCapital, false);
+        return Utils::getKeyAsString(key, isCapital, false);
 
     }
 
 
-    int SetAction(int e) {
+    int setAction(int e) {
         this->action = e;
     }
 
-    std::string GetPressedKeysAsString() {
+    std::string getPressedKeysAsString() {
 
         std::string result;
         int i = 0;
         bool found = false;
 
-        for(bool b : keys) {
+        for (bool b: keys) {
 
             if (b) {
                 found = true;
                 if (!result.empty()) {
                     result += "+";
                 }
-                result += Utils::GetKeyAsString(i, true);
+                result += Utils::getKeyAsString(i, true);
             }
 
             i++;
         }
 
-        if(found)
-        return result;
+        if (found)
+            return result;
         else return "no";
 
     }
 
-    std::array<bool, 256> GetPressedKeysAsArray() {
+    [[nodiscard]] std::array<bool, 256> getPressedKeysAsArray() const {
         return this->keys;
     }
 };

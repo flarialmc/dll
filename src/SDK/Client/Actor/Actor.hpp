@@ -14,6 +14,7 @@
 #include "Components/ActorHeadRotationComponent.hpp"
 #include "Components/ActorTypeComponent.hpp"
 #include "Components/RenderPositionComponent.hpp"
+#include "../Network/Packet/Types/ActorRuntimeID.hpp"
 #include "EntityContext.hpp"
 #include "MobEffect.h"
 
@@ -185,27 +186,48 @@ public:
     BUILD_ACCESS(this, StateVectorComponent*, stateVector, 0x298);
     BUILD_ACCESS(this, Vec2<float>, rotations, 0x2A0);
     BUILD_ACCESS(this, bool, wasHurt, 0x206);
-   
 
-    template <typename Component>
-    Component* tryGet(uintptr_t addr);
-    ItemStack* getArmor(int slot);
-    ActorTypeComponent* getActorTypeComponent();
+
+    template<typename Component>
+    Component *tryGet(uintptr_t addr);
+
+    ItemStack *getArmor(int slot);
+
+    ActorTypeComponent *getActorTypeComponent();
+
     int getEntityTypeId();
-    MobEffectInstance* getEffect(MobEffect* effect);
-    MoveInputComponent* getMoveInputHandler();
+
+    MobEffectInstance *getEffect(MobEffect *effect);
+
+    MoveInputComponent *getMoveInputHandler();
+
     bool isAlive();
-    std::string* getXuid(std::string* str);
+
+    std::string *getXuid(std::string *str);
+
     bool getActorFlag(int flag);
-    Vec3<float>* getPosition();
-    ActorHeadRotationComponent* getActorHeadRotationComponent();
-    ItemStack* getOffhandSlot();
-    EntityContext* GetEntityContext();
+
+    bool canSee(const Actor& actor);
+
+    Vec3<float> *getPosition();
+
+    ActorHeadRotationComponent *getActorHeadRotationComponent();
+
+    ItemStack *getOffhandSlot();
+
+    EntityContext *GetEntityContext();
+
     float getSpeedInMetersPerSecond();
-    void setNametag(std::string* name);
-    std::string* getNametag();
+
+    void setNametag(std::string *name);
+
+    std::string *getNametag();
+
     bool isPlayer();
+
     bool hasCategory(ActorCategory category);
-    RenderPositionComponent* getRenderPositionComponent();
-    bool isValidTarget(Actor* actor);
+
+    RenderPositionComponent *getRenderPositionComponent();
+
+    bool isValidTarget(Actor *actor);
 };

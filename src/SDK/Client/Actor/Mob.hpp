@@ -8,8 +8,11 @@
 class Mob : public Actor {
 public:
     BUILD_ACCESS(this, MobHurtTimeComponent*, mobHurtTimeComponent, 0x610);
+
     void setSprinting(bool state);
-    template <typename Component>
-    Component* tryGetAllah(uintptr_t addr);
-    MobBodyRotationComponent* getBodyRotationComponent();
+
+    template<typename Component>
+    Component *tryGetAllah(uintptr_t addr);
+
+    MobBodyRotationComponent *getBodyRotationComponent();
 };

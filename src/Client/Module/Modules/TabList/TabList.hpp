@@ -1,51 +1,57 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "../../../GUI/Engine/Engine.hpp"
 #include "../../../Events/EventHandler.hpp"
 #include "TabListListener.hpp"
 #include "../Nick/NickListener.hpp"
+#include "../../Manager.hpp"
+#include "../../../Client.hpp"
+#include "../ClickGUI/ClickGUIRenderer.hpp"
 
 
 class TabList : public Module {
 
 public:
+    TabList() : Module("Tab List", "Java-like tab list.\nLists the current online players on the server.",
+                       R"(\Flarial\assets\list.png)", "TAB") {
 
-
-    TabList() : Module("Tab List", "Java-like tab list.\nLists the current online players on the server.", "\\Flarial\\assets\\list.png", 'o') {
-
-        onEnable();
+        Module::setup();
 
     };
 
     void onEnable() override {
-
-        Module::onEnable();
         EventHandler::registerListener(new TabListListener("TabList", this));
-        if (settings.getSettingByName<std::string>("keybind")->value == (std::string)"") settings.getSettingByName<std::string>("keybind")->value = "TAB";
-        if (settings.getSettingByName<bool>("alphaOrder") == nullptr) settings.addSetting<bool>("alphaOrder", true);
+        Module::onEnable();
     }
 
-    void DefaultConfig() override {
+    void onDisable() override {
+        EventHandler::unregisterListener("TabList");
+        Module::onDisable();
+    }
 
-        if(settings.getSettingByName<float>("percentageX") == nullptr) {
+    void defaultConfig() override {
+        if (settings.getSettingByName<bool>("alphaOrder") == nullptr) settings.addSetting<bool>("alphaOrder", true);
+
+        if (settings.getSettingByName<float>("percentageX") == nullptr) {
             settings.addSetting("percentageX", 0.0f);
             settings.addSetting("percentageY", 0.0f);
         }
 
-        if(settings.getSettingByName<bool>("border") == nullptr) {
+        if (settings.getSettingByName<bool>("border") == nullptr) {
             settings.addSetting("border", false);
             settings.addSetting("borderWidth", 1.0f);
         }
 
-        if(settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 32.0f);
+        if (settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 32.0f);
 
-        if(settings.getSettingByName<std::string>("bgColor") == nullptr) {
-            settings.addSetting("bgColor", (std::string)"000000");
-            settings.addSetting("textColor", (std::string)"fafafa");
-            settings.addSetting("borderColor", (std::string)"000000");
+        if (settings.getSettingByName<std::string>("bgColor") == nullptr) {
+            settings.addSetting("bgColor", (std::string) "000000");
+            settings.addSetting("textColor", (std::string) "fafafa");
+            settings.addSetting("borderColor", (std::string) "000000");
         }
 
-        if(settings.getSettingByName<float>("bgOpacity") == nullptr) {
+        if (settings.getSettingByName<float>("bgOpacity") == nullptr) {
             settings.addSetting("bgOpacity", 0.55f);
             settings.addSetting("textOpacity", 1.0f);
             settings.addSetting("borderOpacity", 1.0f);
@@ -57,11 +63,10 @@ public:
             settings.addSetting("borderRGB", false);
         }
 
-        if(settings.getSettingByName<float>("uiscale") == nullptr) {
+        if (settings.getSettingByName<float>("uiscale") == nullptr) {
 
             settings.addSetting("uiscale", 0.65f);
         }
-
 
 
         if (settings.getSettingByName<bool>("BlurEffect") == nullptr) {
@@ -70,15 +75,7 @@ public:
 
     }
 
-    void onDisable() override {
-
-        EventHandler::unregisterListener("TabList");
-
-        Module::onDisable();
-
-    }
-
-    void SettingsRender() override {
+    void settingsRender() override {
         /* Border Start */
 
         float toggleX = Constraints::PercentageConstraint(0.019, "left");
@@ -88,7 +85,9 @@ public:
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
         FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(5.5, textWidth), 2);
-        FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"), Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(1.0f, "height"));
+        FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(1.0f, "height"));
 
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"UI Scale", textWidth * 6.9f,
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
@@ -103,7 +102,9 @@ public:
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         if (FlarialGUI::Toggle(0, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "border")->value)) this->settings.getSettingByName<bool>("border")->value = !this->settings.getSettingByName<bool>("border")->value;
+                "border")->value))
+            this->settings.getSettingByName<bool>("border")->value = !this->settings.getSettingByName<bool>(
+                    "border")->value;
 
 
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, L"Border",
@@ -135,12 +136,12 @@ public:
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::KeybindSelector(0, toggleX, toggleY, settings.getSettingByName<std::string>("keybind")->value);
+        FlarialGUI::KeybindSelector(0, toggleX, toggleY, getKeybind());
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        FlarialGUI::to_wide("Alphabetical Order").c_str(),
+                                        L"Alphabetical Order",
                                         textWidth * 2.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
@@ -148,69 +149,86 @@ public:
         if (FlarialGUI::Toggle(2, toggleX, toggleY,
                                this->settings.getSettingByName<bool>("alphaOrder")->value))
             this->settings.getSettingByName<bool>("alphaOrder")->value = !this->settings.getSettingByName<bool>(
-                "alphaOrder")->value;
+                    "alphaOrder")->value;
 
         /* Rounding End */
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        FlarialGUI::to_wide("Translucency").c_str(), textWidth * 6.9f, textHeight,
+                                        L"Translucency", textWidth * 6.9f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
 
         if (FlarialGUI::Toggle(4, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "BlurEffect")->value)) this->settings.getSettingByName<bool>("BlurEffect")->value = !this->settings.getSettingByName<bool>("BlurEffect")->value;
+                "BlurEffect")->value))
+            this->settings.getSettingByName<bool>("BlurEffect")->value = !this->settings.getSettingByName<bool>(
+                    "BlurEffect")->value;
 
         /* Color Pickers Start*/
 
         toggleX = Constraints::PercentageConstraint(0.55, "left");
         toggleY = Constraints::PercentageConstraint(0.10, "top");
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Background").c_str(), textWidth * 6.9f,
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Background", textWidth * 6.9f,
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(0, toggleX + FlarialGUI::SettingsTextWidth("Background "), toggleY - Constraints::SpacingConstraint(0.017, textWidth), settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
+        FlarialGUI::ColorPicker(0, toggleX + FlarialGUI::SettingsTextWidth("Background "),
+                                toggleY - Constraints::SpacingConstraint(0.017, textWidth),
+                                settings.getSettingByName<std::string>("bgColor")->value,
+                                settings.getSettingByName<float>("bgOpacity")->value,
+                                settings.getSettingByName<bool>("bgRGB")->value);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Text").c_str(), textWidth * 6.9f,
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Text", textWidth * 6.9f,
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(1, toggleX + FlarialGUI::SettingsTextWidth("Text "), toggleY * 0.99f, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
+        FlarialGUI::ColorPicker(1, toggleX + FlarialGUI::SettingsTextWidth("Text "), toggleY * 0.99f,
+                                settings.getSettingByName<std::string>("textColor")->value,
+                                settings.getSettingByName<float>("textOpacity")->value,
+                                settings.getSettingByName<bool>("textRGB")->value);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Border").c_str(), textWidth * 6.9f,
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Border", textWidth * 6.9f,
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(2, toggleX + FlarialGUI::SettingsTextWidth("Border "), toggleY * 0.99f, settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
+        FlarialGUI::ColorPicker(2, toggleX + FlarialGUI::SettingsTextWidth("Border "), toggleY * 0.99f,
+                                settings.getSettingByName<std::string>("borderColor")->value,
+                                settings.getSettingByName<float>("borderOpacity")->value,
+                                settings.getSettingByName<bool>("borderRGB")->value);
 
         FlarialGUI::UnsetScrollView();
 
-        FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
-        FlarialGUI::ColorPickerWindow(1, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
-        FlarialGUI::ColorPickerWindow(2, settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
+        FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("bgColor")->value,
+                                      settings.getSettingByName<float>("bgOpacity")->value,
+                                      settings.getSettingByName<bool>("bgRGB")->value);
+        FlarialGUI::ColorPickerWindow(1, settings.getSettingByName<std::string>("textColor")->value,
+                                      settings.getSettingByName<float>("textOpacity")->value,
+                                      settings.getSettingByName<bool>("textRGB")->value);
+        FlarialGUI::ColorPickerWindow(2, settings.getSettingByName<std::string>("borderColor")->value,
+                                      settings.getSettingByName<float>("borderOpacity")->value,
+                                      settings.getSettingByName<bool>("borderRGB")->value);
 
     }
 
-    void NormalRender(int index, std::string text, std::string value) override {
-
-        if (SDK::hasInstanced) {
+    void normalRender(int index, std::string& value) override {
+        if (SDK::hasInstanced && active) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                 float keycardSize = Constraints::RelativeConstraint(
-                    0.05f * this->settings.getSettingByName<float>("uiscale")->value, "height", true);
+                        0.05f * this->settings.getSettingByName<float>("uiscale")->value, "height", true);
 
                 Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
-                    this->settings.getSettingByName<float>("percentageY")->value);
+                                                      this->settings.getSettingByName<float>("percentageY")->value);
 
                 int i3 = 0;
                 float i2 = 0;
 
-                for (const auto& pair : SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap()) {
+                for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap()) {
 
                     i3++;
 
@@ -224,7 +242,7 @@ public:
 
                 if (settingperc.x != 0)
                     realcenter = Vec2<float>(settingperc.x * MC::windowSize.x,
-                        settingperc.y * MC::windowSize.y);
+                                             settingperc.y * MC::windowSize.y);
                 else
                     realcenter = Constraints::CenterConstraint(i2 * keycardSize, 7.5f * keycardSize, "y", 0.0f, -0.85f);
 
@@ -235,7 +253,7 @@ public:
                 float fakex = realcenter.x;
                 float fixer = 0;
 
-                for (const auto& pair : SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap()) {
+                for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap()) {
 
                     i3++;
 
@@ -243,7 +261,7 @@ public:
                         i2 += 4.85;
                         count++;
 
-                        if(count != 1) {
+                        if (count != 1) {
                             fakex -= ((5.f * keycardSize) / 2.0f);
                             fixer += ((5.f * keycardSize) / 2.0f);
                         }
@@ -252,17 +270,19 @@ public:
                 }
 
                 Vec2<float> rounde = Constraints::RoundingConstraint(
-                    this->settings.getSettingByName<float>("rounding")->value *
-                    settings.getSettingByName<float>("uiscale")->value,
-                    this->settings.getSettingByName<float>("rounding")->value *
-                    settings.getSettingByName<float>("uiscale")->value);
+                        this->settings.getSettingByName<float>("rounding")->value *
+                        settings.getSettingByName<float>("uiscale")->value,
+                        this->settings.getSettingByName<float>("rounding")->value *
+                        settings.getSettingByName<float>("uiscale")->value);
 
                 float totalWidth = i2 * keycardSize;
 
-                if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
+                if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
+                    ClickGUIRenderer::editmenu)
                     FlarialGUI::SetWindowRect(fakex, realcenter.y, totalWidth, keycardSize * 7.5f, index, fixer);
 
-                Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, totalWidth,keycardSize * 7.5f);
+                Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, totalWidth,
+                                                                keycardSize * 7.5f);
 
                 realcenter.x = vec2.x;
                 realcenter.y = vec2.y;
@@ -286,58 +306,71 @@ public:
 
                 D2D1_COLOR_F borderColor;
                 if (settings.getSettingByName<bool>("borderRGB")->value) borderColor = FlarialGUI::rgbColor;
-                else borderColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
+                else
+                    borderColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
 
                 disabledColor.a = settings.getSettingByName<float>("bgOpacity")->value;
                 textColor.a = settings.getSettingByName<float>("textOpacity")->value;
                 borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
                 if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
-                    if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(fakex, realcenter.y, fakex + (i2 * keycardSize), realcenter.y + (7.5*keycardSize)), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value); 
+                    if (settings.getSettingByName<bool>("BlurEffect")->value)
+                        FlarialGUI::BlurRect(D2D1::RoundedRect(
+                                                     D2D1::RectF(fakex, realcenter.y, fakex + (i2 * keycardSize),
+                                                                 realcenter.y + (7.5 * keycardSize)), rounde.x, rounde.x),
+                                             Client::settings.getSettingByName<float>("blurintensity")->value);
                 if (this->settings.getSettingByName<bool>("border")->value) {
-                    FlarialGUI::RoundedHollowRect(fakex, realcenter.y, Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * (settings.getSettingByName<float>("uiscale")->value) / 100.0f), "height", true),
-                        borderColor, totalWidth, 7.5f * keycardSize,
-                        rounde.x, rounde.x);
+                    FlarialGUI::RoundedHollowRect(fakex, realcenter.y, Constraints::RelativeConstraint(
+                                                          (this->settings.getSettingByName<float>("borderWidth")->value *
+                                                           (settings.getSettingByName<float>("uiscale")->value) / 100.0f), "height", true),
+                                                  borderColor, totalWidth, 7.5f * keycardSize,
+                                                  rounde.x, rounde.x);
                 }
                 FlarialGUI::RoundedRect(fakex, realcenter.y, disabledColor, totalWidth, 7.5f * keycardSize,
-                    rounde.x,
-                    rounde.x);
+                                        rounde.x,
+                                        rounde.x);
 
                 int i = 0;
 
                 bool yes = settings.getSettingByName<bool>("alphaOrder")->value;
 
-                if(yes) {
+                if (yes) {
 
-                    auto vecmap = copyMapInAlphabeticalOrder(SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap());
+                    auto vecmap = copyMapInAlphabeticalOrder(
+                            SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap());
                     for (const auto &pair: vecmap) {
 
                         i++;
-                        std::string name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pair.second.name));
-                        
+                        std::string name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pair.second.name)); // TODO: this does not clear all special symbols?
 
-                        auto it = std::find(ModuleManager::OnlineUsers.begin(), ModuleManager::OnlineUsers.end(), name);
+
+                        auto it = std::find(ModuleManager::onlineUsers.begin(), ModuleManager::onlineUsers.end(), name);
 
                         // Check if the string was found
-                        
+
 
                         auto module = ModuleManager::getModule("Nick");
 
-                        if (module->settings.getSettingByName<bool>("enabled")->value && name == Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickListener::original))) {
+                        if (module->isEnabled() &&
+                            name == Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickListener::original))) {
                             name = module->settings.getSettingByName<std::string>("nick")->value;
                         }
 
                         float xx = 0;
 
-                        if (it != ModuleManager::OnlineUsers.end()) {
-                            FlarialGUI::Image("\\Flarial\\assets\\logo.png", D2D1::RectF(fakex + Constraints::SpacingConstraint(0.2, keycardSize), realcenter.y +
-                                Constraints::SpacingConstraint(0.12, keycardSize), fakex + Constraints::SpacingConstraint(1.1, keycardSize), realcenter.y +
-                                Constraints::SpacingConstraint(1.22, keycardSize)));
+                        if (it != ModuleManager::onlineUsers.end()) {
+                            FlarialGUI::image(R"(\Flarial\assets\logo.png)",
+                                              D2D1::RectF(fakex + Constraints::SpacingConstraint(0.2, keycardSize),
+                                                          realcenter.y +
+                                                          Constraints::SpacingConstraint(0.12, keycardSize),
+                                                          fakex + Constraints::SpacingConstraint(1.1, keycardSize),
+                                                          realcenter.y +
+                                                          Constraints::SpacingConstraint(1.22, keycardSize)));
 
                             xx = Constraints::SpacingConstraint(0.5, keycardSize);
 
                         }
 
-                        FlarialGUI::FlarialTextWithFont(fakex +xx+ Constraints::SpacingConstraint(0.5, keycardSize),
+                        FlarialGUI::FlarialTextWithFont(fakex + xx + Constraints::SpacingConstraint(0.5, keycardSize),
                                                         realcenter.y +
                                                         Constraints::SpacingConstraint(0.12, keycardSize),
                                                         FlarialGUI::to_wide(name).c_str(),
@@ -361,16 +394,17 @@ public:
 
                         std::string name = pair.second.name;
 
-                        auto it = std::find(ModuleManager::OnlineUsers.begin(), ModuleManager::OnlineUsers.end(), name);
+                        auto it = std::find(ModuleManager::onlineUsers.begin(), ModuleManager::onlineUsers.end(), name);
 
                         // Check if the string was found
-                        if (it != ModuleManager::OnlineUsers.end()) {
+                        if (it != ModuleManager::onlineUsers.end()) {
                             name = "[F] " + name;
                         }
 
                         auto module = ModuleManager::getModule("Nick");
 
-                        if (module->settings.getSettingByName<bool>("enabled")->value && name == NickListener::backupOri) {
+                        if (module->isEnabled() &&
+                            name == NickListener::backupOri) {
                             name = module->settings.getSettingByName<std::string>("nick")->value;
                         }
 
@@ -393,18 +427,22 @@ public:
                     }
                 }
 
-                if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
+                // TODO ModuleManager::getModule("ClickGUI") FIND ALL AND REPLACE!!!
+
+                if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
+                    ClickGUIRenderer::editmenu)
 
                     FlarialGUI::UnsetWindowRect();
             }
         }
     }
 
-    std::vector<std::pair<mcUUID, PlayerListEntry>> copyMapInAlphabeticalOrder(const std::unordered_map<mcUUID, PlayerListEntry>& sourceMap) {
+    static std::vector<std::pair<mcUUID, PlayerListEntry>>
+    copyMapInAlphabeticalOrder(const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap) {
         std::vector<std::pair<mcUUID, PlayerListEntry>> sortedPairs(sourceMap.begin(), sourceMap.end());
 
         // Sort the vector based on the 'name' field
-        std::sort(sortedPairs.begin(), sortedPairs.end(), [](const auto& a, const auto& b) {
+        std::sort(sortedPairs.begin(), sortedPairs.end(), [](const auto &a, const auto &b) {
             return a.second.name < b.second.name;
         });
 

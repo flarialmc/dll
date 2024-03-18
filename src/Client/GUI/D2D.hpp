@@ -1,4 +1,5 @@
 #pragma once
+
 #include <dxgi.h>
 #include <d3d11.h>
 #include <d3d12.h>
@@ -12,20 +13,18 @@
 #include "../../Utils/Logger/Logger.hpp"
 
 namespace D2D {
-
-    inline ID2D1DeviceContext* context;
-    inline IDXGISurface1* surface = nullptr;
-};
+    inline ID2D1DeviceContext *context;
+    inline IDXGISurface1 *surface = nullptr;
+}
 
 class MC {
 
 public:
-    static inline Vec2<float> mousepos;
+    static inline Vec2<float> mousePos;
     static inline Vec2<float> windowSize;
-    static inline MouseAction mouseaction;
-    static inline MouseButton mousebutton;
+    static inline MouseAction mouseAction;
+    static inline MouseButton mouseButton;
     static inline bool held;
-    static inline bool hasResized;
 
     static inline int frames;
     static inline int fps;

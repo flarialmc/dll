@@ -11,22 +11,16 @@
 
 class KeystrokesListener : public Listener {
 
-    Module* module;
+    Module *module;
 
-    void onRender(RenderEvent& event) override {
-
-        if(SDK::CurrentScreen == "hud_screen")
-        if (module->settings.getSettingByName<bool>("enabled")->value) {
-
-            this->module->NormalRender(7, "", "");
-
-        }
+    void onRender(RenderEvent &event) override {
+        if(!module->isEnabled() || SDK::currentScreen != "hud_screen") return;
+        this->module->normalRender(7, (std::string &) "");
     }
 
 
-
 public:
-    explicit KeystrokesListener(const char string[5], Module* module) {
+    explicit KeystrokesListener(const char string[5], Module *module) {
         this->name = string;
         this->module = module;
     }

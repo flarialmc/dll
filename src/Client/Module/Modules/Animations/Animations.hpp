@@ -2,39 +2,35 @@
 
 #include "../Module.hpp"
 #include "../../../Events/EventHandler.hpp"
+#include "AnimationsListener.hpp"
 
 
 class Animations : public Module {
 
 public:
 
-    Animations() : Module("Animations", "Animate your selected slot square\nwhile you switch slots.", "\\Flarial\\assets\\Animations.png", 'C') {
-
-        onEnable();
-
+    Animations() : Module("Animations", "Animate your selected slot square\nwhile you switch slots.",
+                          R"(\Flarial\assets\Animations.png)", "") {
+        Module::setup();
     };
 
     void onEnable() override {
-
-        if (settings.getSettingByName<float>("hotbarSpeed") == nullptr) settings.addSetting("hotbarSpeed", 7.0f);
-
-
+        EventHandler::registerListener(new AnimationsListener("Animations", this));
         Module::onEnable();
-
-    }
-
-    void NormalRender(int index, std::string text, std::string value) override {
-
-
-
     }
 
     void onDisable() override {
-
+        EventHandler::unregisterListener("Animations");
         Module::onDisable();
     }
 
-    void SettingsRender() override {
+    void defaultConfig() override {
+
+        if (settings.getSettingByName<float>("hotbarSpeed") == nullptr) settings.addSetting("hotbarSpeed", 7.0f);
+
+    }
+
+    void settingsRender() override {
 
         float toggleX = Constraints::PercentageConstraint(0.019, "left");
         float toggleY = Constraints::PercentageConstraint(0.10, "top");
@@ -49,7 +45,7 @@ public:
 
         float percent = FlarialGUI::Slider(1, toggleX + FlarialGUI::SettingsTextWidth("HotBar "),
                                            toggleY, this->settings.getSettingByName<float>("hotbarSpeed")->value, 50.0f,
-                                           0, 0);
+                                           0, false);
 
         this->settings.getSettingByName<float>("hotbarSpeed")->value = percent;
 

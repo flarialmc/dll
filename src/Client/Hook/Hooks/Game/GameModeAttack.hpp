@@ -5,12 +5,12 @@
 class GameModeAttackHook : public Hook {
 
 private:
-    static void callback(Gamemode* gamemode, Actor* actor);
+    static void callback(Gamemode *gamemode, Actor *actor);
 
 public:
-    typedef void(__thiscall* original)(Gamemode*, Actor*);
+    typedef void(__thiscall *original)(Gamemode *, Actor *);
 
-    static inline original attackOriginal = nullptr;
+    static inline original funcOriginal = nullptr;
 
     GameModeAttackHook();
 
