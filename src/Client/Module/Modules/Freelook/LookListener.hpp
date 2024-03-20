@@ -67,7 +67,8 @@ public:
             if (module->isKeybind(event.keys)) { // key is defo pressed
                 std::string serverIP = SDK::getServerIP();
                 if ((serverIP.find("hive") != std::string::npos ||
-                     serverIP.find("galaxite") != std::string::npos)) { // TODO: make it only show once per server switch?
+                     serverIP.find("galaxite") != std::string::npos ||
+                     serverIP.find("venity") != std::string::npos)) { // TODO: make it only show once per server switch?
                     FlarialGUI::Notify("Can't use freelook on " + serverIP); // TODO: move restrictions to API
                     module->restricted = true;
                 } else {
