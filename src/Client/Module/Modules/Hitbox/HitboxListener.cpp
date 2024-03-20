@@ -8,10 +8,11 @@ void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
         return;
     auto player = SDK::clientInstance->getLocalPlayer();
     for (const auto &ent: player->level->getRuntimeActorList()) {
-        if (ent != nullptr){ // && ent->isPlayer() && ent->hasCategory(ActorCategory::Player)
+        if (ent != nullptr && ent != player /*&& ent->isPlayer() && ent->hasCategory(ActorCategory::Player)*/) {
             float dist = player->getPosition()->dist(*ent->getPosition());
             // This may let through some entites
-            if (!ent->isAlive() || !player->isValidTarget(ent) || dist > 30 || !player->canSee(*ent)) // + ent == player ||
+            if (!ent->isAlive() || !player->isValidTarget(ent) || dist > 30 || !player->canSee(*ent) ||
+                ent->getActorFlag(ActorFlags::FLAG_INVISIBLE)) // + ent == player ||
                 continue;
 
             // Add to render list
