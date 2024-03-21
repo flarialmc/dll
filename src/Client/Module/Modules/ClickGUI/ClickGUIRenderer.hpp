@@ -800,25 +800,21 @@ public:
 
         //TODO: MAKE module->setActive() module->isActive() module->isRestricted()
 
-        if (module->isKeybind(event.keys) && module->isKeyPartOfKeybind(event.key) && event.getAction() == (int) ActionType::Pressed) {
-            if (SDK::currentScreen != "hud_screen")
+        if (module->isKeybind(event.keys) && module->isKeyPartOfKeybind(event.key) && event.getAction() == (int)ActionType::Pressed) {
+            if (SDK::currentScreen != "hud_screen" && SDK::currentScreen != "pause_screen")
                 module->active = false;
             else {
-                if (module->active)
-                    module->active = false;
-                else
-                    module->active = true;
+                module->active = !module->active;
             }
 
-            if (module->active){
-                SDK::clientInstance->grabMouse(); // let mouse control the view
-
+            if (module->active) {
                 GUIMouseListener::accumilatedPos = 0;
                 GUIMouseListener::accumilatedBarPos = 0;
 
                 ClickGUIRenderer::page.type = "normal";
                 ClickGUIRenderer::curr = "modules";
-            } else {
+            }
+            else {
                 FlarialGUI::ResetShit();
                 ModuleManager::SaveModulesConfig();
                 Client::SaveSettings();
@@ -892,8 +888,8 @@ public:
 
         }
 
-        if (!module->active && !editmenu && SDK::currentScreen == "hud_screen")
-            SDK::clientInstance->grabMouse();
+        if (module->active || editmenu && SDK::currentScreen == "hud_screen")
+            SDK::clientInstance->releaseMouse(); // release mouse lets cursor move
 
         if (module->active || editmenu)
             event.cancel(); // do not pass key event to the game
