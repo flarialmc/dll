@@ -1,37 +1,31 @@
 #include "Hook.hpp"
+#include <libhat/Scanner.hpp>
+#include <utility>
 
-Hook::Hook(std::string name, std::string signature)
-{
-    this->name = name;
-    this->signature = signature;
+Hook::Hook(std::string name, std::string signature) {
+    this->name = std::move(name);
+    this->signature = std::move(signature);
 }
 
-Hook::~Hook()
-{
+Hook::~Hook() = default;
+
+void Hook::enableHook() {
 }
 
-void Hook::enableHook()
-{
+bool Hook::autoHook(void *callbackPtr, void **funcOriginal) {
+    uintptr_t hookAddr = Memory::findSig(this->signature);
+    return this->manualHook((void *) hookAddr, callbackPtr, funcOriginal);
 }
 
-bool Hook::autoHook(void *callback_ptr, void **func_original)
-{
-    uintptr_t hook_addr = Memory::findSig(this->signature.c_str());
-    return this->manualHook((void *)hook_addr, callback_ptr, func_original);
-}
-
-bool Hook::manualHook(void *hook_addr, void *callback_ptr, void **func_original)
-{
-    if (hook_addr == 0)
-    {
-        Logger::error(std::format("Failed to find address of {}", this->name));
+bool Hook::manualHook(void *hookAddr, void *callbackPtr, void **funcOriginal) {
+    if (hookAddr == nullptr) {
+        Logger::error(std::format("[Hook] Failed to find address of {}", this->name));
         return false;
     }
 
-    MH_CreateHook(hook_addr, callback_ptr, func_original);
-    if (MH_EnableHook(hook_addr) != MH_OK)
-    {
-        Logger::error(std::format("Failed to find address of {}", this->name));
+    MH_CreateHook(hookAddr, callbackPtr, funcOriginal);
+    if (MH_EnableHook(hookAddr) != MH_OK) {
+        Logger::error(std::format("[Hook] Failed to find address of {}", this->name));
         return false;
     } else {
         Logger::info(std::format("[Hook] Successfully hooked {}", this->name));

@@ -2,17 +2,15 @@
 #include "Constraints.hpp"
 #include "Engine.hpp"
 
-float Constraints::PercentageConstraint(float percentage, const std::string& edge, bool ignore_stack)
-{
+float Constraints::PercentageConstraint(float percentage, const std::string &edge, bool ignore_stack) {
     float screenWidth = MC::windowSize.x;
     float screenHeight = MC::windowSize.y;
     float x = 0;
     float y = 0;
 
     // Check if there is a dimension stack and use the top element's dimensions instead
-    if (!FlarialGUI::dimension_stack.empty() && !ignore_stack)
-    {
-        Dimension& top = FlarialGUI::dimension_stack.top();
+    if (!FlarialGUI::dimensionStack.empty() && !ignore_stack) {
+        Dimension &top = FlarialGUI::dimensionStack.top();
         screenWidth = top.width;
         screenHeight = top.height;
         x = top.x;
@@ -21,22 +19,16 @@ float Constraints::PercentageConstraint(float percentage, const std::string& edg
 
     float position;
 
-    if (edge == "top")
-    {
+    if (edge == "top") {
         position = percentage * screenHeight;
         position += y;
-    }
-    else if (edge == "bottom")
-    {
+    } else if (edge == "bottom") {
         position = screenHeight - (percentage * screenHeight);
         position += y;
-    }
-    else if (edge == "left") {
+    } else if (edge == "left") {
         position = percentage * screenWidth;
         position += x;
-    }
-    else if (edge == "right")
-    {
+    } else if (edge == "right") {
         position = screenWidth - (percentage * screenWidth);
         position += x;
     }
@@ -44,39 +36,32 @@ float Constraints::PercentageConstraint(float percentage, const std::string& edg
     return std::ceilf(position * 10000.0f) / 10000.0f;
 }
 
-float Constraints::RelativeConstraint(float percent, const std::string& dimension, bool ignore_stack)
-{
+float Constraints::RelativeConstraint(float percent, const std::string &dimension, bool ignore_stack) {
     float length;
     float screenWidth;
     float screenHeight;
 
-    if (ignore_stack || FlarialGUI::dimension_stack.empty())
-    {
+    if (ignore_stack || FlarialGUI::dimensionStack.empty()) {
         screenWidth = MC::windowSize.x;
         screenHeight = MC::windowSize.y;
-    }
-    else
-    {
-        screenWidth = FlarialGUI::dimension_stack.top().width;
-        screenHeight = FlarialGUI::dimension_stack.top().height;
+    } else {
+        screenWidth = FlarialGUI::dimensionStack.top().width;
+        screenHeight = FlarialGUI::dimensionStack.top().height;
     }
 
 
-    
-    if (dimension == "width")
-    {
+    if (dimension == "width") {
         length = screenWidth * percent;
-    }
-    else if (dimension == "height")
-    {
+    } else if (dimension == "height") {
         length = screenHeight * percent;
     }
 
     return length;
 }
 
-Vec2<float> Constraints::CenterConstraint(float width, float height, const std::string& axis, float xmodifier, float ymodifier, bool ignore_stack)
-{
+Vec2<float>
+Constraints::CenterConstraint(float width, float height, const std::string &axis, float xModifier, float yModifier,
+                              bool ignoreStack) {
     Vec2<float> xy;
 
     float screenWidth;
@@ -84,41 +69,32 @@ Vec2<float> Constraints::CenterConstraint(float width, float height, const std::
     float parentX = 0;
     float parentY = 0;
 
-    if (ignore_stack || FlarialGUI::dimension_stack.empty())
-    {
+    if (ignoreStack || FlarialGUI::dimensionStack.empty()) {
         screenWidth = MC::windowSize.x;
         screenHeight = MC::windowSize.y;
-    }
-    else
-    {
-        screenWidth = FlarialGUI::dimension_stack.top().width;
-        screenHeight = FlarialGUI::dimension_stack.top().height;
-        parentX = FlarialGUI::dimension_stack.top().x;
-        parentY = FlarialGUI::dimension_stack.top().y;
+    } else {
+        screenWidth = FlarialGUI::dimensionStack.top().width;
+        screenHeight = FlarialGUI::dimensionStack.top().height;
+        parentX = FlarialGUI::dimensionStack.top().x;
+        parentY = FlarialGUI::dimensionStack.top().y;
     }
 
     xy.x = (screenWidth - width) / 2.0f + parentX;
     xy.y = (screenHeight - height) / 2.0f + parentY;
 
-    if (axis == "x")
-    {
-        xy.x += xmodifier * (screenWidth - width) / 2.0f;
-    }
-    else if (axis == "y")
-    {
-        xy.y += ymodifier * (screenHeight - height) / 2.0f;
-    }
-    else if (axis == "both")
-    {
-        xy.x += xmodifier * (screenWidth - width) / 2.0f;
-        xy.y += ymodifier * (screenHeight - height) / 2.0f;
+    if (axis == "x") {
+        xy.x += xModifier * (screenWidth - width) / 2.0f;
+    } else if (axis == "y") {
+        xy.y += yModifier * (screenHeight - height) / 2.0f;
+    } else if (axis == "both") {
+        xy.x += xModifier * (screenWidth - width) / 2.0f;
+        xy.y += yModifier * (screenHeight - height) / 2.0f;
     }
 
     return xy;
 }
 
-Vec2<float> Constraints::RoundingConstraint(float radiusX, float radiusY, bool ignore_stack)
-{
+Vec2<float> Constraints::RoundingConstraint(float radiusX, float radiusY) {
     // Get the minimum screen dimension
 
     float screenHeight = MC::windowSize.y;
@@ -128,7 +104,7 @@ Vec2<float> Constraints::RoundingConstraint(float radiusX, float radiusY, bool i
     float scaledRadiusY = radiusY * screenHeight / 1080.0f;
 
     // Return the scaled radii as a Vec2
-    return {scaledRadiusX, scaledRadiusY};
+    return Vec2<float>{scaledRadiusX, scaledRadiusY};
 }
 
 float Constraints::FontScaler(float dimension) {
@@ -145,7 +121,7 @@ float Constraints::FontScaler(float dimension) {
 }
 
 Vec2<float> Constraints::CalculatePercentage(float x, float y) {
-    return { x / MC::windowSize.x, y / MC::windowSize.y };
+    return Vec2<float>{x / MC::windowSize.x, y / MC::windowSize.y};
 }
 
 float Constraints::SpacingConstraint(float percentage, float dimension) {

@@ -10,14 +10,11 @@
 
 class MemoryListener : public Listener {
 
-    Module* module;
+    Module *module;
 
-    void onRender(RenderEvent& event) override {
-
-        if(SDK::CurrentScreen == "hud_screen")
-        if (module->settings.getSettingByName<bool>("enabled")->value) {
-
-
+    void onRender(RenderEvent &event) override {
+        if (module->isEnabled()) {
+            //TODO: (Memory module) Do megabytes mode
             MEMORYSTATUSEX memory_status;
             memory_status.dwLength = sizeof(memory_status);
             GlobalMemoryStatusEx(&memory_status);
@@ -27,13 +24,15 @@ class MemoryListener : public Listener {
 
             int sussymem = static_cast<int>((used_memory * 100) / total_memory);
 
-            this->module->NormalRender(4, module->settings.getSettingByName<std::string>("text")->value, std::to_string(sussymem) + "%");
+            std::string text = std::to_string(sussymem) + "%";
+
+            this->module->normalRender(4, text);
 
         }
     }
 
 public:
-    explicit MemoryListener(const char string[5], Module* module) {
+    explicit MemoryListener(const char string[5], Module *module) {
         this->name = string;
         this->module = module;
     }

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "../../Module.hpp"
 #include "../../../../Client.hpp"
 #include "../../../../Events/EventHandler.hpp"
@@ -8,21 +9,23 @@ class RGBController : public Module {
 
 public:
 
-    RGBController() : Module("RGB Controller", "Does the rgb bing chilling", "", VK_F7) {
+    RGBController() : Module("RGB Controller", "Does the rgb bing chilling", "", "") {
 
-        onEnable();
+        Module::setup();
 
     };
 
     void onEnable() override {
 
         EventHandler::registerListener(new rgbListener("RGB Controller"));
+        Module::onEnable();
 
     }
 
     void onDisable() override {
 
         EventHandler::unregisterListener("RGB Controller");
+        Module::onDisable();
 
     }
 };

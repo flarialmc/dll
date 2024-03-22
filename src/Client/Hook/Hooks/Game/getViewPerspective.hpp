@@ -5,10 +5,10 @@
 class getViewPerspectiveHook : public Hook {
 
 private:
-    static int callback(uintptr_t* a1);
+    static int callback(uintptr_t *a1);
 
 public:
-    typedef int(__thiscall* original)(uintptr_t*);
+    typedef int(__thiscall *original)(uintptr_t *);
 
     static inline original getViewPerspectiveOriginal = nullptr;
 

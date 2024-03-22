@@ -1,4 +1,5 @@
 #pragma once
+
 #include "../../Module.hpp"
 #include "../../../../Client.hpp"
 #include "../../../../Events/EventHandler.hpp"
@@ -8,21 +9,22 @@ class CentreCursor : public Module {
 
 public:
 
-    CentreCursor() : Module("CentreCursor", "Center your cursor on GUI open.", "", VK_F7) {
+    CentreCursor() : Module("CentreCursor", "Center your cursor on GUI open.", "", "") {
 
-        onEnable();
+        Module::setup();
 
     };
 
     void onEnable() override {
 
         EventHandler::registerListener(new CentreCursorListener("CentreCursor"));
-
+        Module::onEnable();
     }
 
     void onDisable() override {
 
         EventHandler::unregisterListener("CentreCursor");
+        Module::onDisable();
 
     }
 };

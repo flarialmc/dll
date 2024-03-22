@@ -1,4 +1,5 @@
 #pragma once
+
 #include "../../Module.hpp"
 #include "../../../../Client.hpp"
 #include "../../../../Events/EventHandler.hpp"
@@ -8,9 +9,9 @@ class TextAlias : public Module {
 
 public:
 
-    TextAlias() : Module("TextAlias", "Updates text aliasing", "", VK_F7) {
+    TextAlias() : Module("TextAlias", "Updates text aliasing", "", "") {
 
-        onEnable();
+        Module::setup();
 
     };
 

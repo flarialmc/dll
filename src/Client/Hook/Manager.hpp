@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include <vector>
 
 #include "Hooks/Hook.hpp"
@@ -9,11 +10,12 @@
 #include "Hooks/Game/OnSuspend.hpp"
 #include "MinHook.h"
 
-class HookManager
-{
+class HookManager {
 public:
     static std::vector<Hook *> hooks;
+
     static void initialize();
+
     static void terminate();
 
 };

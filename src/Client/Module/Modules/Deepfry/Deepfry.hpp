@@ -8,31 +8,32 @@
 class Deepfry : public Module {
 
 public:
+    Deepfry() : Module("Deepfry", "Theres only one way to find out.", R"(\Flarial\assets\frying-pan.png)", "") {
 
-    void NormalRender(int index, std::string text, std::string value) override {
-
-    }
-
-    Deepfry() : Module("Deepfry", "Theres only one way to find out.", "\\Flarial\\assets\\frying-pan.png", 'b') {
-
-        onEnable();
-
+        Module::setup();
     };
 
     void onEnable() override {
 
-        if (settings.getSettingByName<bool>("paint") == nullptr) settings.addSetting("paint", false);
+        EventHandler::registerPriorityListener(new DeepfryListener("Deepfry", this));
 
-        EventHandler::registerListener(new DeepfryListener("Deepfry", this));
         Module::onEnable();
-    }
 
+    }
 
     void onDisable() override {
+
+        EventHandler::unregisterListener("Deepfry");
+
         Module::onDisable();
+
     }
 
-    void SettingsRender() override {
+    void defaultConfig() override {
+        if (settings.getSettingByName<bool>("paint") == nullptr) settings.addSetting("paint", false);
+    }
+
+    void settingsRender() override {
 
         const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
@@ -46,7 +47,9 @@ public:
                                         DWRITE_FONT_WEIGHT_NORMAL);
 
         if (FlarialGUI::Toggle(1, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "paint")->value)) this->settings.getSettingByName<bool>("paint")->value = !this->settings.getSettingByName<bool>("paint")->value;
+                "paint")->value))
+            this->settings.getSettingByName<bool>("paint")->value = !this->settings.getSettingByName<bool>(
+                    "paint")->value;
 
 
     }

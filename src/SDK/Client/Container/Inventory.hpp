@@ -4,5 +4,5 @@
 
 class Inventory {
 public:
-    ItemStack* getItem(int slot);
+    ItemStack *getItem(int slot);
 };

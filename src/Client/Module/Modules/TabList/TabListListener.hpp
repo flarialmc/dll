@@ -12,24 +12,17 @@ class TabListListener : public Listener {
 
     Module* module;
 
-    void onRender(RenderEvent& event) override {
-
-        if (SDK::CurrentScreen == "hud_screen")
-            if (module->settings.getSettingByName<bool>("enabled")->value) {
-
-                this->module->NormalRender(20, "", "");
-
-            }
+    void onRender(RenderEvent &event) override {
+        std::string text;
+        this->module->normalRender(20, text);
     }
 
-    void onKey(KeyEvent& event) override {
-
-        if (SDK::CurrentScreen == "hud_screen")
-            if (module->IsKeybind(event.keys) && module->IsKeyPartOfKeybind(event.key)) {
-            module->settings.getSettingByName<bool>("enabled")->value = !module->settings.getSettingByName<bool>("enabled")->value;
+    void onKey(KeyEvent &event) override {
+        if (module->isKeybind(event.keys) && module->isKeyPartOfKeybind(event.key)) {
+            module->active = !module->active;
         }
 
-        if (!module->IsKeybind(event.keys)) module->settings.getSettingByName<bool>("enabled")->value = false;
+        if (!module->isKeybind(event.keys)) module->active = false;
 
     };
 

@@ -12,67 +12,58 @@
 
 class SprintListener : public Listener {
 
-    Module* module;
-    bool ToggleSprinting = false;
+    Module *module;
+    bool toggleSprinting = false;
 
-    void onKey(KeyEvent& event) override {
-
-        if (SDK::CurrentScreen == "hud_screen")
-            if (module->settings.getSettingByName<bool>("enabled")->value) {
-                if (module->IsKeybind(event.keys) && module->IsKeyPartOfKeybind(event.key)) {
-                    ToggleSprinting = !ToggleSprinting;
-                }
+    void onKey(KeyEvent &event) override {
+            if (module->isKeybind(event.keys) && module->isKeyPartOfKeybind(event.key)) {
+                toggleSprinting = !toggleSprinting;
             }
     };
 
-    void onRender(RenderEvent& event) override {
-        if (SDK::CurrentScreen == "hud_screen")
-            if (module->settings.getSettingByName<bool>("enabled")->value) {
-                if (module->settings.getSettingByName<bool>("status")->value) {
-                    if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
+    void onRender(RenderEvent &event) override {
+        if(!module->isEnabled() || SDK::currentScreen != "hud_screen") return;
 
-                        if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+            if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
 
-                            if (SDK::clientInstance->getLocalPlayer()->getActorFlag(1)) {
-                                this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Sneaking");
-                            }
-                            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(57)) {
-                                this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Swimming");
-                            }
-                            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(32)) {
-                                this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Gliding");
-                            }
-                            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(76)) {
-                                this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Sleeping");
-                            }
-                            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) {
-                                this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Sprinting");
-                            }
-                            else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(34)) {
-                                this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Walking");
-                            }
-                            else { this->module->NormalRender(5, module->settings.getSettingByName<std::string>("text")->value, "Standing"); }
-
-                        }
-
+                if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                    std::string text = "Standing";
+                    if (SDK::clientInstance->getLocalPlayer()->getActorFlag(1)) {
+                        text = "Sneaking";
+                        this->module->normalRender(5, text);
+                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(57)) {
+                        text = "Swimming";
+                        this->module->normalRender(5, text);
+                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(32)) {
+                        text = "Gliding";
+                        this->module->normalRender(5, text);
+                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(76)) {
+                        text = "Sleeping";
+                        this->module->normalRender(5, text);
+                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) {
+                        text = "Sprinting";
+                        this->module->normalRender(5, text);
+                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(34)) {
+                        text = "Walking";
+                        this->module->normalRender(5, text);
+                    } else {
+                        this->module->normalRender(5, text);
                     }
+
                 }
-            }
+        }
     }
 
-    void onLocalTick(TickEvent& event) override {
-        if (module->settings.getSettingByName<bool>("enabled")->value) {
-            if (SDK::clientInstance != nullptr) {
-                if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                    MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
+    void onTick(TickEvent &event) override {
+        if (SDK::clientInstance != nullptr) {
+            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                MoveInputComponent *handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
-                    if (handler->forward) {
-                        if (module->settings.getSettingByName<bool>("always")->value) {
-                            handler->sprinting = true;
-                        }
-                        else {
-                            if(ToggleSprinting) handler->sprinting = ToggleSprinting;
-                        }
+                if (handler->forward) {
+                    if (module->settings.getSettingByName<bool>("always")->value) {
+                        handler->sprinting = true;
+                    } else {
+                        if (toggleSprinting) handler->sprinting = toggleSprinting;
                     }
                 }
             }
@@ -80,7 +71,7 @@ class SprintListener : public Listener {
     }
 
 public:
-    explicit SprintListener(const char string[5], Module* module) {
+    explicit SprintListener(const char string[5], Module *module) {
         this->name = string;
         this->module = module;
     }

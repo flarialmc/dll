@@ -8,29 +8,19 @@ class CPSLimiter : public Module {
 public:
 
 
-    CPSLimiter() : Module("CPS Limiter", "Limit how many clicks you can\nregister per second.", "\\Flarial\\assets\\stop.png", 'o') {
+    CPSLimiter() : Module("CPS Limiter", "Limit how many clicks you can\nregister per second.",
+                          R"(\Flarial\assets\stop.png)", "") {
 
-        onEnable();
-
+        Module::setup();
     };
 
-    void onEnable() override {
-
-        Module::onEnable();
-
+    void defaultConfig() override {
         if (settings.getSettingByName<float>("Left") == nullptr) settings.addSetting("Left", 16.0f);
 
         if (settings.getSettingByName<float>("Right") == nullptr) settings.addSetting("Right", 24.0f);
-
     }
 
-    void onDisable() override {
-
-        Module::onDisable();
-
-    }
-
-    void SettingsRender() override {
+    void settingsRender() override {
 
         /* Border Start */
 
@@ -47,7 +37,7 @@ public:
 
         float percent = FlarialGUI::Slider(4, toggleX + FlarialGUI::SettingsTextWidth("Left "),
                                            toggleY, this->settings.getSettingByName<float>("Left")->value, 100.0f,
-                                           1.00f, 0);
+                                           1.00f, false);
 
         this->settings.getSettingByName<float>("Left")->value = percent;
 
@@ -59,7 +49,7 @@ public:
                                         DWRITE_FONT_WEIGHT_NORMAL);
 
         percent = FlarialGUI::Slider(5, toggleX + FlarialGUI::SettingsTextWidth("Right "),
-                                     toggleY, this->settings.getSettingByName<float>("Right")->value, 100.0f, 1.00f, 0);
+                                     toggleY, this->settings.getSettingByName<float>("Right")->value, 100.0f, 1.00f, false);
 
         this->settings.getSettingByName<float>("Right")->value = percent;
     }

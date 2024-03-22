@@ -16,40 +16,40 @@ class ReachListener : public Listener {
 
     float Reach = 0.0f;
     std::chrono::time_point<std::chrono::high_resolution_clock> last_hit;
-    Module* module;
-
-    void onAttack(AttackEvent& event) override {
+    Module *module;
+    // TODO: Better reach calculation
+    void onAttack(AttackEvent &event) override {
         Vec3<float> *LPPos = SDK::clientInstance->getLocalPlayer()->getPosition();
         Vec3<float> *TargetPos = event.getActor()->getPosition();
 
+
         Reach = LPPos->dist(*TargetPos);
-        if(Reach > 3.0f) Reach = 3.0f;
+        if (Reach > 3.0f) Reach = 3.0f;
         last_hit = std::chrono::high_resolution_clock::now();
     }
 
-    void onLocalTick(TickEvent& event) override {
+    void onTick(TickEvent &event) override {
         std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_hit;
         if (duration.count() >= 15) Reach = 0.0f;
 
     }
 
-    void onRender(RenderEvent& event) override {
+    void onRender(RenderEvent &event) override {
 
-        if (SDK::CurrentScreen == "hud_screen")
-            if (module->settings.getSettingByName<bool>("enabled")->value) {
+        if (module->isEnabled()) {
 
-                std::ostringstream oss;
-                oss << std::fixed << std::setprecision(2) << Reach;
-                std::string reachString = oss.str();
+            std::ostringstream oss;
+            oss << std::fixed << std::setprecision(2) << Reach;
+            std::string reachString = oss.str();
 
-                this->module->NormalRender(9, module->settings.getSettingByName<std::string>("text")->value, reachString);
+            this->module->normalRender(9, reachString);
 
-            }
+        }
 
     }
 
 public:
-    explicit  ReachListener(const char string[5], Module* module) {
+    explicit ReachListener(const char string[5], Module *module) {
         this->name = string;
         this->module = module;
     }

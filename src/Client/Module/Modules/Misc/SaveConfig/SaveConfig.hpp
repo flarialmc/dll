@@ -1,4 +1,5 @@
 #pragma once
+
 #include "../../Module.hpp"
 #include "../../../../Client.hpp"
 #include "../../../../Events/EventHandler.hpp"
@@ -8,21 +9,23 @@ class SaveConfig : public Module {
 
 public:
 
-    SaveConfig() : Module("SaveConfig", "Disables the client.", "", VK_F7) {
+    SaveConfig() : Module("SaveConfig", "Disables the client.", "", "") {
 
-        onEnable();
+        Module::setup();
 
     };
 
     void onEnable() override {
 
         EventHandler::registerListener(new SaveConfigListener("SaveConfig"));
+        Module::onEnable();
 
     }
 
     void onDisable() override {
 
         EventHandler::unregisterListener("SaveConfig");
+        Module::onEnable();
 
     }
 };

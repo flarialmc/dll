@@ -2,5 +2,5 @@
 
 class MinecraftGame {
 public:
-	BUILD_ACCESS(this, bool, mouseGrabbed, 0x190);
+    BUILD_ACCESS(this, bool, mouseGrabbed, 0x1A8);
 };

@@ -1,6 +1,7 @@
 #pragma once
+
 #include <format>
-#include <Windows.h>
+#include <windows.h>
 #include "../../../Events/Listener.hpp"
 #include "../../../Events/Input/MouseEvent.hpp"
 #include "../../../../Utils/Logger/Logger.hpp"
@@ -11,23 +12,26 @@
 
 class GUIMouseListener : public Listener {
 
+    Module *module;
+
     void onMouse(MouseEvent &event) override {
 
-       MC::mousepos.x = event.mouseX;
-       MC::mousepos.y = event.mouseY;
-       MC::mousebutton = event.GetButton();
-       MC::mouseaction = event.GetAction();
+        MC::mousePos.x = event.getMouseX();
+        MC::mousePos.y = event.getMouseY();
+        MC::mouseButton = event.getButton();
+        MC::mouseAction = event.getAction();
 
-       if(event.GetButton() != MouseButton::None && event.GetAction() == MouseAction::PRESS) MC::held = true;
-        if(event.GetButton() != MouseButton::None && event.GetAction() == MouseAction::RELEASE) MC::held = false;
+        if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Press) MC::held = true;
+        if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Release) MC::held = false;
 
-        if(event.GetButton() == MouseButton::Scroll)
-        {
-            accumilatedPos += (event.GetAction() == MouseAction::SCROLL_UP) ? FlarialGUI::scrollposmodifier : -FlarialGUI::scrollposmodifier;
-            accumilatedBarPos += (event.GetAction() == MouseAction::SCROLL_UP) ? FlarialGUI::barscrollposmodifier : -FlarialGUI::barscrollposmodifier;
+        if (event.getButton() == MouseButton::Scroll) {
+            accumilatedPos += (event.getAction() == MouseAction::ScrollUp) ? FlarialGUI::scrollposmodifier
+                                                                           : -FlarialGUI::scrollposmodifier;
+            accumilatedBarPos += (event.getAction() == MouseAction::ScrollUp) ? FlarialGUI::barscrollposmodifier
+                                                                              : -FlarialGUI::barscrollposmodifier;
         }
 
-        if(ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value) event.setCancelled(true);
+        if (module->active) event.cancel();
 
     };
 
@@ -35,7 +39,9 @@ public:
 
     static float inline accumilatedPos = 1;
     static float inline accumilatedBarPos = 1;
-    explicit GUIMouseListener(const char string[5]) {
+
+    explicit GUIMouseListener(const char string[5], Module *emodule) {
         this->name = string;
+        this->module = emodule;
     }
 };

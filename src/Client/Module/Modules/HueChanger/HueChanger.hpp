@@ -9,30 +9,29 @@ class HueChanger : public Module {
 
 public:
 
-    void NormalRender(int index, std::string text, std::string value) override {
+    HueChanger() : Module("Saturation", "A filter to saturate or\ndesaturate Minecraft.",
+                          R"(\Flarial\assets\fullbright.png)", "") {
 
-    }
-
-    HueChanger() : Module("Saturation", "A filter to saturate or\ndesaturate Minecraft.", "\\Flarial\\assets\\fullbright.png", 'b') {
-
-        onEnable();
+        Module::setup();
 
     };
 
     void onEnable() override {
-
-        if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 0.5f);
-
-        EventHandler::registerListener(new HueListener("Hue", this));
+        EventHandler::registerPriorityListener(new HueListener("Hue", this));
         Module::onEnable();
     }
 
 
     void onDisable() override {
+        EventHandler::unregisterListener("Hue");
         Module::onDisable();
     }
 
-    void SettingsRender() override {
+    void defaultConfig() override {
+        if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 0.5f);
+    }
+
+    void settingsRender() override {
 
         const float textWidth = Constraints::RelativeConstraint(0.26, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);

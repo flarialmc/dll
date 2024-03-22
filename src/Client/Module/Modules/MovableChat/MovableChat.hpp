@@ -8,29 +8,24 @@ class MovableChat : public Module {
 
 public:
 
-    MovableChat() : Module("Movable Chat", "Makes the Minecraft chat movable.", "\\Flarial\\assets\\man.png", 'Y') {
+    MovableChat() : Module("Movable Chat", "Makes the Minecraft chat movable.", R"(\Flarial\assets\man.png)", "") {
 
-        onEnable();
+        Module::setup();
 
     };
 
     void onEnable() override {
-
-        Module::onEnable();
         EventHandler::registerListener(new MovableChatListener("MovableChat", this));
+        Module::onEnable();
     }
 
     void onDisable() override {
-
         EventHandler::unregisterListener("MovableChat");
-
         Module::onDisable();
-
     }
 
-    void DefaultConfig() override {
+    void defaultConfig() override {
 
-        if (settings.getSettingByName<bool>("enabled") == nullptr) settings.addSetting("enabled", false);
         if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 21.0f);
         if (settings.getSettingByName<float>("percentageX") == nullptr) {
             settings.addSetting("percentageX", 0.0f);
@@ -40,7 +35,7 @@ public:
 
     }
 
-    void SettingsRender() override {
+    void settingsRender() override {
 
         /* Border Start */
 
@@ -52,7 +47,7 @@ public:
 
         FlarialGUI::ScrollBar(toggleX, toggleY, 140, 40, 2);
         FlarialGUI::SetScrollView(toggleX, toggleY, Constraints::RelativeConstraint(1.0, "width"),
-            Constraints::RelativeConstraint(0.90, "height"));
+                                  Constraints::RelativeConstraint(0.90, "height"));
 
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"UI Scale", textWidth * 6.9f,
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,

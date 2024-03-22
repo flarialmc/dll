@@ -10,19 +10,23 @@
 
 class WeatherListener : public Listener {
 
-    Module* module;
+    Module *module;
 
-    void onLocalTick(TickEvent& event) override {
+    void onTick(TickEvent &event) override {
         if (!SDK::clientInstance->getBlockSource())
             return;
 
-        if (module->settings.getSettingByName<bool>("enabled")->value) {
-            if (module->settings.getSettingByName<float>("rain")->value > 0.02f) SDK::clientInstance->getBlockSource()->dimension->weather->rainLevel = module->settings.getSettingByName<float>("rain")->value;
+        if (module->isEnabled()) {
+            if (module->settings.getSettingByName<float>("rain")->value > 0.02f)
+                SDK::clientInstance->getBlockSource()->dimension->weather->rainLevel = module->settings.getSettingByName<float>(
+                        "rain")->value;
             else SDK::clientInstance->getBlockSource()->dimension->weather->rainLevel = 0.0f;
-            if (module->settings.getSettingByName<float>("lighting")->value < 0.02f) SDK::clientInstance->getBlockSource()->dimension->weather->lightingLevel = module->settings.getSettingByName<float>("lighting")->value;
+            if (module->settings.getSettingByName<float>("lighting")->value < 0.02f)
+                SDK::clientInstance->getBlockSource()->dimension->weather->lightingLevel = module->settings.getSettingByName<float>(
+                        "lighting")->value;
             else SDK::clientInstance->getBlockSource()->dimension->weather->lightingLevel = 0.0f;
 
-            if(module->settings.getSettingByName<bool>("snow")->value){
+            if (module->settings.getSettingByName<bool>("snow")->value) {
                 Vec3<float> *pos = event.getActor()->getPosition();
                 Vec3<int> e(pos->x, pos->y, pos->z);
 
@@ -32,7 +36,7 @@ class WeatherListener : public Listener {
     }
 
 public:
-    explicit WeatherListener(const char string[5], Module* module) {
+    explicit WeatherListener(const char string[5], Module *module) {
         this->name = string;
         this->module = module;
     }

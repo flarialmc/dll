@@ -9,29 +9,26 @@ class PatarHD : public Module {
 
 public:
 
-    PatarHD() : Module("PatarHD", "Who is this now?", "\\Flarial\\assets\\skull.png", 'C') {
+    PatarHD() : Module("PatarHD", "Who is this now?", R"(\Flarial\assets\skull.png)", "") {
 
-        onEnable();
+        Module::setup();
 
     };
 
     void onEnable() override {
 
         EventHandler::registerListener(new PatarHDListener("PatarHDListener", this));
-
         Module::onEnable();
 
     }
 
-    void NormalRender(int index, std::string text, std::string value) override {
-
+    void onDisable() override {
+        EventHandler::unregisterListener("PatarHDListener");
+        Module::onDisable();
     }
 
-    virtual void DefaultConfig() override {
+    void defaultConfig() override {
 
-
-        if (settings.getSettingByName<bool>("enabled") == nullptr)
-            settings.addSetting("enabled", false);
         if (settings.getSettingByName<bool>("dvdmode") == nullptr)
             settings.addSetting("dvdmode", true);
         if (settings.getSettingByName<float>("xveloc") == nullptr)
@@ -42,11 +39,7 @@ public:
             settings.addSetting("scale", 1.0f);
     }
 
-    void onDisable() override {
-        Module::onDisable();
-    }
-
-    void SettingsRender() override {
+    void settingsRender() override {
 
         float toggleX = Constraints::PercentageConstraint(0.019, "left");
         float toggleY = Constraints::PercentageConstraint(0.10, "top");
@@ -55,49 +48,54 @@ public:
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
         FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(7.5, textWidth), 2);
-        FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"), Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(1.0f, "height"));
-        
-        if (FlarialGUI::Toggle(0, toggleX, toggleY, this->settings.getSettingByName<bool>(
-            "dvdmode")->value)) this->settings.getSettingByName<bool>("dvdmode")->value = !this->settings.getSettingByName<bool>("dvdmode")->value;
+        FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(1.0f, "height"));
 
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, L"DVD Mode", textWidth * 3.0f, textHeight,
-            DWRITE_TEXT_ALIGNMENT_LEADING,
-            Constraints::RelativeConstraint(0.12, "height", true),
-            DWRITE_FONT_WEIGHT_NORMAL);
+        if (FlarialGUI::Toggle(0, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "dvdmode")->value))
+            this->settings.getSettingByName<bool>("dvdmode")->value = !this->settings.getSettingByName<bool>(
+                    "dvdmode")->value;
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, L"DVD Mode",
+                                        textWidth * 3.0f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        Constraints::RelativeConstraint(0.12, "height", true),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"X Velocity", textWidth * 3.0f, textHeight,
-            DWRITE_TEXT_ALIGNMENT_LEADING,
-            Constraints::RelativeConstraint(0.12, "height", true),
-            DWRITE_FONT_WEIGHT_NORMAL);
+                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        Constraints::RelativeConstraint(0.12, "height", true),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         float percent = FlarialGUI::Slider(0, toggleX + FlarialGUI::SettingsTextWidth("X Velocity "),
-            toggleY, this->settings.getSettingByName<float>("xveloc")->value, 25.0f);
+                                           toggleY, this->settings.getSettingByName<float>("xveloc")->value, 25.0f);
 
         this->settings.getSettingByName<float>("xveloc")->value = percent;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Y Velocity", textWidth * 3.0f, textHeight,
-            DWRITE_TEXT_ALIGNMENT_LEADING,
-            Constraints::RelativeConstraint(0.12, "height", true),
-            DWRITE_FONT_WEIGHT_NORMAL);
+                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        Constraints::RelativeConstraint(0.12, "height", true),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         percent = FlarialGUI::Slider(1, toggleX + FlarialGUI::SettingsTextWidth("Y Velocity "),
-            toggleY, this->settings.getSettingByName<float>("yveloc")->value, 25.0f);
+                                     toggleY, this->settings.getSettingByName<float>("yveloc")->value, 25.0f);
 
         this->settings.getSettingByName<float>("yveloc")->value = percent;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Scale", textWidth * 3.0f, textHeight,
-            DWRITE_TEXT_ALIGNMENT_LEADING,
-            Constraints::RelativeConstraint(0.12, "height", true),
-            DWRITE_FONT_WEIGHT_NORMAL);
+                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        Constraints::RelativeConstraint(0.12, "height", true),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
         percent = FlarialGUI::Slider(2, toggleX + FlarialGUI::SettingsTextWidth("Scale "),
-            toggleY, this->settings.getSettingByName<float>("scale")->value, 5.0f);
+                                     toggleY, this->settings.getSettingByName<float>("scale")->value, 5.0f);
 
         this->settings.getSettingByName<float>("scale")->value = percent;
 

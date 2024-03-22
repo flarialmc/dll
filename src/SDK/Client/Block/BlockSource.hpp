@@ -10,8 +10,9 @@
 class BlockSource {
 public:
 
-	BUILD_ACCESS(this, mcDimension*, dimension, 0x30);
+    BUILD_ACCESS(this, mcDimension*, dimension, 0x30);
 
-	Block* getBlock(const Vec3<int>&);
-    Biome* getBiome(const Vec3<int>&);
+    Block *getBlock(const Vec3<int> &);
+
+    Biome *getBiome(const Vec3<int> &);
 };

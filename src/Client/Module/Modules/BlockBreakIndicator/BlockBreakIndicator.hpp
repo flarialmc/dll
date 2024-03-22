@@ -11,41 +11,42 @@ class BlockBreakIndicator : public Module {
 public:
 
 
-    BlockBreakIndicator() : Module("Break Progress", "Visual indicator to show the progress\nof breaking a block.", "\\Flarial\\assets\\block_break_indicator.png", 'o') {
-
-        onEnable();
-
+    BlockBreakIndicator() : Module("Break Progress", "Visual indicator to show the progress\nof breaking a block.",
+                                   R"(\Flarial\assets\block_break_indicator.png)", "") {
+        Module::setup();
     };
 
     void onEnable() override {
-
-        Module::onEnable();
-
-        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value}");
-
-        if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.00f);
-        if (settings.getSettingByName<bool>("pbmode") == nullptr) settings.addSetting("pbmode", true);
-        if (settings.getSettingByName<bool>("onlyShowWhileBreaking") == nullptr) settings.addSetting("onlyShowWhileBreaking", false);
-        if (settings.getSettingByName<std::string>("orientation") == nullptr) settings.addSetting("orientation", (std::string)"Vertical");
-        if (settings.getSettingByName<float>("pbwidth") == nullptr) settings.addSetting("pbwidth", 0.91f);
-        if (settings.getSettingByName<float>("pbheight") == nullptr) settings.addSetting("pbheight", 0.82f);
-
-        if (settings.getSettingByName<std::string>("barFill") == nullptr) settings.addSetting("barFill", (std::string)"a83232");
-        if (settings.getSettingByName<float>("barFillOpacity") == nullptr) settings.addSetting("barFillOpacity", 1.0f);
-        if (settings.getSettingByName<bool>("barFillRGB") == nullptr) settings.addSetting("barFillRGB", false);
-
         EventHandler::registerListener(new BlockBreakIndicatorListener("BlockBreakIndicatorListener", this));
+        Module::onEnable();
     }
 
     void onDisable() override {
-
         EventHandler::unregisterListener("BlockBreakIndicatorListener");
-
         Module::onDisable();
+    }
+
+    void defaultConfig() override {
+        if (settings.getSettingByName<std::string>("text") == nullptr)
+            settings.addSetting("text", (std::string) "{value}");
+
+        if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.00f);
+        if (settings.getSettingByName<bool>("pbmode") == nullptr) settings.addSetting("pbmode", true);
+        if (settings.getSettingByName<bool>("onlyShowWhileBreaking") == nullptr)
+            settings.addSetting("onlyShowWhileBreaking", false);
+        if (settings.getSettingByName<std::string>("orientation") == nullptr)
+            settings.addSetting("orientation", (std::string) "Vertical");
+        if (settings.getSettingByName<float>("pbwidth") == nullptr) settings.addSetting("pbwidth", 0.91f);
+        if (settings.getSettingByName<float>("pbheight") == nullptr) settings.addSetting("pbheight", 0.82f);
+
+        if (settings.getSettingByName<std::string>("barFill") == nullptr)
+            settings.addSetting("barFill", (std::string) "a83232");
+        if (settings.getSettingByName<float>("barFillOpacity") == nullptr) settings.addSetting("barFillOpacity", 1.0f);
+        if (settings.getSettingByName<bool>("barFillRGB") == nullptr) settings.addSetting("barFillRGB", false);
 
     }
 
-    void SettingsRender() override {
+    void settingsRender() override {
 
         /* Border Start */
 
@@ -56,7 +57,9 @@ public:
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
         FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(7.5, textWidth), 2);
-        FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"), Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(1.0f, "height"));
+        FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(1.0f, "height"));
 
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"UI Scale", textWidth * 3.0f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
@@ -71,7 +74,9 @@ public:
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         if (FlarialGUI::Toggle(0, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "border")->value)) this->settings.getSettingByName<bool>("border")->value = !this->settings.getSettingByName<bool>("border")->value;
+                "border")->value))
+            this->settings.getSettingByName<bool>("border")->value = !this->settings.getSettingByName<bool>(
+                    "border")->value;
 
 
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, L"Border",
@@ -105,12 +110,14 @@ public:
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        FlarialGUI::to_wide("Translucency").c_str(), textWidth * 6.9f, textHeight,
+                                        L"Translucency", textWidth * 6.9f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
 
         if (FlarialGUI::Toggle(4, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "BlurEffect")->value)) this->settings.getSettingByName<bool>("BlurEffect")->value = !this->settings.getSettingByName<bool>("BlurEffect")->value;
+                "BlurEffect")->value))
+            this->settings.getSettingByName<bool>("BlurEffect")->value = !this->settings.getSettingByName<bool>(
+                    "BlurEffect")->value;
 
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
@@ -145,19 +152,23 @@ public:
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        FlarialGUI::to_wide("Reverse Padding X").c_str(), textWidth * 6.9f, textHeight,
+                                        L"Reverse Padding X", textWidth * 6.9f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
         if (FlarialGUI::Toggle(15, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "reversepaddingx")->value)) this->settings.getSettingByName<bool>("reversepaddingx")->value = !this->settings.getSettingByName<bool>("reversepaddingx")->value;
+                "reversepaddingx")->value))
+            this->settings.getSettingByName<bool>("reversepaddingx")->value = !this->settings.getSettingByName<bool>(
+                    "reversepaddingx")->value;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        FlarialGUI::to_wide("Reverse Padding Y").c_str(), textWidth * 6.9f, textHeight,
+                                        L"Reverse Padding Y", textWidth * 6.9f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
         if (FlarialGUI::Toggle(16, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "reversepaddingy")->value)) this->settings.getSettingByName<bool>("reversepaddingy")->value = !this->settings.getSettingByName<bool>("reversepaddingy")->value;
+                "reversepaddingy")->value))
+            this->settings.getSettingByName<bool>("reversepaddingy")->value = !this->settings.getSettingByName<bool>(
+                    "reversepaddingy")->value;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Padding X", textWidth * 3.0f, textHeight,
@@ -203,29 +214,36 @@ public:
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        FlarialGUI::to_wide("Responsive Rectangle (Moves with the Text)").c_str(),
+                                        L"Responsive Rectangle (Moves with the Text)",
                                         textWidth * 5.f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
         if (FlarialGUI::Toggle(17, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "responsivewidth")->value)) this->settings.getSettingByName<bool>("responsivewidth")->value = !this->settings.getSettingByName<bool>("responsivewidth")->value;
+                "responsivewidth")->value))
+            this->settings.getSettingByName<bool>("responsivewidth")->value = !this->settings.getSettingByName<bool>(
+                    "responsivewidth")->value;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        FlarialGUI::to_wide("Progress bar mode").c_str(), textWidth * 5.f, textHeight,
+                                        L"Progress bar mode", textWidth * 5.f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
         if (FlarialGUI::Toggle(18, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "pbmode")->value)) this->settings.getSettingByName<bool>("pbmode")->value = !this->settings.getSettingByName<bool>("pbmode")->value;
+                "pbmode")->value))
+            this->settings.getSettingByName<bool>("pbmode")->value = !this->settings.getSettingByName<bool>(
+                    "pbmode")->value;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        FlarialGUI::to_wide("Only Show Bar only when breaking").c_str(),
+                                        L"Only Show Bar only when breaking",
                                         textWidth * 5.f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
         if (FlarialGUI::Toggle(19, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "onlyShowWhileBreaking")->value)) this->settings.getSettingByName<bool>("onlyShowWhileBreaking")->value = !this->settings.getSettingByName<bool>("onlyShowWhileBreaking")->value;
+                "onlyShowWhileBreaking")->value))
+            this->settings.getSettingByName<bool>(
+                    "onlyShowWhileBreaking")->value = !this->settings.getSettingByName<bool>(
+                    "onlyShowWhileBreaking")->value;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
@@ -279,51 +297,75 @@ public:
         toggleX = Constraints::PercentageConstraint(0.55, "left");
         toggleY = Constraints::PercentageConstraint(0.10, "top");
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Background").c_str(), textWidth * 6.9f,
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Background", textWidth * 6.9f,
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(0, toggleX + FlarialGUI::SettingsTextWidth("Background "), toggleY - Constraints::SpacingConstraint(0.017, textWidth), settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
+        FlarialGUI::ColorPicker(0, toggleX + FlarialGUI::SettingsTextWidth("Background "),
+                                toggleY - Constraints::SpacingConstraint(0.017, textWidth),
+                                settings.getSettingByName<std::string>("bgColor")->value,
+                                settings.getSettingByName<float>("bgOpacity")->value,
+                                settings.getSettingByName<bool>("bgRGB")->value);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Text").c_str(), textWidth * 6.9f,
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Text", textWidth * 6.9f,
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(1, toggleX + FlarialGUI::SettingsTextWidth("Text "), toggleY * 0.99f, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
+        FlarialGUI::ColorPicker(1, toggleX + FlarialGUI::SettingsTextWidth("Text "), toggleY * 0.99f,
+                                settings.getSettingByName<std::string>("textColor")->value,
+                                settings.getSettingByName<float>("textOpacity")->value,
+                                settings.getSettingByName<bool>("textRGB")->value);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Border").c_str(), textWidth * 6.9f,
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Border", textWidth * 6.9f,
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(2, toggleX + FlarialGUI::SettingsTextWidth("Border "), toggleY * 0.99f, settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
+        FlarialGUI::ColorPicker(2, toggleX + FlarialGUI::SettingsTextWidth("Border "), toggleY * 0.99f,
+                                settings.getSettingByName<std::string>("borderColor")->value,
+                                settings.getSettingByName<float>("borderOpacity")->value,
+                                settings.getSettingByName<bool>("borderRGB")->value);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Bar Fill").c_str(), textWidth * 6.9f,
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Bar Fill", textWidth * 6.9f,
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(3, toggleX + FlarialGUI::SettingsTextWidth("Bar Fill "), toggleY * 0.99f, settings.getSettingByName<std::string>("barFill")->value, settings.getSettingByName<float>("barFillOpacity")->value, settings.getSettingByName<bool>("barFillRGB")->value);
+        FlarialGUI::ColorPicker(3, toggleX + FlarialGUI::SettingsTextWidth("Bar Fill "), toggleY * 0.99f,
+                                settings.getSettingByName<std::string>("barFill")->value,
+                                settings.getSettingByName<float>("barFillOpacity")->value,
+                                settings.getSettingByName<bool>("barFillRGB")->value);
 
         FlarialGUI::UnsetScrollView();
 
-        FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
-        FlarialGUI::ColorPickerWindow(1, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
-        FlarialGUI::ColorPickerWindow(2, settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
-        FlarialGUI::ColorPickerWindow(3, settings.getSettingByName<std::string>("barFill")->value, settings.getSettingByName<float>("barFillOpacity")->value, settings.getSettingByName<bool>("barFillRGB")->value);
+        FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("bgColor")->value,
+                                      settings.getSettingByName<float>("bgOpacity")->value,
+                                      settings.getSettingByName<bool>("bgRGB")->value);
+        FlarialGUI::ColorPickerWindow(1, settings.getSettingByName<std::string>("textColor")->value,
+                                      settings.getSettingByName<float>("textOpacity")->value,
+                                      settings.getSettingByName<bool>("textRGB")->value);
+        FlarialGUI::ColorPickerWindow(2, settings.getSettingByName<std::string>("borderColor")->value,
+                                      settings.getSettingByName<float>("borderOpacity")->value,
+                                      settings.getSettingByName<bool>("borderRGB")->value);
+        FlarialGUI::ColorPickerWindow(3, settings.getSettingByName<std::string>("barFill")->value,
+                                      settings.getSettingByName<float>("barFillOpacity")->value,
+                                      settings.getSettingByName<bool>("barFillRGB")->value);
         /* Color Pickers End */
 
     }
 
     float currentHeight = 0.0f;
 
-    void NormalRender(int index, std::string text, std::string value) override {
-
-        if (!CPSListener::GetLeftHeld()) value = "0%";
+    void normalRender(int index, std::string& value) override {
+        if(SDK::currentScreen != "hud_screen") return;
+        // TODO: needs a logic where if you stopped holding left button it wont show progress if its higher than 0% (if u resetted mining you start at 0%)
+        if (!CPSListener::GetLeftHeld()) {
+            value = "0%";
+        }
 
         if (settings.getSettingByName<bool>("pbmode")->value) {
             if (settings.getSettingByName<bool>("onlyShowWhileBreaking")->value && value == "0%") return;
@@ -333,12 +375,20 @@ public:
             std::istringstream(value) >> percent;
             percent /= 100.0f;
 
-            float barheight = Constraints::RelativeConstraint(0.5f * settings.getSettingByName<float>("uiscale")->value);
-            float barwidth = Constraints::RelativeConstraint(0.05f * settings.getSettingByName<float>("uiscale")->value);
+            float barheight = Constraints::RelativeConstraint(
+                    0.5f * settings.getSettingByName<float>("uiscale")->value);
+            float barwidth = Constraints::RelativeConstraint(
+                    0.05f * settings.getSettingByName<float>("uiscale")->value);
 
-            D2D1_COLOR_F bgColor = settings.getSettingByName<bool>("bgRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
-            D2D1_COLOR_F barFill = settings.getSettingByName<bool>("barFillRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("barFill")->value);
-            D2D1_COLOR_F outline = settings.getSettingByName<bool>("borderRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
+            D2D1_COLOR_F bgColor = settings.getSettingByName<bool>("bgRGB")->value ? FlarialGUI::rgbColor
+                                                                                   : FlarialGUI::HexToColorF(
+                            settings.getSettingByName<std::string>("bgColor")->value);
+            D2D1_COLOR_F barFill = settings.getSettingByName<bool>("barFillRGB")->value ? FlarialGUI::rgbColor
+                                                                                        : FlarialGUI::HexToColorF(
+                            settings.getSettingByName<std::string>("barFill")->value);
+            D2D1_COLOR_F outline = settings.getSettingByName<bool>("borderRGB")->value ? FlarialGUI::rgbColor
+                                                                                       : FlarialGUI::HexToColorF(
+                            settings.getSettingByName<std::string>("borderColor")->value);
 
             std::string orientation = settings.getSettingByName<std::string>("orientation")->value;
 
@@ -352,10 +402,17 @@ public:
             );
 
             Vec2<float> coord;
-            Vec2<float> rounde = Constraints::RoundingConstraint(this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value, this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value);
+            Vec2<float> rounde = Constraints::RoundingConstraint(
+                    this->settings.getSettingByName<float>("rounding")->value *
+                    settings.getSettingByName<float>("uiscale")->value,
+                    this->settings.getSettingByName<float>("rounding")->value *
+                    settings.getSettingByName<float>("uiscale")->value);
 
-            if (settingperc.x != 0) coord = Vec2<float>(settingperc.x * MC::windowSize.x, settingperc.y * MC::windowSize.y);
-            else coord = Constraints::CenterConstraint(barwidth * settings.getSettingByName<float>("pbwidth")->value, barheight * settings.getSettingByName<float>("pbheight")->value);
+            if (settingperc.x != 0)
+                coord = Vec2<float>(settingperc.x * MC::windowSize.x, settingperc.y * MC::windowSize.y);
+            else
+                coord = Constraints::CenterConstraint(barwidth * settings.getSettingByName<float>("pbwidth")->value,
+                                                      barheight * settings.getSettingByName<float>("pbheight")->value);
 
             float pbwidth = barwidth * settings.getSettingByName<float>("pbwidth")->value;
             float pbheight = barheight * this->settings.getSettingByName<float>("pbheight")->value;
@@ -364,7 +421,8 @@ public:
                 std::swap(pbwidth, pbheight);
             }
 
-            if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu) {
+            if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
+                ClickGUIRenderer::editmenu) {
                 FlarialGUI::SetWindowRect(coord.x, coord.y, pbwidth, pbheight, index);
 
                 Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(coord.x, coord.y, index, pbwidth, pbheight);
@@ -384,27 +442,37 @@ public:
 
             FlarialGUI::lerp(currentHeight, filledHeight, 0.5f * FlarialGUI::frameFactor);
 
-            if (settings.getSettingByName<bool>("BlurEffect")->value) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(coord.x, coord.y, coord.x + pbwidth, coord.y + pbheight), rounde.x, rounde.x), Client::settings.getSettingByName<float>("blurintensity")->value);
+            if (settings.getSettingByName<bool>("BlurEffect")->value)
+                FlarialGUI::BlurRect(
+                        D2D1::RoundedRect(D2D1::RectF(coord.x, coord.y, coord.x + pbwidth, coord.y + pbheight),
+                                          rounde.x, rounde.x),
+                        Client::settings.getSettingByName<float>("blurintensity")->value);
 
             FlarialGUI::RoundedRect(coord.x, coord.y, bgColor, pbwidth, pbheight, rounde.x, rounde.y);
-            if (orientation == "Horizontal") FlarialGUI::RoundedRect(coord.x, coord.y, barFill, currentHeight, pbheight, rounde.x, rounde.y);
-            else FlarialGUI::RoundedRect(coord.x, coord.y + pbheight - currentHeight, barFill, pbwidth, currentHeight, rounde.x, rounde.y);
+            if (orientation == "Horizontal")
+                FlarialGUI::RoundedRect(coord.x, coord.y, barFill, currentHeight, pbheight, rounde.x, rounde.y);
+            else
+                FlarialGUI::RoundedRect(coord.x, coord.y + pbheight - currentHeight, barFill, pbwidth, currentHeight,
+                                        rounde.x, rounde.y);
 
             if (this->settings.getSettingByName<bool>("border")->value)
                 FlarialGUI::RoundedHollowRect(
                         coord.x,
                         coord.y,
-                        Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
+                        Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value *
+                                                         settings.getSettingByName<float>("uiscale")->value) / 100.0f,
+                                                        "height", true),
                         outline,
                         pbwidth,
                         pbheight,
                         rounde.x,
                         rounde.y
-                        );
+                );
 
-            if (ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("enabled")->value || ClickGUIRenderer::editmenu)
+            if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
+                ClickGUIRenderer::editmenu)
                 FlarialGUI::UnsetWindowRect();
-        } else Module::NormalRender(index, text, value);
+        } else Module::normalRender(index, value);
     }
 };
 

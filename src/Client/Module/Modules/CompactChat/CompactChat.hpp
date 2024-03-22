@@ -10,31 +10,21 @@ class CompactChat : public Module {
 public:
 
 
-    CompactChat() : Module("Compact Chat", "Tired of spammers? Try this out!\nPuts repeated messages into 1 message.", "\\Flarial\\assets\\block_break_indicator.png", 'o') {
+    CompactChat() : Module("Compact Chat", "Tired of spammers? Try this out!\nPuts repeated messages into 1 message.",
+                           R"(\Flarial\assets\block_break_indicator.png)", "") {
 
-        onEnable();
+        Module::setup();
 
     };
 
     void onEnable() override {
-
-        Module::onEnable();
-
         EventHandler::registerListener(new CompactChatListener("CompactChatListener", this));
+        Module::onEnable();
     }
 
     void onDisable() override {
-
         EventHandler::unregisterListener("CompactChatListener");
-
         Module::onDisable();
-
-    }
-
-    void SettingsRender() override {
-
-        
-
     }
 };
 

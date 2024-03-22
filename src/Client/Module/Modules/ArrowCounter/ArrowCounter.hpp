@@ -8,30 +8,29 @@ class ArrowCounter : public Module {
 
 public:
 
-    ArrowCounter() : Module("Arrow Counter", "Counts how many arrows you have\nin your inventory.", "\\Flarial\\assets\\arrow.png", 'Y') {
-
-        onEnable();
-
+    ArrowCounter() : Module("Arrow Counter", "Counts how many arrows you have\nin your inventory.",
+                            R"(\Flarial\assets\arrow.png)", "") {
+        Module::setup();
     };
 
     void onEnable() override {
-
-        Module::onEnable();
-        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value} Arrows");
-
-        if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
         EventHandler::registerListener(new ArrowListener("Arrow", this));
+        Module::onEnable();
     }
 
     void onDisable() override {
-
         EventHandler::unregisterListener("Arrow");
-
         Module::onDisable();
-
     }
 
-    void SettingsRender() override {
+    void defaultConfig() override {
+        if (settings.getSettingByName<std::string>("text") == nullptr)
+            settings.addSetting("text", (std::string) "{value} Arrows");
+
+        if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
+    }
+
+    void settingsRender() override {
 
         /* Border Start */
 
@@ -42,7 +41,9 @@ public:
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
         FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(5.5, textWidth), 2);
-        FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"), Constraints::RelativeConstraint(1.0, "width"), Constraints::RelativeConstraint(1.0f, "height"));
+        FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(1.0f, "height"));
 
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"UI Scale", textWidth * 3.0f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING,
@@ -60,7 +61,9 @@ public:
                                         Constraints::RelativeConstraint(0.12, "height", true),
                                         DWRITE_FONT_WEIGHT_NORMAL);
         if (FlarialGUI::Toggle(0, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "border")->value)) this->settings.getSettingByName<bool>("border")->value = !this->settings.getSettingByName<bool>("border")->value;
+                "border")->value))
+            this->settings.getSettingByName<bool>("border")->value = !this->settings.getSettingByName<bool>(
+                    "border")->value;
         percent = FlarialGUI::Slider(1, toggleX + FlarialGUI::SettingsTextWidth("Border ") +
                                         Constraints::SpacingConstraint(0.60, textWidth),
                                      toggleY, this->settings.getSettingByName<float>("borderWidth")->value, 4);
@@ -84,11 +87,13 @@ public:
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        FlarialGUI::to_wide("Translucency").c_str(), textWidth * 6.9f, textHeight,
+                                        L"Translucency", textWidth * 6.9f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
         if (FlarialGUI::Toggle(4, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "BlurEffect")->value)) this->settings.getSettingByName<bool>("BlurEffect")->value = !this->settings.getSettingByName<bool>("BlurEffect")->value;
+                "BlurEffect")->value))
+            this->settings.getSettingByName<bool>("BlurEffect")->value = !this->settings.getSettingByName<bool>(
+                    "BlurEffect")->value;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::TextBoxVisual(5, settings.getSettingByName<std::string>("text")->value, 16, toggleX, toggleY);
@@ -120,19 +125,23 @@ public:
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        FlarialGUI::to_wide("Reverse Padding X").c_str(), textWidth * 6.9f, textHeight,
+                                        L"Reverse Padding X", textWidth * 6.9f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
         if (FlarialGUI::Toggle(15, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "reversepaddingx")->value)) this->settings.getSettingByName<bool>("reversepaddingx")->value = !this->settings.getSettingByName<bool>("reversepaddingx")->value;
+                "reversepaddingx")->value))
+            this->settings.getSettingByName<bool>("reversepaddingx")->value = !this->settings.getSettingByName<bool>(
+                    "reversepaddingx")->value;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        FlarialGUI::to_wide("Reverse Padding Y").c_str(), textWidth * 6.9f, textHeight,
+                                        L"Reverse Padding Y", textWidth * 6.9f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
         if (FlarialGUI::Toggle(16, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "reversepaddingy")->value)) this->settings.getSettingByName<bool>("reversepaddingy")->value = !this->settings.getSettingByName<bool>("reversepaddingy")->value;
+                "reversepaddingy")->value))
+            this->settings.getSettingByName<bool>("reversepaddingy")->value = !this->settings.getSettingByName<bool>(
+                    "reversepaddingy")->value;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Padding X", textWidth * 3.0f, textHeight,
@@ -178,12 +187,14 @@ public:
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        FlarialGUI::to_wide("Responsive Rectangle (Moves with the Text)").c_str(),
+                                        L"Responsive Rectangle (Moves with the Text)",
                                         textWidth * 5.f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
         if (FlarialGUI::Toggle(17, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "responsivewidth")->value)) this->settings.getSettingByName<bool>("responsivewidth")->value = !this->settings.getSettingByName<bool>("responsivewidth")->value;
+                "responsivewidth")->value))
+            this->settings.getSettingByName<bool>("responsivewidth")->value = !this->settings.getSettingByName<bool>(
+                    "responsivewidth")->value;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
         FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Rotation", textWidth * 3.0f, textHeight,
@@ -205,34 +216,50 @@ public:
         toggleX = Constraints::PercentageConstraint(0.55, "left");
         toggleY = Constraints::PercentageConstraint(0.10, "top");
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Background").c_str(), textWidth * 6.9f,
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Background", textWidth * 6.9f,
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(0, toggleX + FlarialGUI::SettingsTextWidth("Background "), toggleY - Constraints::SpacingConstraint(0.017, textWidth), settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
+        FlarialGUI::ColorPicker(0, toggleX + FlarialGUI::SettingsTextWidth("Background "),
+                                toggleY - Constraints::SpacingConstraint(0.017, textWidth),
+                                settings.getSettingByName<std::string>("bgColor")->value,
+                                settings.getSettingByName<float>("bgOpacity")->value,
+                                settings.getSettingByName<bool>("bgRGB")->value);
 
         toggleX = Constraints::PercentageConstraint(0.55, "left");
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Text").c_str(), textWidth * 6.9f,
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Text", textWidth * 6.9f,
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(1, toggleX + FlarialGUI::SettingsTextWidth("Text "), toggleY * 0.99f, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
+        FlarialGUI::ColorPicker(1, toggleX + FlarialGUI::SettingsTextWidth("Text "), toggleY * 0.99f,
+                                settings.getSettingByName<std::string>("textColor")->value,
+                                settings.getSettingByName<float>("textOpacity")->value,
+                                settings.getSettingByName<bool>("textRGB")->value);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, FlarialGUI::to_wide("Border").c_str(), textWidth * 6.9f,
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Border", textWidth * 6.9f,
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(2, toggleX + FlarialGUI::SettingsTextWidth("Border "), toggleY * 0.99f, settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
+        FlarialGUI::ColorPicker(2, toggleX + FlarialGUI::SettingsTextWidth("Border "), toggleY * 0.99f,
+                                settings.getSettingByName<std::string>("borderColor")->value,
+                                settings.getSettingByName<float>("borderOpacity")->value,
+                                settings.getSettingByName<bool>("borderRGB")->value);
 
         FlarialGUI::UnsetScrollView();
 
-        FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
-        FlarialGUI::ColorPickerWindow(1, settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
-        FlarialGUI::ColorPickerWindow(2, settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
+        FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("bgColor")->value,
+                                      settings.getSettingByName<float>("bgOpacity")->value,
+                                      settings.getSettingByName<bool>("bgRGB")->value);
+        FlarialGUI::ColorPickerWindow(1, settings.getSettingByName<std::string>("textColor")->value,
+                                      settings.getSettingByName<float>("textOpacity")->value,
+                                      settings.getSettingByName<bool>("textRGB")->value);
+        FlarialGUI::ColorPickerWindow(2, settings.getSettingByName<std::string>("borderColor")->value,
+                                      settings.getSettingByName<float>("borderOpacity")->value,
+                                      settings.getSettingByName<bool>("borderRGB")->value);
         /* Color Pickers End */
 
 

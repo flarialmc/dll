@@ -1,4 +1,5 @@
 #pragma once
+
 #include <format>
 #include "../../../Events/Listener.hpp"
 #include "../../../Events/Input/KeyEvent.hpp"
@@ -9,21 +10,23 @@
 
 class dvdListener : public Listener {
 
-    Module* module;
+    Module *module;
     int color = 1;
     float x = 0;
     float y = 0;
     float xv = 1;
     float yv = 1;
 
-    void onRender(RenderEvent& event) override {
-
-        if (module->settings.getSettingByName<bool>("enabled")->value && SDK::clientInstance->getTopScreenName() == "hud_screen") {
+    void onRender(RenderEvent &event) override {
+        if (module->isEnabled() &&
+            ClientInstance::getTopScreenName() == "hud_screen") {
             float height = 83 * module->settings.getSettingByName<float>("scale")->value;
             float width = 187 * module->settings.getSettingByName<float>("scale")->value;
 
-            FlarialGUI::Image("\\Flarial\\assets\\dvdlogo-0" + std::to_string(color) + ".png",
-                D2D1::RectF(x, y, x + width, y + height));
+            auto path = R"(\Flarial\assets\dvdlogo-0)" + std::to_string(color) + ".png";
+
+            FlarialGUI::image(path,
+                              D2D1::RectF(x, y, x + width, y + height));
 
             x += module->settings.getSettingByName<float>("xveloc")->value * xv;
             y += module->settings.getSettingByName<float>("yveloc")->value * yv;
@@ -54,7 +57,7 @@ class dvdListener : public Listener {
 
 
 public:
-    explicit dvdListener(const char string[5], Module* module) {
+    explicit dvdListener(const char string[5], Module *module) {
         this->name = string;
         this->module = module;
     }
