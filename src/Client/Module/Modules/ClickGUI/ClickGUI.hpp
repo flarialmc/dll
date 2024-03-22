@@ -19,10 +19,12 @@ public:
         Module::onEnable();
     }
 
-    void onDisable() override {
+    void onDisable() override {}
+
+    void terminate() override {
         EventHandler::unregisterListener("ClickGUI");
         EventHandler::unregisterListener("GUIMouse");
-        Module::onDisable();
+        Module::terminate();
     }
 
     void defaultConfig() override {
