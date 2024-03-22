@@ -65,11 +65,6 @@ public:
     }
 
     void onRender(RenderEvent &event) override {
-        if (ClientInstance::getTopScreenName() != "hud_screen") {
-            FlarialGUI::NotifyHeartbeat();
-            return;
-        }
-
         float allahu = Constraints::RelativeConstraint(0.65);
         float akbar = Constraints::RelativeConstraint(0.25);
         Vec2<float> allahuakbar = Constraints::CenterConstraint(allahu, akbar, "y", 1.175, 1.175);
@@ -82,6 +77,10 @@ public:
                                   D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
                                               allahuakbar.y + akbar));
 
+        if (ClientInstance::getTopScreenName() != "hud_screen") {
+            FlarialGUI::NotifyHeartbeat();
+            return;
+        }
 
         if (FlarialGUI::scrollposmodifier == 0) {
             FlarialGUI::scrollposmodifier = Constraints::RelativeConstraint(0.1f);
