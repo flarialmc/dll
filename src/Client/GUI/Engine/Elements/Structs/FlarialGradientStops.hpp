@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../D2D.hpp"
+#include "../../../D2D.hpp"
 
 struct FlarialGradientStops {
     float position;

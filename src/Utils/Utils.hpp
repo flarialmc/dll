@@ -246,6 +246,8 @@ public:
     static std::string removeNonAlphanumeric(const std::string &input);
 
     static std::string remomveNonNumeric(const std::string &input);
+
+    static bool CursorInEllipse(float ellipseX, float ellipseY, float radiusX, float radiusY);
 };
 
 struct CaretMeasureData {

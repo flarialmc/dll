@@ -38,7 +38,7 @@ if("${MSVC_RUNTIME}" STREQUAL "")
 endif()
 
 
-file(GLOB_RECURSE sources "main.cpp" "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp")
+file(GLOB_RECURSE sources "main.cpp" "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp" "src/Client/GUI/Engine/*.cpp")
 
 add_library(${PROJECT_NAME} SHARED ${sources} src/SDK/Client/Render/Matrix.cpp)
 

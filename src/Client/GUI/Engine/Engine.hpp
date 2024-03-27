@@ -11,15 +11,15 @@
 #include <chrono>
 #include <unordered_map>
 #include "../../../Utils/Memory/LRUCache.hpp"
-#include "Elements/HSV.hpp"
-#include "Elements/WindowRect.hpp"
-#include "Elements/SliderRect.hpp"
-#include "Elements/TextBoxStruct.hpp"
-#include "Elements/ColorPicker.hpp"
-#include "Elements/KeybindSelector.hpp"
-#include "Elements/DropdownStruct.hpp"
-#include "Elements/ToolTipStruct.hpp"
-#include "Elements/Notification.hpp"
+#include "Elements/Structs/Notification.hpp"
+#include "Elements/Structs/KeybindSelector.hpp"
+#include "Elements/Structs/DropdownStruct.hpp"
+#include "Elements/Structs/ColorPicker.hpp"
+#include "Elements/Structs/TextBoxStruct.hpp"
+#include "Elements/Structs/SliderRect.hpp"
+#include "Elements/Structs/WindowRect.hpp"
+#include "Elements/Structs/ToolTipStruct.hpp"
+#include "Elements/Structs/HSV.hpp"
 
 class Dimension {
 public:
@@ -113,6 +113,9 @@ namespace FlarialGUI {
 
     void RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, float width = 160,
                                   float height = 100, float radiusX = 10, float radiusY = 10);
+
+    bool Button(float x, float y, D2D_COLOR_F color, D2D_COLOR_F textColor, const wchar_t *text,
+                float width = 100.0f, float height = 160.0f);
 
     void LoadImageFromFile(const wchar_t *filename, ID2D1Bitmap **bitmap);
 
