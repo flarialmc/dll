@@ -7,6 +7,7 @@
 #include "../Module.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
 #include <Windows.h>
+#include <iostream>
 
 class TabListListener : public Listener {
 
@@ -25,6 +26,8 @@ class TabListListener : public Listener {
         if (!module->isKeybind(event.keys)) module->active = false;
 
     };
+
+
 
 public:
     explicit TabListListener(const char string[5], Module* module) {

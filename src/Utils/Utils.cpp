@@ -333,6 +333,8 @@ std::string Utils::getKeyAsString(int key, bool isCapital, bool isKeybind) {
                 return "/";
             case 187:
                 return "=";
+            case 189:
+                return "-";
             case 186:
                 return (std::string) ";";
             default:
@@ -371,7 +373,6 @@ int Utils::getStringAsKey(const std::string &str) {
     if (str == "F10" || str == "f10") return 121;
     if (str == "F11" || str == "f11") return 122;
     if (str == "F12" || str == "f12") return 123;
-
     char c = str[0];
 
     return static_cast<int>(std::toupper(c));

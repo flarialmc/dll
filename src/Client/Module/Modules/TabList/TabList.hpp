@@ -344,6 +344,10 @@ public:
 
 
                         auto it = std::find(ModuleManager::onlineUsers.begin(), ModuleManager::onlineUsers.end(), name);
+                        auto it2 = std::find(ModuleManager::onlineDevs.begin(), ModuleManager::onlineDevs.end(), name);
+                        auto it3 = std::find(ModuleManager::onlineCommites.begin(), ModuleManager::onlineCommites.end(), name);
+                        auto it4 = std::find(ModuleManager::onlinePluses.begin(), ModuleManager::onlinePluses.end(), name);
+                        auto it5 = std::find(ModuleManager::onlineStaff.begin(), ModuleManager::onlineStaff.end(), name);
 
                         // Check if the string was found
 
@@ -365,6 +369,55 @@ public:
                                                           fakex + Constraints::SpacingConstraint(1.1, keycardSize),
                                                           realcenter.y +
                                                           Constraints::SpacingConstraint(1.22, keycardSize)));
+
+                            xx = Constraints::SpacingConstraint(0.5, keycardSize);
+
+                        }
+
+                        if (it2 != ModuleManager::onlineDevs.end()) {
+                            FlarialGUI::image(R"(\Flarial\assets\flarial.png)",
+                                D2D1::RectF(fakex + Constraints::SpacingConstraint(0.2, keycardSize),
+                                    realcenter.y +
+                                    Constraints::SpacingConstraint(0.12, keycardSize),
+                                    fakex + Constraints::SpacingConstraint(1.1, keycardSize),
+                                    realcenter.y +
+                                    Constraints::SpacingConstraint(1.22, keycardSize)));
+
+                            xx = Constraints::SpacingConstraint(0.5, keycardSize);
+
+                        }
+                        if (it3 != ModuleManager::onlineCommites.end()) {
+                            FlarialGUI::image(R"(\Flarial\assets\flarial-contribiutor.png)",
+                                D2D1::RectF(fakex + Constraints::SpacingConstraint(0.2, keycardSize),
+                                    realcenter.y +
+                                    Constraints::SpacingConstraint(0.12, keycardSize),
+                                    fakex + Constraints::SpacingConstraint(1.1, keycardSize),
+                                    realcenter.y +
+                                    Constraints::SpacingConstraint(1.22, keycardSize)));
+
+                            xx = Constraints::SpacingConstraint(0.5, keycardSize);
+
+                        }
+                        if (it4 != ModuleManager::onlinePluses.end()) {
+                            FlarialGUI::image(R"(\Flarial\assets\flarial-premium.png)",
+                                D2D1::RectF(fakex + Constraints::SpacingConstraint(0.2, keycardSize),
+                                    realcenter.y +
+                                    Constraints::SpacingConstraint(0.12, keycardSize),
+                                    fakex + Constraints::SpacingConstraint(1.1, keycardSize),
+                                    realcenter.y +
+                                    Constraints::SpacingConstraint(1.22, keycardSize)));
+
+                            xx = Constraints::SpacingConstraint(0.5, keycardSize);
+
+                        }
+                        if (it5 != ModuleManager::onlineStaff.end()) {
+                            FlarialGUI::image(R"(\Flarial\assets\flarial-staff.png)",
+                                D2D1::RectF(fakex + Constraints::SpacingConstraint(0.2, keycardSize),
+                                    realcenter.y +
+                                    Constraints::SpacingConstraint(0.12, keycardSize),
+                                    fakex + Constraints::SpacingConstraint(1.1, keycardSize),
+                                    realcenter.y +
+                                    Constraints::SpacingConstraint(1.22, keycardSize)));
 
                             xx = Constraints::SpacingConstraint(0.5, keycardSize);
 
@@ -401,6 +454,27 @@ public:
                             name = "[F] " + name;
                         }
 
+                        auto it2 = std::find(ModuleManager::onlineDevs.begin(), ModuleManager::onlineDevs.end(), name);
+
+                        // Check if the string was found
+                        if (it2 != ModuleManager::onlineDevs.end()) {
+                            name = "[FD] " + name;
+                        }
+
+                        auto it3 = std::find(ModuleManager::onlineCommites.begin(), ModuleManager::onlineCommites.end(), name);
+
+                        // Check if the string was found
+                        if (it3 != ModuleManager::onlineCommites.end()) {
+                            name = "[FC] " + name;
+                        }
+
+                        auto it4 = std::find(ModuleManager::onlinePluses.begin(), ModuleManager::onlinePluses.end(), name);
+
+                        // Check if the string was found
+                        if (it4 != ModuleManager::onlinePluses.end()) {
+                            name = "[FP] " + name;
+                        }
+
                         auto module = ModuleManager::getModule("Nick");
 
                         if (module->isEnabled() &&
@@ -429,7 +503,7 @@ public:
 
                 // TODO ModuleManager::getModule("ClickGUI") FIND ALL AND REPLACE!!!
 
-                if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
+                if (ModuleManager::getModule("ClickGUI")->active ||
                     ClickGUIRenderer::editmenu)
 
                     FlarialGUI::UnsetWindowRect();

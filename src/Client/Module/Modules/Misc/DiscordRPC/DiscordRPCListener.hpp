@@ -7,7 +7,6 @@
 class DiscordRPCListener : public Listener {
 
 public:
-    std::string towriteip;
 
     void onRaknetTick(RaknetTickEvent &event) override {
         static bool once = false;
@@ -49,7 +48,7 @@ public:
                     CloseHandle(fileHandle);
                 }
 
-                if (towriteip != ip) {
+                if (SDK::getServerIP() != ip) {
 
                     std::ofstream outputFile(settingspath);
                     if (outputFile.is_open()) {
@@ -57,7 +56,6 @@ public:
                         outputFile.close();
                     }
 
-                    towriteip = ip;
                 }
             }
         }
