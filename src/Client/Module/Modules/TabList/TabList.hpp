@@ -375,7 +375,7 @@ public:
                         }
 
                         if (it2 != ModuleManager::onlineDevs.end()) {
-                            FlarialGUI::image(R"(\Flarial\assets\flarial.png)",
+                            FlarialGUI::image(R"(\Flarial\assets\flarial-dev.png)",
                                 D2D1::RectF(fakex + Constraints::SpacingConstraint(0.2, keycardSize),
                                     realcenter.y +
                                     Constraints::SpacingConstraint(0.12, keycardSize),
