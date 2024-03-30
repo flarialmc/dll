@@ -29,7 +29,7 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
     }
 
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
-    D2D::context->FillRoundedRectangle(roundedRect, FlarialGUI::getBrush(buttonColor));
+    D2D::context->FillRoundedRectangle(roundedRect, FlarialGUI::getBrush(buttonColor).get());
 
     x += Constraints::SpacingConstraint(0.077, width);
     //D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);

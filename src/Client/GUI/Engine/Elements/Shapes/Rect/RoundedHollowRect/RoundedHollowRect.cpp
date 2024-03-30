@@ -5,7 +5,7 @@ void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2
     if (isInScrollView) y += scrollpos;
 
     ID2D1SolidColorBrush *brush;
-    brush = FlarialGUI::getBrush(color);
+    brush = FlarialGUI::getBrush(color).get();
     D2D1_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
 
     // Make the border extend from the outside only

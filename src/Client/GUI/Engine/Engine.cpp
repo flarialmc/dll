@@ -54,13 +54,13 @@
 std::map<std::string, ID2D1Bitmap *> ImagesClass::eimages;
 
 // TODO: release it !!!
+ID2D1Factory *FlarialGUI::factory;
 IDWriteFactory *FlarialGUI::writeFactory;
 ID2D1ImageBrush *FlarialGUI::blurbrush;
-ID2D1Factory *FlarialGUI::factory;
 
 // todo: all use cache
 std::unordered_map<std::string, ToolTipStruct> FlarialGUI::tooltips;
-std::unordered_map<UINT32, winrt::com_ptr<ID2D1SolidColorBrush>> FlarialGUI::brushCache;
+LRUCache<UINT32, winrt::com_ptr<ID2D1SolidColorBrush>> FlarialGUI::brushCache(300);
 std::unordered_map<std::string, ID2D1Image *> FlarialGUI::cachedBitmaps;
 
 LRUCache<uint64_t, winrt::com_ptr<IDWriteTextLayout>> FlarialGUI::textLayoutCache(4000);
@@ -68,42 +68,7 @@ LRUCache<UINT32, winrt::com_ptr<IDWriteTextFormat>> FlarialGUI::textFormatCache(
 
 std::unordered_map<int, float> FlarialGUI::additionalY;
 //std::unordered_map<std::string, winrt::com_ptr<ID2D1GradientStopCollection>> FlarialGUI::gradientStopCache;
-std::unordered_map<std::string, winrt::com_ptr<ID2D1LinearGradientBrush>> FlarialGUI::gradientBrushCache;
-
-bool FlarialGUI::CursorInRect(float rectX, float rectY, float width, float height) {
-    if (MC::mousePos.x >= rectX && MC::mousePos.x <= rectX + width && MC::mousePos.y >= rectY &&
-        MC::mousePos.y <= rectY + height) {
-        return true;
-    }
-    return false;
-}
-
-bool FlarialGUI::isRectInRect(const D2D1_RECT_F &outer, const D2D1_RECT_F &inner) {
-    return (inner.left <= outer.right &&
-            inner.right >= outer.left &&
-            inner.top <= outer.bottom &&
-            inner.bottom >= outer.top);
-}
-
-void FlarialGUI::PushSize(float x, float y, float width, float height) {
-    Dimension size;
-    size.x = x;
-    size.y = y;
-    size.width = width;
-    size.height = height;
-
-    dimensionStack.push(size);
-}
-
-void FlarialGUI::PopSize() {
-    dimensionStack.pop();
-}
-
-void FlarialGUI::PopAllStack() {
-    if (!dimensionStack.empty()) {
-        dimensionStack.pop();
-    }
-}
+LRUCache<uint64_t, winrt::com_ptr<ID2D1LinearGradientBrush>> FlarialGUI::gradientBrushCache(300);
 
 UINT32 ColorValueToUInt(const D3DCOLORVALUE &color) {
     auto r = static_cast<uint8_t>(color.r * 255.0f);
@@ -113,52 +78,6 @@ UINT32 ColorValueToUInt(const D3DCOLORVALUE &color) {
 
     // Combine the color components into a single unsigned int
     return (static_cast<UINT32>(a) << 24) | (static_cast<UINT32>(r) << 16) | (static_cast<UINT32>(g) << 8) | b;
-}
-
-ID2D1LinearGradientBrush *FlarialGUI::getLinearGradientBrush(float x, float hexPreviewSize, float shadePickerWidth,
-                                                             ID2D1GradientStopCollection *pGradientStops,
-                                                             const std::string& susKey) {
-    // Include gradient stop colors in the cache key
-    std::string key = std::to_string(x) + std::to_string(hexPreviewSize) + std::to_string(shadePickerWidth) + susKey;
-
-
-    auto it = gradientBrushCache.find(key);
-    if (it != gradientBrushCache.end()) {
-        return it->second.get();
-    } else {
-        winrt::com_ptr<ID2D1LinearGradientBrush> gBrush;
-
-        D2D::context->CreateLinearGradientBrush(
-                D2D1::LinearGradientBrushProperties(
-                        D2D1::Point2F(x + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize), 0),
-                        D2D1::Point2F(x + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize) +
-                                      shadePickerWidth, 0)
-                ),
-                D2D1::BrushProperties(),
-                pGradientStops,
-                gBrush.put()
-        );
-
-        gradientBrushCache[key] = gBrush;
-        return gBrush.get();
-    }
-}
-
-ID2D1SolidColorBrush *FlarialGUI::getBrush(D2D1_COLOR_F color) {
-
-    UINT32 key = ColorValueToUInt(color);
-
-    auto it = brushCache.find(key);
-    if (it != brushCache.end()) {
-        return it->second.get();
-    } else {
-        winrt::com_ptr<ID2D1SolidColorBrush> brush;
-        D2D::context->CreateSolidColorBrush(color, brush.put());
-
-        brushCache[key] = brush;
-
-        return brush.get();
-    }
 }
 
 uint64_t generateUniqueKey(const wchar_t *text, DWRITE_TEXT_ALIGNMENT alignment,
@@ -200,9 +119,127 @@ uint32_t generateUniqueTextFormatKey(std::string &font, int alignment,
     return combinedHash;
 }
 
+uint64_t generateUniqueLinearGradientBrushKey(float x, float hexPreviewSize, float shadePickerWidth,
+                                              ID2D1GradientStopCollection *pGradientStops) {
+
+    // Use std::hash to create a hash value for each parameter
+    std::hash<float> xHash;
+    std::hash<float> hexPreviewSizeHash;
+    std::hash<float> shadePickerWidthHash;
+    std::hash<UINT32> stopsHash;
+
+    // Combine the hash values of each parameter
+    size_t combinedHash = xHash(x) ^
+            hexPreviewSizeHash(hexPreviewSize) ^
+            shadePickerWidthHash(shadePickerWidth) ^
+            stopsHash(pGradientStops->GetGradientStopCount());
+
+    return combinedHash;
+}
+
+bool FlarialGUI::CursorInRect(float rectX, float rectY, float width, float height) {
+    if (MC::mousePos.x >= rectX && MC::mousePos.x <= rectX + width && MC::mousePos.y >= rectY &&
+        MC::mousePos.y <= rectY + height) {
+        return true;
+    }
+    return false;
+}
+
+bool FlarialGUI::isRectInRect(const D2D1_RECT_F &outer, const D2D1_RECT_F &inner) {
+    return (inner.left <= outer.right &&
+            inner.right >= outer.left &&
+            inner.top <= outer.bottom &&
+            inner.bottom >= outer.top);
+}
+
+void FlarialGUI::PushSize(float x, float y, float width, float height) {
+    Dimension size;
+    size.x = x;
+    size.y = y;
+    size.width = width;
+    size.height = height;
+
+    dimensionStack.push(size);
+}
+
+void FlarialGUI::PopSize() {
+    dimensionStack.pop();
+}
+
+void FlarialGUI::PopAllStack() {
+    if (!dimensionStack.empty()) {
+        dimensionStack.pop();
+    }
+}
+
+winrt::com_ptr<ID2D1LinearGradientBrush> CreateLinearGradientBrush(float x, float hexPreviewSize, float shadePickerWidth,
+                                                     ID2D1GradientStopCollection *pGradientStops) {
+    winrt::com_ptr<ID2D1LinearGradientBrush> gBrush;
+
+    D2D::context->CreateLinearGradientBrush(
+            D2D1::LinearGradientBrushProperties(
+                    D2D1::Point2F(x + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize), 0),
+                    D2D1::Point2F(x + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize) +
+                                  shadePickerWidth, 0)
+            ),
+            D2D1::BrushProperties(),
+            pGradientStops,
+            gBrush.put()
+    );
+
+    return gBrush;
+}
+
+winrt::com_ptr<ID2D1LinearGradientBrush> FlarialGUI::getLinearGradientBrush(float x, float hexPreviewSize, float shadePickerWidth,
+                                                                            ID2D1GradientStopCollection *pGradientStops) {
+
+    uint64_t key = generateUniqueLinearGradientBrushKey(x, hexPreviewSize, shadePickerWidth, pGradientStops);
+
+    winrt::com_ptr<ID2D1LinearGradientBrush> result = FlarialGUI::gradientBrushCache.getOrInsert(CreateLinearGradientBrush, key, x, hexPreviewSize, shadePickerWidth, pGradientStops);
+    return result;
+}
+
+winrt::com_ptr<IDWriteTextLayout> CreateTextLayout(const wchar_t *text,
+                                                   const DWRITE_TEXT_ALIGNMENT alignment,
+                                                   DWRITE_PARAGRAPH_ALIGNMENT paragraphAlignment, const float fontSize,
+                                                   const DWRITE_FONT_WEIGHT weight, float maxWidth, float maxHeight,
+                                                   bool moduleFont) {
+
+    winrt::com_ptr<IDWriteTextFormat> textFormat = FlarialGUI::GetTextFormat(alignment, paragraphAlignment, fontSize,
+                                                                             weight, moduleFont);
+
+    winrt::com_ptr<IDWriteTextLayout> textLayout;
+    //IDWriteTextLayout* textLayout;
+    FlarialGUI::writeFactory->CreateTextLayout(
+            text,
+            (UINT32) wcslen(text),
+            textFormat.get(),
+            maxWidth,
+            maxHeight,
+            textLayout.put()
+    );
+    return textLayout;
+}
+
+winrt::com_ptr<ID2D1SolidColorBrush> CreateBrush(D2D1_COLOR_F color) {
+    winrt::com_ptr<ID2D1SolidColorBrush> brush;
+
+    D2D::context->CreateSolidColorBrush(color, brush.put());
+
+    return brush;
+}
+
+winrt::com_ptr<ID2D1SolidColorBrush> FlarialGUI::getBrush(D2D1_COLOR_F color) {
+
+    UINT32 key = ColorValueToUInt(color);
+
+    winrt::com_ptr<ID2D1SolidColorBrush> result = FlarialGUI::brushCache.getOrInsert(CreateBrush, key, color);
+    //const winrt::com_ptr<IDWriteTextFormat> result = CreateTextFormat(alignment, paragraphAlignment, fontSize, weight, moduleFont);
+    return result;
+}
+
 // TODO Constrains to constants !!!
-winrt::com_ptr<IDWriteTextFormat>
-CreateTextFormat(const DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT paragraphAlignment,
+winrt::com_ptr<IDWriteTextFormat> CreateTextFormat(const DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT paragraphAlignment,
                  const float fontSize,
                  const DWRITE_FONT_WEIGHT weight, bool moduleFont) {
     std::string fontName = Client::settings.getSettingByName<std::string>(
@@ -227,31 +264,7 @@ CreateTextFormat(const DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNME
     return textFormat;
 }
 
-// TODO Constrains to constants !!!
-winrt::com_ptr<IDWriteTextLayout> CreateTextLayout(const wchar_t *text,
-                                                   const DWRITE_TEXT_ALIGNMENT alignment,
-                                                   DWRITE_PARAGRAPH_ALIGNMENT paragraphAlignment, const float fontSize,
-                                                   const DWRITE_FONT_WEIGHT weight, float maxWidth, float maxHeight,
-                                                   bool moduleFont) {
-
-    winrt::com_ptr<IDWriteTextFormat> textFormat = FlarialGUI::GetTextFormat(alignment, paragraphAlignment, fontSize,
-                                                                             weight, moduleFont);
-
-    winrt::com_ptr<IDWriteTextLayout> textLayout;
-    //IDWriteTextLayout* textLayout;
-    FlarialGUI::writeFactory->CreateTextLayout(
-            text,
-            (UINT32) wcslen(text),
-            textFormat.get(),
-            maxWidth,
-            maxHeight,
-            textLayout.put()
-    );
-    return textLayout;
-}
-
-winrt::com_ptr<IDWriteTextFormat>
-FlarialGUI::GetTextFormat(const DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT paragraphAlignment,
+winrt::com_ptr<IDWriteTextFormat>  FlarialGUI::GetTextFormat(const DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT paragraphAlignment,
                           const float fontSize,
                           const DWRITE_FONT_WEIGHT weight, bool moduleFont) {
     UINT32 key = generateUniqueTextFormatKey(
@@ -448,7 +461,7 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, float width,
                                                 DWRITE_FONT_WEIGHT_REGULAR, width, height);
 
     //D2D1_RECT_F textRect = D2D1::RectF(x, y, x + width, y + height);
-    D2D::context->DrawTextLayout(D2D1::Point2F(x, y), textLayout.get(), FlarialGUI::getBrush(color));
+    D2D::context->DrawTextLayout(D2D1::Point2F(x, y), textLayout.get(), FlarialGUI::getBrush(color).get());
 
 }
 
@@ -478,7 +491,7 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
 
     auto textLayout = FlarialGUI::GetTextLayout(text, alignment, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, fontSize, weight,
                                                 width, height, moduleFont);
-    D2D::context->DrawTextLayout(D2D1::Point2F(x, y), textLayout.get(), FlarialGUI::getBrush(color));
+    D2D::context->DrawTextLayout(D2D1::Point2F(x, y), textLayout.get(), FlarialGUI::getBrush(color).get());
 
 }
 

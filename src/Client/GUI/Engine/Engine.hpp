@@ -79,11 +79,11 @@ namespace FlarialGUI {
     inline ID2D1Image *blur_bitmap_cache = nullptr;
 
     extern std::unordered_map<std::string, ToolTipStruct> tooltips;
-    extern std::unordered_map<UINT32, winrt::com_ptr<ID2D1SolidColorBrush>> brushCache;
+    extern LRUCache<UINT32, winrt::com_ptr<ID2D1SolidColorBrush>> brushCache;
     extern LRUCache<uint64_t, winrt::com_ptr<IDWriteTextLayout>> textLayoutCache;
     extern LRUCache<UINT32, winrt::com_ptr<IDWriteTextFormat>> textFormatCache;
     //extern std::unordered_map<std::string, winrt::com_ptr<ID2D1GradientStopCollection>> gradientStopCache;
-    extern std::unordered_map<std::string, winrt::com_ptr<ID2D1LinearGradientBrush>> gradientBrushCache;
+    extern LRUCache<uint64_t, winrt::com_ptr<ID2D1LinearGradientBrush>> gradientBrushCache;
 
     void PushSize(float x, float y, float width, float height);
 
@@ -231,7 +231,7 @@ namespace FlarialGUI {
     std::string
     TextBoxVisual(int index, std::string &text, int limit, float x, float y, const std::string &real = "Text Format");
 
-    ID2D1SolidColorBrush *getBrush(D2D1_COLOR_F color);
+    winrt::com_ptr<ID2D1SolidColorBrush> getBrush(D2D1_COLOR_F color);
 
     extern IDWriteFactory *writeFactory;
 
@@ -259,9 +259,8 @@ namespace FlarialGUI {
 
     void RGBController();
 
-    ID2D1LinearGradientBrush *getLinearGradientBrush(float x, float hexPreviewSize, float shadePickerWidth,
-                                                     ID2D1GradientStopCollection *pGradientStops,
-                                                     const std::string &susKey);
+    winrt::com_ptr<ID2D1LinearGradientBrush> getLinearGradientBrush(float x, float hexPreviewSize, float shadePickerWidth,
+                                                     ID2D1GradientStopCollection *pGradientStops);
 
     void Tooltip(const std::string &id, float x, float y, const std::string &text, float width, float height,
                  bool push = true,

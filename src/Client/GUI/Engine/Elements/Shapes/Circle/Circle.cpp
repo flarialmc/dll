@@ -5,7 +5,7 @@ void FlarialGUI::Circle(float x, float y, const D2D1_COLOR_F &color, float radiu
     // Create a brush using the specified color
     ID2D1SolidColorBrush *brush;
 
-    brush = FlarialGUI::getBrush(color);
+    brush = FlarialGUI::getBrush(color).get();
 
     // Create an ellipse with the specified parameters
     D2D1_ELLIPSE ellipse;

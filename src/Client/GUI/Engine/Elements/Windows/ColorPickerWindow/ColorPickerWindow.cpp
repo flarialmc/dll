@@ -223,13 +223,6 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float &opacity, 
         while (y <= originalY + shadePickerHeight) {
             memset(gradientStops, 0, sizeof(gradientStops));
 
-            std::string firstHSV = std::to_string((ColorPickers[index].hueX / hlwidth)) +
-                                   std::to_string(1.0f - ((y - originalY) / shadePickerHeight));
-            std::string secondHSV = std::to_string((ColorPickers[index].hueX / hlwidth)) +
-                                    std::to_string(1.0f - ((y - originalY) / shadePickerHeight)) + std::to_string(1.0f);
-
-            std::string totalKey = firstHSV + secondHSV;
-
             gradientStops[0].color = HSVtoColorF((ColorPickers[index].hueX / hlwidth) * 360, 0.0f,
                                                  1.0f - ((y - originalY) / shadePickerHeight));
             gradientStops[0].position = 0.0f;
@@ -245,7 +238,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float &opacity, 
                     &pGradientStops
             );
 
-            gBrush = getLinearGradientBrush(x, hexPreviewSize, shadePickerWidth, pGradientStops, totalKey);
+            gBrush = getLinearGradientBrush(x, hexPreviewSize, shadePickerWidth, pGradientStops).get();
 
             D2D::context->FillRectangle(
                     D2D1::RectF(

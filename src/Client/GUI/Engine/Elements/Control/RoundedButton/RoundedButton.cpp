@@ -35,7 +35,7 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
     }
 
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
-    D2D::context->FillRoundedRectangle(roundedRect, FlarialGUI::getBrush(buttonColor));
+    D2D::context->FillRoundedRectangle(roundedRect, FlarialGUI::getBrush(buttonColor).get());
 
 
     if (CursorInRect(x, y, width, height) && glow) {

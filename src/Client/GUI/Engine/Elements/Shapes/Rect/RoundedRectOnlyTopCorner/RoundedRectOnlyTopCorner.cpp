@@ -73,7 +73,7 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
 
     ID2D1SolidColorBrush *brush;
 
-    brush = FlarialGUI::getBrush(color);
+    brush = FlarialGUI::getBrush(color).get();
 
     D2D::context->FillGeometry(geometry, brush);
 
