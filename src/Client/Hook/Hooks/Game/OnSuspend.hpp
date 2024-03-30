@@ -3,6 +3,7 @@
 #include "../Hook.hpp"
 #include "../../../Events/EventHandler.hpp"
 #include "../../../../SDK/SDK.hpp"
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class OnSuspendHook : public Hook {
 
@@ -14,8 +15,7 @@ public:
 
     static inline original suspendOriginal = nullptr;
 
-    OnSuspendHook() : Hook("OnSuspendHook",
-                           "48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 4C 8B F9 4C 8D B1") {}
+    OnSuspendHook() : Hook("onSuspendHook", GET_SIG("onSuspend")) {}
 
     void enableHook() override;
 };

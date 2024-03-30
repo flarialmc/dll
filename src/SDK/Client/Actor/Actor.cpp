@@ -1,4 +1,5 @@
 #include "Actor.hpp"
+#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 // TODO add comments to all components, replace their sigs with simpler ones ?
 
@@ -23,7 +24,7 @@ ActorTypeComponent *Actor::getActorTypeComponent() {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig("48 8B 89 20 04 00 00 48 8B 01 48 8B 40 28 48");
+        sig = Memory::findSig(GET_SIG("Actor::getActorTypeComponent"));
     }
 
     return tryGet<ActorTypeComponent>(sig);
@@ -37,14 +38,14 @@ int Actor::getEntityTypeId() {
 bool Actor::canSee(const Actor& actor) {
     using canSeeFunc = bool (__fastcall *)(Actor *, const Actor&);
     static auto canSee = reinterpret_cast<canSeeFunc>(Memory::offsetFromSig(
-            Memory::findSig("E8 ? ? ? ? 84 C0 74 1C 48 8B 4F 48"), 1));
+            Memory::findSig(GET_SIG("Actor::canSee")), 1));
     return canSee(this, actor);
 
     //return Memory::CallVFunc<82, bool, Player const&>(this, actor);
 }
 
 MobEffectInstance *Actor::getEffect(MobEffect *effect) {
-    static uintptr_t addr = Memory::findSig("E8 ? ? ? ? 8B 78 14");
+    static uintptr_t addr = Memory::findSig(GET_SIG("Actor::getEffect"));
     static auto realAddr = addr + 1 + 4 + *reinterpret_cast<int *>(addr + 1);
     auto fn = reinterpret_cast<MobEffectInstance *(__cdecl *)(Actor *, MobEffect *)>(realAddr);
     return fn(this, effect);
@@ -62,7 +63,7 @@ ItemStack *Actor::getArmor(int slot) {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig("48 8B 89 20 04 00 00 48 8B 01 48 8B 40 28 48");
+        sig = Memory::findSig(GET_SIG("Actor::getArmor"));
     }
 
     auto fn = reinterpret_cast<ItemStack *(__thiscall *)(Actor *, int)>(sig);
@@ -74,7 +75,7 @@ MoveInputComponent *Actor::getMoveInputHandler() { //??$try_get@UMoveInputCompon
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig("48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 2E CD 8B 46");
+        sig = Memory::findSig(GET_SIG("Actor::getMoveInputHandler"));
     }
 
     return tryGet<MoveInputComponent>(sig);
@@ -86,7 +87,7 @@ ActorHeadRotationComponent *Actor::getActorHeadRotationComponent() { //??$try_ge
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig("48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 1C 58 40 E9");
+        sig = Memory::findSig(GET_SIG("Actor::getActorHeadRotationComponent"));
     }
 
     return tryGet<ActorHeadRotationComponent>(sig);
@@ -97,7 +98,7 @@ ItemStack *Actor::getOffhandSlot() {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig("48 8B 89 ? ? ? ? BA ? ? ? ? 48 8B 01 48 8B 40 ? 48 FF 25");
+        sig = Memory::findSig(GET_SIG("Actor::getOffhandSlot"));
     }
 
     auto fn = reinterpret_cast<ItemStack *(__thiscall *)(Actor *)>(sig);
@@ -113,7 +114,7 @@ void Actor::setNametag(std::string *name) {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig("48 89 5C 24 ? 57 48 83 EC ? 48 8B D9 48 8B FA 48 8B 89 ? ? ? ? 48 85 C9 0F 84");
+        sig = Memory::findSig(GET_SIG("Actor::setNametag"));
     }
 
     auto fn = reinterpret_cast<void (__thiscall *)(Actor *, std::string *)>(sig);
@@ -137,8 +138,7 @@ std::string *Actor::getNametag() {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig(
-                "48 83 EC ? 48 8B 81 ? ? ? ? 48 85 C0 74 3B 48 8B 08 BA ? ? ? ? 48 8B 40 ? 48 2B C1 48 C1 F8 ? 66 3B D0 73 17");
+        sig = Memory::findSig(GET_SIG("Actor::getNametag"));
     }
 
     auto fn = reinterpret_cast<std::string *(__thiscall *)(Actor *)>(sig);
@@ -157,7 +157,7 @@ RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URen
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig("48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 6E F3 E8 D4");
+        sig = Memory::findSig(GET_SIG("Actor::getRenderPositionComponent"));
     }
 
     return tryGet<RenderPositionComponent>(sig);

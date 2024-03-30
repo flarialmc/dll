@@ -64,7 +64,7 @@ void HookManager::initialize() {
     hooks.push_back(new TimeChangerHook());
     hooks.push_back(new SendPacketHook());
     hooks.push_back(new getSensHook());
-    hooks.push_back(new getCurrentSwingDuration());
+    //hooks.push_back(new getCurrentSwingDuration());
 
     for (auto hook: hooks)
         hook->enableHook();

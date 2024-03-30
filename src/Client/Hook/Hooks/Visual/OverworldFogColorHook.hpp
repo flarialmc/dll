@@ -23,8 +23,7 @@ public:
 
     static inline OverworldFogColorOriginal funcOriginal = nullptr;
 
-    OverworldFogColorHook() : Hook("Overworld Fog Color Hook",
-                                   "41 0F 10 08 48 8B C2 0F 28 D3 F3 0F 59 1D ? ? ? ? F3 0F 59 15 ? ? ? ? F3 0F 58 1D ? ? ? ? 0F 11 0A F3 0F 58 15 ? ? ? ? F3 0F 59 5A ?") {}
+    OverworldFogColorHook() : Hook("Overworld Fog Color Hook",GET_SIG("OverworldDimension::getBrightnessDependentFogColor")) {}
 
     void enableHook() override {
 

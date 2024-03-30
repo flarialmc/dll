@@ -2,6 +2,8 @@
 
 #include "Client.hpp"
 #include "GUI/Engine/Engine.hpp"
+#include "../Utils/Versions/VersionUtils.hpp"
+#include "../Utils/Versions/WinrtUtils.hpp"
 #include <filesystem>
 #include <thread>
 #include <wingdi.h>
@@ -25,6 +27,21 @@ bool Client::disable = false;
 
 
 void Client::initialize() {
+    Logger::debug("[INIT] Initializing Flarial...");
+
+    VersionUtils::init();
+    Client::version = WinrtUtils::getFormattedVersion();
+    Logger::debug("[INIT] Version: " + WinrtUtils::getVersion());
+    Logger::debug("[INIT] Formatted: " + Client::version);
+
+    if (!VersionUtils::isSupported(Client::version)) {
+        Logger::debug("[INFO] Version not supported!");
+        Client::disable = true;
+        return;
+    }
+
+    VersionUtils::addData();
+
     std::filesystem::path folder_path(Utils::getRoamingPath() + "\\Flarial");
     if (!exists(folder_path)) {
         create_directory(folder_path);
@@ -192,9 +209,10 @@ void Client::initialize() {
     AddFontResource(fontpath.c_str());
 
     Logger::initialize();
+
     HookManager::initialize();
     ModuleManager::initialize();
-    Logger::debug("[Client] Sending");
+    Logger::debug("[Client] Ready.");
 
     if (!Client::disable) {
         FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(

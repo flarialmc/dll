@@ -14,8 +14,7 @@ void ClientInstance::grabMouse() {
     static uintptr_t indexRef;
 
     if (indexRef == 0) {
-        indexRef = Memory::findSig(
-                "48 8B 80 ? ? ? ? FF 15 ? ? ? ? 90 48 85 DB 74 08 48 8B CB E8 ? ? ? ? 48 8B 8F ? ? ? ? E8 ? ? ? ? 33 D2");
+        indexRef = Memory::findSig(GET_SIG("ClientInstance::grabMouse"));
     }
 
     int index = *reinterpret_cast<int *>(indexRef + 3) / 8;
@@ -26,8 +25,7 @@ void ClientInstance::releaseMouse() {
     static uintptr_t indexRef;
 
     if (indexRef == 0) {
-        indexRef = Memory::findSig(
-                "48 8B 80 ? ? ? ? FF 15 ? ? ? ? 90 48 85 DB 74 08 48 8B CB E8 ? ? ? ? 48 8B 8F ? ? ? ? E8 ? ? ? ? 33 D2");
+        indexRef = Memory::findSig(GET_SIG("ClientInstance::grabMouse"));
     }
 
     int index = *reinterpret_cast<int *>(indexRef + 3) / 8;

@@ -14,17 +14,17 @@ class LookListener : public Listener {
 private:
     //static inline uintptr_t rot = Memory::findSig("F3 0F 11 38 ? ? 7C 24 ? 48 81 C4");
 
-    static inline uintptr_t yaw1 = Memory::findSig("F3 0F 11 ? F3 0F 11 ? ? 48 8B CE");
-    static inline uintptr_t yaw2 = Memory::findSig("F3 0F 11 ? F3 0F 11 ? ? 48 8B 4D");
-    static inline uintptr_t pitch = Memory::findSig("F3 0F 11 0E 48 89 9C");
-    static inline uintptr_t movement = Memory::findSig("F3 0F 11 01 48 8D 56");
+    static inline uintptr_t yaw1;
+    static inline uintptr_t yaw2;
+    static inline uintptr_t pitch;
+    static inline uintptr_t movement;
 
     static inline uint8_t nop[4] = {0x90, 0x90, 0x90, 0x90};
     // TODO: this might cause a crash if version is updated
-    static inline auto originalYaw1 = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4])yaw1);
-    static inline auto originalYaw2 = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4])yaw2);
-    static inline auto originalPitch = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4])pitch);
-    static inline auto originalMovement = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4])movement);
+    static inline std::array<std::byte, 4> originalYaw1;
+    static inline std::array<std::byte, 4> originalYaw2;
+    static inline std::array<std::byte, 4> originalPitch;
+    static inline std::array<std::byte, 4> originalMovement;
 public:
     void patch() const {
         if(module->active) return;
@@ -104,5 +104,15 @@ public:
     explicit LookListener(const char string[5], Module *module) {
         this->name = string;
         this->module = module;
+
+        yaw1 = Memory::findSig(GET_SIG("CameraYaw"));
+        yaw2 = Memory::findSig(GET_SIG("CameraYaw2"));
+        pitch = Memory::findSig(GET_SIG("CameraPitch"));
+        movement = Memory::findSig(GET_SIG("CameraMovement"));
+
+        originalYaw1 = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4])yaw1);
+        originalYaw2 = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4])yaw2);
+        originalPitch = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4])pitch);
+        originalMovement = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4])movement);
     }
 };

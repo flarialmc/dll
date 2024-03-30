@@ -12,7 +12,7 @@ public:
     void setSprinting(bool state);
 
     template<typename Component>
-    Component *tryGetAllah(uintptr_t addr);
+    Component *tryGetComponent(uintptr_t addr);
 
     MobBodyRotationComponent *getBodyRotationComponent();
 };

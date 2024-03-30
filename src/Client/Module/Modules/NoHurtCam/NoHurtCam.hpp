@@ -11,13 +11,15 @@ public:
 
     // TODO: restrict on hive
 
-    const static inline uintptr_t sigOffset = Memory::findSig("8B 44 24 48 89 43 08 C6") + 4;
+    static inline uintptr_t sigOffset;
     static inline std::vector<uint8_t> originalCameraAngle;
     static inline uint8_t newCameraAngle[4] = {0x90, 0x90, 0x90};
 
     NoHurtCam() : Module("No Hurt Cam", "Disables hurt camera animation", R"(\Flarial\assets\reach.png)", "") {
 
         originalCameraAngle.resize(3);
+
+        sigOffset = Memory::findSig(GET_SIG("CameraAssignAngle")) + 4;
 
         memcpy(originalCameraAngle.data(), (LPVOID) sigOffset, 3);
 

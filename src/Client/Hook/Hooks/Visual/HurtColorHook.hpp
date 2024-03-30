@@ -25,7 +25,7 @@ public:
 
     void enableHook() override {
 
-        auto RefAddr = Memory::findSig("E8 ? ? ? ? E9 ? ? ? ? 8B 43 ? 48 8D 54 24");
+        auto RefAddr = Memory::findSig(GET_SIG("HurtColor"));
         auto RealFunc = Memory::offsetFromSig(RefAddr, 1);
 
 

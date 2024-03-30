@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include "../Actor/Actor.hpp"
+#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class Actor;
 
@@ -38,7 +39,7 @@ public:
 
     std::vector<Actor *> getRuntimeActorList() {
         // TODO prevent crashing !!!
-        static uintptr_t sig = Memory::findSig("40 53 48 83 EC 30 48 81 C1 E0 1C 00 00");
+        static uintptr_t sig = Memory::findSig(GET_SIG("Level::getRuntimeActorList"));
         static auto getRuntimeActorList = *(decltype(&Level::getRuntimeActorList) *) &sig;
         return (this->*getRuntimeActorList)();
     }

@@ -24,7 +24,7 @@ public:
 
     static inline dimensionFogColorOriginal funcOriginal = nullptr;
 
-    DimensionFogColorHook() : Hook("Fog Color Hook", "41 0F 10 00 48 8B C2 0F 11 02") {}
+    DimensionFogColorHook() : Hook("Fog Color Hook", GET_SIG("Dimension::getBrightnessDependentFogColor")) {}
 
     void enableHook() override {
 

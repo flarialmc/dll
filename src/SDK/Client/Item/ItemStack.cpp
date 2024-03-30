@@ -1,4 +1,5 @@
 #include "ItemStack.hpp"
+#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 bool ItemStack::isValid() {
     return item.counter != nullptr;
@@ -13,12 +14,12 @@ short ItemStack::getDamageValue() {
         return 0;
 
     using getDamageValueFunc = short(__fastcall*)(Item*, void*);
-    static auto getDamageValue = reinterpret_cast<getDamageValueFunc>(Memory::findSig("48 89 5C 24 ? 57 48 83 EC ? 48 8B DA 48 85 D2"));
+    static auto getDamageValue = reinterpret_cast<getDamageValueFunc>(Memory::findSig(GET_SIG("ItemStack::getDamageValue")));
     return getDamageValue(this->item.get(), this->tag);
 }
 
 short ItemStack::getMaxDamage() {
     using getMaxDamageFunc = short(__fastcall*)(ItemStack*);
-    static auto getMaxDamage = reinterpret_cast<getMaxDamageFunc>(Memory::findSig("48 8B 41 08 48 85 C0 74 19"));
+    static auto getMaxDamage = reinterpret_cast<getMaxDamageFunc>(Memory::findSig(GET_SIG("ItemStack::getMaxDamage")));
     return getMaxDamage(this);
 }

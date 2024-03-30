@@ -2,6 +2,7 @@
 
 #include "../Hook.hpp"
 #include "../../../../Utils/Memory/Memory.hpp"
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class getCurrentSwingDuration : public Hook {
 private:
@@ -19,7 +20,7 @@ public:
     static inline getCurrentSwingDurationOriginal funcOriginal = nullptr;
 
     getCurrentSwingDuration() : Hook("getCurrentSwingDurationHook",
-                                     "48 89 5C 24 ? 57 48 83 EC 20 48 8B 15 ? ? ? ? 48 8B F9 33 DB") {}
+                                     GET_SIG("getCurrentSwingDuration")) {}
 
     void enableHook() override {
         this->autoHook((void *) getCurrentSwingDurationCallback, (void **) &funcOriginal);

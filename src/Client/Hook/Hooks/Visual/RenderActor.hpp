@@ -2,6 +2,7 @@
 
 #include "../Hook.hpp"
 #include "../../../../SDK/Client/Actor/Actor.hpp"
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class RenderActorHook : public Hook {
 
@@ -15,8 +16,7 @@ public:
 
     static inline original renderActorOriginal = nullptr;
 
-    RenderActorHook() : Hook("Render Actor",
-                             "48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 4C 89 4C 24 ? 49 8B D8") {}
+    RenderActorHook() : Hook("Render Actor", GET_SIG("RenderActor")) {}
 
     void enableHook() override;
 };

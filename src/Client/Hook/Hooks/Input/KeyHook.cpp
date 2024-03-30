@@ -1,8 +1,9 @@
 #include "KeyHook.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "../../../Client.hpp"
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
-KeyHook::KeyHook() : Hook("key_hook", "48 83 EC ? ? ? C1 4C 8D 05") {}
+KeyHook::KeyHook() : Hook("key_hook", GET_SIG("Keyboard::feed")) {}
 
 void KeyHook::enableHook() {
     this->autoHook((void *) keyCallback, (void **) &funcOriginal);

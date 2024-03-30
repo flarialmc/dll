@@ -2,6 +2,7 @@
 
 #include "../Texture2D.hpp"
 #include "../../../../Utils/Memory/Memory.hpp"
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class MaterialPtr {
 private:
@@ -13,8 +14,7 @@ public:
 
         if (materialCreator == nullptr) {
             // Sig returns 6 addresses, all of them point to the same offset
-            uintptr_t sigOffset = Memory::findSig(
-                    "48 8B 05 ? ? ? ? 48 8D 55 ? 48 8D 0D ? ? ? ? 48 8B 40 ? FF 15 ? ? ? ? 48 8B F8");
+            uintptr_t sigOffset = Memory::findSig(GET_SIG("Tessellator::createMaterial"));
             int offset = *reinterpret_cast<int *>(sigOffset + 3);
             materialCreator = reinterpret_cast<void *>(sigOffset + offset + 7);
         }

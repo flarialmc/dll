@@ -15,7 +15,7 @@ class ForceCoordsListener : public Listener {
     Module *module;
 private:
     // 1.20.12 - static inline uintptr_t option = Memory::findSig("80 78 ? ? 74 ? b0 ? 48 8b 5c 24 ? 48 83 c4 ? 5f c3 32 c0"); // cmp byte ptr [rax+04],00
-    static inline uintptr_t option = Memory::findSig("80 78 ? ? 0F 95 C0 48 8B 5C 24");
+    static inline uintptr_t option;
     bool mojanged = false;
 
     static inline std::vector<uint8_t> original_option;
@@ -76,6 +76,8 @@ public:
     explicit ForceCoordsListener(const char string[5], Module *module) {
         this->name = string;
         this->module = module;
+
+        option = Memory::findSig(GET_SIG("ForceCoordsOption"));
 
         original_option.resize(4);
         memcpy(original_option.data(), (LPVOID) option, 4);
