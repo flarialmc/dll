@@ -7,14 +7,14 @@
 #include "Constraints.hpp"
 #include "animations/fadeinout.hpp"
 #include "Elements/Structs/ImagesClass.hpp"
-#include "Elements/Structs/ToolTipStruct.hpp"
+#include "Elements/Control/Tooltip/ToolTipStruct.hpp"
 #include "Elements/Structs/HSV.hpp"
 #include "Elements/Structs/Notification.hpp"
-#include "Elements/Structs/WindowRect.hpp"
-#include "Elements/Structs/SliderRect.hpp"
-#include "Elements/Structs/TextBoxStruct.hpp"
-#include "Elements/Structs/ColorPicker.hpp"
-#include "Elements/Structs/DropdownStruct.hpp"
+#include "Elements/Windows/WindowRect.hpp"
+#include "Elements/Control/Slider/SliderRect.hpp"
+#include "Elements/Control/TextBox/TextBoxStruct.hpp"
+#include "Elements/Control/ColorPicker/ColorPicker.hpp"
+#include "Elements/Control/Dropdown/DropdownStruct.hpp"
 #include <string>
 
 #define clickgui ModuleManager::getModule("ClickGUI")
