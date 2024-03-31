@@ -7,7 +7,7 @@
 
 class Mob : public Actor {
 public:
-    BUILD_ACCESS(this, MobHurtTimeComponent*, mobHurtTimeComponent, 0x610);
+    BUILD_ACCESS(this, MobHurtTimeComponent*, mobHurtTimeComponent, GET_OFFSET("Gamemode::mobHurtTimeComponent"));
 
     void setSprinting(bool state);
 

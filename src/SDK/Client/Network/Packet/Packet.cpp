@@ -1,13 +1,15 @@
 #include <string>
 #include "Packet.hpp"
 #include "../../../../Utils/Memory/Memory.hpp"
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 std::string *Packet::getName(std::string *amongus) {
-
-    return Memory::CallVFunc<2, std::string *>(this, amongus);
+    static int off = GET_OFFSET("Packet::getName");
+    return Memory::CallVFuncI<std::string *>(off, this, amongus);
 
 }
 
 MinecraftPacketIds Packet::getId() {
-    return MinecraftPacketIds(Memory::CallVFunc<1, MinecraftPacketIds>(this));
+    static int off = GET_OFFSET("Packet::getId");
+    return Memory::CallVFuncI<MinecraftPacketIds>(off, this);
 }

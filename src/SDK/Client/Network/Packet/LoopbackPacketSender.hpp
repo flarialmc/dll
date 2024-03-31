@@ -5,7 +5,7 @@
 
 class LoopbackPacketSender {
 public:
-    BUILD_ACCESS(this, class NetworkSystem*, networkSystem, 0x20);
+    BUILD_ACCESS(this, class NetworkSystem*, networkSystem, GET_OFFSET("LoopbackPacketSender::networkSystem"));
 
     virtual ~LoopbackPacketSender() = 0;
 
@@ -16,10 +16,10 @@ public:
 
 class NetworkSystem {
 public:
-    BUILD_ACCESS(this, class RemoteConnectorComposite*, remoteConnectorComposite, 0x80);
+    BUILD_ACCESS(this, class RemoteConnectorComposite*, remoteConnectorComposite, GET_OFFSET("NetworkSystem::remoteConnectorComposite"));
 };
 
 class RemoteConnectorComposite {
 public:
-    BUILD_ACCESS(this, class RaknetConnector*, rakNetConnector, 0x60);
+    BUILD_ACCESS(this, class RaknetConnector*, rakNetConnector, GET_OFFSET("RemoteConnectorComposite::rakNetConnector"));
 };

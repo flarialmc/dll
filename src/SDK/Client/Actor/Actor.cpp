@@ -13,11 +13,13 @@ Component *Actor::tryGet(uintptr_t addr) {
 }
 
 bool Actor::isAlive() {
-    return Memory::CallVFunc<53, bool>(this);
+    static int off = GET_OFFSET("Actor::isPlayer");
+    return Memory::CallVFuncI<bool>(off, this);
 }
 
 std::string *Actor::getXuid(std::string *str) {
-    return Memory::CallVFunc<253, std::string *, std::string *>(this, str);
+    static int off = GET_OFFSET("Actor::getXuid");
+    return Memory::CallVFuncI<std::string *, std::string *>(off, this, str);
 }
 
 ActorTypeComponent *Actor::getActorTypeComponent() {
@@ -52,7 +54,8 @@ MobEffectInstance *Actor::getEffect(MobEffect *effect) {
 }
 
 bool Actor::getActorFlag(int flag) {
-    return Memory::CallVFunc<0, bool, int>(this, flag);
+    static int off = GET_OFFSET("Actor::getActorFlag");
+    return Memory::CallVFuncI<bool, int>(off, this, flag);
 }
 
 Vec3<float> *Actor::getPosition() {
@@ -146,7 +149,8 @@ std::string *Actor::getNametag() {
 }
 
 bool Actor::isPlayer() {
-    return Memory::CallVFunc<58, bool>(this);
+    static int off = GET_OFFSET("Actor::isPlayer");
+    return Memory::CallVFuncI<bool>(off, this);
 }
 
 bool Actor::hasCategory(ActorCategory category) {
@@ -164,5 +168,6 @@ RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URen
 }
 
 bool Actor::isValidTarget(Actor *actor) {
-    return Memory::CallVFunc<61, bool, Actor *>(this, actor);
+    static int off = GET_OFFSET("Actor::isValidTarget");
+    return Memory::CallVFuncI<bool, Actor *>(off, this, actor);
 }

@@ -19,6 +19,7 @@ public:
             materialCreator = reinterpret_cast<void *>(sigOffset + offset + 7);
         }
 
-        return Memory::CallVFunc<1, MaterialPtr *>(materialCreator, materialName);
+        static int off = GET_OFFSET("createMaterial");
+        return Memory::CallVFuncI<MaterialPtr *>(off, materialCreator, materialName);
     }
 };

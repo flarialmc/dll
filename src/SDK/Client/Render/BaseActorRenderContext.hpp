@@ -12,5 +12,5 @@ private:
 public:
     BaseActorRenderContext(ScreenContext *screenCtx, ClientInstance *clientInstance, MinecraftGame *game);
 
-    BUILD_ACCESS(this, ItemRenderer*, itemRenderer, 0x58);
+    BUILD_ACCESS(this, ItemRenderer*, itemRenderer, GET_OFFSET("BaseActorRenderContext::itemRenderer"));
 };

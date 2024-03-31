@@ -3,7 +3,8 @@
 
 
 Block *BlockSource::getBlock(const Vec3<int> &bp) {
-    return Memory::CallVFunc<2, Block *>(this, bp);
+    static int off = GET_OFFSET("BlockSource::getBlock");
+    return Memory::CallVFuncI<Block *>(off, this, bp);
 }
 
 Biome *BlockSource::getBiome(const Vec3<int> &bp) {

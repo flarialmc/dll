@@ -22,11 +22,11 @@ public:
         return *reinterpret_cast<Minecraft **>((uintptr_t) this + 0xD0);
     }
 
-    BUILD_ACCESS(this, MinecraftGame*, mcgame, 0x0C8);
-    BUILD_ACCESS(this, GuiData*, guiData, 0x558);
-    BUILD_ACCESS(this, Camera, camera, 0x270);
-    BUILD_ACCESS(this, GLMatrix, Matrix1, 0x0330);
-    BUILD_ACCESS(this, ClientHMDState, HMDState, 0x5A8);
+    BUILD_ACCESS(this, MinecraftGame*, mcgame, GET_OFFSET("ClientInstance::minecraftGame"));
+    BUILD_ACCESS(this, GuiData*, guiData, GET_OFFSET("ClientInstance::guiData"));
+    BUILD_ACCESS(this, Camera, camera, GET_OFFSET("ClientInstance::camera"));
+    BUILD_ACCESS(this, GLMatrix, Matrix1, GET_OFFSET("ClientInstance::Matrix1"));
+    BUILD_ACCESS(this, ClientHMDState, HMDState, GET_OFFSET("ClientInstance::clientHMDState"));
 
     LocalPlayer *getLocalPlayer();
 
@@ -44,11 +44,11 @@ public:
 
 
     float *getFovX() {
-        return reinterpret_cast<float *>((uintptr_t) (this) + 0x6F0);
+        return reinterpret_cast<float *>((uintptr_t) (this) + GET_OFFSET("ClientInstance::getFovX"));
     };
 
     float *getFovY() {
-        return reinterpret_cast<float *>((uintptr_t) (this) + 0x704);
+        return reinterpret_cast<float *>((uintptr_t) (this) + GET_OFFSET("ClientInstance::getFovY"));
     };
 
     Vec2<float> getFov() {
@@ -56,7 +56,7 @@ public:
     };
 
     LoopbackPacketSender *getPacketSender() {
-        return *reinterpret_cast<LoopbackPacketSender **>((uintptr_t) this + 0xF0);
+        return *reinterpret_cast<LoopbackPacketSender **>((uintptr_t) this + GET_OFFSET("ClientInstance::getPacketSender"));
     }
 
     RaknetConnector *getRakNetConnector() {

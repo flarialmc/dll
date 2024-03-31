@@ -3,7 +3,8 @@
 #include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void Mob::setSprinting(bool state) {
-    Memory::CallVFunc<159, void, bool>(this, state);
+    static int off = GET_OFFSET("Mob::setSprinting");
+    return Memory::CallVFuncI<void, bool>(off, this, state);
 }
 
 template<typename Component>

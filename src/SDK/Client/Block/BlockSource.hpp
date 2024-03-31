@@ -10,7 +10,7 @@
 class BlockSource {
 public:
 
-    BUILD_ACCESS(this, mcDimension*, dimension, 0x30);
+    BUILD_ACCESS(this, mcDimension*, dimension, GET_OFFSET("BlockSource::dimension"));
 
     Block *getBlock(const Vec3<int> &);
 

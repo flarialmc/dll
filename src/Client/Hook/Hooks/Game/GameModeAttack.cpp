@@ -25,5 +25,5 @@ void GameModeAttackHook::enableHook() {
     int offset = *reinterpret_cast<int *>(base + 3);
     auto **vft = reinterpret_cast<uintptr_t **>(base + offset + 7);
 
-    this->manualHook(vft[14], (void *) callback, (void **) &funcOriginal);
+    this->manualHook(vft[GET_OFFSET("Gamemode::attackVft")], (void *) callback, (void **) &funcOriginal);
 }

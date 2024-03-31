@@ -2,11 +2,13 @@
 #include "../../SDK.hpp"
 
 LocalPlayer *ClientInstance::getLocalPlayer() {
-    return Memory::CallVFunc<29, LocalPlayer *>(this);
+    static int off = GET_OFFSET("ClientInstance::getLocalPlayer");
+    return Memory::CallVFuncI<LocalPlayer *>(off, this);
 }
 
 BlockSource *ClientInstance::getBlockSource() {
-    return Memory::CallVFunc<28, BlockSource *>(this);
+    static int off = GET_OFFSET("ClientInstance::getBlockSource");
+    return Memory::CallVFuncI<BlockSource *>(off, this);
 }
 
 void ClientInstance::grabMouse() {
@@ -18,7 +20,7 @@ void ClientInstance::grabMouse() {
     }
 
     int index = *reinterpret_cast<int *>(indexRef + 3) / 8;
-    return Memory::CallVFuncI<void>(this, index);
+    return Memory::CallVFuncI<void>(index, this);
 }
 
 void ClientInstance::releaseMouse() {
@@ -29,11 +31,12 @@ void ClientInstance::releaseMouse() {
     }
 
     int index = *reinterpret_cast<int *>(indexRef + 3) / 8;
-    return Memory::CallVFuncI<void>(this, index + 1);
+    return Memory::CallVFuncI<void>(index + 1, this);
 }
 
 void ClientInstance::refocusMouse() {
-    return Memory::CallVFunc<333, void>(this);
+    static int off = GET_OFFSET("ClientInstance::refocusMouse");
+    return Memory::CallVFuncI<void>(off, this);
 }
 
 std::string ClientInstance::getTopScreenName() {
@@ -42,5 +45,5 @@ std::string ClientInstance::getTopScreenName() {
 
 LevelRender *ClientInstance::getLevelRender() {
     auto address = reinterpret_cast<uintptr_t>(this);
-    return *reinterpret_cast<LevelRender **>(address + 0xE0);
+    return *reinterpret_cast<LevelRender **>(address + GET_OFFSET("ClientInstance::levelRenderer"));
 }

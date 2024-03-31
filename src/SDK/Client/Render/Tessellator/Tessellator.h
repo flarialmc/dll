@@ -12,7 +12,7 @@ class HashedString;
 
 class Tessellator {
 private:
-    char pad_0000[0x184]{};
+    char pad_0000[0x184]{}; // this is not mutliversion
     Vec3<float> transformOffset; // 0x184
 
 public:
