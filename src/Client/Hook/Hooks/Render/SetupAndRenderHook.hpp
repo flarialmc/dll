@@ -66,9 +66,13 @@ private:
 
 	static void setUpAndRenderCallback(ScreenView* pScreenView, MinecraftUIRenderContext* muirc) {
 
-		SDK::hasInstanced = true;
 		SDK::screenView = pScreenView;
-        SDK::setCI();
+        if(WinrtUtils::check(20, 50)) {
+            SDK::setCI();
+        } else {
+            SDK::clientInstance = muirc->getclientInstance();
+        }
+        SDK::hasInstanced = true;
 
         if(funcOriginalText == nullptr || oDrawImage == nullptr)
             hookDrawTextAndDrawImage(muirc);

@@ -36,6 +36,7 @@ private:
     virtual void destructor();
 
 public:
+    // TODO: breaks on 1.20.50, use vfunc call by index
     virtual void InitializeConfiguration(std::unique_ptr<__int64>);
 
     virtual __int64 Startup(uint32_t, __int64 *, uint32_t, int);

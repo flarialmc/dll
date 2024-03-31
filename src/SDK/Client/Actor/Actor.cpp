@@ -4,7 +4,7 @@
 // TODO add comments to all components, replace their sigs with simpler ones ?
 
 template<typename Component>
-Component *Actor::tryGet(uintptr_t addr) {
+Component *Actor::tryGet(uintptr_t addr) { // TODO: Multiversion
     auto ctx = GetEntityContext();
 
     using efunc = Component *(__thiscall *)(uintptr_t *, const EntityId &);
@@ -108,9 +108,13 @@ ItemStack *Actor::getOffhandSlot() {
     return fn(this);
 }
 
-EntityContext *Actor::GetEntityContext() {
+EntityContext *Actor::GetEntityContext() { // TODO: Multiversion
     auto address = reinterpret_cast<uintptr_t>(this);
-    return reinterpret_cast<EntityContext *>(address + 8);
+    if(WinrtUtils::check(20, 50)) {
+        return reinterpret_cast<EntityContext *>(reinterpret_cast<V1_20_50::EntityContext *>(address + 8));
+    } else {
+        return reinterpret_cast<EntityContext *>(reinterpret_cast<V1_20_40::EntityContext *>(address + 8));
+    }
 }
 
 void Actor::setNametag(std::string *name) {
