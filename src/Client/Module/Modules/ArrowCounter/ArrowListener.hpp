@@ -28,6 +28,7 @@ public:
                 if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
 
                     auto inventory = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory;
+                    if(inventory == nullptr) return;
                     auto offhandItem = SDK::clientInstance->getLocalPlayer()->getOffhandSlot();
 
                     if (offhandItem->getItem() != nullptr) {
