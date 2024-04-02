@@ -45,14 +45,14 @@ void OffsetInit::init2070() {
 
     ADD_OFFSET("createMaterial", 1); // unused
 
-    ADD_OFFSET("Actor::hurtTime", 0x234);
-    ADD_OFFSET("Actor::level", 0x290);
-    ADD_OFFSET("Actor::categories", 0x2C8);
-    ADD_OFFSET("Actor::actorRotationComponent", 0x2E0);
-    ADD_OFFSET("Actor::aabb", 0x2D8);
-    ADD_OFFSET("Actor::stateVector", 0x2D0);
-    ADD_OFFSET("Actor::rotations", 0x2E0);
-    ADD_OFFSET("Actor::wasHurt", 0x23E);
+    ADD_OFFSET("Actor::hurtTime", 0x1FC);
+    ADD_OFFSET("Actor::level", 0x258);
+    ADD_OFFSET("Actor::categories", 0x290);
+    ADD_OFFSET("Actor::actorRotationComponent", 0x2A8);
+    ADD_OFFSET("Actor::aabb", 0x2A0);
+    ADD_OFFSET("Actor::stateVector", 0x2A0);
+    ADD_OFFSET("Actor::rotations", 0x2E0); // likely wrong
+    ADD_OFFSET("Actor::wasHurt", 0x206);
     ADD_OFFSET("Actor::baseTickVft", 29);
 
     ADD_OFFSET("Gamemode::player", 0x8);
@@ -489,7 +489,7 @@ void OffsetInit::init2030() {
     ADD_OFFSET("Actor::level", 0x260);
     ADD_OFFSET("Actor::categories", 0x298);
     ADD_OFFSET("Actor::actorRotationComponent", 0x2B0);
-    ADD_OFFSET("Actor::aabb", 0x2D0);
+    ADD_OFFSET("Actor::aabb", 0x2A8);
     ADD_OFFSET("Actor::stateVector", 0x2A0);
     ADD_OFFSET("Actor::rotations", 0x2B0);
     ADD_OFFSET("Actor::wasHurt", 0x236);
@@ -557,12 +557,12 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("BaseActorRenderContext::itemRenderer", 0x58);
 
-    ADD_OFFSET("GuiData::ScreenSize", 0x0030);
-    ADD_OFFSET("GuiData::ScreenSizeScaled", 0x0040);
-    ADD_OFFSET("GuiData::GuiScale", 0x004C);
-    ADD_OFFSET("GuiData::screenResRounded", 0x0038);
-    ADD_OFFSET("GuiData::sliderAmount", 0x004C);
-    ADD_OFFSET("GuiData::scalingMultiplier", 0x0050);
+    ADD_OFFSET("GuiData::ScreenSize", 0x30);
+    ADD_OFFSET("GuiData::ScreenSizeScaled", 0x40);
+    ADD_OFFSET("GuiData::GuiScale", 0x4C);
+    ADD_OFFSET("GuiData::screenResRounded", 0x38);
+    ADD_OFFSET("GuiData::sliderAmount", 0x4C);
+    ADD_OFFSET("GuiData::scalingMultiplier", 0x50);
 
     ADD_OFFSET("MinecraftUIRenderContext::clientInstance", 0x8);
     ADD_OFFSET("MinecraftUIRenderContext::screenContext", 0x10);
