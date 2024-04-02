@@ -35,6 +35,7 @@ private:
 
     void onMouse(MouseEvent &event) override {
         Module *limiter = ModuleManager::getModule("CPS Limiter");
+        if(limiter == nullptr) return;
         if (event.getButton() == MouseButton::Left) {
             if (!MC::held) {
                 leftClickHeld = false;
