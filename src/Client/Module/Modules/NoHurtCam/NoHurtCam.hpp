@@ -13,7 +13,7 @@ public:
 
     static inline uintptr_t sigOffset;
     static inline std::vector<uint8_t> originalCameraAngle;
-    static inline uint8_t newCameraAngle[4] = {0x90, 0x90, 0x90};
+    static inline uint8_t newCameraAngle[3] = {0x90, 0x90, 0x90};
 
     NoHurtCam() : Module("No Hurt Cam", "Disables hurt camera animation", R"(\Flarial\assets\reach.png)", "") {
 
