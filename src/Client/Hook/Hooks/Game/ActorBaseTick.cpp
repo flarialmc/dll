@@ -17,7 +17,7 @@ void ActorBaseTick::enableHook() {
 
 }
 
-ActorBaseTick::ActorBaseTick() : Hook("ActorBaseTick", GET_SIG("Actor::actorBaseTick")) {}
+ActorBaseTick::ActorBaseTick() : Hook("ActorBaseTick", GET_SIG("Actor::baseTick")) {}
 
 void ActorBaseTick::callback(Actor *actor) {
     // TODO: Might be wrong, req checking

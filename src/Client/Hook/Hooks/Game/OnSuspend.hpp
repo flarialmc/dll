@@ -15,7 +15,7 @@ public:
 
     static inline original suspendOriginal = nullptr;
 
-    OnSuspendHook() : Hook("onSuspendHook", GET_SIG("onSuspend")) {}
+    OnSuspendHook() : Hook("onSuspendHook", GET_SIG("MinecraftGame::onAppSuspended")) {}
 
     void enableHook() override;
 };

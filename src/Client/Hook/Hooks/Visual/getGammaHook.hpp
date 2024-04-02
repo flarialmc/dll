@@ -26,7 +26,7 @@ public:
 
     static inline getGammaOriginal funcOriginal = nullptr;
 
-    getGammaHook() : Hook("getGammaHook",GET_SIG("getGamma")) {}
+    getGammaHook() : Hook("getGammaHook",GET_SIG("Options::getGamma")) {}
 
     void enableHook() override {
         this->autoHook((void *) getGammaCallback, (void **) &funcOriginal);

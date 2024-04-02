@@ -25,7 +25,7 @@ public:
 
     static inline getSensOriginal funcOriginal = nullptr;
 
-    getSensHook() : Hook("getSensHook", GET_SIG("getSens")) {}
+    getSensHook() : Hook("getSensHook", GET_SIG("Options::getSensitivity")) {}
 
     void enableHook() override {
         this->autoHook((void *) getSensCallback, (void **) &funcOriginal);
