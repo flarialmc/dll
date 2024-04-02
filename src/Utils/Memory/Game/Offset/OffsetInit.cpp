@@ -51,7 +51,7 @@ void OffsetInit::init2070() {
     ADD_OFFSET("Actor::actorRotationComponent", 0x2A8);
     ADD_OFFSET("Actor::aabb", 0x2A0);
     ADD_OFFSET("Actor::stateVector", 0x298);
-    ADD_OFFSET("Actor::rotations", 0x2E0); // likely wrong
+    ADD_OFFSET("Actor::rotations", 0x2A8);
     ADD_OFFSET("Actor::wasHurt", 0x206);
     ADD_OFFSET("Actor::baseTickVft", 29);
 
@@ -478,7 +478,7 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("ClientInstance::getFovX", 0x6F8);
     ADD_OFFSET("ClientInstance::getFovY", 0x70C);
-    ADD_OFFSET("ClientInstance::getPacketSender", 0xF0); // might be wrong
+    ADD_OFFSET("ClientInstance::getPacketSender", 0xF0);
 
     ADD_OFFSET("Packet::getId", 1);
     ADD_OFFSET("Packet::getName", 2); // unused
@@ -548,9 +548,9 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("LoopbackPacketSender::networkSystem", 0x20);
 
-    ADD_OFFSET("NetworkSystem::remoteConnectorComposite", 0x80); // might be wrong
+    ADD_OFFSET("NetworkSystem::remoteConnectorComposite", 0x60);
 
-    ADD_OFFSET("RemoteConnectorComposite::rakNetConnector", 0x60); // might be wrong (crashes on this)
+    ADD_OFFSET("RemoteConnectorComposite::rakNetConnector", 0x60);
 
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x438);
     ADD_OFFSET("RaknetConnector::getPeer", 0x278);

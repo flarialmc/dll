@@ -67,11 +67,7 @@ private:
 	static void setUpAndRenderCallback(ScreenView* pScreenView, MinecraftUIRenderContext* muirc) {
 
 		SDK::screenView = pScreenView;
-        if(WinrtUtils::check(20, 50)) {
-            SDK::setCI();
-        } else {
-            SDK::clientInstance = muirc->getclientInstance();
-        }
+        SDK::clientInstance = muirc->getclientInstance();
         SDK::hasInstanced = true;
 
         if(funcOriginalText == nullptr || oDrawImage == nullptr)

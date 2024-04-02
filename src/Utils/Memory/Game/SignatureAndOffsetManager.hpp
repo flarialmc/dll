@@ -1,9 +1,9 @@
 #pragma once
 
-// Partially stolen from Intop
-
 #include <string>
 #include <unordered_map>
+
+// TODO: Signature class
 
 #define ADD_SIG(name, sig) Mgr.addSignature(name, sig)
 #define GET_SIG(name) Mgr.getSig(name)
