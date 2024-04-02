@@ -71,7 +71,7 @@ int SDK::getServerPing() {
 }
 
 std::string SDK::getServerIP() {
-    if(WinrtUtils::check(20, 30)) {
+    if(!WinrtUtils::check(20, 60)) {
         return "Cannot identify";
     }
     if (SDK::hasInstanced && SDK::clientInstance != nullptr) {

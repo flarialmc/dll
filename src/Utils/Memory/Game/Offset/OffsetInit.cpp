@@ -50,7 +50,7 @@ void OffsetInit::init2070() {
     ADD_OFFSET("Actor::categories", 0x290);
     ADD_OFFSET("Actor::actorRotationComponent", 0x2A8);
     ADD_OFFSET("Actor::aabb", 0x2A0);
-    ADD_OFFSET("Actor::stateVector", 0x2A0);
+    ADD_OFFSET("Actor::stateVector", 0x298);
     ADD_OFFSET("Actor::rotations", 0x2E0); // likely wrong
     ADD_OFFSET("Actor::wasHurt", 0x206);
     ADD_OFFSET("Actor::baseTickVft", 29);
