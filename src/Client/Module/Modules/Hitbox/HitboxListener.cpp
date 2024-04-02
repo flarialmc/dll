@@ -16,7 +16,7 @@ void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
                 continue;
 
             // Add to render list
-            entitiesToRender.insert(ent->GetEntityContext()->id);
+            entitiesToRender.insert(ent->getEntityId());
         }
     }
 }
@@ -38,7 +38,7 @@ void HitboxListener::onRender(RenderEvent &event) {
         else color2 = FlarialGUI::HexToColorF(module->settings.getSettingByName<std::string>("color")->value);
 
         for (const auto &ent: player->level->getRuntimeActorList()) {
-            if (entitiesToRender.contains(ent->GetEntityContext()->id)){
+            if (entitiesToRender.contains(ent->getEntityId())){
                 DrawUtils::addEntityBox(ent, (float)fmax(0.5f, 1 / (float)fmax(1,
                                                                                player->getRenderPositionComponent()->renderPos.dist(
                                                                                        ent->getRenderPositionComponent()->renderPos))),
