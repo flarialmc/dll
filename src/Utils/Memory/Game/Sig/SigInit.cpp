@@ -384,7 +384,7 @@ void SigInit::init2030() {
     ADD_SIG("ThirdPersonNametag", "? ? ? ? ? ? 49 8B ? 48 8B ? E8 ? ? ? ? 84 C0 ? ? ? ? ? ? 49 8B ? 49 8b ? ? ? ? ? 49");
 
     // Keystrokes
-    ADD_SIG("Actor::getMoveInputHandler", "40 53 48 83 EC ? 48 8B DA BA 2E CD 8B 46");
+    ADD_SIG("Actor::getMoveInputHandler", "40 53 48 83 EC 20 48 8B DA BA 2E");
 
     // Hitboxes
     ADD_SIG("Actor::getActorTypeComponent", "48 8B 89 20 04 00 00 48 8B 01 48 8B 40 28 48");
