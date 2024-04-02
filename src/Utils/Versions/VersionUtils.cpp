@@ -1,5 +1,8 @@
-#include <thread>
 #include "VersionUtils.hpp"
+
+// Made by marioCST, ported by FreezeEngine
+
+#include <thread>
 
 #include "../Memory/Game/Offset/OffsetInit.hpp"
 #include "../Memory/Game/Sig/SigInit.hpp"

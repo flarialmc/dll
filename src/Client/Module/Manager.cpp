@@ -100,21 +100,17 @@ void ModuleManager::initialize() {
     ModuleManager::addModule(new IPDisplay());
     ModuleManager::addModule(new ReachCounter());
     ModuleManager::addModule(new ComboCounter());
-    if(WinrtUtils::check(20, 60)) { // because of raknet offset missing
-        ModuleManager::addModule(new PingCounter());
-    }
+    ModuleManager::addModule(new PingCounter());
     ModuleManager::addModule(new PotCounter());
     ModuleManager::addModule(new ArrowCounter());
     ModuleManager::addModule(new Time());
     ModuleManager::addModule(new MEM());
     ModuleManager::addModule(new Fullbright());
     ModuleManager::addModule(new ForceCoords());
-    if(WinrtUtils::check(20, 50)) { // because of Move input handler
-        ModuleManager::addModule(new Keystrokes());
-        ModuleManager::addModule(new Sneak());
-        ModuleManager::addModule(new Sprint());
-        ModuleManager::addModule(new Hitbox());
-    }
+    ModuleManager::addModule(new Keystrokes());
+    ModuleManager::addModule(new Sneak());
+    ModuleManager::addModule(new Sprint());
+    ModuleManager::addModule(new Hitbox());
     ModuleManager::addModule(new ThirdPerson());
     ModuleManager::addModule(new SnapLook());
     ModuleManager::addModule(new HurtColor());

@@ -1,7 +1,7 @@
 #include "Actor.hpp"
 #include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
-// TODO add comments to all components, replace their sigs with simpler ones ?
+// TODO add comments to all components, replace their sigs with simpler ones ?       marioCST: use entt's try_get func in EntityContext instead of using sigs, there are no simpler sigs
 
 template<typename Component>
 Component *Actor::tryGet(uintptr_t addr) { // TODO: Multiversion
@@ -109,12 +109,13 @@ ItemStack *Actor::getOffhandSlot() {
 }
 
 EntityContext *Actor::GetEntityContext() { // TODO: Multiversion
-    auto address = reinterpret_cast<uintptr_t>(this);
+    return reinterpret_cast<EntityContext*>((uintptr_t)this + 0x8);
+    /*auto address = reinterpret_cast<uintptr_t>(this);
     if(WinrtUtils::check(20, 50)) {
         return reinterpret_cast<EntityContext *>(reinterpret_cast<V1_20_50::EntityContext *>(address + 8));
     } else {
         return reinterpret_cast<EntityContext *>(reinterpret_cast<V1_20_40::EntityContext *>(address + 8));
-    }
+    }*/
 }
 
 void Actor::setNametag(std::string *name) {

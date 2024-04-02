@@ -31,7 +31,7 @@ public:
     static inline receive receiveSetTitlePacketOriginal = nullptr;
     static inline receive receivePacketPlaySounOriginal = nullptr;
 
-    SendPacketHook() : Hook("sendPacket", GET_SIG("sendPacket")) {}
+    SendPacketHook() : Hook("sendPacket", GET_SIG("LoopbackPacketSender::sendPacket")) {}
 
     void enableHook() override;
 

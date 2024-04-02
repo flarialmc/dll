@@ -1,4 +1,5 @@
 #include "SignatureAndOffsetManager.hpp"
+
 #include "../../Logger/Logger.hpp"
 
 SignatureAndOffsetManager Mgr;

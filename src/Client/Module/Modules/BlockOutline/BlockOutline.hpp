@@ -27,7 +27,7 @@ public:
         highlightColorRipRelAddr = Memory::findSig(GET_SIG("blockHighlightColor")); // RIP REL 4BYTE FROM FUNC OFFSET ADDR
         highlightColorOrigRipRel = *(UINT32*)highlightColorRipRelAddr;
 
-        outlineColorRipRelAddr = Memory::findSig(GET_SIG("blockOutlineColor"));
+        outlineColorRipRelAddr = Memory::findSig(GET_SIG("mce::Color::BLACK"));
         outlineColorOrigRipRel = *(UINT32*)outlineColorRipRelAddr;
         // TODO: make it look better
         selectionColor = (MCCColor*)AllocateBuffer((void*)highlightColorRipRelAddr); // allocate space for color

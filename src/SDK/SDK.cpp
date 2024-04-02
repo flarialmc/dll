@@ -36,7 +36,7 @@ std::shared_ptr<Packet> SDK::createPacket(int id) {
     static uintptr_t Address;
 
     if (Address == NULL) {
-        Address = Memory::findSig(GET_SIG("createPacket"));
+        Address = Memory::findSig(GET_SIG("MinecraftPackets::createPacket"));
     }
 
     auto pFunction = reinterpret_cast<std::shared_ptr<Packet>(__fastcall *)(int)>(Address);
@@ -71,9 +71,6 @@ int SDK::getServerPing() {
 }
 
 std::string SDK::getServerIP() {
-    if(!WinrtUtils::check(20, 60)) {
-        return "Cannot identify";
-    }
     if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             std::string ip{};

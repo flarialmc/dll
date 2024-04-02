@@ -27,7 +27,7 @@ public:
 
     static inline getFovOriginal funcOriginal = nullptr;
 
-    getFovHook() : Hook("getFovHook", GET_SIG("getFov")) {}
+    getFovHook() : Hook("getFovHook", GET_SIG("LevelRendererPlayer::getFov")) {}
 
     void enableHook() override {
         this->autoHook((void *) getFovCallback, (void **) &funcOriginal);

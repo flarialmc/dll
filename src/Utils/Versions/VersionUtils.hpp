@@ -1,5 +1,7 @@
 #pragma once
 
+// Made by marioCST, ported by FreezeEngine
+
 #include <string>
 #include <unordered_map>
 #include <functional>

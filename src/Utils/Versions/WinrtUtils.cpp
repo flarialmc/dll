@@ -1,6 +1,10 @@
 #include "WinrtUtils.hpp"
-#include "../Utils.hpp"
+
+// Made by marioCST, ported by FreezeEngine
+
 #include <winrt/Windows.ApplicationModel.h>
+
+#include "../Utils.hpp"
 
 Version WinrtUtils::getMCVersion() {
     static Version version;
@@ -35,7 +39,7 @@ bool WinrtUtils::check(const int m, const int b) {
 
 std::string WinrtUtils::getVersion() {
     static auto [major, minor, build, error] = getMCVersion();
-    return error.empty() ? std::to_string(major)+"."+std::to_string(minor)+"."+std::to_string(build) : error;
+    return error.empty() ? std::to_string(major) + "." + std::to_string(minor) + "." + std::to_string(build) : error;
 }
 
 std::string WinrtUtils::getFormattedVersion() {
