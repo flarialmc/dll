@@ -215,7 +215,11 @@ public:
 
     ItemStack *getOffhandSlot();
 
-    EntityContext *GetEntityContext();
+    EntityId getEntityId();
+
+    V1_20_50::EntityContext *GetEntityContextV1_20_50();
+
+    V1_20_40::EntityContext *GetEntityContextV1_20_40();
 
     float getSpeedInMetersPerSecond();
 

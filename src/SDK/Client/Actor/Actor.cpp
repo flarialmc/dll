@@ -5,11 +5,32 @@
 
 template<typename Component>
 Component *Actor::tryGet(uintptr_t addr) { // TODO: Multiversion
-    auto ctx = GetEntityContext();
 
-    using efunc = Component *(__thiscall *)(uintptr_t *, const EntityId &);
-    auto func = reinterpret_cast<efunc>(addr);
-    return func(&ctx->basicReg, ctx->id);
+    uintptr_t* basicReg;
+    EntityId id;
+
+    if(WinrtUtils::check(20, 50)) {
+        auto ctx = GetEntityContextV1_20_50();
+        id = ctx->id;
+        basicReg = &ctx->basicReg;
+        using efunc = Component *(__thiscall *)(uintptr_t *, const EntityId &);
+        auto func = reinterpret_cast<efunc>(addr);
+        return func(basicReg, id);
+    }else if(WinrtUtils::check(20, 40)) {
+        auto ctx = GetEntityContextV1_20_40();
+        id = ctx->id;
+        basicReg = &ctx->basicReg;
+        using efunc = Component *(__thiscall *)(uintptr_t *, const EntityId &);
+        auto func = reinterpret_cast<efunc>(addr);
+        return func(basicReg, id);
+    }else{
+        auto a1 = **(uintptr_t***)(this + 0x8);
+        auto a2 = *(uintptr_t*)(this + 0x10);
+
+        using efunc = Component* (__thiscall*)(uintptr_t, uintptr_t*);
+        auto func = reinterpret_cast<efunc>(addr);
+        return func(reinterpret_cast<uintptr_t>(a1), &a2);
+    }
 }
 
 bool Actor::isAlive() {
@@ -108,14 +129,22 @@ ItemStack *Actor::getOffhandSlot() {
     return fn(this);
 }
 
-EntityContext *Actor::GetEntityContext() { // TODO: Multiversion
-    return reinterpret_cast<EntityContext*>((uintptr_t)this + 0x8);
-    /*auto address = reinterpret_cast<uintptr_t>(this);
+EntityId Actor::getEntityId(){
     if(WinrtUtils::check(20, 50)) {
-        return reinterpret_cast<EntityContext *>(reinterpret_cast<V1_20_50::EntityContext *>(address + 8));
-    } else {
-        return reinterpret_cast<EntityContext *>(reinterpret_cast<V1_20_40::EntityContext *>(address + 8));
-    }*/
+        auto ctx = GetEntityContextV1_20_50();
+        return ctx->id;
+    }else{
+        auto ctx = GetEntityContextV1_20_40();
+        return ctx->id;
+    }
+}
+
+V1_20_50::EntityContext *Actor::GetEntityContextV1_20_50() {
+    return reinterpret_cast<V1_20_50::EntityContext*>((uintptr_t)this + 0x8);
+}
+
+V1_20_40::EntityContext *Actor::GetEntityContextV1_20_40() {
+    return reinterpret_cast<V1_20_40::EntityContext*>((uintptr_t)this + 0x8);
 }
 
 void Actor::setNametag(std::string *name) {
