@@ -119,6 +119,12 @@ void OffsetInit::init2070() {
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x438);
     ADD_OFFSET("RaknetConnector::getPeer", 0x278);
 
+    ADD_OFFSET("RakPeer::NumberOfConnections", 10); // `vtable for'RakNet::RakPeer
+    ADD_OFFSET("RakPeer::GetSystemAddressFromIndex", 32);
+    ADD_OFFSET("RakPeer::GetGUIDFromIndex", 33);
+    ADD_OFFSET("RakPeer::GetAveragePing", 42);
+    ADD_OFFSET("RakPeer::GetLastPing", 43);
+
     ADD_OFFSET("BaseActorRenderContext::itemRenderer", 0x58);
 
     ADD_OFFSET("GuiData::ScreenSize", 0x0030);
@@ -582,5 +588,5 @@ void OffsetInit::init2030() {
     ADD_OFFSET("VisualTree::root", 0x8);
 
     ADD_OFFSET("Level::hitResult", 0xA48);
-    ADD_OFFSET("Level::getPlayerMap", 0x3048);
+    ADD_OFFSET("Level::getPlayerMap", 0x2608);
 }
