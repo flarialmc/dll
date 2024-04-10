@@ -76,8 +76,10 @@ public:
             module->settings.setValue("percentageX", percentages.x);
             module->settings.setValue("percentageY", percentages.y);
 
-            if (ClickGUIRenderer::editmenu)
+            if (ClickGUIRenderer::editmenu) {
+                FlarialGUI::RoundedRect(currentPos.x, currentPos.y, D2D1::ColorF(D2D1::ColorF::White, 0.2f), s * 3 + spacing * 3, s);
                 FlarialGUI::UnsetWindowRect();
+            }
         }
 
         if (SDK::currentScreen != "hud_screen") ClickGUIRenderer::editmenu = false;

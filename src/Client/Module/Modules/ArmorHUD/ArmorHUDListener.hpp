@@ -124,24 +124,31 @@ public:
             Vec2<float> settingperc = Vec2<float>(module->settings.getSettingByName<float>("percentageX")->value,
                                                   module->settings.getSettingByName<float>("percentageY")->value);
 
+            float width;
+            float height;
+
+            if (!module->settings.getSettingByName<bool>("vertical")->value) {
+                width = s * 3 + spacing * 3;
+                height = s;
+            }else{
+                width = s;
+                height = s * 3 + spacing * 3;
+            }
+
             if (settingperc.x != 0)
                 currentPos = Vec2<float>(settingperc.x * MC::windowSize.x,
                                          settingperc.y * MC::windowSize.y);
             else
-                currentPos = Constraints::CenterConstraint(s * 3 + spacing * 3, s);
+                currentPos = Constraints::CenterConstraint(width, height);
 
             if (ClickGUIRenderer::editmenu) {
                 // bounding boxes
-                if (!module->settings.getSettingByName<bool>("vertical")->value)
-                    FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, s * 3 + spacing * 3, s, 18);
-                else FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, s, s * 3 + spacing * 3, 18);
+                FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 18);
             }
 
             Vec2<float> vec2;
             // bounding boxes
-            if (!module->settings.getSettingByName<bool>("vertical")->value)
-                vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 18, s * 3 + spacing * 3, s);
-            else vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 18, s, s * 3 + spacing * 3);
+            vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 18, width, height);
 
             currentPos.x = vec2.x;
             currentPos.y = vec2.y;
@@ -151,8 +158,10 @@ public:
             module->settings.setValue("percentageX", percentages.x);
             module->settings.setValue("percentageY", percentages.y);
 
-            if (ClickGUIRenderer::editmenu)
+            if (ClickGUIRenderer::editmenu) {
+                FlarialGUI::RoundedRect(currentPos.x, currentPos.y, D2D1::ColorF(D2D1::ColorF::White, 0.4f), width, height);
                 FlarialGUI::UnsetWindowRect();
+            }
 
             if(module->settings.getSettingByName<bool>("showdurability")->value)
                 renderDurability();
