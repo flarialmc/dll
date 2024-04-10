@@ -81,7 +81,7 @@ void OffsetInit::init2070() {
     ADD_OFFSET("ClientInstance::Matrix1", 0x330);
     ADD_OFFSET("ClientInstance::clientHMDState", 0x5A8); // unused
 
-    ADD_OFFSET("ClientInstance::getFovX", 0x6F8);
+    ADD_OFFSET("ClientInstance::getFovX", 0x6F0);
     ADD_OFFSET("ClientInstance::getFovY", 0x704); // untested
     ADD_OFFSET("ClientInstance::getPacketSender", 0xF0);
 
