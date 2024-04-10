@@ -120,7 +120,19 @@ uint32_t generateUniqueTextFormatKey(std::string &font, int alignment,
 }
 
 uint64_t generateUniqueLinearGradientBrushKey(float x, float hexPreviewSize, float shadePickerWidth,
-                                              ID2D1GradientStopCollection *pGradientStops) {
+                                              ID2D1GradientStopCollection* pGradientStops) {
+
+    // Get gradient stops
+    UINT32 stopCount = pGradientStops->GetGradientStopCount();
+    auto* gradientStops = new D2D1_GRADIENT_STOP[stopCount];
+    pGradientStops->GetGradientStops(gradientStops, stopCount);
+
+    // Hash for gradient stops' colors
+    std::hash<UINT32> colorHash;
+    uint64_t colorKey = 0;
+    for (UINT32 i = 0; i < stopCount; ++i) {
+        colorKey ^= colorHash(ColorValueToUInt(gradientStops[i].color));
+    }
 
     // Use std::hash to create a hash value for each parameter
     std::hash<float> xHash;
@@ -130,9 +142,12 @@ uint64_t generateUniqueLinearGradientBrushKey(float x, float hexPreviewSize, flo
 
     // Combine the hash values of each parameter
     size_t combinedHash = xHash(x) ^
-            hexPreviewSizeHash(hexPreviewSize) ^
-            shadePickerWidthHash(shadePickerWidth) ^
-            stopsHash(pGradientStops->GetGradientStopCount());
+                          hexPreviewSizeHash(hexPreviewSize) ^
+                          shadePickerWidthHash(shadePickerWidth) ^
+                          stopsHash(stopCount) ^
+                          colorKey;
+
+    delete[] gradientStops;
 
     return combinedHash;
 }
