@@ -54,13 +54,13 @@ public:
     template<unsigned int IIdx, typename TRet, typename... TArgs>
     static inline auto CallVFunc(void *thisptr, TArgs... argList) -> TRet {
         using Fn = TRet(__thiscall *)(void *, decltype(argList)...);
-        return (*static_cast<Fn **>(thisptr))[IIdx](thisptr, argList...);
+        return (*static_cast<Fn **>(thisptr))[IIdx](thisptr, std::forward<TArgs>(argList)...);
     }
 
     template <typename TRet, typename... TArgs>
     static auto CallVFuncI(uint32_t index, void* thisptr, TArgs... argList) -> TRet {
-        using Fn = TRet(__thiscall*)(void*, decltype(argList)...);
-        return (*static_cast<Fn**>(thisptr))[index](thisptr, argList...);
+        using Fn = TRet(__thiscall*)(void*, TArgs...);
+        return (*static_cast<Fn**>(thisptr))[index](thisptr, std::forward<TArgs>(argList)...);
     }
 
     static void hookFunc(void *pTarget, void *pDetour, void **ppOriginal, std::string name) {
