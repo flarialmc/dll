@@ -217,7 +217,7 @@ public:
     }
 
     void normalRender(int index, std::string& value) override {
-        if (SDK::hasInstanced && active) {
+        if (SDK::hasInstanced && (active || ClickGUIRenderer::editmenu)) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                 float keycardSize = Constraints::RelativeConstraint(
                         0.05f * this->settings.getSettingByName<float>("uiscale")->value, "height", true);
