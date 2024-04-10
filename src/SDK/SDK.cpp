@@ -45,10 +45,11 @@ std::shared_ptr<Packet> SDK::createPacket(int id) {
 
 void SDK::setCurrentScreen(const std::string& layer) {
     auto currentTime = std::chrono::steady_clock::now();
-    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - SDK::lastSetCurrentScreenTime).count();
+    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastSetCurrentScreenTime).count();
 
-    if (elapsedTime < 16) {
-        return;
+    if (layer != SDK::currentScreen && elapsedTime >= (layer == SDK::currentScreen ? 16 : 500)) {
+        lastSetCurrentScreenTime = std::chrono::steady_clock::now();
+        SDK::currentScreen = layer;
     }
 
     SDK::lastSetCurrentScreenTime = std::chrono::steady_clock::now();
