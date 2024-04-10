@@ -51,9 +51,6 @@ void SDK::setCurrentScreen(const std::string& layer) {
         lastSetCurrentScreenTime = std::chrono::steady_clock::now();
         SDK::currentScreen = layer;
     }
-
-    SDK::lastSetCurrentScreenTime = std::chrono::steady_clock::now();
-    SDK::currentScreen = layer;
 }
 
 int SDK::getServerPing() {
