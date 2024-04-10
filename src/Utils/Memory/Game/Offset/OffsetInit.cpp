@@ -45,7 +45,7 @@ void OffsetInit::init2070() {
 
     ADD_OFFSET("createMaterial", 1); // unused
 
-    ADD_OFFSET("Actor::hurtTime", 0x1FC);
+    ADD_OFFSET("Actor::hurtTime", 0x214); // ?hurtEffects@Mob@@UEAAXAEBVActorDamageSource@@M_N1@Z Mob::hurtEffects 2nd after Actor::getHealth(void)
     ADD_OFFSET("Actor::level", 0x258);
     ADD_OFFSET("Actor::categories", 0x290);
     ADD_OFFSET("Actor::actorRotationComponent", 0x2A8);
@@ -76,10 +76,10 @@ void OffsetInit::init2070() {
     ADD_OFFSET("ClientHMDState::lastLevelProjMatrix", 0x148);
 
     ADD_OFFSET("ClientInstance::minecraftGame", 0xC8);
-    ADD_OFFSET("ClientInstance::guiData", 0x560);
+    ADD_OFFSET("ClientInstance::guiData", 0x558);
     ADD_OFFSET("ClientInstance::camera", 0x270);
     ADD_OFFSET("ClientInstance::Matrix1", 0x330);
-    ADD_OFFSET("ClientInstance::clientHMDState", 0x5B0);
+    ADD_OFFSET("ClientInstance::clientHMDState", 0x5A8); // unused
 
     ADD_OFFSET("ClientInstance::getFovX", 0x6F8);
     ADD_OFFSET("ClientInstance::getFovY", 0x704); // untested
@@ -119,11 +119,11 @@ void OffsetInit::init2070() {
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x438);
     ADD_OFFSET("RaknetConnector::getPeer", 0x278);
 
-    ADD_OFFSET("RakPeer::NumberOfConnections", 10); // `vtable for'RakNet::RakPeer
-    ADD_OFFSET("RakPeer::GetSystemAddressFromIndex", 32);
-    ADD_OFFSET("RakPeer::GetGUIDFromIndex", 33);
-    ADD_OFFSET("RakPeer::GetAveragePing", 42);
-    ADD_OFFSET("RakPeer::GetLastPing", 43);
+    ADD_OFFSET("RakPeer::NumberOfConnections", 10); // `vtable for'RakNet::RakPeer in linux bds
+    ADD_OFFSET("RakPeer::GetSystemAddressFromIndex", 33);
+    ADD_OFFSET("RakPeer::GetGUIDFromIndex", 31);
+    ADD_OFFSET("RakPeer::GetAveragePing", 41);
+    ADD_OFFSET("RakPeer::GetLastPing", 42);
 
     ADD_OFFSET("BaseActorRenderContext::itemRenderer", 0x58);
 
@@ -491,7 +491,7 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("createMaterial", 1); // unused
 
-    ADD_OFFSET("Actor::hurtTime", 0x260);
+    ADD_OFFSET("Actor::hurtTime", 0x22C);
     ADD_OFFSET("Actor::level", 0x260);
     ADD_OFFSET("Actor::categories", 0x298);
     ADD_OFFSET("Actor::actorRotationComponent", 0x2B0);
