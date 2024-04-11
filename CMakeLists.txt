@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD 20)
 
 if(MSVC)
     add_compile_options(/MT)
+#    add_compile_options("$<$<CONFIG:RELEASE>:/Zi>")
+#    add_link_options("$<$<CONFIG:RELEASE>:/DEBUG>") # Enable debug symbols in release for edge cases.
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 endif()
 
