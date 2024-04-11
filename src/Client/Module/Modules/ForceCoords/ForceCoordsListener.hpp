@@ -39,7 +39,7 @@ public:
                                 mojanged = false;
                             }
 
-                            Vec3<float> Pos = SDK::clientInstance->getLocalPlayer()->stateVector->Pos;
+                            Vec3<float> Pos = SDK::clientInstance->getLocalPlayer()->aabb->aabb.lower;
                             //Vec3<float> PrevPos = SDK::clientInstance->getLocalPlayer()->stateVector->PrevPos;
                             //Vec3<float> vel = SDK::clientInstance->getLocalPlayer()->stateVector->velocity;
 
