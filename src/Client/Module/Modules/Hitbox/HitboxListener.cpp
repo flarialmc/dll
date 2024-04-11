@@ -2,7 +2,7 @@
 #include "../../../../Utils/Render/DrawUtils.hpp"
 
 void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
-    entitiesToRender.clear();
+    aabbsToRender.clear();
     if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->mcgame->mouseGrabbed ||
         !SDK::clientInstance->getLocalPlayer()->level)
         return;
@@ -15,15 +15,12 @@ void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
                 ent->getActorFlag(ActorFlags::FLAG_INVISIBLE)) // + ent == player ||
                 continue;
 
-            // Add to render list
-            entitiesToRender.insert(ent->getEntityId());
+            aabbsToRender.emplace_back(ent->getaabb()->aabb);
         }
     }
 }
 
 void HitboxListener::onRender(RenderEvent &event) {
-    if (!this->module->isEnabled())
-        return;
 
     if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->mcgame->mouseGrabbed ||
         !SDK::clientInstance->getLocalPlayer()->level)
@@ -37,13 +34,10 @@ void HitboxListener::onRender(RenderEvent &event) {
         if (module->settings.getSettingByName<bool>("color_rgb")->value) color2 = FlarialGUI::rgbColor;
         else color2 = FlarialGUI::HexToColorF(module->settings.getSettingByName<std::string>("color")->value);
 
-        for (const auto &ent: player->level->getRuntimeActorList()) {
-            if (entitiesToRender.contains(ent->getEntityId())){
-                DrawUtils::addEntityBox(ent, (float)fmax(0.5f, 1 / (float)fmax(1,
-                                                                               player->getRenderPositionComponent()->renderPos.dist(
-                                                                                       ent->getRenderPositionComponent()->renderPos))),
-                                        color2);
-            }
+        for (const auto &aabb: aabbsToRender) {
+            auto lineWidth = (float)fmax(0.5f, 1 / (float)fmax(1,
+                                                               player->getRenderPositionComponent()->renderPos.dist(aabb.lower)));
+            DrawUtils::addBox(aabb.lower, aabb.upper, lineWidth, 1, color2);
         }
     }
 }
