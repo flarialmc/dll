@@ -8,6 +8,9 @@
 #include <d3d11on12.h>
 #include <wrl/client.h>
 #include <algorithm>
+#include <windows.h>
+#include <iostream>
+#include <Psapi.h>
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", "") {}
 
@@ -18,6 +21,47 @@ static std::chrono::steady_clock::time_point start = std::chrono::high_resolutio
 static std::chrono::steady_clock::time_point previousFrameTime = std::chrono::high_resolution_clock::now();
 
 int SwapchainHook::currentBitmap;
+
+bool unloadDll(const wchar_t* moduleName) {
+    HMODULE hModule = GetModuleHandleW(moduleName);
+    if (hModule != NULL) {
+        if (FreeLibrary(hModule)) {
+            Logger::debug("[UNLOAD DLL] DLL unloaded!");
+            return true;
+        } else {
+            Logger::debug("[UNLOAD DLL] Failed to FreeLibrary!");
+            return false;
+        }
+    } else {
+        Logger::debug("[UNLOAD DLL] Failed to unload!");
+        return false;
+    }
+}
+
+bool containsModule(const std::wstring& moduleName) {
+    // Get the handle to the current process
+    HANDLE hProcess = GetCurrentProcess();
+    HMODULE hMods[1024];
+    DWORD cbNeeded;
+
+    // Enumerate modules in the process
+    if (EnumProcessModulesEx(hProcess, hMods, sizeof(hMods), &cbNeeded, LIST_MODULES_ALL)) {
+        for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++) {
+            TCHAR szModName[MAX_PATH];
+
+            // Get the full path to the module
+            if (GetModuleFileNameEx(hProcess, hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR))) {
+                std::wstring baseModuleName = std::filesystem::path(szModName).filename().wstring();
+                // Compare the base module name with the given module name
+                if (moduleName == baseModuleName) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
 
 void SwapchainHook::enableHook() {
     void *swapchain_ptr;
@@ -32,6 +76,17 @@ void SwapchainHook::enableHook() {
 
     if (Client::settings.getSettingByName<bool>("killdx")->value) {
         SwapchainHook::queue = nullptr;
+    }
+
+    bool isRTSS = containsModule(L"RTSSHooks64.dll");
+
+    if(isRTSS) {
+        if(!unloadDll(L"RTSSHooks64.dll")) {
+            Logger::debug("[Swapchain] MSI Afterburner failed to unload!");
+            MessageBox(NULL, "Flarial: client failed to initialize, disable MSI Afterburner!", "", MB_OK);
+            ModuleManager::terminate();
+            Client::disable = true;
+        }
     }
 
     this->manualHook(swapchain_ptr, (void *) swapchainCallback, (void **) &funcOriginal);
