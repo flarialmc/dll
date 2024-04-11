@@ -2,28 +2,45 @@
 
 #include <string>
 #include <unordered_map>
+#include "../../../Utils/Utils.hpp"
 
-// TODO: Signature class
+#define ADD_SIG(name, sig) \
+    []{ \
+        constexpr unsigned int hash_val = Utils::hash(name); \
+        Mgr.addSignature(name, sig); \
+    }()
 
-#define ADD_SIG(name, sig) Mgr.addSignature(name, sig)
-#define GET_SIG(name) Mgr.getSig(name)
+#define GET_SIG(name) \
+    []{ \
+        constexpr unsigned int hash_val = Utils::hash(name); \
+        return Mgr.getSig(name); \
+    }()
 
-#define ADD_OFFSET(name, offset) Mgr.addOffset(name, offset)
-#define GET_OFFSET(name) Mgr.getOffset(name)
+#define ADD_OFFSET(name, offset) \
+    []{ \
+        constexpr unsigned int hash_val = Utils::hash(name); \
+        Mgr.addOffset(name, offset); \
+    }()
+
+#define GET_OFFSET(name) \
+    []{ \
+        constexpr unsigned int hash_val = Utils::hash(name); \
+        return Mgr.getOffset(name); \
+    }()
 
 class SignatureAndOffsetManager {
 public:
-    void addSignature(const std::string& name, const std::string& sig);
-    [[nodiscard]] std::string getSig(const std::string& name) const;
+    void addSignature(const char* name, const char* sig);
+    [[nodiscard]] const char* getSig(const char* name) const;
 
-    void addOffset(const std::string& name, const int& offset);
-    [[nodiscard]] int getOffset(const std::string& name) const;
+    void addOffset(const char* name, int offset);
+    [[nodiscard]] int getOffset(const char* name) const;
 
     void clear();
 
 private:
-    std::unordered_map<std::string, std::string> sigs{};
-    std::unordered_map<std::string, int> offsets{};
+    std::unordered_map<unsigned int, std::string> sigs{};
+    std::unordered_map<unsigned int, int> offsets{};
 };
 
 extern SignatureAndOffsetManager Mgr;

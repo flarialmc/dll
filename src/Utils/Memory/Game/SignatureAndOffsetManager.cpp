@@ -1,38 +1,26 @@
 #include "SignatureAndOffsetManager.hpp"
 
-#include "../../Logger/Logger.hpp"
-
 SignatureAndOffsetManager Mgr;
 
-void SignatureAndOffsetManager::addSignature(const std::string& name, const std::string& sig) {
-    sigs.emplace(name, sig);
+void SignatureAndOffsetManager::addSignature(const char* name, const char* sig) {
+    sigs[Utils::hash(name)] = sig;
 }
 
-std::string SignatureAndOffsetManager::getSig(const std::string& name) const {
-    if (!sigs.contains(name)) {
-#ifndef NDEBUG
-        Logger::debug("[Signatures] Couldn't find sig: " + name);
-#endif
-        return "";
-    }
-    return sigs.at(name);
+const char* SignatureAndOffsetManager::getSig(const char* name) const {
+    auto it = sigs.find(Utils::hash(name));
+    return it != sigs.end() ? it->second.c_str() : nullptr;
 }
 
-void SignatureAndOffsetManager::addOffset(const std::string &name, const int& offset) {
-    offsets.emplace(name, offset);
+void SignatureAndOffsetManager::addOffset(const char* name, int offset) {
+    offsets[Utils::hash(name)] = offset;
 }
 
-int SignatureAndOffsetManager::getOffset(const std::string& name) const {
-    if (!offsets.contains(name)) {
-        #ifndef NDEBUG
-        Logger::debug("[Offsets] Couldn't find offset: " + name);
-        #endif
-        return 0;
-    }
-    return offsets.at(name);
+int SignatureAndOffsetManager::getOffset(const char* name) const {
+    auto it = offsets.find(Utils::hash(name));
+    return it != offsets.end() ? it->second : 0; // Default to 0 if not found
 }
 
 void SignatureAndOffsetManager::clear() {
     sigs.clear();
+    offsets.clear();
 }
-
