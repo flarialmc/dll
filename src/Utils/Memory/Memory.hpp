@@ -95,12 +95,14 @@ public:
     static uintptr_t findSig(std::string_view signature) {
         const auto parsed = hat::parse_signature(signature);
         if (!parsed.has_value()) {
+            Logger::debug("[ Runtime Scanner ] Failed to parse signature: " + std::string(signature));
             return 0u;
         }
 
         const auto result = hat::find_pattern(parsed.value());
 
         if (!result.has_result()) {
+            Logger::debug("[ Runtime Scanner ] Failed to find signature: " + std::string(signature));
             return 0u;
         }
 
