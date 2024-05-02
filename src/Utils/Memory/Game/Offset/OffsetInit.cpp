@@ -29,20 +29,20 @@ void OffsetInit::init2080() {
     // AutoSprint
     ADD_OFFSET("Mob::setSprinting", 154); // +
 
-    ADD_OFFSET("BlockSource::getBlock", 2); // unused
+    //ADD_OFFSET("BlockSource::getBlock", 2); // unused
 
     // Armour HUD, Inventory HUD
     ADD_OFFSET("Inventory::getItem", 5);
 
     ADD_OFFSET("ClientInstance::getBlockSource", 28);
     ADD_OFFSET("ClientInstance::getLocalPlayer", 29);
-    ADD_OFFSET("ClientInstance::refocusMouse", 333); // unused
-    ADD_OFFSET("ClientInstance::levelRenderer", 0xE0); // unused
+    //ADD_OFFSET("ClientInstance::refocusMouse", 333); // unused
+    ADD_OFFSET("ClientInstance::levelRenderer", 0xE0);
 
     ADD_OFFSET("Packet::getId", 1);
-    ADD_OFFSET("Packet::getName", 2); // unused
+    //ADD_OFFSET("Packet::getName", 2); // unused
 
-    ADD_OFFSET("createMaterial", 1); // unused
+    //ADD_OFFSET("createMaterial", 1); // unused
 
 //    ADD_OFFSET("Actor::bobOffset", 0x258);
 //    ADD_OFFSET("Actor::Age", 0x98); 1F0
@@ -60,7 +60,7 @@ void OffsetInit::init2080() {
     ADD_OFFSET("Gamemode::lastBreakProgress", 0x20);
     ADD_OFFSET("Gamemode::attackVft", 14);
 
-    ADD_OFFSET("Mob::mobHurtTimeComponent", 0x610); // unused
+    //ADD_OFFSET("Mob::mobHurtTimeComponent", 0x610); // unused
 
     ADD_OFFSET("Player::playerInventory", 0x788); // +
     ADD_OFFSET("Player::playerName", 0x1D18); // +
@@ -109,6 +109,7 @@ void OffsetInit::init2080() {
     ADD_OFFSET("Weather::lightingLevel", 0x44); // +
     ADD_OFFSET("Weather::rainLevel", 0x3C); // +
 
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x308);
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x5FC);
 
     ADD_OFFSET("LoopbackPacketSender::networkSystem", 0x20);
@@ -177,12 +178,12 @@ void OffsetInit::init2070() {
     ADD_OFFSET("Actor::getActorFlag", 0);
     ADD_OFFSET("Actor::isAlive", 53);
     ADD_OFFSET("Actor::isValidTarget", 61);
-    ADD_OFFSET("Player::getXuid", 247);
+    //ADD_OFFSET("Player::getXuid", 247); // unused
 
     // AutoSprint
     ADD_OFFSET("Mob::setSprinting", 159);
 
-    ADD_OFFSET("BlockSource::getBlock", 2); // unused
+    //ADD_OFFSET("BlockSource::getBlock", 2); // unused
 
     // Armour HUD, Inventory HUD
     ADD_OFFSET("Inventory::getItem", 5);
@@ -193,12 +194,12 @@ void OffsetInit::init2070() {
     ADD_OFFSET("ClientInstance::levelRenderer", 0xE0);
 
     ADD_OFFSET("Packet::getId", 1);
-    ADD_OFFSET("Packet::getName", 2); // unused
+    //ADD_OFFSET("Packet::getName", 2); // unused
 
-    ADD_OFFSET("createMaterial", 1); // unused
+    //ADD_OFFSET("createMaterial", 1); // unused
 
-    ADD_OFFSET("Actor::bobOffset", 0x258);
-    ADD_OFFSET("Actor::Age", 0x98);
+    //ADD_OFFSET("Actor::bobOffset", 0x258);
+    //ADD_OFFSET("Actor::Age", 0x98);
     ADD_OFFSET("Actor::hurtTime", 0x214); // ?hurtEffects@Mob@@UEAAXAEBVActorDamageSource@@M_N1@Z Mob::hurtEffects 2nd after Actor::getHealth(void)
     ADD_OFFSET("Actor::level", 0x258);
     ADD_OFFSET("Actor::categories", 0x290);
@@ -262,6 +263,7 @@ void OffsetInit::init2070() {
     ADD_OFFSET("Weather::lightingLevel", 0x44);
     ADD_OFFSET("Weather::rainLevel", 0x38);
 
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x308);
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x5FC);
 
     ADD_OFFSET("LoopbackPacketSender::networkSystem", 0x20);
@@ -330,25 +332,25 @@ void OffsetInit::init2060() {
     ADD_OFFSET("Actor::getActorFlag", 0);
     ADD_OFFSET("Actor::isAlive", 54);
     ADD_OFFSET("Actor::isValidTarget", 62);
-    ADD_OFFSET("Player::getXuid", 260);
+    //ADD_OFFSET("Player::getXuid", 260);
 
     // AutoSprint
     ADD_OFFSET("Mob::setSprinting", 165);
 
-    ADD_OFFSET("BlockSource::getBlock", 2); // unused
+    //ADD_OFFSET("BlockSource::getBlock", 2); // unused
 
     // Armour HUD, Inventory HUD
     ADD_OFFSET("Inventory::getItem", 5);
 
     ADD_OFFSET("ClientInstance::getBlockSource", 27);
     ADD_OFFSET("ClientInstance::getLocalPlayer", 28);
-    ADD_OFFSET("ClientInstance::refocusMouse", 329); // unused
+    //ADD_OFFSET("ClientInstance::refocusMouse", 329); // unused
     ADD_OFFSET("ClientInstance::levelRenderer", 0xE0);
 
     ADD_OFFSET("Packet::getId", 1);
-    ADD_OFFSET("Packet::getName", 2); // unused
+    //ADD_OFFSET("Packet::getName", 2); // unused
 
-    ADD_OFFSET("createMaterial", 1); // unused
+    //ADD_OFFSET("createMaterial", 1); // unused
 
     ADD_OFFSET("Actor::hurtTime", 0x234);
     ADD_OFFSET("Actor::level", 0x290);
@@ -413,6 +415,7 @@ void OffsetInit::init2060() {
     ADD_OFFSET("Weather::lightingLevel", 0x44);
     ADD_OFFSET("Weather::rainLevel", 0x38);
 
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x308);
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x5E4);
 
     ADD_OFFSET("LoopbackPacketSender::networkSystem", 0x20);
@@ -474,19 +477,19 @@ void OffsetInit::init2050() {
     ADD_OFFSET("Actor::getActorFlag", 0);
     ADD_OFFSET("Actor::isAlive", 57);
     ADD_OFFSET("Actor::isValidTarget", 65);
-    ADD_OFFSET("Player::getXuid", 268); // unused
+    //ADD_OFFSET("Player::getXuid", 268); // unused
 
     // AutoSprint
     ADD_OFFSET("Mob::setSprinting", 252);
 
-    ADD_OFFSET("BlockSource::getBlock", 2); // unused
+    //ADD_OFFSET("BlockSource::getBlock", 2); // unused
 
     // Armour HUD, Inventory HUD
     ADD_OFFSET("Inventory::getItem", 5);
 
     ADD_OFFSET("ClientInstance::getBlockSource", 27);
     ADD_OFFSET("ClientInstance::getLocalPlayer", 28);
-    ADD_OFFSET("ClientInstance::refocusMouse", 328); // unused
+    //ADD_OFFSET("ClientInstance::refocusMouse", 328); // unused
     ADD_OFFSET("ClientInstance::levelRenderer", 0xE0);
 
     ADD_OFFSET("ClientInstance::getFovX", 0x6F8);
@@ -494,9 +497,9 @@ void OffsetInit::init2050() {
     ADD_OFFSET("ClientInstance::getPacketSender", 0xF0);
 
     ADD_OFFSET("Packet::getId", 1);
-    ADD_OFFSET("Packet::getName", 2); // unused
+    //ADD_OFFSET("Packet::getName", 2); // unused
 
-    ADD_OFFSET("createMaterial", 1); // unused
+    //ADD_OFFSET("createMaterial", 1); // unused
 
     ADD_OFFSET("Actor::hurtTime", 0x22C);
     ADD_OFFSET("Actor::level", 0x288);
@@ -557,6 +560,7 @@ void OffsetInit::init2050() {
     ADD_OFFSET("Weather::lightingLevel", 0x44);
     ADD_OFFSET("Weather::rainLevel", 0x38);
 
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x308);
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x5E4);
 
     ADD_OFFSET("LoopbackPacketSender::networkSystem", 0x20);
@@ -624,14 +628,14 @@ void OffsetInit::init2040() {
     // AutoSprint
     ADD_OFFSET("Mob::setSprinting", 175);
 
-    ADD_OFFSET("BlockSource::getBlock", 2); // unused
+    //ADD_OFFSET("BlockSource::getBlock", 2); // unused
 
     // Armour HUD, Inventory HUD
     ADD_OFFSET("Inventory::getItem", 5);
 
     ADD_OFFSET("ClientInstance::getBlockSource", 26);
     ADD_OFFSET("ClientInstance::getLocalPlayer", 27);
-    ADD_OFFSET("ClientInstance::refocusMouse", 307); // unused
+    //ADD_OFFSET("ClientInstance::refocusMouse", 307); // unused
     ADD_OFFSET("ClientInstance::levelRenderer", 0xE0);
 
     ADD_OFFSET("ClientInstance::getFovX", 0x6F8);
@@ -639,9 +643,9 @@ void OffsetInit::init2040() {
     ADD_OFFSET("ClientInstance::getPacketSender", 0xF0);
 
     ADD_OFFSET("Packet::getId", 1);
-    ADD_OFFSET("Packet::getName", 2); // unused
+    //ADD_OFFSET("Packet::getName", 2); // unused
 
-    ADD_OFFSET("createMaterial", 1); // unused
+    //ADD_OFFSET("createMaterial", 1); // unused
 
     ADD_OFFSET("Actor::hurtTime", 0x204);
     ADD_OFFSET("Actor::level", 0x260);
@@ -702,6 +706,7 @@ void OffsetInit::init2040() {
     ADD_OFFSET("Weather::lightingLevel", 0x48);
     ADD_OFFSET("Weather::rainLevel", 0x3C);
 
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x308);
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x5E4);
 
     ADD_OFFSET("LoopbackPacketSender::networkSystem", 0x20);
@@ -768,14 +773,14 @@ void OffsetInit::init2030() {
     // AutoSprint
     ADD_OFFSET("Mob::setSprinting", 252);
 
-    ADD_OFFSET("BlockSource::getBlock", 2); // unused
+    //ADD_OFFSET("BlockSource::getBlock", 2); // unused
 
     // Armour HUD, Inventory HUD
     ADD_OFFSET("Inventory::getItem", 5);
 
     ADD_OFFSET("ClientInstance::getBlockSource", 26);
     ADD_OFFSET("ClientInstance::getLocalPlayer", 27);
-    ADD_OFFSET("ClientInstance::refocusMouse", 307); // unused
+    //ADD_OFFSET("ClientInstance::refocusMouse", 307); // unused
     ADD_OFFSET("ClientInstance::levelRenderer", 0xE0);
 
     ADD_OFFSET("ClientInstance::getFovX", 0x6F8);
@@ -783,9 +788,9 @@ void OffsetInit::init2030() {
     ADD_OFFSET("ClientInstance::getPacketSender", 0xF0);
 
     ADD_OFFSET("Packet::getId", 1);
-    ADD_OFFSET("Packet::getName", 2); // unused
+    //ADD_OFFSET("Packet::getName", 2); // unused
 
-    ADD_OFFSET("createMaterial", 1); // unused
+    //ADD_OFFSET("createMaterial", 1); // unused
 
     ADD_OFFSET("Actor::hurtTime", 0x22C);
     ADD_OFFSET("Actor::level", 0x260);
@@ -846,6 +851,7 @@ void OffsetInit::init2030() {
     ADD_OFFSET("Weather::lightingLevel", 0x44);
     ADD_OFFSET("Weather::rainLevel", 0x38);
 
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x308);
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x5E4);
 
     ADD_OFFSET("LoopbackPacketSender::networkSystem", 0x20);

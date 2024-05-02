@@ -70,7 +70,7 @@ void SigInit::init2080() {
     ADD_SIG("Actor::getMoveInputHandler", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 2E CD 8B 46");
 
     // Hitboxes
-    ADD_SIG("Actor::getActorTypeComponent", "48 8B 89 18 01 0 0 48 8B 01 48 8B 40 28 48");
+    //ADD_SIG("Actor::getActorTypeComponent", "48 8B 89 18 01 0 0 48 8B 01 48 8B 40 28 48"); // unused
     ADD_SIG("Actor::getRenderPositionComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 6E F3 E8 D4");
     ADD_SIG("Actor::canSee", "E8 ? ? ? ? 84 C0 74 1C 48 8B 4F 48"); // Hitboxes
 
@@ -170,7 +170,7 @@ void SigInit::init2070() {
     ADD_SIG("Actor::getMoveInputHandler", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 2E CD 8B 46");
 
     // Hitboxes
-    ADD_SIG("Actor::getActorTypeComponent", "48 8B 89 20 04 00 00 48 8B 01 48 8B 40 28 48");
+    //ADD_SIG("Actor::getActorTypeComponent", "48 8B 89 20 04 00 00 48 8B 01 48 8B 40 28 48");
     ADD_SIG("Actor::getRenderPositionComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 6E F3 E8 D4");
     ADD_SIG("Actor::canSee", "E8 ? ? ? ? 84 C0 74 1C 48 8B 4F 48"); // Hitboxes
 
@@ -289,7 +289,7 @@ void SigInit::init2060() {
     ADD_SIG("Actor::getMoveInputHandler", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 2E CD 8B 46");
 
     // Hitboxes
-    ADD_SIG("Actor::getActorTypeComponent", "48 8B 89 20 04 00 00 48 8B 01 48 8B 40 28 48");
+    //ADD_SIG("Actor::getActorTypeComponent", "48 8B 89 20 04 00 00 48 8B 01 48 8B 40 28 48");
     ADD_SIG("Actor::getRenderPositionComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 6E F3 E8 D4");
     ADD_SIG("Actor::canSee", "E8 ? ? ? ? 84 C0 74 1C 48 8B 4F 48"); // Hitboxes
 
@@ -388,7 +388,7 @@ void SigInit::init2050() {
     ADD_SIG("Actor::getMoveInputHandler", "40 53 48 83 EC ? 48 8B DA BA 2E CD 8B 46");
 
     // Hitboxes
-    ADD_SIG("Actor::getActorTypeComponent", "48 8B 89 18 01 0 0 48 8B 01 48 8B 40 28 48");
+    //ADD_SIG("Actor::getActorTypeComponent", "48 8B 89 18 01 0 0 48 8B 01 48 8B 40 28 48");
     ADD_SIG("Actor::getRenderPositionComponent", "40 53 48 83 EC ? 48 8B DA BA 6E F3 E8 D4");
     ADD_SIG("Actor::canSee", "E8 ? ? ? ? 84 C0 74 1C 48 8B 4F 48"); // Hitboxes
 
@@ -487,7 +487,7 @@ void SigInit::init2040() {
     ADD_SIG("Actor::getMoveInputHandler", "40 53 48 83 EC 20 48 8B DA BA 2E");
 
     // Hitboxes
-    ADD_SIG("Actor::getActorTypeComponent", "48 8B 89 18 01 0 0 48 8B 01 48 8B 40 28 48");
+    //ADD_SIG("Actor::getActorTypeComponent", "48 8B 89 18 01 0 0 48 8B 01 48 8B 40 28 48");
     ADD_SIG("Actor::getRenderPositionComponent", "40 53 48 83 EC ? 48 8B DA BA 6E F3 E8 D4");
     ADD_SIG("Actor::canSee", "E8 ? ? ? ? 84 C0 74 1C 48 8B 4F 48"); // Hitboxes
 
@@ -586,7 +586,7 @@ void SigInit::init2030() {
     ADD_SIG("Actor::getMoveInputHandler", "40 53 48 83 EC 20 48 8B DA BA 2E");
 
     // Hitboxes
-    ADD_SIG("Actor::getActorTypeComponent", "48 8B 89 20 04 00 00 48 8B 01 48 8B 40 28 48");
+    //ADD_SIG("Actor::getActorTypeComponent", "48 8B 89 20 04 00 00 48 8B 01 48 8B 40 28 48");
     ADD_SIG("Actor::getRenderPositionComponent", "40 53 48 83 EC ? 48 8B DA BA 6E F3 E8 D4");
     ADD_SIG("Actor::canSee", "E8 ? ? ? ? 84 C0 74 1C 48 8B 4F 48"); // Hitboxes
 

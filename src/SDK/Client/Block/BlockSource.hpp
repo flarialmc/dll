@@ -12,7 +12,5 @@ public:
 
     BUILD_ACCESS(this, mcDimension*, dimension, GET_OFFSET("BlockSource::dimension"));
 
-    Block *getBlock(const Vec3<int> &);
-
     Biome *getBiome(const Vec3<int> &);
 };

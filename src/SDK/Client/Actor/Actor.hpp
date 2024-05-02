@@ -194,10 +194,6 @@ public:
 
     ItemStack *getArmor(int slot);
 
-    ActorTypeComponent *getActorTypeComponent();
-
-    int getEntityTypeId();
-
     MobEffectInstance *getEffect(MobEffect *effect);
 
     MoveInputComponent *getMoveInputHandler();
@@ -212,22 +208,15 @@ public:
 
     Vec3<float> *getPosition();
 
-    ActorHeadRotationComponent *getActorHeadRotationComponent();
-
     ItemStack *getOffhandSlot();
 
     EntityId getEntityId();
 
     V1_20_50::EntityContext *GetEntityContextV1_20_50();
 
-    V1_20_40::EntityContext *GetEntityContextV1_20_40();
-
-    float getSpeedInMetersPerSecond();
-
     void setNametag(std::string *name);
 
     std::string *getNametag();
-
 
     bool hasCategory(ActorCategory category);
 

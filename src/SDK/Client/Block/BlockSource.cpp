@@ -1,12 +1,6 @@
 #include "BlockSource.hpp"
 #include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
-
-Block *BlockSource::getBlock(const Vec3<int> &bp) {
-    static int off = GET_OFFSET("BlockSource::getBlock");
-    return Memory::CallVFuncI<Block *>(off, this, bp);
-}
-
 Biome *BlockSource::getBiome(const Vec3<int> &bp) {
 
     static uintptr_t sig;

@@ -36,8 +36,6 @@ public:
 
     void releaseMouse();
 
-    void refocusMouse();
-
     static std::string getTopScreenName();
 
     LevelRender *getLevelRender();

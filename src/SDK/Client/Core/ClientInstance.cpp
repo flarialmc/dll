@@ -34,11 +34,6 @@ void ClientInstance::releaseMouse() {
     return Memory::CallVFuncI<void>(index + 1, this);
 }
 
-void ClientInstance::refocusMouse() {
-    static int off = GET_OFFSET("ClientInstance::refocusMouse");
-    return Memory::CallVFuncI<void>(off, this);
-}
-
 std::string ClientInstance::getTopScreenName() {
     return SDK::currentScreen;
 }

@@ -36,28 +36,11 @@ std::string *Actor::getXuid(std::string *str) {
     return Memory::CallVFuncI<std::string *, std::string *>(off, this, str);
 }
 
-ActorTypeComponent *Actor::getActorTypeComponent() {
-    static uintptr_t sig;
-
-    if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getActorTypeComponent"));
-    }
-
-    return tryGet<ActorTypeComponent>(sig);
-}
-
-
-int Actor::getEntityTypeId() {
-    return getActorTypeComponent()->type;
-}
-
 bool Actor::canSee(const Actor& actor) {
     using canSeeFunc = bool (__fastcall *)(Actor *, const Actor&);
     static auto canSee = reinterpret_cast<canSeeFunc>(Memory::offsetFromSig(
             Memory::findSig(GET_SIG("Actor::canSee")), 1));
     return canSee(this, actor);
-
-    //return Memory::CallVFunc<82, bool, Player const&>(this, actor);
 }
 
 MobEffectInstance *Actor::getEffect(MobEffect *effect) {
@@ -99,18 +82,6 @@ MoveInputComponent *Actor::getMoveInputHandler() { //??$try_get@UMoveInputCompon
 
 }
 
-ActorHeadRotationComponent *Actor::getActorHeadRotationComponent() { //??$try_get@UActorHeadRotationComponent
-
-    static uintptr_t sig;
-
-    if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getActorHeadRotationComponent"));
-    }
-
-    return tryGet<ActorHeadRotationComponent>(sig);
-
-}
-
 ItemStack *Actor::getOffhandSlot() {
     static uintptr_t sig;
 
@@ -134,10 +105,6 @@ EntityId Actor::getEntityId(){
 
 V1_20_50::EntityContext *Actor::GetEntityContextV1_20_50() {
     return reinterpret_cast<V1_20_50::EntityContext*>((uintptr_t)this + 0x8);
-}
-
-V1_20_40::EntityContext *Actor::GetEntityContextV1_20_40() {
-    return reinterpret_cast<V1_20_40::EntityContext*>((uintptr_t)this + 0x8);
 }
 
 void Actor::setNametag(std::string *name) {

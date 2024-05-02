@@ -423,8 +423,6 @@ public:
     }
 
 public:
-    std::string *getName(std::string *amongus);
-
     MinecraftPacketIds getId();
 };
 
