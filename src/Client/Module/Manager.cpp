@@ -116,7 +116,9 @@ void ModuleManager::initialize() {
     ModuleManager::addModule(new SnapLook());
     ModuleManager::addModule(new HurtColor());
     ModuleManager::addModule(new FogColor());
-    ModuleManager::addModule(new ArmorHUD());
+    if(!WinrtUtils::check(20,80)) { // TODO: fix Actor::getArmor sig/use other method
+        ModuleManager::addModule(new ArmorHUD());
+    }
     ModuleManager::addModule(new TimeChanger());
     ModuleManager::addModule(new RenderOptions());
     ModuleManager::addModule(new PaperDoll());

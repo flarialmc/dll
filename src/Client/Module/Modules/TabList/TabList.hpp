@@ -70,7 +70,7 @@ public:
 
 
         if (settings.getSettingByName<bool>("BlurEffect") == nullptr) {
-            settings.addSetting("BlurEffect", true);
+            settings.addSetting("BlurEffect", false);
         }
 
     }

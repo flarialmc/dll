@@ -29,12 +29,13 @@ public:
 
                     auto inventory = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory;
                     if(inventory == nullptr) return;
-                    auto offhandItem = SDK::clientInstance->getLocalPlayer()->getOffhandSlot();
 
-                    if (offhandItem->getItem() != nullptr) {
-                        if (offhandItem->getItem()->name == "arrow") {
-                            arrows = offhandItem->count;
-                        }
+                    if(!WinrtUtils::check(20,80)) { // TODO: fix Actor::getOffhandSlot sig
+                        auto offhandItem = SDK::clientInstance->getLocalPlayer()->getOffhandSlot();
+                        if(offhandItem != nullptr)
+                            if (offhandItem->getItem() != nullptr)
+                                if (offhandItem->getItem()->name == "arrow")
+                                    arrows = offhandItem->count;
                     }
 
                     for (int i = 0; i < 36; i++) {

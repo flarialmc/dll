@@ -7,7 +7,7 @@
 #include "../Module.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
 #include <Windows.h>
-
+// TODO: when disabled, does not restore original settings
 class WeatherListener : public Listener {
 
     Module *module;
@@ -26,6 +26,8 @@ class WeatherListener : public Listener {
                         "lighting")->value;
             else SDK::clientInstance->getBlockSource()->dimension->weather->lightingLevel = 0.0f;
 
+
+            // TODO: When you set snow, it will stay even if on until game reload
             if (module->settings.getSettingByName<bool>("snow")->value) {
                 Vec3<float> *pos = event.getActor()->getPosition();
                 Vec3<int> e(pos->x, pos->y, pos->z);
@@ -40,6 +42,5 @@ public:
         this->name = string;
         this->module = module;
     }
-
 };
 

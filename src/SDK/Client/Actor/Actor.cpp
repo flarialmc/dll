@@ -34,12 +34,12 @@ Component *Actor::tryGet(uintptr_t addr) { // TODO: Multiversion
 }
 
 bool Actor::isAlive() {
-    static int off = GET_OFFSET("Actor::isPlayer");
+    static int off = GET_OFFSET("Actor::isAlive");
     return Memory::CallVFuncI<bool>(off, this);
 }
 
 std::string *Actor::getXuid(std::string *str) {
-    static int off = GET_OFFSET("Actor::getXuid");
+    static int off = GET_OFFSET("Player::getXuid");
     return Memory::CallVFuncI<std::string *, std::string *>(off, this, str);
 }
 
@@ -158,19 +158,6 @@ void Actor::setNametag(std::string *name) {
     return fn(this, name);
 }
 
-/*
-std::uint64_t Actor::getRuntimeID() {
-    static uintptr_t sig;
-
-    if (sig == NULL) {
-        sig = Memory::findSig("40 53 48 83 EC 20 8B 41 18 48 8B DA 48 8B 49 10 48 8D 54 24 30 89 44 24 30 E8 ?? ?? ?? ?? 48 85 C0 74 0F");
-    }
-
-    auto fn = reinterpret_cast<std::uint64_t (__thiscall*)(Actor*)>(sig);
-    return fn(this);
-}
-*/
-
 std::string *Actor::getNametag() {
     static uintptr_t sig;
 
@@ -180,11 +167,6 @@ std::string *Actor::getNametag() {
 
     auto fn = reinterpret_cast<std::string *(__thiscall *)(Actor *)>(sig);
     return fn(this);
-}
-
-bool Actor::isPlayer() {
-    static int off = GET_OFFSET("Actor::isPlayer");
-    return Memory::CallVFuncI<bool>(off, this);
 }
 
 bool Actor::hasCategory(ActorCategory category) {

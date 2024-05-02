@@ -177,7 +177,8 @@ struct AABBShapeComponent {
 
 class Actor {
 public:
-
+//    BUILD_ACCESS(this, int32_t , bobOffset, 0x98);
+//    BUILD_ACCESS(this, int32_t , Age, 0x98);
     BUILD_ACCESS(this, int16_t, hurtTime, GET_OFFSET("Actor::hurtTime"));
     BUILD_ACCESS(this, Level*, level, GET_OFFSET("Actor::level"));
     BUILD_ACCESS(this, ActorCategory, categories, GET_OFFSET("Actor::categories"));
@@ -227,7 +228,6 @@ public:
 
     std::string *getNametag();
 
-    bool isPlayer();
 
     bool hasCategory(ActorCategory category);
 

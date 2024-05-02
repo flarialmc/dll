@@ -19,6 +19,7 @@ class MinecraftUIRenderContext {
 public:
     BUILD_ACCESS(this, ClientInstance*, clientInstance, GET_OFFSET("MinecraftUIRenderContext::clientInstance"));
     BUILD_ACCESS(this, ScreenContext*, screenContext, GET_OFFSET("MinecraftUIRenderContext::screenContext"));
+    BUILD_ACCESS(this, float, FrameAlpha, 0x0);
 
     static MaterialPtr *getUIMaterial() {
         static uintptr_t ref;
