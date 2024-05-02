@@ -104,7 +104,7 @@ DWORD WINAPI init(HMODULE real)
         if (Client::disable) {
             break;
         } else {
-            Sleep(50); // wtf 50ms too high
+            Sleep(50);
         }
     }
 

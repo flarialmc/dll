@@ -10,7 +10,7 @@ class AutoRQ : public Module {
 public:
 
 
-    AutoRQ() : Module("Auto RE Q", "just auto re q",
+    AutoRQ() : Module("Auto RE Q", "Automatically requeues into a game",
                       R"(\Flarial\assets\re-q.png)", "") {
 
         Module::setup();
