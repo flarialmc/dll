@@ -35,7 +35,9 @@ public:
     static void initialize(const uintptr_t optionsEntryPtr){
         optionsBaseEntry = (uintptr_t **) optionsEntryPtr;
         initialized = true;
-        initVsync();
+        if((WinrtUtils::check(20,30) && !WinrtUtils::check(20,40)) || WinrtUtils::check(20,50)) { // does not work in 1.20.4X (crashes)
+            initVsync();
+        }
     };
 
     static bool isInitialized() {

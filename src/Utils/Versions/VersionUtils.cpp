@@ -23,6 +23,9 @@ void VersionUtils::init() {
     std::pair<std::function<void()>, std::function<void()>> p2050 = {SigInit::init2050, OffsetInit::init2050};
     versions.emplace("1.20.5", p2050);
 
+    std::pair<std::function<void()>, std::function<void()>> p2040 = {SigInit::init2040, OffsetInit::init2040};
+    versions.emplace("1.20.4", p2040);
+
     std::pair<std::function<void()>, std::function<void()>> p2030 = {SigInit::init2030, OffsetInit::init2030};
     versions.emplace("1.20.3", p2030);
 }

@@ -16,13 +16,6 @@ Component *Actor::tryGet(uintptr_t addr) { // TODO: Multiversion
         using efunc = Component *(__thiscall *)(uintptr_t *, const EntityId &);
         auto func = reinterpret_cast<efunc>(addr);
         return func(basicReg, id);
-    }else if(WinrtUtils::check(20, 40)) {
-        auto ctx = GetEntityContextV1_20_40();
-        id = ctx->id;
-        basicReg = &ctx->basicReg;
-        using efunc = Component *(__thiscall *)(uintptr_t *, const EntityId &);
-        auto func = reinterpret_cast<efunc>(addr);
-        return func(basicReg, id);
     }else{
         auto a1 = **(uintptr_t***)(this + 0x8);
         auto a2 = *(uintptr_t*)(this + 0x10);
