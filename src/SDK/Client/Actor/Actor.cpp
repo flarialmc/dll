@@ -93,16 +93,6 @@ ItemStack *Actor::getOffhandSlot() {
     return fn(this);
 }
 
-EntityId Actor::getEntityId(){
-    if(WinrtUtils::check(20, 50)) {
-        auto ctx = GetEntityContextV1_20_50();
-        return ctx->id;
-    }else{
-        auto ctx = GetEntityContextV1_20_40();
-        return ctx->id;
-    }
-}
-
 V1_20_50::EntityContext *Actor::GetEntityContextV1_20_50() {
     return reinterpret_cast<V1_20_50::EntityContext*>((uintptr_t)this + 0x8);
 }

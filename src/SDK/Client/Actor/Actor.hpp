@@ -11,10 +11,7 @@
 #include "../Container/Inventory.hpp"
 #include "../../../Utils/Utils.hpp"
 #include "Components/StateVectorComponent.hpp"
-#include "Components/ActorHeadRotationComponent.hpp"
-#include "Components/ActorTypeComponent.hpp"
 #include "Components/RenderPositionComponent.hpp"
-#include "../Network/Packet/Types/ActorRuntimeID.hpp"
 #include "EntityContext.hpp"
 #include "MobEffect.h"
 
