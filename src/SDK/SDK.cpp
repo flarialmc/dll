@@ -54,9 +54,6 @@ void SDK::setCurrentScreen(const std::string& layer) {
 }
 
 int SDK::getServerPing() {
-    if(!WinrtUtils::check(20,60)){ // requires RakPeer proper vfunc calls
-        return -1;
-    }
     if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             if (SDK::clientInstance->getRakNetConnector() != nullptr) {
