@@ -59,12 +59,18 @@
 #include "Modules/NoHurtCam/NoHurtCam.hpp"
 #include "Modules/CommandHotkey/CommandHotkey.hpp"
 #include "Modules/Misc/DiscordRPC/DiscordRPCListener.hpp"
+#include "Modules/Overlay/OverlayModule.hpp"
+#include "Modules/AutoRQ/AutoRQ.hpp"
 #include "Modules/MovableChat/MovableChat.hpp"
 #include <algorithm>
 
 namespace ModuleManager {
     std::unordered_map<size_t, Module*> moduleMap;
     std::vector<std::string> onlineUsers;
+    std::vector<std::string> onlineDevs;
+    std::vector<std::string> onlineCommites;
+    std::vector<std::string> onlinePluses;
+    std::vector<std::string> onlineStaff;
 }
 
 void ModuleManager::addModule(Module* module) {
@@ -137,6 +143,8 @@ void ModuleManager::initialize() {
     ModuleManager::addModule(new CommandHotkey());
     ModuleManager::addModule(new NoHurtCam());
     ModuleManager::addModule(new InventoryHUD());
+    //ModuleManager::addModule(new OverlayModule());
+    ModuleManager::addModule(new AutoRQ());
     //ModuleManager::addModule(new MovableChat());
     //ModuleManager::addModule(new CompactChat());
 
