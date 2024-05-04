@@ -22,7 +22,7 @@ class AutoGGListener : public Listener {
         // TODO: add support for other servers (look for "won the game" text)
         if (id == MinecraftPacketIds::PlaySoundA) {
             auto *pkt = reinterpret_cast<PlaySoundPacket *>(event.getPacket());
-            if (pkt->mName == "ui.toast.challenge_complete_java") {
+            if (pkt->mName == "ui.toast.challenge_complete_java" || pkt->mName == "raid.horn") {
                 triggered = true;
             }
 

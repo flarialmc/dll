@@ -70,7 +70,7 @@ void DrawUtils::addBox(Vec3<float> lower, Vec3<float> upper, float lineWidth, in
         for (int i = 0; i < 8; i++) {
             Vec2<float> screen;
 
-            if (viewMatrix.WorldToScreen(vertices[i], screen))
+            if (Matrix::WorldToScreen(vertices[i], screen))
                 screenCords.emplace_back(mode == 2 ? (int) screenCords.size() : i, screen);
             else real = true;
         }
