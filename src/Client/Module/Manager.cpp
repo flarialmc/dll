@@ -107,9 +107,7 @@ void ModuleManager::initialize() {
     ModuleManager::addModule(new IPDisplay());
     ModuleManager::addModule(new ReachCounter());
     ModuleManager::addModule(new ComboCounter());
-    if(WinrtUtils::check(20,60)) { // requires RakPeer proper vfunc calls
-        ModuleManager::addModule(new PingCounter());
-    }
+    ModuleManager::addModule(new PingCounter());
     ModuleManager::addModule(new PotCounter());
     ModuleManager::addModule(new ArrowCounter());
     ModuleManager::addModule(new Time());
