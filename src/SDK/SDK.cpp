@@ -60,7 +60,7 @@ int SDK::getServerPing() {
                 if (SDK::clientInstance->getRakNetConnector()->JoinedIp.empty()) {
                     return 0;
                 } else {
-                    return SDK::clientInstance->getRakNetConnector()->peer->getPing();
+                    return SDK::clientInstance->getRakNetConnector()->getPing();
                 }
             }
         }
