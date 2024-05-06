@@ -64,18 +64,13 @@ bool containsModule(const std::wstring& moduleName) {
 }
 
 void SwapchainHook::enableHook() {
-    void *swapchain_ptr;
 
-    int index;
 
-    if (kiero::getRenderType() == kiero::RenderType::D3D12)
-        index = 140;
-    else index = 8;
-
-    swapchain_ptr = (void *) kiero::getMethodsTable()[index];
-
-    if (Client::settings.getSettingByName<bool>("killdx")->value) {
-        SwapchainHook::queue = nullptr;
+    if (kiero::getRenderType() == kiero::RenderType::D3D12) {
+        kiero::bind(140, (void**)&funcOriginal, swapchainCallback);
+    }
+    else if (kiero::getRenderType() == kiero::RenderType::D3D11) {
+        kiero::bind(8, (void**)&funcOriginal, swapchainCallback);
     }
 
     bool isRTSS = containsModule(L"RTSSHooks64.dll");
@@ -88,13 +83,11 @@ void SwapchainHook::enableHook() {
         Client::disable = true;
         // }
     }
-
-    this->manualHook(swapchain_ptr, (void *) swapchainCallback, (void **) &funcOriginal);
 }
 
 bool SwapchainHook::init = false;
 
-void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
+HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
 
 
     SwapchainHook::swapchain = pSwapChain;
@@ -128,12 +121,13 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
     FlarialGUI::frameFactor = std::min(FlarialGUI::frameFactor, 1.0f);
 
     if (!SwapchainHook::init) {
-        if (SwapchainHook::queue == nullptr) {
+        if (SwapchainHook::queue == nullptr || Client::settings.getSettingByName<bool>("killdx")->value) {
 
             ID3D12Device5 *d3d12device3;
 
             if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device3)))) {
                 Logger::debug("[SwapChain] Removed d3d12 device");
+                pSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
                 d3d12device3->RemoveDevice();
 
                 return funcOriginal(pSwapChain, syncInterval, flags);
@@ -142,11 +136,11 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
             Logger::debug("[SwapChain] Not a DX12 device, running dx11 procedures");
 
             const D2D1_CREATION_PROPERTIES properties
-                    {
-                            D2D1_THREADING_MODE_MULTI_THREADED,
-                            D2D1_DEBUG_LEVEL_NONE,
-                            D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS
-                    };
+            {
+                    D2D1_THREADING_MODE_MULTI_THREADED,
+                    D2D1_DEBUG_LEVEL_NONE,
+                    D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS
+            };
 
             IDXGISurface1 *eBackBuffer;
             pSwapChain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
@@ -161,7 +155,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
             Memory::SafeRelease(eBackBuffer);
 
             SwapchainHook::init = true;
-
 
         } else {
 
@@ -375,13 +368,13 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 RenderEvent event;
                 EventHandler::onRender(event);
                 D2D::context->EndDraw();
+
             }
 
             Memory::SafeRelease(FlarialGUI::blurbrush);
             Memory::SafeRelease(FlarialGUI::blur);
         }
     }
-
 
     if (Client::settings.getSettingByName<bool>("vsync")->value) {
         return funcOriginal(pSwapChain, 0, DXGI_PRESENT_DO_NOT_WAIT);
