@@ -1,5 +1,6 @@
 ﻿#include "Logger.hpp"
 #include "../Utils.hpp"
+#include "crashlogs.hpp"
 #include <Windows.h>
 #include <format>
 #include <filesystem>
@@ -27,6 +28,8 @@ void Logger::writeToFile(const std::string& str) {
 }
 
 void Logger::initialize() {
+    glaiel::crashlogs::set_crashlog_folder(Utils::getRoamingPath() + R"(\Flarial\logs\)");
+    glaiel::crashlogs::begin_monitoring();
     if (std::filesystem::exists(file)) {
         std::filesystem::remove(file);
     }

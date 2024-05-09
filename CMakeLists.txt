@@ -3,7 +3,7 @@ project(Flarial VERSION 1.0 LANGUAGES CXX)
 
 include(FetchContent)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 
 if(MSVC)
     add_compile_options(/MT)
@@ -61,6 +61,8 @@ FetchContent_Declare(
         GIT_REPOSITORY  https://github.com/BasedInc/libhat.git
         GIT_TAG         9ef05d6961ce37a4c801f11159de895aa21878a9
 )
+
 FetchContent_MakeAvailable(libhat)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE libhat windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version)
 target_link_libraries(${PROJECT_NAME} PUBLIC MinHook)
