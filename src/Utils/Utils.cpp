@@ -15,7 +15,7 @@ std::string Utils::getRoamingPath() {
     if (path == nullptr)
         return "";
 
-    return std::string(path) + R"(\..\Local\Packages\Microsoft.MinecraftUWP_8wekyb3d8bbwe\RoamingState)";
+    return std::string(path) + R"(\..\Local\Packages\Microsoft.MinecraftUWP_8wekyb3d8bbwe\RoamingState)"; // Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe Microsoft.MinecraftUWP_8wekyb3d8bbwe
 }
 
 GLMatrix *getMatrixCorrection() {
