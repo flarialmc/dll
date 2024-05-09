@@ -25,9 +25,11 @@ public:
 
     void onSetup() override { // init color just in case
         highlightColorRipRelAddr = Memory::findSig(GET_SIG("blockHighlightColor")); // RIP REL 4BYTE FROM FUNC OFFSET ADDR
+        if(highlightColorRipRelAddr == NULL) return;
         highlightColorOrigRipRel = *(UINT32*)highlightColorRipRelAddr;
 
         outlineColorRipRelAddr = Memory::findSig(GET_SIG("mce::Color::BLACK"));
+        if(outlineColorRipRelAddr == NULL) return;
         outlineColorOrigRipRel = *(UINT32*)outlineColorRipRelAddr;
         // TODO: make it look better
         selectionColor = (MCCColor*)AllocateBuffer((void*)highlightColorRipRelAddr); // allocate space for color
@@ -54,11 +56,13 @@ public:
     }
 
     static void patch() { // change rel rip offset to ours
+        if(highlightColorRipRelAddr == NULL || outlineColorRipRelAddr == NULL) return;
         Memory::patchBytes((void *) highlightColorRipRelAddr, highlightColorNewRipRel.data(), sizeof(UINT32));
         Memory::patchBytes((void *) outlineColorRipRelAddr, outlineColorNewRipRel.data(), sizeof(UINT32));
     }
 
     static void unpatch() { // change rel rip offset to ours
+        if(highlightColorRipRelAddr == NULL || outlineColorRipRelAddr == NULL) return;
         Memory::patchBytes((void *) highlightColorRipRelAddr, &highlightColorOrigRipRel, sizeof(UINT32));
         Memory::patchBytes((void *) outlineColorRipRelAddr, &outlineColorOrigRipRel, sizeof(UINT32));
     }
