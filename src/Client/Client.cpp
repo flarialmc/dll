@@ -76,7 +76,7 @@ void Client::initialize() {
             {cdn_link + "assets/flarial-staff.png",         Path + "flarial-staff.png"},
             {cdn_link + "assets/re-q.png",                  Path + "re-q.png"},
             {cdn_link + "assets/fps.png",                   Path + "fps.png"},
-            {cdn_link + "assets/assets/like.png",            Path + "like.png"},
+            {cdn_link + "assets/like.png",                  Path + "like.png"},
             {cdn_link + "assets/auto_sprint.png",           Path + "auto_sprint.png"},
             {cdn_link + "assets/clickgui.png",              Path + "clickgui.png"},
             {cdn_link + "assets/modules.png",               Path + "modules.png"},
