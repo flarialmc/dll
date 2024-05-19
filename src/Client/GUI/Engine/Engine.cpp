@@ -1,6 +1,7 @@
 ﻿#include "Engine.hpp"
 #include "../../Client.hpp"
 #include <utility>
+#include <winrt/base.h>
 #include <cmath>
 #include <variant>
 #include "Constraints.hpp"
@@ -44,13 +45,16 @@ IDWriteFactory* FlarialGUI::writeFactory;
 ID2D1ImageBrush* FlarialGUI::blurbrush;
 ID2D1ImageBrush* FlarialGUI::shadowbrush;
 ID2D1Factory* FlarialGUI::factory;
+// todo use all cache
 std::unordered_map<std::string, ToolTipStruct> FlarialGUI::Tooltips;
-std::unordered_map<std::string, ID2D1SolidColorBrush*> FlarialGUI::brushCache;
-std::unordered_map<std::string, ID2D1Image*> FlarialGUI::cachedBitmaps;
-std::unordered_map<std::string, IDWriteTextFormat*> FlarialGUI::textFormatCache;
+std::unordered_map<UINT32, winrt::com_ptr<ID2D1SolidColorBrush>> FlarialGUI::brushCache;
+std::unordered_map<std::string, winrt::com_ptr<ID2D1Image>> FlarialGUI::cachedBitmaps;
+
+std::unordered_map<uint64_t, winrt::com_ptr<IDWriteTextLayout>> FlarialGUI::textLayoutCache;
+std::unordered_map<uint64_t, winrt::com_ptr<IDWriteTextFormat>> FlarialGUI::textFormatCache;
 std::unordered_map<int, float> FlarialGUI::additionalY;
-std::unordered_map<std::string, ID2D1GradientStopCollection*> FlarialGUI::gradientStopCache;
-std::unordered_map<std::string, ID2D1LinearGradientBrush*> FlarialGUI::gradientBrushCache;
+std::unordered_map<std::string, winrt::com_ptr<ID2D1GradientStopCollection>> FlarialGUI::gradientStopCache;
+std::unordered_map<std::string, winrt::com_ptr<ID2D1LinearGradientBrush>> FlarialGUI::gradientBrushCache;
 
 
 
@@ -109,6 +113,110 @@ void FlarialGUI::PopAllStack()
 	}
 }
 
+uint64_t generateUniqueKey(const wchar_t* text, DWRITE_TEXT_ALIGNMENT alignment,
+	float fontSize, float weight, float maxWidth,
+	float maxHeight) {
+
+	// Use std::hash to create a hash value for each parameter
+	std::hash<std::wstring> textHash;
+	std::hash<int> alignmentHash;
+	std::hash<float> fontSizeHash;
+	std::hash<float> weightHash;
+	std::hash<float> maxWidthHash;
+	std::hash<float> maxHeightHash;
+
+	// Combine the hash values of each parameter
+	size_t combinedHash = textHash(std::wstring(text)) ^
+		alignmentHash(alignment) ^
+		fontSizeHash(fontSize) ^
+		weightHash(weight) ^
+		maxWidthHash(maxWidth) ^
+		maxHeightHash(maxHeight);
+
+	return combinedHash;
+}
+
+UINT32 generateUniqueTextFormatKey(std::string& font, int alignment,
+	float fontSize, float weight) {
+	std::size_t hashValue = 0;
+	hashValue ^= std::hash<std::string>{}(font) + 0x9e3779b9 + (hashValue << 6) + (hashValue >> 2);
+	hashValue ^= std::hash<int>{}(alignment) + 0x9e3779b9 + (hashValue << 6) + (hashValue >> 2);
+	hashValue ^= std::hash<float>{}(fontSize) + 0x9e3779b9 + (hashValue << 6) + (hashValue >> 2);
+	hashValue ^= std::hash<float>{}(weight) + 0x9e3779b9 + (hashValue << 6) + (hashValue >> 2);
+	return hashValue;
+}
+
+// TODO Constrains to constants !!!
+IDWriteTextFormat* FlarialGUI::GetTextFormat(const DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT paragraphAlignment, const float fontSize,
+	const DWRITE_FONT_WEIGHT weight,bool moduleFont) {
+	// todo: cache layouts and format
+
+	std::string fontName = Client::settings.getSettingByName<std::string>(moduleFont ? "mod_fontname" : "fontname")->value;
+
+	UINT32 key = generateUniqueTextFormatKey(fontName, alignment, fontSize, weight);
+
+	auto it = textFormatCache.find(key);
+	if (it != textFormatCache.end()) {
+		return it->second.get();
+	}
+	else {
+		winrt::com_ptr<IDWriteTextFormat> textFormat;
+		FlarialGUI::writeFactory->CreateTextFormat(FlarialGUI::to_wide(fontName).c_str(),
+			nullptr,
+			weight,
+			DWRITE_FONT_STYLE_NORMAL,
+			DWRITE_FONT_STRETCH_NORMAL,
+			Constraints::FontScaler(fontSize),
+			L"en-us",
+			textFormat.put()
+		);
+
+		textFormat->SetTextAlignment(alignment);
+		//DWRITE_PARAGRAPH_ALIGNMENT_CENTER / DWRITE_PARAGRAPH_ALIGNMENT_NEAR
+		textFormat->SetParagraphAlignment(paragraphAlignment); // TODO THIS MIGHT BE DIFF IN SOME PLACES
+
+		
+
+		textFormatCache[key] = textFormat;
+		return textFormat.get();
+	}
+
+}
+
+
+// TODO Constrains to constants !!!
+IDWriteTextLayout* FlarialGUI::GetTextLayout(const wchar_t* text,
+	const DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT paragraphAlignment, const float fontSize,
+	const DWRITE_FONT_WEIGHT weight, float maxWidth, float maxHeight, bool moduleFont) {
+	// todo: cache layouts and format
+	
+	uint64_t key = generateUniqueKey(text, alignment, fontSize, weight, maxWidth, maxHeight);
+
+	auto it = textLayoutCache.find(key);
+	if (it != textLayoutCache.end()) {
+		return it->second.get();
+	}
+	else {
+		IDWriteTextFormat* textFormat = FlarialGUI::GetTextFormat(alignment, paragraphAlignment, fontSize, weight, moduleFont);
+
+		winrt::com_ptr<IDWriteTextLayout> textLayout;
+
+		FlarialGUI::writeFactory->CreateTextLayout(
+			text,
+			(UINT32)wcslen(text),
+			textFormat,
+			maxWidth,
+			maxHeight,
+			textLayout.put()
+		);
+
+		textLayoutCache[key] = textLayout;
+		return textLayout.get();
+	}
+	
+}
+
+
 bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t* text, const float width, const float height)
 {
 	if (isInScrollView) y += scrollpos;
@@ -116,25 +224,25 @@ bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COL
 
 	const bool isAdditionalY = shouldAdditionalY;
 
-	ID2D1SolidColorBrush* brush;
 	D2D1_COLOR_F buttonColor = CursorInRect(x, y, width, height) ? D2D1::ColorF(color.r - darkenAmounts[x + y], color.g - darkenAmounts[x + y], color.b - darkenAmounts[x + y], color.a) : color;
-	brush = FlarialGUI::getBrush(buttonColor);
+
 	D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
 
 
-	D2D::context->FillRectangle(rect, brush);
+	D2D::context->FillRectangle(rect, FlarialGUI::getBrush(buttonColor));
 
+	FlarialGUI::FlarialTextWithFont(x, y, text, width, height, DWRITE_TEXT_ALIGNMENT_CENTER, 14.0f, DWRITE_FONT_WEIGHT_NORMAL, textColor);
 
-	IDWriteTextFormat* textFormat;
-	FlarialGUI::writeFactory->CreateTextFormat(L"Arial", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-US", &textFormat);
-	ID2D1SolidColorBrush* textBrush;
-	textBrush = FlarialGUI::getBrush(textColor);
-	textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-	textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-	D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat,
-		D2D1::RectF(x, y, x + width, y + height), textBrush);
+	//IDWriteTextFormat* textFormat;
+	//FlarialGUI::writeFactory->CreateTextFormat(L"Arial", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"en-US", &textFormat);
+	//ID2D1SolidColorBrush* textBrush;
+	//textBrush = FlarialGUI::getBrush(textColor);
+	//textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+	//textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	//D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat,
+	//	D2D1::RectF(x, y, x + width, y + height), textBrush);
 
-	textFormat->Release();
+	//textFormat->Release();
 
 	if (CursorInRect(x, y, width, height) && MC::mousebutton == MouseButton::Left && !MC::held)
 	{
@@ -167,12 +275,6 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
 
 	if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return false;
 
-	static ID2D1SolidColorBrush* textBrush;
-	textBrush = FlarialGUI::getBrush(textColor);
-
-	IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, Constraints::FontScaler(width), DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_CENTER);
-
-	ID2D1SolidColorBrush* brush = nullptr;
 	D2D1_COLOR_F buttonColor;
 
 	if (CursorInRect(x, y, width, height))
@@ -186,11 +288,8 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
 
 	}
 
-
-	brush = FlarialGUI::getBrush(buttonColor);
-
 	D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
-	D2D::context->FillRoundedRectangle(roundedRect, brush);
+	D2D::context->FillRoundedRectangle(roundedRect, FlarialGUI::getBrush(buttonColor));
 
 
 	if (CursorInRect(x, y, width, height) && glow) {
@@ -210,11 +309,10 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
 	allahColor.b += 0.02f;
 	allahColor.a = glowAlphas[index];
 
-	FlarialGUI::InnerShadowRect(D2D1::RoundedRect(D2D1::RectF(x, y, x + width * 1.035f, y + height), radiusX, radiusY), 25,
-		allahColor);
-
-
-	D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
+	FlarialGUI::InnerShadowRect(D2D1::RoundedRect(D2D1::RectF(x, y, x + width * 1.035f, y + height), radiusX, radiusY), 25, allahColor);
+	//IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, Constraints::FontScaler(width), DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_CENTER);
+	// todo: a better way maybe?
+	FlarialGUI::FlarialTextWithFont(x, isInScrollView ? y - scrollpos : y, text, width, height, DWRITE_TEXT_ALIGNMENT_CENTER, width, DWRITE_FONT_WEIGHT_REGULAR, textColor);
 
 	if (isAdditionalY) SetIsInAdditionalYMode();
 
@@ -243,13 +341,6 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
 
 	if (isAdditionalY) UnSetIsInAdditionalYMode();
 
-	static ID2D1SolidColorBrush* textBrush;
-
-	textBrush = FlarialGUI::getBrush(textColor);
-
-	IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, Constraints::FontScaler(width * 0.84), DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_CENTER);
-
-	ID2D1SolidColorBrush* brush = nullptr;
 	D2D1_COLOR_F buttonColor;
 
 	if (radioNum != currentNum) {
@@ -261,14 +352,13 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
 		buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[index]);
 	}
 
-
-	brush = FlarialGUI::getBrush(buttonColor);
-
 	D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
-	D2D::context->FillRoundedRectangle(roundedRect, brush);
+	D2D::context->FillRoundedRectangle(roundedRect, FlarialGUI::getBrush(buttonColor));
 
 	x += Constraints::SpacingConstraint(0.077, width);
-	D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
+	//D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
+	// todo: check if this correct
+	FlarialGUI::FlarialTextWithFont(x, y, text, width, height, DWRITE_TEXT_ALIGNMENT_CENTER, width * 0.84, DWRITE_FONT_WEIGHT_REGULAR, textColor);
 
 	if (isAdditionalY) SetIsInAdditionalYMode();
 
@@ -646,7 +736,7 @@ float FlarialGUI::HueToRGB(float p, float q, float t)
 	return p;
 }
 
-
+//todo: this defo laggs req investigation
 std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, float x, float y, std::string real) {
 	if (shouldAdditionalY) {
 		for (int i = 0; i < highestAddIndexes + 1; i++) {
@@ -690,29 +780,20 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 
 	float textSize = Constraints::SpacingConstraint(1.0, textWidth);
 
-	FlarialGUI::FlarialTextWithFont(x + Constraints::RelativeConstraint(0.05f), y, to_wide(text).c_str(),
+	FlarialGUI::FlarialTextWithFont(x + Constraints::RelativeConstraint(0.05f), y, FlarialGUI::to_wide(text).c_str(),
 		Constraints::SpacingConstraint(1.55, textWidth), percHeight,
 		DWRITE_TEXT_ALIGNMENT_LEADING, textSize, DWRITE_FONT_WEIGHT_NORMAL);
 
-	IDWriteTextFormat* textFormat;
-	FlarialGUI::writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(textSize), L"", &textFormat);
-	textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
-	textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+	IDWriteTextLayout* textLayout = FlarialGUI::GetTextLayout(FlarialGUI::to_wide(text).c_str(), DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, textSize, DWRITE_FONT_WEIGHT_NORMAL, Constraints::SpacingConstraint(textWidth, 6.9f), percHeight);
 
-	IDWriteTextLayout* textLayout;
+	//IDWriteTextFormat* textFormat;
+	//FlarialGUI::writeFactory->CreateTextFormat(LClient::settings.getSettingByName<std::string>("fontname")->value, NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(textSize), L"", &textFormat);
 
-	FlarialGUI::writeFactory->CreateTextLayout(
-		FlarialGUI::to_wide(text).c_str(),
-		wcslen(FlarialGUI::to_wide(text).c_str()),
-		textFormat,
-		Constraints::SpacingConstraint(textWidth, 6.9f),
-		percHeight,
-		&textLayout
-	);
+	// textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR); !!!
 
 	DWRITE_TEXT_METRICS textMetrics;
 	textLayout->GetMetrics(&textMetrics);
-	textLayout->Release();
+	//textLayout->Release();
 
 	D2D1_COLOR_F cursorCol = colors_primary2_rgb ? rgbColor : colors_primary2;
 	cursorCol.a = o_colors_primary2;
@@ -724,7 +805,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 	if (FlarialGUI::TextBoxes[index].cursorX > x)
 		FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX, y + Constraints::RelativeConstraint(0.069f) / 2.0f, cursorCol, Constraints::RelativeConstraint(0.01f), percHeight - Constraints::RelativeConstraint(0.069f), 0, 0);
 
-	FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, to_wide(real).c_str(),
+	FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, FlarialGUI::to_wide(real).c_str(),
 		Constraints::SpacingConstraint(6.9, textWidth), percHeight,
 		DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.00, textWidth),
 		DWRITE_FONT_WEIGHT_NORMAL);
@@ -847,7 +928,7 @@ float FlarialGUI::Slider(int index, float x, float y, float startingPoint, const
 	}
 	else if (!text.empty()) startingPoint = std::stof(text);
 
-	FlarialGUI::FlarialTextWithFont(x, y, to_wide(text).c_str(), percWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER,
+	FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), percWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER,
 		Constraints::FontScaler(percWidth * 14.5f), DWRITE_FONT_WEIGHT_NORMAL);
 
 	x += Constraints::SpacingConstraint(1.2, percWidth);
@@ -1187,11 +1268,11 @@ FlarialGUI::Dropdown(int index, float x, float y, const std::vector<std::string>
 
 	FlarialGUI::RoundedRect(x, y, FlarialGUI::DropDownMenus[index].curColor, Constraints::SpacingConstraint(1.55, textWidth), percHeight, round.x, round.x);
 
-	FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.1, textWidth), y, to_wide(value).c_str(),
+	FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.1, textWidth), y, FlarialGUI::to_wide(value).c_str(),
 		Constraints::SpacingConstraint(1.55, textWidth), percHeight,
 		DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.0, textWidth),
 		DWRITE_FONT_WEIGHT_NORMAL);
-	FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, to_wide(label).c_str(),
+	FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y, FlarialGUI::to_wide(label).c_str(),
 		Constraints::SpacingConstraint(3, textWidth), percHeight,
 		DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.00, textWidth),
 		DWRITE_FONT_WEIGHT_NORMAL);
@@ -1298,7 +1379,7 @@ void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const 
 	IDWriteFactory *writeFactory;
 	DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&writeFactory));
 	IDWriteTextFormat *textFormat;
-	FlarialGUI::writeFactory->CreateTextFormat(FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(), NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"", &textFormat);
+	FlarialGUI::writeFactory->CreateTextFormat(LClient::settings.getSettingByName<std::string>("fontname")->value, NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.0f, L"", &textFormat);
 	textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 	textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
@@ -1364,10 +1445,11 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string&
 	if (isAdditionalY) UnSetIsInAdditionalYMode();
 	FlarialGUI::RoundedRect(x, y, KeybindSelectors[index].curColor, percWidth, percHeight, round.x, round.x);
 
-	FlarialGUI::FlarialTextWithFont(x, y, to_wide(text).c_str(), percWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER, textWidth, DWRITE_FONT_WEIGHT_NORMAL);
+	FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), percWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER, textWidth, DWRITE_FONT_WEIGHT_NORMAL);
+
 
 	FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.25, textWidth / 2.0f), y,
-		to_wide("Keybind (Hold for 2 seconds)").c_str(),
+		L"Keybind (Hold for 2 seconds)",
 		Constraints::SpacingConstraint(6.9f, textWidth), percHeight,
 		DWRITE_TEXT_ALIGNMENT_LEADING, textWidth,
 		DWRITE_FONT_WEIGHT_NORMAL);
@@ -1452,34 +1534,11 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 
 	text = "#" + hex;
 
-	IDWriteTextFormat* textFormat;
-	FlarialGUI::writeFactory->CreateTextFormat(
-		FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(),
-		NULL,
-		DWRITE_FONT_WEIGHT_REGULAR,
-		DWRITE_FONT_STYLE_NORMAL,
-		DWRITE_FONT_STRETCH_NORMAL,
-		Constraints::FontScaler(s * 4.0f),
-		L"",
-		&textFormat
-	);
-	textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
-	textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
-
-	IDWriteTextLayout* textLayout;
-
-	FlarialGUI::writeFactory->CreateTextLayout(
-		FlarialGUI::to_wide(text).c_str(),
-		wcslen(FlarialGUI::to_wide(text).c_str()),
-		textFormat,
-		s * 3.f + 100,
-		s * 0.82f,
-		&textLayout
-	);
+	IDWriteTextLayout* textLayout = FlarialGUI::GetTextLayout(FlarialGUI::to_wide(text).c_str(), DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, s * 4.0f, DWRITE_FONT_WEIGHT_REGULAR, s * 3.f + 100, s * 0.82f);
 
 	DWRITE_TEXT_METRICS textMetrics;
 	textLayout->GetMetrics(&textMetrics);
-	textLayout->Release();
+	//textLayout->Release();
 
 	D2D1_COLOR_F cursorCol = colors_primary2_rgb ? rgbColor : colors_primary2;
 	cursorCol.a = o_colors_primary2;
@@ -1490,7 +1549,7 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 
 	if (FlarialGUI::TextBoxes[index].cursorX > x)
 		FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX, y + Constraints::RelativeConstraint(0.1f) / 2.0f, cursorCol, Constraints::RelativeConstraint(0.01f), s * 0.82f - Constraints::RelativeConstraint(0.025f), 0, 0);
-
+	// todo: FlarialGUI::to_wide(text).c_str() make this redundend
 	FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.006f,
 		FlarialGUI::to_wide(text).c_str(), s * 4.3f, s * 1.1f,
 		DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f, DWRITE_FONT_WEIGHT_NORMAL);
@@ -1902,6 +1961,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
 		x = Constraints::PercentageConstraint(0.04, "left");
 
 		if (Toggle(123, x, y, rgb, true)) rgb = !rgb;
+
 		FlarialTextWithFont(x + Constraints::SpacingConstraint(0.60, Constraints::RelativeConstraint(0.12, "height", true)), y, L"Chroma",
 			Constraints::RelativeConstraint(0.12, "height", true) * 3.0f, Constraints::RelativeConstraint(0.029, "height", true), DWRITE_TEXT_ALIGNMENT_LEADING,
 			Constraints::RelativeConstraint(0.12, "height", true),
@@ -2041,14 +2101,11 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t* text, float width,
 
 	if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
 
-	ID2D1SolidColorBrush* brush;
+	//IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, , DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, alignment);
+	IDWriteTextLayout* textLayout = FlarialGUI::GetTextLayout(text, alignment, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, width, DWRITE_FONT_WEIGHT_REGULAR, width, height);
 
-	brush = FlarialGUI::getBrush(color);
-
-	IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, Constraints::FontScaler(width), DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, alignment);
-
-	D2D1_RECT_F textRect = D2D1::RectF(x, y, x + width, y + height);
-	D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
+	//D2D1_RECT_F textRect = D2D1::RectF(x, y, x + width, y + height);
+	D2D::context->DrawTextLayout(D2D1::Point2F(x, y), textLayout, FlarialGUI::getBrush(color));
 
 }
 
@@ -2061,11 +2118,11 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* text, cons
 
 	FlarialTextWithFont(x, y, text, width, height, alignment, fontSize, weight, color, moduleFont);
 }
-
+// TODO SOS NO CACHE
 void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* text, const float width, const float height,
 	const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
-	const DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont)
-{
+	const DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont){
+
 	if (shouldAdditionalY) {
 		for (int i = 0; i < highestAddIndexes + 1; i++) {
 			if (FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
@@ -2077,15 +2134,8 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* text, cons
 
 	if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
 
-	ID2D1SolidColorBrush* brush;
-
-	brush = FlarialGUI::getBrush(color);
-
-
-	IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>(moduleFont ? "mod_fontname" : "fontname")->value, Constraints::FontScaler(fontSize), weight, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, alignment);
-
-	D2D1_RECT_F textRect = D2D1::RectF(x, y, x + width, y + height);
-	D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, textRect, brush);
+	IDWriteTextLayout* textLayout = FlarialGUI::GetTextLayout(text, alignment, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, fontSize, weight, width, height, moduleFont);
+	D2D::context->DrawTextLayout(D2D1::Point2F(x, y), textLayout, FlarialGUI::getBrush(color));
 
 }
 
@@ -2104,7 +2154,7 @@ void FlarialGUI::Image(const std::string imageName, D2D1_RECT_F rect)
 	std::string among = Utils::getRoamingPath() + "\\" + imageName;
 
 	if (ImagesClass::eimages[imageName] == nullptr)
-		LoadImageFromFile(to_wide(among).c_str(), &ImagesClass::eimages[imageName]);
+		LoadImageFromFile(FlarialGUI::to_wide(among).c_str(), &ImagesClass::eimages[imageName]);
 
 	// Draw image
 	D2D1_RECT_F imageRect = D2D1::RectF(rect.left, rect.top, rect.right, rect.bottom);
@@ -2507,18 +2557,7 @@ void FlarialGUI::Notify(std::string text) {
 		e.currentPos = Constraints::PercentageConstraint(0.01, "right", true);
 		e.currentPosY = Constraints::PercentageConstraint(0.25, "bottom", true);
 
-		IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, Constraints::FontScaler(Constraints::SpacingConstraint(0.3, Constraints::RelativeConstraint(0.45, "height", true))), DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_LEADING);
-
-		IDWriteTextLayout* textLayout;
-
-		FlarialGUI::writeFactory->CreateTextLayout(
-			FlarialGUI::to_wide(text).c_str(),
-			wcslen(FlarialGUI::to_wide(text).c_str()),
-			textFormat,
-			Constraints::RelativeConstraint(100.0, "height", true),
-			Constraints::RelativeConstraint(100.0, "height", true),
-			&textLayout
-		);
+		IDWriteTextLayout* textLayout = FlarialGUI::GetTextLayout(FlarialGUI::to_wide(text).c_str(), DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, Constraints::SpacingConstraint(0.3, Constraints::RelativeConstraint(0.45, "height", true)), DWRITE_FONT_WEIGHT_REGULAR, Constraints::RelativeConstraint(100.0, "height", true), Constraints::RelativeConstraint(100.0, "height", true));
 
 		DWRITE_TEXT_METRICS textMetrics;
 		textLayout->GetMetrics(&textMetrics);
@@ -2527,7 +2566,7 @@ void FlarialGUI::Notify(std::string text) {
 
 		notifications.push_back(e);
 
-		textLayout->Release();
+		//textLayout->Release();
 	}
 
 }
@@ -2587,7 +2626,8 @@ void FlarialGUI::NotifyHeartbeat() {
 
 			logoX += Constraints::SpacingConstraint(0.85, logoWidth);
 			logoY -= Constraints::SpacingConstraint(0.105, logoWidth);
-			FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide("Notification").c_str(), rectWidth,
+
+			FlarialGUI::FlarialTextWithFont(logoX, logoY, L"Notification", rectWidth,
 				logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING,
 				Constraints::SpacingConstraint(0.45, Constraints::RelativeConstraint(0.45,
 					"height",
@@ -2663,7 +2703,8 @@ void FlarialGUI::NotifyHeartbeat() {
 			logoX += Constraints::SpacingConstraint(0.85, logoWidth);
 
 			logoY -= Constraints::SpacingConstraint(0.105, logoWidth);
-			FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide("Notification").c_str(), rectWidth,
+
+			FlarialGUI::FlarialTextWithFont(logoX, logoY, L"Notification", rectWidth,
 				logoWidth, DWRITE_TEXT_ALIGNMENT_LEADING,
 				Constraints::SpacingConstraint(0.45, Constraints::RelativeConstraint(0.45,
 					"height",
@@ -2822,23 +2863,33 @@ void FlarialGUI::CopyBitmap(ID2D1Bitmap1* from, ID2D1Bitmap** to)
 	(*to)->CopyFromBitmap(&destPoint, from, &rect);
 }
 
+std::wstring FlarialGUI::to_wide(const std::string& str) {
+	std::wstring wstr;
+	wstr.reserve(str.length());
 
-std::wstring FlarialGUI::to_wide(const std::string& multi)
-{
-	std::wstring wide;
-	wchar_t w;
-	mbstate_t mb{};
-	size_t n = 0, len = multi.length() + 1;
-	while (auto res = mbrtowc(&w, multi.c_str() + n, len - n, &mb))
-	{
-		if (res == size_t(-1) || res == size_t(-2))
-			throw "invalid encoding";
-
-		n += res;
-		wide += w;
+	for (char ch : str) {
+		wstr.push_back(static_cast<wchar_t>(ch));
 	}
-	return wide;
+
+	return wstr;
 }
+/*
+std::wstring Lconst std::string& str)
+{
+	using convert_typeX = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+	return converterX.from_bytes(str);
+}
+
+std::string FlarialGUI::from_wide(const std::wstring& wstr)
+{
+	using convert_typeX = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+	return converterX.to_bytes(wstr);
+}
+*/
 
 template <typename T>
 void FlarialGUI::lerp(T& a, const T& b, float t)
@@ -2856,28 +2907,34 @@ void FlarialGUI::lerp(T& a, const T& b, float t)
 	else a = b;
 }
 
-ID2D1SolidColorBrush* FlarialGUI::getBrush(D2D1_COLOR_F color) {
-	std::string key =
-		std::to_string(color.r) + std::to_string(color.g) + std::to_string(color.b) + std::to_string(color.a);
+UINT32 ColorValueToUInt(const D3DCOLORVALUE& color) {
+	uint8_t r = static_cast<uint8_t>(color.r * 255.0f);
+	uint8_t g = static_cast<uint8_t>(color.g * 255.0f);
+	uint8_t b = static_cast<uint8_t>(color.b * 255.0f);
+	uint8_t a = static_cast<uint8_t>(color.a * 255.0f);
 
+	// Combine the color components into a single unsigned int
+	return (static_cast<UINT32>(a) << 24) | (static_cast<UINT32>(r) << 16) | (static_cast<UINT32>(g) << 8) | b;
+}
+
+ID2D1SolidColorBrush* FlarialGUI::getBrush(D2D1_COLOR_F color) {
+
+	UINT32 key = ColorValueToUInt(color);
 
 	auto it = brushCache.find(key);
 	if (it != brushCache.end()) {
-
-		return it->second;
+		return it->second.get();
 	}
 	else {
-
-		ID2D1SolidColorBrush* brush;
-
-		D2D::context->CreateSolidColorBrush(color, &brush);
+		winrt::com_ptr<ID2D1SolidColorBrush> brush;
+		D2D::context->CreateSolidColorBrush(color, brush.put());
 
 		brushCache[key] = brush;
 
-		return brush;
+		return brush.get();
 	}
 }
-
+/*
 IDWriteTextFormat* FlarialGUI::getTextFormat(const std::string& fontFamily, FLOAT fontSize, DWRITE_FONT_WEIGHT fontWeight, DWRITE_FONT_STYLE fontStyle, DWRITE_FONT_STRETCH fontStretch, DWRITE_TEXT_ALIGNMENT alignment) {
 	std::string key = fontFamily + "|" +
 		std::to_string(fontSize) + "|" +
@@ -2886,13 +2943,15 @@ IDWriteTextFormat* FlarialGUI::getTextFormat(const std::string& fontFamily, FLOA
 		std::to_string(static_cast<int>(fontStretch)) + "|" +
 		std::to_string(static_cast<int>(alignment));
 
-	auto it = textFormatCache.find(key);
-	if (it != textFormatCache.end()) {
-		return it->second;
+	
+
+	auto it = textLayoutCache.find(key);
+	if (it != textLayoutCache.end()) {
+		return it->second.get();
 	}
 	else {
-		IDWriteTextFormat* textFormat;
-		HRESULT hr = FlarialGUI::writeFactory->CreateTextFormat(FlarialGUI::to_wide(fontFamily).c_str(), nullptr, fontWeight, fontStyle, fontStretch, fontSize, L"en-us", &textFormat);
+		winrt::com_ptr<IDWriteTextFormat> textFormat;
+		HRESULT hr = FlarialGUI::writeFactory->CreateTextFormat(LfontFamily, nullptr, fontWeight, fontStyle, fontStretch, fontSize, L"en-us", textFormat.put());
 		if (FAILED(hr)) {
 			// Handle the error appropriately, e.g., log an error message or throw an exception.
 			return nullptr;
@@ -2901,11 +2960,12 @@ IDWriteTextFormat* FlarialGUI::getTextFormat(const std::string& fontFamily, FLOA
 		textFormat->SetTextAlignment(alignment);
 		textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
-		textFormatCache[key] = textFormat;
+		textLayoutCache[key] = textFormat;
 
-		return textFormat;
+		return textFormat.get();
 	}
 }
+*/
 
 ID2D1LinearGradientBrush* FlarialGUI::getLinearGradientBrush(float x, float hexPreviewSize, float shadePickerWidth, ID2D1GradientStopCollection* pGradientStops, std::string susKey) {
 	// Include gradient stop colors in the cache key
@@ -2914,10 +2974,10 @@ ID2D1LinearGradientBrush* FlarialGUI::getLinearGradientBrush(float x, float hexP
 
 	auto it = gradientBrushCache.find(key);
 	if (it != gradientBrushCache.end()) {
-		return it->second;
+		return it->second.get();
 	}
 	else {
-		ID2D1LinearGradientBrush* gBrush;
+		winrt::com_ptr<ID2D1LinearGradientBrush> gBrush;
 
 		D2D::context->CreateLinearGradientBrush(
 			D2D1::LinearGradientBrushProperties(
@@ -2926,11 +2986,11 @@ ID2D1LinearGradientBrush* FlarialGUI::getLinearGradientBrush(float x, float hexP
 			),
 			D2D1::BrushProperties(),
 			pGradientStops,
-			&gBrush
+			gBrush.put()
 		);
 
 		gradientBrushCache[key] = gBrush;
-		return gBrush;
+		return gBrush.get();
 	}
 }
 
@@ -2945,21 +3005,13 @@ void FlarialGUI::UnSetIsInAdditionalYMode()
 }
 
 float FlarialGUI::SettingsTextWidth(std::string text) {
-	IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, Constraints::FontScaler(Constraints::SpacingConstraint(1.05, Constraints::RelativeConstraint(0.12, "height", true))), DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_LEADING);
-	DWRITE_TEXT_METRICS textMetrics;
-	IDWriteTextLayout* textLayout;
 
-	FlarialGUI::writeFactory->CreateTextLayout(
-		FlarialGUI::to_wide(text).c_str(),
-		wcslen(FlarialGUI::to_wide(text).c_str()),
-		textFormat,
-		Constraints::PercentageConstraint(1.0f, "left"),
-		Constraints::RelativeConstraint(0.029, "height", true),
-		&textLayout
-	);
+	IDWriteTextLayout* textLayout = FlarialGUI::GetTextLayout(FlarialGUI::to_wide(text).c_str(), DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, Constraints::SpacingConstraint(1.05, Constraints::RelativeConstraint(0.12, "height", true)), DWRITE_FONT_WEIGHT_REGULAR, Constraints::PercentageConstraint(1.0f, "left"), Constraints::RelativeConstraint(0.029, "height", true));
+
+	DWRITE_TEXT_METRICS textMetrics;
 
 	textLayout->GetMetrics(&textMetrics);
-	textLayout->Release();
+	//textLayout->Release();
 
 	return textMetrics.widthIncludingTrailingWhitespace;
 };
@@ -2976,22 +3028,13 @@ void FlarialGUI::Tooltip(std::string id, float x, float y, std::string text, flo
 	}
 
 	float fontSize1 = Constraints::RelativeConstraint(0.12, "height", true);
-	float fontSize = Constraints::FontScaler(fontSize1);
-	IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, fontSize, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_LEADING);
+	//IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, fontSize, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_LEADING);
+	
+	IDWriteTextLayout* textLayout = FlarialGUI::GetTextLayout(FlarialGUI::to_wide(text).c_str(), DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, fontSize1, DWRITE_FONT_WEIGHT_REGULAR, Constraints::PercentageConstraint(1.0f, "left"), Constraints::RelativeConstraint(0.029, "height", true));
+
 	DWRITE_TEXT_METRICS textMetrics;
-	IDWriteTextLayout* textLayout;
-
-	FlarialGUI::writeFactory->CreateTextLayout(
-		FlarialGUI::to_wide(text).c_str(),
-		wcslen(FlarialGUI::to_wide(text).c_str()),
-		textFormat,
-		Constraints::PercentageConstraint(1.0f, "left"),
-		Constraints::RelativeConstraint(0.029, "height", true),
-		&textLayout
-	);
-
 	textLayout->GetMetrics(&textMetrics);
-	textLayout->Release();
+	//textLayout->Release();
 
 	D2D1_COLOR_F bgCol = colors_secondary2_rgb ? rgbColor : colors_secondary2;
 	bgCol.a = o_colors_secondary2 * Tooltips[id].opac;
