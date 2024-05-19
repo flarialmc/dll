@@ -68,7 +68,7 @@ void Client::initialize() {
 
     std::pair<std::string, std::string> fileData[] = {
             {cdn_link + "assets/gear.png",                  Path + "gear.png"},
-            {cdn_link + "assets/font.ttf",           Path + "font.ttf"},
+            {cdn_link + "assets/font.ttf",                  Path + "font.ttf"},
             {cdn_link + "assets/logo.png",                  Path + "logo.png"},
             {cdn_link + "assets/flareal-dev.png",           Path + "flarial-dev.png"},
             {cdn_link + "assets/flarial-contribiutor.png",  Path + "flarial-contribiutor.png"},
