@@ -34,6 +34,7 @@ Version WinrtUtils::getMCVersion() {
 
 bool WinrtUtils::check(const int m, const int b) {
     static auto [major, minor, build, error] = getMCVersion();
+    if(m < minor) return true;
     return m <= minor && b <= build / 100;
 }
 
@@ -43,6 +44,13 @@ std::string WinrtUtils::getVersion() {
 }
 
 std::string WinrtUtils::getFormattedVersion() {
-    static const std::string& version = getVersion();
-    return version.substr(0, version.size() - 3);
+    const std::string& version = getVersion();
+    size_t lastDotPos = version.find_last_of('.');
+    if (lastDotPos != std::string::npos && version.size() - lastDotPos > 2) {
+        // Found a dot before the last segment with more than one character after it
+        return version.substr(0, lastDotPos + 3);
+    } else {
+        // No dot found or the last segment has only one or two characters
+        return version;
+    }
 }

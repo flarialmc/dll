@@ -12,7 +12,7 @@ std::unordered_map<std::string, std::pair<std::function<void()>, std::function<v
 
 void VersionUtils::init() {
     std::pair<std::function<void()>, std::function<void()>> p2100 = {SigInit::init2100, OffsetInit::init2100};
-    versions.emplace("1.21", p2100);
+    versions.emplace("1.21.3", p2100);
 
     std::pair<std::function<void()>, std::function<void()>> p2080 = {SigInit::init2080, OffsetInit::init2080};
     versions.emplace("1.20.8", p2080);

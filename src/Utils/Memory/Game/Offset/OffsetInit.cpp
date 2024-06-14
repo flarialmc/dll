@@ -22,9 +22,9 @@ void OffsetInit::init2100() {
 
     // Hitboxes and other +/- 1
     ADD_OFFSET("Actor::getActorFlag", 0);
-    ADD_OFFSET("Actor::isAlive", 51);
-    ADD_OFFSET("Actor::isValidTarget", 57);
-    ADD_OFFSET("Player::getXuid", 240); // likely wrong ?
+    ADD_OFFSET("Actor::isAlive", 50); //wrong
+    ADD_OFFSET("Actor::isValidTarget", 56); //wrong
+    ADD_OFFSET("Player::getXuid", 238); // likely wrong ?
 
     // AutoSprint
     ADD_OFFSET("Mob::setSprinting", 154); // +
@@ -32,9 +32,9 @@ void OffsetInit::init2100() {
     //ADD_OFFSET("BlockSource::getBlock", 2); // unused
 
     // Armour HUD, Inventory HUD
-    ADD_OFFSET("Inventory::getItem", 5);
+    ADD_OFFSET("Inventory::getItem", 7); // wrong
 
-    ADD_OFFSET("ClientInstance::getBlockSource", 28);
+    ADD_OFFSET("ClientInstance::getBlockSource", 28); //wrong
     ADD_OFFSET("ClientInstance::getLocalPlayer", 29);
     //ADD_OFFSET("ClientInstance::refocusMouse", 333); // unused
     ADD_OFFSET("ClientInstance::levelRenderer", 0xE0);
@@ -46,25 +46,25 @@ void OffsetInit::init2100() {
 
 //    ADD_OFFSET("Actor::bobOffset", 0x258);
 //    ADD_OFFSET("Actor::Age", 0x98); 1F0
-    ADD_OFFSET("Actor::hurtTime", 0x214); // ?hurtEffects@Mob@@UEAAXAEBVActorDamageSource@@M_N1@Z Mob::hurtEffects 2nd after Actor::getHealth(void)
-    ADD_OFFSET("Actor::level", 0x258);
-    ADD_OFFSET("Actor::categories", 0x290);
-    ADD_OFFSET("Actor::actorRotationComponent", 0x2A8);
-    ADD_OFFSET("Actor::aabb", 0x2A0);
+    ADD_OFFSET("Actor::hurtTime", 0x20C); // ?hurtEffects@Mob@@UEAAXAEBVActorDamageSource@@M_N1@Z Mob::hurtEffects 2nd after Actor::getHealth(void)
+    ADD_OFFSET("Actor::level", 0x250);
+    ADD_OFFSET("Actor::categories", 0x288);
+    ADD_OFFSET("Actor::actorRotationComponent", 0x2A0);
+    ADD_OFFSET("Actor::aabb", 0x298);
     ADD_OFFSET("Actor::stateVector", 0x298);
-    ADD_OFFSET("Actor::rotations", 0x2A8);
-    ADD_OFFSET("Actor::wasHurt", 0x21E); // +
-    ADD_OFFSET("Actor::baseTickVft", 26); // +
+    ADD_OFFSET("Actor::rotations", 0x2A0);
+    ADD_OFFSET("Actor::wasHurt", 0x216);
+    ADD_OFFSET("Actor::baseTickVft", 26);
 
     ADD_OFFSET("Gamemode::player", 0x8);
-    ADD_OFFSET("Gamemode::lastBreakProgress", 0x20);
+    ADD_OFFSET("Gamemode::lastBreakProgress", 0x20); // wrong
     ADD_OFFSET("Gamemode::attackVft", 14);
 
     //ADD_OFFSET("Mob::mobHurtTimeComponent", 0x610); // unused
 
-    ADD_OFFSET("Player::playerInventory", 0x788); // +
-    ADD_OFFSET("Player::playerName", 0x1D18); // +
-    ADD_OFFSET("Player::gamemode", 0xEB0); // +
+    ADD_OFFSET("Player::playerInventory", 0x760); // +
+    ADD_OFFSET("Player::playerName", 0x1D30); // +
+    ADD_OFFSET("Player::gamemode", 0xEC8); // +
 
     ADD_OFFSET("BlockSource::dimension", 0x30);
 
@@ -89,7 +89,6 @@ void OffsetInit::init2100() {
     ADD_OFFSET("Minecraft::timer", 0x00D8);
 
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x1A8);
-    ADD_OFFSET("ClientInstance::grabMouseSigOffset", 3);
 
     ADD_OFFSET("Option::optionInformation", 0x8);
     ADD_OFFSET("Option::value", 0x10);
@@ -107,7 +106,7 @@ void OffsetInit::init2100() {
 
     ADD_OFFSET("Dimension::weather", 0x1B0); // +
 
-    ADD_OFFSET("Weather::lightingLevel", 0x44); // +
+    ADD_OFFSET("Weather::lightingLevel", 0x48); // +
     ADD_OFFSET("Weather::rainLevel", 0x3C); // +
 
     ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x308);
@@ -154,8 +153,8 @@ void OffsetInit::init2100() {
 
     ADD_OFFSET("VisualTree::root", 0x8);
 
-    ADD_OFFSET("Level::hitResult", 0xB30); // +
-    ADD_OFFSET("Level::getPlayerMap", 0x1C88); //+
+    ADD_OFFSET("Level::hitResult", 0xB38); // +
+    ADD_OFFSET("Level::getPlayerMap", 0x1BC8); //+
 };
 
 void OffsetInit::init2080() {
@@ -244,7 +243,6 @@ void OffsetInit::init2080() {
     ADD_OFFSET("Minecraft::timer", 0x00D8);
 
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x1A8);
-    ADD_OFFSET("ClientInstance::grabMouseSigOffset", 3);
 
     ADD_OFFSET("Option::optionInformation", 0x8);
     ADD_OFFSET("Option::value", 0x10);
@@ -399,7 +397,6 @@ void OffsetInit::init2070() {
     ADD_OFFSET("Minecraft::timer", 0x00D8);
 
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x1A8);
-    ADD_OFFSET("ClientInstance::grabMouseSigOffset", 3);
 
     ADD_OFFSET("Option::optionInformation", 0x8);
     ADD_OFFSET("Option::value", 0x10);
@@ -552,7 +549,6 @@ void OffsetInit::init2060() {
     ADD_OFFSET("Minecraft::timer", 0x00D8);
 
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x1A8);
-    ADD_OFFSET("ClientInstance::grabMouseSigOffset", 3);
 
     ADD_OFFSET("Option::optionInformation", 0x8);
     ADD_OFFSET("Option::value", 0x10);
@@ -698,7 +694,6 @@ void OffsetInit::init2050() {
     ADD_OFFSET("Minecraft::timer", 0x00D8);
 
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x190);
-    ADD_OFFSET("ClientInstance::grabMouseSigOffset", 3);
 
     ADD_OFFSET("Option::optionInformation", 0x8);
     ADD_OFFSET("Option::value", 0x10);
@@ -845,7 +840,6 @@ void OffsetInit::init2040() {
     ADD_OFFSET("Minecraft::timer", 0x00D8);
 
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x190);
-    ADD_OFFSET("ClientInstance::grabMouseSigOffset", 3);
 
     ADD_OFFSET("Option::optionInformation", 0x8);
     ADD_OFFSET("Option::value", 0x10);
@@ -991,7 +985,6 @@ void OffsetInit::init2030() {
     ADD_OFFSET("Minecraft::timer", 0x00D8);
 
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x190);
-    ADD_OFFSET("ClientInstance::grabMouseSigOffset", 3);
 
     ADD_OFFSET("Option::optionInformation", 0x8);
     ADD_OFFSET("Option::value", 0x10);

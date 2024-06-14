@@ -9,7 +9,7 @@ void SigInit::init2100() {
     ADD_SIG("Keyboard::feed", "? ? ? ? ? ? ? 4C 8D 05 ? ? ? ? 89 54 24 20 88");
     ADD_SIG("MouseDevice::feed", "? ? ? ? ? ? ? ? 89 68 ? 48 89 70 ? 57 41 54 41 55 41 56 41 57 48 83 EC ? 44 0F B7 BC 24 ? ? ? ? 48 8B D9");
 
-    ADD_SIG("ClientInstance::grabMouse", "48 8B 81 50 0A 00 00 48 8B CA FF 15 ? ? ? ? 90"); // wrong
+    ADD_SIG("ClientInstance::grabMouse", "48 8B 80 ? ? ? ? FF 15 ? ? ? ? 90 48 85 DB 74 08 48 8B CB E8 ? ? ? ? 48 8B 8D ? ? ? ? E8");
 
     ADD_SIG("MinecraftGame::onAppSuspended", "48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 4C 8B E9 45 33 F6"); // wrong
 
@@ -67,7 +67,8 @@ void SigInit::init2100() {
     ADD_SIG("ThirdPersonNametag", "0F 84 ? ? ? ? 49 8B D6 48 8B CE E8 ? ? ? ? 84 C0 0F 84");
 
     // Keystrokes
-    ADD_SIG("Actor::getMoveInputHandler", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 2E CD 8B 46");
+    ADD_SIG("Actor::getMoveInputHandler", "? ? ? ? ? ? ? ? ? ? 48 8B DA BA 2E CD 8B 46");
+
 
     // Hitboxes
     //ADD_SIG("Actor::getActorTypeComponent", "48 8B 89 18 01 0 0 48 8B 01 48 8B 40 28 48"); // unused
@@ -90,7 +91,7 @@ void SigInit::init2100() {
 
     // Tablist
     ADD_SIG("Actor::getNametag", "48 83 EC ? 48 8B 81 ? ? ? ? 48 85 C0 74 3B 48 8B 08 BA ? ? ? ? 48 8B 40 ? 48 2B C1 48 C1 F8 ? 66 3B D0 73 17");
-    ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 C0");
+    ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 10");
 
     ADD_SIG("MinecraftUIRenderContext::getUIMaterial", "4C 8D 05 ? ? ? ? 48 8B D3 48 8B CF 48 8B 5C 24 ? 0F 28 7C 24 ? 44 0F 28 44 24 ? 48 83 C4 40 5F E9 ? ? ? ?");
     ADD_SIG("Tessellator::createMaterial", "48 8B 05 ? ? ? ? 48 8D 55 ? 48 8D 0D ? ? ? ? 48 8B 40 ? FF 15 ? ? ? ? 48 8B F8");

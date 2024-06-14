@@ -19,7 +19,7 @@ void ClientInstance::grabMouse() {
         indexRef = Memory::findSig(GET_SIG("ClientInstance::grabMouse"));
     }
 
-    int index = *reinterpret_cast<int *>(indexRef + GET_OFFSET("ClientInstance::grabMouseSigOffset")) / 8;
+    int index = *reinterpret_cast<int *>(indexRef + 3) / 8;
     return Memory::CallVFuncI<void>(index, this);
 }
 
@@ -33,7 +33,7 @@ void ClientInstance::releaseMouse() {
         }
     }
 
-    int index = *reinterpret_cast<int *>(indexRef + GET_OFFSET("ClientInstance::grabMouseSigOffset")) / 8;
+    int index = *reinterpret_cast<int *>(indexRef + 3) / 8;
     return Memory::CallVFuncI<void>(index + 1, this);
 }
 
