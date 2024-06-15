@@ -37,7 +37,7 @@ class AutoRQListener : public Listener {
             auto *pkt = reinterpret_cast<PlaySoundPacket *>(event.getPacket());
 
             if (pkt->mName == "raid.horn" ||
-                pkt->mName == "raid.horn") {
+                pkt->mName == "mob.ghast.fireball") {
                 triggered = true;
                 std::shared_ptr<Packet> packet = SDK::createPacket(77);
                 auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
