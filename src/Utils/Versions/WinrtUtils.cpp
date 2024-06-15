@@ -45,12 +45,25 @@ std::string WinrtUtils::getVersion() {
 
 std::string WinrtUtils::getFormattedVersion() {
     const std::string& version = getVersion();
-    size_t lastDotPos = version.find_last_of('.');
-    if (lastDotPos != std::string::npos && version.size() - lastDotPos > 2) {
-        // Found a dot before the last segment with more than one character after it
-        return version.substr(0, lastDotPos + 3);
-    } else {
-        // No dot found or the last segment has only one or two characters
-        return version;
+    // Split version string by dots
+    std::vector<std::string> parts;
+    std::istringstream iss(version);
+    std::string part;
+
+    while (std::getline(iss, part, '.')) {
+        parts.push_back(part);
     }
+
+    // Ensure at least major and minor parts exist
+    if (parts.size() < 2) {
+        return version; // Invalid version format
+    }
+
+    // Construct formatted version string
+    std::string formattedVersion = parts[0] + "." + parts[1];
+    if (parts.size() > 2) {
+        formattedVersion += "." + parts[2].substr(0, 1); // Take only the first character of the patch version
+    }
+
+    return formattedVersion;
 }
