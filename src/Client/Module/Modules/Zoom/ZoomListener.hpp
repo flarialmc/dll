@@ -27,6 +27,7 @@ class ZoomListener : public Listener {
 
         float animspeed = module->settings.getSettingByName<float>("anim")->value;
         bool disableanim = module->settings.getSettingByName<bool>("disableanim")->value;
+        bool alwaysanim = module->settings.getSettingByName<bool>("alwaysanim")->value;
 
         if (module->active) {
             animationFinished = false;
@@ -36,7 +37,7 @@ class ZoomListener : public Listener {
                 currentZoomVal = disableanim ? zoomValue : std::lerp(currentZoomVal, zoomValue, animspeed * FlarialGUI::frameFactor);
             }
         } else {
-            if (!animationFinished && !disableanim) {
+            if ((!animationFinished || alwaysanim) && !disableanim) {
                 // Only lerp if animation hasn't finished
                 currentZoomVal = std::lerp(currentZoomVal, fov, animspeed * FlarialGUI::frameFactor);
                 if (currentZoomVal == zoomValue || std::abs(fov - currentZoomVal) < animspeed + unzoomAnimDisableTreshold) { // when fov changes due to sprinting animation used to play
