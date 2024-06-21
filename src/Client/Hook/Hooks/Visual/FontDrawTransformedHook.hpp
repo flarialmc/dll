@@ -12,7 +12,7 @@ private:
         color->r = 1;
         color->g = 0.137255f;
         color->b = 0.227451f;
-        std::string txt("Farial on top!");
+        std::string txt("Flarial on top!");
         funcOriginal(_this, screenContext, txt, x, y, color, angle, s, centered, maxWidth);
 
     }
