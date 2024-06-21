@@ -15,7 +15,10 @@ class FOVChangerListener : public Listener {
     Module *module;
 
     void onGetFOV(FOVEvent &event) override {
-        if(event.getFOV() == 70) return;
+        if(!this->module->settings.getSettingByName<bool>("fovaffectshand")->value){
+            if(event.getFOV() == 70) return;
+        }
+
         bool inserver;
 
         std::string serverIP = SDK::getServerIP();
