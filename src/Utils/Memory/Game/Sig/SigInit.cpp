@@ -51,7 +51,7 @@ void SigInit::init2100() {
     ADD_SIG("TimeChanger", "? ? ? ? ? ? 76 05 F7 EA C1 FA 09 8B C2");
 
     // Weather
-    ADD_SIG("BlockSource::getBiome", "40 53 48 83 EC ? 48 8B D9 E8 ? ? ? ? 48 85 C0 75 5C");
+    ADD_SIG("BlockSource::getBiome", "48 89 5C 24 18 57 48 83 EC 50 48 8B F9 E8");
 
     // FreeLook
     ADD_SIG("CameraYaw", "F3 0F 11 ? F3 0F 11 ? ? 48 8B CE");
