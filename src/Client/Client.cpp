@@ -9,6 +9,14 @@
 #include <wingdi.h>
 #include <wininet.h>
 
+//winrt stuff
+#include "winrt/windows.applicationmodel.core.h"
+#include "winrt/Windows.UI.ViewManagement.h"
+#include "winrt/Windows.Foundation.h"
+#include "winrt/Windows.UI.Core.h"
+#include "winrt/windows.system.h"
+
+
 std::string Client::settingspath = Utils::getRoamingPath() + R"(\Flarial\Config\main.flarial)";
 Settings Client::settings = Settings();
 
@@ -25,10 +33,20 @@ void DownloadAndSave(const std::string& url, const std::string& path) {
 
 bool Client::disable = false;
 
+void setWindowTitle(std::wstring title) {
+    using namespace winrt::Windows::UI::Notifications;
+    using namespace winrt::Windows::UI::ViewManagement;
+    using namespace winrt::Windows::ApplicationModel::Core;
+
+    CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([title = std::move(title)]() {
+        ApplicationView::GetForCurrentView().Title(title);
+        });
+}
 
 void Client::initialize() {
+    setWindowTitle(L"Flarial");
     Logger::debug("[INIT] Initializing Flarial...");
-
+    
     VersionUtils::init();
     Client::version = WinrtUtils::getFormattedVersion();
     Logger::debug("[INIT] Version: " + WinrtUtils::getVersion());
