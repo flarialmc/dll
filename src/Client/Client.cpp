@@ -19,14 +19,23 @@
 
 std::string Client::settingspath = Utils::getRoamingPath() + R"(\Flarial\Config\main.flarial)";
 Settings Client::settings = Settings();
+bool notifiedOfConnectionIssue = false;
 
 void DownloadAndSave(const std::string& url, const std::string& path) {
 
     if (Client::settings.getSettingByName<bool>("dlassets")->value || !std::filesystem::exists(path)) {
         char test[256];
-        strcpy_s(test, "https://cdn-c6f.pages.dev/");
+        strcpy_s(test, "https://flarialbackup.ashank.tech/");
         if (InternetCheckConnectionA(test, FLAG_ICC_FORCE_CONNECTION, 0))
             URLDownloadToFileW(nullptr, FlarialGUI::to_wide(url).c_str(), FlarialGUI::to_wide(path).c_str(), 0, nullptr);
+        else {
+            if(notifiedOfConnectionIssue) return;
+            notifiedOfConnectionIssue = true;
+            MessageBox(NULL, "Flarial: Failed to download assets! Try using vpn.", "", MB_OK);
+            ModuleManager::terminate();
+            Client::disable = true;
+        }
+
     }
 
 }
