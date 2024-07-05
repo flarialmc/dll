@@ -122,9 +122,8 @@ void ModuleManager::initialize() {
     ModuleManager::addModule(new SnapLook());
     ModuleManager::addModule(new HurtColor());
     ModuleManager::addModule(new FogColor());
-    if(!WinrtUtils::check(20,80)) { // TODO: fix Actor::getArmor sig/use other method
-        ModuleManager::addModule(new ArmorHUD());
-    }
+    ModuleManager::addModule(new ArmorHUD());
+
     ModuleManager::addModule(new TimeChanger());
 
     if((WinrtUtils::check(20,30) && !WinrtUtils::check(20,40)) || WinrtUtils::check(20,50)) { // does not work in 1.20.4X

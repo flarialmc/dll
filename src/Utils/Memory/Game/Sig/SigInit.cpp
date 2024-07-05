@@ -85,8 +85,9 @@ void SigInit::init2100() {
     // Armour HUD
     //ADD_SIG("Actor::getArmor", "40 53 48 83 EC 20 8B DA E8 ? ? ? ? 4C 8B C0"); // 40 53 48 83 EC 20 8B DA E8 ? ? ? ? 4C 8B C0, 48 89 54 24 10 48 83 EC 28 80 79 08 07 75 34
     //ADD_SIG("Actor::getOffhandSlot", ""); // wrong
-    ADD_SIG("ItemStack::getDamageValue", "48 83 EC 38 48 8B 41 08 48 85 C0 0F");
-    ADD_SIG("ItemStack::getMaxDamage", "48 8B 41 08 48 85 C0 74 19 48 8B 08 48 85 C9 74 11 48 8B 01 48 8B 80 10");
+    ADD_SIG("Actor::getActorEquipmentComponent", "4C 8B 41 48 4C 8B C9 48 8B 41 50 4C 8B 51 68 49 2B C0 48 C1 F8 03 48 FF C8 25 36");
+    ADD_SIG("ItemStack::getDamageValue", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA 48 85 D2");
+    ADD_SIG("ItemStack::getMaxDamage", "48 8B 41 08 48 85 C0 74 19");
     ADD_SIG("ItemRenderer::renderGuiItemNew", "48 8B ? 53 55 56 57 41 ? 41 ? 41 ? 41 ? 48 81 EC ? ? ? ? 0F 29 ? ? 0F 29 ? ? 48 8B ? ? ? ? ? 48 33 ? 48 89 ? ? ? ? ? ? 45 8B");
 
     // Tablist
@@ -185,8 +186,9 @@ void SigInit::init2080() {
     // Armour HUD
     //ADD_SIG("Actor::getArmor", "40 53 48 83 EC 20 8B DA E8 ? ? ? ? 4C 8B C0"); // 40 53 48 83 EC 20 8B DA E8 ? ? ? ? 4C 8B C0, 48 89 54 24 10 48 83 EC 28 80 79 08 07 75 34
     //ADD_SIG("Actor::getOffhandSlot", ""); // wrong
-    ADD_SIG("ItemStack::getDamageValue", "48 83 EC 38 48 8B 41 08 48 85 C0 0F");
-    ADD_SIG("ItemStack::getMaxDamage", "48 8B 41 08 48 85 C0 74 19 48 8B 08 48 85 C9 74 11 48 8B 01 48 8B 80 10");
+    ADD_SIG("Actor::getActorEquipmentComponent", "4C 8B 41 48 4C 8B C9 48 8B 41 50 4C 8B 51 68 49 2B C0 48 C1 F8 03 48 FF C8 25 36");
+    ADD_SIG("ItemStack::getDamageValue", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA 48 85 D2");
+    ADD_SIG("ItemStack::getMaxDamage", "48 8B 41 08 48 85 C0 74 19");
     ADD_SIG("ItemRenderer::renderGuiItemNew", "48 8B ? 53 55 56 57 41 ? 41 ? 41 ? 41 ? 48 81 EC ? ? ? ? 0F 29 ? ? 0F 29 ? ? 48 8B ? ? ? ? ? 48 33 ? 48 89 ? ? ? ? ? ? 45 8B");
 
     // Tablist

@@ -12,8 +12,10 @@
 #include "../../../Utils/Utils.hpp"
 #include "Components/StateVectorComponent.hpp"
 #include "Components/RenderPositionComponent.hpp"
+#include "Components/ActorEquipmentComponent.h"
 #include "EntityContext.hpp"
 #include "MobEffect.h"
+
 
 enum ActorFlags {
     FLAG_ONFIRE = 0,
@@ -220,4 +222,8 @@ public:
     RenderPositionComponent *getRenderPositionComponent();
 
     bool isValidTarget(Actor *actor);
+
+    SimpleContainer *getArmorContainer();
+
+    SimpleContainer *getOffhandContainer();
 };

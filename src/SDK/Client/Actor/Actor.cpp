@@ -59,15 +59,41 @@ Vec3<float> *Actor::getPosition() {
     return &this->stateVector->Pos;
 }
 
-ItemStack *Actor::getArmor(int slot) {
+SimpleContainer* Actor::getArmorContainer() {
+    if(!WinrtUtils::check(20, 80)) return nullptr;
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getArmor"));
+        sig = Memory::findSig(GET_SIG("Actor::getActorEquipmentComponent"));
     }
 
-    auto fn = reinterpret_cast<ItemStack *(__thiscall *)(Actor *, int)>(sig);
-    return fn(this, slot);
+    return tryGet<ActorEquipmentComponent>(sig)->mArmorContainer;
+}
+
+SimpleContainer* Actor::getOffhandContainer() {
+    if(!WinrtUtils::check(20, 80)) return nullptr;
+    static uintptr_t sig;
+
+    if (sig == NULL) {
+        sig = Memory::findSig(GET_SIG("Actor::getActorEquipmentComponent"));
+    }
+
+    return tryGet<ActorEquipmentComponent>(sig)->mOffhandContainer;
+}
+
+ItemStack *Actor::getArmor(int slot) {
+    if(WinrtUtils::check(20, 80)) {
+        return Actor::getArmorContainer()->getItem(slot);
+    } else {
+        static uintptr_t sig;
+
+        if (sig == NULL) {
+            sig = Memory::findSig(GET_SIG("Actor::getArmor"));
+        }
+
+        auto fn = reinterpret_cast<ItemStack *(__thiscall *)(Actor *, int)>(sig);
+        return fn(this, slot);
+    }
 }
 
 MoveInputComponent *Actor::getMoveInputHandler() { //??$try_get@UMoveInputComponent
@@ -83,14 +109,18 @@ MoveInputComponent *Actor::getMoveInputHandler() { //??$try_get@UMoveInputCompon
 }
 
 ItemStack *Actor::getOffhandSlot() {
-    static uintptr_t sig;
+    if(WinrtUtils::check(20, 80)) {
+        return getOffhandContainer()->getItem(0);
+    } else {
+        static uintptr_t sig;
 
-    if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getOffhandSlot"));
+        if (sig == NULL) {
+            sig = Memory::findSig(GET_SIG("Actor::getOffhandSlot"));
+        }
+
+        auto fn = reinterpret_cast<ItemStack *(__thiscall *)(Actor *)>(sig);
+        return fn(this);
     }
-
-    auto fn = reinterpret_cast<ItemStack *(__thiscall *)(Actor *)>(sig);
-    return fn(this);
 }
 
 V1_20_50::EntityContext *Actor::GetEntityContextV1_20_50() {
