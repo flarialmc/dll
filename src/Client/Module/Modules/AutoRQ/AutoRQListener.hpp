@@ -37,8 +37,9 @@ class AutoRQListener : public Listener {
             if(!module->settings.getSettingByName<bool>("solo")->value) return;
             auto *pkt = reinterpret_cast<SetTitlePacket *>(event.getPacket());
 
-            if (pkt->text == "§6§l»§r§c Game Over §6§l«" ||
-                pkt->text == "§6§l»§r§c Game Over §6§l«") {
+            if (pkt->text == "§cYou're a spectator!" ||
+                pkt->text == "§cYou died!" ||
+                pkt->text == "§7You're spectating the §as§eh§6o§cw§7!") {
                 triggered = true;
                 std::shared_ptr<Packet> packet = SDK::createPacket(77);
                 auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
@@ -54,10 +55,29 @@ class AutoRQListener : public Listener {
             } //std::cout << pkt->mName << std::endl;
 
         }
+        if (id == MinecraftPacketIds::PlaySoundA) {
+            if(!module->settings.getSettingByName<bool>("solo")->value) return;
+            auto *pkt = reinterpret_cast<PlaySoundPacket *>(event.getPacket());
 
+           if (pkt->mName == "hive.grav.game.portal.reached.final") {
+                triggered = true;
+                std::shared_ptr<Packet> packet = SDK::createPacket(77);
+                auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
+
+                command_packet->command = "/connection";
+
+                command_packet->origin.type = CommandOriginType::Player;
+
+                command_packet->InternalSource = true;
+
+                SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+
+            } //std::cout << pkt->mName << std::endl;
+
+        }
         if (id == MinecraftPacketIds::Text) {
             auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
-            if(!module->settings.getSettingByName<bool>("solo")->value) {
+            //if(!module->settings.getSettingByName<bool>("solo")->value) {
                 if (pkt->message == "§c§l» §r§c§lGame OVER!") {
                     triggered = true;
                     std::shared_ptr<Packet> packet = SDK::createPacket(77);
@@ -72,7 +92,7 @@ class AutoRQListener : public Listener {
                     SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
                     return;
                 } //std::cout << pkt->mName << std::endl;
-            }
+            //}
 
             std::string textToCheck = "You are connected to server name ";
             std::string textToCheckToSilence = "You are connected";
