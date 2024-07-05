@@ -33,11 +33,10 @@ class AutoRQListener : public Listener {
     void onPacketReceive(PacketEvent &event) override {
         MinecraftPacketIds id = event.getPacket()->getId();
 
-        if (id == MinecraftPacketIds::PlaySoundA) {
-            auto *pkt = reinterpret_cast<PlaySoundPacket *>(event.getPacket());
+        if (id == MinecraftPacketIds::Text) {
+            auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
-            if (pkt->mName == "raid.horn" ||
-                pkt->mName == "mob.ghast.fireball") {
+            if (pkt->message == "§c§l» §r§c§lGame OVER!") {
                 triggered = true;
                 std::shared_ptr<Packet> packet = SDK::createPacket(77);
                 auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
@@ -53,7 +52,7 @@ class AutoRQListener : public Listener {
             } //std::cout << pkt->mName << std::endl;
 
         }
-        else if (id == MinecraftPacketIds::Text) {
+        if (id == MinecraftPacketIds::Text) {
             auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
             //if (pkt->type == TextPacketType::SYSTEM) {
                 std::string textToCheck = "You are connected to server name ";
