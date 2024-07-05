@@ -166,7 +166,7 @@ public:
         return Vec3<T>(this->x * v, this->y * v, this->z * v);
     };
 public:
-    auto dist(const Vec3<T> pos) -> float {
+    auto dist(const Vec3<T> pos) const -> float {
         return sqrt((std::pow(this->x - pos.x, 2)) + (std::pow(this->y - pos.y, 2)) + (std::pow(this->z - pos.z, 2)));
     };
 };
@@ -246,6 +246,18 @@ public:
     static std::string removeNonAlphanumeric(const std::string &input);
 
     static std::string remomveNonNumeric(const std::string &input);
+
+    static bool CursorInEllipse(float ellipseX, float ellipseY, float radiusX, float radiusY);
+
+    static constexpr unsigned int hash(const char *str) {
+        unsigned int hash = 5381;
+        int c;
+
+        while ((c = *str++))
+            hash = ((hash << 5) + hash) + c; // hash * 33 + c
+
+        return hash;
+    }
 };
 
 struct CaretMeasureData {

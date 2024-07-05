@@ -43,7 +43,7 @@ public:
             ClientInstance::getTopScreenName() == "pause_screen" &&
             module->isEnabled()) {
 
-            if (!enabled && ModuleManager::getModule("ClickGUI")->isEnabled()) {
+            if (!enabled && FlarialGUI::inMenu) {
                 FlarialGUI::Notify("To change the position of the chat, Please click " +
                                    ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                            "editmenubind")->value);
@@ -66,9 +66,9 @@ public:
                 currentPos = Vec2<float>{MovableChatListener::oriXy.x, MovableChatListener::oriXy.y};
 
             if (ClickGUIRenderer::editmenu)
-                FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 20);
+                FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 21);
 
-            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 20, width, height);
+            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 21, width, height);
 
 
             currentPos.x = vec2.x;
@@ -79,10 +79,10 @@ public:
             module->settings.setValue("percentageX", percentages.x);
             module->settings.setValue("percentageY", percentages.y);
 
-            FlarialGUI::RoundedRect(currentPos.x, currentPos.y, D2D1::ColorF(D2D1::ColorF::White, 0.4f), width, height);
-
-            if (ClickGUIRenderer::editmenu)
+            if (ClickGUIRenderer::editmenu) {
+                FlarialGUI::RoundedRect(currentPos.x, currentPos.y, D2D1::ColorF(D2D1::ColorF::White, 0.2f), width, height);
                 FlarialGUI::UnsetWindowRect();
+            }
         } else {
             enabled = false;
         }

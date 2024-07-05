@@ -2,29 +2,73 @@
 
 #include "Client.hpp"
 #include "GUI/Engine/Engine.hpp"
+#include "../Utils/Versions/VersionUtils.hpp"
+#include "../Utils/Versions/WinrtUtils.hpp"
 #include <filesystem>
 #include <thread>
 #include <wingdi.h>
 #include <wininet.h>
 
+//winrt stuff
+#include "winrt/windows.applicationmodel.core.h"
+#include "winrt/Windows.UI.ViewManagement.h"
+#include "winrt/Windows.Foundation.h"
+#include "winrt/Windows.UI.Core.h"
+#include "winrt/windows.system.h"
+
+
 std::string Client::settingspath = Utils::getRoamingPath() + R"(\Flarial\Config\main.flarial)";
 Settings Client::settings = Settings();
+bool notifiedOfConnectionIssue = false;
 
 void DownloadAndSave(const std::string& url, const std::string& path) {
 
     if (Client::settings.getSettingByName<bool>("dlassets")->value || !std::filesystem::exists(path)) {
         char test[256];
-        strcpy_s(test, "https://cdn-c6f.pages.dev/");
+        strcpy_s(test, "https://flarialbackup.ashank.tech/");
         if (InternetCheckConnectionA(test, FLAG_ICC_FORCE_CONNECTION, 0))
             URLDownloadToFileW(nullptr, FlarialGUI::to_wide(url).c_str(), FlarialGUI::to_wide(path).c_str(), 0, nullptr);
+        else {
+            if(notifiedOfConnectionIssue) return;
+            notifiedOfConnectionIssue = true;
+            MessageBox(NULL, "Flarial: Failed to download assets! Try using vpn.", "", MB_OK);
+            ModuleManager::terminate();
+            Client::disable = true;
+        }
+
     }
 
 }
 
 bool Client::disable = false;
 
+void setWindowTitle(std::wstring title) {
+    using namespace winrt::Windows::UI::Notifications;
+    using namespace winrt::Windows::UI::ViewManagement;
+    using namespace winrt::Windows::ApplicationModel::Core;
+
+    CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([title = std::move(title)]() {
+        ApplicationView::GetForCurrentView().Title(title);
+        });
+}
 
 void Client::initialize() {
+    setWindowTitle(L"Flarial");
+    Logger::debug("[INIT] Initializing Flarial...");
+    
+    VersionUtils::init();
+    Client::version = WinrtUtils::getFormattedVersion();
+    Logger::debug("[INIT] Version: " + WinrtUtils::getVersion());
+    Logger::debug("[INIT] Formatted: " + Client::version);
+
+    if (!VersionUtils::isSupported(Client::version)) {
+        Logger::debug("[INFO] Version not supported!");
+        Client::disable = true;
+        return;
+    }
+
+    VersionUtils::addData();
+
     std::filesystem::path folder_path(Utils::getRoamingPath() + "\\Flarial");
     if (!exists(folder_path)) {
         create_directory(folder_path);
@@ -47,73 +91,75 @@ void Client::initialize() {
 
     std::string Path = Utils::getRoamingPath() + R"(\Flarial\assets\)";
 
+    std::string cdn_link = "https://flarialbackup.ashank.tech/";
+
     std::pair<std::string, std::string> fileData[] = {
-            {"https://cdn-c6f.pages.dev/assets/gear.png",                  Path + "gear.png"},
-            {"https://cdn-c6f.pages.dev/assets/font.ttf",                  Path + "font.ttf"},
-            {"https://cdn-c6f.pages.dev/assets/logo.png",                  Path + "logo.png"},
-            {"https://withors-flarial-cdn.pages.dev/flareal-dev.png",      Path + "flarial-dev.png"},
-            {"https://withors-flarial-cdn.pages.dev/flarial-contribiutor.png",      Path + "flarial-contribiutor.png"},
-            {"https://withors-flarial-cdn.pages.dev/flarial-premium.png",      Path + "flarial-premium.png"},
-            {"https://withors-flarial-cdn.pages.dev/flarial-staff.png",      Path + "flarial-staff.png"},
-            {"https://withors-flarial-cdn.pages.dev/re-q.png",      Path + "re-q.png"},
-            {"https://cdn-c6f.pages.dev/assets/fps.png",                   Path + "fps.png"},
-            {"https://cdn-c6f.pages.dev/assets/like.png",                  Path + "like.png"},
-            {"https://cdn-c6f.pages.dev/assets/auto_sprint.png",           Path + "auto_sprint.png"},
-            {"https://cdn-c6f.pages.dev/assets/clickgui.png",              Path + "clickgui.png"},
-            {"https://cdn-c6f.pages.dev/assets/modules.png",               Path + "modules.png"},
-            {"https://cdn-c6f.pages.dev/assets/cursor.png",                Path + "cursor.png"},
-            {"https://cdn-c6f.pages.dev/assets/magnify.png",               Path + "magnify.png"},
-            {"https://cdn-c6f.pages.dev/assets/memory.png",                Path + "memory.png"},
-            {"https://cdn-c6f.pages.dev/assets/time.png",                  Path + "time.png"},
-            {"https://cdn-c6f.pages.dev/assets/fullbright.png",            Path + "fullbright.png"},
-            {"https://cdn-c6f.pages.dev/assets/frying-pan.png",            Path + "frying-pan.png"},
-            {"https://cdn-c6f.pages.dev/assets/font_bold.ttf",             Path + "font_bold.ttf"},
-            {"https://cdn-c6f.pages.dev/assets/flarial-title.png",         Path + "flarial-title.png"},
-            {"https://cdn-c6f.pages.dev/assets/combo.png",                 Path + "combo.png"},
-            {"https://cdn-c6f.pages.dev/assets/reach.png",                 Path + "reach.png"},
-            {"https://cdn-c6f.pages.dev/assets/keyboard.png",              Path + "keyboard.png"},
-            {"https://cdn-c6f.pages.dev/assets/server-ip.png",             Path + "server-ip.png"},
-            {"https://cdn-c6f.pages.dev/assets/coordinates.png",           Path + "coordinates.png"},
-            {"https://cdn-c6f.pages.dev/assets/speed.png",                 Path + "speed.png"},
-            {"https://cdn-c6f.pages.dev/assets/ping.png",                  Path + "ping.png"},
-            {"https://cdn-c6f.pages.dev/assets/arrow.png",                 Path + "arrow.png"},
-            {"https://cdn-c6f.pages.dev/assets/potion.png",                Path + "potion.png"},
-            {"https://cdn-c6f.pages.dev/assets/nametag.png",               Path + "nametag.png"},
-            {"https://cdn-c6f.pages.dev/assets/minecraftia.ttf",           Path + "minecraftia.ttf"},
-            {"https://cdn-c6f.pages.dev/assets/blur.png",                  Path + "blur.png"},
-            {"https://cdn-c6f.pages.dev/assets/eye.png",                   Path + "eye.png"},
-            {"https://cdn-c6f.pages.dev/assets/chestplate.png",            Path + "chestplate.png"},
-            {"https://cdn-c6f.pages.dev/assets/patar.jpg",                 Path + "patar.jpg"},
-            {"https://cdn-c6f.pages.dev/assets/skull.png",                 Path + "skull.png"},
-            {"https://cdn-c6f.pages.dev/assets/freelook.png",              Path + "freelook.png"},
-            {"https://cdn-c6f.pages.dev/assets/hurt.png",                  Path + "hurt.png"},
-            {"https://cdn-c6f.pages.dev/assets/smoke.png",                 Path + "smoke.png"},
-            {"https://cdn-c6f.pages.dev/assets/renderoptions.png",         Path + "renderoptions.png"},
-            {"https://cdn-c6f.pages.dev/assets/man.png",                   Path + "man.png"},
-            {"https://cdn-c6f.pages.dev/assets/search.png",                Path + "search.png"},
-            {"https://cdn-c6f.pages.dev/assets/slowly.png",                Path + "slowly.png"},
-            {"https://cdn-c6f.pages.dev/assets/cloudy.png",                Path + "cloudy.png"},
-            {"https://cdn-c6f.pages.dev/assets/list.png",                  Path + "list.png"},
-            {"https://cdn-c6f.pages.dev/assets/text-box.png",              Path + "text-box.png"},
-            {"https://cdn-c6f.pages.dev/assets/icognito.png",              Path + "icognito.png"},
-            {"https://cdn-c6f.pages.dev/assets/stop.png",                  Path + "stop.png"},
-            {"https://cdn-c6f.pages.dev/assets/block_break_indicator.png", Path + "block_break_indicator.png"},
-            {"https://cdn-c6f.pages.dev/assets/field-of-view.png",         Path + "field-of-view.png"},
-            {"https://cdn-c6f.pages.dev/assets/upside-down.png",           Path + "upside-down.png"},
-            {"https://cdn-c6f.pages.dev/assets/down.png",                  Path + "down.png"},
-            {"https://cdn-c6f.pages.dev/assets/Animations.png",            Path + "Animations.png"},
-            {"https://cdn-c6f.pages.dev/assets/transparent.png",           Path + "transparent.png"},
-            {"https://cdn-c6f.pages.dev/assets/rgb.png",                   Path + "rgb.png"},
-            {"https://cdn-c6f.pages.dev/assets/pencil.png",                Path + "pencil.png"},
-            {"https://cdn-c6f.pages.dev/assets/dvdlogo-01.png",            Path + "dvdlogo-01.png"},
-            {"https://cdn-c6f.pages.dev/assets/dvdlogo-02.png",            Path + "dvdlogo-02.png"},
-            {"https://cdn-c6f.pages.dev/assets/dvdlogo-03.png",            Path + "dvdlogo-03.png"},
-            {"https://cdn-c6f.pages.dev/assets/dvdlogo-04.png",            Path + "dvdlogo-04.png"},
-            {"https://cdn-c6f.pages.dev/assets/dvdlogo-05.png",            Path + "dvdlogo-05.png"},
-            {"https://cdn-c6f.pages.dev/assets/dvdlogo-06.png",            Path + "dvdlogo-06.png"},
-            {"https://cdn-c6f.pages.dev/assets/dvdlogo-07.png",            Path + "dvdlogo-07.png"},
-            {"https://cdn-c6f.pages.dev/assets/dvdlogo-08.png",            Path + "dvdlogo-08.png"},
-            {"https://cdn-c6f.pages.dev/assets/block.png",                 Path + "block.png"}
+            {cdn_link + "assets/gear.png",                  Path + "gear.png"},
+            {cdn_link + "assets/font.ttf",                  Path + "font.ttf"},
+            {cdn_link + "assets/logo.png",                  Path + "logo.png"},
+            {cdn_link + "assets/flareal-dev.png",           Path + "flarial-dev.png"},
+            {cdn_link + "assets/flarial-contribiutor.png",  Path + "flarial-contribiutor.png"},
+            {cdn_link + "assets/flarial-premium.png",       Path + "flarial-premium.png"},
+            {cdn_link + "assets/flarial-staff.png",         Path + "flarial-staff.png"},
+            {cdn_link + "assets/re-q.png",                  Path + "re-q.png"},
+            {cdn_link + "assets/fps.png",                   Path + "fps.png"},
+            {cdn_link + "assets/like.png",                  Path + "like.png"},
+            {cdn_link + "assets/auto_sprint.png",           Path + "auto_sprint.png"},
+            {cdn_link + "assets/clickgui.png",              Path + "clickgui.png"},
+            {cdn_link + "assets/modules.png",               Path + "modules.png"},
+            {cdn_link + "assets/cursor.png",                Path + "cursor.png"},
+            {cdn_link + "assets/magnify.png",               Path + "magnify.png"},
+            {cdn_link + "assets/memory.png",                Path + "memory.png"},
+            {cdn_link + "assets/time.png",                  Path + "time.png"},
+            {cdn_link + "assets/fullbright.png",            Path + "fullbright.png"},
+            {cdn_link + "assets/frying-pan.png",            Path + "frying-pan.png"},
+            {cdn_link + "assets/font_bold.ttf",             Path + "font_bold.ttf"},
+            {cdn_link + "assets/flarial-title.png",         Path + "flarial-title.png"},
+            {cdn_link + "assets/combo.png",                 Path + "combo.png"},
+            {cdn_link + "assets/reach.png",                 Path + "reach.png"},
+            {cdn_link + "assets/keyboard.png",              Path + "keyboard.png"},
+            {cdn_link + "assets/server-ip.png",             Path + "server-ip.png"},
+            {cdn_link + "assets/coordinates.png",           Path + "coordinates.png"},
+            {cdn_link + "assets/speed.png",                 Path + "speed.png"},
+            {cdn_link + "assets/ping.png",                  Path + "ping.png"},
+            {cdn_link + "assets/arrow.png",                 Path + "arrow.png"},
+            {cdn_link + "assets/potion.png",                Path + "potion.png"},
+            {cdn_link + "assets/nametag.png",               Path + "nametag.png"},
+            {cdn_link + "assets/minecraftia.ttf",           Path + "minecraftia.ttf"},
+            {cdn_link + "assets/blur.png",                  Path + "blur.png"},
+            {cdn_link + "assets/eye.png",                   Path + "eye.png"},
+            {cdn_link + "assets/chestplate.png",            Path + "chestplate.png"},
+            {cdn_link + "assets/patar.jpg",                 Path + "patar.jpg"},
+            {cdn_link + "assets/skull.png",                 Path + "skull.png"},
+            {cdn_link + "assets/freelook.png",              Path + "freelook.png"},
+            {cdn_link + "assets/hurt.png",                  Path + "hurt.png"},
+            {cdn_link + "assets/smoke.png",                 Path + "smoke.png"},
+            {cdn_link + "assets/renderoptions.png",         Path + "renderoptions.png"},
+            {cdn_link + "assets/man.png",                   Path + "man.png"},
+            {cdn_link + "assets/search.png",                Path + "search.png"},
+            {cdn_link + "assets/slowly.png",                Path + "slowly.png"},
+            {cdn_link + "assets/cloudy.png",                Path + "cloudy.png"},
+            {cdn_link + "assets/list.png",                  Path + "list.png"},
+            {cdn_link + "assets/text-box.png",              Path + "text-box.png"},
+            {cdn_link + "assets/icognito.png",              Path + "icognito.png"},
+            {cdn_link + "assets/stop.png",                  Path + "stop.png"},
+            {cdn_link + "assets/block_break_indicator.png", Path + "block_break_indicator.png"},
+            {cdn_link + "assets/field-of-view.png",         Path + "field-of-view.png"},
+            {cdn_link + "assets/upside-down.png",           Path + "upside-down.png"},
+            {cdn_link + "assets/down.png",                  Path + "down.png"},
+            {cdn_link + "assets/Animations.png",            Path + "Animations.png"},
+            {cdn_link + "assets/transparent.png",           Path + "transparent.png"},
+            {cdn_link + "assets/rgb.png",                   Path + "rgb.png"},
+            {cdn_link + "assets/pencil.png",                Path + "pencil.png"},
+            {cdn_link + "assets/dvdlogo-01.png",            Path + "dvdlogo-01.png"},
+            {cdn_link + "assets/dvdlogo-02.png",            Path + "dvdlogo-02.png"},
+            {cdn_link + "assets/dvdlogo-03.png",            Path + "dvdlogo-03.png"},
+            {cdn_link + "assets/dvdlogo-04.png",            Path + "dvdlogo-04.png"},
+            {cdn_link + "assets/dvdlogo-05.png",            Path + "dvdlogo-05.png"},
+            {cdn_link + "assets/dvdlogo-06.png",            Path + "dvdlogo-06.png"},
+            {cdn_link + "assets/dvdlogo-07.png",            Path + "dvdlogo-07.png"},
+            {cdn_link + "assets/dvdlogo-08.png",            Path + "dvdlogo-08.png"},
+            {cdn_link + "assets/block.png",                 Path + "block.png"}
     };
 
     Client::CheckSettingsFile();
@@ -197,9 +243,10 @@ void Client::initialize() {
     AddFontResource(fontpath.c_str());
 
     Logger::initialize();
+
     HookManager::initialize();
     ModuleManager::initialize();
-    Logger::debug("[Client] Sending");
+    Logger::debug("[Client] Ready.");
 
     if (!Client::disable) {
         FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(

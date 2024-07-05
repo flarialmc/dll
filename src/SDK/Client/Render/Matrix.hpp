@@ -33,7 +33,7 @@ public:
         return true;
     }
 
-    bool WorldToScreen(Vec3<float> pos, Vec2<float> &screen);
+    static bool WorldToScreen(Vec3<float> pos, Vec2<float> &screen);
 
     static GLMatrix *getMatrixCorrection();
 

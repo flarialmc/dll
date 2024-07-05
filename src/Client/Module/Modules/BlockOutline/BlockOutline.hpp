@@ -8,15 +8,15 @@
 class BlockOutline : public Module {
 
 private:
-    const static inline auto highlightColorRipRelAddr = Memory::findSig("? ? ? ? 0F 11 45 ? 0F 11 00 C6 40 10 ? 45 38 96"); // RIP REL 4BYTE FROM FUNC OFFSET ADDR
-    static inline auto highlightColorOrigRipRel = *(UINT32*)highlightColorRipRelAddr;
+    static inline uintptr_t highlightColorRipRelAddr; // RIP REL 4BYTE FROM FUNC OFFSET ADDR
+    static inline UINT32 highlightColorOrigRipRel;
 
-    const static inline auto outlineColorRipRelAddr = Memory::findSig("? ? ? ? 0F 11 00 C6 40 10 ? 0F 57 C9 0F 11 4D");
-    static inline auto outlineColorOrigRipRel = *(UINT32*)outlineColorRipRelAddr;
+    static inline uintptr_t outlineColorRipRelAddr;
+    static inline UINT32 outlineColorOrigRipRel;
     // TODO: make it look better
-    static inline auto selectionColor = (MCCColor*)AllocateBuffer((void*)highlightColorRipRelAddr); // allocate space for color
-    static inline auto highlightColorNewRipRel = Memory::getRipRel(highlightColorRipRelAddr, reinterpret_cast<uintptr_t>((void*)selectionColor));
-    static inline auto outlineColorNewRipRel= Memory::getRipRel(outlineColorRipRelAddr, reinterpret_cast<uintptr_t>((void*)selectionColor));
+    static inline MCCColor* selectionColor; // allocate space for color
+    static inline std::array<std::byte, 4> highlightColorNewRipRel;
+    static inline std::array<std::byte, 4> outlineColorNewRipRel;
 
 public:
     BlockOutline() : Module("BlockOutline", "Changes the block outline color", R"(\Flarial\assets\block.png)", "") {
@@ -24,6 +24,17 @@ public:
     };
 
     void onSetup() override { // init color just in case
+        highlightColorRipRelAddr = Memory::findSig(GET_SIG("blockHighlightColor")); // RIP REL 4BYTE FROM FUNC OFFSET ADDR
+        if(highlightColorRipRelAddr == NULL) return;
+        highlightColorOrigRipRel = *(UINT32*)highlightColorRipRelAddr;
+
+        outlineColorRipRelAddr = Memory::findSig(GET_SIG("mce::Color::BLACK"));
+        if(outlineColorRipRelAddr == NULL) return;
+        outlineColorOrigRipRel = *(UINT32*)outlineColorRipRelAddr;
+        // TODO: make it look better
+        selectionColor = (MCCColor*)AllocateBuffer((void*)highlightColorRipRelAddr); // allocate space for color
+        highlightColorNewRipRel = Memory::getRipRel(highlightColorRipRelAddr, reinterpret_cast<uintptr_t>((void*)selectionColor));
+        outlineColorNewRipRel= Memory::getRipRel(outlineColorRipRelAddr, reinterpret_cast<uintptr_t>((void*)selectionColor));
         *selectionColor = MCCColor{};
     }
 
@@ -45,11 +56,13 @@ public:
     }
 
     static void patch() { // change rel rip offset to ours
+        if(highlightColorRipRelAddr == NULL || outlineColorRipRelAddr == NULL) return;
         Memory::patchBytes((void *) highlightColorRipRelAddr, highlightColorNewRipRel.data(), sizeof(UINT32));
         Memory::patchBytes((void *) outlineColorRipRelAddr, outlineColorNewRipRel.data(), sizeof(UINT32));
     }
 
     static void unpatch() { // change rel rip offset to ours
+        if(highlightColorRipRelAddr == NULL || outlineColorRipRelAddr == NULL) return;
         Memory::patchBytes((void *) highlightColorRipRelAddr, &highlightColorOrigRipRel, sizeof(UINT32));
         Memory::patchBytes((void *) outlineColorRipRelAddr, &outlineColorOrigRipRel, sizeof(UINT32));
     }

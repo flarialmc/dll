@@ -19,12 +19,7 @@ class ReachListener : public Listener {
     Module *module;
     // TODO: Better reach calculation
     void onAttack(AttackEvent &event) override {
-        Vec3<float> *LPPos = SDK::clientInstance->getLocalPlayer()->getPosition();
-        Vec3<float> *TargetPos = event.getActor()->getPosition();
-
-
-        Reach = LPPos->dist(*TargetPos);
-        if (Reach > 3.0f) Reach = 3.0f;
+        Reach = event.getActor()->getlevel()->getHitResult().distance();
         last_hit = std::chrono::high_resolution_clock::now();
     }
 

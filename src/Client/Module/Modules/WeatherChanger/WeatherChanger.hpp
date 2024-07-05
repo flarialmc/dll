@@ -66,17 +66,21 @@ public:
 
         this->settings.getSettingByName<float>("lighting")->value = percent;
 
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-        if (FlarialGUI::Toggle(0, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "snow")->value))
-            this->settings.getSettingByName<bool>("snow")->value = !this->settings.getSettingByName<bool>(
-                    "snow")->value;
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth / 2.0f), toggleY,
-                                        L"Snow (intensity depends on rain)",
-                                        Constraints::SpacingConstraint(4.5, textWidth), textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
+        if (!WinrtUtils::check(21, 0)) {
 
+            toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+            if (FlarialGUI::Toggle(0, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                    "snow")->value))
+                this->settings.getSettingByName<bool>("snow")->value = !this->settings.getSettingByName<bool>(
+                        "snow")->value;
+            FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth / 2.0f), toggleY,
+                                            L"Snow (intensity depends on rain)",
+                                            Constraints::SpacingConstraint(4.5, textWidth), textHeight,
+                                            DWRITE_TEXT_ALIGNMENT_LEADING,
+                                            Constraints::SpacingConstraint(0.95, textWidth),
+                                            DWRITE_FONT_WEIGHT_NORMAL);
+
+        }
     }
 };
 

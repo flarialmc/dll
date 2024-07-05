@@ -15,6 +15,7 @@
 #include "Hooks/Visual/OverworldFogColorHook.hpp"
 #include "Hooks/Visual/TimeChangerHook.hpp"
 #include "Hooks/Game/getSensHook.hpp"
+#include "Hooks/Game/RenderItemGroup.hpp"
 #include "Hooks/Game/getCurrentSwingDuration.hpp"
 
 std::vector<Hook *> HookManager::hooks;
@@ -47,9 +48,7 @@ void HookManager::initialize() {
     hooks.push_back(new getViewPerspectiveHook());
     // hooks.push_back(new RenderActorHook());
     hooks.push_back(new RaknetTickHook());
-
     hooks.push_back(new SetUpAndRenderHook());
-
     hooks.push_back(new GameModeAttackHook());
     hooks.push_back(new SwapchainHook());
     hooks.push_back(new ResizeHook());
@@ -64,7 +63,8 @@ void HookManager::initialize() {
     hooks.push_back(new TimeChangerHook());
     hooks.push_back(new SendPacketHook());
     hooks.push_back(new getSensHook());
-    hooks.push_back(new getCurrentSwingDuration());
+    //hooks.push_back(new RenderItemGroupHook());
+    //hooks.push_back(new getCurrentSwingDuration());
 
     for (auto hook: hooks)
         hook->enableHook();

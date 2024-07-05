@@ -2,71 +2,23 @@
 
 
 #include "RakPeer.h"
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "../../../../Utils/Versions/WinrtUtils.hpp"
 #include <string>
 #include <vector>
+#include <libhat/Access.hpp>
 
 
 class RaknetConnector {
 public:
-    BUILD_ACCESS(this, std::string, JoinedIp, 0x438);
+    BUILD_ACCESS(this, std::string, JoinedIp, GET_OFFSET("RaknetConnector::JoinedIp"));
 
-
-    virtual void Destructor();
-
-    virtual std::vector<std::string *> getLocalIps();
-
-    virtual std::string *getLocalIp();
-
-    virtual uint16_t getPort();
-
-    virtual __int64 getRefinedLocalIps();
-
-    virtual __int64 *getConnectedGameInfo();
-
-    virtual void setupNatPunch(bool connectToClient);
-
-    virtual __int64 *getNatPunchInfo();
-
-    virtual void startNatPunchingClient(std::string const &, short);
-
-    virtual void addConnectionStateListener(__int64 *);
-
-    virtual void removeConnectionStateListener(__int64 *);
-
-    virtual bool isIPv4Supported();
-
-    virtual bool isIPv6Supported();
-
-    virtual uint16_t getIPv4Port();
-
-    virtual uint16_t getIPv6Port();
-
-    virtual void host(__int64 definition);
-
-    virtual void connect(__int64 const &, __int64 const &);
-
-    virtual void disconnect();
-
-    virtual void tick();
-
-    virtual void runEvents();
-
-    virtual bool isServer();
-
-    virtual bool isConnected(struct NetworkIdentifier const &);
-
-    virtual __int64 closeNetworkConnection(struct NetworkIdentifier const &);
-
-    virtual NetworkIdentifier *getNetworkIdentifier();
-
-    virtual void setApplicationHandshakeCompleted(NetworkIdentifier const &);
-
-    virtual RakPeer *getPeer();
-
-    virtual RakPeer *getPeerConst();
-
-    virtual void _onDisable();
-
-    virtual void _onEnable();
-
+    int getPing() {
+        static auto offset = GET_OFFSET("RaknetConnector::getPeer");
+        if(WinrtUtils::check(20,60)) {
+            return hat::member_at<RakPeer1_20_60*>(this, offset)->getPing();
+        } else {
+            return hat::member_at<RakPeer1_20_50*>(this, offset)->getPing();
+        }
+    }
 };

@@ -25,7 +25,7 @@ class TextHotkeyListener : public Listener {
             if (duration.count() >= 2.5) {
                 if (module->isKeybind(event.keys) && module->isKeyPartOfKeybind(event.key)) {
                     auto player = SDK::clientInstance->getLocalPlayer();
-                    std::string xuid = *player->getXuid(&xuid);
+                    //std::string xuid = *player->getXuid(&xuid);
                     std::shared_ptr<Packet> packet = SDK::createPacket(9);
                     auto *akbar = reinterpret_cast<TextPacket *>(packet.get());
 
@@ -34,7 +34,7 @@ class TextHotkeyListener : public Listener {
                             module->settings.getSettingByName<std::string>("text")->value, std::regex("�"), "§");
                     akbar->platformId = "";
                     akbar->translationNeeded = false;
-                    akbar->xuid = xuid;
+                    //akbar->xuid = xuid;
                     akbar->name = player->playerName;
 
                     SDK::clientInstance->getPacketSender()->sendToServer(akbar);

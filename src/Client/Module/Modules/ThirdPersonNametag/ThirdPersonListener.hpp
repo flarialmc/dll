@@ -15,7 +15,7 @@ class ThirdPersonListener : public Listener {
     bool enabled = false;
     static inline std::vector<uint8_t> Original;
     static inline std::vector<uint8_t> Patched;
-    static inline uintptr_t real = Memory::findSig("0F 84 ? ? ? ? 49 8B D6 48 8B CE E8 ? ? ? ? 84 C0 0F 84");
+    static inline uintptr_t real;
 
 
     void onTick(TickEvent &event) override {
@@ -41,6 +41,8 @@ public:
     explicit ThirdPersonListener(const char string[5], Module *module) {
         this->name = string;
         this->module = module;
+
+        real = Memory::findSig(GET_SIG("ThirdPersonNametag"));
 
         ThirdPersonListener::Original.resize(6);
         memcpy(ThirdPersonListener::Original.data(),

@@ -15,6 +15,8 @@ public:
     static std::string settingspath;
     static Settings settings;
 
+    static inline std::string version;
+
     static void SaveSettings() {
         try {
             std::ofstream outputFile(settingspath);

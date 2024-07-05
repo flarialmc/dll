@@ -7,12 +7,12 @@
 #include "../Module.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include <Windows.h>
-#include <unordered_set>
+#include <vector>
 
 class HitboxListener : public Listener {
 
     Module *module;
-    static inline std::unordered_set<EntityId> entitiesToRender;
+    static inline std::vector<AABB> aabbsToRender;
 public:
 
     void onRender(RenderEvent &event) override;

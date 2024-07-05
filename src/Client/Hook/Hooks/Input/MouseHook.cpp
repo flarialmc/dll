@@ -1,9 +1,9 @@
 #include "MouseHook.hpp"
 #include "../../../Events/EventHandler.hpp"
 #include "../../../Client.hpp"
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
-MouseHook::MouseHook() : Hook("mouse_hook",
-                              "48 8B C4 48 89 58 ?? 48 89 68 ?? 48 89 70 ?? 57 41 54 41 55 41 56 41 57 48 83 EC ?? 44 0F B7 BC 24") {
+MouseHook::MouseHook() : Hook("mouse_hook",GET_SIG("MouseDevice::feed")) {
 }
 
 void MouseHook::enableHook() {

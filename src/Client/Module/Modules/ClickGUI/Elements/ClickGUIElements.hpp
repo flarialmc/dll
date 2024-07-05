@@ -8,7 +8,6 @@ class ClickGUIElements {
 public:
     static std::map<std::string, ID2D1Bitmap *> images;
     static std::vector<float> angles;
-    static std::vector<D2D1_MATRIX_3X2_F> matrixes;
 
     static void convertImageToBitmap(ID2D1Image *pImg, D2D1_SIZE_U size);
 

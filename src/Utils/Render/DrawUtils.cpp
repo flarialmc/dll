@@ -34,7 +34,7 @@ void DrawUtils::addLine(Vec2<float> start, Vec2<float> end, float lineWidth, D2D
         return;
     }
 
-    D2D::context->DrawLine(D2D1::Point2F(start.x, start.y), D2D1::Point2F(end.x, end.y), FlarialGUI::getBrush(color),
+    D2D::context->DrawLine(D2D1::Point2F(start.x, start.y), D2D1::Point2F(end.x, end.y), FlarialGUI::getBrush(color).get(),
                            lineWidth);
 
 }
@@ -61,7 +61,7 @@ void DrawUtils::addBox(Vec3<float> lower, Vec3<float> upper, float lineWidth, in
     viewMatrix.WorldToScreen(Vec3<float>(15, -60, 0), end);
     std::cout << start.x << std::endl;
     D2D::context->DrawLine(D2D1::Point2F(start.x, start.y), D2D1::Point2F(end.x, end.y), FlarialGUI::getBrush(color), lineWidth);
-*/
+    */
 
     if (mode == 1 || mode == 2) {
         // Convert the vertices to screen coordinates
@@ -70,7 +70,7 @@ void DrawUtils::addBox(Vec3<float> lower, Vec3<float> upper, float lineWidth, in
         for (int i = 0; i < 8; i++) {
             Vec2<float> screen;
 
-            if (viewMatrix.WorldToScreen(vertices[i], screen))
+            if (Matrix::WorldToScreen(vertices[i], screen))
                 screenCords.emplace_back(mode == 2 ? (int) screenCords.size() : i, screen);
             else real = true;
         }
@@ -164,21 +164,13 @@ void DrawUtils::addBox(Vec3<float> lower, Vec3<float> upper, float lineWidth, in
 void DrawUtils::addEntityBox(Actor* ent, float lineWidth, D2D_COLOR_F color) {
 
     Vec3<float> end = ent->getRenderPositionComponent()->renderPos;
-    AABB render;
-
-    if (ent->isPlayer()) {
-        render = AABB(end, ent->aabb->size.x, ent->aabb->size.y, 1.8);
-        render.upper.y += 0.2f;
-        render.lower.y += 0.2f;
-    } else
-        render = AABB(end, ent->aabb->size.x, ent->aabb->size.y, 0);
-
-    render.upper.y += 0.1f;
 
     if(lineWidth == 0)
         lineWidth = (float) fmax(0.5f, 1 / (float) fmax(1,
                                                          (float) SDK::clientInstance->getLocalPlayer()->getRenderPositionComponent()->renderPos.dist(
                                                                  end)));
 
-    DrawUtils::addBox(render.lower, render.upper, lineWidth, 1, color);
+    auto aabb = ent->getaabb()->aabb;
+
+    DrawUtils::addBox(aabb.lower, aabb.upper, lineWidth, 1, color);
 }

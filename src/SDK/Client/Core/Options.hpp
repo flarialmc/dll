@@ -4,14 +4,14 @@
 
 class OptionInfo {
 public:
-    BUILD_ACCESS(this, std::string*, TranslateName, 0x158);
+    BUILD_ACCESS(this, std::string*, TranslateName, GET_OFFSET("OptionInfo::TranslateName"));
 };
 
 class Option {
 public:
-    BUILD_ACCESS(this, OptionInfo*, OptionInformation, 0x8); // max value?
-    BUILD_ACCESS(this, bool, value, 0x10); // current value?
-    BUILD_ACCESS(this, bool, value1, 0x70); // max value?
+    //BUILD_ACCESS(this, OptionInfo*, OptionInformation, GET_OFFSET("Option::optionInformation")); // max value?
+    BUILD_ACCESS(this, bool, value, GET_OFFSET("Option::value")); // current value?
+    BUILD_ACCESS(this, bool, value1, GET_OFFSET("Option::value1")); // max value?
 };
 
 class Options {
@@ -35,7 +35,9 @@ public:
     static void initialize(const uintptr_t optionsEntryPtr){
         optionsBaseEntry = (uintptr_t **) optionsEntryPtr;
         initialized = true;
-        initVsync();
+        if((WinrtUtils::check(20,30) && !WinrtUtils::check(20,40)) || WinrtUtils::check(20,50)) { // does not work in 1.20.4X (crashes)
+            initVsync();
+        }
     };
 
     static bool isInitialized() {
@@ -47,11 +49,11 @@ public:
         for (uint16_t i = 4; i < 450; i++) {
 
             if (optionsBaseEntry[i] == nullptr) continue;
-            OptionInfo* info = *(OptionInfo**)((uintptr_t)optionsBaseEntry[i] + 0x8);
+            OptionInfo* info = *(OptionInfo**)((uintptr_t)optionsBaseEntry[i] + GET_OFFSET("Option::optionInformation"));
             if (info == nullptr) continue;
 
             auto* optionsPtr = (Option*)optionsBaseEntry[i];
-            auto translateName = *(std::string*)((uintptr_t)info + 0x158);
+            auto translateName = *(std::string*)((uintptr_t)info + GET_OFFSET("OptionInfo::TranslateName"));
 
             if(translateName.empty()) continue;
 
@@ -67,7 +69,7 @@ public:
 //
 //            if (translateName == nullptr) continue;
 
-            // Logger::debug(translateName);
+            //Logger::debug(translateName);
             if (optionName == translateName) {
                 return optionsPtr;
             }

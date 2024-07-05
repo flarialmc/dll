@@ -4,6 +4,10 @@
 #include <unordered_map>
 
 #include "../Actor/Actor.hpp"
+#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "libhat/Access.hpp"
+#include "HitResult.hpp"
+#include "../../../Utils/Versions/WinrtUtils.hpp"
 
 class Actor;
 
@@ -33,12 +37,21 @@ class Level {
 
 public:
     troll &getPlayerMap() {
-        return direct_access<troll>(this, 0x1E98);
+        return direct_access<troll>(this, GET_OFFSET("Level::getPlayerMap"));
+    }
+
+    HitResult &getHitResult() {
+        static int offset = GET_OFFSET("Level::hitResult");
+
+        if (WinrtUtils::check(20, 60))
+            return *hat::member_at<std::shared_ptr<HitResult>>(this, offset);
+
+        return hat::member_at<HitResult>(this, offset);
     }
 
     std::vector<Actor *> getRuntimeActorList() {
         // TODO prevent crashing !!!
-        static uintptr_t sig = Memory::findSig("40 53 48 83 EC 30 48 81 C1 E0 1C 00 00");
+        static uintptr_t sig = Memory::findSig(GET_SIG("Level::getRuntimeActorList"));
         static auto getRuntimeActorList = *(decltype(&Level::getRuntimeActorList) *) &sig;
         return (this->*getRuntimeActorList)();
     }

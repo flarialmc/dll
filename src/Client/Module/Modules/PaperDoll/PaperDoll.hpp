@@ -36,9 +36,10 @@ public:
         if (settings.getSettingByName<bool>("alwaysshow") == nullptr) settings.addSetting("alwaysshow", false);
         if (settings.getSettingByName<float>("percentageX") == nullptr) {
             settings.addSetting("percentageX", 0.0f);
+        }
+        if (settings.getSettingByName<float>("percentageY") == nullptr) {
             settings.addSetting("percentageY", 0.0f);
         }
-        if (settings.getSettingByName<bool>("vertical") == nullptr) settings.addSetting("vertical", false);
 
     }
 

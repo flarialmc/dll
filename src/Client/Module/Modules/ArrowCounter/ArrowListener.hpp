@@ -28,13 +28,14 @@ public:
                 if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
 
                     auto inventory = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory;
-                    auto offhandItem = SDK::clientInstance->getLocalPlayer()->getOffhandSlot();
+                    if(inventory == nullptr) return;
 
-                    if (offhandItem->getItem() != nullptr) {
-                        if (offhandItem->getItem()->name == "arrow") {
-                            arrows = offhandItem->count;
-                        }
-                    }
+                    auto offhandItem = SDK::clientInstance->getLocalPlayer()->getOffhandSlot();
+                    if(offhandItem != nullptr)
+                        if (offhandItem->getItem() != nullptr)
+                            if (offhandItem->getItem()->name == "arrow")
+                                arrows = offhandItem->count;
+
 
                     for (int i = 0; i < 36; i++) {
                         auto item = inventory->getItem(i);

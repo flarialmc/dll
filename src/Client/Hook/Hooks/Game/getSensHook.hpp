@@ -3,6 +3,7 @@
 #include "../Hook.hpp"
 #include "../../../../Utils/Memory/Memory.hpp"
 #include "../../../Events/Input/SensitivityEvent.hpp"
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include <cmath>
 
 class getSensHook : public Hook {
@@ -24,7 +25,7 @@ public:
 
     static inline getSensOriginal funcOriginal = nullptr;
 
-    getSensHook() : Hook("getSensHook", "4C 8B 51 20 49 B9") {}
+    getSensHook() : Hook("getSensHook", GET_SIG("Options::getSensitivity")) {}
 
     void enableHook() override {
         this->autoHook((void *) getSensCallback, (void **) &funcOriginal);

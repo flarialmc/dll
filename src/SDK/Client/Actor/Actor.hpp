@@ -11,12 +11,11 @@
 #include "../Container/Inventory.hpp"
 #include "../../../Utils/Utils.hpp"
 #include "Components/StateVectorComponent.hpp"
-#include "Components/ActorHeadRotationComponent.hpp"
-#include "Components/ActorTypeComponent.hpp"
 #include "Components/RenderPositionComponent.hpp"
-#include "../Network/Packet/Types/ActorRuntimeID.hpp"
+#include "Components/ActorEquipmentComponent.h"
 #include "EntityContext.hpp"
 #include "MobEffect.h"
+
 
 enum ActorFlags {
     FLAG_ONFIRE = 0,
@@ -177,25 +176,22 @@ struct AABBShapeComponent {
 
 class Actor {
 public:
-
-    BUILD_ACCESS(this, int16_t, hurtTime, 0x1FC);
-    BUILD_ACCESS(this, Level*, level, 0x258);
-    BUILD_ACCESS(this, ActorCategory, categories, 0x290);
-    BUILD_ACCESS(this, ActorRotationComponent*, actorRotationComponent, 0x2A8);
-    BUILD_ACCESS(this, AABBShapeComponent*, aabb, 0x2A0);
-    BUILD_ACCESS(this, StateVectorComponent*, stateVector, 0x298);
-    BUILD_ACCESS(this, Vec2<float>, rotations, 0x2A0);
-    BUILD_ACCESS(this, bool, wasHurt, 0x206);
+//    BUILD_ACCESS(this, int32_t , bobOffset, 0x98);
+//    BUILD_ACCESS(this, int32_t , Age, 0x98);
+    BUILD_ACCESS(this, int16_t, hurtTime, GET_OFFSET("Actor::hurtTime"));
+    BUILD_ACCESS(this, Level*, level, GET_OFFSET("Actor::level"));
+    BUILD_ACCESS(this, ActorCategory, categories, GET_OFFSET("Actor::categories"));
+    BUILD_ACCESS(this, ActorRotationComponent*, actorRotationComponent, GET_OFFSET("Actor::actorRotationComponent"));
+    BUILD_ACCESS(this, AABBShapeComponent*, aabb, GET_OFFSET("Actor::aabb"));
+    BUILD_ACCESS(this, StateVectorComponent*, stateVector, GET_OFFSET("Actor::stateVector"));
+    BUILD_ACCESS(this, Vec2<float>, rotations, GET_OFFSET("Actor::rotations"));
+    BUILD_ACCESS(this, bool, wasHurt, GET_OFFSET("Actor::wasHurt"));
 
 
     template<typename Component>
     Component *tryGet(uintptr_t addr);
 
     ItemStack *getArmor(int slot);
-
-    ActorTypeComponent *getActorTypeComponent();
-
-    int getEntityTypeId();
 
     MobEffectInstance *getEffect(MobEffect *effect);
 
@@ -211,23 +207,23 @@ public:
 
     Vec3<float> *getPosition();
 
-    ActorHeadRotationComponent *getActorHeadRotationComponent();
-
     ItemStack *getOffhandSlot();
 
-    EntityContext *GetEntityContext();
+    EntityId getEntityId();
 
-    float getSpeedInMetersPerSecond();
+    V1_20_50::EntityContext *GetEntityContextV1_20_50();
 
     void setNametag(std::string *name);
 
     std::string *getNametag();
-
-    bool isPlayer();
 
     bool hasCategory(ActorCategory category);
 
     RenderPositionComponent *getRenderPositionComponent();
 
     bool isValidTarget(Actor *actor);
+
+    SimpleContainer *getArmorContainer();
+
+    SimpleContainer *getOffhandContainer();
 };

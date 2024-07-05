@@ -27,6 +27,8 @@ public:
     }
 
     void defaultConfig() override {
+        if (settings.getSettingByName<bool>("alwaysanim") == nullptr) settings.addSetting("alwaysanim", false);
+
         if (settings.getSettingByName<bool>("SaveModifier") == nullptr) settings.addSetting("SaveModifier", true);
         if (settings.getSettingByName<bool>("hidehand") == nullptr) settings.addSetting("hidehand", true);
         if (settings.getSettingByName<bool>("hidemodules") == nullptr) settings.addSetting("hidemodules", false);
@@ -136,6 +138,18 @@ public:
                 "disableanim")->value))
             this->settings.getSettingByName<bool>("disableanim")->value = !this->settings.getSettingByName<bool>(
                     "disableanim")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.25, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                        L"Always animate", textWidth * 3.0f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        Constraints::RelativeConstraint(0.12, "height", true),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+        if (FlarialGUI::Toggle(6, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "alwaysanim")->value))
+            this->settings.getSettingByName<bool>("alwaysanim")->value = !this->settings.getSettingByName<bool>(
+                    "alwaysanim")->value;
 
         FlarialGUI::UnsetScrollView();
 

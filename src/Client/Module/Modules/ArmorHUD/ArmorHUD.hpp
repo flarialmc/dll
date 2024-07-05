@@ -36,6 +36,8 @@ public:
             settings.addSetting("percentageY", 0.0f);
         }
         if (settings.getSettingByName<bool>("vertical") == nullptr) settings.addSetting("vertical", false);
+        if (settings.getSettingByName<bool>("percent") == nullptr) settings.addSetting("percent", false);
+        if (settings.getSettingByName<bool>("color") == nullptr) settings.addSetting("color", false);
         if (settings.getSettingByName<bool>("showdurability") == nullptr) settings.addSetting("showdurability", false);
 
     }
@@ -88,6 +90,30 @@ public:
                 "showdurability")->value))
             this->settings.getSettingByName<bool>("showdurability")->value = !this->settings.getSettingByName<bool>(
                     "showdurability")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                        L"Use percent %", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        if (FlarialGUI::Toggle(4, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "percent")->value))
+            this->settings.getSettingByName<bool>("percent")->value = !this->settings.getSettingByName<bool>(
+                    "percent")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                        L"Change color", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        if (FlarialGUI::Toggle(5, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "color")->value))
+            this->settings.getSettingByName<bool>("color")->value = !this->settings.getSettingByName<bool>(
+                    "color")->value;
 
 
         FlarialGUI::UnsetScrollView();

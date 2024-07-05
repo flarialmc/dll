@@ -28,6 +28,8 @@ public:
 
     void defaultConfig() override {
         if (settings.getSettingByName<float>("fovvalue") == nullptr) settings.addSetting("fovvalue", 60.00f);
+        if (settings.getSettingByName<float>("fovaffectshand") == nullptr) settings.addSetting("fovaffectshand", false);
+
     }
 
     void settingsRender() override {
@@ -53,6 +55,18 @@ public:
                                            0, false);
 
         this->settings.getSettingByName<float>("fovvalue")->value = percent;
+
+        toggleY += Constraints::SpacingConstraint(0.25, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                        L"Affect hand size", textWidth * 3.0f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        Constraints::RelativeConstraint(0.12, "height", true),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+        if (FlarialGUI::Toggle(1, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "fovaffectshand")->value))
+            this->settings.getSettingByName<bool>("fovaffectshand")->value = !this->settings.getSettingByName<bool>(
+                    "fovaffectshand")->value;
 
         FlarialGUI::UnsetScrollView();
     }

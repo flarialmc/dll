@@ -1,12 +1,14 @@
 #include "Mob.hpp"
 #include "Actor.hpp"
+#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void Mob::setSprinting(bool state) {
-    Memory::CallVFunc<159, void, bool>(this, state);
+    static int off = GET_OFFSET("Mob::setSprinting");
+    return Memory::CallVFuncI<void, bool>(off, this, state);
 }
 
 template<typename Component>
-Component *Mob::tryGetAllah(uintptr_t addr) {
+Component *Mob::tryGetComponent(uintptr_t addr) {
     auto a1 = **(uintptr_t ***) (this + 0x8);
     auto a2 = *(uintptr_t *) (this + 0x10);
 
@@ -19,8 +21,8 @@ MobBodyRotationComponent *Mob::getBodyRotationComponent() {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig("48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 2F B8 31 03");
+        sig = Memory::findSig(GET_SIG("Mob::getBodyRotationComponent"));
     }
 
-    return tryGetAllah<MobBodyRotationComponent>(sig);
+    return tryGetComponent<MobBodyRotationComponent>(sig);
 }

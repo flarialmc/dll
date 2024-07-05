@@ -5,6 +5,6 @@
 
 class ScreenView {
 public:
-    BUILD_ACCESS(this, class VisualTree*, VisualTree, 0x48);
+    BUILD_ACCESS(this, class VisualTree*, VisualTree, GET_OFFSET("ScreenView::VisualTree"));
 };
 

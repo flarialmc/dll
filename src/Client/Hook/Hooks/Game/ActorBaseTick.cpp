@@ -5,6 +5,7 @@
 #include "../../../../SDK/SDK.hpp"
 #include "RaknetTick.hpp"
 #include "../../../Client.hpp"
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void ActorBaseTick::enableHook() {
 
@@ -12,12 +13,13 @@ void ActorBaseTick::enableHook() {
     int offset = *reinterpret_cast<int *>(base + 3);
     auto **vft = reinterpret_cast<uintptr_t **>(base + offset + 7);
 
-    this->manualHook(vft[29], (void *) callback, (void **) &funcOriginal);
+    static auto vftOffset = GET_OFFSET("Actor::baseTickVft");
+
+    this->manualHook(vft[vftOffset], (void *) callback, (void **) &funcOriginal);
 
 }
 
-ActorBaseTick::ActorBaseTick() : Hook("ActorBaseTick",
-                                      "48 8D 05 ? ? ? ? 48 89 01 B8 ? ? ? ? 8D 50 FA 44 8D 48 ? 44 8D 40 ? 66 89 44 ? ? E8 ? ? ? ? 48 8B 8B") {}
+ActorBaseTick::ActorBaseTick() : Hook("ActorBaseTick", GET_SIG("Actor::baseTick")) {}
 
 void ActorBaseTick::callback(Actor *actor) {
     // TODO: Might be wrong, req checking

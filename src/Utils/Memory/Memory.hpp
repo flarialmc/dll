@@ -54,13 +54,13 @@ public:
     template<unsigned int IIdx, typename TRet, typename... TArgs>
     static inline auto CallVFunc(void *thisptr, TArgs... argList) -> TRet {
         using Fn = TRet(__thiscall *)(void *, decltype(argList)...);
-        return (*static_cast<Fn **>(thisptr))[IIdx](thisptr, argList...);
+        return (*static_cast<Fn **>(thisptr))[IIdx](thisptr, std::forward<TArgs>(argList)...);
     }
 
-    template<typename TRet, typename... TArgs>
-    static inline auto CallVFuncI(void *thisptr, int index, TArgs... argList) -> TRet {
-        using Fn = TRet(__thiscall *)(void *, decltype(argList)...);
-        return (*static_cast<Fn **>(thisptr))[index](thisptr, argList...);
+    template <typename TRet, typename... TArgs>
+    static auto CallVFuncI(uint32_t index, void* thisptr, TArgs... argList) -> TRet {
+        using Fn = TRet(__thiscall*)(void*, TArgs...);
+        return (*static_cast<Fn**>(thisptr))[index](thisptr, std::forward<TArgs>(argList)...);
     }
 
     static void hookFunc(void *pTarget, void *pDetour, void **ppOriginal, std::string name) {
@@ -95,12 +95,14 @@ public:
     static uintptr_t findSig(std::string_view signature) {
         const auto parsed = hat::parse_signature(signature);
         if (!parsed.has_value()) {
+            Logger::debug("[ Runtime Scanner ] Failed to parse signature: " + std::string(signature));
             return 0u;
         }
 
         const auto result = hat::find_pattern(parsed.value());
 
         if (!result.has_result()) {
+            Logger::debug("[ Runtime Scanner ] Failed to find signature: " + std::string(signature));
             return 0u;
         }
 

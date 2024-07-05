@@ -1,5 +1,6 @@
 #include <chrono>
 #include <thread>
+#include "../../../Client.hpp"
 
 class FadeEffect {
 public:

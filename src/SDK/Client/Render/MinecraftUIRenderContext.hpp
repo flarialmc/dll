@@ -17,8 +17,9 @@
 
 class MinecraftUIRenderContext {
 public:
-    BUILD_ACCESS(this, ClientInstance*, clientInstance, 0x8);
-    BUILD_ACCESS(this, ScreenContext*, screenContext, 0x10);
+    BUILD_ACCESS(this, ClientInstance*, clientInstance, GET_OFFSET("MinecraftUIRenderContext::clientInstance"));
+    BUILD_ACCESS(this, ScreenContext*, screenContext, GET_OFFSET("MinecraftUIRenderContext::screenContext"));
+    BUILD_ACCESS(this, float, FrameAlpha, 0x0);
 
     static MaterialPtr *getUIMaterial() {
         static uintptr_t ref;
@@ -28,8 +29,7 @@ public:
             //The MaterialPtr is called "ui_fill_color, it has a static pointer to its instance.
 
             //ScreenRenderer::fillRectangle
-            ref = Memory::findSig(
-                    "4C 8D 05 ? ? ? ? 48 8B D3 48 8B CF 48 8B 5C 24 ? 0F 28 7C 24 ? 44 0F 28 44 24 ? 48 83 C4 40 5F E9 ? ? ? ?");
+            ref = Memory::findSig(GET_SIG("MinecraftUIRenderContext::getUIMaterial"));
         }
 
         int re = *reinterpret_cast<int *>(ref + 3);

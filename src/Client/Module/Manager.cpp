@@ -61,6 +61,7 @@
 #include "Modules/Misc/DiscordRPC/DiscordRPCListener.hpp"
 #include "Modules/Overlay/OverlayModule.hpp"
 #include "Modules/AutoRQ/AutoRQ.hpp"
+#include "Modules/MovableChat/MovableChat.hpp"
 #include <algorithm>
 
 namespace ModuleManager {
@@ -111,19 +112,25 @@ void ModuleManager::initialize() {
     ModuleManager::addModule(new ArrowCounter());
     ModuleManager::addModule(new Time());
     ModuleManager::addModule(new MEM());
-    ModuleManager::addModule(new Sprint());
     ModuleManager::addModule(new Fullbright());
     ModuleManager::addModule(new ForceCoords());
     ModuleManager::addModule(new Keystrokes());
+    ModuleManager::addModule(new Sneak());
+    ModuleManager::addModule(new Sprint());
+    ModuleManager::addModule(new Hitbox());
     ModuleManager::addModule(new ThirdPerson());
     ModuleManager::addModule(new SnapLook());
     ModuleManager::addModule(new HurtColor());
     ModuleManager::addModule(new FogColor());
     ModuleManager::addModule(new ArmorHUD());
+
     ModuleManager::addModule(new TimeChanger());
-    ModuleManager::addModule(new RenderOptions());
+
+    if((WinrtUtils::check(20,30) && !WinrtUtils::check(20,40)) || WinrtUtils::check(20,50)) { // does not work in 1.20.4X
+        ModuleManager::addModule(new RenderOptions());
+    }
+
     ModuleManager::addModule(new PaperDoll());
-    ModuleManager::addModule(new Sneak());
     ModuleManager::addModule(new GuiScale());
     ModuleManager::addModule(new WeatherChanger());
     ModuleManager::addModule(new TabList());
@@ -136,7 +143,6 @@ void ModuleManager::initialize() {
     ModuleManager::addModule(new BlockBreakIndicator());
     ModuleManager::addModule(new Animations());
     ModuleManager::addModule(new BlockOutline());
-    ModuleManager::addModule(new Hitbox());
     ModuleManager::addModule(new CommandHotkey());
     ModuleManager::addModule(new NoHurtCam());
     ModuleManager::addModule(new InventoryHUD());

@@ -1,6 +1,7 @@
 #include "GameModeAttack.hpp"
 #include "../../../Events/EventHandler.hpp"
 #include "../../../../SDK/SDK.hpp"
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void GameModeAttackHook::callback(Gamemode *gamemode, Actor *actor) {
     //  Combo counter and reach counter logic will be done here in the next commit.
@@ -16,8 +17,7 @@ void GameModeAttackHook::callback(Gamemode *gamemode, Actor *actor) {
 }
 
 
-GameModeAttackHook::GameModeAttackHook() : Hook("GameModeAttack",
-                                                "48 8D 05 ? ? ? ? 48 89 01 48 89 51 08 48 C7 41 ? ? ? ? ? C7 41 ? ? ? ? ?") {}
+GameModeAttackHook::GameModeAttackHook() : Hook("GameModeAttack", GET_SIG("GameMode::attack")) {}
 
 
 void GameModeAttackHook::enableHook() {
@@ -25,5 +25,7 @@ void GameModeAttackHook::enableHook() {
     int offset = *reinterpret_cast<int *>(base + 3);
     auto **vft = reinterpret_cast<uintptr_t **>(base + offset + 7);
 
-    this->manualHook(vft[14], (void *) callback, (void **) &funcOriginal);
+    static auto attackVftOffset = GET_OFFSET("Gamemode::attackVft");
+
+    this->manualHook(vft[attackVftOffset], (void *) callback, (void **) &funcOriginal);
 }

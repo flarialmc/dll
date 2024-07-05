@@ -3,6 +3,7 @@
 #include "../Hook.hpp"
 #include "../../../../SDK/Client/Network/Packet/LoopbackPacketSender.hpp"
 #include "../../../../SDK/Client/Network/Packet/Packet.hpp"
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class SendPacketHook : public Hook {
 
@@ -30,7 +31,7 @@ public:
     static inline receive receiveSetTitlePacketOriginal = nullptr;
     static inline receive receivePacketPlaySounOriginal = nullptr;
 
-    SendPacketHook() : Hook("sendPacket", "48 83 EC ? 48 0F BE ? ? 48 83 C0 ? 74 27") {}
+    SendPacketHook() : Hook("sendPacket", GET_SIG("LoopbackPacketSender::sendPacket")) {}
 
     void enableHook() override;
 

@@ -7,12 +7,12 @@
 
 class Mob : public Actor {
 public:
-    BUILD_ACCESS(this, MobHurtTimeComponent*, mobHurtTimeComponent, 0x610);
+    BUILD_ACCESS(this, MobHurtTimeComponent*, mobHurtTimeComponent, GET_OFFSET("Gamemode::mobHurtTimeComponent"));
 
     void setSprinting(bool state);
 
     template<typename Component>
-    Component *tryGetAllah(uintptr_t addr);
+    Component *tryGetComponent(uintptr_t addr);
 
     MobBodyRotationComponent *getBodyRotationComponent();
 };

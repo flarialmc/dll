@@ -1,13 +1,9 @@
 #include <string>
 #include "Packet.hpp"
 #include "../../../../Utils/Memory/Memory.hpp"
-
-std::string *Packet::getName(std::string *amongus) {
-
-    return Memory::CallVFunc<2, std::string *>(this, amongus);
-
-}
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 MinecraftPacketIds Packet::getId() {
-    return MinecraftPacketIds(Memory::CallVFunc<1, MinecraftPacketIds>(this));
+    static int off = GET_OFFSET("Packet::getId");
+    return Memory::CallVFuncI<MinecraftPacketIds>(off, this);
 }

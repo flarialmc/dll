@@ -1,6 +1,7 @@
 #include "../Hook.hpp"
 #include "../../../Events/EventHandler.hpp"
 #include "../../../../SDK/SDK.hpp"
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class getViewPerspectiveHook : public Hook {
 
@@ -12,7 +13,7 @@ public:
 
     static inline original getViewPerspectiveOriginal = nullptr;
 
-    getViewPerspectiveHook() : Hook("getViewPerspective", "48 83 EC ? 48 8B 01 48 8D 54 ? ? 41 B8 03 00 00 00") {}
+    getViewPerspectiveHook() : Hook("getViewPerspective", GET_SIG("getViewPerspective")) {}
 
     void enableHook() override;
 };

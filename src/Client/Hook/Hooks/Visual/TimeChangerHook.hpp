@@ -32,7 +32,7 @@ public:
 
     static inline TimeChangerOriginal func_original = nullptr;
 
-    TimeChangerHook() : Hook("Time Changer Hook", "44 8B C2 B8 F1 19 76 05 F7 EA") {}
+    TimeChangerHook() : Hook("Time Changer Hook", GET_SIG("TimeChanger")) {}
 
     void enableHook() override {
 

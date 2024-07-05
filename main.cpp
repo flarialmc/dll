@@ -7,7 +7,7 @@
 #include "src/Client/Events/EventHandler.hpp"
 #include "src/Client/Hook/Hooks/Render/ResizeHook.hpp"
 #include "src/Client/Hook/Hooks/Game/RaknetTick.hpp"
-#include "src/Client/Module/Modules/Nick/NickListener.hpp"
+//#include "src/Client/Module/Modules/Nick/NickListener.hpp"
 #include <kiero.h>
 #include <wininet.h>
 
@@ -106,7 +106,7 @@ DWORD WINAPI init(HMODULE real)
         if (Client::disable) {
             break;
         } else {
-            Sleep(50); // wtf 50ms too high
+            Sleep(50);
         }
     }
 
