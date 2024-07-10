@@ -18,6 +18,8 @@ private:
 
     static void receiveCallbackPlaySound(const float *a1, const float *networkIdentifier, const float *netEventCallback,
                                          const std::shared_ptr<Packet>& packet);
+    static void receiveCallbackChangeDimension(const float *a1, const float *networkIdentifier, const float *netEventCallback,
+                                               const std::shared_ptr<Packet>& packet);
 
 public:
 
@@ -30,6 +32,7 @@ public:
     static inline receive receiveTextPacketOriginal = nullptr;
     static inline receive receiveSetTitlePacketOriginal = nullptr;
     static inline receive receivePacketPlaySounOriginal = nullptr;
+    static inline receive receivePacketChangeDimensionOriginal = nullptr;
 
     SendPacketHook() : Hook("sendPacket", GET_SIG("LoopbackPacketSender::sendPacket")) {}
 
