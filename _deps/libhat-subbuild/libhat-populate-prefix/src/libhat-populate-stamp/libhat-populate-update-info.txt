@@ -1,7 +1,0 @@
-# This is a generated file and its contents are an internal implementation detail.
-# The patch step will be re-executed if anything in this file changes.
-# No other meaning or use of this file is supported.
-
-command (connected)=C:/Program Files/CMake/bin/cmake.exe;-Dcan_fetch=YES;-P;D:/Flarial/Flarial/_deps/libhat-subbuild/libhat-populate-prefix/tmp/libhat-populate-gitupdate.cmake
-command (disconnected)=C:/Program Files/CMake/bin/cmake.exe;-Dcan_fetch=NO;-P;D:/Flarial/Flarial/_deps/libhat-subbuild/libhat-populate-prefix/tmp/libhat-populate-gitupdate.cmake
-work_dir=D:/Flarial/Flarial/_deps/libhat-src
