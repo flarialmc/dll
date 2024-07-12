@@ -3,7 +3,7 @@
 class LevelRender {
 public:
     LevelRendererPlayer *getLevelRendererPlayer() {
-        return *reinterpret_cast<LevelRendererPlayer **>((uintptr_t) (this) + GET_OFFSET("LevelRender::getLevelRendererPlayer"));
+        return hat::member_at<LevelRendererPlayer *>(this, GET_OFFSET("LevelRender::getLevelRendererPlayer"));
     };
 
     Vec3<float> getOrigin() {

@@ -1,5 +1,6 @@
 #include "ClientInstance.hpp"
 #include "../../SDK.hpp"
+#include <libhat/Access.hpp>
 
 LocalPlayer *ClientInstance::getLocalPlayer() {
     static int off = GET_OFFSET("ClientInstance::getLocalPlayer");
@@ -42,6 +43,5 @@ std::string ClientInstance::getTopScreenName() {
 }
 
 LevelRender *ClientInstance::getLevelRender() {
-    auto address = reinterpret_cast<uintptr_t>(this);
-    return *reinterpret_cast<LevelRender **>(address + GET_OFFSET("ClientInstance::levelRenderer"));
+    return hat::member_at<LevelRender *>(this, GET_OFFSET("ClientInstance::levelRenderer"));
 }

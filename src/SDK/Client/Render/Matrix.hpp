@@ -35,11 +35,5 @@ public:
 
     static bool WorldToScreen(Vec3<float> pos, Vec2<float> &screen);
 
-    static GLMatrix *getMatrixCorrection();
-
-    static float transformz(const Vec3<float> &p);
-
-    static float transformy(const Vec3<float> &p);
-
-    static float transformx(const Vec3<float> &p);
+    static glm::mat4 getMatrixCorrection();
 };

@@ -1,34 +1,17 @@
 #include "Matrix.hpp"
 #include "../../SDK.hpp"
 
-
-GLMatrix *Matrix::getMatrixCorrection() {
-    GLMatrix toReturn = GLMatrix();
+glm::mat4 Matrix::getMatrixCorrection() {
+    glm::mat4 toReturn;
 
     for (int i = 0; i < 4; i++) {
-        toReturn.matrix[i * 4 + 0] = SDK::clientInstance->Matrix1.matrix[0 + i];
-        toReturn.matrix[i * 4 + 1] = SDK::clientInstance->Matrix1.matrix[4 + i];
-        toReturn.matrix[i * 4 + 2] = SDK::clientInstance->Matrix1.matrix[8 + i];
-        toReturn.matrix[i * 4 + 3] = SDK::clientInstance->Matrix1.matrix[12 + i];
+        toReturn[i][0] = SDK::clientInstance->Matrix1.matrix[0 + i];
+        toReturn[i][1] = SDK::clientInstance->Matrix1.matrix[4 + i];
+        toReturn[i][2] = SDK::clientInstance->Matrix1.matrix[8 + i];
+        toReturn[i][3] = SDK::clientInstance->Matrix1.matrix[12 + i];
     }
 
-    return &toReturn;
-}
-
-float Matrix::transformx(const Vec3<float> &p) {
-    auto matrix = Matrix::getMatrixCorrection()->matrix;
-    return p.x * matrix[0] + p.y * matrix[4] + p.z * matrix[8] + matrix[12];
-
-}
-
-float Matrix::transformy(const Vec3<float> &p) {
-    auto matrix = Matrix::getMatrixCorrection()->matrix;
-    return p.x * matrix[1] + p.y * matrix[5] + p.z * matrix[9] + matrix[13];
-}
-
-float Matrix::transformz(const Vec3<float> &p) {
-    auto matrix = Matrix::getMatrixCorrection()->matrix;
-    return p.x * matrix[2] + p.y * matrix[6] + p.z * matrix[10] + matrix[14];
+    return toReturn;
 }
 
 bool Matrix::WorldToScreen(Vec3<float> pos, Vec2<float> &screen) { // pos = pos 2 w2s, screen = output screen coords
@@ -36,23 +19,20 @@ bool Matrix::WorldToScreen(Vec3<float> pos, Vec2<float> &screen) { // pos = pos 
     Vec2<float> displaySize = SDK::clientInstance->guiData->ScreenSize;
     LevelRender *lr = SDK::clientInstance->getLevelRender();
     Vec3<float> origin = lr->getLevelRendererPlayer()->cameraPos;
-    Vec2<float> fov = SDK::clientInstance->getFov();
 
-    pos.x -= origin.x;
-    pos.y -= origin.y;
-    pos.z -= origin.z;
+    pos = pos.sub(origin);
 
-    float x = transformx(pos);
-    float y = transformy(pos);
-    float z = transformz(pos);
+    glm::mat4x4 matx = getMatrixCorrection();
 
-    if (z > 0) return false;
+    glm::vec4 transformedPos = matx * glm::vec4(pos.x, pos.y, pos.z, 1.0f);
 
-    float mX = (float) displaySize.x / 2.0F;
-    float mY = (float) displaySize.y / 2.0F;
+    if (transformedPos.z > 0) return false;
 
-    screen.x = mX + (mX * x / -z * fov.x);
-    screen.y = mY - (mY * y / -z * fov.y);
+    float mX = displaySize.x / 2.0f;
+    float mY = displaySize.y / 2.0f;
+
+    screen.x = mX + (mX * transformedPos.x / -transformedPos.z * SDK::clientInstance->getFovX());
+    screen.y = mY - (mY * transformedPos.y / -transformedPos.z * SDK::clientInstance->getFovY());
 
     return true;
 }
