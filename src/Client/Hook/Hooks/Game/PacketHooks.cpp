@@ -49,16 +49,6 @@ SendPacketHook::receiveCallbackPlaySound(const float *a1, const float *networkId
         receivePacketPlaySounOriginal(a1, networkIdentifier, netEventCallback, packet);
 }
 
-void
-SendPacketHook::receiveCallbackChangeDimension(const float *a1, const float *networkIdentifier, const float *netEventCallback,
-                                               const std::shared_ptr<Packet>& packet) {
-
-    PacketEvent event(packet.get());
-    EventHandler::onPacketReceive(event);
-    if (!event.isCancelled())
-        receivePacketChangeDimensionOriginal(a1, networkIdentifier, netEventCallback, packet);
-}
-
 void SendPacketHook::enableHook() {
     /*for (int num = 1; num <= (int)MinecraftPacketIds::PacketViolationWarning; num++) {
 
@@ -80,10 +70,6 @@ void SendPacketHook::enableHook() {
     std::shared_ptr<Packet> playSoundPacket = SDK::createPacket((int) MinecraftPacketIds::PlaySoundA);
     Memory::hookFunc((void *) playSoundPacket->packetHandler->vTable[1], receiveCallbackPlaySound,
                      (void **) &receivePacketPlaySounOriginal, "ReceivePacketHook");
-
-    std::shared_ptr<Packet> changeDimensionPacket = SDK::createPacket((int) MinecraftPacketIds::ChangeDimension);
-    Memory::hookFunc((void *) changeDimensionPacket->packetHandler->vTable[1], receiveCallbackChangeDimension,
-                     (void **) &receivePacketChangeDimensionOriginal, "ReceivePacketHook");
 
     this->autoHook((void *) callback, (void **) &sendPacketkOriginal);
 }
