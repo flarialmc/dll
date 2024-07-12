@@ -15,7 +15,16 @@ void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
                 ent->getActorFlag(ActorFlags::FLAG_INVISIBLE)) // + ent == player ||
                 continue;
 
-            aabbsToRender.emplace_back(ent->getaabb()->aabb);
+            float mod = 0.f;
+
+            if (ent->hasCategory(ActorCategory::Player))
+                mod = 1.6f;
+
+            auto& aabbSize = ent->getaabb()->size;
+            auto& renderPos = ent->getRenderPositionComponent()->renderPos;
+            auto lower = renderPos.sub(aabbSize.x / 2.f, mod, aabbSize.x / 2.f), upper = lower.add(aabbSize.x, aabbSize.y, aabbSize.x);
+
+            aabbsToRender.emplace_back(lower, upper);
         }
     }
 }
