@@ -77,7 +77,8 @@ public:
         return nullptr;
     };
     static Option* getOption(const std::string& optionName) {
-        if(!isInitialized()) return nullptr;
+        // disable getting settings in 1.20.4X
+        if(!isInitialized() || !((WinrtUtils::check(20,30) && !WinrtUtils::check(20,40)) || WinrtUtils::check(20,50))) return nullptr;
         std::hash<std::string> optionNameHash;
 
         UINT32 key = optionNameHash(optionName);
