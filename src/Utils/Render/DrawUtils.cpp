@@ -66,8 +66,25 @@ void DrawUtils::addBox(Vec3<float> lower, Vec3<float> upper, float lineWidth, in
         switch (mode) {
             case 1: {
                 // Draw lines between all pairs of vertices
-                for (auto from : screenCords) {
+                for (auto it = screenCords.begin(); it != screenCords.end(); it++) {
+                    auto from = *it;
                     auto fromOrig = vertices[std::get<0>(from)];
+
+                    for (auto to: screenCords) {
+                        auto toOrig = vertices[std::get<0>(to)];
+
+                        // Determine if the line should be drawn based on the relative positions of the vertices
+                        bool shouldDraw = false;
+                        // X direction
+                        shouldDraw |= fromOrig.y == toOrig.y && fromOrig.z == toOrig.z && fromOrig.x < toOrig.x;
+                        // Y direction
+                        shouldDraw |= fromOrig.x == toOrig.x && fromOrig.z == toOrig.z && fromOrig.y < toOrig.y;
+                        // Z direction
+                        shouldDraw |= fromOrig.x == toOrig.x && fromOrig.y == toOrig.y && fromOrig.z < toOrig.z;
+
+                        if (shouldDraw)
+                            DrawUtils::addLine(std::get<1>(from), std::get<1>(to), lineWidth, color);
+                    }
                 }
             }
             case 2: {
@@ -139,6 +156,10 @@ void DrawUtils::addBox(Vec3<float> lower, Vec3<float> upper, float lineWidth, in
                     lastVertex = curVertex;
                 }
             }
+            break;
+
+            default:
+                break;
         }
     }
 }
