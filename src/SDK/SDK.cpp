@@ -45,7 +45,7 @@ int SDK::getServerPing() {
             }
         }
     }
-    return 1;
+    return -1;
 }
 
 std::string SDK::getServerIP() {
