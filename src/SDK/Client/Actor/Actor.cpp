@@ -1,5 +1,4 @@
 #include "Actor.hpp"
-#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 // TODO add comments to all components, replace their sigs with simpler ones ?       marioCST: use entt's try_get func in EntityContext instead of using sigs, there are no simpler sigs
 
@@ -31,23 +30,11 @@ bool Actor::isAlive() {
     return Memory::CallVFuncI<bool>(off, this);
 }
 
-std::string *Actor::getXuid(std::string *str) {
-    static int off = GET_OFFSET("Player::getXuid");
-    return Memory::CallVFuncI<std::string *, std::string *>(off, this, str);
-}
-
 bool Actor::canSee(const Actor& actor) {
     using canSeeFunc = bool (__fastcall *)(Actor *, const Actor&);
     static auto canSee = reinterpret_cast<canSeeFunc>(Memory::offsetFromSig(
             Memory::findSig(GET_SIG("Actor::canSee")), 1));
     return canSee(this, actor);
-}
-
-MobEffectInstance *Actor::getEffect(MobEffect *effect) {
-    static uintptr_t addr = Memory::findSig(GET_SIG("Actor::getEffect"));
-    static auto realAddr = addr + 1 + 4 + *reinterpret_cast<int *>(addr + 1);
-    auto fn = reinterpret_cast<MobEffectInstance *(__cdecl *)(Actor *, MobEffect *)>(realAddr);
-    return fn(this, effect);
 }
 
 bool Actor::getActorFlag(int flag) {

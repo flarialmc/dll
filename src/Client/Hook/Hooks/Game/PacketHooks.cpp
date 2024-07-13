@@ -60,15 +60,15 @@ void SendPacketHook::enableHook() {
     }*/
 
     std::shared_ptr<Packet> textPacket = SDK::createPacket((int) MinecraftPacketIds::Text);
-    Memory::hookFunc((void *) textPacket->packetHandler->vTable[1], receiveCallbackText,
+    Memory::hookFunc((void *) textPacket->packetHandler->vTable[1], (void*)receiveCallbackText,
                      (void **) &receiveTextPacketOriginal, "ReceivePacketHook");
 
     std::shared_ptr<Packet> setTitlePacket = SDK::createPacket((int) MinecraftPacketIds::SetTitle);
-    Memory::hookFunc((void *) setTitlePacket->packetHandler->vTable[1], receiveCallbackSetTitle,
+    Memory::hookFunc((void *) setTitlePacket->packetHandler->vTable[1], (void*)receiveCallbackSetTitle,
                      (void **) &receiveSetTitlePacketOriginal, "ReceivePacketHook");
 
     std::shared_ptr<Packet> playSoundPacket = SDK::createPacket((int) MinecraftPacketIds::PlaySoundA);
-    Memory::hookFunc((void *) playSoundPacket->packetHandler->vTable[1], receiveCallbackPlaySound,
+    Memory::hookFunc((void *) playSoundPacket->packetHandler->vTable[1], (void*)receiveCallbackPlaySound,
                      (void **) &receivePacketPlaySounOriginal, "ReceivePacketHook");
 
     this->autoHook((void *) callback, (void **) &sendPacketkOriginal);

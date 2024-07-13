@@ -10,8 +10,6 @@ class GUIKeyListener : public Listener {
 
     bool isCapital = false;
 
-    std::chrono::steady_clock::time_point lastOnKeyTime = std::chrono::steady_clock::now();
-
     void onKey(KeyEvent &event) override {
         if (!Client::disable) {
 
@@ -43,9 +41,9 @@ class GUIKeyListener : public Listener {
 
                     if (box.isActive && event.getAction() == (int) ActionType::Pressed)
 
-                        if (event.getKey() != VK_BACK && event.getPressedKeysAsString() != "CTRL+V")
+                        if (event.getKey() != VK_BACK && event.getPressedKeysAsString() != "CTRL+V") {
                             box.text += event.getKeyAsString(isCapital);
-                        else if (event.getKey() == VK_BACK) {
+                        } else if (event.getKey() == VK_BACK) {
 
                             if (event.getAction() == (int) ActionType::Pressed) {
 

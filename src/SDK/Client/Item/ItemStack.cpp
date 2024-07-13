@@ -1,11 +1,11 @@
 #include "ItemStack.hpp"
 #include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
-bool ItemStack::isValid() {
+bool ItemStack::isValid() const {
     return item.counter != nullptr;
 }
 
-Item* ItemStack::getItem() {
+Item* ItemStack::getItem() const {
     return item.get();
 }
 

@@ -6,7 +6,6 @@
 #include "../../../Client.hpp"
 #include "../../../Module/Modules/CPS/CPSListener.hpp"
 #include <d3d11on12.h>
-#include <wrl/client.h>
 #include <algorithm>
 #include <windows.h>
 #include <iostream>
@@ -24,7 +23,7 @@ int SwapchainHook::currentBitmap;
 
 bool unloadDll(const wchar_t* moduleName) {
     HMODULE hModule = GetModuleHandleW(moduleName);
-    if (hModule != NULL) {
+    if (hModule != nullptr) {
         if (FreeLibrary(hModule)) {
             Logger::debug("[UNLOAD DLL] DLL unloaded!");
             return true;
@@ -67,10 +66,10 @@ void SwapchainHook::enableHook() {
 
 
     if (kiero::getRenderType() == kiero::RenderType::D3D12) {
-        kiero::bind(140, (void**)&funcOriginal, swapchainCallback);
+        kiero::bind(140, (void**)&funcOriginal, (void*)swapchainCallback);
     }
     else if (kiero::getRenderType() == kiero::RenderType::D3D11) {
-        kiero::bind(8, (void**)&funcOriginal, swapchainCallback);
+        kiero::bind(8, (void**)&funcOriginal, (void*)swapchainCallback);
     }
 
     bool isRTSS = containsModule(L"RTSSHooks64.dll");
@@ -99,7 +98,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     if (elapsed.count() >= 0.5f) {
         // Calculate frame rate based on elapsed time
-        MC::fps = static_cast<int>(MC::frames / elapsed.count());
+        MC::fps = static_cast<int>((float)MC::frames / elapsed.count());
         // Reset frame counter and update start time
         MC::frames = 0;
         start = std::chrono::high_resolution_clock::now();
@@ -255,11 +254,11 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                                 reinterpret_cast<IUnknown **>(&FlarialGUI::writeFactory));
         }
 
-        if (D2D::context != nullptr && !Client::disable && SwapchainHook::init && FlarialGUI::writeFactory != nullptr) {
+        if (D2D::context != nullptr && !Client::disable && FlarialGUI::writeFactory != nullptr) {
 
             if (SwapchainHook::queue != nullptr) {
 
-                SwapchainHook::currentBitmap = pSwapChain->GetCurrentBackBufferIndex();
+                SwapchainHook::currentBitmap = (int)pSwapChain->GetCurrentBackBufferIndex();
 
                 ID3D11Resource *resource = SwapchainHook::D3D11Resources[SwapchainHook::currentBitmap];
                 SwapchainHook::d3d11On12Device->AcquireWrappedResources(&resource, 1);

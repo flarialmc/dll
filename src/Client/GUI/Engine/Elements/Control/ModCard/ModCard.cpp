@@ -66,8 +66,8 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, const std::string&
     float BottomRoundedHeight = sizes[index].y;
 
     float realY = y;
-    float diffX = 0;
-    float diffY = 0;
+    float diffX;
+    float diffY;
 
     if (FlarialGUI::isInScrollView) realY += FlarialGUI::scrollpos;
 

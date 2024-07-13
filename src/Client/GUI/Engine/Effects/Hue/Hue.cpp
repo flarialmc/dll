@@ -18,7 +18,6 @@ void FlarialGUI::ApplyHue(float Hue) {
         cum->SetInput(0, bitmap);
 
         // Set blur intensity
-        float table[3] = {0.0f, 0.5f, 1.0f};
         cum->SetValue(D2D1_SATURATION_PROP_SATURATION, Hue);
         D2D::context->DrawImage(cum);
 

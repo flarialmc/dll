@@ -10,23 +10,13 @@
 #include "Minecraft.hpp"
 #include "../Render/GLMatrix.hpp"
 #include "../Level/LevelRender/LevelRender.hpp"
-#include "Camera.hpp"
-#include "ClientHMDState.hpp"
 #include "../Network/Raknet/RaknetConnector.hpp"
 
 class ClientInstance {
 public:
-
-
-    Minecraft *getMinecraft() {
-        return hat::member_at<Minecraft *>(this, 0xD0);
-    }
-
     BUILD_ACCESS(this, MinecraftGame*, mcgame, GET_OFFSET("ClientInstance::minecraftGame"));
     BUILD_ACCESS(this, GuiData*, guiData, GET_OFFSET("ClientInstance::guiData"));
-    BUILD_ACCESS(this, Camera, camera, GET_OFFSET("ClientInstance::camera"));
     BUILD_ACCESS(this, GLMatrix, Matrix1, GET_OFFSET("ClientInstance::Matrix1"));
-    BUILD_ACCESS(this, ClientHMDState, HMDState, GET_OFFSET("ClientInstance::clientHMDState"));
 
     LocalPlayer *getLocalPlayer();
 
@@ -62,9 +52,5 @@ public:
             return nullptr;
 
         return getPacketSender()->networkSystem->remoteConnectorComposite->rakNetConnector;
-    }
-
-    Matrix const &getProjectionMatrix() {
-        return this->HMDState.lastLevelProjMatrix;
     }
 };

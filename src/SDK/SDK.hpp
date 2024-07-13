@@ -11,8 +11,6 @@ namespace SDK {
     extern std::string currentScreen;
     extern std::chrono::steady_clock::time_point lastSetCurrentScreenTime;
 
-    extern void setCI();
-
     extern int getServerPing();
 
     extern void setCurrentScreen(const std::string& layer);

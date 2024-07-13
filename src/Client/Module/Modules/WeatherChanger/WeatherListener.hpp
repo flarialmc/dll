@@ -30,7 +30,7 @@ class WeatherListener : public Listener {
                 // TODO: When you set snow, it will stay even if on until game reload
                 if (module->settings.getSettingByName<bool>("snow")->value) {
                     Vec3<float> *pos = event.getActor()->getPosition();
-                    Vec3<int> e(pos->x, pos->y, pos->z);
+                    Vec3<int> e((int)pos->x, (int)pos->y, (int)pos->z);
 
                     SDK::clientInstance->getBlockSource()->getBiome(e)->temparature = 0.0f;
                 }

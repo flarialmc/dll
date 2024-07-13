@@ -15,8 +15,8 @@
 #include "Hooks/Visual/OverworldFogColorHook.hpp"
 #include "Hooks/Visual/TimeChangerHook.hpp"
 #include "Hooks/Game/getSensHook.hpp"
-#include "Hooks/Game/RenderItemGroup.hpp"
-#include "Hooks/Game/getCurrentSwingDuration.hpp"
+//#include "Hooks/Game/RenderItemGroup.hpp"
+//#include "Hooks/Game/getCurrentSwingDuration.hpp"
 
 std::vector<Hook *> HookManager::hooks;
 

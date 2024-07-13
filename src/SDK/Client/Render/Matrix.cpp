@@ -18,7 +18,7 @@ bool Matrix::WorldToScreen(Vec3<float> pos, Vec2<float> &screen) { // pos = pos 
 
     Vec2<float> displaySize = SDK::clientInstance->guiData->ScreenSize;
     LevelRender *lr = SDK::clientInstance->getLevelRender();
-    Vec3<float> origin = lr->getLevelRendererPlayer()->cameraPos;
+    Vec3<float> origin = lr->getOrigin();
 
     pos = pos.sub(origin);
 

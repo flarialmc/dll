@@ -44,7 +44,7 @@ public:
     }
 
 
-    int setAction(int e) {
+    void setAction(int e) {
         this->action = e;
     }
 

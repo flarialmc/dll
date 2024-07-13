@@ -159,13 +159,13 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb) {
     float enabledSpacing;
 
     if (isEnabled) {
-        FadeEffect::ApplyFadeInEffect(2.4 * FlarialGUI::frameFactor, Constraints::SpacingConstraint(1.6, circleWidth),
+        FadeEffect::ApplyFadeInEffect(2.4f * FlarialGUI::frameFactor, Constraints::SpacingConstraint(1.6, circleWidth),
                                       FlarialGUI::toggleSpacings[index]);
         enabledSpacing = FlarialGUI::toggleSpacings[index];
         if (enabledSpacing > Constraints::SpacingConstraint(1.6, circleWidth))
             enabledSpacing = Constraints::SpacingConstraint(1.6, circleWidth);
     } else {
-        FadeEffect::ApplyFadeOutEffect(2.4 * FlarialGUI::frameFactor, FlarialGUI::toggleSpacings[index]);
+        FadeEffect::ApplyFadeOutEffect(2.4f * FlarialGUI::frameFactor, FlarialGUI::toggleSpacings[index]);
         enabledSpacing = FlarialGUI::toggleSpacings[index];
     }
 

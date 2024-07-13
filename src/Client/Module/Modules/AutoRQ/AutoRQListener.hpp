@@ -27,7 +27,7 @@
 class AutoRQListener : public Listener {
     Module *module;
 
-    std::string currentGame = "";
+    std::string currentGame;
     bool triggered = false;
 
     void onPacketReceive(PacketEvent &event) override {

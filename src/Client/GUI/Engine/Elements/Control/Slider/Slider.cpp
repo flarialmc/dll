@@ -53,8 +53,7 @@ float FlarialGUI::Slider(int index, float x, float y, float startingPoint, const
         }
     }
 
-    int i = 0;
-    bool ye = false;
+    // bool ye = false;
 
     /*
     for (auto& rect : SliderRects) {
@@ -74,7 +73,6 @@ float FlarialGUI::Slider(int index, float x, float y, float startingPoint, const
 
     Vec2<float> round = Constraints::RoundingConstraint(13, 13);
 
-    const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
     const float percWidth = Constraints::RelativeConstraint(0.056, "height", true);
     const float percHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
@@ -163,8 +161,6 @@ float FlarialGUI::Slider(int index, float x, float y, float startingPoint, const
 
     // Draw the enabled portion rect
     RoundedRect(farLeftX, y, color, enabledWidth, height, round.x, round.x);
-
-    round = Constraints::RoundingConstraint(13, 13);
 
     // Draw the circle in the middle
     FlarialGUI::Circle(circleX, circleY, color, Constraints::SpacingConstraint(circleRadius, 1.1));

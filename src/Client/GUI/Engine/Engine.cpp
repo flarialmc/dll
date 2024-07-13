@@ -15,6 +15,7 @@
 #include "Elements/Control/TextBox/TextBoxStruct.hpp"
 #include "Elements/Control/ColorPicker/ColorPicker.hpp"
 #include "Elements/Control/Dropdown/DropdownStruct.hpp"
+#include "../../../Assets/Assets.hpp"
 #include <string>
 
 #define clickgui ModuleManager::getModule("ClickGUI")
@@ -357,7 +358,7 @@ HSV FlarialGUI::RGBtoHSV(D2D1_COLOR_F rgb) {
     max = r > g ? r : g;
     max = max > b ? max : b;
 
-    out.value = max;                                // v
+    out.value = (float)max;                                // v
     delta = max - min;
     if (delta < 0.00001) {
         out.saturation = 0;
@@ -365,7 +366,7 @@ HSV FlarialGUI::RGBtoHSV(D2D1_COLOR_F rgb) {
         return out;
     }
     if (max > 0.0) { // NOTE: if Max is == 0, this divide would cause a crash
-        out.saturation = (delta / max);                  // s
+        out.saturation = (float)(delta / max);                  // s
     } else {
         // if max is 0, then r = g = b = 0
         // s = 0, h is undefined
@@ -374,11 +375,11 @@ HSV FlarialGUI::RGBtoHSV(D2D1_COLOR_F rgb) {
         return out;
     }
     if (r >= max)                           // > is bogus, just keeps compilor happy
-        out.hue = (g - b) / delta;        // between yellow & magenta
+        out.hue = (float)((g - b) / delta);        // between yellow & magenta
     else if (g >= max)
-        out.hue = 2.0 + (b - r) / delta;  // between cyan & yellow
+        out.hue = 2.0f + (b - r) / delta;  // between cyan & yellow
     else
-        out.hue = 4.0 + (r - g) / delta;  // between magenta & cyan
+        out.hue = 4.0f + (r - g) / delta;  // between magenta & cyan
 
     out.hue *= 60.0;                              // degrees
 
@@ -393,7 +394,7 @@ D2D1::ColorF FlarialGUI::HSVtoColorF(float H, float s, float v) {
         return {0, 0, 0};
     }
     float C = s * v;
-    float X = C * (1 - abs(fmod(H / 60.0, 2) - 1));
+    float X = C * (1 - abs(fmod(H / 60.0f, 2) - 1));
     float m = v - C;
     float r, g, b;
     if (H >= 0 && H < 60) {
@@ -451,7 +452,7 @@ std::string FlarialGUI::ColorFToHex(const D2D1_COLOR_F &color) {
     char hexString[7];
     sprintf(hexString, "%02x%02x%02x", red, green, blue);
 
-    return std::string(hexString);
+    return {hexString};
 }
 
 
@@ -595,7 +596,7 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 
     // check if outside of mc
     WindowRects[currentNum].fixer = fixer;
-    if (WindowRects[currentNum].movedX - fixer < 0) WindowRects[currentNum].movedX = 0.001 + fixer;
+    if (WindowRects[currentNum].movedX - fixer < 0) WindowRects[currentNum].movedX = 0.001f + fixer;
     if (WindowRects[currentNum].movedY < 0) WindowRects[currentNum].movedY = 0;
 
     if (WindowRects[currentNum].movedX + width - fixer > MC::windowSize.x)
@@ -622,7 +623,7 @@ Vec2<float> FlarialGUI::CalculateMovedXY(float x, float y, int num, float rectWi
 
     }
 
-    if (x - WindowRects[num].fixer < 0) x = 0.001 - WindowRects[num].fixer;
+    if (x - WindowRects[num].fixer < 0) x = 0.001f - WindowRects[num].fixer;
     if (y < 0) y = 0;
 
     if (x + rectWidth - WindowRects[num].fixer > MC::windowSize.x)
@@ -723,7 +724,7 @@ void FlarialGUI::NotifyHeartbeat() {
             col.a = 0.60;
 
             if (!FlarialGUI::inMenu)
-                FlarialGUI::BlurRect(rect, 6.0f);
+                FlarialGUI::BlurRect(rect);
             FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
                                     col, rectWidth,
                                     rectHeight, rounding.x, rounding.x);
@@ -809,7 +810,7 @@ void FlarialGUI::NotifyHeartbeat() {
             col.a = 0.60;
 
             if (!FlarialGUI::inMenu)
-                FlarialGUI::BlurRect(rect, 6.0f);
+                FlarialGUI::BlurRect(rect);
             FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
                                     col, rectWidth,
                                     rectHeight, rounding.x, rounding.x);
@@ -904,7 +905,7 @@ void FlarialGUI::CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to) {
 }
 
 std::wstring FlarialGUI::to_wide(const std::string &str) {
-    int wchars_num = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL, 0);
+    int wchars_num = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, nullptr, 0);
     std::wstring wide;
     wide.resize(wchars_num);
     MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, &wide[0], wchars_num);
@@ -953,4 +954,3 @@ float FlarialGUI::SettingsTextWidth(const std::string& text) {
     return textMetrics.widthIncludingTrailingWhitespace;
 }
 
-bool resized = false;

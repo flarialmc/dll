@@ -360,27 +360,27 @@ public:
                     else
                         std::sort(modules.begin(), modules.end(), compareNames);
 
-                    for (Module *real: modules) {
+                    for (Module *pModule: modules) {
                         bool visible = (modcenter.y + yModifier + FlarialGUI::scrollpos > center.y) &&
                                        (modcenter.y + yModifier + FlarialGUI::scrollpos - 150) <
                                        center.y + Constraints::RelativeConstraint(baseHeightReal);
                         if (!searchBarString.empty()) {
-                            std::string name = real->name;
+                            std::string name = pModule->name;
 
                             for (char &c: name) {
-                                c = std::tolower(c);
+                                c = (char)std::tolower(c);
                             }
 
                             std::string search = searchBarString;
 
                             for (char &c: search) {
-                                c = std::tolower(c);
+                                c = (char)std::tolower(c);
                             }
 
                             if (name.starts_with(search) ||
                                 name.find(search) != std::string::npos) {
-                                ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
-                                                          real->icon, i, visible);
+                                ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, pModule,
+                                                          pModule->icon, i, visible);
                                 xModifier += Constraints::SpacingConstraint(1.09, modWidth);
                                 if ((++i % 3) == 0) {
                                     yModifier += Constraints::SpacingConstraint(0.8, modWidth);
@@ -388,8 +388,8 @@ public:
                                 }
                             }
                         } else {
-                            ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
-                                                      real->icon, i, visible);
+                            ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, pModule,
+                                                      pModule->icon, i, visible);
 
                             xModifier += Constraints::SpacingConstraint(1.09, modWidth);
                             if ((++i % 3) == 0) {

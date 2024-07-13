@@ -5,8 +5,6 @@
 #include "../../../Utils/Memory/Memory.hpp"
 #include "../../../Utils/Logger/Logger.hpp"
 #include "Components/MoveInputComponent.hpp"
-#include "Components/ActorRotationComponent.hpp"
-#include "Components/MobHurtTimeComponent.hpp"
 #include "../Level/Level.hpp"
 #include "../Container/Inventory.hpp"
 #include "../../../Utils/Utils.hpp"
@@ -14,7 +12,6 @@
 #include "Components/RenderPositionComponent.hpp"
 #include "Components/ActorEquipmentComponent.h"
 #include "EntityContext.hpp"
-#include "MobEffect.h"
 
 
 enum ActorFlags {
@@ -181,25 +178,17 @@ public:
     BUILD_ACCESS(this, int16_t, hurtTime, GET_OFFSET("Actor::hurtTime"));
     BUILD_ACCESS(this, Level*, level, GET_OFFSET("Actor::level"));
     BUILD_ACCESS(this, ActorCategory, categories, GET_OFFSET("Actor::categories"));
-    BUILD_ACCESS(this, ActorRotationComponent*, actorRotationComponent, GET_OFFSET("Actor::actorRotationComponent"));
     BUILD_ACCESS(this, AABBShapeComponent*, aabb, GET_OFFSET("Actor::aabb"));
     BUILD_ACCESS(this, StateVectorComponent*, stateVector, GET_OFFSET("Actor::stateVector"));
-    BUILD_ACCESS(this, Vec2<float>, rotations, GET_OFFSET("Actor::rotations"));
-    BUILD_ACCESS(this, bool, wasHurt, GET_OFFSET("Actor::wasHurt"));
-
 
     template<typename Component>
     Component *tryGet(uintptr_t addr);
 
     ItemStack *getArmor(int slot);
 
-    MobEffectInstance *getEffect(MobEffect *effect);
-
     MoveInputComponent *getMoveInputHandler();
 
     bool isAlive();
-
-    std::string *getXuid(std::string *str);
 
     bool getActorFlag(int flag);
 
@@ -208,8 +197,6 @@ public:
     Vec3<float> *getPosition();
 
     ItemStack *getOffhandSlot();
-
-    EntityId getEntityId();
 
     V1_20_50::EntityContext *GetEntityContextV1_20_50();
 

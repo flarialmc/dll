@@ -8,7 +8,6 @@
 //needed for threading (threading needed to be able to output a call stack during a stack overflow)
 #include <thread>
 #include <mutex>
-#include <condition_variable>
 #include <atomic>
 
 //needed for being able to output a timestampped crash log
@@ -19,10 +18,8 @@
 //needed for being able to get into the crash handler on a crash
 #include <csignal>
 #include <exception>
-#include <stacktrace>
 #include <cstdlib>
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 
 //a decent amount of this was copied/modified from backward.cpp (https://github.com/bombela/backward-cpp)
 //mostly the stuff related to actually getting crash handlers on crashes
@@ -55,21 +52,6 @@ namespace glaiel::crashlogs {
     //public interface (see header for documentation)
     void set_crashlog_folder(std::string folderpath) {
         output_folder = folderpath;
-    }
-    void set_crashlog_filename(std::string filename_format) {
-        filename = filename_format;
-    }
-    void set_on_write_crashlog_callback(void(*on_write_crashlog)(std::string)) {
-        on_output_crashlog = on_write_crashlog;
-    }
-    void set_crashlog_header_message(std::string message) {
-        std::unique_lock<std::mutex> lk(mut);
-        if(status != program_status::running) return;
-        header_message = message;
-    }
-    std::string get_crashlog_header_message() {
-        std::unique_lock<std::mutex> lk(mut);
-        return header_message;
     }
 
     static std::filesystem::path get_log_filepath();

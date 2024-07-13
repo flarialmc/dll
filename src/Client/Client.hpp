@@ -17,6 +17,8 @@ public:
 
     static inline std::string version;
 
+    static inline HMODULE currentModule = NULL;
+
     static void SaveSettings() {
         try {
             std::ofstream outputFile(settingspath);

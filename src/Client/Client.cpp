@@ -3,7 +3,6 @@
 #include "Client.hpp"
 #include "GUI/Engine/Engine.hpp"
 #include "../Utils/Versions/VersionUtils.hpp"
-#include "../Utils/Versions/WinrtUtils.hpp"
 #include <filesystem>
 #include <thread>
 #include <wingdi.h>
@@ -12,7 +11,6 @@
 //winrt stuff
 #include "winrt/windows.applicationmodel.core.h"
 #include "winrt/Windows.UI.ViewManagement.h"
-#include "winrt/Windows.Foundation.h"
 #include "winrt/Windows.UI.Core.h"
 #include "winrt/windows.system.h"
 
@@ -31,7 +29,7 @@ void DownloadAndSave(const std::string& url, const std::string& path) {
         else {
             if(notifiedOfConnectionIssue) return;
             notifiedOfConnectionIssue = true;
-            MessageBox(NULL, "Flarial: Failed to download assets! Try using vpn.", "", MB_OK);
+            MessageBox(nullptr, "Flarial: Failed to download assets! Try using vpn.", "", MB_OK);
             ModuleManager::terminate();
             Client::disable = true;
         }

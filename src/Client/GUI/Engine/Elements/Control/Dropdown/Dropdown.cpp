@@ -2,6 +2,7 @@
 #include "../../../Constraints.hpp"
 #include "../../Structs/ImagesClass.hpp"
 #include "../../../../../Module/Manager.hpp"
+#include "../../../../../../Assets/Assets.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -39,14 +40,13 @@
 
 std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<std::string>& options, std::string &value,
                      const std::string& label) {
-    D2D1_COLOR_F col;
 
     Vec2<float> round = Constraints::RoundingConstraint(13, 13);
     const bool isAdditionalY = shouldAdditionalY;
     const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
     const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
     float childHeights = Constraints::RelativeConstraint(0.030, "height", true);
-    float maxHeight = (options.size() - 1) * childHeights + 2;
+    float maxHeight = ((float)options.size() - 1.0f) * childHeights + 2.0f;
     float addYVal = maxHeight + Constraints::SpacingConstraint(0.05, textWidth);
     float clickingY = y;
 
@@ -97,7 +97,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
             FlarialGUI::DropDownMenus[index].isActive = false;
             value = FlarialGUI::DropDownMenus[index].selected;
         }
-        FlarialGUI::lerp(FlarialGUI::DropDownMenus[index].opacityHover, 0.0f, 0.25 * FlarialGUI::frameFactor);
+        FlarialGUI::lerp(FlarialGUI::DropDownMenus[index].opacityHover, 0.0f, 0.25f * FlarialGUI::frameFactor);
     } else if (!FlarialGUI::DropDownMenus[index].isActive) {
         if (FlarialGUI::DropDownMenus[index].firstTime) {
             FlarialGUI::DropDownMenus[index].selected = value;
@@ -120,7 +120,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
         FlarialGUI::lerp(
                 FlarialGUI::DropDownMenus[index].rotation,
                 180.0f,
-                0.25 * FlarialGUI::frameFactor
+                0.25f * FlarialGUI::frameFactor
         );
     } else {
         //y = originalY - maxHeight;
@@ -137,7 +137,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
         FlarialGUI::lerp(
                 FlarialGUI::DropDownMenus[index].rotation,
                 0.0f,
-                0.25 * FlarialGUI::frameFactor
+                0.25f * FlarialGUI::frameFactor
         );
     }
 
@@ -156,7 +156,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     for (const std::string &op: options) {
         if (op == FlarialGUI::DropDownMenus[index].selected) continue;
 
-        float curY = y + (counter * childHeights) - (counter * 0.1f) + 5;
+        float curY = y + ((float)counter * childHeights) - ((float)counter * 0.1f) + 5.f;
 
         if (counter == 0) {
             if (curY > (originalY - lastChildHeight + 20))
@@ -165,12 +165,12 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
                                         childHeights, 0, 0);
 
             counter++;
-            curY = y + (counter * childHeights) - (counter * 0.1f) + 5;
+            curY = y + ((float)counter * childHeights) - ((float)counter * 0.1f) + 5.f;
         }
 
         if (curY < (originalY - lastChildHeight + 20)) continue;
 
-        float curClickingY = clickingY + (counter * childHeights) + 5;
+        float curClickingY = clickingY + ((float)counter * childHeights) + 5.f;
 
         if (counter == options.size() - 1) {
             FlarialGUI::RoundedRect(x + offset, curY, unselectedChildCol,
@@ -188,7 +188,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
                 FlarialGUI::DropDownMenus[index].opacityHover = 0.0f;
                 value = op;
             } else {
-                FlarialGUI::lerp(FlarialGUI::DropDownMenus[index].opacityHover, 1.0f, 0.25 * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(FlarialGUI::DropDownMenus[index].opacityHover, 1.0f, 0.25f * FlarialGUI::frameFactor);
             }
             FlarialGUI::DropDownMenus[index].hoveredIndex = counter;
         }
@@ -196,8 +196,8 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     }
 
     FlarialGUI::lerp(FlarialGUI::DropDownMenus[index].yHover,
-                     y + (FlarialGUI::DropDownMenus[index].hoveredIndex * childHeights) - (counter * 0.1f) + 5,
-                     0.25 * FlarialGUI::frameFactor);
+                     y + ((float)FlarialGUI::DropDownMenus[index].hoveredIndex * childHeights) - ((float)counter * 0.1f) + 5.f,
+                     0.25f * FlarialGUI::frameFactor);
 
     if (FlarialGUI::DropDownMenus[index].yHover >= originalY &&
         (originalY + percHeight + maxHeight) >= FlarialGUI::DropDownMenus[index].yHover) {
@@ -218,7 +218,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     for (const std::string &op: options) {
         if (op == FlarialGUI::DropDownMenus[index].selected) continue;
 
-        float curY = y + (counter * childHeights) - (counter * 0.1f) + 5;
+        float curY = y + ((float)counter * childHeights) - ((float)counter * 0.1f) + 5.f;
 
         if (curY < originalY) continue;
 
@@ -251,7 +251,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
                                     DWRITE_FONT_WEIGHT_NORMAL);
 
     float is = percHeight / 2;
-    float ix = x + Constraints::SpacingConstraint(1.5, textWidth) - is * 1.2;
+    float ix = x + Constraints::SpacingConstraint(1.5, textWidth) - is * 1.2f;
     float iy = y + Constraints::SpacingConstraint(0.28, percHeight);
 
     std::string imageName = R"(\Flarial\assets\down.png)";

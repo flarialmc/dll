@@ -268,7 +268,6 @@ public:
         FlarialGUI::ColorPicker(0, toggleX + FlarialGUI::SettingsTextWidth("Background "),
                                 toggleY - Constraints::SpacingConstraint(0.017, textWidth),
                                 settings.getSettingByName<std::string>("bgColor")->value,
-                                settings.getSettingByName<float>("bgOpacity")->value,
                                 settings.getSettingByName<bool>("bgRGB")->value);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
@@ -279,7 +278,6 @@ public:
                                         DWRITE_FONT_WEIGHT_NORMAL);
         FlarialGUI::ColorPicker(1, toggleX + FlarialGUI::SettingsTextWidth("Text "), toggleY * 0.99f,
                                 settings.getSettingByName<std::string>("textColor")->value,
-                                settings.getSettingByName<float>("textOpacity")->value,
                                 settings.getSettingByName<bool>("textRGB")->value);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
@@ -290,7 +288,6 @@ public:
                                         DWRITE_FONT_WEIGHT_NORMAL);
         FlarialGUI::ColorPicker(2, toggleX + FlarialGUI::SettingsTextWidth("Border "), toggleY * 0.99f,
                                 settings.getSettingByName<std::string>("borderColor")->value,
-                                settings.getSettingByName<float>("borderOpacity")->value,
                                 settings.getSettingByName<bool>("borderRGB")->value);
 
         FlarialGUI::UnsetScrollView();

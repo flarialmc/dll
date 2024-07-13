@@ -3,24 +3,7 @@
 
 #include "../../Client/GUI/Engine/Engine.hpp"
 #include "../../SDK/SDK.hpp"
-
-GuiData *guiData;
-Matrix viewMatrix;
-Matrix projMatrix;
-MCCColor *colorHolder;
-Vec2<float> screenSize;
-Vec3<float> origin;
-
-void DrawUtils::setCtx(MinecraftUIRenderContext *ctx, GuiData *gui) {
-    guiData = gui;
-    viewMatrix = SDK::clientInstance->camera.viewMatrix.correct();
-    projMatrix = SDK::clientInstance->getProjectionMatrix();
-    screenSize.x = gui->ScreenSizeScaled.x;
-    screenSize.y = gui->ScreenSizeScaled.y;
-
-    if (SDK::clientInstance->getLevelRender() != nullptr)
-        origin = SDK::clientInstance->getLevelRender()->getOrigin();
-}
+#include "../../SDK/Client/Render/Matrix.hpp"
 
 void DrawUtils::addLine(Vec2<float> start, Vec2<float> end, float lineWidth, D2D_COLOR_F color) {
 

@@ -30,10 +30,10 @@ public:
 
         if (SDK::currentScreen == "hud_screen") {
 
-            if (previousFrames.size() >= static_cast<size_t>(maxFrames)) {
+            if (previousFrames.size() >= static_cast<int>(maxFrames)) {
                 // Remove excess frames if maxFrames is reduced
-                size_t framesToRemove = previousFrames.size() - static_cast<size_t>(maxFrames);
-                for (size_t i = 0; i < framesToRemove; ++i) {
+                int framesToRemove = (int)previousFrames.size() - static_cast<int>(maxFrames);
+                for (int i = 0; i < framesToRemove; ++i) {
                     previousFrames[i]->Release();
                 }
                 previousFrames.erase(previousFrames.begin(), previousFrames.begin() + framesToRemove);

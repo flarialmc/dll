@@ -9,28 +9,6 @@ std::string SDK::currentScreen;
 bool SDK::hasInstanced = false;
 std::chrono::steady_clock::time_point SDK::lastSetCurrentScreenTime;
 
-void SDK::setCI() {
-    struct bruh {
-        struct bruh2 {
-            struct bruh3 {
-                char pad[0x58];
-                struct bruh4 {
-                    ClientInstance *ci;
-                } *bruh4;
-            } *bruh3;
-        } *bruh2;
-    };
-
-    static bruh *off;
-
-    if (off == nullptr) {
-        uintptr_t addr = Memory::findSig(GET_SIG("clientInstanceSig"));
-        off = reinterpret_cast<bruh *>(Memory::offsetFromSig(addr, 3));
-    }
-
-    clientInstance = off->bruh2->bruh3->bruh4->ci;
-}
-
 std::shared_ptr<Packet> SDK::createPacket(int id) {
 
     static uintptr_t Address;

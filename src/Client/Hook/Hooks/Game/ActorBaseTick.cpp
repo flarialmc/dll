@@ -1,11 +1,7 @@
-#include <filesystem>
 #include <fstream>
 #include "ActorBaseTick.hpp"
 #include "../../../Events/EventHandler.hpp"
-#include "../../../../SDK/SDK.hpp"
-#include "RaknetTick.hpp"
 #include "../../../Client.hpp"
-#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void ActorBaseTick::enableHook() {
 

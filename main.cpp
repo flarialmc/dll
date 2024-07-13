@@ -6,11 +6,9 @@
 #include "src/Client/Client.hpp"
 #include "src/Client/Events/EventHandler.hpp"
 #include "src/Client/Hook/Hooks/Render/ResizeHook.hpp"
-#include "src/Client/Hook/Hooks/Game/RaknetTick.hpp"
 //#include "src/Client/Module/Modules/Nick/NickListener.hpp"
 #include <kiero.h>
 #include <wininet.h>
-
 
 std::chrono::steady_clock::time_point lastBeatTime;
 
@@ -140,6 +138,7 @@ BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReser
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
+        Client::currentModule = instance;
         CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)init, instance, 0, nullptr);
         break;
     case DLL_PROCESS_DETACH:
@@ -182,21 +181,4 @@ std::string replaceAll(std::string subject, const std::string& search,
         pos += replace.length();
     }
     return subject;
-}
-
-std::string removeColorCodes(const std::string& input) {
-    std::string result;
-    bool skipNext = false;
-
-    for (char c : input) {
-        if (skipNext) {
-            skipNext = false;
-        } else if (c == L'§') {
-            skipNext = true;
-        } else {
-            result += c;
-        }
-    }
-
-    return result;
 }

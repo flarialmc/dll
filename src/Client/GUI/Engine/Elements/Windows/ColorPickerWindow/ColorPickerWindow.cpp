@@ -68,13 +68,12 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float &opacity, 
         float y = Constraints::PercentageConstraint(0.10, "top");
         float spacing = Constraints::SpacingConstraint(0.15, rectheight);
         float hexPreviewSize = Constraints::SpacingConstraint(0.265, rectheight);
-        Vec2<float> hexPreviewRound = Constraints::RoundingConstraint(10, 10);
 
         // hue line and opacity line
         float hlwidth = Constraints::SpacingConstraint(0.85f, rectwidth);
         float gap2L = Constraints::SpacingConstraint(0.3f, hexPreviewSize);
         float shadePickerHeight = hexPreviewSize * 2.0f + Constraints::SpacingConstraint(0.1, hexPreviewSize);
-        float shadePickerWidth = rectwidth - (hexPreviewSize * 1.86);
+        float shadePickerWidth = rectwidth - (hexPreviewSize * 1.86f);
 
         HSV hsv_color{};
 
@@ -92,8 +91,6 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float &opacity, 
                 ColorPickers[index].shade.x / shadePickerWidth,
                 1.0f - ColorPickers[index].shade.y / shadePickerHeight
         );
-
-        hsv_color = RGBtoHSV(color);
 
         color.a = ColorPickers[index].opacX / hlwidth;
         ColorPickers[index].opacX = opacity * hlwidth;
@@ -130,7 +127,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float &opacity, 
         D2D1_GRADIENT_STOP gradientStops[69];
 
         for (int j = 0; j <= 360; j += 20) {
-            gradientStops[j / 20].color = FlarialGUI::HSVtoColorF(j, 1.0f, 1.0f);
+            gradientStops[j / 20].color = FlarialGUI::HSVtoColorF((float)j, 1.0f, 1.0f);
             gradientStops[j / 20].position = (float) j / 360.0f;
         }
 

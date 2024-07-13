@@ -2,8 +2,8 @@
 #include "../../../Structs/ImagesClass.hpp"
 
 void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const float width, const float height,
-                                             const D2D1_COLOR_F color, const std::string& imagePath,
-                                             const float imageWidth, const float imageHeight, const wchar_t *text) {
+                                             const D2D1_COLOR_F color, const std::string &imagePath,
+                                             const float imageWidth, const float imageHeight) {
 
     float imageY = y;
 

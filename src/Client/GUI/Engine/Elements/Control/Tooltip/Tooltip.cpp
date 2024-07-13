@@ -71,8 +71,6 @@ void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::str
     float rectWidth = textMetrics.width + spacing * 2;
     float rectHeight = textMetrics.height + spacing * 2;
 
-    bool display = false;
-
     if (CursorInRect(x, y, width, height)) {
         if (!tooltips[id].in) {
             tooltips[id].in = true;
@@ -93,11 +91,9 @@ void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::str
                 tooltips[id].hoverY = MC::mousePos.y;
             }
 
-            display = true;
             lerp(tooltips[id].opac, 1.0f, 0.35f * frameFactor);
         }
     } else if (tooltips[id].hovering && CursorInRect(tooltips[id].hoverX, tooltips[id].hoverY, rectWidth, rectHeight)) {
-        display = true;
         tooltips[id].in = true;
         lerp(tooltips[id].opac, 1.0f, 0.35f * frameFactor);
     } else {
@@ -117,7 +113,7 @@ void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::str
                           Constraints::RelativeConstraint(0.001, "height", true), outlineCol, rectWidth, rectHeight,
                           round.x, round.x);
         FlarialTextWithFont(spacing + tooltips[id].hoverX + offset, tooltips[id].hoverY - offset,
-                            FlarialGUI::to_wide(text).c_str(), textMetrics.width * 6.9, rectHeight,
+                            FlarialGUI::to_wide(text).c_str(), textMetrics.width * 6.9f, rectHeight,
                             DWRITE_TEXT_ALIGNMENT_LEADING, fontSize1, DWRITE_FONT_WEIGHT_REGULAR, textCol);
     }
 

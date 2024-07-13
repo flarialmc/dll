@@ -13,7 +13,8 @@
 #define GET_SIG(name) \
     []{ \
         constexpr unsigned int hash_val = Utils::hash(name); \
-        return Mgr.getSig(hash_val); \
+        static auto sig = Mgr.getSig(hash_val);\
+        return sig; \
     }()
 
 #define ADD_OFFSET(name, offset) \
@@ -25,7 +26,8 @@
 #define GET_OFFSET(name) \
     []{ \
         constexpr unsigned int hash_val = Utils::hash(name); \
-        return Mgr.getOffset(hash_val); \
+        static auto offset = Mgr.getOffset(hash_val);\
+        return offset; \
     }()
 
 class SignatureAndOffsetManager {

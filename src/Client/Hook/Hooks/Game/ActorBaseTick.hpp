@@ -15,5 +15,4 @@ public:
 
     void enableHook() override;
 
-    static inline bool writeIP;
 };
