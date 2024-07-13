@@ -12,7 +12,7 @@ public:
 
 
     IPDisplay() : Module("IP Display", "Displays the current server IP you're playing on.",
-                         R"(\Flarial\assets\server-ip.png)", "") {
+                         IDR_SERVER_IP_PNG, "") {
 
         Module::setup();
     };

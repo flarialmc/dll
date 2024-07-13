@@ -9,7 +9,7 @@ class Zoom : public Module {
 
 public:
 
-    Zoom() : Module("Zoom", "Allows you to see distant places.", R"(\Flarial\assets\magnify.png)", "C") {
+    Zoom() : Module("Zoom", "Allows you to see distant places.", IDR_MAGNIFY_PNG, "C") {
 
         Module::setup();
 

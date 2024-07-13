@@ -11,7 +11,7 @@ public:
 
 
     SpeedDisplay() : Module("Speed Display", "Displays your current travel speed in blocks/second.",
-                            R"(\Flarial\assets\speed.png)", "") {
+                            IDR_SPEED_PNG, "") {
 
         Module::setup();
 

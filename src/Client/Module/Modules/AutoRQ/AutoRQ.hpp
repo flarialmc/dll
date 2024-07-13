@@ -11,7 +11,7 @@ public:
 
 
     AutoRQ() : Module("Auto RE Q", "Automatically requeues into a game (Hive)",
-                      R"(\Flarial\assets\re-q.png)", "") {
+                      IDR_RE_Q_PNG, "") {
 
         Module::setup();
 

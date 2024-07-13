@@ -103,7 +103,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float &opacity, 
 
         // color preview square
 
-        FlarialGUI::image(R"(\Flarial\assets\transparent.png)", D2D1::RectF(
+        FlarialGUI::image(IDR_TRANSPARENT_PNG, D2D1::RectF(
                 x + 1,
                 y + 1,
                 x + hexPreviewSize - 1,
@@ -113,7 +113,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string &hex, float &opacity, 
 
         // previous color preview square
 
-        FlarialGUI::image(R"(\Flarial\assets\transparent.png)", D2D1::RectF(
+        FlarialGUI::image(IDR_TRANSPARENT_PNG, D2D1::RectF(
                 x + 1,
                 y + 1 + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize),
                 x + hexPreviewSize - 1,

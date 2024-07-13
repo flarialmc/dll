@@ -12,17 +12,18 @@
 #include "../../GUI/Engine/Engine.hpp"
 #include "../../GUI/Engine/Constraints.hpp"
 #include "../../../SDK/SDK.hpp"
+#include "../../../Assets/Assets.hpp"
 
 class Module {
 public:
     std::string name;
     std::string description;
-    std::string icon;
+    int icon;
     std::string defaultKeybind;
     Settings settings;
     std::string settingspath;
 
-    Module(const std::string &ename, const std::string &edescription, const std::string &eicon, const std::string& ekey) {
+    Module(const std::string &ename, const std::string &edescription, int eicon, const std::string& ekey) {
         name = ename;
         description = edescription;
         icon = eicon;

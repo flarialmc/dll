@@ -9,7 +9,7 @@ class FPSCounter : public Module {
 public:
 
     FPSCounter() : Module("FPS", "Shows how much Frames Per Second (FPS)\nyour device is rendering.",
-                          R"(\Flarial\assets\fps.png)", "") {
+                          IDR_FPS_PNG, "") {
 
         Module::setup();
 

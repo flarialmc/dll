@@ -23,8 +23,8 @@ class PatarHDListener : public Listener {
             float s = Constraints::RelativeConstraint(0.35, "height", true) *
                       module->settings.getSettingByName<float>("scale")->value;
             if (module->settings.getSettingByName<bool>("dvdmode")->value) {
-                FlarialGUI::image(R"(\Flarial\assets\patar.jpg)",
-                                  D2D1::RectF(x, y, x + s, y + s));
+                FlarialGUI::image(IDR_PATAR_JPG,
+                                  D2D1::RectF(x, y, x + s, y + s), "JPG");
 
                 x += module->settings.getSettingByName<float>("xveloc")->value * xv;
                 y += module->settings.getSettingByName<float>("yveloc")->value * yv;
@@ -35,7 +35,7 @@ class PatarHDListener : public Listener {
                 if (y < 0) yv = 1;
             } else {
                 Vec2<float> center = Constraints::CenterConstraint(s, s);
-                FlarialGUI::image(R"(\Flarial\assets\patar.jpg)",
+                FlarialGUI::image(IDR_PATAR_JPG,
                                   D2D1::RectF(center.x, center.y, center.x + s, center.y + s));
             }
         }

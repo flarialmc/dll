@@ -8,7 +8,7 @@ class ComboCounter : public Module {
 
 public:
 
-    ComboCounter() : Module("Combo", "Keeps track of consecutive hits.", R"(\Flarial\assets\combo.png)", "") {
+    ComboCounter() : Module("Combo", "Keeps track of consecutive hits.", IDR_COMBO_PNG, "") {
 
         Module::setup();
 

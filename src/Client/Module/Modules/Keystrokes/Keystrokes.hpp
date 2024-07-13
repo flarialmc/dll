@@ -30,7 +30,7 @@ public:
 
 
     Keystrokes() : Module("Keystrokes", "Displays real-time information about your\nWASD and mouse inputs.",
-                          R"(\Flarial\assets\keyboard.png)", "") {
+                          IDR_KEYBOARD_PNG, "") {
         Module::setup();
     };
 

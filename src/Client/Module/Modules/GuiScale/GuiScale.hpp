@@ -10,7 +10,7 @@ class GuiScale : public Module {
 public:
 
     GuiScale() : Module("MC GUI Scale", "Change your GUI Scale beyond\nMinecraft's restrictions.",
-                        R"(\Flarial\assets\nametag.png)", "") {
+                        IDR_NAMETAG_PNG, "") {
 
         Module::setup();
     };

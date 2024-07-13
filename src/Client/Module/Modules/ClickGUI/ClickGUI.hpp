@@ -9,7 +9,7 @@ class ClickGUI : public Module {
 
 public:
 
-    ClickGUI() : Module("ClickGUI", "What do you think it is?", R"(\Flarial\assets\clickgui.png)", "K") {
+    ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {
         Module::setup();
     };
 

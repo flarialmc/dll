@@ -276,4 +276,10 @@ namespace FlarialGUI {
 
     std::string Dropdown(int index, float x, float y, const std::vector<std::string> &options, std::string &value,
                          const std::string &label);
+
+    void image(int resourceId, D2D1_RECT_F rect, LPCTSTR type = "PNG");
+
+    void LoadImageFromResource(int resourceId, ID2D1Bitmap **bitmap, LPCTSTR type = "PNG");
+
+    void LoadFont(int resourceId, LPCTSTR type = "TTF");
 }

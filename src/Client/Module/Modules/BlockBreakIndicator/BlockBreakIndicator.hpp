@@ -12,7 +12,7 @@ public:
 
 
     BlockBreakIndicator() : Module("Break Progress", "Visual indicator to show the progress\nof breaking a block.",
-                                   R"(\Flarial\assets\block_break_indicator.png)", "") {
+                                   IDR_BLOCK_BREAK_INDICATOR_PNG, "") {
         Module::setup();
     };
 

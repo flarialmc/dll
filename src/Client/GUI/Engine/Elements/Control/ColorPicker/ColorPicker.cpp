@@ -67,7 +67,7 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 
     if (rgb) {
         FlarialGUI::image(
-                R"(\Flarial\assets\rgb.png)",
+                IDR_RGB_PNG,
                 D2D1::RectF(
                         x + Constraints::SpacingConstraint(0.1, s),
                         y + s * 0.21f,

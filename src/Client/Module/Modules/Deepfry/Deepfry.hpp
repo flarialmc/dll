@@ -8,7 +8,7 @@
 class Deepfry : public Module {
 
 public:
-    Deepfry() : Module("Deepfry", "Theres only one way to find out.", R"(\Flarial\assets\frying-pan.png)", "") {
+    Deepfry() : Module("Deepfry", "Theres only one way to find out.", IDR_FRYING_PAN_PNG, "") {
 
         Module::setup();
     };

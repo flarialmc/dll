@@ -9,7 +9,7 @@ public:
 
 
     CPSLimiter() : Module("CPS Limiter", "Limit how many clicks you can\nregister per second.",
-                          R"(\Flarial\assets\stop.png)", "") {
+                          IDR_STOP_PNG, "") {
 
         Module::setup();
     };

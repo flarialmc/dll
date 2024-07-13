@@ -10,7 +10,7 @@ class Time : public Module {
 public:
 
 
-    Time() : Module("IRL Time", "Displays your current local time.", R"(\Flarial\assets\time.png)", "") {
+    Time() : Module("IRL Time", "Displays your current local time.", IDR_TIME_PNG, "") {
 
         Module::setup();
 

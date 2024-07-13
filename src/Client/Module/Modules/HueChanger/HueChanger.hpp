@@ -10,7 +10,7 @@ class HueChanger : public Module {
 public:
 
     HueChanger() : Module("Saturation", "A filter to saturate or\ndesaturate Minecraft.",
-                          R"(\Flarial\assets\fullbright.png)", "") {
+                          IDR_FULLBRIGHT_PNG, "") {
 
         Module::setup();
 

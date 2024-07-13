@@ -11,7 +11,7 @@ public:
 
     NickModule() : Module("Nick",
                           "Hides your username and replace it with something else.\nWorks everywhere (chat, pause, third person, etc)\nOther people will not be able to see your nick.",
-                          R"(\Flarial\assets\icognito.png)", "") {
+                          IDR_ICOGNITO_PNG, "") {
 
         Module::setup();
 

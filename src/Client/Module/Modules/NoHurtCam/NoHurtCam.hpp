@@ -15,7 +15,7 @@ public:
     static inline std::vector<uint8_t> originalCameraAngle;
     static inline uint8_t newCameraAngle[3] = {0x90, 0x90, 0x90};
 
-    NoHurtCam() : Module("No Hurt Cam", "Disables hurt camera animation", R"(\Flarial\assets\reach.png)", "") {
+    NoHurtCam() : Module("No Hurt Cam", "Disables hurt camera animation", IDR_REACH_PNG, "") {
 
         originalCameraAngle.resize(3);
 

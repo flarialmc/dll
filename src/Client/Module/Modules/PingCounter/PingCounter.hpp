@@ -9,7 +9,7 @@ class PingCounter : public Module {
 public:
 
     PingCounter() : Module("Ping Counter", "Displays your current latency to the server.",
-                           R"(\Flarial\assets\ping.png)", "") {
+                           IDR_PING_PNG, "") {
 
         Module::setup();
 

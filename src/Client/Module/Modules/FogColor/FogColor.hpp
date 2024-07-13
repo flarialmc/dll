@@ -9,7 +9,7 @@ class FogColor : public Module {
 
 public:
 
-    FogColor() : Module("Fog Color", "Changes the color of the\nMinecraft fog.", R"(\Flarial\assets\smoke.png)", "") {
+    FogColor() : Module("Fog Color", "Changes the color of the\nMinecraft fog.", IDR_SMOKE_PNG, "") {
 
         Module::setup();
 

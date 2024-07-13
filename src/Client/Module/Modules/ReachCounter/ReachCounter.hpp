@@ -8,7 +8,7 @@ class ReachCounter : public Module {
 
 public:
 
-    ReachCounter() : Module("Reach Counter", "Displays your last hit range in blocks.", R"(\Flarial\assets\reach.png)",
+    ReachCounter() : Module("Reach Counter", "Displays your last hit range in blocks.", IDR_REACH_PNG,
                             "") {
 
         Module::setup();

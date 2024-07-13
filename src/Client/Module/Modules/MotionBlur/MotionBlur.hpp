@@ -11,7 +11,7 @@ public:
 
     MotionBlur() : Module("Motion Blur",
                           "Make fast movements appear smoother and more realistic by\nblurring the image slightly in the direction of motion.",
-                          R"(\Flarial\assets\blur.png)", "") {
+                          IDR_BLUR_PNG, "") {
 
         Module::setup();
 

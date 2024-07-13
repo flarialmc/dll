@@ -8,7 +8,7 @@ class SnapLook : public Module {
 
 public:
 
-    SnapLook() : Module("SnapLook", "Quickly look behind you.", R"(\Flarial\assets\eye.png)", "V") {
+    SnapLook() : Module("SnapLook", "Quickly look behind you.", IDR_EYE_PNG, "V") {
 
         Module::setup();
 

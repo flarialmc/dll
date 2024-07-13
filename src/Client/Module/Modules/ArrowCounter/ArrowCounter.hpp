@@ -9,7 +9,7 @@ class ArrowCounter : public Module {
 public:
 
     ArrowCounter() : Module("Arrow Counter", "Counts how many arrows you have\nin your inventory.",
-                            R"(\Flarial\assets\arrow.png)", "") {
+                            IDR_ARROW_PNG, "") {
         Module::setup();
     };
 

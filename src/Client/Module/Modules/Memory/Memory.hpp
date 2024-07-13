@@ -10,7 +10,7 @@ class MEM : public Module {
 public:
 
 
-    MEM() : Module("Memory", "Shows your current system RAM usage.", R"(\Flarial\assets\memory.png)", "") {
+    MEM() : Module("Memory", "Shows your current system RAM usage.", IDR_MEMORY_PNG, "") {
 
         Module::setup();
     };

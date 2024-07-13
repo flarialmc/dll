@@ -9,7 +9,7 @@ class InventoryHUD : public Module {
 public:
 
     InventoryHUD() : Module("InventoryHUD", "Displays the armor you're\ncurrently wearing.",
-                        R"(\Flarial\assets\chestplate.png)", "") {
+                        IDR_CHESTPLATE_PNG, "") {
         Module::setup();
     };
 

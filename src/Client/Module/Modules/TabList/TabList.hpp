@@ -14,7 +14,7 @@ class TabList : public Module {
 
 public:
     TabList() : Module("Tab List", "Java-like tab list.\nLists the current online players on the server.",
-                       R"(\Flarial\assets\list.png)", "TAB") {
+                       IDR_LIST_PNG, "TAB") {
 
         Module::setup();
 
@@ -442,6 +442,8 @@ public:
 
                         i++;
 
+                        /*
+
                         std::string name = pair.second.name;
 
                         auto it = std::find(ModuleManager::onlineUsers.begin(), ModuleManager::onlineUsers.end(), name);
@@ -471,6 +473,7 @@ public:
                         if (it4 != ModuleManager::onlinePluses.end()) {
                             name = "[FP] " + name;
                         }
+                         */
 
                         auto module = ModuleManager::getModule("Nick");
 

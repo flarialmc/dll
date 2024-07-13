@@ -10,7 +10,7 @@ class CPSCounter : public Module {
 public:
 
 
-    CPSCounter() : Module("CPS", "Counts your Clicks per second.", R"(\Flarial\assets\cursor.png)", "") {
+    CPSCounter() : Module("CPS", "Counts your Clicks per second.", IDR_CURSOR_PNG, "") {
         Module::setup();
     };
 

@@ -9,7 +9,7 @@ class HurtColor : public Module {
 
 public:
 
-    HurtColor() : Module("Hurt Color", "Change the color when you hit entities.", R"(\Flarial\assets\hurt.png)", "") {
+    HurtColor() : Module("Hurt Color", "Change the color when you hit entities.", IDR_HURT_PNG, "") {
 
         Module::setup();
 

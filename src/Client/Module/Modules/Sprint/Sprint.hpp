@@ -10,7 +10,7 @@ class Sprint : public Module {
 public:
 
 
-    Sprint() : Module("Toggle Sprint", "Automatically sprints for you!!!", R"(\Flarial\assets\auto_sprint.png)", "SHIFT") {
+    Sprint() : Module("Toggle Sprint", "Automatically sprints for you!!!", IDR_AUTO_SPRINT_PNG, "SHIFT") {
 
         Module::setup();
 

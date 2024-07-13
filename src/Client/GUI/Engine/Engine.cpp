@@ -53,6 +53,7 @@
 #define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
 
 std::map<std::string, ID2D1Bitmap *> ImagesClass::eimages;
+std::map<int, ID2D1Bitmap *> ImagesClass::images;
 
 // TODO: release it !!!
 ID2D1Factory *FlarialGUI::factory;
@@ -511,6 +512,72 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
 
 }
 
+void FlarialGUI::LoadFont(int resourceId, LPCTSTR type) {
+    LPVOID pFontData = NULL;
+    DWORD dwFontSize = 0;
+
+    HRSRC hRes = FindResource(Client::currentModule, MAKEINTRESOURCE(resourceId), type);
+
+    HGLOBAL hResData = LoadResource(Client::currentModule, hRes);
+
+    dwFontSize = SizeofResource(Client::currentModule, hRes);
+    pFontData = LockResource(hResData);
+
+    HANDLE hFont = AddFontMemResourceEx(pFontData, dwFontSize, NULL, NULL);
+}
+
+void FlarialGUI::LoadImageFromResource(int resourceId, ID2D1Bitmap **bitmap, LPCTSTR type) {
+    IWICBitmapDecoder *pDecoder = nullptr;
+    IWICBitmapFrameDecode *pFrame = nullptr;
+    IWICStream *pStream = nullptr;
+    HRSRC imageResHandle = nullptr;
+    HGLOBAL imageResDataHandle = nullptr;
+    void *pImageFile = nullptr;
+    DWORD imageFileSize = 0;
+
+    // Locate the resource
+    imageResHandle = FindResource(Client::currentModule, MAKEINTRESOURCE(resourceId), type);
+
+    // Load the resource
+    imageResDataHandle = LoadResource(Client::currentModule, imageResHandle);
+
+    // Lock the resource to get a pointer to the image data
+    pImageFile = LockResource(imageResDataHandle);
+    imageFileSize = SizeofResource(Client::currentModule, imageResHandle);
+
+    IWICImagingFactory *imagingFactory = nullptr;
+    CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&imagingFactory));
+
+    // Create a WIC stream to map onto the memory
+    imagingFactory->CreateStream(&pStream);
+
+    // Initialize the stream with the memory pointer and size
+    pStream->InitializeFromMemory(static_cast<BYTE *>(pImageFile), imageFileSize);
+
+    // Create a decoder for the stream
+    imagingFactory->CreateDecoderFromStream(pStream, NULL, WICDecodeMetadataCacheOnLoad, &pDecoder);
+
+    // Get the first frame of the image
+    pDecoder->GetFrame(0, &pFrame);
+
+    // Convert the frame to a Direct2D bitmap
+    IWICFormatConverter *pConverter = NULL;
+    imagingFactory->CreateFormatConverter(&pConverter);
+    pConverter->Initialize(pFrame, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.0,
+                           WICBitmapPaletteTypeMedianCut);
+
+    D2D::context->CreateBitmapFromWicBitmap(pConverter, nullptr, bitmap);
+
+    if (pConverter)
+        pConverter->Release();
+    if (pDecoder)
+        pDecoder->Release();
+    if (pFrame)
+        pFrame->Release();
+    if (pStream)
+        pStream->Release();
+}
+
 void FlarialGUI::LoadImageFromFile(const wchar_t *filename, ID2D1Bitmap **bitmap) {
     // Initialize COM
     CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
@@ -755,7 +822,7 @@ void FlarialGUI::NotifyHeartbeat() {
                     Constraints::PercentageConstraint(0.01, "top") - Constraints::SpacingConstraint(0.10, rectHeight);
             float logoWidth = Constraints::RelativeConstraint(1.25);
 
-            FlarialGUI::image(R"(\Flarial\assets\logo.png)",
+            FlarialGUI::image(IDR_LOGO_PNG,
                               D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth));
 
             logoX += Constraints::SpacingConstraint(0.85, logoWidth);
@@ -841,7 +908,7 @@ void FlarialGUI::NotifyHeartbeat() {
                     Constraints::PercentageConstraint(0.01, "top") - Constraints::SpacingConstraint(0.10, rectHeight);
             float logoWidth = Constraints::RelativeConstraint(1.25);
 
-            FlarialGUI::image(R"(\Flarial\assets\logo.png)",
+            FlarialGUI::image(IDR_LOGO_PNG,
                               D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth));
 
             logoX += Constraints::SpacingConstraint(0.85, logoWidth);

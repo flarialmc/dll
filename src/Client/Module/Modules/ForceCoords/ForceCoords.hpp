@@ -10,7 +10,7 @@ class ForceCoords : public Module {
 public:
 
 
-    ForceCoords() : Module("Coordinates", "Shows your ingame position. (XYZ)", R"(\Flarial\assets\coordinates.png)",
+    ForceCoords() : Module("Coordinates", "Shows your ingame position. (XYZ)", IDR_COORDINATES_PNG,
                            "") {
 
         Module::setup();

@@ -8,7 +8,7 @@ class Hitbox : public Module {
 
 public:
 
-    Hitbox() : Module("Hitbox", "Displays hitboxes of entities", R"(\Flarial\assets\block.png)", "") {
+    Hitbox() : Module("Hitbox", "Displays hitboxes of entities", IDR_BLOCK_PNG, "") {
 
         Module::setup();
 

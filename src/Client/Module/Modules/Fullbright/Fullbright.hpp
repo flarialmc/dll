@@ -11,7 +11,7 @@ public:
 
     Fullbright() : Module("Fullbright",
                           "No need for torches!\nProvides consistent and constant illumination.\nEffectively removing darkness and shadows.",
-                          R"(\Flarial\assets\fullbright.png)", "") {
+                          IDR_FULLBRIGHT_PNG, "") {
 
         Module::setup();
 

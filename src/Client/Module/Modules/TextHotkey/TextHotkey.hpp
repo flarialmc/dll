@@ -11,7 +11,7 @@ public:
 
 
     TextHotkey() : Module("Text Hotkey", "Send something in chat with a\nclick of a button!",
-                          R"(\Flarial\assets\text-box.png)", "") {
+                          IDR_TEXT_BOX_PNG, "") {
 
         Module::setup();
 

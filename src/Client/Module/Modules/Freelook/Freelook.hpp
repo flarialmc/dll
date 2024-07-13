@@ -10,7 +10,7 @@ public:
 
     FreeLook() : Module("FreeLook",
                         "Freely move your camera in 3rd person mode\nwhile keeping the player rotation the same.",
-                        R"(\Flarial\assets\freelook.png)", "F") {
+                        IDR_FREELOOK_PNG, "F") {
 
         Module::setup();
 

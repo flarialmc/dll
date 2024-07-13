@@ -9,7 +9,7 @@ class PotCounter : public Module {
 public:
 
     PotCounter() : Module("Pot Counter", "Counts how much potions are\nin your inventory.",
-                          R"(\Flarial\assets\potion.png)", "") {
+                          IDR_POTION_PNG, "") {
 
         Module::setup();
 
