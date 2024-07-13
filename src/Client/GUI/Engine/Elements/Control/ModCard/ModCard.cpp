@@ -221,7 +221,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     if (!Client::settings.getSettingByName<bool>("noicons")->value)
         FlarialGUI::RoundedRectWithImageAndText(index, settingx2, (buttony - settingswidth) - settingsheightspac,
                                                 settingswidth, settingswidth,
-                                                mod4Col, R"(\Flarial\assets\gear.png)", iconwidth, iconwidth);
+                                                mod4Col, IDR_GEAR_PNG, iconwidth, iconwidth);
 
 
     if (iconId != -1 && images[iconId] == nullptr) {

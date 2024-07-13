@@ -282,4 +282,8 @@ namespace FlarialGUI {
     void LoadImageFromResource(int resourceId, ID2D1Bitmap **bitmap, LPCTSTR type = "PNG");
 
     void LoadFont(int resourceId, LPCTSTR type = "TTF");
+
+    void RoundedRectWithImageAndText(int index, float x, float y, const float width, const float height,
+                                     const D2D1_COLOR_F color, int iconId, const float imageWidth,
+                                     const float imageHeight);
 }
