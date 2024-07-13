@@ -322,7 +322,7 @@ public:
                     float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
                     float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
 
-                    Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.60,
+                    Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.63,
                                                                           -0.52);
 
                     FlarialGUI::PushSize(center.x, center.y, baseWidth,
