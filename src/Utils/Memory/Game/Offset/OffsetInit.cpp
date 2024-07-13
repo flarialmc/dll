@@ -91,6 +91,7 @@ void OffsetInit::init2100() {
 
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x458);
     ADD_OFFSET("RaknetConnector::getPeer", 0x298);
+    ADD_OFFSET("RakPeer::GetAveragePing", 44);
 
     ADD_OFFSET("BaseActorRenderContext::itemRenderer", 0x58);
 
@@ -210,6 +211,7 @@ void OffsetInit::init2080() {
 
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x458);
     ADD_OFFSET("RaknetConnector::getPeer", 0x298);
+    ADD_OFFSET("RakPeer::GetAveragePing", 44);
 
     ADD_OFFSET("BaseActorRenderContext::itemRenderer", 0x58);
 
@@ -329,6 +331,7 @@ void OffsetInit::init2070() {
 
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x438);
     ADD_OFFSET("RaknetConnector::getPeer", 0x278);
+    ADD_OFFSET("RakPeer::GetAveragePing", 44);
 
     ADD_OFFSET("BaseActorRenderContext::itemRenderer", 0x58);
 
@@ -448,6 +451,7 @@ void OffsetInit::init2060() {
 
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x438);
     ADD_OFFSET("RaknetConnector::getPeer", 0x278);
+    ADD_OFFSET("RakPeer::GetAveragePing", 44);
 
     ADD_OFFSET("BaseActorRenderContext::itemRenderer", 0x58);
 
@@ -566,6 +570,7 @@ void OffsetInit::init2050() {
 
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x438);
     ADD_OFFSET("RaknetConnector::getPeer", 0x278);
+    ADD_OFFSET("RakPeer::GetAveragePing", 42);
 
     ADD_OFFSET("BaseActorRenderContext::itemRenderer", 0x58);
 
@@ -685,6 +690,7 @@ void OffsetInit::init2040() {
 
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x438);
     ADD_OFFSET("RaknetConnector::getPeer", 0x278);
+    ADD_OFFSET("RakPeer::GetAveragePing", 42);
 
     ADD_OFFSET("BaseActorRenderContext::itemRenderer", 0x58);
 
@@ -803,6 +809,7 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x438);
     ADD_OFFSET("RaknetConnector::getPeer", 0x278);
+    ADD_OFFSET("RakPeer::GetAveragePing", 42);
 
     ADD_OFFSET("BaseActorRenderContext::itemRenderer", 0x58);
 

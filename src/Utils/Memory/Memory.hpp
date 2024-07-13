@@ -153,4 +153,8 @@ public:
 
         return relRipBytes;
     }
+
+    static inline uintptr_t GetAddressByIndex(uintptr_t vtable, int index) {
+        return (*reinterpret_cast<uintptr_t*>(vtable + 8 * index));
+    }
 };

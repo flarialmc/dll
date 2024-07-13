@@ -5,8 +5,12 @@
 #include <filesystem>
 #include <fstream>
 
-//not updated
 void RaknetTickHook::callback(RaknetConnector *raknet) {
+    if(getAveragePingOriginal == nullptr) {
+        uintptr_t getAveragePingAddr = Memory::GetAddressByIndex(raknet->peer->vTable, GET_OFFSET("RakPeer::GetAveragePing"));
+        Memory::hookFunc((void *) getAveragePingAddr, (void*)getAveragePingCallback,
+                         (void **) &getAveragePingOriginal, "RakPeer::GetAveragePing");
+    }
     raknetTickOriginal(raknet);
     if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
@@ -16,6 +20,11 @@ void RaknetTickHook::callback(RaknetConnector *raknet) {
     }
 }
 
+__int64 RaknetTickHook::getAveragePingCallback(RakPeer *_this, void *guid) {
+    auto avgPing = getAveragePingOriginal(_this, guid);
+    SDK::serverPing = avgPing;
+    return avgPing;
+}
 
 void RaknetTickHook::enableHook() {
     this->autoHook((void *) callback, (void **) &raknetTickOriginal);

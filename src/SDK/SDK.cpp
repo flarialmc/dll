@@ -7,6 +7,8 @@ ClientInstance *SDK::clientInstance = nullptr;
 ScreenView *SDK::screenView = nullptr;
 std::string SDK::currentScreen;
 bool SDK::hasInstanced = false;
+__int64 SDK::serverPing = 0;
+
 std::chrono::steady_clock::time_point SDK::lastSetCurrentScreenTime;
 
 std::shared_ptr<Packet> SDK::createPacket(int id) {
@@ -38,7 +40,7 @@ int SDK::getServerPing() {
                 if (SDK::clientInstance->getRakNetConnector()->JoinedIp.empty()) {
                     return 0;
                 } else {
-                    return SDK::clientInstance->getRakNetConnector()->getPing();
+                    return (int)SDK::serverPing;
                 }
             }
         }
@@ -54,9 +56,11 @@ std::string SDK::getServerIP() {
                 ip = SDK::clientInstance->getRakNetConnector()->JoinedIp;
                 if (!ip.empty()) {
                     return ip;
+                } else{
+                    return "world";
                 }
             }
         }
     }
-    return "world";
+    return "none";
 }
