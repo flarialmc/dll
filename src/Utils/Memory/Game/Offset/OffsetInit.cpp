@@ -32,8 +32,6 @@ void OffsetInit::init2100() {
     ADD_OFFSET("Actor::hurtTime", 0x20C); // ?hurtEffects@Mob@@UEAAXAEBVActorDamageSource@@M_N1@Z Mob::hurtEffects 2nd after Actor::getHealth(void)
     ADD_OFFSET("Actor::level", 0x250);
     ADD_OFFSET("Actor::categories", 0x288);
-    ADD_OFFSET("Actor::aabb", 0x298);
-    ADD_OFFSET("Actor::stateVector", 0x298);
     ADD_OFFSET("Actor::baseTickVft", 26);
 
     ADD_OFFSET("Gamemode::player", 0x8);
@@ -152,8 +150,6 @@ void OffsetInit::init2080() {
     ADD_OFFSET("Actor::hurtTime", 0x214); // ?hurtEffects@Mob@@UEAAXAEBVActorDamageSource@@M_N1@Z Mob::hurtEffects 2nd after Actor::getHealth(void)
     ADD_OFFSET("Actor::level", 0x258);
     ADD_OFFSET("Actor::categories", 0x290);
-    ADD_OFFSET("Actor::aabb", 0x2A0);
-    ADD_OFFSET("Actor::stateVector", 0x298);
     ADD_OFFSET("Actor::baseTickVft", 26);
 
     ADD_OFFSET("Gamemode::player", 0x8);
@@ -272,8 +268,6 @@ void OffsetInit::init2070() {
     ADD_OFFSET("Actor::hurtTime", 0x214); // ?hurtEffects@Mob@@UEAAXAEBVActorDamageSource@@M_N1@Z Mob::hurtEffects 2nd after Actor::getHealth(void)
     ADD_OFFSET("Actor::level", 0x258);
     ADD_OFFSET("Actor::categories", 0x290);
-    ADD_OFFSET("Actor::aabb", 0x2A0);
-    ADD_OFFSET("Actor::stateVector", 0x298);
     ADD_OFFSET("Actor::baseTickVft", 29);
 
     ADD_OFFSET("Gamemode::player", 0x8);
@@ -392,8 +386,6 @@ void OffsetInit::init2060() {
     ADD_OFFSET("Actor::hurtTime", 0x234);
     ADD_OFFSET("Actor::level", 0x290);
     ADD_OFFSET("Actor::categories", 0x2C8);
-    ADD_OFFSET("Actor::aabb", 0x2D8);
-    ADD_OFFSET("Actor::stateVector", 0x2D0);
     ADD_OFFSET("Actor::baseTickVft", 30);
 
     ADD_OFFSET("Gamemode::player", 0x8);
@@ -515,8 +507,6 @@ void OffsetInit::init2050() {
     ADD_OFFSET("Actor::hurtTime", 0x22C);
     ADD_OFFSET("Actor::level", 0x288);
     ADD_OFFSET("Actor::categories", 0x2C0);
-    ADD_OFFSET("Actor::aabb", 0x2D0);
-    ADD_OFFSET("Actor::stateVector", 0x2C8);
     ADD_OFFSET("Actor::baseTickVft", 30);
 
     ADD_OFFSET("Gamemode::player", 0x8);
@@ -635,8 +625,6 @@ void OffsetInit::init2040() {
     ADD_OFFSET("Actor::hurtTime", 0x204);
     ADD_OFFSET("Actor::level", 0x260);
     ADD_OFFSET("Actor::categories", 0x298);
-    ADD_OFFSET("Actor::aabb", 0x2A8);
-    ADD_OFFSET("Actor::stateVector", 0x2A0);
     ADD_OFFSET("Actor::baseTickVft", 30);
 
     ADD_OFFSET("Gamemode::player", 0x8);
@@ -754,8 +742,6 @@ void OffsetInit::init2030() {
     ADD_OFFSET("Actor::hurtTime", 0x22C);
     ADD_OFFSET("Actor::level", 0x260);
     ADD_OFFSET("Actor::categories", 0x298);
-    ADD_OFFSET("Actor::aabb", 0x2A8);
-    ADD_OFFSET("Actor::stateVector", 0x2A0);
     ADD_OFFSET("Actor::baseTickVft", 44);
 
     ADD_OFFSET("Gamemode::player", 0x8);
@@ -777,7 +763,7 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("Minecraft::timer", 0xD8);
 
-    ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x190);
+    ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x188);
 
     ADD_OFFSET("Option::optionInformation", 0x8);
     ADD_OFFSET("Option::value", 0x10);

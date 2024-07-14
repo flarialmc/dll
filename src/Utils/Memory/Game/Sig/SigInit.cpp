@@ -16,6 +16,10 @@ void SigInit::init2120() {
     ADD_SIG("ScreenView::setupAndRender", "? ? ? ? ? ? ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B FA 48 89");
     ADD_SIG("Font::drawTransformed", "48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 48 89 78 ? 41 54 41 56 41 57 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78"); // wrong
 
+    ADD_SIG("Actor::getActorGameTypeComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA DE AB CB AF");
+    ADD_SIG("Actor::getAABBShapeComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA F2 C9 10 1B");
+    ADD_SIG("Actor::getStateVectorComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 91 3C C9 0E");
+
     // AutoGG, AutoRQ, DiscordRPC ...
     ADD_SIG("LoopbackPacketSender::sendPacket", "48 83 EC ? 48 0F BE ? ? 48 83 C0 ? 74 27");
     ADD_SIG("MinecraftPackets::createPacket", "40 53 48 83 EC ? 45 33 C0 48 8B D9 81 FA");
@@ -107,6 +111,10 @@ void SigInit::init2100() {
 
     ADD_SIG("ScreenView::setupAndRender", "? ? ? ? ? ? ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B FA 48 89");
     ADD_SIG("Font::drawTransformed", "48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 48 89 78 ? 41 54 41 56 41 57 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78"); // wrong
+
+    ADD_SIG("Actor::getActorGameTypeComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA DE AB CB AF");
+    ADD_SIG("Actor::getAABBShapeComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA F2 C9 10 1B");
+    ADD_SIG("Actor::getStateVectorComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 91 3C C9 0E");
 
     // AutoGG, AutoRQ, DiscordRPC ...
     ADD_SIG("LoopbackPacketSender::sendPacket", "48 83 EC ? 48 0F BE ? ? 48 83 C0 ? 74 27");
@@ -200,6 +208,10 @@ void SigInit::init2080() {
     ADD_SIG("ScreenView::setupAndRender", "? ? ? ? ? ? ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B FA 48 89");
     ADD_SIG("Font::drawTransformed", "48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 48 89 78 ? 41 54 41 56 41 57 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78");
 
+    ADD_SIG("Actor::getActorGameTypeComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA DE AB CB AF");
+    ADD_SIG("Actor::getAABBShapeComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA F2 C9 10 1B");
+    ADD_SIG("Actor::getStateVectorComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 91 3C C9 0E");
+
     // AutoGG, AutoRQ, DiscordRPC ...
     ADD_SIG("LoopbackPacketSender::sendPacket", "48 83 EC ? 48 0F BE ? ? 48 83 C0 ? 74 27");
     ADD_SIG("MinecraftPackets::createPacket", "40 53 48 83 EC 30 45 33 C0 48 8B D9 FF CA 81 FA ? ? ? ? 0F 87 ? ? ? ? 48 63 C2 48 8D 0D ? ? ? ? 0F B6 84 01 ? ? ? ? 8B 94 81 ? ? ? ? 48 03 D1");
@@ -290,6 +302,10 @@ void SigInit::init2070() {
 
     ADD_SIG("ScreenView::setupAndRender", "? ? ? ? ? ? ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B FA 48 89 54 24 ? 4C 8B E9 48 89 4C 24");
     ADD_SIG("Font::drawTransformed", "48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 48 89 78 ? 41 54 41 56 41 57 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78");
+
+    ADD_SIG("Actor::getActorGameTypeComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA DE AB CB AF");
+    ADD_SIG("Actor::getAABBShapeComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA F2 C9 10 1B");
+    ADD_SIG("Actor::getStateVectorComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 91 3C C9 0E");
 
     // AutoGG, AutoRQ, DiscordRPC ...
     ADD_SIG("LoopbackPacketSender::sendPacket", "48 83 EC ? 48 0F BE ? ? 48 83 C0 ? 74 27");
@@ -384,6 +400,10 @@ void SigInit::init2060() {
     ADD_SIG("ScreenView::setupAndRender", "48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B FA 48 89 54 24 ? 4C 8B E9 48 89 4C 24");
     ADD_SIG("Font::drawTransformed", "48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 48 89 78 ? 41 54 41 56 41 57 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78");
 
+    ADD_SIG("Actor::getActorGameTypeComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA DE AB CB AF");
+    ADD_SIG("Actor::getAABBShapeComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA F2 C9 10 1B");
+    ADD_SIG("Actor::getStateVectorComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 91 3C C9 0E");
+
     // AutoGG, AutoRQ, DiscordRPC ...
     ADD_SIG("LoopbackPacketSender::sendPacket", "48 83 EC ? 48 0F BE ? ? 48 83 C0 ? 74 27");
     ADD_SIG("MinecraftPackets::createPacket", "40 53 48 83 EC 30 45 33 C0 48 8B D9 FF CA 81 FA ? ? ? ? 0F 87 ? ? ? ? 48 63 C2 48 8D 0D ? ? ? ? 0F B6 84 01 ? ? ? ? 8B 94 81 ? ? ? ? 48 03 D1");
@@ -475,6 +495,10 @@ void SigInit::init2050() {
 
     ADD_SIG("ScreenView::setupAndRender", "48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B FA 48 89 54 24 ? 4C 8B E9 48 89 4C 24");
     ADD_SIG("Font::drawTransformed", "48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 48 89 78 ? 41 54 41 56 41 57 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78");
+
+    ADD_SIG("Actor::getActorGameTypeComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA DE AB CB AF");
+    ADD_SIG("Actor::getAABBShapeComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA F2 C9 10 1B");
+    ADD_SIG("Actor::getStateVectorComponent", "48 89 5C 24 ? 57 48 83 EC ? 48 8B DA BA 91 3C C9 0E");
 
     // AutoGG, AutoRQ, DiscordRPC ...
     ADD_SIG("LoopbackPacketSender::sendPacket", "48 83 EC ? 48 0F BE ? ? 48 83 C0 ? 74 27");
@@ -568,6 +592,10 @@ void SigInit::init2040() {
     ADD_SIG("ScreenView::setupAndRender", "48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B FA 48 89 54 24 ? 4C 8B E9 48 89 4C 24");
     ADD_SIG("Font::drawTransformed", "48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 48 89 78 ? 41 54 41 56 41 57 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78");
 
+    ADD_SIG("Actor::getActorGameTypeComponent", "40 53 48 83 EC ? 48 8B DA BA DE AB CB AF");
+    ADD_SIG("Actor::getAABBShapeComponent", "40 53 48 83 EC ? 48 8B DA BA F2 C9 10 1B");
+    ADD_SIG("Actor::getStateVectorComponent", "40 53 48 83 EC ? 48 8B DA BA 91 3C C9 0E");
+
     // AutoGG, AutoRQ, DiscordRPC ...
     ADD_SIG("LoopbackPacketSender::sendPacket", "48 83 EC ? 48 0F BE ? ? 48 83 C0 ? 74 27");
     ADD_SIG("MinecraftPackets::createPacket", "40 53 48 83 EC 30 45 33 C0 48 8B D9 FF CA 81 FA ? ? ? ? 0F 87 ? ? ? ? 48 63 C2 48 8D 0D ? ? ? ? 0F B6 84 01 ? ? ? ? 8B 94 81 ? ? ? ? 48 03 D1");
@@ -660,6 +688,10 @@ void SigInit::init2030() {
     ADD_SIG("ScreenView::setupAndRender", "48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B FA 48 89 54 24 ? 4C 8B E9 48 89 4C 24");
     ADD_SIG("Font::drawTransformed", "48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 48 89 78 ? 41 54 41 56 41 57 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78");
 
+    ADD_SIG("Actor::getActorGameTypeComponent", "40 53 48 83 EC 20 48 8B DA BA DE AB CB AF");
+    ADD_SIG("Actor::getAABBShapeComponent", "40 53 48 83 EC 20 48 8B DA BA F2 C9 10 1B");
+    ADD_SIG("Actor::getStateVectorComponent", "40 53 48 83 EC 20 48 8B DA BA 91 3C C9 0E");
+
     // AutoGG, AutoRQ, DiscordRPC ...
     ADD_SIG("LoopbackPacketSender::sendPacket", "48 89 5C 24 ? 57 48 83 EC 20 48 8B D9 48 8B FA 48 8B 49 20 E8 ? ? ? ? 4C 8B 03 48 8B D7");
     ADD_SIG("MinecraftPackets::createPacket", "40 53 48 83 EC 30 45 33 C0 48 8B D9 FF CA 81 FA ? ? ? ? 0F 87 ? ? ? ? 48 63 C2 48 8D 0D ? ? ? ? 0F B6 84 01 ? ? ? ? 8B 94 81 ? ? ? ? 48 03 D1");
@@ -676,7 +708,7 @@ void SigInit::init2030() {
     ADD_SIG("LevelRendererPlayer::getFov", "48 8B ? 48 89 ? ? 48 89 ? ? 57 48 81 EC ? ? ? ? 0F 29 ? ? 0F 29 ? ? 44 0F ? ? ? 44 0F ? ? ? 48 8B ? ? ? ? ? 48 33 ? 48 89 ? ? ? 41 0F");
 
     // Zoom
-    ADD_SIG("Options::getSensitivity", "48 83 EC 28 80 B9 88 14 00 00 00 48 8D 54 24 30 48 8B 01 48 8B 40 60 74 38 41 B8 17 01 00 00");
+    ADD_SIG("Options::getSensitivity", "4C 8B 51 20 49 B9");
 
     // Fullbright
     ADD_SIG("Options::getGamma", "48 83 EC 28 80 B9 88 14 00 00 00 48 8D 54 24 30 48 8B 01 48 8B 40 60 74 38 41 B8 17 01 00 00");
@@ -715,7 +747,7 @@ void SigInit::init2030() {
 
     // Hitboxes
     ADD_SIG("Actor::getRenderPositionComponent", "40 53 48 83 EC ? 48 8B DA BA 6E F3 E8 D4");
-    ADD_SIG("Actor::canSee", "E8 ? ? ? ? 84 C0 74 1C 48 8B 4F 48"); // Hitboxes
+    ADD_SIG("Actor::canSee", "48 89 5C 24 20 56 48 81 EC 00"); // Hitboxes
 
     // onTick event
     ADD_SIG("Actor::baseTick", "48 8D 05 ? ? ? ? 48 89 01 B8 ? ? ? ? 8D 50 FA 44 8D 48 ? 44 8D 40 ? 66 89 44 ? ? E8 ? ? ? ? 48 8B 8B");
@@ -732,7 +764,7 @@ void SigInit::init2030() {
 
     // Tablist
     ADD_SIG("Actor::getNametag", "48 83 EC ? 48 8B 81 ? ? ? ? 48 85 C0 74 3B 48 8B 08 BA ? ? ? ? 48 8B 40 ? 48 2B C1 48 C1 F8 ? 66 3B D0 73 17");
-    ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 D8 1C 00 00");
+    ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 D8");
 
     ADD_SIG("baseActorRenderContext", "48 89 ? ? ? 48 89 ? ? ? 48 89 ? ? ? 48 89 ? ? ? 57 48 83 EC ? 49 8B ? 48 8B ? 48 8B ? 48 8D ? ? ? ? ? 48 89 ? 33 ED");
 

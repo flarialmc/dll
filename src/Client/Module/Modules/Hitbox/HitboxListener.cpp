@@ -20,7 +20,7 @@ void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
             if (ent->hasCategory(ActorCategory::Player))
                 mod = 1.6f;
 
-            auto& aabbSize = ent->getaabb()->size;
+            auto& aabbSize = ent->getAABBShapeComponent()->size;
             auto& renderPos = ent->getRenderPositionComponent()->renderPos;
             auto lower = renderPos.sub(aabbSize.x / 2.f, mod, aabbSize.x / 2.f), upper = lower.add(aabbSize.x, aabbSize.y, aabbSize.x);
 

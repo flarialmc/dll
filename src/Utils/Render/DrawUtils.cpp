@@ -174,7 +174,7 @@ void DrawUtils::addEntityBox(Actor* ent, float lineWidth, D2D_COLOR_F color) {
                                                          (float) SDK::clientInstance->getLocalPlayer()->getRenderPositionComponent()->renderPos.dist(
                                                                  end)));
 
-    auto aabb = ent->getaabb()->aabb;
+    auto aabb = ent->getAABBShapeComponent()->aabb;
 
     DrawUtils::addBox(aabb.lower, aabb.upper, lineWidth, 1, color);
 }

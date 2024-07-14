@@ -12,6 +12,8 @@
 #include "Components/RenderPositionComponent.hpp"
 #include "Components/ActorEquipmentComponent.h"
 #include "EntityContext.hpp"
+#include "Components/ActorGameTypeComponent.hpp"
+#include "Components/AABBShapeComponent.hpp"
 
 
 enum ActorFlags {
@@ -166,10 +168,7 @@ enum class ActorCategory {
 
 class Level;
 
-struct AABBShapeComponent {
-    AABB aabb;
-    Vec2<float> size;
-};
+
 
 class Actor {
 public:
@@ -178,8 +177,6 @@ public:
     BUILD_ACCESS(this, int16_t, hurtTime, GET_OFFSET("Actor::hurtTime"));
     BUILD_ACCESS(this, Level*, level, GET_OFFSET("Actor::level"));
     BUILD_ACCESS(this, ActorCategory, categories, GET_OFFSET("Actor::categories"));
-    BUILD_ACCESS(this, AABBShapeComponent*, aabb, GET_OFFSET("Actor::aabb"));
-    BUILD_ACCESS(this, StateVectorComponent*, stateVector, GET_OFFSET("Actor::stateVector"));
 
     template<typename Component>
     Component *tryGet(uintptr_t addr);
@@ -213,4 +210,10 @@ public:
     SimpleContainer *getArmorContainer();
 
     SimpleContainer *getOffhandContainer();
+
+    ActorGameTypeComponent *getGameModeType();
+
+    AABBShapeComponent *getAABBShapeComponent();
+
+    StateVectorComponent *getStateVectorComponent();
 };
