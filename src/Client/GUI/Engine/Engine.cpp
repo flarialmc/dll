@@ -512,18 +512,36 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
 
 }
 
-void FlarialGUI::LoadFont(int resourceId, LPCTSTR type) {
+void FlarialGUI::LoadFont(int resourceId) {
     LPVOID pFontData = NULL;
     DWORD dwFontSize = 0;
 
-    HRSRC hRes = FindResource(Client::currentModule, MAKEINTRESOURCE(resourceId), type);
+    HRSRC hRes = FindResource(Client::currentModule, MAKEINTRESOURCE(resourceId), RT_RCDATA);
+    if (hRes == NULL)
+        return;
 
     HGLOBAL hResData = LoadResource(Client::currentModule, hRes);
+    if (hResData == NULL)
+        return;
+
+    pFontData = LockResource(hResData);
+    if (pFontData == NULL)
+        return;
 
     dwFontSize = SizeofResource(Client::currentModule, hRes);
-    pFontData = LockResource(hResData);
 
-    HANDLE hFont = AddFontMemResourceEx(pFontData, dwFontSize, NULL, NULL);
+    std::string lpFileName = Utils::getRoamingPath() + "\\Flarial\\assets\\" + std::to_string(resourceId) + ".ttf";
+
+    std::ofstream outFile(lpFileName, std::ios::binary);
+    if (!outFile) {
+        return;
+    }
+
+    // Write the font data directly as binary
+    outFile.write(reinterpret_cast<const char*>(pFontData), dwFontSize);
+    outFile.close();
+
+    AddFontResource(lpFileName.c_str());
 }
 
 void FlarialGUI::LoadImageFromResource(int resourceId, ID2D1Bitmap **bitmap, LPCTSTR type) {

@@ -64,9 +64,9 @@ IDR_TRANSPARENT_PNG      PNG "Data\\transparent.png"
 IDR_UPSIDE_DOWN_PNG      PNG "Data\\upside-down.png"
 
 // TTF Resources
-IDR_FONT_TTF             TTF "Data\\Fonts\\font.ttf"
-IDR_FONT_BOLD_TTF        TTF "Data\\Fonts\\font_bold.ttf"
-IDR_MINECRAFTIA_TTF      TTF "Data\\Fonts\\minecraftia.ttf"
+IDR_FONT_TTF             RCDATA "Data\\Fonts\\font.ttf"
+IDR_FONT_BOLD_TTF        RCDATA "Data\\Fonts\\font_bold.ttf"
+IDR_MINECRAFTIA_TTF      RCDATA "Data\\Fonts\\minecraftia.ttf"
 
 // JPG Resources
 IDR_PATAR_JPG            JPG "Data\\patar.jpg"
