@@ -10,7 +10,7 @@ class WeatherChanger : public Module {
 public:
 
 
-    WeatherChanger() : Module("Weather Changer", "Changes the weather ingame.", R"(\Flarial\assets\cloudy.png)", "") {
+    WeatherChanger() : Module("Weather Changer", "Changes the weather ingame.", IDR_CLOUDY_PNG, "") {
 
         Module::setup();
 

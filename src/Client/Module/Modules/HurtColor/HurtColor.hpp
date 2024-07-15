@@ -9,7 +9,7 @@ class HurtColor : public Module {
 
 public:
 
-    HurtColor() : Module("Hurt Color", "Change the color when you hit entities.", R"(\Flarial\assets\hurt.png)", "") {
+    HurtColor() : Module("Hurt Color", "Change the color when you hit entities.", IDR_HURT_PNG, "") {
 
         Module::setup();
 
@@ -46,7 +46,6 @@ public:
         FlarialGUI::ColorPicker(0, x + FlarialGUI::SettingsTextWidth("Color "),
                                 y - Constraints::SpacingConstraint(0.017, textWidth),
                                 settings.getSettingByName<std::string>("color")->value,
-                                settings.getSettingByName<float>("colorOpacity")->value,
                                 settings.getSettingByName<bool>("color_rgb")->value);
 
         FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("color")->value,

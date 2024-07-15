@@ -17,7 +17,7 @@ class FPSListener : public Listener {
 
         if (module->isEnabled()) {
 
-            int fps = (int)round((MC::fps *
+            int fps = (int)round(((float)MC::fps *
                     round(module->settings.getSettingByName<float>(
                             "fpsSpoofer")->value)));
 

@@ -36,7 +36,7 @@ void Module::normalRender(int index, std::string &value) {
     std::string search = "{VALUE}";
 
     for (char c: text) {
-        uppercaseSentence += std::toupper(c);
+        uppercaseSentence += (char)std::toupper(c);
     }
 
     size_t pos = uppercaseSentence.find(search);
@@ -135,7 +135,7 @@ void Module::normalRender(int index, std::string &value) {
                                                                                            textHeight *
                                                                                            this->settings.getSettingByName<float>(
                                                                                                    "rectheight")->value /
-                                                                                           2.0);
+                                                                                           2.0f);
 
         D2D1_MATRIX_3X2_F rotationMatrix = D2D1::Matrix3x2F::Rotation(rotation, rotationCenter);
         D2D::context->SetTransform(rotationMatrix);
@@ -147,8 +147,7 @@ void Module::normalRender(int index, std::string &value) {
                                                            realcenter.y + (textHeight) *
                                                                           this->settings.getSettingByName<float>(
                                                                                   "rectheight")->value), rounde.x,
-                                               rounde.x),
-                             Client::settings.getSettingByName<float>("blurintensity")->value);
+                                               rounde.x));
 
     FlarialGUI::RoundedRect(
             realcenter.x + textMetrics.left,

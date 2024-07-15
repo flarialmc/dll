@@ -1,6 +1,5 @@
 #include "GameModeAttack.hpp"
 #include "../../../Events/EventHandler.hpp"
-#include "../../../../SDK/SDK.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void GameModeAttackHook::callback(Gamemode *gamemode, Actor *actor) {

@@ -8,7 +8,6 @@
 #include "../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
 #include "../../../Module/Modules/MotionBlur/MotionBlurListener.hpp"
 #include "../../../Module/Manager.hpp"
-#include "../../../Module/Modules/GuiScale/GuiScaleListener.hpp"
 #include "../../../GUI/Engine/Elements/Structs/ImagesClass.hpp"
 
 void ResizeHook::enableHook() {
@@ -69,10 +68,16 @@ void ResizeHook::cleanShit(bool isResize) {
     MotionBlurListener::previousFrames.clear();
 
     for (auto &i: ImagesClass::eimages) {
-
         Memory::SafeRelease(i.second);
-
     }
+
+    ImagesClass::eimages.clear();
+
+    for (auto &i: ImagesClass::images) {
+        Memory::SafeRelease(i.second);
+    }
+
+    ImagesClass::images.clear();
 
     //for (auto& i : FlarialGUI::brushCache) {
     //	ID2D1SolidColorBrush* brush = i.second.get();
@@ -95,8 +100,6 @@ void ResizeHook::cleanShit(bool isResize) {
 
     FlarialGUI::textFormatCache.clear();
     FlarialGUI::textLayoutCache.clear();
-
-    ImagesClass::eimages.clear();
 
     if (SwapchainHook::init && SwapchainHook::d3d11On12Device != nullptr) {
 

@@ -14,7 +14,7 @@ class TabList : public Module {
 
 public:
     TabList() : Module("Tab List", "Java-like tab list.\nLists the current online players on the server.",
-                       R"(\Flarial\assets\list.png)", "TAB") {
+                       IDR_LIST_PNG, "TAB") {
 
         Module::setup();
 
@@ -177,7 +177,6 @@ public:
         FlarialGUI::ColorPicker(0, toggleX + FlarialGUI::SettingsTextWidth("Background "),
                                 toggleY - Constraints::SpacingConstraint(0.017, textWidth),
                                 settings.getSettingByName<std::string>("bgColor")->value,
-                                settings.getSettingByName<float>("bgOpacity")->value,
                                 settings.getSettingByName<bool>("bgRGB")->value);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
@@ -188,7 +187,6 @@ public:
                                         DWRITE_FONT_WEIGHT_NORMAL);
         FlarialGUI::ColorPicker(1, toggleX + FlarialGUI::SettingsTextWidth("Text "), toggleY * 0.99f,
                                 settings.getSettingByName<std::string>("textColor")->value,
-                                settings.getSettingByName<float>("textOpacity")->value,
                                 settings.getSettingByName<bool>("textRGB")->value);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
@@ -199,7 +197,6 @@ public:
                                         DWRITE_FONT_WEIGHT_NORMAL);
         FlarialGUI::ColorPicker(2, toggleX + FlarialGUI::SettingsTextWidth("Border "), toggleY * 0.99f,
                                 settings.getSettingByName<std::string>("borderColor")->value,
-                                settings.getSettingByName<float>("borderOpacity")->value,
                                 settings.getSettingByName<bool>("borderRGB")->value);
 
         FlarialGUI::UnsetScrollView();
@@ -235,7 +232,6 @@ public:
                     if (i3 % 10 == 1) {
                         i2 += 4.85;
                     }
-
                 }
 
                 Vec2<float> realcenter;
@@ -256,7 +252,6 @@ public:
                 for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap()) {
 
                     i3++;
-
                     if (i3 % 10 == 1) {
                         i2 += 4.85;
                         count++;
@@ -266,7 +261,6 @@ public:
                             fixer += ((5.f * keycardSize) / 2.0f);
                         }
                     }
-
                 }
 
                 Vec2<float> rounde = Constraints::RoundingConstraint(
@@ -316,8 +310,7 @@ public:
                     if (settings.getSettingByName<bool>("BlurEffect")->value)
                         FlarialGUI::BlurRect(D2D1::RoundedRect(
                                                      D2D1::RectF(fakex, realcenter.y, fakex + (i2 * keycardSize),
-                                                                 realcenter.y + (7.5 * keycardSize)), rounde.x, rounde.x),
-                                             Client::settings.getSettingByName<float>("blurintensity")->value);
+                                                                 realcenter.y + (7.5f * keycardSize)), rounde.x, rounde.x));
                 if (this->settings.getSettingByName<bool>("border")->value) {
                     FlarialGUI::RoundedHollowRect(fakex, realcenter.y, Constraints::RelativeConstraint(
                                                           (this->settings.getSettingByName<float>("borderWidth")->value *
@@ -360,6 +353,8 @@ public:
                         }
 
                         float xx = 0;
+
+                        /*
 
                         if (it != ModuleManager::onlineUsers.end()) {
                             FlarialGUI::image(R"(\Flarial\assets\logo.png)",
@@ -423,6 +418,8 @@ public:
 
                         }
 
+                        */
+
                         FlarialGUI::FlarialTextWithFont(fakex + xx + Constraints::SpacingConstraint(0.5, keycardSize),
                                                         realcenter.y +
                                                         Constraints::SpacingConstraint(0.12, keycardSize),
@@ -444,6 +441,8 @@ public:
                     for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap()) {
 
                         i++;
+
+                        /*
 
                         std::string name = pair.second.name;
 
@@ -474,6 +473,7 @@ public:
                         if (it4 != ModuleManager::onlinePluses.end()) {
                             name = "[FP] " + name;
                         }
+                         */
 
                         auto module = ModuleManager::getModule("Nick");
 

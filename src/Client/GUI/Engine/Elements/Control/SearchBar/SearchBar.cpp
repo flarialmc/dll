@@ -172,7 +172,7 @@ std::string ClickGUIElements::SearchBar(int index, std::string &text, int limit,
 
             }
 
-            FlarialGUI::image(R"(\Flarial\assets\search.png)",
+            FlarialGUI::image(IDR_SEARCH_PNG,
                               D2D1::RectF((x - textWidth) + Constraints::RelativeConstraint(0.245, "height") / 2.0f,
                                           y + Constraints::RelativeConstraint(0.245, "height") / 2.0f,
                                           ((x - textWidth) +

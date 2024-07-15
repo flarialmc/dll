@@ -12,17 +12,18 @@
 #include "../../GUI/Engine/Engine.hpp"
 #include "../../GUI/Engine/Constraints.hpp"
 #include "../../../SDK/SDK.hpp"
+#include "../../../Assets/Assets.hpp"
 
 class Module {
 public:
     std::string name;
     std::string description;
-    std::string icon;
+    int icon;
     std::string defaultKeybind;
     Settings settings;
     std::string settingspath;
 
-    Module(const std::string &ename, const std::string &edescription, const std::string &eicon, const std::string& ekey) {
+    Module(const std::string &ename, const std::string &edescription, int eicon, const std::string& ekey) {
         name = ename;
         description = edescription;
         icon = eicon;
@@ -148,7 +149,7 @@ public:
         settings.getSettingByName<bool>("enabled")->value = enabled;
     }
 
-    void setKeybind(std::string newKeybind) {
+    void setKeybind(const std::string& newKeybind) {
         auto key = settings.getSettingByName<std::string>("keybind");
         if(key == nullptr)
             settings.addSetting("keybind", newKeybind);
@@ -243,12 +244,14 @@ public:
         if(name!="ClickGUI")
             if (FlarialGUI::inMenu) return false;
         if (SDK::currentScreen == "chat_screen") return false;
-        for (TextBoxStruct &i: FlarialGUI::TextBoxes) if (i.isActive) return false;
+        bool allInactive = std::ranges::all_of(FlarialGUI::TextBoxes, [](const TextBoxStruct& i) {
+            return !i.isActive;
+        });
         // All keys in the keybind are being held down
-        return true;
+        return allInactive;
     }
 
-    bool isAdditionalKeybind(const std::array<bool, 256> &keys, const std::string& bind) {
+    [[nodiscard]] bool isAdditionalKeybind(const std::array<bool, 256> &keys, const std::string& bind) const {
         std::vector<int> keyCodes = Utils::getStringAsKeys(bind);
 
         for (int keyCode: keyCodes) {
@@ -261,9 +264,11 @@ public:
         if(name!="ClickGUI")
             if (FlarialGUI::inMenu) return false;
         if (SDK::currentScreen == "chat_screen") return false;
-        for (TextBoxStruct &i: FlarialGUI::TextBoxes) if (i.isActive) return false;
+        bool allInactive = std::ranges::all_of(FlarialGUI::TextBoxes, [](const TextBoxStruct& i) {
+            return !i.isActive;
+        });
         // All keys in the keybind are being held down
-        return true;
+        return allInactive;
     }
 
     bool isKeyPartOfKeybind(int keyCode) {

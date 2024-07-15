@@ -15,5 +15,4 @@ struct DropdownStruct {
     bool curColorDone = false;
     float yChilds = 0.0f;
     bool offsettedQ = false;
-    float offsetted = 0.0f;
 };

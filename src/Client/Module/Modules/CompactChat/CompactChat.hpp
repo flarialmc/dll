@@ -11,7 +11,7 @@ public:
 
 
     CompactChat() : Module("Compact Chat", "Tired of spammers? Try this out!\nPuts repeated messages into 1 message.",
-                           R"(\Flarial\assets\block_break_indicator.png)", "") {
+                           IDR_BLOCK_BREAK_INDICATOR_PNG, "") {
 
         Module::setup();
 

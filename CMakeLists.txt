@@ -7,6 +7,37 @@ set(CMAKE_CXX_STANDARD 23)
 
 if(MSVC)
     add_compile_options(/MT)
+
+    # Optimize for speed
+    add_compile_options($<$<CONFIG:Release>:/O2>)
+    add_compile_options($<$<CONFIG:Release>:/Ot>)
+    add_compile_options($<$<CONFIG:Release>:/Ox>)
+    add_compile_options($<$<CONFIG:Release>:/Oy>)
+
+    # Enable intrinsic functions
+    add_compile_options($<$<CONFIG:Release>:/Oi>)
+
+    # Enable link-time code generation for whole program optimization
+    add_compile_options($<$<CONFIG:Release>:/GL>)
+
+    # Separate functions for the linker to improve the optimization process
+    add_compile_options($<$<CONFIG:Release>:/Gy>)
+
+    # Optimize global data to reduce the binary size
+    add_compile_options($<$<CONFIG:Release>:/Gw>)
+
+    # Enable string pooling to reduce binary size by consolidating duplicate strings
+    add_compile_options($<$<CONFIG:Release>:/GF>)
+
+    # Optimize floating point operations for speed (may introduce minor precision differences)
+    # add_compile_options($<$<CONFIG:Release>:/fp:fast>)
+
+    # Disable RTTI (Run-Time Type Information) to reduce binary size and possibly improve performance
+    add_compile_options($<$<CONFIG:Release>:/GR->)
+
+    # Inline any suitable function to improve performance by reducing function call overhead
+    add_compile_options($<$<CONFIG:Release>:/Ob2>)
+
 #    add_compile_options("$<$<CONFIG:RELEASE>:/Zi>")
 #    add_link_options("$<$<CONFIG:RELEASE>:/DEBUG>") # Enable debug symbols in release for edge cases.
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
@@ -42,7 +73,7 @@ endif()
 
 file(GLOB_RECURSE sources "main.cpp" "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp" "src/Client/GUI/Engine/*.cpp")
 
-add_library(${PROJECT_NAME} SHARED ${sources} src/SDK/Client/Render/Matrix.cpp)
+add_library(${PROJECT_NAME} SHARED ${sources} src/SDK/Client/Render/Matrix.cpp src/Assets/Assets.rc)
 
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/" "${CMAKE_CURRENT_LIST_DIR}/lib/glm/")
 

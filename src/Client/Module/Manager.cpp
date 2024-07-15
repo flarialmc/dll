@@ -3,10 +3,9 @@
 #include "Manager.hpp"
 #include "../Events/EventHandler.hpp"
 #include "Modules/Input/GUIKeyListener.hpp"
-#include "Modules/Misc/Uninject/Uninject.hpp"
-#include "Modules/Misc/SaveConfig/SaveConfig.hpp"
-#include "Modules/Misc/RGB/rgb.hpp"
-#include "Modules/Misc/TextAlias/TextAlias.hpp"
+#include "Modules/Misc/SaveConfig/SaveConfigListener.hpp"
+#include "Modules/Misc/RGB/rgbListener.hpp"
+#include "Modules/Misc/TextAlias/TextAliasListener.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/Module.hpp"
 #include "Modules/FPS/FPSCounter.hpp"
@@ -45,10 +44,11 @@
 #include "Modules/TextHotkey/TextHotkey.hpp"
 #include "Modules/Nick/NickModule.hpp"
 #include "Modules/SpeedDisplay/SpeedDisplay.hpp"
-#include "Modules/Misc/CentreCursor/CentreCursor.hpp"
+#include "Modules/Misc/CentreCursor/CentreCursorListener.hpp"
+#include "Modules/Misc/Uninject/UninjectListener.hpp"
 #include "Modules/CPSLimiter/CPSLimiter.hpp"
 #include "Modules/BlockBreakIndicator/BlockBreakIndicator.hpp"
-#include "Modules/CompactChat/CompactChat.hpp"
+//#include "Modules/CompactChat/CompactChat.hpp"
 #include "Modules/FOVChanger/FOVChanger.hpp"
 #include "Modules/UpsideDown/UpsideDown.hpp"
 #include "Modules/Animations/Animations.hpp"
@@ -59,9 +59,9 @@
 #include "Modules/NoHurtCam/NoHurtCam.hpp"
 #include "Modules/CommandHotkey/CommandHotkey.hpp"
 #include "Modules/Misc/DiscordRPC/DiscordRPCListener.hpp"
-#include "Modules/Overlay/OverlayModule.hpp"
+//#include "Modules/Overlay/OverlayModule.hpp"
 #include "Modules/AutoRQ/AutoRQ.hpp"
-#include "Modules/MovableChat/MovableChat.hpp"
+//#include "Modules/MovableChat/MovableChat.hpp"
 #include <algorithm>
 
 namespace ModuleManager {
@@ -71,6 +71,7 @@ namespace ModuleManager {
     std::vector<std::string> onlineCommites;
     std::vector<std::string> onlinePluses;
     std::vector<std::string> onlineStaff;
+    bool initialized = false;
 }
 
 void ModuleManager::addModule(Module* module) {
@@ -158,9 +159,12 @@ void ModuleManager::initialize() {
     EventHandler::registerListener(new CentreCursorListener("CentreCursor"));
     EventHandler::registerListener(new rgbListener("RGB Controller"));
     EventHandler::registerListener(new TextAliasListener("TextAlias"));
+
+    initialized = true;
 }
 
 void ModuleManager::terminate() {
+    initialized = false;
     for (const auto& pair : ModuleManager::moduleMap) {
         pair.second->terminate();
     }

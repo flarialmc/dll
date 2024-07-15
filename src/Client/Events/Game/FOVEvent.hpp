@@ -7,7 +7,7 @@ class FOVEvent : public Event, Cancellable {
 private:
     float fov;
 public:
-    float getFOV() {
+    [[nodiscard]] float getFOV() const {
         return this->fov;
     }
 

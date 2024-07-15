@@ -11,7 +11,7 @@ public:
 
 
     AutoRQ() : Module("Auto RE Q", "Automatically requeues into a game (Hive)",
-                      R"(\Flarial\assets\re-q.png)", "") {
+                      IDR_RE_Q_PNG, "") {
 
         Module::setup();
 
@@ -32,6 +32,10 @@ public:
             settings.addSetting("command", (std::string)"");
         if (settings.getSettingByName<bool>("solo") == nullptr)
             settings.addSetting("solo", false);
+        if (settings.getSettingByName<bool>("AutoMapAvoider") == nullptr)
+            settings.addSetting("AutoMapAvoider", false);
+        if (settings.getSettingByName<std::string>("text") == nullptr) 
+            settings.addSetting("text", (std::string) "Input maps, like this");
     }
 
     void settingsRender() override {
@@ -50,6 +54,24 @@ public:
                 "solo")->value))
             this->settings.getSettingByName<bool>("solo")->value = !this->settings.getSettingByName<bool>(
                     "solo")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0, textWidth), toggleY,
+                                        L"Avoid Maps (Hive). Input one or more maps using comma's.", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        if (FlarialGUI::Toggle(0, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "AutoMapAvoider")->value))
+            this->settings.getSettingByName<bool>("AutoMapAvoider")->value = !this->settings.getSettingByName<bool>(
+                    "AutoMapAvoider")->value;
+        
+        FlarialGUI::TextBoxVisual(1, settings.getSettingByName<std::string>("text")->value, 256, toggleX +
+         Constraints::SpacingConstraint(0.60, textWidth), toggleY, "");
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
     }
 };
 

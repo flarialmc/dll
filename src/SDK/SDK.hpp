@@ -10,8 +10,7 @@ namespace SDK {
     extern bool hasInstanced;
     extern std::string currentScreen;
     extern std::chrono::steady_clock::time_point lastSetCurrentScreenTime;
-
-    extern void setCI();
+    extern __int64 serverPing;
 
     extern int getServerPing();
 
@@ -20,6 +19,4 @@ namespace SDK {
     extern std::string getServerIP();
 
     extern std::shared_ptr<Packet> createPacket(int id);
-
-
 }

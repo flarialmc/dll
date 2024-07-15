@@ -127,7 +127,7 @@ public:
     };
 
     auto sub(T x, T y, T z) -> Vec3<T> {
-        return Vec3<T>(this->x + x, this->y + y, this->z + z);
+        return Vec3<T>(this->x - x, this->y - y, this->z - z);
     };
 
     auto sub(const Vec3<T> &vec) -> Vec3<T> {

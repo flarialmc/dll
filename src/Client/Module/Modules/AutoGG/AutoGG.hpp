@@ -11,7 +11,7 @@ public:
 
 
     AutoGG() : Module("Auto GG", "Automatically sends a message when you\nwin a game. (Doesn't work everywhere)",
-                      R"(\Flarial\assets\like.png)", "") {
+                      IDR_LIKE_PNG, "") {
 
         Module::setup();
 

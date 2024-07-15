@@ -15,6 +15,7 @@
 #include "Elements/Control/TextBox/TextBoxStruct.hpp"
 #include "Elements/Control/ColorPicker/ColorPicker.hpp"
 #include "Elements/Control/Dropdown/DropdownStruct.hpp"
+#include "../../../Assets/Assets.hpp"
 #include <string>
 
 #define clickgui ModuleManager::getModule("ClickGUI")
@@ -52,6 +53,7 @@
 #define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
 
 std::map<std::string, ID2D1Bitmap *> ImagesClass::eimages;
+std::map<int, ID2D1Bitmap *> ImagesClass::images;
 
 // TODO: release it !!!
 ID2D1Factory *FlarialGUI::factory;
@@ -357,7 +359,7 @@ HSV FlarialGUI::RGBtoHSV(D2D1_COLOR_F rgb) {
     max = r > g ? r : g;
     max = max > b ? max : b;
 
-    out.value = max;                                // v
+    out.value = (float)max;                                // v
     delta = max - min;
     if (delta < 0.00001) {
         out.saturation = 0;
@@ -365,7 +367,7 @@ HSV FlarialGUI::RGBtoHSV(D2D1_COLOR_F rgb) {
         return out;
     }
     if (max > 0.0) { // NOTE: if Max is == 0, this divide would cause a crash
-        out.saturation = (delta / max);                  // s
+        out.saturation = (float)(delta / max);                  // s
     } else {
         // if max is 0, then r = g = b = 0
         // s = 0, h is undefined
@@ -374,11 +376,11 @@ HSV FlarialGUI::RGBtoHSV(D2D1_COLOR_F rgb) {
         return out;
     }
     if (r >= max)                           // > is bogus, just keeps compilor happy
-        out.hue = (g - b) / delta;        // between yellow & magenta
+        out.hue = (float)((g - b) / delta);        // between yellow & magenta
     else if (g >= max)
-        out.hue = 2.0 + (b - r) / delta;  // between cyan & yellow
+        out.hue = 2.0f + (b - r) / delta;  // between cyan & yellow
     else
-        out.hue = 4.0 + (r - g) / delta;  // between magenta & cyan
+        out.hue = 4.0f + (r - g) / delta;  // between magenta & cyan
 
     out.hue *= 60.0;                              // degrees
 
@@ -393,7 +395,7 @@ D2D1::ColorF FlarialGUI::HSVtoColorF(float H, float s, float v) {
         return {0, 0, 0};
     }
     float C = s * v;
-    float X = C * (1 - abs(fmod(H / 60.0, 2) - 1));
+    float X = C * (1 - abs(fmod(H / 60.0f, 2) - 1));
     float m = v - C;
     float r, g, b;
     if (H >= 0 && H < 60) {
@@ -451,7 +453,7 @@ std::string FlarialGUI::ColorFToHex(const D2D1_COLOR_F &color) {
     char hexString[7];
     sprintf(hexString, "%02x%02x%02x", red, green, blue);
 
-    return std::string(hexString);
+    return {hexString};
 }
 
 
@@ -508,6 +510,90 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
                                                 width, height, moduleFont);
     D2D::context->DrawTextLayout(D2D1::Point2F(x, y), textLayout.get(), FlarialGUI::getBrush(color).get());
 
+}
+
+void FlarialGUI::LoadFont(int resourceId) {
+    LPVOID pFontData = NULL;
+    DWORD dwFontSize = 0;
+
+    HRSRC hRes = FindResource(Client::currentModule, MAKEINTRESOURCE(resourceId), RT_RCDATA);
+    if (hRes == NULL)
+        return;
+
+    HGLOBAL hResData = LoadResource(Client::currentModule, hRes);
+    if (hResData == NULL)
+        return;
+
+    pFontData = LockResource(hResData);
+    if (pFontData == NULL)
+        return;
+
+    dwFontSize = SizeofResource(Client::currentModule, hRes);
+
+    std::string lpFileName = Utils::getRoamingPath() + "\\Flarial\\assets\\" + std::to_string(resourceId) + ".ttf";
+
+    std::ofstream outFile(lpFileName, std::ios::binary);
+    if (!outFile) {
+        return;
+    }
+
+    // Write the font data directly as binary
+    outFile.write(reinterpret_cast<const char*>(pFontData), dwFontSize);
+    outFile.close();
+
+    AddFontResource(lpFileName.c_str());
+}
+
+void FlarialGUI::LoadImageFromResource(int resourceId, ID2D1Bitmap **bitmap, LPCTSTR type) {
+    IWICBitmapDecoder *pDecoder = nullptr;
+    IWICBitmapFrameDecode *pFrame = nullptr;
+    IWICStream *pStream = nullptr;
+    HRSRC imageResHandle = nullptr;
+    HGLOBAL imageResDataHandle = nullptr;
+    void *pImageFile = nullptr;
+    DWORD imageFileSize = 0;
+
+    // Locate the resource
+    imageResHandle = FindResource(Client::currentModule, MAKEINTRESOURCE(resourceId), type);
+
+    // Load the resource
+    imageResDataHandle = LoadResource(Client::currentModule, imageResHandle);
+
+    // Lock the resource to get a pointer to the image data
+    pImageFile = LockResource(imageResDataHandle);
+    imageFileSize = SizeofResource(Client::currentModule, imageResHandle);
+
+    IWICImagingFactory *imagingFactory = nullptr;
+    CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&imagingFactory));
+
+    // Create a WIC stream to map onto the memory
+    imagingFactory->CreateStream(&pStream);
+
+    // Initialize the stream with the memory pointer and size
+    pStream->InitializeFromMemory(static_cast<BYTE *>(pImageFile), imageFileSize);
+
+    // Create a decoder for the stream
+    imagingFactory->CreateDecoderFromStream(pStream, NULL, WICDecodeMetadataCacheOnLoad, &pDecoder);
+
+    // Get the first frame of the image
+    pDecoder->GetFrame(0, &pFrame);
+
+    // Convert the frame to a Direct2D bitmap
+    IWICFormatConverter *pConverter = NULL;
+    imagingFactory->CreateFormatConverter(&pConverter);
+    pConverter->Initialize(pFrame, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, nullptr, 0.0,
+                           WICBitmapPaletteTypeMedianCut);
+
+    D2D::context->CreateBitmapFromWicBitmap(pConverter, nullptr, bitmap);
+
+    if (pConverter)
+        pConverter->Release();
+    if (pDecoder)
+        pDecoder->Release();
+    if (pFrame)
+        pFrame->Release();
+    if (pStream)
+        pStream->Release();
 }
 
 void FlarialGUI::LoadImageFromFile(const wchar_t *filename, ID2D1Bitmap **bitmap) {
@@ -595,7 +681,7 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 
     // check if outside of mc
     WindowRects[currentNum].fixer = fixer;
-    if (WindowRects[currentNum].movedX - fixer < 0) WindowRects[currentNum].movedX = 0.001 + fixer;
+    if (WindowRects[currentNum].movedX - fixer < 0) WindowRects[currentNum].movedX = 0.001f + fixer;
     if (WindowRects[currentNum].movedY < 0) WindowRects[currentNum].movedY = 0;
 
     if (WindowRects[currentNum].movedX + width - fixer > MC::windowSize.x)
@@ -622,7 +708,7 @@ Vec2<float> FlarialGUI::CalculateMovedXY(float x, float y, int num, float rectWi
 
     }
 
-    if (x - WindowRects[num].fixer < 0) x = 0.001 - WindowRects[num].fixer;
+    if (x - WindowRects[num].fixer < 0) x = 0.001f - WindowRects[num].fixer;
     if (y < 0) y = 0;
 
     if (x + rectWidth - WindowRects[num].fixer > MC::windowSize.x)
@@ -723,7 +809,7 @@ void FlarialGUI::NotifyHeartbeat() {
             col.a = 0.60;
 
             if (!FlarialGUI::inMenu)
-                FlarialGUI::BlurRect(rect, 6.0f);
+                FlarialGUI::BlurRect(rect);
             FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
                                     col, rectWidth,
                                     rectHeight, rounding.x, rounding.x);
@@ -754,7 +840,7 @@ void FlarialGUI::NotifyHeartbeat() {
                     Constraints::PercentageConstraint(0.01, "top") - Constraints::SpacingConstraint(0.10, rectHeight);
             float logoWidth = Constraints::RelativeConstraint(1.25);
 
-            FlarialGUI::image(R"(\Flarial\assets\logo.png)",
+            FlarialGUI::image(IDR_LOGO_PNG,
                               D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth));
 
             logoX += Constraints::SpacingConstraint(0.85, logoWidth);
@@ -809,7 +895,7 @@ void FlarialGUI::NotifyHeartbeat() {
             col.a = 0.60;
 
             if (!FlarialGUI::inMenu)
-                FlarialGUI::BlurRect(rect, 6.0f);
+                FlarialGUI::BlurRect(rect);
             FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
                                     col, rectWidth,
                                     rectHeight, rounding.x, rounding.x);
@@ -840,7 +926,7 @@ void FlarialGUI::NotifyHeartbeat() {
                     Constraints::PercentageConstraint(0.01, "top") - Constraints::SpacingConstraint(0.10, rectHeight);
             float logoWidth = Constraints::RelativeConstraint(1.25);
 
-            FlarialGUI::image(R"(\Flarial\assets\logo.png)",
+            FlarialGUI::image(IDR_LOGO_PNG,
                               D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth));
 
             logoX += Constraints::SpacingConstraint(0.85, logoWidth);
@@ -904,7 +990,7 @@ void FlarialGUI::CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to) {
 }
 
 std::wstring FlarialGUI::to_wide(const std::string &str) {
-    int wchars_num = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL, 0);
+    int wchars_num = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, nullptr, 0);
     std::wstring wide;
     wide.resize(wchars_num);
     MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, &wide[0], wchars_num);
@@ -953,4 +1039,3 @@ float FlarialGUI::SettingsTextWidth(const std::string& text) {
     return textMetrics.widthIncludingTrailingWhitespace;
 }
 
-bool resized = false;

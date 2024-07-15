@@ -10,7 +10,7 @@ private:
     TextureData *texturePtr;
     Vec2<float> &imagePos;
 public:
-    Vec2<float> &getImagePos() const {
+    [[nodiscard]] Vec2<float> &getImagePos() const {
         return imagePos;
     }
 

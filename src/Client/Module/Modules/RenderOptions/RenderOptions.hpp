@@ -10,7 +10,7 @@ class RenderOptions : public Module {
 public:
 
     RenderOptions() : Module("Render Option", "Change the way how the game is rendered.",
-                             R"(\Flarial\assets\renderoptions.png)", "") {
+                             IDR_RENDEROPTIONS_PNG, "") {
 
         Module::setup();
     };

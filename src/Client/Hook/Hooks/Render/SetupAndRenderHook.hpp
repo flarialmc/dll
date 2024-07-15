@@ -81,8 +81,6 @@ private:
             SDK::setCurrentScreen(event.getLayer()); // updates every 16 ms
         }
 
-		DrawUtils::setCtx(muirc, SDK::clientInstance->guiData);
-
         if(layer == "debug_screen" || layer == "hud_screen" || layer == "start_screen") {
             SetupAndRenderEvent event(muirc);
             funcOriginal(pScreenView, muirc);

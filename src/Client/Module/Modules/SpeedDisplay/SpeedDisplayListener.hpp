@@ -36,8 +36,8 @@ class SpeedDisplayListener : public Listener {
                 SDK::hasInstanced && SDK::clientInstance != nullptr &&
                 SDK::clientInstance->getLocalPlayer() != nullptr
                 ) {
-            if(SDK::clientInstance->getLocalPlayer()->stateVector != nullptr)
-                speed = std::format("{:.2f}", SDK::clientInstance->getLocalPlayer()->stateVector->Pos.dist(PrevPos) * 20);
+            if(SDK::clientInstance->getLocalPlayer()->getStateVectorComponent() != nullptr)
+                speed = std::format("{:.2f}", SDK::clientInstance->getLocalPlayer()->getStateVectorComponent()->Pos.dist(PrevPos) * 20);
         }
     };
 
@@ -55,7 +55,7 @@ class SpeedDisplayListener : public Listener {
             });
             lol.detach();
         }
-        PrevPos = SDK::clientInstance->getLocalPlayer()->stateVector->Pos;
+        PrevPos = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent()->Pos;
     }
 
 public:

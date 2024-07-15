@@ -8,7 +8,7 @@ class PaperDoll : public Module {
 
 public:
 
-    PaperDoll() : Module("Movable Paperdoll", "Makes the Minecraft paperdoll movable.", R"(\Flarial\assets\man.png)",
+    PaperDoll() : Module("Movable Paperdoll", "Makes the Minecraft paperdoll movable.", IDR_MAN_PNG,
                          "") {
 
         Module::setup();

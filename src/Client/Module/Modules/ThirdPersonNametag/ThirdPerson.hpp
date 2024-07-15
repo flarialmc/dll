@@ -10,7 +10,7 @@ class ThirdPerson : public Module {
 public:
 
     ThirdPerson() : Module("Nametag", "Shows your nametag for you while\nin 3rd person mode.",
-                           R"(\Flarial\assets\nametag.png)", "") {
+                           IDR_NAMETAG_PNG, "") {
 
         Module::setup();
 

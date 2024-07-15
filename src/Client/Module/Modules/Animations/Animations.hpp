@@ -10,7 +10,7 @@ class Animations : public Module {
 public:
 
     Animations() : Module("Animations", "Animate your selected slot square\nwhile you switch slots.",
-                          R"(\Flarial\assets\Animations.png)", "") {
+                          IDR_ANIMATIONS_PNG, "") {
         Module::setup();
     };
 

@@ -9,7 +9,7 @@ class ClickGUI : public Module {
 
 public:
 
-    ClickGUI() : Module("ClickGUI", "What do you think it is?", R"(\Flarial\assets\clickgui.png)", "K") {
+    ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {
         Module::setup();
     };
 
@@ -200,8 +200,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_text")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_text")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_text_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("Text Color  ") + tooltipV * 4.125f,
@@ -223,8 +221,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_enabled")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_enabled")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_enabled_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("Enabled Color  ") + tooltipV * 4.125f,
@@ -246,8 +242,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_disabled")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_disabled")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_disabled_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("Disabled Color  ") + tooltipV * 4.125f,
@@ -269,8 +263,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_primary1")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_primary1")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_primary1_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("Primary 1  ") + tooltipV * 4.125f, rectY,
@@ -292,8 +284,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_primary2")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_primary2")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_primary2_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("Primary 2  ") + tooltipV * 4.125f, rectY,
@@ -315,8 +305,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_primary3")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_primary3")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_primary3_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("Primary 3  ") + tooltipV * 4.125f, rectY,
@@ -338,8 +326,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_primary4")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_primary4")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_primary4_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("Primary 4  ") + tooltipV * 4.125f, rectY,
@@ -361,8 +347,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_secondary1")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_secondary1")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_secondary1_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("Secondary 1  ") + tooltipV * 4.125f,
@@ -383,8 +367,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_secondary2")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_secondary2")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_secondary2_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("Secondary 2  ") + tooltipV * 4.125f,
@@ -406,8 +388,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_secondary3")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_secondary3")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_secondary3_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("Secondary 3  ") + tooltipV * 4.125f,
@@ -429,8 +409,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_secondary4")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_secondary4")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_secondary4_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("Secondary 4  ") + tooltipV * 4.125f,
@@ -452,8 +430,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_secondary5")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_secondary5")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_secondary5_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("Secondary 5  ") + tooltipV * 4.125f,
@@ -475,8 +451,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_secondary6")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_secondary6")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_secondary6_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("Secondary 6  ") + tooltipV * 4.125f,
@@ -498,8 +472,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_secondary7")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_secondary7")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_secondary7_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("Secondary 7  ") + tooltipV * 4.125f,
@@ -520,8 +492,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_mod1")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_mod1")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_mod1_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("ModCard 1  ") + tooltipV * 4.125f, rectY,
@@ -543,8 +513,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_mod2")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_mod2")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_mod2_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("ModCard 2  ") + tooltipV * 4.125f, rectY,
@@ -566,8 +534,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_mod3")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_mod3")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_mod3_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("ModCard 3  ") + tooltipV * 4.125f, rectY,
@@ -589,8 +555,6 @@ public:
                                 rectY - Constraints::SpacingConstraint(0.017, textWidth),
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                         "colors_mod4")->value,
-                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>(
-                                        "o_colors_mod4")->value,
                                 ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>(
                                         "colors_mod4_rgb")->value);
         FlarialGUI::FlarialTextWithFont(rectX + FlarialGUI::SettingsTextWidth("ModCard 4  ") + tooltipV * 4.125f, rectY,

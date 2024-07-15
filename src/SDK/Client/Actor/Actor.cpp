@@ -1,5 +1,6 @@
 #include "Actor.hpp"
-#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "Components/ActorGameTypeComponent.hpp"
+#include "Components/AABBShapeComponent.hpp"
 
 // TODO add comments to all components, replace their sigs with simpler ones ?       marioCST: use entt's try_get func in EntityContext instead of using sigs, there are no simpler sigs
 
@@ -31,23 +32,18 @@ bool Actor::isAlive() {
     return Memory::CallVFuncI<bool>(off, this);
 }
 
-std::string *Actor::getXuid(std::string *str) {
-    static int off = GET_OFFSET("Player::getXuid");
-    return Memory::CallVFuncI<std::string *, std::string *>(off, this, str);
-}
-
 bool Actor::canSee(const Actor& actor) {
     using canSeeFunc = bool (__fastcall *)(Actor *, const Actor&);
-    static auto canSee = reinterpret_cast<canSeeFunc>(Memory::offsetFromSig(
-            Memory::findSig(GET_SIG("Actor::canSee")), 1));
+    static uintptr_t sig;
+    if (sig == NULL) {
+        if (!WinrtUtils::check(20, 40)) {
+            sig = Memory::findSig(GET_SIG("Actor::canSee"));
+        } else {
+            sig = Memory::offsetFromSig(Memory::findSig(GET_SIG("Actor::canSee")), 1);
+        }
+    }
+    static auto canSee = reinterpret_cast<canSeeFunc>(sig);
     return canSee(this, actor);
-}
-
-MobEffectInstance *Actor::getEffect(MobEffect *effect) {
-    static uintptr_t addr = Memory::findSig(GET_SIG("Actor::getEffect"));
-    static auto realAddr = addr + 1 + 4 + *reinterpret_cast<int *>(addr + 1);
-    auto fn = reinterpret_cast<MobEffectInstance *(__cdecl *)(Actor *, MobEffect *)>(realAddr);
-    return fn(this, effect);
 }
 
 bool Actor::getActorFlag(int flag) {
@@ -56,7 +52,7 @@ bool Actor::getActorFlag(int flag) {
 }
 
 Vec3<float> *Actor::getPosition() {
-    return &this->stateVector->Pos;
+    return &this->getStateVectorComponent()->Pos;
 }
 
 SimpleContainer* Actor::getArmorContainer() {
@@ -64,7 +60,7 @@ SimpleContainer* Actor::getArmorContainer() {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getActorEquipmentComponent"));
+        sig = Memory::findSig(GET_SIG("Actor::getActorEquipmentComponent")); // 8B DA BA 2E CD 8B 46
     }
 
     return tryGet<ActorEquipmentComponent>(sig)->mArmorContainer;
@@ -75,7 +71,7 @@ SimpleContainer* Actor::getOffhandContainer() {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getActorEquipmentComponent"));
+        sig = Memory::findSig(GET_SIG("Actor::getActorEquipmentComponent")); // 8B DA BA 2E CD 8B 46
     }
 
     return tryGet<ActorEquipmentComponent>(sig)->mOffhandContainer;
@@ -101,11 +97,43 @@ MoveInputComponent *Actor::getMoveInputHandler() { //??$try_get@UMoveInputCompon
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getMoveInputHandler"));
+        sig = Memory::findSig(GET_SIG("Actor::getMoveInputHandler")); // 8B DA BA 2E CD 8B 46
     }
 
     return tryGet<MoveInputComponent>(sig);
+}
 
+ActorGameTypeComponent *Actor::getGameModeType() {
+
+    static uintptr_t sig;
+
+    if (sig == NULL) {
+        sig = Memory::findSig(GET_SIG("Actor::getActorGameTypeComponent")); // 8B DA BA DE AB CB AF
+    }
+
+    return tryGet<ActorGameTypeComponent>(sig);
+}
+
+AABBShapeComponent *Actor::getAABBShapeComponent() {
+
+    static uintptr_t sig;
+
+    if (sig == NULL) {
+        sig = Memory::findSig(GET_SIG("Actor::getAABBShapeComponent")); // 8B DA BA F2 C9 10 1B
+    }
+
+    return tryGet<AABBShapeComponent>(sig);
+}
+
+StateVectorComponent *Actor::getStateVectorComponent() {
+
+    static uintptr_t sig;
+
+    if (sig == NULL) {
+        sig = Memory::findSig(GET_SIG("Actor::getStateVectorComponent")); // 8B DA BA 91 3C C9 0E
+    }
+
+    return tryGet<StateVectorComponent>(sig);
 }
 
 ItemStack *Actor::getOffhandSlot() {
@@ -157,13 +185,16 @@ RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URen
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getRenderPositionComponent"));
+        sig = Memory::findSig(GET_SIG("Actor::getRenderPositionComponent")); // 8B DA BA 6E F3 E8 D4
     }
 
     return tryGet<RenderPositionComponent>(sig);
 }
 
 bool Actor::isValidTarget(Actor *actor) {
+    if(!WinrtUtils::check(20, 40)) {
+        return true;
+    }
     static int off = GET_OFFSET("Actor::isValidTarget");
     return Memory::CallVFuncI<bool, Actor *>(off, this, actor);
 }

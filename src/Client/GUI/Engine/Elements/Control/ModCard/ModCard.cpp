@@ -1,5 +1,6 @@
 #include "../../../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
 #include "../../../../../Module/Modules/ClickGUI/ClickGUIRenderer.hpp"
+#include "../../../../../../Assets/Assets.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -39,11 +40,11 @@
 #define o_colors_mod4 clickgui->settings.getSettingByName<float>("o_colors_mod4")->value
 #define colors_mod4_rgb clickgui->settings.getSettingByName<bool>("colors_mod4_rgb")->value
 
-std::map<std::string, ID2D1Bitmap *> ClickGUIElements::images;
+std::map<int, ID2D1Bitmap *> ClickGUIElements::images;
 std::vector<Vec2<float>> sizes;
 std::vector<Vec2<float>> shadowSizes;
 
-void ClickGUIElements::ModCard(float x, float y, Module *mod, const std::string& iconpath, const int index, bool visible) {
+void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const int index, bool visible) {
     Vec2<float> round = Constraints::RoundingConstraint(34, 34);
 
 
@@ -66,8 +67,8 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, const std::string&
     float BottomRoundedHeight = sizes[index].y;
 
     float realY = y;
-    float diffX = 0;
-    float diffY = 0;
+    float diffX;
+    float diffY;
 
     if (FlarialGUI::isInScrollView) realY += FlarialGUI::scrollpos;
 
@@ -220,15 +221,13 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, const std::string&
     if (!Client::settings.getSettingByName<bool>("noicons")->value)
         FlarialGUI::RoundedRectWithImageAndText(index, settingx2, (buttony - settingswidth) - settingsheightspac,
                                                 settingswidth, settingswidth,
-                                                mod4Col, R"(\Flarial\assets\gear.png)", iconwidth, iconwidth, L"");
+                                                mod4Col, IDR_GEAR_PNG, iconwidth, iconwidth);
 
 
-    if (!iconpath.empty() && images[mod->name] == nullptr) {
+    if (iconId != -1 && images[iconId] == nullptr) {
+        FlarialGUI::LoadImageFromResource(iconId, &images[iconId]);
 
-        std::string among = Utils::getRoamingPath() + "\\" + iconpath;
-        FlarialGUI::LoadImageFromFile(FlarialGUI::to_wide(among).c_str(), &images[mod->name]);
-
-    } else if (images[mod->name] != nullptr) {
+    } else if (images[iconId] != nullptr) {
 
         if (FlarialGUI::isInScrollView) {
             modicony += FlarialGUI::scrollpos;
@@ -237,7 +236,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, const std::string&
         if (!Client::settings.getSettingByName<bool>("noicons")->value &&
             FlarialGUI::isRectInRect(FlarialGUI::ScrollViewRect,
                                      D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize)))
-            D2D::context->DrawBitmap(images[mod->name], D2D1::RectF(modiconx, modicony, modiconx + paddingSize,
+            D2D::context->DrawBitmap(images[iconId], D2D1::RectF(modiconx, modicony, modiconx + paddingSize,
                                                                     modicony + paddingSize));
     }
 

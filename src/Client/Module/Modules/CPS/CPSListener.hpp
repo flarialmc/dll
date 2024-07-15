@@ -10,12 +10,6 @@
 #include <windows.h>
 #include <chrono>
 
-namespace CPS {
-
-    static int inline leftcps = 0;
-    static int inline rightcps = 0;
-}
-
 class ClickData {
 public:
     double timestamp;  // Milliseconds since some reference point
@@ -121,7 +115,7 @@ public:
         }
 
         double currentMicros = Microtime();
-        int count = std::count_if(leftClickList.begin(), leftClickList.end(), [currentMicros](const ClickData &click) {
+        auto count = std::count_if(leftClickList.begin(), leftClickList.end(), [currentMicros](const ClickData &click) {
             return (currentMicros - click.timestamp <= 1.0);
         });
 
@@ -134,7 +128,7 @@ public:
         }
 
         double currentMicros = Microtime();
-        int count = std::count_if(rightClickList.begin(), rightClickList.end(),
+        auto count = std::count_if(rightClickList.begin(), rightClickList.end(),
                                   [currentMicros](const ClickData &click) {
                                       return (currentMicros - click.timestamp <= 1.0);
                                   });

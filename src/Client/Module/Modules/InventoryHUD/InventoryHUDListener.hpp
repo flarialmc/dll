@@ -108,7 +108,6 @@ public:
                         if (SDK::clientInstance->getLocalPlayer()->playerInventory->getinventory()->getItem(i)->getItem() != nullptr) {
                             //durabilities[i][1] = SDK::clientInstance->getLocalPlayer()->getArmor(i)->getMaxDamage();
                             //durabilities[i][0] = durabilities[i][1] - SDK::clientInstance->getLocalPlayer()->getArmor(i)->getDamageValue();
-                            convert = this->convert();
                             barc.itemRenderer->renderGuiItemNew(&barc,
                                                                 SDK::clientInstance->getLocalPlayer()->playerInventory->getinventory()->getItem(
                                                                         i), 0,

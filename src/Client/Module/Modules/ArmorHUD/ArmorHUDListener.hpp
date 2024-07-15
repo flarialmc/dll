@@ -28,9 +28,7 @@ public:
     };
     // TODO: delete testing variables (or adjust and delete)
     Vec2<float> testOffset = Vec2<float>{4,0};
-    float testSpacing = 46;
-
-
+    float testSpacing = 15;
 
     [[nodiscard]] Vec2<float> convert() const {
 
@@ -40,22 +38,41 @@ public:
 
         return Vec2<float>{currentPos.x * (LOL.x / xd.x), currentPos.y * (LOL.y / xd.y)};
     }
+
+    [[nodiscard]] Vec2<float> convert(Vec2<float> pos) {
+
+        auto e = SDK::clientInstance->guiData;
+        Vec2<float> LOL = Vec2<float>(e->ScreenSize.x, e->ScreenSize.y);
+        Vec2<float> xd = Vec2<float>(e->ScreenSizeScaled.x, e->ScreenSizeScaled.y);
+        float scale = module->settings.getSettingByName<float>("uiscale")->value;
+        return Vec2<float>{pos.x * (LOL.x / xd.x) * scale, pos.y * (LOL.y / xd.y) * scale};
+    }
+
     // TODO: Make it look better
     void renderDurability() {
         if(FlarialGUI::inMenu) return;
-        Vec2<float> convert = this->convert();
 
-        static auto greenColor = FlarialGUI::HexToColorF("40FF00");
-        static auto redColor = FlarialGUI::HexToColorF("FF0000");
-        static auto whiteColor = FlarialGUI::HexToColorF("FFFFFF");
+        auto rgb = module->settings.getSettingByName<bool>("colorFull_rgb")->value;
+        auto rgb1 = module->settings.getSettingByName<bool>("colorLow_rgb")->value;
+        auto rgb2 = module->settings.getSettingByName<bool>("colorMain_rgb")->value;
 
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+        auto rgbColor = FlarialGUI::rgbColor;
+
+        auto fullColor = rgb ? rgbColor : FlarialGUI::HexToColorF(module->settings.getSettingByName<std::string>("colorFull")->value);
+        auto lowColor = rgb1 ? rgbColor : FlarialGUI::HexToColorF(module->settings.getSettingByName<std::string>("colorLow")->value);
+        auto mainColor = rgb2 ? rgbColor : FlarialGUI::HexToColorF(module->settings.getSettingByName<std::string>("colorMain")->value);
+
+        const float textWidth = Constraints::RelativeConstraint(module->settings.getSettingByName<float>("textSize")->value, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
+
         if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr)
                 if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
 
-                    float spacing = testSpacing * module->settings.getSettingByName<float>("uiscale")->value;
+                    auto vertical = module->settings.getSettingByName<bool>("vertical")->value;
+
+                    float spacing = testSpacing;
+                    spacing = convert(Vec2<float>{spacing, spacing}).x;
 
                     if (SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(
                             SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot)->getItem() !=
@@ -78,25 +95,26 @@ public:
 
                         const wchar_t *widecstr = widestr.c_str();
 
-                        D2D1::ColorF color = whiteColor;
+                        D2D1_COLOR_F color = mainColor;
 
-                        if (module->settings.getSettingByName<bool>("color")->value){
+                        if (module->settings.getSettingByName<bool>("color")->value && durabilities[0][1] != 0){
                             if(std::round((float)durabilities[0][0] / (float)durabilities[0][1] * 100) <= 15){
-                                color = redColor;
+                                color = lowColor;
                             } else {
-                                color = greenColor;
+                                color = fullColor;
                             }
                         }
 
-                        FlarialGUI::FlarialTextWithFont(currentPos.x + testOffset.x + (durabilities[0][1] != 0 ? spacing : 0), currentPos.y + testOffset.y,
+                        float spacingX = vertical ? (durabilities[0][1] != 0 ? spacing : 0) : 0;
+                        float spacingY = vertical ? 0: (durabilities[0][1] != 0 ? spacing : 0);
+
+                        FlarialGUI::FlarialTextWithFont(currentPos.x + testOffset.x + spacingX, currentPos.y + testOffset.y + spacingY,
                                                         widecstr, textWidth * 6.9f,
                                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                        Constraints::RelativeConstraint(0.12, "height", true),
+                                                        textWidth,
                                                         DWRITE_FONT_WEIGHT_NORMAL, color, false);
 
                     }
-
-
 
                     float xmodifier = 0.0f;
                     float ymodifier = 0.0f;
@@ -115,8 +133,6 @@ public:
 
                         if (SDK::clientInstance->getLocalPlayer()->getArmor(i-1)->getItem() != nullptr) {
 
-                            convert = this->convert();
-
                             std::string text;
 
                             if (module->settings.getSettingByName<bool>("percent")->value)
@@ -128,13 +144,13 @@ public:
 
                             const wchar_t *widecstr = widestr.c_str();
 
-                            D2D1::ColorF color = whiteColor;
+                            D2D1_COLOR_F color = mainColor;
 
                             if (module->settings.getSettingByName<bool>("color")->value){
                                 if(std::round((float)durabilities[i][0] / (float)durabilities[i][1] * 100) <= 15){
-                                    color = redColor;
+                                    color = lowColor;
                                 } else {
-                                    color = greenColor;
+                                    color = fullColor;
                                 }
                             }
 
@@ -142,7 +158,7 @@ public:
                                     currentPos.x + xmodifier + xoffset + testOffset.x,
                                     currentPos.y + ymodifier + yoffset + testOffset.y, widecstr, textWidth * 6.9f,
                                     textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                    Constraints::RelativeConstraint(0.12, "height", true),
+                                    textWidth,
                                     DWRITE_FONT_WEIGHT_NORMAL, color, false);
                         }
                     }

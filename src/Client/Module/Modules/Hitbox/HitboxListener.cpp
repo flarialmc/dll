@@ -15,7 +15,16 @@ void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
                 ent->getActorFlag(ActorFlags::FLAG_INVISIBLE)) // + ent == player ||
                 continue;
 
-            aabbsToRender.emplace_back(ent->getaabb()->aabb);
+            float mod = 0.f;
+
+            if (ent->hasCategory(ActorCategory::Player))
+                mod = 1.6f;
+
+            auto& aabbSize = ent->getAABBShapeComponent()->size;
+            auto& renderPos = ent->getRenderPositionComponent()->renderPos;
+            auto lower = renderPos.sub(aabbSize.x / 2.f, mod, aabbSize.x / 2.f), upper = lower.add(aabbSize.x, aabbSize.y, aabbSize.x);
+
+            aabbsToRender.emplace_back(lower, upper);
         }
     }
 }
@@ -35,9 +44,25 @@ void HitboxListener::onRender(RenderEvent &event) {
         else color2 = FlarialGUI::HexToColorF(module->settings.getSettingByName<std::string>("color")->value);
 
         for (const auto &aabb: aabbsToRender) {
-            auto lineWidth = (float)fmax(0.5f, 1 / (float)fmax(1,
-                                                               player->getRenderPositionComponent()->renderPos.dist(aabb.lower)));
-            DrawUtils::addBox(aabb.lower, aabb.upper, lineWidth, 1, color2);
+            // Retrieve the thickness setting value from the module settings
+            float thickness = module->settings.getSettingByName<float>("thickness")->value;
+            bool staticThickness = module->settings.getSettingByName<bool>("staticThickness")->value;
+            bool outline = module->settings.getSettingByName<bool>("outline")->value;
+
+            float lineWidth = thickness;
+
+            if(!staticThickness) {
+                // Get the render position of the player and compute the distance to the AABB lower bound
+                float distance = player->getRenderPositionComponent()->renderPos.dist(aabb.lower);
+
+                // Compute the scaling factor based on the distance, ensuring it does not exceed the max distance of 30
+                float scaleFactor = 1.f - (distance / 30.0f);
+
+                // Calculate the line width, ensuring it does not fall below a minimum threshold of 0.5
+                lineWidth = thickness * scaleFactor;
+            }
+
+            DrawUtils::addBox(aabb.lower, aabb.upper, staticThickness ? thickness : lineWidth, outline ? 2 : 1, color2);
         }
     }
 }

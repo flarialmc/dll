@@ -1,7 +1,6 @@
 ﻿#include "Utils.hpp"
 #include "Logger/Logger.hpp"
 #include "../Client/GUI/Engine/Engine.hpp"
-#include "../Client/Hook/Hooks/Visual/getFovHook.hpp"
 #include <sstream>
 #include <algorithm>
 #include <iostream>
@@ -18,34 +17,6 @@ std::string Utils::getRoamingPath() {
     return std::string(path) + R"(\..\Local\Packages\Microsoft.MinecraftUWP_8wekyb3d8bbwe\RoamingState)"; // Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe Microsoft.MinecraftUWP_8wekyb3d8bbwe
 }
 
-GLMatrix *getMatrixCorrection() {
-    GLMatrix toReturn = GLMatrix();
-
-    for (int i = 0; i < 4; i++) {
-        toReturn.matrix[i * 4 + 0] = SDK::clientInstance->Matrix1.matrix[0 + i];
-        toReturn.matrix[i * 4 + 1] = SDK::clientInstance->Matrix1.matrix[4 + i];
-        toReturn.matrix[i * 4 + 2] = SDK::clientInstance->Matrix1.matrix[8 + i];
-        toReturn.matrix[i * 4 + 3] = SDK::clientInstance->Matrix1.matrix[12 + i];
-    }
-
-    return &toReturn;
-}
-
-__forceinline float transformx(const Vec3<float> &p) {
-    auto matrix = getMatrixCorrection()->matrix;
-    return p.x * matrix[0] + p.y * matrix[4] + p.z * matrix[8] + matrix[12];
-}
-
-__forceinline float transformy(const Vec3<float> &p) {
-    auto matrix = getMatrixCorrection()->matrix;
-    return p.x * matrix[1] + p.y * matrix[5] + p.z * matrix[9] + matrix[13];
-}
-
-__forceinline float transformz(const Vec3<float> &p) {
-    auto matrix = getMatrixCorrection()->matrix;
-    return p.x * matrix[2] + p.y * matrix[6] + p.z * matrix[10] + matrix[14];
-}
-
 std::string Utils::removeColorCodes(const std::string &input) {
     std::string result;
     bool skipNext = false;
@@ -56,7 +27,7 @@ std::string Utils::removeColorCodes(const std::string &input) {
         } else if (c == L'§') {
             skipNext = true;
         } else {
-            result += c;
+            result += (char)c;
         }
     }
 

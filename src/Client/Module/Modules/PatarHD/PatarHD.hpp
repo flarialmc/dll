@@ -9,7 +9,7 @@ class PatarHD : public Module {
 
 public:
 
-    PatarHD() : Module("PatarHD", "Who is this now?", R"(\Flarial\assets\skull.png)", "") {
+    PatarHD() : Module("PatarHD", "Who is this now?", IDR_SKULL_PNG, "") {
 
         Module::setup();
 

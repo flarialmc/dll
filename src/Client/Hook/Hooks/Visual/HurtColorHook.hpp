@@ -29,7 +29,7 @@ public:
         auto RealFunc = Memory::offsetFromSig(RefAddr, 1);
 
 
-        this->manualHook((void *) RealFunc, HurtColorCallback, (void **) &funcOriginal);
+        this->manualHook((void *) RealFunc, (void*)HurtColorCallback, (void **) &funcOriginal);
     }
 };
 

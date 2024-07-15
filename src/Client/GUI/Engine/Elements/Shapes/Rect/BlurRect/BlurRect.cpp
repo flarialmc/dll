@@ -1,7 +1,7 @@
 #include "../../../../Engine.hpp"
 #include "../../../../../../Hook/Hooks/Render/SwapchainHook.hpp"
 
-void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect, float intensity) {
+void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect) {
 
 
     if (SwapchainHook::init && FlarialGUI::blurbrush != nullptr) {

@@ -7,15 +7,16 @@ class RaknetTickHook : public Hook { //RaknetConnector::tick :)
 
 private:
     static void callback(RaknetConnector *);
+    static __int64 getAveragePingCallback(RakPeer*, void*);
 
 public:
-    static std::string towriteip;
-
     typedef void(__thiscall *original)(RaknetConnector *);
+    typedef __int64(__thiscall *originalRakPeer)(RakPeer*, void*);
 
     static inline original raknetTickOriginal = nullptr;
+    static inline originalRakPeer getAveragePingOriginal = nullptr;
 
-    RaknetTickHook() : Hook("RaknetTick",GET_SIG("RaknetTick")) {}
+    RaknetTickHook() : Hook("RaknetTick", GET_SIG("RaknetTick")) {}
 
     void enableHook() override;
 };

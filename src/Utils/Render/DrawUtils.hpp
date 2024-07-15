@@ -4,8 +4,6 @@
 
 class DrawUtils {
 public:
-    static void setCtx(MinecraftUIRenderContext *ctx, GuiData *gui);
-
     static void addLine(Vec2<float> start, Vec2<float> end, float lineWidth, D2D_COLOR_F color);
 
     static void addBox(Vec3<float> lower, Vec3<float> upper, float lineWidth, int mode = 1,

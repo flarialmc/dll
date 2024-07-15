@@ -5,11 +5,9 @@ bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COL
     if (isInScrollView) y += scrollpos;
     if (shouldAdditionalY) y += additionalY[additionalIndex];
 
-    const bool isAdditionalY = shouldAdditionalY;
-
-    D2D1_COLOR_F buttonColor = CursorInRect(x, y, width, height) ? D2D1::ColorF(color.r - darkenAmounts[x + y],
-                                                                                color.g - darkenAmounts[x + y],
-                                                                                color.b - darkenAmounts[x + y], color.a)
+    D2D1_COLOR_F buttonColor = CursorInRect(x, y, width, height) ? D2D1::ColorF(color.r - darkenAmounts[(int)(x + y)],
+                                                                                color.g - darkenAmounts[(int)(x + y)],
+                                                                                color.b - darkenAmounts[(int)(x + y)], color.a)
                                                                  : color;
 
     D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);

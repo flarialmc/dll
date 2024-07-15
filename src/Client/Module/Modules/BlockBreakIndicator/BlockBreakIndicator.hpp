@@ -12,7 +12,7 @@ public:
 
 
     BlockBreakIndicator() : Module("Break Progress", "Visual indicator to show the progress\nof breaking a block.",
-                                   R"(\Flarial\assets\block_break_indicator.png)", "") {
+                                   IDR_BLOCK_BREAK_INDICATOR_PNG, "") {
         Module::setup();
     };
 
@@ -304,7 +304,6 @@ public:
         FlarialGUI::ColorPicker(0, toggleX + FlarialGUI::SettingsTextWidth("Background "),
                                 toggleY - Constraints::SpacingConstraint(0.017, textWidth),
                                 settings.getSettingByName<std::string>("bgColor")->value,
-                                settings.getSettingByName<float>("bgOpacity")->value,
                                 settings.getSettingByName<bool>("bgRGB")->value);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
@@ -315,7 +314,6 @@ public:
                                         DWRITE_FONT_WEIGHT_NORMAL);
         FlarialGUI::ColorPicker(1, toggleX + FlarialGUI::SettingsTextWidth("Text "), toggleY * 0.99f,
                                 settings.getSettingByName<std::string>("textColor")->value,
-                                settings.getSettingByName<float>("textOpacity")->value,
                                 settings.getSettingByName<bool>("textRGB")->value);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
@@ -326,7 +324,6 @@ public:
                                         DWRITE_FONT_WEIGHT_NORMAL);
         FlarialGUI::ColorPicker(2, toggleX + FlarialGUI::SettingsTextWidth("Border "), toggleY * 0.99f,
                                 settings.getSettingByName<std::string>("borderColor")->value,
-                                settings.getSettingByName<float>("borderOpacity")->value,
                                 settings.getSettingByName<bool>("borderRGB")->value);
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
@@ -337,7 +334,6 @@ public:
                                         DWRITE_FONT_WEIGHT_NORMAL);
         FlarialGUI::ColorPicker(3, toggleX + FlarialGUI::SettingsTextWidth("Bar Fill "), toggleY * 0.99f,
                                 settings.getSettingByName<std::string>("barFill")->value,
-                                settings.getSettingByName<float>("barFillOpacity")->value,
                                 settings.getSettingByName<bool>("barFillRGB")->value);
 
         FlarialGUI::UnsetScrollView();
@@ -445,8 +441,7 @@ public:
             if (settings.getSettingByName<bool>("BlurEffect")->value)
                 FlarialGUI::BlurRect(
                         D2D1::RoundedRect(D2D1::RectF(coord.x, coord.y, coord.x + pbwidth, coord.y + pbheight),
-                                          rounde.x, rounde.x),
-                        Client::settings.getSettingByName<float>("blurintensity")->value);
+                                          rounde.x, rounde.x));
 
             FlarialGUI::RoundedRect(coord.x, coord.y, bgColor, pbwidth, pbheight, rounde.x, rounde.y);
             if (orientation == "Horizontal")

@@ -10,7 +10,7 @@ class Sneak : public Module {
 public:
 
 
-    Sneak() : Module("Toggle Sneak", "No need to hold down your sneak key.", R"(\Flarial\assets\slowly.png)", "SHIFT") {
+    Sneak() : Module("Toggle Sneak", "No need to hold down your sneak key.", IDR_SLOWLY_PNG, "SHIFT") {
 
         Module::setup();
 

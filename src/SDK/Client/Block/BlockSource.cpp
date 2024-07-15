@@ -1,5 +1,4 @@
 #include "BlockSource.hpp"
-#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 Biome *BlockSource::getBiome(const Vec3<int> &bp) {
 

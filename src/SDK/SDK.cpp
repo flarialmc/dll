@@ -7,29 +7,9 @@ ClientInstance *SDK::clientInstance = nullptr;
 ScreenView *SDK::screenView = nullptr;
 std::string SDK::currentScreen;
 bool SDK::hasInstanced = false;
+__int64 SDK::serverPing = 0;
+
 std::chrono::steady_clock::time_point SDK::lastSetCurrentScreenTime;
-
-void SDK::setCI() {
-    struct bruh {
-        struct bruh2 {
-            struct bruh3 {
-                char pad[0x58];
-                struct bruh4 {
-                    ClientInstance *ci;
-                } *bruh4;
-            } *bruh3;
-        } *bruh2;
-    };
-
-    static bruh *off;
-
-    if (off == nullptr) {
-        uintptr_t addr = Memory::findSig(GET_SIG("clientInstanceSig"));
-        off = reinterpret_cast<bruh *>(Memory::offsetFromSig(addr, 3));
-    }
-
-    clientInstance = off->bruh2->bruh3->bruh4->ci;
-}
 
 std::shared_ptr<Packet> SDK::createPacket(int id) {
 
@@ -60,12 +40,12 @@ int SDK::getServerPing() {
                 if (SDK::clientInstance->getRakNetConnector()->JoinedIp.empty()) {
                     return 0;
                 } else {
-                    return SDK::clientInstance->getRakNetConnector()->getPing();
+                    return (int)SDK::serverPing;
                 }
             }
         }
     }
-    return 1;
+    return -1;
 }
 
 std::string SDK::getServerIP() {
@@ -76,9 +56,11 @@ std::string SDK::getServerIP() {
                 ip = SDK::clientInstance->getRakNetConnector()->JoinedIp;
                 if (!ip.empty()) {
                     return ip;
+                } else{
+                    return "world";
                 }
             }
         }
     }
-    return "world";
+    return "none";
 }

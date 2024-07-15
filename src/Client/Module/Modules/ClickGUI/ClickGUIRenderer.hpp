@@ -73,7 +73,7 @@ public:
         if (ClientInstance::getTopScreenName() == "inventory_screen" ||
             SDK::currentScreen.find("chest") != std::string::npos)
             if (Client::settings.getSettingByName<bool>("watermark")->value)
-                FlarialGUI::image(R"(\Flarial\assets\flarial-title.png)",
+                FlarialGUI::image(IDR_FLARIAL_TITLE_PNG,
                                   D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
                                               allahuakbar.y + akbar));
 
@@ -171,7 +171,7 @@ public:
             float logoY = (navy + navigationBarHeight / 2.0f - logoWidth / 2.0f);
 
             if (!Client::settings.getSettingByName<bool>("noicons")->value)
-                FlarialGUI::image(R"(\Flarial\assets\logo.png)",
+                FlarialGUI::image(IDR_LOGO_PNG,
                                   D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth));
 
             FlarialGUI::Tooltip("easter egg", logoX, logoY, "Never gonna give you up", logoWidth, logoWidth);
@@ -231,7 +231,7 @@ public:
             radioY -= Constraints::SpacingConstraint(-0.15f, logoWidth);
 
             if (!Client::settings.getSettingByName<bool>("noicons")->value)
-                FlarialGUI::image(R"(\Flarial\assets\modules.png)",
+                FlarialGUI::image(IDR_MODULES_PNG,
                                   D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
 
 
@@ -270,7 +270,7 @@ public:
             radioY -= Constraints::SpacingConstraint(-0.15f, logoWidth);
 
             if (!Client::settings.getSettingByName<bool>("noicons")->value)
-                FlarialGUI::image(R"(\Flarial\assets\gear.png)",
+                FlarialGUI::image(IDR_GEAR_PNG,
                                   D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
 
             radioX = navx - Constraints::SpacingConstraint(-0.85f, logoWidth);
@@ -305,7 +305,7 @@ public:
             radioY -= Constraints::SpacingConstraint(-0.15f, logoWidth);
 
             if (!Client::settings.getSettingByName<bool>("noicons")->value)
-                FlarialGUI::image(R"(\Flarial\assets\pencil.png)",
+                FlarialGUI::image(IDR_PENCIL_PNG,
                                   D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
 
             /* tab buttons end */
@@ -322,7 +322,7 @@ public:
                     float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
                     float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
 
-                    Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.60,
+                    Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.63,
                                                                           -0.52);
 
                     FlarialGUI::PushSize(center.x, center.y, baseWidth,
@@ -360,27 +360,27 @@ public:
                     else
                         std::sort(modules.begin(), modules.end(), compareNames);
 
-                    for (Module *real: modules) {
+                    for (Module *pModule: modules) {
                         bool visible = (modcenter.y + yModifier + FlarialGUI::scrollpos > center.y) &&
                                        (modcenter.y + yModifier + FlarialGUI::scrollpos - 150) <
                                        center.y + Constraints::RelativeConstraint(baseHeightReal);
                         if (!searchBarString.empty()) {
-                            std::string name = real->name;
+                            std::string name = pModule->name;
 
                             for (char &c: name) {
-                                c = std::tolower(c);
+                                c = (char)std::tolower(c);
                             }
 
                             std::string search = searchBarString;
 
                             for (char &c: search) {
-                                c = std::tolower(c);
+                                c = (char)std::tolower(c);
                             }
 
                             if (name.starts_with(search) ||
                                 name.find(search) != std::string::npos) {
-                                ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
-                                                          real->icon, i, visible);
+                                ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, pModule,
+                                                          pModule->icon, i, visible);
                                 xModifier += Constraints::SpacingConstraint(1.09, modWidth);
                                 if ((++i % 3) == 0) {
                                     yModifier += Constraints::SpacingConstraint(0.8, modWidth);
@@ -388,8 +388,8 @@ public:
                                 }
                             }
                         } else {
-                            ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, real,
-                                                      real->icon, i, visible);
+                            ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, pModule,
+                                                      pModule->icon, i, visible);
 
                             xModifier += Constraints::SpacingConstraint(1.09, modWidth);
                             if ((++i % 3) == 0) {

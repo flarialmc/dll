@@ -35,7 +35,7 @@
 #define o_colors_secondary7 clickgui->settings.getSettingByName<float>("o_colors_secondary7")->value
 #define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
 
-void FlarialGUI::ColorPicker(const int index, float x, const float y, std::string &hex, float &opacity, bool &rgb) {
+void FlarialGUI::ColorPicker(const int index, float x, const float y, std::string &hex, bool &rgb) {
 
     // Accepts hex, so for e.g. fps counter bg color wants to be changed then you'd have to give a modifyable hex value
     // Preferably save every color in config as a hex (string)
@@ -67,7 +67,7 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 
     if (rgb) {
         FlarialGUI::image(
-                R"(\Flarial\assets\rgb.png)",
+                IDR_RGB_PNG,
                 D2D1::RectF(
                         x + Constraints::SpacingConstraint(0.1, s),
                         y + s * 0.21f,

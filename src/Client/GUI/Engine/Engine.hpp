@@ -145,7 +145,7 @@ namespace FlarialGUI {
                             float width, float height, float radiusX, float radiusY,
                             const std::string &radioName, const std::string &currentRadio);
 
-    void ApplyGaussianBlur(float blurIntensity);
+    void ApplyGaussianBlur();
 
     void ApplyPaintEffect(float blurIntensity);
 
@@ -195,7 +195,7 @@ namespace FlarialGUI {
 
     D2D1::ColorF HSVtoColorF(float H, float s, float v);
 
-    void ColorPicker(int index, float x, float y, std::string &hex, float &opacity, bool &rgb);
+    void ColorPicker(const int index, float x, const float y, std::string &hex, bool &rgb);
 
     void ColorPickerWindow(int index, std::string &hex, float &opacity, bool &rgb);
 
@@ -222,7 +222,7 @@ namespace FlarialGUI {
 
     void Notify(const std::string &text);
 
-    void BlurRect(D2D1_ROUNDED_RECT rect, float intensity);
+    void BlurRect(D2D1_ROUNDED_RECT rect);
 
     void ApplyGaussianBlurToTarget(ID2D1BitmapRenderTarget *target, float blurIntensity);
 
@@ -270,10 +270,20 @@ namespace FlarialGUI {
 
     void image(const std::string &imageName, D2D1_RECT_F rect);
 
-    void RoundedRectWithImageAndText(int index, float x, float y, float width, float height,
-                                     D2D1_COLOR_F color, const std::string &imagePath, float imageWidth,
-                                     float imageHeight, const wchar_t *text);
+    void RoundedRectWithImageAndText(int index, float x, float y, const float width, const float height,
+                                     const D2D1_COLOR_F color, const std::string &imagePath,
+                                     const float imageWidth, const float imageHeight);
 
     std::string Dropdown(int index, float x, float y, const std::vector<std::string> &options, std::string &value,
                          const std::string &label);
+
+    void image(int resourceId, D2D1_RECT_F rect, LPCTSTR type = "PNG");
+
+    void LoadImageFromResource(int resourceId, ID2D1Bitmap **bitmap, LPCTSTR type = "PNG");
+
+    void LoadFont(int resourceId);
+
+    void RoundedRectWithImageAndText(int index, float x, float y, const float width, const float height,
+                                     const D2D1_COLOR_F color, int iconId, const float imageWidth,
+                                     const float imageHeight);
 }
