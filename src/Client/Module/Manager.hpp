@@ -6,6 +6,8 @@
 namespace ModuleManager {
     extern std::unordered_map<size_t, Module*> moduleMap;
 
+    extern bool initialized;
+
     void initialize();
 
     void terminate();

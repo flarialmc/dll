@@ -53,6 +53,7 @@ void EventHandler::unregisterAll() {
 void EventHandler::onTick(TickEvent &event) {
 
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
 
     for (Listener *&listener: listeners) {
 
@@ -65,6 +66,7 @@ void EventHandler::onTick(TickEvent &event) {
 void EventHandler::onPacketSend(PacketEvent &event) {
 
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
 
     for (Listener *&listener: listeners) {
 
@@ -77,6 +79,7 @@ void EventHandler::onPacketSend(PacketEvent &event) {
 void EventHandler::onPacketReceive(PacketEvent &event) {
 
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
 
     for (Listener *&listener: listeners) {
 
@@ -89,6 +92,7 @@ void EventHandler::onPacketReceive(PacketEvent &event) {
 void EventHandler::onKey(KeyEvent &event) {
 
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
     if (SDK::currentScreen != "hud_screen" &&
     SDK::currentScreen != "f1_screen" &&
     SDK::currentScreen != "zoom_screen"&&
@@ -103,8 +107,8 @@ void EventHandler::onKey(KeyEvent &event) {
 }
 
 void EventHandler::onAttack(AttackEvent &event) {
-
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
 
     for (Listener *&listener: listeners) {
 
@@ -115,8 +119,8 @@ void EventHandler::onAttack(AttackEvent &event) {
 }
 
 void EventHandler::onMouse(MouseEvent &event) {
-
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
 
     for (Listener *&listener: listeners) {
 
@@ -127,8 +131,8 @@ void EventHandler::onMouse(MouseEvent &event) {
 }
 
 void EventHandler::onRender(RenderEvent &event) {
-
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
 
     for (Listener *&listener: listeners) {
 
@@ -140,6 +144,7 @@ void EventHandler::onRender(RenderEvent &event) {
 
 void EventHandler::onSetupAndRender(SetupAndRenderEvent &event) {
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
 
     for (Listener *&listener: listeners) {
         listener->onSetupAndRender(event);
@@ -149,6 +154,7 @@ void EventHandler::onSetupAndRender(SetupAndRenderEvent &event) {
 
 void EventHandler::onGetViewPerspective(PerspectiveEvent &event) {
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
 
     for (Listener *&listener: listeners) {
         listener->onGetViewPerspective(event);
@@ -157,6 +163,7 @@ void EventHandler::onGetViewPerspective(PerspectiveEvent &event) {
 
 void EventHandler::onGetSensitivity(SensitivityEvent &event) {
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
 //    if (SDK::currentScreen != "hud_screen" && SDK::currentScreen != "zoom_screen" && SDK::currentScreen != "f1_screen") return;
 
     for (Listener *&listener: listeners) {
@@ -166,6 +173,7 @@ void EventHandler::onGetSensitivity(SensitivityEvent &event) {
 
 void EventHandler::onGetFogColor(FogColorEvent &event) {
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
 
     for (Listener *&listener: listeners) {
         listener->onGetFogColor(event);
@@ -174,6 +182,7 @@ void EventHandler::onGetFogColor(FogColorEvent &event) {
 
 void EventHandler::onGetHurtColor(HurtColorEvent &event) {
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
 
     for (Listener *&listener: listeners) {
         listener->onGetHurtColor(event);
@@ -182,6 +191,7 @@ void EventHandler::onGetHurtColor(HurtColorEvent &event) {
 
 void EventHandler::onGetGamma(GammaEvent &event) {
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
 
     for (Listener *&listener: listeners) {
         listener->onGetGamma(event);
@@ -190,6 +200,7 @@ void EventHandler::onGetGamma(GammaEvent &event) {
 
 void EventHandler::onGetFOV(FOVEvent &event) {
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
 //    if (SDK::currentScreen != "hud_screen" && SDK::currentScreen != "zoom_screen" && SDK::currentScreen != "f1_screen") return;
 
     for (Listener *&listener: listeners) {
@@ -199,6 +210,7 @@ void EventHandler::onGetFOV(FOVEvent &event) {
 
 void EventHandler::onDrawText(DrawTextEvent &event) {
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
     for (Listener *&listener: listeners) {
         listener->onDrawText(event);
     }
@@ -206,6 +218,7 @@ void EventHandler::onDrawText(DrawTextEvent &event) {
 
 void EventHandler::onDrawImage(DrawImageEvent &event) {
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
     for (Listener *&listener: listeners) {
         listener->onDrawImage(event);
     }
@@ -213,6 +226,7 @@ void EventHandler::onDrawImage(DrawImageEvent &event) {
 
 void EventHandler::onSetTopScreenName(SetTopScreenNameEvent &event) {
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
     for (Listener *&listener: listeners) {
         listener->onSetTopScreenName(event);
     }
@@ -220,6 +234,7 @@ void EventHandler::onSetTopScreenName(SetTopScreenNameEvent &event) {
 
 void EventHandler::onRaknetTick(RaknetTickEvent &event) {
     if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
     for (Listener *&listener: listeners) {
         listener->onRaknetTick(event);
     }

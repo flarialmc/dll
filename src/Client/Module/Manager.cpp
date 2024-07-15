@@ -71,6 +71,7 @@ namespace ModuleManager {
     std::vector<std::string> onlineCommites;
     std::vector<std::string> onlinePluses;
     std::vector<std::string> onlineStaff;
+    bool initialized = false;
 }
 
 void ModuleManager::addModule(Module* module) {
@@ -158,9 +159,12 @@ void ModuleManager::initialize() {
     EventHandler::registerListener(new CentreCursorListener("CentreCursor"));
     EventHandler::registerListener(new rgbListener("RGB Controller"));
     EventHandler::registerListener(new TextAliasListener("TextAlias"));
+
+    initialized = true;
 }
 
 void ModuleManager::terminate() {
+    initialized = false;
     for (const auto& pair : ModuleManager::moduleMap) {
         pair.second->terminate();
     }
