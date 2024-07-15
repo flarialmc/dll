@@ -1,12 +1,14 @@
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+
 struct MoveInputComponent {
+    // ? calculateMoveVector@PlayerMovement
+    BUILD_ACCESS(this, bool, forward, GET_OFFSET("MoveInputComponent::forward"));
+    BUILD_ACCESS(this, bool, backward, GET_OFFSET("MoveInputComponent::backward"));
+    BUILD_ACCESS(this, bool, left, GET_OFFSET("MoveInputComponent::left"));
+    BUILD_ACCESS(this, bool, right, GET_OFFSET("MoveInputComponent::right"));
 
-    BUILD_ACCESS(this, bool, forward, 0x0A);
-    BUILD_ACCESS(this, bool, backward, 0x0B);
-    BUILD_ACCESS(this, bool, left, 0x0C);
-    BUILD_ACCESS(this, bool, right, 0x0D);
-
-    BUILD_ACCESS(this, bool, sneaking, 0x20);
-    BUILD_ACCESS(this, bool, jumping, 0x26);
-    BUILD_ACCESS(this, bool, sprinting, 0x27);
+    BUILD_ACCESS(this, bool, sneaking, GET_OFFSET("MoveInputComponent::sneaking")); // ?setSneaking@Actor ?
+    BUILD_ACCESS(this, bool, jumping, GET_OFFSET("MoveInputComponent::jumping"));
+    BUILD_ACCESS(this, bool, sprinting, GET_OFFSET("MoveInputComponent::sprinting"));
 
 };

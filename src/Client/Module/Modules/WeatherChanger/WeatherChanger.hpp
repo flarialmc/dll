@@ -10,35 +10,31 @@ class WeatherChanger : public Module {
 public:
 
 
-    WeatherChanger() : Module("Weather Changer", "Changes the weather ingame.", "\\Flarial\\assets\\cloudy.png", 'o') {
+    WeatherChanger() : Module("Weather Changer", "Changes the weather ingame.", R"(\Flarial\assets\cloudy.png)", "") {
 
-        onEnable();
+        Module::setup();
 
     };
 
     void onEnable() override {
-
+        EventHandler::registerListener(new WeatherListener("Weather", this));
         Module::onEnable();
+    }
 
+    void onDisable() override {
+        EventHandler::unregisterListener("Weather");
+        Module::onDisable();
+    }
+
+    void defaultConfig() override {
         if (settings.getSettingByName<float>("rain") == nullptr) settings.addSetting("rain", 1.00f);
 
         if (settings.getSettingByName<float>("lighting") == nullptr) settings.addSetting("lighting", 0.00f);
 
         if (settings.getSettingByName<bool>("snow") == nullptr) settings.addSetting("snow", false);
-
-
-        EventHandler::registerListener(new WeatherListener("Weather", this));
     }
 
-    void onDisable() override {
-
-        EventHandler::unregisterListener("Weather");
-
-        Module::onDisable();
-
-    }
-
-    void SettingsRender() override {
+    void settingsRender() override {
 
         /* Border Start */
 
@@ -70,15 +66,21 @@ public:
 
         this->settings.getSettingByName<float>("lighting")->value = percent;
 
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-        if (FlarialGUI::Toggle(0, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "snow")->value)) this->settings.getSettingByName<bool>("snow")->value = !this->settings.getSettingByName<bool>("snow")->value;
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth / 2.0f), toggleY,
-                                        L"Snow (intensity depends on rain)",
-                                        Constraints::SpacingConstraint(4.5, textWidth), textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.95, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
+        if (!WinrtUtils::check(21, 0)) {
 
+            toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+            if (FlarialGUI::Toggle(0, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                    "snow")->value))
+                this->settings.getSettingByName<bool>("snow")->value = !this->settings.getSettingByName<bool>(
+                        "snow")->value;
+            FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth / 2.0f), toggleY,
+                                            L"Snow (intensity depends on rain)",
+                                            Constraints::SpacingConstraint(4.5, textWidth), textHeight,
+                                            DWRITE_TEXT_ALIGNMENT_LEADING,
+                                            Constraints::SpacingConstraint(0.95, textWidth),
+                                            DWRITE_FONT_WEIGHT_NORMAL);
+
+        }
     }
 };
 

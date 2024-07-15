@@ -5,6 +5,7 @@
 
 class PlayerInventory {
 public:
-	BUILD_ACCESS(this, int, SelectedSlot, 0x010)
-	BUILD_ACCESS(this, Inventory*, inventory, 0xC0);
+    BUILD_ACCESS(this, int, SelectedSlot, GET_OFFSET("PlayerInventory::SelectedSlot"));
+
+    BUILD_ACCESS(this, Inventory*, inventory, GET_OFFSET("PlayerInventory::inventory"));
 };

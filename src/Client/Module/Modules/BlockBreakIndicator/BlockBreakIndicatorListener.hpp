@@ -14,26 +14,25 @@
 
 class BlockBreakIndicatorListener : public Listener {
 
-	Module* module;
+    Module *module;
 
-	void onRender(RenderEvent& event) override {
-		if (
-			SDK::CurrentScreen == "hud_screen" &&
-			module->settings.getSettingByName<bool>("enabled")->value &&
-			SDK::hasInstanced && SDK::clientInstance != nullptr &&
-			SDK::clientInstance->getLocalPlayer() != nullptr
-			) {
+    void onRender(RenderEvent &event) override {
+        if (
+                SDK::hasInstanced && SDK::clientInstance != nullptr &&
+                SDK::clientInstance->getLocalPlayer() != nullptr &&
+                SDK::clientInstance->getLocalPlayer()->getgamemode() != nullptr
+                ) {
+            auto progress_value = (*SDK::clientInstance->getLocalPlayer()->getgamemode()).lastBreakProgress *100;
+            std::string progress = std::format("{:.0f}%", progress_value);
+            this->module->normalRender(16, progress);
+        }
+    }
 
-			std::string progress = std::format("{:.0f}%", (*SDK::clientInstance->getLocalPlayer()->getgamemode()).lastBreakProgress*100);
-			this->module->NormalRender(16, module->settings.getSettingByName<std::string>("text")->value, progress);
-
-		}
-	}
 
 public:
-	explicit BlockBreakIndicatorListener(const char string[5], Module* module) {
-		this->name = string;
-		this->module = module;
-	}
+    explicit BlockBreakIndicatorListener(const char string[5], Module *module) {
+        this->name = string;
+        this->module = module;
+    }
 };
 

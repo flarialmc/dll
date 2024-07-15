@@ -7,14 +7,14 @@
 #include "../Module.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
 #include "../../Manager.hpp"
-#include <Windows.h>
+#include <windows.h>
 #include <chrono>
 
 namespace CPS {
 
     static int inline leftcps = 0;
     static int inline rightcps = 0;
-};
+}
 
 class ClickData {
 public:
@@ -31,20 +31,20 @@ private:
     static inline bool leftClickHeld;
     static inline std::chrono::time_point<std::chrono::high_resolution_clock> lastRightClick;
     static inline std::chrono::time_point<std::chrono::high_resolution_clock> lastLeftClick;
-    Module* module;
+    Module *module;
 
-    void onMouse(MouseEvent& event) override {
-        Module* limiter = ModuleManager::getModule("CPS Limiter");
-        if (event.GetButton() == MouseButton::Left) {
+    void onMouse(MouseEvent &event) override {
+        Module *limiter = ModuleManager::getModule("CPS Limiter");
+        if(limiter == nullptr) return;
+        if (event.getButton() == MouseButton::Left) {
             if (!MC::held) {
                 leftClickHeld = false;
-            }
-            else {
+            } else {
                 leftClickHeld = true;
                 if (limiter->settings.getSettingByName<bool>("enabled")) {
                     std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - lastLeftClick;
-                    float LT = 1.3 / limiter->settings.getSettingByName<float>("Left")->value;
-                    if (duration.count() < LT and limiter->settings.getSettingByName<bool>("enabled")->value) {
+                    float LT = 1.3f / limiter->settings.getSettingByName<float>("Left")->value;
+                    if (duration.count() < LT and limiter->isEnabled()) {
                         MC::held = !MC::held;
                         event.cancel();
                         return;
@@ -54,16 +54,15 @@ private:
                 lastLeftClick = std::chrono::high_resolution_clock::now();
             }
         }
-        if (event.GetButton() == MouseButton::Right) {
+        if (event.getButton() == MouseButton::Right) {
             if (!MC::held) {
                 rightClickHeld = false;
-            }
-            else {
+            } else {
                 rightClickHeld = true;
                 if (limiter->settings.getSettingByName<bool>("enabled")) {
                     std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - lastRightClick;
                     float RT = 1 / limiter->settings.getSettingByName<float>("Right")->value;
-                    if (duration.count() < RT and limiter->settings.getSettingByName<bool>("enabled")->value) {
+                    if (duration.count() < RT and limiter->isEnabled()) {
                         MC::held = !MC::held;
                         event.cancel();
                         return;
@@ -76,25 +75,27 @@ private:
 
     }
 
-    void onRender(RenderEvent& event) override {
-
-        if (SDK::CurrentScreen == "hud_screen")
-            if (module->settings.getSettingByName<bool>("enabled")->value) {
-                if (!module->settings.getSettingByName<bool>("rightcps")->value)
-                    this->module->NormalRender(1, module->settings.getSettingByName<std::string>("text")->value, std::to_string(GetLeftCPS()));
-                else this->module->NormalRender(1, module->settings.getSettingByName<std::string>("text")->value, std::to_string(GetLeftCPS()) + " | " + std::to_string(GetRightCPS()));
+    void onRender(RenderEvent &event) override {
+            if (module->isEnabled()) {
+                if (!module->settings.getSettingByName<bool>("rightcps")->value) {
+                    std::string leftCPS = std::to_string(GetLeftCPS());
+                    this->module->normalRender(1, leftCPS);
+                } else {
+                    std::string leftAndRightCPS = std::to_string(GetLeftCPS()) + " | " + std::to_string(GetRightCPS());
+                    this->module->normalRender(1, leftAndRightCPS);
+                }
 
             }
 
     }
 
 public:
-    explicit CPSListener(const char string[5], Module* module) {
+    explicit CPSListener(const char string[5], Module *module) {
         this->name = string;
         this->module = module;
     }
 
-    void AddLeftClick() {
+    static void AddLeftClick() {
         ClickData click{};
         click.timestamp = Microtime();
         leftClickList.insert(leftClickList.begin(), click);
@@ -104,7 +105,7 @@ public:
         }
     }
 
-    void AddRightClick() {
+    static void AddRightClick() {
         ClickData click{};
         click.timestamp = Microtime();
         rightClickList.insert(rightClickList.begin(), click);
@@ -120,11 +121,11 @@ public:
         }
 
         double currentMicros = Microtime();
-        int count = std::count_if(leftClickList.begin(), leftClickList.end(), [currentMicros](const ClickData& click) {
+        int count = std::count_if(leftClickList.begin(), leftClickList.end(), [currentMicros](const ClickData &click) {
             return (currentMicros - click.timestamp <= 1.0);
-            });
+        });
 
-        return (int)std::round(count);
+        return (int) std::round(count);
     }
 
     [[nodiscard]] static int GetRightCPS() {
@@ -133,23 +134,26 @@ public:
         }
 
         double currentMicros = Microtime();
-        int count = std::count_if(rightClickList.begin(), rightClickList.end(), [currentMicros](const ClickData& click) {
-            return (currentMicros - click.timestamp <= 1.0);
-            });
+        int count = std::count_if(rightClickList.begin(), rightClickList.end(),
+                                  [currentMicros](const ClickData &click) {
+                                      return (currentMicros - click.timestamp <= 1.0);
+                                  });
 
-        return (int)std::round(count);
+        return (int) std::round(count);
     }
 
     [[nodiscard]] static bool GetLeftHeld() {
         return leftClickHeld;
     }
+
     [[nodiscard]] static bool GetRightHeld() {
         return rightClickHeld;
     }
 
 private:
     [[nodiscard]] static double Microtime() {
-        return (double(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) / double(1000000));
+        return (double(std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::system_clock::now().time_since_epoch()).count()) / double(1000000));
     }
 
 };

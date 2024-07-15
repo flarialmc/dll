@@ -1,0 +1,69 @@
+#include "WinrtUtils.hpp"
+
+// Made by marioCST, ported by FreezeEngine
+
+#include <winrt/Windows.ApplicationModel.h>
+
+#include "../Utils.hpp"
+
+Version WinrtUtils::getMCVersion() {
+    static Version version;
+
+    static bool done = false;
+
+    if (!done) {
+        winrt::init_apartment();
+
+        try {
+            const winrt::Windows::ApplicationModel::Package package = winrt::Windows::ApplicationModel::Package::Current();
+            auto [major, minor, build, revision] = package.Id().Version();
+
+            version.major = major;
+            version.minor = minor;
+            version.build = build;
+        }
+        catch (const winrt::hresult_error& ex) {
+            version.error = "Error: " + to_string(ex.message());
+        }
+
+        done = true;
+    }
+
+    return version;
+}
+
+bool WinrtUtils::check(const int m, const int b) {
+    static auto [major, minor, build, error] = getMCVersion();
+    if(m < minor) return true;
+    return m <= minor && b <= build / 100;
+}
+
+std::string WinrtUtils::getVersion() {
+    static auto [major, minor, build, error] = getMCVersion();
+    return error.empty() ? std::to_string(major) + "." + std::to_string(minor) + "." + std::to_string(build) : error;
+}
+
+std::string WinrtUtils::getFormattedVersion() {
+    const std::string& version = getVersion();
+    // Split version string by dots
+    std::vector<std::string> parts;
+    std::istringstream iss(version);
+    std::string part;
+
+    while (std::getline(iss, part, '.')) {
+        parts.push_back(part);
+    }
+
+    // Ensure at least major and minor parts exist
+    if (parts.size() < 2) {
+        return version; // Invalid version format
+    }
+
+    // Construct formatted version string
+    std::string formattedVersion = parts[0] + "." + parts[1];
+    if (parts.size() > 2) {
+        formattedVersion += "." + parts[2].substr(0, 1); // Take only the first character of the patch version
+    }
+
+    return formattedVersion;
+}

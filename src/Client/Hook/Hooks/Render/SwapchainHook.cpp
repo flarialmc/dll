@@ -8,45 +8,92 @@
 #include <d3d11on12.h>
 #include <wrl/client.h>
 #include <algorithm>
+#include <windows.h>
+#include <iostream>
+#include <Psapi.h>
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", "") {}
 
-ID3D12CommandQueue* SwapchainHook::queue = nullptr;
+ID3D12CommandQueue *SwapchainHook::queue = nullptr;
 
 static std::chrono::high_resolution_clock fpsclock;
-static std::chrono::steady_clock::time_point start = fpsclock.now();
-static std::chrono::steady_clock::time_point previousFrameTime = fpsclock.now();
+static std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
+static std::chrono::steady_clock::time_point previousFrameTime = std::chrono::high_resolution_clock::now();
 
 int SwapchainHook::currentBitmap;
 
-void SwapchainHook::enableHook()
-{
-    void* swapchain_ptr;
+bool unloadDll(const wchar_t* moduleName) {
+    HMODULE hModule = GetModuleHandleW(moduleName);
+    if (hModule != NULL) {
+        if (FreeLibrary(hModule)) {
+            Logger::debug("[UNLOAD DLL] DLL unloaded!");
+            return true;
+        } else {
+            Logger::debug("[UNLOAD DLL] Failed to FreeLibrary!");
+            return false;
+        }
+    } else {
+        Logger::debug("[UNLOAD DLL] Failed to unload!");
+        return false;
+    }
+}
 
-    int index;
+bool containsModule(const std::wstring& moduleName) {
+    // Get the handle to the current process
+    HANDLE hProcess = GetCurrentProcess();
+    HMODULE hMods[1024];
+    DWORD cbNeeded;
 
-    if(kiero::getRenderType() == kiero::RenderType::D3D12)
-        index = 140;
-    else index = 8;
+    // Enumerate modules in the process
+    if (EnumProcessModulesEx(hProcess, hMods, sizeof(hMods), &cbNeeded, LIST_MODULES_ALL)) {
+        for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++) {
+            TCHAR szModName[MAX_PATH];
 
-    swapchain_ptr = (void *)kiero::getMethodsTable()[index];
-
-    if(Client::settings.getSettingByName<bool>("killdx")->value) {
-        SwapchainHook::queue = nullptr;
+            // Get the full path to the module
+            if (GetModuleFileNameEx(hProcess, hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR))) {
+                std::wstring baseModuleName = std::filesystem::path(szModName).filename().wstring();
+                // Compare the base module name with the given module name
+                if (moduleName == baseModuleName) {
+                    return true;
+                }
+            }
+        }
     }
 
-    this->manualHook(swapchain_ptr, swapchainCallback, (void **)&func_original);
+    return false;
+}
+
+void SwapchainHook::enableHook() {
+
+
+    if (kiero::getRenderType() == kiero::RenderType::D3D12) {
+        kiero::bind(140, (void**)&funcOriginal, swapchainCallback);
+    }
+    else if (kiero::getRenderType() == kiero::RenderType::D3D11) {
+        kiero::bind(8, (void**)&funcOriginal, swapchainCallback);
+    }
+
+    bool isRTSS = containsModule(L"RTSSHooks64.dll");
+
+    if(isRTSS) {
+        // if(!unloadDll(L"RTSSHooks64.dll")) { // causes a crash sometimes
+        // Logger::debug("[Swapchain] MSI Afterburner failed to unload!");
+        MessageBox(NULL, "Flarial: client failed to initialize, disable MSI Afterburner!", "", MB_OK);
+        ModuleManager::terminate();
+        Client::disable = true;
+        // }
+    }
 }
 
 bool SwapchainHook::init = false;
 
-void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
+HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
 
 
     SwapchainHook::swapchain = pSwapChain;
     SwapchainHook::flagsreal = flags;
 
-    std::chrono::duration<float> elapsed = fpsclock.now() - start;
+    std::chrono::duration<float> elapsed = std::chrono::high_resolution_clock::now() - start;
     MC::frames += 1;
 
 
@@ -55,14 +102,14 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
         MC::fps = static_cast<int>(MC::frames / elapsed.count());
         // Reset frame counter and update start time
         MC::frames = 0;
-        start = fpsclock.now();
+        start = std::chrono::high_resolution_clock::now();
     }
 
     constexpr float targetFrameRate = 60.0f;
 
 // Measure the elapsed frame time
-    std::chrono::duration<float> frameTime = fpsclock.now() - previousFrameTime;
-    previousFrameTime = fpsclock.now();
+    std::chrono::duration<float> frameTime = std::chrono::high_resolution_clock::now() - previousFrameTime;
+    previousFrameTime = std::chrono::high_resolution_clock::now();
 
 // Calculate the current frame rate
     float currentFrameRate = 1.0f / frameTime.count();
@@ -74,38 +121,40 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
     FlarialGUI::frameFactor = std::min(FlarialGUI::frameFactor, 1.0f);
 
     if (!SwapchainHook::init) {
-        if (SwapchainHook::queue == nullptr) {
+        if (SwapchainHook::queue == nullptr || Client::settings.getSettingByName<bool>("killdx")->value) {
 
-            ID3D12Device5* d3d12device3;
+            ID3D12Device5 *d3d12device3;
 
             if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device3)))) {
-                Logger::debug("Removed d3d12 device");
+                Logger::debug("[SwapChain] Removed d3d12 device");
+                pSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
                 d3d12device3->RemoveDevice();
 
-                return func_original(pSwapChain, syncInterval, flags);
+                return funcOriginal(pSwapChain, syncInterval, flags);
             }
 
-            Logger::debug("not a DX12 device, running dx11 procedures");
+            Logger::debug("[SwapChain] Not a DX12 device, running dx11 procedures");
 
-                    const D2D1_CREATION_PROPERTIES properties
-                            {
-                                    D2D1_THREADING_MODE_MULTI_THREADED,
-                                    D2D1_DEBUG_LEVEL_NONE,
-                                    D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS
-                            };
+            const D2D1_CREATION_PROPERTIES properties
+            {
+                    D2D1_THREADING_MODE_MULTI_THREADED,
+                    D2D1_DEBUG_LEVEL_NONE,
+                    D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS
+            };
 
-                    IDXGISurface1 *eBackBuffer;
-                    pSwapChain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
+            IDXGISurface1 *eBackBuffer;
+            pSwapChain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
 
-                    D2D1CreateDeviceContext(eBackBuffer, properties, &D2D::context);
+            D2D1CreateDeviceContext(eBackBuffer, properties, &D2D::context);
 
-                    D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW, D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED), 96.0, 96.0);
-                    D2D::context->CreateBitmapFromDxgiSurface(eBackBuffer, props, &SwapchainHook::D2D1Bitmap);
+            D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(
+                    D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
+                    D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED), 96.0, 96.0);
+            D2D::context->CreateBitmapFromDxgiSurface(eBackBuffer, props, &SwapchainHook::D2D1Bitmap);
 
-                    Memory::SafeRelease(eBackBuffer);
+            Memory::SafeRelease(eBackBuffer);
 
-                    SwapchainHook::init = true;
-
+            SwapchainHook::init = true;
 
         } else {
 
@@ -115,7 +164,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 kiero::getRenderType() == kiero::RenderType::D3D12) {
                 ID3D11Device *d3d11device;
                 D3D11On12CreateDevice(device,
-                                              D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
+                                      D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
                                       (IUnknown **) &SwapchainHook::queue, 1, 0, &d3d11device, &SwapchainHook::context,
                                       nullptr);
 
@@ -135,7 +184,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 device2->CreateDeviceContext(deviceOptions, &D2D::context);
 
-                Logger::debug("okay so far");
+                Logger::debug("[SwapChain] Prepared.");
 
                 DXGI_SWAP_CHAIN_DESC1 swapChainDescription;
                 pSwapChain->GetDesc1(&swapChainDescription);
@@ -199,19 +248,16 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
         }
 
 
-
     } else {
 
-
-        if(FlarialGUI::writeFactory == nullptr) {
+        if (FlarialGUI::writeFactory == nullptr) {
             DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
                                 reinterpret_cast<IUnknown **>(&FlarialGUI::writeFactory));
         }
 
+        if (D2D::context != nullptr && !Client::disable && SwapchainHook::init && FlarialGUI::writeFactory != nullptr) {
 
-        if(D2D::context != nullptr && !Client::disable && SwapchainHook::init && FlarialGUI::writeFactory != nullptr) {
-
-            if(SwapchainHook::queue != nullptr) {
+            if (SwapchainHook::queue != nullptr) {
 
                 SwapchainHook::currentBitmap = pSwapChain->GetCurrentBackBufferIndex();
 
@@ -222,7 +268,10 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 /* Blur Stuff */
 
-                if(ModuleManager::doesAnyModuleHave("BlurEffect") && Client::settings.getSettingByName<float>("blurintensity")->value > 1 || !FlarialGUI::notifications.empty() && Client::settings.getSettingByName<float>("blurintensity")->value > 1) {
+                if (ModuleManager::doesAnyModuleHave("BlurEffect") &&
+                    Client::settings.getSettingByName<float>("blurintensity")->value > 1 ||
+                    !FlarialGUI::notifications.empty() &&
+                    Client::settings.getSettingByName<float>("blurintensity")->value > 1) {
                     ID2D1Bitmap *bitmap = nullptr;
 
                     if (FlarialGUI::blur == nullptr) {
@@ -239,7 +288,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                     FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
                     FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION,
                                                Client::settings.getSettingByName<float>("blurintensity")->value);
-                    FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_QUALITY);
+                    FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION,
+                                               D2D1_GAUSSIANBLUR_OPTIMIZATION_QUALITY);
 
 
                     ID2D1Image *image;
@@ -247,7 +297,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                     D2D1_IMAGE_BRUSH_PROPERTIES props = D2D1::ImageBrushProperties(
                             D2D1::RectF(0, 0, MC::windowSize.x, MC::windowSize.y));
                     D2D::context->CreateImageBrush(image, props, &FlarialGUI::blurbrush);
-
 
 
                     Memory::SafeRelease(image);
@@ -260,7 +309,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
-                RenderEvent event;
+                RenderEvent event{};
                 EventHandler::onRender(event);
 
 
@@ -276,7 +325,10 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
 
                 /* Blur Stuff */
 
-                if(ModuleManager::doesAnyModuleHave("BlurEffect") && Client::settings.getSettingByName<float>("blurintensity")->value > 1 || !FlarialGUI::notifications.empty() && Client::settings.getSettingByName<float>("blurintensity")->value > 1) {
+                if (ModuleManager::doesAnyModuleHave("BlurEffect") &&
+                    Client::settings.getSettingByName<float>("blurintensity")->value > 1 ||
+                    !FlarialGUI::notifications.empty() &&
+                    Client::settings.getSettingByName<float>("blurintensity")->value > 1) {
                     ID2D1Bitmap *bitmap = nullptr;
 
                     if (FlarialGUI::blur == nullptr) {
@@ -293,7 +345,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                     FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
                     FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION,
                                                Client::settings.getSettingByName<float>("blurintensity")->value);
-                    FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_QUALITY);
+                    FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION,
+                                               D2D1_GAUSSIANBLUR_OPTIMIZATION_QUALITY);
 
 
                     ID2D1Image *image;
@@ -301,7 +354,6 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                     D2D1_IMAGE_BRUSH_PROPERTIES props = D2D1::ImageBrushProperties(
                             D2D1::RectF(0, 0, MC::windowSize.x, MC::windowSize.y));
                     D2D::context->CreateImageBrush(image, props, &FlarialGUI::blurbrush);
-
 
 
                     Memory::SafeRelease(image);
@@ -316,6 +368,7 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
                 RenderEvent event;
                 EventHandler::onRender(event);
                 D2D::context->EndDraw();
+
             }
 
             Memory::SafeRelease(FlarialGUI::blurbrush);
@@ -323,11 +376,8 @@ void SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInte
         }
     }
 
-
-
     if (Client::settings.getSettingByName<bool>("vsync")->value) {
-        return func_original(pSwapChain, 0, DXGI_PRESENT_DO_NOT_WAIT);
-    }
-    else return func_original(pSwapChain, syncInterval, flags);
+        return funcOriginal(pSwapChain, 0, DXGI_PRESENT_DO_NOT_WAIT);
+    } else return funcOriginal(pSwapChain, syncInterval, flags);
 
 }

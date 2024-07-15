@@ -1,17 +1,21 @@
 ﻿#pragma once
+
 #include "Hook/Manager.hpp"
 #include "Module/Manager.hpp"
 #include <vector>
 
-class Client
-{
+class Client {
 public:
     static void initialize();
+
     static bool disable;
+
     static void centerCursor();
 
     static std::string settingspath;
     static Settings settings;
+
+    static inline std::string version;
 
     static void SaveSettings() {
         try {
@@ -23,7 +27,7 @@ public:
             } else {
                 Logger::error("Failed to open file. Maybe it doesn't exist?: " + settingspath);
             }
-        } catch (const std::exception& ex) {
+        } catch (const std::exception &ex) {
             Logger::error(ex.what());
         }
     }
@@ -51,7 +55,8 @@ public:
             std::filesystem::path filePath(settingspath);
             std::filesystem::create_directories(filePath.parent_path());
 
-            HANDLE fileHandle = CreateFileA(settingspath.c_str(), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+            HANDLE fileHandle = CreateFileA(settingspath.c_str(), GENERIC_WRITE | GENERIC_READ,
+                                            FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
                                             OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
             if (fileHandle == INVALID_HANDLE_VALUE) {

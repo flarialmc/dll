@@ -2,51 +2,34 @@
 
 #include "../Hook.hpp"
 #include "../../../../Utils/Memory/Memory.hpp"
-#include "../../../Module/Manager.hpp"
-#include "../../../Module/Modules/Zoom/Zoom.hpp"
-#include "../../../Module/Modules/Zoom/ZoomListener.hpp"
-#include "../../../Module/Manager.hpp"
+#include "../../../Events/Input/SensitivityEvent.hpp"
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include <cmath>
 
-class getSensHook : public Hook
-{
+class getSensHook : public Hook {
 private:
+    // max sens = 0.858693;
 
-	static inline float currSens = 0.0f;
-	static inline bool saved = false;
+    static float getSensCallback(unsigned int *a1, unsigned int a2) {
 
-	// max sens = 0.858693;
+        float sensitivity = funcOriginal(a1, a2);
 
-	static float getSensCallback(unsigned int* a1, unsigned int a2) {
+        SensitivityEvent event(sensitivity);
+        EventHandler::onGetSensitivity(event);
 
-		float sens = func_original(a1, a2);
-
-		if (ModuleManager::getModule("Zoom") != nullptr) {
-			auto zom = reinterpret_cast<Zoom*>(ModuleManager::getModule("Zoom"));
-			if (zom->settings.getSettingByName<bool>("enabled")->value) {
-				if (!saved) {
-					saved = true;
-					currSens = sens;
-				}
-				sens = currSens - (currSens * (((90-ZoomListener::zoomValue) / 90.0f) / 1.25f));
-			}
-			else if (saved) {
-				saved = false;
-			}
-		}
-
-		return sens;
-	}
+        return event.getSensitivity();
+    }
 
 public:
-	typedef float(__thiscall* getSensOriginal)(unsigned int*, unsigned int);
-	static inline getSensOriginal func_original = nullptr;
+    typedef float(__thiscall *getSensOriginal)(unsigned int *, unsigned int);
 
-	getSensHook() : Hook("getSensHook", "48 83 EC ? 48 8B 01 48 8D 54 24 ? 41 B8 17 01 00 00") {}
+    static inline getSensOriginal funcOriginal = nullptr;
 
-	void enableHook() override {
-		this->autoHook(getSensCallback, (void**)&func_original);
-	}
+    getSensHook() : Hook("getSensHook", GET_SIG("Options::getSensitivity")) {}
+
+    void enableHook() override {
+        this->autoHook((void *) getSensCallback, (void **) &funcOriginal);
+    }
 };
 
 

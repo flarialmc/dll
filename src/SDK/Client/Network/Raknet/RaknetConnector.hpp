@@ -2,42 +2,23 @@
 
 
 #include "RakPeer.h"
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "../../../../Utils/Versions/WinrtUtils.hpp"
 #include <string>
 #include <vector>
+#include <libhat/Access.hpp>
 
 
 class RaknetConnector {
 public:
-	BUILD_ACCESS(this, std::string, JoinedIp, 0x438);
+    BUILD_ACCESS(this, std::string, JoinedIp, GET_OFFSET("RaknetConnector::JoinedIp"));
 
-
-	virtual void Destructor();
-	virtual std::vector<std::string*> getLocalIps(void);
-	virtual std::string* getLocalIp(void);
-	virtual uint16_t getPort(void);
-	virtual __int64 getRefinedLocalIps(void);
-	virtual __int64* getConnectedGameInfo(void);
-	virtual void setupNatPunch(bool connectToClient);
-	virtual __int64* getNatPunchInfo(void);
-	virtual void startNatPunchingClient(std::string const&, short);
-	virtual void addConnectionStateListener(__int64*);
-	virtual void removeConnectionStateListener(__int64*);
-	virtual bool isIPv4Supported(void);
-	virtual bool isIPv6Supported(void);
-	virtual uint16_t getIPv4Port(void);
-	virtual uint16_t getIPv6Port(void);
-	virtual void host(__int64 const definition);
-	virtual void connect(__int64 const&, __int64 const&);
-	virtual void disconnect(void);
-	virtual void tick(void);
-	virtual void runEvents(void);
-	virtual bool isServer(void);
-	virtual bool isConnected(struct NetworkIdentifier const&);
-	virtual __int64 closeNetworkConnection(struct NetworkIdentifier const&);
-	virtual NetworkIdentifier* getNetworkIdentifier(void);
-	virtual RakPeer* getPeer(void);
-	virtual RakPeer* getPeerConst(void);
-	virtual void _onDisable(void);
-	virtual void _onEnable(void);
-
+    int getPing() {
+        static auto offset = GET_OFFSET("RaknetConnector::getPeer");
+        if(WinrtUtils::check(20,60)) {
+            return hat::member_at<RakPeer1_20_60*>(this, offset)->getPing();
+        } else {
+            return hat::member_at<RakPeer1_20_50*>(this, offset)->getPing();
+        }
+    }
 };

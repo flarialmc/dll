@@ -5,6 +5,6 @@
 
 class Gamemode {
 public:
-	BUILD_ACCESS(this, Player*, player, 0x8);
-	BUILD_ACCESS(this, float, lastBreakProgress, 0x20);
+    BUILD_ACCESS(this, Player*, player, GET_OFFSET("Gamemode::player"));
+    BUILD_ACCESS(this, float, lastBreakProgress, GET_OFFSET("Gamemode::lastBreakProgress"));
 };

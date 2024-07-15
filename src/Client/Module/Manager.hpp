@@ -2,14 +2,28 @@
 
 #include <vector>
 #include "Modules/Module.hpp"
+// TODO make moduleMap AND modules but use moduleMap for search
+namespace ModuleManager {
+    extern std::unordered_map<size_t, Module*> moduleMap;
 
-namespace ModuleManager
-{
-    extern std::vector<Module*> modules;
     void initialize();
+
     void terminate();
+
+    void addModule(Module *module);
+
+    std::vector<Module *> getModules();
+
     void SaveModulesConfig();
-    bool doesAnyModuleHave(std::string settingName);
-    Module* getModule(std::string name);
-    extern std::vector<std::string> OnlineUsers;
-};
+
+    bool doesAnyModuleHave(const std::string& settingName);
+
+    Module *getModule(const std::string& name);
+
+    extern std::vector<std::string> onlineUsers;
+    extern std::vector<std::string> onlineDevs;
+    extern std::vector<std::string> onlineCommites;
+    extern std::vector<std::string> onlinePluses;
+    extern std::vector<std::string> onlineStaff;
+}
+

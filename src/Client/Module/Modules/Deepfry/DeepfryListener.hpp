@@ -10,20 +10,20 @@
 
 class DeepfryListener : public Listener {
 
-    Module* module;
+    Module *module;
 
-    void onRender(RenderEvent& event) override {
+    void onRender(RenderEvent &event) override {
 
-        if (module->settings.getSettingByName<bool>("enabled")->value) {
+        if (module->isEnabled()) {
             if (module->settings.getSettingByName<bool>("paint")->value) FlarialGUI::ApplyPaintEffect(10.0f);
             else FlarialGUI::ApplyCombinedDeepFry();
-            
+
         }
 
     }
 
 public:
-    explicit DeepfryListener(const char string[5], Module* module) {
+    explicit DeepfryListener(const char string[5], Module *module) {
         this->name = string;
         this->module = module;
     }

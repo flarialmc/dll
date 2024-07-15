@@ -1,31 +1,24 @@
-#include <iostream>
 #include "KeyHook.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "../../../Client.hpp"
-#include "../../../Events/EventHandler.hpp"
+#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
-KeyHook::KeyHook() : Hook("key_hook", "48 ?? ?? ?? 0F B6 ?? 4C ?? ?? ?? ?? ?? ?? 89 ?? ?? ?? 88")
-{
+KeyHook::KeyHook() : Hook("key_hook", GET_SIG("Keyboard::feed")) {}
+
+void KeyHook::enableHook() {
+    this->autoHook((void *) keyCallback, (void **) &funcOriginal);
 }
 
-void KeyHook::enableHook()
-{
-	this->autoHook((void*)keyCallback, (void**)&func_original);
-}
+void KeyHook::keyCallback(unsigned char  key, int state) {
+    if (Client::disable) return;
+    if (state == (int) ActionType::Pressed) keys[key] = true;
+    else keys[key] = false;
 
-void KeyHook::keyCallback(int key, int state)
-{
-	if (Client::disable) return;
-	if (state == (int)ActionType::PRESSED) keys[key] = true;
-	else keys[key] = false;
+    KeyEvent event(key, state, keys);
+    EventHandler::onKey(event);
 
-	KeyEvent event(key, state, keys);
-	EventHandler::onKey(event);
+    Sleep(0);
 
-	std::to_string(event.GetKey());
-	std::to_string(event.GetAction());
-	std::to_string(event.isCancelled());
-
-	if (!event.isCancelled())
-		func_original(event.GetKey(), event.GetAction());
+    if (!event.isCancelled())
+        funcOriginal(event.getKey(), event.getAction());
 }

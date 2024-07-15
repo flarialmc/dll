@@ -1,47 +1,47 @@
 #include "ClientInstance.hpp"
 #include "../../SDK.hpp"
 
-LocalPlayer* ClientInstance::getLocalPlayer() {
-    return Memory::CallVFunc<28,LocalPlayer*>(this);
+LocalPlayer *ClientInstance::getLocalPlayer() {
+    static int off = GET_OFFSET("ClientInstance::getLocalPlayer");
+    return Memory::CallVFuncI<LocalPlayer *>(off, this);
 }
 
-BlockSource* ClientInstance::getBlockSource() {
-    return Memory::CallVFunc<27, BlockSource*>(this);
+BlockSource *ClientInstance::getBlockSource() {
+    static int off = GET_OFFSET("ClientInstance::getBlockSource");
+    return Memory::CallVFuncI<BlockSource *>(off, this);
 }
+
 void ClientInstance::grabMouse() {
 
     static uintptr_t indexRef;
-  
+
     if (indexRef == 0) {
-        indexRef = Memory::findSig(
-            "48 8B 80 ? ? ? ? FF 15 ? ? ? ? 90 48 85 DB 74 08 48 8B CB E8 ? ? ? ? 48 8B 8F ? ? ? ? E8 ? ? ? ? 33 D2");
+        indexRef = Memory::findSig(GET_SIG("ClientInstance::grabMouse"));
     }
-    
-    int index = *reinterpret_cast<int*>(indexRef + 3) / 8;
-    return Memory::CallVFuncI<void>(this, index);
+
+    int index = *reinterpret_cast<int *>(indexRef + 3) / 8;
+    return Memory::CallVFuncI<void>(index, this);
 }
 
 void ClientInstance::releaseMouse() {
     static uintptr_t indexRef;
 
     if (indexRef == 0) {
-        indexRef = Memory::findSig(
-            "48 8B 80 ? ? ? ? FF 15 ? ? ? ? 90 48 85 DB 74 08 48 8B CB E8 ? ? ? ? 48 8B 8F ? ? ? ? E8 ? ? ? ? 33 D2");
+        indexRef = Memory::findSig(GET_SIG("ClientInstance::grabMouse"));
+        if(indexRef == NULL) {
+            return;
+        }
     }
 
-    int index = *reinterpret_cast<int*>(indexRef + 3) / 8;
-    return Memory::CallVFuncI<void>(this, index + 1);
+    int index = *reinterpret_cast<int *>(indexRef + 3) / 8;
+    return Memory::CallVFuncI<void>(index + 1, this);
 }
 
-void ClientInstance::refocusMouse() {
-    return Memory::CallVFunc<328, void>(this);
-}
 std::string ClientInstance::getTopScreenName() {
-    return SDK::CurrentScreen;
+    return SDK::currentScreen;
 }
 
-LevelRender* ClientInstance::getLevelRender()
-{
-    uintptr_t address = reinterpret_cast<uintptr_t>(this);
-    return *reinterpret_cast<LevelRender**>(address + 0xE0);
+LevelRender *ClientInstance::getLevelRender() {
+    auto address = reinterpret_cast<uintptr_t>(this);
+    return *reinterpret_cast<LevelRender **>(address + GET_OFFSET("ClientInstance::levelRenderer"));
 }

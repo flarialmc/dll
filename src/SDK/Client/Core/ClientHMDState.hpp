@@ -5,5 +5,5 @@
 
 class ClientHMDState {
 public:
-	BUILD_ACCESS(this, Matrix, lastLevelProjMatrix, 0x148);
+    BUILD_ACCESS(this, Matrix, lastLevelProjMatrix, GET_OFFSET("ClientHMDState::lastLevelProjMatrix"));
 };

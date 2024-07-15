@@ -19,36 +19,35 @@ public:
 
  
 
-    void onLocalTick(TickEvent& event) override {
+    void onTick(TickEvent& event) override {
        
     }
 
     void onRender(RenderEvent& event) override {
-
-       
-
-        if (SDK::CurrentScreen == "hud_screen")
-            if (module->settings.getSettingByName<bool>("enabled")->value && SDK::clientInstance->getLocalPlayer() != nullptr) {
-
-                if(SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
+        if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
+            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
                     auto inventory = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory;
 
-                    for (int i = 0; i < 36; i++) {
-                        auto item = inventory->getItem(i);
+                    if (inventory != nullptr) {
+                        for (int i = 0; i < 36; i++) {
+                            auto item = inventory->getItem(i);
 
-                        if (item->getItem() != NULL) {
-                            if (item->getItem()->name == "splash_potion") {
-                                pots++;
+                            if (item->getItem() != nullptr) {
+                                if (item->getItem()->name == "splash_potion") {
+                                    pots++;
+                                }
                             }
                         }
                     }
 
+                    auto potsStr = std::to_string(pots);
 
-                    this->module->NormalRender(14, module->settings.getSettingByName<std::string>(
-                            "text")->value, std::to_string(pots));
+                    this->module->normalRender(14, potsStr);
 
                     pots = 0;
                 }
+            }
         }
     }
 

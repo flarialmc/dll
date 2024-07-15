@@ -8,39 +8,41 @@ class ArmorHUD : public Module {
 
 public:
 
-    ArmorHUD() : Module("ArmorHUD", "Displays the armor you're\ncurrently wearing.", "\\Flarial\\assets\\chestplate.png", 'Y') {
-
-        onEnable();
-
+    ArmorHUD() : Module("ArmorHUD", "Displays the armor you're\ncurrently wearing.",
+                        R"(\Flarial\assets\chestplate.png)", "") {
+        Module::setup();
     };
 
     void onEnable() override {
-
-        Module::onEnable();
         EventHandler::registerListener(new ArmorHUDListener("ArmorHUD", this));
+        if(FlarialGUI::inMenu){
+            FlarialGUI::Notify("To change the position of ArmorHUD, Please click " +
+                               ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
+                                       "editmenubind")->value + " in the settings tab.");
+        }
+        Module::onEnable();
     }
 
     void onDisable() override {
-
         EventHandler::unregisterListener("ArmorHUD");
-
         Module::onDisable();
-
     }
 
-    void DefaultConfig() override {
+    void defaultConfig() override {
 
-        if (settings.getSettingByName<bool>("enabled") == nullptr) settings.addSetting("enabled", false);
         if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 2.0f);
         if (settings.getSettingByName<float>("percentageX") == nullptr) {
             settings.addSetting("percentageX", 0.0f);
             settings.addSetting("percentageY", 0.0f);
         }
         if (settings.getSettingByName<bool>("vertical") == nullptr) settings.addSetting("vertical", false);
+        if (settings.getSettingByName<bool>("percent") == nullptr) settings.addSetting("percent", false);
+        if (settings.getSettingByName<bool>("color") == nullptr) settings.addSetting("color", false);
+        if (settings.getSettingByName<bool>("showdurability") == nullptr) settings.addSetting("showdurability", false);
 
     }
 
-    void SettingsRender() override {
+    void settingsRender() override {
 
         /* Border Start */
 
@@ -68,12 +70,50 @@ public:
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        FlarialGUI::to_wide("Vertical").c_str(), textWidth * 6.9f, textHeight,
+                                        L"Vertical", textWidth * 6.9f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
 
         if (FlarialGUI::Toggle(2, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "vertical")->value)) this->settings.getSettingByName<bool>("vertical")->value = !this->settings.getSettingByName<bool>("vertical")->value;
+                "vertical")->value))
+            this->settings.getSettingByName<bool>("vertical")->value = !this->settings.getSettingByName<bool>(
+                    "vertical")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                        L"Show durability", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        if (FlarialGUI::Toggle(3, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "showdurability")->value))
+            this->settings.getSettingByName<bool>("showdurability")->value = !this->settings.getSettingByName<bool>(
+                    "showdurability")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                        L"Use percent %", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        if (FlarialGUI::Toggle(4, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "percent")->value))
+            this->settings.getSettingByName<bool>("percent")->value = !this->settings.getSettingByName<bool>(
+                    "percent")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                        L"Change color", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        if (FlarialGUI::Toggle(5, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "color")->value))
+            this->settings.getSettingByName<bool>("color")->value = !this->settings.getSettingByName<bool>(
+                    "color")->value;
 
 
         FlarialGUI::UnsetScrollView();

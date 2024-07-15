@@ -5,10 +5,10 @@
 
 class GuiData {
 public:
-	BUILD_ACCESS(this, Vec2<float>, ScreenSize, 0x0030);
-	BUILD_ACCESS(this, Vec2<float>, ScreenSizeScaled, 0x0040);
-	BUILD_ACCESS(this, float, GuiScale, 0x004C);
-    BUILD_ACCESS(this, float, screenResRounded, 0x0038);
-    BUILD_ACCESS(this, float, sliderAmount, 0x004C);
-    BUILD_ACCESS(this, float, scalingMultiplier, 0x0050);
+    BUILD_ACCESS(this, Vec2<float>, ScreenSize, GET_OFFSET("GuiData::ScreenSize"));
+    BUILD_ACCESS(this, Vec2<float>, ScreenSizeScaled, GET_OFFSET("GuiData::ScreenSizeScaled"));
+    BUILD_ACCESS(this, float, GuiScale, GET_OFFSET("GuiData::GuiScale"));
+    BUILD_ACCESS(this, float, screenResRounded, GET_OFFSET("GuiData::screenResRounded"));
+    BUILD_ACCESS(this, float, sliderAmount, GET_OFFSET("GuiData::sliderAmount"));
+    BUILD_ACCESS(this, float, scalingMultiplier, GET_OFFSET("GuiData::scalingMultiplier"));
 };

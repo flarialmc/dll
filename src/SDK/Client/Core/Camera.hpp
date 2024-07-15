@@ -5,6 +5,6 @@
 
 class Camera {
 public:
-	BUILD_ACCESS(this, Matrix, viewMatrix, 0xC0);
-	BUILD_ACCESS(this, Matrix, projectionMatrix, 0x100);
+    BUILD_ACCESS(this, Matrix, viewMatrix, GET_OFFSET("Camera::viewMatrix"));
+    BUILD_ACCESS(this, Matrix, projectionMatrix, GET_OFFSET("Camera::projectionMatrix"));
 };

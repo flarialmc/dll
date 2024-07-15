@@ -7,7 +7,7 @@
 #include "src/Client/Events/EventHandler.hpp"
 #include "src/Client/Hook/Hooks/Render/ResizeHook.hpp"
 #include "src/Client/Hook/Hooks/Game/RaknetTick.hpp"
-#include "src/Client/Module/Modules/Nick/NickListener.hpp"
+//#include "src/Client/Module/Modules/Nick/NickListener.hpp"
 #include <kiero.h>
 #include <wininet.h>
 
@@ -23,23 +23,20 @@ std::string removeColorCodes(const std::string& input);
 
 DWORD WINAPI init(HMODULE real)
 {
+#ifndef NDEBUG
+    bool shouldDebug = false; // Change this bool locally, NEVER push it set to true
 
-
-    bool showConsole = true;
-    
-    if (GetConsoleWindow() == nullptr && showConsole) {
+    if (GetConsoleWindow() == nullptr && shouldDebug) {
         AllocConsole();
         SetConsoleTitleA("Flarial-Debugger");
         FILE *out;
         freopen_s(&out, ("CONOUT$"), ("w"), stdout);
     }
-    
-
-
+#endif
 
     Client::initialize();
-    Logger::info("Initializing Client");
-    /* API unavalible, crashes
+    Logger::info("[Client] Initializing");
+    /*
     std::thread statusThread([]() {
         while (true) {
 
@@ -50,9 +47,9 @@ DWORD WINAPI init(HMODULE real)
                 if(SDK::hasInstanced && SDK::clientInstance != nullptr) {
                     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                         if(elapsed >= std::chrono::seconds(60)) {
-                            ModuleManager::OnlineUsers.clear();
+                            ModuleManager::onlineUsers.clear();
                             std::string name = SDK::clientInstance->getLocalPlayer()->playerName;
-                            ModuleManager::OnlineUsers.push_back(Utils::removeColorCodes(name));
+                            ModuleManager::onlineUsers.push_back(Utils::removeColorCodes(name));
                             std::string pp = DownloadString("https://api.flarial.net/users");
 
                             json playersDict = json::parse(pp);
@@ -65,7 +62,7 @@ DWORD WINAPI init(HMODULE real)
                                 std::time_t unixTimestamp = player.value()["lastbeat"];
                                 std::chrono::time_point<std::chrono::system_clock> timePoint = std::chrono::system_clock::from_time_t(unixTimestamp);
  
-                                ModuleManager::OnlineUsers.push_back(Utils::removeNonAlphanumeric(player.key()));
+                                ModuleManager::onlineUsers.push_back(Utils::removeNonAlphanumeric(player.key()));
                                
                                 //std::cout << Utils::removeNonAlphanumeric(player.key()) << std::endl;
                       
@@ -83,7 +80,7 @@ DWORD WINAPI init(HMODULE real)
 
                             if(SDK::clientInstance != nullptr)
                             if(SDK::clientInstance->getLocalPlayer() != nullptr)
-                            if (module->settings.getSettingByName<bool>("enabled")->value) {
+                            if (module->isEnabled()) {
                                 name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickListener::original));
                             }
                             // send thing
@@ -104,11 +101,11 @@ DWORD WINAPI init(HMODULE real)
     });
     statusThread.detach();
     */
+
     while (true) {
         if (Client::disable) {
             break;
         } else {
-
             Sleep(50);
         }
     }
@@ -124,14 +121,14 @@ DWORD WINAPI init(HMODULE real)
 
     kiero::shutdown();
 
-    Logger::debug("Shut down Kiero.");
+    Logger::debug("[Kiero] Shut down Kiero.");
 
-    ResizeHook::CleanShit();
+    ResizeHook::cleanShit();
 
     MH_DisableHook(MH_ALL_HOOKS);
     MH_Uninitialize();
 
-    Logger::debug("Freeing Library.");
+    Logger::debug("[MinHook] Freeing Library.");
 
     Sleep(100);
 

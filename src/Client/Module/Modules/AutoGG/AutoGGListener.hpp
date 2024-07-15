@@ -1,110 +1,93 @@
 #pragma once
 
 #include "../../../../SDK/SDK.hpp"
+#include "../../../../SDK//Client/Network/Packet/PlaySoundPacket.hpp"
 #include "../../../../SDK//Client/Network/Packet/TextPacket.hpp"
 #include <format>
 #include "../../../Events/Listener.hpp"
 #include "../../../Events/Input/KeyEvent.hpp"
 #include "../Module.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
-#include "../../../../SDK/Client/Network/Packet/SetTitlePacket.hpp"
 #include <Windows.h>
+#include <chrono>
 
 class AutoGGListener : public Listener {
+    Module *module;
 
-    Module* module;
-    bool prevPacketSent = false;
 
     void onPacketReceive(PacketEvent &event) override {
+        bool triggered = false;
+        MinecraftPacketIds id = event.getPacket()->getId();
 
-
-        if (module->settings.getSettingByName<bool>("enabled")->value) {
-            bool innanillah = false;
-
-            if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
-
-                TextPacket *pkt = reinterpret_cast<TextPacket *>(event.getPacket().get());
-                std::string amongus;
-
-                std::string allahuakbar = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pkt->message));
-
-                if (allahuakbar.find("won the game") != std::string::npos) {
-
-                    innanillah = true;
-
-                }
+        // TODO: add support for other servers (look for "won the game" text)
+        if (id == MinecraftPacketIds::PlaySoundA) {
+            auto *pkt = reinterpret_cast<PlaySoundPacket *>(event.getPacket());
+            if (pkt->mName == "ui.toast.challenge_complete_java") {
+                triggered = true;
             }
 
-            if (event.getPacket()->getId() == MinecraftPacketIds::SetTitle) {
 
-                SetTitlePacket *pkt = reinterpret_cast<SetTitlePacket *>(event.getPacket().get());
-                std::string amongus;
-
-                std::string allahuakbar = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pkt->text));
-
-                if (allahuakbar.find("won") != std::string::npos || allahuakbar.find("lost") != std::string::npos ||
-                    allahuakbar.find("spectating") != std::string::npos || allahuakbar.find("last") != std::string::npos ||
-                    allahuakbar.find("Over") != std::string::npos ||
-                    allahuakbar.find("Sweet Victory") != std::string::npos) {
-
-                    innanillah = true;
-
-                }
-            }
-
-            if (innanillah) {
-                std::string stringToSendYessir = module->settings.getSettingByName<std::string>("text")->value;
-                if (!stringToSendYessir.empty()) {
-                    if (prevPacketSent) {
-                        prevPacketSent = false;
-                        return;
-                    }
-
-                    //std::cout << "bing chilling lol gg" << std::endl;
-
-                    prevPacketSent = true;
-
+            if (triggered) {
+                std::string win_message = module->settings.getSettingByName<std::string>("text")->value;
+                if (!win_message.empty()) {
                     auto player = SDK::clientInstance->getLocalPlayer();
-                    std::string xuid = *player->getXuid(&xuid);
                     std::shared_ptr<Packet> packet = SDK::createPacket(9);
-                    TextPacket *akbar = reinterpret_cast<TextPacket *>(packet.get());
+                    auto *text = reinterpret_cast<TextPacket *>(packet.get());
 
 
-                    akbar->type = TextPacketType::CHAT;
-                    akbar->message = stringToSendYessir;
-                    akbar->platformId = "";
-                    akbar->translationNeeded = false;
-                    akbar->xuid = xuid;
-                    akbar->name = player->playerName;
+                    text->type = TextPacketType::CHAT;
+                    text->message = win_message;
+                    text->platformId = "";
+                    text->translationNeeded = false;
+                    text->xuid = "";
+                    text->name = player->playerName;
 
-                    SDK::clientInstance->getPacketSender()->sendToServer(akbar);
+                    SDK::clientInstance->getPacketSender()->sendToServer(text);
+                }
+            }
+        }
+    
+        else if (id == MinecraftPacketIds::Text) {
+            auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
+            if (pkt->message == "§c§l» §r§c§lGame OVER!") {
+                triggered = true;
+            }
+
+
+            if (triggered) {
+                std::string win_message = module->settings.getSettingByName<std::string>("text")->value;
+                if (!win_message.empty()) {
+                    auto player = SDK::clientInstance->getLocalPlayer();
+                    std::shared_ptr<Packet> packet = SDK::createPacket(9);
+                    auto *text = reinterpret_cast<TextPacket *>(packet.get());
+
+
+                    text->type = TextPacketType::CHAT;
+                    text->message = win_message;
+                    text->platformId = "";
+                    text->translationNeeded = false;
+                    text->xuid = "";
+                    text->name = player->playerName;
+
+                    SDK::clientInstance->getPacketSender()->sendToServer(text);
                 }
             }
         }
     }
-
     void onPacketSend(PacketEvent &event) override {
-//        if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
-//            TextPacket *pkt = reinterpret_cast<TextPacket *>(event.getPacket().get());
-//            std::string allahuakbar = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pkt->message));
-//            std::string stringToSendYessir = module->settings.getSettingByName<std::string>("text")->value;
-//
-//            std::cout << allahuakbar << std::endl;
-//
-//            if (allahuakbar == stringToSendYessir) {
-//
-//            }
-//        }
+        /*if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
+            TextPacket *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
+            std::cout << pkt->message << std::endl;
+            
+        }
+        */
     }
-
 
 public:
     explicit AutoGGListener(const char string[5], Module *
 
-    module) {
+                            module) {
         this->name = string;
         this->module = module;
     }
-
 };
-

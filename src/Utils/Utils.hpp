@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include <string>
 #include <cstdlib>
 #include <cmath>
@@ -9,18 +10,18 @@ struct MCCColor {
         struct {
             float r, g, b, a;
         };
-        float arr[4];
+        float arr[4]{};
     };
     bool shouldDelete = true;
 
     MCCColor() {
-        this->r = 1;
-        this->g = 1;
-        this->b = 1;
-        this->a = 1;
+        this->r = 1.0f;
+        this->g = 1.0f;
+        this->b = 1.0f;
+        this->a = 1.0f;
     };
 
-    MCCColor(const MCCColor& other) {
+    MCCColor(const MCCColor &other) {
         this->r = other.r;
         this->g = other.g;
         this->b = other.b;
@@ -28,7 +29,7 @@ struct MCCColor {
         this->shouldDelete = other.shouldDelete;
     }
 
-    MCCColor(const float* arr) {
+    explicit MCCColor(const float *arr) {
         this->arr[0] = arr[0];
         this->arr[1] = arr[1];
         this->arr[2] = arr[2];
@@ -57,9 +58,9 @@ struct MCCColor {
         this->shouldDelete = shouldDelete;
     };
 
-    MCCColor lerp(const MCCColor& o, float t) const;
+    [[nodiscard]] MCCColor lerp(const MCCColor &o, float t) const;
 
-    MCCColor changeBrightness(float b) const;
+    [[nodiscard]] MCCColor changeBrightness(float b) const;
 };
 
 template<typename T>
@@ -67,32 +68,35 @@ class Vec2 {
 public:
     T x = 0, y = 0;
 public:
-    Vec2(T x = 0, T y = 0) {
+    explicit Vec2(T x = 0, T y = 0) {
         this->x = x;
         this->y = y;
     };
 public:
-    auto sub(const Vec2<T>& v) -> Vec2<T> {
+    auto sub(const Vec2<T> &v) -> Vec2<T> {
         return Vec2<T>(this->x - v.x, this->y - v.y);
     };
-    auto add(const Vec2<T>& v) -> Vec2<T> {
+
+    auto add(const Vec2<T> &v) -> Vec2<T> {
         return Vec2<T>(this->x + v.x, this->y + v.y);
     };
-    auto div(const Vec2<T>& v) -> Vec2<T> {
+
+    auto div(const Vec2<T> &v) -> Vec2<T> {
         return Vec2<T>(this->x / v.x, this->y / v.y);
     };
-    auto mul(const Vec2<T>& v) -> Vec2<T> {
+
+    auto mul(const Vec2<T> &v) -> Vec2<T> {
         return Vec2<T>(this->x * v.x, this->y * v.y);
     };
-    auto dist(const Vec2<T>& v) -> float {
+
+    auto dist(const Vec2<T> &v) -> float {
         auto dX = this->x - v.x;
         auto dY = this->y - v.y;
 
         return sqrt(dX * dX + dY * dY);
     };
+
     auto ToInt() {
-        int x = this->x;
-        int y = this->y;
         return Vec2<int>(x, y);
     }
 };
@@ -102,22 +106,19 @@ class Vec3 : public Vec2<T> {
 public:
     T z = 0;
 public:
-    Vec3(T x = 0, T y = 0, T z = 0) : Vec2<T>(x, y) {
+    explicit Vec3(T x = 0, T y = 0, T z = 0) : Vec2<T>(x, y) {
         this->z = z;
     };
 
     auto ToFloat() {
-        float x = this->x;
-        float y = this->y;
-        float z = this->z;
-        return Vec3<float>(x, y, z);
+        return Vec3<float>(this->x, this->y, z);
     }
 
     auto add(T x, T y, T z) -> Vec3<T> {
         return Vec3<T>(this->x + x, this->y + y, this->z + z);
     };
 
-    auto add(const Vec3<T>& vec) -> Vec3<T> {
+    auto add(const Vec3<T> &vec) -> Vec3<T> {
         return Vec3<T>(this->x + vec.x, this->y + vec.y, this->z + vec.z);
     };
 
@@ -129,7 +130,7 @@ public:
         return Vec3<T>(this->x + x, this->y + y, this->z + z);
     };
 
-    auto sub(const Vec3<T>& vec) -> Vec3<T> {
+    auto sub(const Vec3<T> &vec) -> Vec3<T> {
         return Vec3<T>(this->x - vec.x, this->y - vec.y, this->z - vec.z);
     };
 
@@ -145,7 +146,7 @@ public:
         return Vec3<T>(this->x / x, this->y / y, this->z / z);
     };
 
-    auto div(const Vec3<T>& vec) -> Vec3<T> {
+    auto div(const Vec3<T> &vec) -> Vec3<T> {
         return Vec3<T>(this->x / vec.x, this->y / vec.y, this->z / vec.z);
     };
 
@@ -157,7 +158,7 @@ public:
         return Vec3<T>(this->x * x, this->y * y, this->z * z);
     };
 
-    auto mul(const Vec3<T>& vec) -> Vec3<T> {
+    auto mul(const Vec3<T> &vec) -> Vec3<T> {
         return Vec3<T>(this->x * vec.x, this->y * vec.y, this->z * vec.z);
     };
 
@@ -165,7 +166,7 @@ public:
         return Vec3<T>(this->x * v, this->y * v, this->z * v);
     };
 public:
-    auto dist(const Vec3<T> pos) -> float {
+    auto dist(const Vec3<T> pos) const -> float {
         return sqrt((std::pow(this->x - pos.x, 2)) + (std::pow(this->y - pos.y, 2)) + (std::pow(this->z - pos.z, 2)));
     };
 };
@@ -175,7 +176,7 @@ class Vec4 : public Vec3<T> {
 public:
     T w = 0;
 public:
-    Vec4(T x = 0, T y = 0, T z = 0, T w = 0) : Vec3<T>(x, y, z) {
+    explicit Vec4(T x = 0, T y = 0, T z = 0, T w = 0) : Vec3<T>(x, y, z) {
         this->w = w;
     };
 };
@@ -184,16 +185,19 @@ struct AABB {
     Vec3<float> lower;
     Vec3<float> upper;
 
-    AABB() {}
+    AABB() = default;
+
     AABB(Vec3<float> l, Vec3<float> h) : lower(l), upper(h) {};
-    AABB(const AABB& aabb) {
+
+    AABB(const AABB &aabb) {
         lower = Vec3<float>(aabb.lower);
         upper = Vec3<float>(aabb.upper);
     }
+
     AABB(Vec3<float> lower, float width, float height, float eyeHeight) {
         lower = lower.sub(Vec3<float>(width, eyeHeight * 2, width).div(2));
         this->lower = lower;
-        this->upper = { lower.x + width, lower.y + height, lower.z + width };
+        this->upper = Vec3<float>{lower.x + width, lower.y + height, lower.z + width};
     }
 
     bool isFullBlock() {
@@ -202,11 +206,11 @@ struct AABB {
     }
 
     AABB expanded(float amount) {
-        return AABB(lower.sub(amount), upper.add(amount));
+        return {lower.sub(amount), upper.add(amount)};
     }
 
     AABB expandedXZ(float amount) {
-        return AABB(lower.sub(amount, 0.f, amount), upper.add(amount, 0.f, amount));
+        return {lower.sub(amount, 0.f, amount), upper.add(amount, 0.f, amount)};
     }
 
     Vec3<float> centerPoint() {
@@ -214,51 +218,57 @@ struct AABB {
         return lower.add(diff.mul(0.5f));
     }
 
-    bool intersects(AABB aabb) {
+    bool intersects(const AABB& aabb) {
         return aabb.upper.x > lower.x && upper.x > aabb.lower.x &&
-            aabb.upper.y > lower.y && upper.y > aabb.lower.y &&
-            aabb.upper.z > lower.z && upper.z > aabb.lower.z;
+               aabb.upper.y > lower.y && upper.y > aabb.lower.y &&
+               aabb.upper.z > lower.z && upper.z > aabb.lower.z;
     }
 
-    bool intersectsXZ(AABB aabb) {
+    bool intersectsXZ(const AABB& aabb) {
         return aabb.upper.x > lower.x && upper.x > aabb.lower.x &&
-            aabb.upper.z > lower.z && upper.z > aabb.lower.z;
+               aabb.upper.z > lower.z && upper.z > aabb.lower.z;
     }
 };
 
 
-class Utils
-{
+class Utils {
 public:
     static std::string getRoamingPath();
 
-    static std::string GetKeyAsString(int key, bool isCapital = false, bool isKeybind = true);
+    static std::string getKeyAsString(int key, bool isCapital = false, bool isKeybind = true);
 
-    static int GetStringAsKey(const std::string &str);
+    static int getStringAsKey(const std::string &str);
 
-    static std::string removeColorCodes(const std::string& input);
+    static std::string removeColorCodes(const std::string &input);
 
-    static std::vector<int> GetStringAsKeys(const std::string str);
+    static std::vector<int> getStringAsKeys(const std::string& str);
 
-    static std::string removeNonAlphanumeric(const std::string& input);
+    static std::string removeNonAlphanumeric(const std::string &input);
 
     static std::string remomveNonNumeric(const std::string &input);
+
+    static bool CursorInEllipse(float ellipseX, float ellipseY, float radiusX, float radiusY);
+
+    static constexpr unsigned int hash(const char *str) {
+        unsigned int hash = 5381;
+        int c;
+
+        while ((c = *str++))
+            hash = ((hash << 5) + hash) + c; // hash * 33 + c
+
+        return hash;
+    }
 };
 
-#pragma once
+struct CaretMeasureData {
+    int Position{};
+    bool isSingleline{};// false|insert
 
-struct CaretMeasureData
-{
-    int Position;
-    bool isSingleline;// false|insert
-
-    CaretMeasureData()
-    {
+    CaretMeasureData() {
         CaretMeasureData(0xFFFFFFFF, true);
     };
 
-    CaretMeasureData(int position, bool singlelines)
-    {
+    CaretMeasureData(int position, bool singlelines) {
         this->Position = position;
         this->isSingleline = singlelines;
     };

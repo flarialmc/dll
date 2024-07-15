@@ -2,5 +2,5 @@
 
 class Minecraft {
 public:
-	BUILD_ACCESS(this, float*, timer, 0x00D8);
+    BUILD_ACCESS(this, float*, timer, GET_OFFSET("Minecraft::timer"));
 };

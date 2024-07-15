@@ -1,3 +1,4 @@
 #pragma once
 
-class Block {};
+class Block {
+};

@@ -1,10 +1,8 @@
 #pragma once
 
-struct TextMeasureData
-{ // Stores information about how the text should be displayed
+struct TextMeasureData { // Stores information about how the text should be displayed
 public:
-    TextMeasureData(float size, bool showShadow)
-    {
+    TextMeasureData(float size, bool showShadow) {
         this->textSize = size;
         this->showShadow = showShadow;
         this->id = 0;

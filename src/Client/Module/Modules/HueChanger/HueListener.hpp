@@ -10,11 +10,11 @@
 
 class HueListener : public Listener {
 
-    Module* module;
+    Module *module;
 
-    void onRender(RenderEvent& event) override {
+    void onRender(RenderEvent &event) override {
 
-        if (module->settings.getSettingByName<bool>("enabled")->value) {
+        if (module->isEnabled()) {
 
             FlarialGUI::ApplyHue(module->settings.getSettingByName<float>("intensity")->value);
 
@@ -23,7 +23,7 @@ class HueListener : public Listener {
     }
 
 public:
-    explicit HueListener(const char string[5], Module* module) {
+    explicit HueListener(const char string[5], Module *module) {
         this->name = string;
         this->module = module;
     }
