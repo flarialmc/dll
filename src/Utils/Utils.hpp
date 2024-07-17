@@ -235,6 +235,8 @@ class Utils {
 public:
     static std::string getRoamingPath();
 
+    static bool hasEnding(std::string const &fullString, std::string const &ending);
+
     static std::string getKeyAsString(int key, bool isCapital = false, bool isKeybind = true);
 
     static int getStringAsKey(const std::string &str);

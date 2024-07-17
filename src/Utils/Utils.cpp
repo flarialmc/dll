@@ -17,11 +17,22 @@ std::string Utils::getRoamingPath() {
     return std::string(path) + R"(\..\Local\Packages\Microsoft.MinecraftUWP_8wekyb3d8bbwe\RoamingState)"; // Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe Microsoft.MinecraftUWP_8wekyb3d8bbwe
 }
 
+bool Utils::hasEnding (std::string const &fullString, std::string const &ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
+}
+
+
 std::string Utils::removeColorCodes(const std::string &input) {
     std::string result;
+    std::string newinput = input;
+
     bool skipNext = false;
 
-    for (wchar_t c: FlarialGUI::to_wide(input)) {
+    for (wchar_t c: FlarialGUI::to_wide(newinput)) {
         if (skipNext) {
             skipNext = false;
         } else if (c == L'§') {
@@ -30,6 +41,9 @@ std::string Utils::removeColorCodes(const std::string &input) {
             result += (char)c;
         }
     }
+
+    result.erase(std::prev(result.end()));
+
 
     return result;
 }
