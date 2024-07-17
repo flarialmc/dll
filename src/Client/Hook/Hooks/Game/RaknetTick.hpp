@@ -6,6 +6,8 @@
 class RaknetTickHook : public Hook { //RaknetConnector::tick :)
 
 private:
+    static std::string towriteip;
+
     static void callback(RaknetConnector *);
     static __int64 getAveragePingCallback(RakPeer*, void*);
 

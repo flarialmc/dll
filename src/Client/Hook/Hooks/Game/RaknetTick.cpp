@@ -5,6 +5,8 @@
 #include <filesystem>
 #include <fstream>
 
+std::string RaknetTickHook::towriteip = "";
+
 void RaknetTickHook::callback(RaknetConnector *raknet) {
     if(getAveragePingOriginal == nullptr) {
         uintptr_t getAveragePingAddr = Memory::GetAddressByIndex(raknet->peer->vTable, GET_OFFSET("RakPeer::GetAveragePing"));
@@ -14,10 +16,26 @@ void RaknetTickHook::callback(RaknetConnector *raknet) {
     raknetTickOriginal(raknet);
     if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+
+            std::string ip = raknet->JoinedIp;
+
+            if (ip.empty() && SDK::clientInstance == nullptr) {
+                ip = "none";
+            }
+
+            if (ip.empty() && SDK::clientInstance != nullptr) {
+
+                if (SDK::clientInstance->getLocalPlayer() == nullptr) {
+                    ip = "none";
+                }
+            }
+
+                towriteip = ip;
+            }
+
             RaknetTickEvent event{};
             EventHandler::onRaknetTick(event);
         }
-    }
 }
 
 __int64 RaknetTickHook::getAveragePingCallback(RakPeer *_this, void *guid) {

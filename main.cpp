@@ -34,7 +34,7 @@ DWORD WINAPI init(HMODULE real)
 
     Client::initialize();
     Logger::info("[Client] Initializing");
-    /*
+
     std::thread statusThread([]() {
         while (true) {
 
@@ -48,7 +48,7 @@ DWORD WINAPI init(HMODULE real)
                             ModuleManager::onlineUsers.clear();
                             std::string name = SDK::clientInstance->getLocalPlayer()->playerName;
                             ModuleManager::onlineUsers.push_back(Utils::removeColorCodes(name));
-                            std::string pp = DownloadString("https://api.flarial.net/users");
+                            std::string pp = DownloadString("https://api.flarial.synthetix.host/users");
 
                             json playersDict = json::parse(pp);
 
@@ -82,9 +82,9 @@ DWORD WINAPI init(HMODULE real)
                                 name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickListener::original));
                             }
                             // send thing
-                            std::cout << DownloadString(std::format("https://api.flarial.net/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend))
+                            std::cout << DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend))
 
-                            + " " + std::format("https://api.flarial.net/heartbeat/{}/{}",
+                            + " " + std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",
                               Utils::removeColorCodes(name),
                                 ipToSend) << std::endl;
 
@@ -98,7 +98,7 @@ DWORD WINAPI init(HMODULE real)
         }
     });
     statusThread.detach();
-    */
+
 
     while (true) {
         if (Client::disable) {
