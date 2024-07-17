@@ -10,6 +10,8 @@
 #include <kiero.h>
 #include <wininet.h>
 
+#include "src/Client/Module/Modules/Nick/NickListener.hpp"
+
 std::chrono::steady_clock::time_point lastBeatTime;
 
 std::string replaceAll(std::string subject, const std::string& search,

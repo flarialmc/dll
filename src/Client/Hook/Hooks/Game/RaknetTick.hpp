@@ -5,7 +5,7 @@
 
 class RaknetTickHook : public Hook { //RaknetConnector::tick :)
 
-private:
+public:
     static std::string towriteip;
 
     static void callback(RaknetConnector *);
