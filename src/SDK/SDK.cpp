@@ -24,13 +24,16 @@ std::shared_ptr<Packet> SDK::createPacket(int id) {
 }
 
 void SDK::setCurrentScreen(const std::string& layer) {
-    auto currentTime = std::chrono::steady_clock::now();
-    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastSetCurrentScreenTime).count();
-
-    if (layer != SDK::currentScreen && elapsedTime >= (layer == SDK::currentScreen ? 16 : 500)) {
-        lastSetCurrentScreenTime = std::chrono::steady_clock::now();
-        SDK::currentScreen = layer;
-    }
+    SDK::currentScreen = layer;
+    return;
+    // TODO: use CI::GetScreenName
+//    auto currentTime = std::chrono::steady_clock::now();
+//    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastSetCurrentScreenTime).count();
+//
+//    if (layer != SDK::currentScreen && elapsedTime >= (layer == SDK::currentScreen ? 16 : 500)) {
+//        lastSetCurrentScreenTime = std::chrono::steady_clock::now();
+//        SDK::currentScreen = layer;
+//    }
 }
 
 int SDK::getServerPing() {
