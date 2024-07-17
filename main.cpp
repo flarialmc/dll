@@ -52,27 +52,37 @@ DWORD WINAPI init(HMODULE real)
                             ModuleManager::onlineUsers.push_back(Utils::removeColorCodes(name));
                             std::string pp = DownloadString("https://api.flarial.synthetix.host/users");
 
-                            json playersDict = json::parse(pp);
+                            json playersDict;
+
+                            try {
+                                playersDict = json::parse(pp);
+                            } catch (const json::parse_error& e) {
+                                Logger::error(e.what());
+                                lastBeatTime = now;
+                                continue;
+                            }
 
                             int totalPlaytime = 0;
                             int numberOfPlayers = 0;
 
                             for (const auto& player : playersDict.items()) {
-
-                                std::time_t unixTimestamp = player.value()["lastbeat"];
-                                std::chrono::time_point<std::chrono::system_clock> timePoint = std::chrono::system_clock::from_time_t(unixTimestamp);
- 
-                                ModuleManager::onlineUsers.push_back(Utils::removeNonAlphanumeric(player.key()));
-                               
-                                //std::cout << Utils::removeNonAlphanumeric(player.key()) << std::endl;
-                      
+                                try {
+                                    if (!player.value().contains("lastbeat") || !player.value()["lastbeat"].is_number()) {
+                                        std::cerr << "Invalid or missing 'lastbeat' for player: " << player.key() << std::endl;
+                                        continue;
+                                    }
+                                    ModuleManager::onlineUsers.push_back(Utils::removeNonAlphanumeric(player.key()));
+                                } catch (const std::exception& e) {
+                                    std::cerr << "Error processing player: " << player.key() << " - " << e.what() << std::endl;
+                                    continue;
+                                }
                             }
 
-                            std::string ipToSend;
+                            std::string ipToSend = SDK::getServerIP();
 
                             if (!Client::settings.getSettingByName<bool>("anonymousApi")->value) {
-                                if (RaknetTickHook::towriteip.find("none") != std::string::npos) ipToSend = "in.singleplayer";
-                                else if (!RaknetTickHook::towriteip.empty()) ipToSend = RaknetTickHook::towriteip;
+                                if (ipToSend.find("none") != std::string::npos) ipToSend = "in.singleplayer";
+                                else if (!ipToSend.empty());
                                 else ipToSend = "in.singleplayer";
                             } else ipToSend = "is.anonymous";
 
@@ -84,11 +94,7 @@ DWORD WINAPI init(HMODULE real)
                                 name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickListener::original));
                             }
                             // send thing
-                            std::cout << DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend))
-
-                            + " " + std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",
-                              Utils::removeColorCodes(name),
-                                ipToSend) << std::endl;
+                            DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend));
 
                             lastBeatTime = now;
                         }
