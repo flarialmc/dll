@@ -49,7 +49,7 @@ void OffsetInit::init2100() {
 
     ADD_OFFSET("ClientInstance::minecraftGame", 0xC8);
     ADD_OFFSET("ClientInstance::guiData", 0x558);
-    ADD_OFFSET("ClientInstance::Matrix1", 0x330);
+    ADD_OFFSET("ClientInstance::viewMatrix", 0x330);
 
     ADD_OFFSET("ClientInstance::getFovX", 0x6F0);
     ADD_OFFSET("ClientInstance::getFovY", 0x704);
@@ -167,7 +167,7 @@ void OffsetInit::init2080() {
 
     ADD_OFFSET("ClientInstance::minecraftGame", 0xC8);
     ADD_OFFSET("ClientInstance::guiData", 0x558);
-    ADD_OFFSET("ClientInstance::Matrix1", 0x330);
+    ADD_OFFSET("ClientInstance::viewMatrix", 0x330);
 
     ADD_OFFSET("ClientInstance::getFovX", 0x6F0);
     ADD_OFFSET("ClientInstance::getFovY", 0x704);
@@ -285,7 +285,7 @@ void OffsetInit::init2070() {
 
     ADD_OFFSET("ClientInstance::minecraftGame", 0xC8);
     ADD_OFFSET("ClientInstance::guiData", 0x558);
-    ADD_OFFSET("ClientInstance::Matrix1", 0x330);
+    ADD_OFFSET("ClientInstance::viewMatrix", 0x330);
 
     ADD_OFFSET("ClientInstance::getFovX", 0x6F0);
     ADD_OFFSET("ClientInstance::getFovY", 0x704);
@@ -403,7 +403,7 @@ void OffsetInit::init2060() {
 
     ADD_OFFSET("ClientInstance::minecraftGame", 0x0C8);
     ADD_OFFSET("ClientInstance::guiData", 0x558);
-    ADD_OFFSET("ClientInstance::Matrix1", 0x0330);
+    ADD_OFFSET("ClientInstance::viewMatrix", 0x0330);
 
     ADD_OFFSET("ClientInstance::getFovX", 0x6F0);
     ADD_OFFSET("ClientInstance::getFovY", 0x704);
@@ -524,7 +524,7 @@ void OffsetInit::init2050() {
 
     ADD_OFFSET("ClientInstance::minecraftGame", 0x0C8);
     ADD_OFFSET("ClientInstance::guiData", 0x560);
-    ADD_OFFSET("ClientInstance::Matrix1", 0x0330);
+    ADD_OFFSET("ClientInstance::viewMatrix", 0x0330);
 
     ADD_OFFSET("Minecraft::timer", 0xD8);
 
@@ -642,7 +642,7 @@ void OffsetInit::init2040() {
 
     ADD_OFFSET("ClientInstance::minecraftGame", 0xC8);
     ADD_OFFSET("ClientInstance::guiData", 0x560);
-    ADD_OFFSET("ClientInstance::Matrix1", 0x330);
+    ADD_OFFSET("ClientInstance::viewMatrix", 0x330);
 
     ADD_OFFSET("Minecraft::timer", 0xD8);
 
@@ -759,7 +759,7 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("ClientInstance::minecraftGame", 0xC8);
     ADD_OFFSET("ClientInstance::guiData", 0x560);
-    ADD_OFFSET("ClientInstance::Matrix1", 0x330);
+    ADD_OFFSET("ClientInstance::viewMatrix", 0x330);
 
     ADD_OFFSET("Minecraft::timer", 0xD8);
 

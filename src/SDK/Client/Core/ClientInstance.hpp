@@ -16,7 +16,7 @@ class ClientInstance {
 public:
     BUILD_ACCESS(this, MinecraftGame*, mcgame, GET_OFFSET("ClientInstance::minecraftGame"));
     BUILD_ACCESS(this, GuiData*, guiData, GET_OFFSET("ClientInstance::guiData"));
-    BUILD_ACCESS(this, GLMatrix, Matrix1, GET_OFFSET("ClientInstance::Matrix1"));
+    BUILD_ACCESS(this, GLMatrix, viewMatrix, GET_OFFSET("ClientInstance::viewMatrix"));
 
     LocalPlayer *getLocalPlayer();
 

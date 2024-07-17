@@ -17,5 +17,5 @@ public:
 
     static bool WorldToScreen(Vec3<float> pos, Vec2<float> &screen);
 
-    static glm::mat4 getMatrixCorrection();
+    static glm::mat4 getMatrixCorrection(GLMatrix mat);
 };

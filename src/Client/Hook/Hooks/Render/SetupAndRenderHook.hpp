@@ -81,6 +81,20 @@ private:
             SDK::setCurrentScreen(event.getLayer()); // updates every 16 ms
         }
 
+        Vec3<float> origin{ 0, 0, 0 };
+        Vec3<float> pos{ 0, 0, 0 };
+
+        auto player = SDK::clientInstance->getLocalPlayer();
+
+        if (player && SDK::clientInstance->getLevelRender())
+        {
+            origin = SDK::clientInstance->getLevelRender()->getOrigin();
+            pos = player->getRenderPositionComponent()->renderPos;
+        }
+
+        FrameTransform transform = { SDK::clientInstance->getviewMatrix(), origin, SDK::clientInstance->getFov(), pos};
+        SwapchainHook::FrameTransforms.push(transform);
+
         if(layer == "debug_screen" || layer == "hud_screen" || layer == "start_screen") {
             SetupAndRenderEvent event(muirc);
             funcOriginal(pScreenView, muirc);

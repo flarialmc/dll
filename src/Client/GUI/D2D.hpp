@@ -11,6 +11,7 @@
 #include "../../Utils/Utils.hpp"
 #include "../Events/Input/MouseEvent.hpp"
 #include "../../Utils/Logger/Logger.hpp"
+#include "../../SDK/Client/Render/FrameTransform.hpp"
 
 namespace D2D {
     inline ID2D1DeviceContext *context;
@@ -22,6 +23,7 @@ class MC {
 public:
     static inline Vec2<float> mousePos;
     static inline Vec2<float> windowSize;
+    static inline FrameTransform Transform;
     static inline MouseAction mouseAction;
     static inline MouseButton mouseButton;
     static inline bool held;

@@ -9,6 +9,7 @@
 #include <d3d11on12.h>
 
 #include "kiero.h"
+#include "../../../../SDK/Client/Render/FrameTransform.hpp"
 
 class SwapchainHook : public Hook {
 private:
@@ -37,5 +38,9 @@ public:
     static inline uintptr_t bufferCount;
     static bool hasResized;
     static int currentBitmap;
+
+    static inline std::queue<FrameTransform> FrameTransforms;
+    static inline int transformDelay = 3;
+
     static inline UINT flagsreal;
 };
