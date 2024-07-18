@@ -1,4 +1,7 @@
 #include "MouseHook.hpp"
+
+#include <imgui.h>
+
 #include "../../../Events/EventHandler.hpp"
 #include "../../../Client.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
@@ -25,6 +28,10 @@ void MouseHook::mouseCallback(void *mouseDevice, char button, char action, short
 
     MouseEvent event(button, action, mouseX, mouseY);
     EventHandler::onMouse(event);
+
+
+    ImGui::GetIO().AddMousePosEvent(mouseX, mouseY);
+    ImGui::GetIO().AddMouseButtonEvent(button - 1, action);
 
     if (!event.isCancelled()) {
         return funcOriginal(mouseDevice, event.getButton(), event.getActionAsChar(), mouseX, mouseY, movementX,

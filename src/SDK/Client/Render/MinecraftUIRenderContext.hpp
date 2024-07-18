@@ -10,7 +10,7 @@
 #include "../Level/Level.hpp"
 #include "../Container/Inventory.hpp"
 #include "../../../Utils/Utils.hpp"
-#include "../../../Client/GUI/D2D.hpp"
+#include "../../../Client/GUI/Data.hpp"
 #include "Texture2D.hpp"
 
 class MinecraftUIRenderContext {

@@ -2,7 +2,7 @@
 
 #include "../Event.hpp"
 #include "../Cancellable.hpp"
-#include "../../GUI/D2D.hpp"
+#include "../../GUI/Data.hpp"
 
 class HurtColorEvent : public Event, Cancellable {
 private:

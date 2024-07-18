@@ -5,7 +5,7 @@
 #include "../../../Events/Listener.hpp"
 #include "../../../Events/Input/MouseEvent.hpp"
 #include "../../../../Utils/Logger/Logger.hpp"
-#include "../../../GUI/D2D.hpp"
+#include "../../../GUI/Data.hpp"
 
 class GUIMouseListener : public Listener {
 

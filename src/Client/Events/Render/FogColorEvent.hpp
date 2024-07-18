@@ -2,7 +2,7 @@
 
 #include "../Event.hpp"
 #include "../Cancellable.hpp"
-#include "../../GUI/D2D.hpp"
+#include "../../GUI/Data.hpp"
 
 class FogColorEvent : public Event, Cancellable {
 private:

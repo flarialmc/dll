@@ -3,7 +3,7 @@
 //
 
 #include "ResizeHook.hpp"
-#include "../../../GUI/D2D.hpp"
+#include "../../../GUI/Data.hpp"
 #include "SwapchainHook.hpp"
 #include "../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
 #include "../../../Module/Modules/MotionBlur/MotionBlurListener.hpp"

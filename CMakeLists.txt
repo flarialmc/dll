@@ -73,7 +73,9 @@ endif()
 
 file(GLOB_RECURSE sources "main.cpp" "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp")
 
-add_library(${PROJECT_NAME} SHARED ${sources} src/SDK/Client/Render/Matrix.cpp src/Assets/Assets.rc)
+add_library(${PROJECT_NAME} SHARED ${sources} src/SDK/Client/Render/Matrix.cpp src/Assets/Assets.rc
+        src/Client/GUI/Renderer.cpp
+        src/Client/GUI/Renderer.hpp)
 
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/" "${CMAKE_CURRENT_LIST_DIR}/lib/glm/" "${CMAKE_CURRENT_LIST_DIR}/lib/ImGui")
 
