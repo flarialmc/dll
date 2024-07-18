@@ -119,7 +119,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     if (!SwapchainHook::init) {
         if (Client::settings.getSettingByName<bool>("killdx")->value) {
-
             ID3D12Device5 *d3d12device3;
 
             if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device3)))) {
@@ -129,8 +128,10 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
                 return funcOriginal(pSwapChain, syncInterval, flags);
             }
+        }
 
             if(SwapchainHook::queue == nullptr) {
+
                 Logger::debug("[SwapChain] Not a DX12 device, running dx11 procedures");
 
                 const D2D1_CREATION_PROPERTIES properties
@@ -138,7 +139,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                     D2D1_THREADING_MODE_MULTI_THREADED,
                     D2D1_DEBUG_LEVEL_NONE,
                     D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS
-            };
+                };
 
                 IDXGISurface1 *eBackBuffer;
                 pSwapChain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
@@ -154,8 +155,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
                 SwapchainHook::init = true;
             }
-
-        } else {
+             else {
 
             ID3D12Device5 *device;
 
