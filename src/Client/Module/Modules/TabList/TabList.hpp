@@ -77,25 +77,7 @@ public:
 
     void settingsRender() override { }
 
-    void normalRender(int index, std::string& value) override {
-        if (SDK::hasInstanced && (active || ClickGUIRenderer::editmenu)) {
-            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                float keycardSize = Constraints::RelativeConstraint(
-                        0.05f * this->settings.getSettingByName<float>("uiscale")->value, "height", true);
-
-                Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
-                                                      this->settings.getSettingByName<float>("percentageY")->value);
-
-                int i3 = 0;
-                float i2 = 0;
-
-                for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap()) {
-
-                    i3++;
-
-                    if (i3 % 10 == 1) {
-                        i2 += 4.85;
-                    }
+    void normalRender() override { }
                 }
 
                 Vec2<float> realcenter;

@@ -43,7 +43,7 @@ public:
         Module::terminate();
     }
 
-    void onColorChange() {
+    void onColorChange() { /*
         // change our color
         D2D1_COLOR_F color;
         if (settings.getSettingByName<bool>("color_rgb")->value) color = FlarialGUI::rgbColor;
@@ -53,6 +53,7 @@ public:
         selectionColor->g = color.g;
         selectionColor->b = color.b;
         selectionColor->a = settings.getSettingByName<float>("colorOpacity")->value;
+        */
     }
 
     static void patch() { // change rel rip offset to ours

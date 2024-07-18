@@ -9,16 +9,14 @@
 #include "../../../../Utils/Logger/Logger.hpp"
 #include "../../../GUI/Data.hpp"
 #include "../Module.hpp"
-#include "../../../GUI/Engine/Engine.hpp"
-#include "../../../GUI/Engine/Constraints.hpp"
 #include "Elements/ClickGUIElements.hpp"
 #include "../../../Hook/Hooks/Render/SwapchainHook.hpp"
 #include "../../Manager.hpp"
-#include "../../../GUI/Engine/animations/fadeinout.hpp"
 #include "GUIMouseListener.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "../../../Hook/Hooks/Render/ResizeHook.hpp"
 
+/*
 #define clickgui ModuleManager::getModule("ClickGUI")
 
 #define colors_text FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_text")->value)
@@ -44,6 +42,7 @@
 #define colors_secondary6 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary6")->value)
 #define o_colors_secondary6 clickgui->settings.getSettingByName<float>("o_colors_secondary6")->value
 #define colors_secondary6_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary6_rgb")->value
+*/
 
 struct PageType {
     std::string type = "normal";

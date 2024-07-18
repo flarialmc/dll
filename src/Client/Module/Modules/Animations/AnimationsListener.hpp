@@ -29,7 +29,7 @@ class AnimationsListener : public Listener {
         if (strcmp(event.getTexturePath().c_str(), "textures/ui/selected_hotbar_slot") == 0)
         {
             static float lerpedPos = event.getImagePos().x; // old pos
-            lerpedPos = animate(event.getImagePos().x, lerpedPos, (0.016f * module->settings.getSettingByName<float>("hotbarSpeed")->value) * FlarialGUI::frameFactor);
+            //lerpedPos = animate(event.getImagePos().x, lerpedPos, (0.016f * module->settings.getSettingByName<float>("hotbarSpeed")->value) * FlarialGUI::frameFactor);
             event.getImagePos().x = lerpedPos;
         }
     }
