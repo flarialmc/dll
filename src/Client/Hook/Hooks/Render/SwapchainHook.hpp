@@ -24,6 +24,8 @@ class SwapchainHook : public Hook {
 
     static void InitDX11();
 
+    void RenderDX12();
+
 public:
     typedef HRESULT(__thiscall *SwapchainOriginal)(IDXGISwapChain3 *, UINT, UINT);
 
