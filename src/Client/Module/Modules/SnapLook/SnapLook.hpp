@@ -26,11 +26,5 @@ public:
         Module::onDisable();
     }
 
-    void settingsRender() override {
-
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
-
-        FlarialGUI::KeybindSelector(0, toggleX, toggleY, getKeybind());
-    }
+    void settingsRender() override { }
 };

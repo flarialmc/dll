@@ -42,55 +42,5 @@ public:
 
     }
 
-    void settingsRender() override {
-
-
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
-
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
-
-        FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(7.5, textWidth), 2);
-        FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"),
-                                  Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(1.0f, "height"));
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"X Velocity", textWidth * 3.0f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        float percent = FlarialGUI::Slider(0, toggleX + FlarialGUI::SettingsTextWidth("X Velocity "),
-                                           toggleY, this->settings.getSettingByName<float>("xveloc")->value, 25.0f);
-
-        this->settings.getSettingByName<float>("xveloc")->value = percent;
-
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Y Velocity", textWidth * 3.0f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        percent = FlarialGUI::Slider(1, toggleX + FlarialGUI::SettingsTextWidth("Y Velocity "),
-                                     toggleY, this->settings.getSettingByName<float>("yveloc")->value, 25.0f);
-
-        this->settings.getSettingByName<float>("yveloc")->value = percent;
-
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Scale", textWidth * 3.0f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        percent = FlarialGUI::Slider(2, toggleX + FlarialGUI::SettingsTextWidth("Scale "),
-                                     toggleY, this->settings.getSettingByName<float>("scale")->value, 5.0f);
-
-        this->settings.getSettingByName<float>("scale")->value = percent;
-
-        FlarialGUI::UnsetScrollView();
-
-    }
+    void settingsRender() override { }
 };

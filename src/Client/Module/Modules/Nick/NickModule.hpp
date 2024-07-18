@@ -54,13 +54,5 @@ public:
 
     }
 
-    void settingsRender() override {
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
-
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-        FlarialGUI::TextBoxVisual(5, settings.getSettingByName<std::string>("nick")->value, 16, toggleX, toggleY);
-    }
+    void settingsRender() override { }
 };
