@@ -280,7 +280,7 @@ public:
 
             if (!FlarialGUI::activeColorPickerWindows && FlarialGUI::RoundedRadioButton(2, radioX, radioY,
                                                                                         mod6Col,
-                                                                                        modTextCol, L"Edit Menu",
+                                                                                        modTextCol, L"",
                                                                                         RadioButtonWidth,
                                                                                         RadioButtonHeight, round.x,
                                                                                         round.x, "editmenu",
