@@ -751,13 +751,6 @@ public:
 
                     round = Constraints::RoundingConstraint(25, 25);
 
-                    FlarialGUI::RoundedHollowRect(centered.first + rectX, rectHeight + rectY + Constraints::RelativeConstraint(0.09),
-                                                  Constraints::RelativeConstraint(0.01, "height", true), colorThing,
-                                                  childWidth, childHeight, round.x, round.x);
-
-                    FlarialGUI::RoundedRect(centered.first + rectX, rectHeight + rectY + Constraints::RelativeConstraint(0.09), bruv,
-                                            childWidth, childHeight, round.x, round.x);
-
                     float buttonWidth = Constraints::RelativeConstraint(0.19f, "width");
                     float buttonHeight = Constraints::RelativeConstraint(0.1f, "height");
                     float spacingX = Constraints::RelativeConstraint(0.03);
