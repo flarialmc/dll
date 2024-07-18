@@ -106,9 +106,9 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
 
     if (FlarialGUI::TextBoxes[index].cursorX > x)
         FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX,
-                                y + Constraints::RelativeConstraint(0.069f) / 2.0f, cursorCol,
-                                Constraints::RelativeConstraint(0.01f),
-                                percHeight - Constraints::RelativeConstraint(0.069f), 0, 0);
+                                y + Constraints::RelativeConstraint(0.045f) / 2.0f, cursorCol,
+                                Constraints::RelativeConstraint(0.005f),
+                                percHeight - Constraints::RelativeConstraint(0.045f), 0, 0);
 
     FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y,
                                     FlarialGUI::to_wide(real).c_str(),

@@ -744,20 +744,19 @@ public:
 
                 if (!FlarialGUI::activeColorPickerWindows) {
 
-                    float childHeight = Constraints::SpacingConstraint(0.5, rectHeight);
+                    float childHeight = Constraints::SpacingConstraint(0.3, rectHeight);
                     float childWidth = Constraints::SpacingConstraint(0.45, rectWidth);
                     std::pair<float, float> centered = centerChildRectangle(rectWidth, rectHeight, childWidth,
                                                                             childHeight);
 
                     round = Constraints::RoundingConstraint(25, 25);
 
-                    FlarialGUI::RoundedRect(centered.first + rectX, rectHeight + rectY + centered.second +
-                                                                    Constraints::RelativeConstraint(0.035), bruv,
-                                            childWidth, childHeight, round.x, round.x);
-                    FlarialGUI::RoundedHollowRect(centered.first + rectX, rectHeight + rectY + centered.second +
-                                                                          Constraints::RelativeConstraint(0.035),
+                    FlarialGUI::RoundedHollowRect(centered.first + rectX, rectHeight + rectY + Constraints::RelativeConstraint(0.09),
                                                   Constraints::RelativeConstraint(0.01, "height", true), colorThing,
                                                   childWidth, childHeight, round.x, round.x);
+
+                    FlarialGUI::RoundedRect(centered.first + rectX, rectHeight + rectY + Constraints::RelativeConstraint(0.09), bruv,
+                                            childWidth, childHeight, round.x, round.x);
 
                     float buttonWidth = Constraints::RelativeConstraint(0.19f, "width");
                     float buttonHeight = Constraints::RelativeConstraint(0.1f, "height");
@@ -768,8 +767,7 @@ public:
 
 
                     if (FlarialGUI::RoundedButton(0, spacingX + centered.first + rectX,
-                                                  thingYes.second + rectHeight + rectY + centered.second +
-                                                  Constraints::RelativeConstraint(0.035), colorThing, textCol, L"Reset",
+                                                  thingYes.second + rectHeight + rectY + Constraints::RelativeConstraint(0.09), colorThing, textCol, L"Reset",
                                                   buttonWidth, buttonHeight, round.x, round.x)) {
                         auto currentModule = ModuleManager::getModule(ClickGUIRenderer::page.module);
                         bool wasEnabled = module->isEnabled();
@@ -782,8 +780,7 @@ public:
 
 
                     if (FlarialGUI::RoundedButton(1, -spacingX + centered.first + rectX + childWidth - buttonWidth,
-                                                  thingYes.second + rectHeight + rectY + centered.second +
-                                                  Constraints::RelativeConstraint(0.035), colorThing, textCol,
+                                                  thingYes.second + rectHeight + rectY + Constraints::RelativeConstraint(0.09), colorThing, textCol,
                                                   L"Copy From", buttonWidth, buttonHeight, round.x, round.x)) {
 
                     }
