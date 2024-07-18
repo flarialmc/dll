@@ -35,6 +35,7 @@ public:
     static inline ID3D11On12Device *d3d11On12Device;
     static inline ID2D1Bitmap1 *D2D1Bitmap;
     static inline ID3D11DeviceContext *context;
+    static inline ID3D11Device* d3d11Device;
     static inline uintptr_t bufferCount;
     static bool hasResized;
     static int currentBitmap;

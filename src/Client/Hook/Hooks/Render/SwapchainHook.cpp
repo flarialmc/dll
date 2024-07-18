@@ -11,6 +11,11 @@
 #include <iostream>
 #include <Psapi.h>
 
+#include <imgui.h>
+#include <imgui_impl_dx11.h>
+#include <imgui_impl_dx12.h>
+#include <imgui_impl_win32.h>
+
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", "") {}
 
 ID3D12CommandQueue *SwapchainHook::queue = nullptr;
@@ -18,6 +23,8 @@ ID3D12CommandQueue *SwapchainHook::queue = nullptr;
 static std::chrono::high_resolution_clock fpsclock;
 static std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 static std::chrono::steady_clock::time_point previousFrameTime = std::chrono::high_resolution_clock::now();
+
+auto window = (HWND)FindWindowA(nullptr, (LPCSTR)"Minecraft");;
 
 int SwapchainHook::currentBitmap;
 bool unloadDll(const wchar_t* moduleName) {
@@ -140,6 +147,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                     D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS
             };
 
+                pSwapChain->GetDevice(IID_PPV_ARGS(&SwapchainHook::d3d11Device));
+
                 IDXGISurface1 *eBackBuffer;
                 pSwapChain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
 
@@ -149,6 +158,16 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                         D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
                         D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED), 96.0, 96.0);
                 D2D::context->CreateBitmapFromDxgiSurface(eBackBuffer, props, &SwapchainHook::D2D1Bitmap);
+
+                //ImGui Init balls cum pussy
+
+                ImGui::CreateContext();
+
+                ID3D11DeviceContext* ppContext = nullptr;
+			    SwapchainHook::d3d11Device->GetImmediateContext(&ppContext);
+                ImGui_ImplWin32_Init(window);
+			    ImGui_ImplDX11_Init(SwapchainHook::d3d11Device, ppContext);
+			    ppContext->Release();
 
                 Memory::SafeRelease(eBackBuffer);
 
@@ -370,9 +389,43 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
                 MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
-                RenderEvent event;
-                EventHandler::onRender(event);
-                D2D::context->EndDraw();
+                ID3D11RenderTargetView* mainRenderTargetView = nullptr;
+	            ID3D11DeviceContext* ppContext = nullptr;
+	            ID3D11Texture2D* pBackBuffer = nullptr;
+
+
+	            d3d11Device->GetImmediateContext(&ppContext);
+
+	            if (ppContext)
+
+	            if (SUCCEEDED(pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer)))
+
+                    if (SUCCEEDED(d3d11Device->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView))) {
+
+                        ImGui_ImplDX11_NewFrame();
+                        ImGui_ImplWin32_NewFrame();
+                        ImGui::NewFrame();
+
+                        ImGui::GetForegroundDrawList()->AddRectFilledMultiColor(ImVec2(), ImVec2(100, 100), ImColor(255, 255, 255, 255), ImColor(0, 0, 0, 255), ImColor(100, 100, 100, 255), ImColor(0, 255, 0, 255));
+
+                        RenderEvent event;
+                        EventHandler::onRender(event);
+
+                        D2D::context->EndDraw();
+
+                        ImGui::EndFrame();
+                        ImGui::Render();
+
+                        ppContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
+                        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+                    }
+
+                if (pBackBuffer) pBackBuffer->Release();
+
+	            if (mainRenderTargetView) mainRenderTargetView->Release();
+
+	            if (ppContext) ppContext->Release();
 
             }
 
