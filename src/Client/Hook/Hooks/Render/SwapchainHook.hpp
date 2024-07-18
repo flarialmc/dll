@@ -11,6 +11,12 @@
 #include "kiero.h"
 #include "../../../../SDK/Client/Render/FrameTransform.hpp"
 
+struct FrameContext {
+	ID3D12CommandAllocator* commandAllocator = nullptr;
+	ID3D12Resource* main_render_target_resource = nullptr;
+	D3D12_CPU_DESCRIPTOR_HANDLE main_render_target_descriptor;
+};
+
 class SwapchainHook : public Hook {
 private:
     static HRESULT swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags);
@@ -39,6 +45,17 @@ public:
     static inline uintptr_t bufferCount;
     static bool hasResized;
     static int currentBitmap;
+
+    static inline ID3D12Device5* d3d12Device5 = nullptr;
+
+    static inline ID3D12DescriptorHeap* d3d12DescriptorHeapImGuiRender = nullptr;
+    static inline ID3D12DescriptorHeap* d3d12DescriptorHeapBackBuffers = nullptr;
+    static inline ID3D12GraphicsCommandList* d3d12CommandList = nullptr;
+    static inline ID3D12CommandQueue* d3d12CommandQueue = nullptr;
+    static inline ID3D12CommandAllocator* allocator = nullptr;
+
+    static inline uint64_t buffersCounts = 0;
+    static inline std::vector<FrameContext> frameContexts = {};
 
     static inline std::queue<FrameTransform> FrameTransforms;
     static inline int transformDelay = 3;
