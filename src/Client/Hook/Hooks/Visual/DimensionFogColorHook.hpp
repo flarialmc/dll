@@ -6,8 +6,17 @@
 #include "../../../Module/Manager.hpp"
 #include "../../../Events/Render/FogColorEvent.hpp"
 
+class Dimension {
+public:
+    float x = 0;
+    float y = 0;
+    float height = 0;
+    float width = 0;
+};
+
 class DimensionFogColorHook : public Hook {
 private:
+
 
     static MCCColor &
     DimensionFogColorCallback(Dimension *_this, MCCColor &result, MCCColor const &baseColor, float brightness) {

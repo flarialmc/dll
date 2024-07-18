@@ -6,7 +6,7 @@
 #include "../../../Events/Listener.hpp"
 #include "../../../Events/Input/KeyEvent.hpp"
 #include "../Module.hpp"
-#include "../../../GUI/Engine/Engine.hpp"
+
 #include "../../../../SDK/SDK.hpp"
 #include "DollListener.hpp"
 #include "../../Manager.hpp"
@@ -32,6 +32,7 @@ public:
     }
 
     void onRender(RenderEvent &event) override {
+        /*
 
         if (ClientInstance::getTopScreenName() == "hud_screen" &&
             module->isEnabled() ||
@@ -72,6 +73,7 @@ public:
                 FlarialGUI::UnsetWindowRect();
             }
         }
+        */
     }
 
     void onSetupAndRender(SetupAndRenderEvent &event) override {
@@ -94,11 +96,12 @@ public:
                     control->scale = module->settings.getSettingByName<float>("uiscale")->value;
 
 
+                    /*
                     if (module->settings.getSettingByName<bool>("alwaysshow")->value || ClickGUIRenderer::editmenu) {
                         auto component = reinterpret_cast<CustomRenderComponent*>(control->components[4].get());
                         component->renderer->state = 1.0f;
                     }
-
+                    */
                     return; // dont go through other controls
                 }
 

@@ -5,7 +5,7 @@
 #include "../../../Events/Listener.hpp"
 #include "../../../Events/Input/KeyEvent.hpp"
 #include "../Module.hpp"
-#include "../../../GUI/Engine/Engine.hpp"
+
 #include "../../../../SDK/SDK.hpp"
 #include <Windows.h>
 
@@ -15,6 +15,7 @@ class FogColorListener : public Listener {
 
     void onGetFogColor(FogColorEvent &event) override {
 
+        /*
         D2D1_COLOR_F color;
         if (module->settings.getSettingByName<bool>("color_rgb")->value)
             color = FlarialGUI::rgbColor;
@@ -22,6 +23,7 @@ class FogColorListener : public Listener {
             color = FlarialGUI::HexToColorF(module->settings.getSettingByName<std::string>("color")->value);
 
         event.setFogColorFromD2DColor(color, module->settings.getSettingByName<float>("colorOpacity")->value);
+        */
     }
 
 public:

@@ -17,6 +17,8 @@ public:
     std::string curAliasMode;
 
     void onTick(TickEvent &event) override {
+
+        /*
         if (!SwapchainHook::init) {
             if (D2D::context != nullptr &&
                 curAliasMode != Client::settings.getSettingByName<std::string>("aliasingMode")->value) {
@@ -27,6 +29,7 @@ public:
             if (D2D::context != nullptr && aliases[curAliasMode] != D2D::context->GetTextAntialiasMode())
                 D2D::context->SetTextAntialiasMode(aliases[curAliasMode]);
         }
+        */
     }
 
 public:

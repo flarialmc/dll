@@ -49,7 +49,5 @@ public:
     void settingsRender() override { }
 
     float currentHeight = 0.0f;
-
-    void normalRender() override { }
 };
 

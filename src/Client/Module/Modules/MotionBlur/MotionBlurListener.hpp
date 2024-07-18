@@ -24,6 +24,8 @@ public:
 
     void onRender(RenderEvent &event) override {
 
+        /*
+
         int maxFrames = (int)round(module->settings.getSettingByName<float>("intensity2")->value);
 
         // TODO: Clear frames if not in HUD !!!
@@ -64,6 +66,7 @@ public:
         }
 
         D2D::context->Flush();
-
+*/
     }
+
 };

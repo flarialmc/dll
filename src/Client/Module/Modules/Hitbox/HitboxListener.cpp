@@ -31,6 +31,7 @@ void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
 
 void HitboxListener::onRender(RenderEvent &event) {
 
+    /*
     if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->mcgame->mouseGrabbed ||
         !SDK::clientInstance->getLocalPlayer()->level)
         return;
@@ -65,4 +66,5 @@ void HitboxListener::onRender(RenderEvent &event) {
             DrawUtils::addBox(aabb.lower, aabb.upper, staticThickness ? thickness : lineWidth, outline ? 2 : 1, color2);
         }
     }
+    */
 }

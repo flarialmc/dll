@@ -15,11 +15,14 @@ public:
 
     void onEnable() override {
         EventHandler::registerListener(new ArmorHUDListener("ArmorHUD", this));
+
+        /*
         if(FlarialGUI::inMenu){
-            FlarialGUI::Notify("To change the position of ArmorHUD, Please click " +
+            //FlarialGUI::Notify("To change the position of ArmorHUD, Please click " +
                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                        "editmenubind")->value + " in the settings tab.");
         }
+        */
         Module::onEnable();
     }
 

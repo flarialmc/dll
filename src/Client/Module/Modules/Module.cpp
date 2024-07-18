@@ -1,6 +1,5 @@
 #include "Module.hpp"
 #include "../../Client.hpp"
-#include "ClickGUI/ClickGUIRenderer.hpp"
 
 std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {
         {"Left", DWRITE_TEXT_ALIGNMENT_LEADING},
@@ -9,6 +8,8 @@ std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {
 };
 
 void Module::normalRender(int index, std::string &value) {
+
+    /*
     if(!isEnabled() || SDK::currentScreen != "hud_screen") return;
 
     std::string text{};
@@ -191,5 +192,7 @@ void Module::normalRender(int index, std::string &value) {
     if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
         ClickGUIRenderer::editmenu)
         FlarialGUI::UnsetWindowRect();
+
+        */
 }
 

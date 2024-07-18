@@ -5,7 +5,6 @@
 #include "../../../Events/Listener.hpp"
 #include "../../../Events/Input/KeyEvent.hpp"
 #include "../Module.hpp"
-#include "../../../GUI/Engine/Engine.hpp"
 #include "../../Manager.hpp"
 #include <windows.h>
 #include <chrono>

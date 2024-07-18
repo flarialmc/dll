@@ -17,7 +17,7 @@ class PatarHDListener : public Listener {
     float yv = 1;
 
     void onRender(RenderEvent &event) override {
-
+/*
         if (module->isEnabled() &&
             ClientInstance::getTopScreenName() == "hud_screen") {
             float s = Constraints::RelativeConstraint(0.35, "height", true) *
@@ -39,7 +39,7 @@ class PatarHDListener : public Listener {
                                   D2D1::RectF(center.x, center.y, center.x + s, center.y + s));
             }
         }
-
+*/
     }
 
 
