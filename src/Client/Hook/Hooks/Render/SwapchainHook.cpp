@@ -20,7 +20,6 @@ static std::chrono::steady_clock::time_point start = std::chrono::high_resolutio
 static std::chrono::steady_clock::time_point previousFrameTime = std::chrono::high_resolution_clock::now();
 
 int SwapchainHook::currentBitmap;
-
 bool unloadDll(const wchar_t* moduleName) {
     HMODULE hModule = GetModuleHandleW(moduleName);
     if (hModule != nullptr) {
@@ -88,7 +87,6 @@ bool SwapchainHook::init = false;
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
 
-
     SwapchainHook::swapchain = pSwapChain;
     SwapchainHook::flagsreal = flags;
 
@@ -120,7 +118,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     FlarialGUI::frameFactor = std::min(FlarialGUI::frameFactor, 1.0f);
 
     if (!SwapchainHook::init) {
-        if (SwapchainHook::queue == nullptr || Client::settings.getSettingByName<bool>("killdx")->value) {
+        if (Client::settings.getSettingByName<bool>("killdx")->value) {
 
             ID3D12Device5 *d3d12device3;
 
@@ -132,28 +130,30 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                 return funcOriginal(pSwapChain, syncInterval, flags);
             }
 
-            Logger::debug("[SwapChain] Not a DX12 device, running dx11 procedures");
+            if(SwapchainHook::queue == nullptr) {
+                Logger::debug("[SwapChain] Not a DX12 device, running dx11 procedures");
 
-            const D2D1_CREATION_PROPERTIES properties
-            {
+                const D2D1_CREATION_PROPERTIES properties
+                {
                     D2D1_THREADING_MODE_MULTI_THREADED,
                     D2D1_DEBUG_LEVEL_NONE,
                     D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS
             };
 
-            IDXGISurface1 *eBackBuffer;
-            pSwapChain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
+                IDXGISurface1 *eBackBuffer;
+                pSwapChain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
 
-            D2D1CreateDeviceContext(eBackBuffer, properties, &D2D::context);
+                D2D1CreateDeviceContext(eBackBuffer, properties, &D2D::context);
 
-            D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(
-                    D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
-                    D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED), 96.0, 96.0);
-            D2D::context->CreateBitmapFromDxgiSurface(eBackBuffer, props, &SwapchainHook::D2D1Bitmap);
+                D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(
+                        D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
+                        D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED), 96.0, 96.0);
+                D2D::context->CreateBitmapFromDxgiSurface(eBackBuffer, props, &SwapchainHook::D2D1Bitmap);
 
-            Memory::SafeRelease(eBackBuffer);
+                Memory::SafeRelease(eBackBuffer);
 
-            SwapchainHook::init = true;
+                SwapchainHook::init = true;
+            }
 
         } else {
 
