@@ -1,6 +1,6 @@
 #include "Matrix.hpp"
 #include "../../SDK.hpp"
-#include "../../../Client/GUI/Data.hpp"
+#include "../../../Client/GUI/D2D.hpp"
 
 glm::mat4 Matrix::getMatrixCorrection(GLMatrix mat) {
     glm::mat4 toReturn;

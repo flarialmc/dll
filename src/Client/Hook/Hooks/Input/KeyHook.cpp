@@ -1,7 +1,4 @@
 #include "KeyHook.hpp"
-
-#include <imgui.h>
-
 #include "../../../../SDK/SDK.hpp"
 #include "../../../Client.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
@@ -19,8 +16,6 @@ void KeyHook::keyCallback(unsigned char  key, int state) {
 
     KeyEvent event(key, state, keys);
     EventHandler::onKey(event);
-
-    ImGui::GetIO().AddMouseButtonEvent(key, state);
 
     Sleep(0);
 

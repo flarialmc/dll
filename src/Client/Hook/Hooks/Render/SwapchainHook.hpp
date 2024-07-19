@@ -18,11 +18,9 @@ struct FrameContext {
 };
 
 class SwapchainHook : public Hook {
+private:
     static HRESULT swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags);
 
-    static void InitDX12(IDXGISwapChain3 *swapchain);
-
-    static void InitDX11();
 
 public:
     typedef HRESULT(__thiscall *SwapchainOriginal)(IDXGISwapChain3 *, UINT, UINT);

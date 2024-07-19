@@ -14,16 +14,8 @@
 #include "../../SDK/Client/Render/FrameTransform.hpp"
 
 namespace D2D {
-    extern ID2D1DeviceContext *context;
-    extern IDXGISurface1 *surface = nullptr;
-}
-
-namespace ImGui {
-
-}
-
-namespace DX11on12 {
-
+    inline ID2D1DeviceContext *context;
+    inline IDXGISurface1 *surface = nullptr;
 }
 
 class MC {

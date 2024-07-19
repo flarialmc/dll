@@ -36,7 +36,6 @@ public:
             settings.addSetting("AutoMapAvoider", false);
         if (settings.getSettingByName<std::string>("text") == nullptr) 
             settings.addSetting("text", (std::string) "Input maps, like this");
-
     }
 
     void settingsRender() override {
