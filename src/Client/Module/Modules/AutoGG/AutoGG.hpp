@@ -31,6 +31,13 @@ public:
         if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string) "GG");
     }
 
-    void settingsRender() override { }
+    void settingsRender() override {
+
+        float toggleX = Constraints::PercentageConstraint(0.019, "left");
+        float toggleY = Constraints::PercentageConstraint(0.10, "top");
+
+        FlarialGUI::TextBoxVisual(5, settings.getSettingByName<std::string>("text")->value, 50, toggleX, toggleY);
+
+    }
 };
 

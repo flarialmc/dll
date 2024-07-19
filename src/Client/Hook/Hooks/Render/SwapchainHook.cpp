@@ -94,8 +94,6 @@ void SwapchainHook::enableHook() {
 
 bool SwapchainHook::init = false;
 
-// main stuff
-
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
 
 
@@ -131,9 +129,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     return funcOriginal(pSwapChain, syncInterval, flags);
 }
-
-
-// other stuff
 
 void SwapchainHook::InitDX12(IDXGISwapChain3* swapchain) {
 

@@ -32,6 +32,19 @@ public:
             settings.addSetting("command", (std::string) "");
     }
 
-    void settingsRender() override { }
+    void settingsRender() override {
+
+        float toggleX = Constraints::PercentageConstraint(0.019, "left");
+        float toggleY = Constraints::PercentageConstraint(0.10, "top");
+
+        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+
+        FlarialGUI::KeybindSelector(0, toggleX, toggleY, getKeybind());
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::TextBoxVisual(5, settings.getSettingByName<std::string>("command")->value, 50, toggleX, toggleY);
+
+    }
 };
 
