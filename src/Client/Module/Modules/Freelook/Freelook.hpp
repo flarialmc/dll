@@ -37,5 +37,30 @@ public:
 
 
 
-    void settingsRender() override { }
+    void settingsRender() override { },
+                             this->settings.getSettingByName<std::string>("mode")->value, "Freelook mode");
+        FlarialGUI::SetIsInAdditionalYMode();
+
+        y += Constraints::SpacingConstraint(0.35, textWidth);
+
+        if (FlarialGUI::Toggle(1, x, y, this->settings.getSettingByName<bool>(
+                "toggle")->value))
+            this->settings.getSettingByName<bool>("toggle")->value = !this->settings.getSettingByName<bool>(
+                    "toggle")->value;
+
+
+        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.60, textWidth), y, L"Toggleable",
+                                        textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        Constraints::RelativeConstraint(0.12, "height", true),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        y += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::KeybindSelector(2, x, y, getKeybind());
+
+
+        FlarialGUI::UnsetScrollView();
+        FlarialGUI::UnSetIsInAdditionalYMode();
+
+    }
 };

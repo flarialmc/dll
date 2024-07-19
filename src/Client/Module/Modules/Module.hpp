@@ -9,6 +9,8 @@
 #include <filesystem>
 #include <sstream>
 #include <utility>
+#include "../../GUI/Engine/Engine.hpp"
+#include "../../GUI/Engine/Constraints.hpp"
 #include "../../../SDK/SDK.hpp"
 #include "../../../Assets/Assets.hpp"
 
@@ -229,7 +231,7 @@ public:
     virtual void settingsRender() {}
 
     bool isKeybind(const std::array<bool, 256> &keys) {
-/*
+
         std::vector<int> keyCodes = Utils::getStringAsKeys(getKeybind());
 
         for (int keyCode: keyCodes) {
@@ -247,13 +249,9 @@ public:
         });
         // All keys in the keybind are being held down
         return allInactive;
-        */
-        return false;
     }
 
     [[nodiscard]] bool isAdditionalKeybind(const std::array<bool, 256> &keys, const std::string& bind) const {
-
-        /*
         std::vector<int> keyCodes = Utils::getStringAsKeys(bind);
 
         for (int keyCode: keyCodes) {
@@ -271,8 +269,6 @@ public:
         });
         // All keys in the keybind are being held down
         return allInactive;
-        */
-        return false;
     }
 
     bool isKeyPartOfKeybind(int keyCode) {

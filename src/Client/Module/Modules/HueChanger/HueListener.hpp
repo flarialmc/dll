@@ -16,7 +16,7 @@ class HueListener : public Listener {
 
         if (module->isEnabled()) {
 
-            //FlarialGUI::ApplyHue(module->settings.getSettingByName<float>("intensity")->value);
+            FlarialGUI::ApplyHue(module->settings.getSettingByName<float>("intensity")->value);
 
         }
 

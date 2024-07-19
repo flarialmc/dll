@@ -14,8 +14,6 @@ class HurtColorListener : public Listener {
     Module *module;
 
     void onGetHurtColor(HurtColorEvent &event) override {
-
-        /*
         D2D1_COLOR_F color;
         if (module->settings.getSettingByName<bool>("color_rgb")->value)
             color = FlarialGUI::rgbColor;
@@ -23,8 +21,6 @@ class HurtColorListener : public Listener {
             color = FlarialGUI::HexToColorF(module->settings.getSettingByName<std::string>("color")->value);
 
         event.setHurtColorFromD2DColor(color, module->settings.getSettingByName<float>("colorOpacity")->value);
-        */
-
     }
 
 public:

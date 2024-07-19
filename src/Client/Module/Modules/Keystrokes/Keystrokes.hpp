@@ -146,7 +146,13 @@ public:
         return std::make_pair((parentWidth - childWidth) / 2, (parentHeight - childHeight) / 2);
     }
 
-    void normalRender() override { }";
+    void normalRender(int index, std::string& value) override {
+        if (SDK::hasInstanced) {
+            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                // lmb
+                std::string lmbText = settings.getSettingByName<std::string>("lmbtext")->value;
+                std::string uppercaseSentence;
+                std::string search = "{VALUE}";
 
                 for (char c: lmbText) uppercaseSentence += (char)std::toupper(c);
 

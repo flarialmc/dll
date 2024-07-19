@@ -109,7 +109,7 @@ class AutoRQListener : public Listener {
                         std::transform(pkt->message.begin(), pkt->message.end(), pkt->message.begin(), ::tolower);
                         if (pkt->message.substr(0, (evaluate_string.length())) == evaluate_string)  { 
                             triggered = true;
-                            //FlarialGUI::Notify("Found map: " + result[i]);
+                            FlarialGUI::Notify("Found map: " + result[i]);
                             std::shared_ptr<Packet> packet = SDK::createPacket(77);
                             auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
                             command_packet->command = "/connection";
@@ -147,11 +147,11 @@ class AutoRQListener : public Listener {
                 std::string server = pkt->message.replace(0, textToCheck.length(), "");
                 std::regex pattern("\\d+");
                 std::string name = std::regex_replace(server, pattern, "");
-                //FlarialGUI::Notify("Preparing Q: " + name);
+                FlarialGUI::Notify("Preparing Q: " + name);
                 std::thread t([name]() {
                     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-                    //FlarialGUI::Notify("Executing command /q " + name);
+                    FlarialGUI::Notify("Executing command /q " + name);
 
                     std::shared_ptr<Packet> packet = SDK::createPacket(77);
                     auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
