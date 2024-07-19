@@ -132,7 +132,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
 void SwapchainHook::InitDX12(IDXGISwapChain3* swapchain) {
 
-                DXGI_SWAP_CHAIN_DESC sdesc;
+     DXGI_SWAP_CHAIN_DESC sdesc;
 	            swapchain->GetDesc(&sdesc);
 	            sdesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	            sdesc.OutputWindow = window;
@@ -190,6 +190,53 @@ void SwapchainHook::InitDX12(IDXGISwapChain3* swapchain) {
                                         d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart(),
                                         d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart());
                                 }
+
+                                ImGui_ImplDX12_NewFrame();
+                                ImGui_ImplWin32_NewFrame();
+                                ImGui::NewFrame();
+
+                                ImGui::GetForegroundDrawList()->AddRectFilledMultiColor(ImVec2(), ImVec2(100, 100), ImColor(255, 255, 255, 255), ImColor(0, 0, 0, 255), ImColor(100, 100, 100, 255), ImColor(0, 255, 0, 255));
+
+                                RenderEvent event{};
+                                EventHandler::onRender(event);
+
+
+                                D2D::context->EndDraw();
+
+                                D2D::context->SetTarget(nullptr);
+
+                                d3d11On12Device->ReleaseWrappedResources(&resource, 1);
+
+                                context->Flush();
+
+                                frameContexts[swapchain->GetCurrentBackBufferIndex()].commandAllocator->Reset();;
+
+                                D3D12_RESOURCE_BARRIER barrier;
+                                barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+                                barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+                                barrier.Transition.pResource = frameContexts[swapchain->GetCurrentBackBufferIndex()].main_render_target_resource;
+                                barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+                                barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+                                barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+                                d3d12CommandList->Reset(frameContexts[swapchain->GetCurrentBackBufferIndex()].commandAllocator, nullptr);
+                                d3d12CommandList->ResourceBarrier(1, &barrier);
+                                d3d12CommandList->OMSetRenderTargets(1, &frameContexts[swapchain->GetCurrentBackBufferIndex()].main_render_target_descriptor, FALSE, nullptr);
+                                d3d12CommandList->SetDescriptorHeaps(1, &d3d12DescriptorHeapImGuiRender);
+
+                                ImGui::EndFrame();
+                                ImGui::Render();
+
+                                ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), d3d12CommandList);
+
+                                barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+                                barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+
+                                d3d12CommandList->ResourceBarrier(1, &barrier);
+                                d3d12CommandList->Close();
+
+                                SwapchainHook::queue->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList* const*>(&d3d12CommandList));
+
                             }
                         }
                     }
@@ -232,45 +279,6 @@ void SwapchainHook::InitDX11() {
     ImGui_ImplWin32_Init(window);
     ImGui_ImplDX11_Init(d3d11Device, ppContext);
     ppContext->Release();
-}
-
-void SwapchainHook::RenderDX12() {
-                                ImGui_ImplDX12_NewFrame();
-                                ImGui_ImplWin32_NewFrame();
-                                ImGui::NewFrame();
-
-                                ImGui::GetForegroundDrawList()->AddRectFilledMultiColor(ImVec2(), ImVec2(100, 100), ImColor(255, 255, 255, 255), ImColor(0, 0, 0, 255), ImColor(100, 100, 100, 255), ImColor(0, 255, 0, 255));
-
-                                RenderEvent event{};
-                                EventHandler::onRender(event);
-
-                                frameContexts[swapchain->GetCurrentBackBufferIndex()].commandAllocator->Reset();;
-
-                                D3D12_RESOURCE_BARRIER barrier;
-                                barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-                                barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-                                barrier.Transition.pResource = frameContexts[swapchain->GetCurrentBackBufferIndex()].main_render_target_resource;
-                                barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-                                barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-                                barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-
-                                d3d12CommandList->Reset(frameContexts[swapchain->GetCurrentBackBufferIndex()].commandAllocator, nullptr);
-                                d3d12CommandList->ResourceBarrier(1, &barrier);
-                                d3d12CommandList->OMSetRenderTargets(1, &frameContexts[swapchain->GetCurrentBackBufferIndex()].main_render_target_descriptor, FALSE, nullptr);
-                                d3d12CommandList->SetDescriptorHeaps(1, &d3d12DescriptorHeapImGuiRender);
-
-                                ImGui::EndFrame();
-                                ImGui::Render();
-
-                                ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), d3d12CommandList);
-
-                                barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-                                barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-
-                                d3d12CommandList->ResourceBarrier(1, &barrier);
-                                d3d12CommandList->Close();
-
-                                queue->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList* const*>(&d3d12CommandList));
 }
 
 void RenderDX11(IDXGISwapChain3* swapchain) {
