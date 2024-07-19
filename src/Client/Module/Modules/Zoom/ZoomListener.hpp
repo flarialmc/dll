@@ -29,7 +29,6 @@ class ZoomListener : public Listener {
         bool disableanim = module->settings.getSettingByName<bool>("disableanim")->value;
         bool alwaysanim = module->settings.getSettingByName<bool>("alwaysanim")->value;
 
-        /*
         if (module->active) {
             animationFinished = false;
             if (fov > 180) {
@@ -50,7 +49,6 @@ class ZoomListener : public Listener {
                 currentZoomVal = fov;
             }
         }
-        */
 
         event.setFOV(currentZoomVal);
     }

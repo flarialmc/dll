@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Client.hpp"
+#include "GUI/Engine/Engine.hpp"
 #include "../Utils/Versions/VersionUtils.hpp"
 #include <filesystem>
 #include <thread>
@@ -20,7 +21,6 @@ bool notifiedOfConnectionIssue = false;
 
 void DownloadAndSave(const std::string& url, const std::string& path) {
 
-    /*
     if (Client::settings.getSettingByName<bool>("dlassets")->value || !std::filesystem::exists(path)) {
         char test[256];
         strcpy_s(test, "https://flarialbackup.ashank.tech/");
@@ -35,7 +35,7 @@ void DownloadAndSave(const std::string& url, const std::string& path) {
         }
 
     }
-*/
+
 }
 
 bool Client::disable = false;
@@ -147,25 +147,22 @@ void Client::initialize() {
     if (Client::settings.getSettingByName<float>("rgb_value") == nullptr)
         Client::settings.addSetting("rgb_value", 1.0f);
 
-    /*
     FlarialGUI::LoadFont(IDR_FONT_TTF);
 
     FlarialGUI::LoadFont(IDR_FONT_BOLD_TTF);
 
     FlarialGUI::LoadFont(IDR_MINECRAFTIA_TTF);
-*/
+
     Logger::initialize();
 
     HookManager::initialize();
     ModuleManager::initialize();
     Logger::debug("[Client] Ready.");
 
-    /*
     if (!Client::disable) {
-        //FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
+        FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                 "keybind")->value + " to open the menu in-game.");
     }
-    */
 }
 
 std::string window = "Minecraft";

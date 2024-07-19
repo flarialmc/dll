@@ -35,5 +35,6 @@ public:
     }
 
     void settingsRender() override { }
+    }
 };
 

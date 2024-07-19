@@ -6,7 +6,7 @@
 #include "../../../Events/Listener.hpp"
 #include "../../../Events/Input/KeyEvent.hpp"
 #include "../Module.hpp"
-
+#include "../../../GUI/Engine/Engine.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "MovableChatListener.hpp"
 #include "../../Manager.hpp"
@@ -44,7 +44,7 @@ public:
             module->isEnabled()) {
 
             if (!enabled && FlarialGUI::inMenu) {
-                //FlarialGUI::Notify("To change the position of the chat, Please click " +
+                FlarialGUI::Notify("To change the position of the chat, Please click " +
                                    ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                            "editmenubind")->value);
                 enabled = true;

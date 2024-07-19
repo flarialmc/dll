@@ -1,11 +1,11 @@
 #include <iostream>
 #include "DrawUtils.hpp"
+
+#include "../../Client/GUI/Engine/Engine.hpp"
 #include "../../SDK/SDK.hpp"
 #include "../../SDK/Client/Render/Matrix.hpp"
 
 void DrawUtils::addLine(Vec2<float> start, Vec2<float> end, float lineWidth, D2D_COLOR_F color) {
-
-    /*
 
     if (start.x < 0 || start.x > SDK::clientInstance->guiData->ScreenSize.x || start.y < 0 ||
         start.y > SDK::clientInstance->guiData->ScreenSize.y) {
@@ -19,7 +19,6 @@ void DrawUtils::addLine(Vec2<float> start, Vec2<float> end, float lineWidth, D2D
 
     D2D::context->DrawLine(D2D1::Point2F(start.x, start.y), D2D1::Point2F(end.x, end.y), FlarialGUI::getBrush(color).get(),
                            lineWidth);
-                           */
 
 }
 

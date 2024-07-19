@@ -1,5 +1,6 @@
 ﻿#include "Utils.hpp"
 #include "Logger/Logger.hpp"
+#include "../Client/GUI/Engine/Engine.hpp"
 #include <sstream>
 #include <algorithm>
 #include <iostream>
@@ -26,8 +27,6 @@ bool Utils::hasEnding (std::string const &fullString, std::string const &ending)
 
 
 std::string Utils::removeColorCodes(const std::string &input) {
-
-    /*
     std::string result;
     std::string newinput = input;
 
@@ -47,8 +46,6 @@ std::string Utils::removeColorCodes(const std::string &input) {
 
 
     return result;
-    */
-    return "test";
 }
 
 std::string Utils::removeNonAlphanumeric(const std::string &input) {
@@ -387,8 +384,6 @@ int Utils::getStringAsKey(const std::string &str) {
 }
 
 bool Utils::CursorInEllipse(float ellipseX, float ellipseY, float radiusX, float radiusY) {
-
-    /*
     float mouseX = MC::mousePos.x;
     float mouseY = MC::mousePos.y;
 
@@ -396,6 +391,4 @@ bool Utils::CursorInEllipse(float ellipseX, float ellipseY, float radiusX, float
     float normalizedY = (mouseY - ellipseY) / radiusY;
 
     return (normalizedX * normalizedX + normalizedY * normalizedY) <= 1.0f;
-*/
-
 }

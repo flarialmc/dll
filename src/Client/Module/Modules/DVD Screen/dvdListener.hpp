@@ -23,10 +23,8 @@ class dvdListener : public Listener {
             float height = 83 * module->settings.getSettingByName<float>("scale")->value;
             float width = 187 * module->settings.getSettingByName<float>("scale")->value;
 
-            /*
             FlarialGUI::image(IDR_DVDLOGO_01_PNG - 1 + color,
                               D2D1::RectF(x, y, x + width, y + height));
-                              */
 
             x += module->settings.getSettingByName<float>("xveloc")->value * xv;
             y += module->settings.getSettingByName<float>("yveloc")->value * yv;

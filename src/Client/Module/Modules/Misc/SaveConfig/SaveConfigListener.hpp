@@ -13,7 +13,7 @@ public:
         if (event.getKey() == VK_F7 && static_cast<ActionType>(event.getAction()) == ActionType::Released) {
             ModuleManager::SaveModulesConfig();
             Client::SaveSettings();
-            //FlarialGUI::Notify("Config Saved");
+            FlarialGUI::Notify("Config Saved");
         }
     }
 

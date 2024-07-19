@@ -2,9 +2,11 @@
 
 #include "Manager.hpp"
 #include "../Events/EventHandler.hpp"
+#include "Modules/Input/GUIKeyListener.hpp"
 #include "Modules/Misc/SaveConfig/SaveConfigListener.hpp"
 #include "Modules/Misc/RGB/rgbListener.hpp"
 #include "Modules/Misc/TextAlias/TextAliasListener.hpp"
+#include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/Module.hpp"
 #include "Modules/FPS/FPSCounter.hpp"
 #include "Modules/CPS/CPSCounter.hpp"
@@ -99,7 +101,7 @@ void ModuleManager::initialize() {
     ModuleManager::addModule(new Zoom()); //2
     ModuleManager::addModule(new UpsideDown()); //3
 
-//    ModuleManager::addModule(new ClickGUI());
+    ModuleManager::addModule(new ClickGUI());
 
     ModuleManager::addModule(new FPSCounter());
     ModuleManager::addModule(new CPSCounter());
@@ -150,7 +152,7 @@ void ModuleManager::initialize() {
     //ModuleManager::addModule(new MovableChat());
     //ModuleManager::addModule(new CompactChat());
 
-//    EventHandler::registerListener(new GUIKeyListener("GuiKeyListener"));
+    EventHandler::registerListener(new GUIKeyListener("GuiKeyListener"));
     EventHandler::registerListener(new DiscordRPCListener("DiscordRPC"));
     EventHandler::registerListener(new UninjectListener("Uninject"));
     EventHandler::registerListener(new SaveConfigListener("SaveConfig"));

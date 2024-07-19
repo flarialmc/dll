@@ -5,8 +5,10 @@
 #include "ResizeHook.hpp"
 #include "../../../GUI/Data.hpp"
 #include "SwapchainHook.hpp"
+#include "../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
 #include "../../../Module/Modules/MotionBlur/MotionBlurListener.hpp"
 #include "../../../Module/Manager.hpp"
+#include "../../../GUI/Engine/Elements/Structs/ImagesClass.hpp"
 
 void ResizeHook::enableHook() {
 

@@ -31,7 +31,7 @@ class FOVChangerListener : public Listener {
         if (inserver) {
             if (fovSetting > 150) {
                 if (!notified150Fov) {
-                    //FlarialGUI::Notify("FOV Changer has been limmited to 150 on servers.");
+                    FlarialGUI::Notify("FOV Changer has been limmited to 150 on servers.");
                     notified150Fov = true;
                 }
                 event.setFOV(150.0f);
