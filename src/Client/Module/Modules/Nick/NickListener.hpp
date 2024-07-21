@@ -16,17 +16,17 @@ public:
     static inline std::string backupOri;
 
     void onRaknetTick(RaknetTickEvent &event) override {
-        if (module->isEnabled()) {
-            std::string serverIP = SDK::getServerIP();
-            if(serverIP.find("cubecraft") != std::string::npos) {
-                if(!module->restricted) {
-                    FlarialGUI::Notify("Can't use Nick on " + serverIP); // TODO: move restrictions to API
-                    module->restricted = true;
-                }
-            } else {
-                module->restricted = false;
-            }
-        }
+//        if (module->isEnabled()) {
+//            std::string serverIP = SDK::getServerIP();
+//            if(serverIP.find("cubecraft") != std::string::npos) {
+//                if(!module->restricted) {
+//                    FlarialGUI::Notify("Can't use Nick on " + serverIP); // TODO: move restrictions to API
+//                    module->restricted = true;
+//                }
+//            } else {
+//                module->restricted = false;
+//            }
+//        }
     }
 
     void onDrawText(DrawTextEvent &event) override {
@@ -39,7 +39,7 @@ public:
                     if (pos != std::string::npos) {
                         std::string faketxt = *event.getText();
                         faketxt.replace(pos, localPlayerName.length(),
-                                        module->settings.getSettingByName<std::string>("nick")->value);
+                                        "§o"+Utils::removeColorCodes(module->settings.getSettingByName<std::string>("nick")->value));
                         *event.getText() = faketxt;
                     }
                 }
@@ -64,7 +64,7 @@ public:
 
         if (enabled && !module->restricted) {
 
-            std::string val = module->settings.getSettingByName<std::string>("nick")->value;
+            std::string val = "§o"+Utils::removeColorCodes(module->settings.getSettingByName<std::string>("nick")->value);
             SDK::clientInstance->getLocalPlayer()->setNametag(&val);
             SDK::clientInstance->getLocalPlayer()->playerName = val;
 
