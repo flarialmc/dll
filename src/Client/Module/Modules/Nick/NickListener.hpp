@@ -15,11 +15,25 @@ class NickListener : public Listener {
 public:
     static inline std::string backupOri;
 
+    void onRaknetTick(RaknetTickEvent &event) override {
+        if (module->isEnabled()) {
+            std::string serverIP = SDK::getServerIP();
+            if(serverIP.find("cubecraft") != std::string::npos) {
+                if(!module->restricted) {
+                    FlarialGUI::Notify("Can't use Nick on " + serverIP); // TODO: move restrictions to API
+                    module->restricted = true;
+                }
+            } else {
+                module->restricted = false;
+            }
+        }
+    }
+
     void onDrawText(DrawTextEvent &event) override {
         if (SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                 if (original.empty()) original = SDK::clientInstance->getLocalPlayer()->playerName;
-                if (module->isEnabled()) {
+                if (module->isEnabled() && !module->restricted) {
                     std::string localPlayerName = original;
                     size_t pos = event.getText()->find(localPlayerName);
                     if (pos != std::string::npos) {
@@ -48,7 +62,7 @@ public:
             if (!enabled) original2 = *SDK::clientInstance->getLocalPlayer()->getNametag();
         }
 
-        if (enabled) {
+        if (enabled && !module->restricted) {
 
             std::string val = module->settings.getSettingByName<std::string>("nick")->value;
             SDK::clientInstance->getLocalPlayer()->setNametag(&val);
