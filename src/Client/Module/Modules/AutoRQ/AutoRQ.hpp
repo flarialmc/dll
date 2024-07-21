@@ -32,6 +32,20 @@ public:
             settings.addSetting("command", (std::string)"");
         if (settings.getSettingByName<bool>("solo") == nullptr)
             settings.addSetting("solo", false);
+        if (settings.getSettingByName<bool>("murderer") == nullptr)
+            settings.addSetting("murderer", false);
+        if (settings.getSettingByName<bool>("sheriff") == nullptr)
+            settings.addSetting("sheriff", false);
+        if (settings.getSettingByName<bool>("innocent") == nullptr)
+            settings.addSetting("innocent", false);
+        if (settings.getSettingByName<bool>("hider") == nullptr)
+            settings.addSetting("hider", false);
+        if (settings.getSettingByName<bool>("seeker") == nullptr)
+            settings.addSetting("seeker", false);
+        if (settings.getSettingByName<bool>("death") == nullptr)
+            settings.addSetting("death", false);
+        if (settings.getSettingByName<bool>("runner") == nullptr)
+            settings.addSetting("runner", false);
         if (settings.getSettingByName<bool>("AutoMapAvoider") == nullptr)
             settings.addSetting("AutoMapAvoider", false);
         if (settings.getSettingByName<std::string>("text") == nullptr) 
@@ -44,6 +58,11 @@ public:
 
         const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
+
+        FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(5.5, textWidth), 2);
+        FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(1.0f, "height"));
 
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
                                         L"Solo mode", textWidth * 6.9f, textHeight,
@@ -58,7 +77,122 @@ public:
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0, textWidth), toggleY,
-                                        L"Avoid Maps (Hive). Input one or more maps using comma's.", textWidth * 6.9f, textHeight,
+                                        L"Re-Q when you get a specific role (Hive)", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0, textWidth), toggleY,
+                                        L"Murder Mystery", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                        L"Murderer", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        if (FlarialGUI::Toggle(3, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "murderer")->value))
+            this->settings.getSettingByName<bool>("murderer")->value = !this->settings.getSettingByName<bool>(
+                    "murderer")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                        L"Sheriff", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        if (FlarialGUI::Toggle(4, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "sheriff")->value))
+            this->settings.getSettingByName<bool>("sheriff")->value = !this->settings.getSettingByName<bool>(
+                    "sheriff")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                        L"Innocent", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        if (FlarialGUI::Toggle(6, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "innocent")->value))
+            this->settings.getSettingByName<bool>("innocent")->value = !this->settings.getSettingByName<bool>(
+                    "innocent")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0, textWidth), toggleY,
+                                        L"Hide and Seek", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                        L"Hider", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        if (FlarialGUI::Toggle(7, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "hider")->value))
+            this->settings.getSettingByName<bool>("hider")->value = !this->settings.getSettingByName<bool>(
+                    "hider")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                        L"Seeker", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        if (FlarialGUI::Toggle(8, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "seeker")->value))
+            this->settings.getSettingByName<bool>("seeker")->value = !this->settings.getSettingByName<bool>(
+                    "seeker")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0, textWidth), toggleY,
+                                        L"Deathrun", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                        L"Death", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        if (FlarialGUI::Toggle(9, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "death")->value))
+            this->settings.getSettingByName<bool>("death")->value = !this->settings.getSettingByName<bool>(
+                    "death")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                        L"Runner", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        if (FlarialGUI::Toggle(10, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "runner")->value))
+            this->settings.getSettingByName<bool>("runner")->value = !this->settings.getSettingByName<bool>(
+                    "runner")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        toggleX = Constraints::PercentageConstraint(0.55, "left");
+        toggleY = Constraints::PercentageConstraint(0.10, "top");
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0, textWidth), toggleY,
+                                        L"Avoid Maps (Hive). Input one or more maps\nusing comma's.", textWidth * 6.9f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
 
@@ -72,6 +206,7 @@ public:
          Constraints::SpacingConstraint(0.60, textWidth), toggleY, "");
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        FlarialGUI::UnsetScrollView();
     }
 };
 
