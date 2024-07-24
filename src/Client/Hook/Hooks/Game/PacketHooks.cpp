@@ -11,7 +11,7 @@ void SendPacketHook::callback(LoopbackPacketSender *pSender, Packet *pPacket) {
     EventHandler::onPacketSend(event);
 
     if (!event.isCancelled()) {
-        sendPacketkOriginal(pSender, pPacket);
+        sendPacketOriginal(pSender, pPacket);
     }
 }
 
@@ -46,7 +46,16 @@ SendPacketHook::receiveCallbackPlaySound(const float *a1, const float *networkId
     PacketEvent event(packet.get());
     EventHandler::onPacketReceive(event);
     if (!event.isCancelled())
-        receivePacketPlaySounOriginal(a1, networkIdentifier, netEventCallback, packet);
+        receivePacketPlaySoundOriginal(a1, networkIdentifier, netEventCallback, packet);
+}
+
+void SendPacketHook::receiveCallbackEntityEvent(const float *a1, const float *networkIdentifier,
+                                                const float *netEventCallback, const std::shared_ptr<Packet> &packet) {
+    PacketEvent event(packet.get());
+    EventHandler::onPacketReceive(event);
+    if (!event.isCancelled())
+        receivePacketEntityEventOriginal(a1, networkIdentifier, netEventCallback, packet);
+
 }
 
 void SendPacketHook::enableHook() {
@@ -69,7 +78,11 @@ void SendPacketHook::enableHook() {
 
     std::shared_ptr<Packet> playSoundPacket = SDK::createPacket((int) MinecraftPacketIds::PlaySoundA);
     Memory::hookFunc((void *) playSoundPacket->packetHandler->vTable[1], (void*)receiveCallbackPlaySound,
-                     (void **) &receivePacketPlaySounOriginal, "ReceivePacketHook");
+                     (void **) &receivePacketPlaySoundOriginal, "ReceivePacketHook");
 
-    this->autoHook((void *) callback, (void **) &sendPacketkOriginal);
+    std::shared_ptr<Packet> EntityEventPacket = SDK::createPacket((int) MinecraftPacketIds::ActorEvent);
+    Memory::hookFunc((void *) EntityEventPacket->packetHandler->vTable[1], (void*)receiveCallbackEntityEvent,
+                     (void **) &receivePacketEntityEventOriginal, "ReceivePacketHook");
+
+    this->autoHook((void *) callback, (void **) &sendPacketOriginal);
 }

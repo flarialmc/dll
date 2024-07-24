@@ -19,6 +19,9 @@ private:
     static void receiveCallbackPlaySound(const float *a1, const float *networkIdentifier, const float *netEventCallback,
                                          const std::shared_ptr<Packet>& packet);
 
+    static void receiveCallbackEntityEvent(const float *a1, const float *networkIdentifier, const float *netEventCallback,
+                                           const std::shared_ptr<Packet>& packet);
+
 public:
 
     typedef void(__thiscall *original)(LoopbackPacketSender *, Packet *);
@@ -26,10 +29,11 @@ public:
     typedef void(__thiscall *receive)(const float *a1, const float *networkIdentifier, const float *netEventCallback,
                                       std::shared_ptr<Packet> packet);
 
-    static inline original sendPacketkOriginal = nullptr;
+    static inline original sendPacketOriginal = nullptr;
     static inline receive receiveTextPacketOriginal = nullptr;
     static inline receive receiveSetTitlePacketOriginal = nullptr;
-    static inline receive receivePacketPlaySounOriginal = nullptr;
+    static inline receive receivePacketPlaySoundOriginal = nullptr;
+    static inline receive receivePacketEntityEventOriginal = nullptr;
 
     SendPacketHook() : Hook("sendPacket", GET_SIG("LoopbackPacketSender::sendPacket")) {}
 

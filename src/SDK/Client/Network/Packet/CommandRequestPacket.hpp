@@ -34,10 +34,10 @@ public:
 class CommandRequestPacket : public Packet {
 
 public:
-    CommandRequestPacket();
-
     std::string command;
     CommandOriginData origin;
     bool InternalSource;
+
+    CommandRequestPacket() = default;
 };
 
