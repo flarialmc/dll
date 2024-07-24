@@ -1,6 +1,7 @@
 #include "Actor.hpp"
 #include "Components/ActorGameTypeComponent.hpp"
 #include "Components/AABBShapeComponent.hpp"
+#include "Components/RuntimeIDComponent.hpp"
 
 // TODO add comments to all components, replace their sigs with simpler ones ?       marioCST: use entt's try_get func in EntityContext instead of using sigs, there are no simpler sigs
 
@@ -149,6 +150,16 @@ ItemStack *Actor::getOffhandSlot() {
         auto fn = reinterpret_cast<ItemStack *(__thiscall *)(Actor *)>(sig);
         return fn(this);
     }
+}
+
+RuntimeIDComponent *Actor::getRuntimeIDComponent() {
+    static uintptr_t sig;
+
+    if (sig == NULL) {
+        sig = Memory::findSig(GET_SIG("Actor::getRuntimeIDComponent"));
+    }
+
+    return tryGet<RuntimeIDComponent>(sig);
 }
 
 V1_20_50::EntityContext *Actor::GetEntityContextV1_20_50() {
