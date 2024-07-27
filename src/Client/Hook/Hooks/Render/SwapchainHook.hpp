@@ -22,7 +22,6 @@ private:
     static HRESULT swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags);
 
 
-
 public:
     typedef HRESULT(__thiscall *SwapchainOriginal)(IDXGISwapChain3 *, UINT, UINT);
 
@@ -30,9 +29,6 @@ public:
     static bool init;
 
     SwapchainHook();
-
-    static void DX11Blur();
-    static void DX12Blur();
 
     void enableHook() override;
 
