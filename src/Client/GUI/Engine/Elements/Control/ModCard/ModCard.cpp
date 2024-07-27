@@ -122,13 +122,11 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     D2D1_COLOR_F mod2Col = colors_mod2_rgb ? FlarialGUI::rgbColor : colors_mod2;
     mod2Col.a = o_colors_mod2;
 
-    FlarialGUI::RoundedRect(x, y, mod2Col, BottomRoundedWidth, BottomRoundedHeight, round.x, round.x);
+    FlarialGUI::RoundedRect(x, y, mod1Col, BottomRoundedWidth, BottomRoundedHeight, round.x, round.x);
 
     // Top rounded rect
 
     float TopRoundedHeight = Constraints::SpacingConstraint(sizes[index].y, 0.635f);
-    FlarialGUI::RoundedRectOnlyTopCorner(x, y, mod1Col,
-                                         BottomRoundedWidth, TopRoundedHeight, round.x, round.x);
 
     FlarialGUI::PushSize(x, y, BottomRoundedWidth, BottomRoundedHeight);
     // Mod Name
@@ -140,7 +138,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     FlarialGUI::FlarialTextWithFont(textx, texty, FlarialGUI::to_wide(mod->name).c_str(), textWidth, textHeight,
                                     DWRITE_TEXT_ALIGNMENT_CENTER,
                                     Constraints::SpacingConstraint(0.8, textWidth),
-                                    DWRITE_FONT_WEIGHT_NORMAL);
+                                    DWRITE_FONT_WEIGHT_NORMAL, FlarialGUI::HexToColorF("8b767a"),false);
 
     // Mod icon
 
@@ -162,7 +160,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     modiconx = Constraints::PercentageConstraint(0.43, "left");
     modicony = Constraints::PercentageConstraint(0.15, "top");
 
-    // enabled / disabled button
+    // enabled / disabled button DECLARATIONS
 
     std::string text;
     text = mod->isEnabled() ? "Enabled" : "Disabled";
@@ -172,11 +170,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     enabledColor.a = o_colors_enabled;
     disabledColor.a = o_colors_disabled;
 
-    D2D1_COLOR_F to = text == "Enabled" ? enabledColor : disabledColor;
-    if (FlarialGUI::buttonColors.size() >= index)
-        FlarialGUI::buttonColors[index] = FlarialGUI::LerpColor(FlarialGUI::buttonColors[index], to,
-                                                                0.15f * FlarialGUI::frameFactor);
-    else FlarialGUI::buttonColors.resize(index);
+
 
     float buttonWidth = Constraints::RelativeConstraint(0.71, "width");
     float buttonHeight = Constraints::RelativeConstraint(0.27);
@@ -184,22 +178,13 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     float buttonx = Constraints::PercentageConstraint(0.04, "right");
     float buttony = Constraints::PercentageConstraint(0.05, "bottom");
 
-    round = Constraints::RoundingConstraint(26, 26);
+    D2D1_COLOR_F to = text == "Enabled" ? enabledColor : disabledColor;
 
-    D2D1_COLOR_F textCol = colors_text_rgb ? FlarialGUI::rgbColor : colors_text;
-    textCol.a = o_colors_text;
-
-    if (FlarialGUI::RoundedButton(index, buttonx - buttonWidth, buttony - buttonHeight,
-                                  FlarialGUI::buttonColors[index], textCol,
-                                  FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, round.x,
-                                  round.x)) {
-        mod->toggle();
-    }
-
+    // en/dis button end
 
     // Settings Button
     float settingswidth = Constraints::RelativeConstraint(0.17);
-    float iconwidth = Constraints::RelativeConstraint(0.10);
+    float iconwidth = Constraints::RelativeConstraint(0.15);
     float settingsheightspac = Constraints::SpacingConstraint(0.31, settingswidth);
 
     float paddingwidth = Constraints::RelativeConstraint(0.26);
@@ -208,21 +193,21 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     round = Constraints::RoundingConstraint(20, 20);
 
-    float settingx = Constraints::PercentageConstraint(0.025, "left");
-    float settingx2 = Constraints::PercentageConstraint(0.059, "left");
+    float settingx = Constraints::PercentageConstraint(0.0485, "left");
+    float settingx2 = Constraints::PercentageConstraint(0.0797, "left");
 
-    FlarialGUI::RoundedRect(settingx, (buttony - paddingwidth) - paddingheightspac,
-                            mod3Col, paddingwidth,
-                            paddingwidth, round.x, round.x);
+    FlarialGUI::RoundedRect(settingx, buttony - buttonHeight,
+                            mod3Col, paddingwidth + Constraints::RelativeConstraint(0.26),
+                            buttonHeight, round.x, round.x);
 
     D2D1_COLOR_F mod4Col = colors_mod4_rgb ? FlarialGUI::rgbColor : colors_mod4;
     mod4Col.a = o_colors_mod4;
 
-    if (!Client::settings.getSettingByName<bool>("noicons")->value)
-        FlarialGUI::RoundedRectWithImageAndText(index, settingx2, (buttony - settingswidth) - settingsheightspac,
-                                                settingswidth, settingswidth,
-                                                mod4Col, IDR_GEAR_PNG, iconwidth, iconwidth);
+    if (!Client::settings.getSettingByName<bool>("noicons")->value) {
+        RotatingGear(index, settingx2, (buttony - buttonHeight) + Constraints::SpacingConstraint(0.18, paddingwidth), settingswidth, settingswidth, iconwidth, iconwidth);
+    }
 
+    // settings button end
 
     if (iconId != -1 && images[iconId] == nullptr) {
         FlarialGUI::LoadImageFromResource(iconId, &images[iconId]);
@@ -240,6 +225,31 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
                                                                     modicony + paddingSize));
     }
 
+    // actually button
+
+    if (FlarialGUI::buttonColors.size() >= index)
+        FlarialGUI::buttonColors[index] = FlarialGUI::LerpColor(FlarialGUI::buttonColors[index], to,
+                                                                0.15f * FlarialGUI::frameFactor);
+    else FlarialGUI::buttonColors.resize(index);
+
+    round = Constraints::RoundingConstraint(26, 26);
+
+    D2D1_COLOR_F textCol = colors_text_rgb ? FlarialGUI::rgbColor : colors_text;
+    textCol.a = o_colors_text;
+
+    D2D1_COLOR_F buttonColor;
+    buttonColor = D2D1::ColorF(FlarialGUI::buttonColors[index].r - FlarialGUI::darkenAmounts[index], FlarialGUI::buttonColors[index].g - FlarialGUI::darkenAmounts[index],
+                                   FlarialGUI::buttonColors[index].b - FlarialGUI::darkenAmounts[index], FlarialGUI::buttonColors[index].a);
+
+    FlarialGUI::RoundedRect((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.02f, paddingwidth), buttony - buttonHeight,
+                                  buttonColor, buttonWidth - Constraints::SpacingConstraint(1.5, paddingwidth), buttonHeight, 0.f, 0.f);
+
+    if (FlarialGUI::RoundedButton(index, buttonx - buttonWidth, buttony - buttonHeight,
+                                  FlarialGUI::buttonColors[index], textCol,
+                                  FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, round.x,
+                                  round.x)) {
+        mod->toggle();
+                                  }
     if (FlarialGUI::isInScrollView)
         buttony += FlarialGUI::scrollpos;
 
@@ -257,4 +267,53 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         GUIMouseListener::accumilatedBarPos = 0;
     }
     FlarialGUI::PopSize();
+}
+
+#include "../../Structs/ImagesClass.hpp"
+
+void ClickGUIElements::RotatingGear(int index, float x, float y, float width, float height, float imageWidth, float imageHeight) {
+
+    float imageY = y;
+
+    if (FlarialGUI::isInScrollView) {
+        y += FlarialGUI::scrollpos;
+        imageY += FlarialGUI::scrollpos;
+    }
+
+    x = x + (width - imageWidth) / 2.0f;
+    imageY = imageY + (height - imageHeight) / 2.0f;
+
+    D2D1_RECT_F imagerectf = D2D1::RectF(x, imageY, x + imageWidth, imageY + imageHeight);
+
+    if (ImagesClass::images[IDR_SETTINGS_WHITE_PNG] == nullptr) {
+        FlarialGUI::LoadImageFromResource(IDR_SETTINGS_WHITE_PNG, &ImagesClass::images[IDR_SETTINGS_WHITE_PNG]);
+
+    } else if (ImagesClass::images[IDR_SETTINGS_WHITE_PNG] != nullptr) {
+
+        D2D1_MATRIX_3X2_F oldTransform;
+        D2D::context->GetTransform(&oldTransform);
+
+        if (FlarialGUI::CursorInRect(x, y, width, height)) {
+
+            FlarialGUI::lerp(FlarialGUI::rotationAngles[index], FlarialGUI::rotationAngles[index] + 15, 0.5f * FlarialGUI::frameFactor);
+        }
+
+
+        float rotationAngle = FlarialGUI::rotationAngles[index];// Specify the rotation angle in degrees
+        D2D1_POINT_2F rotationCenter = D2D1::Point2F(imagerectf.left + imageWidth / 2.0f, imagerectf.top +
+                                                                                          imageHeight /
+                                                                                          2.0f);  // Specify the rotation center
+        D2D1_MATRIX_3X2_F rotationMatrix = D2D1::Matrix3x2F::Rotation(rotationAngle, rotationCenter);
+
+        D2D1_MATRIX_3X2_F translationMatrix = D2D1::Matrix3x2F::Translation(x, imageY);
+        D2D1_MATRIX_3X2_F combinedMatrix = translationMatrix * rotationMatrix;
+
+        D2D::context->SetTransform(combinedMatrix);
+
+        imagerectf = D2D1::RectF(0, 0, imageWidth, imageHeight);
+
+        D2D::context->DrawBitmap(ImagesClass::images[IDR_SETTINGS_WHITE_PNG], imagerectf, 1.0, D2D1_INTERPOLATION_MODE_ANISOTROPIC);
+
+        D2D::context->SetTransform(oldTransform);
+    }
 }
