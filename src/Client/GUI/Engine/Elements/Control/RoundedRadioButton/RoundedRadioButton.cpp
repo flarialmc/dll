@@ -20,11 +20,12 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
     D2D1_COLOR_F buttonColor;
 
     if (radioNum != currentNum) {
-        FadeEffect::ApplyFadeInEffect(0.1f * FlarialGUI::frameFactor, 1, opacityAmounts[index]);
-        buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[index]);
+        if(opacityAmounts[index] != 0) FlarialGUI::lerp(opacityAmounts[index], 0.f, 0.25f * FlarialGUI::frameFactor);
+        if(opacityAmounts[index] < 0.4f) opacityAmounts[index] = 0;
+        buttonColor = D2D1::ColorF(color.r, color.g, color.b,  opacityAmounts[index]);
     } else {
-        FadeEffect::ApplyFadeOutEffect(0.1f * FlarialGUI::frameFactor, opacityAmounts[index]);
-        buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[index]);
+        FlarialGUI::lerp(opacityAmounts[index], 1.f, 0.25f * FlarialGUI::frameFactor);
+        buttonColor = D2D1::ColorF(color.r, color.g, color.b, opacityAmounts[index]);
     }
 
     D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
