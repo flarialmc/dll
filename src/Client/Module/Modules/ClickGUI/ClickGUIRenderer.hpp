@@ -197,7 +197,7 @@ public:
 
             float shit = Constraints::RelativeConstraint(0.395f);
 
-            float RadioButtonWidth = Constraints::RelativeConstraint(0.129, "width");
+            float RadioButtonWidth = Constraints::RelativeConstraint(0.134, "width");
             float RadioButtonHeight = shit;
 
             if(curr == "modules") FlarialGUI::lerp(width1, RadioButtonWidth, 0.15f * FlarialGUI::frameFactor);
