@@ -239,7 +239,7 @@ public:
                 tabBgCol.a = o_colors_secondary8;
             } else {
                 tabBgCol = colors_secondary5_rgb ? FlarialGUI::rgbColor : colors_secondary5;
-                tabBgCol.a = o_colors_secondary5;
+                tabBgCol.a = 0.f;
             }
 
             FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15f, logoWidth),
@@ -292,7 +292,7 @@ public:
                 tabBgCol.a = o_colors_secondary8;
             } else {
                 tabBgCol = colors_secondary5_rgb ? FlarialGUI::rgbColor : colors_secondary5;
-                tabBgCol.a = o_colors_secondary5;
+                tabBgCol.a = 0.f;
             }
 
             FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15f, logoWidth),
@@ -341,7 +341,7 @@ public:
                 tabBgCol.a = o_colors_secondary8;
             } else {
                 tabBgCol = colors_secondary5_rgb ? FlarialGUI::rgbColor : colors_secondary5;
-                tabBgCol.a = o_colors_secondary5;
+                tabBgCol.a = 0.f;
             }
 
             FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15f, logoWidth),
