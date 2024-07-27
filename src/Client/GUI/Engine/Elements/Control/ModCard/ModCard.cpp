@@ -241,7 +241,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     buttonColor = D2D1::ColorF(FlarialGUI::buttonColors[index].r - FlarialGUI::darkenAmounts[index], FlarialGUI::buttonColors[index].g - FlarialGUI::darkenAmounts[index],
                                    FlarialGUI::buttonColors[index].b - FlarialGUI::darkenAmounts[index], FlarialGUI::buttonColors[index].a);
 
-    FlarialGUI::RoundedRect((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.02f, paddingwidth), buttony - buttonHeight,
+    FlarialGUI::RoundedRect((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.012f, paddingwidth), buttony - buttonHeight,
                                   buttonColor, buttonWidth - Constraints::SpacingConstraint(1.5, paddingwidth), buttonHeight, 0.f, 0.f);
 
     if (FlarialGUI::RoundedButton(index, buttonx - buttonWidth, buttony - buttonHeight,
