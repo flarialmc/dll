@@ -22,7 +22,12 @@ private:
     static HRESULT swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags);
 
 
+
 public:
+
+    static void DX12Blur();
+
+    static void DX11Blur();
     typedef HRESULT(__thiscall *SwapchainOriginal)(IDXGISwapChain3 *, UINT, UINT);
 
     static inline SwapchainOriginal funcOriginal = nullptr;
