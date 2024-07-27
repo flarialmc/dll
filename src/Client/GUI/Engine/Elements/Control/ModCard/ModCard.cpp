@@ -208,7 +208,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     }
 
     // settings button end
-
+    /*
     if (iconId != -1 && images[iconId] == nullptr) {
         FlarialGUI::LoadImageFromResource(iconId, &images[iconId]);
 
@@ -224,6 +224,9 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
             D2D::context->DrawBitmap(images[iconId], D2D1::RectF(modiconx, modicony, modiconx + paddingSize,
                                                                     modicony + paddingSize));
     }
+    */
+
+    FlarialGUI::image(iconId, D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize));
 
     // actually button
 
