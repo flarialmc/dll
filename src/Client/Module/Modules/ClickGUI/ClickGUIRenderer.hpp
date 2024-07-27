@@ -43,7 +43,17 @@
 
 #define colors_secondary6 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary6")->value)
 #define o_colors_secondary6 clickgui->settings.getSettingByName<float>("o_colors_secondary6")->value
-#define colors_secondary6_rgb ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary6_rgb")->value
+#define colors_secondary6_rgb clickgui->settings.getSettingByName<bool>("colors_secondary6_rgb")->value
+
+#define colors_secondary7 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary7")->value)
+#define o_colors_secondary7 clickgui->settings.getSettingByName<float>("o_colors_secondary7")->value
+#define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
+
+#define colors_secondary8 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary8")->value)
+#define o_colors_secondary8 clickgui->settings.getSettingByName<float>("o_colors_secondary8")->value
+#define colors_secondary8_rgb clickgui->settings.getSettingByName<bool>("colors_secondary8_rgb")->value
+
+
 
 struct PageType {
     std::string type = "normal";
@@ -55,6 +65,8 @@ class ClickGUIRenderer : public Listener {
     float baseHeightReal = 1.0f;
     float baseHeightActual = 0.00001f;
     float realBlurAmount = 0.00001f;
+    float radioPushAmount1 = 0.0000001f;
+    float radioPushAmount2 = 0.0000001f;
     std::string searchBarString;
 public:
     static inline bool editmenu = false;
@@ -222,6 +234,14 @@ public:
             D2D1_COLOR_F tabBgCol = colors_secondary5_rgb ? FlarialGUI::rgbColor : colors_secondary5;
             tabBgCol.a = o_colors_secondary5;
 
+            if(ClickGUIRenderer::curr != "modules") {
+                tabBgCol = colors_secondary8_rgb ? FlarialGUI::rgbColor : colors_secondary8;
+                tabBgCol.a = o_colors_secondary8;
+            } else {
+                tabBgCol = colors_secondary5_rgb ? FlarialGUI::rgbColor : colors_secondary5;
+                tabBgCol.a = o_colors_secondary5;
+            }
+
             FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15f, logoWidth),
                                     radioY + Constraints::SpacingConstraint(-0.12f, logoWidth),
                                     tabBgCol, shit, shit,
@@ -230,16 +250,22 @@ public:
             radioX -= Constraints::SpacingConstraint(-0.125f, logoWidth);
             radioY -= Constraints::SpacingConstraint(-0.15f, logoWidth);
 
-            if (!Client::settings.getSettingByName<bool>("noicons")->value)
-                FlarialGUI::image(IDR_MODULES_PNG,
-                                  D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+            if (!Client::settings.getSettingByName<bool>("noicons")->value) {
+                if(ClickGUIRenderer::curr == "modules") FlarialGUI::image(IDR_FOLDER_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+                else FlarialGUI::image(IDR_FOLDER_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+            }
 
 
             radioX = navx - Constraints::SpacingConstraint(-0.85f, logoWidth);
             radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
 
+            if(ClickGUIRenderer::curr != "modules") radioX += Constraints::SpacingConstraint(6.5f, logoWidth);
+            else radioX += Constraints::SpacingConstraint(4.9f, logoWidth);
             round = Constraints::RoundingConstraint(30, 30);
-            radioX += Constraints::SpacingConstraint(13.f, logoWidth);
+
+            if(ClickGUIRenderer::curr == "modules") FlarialGUI::lerp(radioPushAmount1, Constraints::SpacingConstraint(7.7f, logoWidth),  0.5f * FlarialGUI::frameFactor);
+            else FlarialGUI::lerp(radioPushAmount1, 0.f,  0.5f * FlarialGUI::frameFactor);
+            radioX += radioPushAmount1;
             if (!FlarialGUI::activeColorPickerWindows && FlarialGUI::RoundedRadioButton(0, radioX, radioY,
                                                                                         mod6Col,
                                                                                         modTextCol, L"Settings",
@@ -261,6 +287,14 @@ public:
 
             round = Constraints::RoundingConstraint(15, 15);
 
+            if(ClickGUIRenderer::curr != "settings") {
+                tabBgCol = colors_secondary8_rgb ? FlarialGUI::rgbColor : colors_secondary8;
+                tabBgCol.a = o_colors_secondary8;
+            } else {
+                tabBgCol = colors_secondary5_rgb ? FlarialGUI::rgbColor : colors_secondary5;
+                tabBgCol.a = o_colors_secondary5;
+            }
+
             FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15f, logoWidth),
                                     radioY + Constraints::SpacingConstraint(-0.12f, logoWidth),
                                     tabBgCol, shit, shit,
@@ -269,13 +303,19 @@ public:
             radioX -= Constraints::SpacingConstraint(-0.125f, logoWidth);
             radioY -= Constraints::SpacingConstraint(-0.15f, logoWidth);
 
-            if (!Client::settings.getSettingByName<bool>("noicons")->value)
-                FlarialGUI::image(IDR_GEAR_PNG,
-                                  D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+            if (!Client::settings.getSettingByName<bool>("noicons")->value) {
+                if(ClickGUIRenderer::curr == "settings") FlarialGUI::image(IDR_SETTINGS_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+                else FlarialGUI::image(IDR_SETTINGS_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+            }
 
             radioX = navx - Constraints::SpacingConstraint(-0.85f, logoWidth);
             radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
-            radioX += Constraints::SpacingConstraint(21.69f, logoWidth);
+
+            if(ClickGUIRenderer::curr == "modules") radioX += Constraints::SpacingConstraint(4.9f * 1.45f, logoWidth);
+
+            if(ClickGUIRenderer::curr == "settings") FlarialGUI::lerp(radioPushAmount2, Constraints::SpacingConstraint(15.f, logoWidth),  0.5f * FlarialGUI::frameFactor);
+            else FlarialGUI::lerp(radioPushAmount2, 0.f,  0.5f * FlarialGUI::frameFactor);
+            radioX += radioPushAmount1 + radioPushAmount2;
             round = Constraints::RoundingConstraint(30, 30);
 
             if (!FlarialGUI::activeColorPickerWindows && FlarialGUI::RoundedRadioButton(2, radioX, radioY,
@@ -296,6 +336,14 @@ public:
 
             round = Constraints::RoundingConstraint(15, 15);
 
+            if(ClickGUIRenderer::curr != "editmenu") {
+                tabBgCol = colors_secondary8_rgb ? FlarialGUI::rgbColor : colors_secondary8;
+                tabBgCol.a = o_colors_secondary8;
+            } else {
+                tabBgCol = colors_secondary5_rgb ? FlarialGUI::rgbColor : colors_secondary5;
+                tabBgCol.a = o_colors_secondary5;
+            }
+
             FlarialGUI::RoundedRect(radioX + Constraints::SpacingConstraint(-0.15f, logoWidth),
                                     radioY + Constraints::SpacingConstraint(-0.12f, logoWidth),
                                     tabBgCol, shit, shit,
@@ -304,9 +352,11 @@ public:
             radioX -= Constraints::SpacingConstraint(-0.125f, logoWidth);
             radioY -= Constraints::SpacingConstraint(-0.15f, logoWidth);
 
-            if (!Client::settings.getSettingByName<bool>("noicons")->value)
-                FlarialGUI::image(IDR_PENCIL_PNG,
-                                  D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+            if (!Client::settings.getSettingByName<bool>("noicons")->value) {
+                if(ClickGUIRenderer::curr == "editmenu") FlarialGUI::image(IDR_STYLUS_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+                else FlarialGUI::image(IDR_STYLUS_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+
+            }
 
             /* tab buttons end */
 
