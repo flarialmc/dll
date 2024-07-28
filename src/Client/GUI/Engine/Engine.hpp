@@ -281,6 +281,10 @@ namespace FlarialGUI {
 
     void LoadImageFromResource(int resourceId, ID2D1Bitmap **bitmap, LPCTSTR type = "PNG");
 
+    bool LoadImageFromResource(int resourceId, ID3D11ShaderResourceView** out_srv, LPCTSTR type);
+
+    bool LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HANDLE srv_cpu_handle, ID3D12Resource** out_tex_resource, LPCTSTR type);
+
     void LoadFont(int resourceId);
 
     void RoundedRectWithImageAndText(int index, float x, float y, const float width, const float height,

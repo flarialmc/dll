@@ -55,6 +55,9 @@
 std::map<std::string, ID2D1Bitmap *> ImagesClass::eimages;
 std::map<int, ID2D1Bitmap *> ImagesClass::images;
 
+std::map<int, ID3D11ShaderResourceView*> ImagesClass::ImguiDX11Images;
+std::map<int, ImTextureID> ImagesClass::ImguiDX12Images;
+
 // TODO: release it !!!
 ID2D1Factory *FlarialGUI::factory;
 IDWriteFactory *FlarialGUI::writeFactory;
