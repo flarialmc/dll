@@ -175,6 +175,28 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 			    ImGui_ImplDX11_Init(d3d11Device, ppContext);
 			    ppContext->Release();
 
+                bool fontLoaded = false;
+
+                std::string font1 = Client::settings.getSettingByName<std::string>("mod_fontname")->value;
+                std::transform(font1.begin(), font1.end(), font1.begin(), ::towlower);
+                if (!FlarialGUI::FontMap[font1]) {
+                    if (FlarialGUI::LoadFontFromFontFamily(font1)) {
+                        fontLoaded = true;
+                    }
+                }
+
+                std::string font2 = Client::settings.getSettingByName<std::string>("fontname")->value;
+                std::transform(font2.begin(), font2.end(), font2.begin(), ::towlower);
+                if (!FlarialGUI::FontMap[font2]) {
+                    if (FlarialGUI::LoadFontFromFontFamily(font2)) {
+                        fontLoaded = true;
+                    }
+                }
+
+                if (fontLoaded) {
+                    ImGui::GetIO().Fonts->Build();
+                }
+
                 Memory::SafeRelease(eBackBuffer);
 
                 init = true;
@@ -276,28 +298,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     } else {
 
-        bool fontLoaded = false;
-
-        std::string font1 = Client::settings.getSettingByName<std::string>("mod_fontname")->value;
-        std::transform(font1.begin(), font1.end(), font1.begin(), ::towlower);
-        if (!FlarialGUI::FontMap[font1]) {
-            if (FlarialGUI::LoadFontFromFontFamily(font1)) {
-                fontLoaded = true;
-            }
-        }
-
-        std::string font2 = Client::settings.getSettingByName<std::string>("fontname")->value;
-        std::transform(font2.begin(), font2.end(), font2.begin(), ::towlower);
-        if (!FlarialGUI::FontMap[font2]) {
-            if (FlarialGUI::LoadFontFromFontFamily(font2)) {
-                fontLoaded = true;
-            }
-        }
-
-        if (fontLoaded) {
-            ImGui::GetIO().Fonts->Build();
-        }
-
         while(FrameTransforms.size() > transformDelay)
         {
             MC::Transform = FrameTransforms.front();
@@ -384,6 +384,28 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                                         DXGI_FORMAT_R8G8B8A8_UNORM, d3d12DescriptorHeapImGuiRender,
                                         d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart(),
                                         d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart());
+
+                                    bool fontLoaded = false;
+
+                                    std::string font1 = Client::settings.getSettingByName<std::string>("mod_fontname")->value;
+                                    std::transform(font1.begin(), font1.end(), font1.begin(), ::towlower);
+                                    if (!FlarialGUI::FontMap[font1]) {
+                                        if (FlarialGUI::LoadFontFromFontFamily(font1)) {
+                                            fontLoaded = true;
+                                        }
+                                    }
+
+                                    std::string font2 = Client::settings.getSettingByName<std::string>("fontname")->value;
+                                    std::transform(font2.begin(), font2.end(), font2.begin(), ::towlower);
+                                    if (!FlarialGUI::FontMap[font2]) {
+                                        if (FlarialGUI::LoadFontFromFontFamily(font2)) {
+                                            fontLoaded = true;
+                                        }
+                                    }
+
+                                    if (fontLoaded) {
+                                        ImGui::GetIO().Fonts->Build();
+                                    }
                                 }
 
                                 ImGui_ImplDX12_NewFrame();
