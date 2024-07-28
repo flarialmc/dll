@@ -320,13 +320,14 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
                 if (d3d12DescriptorHeapImGuiRender or SUCCEEDED(d3d12Device5->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&d3d12DescriptorHeapImGuiRender)))) {
 
-                    if (SUCCEEDED(d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&allocator)))) {
+                    if (!allocator) d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&allocator));
 
                         for (size_t i = 0; i < buffersCounts; i++) {
                             frameContexts[i].commandAllocator = allocator;
                         };
 
-                        if (SUCCEEDED(d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator, NULL, IID_PPV_ARGS(&d3d12CommandList)))) {
+                        if(!d3d12CommandList) d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator, NULL, IID_PPV_ARGS(&d3d12CommandList));
+                        if (d3d12CommandList) {
 
                             D3D12_DESCRIPTOR_HEAP_DESC descriptorBackBuffers;
                             descriptorBackBuffers.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
@@ -379,6 +380,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
                                 context->Flush();
 
+                                // crash here, likely with allocator again
+
                                 frameContexts[pSwapChain->GetCurrentBackBufferIndex()].commandAllocator->Reset();;
 
                                 D3D12_RESOURCE_BARRIER barrier;
@@ -407,20 +410,11 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
                                 queue->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList* const*>(&d3d12CommandList));
 
+                                // crash end
+
                             }
-                        }
                     }
                 }
-
-	            if (allocator) {
-		            allocator->Release();
-		            allocator = nullptr;
-	            }
-
-	            if (d3d12CommandList) {
-		            d3d12CommandList->Release();
-		            d3d12CommandList = nullptr;
-	            }
 
 	            if (d3d12DescriptorHeapBackBuffers) {
 		            d3d12DescriptorHeapBackBuffers->Release();
@@ -489,7 +483,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         }
     }
 
-    if(init && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImageToCache();
+    //if(init && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImageToCache();
 
     if (Client::settings.getSettingByName<bool>("vsync")->value) {
         return funcOriginal(pSwapChain, 0, DXGI_PRESENT_DO_NOT_WAIT);
