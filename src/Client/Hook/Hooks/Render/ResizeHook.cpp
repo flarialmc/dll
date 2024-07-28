@@ -9,6 +9,7 @@
 #include "../../../Module/Modules/MotionBlur/MotionBlurListener.hpp"
 #include "../../../Module/Manager.hpp"
 #include "../../../GUI/Engine/Elements/Structs/ImagesClass.hpp"
+#include "../../../../../lib/ImGui/imgui.h"
 
 void ResizeHook::enableHook() {
 
@@ -154,4 +155,5 @@ void ResizeHook::cleanShit(bool isResize) {
 
     FlarialGUI::scrollposmodifier = 0;
 
+    ImGui::DestroyContext();
 }

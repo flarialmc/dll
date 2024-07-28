@@ -15,6 +15,10 @@
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_dx12.h>
 #include <imgui_impl_win32.h>
+#include "../../../../../lib/ImGui/imgui.h"
+#include "../../../../../lib/ImGui/imgui_impl_win32.h"
+#include "../../../../../lib/ImGui/imgui_impl_dx11.h"
+#include "../../../../../lib/ImGui/imgui_impl_dx12.h"
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", "") {}
 
@@ -462,6 +466,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                         ImGui::NewFrame();
 
                         ImGui::GetForegroundDrawList()->AddRectFilledMultiColor(ImVec2(), ImVec2(100, 100), ImColor(255, 255, 255, 255), ImColor(0, 0, 0, 255), ImColor(100, 100, 100, 255), ImColor(0, 255, 0, 255));
+
 
                         RenderEvent event;
                         EventHandler::onRender(event);
