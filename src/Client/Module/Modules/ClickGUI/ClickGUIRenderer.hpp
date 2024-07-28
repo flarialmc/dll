@@ -392,9 +392,10 @@ public:
                         std::sort(modules.begin(), modules.end(), compareNames);
 
                     for (Module *pModule: modules) {
-                        bool visible = (modcenter.y + yModifier + FlarialGUI::scrollpos > center.y) &&
-                                       (modcenter.y + yModifier + FlarialGUI::scrollpos - 150) <
+                        bool visible = (modcenter.y + yModifier + FlarialGUI::scrollpos + 55 > center.y) &&
+                                       (modcenter.y + yModifier + FlarialGUI::scrollpos - 200) <
                                        center.y + Constraints::RelativeConstraint(baseHeightReal);
+
                         if (!searchBarString.empty()) {
                             std::string name = pModule->name;
 
