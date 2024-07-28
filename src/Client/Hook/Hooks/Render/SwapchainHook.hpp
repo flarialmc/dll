@@ -48,6 +48,7 @@ public:
     static inline ID3D11DeviceContext *context;
     static inline ID3D11Device* d3d11Device;
     static inline uintptr_t bufferCount;
+    static inline ID3D12GraphicsCommandList* DX12CommandLists;
     static bool hasResized;
     static int currentBitmap;
 

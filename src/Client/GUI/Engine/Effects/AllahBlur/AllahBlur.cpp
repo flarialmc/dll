@@ -2,6 +2,8 @@
 #include "../../../../Hook/Hooks/Render/SwapchainHook.hpp"
 
 void FlarialGUI::AllahBlur(float intensity) {
+
+    /*
     // Create Gaussian blur effect
     if (FlarialGUI::blur == nullptr) {
 
@@ -24,6 +26,6 @@ void FlarialGUI::AllahBlur(float intensity) {
         // Draw the image with the Gaussian blur effect
         if (FlarialGUI::blur_bitmap_cache != nullptr)
             D2D::context->DrawImage(FlarialGUI::blur_bitmap_cache);
-    }
+    }*/
 
 }

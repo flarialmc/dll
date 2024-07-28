@@ -3,6 +3,7 @@
 #include <utility>
 #include <winrt/base.h>
 #include <cmath>
+#include <imgui_internal.h>
 #include <variant>
 #include "Constraints.hpp"
 #include "animations/fadeinout.hpp"
@@ -17,6 +18,14 @@
 #include "Elements/Control/Dropdown/DropdownStruct.hpp"
 #include "../../../Assets/Assets.hpp"
 #include <string>
+#include <windows.h>
+#include <dwrite.h>
+#include <wrl.h>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <fstream>
+#include <algorithm>
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -155,6 +164,13 @@ uint64_t generateUniqueLinearGradientBrushKey(float x, float hexPreviewSize, flo
     delete[] gradientStops;
 
     return combinedHash;
+}
+
+std::string WideToNarrow(const std::wstring& wideStr) {
+    int narrowStrLen = WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+    std::vector<char> narrowStr(narrowStrLen);
+    WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, narrowStr.data(), narrowStrLen, nullptr, nullptr);
+    return std::string(narrowStr.data());
 }
 
 bool FlarialGUI::CursorInRect(float rectX, float rectY, float width, float height) {
@@ -489,9 +505,22 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, float width,
 
 }
 
+void FlarialGUI::LoadAllImageToCache() {
+
+    for (int i = 101; i < MAX_IMAGE_ID; ++i) {
+        LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "PNG");
+    }
+
+    hasLoadedAll = true;
+
+}
+
+
 void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
                                      const DWRITE_FONT_WEIGHT weight, bool moduleFont) {
+
+
     D2D1_COLOR_F color = colors_text_rgb ? rgbColor : colors_text;
     color.a = o_colors_text;
 
@@ -513,10 +542,33 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
 
     if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
 
-    auto textLayout = FlarialGUI::GetTextLayout(text, alignment, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, fontSize, weight,
-                                                width, height, moduleFont);
-    D2D::context->DrawTextLayout(D2D1::Point2F(x, y), textLayout.get(), FlarialGUI::getBrush(color).get());
+    std::string font = Client::settings.getSettingByName<std::string>(moduleFont ? "mod_fontname" : "fontname")->value;
 
+    if (!FontMap[font]) font = "162";
+
+    ImGui::PushFont(FontMap[font]);
+	float fSize = fontSize/600;
+
+	ImGui::SetWindowFontScale(fSize);
+
+	switch (alignment) {
+        case DWRITE_TEXT_ALIGNMENT::DWRITE_TEXT_ALIGNMENT_LEADING: 
+			break;
+
+        case DWRITE_TEXT_ALIGNMENT::DWRITE_TEXT_ALIGNMENT_CENTER: {
+			x += (width / 2) - (ImGui::CalcTextSize(WideToNarrow(text).c_str()).x / 2);
+			break;
+		}
+
+		case DWRITE_TEXT_ALIGNMENT::DWRITE_TEXT_ALIGNMENT_TRAILING: {
+			x += (width - ImGui::CalcTextSize(WideToNarrow(text).c_str()).x);
+			break;
+		}
+	}
+
+	y += (height / 2) - (ImGui::CalcTextSize(WideToNarrow(text).c_str()).y / 2);
+	ImGui::GetBackgroundDrawList()->AddText(ImVec2(x, y), ImColor(color.r, color.g, color.b, color.a), WideToNarrow(text).c_str());
+	ImGui::PopFont();
 }
 
 void FlarialGUI::LoadFont(int resourceId) {
@@ -549,6 +601,127 @@ void FlarialGUI::LoadFont(int resourceId) {
     outFile.close();
 
     AddFontResource(lpFileName.c_str());
+}
+
+// Function to get the font file path
+std::wstring GetFontFilePath(const std::wstring& fontName) {
+    Microsoft::WRL::ComPtr<IDWriteFactory> factory;
+    Microsoft::WRL::ComPtr<IDWriteFontCollection> fontCollection;
+    Microsoft::WRL::ComPtr<IDWriteFontFamily> fontFamily;
+    Microsoft::WRL::ComPtr<IDWriteFont> font;
+    Microsoft::WRL::ComPtr<IDWriteFontFace> fontFace;
+    Microsoft::WRL::ComPtr<IDWriteFontFile> fontFile;
+    const void* fontFileReferenceKey;
+    UINT32 fontFileReferenceKeySize;
+    Microsoft::WRL::ComPtr<IDWriteFontFileLoader> fontFileLoader;
+    Microsoft::WRL::ComPtr<IDWriteLocalFontFileLoader> localFontFileLoader;
+    UINT32 filePathLength = 0;
+
+    // Create a DirectWrite factory
+    HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), &factory);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Get the system font collection
+    hr = factory->GetSystemFontCollection(&fontCollection);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Find the font family
+    UINT32 index = 0;
+    BOOL exists = FALSE;
+    hr = fontCollection->FindFamilyName(fontName.c_str(), &index, &exists);
+    if (FAILED(hr) || !exists) {
+        return L"";
+    }
+
+    // Get the font family
+    hr = fontCollection->GetFontFamily(index, &fontFamily);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Get the font
+    hr = fontFamily->GetFont(0, &font);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Get the font face
+    hr = font->CreateFontFace(&fontFace);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Get the font file count
+    UINT32 fileCount = 0;
+    hr = fontFace->GetFiles(&fileCount, nullptr);
+    if (FAILED(hr) || fileCount == 0) {
+        return L"";
+    }
+
+    // Allocate space for the font files
+    std::vector<Microsoft::WRL::ComPtr<IDWriteFontFile>> fontFiles(fileCount);
+    
+    // Get the font files
+    hr = fontFace->GetFiles(&fileCount, reinterpret_cast<IDWriteFontFile**>(fontFiles.data()));
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Get the file reference key
+    hr = fontFiles[0]->GetReferenceKey(&fontFileReferenceKey, &fontFileReferenceKeySize);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Get the font file loader
+    hr = fontFiles[0]->GetLoader(&fontFileLoader);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Query for the local font file loader interface
+    hr = fontFileLoader->QueryInterface(__uuidof(IDWriteLocalFontFileLoader), &localFontFileLoader);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Get the font file path length
+    hr = localFontFileLoader->GetFilePathLengthFromKey(fontFileReferenceKey, fontFileReferenceKeySize, &filePathLength);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Get the font file path
+    std::vector<wchar_t> filePathBuffer(filePathLength + 1);
+    hr = localFontFileLoader->GetFilePathFromKey(fontFileReferenceKey, fontFileReferenceKeySize, filePathBuffer.data(), filePathLength + 1);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    return std::wstring(filePathBuffer.data(), filePathLength);
+}
+
+bool FlarialGUI::LoadFontFromFontFamily(std::string name) {
+    std::transform(name.begin(), name.end(), name.begin(), ::towlower);
+    std::wstring fontName = FlarialGUI::to_wide(name);
+    std::wstring fontFilePath = GetFontFilePath(fontName);
+
+    if (!fontFilePath.empty()) {
+        std::ifstream fontFile(fontFilePath, std::ios::binary);
+        if (fontFile) {
+			FontMap[name] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 100);
+            if(!FontMap[name]) return false;
+            return true;
+        }
+    }
+    else {
+        FontsNotFound[name] = true;
+        return false;
+    }
 }
 
 void FlarialGUI::LoadImageFromResource(int resourceId, ID2D1Bitmap **bitmap, LPCTSTR type) {
@@ -786,6 +959,46 @@ void FlarialGUI::Notify(const std::string& text) {
 
         notifications.push_back(e);
     }
+
+}
+
+/* rotation stuff */
+
+static int rotation_start_index;
+void FlarialGUI::ImRotateStart()
+{
+    rotation_start_index = ImGui::GetBackgroundDrawList()->VtxBuffer.Size;
+}
+
+ImVec2 FlarialGUI::ImRotationCenter()
+{
+    ImVec2 l(FLT_MAX, FLT_MAX), u(-FLT_MAX, -FLT_MAX); // bounds
+
+    const auto& buf = ImGui::GetBackgroundDrawList()->VtxBuffer;
+    for (int i = rotation_start_index; i < buf.Size; i++)
+        l = ImMin(l, buf[i].pos), u = ImMax(u, buf[i].pos);
+
+    return ImVec2((l.x+u.x)/2, (l.y+u.y)/2); // or use _ClipRectStack?
+}
+
+ImVec2 operator-(const ImVec2& l, const ImVec2& r) { return{ l.x - r.x, l.y - r.y }; }
+
+void FlarialGUI::ImRotateEnd(float rad, ImVec2 center)
+{
+    float s=sin(rad), c=cos(rad);
+    center = ImRotate(center, s, c) - center;
+
+    auto& buf = ImGui::GetBackgroundDrawList()->VtxBuffer;
+    for (int i = rotation_start_index; i < buf.Size; i++)
+        buf[i].pos = ImRotate(buf[i].pos, s, c) - center;
+}
+
+/* rotation stuff end */
+
+void FlarialGUI::PushImClipRect(ImVec2 pos, ImVec2 size) {
+    ImVec2 max(pos.x + size.x, pos.y + size.y);
+
+    ImGui::GetBackgroundDrawList()->PushClipRect(pos, max);
 
 }
 

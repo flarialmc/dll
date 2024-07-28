@@ -30,7 +30,7 @@ static std::chrono::high_resolution_clock fpsclock;
 static std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 static std::chrono::steady_clock::time_point previousFrameTime = std::chrono::high_resolution_clock::now();
 
-auto window = (HWND)FindWindowA(nullptr, (LPCSTR)"Minecraft");;
+auto window = (HWND)FindWindowA(nullptr, (LPCSTR)"Minecraft");
 
 int SwapchainHook::currentBitmap;
 bool unloadDll(const wchar_t* moduleName) {
@@ -276,6 +276,45 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     } else {
 
+        if (ImGui::GetCurrentContext()) {
+
+            bool fontLoaded = false;
+
+            std::string font1 = Client::settings.getSettingByName<std::string>("mod_fontname")->value;
+            std::transform(font1.begin(), font1.end(), font1.begin(), ::towlower);
+            if (!FlarialGUI::FontMap[font1]) {
+                if (FlarialGUI::LoadFontFromFontFamily(font1)) {
+                    fontLoaded = true;
+                }
+            }
+
+            std::string font2 = Client::settings.getSettingByName<std::string>("fontname")->value;
+            std::transform(font2.begin(), font2.end(), font2.begin(), ::towlower);
+            if (!FlarialGUI::FontMap[font2]) {
+                if (FlarialGUI::LoadFontFromFontFamily(font2)) {
+                    fontLoaded = true;
+                }
+            }
+
+            if (!FlarialGUI::FontMap["162"]) {
+                FlarialGUI::FontMap["162"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 100);
+                fontLoaded = true;
+            }
+
+            if (fontLoaded) {
+                ImGui::GetIO().Fonts->Build();
+                if (d3d11Device) {
+                    ImGui_ImplDX11_InvalidateDeviceObjects();
+                    ImGui_ImplDX11_CreateDeviceObjects();
+                }
+                else {
+                    ImGui_ImplDX12_InvalidateDeviceObjects();
+                    ImGui_ImplDX12_CreateDeviceObjects();
+                }
+
+            }
+        }
+
         while(FrameTransforms.size() > transformDelay)
         {
             MC::Transform = FrameTransforms.front();
@@ -320,13 +359,14 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
                 if (d3d12DescriptorHeapImGuiRender or SUCCEEDED(d3d12Device5->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&d3d12DescriptorHeapImGuiRender)))) {
 
-                    if (SUCCEEDED(d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&allocator)))) {
+                    if (!allocator) d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&allocator));
 
                         for (size_t i = 0; i < buffersCounts; i++) {
                             frameContexts[i].commandAllocator = allocator;
                         };
 
-                        if (SUCCEEDED(d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator, NULL, IID_PPV_ARGS(&d3d12CommandList)))) {
+                        if(!d3d12CommandList) d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator, NULL, IID_PPV_ARGS(&d3d12CommandList));
+                        if (d3d12CommandList) {
 
                             D3D12_DESCRIPTOR_HEAP_DESC descriptorBackBuffers;
                             descriptorBackBuffers.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
@@ -367,8 +407,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                                 ImGui_ImplWin32_NewFrame();
                                 ImGui::NewFrame();
 
-                                ImGui::GetForegroundDrawList()->AddRectFilledMultiColor(ImVec2(), ImVec2(100, 100), ImColor(255, 255, 255, 255), ImColor(0, 0, 0, 255), ImColor(100, 100, 100, 255), ImColor(0, 255, 0, 255));
-
                                 RenderEvent event{};
                                 EventHandler::onRender(event);
 
@@ -380,6 +418,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                                 d3d11On12Device->ReleaseWrappedResources(&resource, 1);
 
                                 context->Flush();
+
+                                // crash here, likely with allocator again
 
                                 frameContexts[pSwapChain->GetCurrentBackBufferIndex()].commandAllocator->Reset();;
 
@@ -409,20 +449,11 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
                                 queue->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList* const*>(&d3d12CommandList));
 
+                                // crash end
+
                             }
-                        }
                     }
                 }
-
-	            if (allocator) {
-		            allocator->Release();
-		            allocator = nullptr;
-	            }
-
-	            if (d3d12CommandList) {
-		            d3d12CommandList->Release();
-		            d3d12CommandList = nullptr;
-	            }
 
 	            if (d3d12DescriptorHeapBackBuffers) {
 		            d3d12DescriptorHeapBackBuffers->Release();
@@ -465,9 +496,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                         ImGui_ImplWin32_NewFrame();
                         ImGui::NewFrame();
 
-                        ImGui::GetForegroundDrawList()->AddRectFilledMultiColor(ImVec2(), ImVec2(100, 100), ImColor(255, 255, 255, 255), ImColor(0, 0, 0, 255), ImColor(100, 100, 100, 255), ImColor(0, 255, 0, 255));
-
-
                         RenderEvent event;
                         EventHandler::onRender(event);
 
@@ -493,6 +521,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
             Memory::SafeRelease(FlarialGUI::blur);
         }
     }
+
+    //if(init && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImageToCache();
 
     if (Client::settings.getSettingByName<bool>("vsync")->value) {
         return funcOriginal(pSwapChain, 0, DXGI_PRESENT_DO_NOT_WAIT);

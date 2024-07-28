@@ -293,30 +293,16 @@ void ClickGUIElements::RotatingGear(int index, float x, float y, float width, fl
 
     } else if (ImagesClass::images[IDR_SETTINGS_WHITE_PNG] != nullptr) {
 
-        D2D1_MATRIX_3X2_F oldTransform;
-        D2D::context->GetTransform(&oldTransform);
-
         if (FlarialGUI::CursorInRect(x, y, width, height)) {
-
-            FlarialGUI::lerp(FlarialGUI::rotationAngles[index], FlarialGUI::rotationAngles[index] + 15, 0.5f * FlarialGUI::frameFactor);
+            FlarialGUI::lerp(FlarialGUI::rotationAngles[index], FlarialGUI::rotationAngles[index] + 15, 0.004f * FlarialGUI::frameFactor);
         }
 
 
-        float rotationAngle = FlarialGUI::rotationAngles[index];// Specify the rotation angle in degrees
-        D2D1_POINT_2F rotationCenter = D2D1::Point2F(imagerectf.left + imageWidth / 2.0f, imagerectf.top +
-                                                                                          imageHeight /
-                                                                                          2.0f);  // Specify the rotation center
-        D2D1_MATRIX_3X2_F rotationMatrix = D2D1::Matrix3x2F::Rotation(rotationAngle, rotationCenter);
+        float rotationAngle = FlarialGUI::rotationAngles[index];
+        ImVec2 rotationCenter(x + imageWidth / 2.0f, imageY + imageHeight / 2.0f);
 
-        D2D1_MATRIX_3X2_F translationMatrix = D2D1::Matrix3x2F::Translation(x, imageY);
-        D2D1_MATRIX_3X2_F combinedMatrix = translationMatrix * rotationMatrix;
-
-        D2D::context->SetTransform(combinedMatrix);
-
-        imagerectf = D2D1::RectF(0, 0, imageWidth, imageHeight);
-
-        D2D::context->DrawBitmap(ImagesClass::images[IDR_SETTINGS_WHITE_PNG], imagerectf, 1.0, D2D1_INTERPOLATION_MODE_ANISOTROPIC);
-
-        D2D::context->SetTransform(oldTransform);
+        FlarialGUI::ImRotateStart();
+        FlarialGUI::image(IDR_SETTINGS_WHITE_PNG, imagerectf, "PNG", false);
+        FlarialGUI::ImRotateEnd(rotationAngle, rotationCenter);
     }
 }
