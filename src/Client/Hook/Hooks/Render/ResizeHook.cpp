@@ -154,6 +154,4 @@ void ResizeHook::cleanShit(bool isResize) {
     }
 
     FlarialGUI::scrollposmodifier = 0;
-
-    ImGui::DestroyContext();
 }
