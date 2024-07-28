@@ -1,4 +1,4 @@
-// dear imgui, v1.90.9
+// dear imgui, v1.90.8
 // (demo code)
 
 // Help:
@@ -462,26 +462,19 @@ void ImGui::ShowDemoWindow(bool* p_open)
             ImGui::CheckboxFlags("io.ConfigFlags: NavEnableSetMousePos", &io.ConfigFlags, ImGuiConfigFlags_NavEnableSetMousePos);
             ImGui::SameLine(); HelpMarker("Instruct navigation to move the mouse cursor. See comment for ImGuiConfigFlags_NavEnableSetMousePos.");
             ImGui::CheckboxFlags("io.ConfigFlags: NoMouse",              &io.ConfigFlags, ImGuiConfigFlags_NoMouse);
-            ImGui::SameLine(); HelpMarker("Instruct dear imgui to disable mouse inputs and interactions.");
-
-            // The "NoMouse" option can get us stuck with a disabled mouse! Let's provide an alternative way to fix it:
             if (io.ConfigFlags & ImGuiConfigFlags_NoMouse)
             {
+                // The "NoMouse" option can get us stuck with a disabled mouse! Let's provide an alternative way to fix it:
                 if (fmodf((float)ImGui::GetTime(), 0.40f) < 0.20f)
                 {
                     ImGui::SameLine();
                     ImGui::Text("<<PRESS SPACE TO DISABLE>>");
                 }
-                // Prevent both being checked
-                if (ImGui::IsKeyPressed(ImGuiKey_Space) || (io.ConfigFlags & ImGuiConfigFlags_NoKeyboard))
+                if (ImGui::IsKeyPressed(ImGuiKey_Space))
                     io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
             }
-
-            ImGui::CheckboxFlags("io.ConfigFlags: NoMouseCursorChange",  &io.ConfigFlags, ImGuiConfigFlags_NoMouseCursorChange);
+            ImGui::CheckboxFlags("io.ConfigFlags: NoMouseCursorChange", &io.ConfigFlags, ImGuiConfigFlags_NoMouseCursorChange);
             ImGui::SameLine(); HelpMarker("Instruct backend to not alter mouse cursor shape and visibility.");
-            ImGui::CheckboxFlags("io.ConfigFlags: NoKeyboard", &io.ConfigFlags, ImGuiConfigFlags_NoKeyboard);
-            ImGui::SameLine(); HelpMarker("Instruct dear imgui to disable keyboard inputs and interactions.");
-
             ImGui::Checkbox("io.ConfigInputTrickleEventQueue", &io.ConfigInputTrickleEventQueue);
             ImGui::SameLine(); HelpMarker("Enable input queue trickling: some types of events submitted during the same frame (e.g. button down + up) will be spread over multiple frames, improving interactions with low framerates.");
             ImGui::Checkbox("io.MouseDrawCursor", &io.MouseDrawCursor);
@@ -720,19 +713,18 @@ static void ShowDemoWindowWidgets()
 
         {
             IMGUI_DEMO_MARKER("Widgets/Basic/DragInt, DragFloat");
-            static int i1 = 50, i2 = 42, i3 = 128;
+            static int i1 = 50, i2 = 42;
             ImGui::DragInt("drag int", &i1, 1);
             ImGui::SameLine(); HelpMarker(
                 "Click and drag to edit value.\n"
                 "Hold SHIFT/ALT for faster/slower edit.\n"
                 "Double-click or CTRL+click to input value.");
+
             ImGui::DragInt("drag int 0..100", &i2, 1, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
-            ImGui::DragInt("drag int wrap 100..200", &i3, 1, 100, 200, "%d", ImGuiSliderFlags_WrapAround);
 
             static float f1 = 1.00f, f2 = 0.0067f;
             ImGui::DragFloat("drag float", &f1, 0.005f);
             ImGui::DragFloat("drag small float", &f2, 0.0001f, 0.0f, 0.0f, "%.06f ns");
-            //ImGui::DragFloat("drag wrap -1..1", &f3, 0.005f, -1.0f, 1.0f, NULL, ImGuiSliderFlags_WrapAround);
         }
 
         ImGui::SeparatorText("Sliders");
@@ -889,11 +881,12 @@ static void ShowDemoWindowWidgets()
 
         // Using ImGuiHoveredFlags_ForTooltip will pull flags from 'style.HoverFlagsForTooltipMouse' or 'style.HoverFlagsForTooltipNav',
         // which default value include the ImGuiHoveredFlags_AllowWhenDisabled flag.
+        // As a result, Set
         ImGui::BeginDisabled();
         ImGui::Button("Disabled item", sz);
+        ImGui::EndDisabled();
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip))
             ImGui::SetTooltip("I am a a tooltip for a disabled item.");
-        ImGui::EndDisabled();
 
         ImGui::TreePop();
     }
@@ -1737,7 +1730,6 @@ static void ShowDemoWindowWidgets()
             ImGui::CheckboxFlags("ImGuiTabBarFlags_AutoSelectNewTabs", &tab_bar_flags, ImGuiTabBarFlags_AutoSelectNewTabs);
             ImGui::CheckboxFlags("ImGuiTabBarFlags_TabListPopupButton", &tab_bar_flags, ImGuiTabBarFlags_TabListPopupButton);
             ImGui::CheckboxFlags("ImGuiTabBarFlags_NoCloseWithMiddleMouseButton", &tab_bar_flags, ImGuiTabBarFlags_NoCloseWithMiddleMouseButton);
-            ImGui::CheckboxFlags("ImGuiTabBarFlags_DrawSelectedOverline", &tab_bar_flags, ImGuiTabBarFlags_DrawSelectedOverline);
             if ((tab_bar_flags & ImGuiTabBarFlags_FittingPolicyMask_) == 0)
                 tab_bar_flags |= ImGuiTabBarFlags_FittingPolicyDefault_;
             if (ImGui::CheckboxFlags("ImGuiTabBarFlags_FittingPolicyResizeDown", &tab_bar_flags, ImGuiTabBarFlags_FittingPolicyResizeDown))
@@ -1746,13 +1738,11 @@ static void ShowDemoWindowWidgets()
                 tab_bar_flags &= ~(ImGuiTabBarFlags_FittingPolicyMask_ ^ ImGuiTabBarFlags_FittingPolicyScroll);
 
             // Tab Bar
-            ImGui::AlignTextToFramePadding();
-            ImGui::Text("Opened:");
             const char* names[4] = { "Artichoke", "Beetroot", "Celery", "Daikon" };
             static bool opened[4] = { true, true, true, true }; // Persistent user state
             for (int n = 0; n < IM_ARRAYSIZE(opened); n++)
             {
-                ImGui::SameLine();
+                if (n > 0) { ImGui::SameLine(); }
                 ImGui::Checkbox(names[n], &opened[n]);
             }
 
@@ -2145,8 +2135,6 @@ static void ShowDemoWindowWidgets()
         ImGui::SameLine(); HelpMarker("Disable rounding underlying value to match precision of the format string (e.g. %.3f values are rounded to those 3 digits).");
         ImGui::CheckboxFlags("ImGuiSliderFlags_NoInput", &flags, ImGuiSliderFlags_NoInput);
         ImGui::SameLine(); HelpMarker("Disable CTRL+Click or Enter key allowing to input text directly into the widget.");
-        ImGui::CheckboxFlags("ImGuiSliderFlags_WrapAround", &flags, ImGuiSliderFlags_WrapAround);
-        ImGui::SameLine(); HelpMarker("Enable wrapping around from max to min and from min to max (only supported by DragXXX() functions)");
 
         // Drags
         static float drag_f = 0.5f;
@@ -2161,10 +2149,9 @@ static void ShowDemoWindowWidgets()
         // Sliders
         static float slider_f = 0.5f;
         static int slider_i = 50;
-        const ImGuiSliderFlags flags_for_sliders = flags & ~ImGuiSliderFlags_WrapAround;
         ImGui::Text("Underlying float value: %f", slider_f);
-        ImGui::SliderFloat("SliderFloat (0 -> 1)", &slider_f, 0.0f, 1.0f, "%.3f", flags_for_sliders);
-        ImGui::SliderInt("SliderInt (0 -> 100)", &slider_i, 0, 100, "%d", flags_for_sliders);
+        ImGui::SliderFloat("SliderFloat (0 -> 1)", &slider_f, 0.0f, 1.0f, "%.3f", flags);
+        ImGui::SliderInt("SliderInt (0 -> 100)", &slider_i, 0, 100, "%d", flags);
 
         ImGui::TreePop();
     }
@@ -6854,7 +6841,7 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
                 "Right-click to open edit options menu.");
 
             ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, ImGui::GetTextLineHeightWithSpacing() * 10), ImVec2(FLT_MAX, FLT_MAX));
-            ImGui::BeginChild("##colors", ImVec2(0, 0), ImGuiChildFlags_Border | ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_AlwaysHorizontalScrollbar);
+            ImGui::BeginChild("##colors", ImVec2(0, 0), ImGuiChildFlags_Border, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_AlwaysHorizontalScrollbar | ImGuiWindowFlags_NavFlattened);
             ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
             for (int i = 0; i < ImGuiCol_COUNT; i++)
             {
@@ -6935,10 +6922,10 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
                 ImGui::SetNextWindowPos(ImGui::GetCursorScreenPos());
             if (show_samples && ImGui::BeginTooltip())
             {
-                ImGui::TextUnformatted("(R = radius, N = approx number of segments)");
+                ImGui::TextUnformatted("(R = radius, N = number of segments)");
                 ImGui::Spacing();
                 ImDrawList* draw_list = ImGui::GetWindowDrawList();
-                const float min_widget_width = ImGui::CalcTextSize("R: MMM\nN: MMM").x;
+                const float min_widget_width = ImGui::CalcTextSize("N: MMM\nR: MMM").x;
                 for (int n = 0; n < 8; n++)
                 {
                     const float RAD_MIN = 5.0f;
@@ -6947,7 +6934,6 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
 
                     ImGui::BeginGroup();
 
-                    // N is not always exact here due to how PathArcTo() function work internally
                     ImGui::Text("R: %.f\nN: %d", rad, draw_list->_CalcCircleAutoSegmentCount(rad));
 
                     const float canvas_width = IM_MAX(min_widget_width, rad * 2.0f);
@@ -6975,22 +6961,6 @@ void ImGui::ShowStyleEditor(ImGuiStyle* ref)
             ImGui::DragFloat("Global Alpha", &style.Alpha, 0.005f, 0.20f, 1.0f, "%.2f"); // Not exposing zero here so user doesn't "lose" the UI (zero alpha clips all widgets). But application code could have a toggle to switch between zero and non-zero.
             ImGui::DragFloat("Disabled Alpha", &style.DisabledAlpha, 0.005f, 0.0f, 1.0f, "%.2f"); ImGui::SameLine(); HelpMarker("Additional alpha multiplier for disabled items (multiply over current value of Alpha).");
             ImGui::PopItemWidth();
-
-            ImGui::EndTabItem();
-        }
-
-        if (ImGui::BeginTabItem("Shadows"))
-        {
-            ImGui::Text("Window shadows:");
-            ImGui::ColorEdit4("Color", (float*)&style.Colors[ImGuiCol_WindowShadow], ImGuiColorEditFlags_AlphaBar);
-            ImGui::SameLine();
-            HelpMarker("Same as 'WindowShadow' in Colors tab.");
-
-            ImGui::SliderFloat("Size", &style.WindowShadowSize, 0.0f, 128.0f, "%.1f");
-            ImGui::SameLine();
-            HelpMarker("Set shadow size to zero to disable shadows.");
-            ImGui::SliderFloat("Offset distance", &style.WindowShadowOffsetDist, 0.0f, 64.0f, "%.0f");
-            ImGui::SliderAngle("Offset angle", &style.WindowShadowOffsetAngle);
 
             ImGui::EndTabItem();
         }
@@ -7271,7 +7241,7 @@ struct ExampleAppConsole
 
         // Reserve enough left-over height for 1 separator + 1 input text
         const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
-        if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, -footer_height_to_reserve), ImGuiChildFlags_NavFlattened, ImGuiWindowFlags_HorizontalScrollbar))
+        if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, -footer_height_to_reserve), ImGuiChildFlags_None, ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NavFlattened))
         {
             if (ImGui::BeginPopupContextWindow())
             {
@@ -8397,165 +8367,6 @@ static void ShowExampleAppCustomRendering(bool* p_open)
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem("Shadows"))
-        {
-            static float shadow_thickness = 40.0f;
-            static ImVec4 shadow_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
-            static bool shadow_filled = false;
-            static ImVec4 shape_color = ImVec4(0.9f, 0.6f, 0.3f, 1.0f);
-            static float shape_rounding = 0.0f;
-            static ImVec2 shadow_offset(0.0f, 0.0f);
-            static ImVec4 background_color = ImVec4(0.5f, 0.5f, 0.7f, 1.0f);
-            static bool wireframe = false;
-            static bool aa = true;
-            static int poly_shape_index = 0;
-            ImGui::Checkbox("Shadow filled", &shadow_filled);
-            ImGui::SameLine();
-            HelpMarker("This will fill the section behind the shape to shadow. It's often unnecessary and wasteful but provided for consistency.");
-            ImGui::Checkbox("Wireframe shapes", &wireframe);
-            ImGui::SameLine();
-            HelpMarker("This draws the shapes in wireframe so you can see the shadow underneath.");
-            ImGui::Checkbox("Anti-aliasing", &aa);
-
-            ImGui::DragFloat("Shadow Thickness", &shadow_thickness, 1.0f, 0.0f, 100.0f, "%.02f");
-            ImGui::SliderFloat2("Offset", (float*)&shadow_offset, -32.0f, 32.0f);
-            ImGui::SameLine();
-            HelpMarker("Note that currently circles/convex shapes do not support non-zero offsets for unfilled shadows.");
-            ImGui::ColorEdit4("Background Color", &background_color.x);
-            ImGui::ColorEdit4("Shadow Color", &shadow_color.x);
-            ImGui::ColorEdit4("Shape Color", &shape_color.x);
-            ImGui::DragFloat("Shape Rounding", &shape_rounding, 1.0f, 0.0f, 20.0f, "%.02f");
-            ImGui::Combo("Convex shape", &poly_shape_index, "Shape 1\0Shape 2\0Shape 3\0Shape 4\0Shape 4 (winding reversed)");
-
-            ImDrawList* draw_list = ImGui::GetWindowDrawList();
-            ImDrawListFlags old_flags = draw_list->Flags;
-
-            if (aa)
-                draw_list->Flags |= ~ImDrawListFlags_AntiAliasedFill;
-            else
-                draw_list->Flags &= ~ImDrawListFlags_AntiAliasedFill;
-
-            // Fill a strip of background
-            draw_list->AddRectFilled(ImVec2(ImGui::GetCursorScreenPos().x, ImGui::GetCursorScreenPos().y), ImVec2(ImGui::GetCursorScreenPos().x + ImGui::GetWindowContentRegionMax().x, ImGui::GetCursorScreenPos().y + 200.0f), ImGui::GetColorU32(background_color));
-
-            // Rectangle
-            {
-                ImVec2 p = ImGui::GetCursorScreenPos();
-                ImGui::Dummy(ImVec2(200.0f, 200.0f));
-
-                ImVec2 r1(p.x + 50.0f, p.y + 50.0f);
-                ImVec2 r2(p.x + 150.0f, p.y + 150.0f);
-                ImDrawFlags draw_flags = shadow_filled ? ImDrawFlags_None : ImDrawFlags_ShadowCutOutShapeBackground;
-                draw_list->AddShadowRect(r1, r2, ImGui::GetColorU32(shadow_color), shadow_thickness, shadow_offset, draw_flags, shape_rounding);
-
-                if (wireframe)
-                    draw_list->AddRect(r1, r2, ImGui::GetColorU32(shape_color), shape_rounding);
-                else
-                    draw_list->AddRectFilled(r1, r2, ImGui::GetColorU32(shape_color), shape_rounding);
-            }
-
-            ImGui::SameLine();
-
-            // Circle
-            {
-                ImVec2 p = ImGui::GetCursorScreenPos();
-                ImGui::Dummy(ImVec2(200.0f, 200.0f));
-
-                // FIXME-SHADOWS: Offset forced to zero when shadow is not filled because it isn't supported
-                float off = 10.0f;
-                ImVec2 r1(p.x + 50.0f + off, p.y + 50.0f + off);
-                ImVec2 r2(p.x + 150.0f - off, p.y + 150.0f - off);
-                ImVec2 center(p.x + 100.0f, p.y + 100.0f);
-                ImDrawFlags draw_flags = shadow_filled ? ImDrawFlags_None : ImDrawFlags_ShadowCutOutShapeBackground;
-                draw_list->AddShadowCircle(center, 50.0f, ImGui::GetColorU32(shadow_color), shadow_thickness, shadow_filled ? shadow_offset : ImVec2(0.0f, 0.0f), draw_flags, 0);
-
-                if (wireframe)
-                    draw_list->AddCircle(center, 50.0f, ImGui::GetColorU32(shape_color), 0);
-                else
-                    draw_list->AddCircleFilled(center, 50.0f, ImGui::GetColorU32(shape_color), 0);
-            }
-
-            ImGui::SameLine();
-
-            // Convex shape
-            {
-                ImVec2 pos = ImGui::GetCursorScreenPos();
-                ImGui::Dummy(ImVec2(200.0f, 200.0f));
-
-                const ImVec2 poly_centre(pos.x + 50.0f, pos.y + 100.0f);
-                ImVec2 poly_points[8];
-                int poly_points_count = 0;
-
-                switch (poly_shape_index)
-                {
-                default:
-                case 0:
-                {
-                    poly_points[0] = ImVec2(poly_centre.x - 32.0f, poly_centre.y);
-                    poly_points[1] = ImVec2(poly_centre.x - 24.0f, poly_centre.y + 24.0f);
-                    poly_points[2] = ImVec2(poly_centre.x, poly_centre.y + 32.0f);
-                    poly_points[3] = ImVec2(poly_centre.x + 24.0f, poly_centre.y + 24.0f);
-                    poly_points[4] = ImVec2(poly_centre.x + 32.0f, poly_centre.y);
-                    poly_points[5] = ImVec2(poly_centre.x + 24.0f, poly_centre.y - 24.0f);
-                    poly_points[6] = ImVec2(poly_centre.x, poly_centre.y - 32.0f);
-                    poly_points[7] = ImVec2(poly_centre.x - 32.0f, poly_centre.y - 32.0f);
-                    poly_points_count = 8;
-                    break;
-                }
-                case 1:
-                {
-                    poly_points[0] = ImVec2(poly_centre.x + 40.0f, poly_centre.y - 20.0f);
-                    poly_points[1] = ImVec2(poly_centre.x, poly_centre.y + 32.0f);
-                    poly_points[2] = ImVec2(poly_centre.x - 24.0f, poly_centre.y - 32.0f);
-                    poly_points_count = 3;
-                    break;
-                }
-                case 2:
-                {
-                    poly_points[0] = ImVec2(poly_centre.x - 32.0f, poly_centre.y);
-                    poly_points[1] = ImVec2(poly_centre.x, poly_centre.y + 32.0f);
-                    poly_points[2] = ImVec2(poly_centre.x + 32.0f, poly_centre.y);
-                    poly_points[3] = ImVec2(poly_centre.x, poly_centre.y - 32.0f);
-                    poly_points_count = 4;
-                    break;
-                }
-                case 3:
-                {
-                    poly_points[0] = ImVec2(poly_centre.x - 4.0f, poly_centre.y - 20.0f);
-                    poly_points[1] = ImVec2(poly_centre.x + 12.0f, poly_centre.y + 2.0f);
-                    poly_points[2] = ImVec2(poly_centre.x + 8.0f, poly_centre.y + 16.0f);
-                    poly_points[3] = ImVec2(poly_centre.x, poly_centre.y + 32.0f);
-                    poly_points[4] = ImVec2(poly_centre.x - 16.0f, poly_centre.y - 32.0f);
-                    poly_points_count = 5;
-                    break;
-                }
-                case 4: // Same as test case 3 but with reversed winding
-                {
-                    poly_points[0] = ImVec2(poly_centre.x - 16.0f, poly_centre.y - 32.0f);
-                    poly_points[1] = ImVec2(poly_centre.x, poly_centre.y + 32.0f);
-                    poly_points[2] = ImVec2(poly_centre.x + 8.0f, poly_centre.y + 16.0f);
-                    poly_points[3] = ImVec2(poly_centre.x + 12.0f, poly_centre.y + 2.0f);
-                    poly_points[4] = ImVec2(poly_centre.x - 4.0f, poly_centre.y - 20.0f);
-                    poly_points_count = 5;
-                    break;
-                }
-                }
-
-                // FIXME-SHADOWS: Offset forced to zero when shadow is not filled because it isn't supported
-                ImDrawFlags draw_flags = shadow_filled ? ImDrawFlags_None : ImDrawFlags_ShadowCutOutShapeBackground;
-                draw_list->AddShadowConvexPoly(poly_points, poly_points_count, ImGui::GetColorU32(shadow_color), shadow_thickness, shadow_filled ? shadow_offset : ImVec2(0.0f, 0.0f), draw_flags);
-
-                if (wireframe)
-                    draw_list->AddPolyline(poly_points, poly_points_count, ImGui::GetColorU32(shape_color), true, 1.0f);
-                else
-                    draw_list->AddConvexPolyFilled(poly_points, poly_points_count, ImGui::GetColorU32(shape_color));
-            }
-
-            draw_list->Flags = old_flags;
-
-            ImGui::EndTabItem();
-        }
-
         if (ImGui::BeginTabItem("BG/FG draw lists"))
         {
             static bool draw_bg = true;
@@ -8806,7 +8617,6 @@ void ShowExampleAppDocuments(bool* p_open)
     // Submit Tab Bar and Tabs
     {
         ImGuiTabBarFlags tab_bar_flags = (opt_fitting_flags) | (opt_reorderable ? ImGuiTabBarFlags_Reorderable : 0);
-        tab_bar_flags |= ImGuiTabBarFlags_DrawSelectedOverline;
         if (ImGui::BeginTabBar("##tabs", tab_bar_flags))
         {
             if (opt_reorderable)

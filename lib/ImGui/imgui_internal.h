@@ -1,4 +1,4 @@
-// dear imgui, v1.90.9
+// dear imgui, v1.90.8
 // (internal structures/api)
 
 // You may use this file to debug, understand or extend Dear ImGui features but we don't provide any guarantee of forward compatibility.
@@ -145,7 +145,6 @@ struct ImGuiPopupData;              // Storage for current popup stack
 struct ImGuiSettingsHandler;        // Storage for one type registered in the .ini file
 struct ImGuiStackSizes;             // Storage of stack sizes for debugging/asserting
 struct ImGuiStyleMod;               // Stacked style modifier, backup of modified data so we can restore it
-struct ImGuiStyleShadowTexConfig;   // Shadow Texture baking config
 struct ImGuiTabBar;                 // Storage for a tab bar
 struct ImGuiTabItem;                // Storage for a tab item (within a tab bar)
 struct ImGuiTable;                  // Storage for a table
@@ -349,7 +348,6 @@ namespace ImStb
 // - Helper: ImPool<>
 // - Helper: ImChunkStream<>
 // - Helper: ImGuiTextIndex
-// - Helper: ImGuiStorage
 //-----------------------------------------------------------------------------
 
 // Helpers: Hashing
@@ -481,7 +479,6 @@ static inline ImVec4 ImLerp(const ImVec4& a, const ImVec4& b, float t)          
 static inline float  ImSaturate(float f)                                        { return (f < 0.0f) ? 0.0f : (f > 1.0f) ? 1.0f : f; }
 static inline float  ImLengthSqr(const ImVec2& lhs)                             { return (lhs.x * lhs.x) + (lhs.y * lhs.y); }
 static inline float  ImLengthSqr(const ImVec4& lhs)                             { return (lhs.x * lhs.x) + (lhs.y * lhs.y) + (lhs.z * lhs.z) + (lhs.w * lhs.w); }
-static inline float  ImLength(const ImVec2& lhs, float fail_value)              { float d = (lhs.x * lhs.x) + (lhs.y * lhs.y); if (d > 0.0f) return ImSqrt(d); return fail_value; }
 static inline float  ImInvLength(const ImVec2& lhs, float fail_value)           { float d = (lhs.x * lhs.x) + (lhs.y * lhs.y); if (d > 0.0f) return ImRsqrt(d); return fail_value; }
 static inline float  ImTrunc(float f)                                           { return (float)(int)(f); }
 static inline ImVec2 ImTrunc(const ImVec2& v)                                   { return ImVec2((float)(int)(v.x), (float)(int)(v.y)); }
@@ -725,7 +722,7 @@ struct ImChunkStream
     void    swap(ImChunkStream<T>& rhs) { rhs.Buf.swap(Buf); }
 };
 
-// Helper: ImGuiTextIndex
+// Helper: ImGuiTextIndex<>
 // Maintain a line index for a text buffer. This is a strong candidate to be moved into the public API.
 struct ImGuiTextIndex
 {
@@ -739,8 +736,6 @@ struct ImGuiTextIndex
     void            append(const char* base, int old_size, int new_size);
 };
 
-// Helper: ImGuiStorage
-IMGUI_API ImGuiStoragePair* ImLowerBound(ImGuiStoragePair* in_begin, ImGuiStoragePair* in_end, ImGuiID key);
 //-----------------------------------------------------------------------------
 // [SECTION] ImDrawList support
 //-----------------------------------------------------------------------------
@@ -790,9 +785,6 @@ struct IMGUI_API ImDrawListSharedData
     float           ArcFastRadiusCutoff;                        // Cutoff radius after which arc drawing will fallback to slower PathArcTo()
     ImU8            CircleSegmentCounts[64];    // Precomputed segment count for given radius before we calculate it dynamically (to avoid calculation overhead)
     const ImVec4*   TexUvLines;                 // UV of anti-aliased lines in the atlas
-
-    int*            ShadowRectIds;              // IDs of rects for shadow texture (2 entries)
-    const ImVec4*   ShadowRectUvs;              // UV coordinates for shadow texture (10 entries)
 
     ImDrawListSharedData();
     void SetCircleTessellationMaxError(float max_error);
@@ -1604,7 +1596,7 @@ struct ImGuiNavItemData
     float               DistBox;        //      Move    // Best candidate box distance to current NavId
     float               DistCenter;     //      Move    // Best candidate center distance to current NavId
     float               DistAxial;      //      Move    // Best candidate axial distance to current NavId
-    ImGuiSelectionUserData SelectionUserData;//I+Mov    // Best candidate SetNextItemSelectionUserData() value. Valid if (InFlags & ImGuiItemFlags_HasSelectionUserData)
+    ImGuiSelectionUserData SelectionUserData;//I+Mov    // Best candidate SetNextItemSelectionData() value.
 
     ImGuiNavItemData()  { Clear(); }
     void Clear()        { Window = NULL; ID = FocusScopeId = 0; InFlags = 0; SelectionUserData = -1; DistBox = DistCenter = DistAxial = FLT_MAX; }
@@ -1944,7 +1936,6 @@ struct ImGuiContext
     bool                    GcCompactAll;                       // Request full GC
     bool                    TestEngineHookItems;                // Will call test engine hooks: ImGuiTestEngineHook_ItemAdd(), ImGuiTestEngineHook_ItemInfo(), ImGuiTestEngineHook_Log()
     void*                   TestEngine;                         // Test engine user data
-    char                    ContextName[16];                    // Storage for a context name (to facilitate debugging multi-context setups)
 
     // Inputs
     ImVector<ImGuiInputEvent> InputEventsQueue;                 // Input events which will be trickled/written into IO structure.
@@ -1964,7 +1955,6 @@ struct ImGuiContext
     ImGuiWindow*            CurrentWindow;                      // Window being drawn into
     ImGuiWindow*            HoveredWindow;                      // Window the mouse is hovering. Will typically catch mouse inputs.
     ImGuiWindow*            HoveredWindowUnderMovingWindow;     // Hovered window ignoring MovingWindow. Only set if MovingWindow is set.
-    ImGuiWindow*            HoveredWindowBeforeClear;           // Window the mouse is hovering. Filled even with _NoMouse. This is currently useful for multi-context compositors.
     ImGuiWindow*            MovingWindow;                       // Track the window we clicked on (in order to preserve focus). The actual window that is moved is generally MovingWindow->RootWindow.
     ImGuiWindow*            WheelingWindow;                     // Track the window we started mouse-wheeling on. Until a timer elapse or mouse has moved, generally keep scrolling the same window even if during the course of scrolling the mouse ends up hovering a child window.
     ImVec2                  WheelingWindowRefMousePos;
@@ -1981,7 +1971,7 @@ struct ImGuiContext
     float                   HoveredIdTimer;                     // Measure contiguous hovering time
     float                   HoveredIdNotActiveTimer;            // Measure contiguous hovering time where the item has not been active
     bool                    HoveredIdAllowOverlap;
-    bool                    HoveredIdIsDisabled;                // At least one widget passed the rect test, but has been discarded by disabled flag or popup inhibit. May be true even if HoveredId == 0.
+    bool                    HoveredIdDisabled;                  // At least one widget passed the rect test, but has been discarded by disabled flag or popup inhibit. May be true even if HoveredId == 0.
     bool                    ItemUnclipByLog;                    // Disable ItemAdd() clipping, essentially a memory-locality friendly copy of LogEnabled
     ImGuiID                 ActiveId;                           // Active widget
     ImGuiID                 ActiveIdIsAlive;                    // Active widget has been seen this frame (we can't use a bool as the ActiveId may change within the frame)
@@ -2049,7 +2039,6 @@ struct ImGuiContext
     ImGuiWindow*            NavWindow;                          // Focused window for navigation. Could be called 'FocusedWindow'
     ImGuiID                 NavId;                              // Focused item for navigation
     ImGuiID                 NavFocusScopeId;                    // Focused focus scope (e.g. selection code often wants to "clear other items" when landing on an item of the same scope)
-    ImGuiNavLayer           NavLayer;                           // Focused layer (main scrolling layer, or menu/title bar layer)
     ImGuiID                 NavActivateId;                      // ~~ (g.ActiveId == 0) && (IsKeyPressed(ImGuiKey_Space) || IsKeyDown(ImGuiKey_Enter) || IsKeyPressed(ImGuiKey_NavGamepadActivate)) ? NavId : 0, also set when calling ActivateItem()
     ImGuiID                 NavActivateDownId;                  // ~~ IsKeyDown(ImGuiKey_Space) || IsKeyDown(ImGuiKey_Enter) || IsKeyDown(ImGuiKey_NavGamepadActivate) ? NavId : 0
     ImGuiID                 NavActivatePressedId;               // ~~ IsKeyPressed(ImGuiKey_Space) || IsKeyPressed(ImGuiKey_Enter) || IsKeyPressed(ImGuiKey_NavGamepadActivate) ? NavId : 0 (no repeat)
@@ -2057,9 +2046,13 @@ struct ImGuiContext
     ImVector<ImGuiFocusScopeData> NavFocusRoute;                // Reversed copy focus scope stack for NavId (should contains NavFocusScopeId). This essentially follow the window->ParentWindowForFocusRoute chain.
     ImGuiID                 NavHighlightActivatedId;
     float                   NavHighlightActivatedTimer;
+    ImGuiID                 NavJustMovedToId;                   // Just navigated to this id (result of a successfully MoveRequest).
+    ImGuiID                 NavJustMovedToFocusScopeId;         // Just navigated to this focus scope id (result of a successfully MoveRequest).
+    ImGuiKeyChord           NavJustMovedToKeyMods;
     ImGuiID                 NavNextActivateId;                  // Set by ActivateItem(), queued until next frame.
     ImGuiActivateFlags      NavNextActivateFlags;
     ImGuiInputSource        NavInputSource;                     // Keyboard or Gamepad mode? THIS CAN ONLY BE ImGuiInputSource_Keyboard or ImGuiInputSource_Mouse
+    ImGuiNavLayer           NavLayer;                           // Layer we are navigating on. For now the system is hard-coded for 0=main contents and 1=menu/title bar, may expose layers later.
     ImGuiSelectionUserData  NavLastValidSelectionUserData;      // Last valid data passed to SetNextItemSelectionUser(), or -1. For current window. Not reset when focusing an item that doesn't have selection data.
     bool                    NavIdIsAlive;                       // Nav widget has been seen this frame ~~ NavRectRel is valid
     bool                    NavMousePosDirty;                   // When set we will update mouse position if (io.ConfigFlags & ImGuiConfigFlags_NavEnableSetMousePos) if set (NB: this not enabled by default)
@@ -2089,14 +2082,6 @@ struct ImGuiContext
     ImGuiNavItemData        NavMoveResultLocalVisible;          // Best move request candidate within NavWindow that are mostly visible (when using ImGuiNavMoveFlags_AlsoScoreVisibleSet flag)
     ImGuiNavItemData        NavMoveResultOther;                 // Best move request candidate within NavWindow's flattened hierarchy (when using ImGuiWindowFlags_NavFlattened flag)
     ImGuiNavItemData        NavTabbingResultFirst;              // First tabbing request candidate within NavWindow and flattened hierarchy
-
-    // Navigation: record of last move request
-    ImGuiID                 NavJustMovedFromFocusScopeId;       // Just navigated from this focus scope id (result of a successfully MoveRequest).
-    ImGuiID                 NavJustMovedToId;                   // Just navigated to this id (result of a successfully MoveRequest).
-    ImGuiID                 NavJustMovedToFocusScopeId;         // Just navigated to this focus scope id (result of a successfully MoveRequest).
-    ImGuiKeyChord           NavJustMovedToKeyMods;
-    bool                    NavJustMovedToIsTabbing;            // Copy of ImGuiNavMoveFlags_IsTabbing. Maybe we should store whole flags.
-    bool                    NavJustMovedToHasSelectionData;     // Copy of move result's InFlags & ImGuiItemFlags_HasSelectionUserData). Maybe we should just store ImGuiNavItemData.
 
     // Navigation: Windowing (CTRL+TAB for list, or Menu button + keys or directional pads to move/resize)
     ImGuiKeyChord           ConfigNavWindowingKeyNext;          // = ImGuiMod_Ctrl | ImGuiKey_Tab (or ImGuiMod_Super | ImGuiKey_Tab on OS X). For reconfiguration (see #4828)
@@ -2278,7 +2263,6 @@ struct ImGuiContext
         GcCompactAll = false;
         TestEngineHookItems = false;
         TestEngine = NULL;
-        memset(ContextName, 0, sizeof(ContextName));
 
         InputEventsNextMouseSource = ImGuiMouseSource_Mouse;
         InputEventsNextEventId = 1;
@@ -2287,7 +2271,6 @@ struct ImGuiContext
         CurrentWindow = NULL;
         HoveredWindow = NULL;
         HoveredWindowUnderMovingWindow = NULL;
-        HoveredWindowBeforeClear = NULL;
         MovingWindow = NULL;
         WheelingWindow = NULL;
         WheelingWindowStartFrame = WheelingWindowScrolledFrame = -1;
@@ -2296,7 +2279,7 @@ struct ImGuiContext
         DebugHookIdInfo = 0;
         HoveredId = HoveredIdPreviousFrame = 0;
         HoveredIdAllowOverlap = false;
-        HoveredIdIsDisabled = false;
+        HoveredIdDisabled = false;
         HoveredIdTimer = HoveredIdNotActiveTimer = 0.0f;
         ItemUnclipByLog = false;
         ActiveId = 0;
@@ -2334,18 +2317,18 @@ struct ImGuiContext
 
         NavWindow = NULL;
         NavId = NavFocusScopeId = NavActivateId = NavActivateDownId = NavActivatePressedId = 0;
-        NavLayer = ImGuiNavLayer_Main;
-        NavNextActivateId = 0;
+        NavJustMovedToId = NavJustMovedToFocusScopeId = NavNextActivateId = 0;
         NavActivateFlags = NavNextActivateFlags = ImGuiActivateFlags_None;
         NavHighlightActivatedId = 0;
         NavHighlightActivatedTimer = 0.0f;
+        NavJustMovedToKeyMods = ImGuiMod_None;
         NavInputSource = ImGuiInputSource_Keyboard;
+        NavLayer = ImGuiNavLayer_Main;
         NavLastValidSelectionUserData = ImGuiSelectionUserData_Invalid;
         NavIdIsAlive = false;
         NavMousePosDirty = false;
         NavDisableHighlight = true;
         NavDisableMouseHover = false;
-
         NavAnyRequest = false;
         NavInitRequest = false;
         NavInitRequestFromMove = false;
@@ -2359,11 +2342,6 @@ struct ImGuiContext
         NavScoringDebugCount = 0;
         NavTabbingDir = 0;
         NavTabbingCounter = 0;
-
-        NavJustMovedFromFocusScopeId = NavJustMovedToId = NavJustMovedToFocusScopeId = 0;
-        NavJustMovedToKeyMods = ImGuiMod_None;
-        NavJustMovedToIsTabbing = false;
-        NavJustMovedToHasSelectionData = false;
 
         // All platforms use Ctrl+Tab but Ctrl<>Super are swapped on Mac...
         // FIXME: Because this value is stored, it annoyingly interfere with toggling io.ConfigMacOSXBehaviors updating this..
@@ -3165,26 +3143,22 @@ namespace ImGui
     IMGUI_API void          LogRenderedText(const ImVec2* ref_pos, const char* text, const char* text_end = NULL);
     IMGUI_API void          LogSetNextTextDecoration(const char* prefix, const char* suffix);
 
-    // Childs
+    // Popups, Modals, Tooltips
     IMGUI_API bool          BeginChildEx(const char* name, ImGuiID id, const ImVec2& size_arg, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags);
-
-    // Popups, Modals
-    IMGUI_API bool          BeginPopupEx(ImGuiID id, ImGuiWindowFlags extra_window_flags);
     IMGUI_API void          OpenPopupEx(ImGuiID id, ImGuiPopupFlags popup_flags = ImGuiPopupFlags_None);
     IMGUI_API void          ClosePopupToLevel(int remaining, bool restore_focus_to_window_under_popup);
     IMGUI_API void          ClosePopupsOverWindow(ImGuiWindow* ref_window, bool restore_focus_to_window_under_popup);
     IMGUI_API void          ClosePopupsExceptModals();
     IMGUI_API bool          IsPopupOpen(ImGuiID id, ImGuiPopupFlags popup_flags);
+    IMGUI_API bool          BeginPopupEx(ImGuiID id, ImGuiWindowFlags extra_flags);
+    IMGUI_API bool          BeginTooltipEx(ImGuiTooltipFlags tooltip_flags, ImGuiWindowFlags extra_window_flags);
+    IMGUI_API bool          BeginTooltipHidden();
     IMGUI_API ImRect        GetPopupAllowedExtentRect(ImGuiWindow* window);
     IMGUI_API ImGuiWindow*  GetTopMostPopupModal();
     IMGUI_API ImGuiWindow*  GetTopMostAndVisiblePopupModal();
     IMGUI_API ImGuiWindow*  FindBlockingModal(ImGuiWindow* window);
     IMGUI_API ImVec2        FindBestWindowPosForPopup(ImGuiWindow* window);
     IMGUI_API ImVec2        FindBestWindowPosForPopupEx(const ImVec2& ref_pos, const ImVec2& size, ImGuiDir* last_dir, const ImRect& r_outer, const ImRect& r_avoid, ImGuiPopupPositionPolicy policy);
-
-    // Tooltips
-    IMGUI_API bool          BeginTooltipEx(ImGuiTooltipFlags tooltip_flags, ImGuiWindowFlags extra_window_flags);
-    IMGUI_API bool          BeginTooltipHidden();
 
     // Menus
     IMGUI_API bool          BeginViewportSideBar(const char* name, ImGuiViewport* viewport, ImGuiDir dir, float size, ImGuiWindowFlags window_flags);
@@ -3347,6 +3321,7 @@ namespace ImGui
     IMGUI_API void          TableOpenContextMenu(int column_n = -1);
     IMGUI_API void          TableSetColumnWidth(int column_n, float width);
     IMGUI_API void          TableSetColumnSortDirection(int column_n, ImGuiSortDirection sort_direction, bool append_to_sort_specs);
+    IMGUI_API int           TableGetHoveredColumn();    // May use (TableGetColumnFlags() & ImGuiTableColumnFlags_IsHovered) instead. Return hovered column. return -1 when table is not hovered. return columns_count if the unused space at the right of visible columns is hovered.
     IMGUI_API int           TableGetHoveredRow();       // Retrieve *PREVIOUS FRAME* hovered row. This difference with TableGetHoveredColumn() is the reason why this is not public yet.
     IMGUI_API float         TableGetHeaderRowHeight();
     IMGUI_API float         TableGetHeaderAngledMaxLabelWidth();

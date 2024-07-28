@@ -98,7 +98,6 @@ typedef DWORD(WINAPI* PFN_XInputGetState)(DWORD, XINPUT_STATE*);
 #endif
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpragmas"                  // warning: unknown option after '#pragma GCC diagnostic' kind
 #pragma GCC diagnostic ignored "-Wcast-function-type"       // warning: cast between incompatible function types (for loader)
 #endif
 
@@ -170,8 +169,7 @@ static bool ImGui_ImplWin32_InitEx(void* hwnd, bool platform_has_own_dc)
     ImGui_ImplWin32_UpdateKeyboardCodePage();
 
     // Set platform dependent data in viewport
-    ImGuiViewport* main_viewport = ImGui::GetMainViewport();
-    main_viewport->PlatformHandle = main_viewport->PlatformHandleRaw = (void*)bd->hWnd;
+    ImGui::GetMainViewport()->PlatformHandleRaw = (void*)hwnd;
     IM_UNUSED(platform_has_own_dc); // Used in 'docking' branch
 
     // Dynamically load XInput library
