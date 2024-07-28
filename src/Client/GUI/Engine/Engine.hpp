@@ -106,7 +106,7 @@ namespace FlarialGUI {
                                                     bool moduleFont = false);
 
     void RoundedRect(float x, float y, D2D_COLOR_F color, float width = 160.0f, float height = 75.0,
-                     float radiusX = 10.0f, float radiusY = 10.0f);
+                     float radiusX = 10.0f, float radiusY = 10.0f, ImDrawFlags flags = 0);
 
     void RoundedRect(bool imgui, float x, float y, ImColor color, float width = 160.0f, float height = 75.0,
         float radiusX = 10.0f, float radiusY = 10.0f);
@@ -208,6 +208,7 @@ namespace FlarialGUI {
     std::wstring to_wide(const std::string &str);
 
     void PushImClipRect(D2D_RECT_F rect);
+    void PushImClipRect(ImVec2 pos, ImVec2 size);
 
     void PopImClipRect();
 

@@ -789,6 +789,13 @@ void FlarialGUI::Notify(const std::string& text) {
 
 }
 
+void FlarialGUI::PushImClipRect(ImVec2 pos, ImVec2 size) {
+    ImVec2 max(pos.x + size.x, pos.y + size.y);
+
+    ImGui::GetBackgroundDrawList()->PushClipRect(pos, max);
+
+}
+
 void FlarialGUI::PushImClipRect(D2D_RECT_F rect) {
     ImVec2 pos(rect.left, rect.top);
     ImVec2 size(rect.right - rect.left, rect.bottom - rect.top);
