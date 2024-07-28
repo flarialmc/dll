@@ -547,12 +547,12 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
     if (!FontMap[font]) font = "162";
 
     ImGui::PushFont(FontMap[font]);
-	float fSize = fontSize/450;
+	float fSize = fontSize/600;
 
 	ImGui::SetWindowFontScale(fSize);
 
 	switch (alignment) {
-        case DWRITE_TEXT_ALIGNMENT::DWRITE_TEXT_ALIGNMENT_LEADING: 
+        case DWRITE_TEXT_ALIGNMENT::DWRITE_TEXT_ALIGNMENT_LEADING:
 			break;
 
         case DWRITE_TEXT_ALIGNMENT::DWRITE_TEXT_ALIGNMENT_CENTER: {
@@ -713,7 +713,7 @@ bool FlarialGUI::LoadFontFromFontFamily(std::string name) {
     if (!fontFilePath.empty()) {
         std::ifstream fontFile(fontFilePath, std::ios::binary);
         if (fontFile) {
-			FontMap[name] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 75);
+			FontMap[name] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 100);
             if(!FontMap[name]) return false;
             return true;
         }
