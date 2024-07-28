@@ -207,6 +207,10 @@ namespace FlarialGUI {
 
     std::wstring to_wide(const std::string &str);
 
+    void PushImClipRect(D2D_RECT_F rect);
+
+    void PopImClipRect();
+
     void
     FlarialTextWithFont(float x, float y, const wchar_t *text, float width, float height,
                         DWRITE_TEXT_ALIGNMENT alignment, float fontSize,

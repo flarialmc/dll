@@ -639,12 +639,14 @@ void FlarialGUI::SetScrollView(float x, float y, float width, float height) {
     FlarialGUI::isInScrollView = true;
     D2D1_RECT_F clipRect = D2D1::RectF(x, y, x + width, y + height);
     ScrollViewRect = clipRect;
+    PushImClipRect(clipRect);
     D2D::context->PushAxisAlignedClip(&clipRect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
 }
 
 void FlarialGUI::UnsetScrollView() {
     FlarialGUI::isInScrollView = false;
+    PopImClipRect();
     D2D::context->PopAxisAlignedClip();
 }
 
@@ -787,6 +789,20 @@ void FlarialGUI::Notify(const std::string& text) {
 
 }
 
+void FlarialGUI::PushImClipRect(D2D_RECT_F rect) {
+    ImVec2 pos(rect.left, rect.top);
+    ImVec2 size(rect.right - rect.left, rect.bottom - rect.top);
+
+    ImVec2 max(pos.x + size.x, pos.y + size.y);
+
+    ImGui::GetBackgroundDrawList()->PushClipRect(pos, max);
+
+}
+
+void FlarialGUI::PopImClipRect() {
+    ImGui::GetBackgroundDrawList()->PopClipRect();
+}
+
 void FlarialGUI::NotifyHeartbeat() {
 
 
@@ -829,6 +845,8 @@ void FlarialGUI::NotifyHeartbeat() {
                                                                                                       true)),
                                                  notif.currentPosY + rectHeight);
 
+
+            PushImClipRect(cutoutrect);
             D2D::context->PushAxisAlignedClip(cutoutrect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
             col = colors_primary1_rgb ? rgbColor : colors_primary1;
@@ -838,6 +856,7 @@ void FlarialGUI::NotifyHeartbeat() {
                                     rectHeight, rounding.x, rounding.x);
 
             D2D::context->PopAxisAlignedClip();
+            PopImClipRect();
 
             FlarialGUI::PushSize(notif.currentPos, notif.currentPosY, rectWidth, rectHeight);
 
@@ -915,6 +934,7 @@ void FlarialGUI::NotifyHeartbeat() {
                                                                                                       true)),
                                                  notif.currentPosY + rectHeight);
 
+            PushImClipRect(cutoutrect);
             D2D::context->PushAxisAlignedClip(cutoutrect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
             col = colors_primary1_rgb ? rgbColor : colors_primary1;
@@ -924,6 +944,7 @@ void FlarialGUI::NotifyHeartbeat() {
                                     rectHeight, rounding.x, rounding.x);
 
             D2D::context->PopAxisAlignedClip();
+            PopImClipRect();
 
             FlarialGUI::PushSize(notif.currentPos, notif.currentPosY, rectWidth, rectHeight);
 
