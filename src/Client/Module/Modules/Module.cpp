@@ -16,10 +16,7 @@ void Module::normalRender(int index, std::string &value) {
         text = this->settings.getSettingByName<std::string>("text")->value;
 
     float rotation = this->settings.getSettingByName<float>("rotation")->value;
-    D2D1_MATRIX_3X2_F oldTransform;
-    D2D1_POINT_2F rotationCenter;
-    if (rotation > 0.0f) D2D::context->GetTransform(&oldTransform);
-
+    ImVec2 rotationCenter;
     DWRITE_TEXT_ALIGNMENT alignment = alignments[this->settings.getSettingByName<std::string>(
             "textalignment")->value];
     bool responsivewidth = this->settings.getSettingByName<bool>("responsivewidth")->value;
@@ -131,14 +128,14 @@ void Module::normalRender(int index, std::string &value) {
     borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
 
     if (rotation > 0.0f) {
-        rotationCenter = D2D1::Point2F(realcenter.x + textMetrics.left + rectWidth / 2.0f, realcenter.y +
-                                                                                           textHeight *
-                                                                                           this->settings.getSettingByName<float>(
-                                                                                                   "rectheight")->value /
-                                                                                           2.0f);
+        ImVec2 rotationCenter = ImVec2(
+            realcenter.x + textMetrics.left + rectWidth / 2.0f,
+            realcenter.y + textHeight * this->settings.getSettingByName<float>("rectheight")->value / 2.0f
+        );
 
-        D2D1_MATRIX_3X2_F rotationMatrix = D2D1::Matrix3x2F::Rotation(rotation, rotationCenter);
-        D2D::context->SetTransform(rotationMatrix);
+
+
+        FlarialGUI::ImRotateStart();
     }
 
     if (settings.getSettingByName<bool>("BlurEffect")->value)
@@ -186,7 +183,7 @@ void Module::normalRender(int index, std::string &value) {
         );
     }
 
-    if (rotation > 0.0f) D2D::context->SetTransform(oldTransform);
+    FlarialGUI::ImRotateEnd(rotation, rotationCenter);
 
     if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
         ClickGUIRenderer::editmenu)
