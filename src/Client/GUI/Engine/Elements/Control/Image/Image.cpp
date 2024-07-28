@@ -329,18 +329,6 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 			ImGui::GetBackgroundDrawList()->AddImage(ImagesClass::ImguiDX12Images[resourceId], ImVec2(imageRect.left, imageRect.top), ImVec2(imageRect.right, imageRect.bottom), ImVec2(0, 0), ImVec2(1, 1), IM_COL32_WHITE);
 		}
 	}
-    // Draw image
-    D2D1_BITMAP_INTERPOLATION_MODE interpolationMode = D2D1_BITMAP_INTERPOLATION_MODE_LINEAR;
 
-    if (resourceId == IDR_TRANSPARENT_PNG)
-        interpolationMode = D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR;
 
-    if (isInScrollView) {
-        if (isRectInRect(ScrollViewRect, rect))
-            D2D::context->DrawBitmap(ImagesClass::images[resourceId], imageRect, 1.0f,
-                                     interpolationMode);
-    } else {
-        D2D::context->DrawBitmap(ImagesClass::images[resourceId], imageRect, 1.0f,
-                                 interpolationMode);
-    }
 }
