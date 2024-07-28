@@ -492,7 +492,7 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, float width,
 
 void FlarialGUI::LoadAllImageToCache() {
 
-    for (int i = 0; i < MAX_IMAGE_ID; ++i) {
+    for (int i = 101; i < MAX_IMAGE_ID; ++i) {
         LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "PNG");
     }
 

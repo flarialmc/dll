@@ -283,8 +283,10 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 
     D2D1_RECT_F imageRect = D2D1::RectF(rect.left, rect.top, rect.right, rect.bottom);
 
+	/*
     if (ImagesClass::images[resourceId] == nullptr)
         LoadImageFromResource(resourceId, &ImagesClass::images[resourceId], type);
+        */
 
     if (SwapchainHook::d3d11Device != nullptr) {
 		if (ImagesClass::ImguiDX11Images[resourceId] == nullptr) {

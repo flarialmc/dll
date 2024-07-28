@@ -73,7 +73,7 @@ namespace FlarialGUI {
     bool inline isInWindowRect = false;
     bool inline inMenu = false;
     bool inline resizing = false;
-    bool hasLoadedAll = false;
+    bool inline hasLoadedAll = false;
 
     inline ID2D1Effect *blur = nullptr;
     inline ID2D1Effect *shadow_blur = nullptr;
