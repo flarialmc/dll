@@ -85,7 +85,7 @@ std::string ClickGUIElements::SearchBar(int index, std::string &text, int limit,
                 FlarialGUI::lerp(searchBarSizes[index], Constraints::RelativeConstraint(2.7f, "height"),
                                  0.12f * FlarialGUI::frameFactor);
 
-                FlarialGUI::lerp(searchCutOutHeights[index], Constraints::RelativeConstraint(0.395, "height"),
+                FlarialGUI::lerp(searchCutOutHeights[index], Constraints::RelativeConstraint(0.395f, "height"),
                                  0.12f * FlarialGUI::frameFactor);
             } else {
 
@@ -101,15 +101,15 @@ std::string ClickGUIElements::SearchBar(int index, std::string &text, int limit,
             D2D1_COLOR_F searchbg = colors_secondary4_rgb ? FlarialGUI::rgbColor : colors_secondary4;
             searchbg.a = o_colors_secondary4;
 
-            FlarialGUI::RoundedRect(x - textWidth, y, searchbg, textWidth, percHeight, round.x,
-                                    round.x);
 
-            D2D::context->PushAxisAlignedClip(
-                    D2D1::RectF(x - textWidth, y + percHeight, (x - textWidth) + textWidth,
-                                y + searchCutOutHeights[index]), D2D1_ANTIALIAS_MODE_ALIASED);
-            FlarialGUI::RoundedRect(x - textWidth, y, col, textWidth, percHeight, round.x,
-                                    round.x);
-            D2D::context->PopAxisAlignedClip();
+            if(FlarialGUI::TextBoxes[index].isActive) FlarialGUI::RoundedRect(x - textWidth, y, searchbg, textWidth, percHeight, round.x,round.x, ImDrawFlags_RoundCornersBottom);
+            else  FlarialGUI::RoundedRect(x - textWidth, y, searchbg, textWidth, percHeight, round.x,round.x, ImDrawFlags_RoundCornersAll);
+
+
+            ImVec2 pos{x - textWidth, y + searchCutOutHeights[index]};
+            ImVec2 size{textWidth, percHeight - searchCutOutHeights[index]};
+
+            FlarialGUI::RoundedRect(pos.x, pos.y, col, size.x, size.y, round.x, round.y);
 
             //TODO: text renders higher
 

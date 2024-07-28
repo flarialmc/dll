@@ -3,6 +3,7 @@
 
 void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect, D2D1_COLOR_F color) {
 
+    /*
     // Use shadows only in dx 12 for now
     if (!Client::settings.getSettingByName<bool>("noshadows")->value && SwapchainHook::queue != nullptr) {
         // Create a new blank bitmap
@@ -44,5 +45,5 @@ void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect, D2D1_COLOR_F color) {
         }
 
         Memory::SafeRelease(newLayer);
-    }
+    }*/
 }

@@ -9,6 +9,7 @@
 #include <vector>
 #include <winrt/base.h>
 #include <chrono>
+#include <imgui.h>
 #include <unordered_map>
 #include "../../../Utils/Memory/LRUCache.hpp"
 #include "Elements/Structs/Notification.hpp"
@@ -76,6 +77,7 @@ namespace FlarialGUI {
     bool inline isInWindowRect = false;
     bool inline inMenu = false;
     bool inline resizing = false;
+    bool inline hasLoadedAll = false;
 
     inline ID2D1Effect *blur = nullptr;
     inline ID2D1Effect *shadow_blur = nullptr;
@@ -108,8 +110,15 @@ namespace FlarialGUI {
                                                     float maxWidth = 500, float maxHeight = 500,
                                                     bool moduleFont = false);
 
-    void RoundedRect(float x, float y, D2D_COLOR_F color, float width = 160.0f, float height = 75,
-                     float radiusX = 10.0f, float radiusY = 10.0f);
+    void ImRotateStart();
+    ImVec2 ImRotationCenter();
+    void ImRotateEnd(float rad, ImVec2 center = ImRotationCenter());
+
+    void RoundedRect(float x, float y, D2D_COLOR_F color, float width = 160.0f, float height = 75.0,
+                     float radiusX = 10.0f, float radiusY = 10.0f, ImDrawFlags flags = ImDrawFlags_RoundCornersAll);
+
+    void RoundedRect(bool imgui, float x, float y, ImColor color, float width = 160.0f, float height = 75.0,
+        float radiusX = 10.0f, float radiusY = 10.0f);
 
     bool RoundedButton(int index, float x, float y, D2D_COLOR_F color, D2D_COLOR_F textColor,
                        const wchar_t *text, float width = 160.0f, float height = 100.0f,
@@ -207,6 +216,11 @@ namespace FlarialGUI {
 
     std::wstring to_wide(const std::string &str);
 
+    void PushImClipRect(D2D_RECT_F rect);
+    void PushImClipRect(ImVec2 pos, ImVec2 size);
+
+    void PopImClipRect();
+
     void
     FlarialTextWithFont(float x, float y, const wchar_t *text, float width, float height,
                         DWRITE_TEXT_ALIGNMENT alignment, float fontSize,
@@ -281,7 +295,9 @@ namespace FlarialGUI {
     std::string Dropdown(int index, float x, float y, const std::vector<std::string> &options, std::string &value,
                          const std::string &label);
 
-    void image(int resourceId, D2D1_RECT_F rect, LPCTSTR type = "PNG");
+    void image(int resourceId, D2D1_RECT_F rect, LPCTSTR type = "PNG", bool shouldadd = true);
+
+    void LoadAllImageToCache();
 
     void LoadImageFromResource(int resourceId, ID2D1Bitmap **bitmap, LPCTSTR type = "PNG");
 
@@ -296,4 +312,6 @@ namespace FlarialGUI {
     void RoundedRectWithImageAndText(int index, float x, float y, const float width, const float height,
                                      const D2D1_COLOR_F color, int iconId, const float imageWidth,
                                      const float imageHeight);
+
+    ImColor D2DColorToImColor(D2D1_COLOR_F color);
 }

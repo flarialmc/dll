@@ -1,4 +1,5 @@
 #include "../../../Engine.hpp"
+#include <imgui.h>
 
 bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text,
                         const float width, const float height) {
@@ -10,10 +11,12 @@ bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COL
                                                                                 color.b - darkenAmounts[(int)(x + y)], color.a)
                                                                  : color;
 
-    D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
+    //D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
 
 
-    D2D::context->FillRectangle(rect, FlarialGUI::getBrush(buttonColor).get());
+    //D2D::context->FillRectangle(rect, FlarialGUI::getBrush(buttonColor).get());
+
+    FlarialGUI::RoundedRect(x, y, color, width, height);
 
     FlarialGUI::FlarialTextWithFont(x, y, text, width, height, DWRITE_TEXT_ALIGNMENT_CENTER, 14.0f,
                                     DWRITE_FONT_WEIGHT_NORMAL, textColor);

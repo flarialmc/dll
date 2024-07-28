@@ -3,6 +3,7 @@
 #include <utility>
 #include <winrt/base.h>
 #include <cmath>
+#include <imgui_internal.h>
 #include <variant>
 #include "Constraints.hpp"
 #include "animations/fadeinout.hpp"
@@ -363,6 +364,10 @@ float FlarialGUI::HueToRGB(float p, float q, float t) {
     return p;
 }
 
+ImColor FlarialGUI::D2DColorToImColor(D2D1_COLOR_F color) {
+    return ImColor(color.r, color.g, color.b, color.a);
+}
+
 HSV FlarialGUI::RGBtoHSV(D2D1_COLOR_F rgb) {
     float r = rgb.r;
     float g = rgb.g;
@@ -500,9 +505,22 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, float width,
 
 }
 
+void FlarialGUI::LoadAllImageToCache() {
+
+    for (int i = 101; i < MAX_IMAGE_ID; ++i) {
+        LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "PNG");
+    }
+
+    hasLoadedAll = true;
+
+}
+
+
 void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
                                      const DWRITE_FONT_WEIGHT weight, bool moduleFont) {
+
+
     D2D1_COLOR_F color = colors_text_rgb ? rgbColor : colors_text;
     color.a = o_colors_text;
 
@@ -797,12 +815,14 @@ void FlarialGUI::SetScrollView(float x, float y, float width, float height) {
     FlarialGUI::isInScrollView = true;
     D2D1_RECT_F clipRect = D2D1::RectF(x, y, x + width, y + height);
     ScrollViewRect = clipRect;
+    PushImClipRect(clipRect);
     D2D::context->PushAxisAlignedClip(&clipRect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
 }
 
 void FlarialGUI::UnsetScrollView() {
     FlarialGUI::isInScrollView = false;
+    PopImClipRect();
     D2D::context->PopAxisAlignedClip();
 }
 
@@ -945,6 +965,60 @@ void FlarialGUI::Notify(const std::string& text) {
 
 }
 
+/* rotation stuff */
+
+static int rotation_start_index;
+void FlarialGUI::ImRotateStart()
+{
+    rotation_start_index = ImGui::GetBackgroundDrawList()->VtxBuffer.Size;
+}
+
+ImVec2 FlarialGUI::ImRotationCenter()
+{
+    ImVec2 l(FLT_MAX, FLT_MAX), u(-FLT_MAX, -FLT_MAX); // bounds
+
+    const auto& buf = ImGui::GetBackgroundDrawList()->VtxBuffer;
+    for (int i = rotation_start_index; i < buf.Size; i++)
+        l = ImMin(l, buf[i].pos), u = ImMax(u, buf[i].pos);
+
+    return ImVec2((l.x+u.x)/2, (l.y+u.y)/2); // or use _ClipRectStack?
+}
+
+ImVec2 operator-(const ImVec2& l, const ImVec2& r) { return{ l.x - r.x, l.y - r.y }; }
+
+void FlarialGUI::ImRotateEnd(float rad, ImVec2 center)
+{
+    float s=sin(rad), c=cos(rad);
+    center = ImRotate(center, s, c) - center;
+
+    auto& buf = ImGui::GetBackgroundDrawList()->VtxBuffer;
+    for (int i = rotation_start_index; i < buf.Size; i++)
+        buf[i].pos = ImRotate(buf[i].pos, s, c) - center;
+}
+
+/* rotation stuff end */
+
+void FlarialGUI::PushImClipRect(ImVec2 pos, ImVec2 size) {
+    ImVec2 max(pos.x + size.x, pos.y + size.y);
+
+    ImGui::GetBackgroundDrawList()->PushClipRect(pos, max);
+
+}
+
+void FlarialGUI::PushImClipRect(D2D_RECT_F rect) {
+    ImVec2 pos(rect.left, rect.top);
+    ImVec2 size(rect.right - rect.left, rect.bottom - rect.top);
+
+    ImVec2 max(pos.x + size.x, pos.y + size.y);
+
+    ImGui::GetBackgroundDrawList()->PushClipRect(pos, max);
+
+}
+
+void FlarialGUI::PopImClipRect() {
+    ImGui::GetBackgroundDrawList()->PopClipRect();
+}
+
 void FlarialGUI::NotifyHeartbeat() {
 
 
@@ -987,6 +1061,8 @@ void FlarialGUI::NotifyHeartbeat() {
                                                                                                       true)),
                                                  notif.currentPosY + rectHeight);
 
+
+            PushImClipRect(cutoutrect);
             D2D::context->PushAxisAlignedClip(cutoutrect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
             col = colors_primary1_rgb ? rgbColor : colors_primary1;
@@ -996,6 +1072,7 @@ void FlarialGUI::NotifyHeartbeat() {
                                     rectHeight, rounding.x, rounding.x);
 
             D2D::context->PopAxisAlignedClip();
+            PopImClipRect();
 
             FlarialGUI::PushSize(notif.currentPos, notif.currentPosY, rectWidth, rectHeight);
 
@@ -1073,6 +1150,7 @@ void FlarialGUI::NotifyHeartbeat() {
                                                                                                       true)),
                                                  notif.currentPosY + rectHeight);
 
+            PushImClipRect(cutoutrect);
             D2D::context->PushAxisAlignedClip(cutoutrect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
             col = colors_primary1_rgb ? rgbColor : colors_primary1;
@@ -1082,6 +1160,7 @@ void FlarialGUI::NotifyHeartbeat() {
                                     rectHeight, rounding.x, rounding.x);
 
             D2D::context->PopAxisAlignedClip();
+            PopImClipRect();
 
             FlarialGUI::PushSize(notif.currentPos, notif.currentPosY, rectWidth, rectHeight);
 
