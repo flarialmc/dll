@@ -108,9 +108,10 @@ std::string ClickGUIElements::SearchBar(int index, std::string &text, int limit,
             D2D1_RECT_F cutoutrect = D2D1::RectF(x - textWidth, y + percHeight, (x - textWidth) + textWidth,
                                 y + searchCutOutHeights[index]);
 
+            FlarialGUI::PushImClipRect(cutoutrect);
             D2D::context->PushAxisAlignedClip(cutoutrect, D2D1_ANTIALIAS_MODE_ALIASED);
 
-            FlarialGUI::PushImClipRect(cutoutrect);
+
 
             FlarialGUI::RoundedRect(x - textWidth, y, col, textWidth, percHeight, round.x,
                                     round.x);
