@@ -20,6 +20,7 @@
 #include "Elements/Windows/WindowRect.hpp"
 #include "Elements/Control/Tooltip/ToolTipStruct.hpp"
 #include "Elements/Structs/HSV.hpp"
+#include <imgui.h>
 
 class Dimension {
 public:
@@ -64,6 +65,9 @@ namespace FlarialGUI {
     inline ColorPicker ColorPickers[2000];
     inline DropdownStruct DropDownMenus[2000];
     inline KeybindSelector KeybindSelectors[2000];
+
+    inline std::map<std::string, ImFont*> FontMap = {};
+    inline std::map<std::string, bool> FontsNotFound = {};
 
     inline std::string currentKeybind;
 
@@ -286,6 +290,8 @@ namespace FlarialGUI {
     bool LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HANDLE srv_cpu_handle, ID3D12Resource** out_tex_resource, LPCTSTR type);
 
     void LoadFont(int resourceId);
+
+    bool LoadFontFromFontFamily(std::string name);
 
     void RoundedRectWithImageAndText(int index, float x, float y, const float width, const float height,
                                      const D2D1_COLOR_F color, int iconId, const float imageWidth,

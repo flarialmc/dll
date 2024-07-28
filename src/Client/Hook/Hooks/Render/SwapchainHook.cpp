@@ -30,7 +30,7 @@ static std::chrono::high_resolution_clock fpsclock;
 static std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 static std::chrono::steady_clock::time_point previousFrameTime = std::chrono::high_resolution_clock::now();
 
-auto window = (HWND)FindWindowA(nullptr, (LPCSTR)"Minecraft");;
+auto window = (HWND)FindWindowA(nullptr, (LPCSTR)"Minecraft");
 
 int SwapchainHook::currentBitmap;
 bool unloadDll(const wchar_t* moduleName) {
@@ -276,6 +276,28 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     } else {
 
+        bool fontLoaded = false;
+
+        std::string font1 = Client::settings.getSettingByName<std::string>("mod_fontname")->value;
+        std::transform(font1.begin(), font1.end(), font1.begin(), ::towlower);
+        if (!FlarialGUI::FontMap[font1]) {
+            if (FlarialGUI::LoadFontFromFontFamily(font1)) {
+                fontLoaded = true;
+            }
+        }
+
+        std::string font2 = Client::settings.getSettingByName<std::string>("fontname")->value;
+        std::transform(font2.begin(), font2.end(), font2.begin(), ::towlower);
+        if (!FlarialGUI::FontMap[font2]) {
+            if (FlarialGUI::LoadFontFromFontFamily(font2)) {
+                fontLoaded = true;
+            }
+        }
+
+        if (fontLoaded) {
+            ImGui::GetIO().Fonts->Build();
+        }
+
         while(FrameTransforms.size() > transformDelay)
         {
             MC::Transform = FrameTransforms.front();
@@ -464,9 +486,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                         ImGui_ImplDX11_NewFrame();
                         ImGui_ImplWin32_NewFrame();
                         ImGui::NewFrame();
-
-                        ImGui::GetForegroundDrawList()->AddRectFilledMultiColor(ImVec2(), ImVec2(100, 100), ImColor(255, 255, 255, 255), ImColor(0, 0, 0, 255), ImColor(100, 100, 100, 255), ImColor(0, 255, 0, 255));
-
 
                         RenderEvent event;
                         EventHandler::onRender(event);
