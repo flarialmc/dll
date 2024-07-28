@@ -294,7 +294,7 @@ void ClickGUIElements::RotatingGear(int index, float x, float y, float width, fl
     } else if (ImagesClass::images[IDR_SETTINGS_WHITE_PNG] != nullptr) {
 
         if (FlarialGUI::CursorInRect(x, y, width, height)) {
-            FlarialGUI::lerp(FlarialGUI::rotationAngles[index], FlarialGUI::rotationAngles[index] + 10000, 0.02f * FlarialGUI::frameFactor);
+            FlarialGUI::lerp(FlarialGUI::rotationAngles[index], FlarialGUI::rotationAngles[index] + 15, 0.0015f * FlarialGUI::frameFactor);
         }
 
 
