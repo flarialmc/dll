@@ -9,6 +9,7 @@
 #include <vector>
 #include <winrt/base.h>
 #include <chrono>
+#include <imgui.h>
 #include <unordered_map>
 #include "../../../Utils/Memory/LRUCache.hpp"
 #include "Elements/Structs/Notification.hpp"
@@ -104,8 +105,11 @@ namespace FlarialGUI {
                                                     float maxWidth = 500, float maxHeight = 500,
                                                     bool moduleFont = false);
 
-    void RoundedRect(float x, float y, D2D_COLOR_F color, float width = 160.0f, float height = 75,
+    void RoundedRect(float x, float y, D2D_COLOR_F color, float width = 160.0f, float height = 75.0,
                      float radiusX = 10.0f, float radiusY = 10.0f);
+
+    void RoundedRect(bool imgui, float x, float y, ImColor color, float width = 160.0f, float height = 75.0,
+        float radiusX = 10.0f, float radiusY = 10.0f);
 
     bool RoundedButton(int index, float x, float y, D2D_COLOR_F color, D2D_COLOR_F textColor,
                        const wchar_t *text, float width = 160.0f, float height = 100.0f,
@@ -290,4 +294,6 @@ namespace FlarialGUI {
     void RoundedRectWithImageAndText(int index, float x, float y, const float width, const float height,
                                      const D2D1_COLOR_F color, int iconId, const float imageWidth,
                                      const float imageHeight);
+
+    ImColor D2DColorToImColor(D2D1_COLOR_F color);
 }

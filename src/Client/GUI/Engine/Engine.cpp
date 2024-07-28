@@ -348,6 +348,10 @@ float FlarialGUI::HueToRGB(float p, float q, float t) {
     return p;
 }
 
+ImColor FlarialGUI::D2DColorToImColor(D2D1_COLOR_F color) {
+    return ImColor(color.r, color.g, color.b, color.a);
+}
+
 HSV FlarialGUI::RGBtoHSV(D2D1_COLOR_F rgb) {
     float r = rgb.r;
     float g = rgb.g;
