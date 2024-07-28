@@ -544,7 +544,7 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
 
     std::string font = Client::settings.getSettingByName<std::string>(moduleFont ? "mod_fontname" : "fontname")->value;
 
-    if (!FontMap[font]) font = "space grotesk";
+    if (!FontMap[font]) font = "162";
 
     ImGui::PushFont(FontMap[font]);
 	float fSize = fontSize/600;
@@ -706,9 +706,6 @@ std::wstring GetFontFilePath(const std::wstring& fontName) {
 }
 
 bool FlarialGUI::LoadFontFromFontFamily(std::string name) {
-
-    if (FontsNotFound[name] or FontMap[name]) return false;
-
     std::transform(name.begin(), name.end(), name.begin(), ::towlower);
     std::wstring fontName = FlarialGUI::to_wide(name);
     std::wstring fontFilePath = GetFontFilePath(fontName);

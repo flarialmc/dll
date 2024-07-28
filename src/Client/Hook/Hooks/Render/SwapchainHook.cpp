@@ -276,26 +276,43 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     } else {
 
-        bool fontLoaded = false;
+        if (ImGui::GetCurrentContext()) {
 
-        std::string font1 = Client::settings.getSettingByName<std::string>("mod_fontname")->value;
-        std::transform(font1.begin(), font1.end(), font1.begin(), ::towlower);
-        if (!FlarialGUI::FontMap[font1]) {
-            if (FlarialGUI::LoadFontFromFontFamily(font1)) {
+            bool fontLoaded = false;
+
+            std::string font1 = Client::settings.getSettingByName<std::string>("mod_fontname")->value;
+            std::transform(font1.begin(), font1.end(), font1.begin(), ::towlower);
+            if (!FlarialGUI::FontMap[font1]) {
+                if (FlarialGUI::LoadFontFromFontFamily(font1)) {
+                    fontLoaded = true;
+                }
+            }
+
+            std::string font2 = Client::settings.getSettingByName<std::string>("fontname")->value;
+            std::transform(font2.begin(), font2.end(), font2.begin(), ::towlower);
+            if (!FlarialGUI::FontMap[font2]) {
+                if (FlarialGUI::LoadFontFromFontFamily(font2)) {
+                    fontLoaded = true;
+                }
+            }
+
+            if (!FlarialGUI::FontMap["162"]) {
+                FlarialGUI::FontMap["162"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 100);
                 fontLoaded = true;
             }
-        }
 
-        std::string font2 = Client::settings.getSettingByName<std::string>("fontname")->value;
-        std::transform(font2.begin(), font2.end(), font2.begin(), ::towlower);
-        if (!FlarialGUI::FontMap[font2]) {
-            if (FlarialGUI::LoadFontFromFontFamily(font2)) {
-                fontLoaded = true;
+            if (fontLoaded) {
+                ImGui::GetIO().Fonts->Build();
+                if (d3d11Device) {
+                    ImGui_ImplDX11_InvalidateDeviceObjects();
+                    ImGui_ImplDX11_CreateDeviceObjects();
+                }
+                else {
+                    ImGui_ImplDX12_InvalidateDeviceObjects();
+                    ImGui_ImplDX12_CreateDeviceObjects();
+                }
+
             }
-        }
-
-        if (fontLoaded) {
-            ImGui::GetIO().Fonts->Build();
         }
 
         while(FrameTransforms.size() > transformDelay)
