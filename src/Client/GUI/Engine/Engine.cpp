@@ -3,6 +3,7 @@
 #include <utility>
 #include <winrt/base.h>
 #include <cmath>
+#include <imgui_internal.h>
 #include <variant>
 #include "Constraints.hpp"
 #include "animations/fadeinout.hpp"
@@ -489,9 +490,22 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, float width,
 
 }
 
+void FlarialGUI::LoadAllImageToCache() {
+
+    for (int i = 0; i < MAX_IMAGE_ID; ++i) {
+        LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "PNG");
+    }
+
+    hasLoadedAll = true;
+
+}
+
+
 void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
                                      const DWRITE_FONT_WEIGHT weight, bool moduleFont) {
+
+
     D2D1_COLOR_F color = colors_text_rgb ? rgbColor : colors_text;
     color.a = o_colors_text;
 
@@ -788,6 +802,39 @@ void FlarialGUI::Notify(const std::string& text) {
     }
 
 }
+
+/* rotation stuff */
+
+static int rotation_start_index;
+void FlarialGUI::ImRotateStart()
+{
+    rotation_start_index = ImGui::GetBackgroundDrawList()->VtxBuffer.Size;
+}
+
+ImVec2 FlarialGUI::ImRotationCenter()
+{
+    ImVec2 l(FLT_MAX, FLT_MAX), u(-FLT_MAX, -FLT_MAX); // bounds
+
+    const auto& buf = ImGui::GetBackgroundDrawList()->VtxBuffer;
+    for (int i = rotation_start_index; i < buf.Size; i++)
+        l = ImMin(l, buf[i].pos), u = ImMax(u, buf[i].pos);
+
+    return ImVec2((l.x+u.x)/2, (l.y+u.y)/2); // or use _ClipRectStack?
+}
+
+ImVec2 operator-(const ImVec2& l, const ImVec2& r) { return{ l.x - r.x, l.y - r.y }; }
+
+void FlarialGUI::ImRotateEnd(float rad, ImVec2 center)
+{
+    float s=sin(rad), c=cos(rad);
+    center = ImRotate(center, s, c) - center;
+
+    auto& buf = ImGui::GetBackgroundDrawList()->VtxBuffer;
+    for (int i = rotation_start_index; i < buf.Size; i++)
+        buf[i].pos = ImRotate(buf[i].pos, s, c) - center;
+}
+
+/* rotation stuff end */
 
 void FlarialGUI::PushImClipRect(ImVec2 pos, ImVec2 size) {
     ImVec2 max(pos.x + size.x, pos.y + size.y);

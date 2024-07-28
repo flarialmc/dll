@@ -73,6 +73,7 @@ namespace FlarialGUI {
     bool inline isInWindowRect = false;
     bool inline inMenu = false;
     bool inline resizing = false;
+    bool hasLoadedAll = false;
 
     inline ID2D1Effect *blur = nullptr;
     inline ID2D1Effect *shadow_blur = nullptr;
@@ -105,8 +106,12 @@ namespace FlarialGUI {
                                                     float maxWidth = 500, float maxHeight = 500,
                                                     bool moduleFont = false);
 
+    void ImRotateStart();
+    ImVec2 ImRotationCenter();
+    void ImRotateEnd(float rad, ImVec2 center = ImRotationCenter());
+
     void RoundedRect(float x, float y, D2D_COLOR_F color, float width = 160.0f, float height = 75.0,
-                     float radiusX = 10.0f, float radiusY = 10.0f, ImDrawFlags flags = 0);
+                     float radiusX = 10.0f, float radiusY = 10.0f, ImDrawFlags flags = ImDrawFlags_RoundCornersAll);
 
     void RoundedRect(bool imgui, float x, float y, ImColor color, float width = 160.0f, float height = 75.0,
         float radiusX = 10.0f, float radiusY = 10.0f);
@@ -286,7 +291,9 @@ namespace FlarialGUI {
     std::string Dropdown(int index, float x, float y, const std::vector<std::string> &options, std::string &value,
                          const std::string &label);
 
-    void image(int resourceId, D2D1_RECT_F rect, LPCTSTR type = "PNG");
+    void image(int resourceId, D2D1_RECT_F rect, LPCTSTR type = "PNG", bool shouldadd = true);
+
+    void LoadAllImageToCache();
 
     void LoadImageFromResource(int resourceId, ID2D1Bitmap **bitmap, LPCTSTR type = "PNG");
 

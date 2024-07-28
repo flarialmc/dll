@@ -4,6 +4,8 @@
 void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect) {
 
 
+    /*
+
     if (SwapchainHook::init && FlarialGUI::blurbrush != nullptr) {
 
         if (factory == nullptr) D2D::context->GetFactory(&factory);
@@ -16,5 +18,6 @@ void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect) {
         Memory::SafeRelease(factory);
         //Memory::SafeRelease(geo); factory does not need to be destroyed
     }
+    */
 
 }

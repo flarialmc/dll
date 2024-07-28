@@ -367,8 +367,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                                 ImGui_ImplWin32_NewFrame();
                                 ImGui::NewFrame();
 
-                                ImGui::GetForegroundDrawList()->AddRectFilledMultiColor(ImVec2(), ImVec2(100, 100), ImColor(255, 255, 255, 255), ImColor(0, 0, 0, 255), ImColor(100, 100, 100, 255), ImColor(0, 255, 0, 255));
-
                                 RenderEvent event{};
                                 EventHandler::onRender(event);
 
@@ -465,9 +463,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                         ImGui_ImplWin32_NewFrame();
                         ImGui::NewFrame();
 
-                        ImGui::GetForegroundDrawList()->AddRectFilledMultiColor(ImVec2(), ImVec2(100, 100), ImColor(255, 255, 255, 255), ImColor(0, 0, 0, 255), ImColor(100, 100, 100, 255), ImColor(0, 255, 0, 255));
-
-
                         RenderEvent event;
                         EventHandler::onRender(event);
 
@@ -493,6 +488,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
             Memory::SafeRelease(FlarialGUI::blur);
         }
     }
+
+    if(init && initImgui && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImageToCache();
 
     if (Client::settings.getSettingByName<bool>("vsync")->value) {
         return funcOriginal(pSwapChain, 0, DXGI_PRESENT_DO_NOT_WAIT);
