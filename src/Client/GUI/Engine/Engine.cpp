@@ -608,7 +608,7 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
 
 
     ImGui::PushFont(FontMap[weightedName]);
-    float fSize = (fontSize / 160);
+    float fSize = (fontSize / 225);
 
 	ImGui::SetWindowFontScale(fSize);
 
@@ -661,7 +661,7 @@ void FlarialGUI::LoadFont(int resourceId) {
     outFile.write(reinterpret_cast<const char*>(pFontData), dwFontSize);
     outFile.close();
 
-    AddFontResource(lpFileName.c_str());
+    //AddFontResource(lpFileName.c_str());
 }
 
 std::wstring FlarialGUI::GetFontFilePath(const std::wstring& fontName, DWRITE_FONT_WEIGHT weight) {
