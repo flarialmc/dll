@@ -548,7 +548,7 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
     if (!FontMap[font]) font = "162";
 
     ImGui::PushFont(FontMap[font]);
-    float fSize = (fontSize / 120);
+    float fSize = (fontSize / 175);
 
 	ImGui::SetWindowFontScale(fSize);
 
