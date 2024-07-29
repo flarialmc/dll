@@ -168,16 +168,20 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
                 //ImGui Init
 
-                ImGui::CreateContext();
+                if(!initImgui) {
+                    ImGui::CreateContext();
 
-                ID3D11DeviceContext* ppContext = nullptr;
-			    d3d11Device->GetImmediateContext(&ppContext);
-                ImGui_ImplWin32_Init(window);
-			    ImGui_ImplDX11_Init(d3d11Device, ppContext);
-			    ppContext->Release();
+                    ID3D11DeviceContext* ppContext = nullptr;
+                    d3d11Device->GetImmediateContext(&ppContext);
+                    ImGui_ImplWin32_Init(window);
+                    ImGui_ImplDX11_Init(d3d11Device, ppContext);
+                    ppContext->Release();
+
+                    initImgui = true;
+
+                }
 
                 Memory::SafeRelease(eBackBuffer);
-
                 init = true;
             }
 
