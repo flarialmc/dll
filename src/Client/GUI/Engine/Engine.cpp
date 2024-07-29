@@ -592,7 +592,7 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
 
 
     ImGui::PushFont(FontMap[font]);
-    float fSize = (fontSize / 175);
+    float fSize = (fontSize / 160);
 
 	ImGui::SetWindowFontScale(fSize);
 
@@ -772,7 +772,7 @@ void FlarialGUI::LoadFonts(std::map<std::string, ImFont*>& FontMap) {
                 std::string fontName = WideToNarrow(entry.path().stem().wstring());
 
                 FontMap[fontName] = io.Fonts->AddFontFromFileTTF(
-                    WideToNarrow(fontPath).c_str(), 75, &config
+                    WideToNarrow(fontPath).c_str(), 30, &config
                 );
             }
         }
