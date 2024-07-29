@@ -43,7 +43,7 @@ DWORD WINAPI init(HMODULE real)
             if(!Client::disable) {
                 if(SDK::hasInstanced && SDK::clientInstance != nullptr) {
                     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                        if(elapsed >= std::chrono::seconds(60)) {
+                        if(elapsed >= std::chrono::seconds(27)) {
                             ModuleManager::onlineUsers.clear();
                             std::string name = SDK::clientInstance->getLocalPlayer()->playerName;
                             ModuleManager::onlineUsers.push_back(Utils::removeColorCodes(name));
@@ -91,7 +91,7 @@ DWORD WINAPI init(HMODULE real)
                                 name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickListener::original));
                             }
                             // send thing
-                            DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend));
+                            std::cout << DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend)) << std::endl;
 
                             lastBeatTime = now;
                         }

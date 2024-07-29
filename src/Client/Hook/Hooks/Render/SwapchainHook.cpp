@@ -334,7 +334,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
             }
 
             if (!FlarialGUI::FontMap["164"]) {
-                FlarialGUI::FontMap["164"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 15);
+                FlarialGUI::FontMap["164"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 2);
                 fontLoaded = true;
             }
 
