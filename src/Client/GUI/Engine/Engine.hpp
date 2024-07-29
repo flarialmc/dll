@@ -92,7 +92,7 @@ namespace FlarialGUI {
     extern LRUCache<uint64_t, winrt::com_ptr<ID2D1LinearGradientBrush>> gradientBrushCache;
 
     void PushSize(float x, float y, float width, float height);
-
+    void LoadFonts(std::map<std::string, ImFont*>& FontMap);
     void PopSize();
 
     void PopAllStack();

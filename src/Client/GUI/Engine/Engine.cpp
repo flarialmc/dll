@@ -528,6 +528,14 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
     FlarialTextWithFont(x, y, text, width, height, alignment, fontSize, weight, color, moduleFont);
 }
 
+bool replace(std::string& str, const std::string& from, const std::string& to) {
+    size_t start_pos = str.find(from);
+    if(start_pos == std::string::npos)
+        return false;
+    str.replace(start_pos, from.length(), to);
+    return true;
+}
+
 void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
                                      const DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont) {
@@ -545,7 +553,43 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
 
     std::string font = Client::settings.getSettingByName<std::string>(moduleFont ? "mod_fontname" : "fontname")->value;
 
-    if (!FontMap[font]) font = "162";
+    if(!font.contains("-")) {
+        switch (weight) {
+
+            case DWRITE_FONT_WEIGHT_BOLD:
+                font = font + "-Bold";
+            break;
+            case DWRITE_FONT_WEIGHT_NORMAL:
+                font = font + "-Normal";
+            break;
+            case DWRITE_FONT_WEIGHT_SEMI_BOLD:
+                font = font + "-SemiBold";
+            break;
+            case DWRITE_FONT_WEIGHT_EXTRA_BOLD:
+                font = font + "-ExtraBold";
+            break;
+            case DWRITE_FONT_WEIGHT_MEDIUM:
+                font = font + "-Medium";
+            break;
+            case DWRITE_FONT_WEIGHT_LIGHT:
+                font = font + "-Light";
+            break;
+            case DWRITE_FONT_WEIGHT_EXTRA_LIGHT:
+                font = font + "-ExtraLight";
+            break;
+        }
+    }
+
+    if(font.contains("Minecraft")) font = "164";
+
+    if(!FontMap[font] && font.contains("Normal")) replace(font, "Normal", "Medium");
+
+    if (!FontMap[font] || font == "Space Grotesk") font = "162";
+
+    if(font == "162" && weight == DWRITE_FONT_WEIGHT_BOLD) font = "163";
+
+
+
 
     ImGui::PushFont(FontMap[font]);
     float fSize = (fontSize / 175);
@@ -706,27 +750,32 @@ std::wstring GetFontFilePath(const std::wstring& fontName) {
     return std::wstring(filePathBuffer.data(), filePathLength);
 }
 
-bool FlarialGUI::LoadFontFromFontFamily(std::string name) {
-    std::transform(name.begin(), name.end(), name.begin(), ::towlower);
-    std::wstring fontName = FlarialGUI::to_wide(name);
-    std::wstring fontFilePath = GetFontFilePath(fontName);
-    std::cout << WideToNarrow(fontFilePath).c_str() << std::endl;
+void FlarialGUI::LoadFonts(std::map<std::string, ImFont*>& FontMap) {
+    namespace fs = std::filesystem;
+    // Directories to search for fonts
+    std::vector<std::wstring> fontDirectories = {
+        std::wstring(_wgetenv(L"USERPROFILE")) + L"\\AppData\\Local\\Microsoft\\Windows\\Fonts"
+    };
+    ImGuiIO& io = ImGui::GetIO();
 
-    if (!fontFilePath.empty()) {
-        std::ifstream fontFile(fontFilePath, std::ios::binary);
-        if (fontFile) {
+    ImFontConfig config;
+    config.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_ForceAutoHint;
 
-            ImFontConfig config;
-            config.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_ForceAutoHint;
-			FontMap[name] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 75, &config);
+    for (const auto& dir : fontDirectories) {
+        for (const auto& entry : fs::directory_iterator(dir)) {
 
-            if(!FontMap[name]) return false;
-            return true;
+            if (entry.is_regular_file() && entry.path().extension() == L".ttf" && !entry.path().filename().string().contains("fon")) {
+
+                std::cout << entry.path().string() << std::endl;
+
+                std::wstring fontPath = entry.path().wstring();
+                std::string fontName = WideToNarrow(entry.path().stem().wstring());
+
+                FontMap[fontName] = io.Fonts->AddFontFromFileTTF(
+                    WideToNarrow(fontPath).c_str(), 75, &config
+                );
+            }
         }
-    }
-    else {
-        FontsNotFound[name] = true;
-        return false;
     }
 }
 

@@ -25,6 +25,7 @@ SwapchainHook::SwapchainHook() : Hook("swapchain_hook", "") {}
 ID3D12CommandQueue *SwapchainHook::queue = nullptr;
 
 bool initImgui = false;
+bool allfontloaded = false;
 
 static std::chrono::high_resolution_clock fpsclock;
 static std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
@@ -280,25 +281,23 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
             bool fontLoaded = false;
 
-            std::string font1 = Client::settings.getSettingByName<std::string>("mod_fontname")->value;
-            std::transform(font1.begin(), font1.end(), font1.begin(), ::towlower);
-            if (!FlarialGUI::FontMap[font1]) {
-                if (FlarialGUI::LoadFontFromFontFamily(font1)) {
-                    fontLoaded = true;
-                }
-            }
-
-            std::string font2 = Client::settings.getSettingByName<std::string>("fontname")->value;
-            std::transform(font2.begin(), font2.end(), font2.begin(), ::towlower);
-            if (!FlarialGUI::FontMap[font2]) {
-                if (FlarialGUI::LoadFontFromFontFamily(font2)) {
-                    std::cout << "yes" << std::endl;
-                    fontLoaded = true;
-                }
+            if(!allfontloaded) {
+                FlarialGUI::LoadFonts(FlarialGUI::FontMap);
+                allfontloaded = true;
             }
 
             if (!FlarialGUI::FontMap["162"]) {
                 FlarialGUI::FontMap["162"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 30);
+                fontLoaded = true;
+            }
+
+            if (!FlarialGUI::FontMap["163"]) {
+                FlarialGUI::FontMap["163"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "163" + ".ttf").c_str(), 30);
+                fontLoaded = true;
+            }
+
+            if (!FlarialGUI::FontMap["164"]) {
+                FlarialGUI::FontMap["164"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 30);
                 fontLoaded = true;
             }
 
