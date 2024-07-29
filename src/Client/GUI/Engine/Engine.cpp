@@ -26,6 +26,7 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include <misc/freetype/imgui_freetype.h>
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -547,7 +548,7 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
     if (!FontMap[font]) font = "162";
 
     ImGui::PushFont(FontMap[font]);
-    float fSize = (fontSize / 600) * 1.25;
+    float fSize = (fontSize / 600);
 
 	ImGui::SetWindowFontScale(fSize);
 
@@ -715,8 +716,7 @@ bool FlarialGUI::LoadFontFromFontFamily(std::string name) {
         if (fontFile) {
 
             ImFontConfig config;
-            config.PixelSnapH = true;
-            config.RasterizerMultiply = 3;
+            config.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_ForceAutoHint;
 			FontMap[name] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 75, &config);
 
             if(!FontMap[name]) return false;
