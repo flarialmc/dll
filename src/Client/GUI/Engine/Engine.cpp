@@ -167,7 +167,7 @@ uint64_t generateUniqueLinearGradientBrushKey(float x, float hexPreviewSize, flo
     return combinedHash;
 }
 
-std::string WideToNarrow(const std::wstring& wideStr) {
+std::string FlarialGUI::WideToNarrow(const std::wstring& wideStr) {
     int narrowStrLen = WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, nullptr, 0, nullptr, nullptr);
     std::vector<char> narrowStr(narrowStrLen);
     WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, narrowStr.data(), narrowStrLen, nullptr, nullptr);
@@ -536,6 +536,36 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
     return true;
 }
 
+std::string FlarialGUI::GetWeightedName(std::string name, DWRITE_FONT_WEIGHT weight) {
+
+    if(!name.contains("-")) {
+        switch (weight) {
+
+            case DWRITE_FONT_WEIGHT_BOLD:
+               return name + "-Bold";
+            break;
+            case DWRITE_FONT_WEIGHT_NORMAL:
+                return name + "-Normal";
+            break;
+            case DWRITE_FONT_WEIGHT_SEMI_BOLD:
+                return name + "-SemiBold";
+            break;
+            case DWRITE_FONT_WEIGHT_EXTRA_BOLD:
+                return name + "-ExtraBold";
+            break;
+            case DWRITE_FONT_WEIGHT_MEDIUM:
+                return name + "-Medium";
+            break;
+            case DWRITE_FONT_WEIGHT_LIGHT:
+                return name + "-Light";
+            break;
+            case DWRITE_FONT_WEIGHT_EXTRA_LIGHT:
+                return name + "-ExtraLight";
+            break;
+        }
+    }
+}
+
 void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
                                      const DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont) {
@@ -552,46 +582,32 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
     if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
 
     std::string font = Client::settings.getSettingByName<std::string>(moduleFont ? "mod_fontname" : "fontname")->value;
+    std::string weightedName = GetWeightedName(font, weight);
+    std::transform(weightedName.begin(), weightedName.end(), weightedName.begin(), ::towlower);
 
-    if(!font.contains("-")) {
-        switch (weight) {
+    if(!FontMap[weightedName] && !FontsNotFound[weightedName]) {
 
-            case DWRITE_FONT_WEIGHT_BOLD:
-                font = font + "-Bold";
-            break;
-            case DWRITE_FONT_WEIGHT_NORMAL:
-                font = font + "-Normal";
-            break;
-            case DWRITE_FONT_WEIGHT_SEMI_BOLD:
-                font = font + "-SemiBold";
-            break;
-            case DWRITE_FONT_WEIGHT_EXTRA_BOLD:
-                font = font + "-ExtraBold";
-            break;
-            case DWRITE_FONT_WEIGHT_MEDIUM:
-                font = font + "-Medium";
-            break;
-            case DWRITE_FONT_WEIGHT_LIGHT:
-                font = font + "-Light";
-            break;
-            case DWRITE_FONT_WEIGHT_EXTRA_LIGHT:
-                font = font + "-ExtraLight";
-            break;
+        if(moduleFont) {
+            DoLoadModuleFontLater = true;
+            LoadModuleFontLater = font;
+            LoadModuleFontLaterWeight = weight;
+        } else {
+            DoLoadGUIFontLater = true;
+            LoadGUIFontLater = font;
+            LoadGUIFontLaterWeight = weight;
         }
     }
 
-    if(font.contains("Minecraft")) font = "164";
+    if(weightedName.contains("Minecraft")) weightedName = "164";
 
-    if(!FontMap[font] && font.contains("Normal")) replace(font, "Normal", "Medium");
+    if(!FontMap[weightedName] && weightedName.contains("Normal")) replace(weightedName, "Normal", "Medium");
 
-    if (!FontMap[font] || font == "Space Grotesk") font = "162";
+    if (!FontMap[weightedName] || font == "Space Grotesk") weightedName = "162";
 
-    if(font == "162" && weight == DWRITE_FONT_WEIGHT_BOLD) font = "163";
-
-
+    if(weightedName == "162" && weight == DWRITE_FONT_WEIGHT_BOLD) weightedName = "163";
 
 
-    ImGui::PushFont(FontMap[font]);
+    ImGui::PushFont(FontMap[weightedName]);
     float fSize = (fontSize / 160);
 
 	ImGui::SetWindowFontScale(fSize);
@@ -648,8 +664,7 @@ void FlarialGUI::LoadFont(int resourceId) {
     AddFontResource(lpFileName.c_str());
 }
 
-// Function to get the font file path
-std::wstring GetFontFilePath(const std::wstring& fontName) {
+std::wstring FlarialGUI::GetFontFilePath(const std::wstring& fontName, DWRITE_FONT_WEIGHT weight) {
     Microsoft::WRL::ComPtr<IDWriteFactory> factory;
     Microsoft::WRL::ComPtr<IDWriteFontCollection> fontCollection;
     Microsoft::WRL::ComPtr<IDWriteFontFamily> fontFamily;
@@ -688,10 +703,31 @@ std::wstring GetFontFilePath(const std::wstring& fontName) {
         return L"";
     }
 
-    // Get the font
-    hr = fontFamily->GetFont(0, &font);
-    if (FAILED(hr)) {
+    // Get the font count in the family
+    UINT32 fontCount = fontFamily->GetFontCount();
+    if (fontCount == 0) {
         return L"";
+    }
+
+    // Find the font with the specified weight
+    UINT32 fontIndex = -1;
+    for (UINT32 i = 0; i < fontCount; ++i) {
+        Microsoft::WRL::ComPtr<IDWriteFont> tempFont;
+        hr = fontFamily->GetFont(i, &tempFont);
+        if (FAILED(hr)) {
+            continue;
+        }
+        if (tempFont->GetWeight() == weight) {
+
+            fontIndex = i;
+            fontFamily->GetFont(fontIndex, &font);
+            break;
+        }
+    }
+
+
+    if (fontIndex == -1) {
+        if(FAILED(fontFamily->GetFont(0, &font))) return L"";
     }
 
     // Get the font face
@@ -709,7 +745,7 @@ std::wstring GetFontFilePath(const std::wstring& fontName) {
 
     // Allocate space for the font files
     std::vector<Microsoft::WRL::ComPtr<IDWriteFontFile>> fontFiles(fileCount);
-    
+
     // Get the font files
     hr = fontFace->GetFiles(&fileCount, reinterpret_cast<IDWriteFontFile**>(fontFiles.data()));
     if (FAILED(hr)) {
@@ -747,8 +783,36 @@ std::wstring GetFontFilePath(const std::wstring& fontName) {
         return L"";
     }
 
+    std::cout << FlarialGUI::WideToNarrow(std::wstring(filePathBuffer.data(), filePathLength)).c_str() << std::endl;
+
     return std::wstring(filePathBuffer.data(), filePathLength);
 }
+
+
+bool FlarialGUI::LoadFontFromFontFamily(std::string name, std::string weightedName, DWRITE_FONT_WEIGHT weight) {
+    std::transform(name.begin(), name.end(), name.begin(), ::towlower);
+    std::wstring fontName = FlarialGUI::to_wide(name);
+    std::wstring fontFilePath = GetFontFilePath(fontName, weight);
+    //std::cout << WideToNarrow(fontFilePath).c_str() << std::endl;
+
+    if (!fontFilePath.empty()) {
+
+        std::ifstream fontFile(fontFilePath, std::ios::binary);
+        if (fontFile) {
+
+            ImFontConfig config;
+            config.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_ForceAutoHint;
+            FontMap[weightedName] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 75, &config);
+            if(!FontMap[weightedName]) return false;
+            return true;
+
+        }
+    }
+
+    FontsNotFound[weightedName] = true;
+    return false;
+}
+
 
 void FlarialGUI::LoadFonts(std::map<std::string, ImFont*>& FontMap) {
     namespace fs = std::filesystem;

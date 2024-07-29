@@ -60,6 +60,17 @@ namespace FlarialGUI {
     float inline barscrollpos = 0;
     float inline barscrollposmodifier = 10.0f;
 
+    std::string inline LoadGUIFontLater = "";
+    bool inline DoLoadGUIFontLater = false;
+    DWRITE_FONT_WEIGHT inline LoadGUIFontLaterWeight = DWRITE_FONT_WEIGHT_NORMAL;
+
+
+    std::string inline LoadModuleFontLater = "";
+    bool inline DoLoadModuleFontLater = false;
+    DWRITE_FONT_WEIGHT inline LoadModuleFontLaterWeight = DWRITE_FONT_WEIGHT_NORMAL;
+
+    std::string GetWeightedName(std::string name, DWRITE_FONT_WEIGHT weight);
+
     inline WindowRect WindowRects[1000];
     inline SliderRect SliderRects[2500];
     inline TextBoxStruct TextBoxes[1000];
@@ -93,6 +104,8 @@ namespace FlarialGUI {
 
     void PushSize(float x, float y, float width, float height);
     void LoadFonts(std::map<std::string, ImFont*>& FontMap);
+    std::wstring GetFontFilePath(const std::wstring& fontName, DWRITE_FONT_WEIGHT weight);
+    std::string WideToNarrow(const std::wstring& wideStr);
     void PopSize();
 
     void PopAllStack();
@@ -307,7 +320,7 @@ namespace FlarialGUI {
 
     void LoadFont(int resourceId);
 
-    bool LoadFontFromFontFamily(std::string name);
+    bool LoadFontFromFontFamily(std::string name, std::string weightedName, DWRITE_FONT_WEIGHT weight);
 
     void RoundedRectWithImageAndText(int index, float x, float y, const float width, const float height,
                                      const D2D1_COLOR_F color, int iconId, const float imageWidth,

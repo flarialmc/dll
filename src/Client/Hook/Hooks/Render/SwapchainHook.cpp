@@ -285,10 +285,43 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
             bool fontLoaded = false;
 
+
+            if(FlarialGUI::DoLoadModuleFontLater) {
+                std::string font1 = FlarialGUI::LoadModuleFontLater;
+                std::transform(font1.begin(), font1.end(), font1.begin(), ::towlower);
+                std::string weightedName = FlarialGUI::GetWeightedName(font1, FlarialGUI::LoadModuleFontLaterWeight);
+                std::transform(weightedName.begin(), weightedName.end(), weightedName.begin(), ::towlower);
+                if (!FlarialGUI::FontMap[weightedName]) {
+                    if (FlarialGUI::LoadFontFromFontFamily(font1, weightedName, FlarialGUI::LoadModuleFontLaterWeight)) {
+                        fontLoaded = true;
+                    }
+                }
+
+                FlarialGUI::DoLoadModuleFontLater = false;
+            }
+
+            if(FlarialGUI::DoLoadGUIFontLater) {
+                std::string font2 = FlarialGUI::LoadGUIFontLater;
+                std::transform(font2.begin(), font2.end(), font2.begin(), ::towlower);
+                std::string weightedName = FlarialGUI::GetWeightedName(font2, FlarialGUI::LoadGUIFontLaterWeight);
+                std::transform(weightedName.begin(), weightedName.end(), weightedName.begin(), ::towlower);
+                if (!FlarialGUI::FontMap[weightedName]) {
+                    if (FlarialGUI::LoadFontFromFontFamily(font2, weightedName, FlarialGUI::LoadGUIFontLaterWeight)) {
+                        fontLoaded = true;
+                    }
+                }
+
+                FlarialGUI::DoLoadGUIFontLater = false;
+            }
+
+                //std::cout << FlarialGUI::WideToNarrow(FlarialGUI::GetFontFilePath(L"Dosis", DWRITE_FONT_WEIGHT_EXTRA_BLACK)).c_str() << std::endl;
+            /*
             if(!allfontloaded) {
                 FlarialGUI::LoadFonts(FlarialGUI::FontMap);
+
                 allfontloaded = true;
             }
+            */
 
             if (!FlarialGUI::FontMap["162"]) {
                 FlarialGUI::FontMap["162"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 30);
