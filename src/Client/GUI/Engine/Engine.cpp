@@ -548,7 +548,7 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
     if (!FontMap[font]) font = "162";
 
     ImGui::PushFont(FontMap[font]);
-    float fSize = (fontSize / 600);
+    float fSize = (fontSize / 120);
 
 	ImGui::SetWindowFontScale(fSize);
 
@@ -710,6 +710,7 @@ bool FlarialGUI::LoadFontFromFontFamily(std::string name) {
     std::transform(name.begin(), name.end(), name.begin(), ::towlower);
     std::wstring fontName = FlarialGUI::to_wide(name);
     std::wstring fontFilePath = GetFontFilePath(fontName);
+    std::cout << WideToNarrow(fontFilePath).c_str() << std::endl;
 
     if (!fontFilePath.empty()) {
         std::ifstream fontFile(fontFilePath, std::ios::binary);

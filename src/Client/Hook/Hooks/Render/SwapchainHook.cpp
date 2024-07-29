@@ -292,12 +292,13 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
             std::transform(font2.begin(), font2.end(), font2.begin(), ::towlower);
             if (!FlarialGUI::FontMap[font2]) {
                 if (FlarialGUI::LoadFontFromFontFamily(font2)) {
+                    std::cout << "yes" << std::endl;
                     fontLoaded = true;
                 }
             }
 
             if (!FlarialGUI::FontMap["162"]) {
-                FlarialGUI::FontMap["162"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 100);
+                FlarialGUI::FontMap["162"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 30);
                 fontLoaded = true;
             }
 
