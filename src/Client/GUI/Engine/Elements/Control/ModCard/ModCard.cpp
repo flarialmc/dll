@@ -252,10 +252,13 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     if (FlarialGUI::RoundedButton(index, buttonx - buttonWidth, buttony - buttonHeight,
                                   FlarialGUI::buttonColors[index], textCol,
-                                  FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, round.x,
+                                  L"", buttonWidth, buttonHeight, round.x,
                                   round.x)) {
         mod->toggle();
                                   }
+
+    FlarialGUI::FlarialTextWithFont((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.15f, paddingwidth), buttony - buttonHeight, FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, DWRITE_TEXT_ALIGNMENT_CENTER, buttonWidth, DWRITE_FONT_WEIGHT_NORMAL, false);
+
     if (FlarialGUI::isInScrollView)
         buttony += FlarialGUI::scrollpos;
 

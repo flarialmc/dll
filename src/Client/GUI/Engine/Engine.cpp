@@ -566,6 +566,18 @@ std::string FlarialGUI::GetWeightedName(std::string name, DWRITE_FONT_WEIGHT wei
     }
 }
 
+bool hasEnding (std::string const &fullString, std::string const &ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
+}
+
+bool ifFontScale2(const float fontSize) {
+    return fontSize / 135 > 1;
+}
+
 void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
                                      const DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont) {
@@ -585,7 +597,7 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
     std::string weightedName = GetWeightedName(font, weight);
     std::transform(weightedName.begin(), weightedName.end(), weightedName.begin(), ::towlower);
 
-    if(!FontMap[weightedName] && !FontsNotFound[weightedName]) {
+    if(!FontMap[weightedName + "-1"] && !FontsNotFound[weightedName + "-1"]) {
 
         if(moduleFont) {
             DoLoadModuleFontLater = true;
@@ -598,30 +610,38 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
         }
     }
 
+    if(ifFontScale2(fontSize)) weightedName += "-2.0";
+    else weightedName += "-1";
+
     if(weightedName.contains("minecraft")) weightedName = "164";
 
     if(!FontMap[weightedName] && weightedName.contains("Normal")) replace(weightedName, "Normal", "Medium");
 
-    if (!FontMap[weightedName] || font == "Space Grotesk") weightedName = "162";
+    if (!FontMap[weightedName] || font == "Space Grotesk") weightedName = "162-1";
 
-    if(weightedName == "162" && weight == DWRITE_FONT_WEIGHT_BOLD) weightedName = "163";
+    if((weightedName == "162-1" || weightedName == "162") && weight == DWRITE_FONT_WEIGHT_BOLD) weightedName = "163-2.0";
 
+    if(weightedName == "162") weightedName = "162-1";
+
+
+    float sizeMultiplier = 1.0f;
+    if(hasEnding(weightedName, "2.0")) sizeMultiplier = 0.6f;
 
     ImGui::PushFont(FontMap[weightedName]);
-    float fSize = (fontSize / 135);
+    float fSize = (fontSize / 135) * sizeMultiplier;
 
 	ImGui::SetWindowFontScale(fSize);
 
 	switch (alignment) {
-        case DWRITE_TEXT_ALIGNMENT::DWRITE_TEXT_ALIGNMENT_LEADING:
+        case DWRITE_TEXT_ALIGNMENT_LEADING:
 			break;
 
-        case DWRITE_TEXT_ALIGNMENT::DWRITE_TEXT_ALIGNMENT_CENTER: {
+        case DWRITE_TEXT_ALIGNMENT_CENTER: {
 			x += (width / 2) - (ImGui::CalcTextSize(WideToNarrow(text).c_str()).x / 2);
 			break;
 		}
 
-		case DWRITE_TEXT_ALIGNMENT::DWRITE_TEXT_ALIGNMENT_TRAILING: {
+		case DWRITE_TEXT_ALIGNMENT_TRAILING: {
 			x += (width - ImGui::CalcTextSize(WideToNarrow(text).c_str()).x);
 			break;
 		}
@@ -801,9 +821,9 @@ bool FlarialGUI::LoadFontFromFontFamily(std::string name, std::string weightedNa
         if (fontFile) {
 
             ImFontConfig config;
-            config.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_ForceAutoHint;
-            FontMap[weightedName] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 23, &config);
-            if(!FontMap[weightedName]) return false;
+            FontMap[weightedName + "-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 23, &config);
+            FontMap[weightedName + "-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 40, &config);
+            if(!FontMap[weightedName + "-1"]) return false;
             return true;
 
         }
