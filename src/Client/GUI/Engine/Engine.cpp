@@ -578,6 +578,7 @@ bool ifFontScale2(const float fontSize) {
     return fontSize / 135 > 1;
 }
 
+
 void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
                                      const DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont) {
@@ -622,6 +623,10 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
     if((weightedName == "162-1" || weightedName == "162") && weight == DWRITE_FONT_WEIGHT_BOLD) weightedName = "163-2.0";
 
     if(weightedName == "162") weightedName = "162-1";
+
+    if(weightedName.contains("-1") && ifFontScale2(fontSize)) replace(weightedName, "-1", "-2.0");
+
+    std::cout << weightedName << std::endl;
 
 
     float sizeMultiplier = 1.0f;

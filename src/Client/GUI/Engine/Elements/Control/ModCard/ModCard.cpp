@@ -109,7 +109,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
         FlarialGUI::ShadowRect(
             Vec2<float>(x - diffX2, realY - diffY2),
-            Vec2<float>(shadowSizes[index].x, shadowSizes[index].y),
+            Vec2<float>(BottomRoundedWidth, BottomRoundedHeight),
             D2D1::ColorF(D2D1::ColorF::White),
             round.x,
             15.0f
