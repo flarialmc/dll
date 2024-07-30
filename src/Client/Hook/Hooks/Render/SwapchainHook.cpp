@@ -131,20 +131,18 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 // Limit the frame factor to a maximum of 1.0
     FlarialGUI::frameFactor = std::min(FlarialGUI::frameFactor, 1.0f);
 
-
-    if (Client::settings.getSettingByName<bool>("killdx")->value) {
-        ID3D12Device5 *d3d12device3;
-
-        if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device3)))) {
-            Logger::debug("[SwapChain] Removed d3d12 device");
-            pSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
-            d3d12device3->RemoveDevice();
-
-            return funcOriginal(pSwapChain, syncInterval, flags);
-        }
-    }
-
     if (!init) {
+        if (Client::settings.getSettingByName<bool>("killdx")->value) {
+
+            ID3D12Device5 *d3d12device3;
+
+            if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device3)))) {
+                Logger::debug("[SwapChain] Removed d3d12 device");
+                pSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+                d3d12device3->RemoveDevice();
+
+                return funcOriginal(pSwapChain, syncInterval, flags);
+            }
 
             if(queue == nullptr) {
                 Logger::debug("[SwapChain] Not a DX12 device, running dx11 procedures");
