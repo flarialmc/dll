@@ -619,7 +619,7 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
 
     if (!FontMap[weightedName] || font == "Space Grotesk") weightedName = "162-1";
 
-    //if((weightedName == "162-1" || weightedName == "162") && weight == DWRITE_FONT_WEIGHT_BOLD) weightedName = "163-2.0";
+    if((weightedName == "162-1" || weightedName == "162") && weight == DWRITE_FONT_WEIGHT_BOLD) weightedName = "163-2.0";
 
     if(weightedName == "162") weightedName = "162-1";
 
