@@ -802,7 +802,7 @@ bool FlarialGUI::LoadFontFromFontFamily(std::string name, std::string weightedNa
 
             ImFontConfig config;
             config.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_ForceAutoHint;
-            FontMap[weightedName] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 30, &config);
+            FontMap[weightedName] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 23, &config);
             if(!FontMap[weightedName]) return false;
             return true;
 
