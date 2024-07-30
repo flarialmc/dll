@@ -501,6 +501,11 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 		            d3d12DescriptorHeapBackBuffers->Release();
 		            d3d12DescriptorHeapBackBuffers = nullptr;
 	            }
+
+                if (!frameContexts.empty() && frameContexts.front().commandAllocator != nullptr) {
+                    frameContexts.front().commandAllocator = nullptr;
+                }
+
 	            if (!frameContexts.empty() && frameContexts.front().main_render_target_resource != nullptr) {
 		            frameContexts.front().main_render_target_resource->Release();
 		            frameContexts.front().main_render_target_resource = nullptr;
