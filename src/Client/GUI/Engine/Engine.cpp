@@ -626,7 +626,7 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
 
     if(weightedName.contains("-1") && ifFontScale2(fontSize)) replace(weightedName, "-1", "-2.0");
 
-    std::cout << weightedName << std::endl;
+    //std::cout << weightedName << std::endl;
 
 
     float sizeMultiplier = 1.0f;
