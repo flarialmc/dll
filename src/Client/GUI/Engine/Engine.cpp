@@ -598,7 +598,7 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
         }
     }
 
-    if(weightedName.contains("Minecraft")) weightedName = "164";
+    if(weightedName.contains("minecraft")) weightedName = "164";
 
     if(!FontMap[weightedName] && weightedName.contains("Normal")) replace(weightedName, "Normal", "Medium");
 
