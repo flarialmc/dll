@@ -106,17 +106,19 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 
     cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
 
+
+    sizes[text] = FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.006f,
+                                    FlarialGUI::to_wide(text).c_str(), s * 4.3f, s * 1.1f,
+                                    DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f, DWRITE_FONT_WEIGHT_NORMAL);
+
     FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorX,
-                     x + Constraints::SpacingConstraint(0.555f, s) + TextSizes[sizes[text]] +
-                     Constraints::RelativeConstraint(0.055f), 0.420f * FlarialGUI::frameFactor);
+                 x + Constraints::SpacingConstraint(0.555f, s) + TextSizes[sizes[text]] +
+                 Constraints::RelativeConstraint(0.055f), 0.420f * FlarialGUI::frameFactor);
 
     if (FlarialGUI::TextBoxes[index].cursorX > x)
         FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX, y + Constraints::RelativeConstraint(0.05f) / 2.0f,
                                 cursorCol, Constraints::RelativeConstraint(0.005f),
                                 s * 0.82f - Constraints::RelativeConstraint(0.025f), 0, 0);
-    sizes[text] = FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.006f,
-                                    FlarialGUI::to_wide(text).c_str(), s * 4.3f, s * 1.1f,
-                                    DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f, DWRITE_FONT_WEIGHT_NORMAL);
 
     float clickingY = y;
     if (isInScrollView) clickingY += scrollpos;
