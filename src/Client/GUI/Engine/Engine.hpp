@@ -96,6 +96,7 @@ namespace FlarialGUI {
     inline ID2D1Image *blur_bitmap_cache = nullptr;
 
     extern std::unordered_map<std::string, ToolTipStruct> tooltips;
+    extern std::unordered_map<std::string, float> TextSizes;
     extern LRUCache<UINT32, winrt::com_ptr<ID2D1SolidColorBrush>> brushCache;
     extern LRUCache<uint64_t, winrt::com_ptr<IDWriteTextLayout>> textLayoutCache;
     extern LRUCache<UINT32, winrt::com_ptr<IDWriteTextFormat>> textFormatCache;
@@ -234,12 +235,12 @@ namespace FlarialGUI {
 
     void PopImClipRect();
 
-    void
+    std::string
     FlarialTextWithFont(float x, float y, const wchar_t *text, float width, float height,
                         DWRITE_TEXT_ALIGNMENT alignment, float fontSize,
                         DWRITE_FONT_WEIGHT weight, bool moduleFont = false);
 
-    void
+    std::string
     FlarialTextWithFont(float x, float y, const wchar_t *text, float width, float height,
                         DWRITE_TEXT_ALIGNMENT alignment, float fontSize,
                         DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont = false);
