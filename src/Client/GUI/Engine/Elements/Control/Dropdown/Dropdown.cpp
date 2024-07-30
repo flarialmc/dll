@@ -117,9 +117,10 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
         FlarialGUI::lerp(y, originalY, 0.25f * FlarialGUI::frameFactor);
         FlarialGUI::DropDownMenus[index].curColor = FlarialGUI::LerpColor(FlarialGUI::DropDownMenus[index].curColor,
                                                                           selectedCol, 0.1f * FlarialGUI::frameFactor);
+
         FlarialGUI::lerp(
                 FlarialGUI::DropDownMenus[index].rotation,
-                180.0f,
+                270.f,
                 0.25f * FlarialGUI::frameFactor
         );
     } else {
@@ -136,7 +137,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
                                                                           0.1f * FlarialGUI::frameFactor);
         FlarialGUI::lerp(
                 FlarialGUI::DropDownMenus[index].rotation,
-                0.0f,
+                90.f,
                 0.25f * FlarialGUI::frameFactor
         );
     }
@@ -257,15 +258,12 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     if (ImagesClass::images[IDR_DOWN_PNG] == nullptr)
         LoadImageFromResource(IDR_DOWN_PNG, &ImagesClass::images[IDR_DOWN_PNG]);
 
+    /*
     D2D1_MATRIX_3X2_F oldTransform;
     D2D::context->GetTransform(&oldTransform);
+    */
 
-    auto rectf = D2D1::RectF(ix, iy, ix + is, iy + is);
-
-    if (isInScrollView) {
-        rectf.top += scrollpos;
-        rectf.bottom += scrollpos;
-    }
+    /*
 
     D2D1_POINT_2F rotationCenter = D2D1::Point2F(rectf.left + is / 2, rectf.top + is / 2);
     D2D1_MATRIX_3X2_F rotationMatrix = D2D1::Matrix3x2F::Rotation(FlarialGUI::DropDownMenus[index].rotation,
@@ -276,6 +274,17 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     D2D::context->DrawBitmap(ImagesClass::images[IDR_DOWN_PNG], rectf, 1.0f, D2D1_INTERPOLATION_MODE_ANISOTROPIC);
 
     D2D::context->SetTransform(oldTransform);
+    */
+
+    auto rectf = D2D1::RectF(ix, iy, ix + is, iy + is);
+
+    float rotationAngle = FlarialGUI::DropDownMenus[index].rotation;
+    ImVec2 rotationCenter(ix + is / 2.0f, iy + is / 2.0f);
+
+    FlarialGUI::ImRotateStart();
+    FlarialGUI::image(IDR_DOWN_PNG, rectf, "PNG", false);
+    FlarialGUI::ImRotateEnd(rotationAngle, rotationCenter);
+
 
     FlarialGUI::RoundedRect(ix - 8, iy - 5,
                             FlarialGUI::DropDownMenus[index].isActive ? D2D1::ColorF(D2D1::ColorF::White)

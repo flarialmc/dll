@@ -1120,9 +1120,10 @@ ImVec2 FlarialGUI::ImRotationCenter()
 
 ImVec2 operator-(const ImVec2& l, const ImVec2& r) { return{ l.x - r.x, l.y - r.y }; }
 
-void FlarialGUI::ImRotateEnd(float rad, ImVec2 center)
+void FlarialGUI::ImRotateEnd(float angle, ImVec2 center)
 {
-    float s=sin(rad), c=cos(rad);
+    float rad = angle * IM_PI / 180.0f;  // Convert angle from degrees to radians
+    float s = sin(rad), c = cos(rad);
     center = ImRotate(center, s, c) - center;
 
     auto& buf = ImGui::GetBackgroundDrawList()->VtxBuffer;
