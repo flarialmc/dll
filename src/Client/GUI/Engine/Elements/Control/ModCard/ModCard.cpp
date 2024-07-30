@@ -100,6 +100,8 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     }
 
+    x -= diffX;
+    y -= diffY;
 
     if (shadowSizes[index].x > Constraints::RelativeConstraint(0.255f, "height")) {
 
@@ -108,16 +110,13 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         float diffY2 = (shadowSizes[index].y - BottomRoundedHeight) / 2.0f;
 
         FlarialGUI::ShadowRect(
-            Vec2<float>(x - diffX2, realY - diffY2),
+            Vec2<float>(x, y),
             Vec2<float>(BottomRoundedWidth, BottomRoundedHeight),
-            D2D1::ColorF(D2D1::ColorF::White),
+            D2D1::ColorF(0, 0, 0, .7),
             round.x,
-            15.0f
+            (diffX*5)
         );
     }
-
-    x -= diffX;
-    y -= diffY;
 
     D2D1_COLOR_F mod1Col = colors_mod1_rgb ? FlarialGUI::rgbColor : colors_mod1;
     mod1Col.a = o_colors_mod1;
