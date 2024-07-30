@@ -8,6 +8,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb.h>
 
+
 void FlarialGUI::image(const std::string& imageName, D2D1_RECT_F rect) {
 
     if (isInScrollView) {
@@ -289,6 +290,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
     if (SwapchainHook::d3d11Device != nullptr) {
 		if (ImagesClass::ImguiDX11Images[resourceId] == nullptr) {
             if (LoadImageFromResource(resourceId, &ImagesClass::ImguiDX11Images[resourceId], type)) {
+            	//totalImageLoaded++;
                 //Logger::debug("Image loaded");
             }
             else {
@@ -304,8 +306,6 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 		if (ImagesClass::ImguiDX12Images[resourceId] == nullptr) {
 			static_assert(sizeof(ImTextureID) >= sizeof(D3D12_CPU_DESCRIPTOR_HANDLE), "D3D12_CPU_DESCRIPTOR_HANDLE is too large to fit in an ImTextureID");
 
-			// We presume here that we have our D3D device pointer in g_pd3dDevice
-
 			int my_image_width = 0;
 			int my_image_height = 0;
 			ID3D12Resource* my_texture = NULL;
@@ -313,14 +313,26 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 			ID3D12Device* ImageDevice4Fun;
 			SwapchainHook::swapchain->GetDevice(IID_PPV_ARGS(&ImageDevice4Fun));
 
-			UINT handle_increment = ImageDevice4Fun->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			int descriptor_index = ImagesClass::ImguiDX12Images.size() + 1; // The descriptor table index to use (not normally a hard-coded constant, but in this case we'll assume we have slot 1 reserved for us)
-			D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
-			cpu.ptr += (handle_increment);
-			D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
-			gpu.ptr += (handle_increment);
+			if(!SwapchainHook::d3d12DescriptorHeapImGuiIMAGE) {
 
-			bool ret = LoadImageFromResource(resourceId, cpu, &my_texture, type);
+				D3D12_DESCRIPTOR_HEAP_DESC descriptorImGuiRender = {};
+				descriptorImGuiRender.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+				descriptorImGuiRender.NumDescriptors = 100; // MAY NEED TO CHANGE THIS IS WE GET MORE THAN 100 ASSETS
+				descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+
+				ImageDevice4Fun->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&SwapchainHook::d3d12DescriptorHeapImGuiIMAGE));
+			}
+
+			bool ret = false;
+
+			UINT handle_increment = ImageDevice4Fun->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			int descriptor_index = ImagesClass::ImguiDX12Images.size();
+			D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetCPUDescriptorHandleForHeapStart();
+			cpu.ptr += (handle_increment * descriptor_index);
+			D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetGPUDescriptorHandleForHeapStart();
+			gpu.ptr += (handle_increment * descriptor_index);
+
+			ret = LoadImageFromResource(resourceId, cpu, &my_texture, type);
 			if (!ret)
 				return;
 			ImagesClass::ImguiDX12Images[resourceId] = (ImTextureID)gpu.ptr;

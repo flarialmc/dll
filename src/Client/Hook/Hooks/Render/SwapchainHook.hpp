@@ -54,6 +54,8 @@ public:
 
     static inline ID3D12Device5* d3d12Device5 = nullptr;
 
+
+    static inline ID3D12DescriptorHeap* d3d12DescriptorHeapImGuiIMAGE = nullptr;
     static inline ID3D12DescriptorHeap* d3d12DescriptorHeapImGuiRender = nullptr;
     static inline ID3D12DescriptorHeap* d3d12DescriptorHeapBackBuffers = nullptr;
     static inline ID3D12GraphicsCommandList* d3d12CommandList = nullptr;
