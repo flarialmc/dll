@@ -270,7 +270,7 @@ namespace FlarialGUI {
     extern ID2D1Factory *factory;
     extern std::unordered_map<std::string, ID2D1Image *> cachedBitmaps;
 
-    void ShadowRect(D2D1_ROUNDED_RECT rect, D2D1_COLOR_F color = D2D1::ColorF(0, 0, 0, 0.75f));
+    void ShadowRect(Vec2<float> pos, Vec2<float> size, D2D_COLOR_F color, float rounding, int shadowSize);
 
     void ApplySusGaussianBlur(float blurIntensity);
 
