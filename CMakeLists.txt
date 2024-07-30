@@ -95,14 +95,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(libhat)
 
-FetchContent_Declare(
-        freetype
-        GIT_REPOSITORY  https://github.com/freetype/freetype.git
-        GIT_TAG         3f8edd234d752a4446afb36f1c5679da4858c699
-)
-
-FetchContent_MakeAvailable(freetype)
 
 
-target_link_libraries(${PROJECT_NAME} PRIVATE libhat freetype windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version)
+target_link_libraries(${PROJECT_NAME} PRIVATE libhat windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version)
 target_link_libraries(${PROJECT_NAME} PUBLIC MinHook)
