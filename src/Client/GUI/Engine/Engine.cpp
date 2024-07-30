@@ -26,7 +26,7 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
-#include <misc/freetype/imgui_freetype.h>
+//#include <misc/freetype/imgui_freetype.h>
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -843,7 +843,7 @@ void FlarialGUI::LoadFonts(std::map<std::string, ImFont*>& FontMap) {
     ImGuiIO& io = ImGui::GetIO();
 
     ImFontConfig config;
-    config.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_ForceAutoHint;
+    //config.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_ForceAutoHint;
 
     for (const auto& dir : fontDirectories) {
         for (const auto& entry : fs::directory_iterator(dir)) {
