@@ -336,6 +336,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 			if (!ret)
 				return;
 			ImagesClass::ImguiDX12Images[resourceId] = (ImTextureID)gpu.ptr;
+			ImageDevice4Fun->Release();
 
 		}
 		else {
@@ -343,5 +344,46 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 		}
 	}
 
+
+}
+
+void FlarialGUI::LoadAllImages() {
+
+	if(SwapchainHook::queue) {
+		ID3D12Device* ImageDevice4Fun;
+		SwapchainHook::swapchain->GetDevice(IID_PPV_ARGS(&ImageDevice4Fun));
+
+		if(!SwapchainHook::d3d12DescriptorHeapImGuiIMAGE) {
+
+			D3D12_DESCRIPTOR_HEAP_DESC descriptorImGuiRender = {};
+			descriptorImGuiRender.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+			descriptorImGuiRender.NumDescriptors = 100; // MAY NEED TO CHANGE THIS IS WE GET MORE THAN 100 ASSETS
+			descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+
+			ImageDevice4Fun->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&SwapchainHook::d3d12DescriptorHeapImGuiIMAGE));
+		}
+
+		for(int i = 100; i <= MAX_IMAGE_ID; i++) {
+			if(i != IDR_PATAR_JPG) {
+				ID3D12Resource* my_texture = NULL;
+
+				UINT handle_increment = ImageDevice4Fun->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				int descriptor_index = ImagesClass::ImguiDX12Images.size();
+				D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetCPUDescriptorHandleForHeapStart();
+				cpu.ptr += (handle_increment * descriptor_index);
+				D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetGPUDescriptorHandleForHeapStart();
+				gpu.ptr += (handle_increment * descriptor_index);
+				if(LoadImageFromResource(i, cpu, &my_texture, "PNG")) ImagesClass::ImguiDX12Images[i] = (ImTextureID)gpu.ptr;
+			}
+		}
+
+		ImageDevice4Fun->Release();
+	} else {
+		for(int i = 100; i <= MAX_IMAGE_ID; i++) {
+			if(i != IDR_PATAR_JPG) LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "PNG");
+		}
+	}
+
+	FlarialGUI::hasLoadedAll = true;
 
 }

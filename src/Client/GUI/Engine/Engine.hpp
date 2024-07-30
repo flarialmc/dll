@@ -305,6 +305,8 @@ namespace FlarialGUI {
                                      const D2D1_COLOR_F color, const std::string &imagePath,
                                      const float imageWidth, const float imageHeight);
 
+    void LoadAllImages();
+
     std::string Dropdown(int index, float x, float y, const std::vector<std::string> &options, std::string &value,
                          const std::string &label);
 

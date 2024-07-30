@@ -564,6 +564,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         }
     }
 
+    if(init && initImgui && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImages();
+
     //if(init && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImageToCache();
 
     if (Client::settings.getSettingByName<bool>("vsync")->value) {
