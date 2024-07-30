@@ -36,6 +36,9 @@
 #define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
 
 //TODO: this defo laggs req investigation
+static std::string rReal;
+static std::string ttext;
+
 std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, float x, float y, const std::string& real) {
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
@@ -78,21 +81,16 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
 
     float textSize = Constraints::SpacingConstraint(1.0, textWidth);
 
-    FlarialGUI::FlarialTextWithFont(x + Constraints::RelativeConstraint(0.05f), y, FlarialGUI::to_wide(text).c_str(),
+    ttext = FlarialGUI::FlarialTextWithFont(x + Constraints::RelativeConstraint(0.05f), y, FlarialGUI::to_wide(text).c_str(),
                                     Constraints::SpacingConstraint(1.55, textWidth), percHeight,
                                     DWRITE_TEXT_ALIGNMENT_LEADING, textSize, DWRITE_FONT_WEIGHT_NORMAL);
 
-    auto textLayout = FlarialGUI::GetTextLayout(FlarialGUI::to_wide(text).c_str(), DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                DWRITE_PARAGRAPH_ALIGNMENT_NEAR, textSize, DWRITE_FONT_WEIGHT_NORMAL,
-                                                Constraints::SpacingConstraint(textWidth, 6.9f), percHeight);
+
 
     //IDWriteTextFormat* textFormat;
     //FlarialGUI::writeFactory->CreateTextFormat(LClient::settings.getSettingByName<std::string>("fontname")->value, NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(textSize), L"", &textFormat);
 
     // textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR); !!!
-
-    DWRITE_TEXT_METRICS textMetrics{};
-    textLayout->GetMetrics(&textMetrics);
     //textLayout->Release();
 
     D2D1_COLOR_F cursorCol = colors_primary2_rgb ? rgbColor : colors_primary2;
@@ -101,7 +99,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
     cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
 
     FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorX,
-                     x + textMetrics.widthIncludingTrailingWhitespace + Constraints::RelativeConstraint(0.055f),
+                     x + FlarialGUI::TextSizes[ttext] + Constraints::RelativeConstraint(0.055f),
                      0.420f * FlarialGUI::frameFactor);
 
     if (FlarialGUI::TextBoxes[index].cursorX > x)
@@ -110,7 +108,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
                                 Constraints::RelativeConstraint(0.005f),
                                 percHeight - Constraints::RelativeConstraint(0.045f), 0, 0);
 
-    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y,
+    rReal = FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y,
                                     FlarialGUI::to_wide(real).c_str(),
                                     Constraints::SpacingConstraint(6.9, textWidth), percHeight,
                                     DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.00, textWidth),

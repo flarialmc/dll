@@ -35,6 +35,8 @@
 #define o_colors_secondary7 clickgui->settings.getSettingByName<float>("o_colors_secondary7")->value
 #define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
 
+static std::map<std::string, std::string> sizes;
+
 void FlarialGUI::ColorPicker(const int index, float x, const float y, std::string &hex, bool &rgb) {
 
     // Accepts hex, so for e.g. fps counter bg color wants to be changed then you'd have to give a modifyable hex value
@@ -97,13 +99,6 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
                               s * 0.82f);
 
     text = "#" + hex;
-
-    auto textLayout = FlarialGUI::GetTextLayout(FlarialGUI::to_wide(text).c_str(), DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                DWRITE_PARAGRAPH_ALIGNMENT_CENTER, s * 4.0f, DWRITE_FONT_WEIGHT_REGULAR,
-                                                s * 3.f + 100, s * 0.82f);
-
-    DWRITE_TEXT_METRICS textMetrics{};
-    textLayout->GetMetrics(&textMetrics);
     //textLayout->Release();
 
     D2D1_COLOR_F cursorCol = colors_primary2_rgb ? rgbColor : colors_primary2;
@@ -112,15 +107,14 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
     cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
 
     FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorX,
-                     x + Constraints::SpacingConstraint(1.05f, s) + textMetrics.widthIncludingTrailingWhitespace +
+                     x + Constraints::SpacingConstraint(0.555f, s) + TextSizes[sizes[text]] +
                      Constraints::RelativeConstraint(0.055f), 0.420f * FlarialGUI::frameFactor);
 
     if (FlarialGUI::TextBoxes[index].cursorX > x)
-        FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX, y + Constraints::RelativeConstraint(0.1f) / 2.0f,
-                                cursorCol, Constraints::RelativeConstraint(0.01f),
+        FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX, y + Constraints::RelativeConstraint(0.05f) / 2.0f,
+                                cursorCol, Constraints::RelativeConstraint(0.005f),
                                 s * 0.82f - Constraints::RelativeConstraint(0.025f), 0, 0);
-    // TODO: FlarialGUI::to_wide(text).c_str() make this redundend
-    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.006f,
+    sizes[text] = FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.006f,
                                     FlarialGUI::to_wide(text).c_str(), s * 4.3f, s * 1.1f,
                                     DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f, DWRITE_FONT_WEIGHT_NORMAL);
 

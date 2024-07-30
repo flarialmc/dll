@@ -8,7 +8,7 @@ std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {
         {"Right", DWRITE_TEXT_ALIGNMENT_TRAILING}
 };
 
-static std::string name = "";
+static std::string Lname = "";
 
 void Module::normalRender(int index, std::string &value) {
     if(!isEnabled() || SDK::currentScreen != "hud_screen") return;
@@ -59,7 +59,7 @@ void Module::normalRender(int index, std::string &value) {
                        ? (Constraints::RelativeConstraint(
                     0.225f * settings.getSettingByName<float>("uiscale")->value) *
                           this->settings.getSettingByName<float>("rectwidth")->value)
-                       : (FlarialGUI::TextSizes[name] + Constraints::SpacingConstraint(2.0, realspacing)) *
+                       : (FlarialGUI::TextSizes[Lname] + Constraints::SpacingConstraint(2.0, realspacing)) *
                          this->settings.getSettingByName<float>("rectwidth")->value);
 
     Vec2<float> realcenter;
@@ -150,7 +150,7 @@ void Module::normalRender(int index, std::string &value) {
             true
     );
 
-    name = rname;
+    Lname = rname;
 
     if (this->settings.getSettingByName<bool>("border")->value) {
         FlarialGUI::RoundedHollowRect(

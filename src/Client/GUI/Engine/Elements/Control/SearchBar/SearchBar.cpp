@@ -41,6 +41,7 @@
 
 std::vector<float> searchBarSizes;
 std::vector<float> searchCutOutHeights;
+static std::string name = "";
 
 std::string ClickGUIElements::SearchBar(int index, std::string &text, int limit, float x, float y) {
 
@@ -111,21 +112,6 @@ std::string ClickGUIElements::SearchBar(int index, std::string &text, int limit,
 
             FlarialGUI::RoundedRect(pos.x, pos.y, col, size.x, size.y, round.x, round.y);
 
-            //TODO: text renders higher
-
-            IDWriteTextFormat *textFormat;
-            FlarialGUI::writeFactory->CreateTextFormat(
-                    FlarialGUI::to_wide(Client::settings.getSettingByName<std::string>("fontname")->value).c_str(),
-                    nullptr,
-                    DWRITE_FONT_WEIGHT_REGULAR,
-                    DWRITE_FONT_STYLE_NORMAL,
-                    DWRITE_FONT_STRETCH_NORMAL,
-                    Constraints::FontScaler(Constraints::SpacingConstraint(0.60f, textWidth)),
-                    L"",
-                    &textFormat
-            );
-            textFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
-            textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
             /*IDWriteTextLayout* textLayout = FlarialGUI::GetTextLayout(
                 FlarialGUI::to_wide(text).c_str(),
@@ -134,20 +120,6 @@ std::string ClickGUIElements::SearchBar(int index, std::string &text, int limit,
                 Constraints::SpacingConstraint(0.60f, textWidth),
                 DWRITE_FONT_WEIGHT_REGULAR, textWidth, percHeight);
             */
-            IDWriteTextLayout *textLayout;
-
-            FlarialGUI::writeFactory->CreateTextLayout(
-                    FlarialGUI::to_wide(text).c_str(),
-                    wcslen(FlarialGUI::to_wide(text).c_str()),
-                    textFormat,
-                    textWidth,
-                    percHeight,
-                    &textLayout
-            );
-
-            DWRITE_TEXT_METRICS textMetrics{};
-            textLayout->GetMetrics(&textMetrics);
-            // todo textLayout->Release();
 
             D2D1_COLOR_F cursorCol = D2D1::ColorF(D2D1::ColorF::White);
 
@@ -155,14 +127,14 @@ std::string ClickGUIElements::SearchBar(int index, std::string &text, int limit,
 
             FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorX,
                              (x - textWidth) + Constraints::RelativeConstraint(0.38, "height") +
-                             textMetrics.widthIncludingTrailingWhitespace, 0.420f * FlarialGUI::frameFactor);
+                             FlarialGUI::TextSizes[name], 0.420f * FlarialGUI::frameFactor);
 
             FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX,
                                     y + Constraints::RelativeConstraint(0.2f) / 2.0f, cursorCol,
                                     Constraints::RelativeConstraint(0.025f), percHeight / 1.9f, 0, 0);
 
             if (searchBarSizes[index] > Constraints::RelativeConstraint(0.45, "height")) {
-                FlarialGUI::FlarialTextWithFont((x - textWidth) + Constraints::RelativeConstraint(0.38, "height"),
+                name = FlarialGUI::FlarialTextWithFont((x - textWidth) + Constraints::RelativeConstraint(0.38, "height"),
                                                 y,
                                                 FlarialGUI::to_wide(text).c_str(),
                                                 textWidth, percHeight,
