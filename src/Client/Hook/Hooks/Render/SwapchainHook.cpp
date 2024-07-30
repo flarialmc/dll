@@ -291,7 +291,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                 std::transform(font1.begin(), font1.end(), font1.begin(), ::towlower);
                 std::string weightedName = FlarialGUI::GetWeightedName(font1, FlarialGUI::LoadModuleFontLaterWeight);
                 std::transform(weightedName.begin(), weightedName.end(), weightedName.begin(), ::towlower);
-                if (!FlarialGUI::FontMap[weightedName]) {
+                if (!FlarialGUI::FontMap[weightedName + "-1"]) {
                     if (FlarialGUI::LoadFontFromFontFamily(font1, weightedName, FlarialGUI::LoadModuleFontLaterWeight)) {
                         fontLoaded = true;
                     }
@@ -305,7 +305,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                 std::transform(font2.begin(), font2.end(), font2.begin(), ::towlower);
                 std::string weightedName = FlarialGUI::GetWeightedName(font2, FlarialGUI::LoadGUIFontLaterWeight);
                 std::transform(weightedName.begin(), weightedName.end(), weightedName.begin(), ::towlower);
-                if (!FlarialGUI::FontMap[weightedName]) {
+                if (!FlarialGUI::FontMap[weightedName + "-1"]) {
                     if (FlarialGUI::LoadFontFromFontFamily(font2, weightedName, FlarialGUI::LoadGUIFontLaterWeight)) {
                         fontLoaded = true;
                     }
@@ -323,18 +323,23 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
             }
             */
 
-            if (!FlarialGUI::FontMap["162"]) {
-                FlarialGUI::FontMap["162"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 23);
+            if (!FlarialGUI::FontMap["162-1"]) {
+                ImFontConfig config;
+                FlarialGUI::FontMap["162-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 23, &config);
+                FlarialGUI::FontMap["162-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 40, &config);
                 fontLoaded = true;
             }
 
-            if (!FlarialGUI::FontMap["163"]) {
-                FlarialGUI::FontMap["163"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "163" + ".ttf").c_str(), 23);
+            if (!FlarialGUI::FontMap["163-1"]) {
+                ImFontConfig config;
+                FlarialGUI::FontMap["163-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "163" + ".ttf").c_str(), 23, &config);
+                FlarialGUI::FontMap["163-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "163" + ".ttf").c_str(), 40, &config);
+
                 fontLoaded = true;
             }
 
             if (!FlarialGUI::FontMap["164"]) {
-                FlarialGUI::FontMap["164"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 23);
+                FlarialGUI::FontMap["164"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 20);
                 fontLoaded = true;
             }
 
