@@ -172,11 +172,11 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
 
 
-    float buttonWidth = Constraints::RelativeConstraint(0.71, "width");
-    float buttonHeight = Constraints::RelativeConstraint(0.27);
+    float buttonWidth = Constraints::RelativeConstraint(0.68, "width");
+    float buttonHeight = Constraints::RelativeConstraint(0.259);
 
     float buttonx = Constraints::PercentageConstraint(0.04, "right");
-    float buttony = Constraints::PercentageConstraint(0.05, "bottom");
+    float buttony = Constraints::PercentageConstraint(0.093, "bottom");
 
     D2D1_COLOR_F to = text == "Enabled" ? enabledColor : disabledColor;
 
@@ -194,7 +194,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     round = Constraints::RoundingConstraint(20, 20);
 
     float settingx = Constraints::PercentageConstraint(0.0485, "left");
-    float settingx2 = Constraints::PercentageConstraint(0.0797, "left");
+    float settingx2 = Constraints::PercentageConstraint(0.0885, "left");
 
     FlarialGUI::RoundedRect(settingx, buttony - buttonHeight,
                             mod3Col, paddingwidth + Constraints::RelativeConstraint(0.26),
@@ -204,7 +204,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     mod4Col.a = o_colors_mod4;
 
     if (!Client::settings.getSettingByName<bool>("noicons")->value) {
-        RotatingGear(index, settingx2, (buttony - buttonHeight) + Constraints::SpacingConstraint(0.18, paddingwidth), settingswidth, settingswidth, iconwidth, iconwidth);
+        RotatingGear(index, settingx2, (buttony - buttonHeight) + Constraints::SpacingConstraint(0.162, paddingwidth), settingswidth, settingswidth, iconwidth, iconwidth);
     }
 
     // settings button end
@@ -235,7 +235,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
                                                                 0.15f * FlarialGUI::frameFactor);
     else FlarialGUI::buttonColors.resize(index);
 
-    round = Constraints::RoundingConstraint(26, 26);
+    round = Constraints::RoundingConstraint(22, 22);
 
     D2D1_COLOR_F textCol = colors_text_rgb ? FlarialGUI::rgbColor : colors_text;
     textCol.a = o_colors_text;
@@ -244,7 +244,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     buttonColor = D2D1::ColorF(FlarialGUI::buttonColors[index].r - FlarialGUI::darkenAmounts[index], FlarialGUI::buttonColors[index].g - FlarialGUI::darkenAmounts[index],
                                    FlarialGUI::buttonColors[index].b - FlarialGUI::darkenAmounts[index], FlarialGUI::buttonColors[index].a);
 
-    FlarialGUI::RoundedRect((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.012f, paddingwidth), buttony - buttonHeight,
+    FlarialGUI::RoundedRect((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.155f, paddingwidth), buttony - buttonHeight,
                                   buttonColor, buttonWidth - Constraints::SpacingConstraint(1.5, paddingwidth), buttonHeight, 0.f, 0.f);
 
     if (FlarialGUI::RoundedButton(index, buttonx - buttonWidth, buttony - buttonHeight,
