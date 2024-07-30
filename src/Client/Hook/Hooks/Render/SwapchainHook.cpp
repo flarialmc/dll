@@ -188,8 +188,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         } else {
 
             ID3D12Device5 *device;
-
             pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12Device5));
+
 
             if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&device))) &&
                 kiero::getRenderType() == kiero::RenderType::D3D12) {
@@ -352,6 +352,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
             }
         }
 
+        if(init && initImgui)
         while(FrameTransforms.size() > transformDelay)
         {
             MC::Transform = FrameTransforms.front();

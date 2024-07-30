@@ -78,7 +78,7 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, ID3D11ShaderResourceView*
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	desc.CPUAccessFlags = 0;
 
-	ID3D11Texture2D* pTexture = NULL;
+	ID3D11Texture2D* pTexture = nullptr;
 	D3D11_SUBRESOURCE_DATA subResource;
 	subResource.pSysMem = image_data;
 	subResource.SysMemPitch = desc.Width * 4;
@@ -104,6 +104,9 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
     HGLOBAL imageResDataHandle = nullptr;
     const unsigned char* pImageFile = nullptr;
     DWORD imageFileSize = 0;
+
+	ID3D12Device* ImageDevice4Fun;
+	SwapchainHook::swapchain->GetDevice(IID_PPV_ARGS(&ImageDevice4Fun));
 
     // Locate the resource
     imageResHandle = FindResource(Client::currentModule, MAKEINTRESOURCE(resourceId), type);
@@ -143,8 +146,8 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-	ID3D12Resource* pTexture = NULL;
-	SwapchainHook::d3d12Device5->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
+	ID3D12Resource* pTexture = nullptr;
+	ImageDevice4Fun->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
 		D3D12_RESOURCE_STATE_COPY_DEST, NULL, IID_PPV_ARGS(&pTexture));
 
 	// Create a temporary upload resource to move the data in
@@ -167,7 +170,7 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
 
 	ID3D12Resource* uploadBuffer = NULL;
-	HRESULT hr = SwapchainHook::d3d12Device5->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
+	HRESULT hr = ImageDevice4Fun->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
 		D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&uploadBuffer));
 	IM_ASSERT(SUCCEEDED(hr));
 
@@ -205,7 +208,7 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 
 	// Create a temporary command queue to do the copy with
 	ID3D12Fence* fence = NULL;
-	hr = SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+	hr = ImageDevice4Fun->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 	IM_ASSERT(SUCCEEDED(hr));
 
 	HANDLE event = CreateEvent(0, 0, 0, 0);
@@ -217,15 +220,15 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	queueDesc.NodeMask = 1;
 
 	ID3D12CommandQueue* cmdQueue = NULL;
-	hr = SwapchainHook::d3d12Device5->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cmdQueue));
+	hr = ImageDevice4Fun->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cmdQueue));
 	IM_ASSERT(SUCCEEDED(hr));
 
 	ID3D12CommandAllocator* cmdAlloc = NULL;
-	hr = SwapchainHook::d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAlloc));
+	hr = ImageDevice4Fun->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAlloc));
 	IM_ASSERT(SUCCEEDED(hr));
 
 	ID3D12GraphicsCommandList* cmdList = NULL;
-	hr = SwapchainHook::d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAlloc, NULL, IID_PPV_ARGS(&cmdList));
+	hr = ImageDevice4Fun->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAlloc, NULL, IID_PPV_ARGS(&cmdList));
 	IM_ASSERT(SUCCEEDED(hr));
 
 	cmdList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, NULL);
@@ -243,14 +246,6 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	fence->SetEventOnCompletion(1, event);
 	WaitForSingleObject(event, INFINITE);
 
-	// Tear down our temporary command queue and release the upload resource
-	cmdList->Release();
-	cmdAlloc->Release();
-	cmdQueue->Release();
-	CloseHandle(event);
-	fence->Release();
-	uploadBuffer->Release();
-
 	// Create a shader resource view for the texture
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	ZeroMemory(&srvDesc, sizeof(srvDesc));
@@ -259,11 +254,14 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	srvDesc.Texture2D.MipLevels = desc.MipLevels;
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	SwapchainHook::d3d12Device5->CreateShaderResourceView(pTexture, &srvDesc, srv_cpu_handle);
+
+	ImageDevice4Fun->CreateShaderResourceView(pTexture, &srvDesc, srv_cpu_handle);
 
 	// Return results
 	*out_tex_resource = pTexture;
+	//pTexture->Release();
 	stbi_image_free(image_data);
+
 
 	return true;
 }
@@ -291,7 +289,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
     if (SwapchainHook::d3d11Device != nullptr) {
 		if (ImagesClass::ImguiDX11Images[resourceId] == nullptr) {
             if (LoadImageFromResource(resourceId, &ImagesClass::ImguiDX11Images[resourceId], type)) {
-                Logger::debug("Image loaded");
+                //Logger::debug("Image loaded");
             }
             else {
                 Logger::debug("couldn't load image");
@@ -312,12 +310,15 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 			int my_image_height = 0;
 			ID3D12Resource* my_texture = NULL;
 
-			UINT handle_increment = SwapchainHook::d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			ID3D12Device* ImageDevice4Fun;
+			SwapchainHook::swapchain->GetDevice(IID_PPV_ARGS(&ImageDevice4Fun));
+
+			UINT handle_increment = ImageDevice4Fun->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			int descriptor_index = ImagesClass::ImguiDX12Images.size() + 1; // The descriptor table index to use (not normally a hard-coded constant, but in this case we'll assume we have slot 1 reserved for us)
 			D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
-			cpu.ptr += (handle_increment * descriptor_index);
+			cpu.ptr += (handle_increment);
 			D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
-			gpu.ptr += (handle_increment * descriptor_index);
+			gpu.ptr += (handle_increment);
 
 			bool ret = LoadImageFromResource(resourceId, cpu, &my_texture, type);
 			if (!ret)
