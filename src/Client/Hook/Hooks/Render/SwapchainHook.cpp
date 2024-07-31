@@ -94,6 +94,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     MC::frames += 1;
 
     if (Client::settings.getSettingByName<bool>("killdx")->value) {
+        SwapchainHook::queue = nullptr;
         ID3D12Device5 *d3d12device3;
 
         if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device3)))) {
@@ -154,8 +155,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                 Memory::SafeRelease(eBackBuffer);
 
                 SwapchainHook::init = true;
-            }
-             else {
+            } else {
 
             ID3D12Device5 *device;
 
