@@ -28,6 +28,11 @@ public:
     static void DX12Blur();
 
     static void DX11Blur();
+
+    static void DX11Init();
+
+    static void DX12Init();
+
     typedef HRESULT(__thiscall *SwapchainOriginal)(IDXGISwapChain3 *, UINT, UINT);
 
     static inline SwapchainOriginal funcOriginal = nullptr;
