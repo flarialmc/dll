@@ -62,12 +62,6 @@ void ResizeHook::cleanShit(bool isResize) {
 
     ClickGUIElements::images.clear();
 
-    for (ID2D1Bitmap *bitmap: MotionBlurListener::previousFrames) {
-        Memory::SafeRelease(bitmap);
-    }
-
-    MotionBlurListener::previousFrames.clear();
-
     for (auto &i: ImagesClass::eimages) {
         Memory::SafeRelease(i.second);
     }

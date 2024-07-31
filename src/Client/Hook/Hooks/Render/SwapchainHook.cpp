@@ -407,7 +407,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 	            ID3D11DeviceContext* ppContext = nullptr;
 	            ID3D11Texture2D* pBackBuffer = nullptr;
 
-
 	            d3d11Device->GetImmediateContext(&ppContext);
 
 	            if (ppContext)
