@@ -282,7 +282,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     ImVec2 rotationCenter(ix + is / 2.0f, iy + is / 2.0f);
 
     FlarialGUI::ImRotateStart();
-    FlarialGUI::image(IDR_DOWN_PNG, rectf, "PNG", false);
+    FlarialGUI::image(IDR_DOWN_PNG, rectf, "PNG", true);
     FlarialGUI::ImRotateEnd(rotationAngle, rotationCenter);
 
 
