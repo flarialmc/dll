@@ -7,6 +7,7 @@
 #include "../Module.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include <Windows.h>
+#include <d3dcompiler.h>
 
 class MotionBlurListener : public Listener {
 
@@ -25,7 +26,7 @@ public:
     void onRender(RenderEvent &event) override {
         int maxFrames = (int)round(module->settings.getSettingByName<float>("intensity2")->value);
 
-        if (SDK::currentScreen == "hud_screen") {
+        if (true) {
             if (previousFrames.size() >= static_cast<int>(maxFrames)) {
                 // Remove excess frames if maxFrames is reduced
                 int framesToRemove = (int)previousFrames.size() - static_cast<int>(maxFrames);
@@ -43,8 +44,10 @@ public:
             if(!SwapchainHook::queue) {
                 for (ID3D11ShaderResourceView* frame: previousFrames) {
 
-                    //if(!frame) std::cout << "TROLLED" << std::endl;
-                    RenderTextureWithOpacity(frame, alpha);
+                    if(SwapchainHook::d3d11Device) {
+                        if(!vertexBuffer) InitializeFullscreenQuad(SwapchainHook::d3d11Device);
+                        RenderFullscreenQuad(frame, alpha);
+                    }
                     alpha *= module->settings.getSettingByName<float>("intensity")->value;
                 }
             } else {
@@ -74,10 +77,33 @@ public:
         D3D11_TEXTURE2D_DESC desc;
         buffer2D->GetDesc(&desc);
 
-        ID3D11Texture2D* pTexture = nullptr;
-        HRESULT r = SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pTexture);
+        ID3D11Texture2D* stageTex = nullptr;
+        D3D11_TEXTURE2D_DESC stageDesc = desc;
+        stageDesc.Usage = D3D11_USAGE_STAGING;
+        stageDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        stageDesc.BindFlags = 0;
 
-        deviceContext->CopyResource(pTexture, buffer2D);
+        //desc.Usage = DXGI_USAGE_SHADER_INPUT;
+        HRESULT r = SwapchainHook::d3d11Device->CreateTexture2D(&stageDesc, nullptr, &stageTex);
+        deviceContext->CopyResource(stageTex, buffer2D);
+
+        if (FAILED(r))  std::cout << "Failed to create stage texture: " << std::hex << r << std::endl;
+
+
+        D3D11_TEXTURE2D_DESC defaultDesc = desc;
+        defaultDesc.Usage = D3D11_USAGE_DEFAULT;
+        defaultDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        defaultDesc.CPUAccessFlags = 0;
+
+        ID3D11Texture2D* defaultTexture = nullptr;
+        hr = SwapchainHook::d3d11Device->CreateTexture2D(&defaultDesc, nullptr, &defaultTexture);
+        if (FAILED(hr)) {
+            std::cout << "Failed to create def texture: " << std::hex << r << std::endl;
+        }
+
+        deviceContext->CopyResource(defaultTexture, stageTex);
+
+        stageTex->Release();
 
         ID3D11ShaderResourceView* outSRV;
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
@@ -86,45 +112,130 @@ public:
         srvDesc.Texture2D.MipLevels = desc.MipLevels;
         srvDesc.Texture2D.MostDetailedMip = 0;
 
-        if (FAILED(SwapchainHook::d3d11Device->CreateShaderResourceView(pTexture, &srvDesc, &outSRV)))
+        if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(defaultTexture, &srvDesc, &outSRV)))
         {
-            std::cout << "Failed to create shader resource view: " << std::endl;
+            std::cout << "Failed to create shader resource view: " << std::hex << hr << std::endl;
         }
+
+        //if(outSRV) std::cout << "Wroekd" << std::endl;
 
         backBuffer->Release();
         buffer2D->Release();
-        pTexture->Release();
+        defaultTexture->Release();
 
         return outSRV;
     }
 
-    void RenderTextureWithOpacity(ID3D11ShaderResourceView* textureSRV, float opacity)
-    {
+    struct Vertex {
+        DirectX::XMFLOAT3 position;
+        DirectX::XMFLOAT2 texcoord;
+    };
 
-        ID3D11DeviceContext* deviceContext;
-        SwapchainHook::d3d11Device->GetImmediateContext(&deviceContext);
+    const char* vertexShaderSrc = R"(
+cbuffer ConstantBuffer : register(b0)
+{
+    float opacity;
+};
+struct VS_INPUT
+{
+    float3 pos : POSITION;
+    float2 tex : TEXCOORD;
+};
+struct PS_INPUT
+{
+    float4 pos : SV_POSITION;
+    float2 tex : TEXCOORD;
+};
+PS_INPUT main(VS_INPUT input)
+{
+    PS_INPUT output;
+    output.pos = float4(input.pos, 1.0f);
+    output.tex = input.tex;
+    return output;
+}
+)";
 
-        if (!deviceContext || !textureSRV)
-            return;
+    const char* pixelShaderSrc = R"(
+cbuffer ConstantBuffer : register(b0)
+{
+    float opacity;
+};
+Texture2D shaderTexture : register(t0);
+SamplerState samplerState : register(s0);
+struct PS_INPUT
+{
+    float4 pos : SV_POSITION;
+    float2 tex : TEXCOORD;
+};
+float4 main(PS_INPUT input) : SV_Target
+{
+    return shaderTexture.Sample(samplerState, input.tex) * opacity;
+}
+)";
 
-        struct PixelShaderConstants
-        {
-            float opacity;
-            float padding[3];
-        } psConstants;
+    ID3D11VertexShader* vertexShader;
+    ID3D11PixelShader* pixelShader;
+    ID3D11InputLayout* inputLayout;
+    ID3D11Buffer* vertexBuffer;
+    ID3D11Buffer* constantBuffer;
+    ID3D11SamplerState* samplerState;
 
-        psConstants.opacity = opacity;
+    void InitializeFullscreenQuad(ID3D11Device* device) {
+        ID3DBlob* vsBlob;
+        ID3DBlob* psBlob;
+        D3DCompile(vertexShaderSrc, strlen(vertexShaderSrc), nullptr, nullptr, nullptr, "main", "vs_5_0", 0, 0, &vsBlob, nullptr);
+        D3DCompile(pixelShaderSrc, strlen(pixelShaderSrc), nullptr, nullptr, nullptr, "main", "ps_5_0", 0, 0, &psBlob, nullptr);
+        device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &vertexShader);
+        device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &pixelShader);
+        D3D11_INPUT_ELEMENT_DESC layout[] = {
+            { "POSITION", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+            { "TEXCOORD", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        };
+        device->CreateInputLayout(layout, ARRAYSIZE(layout), vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &inputLayout);
+        vsBlob->Release();
+        psBlob->Release();
+        Vertex vertices[] = {
+            { { -1.0f, -1.0f, 0.0f }, { 0.0f, 1.0f } },
+            { { -1.0f,  1.0f, 0.0f }, { 0.0f, 0.0f } },
+            { {  1.0f, -1.0f, 0.0f }, { 1.0f, 1.0f } },
+            { {  1.0f,  1.0f, 0.0f }, { 1.0f, 0.0f } },
+        };
+        D3D11_BUFFER_DESC bufferDesc = { sizeof(vertices), D3D11_USAGE_DEFAULT, D3D11_BIND_VERTEX_BUFFER, 0, 0, 0 };
+        D3D11_SUBRESOURCE_DATA initData = { vertices, 0, 0 };
+        device->CreateBuffer(&bufferDesc, &initData, &vertexBuffer);
+        D3D11_BUFFER_DESC cbDesc = { sizeof(float), D3D11_USAGE_DEFAULT, D3D11_BIND_CONSTANT_BUFFER, 0, 0, 0 };
+        device->CreateBuffer(&cbDesc, nullptr, &constantBuffer);
+        D3D11_SAMPLER_DESC sampDesc = {};
+        sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+        sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+        sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+        device->CreateSamplerState(&sampDesc, &samplerState);
+    }
 
-        deviceContext->PSSetShaderResources(0, 1, &textureSRV);
-        deviceContext->UpdateSubresource(
-            nullptr,
-            0,
-            nullptr,
-            &psConstants,
-            0,
-            0
-        );
-        deviceContext->PSSetConstantBuffers(0, 1, nullptr);
-        deviceContext->Draw(6, 0);
+
+    void RenderFullscreenQuad(ID3D11ShaderResourceView* srv, float opacity) {
+
+        ID3D11DeviceContext* context;
+        SwapchainHook::d3d11Device->GetImmediateContext(&context);
+        UINT stride = sizeof(Vertex);
+        UINT offset = 0;
+
+        if(SwapchainHook::d3d11Device && context && vertexBuffer && constantBuffer && srv && SwapchainHook::init && inputLayout) {
+            context->IASetInputLayout(inputLayout);
+
+            context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+            context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+            context->VSSetShader(vertexShader, nullptr, 0);
+            context->PSSetShader(pixelShader, nullptr, 0);
+            context->PSSetShaderResources(0, 1, &srv);
+            context->PSSetSamplers(0, 1, &samplerState);
+            context->UpdateSubresource(constantBuffer, 0, nullptr, &opacity, 0, 0);
+            context->VSSetConstantBuffers(0, 1, &constantBuffer);
+            context->PSSetConstantBuffers(0, 1, &constantBuffer);
+            context->Draw(4, 0);
+        } else {
+            //std::cout << "TROLLED" << std::endl;
+        }
     }
 };
