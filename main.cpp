@@ -162,7 +162,7 @@ BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReser
 }
 
 std::string DownloadString(std::string URL) {
-    HINTERNET interwebs = InternetOpenA("holyshitplsdonthurtme", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, NULL);
+    HINTERNET interwebs = InternetOpenA("Samsung Smart Fridge", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, NULL);
     HINTERNET urlFile;
     std::string rtn;
     if (interwebs) {
