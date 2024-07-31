@@ -1404,21 +1404,7 @@ void FlarialGUI::UnSetIsInAdditionalYMode() {
 
 float FlarialGUI::SettingsTextWidth(const std::string& text) {
 
-    auto textLayout = FlarialGUI::GetTextLayout(FlarialGUI::to_wide(text).c_str(), DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                DWRITE_PARAGRAPH_ALIGNMENT_CENTER, Constraints::SpacingConstraint(1.05,
-                                                                                                                  Constraints::RelativeConstraint(
-                                                                                                                          0.12,
-                                                                                                                          "height",
-                                                                                                                          true)),
-                                                DWRITE_FONT_WEIGHT_REGULAR,
-                                                Constraints::PercentageConstraint(1.0f, "left"),
-                                                Constraints::RelativeConstraint(0.029, "height", true));
 
-    DWRITE_TEXT_METRICS textMetrics{};
 
-    textLayout->GetMetrics(&textMetrics);
-    //textLayout->Release();
-
-    return textMetrics.widthIncludingTrailingWhitespace;
 }
 
