@@ -565,6 +565,8 @@ std::string FlarialGUI::GetWeightedName(std::string name, DWRITE_FONT_WEIGHT wei
             break;
         }
     }
+
+    return name + "-Normal";
 }
 
 bool hasEnding (std::string const &fullString, std::string const &ending) {
@@ -1404,7 +1406,7 @@ void FlarialGUI::UnSetIsInAdditionalYMode() {
 
 float FlarialGUI::SettingsTextWidth(const std::string& text) {
 
-
+return 100;
 
 }
 
