@@ -71,7 +71,10 @@ DWORD WINAPI init(HMODULE real)
                                         std::cerr << "Invalid or missing 'lastbeat' for player: " << player.key() << std::endl;
                                         continue;
                                     }
-                                    ModuleManager::onlineUsers.push_back(Utils::removeNonAlphanumeric(player.key()));
+
+                                    std::string name2 = Utils::removeNonAlphanumeric(player.key());
+                                    name2 = replaceAll(name2, "�", "");
+                                    ModuleManager::onlineUsers.push_back(name2);
                                 } catch (const std::exception& e) {
                                     std::cerr << "Error processing player: " << player.key() << " - " << e.what() << std::endl;
                                     continue;
@@ -92,6 +95,8 @@ DWORD WINAPI init(HMODULE real)
                             if(SDK::clientInstance->getLocalPlayer() != nullptr)
                             if (module->isEnabled()) {
                                 name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickListener::original));
+                                name = replaceAll(name, "�", "");
+
                             }
                             // send thing
                             std::cout << DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend)) << std::endl;
@@ -157,7 +162,7 @@ BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReser
 }
 
 std::string DownloadString(std::string URL) {
-    HINTERNET interwebs = InternetOpenA("Samsung Smart Fridge", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, NULL);
+    HINTERNET interwebs = InternetOpenA("holyshitplsdonthurtme", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, NULL);
     HINTERNET urlFile;
     std::string rtn;
     if (interwebs) {
