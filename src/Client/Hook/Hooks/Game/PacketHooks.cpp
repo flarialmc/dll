@@ -15,8 +15,10 @@ void SendPacketHook::callback(LoopbackPacketSender *pSender, Packet *pPacket) {
     }
 }
 
-void SendPacketHook::receiveCallbackText(const float *a1, const float *networkIdentifier, const float *netEventCallback,
+void SendPacketHook::receiveCallbackText(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
                                          const std::shared_ptr<Packet>& packet) {
+
+    SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
     if (
             packet.get() &&
             CompactChatListener::prev == reinterpret_cast<TextPacket *>(packet.get())->message
@@ -25,36 +27,39 @@ void SendPacketHook::receiveCallbackText(const float *a1, const float *networkId
         PacketEvent event(packet.get());
         EventHandler::onPacketReceive(event);
         if (!event.isCancelled())
-            receiveTextPacketOriginal(a1, networkIdentifier, netEventCallback, packet);
+            receiveTextPacketOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
     }
 }
 
 void
-SendPacketHook::receiveCallbackSetTitle(const float *a1, const float *networkIdentifier, const float *netEventCallback,
+SendPacketHook::receiveCallbackSetTitle(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
                                         const std::shared_ptr<Packet>& packet) {
+
+    SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
 
     PacketEvent event(packet.get());
     EventHandler::onPacketReceive(event);
     if (!event.isCancelled())
-        receiveSetTitlePacketOriginal(a1, networkIdentifier, netEventCallback, packet);
+        receiveSetTitlePacketOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
 }
 
 void
-SendPacketHook::receiveCallbackPlaySound(const float *a1, const float *networkIdentifier, const float *netEventCallback,
+SendPacketHook::receiveCallbackPlaySound(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
                                          const std::shared_ptr<Packet>& packet) {
-
+    SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
     PacketEvent event(packet.get());
     EventHandler::onPacketReceive(event);
     if (!event.isCancelled())
-        receivePacketPlaySoundOriginal(a1, networkIdentifier, netEventCallback, packet);
+        receivePacketPlaySoundOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
 }
 
-void SendPacketHook::receiveCallbackEntityEvent(const float *a1, const float *networkIdentifier,
-                                                const float *netEventCallback, const std::shared_ptr<Packet> &packet) {
+void SendPacketHook::receiveCallbackEntityEvent(void *packetHandlerDispatcher, void *networkIdentifier,
+                                                void *netEventCallback, const std::shared_ptr<Packet> &packet) {
+    SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
     PacketEvent event(packet.get());
     EventHandler::onPacketReceive(event);
     if (!event.isCancelled())
-        receivePacketEntityEventOriginal(a1, networkIdentifier, netEventCallback, packet);
+        receivePacketEntityEventOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
 
 }
 
@@ -85,4 +90,10 @@ void SendPacketHook::enableHook() {
                      (void **) &receivePacketEntityEventOriginal, "ReceivePacketHook");
 
     this->autoHook((void *) callback, (void **) &sendPacketOriginal);
+}
+
+void SendPacketHook::setVariables(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback) {
+    SendPacketHook::NetworkIdentifier = networkIdentifier;
+    SendPacketHook::PacketHandlerDispatcher = packetHandlerDispatcher;
+    SendPacketHook::NetEventCallback = netEventCallback;
 }
