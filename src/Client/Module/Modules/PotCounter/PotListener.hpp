@@ -20,12 +20,9 @@ public:
  
 
     void onTick(TickEvent& event) override {
-       
-    }
-
-    void onRender(RenderEvent& event) override {
         if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                auto potsCount = 0;
                 if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
                     auto inventory = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory;
 
@@ -35,20 +32,21 @@ public:
 
                             if (item->getItem() != nullptr) {
                                 if (item->getItem()->name == "splash_potion") {
-                                    pots++;
+                                    potsCount++;
                                 }
                             }
                         }
                     }
 
-                    auto potsStr = std::to_string(pots);
-
-                    this->module->normalRender(14, potsStr);
-
-                    pots = 0;
+                    pots = potsCount;
                 }
             }
         }
+    }
+
+    void onRender(RenderEvent& event) override {
+        auto potsStr = std::to_string(pots);
+        this->module->normalRender(14, potsStr);
     }
 
 public:
