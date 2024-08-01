@@ -61,6 +61,8 @@
 #include "Modules/Misc/DiscordRPC/DiscordRPCListener.hpp"
 //#include "Modules/Overlay/OverlayModule.hpp"
 #include "Modules/AutoRQ/AutoRQ.hpp"
+#include "Modules/HitPing/HitPing.hpp"
+#include "Modules/InstantHurtAnimation/InstantHurtAnimation.hpp"
 //#include "Modules/MovableChat/MovableChat.hpp"
 #include <algorithm>
 
@@ -149,6 +151,8 @@ void ModuleManager::initialize() {
     addModule(new InventoryHUD());
     //addModule(new OverlayModule());
     addModule(new AutoRQ());
+    addModule(new HitPing());
+    addModule(new InstantHurtAnimation());
     //addModule(new MovableChat());
     //addModule(new CompactChat());
 
@@ -199,5 +203,4 @@ Module* ModuleManager::getModule(const std::string& name) {
     size_t hash = std::hash<std::string>{}(name);
 
     return moduleMap[hash];
-
 }
