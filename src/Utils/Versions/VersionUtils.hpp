@@ -12,5 +12,5 @@ public:
     static bool isSupported(const std::string& version);
     static void addData();
 
-    static std::unordered_map<std::string, std::pair<std::function<void()>, std::function<void()>>> versions;
+    static std::vector<std::pair<std::string, std::pair<std::function<void()>, std::function<void()>>>> versions;
 };
