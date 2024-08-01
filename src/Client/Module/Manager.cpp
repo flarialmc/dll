@@ -61,6 +61,8 @@
 #include "Modules/Misc/DiscordRPC/DiscordRPCListener.hpp"
 //#include "Modules/Overlay/OverlayModule.hpp"
 #include "Modules/AutoRQ/AutoRQ.hpp"
+#include "Modules/HitPing/HitPing.hpp"
+#include "Modules/InstantHurtAnimation/InstantHurtAnimation.hpp"
 //#include "Modules/MovableChat/MovableChat.hpp"
 #include <algorithm>
 
@@ -147,6 +149,8 @@ void ModuleManager::initialize() {
     ModuleManager::addModule(new CommandHotkey());
     ModuleManager::addModule(new NoHurtCam());
     ModuleManager::addModule(new InventoryHUD());
+    ModuleManager::addModule(new HitPing());
+    ModuleManager::addModule(new InstantHurtAnimation());
     //ModuleManager::addModule(new OverlayModule());
     ModuleManager::addModule(new AutoRQ());
     //ModuleManager::addModule(new MovableChat());
