@@ -16,7 +16,6 @@ public:
     explicit MotionBlurListener(const char string[5], Module *module) {
         this->name = string;
         this->module = module;
-
     }
 
 
@@ -64,6 +63,5 @@ public:
         }
 
         D2D::context->Flush();
-
     }
 };
