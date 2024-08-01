@@ -8,6 +8,7 @@
 #include "../../../../SDK/SDK.hpp"
 #include <Windows.h>
 #include <d3dcompiler.h>
+#include <wrl/client.h>
 
 class MotionBlurListener : public Listener {
 
@@ -179,6 +180,14 @@ float4 main(PS_INPUT input) : SV_Target
     ID3D11Buffer* vertexBuffer;
     ID3D11Buffer* constantBuffer;
     ID3D11SamplerState* samplerState;
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView = nullptr;
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView = nullptr;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer = nullptr;
+
+    struct CONSTANT_BUFFER_DATA {
+        float opacity;
+    };
+
 
     void InitializeFullscreenQuad(ID3D11Device* device) {
         ID3DBlob* vsBlob;
@@ -188,10 +197,11 @@ float4 main(PS_INPUT input) : SV_Target
         device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &vertexShader);
         device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &pixelShader);
         D3D11_INPUT_ELEMENT_DESC layout[] = {
-            { "POSITION", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "TEXCOORD", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+            { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+            { "TEXCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         };
-        device->CreateInputLayout(layout, ARRAYSIZE(layout), vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &inputLayout);
+        HRESULT hr = device->CreateInputLayout(layout, ARRAYSIZE(layout), vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &inputLayout);
+        if(FAILED(hr)) std::cout << "Failed to create input Layout: " << std::hex << hr << std::endl;
         vsBlob->Release();
         psBlob->Release();
         Vertex vertices[] = {
@@ -202,9 +212,17 @@ float4 main(PS_INPUT input) : SV_Target
         };
         D3D11_BUFFER_DESC bufferDesc = { sizeof(vertices), D3D11_USAGE_DEFAULT, D3D11_BIND_VERTEX_BUFFER, 0, 0, 0 };
         D3D11_SUBRESOURCE_DATA initData = { vertices, 0, 0 };
-        device->CreateBuffer(&bufferDesc, &initData, &vertexBuffer);
-        D3D11_BUFFER_DESC cbDesc = { sizeof(float), D3D11_USAGE_DEFAULT, D3D11_BIND_CONSTANT_BUFFER, 0, 0, 0 };
-        device->CreateBuffer(&cbDesc, nullptr, &constantBuffer);
+        hr = device->CreateBuffer(&bufferDesc, &initData, &vertexBuffer);
+        if(FAILED(hr)) std::cout << "Failed to create vertex buffer: " << std::hex << hr << std::endl;
+        D3D11_BUFFER_DESC cbDesc;
+        cbDesc.ByteWidth = sizeof( CONSTANT_BUFFER_DATA );
+        cbDesc.Usage = D3D11_USAGE_DEFAULT;
+        cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        cbDesc.MiscFlags = 0;
+        cbDesc.StructureByteStride = 0;
+        hr = device->CreateBuffer(&cbDesc, nullptr, &constantBuffer);
+        if(FAILED(hr)) std::cout << "Failed to create constant buffer: " << std::hex << hr << std::endl;
         D3D11_SAMPLER_DESC sampDesc = {};
         sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
         sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -214,28 +232,108 @@ float4 main(PS_INPUT input) : SV_Target
     }
 
 
-    void RenderFullscreenQuad(ID3D11ShaderResourceView* srv, float opacity) {
+void RenderFullscreenQuad(ID3D11ShaderResourceView* srv, float opacity) {
 
-        ID3D11DeviceContext* context;
-        SwapchainHook::d3d11Device->GetImmediateContext(&context);
-        UINT stride = sizeof(Vertex);
-        UINT offset = 0;
+    ID3D11DeviceContext* context = nullptr;
+    SwapchainHook::d3d11Device->GetImmediateContext(&context);
 
-        if(SwapchainHook::d3d11Device && context && vertexBuffer && constantBuffer && srv && SwapchainHook::init && inputLayout) {
-            context->IASetInputLayout(inputLayout);
+    UINT stride = sizeof(Vertex);
+    UINT offset = 0;
 
-            context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-            context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-            context->VSSetShader(vertexShader, nullptr, 0);
-            context->PSSetShader(pixelShader, nullptr, 0);
-            context->PSSetShaderResources(0, 1, &srv);
-            context->PSSetSamplers(0, 1, &samplerState);
-            context->UpdateSubresource(constantBuffer, 0, nullptr, &opacity, 0, 0);
-            context->VSSetConstantBuffers(0, 1, &constantBuffer);
-            context->PSSetConstantBuffers(0, 1, &constantBuffer);
-            context->Draw(4, 0);
-        } else {
-            //std::cout << "TROLLED" << std::endl;
+
+    if (!SwapchainHook::d3d11Device || !context || !vertexBuffer || !constantBuffer || !srv || !SwapchainHook::init || !inputLayout) {
+        std::cout << "One or more required resources are null." << std::endl;
+        if (context) {
+            context->Release();
+        }
+        return;
+    }
+
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer = nullptr;
+    HRESULT hr = SwapchainHook::swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(backBuffer.GetAddressOf()));
+    if (FAILED(hr)) {
+        std::cout << "Failed to get the swap chain buffer. HRESULT: " << std::hex << hr << std::endl;
+        if (context) {
+            context->Release();
+        }
+        return;
+    }
+
+    hr = SwapchainHook::d3d11Device->CreateRenderTargetView(backBuffer.Get(), nullptr, &renderTargetView);
+    if (FAILED(hr)) {
+        std::cout << "Failed to create render target view. HRESULT: " << std::hex << hr << std::endl;
+        if (context) {
+            context->Release();
+        }
+        return;
+    }
+
+    if (!depthStencilBuffer) {
+        D3D11_TEXTURE2D_DESC depthStencilDesc = {};
+        depthStencilDesc.Width = MC::windowSize.x;
+        depthStencilDesc.Height = MC::windowSize.y;
+        depthStencilDesc.MipLevels = 1;
+        depthStencilDesc.ArraySize = 1;
+        depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        depthStencilDesc.SampleDesc.Count = 1;
+        depthStencilDesc.SampleDesc.Quality = 0;
+        depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
+        depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+        depthStencilDesc.CPUAccessFlags = 0;
+        depthStencilDesc.MiscFlags = 0;
+
+        hr = SwapchainHook::d3d11Device->CreateTexture2D(&depthStencilDesc, nullptr, &depthStencilBuffer);
+        if (FAILED(hr)) {
+            std::cout << "Failed to create depth stencil buffer. HRESULT: " << std::hex << hr << std::endl;
+            if (context) {
+                context->Release();
+            }
+            return;
+        }
+
+        hr = SwapchainHook::d3d11Device->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, &depthStencilView);
+        if (FAILED(hr)) {
+            std::cout << "Failed to create depth stencil view. HRESULT: " << std::hex << hr << std::endl;
+            if (context) {
+                context->Release();
+            }
+            return;
         }
     }
+
+    context->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
+
+    D3D11_VIEWPORT viewport = {};
+    viewport.Width = MC::windowSize.x;
+    viewport.Height = MC::windowSize.y;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    context->RSSetViewports(1, &viewport);
+
+    CONSTANT_BUFFER_DATA data{opacity};
+    context->UpdateSubresource(constantBuffer, 0, nullptr, &data, 0, 0);
+    context->VSSetConstantBuffers(0, 1, &constantBuffer);
+    context->PSSetConstantBuffers(0, 1, &constantBuffer);
+
+    context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+    context->VSSetShader(vertexShader, nullptr, 0);
+    context->PSSetShader(pixelShader, nullptr, 0);
+    context->PSSetShaderResources(0, 1, &srv);
+    context->PSSetSamplers(0, 1, &samplerState);
+    context->IASetInputLayout(inputLayout);
+
+
+
+    context->Draw(4, 0);
+
+
+    if (context) {
+        context->Release();
+    }
+}
+
+
 };
