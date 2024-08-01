@@ -47,8 +47,10 @@ DWORD WINAPI init(HMODULE real)
                 if(SDK::hasInstanced && SDK::clientInstance != nullptr) {
                     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                         if(elapsed >= std::chrono::seconds(60)) {
-                            ModuleManager::onlineUsers.clear();
                             std::string name = SDK::clientInstance->getLocalPlayer()->playerName;
+
+                            /*
+                            ModuleManager::onlineUsers.clear();
                             ModuleManager::onlineUsers.push_back(Utils::removeColorCodes(name));
                             std::string pp = DownloadString("https://api.flarial.synthetix.host/users");
 
@@ -80,6 +82,7 @@ DWORD WINAPI init(HMODULE real)
                                     continue;
                                 }
                             }
+                            */
 
                             std::string ipToSend = SDK::getServerIP();
 
