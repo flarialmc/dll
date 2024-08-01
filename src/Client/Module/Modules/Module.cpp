@@ -18,7 +18,6 @@ void Module::normalRender(int index, std::string &value) {
         text = this->settings.getSettingByName<std::string>("text")->value;
 
     float rotation = this->settings.getSettingByName<float>("rotation")->value;
-    ImVec2 rotationCenter;
     DWRITE_TEXT_ALIGNMENT alignment = alignments[this->settings.getSettingByName<std::string>(
             "textalignment")->value];
     bool responsivewidth = this->settings.getSettingByName<bool>("responsivewidth")->value;
@@ -109,11 +108,11 @@ void Module::normalRender(int index, std::string &value) {
     textColor.a = settings.getSettingByName<float>("textOpacity")->value;
     borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
 
-    if (rotation > 0.0f) {
+    ImVec2 rotationCenter = ImVec2(
+    realcenter.x + rectWidth / 2.0f,
+    realcenter.y + textHeight * this->settings.getSettingByName<float>("rectheight")->value / 2.0f);
 
-        ImVec2 rotationCenter = ImVec2(
-            realcenter.x + rectWidth / 2.0f,
-            realcenter.y + textHeight * this->settings.getSettingByName<float>("rectheight")->value / 2.0f);
+    if (rotation > 0.0f) {
 
         FlarialGUI::ImRotateStart();
     }
