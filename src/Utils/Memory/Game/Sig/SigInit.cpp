@@ -28,6 +28,8 @@ void SigInit::init2080() {
 
     ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 C0");
 
+    ADD_SIG("GuiData::displayClientMessage", "40 55 53 56 57 41 56 48 8D AC 24 F0 FE FF FF 48 81 EC 10 02 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 85 00 01 00 00 41");
+
     ADD_SIG("HitResult::getEntity", "48 83 EC 58 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 40 48 8D");
 }
 
@@ -201,6 +203,7 @@ void SigInit::init2030() {
     ADD_SIG("Tessellator::resetTransform", "80 B9 ? ? ? ? ? 4C 8B C1 75");
     ADD_SIG("MeshHelper::renderImmediately", "48 89 5C 24 ? 48 89 74 24 ? 57 48 81 EC ? ? ? ? 49 8B F8 48 8B DA 48 8B F1 80 BA");
 
+    ADD_SIG("GuiData::displayClientMessage", "40 55 53 56 57 41 56 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 41 0F B6 F0");
 
     ADD_SIG("HitResult::getEntity", "E8 ? ? ? ? EB 1A 48 8B CE");
 }
