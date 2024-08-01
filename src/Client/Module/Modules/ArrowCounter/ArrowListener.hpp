@@ -19,13 +19,10 @@ public:
 
 
     void onTick(TickEvent &event) override {
-
-    }
-
-    void onRender(RenderEvent &event) override {
         if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                 if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
+                    auto arrowsCount = 0;
 
                     auto inventory = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory;
                     if(inventory == nullptr) return;
@@ -34,7 +31,7 @@ public:
                     if(offhandItem != nullptr)
                         if (offhandItem->getItem() != nullptr)
                             if (offhandItem->getItem()->name == "arrow")
-                                arrows = offhandItem->count;
+                                arrowsCount = offhandItem->count;
 
 
                     for (int i = 0; i < 36; i++) {
@@ -42,20 +39,21 @@ public:
 
                         if (item->getItem() != nullptr) {
                             if (item->getItem()->name == "arrow") {
-                                arrows += item->count;
+                                arrowsCount += item->count;
                             }
 
                         }
                     }
 
-                    auto arrowsStr = std::to_string(arrows);
-
-                    this->module->normalRender(13, arrowsStr);
-
-                    arrows = 0;
+                    arrows = arrowsCount;
                 }
             }
         }
+    }
+
+    void onRender(RenderEvent &event) override {
+        auto arrowsStr = std::to_string(arrows);
+        this->module->normalRender(13, arrowsStr);
     }
 
 public:
