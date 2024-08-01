@@ -51,7 +51,8 @@ std::string Utils::removeColorCodes(const std::string &input) {
 std::string Utils::removeNonAlphanumeric(const std::string &input) {
     std::string result;
     std::copy_if(input.begin(), input.end(), std::back_inserter(result), [](char c) {
-        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' || c == ' ';
+        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' || c == ' ' ||
+               c == '-';
     });
     return result;
 }
@@ -390,4 +391,16 @@ bool Utils::CursorInEllipse(float ellipseX, float ellipseY, float radiusX, float
     float normalizedY = (mouseY - ellipseY) / radiusY;
 
     return (normalizedX * normalizedX + normalizedY * normalizedY) <= 1.0f;
+}
+
+int Utils::CountBytes(const std::string& data) {
+    std::istringstream iss(data);
+    int count = 0;
+    std::string byte;
+
+    while (iss >> byte) {
+        count++;
+    }
+
+    return count;
 }

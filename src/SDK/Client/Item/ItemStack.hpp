@@ -18,4 +18,5 @@ public:
     [[nodiscard]] Item* getItem() const;
     short getDamageValue();
     short getMaxDamage();
+    bool isEnchanted();
 };
