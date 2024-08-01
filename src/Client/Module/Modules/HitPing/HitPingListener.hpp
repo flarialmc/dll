@@ -35,7 +35,7 @@ class HitPingListener : public Listener {
         if (module->isEnabled()) {
             auto delayStr = std::to_string(pingReach)+"\n"+std::to_string((int)round(hitDelay.count() * 1000));
 
-            this->module->normalRender(7, delayStr);
+            this->module->normalRender(21, delayStr);
         }
     }
 
