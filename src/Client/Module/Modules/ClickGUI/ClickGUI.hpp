@@ -130,6 +130,13 @@ public:
         if (settings.getSettingByName<bool>("colors_secondary7_rgb") == nullptr)
             settings.addSetting("colors_secondary7_rgb", false);
 
+        if (settings.getSettingByName<std::string>("colors_secondary8") == nullptr)
+            settings.addSetting("colors_secondary8", (std::string) "302728");
+        if (settings.getSettingByName<float>("o_colors_secondary8") == nullptr)
+            settings.addSetting("o_colors_secondary8", 1.0f);
+        if (settings.getSettingByName<bool>("colors_secondary8_rgb") == nullptr)
+            settings.addSetting("colors_secondary8_rgb", false);
+
         if (settings.getSettingByName<std::string>("colors_mod1") == nullptr)
             settings.addSetting("colors_mod1", (std::string) "201a1b");
         if (settings.getSettingByName<float>("o_colors_mod1") == nullptr)

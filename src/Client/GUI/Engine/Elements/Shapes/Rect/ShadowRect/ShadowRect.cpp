@@ -1,48 +1,66 @@
 #include "../../../../Engine.hpp"
 #include "../../../../../../Client.hpp"
 
-void FlarialGUI::ShadowRect(D2D1_ROUNDED_RECT rect, D2D1_COLOR_F color) {
+inline float GetColorComponent(ImU32 color, int shift) {
+    return ((color >> shift) & 0xFF) / 255.0f;
+}
 
-    // Use shadows only in dx 12 for now
-    if (!Client::settings.getSettingByName<bool>("noshadows")->value && SwapchainHook::queue != nullptr) {
-        // Create a new blank bitmap
-        ID2D1Bitmap1 *newLayer = nullptr;
-        D2D1_BITMAP_PROPERTIES1 newLayerProps = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET,
-                                                                        D2D::context->GetPixelFormat());
-        D2D::context->CreateBitmap(D2D::context->GetPixelSize(), nullptr, 0, newLayerProps, &newLayer);
+void RoundedRectBorder(Vec2<float> Position, Vec2<float> Size, ImColor Colour, float Thickness, float Rounding, int Flags) {
+    ImGui::GetBackgroundDrawList()->AddRect(ImVec2(Position.x, Position.y), ImVec2(Position.x + Size.x, Position.y + Size.y), Colour, Rounding, Flags, Thickness);
+}
 
-        if(FlarialGUI::shadow_blur == nullptr){
-            D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &FlarialGUI::shadow_blur);
-            FlarialGUI::shadow_blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
-            FlarialGUI::shadow_blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, 10.0f);
-        }
+void FlarialGUI::ShadowRect(Vec2<float> pos, Vec2<float> size, D2D_COLOR_F color, float rounding, int shadowSize)
+{
+    if (isInScrollView) pos.y += scrollpos;
 
-        if (newLayer != nullptr) {
-            D2D::context->SetTarget(newLayer);
-            D2D::context->Clear(D2D1::ColorF(0, 0, 0, 0));
+    ImColor shadowColor = ImColor(color.r, color.g, color.b, color.a);
+	shadowColor.Value.w *= .5f;
 
-            ID2D1SolidColorBrush *colorBrush;
-            colorBrush = FlarialGUI::getBrush(color).get();
-            D2D::context->FillRoundedRectangle(rect, colorBrush);
+    for (int i = 0; i < shadowSize; i++)
+    {
+        float progress = (float)i / shadowSize;
+        float alphaFactor = (1.0f - progress) * (1.0f - progress); //took help from gpt for alpha factor
 
+        float shadowR = GetColorComponent(shadowColor, IM_COL32_R_SHIFT);
+        float shadowG = GetColorComponent(shadowColor, IM_COL32_G_SHIFT);
+        float shadowB = GetColorComponent(shadowColor, IM_COL32_B_SHIFT);
+        float shadowA = GetColorComponent(shadowColor, IM_COL32_A_SHIFT) * alphaFactor;
 
-            FlarialGUI::shadow_blur->SetInput(0, newLayer);
+        ImU32 fadedShadowColor = ImColor(shadowR, shadowG, shadowB, shadowA);
 
-            ID2D1Image *out;
-            FlarialGUI::shadow_blur->GetOutput(&out);
+        Vec2 offset = Vec2(progress * shadowSize, progress * shadowSize);
 
-            // Set the rendering target to the main bitmap
-            if (SwapchainHook::queue != nullptr)
-                D2D::context->SetTarget(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap]);
-            else D2D::context->SetTarget(SwapchainHook::D2D1Bitmap);
+        //ImGui::GetBackgroundDrawList()->AddRect(ImVec2(pos.x - offset.x, pos.y - offset.y), ImVec2(pos.x + size.x + (offset.x * 2), pos.y + size.y + (offset.y * 2)), fadedShadowColor, rounding + progress * shadowSize, 240, 2);
 
-
-            D2D::context->DrawImage(out);
-
-            Memory::SafeRelease(newLayer);
-            Memory::SafeRelease(out);
-        }
-
-        Memory::SafeRelease(newLayer);
+		RoundedRectBorder(pos - offset, size + offset + offset, fadedShadowColor, 2.0f, rounding + progress * shadowSize, 240);
     }
+    //ImGui::GetBackgroundDrawList()->AddRect(ImVec2(pos.x, pos.y), ImVec2(size.x + pos.y, size.y + pos.y), shadowColor, rounding, 240, 1);
+	RoundedRectBorder(pos, size, ImColor(color.r, color.g, color.b, color.a), 1, rounding, 240);
+
+    /*
+
+    color.a *= .5f;
+
+    for (int i = 0; i < shadowSize; i++)
+    {
+        float progress = (float)i / shadowSize;
+        float alphaFactor = (1.0f - progress) * (1.0f - progress); //took help from gpt for alpha factor
+
+        ImColor fadedShadowColor = ImColor(color.r, color.g, color.b, color.a * alphaFactor);
+
+        Vec2 offset = Vec2(progress * shadowSize, progress * shadowSize);
+
+        ImGui::GetBackgroundDrawList()->AddRect(ImVec2(pos.x - (offset.x), pos.y - (offset.y)), ImVec2(pos.x + size.x + (offset.x * 2), pos.y + size.y + (offset.y * 2)), fadedShadowColor, rounding + progress * shadowSize, 0, 2);
+
+        //FlarialGUI::RoundedHollowRect(pos.x - offset.x, pos.y - offset.y, 2.0f, fadedShadowColor, size.x + offset.x*2, size.y + offset.y*2, rounding + progress * shadowSize, rounding + progress * shadowSize);
+        
+        //RoundedRectBorder(pos - offset, size + offset + offset, fadedShadowColor, 2.0f, rounding + progress * shadowSize);
+    }
+
+    ImGui::GetBackgroundDrawList()->AddRect(ImVec2(pos.x, pos.y), ImVec2(pos.x + size.x, pos.y + size.y), D2DColorToImColor(color), rounding, 0, 2);
+
+    //FlarialGUI::RoundedHollowRect(pos.x, pos.y, shadowSize, color, size.x, size.y, rounding, rounding);
+    //RoundedRectBorder(pos, size, color, 1, rounding);
+
+    */
 }

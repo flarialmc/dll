@@ -18,22 +18,15 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
     if (isAdditionalY) UnSetIsInAdditionalYMode();
 
     D2D1_COLOR_F buttonColor;
+    buttonColor = D2D1::ColorF(color.r, color.g, color.b, 255.f);
 
-    if (radioNum != currentNum) {
-        FadeEffect::ApplyFadeInEffect(0.03f * FlarialGUI::frameFactor, 1, opacityAmounts[index]);
-        buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[index]);
-    } else {
-        FadeEffect::ApplyFadeOutEffect(0.03f * FlarialGUI::frameFactor, opacityAmounts[index]);
-        buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[index]);
-    }
+    FlarialGUI::RoundedRect(x, y, buttonColor, width, height, radiusX, radiusY);
 
-    D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
-    D2D::context->FillRoundedRectangle(roundedRect, FlarialGUI::getBrush(buttonColor).get());
-
-    x += Constraints::SpacingConstraint(0.077, width);
+    x += Constraints::SpacingConstraint(0.097, width);
     //D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
     // TODO: check if this correct
-    FlarialGUI::FlarialTextWithFont(x, y, text, width, height, DWRITE_TEXT_ALIGNMENT_CENTER, width * 0.84f,
+
+    if(radioNum == currentNum) FlarialGUI::FlarialTextWithFont(x, y, text, width, height, DWRITE_TEXT_ALIGNMENT_CENTER, width * 1.05,
                                     DWRITE_FONT_WEIGHT_REGULAR, textColor);
 
     if (isAdditionalY) SetIsInAdditionalYMode();
