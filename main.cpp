@@ -49,7 +49,7 @@ DWORD WINAPI init(HMODULE real)
                         if(elapsed >= std::chrono::seconds(60)) {
                             std::string name = SDK::clientInstance->getLocalPlayer()->playerName;
 
-                            /*
+
                             ModuleManager::onlineUsers.clear();
                             ModuleManager::onlineUsers.push_back(Utils::removeColorCodes(name));
                             std::string pp = DownloadString("https://api.flarial.synthetix.host/users");
@@ -82,7 +82,6 @@ DWORD WINAPI init(HMODULE real)
                                     continue;
                                 }
                             }
-                            */
 
                             std::string ipToSend = SDK::getServerIP();
 
