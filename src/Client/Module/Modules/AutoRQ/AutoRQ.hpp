@@ -32,6 +32,8 @@ public:
             settings.addSetting("command", (std::string)"");
         if (settings.getSettingByName<bool>("solo") == nullptr)
             settings.addSetting("solo", false);
+        if (settings.getSettingByName<bool>("hub") == nullptr)
+            settings.addSetting("hub", false);
         if (settings.getSettingByName<bool>("murderer") == nullptr)
             settings.addSetting("murderer", false);
         if (settings.getSettingByName<bool>("sheriff") == nullptr)
@@ -64,6 +66,13 @@ public:
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(1.0f, "height"));
 
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0, textWidth), toggleY,
+                                        L"Re-Q when you finish or die in a game\npls dont use while in a party", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
                                         L"Solo mode", textWidth * 6.9f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
@@ -73,6 +82,25 @@ public:
                 "solo")->value))
             this->settings.getSettingByName<bool>("solo")->value = !this->settings.getSettingByName<bool>(
                     "solo")->value;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0, textWidth), toggleY,
+                                        L"Use /hub instead of /q", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                        L"use /hub", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        if (FlarialGUI::Toggle(11, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                "hub")->value))
+            this->settings.getSettingByName<bool>("hub")->value = !this->settings.getSettingByName<bool>(
+                    "hub")->value;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
