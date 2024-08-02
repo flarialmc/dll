@@ -43,21 +43,12 @@ void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::str
 
     if (relative && isInScrollView) y += scrollpos;
     if (push) {
-        tooltipsList[id] = ToolTipParams{x, y, text, width, height, relative};
+        tooltipsList[id] = ToolTipParams{x, y, text, width, height, relative, ""};
         return;
     }
 
     float fontSize1 = Constraints::RelativeConstraint(0.12, "height", true);
     //IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, fontSize, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_LEADING);
-
-    auto textLayout = FlarialGUI::GetTextLayout(FlarialGUI::to_wide(text).c_str(), DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                DWRITE_PARAGRAPH_ALIGNMENT_CENTER, fontSize1,
-                                                DWRITE_FONT_WEIGHT_REGULAR,
-                                                Constraints::PercentageConstraint(1.0f, "left"),
-                                                Constraints::RelativeConstraint(0.029, "height", true));
-
-    DWRITE_TEXT_METRICS textMetrics{};
-    textLayout->GetMetrics(&textMetrics);
     //textLayout->Release();
 
     D2D1_COLOR_F bgCol = colors_secondary2_rgb ? rgbColor : colors_secondary2;
@@ -68,8 +59,8 @@ void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::str
     textCol.a = o_colors_text * tooltips[id].opac;
 
     float spacing = Constraints::RelativeConstraint(0.01f, "height", true);
-    float rectWidth = textMetrics.width + spacing * 2;
-    float rectHeight = textMetrics.height + spacing * 2;
+    float rectWidth = TextSizes[tooltips[id].textName] + spacing * 2;
+    float rectHeight = spacing * 10;
 
     if (CursorInRect(x, y, width, height)) {
         if (!tooltips[id].in) {
@@ -112,8 +103,8 @@ void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::str
         RoundedHollowRect(tooltips[id].hoverX + offset, tooltips[id].hoverY - offset,
                           Constraints::RelativeConstraint(0.001, "height", true), outlineCol, rectWidth, rectHeight,
                           round.x, round.x);
-        FlarialTextWithFont(spacing + tooltips[id].hoverX + offset, tooltips[id].hoverY - offset,
-                            FlarialGUI::to_wide(text).c_str(), textMetrics.width * 6.9f, rectHeight,
+        tooltips[id].textName = FlarialTextWithFont(spacing + tooltips[id].hoverX + offset, tooltips[id].hoverY - offset,
+                            FlarialGUI::to_wide(text).c_str(), Constraints::RelativeConstraint(1, "height", true) * 6.9f, rectHeight,
                             DWRITE_TEXT_ALIGNMENT_LEADING, fontSize1, DWRITE_FONT_WEIGHT_REGULAR, textCol);
     }
 

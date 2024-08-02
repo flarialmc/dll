@@ -3,6 +3,7 @@
 #include <utility>
 #include <winrt/base.h>
 #include <cmath>
+#include <imgui_internal.h>
 #include <variant>
 #include "Constraints.hpp"
 #include "animations/fadeinout.hpp"
@@ -17,6 +18,15 @@
 #include "Elements/Control/Dropdown/DropdownStruct.hpp"
 #include "../../../Assets/Assets.hpp"
 #include <string>
+#include <windows.h>
+#include <dwrite.h>
+#include <wrl.h>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <fstream>
+#include <algorithm>
+//#include <misc/freetype/imgui_freetype.h>
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -55,10 +65,14 @@
 std::map<std::string, ID2D1Bitmap *> ImagesClass::eimages;
 std::map<int, ID2D1Bitmap *> ImagesClass::images;
 
+std::map<int, ID3D11ShaderResourceView*> ImagesClass::ImguiDX11Images;
+std::map<int, ImTextureID> ImagesClass::ImguiDX12Images;
+
 // TODO: release it !!!
 ID2D1Factory *FlarialGUI::factory;
 IDWriteFactory *FlarialGUI::writeFactory;
 ID2D1ImageBrush *FlarialGUI::blurbrush;
+std::unordered_map<std::string, float> FlarialGUI::TextSizes;
 
 // todo: all use cache
 std::unordered_map<std::string, ToolTipStruct> FlarialGUI::tooltips;
@@ -152,6 +166,13 @@ uint64_t generateUniqueLinearGradientBrushKey(float x, float hexPreviewSize, flo
     delete[] gradientStops;
 
     return combinedHash;
+}
+
+std::string FlarialGUI::WideToNarrow(const std::wstring& wideStr) {
+    int narrowStrLen = WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+    std::vector<char> narrowStr(narrowStrLen);
+    WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, narrowStr.data(), narrowStrLen, nullptr, nullptr);
+    return std::string(narrowStr.data());
 }
 
 bool FlarialGUI::CursorInRect(float rectX, float rectY, float width, float height) {
@@ -345,6 +366,10 @@ float FlarialGUI::HueToRGB(float p, float q, float t) {
     return p;
 }
 
+ImColor FlarialGUI::D2DColorToImColor(D2D1_COLOR_F color) {
+    return ImColor(color.r, color.g, color.b, color.a);
+}
+
 HSV FlarialGUI::RGBtoHSV(D2D1_COLOR_F rgb) {
     float r = rgb.r;
     float g = rgb.g;
@@ -482,16 +507,82 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, float width,
 
 }
 
-void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
+void FlarialGUI::LoadAllImageToCache() {
+
+    for (int i = 101; i < MAX_IMAGE_ID; ++i) {
+        LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "PNG");
+    }
+
+    hasLoadedAll = true;
+
+}
+
+
+std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
                                      const DWRITE_FONT_WEIGHT weight, bool moduleFont) {
+
+
     D2D1_COLOR_F color = colors_text_rgb ? rgbColor : colors_text;
     color.a = o_colors_text;
 
-    FlarialTextWithFont(x, y, text, width, height, alignment, fontSize, weight, color, moduleFont);
+    return FlarialTextWithFont(x, y, text, width, height, alignment, fontSize, weight, color, moduleFont);
 }
 
-void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
+bool replace(std::string& str, const std::string& from, const std::string& to) {
+    size_t start_pos = str.find(from);
+    if(start_pos == std::string::npos)
+        return false;
+    str.replace(start_pos, from.length(), to);
+    return true;
+}
+
+std::string FlarialGUI::GetWeightedName(std::string name, DWRITE_FONT_WEIGHT weight) {
+
+    if(!name.contains("-")) {
+        switch (weight) {
+
+            case DWRITE_FONT_WEIGHT_BOLD:
+               return name + "-Bold";
+            break;
+            case DWRITE_FONT_WEIGHT_NORMAL:
+                return name + "-Normal";
+            break;
+            case DWRITE_FONT_WEIGHT_SEMI_BOLD:
+                return name + "-SemiBold";
+            break;
+            case DWRITE_FONT_WEIGHT_EXTRA_BOLD:
+                return name + "-ExtraBold";
+            break;
+            case DWRITE_FONT_WEIGHT_MEDIUM:
+                return name + "-Medium";
+            break;
+            case DWRITE_FONT_WEIGHT_LIGHT:
+                return name + "-Light";
+            break;
+            case DWRITE_FONT_WEIGHT_EXTRA_LIGHT:
+                return name + "-ExtraLight";
+            break;
+        }
+    }
+
+    return name + "-Normal";
+}
+
+bool hasEnding (std::string const &fullString, std::string const &ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
+}
+
+bool ifFontScale2(const float fontSize) {
+    return fontSize / 135 > 1;
+}
+
+
+std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
                                      const DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont) {
 
@@ -504,12 +595,75 @@ void FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, cons
     }
     if (isInScrollView) y += scrollpos;
 
-    if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
+    if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return "no";
 
-    auto textLayout = FlarialGUI::GetTextLayout(text, alignment, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, fontSize, weight,
-                                                width, height, moduleFont);
-    D2D::context->DrawTextLayout(D2D1::Point2F(x, y), textLayout.get(), FlarialGUI::getBrush(color).get());
+    std::string font = Client::settings.getSettingByName<std::string>(moduleFont ? "mod_fontname" : "fontname")->value;
+    std::string weightedName = GetWeightedName(font, weight);
+    std::transform(weightedName.begin(), weightedName.end(), weightedName.begin(), ::towlower);
 
+    if(!FontMap[weightedName + "-1"] && !FontsNotFound[weightedName + "-1"]) {
+
+        if(moduleFont) {
+            DoLoadModuleFontLater = true;
+            LoadModuleFontLater = font;
+            LoadModuleFontLaterWeight = weight;
+        } else {
+            DoLoadGUIFontLater = true;
+            LoadGUIFontLater = font;
+            LoadGUIFontLaterWeight = weight;
+        }
+    }
+
+    if(ifFontScale2(fontSize)) weightedName += "-2.0";
+    else weightedName += "-1";
+
+    if(weightedName.contains("minecraft")) weightedName = "164";
+
+    if(!FontMap[weightedName] && weightedName.contains("Normal")) replace(weightedName, "Normal", "Medium");
+
+    if (!FontMap[weightedName] || font == "Space Grotesk") weightedName = "162-1";
+
+    if((weightedName == "162-1" || weightedName == "162") && weight == DWRITE_FONT_WEIGHT_BOLD) weightedName = "163-2.0";
+
+    if(weightedName == "162") weightedName = "162-1";
+
+    if(weightedName.contains("-1") && ifFontScale2(fontSize)) replace(weightedName, "-1", "-2.0");
+
+    //std::cout << weightedName << std::endl;
+
+
+    float sizeMultiplier = 1.0f;
+    if(hasEnding(weightedName, "2.0")) sizeMultiplier = 0.6f;
+
+    ImGui::PushFont(FontMap[weightedName]);
+    float fSize = (fontSize / 135) * sizeMultiplier;
+
+	ImGui::SetWindowFontScale(fSize);
+
+
+
+	switch (alignment) {
+        case DWRITE_TEXT_ALIGNMENT_LEADING:
+			break;
+
+        case DWRITE_TEXT_ALIGNMENT_CENTER: {
+			x += (width / 2) - (ImGui::CalcTextSize(WideToNarrow(text).c_str()).x / 2);
+			break;
+		}
+
+		case DWRITE_TEXT_ALIGNMENT_TRAILING: {
+			x += (width - ImGui::CalcTextSize(WideToNarrow(text).c_str()).x);
+			break;
+		}
+	}
+
+    TextSizes[weightedName + std::to_string(fSize)] = ImGui::CalcTextSize(WideToNarrow(text).c_str()).x;
+
+	y += (height / 2) - (ImGui::CalcTextSize(WideToNarrow(text).c_str()).y / 2);
+	ImGui::GetBackgroundDrawList()->AddText(ImVec2(x, y), ImColor(color.r, color.g, color.b, color.a), WideToNarrow(text).c_str());
+	ImGui::PopFont();
+
+    return weightedName + std::to_string(fSize);
 }
 
 void FlarialGUI::LoadFont(int resourceId) {
@@ -541,7 +695,186 @@ void FlarialGUI::LoadFont(int resourceId) {
     outFile.write(reinterpret_cast<const char*>(pFontData), dwFontSize);
     outFile.close();
 
-    AddFontResource(lpFileName.c_str());
+    //AddFontResource(lpFileName.c_str());
+}
+
+std::wstring FlarialGUI::GetFontFilePath(const std::wstring& fontName, DWRITE_FONT_WEIGHT weight) {
+    Microsoft::WRL::ComPtr<IDWriteFactory> factory;
+    Microsoft::WRL::ComPtr<IDWriteFontCollection> fontCollection;
+    Microsoft::WRL::ComPtr<IDWriteFontFamily> fontFamily;
+    Microsoft::WRL::ComPtr<IDWriteFont> font;
+    Microsoft::WRL::ComPtr<IDWriteFontFace> fontFace;
+    Microsoft::WRL::ComPtr<IDWriteFontFile> fontFile;
+    const void* fontFileReferenceKey;
+    UINT32 fontFileReferenceKeySize;
+    Microsoft::WRL::ComPtr<IDWriteFontFileLoader> fontFileLoader;
+    Microsoft::WRL::ComPtr<IDWriteLocalFontFileLoader> localFontFileLoader;
+    UINT32 filePathLength = 0;
+
+    // Create a DirectWrite factory
+    HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), &factory);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Get the system font collection
+    hr = factory->GetSystemFontCollection(&fontCollection);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Find the font family
+    UINT32 index = 0;
+    BOOL exists = FALSE;
+    hr = fontCollection->FindFamilyName(fontName.c_str(), &index, &exists);
+    if (FAILED(hr) || !exists) {
+        return L"";
+    }
+
+    // Get the font family
+    hr = fontCollection->GetFontFamily(index, &fontFamily);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Get the font count in the family
+    UINT32 fontCount = fontFamily->GetFontCount();
+    if (fontCount == 0) {
+        return L"";
+    }
+
+    // Find the font with the specified weight
+    UINT32 fontIndex = -1;
+    for (UINT32 i = 0; i < fontCount; ++i) {
+        Microsoft::WRL::ComPtr<IDWriteFont> tempFont;
+        hr = fontFamily->GetFont(i, &tempFont);
+        if (FAILED(hr)) {
+            continue;
+        }
+        if (tempFont->GetWeight() == weight) {
+
+            fontIndex = i;
+            fontFamily->GetFont(fontIndex, &font);
+            break;
+        }
+    }
+
+
+    if (fontIndex == -1) {
+        if(FAILED(fontFamily->GetFont(0, &font))) return L"";
+    }
+
+    // Get the font face
+    hr = font->CreateFontFace(&fontFace);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Get the font file count
+    UINT32 fileCount = 0;
+    hr = fontFace->GetFiles(&fileCount, nullptr);
+    if (FAILED(hr) || fileCount == 0) {
+        return L"";
+    }
+
+    // Allocate space for the font files
+    std::vector<Microsoft::WRL::ComPtr<IDWriteFontFile>> fontFiles(fileCount);
+
+    // Get the font files
+    hr = fontFace->GetFiles(&fileCount, reinterpret_cast<IDWriteFontFile**>(fontFiles.data()));
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Get the file reference key
+    hr = fontFiles[0]->GetReferenceKey(&fontFileReferenceKey, &fontFileReferenceKeySize);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Get the font file loader
+    hr = fontFiles[0]->GetLoader(&fontFileLoader);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Query for the local font file loader interface
+    hr = fontFileLoader->QueryInterface(__uuidof(IDWriteLocalFontFileLoader), &localFontFileLoader);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Get the font file path length
+    hr = localFontFileLoader->GetFilePathLengthFromKey(fontFileReferenceKey, fontFileReferenceKeySize, &filePathLength);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    // Get the font file path
+    std::vector<wchar_t> filePathBuffer(filePathLength + 1);
+    hr = localFontFileLoader->GetFilePathFromKey(fontFileReferenceKey, fontFileReferenceKeySize, filePathBuffer.data(), filePathLength + 1);
+    if (FAILED(hr)) {
+        return L"";
+    }
+
+    std::cout << FlarialGUI::WideToNarrow(std::wstring(filePathBuffer.data(), filePathLength)).c_str() << std::endl;
+
+    return std::wstring(filePathBuffer.data(), filePathLength);
+}
+
+
+bool FlarialGUI::LoadFontFromFontFamily(std::string name, std::string weightedName, DWRITE_FONT_WEIGHT weight) {
+    std::transform(name.begin(), name.end(), name.begin(), ::towlower);
+    std::wstring fontName = FlarialGUI::to_wide(name);
+    std::wstring fontFilePath = GetFontFilePath(fontName, weight);
+    //std::cout << WideToNarrow(fontFilePath).c_str() << std::endl;
+
+    if (!fontFilePath.empty()) {
+
+        std::ifstream fontFile(fontFilePath, std::ios::binary);
+        if (fontFile) {
+
+            ImFontConfig config;
+            FontMap[weightedName + "-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 23, &config);
+            FontMap[weightedName + "-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 40, &config);
+            if(!FontMap[weightedName + "-1"]) return false;
+            return true;
+
+        }
+    }
+
+    FontsNotFound[weightedName] = true;
+    return false;
+}
+
+
+void FlarialGUI::LoadFonts(std::map<std::string, ImFont*>& FontMap) {
+    namespace fs = std::filesystem;
+    // Directories to search for fonts
+    std::vector<std::wstring> fontDirectories = {
+        std::wstring(_wgetenv(L"USERPROFILE")) + L"\\AppData\\Local\\Microsoft\\Windows\\Fonts"
+    };
+    ImGuiIO& io = ImGui::GetIO();
+
+    ImFontConfig config;
+    //config.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_ForceAutoHint;
+
+    for (const auto& dir : fontDirectories) {
+        for (const auto& entry : fs::directory_iterator(dir)) {
+
+            if (entry.is_regular_file() && entry.path().extension() == L".ttf" && !entry.path().filename().string().contains("fon")) {
+
+                std::cout << entry.path().string() << std::endl;
+
+                std::wstring fontPath = entry.path().wstring();
+                std::string fontName = WideToNarrow(entry.path().stem().wstring());
+
+                FontMap[fontName] = io.Fonts->AddFontFromFileTTF(
+                    WideToNarrow(fontPath).c_str(), 30, &config
+                );
+            }
+        }
+    }
 }
 
 void FlarialGUI::LoadImageFromResource(int resourceId, ID2D1Bitmap **bitmap, LPCTSTR type) {
@@ -632,12 +965,14 @@ void FlarialGUI::SetScrollView(float x, float y, float width, float height) {
     FlarialGUI::isInScrollView = true;
     D2D1_RECT_F clipRect = D2D1::RectF(x, y, x + width, y + height);
     ScrollViewRect = clipRect;
+    PushImClipRect(clipRect);
     D2D::context->PushAxisAlignedClip(&clipRect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
 }
 
 void FlarialGUI::UnsetScrollView() {
     FlarialGUI::isInScrollView = false;
+    PopImClipRect();
     D2D::context->PopAxisAlignedClip();
 }
 
@@ -759,25 +1094,66 @@ void FlarialGUI::Notify(const std::string& text) {
         e.finished = false;
         e.currentPos = Constraints::PercentageConstraint(0.01, "right", true);
         e.currentPosY = Constraints::PercentageConstraint(0.25, "bottom", true);
-
-        auto textLayout = FlarialGUI::GetTextLayout(FlarialGUI::to_wide(text).c_str(), DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                    DWRITE_PARAGRAPH_ALIGNMENT_CENTER,
-                                                    Constraints::SpacingConstraint(0.3,
-                                                                                   Constraints::RelativeConstraint(0.45,
-                                                                                                                   "height",
-                                                                                                                   true)),
-                                                    DWRITE_FONT_WEIGHT_REGULAR,
-                                                    Constraints::RelativeConstraint(100.0, "height", true),
-                                                    Constraints::RelativeConstraint(100.0, "height", true));
-
-        DWRITE_TEXT_METRICS textMetrics{};
-        textLayout->GetMetrics(&textMetrics);
-
-        e.width = textMetrics.width + textMetrics.width * 0.60f;
+        e.width = Constraints::RelativeConstraint(0.12f, "height", true);
 
         notifications.push_back(e);
     }
 
+}
+
+/* rotation stuff */
+
+static int rotation_start_index;
+void FlarialGUI::ImRotateStart()
+{
+    rotation_start_index = ImGui::GetBackgroundDrawList()->VtxBuffer.Size;
+}
+
+ImVec2 FlarialGUI::ImRotationCenter()
+{
+    ImVec2 l(FLT_MAX, FLT_MAX), u(-FLT_MAX, -FLT_MAX); // bounds
+
+    const auto& buf = ImGui::GetBackgroundDrawList()->VtxBuffer;
+    for (int i = rotation_start_index; i < buf.Size; i++)
+        l = ImMin(l, buf[i].pos), u = ImMax(u, buf[i].pos);
+
+    return ImVec2((l.x+u.x)/2, (l.y+u.y)/2); // or use _ClipRectStack?
+}
+
+ImVec2 operator-(const ImVec2& l, const ImVec2& r) { return{ l.x - r.x, l.y - r.y }; }
+
+void FlarialGUI::ImRotateEnd(float angle, ImVec2 center)
+{
+    float rad = angle * IM_PI / 180.0f;  // Convert angle from degrees to radians
+    float s = sin(rad), c = cos(rad);
+    center = ImRotate(center, s, c) - center;
+
+    auto& buf = ImGui::GetBackgroundDrawList()->VtxBuffer;
+    for (int i = rotation_start_index; i < buf.Size; i++)
+        buf[i].pos = ImRotate(buf[i].pos, s, c) - center;
+}
+
+/* rotation stuff end */
+
+void FlarialGUI::PushImClipRect(ImVec2 pos, ImVec2 size) {
+    ImVec2 max(pos.x + size.x, pos.y + size.y);
+
+    ImGui::GetBackgroundDrawList()->PushClipRect(pos, max);
+
+}
+
+void FlarialGUI::PushImClipRect(D2D_RECT_F rect) {
+    ImVec2 pos(rect.left, rect.top);
+    ImVec2 size(rect.right - rect.left, rect.bottom - rect.top);
+
+    ImVec2 max(pos.x + size.x, pos.y + size.y);
+
+    ImGui::GetBackgroundDrawList()->PushClipRect(pos, max);
+
+}
+
+void FlarialGUI::PopImClipRect() {
+    ImGui::GetBackgroundDrawList()->PopClipRect();
 }
 
 void FlarialGUI::NotifyHeartbeat() {
@@ -793,7 +1169,7 @@ void FlarialGUI::NotifyHeartbeat() {
 
     for (auto &notif: FlarialGUI::notifications) {
 
-        float rectWidth = notif.width;
+        float rectWidth = notif.width + notif.textSize;
         float x = Constraints::PercentageConstraint(0.01, "right", true) - rectWidth;
 
         FlarialGUI::lerp(notif.currentPosY, y, 0.20f * FlarialGUI::frameFactor);
@@ -822,6 +1198,8 @@ void FlarialGUI::NotifyHeartbeat() {
                                                                                                       true)),
                                                  notif.currentPosY + rectHeight);
 
+
+            PushImClipRect(cutoutrect);
             D2D::context->PushAxisAlignedClip(cutoutrect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
             col = colors_primary1_rgb ? rgbColor : colors_primary1;
@@ -831,6 +1209,7 @@ void FlarialGUI::NotifyHeartbeat() {
                                     rectHeight, rounding.x, rounding.x);
 
             D2D::context->PopAxisAlignedClip();
+            PopImClipRect();
 
             FlarialGUI::PushSize(notif.currentPos, notif.currentPosY, rectWidth, rectHeight);
 
@@ -854,7 +1233,9 @@ void FlarialGUI::NotifyHeartbeat() {
                                             DWRITE_FONT_WEIGHT_BOLD);
 
             logoY += Constraints::SpacingConstraint(0.185, logoWidth);
-            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide(notif.text).c_str(), rectWidth, logoWidth,
+
+
+            std::string finalName = FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide(notif.text).c_str(), rectWidth, logoWidth,
                                             DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.3,
                                                                                                           Constraints::RelativeConstraint(
                                                                                                                   0.45,
@@ -862,6 +1243,7 @@ void FlarialGUI::NotifyHeartbeat() {
                                                                                                                   true)),
                                             DWRITE_FONT_WEIGHT_NORMAL);
 
+            notif.textSize = TextSizes[finalName];
 
             FlarialGUI::PopSize();
 
@@ -908,6 +1290,7 @@ void FlarialGUI::NotifyHeartbeat() {
                                                                                                       true)),
                                                  notif.currentPosY + rectHeight);
 
+            PushImClipRect(cutoutrect);
             D2D::context->PushAxisAlignedClip(cutoutrect, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
             col = colors_primary1_rgb ? rgbColor : colors_primary1;
@@ -917,6 +1300,7 @@ void FlarialGUI::NotifyHeartbeat() {
                                     rectHeight, rounding.x, rounding.x);
 
             D2D::context->PopAxisAlignedClip();
+            PopImClipRect();
 
             FlarialGUI::PushSize(notif.currentPos, notif.currentPosY, rectWidth, rectHeight);
 
@@ -941,7 +1325,7 @@ void FlarialGUI::NotifyHeartbeat() {
                                             DWRITE_FONT_WEIGHT_BOLD);
 
             logoY += Constraints::SpacingConstraint(0.185, logoWidth);
-            FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide(notif.text).c_str(), rectWidth, logoWidth,
+            std::string finalName = FlarialGUI::FlarialTextWithFont(logoX, logoY, FlarialGUI::to_wide(notif.text).c_str(), rectWidth, logoWidth,
                                             DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(0.3,
                                                                                                           Constraints::RelativeConstraint(
                                                                                                                   0.45,
@@ -949,6 +1333,7 @@ void FlarialGUI::NotifyHeartbeat() {
                                                                                                                   true)),
                                             DWRITE_FONT_WEIGHT_NORMAL);
 
+            notif.textSize = TextSizes[finalName];
             FlarialGUI::PopSize();
 
             if (notif.currentPos > Constraints::PercentageConstraint(0.01, "right", true)) notif.finished = true;
@@ -1021,21 +1406,7 @@ void FlarialGUI::UnSetIsInAdditionalYMode() {
 
 float FlarialGUI::SettingsTextWidth(const std::string& text) {
 
-    auto textLayout = FlarialGUI::GetTextLayout(FlarialGUI::to_wide(text).c_str(), DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                DWRITE_PARAGRAPH_ALIGNMENT_CENTER, Constraints::SpacingConstraint(1.05,
-                                                                                                                  Constraints::RelativeConstraint(
-                                                                                                                          0.12,
-                                                                                                                          "height",
-                                                                                                                          true)),
-                                                DWRITE_FONT_WEIGHT_REGULAR,
-                                                Constraints::PercentageConstraint(1.0f, "left"),
-                                                Constraints::RelativeConstraint(0.029, "height", true));
+return 100;
 
-    DWRITE_TEXT_METRICS textMetrics{};
-
-    textLayout->GetMetrics(&textMetrics);
-    //textLayout->Release();
-
-    return textMetrics.widthIncludingTrailingWhitespace;
 }
 

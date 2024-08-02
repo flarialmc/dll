@@ -9,6 +9,7 @@
 #include "../../../Module/Modules/MotionBlur/MotionBlurListener.hpp"
 #include "../../../Module/Manager.hpp"
 #include "../../../GUI/Engine/Elements/Structs/ImagesClass.hpp"
+#include "../../../../../lib/ImGui/imgui.h"
 
 void ResizeHook::enableHook() {
 
@@ -60,12 +61,6 @@ void ResizeHook::cleanShit(bool isResize) {
     FlarialGUI::cachedBitmaps.clear();
 
     ClickGUIElements::images.clear();
-
-    for (ID2D1Bitmap *bitmap: MotionBlurListener::previousFrames) {
-        Memory::SafeRelease(bitmap);
-    }
-
-    MotionBlurListener::previousFrames.clear();
 
     for (auto &i: ImagesClass::eimages) {
         Memory::SafeRelease(i.second);
@@ -154,4 +149,5 @@ void ResizeHook::cleanShit(bool isResize) {
 
     FlarialGUI::scrollposmodifier = 0;
 
+    //ImGui::DestroyContext();
 }

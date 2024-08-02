@@ -52,6 +52,7 @@ std::string Utils::removeNonAlphanumeric(const std::string &input) {
     std::string result;
     std::copy_if(input.begin(), input.end(), std::back_inserter(result), [](char c) {
         return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' || c == ' ';
+
     });
     return result;
 }

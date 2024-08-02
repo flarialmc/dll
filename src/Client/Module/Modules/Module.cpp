@@ -8,6 +8,8 @@ std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {
         {"Right", DWRITE_TEXT_ALIGNMENT_TRAILING}
 };
 
+static std::string Lname = "";
+
 void Module::normalRender(int index, std::string &value) {
     if(!isEnabled() || SDK::currentScreen != "hud_screen") return;
 
@@ -16,10 +18,6 @@ void Module::normalRender(int index, std::string &value) {
         text = this->settings.getSettingByName<std::string>("text")->value;
 
     float rotation = this->settings.getSettingByName<float>("rotation")->value;
-    D2D1_MATRIX_3X2_F oldTransform;
-    D2D1_POINT_2F rotationCenter;
-    if (rotation > 0.0f) D2D::context->GetTransform(&oldTransform);
-
     DWRITE_TEXT_ALIGNMENT alignment = alignments[this->settings.getSettingByName<std::string>(
             "textalignment")->value];
     bool responsivewidth = this->settings.getSettingByName<bool>("responsivewidth")->value;
@@ -50,25 +48,6 @@ void Module::normalRender(int index, std::string &value) {
     float textSize = Constraints::SpacingConstraint(3.2f, textHeight) *
                      this->settings.getSettingByName<float>("textscale")->value;
 
-    DWRITE_TEXT_METRICS textMetrics{};
-
-    if (responsivewidth) {
-
-        //IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(
-        //	Client::settings.getSettingByName<std::string>("mod_fontname")->value,
-        //	Constraints::FontScaler(textSize), DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL,
-        //	DWRITE_FONT_STRETCH_NORMAL, alignment);
-
-        auto textLayout = FlarialGUI::GetTextLayout(FlarialGUI::to_wide(text).c_str(), alignment,
-                                                    DWRITE_PARAGRAPH_ALIGNMENT_CENTER, textSize,
-                                                    DWRITE_FONT_WEIGHT_REGULAR, textWidth, textHeight);
-
-        textLayout->GetMetrics(&textMetrics);
-        //textLayout->Release();
-    }
-
-    if (!responsivewidth) textMetrics.left = 0;
-
     Vec2<float> settingperc = Vec2<float>(
             this->settings.getSettingByName<float>("percentageX")->value,
             this->settings.getSettingByName<float>("percentageY")->value
@@ -79,7 +58,7 @@ void Module::normalRender(int index, std::string &value) {
                        ? (Constraints::RelativeConstraint(
                     0.225f * settings.getSettingByName<float>("uiscale")->value) *
                           this->settings.getSettingByName<float>("rectwidth")->value)
-                       : (textMetrics.width + Constraints::SpacingConstraint(2.0, realspacing)) *
+                       : (FlarialGUI::TextSizes[Lname] + Constraints::SpacingConstraint(2.0, realspacing)) *
                          this->settings.getSettingByName<float>("rectwidth")->value);
 
     Vec2<float> realcenter;
@@ -92,9 +71,8 @@ void Module::normalRender(int index, std::string &value) {
 
     if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
         ClickGUIRenderer::editmenu) {
-        FlarialGUI::SetWindowRect(realcenter.x + textMetrics.left, realcenter.y, rectWidth,
-                                  textHeight * this->settings.getSettingByName<float>("rectheight")->value, index,
-                                  -textMetrics.left);
+        FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth,
+                                  textHeight * this->settings.getSettingByName<float>("rectheight")->value, index);
 
         Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, rectWidth, textHeight *
                                                                                                       this->settings.getSettingByName<float>(
@@ -130,27 +108,27 @@ void Module::normalRender(int index, std::string &value) {
     textColor.a = settings.getSettingByName<float>("textOpacity")->value;
     borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
 
-    if (rotation > 0.0f) {
-        rotationCenter = D2D1::Point2F(realcenter.x + textMetrics.left + rectWidth / 2.0f, realcenter.y +
-                                                                                           textHeight *
-                                                                                           this->settings.getSettingByName<float>(
-                                                                                                   "rectheight")->value /
-                                                                                           2.0f);
+    ImVec2 rotationCenter = ImVec2(
+    realcenter.x + rectWidth / 2.0f,
+    realcenter.y + textHeight * this->settings.getSettingByName<float>("rectheight")->value / 2.0f);
 
-        D2D1_MATRIX_3X2_F rotationMatrix = D2D1::Matrix3x2F::Rotation(rotation, rotationCenter);
-        D2D::context->SetTransform(rotationMatrix);
+    if (rotation > 0.0f) {
+
+        FlarialGUI::ImRotateStart();
     }
 
+
+
     if (settings.getSettingByName<bool>("BlurEffect")->value)
-        FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x + textMetrics.left, realcenter.y,
-                                                           realcenter.x + rectWidth + textMetrics.left,
+        FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y,
+                                                           realcenter.x + rectWidth,
                                                            realcenter.y + (textHeight) *
                                                                           this->settings.getSettingByName<float>(
                                                                                   "rectheight")->value), rounde.x,
                                                rounde.x));
 
     FlarialGUI::RoundedRect(
-            realcenter.x + textMetrics.left,
+            realcenter.x,
             realcenter.y,
             bgColor,
             rectWidth,
@@ -159,8 +137,8 @@ void Module::normalRender(int index, std::string &value) {
             rounde.x
     );
 
-    FlarialGUI::FlarialTextWithFont(
-            realcenter.x + Constraints::SpacingConstraint(paddingX, textWidth) + textMetrics.left,
+    std::string rname = FlarialGUI::FlarialTextWithFont(
+            realcenter.x + Constraints::SpacingConstraint(paddingX, textWidth),
             realcenter.y + Constraints::SpacingConstraint(paddingY, textWidth),
             FlarialGUI::to_wide(text).c_str(),
             rectWidth,
@@ -171,9 +149,11 @@ void Module::normalRender(int index, std::string &value) {
             true
     );
 
+    Lname = rname;
+
     if (this->settings.getSettingByName<bool>("border")->value) {
         FlarialGUI::RoundedHollowRect(
-                realcenter.x + textMetrics.left,
+                realcenter.x,
                 realcenter.y,
                 Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value *
                                                  settings.getSettingByName<float>("uiscale")->value) / 100.0f,
@@ -186,7 +166,9 @@ void Module::normalRender(int index, std::string &value) {
         );
     }
 
-    if (rotation > 0.0f) D2D::context->SetTransform(oldTransform);
+    if (rotation > 0.0f) {
+        FlarialGUI::ImRotateEnd(rotation, rotationCenter);
+    }
 
     if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
         ClickGUIRenderer::editmenu)

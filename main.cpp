@@ -23,16 +23,13 @@ std::string removeColorCodes(const std::string& input);
 
 DWORD WINAPI init(HMODULE real)
 {
-#ifndef NDEBUG
-    bool shouldDebug = false; // Change this bool locally, NEVER push it set to true
-
-    if (GetConsoleWindow() == nullptr && shouldDebug) {
+    if (GetConsoleWindow() == nullptr and true) {
         AllocConsole();
-        SetConsoleTitleA("Flarial-Debugger");
+        SetConsoleTitleA("Caspian-Debug");
         FILE *out;
         freopen_s(&out, ("CONOUT$"), ("w"), stdout);
     }
-#endif
+
 
     Client::initialize();
     Logger::info("[Client] Initializing");
@@ -46,7 +43,9 @@ DWORD WINAPI init(HMODULE real)
             if(!Client::disable) {
                 if(SDK::hasInstanced && SDK::clientInstance != nullptr) {
                     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                        if(elapsed >= std::chrono::seconds(60)) {
+
+                        if(elapsed >= std::chrono::seconds(27)) {
+                            ModuleManager::onlineUsers.clear();
                             std::string name = SDK::clientInstance->getLocalPlayer()->playerName;
 
 
@@ -100,7 +99,8 @@ DWORD WINAPI init(HMODULE real)
                                 name = replaceAll(name, "�", "");
 
                             }
-                            // send thing
+
+                            std::cout << std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend) << std::endl;
                             std::cout << DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend)) << std::endl;
 
                             lastBeatTime = now;
