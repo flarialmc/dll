@@ -30,7 +30,7 @@ public:
     void onRender(RenderEvent &event) override {
         int maxFrames = (int)round(module->settings.getSettingByName<float>("intensity2")->value);
 
-        if (SDK::currentScreen == "hud_screen") {
+        if (SDK::currentScreen == "hud_screen" && !SwapchainHook::queue) {
             if (previousFrames.size() >= static_cast<int>(maxFrames)) {
                 // Remove excess frames if maxFrames is reduced
                 int framesToRemove = (int)previousFrames.size() - static_cast<int>(maxFrames);
@@ -45,7 +45,6 @@ public:
 
             float alpha = 0.3f;
 
-            if(!SwapchainHook::queue) {
                 for (ID3D11ShaderResourceView* frame: previousFrames) {
 
                     if(SwapchainHook::d3d11Device) {
@@ -53,9 +52,7 @@ public:
                     }
                     alpha *= module->settings.getSettingByName<float>("intensity")->value;
                 }
-            } else {
-               //do later
-            }
+
 
             } else {
 
