@@ -47,8 +47,10 @@ DWORD WINAPI init(HMODULE real)
                 if(SDK::hasInstanced && SDK::clientInstance != nullptr) {
                     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                         if(elapsed >= std::chrono::seconds(60)) {
-                            ModuleManager::onlineUsers.clear();
                             std::string name = SDK::clientInstance->getLocalPlayer()->playerName;
+
+
+                            ModuleManager::onlineUsers.clear();
                             ModuleManager::onlineUsers.push_back(Utils::removeColorCodes(name));
                             std::string pp = DownloadString("https://api.flarial.synthetix.host/users");
 
@@ -71,7 +73,10 @@ DWORD WINAPI init(HMODULE real)
                                         std::cerr << "Invalid or missing 'lastbeat' for player: " << player.key() << std::endl;
                                         continue;
                                     }
-                                    ModuleManager::onlineUsers.push_back(Utils::removeNonAlphanumeric(player.key()));
+
+                                    std::string name2 = Utils::removeNonAlphanumeric(player.key());
+                                    name2 = replaceAll(name2, "�", "");
+                                    ModuleManager::onlineUsers.push_back(name2);
                                 } catch (const std::exception& e) {
                                     std::cerr << "Error processing player: " << player.key() << " - " << e.what() << std::endl;
                                     continue;
@@ -92,9 +97,11 @@ DWORD WINAPI init(HMODULE real)
                             if(SDK::clientInstance->getLocalPlayer() != nullptr)
                             if (module->isEnabled()) {
                                 name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickListener::original));
+                                name = replaceAll(name, "�", "");
+
                             }
                             // send thing
-                            DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend));
+                            std::cout << DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend)) << std::endl;
 
                             lastBeatTime = now;
                         }

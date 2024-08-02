@@ -14,6 +14,7 @@
 #include "EntityContext.hpp"
 #include "Components/ActorGameTypeComponent.hpp"
 #include "Components/AABBShapeComponent.hpp"
+#include "Components/RuntimeIDComponent.hpp"
 
 
 enum ActorFlags {
@@ -216,4 +217,6 @@ public:
     AABBShapeComponent *getAABBShapeComponent();
 
     StateVectorComponent *getStateVectorComponent();
+
+    RuntimeIDComponent *getRuntimeIDComponent();
 };

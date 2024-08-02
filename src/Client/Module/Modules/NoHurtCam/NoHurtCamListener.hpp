@@ -49,11 +49,15 @@ public:
     }
 
     void onTick(TickEvent &event) override {
-        if (module->isEnabled() && !module->restricted) {
+        if (!module->restricted) {
             patch();
         } else {
             unpatch();
         }
+    }
+
+    void onUnregister() override {
+        unpatch();
     }
 
     NoHurtCamListener(const char string[5], Module *module) {
@@ -62,8 +66,10 @@ public:
 
         originalCameraAngle.resize(3);
 
-        sigOffset = Memory::findSig(GET_SIG("CameraAssignAngle")) + 4;
+        if(sigOffset == NULL) {
+            sigOffset = Memory::findSig(GET_SIG("CameraAssignAngle")) + 4;
+        }
 
-        memcpy(originalCameraAngle.data(), (LPVOID) sigOffset, 3);
+        Memory::patchBytes( originalCameraAngle.data(), (LPVOID)sigOffset, 3);
     }
 };
