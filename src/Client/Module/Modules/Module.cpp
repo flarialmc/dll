@@ -200,6 +200,10 @@ void Module::resetPadding() {
     textboxIndex = 0;
 }
 
+void Module::extraPadding() {
+    padding += Constraints::RelativeConstraint(0.055f, "height", true);
+}
+
 void Module::addHeader(std::string text) {
     float x = Constraints::PercentageConstraint(0.019, "left");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
@@ -210,7 +214,7 @@ void Module::addHeader(std::string text) {
     std::string name = FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 500, 0, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.215f, "height", true), DWRITE_FONT_WEIGHT_BOLD, false);
     FlarialGUI::RoundedRect(x, y + Constraints::RelativeConstraint(0.011f, "width", true), col, FlarialGUI::TextSizes[name], 3.0f, 0, 0);
 
-    padding += Constraints::RelativeConstraint(0.055f, "height", true);
+    padding += Constraints::RelativeConstraint(0.043f, "height", true);
 }
 
 void Module::addToggle(std::string text, std::string subtext, bool& value) {

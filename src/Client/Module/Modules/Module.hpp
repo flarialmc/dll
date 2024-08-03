@@ -48,6 +48,9 @@ public:
     int colorPickerIndex = 0;
 
     void resetPadding();
+
+    void extraPadding();
+
     void addHeader(std::string text);
     void addToggle(std::string text, std::string subtext, bool& value);
     virtual void loadDefaults();
