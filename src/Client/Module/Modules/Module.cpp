@@ -212,7 +212,7 @@ void Module::addHeader(std::string text) {
     col.a = o_colors_secondary6;
 
     std::string name = FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 500, 0, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.215f, "height", true), DWRITE_FONT_WEIGHT_BOLD, false);
-    FlarialGUI::RoundedRect(x, y + Constraints::RelativeConstraint(0.011f, "width", true), col, FlarialGUI::TextSizes[name], 3.0f, 0, 0);
+    FlarialGUI::RoundedRect(x, y + Constraints::RelativeConstraint(0.023f, "width"), col, FlarialGUI::TextSizes[name], 3.0f, 0, 0);
 
     padding += Constraints::RelativeConstraint(0.055f, "height", true);
 }
