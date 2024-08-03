@@ -190,7 +190,7 @@ public:
 
             /* tab buttons start */
 
-            float shit = Constraints::RelativeConstraint(0.395f);
+            float shit = Constraints::RelativeConstraint(0.448f);
 
             float RadioButtonWidth = Constraints::RelativeConstraint(0.134, "width");
             float RadioButtonHeight = shit;
@@ -249,7 +249,7 @@ public:
             }
 
 
-            logoWidth = Constraints::RelativeConstraint(0.243f);
+            logoWidth = shit * 0.625f;
 
             radioX += Constraints::SpacingConstraint(0.29f, logoWidth);
             radioY += Constraints::SpacingConstraint(0.29f, logoWidth);
@@ -261,7 +261,7 @@ public:
 
             // radiobutton of settings
 
-            radioX = navx - Constraints::SpacingConstraint(-0.85f, logoWidth);
+            radioX = navx - Constraints::SpacingConstraint(-0.36f, logoWidth);
             radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
 
             if(ClickGUIRenderer::curr != "settings") {
@@ -304,7 +304,7 @@ public:
 
             // radiobutton of editmenu
 
-            radioX = navx - Constraints::SpacingConstraint(-0.85f, logoWidth);
+            radioX = navx - Constraints::SpacingConstraint(-0.36f, logoWidth);
             radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
 
             radioPushAmount2 = Constraints::SpacingConstraint(0.9f * 5.69f, logoWidth) + width1 + width2;
