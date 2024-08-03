@@ -132,7 +132,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     FlarialGUI::PushSize(x, y, BottomRoundedWidth, BottomRoundedHeight);
     // Mod Name
-    float textx = Constraints::PercentageConstraint(0.121, "left");
+    float textx = Constraints::PercentageConstraint(0.119, "left");
     float texty = Constraints::PercentageConstraint(0.415, "top");
     float textWidth = Constraints::RelativeConstraint(1.0);
     float textHeight = Constraints::RelativeConstraint(0.2);
