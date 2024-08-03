@@ -124,7 +124,7 @@ public:
 
             /* Base Rectangle Start */
 
-            float baseWidth = Constraints::RelativeConstraint(0.85);
+            float baseWidth = Constraints::RelativeConstraint(0.81);
 
             if (module->active) {
 
@@ -155,7 +155,7 @@ public:
 
             /* Nav Bar Start */
 
-            float navigationBarWidth = Constraints::RelativeConstraint(1.293f);
+            float navigationBarWidth = Constraints::RelativeConstraint(1.235f);
             float navigationBarHeight = Constraints::RelativeConstraint(0.124f);
             float navx = Constraints::PercentageConstraint(0.013f, "left");
             float navy = Constraints::PercentageConstraint(0.019f, "top");
@@ -354,7 +354,7 @@ public:
                     float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
                     float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
 
-                    Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.63,
+                    Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.58,
                                                                           -0.52);
 
                     FlarialGUI::PushSize(center.x, center.y, baseWidth,
@@ -414,7 +414,7 @@ public:
                                 name.find(search) != std::string::npos) {
                                 ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, pModule,
                                                           pModule->icon, i, visible);
-                                xModifier += Constraints::SpacingConstraint(1.09, modWidth);
+                                xModifier += Constraints::SpacingConstraint(1.02f, modWidth);
                                 if ((++i % 3) == 0) {
                                     yModifier += Constraints::SpacingConstraint(0.8, modWidth);
                                     xModifier = 0.0f;
@@ -424,7 +424,7 @@ public:
                             ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, pModule,
                                                       pModule->icon, i, visible);
 
-                            xModifier += Constraints::SpacingConstraint(1.09, modWidth);
+                            xModifier += Constraints::SpacingConstraint(1.02f, modWidth);
                             if ((++i % 3) == 0) {
                                 yModifier += Constraints::SpacingConstraint(0.8, modWidth);
                                 xModifier = 0.0f;

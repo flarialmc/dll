@@ -48,6 +48,9 @@ public:
     int colorPickerIndex = 0;
 
     void resetPadding();
+
+    void extraPadding();
+
     void addHeader(std::string text);
     void addSlider(std::string text, std::string subtext, float& startingPoint, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
     void addToggle(std::string text, std::string subtext, bool& value);
