@@ -74,12 +74,12 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     if (FlarialGUI::CursorInRect(x, realY, BottomRoundedWidth, BottomRoundedHeight)) {
 
-        FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.198f, "height", true),
+        FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.186f, "height", true),
                          0.15f * FlarialGUI::frameFactor);
         FlarialGUI::lerp(sizes[index].y, Constraints::RelativeConstraint(0.149f, "height", true),
                          0.15f * FlarialGUI::frameFactor);
 
-        diffX = (sizes[index].x - Constraints::RelativeConstraint(0.19f, "height", true)) / 2.0f;
+        diffX = (sizes[index].x - Constraints::RelativeConstraint(0.178f, "height", true)) / 2.0f;
         diffY = (sizes[index].y - Constraints::RelativeConstraint(0.141f, "height", true)) / 2.0f;
 
         FlarialGUI::lerp(shadowSizes[index].x, BottomRoundedWidth, 0.25f * FlarialGUI::frameFactor);
@@ -87,7 +87,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     } else {
 
-        FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.19f, "height", true),
+        FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.178f, "height", true),
                          0.15f * FlarialGUI::frameFactor);
         FlarialGUI::lerp(sizes[index].y, Constraints::RelativeConstraint(0.141f, "height", true),
                          0.15f * FlarialGUI::frameFactor);
@@ -95,7 +95,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         FlarialGUI::lerp(shadowSizes[index].x, 0.01f, 0.01f * FlarialGUI::frameFactor);
         FlarialGUI::lerp(shadowSizes[index].y, 0.01f, 0.01f * FlarialGUI::frameFactor);
 
-        diffX = (sizes[index].x - Constraints::RelativeConstraint(0.19f, "height", true)) / 2.0f;
+        diffX = (sizes[index].x - Constraints::RelativeConstraint(0.178f, "height", true)) / 2.0f;
         diffY = (sizes[index].y - Constraints::RelativeConstraint(0.141f, "height", true)) / 2.0f;
 
     }
