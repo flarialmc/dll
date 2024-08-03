@@ -213,15 +213,15 @@ void Module::addHeader(std::string text) {
     padding += Constraints::RelativeConstraint(0.055f, "height", true);
 }
 
-void Module::addToggle(std::string text, std::string subtext, bool& value) {
+void Module::addSlider(std::string text, std::string subtext, float& startingPoint, float maxVal, float minVal, bool zerosafe) {
     float x = Constraints::PercentageConstraint(0.019, "left");
-    float elementX = Constraints::PercentageConstraint(0.119f, "right");
+    float elementX = Constraints::PercentageConstraint(0.33f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-    if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false)) value = !value;
+    FlarialGUI::Slider(sliderIndex, elementX, y, startingPoint, maxVal, minVal, zerosafe);
 
     float textX = x;
-    float textY = y; // For some reason, if you do not do this minus, the spacing is way bigger than expected.
+    float textY = y;
     float subtextY;
     float fontSize = Constraints::RelativeConstraint(0.140f, "height", true);
     float fontSize2 = Constraints::RelativeConstraint(0.132f, "height", true);
@@ -238,6 +238,34 @@ void Module::addToggle(std::string text, std::string subtext, bool& value) {
     FlarialGUI::FlarialTextWithFont(textX, textY, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, false);
     if (!subtext.empty()) FlarialGUI::FlarialTextWithFont(textX, subtextY, FlarialGUI::to_wide(subtext).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, FlarialGUI::HexToColorF("473b3d"), false);
 
+    padding += Constraints::RelativeConstraint(0.05f, "height", true);
+    sliderIndex++;
+}
+
+void Module::addToggle(std::string text, std::string subtext, bool& value) {
+    float x = Constraints::PercentageConstraint(0.019, "left");
+    float elementX = Constraints::PercentageConstraint(0.119f, "right");
+    float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+    if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false)) value = !value;
+
+    float textX = x;
+    float textY = y;
+    float subtextY;
+    float fontSize = Constraints::RelativeConstraint(0.140f, "height", true);
+    float fontSize2 = Constraints::RelativeConstraint(0.132f, "height", true);
+
+    if (!subtext.empty()) {
+        subtextY = textY;
+        textY -= Constraints::RelativeConstraint(0.009f, "height", true);
+        subtextY += Constraints::RelativeConstraint(0.009f, "height", true);
+    }
+    else {
+        textY += Constraints::RelativeConstraint(0.0015f, "height", true);
+    }
+
+    FlarialGUI::FlarialTextWithFont(textX, textY, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, false);
+    if (!subtext.empty()) FlarialGUI::FlarialTextWithFont(textX, subtextY, FlarialGUI::to_wide(subtext).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, FlarialGUI::HexToColorF("473b3d"), false);
 
     padding += Constraints::RelativeConstraint(0.05f, "height", true);
     toggleIndex++;

@@ -51,6 +51,8 @@ public:
 
         this->addToggle("NO MORE TROLLING.....", "", settings.getSettingByName<bool>("reversepaddingx")->value);
 
+        this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
+
         this->resetPadding();
 
         FlarialGUI::UnsetScrollView();

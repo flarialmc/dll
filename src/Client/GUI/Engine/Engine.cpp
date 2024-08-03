@@ -581,7 +581,6 @@ bool ifFontScale2(const float fontSize) {
     return fontSize / 135 > 1;
 }
 
-
 std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
                                      const DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont) {

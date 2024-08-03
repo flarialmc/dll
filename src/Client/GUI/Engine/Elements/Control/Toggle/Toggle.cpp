@@ -94,8 +94,7 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb) {
         enabledSpacing = FlarialGUI::toggleSpacings[index];
     }
 
-    FlarialGUI::RoundedRect(x + xSpacing + enabledSpacing, y + ySpacing, circleColor, circleWidth, circleHeight,
-                            round.x, round.x);
+    FlarialGUI::RoundedRect(x + xSpacing + enabledSpacing, y + ySpacing, circleColor, circleWidth, circleHeight, round.x, round.x);
 
     if (isAdditionalY) SetIsInAdditionalYMode();
 
