@@ -39,6 +39,7 @@ public:
     bool active = false;
     bool restricted = false;
     bool terminating = false;
+    float padding = 0;
 
 public:
 
@@ -226,6 +227,15 @@ public:
             settings.addSetting("BlurEffect", false);
         }
 
+    }
+
+    void resetPadding () {
+        padding = 0;
+    }
+
+    void addToggle(std::string text, std::string subtext, bool& value) {
+        //FlarialGUI::Toggle
+        //padding += ......
     }
 
     virtual void settingsRender() {}
