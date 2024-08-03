@@ -127,15 +127,9 @@ public:
             float baseWidth = Constraints::RelativeConstraint(0.85);
 
             if (module->active) {
-                if (ClickGUIRenderer::page.type == "settings" || curr == "settings") {
 
-                    FlarialGUI::lerp(baseHeightReal, 0.50f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+                FlarialGUI::lerp(baseHeightReal, 0.64f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
 
-                    //FadeEffect::ApplyFadeOutEffect(0.015f * FlarialGUI::frameFactor, baseHeightReal, 0.35f);
-                } else {
-                    FlarialGUI::lerp(baseHeightReal, 0.64f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
-                    //FadeEffect::ApplyFadeInEffect(0.015f * FlarialGUI::frameFactor, 0.64f, baseHeightReal);
-                }
             }
 
             float baseHeight = Constraints::RelativeConstraint(baseHeightReal);
@@ -162,9 +156,9 @@ public:
             /* Nav Bar Start */
 
             float navigationBarWidth = Constraints::RelativeConstraint(1.293f);
-            float navigationBarHeight = Constraints::RelativeConstraint(0.134f);
+            float navigationBarHeight = Constraints::RelativeConstraint(0.124f);
             float navx = Constraints::PercentageConstraint(0.013f, "left");
-            float navy = Constraints::PercentageConstraint(0.016f, "top");
+            float navy = Constraints::PercentageConstraint(0.019f, "top");
             round = Constraints::RoundingConstraint(28, 28);
 
             D2D1_COLOR_F navColor = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
@@ -459,7 +453,7 @@ public:
                     float rectX = Constraints::PercentageConstraint(0.01, "left");
                     float rectY = Constraints::PercentageConstraint(0.20, "top");
                     float rectWidth = Constraints::RelativeConstraint(0.965, "width");
-                    float rectHeight = Constraints::RelativeConstraint(0.755);
+                    float rectHeight = Constraints::RelativeConstraint(0.6);
 
                     float scrollWidth = Constraints::RelativeConstraint(1.12);
                     float scrollHeight = Constraints::RelativeConstraint(1.3);
@@ -469,7 +463,7 @@ public:
                     const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
                     round = Constraints::RoundingConstraint(50, 50);
 
-                    float anotherRectHeight = Constraints::RelativeConstraint(0.785);
+                    float anotherRectHeight = Constraints::RelativeConstraint(0.6);
                     float anotherRectWidth = Constraints::RelativeConstraint(0.981, "width");
 
                     D2D1_COLOR_F iRanOutOfNamesToCallTheseColors = colors_secondary2_rgb ? FlarialGUI::rgbColor
@@ -749,14 +743,14 @@ public:
 
                 FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
 
-                float rectX = Constraints::PercentageConstraint(0.01, "left");
-                float rectY = Constraints::PercentageConstraint(0.20, "top");
+                float rectX = Constraints::PercentageConstraint(0.015, "left");
+                float rectY = Constraints::PercentageConstraint(0.167, "top");
                 float rectWidth = Constraints::RelativeConstraint(0.965, "width");
-                float rectHeight = Constraints::RelativeConstraint(0.755);
-                round = Constraints::RoundingConstraint(50, 50);
+                float rectHeight = Constraints::RelativeConstraint(0.85);
+                round = Constraints::RoundingConstraint(38.f, 38.5f);
 
-                float anotherRectHeight = Constraints::RelativeConstraint(0.785);
-                float anotherRectWidth = Constraints::RelativeConstraint(0.981, "width");
+                float anotherRectHeight = Constraints::RelativeConstraint(0.8105);
+                float anotherRectWidth = Constraints::RelativeConstraint(0.972, "width");
 
                 D2D1_COLOR_F colorThing = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
                 colorThing.a = o_colors_secondary2;
@@ -769,12 +763,6 @@ public:
 
                 D2D1_COLOR_F textCol = colors_text_rgb ? FlarialGUI::rgbColor : colors_text;
                 textCol.a = o_colors_text;
-
-                round = Constraints::RoundingConstraint(40, 40);
-                FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth),
-                                        rectY + Constraints::SpacingConstraint(0.01, rectWidth),
-                                        bruv, rectWidth,
-                                        rectHeight, round.x, round.x);
 
                 FlarialGUI::PopSize();
 
@@ -811,7 +799,7 @@ public:
 
 
                     if (FlarialGUI::RoundedButton(0, spacingX + centered.first + rectX,
-                                                  thingYes.second + rectHeight + rectY + Constraints::RelativeConstraint(0.09), colorThing, textCol, L"Reset",
+                                                  thingYes.second + rectHeight + rectY - Constraints::RelativeConstraint(0.06f), colorThing, textCol, L"Reset",
                                                   buttonWidth, buttonHeight, round.x, round.x)) {
                         auto currentModule = ModuleManager::getModule(ClickGUIRenderer::page.module);
                         bool wasEnabled = module->isEnabled();
@@ -824,7 +812,7 @@ public:
 
 
                     if (FlarialGUI::RoundedButton(1, -spacingX + centered.first + rectX + childWidth - buttonWidth,
-                                                  thingYes.second + rectHeight + rectY + Constraints::RelativeConstraint(0.09), colorThing, textCol,
+                                                  thingYes.second + rectHeight + rectY - Constraints::RelativeConstraint(0.06f), colorThing, textCol,
                                                   L"Copy From", buttonWidth, buttonHeight, round.x, round.x)) {
 
                     }

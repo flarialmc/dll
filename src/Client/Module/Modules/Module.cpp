@@ -54,6 +54,19 @@ void Module::normalRender(int index, std::string &value) {
     );
 
     float realspacing = Constraints::SpacingConstraint(0.05f, textWidth);
+
+    std::string rname = FlarialGUI::FlarialTextWithFont(0,0,
+        FlarialGUI::to_wide(text).c_str(),
+        1000000,
+        textHeight,
+        alignment,
+        textSize, DWRITE_FONT_WEIGHT_NORMAL,
+        D2D1::ColorF(0, 0, 0 ,0),
+        true
+);
+
+    Lname = rname;
+
     float rectWidth = (!responsivewidth
                        ? (Constraints::RelativeConstraint(
                     0.225f * settings.getSettingByName<float>("uiscale")->value) *
@@ -137,7 +150,7 @@ void Module::normalRender(int index, std::string &value) {
             rounde.x
     );
 
-    std::string rname = FlarialGUI::FlarialTextWithFont(
+    FlarialGUI::FlarialTextWithFont(
             realcenter.x + Constraints::SpacingConstraint(paddingX, textWidth),
             realcenter.y + Constraints::SpacingConstraint(paddingY, textWidth),
             FlarialGUI::to_wide(text).c_str(),
@@ -148,8 +161,6 @@ void Module::normalRender(int index, std::string &value) {
             textColor,
             true
     );
-
-    Lname = rname;
 
     if (this->settings.getSettingByName<bool>("border")->value) {
         FlarialGUI::RoundedHollowRect(

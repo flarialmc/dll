@@ -152,8 +152,8 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb) {
     float circleHeight = Constraints::RelativeConstraint(0.02, "height", true);
 
 
-    float ySpacing = Constraints::SpacingConstraint(0.2, circleHeight);
-    float xSpacing = Constraints::SpacingConstraint(0.2, circleWidth);
+    float ySpacing = Constraints::SpacingConstraint(0.2205f, circleHeight);
+    float xSpacing = Constraints::SpacingConstraint(0.2f, circleWidth);
     round = Constraints::RoundingConstraint(23, 23);
 
     float enabledSpacing;
