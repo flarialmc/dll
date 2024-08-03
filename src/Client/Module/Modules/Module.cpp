@@ -2,6 +2,10 @@
 #include "../../Client.hpp"
 #include "ClickGUI/ClickGUIRenderer.hpp"
 
+#define colors_secondary6 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary6")->value)
+#define o_colors_secondary6 clickgui->settings.getSettingByName<float>("o_colors_secondary6")->value
+#define colors_secondary6_rgb clickgui->settings.getSettingByName<bool>("colors_secondary6_rgb")->value
+
 std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {
         {"Left", DWRITE_TEXT_ALIGNMENT_LEADING},
         {"Center", DWRITE_TEXT_ALIGNMENT_CENTER},
@@ -196,6 +200,19 @@ void Module::resetPadding() {
     textboxIndex = 0;
 }
 
+void Module::addHeader(std::string text) {
+    float x = Constraints::PercentageConstraint(0.019, "left");
+    float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+    D2D1_COLOR_F col = colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6;
+    col.a = o_colors_secondary6;
+
+    std::string name = FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 500, 0, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.215f, "height", true), DWRITE_FONT_WEIGHT_BOLD, false);
+    FlarialGUI::RoundedRect(x, y + Constraints::RelativeConstraint(0.011f, "width", true), col, FlarialGUI::TextSizes[name], 3.0f, 0, 0);
+
+    padding += Constraints::RelativeConstraint(0.055f, "height", true);
+}
+
 void Module::addToggle(std::string text, std::string subtext, bool& value) {
     float x = Constraints::PercentageConstraint(0.019, "left");
     float elementX = Constraints::PercentageConstraint(0.119f, "right");
@@ -206,7 +223,7 @@ void Module::addToggle(std::string text, std::string subtext, bool& value) {
     float textX = x;
     float textY = y; // For some reason, if you do not do this minus, the spacing is way bigger than expected.
     float subtextY;
-    float fontSize = Constraints::RelativeConstraint(0.155f, "height", true);
+    float fontSize = Constraints::RelativeConstraint(0.140f, "height", true);
     float fontSize2 = Constraints::RelativeConstraint(0.132f, "height", true);
 
     if (!subtext.empty()) {

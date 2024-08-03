@@ -67,11 +67,8 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb) {
 
     if (isAdditionalY) UnSetIsInAdditionalYMode();
 
-    if (isEnabled) {
-        toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], enabledColor, 0.10f * FlarialGUI::frameFactor);
-    } else {
-        toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], disabledColor, 0.10f * FlarialGUI::frameFactor);
-    }
+    if (isEnabled) toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], enabledColor, 0.10f * FlarialGUI::frameFactor);
+    else toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], disabledColor, 0.10f * FlarialGUI::frameFactor);
 
     FlarialGUI::RoundedRect(x, y, rgb ? rgbColor : toggleColors[index], rectWidth, rectHeight, round.x, round.x);
 
@@ -90,10 +87,9 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb) {
         FlarialGUI::lerp(FlarialGUI::toggleSpacings[index], Constraints::SpacingConstraint(1.6, circleWidth), 0.25f * FlarialGUI::frameFactor);
         //FadeEffect::ApplyFadeInEffect(2.4f * FlarialGUI::frameFactor, Constraints::SpacingConstraint(1.6, circleWidth),FlarialGUI::toggleSpacings[index]);
         enabledSpacing = FlarialGUI::toggleSpacings[index];
-        if (enabledSpacing > Constraints::SpacingConstraint(1.6, circleWidth))
-        enabledSpacing = Constraints::SpacingConstraint(1.6, circleWidth);
+        if (enabledSpacing > Constraints::SpacingConstraint(1.6, circleWidth)) enabledSpacing = Constraints::SpacingConstraint(1.6, circleWidth);
     } else {
-        FlarialGUI::lerp(FlarialGUI::toggleSpacings[index], 0.0f, 0.25f * FlarialGUI::frameFactor);
+        FlarialGUI::lerp(FlarialGUI::toggleSpacings[index], Constraints::SpacingConstraint(0.1, circleWidth), 0.25f * FlarialGUI::frameFactor);
         //FadeEffect::ApplyFadeOutEffect(2.4f * FlarialGUI::frameFactor, FlarialGUI::toggleSpacings[index]);
         enabledSpacing = FlarialGUI::toggleSpacings[index];
     }

@@ -45,6 +45,8 @@ public:
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(1.0f, "height"));
 
+        this->addHeader("Module UI");
+
         this->addToggle("funny", "im just trolling", settings.getSettingByName<bool>("border")->value);
 
         this->addToggle("NO MORE TROLLING.....", "", settings.getSettingByName<bool>("reversepaddingx")->value);
