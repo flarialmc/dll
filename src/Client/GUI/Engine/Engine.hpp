@@ -23,6 +23,45 @@
 #include "Elements/Structs/HSV.hpp"
 #include <imgui.h>
 
+using namespace DirectX;
+
+struct BlurInputBuffer
+{
+    XMFLOAT2 resolution;
+    XMFLOAT2 offset;
+    XMFLOAT2 halfpixel;
+    XMFLOAT2 _dummy;
+};
+
+
+class Blur
+{
+private:
+    static inline ID3D11Device *pDevice = nullptr;
+    static inline ID3D11DeviceContext *pContext = nullptr;
+
+    static inline ID3D11PixelShader *pUpsampleShader = nullptr;
+    static inline ID3D11PixelShader *pDownsampleShader = nullptr;
+    static inline ID3D11VertexShader *pVertexShader = nullptr;
+    static inline ID3D11InputLayout *pInputLayout = nullptr;
+
+    static inline ID3D11SamplerState *pSampler = nullptr;
+    static inline ID3D11Buffer *pVertexBuffer = nullptr;
+    static inline ID3D11Buffer *pConstantBuffer = nullptr;
+    static inline BlurInputBuffer constantBuffer;
+
+    // RAII
+    static void InitializePipeline();
+    //static void Cleanup();
+
+    static void RenderToRTV(ID3D11RenderTargetView *, ID3D11ShaderResourceView *, XMFLOAT2);
+
+public:
+    static void blur(ID3D11Device *);
+
+    static void RenderBlur(ID3D11Texture2D *, ID3D11RenderTargetView *, int);
+};
+
 class Dimension {
 public:
     float x = 0;

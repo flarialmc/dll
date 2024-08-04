@@ -2,6 +2,20 @@
 
 #include <string>
 
+#define STR(x) #x
+#define STRINGIFY(x) STR(x)
+
+#define CheckHRESULTNoErr(HR, OP) \
+    if (FAILED(hr = HR)) { \
+        Logger::error(" failed, with HRESULT 0x%lx", hr); \
+    }
+#define CheckHRESULTEx(HR, OP) \
+    if (FAILED(hr = HR)) { \
+        Logger::error(" failed, with HRESULT 0x%lx", hr); \
+    }
+#define CheckHRESULT(HR) CheckHRESULTEx(HR, "Operation")
+
+
 class Logger {
 public:
     static std::string file;
