@@ -419,6 +419,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                         ImGui_ImplWin32_NewFrame();
                         ImGui::NewFrame();
 
+                        Blur::RenderBlur(pBackBuffer, mainRenderTargetView, 3);
+
                         RenderEvent event;
                         EventHandler::onRender(event);
 
@@ -509,6 +511,8 @@ void SwapchainHook::DX11Init() {
         initImgui = true;
 
     }
+
+    Blur::blur(d3d11Device);
 
     Memory::SafeRelease(eBackBuffer);
     init = true;
