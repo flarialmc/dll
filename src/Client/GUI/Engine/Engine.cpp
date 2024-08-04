@@ -126,6 +126,9 @@ std::unordered_map<std::string, ID2D1Image *> FlarialGUI::cachedBitmaps;
 LRUCache<uint64_t, winrt::com_ptr<IDWriteTextLayout>> FlarialGUI::textLayoutCache(4000);
 LRUCache<UINT32, winrt::com_ptr<IDWriteTextFormat>> FlarialGUI::textFormatCache(300);
 
+LRUCache<std::wstring, std::string> FlarialGUI::fromWideCache(4000);
+LRUCache<std::string, std::wstring> FlarialGUI::toWideCache(4000);
+
 std::unordered_map<int, float> FlarialGUI::additionalY;
 //std::unordered_map<std::string, winrt::com_ptr<ID2D1GradientStopCollection>> FlarialGUI::gradientStopCache;
 LRUCache<uint64_t, winrt::com_ptr<ID2D1LinearGradientBrush>> FlarialGUI::gradientBrushCache(300);
@@ -296,11 +299,15 @@ uint64_t generateUniqueLinearGradientBrushKey(float x, float hexPreviewSize, flo
     return combinedHash;
 }
 
-std::string FlarialGUI::WideToNarrow(const std::wstring& wideStr) {
+std::string WideToNarrow_creator(const std::wstring& wideStr) {
     int narrowStrLen = WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, nullptr, 0, nullptr, nullptr);
     std::vector<char> narrowStr(narrowStrLen);
     WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, narrowStr.data(), narrowStrLen, nullptr, nullptr);
     return std::string(narrowStr.data());
+}
+
+std::string FlarialGUI::WideToNarrow(const std::wstring& wideStr) {
+ return fromWideCache.getOrInsert(WideToNarrow_creator, wideStr, wideStr);
 }
 
 bool FlarialGUI::CursorInRect(float rectX, float rectY, float width, float height) {
@@ -1501,12 +1508,17 @@ void FlarialGUI::CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to) {
     (*to)->CopyFromBitmap(&destPoint, from, &rect);
 }
 
-std::wstring FlarialGUI::to_wide(const std::string &str) {
+std::wstring to_wide_creator(const std::string &str) {
+
     int wchars_num = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, nullptr, 0);
     std::wstring wide;
     wide.resize(wchars_num);
     MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, &wide[0], wchars_num);
     return wide;
+}
+
+std::wstring FlarialGUI::to_wide(const std::string &str) {
+    return toWideCache.getOrInsert(to_wide_creator, str, str);
 }
 
 template<typename T>

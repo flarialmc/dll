@@ -43,7 +43,7 @@ public:
         FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
         FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(1.0f, "height"));
+                                  Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Module UI");
         this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 2.f);

@@ -133,6 +133,8 @@ namespace FlarialGUI {
     extern LRUCache<UINT32, winrt::com_ptr<ID2D1SolidColorBrush>> brushCache;
     extern LRUCache<uint64_t, winrt::com_ptr<IDWriteTextLayout>> textLayoutCache;
     extern LRUCache<UINT32, winrt::com_ptr<IDWriteTextFormat>> textFormatCache;
+    extern LRUCache<std::wstring, std::string> fromWideCache;
+    extern LRUCache<std::string, std::wstring> toWideCache;
     //extern std::unordered_map<std::string, winrt::com_ptr<ID2D1GradientStopCollection>> gradientStopCache;
     extern LRUCache<uint64_t, winrt::com_ptr<ID2D1LinearGradientBrush>> gradientBrushCache;
 
