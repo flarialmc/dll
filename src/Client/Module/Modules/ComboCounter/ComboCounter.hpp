@@ -52,7 +52,7 @@ public:
         this->addToggle("Border", "im just trolling", settings.getSettingByName<bool>("border")->value);
 
         this->addConditionalSlider(settings.getSettingByName<bool>("border")->value, "Border Width", "", settings.getSettingByName<float>("borderWidth")->value, 4.0f);
-
+        
         this->addToggle("NO MORE TROLLING.....", "", settings.getSettingByName<bool>("reversepaddingx")->value);
 
         this->extraPadding();

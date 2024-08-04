@@ -361,4 +361,8 @@ namespace FlarialGUI {
                                      const float imageHeight);
 
     ImColor D2DColorToImColor(D2D1_COLOR_F color);
+
+    void OverrideAlphaValues(float percent);
+
+    void ResetOverrideAlphaValues();
 }
