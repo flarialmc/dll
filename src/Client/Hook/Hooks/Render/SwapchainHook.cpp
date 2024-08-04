@@ -162,6 +162,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     } else {
 
+        SaveBackbuffer();
 
         /* IMPORTANT FONT STUFF */
         if (ImGui::GetCurrentContext()) {
@@ -419,8 +420,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                         ImGui_ImplWin32_NewFrame();
                         ImGui::NewFrame();
 
-                        
-
                         RenderEvent event;
                         event.RTV = mainRenderTargetView;
                         EventHandler::onRender(event);
@@ -610,3 +609,59 @@ void SwapchainHook::DX12Init() {
                 init = true;
             }
 }
+
+ID3D11Texture2D* SwapchainHook::GetBackbuffer()
+{
+    return SavedD3D11BackBuffer;
+}
+
+  void SwapchainHook::SaveBackbuffer()
+    {
+
+        Memory::SafeRelease(SavedD3D11BackBuffer);
+
+        ID3D11DeviceContext* deviceContext;
+        SwapchainHook::d3d11Device->GetImmediateContext(&deviceContext);
+        IDXGISurface1* backBuffer = nullptr;
+        HRESULT hr;
+        SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
+
+        ID3D11Texture2D* buffer2D = nullptr;
+        if(FAILED(backBuffer->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&buffer2D)))) std::cout << "failed to get 2d" << std::endl;
+
+        D3D11_TEXTURE2D_DESC desc;
+        buffer2D->GetDesc(&desc);
+
+        ID3D11Texture2D* stageTex = nullptr;
+        D3D11_TEXTURE2D_DESC stageDesc = desc;
+        stageDesc.Usage = D3D11_USAGE_STAGING;
+        stageDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        stageDesc.BindFlags = 0;
+
+        //desc.Usage = DXGI_USAGE_SHADER_INPUT;
+        HRESULT r = SwapchainHook::d3d11Device->CreateTexture2D(&stageDesc, nullptr, &stageTex);
+        deviceContext->CopyResource(stageTex, buffer2D);
+
+        if (FAILED(r))  std::cout << "Failed to create stage texture: " << std::hex << r << std::endl;
+
+
+        D3D11_TEXTURE2D_DESC defaultDesc = desc;
+        defaultDesc.Usage = D3D11_USAGE_DEFAULT;
+        defaultDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        defaultDesc.CPUAccessFlags = 0;
+
+        ID3D11Texture2D* defaultTexture = nullptr;
+        hr = SwapchainHook::d3d11Device->CreateTexture2D(&defaultDesc, nullptr, &defaultTexture);
+        if (FAILED(hr)) {
+            std::cout << "Failed to create def texture: " << std::hex << r << std::endl;
+        }
+
+        deviceContext->CopyResource(defaultTexture, stageTex);
+
+        stageTex->Release();
+        Memory::SafeRelease(backBuffer);
+        Memory::SafeRelease(buffer2D);
+        Memory::SafeRelease(deviceContext);
+
+        SavedD3D11BackBuffer = defaultTexture;
+    }

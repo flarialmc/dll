@@ -164,6 +164,7 @@ ID3D11PixelShader *dbgShader;
 
 void Blur::InitializePipeline()
 {
+
     HRESULT hr;
     ID3D11DeviceContext* pContext;
     SwapchainHook::d3d11Device->GetImmediateContext(&pContext);
@@ -211,8 +212,9 @@ void Blur::InitializePipeline()
     sd.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
     SwapchainHook::d3d11Device->CreateSamplerState(&sd, &pSampler);
 
-}
+    pContext->Release();
 
+}
 void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderResourceView *pShaderResourceView, XMFLOAT2 rtvSize)
 {
     HRESULT hr;
@@ -222,7 +224,8 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     dsd.DepthEnable = false;
     dsd.StencilEnable = false;
     ID3D11DepthStencilState *pDepthStencilState;
-    SwapchainHook::d3d11Device->CreateDepthStencilState(&dsd, &pDepthStencilState);
+    hr = SwapchainHook::d3d11Device->CreateDepthStencilState(&dsd, &pDepthStencilState);
+    if (FAILED(hr)) { pContext->Release(); return; }
     pContext->OMSetDepthStencilState(pDepthStencilState, 0);
 
     void *null = nullptr;
@@ -243,7 +246,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     pContext->VSSetShader(pVertexShader, nullptr, 0);
     pContext->PSSetSamplers(0, 1, &pSampler);
     pContext->PSSetConstantBuffers(0, 1, &pConstantBuffer);
-    D3D11_BLEND_DESC bd;
+    D3D11_BLEND_DESC bd{};
     ZeroMemory(&bd, sizeof(bd));
     bd.AlphaToCoverageEnable = false;
     bd.RenderTarget[0].BlendEnable = true;
@@ -255,7 +258,8 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
     bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
     ID3D11BlendState *pBlendState;
-    SwapchainHook::d3d11Device->CreateBlendState(&bd, &pBlendState);
+    hr = SwapchainHook::d3d11Device->CreateBlendState(&bd, &pBlendState);
+    if (FAILED(hr)) { pContext->Release(); pDepthStencilState->Release(); return; }
     pContext->OMSetBlendState(pBlendState, NULL, 0xffffffff);
     D3D11_RASTERIZER_DESC rd{};
     rd.FillMode = D3D11_FILL_SOLID;
@@ -263,7 +267,8 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     rd.DepthClipEnable = false;
     rd.ScissorEnable = false;
     ID3D11RasterizerState *pRasterizerState;
-    SwapchainHook::d3d11Device->CreateRasterizerState(&rd, &pRasterizerState);
+    hr = SwapchainHook::d3d11Device->CreateRasterizerState(&rd, &pRasterizerState);
+    if (FAILED(hr)) { pContext->Release(); pDepthStencilState->Release(); pBlendState->Release(); return; }
     pContext->RSSetState(pRasterizerState);
 
     pContext->PSSetShaderResources(0, 1, &pShaderResourceView);
@@ -280,26 +285,29 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     pContext->Draw(sizeof(quadVertices) / sizeof(quadVertices[0]), 0);
     ID3D11RenderTargetView* kajgd = nullptr;
     pContext->OMSetRenderTargets(1, &kajgd, nullptr);
+
+    pDepthStencilState->Release();
+    pBlendState->Release();
+    pRasterizerState->Release();
+    pContext->Release();
 }
 
 void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iterations, float intensity)
 {
-    ID3D11Texture2D* tex = MotionBlurListener::GetBackbuffer();
-    if(!tex) return;
+    if (!SwapchainHook::GetBackbuffer()) return;
 
-    ID3D11ShaderResourceView *pOrigShaderResourceView = MotionBlurListener::SaveBackbuffer();
-    if(!pOrigShaderResourceView) return;
+    ID3D11ShaderResourceView *pOrigShaderResourceView = MotionBlurListener::BackbufferToSRV();
+    if (!pOrigShaderResourceView) return;
 
     ID3D11DeviceContext* pContext;
     SwapchainHook::d3d11Device->GetImmediateContext(&pContext);
 
-    HRESULT hr;
     std::vector<ID3D11Texture2D *> framebuffers;
     std::vector<ID3D11RenderTargetView *> renderTargetViews;
     std::vector<ID3D11ShaderResourceView *> shaderResourceViews;
     std::vector<XMFLOAT2> fbSizes;
     D3D11_TEXTURE2D_DESC desc;
-    tex->GetDesc(&desc);
+    SwapchainHook::GetBackbuffer()->GetDesc(&desc);
 
     framebuffers.reserve((size_t)iterations);
     renderTargetViews.reserve((size_t)iterations);
@@ -355,8 +363,13 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
             renderTargetViews[i]->Release();
         framebuffers[i]->Release();
         shaderResourceViews[i]->Release();
+
+        renderTargetViews.clear();
+        framebuffers.clear();
+        shaderResourceViews.clear();
+        fbSizes.clear();
     }
 
-    tex->Release();
+    pContext->Release();
     pOrigShaderResourceView->Release();
 }

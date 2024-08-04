@@ -40,7 +40,7 @@ public:
                 previousFrames.erase(previousFrames.begin(), previousFrames.begin() + framesToRemove);
             }
 
-            ID3D11ShaderResourceView* buffer = SaveBackbuffer();
+            ID3D11ShaderResourceView* buffer = BackbufferToSRV();
             if(buffer) previousFrames.push_back(buffer);
 
 
@@ -75,118 +75,20 @@ public:
         ImGui::SetCursorScreenPos(ImVec2(pos.x + size.x, pos.y));
     }
 
-        static ID3D11Texture2D* GetBackbuffer()
-    {
+    static ID3D11ShaderResourceView* BackbufferToSRV() {
 
-        ID3D11DeviceContext* deviceContext;
-        SwapchainHook::d3d11Device->GetImmediateContext(&deviceContext);
-        IDXGISurface1* backBuffer = nullptr;
         HRESULT hr;
-        SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
-
-        ID3D11Texture2D* buffer2D = nullptr;
-        if(FAILED(backBuffer->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&buffer2D)))) std::cout << "failed to get 2d" << std::endl;
-
-        D3D11_TEXTURE2D_DESC desc;
-        buffer2D->GetDesc(&desc);
-
-        ID3D11Texture2D* stageTex = nullptr;
-        D3D11_TEXTURE2D_DESC stageDesc = desc;
-        stageDesc.Usage = D3D11_USAGE_STAGING;
-        stageDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-        stageDesc.BindFlags = 0;
-
-        //desc.Usage = DXGI_USAGE_SHADER_INPUT;
-        HRESULT r = SwapchainHook::d3d11Device->CreateTexture2D(&stageDesc, nullptr, &stageTex);
-        deviceContext->CopyResource(stageTex, buffer2D);
-
-        if (FAILED(r))  std::cout << "Failed to create stage texture: " << std::hex << r << std::endl;
-
-
-        D3D11_TEXTURE2D_DESC defaultDesc = desc;
-        defaultDesc.Usage = D3D11_USAGE_DEFAULT;
-        defaultDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-        defaultDesc.CPUAccessFlags = 0;
-
-        ID3D11Texture2D* defaultTexture = nullptr;
-        hr = SwapchainHook::d3d11Device->CreateTexture2D(&defaultDesc, nullptr, &defaultTexture);
-        if (FAILED(hr)) {
-            std::cout << "Failed to create def texture: " << std::hex << r << std::endl;
-        }
-
-        deviceContext->CopyResource(defaultTexture, stageTex);
-
-        stageTex->Release();
-
-        //if(outSRV) std::cout << "Wroekd" << std::endl;
-
-        backBuffer->Release();
-        buffer2D->Release();
-
-        return defaultTexture;
-    }
-
-
-    static ID3D11ShaderResourceView* SaveBackbuffer()
-    {
-
-        ID3D11DeviceContext* deviceContext;
-        SwapchainHook::d3d11Device->GetImmediateContext(&deviceContext);
-        IDXGISurface1* backBuffer = nullptr;
-        HRESULT hr;
-        SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
-
-        ID3D11Texture2D* buffer2D = nullptr;
-        if(FAILED(backBuffer->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&buffer2D)))) std::cout << "failed to get 2d" << std::endl;
-
-        D3D11_TEXTURE2D_DESC desc;
-        buffer2D->GetDesc(&desc);
-
-        ID3D11Texture2D* stageTex = nullptr;
-        D3D11_TEXTURE2D_DESC stageDesc = desc;
-        stageDesc.Usage = D3D11_USAGE_STAGING;
-        stageDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-        stageDesc.BindFlags = 0;
-
-        //desc.Usage = DXGI_USAGE_SHADER_INPUT;
-        HRESULT r = SwapchainHook::d3d11Device->CreateTexture2D(&stageDesc, nullptr, &stageTex);
-        deviceContext->CopyResource(stageTex, buffer2D);
-
-        if (FAILED(r))  std::cout << "Failed to create stage texture: " << std::hex << r << std::endl;
-
-
-        D3D11_TEXTURE2D_DESC defaultDesc = desc;
-        defaultDesc.Usage = D3D11_USAGE_DEFAULT;
-        defaultDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-        defaultDesc.CPUAccessFlags = 0;
-
-        ID3D11Texture2D* defaultTexture = nullptr;
-        hr = SwapchainHook::d3d11Device->CreateTexture2D(&defaultDesc, nullptr, &defaultTexture);
-        if (FAILED(hr)) {
-            std::cout << "Failed to create def texture: " << std::hex << r << std::endl;
-        }
-
-        deviceContext->CopyResource(defaultTexture, stageTex);
-
-        stageTex->Release();
-
         ID3D11ShaderResourceView* outSRV;
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-        srvDesc.Format = desc.Format;
+        srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Texture2D.MipLevels = desc.MipLevels;
+        srvDesc.Texture2D.MipLevels = 1;
         srvDesc.Texture2D.MostDetailedMip = 0;
 
-        if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(defaultTexture, &srvDesc, &outSRV)))
+        if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::GetBackbuffer(), &srvDesc, &outSRV)))
         {
             std::cout << "Failed to create shader resource view: " << std::hex << hr << std::endl;
         }
-
-        //if(outSRV) std::cout << "Wroekd" << std::endl;
-
-        Memory::SafeRelease(backBuffer);
-        Memory::SafeRelease(buffer2D);
-        Memory::SafeRelease(defaultTexture);
 
         return outSRV;
     }
@@ -405,6 +307,6 @@ void InitializeRenderResources(ID3D11Device* device)
     //context->OMSetRenderTargets(1, nullptr, nullptr);
 
 
-    std::cout << "trolled" << std::endl;
+    context->Release();
  }
 };
