@@ -36,9 +36,7 @@ struct BlurInputBuffer
 
 class Blur
 {
-private:
-    static inline ID3D11Device *pDevice = nullptr;
-    static inline ID3D11DeviceContext *pContext = nullptr;
+public:
 
     static inline ID3D11PixelShader *pUpsampleShader = nullptr;
     static inline ID3D11PixelShader *pDownsampleShader = nullptr;
@@ -55,11 +53,7 @@ private:
     //static void Cleanup();
 
     static void RenderToRTV(ID3D11RenderTargetView *, ID3D11ShaderResourceView *, XMFLOAT2);
-
-public:
-    static void blur(ID3D11Device *);
-
-    static void RenderBlur(ID3D11Texture2D *, ID3D11RenderTargetView *, int);
+    static void RenderBlur(ID3D11RenderTargetView *, int);
 };
 
 class Dimension {
