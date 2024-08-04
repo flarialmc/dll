@@ -271,6 +271,8 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 
 void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shouldadd) {
 
+	if(Client::settings.getSettingByName<bool>("noicons")->value) return;
+
     if (isInScrollView and shouldadd) {
         rect.top += scrollpos;
         rect.bottom += scrollpos;
