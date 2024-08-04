@@ -51,7 +51,6 @@ public:
     int colorPickerIndex = 0;
 
     void resetPadding();
-
     void extraPadding();
     void addElementText(std::string text, std::string subtext = "");
     void addHeader(std::string text);
@@ -60,6 +59,7 @@ public:
     void addToggle(std::string text, std::string subtext, bool& value);
     void addTextBox(std::string text, std::string subtext, std::string& value);
     void addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value);
+    void addColorPicker(std::string text, std::string subtext, std::string& value, bool& rgb);
     virtual void loadDefaults();
     void saveSettings() const;
     void loadSettings();

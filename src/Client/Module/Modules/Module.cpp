@@ -212,9 +212,21 @@ void Module::addHeader(std::string text) {
     col.a = o_colors_secondary6;
 
     std::string name = FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 500, 0, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.215f, "height", true), DWRITE_FONT_WEIGHT_BOLD, false);
-    FlarialGUI::RoundedRect(x, y + Constraints::RelativeConstraint(0.023f, "width"), col, FlarialGUI::TextSizes[name] + Constraints::RelativeConstraint(0.02f, "width"), 3.0f, 0, 0);
+    FlarialGUI::RoundedRect(x, y + Constraints::RelativeConstraint(0.023f, "width"), col, FlarialGUI::TextSizes[name] + Constraints::RelativeConstraint(0.01f, "width"), 3.0f, 0, 0);
 
     padding += Constraints::RelativeConstraint(0.055f, "height", true);
+}
+
+void Module::addColorPicker(std::string text, std::string subtext, std::string& value, bool& rgb) {
+    float elementX = Constraints::PercentageConstraint(0.285f, "right");
+    float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+    FlarialGUI::ColorPicker(colorPickerIndex, elementX, y, value, rgb);
+
+    Module::addElementText(text, subtext);
+
+    padding += Constraints::RelativeConstraint(0.05f, "height", true);
+    colorPickerIndex++;
 }
 
 void Module::addTextBox(std::string text, std::string subtext, std::string& value) {

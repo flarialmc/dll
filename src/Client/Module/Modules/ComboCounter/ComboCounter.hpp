@@ -46,17 +46,32 @@ public:
                                   Constraints::RelativeConstraint(1.0f, "height"));
 
         this->addHeader("Module UI");
-        this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
+        this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 2.f);
         this->addToggle("Border", "", settings.getSettingByName<bool>("border")->value);
-        this->addConditionalSlider(settings.getSettingByName<bool>("border")->value, "Border Width", "", settings.getSettingByName<float>("borderWidth")->value, 4.0f);
+        this->addConditionalSlider(settings.getSettingByName<bool>("border")->value, "Border Width", "", settings.getSettingByName<float>("borderWidth")->value, 4.f);
         this->addSlider("Rounding", "", this->settings.getSettingByName<float>("rounding")->value);
         this->addToggle("Translucency", "", this->settings.getSettingByName<bool>("BlurEffect")->value);
+        this->addToggle("Responsive Rectangle", "Resizes width with text", this->settings.getSettingByName<bool>("responsivewidth")->value);
+        this->addSlider("Rotation", "", this->settings.getSettingByName<float>("rotation")->value, 359.f, 0.f, false);
+        this->addSlider("Rectangle Width", "", this->settings.getSettingByName<float>("rectwidth")->value, 3.f);
+        this->addSlider("Rectangle Height", "", this->settings.getSettingByName<float>("rectheight")->value, 3.f);
+
         this->extraPadding();
 
         this->addHeader("Text");
         this->addTextBox("Text Format", "", settings.getSettingByName<std::string>("text")->value);
-        this->addSlider("Text Scale", "", this->settings.getSettingByName<float>("textscale")->value, 2.00f);
+        this->addSlider("Text Scale", "", this->settings.getSettingByName<float>("textscale")->value, 2.f);
         this->addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, this->settings.getSettingByName<std::string>("textalignment")->value);
+        this->addToggle("Reverse Padding X", "", this->settings.getSettingByName<bool>("reversepaddingx")->value);
+        this->addToggle("Reverse Padding Y", "", this->settings.getSettingByName<bool>("reversepaddingy")->value);
+        this->addSlider("Padding X", "", this->settings.getSettingByName<float>("padx")->value, 1.f, 0.f, false);
+        this->addSlider("Padding Y", "", this->settings.getSettingByName<float>("pady")->value, 1.f, 0.f, false);
+        
+        this->extraPadding();
+
+        this->addHeader("Colors");
+        this->addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<bool>("bgRGB")->value);
+
 
         this->resetPadding();
 

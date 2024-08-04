@@ -37,7 +37,7 @@
 
 static std::map<std::string, std::string> sizes;
 
-void FlarialGUI::ColorPicker(const int index, float x, const float y, std::string &hex, bool &rgb) {
+void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex, bool &rgb) {
 
     // Accepts hex, so for e.g. fps counter bg color wants to be changed then you'd have to give a modifyable hex value
     // Preferably save every color in config as a hex (string)
@@ -58,7 +58,9 @@ void FlarialGUI::ColorPicker(const int index, float x, const float y, std::strin
 
     Vec2<float> round = Constraints::RoundingConstraint(13, 13);
 
-    float s = Constraints::RelativeConstraint(0.0285, "height", true);
+    float s = Constraints::RelativeConstraint(0.0285, "height", true); // this is the height of whole rect;
+
+    y -= s / 2.f;
 
     D2D1_COLOR_F baseColor = colors_primary4_rgb ? rgbColor : colors_primary4;
     baseColor.a = o_colors_primary4;
