@@ -419,9 +419,10 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                         ImGui_ImplWin32_NewFrame();
                         ImGui::NewFrame();
 
-                        Blur::RenderBlur(mainRenderTargetView, 3);
+                        
 
                         RenderEvent event;
+                        event.RTV = mainRenderTargetView;
                         EventHandler::onRender(event);
 
                         D2D::context->EndDraw();

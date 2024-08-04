@@ -117,9 +117,6 @@ public:
 
         }
 
-        //if (realBlurAmount > 0.1) FlarialGUI::AllahBlur(realBlurAmount);
-
-
         if (SwapchainHook::init && baseHeightActual > 0.1) {
 
             /* Base Rectangle Start */
@@ -131,6 +128,8 @@ public:
                 FlarialGUI::lerp(baseHeightReal, 0.64f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
 
             }
+
+            Blur::RenderBlur(event.RTV, 3, realBlurAmount/4);
 
             float baseHeight = Constraints::RelativeConstraint(baseHeightReal);
 

@@ -53,7 +53,7 @@ public:
     //static void Cleanup();
 
     static void RenderToRTV(ID3D11RenderTargetView *, ID3D11ShaderResourceView *, XMFLOAT2);
-    static void RenderBlur(ID3D11RenderTargetView *, int);
+    static void RenderBlur(ID3D11RenderTargetView *, int, float);
 };
 
 class Dimension {

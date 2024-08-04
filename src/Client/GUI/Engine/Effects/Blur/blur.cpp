@@ -7,7 +7,7 @@
 
 // CREDITS @MR CHIPS (@chyves)
 
-#define BLUR_OFFSET 0.5f
+#define BLUR_OFFSET 10
 
 static const XMFLOAT4 quadVertices[] =
     {
@@ -31,75 +31,100 @@ cbuffer BlurInputBuffer : register(b0)
 {
     float2 resolution;
     float2 offset;
-    float2 halfpixel;
+    float2 halfPixel;
 };
+
 sampler sampler0 : register(s0);
 Texture2D texture0 : register(t0);
 
 float4 main(float4 screenSpace : SV_Position) : SV_TARGET
 {
     float2 uv = screenSpace.xy / resolution;
-    float4 sum = float4(0.0, 0.0, 0.0, 0.0);
-    float2 offsets[5] = {
-        -2.0 * halfpixel * offset,
-        -halfpixel * offset,
-        float2(0.0, 0.0),
-        halfpixel * offset,
-        2.0 * halfpixel * offset
-    };
-    float weights[5] = {
-        0.06136,
-        0.24477,
-        0.38774,
-        0.24477,
-        0.06136
-    };
-    for (int i = 0; i < 5; i++)
-    {
-        sum += texture0.Sample(sampler0, uv + offsets[i]) * weights[i];
-    }
-    return sum;
-})";
+    float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
 
+    static const float2 offsets[9] = {
+        float2(-1.0, -1.0) * halfPixel * offset,
+        float2(0.0, -1.0) * halfPixel * offset,
+        float2(1.0, -1.0) * halfPixel * offset,
+        float2(-1.0, 0.0) * halfPixel * offset,
+        float2(0.0, 0.0) * halfPixel * offset,
+        float2(1.0, 0.0) * halfPixel * offset,
+        float2(-1.0, 1.0) * halfPixel * offset,
+        float2(0.0, 1.0) * halfPixel * offset,
+        float2(1.0, 1.0) * halfPixel * offset
+    };
+
+    static const float weights[9] = {
+        0.06136, 0.12245, 0.06136,
+        0.12245, 0.24477, 0.12245,
+        0.06136, 0.12245, 0.06136
+    };
+
+    float weightSum = 0.0;
+    for (int i = 0; i < 9; i++)
+    {
+        weightSum += weights[i];
+    }
+
+    for (int i = 0; i < 9; i++)
+    {
+        colorSum += texture0.Sample(sampler0, uv + offsets[i]) * (weights[i] / weightSum);
+    }
+
+    return colorSum;
+}
+)";
 
 const char *upsampleShaderSrc = R"(
 cbuffer BlurInputBuffer : register(b0)
 {
     float2 resolution;
     float2 offset;
-    float2 halfpixel;
+    float2 halfPixel;
 };
-struct PS_INPUT
-{
-    float4 pos : POSITION;
-};
+
 sampler sampler0 : register(s0);
 Texture2D texture0 : register(t0);
 
-float4 main(PS_INPUT input, float4 screenSpace : SV_Position) : SV_TARGET
+float4 main(float4 screenSpace : SV_Position) : SV_TARGET
 {
     float2 uv = screenSpace.xy / resolution;
-    float4 sum = float4(0.0, 0.0, 0.0, 0.0);
-    float2 offsets[5] = {
-        -2.0 * halfpixel * offset,
-        -halfpixel * offset,
-        float2(0.0, 0.0),
-        halfpixel * offset,
-        2.0 * halfpixel * offset
+    float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
+
+    static const float2 offsets[9] = {
+        float2(-1.0, -1.0) * halfPixel * offset,
+        float2(0.0, -1.0) * halfPixel * offset,
+        float2(1.0, -1.0) * halfPixel * offset,
+        float2(-1.0, 0.0) * halfPixel * offset,
+        float2(0.0, 0.0) * halfPixel * offset,
+        float2(1.0, 0.0) * halfPixel * offset,
+        float2(-1.0, 1.0) * halfPixel * offset,
+        float2(0.0, 1.0) * halfPixel * offset,
+        float2(1.0, 1.0) * halfPixel * offset
     };
-    float weights[5] = {
-        0.06136,
-        0.24477,
-        0.38774,
-        0.24477,
-        0.06136
+
+    static const float weights[9] = {
+        0.06136, 0.12245, 0.06136,
+        0.12245, 0.24477, 0.12245,
+        0.06136, 0.12245, 0.06136
     };
-    for (int i = 0; i < 5; i++)
+
+    float weightSum = 0.0;
+    for (int i = 0; i < 9; i++)
     {
-        sum += texture0.Sample(sampler0, uv + offsets[i]) * weights[i];
+        weightSum += weights[i];
     }
-    return sum;
-})";
+
+    for (int i = 0; i < 9; i++)
+    {
+        colorSum += texture0.Sample(sampler0, uv + offsets[i]) * (weights[i] / weightSum);
+    }
+
+    return colorSum;
+}
+)";
+
+
 
 const char *dbgDrawTextureShaderSrc = "cbuffer BlurInputBuffer : register(b0)\
 {\
@@ -257,7 +282,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     pContext->OMSetRenderTargets(1, &kajgd, nullptr);
 }
 
-void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iterations)
+void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iterations, float intensity)
 {
     ID3D11Texture2D* tex = MotionBlurListener::GetBackbuffer();
     if(!tex) return;
@@ -308,7 +333,7 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
         desc.Height /= 2;
     }
 
-    constantBuffer.offset = XMFLOAT2(BLUR_OFFSET, BLUR_OFFSET);
+    constantBuffer.offset = XMFLOAT2(intensity, intensity);
     pContext->PSSetShader(pDownsampleShader, nullptr, 0);
     RenderToRTV(renderTargetViews[1], pOrigShaderResourceView, fbSizes[1]);
 

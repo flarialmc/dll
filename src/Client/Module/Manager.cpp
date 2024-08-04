@@ -198,10 +198,6 @@ bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {
 Module* ModuleManager::getModule(const std::string& name) {
     size_t hash = std::hash<std::string>{}(name);
 
-    auto it = moduleMap.find(hash);
-    if (it != moduleMap.end()) {
-        return it->second;
-    }
+    return moduleMap[hash];
 
-    return nullptr;
 }
