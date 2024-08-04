@@ -291,8 +291,7 @@ namespace FlarialGUI {
 
     void NotifyHeartbeat();
 
-    std::string
-    TextBoxVisual(int index, std::string &text, int limit, float x, float y, const std::string &real = "Text Format");
+    std::string TextBoxVisual(int index, std::string& text, int limit, float x, float y, const std::string& real = "");
 
     winrt::com_ptr<ID2D1SolidColorBrush> getBrush(D2D1_COLOR_F color);
 
@@ -361,4 +360,8 @@ namespace FlarialGUI {
                                      const float imageHeight);
 
     ImColor D2DColorToImColor(D2D1_COLOR_F color);
+
+    void OverrideAlphaValues(float percent);
+
+    void ResetOverrideAlphaValues();
 }

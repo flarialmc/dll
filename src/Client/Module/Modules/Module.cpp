@@ -217,20 +217,37 @@ void Module::addHeader(std::string text) {
     padding += Constraints::RelativeConstraint(0.055f, "height", true);
 }
 
-void Module::addConditionalSlider(bool condition, std::string text, std::string subtext, float& startingPoint, float maxVal, float minVal, bool zerosafe) {
+void Module::addTextBox(std::string text, std::string subtext, std::string& value) {
+    float x = Constraints::PercentageConstraint(0.019, "left");
+    float elementX = Constraints::PercentageConstraint(0.285f, "right");
+    float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+    FlarialGUI::TextBoxVisual(textboxIndex, settings.getSettingByName<std::string>("text")->value, 16, elementX , y);
+
+    Module::addElementText(text, subtext);
+
+    padding += Constraints::RelativeConstraint(0.05f, "height", true);
+    textboxIndex++;
+}
+
+void Module::addConditionalSlider(bool condition, std::string text, std::string subtext, float& value, float maxVal, float minVal, bool zerosafe) {
+    
+    FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalSliderAnims[sliderIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
+
     if (condition) {
         padding -= conditionalSliderAnims[sliderIndex];
         FlarialGUI::lerp(conditionalSliderAnims[sliderIndex], 0.0f, 0.25f * FlarialGUI::frameFactor);
-        Module::addSlider(text, subtext, startingPoint, maxVal, minVal, zerosafe);
+        Module::addSlider(text, subtext, value, maxVal, minVal, zerosafe);
     }
     else {
         FlarialGUI::lerp(conditionalSliderAnims[sliderIndex], Constraints::RelativeConstraint(0.05f, "height", true), 0.25f * FlarialGUI::frameFactor);
         if (conditionalSliderAnims[sliderIndex] < Constraints::RelativeConstraint(0.0499f, "height", true)) {
             padding -= conditionalSliderAnims[sliderIndex];
-            if (conditionalSliderAnims[sliderIndex] < Constraints::RelativeConstraint(0.045f, "height", true)) Module::addSlider(text, subtext, startingPoint, maxVal, minVal, zerosafe);
-            else padding += Constraints::RelativeConstraint(0.05f, "height", true);
+            Module::addSlider(text, subtext, value, maxVal, minVal, zerosafe);
         }
     }
+
+    FlarialGUI::ResetOverrideAlphaValues();
 }
 
 void Module::addElementText(std::string text, std::string subtext) {
@@ -254,12 +271,11 @@ void Module::addElementText(std::string text, std::string subtext) {
     if (!subtext.empty()) FlarialGUI::FlarialTextWithFont(x, subtextY, FlarialGUI::to_wide(subtext).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, FlarialGUI::HexToColorF("473b3d"), false);
 }
 
-void Module::addSlider(std::string text, std::string subtext, float& startingPoint, float maxVal, float minVal, bool zerosafe) {
-    float x = Constraints::PercentageConstraint(0.019, "left");
+void Module::addSlider(std::string text, std::string subtext, float& value, float maxVal, float minVal, bool zerosafe) {
     float elementX = Constraints::PercentageConstraint(0.33f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-    FlarialGUI::Slider(sliderIndex, elementX, y, startingPoint, maxVal, minVal, zerosafe);
+    FlarialGUI::Slider(sliderIndex, elementX, y, value, maxVal, minVal, zerosafe);
 
     Module::addElementText(text, subtext);
     

@@ -46,14 +46,13 @@ public:
                                   Constraints::RelativeConstraint(1.0f, "height"));
 
         this->addHeader("Module UI");
-
         this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
-
-        this->addToggle("Border", "im just trolling", settings.getSettingByName<bool>("border")->value);
-
+        this->addToggle("Border", "", settings.getSettingByName<bool>("border")->value);
         this->addConditionalSlider(settings.getSettingByName<bool>("border")->value, "Border Width", "", settings.getSettingByName<float>("borderWidth")->value, 4.0f);
+        this->addSlider("Rounding", "", this->settings.getSettingByName<float>("rounding")->value);
+        this->addToggle("Translucency", "", this->settings.getSettingByName<bool>("BlurEffect")->value);
+        this->addTextBox("Text Format", "", settings.getSettingByName<std::string>("text")->value);
 
-        this->addToggle("NO MORE TROLLING.....", "", settings.getSettingByName<bool>("reversepaddingx")->value);
 
         this->extraPadding();
 
