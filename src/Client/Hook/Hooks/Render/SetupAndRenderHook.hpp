@@ -93,7 +93,10 @@ private:
         }
 
         FrameTransform transform = { SDK::clientInstance->getviewMatrix(), origin, SDK::clientInstance->getFov(), pos};
+
+        SwapchainHook::frameTransformsMtx.lock();
         SwapchainHook::FrameTransforms.push(transform);
+        SwapchainHook::frameTransformsMtx.unlock();
 
         if(layer == "debug_screen" || layer == "hud_screen" || layer == "start_screen") {
             SetupAndRenderEvent event(muirc);

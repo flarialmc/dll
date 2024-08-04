@@ -244,11 +244,13 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
         /* RENDER SYNC */
 
-        if(init && initImgui)
-        while(FrameTransforms.size() > transformDelay)
-        {
-            MC::Transform = FrameTransforms.front();
-            FrameTransforms.pop();
+        if(init && initImgui) {
+            frameTransformsMtx.lock();
+            while (FrameTransforms.size() > transformDelay) {
+                MC::Transform = FrameTransforms.front();
+                FrameTransforms.pop();
+            }
+            frameTransformsMtx.unlock();
         }
 
          /* RENDER SYNC */

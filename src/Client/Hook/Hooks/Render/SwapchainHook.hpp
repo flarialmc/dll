@@ -73,6 +73,7 @@ public:
     static inline uint64_t buffersCounts = 0;
     static inline std::vector<FrameContext> frameContexts = {};
 
+    static inline std::mutex frameTransformsMtx;
     static inline std::queue<FrameTransform> FrameTransforms;
     static inline int transformDelay = 3;
 
