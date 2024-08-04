@@ -218,16 +218,27 @@ void Module::addHeader(std::string text) {
 }
 
 void Module::addTextBox(std::string text, std::string subtext, std::string& value) {
-    float x = Constraints::PercentageConstraint(0.019, "left");
     float elementX = Constraints::PercentageConstraint(0.285f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-    FlarialGUI::TextBoxVisual(textboxIndex, settings.getSettingByName<std::string>("text")->value, 16, elementX , y);
+    FlarialGUI::TextBoxVisual(textboxIndex, value, 16, elementX , y);
 
     Module::addElementText(text, subtext);
 
     padding += Constraints::RelativeConstraint(0.05f, "height", true);
     textboxIndex++;
+}
+
+void Module::addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value) {
+    float elementX = Constraints::PercentageConstraint(0.285f, "right");
+    float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+    FlarialGUI::Dropdown(dropdownIndex, elementX, y, options, value, "");
+
+    Module::addElementText(text, subtext);
+
+    padding += Constraints::RelativeConstraint(0.05f, "height", true);
+    dropdownIndex++;
 }
 
 void Module::addConditionalSlider(bool condition, std::string text, std::string subtext, float& value, float maxVal, float minVal, bool zerosafe) {

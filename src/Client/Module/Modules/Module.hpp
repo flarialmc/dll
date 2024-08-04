@@ -59,6 +59,7 @@ public:
     void addSlider(std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
     void addToggle(std::string text, std::string subtext, bool& value);
     void addTextBox(std::string text, std::string subtext, std::string& value);
+    void addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value);
     virtual void loadDefaults();
     void saveSettings() const;
     void loadSettings();

@@ -179,8 +179,7 @@ namespace FlarialGUI {
 
     void LoadImageFromFile(const wchar_t *filename, ID2D1Bitmap **bitmap);
 
-    void FlarialText(float x, float y, const wchar_t *text, float width, float height,
-                     DWRITE_TEXT_ALIGNMENT alignment);
+    void FlarialText(float x, float y, const wchar_t *text, float width, float height,DWRITE_TEXT_ALIGNMENT alignment);
 
     void SetScrollView(float x, float y, float width, float height);
 
@@ -223,7 +222,7 @@ namespace FlarialGUI {
 
     bool Toggle(int index, float x, float y, bool isEnabled, bool rgb);
 
-    float Slider(int index, float x, float y, float& startingPoint, float maxValue = 100.0f, float minValue = 0.0f, bool zerosafe = true);
+    float Slider(int index, float x, float y, float& value, float maxValue = 100.0f, float minValue = 0.0f, bool zerosafe = true);
 
     void Circle(float x, float y, const D2D1_COLOR_F &color, float radius);
 
@@ -241,8 +240,7 @@ namespace FlarialGUI {
 
     std::string ColorFToHex(const D2D1_COLOR_F &color);
 
-    void
-    RoundedHollowRect(float x, float y, float borderWidth, D2D_COLOR_F color, float width,
+    void RoundedHollowRect(float x, float y, float borderWidth, D2D_COLOR_F color, float width,
                       float height, float radiusX,
                       float radiusY);
 

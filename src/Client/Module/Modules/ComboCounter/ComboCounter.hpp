@@ -51,12 +51,12 @@ public:
         this->addConditionalSlider(settings.getSettingByName<bool>("border")->value, "Border Width", "", settings.getSettingByName<float>("borderWidth")->value, 4.0f);
         this->addSlider("Rounding", "", this->settings.getSettingByName<float>("rounding")->value);
         this->addToggle("Translucency", "", this->settings.getSettingByName<bool>("BlurEffect")->value);
-        this->addTextBox("Text Format", "", settings.getSettingByName<std::string>("text")->value);
-
-
         this->extraPadding();
 
         this->addHeader("Text");
+        this->addTextBox("Text Format", "", settings.getSettingByName<std::string>("text")->value);
+        this->addSlider("Text Scale", "", this->settings.getSettingByName<float>("textscale")->value, 2.00f);
+        this->addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, this->settings.getSettingByName<std::string>("textalignment")->value);
 
         this->resetPadding();
 
