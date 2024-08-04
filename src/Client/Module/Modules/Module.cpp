@@ -212,9 +212,46 @@ void Module::addHeader(std::string text) {
     col.a = o_colors_secondary6;
 
     std::string name = FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 500, 0, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.215f, "height", true), DWRITE_FONT_WEIGHT_BOLD, false);
-    FlarialGUI::RoundedRect(x, y + Constraints::RelativeConstraint(0.023f, "width"), col, FlarialGUI::TextSizes[name], 3.0f, 0, 0);
+    FlarialGUI::RoundedRect(x, y + Constraints::RelativeConstraint(0.023f, "width"), col, FlarialGUI::TextSizes[name] + Constraints::RelativeConstraint(0.02f, "width"), 3.0f, 0, 0);
 
     padding += Constraints::RelativeConstraint(0.055f, "height", true);
+}
+
+void Module::addConditionalSlider(bool condition, std::string text, std::string subtext, float& startingPoint, float maxVal, float minVal, bool zerosafe) {
+    if (condition) {
+        padding -= conditionalSliderAnims[sliderIndex];
+        FlarialGUI::lerp(conditionalSliderAnims[sliderIndex], 0.0f, 0.25f * FlarialGUI::frameFactor);
+        Module::addSlider(text, subtext, startingPoint, maxVal, minVal, zerosafe);
+    }
+    else {
+        FlarialGUI::lerp(conditionalSliderAnims[sliderIndex], Constraints::RelativeConstraint(0.05f, "height", true), 0.25f * FlarialGUI::frameFactor);
+        if (conditionalSliderAnims[sliderIndex] < Constraints::RelativeConstraint(0.0499f, "height", true)) {
+            padding -= conditionalSliderAnims[sliderIndex];
+            if (conditionalSliderAnims[sliderIndex] < Constraints::RelativeConstraint(0.045f, "height", true)) Module::addSlider(text, subtext, startingPoint, maxVal, minVal, zerosafe);
+            else padding += Constraints::RelativeConstraint(0.05f, "height", true);
+        }
+    }
+}
+
+void Module::addElementText(std::string text, std::string subtext) {
+    float x = Constraints::PercentageConstraint(0.019, "left");
+    float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+    float subtextY;
+    float fontSize = Constraints::RelativeConstraint(0.140f, "height", true);
+    float fontSize2 = Constraints::RelativeConstraint(0.132f, "height", true);
+
+    if (!subtext.empty()) {
+        subtextY = y;
+        y -= Constraints::RelativeConstraint(0.009f, "height", true);
+        subtextY += Constraints::RelativeConstraint(0.009f, "height", true);
+    }
+    else {
+        y += Constraints::RelativeConstraint(0.0015f, "height", true);
+    }
+
+    FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, false);
+    if (!subtext.empty()) FlarialGUI::FlarialTextWithFont(x, subtextY, FlarialGUI::to_wide(subtext).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, FlarialGUI::HexToColorF("473b3d"), false);
 }
 
 void Module::addSlider(std::string text, std::string subtext, float& startingPoint, float maxVal, float minVal, bool zerosafe) {
@@ -224,24 +261,8 @@ void Module::addSlider(std::string text, std::string subtext, float& startingPoi
 
     FlarialGUI::Slider(sliderIndex, elementX, y, startingPoint, maxVal, minVal, zerosafe);
 
-    float textX = x;
-    float textY = y;
-    float subtextY;
-    float fontSize = Constraints::RelativeConstraint(0.140f, "height", true);
-    float fontSize2 = Constraints::RelativeConstraint(0.132f, "height", true);
-
-    if (!subtext.empty()) {
-        subtextY = textY;
-        textY -= Constraints::RelativeConstraint(0.009f, "height", true);
-        subtextY += Constraints::RelativeConstraint(0.009f, "height", true);
-    }
-    else {
-        textY += Constraints::RelativeConstraint(0.0015f, "height", true);
-    }
-
-    FlarialGUI::FlarialTextWithFont(textX, textY, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, false);
-    if (!subtext.empty()) FlarialGUI::FlarialTextWithFont(textX, subtextY, FlarialGUI::to_wide(subtext).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, FlarialGUI::HexToColorF("473b3d"), false);
-
+    Module::addElementText(text, subtext);
+    
     padding += Constraints::RelativeConstraint(0.05f, "height", true);
     sliderIndex++;
 }
@@ -253,24 +274,8 @@ void Module::addToggle(std::string text, std::string subtext, bool& value) {
 
     if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false)) value = !value;
 
-    float textX = x;
-    float textY = y;
-    float subtextY;
-    float fontSize = Constraints::RelativeConstraint(0.140f, "height", true);
-    float fontSize2 = Constraints::RelativeConstraint(0.132f, "height", true);
-
-    if (!subtext.empty()) {
-        subtextY = textY;
-        textY -= Constraints::RelativeConstraint(0.009f, "height", true);
-        subtextY += Constraints::RelativeConstraint(0.009f, "height", true);
-    }
-    else {
-        textY += Constraints::RelativeConstraint(0.0015f, "height", true);
-    }
-
-    FlarialGUI::FlarialTextWithFont(textX, textY, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, false);
-    if (!subtext.empty()) FlarialGUI::FlarialTextWithFont(textX, subtextY, FlarialGUI::to_wide(subtext).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, FlarialGUI::HexToColorF("473b3d"), false);
-
+    Module::addElementText(text, subtext);
+    
     padding += Constraints::RelativeConstraint(0.05f, "height", true);
     toggleIndex++;
 }

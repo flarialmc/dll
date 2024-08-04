@@ -191,8 +191,6 @@ namespace FlarialGUI {
     bool Toggle(int index, float x, float y, bool isEnabled, bool rgb);
 
     float Slider(int index, float x, float y, float& startingPoint, float maxValue = 100.0f, float minValue = 0.0f, bool zerosafe = true);
-    //void Slider(bool troll, int index, float x, float y, float& startingPoint, float maxValue = 100.0f, float minValue = 0.0f, bool zerosafe = true);
-
 
     void Circle(float x, float y, const D2D1_COLOR_F &color, float radius);
 

@@ -9,12 +9,14 @@
 #include <filesystem>
 #include <sstream>
 #include <utility>
+#include <vector>
 #include "../../GUI/Engine/Engine.hpp"
 #include "../../GUI/Engine/Constraints.hpp"
 #include "../../../SDK/SDK.hpp"
 #include "../../../Assets/Assets.hpp"
 
 class Module {
+
 public:
     std::string name;
     std::string description;
@@ -42,6 +44,7 @@ public:
     float padding = 0;
     int toggleIndex = 0;
     int sliderIndex = 0;
+    std::vector<float> conditionalSliderAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
     int dropdownIndex = 0;
     int textboxIndex = 0;
     int keybindIndex = 0;
@@ -50,8 +53,9 @@ public:
     void resetPadding();
 
     void extraPadding();
-
+    void addElementText(std::string text, std::string subtext = "");
     void addHeader(std::string text);
+    void addConditionalSlider(bool condition, std::string text, std::string subtext, float& startingPoint, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
     void addSlider(std::string text, std::string subtext, float& startingPoint, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
     void addToggle(std::string text, std::string subtext, bool& value);
     virtual void loadDefaults();
