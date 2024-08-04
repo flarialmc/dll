@@ -246,7 +246,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     buttonColor = D2D1::ColorF(FlarialGUI::buttonColors[index].r - FlarialGUI::darkenAmounts[index], FlarialGUI::buttonColors[index].g - FlarialGUI::darkenAmounts[index],
                                    FlarialGUI::buttonColors[index].b - FlarialGUI::darkenAmounts[index], FlarialGUI::buttonColors[index].a);
 
-    FlarialGUI::RoundedRect((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.155f, paddingwidth), buttony - buttonHeight,
+    FlarialGUI::RoundedRect((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.105f, paddingwidth), buttony - buttonHeight,
                                   buttonColor, buttonWidth - Constraints::SpacingConstraint(1.5, paddingwidth), buttonHeight, 0.f, 0.f);
 
     if (FlarialGUI::RoundedButton(index, buttonx - buttonWidth, buttony - buttonHeight,
@@ -261,8 +261,8 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     if (FlarialGUI::isInScrollView)
         buttony += FlarialGUI::scrollpos;
 
-    if (FlarialGUI::CursorInRect(buttonx - paddingspacing, (buttony - paddingwidth) - paddingheightspac,
-                                 paddingwidth, paddingwidth) && MC::mouseButton == MouseButton::Left &&
+    if (FlarialGUI::CursorInRect(settingx, buttony - buttonHeight,
+                                 paddingwidth + Constraints::RelativeConstraint(0.26), buttonHeight) && MC::mouseButton == MouseButton::Left &&
         !MC::held) {
         FlarialGUI::TextBoxes[0].isActive = false;
         MC::mouseButton = MouseButton::None;
