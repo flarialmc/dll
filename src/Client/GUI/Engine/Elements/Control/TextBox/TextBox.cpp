@@ -49,8 +49,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
     }
 
     if (FlarialGUI::TextBoxes[index].isActive) {
-        if (FlarialGUI::TextBoxes[index].isAt1)
-            FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, -1.0f, 0.05f * FlarialGUI::frameFactor);
+        if (FlarialGUI::TextBoxes[index].isAt1) FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, -1.0f, 0.05f * FlarialGUI::frameFactor);
         else FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, 2.0f, 0.05f * FlarialGUI::frameFactor);
     } else FlarialGUI::TextBoxes[index].cursorOpac = 0;
 
@@ -64,6 +63,8 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
     const bool isAdditionalY = shouldAdditionalY;
     const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
     const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
+
+    y -= percHeight / 2.0f;
 
     if (isAdditionalY) UnSetIsInAdditionalYMode();
 
@@ -84,14 +85,6 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
     ttext = FlarialGUI::FlarialTextWithFont(x + Constraints::RelativeConstraint(0.05f), y, FlarialGUI::to_wide(text).c_str(),
                                     Constraints::SpacingConstraint(1.55, textWidth), percHeight,
                                     DWRITE_TEXT_ALIGNMENT_LEADING, textSize, DWRITE_FONT_WEIGHT_NORMAL);
-
-
-
-    //IDWriteTextFormat* textFormat;
-    //FlarialGUI::writeFactory->CreateTextFormat(LClient::settings.getSettingByName<std::string>("fontname")->value, NULL, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, Constraints::FontScaler(textSize), L"", &textFormat);
-
-    // textFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR); !!!
-    //textLayout->Release();
 
     D2D1_COLOR_F cursorCol = colors_primary2_rgb ? rgbColor : colors_primary2;
     cursorCol.a = o_colors_primary2;

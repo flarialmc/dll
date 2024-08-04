@@ -130,28 +130,6 @@ std::unordered_map<int, float> FlarialGUI::additionalY;
 //std::unordered_map<std::string, winrt::com_ptr<ID2D1GradientStopCollection>> FlarialGUI::gradientStopCache;
 LRUCache<uint64_t, winrt::com_ptr<ID2D1LinearGradientBrush>> FlarialGUI::gradientBrushCache(300);
 
-/*
-float b_o_colors_text = o_colors_text;
-float b_o_colors_enabled = o_colors_enabled;
-float b_o_colors_disabled = o_colors_disabled;
-float b_o_colors_primary1 = o_colors_primary1;
-float b_o_colors_primary2 = o_colors_primary2;
-float b_o_colors_primary3 = o_colors_primary3;
-float b_o_colors_primary4 = o_colors_primary4;
-float b_o_colors_secondary1 = o_colors_secondary1;
-float b_o_colors_secondary2 = o_colors_secondary2;
-float b_o_colors_secondary3 = o_colors_secondary3;
-float b_o_colors_secondary4 = o_colors_secondary4;
-float b_o_colors_secondary5 = o_colors_secondary5;
-float b_o_colors_secondary6 = o_colors_secondary6;
-float b_o_colors_secondary7 = o_colors_secondary7;
-float b_o_colors_secondary8 = o_colors_secondary8;
-float b_o_colors_mod1 = o_colors_mod1;
-float b_o_colors_mod2 = o_colors_mod2;
-float b_o_colors_mod3 = o_colors_mod3;
-float b_o_colors_mod4 = o_colors_mod4;
-*/
-
 float b_o_colors_text;
 float b_o_colors_enabled;
 float b_o_colors_disabled;
