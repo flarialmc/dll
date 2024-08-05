@@ -338,7 +338,7 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
         desc.Height /= 2;
     }
 
-    constantBuffer.offset = XMFLOAT2(intensity, intensity);
+    constantBuffer.offset = XMFLOAT2(intensity * 3, intensity * 3);
     pContext->PSSetShader(pDownsampleShader, nullptr, 0);
     RenderToRTV(renderTargetViews[1], pOrigShaderResourceView, fbSizes[1]);
 
