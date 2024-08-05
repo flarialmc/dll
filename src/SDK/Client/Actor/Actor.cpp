@@ -62,6 +62,8 @@ SimpleContainer* Actor::getArmorContainer() {
 
     if (sig == NULL) {
         sig = Memory::findSig(GET_SIG("Actor::getActorEquipmentComponent")); // 8B DA BA 2E CD 8B 46
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix2"));
+        sig = sig - size;
     }
 
     return tryGet<ActorEquipmentComponent>(sig)->mArmorContainer;
@@ -73,6 +75,8 @@ SimpleContainer* Actor::getOffhandContainer() {
 
     if (sig == NULL) {
         sig = Memory::findSig(GET_SIG("Actor::getActorEquipmentComponent")); // 8B DA BA 2E CD 8B 46
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix2"));
+        sig = sig - size;
     }
 
     return tryGet<ActorEquipmentComponent>(sig)->mOffhandContainer;
@@ -99,6 +103,8 @@ MoveInputComponent *Actor::getMoveInputHandler() { //??$try_get@UMoveInputCompon
 
     if (sig == NULL) {
         sig = Memory::findSig(GET_SIG("Actor::getMoveInputHandler")); // 8B DA BA 2E CD 8B 46
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
+        sig = sig - size;
     }
 
     return tryGet<MoveInputComponent>(sig);
@@ -110,6 +116,8 @@ ActorGameTypeComponent *Actor::getGameModeType() {
 
     if (sig == NULL) {
         sig = Memory::findSig(GET_SIG("Actor::getActorGameTypeComponent")); // 8B DA BA DE AB CB AF
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
+        sig = sig - size;
     }
 
     return tryGet<ActorGameTypeComponent>(sig);
@@ -121,6 +129,8 @@ AABBShapeComponent *Actor::getAABBShapeComponent() {
 
     if (sig == NULL) {
         sig = Memory::findSig(GET_SIG("Actor::getAABBShapeComponent")); // 8B DA BA F2 C9 10 1B
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
+        sig = sig - size;
     }
 
     return tryGet<AABBShapeComponent>(sig);
@@ -132,6 +142,8 @@ StateVectorComponent *Actor::getStateVectorComponent() {
 
     if (sig == NULL) {
         sig = Memory::findSig(GET_SIG("Actor::getStateVectorComponent")); // 8B DA BA 91 3C C9 0E
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
+        sig = sig - size;
     }
 
     return tryGet<StateVectorComponent>(sig);
@@ -157,6 +169,8 @@ RuntimeIDComponent *Actor::getRuntimeIDComponent() {
 
     if (sig == NULL) {
         sig = Memory::findSig(GET_SIG("Actor::getRuntimeIDComponent"));
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
+        sig = sig - size;
     }
 
     return tryGet<RuntimeIDComponent>(sig);
@@ -197,6 +211,8 @@ RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URen
 
     if (sig == NULL) {
         sig = Memory::findSig(GET_SIG("Actor::getRenderPositionComponent")); // 8B DA BA 6E F3 E8 D4
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
+        sig = sig - size;
     }
 
     return tryGet<RenderPositionComponent>(sig);

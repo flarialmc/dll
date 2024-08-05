@@ -20,11 +20,11 @@ public:
     Vec2<float> currentPos;
     bool enabled = false;
     int durabilities[5][2] = {
-        {0,0},
-        {0,0},
-        {0,0},
-        {0,0},
-        {0,0}
+            {0,0},
+            {0,0},
+            {0,0},
+            {0,0},
+            {0,0}
     };
     // TODO: delete testing variables (or adjust and delete)
     Vec2<float> testOffset = Vec2<float>{4,0};
@@ -135,31 +135,37 @@ public:
 
                             std::string text;
 
-                            if (module->settings.getSettingByName<bool>("percent")->value)
-                                text = std::to_string((int)std::round((float)durabilities[i][0] / (float)durabilities[i][1]  * 100))+"%";
-                            else
-                                text = std::to_string(durabilities[i][0]) + "/" + std::to_string(durabilities[i][1]);
+                            if (durabilities[i][1] != 0) { // for some servers with custom items with max durability of 0
+                                if (module->settings.getSettingByName<bool>("percent")->value)
+                                    text = std::to_string((int) std::round(
+                                            (float) durabilities[i][0] / (float) durabilities[i][1] * 100)) + "%";
+                                else
+                                    text = std::to_string(durabilities[i][0]) + "/" +
+                                           std::to_string(durabilities[i][1]);
 
-                            std::wstring widestr = std::wstring(text.begin(), text.end());
 
-                            const wchar_t *widecstr = widestr.c_str();
+                                std::wstring widestr = std::wstring(text.begin(), text.end());
 
-                            D2D1_COLOR_F color = mainColor;
+                                const wchar_t *widecstr = widestr.c_str();
 
-                            if (module->settings.getSettingByName<bool>("color")->value){
-                                if(std::round((float)durabilities[i][0] / (float)durabilities[i][1] * 100) <= 15){
-                                    color = lowColor;
-                                } else {
-                                    color = fullColor;
+                                D2D1_COLOR_F color = mainColor;
+
+                                if (module->settings.getSettingByName<bool>("color")->value) {
+                                    if (std::round((float) durabilities[i][0] / (float) durabilities[i][1] * 100) <=
+                                        15) {
+                                        color = lowColor;
+                                    } else {
+                                        color = fullColor;
+                                    }
                                 }
-                            }
 
-                            FlarialGUI::FlarialTextWithFont(
-                                    currentPos.x + xmodifier + xoffset + testOffset.x,
-                                    currentPos.y + ymodifier + yoffset + testOffset.y, widecstr, textWidth * 6.9f,
-                                    textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                    textWidth,
-                                    DWRITE_FONT_WEIGHT_NORMAL, color, false);
+                                FlarialGUI::FlarialTextWithFont(
+                                        currentPos.x + xmodifier + xoffset + testOffset.x,
+                                        currentPos.y + ymodifier + yoffset + testOffset.y, widecstr, textWidth * 6.9f,
+                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        textWidth,
+                                        DWRITE_FONT_WEIGHT_NORMAL, color, false);
+                            }
                         }
                     }
                 }
@@ -241,14 +247,28 @@ public:
                             nullptr) {
                             auto item = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(
                                     SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot);
-                            durabilities[0][1] = item->getMaxDamage();
-                            durabilities[0][0] = durabilities[0][1] - item->getDamageValue();
+
+                            auto maxDamage = item->getMaxDamage();
+                            auto durabilityLeft = maxDamage - item->getDamageValue();
+
+                            durabilities[0][1] = maxDamage;
+                            durabilities[0][0] = durabilityLeft;
+
                             barc.itemRenderer->renderGuiItemNew(&barc,
                                                                 item,
                                                                 0, convert.x, convert.y, 1.0f,
                                                                 module->settings.getSettingByName<float>(
                                                                         "uiscale")->value,
                                                                 false);
+
+                            if(item->isEnchanted()) {
+                                barc.itemRenderer->renderGuiItemNew(&barc,
+                                                                    item,
+                                                                    0, convert.x, convert.y, 1.0f,
+                                                                    module->settings.getSettingByName<float>(
+                                                                            "uiscale")->value,
+                                                                    true);
+                            }
                         }
 
 
@@ -262,20 +282,35 @@ public:
                             if (module->settings.getSettingByName<bool>("vertical")->value) ymodifier += spacing;
                             else xmodifier += spacing;
 
-                            if (SDK::clientInstance->getLocalPlayer()->getArmor(i-1)->getItem() != nullptr) {
-                                durabilities[i][1] = SDK::clientInstance->getLocalPlayer()->getArmor(i-1)->getMaxDamage();
-                                durabilities[i][0] = durabilities[i][1] -
-                                                     SDK::clientInstance->getLocalPlayer()->getArmor(
-                                                             i-1)->getDamageValue();
+                            auto armorSlot = SDK::clientInstance->getLocalPlayer()->getArmor(i-1);
+
+                            if (armorSlot->getItem() != nullptr) {
+
+                                auto maxDamage = armorSlot->getMaxDamage();
+                                auto durabilityLeft = maxDamage - armorSlot->getDamageValue();
+
+                                durabilities[i][1] = maxDamage;
+                                durabilities[i][0] = durabilityLeft;
 
 
                                 convert = this->convert();
+
                                 barc.itemRenderer->renderGuiItemNew(&barc,
-                                                                    SDK::clientInstance->getLocalPlayer()->getArmor(i-1),
+                                                                    armorSlot,
                                                                     0,
                                                                     convert.x + xmodifier, convert.y + ymodifier, 1.0f,
                                                                     module->settings.getSettingByName<float>(
                                                                             "uiscale")->value, false);
+
+                                if(armorSlot->isEnchanted()) {
+                                    barc.itemRenderer->renderGuiItemNew(&barc,
+                                                                        armorSlot,
+                                                                        0,
+                                                                        convert.x + xmodifier, convert.y + ymodifier, 1.0f,
+                                                                        module->settings.getSettingByName<float>(
+                                                                                "uiscale")->value,
+                                                                        true);
+                                }
                             }
                         }
                     }
