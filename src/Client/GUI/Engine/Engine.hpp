@@ -27,10 +27,9 @@ using namespace DirectX;
 
 struct BlurInputBuffer
 {
+    FLOAT intensity;
     XMFLOAT2 resolution;
-    XMFLOAT2 offset;
-    XMFLOAT2 halfpixel;
-    XMFLOAT2 _dummy;
+    FLOAT padding[1];
 };
 
 
