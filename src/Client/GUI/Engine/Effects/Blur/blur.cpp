@@ -294,6 +294,8 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
 
 void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iterations, float intensity)
 {
+    if(intensity < 1) return;
+
     if (!SwapchainHook::GetBackbuffer()) return;
 
     ID3D11ShaderResourceView *pOrigShaderResourceView = MotionBlurListener::BackbufferToSRV();
@@ -319,56 +321,15 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 
     desc.BindFlags |= D3D11_BIND_RENDER_TARGET;
 
-    for (int i = 0; i <= iterations; i++)
-    {
-        ID3D11Texture2D *pFrameBuffer;
-        ID3D11RenderTargetView *pRenderTargetView;
-        ID3D11ShaderResourceView *pShaderResourceView;
+    XMFLOAT2 fbSize = XMFLOAT2(desc.Width, desc.Height);
 
-        SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pFrameBuffer);
-        if (i == 0)
-            pRenderTargetView = pDstRenderTargetView;
-        else
-            SwapchainHook::d3d11Device->CreateRenderTargetView(pFrameBuffer, nullptr, &pRenderTargetView);
-        SwapchainHook::d3d11Device->CreateShaderResourceView(pFrameBuffer, nullptr, &pShaderResourceView);
-
-        framebuffers.push_back(pFrameBuffer);
-        renderTargetViews.push_back(pRenderTargetView);
-        shaderResourceViews.push_back(pShaderResourceView);
-        fbSizes.push_back(XMFLOAT2(desc.Width, desc.Height));
-
-        desc.Width /= 2;
-        desc.Height /= 2;
-    }
-
-    constantBuffer.offset = XMFLOAT2(intensity, intensity);
-    pContext->PSSetShader(pDownsampleShader, nullptr, 0);
-    RenderToRTV(renderTargetViews[1], pOrigShaderResourceView, fbSizes[1]);
-
-    for (int i = 1; i < iterations; i++)
-    {
-        RenderToRTV(renderTargetViews[i + 1], shaderResourceViews[i], fbSizes[i + 1]);
-    }
+    constantBuffer.offset = XMFLOAT2(intensity * 4, intensity * 4);
 
     pContext->PSSetShader(pUpsampleShader, nullptr, 0);
+    RenderToRTV(pDstRenderTargetView, pOrigShaderResourceView, fbSize);
 
-    for (int i = iterations; i > 0; i--)
-    {
-        RenderToRTV(renderTargetViews[i - 1], shaderResourceViews[i], fbSizes[i - 1]);
-    }
 
-    for (int i = 0; i < iterations; i++)
-    {
-        if (i != 0)
-            renderTargetViews[i]->Release();
-        framebuffers[i]->Release();
-        shaderResourceViews[i]->Release();
 
-        renderTargetViews.clear();
-        framebuffers.clear();
-        shaderResourceViews.clear();
-        fbSizes.clear();
-    }
 
     pContext->Release();
     pOrigShaderResourceView->Release();

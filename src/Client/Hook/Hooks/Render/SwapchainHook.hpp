@@ -59,6 +59,7 @@ public:
     static inline ID3D12GraphicsCommandList* DX12CommandLists;
     static bool hasResized;
     static int currentBitmap;
+    static inline ID3D11Texture2D* stageTex;
 
     static inline ID3D12Device5* d3d12Device5 = nullptr;
 

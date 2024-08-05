@@ -75,8 +75,9 @@ public:
     }
 
     void onSetupAndRender(SetupAndRenderEvent &event) override {
-        if(SDK::currentScreen == "hud_screen") {
 
+        if(this->module->isEnabled())
+        if(SDK::currentScreen == "hud_screen") {
             SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl>& control) {
 
                 if (control->LayerName == "hud_player") {
@@ -101,7 +102,6 @@ public:
 
                     return; // dont go through other controls
                 }
-
             });
         }
     }

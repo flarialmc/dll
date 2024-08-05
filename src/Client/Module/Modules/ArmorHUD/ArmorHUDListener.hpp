@@ -226,6 +226,7 @@ public:
     }
 
     void onSetupAndRender(SetupAndRenderEvent &event) override {
+        if(this->module->isEnabled())
         if (ClientInstance::getTopScreenName() == "hud_screen") {
             auto muirc = event.getMuirc();
             BaseActorRenderContext barc(muirc->screenContext, muirc->clientInstance,

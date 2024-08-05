@@ -91,6 +91,8 @@ public:
 
     void onSetupAndRender(SetupAndRenderEvent &event) override {
 
+        if(this->module->isEnabled())
+
 
         if (SDK::screenView->VisualTree->root->LayerName == "hud_screen") {
 

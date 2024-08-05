@@ -765,7 +765,6 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
 
     //std::cout << weightedName << std::endl;
 
-
     float sizeMultiplier = 1.0f;
     if(hasEnding(weightedName, "2.0")) sizeMultiplier = 0.6f;
 
@@ -773,7 +772,9 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
     float fSize = (fontSize / 135) * sizeMultiplier;
 
 	ImGui::SetWindowFontScale(fSize);
-
+    std::string stringText = WideToNarrow(text).c_str();
+    ImVec2 size = ImGui::CalcTextSize(stringText.c_str());
+    std::string fontedName = weightedName + std::to_string(fSize);
 
 
 	switch (alignment) {
@@ -781,23 +782,22 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
 			break;
 
         case DWRITE_TEXT_ALIGNMENT_CENTER: {
-			x += (width / 2) - (ImGui::CalcTextSize(WideToNarrow(text).c_str()).x / 2);
+			x += (width / 2) - (size.x / 2);
 			break;
 		}
 
 		case DWRITE_TEXT_ALIGNMENT_TRAILING: {
-			x += (width - ImGui::CalcTextSize(WideToNarrow(text).c_str()).x);
+			x += (width - size.x);
 			break;
 		}
 	}
 
-    TextSizes[weightedName + std::to_string(fSize)] = ImGui::CalcTextSize(WideToNarrow(text).c_str()).x;
-
-	y += (height / 2) - (ImGui::CalcTextSize(WideToNarrow(text).c_str()).y / 2);
-	ImGui::GetBackgroundDrawList()->AddText(ImVec2(x, y), ImColor(color.r, color.g, color.b, color.a), WideToNarrow(text).c_str());
+    TextSizes[fontedName] = size.x;
+	y += (height / 2) - (size.y / 2);
+	ImGui::GetBackgroundDrawList()->AddText(ImVec2(x, y), ImColor(color.r, color.g, color.b, color.a), stringText.c_str());
 	ImGui::PopFont();
 
-    return weightedName + std::to_string(fSize);
+    return fontedName;
 }
 
 void FlarialGUI::LoadFont(int resourceId) {

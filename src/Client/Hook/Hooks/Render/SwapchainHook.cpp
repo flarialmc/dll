@@ -620,7 +620,7 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
   void SwapchainHook::SaveBackbuffer()
     {
 
-        Memory::SafeRelease(SavedD3D11BackBuffer);
+       if(SwapchainHook::queue) return;
 
         ID3D11DeviceContext* deviceContext;
         SwapchainHook::d3d11Device->GetImmediateContext(&deviceContext);
@@ -633,18 +633,18 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
 
         D3D11_TEXTURE2D_DESC desc;
         buffer2D->GetDesc(&desc);
+        HRESULT r;
 
-        ID3D11Texture2D* stageTex = nullptr;
-        D3D11_TEXTURE2D_DESC stageDesc = desc;
-        stageDesc.Usage = D3D11_USAGE_STAGING;
-        stageDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-        stageDesc.BindFlags = 0;
-
-        //desc.Usage = DXGI_USAGE_SHADER_INPUT;
-        HRESULT r = SwapchainHook::d3d11Device->CreateTexture2D(&stageDesc, nullptr, &stageTex);
+        if(!stageTex) {
+            D3D11_TEXTURE2D_DESC stageDesc = desc;
+            stageDesc.Usage = D3D11_USAGE_STAGING;
+            stageDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+            stageDesc.BindFlags = 0;
+            r = SwapchainHook::d3d11Device->CreateTexture2D(&stageDesc, nullptr, &stageTex);
+            if (FAILED(r))  std::cout << "Failed to create stage texture: " << std::hex << r << std::endl;
+        }
         deviceContext->CopyResource(stageTex, buffer2D);
 
-        if (FAILED(r))  std::cout << "Failed to create stage texture: " << std::hex << r << std::endl;
 
 
         D3D11_TEXTURE2D_DESC defaultDesc = desc;
@@ -652,18 +652,16 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
         defaultDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
         defaultDesc.CPUAccessFlags = 0;
 
-        ID3D11Texture2D* defaultTexture = nullptr;
-        hr = SwapchainHook::d3d11Device->CreateTexture2D(&defaultDesc, nullptr, &defaultTexture);
-        if (FAILED(hr)) {
-            std::cout << "Failed to create def texture: " << std::hex << r << std::endl;
+        if(!SavedD3D11BackBuffer) {
+            hr = SwapchainHook::d3d11Device->CreateTexture2D(&defaultDesc, nullptr, &SavedD3D11BackBuffer);
+            if (FAILED(hr)) {
+                std::cout << "Failed to create def texture: " << std::hex << r << std::endl;
+            }
         }
 
-        deviceContext->CopyResource(defaultTexture, stageTex);
+        deviceContext->CopyResource(SavedD3D11BackBuffer, stageTex);
 
-        stageTex->Release();
         Memory::SafeRelease(backBuffer);
         Memory::SafeRelease(buffer2D);
         Memory::SafeRelease(deviceContext);
-
-        SavedD3D11BackBuffer = defaultTexture;
     }
