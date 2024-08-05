@@ -78,51 +78,50 @@ float4 main(float4 screenSpace : SV_Position) : SV_TARGET
 const char *upsampleShaderSrc = R"(
 cbuffer BlurInputBuffer : register(b0)
 {
+    float intensity;
     float2 resolution;
-    float2 offset;
-    float2 halfPixel;
 };
 
 sampler sampler0 : register(s0);
-Texture2D texture0 : register(t0);
+Texture2D inputTexture : register(t0);
 
 float4 main(float4 screenSpace : SV_Position) : SV_TARGET
 {
-    float2 uv = screenSpace.xy / resolution;
-    float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
+    float2 texSize = resolution;
+    float2 texelSize = 1.0f / texSize;
+    float2 texCoord = screenSpace.xy / texSize;
 
-    static const float2 offsets[9] = {
-        float2(-1.0, -1.0) * halfPixel * offset,
-        float2(0.0, -1.0) * halfPixel * offset,
-        float2(1.0, -1.0) * halfPixel * offset,
-        float2(-1.0, 0.0) * halfPixel * offset,
-        float2(0.0, 0.0) * halfPixel * offset,
-        float2(1.0, 0.0) * halfPixel * offset,
-        float2(-1.0, 1.0) * halfPixel * offset,
-        float2(0.0, 1.0) * halfPixel * offset,
-        float2(1.0, 1.0) * halfPixel * offset
+    // Scale offsets with a larger factor for more noticeable blur
+    float2 offsets[9] = {
+        float2(-1.0f, -1.0f), float2(0.0f, -1.0f), float2(1.0f, -1.0f),
+        float2(-1.0f,  0.0f), float2(0.0f,  0.0f), float2(1.0f,  0.0f),
+        float2(-1.0f,  1.0f), float2(0.0f,  1.0f), float2(1.0f,  1.0f)
     };
 
-    static const float weights[9] = {
-        0.06136, 0.12245, 0.06136,
-        0.12245, 0.24477, 0.12245,
-        0.06136, 0.12245, 0.06136
-    };
-
-    float weightSum = 0.0;
+    float weights[9];
+    float sum = 0.0f;
+    float sigma = intensity * 2.0f; // Scale intensity for more noticeable blur
     for (int i = 0; i < 9; i++)
     {
-        weightSum += weights[i];
+        float2 offset = offsets[i] * texelSize * sigma;
+        weights[i] = exp(-dot(offset, offset) / (2.0f * sigma * sigma));
+        sum += weights[i];
     }
 
+    float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
     for (int i = 0; i < 9; i++)
     {
-        colorSum += texture0.Sample(sampler0, uv + offsets[i]) * (weights[i] / weightSum);
+        float2 offset = offsets[i] * texelSize * sigma;
+        color += inputTexture.Sample(sampler0, texCoord + offset) * weights[i];
     }
 
-    return colorSum;
+    color /= sum;
+
+    return color;
 }
+
 )";
+
 
 
 
@@ -146,19 +145,24 @@ float4 main(PS_INPUT input, float4 screenSpace : SV_Position) : SV_TARGET {\
 ID3DBlob *TryCompileShader(const char *pSrcData, const char *pTarget)
 {
     HRESULT hr;
+    ID3DBlob *shaderBlob = nullptr;
+    ID3DBlob *errorBlob = nullptr;
 
-    ID3DBlob *shaderBlob;
-    ID3DBlob *errorBlob;
     hr = D3DCompile(pSrcData, strlen(pSrcData), nullptr, nullptr, nullptr, "main", pTarget, 0, 0, &shaderBlob, &errorBlob);
 
     if (FAILED(hr))
     {
-        Logger::error("[Blur] Failed to compile shader");
-        errorBlob->Release();
+        if (errorBlob)
+        {
+            Logger::error(std::format("[Blur] Failed to compile shader: {}", static_cast<char*>(errorBlob->GetBufferPointer())));
+            errorBlob->Release();
+        }
         throw std::logic_error("Failed to compile shader!");
     }
+
     return shaderBlob;
 }
+
 
 ID3D11PixelShader *dbgShader;
 
@@ -232,8 +236,6 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     pContext->PSSetShaderResources(0, 1, (ID3D11ShaderResourceView **)&null);
     pContext->OMSetRenderTargets(1, &pRenderTargetView, nullptr);
 
-    constantBuffer.resolution = rtvSize;
-    constantBuffer.halfpixel = XMFLOAT2(0.5 / rtvSize.x, 0.5 / rtvSize.y);
     pContext->UpdateSubresource(pConstantBuffer, 0, nullptr, &constantBuffer, 0, 0);
 
     pContext->IASetInputLayout(pInputLayout);
@@ -294,6 +296,8 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
 
 void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iterations, float intensity)
 {
+    if(intensity < 1) return;
+
     if (!SwapchainHook::GetBackbuffer()) return;
 
     ID3D11ShaderResourceView *pOrigShaderResourceView = MotionBlurListener::BackbufferToSRV();
@@ -319,56 +323,13 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 
     desc.BindFlags |= D3D11_BIND_RENDER_TARGET;
 
-    for (int i = 0; i <= iterations; i++)
-    {
-        ID3D11Texture2D *pFrameBuffer;
-        ID3D11RenderTargetView *pRenderTargetView;
-        ID3D11ShaderResourceView *pShaderResourceView;
+    XMFLOAT2 fbSize = XMFLOAT2(desc.Width, desc.Height);
 
-        SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pFrameBuffer);
-        if (i == 0)
-            pRenderTargetView = pDstRenderTargetView;
-        else
-            SwapchainHook::d3d11Device->CreateRenderTargetView(pFrameBuffer, nullptr, &pRenderTargetView);
-        SwapchainHook::d3d11Device->CreateShaderResourceView(pFrameBuffer, nullptr, &pShaderResourceView);
-
-        framebuffers.push_back(pFrameBuffer);
-        renderTargetViews.push_back(pRenderTargetView);
-        shaderResourceViews.push_back(pShaderResourceView);
-        fbSizes.push_back(XMFLOAT2(desc.Width, desc.Height));
-
-        desc.Width /= 2;
-        desc.Height /= 2;
-    }
-
-    constantBuffer.offset = XMFLOAT2(intensity, intensity);
-    pContext->PSSetShader(pDownsampleShader, nullptr, 0);
-    RenderToRTV(renderTargetViews[1], pOrigShaderResourceView, fbSizes[1]);
-
-    for (int i = 1; i < iterations; i++)
-    {
-        RenderToRTV(renderTargetViews[i + 1], shaderResourceViews[i], fbSizes[i + 1]);
-    }
+    constantBuffer.intensity = intensity;
+    constantBuffer.resolution = fbSize;
 
     pContext->PSSetShader(pUpsampleShader, nullptr, 0);
-
-    for (int i = iterations; i > 0; i--)
-    {
-        RenderToRTV(renderTargetViews[i - 1], shaderResourceViews[i], fbSizes[i - 1]);
-    }
-
-    for (int i = 0; i < iterations; i++)
-    {
-        if (i != 0)
-            renderTargetViews[i]->Release();
-        framebuffers[i]->Release();
-        shaderResourceViews[i]->Release();
-
-        renderTargetViews.clear();
-        framebuffers.clear();
-        shaderResourceViews.clear();
-        fbSizes.clear();
-    }
+    RenderToRTV(pDstRenderTargetView, pOrigShaderResourceView, fbSize);
 
     pContext->Release();
     pOrigShaderResourceView->Release();

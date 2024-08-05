@@ -263,8 +263,7 @@ void InitializeRenderResources(ID3D11Device* device)
     void RenderSRV(ID3D11ShaderResourceView* srv, float width, float height, float opacity)
 {
 
-    ID3D11DeviceContext* context;
-    SwapchainHook::d3d11Device->GetImmediateContext(&context);
+    ID3D11DeviceContext* context = SwapchainHook::context;
 
 
     context->OMSetRenderTargets(1, &gRTV, gDSV);
