@@ -129,7 +129,7 @@ public:
 
             }
 
-            Blur::RenderBlur(event.RTV, 3, realBlurAmount/4);
+            Blur::RenderBlur(event.RTV, 1, realBlurAmount/4);
 
             float baseHeight = Constraints::RelativeConstraint(baseHeightReal);
 

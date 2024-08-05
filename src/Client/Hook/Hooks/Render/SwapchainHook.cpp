@@ -498,24 +498,21 @@ void SwapchainHook::DX11Init() {
             D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
             D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED), 96.0, 96.0);
     D2D::context->CreateBitmapFromDxgiSurface(eBackBuffer, props, &D2D1Bitmap);
-
     //ImGui Init
 
     if(!initImgui) {
         ImGui::CreateContext();
 
-        ID3D11DeviceContext* ppContext = nullptr;
-        d3d11Device->GetImmediateContext(&ppContext);
+        d3d11Device->GetImmediateContext(&context);
         ImGui_ImplWin32_Init(window);
-        ImGui_ImplDX11_Init(d3d11Device, ppContext);
-        ppContext->Release();
-
+        ImGui_ImplDX11_Init(d3d11Device, context);
         initImgui = true;
 
     }
 
-    Blur::InitializePipeline();
+    SaveBackbuffer();
 
+    Blur::InitializePipeline();
     Memory::SafeRelease(eBackBuffer);
     init = true;
 }

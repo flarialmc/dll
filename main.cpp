@@ -23,7 +23,7 @@ std::string removeColorCodes(const std::string& input);
 
 DWORD WINAPI init(HMODULE real)
 {
-    if (GetConsoleWindow() == nullptr and true) {
+    if (true) {
         AllocConsole();
         SetConsoleTitleA("Caspian-Debug");
         FILE *out;

@@ -27,9 +27,10 @@ using namespace DirectX;
 
 struct BlurInputBuffer
 {
-    FLOAT intensity;
     XMFLOAT2 resolution;
-    FLOAT padding[1];
+    XMFLOAT2 offset;
+    XMFLOAT2 halfpixel;
+    XMFLOAT2 _dummy;
 };
 
 
@@ -52,8 +53,10 @@ public:
     //static void Cleanup();
 
     static void RenderToRTV(ID3D11RenderTargetView *, ID3D11ShaderResourceView *, XMFLOAT2);
+
     static void RenderBlur(ID3D11RenderTargetView *, int, float);
 };
+
 
 class Dimension {
 public:
