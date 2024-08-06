@@ -87,7 +87,9 @@ public:
 
         if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::GetBackbuffer(), &srvDesc, &outSRV)))
         {
-            std::cout << "Failed to create shader resource view: " << std::hex << hr << std::endl;
+            std::stringstream ss;
+            ss << "0x" << std::hex << std::setw(8) << std::setfill('0') << hr;
+            Logger::error("Failed to create shader resource view: " + ss.str());
         }
 
         return outSRV;
