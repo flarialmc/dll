@@ -9,7 +9,7 @@ class Zoom : public Module {
 
 public:
 
-    Zoom() : Module("Zoom", "Allows you to see distant places.", IDR_MAGNIFY_PNG, "C") {
+    Zoom() : Module("Zoom", "Allows you to see distant places.", R"(\Flarial\assets\magnify.png)", "C") {
 
         Module::setup();
 
@@ -32,6 +32,7 @@ public:
         if (settings.getSettingByName<bool>("SaveModifier") == nullptr) settings.addSetting("SaveModifier", true);
         if (settings.getSettingByName<bool>("hidehand") == nullptr) settings.addSetting("hidehand", true);
         if (settings.getSettingByName<bool>("hidemodules") == nullptr) settings.addSetting("hidemodules", false);
+        if (settings.getSettingByName<bool>("UseScroll") == nullptr) settings.addSetting("UseScroll", true);
         //if (settings.getSettingByName<bool>("hidehud") == nullptr) settings.addSetting("hidehud", false);
         if (settings.getSettingByName<float>("modifier") == nullptr) settings.addSetting("modifier", 10.0f);
         if (settings.getSettingByName<float>("anim") == nullptr) settings.addSetting("anim", 0.20f);
@@ -150,7 +151,17 @@ public:
                 "alwaysanim")->value))
             this->settings.getSettingByName<bool>("alwaysanim")->value = !this->settings.getSettingByName<bool>(
                     "alwaysanim")->value;
+        toggleY += Constraints::SpacingConstraint(0.25, textWidth);
 
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+            L"Use Scroll", textWidth * 3.0f, textHeight,
+            DWRITE_TEXT_ALIGNMENT_LEADING,
+            Constraints::RelativeConstraint(0.12, "height", true),
+            DWRITE_FONT_WEIGHT_NORMAL);
+        if (FlarialGUI::Toggle(7, toggleX, toggleY, this->settings.getSettingByName<bool>(
+            "UseScroll")->value))
+            this->settings.getSettingByName<bool>("UseScroll")->value = !this->settings.getSettingByName<bool>(
+                "UseScroll")->value;
         FlarialGUI::UnsetScrollView();
 
     }
