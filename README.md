@@ -38,13 +38,4 @@
    ```
    This command compiles the project according to the generated build files.
 
-### Additional Notes:
-- **Dependencies**: If the project has external dependencies that are not included in the repository, ensure they are installed on your system before running CMake. You may need to specify their paths or use CMake options (`-D` flags) to configure the project correctly.
-  
-- **Build Configurations**: CMake supports different build configurations (e.g., Debug, Release). You can specify these configurations during the CMake configuration step using `-DCMAKE_BUILD_TYPE`:
-  ```bash
-  cmake -DCMAKE_BUILD_TYPE=Release ..
-  ```
-  Replace `Release` with `Debug` or any other configuration you need.
-
 By following these steps, you should be able to clone and build the project using CMake successfully.
