@@ -1,0 +1,41 @@
+name: featrequest
+description: Suggest a new feature for Flarial
+title: "[FEATURE REQUEST] "
+labels: ["enhancement"]
+
+body:
+  - type: input
+    id: feature
+    attributes:
+      label: Feature description
+      description: A clear and concise description of what the feature is.
+      placeholder: I would like to see [...]
+  
+  - type: input
+    id: reason
+    attributes:
+      label: Reason
+      description: Why do you think this feature should be added?
+      placeholder: I think this feature should be added because [...]
+  
+  - type: input
+    id: usecase
+    attributes:
+      label: Use case
+      description: How would you use this feature?
+      placeholder: I would use this feature to [...]
+  
+  - type: input
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: Have you considered any alternative solutions or features?
+      placeholder: An alternative solution could be [...]
+  
+  - type: input
+    id: additional
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the feature request here.
+      placeholder: |
+        Add any other context or screenshots about the feature request here.
