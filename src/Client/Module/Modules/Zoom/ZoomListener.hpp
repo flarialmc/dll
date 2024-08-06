@@ -75,29 +75,32 @@ class ZoomListener : public Listener {
                 //todo make it so that modules work together
                 auto fovchanger = ModuleManager::getModule("FOV Changer");
                 auto upsidedown = ModuleManager::getModule("Upside Down");
+                if (this->module->settings.getSettingByName<bool>("UseScroll")->value == true) {
+                    if (event.getAction() == MouseAction::ScrollUp) {
+                        if ((fovchanger != nullptr &&
+                            fovchanger->settings.getSettingByName<float>("fovvalue")->value > 180) ||
+                            (upsidedown != nullptr && upsidedown->isEnabled()))
+                            zoomValue += this->module->settings.getSettingByName<float>("modifier")->value;
+                        else zoomValue -= this->module->settings.getSettingByName<float>("modifier")->value;
+                    }
+                    if (event.getAction() != MouseAction::ScrollUp && event.getButton() == MouseButton::Scroll) {
+                        if ((fovchanger != nullptr &&
+                            fovchanger->settings.getSettingByName<float>("fovvalue")->value > 180) ||
+                            (upsidedown != nullptr && upsidedown->isEnabled()))
+                            zoomValue -= this->module->settings.getSettingByName<float>("modifier")->value;
+                        else zoomValue += this->module->settings.getSettingByName<float>("modifier")->value;
+                    }
 
-                if (event.getAction() == MouseAction::ScrollUp) {
-                    if ((fovchanger != nullptr &&
-                         fovchanger->settings.getSettingByName<float>("fovvalue")->value > 180) ||
-                        (upsidedown != nullptr && upsidedown->isEnabled()))
-                        zoomValue += this->module->settings.getSettingByName<float>("modifier")->value;
-                    else zoomValue -= this->module->settings.getSettingByName<float>("modifier")->value;
-                }
-                if (event.getAction() != MouseAction::ScrollUp && event.getButton() == MouseButton::Scroll) {
-                    if ((fovchanger != nullptr &&
-                         fovchanger->settings.getSettingByName<float>("fovvalue")->value > 180) ||
-                        (upsidedown != nullptr && upsidedown->isEnabled()))
-                        zoomValue -= this->module->settings.getSettingByName<float>("modifier")->value;
-                    else zoomValue += this->module->settings.getSettingByName<float>("modifier")->value;
-                }
+                    if (zoomValue < 1) zoomValue = 1;
+                    else if (zoomValue > realFov) zoomValue = realFov;
 
-                if (zoomValue < 1) zoomValue = 1;
-                else if (zoomValue > realFov) zoomValue = realFov;
-
-                if (event.getAction() == MouseAction::ScrollUp ||
+                    if (event.getAction() == MouseAction::ScrollUp ||
                         event.getAction() != MouseAction::ScrollUp && event.getButton() == MouseButton::Scroll) {
-                    event.setButton(MouseButton::None);
-                    event.setAction(MouseAction::Release);
+                        event.setButton(MouseButton::None);
+                        event.setAction(MouseAction::Release);
+
+
+                    }
                 }
             }
     }
