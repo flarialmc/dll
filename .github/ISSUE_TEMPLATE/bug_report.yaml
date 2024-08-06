@@ -1,4 +1,4 @@
-name: Bug report
+name: Bug Report
 description: Report a bug in Flarial
 title: "[BUG] "
 labels: ["dll","launcher"]
@@ -21,28 +21,28 @@ body:
         - label: |
             I have searched the [issues](https://github.com/flarialmc/dll/issues?q=is%3Aissue+is%3Aopen) of this repository and believe that this is not a duplicate
           required: true
-  - type: input
+  - type: textarea
     id: bug
     attributes:
       label: Bug description
       description: A clear and concise description of what the bug is.
       placeholder: I was trying to [...] but [...]
   
-  - type: input
+  - type: textarea
     id: expected
     attributes:
       label: Expected behavior
       description: A clear and concise description of what you expected to happen.
       placeholder: I expected [...]
 
-  - type: input
+  - type: textarea
     id: actual
     attributes:
       label: Actual behavior
       description: A clear and concise description of what actually happened.
       placeholder: Instead [...]
 
-  - type: input
+  - type: textarea
     id: steps
     attributes:
       label: Steps to reproduce
@@ -67,14 +67,14 @@ body:
         - Windows 10
         - Windows 11
   
-  - type: input
+  - type: textarea
     id: osversion
     attributes:
       label: OS Version
       description: What version of the operating system are you using?
       placeholder: 21H1, 21H2, 22H1, etc.
   
-  - type: input
+  - type: textarea
     id: additional
     attributes:
       label: Additional notes
