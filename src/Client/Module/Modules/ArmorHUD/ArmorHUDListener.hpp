@@ -10,6 +10,7 @@
 #include "../../../../SDK/SDK.hpp"
 #include "../../../../SDK/Client/Render/BaseActorRenderContext.hpp"
 #include "../../../../SDK/Client/Render/ItemRenderer.hpp"
+#include "../../../../Utils/Render/PositionUtils.hpp"
 #include <Windows.h>
 #include <chrono>
 
@@ -54,7 +55,7 @@ public:
                     auto vertical = module->settings.getSettingByName<bool>("vertical")->value;
 
                     float spacing = testSpacing;
-                    spacing = convert(Vec2<float>{spacing, spacing}).x;
+                    spacing = PositionUtils::getScaledPos(Vec2<float>{spacing, spacing}).x;
 
                     if (SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory->getItem(
                             SDK::clientInstance->getLocalPlayer()->getSupplies()->SelectedSlot)->getItem() !=
@@ -220,7 +221,8 @@ public:
             BaseActorRenderContext barc(muirc->getScreenContext(), muirc->getClientInstance(),
                                         muirc->getClientInstance()->getMinecraftGame());
 
-            Vec2<float> convert = this->convert();
+            Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
+
             if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
                 if (SDK::clientInstance->getLocalPlayer() != nullptr)
                     if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
@@ -238,7 +240,7 @@ public:
 
                             barc.itemRenderer->renderGuiItemNew(&barc,
                                                                 item,
-                                                                0, convert.x, convert.y, 1.0f,
+                                                                0, scaledPos.x, scaledPos.y, 1.0f,
                                                                 module->settings.getSettingByName<float>(
                                                                         "uiscale")->value,
                                                                 false);
@@ -246,7 +248,7 @@ public:
                             if(item->isEnchanted()) {
                                 barc.itemRenderer->renderGuiItemNew(&barc,
                                                                     item,
-                                                                    0, convert.x, convert.y, 1.0f,
+                                                                    0, scaledPos.x, scaledPos.y, 1.0f,
                                                                     module->settings.getSettingByName<float>(
                                                                             "uiscale")->value,
                                                                     true);
@@ -274,13 +276,10 @@ public:
                                 durabilities[i][1] = maxDamage;
                                 durabilities[i][0] = durabilityLeft;
 
-
-                                convert = this->convert();
-
                                 barc.itemRenderer->renderGuiItemNew(&barc,
                                                                     armorSlot,
                                                                     0,
-                                                                    convert.x + xmodifier, convert.y + ymodifier, 1.0f,
+                                                                    scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
                                                                     module->settings.getSettingByName<float>(
                                                                             "uiscale")->value, false);
 
@@ -288,7 +287,7 @@ public:
                                     barc.itemRenderer->renderGuiItemNew(&barc,
                                                                         armorSlot,
                                                                         0,
-                                                                        convert.x + xmodifier, convert.y + ymodifier, 1.0f,
+                                                                        scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
                                                                         module->settings.getSettingByName<float>(
                                                                                 "uiscale")->value,
                                                                         true);

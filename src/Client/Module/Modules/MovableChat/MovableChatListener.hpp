@@ -11,6 +11,7 @@
 #include "MovableChatListener.hpp"
 #include "../../Manager.hpp"
 #include "../ClickGUI/ClickGUIRenderer.hpp"
+#include "../../../../Utils/Render/PositionUtils.hpp"
 #include <Windows.h>
 #include <chrono>
 
@@ -23,16 +24,6 @@ public:
     Vec2<float> currentPos;
     bool enabled = true;
     static inline Vec2<float> oriXy = Vec2<float>{0.0f, 0.0f};
-
-
-    [[nodiscard]] Vec2<float> convert() const {
-
-        auto e = SDK::clientInstance->guiData;
-        Vec2<float> xd = Vec2<float>(e->ScreenSize.x, e->ScreenSize.y);
-        Vec2<float> LOL = Vec2<float>(e->ScreenSizeScaled.x, e->ScreenSizeScaled.y);
-
-        return Vec2<float>{currentPos.x * (LOL.x / xd.x), currentPos.y * (LOL.y / xd.y)};
-    }
 
     void onRender(RenderEvent &event) override {
 
@@ -106,10 +97,10 @@ public:
                         MovableChatListener::oriXy.y = control->y;
                     }
 
-                    Vec2<float> convert = this->convert();
+                    Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
 
-                    control->x = convert.x + 5;
-                    control->y = convert.y;
+                    control->x = scaledPos.x + 5;
+                    control->y = scaledPos.y;
 
                     control->scale = module->settings.getSettingByName<float>("uiscale")->value + 100;
 
