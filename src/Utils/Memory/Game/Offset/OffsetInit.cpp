@@ -46,7 +46,6 @@ void OffsetInit::init2070() {
     Logger::debug("[Offsets] Loading offsets for 1.20.7X");
 
     ADD_OFFSET("ClientInstance::getBlockSource", 28);
-    ADD_OFFSET("ClientInstance::getLocalPlayer", 29);
 
     ADD_OFFSET("Actor::hurtTime", 0x214);
     ADD_OFFSET("Actor::level", 0x258);
@@ -93,7 +92,6 @@ void OffsetInit::init2050() {
     Logger::debug("[Offsets] Loading offsets for 1.20.5X");
 
     ADD_OFFSET("ClientInstance::getBlockSource", 27);
-    ADD_OFFSET("ClientInstance::getLocalPlayer", 28);
 
     ADD_OFFSET("Actor::hurtTime", 0x22C);
     ADD_OFFSET("Actor::level", 0x288);
@@ -151,7 +149,6 @@ void OffsetInit::init2030() {
     ADD_OFFSET("Inventory::getItem", 5);
 
     ADD_OFFSET("ClientInstance::getBlockSource", 26);
-    ADD_OFFSET("ClientInstance::getLocalPlayer", 27);
     ADD_OFFSET("ClientInstance::levelRenderer", 0xE0);
 
     ADD_OFFSET("ClientInstance::getFovX", 0x6F8);
