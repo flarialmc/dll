@@ -103,7 +103,7 @@ class AutoRQListener : public Listener {
                     command_packet->InternalSource = true;
 
                     SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-
+                    
                 } //std::cout << pkt->mName << std::endl;
             }
         }
@@ -291,28 +291,48 @@ class AutoRQListener : public Listener {
             std::string textToCheckToSilence = "You are connected";
 
             if (pkt->message.find(textToCheck) != std::string::npos && triggered) {
-                std::string server = pkt->message.replace(0, textToCheck.length(), "");
-                std::regex pattern("\\d+");
-                std::string name = std::regex_replace(server, pattern, "");
-                FlarialGUI::Notify("Preparing Q: " + name);
-                std::thread t([name]() {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                if(!module->settings.getSettingByName<bool>("hub")->value){
+                    std::string server = pkt->message.replace(0, textToCheck.length(), "");
+                    std::regex pattern("\\d+");
+                    std::string name = std::regex_replace(server, pattern, "");
+                    FlarialGUI::Notify("Preparing Q: " + name);
+                    std::thread t([name]() {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-                    FlarialGUI::Notify("Executing command /q " + name);
+                        FlarialGUI::Notify("Executing command /q " + name);
 
-                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-                    command_packet->command = "/q " + name;
+                        std::shared_ptr<Packet> packet = SDK::createPacket(77);
+                        auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
+                        command_packet->command = "/q " + name;
 
-                    command_packet->origin.type = CommandOriginType::Player;
+                        command_packet->origin.type = CommandOriginType::Player;
 
-                    command_packet->InternalSource = true;
-                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-                });
-                t.detach();
-                triggered = false;
-                pkt->message = "";
+                        command_packet->InternalSource = true;
+                        SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+                    });
+                    t.detach();
+                    triggered = false;
+                    pkt->message = "";
+                }
+                else{
+                    std::thread h([]() {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                        FlarialGUI::Notify("Executing command /hub");
+                        std::shared_ptr<Packet> packet = SDK::createPacket(77);
+                        auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
 
+                        command_packet->command = "/hub";
+
+                        command_packet->origin.type = CommandOriginType::Player;
+
+                        command_packet->InternalSource = true;
+
+                        SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+                    });
+                    h.detach();
+                    triggered = false;
+                    pkt->message = "";
+                }
             }
             else if (pkt->message.find(textToCheckToSilence) != std::string::npos) {
                 event.cancel();
