@@ -16,11 +16,3 @@ namespace V1_20_50 {
         EntityId id;
     };
 }
-
-namespace V1_20_40 {
-    class EntityContext {
-    public:
-        uintptr_t &basicReg;
-        EntityId id;
-    };
-}

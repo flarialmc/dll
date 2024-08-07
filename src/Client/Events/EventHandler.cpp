@@ -102,7 +102,6 @@ void EventHandler::onKey(KeyEvent &event) {
 
     for (Listener *&listener: listeners) {
         listener->onKey(event);
-
     }
 
 }
