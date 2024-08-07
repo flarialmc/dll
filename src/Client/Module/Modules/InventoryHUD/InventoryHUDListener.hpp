@@ -28,17 +28,6 @@ public:
 
     Vec2<float> testOffset = Vec2<float>{0,0};
 
-
-
-    [[nodiscard]] Vec2<float> convert() const {
-
-        auto e = SDK::clientInstance->guiData;
-        Vec2<float> xd = Vec2<float>(e->ScreenSize.x, e->ScreenSize.y);
-        Vec2<float> LOL = Vec2<float>(e->ScreenSizeScaled.x, e->ScreenSizeScaled.y);
-
-        return Vec2<float>{currentPos.x * (LOL.x / xd.x), currentPos.y * (LOL.y / xd.y)};
-    }
-
     void onRender(RenderEvent &event) override {
         if (ClientInstance::getTopScreenName() == "hud_screen" &&
             module->isEnabled() ||
@@ -93,7 +82,7 @@ public:
             BaseActorRenderContext barc(muirc->getScreenContext(), muirc->getClientInstance(),
                                         muirc->getClientInstance()->getMinecraftGame());
 
-            Vec2<float> convert = this->convert();
+            Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
 
             if (SDK::clientInstance->getLocalPlayer() != nullptr)
                 if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
@@ -113,7 +102,7 @@ public:
                             barc.itemRenderer->renderGuiItemNew(&barc,
                                                                 SDK::clientInstance->getLocalPlayer()->getSupplies()->getinventory()->getItem(
                                                                         i), 0,
-                                                                convert.x + xmodifier, convert.y + ymodifier, 1.0f,
+                                                                scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
                                                                 module->settings.getSettingByName<float>(
                                                                         "uiscale")->value, false);
                         }
