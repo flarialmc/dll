@@ -17,6 +17,7 @@
 #include "Render/DrawImageEvent.hpp"
 #include "Render/SetTopScreenNameEvent.hpp"
 #include "Game/RaknetTickEvent.hpp"
+#include "Render/GetTextureEvent.hpp"
 
 class Listener {
 public:
@@ -58,6 +59,7 @@ public:
 
     virtual void onRaknetTick(RaknetTickEvent &event) {};
 
-    virtual void onUnregister() {};
+    virtual void onGetTexture(GetTextureEvent &event) {};
 
+    virtual void onUnregister() {};
 };

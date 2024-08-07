@@ -1,6 +1,5 @@
 #pragma once
 
-#include "TexturePtr.hpp"
 #include "Textures/mceTextureDescription.hpp"
 #include "Textures/ClientTexture.hpp"
 #include "Textures/IsMissingTexture.hpp"

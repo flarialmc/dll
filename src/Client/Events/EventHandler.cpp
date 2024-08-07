@@ -239,3 +239,11 @@ void EventHandler::onRaknetTick(RaknetTickEvent &event) {
         listener->onRaknetTick(event);
     }
 }
+
+void EventHandler::onGetTexture(GetTextureEvent &event) {
+    if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
+    for (Listener *&listener: listeners) {
+        listener->onGetTexture(event);
+    }
+}

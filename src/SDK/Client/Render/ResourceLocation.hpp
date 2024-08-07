@@ -24,6 +24,8 @@ public:
     uint64_t pathHash{};
     uint64_t fullHash{};
 
+    ResourceLocation() = default;
+
     ResourceLocation(const std::string& filePath, bool external) {
         this->filePath = filePath;
         if (external)
