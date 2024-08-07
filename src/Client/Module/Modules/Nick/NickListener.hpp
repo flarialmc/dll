@@ -32,14 +32,14 @@ public:
     void onDrawText(DrawTextEvent &event) override {
         if (SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                if (original.empty()) original = SDK::clientInstance->getLocalPlayer()->playerName;
+                if (original.empty()) original = SDK::clientInstance->getLocalPlayer()->getPlayerName();
                 if (module->isEnabled() && !module->restricted) {
                     std::string localPlayerName = original;
                     size_t pos = event.getText()->find(localPlayerName);
                     if (pos != std::string::npos) {
                         std::string faketxt = *event.getText();
                         faketxt.replace(pos, localPlayerName.length(),
-                                        "§o"+Utils::removeColorCodes(module->settings.getSettingByName<std::string>("nick")->value));
+                                        "§o"+Utils::removeColorCodes(module->settings.getSettingByName<std::string>("nick")->value)+"§r");
                         *event.getText() = faketxt;
                     }
                 }
@@ -51,7 +51,7 @@ public:
         if (!SDK::clientInstance->getLocalPlayer())
             return;
 
-        if (original.empty()) original = SDK::clientInstance->getLocalPlayer()->playerName;
+        if (original.empty()) original = SDK::clientInstance->getLocalPlayer()->getPlayerName();
         if (original2.empty()) original2 = *SDK::clientInstance->getLocalPlayer()->getNametag();
         if (backupOri.empty()) backupOri = *SDK::clientInstance->getLocalPlayer()->getNametag();
 
@@ -64,7 +64,7 @@ public:
 
         if (enabled && !module->restricted) {
 
-            std::string val = "§o"+Utils::removeColorCodes(module->settings.getSettingByName<std::string>("nick")->value);
+            std::string val = "§o"+Utils::removeColorCodes(module->settings.getSettingByName<std::string>("nick")->value)+"§r";
             SDK::clientInstance->getLocalPlayer()->setNametag(&val);
             SDK::clientInstance->getLocalPlayer()->getPlayerName() = val;
 
