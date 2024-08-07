@@ -23,12 +23,16 @@ std::string removeColorCodes(const std::string& input);
 
 DWORD WINAPI init(HMODULE real)
 {
-    if (true) {
+    #ifndef NDEBUG
+    bool shouldDebug = true; // Change this bool locally, NEVER push it set to true
+
+    if (GetConsoleWindow() == nullptr && shouldDebug) {
         AllocConsole();
-        SetConsoleTitleA("Caspian-Debug");
+        SetConsoleTitleA("Flarial-Debugger");
         FILE *out;
         freopen_s(&out, ("CONOUT$"), ("w"), stdout);
     }
+    #endif
 
 
     Client::initialize();
