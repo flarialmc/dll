@@ -17,7 +17,7 @@ glm::mat4 Matrix::getMatrixCorrection(GLMatrix mat) {
 
 bool Matrix::WorldToScreen(Vec3<float> pos, Vec2<float> &screen) { // pos = pos 2 w2s, screen = output screen coords
 
-    Vec2<float> displaySize = SDK::clientInstance->guiData->ScreenSize;
+    Vec2<float> displaySize = SDK::clientInstance->getGuiData()->ScreenSize;
     Vec3<float> origin = MC::Transform.origin;
 
     pos = pos.sub(origin);

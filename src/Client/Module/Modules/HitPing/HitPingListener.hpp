@@ -89,7 +89,7 @@ class HitPingListener : public Listener {
 
                         if(time.count() >= 0.0001) {
                             hitDelay = time;
-                            auto actors = SDK::clientInstance->getLocalPlayer()->level->getRuntimeActorList();
+                            auto actors = SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList();
                             auto actor = std::find_if(actors.begin(), actors.end(), [&](auto &a) {
                                 return a->getRuntimeIDComponent()->runtimeID == id;
                             });

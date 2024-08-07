@@ -14,9 +14,17 @@
 
 class ClientInstance {
 public:
-    BUILD_ACCESS(this, MinecraftGame*, mcgame, GET_OFFSET("ClientInstance::minecraftGame"));
-    BUILD_ACCESS(this, GuiData*, guiData, GET_OFFSET("ClientInstance::guiData"));
-    BUILD_ACCESS(this, GLMatrix, viewMatrix, GET_OFFSET("ClientInstance::viewMatrix"));
+    MinecraftGame* getMinecraftGame() {
+        return hat::member_at<MinecraftGame*>(this, GET_OFFSET("ClientInstance::minecraftGame"));
+    };
+
+    GuiData *getGuiData() {
+        return hat::member_at<GuiData*>(this, GET_OFFSET("ClientInstance::guiData"));
+    };
+
+    GLMatrix getViewMatrix() {
+        return hat::member_at<GLMatrix>(this, GET_OFFSET("ClientInstance::viewMatrix"));
+    };
 
     LocalPlayer *getLocalPlayer();
 
@@ -29,7 +37,6 @@ public:
     static std::string getTopScreenName();
 
     LevelRender *getLevelRender();
-
 
     float getFovX() {
         return hat::member_at<float>(this, GET_OFFSET("ClientInstance::getFovX"));

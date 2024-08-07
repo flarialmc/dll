@@ -23,8 +23,8 @@ public:
         if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                 auto potsCount = 0;
-                if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
-                    auto inventory = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory;
+                if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
+                    auto inventory = SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory;
 
                     if (inventory != nullptr) {
                         for (int i = 0; i < 36; i++) {

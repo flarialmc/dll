@@ -90,13 +90,13 @@ public:
         if(this->module->isEnabled())
         if (ClientInstance::getTopScreenName() == "hud_screen") {
             auto muirc = event.getMuirc();
-            BaseActorRenderContext barc(muirc->screenContext, muirc->clientInstance,
-                                        muirc->clientInstance->mcgame);
+            BaseActorRenderContext barc(muirc->getScreenContext(), muirc->getClientInstance(),
+                                        muirc->getClientInstance()->getMinecraftGame());
 
             Vec2<float> convert = this->convert();
 
             if (SDK::clientInstance->getLocalPlayer() != nullptr)
-                if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
+                if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
 
 
                     float spacing = 15 * module->settings.getSettingByName<float>("uiscale")->value;
@@ -107,11 +107,11 @@ public:
                     int counter = 0;
 
                     for (int i = 9; i < 36; i++) {
-                        if (SDK::clientInstance->getLocalPlayer()->playerInventory->getinventory()->getItem(i)->getItem() != nullptr) {
+                        if (SDK::clientInstance->getLocalPlayer()->getSupplies()->getinventory()->getItem(i)->getItem() != nullptr) {
                             //durabilities[i][1] = SDK::clientInstance->getLocalPlayer()->getArmor(i)->getMaxDamage();
                             //durabilities[i][0] = durabilities[i][1] - SDK::clientInstance->getLocalPlayer()->getArmor(i)->getDamageValue();
                             barc.itemRenderer->renderGuiItemNew(&barc,
-                                                                SDK::clientInstance->getLocalPlayer()->playerInventory->getinventory()->getItem(
+                                                                SDK::clientInstance->getLocalPlayer()->getSupplies()->getinventory()->getItem(
                                                                         i), 0,
                                                                 convert.x + xmodifier, convert.y + ymodifier, 1.0f,
                                                                 module->settings.getSettingByName<float>(

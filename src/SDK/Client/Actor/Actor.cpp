@@ -6,7 +6,7 @@
 // TODO add comments to all components, replace their sigs with simpler ones ?       marioCST: use entt's try_get func in EntityContext instead of using sigs, there are no simpler sigs
 
 template<typename Component>
-Component *Actor::tryGet(uintptr_t addr) { // TODO: Multiversion
+Component *Actor::tryGet(uintptr_t addr) {
 
     uintptr_t* basicReg;
     EntityId id;
@@ -28,9 +28,16 @@ Component *Actor::tryGet(uintptr_t addr) { // TODO: Multiversion
     }
 }
 
-bool Actor::isAlive() {
-    static int off = GET_OFFSET("Actor::isAlive");
-    return Memory::CallVFuncI<bool>(off, this);
+int16_t Actor::getHurtTime() {
+    return hat::member_at<int16_t>(this, GET_OFFSET("Actor::hurtTime"));
+}
+
+Level *Actor::getLevel() {
+    return hat::member_at<Level*>(this, GET_OFFSET("Actor::level"));
+}
+
+ActorCategory Actor::getCategories() {
+    return hat::member_at<ActorCategory>(this, GET_OFFSET("Actor::categories"));
 }
 
 bool Actor::canSee(const Actor& actor) {
@@ -168,7 +175,7 @@ RuntimeIDComponent *Actor::getRuntimeIDComponent() {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getRuntimeIDComponent"));
+        sig = Memory::findSig(GET_SIG("Actor::getRuntimeIDComponent")); // 8B DA BA 14 14 A1 3C
         auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
         sig = sig - size;
     }
@@ -203,7 +210,7 @@ std::string *Actor::getNametag() {
 }
 
 bool Actor::hasCategory(ActorCategory category) {
-    return ((int) this->categories & (int) category) != 0;
+    return ((int) this->getCategories() & (int) category) != 0;
 }
 
 RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URenderPositionComponent
@@ -218,10 +225,10 @@ RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URen
     return tryGet<RenderPositionComponent>(sig);
 }
 
-bool Actor::isValidTarget(Actor *actor) {
-    if(!WinrtUtils::check(20, 40)) {
-        return true;
-    }
-    static int off = GET_OFFSET("Actor::isValidTarget");
-    return Memory::CallVFuncI<bool, Actor *>(off, this, actor);
+bool Actor::isValidAABB() {
+    auto AABBShapeComponent = this->getAABBShapeComponent();
+    if(!AABBShapeComponent) return false;
+    auto size = AABBShapeComponent->size;
+    if(size.x < 0.1f || size.y < 0.1f) return false;
+    return true;
 }

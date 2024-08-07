@@ -6,9 +6,6 @@
 void OffsetInit::init2100() {
     Logger::debug("[Offsets] Loading offsets for 1.21.0X");
 
-    ADD_OFFSET("Actor::isAlive", 50);
-    ADD_OFFSET("Actor::isValidTarget", 56);
-
     ADD_OFFSET("Inventory::getItem", 7);
 
     ADD_OFFSET("Actor::hurtTime", 0x20C);
@@ -28,8 +25,6 @@ void OffsetInit::init2100() {
 void OffsetInit::init2080() {
     Logger::debug("[Offsets] Loading offsets for 1.20.8X");
 
-    ADD_OFFSET("Actor::isAlive", 51);
-    ADD_OFFSET("Actor::isValidTarget", 57);
     ADD_OFFSET("Actor::baseTickVft", 26);
 
     ADD_OFFSET("Player::playerInventory",  0x788);
@@ -49,9 +44,6 @@ void OffsetInit::init2080() {
 
 void OffsetInit::init2070() {
     Logger::debug("[Offsets] Loading offsets for 1.20.7X");
-
-    ADD_OFFSET("Actor::isAlive", 53);
-    ADD_OFFSET("Actor::isValidTarget", 61);
 
     ADD_OFFSET("ClientInstance::getBlockSource", 28);
     ADD_OFFSET("ClientInstance::getLocalPlayer", 29);
@@ -77,9 +69,6 @@ void OffsetInit::init2070() {
 void OffsetInit::init2060() {
     Logger::debug("[Offsets] Loading offsets for 1.20.6X");
 
-    ADD_OFFSET("Actor::isAlive", 54);
-    ADD_OFFSET("Actor::isValidTarget", 62);
-
     ADD_OFFSET("Actor::hurtTime", 0x234);
     ADD_OFFSET("Actor::level", 0x290);
     ADD_OFFSET("Actor::categories", 0x2C8);
@@ -102,9 +91,6 @@ void OffsetInit::init2060() {
 
 void OffsetInit::init2050() {
     Logger::debug("[Offsets] Loading offsets for 1.20.5X");
-
-    ADD_OFFSET("Actor::isAlive", 57);
-    ADD_OFFSET("Actor::isValidTarget", 65);
 
     ADD_OFFSET("ClientInstance::getBlockSource", 27);
     ADD_OFFSET("ClientInstance::getLocalPlayer", 28);
@@ -132,8 +118,6 @@ void OffsetInit::init2040() {
     // getGamma, combo &
     Logger::debug("[Offsets] Loading offsets for 1.20.4X");
 
-    ADD_OFFSET("Actor::isAlive", 58);
-    ADD_OFFSET("Actor::isValidTarget", 66);
     ADD_OFFSET("Actor::hurtTime", 0x204);
     ADD_OFFSET("Actor::baseTickVft", 30);
 
@@ -162,8 +146,6 @@ void OffsetInit::init2030() {
 
     // Hitboxes and other
     ADD_OFFSET("Actor::getActorFlag", 0);
-    ADD_OFFSET("Actor::isAlive", 89);
-    ADD_OFFSET("Actor::isValidTarget", 65);
 
     // Armour HUD, Inventory HUD
     ADD_OFFSET("Inventory::getItem", 5);
@@ -247,6 +229,10 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("MinecraftUIRenderContext::clientInstance", 0x8);
     ADD_OFFSET("MinecraftUIRenderContext::screenContext", 0x10);
+    ADD_OFFSET("MinecraftUIRenderContext::textures", 0x48);
+
+    ADD_OFFSET("TextureGroup::base", 0x18);
+    ADD_OFFSET("TextureGroup::loadedTextures", 0x178);
 
     ADD_OFFSET("ScreenView::VisualTree", 0x48);
 

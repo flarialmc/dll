@@ -92,7 +92,7 @@ private:
             pos = player->getRenderPositionComponent()->renderPos;
         }
 
-        FrameTransform transform = { SDK::clientInstance->getviewMatrix(), origin, SDK::clientInstance->getFov(), pos};
+        FrameTransform transform = { SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov(), pos};
 
         SwapchainHook::frameTransformsMtx.lock();
         SwapchainHook::FrameTransforms.push(transform);

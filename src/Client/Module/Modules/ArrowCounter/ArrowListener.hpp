@@ -21,10 +21,10 @@ public:
     void onTick(TickEvent &event) override {
         if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
+                if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
                     auto arrowsCount = 0;
 
-                    auto inventory = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory;
+                    auto inventory = SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory;
                     if(inventory == nullptr) return;
 
                     auto offhandItem = SDK::clientInstance->getLocalPlayer()->getOffhandSlot();

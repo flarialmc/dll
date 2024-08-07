@@ -7,13 +7,13 @@
 
 void DrawUtils::addLine(Vec2<float> start, Vec2<float> end, float lineWidth, D2D_COLOR_F color) {
 
-    if (start.x < 0 || start.x > SDK::clientInstance->guiData->ScreenSize.x || start.y < 0 ||
-        start.y > SDK::clientInstance->guiData->ScreenSize.y) {
+    if (start.x < 0 || start.x > SDK::clientInstance->getGuiData()->ScreenSize.x || start.y < 0 ||
+        start.y > SDK::clientInstance->getGuiData()->ScreenSize.y) {
         return;
     }
 
-    if (end.x < 0 || end.x > SDK::clientInstance->guiData->ScreenSize.x || end.y < 0 ||
-        end.y > SDK::clientInstance->guiData->ScreenSize.y) {
+    if (end.x < 0 || end.x > SDK::clientInstance->getGuiData()->ScreenSize.x || end.y < 0 ||
+        end.y > SDK::clientInstance->getGuiData()->ScreenSize.y) {
         return;
     }
 

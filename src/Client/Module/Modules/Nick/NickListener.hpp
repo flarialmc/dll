@@ -66,7 +66,7 @@ public:
 
             std::string val = "§o"+Utils::removeColorCodes(module->settings.getSettingByName<std::string>("nick")->value);
             SDK::clientInstance->getLocalPlayer()->setNametag(&val);
-            SDK::clientInstance->getLocalPlayer()->playerName = val;
+            SDK::clientInstance->getLocalPlayer()->getPlayerName() = val;
 
         } else {
 
@@ -83,7 +83,7 @@ public:
             //std::cout << original2 << std::endl;
 
             SDK::clientInstance->getLocalPlayer()->setNametag(&val2);
-            SDK::clientInstance->getLocalPlayer()->playerName = val;
+            SDK::clientInstance->getLocalPlayer()->getPlayerName() = val;
 
         }
 

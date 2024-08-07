@@ -8,8 +8,7 @@
 
 class BlockSource {
 public:
-
-    BUILD_ACCESS(this, mcDimension*, dimension, GET_OFFSET("BlockSource::dimension"));
+    mcDimension* getDimension();
 
     Biome *getBiome(const Vec3<int> &);
 };

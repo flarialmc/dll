@@ -30,24 +30,6 @@ public:
     Vec2<float> testOffset = Vec2<float>{4,0};
     float testSpacing = 15;
 
-    [[nodiscard]] Vec2<float> convert() const {
-
-        auto e = SDK::clientInstance->guiData;
-        Vec2<float> xd = Vec2<float>(e->ScreenSize.x, e->ScreenSize.y);
-        Vec2<float> LOL = Vec2<float>(e->ScreenSizeScaled.x, e->ScreenSizeScaled.y);
-
-        return Vec2<float>{currentPos.x * (LOL.x / xd.x), currentPos.y * (LOL.y / xd.y)};
-    }
-
-    [[nodiscard]] Vec2<float> convert(Vec2<float> pos) {
-
-        auto e = SDK::clientInstance->guiData;
-        Vec2<float> LOL = Vec2<float>(e->ScreenSize.x, e->ScreenSize.y);
-        Vec2<float> xd = Vec2<float>(e->ScreenSizeScaled.x, e->ScreenSizeScaled.y);
-        float scale = module->settings.getSettingByName<float>("uiscale")->value;
-        return Vec2<float>{pos.x * (LOL.x / xd.x) * scale, pos.y * (LOL.y / xd.y) * scale};
-    }
-
     // TODO: Make it look better
     void renderDurability() {
         if(FlarialGUI::inMenu) return;
@@ -67,18 +49,18 @@ public:
 
         if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr)
-                if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
+                if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
 
                     auto vertical = module->settings.getSettingByName<bool>("vertical")->value;
 
                     float spacing = testSpacing;
                     spacing = convert(Vec2<float>{spacing, spacing}).x;
 
-                    if (SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(
-                            SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot)->getItem() !=
+                    if (SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory->getItem(
+                            SDK::clientInstance->getLocalPlayer()->getSupplies()->SelectedSlot)->getItem() !=
                         nullptr) {
-                        auto currentItem = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(
-                                SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot);
+                        auto currentItem = SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory->getItem(
+                                SDK::clientInstance->getLocalPlayer()->getSupplies()->SelectedSlot);
 
                         std::string text;
 
@@ -235,18 +217,18 @@ public:
         if(this->module->isEnabled())
         if (ClientInstance::getTopScreenName() == "hud_screen") {
             auto muirc = event.getMuirc();
-            BaseActorRenderContext barc(muirc->screenContext, muirc->clientInstance,
-                                        muirc->clientInstance->mcgame);
+            BaseActorRenderContext barc(muirc->getScreenContext(), muirc->getClientInstance(),
+                                        muirc->getClientInstance()->getMinecraftGame());
 
             Vec2<float> convert = this->convert();
             if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
                 if (SDK::clientInstance->getLocalPlayer() != nullptr)
-                    if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
-                        if (SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(
-                                SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot)->getItem() !=
+                    if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
+                        if (SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory->getItem(
+                                SDK::clientInstance->getLocalPlayer()->getSupplies()->SelectedSlot)->getItem() !=
                             nullptr) {
-                            auto item = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(
-                                    SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot);
+                            auto item = SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory->getItem(
+                                    SDK::clientInstance->getLocalPlayer()->getSupplies()->SelectedSlot);
 
                             auto maxDamage = item->getMaxDamage();
                             auto durabilityLeft = maxDamage - item->getDamageValue();

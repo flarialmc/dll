@@ -9,14 +9,13 @@ class GuiScaleListener : public Listener {
 public:
 
     void onRender(RenderEvent& event) override {
-        if(SDK::currentScreen == "hud_screen")
-            if(SDK::clientInstance->guiData != nullptr)
         if(SDK::getCurrentScreen() == "hud_screen")
+            if(SDK::clientInstance->getGuiData() != nullptr)
         if (module->settings.getSettingByName<bool>("enabled")->value){
         float percent = module->settings.getSettingByName<float>("guiscale")->value;
-        SDK::clientInstance->guiData->GuiScale = percent;
-        SDK::clientInstance->guiData->ScreenSizeScaled = Vec2{ SDK::clientInstance->guiData->ScreenSize.x * 1 / percent, SDK::clientInstance->guiData->ScreenSize.y * 1 / percent };
-        SDK::clientInstance->guiData->scalingMultiplier = 1 / percent;
+        SDK::clientInstance->getGuiData()->GuiScale = percent;
+        SDK::clientInstance->getGuiData()->ScreenSizeScaled = Vec2{ SDK::clientInstance->getGuiData()->ScreenSize.x * 1 / percent, SDK::clientInstance->getGuiData()->ScreenSize.y * 1 / percent };
+        SDK::clientInstance->getGuiData()->scalingMultiplier = 1 / percent;
         }
     }
 
