@@ -85,8 +85,7 @@ public:
         Vec2<float> allahuakbar = Constraints::CenterConstraint(allahu, akbar, "y", 1.175, 1.175);
         // TODO: add inventory screen to onRender?
         // watermark
-        if (ClientInstance::getTopScreenName() == "inventory_screen" ||
-            SDK::currentScreen.find("chest") != std::string::npos)
+        if (SDK::getCurrentScreen() == "inventory_screen" || SDK::getCurrentScreen().find("chest") != std::string::npos)
             if (Client::settings.getSettingByName<bool>("watermark")->value)
                 FlarialGUI::image(IDR_FLARIAL_TITLE_PNG,
                                   D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
@@ -828,7 +827,7 @@ public:
         //TODO: MAKE module->setActive() module->isActive() module->isRestricted()
 
         if (module->isKeybind(event.keys) && module->isKeyPartOfKeybind(event.key) && event.getAction() == (int)ActionType::Pressed) {
-            if (SDK::currentScreen != "hud_screen" && SDK::currentScreen != "pause_screen")
+            if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen")
                 module->active = false;
             else {
                 module->active = !module->active;
@@ -915,7 +914,7 @@ public:
 
         }
 
-        if (module->active || editmenu && SDK::currentScreen == "hud_screen")
+        if (module->active || editmenu && SDK::getCurrentScreen() == "hud_screen")
             SDK::clientInstance->releaseMouse(); // release mouse lets cursor move
 
         if (module->active || editmenu)
@@ -925,12 +924,12 @@ public:
     }
 
     void onMouse(MouseEvent &event) override {
-        if(SDK::currentScreen != "hud_screen"){
+        if(SDK::getCurrentScreen() != "hud_screen"){
             if(module->active)
                 module->active = false;
         }
 
-        if ((module->active || editmenu) && SDK::currentScreen == "hud_screen")
+        if ((module->active || editmenu) && SDK::getCurrentScreen() == "hud_screen")
             event.cancel(); // TODO: modules dont listen for canceled state!!!
 
     }

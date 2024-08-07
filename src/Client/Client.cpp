@@ -196,8 +196,8 @@ void Client::centerCursor() {
         }
 
 
-        if ((SDK::currentScreen != "hud_screen" && InHudScreen) ||
-            (SDK::currentScreen == "hud_screen" && !InHudScreen)) {
+        if ((SDK::getCurrentScreen() != "hud_screen" && InHudScreen) ||
+            (SDK::getCurrentScreen() == "hud_screen" && !InHudScreen)) {
             GetWindowRect(hWnd, &currentRect);
             GetClientRect(hWnd, &clientRect);
 

@@ -11,6 +11,7 @@ public:
     void onRender(RenderEvent& event) override {
         if(SDK::currentScreen == "hud_screen")
             if(SDK::clientInstance->guiData != nullptr)
+        if(SDK::getCurrentScreen() == "hud_screen")
         if (module->settings.getSettingByName<bool>("enabled")->value){
         float percent = module->settings.getSettingByName<float>("guiscale")->value;
         SDK::clientInstance->guiData->GuiScale = percent;

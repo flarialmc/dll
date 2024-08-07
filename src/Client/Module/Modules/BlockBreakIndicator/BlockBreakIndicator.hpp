@@ -357,7 +357,7 @@ public:
     float currentHeight = 0.0f;
 
     void normalRender(int index, std::string& value) override {
-        if(SDK::currentScreen != "hud_screen") return;
+        if(SDK::getCurrentScreen() != "hud_screen") return;
         // TODO: needs a logic where if you stopped holding left button it wont show progress if its higher than 0% (if u resetted mining you start at 0%)
         if (!CPSListener::GetLeftHeld()) {
             value = "0%";

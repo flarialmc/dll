@@ -82,7 +82,7 @@ public:
             }
         }
 
-        if (SDK::currentScreen != "hud_screen") ClickGUIRenderer::editmenu = false;
+        if (SDK::getCurrentScreen() != "hud_screen") ClickGUIRenderer::editmenu = false;
     }
 
     void onSetupAndRender(SetupAndRenderEvent &event) override {

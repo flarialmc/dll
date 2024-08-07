@@ -15,7 +15,7 @@ std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {
 static std::string Lname = "";
 
 void Module::normalRender(int index, std::string &value) {
-    if(!isEnabled() || SDK::currentScreen != "hud_screen") return;
+    if(!isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
 
     std::string text{};
     if(this->settings.getSettingByName<std::string>("text")!=nullptr)
@@ -522,7 +522,7 @@ bool Module::isKeybind(const std::array<bool, 256>& keys) {
     // TODO: in menu should also mean in Edit Mode, when edit mode all modules set to active(visible? add visible setting (for TAB))
     if (name != "ClickGUI")
         if (FlarialGUI::inMenu) return false;
-    if (SDK::currentScreen == "chat_screen") return false;
+    if (SDK::getCurrentScreen() == "chat_screen") return false;
     bool allInactive = std::ranges::all_of(FlarialGUI::TextBoxes, [](const TextBoxStruct& i) {
         return !i.isActive;
         });
@@ -542,7 +542,7 @@ bool Module::isKeybind(const std::array<bool, 256>& keys) {
     }
     if (name != "ClickGUI")
         if (FlarialGUI::inMenu) return false;
-    if (SDK::currentScreen == "chat_screen") return false;
+    if (SDK::getCurrentScreen() == "chat_screen") return false;
     bool allInactive = std::ranges::all_of(FlarialGUI::TextBoxes, [](const TextBoxStruct& i) {
         return !i.isActive;
         });

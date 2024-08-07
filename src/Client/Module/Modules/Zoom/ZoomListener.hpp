@@ -70,7 +70,7 @@ class ZoomListener : public Listener {
 
     //TODO: RE CHECK
     void onMouse(MouseEvent &event) override {
-        if (SDK::currentScreen == "hud_screen" || SDK::currentScreen == "f1_screen" || SDK::currentScreen == "zoom_screen")
+        if (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f1_screen" || SDK::getCurrentScreen() == "zoom_screen")
             if (module->active) {
                 //todo make it so that modules work together
                 auto fovchanger = ModuleManager::getModule("FOV Changer");
