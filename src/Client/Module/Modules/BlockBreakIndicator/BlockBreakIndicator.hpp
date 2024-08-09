@@ -9,8 +9,6 @@
 class BlockBreakIndicator : public Module {
 
 public:
-
-
     BlockBreakIndicator() : Module("Break Progress", "Visual indicator to show the progress\nof breaking a block.",
                                    IDR_BLOCK_BREAK_INDICATOR_PNG, "") {
         Module::setup();
@@ -358,10 +356,6 @@ public:
 
     void normalRender(int index, std::string& value) override {
         if(SDK::getCurrentScreen() != "hud_screen") return;
-        // TODO: needs a logic where if you stopped holding left button it wont show progress if its higher than 0% (if u resetted mining you start at 0%)
-        if (!CPSListener::GetLeftHeld()) {
-            value = "0%";
-        }
 
         if (settings.getSettingByName<bool>("pbmode")->value) {
             if (settings.getSettingByName<bool>("onlyShowWhileBreaking")->value && value == "0%") return;
@@ -444,11 +438,15 @@ public:
                                           rounde.x, rounde.x));
 
             FlarialGUI::RoundedRect(coord.x, coord.y, bgColor, pbwidth, pbheight, rounde.x, rounde.y);
-            if (orientation == "Horizontal")
-                FlarialGUI::RoundedRect(coord.x, coord.y, barFill, currentHeight, pbheight, rounde.x, rounde.y);
-            else
-                FlarialGUI::RoundedRect(coord.x, coord.y + pbheight - currentHeight, barFill, pbwidth, currentHeight,
-                                        rounde.x, rounde.y);
+
+            if(currentHeight > 0.5f) {
+                if (orientation == "Horizontal")
+                    FlarialGUI::RoundedRect(coord.x, coord.y, barFill, currentHeight, pbheight, rounde.x, rounde.y);
+                else
+                    FlarialGUI::RoundedRect(coord.x, coord.y + pbheight - currentHeight, barFill, pbwidth,
+                                            currentHeight,
+                                            rounde.x, rounde.y);
+            }
 
             if (this->settings.getSettingByName<bool>("border")->value)
                 FlarialGUI::RoundedHollowRect(
