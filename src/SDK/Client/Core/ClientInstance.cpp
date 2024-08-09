@@ -3,8 +3,16 @@
 #include <libhat/Access.hpp>
 
 LocalPlayer *ClientInstance::getLocalPlayer() {
-    static int off = GET_OFFSET("ClientInstance::getLocalPlayer");
-    return Memory::CallVFuncI<LocalPlayer *>(off, this);
+    // Indig0r
+    static uintptr_t indexRef;
+
+    if (indexRef == 0) {
+        indexRef = Memory::findSig(GET_SIG("ClientInstance::getLocalPlayerIndex"));
+    }
+
+    int index = *reinterpret_cast<int*>(indexRef + 9) / 8;
+
+    return Memory::CallVFuncI<LocalPlayer *>(index, this);
 }
 
 BlockSource *ClientInstance::getBlockSource() {
@@ -39,6 +47,7 @@ void ClientInstance::releaseMouse() {
 }
 
 std::string ClientInstance::getTopScreenName() {
+    std::lock_guard<std::mutex> guard(SDK::currentScreenMtx);
     return SDK::currentScreen;
 }
 

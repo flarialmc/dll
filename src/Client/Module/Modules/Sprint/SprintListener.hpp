@@ -22,7 +22,7 @@ class SprintListener : public Listener {
     };
 
     void onRender(RenderEvent &event) override {
-        if(!module->isEnabled() || SDK::currentScreen != "hud_screen") return;
+        if(!module->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
 
             if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
 

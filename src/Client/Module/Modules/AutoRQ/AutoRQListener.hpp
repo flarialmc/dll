@@ -87,6 +87,153 @@ class AutoRQListener : public Listener {
             }
         }
         if (id == MinecraftPacketIds::Text) {
+            if(module->settings.getSettingByName<bool>("murderer")->value){
+                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
+
+                if (pkt->message == "§c§l» §r§c§lMurderer") {
+                    triggered = true;
+                    FlarialGUI::Notify("Found role Murderer");
+                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
+                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
+
+                    command_packet->command = "/connection";
+
+                    command_packet->origin.type = CommandOriginType::Player;
+
+                    command_packet->InternalSource = true;
+
+                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+                    
+                } //std::cout << pkt->mName << std::endl;
+            }
+        }
+        if (id == MinecraftPacketIds::Text) {
+            if(module->settings.getSettingByName<bool>("sheriff")->value){
+                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
+
+                if (pkt->message == "§9§l» §r§9§lSheriff") {
+                    triggered = true;
+                    FlarialGUI::Notify("Found role Sheriff");
+                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
+                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
+
+                    command_packet->command = "/connection";
+
+                    command_packet->origin.type = CommandOriginType::Player;
+
+                    command_packet->InternalSource = true;
+
+                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+
+                } //std::cout << pkt->mName << std::endl;
+            }
+        }
+        if (id == MinecraftPacketIds::Text) {
+            if(module->settings.getSettingByName<bool>("innocent")->value){
+                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
+
+                if (pkt->message == "§a§l» §r§a§lInnocent") {
+                    triggered = true;
+                    FlarialGUI::Notify("Found role Innocent");
+                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
+                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
+
+                    command_packet->command = "/connection";
+
+                    command_packet->origin.type = CommandOriginType::Player;
+
+                    command_packet->InternalSource = true;
+
+                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+
+                } //std::cout << pkt->mName << std::endl;
+            }
+        }
+        if (id == MinecraftPacketIds::Text) {
+            if(module->settings.getSettingByName<bool>("death")->value){
+                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
+
+                if (pkt->message == "§d§l» §r§bYou are a §cDeath") {
+                    triggered = true;
+                    FlarialGUI::Notify("Found role Death");
+                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
+                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
+
+                    command_packet->command = "/connection";
+
+                    command_packet->origin.type = CommandOriginType::Player;
+
+                    command_packet->InternalSource = true;
+
+                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+
+                } //std::cout << pkt->mName << std::endl;
+            }
+        }
+        if (id == MinecraftPacketIds::Text) {
+            if(module->settings.getSettingByName<bool>("runner")->value){
+                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
+
+                if (pkt->message == "§d§l» §r§bYou are a §aRunner") {
+                    triggered = true;
+                    FlarialGUI::Notify("Found role Runner");
+                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
+                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
+
+                    command_packet->command = "/connection";
+
+                    command_packet->origin.type = CommandOriginType::Player;
+
+                    command_packet->InternalSource = true;
+
+                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+
+                } //std::cout << pkt->mName << std::endl;
+            }
+        }
+        if (id == MinecraftPacketIds::Text) {
+            if(module->settings.getSettingByName<bool>("hider")->value){
+                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
+
+                if (pkt->message == "§e§l» §rYou are a §eHIDER") {
+                    triggered = true;
+                    FlarialGUI::Notify("Found role Hider");
+                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
+                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
+
+                    command_packet->command = "/connection";
+
+                    command_packet->origin.type = CommandOriginType::Player;
+
+                    command_packet->InternalSource = true;
+
+                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+
+                } //std::cout << pkt->mName << std::endl;
+            }
+        }
+        if (id == MinecraftPacketIds::Text) {
+            if(module->settings.getSettingByName<bool>("seeker")->value){
+                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
+
+                if (pkt->message == "§c§l» §rYou are a §cSEEKER") {
+                    triggered = true;
+                    FlarialGUI::Notify("Found role Seeker");
+                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
+                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
+
+                    command_packet->command = "/connection";
+
+                    command_packet->origin.type = CommandOriginType::Player;
+
+                    command_packet->InternalSource = true;
+
+                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+
+                } //std::cout << pkt->mName << std::endl;
+            }
+        }
+        if (id == MinecraftPacketIds::Text) {
             if(module->settings.getSettingByName<bool>("AutoMapAvoider")->value){
                 auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
                 std::string maps_to_avoid = module->settings.getSettingByName<std::string>("text")->value;
@@ -144,28 +291,48 @@ class AutoRQListener : public Listener {
             std::string textToCheckToSilence = "You are connected";
 
             if (pkt->message.find(textToCheck) != std::string::npos && triggered) {
-                std::string server = pkt->message.replace(0, textToCheck.length(), "");
-                std::regex pattern("\\d+");
-                std::string name = std::regex_replace(server, pattern, "");
-                FlarialGUI::Notify("Preparing Q: " + name);
-                std::thread t([name]() {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                if(!module->settings.getSettingByName<bool>("hub")->value){
+                    std::string server = pkt->message.replace(0, textToCheck.length(), "");
+                    std::regex pattern("\\d+");
+                    std::string name = std::regex_replace(server, pattern, "");
+                    FlarialGUI::Notify("Preparing Q: " + name);
+                    std::thread t([name]() {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-                    FlarialGUI::Notify("Executing command /q " + name);
+                        FlarialGUI::Notify("Executing command /q " + name);
 
-                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-                    command_packet->command = "/q " + name;
+                        std::shared_ptr<Packet> packet = SDK::createPacket(77);
+                        auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
+                        command_packet->command = "/q " + name;
 
-                    command_packet->origin.type = CommandOriginType::Player;
+                        command_packet->origin.type = CommandOriginType::Player;
 
-                    command_packet->InternalSource = true;
-                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-                });
-                t.detach();
-                triggered = false;
-                pkt->message = "";
+                        command_packet->InternalSource = true;
+                        SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+                    });
+                    t.detach();
+                    triggered = false;
+                    pkt->message = "";
+                }
+                else{
+                    std::thread h([]() {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                        FlarialGUI::Notify("Executing command /hub");
+                        std::shared_ptr<Packet> packet = SDK::createPacket(77);
+                        auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
 
+                        command_packet->command = "/hub";
+
+                        command_packet->origin.type = CommandOriginType::Player;
+
+                        command_packet->InternalSource = true;
+
+                        SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+                    });
+                    h.detach();
+                    triggered = false;
+                    pkt->message = "";
+                }
             }
             else if (pkt->message.find(textToCheckToSilence) != std::string::npos) {
                 event.cancel();

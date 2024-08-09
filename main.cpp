@@ -23,12 +23,16 @@ std::string removeColorCodes(const std::string& input);
 
 DWORD WINAPI init(HMODULE real)
 {
-    if (GetConsoleWindow() == nullptr and true) {
+    #ifndef NDEBUG
+    bool shouldDebug = true; // Change this bool locally, NEVER push it set to true
+
+    if (GetConsoleWindow() == nullptr && shouldDebug) {
         AllocConsole();
-        SetConsoleTitleA("Caspian-Debug");
+        SetConsoleTitleA("Flarial-Debugger");
         FILE *out;
         freopen_s(&out, ("CONOUT$"), ("w"), stdout);
     }
+    #endif
 
 
     Client::initialize();
@@ -42,10 +46,15 @@ DWORD WINAPI init(HMODULE real)
 
             if(!Client::disable) {
                 if(SDK::hasInstanced && SDK::clientInstance != nullptr) {
+                    // may crash here cuz accessed on other thread
                     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+
                         if(elapsed >= std::chrono::seconds(27)) {
                             ModuleManager::onlineUsers.clear();
-                            std::string name = SDK::clientInstance->getLocalPlayer()->playerName;
+                            std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
+
+
+                            ModuleManager::onlineUsers.clear();
                             ModuleManager::onlineUsers.push_back(Utils::removeColorCodes(name));
                             std::string pp = DownloadString("https://api.flarial.synthetix.host/users");
 
@@ -68,7 +77,10 @@ DWORD WINAPI init(HMODULE real)
                                         std::cerr << "Invalid or missing 'lastbeat' for player: " << player.key() << std::endl;
                                         continue;
                                     }
-                                    ModuleManager::onlineUsers.push_back(Utils::removeNonAlphanumeric(player.key()));
+
+                                    std::string name2 = Utils::removeNonAlphanumeric(player.key());
+                                    name2 = replaceAll(name2, "�", "");
+                                    ModuleManager::onlineUsers.push_back(name2);
                                 } catch (const std::exception& e) {
                                     std::cerr << "Error processing player: " << player.key() << " - " << e.what() << std::endl;
                                     continue;
@@ -86,11 +98,13 @@ DWORD WINAPI init(HMODULE real)
                             auto module = ModuleManager::getModule("Nick");
 
                             if(SDK::clientInstance != nullptr)
-                            if(SDK::clientInstance->getLocalPlayer() != nullptr)
-                            if (module->isEnabled()) {
-                                name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickListener::original));
-                            }
-                            // send thing
+                                if(SDK::clientInstance->getLocalPlayer() != nullptr)
+                                    if (module->isEnabled()) {
+                                        name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickListener::original));
+                                        name = replaceAll(name, "�", "");
+
+                                    }
+
                             std::cout << std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend) << std::endl;
                             std::cout << DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend)) << std::endl;
 
@@ -143,12 +157,12 @@ BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReser
 {
     switch (ul_reason_for_call)
     {
-    case DLL_PROCESS_ATTACH:
-        Client::currentModule = instance;
-        CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)init, instance, 0, nullptr);
-        break;
-    case DLL_PROCESS_DETACH:
-        ModuleManager::terminate();
+        case DLL_PROCESS_ATTACH:
+            Client::currentModule = instance;
+            CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)init, instance, 0, nullptr);
+            break;
+        case DLL_PROCESS_DETACH:
+            ModuleManager::terminate();
     }
 
     return TRUE;

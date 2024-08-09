@@ -21,8 +21,6 @@ enum SetTitleType {
 class SetTitlePacket : public Packet {
 
 public:
-    SetTitlePacket();
-
     SetTitleType type;         // 0x30
     std::string text;              // 0x50
     float fadeInTime;   // 0x70
@@ -31,4 +29,6 @@ public:
 
     std::string xuid;
     std::string platformId;
+
+    SetTitlePacket() = default;
 };

@@ -40,7 +40,7 @@ class AutoGGListener : public Listener {
                     text->platformId = "";
                     text->translationNeeded = false;
                     text->xuid = "";
-                    text->name = player->playerName;
+                    text->name = player->getPlayerName();
 
                     SDK::clientInstance->getPacketSender()->sendToServer(text);
                 }
@@ -67,7 +67,7 @@ class AutoGGListener : public Listener {
                     text->platformId = "";
                     text->translationNeeded = false;
                     text->xuid = "";
-                    text->name = player->playerName;
+                    text->name = player->getPlayerName();
 
                     SDK::clientInstance->getPacketSender()->sendToServer(text);
                 }

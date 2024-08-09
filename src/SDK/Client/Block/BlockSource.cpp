@@ -1,5 +1,9 @@
 #include "BlockSource.hpp"
 
+mcDimension *BlockSource::getDimension() {
+    return hat::member_at<mcDimension *>(this, GET_OFFSET("BlockSource::dimension"));
+}
+
 Biome *BlockSource::getBiome(const Vec3<int> &bp) {
 
     static uintptr_t sig;

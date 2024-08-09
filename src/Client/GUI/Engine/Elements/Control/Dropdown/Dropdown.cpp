@@ -45,6 +45,9 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     const bool isAdditionalY = shouldAdditionalY;
     const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
     const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
+
+    y -= percHeight / 2.0f;
+
     float childHeights = Constraints::RelativeConstraint(0.030, "height", true);
     float maxHeight = ((float)options.size() - 1.0f) * childHeights + 2.0f;
     float addYVal = maxHeight + Constraints::SpacingConstraint(0.05, textWidth);
