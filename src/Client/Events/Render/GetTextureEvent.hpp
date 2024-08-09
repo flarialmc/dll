@@ -7,9 +7,9 @@
 #include "../Event.hpp"
 
 class GetTextureEvent : public Event, Cancellable {
-private:
-    ResourceLocation* location;
 public:
+    ResourceLocation* location;
+
     explicit GetTextureEvent(ResourceLocation* resourceLocation) {
         location = resourceLocation;
     }

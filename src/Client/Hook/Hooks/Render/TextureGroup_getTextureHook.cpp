@@ -16,5 +16,5 @@ TexturePtr* TextureGroup_getTextureHook::TextureGroup_getTextureCallback(Texture
     auto event = GetTextureEvent(location);
     EventHandler::onGetTexture(event);
 
-    return funcOriginal(_this, result, location, forceReload, a5, a6, a7);
+    return funcOriginal(_this, result, event.location, forceReload, a5, a6, a7);
 }
