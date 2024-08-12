@@ -56,8 +56,13 @@ public:
 
                     float spacing = testSpacing;
 
-                    if (SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory->getItem(
-                            SDK::clientInstance->getLocalPlayer()->getSupplies()->SelectedSlot)->getItem() !=
+                    auto scaledPos = PositionUtils::getCustomScreenScaledPos(Vec2<float>{spacing, spacing},
+                                                                             module->settings.getSettingByName<float>(
+                                                                                     "uiscale")->value);
+                    spacing = vertical ? scaledPos.y : scaledPos.x;
+
+                    if (SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
+                            SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot())->getItem() !=
                         nullptr) {
                         auto currentItem = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
                                 SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot());
