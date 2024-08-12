@@ -24,7 +24,7 @@ public:
                 if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
                     auto arrowsCount = 0;
 
-                    auto inventory = SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory;
+                    auto inventory = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory();
                     if(inventory == nullptr) return;
 
                     auto offhandItem = SDK::clientInstance->getLocalPlayer()->getOffhandSlot();

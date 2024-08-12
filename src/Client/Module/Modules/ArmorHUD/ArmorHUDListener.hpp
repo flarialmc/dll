@@ -28,7 +28,7 @@ public:
             {0,0}
     };
     // TODO: delete testing variables (or adjust and delete)
-    Vec2<float> testOffset = Vec2<float>{4,0};
+    Vec2<float> testOffset = Vec2<float>{0,0};
     float testSpacing = 15;
 
     // TODO: Make it look better
@@ -55,13 +55,12 @@ public:
                     auto vertical = module->settings.getSettingByName<bool>("vertical")->value;
 
                     float spacing = testSpacing;
-                    spacing = PositionUtils::getScaledPos(Vec2<float>{spacing, spacing}).x;
 
                     if (SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory->getItem(
                             SDK::clientInstance->getLocalPlayer()->getSupplies()->SelectedSlot)->getItem() !=
                         nullptr) {
-                        auto currentItem = SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory->getItem(
-                                SDK::clientInstance->getLocalPlayer()->getSupplies()->SelectedSlot);
+                        auto currentItem = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
+                                SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot());
 
                         std::string text;
 
@@ -105,12 +104,12 @@ public:
                     float xoffset = 0.0f;
                     float yoffset = 0.0f;
 
-                    if (module->settings.getSettingByName<bool>("vertical")->value) xoffset += spacing;
+                    if (vertical) xoffset += spacing;
                     else yoffset += spacing;
 
                     for (int i = 1; i < 5; i++) {
 
-                        if (module->settings.getSettingByName<bool>("vertical")->value) ymodifier += spacing;
+                        if (vertical) ymodifier += spacing;
                         else xmodifier += spacing;
 
 
@@ -226,11 +225,11 @@ public:
             if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
                 if (SDK::clientInstance->getLocalPlayer() != nullptr)
                     if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
-                        if (SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory->getItem(
-                                SDK::clientInstance->getLocalPlayer()->getSupplies()->SelectedSlot)->getItem() !=
+                        if (SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
+                                SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot())->getItem() !=
                             nullptr) {
-                            auto item = SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory->getItem(
-                                    SDK::clientInstance->getLocalPlayer()->getSupplies()->SelectedSlot);
+                            auto item = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
+                                    SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot());
 
                             auto maxDamage = item->getMaxDamage();
                             auto durabilityLeft = maxDamage - item->getDamageValue();
