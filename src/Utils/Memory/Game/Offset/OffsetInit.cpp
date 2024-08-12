@@ -157,7 +157,7 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("Packet::getId", 1);
 
-    ADD_OFFSET("Actor::hurtTime", 0x22C); // ?hurtEffects@Mob@@UEAAXAEBVActorDamageSource@@M_N1@Z Mob::hurtEffects 2nd after Actor::getHealth(void)
+    ADD_OFFSET("Actor::hurtTime", 0x204); // ?hurtEffects@Mob@@UEAAXAEBVActorDamageSource@@M_N1@Z Mob::hurtEffects 2nd after Actor::getHealth(void)
     ADD_OFFSET("Actor::level", 0x260);
     ADD_OFFSET("Actor::categories", 0x298);
     ADD_OFFSET("Actor::baseTickVft", 44);
