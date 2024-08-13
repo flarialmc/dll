@@ -3,16 +3,16 @@
 
 void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
     aabbsToRender.clear();
-    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->mcgame->mouseGrabbed ||
-        !SDK::clientInstance->getLocalPlayer()->level)
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->getMinecraftGame()->mouseGrabbed ||
+        !SDK::clientInstance->getLocalPlayer()->getLevel())
         return;
     auto player = SDK::clientInstance->getLocalPlayer();
-    for (const auto &ent: player->level->getRuntimeActorList()) {
+    for (const auto &ent: player->getLevel()->getRuntimeActorList()) {
         if (ent != nullptr && ent != player /*&& ent->isPlayer() && ent->hasCategory(ActorCategory::Player)*/) {
             float dist = player->getPosition()->dist(*ent->getPosition());
             // This may let through some entites
-            if (!ent->isAlive() || !player->isValidTarget(ent) || dist > 30 || !player->canSee(*ent) ||
-                ent->getActorFlag(ActorFlags::FLAG_INVISIBLE)) // + ent == player ||
+            if (!ent->isValidAABB() || dist > 30 || !player->canSee(*ent) ||
+                ent->getActorFlag(ActorFlags::FLAG_INVISIBLE))
                 continue;
 
             float mod = 0.f;
@@ -31,8 +31,8 @@ void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
 
 void HitboxListener::onRender(RenderEvent &event) {
 
-    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->mcgame->mouseGrabbed ||
-        !SDK::clientInstance->getLocalPlayer()->level)
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->getMinecraftGame()->mouseGrabbed ||
+        !SDK::clientInstance->getLocalPlayer()->getLevel())
         return;
 
     auto player = SDK::clientInstance->getLocalPlayer();

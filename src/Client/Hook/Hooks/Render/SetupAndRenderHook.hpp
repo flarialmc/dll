@@ -30,7 +30,7 @@ private:
 
 	static void drawImageDetour(
 		MinecraftUIRenderContext* _this,
-		TextureData* texturePtr,
+		TexturePtr* texturePtr,
 		Vec2<float>& imagePos,
 		Vec2<float>& imageDimension,
 		Vec2<float>& uvPos,
@@ -40,7 +40,7 @@ private:
         DrawImageEvent event(texturePtr, imagePos);
         EventHandler::onDrawImage(event);
 
-        Memory::CallFunc<void*, MinecraftUIRenderContext*, TextureData*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(
+        Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(
                 oDrawImage,
                 _this,
                 texturePtr,
@@ -67,7 +67,7 @@ private:
 	static void setUpAndRenderCallback(ScreenView* pScreenView, MinecraftUIRenderContext* muirc) {
 
 		SDK::screenView = pScreenView;
-        SDK::clientInstance = muirc->getclientInstance();
+        SDK::clientInstance = muirc->getClientInstance();
         SDK::hasInstanced = true;
 
         if(funcOriginalText == nullptr || oDrawImage == nullptr)
@@ -92,8 +92,11 @@ private:
             pos = player->getRenderPositionComponent()->renderPos;
         }
 
-        FrameTransform transform = { SDK::clientInstance->getviewMatrix(), origin, SDK::clientInstance->getFov(), pos};
+        FrameTransform transform = { SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov(), pos};
+
+        SwapchainHook::frameTransformsMtx.lock();
         SwapchainHook::FrameTransforms.push(transform);
+        SwapchainHook::frameTransformsMtx.unlock();
 
         if(layer == "debug_screen" || layer == "hud_screen" || layer == "start_screen") {
             SetupAndRenderEvent event(muirc);

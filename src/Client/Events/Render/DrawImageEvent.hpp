@@ -3,11 +3,11 @@
 #include "../Event.hpp"
 #include "../Cancellable.hpp"
 #include "../../../Utils/Utils.hpp"
-#include "../../../SDK/Client/Render/Texture2D.hpp"
+#include "../../../SDK/Client/Render/TexturePtr.hpp"
 
 class DrawImageEvent : public Event, Cancellable {
 private:
-    TextureData *texturePtr;
+    TexturePtr *texturePtr;
     Vec2<float> &imagePos;
 public:
     [[nodiscard]] Vec2<float> &getImagePos() const {
@@ -18,7 +18,7 @@ public:
         return this->texturePtr->GetFilePath();
     }
 
-    explicit DrawImageEvent(TextureData *texturePtr, Vec2<float> &imagePos)
+    explicit DrawImageEvent(TexturePtr *texturePtr, Vec2<float> &imagePos)
             : texturePtr(texturePtr), imagePos(imagePos) {
     }
 };

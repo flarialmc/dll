@@ -41,7 +41,7 @@ public:
                 val2 = NickListener::original2;
 
                 SDK::clientInstance->getLocalPlayer()->setNametag(&val2);
-                SDK::clientInstance->getLocalPlayer()->playerName = val;
+                SDK::clientInstance->getLocalPlayer()->getPlayerName() = val;
             }
         EventHandler::unregisterListener("NickListener");
         Module::onDisable();

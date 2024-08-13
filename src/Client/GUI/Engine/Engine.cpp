@@ -34,6 +34,14 @@
 #define o_colors_text clickgui->settings.getSettingByName<float>("o_colors_text")->value
 #define colors_text_rgb clickgui->settings.getSettingByName<bool>("colors_text_rgb")->value
 
+#define colors_enabled HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_enabled")->value)
+#define o_colors_enabled clickgui->settings.getSettingByName<float>("o_colors_enabled")->value
+#define colors_enabled_rgb clickgui->settings.getSettingByName<bool>("colors_enabled_rgb")->value
+
+#define colors_disabled HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_disabled")->value)
+#define o_colors_disabled clickgui->settings.getSettingByName<float>("o_colors_disabled")->value
+#define colors_disabled_rgb clickgui->settings.getSettingByName<bool>("colors_disabled_rgb")->value
+
 #define colors_primary1 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary1")->value)
 #define o_colors_primary1 clickgui->settings.getSettingByName<float>("o_colors_primary1")->value
 #define colors_primary1_rgb clickgui->settings.getSettingByName<bool>("colors_primary1_rgb")->value
@@ -58,9 +66,45 @@
 #define o_colors_secondary2 clickgui->settings.getSettingByName<float>("o_colors_secondary2")->value
 #define colors_secondary2_rgb clickgui->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
 
+#define colors_secondary3 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary4")->value)
+#define o_colors_secondary3 clickgui->settings.getSettingByName<float>("o_colors_secondary3")->value
+#define colors_secondary3_rgb clickgui->settings.getSettingByName<bool>("colors_secondary4_rgb")->value
+
+#define colors_secondary4 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary3")->value)
+#define o_colors_secondary4 clickgui->settings.getSettingByName<float>("o_colors_secondary4")->value
+#define colors_secondary4_rgb clickgui->settings.getSettingByName<bool>("colors_secondary3_rgb")->value
+
+#define colors_secondary5 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary5")->value)
+#define o_colors_secondary5 clickgui->settings.getSettingByName<float>("o_colors_secondary5")->value
+#define colors_secondary5_rgb clickgui->settings.getSettingByName<bool>("colors_secondary5_rgb")->value
+
+#define colors_secondary6 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary6")->value)
+#define o_colors_secondary6 clickgui->settings.getSettingByName<float>("o_colors_secondary6")->value
+#define colors_secondary6_rgb clickgui->settings.getSettingByName<bool>("colors_secondary6_rgb")->value
+
 #define colors_secondary7 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary7")->value)
 #define o_colors_secondary7 clickgui->settings.getSettingByName<float>("o_colors_secondary7")->value
 #define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
+
+#define colors_secondary8 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary8")->value)
+#define o_colors_secondary8 clickgui->settings.getSettingByName<float>("o_colors_secondary8")->value
+#define colors_secondary8_rgb clickgui->settings.getSettingByName<bool>("colors_secondary8_rgb")->value
+
+#define colors_mod1 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_mod1")->value)
+#define o_colors_mod1 clickgui->settings.getSettingByName<float>("o_colors_mod1")->value
+#define colors_mod1_rgb clickgui->settings.getSettingByName<bool>("colors_mod1_rgb")->value
+
+#define colors_mod2 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_mod2")->value)
+#define o_colors_mod2 clickgui->settings.getSettingByName<float>("o_colors_mod2")->value
+#define colors_mod2_rgb clickgui->settings.getSettingByName<bool>("colors_mod2_rgb")->value
+
+#define colors_mod3 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_mod3")->value)
+#define o_colors_mod3 clickgui->settings.getSettingByName<float>("o_colors_mod3")->value
+#define colors_mod3_rgb clickgui->settings.getSettingByName<bool>("colors_mod3_rgb")->value
+
+#define colors_mod4 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_mod4")->value)
+#define o_colors_mod4 clickgui->settings.getSettingByName<float>("o_colors_mod4")->value
+#define colors_mod4_rgb clickgui->settings.getSettingByName<bool>("colors_mod4_rgb")->value
 
 std::map<std::string, ID2D1Bitmap *> ImagesClass::eimages;
 std::map<int, ID2D1Bitmap *> ImagesClass::images;
@@ -82,9 +126,96 @@ std::unordered_map<std::string, ID2D1Image *> FlarialGUI::cachedBitmaps;
 LRUCache<uint64_t, winrt::com_ptr<IDWriteTextLayout>> FlarialGUI::textLayoutCache(4000);
 LRUCache<UINT32, winrt::com_ptr<IDWriteTextFormat>> FlarialGUI::textFormatCache(300);
 
+LRUCache<std::wstring, std::string> FlarialGUI::fromWideCache(4000);
+LRUCache<std::string, std::wstring> FlarialGUI::toWideCache(4000);
+
 std::unordered_map<int, float> FlarialGUI::additionalY;
 //std::unordered_map<std::string, winrt::com_ptr<ID2D1GradientStopCollection>> FlarialGUI::gradientStopCache;
 LRUCache<uint64_t, winrt::com_ptr<ID2D1LinearGradientBrush>> FlarialGUI::gradientBrushCache(300);
+
+float b_o_colors_text;
+float b_o_colors_enabled;
+float b_o_colors_disabled;
+float b_o_colors_primary1;
+float b_o_colors_primary2;
+float b_o_colors_primary3;
+float b_o_colors_primary4;
+float b_o_colors_secondary1;
+float b_o_colors_secondary2;
+float b_o_colors_secondary3;
+float b_o_colors_secondary4;
+float b_o_colors_secondary5;
+float b_o_colors_secondary6;
+float b_o_colors_secondary7;
+float b_o_colors_secondary8;
+float b_o_colors_mod1;
+float b_o_colors_mod2;
+float b_o_colors_mod3;
+float b_o_colors_mod4;
+
+void FlarialGUI::OverrideAlphaValues(float percent) {
+    b_o_colors_text = o_colors_text;
+    b_o_colors_enabled = o_colors_enabled;
+    b_o_colors_disabled = o_colors_disabled;
+    b_o_colors_primary1 = o_colors_primary1;
+    b_o_colors_primary2 = o_colors_primary2;
+    b_o_colors_primary3 = o_colors_primary3;
+    b_o_colors_primary4 = o_colors_primary4;
+    b_o_colors_secondary1 = o_colors_secondary1;
+    b_o_colors_secondary2 = o_colors_secondary2;
+    b_o_colors_secondary3 = o_colors_secondary3;
+    b_o_colors_secondary4 = o_colors_secondary4;
+    b_o_colors_secondary5 = o_colors_secondary5;
+    b_o_colors_secondary6 = o_colors_secondary6;
+    b_o_colors_secondary7 = o_colors_secondary7;
+    b_o_colors_secondary8 = o_colors_secondary8;
+    b_o_colors_mod1 = o_colors_mod1;
+    b_o_colors_mod2 = o_colors_mod2;
+    b_o_colors_mod3 = o_colors_mod3;
+    b_o_colors_mod4 = o_colors_mod4;
+
+    o_colors_text = percent * b_o_colors_text;
+    o_colors_enabled = percent * b_o_colors_enabled;
+    o_colors_disabled = percent * b_o_colors_disabled;
+    o_colors_primary1 = percent * b_o_colors_primary1;
+    o_colors_primary2 = percent * b_o_colors_primary2;
+    o_colors_primary3 = percent * b_o_colors_primary3;
+    o_colors_primary4 = percent * b_o_colors_primary4;
+    o_colors_secondary1 = percent * b_o_colors_secondary1;
+    o_colors_secondary2 = percent * b_o_colors_secondary2;
+    o_colors_secondary3 = percent * b_o_colors_secondary3;
+    o_colors_secondary4 = percent * b_o_colors_secondary4;
+    o_colors_secondary5 = percent * b_o_colors_secondary5;
+    o_colors_secondary6 = percent * b_o_colors_secondary6;
+    o_colors_secondary7 = percent * b_o_colors_secondary7;
+    o_colors_secondary8 = percent * b_o_colors_secondary8;
+    o_colors_mod1 = percent * b_o_colors_mod1;
+    o_colors_mod2 = percent * b_o_colors_mod2;
+    o_colors_mod3 = percent * b_o_colors_mod3;
+    o_colors_mod4 = percent * b_o_colors_mod4;
+}
+
+void FlarialGUI::ResetOverrideAlphaValues() {
+    o_colors_text = b_o_colors_text;
+    o_colors_enabled = b_o_colors_enabled;
+    o_colors_disabled = b_o_colors_disabled;
+    o_colors_primary1 = b_o_colors_primary1;
+    o_colors_primary2 = b_o_colors_primary2;
+    o_colors_primary3 = b_o_colors_primary3;
+    o_colors_primary4 = b_o_colors_primary4;
+    o_colors_secondary1 = b_o_colors_secondary1;
+    o_colors_secondary2 = b_o_colors_secondary2;
+    o_colors_secondary3 = b_o_colors_secondary3;
+    o_colors_secondary4 = b_o_colors_secondary4;
+    o_colors_secondary5 = b_o_colors_secondary5;
+    o_colors_secondary6 = b_o_colors_secondary6;
+    o_colors_secondary7 = b_o_colors_secondary7;
+    o_colors_secondary8 = b_o_colors_secondary8;
+    o_colors_mod1 = b_o_colors_mod1;
+    o_colors_mod2 = b_o_colors_mod2;
+    o_colors_mod3 = b_o_colors_mod3;
+    o_colors_mod4 = b_o_colors_mod4;
+}
 
 UINT32 ColorValueToUInt(const D3DCOLORVALUE &color) {
     auto r = static_cast<uint8_t>(color.r * 255.0f);
@@ -168,11 +299,15 @@ uint64_t generateUniqueLinearGradientBrushKey(float x, float hexPreviewSize, flo
     return combinedHash;
 }
 
-std::string FlarialGUI::WideToNarrow(const std::wstring& wideStr) {
+std::string WideToNarrow_creator(const std::wstring& wideStr) {
     int narrowStrLen = WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, nullptr, 0, nullptr, nullptr);
     std::vector<char> narrowStr(narrowStrLen);
     WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, narrowStr.data(), narrowStrLen, nullptr, nullptr);
     return std::string(narrowStr.data());
+}
+
+std::string FlarialGUI::WideToNarrow(const std::wstring& wideStr) {
+ return fromWideCache.getOrInsert(WideToNarrow_creator, wideStr, wideStr);
 }
 
 bool FlarialGUI::CursorInRect(float rectX, float rectY, float width, float height) {
@@ -581,7 +716,6 @@ bool ifFontScale2(const float fontSize) {
     return fontSize / 135 > 1;
 }
 
-
 std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
                                      const DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont) {
@@ -631,7 +765,6 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
 
     //std::cout << weightedName << std::endl;
 
-
     float sizeMultiplier = 1.0f;
     if(hasEnding(weightedName, "2.0")) sizeMultiplier = 0.6f;
 
@@ -639,7 +772,9 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
     float fSize = (fontSize / 135) * sizeMultiplier;
 
 	ImGui::SetWindowFontScale(fSize);
-
+    std::string stringText = WideToNarrow(text).c_str();
+    ImVec2 size = ImGui::CalcTextSize(stringText.c_str());
+    std::string fontedName = weightedName + std::to_string(fSize);
 
 
 	switch (alignment) {
@@ -647,23 +782,22 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
 			break;
 
         case DWRITE_TEXT_ALIGNMENT_CENTER: {
-			x += (width / 2) - (ImGui::CalcTextSize(WideToNarrow(text).c_str()).x / 2);
+			x += (width / 2) - (size.x / 2);
 			break;
 		}
 
 		case DWRITE_TEXT_ALIGNMENT_TRAILING: {
-			x += (width - ImGui::CalcTextSize(WideToNarrow(text).c_str()).x);
+			x += (width - size.x);
 			break;
 		}
 	}
 
-    TextSizes[weightedName + std::to_string(fSize)] = ImGui::CalcTextSize(WideToNarrow(text).c_str()).x;
-
-	y += (height / 2) - (ImGui::CalcTextSize(WideToNarrow(text).c_str()).y / 2);
-	ImGui::GetBackgroundDrawList()->AddText(ImVec2(x, y), ImColor(color.r, color.g, color.b, color.a), WideToNarrow(text).c_str());
+    TextSizes[fontedName] = size.x;
+	y += (height / 2) - (size.y / 2);
+	ImGui::GetBackgroundDrawList()->AddText(ImVec2(x, y), ImColor(color.r, color.g, color.b, color.a), stringText.c_str());
 	ImGui::PopFont();
 
-    return weightedName + std::to_string(fSize);
+    return fontedName;
 }
 
 void FlarialGUI::LoadFont(int resourceId) {
@@ -1374,12 +1508,17 @@ void FlarialGUI::CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to) {
     (*to)->CopyFromBitmap(&destPoint, from, &rect);
 }
 
-std::wstring FlarialGUI::to_wide(const std::string &str) {
+std::wstring to_wide_creator(const std::string &str) {
+
     int wchars_num = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, nullptr, 0);
     std::wstring wide;
     wide.resize(wchars_num);
     MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, &wide[0], wchars_num);
     return wide;
+}
+
+std::wstring FlarialGUI::to_wide(const std::string &str) {
+    return toWideCache.getOrInsert(to_wide_creator, str, str);
 }
 
 template<typename T>

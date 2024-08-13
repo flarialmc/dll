@@ -28,7 +28,7 @@ class ComboListener : public Listener {
             return;
 
         auto LP = reinterpret_cast<LocalPlayer *>(event.getActor());
-        if (LP->hurtTime != 0)
+        if (LP->getHurtTime() != 0)
             Combo = 0;
         std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_hit;
         if (duration.count() >= 15) Combo = 0;

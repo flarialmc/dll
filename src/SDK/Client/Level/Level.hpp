@@ -33,11 +33,9 @@ public:
 };
 
 class Level {
-    using troll = std::unordered_map<mcUUID, PlayerListEntry>;
-
 public:
-    troll &getPlayerMap() {
-        return direct_access<troll>(this, GET_OFFSET("Level::getPlayerMap"));
+    std::unordered_map<mcUUID, PlayerListEntry> &getPlayerMap() {
+        return hat::member_at<std::unordered_map<mcUUID, PlayerListEntry>>(this, GET_OFFSET("Level::getPlayerMap"));
     }
 
     HitResult &getHitResult() {

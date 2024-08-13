@@ -23,6 +23,41 @@
 #include "Elements/Structs/HSV.hpp"
 #include <imgui.h>
 
+using namespace DirectX;
+
+struct BlurInputBuffer
+{
+    XMFLOAT2 resolution;
+    XMFLOAT2 offset;
+    XMFLOAT2 halfpixel;
+    XMFLOAT2 _dummy;
+};
+
+
+class Blur
+{
+public:
+
+    static inline ID3D11PixelShader *pUpsampleShader = nullptr;
+    static inline ID3D11PixelShader *pDownsampleShader = nullptr;
+    static inline ID3D11VertexShader *pVertexShader = nullptr;
+    static inline ID3D11InputLayout *pInputLayout = nullptr;
+
+    static inline ID3D11SamplerState *pSampler = nullptr;
+    static inline ID3D11Buffer *pVertexBuffer = nullptr;
+    static inline ID3D11Buffer *pConstantBuffer = nullptr;
+    static inline BlurInputBuffer constantBuffer;
+
+    // RAII
+    static void InitializePipeline();
+    //static void Cleanup();
+
+    static void RenderToRTV(ID3D11RenderTargetView *, ID3D11ShaderResourceView *, XMFLOAT2);
+
+    static void RenderBlur(ID3D11RenderTargetView *, int, float);
+};
+
+
 class Dimension {
 public:
     float x = 0;
@@ -100,6 +135,8 @@ namespace FlarialGUI {
     extern LRUCache<UINT32, winrt::com_ptr<ID2D1SolidColorBrush>> brushCache;
     extern LRUCache<uint64_t, winrt::com_ptr<IDWriteTextLayout>> textLayoutCache;
     extern LRUCache<UINT32, winrt::com_ptr<IDWriteTextFormat>> textFormatCache;
+    extern LRUCache<std::wstring, std::string> fromWideCache;
+    extern LRUCache<std::string, std::wstring> toWideCache;
     //extern std::unordered_map<std::string, winrt::com_ptr<ID2D1GradientStopCollection>> gradientStopCache;
     extern LRUCache<uint64_t, winrt::com_ptr<ID2D1LinearGradientBrush>> gradientBrushCache;
 
@@ -146,8 +183,7 @@ namespace FlarialGUI {
 
     void LoadImageFromFile(const wchar_t *filename, ID2D1Bitmap **bitmap);
 
-    void FlarialText(float x, float y, const wchar_t *text, float width, float height,
-                     DWRITE_TEXT_ALIGNMENT alignment);
+    void FlarialText(float x, float y, const wchar_t *text, float width, float height,DWRITE_TEXT_ALIGNMENT alignment);
 
     void SetScrollView(float x, float y, float width, float height);
 
@@ -190,9 +226,7 @@ namespace FlarialGUI {
 
     bool Toggle(int index, float x, float y, bool isEnabled, bool rgb);
 
-    float Slider(int index, float x, float y, float startingPoint = 50.0f, float maxValue = 100.0f,
-                 float minValue = 0.0f,
-                 bool zerosafe = true);
+    float Slider(int index, float x, float y, float& value, float maxValue = 100.0f, float minValue = 0.0f, bool zerosafe = true);
 
     void Circle(float x, float y, const D2D1_COLOR_F &color, float radius);
 
@@ -210,8 +244,7 @@ namespace FlarialGUI {
 
     std::string ColorFToHex(const D2D1_COLOR_F &color);
 
-    void
-    RoundedHollowRect(float x, float y, float borderWidth, D2D_COLOR_F color, float width,
+    void RoundedHollowRect(float x, float y, float borderWidth, D2D_COLOR_F color, float width,
                       float height, float radiusX,
                       float radiusY);
 
@@ -222,7 +255,7 @@ namespace FlarialGUI {
 
     D2D1::ColorF HSVtoColorF(float H, float s, float v);
 
-    void ColorPicker(const int index, float x, const float y, std::string &hex, bool &rgb);
+    void ColorPicker(const int index, float x, float y, std::string &hex, bool &rgb);
 
     void ColorPickerWindow(int index, std::string &hex, float &opacity, bool &rgb);
 
@@ -260,8 +293,7 @@ namespace FlarialGUI {
 
     void NotifyHeartbeat();
 
-    std::string
-    TextBoxVisual(int index, std::string &text, int limit, float x, float y, const std::string &real = "Text Format");
+    std::string TextBoxVisual(int index, std::string& text, int limit, float x, float y, const std::string& real = "");
 
     winrt::com_ptr<ID2D1SolidColorBrush> getBrush(D2D1_COLOR_F color);
 
@@ -330,4 +362,8 @@ namespace FlarialGUI {
                                      const float imageHeight);
 
     ImColor D2DColorToImColor(D2D1_COLOR_F color);
+
+    void OverrideAlphaValues(float percent);
+
+    void ResetOverrideAlphaValues();
 }

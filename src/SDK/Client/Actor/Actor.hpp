@@ -170,14 +170,13 @@ enum class ActorCategory {
 class Level;
 
 
-
 class Actor {
 public:
-//    BUILD_ACCESS(this, int32_t , bobOffset, 0x98);
-//    BUILD_ACCESS(this, int32_t , Age, 0x98);
-    BUILD_ACCESS(this, int16_t, hurtTime, GET_OFFSET("Actor::hurtTime"));
-    BUILD_ACCESS(this, Level*, level, GET_OFFSET("Actor::level"));
-    BUILD_ACCESS(this, ActorCategory, categories, GET_OFFSET("Actor::categories"));
+    int16_t getHurtTime();
+
+    Level* getLevel();
+
+    ActorCategory getCategories();
 
     template<typename Component>
     Component *tryGet(uintptr_t addr);
@@ -185,8 +184,6 @@ public:
     ItemStack *getArmor(int slot);
 
     MoveInputComponent *getMoveInputHandler();
-
-    bool isAlive();
 
     bool getActorFlag(int flag);
 
@@ -206,8 +203,6 @@ public:
 
     RenderPositionComponent *getRenderPositionComponent();
 
-    bool isValidTarget(Actor *actor);
-
     SimpleContainer *getArmorContainer();
 
     SimpleContainer *getOffhandContainer();
@@ -219,4 +214,6 @@ public:
     StateVectorComponent *getStateVectorComponent();
 
     RuntimeIDComponent *getRuntimeIDComponent();
+
+    bool isValidAABB();
 };

@@ -30,7 +30,7 @@ public:
     void onRender(RenderEvent &event) override {
         int maxFrames = (int)round(module->settings.getSettingByName<float>("intensity2")->value);
 
-        if (SDK::currentScreen == "hud_screen" && !SwapchainHook::queue) {
+        if (SDK::getCurrentScreen() == "hud_screen" && !SwapchainHook::queue) {
             if (previousFrames.size() >= static_cast<int>(maxFrames)) {
                 // Remove excess frames if maxFrames is reduced
                 int framesToRemove = (int)previousFrames.size() - static_cast<int>(maxFrames);
@@ -40,7 +40,8 @@ public:
                 previousFrames.erase(previousFrames.begin(), previousFrames.begin() + framesToRemove);
             }
 
-            previousFrames.push_back(SaveBackbuffer());
+            ID3D11ShaderResourceView* buffer = BackbufferToSRV();
+            if(buffer) previousFrames.push_back(buffer);
 
 
             float alpha = 0.3f;
@@ -74,67 +75,22 @@ public:
         ImGui::SetCursorScreenPos(ImVec2(pos.x + size.x, pos.y));
     }
 
+    static ID3D11ShaderResourceView* BackbufferToSRV() {
 
-    ID3D11ShaderResourceView* SaveBackbuffer()
-    {
-
-        ID3D11DeviceContext* deviceContext;
-        SwapchainHook::d3d11Device->GetImmediateContext(&deviceContext);
-        IDXGISurface1* backBuffer = nullptr;
         HRESULT hr;
-        SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
-
-        ID3D11Texture2D* buffer2D = nullptr;
-        if(FAILED(backBuffer->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&buffer2D)))) std::cout << "failed to get 2d" << std::endl;
-
-        D3D11_TEXTURE2D_DESC desc;
-        buffer2D->GetDesc(&desc);
-
-        ID3D11Texture2D* stageTex = nullptr;
-        D3D11_TEXTURE2D_DESC stageDesc = desc;
-        stageDesc.Usage = D3D11_USAGE_STAGING;
-        stageDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-        stageDesc.BindFlags = 0;
-
-        //desc.Usage = DXGI_USAGE_SHADER_INPUT;
-        HRESULT r = SwapchainHook::d3d11Device->CreateTexture2D(&stageDesc, nullptr, &stageTex);
-        deviceContext->CopyResource(stageTex, buffer2D);
-
-        if (FAILED(r))  std::cout << "Failed to create stage texture: " << std::hex << r << std::endl;
-
-
-        D3D11_TEXTURE2D_DESC defaultDesc = desc;
-        defaultDesc.Usage = D3D11_USAGE_DEFAULT;
-        defaultDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-        defaultDesc.CPUAccessFlags = 0;
-
-        ID3D11Texture2D* defaultTexture = nullptr;
-        hr = SwapchainHook::d3d11Device->CreateTexture2D(&defaultDesc, nullptr, &defaultTexture);
-        if (FAILED(hr)) {
-            std::cout << "Failed to create def texture: " << std::hex << r << std::endl;
-        }
-
-        deviceContext->CopyResource(defaultTexture, stageTex);
-
-        stageTex->Release();
-
         ID3D11ShaderResourceView* outSRV;
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-        srvDesc.Format = desc.Format;
+        srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Texture2D.MipLevels = desc.MipLevels;
+        srvDesc.Texture2D.MipLevels = 1;
         srvDesc.Texture2D.MostDetailedMip = 0;
 
-        if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(defaultTexture, &srvDesc, &outSRV)))
+        if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::GetBackbuffer(), &srvDesc, &outSRV)))
         {
-            std::cout << "Failed to create shader resource view: " << std::hex << hr << std::endl;
+            std::stringstream ss;
+            ss << "0x" << std::hex << std::setw(8) << std::setfill('0') << hr;
+            Logger::error("Failed to create shader resource view: " + ss.str());
         }
-
-        //if(outSRV) std::cout << "Wroekd" << std::endl;
-
-        backBuffer->Release();
-        buffer2D->Release();
-        defaultTexture->Release();
 
         return outSRV;
     }
@@ -309,8 +265,7 @@ void InitializeRenderResources(ID3D11Device* device)
     void RenderSRV(ID3D11ShaderResourceView* srv, float width, float height, float opacity)
 {
 
-    ID3D11DeviceContext* context;
-    SwapchainHook::d3d11Device->GetImmediateContext(&context);
+    ID3D11DeviceContext* context = SwapchainHook::context;
 
 
     context->OMSetRenderTargets(1, &gRTV, gDSV);
@@ -353,6 +308,6 @@ void InitializeRenderResources(ID3D11Device* device)
     //context->OMSetRenderTargets(1, nullptr, nullptr);
 
 
-    std::cout << "trolled" << std::endl;
+    context->Release();
  }
 };

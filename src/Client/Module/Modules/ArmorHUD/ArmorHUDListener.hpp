@@ -10,6 +10,7 @@
 #include "../../../../SDK/SDK.hpp"
 #include "../../../../SDK/Client/Render/BaseActorRenderContext.hpp"
 #include "../../../../SDK/Client/Render/ItemRenderer.hpp"
+#include "../../../../Utils/Render/PositionUtils.hpp"
 #include <Windows.h>
 #include <chrono>
 
@@ -20,33 +21,15 @@ public:
     Vec2<float> currentPos;
     bool enabled = false;
     int durabilities[5][2] = {
-        {0,0},
-        {0,0},
-        {0,0},
-        {0,0},
-        {0,0}
+            {0,0},
+            {0,0},
+            {0,0},
+            {0,0},
+            {0,0}
     };
     // TODO: delete testing variables (or adjust and delete)
     Vec2<float> testOffset = Vec2<float>{4,0};
     float testSpacing = 15;
-
-    [[nodiscard]] Vec2<float> convert() const {
-
-        auto e = SDK::clientInstance->guiData;
-        Vec2<float> xd = Vec2<float>(e->ScreenSize.x, e->ScreenSize.y);
-        Vec2<float> LOL = Vec2<float>(e->ScreenSizeScaled.x, e->ScreenSizeScaled.y);
-
-        return Vec2<float>{currentPos.x * (LOL.x / xd.x), currentPos.y * (LOL.y / xd.y)};
-    }
-
-    [[nodiscard]] Vec2<float> convert(Vec2<float> pos) {
-
-        auto e = SDK::clientInstance->guiData;
-        Vec2<float> LOL = Vec2<float>(e->ScreenSize.x, e->ScreenSize.y);
-        Vec2<float> xd = Vec2<float>(e->ScreenSizeScaled.x, e->ScreenSizeScaled.y);
-        float scale = module->settings.getSettingByName<float>("uiscale")->value;
-        return Vec2<float>{pos.x * (LOL.x / xd.x) * scale, pos.y * (LOL.y / xd.y) * scale};
-    }
 
     // TODO: Make it look better
     void renderDurability() {
@@ -67,18 +50,18 @@ public:
 
         if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr)
-                if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
+                if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
 
                     auto vertical = module->settings.getSettingByName<bool>("vertical")->value;
 
                     float spacing = testSpacing;
-                    spacing = convert(Vec2<float>{spacing, spacing}).x;
+                    spacing = PositionUtils::getScaledPos(Vec2<float>{spacing, spacing}).x;
 
-                    if (SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(
-                            SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot)->getItem() !=
+                    if (SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory->getItem(
+                            SDK::clientInstance->getLocalPlayer()->getSupplies()->SelectedSlot)->getItem() !=
                         nullptr) {
-                        auto currentItem = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(
-                                SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot);
+                        auto currentItem = SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory->getItem(
+                                SDK::clientInstance->getLocalPlayer()->getSupplies()->SelectedSlot);
 
                         std::string text;
 
@@ -135,31 +118,37 @@ public:
 
                             std::string text;
 
-                            if (module->settings.getSettingByName<bool>("percent")->value)
-                                text = std::to_string((int)std::round((float)durabilities[i][0] / (float)durabilities[i][1]  * 100))+"%";
-                            else
-                                text = std::to_string(durabilities[i][0]) + "/" + std::to_string(durabilities[i][1]);
+                            if (durabilities[i][1] != 0) { // for some servers with custom items with max durability of 0
+                                if (module->settings.getSettingByName<bool>("percent")->value)
+                                    text = std::to_string((int) std::round(
+                                            (float) durabilities[i][0] / (float) durabilities[i][1] * 100)) + "%";
+                                else
+                                    text = std::to_string(durabilities[i][0]) + "/" +
+                                           std::to_string(durabilities[i][1]);
 
-                            std::wstring widestr = std::wstring(text.begin(), text.end());
 
-                            const wchar_t *widecstr = widestr.c_str();
+                                std::wstring widestr = std::wstring(text.begin(), text.end());
 
-                            D2D1_COLOR_F color = mainColor;
+                                const wchar_t *widecstr = widestr.c_str();
 
-                            if (module->settings.getSettingByName<bool>("color")->value){
-                                if(std::round((float)durabilities[i][0] / (float)durabilities[i][1] * 100) <= 15){
-                                    color = lowColor;
-                                } else {
-                                    color = fullColor;
+                                D2D1_COLOR_F color = mainColor;
+
+                                if (module->settings.getSettingByName<bool>("color")->value) {
+                                    if (std::round((float) durabilities[i][0] / (float) durabilities[i][1] * 100) <=
+                                        15) {
+                                        color = lowColor;
+                                    } else {
+                                        color = fullColor;
+                                    }
                                 }
-                            }
 
-                            FlarialGUI::FlarialTextWithFont(
-                                    currentPos.x + xmodifier + xoffset + testOffset.x,
-                                    currentPos.y + ymodifier + yoffset + testOffset.y, widecstr, textWidth * 6.9f,
-                                    textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                    textWidth,
-                                    DWRITE_FONT_WEIGHT_NORMAL, color, false);
+                                FlarialGUI::FlarialTextWithFont(
+                                        currentPos.x + xmodifier + xoffset + testOffset.x,
+                                        currentPos.y + ymodifier + yoffset + testOffset.y, widecstr, textWidth * 6.9f,
+                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        textWidth,
+                                        DWRITE_FONT_WEIGHT_NORMAL, color, false);
+                            }
                         }
                     }
                 }
@@ -222,32 +211,48 @@ public:
                 renderDurability();
         }
 
-        if (SDK::currentScreen != "hud_screen") ClickGUIRenderer::editmenu = false;
+        if (SDK::getCurrentScreen() != "hud_screen") ClickGUIRenderer::editmenu = false;
     }
 
     void onSetupAndRender(SetupAndRenderEvent &event) override {
+        if(this->module->isEnabled())
         if (ClientInstance::getTopScreenName() == "hud_screen") {
             auto muirc = event.getMuirc();
-            BaseActorRenderContext barc(muirc->screenContext, muirc->clientInstance,
-                                        muirc->clientInstance->mcgame);
+            BaseActorRenderContext barc(muirc->getScreenContext(), muirc->getClientInstance(),
+                                        muirc->getClientInstance()->getMinecraftGame());
 
-            Vec2<float> convert = this->convert();
+            Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
+
             if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
                 if (SDK::clientInstance->getLocalPlayer() != nullptr)
-                    if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
-                        if (SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(
-                                SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot)->getItem() !=
+                    if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
+                        if (SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory->getItem(
+                                SDK::clientInstance->getLocalPlayer()->getSupplies()->SelectedSlot)->getItem() !=
                             nullptr) {
-                            auto item = SDK::clientInstance->getLocalPlayer()->playerInventory->inventory->getItem(
-                                    SDK::clientInstance->getLocalPlayer()->playerInventory->SelectedSlot);
-                            durabilities[0][1] = item->getMaxDamage();
-                            durabilities[0][0] = durabilities[0][1] - item->getDamageValue();
+                            auto item = SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory->getItem(
+                                    SDK::clientInstance->getLocalPlayer()->getSupplies()->SelectedSlot);
+
+                            auto maxDamage = item->getMaxDamage();
+                            auto durabilityLeft = maxDamage - item->getDamageValue();
+
+                            durabilities[0][1] = maxDamage;
+                            durabilities[0][0] = durabilityLeft;
+
                             barc.itemRenderer->renderGuiItemNew(&barc,
                                                                 item,
-                                                                0, convert.x, convert.y, 1.0f,
+                                                                0, scaledPos.x, scaledPos.y, 1.0f,
                                                                 module->settings.getSettingByName<float>(
                                                                         "uiscale")->value,
                                                                 false);
+
+                            if(item->isEnchanted()) {
+                                barc.itemRenderer->renderGuiItemNew(&barc,
+                                                                    item,
+                                                                    0, scaledPos.x, scaledPos.y, 1.0f,
+                                                                    module->settings.getSettingByName<float>(
+                                                                            "uiscale")->value,
+                                                                    true);
+                            }
                         }
 
 
@@ -261,20 +266,32 @@ public:
                             if (module->settings.getSettingByName<bool>("vertical")->value) ymodifier += spacing;
                             else xmodifier += spacing;
 
-                            if (SDK::clientInstance->getLocalPlayer()->getArmor(i-1)->getItem() != nullptr) {
-                                durabilities[i][1] = SDK::clientInstance->getLocalPlayer()->getArmor(i-1)->getMaxDamage();
-                                durabilities[i][0] = durabilities[i][1] -
-                                                     SDK::clientInstance->getLocalPlayer()->getArmor(
-                                                             i-1)->getDamageValue();
+                            auto armorSlot = SDK::clientInstance->getLocalPlayer()->getArmor(i-1);
 
+                            if (armorSlot->getItem() != nullptr) {
 
-                                convert = this->convert();
+                                auto maxDamage = armorSlot->getMaxDamage();
+                                auto durabilityLeft = maxDamage - armorSlot->getDamageValue();
+
+                                durabilities[i][1] = maxDamage;
+                                durabilities[i][0] = durabilityLeft;
+
                                 barc.itemRenderer->renderGuiItemNew(&barc,
-                                                                    SDK::clientInstance->getLocalPlayer()->getArmor(i-1),
+                                                                    armorSlot,
                                                                     0,
-                                                                    convert.x + xmodifier, convert.y + ymodifier, 1.0f,
+                                                                    scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
                                                                     module->settings.getSettingByName<float>(
                                                                             "uiscale")->value, false);
+
+                                if(armorSlot->isEnchanted()) {
+                                    barc.itemRenderer->renderGuiItemNew(&barc,
+                                                                        armorSlot,
+                                                                        0,
+                                                                        scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
+                                                                        module->settings.getSettingByName<float>(
+                                                                                "uiscale")->value,
+                                                                        true);
+                                }
                             }
                         }
                     }

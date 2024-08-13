@@ -85,8 +85,7 @@ public:
         Vec2<float> allahuakbar = Constraints::CenterConstraint(allahu, akbar, "y", 1.175, 1.175);
         // TODO: add inventory screen to onRender?
         // watermark
-        if (ClientInstance::getTopScreenName() == "inventory_screen" ||
-            SDK::currentScreen.find("chest") != std::string::npos)
+        if (SDK::getCurrentScreen() == "inventory_screen" || SDK::getCurrentScreen().find("chest") != std::string::npos)
             if (Client::settings.getSettingByName<bool>("watermark")->value)
                 FlarialGUI::image(IDR_FLARIAL_TITLE_PNG,
                                   D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
@@ -117,26 +116,19 @@ public:
 
         }
 
-        //if (realBlurAmount > 0.1) FlarialGUI::AllahBlur(realBlurAmount);
-
-
         if (SwapchainHook::init && baseHeightActual > 0.1) {
 
             /* Base Rectangle Start */
 
-            float baseWidth = Constraints::RelativeConstraint(0.85);
+            float baseWidth = Constraints::RelativeConstraint(0.81);
 
             if (module->active) {
-                if (ClickGUIRenderer::page.type == "settings" || curr == "settings") {
 
-                    FlarialGUI::lerp(baseHeightReal, 0.50f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+                FlarialGUI::lerp(baseHeightReal, 0.64f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
 
-                    //FadeEffect::ApplyFadeOutEffect(0.015f * FlarialGUI::frameFactor, baseHeightReal, 0.35f);
-                } else {
-                    FlarialGUI::lerp(baseHeightReal, 0.64f, 0.28f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
-                    //FadeEffect::ApplyFadeInEffect(0.015f * FlarialGUI::frameFactor, 0.64f, baseHeightReal);
-                }
             }
+
+            Blur::RenderBlur(event.RTV, 3, realBlurAmount/4);
 
             float baseHeight = Constraints::RelativeConstraint(baseHeightReal);
 
@@ -161,10 +153,10 @@ public:
 
             /* Nav Bar Start */
 
-            float navigationBarWidth = Constraints::RelativeConstraint(1.293f);
-            float navigationBarHeight = Constraints::RelativeConstraint(0.134f);
+            float navigationBarWidth = Constraints::RelativeConstraint(1.235f);
+            float navigationBarHeight = Constraints::RelativeConstraint(0.124f);
             float navx = Constraints::PercentageConstraint(0.013f, "left");
-            float navy = Constraints::PercentageConstraint(0.016f, "top");
+            float navy = Constraints::PercentageConstraint(0.019f, "top");
             round = Constraints::RoundingConstraint(28, 28);
 
             D2D1_COLOR_F navColor = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
@@ -196,7 +188,7 @@ public:
 
             /* tab buttons start */
 
-            float shit = Constraints::RelativeConstraint(0.395f);
+            float shit = Constraints::RelativeConstraint(0.448f);
 
             float RadioButtonWidth = Constraints::RelativeConstraint(0.134, "width");
             float RadioButtonHeight = shit;
@@ -255,7 +247,7 @@ public:
             }
 
 
-            logoWidth = Constraints::RelativeConstraint(0.243f);
+            logoWidth = shit * 0.625f;
 
             radioX += Constraints::SpacingConstraint(0.29f, logoWidth);
             radioY += Constraints::SpacingConstraint(0.29f, logoWidth);
@@ -267,7 +259,7 @@ public:
 
             // radiobutton of settings
 
-            radioX = navx - Constraints::SpacingConstraint(-0.85f, logoWidth);
+            radioX = navx - Constraints::SpacingConstraint(-0.36f, logoWidth);
             radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
 
             if(ClickGUIRenderer::curr != "settings") {
@@ -310,7 +302,7 @@ public:
 
             // radiobutton of editmenu
 
-            radioX = navx - Constraints::SpacingConstraint(-0.85f, logoWidth);
+            radioX = navx - Constraints::SpacingConstraint(-0.36f, logoWidth);
             radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
 
             radioPushAmount2 = Constraints::SpacingConstraint(0.9f * 5.69f, logoWidth) + width1 + width2;
@@ -360,7 +352,7 @@ public:
                     float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
                     float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
 
-                    Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.63,
+                    Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.58,
                                                                           -0.52);
 
                     FlarialGUI::PushSize(center.x, center.y, baseWidth,
@@ -420,7 +412,7 @@ public:
                                 name.find(search) != std::string::npos) {
                                 ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, pModule,
                                                           pModule->icon, i, visible);
-                                xModifier += Constraints::SpacingConstraint(1.09, modWidth);
+                                xModifier += Constraints::SpacingConstraint(1.02f, modWidth);
                                 if ((++i % 3) == 0) {
                                     yModifier += Constraints::SpacingConstraint(0.8, modWidth);
                                     xModifier = 0.0f;
@@ -430,7 +422,7 @@ public:
                             ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, pModule,
                                                       pModule->icon, i, visible);
 
-                            xModifier += Constraints::SpacingConstraint(1.09, modWidth);
+                            xModifier += Constraints::SpacingConstraint(1.02f, modWidth);
                             if ((++i % 3) == 0) {
                                 yModifier += Constraints::SpacingConstraint(0.8, modWidth);
                                 xModifier = 0.0f;
@@ -459,7 +451,7 @@ public:
                     float rectX = Constraints::PercentageConstraint(0.01, "left");
                     float rectY = Constraints::PercentageConstraint(0.20, "top");
                     float rectWidth = Constraints::RelativeConstraint(0.965, "width");
-                    float rectHeight = Constraints::RelativeConstraint(0.755);
+                    float rectHeight = Constraints::RelativeConstraint(0.6);
 
                     float scrollWidth = Constraints::RelativeConstraint(1.12);
                     float scrollHeight = Constraints::RelativeConstraint(1.3);
@@ -469,7 +461,7 @@ public:
                     const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
                     round = Constraints::RoundingConstraint(50, 50);
 
-                    float anotherRectHeight = Constraints::RelativeConstraint(0.785);
+                    float anotherRectHeight = Constraints::RelativeConstraint(0.6);
                     float anotherRectWidth = Constraints::RelativeConstraint(0.981, "width");
 
                     D2D1_COLOR_F iRanOutOfNamesToCallTheseColors = colors_secondary2_rgb ? FlarialGUI::rgbColor
@@ -749,14 +741,14 @@ public:
 
                 FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
 
-                float rectX = Constraints::PercentageConstraint(0.01, "left");
-                float rectY = Constraints::PercentageConstraint(0.20, "top");
+                float rectX = Constraints::PercentageConstraint(0.015, "left");
+                float rectY = Constraints::PercentageConstraint(0.167, "top");
                 float rectWidth = Constraints::RelativeConstraint(0.965, "width");
-                float rectHeight = Constraints::RelativeConstraint(0.755);
-                round = Constraints::RoundingConstraint(50, 50);
+                float rectHeight = Constraints::RelativeConstraint(0.85);
+                round = Constraints::RoundingConstraint(38.f, 38.5f);
 
-                float anotherRectHeight = Constraints::RelativeConstraint(0.785);
-                float anotherRectWidth = Constraints::RelativeConstraint(0.981, "width");
+                float anotherRectHeight = Constraints::RelativeConstraint(0.8105);
+                float anotherRectWidth = Constraints::RelativeConstraint(0.972, "width");
 
                 D2D1_COLOR_F colorThing = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
                 colorThing.a = o_colors_secondary2;
@@ -769,12 +761,6 @@ public:
 
                 D2D1_COLOR_F textCol = colors_text_rgb ? FlarialGUI::rgbColor : colors_text;
                 textCol.a = o_colors_text;
-
-                round = Constraints::RoundingConstraint(40, 40);
-                FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth),
-                                        rectY + Constraints::SpacingConstraint(0.01, rectWidth),
-                                        bruv, rectWidth,
-                                        rectHeight, round.x, round.x);
 
                 FlarialGUI::PopSize();
 
@@ -811,7 +797,7 @@ public:
 
 
                     if (FlarialGUI::RoundedButton(0, spacingX + centered.first + rectX,
-                                                  thingYes.second + rectHeight + rectY + Constraints::RelativeConstraint(0.09), colorThing, textCol, L"Reset",
+                                                  thingYes.second + rectHeight + rectY - Constraints::RelativeConstraint(0.06f), colorThing, textCol, L"Reset",
                                                   buttonWidth, buttonHeight, round.x, round.x)) {
                         auto currentModule = ModuleManager::getModule(ClickGUIRenderer::page.module);
                         bool wasEnabled = module->isEnabled();
@@ -824,7 +810,7 @@ public:
 
 
                     if (FlarialGUI::RoundedButton(1, -spacingX + centered.first + rectX + childWidth - buttonWidth,
-                                                  thingYes.second + rectHeight + rectY + Constraints::RelativeConstraint(0.09), colorThing, textCol,
+                                                  thingYes.second + rectHeight + rectY - Constraints::RelativeConstraint(0.06f), colorThing, textCol,
                                                   L"Copy From", buttonWidth, buttonHeight, round.x, round.x)) {
 
                     }
@@ -841,7 +827,7 @@ public:
         //TODO: MAKE module->setActive() module->isActive() module->isRestricted()
 
         if (module->isKeybind(event.keys) && module->isKeyPartOfKeybind(event.key) && event.getAction() == (int)ActionType::Pressed) {
-            if (SDK::currentScreen != "hud_screen" && SDK::currentScreen != "pause_screen")
+            if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen")
                 module->active = false;
             else {
                 module->active = !module->active;
@@ -928,7 +914,7 @@ public:
 
         }
 
-        if (module->active || editmenu && SDK::currentScreen == "hud_screen")
+        if (module->active || editmenu && SDK::getCurrentScreen() == "hud_screen")
             SDK::clientInstance->releaseMouse(); // release mouse lets cursor move
 
         if (module->active || editmenu)
@@ -938,12 +924,12 @@ public:
     }
 
     void onMouse(MouseEvent &event) override {
-        if(SDK::currentScreen != "hud_screen"){
+        if(SDK::getCurrentScreen() != "hud_screen"){
             if(module->active)
                 module->active = false;
         }
 
-        if ((module->active || editmenu) && SDK::currentScreen == "hud_screen")
+        if ((module->active || editmenu) && SDK::getCurrentScreen() == "hud_screen")
             event.cancel(); // TODO: modules dont listen for canceled state!!!
 
     }
