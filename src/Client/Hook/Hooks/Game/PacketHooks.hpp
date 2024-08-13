@@ -24,6 +24,9 @@ private:
     static void receiveCallbackEntityEvent(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
                                            const std::shared_ptr<Packet>& packet);
 
+    static void receiveCallbackChangeDimension(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
+                                           const std::shared_ptr<Packet>& packet);
+    
 public:
 
     static inline void* NetworkIdentifier;
@@ -40,7 +43,8 @@ public:
     static inline receive receiveSetTitlePacketOriginal = nullptr;
     static inline receive receivePacketPlaySoundOriginal = nullptr;
     static inline receive receivePacketEntityEventOriginal = nullptr;
-
+    static inline receive receivePacketChangeDimensionOriginal = nullptr;
+    
     SendPacketHook() : Hook("sendPacket", GET_SIG("LoopbackPacketSender::sendPacket")) {}
 
     void enableHook() override;

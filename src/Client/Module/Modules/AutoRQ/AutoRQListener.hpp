@@ -32,8 +32,10 @@
 class AutoRQListener : public Listener {
     Module *module;
 
-    std::string currentGame;
-    bool triggered = false;
+    std::string gamemode = "";
+    bool connection_triggered = false;
+    bool chs = false;
+    bool queue_triggered = false;
 
     inline void ltrim(std::string &s) {
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
@@ -51,19 +53,8 @@ class AutoRQListener : public Listener {
                 if (pkt->text == "§cYou're a spectator!" ||
                     pkt->text == "§cYou died!" ||
                     pkt->text == "§7You're spectating the §as§eh§6o§cw§7!") {
-                    triggered = true;
-                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-
-                    command_packet->command = "/connection";
-
-                    command_packet->origin.type = CommandOriginType::Player;
-
-                    command_packet->InternalSource = true;
-
-                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-
-                } //std::cout << pkt->mName << std::endl;
+                    queue_triggered = true;
+                }
             }
         }
         if (id == MinecraftPacketIds::PlaySoundA) {
@@ -71,19 +62,8 @@ class AutoRQListener : public Listener {
                 auto *pkt = reinterpret_cast<PlaySoundPacket *>(event.getPacket());
 
                 if (pkt->mName == "hive.grav.game.portal.reached.final") {
-                    triggered = true;
-                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-
-                    command_packet->command = "/connection";
-
-                    command_packet->origin.type = CommandOriginType::Player;
-
-                    command_packet->InternalSource = true;
-
-                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-
-                } //std::cout << pkt->mName << std::endl;
+                    queue_triggered = true;
+                }
             }
         }
         if (id == MinecraftPacketIds::Text) {
@@ -91,20 +71,9 @@ class AutoRQListener : public Listener {
                 auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
                 if (pkt->message == "§c§l» §r§c§lMurderer") {
-                    triggered = true;
                     FlarialGUI::Notify("Found role Murderer");
-                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-
-                    command_packet->command = "/connection";
-
-                    command_packet->origin.type = CommandOriginType::Player;
-
-                    command_packet->InternalSource = true;
-
-                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-                    
-                } //std::cout << pkt->mName << std::endl;
+                    queue_triggered = true;
+                }
             }
         }
         if (id == MinecraftPacketIds::Text) {
@@ -112,20 +81,9 @@ class AutoRQListener : public Listener {
                 auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
                 if (pkt->message == "§9§l» §r§9§lSheriff") {
-                    triggered = true;
                     FlarialGUI::Notify("Found role Sheriff");
-                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-
-                    command_packet->command = "/connection";
-
-                    command_packet->origin.type = CommandOriginType::Player;
-
-                    command_packet->InternalSource = true;
-
-                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-
-                } //std::cout << pkt->mName << std::endl;
+                    queue_triggered = true;
+                }
             }
         }
         if (id == MinecraftPacketIds::Text) {
@@ -133,20 +91,9 @@ class AutoRQListener : public Listener {
                 auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
                 if (pkt->message == "§a§l» §r§a§lInnocent") {
-                    triggered = true;
                     FlarialGUI::Notify("Found role Innocent");
-                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-
-                    command_packet->command = "/connection";
-
-                    command_packet->origin.type = CommandOriginType::Player;
-
-                    command_packet->InternalSource = true;
-
-                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-
-                } //std::cout << pkt->mName << std::endl;
+                    queue_triggered = true;
+                }
             }
         }
         if (id == MinecraftPacketIds::Text) {
@@ -154,20 +101,9 @@ class AutoRQListener : public Listener {
                 auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
                 if (pkt->message == "§d§l» §r§bYou are a §cDeath") {
-                    triggered = true;
                     FlarialGUI::Notify("Found role Death");
-                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-
-                    command_packet->command = "/connection";
-
-                    command_packet->origin.type = CommandOriginType::Player;
-
-                    command_packet->InternalSource = true;
-
-                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-
-                } //std::cout << pkt->mName << std::endl;
+                    queue_triggered = true;
+                }
             }
         }
         if (id == MinecraftPacketIds::Text) {
@@ -175,20 +111,9 @@ class AutoRQListener : public Listener {
                 auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
                 if (pkt->message == "§d§l» §r§bYou are a §aRunner") {
-                    triggered = true;
                     FlarialGUI::Notify("Found role Runner");
-                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-
-                    command_packet->command = "/connection";
-
-                    command_packet->origin.type = CommandOriginType::Player;
-
-                    command_packet->InternalSource = true;
-
-                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-
-                } //std::cout << pkt->mName << std::endl;
+                    queue_triggered = true;
+                }
             }
         }
         if (id == MinecraftPacketIds::Text) {
@@ -196,20 +121,9 @@ class AutoRQListener : public Listener {
                 auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
                 if (pkt->message == "§e§l» §rYou are a §eHIDER") {
-                    triggered = true;
                     FlarialGUI::Notify("Found role Hider");
-                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-
-                    command_packet->command = "/connection";
-
-                    command_packet->origin.type = CommandOriginType::Player;
-
-                    command_packet->InternalSource = true;
-
-                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-
-                } //std::cout << pkt->mName << std::endl;
+                    queue_triggered = true;
+                }
             }
         }
         if (id == MinecraftPacketIds::Text) {
@@ -217,20 +131,9 @@ class AutoRQListener : public Listener {
                 auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
                 if (pkt->message == "§c§l» §rYou are a §cSEEKER") {
-                    triggered = true;
                     FlarialGUI::Notify("Found role Seeker");
-                    std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                    auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-
-                    command_packet->command = "/connection";
-
-                    command_packet->origin.type = CommandOriginType::Player;
-
-                    command_packet->InternalSource = true;
-
-                    SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-
-                } //std::cout << pkt->mName << std::endl;
+                    queue_triggered = true;
+                }
             }
         }
         if (id == MinecraftPacketIds::Text) {
@@ -255,14 +158,8 @@ class AutoRQListener : public Listener {
                         std::transform(evaluate_string.begin(), evaluate_string.end(), evaluate_string.begin(), ::tolower);
                         std::transform(pkt->message.begin(), pkt->message.end(), pkt->message.begin(), ::tolower);
                         if (pkt->message.substr(0, (evaluate_string.length())) == evaluate_string)  { 
-                            triggered = true;
                             FlarialGUI::Notify("Found map: " + result[i]);
-                            std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                            auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-                            command_packet->command = "/connection";
-                            command_packet->origin.type = CommandOriginType::Player;
-                            command_packet->InternalSource = true;
-                            SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+                            queue_triggered = true;
                         }
                     }
                 }
@@ -272,9 +169,32 @@ class AutoRQListener : public Listener {
             auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
             //if(!module->settings.getSettingByName<bool>("solo")->value) {
                 if (pkt->message == "§c§l» §r§c§lGame OVER!") {
-                    triggered = true;
+                    queue_triggered = true;
+                }
+            //}
+
+            std::string textToCheck = "You are connected to server name ";
+            std::string textToCheckToSilence = "You are connected";
+
+            if (pkt->message.find(textToCheck) != std::string::npos && connection_triggered) {
+                std::string server = pkt->message.replace(0, textToCheck.length(), "");
+                std::regex pattern("\\d+");
+                gamemode = std::regex_replace(server, pattern, "");
+                connection_triggered = false;
+                //FlarialGUI::Notify("Detecting gamemode " + gamemode);
+                event.cancel();
+            }
+            else if (pkt->message.find(textToCheckToSilence) != std::string::npos) {
+                event.cancel();
+            }
+        }
+        if (id == MinecraftPacketIds::ChangeDimension) {
+            if(chs){
+                std::thread ts([this]() {
                     std::shared_ptr<Packet> packet = SDK::createPacket(77);
                     auto *command_packet = reinterpret_cast<CommandRequestPacket *>(packet.get());
+
+                    connection_triggered = true;
 
                     command_packet->command = "/connection";
 
@@ -283,60 +203,46 @@ class AutoRQListener : public Listener {
                     command_packet->InternalSource = true;
 
                     SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-                    return;
-                } //std::cout << pkt->mName << std::endl;
-            //}
+                    chs = false;
+                });
+                ts.detach();
+            }else{
+                chs = true;
 
-            std::string textToCheck = "You are connected to server name ";
-            std::string textToCheckToSilence = "You are connected";
-
-            if (pkt->message.find(textToCheck) != std::string::npos && triggered) {
-                if(!module->settings.getSettingByName<bool>("hub")->value){
-                    std::string server = pkt->message.replace(0, textToCheck.length(), "");
-                    std::regex pattern("\\d+");
-                    std::string name = std::regex_replace(server, pattern, "");
-                    FlarialGUI::Notify("Preparing Q: " + name);
-                    std::thread t([name]() {
-                        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-                        FlarialGUI::Notify("Executing command /q " + name);
-
-                        std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                        auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-                        command_packet->command = "/q " + name;
-
-                        command_packet->origin.type = CommandOriginType::Player;
-
-                        command_packet->InternalSource = true;
-                        SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-                    });
-                    t.detach();
-                    triggered = false;
-                    pkt->message = "";
-                }
-                else{
-                    std::thread h([]() {
-                        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                        FlarialGUI::Notify("Executing command /hub");
-                        std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                        auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-
-                        command_packet->command = "/hub";
-
-                        command_packet->origin.type = CommandOriginType::Player;
-
-                        command_packet->InternalSource = true;
-
-                        SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-                    });
-                    h.detach();
-                    triggered = false;
-                    pkt->message = "";
-                }
             }
-            else if (pkt->message.find(textToCheckToSilence) != std::string::npos) {
-                event.cancel();
+        }
+        if (queue_triggered == true){
+            if(module->settings.getSettingByName<bool>("hub")->value){
+            queue_triggered = false;
+            std::shared_ptr<Packet> packet = SDK::createPacket(77);
+            auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
+
+            FlarialGUI::Notify("Executing command /hub");
+
+            command_packet->command = "/hub";
+
+            command_packet->origin.type = CommandOriginType::Player;
+
+            command_packet->InternalSource = true;
+
+            SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
             }
+            else{
+            queue_triggered = false;
+            std::shared_ptr<Packet> packet = SDK::createPacket(77);
+            auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
+
+            FlarialGUI::Notify("Re queuing into " + gamemode);
+
+            command_packet->command = "/q " + gamemode;
+
+            command_packet->origin.type = CommandOriginType::Player;
+
+            command_packet->InternalSource = true;
+
+            SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+            }
+
         }
     }
 

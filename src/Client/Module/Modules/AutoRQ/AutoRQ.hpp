@@ -237,4 +237,3 @@ public:
         FlarialGUI::UnsetScrollView();
     }
 };
-
