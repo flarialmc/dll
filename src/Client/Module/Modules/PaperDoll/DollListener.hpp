@@ -95,7 +95,7 @@ public:
 
 
                     if (module->settings.getSettingByName<bool>("alwaysshow")->value || ClickGUIRenderer::editmenu) {
-                        auto component = reinterpret_cast<CustomRenderComponent*>(control->components[4].get());
+                        auto component = reinterpret_cast<CustomRenderComponent*>(control->getComponents()[4].get());
                         component->renderer->state = 1.0f;
                     }
 

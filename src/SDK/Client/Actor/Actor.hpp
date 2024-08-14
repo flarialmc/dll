@@ -186,8 +186,6 @@ public:
 
     MoveInputComponent *getMoveInputHandler();
 
-    bool isAlive();
-
     bool getActorFlag(int flag);
 
     bool canSee(const Actor& actor);
@@ -206,8 +204,6 @@ public:
 
     RenderPositionComponent *getRenderPositionComponent();
 
-    bool isValidTarget(Actor *actor);
-
     SimpleContainer *getArmorContainer();
 
     SimpleContainer *getOffhandContainer();
@@ -219,4 +215,10 @@ public:
     StateVectorComponent *getStateVectorComponent();
 
     RuntimeIDComponent *getRuntimeIDComponent();
+
+    uint64_t getRuntimeID();
+
+    int64_t* getActorFlags();
+
+    bool isValidAABB();
 };

@@ -142,7 +142,9 @@ void ModuleManager::initialize() {
     ModuleManager::addModule(new SpeedDisplay());
     ModuleManager::addModule(new CPSLimiter());
     ModuleManager::addModule(new BlockBreakIndicator());
-    ModuleManager::addModule(new Animations());
+    if(!WinrtUtils::check(21,20)) { // TODO
+        ModuleManager::addModule(new Animations());
+    }
     ModuleManager::addModule(new BlockOutline());
     ModuleManager::addModule(new CommandHotkey());
     ModuleManager::addModule(new NoHurtCam());

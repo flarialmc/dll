@@ -59,8 +59,10 @@ private:
                              "drawText");
         }
 
-        if (oDrawImage == nullptr) {
-            Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour, (void **) &oDrawImage, "DrawImage");
+        if(!WinrtUtils::check(21,20)) { // TODO
+            if (oDrawImage == nullptr) {
+                Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour, (void **) &oDrawImage, "DrawImage");
+            }
         }
     }
 
@@ -93,7 +95,9 @@ private:
         }
 
         FrameTransform transform = { SDK::clientInstance->getviewMatrix(), origin, SDK::clientInstance->getFov(), pos};
+        SwapchainHook::frameTransformsMtx.lock();
         SwapchainHook::FrameTransforms.push(transform);
+        SwapchainHook::frameTransformsMtx.unlock();
 
         if(layer == "debug_screen" || layer == "hud_screen" || layer == "start_screen") {
             SetupAndRenderEvent event(muirc);

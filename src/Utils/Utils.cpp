@@ -391,3 +391,16 @@ bool Utils::CursorInEllipse(float ellipseX, float ellipseY, float radiusX, float
 
     return (normalizedX * normalizedX + normalizedY * normalizedY) <= 1.0f;
 }
+
+int Utils::CountBytes(const std::string& data) {
+    std::istringstream iss(data);
+    int count = 0;
+    std::string byte;
+
+    while (iss >> byte) {
+        count++;
+    }
+
+    return count;
+}
+

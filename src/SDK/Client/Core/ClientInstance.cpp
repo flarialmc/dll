@@ -3,8 +3,18 @@
 #include <libhat/Access.hpp>
 
 LocalPlayer *ClientInstance::getLocalPlayer() {
-    static int off = GET_OFFSET("ClientInstance::getLocalPlayer");
-    return Memory::CallVFuncI<LocalPlayer *>(off, this);
+    // Indig0r
+    static uintptr_t indexRef;
+
+    if (indexRef == 0) {
+        indexRef = Memory::findSig(GET_SIG("ClientInstance::getLocalPlayerIndex"));
+    }
+
+    int index = *reinterpret_cast<int*>(indexRef + 9) / 8;
+
+    auto *lp = Memory::CallVFuncI<LocalPlayer *>(index, this);
+
+    return lp;
 }
 
 BlockSource *ClientInstance::getBlockSource() {

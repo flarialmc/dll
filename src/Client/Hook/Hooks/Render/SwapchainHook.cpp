@@ -249,11 +249,13 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     } else {
 
+        frameTransformsMtx.lock();
         while(FrameTransforms.size() > transformDelay)
         {
             MC::Transform = FrameTransforms.front();
             FrameTransforms.pop();
         }
+        frameTransformsMtx.unlock();
 
         if (FlarialGUI::writeFactory == nullptr) {
             DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),

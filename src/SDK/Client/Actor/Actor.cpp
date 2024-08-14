@@ -28,11 +28,6 @@ Component *Actor::tryGet(uintptr_t addr) { // TODO: Multiversion
     }
 }
 
-bool Actor::isAlive() {
-    static int off = GET_OFFSET("Actor::isAlive");
-    return Memory::CallVFuncI<bool>(off, this);
-}
-
 bool Actor::canSee(const Actor& actor) {
     using canSeeFunc = bool (__fastcall *)(Actor *, const Actor&);
     static uintptr_t sig;
@@ -47,7 +42,41 @@ bool Actor::canSee(const Actor& actor) {
     return canSee(this, actor);
 }
 
+uint64_t Actor::getRuntimeID() {
+    return this->GetEntityContextV1_20_50()->id;
+}
+
+int64_t* Actor::getActorFlags() {
+    if(WinrtUtils::check(21, 20)) {
+        static uintptr_t sig;
+
+        if (sig == NULL) {
+            sig = Memory::findSig(GET_SIG("SynchedActorDataAccess::getActorFlags"));
+        }
+
+        auto fn = reinterpret_cast<int64_t* (__thiscall *)(void *, void *)>(sig);
+        auto runtimeId = this->getRuntimeID();
+        int64_t* flags = fn(&this->GetEntityContextV1_20_50()->basicReg, &runtimeId);
+        return flags;
+    }
+    return nullptr;
+}
+
 bool Actor::getActorFlag(int flag) {
+    if(WinrtUtils::check(21, 20)) {
+        auto flags = Actor::getActorFlags();
+
+        if (static_cast<uint64_t>(flag) >= 0x77) { // 1.21.2
+            throw std::out_of_range("Flag index out of range");
+        }
+
+        int64_t index = flag >> 6;
+        int64_t bitMask = flag & 0x3F;
+
+        int64_t block = flags[index];
+
+        return (block >> bitMask) & 1;
+    }
     static int off = GET_OFFSET("Actor::getActorFlag");
     return Memory::CallVFuncI<bool, int>(off, this, flag);
 }
@@ -62,6 +91,8 @@ SimpleContainer* Actor::getArmorContainer() {
 
     if (sig == NULL) {
         sig = Memory::findSig(GET_SIG("Actor::getActorEquipmentComponent")); // 8B DA BA 2E CD 8B 46
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix2"));
+        sig = sig - size;
     }
 
     return tryGet<ActorEquipmentComponent>(sig)->mArmorContainer;
@@ -73,6 +104,8 @@ SimpleContainer* Actor::getOffhandContainer() {
 
     if (sig == NULL) {
         sig = Memory::findSig(GET_SIG("Actor::getActorEquipmentComponent")); // 8B DA BA 2E CD 8B 46
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix2"));
+        sig = sig - size;
     }
 
     return tryGet<ActorEquipmentComponent>(sig)->mOffhandContainer;
@@ -99,6 +132,8 @@ MoveInputComponent *Actor::getMoveInputHandler() { //??$try_get@UMoveInputCompon
 
     if (sig == NULL) {
         sig = Memory::findSig(GET_SIG("Actor::getMoveInputHandler")); // 8B DA BA 2E CD 8B 46
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
+        sig = sig - size;
     }
 
     return tryGet<MoveInputComponent>(sig);
@@ -110,6 +145,8 @@ ActorGameTypeComponent *Actor::getGameModeType() {
 
     if (sig == NULL) {
         sig = Memory::findSig(GET_SIG("Actor::getActorGameTypeComponent")); // 8B DA BA DE AB CB AF
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
+        sig = sig - size;
     }
 
     return tryGet<ActorGameTypeComponent>(sig);
@@ -121,6 +158,8 @@ AABBShapeComponent *Actor::getAABBShapeComponent() {
 
     if (sig == NULL) {
         sig = Memory::findSig(GET_SIG("Actor::getAABBShapeComponent")); // 8B DA BA F2 C9 10 1B
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
+        sig = sig - size;
     }
 
     return tryGet<AABBShapeComponent>(sig);
@@ -132,6 +171,8 @@ StateVectorComponent *Actor::getStateVectorComponent() {
 
     if (sig == NULL) {
         sig = Memory::findSig(GET_SIG("Actor::getStateVectorComponent")); // 8B DA BA 91 3C C9 0E
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
+        sig = sig - size;
     }
 
     return tryGet<StateVectorComponent>(sig);
@@ -156,7 +197,9 @@ RuntimeIDComponent *Actor::getRuntimeIDComponent() {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getRuntimeIDComponent"));
+        sig = Memory::findSig(GET_SIG("Actor::getRuntimeIDComponent")); // 8B DA BA 14 14 A1 3C
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
+        sig = sig - size;
     }
 
     return tryGet<RuntimeIDComponent>(sig);
@@ -197,15 +240,17 @@ RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URen
 
     if (sig == NULL) {
         sig = Memory::findSig(GET_SIG("Actor::getRenderPositionComponent")); // 8B DA BA 6E F3 E8 D4
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
+        sig = sig - size;
     }
 
     return tryGet<RenderPositionComponent>(sig);
 }
 
-bool Actor::isValidTarget(Actor *actor) {
-    if(!WinrtUtils::check(20, 40)) {
-        return true;
-    }
-    static int off = GET_OFFSET("Actor::isValidTarget");
-    return Memory::CallVFuncI<bool, Actor *>(off, this, actor);
+bool Actor::isValidAABB() {
+    auto AABBShapeComponent = this->getAABBShapeComponent();
+    if(!AABBShapeComponent) return false;
+    auto size = AABBShapeComponent->size;
+    if(size.x < 0.1f || size.y < 0.1f) return false;
+    return true;
 }

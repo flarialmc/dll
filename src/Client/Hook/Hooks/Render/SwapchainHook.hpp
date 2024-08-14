@@ -39,6 +39,7 @@ public:
     static bool hasResized;
     static int currentBitmap;
 
+    static inline std::mutex frameTransformsMtx;
     static inline std::queue<FrameTransform> FrameTransforms;
     static inline int transformDelay = 3;
 

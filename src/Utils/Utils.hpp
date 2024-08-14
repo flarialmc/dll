@@ -251,6 +251,8 @@ public:
 
     static bool CursorInEllipse(float ellipseX, float ellipseY, float radiusX, float radiusY);
 
+    static int CountBytes(const std::string &data);
+
     static constexpr unsigned int hash(const char *str) {
         unsigned int hash = 5381;
         int c;
