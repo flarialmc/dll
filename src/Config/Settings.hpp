@@ -73,13 +73,14 @@ public:
 
 
     template<typename T>
-    SettingType<T> *getSettingByName(const std::string &name) { // TODO: Crash if loaded in game, couldnt load settings? Module was null?
+    SettingType<T> *getSettingByName(const std::string &name) {
 
         auto it = settings.find(name);
         if (it != settings.end()) {
             return static_cast<SettingType<T> *>(it->second.get());
         }
-        return nullptr;
+        settings[name] = std::make_unique<SettingType<T>>(name, T{});
+        return static_cast<SettingType<T> *>(settings[name].get());
     }
 
     template<typename T>
