@@ -344,6 +344,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
                                 RenderEvent event{};
                                 event.RTV = mainRenderTargetView;
+                                Blur::RenderBlur(event.RTV, 3, 10.35f);
                                 EventHandler::onRender(event);
 
 
@@ -674,10 +675,11 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
 
 
         ID3D11Texture2D* buffer2D = nullptr;
+        HRESULT hr;
         D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&buffer2D));
+        if (FAILED(hr))  std::cout << "Failed to create stage texture: " << std::hex << hr << std::endl;
 
         ID3D11DeviceContext* deviceContext = context;
-        HRESULT hr;
 
         D3D11_TEXTURE2D_DESC desc;
         buffer2D->GetDesc(&desc);
