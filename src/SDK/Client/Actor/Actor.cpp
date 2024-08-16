@@ -2,6 +2,7 @@
 #include "Components/ActorGameTypeComponent.hpp"
 #include "Components/AABBShapeComponent.hpp"
 #include "Components/RuntimeIDComponent.hpp"
+#include "Components/ActorDataFlagComponent.hpp"
 
 // TODO add comments to all components, replace their sigs with simpler ones ?       marioCST: use entt's try_get func in EntityContext instead of using sigs, there are no simpler sigs
 
@@ -32,6 +33,11 @@ int16_t Actor::getHurtTime() {
     return hat::member_at<int16_t>(this, GET_OFFSET("Actor::hurtTime"));
 }
 
+void Actor::setHurtTime(int16_t hurtTime) {
+    int16_t& hurttime = hat::member_at<int16_t>(this, GET_OFFSET("Actor::hurtTime"));
+    hurttime = hurtTime;
+}
+
 Level *Actor::getLevel() {
     return hat::member_at<Level*>(this, GET_OFFSET("Actor::level"));
 }
@@ -54,7 +60,31 @@ bool Actor::canSee(const Actor& actor) {
     return canSee(this, actor);
 }
 
-bool Actor::getActorFlag(int flag) {
+uint64_t Actor::getRuntimeID() {
+    return this->GetEntityContextV1_20_50()->id;
+}
+
+ActorDataFlagComponent* Actor::getActorDataFlagComponent() {
+    if(!WinrtUtils::check(20, 80)) return nullptr;
+    static uintptr_t sig;
+
+    if (sig == NULL) {
+        sig = Memory::findSig(GET_SIG("Actor::getActorDataFlagComponent"));
+        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix2"));
+        sig = sig - size;
+    }
+
+    return tryGet<ActorDataFlagComponent>(sig);
+}
+
+bool Actor::getActorFlag(ActorFlags flag) {
+    if(WinrtUtils::check(21, 20)) {
+        auto actorDataFlagComponent = Actor::getActorDataFlagComponent();
+
+        if(!actorDataFlagComponent) return false;
+
+        return actorDataFlagComponent->flags[flag];
+    }
     static int off = GET_OFFSET("Actor::getActorFlag");
     return Memory::CallVFuncI<bool, int>(off, this, flag);
 }
@@ -68,7 +98,7 @@ SimpleContainer* Actor::getArmorContainer() {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getActorEquipmentComponent")); // 8B DA BA 2E CD 8B 46
+        sig = Memory::findSig(GET_SIG("Actor::getActorEquipmentComponent"));
         auto size = Utils::CountBytes(GET_SIG("tryGetPrefix2"));
         sig = sig - size;
     }
@@ -81,7 +111,7 @@ SimpleContainer* Actor::getOffhandContainer() {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getActorEquipmentComponent")); // 8B DA BA 2E CD 8B 46
+        sig = Memory::findSig(GET_SIG("Actor::getActorEquipmentComponent"));
         auto size = Utils::CountBytes(GET_SIG("tryGetPrefix2"));
         sig = sig - size;
     }

@@ -28,22 +28,22 @@ class SprintListener : public Listener {
 
                 if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                     std::string text = "Standing";
-                    if (SDK::clientInstance->getLocalPlayer()->getActorFlag(1)) {
+                    if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SNEAKING)) {
                         text = "Sneaking";
                         this->module->normalRender(5, text);
-                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(57)) {
+                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SWIMMING)) {
                         text = "Swimming";
                         this->module->normalRender(5, text);
-                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(32)) {
+                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_GLIDING)) {
                         text = "Gliding";
                         this->module->normalRender(5, text);
-                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(76)) {
+                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SLEEPING)) {
                         text = "Sleeping";
                         this->module->normalRender(5, text);
-                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(3)) {
+                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SPRINTING)) {
                         text = "Sprinting";
                         this->module->normalRender(5, text);
-                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(34)) {
+                    } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(FLAG_MOVING)) {
                         text = "Walking";
                         this->module->normalRender(5, text);
                     } else {

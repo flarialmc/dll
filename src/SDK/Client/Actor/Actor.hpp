@@ -15,6 +15,7 @@
 #include "Components/ActorGameTypeComponent.hpp"
 #include "Components/AABBShapeComponent.hpp"
 #include "Components/RuntimeIDComponent.hpp"
+#include "Components/ActorDataFlagComponent.hpp"
 
 
 enum ActorFlags {
@@ -185,7 +186,7 @@ public:
 
     MoveInputComponent *getMoveInputHandler();
 
-    bool getActorFlag(int flag);
+    bool getActorFlag(ActorFlags flag);
 
     bool canSee(const Actor& actor);
 
@@ -216,4 +217,10 @@ public:
     RuntimeIDComponent *getRuntimeIDComponent();
 
     bool isValidAABB();
+
+    uint64_t getRuntimeID();
+
+    ActorDataFlagComponent *getActorDataFlagComponent();
+
+    void setHurtTime(int16_t hurtTime);
 };
