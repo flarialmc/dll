@@ -18,6 +18,8 @@ void SigInit::init2120() {
     ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 40");
 
     ADD_SIG("ActorCollision::isOnGround", "E8 ? ? ? ? 84 C0 49 8B 87");
+
+    ADD_SIG("HurtColor", "E8 ? ? ? ? E9 ? ? ? ? 8B 43 ? 48 8D 54 24 ? 48 8B 4B ? 89 44 24 ? E8 ? ? ? ? 4C 8B D8");
 }
 
 void SigInit::init2102() {

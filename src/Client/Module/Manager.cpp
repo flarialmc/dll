@@ -125,9 +125,7 @@ void ModuleManager::initialize() {
     addModule(new Hitbox());
     addModule(new ThirdPerson());
     addModule(new SnapLook());
-    if(!WinrtUtils::check(21,20)) { // TODO
-        addModule(new HurtColor());
-    }
+    addModule(new HurtColor());
     addModule(new FogColor());
     addModule(new ArmorHUD());
 
