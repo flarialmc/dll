@@ -26,6 +26,8 @@ class BlockBreakIndicatorListener : public Listener {
                 SDK::clientInstance->getLocalPlayer()->getGamemode() != nullptr
                 ) {
 
+            if(SDK::getCurrentScreen() != "hud_screen") return;
+
             if (CPSListener::GetLeftHeld()) {
                 auto progress= (*SDK::clientInstance->getLocalPlayer()->getGamemode()).getLastBreakProgress() * 100;
                 if(lastProgress != progress) {
