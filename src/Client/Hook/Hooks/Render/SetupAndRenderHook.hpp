@@ -51,6 +51,31 @@ private:
 		);
 	}
 
+	static void drawImageDetour2120(
+		MinecraftUIRenderContext* _this,
+		TexturePtr* texturePtr,
+		Vec2<float>& imagePos,
+		Vec2<float>& imageDimension,
+		Vec2<float>& uvPos,
+		Vec2<float>& uvSize,
+		bool unk
+	)
+	{
+		DrawImageEvent event(texturePtr, imagePos);
+		EventHandler::onDrawImage(event);
+
+		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(
+				oDrawImage,
+				_this,
+				texturePtr,
+				event.getImagePos(),
+				imageDimension,
+				uvPos,
+				uvSize,
+				unk
+		);
+	}
+
     static void hookDrawTextAndDrawImage(MinecraftUIRenderContext* muirc) {
         auto vTable = *(uintptr_t **) muirc;
 
@@ -59,11 +84,12 @@ private:
                              "drawText");
         }
 
-        if(!WinrtUtils::check(21,20)) { // TODO
-            if (oDrawImage == nullptr) {
-                Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour, (void **) &oDrawImage, "DrawImage");
-            }
-        }
+		if (oDrawImage == nullptr) {
+			if (WinrtUtils::check(21, 20))
+				Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour2120, (void **) &oDrawImage, "DrawImage");
+			else
+				Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour, (void **) &oDrawImage, "DrawImage");
+		}
     }
 
 	static void setUpAndRenderCallback(ScreenView* pScreenView, MinecraftUIRenderContext* muirc) {
