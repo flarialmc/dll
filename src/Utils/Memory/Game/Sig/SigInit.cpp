@@ -31,7 +31,7 @@ void SigInit::init2102() {
 void SigInit::init2100() {
     Logger::debug("[Signatures] Loading sigs for 1.21.0X");
 
-    ADD_SIG("BlockSource::getBiome", "48 89 5C 24 18 57 48 83 EC 50 48 8B F9 E8");
+    ADD_SIG("BlockSource::getBiome", "40 53 48 83 EC ? 48 8B D9 E8 ? ? ? ? 48 85 C0 75 ? 48 8B 03");
     ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 10");
 
     ADD_SIG("ActorCollision::isOnGround", "E8 ? ? ? ? 88 45 FF");
