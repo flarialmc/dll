@@ -262,3 +262,25 @@ bool Actor::isValidAABB() {
     if(size.x < 0.1f || size.y < 0.1f) return false;
     return true;
 }
+
+bool Actor::isOnGround() {
+    const auto ctx = this->GetEntityContextV1_20_50();
+
+    if (WinrtUtils::check(20, 60)) {
+        using isOnGroundFunc = bool(__fastcall *)(uintptr_t&, EntityId&);
+        static isOnGroundFunc isOnGround = Memory::getOffsetFromSig<isOnGroundFunc>(Memory::findSig(GET_SIG("ActorCollision::isOnGround")), 1);
+
+        if (isOnGround)
+            return isOnGround(ctx->basicReg, ctx->id);
+
+        return false;
+    }
+
+    using isOnGroundFunc = bool(__fastcall *)(V1_20_50::EntityContext*);
+    static isOnGroundFunc isOnGround = reinterpret_cast<isOnGroundFunc>(Memory::findSig(GET_SIG("ActorCollision::isOnGround")));
+
+    if (isOnGround)
+        return isOnGround(ctx);
+
+    return false;
+}
