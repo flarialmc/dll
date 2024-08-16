@@ -57,6 +57,28 @@ public:
     static void RenderBlur(ID3D11RenderTargetView *, int, float);
 };
 
+class BlurDX12
+{
+public:
+
+    static inline ID3D11PixelShader *pUpsampleShader = nullptr;
+    static inline ID3D11PixelShader *pDownsampleShader = nullptr;
+    static inline ID3D11VertexShader *pVertexShader = nullptr;
+    static inline ID3D11InputLayout *pInputLayout = nullptr;
+
+    static inline ID3D11SamplerState *pSampler = nullptr;
+    static inline ID3D11Buffer *pVertexBuffer = nullptr;
+    static inline ID3D11Buffer *pConstantBuffer = nullptr;
+    static inline BlurInputBuffer constantBuffer;
+
+    // RAII
+    static void InitializePipeline();
+    //static void Cleanup();
+
+    static void RenderBlur(ID3D12GraphicsCommandList* commandList);
+};
+
+
 
 class Dimension {
 public:

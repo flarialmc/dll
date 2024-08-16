@@ -344,7 +344,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
                                 RenderEvent event{};
                                 event.RTV = mainRenderTargetView;
-                                Blur::RenderBlur(event.RTV, 3, 10.35f);
+                                BlurDX12::RenderBlur(SwapchainHook::d3d12CommandList);
                                 EventHandler::onRender(event);
 
 
@@ -539,7 +539,7 @@ void SwapchainHook::DX12Init() {
                 kiero::getRenderType() == kiero::RenderType::D3D12) {
                 D3D11On12CreateDevice(device,
                                       D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
-                                      (IUnknown **) &queue, 1, 0, &d3d11Device, &context,
+                                      (IUnknown **) &queue, 1, 0, &SwapchainHook::d3d11Device, &context,
                                       nullptr);
 
                 d3d11Device->QueryInterface(IID_PPV_ARGS(&d3d11On12Device));
@@ -616,7 +616,7 @@ void SwapchainHook::DX12Init() {
                 Memory::SafeRelease(dxgiDevice);
                 Memory::SafeRelease(d2dFactory);
 
-                Blur::InitializePipeline();
+                BlurDX12::InitializePipeline();
                 init = true;
             }
 }
@@ -676,13 +676,14 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
 
         ID3D11Texture2D* buffer2D = nullptr;
         HRESULT hr;
-        D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&buffer2D));
-        if (FAILED(hr))  std::cout << "Failed to create stage texture: " << std::hex << hr << std::endl;
+        hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&buffer2D));
+        if (FAILED(hr))  std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
 
         ID3D11DeviceContext* deviceContext = context;
 
         D3D11_TEXTURE2D_DESC desc;
         buffer2D->GetDesc(&desc);
+        std::cout << desc.Format << std::endl;
         HRESULT r;
 
         if(!stageTex) {
