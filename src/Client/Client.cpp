@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Client.hpp"
 #include "GUI/Engine/Engine.hpp"
@@ -18,6 +18,8 @@
 std::string Client::settingspath = Utils::getRoamingPath() + R"(\Flarial\Config\main.flarial)";
 Settings Client::settings = Settings();
 bool notifiedOfConnectionIssue = false;
+// UPDATE THIS TO THE LATEST GITHUB COMMIT AFTER CHANGING ANYHTHING
+std::string current_commit = "test";
 
 void DownloadAndSave(const std::string& url, const std::string& path) {
 
@@ -51,7 +53,9 @@ void setWindowTitle(std::wstring title) {
 }
 
 void Client::initialize() {
-    setWindowTitle(L"Flarial");
+
+    std::string title = WinrtUtils::getFormattedVersion() + " " + current_commit;
+    setWindowTitle(L"Flarial " + FlarialGUI::to_wide(title));
     Logger::debug("[INIT] Initializing Flarial...");
     
     VersionUtils::init();
