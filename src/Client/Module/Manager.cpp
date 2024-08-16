@@ -66,6 +66,8 @@
 //#include "Modules/MovableChat/MovableChat.hpp"
 #include <algorithm>
 
+#include "Modules/ItemPhysics/ItemPhysics.hpp"
+
 namespace ModuleManager {
     std::unordered_map<size_t, Module*> moduleMap;
     std::vector<std::string> onlineUsers;
@@ -123,17 +125,13 @@ void ModuleManager::initialize() {
     addModule(new Hitbox());
     addModule(new ThirdPerson());
     addModule(new SnapLook());
-    if(!WinrtUtils::check(21,20)) { // TODO
-        addModule(new HurtColor());
-    }
+    addModule(new HurtColor());
     addModule(new FogColor());
     addModule(new ArmorHUD());
 
     addModule(new TimeChanger());
 
-    if((WinrtUtils::check(20,30) && !WinrtUtils::check(20,40)) || WinrtUtils::check(20,50)) { // does not work in 1.20.4X
-        addModule(new RenderOptions());
-    }
+    addModule(new RenderOptions());
 
     addModule(new PaperDoll());
     addModule(new GuiScale());
@@ -157,6 +155,7 @@ void ModuleManager::initialize() {
     addModule(new InstantHurtAnimation());
     //addModule(new MovableChat());
     //addModule(new CompactChat());
+    addModule(new ItemPhysics());
 
     EventHandler::registerListener(new GUIKeyListener("GuiKeyListener"));
     EventHandler::registerListener(new DiscordRPCListener("DiscordRPC"));

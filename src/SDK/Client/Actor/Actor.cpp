@@ -66,13 +66,8 @@ uint64_t Actor::getRuntimeID() {
 
 ActorDataFlagComponent* Actor::getActorDataFlagComponent() {
     if(!WinrtUtils::check(20, 80)) return nullptr;
-    static uintptr_t sig;
 
-    if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getActorDataFlagComponent"));
-        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix2"));
-        sig = sig - size;
-    }
+    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorDataFlagComponent"));
 
     return tryGet<ActorDataFlagComponent>(sig);
 }
@@ -95,26 +90,16 @@ Vec3<float> *Actor::getPosition() {
 
 SimpleContainer* Actor::getArmorContainer() {
     if(!WinrtUtils::check(20, 80)) return nullptr;
-    static uintptr_t sig;
 
-    if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getActorEquipmentComponent"));
-        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix2"));
-        sig = sig - size;
-    }
+    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorEquipmentComponent"));
 
     return tryGet<ActorEquipmentComponent>(sig)->mArmorContainer;
 }
 
 SimpleContainer* Actor::getOffhandContainer() {
     if(!WinrtUtils::check(20, 80)) return nullptr;
-    static uintptr_t sig;
 
-    if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getActorEquipmentComponent"));
-        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix2"));
-        sig = sig - size;
-    }
+    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorEquipmentComponent"));
 
     return tryGet<ActorEquipmentComponent>(sig)->mOffhandContainer;
 }
@@ -136,52 +121,28 @@ ItemStack *Actor::getArmor(int slot) {
 
 MoveInputComponent *Actor::getMoveInputHandler() { //??$try_get@UMoveInputComponent
 
-    static uintptr_t sig;
-
-    if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getMoveInputHandler")); // 8B DA BA 2E CD 8B 46
-        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
-        sig = sig - size;
-    }
+    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMoveInputHandler"));
 
     return tryGet<MoveInputComponent>(sig);
 }
 
 ActorGameTypeComponent *Actor::getGameModeType() {
 
-    static uintptr_t sig;
-
-    if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getActorGameTypeComponent")); // 8B DA BA DE AB CB AF
-        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
-        sig = sig - size;
-    }
+    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getActorGameTypeComponent"));
 
     return tryGet<ActorGameTypeComponent>(sig);
 }
 
 AABBShapeComponent *Actor::getAABBShapeComponent() {
 
-    static uintptr_t sig;
-
-    if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getAABBShapeComponent")); // 8B DA BA F2 C9 10 1B
-        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
-        sig = sig - size;
-    }
+    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getAABBShapeComponent"));
 
     return tryGet<AABBShapeComponent>(sig);
 }
 
 StateVectorComponent *Actor::getStateVectorComponent() {
 
-    static uintptr_t sig;
-
-    if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getStateVectorComponent")); // 8B DA BA 91 3C C9 0E
-        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
-        sig = sig - size;
-    }
+    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getStateVectorComponent"));
 
     return tryGet<StateVectorComponent>(sig);
 }
@@ -202,13 +163,7 @@ ItemStack *Actor::getOffhandSlot() {
 }
 
 RuntimeIDComponent *Actor::getRuntimeIDComponent() {
-    static uintptr_t sig;
-
-    if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getRuntimeIDComponent")); // 8B DA BA 14 14 A1 3C
-        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
-        sig = sig - size;
-    }
+    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
 
     return tryGet<RuntimeIDComponent>(sig);
 }
@@ -244,13 +199,7 @@ bool Actor::hasCategory(ActorCategory category) {
 }
 
 RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URenderPositionComponent
-    static uintptr_t sig;
-
-    if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getRenderPositionComponent")); // 8B DA BA 6E F3 E8 D4
-        auto size = Utils::CountBytes(GET_SIG("tryGetPrefix"));
-        sig = sig - size;
-    }
+    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRenderPositionComponent"));
 
     return tryGet<RenderPositionComponent>(sig);
 }
@@ -261,4 +210,26 @@ bool Actor::isValidAABB() {
     auto size = AABBShapeComponent->size;
     if(size.x < 0.1f || size.y < 0.1f) return false;
     return true;
+}
+
+bool Actor::isOnGround() {
+    const auto ctx = this->GetEntityContextV1_20_50();
+
+    if (WinrtUtils::check(20, 60)) {
+        using isOnGroundFunc = bool(__fastcall *)(uintptr_t&, EntityId&);
+        static isOnGroundFunc isOnGround = Memory::getOffsetFromSig<isOnGroundFunc>(Memory::findSig(GET_SIG("ActorCollision::isOnGround")), 1);
+
+        if (isOnGround)
+            return isOnGround(ctx->basicReg, ctx->id);
+
+        return false;
+    }
+
+    using isOnGroundFunc = bool(__fastcall *)(V1_20_50::EntityContext*);
+    static isOnGroundFunc isOnGround = reinterpret_cast<isOnGroundFunc>(Memory::findSig(GET_SIG("ActorCollision::isOnGround")));
+
+    if (isOnGround)
+        return isOnGround(ctx);
+
+    return false;
 }

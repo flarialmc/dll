@@ -223,4 +223,6 @@ public:
     ActorDataFlagComponent *getActorDataFlagComponent();
 
     void setHurtTime(int16_t hurtTime);
+
+    bool isOnGround();
 };

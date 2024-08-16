@@ -59,9 +59,7 @@ void HookManager::initialize() {
     hooks.push_back(new OnSuspendHook());
     hooks.push_back(new getGammaHook());
     hooks.push_back(new FontDrawTransformedHook());
-    if(!WinrtUtils::check(21,20)) { // TODO
-        hooks.push_back(new HurtColorHook());
-    }
+    hooks.push_back(new HurtColorHook());
     hooks.push_back(new DimensionFogColorHook());
     hooks.push_back(new OverworldFogColorHook());
     hooks.push_back(new TimeChangerHook());

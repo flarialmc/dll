@@ -128,7 +128,30 @@ public:
         return addr;
     }
 
-    static void patchBytes(void *dst, void *src, unsigned int size) {
+    static void nopBytes(void* dst, const unsigned int size) {
+        if (dst == nullptr)
+            return;
+
+        DWORD oldprotect;
+        VirtualProtect(dst, size, PAGE_EXECUTE_READWRITE, &oldprotect);
+        memset(dst, 0x90, size);
+        VirtualProtect(dst, size, oldprotect, &oldprotect);
+    }
+
+    static void copyBytes(void* src, void* dst, const unsigned int size) {
+        if (src == nullptr || dst == nullptr)
+            return;
+
+        DWORD oldprotect;
+        VirtualProtect(src, size, PAGE_EXECUTE_READWRITE, &oldprotect);
+        memcpy(dst, src, size);
+        VirtualProtect(src, size, oldprotect, &oldprotect);
+    }
+
+    static void patchBytes(void *dst, const void *src, const unsigned int size) {
+        if (src == nullptr || dst == nullptr)
+            return;
+
         DWORD oldprotect;
         VirtualProtect(dst, size, PAGE_EXECUTE_READWRITE, &oldprotect);
         memcpy(dst, src, size);
@@ -141,6 +164,11 @@ public:
         // offset val = *reinterpret_cast<int *>(sig + offset)
         // base = sig + offset + 4
         return sig + offset + 4 + *reinterpret_cast<int *>(sig + offset);
+    }
+
+    template<typename Ret>
+    static Ret getOffsetFromSig(const uintptr_t sig, const int offset) {
+        return reinterpret_cast<Ret>(offsetFromSig(sig, offset));
     }
 
     static inline std::array<std::byte, 4> getRipRel(uintptr_t instructionAddress, uintptr_t targetAddress) {
