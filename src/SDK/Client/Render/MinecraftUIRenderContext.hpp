@@ -14,6 +14,7 @@
 #include "TexturePtr.hpp"
 #include "TextureGroup.hpp"
 #include "../../../Client/Module/Manager.hpp"
+#include "ScreenContext.hpp"
 
 class MinecraftUIRenderContext {
 public:
@@ -21,7 +22,7 @@ public:
         return hat::member_at<ClientInstance*>(this, GET_OFFSET("MinecraftUIRenderContext::clientInstance"));
     }
 
-    class ScreenContext* getScreenContext() {
+    ScreenContext* getScreenContext() {
         return hat::member_at<ScreenContext*>(this, GET_OFFSET("MinecraftUIRenderContext::screenContext"));
     }
 
