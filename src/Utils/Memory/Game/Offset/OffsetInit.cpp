@@ -169,6 +169,8 @@ void OffsetInit::init2040() {
 
     ADD_OFFSET("Level::hitResult", 0xA68);
     ADD_OFFSET("Level::getPlayerMap", 0x25F0);
+
+    ADD_OFFSET("OptionInfo::TranslateName", 0x168);
 }
 
 void OffsetInit::init2030() {

@@ -131,9 +131,7 @@ void ModuleManager::initialize() {
 
     addModule(new TimeChanger());
 
-    if((WinrtUtils::check(20,30) && !WinrtUtils::check(20,40)) || WinrtUtils::check(20,50)) { // does not work in 1.20.4X
-        addModule(new RenderOptions());
-    }
+    addModule(new RenderOptions());
 
     addModule(new PaperDoll());
     addModule(new GuiScale());

@@ -35,9 +35,7 @@ public:
     static void initialize(const uintptr_t optionsEntryPtr){
         optionsBaseEntry = (uintptr_t **) optionsEntryPtr;
         initialized = true;
-        if((WinrtUtils::check(20,30) && !WinrtUtils::check(20,40)) || WinrtUtils::check(20,50)) { // does not work in 1.20.4X (crashes)
-            initVsync();
-        }
+        initVsync();
     };
 
     static bool isInitialized() {
@@ -77,8 +75,7 @@ public:
         return nullptr;
     };
     static Option* getOption(const std::string& optionName) {
-        // disable getting settings in 1.20.4X
-        if(!isInitialized() || !((WinrtUtils::check(20,30) && !WinrtUtils::check(20,40)) || WinrtUtils::check(20,50))) return nullptr;
+        if(!isInitialized()) return nullptr;
         std::hash<std::string> optionNameHash;
 
         UINT32 key = optionNameHash(optionName);
