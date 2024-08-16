@@ -22,6 +22,9 @@ class BlockBreakIndicatorListener : public Listener {
                 SDK::clientInstance->getLocalPlayer() != nullptr &&
                 SDK::clientInstance->getLocalPlayer()->getgamemode() != nullptr
                 ) {
+
+            if(SDK::currentScreen != "hud_screen") return;
+
             auto progress_value = (*SDK::clientInstance->getLocalPlayer()->getgamemode()).lastBreakProgress *100;
             std::string progress = std::format("{:.0f}%", progress_value);
             this->module->normalRender(16, progress);
