@@ -33,6 +33,12 @@ If you encounter issues, check out our [FAQ](https://discord.gg/flarial-communit
 
 2. **Git**: Install Git if you haven't already. You can download Git from [git-scm.com](https://git-scm.com/downloads) and follow the installation instructions.
 
+
+
+3. **OpenCV**: Install [OpenCV](https://opencv.org/releases). Click the "Windows" option and follow these instructions:
+  - When running the installer, make sure you choose the path to be "C:/opencv"
+  - Add the path C:\opencv\opencv\build\x64\vc16\bin to your Environment Variables (PATH) for it to work properly
+  - You are good to go! You can now build Flarial.
 ### Steps to Clone and Build the Project:
 
 1. **Clone the Repository**:

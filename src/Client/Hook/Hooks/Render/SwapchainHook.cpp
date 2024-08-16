@@ -344,7 +344,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
                                 RenderEvent event{};
                                 event.RTV = mainRenderTargetView;
-                                BlurDX12::RenderBlur(SwapchainHook::d3d12CommandList);
+                                //BlurDX12::RenderBlur(SwapchainHook::d3d12CommandList);
                                 EventHandler::onRender(event);
 
 
@@ -523,7 +523,6 @@ void SwapchainHook::DX11Init() {
 
     SaveBackbuffer();
 
-    Blur::InitializePipeline();
     Memory::SafeRelease(eBackBuffer);
     init = true;
 }
@@ -616,7 +615,7 @@ void SwapchainHook::DX12Init() {
                 Memory::SafeRelease(dxgiDevice);
                 Memory::SafeRelease(d2dFactory);
 
-                BlurDX12::InitializePipeline();
+                //BlurDX12::InitializePipeline();
                 init = true;
             }
 }
