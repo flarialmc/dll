@@ -3,6 +3,35 @@
 #include "../../../Logger/Logger.hpp"
 #include "../SignatureAndOffsetManager.hpp"
 
+void OffsetInit::init2120() {
+    Logger::debug("[Offsets] Loading offsets for 1.21.2X");
+
+    ADD_OFFSET("Actor::hurtTime", 0x1F4);
+    ADD_OFFSET("Actor::level", 0x230);
+    ADD_OFFSET("Actor::categories", 0x268);
+
+    ADD_OFFSET("Player::playerInventory", 0x628);
+    ADD_OFFSET("Player::playerName", 0xC88);
+    ADD_OFFSET("Player::gamemode", 0xB00);
+
+    ADD_OFFSET("Actor::baseTickVft", 24);
+
+    ADD_OFFSET("PlayerInventory::inventory", 0xB8);
+
+    ADD_OFFSET("UIControl::x", 0x10);
+    ADD_OFFSET("UIControl::y", 0x14);
+    ADD_OFFSET("UIControl::LayerName", 0x20);
+    ADD_OFFSET("UIControl::scale", 0x48);
+
+    ADD_OFFSET("UIControl::children", 0x90);
+    ADD_OFFSET("UIControl::components", 0xB0);
+
+    ADD_OFFSET("RaknetConnector::JoinedIp", 0x390);
+
+    ADD_OFFSET("Level::hitResult", 0x220);
+    ADD_OFFSET("Level::getPlayerMap", 0xBF8);
+}
+
 void OffsetInit::init2100() {
     Logger::debug("[Offsets] Loading offsets for 1.21.0X");
 
@@ -19,7 +48,7 @@ void OffsetInit::init2100() {
     ADD_OFFSET("Weather::lightingLevel", 0x48);
 
     ADD_OFFSET("Level::hitResult", 0xB38);
-    ADD_OFFSET("Level::getPlayerMap", 0x1BC8);
+    ADD_OFFSET("Level::getPlayerMap", 0x1BC8); // getRuntimeActorList offset + B8 || Level::getPlayerList
 }
 
 void OffsetInit::init2080() {
@@ -228,6 +257,13 @@ void OffsetInit::init2030() {
     ADD_OFFSET("MinecraftUIRenderContext::screenContext", 0x10);
     ADD_OFFSET("MinecraftUIRenderContext::textures", 0x48);
 
+    ADD_OFFSET("ScreenContext::colorHolder", 0x30);
+    ADD_OFFSET("ScreenContext::tessellator", 0xC0);
+
+    ADD_OFFSET("Tessellator::transformOffset", 0x184);
+
+    ADD_OFFSET("createMaterial", 1);
+
     ADD_OFFSET("TextureGroup::base", 0x18);
     ADD_OFFSET("TextureGroup::loadedTextures", 0x178);
 
@@ -242,6 +278,7 @@ void OffsetInit::init2030() {
     ADD_OFFSET("UIControl::x", 0x78);
     ADD_OFFSET("UIControl::y", 0x7C);
     ADD_OFFSET("UIControl::children", 0xA0);
+    ADD_OFFSET("UIControl::components", 0xC0);
 
     ADD_OFFSET("VisualTree::root", 0x8);
 

@@ -45,6 +45,13 @@ std::string WinrtUtils::getVersion() {
 
 std::string WinrtUtils::getFormattedVersion() {
     const std::string& version = getVersion();
+
+    if(version == "1.21.202") { // i cba for now
+        // 1.21.202.0 - 1.21.2
+        // 1.21.2003.0 - 1.21.20
+        return "1.21.02";
+    }
+
     // Split version string by dots
     std::vector<std::string> parts;
     std::istringstream iss(version);

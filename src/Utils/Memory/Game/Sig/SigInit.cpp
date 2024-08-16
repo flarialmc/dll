@@ -4,7 +4,22 @@
 #include "../SignatureAndOffsetManager.hpp"
 
 void SigInit::init2120() {
-    Logger::debug("[Signatures] Loading sigs for 1.21.2X");
+    Logger::debug("[Signatures] Loading sigs for 1.21.20");
+
+    ADD_SIG("Options::getGamma", "48 83 EC 28 80 B9 80 17 00 00 00 48 8D 54 24 30 48 8B 01 48 8B 40 60 74 38 41 B8 19");
+    ADD_SIG("mce::TextureGroup::getTexture", "40 55 53 56 57 41 55 41 56 41 57 48 8D 6C 24 E9 48 81 EC 00");
+    ADD_SIG("RaknetTick", "4C 8B DC 49 89 5B 10 49 89 73 18 57 48 81 EC 10 02");
+    ADD_SIG("ItemRenderer::renderGuiItemNew", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 E8 48 81 EC 18 01 00 00 0F 29 B4 24 00 01 00 00 48");
+
+    ADD_SIG("Actor::baseTick", "48 8D 05 ? ? ? ? 48 89 01 B8 37 00 00 00 8D 50 FA 44 8D 48 FE 44 8D 40 FC 66 89 44 24 20 E8 ?? ?? ?? ?? 48 8B 8B C0 10 00 00");
+
+    ADD_SIG("MinecraftPackets::createPacket", "40 53 48 83 EC 30 45 33 C0 48 8B D9 81");
+
+    ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 40");
+}
+
+void SigInit::init2102() {
+    Logger::debug("[Signatures] Loading sigs for 1.21.02");
 
     ADD_SIG("MinecraftPackets::createPacket", "40 53 48 83 EC ? 45 33 C0 48 8B D9 81 FA");
 }
@@ -23,6 +38,8 @@ void SigInit::init2080() {
 
     // 36 48 C4 71
     ADD_SIG("Actor::getActorEquipmentComponent", "C8 25 36 48 C4 71");
+    // Actor::getActorFlag replacment
+    ADD_SIG("Actor::getActorDataFlagComponent", "C8 25 76 59 47 33");
 
     ADD_SIG("ClientInstance::grabMouse", "48 8B 80 ? ? ? ? FF 15 ? ? ? ? 90 48 85 DB 74 08 48 8B CB E8 ? ? ? ? 48 8B 8D ? ? ? ? E8");
 
@@ -196,6 +213,9 @@ void SigInit::init2030() {
 
     ADD_SIG("baseActorRenderContext", "48 89 ? ? ? 48 89 ? ? ? 48 89 ? ? ? 48 89 ? ? ? 57 48 83 EC ? 49 8B ? 48 8B ? 48 8B ? 48 8D ? ? ? ? ? 48 89 ? 33 ED");
 
+    ADD_SIG("MinecraftUIRenderContext::getUIMaterial", "4C 8D 05 ? ? ? ? 48 8B D3 48 8B CF 48 8B 5C 24 ? 0F 28 7C 24 ? 44 0F 28 44 24 ? 48 83 C4 40 5F E9 ? ? ? ?");
+
+    ADD_SIG("Tessellator::createMaterial", "48 8B 05 ? ? ? ? 48 8D 55 ? 48 8D 0D ? ? ? ? 48 8B 40 ? FF 15 ? ? ? ? 48 8B F8");
     ADD_SIG("Tessellator::begin", "48 89 5C 24 ? 56 48 83 EC ? 80 B9 ? ? ? ? ? 45 0F B6");
     ADD_SIG("Tessellator::vertex", "40 57 48 81 EC ? ? ? ? 0F 29 7C ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 8B 81");
     ADD_SIG("Tessellator::colorF", "80 B9 ? ? ? ? ? 4C 8B C1 75");

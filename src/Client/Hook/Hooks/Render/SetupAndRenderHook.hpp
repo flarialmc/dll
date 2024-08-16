@@ -59,8 +59,10 @@ private:
                              "drawText");
         }
 
-        if (oDrawImage == nullptr) {
-            Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour, (void **) &oDrawImage, "DrawImage");
+        if(!WinrtUtils::check(21,20)) { // TODO
+            if (oDrawImage == nullptr) {
+                Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour, (void **) &oDrawImage, "DrawImage");
+            }
         }
     }
 
