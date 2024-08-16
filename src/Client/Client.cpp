@@ -55,7 +55,7 @@ void setWindowTitle(std::wstring title) {
 void Client::initialize() {
 
     std::string title = WinrtUtils::getFormattedVersion() + " " + current_commit;
-    setWindowTitle(L"Flarial " + FlarialGUI::to_wide(title));
+    setWindowTitle(L"Flarial " + L" " + FlarialGUI::to_wide(title));
     Logger::debug("[INIT] Initializing Flarial...");
     
     VersionUtils::init();
