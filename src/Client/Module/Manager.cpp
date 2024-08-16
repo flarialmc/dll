@@ -66,6 +66,8 @@
 //#include "Modules/MovableChat/MovableChat.hpp"
 #include <algorithm>
 
+#include "Modules/ItemPhysics/ItemPhysics.hpp"
+
 namespace ModuleManager {
     std::unordered_map<size_t, Module*> moduleMap;
     std::vector<std::string> onlineUsers;
@@ -157,6 +159,7 @@ void ModuleManager::initialize() {
     addModule(new InstantHurtAnimation());
     //addModule(new MovableChat());
     //addModule(new CompactChat());
+    addModule(new ItemPhysics());
 
     EventHandler::registerListener(new GUIKeyListener("GuiKeyListener"));
     EventHandler::registerListener(new DiscordRPCListener("DiscordRPC"));
