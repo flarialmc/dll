@@ -61,6 +61,8 @@ void Client::initialize() {
 
     if (!VersionUtils::isSupported(Client::version)) {
         Logger::debug("[INFO] Version not supported!");
+        MessageBox(NULL, "Flarial: this version is not supported!", "", MB_OK);
+        ModuleManager::terminate();
         Client::disable = true;
         return;
     }
