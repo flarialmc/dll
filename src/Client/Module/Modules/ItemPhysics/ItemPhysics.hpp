@@ -8,7 +8,7 @@ class ItemPhysics : public Module {
 public:
     ItemPhysicsListener* listener;
 
-    ItemPhysics() : Module("ItemPhysics", "Changes rotation behavior of dropped items", IDR_BLOCK_PNG, "") {
+    ItemPhysics() : Module("ItemPhysics", "Changes rotation behavior of dropped items", IDR_ITEM_PHYSICS_PNG, "") {
         Module::setup();
     }
 
