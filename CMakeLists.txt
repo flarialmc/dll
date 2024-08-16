@@ -87,22 +87,15 @@ endif()
 add_library(MinHook SHARED IMPORTED GLOBAL)
 set_target_properties(MinHook PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/minhook/minhook.lib")
 
-
 FetchContent_Declare(
         libhat
         GIT_REPOSITORY  https://github.com/BasedInc/libhat.git
-        GIT_TAG         f4755aea0987e77c0f6f496c49eb9cd08d5f5a06
-        GIT_SHALLOW TRUE
-        GIT_PROGRESS TRUE
+        GIT_TAG         9ef05d6961ce37a4c801f11159de895aa21878a9
 )
 
 FetchContent_MakeAvailable(libhat)
 
-set(OpenCV_DIR C:/opencv/opencv/build/)
-find_package(OpenCV REQUIRED)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenCV_LIBS} libhat windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE libhat windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version)
 target_link_libraries(${PROJECT_NAME} PUBLIC MinHook)
-
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

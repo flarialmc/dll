@@ -1,92 +1,373 @@
-#pragma once
 #include <vector>
 #include <d3d11.h>
 #include <d3dcompiler.h>
-#include <opencv2/core/hal/interface.h>
-#include <opencv2/opencv.hpp>
 #include "../../Engine.hpp"
 #include "../../../../Hook/Hooks/Render/SwapchainHook.hpp"
 #include "../../../../Module/Modules/MotionBlur/MotionBlurListener.hpp"
 
+// CREDITS @MR CHIPS (@chyves)
+
+#define BLUR_OFFSET 10
+
+static const XMFLOAT4 quadVertices[] =
+    {
+        XMFLOAT4(1.0, -1.0, 0.0, 1.0),
+        XMFLOAT4(-1.0, -1.0, 0.0, 1.0),
+        XMFLOAT4(-1.0, 1.0, 0.0, 1.0),
+        XMFLOAT4(-1.0, 1.0, 0.0, 1.0),
+        XMFLOAT4(1.0, 1.0, 0.0, 1.0),
+        XMFLOAT4(1.0, -1.0, 0.0, 1.0)};
+
+const char *vertexShaderSrc = "struct VS_INPUT {\
+    float4 pos : POSITION;\
+};\
+\
+float4 main(VS_INPUT input) : SV_POSITION {\
+    return input.pos;\
+}";
+
+const char *downsampleShaderSrc = R"(
+cbuffer BlurInputBuffer : register(b0)
+{
+    float2 resolution;
+    float2 offset;
+    float2 halfPixel;
+};
+
+sampler sampler0 : register(s0);
+Texture2D texture0 : register(t0);
+
+float4 main(float4 screenSpace : SV_Position) : SV_TARGET
+{
+    float2 uv = screenSpace.xy / resolution;
+    float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
+
+    static const float2 offsets[9] = {
+        float2(-1.0, -1.0) * halfPixel * offset,
+        float2(0.0, -1.0) * halfPixel * offset,
+        float2(1.0, -1.0) * halfPixel * offset,
+        float2(-1.0, 0.0) * halfPixel * offset,
+        float2(0.0, 0.0) * halfPixel * offset,
+        float2(1.0, 0.0) * halfPixel * offset,
+        float2(-1.0, 1.0) * halfPixel * offset,
+        float2(0.0, 1.0) * halfPixel * offset,
+        float2(1.0, 1.0) * halfPixel * offset
+    };
+
+    static const float weights[9] = {
+        0.06136, 0.12245, 0.06136,
+        0.12245, 0.24477, 0.12245,
+        0.06136, 0.12245, 0.06136
+    };
+
+    float weightSum = 0.0;
+    for (int i = 0; i < 9; i++)
+    {
+        weightSum += weights[i];
+    }
+
+    for (int i = 0; i < 9; i++)
+    {
+        colorSum += texture0.Sample(sampler0, uv + offsets[i]) * (weights[i] / weightSum);
+    }
+
+    return colorSum;
+}
+)";
+
+const char *upsampleShaderSrc = R"(
+cbuffer BlurInputBuffer : register(b0)
+{
+    float2 resolution;
+    float2 offset;
+    float2 halfPixel;
+};
+
+sampler sampler0 : register(s0);
+Texture2D texture0 : register(t0);
+
+float4 main(float4 screenSpace : SV_Position) : SV_TARGET
+{
+    float2 uv = screenSpace.xy / resolution;
+    float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
+
+    static const float2 offsets[9] = {
+        float2(-1.0, -1.0) * halfPixel * offset,
+        float2(0.0, -1.0) * halfPixel * offset,
+        float2(1.0, -1.0) * halfPixel * offset,
+        float2(-1.0, 0.0) * halfPixel * offset,
+        float2(0.0, 0.0) * halfPixel * offset,
+        float2(1.0, 0.0) * halfPixel * offset,
+        float2(-1.0, 1.0) * halfPixel * offset,
+        float2(0.0, 1.0) * halfPixel * offset,
+        float2(1.0, 1.0) * halfPixel * offset
+    };
+
+    static const float weights[9] = {
+        0.06136, 0.12245, 0.06136,
+        0.12245, 0.24477, 0.12245,
+        0.06136, 0.12245, 0.06136
+    };
+
+    float weightSum = 0.0;
+    for (int i = 0; i < 9; i++)
+    {
+        weightSum += weights[i];
+    }
+
+    for (int i = 0; i < 9; i++)
+    {
+        colorSum += texture0.Sample(sampler0, uv + offsets[i]) * (weights[i] / weightSum);
+    }
+
+    return colorSum;
+}
+)";
 
 
-void Blur::RenderBlur(ID3D11Texture2D* inputTexture, ID3D11Device* device, ID3D11DeviceContext* deviceContext) {
-    ID3D11ShaderResourceView* inputSRV = nullptr;
-    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-    srvDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-    srvDesc.Texture2D.MipLevels = 1;
-    srvDesc.Texture2D.MostDetailedMip = 0;
-    device->CreateShaderResourceView(inputTexture, &srvDesc, &inputSRV);
 
-    D3D11_TEXTURE2D_DESC inputDesc;
-    inputTexture->GetDesc(&inputDesc);
+const char *dbgDrawTextureShaderSrc = "cbuffer BlurInputBuffer : register(b0)\
+{\
+    float2 resolution;\
+    float2 offset;\
+    float2 halfpixel;\
+};\
+struct PS_INPUT {\
+    float4 pos : POSITION;\
+};\
+sampler sampler0 : register(s0);\
+Texture2D texture0 : register(t0);\
+\
+float4 main(PS_INPUT input, float4 screenSpace : SV_Position) : SV_TARGET {\
+    float2 uv = screenSpace.xy / resolution;\
+    return texture0.Sample(sampler0, uv);\
+}";
 
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
-    deviceContext->Map(inputTexture, 0, D3D11_MAP_READ, 0, &mappedResource);
+ID3DBlob *TryCompileShader(const char *pSrcData, const char *pTarget)
+{
+    HRESULT hr;
 
-    cv::Mat src(inputDesc.Height, inputDesc.Width, CV_8UC4, mappedResource.pData, mappedResource.RowPitch);
-    deviceContext->Unmap(inputTexture, 0);
+    ID3DBlob *shaderBlob;
+    ID3DBlob *errorBlob;
+    hr = D3DCompile(pSrcData, strlen(pSrcData), nullptr, nullptr, nullptr, "main", pTarget, 0, 0, &shaderBlob, &errorBlob);
 
-    cv::Mat dst = ImageProcessor::ApplyGaussianBlur(src, 15);
-
-    ID3D11Texture2D* texture_blur = ImageProcessor::LoadTextureFromMat(dst, device, deviceContext);
-
-    ID3D11ShaderResourceView* texture_srv = nullptr;
-    device->CreateShaderResourceView(texture_blur, &srvDesc, &texture_srv);
-
-    ImGui::Image(texture_srv, ImVec2(dst.cols, dst.rows));
-
-    if (inputSRV) inputSRV->Release();
-    if (texture_srv) texture_srv->Release();
-    if (texture_blur) texture_blur->Release();
+    if (FAILED(hr))
+    {
+        Logger::error("[Blur] Failed to compile shader");
+        errorBlob->Release();
+        throw std::logic_error("Failed to compile shader!");
+    }
+    return shaderBlob;
 }
 
-cv::Mat ImageProcessor::ApplyGaussianBlur(const cv::Mat& src, double sigma) {
-    cv::Mat dst;
-    GaussianBlur(src, dst, cv::Size(0, 0), sigma);
-    return dst;
+ID3D11PixelShader *dbgShader;
+
+void Blur::InitializePipeline()
+{
+
+    HRESULT hr;
+    ID3D11DeviceContext* pContext = SwapchainHook::context;
+
+    // byteWidth has to be a multiple of 32, BlurInputBuffer has a size of 24
+    CD3D11_BUFFER_DESC cbd(
+        sizeof(BlurInputBuffer),
+        D3D11_BIND_CONSTANT_BUFFER);
+    CD3D11_BUFFER_DESC cbdVertex(
+        sizeof(quadVertices),
+        D3D11_BIND_VERTEX_BUFFER);
+
+    SwapchainHook::d3d11Device->CreateBuffer(
+        &cbd,
+        nullptr,
+        &pConstantBuffer);
+
+    D3D11_SUBRESOURCE_DATA vertexBufferData = {quadVertices, 0, 0};
+
+    SwapchainHook::d3d11Device->CreateBuffer(
+        &cbdVertex,
+        &vertexBufferData,
+        &pVertexBuffer);
+
+    ID3DBlob *shaderBlob = TryCompileShader(upsampleShaderSrc, "ps_4_0");
+    SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pUpsampleShader);
+
+    shaderBlob = TryCompileShader(downsampleShaderSrc, "ps_4_0");
+    SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pDownsampleShader);
+
+    shaderBlob = TryCompileShader(dbgDrawTextureShaderSrc, "ps_4_0");
+    SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &dbgShader);
+
+    shaderBlob = TryCompileShader(vertexShaderSrc, "vs_4_0");
+    SwapchainHook::d3d11Device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pVertexShader);
+
+    D3D11_INPUT_ELEMENT_DESC ied =
+        {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,
+         0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0};
+    SwapchainHook::d3d11Device->CreateInputLayout(&ied, 1, shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), &pInputLayout);
+    D3D11_SAMPLER_DESC sd{};
+    sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+    sd.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sd.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sd.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    SwapchainHook::d3d11Device->CreateSamplerState(&sd, &pSampler);
+    
+}
+void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderResourceView *pShaderResourceView, XMFLOAT2 rtvSize)
+{
+    HRESULT hr;
+    ID3D11DeviceContext* pContext = SwapchainHook::context;
+    D3D11_DEPTH_STENCIL_DESC dsd{};
+    dsd.DepthEnable = false;
+    dsd.StencilEnable = false;
+    ID3D11DepthStencilState *pDepthStencilState;
+    hr = SwapchainHook::d3d11Device->CreateDepthStencilState(&dsd, &pDepthStencilState);
+    if (FAILED(hr)) { pContext->Release(); return; }
+    pContext->OMSetDepthStencilState(pDepthStencilState, 0);
+
+    void *null = nullptr;
+    pContext->PSSetShaderResources(0, 1, (ID3D11ShaderResourceView **)&null);
+    pContext->OMSetRenderTargets(1, &pRenderTargetView, nullptr);
+
+    constantBuffer.resolution = rtvSize;
+    constantBuffer.halfpixel = XMFLOAT2(0.5 / rtvSize.x, 0.5 / rtvSize.y);
+    pContext->UpdateSubresource(pConstantBuffer, 0, nullptr, &constantBuffer, 0, 0);
+
+    pContext->IASetInputLayout(pInputLayout);
+    UINT stride = sizeof(XMFLOAT4);
+    UINT offset = 0;
+
+    pContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
+    pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    pContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+    pContext->VSSetShader(pVertexShader, nullptr, 0);
+    pContext->PSSetSamplers(0, 1, &pSampler);
+    pContext->PSSetConstantBuffers(0, 1, &pConstantBuffer);
+    D3D11_BLEND_DESC bd{};
+    ZeroMemory(&bd, sizeof(bd));
+    bd.AlphaToCoverageEnable = false;
+    bd.RenderTarget[0].BlendEnable = true;
+    bd.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    bd.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+    bd.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    bd.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+    bd.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+    bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    ID3D11BlendState *pBlendState;
+    hr = SwapchainHook::d3d11Device->CreateBlendState(&bd, &pBlendState);
+    if (FAILED(hr)) { pContext->Release(); pDepthStencilState->Release(); return; }
+    pContext->OMSetBlendState(pBlendState, NULL, 0xffffffff);
+    D3D11_RASTERIZER_DESC rd{};
+    rd.FillMode = D3D11_FILL_SOLID;
+    rd.CullMode = D3D11_CULL_NONE;
+    rd.DepthClipEnable = false;
+    rd.ScissorEnable = false;
+    ID3D11RasterizerState *pRasterizerState;
+    hr = SwapchainHook::d3d11Device->CreateRasterizerState(&rd, &pRasterizerState);
+    if (FAILED(hr)) { pContext->Release(); pDepthStencilState->Release(); pBlendState->Release(); return; }
+    pContext->RSSetState(pRasterizerState);
+
+    pContext->PSSetShaderResources(0, 1, &pShaderResourceView);
+    D3D11_VIEWPORT viewport{};
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = rtvSize.x;
+    viewport.Height = rtvSize.y;
+    viewport.MaxDepth = 1.0f;
+
+    FLOAT backgroundColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+    pContext->ClearRenderTargetView(pRenderTargetView, backgroundColor);
+    pContext->RSSetViewports(1, &viewport);
+    pContext->Draw(sizeof(quadVertices) / sizeof(quadVertices[0]), 0);
+    ID3D11RenderTargetView* kajgd = nullptr;
+    pContext->OMSetRenderTargets(1, &kajgd, nullptr);
+
+    pDepthStencilState->Release();
+    pBlendState->Release();
+    pRasterizerState->Release();
 }
 
-ID3D11Texture2D* ImageProcessor::LoadTextureFromMat(cv::Mat& mat, ID3D11Device* device, ID3D11DeviceContext* context) {
-    if (mat.empty() || device == nullptr || context == nullptr) return nullptr;
+void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iterations, float intensity)
+{
 
-    cv::Mat matBGRA;
-    if (mat.channels() == 3) {
-        cvtColor(mat, matBGRA, cv::COLOR_BGR2BGRA);
+    if(intensity < 1) return;
+
+    if (!SwapchainHook::GetBackbuffer()) return;
+
+    ID3D11ShaderResourceView *pOrigShaderResourceView = MotionBlurListener::BackbufferToSRV();
+    if (!pOrigShaderResourceView) return;
+
+    ID3D11DeviceContext* pContext = SwapchainHook::context;
+
+    std::vector<ID3D11Texture2D *> framebuffers;
+    std::vector<ID3D11RenderTargetView *> renderTargetViews;
+    std::vector<ID3D11ShaderResourceView *> shaderResourceViews;
+    std::vector<XMFLOAT2> fbSizes;
+    D3D11_TEXTURE2D_DESC desc;
+    SwapchainHook::GetBackbuffer()->GetDesc(&desc);
+
+    framebuffers.reserve((size_t)iterations);
+    renderTargetViews.reserve((size_t)iterations);
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvd{};
+    srvd.Format = desc.Format;
+    srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvd.Texture2D.MipLevels = 1;
+
+    desc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+
+    for (int i = 0; i <= iterations; i++)
+    {
+        ID3D11Texture2D *pFrameBuffer;
+        ID3D11RenderTargetView *pRenderTargetView;
+        ID3D11ShaderResourceView *pShaderResourceView;
+
+        SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pFrameBuffer);
+        if (i == 0)
+            pRenderTargetView = pDstRenderTargetView;
+        else
+            SwapchainHook::d3d11Device->CreateRenderTargetView(pFrameBuffer, nullptr, &pRenderTargetView);
+        SwapchainHook::d3d11Device->CreateShaderResourceView(pFrameBuffer, nullptr, &pShaderResourceView);
+
+        framebuffers.push_back(pFrameBuffer);
+        renderTargetViews.push_back(pRenderTargetView);
+        shaderResourceViews.push_back(pShaderResourceView);
+        fbSizes.push_back(XMFLOAT2(desc.Width, desc.Height));
+
+        desc.Width /= 2;
+        desc.Height /= 2;
     }
-    else if (mat.channels() == 4) {
-        matBGRA = mat;
-    }
-    else {
-        return nullptr;
-    }
 
-    D3D11_TEXTURE2D_DESC desc = {};
-    desc.Width = matBGRA.cols;
-    desc.Height = matBGRA.rows;
-    desc.MipLevels = 1;
-    desc.ArraySize = 1;
-    desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-    desc.SampleDesc.Count = 1;
-    desc.Usage = D3D11_USAGE_DYNAMIC;
-    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    desc.MiscFlags = 0;
+    constantBuffer.offset = XMFLOAT2(intensity * 3, intensity * 3);
+    pContext->PSSetShader(pDownsampleShader, nullptr, 0);
+    RenderToRTV(renderTargetViews[1], pOrigShaderResourceView, fbSizes[1]);
 
-    ID3D11Texture2D* texture = nullptr;
-    HRESULT hr = device->CreateTexture2D(&desc, nullptr, &texture);
-    if (FAILED(hr)) return nullptr;
-
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
-    hr = context->Map(texture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-    if (FAILED(hr)) return nullptr;
-
-    for (int y = 0; y < matBGRA.rows; ++y) {
-        memcpy(static_cast<BYTE*>(mappedResource.pData) + y * mappedResource.RowPitch, matBGRA.ptr<uchar>(y), matBGRA.cols * 4);
+    for (int i = 1; i < iterations; i++)
+    {
+        RenderToRTV(renderTargetViews[i + 1], shaderResourceViews[i], fbSizes[i + 1]);
     }
 
-    context->Unmap(texture, 0);
+    pContext->PSSetShader(pUpsampleShader, nullptr, 0);
 
-    return texture;
+    for (int i = iterations; i > 0; i--)
+    {
+        RenderToRTV(renderTargetViews[i - 1], shaderResourceViews[i], fbSizes[i - 1]);
+    }
+
+    for (int i = 0; i < iterations; i++)
+    {
+
+        if (i != 0)
+            renderTargetViews[i]->Release();
+        framebuffers[i]->Release();
+        shaderResourceViews[i]->Release();
+
+        renderTargetViews.clear();
+        framebuffers.clear();
+        shaderResourceViews.clear();
+        fbSizes.clear();
+    }
+
+    pContext->Release();
+    pOrigShaderResourceView->Release();
 }
