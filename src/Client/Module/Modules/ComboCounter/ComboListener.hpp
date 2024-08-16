@@ -35,12 +35,11 @@ class ComboListener : public Listener {
     }
 
     void onRender(RenderEvent &event) override {
-            if (module->isEnabled()) {
-                auto comboStr = std::to_string(Combo);
-                this->module->normalRender(8, comboStr);
+        if (module->isEnabled()) {
+            auto comboStr = std::to_string(Combo);
+            this->module->normalRender(8, comboStr);
 
-            }
-
+        }
     }
 
 public:

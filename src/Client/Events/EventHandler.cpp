@@ -149,7 +149,6 @@ void EventHandler::onSetupAndRender(SetupAndRenderEvent &event) {
     for (Listener *&listener: listeners) {
         listener->onSetupAndRender(event);
     }
-
 }
 
 void EventHandler::onGetViewPerspective(PerspectiveEvent &event) {
