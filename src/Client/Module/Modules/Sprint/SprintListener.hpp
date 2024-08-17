@@ -24,6 +24,8 @@ class SprintListener : public Listener {
     void onRender(RenderEvent &event) override {
         if(!module->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
 
+        if(!module->settings.getSettingByName<bool>("status")->value) return;
+
             if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
 
                 if (SDK::clientInstance->getLocalPlayer() != nullptr) {

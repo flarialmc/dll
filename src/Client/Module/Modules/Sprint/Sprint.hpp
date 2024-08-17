@@ -122,7 +122,7 @@ public:
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        L"toggle Status", textWidth * 6.9f, textHeight,
+                                        L"Toggle Status", textWidth * 6.9f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
 
