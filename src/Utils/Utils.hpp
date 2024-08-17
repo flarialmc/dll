@@ -89,6 +89,10 @@ public:
         return Vec2<T>(this->x * v.x, this->y * v.y);
     };
 
+    auto mul(float v) -> Vec2<T> {
+        return Vec2<T>(this->x * v, this->y * v);
+    };
+
     auto dist(const Vec2<T> &v) -> float {
         auto dX = this->x - v.x;
         auto dY = this->y - v.y;
@@ -99,6 +103,14 @@ public:
     auto ToInt() {
         return Vec2<int>(x, y);
     }
+
+    auto operator+(const Vec2<T> Vec) {
+		return Vec2(this->x + Vec.x, this->y + Vec.y);
+	}
+
+	auto operator-(const Vec2<T> Vec) {
+		return Vec2(this->x - Vec.x, this->y - Vec.y);
+	}
 };
 
 template<typename T>

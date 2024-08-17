@@ -4,7 +4,6 @@
 
 class UIControl {
 public:
-    char filling[192]; //0x0000
     BUILD_ACCESS(this, std::string, LayerName, GET_OFFSET("UIControl::LayerName"));
     BUILD_ACCESS(this, float, scale, GET_OFFSET("UIControl::scale"));
     BUILD_ACCESS(this, float, x, GET_OFFSET("UIControl::x"));

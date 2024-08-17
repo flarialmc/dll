@@ -491,6 +491,57 @@ public:
 
                     rectY += Constraints::SpacingConstraint(0.35, textWidth);
 
+                    if (FlarialGUI::Toggle(12, rectX, rectY,
+                                           Client::settings.getSettingByName<bool>("highqualityblur")->value)) {
+
+                        Client::settings.getSettingByName<bool>(
+                                "highqualityblur")->value = !Client::settings.getSettingByName<bool>("highqualityblur")->value;
+                    }
+
+                    FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(1.2f, textWidth / 2.0f),
+                                                    rectY,
+                                                    L"Higher blur quality (works with dynamic option too)",
+                                                    Constraints::SpacingConstraint(4.5, textWidth), textHeight,
+                                                    DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                    Constraints::SpacingConstraint(0.95, textWidth),
+                                                    DWRITE_FONT_WEIGHT_NORMAL);
+
+                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
+
+                    if (FlarialGUI::Toggle(11, rectX, rectY,
+                                           Client::settings.getSettingByName<bool>("dynamicblurrquality")->value)) {
+
+                        Client::settings.getSettingByName<bool>(
+                                "dynamicblurrquality")->value = !Client::settings.getSettingByName<bool>("dynamicblurrquality")->value;
+                    }
+
+                    FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(1.2f, textWidth / 2.0f),
+                                                    rectY,
+                                                    L"Dynamic blur quality (fps based)",
+                                                    Constraints::SpacingConstraint(4.5, textWidth), textHeight,
+                                                    DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                    Constraints::SpacingConstraint(0.95, textWidth),
+                                                    DWRITE_FONT_WEIGHT_NORMAL);
+
+                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
+
+                    if (FlarialGUI::Toggle(10, rectX, rectY,
+                                           Client::settings.getSettingByName<bool>("limitblurfps")->value)) {
+
+                        Client::settings.getSettingByName<bool>(
+                                "limitblurfps")->value = !Client::settings.getSettingByName<bool>("limitblurfps")->value;
+                    }
+
+                    FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(1.2f, textWidth / 2.0f),
+                                                    rectY,
+                                                    L"Dynamic blur updates",
+                                                    Constraints::SpacingConstraint(4.5, textWidth), textHeight,
+                                                    DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                    Constraints::SpacingConstraint(0.95, textWidth),
+                                                    DWRITE_FONT_WEIGHT_NORMAL);
+
+                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
+
                     FlarialGUI::FlarialTextWithFont(rectX, rectY, L"Chroma Speed",
                                                     textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                                     Constraints::SpacingConstraint(1.05, textWidth),

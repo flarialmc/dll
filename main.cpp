@@ -47,7 +47,7 @@ DWORD WINAPI init(HMODULE real)
                 if(SDK::hasInstanced && SDK::clientInstance != nullptr) {
                     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                         if(elapsed >= std::chrono::seconds(60)) {
-                            std::string name = SDK::clientInstance->getLocalPlayer()->playerName;
+                            std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
 
 
                             ModuleManager::onlineUsers.clear();

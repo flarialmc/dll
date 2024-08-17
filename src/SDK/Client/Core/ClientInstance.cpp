@@ -12,9 +12,7 @@ LocalPlayer *ClientInstance::getLocalPlayer() {
 
     int index = *reinterpret_cast<int*>(indexRef + 9) / 8;
 
-    auto *lp = Memory::CallVFuncI<LocalPlayer *>(index, this);
-
-    return lp;
+    return Memory::CallVFuncI<LocalPlayer *>(index, this);
 }
 
 BlockSource *ClientInstance::getBlockSource() {
@@ -49,6 +47,7 @@ void ClientInstance::releaseMouse() {
 }
 
 std::string ClientInstance::getTopScreenName() {
+    std::lock_guard<std::mutex> guard(SDK::currentScreenMtx);
     return SDK::currentScreen;
 }
 

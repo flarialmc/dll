@@ -30,6 +30,8 @@ void OffsetInit::init2120() {
 
     ADD_OFFSET("Level::hitResult", 0x220);
     ADD_OFFSET("Level::getPlayerMap", 0xBF8);
+
+    ADD_OFFSET("ItemActor::stack", 0x408);
 }
 
 void OffsetInit::init2100() {
@@ -49,6 +51,8 @@ void OffsetInit::init2100() {
 
     ADD_OFFSET("Level::hitResult", 0xB38);
     ADD_OFFSET("Level::getPlayerMap", 0x1BC8); // getRuntimeActorList offset + B8 || Level::getPlayerList
+
+    ADD_OFFSET("ItemActor::stack", 0x448);
 }
 
 void OffsetInit::init2080() {
@@ -69,6 +73,8 @@ void OffsetInit::init2080() {
 
     ADD_OFFSET("Level::hitResult", 0xB30);
     ADD_OFFSET("Level::getPlayerMap", 0x1C88);
+
+    ADD_OFFSET("ItemActor::stack", 0x470);
 }
 
 void OffsetInit::init2070() {
@@ -92,6 +98,7 @@ void OffsetInit::init2070() {
 
     ADD_OFFSET("Level::hitResult", 0xB18);
 
+    ADD_OFFSET("ItemActor::stack", 0x498);
 }
 
 void OffsetInit::init2060() {
@@ -115,6 +122,8 @@ void OffsetInit::init2060() {
 
     ADD_OFFSET("Level::hitResult", 0xA98);
     ADD_OFFSET("Level::getPlayerMap", 0x1E98);
+
+    ADD_OFFSET("ItemActor::stack", 0x4D0);
 }
 
 void OffsetInit::init2050() {
@@ -139,6 +148,8 @@ void OffsetInit::init2050() {
 
     ADD_OFFSET("Level::hitResult", 0xA48);
     ADD_OFFSET("Level::getPlayerMap", 0x1EA8);
+
+    ADD_OFFSET("ItemActor::stack", 0x4C8);
 }
 
 void OffsetInit::init2040() {
@@ -158,6 +169,8 @@ void OffsetInit::init2040() {
 
     ADD_OFFSET("Level::hitResult", 0xA68);
     ADD_OFFSET("Level::getPlayerMap", 0x25F0);
+
+    ADD_OFFSET("OptionInfo::TranslateName", 0x168);
 }
 
 void OffsetInit::init2030() {
@@ -284,4 +297,6 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("Level::hitResult", 0xA48);
     ADD_OFFSET("Level::getPlayerMap", 0x2608);
+
+    ADD_OFFSET("ItemActor::stack", 0x4A0);
 }

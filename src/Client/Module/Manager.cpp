@@ -61,8 +61,12 @@
 #include "Modules/Misc/DiscordRPC/DiscordRPCListener.hpp"
 //#include "Modules/Overlay/OverlayModule.hpp"
 #include "Modules/AutoRQ/AutoRQ.hpp"
+#include "Modules/HitPing/HitPing.hpp"
+#include "Modules/InstantHurtAnimation/InstantHurtAnimation.hpp"
 //#include "Modules/MovableChat/MovableChat.hpp"
 #include <algorithm>
+
+#include "Modules/ItemPhysics/ItemPhysics.hpp"
 
 namespace ModuleManager {
     std::unordered_map<size_t, Module*> moduleMap;
@@ -88,73 +92,70 @@ std::vector<Module*> ModuleManager::getModules() {
 }
 
 void ModuleManager::initialize() {
-    ModuleManager::addModule(new MotionBlur());
+    addModule(new MotionBlur());
 
     // Screen effects
-    ModuleManager::addModule(new Deepfry());
-    ModuleManager::addModule(new HueChanger());
-    ModuleManager::addModule(new PatarHD());
-    ModuleManager::addModule(new DVD());
+    addModule(new Deepfry());
+    addModule(new HueChanger());
+    addModule(new PatarHD());
+    addModule(new DVD());
 
     // FOV Changers
-    ModuleManager::addModule(new FOVChanger()); //1
-    ModuleManager::addModule(new Zoom()); //2
-    ModuleManager::addModule(new UpsideDown()); //3
+    addModule(new FOVChanger()); //1
+    addModule(new Zoom()); //2
+    addModule(new UpsideDown()); //3
 
-    ModuleManager::addModule(new ClickGUI());
+    addModule(new ClickGUI());
 
-    ModuleManager::addModule(new FPSCounter());
-    ModuleManager::addModule(new CPSCounter());
-    ModuleManager::addModule(new IPDisplay());
-    ModuleManager::addModule(new ReachCounter());
-    ModuleManager::addModule(new ComboCounter());
-    ModuleManager::addModule(new PingCounter());
-    ModuleManager::addModule(new PotCounter());
-    ModuleManager::addModule(new ArrowCounter());
-    ModuleManager::addModule(new Time());
-    ModuleManager::addModule(new MEM());
-    ModuleManager::addModule(new Fullbright());
-    ModuleManager::addModule(new ForceCoords());
-    ModuleManager::addModule(new Keystrokes());
-    ModuleManager::addModule(new Sneak());
-    ModuleManager::addModule(new Sprint());
-    ModuleManager::addModule(new Hitbox());
-    ModuleManager::addModule(new ThirdPerson());
-    ModuleManager::addModule(new SnapLook());
-    if(!WinrtUtils::check(21,20)) { // TODO
-        ModuleManager::addModule(new HurtColor());
-    }
-    ModuleManager::addModule(new FogColor());
-    ModuleManager::addModule(new ArmorHUD());
+    addModule(new FPSCounter());
+    addModule(new CPSCounter());
+    addModule(new IPDisplay());
+    addModule(new ReachCounter());
+    addModule(new ComboCounter());
+    addModule(new PingCounter());
+    addModule(new PotCounter());
+    addModule(new ArrowCounter());
+    addModule(new Time());
+    addModule(new MEM());
+    addModule(new Fullbright());
+    addModule(new ForceCoords());
+    addModule(new Keystrokes());
+    addModule(new Sneak());
+    addModule(new Sprint());
+    addModule(new Hitbox());
+    addModule(new ThirdPerson());
+    addModule(new SnapLook());
+    addModule(new HurtColor());
+    addModule(new FogColor());
+    addModule(new ArmorHUD());
 
-    ModuleManager::addModule(new TimeChanger());
+    addModule(new TimeChanger());
 
-    if((WinrtUtils::check(20,30) && !WinrtUtils::check(20,40)) || WinrtUtils::check(20,50)) { // does not work in 1.20.4X
-        ModuleManager::addModule(new RenderOptions());
-    }
+    addModule(new RenderOptions());
 
-    ModuleManager::addModule(new PaperDoll());
-    ModuleManager::addModule(new GuiScale());
-    ModuleManager::addModule(new WeatherChanger());
-    ModuleManager::addModule(new TabList());
-    ModuleManager::addModule(new AutoGG());
-    ModuleManager::addModule(new TextHotkey());
-    ModuleManager::addModule(new NickModule());
-    ModuleManager::addModule(new FreeLook());
-    ModuleManager::addModule(new SpeedDisplay());
-    ModuleManager::addModule(new CPSLimiter());
-    ModuleManager::addModule(new BlockBreakIndicator());
-    if(!WinrtUtils::check(21,20)) { // TODO
-        ModuleManager::addModule(new Animations());
-    }
-    ModuleManager::addModule(new BlockOutline());
-    ModuleManager::addModule(new CommandHotkey());
-    ModuleManager::addModule(new NoHurtCam());
-    ModuleManager::addModule(new InventoryHUD());
-    //ModuleManager::addModule(new OverlayModule());
-    ModuleManager::addModule(new AutoRQ());
-    //ModuleManager::addModule(new MovableChat());
-    //ModuleManager::addModule(new CompactChat());
+    addModule(new PaperDoll());
+    addModule(new GuiScale());
+    addModule(new WeatherChanger());
+    addModule(new TabList());
+    addModule(new AutoGG());
+    addModule(new TextHotkey());
+    addModule(new NickModule());
+    addModule(new FreeLook());
+    addModule(new SpeedDisplay());
+    addModule(new CPSLimiter());
+    addModule(new BlockBreakIndicator());
+    addModule(new Animations());
+    addModule(new BlockOutline());
+    addModule(new CommandHotkey());
+    addModule(new NoHurtCam());
+    addModule(new InventoryHUD());
+    //addModule(new OverlayModule());
+    addModule(new AutoRQ());
+    //addModule(new HitPing());
+    //addModule(new InstantHurtAnimation());
+    //addModule(new MovableChat());
+    //addModule(new CompactChat());
+    //addModule(new ItemPhysics());
 
     EventHandler::registerListener(new GUIKeyListener("GuiKeyListener"));
     EventHandler::registerListener(new DiscordRPCListener("DiscordRPC"));
@@ -169,14 +170,15 @@ void ModuleManager::initialize() {
 
 void ModuleManager::terminate() {
     initialized = false;
-    for (const auto& pair : ModuleManager::moduleMap) {
-        pair.second->terminate();
+    for (const auto& pair : moduleMap) {
+        if (pair.second != nullptr)
+            pair.second->terminate();
     }
     moduleMap.clear();
 }
 
 void ModuleManager::SaveModulesConfig() {
-    for (const auto& pair : ModuleManager::moduleMap) {
+    for (const auto& pair : moduleMap) {
         pair.second->saveSettings();
     }
 }
@@ -185,11 +187,14 @@ bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {
 
     bool result = false;
 
-    for (const auto& pair : ModuleManager::moduleMap) {
+    if(!ModuleManager::initialized) return false;
+
+    for (const auto& pair : moduleMap) {
+        if(!pair.second) continue;
 
         if (pair.second->settings.getSettingByName<bool>(settingName) != nullptr)
             if (pair.second->settings.getSettingByName<bool>(settingName)->value &&
-                pair.second->isEnabled()) {
+                pair.second->isEnabled() && (pair.second->active || pair.second->defaultKeybind.empty())) {
                 result = true;
                 break;
             }
@@ -202,10 +207,5 @@ bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {
 Module* ModuleManager::getModule(const std::string& name) {
     size_t hash = std::hash<std::string>{}(name);
 
-    auto it = moduleMap.find(hash);
-    if (it != moduleMap.end()) {
-        return it->second;
-    }
-
-    return nullptr;
+    return moduleMap[hash];
 }

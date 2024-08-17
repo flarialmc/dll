@@ -146,11 +146,7 @@ void ResizeHook::cleanShit(bool isResize) {
 
     Memory::SafeRelease(SwapchainHook::D2D1Bitmap);
 
-    if (SwapchainHook::init) {
-
-        Memory::SafeRelease(D2D::context);
-
-    }
+    Memory::SafeRelease(D2D::context);
 
     FlarialGUI::scrollposmodifier = 0;
 

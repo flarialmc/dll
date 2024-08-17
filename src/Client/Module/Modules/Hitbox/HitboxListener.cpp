@@ -4,16 +4,16 @@
 void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
     std::lock_guard<std::mutex> guard(renderMtx);
     aabbsToRender.clear();
-    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->mcgame->mouseGrabbed ||
-        !SDK::clientInstance->getLocalPlayer()->level)
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->getMinecraftGame()->mouseGrabbed ||
+        !SDK::clientInstance->getLocalPlayer()->getLevel())
         return;
     auto player = SDK::clientInstance->getLocalPlayer();
-    for (const auto &ent: player->level->getRuntimeActorList()) {
+    for (const auto &ent: player->getLevel()->getRuntimeActorList()) {
         if (ent != nullptr && ent != player /*&& ent->isPlayer() && ent->hasCategory(ActorCategory::Player)*/) {
             float dist = player->getPosition()->dist(*ent->getPosition());
             // This may let through some entites
             if (!ent->isValidAABB() || dist > 30 || !player->canSee(*ent) ||
-                ent->getActorFlag(ActorFlags::FLAG_INVISIBLE)) // + ent == player ||
+                ent->getActorFlag(ActorFlags::FLAG_INVISIBLE))
                 continue;
 
             float mod = 0.f;
@@ -32,13 +32,13 @@ void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
 
 void HitboxListener::onRender(RenderEvent &event) {
 
-    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->mcgame->mouseGrabbed ||
-        !SDK::clientInstance->getLocalPlayer()->level)
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->getMinecraftGame()->mouseGrabbed ||
+        !SDK::clientInstance->getLocalPlayer()->getLevel())
         return;
 
     auto player = SDK::clientInstance->getLocalPlayer();
 
-    if(FlarialGUI::inMenu || SDK::currentScreen != "hud_screen") return;
+    if(FlarialGUI::inMenu || SDK::getCurrentScreen() != "hud_screen") return;
 
     if (player != nullptr) {
         D2D1_COLOR_F color2;

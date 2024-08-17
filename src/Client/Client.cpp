@@ -61,6 +61,8 @@ void Client::initialize() {
 
     if (!VersionUtils::isSupported(Client::version)) {
         Logger::debug("[INFO] Version not supported!");
+        MessageBox(NULL, "Flarial: this version is not supported!", "", MB_OK);
+        ModuleManager::terminate();
         Client::disable = true;
         return;
     }
@@ -98,6 +100,15 @@ void Client::initialize() {
 
     if (Client::settings.getSettingByName<float>("blurintensity") == nullptr)
         Client::settings.addSetting("blurintensity", 18.0f);
+
+    if (Client::settings.getSettingByName<bool>("limitblurfps") == nullptr)
+        Client::settings.addSetting("limitblurfps", true);
+
+    if (Client::settings.getSettingByName<bool>("dynamicblurrquality") == nullptr)
+        Client::settings.addSetting("dynamicblurrquality", true);
+
+    if (Client::settings.getSettingByName<bool>("highqualityblur") == nullptr)
+        Client::settings.addSetting("highqualityblur", false);
 
     if (Client::settings.getSettingByName<bool>("killdx") == nullptr)
         Client::settings.addSetting("killdx", false);
@@ -196,8 +207,8 @@ void Client::centerCursor() {
         }
 
 
-        if ((SDK::currentScreen != "hud_screen" && InHudScreen) ||
-            (SDK::currentScreen == "hud_screen" && !InHudScreen)) {
+        if ((SDK::getCurrentScreen() != "hud_screen" && InHudScreen) ||
+            (SDK::getCurrentScreen() == "hud_screen" && !InHudScreen)) {
             GetWindowRect(hWnd, &currentRect);
             GetClientRect(hWnd, &clientRect);
 

@@ -14,6 +14,7 @@
 #include "Render/FogColorEvent.hpp"
 #include "Render/HurtColorEvent.hpp"
 #include "Render/GammaEvent.hpp"
+#include "Render/GetTextureEvent.hpp"
 
 class EventHandler {
 
@@ -66,6 +67,7 @@ public:
 
     static void onRaknetTick(RaknetTickEvent &event);
 
-    static void unregisterAll();
+    static void onGetTexture(GetTextureEvent &event);
 
+    static void unregisterAll();
 };

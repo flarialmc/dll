@@ -14,7 +14,7 @@ class KeystrokesListener : public Listener {
     Module *module;
 
     void onRender(RenderEvent &event) override {
-        if(!module->isEnabled() || SDK::currentScreen != "hud_screen") return;
+        if(!module->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
         this->module->normalRender(7, (std::string &) "");
     }
 

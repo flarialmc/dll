@@ -8,13 +8,16 @@ namespace SDK {
     extern ClientInstance *clientInstance;
     extern ScreenView *screenView;
     extern bool hasInstanced;
+    extern std::mutex currentScreenMtx;
     extern std::string currentScreen;
     extern std::chrono::steady_clock::time_point lastSetCurrentScreenTime;
-    extern __int64 serverPing;
+    extern uint64_t serverPing;
 
     extern int getServerPing();
 
     extern void setCurrentScreen(const std::string& layer);
+
+    extern std::string getCurrentScreen();
 
     extern std::string getServerIP();
 

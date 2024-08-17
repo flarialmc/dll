@@ -286,4 +286,8 @@ namespace FlarialGUI {
     void RoundedRectWithImageAndText(int index, float x, float y, const float width, const float height,
                                      const D2D1_COLOR_F color, int iconId, const float imageWidth,
                                      const float imageHeight);
+
+    void PrepareBlur(float intensity);
+
+    void PrepareBlur(ID2D1Effect *effect, float intensity);
 }

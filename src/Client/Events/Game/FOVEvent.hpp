@@ -3,7 +3,7 @@
 #include "../Event.hpp"
 #include "../Cancellable.hpp"
 
-class FOVEvent : public Event, Cancellable {
+class FOVEvent : public Event, public Cancellable {
 private:
     float fov;
 public:

@@ -225,7 +225,7 @@ public:
                 int i3 = 0;
                 float i2 = 0;
 
-                for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap()) {
+                for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
 
                     i3++;
 
@@ -249,7 +249,7 @@ public:
                 float fakex = realcenter.x;
                 float fixer = 0;
 
-                for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap()) {
+                for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
 
                     i3++;
                     if (i3 % 10 == 1) {
@@ -329,7 +329,7 @@ public:
                 if (yes) {
 
                     auto vecmap = copyMapInAlphabeticalOrder(
-                            SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap());
+                            SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap());
                     for (const auto &pair: vecmap) {
 
                         i++;
@@ -438,7 +438,7 @@ public:
                     }
 
                 } else {
-                    for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap()) {
+                    for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
 
                         i++;
 

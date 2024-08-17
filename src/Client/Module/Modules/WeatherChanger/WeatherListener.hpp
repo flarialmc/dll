@@ -18,22 +18,20 @@ class WeatherListener : public Listener {
 
         if (module->isEnabled()) {
             if (module->settings.getSettingByName<float>("rain")->value > 0.02f)
-                SDK::clientInstance->getBlockSource()->dimension->weather->rainLevel = module->settings.getSettingByName<float>(
+                SDK::clientInstance->getBlockSource()->getDimension()->weather->rainLevel = module->settings.getSettingByName<float>(
                         "rain")->value;
-            else SDK::clientInstance->getBlockSource()->dimension->weather->rainLevel = 0.0f;
+            else SDK::clientInstance->getBlockSource()->getDimension()->weather->rainLevel = 0.0f;
             if (module->settings.getSettingByName<float>("lighting")->value < 0.02f)
-                SDK::clientInstance->getBlockSource()->dimension->weather->lightingLevel = module->settings.getSettingByName<float>(
+                SDK::clientInstance->getBlockSource()->getDimension()->weather->lightingLevel = module->settings.getSettingByName<float>(
                         "lighting")->value;
-            else SDK::clientInstance->getBlockSource()->dimension->weather->lightingLevel = 0.0f;
+            else SDK::clientInstance->getBlockSource()->getDimension()->weather->lightingLevel = 0.0f;
 
-            if (!WinrtUtils::check(21, 0)) {
-                // TODO: When you set snow, it will stay even if on until game reload
-                if (module->settings.getSettingByName<bool>("snow")->value) {
-                    Vec3<float> *pos = event.getActor()->getPosition();
-                    Vec3<int> e((int)pos->x, (int)pos->y, (int)pos->z);
+            // TODO: When you set snow, it will stay even if on until game reload
+            if (module->settings.getSettingByName<bool>("snow")->value) {
+                Vec3<float> *pos = event.getActor()->getPosition();
+                Vec3<int> e((int)pos->x, (int)pos->y, (int)pos->z);
 
-                    SDK::clientInstance->getBlockSource()->getBiome(e)->temparature = 0.0f;
-                }
+                SDK::clientInstance->getBlockSource()->getBiome(e)->temparature = 0.0f;
             }
         }
     }
