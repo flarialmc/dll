@@ -187,7 +187,10 @@ bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {
 
     bool result = false;
 
+    if(!ModuleManager::initialized) return false;
+
     for (const auto& pair : moduleMap) {
+        if(!pair.second) continue;
 
         if (pair.second->settings.getSettingByName<bool>(settingName) != nullptr)
             if (pair.second->settings.getSettingByName<bool>(settingName)->value &&
