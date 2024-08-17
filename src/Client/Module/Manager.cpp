@@ -171,7 +171,8 @@ void ModuleManager::initialize() {
 void ModuleManager::terminate() {
     initialized = false;
     for (const auto& pair : moduleMap) {
-        pair.second->terminate();
+        if (pair.second != nullptr)
+            pair.second->terminate();
     }
     moduleMap.clear();
 }

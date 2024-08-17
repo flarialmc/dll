@@ -10,6 +10,7 @@ class ItemPhysicsListener : public Listener {
     ItemPhysics* mod;
     uint32_t origPosRel = 0;
     float* newPosRel = nullptr;
+    bool patched = false;
 
     std::unordered_map<Actor*, std::tuple<float, Vec3<float>, Vec3<int>>> actorData;
     ActorRenderData* renderData = nullptr;

@@ -133,6 +133,7 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
     const auto preserveRotations = settings.getSettingByName<bool>("preserverots")->value;
 
     if (curr->isOnGround() && yMod == 0.f && !preserveRotations && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
+        SDK::clientInstance->getGuiData()->displayClientMessage("Test");
         if (smoothRotations && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
             vec.x += static_cast<float>(sign.x) * deltaTime * speed * xMul;
 
@@ -206,6 +207,7 @@ static char data[0x5], data2[0x5];
 void ItemPhysicsListener::onEnable() {
     static auto posAddr = Memory::findSig(GET_SIG("ItemPositionConst")) + 4;
     origPosRel = *reinterpret_cast<uint32_t*>(posAddr);
+    patched = true;
 
     static auto rotateAddr = reinterpret_cast<void*>(Memory::findSig(GET_SIG("glm_rotateRef")));
 
@@ -242,10 +244,12 @@ void ItemPhysicsListener::onEnable() {
 }
 
 void ItemPhysicsListener::onDisable() {
-    static auto posAddr = Memory::findSig(GET_SIG("ItemPositionConst")) + 4;
+    if (patched) {
+        static auto posAddr = Memory::findSig(GET_SIG("ItemPositionConst")) + 4;
 
-    Memory::patchBytes(reinterpret_cast<void*>(posAddr), &origPosRel, 4);
-    FreeBuffer(newPosRel);
+        Memory::patchBytes(reinterpret_cast<void*>(posAddr), &origPosRel, 4);
+        FreeBuffer(newPosRel);
+    }
 
     glm_rotateHook->disable();
     ItemRenderer_renderHook->disable();
