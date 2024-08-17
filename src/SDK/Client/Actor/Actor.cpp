@@ -149,7 +149,7 @@ StateVectorComponent *Actor::getStateVectorComponent() {
 
 ItemStack *Actor::getOffhandSlot() {
     if(WinrtUtils::check(20, 80)) {
-        return getOffhandContainer()->getItem(0);
+        return getOffhandContainer()->getItem(1);
     } else {
         static uintptr_t sig;
 
