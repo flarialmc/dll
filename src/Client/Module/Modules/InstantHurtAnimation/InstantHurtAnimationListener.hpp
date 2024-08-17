@@ -106,10 +106,12 @@ class InstantHurtAnimationListener : public Listener {
 
         hitEntities[runtimeID] = now;
 
-        SendPacketHook::receivePacketEntityEventOriginal(SendPacketHook::PacketHandlerDispatcher,
-                                                         SendPacketHook::NetworkIdentifier,
-                                                         SendPacketHook::NetEventCallback,
-                                                         packet);
+        if(SendPacketHook::PacketHandlerDispatcher && SendPacketHook::NetworkIdentifier && SendPacketHook::NetEventCallback) {
+            SendPacketHook::receivePacketEntityEventOriginal(SendPacketHook::PacketHandlerDispatcher,
+                                                             SendPacketHook::NetworkIdentifier,
+                                                             SendPacketHook::NetEventCallback,
+                                                             packet);
+        }
     };
 
     void ClearOldHits() {
