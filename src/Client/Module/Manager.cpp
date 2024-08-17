@@ -194,7 +194,7 @@ bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {
 
         if (pair.second->settings.getSettingByName<bool>(settingName) != nullptr)
             if (pair.second->settings.getSettingByName<bool>(settingName)->value &&
-                pair.second->isEnabled()) {
+                pair.second->isEnabled() && pair.second->active) {
                 result = true;
                 break;
             }
