@@ -98,15 +98,15 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
     auto& sign = std::get<2>(listener->actorData.at(curr));
 
     auto& settings = mod->settings;
-    const auto speed = settings.getSettingByName<float>("speed");
-    const auto xMul = settings.getSettingByName<float>("xmul");
-    const auto yMul = settings.getSettingByName<float>("ymul");
-    const auto zMul = settings.getSettingByName<float>("zmul");
+    const auto speed = settings.getSettingByName<float>("speed")->value;
+    const auto xMul = settings.getSettingByName<float>("xmul")->value;
+    const auto yMul = settings.getSettingByName<float>("ymul")->value;
+    const auto zMul = settings.getSettingByName<float>("zmul")->value;
 
     if (!curr->isOnGround() || yMod > 0.f) {
-        vec.x += static_cast<float>(sign.x) * deltaTime * speed->value * xMul->value;
-        vec.y += static_cast<float>(sign.y) * deltaTime * speed->value * yMul->value;
-        vec.z += static_cast<float>(sign.z) * deltaTime * speed->value * zMul->value;
+        vec.x += static_cast<float>(sign.x) * deltaTime * speed * xMul;
+        vec.y += static_cast<float>(sign.y) * deltaTime * speed * yMul;
+        vec.z += static_cast<float>(sign.z) * deltaTime * speed * zMul;
 
         if (vec.x > 360.f)
             vec.x -= 360.f;
@@ -129,15 +129,15 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
 
     Vec3<float> renderVec = vec;
 
-    const auto smoothRotations = settings.getSettingByName<float>("smoothrots");
-    const auto preserveRotations = settings.getSettingByName<float>("preserverots");
+    const auto smoothRotations = settings.getSettingByName<bool>("smoothrots")->value;
+    const auto preserveRotations = settings.getSettingByName<bool>("preserverots")->value;
 
     if (curr->isOnGround() && yMod == 0.f && !preserveRotations && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
         if (smoothRotations && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
-            vec.x += static_cast<float>(sign.x) * deltaTime * speed->value * xMul->value;
+            vec.x += static_cast<float>(sign.x) * deltaTime * speed * xMul;
 
             if (curr->getStack().block != nullptr) {
-                vec.z += static_cast<float>(sign.z) * deltaTime * speed->value * zMul->value;
+                vec.z += static_cast<float>(sign.z) * deltaTime * speed * zMul;
 
                 if (vec.x > 360.f || vec.x < 0.f) {
                     vec.x = 0.f;
@@ -150,7 +150,7 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
                 }
             }
             else {
-                vec.y += static_cast<float>(sign.y) * deltaTime * speed->value * yMul->value;
+                vec.y += static_cast<float>(sign.y) * deltaTime * speed * yMul;
 
                 if (vec.x - 90.f > 360.f || vec.x - 90.f < 0.f) {
                     vec.x = 90.f;
