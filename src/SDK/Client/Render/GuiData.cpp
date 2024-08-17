@@ -14,11 +14,9 @@ void GuiData::displayClientMessage(const std::string &str) {
     }
 
     if (WinrtUtils::check(21, 20)) {
-        char bruh[0x28]{};
-
-        using func_t = void(*)(GuiData*, const std::string&, char*, bool);
+        using func_t = void(*)(GuiData*, const std::string&, std::optional<std::string>, bool); // The new optional seems to be some kind of filtered message for the future. If set, it overwrites the other string
         static auto func = reinterpret_cast<func_t>(sig);
-        func(this, str, bruh, true);
+        func(this, str, {}, true);
     }
     else {
         using func_t = void(*)(GuiData*, const std::string&, bool);
