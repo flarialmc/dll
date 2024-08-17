@@ -133,7 +133,6 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
     const auto preserveRotations = settings.getSettingByName<bool>("preserverots")->value;
 
     if (curr->isOnGround() && yMod == 0.f && !preserveRotations && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
-        SDK::clientInstance->getGuiData()->displayClientMessage("Test");
         if (smoothRotations && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
             vec.x += static_cast<float>(sign.x) * deltaTime * speed * xMul;
 
