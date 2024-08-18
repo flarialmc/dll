@@ -114,8 +114,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     if (Client::settings.getSettingByName<bool>("killdx")->value) {
         SwapchainHook::queue = nullptr;
-        winrt::com_ptr<ID3D12Device5> d3d12device3;
-        if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(d3d12device3.put())))) {
+        ID3D12Device5* d3d12device3;
+        if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device3)))) {
             Logger::debug("[SwapChain] Removed d3d12 device");
             pSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
             d3d12device3->RemoveDevice();
