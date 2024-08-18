@@ -101,7 +101,7 @@ private:
         if(funcOriginalText == nullptr || oDrawImage == nullptr)
             hookDrawTextAndDrawImage(muirc);
 
-        std::string layer = pScreenView->VisualTree->root->LayerName;
+        std::string layer = pScreenView->VisualTree->root->getLayerName();
 
         if (layer != "debug_screen" && layer != "toast_screen"){ // start_screen, play_screen, world_loading_progress_screen, pause_screen, hud_screen
             SetTopScreenNameEvent event(layer);
