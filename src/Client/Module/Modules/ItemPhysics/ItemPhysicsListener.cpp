@@ -44,6 +44,8 @@ void ItemPhysicsListener::ItemRenderer_render(ItemRenderer* _this, BaseActorRend
     using func_t = void(*)(ItemRenderer*, BaseActorRenderContext*, ActorRenderData*);
     static auto oFunc = reinterpret_cast<func_t>(ItemRenderer_renderHook->trampoline);
 
+    if(!ModuleManager::initialized) return oFunc(_this, renderCtx, renderData);
+
     static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("ItemPhysics"));
     const auto listener = mod->listener;
 
@@ -57,6 +59,8 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
     using glm_rotate_t = void(__fastcall*)(glm::mat4x4&, float, float, float, float);
     static auto glm_rotate = reinterpret_cast<glm_rotate_t>(rotateSig);
 
+    if(!ModuleManager::initialized) return;
+
     static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("ItemPhysics"));
     const auto listener = mod->listener;
     const auto renderData = listener->renderData;
@@ -68,6 +72,8 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
 
     static float height = 0.5f;
 
+    bool isOnGround = curr->isOnGround();
+
     if (!listener->actorData.contains(curr)) {
         std::random_device rd;
         std::mt19937 gen(rd());
@@ -78,7 +84,7 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
         const auto vec = Vec3<float>(dist2(gen), dist2(gen), dist2(gen));
         const auto sign = Vec3(dist(gen) * 2 - 1, dist(gen) * 2 - 1, dist(gen) * 2 - 1);
 
-        auto def = std::tuple{curr->isOnGround() ? 0.f : height, vec, sign};
+        auto def = std::tuple{ isOnGround ? 0.f : height, vec, sign};
         listener->actorData.emplace(curr, def);
     }
 
@@ -103,7 +109,7 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
     const auto yMul = settings.getSettingByName<float>("ymul")->value;
     const auto zMul = settings.getSettingByName<float>("zmul")->value;
 
-    if (!curr->isOnGround() || yMod > 0.f) {
+    if (!isOnGround || yMod > 0.f) {
         vec.x += static_cast<float>(sign.x) * deltaTime * speed * xMul;
         vec.y += static_cast<float>(sign.y) * deltaTime * speed * yMul;
         vec.z += static_cast<float>(sign.z) * deltaTime * speed * zMul;
@@ -132,7 +138,7 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
     const auto smoothRotations = settings.getSettingByName<bool>("smoothrots")->value;
     const auto preserveRotations = settings.getSettingByName<bool>("preserverots")->value;
 
-    if (curr->isOnGround() && yMod == 0.f && !preserveRotations && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
+    if (isOnGround && yMod == 0.f && !preserveRotations && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
         if (smoothRotations && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
             vec.x += static_cast<float>(sign.x) * deltaTime * speed * xMul;
 
@@ -173,6 +179,12 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
                 renderVec.x = 90.f;
                 renderVec.y = 0.f;
             }
+        }
+    }
+
+    if(isOnGround) {
+        if(curr->getStack().block == nullptr) {
+            pos.y -= 0.12;
         }
     }
 

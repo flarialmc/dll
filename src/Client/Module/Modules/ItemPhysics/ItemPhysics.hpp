@@ -103,7 +103,7 @@ public:
                                         Constraints::RelativeConstraint(0.12, "height", true),
                                         DWRITE_FONT_WEIGHT_NORMAL);
 
-        float ymul = FlarialGUI::Slider(1, xPos + FlarialGUI::SettingsTextWidth("Y Multiplier "),
+        float ymul = FlarialGUI::Slider(2, xPos + FlarialGUI::SettingsTextWidth("Y Multiplier "),
                                         yPos,
                                         this->settings.getSettingByName<float>("ymul")->value, 30.f, 7.f);
 
@@ -120,7 +120,7 @@ public:
                                         Constraints::RelativeConstraint(0.12, "height", true),
                                         DWRITE_FONT_WEIGHT_NORMAL);
 
-        float zmul = FlarialGUI::Slider(2, xPos + FlarialGUI::SettingsTextWidth("Z Multiplier "),
+        float zmul = FlarialGUI::Slider(3, xPos + FlarialGUI::SettingsTextWidth("Z Multiplier "),
                                         yPos,
                                         this->settings.getSettingByName<float>("zmul")->value, 30.f, 7.f);
 
