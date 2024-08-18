@@ -273,8 +273,6 @@ void OffsetInit::init2030() {
     ADD_OFFSET("ScreenContext::colorHolder", 0x30);
     ADD_OFFSET("ScreenContext::tessellator", 0xC0);
 
-    ADD_OFFSET("Tessellator::transformOffset", 0x184);
-
     ADD_OFFSET("createMaterial", 1);
 
     ADD_OFFSET("TextureGroup::base", 0x18);

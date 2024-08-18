@@ -14,6 +14,8 @@
 #include "../../../Module/Modules/Hitbox/HitboxListener.hpp"
 #include <format>
 
+#include "../../../../Utils/Render/MaterialUtils.hpp"
+
 __int64* oDrawImage = nullptr;
 
 class SetUpAndRenderHook : public Hook
@@ -93,6 +95,7 @@ private:
     }
 
 	static void setUpAndRenderCallback(ScreenView* pScreenView, MinecraftUIRenderContext* muirc) {
+		MaterialUtils::update();
 
 		SDK::screenView = pScreenView;
         SDK::clientInstance = muirc->getClientInstance();
@@ -126,13 +129,12 @@ private:
         SwapchainHook::FrameTransforms.push(transform);
         SwapchainHook::frameTransformsMtx.unlock();
 
-        if(layer == "debug_screen" || layer == "hud_screen" || layer == "start_screen") {
-            SetupAndRenderEvent event(muirc);
-            funcOriginal(pScreenView, muirc);
-            EventHandler::onSetupAndRender(event);
-        } else {
-            funcOriginal(pScreenView, muirc);
-        }
+		funcOriginal(pScreenView, muirc);
+
+		if (layer != "debug_screen" && layer != "toast_screen") {
+			SetupAndRenderEvent event(muirc);
+			EventHandler::onSetupAndRender(event);
+		}
 	}
 
 
