@@ -47,79 +47,31 @@ ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT wi
 }
 // TODO: get back to this to check
 void ResizeHook::cleanShit(bool isResize) {
-
-    for (auto &i: ClickGUIElements::images) {
-        Memory::SafeRelease(i.second);
-    }
-
-    for (auto &entry: FlarialGUI::cachedBitmaps) {
-        ID2D1Image *bitmap = entry.second;
-        Memory::SafeRelease(bitmap);
-    }
-
     FlarialGUI::cachedBitmaps.clear();
 
     ClickGUIElements::images.clear();
 
-    for (ID2D1Bitmap *bitmap: MotionBlurListener::previousFrames) {
-        Memory::SafeRelease(bitmap);
-    }
-
     MotionBlurListener::previousFrames.clear();
-
-    for (auto &i: ImagesClass::eimages) {
-        Memory::SafeRelease(i.second);
-    }
 
     ImagesClass::eimages.clear();
 
-    for (auto &i: ImagesClass::images) {
-        Memory::SafeRelease(i.second);
-    }
-
     ImagesClass::images.clear();
-
-    //for (auto& i : FlarialGUI::brushCache) {
-    //	ID2D1SolidColorBrush* brush = i.second.get();
-    //	Memory::SafeRelease(brush);
-    //}
 
     FlarialGUI::brushCache.clear();
 
-    //for (auto& i : FlarialGUI::gradientBrushCache) {
-    //	ID2D1LinearGradientBrush* gradientBrush = i.second.get();
-    //	Memory::SafeRelease(gradientBrush);
-    //}
-
     FlarialGUI::gradientBrushCache.clear();
-
-    //for (auto& i : FlarialGUI::textLayoutCache) {
-    //	IDWriteTextFormat* textFormat = i.second.get();
-    //	Memory::SafeRelease(textFormat);
-    //}
 
     FlarialGUI::textFormatCache.clear();
     FlarialGUI::textLayoutCache.clear();
 
     if (SwapchainHook::init && SwapchainHook::d3d11On12Device != nullptr) {
 
-        Memory::SafeRelease(SwapchainHook::D3D12DescriptorHeap);
-
-        for (ID2D1Bitmap1 *bitmap: SwapchainHook::D2D1Bitmaps) {
-            Memory::SafeRelease(bitmap);
-        }
+        SwapchainHook::D3D12DescriptorHeap.put_void();
 
         if (!isResize && SwapchainHook::queue != nullptr) {
-            SwapchainHook::d3d11On12Device->ReleaseWrappedResources(SwapchainHook::D3D11Resources.data(),
+            auto resources = SwapchainHook::D3D11Resources.data()->get();
+            SwapchainHook::d3d11On12Device->ReleaseWrappedResources(&resources,
                                                                     static_cast<UINT>(SwapchainHook::D3D11Resources.size()));
-        }
-
-        for (ID3D11Resource *resource: SwapchainHook::D3D11Resources) {
-            Memory::SafeRelease(resource);
-        }
-
-        for (IDXGISurface *surface: SwapchainHook::DXGISurfaces) {
-            Memory::SafeRelease(surface);
         }
 
         SwapchainHook::D2D1Bitmaps.clear();
@@ -128,25 +80,25 @@ void ResizeHook::cleanShit(bool isResize) {
 
         SwapchainHook::context->Flush();
         // TODO: release all render effects here
-        Memory::SafeRelease(SwapchainHook::context);
-        Memory::SafeRelease(D2D::surface);
-        Memory::SafeRelease(FlarialGUI::blur);
-        Memory::SafeRelease(FlarialGUI::shadow_blur);
-        Memory::SafeRelease(FlarialGUI::blurbrush);
-        Memory::SafeRelease(FlarialGUI::factory);
-        Memory::SafeRelease(FlarialGUI::writeFactory);
-        Memory::SafeRelease(FlarialGUI::screen_bitmap_cache);
-        Memory::SafeRelease(FlarialGUI::blur_bitmap_cache);
+        SwapchainHook::context.put_void();
 
-        Memory::SafeRelease(SwapchainHook::d3d11On12Device);
+        D2D::surface.put_void();
+        FlarialGUI::blur.put_void();
+        FlarialGUI::shadow_blur.put_void();
+        FlarialGUI::blurbrush.put_void();
+        FlarialGUI::factory.put_void();
+        FlarialGUI::writeFactory.put_void();
+        FlarialGUI::screen_bitmap_cache.put_void();
+        FlarialGUI::blur_bitmap_cache.put_void();
+
+        SwapchainHook::d3d11On12Device.put_void();
 
         if (!isResize) Memory::SafeRelease(SwapchainHook::queue);
-
     }
 
-    Memory::SafeRelease(SwapchainHook::D2D1Bitmap);
+    SwapchainHook::D2D1Bitmap.put_void();
 
-    Memory::SafeRelease(D2D::context);
+    D2D::context.put_void();
 
     FlarialGUI::scrollposmodifier = 0;
 

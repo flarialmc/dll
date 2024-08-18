@@ -99,7 +99,7 @@ public:
                                                         widecstr, textWidth * 6.9f,
                                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                                         textWidth,
-                                                        DWRITE_FONT_WEIGHT_NORMAL, color, false);
+                                                        DWRITE_FONT_WEIGHT_NORMAL, color, true);
 
                     }
 
@@ -151,7 +151,7 @@ public:
                                         currentPos.y + ymodifier + yoffset + testOffset.y, widecstr, textWidth * 6.9f,
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         textWidth,
-                                        DWRITE_FONT_WEIGHT_NORMAL, color, false);
+                                        DWRITE_FONT_WEIGHT_NORMAL, color, true);
                             }
                         }
                     }

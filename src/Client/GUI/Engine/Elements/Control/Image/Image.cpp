@@ -18,7 +18,7 @@ void FlarialGUI::image(const std::string& imageName, D2D1_RECT_F rect) {
     std::string among = Utils::getRoamingPath() + "\\" + imageName;
 
     if (ImagesClass::eimages[imageName] == nullptr)
-        LoadImageFromFile(FlarialGUI::to_wide(among).c_str(), &ImagesClass::eimages[imageName]);
+        LoadImageFromFile(FlarialGUI::to_wide(among).c_str(), ImagesClass::eimages[imageName].put());
 
     // Draw image
     D2D1_RECT_F imageRect = D2D1::RectF(rect.left, rect.top, rect.right, rect.bottom);
@@ -29,10 +29,10 @@ void FlarialGUI::image(const std::string& imageName, D2D1_RECT_F rect) {
 
     if (isInScrollView) {
         if (isRectInRect(ScrollViewRect, rect))
-            D2D::context->DrawBitmap(ImagesClass::eimages[imageName], imageRect, 1.0f,
+            D2D::context->DrawBitmap(ImagesClass::eimages[imageName].get(), imageRect, 1.0f,
                                      interpolationMode);
     } else {
-        D2D::context->DrawBitmap(ImagesClass::eimages[imageName], imageRect, 1.0f,
+        D2D::context->DrawBitmap(ImagesClass::eimages[imageName].get(), imageRect, 1.0f,
                                  interpolationMode);
     }
 }
@@ -49,7 +49,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type) {
     }
 
     if (ImagesClass::images[resourceId] == nullptr)
-        LoadImageFromResource(resourceId, &ImagesClass::images[resourceId], type);
+        LoadImageFromResource(resourceId, ImagesClass::images[resourceId].put(), type);
 
 
     // Draw image
@@ -61,10 +61,10 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type) {
 
     if (isInScrollView) {
         if (isRectInRect(ScrollViewRect, rect))
-            D2D::context->DrawBitmap(ImagesClass::images[resourceId], imageRect, 1.0f,
+            D2D::context->DrawBitmap(ImagesClass::images[resourceId].get(), imageRect, 1.0f,
                                      interpolationMode);
     } else {
-        D2D::context->DrawBitmap(ImagesClass::images[resourceId], imageRect, 1.0f,
+        D2D::context->DrawBitmap(ImagesClass::images[resourceId].get(), imageRect, 1.0f,
                                  interpolationMode);
     }
 }

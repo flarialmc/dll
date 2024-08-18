@@ -52,18 +52,18 @@
 #define o_colors_secondary7 clickgui->settings.getSettingByName<float>("o_colors_secondary7")->value
 #define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
 
-std::map<std::string, ID2D1Bitmap *> ImagesClass::eimages;
-std::map<int, ID2D1Bitmap *> ImagesClass::images;
+std::map<std::string, winrt::com_ptr<ID2D1Bitmap>> ImagesClass::eimages;
+std::map<int, winrt::com_ptr<ID2D1Bitmap>> ImagesClass::images;
 
 // TODO: release it !!!
-ID2D1Factory *FlarialGUI::factory;
-IDWriteFactory *FlarialGUI::writeFactory;
-ID2D1ImageBrush *FlarialGUI::blurbrush;
+winrt::com_ptr<ID2D1Factory> FlarialGUI::factory;
+winrt::com_ptr<IDWriteFactory> FlarialGUI::writeFactory;
+winrt::com_ptr<ID2D1ImageBrush> FlarialGUI::blurbrush;
 
 // todo: all use cache
 std::unordered_map<std::string, ToolTipStruct> FlarialGUI::tooltips;
 LRUCache<UINT32, winrt::com_ptr<ID2D1SolidColorBrush>> FlarialGUI::brushCache(300);
-std::unordered_map<std::string, ID2D1Image *> FlarialGUI::cachedBitmaps;
+std::unordered_map<std::string, winrt::com_ptr<ID2D1Image>> FlarialGUI::cachedBitmaps;
 
 LRUCache<uint64_t, winrt::com_ptr<IDWriteTextLayout>> FlarialGUI::textLayoutCache(4000);
 LRUCache<UINT32, winrt::com_ptr<IDWriteTextFormat>> FlarialGUI::textFormatCache(300);

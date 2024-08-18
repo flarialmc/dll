@@ -40,7 +40,7 @@
 #define o_colors_mod4 clickgui->settings.getSettingByName<float>("o_colors_mod4")->value
 #define colors_mod4_rgb clickgui->settings.getSettingByName<bool>("colors_mod4_rgb")->value
 
-std::map<int, ID2D1Bitmap *> ClickGUIElements::images;
+std::map<int, winrt::com_ptr<ID2D1Bitmap>> ClickGUIElements::images;
 std::vector<Vec2<float>> sizes;
 std::vector<Vec2<float>> shadowSizes;
 
@@ -225,7 +225,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
 
     if (iconId != -1 && images[iconId] == nullptr) {
-        FlarialGUI::LoadImageFromResource(iconId, &images[iconId]);
+        FlarialGUI::LoadImageFromResource(iconId, images[iconId].put());
 
     } else if (images[iconId] != nullptr) {
 
@@ -236,7 +236,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         if (!Client::settings.getSettingByName<bool>("noicons")->value &&
             FlarialGUI::isRectInRect(FlarialGUI::ScrollViewRect,
                                      D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize)))
-            D2D::context->DrawBitmap(images[iconId], D2D1::RectF(modiconx, modicony, modiconx + paddingSize,
+            D2D::context->DrawBitmap(images[iconId].get(), D2D1::RectF(modiconx, modicony, modiconx + paddingSize,
                                                                     modicony + paddingSize));
     }
 

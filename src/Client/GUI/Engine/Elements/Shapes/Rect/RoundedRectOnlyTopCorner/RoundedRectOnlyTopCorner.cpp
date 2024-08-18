@@ -21,13 +21,13 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
     D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
 
     if (factory == nullptr)
-        D2D::context->GetFactory(&factory);
+        D2D::context->GetFactory(factory.put());
 
-    ID2D1PathGeometry *geometry = nullptr;
-    factory->CreatePathGeometry(&geometry);
+    winrt::com_ptr<ID2D1PathGeometry> geometry = nullptr;
+    factory->CreatePathGeometry(geometry.put());
 
-    ID2D1GeometrySink *sink = nullptr;
-    geometry->Open(&sink);
+    winrt::com_ptr<ID2D1GeometrySink> sink = nullptr;
+    geometry->Open(sink.put());
 
     D2D1_POINT_2F startPoint = D2D1::Point2F(rect.left + radiusX, rect.top);
     D2D1_POINT_2F topRightArcEndPoint = D2D1::Point2F(rect.right - radiusX, rect.top);
@@ -71,15 +71,7 @@ void FlarialGUI::RoundedRectOnlyTopCorner(float x, float y, D2D_COLOR_F color, f
     sink->EndFigure(D2D1_FIGURE_END_CLOSED);
     sink->Close();
 
-    ID2D1SolidColorBrush *brush;
-
-    brush = FlarialGUI::getBrush(color).get();
-
-    D2D::context->FillGeometry(geometry, brush);
-
-    Memory::SafeRelease(sink);
-    Memory::SafeRelease(geometry);
-    Memory::SafeRelease(factory);
+    D2D::context->FillGeometry(geometry.get(), FlarialGUI::getBrush(color).get());
 
     if (isAdditionalY) SetIsInAdditionalYMode();
 }

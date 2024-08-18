@@ -28,7 +28,7 @@ void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const 
     if (ImagesClass::eimages[imagePath] == nullptr) {
 
         std::string among = Utils::getRoamingPath() + "\\" + imagePath;
-        FlarialGUI::LoadImageFromFile(to_wide(among).c_str(), &ImagesClass::eimages[imagePath]);
+        FlarialGUI::LoadImageFromFile(to_wide(among).c_str(), ImagesClass::eimages[imagePath].put());
 
     } else if (ImagesClass::eimages[imagePath] != nullptr) {
 
@@ -54,7 +54,7 @@ void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const 
 
         imagerectf = D2D1::RectF(0, 0, imageWidth, imageHeight);
 
-        D2D::context->DrawBitmap(ImagesClass::eimages[imagePath], imagerectf, 1.0, D2D1_INTERPOLATION_MODE_ANISOTROPIC);
+        D2D::context->DrawBitmap(ImagesClass::eimages[imagePath].get(), imagerectf, 1.0, D2D1_INTERPOLATION_MODE_ANISOTROPIC);
 
         D2D::context->SetTransform(oldTransform);
     }
@@ -101,7 +101,7 @@ void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const 
     D2D1_RECT_F imagerectf = D2D1::RectF(x, imageY, x + imageWidth, imageY + imageHeight);
 
     if (ImagesClass::images[iconId] == nullptr) {
-        FlarialGUI::LoadImageFromResource(iconId, &ImagesClass::images[iconId]);
+        FlarialGUI::LoadImageFromResource(iconId, ImagesClass::images[iconId].put());
 
     } else if (ImagesClass::images[iconId] != nullptr) {
 
@@ -127,7 +127,7 @@ void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const 
 
         imagerectf = D2D1::RectF(0, 0, imageWidth, imageHeight);
 
-        D2D::context->DrawBitmap(ImagesClass::images[iconId], imagerectf, 1.0, D2D1_INTERPOLATION_MODE_ANISOTROPIC);
+        D2D::context->DrawBitmap(ImagesClass::images[iconId].get(), imagerectf, 1.0, D2D1_INTERPOLATION_MODE_ANISOTROPIC);
 
         D2D::context->SetTransform(oldTransform);
     }

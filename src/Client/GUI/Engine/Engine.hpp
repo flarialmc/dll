@@ -73,10 +73,10 @@ namespace FlarialGUI {
     bool inline inMenu = false;
     bool inline resizing = false;
 
-    inline ID2D1Effect *blur = nullptr;
-    inline ID2D1Effect *shadow_blur = nullptr;
-    inline ID2D1Bitmap *screen_bitmap_cache = nullptr;
-    inline ID2D1Image *blur_bitmap_cache = nullptr;
+    inline winrt::com_ptr<ID2D1Effect> blur = nullptr;
+    inline winrt::com_ptr<ID2D1Effect> shadow_blur = nullptr;
+    inline winrt::com_ptr<ID2D1Bitmap> screen_bitmap_cache = nullptr;
+    inline winrt::com_ptr<ID2D1Image> blur_bitmap_cache = nullptr;
 
     extern std::unordered_map<std::string, ToolTipStruct> tooltips;
     extern LRUCache<UINT32, winrt::com_ptr<ID2D1SolidColorBrush>> brushCache;
@@ -233,11 +233,11 @@ namespace FlarialGUI {
 
     winrt::com_ptr<ID2D1SolidColorBrush> getBrush(D2D1_COLOR_F color);
 
-    extern IDWriteFactory *writeFactory;
+    extern winrt::com_ptr<IDWriteFactory> writeFactory;
 
-    extern ID2D1ImageBrush *blurbrush;
-    extern ID2D1Factory *factory;
-    extern std::unordered_map<std::string, ID2D1Image *> cachedBitmaps;
+    extern winrt::com_ptr<ID2D1ImageBrush> blurbrush;
+    extern winrt::com_ptr<ID2D1Factory> factory;
+    extern std::unordered_map<std::string, winrt::com_ptr<ID2D1Image>> cachedBitmaps;
 
     void ShadowRect(D2D1_ROUNDED_RECT rect, D2D1_COLOR_F color = D2D1::ColorF(0, 0, 0, 0.75f));
 

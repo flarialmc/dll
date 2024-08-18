@@ -255,7 +255,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     float iy = y + Constraints::SpacingConstraint(0.28, percHeight);
 
     if (ImagesClass::images[IDR_DOWN_PNG] == nullptr)
-        LoadImageFromResource(IDR_DOWN_PNG, &ImagesClass::images[IDR_DOWN_PNG]);
+        LoadImageFromResource(IDR_DOWN_PNG, ImagesClass::images[IDR_DOWN_PNG].put());
 
     D2D1_MATRIX_3X2_F oldTransform;
     D2D::context->GetTransform(&oldTransform);
@@ -273,7 +273,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 
     D2D::context->SetTransform(rotationMatrix);
 
-    D2D::context->DrawBitmap(ImagesClass::images[IDR_DOWN_PNG], rectf, 1.0f, D2D1_INTERPOLATION_MODE_ANISOTROPIC);
+    D2D::context->DrawBitmap(ImagesClass::images[IDR_DOWN_PNG].get(), rectf, 1.0f, D2D1_INTERPOLATION_MODE_ANISOTROPIC);
 
     D2D::context->SetTransform(oldTransform);
 

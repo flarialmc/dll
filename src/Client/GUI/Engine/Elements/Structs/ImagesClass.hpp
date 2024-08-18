@@ -5,6 +5,6 @@
 
 class ImagesClass {
 public:
-    static std::map<std::string, ID2D1Bitmap *> eimages;
-    static std::map<int, ID2D1Bitmap *> images;
+    static std::map<std::string, winrt::com_ptr<ID2D1Bitmap>> eimages;
+    static std::map<int, winrt::com_ptr<ID2D1Bitmap>> images;
 };
