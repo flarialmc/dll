@@ -106,6 +106,11 @@ void prepareBlur() {
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
 
+    if(Client::disable) {
+        pSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+        return funcOriginal(pSwapChain, syncInterval, flags);
+    }
+
     SwapchainHook::swapchain = pSwapChain;
     SwapchainHook::flagsreal = flags;
 
