@@ -8,7 +8,7 @@ class InventoryHUD : public Module {
 
 public:
 
-    InventoryHUD() : Module("InventoryHUD", "Displays the armor you're\ncurrently wearing.",
+    InventoryHUD() : Module("InventoryHUD", "Displays your inventory\non your HUD",
                         IDR_CHESTPLATE_PNG, "") {
         Module::setup();
     };

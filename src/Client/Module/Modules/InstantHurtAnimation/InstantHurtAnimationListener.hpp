@@ -82,6 +82,7 @@ class InstantHurtAnimationListener : public Listener {
 
 
     void onAttack(AttackEvent &event) override {
+        if(!event.getActor()->hasCategory(ActorCategory::Player)) return;
         if(module->settings.getSettingByName<bool>("tryToExcludeTeam")->value)
             if(IsOnTeam(event.getActor())) return;
 

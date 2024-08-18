@@ -77,7 +77,7 @@ public:
         this->name = string;
         this->module = module;
 
-        option = Memory::findSig(GET_SIG("ForceCoordsOption"));
+        option = GET_SIG_ADDRESS("ForceCoordsOption");
 
         original_option.resize(4);
         memcpy(original_option.data(), (LPVOID) option, 4);

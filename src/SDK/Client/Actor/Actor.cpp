@@ -51,9 +51,9 @@ bool Actor::canSee(const Actor& actor) {
     static uintptr_t sig;
     if (sig == NULL) {
         if (!WinrtUtils::check(20, 40)) {
-            sig = Memory::findSig(GET_SIG("Actor::canSee"));
+            sig = GET_SIG_ADDRESS("Actor::canSee");
         } else {
-            sig = Memory::offsetFromSig(Memory::findSig(GET_SIG("Actor::canSee")), 1);
+            sig = Memory::offsetFromSig(GET_SIG_ADDRESS("Actor::canSee"), 1);
         }
     }
     static auto canSee = reinterpret_cast<canSeeFunc>(sig);
@@ -111,7 +111,7 @@ ItemStack *Actor::getArmor(int slot) {
         static uintptr_t sig;
 
         if (sig == NULL) {
-            sig = Memory::findSig(GET_SIG("Actor::getArmor"));
+            sig = GET_SIG_ADDRESS("Actor::getArmor");
         }
 
         auto fn = reinterpret_cast<ItemStack *(__thiscall *)(Actor *, int)>(sig);
@@ -154,7 +154,7 @@ ItemStack *Actor::getOffhandSlot() {
         static uintptr_t sig;
 
         if (sig == NULL) {
-            sig = Memory::findSig(GET_SIG("Actor::getOffhandSlot"));
+            sig = GET_SIG_ADDRESS("Actor::getOffhandSlot");
         }
 
         auto fn = reinterpret_cast<ItemStack *(__thiscall *)(Actor *)>(sig);
@@ -176,7 +176,7 @@ void Actor::setNametag(std::string *name) {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::setNametag"));
+        sig = GET_SIG_ADDRESS("Actor::setNametag");
     }
 
     auto fn = reinterpret_cast<void (__thiscall *)(Actor *, std::string *)>(sig);
@@ -187,7 +187,7 @@ std::string *Actor::getNametag() {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("Actor::getNametag"));
+        sig = GET_SIG_ADDRESS("Actor::getNametag");
     }
 
     auto fn = reinterpret_cast<std::string *(__thiscall *)(Actor *)>(sig);
@@ -217,7 +217,7 @@ bool Actor::isOnGround() {
 
     if (WinrtUtils::check(20, 60)) {
         using isOnGroundFunc = bool(__fastcall *)(uintptr_t&, EntityId&);
-        static isOnGroundFunc isOnGround = Memory::getOffsetFromSig<isOnGroundFunc>(Memory::findSig(GET_SIG("ActorCollision::isOnGround")), 1);
+        static isOnGroundFunc isOnGround = Memory::getOffsetFromSig<isOnGroundFunc>(GET_SIG_ADDRESS("ActorCollision::isOnGround"), 1);
 
         if (isOnGround)
             return isOnGround(ctx->basicReg, ctx->id);
@@ -226,7 +226,7 @@ bool Actor::isOnGround() {
     }
 
     using isOnGroundFunc = bool(__fastcall *)(V1_20_50::EntityContext*);
-    static isOnGroundFunc isOnGround = reinterpret_cast<isOnGroundFunc>(Memory::findSig(GET_SIG("ActorCollision::isOnGround")));
+    static isOnGroundFunc isOnGround = reinterpret_cast<isOnGroundFunc>(GET_SIG_ADDRESS("ActorCollision::isOnGround"));
 
     if (isOnGround)
         return isOnGround(ctx);

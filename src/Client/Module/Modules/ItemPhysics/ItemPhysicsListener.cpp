@@ -55,7 +55,7 @@ void ItemPhysicsListener::ItemRenderer_render(ItemRenderer* _this, BaseActorRend
 }
 
 void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, float y, float z) {
-    static auto rotateSig = Memory::findSig(GET_SIG("glm_rotate"));
+    static auto rotateSig = GET_SIG_ADDRESS("glm_rotate");
     using glm_rotate_t = void(__fastcall*)(glm::mat4x4&, float, float, float, float);
     static auto glm_rotate = reinterpret_cast<glm_rotate_t>(rotateSig);
 
@@ -216,16 +216,16 @@ void ItemPhysicsListener::onSetupAndRender(SetupAndRenderEvent& event) {
 static char data[0x5], data2[0x5];
 
 void ItemPhysicsListener::onEnable() {
-    static auto posAddr = Memory::findSig(GET_SIG("ItemPositionConst")) + 4;
+    static auto posAddr = GET_SIG_ADDRESS("ItemPositionConst") + 4;
     origPosRel = *reinterpret_cast<uint32_t*>(posAddr);
     patched = true;
 
-    static auto rotateAddr = reinterpret_cast<void*>(Memory::findSig(GET_SIG("glm_rotateRef")));
+    static auto rotateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_rotateRef"));
 
     if (glm_rotateHook == nullptr)
         glm_rotateHook = std::make_unique<INeedADecentHookClassForMemory>(rotateAddr, glm_rotate);
 
-    static auto ItemRenderer_renderAddr = reinterpret_cast<void*>(Memory::findSig(GET_SIG("ItemRenderer::render")));
+    static auto ItemRenderer_renderAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("ItemRenderer::render"));
 
     if (ItemRenderer_renderHook == nullptr)
         ItemRenderer_renderHook = std::make_unique<INeedADecentHookClassForMemory>(ItemRenderer_renderAddr, ItemRenderer_render);
@@ -243,12 +243,12 @@ void ItemPhysicsListener::onEnable() {
 
     ItemRenderer_renderHook->enable();
 
-    static auto translateAddr = reinterpret_cast<void*>(Memory::findSig(GET_SIG("glm_translateRef")));
+    static auto translateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef"));
     Memory::copyBytes(translateAddr, data, 5);
     Memory::nopBytes(translateAddr, 5);
 
     if (WinrtUtils::check(21, 0)) {
-        static auto translateAddr2 = reinterpret_cast<void*>(Memory::findSig(GET_SIG("glm_translateRef2")));
+        static auto translateAddr2 = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef2"));
         Memory::copyBytes(translateAddr2, data2, 5);
         Memory::nopBytes(translateAddr2, 5);
     }
@@ -256,7 +256,7 @@ void ItemPhysicsListener::onEnable() {
 
 void ItemPhysicsListener::onDisable() {
     if (patched) {
-        static auto posAddr = Memory::findSig(GET_SIG("ItemPositionConst")) + 4;
+        static auto posAddr = GET_SIG_ADDRESS("ItemPositionConst") + 4;
 
         Memory::patchBytes(reinterpret_cast<void*>(posAddr), &origPosRel, 4);
         FreeBuffer(newPosRel);
@@ -265,11 +265,11 @@ void ItemPhysicsListener::onDisable() {
     glm_rotateHook->disable();
     ItemRenderer_renderHook->disable();
 
-    static auto translateAddr = reinterpret_cast<void*>(Memory::findSig(GET_SIG("glm_translateRef")));
+    static auto translateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef"));
     Memory::patchBytes(translateAddr, data, 5);
 
     if (WinrtUtils::check(21, 0)) {
-        static auto translateAddr2 = reinterpret_cast<void*>(Memory::findSig(GET_SIG("glm_translateRef2")));
+        static auto translateAddr2 = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef2"));
         Memory::patchBytes(translateAddr2, data2, 5);
     }
 

@@ -10,7 +10,7 @@ void GuiData::displayClientMessage(const std::string &str) {
     static uintptr_t sig;
 
     if (sig == NULL) {
-        sig = Memory::findSig(GET_SIG("GuiData::displayClientMessage"));
+        sig = GET_SIG_ADDRESS("GuiData::displayClientMessage");
     }
 
     if (WinrtUtils::check(21, 20)) {

@@ -67,7 +67,7 @@ public:
         originalCameraAngle.resize(3);
 
         if(sigOffset == NULL) {
-            sigOffset = Memory::findSig(GET_SIG("CameraAssignAngle")) + 4;
+            sigOffset = GET_SIG_ADDRESS("CameraAssignAngle") + 4;
         }
 
         Memory::patchBytes( originalCameraAngle.data(), (LPVOID)sigOffset, 3);

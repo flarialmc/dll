@@ -18,6 +18,8 @@
 std::string Client::settingspath = Utils::getRoamingPath() + R"(\Flarial\Config\main.flarial)";
 Settings Client::settings = Settings();
 bool notifiedOfConnectionIssue = false;
+// UPDATE THIS TO THE LATEST GITHUB COMMIT AFTER CHANGING ANYHTHING
+std::string current_commit = "test";
 
 void DownloadAndSave(const std::string& url, const std::string& path) {
 
@@ -47,13 +49,15 @@ void setWindowTitle(std::wstring title) {
 
     CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([title = std::move(title)]() {
         ApplicationView::GetForCurrentView().Title(title);
-        });
+    });
 }
 
 void Client::initialize() {
-    setWindowTitle(L"Flarial");
+
+    std::string title = WinrtUtils::getFormattedVersion() + " " + current_commit;
+    setWindowTitle(L"Flarial " + FlarialGUI::to_wide(title));
     Logger::debug("[INIT] Initializing Flarial...");
-    
+
     VersionUtils::init();
     Client::version = WinrtUtils::getFormattedVersion();
     Logger::debug("[INIT] Version: " + WinrtUtils::getVersion());
@@ -101,17 +105,8 @@ void Client::initialize() {
     if (Client::settings.getSettingByName<float>("blurintensity") == nullptr)
         Client::settings.addSetting("blurintensity", 18.0f);
 
-    if (Client::settings.getSettingByName<bool>("limitblurfps") == nullptr)
-        Client::settings.addSetting("limitblurfps", true);
-
-    if (Client::settings.getSettingByName<bool>("dynamicblurrquality") == nullptr)
-        Client::settings.addSetting("dynamicblurrquality", true);
-
-    if (Client::settings.getSettingByName<bool>("highqualityblur") == nullptr)
-        Client::settings.addSetting("highqualityblur", false);
-
     if (Client::settings.getSettingByName<bool>("killdx") == nullptr)
-        Client::settings.addSetting("killdx", false);
+        Client::settings.addSetting("killdx", true); // TODO: Fix dx12 stuff and set this to false again
 
     if (Client::settings.getSettingByName<bool>("disable_alias") == nullptr)
         Client::settings.addSetting("disable_alias", false);

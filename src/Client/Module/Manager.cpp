@@ -151,11 +151,11 @@ void ModuleManager::initialize() {
     addModule(new InventoryHUD());
     //addModule(new OverlayModule());
     addModule(new AutoRQ());
-    addModule(new HitPing());
-    addModule(new InstantHurtAnimation());
+    //addModule(new HitPing());
+    //addModule(new InstantHurtAnimation());
     //addModule(new MovableChat());
     //addModule(new CompactChat());
-    addModule(new ItemPhysics());
+    //addModule(new ItemPhysics());
 
     EventHandler::registerListener(new GUIKeyListener("GuiKeyListener"));
     EventHandler::registerListener(new DiscordRPCListener("DiscordRPC"));

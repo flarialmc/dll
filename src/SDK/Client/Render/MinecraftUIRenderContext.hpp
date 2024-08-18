@@ -36,7 +36,7 @@ public:
 
     TexturePtr* getTexture(TexturePtr* ptr, const ResourceLocation& location, bool forceReload) {
         using getTextureFunc = TexturePtr*(__fastcall*)(MinecraftUIRenderContext*, TexturePtr*, const ResourceLocation&, bool);
-        static auto getTextureOriginal = reinterpret_cast<getTextureFunc>(Memory::findSig(GET_SIG("MinecraftUIRenderContext::getTexture")));
+        static auto getTextureOriginal = reinterpret_cast<getTextureFunc>(GET_SIG_ADDRESS("MinecraftUIRenderContext::getTexture"));
         return getTextureOriginal(this, ptr, location, forceReload);
     }
 

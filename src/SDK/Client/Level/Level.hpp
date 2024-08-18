@@ -49,7 +49,7 @@ public:
 
     std::vector<Actor *> getRuntimeActorList() {
         // TODO prevent crashing !!!
-        static uintptr_t sig = Memory::findSig(GET_SIG("Level::getRuntimeActorList"));
+        static uintptr_t sig = GET_SIG_ADDRESS("Level::getRuntimeActorList");
         static auto getRuntimeActorList = *(decltype(&Level::getRuntimeActorList) *) &sig;
         return (this->*getRuntimeActorList)();
     }

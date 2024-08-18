@@ -75,4 +75,6 @@ void VersionUtils::addData() {
 
     t1.join();
     t2.join();
+
+    Mgr.scanAllSignatures();
 }

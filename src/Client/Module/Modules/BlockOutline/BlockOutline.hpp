@@ -24,11 +24,11 @@ public:
     };
 
     void onSetup() override { // init color just in case
-        highlightColorRipRelAddr = Memory::findSig(GET_SIG("blockHighlightColor")); // RIP REL 4BYTE FROM FUNC OFFSET ADDR
+        highlightColorRipRelAddr = GET_SIG_ADDRESS("blockHighlightColor"); // RIP REL 4BYTE FROM FUNC OFFSET ADDR
         if(highlightColorRipRelAddr == NULL) return;
         highlightColorOrigRipRel = *(UINT32*)highlightColorRipRelAddr;
 
-        outlineColorRipRelAddr = Memory::findSig(GET_SIG("mce::Color::BLACK"));
+        outlineColorRipRelAddr = GET_SIG_ADDRESS("mce::Color::BLACK");
         if(outlineColorRipRelAddr == NULL) return;
         outlineColorOrigRipRel = *(UINT32*)outlineColorRipRelAddr;
         // TODO: make it look better

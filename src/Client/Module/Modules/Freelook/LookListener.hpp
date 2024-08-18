@@ -105,10 +105,10 @@ public:
         this->name = string;
         this->module = module;
 
-        yaw1 = Memory::findSig(GET_SIG("CameraYaw"));
-        yaw2 = Memory::findSig(GET_SIG("CameraYaw2"));
-        pitch = Memory::findSig(GET_SIG("CameraPitch"));
-        movement = Memory::findSig(GET_SIG("CameraMovement"));
+        yaw1 = GET_SIG_ADDRESS("CameraYaw");
+        yaw2 = GET_SIG_ADDRESS("CameraYaw2");
+        pitch = GET_SIG_ADDRESS("CameraPitch");
+        movement = GET_SIG_ADDRESS("CameraMovement");
 
         originalYaw1 = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4])yaw1);
         originalYaw2 = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4])yaw2);
