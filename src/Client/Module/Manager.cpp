@@ -67,6 +67,7 @@
 #include <algorithm>
 
 #include "Modules/ItemPhysics/ItemPhysics.hpp"
+#include "Modules/Crosshair/Crosshair.hpp"
 
 namespace ModuleManager {
     std::unordered_map<size_t, Module*> moduleMap;
@@ -156,6 +157,7 @@ void ModuleManager::initialize() {
     //addModule(new MovableChat());
     //addModule(new CompactChat());
     addModule(new ItemPhysics());
+    addModule(new Crosshair());
 
     EventHandler::registerListener(new GUIKeyListener("GuiKeyListener"));
     EventHandler::registerListener(new DiscordRPCListener("DiscordRPC"));

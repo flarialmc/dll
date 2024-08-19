@@ -27,3 +27,7 @@ clion/
 clion-ninja/
 *.zip
 localextras/
+_deps/
+*.pdb
+*.dll
+*.ilk
