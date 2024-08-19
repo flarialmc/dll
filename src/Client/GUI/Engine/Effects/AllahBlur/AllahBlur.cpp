@@ -46,9 +46,13 @@ void FlarialGUI::PrepareBlur(float intensity) {
 
         float timeBetweenFrames = calculateTimeBetweenFrames(MC::fps);
 
-        auto shouldLimit = Client::settings.getSettingByName<bool>("limitblurfps")->value;
-        auto highQualityBlur = Client::settings.getSettingByName<bool>("highqualityblur")->value;
-        auto dynamicBlurQuality = Client::settings.getSettingByName<bool>("dynamicblurrquality")->value;
+        auto shouldLimitSetting = Client::settings.getSettingByName<bool>("limitblurfps");
+        auto highQualityBlurSetting = Client::settings.getSettingByName<bool>("highqualityblur");
+        auto dynamicBlurQualitySetting = Client::settings.getSettingByName<bool>("dynamicblurrquality");
+
+        auto shouldLimit = shouldLimitSetting ? shouldLimitSetting->value : true;
+        auto highQualityBlur = highQualityBlurSetting ? highQualityBlurSetting->value : false;
+        auto dynamicBlurQuality = dynamicBlurQualitySetting ? dynamicBlurQualitySetting->value : true;
 
         auto shouldUpdate = (shouldLimit && elapsed.count() >= timeBetweenFrames) || !shouldLimit;
         auto isLerping = delta > 0.001 || delta < -0.1;

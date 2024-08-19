@@ -19,7 +19,7 @@ std::string Client::settingspath = Utils::getRoamingPath() + R"(\Flarial\Config\
 Settings Client::settings = Settings();
 bool notifiedOfConnectionIssue = false;
 // UPDATE THIS TO THE LATEST GITHUB COMMIT AFTER CHANGING ANYHTHING
-std::string current_commit = "test";
+std::string current_commit = "cfbd2c2f";
 
 void DownloadAndSave(const std::string& url, const std::string& path) {
 
@@ -105,8 +105,17 @@ void Client::initialize() {
     if (Client::settings.getSettingByName<float>("blurintensity") == nullptr)
         Client::settings.addSetting("blurintensity", 18.0f);
 
+    if (Client::settings.getSettingByName<bool>("limitblurfps") == nullptr)
+        Client::settings.addSetting("limitblurfps", true);
+
+    if (Client::settings.getSettingByName<bool>("dynamicblurrquality") == nullptr)
+        Client::settings.addSetting("dynamicblurrquality", true);
+
+    if (Client::settings.getSettingByName<bool>("highqualityblur") == nullptr)
+        Client::settings.addSetting("highqualityblur", false);
+
     if (Client::settings.getSettingByName<bool>("killdx") == nullptr)
-        Client::settings.addSetting("killdx", true); // TODO: Fix dx12 stuff and set this to false again
+        Client::settings.addSetting("killdx", false);
 
     if (Client::settings.getSettingByName<bool>("disable_alias") == nullptr)
         Client::settings.addSetting("disable_alias", false);
