@@ -98,7 +98,7 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
         vec.z = std::fmod(vec.z + sign.z * (1.f / MC::fps) * speed * zMul, 360.f);
     }
 
-    const Vec3<float> targetVec = (yMod < 0.1) ? Vec3<float>(90.f, vec.y, vec.z) : vec;
+    const Vec3<float> targetVec = (yMod < 0.1f) ? Vec3<float>(90.f, vec.y, vec.z) : vec;
 
     if (curr->isOnGround()) {
         if (curr->getStack().block == nullptr) {
@@ -108,7 +108,7 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
 
     const Vec3<float> targetPos = renderData->position;
 
-    const float lerpFactor = 0.1f;
+    const float lerpFactor = 0.2f;
 
     vec.x = lerp(vec.x, targetVec.x, lerpFactor);
     vec.y = lerp(vec.y, targetVec.y, lerpFactor);
@@ -118,12 +118,12 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
     pos.y = lerp(pos.y, targetPos.y, lerpFactor);
     pos.z = lerp(pos.z, targetPos.z, lerpFactor);
 
-    
     mat = translate(mat, { pos.x, pos.y, pos.z });
     glm_rotate(mat, vec.x, 1.f, 0.f, 0.f);
     glm_rotate(mat, vec.y, 0.f, 1.f, 0.f);
     glm_rotate(mat, vec.z, 0.f, 0.f, 1.f);
 }
+
 
 void ItemPhysicsListener::onSetupAndRender(SetupAndRenderEvent& event) {
     static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("ItemPhysics"));
