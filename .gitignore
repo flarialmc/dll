@@ -31,3 +31,4 @@ _deps/
 *.pdb
 *.dll
 *.ilk
+Makefile
