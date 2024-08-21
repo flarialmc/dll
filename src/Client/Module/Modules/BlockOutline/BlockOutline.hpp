@@ -4,6 +4,7 @@
 #include "../../../Client.hpp"
 #include "../../../../Utils/Utils.hpp"
 #include "../../../../Utils/Memory/CustomAllocator/Buffer.hpp" // why its not hpp here ???
+#include "BlockOutlineListener.hpp"
 
 class BlockOutline : public Module {
 
@@ -69,11 +70,13 @@ public:
 
     void onEnable() override {
         onColorChange();
+        EventHandler::registerListener(new BlockOutlineListener("BlockOutline", this, selectionColor));
         patch();
         Module::onEnable();
     }
 
     void onDisable() override {
+        EventHandler::unregisterListener("BlockOutline");
         unpatch();
         Module::onDisable();
     }
