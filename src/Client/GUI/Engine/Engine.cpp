@@ -269,7 +269,7 @@ winrt::com_ptr<IDWriteTextFormat> CreateTextFormat(const DWRITE_TEXT_ALIGNMENT a
                                                weight,
                                                DWRITE_FONT_STYLE_NORMAL,
                                                DWRITE_FONT_STRETCH_NORMAL,
-                                               Constraints::FontScaler(fontSize),
+                                               Constraints::FontScaler(fontSize <= 0 ? 12.0f : fontSize),
                                                L"en-us",
                                                textFormat.put()
     );
