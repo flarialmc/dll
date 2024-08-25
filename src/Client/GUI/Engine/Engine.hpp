@@ -23,6 +23,7 @@
 #include "Elements/Structs/HSV.hpp"
 #include <imgui.h>
 
+
 using namespace DirectX;
 
 struct BlurInputBuffer
@@ -37,48 +38,16 @@ struct BlurInputBuffer
 class Blur
 {
 public:
-
-    static inline ID3D11PixelShader *pUpsampleShader = nullptr;
-    static inline ID3D11PixelShader *pDownsampleShader = nullptr;
-    static inline ID3D11VertexShader *pVertexShader = nullptr;
-    static inline ID3D11InputLayout *pInputLayout = nullptr;
-
-    static inline ID3D11SamplerState *pSampler = nullptr;
-    static inline ID3D11Buffer *pVertexBuffer = nullptr;
-    static inline ID3D11Buffer *pConstantBuffer = nullptr;
-    static inline BlurInputBuffer constantBuffer;
-
-    // RAII
-    static void InitializePipeline();
-    //static void Cleanup();
-
-    static void RenderToRTV(ID3D11RenderTargetView *, ID3D11ShaderResourceView *, XMFLOAT2);
-
-    static void RenderBlur(ID3D11RenderTargetView *, int, float);
+    static void RenderBlur(ID3D11Texture2D*, ID3D11Device*, ID3D11DeviceContext*);
 };
 
-class BlurDX12
-{
+#include <opencv2/opencv.hpp>
+
+class ImageProcessor {
 public:
-
-    static inline ID3D11PixelShader *pUpsampleShader = nullptr;
-    static inline ID3D11PixelShader *pDownsampleShader = nullptr;
-    static inline ID3D11VertexShader *pVertexShader = nullptr;
-    static inline ID3D11InputLayout *pInputLayout = nullptr;
-
-    static inline ID3D11SamplerState *pSampler = nullptr;
-    static inline ID3D11Buffer *pVertexBuffer = nullptr;
-    static inline ID3D11Buffer *pConstantBuffer = nullptr;
-    static inline BlurInputBuffer constantBuffer;
-
-    // RAII
-    static void InitializePipeline();
-    //static void Cleanup();
-
-    static void RenderBlur(ID3D12GraphicsCommandList* commandList);
+    static cv::Mat ApplyGaussianBlur(const cv::Mat& src, double sigma);
+    static ID3D11Texture2D* LoadTextureFromMat(cv::Mat& mat, ID3D11Device* device, ID3D11DeviceContext* context);
 };
-
-
 
 class Dimension {
 public:
