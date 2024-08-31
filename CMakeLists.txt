@@ -73,7 +73,8 @@ endif()
 
 file(GLOB_RECURSE sources "main.cpp" "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp")
 
-add_library(${PROJECT_NAME} SHARED ${sources} src/SDK/Client/Render/Matrix.cpp src/Assets/Assets.rc)
+add_library(${PROJECT_NAME} SHARED ${sources} src/SDK/Client/Render/Matrix.cpp src/Assets/Assets.rc
+        src/Client/GUI/Engine/Effects/Blur/blur.hpp)
 
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/" "${CMAKE_CURRENT_LIST_DIR}/lib/glm/" "${CMAKE_CURRENT_LIST_DIR}/lib/ImGui")
 
@@ -86,6 +87,23 @@ endif()
 
 add_library(MinHook SHARED IMPORTED GLOBAL)
 set_target_properties(MinHook PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/minhook/minhook.lib")
+
+
+add_library(OpenCV SHARED IMPORTED GLOBAL)
+set_target_properties(OpenCV PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/opencv-d/opencv_imgcodecs4100d.lib")
+
+add_library(OpenCV2 SHARED IMPORTED GLOBAL)
+set_target_properties(OpenCV2 PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/opencv-d/opencv_imgproc4100d.lib")
+
+add_library(OpenCV3 SHARED IMPORTED GLOBAL)
+set_target_properties(OpenCV3 PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/opencv-d/opencv_videoio4100d.lib")
+
+add_library(OpenCV4 SHARED IMPORTED GLOBAL)
+set_target_properties(OpenCV4 PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/opencv-d/opencv_core4100d.lib")
+
+add_library(OpenCV5 SHARED IMPORTED GLOBAL)
+set_target_properties(OpenCV5 PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/opencv-d/opencv_world4100d.lib")
+
 
 
 FetchContent_Declare(
@@ -101,8 +119,11 @@ FetchContent_MakeAvailable(libhat)
 set(OpenCV_DIR C:/opencv/opencv/build/)
 find_package(OpenCV REQUIRED)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenCV_LIBS} libhat windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version)
-target_link_libraries(${PROJECT_NAME} PUBLIC MinHook)
+message(${OpenCV_LIBS})
+message(${OpenCV_INCLUDE_DIRS})
 
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+target_link_options(Flarial PRIVATE /NODEFAULTLIB:MSVCRTD)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC ${OpenCV_LIBS} libhat windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version)
+target_link_libraries(${PROJECT_NAME} PUBLIC MinHook)
+target_include_directories(Flarial PRIVATE ${OpenCV_INCLUDE_DIRS})
