@@ -523,6 +523,7 @@ void SwapchainHook::DX11Init() {
 
     SaveBackbuffer();
 
+    Blur::InitializePipeline();
     Memory::SafeRelease(eBackBuffer);
     init = true;
 }
