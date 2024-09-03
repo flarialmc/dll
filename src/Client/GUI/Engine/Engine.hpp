@@ -23,7 +23,6 @@
 #include "Elements/Structs/HSV.hpp"
 #include <imgui.h>
 
-#include "Effects/Blur/blur.hpp"
 
 using namespace DirectX;
 
@@ -39,44 +38,16 @@ struct BlurInputBuffer
 class Blur
 {
 public:
-    static void RenderBlur(ID3D11Texture2D* inputTexture, ID3D11Device* device, ID3D11DeviceContext* deviceContext) {
-
-
-        ID3D11ShaderResourceView* inputSRV = nullptr;
-        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-        srvDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Texture2D.MipLevels = 1;
-        srvDesc.Texture2D.MostDetailedMip = 0;
-        device->CreateShaderResourceView(inputTexture, &srvDesc, &inputSRV);
-
-        D3D11_TEXTURE2D_DESC inputDesc;
-        inputTexture->GetDesc(&inputDesc);
-
-        D3D11_MAPPED_SUBRESOURCE mappedResource;
-        deviceContext->Map(inputTexture, 0, D3D11_MAP_READ, 0, &mappedResource);
-
-        cv::Mat src(inputDesc.Height, inputDesc.Width, CV_8UC4, mappedResource.pData, mappedResource.RowPitch);
-        deviceContext->Unmap(inputTexture, 0);
-
-        cv::Mat dst = ImageProcessor::ApplyGaussianBlur(src, 15);
-
-        ID3D11Texture2D* texture_blur = ImageProcessor::LoadTextureFromMat(dst, device, deviceContext);
-
-        ID3D11ShaderResourceView* texture_srv = nullptr;
-        device->CreateShaderResourceView(texture_blur, &srvDesc, &texture_srv);
-
-        ImGui::Image(texture_srv, ImVec2(dst.cols, dst.rows));
-
-        if (inputSRV) inputSRV->Release();
-        if (texture_srv) texture_srv->Release();
-        if (texture_blur) texture_blur->Release();
-
-    }
-
-
+    static void RenderBlur(ID3D11Texture2D*, ID3D11Device*, ID3D11DeviceContext*);
 };
 
+#include <opencv2/opencv.hpp>
+
+class ImageProcessor {
+public:
+    static cv::Mat ApplyGaussianBlur(const cv::Mat& src, double sigma);
+    static ID3D11Texture2D* LoadTextureFromMat(cv::Mat& mat, ID3D11Device* device, ID3D11DeviceContext* context);
+};
 
 class Dimension {
 public:
