@@ -202,6 +202,8 @@ public:
 
     bool hasCategory(ActorCategory category);
 
+    float getApproximateReach(Actor* target);
+
     RenderPositionComponent *getRenderPositionComponent();
 
     SimpleContainer *getArmorContainer();
@@ -225,4 +227,10 @@ public:
     void setHurtTime(int16_t hurtTime);
 
     bool isOnGround();
+
+    bool IsOnSameTeam(Actor *actor);
+
+    Vec3<float> getLerpedPosition();
+
+    AABB getLerpedAABB(bool asHitbox = false);
 };

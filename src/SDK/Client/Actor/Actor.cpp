@@ -3,6 +3,8 @@
 #include "Components/AABBShapeComponent.hpp"
 #include "Components/RuntimeIDComponent.hpp"
 #include "Components/ActorDataFlagComponent.hpp"
+#include "../../SDK.hpp"
+#include "../../../Client/GUI/Engine/Engine.hpp"
 
 // TODO add comments to all components, replace their sigs with simpler ones ?       marioCST: use entt's try_get func in EntityContext instead of using sigs, there are no simpler sigs
 
@@ -230,6 +232,77 @@ bool Actor::isOnGround() {
 
     if (isOnGround)
         return isOnGround(ctx);
+
+    return false;
+}
+
+Vec3<float> Actor::getLerpedPosition() {
+    return this->getRenderPositionComponent()->renderPos;
+}
+
+AABB Actor::getLerpedAABB(bool asHitbox) {
+    auto renderPos = this->getRenderPositionComponent()->renderPos;
+    auto aabbSize = this->getAABBShapeComponent()->size;
+
+    float mod = 0.f;
+
+    if (this->hasCategory(ActorCategory::Player))
+        mod = 1.6f;
+
+    auto lower = renderPos.sub(aabbSize.x / 2.f, mod, aabbSize.x / 2.f), upper = lower.add(aabbSize.x, aabbSize.y, aabbSize.x);
+
+    auto aabb = AABB(lower, upper);
+
+    if(asHitbox)
+        return aabb.expandedXZ(0.1);
+
+    return aabb;
+}
+
+float Actor::getApproximateReach(Actor *target) {
+    auto actorHitBox = target->getLerpedAABB(true);
+
+    auto upper = actorHitBox.upper;
+    auto lower = actorHitBox.lower;
+
+    auto posAtTimeOfHit = this->getLerpedPosition();
+
+    auto closestPoint = Vec3<float>{ std::clamp(posAtTimeOfHit.x, lower.x, upper.x),
+                                     std::clamp(posAtTimeOfHit.y, lower.y, upper.y),
+                                     std::clamp(posAtTimeOfHit.z, lower.z, upper.z) };
+
+    return posAtTimeOfHit.dist(closestPoint);
+}
+
+bool Actor::IsOnSameTeam(Actor *actor) {
+    std::string playerName = *this->getNametag();
+    std::string actorName = *actor->getNametag();
+
+    if (playerName.empty() || actorName.empty()) return false;
+
+    auto cleanName = [](std::string &name) {
+        constexpr std::string tags[] = {"§r", "§l"};
+        for (const auto &tag : tags) {
+            size_t pos;
+            while ((pos = name.find(tag)) != std::string::npos) {
+                name.erase(pos, tag.length());
+            }
+        }
+    };
+
+    cleanName(playerName);
+    cleanName(actorName);
+
+    size_t playerTeamPos = playerName.find("§");
+    if (playerTeamPos == std::string::npos) return false;
+
+    std::string playerTeam = playerName.substr(playerTeamPos + 2, 1);
+
+    size_t actorTeamPos = actorName.find("§");
+    if (actorTeamPos != std::string::npos) {
+        std::string actorTeam = actorName.substr(actorTeamPos + 2, 1);
+        return actorTeam == playerTeam;
+    }
 
     return false;
 }
