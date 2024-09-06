@@ -36,6 +36,7 @@ public:
             settings.addSetting("percentageY", 0.0f);
         }
         if (settings.getSettingByName<bool>("vertical") == nullptr) settings.addSetting("vertical", false);
+        if (settings.getSettingByName<bool>("durability_left") == nullptr) settings.addSetting("durability_left", false);
         if (settings.getSettingByName<bool>("percent") == nullptr) settings.addSetting("percent", false);
         if (settings.getSettingByName<bool>("color") == nullptr) settings.addSetting("color", false);
         if (settings.getSettingByName<bool>("showdurability") == nullptr) settings.addSetting("showdurability", false);
@@ -93,6 +94,20 @@ public:
                     "vertical")->value;
 
         toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        if(this->settings.getSettingByName<bool>("vertical")->value) {
+            FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                            L"Durability to the left", textWidth * 6.9f, textHeight,
+                                            DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                            DWRITE_FONT_WEIGHT_NORMAL);
+
+            if (FlarialGUI::Toggle(6, toggleX, toggleY, this->settings.getSettingByName<bool>(
+                    "durability_left")->value))
+                this->settings.getSettingByName<bool>("durability_left")->value = !this->settings.getSettingByName<bool>(
+                        "durability_left")->value;
+
+            toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        }
 
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
                                         L"Show durability", textWidth * 6.9f, textHeight,

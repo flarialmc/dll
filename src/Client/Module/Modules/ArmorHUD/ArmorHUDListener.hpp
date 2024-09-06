@@ -53,6 +53,7 @@ public:
                 if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
 
                     auto vertical = module->settings.getSettingByName<bool>("vertical")->value;
+                    auto durability_left = module->settings.getSettingByName<bool>("durability_left")->value;
 
                     float spacing = testSpacing;
 
@@ -93,9 +94,11 @@ public:
                         }
 
                         float spacingX = vertical ? (durabilities[0][1] != 0 ? spacing : 0) : 0;
+                        if(durability_left) spacingX *= -1;
                         float spacingY = vertical ? 0: (durabilities[0][1] != 0 ? spacing : 0);
 
-                        FlarialGUI::FlarialTextWithFont(currentPos.x + testOffset.x + spacingX, currentPos.y + testOffset.y + spacingY,
+                        FlarialGUI::FlarialTextWithFont(currentPos.x + testOffset.x + spacingX,
+                                                        currentPos.y + testOffset.y + spacingY,
                                                         widecstr, textWidth * 6.9f,
                                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                                         textWidth,
@@ -111,6 +114,8 @@ public:
 
                     if (vertical) xoffset += spacing;
                     else yoffset += spacing;
+
+                    if(durability_left) xoffset *= -1;
 
                     for (int i = 1; i < 5; i++) {
 
