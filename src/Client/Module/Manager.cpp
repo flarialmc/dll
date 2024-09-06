@@ -67,6 +67,7 @@
 #include <algorithm>
 
 #include "Modules/ItemPhysics/ItemPhysics.hpp"
+#include "Modules/OpponentReach/OpponentReach.hpp"
 
 namespace ModuleManager {
     std::unordered_map<size_t, Module*> moduleMap;
@@ -153,6 +154,7 @@ void ModuleManager::initialize() {
     addModule(new AutoRQ());
     addModule(new HitPing());
     addModule(new InstantHurtAnimation());
+    addModule(new OpponentReach());
     //addModule(new MovableChat());
     //addModule(new CompactChat());
     addModule(new ItemPhysics());
