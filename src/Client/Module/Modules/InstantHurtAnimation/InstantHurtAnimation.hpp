@@ -47,6 +47,8 @@ public:
             this->settings.getSettingByName<bool>("tryToExcludeTeam")->value = !this->settings.getSettingByName<bool>(
                     "tryToExcludeTeam")->value;
 
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
         FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
                                         L"Only with armor", textWidth * 6.9f, textHeight,
                                         DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
