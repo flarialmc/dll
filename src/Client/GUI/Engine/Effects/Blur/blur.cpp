@@ -322,6 +322,8 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
         ID3D11RenderTargetView *pRenderTargetView;
         ID3D11ShaderResourceView *pShaderResourceView;
 
+
+        // create texture2d for each size and simply reuse to create rtvs & srvs
         SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pFrameBuffer);
         if (i == 0)
             pRenderTargetView = pDstRenderTargetView;

@@ -627,6 +627,8 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
   void SwapchainHook::SaveBackbuffer() {
     if(!SwapchainHook::queue) {
 
+        Memory::SafeRelease(SavedD3D11BackBuffer);
+
         ID3D11DeviceContext* deviceContext = SwapchainHook::context;
         IDXGISurface1* backBuffer = nullptr;
         HRESULT hr;
@@ -667,8 +669,6 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
 
         Memory::SafeRelease(backBuffer);
         Memory::SafeRelease(buffer2D);
-        Memory::SafeRelease(deviceContext);
-
     } else {
 
 

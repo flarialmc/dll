@@ -30,7 +30,7 @@ public:
     void onRender(RenderEvent &event) override {
         int maxFrames = (int)round(module->settings.getSettingByName<float>("intensity2")->value);
 
-        if (SDK::getCurrentScreen() == "hud_screen" && !SwapchainHook::queue) {
+        if (SDK::getCurrentScreen() == "hud_screen" && !SwapchainHook::queue && this->module->isEnabled()) {
             if (previousFrames.size() >= static_cast<int>(maxFrames)) {
                 // Remove excess frames if maxFrames is reduced
                 int framesToRemove = (int)previousFrames.size() - static_cast<int>(maxFrames);
@@ -42,13 +42,14 @@ public:
 
             ID3D11ShaderResourceView* buffer = BackbufferToSRV();
             if(buffer) previousFrames.push_back(buffer);
+            else std::cout << "Couldn't save buffer for Motion Blur.";
 
 
             float alpha = 0.3f;
 
                 for (ID3D11ShaderResourceView* frame: previousFrames) {
 
-                    if(SwapchainHook::d3d11Device) {
+                    if(!SwapchainHook::queue) {
                         ImageWithOpacity(frame, {MC::windowSize.x, MC::windowSize.y}, alpha);
                     }
                     alpha *= module->settings.getSettingByName<float>("intensity")->value;
@@ -64,39 +65,39 @@ public:
 
     void ImageWithOpacity(ID3D11ShaderResourceView* srv, ImVec2 size, float opacity)
     {
-        if (opacity <= 0.0f)
+        if (opacity <= 0.0f) {
+            //std::cout << "alpha: " + std::to_string(opacity) << std::endl;
             return;
+        }
 
         opacity = opacity > 1.0f ? 1.0f : opacity < 0.0f ? 0.0f : opacity;
         ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
         ImVec2 pos = {0, 0};
         ImU32 col = IM_COL32(255, 255, 255, static_cast<int>(opacity * 255));
-        draw_list->AddImage((void*)srv, pos, ImVec2(pos.x + size.x, pos.y + size.y), ImVec2(0, 0), ImVec2(1, 1), col);
+        draw_list->AddImage(srv, pos, ImVec2(pos.x + size.x, pos.y + size.y), ImVec2(0, 0), ImVec2(1, 1), col);
         ImGui::SetCursorScreenPos(ImVec2(pos.x + size.x, pos.y));
     }
 
     static ID3D11ShaderResourceView* BackbufferToSRV() {
 
         HRESULT hr;
-        ID3D11ShaderResourceView* outSRV = nullptr;
-        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+
         D3D11_TEXTURE2D_DESC d;
         SwapchainHook::GetBackbuffer()->GetDesc(&d);
+        ID3D11ShaderResourceView* outSRV;
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
         srvDesc.Format = d.Format;
         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
         srvDesc.Texture2D.MipLevels = d.MipLevels;
         srvDesc.Texture2D.MostDetailedMip = 0;
 
-        if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::GetBackbuffer(), &srvDesc, &outSRV)) || !outSRV)
+        if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::GetBackbuffer(), &srvDesc, &outSRV)))
         {
-            std::stringstream ss;
-            ss << "0x" << std::hex << std::setw(8) << std::setfill('0') << hr;
-            Logger::error("Failed to create shader resource view: " + ss.str());
+            std::cout << "Failed to create shader resource view: " << std::hex << hr << std::endl;
         }
 
         return outSRV;
     }
-
 
 const char* vertexShaderSrc = R"(
 cbuffer ConstantBuffer : register(b0)
