@@ -451,6 +451,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
 	            if (mainRenderTargetView) mainRenderTargetView->Release();
 
+                Memory::SafeRelease(ppContext);
+
             }
 
             Memory::SafeRelease(FlarialGUI::blurbrush);

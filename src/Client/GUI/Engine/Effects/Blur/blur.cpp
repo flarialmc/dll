@@ -287,6 +287,9 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     pRasterizerState->Release();
 }
 
+std::vector<ID3D11Texture2D *> framebuffers;
+bool hasDoneFrames = false;
+
 void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iterations, float intensity)
 {
 
@@ -299,13 +302,13 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 
     ID3D11DeviceContext* pContext = SwapchainHook::context;
 
-    std::vector<ID3D11Texture2D *> framebuffers;
     std::vector<ID3D11RenderTargetView *> renderTargetViews;
     std::vector<ID3D11ShaderResourceView *> shaderResourceViews;
     std::vector<XMFLOAT2> fbSizes;
     D3D11_TEXTURE2D_DESC desc;
     SwapchainHook::GetBackbuffer()->GetDesc(&desc);
 
+    if(!hasDoneFrames)
     framebuffers.reserve((size_t)iterations);
     renderTargetViews.reserve((size_t)iterations);
 
@@ -324,13 +327,16 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 
 
         // create texture2d for each size and simply reuse to create rtvs & srvs
+        if(!hasDoneFrames)
         SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pFrameBuffer);
+        else pFrameBuffer = framebuffers[i];
         if (i == 0)
             pRenderTargetView = pDstRenderTargetView;
         else
             SwapchainHook::d3d11Device->CreateRenderTargetView(pFrameBuffer, nullptr, &pRenderTargetView);
         SwapchainHook::d3d11Device->CreateShaderResourceView(pFrameBuffer, nullptr, &pShaderResourceView);
 
+        if(!hasDoneFrames)
         framebuffers.push_back(pFrameBuffer);
         renderTargetViews.push_back(pRenderTargetView);
         shaderResourceViews.push_back(pShaderResourceView);
@@ -339,6 +345,8 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
         desc.Width /= 2;
         desc.Height /= 2;
     }
+
+    hasDoneFrames = true;
 
     constantBuffer.offset = XMFLOAT2(intensity * 3, intensity * 3);
     pContext->PSSetShader(pDownsampleShader, nullptr, 0);
@@ -361,15 +369,13 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 
         if (i != 0)
             renderTargetViews[i]->Release();
-        framebuffers[i]->Release();
         shaderResourceViews[i]->Release();
 
         renderTargetViews.clear();
-        framebuffers.clear();
         shaderResourceViews.clear();
         fbSizes.clear();
     }
 
-    
+
     pOrigShaderResourceView->Release();
 }
