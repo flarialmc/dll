@@ -78,14 +78,16 @@ public:
     static ID3D11ShaderResourceView* BackbufferToSRV() {
 
         HRESULT hr;
-        ID3D11ShaderResourceView* outSRV;
-        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-        srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        ID3D11ShaderResourceView* outSRV = nullptr;
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+        D3D11_TEXTURE2D_DESC d;
+        SwapchainHook::GetBackbuffer()->GetDesc(&d);
+        srvDesc.Format = d.Format;
         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Texture2D.MipLevels = 1;
+        srvDesc.Texture2D.MipLevels = d.MipLevels;
         srvDesc.Texture2D.MostDetailedMip = 0;
 
-        if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::GetBackbuffer(), &srvDesc, &outSRV)))
+        if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::GetBackbuffer(), &srvDesc, &outSRV)) || !outSRV)
         {
             std::stringstream ss;
             ss << "0x" << std::hex << std::setw(8) << std::setfill('0') << hr;
@@ -306,8 +308,5 @@ void InitializeRenderResources(ID3D11Device* device)
     context->Draw(4, 0);
 
     //context->OMSetRenderTargets(1, nullptr, nullptr);
-
-
-    context->Release();
- }
+}
 };

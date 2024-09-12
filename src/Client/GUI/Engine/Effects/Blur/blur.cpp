@@ -221,7 +221,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     dsd.StencilEnable = false;
     ID3D11DepthStencilState *pDepthStencilState;
     hr = SwapchainHook::d3d11Device->CreateDepthStencilState(&dsd, &pDepthStencilState);
-    if (FAILED(hr)) { pContext->Release(); return; }
+    if (FAILED(hr)) {  return; }
     pContext->OMSetDepthStencilState(pDepthStencilState, 0);
 
     void *null = nullptr;
@@ -255,7 +255,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
     ID3D11BlendState *pBlendState;
     hr = SwapchainHook::d3d11Device->CreateBlendState(&bd, &pBlendState);
-    if (FAILED(hr)) { pContext->Release(); pDepthStencilState->Release(); return; }
+    if (FAILED(hr)) {  pDepthStencilState->Release(); return; }
     pContext->OMSetBlendState(pBlendState, NULL, 0xffffffff);
     D3D11_RASTERIZER_DESC rd{};
     rd.FillMode = D3D11_FILL_SOLID;
@@ -264,7 +264,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     rd.ScissorEnable = false;
     ID3D11RasterizerState *pRasterizerState;
     hr = SwapchainHook::d3d11Device->CreateRasterizerState(&rd, &pRasterizerState);
-    if (FAILED(hr)) { pContext->Release(); pDepthStencilState->Release(); pBlendState->Release(); return; }
+    if (FAILED(hr)) {  pDepthStencilState->Release(); pBlendState->Release(); return; }
     pContext->RSSetState(pRasterizerState);
 
     pContext->PSSetShaderResources(0, 1, &pShaderResourceView);
@@ -368,6 +368,6 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
         fbSizes.clear();
     }
 
-    pContext->Release();
+    
     pOrigShaderResourceView->Release();
 }

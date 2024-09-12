@@ -24,7 +24,7 @@ std::string removeColorCodes(const std::string& input);
 DWORD WINAPI init(HMODULE real)
 {
 #ifndef NDEBUG
-    bool shouldDebug = false; // Change this bool locally, NEVER push it set to true
+    bool shouldDebug = true; // Change this bool locally, NEVER push it set to true
 
     if (GetConsoleWindow() == nullptr && shouldDebug) {
         AllocConsole();

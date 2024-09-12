@@ -451,8 +451,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
 	            if (mainRenderTargetView) mainRenderTargetView->Release();
 
-	            if (ppContext) ppContext->Release();
-
             }
 
             Memory::SafeRelease(FlarialGUI::blurbrush);
@@ -616,7 +614,7 @@ void SwapchainHook::DX12Init() {
                 Memory::SafeRelease(dxgiDevice);
                 Memory::SafeRelease(d2dFactory);
 
-                //BlurDX12::InitializePipeline();
+                Blur::InitializePipeline();
                 init = true;
             }
 }
@@ -683,14 +681,15 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
 
         D3D11_TEXTURE2D_DESC desc;
         buffer2D->GetDesc(&desc);
-        std::cout << desc.Format << std::endl;
         HRESULT r;
 
         if(!stageTex) {
-            D3D11_TEXTURE2D_DESC stageDesc = desc;
+            D3D11_TEXTURE2D_DESC stageDesc = {};
+            stageDesc = desc;
             stageDesc.Usage = D3D11_USAGE_STAGING;
-            stageDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+            stageDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
             stageDesc.BindFlags = 0;
+            stageDesc.MiscFlags = 0;
             r = SwapchainHook::d3d11Device->CreateTexture2D(&stageDesc, nullptr, &stageTex);
             if (FAILED(r))  std::cout << "Failed to create stage texture: " << std::hex << r << std::endl;
         }
@@ -710,6 +709,5 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
 
         deviceContext->CopyResource(SavedD3D11BackBuffer, stageTex);
         Memory::SafeRelease(buffer2D);
-        Memory::SafeRelease(deviceContext);
     }
 }
