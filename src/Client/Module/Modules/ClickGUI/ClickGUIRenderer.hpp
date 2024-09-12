@@ -61,6 +61,7 @@ struct PageType {
 };
 
 class ClickGUIRenderer : public Listener {
+    Module *module;
     float baseHeightReal = 1.0f;
     float baseHeightActual = 0.00001f;
     float realBlurAmount = 0.00001f;
@@ -72,7 +73,6 @@ class ClickGUIRenderer : public Listener {
     std::string searchBarString;
 public:
     static inline bool editmenu = false;
-    static Module *module;
 
     static std::pair<float, float>
     centerChildRectangle(float parentWidth, float parentHeight, float childWidth, float childHeight) {
