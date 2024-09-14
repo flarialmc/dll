@@ -349,10 +349,12 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                                 //BlurDX12::RenderBlur(SwapchainHook::d3d12CommandList);
                                 EventHandler::onRender(event);
 
-                                if(!first)
-                                FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                             "keybind")->value + " to open the menu in-game.");
-                                else first = true;
+                                if(!first) {
+                                    FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
+                                 "keybind")->value + " to open the menu in-game.");
+                                    FlarialGUI::Notify("Join our discord! https://flarial.xyz/discord");
+                                    first = true;
+                                }
 
 
                                 D2D::context->EndDraw();
@@ -444,10 +446,13 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                         event.RTV = mainRenderTargetView;
                         EventHandler::onRender(event);
 
-                        if(!first)
+                        if(!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
                             FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                          "keybind")->value + " to open the menu in-game.");
-                        else first = true;
+
+                            FlarialGUI::Notify("Join our discord! https://flarial.xyz/discord");
+                            first = true;
+                        }
 
                         D2D::context->EndDraw();
 

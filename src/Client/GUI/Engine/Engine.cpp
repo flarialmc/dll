@@ -1281,10 +1281,9 @@ void FlarialGUI::Notify(const std::string& text) {
         Notification e;
         e.text = text;
         e.finished = false;
-        e.currentPos = Constraints::CenterConstraint(0, 0).x;
-        e.currentPosY = Constraints::PercentageConstraint(0.25, "bottom", true);
-        std::string sizeName = FlarialGUI::FlarialTextWithFont(e.currentPos, e.currentPosY, FlarialGUI::to_wide(e.text).c_str(), 10000, 25, DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::RelativeConstraint(0.15, "height", true), DWRITE_FONT_WEIGHT_NORMAL, D2D1::ColorF(0, 0, 0 ,0));
-        e.width = FlarialGUI::TextSizes[sizeName];
+        e.currentPosY = MC::windowSize.y;
+        e.arrived = false;
+        e.finished = false;
 
         notifications.push_back(e);
     }
@@ -1299,13 +1298,58 @@ void FlarialGUI::NotifyHeartbeat() {
     // end of torll
 
 
+    Vec2<float> round = Constraints::RoundingConstraint(20, 20);
+    float height = Constraints::RelativeConstraint(0.035, "height", true);
+    float posxModif = 0;
+    float fontSize = Constraints::RelativeConstraint(0.128, "height", true);
+    float textposyModif = Constraints::RelativeConstraint(0.0045f, "height", true);
 
+    int i = 0;
     for(Notification& n : notifications) {
 
-        FlarialGUI::RoundedRect(n.currentPos, n.currentPosY, FlarialGUI::HexToColorF("ff2438"), n.width, 25);
-        FlarialGUI::FlarialTextWithFont(n.currentPos, n.currentPosY, FlarialGUI::to_wide(n.text).c_str(), n.width, 25, DWRITE_TEXT_ALIGNMENT_CENTER, Constraints::RelativeConstraint(0.15, "height", true), DWRITE_FONT_WEIGHT_NORMAL);
-    }
+        float posyModif = -((height + Constraints::RelativeConstraint(0.009f, "height", true)) * i);
 
+        if(n.firstTime) {
+            float TrollSize = Constraints::RelativeConstraint(0.1385, "height", true);
+            std::string sizeName = FlarialGUI::FlarialTextWithFont(n.currentPos, n.currentPosY, FlarialGUI::to_wide(n.text).c_str(), 10, 25, DWRITE_TEXT_ALIGNMENT_CENTER, TrollSize, DWRITE_FONT_WEIGHT_NORMAL, D2D1::ColorF(0, 0, 0 ,0));
+            n.width = FlarialGUI::TextSizes[sizeName] * 1.003;
+            n.currentPos = Constraints::CenterConstraint(n.width, 0).x;
+            n.firstTime = false;
+        }
+
+        if(!n.finished) {
+            if(!n.arrived) {
+
+                FlarialGUI::RoundedRect(n.currentPos, n.currentPosY + posyModif, FlarialGUI::HexToColorF("ff2438"), n.width, height, round.x, round.x);
+                FlarialGUI::FlarialTextWithFont(n.currentPos + posxModif, n.currentPosY + posyModif + textposyModif, FlarialGUI::to_wide(n.text).c_str(), n.width, 25, DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL);
+                FlarialGUI::lerp(n.currentPosY, Constraints::PercentageConstraint(0.1f, "bottom", true), FlarialGUI::frameFactor * 0.067f);
+
+                if(n.currentPosY <= Constraints::PercentageConstraint(0.08f, "bottom", true)) {
+                    n.arrived = true;
+                    n.time = std::chrono::steady_clock::now();
+                }
+
+                i++;
+
+            } else {
+
+                std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
+                auto timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(current - n.time);
+
+                FlarialGUI::RoundedRect(n.currentPos, n.currentPosY + posyModif, FlarialGUI::HexToColorF("ff2438"), n.width, height, round.x, round.x);
+                FlarialGUI::FlarialTextWithFont(n.currentPos + posxModif, n.currentPosY + posyModif + textposyModif, FlarialGUI::to_wide(n.text).c_str(), n.width, 25, DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL);
+
+                if (timeDifference.count() > 5000) {
+                    FlarialGUI::lerp(n.currentPosY, MC::windowSize.y + 500, FlarialGUI::frameFactor * 0.052f);
+                    if(n.currentPosY >= MC::windowSize.y) { n.finished = true; }
+                }
+
+                i++;
+            }
+        } else {
+           FlarialGUI::notifications.erase(std::next(FlarialGUI::notifications.begin(), i));
+        }
+    }
 }
 
 void FlarialGUI::CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to) {
