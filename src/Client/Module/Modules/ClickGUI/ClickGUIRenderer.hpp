@@ -91,11 +91,6 @@ public:
                                   D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
                                               allahuakbar.y + akbar));
 
-        if (ClientInstance::getTopScreenName() != "hud_screen") {
-            FlarialGUI::NotifyHeartbeat();
-            return;
-        }
-
         if (FlarialGUI::scrollposmodifier == 0) {
             FlarialGUI::scrollposmodifier = Constraints::RelativeConstraint(0.1f);
         }
@@ -818,8 +813,8 @@ public:
             }
             FlarialGUI::PopSize(); // Pops base rect
         }
-        FlarialGUI::NotifyHeartbeat();
         FlarialGUI::displayToolTips();
+        FlarialGUI::NotifyHeartbeat();
     }
 
     void onKey(KeyEvent &event) override {

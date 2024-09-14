@@ -164,11 +164,6 @@ void Client::initialize() {
     HookManager::initialize();
     ModuleManager::initialize();
     Logger::debug("[Client] Ready.");
-
-    if (!Client::disable) {
-        FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                "keybind")->value + " to open the menu in-game.");
-    }
 }
 
 std::string window = "Minecraft";

@@ -26,6 +26,7 @@ ID3D12CommandQueue *SwapchainHook::queue = nullptr;
 
 bool initImgui = false;
 bool allfontloaded = false;
+bool first = false;
 
 static std::chrono::high_resolution_clock fpsclock;
 static std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
@@ -155,6 +156,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
             DX12Init();
 
         }
+
 
 
         /* INIT END */
@@ -347,6 +349,11 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                                 //BlurDX12::RenderBlur(SwapchainHook::d3d12CommandList);
                                 EventHandler::onRender(event);
 
+                                if(!first)
+                                FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
+                             "keybind")->value + " to open the menu in-game.");
+                                else first = true;
+
 
                                 D2D::context->EndDraw();
 
@@ -436,6 +443,11 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                         RenderEvent event;
                         event.RTV = mainRenderTargetView;
                         EventHandler::onRender(event);
+
+                        if(!first)
+                            FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
+                         "keybind")->value + " to open the menu in-game.");
+                        else first = true;
 
                         D2D::context->EndDraw();
 

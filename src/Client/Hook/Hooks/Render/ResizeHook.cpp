@@ -52,6 +52,9 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(SwapchainHook::stageTex);
     Memory::SafeRelease(SwapchainHook::SavedD3D11BackBuffer);
 
+    Blur::hasDoneFrames = false;
+    for(ID3D11Texture2D* tex : Blur::framebuffers){ Memory::SafeRelease(tex); Blur::framebuffers.clear();}
+
     for (auto &i: ClickGUIElements::images) {
         Memory::SafeRelease(i.second);
     }

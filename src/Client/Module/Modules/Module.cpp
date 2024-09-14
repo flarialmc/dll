@@ -195,7 +195,7 @@ void Module::resetPadding() {
     toggleIndex = 0;
     dropdownIndex = 0;
     sliderIndex = 0;
-    colorPickerIndex = 0;
+    colorPickerIndex = 100;
     keybindIndex = 0;
     textboxIndex = 0;
 }

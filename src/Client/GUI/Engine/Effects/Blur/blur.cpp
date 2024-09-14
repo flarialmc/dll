@@ -287,9 +287,6 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     pRasterizerState->Release();
 }
 
-std::vector<ID3D11Texture2D *> framebuffers;
-bool hasDoneFrames = false;
-
 void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iterations, float intensity)
 {
 

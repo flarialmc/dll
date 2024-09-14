@@ -48,7 +48,7 @@ public:
     int dropdownIndex = 0;
     int textboxIndex = 0;
     int keybindIndex = 0;
-    int colorPickerIndex = 0;
+    int colorPickerIndex = 100;
 
     void resetPadding();
     void extraPadding();

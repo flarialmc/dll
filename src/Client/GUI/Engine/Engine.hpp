@@ -54,6 +54,10 @@ public:
 
     static void RenderToRTV(ID3D11RenderTargetView *, ID3D11ShaderResourceView *, XMFLOAT2);
 
+    static inline std::vector<ID3D11Texture2D *> framebuffers;
+
+    static inline bool hasDoneFrames = false;
+
     static void RenderBlur(ID3D11RenderTargetView *, int, float);
 };
 

@@ -109,7 +109,7 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex
     cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
 
 
-    sizes[text] = FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.004f,
+    sizes[text] = FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.0025f,
                                     FlarialGUI::to_wide(text).c_str(), s * 4.3f, s * 1.1f,
                                     DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f, DWRITE_FONT_WEIGHT_NORMAL);
 
