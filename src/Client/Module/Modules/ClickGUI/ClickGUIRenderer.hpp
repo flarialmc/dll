@@ -62,6 +62,7 @@ struct PageType {
 
 class ClickGUIRenderer : public Listener {
     Module *module;
+    Module *ghostMainModule;
     float baseHeightReal = 1.0f;
     float baseHeightActual = 0.00001f;
     float realBlurAmount = 0.00001f;
@@ -441,38 +442,29 @@ public:
                     //FlarialGUI::ShadowRect(Vec2{center.x, center.y}, Vec2{baseWidth, Constraints::RelativeConstraint(baseHeightReal, "height", true)}, FlarialGUI::HexToColorF("120e0f"), baseRound.x, 100);
                 } else if (e == "settings") {
 
+
                     FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
 
-                    float rectX = Constraints::PercentageConstraint(0.01, "left");
-                    float rectY = Constraints::PercentageConstraint(0.20, "top");
+                    float rectX = Constraints::PercentageConstraint(0.015, "left");
+                    float rectY = Constraints::PercentageConstraint(0.167, "top");
                     float rectWidth = Constraints::RelativeConstraint(0.965, "width");
-                    float rectHeight = Constraints::RelativeConstraint(0.6);
+                    float rectHeight = Constraints::RelativeConstraint(0.85);
+                    round = Constraints::RoundingConstraint(38.f, 38.5f);
 
-                    float scrollWidth = Constraints::RelativeConstraint(1.12);
-                    float scrollHeight = Constraints::RelativeConstraint(1.3);
-                    Vec2<float> scrollcenter = Constraints::CenterConstraint(scrollWidth, scrollHeight, "y", 0.0, 1);
+                    float anotherRectHeight = Constraints::RelativeConstraint(0.8105);
+                    float anotherRectWidth = Constraints::RelativeConstraint(0.972, "width");
 
-                    const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-                    const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
-                    round = Constraints::RoundingConstraint(50, 50);
+                    D2D1_COLOR_F colorThing = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
+                    colorThing.a = o_colors_secondary2;
 
-                    float anotherRectHeight = Constraints::RelativeConstraint(0.6);
-                    float anotherRectWidth = Constraints::RelativeConstraint(0.981, "width");
+                    FlarialGUI::RoundedRect(rectX, rectY, colorThing,
+                                            anotherRectWidth, anotherRectHeight, round.x, round.x);
 
-                    D2D1_COLOR_F iRanOutOfNamesToCallTheseColors = colors_secondary2_rgb ? FlarialGUI::rgbColor
-                                                                                         : colors_secondary2;
-                    iRanOutOfNamesToCallTheseColors.a = o_colors_secondary2;
+                    D2D1_COLOR_F bruv = colors_secondary1_rgb ? FlarialGUI::rgbColor : colors_secondary1;
+                    bruv.a = o_colors_secondary1;
 
-                    FlarialGUI::RoundedRect(rectX, rectY, iRanOutOfNamesToCallTheseColors, anotherRectWidth,
-                                            anotherRectHeight, round.x, round.x);
-
-                    D2D1_COLOR_F wtfCol = colors_secondary1_rgb ? FlarialGUI::rgbColor : colors_secondary1;
-                    wtfCol.a = o_colors_secondary1;
-
-                    round = Constraints::RoundingConstraint(45, 45);
-                    FlarialGUI::RoundedRect(rectX + Constraints::SpacingConstraint(0.0085, rectWidth),
-                                            rectY + Constraints::SpacingConstraint(0.01, rectWidth), wtfCol, rectWidth,
-                                            rectHeight, round.x, round.x);
+                    D2D1_COLOR_F textCol = colors_text_rgb ? FlarialGUI::rgbColor : colors_text;
+                    textCol.a = o_colors_text;
 
                     FlarialGUI::PopSize();
 
@@ -480,252 +472,51 @@ public:
                                          rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth,
                                          rectHeight);
 
-                    rectX = Constraints::PercentageConstraint(0.019, "left");
+                    Module* c = this->ghostMainModule;
 
-                    FlarialGUI::ScrollBar(scrollWidth, scrollHeight, 270, 1000, 2);
-                    FlarialGUI::SetScrollView(rectX, rectY + Constraints::SpacingConstraint(0.01, rectWidth),
+
+                    float toggleX = Constraints::PercentageConstraint(0.019, "left");
+                    float toggleY = Constraints::PercentageConstraint(0.10, "top");
+
+                    const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
+
+
+                    FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+                    FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"),
                                               Constraints::RelativeConstraint(1.0, "width"),
-                                              Constraints::RelativeConstraint(1.0, "height"));
+                                              Constraints::RelativeConstraint(0.88f, "height"));
 
-                    rectY = Constraints::PercentageConstraint(0.10, "top");
+                    c->addHeader("Fonts");
+                    c->addTextBox("ClickGUI", "", Client::settings.getSettingByName<std::string>("fontname")->value);
+                    c->addTextBox("Modules", "", Client::settings.getSettingByName<std::string>("mod_fontname")->value);
 
-                    FlarialGUI::TextBoxVisual(1, Client::settings.getSettingByName<std::string>("fontname")->value, 26,
-                                              rectX, rectY, "Click GUI Font (Anything installed in your system)");
+                    c->extraPadding();
 
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                    c->addHeader("Rendering");
+                    c->addToggle("Better Frames", "RTX Disabled, Restart Required.", Client::settings.getSettingByName<bool>("killdx")->value);
+                    c->addToggle("V-SYNC Disabler", "(Sometimes) Only works with Better Frames.", Client::settings.getSettingByName<bool>("vsync")->value);
+                    c->addToggle("Disable Animations", "",  Client::settings.getSettingByName<bool>("disableanims")->value);
+                    c->addSlider("UI Blur Intensity", "", Client::settings.getSettingByName<float>("blurintensity")->value, 25.f);
+                    c->addSlider("Chroma / RGB Speed", "", Client::settings.getSettingByName<float>("rgb_speed")->value, 10.f);
+                    c->addSlider("Chroma / RGB Saturation", "", Client::settings.getSettingByName<float>("rgb_saturation")->value, 1.f);
+                    c->addSlider("Chroma / RGB Value", "", Client::settings.getSettingByName<float>("rgb_value")->value, 1.f);
+                    c->addToggle("Inventory Watermark", "", Client::settings.getSettingByName<bool>("watermark")->value);
+                    c->addToggle("Enabled Modules on Top", "", Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value);
+                    c->addToggle("No UI Icons / Images", "Flarial only", Client::settings.getSettingByName<bool>("noicons")->value);
+                    c->addToggle("Disable UI Shadows", "Flarial only",  Client::settings.getSettingByName<bool>("noshadows")->value);
 
-                    FlarialGUI::TextBoxVisual(2, Client::settings.getSettingByName<std::string>("mod_fontname")->value,
-                                              26, rectX, rectY, "Modules Font (Anything installed in your system)");
+                    c->extraPadding();
 
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
+                    c->addHeader("Misc");
+                    c->addToggle("Center Cursor", "Centers your cursor everytime you open your inventory, etc.", Client::settings.getSettingByName<bool>("centreCursor")->value);
+                    c->addToggle("Anonymous on API", "Stay anonymous on Flarial's API.", Client::settings.getSettingByName<bool>("anonymousApi")->value);
 
-                    FlarialGUI::Dropdown(0, rectX, rectY,
-                                         std::vector<std::string>{"Default", "Cleartype", "Grayscale", "Aliased"},
-                                         Client::settings.getSettingByName<std::string>("aliasingMode")->value,
-                                         "Text Aliasing");
-                    FlarialGUI::SetIsInAdditionalYMode();
+                    c->resetPadding();
 
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
-
-                    FlarialGUI::FlarialTextWithFont(rectX, rectY, L"Eject keybind",
-                                                    textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                    Constraints::SpacingConstraint(1.05, textWidth),
-                                                    DWRITE_FONT_WEIGHT_NORMAL);
-                    FlarialGUI::KeybindSelector(0, rectX + FlarialGUI::SettingsTextWidth("Eject keybind "), rectY,
-                                                Client::settings.getSettingByName<std::string>("ejectKeybind")->value);
-
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
-
-                    FlarialGUI::FlarialTextWithFont(rectX, rectY, L"Blur Intensity",
-                                                    textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                    Constraints::SpacingConstraint(1.05, textWidth),
-                                                    DWRITE_FONT_WEIGHT_NORMAL);
-
-                    float percent = FlarialGUI::Slider(7, rectX + FlarialGUI::SettingsTextWidth("Blur Intensity "),
-                                                       rectY, Client::settings.getSettingByName<float>(
-                                    "blurintensity")->value, 25);
-
-                    Client::settings.getSettingByName<float>("blurintensity")->value = percent;
-
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
-
-                    FlarialGUI::FlarialTextWithFont(rectX, rectY, L"Chroma Speed",
-                                                    textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                    Constraints::SpacingConstraint(1.05, textWidth),
-                                                    DWRITE_FONT_WEIGHT_NORMAL);
-
-                    percent = FlarialGUI::Slider(8, rectX + FlarialGUI::SettingsTextWidth("Chroma Speed "),
-                                                 rectY, Client::settings.getSettingByName<float>(
-                                    "rgb_speed")->value, 10);
-
-                    Client::settings.getSettingByName<float>("rgb_speed")->value = percent;
-
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
-
-                    FlarialGUI::FlarialTextWithFont(rectX, rectY, L"Chroma Saturation",
-                                                    textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                    Constraints::SpacingConstraint(1.05, textWidth),
-                                                    DWRITE_FONT_WEIGHT_NORMAL);
-
-                    percent = FlarialGUI::Slider(9, rectX + FlarialGUI::SettingsTextWidth("Chroma Saturation "),
-                                                 rectY, Client::settings.getSettingByName<float>(
-                                    "rgb_saturation")->value, 1);
-
-                    Client::settings.getSettingByName<float>("rgb_saturation")->value = percent;
-
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
-
-                    FlarialGUI::FlarialTextWithFont(rectX, rectY, L"Chroma Value",
-                                                    textWidth * 1.69f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                    Constraints::SpacingConstraint(1.05, textWidth),
-                                                    DWRITE_FONT_WEIGHT_NORMAL);
-
-                    percent = FlarialGUI::Slider(10, rectX + FlarialGUI::SettingsTextWidth("Chroma Value "),
-                                                 rectY, Client::settings.getSettingByName<float>(
-                                    "rgb_value")->value, 1);
-
-                    Client::settings.getSettingByName<float>("rgb_value")->value = percent;
-
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
-
-
-                    if (FlarialGUI::Toggle(0, rectX, rectY,
-                                           Client::settings.getSettingByName<bool>("killdx")->value)) {
-
-                        Client::settings.getSettingByName<bool>(
-                                "killdx")->value = !Client::settings.getSettingByName<bool>("killdx")->value;
-                    }
-
-
-                    FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(1.2f, textWidth / 2.0f),
-                                                    rectY,
-                                                    L"Better Frames (No RTX) (Restart required)",
-                                                    Constraints::SpacingConstraint(4.5, textWidth), textHeight,
-                                                    DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                    Constraints::SpacingConstraint(0.95, textWidth),
-                                                    DWRITE_FONT_WEIGHT_NORMAL);
-
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                    if (FlarialGUI::Toggle(1, rectX, rectY,
-                                           Client::settings.getSettingByName<bool>("vsync")->value)) {
-
-                        Client::settings.getSettingByName<bool>(
-                                "vsync")->value = !Client::settings.getSettingByName<bool>("vsync")->value;
-                    }
-
-                    FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
-                                                    L"Vsync Disabler (Experimental)",
-                                                    Constraints::SpacingConstraint(4.5, textWidth), textHeight,
-                                                    DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                    Constraints::SpacingConstraint(0.95, textWidth),
-                                                    DWRITE_FONT_WEIGHT_NORMAL);
-
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                    if (FlarialGUI::Toggle(9, rectX, rectY,
-                                           Client::settings.getSettingByName<bool>("disableanims")->value)) {
-
-                        Client::settings.getSettingByName<bool>(
-                                "disableanims")->value = !Client::settings.getSettingByName<bool>(
-                                "disableanims")->value;
-                    }
-                    FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
-                                                    L"Disable Animations",
-                                                    Constraints::SpacingConstraint(4.5, textWidth), textHeight,
-                                                    DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                    Constraints::SpacingConstraint(0.95, textWidth),
-                                                    DWRITE_FONT_WEIGHT_NORMAL);
-
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                    if (FlarialGUI::Toggle(2, rectX, rectY,
-                                           Client::settings.getSettingByName<bool>("watermark")->value)) {
-
-                        Client::settings.getSettingByName<bool>(
-                                "watermark")->value = !Client::settings.getSettingByName<bool>("watermark")->value;
-                    }
-                    FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
-                                                    L"Watermark In Inventories",
-                                                    Constraints::SpacingConstraint(4.5, textWidth), textHeight,
-                                                    DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                    Constraints::SpacingConstraint(0.95, textWidth),
-                                                    DWRITE_FONT_WEIGHT_NORMAL);
-
-
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                    if (FlarialGUI::Toggle(8, rectX, rectY,
-                                           Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value)) {
-
-                        Client::settings.getSettingByName<bool>(
-                                "enabledModulesOnTop")->value = !Client::settings.getSettingByName<bool>(
-                                "enabledModulesOnTop")->value;
-                    }
-                    FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
-                                                    L"Enabled Modules on Top",
-                                                    Constraints::SpacingConstraint(4.5, textWidth), textHeight,
-                                                    DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                    Constraints::SpacingConstraint(0.95, textWidth),
-                                                    DWRITE_FONT_WEIGHT_NORMAL);
-
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                    if (FlarialGUI::Toggle(7, rectX, rectY,
-                                           Client::settings.getSettingByName<bool>("centreCursor")->value)) {
-
-                        Client::settings.getSettingByName<bool>(
-                                "centreCursor")->value = !Client::settings.getSettingByName<bool>(
-                                "centreCursor")->value;
-                    }
-
-                    FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
-                                                    L"Centre Cursor",
-                                                    Constraints::SpacingConstraint(4.5, textWidth), textHeight,
-                                                    DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                    Constraints::SpacingConstraint(0.95, textWidth),
-                                                    DWRITE_FONT_WEIGHT_NORMAL);
-
-
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                    if (FlarialGUI::Toggle(3, rectX, rectY,
-                                           Client::settings.getSettingByName<bool>("dlassets")->value)) {
-
-                        Client::settings.getSettingByName<bool>(
-                                "dlassets")->value = !Client::settings.getSettingByName<bool>("dlassets")->value;
-                    }
-
-                    FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
-                                                    L"Re-Download Assets Every Restart",
-                                                    Constraints::SpacingConstraint(4.5, textWidth), textHeight,
-                                                    DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                    Constraints::SpacingConstraint(0.95, textWidth),
-                                                    DWRITE_FONT_WEIGHT_NORMAL);
-
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                    if (FlarialGUI::Toggle(4, rectX, rectY,
-                                           Client::settings.getSettingByName<bool>("noicons")->value)) {
-
-                        Client::settings.getSettingByName<bool>(
-                                "noicons")->value = !Client::settings.getSettingByName<bool>("noicons")->value;
-                    }
-
-                    FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
-                                                    L"No Icons", Constraints::SpacingConstraint(4.5, textWidth),
-                                                    textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                    Constraints::SpacingConstraint(0.95, textWidth),
-                                                    DWRITE_FONT_WEIGHT_NORMAL);
-
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                    if (FlarialGUI::Toggle(5, rectX, rectY,
-                                           Client::settings.getSettingByName<bool>("noshadows")->value)) {
-
-                        Client::settings.getSettingByName<bool>(
-                                "noshadows")->value = !Client::settings.getSettingByName<bool>("noshadows")->value;
-                    }
-
-                    FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
-                                                    L"No Shadows", Constraints::SpacingConstraint(4.5, textWidth),
-                                                    textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                    Constraints::SpacingConstraint(0.95, textWidth),
-                                                    DWRITE_FONT_WEIGHT_NORMAL);
-
-                    rectY += Constraints::SpacingConstraint(0.35, textWidth);
-                    FlarialGUI::FlarialTextWithFont(rectX + Constraints::SpacingConstraint(0.60, textWidth), rectY,
-                                                    L"Anonymous Telemetry",
-                                                    Constraints::SpacingConstraint(4.5, textWidth), textHeight,
-                                                    DWRITE_TEXT_ALIGNMENT_LEADING,
-                                                    Constraints::SpacingConstraint(0.95, textWidth),
-                                                    DWRITE_FONT_WEIGHT_NORMAL);
-
-                    if (FlarialGUI::Toggle(6, rectX, rectY,
-                                           Client::settings.getSettingByName<bool>("anonymousApi")->value)) {
-
-                        Client::settings.getSettingByName<bool>(
-                                "anonymousApi")->value = !Client::settings.getSettingByName<bool>(
-                                "anonymousApi")->value;
-                    }
-
-                    FlarialGUI::UnSetIsInAdditionalYMode();
                     FlarialGUI::UnsetScrollView();
                     FlarialGUI::PopSize();
-                }
 
+                }
                 /* Mod Card End */
             } else if (ClickGUIRenderer::page.type == "settings") {
 
@@ -943,6 +734,7 @@ public:
     explicit ClickGUIRenderer(const char string[5], Module *emodule) {
         this->name = string;
         this->module = emodule;
+        this->ghostMainModule = new Module("main", "troll", IDR_COMBO_PNG, "");
         ClickGUIRenderer::curr = "modules";
     }
 

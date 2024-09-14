@@ -50,7 +50,6 @@ public:
         this->addToggle("Border", "", settings.getSettingByName<bool>("border")->value);
         this->addConditionalSlider(settings.getSettingByName<bool>("border")->value, "Border Width", "", settings.getSettingByName<float>("borderWidth")->value, 4.f);
         this->addSlider("Rounding", "", this->settings.getSettingByName<float>("rounding")->value);
-        this->addToggle("Translucency", "", this->settings.getSettingByName<bool>("BlurEffect")->value);
         this->addToggle("Responsive Rectangle", "Resizes width with text", this->settings.getSettingByName<bool>("responsivewidth")->value);
         this->addSlider("Rotation", "", this->settings.getSettingByName<float>("rotation")->value, 359.f, 0.f, false);
         this->addSlider("Rectangle Width", "", this->settings.getSettingByName<float>("rectwidth")->value, 3.f);
@@ -66,7 +65,7 @@ public:
         this->addToggle("Reverse Padding Y", "", this->settings.getSettingByName<bool>("reversepaddingy")->value);
         this->addSlider("Padding X", "", this->settings.getSettingByName<float>("padx")->value, 1.f, 0.f, false);
         this->addSlider("Padding Y", "", this->settings.getSettingByName<float>("pady")->value, 1.f, 0.f, false);
-        
+
         this->extraPadding();
 
         this->addHeader("Colors");
