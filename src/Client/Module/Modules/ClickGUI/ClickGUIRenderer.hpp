@@ -63,7 +63,7 @@ struct PageType {
 class ClickGUIRenderer : public Listener {
     Module *module;
     Module *ghostMainModule;
-    float baseHeightReal = 1.0f;
+    float baseHeightReal = 0.f;
     float baseHeightActual = 0.00001f;
     float realBlurAmount = 0.00001f;
     float radioPushAmount1 = 0.0000001f;
@@ -104,7 +104,7 @@ public:
 
         } else {
 
-            FlarialGUI::lerp(baseHeightReal, 0.01f, 0.22f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+            FlarialGUI::lerp(baseHeightReal, 0.0001f, 0.22f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
             FlarialGUI::lerp(baseHeightActual, 0.00001f, 0.30f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
             FlarialGUI::lerp(realBlurAmount, 0.00001f, 0.15f * FlarialGUI::frameFactor);
 
@@ -112,7 +112,7 @@ public:
 
         }
 
-        if (SwapchainHook::init && baseHeightActual > 0.1) {
+        if (SwapchainHook::init && baseHeightActual > 0.01) {
 
             /* Base Rectangle Start */
 

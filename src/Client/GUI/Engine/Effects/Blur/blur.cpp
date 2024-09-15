@@ -290,7 +290,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
 void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iterations, float intensity)
 {
 
-    if(intensity < 1) return;
+    if(intensity < 0) return;
 
     if (!SwapchainHook::GetBackbuffer()) return;
 
