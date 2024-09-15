@@ -57,6 +57,9 @@ public:
     void addConditionalSlider(bool condition, std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
     void addSlider(std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
     void addToggle(std::string text, std::string subtext, bool& value);
+
+    void addKeybind(std::string text, std::string subtext, std::string &keybind);
+
     void addTextBox(std::string text, std::string subtext, std::string& value);
     void addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value);
     void addColorPicker(std::string text, std::string subtext, std::string& value, bool& rgb);

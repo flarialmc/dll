@@ -92,15 +92,12 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
     if (isAdditionalY) UnSetIsInAdditionalYMode();
     FlarialGUI::RoundedRect(x, y, KeybindSelectors[index].curColor, percWidth, percHeight, round.x, round.x);
 
+    if(text != "" & text != " ")
     FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), percWidth, percHeight,
                                     DWRITE_TEXT_ALIGNMENT_CENTER, textWidth, DWRITE_FONT_WEIGHT_NORMAL);
+    else  FlarialGUI::FlarialTextWithFont(x, y, L"unset", percWidth, percHeight,
+                                    DWRITE_TEXT_ALIGNMENT_CENTER, textWidth, DWRITE_FONT_WEIGHT_NORMAL);
 
-
-    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.25, textWidth / 2.0f), y,
-                                    L"Keybind (Hold for 2 seconds)",
-                                    Constraints::SpacingConstraint(6.9f, textWidth), percHeight,
-                                    DWRITE_TEXT_ALIGNMENT_LEADING, textWidth,
-                                    DWRITE_FONT_WEIGHT_NORMAL);
 
     if (isAdditionalY) SetIsInAdditionalYMode();
 

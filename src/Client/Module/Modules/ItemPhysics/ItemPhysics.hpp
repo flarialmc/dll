@@ -8,12 +8,12 @@ class ItemPhysics : public Module {
 public:
     ItemPhysicsListener* listener = nullptr;
 
-    ItemPhysics() : Module("ItemPhysics", "Changes rotation behavior of dropped items", IDR_ITEM_PHYSICS_PNG, "") {
+    ItemPhysics() : Module("Item Physics", "Changes rotation behavior of dropped items", IDR_ITEM_PHYSICS_PNG, "") {
         Module::setup();
     }
 
     void onEnable() override {
-        listener = new ItemPhysicsListener("ItemPhysics", this);
+        listener = new ItemPhysicsListener("Item Physics", this);
 
         EventHandler::registerListener(listener);
 
@@ -26,7 +26,7 @@ public:
         if (listener != nullptr)
             listener->onDisable();
 
-        EventHandler::unregisterListener("ItemPhysics");
+        EventHandler::unregisterListener("Item Physics");
 
         delete listener;
 

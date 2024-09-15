@@ -486,6 +486,11 @@ public:
                                               Constraints::RelativeConstraint(1.0, "width"),
                                               Constraints::RelativeConstraint(0.88f, "height"));
 
+                    c->addHeader("Keybinds");
+                    c->addKeybind("Eject Keybind", "When setting, hold the new bind for 2 seconds", Client::settings.getSettingByName<std::string>("ejectKeybind")->value);
+
+                    c->extraPadding();
+
                     c->addHeader("Fonts");
                     c->addTextBox("ClickGUI", "", Client::settings.getSettingByName<std::string>("fontname")->value);
                     c->addTextBox("Modules", "", Client::settings.getSettingByName<std::string>("mod_fontname")->value);

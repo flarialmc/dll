@@ -48,7 +48,7 @@ void ItemPhysicsListener::ItemRenderer_render(ItemRenderer* _this, BaseActorRend
     using func_t = void(*)(ItemRenderer*, BaseActorRenderContext*, ActorRenderData*);
     static auto oFunc = reinterpret_cast<func_t>(ItemRenderer_renderHook->trampoline);
 
-    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("ItemPhysics"));
+    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics"));
     mod->listener->renderData = renderData;
 
     oFunc(_this, renderCtx, renderData);
@@ -59,7 +59,7 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
     using glm_rotate_t = void(__fastcall*)(glm::mat4x4&, float, float, float, float);
     static auto glm_rotate = reinterpret_cast<glm_rotate_t>(rotateSig);
 
-    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("ItemPhysics"));
+    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics"));
     const auto renderData = mod->listener->renderData;
     if (renderData == nullptr) return;
 
@@ -126,7 +126,7 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
 
 
 void ItemPhysicsListener::onSetupAndRender(SetupAndRenderEvent& event) {
-    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("ItemPhysics"));
+    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics"));
     if (!mod->isEnabled()) return;
 
     const auto player = SDK::clientInstance->getLocalPlayer();
