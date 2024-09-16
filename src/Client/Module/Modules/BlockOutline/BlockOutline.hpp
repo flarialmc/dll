@@ -19,7 +19,7 @@ private:
     static inline std::array<std::byte, 4> outlineColorNewRipRel;
 
 public:
-    BlockOutline() : Module("BlockOutline", "Changes the block outline color", IDR_BLOCK_PNG, "") {
+    BlockOutline() : Module("Block Outline", "Changes the block outline color", IDR_BLOCK_PNG, "") {
         Module::setup();
     };
 
