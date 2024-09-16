@@ -58,9 +58,16 @@ void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::str
     D2D1_COLOR_F textCol = colors_text_rgb ? rgbColor : colors_text;
     textCol.a = o_colors_text * tooltips[id].opac;
 
+
     float spacing = Constraints::RelativeConstraint(0.01f, "height", true);
-    float rectWidth = TextSizes[tooltips[id].textName] + spacing * 2;
-    float rectHeight = spacing * 10;
+    float offset = Constraints::RelativeConstraint(0.015, "height", true);
+
+    tooltips[id].textName = FlarialTextWithFont(spacing + tooltips[id].hoverX + offset, tooltips[id].hoverY - offset,
+                    FlarialGUI::to_wide(text).c_str(),  100000.f, 100000.f,
+                    DWRITE_TEXT_ALIGNMENT_LEADING, fontSize1, DWRITE_FONT_WEIGHT_REGULAR, D2D1::ColorF(0, 0, 0, 0));
+
+    float rectWidth = TextSizesXY[tooltips[id].textName].x + spacing * 2;
+    float rectHeight = TextSizesXY[tooltips[id].textName].y + spacing;
 
     if (CursorInRect(x, y, width, height)) {
         if (!tooltips[id].in) {
@@ -93,18 +100,16 @@ void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::str
         lerp(tooltips[id].opac, 0.0f, 0.35f * frameFactor);
     }
 
-    if (tooltips[id].opac > 0.1f) {
+    if (tooltips[id].opac > 0) {
         Vec2<float> round = Constraints::RoundingConstraint(10, 10);
-
-        float offset = Constraints::RelativeConstraint(0.015, "height", true);
 
         RoundedRect(tooltips[id].hoverX + offset, tooltips[id].hoverY - offset, bgCol, rectWidth, rectHeight, round.x,
                     round.x);
         RoundedHollowRect(tooltips[id].hoverX + offset, tooltips[id].hoverY - offset,
                           Constraints::RelativeConstraint(0.001, "height", true), outlineCol, rectWidth, rectHeight,
                           round.x, round.x);
-        tooltips[id].textName = FlarialTextWithFont(spacing + tooltips[id].hoverX + offset, tooltips[id].hoverY - offset,
-                            FlarialGUI::to_wide(text).c_str(), Constraints::RelativeConstraint(1, "height", true) * 6.9f, rectHeight,
+        FlarialTextWithFont(spacing + tooltips[id].hoverX + offset, tooltips[id].hoverY - offset,
+                            FlarialGUI::to_wide(text).c_str(), rectWidth * 6.9f, rectHeight,
                             DWRITE_TEXT_ALIGNMENT_LEADING, fontSize1, DWRITE_FONT_WEIGHT_REGULAR, textCol);
     }
 

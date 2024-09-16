@@ -224,7 +224,7 @@ void Module::addHeader(std::string text) {
 }
 
 void Module::addColorPicker(std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb) {
-    float elementX = Constraints::PercentageConstraint(0.285f, "right");
+    float elementX = Constraints::PercentageConstraint(0.195f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
     FlarialGUI::ColorPicker(colorPickerIndex, elementX, y, value, rgb);

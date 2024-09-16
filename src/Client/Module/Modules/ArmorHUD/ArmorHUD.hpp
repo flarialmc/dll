@@ -74,24 +74,34 @@ public:
 
 
         this->addHeader("Main");
-        this->extraPadding();
 
         this->addSlider("Size", "", this->settings.getSettingByName<float>("uiscale")->value);
         this->addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", this->settings.getSettingByName<bool>("vertical")->value);
         this->addToggle("Change Color", "", this->settings.getSettingByName<bool>("color")->value);
 
-
-        this->addHeader("Text");
         this->extraPadding();
+        this->addHeader("Text");
 
         this->addToggle("Show Durability", "", this->settings.getSettingByName<bool>("showdurability")->value);
         this->addConditionalSlider(this->settings.getSettingByName<bool>("showdurability")->value, "Text Size", "Text size of Durability", this->settings.getSettingByName<float>("textSize")->value, 0.25f, 0.0f, true);
         this->addToggle("Show Durability in %", "", this->settings.getSettingByName<bool>("percent")->value);
 
-        this->addHeader("Colors");
         this->extraPadding();
+        this->addHeader("Colors");
 
-        this->resetPadding();
+        this->addColorPicker("Main", "", settings.getSettingByName<std::string>("colorMain")->value,
+                                      settings.getSettingByName<float>("bgOpacity")->value,
+                                      settings.getSettingByName<bool>("colorMain_rgb")->value);
+
+        this->addColorPicker("Full", "", settings.getSettingByName<std::string>("colorFull")->value,
+                                      settings.getSettingByName<float>("textOpacity")->value,
+                                      settings.getSettingByName<bool>("colorFull_rgb")->value);
+
+        this->addColorPicker("Low", "", settings.getSettingByName<std::string>("colorLow")->value,
+                                      settings.getSettingByName<float>("borderOpacity")->value,
+                                      settings.getSettingByName<bool>("colorLow_rgb")->value);
+
         FlarialGUI::UnsetScrollView();
+        this->resetPadding();
     }
 };

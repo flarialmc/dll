@@ -44,10 +44,10 @@ public:
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Misc");
-        this->extraPadding();
-
         this->addSlider("Hotbar", "", this->settings.getSettingByName<float>("hotbarSpeed")->value);
 
         FlarialGUI::UnsetScrollView();
+
+        this->resetPadding();
     }
 };

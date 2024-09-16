@@ -117,6 +117,7 @@ ID2D1Factory *FlarialGUI::factory;
 IDWriteFactory *FlarialGUI::writeFactory;
 ID2D1ImageBrush *FlarialGUI::blurbrush;
 std::unordered_map<std::string, float> FlarialGUI::TextSizes;
+std::unordered_map<std::string, Vec2<float>> FlarialGUI::TextSizesXY;
 
 // todo: all use cache
 std::unordered_map<std::string, ToolTipStruct> FlarialGUI::tooltips;
@@ -793,6 +794,7 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
 	}
 
     TextSizes[fontedName] = size.x;
+    TextSizesXY[fontedName] = Vec2<float>(size.x, size.y);
 	y += (height / 2) - (size.y / 2);
 	ImGui::GetBackgroundDrawList()->AddText(ImVec2(x, y), ImColor(color.r, color.g, color.b, color.a), stringText.c_str());
 	ImGui::PopFont();
@@ -1307,12 +1309,12 @@ void FlarialGUI::NotifyHeartbeat() {
     int i = 0;
     for(Notification& n : notifications) {
 
-        float posyModif = -((height + Constraints::RelativeConstraint(0.009f, "height", true)) * i);
+        float posyModif = -((height + Constraints::RelativeConstraint(0.01f, "height", true)) * i);
 
         if(n.firstTime) {
-            float TrollSize = Constraints::RelativeConstraint(0.1385, "height", true);
+            float TrollSize = Constraints::RelativeConstraint(0.128, "height", true);
             std::string sizeName = FlarialGUI::FlarialTextWithFont(n.currentPos, n.currentPosY, FlarialGUI::to_wide(n.text).c_str(), 10, 25, DWRITE_TEXT_ALIGNMENT_CENTER, TrollSize, DWRITE_FONT_WEIGHT_NORMAL, D2D1::ColorF(0, 0, 0 ,0));
-            n.width = FlarialGUI::TextSizes[sizeName] * 1.003;
+            n.width = FlarialGUI::TextSizes[sizeName] + Constraints::RelativeConstraint(0.0345f, "height", true);
             n.currentPos = Constraints::CenterConstraint(n.width, 0).x;
             n.firstTime = false;
         }
