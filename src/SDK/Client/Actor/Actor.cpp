@@ -206,6 +206,12 @@ RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URen
     return tryGet<RenderPositionComponent>(sig);
 }
 
+MobEffectsComponent *Actor::getMobEffectsComponent() {
+    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMobEffectsComponent"));
+
+    return tryGet<MobEffectsComponent>(sig);
+}
+
 bool Actor::isValidAABB() {
     auto AABBShapeComponent = this->getAABBShapeComponent();
     if(!AABBShapeComponent) return false;
