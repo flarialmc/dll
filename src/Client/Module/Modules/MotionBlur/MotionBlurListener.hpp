@@ -28,6 +28,9 @@ public:
 
 
     void onRender(RenderEvent &event) override {
+
+        if(ModuleManager::getModule("ClickGUI")->isEnabled()) return;
+
         int maxFrames = (int)round(module->settings.getSettingByName<float>("intensity2")->value);
 
         if (SDK::getCurrentScreen() == "hud_screen" && !SwapchainHook::queue && this->module->isEnabled()) {

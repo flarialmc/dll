@@ -112,7 +112,9 @@ public:
 
         }
 
-        if (SwapchainHook::init && baseHeightActual > 0.014) {
+        if (SwapchainHook::init && baseHeightActual > 0.0155f) {
+
+            this->module->settings.getSettingByName<bool>("enabled")->value = true;
 
             /* Base Rectangle Start */
 
@@ -609,6 +611,9 @@ public:
             }
             FlarialGUI::PopSize(); // Pops base rect
         }
+
+        if(realBlurAmount < 0.5f)  this->module->settings.getSettingByName<bool>("enabled")->value = false;
+
         FlarialGUI::displayToolTips();
         FlarialGUI::NotifyHeartbeat();
     }
