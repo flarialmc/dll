@@ -330,7 +330,7 @@ void Module::addToggle(std::string text, std::string subtext, bool& value) {
 
 void Module::addKeybind(std::string text, std::string subtext, std::string& keybind) {
     float elementX = Constraints::PercentageConstraint(0.13f, "right");
-    float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+    float y = Constraints::PercentageConstraint(0.08, "top") + padding;
 
     FlarialGUI::KeybindSelector(keybindIndex, elementX, y, keybind);
 

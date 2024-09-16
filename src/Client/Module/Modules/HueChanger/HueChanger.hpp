@@ -33,23 +33,23 @@ public:
 
     void settingsRender() override {
 
-        const float textWidth = Constraints::RelativeConstraint(0.26, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
-
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
 
-        FlarialGUI::FlarialTextWithFont(x, y, L"Saturation Intensity", textWidth * 3.0f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
-        float percent = FlarialGUI::Slider(3, x + FlarialGUI::SettingsTextWidth("Saturation Intensity "),
-                                           y,
-                                           this->settings.getSettingByName<float>("intensity")->value, 3.0f);
 
-        this->settings.getSettingByName<float>("intensity")->value = percent;
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(0.88f, "height"));
 
+        this->addHeader("Misc");
+        this->addSlider("Saturation Intensity", "", this->settings.getSettingByName<float>("intensity")->value);
+
+        FlarialGUI::UnsetScrollView();
+
+        this->resetPadding();
 
     }
 };

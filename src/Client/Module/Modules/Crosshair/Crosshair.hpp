@@ -39,28 +39,23 @@ public:
     }
 
     void settingsRender() override {
-        /* Border Start */
 
-        float xPos = Constraints::PercentageConstraint(0.019, "left");
-        float yPos = Constraints::PercentageConstraint(0.10, "top");
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
-        yPos += Constraints::SpacingConstraint(0.35, textWidth);
 
-        /* Third Person Crosshair Start */
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(0.88f, "height"));
 
-        FlarialGUI::FlarialTextWithFont(xPos + Constraints::SpacingConstraint(0.60, textWidth), yPos,
-            L"Third Person Crosshair", textWidth * 6.9f, textHeight,
-            DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
-            DWRITE_FONT_WEIGHT_NORMAL);
+        this->addHeader("Misc");
+        this->addToggle("Third Person Crosshair", "",  this->settings.getSettingByName<bool>("thirdpersoncrosshair")->value);
 
-        if (FlarialGUI::Toggle(0, xPos, yPos, this->settings.getSettingByName<bool>(
-            "thirdpersoncrosshair")->value))
-            this->settings.getSettingByName<bool>("thirdpersoncrosshair")->value = !this->settings.getSettingByName<bool>(
-                "thirdpersoncrosshair")->value;
+        FlarialGUI::UnsetScrollView();
 
-        /* Third Person Crosshair End */
+        this->resetPadding();
     }
 };
