@@ -50,6 +50,16 @@ public:
     int keybindIndex = 0;
     int colorPickerIndex = 100;
 
+    struct DrDisrespect {
+        std::string* value;
+        float* opacity;
+        bool* rgb;
+    };
+
+    std::unordered_map<int, DrDisrespect> color_pickers;
+
+
+
     void resetPadding();
     void extraPadding();
     void addElementText(std::string text, std::string subtext = "");
@@ -62,7 +72,7 @@ public:
 
     void addTextBox(std::string text, std::string subtext, std::string& value);
     void addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value);
-    void addColorPicker(std::string text, std::string subtext, std::string& value, bool& rgb);
+    void addColorPicker(std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb);
     virtual void loadDefaults();
     void saveSettings() const;
     void loadSettings();

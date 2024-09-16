@@ -195,6 +195,12 @@ void Module::resetPadding() {
     toggleIndex = 0;
     dropdownIndex = 0;
     sliderIndex = 0;
+
+    int i = 100;
+    for (int i = 100; i < colorPickerIndex; ++i) {
+        FlarialGUI::ColorPickerWindow(i, *color_pickers[i].value, *color_pickers[i].opacity, *color_pickers[i].rgb);
+    }
+
     colorPickerIndex = 100;
     keybindIndex = 0;
     textboxIndex = 0;
@@ -217,7 +223,7 @@ void Module::addHeader(std::string text) {
     padding += Constraints::RelativeConstraint(0.055f, "height", true);
 }
 
-void Module::addColorPicker(std::string text, std::string subtext, std::string& value, bool& rgb) {
+void Module::addColorPicker(std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb) {
     float elementX = Constraints::PercentageConstraint(0.285f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
@@ -226,6 +232,9 @@ void Module::addColorPicker(std::string text, std::string subtext, std::string& 
     Module::addElementText(text, subtext);
 
     padding += Constraints::RelativeConstraint(0.05f, "height", true);
+
+    DrDisrespect respect = { &value, &opacity, &rgb };
+    color_pickers[colorPickerIndex] = respect;
     colorPickerIndex++;
 }
 

@@ -112,7 +112,7 @@ public:
 
         }
 
-        if (SwapchainHook::init && baseHeightActual > 0.01) {
+        if (SwapchainHook::init && baseHeightActual > 0.014) {
 
             /* Base Rectangle Start */
 
