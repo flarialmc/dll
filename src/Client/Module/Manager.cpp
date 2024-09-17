@@ -69,6 +69,7 @@
 #include "Modules/ItemPhysics/ItemPhysics.hpp"
 #include "Modules/OpponentReach/OpponentReach.hpp"
 #include "Modules/ViewModel/ViewModel.hpp"
+#include "Modules/PotionHUD/PotionHUD.hpp"
 
 namespace ModuleManager {
     std::unordered_map<size_t, Module*> moduleMap;
@@ -157,6 +158,7 @@ void ModuleManager::initialize() {
     addModule(new InstantHurtAnimation());
     addModule(new OpponentReach());
     addModule(new ViewModel());
+    addModule(new PotionHUD());
     //addModule(new MovableChat());
     //addModule(new CompactChat());
     addModule(new ItemPhysics());

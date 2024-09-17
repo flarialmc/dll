@@ -51,6 +51,13 @@ public:
         return getTexture(&texture, location, forceReload);
     }
 
+    void drawImage(TexturePtr* texture, Vec2<float>& pos, Vec2<float>& size, Vec2<float>& uvPos, Vec2<float>& uvSize) {
+        if (WinrtUtils::check(21, 20))
+            Memory::CallVFunc<7, void, TexturePtr*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&, bool>(this, texture, pos, size, uvPos, uvSize, false);
+        else
+            Memory::CallVFunc<7, void, TexturePtr*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(this, texture, pos, size, uvPos, uvSize);
+    }
+
     void reloadTexture(const ResourceLocation& location) {
         this->createTexture(location, true);
     }
