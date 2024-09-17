@@ -9,7 +9,7 @@ class ViewModel : public Module {
 
 public:
 
-    ViewModel() : Module("ViewModel", "Allows you to see distant places.", IDR_MAGNIFY_PNG, "C") {
+    ViewModel() : Module("ViewModel", "Allows you to modify how item in hand looks.", IDR_MAGNIFY_PNG, "C") {
 
         Module::setup();
 
