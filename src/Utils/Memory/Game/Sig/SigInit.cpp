@@ -3,15 +3,47 @@
 
 #include "../SignatureAndOffsetManager.hpp"
 
+void SigInit::init2130() {
+    Logger::debug("[Signatures] Loading sigs for 1.21.30");
+    ADD_SIG("Actor::baseTick", "48 8D 05 ? ? ? ? 48 89 01 BA 31 00 00 00 44 8D 4A 04 44 8D 42 02 66 C7 44 24 20 37 00 E8 ? ? ? ? 48 8B 8B 70 11 00 00");
+    ADD_SIG("ItemRenderer::renderGuiItemNew", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 D8 48 81 EC 28 01 00 00 0F 29 B4 24 10 01 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 45 00 44");
+
+    //ADD_SIG("MinecraftGame::onAppSuspended", "");
+
+    ADD_SIG("ThirdPersonNametag", "0f 84 ? ? ? ? 49 8d 96 ? ? ? ? 49 8b cc");
+
+    ADD_SIG("Actor::getOnGroundFlagComponent", "DA BA A3 99 E2 C3");
+
+    ADD_SIG("Actor::canSee", "E8 ? ? ? ? 84 C0 74 1C 48 8B 4B 48");
+
+    ADD_SIG("HurtColor", "E8 ? ? ? ? E9 FD 02 00 00 8B 46 18");
+
+    ADD_SIG("CameraAssignAngle", "F3 0F 11 43 08 C6 43 0C 01");
+
+    ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 50");
+
+    ADD_SIG("ItemStack::getMaxDamage", "48 83 EC 28 48 8B 41 08 33 D2 48 85 C0 74 08 48 39 10 0F 94 C1 EB 05 B9 01 00 00 00 84 C9 75 20");
+
+    //ADD_SIG("Tessellator::begin", "");
+
+    //ADD_SIG("MeshHelpers::renderMeshImmediately", "");
+
+    //ADD_SIG("glm_rotateRef", "");
+
+    //ADD_SIG("glm_translateRef", "");
+
+    //ADD_SIG("mce::TextureGroup::getTexture", "");
+}
+
 void SigInit::init2120() {
     Logger::debug("[Signatures] Loading sigs for 1.21.20");
 
-    ADD_SIG("Options::getGamma", "48 83 EC 28 80 B9 80 17 00 00 00 48 8D 54 24 30 48 8B 01 48 8B 40 60 74 38 41 B8 19");
+    ADD_SIG("Options::getGamma", "48 83 EC 28 80 B9 ? 17 00 00 00 48 8D 54 24 30 48 8B 01 48 8B 40 60 74 38 41 B8 19");
     ADD_SIG("mce::TextureGroup::getTexture", "40 55 53 56 57 41 55 41 56 41 57 48 8D 6C 24 E9 48 81 EC 00");
     ADD_SIG("RaknetTick", "4C 8B DC 49 89 5B 10 49 89 73 18 57 48 81 EC 10 02");
     ADD_SIG("ItemRenderer::renderGuiItemNew", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 E8 48 81 EC 18 01 00 00 0F 29 B4 24 00 01 00 00 48");
 
-    ADD_SIG("Actor::baseTick", "48 8D 05 ? ? ? ? 48 89 01 B8 37 00 00 00 8D 50 FA 44 8D 48 FE 44 8D 40 FC 66 89 44 24 20 E8 ?? ?? ?? ?? 48 8B 8B C0 10 00 00");
+    ADD_SIG("Actor::baseTick", "48 8D 05 ? ? ? ? 48 89 01 B8 37 00 00 00 8D 50 FA 44 8D 48 FE 44 8D 40 FC 66 89 44 24 20 E8 ? ? ? ? 48 8B 8B C0 10 00 00");
 
     ADD_SIG("MinecraftPackets::createPacket", "40 53 48 83 EC 30 45 33 C0 48 8B D9 81");
 
@@ -84,7 +116,7 @@ void SigInit::init2070() {
 
     ADD_SIG("TimeChanger", "? ? ? ? ? ? 76 05 F7 EA C1 FA 09 8B C2");
 
-    ADD_SIG("Actor::getArmor", "48 8B 89 20 04 00 00 48 8B 01 48 8B 40 28 48");
+    ADD_SIG("Actor::getArmor", "48 8B 89 20 04 00 00 48 8B 01 48 8B 40 28 48"); // depricated
 
     ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 E0 1C 00 00");
 }
@@ -123,7 +155,7 @@ void SigInit::init2050() {
     ADD_SIG("ThirdPersonNametag", "? ? ? ? ? ? 49 8B D6 48 8B CE E8 ? ? ? ? 84 C0 0F 84 ? ? ? ? 49 8B 97");
 
     ADD_SIG("Actor::getArmor", "48 8B 89 50 04 00 00 48 8B 01 48 8B 40 28 48");
-    ADD_SIG("Actor::getOffhandSlot", "48 8B 89 ? ? ? ? BA ? ? ? ? 48 8B 01 48 8B 40 ? 48 FF 25");
+    ADD_SIG("Actor::getOffhandSlot", "48 8B 89 ? ? ? ? BA ? ? ? ? 48 8B 01 48 8B 40 ? 48 FF 25"); // depricated
 
     ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 D8 1C 00 00");
 

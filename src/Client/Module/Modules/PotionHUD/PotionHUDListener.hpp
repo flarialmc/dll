@@ -57,10 +57,10 @@ public:
                     float xoffset = 0.0f;
                     float yoffset = 0.0f;
 
-                    auto effects = SDK::clientInstance->getLocalPlayer()->getMobEffectsComponent()->effects;
+                    std::vector<UnifiedMobEffectData> effects = SDK::clientInstance->getLocalPlayer()->getMobEffects();
                     for(const auto& effect : effects) {
                         if(!effect.isValid()) continue;
-                        std::string text = effect.getName();
+                        std::string text = effect.getNameAndTime();
                         std::wstring widestr = std::wstring(text.begin(), text.end());
                         const wchar_t *widecstr = widestr.c_str();
                         FlarialGUI::FlarialTextWithFont(
@@ -89,7 +89,7 @@ public:
                                                   module->settings.getSettingByName<float>("percentageY")->value);
 
 
-            float width = s * 3 + spacing * 3;
+            float width = s * 3 + spacing * 2;
             float height = s;
 
             if (settingperc.x != 0)

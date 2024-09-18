@@ -18,20 +18,31 @@ class NoHurtCamListener : public Listener {
 
     static inline uintptr_t sigOffset;
     static inline std::vector<uint8_t> originalCameraAngle;
-    static inline uint8_t newCameraAngle[3] = {0x90, 0x90, 0x90};
 
 public:
 
     static void patch() {
         if(patched) return;
         patched = true;
-        Memory::patchBytes((LPVOID) sigOffset, newCameraAngle, 3);
+        int size;
+        if (WinrtUtils::check(21, 30)) {
+            size = 3;
+        } else {
+            size = 5;
+        }
+        Memory::nopBytes((LPVOID) sigOffset, size);
     }
 
     static void unpatch() {
         if(!patched) return;
         patched = false;
-        Memory::patchBytes((LPVOID) sigOffset, originalCameraAngle.data(), 3);
+        int size;
+        if (WinrtUtils::check(21, 30)) {
+            size = 3;
+        } else {
+            size = 5;
+        }
+        Memory::patchBytes((LPVOID) sigOffset, originalCameraAngle.data(), size);
     }
 
     void onRaknetTick(RaknetTickEvent &event) override {
@@ -64,10 +75,21 @@ public:
         this->name = string;
         this->module = module;
 
-        originalCameraAngle.resize(3);
+        int size;
+        if (WinrtUtils::check(21, 30)) {
+            size = 3;
+        } else {
+            size = 5;
+        }
+
+        originalCameraAngle.resize(size);
 
         if(sigOffset == NULL) {
-            sigOffset = GET_SIG_ADDRESS("CameraAssignAngle") + 4;
+            if (WinrtUtils::check(21, 30)) {
+                sigOffset = GET_SIG_ADDRESS("CameraAssignAngle");
+            } else {
+                sigOffset = GET_SIG_ADDRESS("CameraAssignAngle") + 4;
+            }
         }
 
         Memory::patchBytes( originalCameraAngle.data(), (LPVOID)sigOffset, 3);

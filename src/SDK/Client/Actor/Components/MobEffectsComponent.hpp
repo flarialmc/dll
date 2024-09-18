@@ -9,20 +9,6 @@
 
 class MobEffect {
 public:
-    struct FactorCalculationData {
-        FactorCalculationData() = delete;
-
-        int paddingDuration;
-        float factorStart;
-        float factorTarget;
-        float factorCurrent;
-        std::function<void(FactorCalculationData&, int)> updateFn;
-        int effectChangedTimestamp;
-        float factorPreviousFrame;
-        bool hadEffectLastTick;
-        bool hadApplied;
-    };
-
     enum class EffectType : uint32_t {
         Empty = 0,
         Speed = 1,
@@ -186,6 +172,7 @@ public:
 
 class MobEffectInstance {
 public:
+    MobEffectInstance() = delete;
     MobEffect::EffectType id;
     int duration;
     int durationEasy;
@@ -196,15 +183,53 @@ public:
     bool ambient;
     bool noCounter;
     bool effectVisible;
-    MobEffect::FactorCalculationData factorCalculationData;
+    char pad_0064[0x64];
+};
+static_assert(sizeof(MobEffectInstance) == 0x80);
+
+class MobEffectInstance1_21_30 {
+public:
+    MobEffectInstance1_21_30() = delete;
+    MobEffect::EffectType id;
+    int duration;
+    float idk;
+    int durationEasy;
+    int durationNormal;
+    int durationHard;
+    char pad_0008[0x8];
+    int amplifier;
+    bool displayOnScreenTextureAnimation;
+    bool ambient;
+    bool noCounter;
+    bool effectVisible;
+    char pad_0068[0x60];
+};
+static_assert(sizeof(MobEffectInstance1_21_30) == 0x88);
+
+struct MobEffectsComponent
+{
+    std::vector<MobEffectInstance> effects;
+};
+
+struct MobEffectsComponent1_21_30
+{
+    std::vector<MobEffectInstance1_21_30> effects;
+};
+
+struct UnifiedMobEffectData {
+    MobEffect::EffectType id;
+    int duration;
+    int amplifier;
+
+    UnifiedMobEffectData(MobEffect::EffectType id, int duration, int amplifier) : id(id), duration(duration), amplifier(amplifier) {}
 
     [[nodiscard]] bool isValid() const {
         return id != MobEffect::EffectType::Empty;
     }
 
-    [[nodiscard]] std::string getName() const {
+    [[nodiscard]] std::string getNameAndTime() const {
         std::string name = MobEffect::effectTypeToString(id);
-        name += " " + MobEffect::amplifierToString(amplifier) + " " + getTime();
+        name += " " + MobEffect::amplifierToString(amplifier) + "\n" + getTime();
         return name;
     }
 
@@ -225,9 +250,4 @@ public:
         auto location = ResourceLocation(getTexturePath(), false);
         return location;
     }
-};
-
-struct MobEffectsComponent
-{
-    std::vector<MobEffectInstance> effects;
 };

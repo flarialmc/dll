@@ -125,8 +125,13 @@ void ModuleManager::initialize() {
     addModule(new Keystrokes());
     addModule(new Sneak());
     addModule(new Sprint());
+
     addModule(new Hitbox());
-    addModule(new ThirdPerson());
+
+    if (!WinrtUtils::check(21, 30)) {
+        addModule(new ThirdPerson());
+    }
+
     addModule(new SnapLook());
     addModule(new HurtColor());
     addModule(new FogColor());
@@ -134,7 +139,9 @@ void ModuleManager::initialize() {
 
     addModule(new TimeChanger());
 
-    addModule(new RenderOptions());
+    if (!WinrtUtils::check(21, 20)) {
+        addModule(new RenderOptions());
+    }
 
     addModule(new PaperDoll());
     addModule(new GuiScale());
@@ -150,18 +157,25 @@ void ModuleManager::initialize() {
     addModule(new Animations());
     addModule(new BlockOutline());
     addModule(new CommandHotkey());
-    addModule(new NoHurtCam());
+
+    if (!WinrtUtils::check(21, 30)) {
+        addModule(new NoHurtCam());
+    }
+
     addModule(new InventoryHUD());
     //addModule(new OverlayModule());
     addModule(new AutoRQ());
-    addModule(new HitPing());
+    //addModule(new HitPing());
     addModule(new InstantHurtAnimation());
-    addModule(new OpponentReach());
+    //addModule(new OpponentReach());
     addModule(new ViewModel());
     addModule(new PotionHUD());
+
     //addModule(new MovableChat());
     //addModule(new CompactChat());
-    addModule(new ItemPhysics());
+    if (!WinrtUtils::check(21, 30)) {
+        addModule(new ItemPhysics());
+    }
 
     EventHandler::registerListener(new GUIKeyListener("GuiKeyListener"));
     EventHandler::registerListener(new DiscordRPCListener("DiscordRPC"));

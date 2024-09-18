@@ -119,11 +119,15 @@ private:
 
         if (player && SDK::clientInstance->getLevelRender())
         {
-            origin = SDK::clientInstance->getLevelRender()->getOrigin();
-            pos = player->getRenderPositionComponent()->renderPos;
+            if(WinrtUtils::check(21, 30)) {
+                auto coords = SDK::clientInstance->getLevelRender()->getOrigin();
+                origin = Vec3<float>{ coords.z, coords.x, coords.y };
+            } else {
+                origin = SDK::clientInstance->getLevelRender()->getOrigin();
+            }
         }
 
-        FrameTransform transform = { SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov(), pos};
+        FrameTransform transform = { SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov() };
 
         SwapchainHook::frameTransformsMtx.lock();
         SwapchainHook::FrameTransforms.push(transform);

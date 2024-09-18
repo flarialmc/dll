@@ -219,8 +219,6 @@ public:
 
     RuntimeIDComponent *getRuntimeIDComponent();
 
-    MobEffectsComponent* getMobEffectsComponent();
-
     bool isValidAABB();
 
     uint64_t getRuntimeID();
@@ -236,4 +234,6 @@ public:
     Vec3<float> getLerpedPosition();
 
     AABB getLerpedAABB(bool asHitbox = false);
+
+    std::vector<UnifiedMobEffectData> getMobEffects();
 };

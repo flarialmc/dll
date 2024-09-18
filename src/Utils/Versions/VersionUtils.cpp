@@ -11,6 +11,9 @@
 std::vector<std::pair<std::string, std::pair<std::function<void()>, std::function<void()>>>> VersionUtils::versions;
 
 void VersionUtils::init() {
+    std::pair<std::string, std::pair<std::function<void()>, std::function<void()>>> p2130 = {"1.21.3", {SigInit::init2130, OffsetInit::init2130}};
+    versions.push_back(p2130);
+
     std::pair<std::string, std::pair<std::function<void()>, std::function<void()>>> p2120 = {"1.21.2", {SigInit::init2120, OffsetInit::init2120}};
     versions.push_back(p2120);
 
@@ -20,7 +23,7 @@ void VersionUtils::init() {
     std::pair<std::string, std::pair<std::function<void()>, std::function<void()>>> p2110 = {"1.21.1", {SigInit::init2100, OffsetInit::init2100}};
     versions.push_back(p2110);
 
-    std::pair<std::string, std::pair<std::function<void()>, std::function<void()>>> p2100 = {"1.21.3", {SigInit::init2100, OffsetInit::init2100}};
+    std::pair<std::string, std::pair<std::function<void()>, std::function<void()>>> p2100 = {"1.21.03", {SigInit::init2100, OffsetInit::init2100}};
     versions.push_back(p2100);
 
     std::pair<std::string, std::pair<std::function<void()>, std::function<void()>>> p2080 = {"1.20.8", {SigInit::init2080, OffsetInit::init2080}};

@@ -5,6 +5,7 @@
 #include "Components/ActorDataFlagComponent.hpp"
 #include "../../SDK.hpp"
 #include "../../../Client/GUI/Engine/Engine.hpp"
+#include "Components/OnGroundFlagComponent.hpp"
 
 // TODO add comments to all components, replace their sigs with simpler ones ?       marioCST: use entt's try_get func in EntityContext instead of using sigs, there are no simpler sigs
 
@@ -206,10 +207,22 @@ RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URen
     return tryGet<RenderPositionComponent>(sig);
 }
 
-MobEffectsComponent *Actor::getMobEffectsComponent() {
+std::vector<UnifiedMobEffectData> Actor::getMobEffects() {
     static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMobEffectsComponent"));
+    std::vector<UnifiedMobEffectData> unifiedEffects;
+    if (WinrtUtils::check(21, 30)) {
+        auto component =  tryGet<MobEffectsComponent1_21_30>(sig);
+        for (auto &effect : component->effects) {
+            unifiedEffects.emplace_back(effect.id, effect.duration, effect.amplifier);
+        }
+    } else {
+        auto component =  tryGet<MobEffectsComponent>(sig);
 
-    return tryGet<MobEffectsComponent>(sig);
+        for (auto &effect : component->effects) {
+            unifiedEffects.emplace_back(effect.id, effect.duration, effect.amplifier);
+        }
+    }
+    return unifiedEffects;
 }
 
 bool Actor::isValidAABB() {
@@ -221,25 +234,34 @@ bool Actor::isValidAABB() {
 }
 
 bool Actor::isOnGround() {
-    const auto ctx = this->GetEntityContextV1_20_50();
+    if (WinrtUtils::check(21, 30)) {
+        static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getOnGroundFlagComponent"));
+        auto component = tryGet<OnGroundFlagComponent>(sig);
 
-    if (WinrtUtils::check(20, 60)) {
-        using isOnGroundFunc = bool(__fastcall *)(uintptr_t&, EntityId&);
-        static isOnGroundFunc isOnGround = Memory::getOffsetFromSig<isOnGroundFunc>(GET_SIG_ADDRESS("ActorCollision::isOnGround"), 1);
+        return component != nullptr;
+    } else {
+        const auto ctx = this->GetEntityContextV1_20_50();
+
+        if (WinrtUtils::check(20, 60)) {
+            using isOnGroundFunc = bool (__fastcall *)(uintptr_t &, EntityId &);
+            static isOnGroundFunc isOnGround = Memory::getOffsetFromSig<isOnGroundFunc>(
+                    GET_SIG_ADDRESS("ActorCollision::isOnGround"), 1);
+
+            if (isOnGround)
+                return isOnGround(ctx->basicReg, ctx->id);
+
+            return false;
+        }
+
+        using isOnGroundFunc = bool (__fastcall *)(V1_20_50::EntityContext *);
+        static isOnGroundFunc isOnGround = reinterpret_cast<isOnGroundFunc>(GET_SIG_ADDRESS(
+                "ActorCollision::isOnGround"));
 
         if (isOnGround)
-            return isOnGround(ctx->basicReg, ctx->id);
+            return isOnGround(ctx);
 
         return false;
     }
-
-    using isOnGroundFunc = bool(__fastcall *)(V1_20_50::EntityContext*);
-    static isOnGroundFunc isOnGround = reinterpret_cast<isOnGroundFunc>(GET_SIG_ADDRESS("ActorCollision::isOnGround"));
-
-    if (isOnGround)
-        return isOnGround(ctx);
-
-    return false;
 }
 
 Vec3<float> Actor::getLerpedPosition() {
