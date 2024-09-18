@@ -26,9 +26,9 @@ public:
         patched = true;
         int size;
         if (WinrtUtils::check(21, 30)) {
-            size = 3;
-        } else {
             size = 5;
+        } else {
+            size = 3;
         }
         Memory::nopBytes((LPVOID) sigOffset, size);
     }
@@ -38,9 +38,9 @@ public:
         patched = false;
         int size;
         if (WinrtUtils::check(21, 30)) {
-            size = 3;
-        } else {
             size = 5;
+        } else {
+            size = 3;
         }
         Memory::patchBytes((LPVOID) sigOffset, originalCameraAngle.data(), size);
     }
@@ -77,9 +77,9 @@ public:
 
         int size;
         if (WinrtUtils::check(21, 30)) {
-            size = 3;
-        } else {
             size = 5;
+        } else {
+            size = 3;
         }
 
         originalCameraAngle.resize(size);
@@ -92,6 +92,6 @@ public:
             }
         }
 
-        Memory::patchBytes( originalCameraAngle.data(), (LPVOID)sigOffset, 3);
+        Memory::patchBytes( originalCameraAngle.data(), (LPVOID)sigOffset, size);
     }
 };
