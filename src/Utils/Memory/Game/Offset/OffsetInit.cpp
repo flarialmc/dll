@@ -16,8 +16,7 @@ void OffsetInit::init2130() {
     ADD_OFFSET("ClientInstance::getFovX", 0x720);
     ADD_OFFSET("ClientInstance::getFovY", 0x734);
 
-    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x308);
-    ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x618);
+    ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x614);
 
     ADD_OFFSET("ClientInstance::guiData", 0x588);
 
@@ -176,6 +175,8 @@ void OffsetInit::init2050() {
     ADD_OFFSET("Level::getPlayerMap", 0x1EA8);
 
     ADD_OFFSET("ItemActor::stack", 0x4C8);
+
+    ADD_OFFSET("OptionInfo::TranslateName", 0x158);
 }
 
 void OffsetInit::init2040() {

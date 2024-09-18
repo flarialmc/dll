@@ -10,8 +10,10 @@ void SigInit::init2130() {
 
     //ADD_SIG("MinecraftGame::onAppSuspended", "");
 
-    ADD_SIG("ThirdPersonNametag", "0f 84 ? ? ? ? 49 8d 96 ? ? ? ? 49 8b cc");
+    ADD_SIG("ThirdPersonNametag", "0F 84 ? ? ? ? 49 8B D4 49 8B CD");
 
+
+    ADD_SIG("tryGetPrefix3", "40 53 48 83 EC 40 48 8B");
     ADD_SIG("Actor::getOnGroundFlagComponent", "DA BA A3 99 E2 C3");
 
     ADD_SIG("Actor::canSee", "E8 ? ? ? ? 84 C0 74 1C 48 8B 4B 48");
@@ -24,15 +26,14 @@ void SigInit::init2130() {
 
     ADD_SIG("ItemStack::getMaxDamage", "48 83 EC 28 48 8B 41 08 33 D2 48 85 C0 74 08 48 39 10 0F 94 C1 EB 05 B9 01 00 00 00 84 C9 75 20");
 
-    //ADD_SIG("Tessellator::begin", "");
+    ADD_SIG("Tessellator::begin", "48 89 5C 24 ? 57 48 83 EC ? 80 B9 ? ? ? ? ? 45 0F B6");
 
-    //ADD_SIG("MeshHelpers::renderMeshImmediately", "");
+    ADD_SIG("MeshHelpers::renderMeshImmediately", "E8 ? ? ? ? C6 47 38 ? F3 0F 10 ? ? ? ? ? 0F 57 D2");
 
-    //ADD_SIG("glm_rotateRef", "");
+    ADD_SIG("glm_rotateRef", "E8 ? ? ? ? 41 BC ? ? ? ? 0F B6 47");
+    ADD_SIG("glm_translateRef", "E8 ? ? ? ? 48 8D 15 ? ? ? ? 44 0F 28 05");
 
-    //ADD_SIG("glm_translateRef", "");
-
-    //ADD_SIG("mce::TextureGroup::getTexture", "");
+    ADD_SIG("mce::TextureGroup::getTexture", "40 55 53 56 57 41 54 41 56 41 57 48 8D 6C 24 E9 48 81 EC 00");
 }
 
 void SigInit::init2120() {

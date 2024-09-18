@@ -119,12 +119,7 @@ private:
 
         if (player && SDK::clientInstance->getLevelRender())
         {
-            if(WinrtUtils::check(21, 30)) {
-                auto coords = SDK::clientInstance->getLevelRender()->getOrigin();
-                origin = Vec3<float>{ coords.z, coords.x, coords.y };
-            } else {
-                origin = SDK::clientInstance->getLevelRender()->getOrigin();
-            }
+            origin = SDK::clientInstance->getLevelRender()->getOrigin();
         }
 
         FrameTransform transform = { SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov() };
