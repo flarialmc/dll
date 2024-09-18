@@ -202,7 +202,7 @@ public:
     bool ambient;
     bool noCounter;
     bool effectVisible;
-    char pad_0068[0x60];
+    char pad_0060[0x60];
 };
 static_assert(sizeof(MobEffectInstance1_21_30) == 0x88);
 
