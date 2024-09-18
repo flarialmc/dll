@@ -235,7 +235,7 @@ bool Actor::isValidAABB() {
 
 bool Actor::isOnGround() {
     if (WinrtUtils::check(21, 30)) {
-        static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getOnGroundFlagComponent"));
+        static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix3")) + " " + GET_SIG("Actor::getOnGroundFlagComponent"));
         auto component = tryGet<OnGroundFlagComponent>(sig);
 
         return component != nullptr;
@@ -254,8 +254,7 @@ bool Actor::isOnGround() {
         }
 
         using isOnGroundFunc = bool (__fastcall *)(V1_20_50::EntityContext *);
-        static isOnGroundFunc isOnGround = reinterpret_cast<isOnGroundFunc>(GET_SIG_ADDRESS(
-                "ActorCollision::isOnGround"));
+        static isOnGroundFunc isOnGround = reinterpret_cast<isOnGroundFunc>(GET_SIG_ADDRESS("ActorCollision::isOnGround"));
 
         if (isOnGround)
             return isOnGround(ctx);
