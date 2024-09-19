@@ -155,16 +155,14 @@ public:
     static std::string amplifierToString(int amplifier) {
         switch (amplifier) {
             case 0:
-                return "";
-            case 1:
                 return "I";
-            case 2:
+            case 1:
                 return "II";
-            case 3:
+            case 2:
                 return "III";
-            case 4:
+            case 3:
                 return "IV";
-            case 5:
+            case 4:
                 return "V";
             default:
                 return std::to_string(amplifier);
