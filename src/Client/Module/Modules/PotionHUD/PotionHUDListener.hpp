@@ -22,7 +22,7 @@ public:
     Vec2<float> currentPos;
     bool enabled = false;
 
-    float testSpacing = 10;
+    float testSpacing = 20;
 
     void renderText() const {
         if(FlarialGUI::inMenu && !ClickGUIRenderer::editmenu) return;
@@ -126,33 +126,40 @@ public:
         if (SDK::getCurrentScreen() != "hud_screen") ClickGUIRenderer::editmenu = false;
     }
 
+    void onRenderPotionHUD(RenderPotionHUDEvent &event) override {
+        event.cancel();
+    }
+
     void onSetupAndRender(SetupAndRenderEvent &event) override {
         if(this->module->isEnabled())
         if (ClientInstance::getTopScreenName() == "hud_screen") {
-            // TODO: Make icons work
-//            Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
-//
-//            if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
-//                float spacing = 15 * module->settings.getSettingByName<float>("uiscale")->value;
-//
-//                float xmodifier = 0.0f;
-//                float ymodifier = 0.0f;
-//
-//                auto muirc = event.getMuirc();
-//                auto effects = SDK::clientInstance->getLocalPlayer()->getMobEffectsComponent()->effects;
-//                for(const auto& effect : effects) {
-//                    if(!effect.isValid()) continue;
-//                    auto location = effect.getTextureLocation();
-//                    auto texture = muirc->createTexture(location, false);
-//                    //auto position = Vec2<float>(scaledPos.x + xmodifier, scaledPos.y + ymodifier);
-//                    auto position = Vec2<float>(50, 50);
-//                    static auto size = Vec2<float>(18.0f, 18.0f);
-//                    static auto uvPos = Vec2<float>(0.f, 0.f);
-//                    static auto uvSize = Vec2<float>(1.0f, 1.0f);
-//                    muirc->drawImage(texture, position, size,uvPos,uvSize);
-//                    ymodifier += spacing;
-//                }
-//            }
+            Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
+
+            if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
+                auto ui_scale = module->settings.getSettingByName<float>("uiscale")->value;
+                auto ui_icon_scale = ui_scale / 2.f;
+                float spacing = 20 * ui_scale;
+
+                float xmodifier = 0.0f;
+                float ymodifier = 0.0f;
+
+                auto muirc = event.getMuirc();
+                auto effects = SDK::clientInstance->getLocalPlayer()->getMobEffects();
+                for(const auto& effect : effects) {
+                    if(!effect.isValid()) continue;
+                    auto location = effect.getTextureLocation();
+                    auto texture = muirc->createTexture(location, false);
+                    auto position = Vec2<float>(scaledPos.x + xmodifier - 20.0f * ui_scale, scaledPos.y + ymodifier);
+                    auto size = Vec2<float>(18.0f * ui_scale, 18.0f * ui_scale);
+                    static auto uvPos = Vec2<float>(0.f, 0.f);
+                    static auto uvSize = Vec2<float>(1.0f, 1.0f);
+                    muirc->drawImage(texture, position, size,uvPos,uvSize);
+                    static auto color = mce::Color();
+                    static auto flushLayer = HashedString("ui_flush");
+                    muirc->flushImages(color, 1.0f, flushLayer);
+                    ymodifier += spacing;
+                }
+            }
         }
     }
 

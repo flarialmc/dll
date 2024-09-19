@@ -166,8 +166,13 @@ ItemStack *Actor::getOffhandSlot() {
 }
 
 RuntimeIDComponent *Actor::getRuntimeIDComponent() {
-    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
-
+    static uintptr_t sig;
+    if(WinrtUtils::check(20, 50) && !WinrtUtils::check(20, 60)) {
+        sig = Memory::findSig(
+                std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
+    } else {
+        sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
+    }
     return tryGet<RuntimeIDComponent>(sig);
 }
 
@@ -264,6 +269,9 @@ bool Actor::isOnGround() {
 }
 
 Vec3<float> Actor::getLerpedPosition() {
+//    if(SDK::clientInstance->getLocalPlayer() == this) { // only in first person
+//        return SDK::clientInstance->getLevelRender()->getOrigin();
+//    }
     return this->getRenderPositionComponent()->renderPos;
 }
 

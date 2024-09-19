@@ -15,6 +15,7 @@
 #include "TextureGroup.hpp"
 #include "../../../Client/Module/Manager.hpp"
 #include "ScreenContext.hpp"
+#include "../Core/HashedString.hpp"
 
 class MinecraftUIRenderContext {
 public:
@@ -34,28 +35,30 @@ public:
         return getTextureGroup()->getLoadedTextures();
     }
 
-    TexturePtr* getTexture(TexturePtr* ptr, const ResourceLocation& location, bool forceReload) {
-        using getTextureFunc = TexturePtr*(__fastcall*)(MinecraftUIRenderContext*, TexturePtr*, const ResourceLocation&, bool);
-        static auto getTextureOriginal = reinterpret_cast<getTextureFunc>(GET_SIG_ADDRESS("MinecraftUIRenderContext::getTexture"));
-        return getTextureOriginal(this, ptr, location, forceReload);
+    TexturePtr& getTexture(TexturePtr& ptr, const ResourceLocation& location, bool forceReload) {
+        return Memory::CallVFuncI<TexturePtr&>(29, this, ptr, location, forceReload);
     }
 
-    TexturePtr* createTexture(const std::string& path, bool external, bool forceReload) {
+    TexturePtr& createTexture(const std::string& path, bool external, bool forceReload) {
         const auto resource = ResourceLocation(path, external);
-        TexturePtr texture = TexturePtr();
-        return getTexture(&texture, resource, forceReload);
+        TexturePtr texture;
+        return getTexture(texture, resource, forceReload);
     }
 
-    TexturePtr* createTexture(const ResourceLocation& location, bool forceReload) {
-        TexturePtr texture = TexturePtr();
-        return getTexture(&texture, location, forceReload);
+    TexturePtr& createTexture(const ResourceLocation& location, bool forceReload) {
+        TexturePtr texture;
+        return getTexture(texture, location, forceReload);
     }
 
-    void drawImage(TexturePtr* texture, Vec2<float>& pos, Vec2<float>& size, Vec2<float>& uvPos, Vec2<float>& uvSize) {
+    void drawImage(TexturePtr& texture, Vec2<float>& pos, Vec2<float>& size, Vec2<float>& uvPos, Vec2<float>& uvSize) {
         if (WinrtUtils::check(21, 20))
-            Memory::CallVFunc<7, void, TexturePtr*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&, bool>(this, texture, pos, size, uvPos, uvSize, false);
+            Memory::CallVFunc<7, void, TexturePtr&, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&, bool>(this, texture, pos, size, uvPos, uvSize, false);
         else
-            Memory::CallVFunc<7, void, TexturePtr*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(this, texture, pos, size, uvPos, uvSize);
+            Memory::CallVFunc<7, void, TexturePtr&, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(this, texture, pos, size, uvPos, uvSize);
+    }
+
+    void flushImages(mce::Color &color, float opacity, HashedString &hashedString) {
+        Memory::CallVFunc<9, void, mce::Color&, float, HashedString &>(this, color, opacity, hashedString);
     }
 
     void reloadTexture(const ResourceLocation& location) {
@@ -88,7 +91,7 @@ public:
                 textures[from] = textures[to];
             } else {
                 auto texture = createTexture(to, false);
-                textures[from] = *texture->clientTexture;
+                textures[from] = *texture.clientTexture;
             }
         }
     }

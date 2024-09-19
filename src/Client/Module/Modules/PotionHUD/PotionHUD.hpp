@@ -30,7 +30,7 @@ public:
 
     void defaultConfig() override {
 
-        if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 2.0f);
+        if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 1.0f);
 
         if (settings.getSettingByName<std::string>("colorMain") == nullptr)
             settings.addSetting("colorMain", (std::string) "FFFFFF");
@@ -42,7 +42,7 @@ public:
 
         if (settings.getSettingByName<bool>("colorLow_rgb") == nullptr) settings.addSetting("colorLow_rgb", false);
 
-        if (settings.getSettingByName<float>("textSize") == nullptr) settings.addSetting("textSize", 0.12f);
+        if (settings.getSettingByName<float>("textSize") == nullptr) settings.addSetting("textSize", 0.14f);
 
     }
 
