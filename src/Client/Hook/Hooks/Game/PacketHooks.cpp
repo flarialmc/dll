@@ -62,6 +62,15 @@ void SendPacketHook::receiveCallbackEntityEvent(void *packetHandlerDispatcher, v
         receivePacketEntityEventOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
 
 }
+void
+SendPacketHook::receiveCallbackChangeDimension(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
+                                               const std::shared_ptr<Packet>& packet) {
+
+    PacketEvent event(packet.get());
+    EventHandler::onPacketReceive(event);
+    if (!event.isCancelled())
+        receivePacketChangeDimensionOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
+}
 
 void SendPacketHook::enableHook() {
     /*for (int num = 1; num <= (int)MinecraftPacketIds::PacketViolationWarning; num++) {
@@ -88,6 +97,10 @@ void SendPacketHook::enableHook() {
     std::shared_ptr<Packet> EntityEventPacket = SDK::createPacket((int) MinecraftPacketIds::ActorEvent);
     Memory::hookFunc((void *) EntityEventPacket->packetHandler->vTable[1], (void*)receiveCallbackEntityEvent,
                      (void **) &receivePacketEntityEventOriginal, "ReceivePacketHook");
+
+    std::shared_ptr<Packet> changeDimensionPacket = SDK::createPacket((int) MinecraftPacketIds::ChangeDimension);
+    Memory::hookFunc((void *) changeDimensionPacket->packetHandler->vTable[1], receiveCallbackChangeDimension,
+                     (void **) &receivePacketChangeDimensionOriginal, "ReceivePacketHook");
 
     this->autoHook((void *) callback, (void **) &sendPacketOriginal);
 }
