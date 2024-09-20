@@ -20,7 +20,7 @@ std::shared_ptr<Packet> SDK::createPacket(int id) {
     static uintptr_t Address;
 
     if (Address == NULL) {
-        Address = Memory::findSig(GET_SIG("MinecraftPackets::createPacket"));
+        Address = GET_SIG_ADDRESS("MinecraftPackets::createPacket");
     }
 
     auto pFunction = reinterpret_cast<std::shared_ptr<Packet>(__fastcall *)(int)>(Address);

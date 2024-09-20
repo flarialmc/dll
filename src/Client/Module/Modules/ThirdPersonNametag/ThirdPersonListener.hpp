@@ -42,7 +42,7 @@ public:
         this->name = string;
         this->module = module;
 
-        real = Memory::findSig(GET_SIG("ThirdPersonNametag"));
+        real = GET_SIG_ADDRESS("ThirdPersonNametag");
 
         ThirdPersonListener::Original.resize(6);
         memcpy(ThirdPersonListener::Original.data(),

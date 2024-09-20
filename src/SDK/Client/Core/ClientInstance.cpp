@@ -7,7 +7,7 @@ LocalPlayer *ClientInstance::getLocalPlayer() {
     static uintptr_t indexRef;
 
     if (indexRef == 0) {
-        indexRef = Memory::findSig(GET_SIG("ClientInstance::getLocalPlayerIndex"));
+        indexRef = GET_SIG_ADDRESS("ClientInstance::getLocalPlayerIndex");
     }
 
     int index = *reinterpret_cast<int*>(indexRef + 9) / 8;
@@ -25,7 +25,7 @@ void ClientInstance::grabMouse() {
     static uintptr_t indexRef;
 
     if (indexRef == 0) {
-        indexRef = Memory::findSig(GET_SIG("ClientInstance::grabMouse"));
+        indexRef = GET_SIG_ADDRESS("ClientInstance::grabMouse");
     }
 
     int index = *reinterpret_cast<int *>(indexRef + 3) / 8;
@@ -36,7 +36,7 @@ void ClientInstance::releaseMouse() {
     static uintptr_t indexRef;
 
     if (indexRef == 0) {
-        indexRef = Memory::findSig(GET_SIG("ClientInstance::grabMouse"));
+        indexRef = GET_SIG_ADDRESS("ClientInstance::grabMouse");
         if(indexRef == NULL) {
             return;
         }

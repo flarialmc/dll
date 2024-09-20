@@ -4,6 +4,7 @@
 #include "../../../Client.hpp"
 #include "../../../../Utils/Utils.hpp"
 #include "../../../../Utils/Memory/CustomAllocator/Buffer.hpp" // why its not hpp here ???
+#include "BlockOutlineListener.hpp"
 
 class BlockOutline : public Module {
 
@@ -24,11 +25,11 @@ public:
     };
 
     void onSetup() override { // init color just in case
-        highlightColorRipRelAddr = Memory::findSig(GET_SIG("blockHighlightColor")); // RIP REL 4BYTE FROM FUNC OFFSET ADDR
+        highlightColorRipRelAddr = GET_SIG_ADDRESS("blockHighlightColor"); // RIP REL 4BYTE FROM FUNC OFFSET ADDR
         if(highlightColorRipRelAddr == NULL) return;
         highlightColorOrigRipRel = *(UINT32*)highlightColorRipRelAddr;
 
-        outlineColorRipRelAddr = Memory::findSig(GET_SIG("mce::Color::BLACK"));
+        outlineColorRipRelAddr = GET_SIG_ADDRESS("mce::Color::BLACK");
         if(outlineColorRipRelAddr == NULL) return;
         outlineColorOrigRipRel = *(UINT32*)outlineColorRipRelAddr;
         // TODO: make it look better
@@ -69,11 +70,13 @@ public:
 
     void onEnable() override {
         onColorChange();
+        EventHandler::registerListener(new BlockOutlineListener("BlockOutline", this, selectionColor));
         patch();
         Module::onEnable();
     }
 
     void onDisable() override {
+        EventHandler::unregisterListener("BlockOutline");
         unpatch();
         Module::onDisable();
     }

@@ -7,13 +7,6 @@
 #include "../../../../SDK/Client/Actor/ItemActor.hpp"
 #include "../../../../Utils/Memory/CustomAllocator/Buffer.hpp"
 
-static char data[0x5], data2[0x5];
-
-float lerp(float a, float b, float t) {
-    return a + t * (b - a);
-}
-
-
 class INeedADecentHookClassForMemory {
 public:
     void* pointer = nullptr;
@@ -22,11 +15,12 @@ public:
 
     INeedADecentHookClassForMemory(void* function, void* hook) {
         pointer = function;
-        if (!IsBadReadPtr(pointer, sizeof(pointer))) {
-            if (MH_CreateHook(pointer, hook, &trampoline) == MH_OK) {
-                valid = true;
-            }
-        }
+
+        if (IsBadReadPtr(pointer, sizeof(pointer)))
+            return;
+
+        if (const auto status = MH_CreateHook(pointer, hook, &trampoline); status == MH_OK)
+            valid = true;
     }
 
     ~INeedADecentHookClassForMemory() {
@@ -34,11 +28,13 @@ public:
     }
 
     void enable() const {
-        if (valid) MH_EnableHook(pointer);
+        if (valid)
+            MH_EnableHook(pointer);
     }
 
     void disable() const {
-        if (valid) MH_DisableHook(pointer);
+        if (valid)
+            MH_DisableHook(pointer);
     }
 };
 
@@ -48,43 +44,64 @@ void ItemPhysicsListener::ItemRenderer_render(ItemRenderer* _this, BaseActorRend
     using func_t = void(*)(ItemRenderer*, BaseActorRenderContext*, ActorRenderData*);
     static auto oFunc = reinterpret_cast<func_t>(ItemRenderer_renderHook->trampoline);
 
-    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics"));
-    mod->listener->renderData = renderData;
+    if(!ModuleManager::initialized) return oFunc(_this, renderCtx, renderData);
+
+    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("ItemPhysics"));
+    const auto listener = mod->listener;
+
+    listener->renderData = renderData;
 
     oFunc(_this, renderCtx, renderData);
 }
 
 void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, float y, float z) {
-    static auto rotateSig = Memory::findSig(GET_SIG("glm_rotate"));
+    static auto rotateSig = GET_SIG_ADDRESS("glm_rotate");
     using glm_rotate_t = void(__fastcall*)(glm::mat4x4&, float, float, float, float);
     static auto glm_rotate = reinterpret_cast<glm_rotate_t>(rotateSig);
 
-    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics"));
-    const auto renderData = mod->listener->renderData;
-    if (renderData == nullptr) return;
+    if(!ModuleManager::initialized) return;
+
+    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("ItemPhysics"));
+    const auto listener = mod->listener;
+    const auto renderData = listener->renderData;
+
+    if (renderData == nullptr)
+        return;
 
     auto curr = reinterpret_cast<ItemActor*>(renderData->actor);
+
     static float height = 0.5f;
 
-    if (!mod->listener->actorData.contains(curr)) {
+    bool isOnGround = curr->isOnGround();
+
+    if (!listener->actorData.contains(curr)) {
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution dist(0, 1), dist2(0, 359);
+
+        std::uniform_int_distribution dist(0, 1);
+        std::uniform_int_distribution dist2(0, 359);
 
         const auto vec = Vec3<float>(dist2(gen), dist2(gen), dist2(gen));
         const auto sign = Vec3(dist(gen) * 2 - 1, dist(gen) * 2 - 1, dist(gen) * 2 - 1);
-        mod->listener->actorData.emplace(curr, std::tuple{ curr->isOnGround() ? 0.f : height, vec, sign });
+
+        auto def = std::tuple{ isOnGround ? 0.f : height, vec, sign};
+        listener->actorData.emplace(curr, def);
     }
 
-    auto& [yMod, vec, sign] = mod->listener->actorData.at(curr);
-    yMod -= height * (1.f / MC::fps);
+    const float deltaTime = 1.f / static_cast<float>(MC::fps);
 
-    if (yMod <= 0.f && curr->isOnGround()) {
+    float& yMod = std::get<0>(listener->actorData.at(curr));
+
+    yMod -= height * deltaTime;
+
+    if (yMod <= 0.f)
         yMod = 0.f;
-    }
 
     Vec3<float> pos = renderData->position;
     pos.y += yMod;
+
+    auto& vec = std::get<1>(listener->actorData.at(curr));
+    auto& sign = std::get<2>(listener->actorData.at(curr));
 
     auto& settings = mod->settings;
     const auto speed = settings.getSettingByName<float>("speed")->value;
@@ -92,44 +109,98 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
     const auto yMul = settings.getSettingByName<float>("ymul")->value;
     const auto zMul = settings.getSettingByName<float>("zmul")->value;
 
-    if (!curr->isOnGround() || yMod > 0.f) {
-        vec.x = std::fmod(vec.x + sign.x * (1.f / MC::fps) * speed * xMul, 360.f);
-        vec.y = std::fmod(vec.y + sign.y * (1.f / MC::fps) * speed * yMul, 360.f);
-        vec.z = std::fmod(vec.z + sign.z * (1.f / MC::fps) * speed * zMul, 360.f);
+    if (!isOnGround || yMod > 0.f) {
+        vec.x += static_cast<float>(sign.x) * deltaTime * speed * xMul;
+        vec.y += static_cast<float>(sign.y) * deltaTime * speed * yMul;
+        vec.z += static_cast<float>(sign.z) * deltaTime * speed * zMul;
+
+        if (vec.x > 360.f)
+            vec.x -= 360.f;
+
+        if (vec.x < 0.f)
+            vec.x += 360.f;
+
+        if (vec.y > 360.f)
+            vec.y -= 360.f;
+
+        if (vec.y < 0.f)
+            vec.y += 360.f;
+
+        if (vec.z > 360.f)
+            vec.z -= 360.f;
+
+        if (vec.z < 0.f)
+            vec.z += 360.f;
     }
 
-    const Vec3<float> targetVec = (yMod < 0.1f) ? Vec3<float>(90.f, vec.y, vec.z) : vec;
+    Vec3<float> renderVec = vec;
 
-    if (curr->isOnGround()) {
-        if (curr->getStack().block == nullptr) {
-            const Vec3<float> targetVec = (yMod < 0.1) ? Vec3<float>(90.f, vec.y - 0.12, vec.z) : vec;
+    const auto smoothRotations = settings.getSettingByName<bool>("smoothrots")->value;
+    const auto preserveRotations = settings.getSettingByName<bool>("preserverots")->value;
+
+    if (isOnGround && yMod == 0.f && !preserveRotations && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
+        if (smoothRotations && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
+            vec.x += static_cast<float>(sign.x) * deltaTime * speed * xMul;
+
+            if (curr->getStack().block != nullptr) {
+                vec.z += static_cast<float>(sign.z) * deltaTime * speed * zMul;
+
+                if (vec.x > 360.f || vec.x < 0.f) {
+                    vec.x = 0.f;
+                    sign.x = 0;
+                }
+
+                if (vec.z > 360.f || vec.z < 0.f) {
+                    vec.z = 0.f;
+                    sign.z = 0;
+                }
+            }
+            else {
+                vec.y += static_cast<float>(sign.y) * deltaTime * speed * yMul;
+
+                if (vec.x - 90.f > 360.f || vec.x - 90.f < 0.f) {
+                    vec.x = 90.f;
+                    sign.x = 0;
+                }
+
+                if (vec.y > 360.f || vec.y < 0.f) {
+                    vec.y = 0.f;
+                    sign.y = 0;
+                }
+            }
+        }
+
+        if (!smoothRotations) {
+            if (curr->getStack().block != nullptr) {
+                renderVec.x = 0.f;
+                renderVec.z = 0.f;
+            }
+            else {
+                renderVec.x = 90.f;
+                renderVec.y = 0.f;
+            }
         }
     }
 
-    const Vec3<float> targetPos = renderData->position;
+    if(isOnGround) {
+        if(curr->getStack().block == nullptr) {
+            pos.y -= 0.12;
+        }
+    }
 
-    const float lerpFactor = 0.2f;
+    mat = translate(mat, {pos.x, pos.y, pos.z});
 
-    vec.x = lerp(vec.x, targetVec.x, lerpFactor);
-    vec.y = lerp(vec.y, targetVec.y, lerpFactor);
-    vec.z = lerp(vec.z, targetVec.z, lerpFactor);
-
-    pos.x = lerp(pos.x, targetPos.x, lerpFactor);
-    pos.y = lerp(pos.y, targetPos.y, lerpFactor);
-    pos.z = lerp(pos.z, targetPos.z, lerpFactor);
-
-    mat = translate(mat, { pos.x, pos.y, pos.z });
-    glm_rotate(mat, vec.x, 1.f, 0.f, 0.f);
-    glm_rotate(mat, vec.y, 0.f, 1.f, 0.f);
-    glm_rotate(mat, vec.z, 0.f, 0.f, 1.f);
+    glm_rotate(mat, renderVec.x, 1.f, 0.f, 0.f);
+    glm_rotate(mat, renderVec.y, 0.f, 1.f, 0.f);
+    glm_rotate(mat, renderVec.z, 0.f, 0.f, 1.f);
 }
 
-
 void ItemPhysicsListener::onSetupAndRender(SetupAndRenderEvent& event) {
-    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics"));
-    if (!mod->isEnabled()) return;
+    if (!mod->isEnabled())
+        return;
 
     const auto player = SDK::clientInstance->getLocalPlayer();
+
     static bool playerNull = player == nullptr;
 
     if (playerNull != (player == nullptr)) {
@@ -142,16 +213,20 @@ void ItemPhysicsListener::onSetupAndRender(SetupAndRenderEvent& event) {
     }
 }
 
+static char data[0x5], data2[0x5];
+
 void ItemPhysicsListener::onEnable() {
-    static auto posAddr = Memory::findSig(GET_SIG("ItemPositionConst")) + 4;
+    static auto posAddr = GET_SIG_ADDRESS("ItemPositionConst") + 4;
     origPosRel = *reinterpret_cast<uint32_t*>(posAddr);
     patched = true;
 
-    static auto rotateAddr = reinterpret_cast<void*>(Memory::findSig(GET_SIG("glm_rotateRef")));
+    static auto rotateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_rotateRef"));
+
     if (glm_rotateHook == nullptr)
         glm_rotateHook = std::make_unique<INeedADecentHookClassForMemory>(rotateAddr, glm_rotate);
 
-    static auto ItemRenderer_renderAddr = reinterpret_cast<void*>(Memory::findSig(GET_SIG("ItemRenderer::render")));
+    static auto ItemRenderer_renderAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("ItemRenderer::render"));
+
     if (ItemRenderer_renderHook == nullptr)
         ItemRenderer_renderHook = std::make_unique<INeedADecentHookClassForMemory>(ItemRenderer_renderAddr, ItemRenderer_render);
 
@@ -159,18 +234,21 @@ void ItemPhysicsListener::onEnable() {
     *newPosRel = 0.f;
 
     const auto newRipRel = Memory::getRipRel(posAddr, reinterpret_cast<uintptr_t>(newPosRel));
+
     Memory::patchBytes(reinterpret_cast<void*>(posAddr), newRipRel.data(), 4);
 
     glm_rotateHook->enable();
+
     Memory::patchBytes(rotateAddr, (BYTE*)"\xE8", 1);
+
     ItemRenderer_renderHook->enable();
 
-    static auto translateAddr = reinterpret_cast<void*>(Memory::findSig(GET_SIG("glm_translateRef")));
+    static auto translateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef"));
     Memory::copyBytes(translateAddr, data, 5);
     Memory::nopBytes(translateAddr, 5);
 
     if (WinrtUtils::check(21, 0)) {
-        static auto translateAddr2 = reinterpret_cast<void*>(Memory::findSig(GET_SIG("glm_translateRef2")));
+        static auto translateAddr2 = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef2"));
         Memory::copyBytes(translateAddr2, data2, 5);
         Memory::nopBytes(translateAddr2, 5);
     }
@@ -178,7 +256,8 @@ void ItemPhysicsListener::onEnable() {
 
 void ItemPhysicsListener::onDisable() {
     if (patched) {
-        static auto posAddr = Memory::findSig(GET_SIG("ItemPositionConst")) + 4;
+        static auto posAddr = GET_SIG_ADDRESS("ItemPositionConst") + 4;
+
         Memory::patchBytes(reinterpret_cast<void*>(posAddr), &origPosRel, 4);
         FreeBuffer(newPosRel);
     }
@@ -186,11 +265,11 @@ void ItemPhysicsListener::onDisable() {
     glm_rotateHook->disable();
     ItemRenderer_renderHook->disable();
 
-    static auto translateAddr = reinterpret_cast<void*>(Memory::findSig(GET_SIG("glm_translateRef")));
+    static auto translateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef"));
     Memory::patchBytes(translateAddr, data, 5);
 
     if (WinrtUtils::check(21, 0)) {
-        static auto translateAddr2 = reinterpret_cast<void*>(Memory::findSig(GET_SIG("glm_translateRef2")));
+        static auto translateAddr2 = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef2"));
         Memory::patchBytes(translateAddr2, data2, 5);
     }
 

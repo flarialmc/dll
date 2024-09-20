@@ -5,6 +5,20 @@ include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 23)
 
+execute_process(
+        COMMAND git rev-parse --short HEAD
+        OUTPUT_VARIABLE COMMIT_HASH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/commit_hash.h.in
+        ${CMAKE_CURRENT_BINARY_DIR}/commit_hash.h
+        @ONLY
+)
+
+add_definitions(-DCOMMIT_HASH="${COMMIT_HASH}")
+
 if(MSVC)
     add_compile_options(/MT)
 
@@ -71,11 +85,11 @@ if("${MSVC_RUNTIME}" STREQUAL "")
 endif()
 
 
-file(GLOB_RECURSE sources "main.cpp" "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp")
+file(GLOB_RECURSE sources "main.cpp" "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp" "src/Client/GUI/Engine/*.cpp")
 
 add_library(${PROJECT_NAME} SHARED ${sources} src/SDK/Client/Render/Matrix.cpp src/Assets/Assets.rc)
 
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/" "${CMAKE_CURRENT_LIST_DIR}/lib/glm/" "${CMAKE_CURRENT_LIST_DIR}/lib/ImGui")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/" "${CMAKE_CURRENT_LIST_DIR}/lib/glm/")
 
 # Disable RTTI
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -94,8 +108,6 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(libhat)
-
-
 
 target_link_libraries(${PROJECT_NAME} PRIVATE libhat windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version)
 target_link_libraries(${PROJECT_NAME} PUBLIC MinHook)

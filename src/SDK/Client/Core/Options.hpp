@@ -51,9 +51,9 @@ public:
             if (info == nullptr) continue;
 
             auto* optionsPtr = (Option*)optionsBaseEntry[i];
-            auto translateName = *(std::string*)((uintptr_t)info + GET_OFFSET("OptionInfo::TranslateName"));
+            auto translateName = (std::string*)((uintptr_t)info + GET_OFFSET("OptionInfo::TranslateName"));
 
-            if(translateName.empty()) continue;
+            if(translateName->empty()) continue;
 
 //            if (optionsBaseEntry[i] == nullptr) continue;
 //
@@ -68,7 +68,7 @@ public:
 //            if (translateName == nullptr) continue;
 
             //Logger::debug(translateName);
-            if (optionName == translateName) {
+            if (*translateName == optionName) {
                 return optionsPtr;
             }
         }

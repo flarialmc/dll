@@ -3,7 +3,9 @@
 #include "EventHandler.hpp"
 #include "Render/RenderEvent.hpp"
 #include "Network/PacketEvent.hpp"
+#include "Render/RenderPotionHUDEvent.hpp"
 #include "../Client.hpp"
+
 // TODO: rewrite event stuff
  void EventHandler::registerListener(Listener *listener) {
     Logger::debug("[EventHandler] Added listener: " + listener->name);
@@ -244,5 +246,13 @@ void EventHandler::onGetTexture(GetTextureEvent &event) {
     if (!ModuleManager::initialized) return;
     for (Listener *&listener: listeners) {
         listener->onGetTexture(event);
+    }
+}
+
+void EventHandler::onRenderPotionHUD(RenderPotionHUDEvent &event) {
+    if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
+    for (Listener *&listener: listeners) {
+        listener->onRenderPotionHUD(event);
     }
 }

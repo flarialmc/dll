@@ -54,7 +54,7 @@ class HitPingListener : public Listener {
                 // hitting too fast
                 (*hitActors)[id].second.lastActorTouch = start;
                 return;
-            } else if (!(*hitActors)[id].first){
+            } else if (!(*hitActors)[id].first) {
                 (*hitActors)[id].first = true;
                 (*hitActors)[id].second.lastActorTouch = start;
                 (*hitActors)[id].second.lastActorStableTouch = start;

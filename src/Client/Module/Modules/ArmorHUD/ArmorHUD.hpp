@@ -36,6 +36,7 @@ public:
             settings.addSetting("percentageY", 0.0f);
         }
         if (settings.getSettingByName<bool>("vertical") == nullptr) settings.addSetting("vertical", false);
+        if (settings.getSettingByName<bool>("durability_left") == nullptr) settings.addSetting("durability_left", false);
         if (settings.getSettingByName<bool>("percent") == nullptr) settings.addSetting("percent", false);
         if (settings.getSettingByName<bool>("color") == nullptr) settings.addSetting("color", false);
         if (settings.getSettingByName<bool>("showdurability") == nullptr) settings.addSetting("showdurability", false);
@@ -77,6 +78,8 @@ public:
 
         this->addSlider("Size", "", this->settings.getSettingByName<float>("uiscale")->value);
         this->addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", this->settings.getSettingByName<bool>("vertical")->value);
+
+
         this->addToggle("Change Color", "", this->settings.getSettingByName<bool>("color")->value);
 
         this->extraPadding();
@@ -85,6 +88,9 @@ public:
         this->addToggle("Show Durability", "", this->settings.getSettingByName<bool>("showdurability")->value);
         this->addConditionalSlider(this->settings.getSettingByName<bool>("showdurability")->value, "Text Size", "Text size of Durability", this->settings.getSettingByName<float>("textSize")->value, 0.25f, 0.0f, true);
         this->addToggle("Show Durability in %", "", this->settings.getSettingByName<bool>("percent")->value);
+        if(this->settings.getSettingByName<bool>("vertical")->value){
+            this->addToggle("Durability to the left", "", this->settings.getSettingByName<bool>("vertical")->value);
+        }
 
         this->extraPadding();
         this->addHeader("Colors");

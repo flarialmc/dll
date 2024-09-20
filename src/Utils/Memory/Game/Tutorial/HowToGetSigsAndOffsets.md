@@ -142,6 +142,11 @@ Found near getActorFlag first param is basicReg, second is runtimeID
 # VTable Indexes
 Memory::GetAddressByIndex(vtableAddr, function
 
+# Bobbing function
+0.017453292 find this and compare refs
+48 89 5C 24 10 48 89 74 24 20 4C 89 44 24 18 57 48 83 EC 60 0F 29 74 24 50 0F 29 1.21.30
+40 53 56 57 48 81 EC 80 00 00 00 0F 29 74 24 70 0F 29 7C 24 60 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 50 1.21.20 and below a bit
+
 
 # Sigs to functions
 ### ItemRenderer::renderGuiItemNew
@@ -151,10 +156,12 @@ xref out 1 time, then xref to last func and here you go
 ### Level::getRuntimeActorList
 48 89 5C 24 18 55 56 57 48 83 EC 40 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 38 48 8B F2 48 8B E9 48 89
 xref out and here u go
+or scan 40 53 48 83 EC 30 48 81 (1.21.30+) first res should be it
 
 ### Actor::baseTick
 48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 40 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 30 8B
-2nd xref is it 
+2nd xref is it
+?? ?? ?? ?? 48 8B 8B C0 10 00 00 or this and first one should be it
 
 ### Player::BaseTick
 gamePlayEmote, gamePlayFlying, /gameplay/death
@@ -169,3 +176,9 @@ look for textures/ui/cross_hair or ui_crosshair, first function should be it
 
 ### ItemRenderer::render
 Look for this number 0x80100240C00
+
+### HudMobEffectsRenderer::render
+textures/ui/hud_mob_effect_background
+
+### ActorCollision::isOnGround
+minecraft:arrow_spell_emitter

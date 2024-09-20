@@ -34,26 +34,23 @@ public:
 
     void settingsRender() override {
 
+        float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
 
-        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
+        FlarialGUI::FlarialTextWithFont(x, y, L"Color", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+        FlarialGUI::ColorPicker(0, x + FlarialGUI::SettingsTextWidth("Color "),
+                                y - Constraints::SpacingConstraint(0.017, textWidth),
+                                settings.getSettingByName<std::string>("color")->value,
+                                settings.getSettingByName<bool>("color_rgb")->value);
 
-
-        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
-                                  Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(0.88f, "height"));
-
-        this->addHeader("Colors");
-        this->addColorPicker("Hurt Color", "", settings.getSettingByName<std::string>("color")->value,
+        FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("color")->value,
                                       settings.getSettingByName<float>("colorOpacity")->value,
                                       settings.getSettingByName<bool>("color_rgb")->value);
-
-        FlarialGUI::UnsetScrollView();
-
-        this->resetPadding();
 
     }
 };
