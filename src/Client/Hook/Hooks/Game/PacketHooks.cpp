@@ -113,7 +113,7 @@ void SendPacketHook::enableHook() {
     Memory::hookFunc((void *) playSoundPacket->packetHandler->vTable[1], (void*)receiveCallbackPlaySound,
                      (void **) &receivePacketPlaySoundOriginal, "ReceivePacketHook");
 
-    std::shared_ptr<Packet> EntityEventPacket = SDK::createPacket((int) MinecraftPacketIds::Interact);
+    std::shared_ptr<Packet> EntityEventPacket = SDK::createPacket((int) MinecraftPacketIds::ActorEvent);
     Memory::hookFunc((void *) EntityEventPacket->packetHandler->vTable[1], (void*)receiveCallbackEntityEvent,
                      (void **) &receivePacketEntityEventOriginal, "ReceivePacketHook");
 
