@@ -50,11 +50,11 @@ class HitPingListener : public Listener {
 
         auto it = hitActors->find(id);
         if (it != hitActors->end()) {
-            if(start - (*hitActors)[id].second.lastActorTouch <= std::chrono::milliseconds(480) && false) {
+            if(start - (*hitActors)[id].second.lastActorTouch <= std::chrono::milliseconds(480)) {
                 // hitting too fast
                 (*hitActors)[id].second.lastActorTouch = start;
                 return;
-            } else if (!(*hitActors)[id].first || true) {
+            } else if (!(*hitActors)[id].first) {
                 (*hitActors)[id].first = true;
                 (*hitActors)[id].second.lastActorTouch = start;
                 (*hitActors)[id].second.lastActorStableTouch = start;
@@ -87,7 +87,7 @@ class HitPingListener : public Listener {
                     if(start + std::chrono::milliseconds(500) > now) {
                         std::chrono::duration<double> time = now - start;
 
-                        if(time.count() >= 0.0001 || true) {
+                        if(time.count() >= 0.0001) {
                             hitDelay = time;
                             auto actors = SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList();
                             auto actor = std::find_if(actors.begin(), actors.end(), [&](auto &a) {
