@@ -54,6 +54,7 @@ public:
         if(packet->getId() == MinecraftPacketIds::ContainerClose) {
             auto ccp = (ContainerClosePacket *) packet;
             if(sendingClosePacket) return;
+            if(!inventoryOpen) return;
             if(ccp->ContainerId == ContainerID::None || ccp->ContainerId == ContainerID::Inventory) {
                 CloseInventory();
                 event.cancel();
@@ -118,7 +119,7 @@ public:
         inventoryOpen = true;
         auto packet = SDK::createPacket((int)MinecraftPacketIds::ContainerOpen);
         auto cop = (ContainerOpenPacket *) packet.get();
-        cop->ContainerId = ContainerID::First;
+        cop->ContainerId = ContainerID::Inventory;
         cop->Type = ContainerType::Inventory;
         cop->Pos = BlockPos(0, 0, 0);
         cop->EntityUniqueID = -1;
