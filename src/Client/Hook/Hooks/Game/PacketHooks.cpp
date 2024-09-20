@@ -63,6 +63,34 @@ void SendPacketHook::receiveCallbackEntityEvent(void *packetHandlerDispatcher, v
 
 }
 
+void SendPacketHook::receiveCallbackInteract(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
+                                             const std::shared_ptr<Packet> &packet) {
+    SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
+    PacketEvent event(packet.get());
+    EventHandler::onPacketReceive(event);
+    if (!event.isCancelled())
+        receivePacketInteractOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
+}
+
+void SendPacketHook::receiveCallbackContainerOpen(void *packetHandlerDispatcher, void *networkIdentifier,
+                                                  void *netEventCallback, const std::shared_ptr<Packet> &packet) {
+    SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
+    PacketEvent event(packet.get());
+    EventHandler::onPacketReceive(event);
+    if (!event.isCancelled())
+        receivePacketContainerOpenOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
+}
+
+void SendPacketHook::receiveCallbackContainerClose(void *packetHandlerDispatcher, void *networkIdentifier,
+                                                   void *netEventCallback, const std::shared_ptr<Packet> &packet) {
+    SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
+    PacketEvent event(packet.get());
+    EventHandler::onPacketReceive(event);
+    if (!event.isCancelled())
+        receivePacketContainerCloseOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
+}
+
+
 void SendPacketHook::enableHook() {
     /*for (int num = 1; num <= (int)MinecraftPacketIds::PacketViolationWarning; num++) {
 
@@ -85,9 +113,21 @@ void SendPacketHook::enableHook() {
     Memory::hookFunc((void *) playSoundPacket->packetHandler->vTable[1], (void*)receiveCallbackPlaySound,
                      (void **) &receivePacketPlaySoundOriginal, "ReceivePacketHook");
 
-    std::shared_ptr<Packet> EntityEventPacket = SDK::createPacket((int) MinecraftPacketIds::ActorEvent);
+    std::shared_ptr<Packet> EntityEventPacket = SDK::createPacket((int) MinecraftPacketIds::Interact);
     Memory::hookFunc((void *) EntityEventPacket->packetHandler->vTable[1], (void*)receiveCallbackEntityEvent,
                      (void **) &receivePacketEntityEventOriginal, "ReceivePacketHook");
+
+    std::shared_ptr<Packet> InteractPacket = SDK::createPacket((int) MinecraftPacketIds::Interact);
+    Memory::hookFunc((void *) InteractPacket->packetHandler->vTable[1], (void*)receiveCallbackInteract,
+                     (void **) &receivePacketInteractOriginal, "ReceivePacketHook");
+
+    std::shared_ptr<Packet> ContainerOpenPacket = SDK::createPacket((int) MinecraftPacketIds::ContainerOpen);
+    Memory::hookFunc((void *) ContainerOpenPacket->packetHandler->vTable[1], (void *)receiveCallbackContainerOpen,
+                     (void **) &receivePacketContainerOpenOriginal, "ReceivePacketHook");
+
+    std::shared_ptr<Packet> ContainerClosePacket = SDK::createPacket((int) MinecraftPacketIds::ContainerClose);
+    Memory::hookFunc((void *) ContainerClosePacket->packetHandler->vTable[1], (void *)receiveCallbackContainerClose,
+                     (void **) &receivePacketContainerCloseOriginal, "ReceivePacketHook");
 
     this->autoHook((void *) callback, (void **) &sendPacketOriginal);
 }
