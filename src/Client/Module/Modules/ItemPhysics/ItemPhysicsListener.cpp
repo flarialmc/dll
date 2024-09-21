@@ -46,7 +46,7 @@ void ItemPhysicsListener::ItemRenderer_render(ItemRenderer* _this, BaseActorRend
 
     if(!ModuleManager::initialized) return oFunc(_this, renderCtx, renderData);
 
-    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("ItemPhysics"));
+    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics"));
     const auto listener = mod->listener;
 
     listener->renderData = renderData;

@@ -11,6 +11,7 @@
 #include <wininet.h>
 
 #include "src/Client/Module/Modules/Nick/NickListener.hpp"
+#include "src/Utils/Logger/crashlogs.hpp"
 
 std::chrono::steady_clock::time_point lastBeatTime;
 
@@ -34,23 +35,19 @@ DWORD WINAPI init(HMODULE real)
     }
 #endif
 
-
     Client::initialize();
     Logger::info("[Client] Initializing");
 
     std::thread statusThread([]() {
-        while (true) {
+        while (!Client::disable) {
 
             auto now = std::chrono::steady_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastBeatTime);
 
             if(!Client::disable) {
                 if(SDK::hasInstanced && SDK::clientInstance != nullptr) {
-                    // may crash here cuz accessed on other thread
                     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-
-                        if(elapsed >= std::chrono::seconds(27)) {
-                            ModuleManager::onlineUsers.clear();
+                        if(elapsed >= std::chrono::seconds(60)) {
                             std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
 
 
@@ -119,7 +116,6 @@ DWORD WINAPI init(HMODULE real)
     });
     statusThread.detach();
 
-
     while (true) {
         if (Client::disable) {
             break;
@@ -134,35 +130,36 @@ DWORD WINAPI init(HMODULE real)
 
     EventHandler::unregisterAll();
 
-    ModuleManager::terminate();
-    HookManager::terminate();
+    ResizeHook::cleanShit();
 
     kiero::shutdown();
 
     Logger::debug("[Kiero] Shut down Kiero.");
 
-    ResizeHook::cleanShit();
+    ModuleManager::terminate();
+    HookManager::terminate();
 
     MH_DisableHook(MH_ALL_HOOKS);
     MH_Uninitialize();
 
+    glaiel::crashlogs::end_session();
+
     Logger::debug("[MinHook] Freeing Library.");
 
-    Sleep(100);
-
-    FreeLibraryAndExitThread(real, 1);
+    FreeLibraryAndExitThread(Client::currentModule, 0);
 }
 
 BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
-    switch (ul_reason_for_call)
-    {
+
+    switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH:
+            DisableThreadLibraryCalls(instance);
             Client::currentModule = instance;
-            CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)init, instance, 0, nullptr);
+            CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE) init, instance, 0, nullptr);
             break;
         case DLL_PROCESS_DETACH:
-            ModuleManager::terminate();
+            break;
     }
 
     return TRUE;

@@ -108,6 +108,10 @@ public:
 		return Vec2(this->x + Vec.x, this->y + Vec.y);
 	}
 
+    auto operator==(const Vec2<T> Vec) {
+        return this->x == Vec.x && this->y == Vec.y;
+    }
+
 	auto operator-(const Vec2<T> Vec) {
 		return Vec2(this->x - Vec.x, this->y - Vec.y);
 	}
@@ -172,6 +176,10 @@ public:
 
     auto mul(const Vec3<T> &vec) -> Vec3<T> {
         return Vec3<T>(this->x * vec.x, this->y * vec.y, this->z * vec.z);
+    };
+
+    auto lerp(const Vec3<T> &vec, T t) -> Vec3<T> {
+        return Vec3<T>(std::lerp(this->x, vec.x, t), std::lerp(this->y, vec.y, t), std::lerp(this->z, vec.z, t));
     };
 
     auto mul(T v) -> Vec3<T> {

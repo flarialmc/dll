@@ -70,7 +70,7 @@ public:
         if(SDK::getCurrentScreen() == "hud_screen") {
             SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl>& control) {
 
-                if (control->LayerName == "hud_player") {
+                if (control->getLayerName() == "hud_player") {
 
                     if(DollListener::oriXY.x == 0.0f) {
                         DollListener::oriXY.x = control->x;
