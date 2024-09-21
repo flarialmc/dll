@@ -169,6 +169,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
             bool fontLoaded = false;
 
             if(FlarialGUI::DoLoadModuleFontLater) {
+                if(Client::settings.getSettingByName<bool>("overrideFontWeight")->value) FlarialGUI::LoadModuleFontLaterWeight = FlarialGUI::GetFontWeightFromString(Client::settings.getSettingByName<std::string>("fontWeight")->value);
+
                 std::string font1 = FlarialGUI::LoadModuleFontLater;
                 std::transform(font1.begin(), font1.end(), font1.begin(), ::towlower);
                 std::string weightedName = FlarialGUI::GetWeightedName(font1, FlarialGUI::LoadModuleFontLaterWeight);
@@ -183,6 +185,10 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
             }
 
             if(FlarialGUI::DoLoadGUIFontLater) {
+
+                if(Client::settings.getSettingByName<bool>("overrideFontWeight")->value) FlarialGUI::LoadGUIFontLaterWeight = FlarialGUI::GetFontWeightFromString(Client::settings.getSettingByName<std::string>("fontWeight")->value);
+
+
                 std::string font2 = FlarialGUI::LoadGUIFontLater;
                 std::transform(font2.begin(), font2.end(), font2.begin(), ::towlower);
                 std::string weightedName = FlarialGUI::GetWeightedName(font2, FlarialGUI::LoadGUIFontLaterWeight);

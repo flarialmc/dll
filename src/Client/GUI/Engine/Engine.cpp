@@ -648,7 +648,6 @@ void FlarialGUI::LoadAllImageToCache() {
 
 
 
-
 bool replace(std::string& str, const std::string& from, const std::string& to) {
     size_t start_pos = str.find(from);
     if(start_pos == std::string::npos)
@@ -656,6 +655,27 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
     str.replace(start_pos, from.length(), to);
     return true;
 }
+
+DWRITE_FONT_WEIGHT FlarialGUI::GetFontWeightFromString(const std::string& weightStr) {
+    if (weightStr == "Bold") {
+        return DWRITE_FONT_WEIGHT_BOLD;
+    } else if (weightStr == "Normal") {
+        return DWRITE_FONT_WEIGHT_NORMAL;
+    } else if (weightStr == "SemiBold") {
+        return DWRITE_FONT_WEIGHT_SEMI_BOLD;
+    } else if (weightStr == "ExtraBold") {
+        return DWRITE_FONT_WEIGHT_EXTRA_BOLD;
+    } else if (weightStr == "Medium") {
+        return DWRITE_FONT_WEIGHT_MEDIUM;
+    } else if (weightStr == "Light") {
+        return DWRITE_FONT_WEIGHT_LIGHT;
+    } else if (weightStr == "ExtraLight") {
+        return DWRITE_FONT_WEIGHT_EXTRA_LIGHT;
+    } else {
+        return DWRITE_FONT_WEIGHT_NORMAL;
+    }
+}
+
 
 std::string FlarialGUI::GetWeightedName(std::string name, DWRITE_FONT_WEIGHT weight) {
 
