@@ -624,13 +624,6 @@ void FlarialGUI::FlarialText(float x, float y, const wchar_t *text, float width,
     color.a = o_colors_text;
 
     if (isInScrollView) y += scrollpos;
-    if (shouldAdditionalY) {
-        for (int i = 0; i < highestAddIndexes + 1; i++) {
-            if (FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
-                y += additionalY[i];
-            }
-        }
-    }
 
     if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return;
 
@@ -654,16 +647,7 @@ void FlarialGUI::LoadAllImageToCache() {
 }
 
 
-std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
-                                     const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
-                                     const DWRITE_FONT_WEIGHT weight, bool moduleFont) {
 
-
-    D2D1_COLOR_F color = colors_text_rgb ? rgbColor : colors_text;
-    color.a = o_colors_text;
-
-    return FlarialTextWithFont(x, y, text, width, height, alignment, fontSize, weight, color, moduleFont);
-}
 
 bool replace(std::string& str, const std::string& from, const std::string& to) {
     size_t start_pos = str.find(from);
@@ -719,6 +703,17 @@ bool hasEnding (std::string const &fullString, std::string const &ending) {
 
 bool ifFontScale2(const float fontSize) {
     return fontSize / 135 > 1;
+}
+
+std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
+                                     const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
+                                     const DWRITE_FONT_WEIGHT weight, bool moduleFont) {
+
+
+    D2D1_COLOR_F color = colors_text_rgb ? rgbColor : colors_text;
+    color.a = o_colors_text;
+
+    return FlarialTextWithFont(x, y, text, width, height, alignment, fontSize, weight, color, moduleFont);
 }
 
 std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,

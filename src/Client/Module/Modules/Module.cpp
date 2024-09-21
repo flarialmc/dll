@@ -204,6 +204,7 @@ void Module::resetPadding() {
     colorPickerIndex = 100;
     keybindIndex = 0;
     textboxIndex = 0;
+    FlarialGUI::UnSetIsInAdditionalYMode();
 }
 
 void Module::extraPadding() {
@@ -214,10 +215,18 @@ void Module::addHeader(std::string text) {
     float x = Constraints::PercentageConstraint(0.019, "left");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
+
     D2D1_COLOR_F col = colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6;
     col.a = o_colors_secondary6;
 
     std::string name = FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 500, 0, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.215f, "height", true), DWRITE_FONT_WEIGHT_BOLD, false);
+
+    if(FlarialGUI::shouldAdditionalY)
+        for (int i = 0; i < FlarialGUI::highestAddIndexes + 1; i++) {
+            if (FlarialGUI::DropDownMenus[i].isActive && i <= FlarialGUI::additionalIndex) {
+                y += FlarialGUI::additionalY[i];
+            }
+        }
     FlarialGUI::RoundedRect(x, y + Constraints::RelativeConstraint(0.023f, "width"), col, FlarialGUI::TextSizes[name] + Constraints::RelativeConstraint(0.01f, "width"), 3.0f, 0, 0);
 
     padding += Constraints::RelativeConstraint(0.055f, "height", true);
@@ -256,7 +265,10 @@ void Module::addDropdown(std::string text, std::string subtext, const std::vecto
 
     FlarialGUI::Dropdown(dropdownIndex, elementX, y, options, value, "");
 
+
     Module::addElementText(text, subtext);
+
+    FlarialGUI::SetIsInAdditionalYMode();
 
     padding += Constraints::RelativeConstraint(0.05f, "height", true);
     dropdownIndex++;
