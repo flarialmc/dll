@@ -104,7 +104,7 @@ private:
         if(funcOriginalText == nullptr || oDrawImage == nullptr)
             hookDrawTextAndDrawImage(muirc);
 
-        std::string layer = pScreenView->VisualTree->root->LayerName;
+        std::string layer = pScreenView->VisualTree->root->getLayerName();
 
         if (layer != "debug_screen" && layer != "toast_screen"){ // start_screen, play_screen, world_loading_progress_screen, pause_screen, hud_screen
             SetTopScreenNameEvent event(layer);
@@ -120,10 +120,9 @@ private:
         if (player && SDK::clientInstance->getLevelRender())
         {
             origin = SDK::clientInstance->getLevelRender()->getOrigin();
-            pos = player->getRenderPositionComponent()->renderPos;
         }
 
-        FrameTransform transform = { SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov(), pos};
+        FrameTransform transform = { SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov() };
 
         SwapchainHook::frameTransformsMtx.lock();
         SwapchainHook::FrameTransforms.push(transform);
