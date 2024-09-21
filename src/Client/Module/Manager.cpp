@@ -24,6 +24,7 @@
 #include "Modules/PingCounter/PingCounter.hpp"
 #include "Modules/PotCounter/PotCounter.hpp"
 #include "Modules/ArrowCounter/ArrowCounter.hpp"
+#include "Modules/EntityCounter/EntityCounter.hpp"
 #include "Modules/SnapLook/SnapLook.hpp"
 #include "Modules/Freelook/Freelook.hpp"
 #include "Modules/ThirdPersonNametag/ThirdPerson.hpp"
@@ -119,6 +120,7 @@ void ModuleManager::initialize() {
     addModule(new PingCounter());
     addModule(new PotCounter());
     addModule(new ArrowCounter());
+    addModule(new EntityCounter());
     addModule(new Time());
     addModule(new MEM());
     addModule(new Fullbright());
