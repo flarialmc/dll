@@ -131,6 +131,7 @@ namespace FlarialGUI {
     DWRITE_FONT_WEIGHT inline LoadModuleFontLaterWeight = DWRITE_FONT_WEIGHT_NORMAL;
 
     std::string GetWeightedName(std::string name, DWRITE_FONT_WEIGHT weight);
+    DWRITE_FONT_WEIGHT GetFontWeightFromString(const std::string& weightStr);
 
     inline WindowRect WindowRects[1000];
     inline SliderRect SliderRects[2500];
