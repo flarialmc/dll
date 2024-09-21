@@ -61,7 +61,7 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
 
     if(!ModuleManager::initialized) return;
 
-    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("ItemPhysics"));
+    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics"));
     const auto listener = mod->listener;
     const auto renderData = listener->renderData;
 
