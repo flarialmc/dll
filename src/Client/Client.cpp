@@ -153,6 +153,18 @@ void Client::initialize() {
     if (Client::settings.getSettingByName<float>("rgb_value") == nullptr)
         Client::settings.addSetting("rgb_value", 1.0f);
 
+    if (Client::settings.getSettingByName<float>("modules_font_scale") == nullptr)
+        Client::settings.addSetting("modules_font_scale", 1.0f);
+
+    if (Client::settings.getSettingByName<float>("gui_font_scale") == nullptr)
+        Client::settings.addSetting("gui_font_scale", 1.0f);
+
+    if (Client::settings.getSettingByName<bool>("overrideFontWeight") == nullptr)
+        Client::settings.addSetting("overrideFontWeight", (bool)false);
+
+    if (Client::settings.getSettingByName<std::string>("fontWeight") == nullptr)
+        Client::settings.addSetting("fontWeight", (std::string) "Normal");
+
     FlarialGUI::LoadFont(IDR_FONT_TTF);
 
     FlarialGUI::LoadFont(IDR_FONT_BOLD_TTF);

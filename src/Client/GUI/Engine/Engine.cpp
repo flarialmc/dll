@@ -675,11 +675,16 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
 
 std::string FlarialGUI::GetWeightedName(std::string name, DWRITE_FONT_WEIGHT weight) {
 
+    std::string adder;
+    if(Client::settings.getSettingByName<bool>("overrideFontWeight")->value) {
+        return name + "-" + Client::settings.getSettingByName<std::string>("fontWeight")->value;
+    }
+
     if(!name.contains("-")) {
         switch (weight) {
 
             case DWRITE_FONT_WEIGHT_BOLD:
-               return name + "-Bold";
+                return name + "-Bold";
             break;
             case DWRITE_FONT_WEIGHT_NORMAL:
                 return name + "-Normal";
@@ -700,8 +705,7 @@ std::string FlarialGUI::GetWeightedName(std::string name, DWRITE_FONT_WEIGHT wei
                 return name + "-ExtraLight";
             break;
         }
-    }
-
+      }
     return name + "-Normal";
 }
 
@@ -772,7 +776,7 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
     if(hasEnding(weightedName, "2.0")) sizeMultiplier = 0.6f;
 
     ImGui::PushFont(FontMap[weightedName]);
-    float fSize = (fontSize / 135) * sizeMultiplier;
+    float fSize = ((fontSize * Client::settings.getSettingByName<float>(moduleFont ? "modules_font_scale" : "gui_font_scale")->value) / 135) * sizeMultiplier;
 
 	ImGui::SetWindowFontScale(fSize);
     std::string stringText = WideToNarrow(text).c_str();
