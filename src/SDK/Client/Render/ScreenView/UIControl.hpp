@@ -7,6 +7,7 @@ public:
     BUILD_ACCESS(this, float, scale, GET_OFFSET("UIControl::scale"));
     BUILD_ACCESS(this, float, x, GET_OFFSET("UIControl::x"));
     BUILD_ACCESS(this, float, y, GET_OFFSET("UIControl::y"));
+    BUILD_ACCESS(this, std::string, LayerName, GET_OFFSET("UIControl::LayerName"));
     BUILD_ACCESS(this, std::vector<std::shared_ptr<UIControl>>, children, GET_OFFSET("UIControl::children"));
 
     std::string& getLayerName() {
