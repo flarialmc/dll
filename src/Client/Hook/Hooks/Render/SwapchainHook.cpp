@@ -220,8 +220,10 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                 fontLoaded = true;
             }
 
-            if (!FlarialGUI::FontMap["164"]) {
-                FlarialGUI::FontMap["164"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 20);
+            if (!FlarialGUI::FontMap["164-1"]) {
+                FlarialGUI::FontMap["164-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 23);
+                FlarialGUI::FontMap["164-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 40);
+
                 fontLoaded = true;
             }
 

@@ -310,7 +310,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 
 				D3D12_DESCRIPTOR_HEAP_DESC descriptorImGuiRender = {};
 				descriptorImGuiRender.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-				descriptorImGuiRender.NumDescriptors = 500; // MAY NEED TO CHANGE THIS IS WE GET MORE THAN 100 ASSETS
+				descriptorImGuiRender.NumDescriptors = MAX_IMAGE_ID; // MAY NEED TO CHANGE THIS IS WE GET MORE THAN 100 ASSETS
 				descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
 				ImageDevice4Fun->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&SwapchainHook::d3d12DescriptorHeapImGuiIMAGE));

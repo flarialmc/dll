@@ -749,10 +749,12 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
         }
     }
 
-    if(ifFontScale2(fontSize)) weightedName += "-2.0";
-    else weightedName += "-1";
+
 
     if(weightedName.contains("minecraft")) weightedName = "164";
+
+    if(ifFontScale2(fontSize)) weightedName += "-2.0";
+    else weightedName += "-1";
 
     if(!FontMap[weightedName] && weightedName.contains("Normal")) replace(weightedName, "Normal", "Medium");
 
