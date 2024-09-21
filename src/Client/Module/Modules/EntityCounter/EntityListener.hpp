@@ -9,24 +9,18 @@
 
 class EntityListener : public Listener {
 public:
-
     Module *module;
 
     void onRender(RenderEvent &event) override {
-
-        int entities = 0;
-
         if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr && SDK::getCurrentScreen() == "hud_screen") {
 
-                for(auto& entity : SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList()) {
-                    entities++;
-                }
+                int entityCount = SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList().size();
+                std::string str = std::format("{}", entityCount);
+
+                this->module->normalRender(24, str);
             }
         }
-
-        std::string value = std::format("{}", entities);
-        this->module->normalRender(24, value);
     }
 
 public:
