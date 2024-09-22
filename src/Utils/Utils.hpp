@@ -282,6 +282,10 @@ public:
 
         return hash;
     }
+
+    static std::wstring StrToWStr(const std::string &s);
+
+    static std::string WStrToStr(const std::wstring &ws);
 };
 
 struct CaretMeasureData {
