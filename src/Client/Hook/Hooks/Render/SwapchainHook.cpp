@@ -26,6 +26,7 @@ ID3D12CommandQueue *SwapchainHook::queue = nullptr;
 
 bool initImgui = false;
 bool allfontloaded = false;
+bool first = false;
 
 static std::chrono::high_resolution_clock fpsclock;
 static std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
@@ -157,18 +158,19 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         }
 
 
+
         /* INIT END */
         /* RENDERING START */
 
     } else {
-
-
         /* IMPORTANT FONT STUFF */
         if (ImGui::GetCurrentContext()) {
 
             bool fontLoaded = false;
 
             if(FlarialGUI::DoLoadModuleFontLater) {
+                if(Client::settings.getSettingByName<bool>("overrideFontWeight")->value) FlarialGUI::LoadModuleFontLaterWeight = FlarialGUI::GetFontWeightFromString(Client::settings.getSettingByName<std::string>("fontWeight")->value);
+
                 std::string font1 = FlarialGUI::LoadModuleFontLater;
                 std::transform(font1.begin(), font1.end(), font1.begin(), ::towlower);
                 std::string weightedName = FlarialGUI::GetWeightedName(font1, FlarialGUI::LoadModuleFontLaterWeight);
@@ -183,6 +185,10 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
             }
 
             if(FlarialGUI::DoLoadGUIFontLater) {
+
+                if(Client::settings.getSettingByName<bool>("overrideFontWeight")->value) FlarialGUI::LoadGUIFontLaterWeight = FlarialGUI::GetFontWeightFromString(Client::settings.getSettingByName<std::string>("fontWeight")->value);
+
+
                 std::string font2 = FlarialGUI::LoadGUIFontLater;
                 std::transform(font2.begin(), font2.end(), font2.begin(), ::towlower);
                 std::string weightedName = FlarialGUI::GetWeightedName(font2, FlarialGUI::LoadGUIFontLaterWeight);
@@ -220,14 +226,16 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                 fontLoaded = true;
             }
 
-            if (!FlarialGUI::FontMap["164"]) {
-                FlarialGUI::FontMap["164"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 20);
+            if (!FlarialGUI::FontMap["164-1"]) {
+                FlarialGUI::FontMap["164-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 23);
+                FlarialGUI::FontMap["164-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 40);
+
                 fontLoaded = true;
             }
 
             if (fontLoaded) {
                 ImGui::GetIO().Fonts->Build();
-                if (d3d11Device) {
+                if (!queue) {
                     ImGui_ImplDX11_InvalidateDeviceObjects();
                     ImGui_ImplDX11_CreateDeviceObjects();
                 }
@@ -243,11 +251,13 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
         /* RENDER SYNC */
 
-        if(init && initImgui)
-        while(FrameTransforms.size() > transformDelay)
-        {
-            MC::Transform = FrameTransforms.front();
-            FrameTransforms.pop();
+        if(init && initImgui) {
+            frameTransformsMtx.lock();
+            while (FrameTransforms.size() > transformDelay) {
+                MC::Transform = FrameTransforms.front();
+                FrameTransforms.pop();
+            }
+            frameTransformsMtx.unlock();
         }
 
          /* RENDER SYNC */
@@ -263,6 +273,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                 ID3D11Resource *resource = D3D11Resources[currentBitmap];
                 d3d11On12Device->AcquireWrappedResources(&resource, 1);
 
+                SaveBackbuffer();
                 D2D::context->SetTarget(D2D1Bitmaps[currentBitmap]);
 
                 DX12Blur();
@@ -335,8 +346,23 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                                 ImGui_ImplWin32_NewFrame();
                                 ImGui::NewFrame();
 
+                                ID3D11Texture2D* buffer2D = nullptr;
+                                D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&buffer2D));
+
+                                ID3D11RenderTargetView* mainRenderTargetView;
+                                d3d11Device->CreateRenderTargetView(buffer2D, NULL, &mainRenderTargetView);
+
                                 RenderEvent event{};
+                                event.RTV = mainRenderTargetView;
+                                //BlurDX12::RenderBlur(SwapchainHook::d3d12CommandList);
                                 EventHandler::onRender(event);
+
+                                if(!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
+                                    FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
+                                 "keybind")->value + " to open the menu in-game.");
+                                    FlarialGUI::Notify("Join our discord! https://flarial.xyz/discord");
+                                    first = true;
+                                }
 
 
                                 D2D::context->EndDraw();
@@ -375,6 +401,9 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
                                 queue->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList* const*>(&d3d12CommandList));
 
+                                Memory::SafeRelease(mainRenderTargetView);
+                                Memory::SafeRelease(buffer2D);
+
                             }
                     }
                 }
@@ -399,6 +428,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
                 DX11Blur();
 
+                SaveBackbuffer();
+
                 D2D::context->BeginDraw();
 
                 MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
@@ -419,10 +450,17 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                         ImGui_ImplWin32_NewFrame();
                         ImGui::NewFrame();
 
-                        Blur::RenderBlur(pBackBuffer, mainRenderTargetView, 3);
-
                         RenderEvent event;
+                        event.RTV = mainRenderTargetView;
                         EventHandler::onRender(event);
+
+                        if(!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
+                            FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
+                         "keybind")->value + " to open the menu in-game.");
+
+                            FlarialGUI::Notify("Join our discord! https://flarial.xyz/discord");
+                            first = true;
+                        }
 
                         D2D::context->EndDraw();
 
@@ -438,7 +476,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
 	            if (mainRenderTargetView) mainRenderTargetView->Release();
 
-	            if (ppContext) ppContext->Release();
+                Memory::SafeRelease(ppContext);
 
             }
 
@@ -496,42 +534,40 @@ void SwapchainHook::DX11Init() {
             D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
             D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED), 96.0, 96.0);
     D2D::context->CreateBitmapFromDxgiSurface(eBackBuffer, props, &D2D1Bitmap);
-
     //ImGui Init
 
     if(!initImgui) {
         ImGui::CreateContext();
 
-        ID3D11DeviceContext* ppContext = nullptr;
-        d3d11Device->GetImmediateContext(&ppContext);
+        d3d11Device->GetImmediateContext(&context);
         ImGui_ImplWin32_Init(window);
-        ImGui_ImplDX11_Init(d3d11Device, ppContext);
-        ppContext->Release();
-
+        ImGui_ImplDX11_Init(d3d11Device, context);
         initImgui = true;
 
     }
 
-    Blur::blur(d3d11Device);
+    SaveBackbuffer();
 
+    Blur::InitializePipeline();
     Memory::SafeRelease(eBackBuffer);
     init = true;
 }
 
 
 void SwapchainHook::DX12Init() {
+
+
                 ID3D12Device5 *device;
             swapchain->GetDevice(IID_PPV_ARGS(&d3d12Device5));
 
             if (SUCCEEDED(swapchain->GetDevice(IID_PPV_ARGS(&device))) &&
                 kiero::getRenderType() == kiero::RenderType::D3D12) {
-                ID3D11Device *d3d11device;
                 D3D11On12CreateDevice(device,
                                       D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
-                                      (IUnknown **) &queue, 1, 0, &d3d11device, &context,
+                                      (IUnknown **) &queue, 1, 0, &SwapchainHook::d3d11Device, &context,
                                       nullptr);
 
-                d3d11device->QueryInterface(IID_PPV_ARGS(&d3d11On12Device));
+                d3d11Device->QueryInterface(IID_PPV_ARGS(&d3d11On12Device));
 
                 D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS;
                 ID2D1Factory7 *d2dFactory;
@@ -602,10 +638,104 @@ void SwapchainHook::DX12Init() {
 
                 Memory::SafeRelease(device);
                 Memory::SafeRelease(device2);
-                Memory::SafeRelease(d3d11device);
                 Memory::SafeRelease(dxgiDevice);
                 Memory::SafeRelease(d2dFactory);
 
+                Blur::InitializePipeline();
                 init = true;
             }
+}
+
+ID3D11Texture2D* SwapchainHook::GetBackbuffer()
+{
+    return SavedD3D11BackBuffer;
+}
+
+  void SwapchainHook::SaveBackbuffer() {
+
+    if(!SwapchainHook::queue) {
+
+        Memory::SafeRelease(SavedD3D11BackBuffer);
+
+        ID3D11DeviceContext* deviceContext = SwapchainHook::context;
+        IDXGISurface1* backBuffer = nullptr;
+        HRESULT hr;
+        SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
+
+        ID3D11Texture2D* buffer2D = nullptr;
+        if(FAILED(backBuffer->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&buffer2D)))) std::cout << "failed to get 2d" << std::endl;
+
+        D3D11_TEXTURE2D_DESC desc;
+        buffer2D->GetDesc(&desc);
+        HRESULT r;
+
+        if(!stageTex) {
+            D3D11_TEXTURE2D_DESC stageDesc = desc;
+            stageDesc.Usage = D3D11_USAGE_STAGING;
+            stageDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+            stageDesc.BindFlags = 0;
+            r = SwapchainHook::d3d11Device->CreateTexture2D(&stageDesc, nullptr, &stageTex);
+            if (FAILED(r))  std::cout << "Failed to create stage texture: " << std::hex << r << std::endl;
+        }
+        deviceContext->CopyResource(stageTex, buffer2D);
+
+
+
+        D3D11_TEXTURE2D_DESC defaultDesc = desc;
+        defaultDesc.Usage = D3D11_USAGE_DEFAULT;
+        defaultDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        defaultDesc.CPUAccessFlags = 0;
+
+        if(!SavedD3D11BackBuffer) {
+            hr = SwapchainHook::d3d11Device->CreateTexture2D(&defaultDesc, nullptr, &SavedD3D11BackBuffer);
+            if (FAILED(hr)) {
+                std::cout << "Failed to create def texture: " << std::hex << r << std::endl;
+            }
+        }
+
+        deviceContext->CopyResource(SavedD3D11BackBuffer, stageTex);
+
+        Memory::SafeRelease(backBuffer);
+        Memory::SafeRelease(buffer2D);
+    } else {
+
+
+        ID3D11Texture2D* buffer2D = nullptr;
+        HRESULT hr;
+        hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&buffer2D));
+        if (FAILED(hr))  std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
+
+        ID3D11DeviceContext* deviceContext = context;
+
+        D3D11_TEXTURE2D_DESC desc;
+        buffer2D->GetDesc(&desc);
+        HRESULT r;
+
+        if(!stageTex) {
+            D3D11_TEXTURE2D_DESC stageDesc = {};
+            stageDesc = desc;
+            stageDesc.Usage = D3D11_USAGE_STAGING;
+            stageDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
+            stageDesc.BindFlags = 0;
+            stageDesc.MiscFlags = 0;
+            r = SwapchainHook::d3d11Device->CreateTexture2D(&stageDesc, nullptr, &stageTex);
+            if (FAILED(r))  std::cout << "Failed to create stage texture: " << std::hex << r << std::endl;
+        }
+        deviceContext->CopyResource(stageTex, buffer2D);
+
+        D3D11_TEXTURE2D_DESC defaultDesc = desc;
+        defaultDesc.Usage = D3D11_USAGE_DEFAULT;
+        defaultDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        defaultDesc.CPUAccessFlags = 0;
+
+        if(!SavedD3D11BackBuffer) {
+            hr = SwapchainHook::d3d11Device->CreateTexture2D(&defaultDesc, nullptr, &SavedD3D11BackBuffer);
+            if (FAILED(hr)) {
+                std::cout << "Failed to create def texture: " << std::hex << r << std::endl;
+            }
+        }
+
+        deviceContext->CopyResource(SavedD3D11BackBuffer, stageTex);
+        Memory::SafeRelease(buffer2D);
+    }
 }

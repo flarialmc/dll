@@ -225,7 +225,7 @@ public:
                 int i3 = 0;
                 float i2 = 0;
 
-                for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap()) {
+                for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
 
                     i3++;
 
@@ -249,7 +249,7 @@ public:
                 float fakex = realcenter.x;
                 float fixer = 0;
 
-                for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap()) {
+                for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
 
                     i3++;
                     if (i3 % 10 == 1) {
@@ -329,11 +329,13 @@ public:
                 if (yes) {
 
                     auto vecmap = copyMapInAlphabeticalOrder(
-                            SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap());
+                            SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap());
                     for (const auto &pair: vecmap) {
 
                         i++;
-                        std::string name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pair.second.name)); // TODO: this does not clear all special symbols?
+                        // std::string name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pair.second.name));
+                        std::string name = Utils::removeColorCodes(pair.second.name);
+                        if (name.empty()) continue;
 
 
                         auto it = std::find(ModuleManager::onlineUsers.begin(), ModuleManager::onlineUsers.end(), name);
@@ -423,7 +425,7 @@ public:
                         FlarialGUI::FlarialTextWithFont(fakex + xx + Constraints::SpacingConstraint(0.5, keycardSize),
                                                         realcenter.y +
                                                         Constraints::SpacingConstraint(0.12, keycardSize),
-                                                        FlarialGUI::to_wide(name).c_str(),
+                                                        Utils::StrToWStr(name).c_str(),
                                                         keycardSize * 5, keycardSize,
                                                         DWRITE_TEXT_ALIGNMENT_LEADING, fontSize,
                                                         DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
@@ -438,7 +440,7 @@ public:
                     }
 
                 } else {
-                    for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getlevel()->getPlayerMap()) {
+                    for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
 
                         i++;
 

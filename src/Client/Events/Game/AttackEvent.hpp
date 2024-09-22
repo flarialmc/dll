@@ -3,7 +3,7 @@
 #include "../Cancellable.hpp"
 #include "../../../SDK/Client/Actor/Actor.hpp"
 
-class AttackEvent : public Event {
+class AttackEvent : public Event, public Cancellable {
     Actor* actor;
 public:
     Actor* getActor() {

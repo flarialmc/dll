@@ -15,6 +15,8 @@
 #include "Hooks/Visual/OverworldFogColorHook.hpp"
 #include "Hooks/Visual/TimeChangerHook.hpp"
 #include "Hooks/Game/getSensHook.hpp"
+#include "Hooks/Render/TextureGroup_getTextureHook.hpp"
+#include "Hooks/Render/HudMobEffectsRenderer.hpp"
 //#include "Hooks/Game/RenderItemGroup.hpp"
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 
@@ -45,6 +47,7 @@ void HookManager::initialize() {
 
     if (!Client::settings.getSettingByName<bool>("killdx")->value) hooks.push_back(new CommandListHook());
 
+    hooks.push_back(new TextureGroup_getTextureHook());
     hooks.push_back(new getViewPerspectiveHook());
     // hooks.push_back(new RenderActorHook());
     hooks.push_back(new RaknetTickHook());
@@ -63,6 +66,7 @@ void HookManager::initialize() {
     hooks.push_back(new TimeChangerHook());
     hooks.push_back(new SendPacketHook());
     hooks.push_back(new getSensHook());
+    hooks.push_back(new HudMobEffectsRendererHook());
     //hooks.push_back(new RenderItemGroupHook());
     //hooks.push_back(new getCurrentSwingDuration());
 

@@ -19,6 +19,8 @@ std::string Client::settingspath = Utils::getRoamingPath() + R"(\Flarial\Config\
 Settings Client::settings = Settings();
 bool notifiedOfConnectionIssue = false;
 
+std::string current_commit = COMMIT_HASH;
+
 void DownloadAndSave(const std::string& url, const std::string& path) {
 
     if (Client::settings.getSettingByName<bool>("dlassets")->value || !std::filesystem::exists(path)) {
@@ -51,7 +53,9 @@ void setWindowTitle(std::wstring title) {
 }
 
 void Client::initialize() {
-    setWindowTitle(L"Flarial");
+
+    std::string title = WinrtUtils::getFormattedVersion() + " " + current_commit;
+    setWindowTitle(L"Flarial " + FlarialGUI::to_wide(title));
     Logger::debug("[INIT] Initializing Flarial...");
     
     VersionUtils::init();
@@ -61,6 +65,8 @@ void Client::initialize() {
 
     if (!VersionUtils::isSupported(Client::version)) {
         Logger::debug("[INFO] Version not supported!");
+        MessageBox(NULL, "Flarial: this version is not supported!", "", MB_OK);
+        ModuleManager::terminate();
         Client::disable = true;
         return;
     }
@@ -100,7 +106,7 @@ void Client::initialize() {
         Client::settings.addSetting("blurintensity", 18.0f);
 
     if (Client::settings.getSettingByName<bool>("killdx") == nullptr)
-        Client::settings.addSetting("killdx", false);
+        Client::settings.addSetting("killdx", true); // TODO: Fix dx12 stuff and set this to false again
 
     if (Client::settings.getSettingByName<bool>("disable_alias") == nullptr)
         Client::settings.addSetting("disable_alias", false);
@@ -147,6 +153,18 @@ void Client::initialize() {
     if (Client::settings.getSettingByName<float>("rgb_value") == nullptr)
         Client::settings.addSetting("rgb_value", 1.0f);
 
+    if (Client::settings.getSettingByName<float>("modules_font_scale") == nullptr)
+        Client::settings.addSetting("modules_font_scale", 1.0f);
+
+    if (Client::settings.getSettingByName<float>("gui_font_scale") == nullptr)
+        Client::settings.addSetting("gui_font_scale", 1.0f);
+
+    if (Client::settings.getSettingByName<bool>("overrideFontWeight") == nullptr)
+        Client::settings.addSetting("overrideFontWeight", (bool)false);
+
+    if (Client::settings.getSettingByName<std::string>("fontWeight") == nullptr)
+        Client::settings.addSetting("fontWeight", (std::string) "Normal");
+
     FlarialGUI::LoadFont(IDR_FONT_TTF);
 
     FlarialGUI::LoadFont(IDR_FONT_BOLD_TTF);
@@ -158,11 +176,6 @@ void Client::initialize() {
     HookManager::initialize();
     ModuleManager::initialize();
     Logger::debug("[Client] Ready.");
-
-    if (!Client::disable) {
-        FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                "keybind")->value + " to open the menu in-game.");
-    }
 }
 
 std::string window = "Minecraft";
@@ -196,8 +209,8 @@ void Client::centerCursor() {
         }
 
 
-        if ((SDK::currentScreen != "hud_screen" && InHudScreen) ||
-            (SDK::currentScreen == "hud_screen" && !InHudScreen)) {
+        if ((SDK::getCurrentScreen() != "hud_screen" && InHudScreen) ||
+            (SDK::getCurrentScreen() == "hud_screen" && !InHudScreen)) {
             GetWindowRect(hWnd, &currentRect);
             GetClientRect(hWnd, &clientRect);
 

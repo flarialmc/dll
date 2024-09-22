@@ -89,6 +89,10 @@ public:
         return Vec2<T>(this->x * v.x, this->y * v.y);
     };
 
+    auto mul(float v) -> Vec2<T> {
+        return Vec2<T>(this->x * v, this->y * v);
+    };
+
     auto dist(const Vec2<T> &v) -> float {
         auto dX = this->x - v.x;
         auto dY = this->y - v.y;
@@ -103,6 +107,10 @@ public:
     auto operator+(const Vec2<T> Vec) {
 		return Vec2(this->x + Vec.x, this->y + Vec.y);
 	}
+
+    auto operator==(const Vec2<T> Vec) {
+        return this->x == Vec.x && this->y == Vec.y;
+    }
 
 	auto operator-(const Vec2<T> Vec) {
 		return Vec2(this->x - Vec.x, this->y - Vec.y);
@@ -168,6 +176,10 @@ public:
 
     auto mul(const Vec3<T> &vec) -> Vec3<T> {
         return Vec3<T>(this->x * vec.x, this->y * vec.y, this->z * vec.z);
+    };
+
+    auto lerp(const Vec3<T> &vec, T t) -> Vec3<T> {
+        return Vec3<T>(std::lerp(this->x, vec.x, t), std::lerp(this->y, vec.y, t), std::lerp(this->z, vec.z, t));
     };
 
     auto mul(T v) -> Vec3<T> {
@@ -259,6 +271,8 @@ public:
 
     static bool CursorInEllipse(float ellipseX, float ellipseY, float radiusX, float radiusY);
 
+    static int CountBytes(const std::string &data);
+
     static constexpr unsigned int hash(const char *str) {
         unsigned int hash = 5381;
         int c;
@@ -268,6 +282,10 @@ public:
 
         return hash;
     }
+
+    static std::wstring StrToWStr(const std::string &s);
+
+    static std::string WStrToStr(const std::wstring &ws);
 };
 
 struct CaretMeasureData {
