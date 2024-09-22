@@ -4,6 +4,8 @@
 #include <sstream>
 #include <algorithm>
 #include <iostream>
+#include <codecvt>
+#include <regex>
 
 std::string Utils::getRoamingPath() {
     char *path = nullptr;
@@ -25,36 +27,68 @@ bool Utils::hasEnding (std::string const &fullString, std::string const &ending)
     }
 }
 
-
 std::string Utils::removeColorCodes(const std::string &input) {
     std::string result;
-    std::string newinput = input;
 
     bool skipNext = false;
-
-    for (wchar_t c: FlarialGUI::to_wide(newinput)) {
+    for (size_t i = 0; i < input.size();) {
         if (skipNext) {
             skipNext = false;
-        } else if (c == L'§') {
+            ++i;
+        } else if (input[i] == '\xC2' && i + 1 < input.size() && input[i + 1] == '\xA7') {
             skipNext = true;
+            i += 2;
         } else {
-            result += (char)c;
+            if ((input[i] & 0xC0) == 0xC0) { // UTF-8 continuation byte
+                size_t bytesLeft = 0;
+                while ((input[i + bytesLeft] & 0xC0) == 0x80) {
+                    ++bytesLeft;
+                }
+                result.append(input, i, bytesLeft + 1);
+                i += bytesLeft + 1;
+            } else {
+                result += input[i];
+                ++i;
+            }
         }
     }
-
-    result.erase(std::prev(result.end()));
-
 
     return result;
 }
 
-std::string Utils::removeNonAlphanumeric(const std::string &input) {
-    std::string result;
-    std::copy_if(input.begin(), input.end(), std::back_inserter(result), [](char c) {
-        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' || c == ' ';
+std::wstring Utils::StrToWStr(std::string const& s) {
+    // Latite
+    int slength = static_cast<int>(s.length()) + 1;
+    int len = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), slength, 0, 0);
+    wchar_t* buf = new wchar_t[len];
+    MultiByteToWideChar(CP_UTF8, 0, s.c_str(), slength, buf, len);
+    std::wstring r(buf);
+    delete[] buf;
+    return r;
+}
 
-    });
-    return result;
+std::string Utils::WStrToStr(std::wstring const& ws) {
+    // Latite
+    std::string ret;
+    int len = WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), static_cast<int>(ws.size()), NULL, 0, NULL, NULL);
+    if (len > 0) {
+        ret.resize(len);
+        WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), static_cast<int>(ws.size()), &ret[0], len, NULL, NULL);
+    }
+    return ret;
+}
+
+std::string Utils::removeNonAlphanumeric(const std::string &input) {
+    std::regex pattern("[A-Za-z][A-Za-z0-9 ]{2,16}");
+    std::smatch match;
+    if (std::regex_search(input, match, pattern)) {
+        std::string nickname = match.str();
+        // Remove trailing spaces
+        nickname.erase(nickname.find_last_not_of(" ") + 1);
+        return nickname;
+    } else {
+        return "";
+    }
 }
 
 std::string Utils::remomveNonNumeric(const std::string &input) {

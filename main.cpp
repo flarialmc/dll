@@ -95,17 +95,22 @@ DWORD WINAPI init(HMODULE real)
                             auto module = ModuleManager::getModule("Nick");
 
                             if(SDK::clientInstance != nullptr)
-                                if(SDK::clientInstance->getLocalPlayer() != nullptr)
-                                    if (module->isEnabled()) {
-                                        name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickListener::original));
-                                        name = replaceAll(name, "�", "");
+                            if(SDK::clientInstance->getLocalPlayer() != nullptr) {
+                                if (module->isEnabled()) {
+                                    name = Utils::removeNonAlphanumeric(
+                                            Utils::removeColorCodes(NickListener::original));
+                                    name = replaceAll(name, "�", "");
 
-                                    }
+                                }
+                                std::string clearedName = Utils::removeNonAlphanumeric(Utils::removeColorCodes(name));
+                                if (clearedName.empty()) clearedName = Utils::removeColorCodes(name);
+                                // send thing
+                                std::cout << DownloadString(
+                                        std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}", clearedName,
+                                                    ipToSend)) << std::endl;
 
-                            std::cout << std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend) << std::endl;
-                            std::cout << DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend)) << std::endl;
-
-                            lastBeatTime = now;
+                                lastBeatTime = now;
+                            }
                         }
                     }
                 }
