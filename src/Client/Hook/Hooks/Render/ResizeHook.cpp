@@ -5,6 +5,7 @@
 #include "ResizeHook.hpp"
 #include "../../../GUI/D2D.hpp"
 #include "SwapchainHook.hpp"
+#include "../../../Client.hpp"
 #include "../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
 #include "../../../Module/Modules/MotionBlur/MotionBlurListener.hpp"
 #include "../../../Module/Manager.hpp"
@@ -43,7 +44,7 @@ ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT wi
                 if(SDK::clientInstance!=nullptr)
                     SDK::clientInstance->releaseMouse();
 
-    return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, flags);
+    return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, DXGI_PRESENT_ALLOW_TEARING);
 }
 // TODO: get back to this to check
 void ResizeHook::cleanShit(bool isResize) {
