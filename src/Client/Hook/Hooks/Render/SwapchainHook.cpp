@@ -148,6 +148,9 @@ void prepareBlur() {
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
 
+
+    fD3D11 = Client::settings.getSettingByName<bool>("killdx")->value;
+
     if(!fEnabled) return DXGI_ERROR_DEVICE_RESET;
 
     if(Client::disable) {
@@ -160,17 +163,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     std::chrono::duration<float> elapsed = std::chrono::high_resolution_clock::now() - start;
     MC::frames += 1;
 
-    if (Client::settings.getSettingByName<bool>("killdx")->value) {
-        SwapchainHook::queue = nullptr;
-        ID3D12Device5* d3d12device3;
-        if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device3)))) {
-            Logger::debug("[SwapChain] Removed d3d12 device");
-            pSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
-            d3d12device3->RemoveDevice();
-
-            return funcOriginal(pSwapChain, syncInterval, flags);
-        }
-    }
 
     if (elapsed.count() >= 0.5f) {
         // Calculate frame rate based on elapsed time
