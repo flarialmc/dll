@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <ranges>
 #include <string>
 #include <cstdlib>
 #include <cmath>
@@ -146,7 +147,7 @@ public:
         return Vec3<T>(this->x - x, this->y - y, this->z - z);
     };
 
-    auto sub(const Vec3<T> &vec) -> Vec3<T> {
+    auto sub(const Vec3<T>& vec) const -> Vec3<T> {
         return Vec3<T>(this->x - vec.x, this->y - vec.y, this->z - vec.z);
     };
 
@@ -286,6 +287,13 @@ public:
     static std::wstring StrToWStr(const std::string &s);
 
     static std::string WStrToStr(const std::wstring &ws);
+
+    static std::vector<std::string> splitString(const std::string& str, char delimiter) {
+        return str
+          | std::views::split(delimiter)
+          | std::views::transform([](auto&& token) { return std::string{token.begin(), token.end()}; })
+          | std::ranges::to<std::vector>();
+    }
 };
 
 struct CaretMeasureData {

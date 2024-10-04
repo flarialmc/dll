@@ -11,6 +11,7 @@
 #include "../Render/GLMatrix.hpp"
 #include "../Level/LevelRender/LevelRender.hpp"
 #include "../Network/Raknet/RaknetConnector.hpp"
+#include "../Render/Camera.hpp"
 
 class ClientInstance {
 public:
@@ -25,6 +26,11 @@ public:
     GLMatrix getViewMatrix() {
         return hat::member_at<GLMatrix>(this, GET_OFFSET("ClientInstance::viewMatrix"));
     };
+
+    mce::Camera& getCamera() {
+        static int off = GET_OFFSET("ClientInstance::camera");
+        return hat::member_at<mce::Camera>(this, off);
+    }
 
     LocalPlayer *getLocalPlayer();
 

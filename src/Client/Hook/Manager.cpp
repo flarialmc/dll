@@ -17,6 +17,7 @@
 #include "Hooks/Game/getSensHook.hpp"
 #include "Hooks/Render/TextureGroup_getTextureHook.hpp"
 #include "Hooks/Render/HudMobEffectsRenderer.hpp"
+#include "Hooks/Visual/BaseActorRendererRenderTextHook.hpp"
 //#include "Hooks/Game/RenderItemGroup.hpp"
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 
@@ -69,6 +70,7 @@ void HookManager::initialize() {
     hooks.push_back(new HudMobEffectsRendererHook());
     //hooks.push_back(new RenderItemGroupHook());
     //hooks.push_back(new getCurrentSwingDuration());
+    hooks.push_back(new BaseActorRendererRenderTextHook());
 
     for (auto hook: hooks)
         hook->enableHook();
