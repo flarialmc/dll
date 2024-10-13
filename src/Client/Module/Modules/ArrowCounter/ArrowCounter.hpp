@@ -32,6 +32,18 @@ public:
 
     void settingsRender() override {
 
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
+
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
+
+
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(0.88f, "height"));
+
+
         this->addHeader("Main");
         this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
         this->addToggle("Border", "",  this->settings.getSettingByName<bool>(
@@ -50,7 +62,6 @@ public:
 
         this->extraPadding();
 
-                                        DWRITE_FONT_WEIGHT_NORMAL);
         this->addHeader("Colors");
         this->addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
         this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
@@ -76,8 +87,7 @@ public:
 
         this->addSlider("Rotation", "see for yourself!", this->settings.getSettingByName<float>("rotation")->value);
 
+        FlarialGUI::UnsetScrollView();
         this->resetPadding();
-
-
     }
 };
