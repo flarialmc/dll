@@ -130,13 +130,6 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
     if (!fEnabled)
         fEnabled = TRUE;
 
-    ID3D12CommandQueue *pCommandQueue = NULL;
-    if (fD3D11 && !pDevice->QueryInterface(IID_PPV_ARGS(&pCommandQueue)))
-    {
-        pCommandQueue->Release();
-        return DXGI_ERROR_INVALID_CALL;
-    }
-
     pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
     MADECHAIN = TRUE;
     return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
@@ -150,8 +143,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         return DXGI_ERROR_DEVICE_RESET;
     }
 
-    if(!MADECHAIN) {
-        std::cout << "FOr real" << std::endl;
+    if(!MADECHAIN && fEnabled) {
         return funcOriginal(pSwapChain, syncInterval, flags);
     }
 
@@ -209,8 +201,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
             DX12Init();
 
         }
-
-
 
         /* INIT END */
         /* RENDERING START */
