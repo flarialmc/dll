@@ -35,6 +35,7 @@ public:
             settings.addSetting("percentageX", 0.0f);
             settings.addSetting("percentageY", 0.0f);
         }
+        if (settings.getSettingByName<bool>("show_offhand") == nullptr) settings.addSetting("show_offhand", true);
         if (settings.getSettingByName<bool>("vertical") == nullptr) settings.addSetting("vertical", false);
         if (settings.getSettingByName<bool>("durability_left") == nullptr) settings.addSetting("durability_left", false);
         if (settings.getSettingByName<bool>("percent") == nullptr) settings.addSetting("percent", false);
@@ -78,7 +79,11 @@ public:
 
         this->addSlider("Size", "", this->settings.getSettingByName<float>("uiscale")->value);
         this->addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", this->settings.getSettingByName<bool>("vertical")->value);
+        if(this->settings.getSettingByName<bool>("vertical")->value){
+            this->addToggle("Durability to the left", "", this->settings.getSettingByName<bool>("durability_left")->value);
+        }
 
+        this->addToggle("Show offhand item", "", this->settings.getSettingByName<bool>("show_offhand")->value);
 
         this->addToggle("Change Color", "", this->settings.getSettingByName<bool>("color")->value);
 
@@ -88,9 +93,6 @@ public:
         this->addToggle("Show Durability", "", this->settings.getSettingByName<bool>("showdurability")->value);
         this->addConditionalSlider(this->settings.getSettingByName<bool>("showdurability")->value, "Text Size", "Text size of Durability", this->settings.getSettingByName<float>("textSize")->value, 0.25f, 0.0f, true);
         this->addToggle("Show Durability in %", "", this->settings.getSettingByName<bool>("percent")->value);
-        if(this->settings.getSettingByName<bool>("vertical")->value){
-            this->addToggle("Durability to the left", "", this->settings.getSettingByName<bool>("vertical")->value);
-        }
 
         this->extraPadding();
         this->addHeader("Colors");
