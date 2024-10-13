@@ -86,6 +86,13 @@ void SwapchainHook::enableHook() {
         kiero::bind(8, (void**)&funcOriginal, (void*)swapchainCallback);
     }
 
+    // CREDIT @AETOPIA
+
+    IDXGIFactory2 *pFactory = NULL;
+    CreateDXGIFactory(IID_PPV_ARGS(&pFactory));
+    Memory::hookFunc((*(LPVOID **)pFactory)[16], (void*) CreateSwapChainForCoreWindow, (void**) &IDXGIFactory2_CreateSwapChainForCoreWindow, "CreateSwapchainForCoreWindow");
+    Memory::SafeRelease(pFactory);
+
     bool isRTSS = containsModule(L"RTSSHooks64.dll");
 
     if(isRTSS) {
@@ -100,7 +107,53 @@ void SwapchainHook::enableHook() {
 
 bool SwapchainHook::init = false;
 
+
+// CREDIT @AETOPIA
+
+BOOL _ = FALSE, $ = FALSE, fEnabled = FALSE, fD3D11 = FALSE, MADECHAIN = FALSE;
+
+HRESULT(*IDXGISwapChain_ResizeBuffers)
+(IDXGISwapChain *This, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags) = NULL;
+
+HRESULT (*IDXGISwapChain_Present)(IDXGISwapChain *, UINT, UINT) = NULL;
+
+HRESULT(*SwapchainHook::IDXGIFactory2_CreateSwapChainForCoreWindow)
+(IDXGIFactory2 *This, IUnknown *pDevice, IUnknown *pWindow, const DXGI_SWAP_CHAIN_DESC1 *pDesc,
+ IDXGIOutput *pRestrictToOutput, IDXGISwapChain1 **ppSwapChain) = NULL;
+
+HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknown *pDevice, IUnknown *pWindow,
+                                     DXGI_SWAP_CHAIN_DESC1 *pDesc, IDXGIOutput *pRestrictToOutput,
+                                     IDXGISwapChain1 **ppSwapChain)
+
+{
+
+    if (!fEnabled)
+        fEnabled = TRUE;
+
+    ID3D12CommandQueue *pCommandQueue = NULL;
+    if (fD3D11 && !pDevice->QueryInterface(IID_PPV_ARGS(&pCommandQueue)))
+    {
+        pCommandQueue->Release();
+        return DXGI_ERROR_INVALID_CALL;
+    }
+
+    pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+    MADECHAIN = TRUE;
+    return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
+}
+
+// CREDIT @AETOPIA
+
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
+
+    if(!fEnabled) {
+        return DXGI_ERROR_DEVICE_RESET;
+    }
+
+    if(!MADECHAIN) {
+        std::cout << "FOr real" << std::endl;
+        return funcOriginal(pSwapChain, syncInterval, flags);
+    }
 
     swapchain = pSwapChain;
     flagsreal = flags;
@@ -113,7 +166,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
             pSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
             d3d12device3->RemoveDevice();
 
-            return funcOriginal(pSwapChain, syncInterval, flags);
+            return funcOriginal(pSwapChain, syncInterval, flags | DXGI_PRESENT_ALLOW_TEARING);
         }
     }
 
@@ -487,17 +540,11 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     /* EACH FRAME STUFF */
 
-    try {
-        if(init && initImgui && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImages();
-    } catch (const std::exception &ex) { return 0; }
-
-    //if(init && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImageToCache();
-
     if (Client::settings.getSettingByName<bool>("vsync")->value) {
-        return funcOriginal(pSwapChain, 0, DXGI_PRESENT_DO_NOT_WAIT);
+        return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
     }
 
-    return funcOriginal(pSwapChain, syncInterval, flags);
+return funcOriginal(pSwapChain, syncInterval, flags);
 
 }
 
