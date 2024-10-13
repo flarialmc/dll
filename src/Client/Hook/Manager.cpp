@@ -45,10 +45,11 @@ void HookManager::initialize() {
     hooks.push_back(new KeyHook());
     hooks.push_back(new MouseHook());
 
+    if (!Client::settings.getSettingByName<bool>("killdx")->value) hooks.push_back(new CommandListHook());
+
     hooks.push_back(new SwapchainHook());
     hooks.push_back(new ResizeHook());
 
-    if (!Client::settings.getSettingByName<bool>("killdx")->value) hooks.push_back(new CommandListHook());
 
     hooks.push_back(new TextureGroup_getTextureHook());
     hooks.push_back(new getViewPerspectiveHook());
