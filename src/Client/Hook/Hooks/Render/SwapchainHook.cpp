@@ -487,7 +487,9 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     /* EACH FRAME STUFF */
 
-    if(init && initImgui && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImages();
+    try {
+        if(init && initImgui && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImages();
+    } catch (const std::exception &ex) {};
 
     //if(init && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImageToCache();
 
