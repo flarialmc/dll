@@ -540,6 +540,10 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     /* EACH FRAME STUFF */
 
+    try {
+        if(init && initImgui && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImages();
+    } catch (const std::exception &ex) { return 0; }
+
     if (Client::settings.getSettingByName<bool>("vsync")->value) {
         return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
     }
