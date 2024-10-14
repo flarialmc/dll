@@ -20,7 +20,6 @@ public:
     Vec2<float> currentPos;
     bool enabled = false;
     static inline Vec2<float> oriXY = Vec2<float>{0.0f, 0.0f};
-    static inline Vec2<float> lastAppliedPos = Vec2<float>{0.0f, 0.0f};
 
     void onRender(RenderEvent &event) override {
 
@@ -68,7 +67,6 @@ public:
     void onSetupAndRender(SetupAndRenderEvent &event) override {
         if(this->module->isEnabled())
         if(SDK::getCurrentScreen() == "hud_screen") {
-            if(lastAppliedPos == currentPos && !module->settings.getSettingByName<bool>("alwaysshow")->value) return;
             SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl>& control) {
 
                 if (control->getLayerName() == "hud_player") {
@@ -90,8 +88,6 @@ public:
                         auto component = reinterpret_cast<CustomRenderComponent*>(control->getComponents()[4].get());
                         component->renderer->state = 1.0f;
                     }
-
-                    lastAppliedPos = currentPos;
 
                     return; // dont go through other controls
                 }

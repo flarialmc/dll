@@ -333,7 +333,9 @@ public:
                     for (const auto &pair: vecmap) {
 
                         i++;
-                        std::string name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pair.second.name)); // TODO: this does not clear all special symbols?
+                        // std::string name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pair.second.name));
+                        std::string name = Utils::removeColorCodes(pair.second.name);
+                        if (name.empty()) continue;
 
 
                         auto it = std::find(ModuleManager::onlineUsers.begin(), ModuleManager::onlineUsers.end(), name);
@@ -423,7 +425,7 @@ public:
                         FlarialGUI::FlarialTextWithFont(fakex + xx + Constraints::SpacingConstraint(0.5, keycardSize),
                                                         realcenter.y +
                                                         Constraints::SpacingConstraint(0.12, keycardSize),
-                                                        FlarialGUI::to_wide(name).c_str(),
+                                                        Utils::StrToWStr(name).c_str(),
                                                         keycardSize * 5, keycardSize,
                                                         DWRITE_TEXT_ALIGNMENT_LEADING, fontSize,
                                                         DWRITE_FONT_WEIGHT_NORMAL, textColor, true);

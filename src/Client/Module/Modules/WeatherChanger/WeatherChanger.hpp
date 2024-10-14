@@ -71,11 +71,10 @@ public:
                 "snow")->value))
             this->settings.getSettingByName<bool>("snow")->value = !this->settings.getSettingByName<bool>(
                     "snow")->value;
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth / 2.0f), toggleY,
-                                        L"Snow (intensity depends on rain)",
-                                        Constraints::SpacingConstraint(4.5, textWidth), textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::SpacingConstraint(0.95, textWidth),
+
+        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
+                                        L"Snow (intensity depends on rain)", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
     }
 };

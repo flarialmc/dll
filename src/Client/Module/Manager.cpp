@@ -67,6 +67,10 @@
 #include <algorithm>
 
 #include "Modules/ItemPhysics/ItemPhysics.hpp"
+#include "Modules/OpponentReach/OpponentReach.hpp"
+#include "Modules/ViewModel/ViewModel.hpp"
+#include "Modules/PotionHUD/PotionHUD.hpp"
+#include "Modules/FasterInventory/FasterInventory.hpp"
 
 namespace ModuleManager {
     std::unordered_map<size_t, Module*> moduleMap;
@@ -128,11 +132,8 @@ void ModuleManager::initialize() {
     addModule(new HurtColor());
     addModule(new FogColor());
     addModule(new ArmorHUD());
-
     addModule(new TimeChanger());
-
     addModule(new RenderOptions());
-
     addModule(new PaperDoll());
     addModule(new GuiScale());
     addModule(new WeatherChanger());
@@ -153,9 +154,15 @@ void ModuleManager::initialize() {
     addModule(new AutoRQ());
     addModule(new HitPing());
     addModule(new InstantHurtAnimation());
+    addModule(new OpponentReach());
+    addModule(new ViewModel());
+    addModule(new PotionHUD());
+    addModule(new FasterInventory());
+
     //addModule(new MovableChat());
     //addModule(new CompactChat());
     addModule(new ItemPhysics());
+
 
     EventHandler::registerListener(new GUIKeyListener("GuiKeyListener"));
     EventHandler::registerListener(new DiscordRPCListener("DiscordRPC"));

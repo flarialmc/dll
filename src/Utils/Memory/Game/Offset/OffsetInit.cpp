@@ -3,6 +3,31 @@
 #include "../../../Logger/Logger.hpp"
 #include "../SignatureAndOffsetManager.hpp"
 
+void OffsetInit::init2130() {
+    Logger::debug("[Offsets] Loading offsets for 1.21.3X");
+
+    ADD_OFFSET("Player::gamemode", 0xB18);
+    ADD_OFFSET("Player::playerName", 0xCA0);
+
+    ADD_OFFSET("Level::hitResult", 0x230);
+    ADD_OFFSET("Level::getPlayerMap", 0xC08);
+
+    ADD_OFFSET("ClientInstance::viewMatrix", 0x360);
+    ADD_OFFSET("ClientInstance::getFovX", 0x720);
+    ADD_OFFSET("ClientInstance::getFovY", 0x734);
+
+    ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x614);
+
+    ADD_OFFSET("ClientInstance::guiData", 0x588);
+
+    ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x1A0);
+
+    ADD_OFFSET("MoveInputComponent::forward", 0x2C);
+    ADD_OFFSET("MoveInputComponent::backward", 0x2D);
+    ADD_OFFSET("MoveInputComponent::left", 0x2E);
+    ADD_OFFSET("MoveInputComponent::right", 0x2F);
+}
+
 void OffsetInit::init2120() {
     Logger::debug("[Offsets] Loading offsets for 1.21.2X");
 
@@ -150,6 +175,8 @@ void OffsetInit::init2050() {
     ADD_OFFSET("Level::getPlayerMap", 0x1EA8);
 
     ADD_OFFSET("ItemActor::stack", 0x4C8);
+
+    ADD_OFFSET("OptionInfo::TranslateName", 0x158);
 }
 
 void OffsetInit::init2040() {

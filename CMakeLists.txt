@@ -5,6 +5,20 @@ include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 23)
 
+execute_process(
+        COMMAND git rev-parse --short HEAD
+        OUTPUT_VARIABLE COMMIT_HASH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/commit_hash.h.in
+        ${CMAKE_CURRENT_BINARY_DIR}/commit_hash.h
+        @ONLY
+)
+
+add_definitions(-DCOMMIT_HASH="${COMMIT_HASH}")
+
 if(MSVC)
     add_compile_options(/MT)
 

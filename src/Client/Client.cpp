@@ -18,8 +18,8 @@
 std::string Client::settingspath = Utils::getRoamingPath() + R"(\Flarial\Config\main.flarial)";
 Settings Client::settings = Settings();
 bool notifiedOfConnectionIssue = false;
-// UPDATE THIS TO THE LATEST GITHUB COMMIT AFTER CHANGING ANYHTHING
-std::string current_commit = "cfbd2c2f";
+
+std::string current_commit = COMMIT_HASH;
 
 void DownloadAndSave(const std::string& url, const std::string& path) {
 

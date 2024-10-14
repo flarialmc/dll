@@ -3,6 +3,9 @@
 #include "Components/AABBShapeComponent.hpp"
 #include "Components/RuntimeIDComponent.hpp"
 #include "Components/ActorDataFlagComponent.hpp"
+#include "../../SDK.hpp"
+#include "../../../Client/GUI/Engine/Engine.hpp"
+#include "Components/OnGroundFlagComponent.hpp"
 
 // TODO add comments to all components, replace their sigs with simpler ones ?       marioCST: use entt's try_get func in EntityContext instead of using sigs, there are no simpler sigs
 
@@ -20,12 +23,12 @@ Component *Actor::tryGet(uintptr_t addr) {
         auto func = reinterpret_cast<efunc>(addr);
         return func(basicReg, id);
     }else{
-        auto a1 = **(uintptr_t***)(this + 0x8);
-        auto a2 = *(uintptr_t*)(this + 0x10);
+        basicReg = **(uintptr_t***)(this + 0x8);
+        id = *(uintptr_t*)(this + 0x10);
 
-        using efunc = Component* (__thiscall*)(uintptr_t, uintptr_t*);
+        using efunc = Component* (__thiscall*)(uintptr_t, const EntityId &);
         auto func = reinterpret_cast<efunc>(addr);
-        return func(reinterpret_cast<uintptr_t>(a1), &a2);
+        return func(reinterpret_cast<uintptr_t>(basicReg), id);
     }
 }
 
@@ -163,8 +166,15 @@ ItemStack *Actor::getOffhandSlot() {
 }
 
 RuntimeIDComponent *Actor::getRuntimeIDComponent() {
-    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
-
+    static uintptr_t sig;
+    if(sig == NULL) {
+        if (WinrtUtils::check(20, 50) && !WinrtUtils::check(20, 60)) {
+            sig = Memory::findSig(
+                    std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
+        } else {
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
+        }
+    }
     return tryGet<RuntimeIDComponent>(sig);
 }
 
@@ -204,6 +214,24 @@ RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URen
     return tryGet<RenderPositionComponent>(sig);
 }
 
+std::vector<UnifiedMobEffectData> Actor::getMobEffects() {
+    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMobEffectsComponent"));
+    std::vector<UnifiedMobEffectData> unifiedEffects;
+    if (WinrtUtils::check(21, 30)) {
+        auto component =  tryGet<MobEffectsComponent1_21_30>(sig);
+        for (auto &effect : component->effects) {
+            unifiedEffects.emplace_back(effect.id, effect.duration, effect.amplifier);
+        }
+    } else {
+        auto component =  tryGet<MobEffectsComponent>(sig);
+
+        for (auto &effect : component->effects) {
+            unifiedEffects.emplace_back(effect.id, effect.duration, effect.amplifier);
+        }
+    }
+    return unifiedEffects;
+}
+
 bool Actor::isValidAABB() {
     auto AABBShapeComponent = this->getAABBShapeComponent();
     if(!AABBShapeComponent) return false;
@@ -213,23 +241,105 @@ bool Actor::isValidAABB() {
 }
 
 bool Actor::isOnGround() {
-    const auto ctx = this->GetEntityContextV1_20_50();
+    if (WinrtUtils::check(21, 30)) {
+        static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix3")) + " " + GET_SIG("Actor::getOnGroundFlagComponent"));
+        auto component = tryGet<OnGroundFlagComponent>(sig);
 
-    if (WinrtUtils::check(20, 60)) {
-        using isOnGroundFunc = bool(__fastcall *)(uintptr_t&, EntityId&);
-        static isOnGroundFunc isOnGround = Memory::getOffsetFromSig<isOnGroundFunc>(GET_SIG_ADDRESS("ActorCollision::isOnGround"), 1);
+        return component != nullptr;
+    } else {
+        const auto ctx = this->GetEntityContextV1_20_50();
+
+        if (WinrtUtils::check(20, 60)) {
+            using isOnGroundFunc = bool (__fastcall *)(uintptr_t &, EntityId &);
+            static isOnGroundFunc isOnGround = Memory::getOffsetFromSig<isOnGroundFunc>(
+                    GET_SIG_ADDRESS("ActorCollision::isOnGround"), 1);
+
+            if (isOnGround)
+                return isOnGround(ctx->basicReg, ctx->id);
+
+            return false;
+        }
+
+        using isOnGroundFunc = bool (__fastcall *)(V1_20_50::EntityContext *);
+        static isOnGroundFunc isOnGround = reinterpret_cast<isOnGroundFunc>(GET_SIG_ADDRESS("ActorCollision::isOnGround"));
 
         if (isOnGround)
-            return isOnGround(ctx->basicReg, ctx->id);
+            return isOnGround(ctx);
 
         return false;
     }
+}
 
-    using isOnGroundFunc = bool(__fastcall *)(V1_20_50::EntityContext*);
-    static isOnGroundFunc isOnGround = reinterpret_cast<isOnGroundFunc>(GET_SIG_ADDRESS("ActorCollision::isOnGround"));
+Vec3<float> Actor::getLerpedPosition() {
+//    if(SDK::clientInstance->getLocalPlayer() == this) { // only in first person
+//        return SDK::clientInstance->getLevelRender()->getOrigin();
+//    }
+    return this->getRenderPositionComponent()->renderPos;
+}
 
-    if (isOnGround)
-        return isOnGround(ctx);
+AABB Actor::getLerpedAABB(bool asHitbox) {
+    auto renderPos = this->getRenderPositionComponent()->renderPos;
+    auto aabbSize = this->getAABBShapeComponent()->size;
+
+    float mod = 0.f;
+
+    if (this->hasCategory(ActorCategory::Player))
+        mod = 1.6f;
+
+    auto lower = renderPos.sub(aabbSize.x / 2.f, mod, aabbSize.x / 2.f), upper = lower.add(aabbSize.x, aabbSize.y, aabbSize.x);
+
+    auto aabb = AABB(lower, upper);
+
+    if(asHitbox)
+        return aabb.expandedXZ(0.1);
+
+    return aabb;
+}
+
+float Actor::getApproximateReach(Actor *target) {
+    auto actorHitBox = target->getLerpedAABB(true);
+
+    auto upper = actorHitBox.upper;
+    auto lower = actorHitBox.lower;
+
+    auto posAtTimeOfHit = this->getLerpedPosition();
+
+    auto closestPoint = Vec3<float>{ std::clamp(posAtTimeOfHit.x, lower.x, upper.x),
+                                     std::clamp(posAtTimeOfHit.y, lower.y, upper.y),
+                                     std::clamp(posAtTimeOfHit.z, lower.z, upper.z) };
+
+    return posAtTimeOfHit.dist(closestPoint);
+}
+
+bool Actor::IsOnSameTeam(Actor *actor) {
+    std::string playerName = *this->getNametag();
+    std::string actorName = *actor->getNametag();
+
+    if (playerName.empty() || actorName.empty()) return false;
+
+    auto cleanName = [](std::string &name) {
+        constexpr std::string tags[] = {"§r", "§l"};
+        for (const auto &tag : tags) {
+            size_t pos;
+            while ((pos = name.find(tag)) != std::string::npos) {
+                name.erase(pos, tag.length());
+            }
+        }
+    };
+
+    cleanName(playerName);
+    cleanName(actorName);
+
+    size_t playerTeamPos = playerName.find("§");
+    if (playerTeamPos == std::string::npos) return false;
+
+    std::string playerTeam = playerName.substr(playerTeamPos + 2, 1);
+
+    size_t actorTeamPos = actorName.find("§");
+    if (actorTeamPos != std::string::npos) {
+        std::string actorTeam = actorName.substr(actorTeamPos + 2, 1);
+        return actorTeam == playerTeam;
+    }
 
     return false;
 }

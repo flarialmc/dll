@@ -178,6 +178,10 @@ public:
         return Vec3<T>(this->x * vec.x, this->y * vec.y, this->z * vec.z);
     };
 
+    auto lerp(const Vec3<T> &vec, T t) -> Vec3<T> {
+        return Vec3<T>(std::lerp(this->x, vec.x, t), std::lerp(this->y, vec.y, t), std::lerp(this->z, vec.z, t));
+    };
+
     auto mul(T v) -> Vec3<T> {
         return Vec3<T>(this->x * v, this->y * v, this->z * v);
     };
@@ -278,6 +282,10 @@ public:
 
         return hash;
     }
+
+    static std::wstring StrToWStr(const std::string &s);
+
+    static std::string WStrToStr(const std::wstring &ws);
 };
 
 struct CaretMeasureData {

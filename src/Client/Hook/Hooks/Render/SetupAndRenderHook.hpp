@@ -120,10 +120,9 @@ private:
         if (player && SDK::clientInstance->getLevelRender())
         {
             origin = SDK::clientInstance->getLevelRender()->getOrigin();
-            pos = player->getRenderPositionComponent()->renderPos;
         }
 
-        FrameTransform transform = { SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov(), pos};
+        FrameTransform transform = { SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov() };
 
         SwapchainHook::frameTransformsMtx.lock();
         SwapchainHook::FrameTransforms.push(transform);
