@@ -62,6 +62,15 @@ void SendPacketHook::receiveCallbackEntityEvent(void *packetHandlerDispatcher, v
         receivePacketEntityEventOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
 
 }
+void
+SendPacketHook::receiveCallbackChangeDimension(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
+                                               const std::shared_ptr<Packet>& packet) {
+
+    PacketEvent event(packet.get());
+    EventHandler::onPacketReceive(event);
+    if (!event.isCancelled())
+        receivePacketChangeDimensionOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
+}
 
 void SendPacketHook::receiveCallbackInteract(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
                                              const std::shared_ptr<Packet> &packet) {
@@ -117,6 +126,11 @@ void SendPacketHook::enableHook() {
     Memory::hookFunc((void *) EntityEventPacket->packetHandler->vTable[1], (void*)receiveCallbackEntityEvent,
                      (void **) &receivePacketEntityEventOriginal, "ReceivePacketHook");
 
+
+    std::shared_ptr<Packet> changeDimensionPacket = SDK::createPacket((int) MinecraftPacketIds::ChangeDimension);
+    Memory::hookFunc((void *) changeDimensionPacket->packetHandler->vTable[1], receiveCallbackChangeDimension,
+                     (void **) &receivePacketChangeDimensionOriginal, "ReceivePacketHook");
+
     std::shared_ptr<Packet> InteractPacket = SDK::createPacket((int) MinecraftPacketIds::Interact);
     Memory::hookFunc((void *) InteractPacket->packetHandler->vTable[1], (void*)receiveCallbackInteract,
                      (void **) &receivePacketInteractOriginal, "ReceivePacketHook");
@@ -128,6 +142,7 @@ void SendPacketHook::enableHook() {
     std::shared_ptr<Packet> ContainerClosePacket = SDK::createPacket((int) MinecraftPacketIds::ContainerClose);
     Memory::hookFunc((void *) ContainerClosePacket->packetHandler->vTable[1], (void *)receiveCallbackContainerClose,
                      (void **) &receivePacketContainerCloseOriginal, "ReceivePacketHook");
+
 
     this->autoHook((void *) callback, (void **) &sendPacketOriginal);
 }

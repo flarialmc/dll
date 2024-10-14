@@ -171,6 +171,7 @@ void ModuleManager::initialize() {
     EventHandler::registerListener(new CentreCursorListener("CentreCursor"));
     EventHandler::registerListener(new rgbListener("RGB Controller"));
     EventHandler::registerListener(new TextAliasListener("TextAlias"));
+    EventHandler::registerListener(new HiveModeCatcherListener("HiveModeCatcher"));
 
     initialized = true;
 }
