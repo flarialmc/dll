@@ -85,7 +85,7 @@ public:
         this->addToggle("Responsive Rectangle", "Rectangle resizes with text",  this->settings.getSettingByName<bool>(
 "responsivewidth")->value);
 
-        this->addSlider("Rotation", "see for yourself!", this->settings.getSettingByName<float>("rotation")->value);
+        this->addSlider("Rotation", "see for yourself!", this->settings.getSettingByName<float>("rotation")->value, 360.f, 0, false);
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();

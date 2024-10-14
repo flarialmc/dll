@@ -112,7 +112,7 @@ public:
 
         }
 
-        if (SwapchainHook::init && baseHeightActual > 0.0155f) {
+        if (SwapchainHook::init && baseHeightActual > 0.1f) {
 
             this->module->settings.getSettingByName<bool>("enabled")->value = true;
 

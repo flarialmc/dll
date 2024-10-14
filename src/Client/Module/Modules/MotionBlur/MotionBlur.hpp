@@ -18,8 +18,11 @@ public:
     };
 
     void onEnable() override {
-        EventHandler::registerPriorityListener(new MotionBlurListener("MotionBlurListener", this));
-        Module::onEnable();
+        if(SwapchainHook::queue) FlarialGUI::Notify("Please turn on Better Frames in Settings!");
+        else {
+            EventHandler::registerPriorityListener(new MotionBlurListener("MotionBlurListener", this));
+            Module::onEnable();
+        }
     }
 
     void onDisable() override {
