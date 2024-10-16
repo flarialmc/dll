@@ -94,19 +94,26 @@ private:
         stack.pop();
     }
 
-    static void BaseActorRenderer_renderTextCallback(ScreenContext* screenContext, ViewRenderData* viewData, NameTagRenderObject* tagData, Font* font, float size) {
-#ifndef NDEBUG
+    static bool contains(const std::vector<std::string>& vec, const std::string& str) {
+        return std::find(vec.begin(), vec.end(), str) != vec.end();
+    }
 
+    static void BaseActorRenderer_renderTextCallback(ScreenContext* screenContext, ViewRenderData* viewData, NameTagRenderObject* tagData, Font* font, float size) {
+
+        std::cout << Utils::removeNonAlphanumeric(Utils::removeColorCodes(tagData->nameTag)) << std::endl;
+        if(contains(Client::allPlayers, Utils::removeNonAlphanumeric(Utils::removeColorCodes(tagData->nameTag))))
         drawLogo(screenContext, viewData->cameraPos, viewData->cameraTargetPos, tagData->nameTag, tagData->pos, font);
-#endif
+
 
         funcOriginal(screenContext, viewData, tagData, font, size);
     }
 
     static void BaseActorRenderer_renderTextCallback40(ScreenContext* screenContext, ViewRenderData* viewData, NameTagRenderObject* tagData, Font* font, void* mesh) {
-#ifndef NDEBUG
+
+        std::cout << Utils::removeNonAlphanumeric(Utils::removeColorCodes(tagData->nameTag)) << std::endl;
+        if(contains(Client::allPlayers, Utils::removeNonAlphanumeric(Utils::removeColorCodes(tagData->nameTag))))
         drawLogo(screenContext, viewData->cameraPos, viewData->cameraTargetPos, tagData->nameTag, tagData->pos, font);
-#endif
+
 
         funcOriginal40(screenContext, viewData, tagData, font, mesh);
     }

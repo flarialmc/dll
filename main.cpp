@@ -22,10 +22,17 @@ std::string DownloadString(std::string URL);
 
 std::string removeColorCodes(const std::string& input);
 
+void printVector(const std::vector<std::string>& vec) {
+    for (const auto& str : vec) {
+        std::cout << str << std::endl;
+    }
+}
+
+
 DWORD WINAPI init(HMODULE real)
 {
 #ifndef NDEBUG
-    bool shouldDebug = false; // Change this bool locally, NEVER push it set to true
+    bool shouldDebug = true; // Change this bool locally, NEVER push it set to true
 
     if (GetConsoleWindow() == nullptr && shouldDebug) {
         AllocConsole();
@@ -165,6 +172,7 @@ DWORD WINAPI init(HMODULE real)
 
     FreeLibraryAndExitThread(Client::currentModule, 0);
 }
+
 
 BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
