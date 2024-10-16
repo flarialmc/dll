@@ -22,10 +22,17 @@ std::string DownloadString(std::string URL);
 
 std::string removeColorCodes(const std::string& input);
 
+void printVector(const std::vector<std::string>& vec) {
+    for (const auto& str : vec) {
+        std::cout << str << std::endl;
+    }
+}
+
+
 DWORD WINAPI init(HMODULE real)
 {
 #ifndef NDEBUG
-    bool shouldDebug = false; // Change this bool locally, NEVER push it set to true
+    bool shouldDebug = true; // Change this bool locally, NEVER push it set to true
 
     if (GetConsoleWindow() == nullptr && shouldDebug) {
         AllocConsole();
@@ -121,6 +128,24 @@ DWORD WINAPI init(HMODULE real)
     });
     statusThread.detach();
 
+    std::thread usersThread([]() {
+        while(!Client::disable) {
+            if(!Client::disable){
+            Client::allPlayersJson = DownloadString("https://api.flarial.synthetix.host/servers");
+
+            try {
+                nlohmann::json data = nlohmann::json::parse(Client::allPlayersJson);
+                Client::allPlayers = Client::getPlayersVector(data);
+            }  catch (const json::parse_error& e) {
+                                Logger::error(e.what());
+                                continue;
+            }
+            Sleep(300000);
+           } else break;
+        }
+    });
+    usersThread.detach();
+
     while (true) {
         if (Client::disable) {
             break;
@@ -153,6 +178,7 @@ DWORD WINAPI init(HMODULE real)
 
     FreeLibraryAndExitThread(Client::currentModule, 0);
 }
+
 
 BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReserved)
 {

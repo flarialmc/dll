@@ -17,7 +17,7 @@ class BaseActorRendererRenderTextHook : public Hook {
 private:
 
     static void drawLogo(ScreenContext* screenContext, const Vec3<float>& cameraPos, const Vec3<float>& cameraTargetPos, const std::string& nameTag, const Vec3<float>& tagPos, Font* font) {
-        static bool doRender = false; // This bool exists because this function would render the logo on every nametag without exceptions. NEVER PUSH THIS SET TO TRUE UNLESS PROPER FILTERING IS IMPLEMENTED. In case of filter implementation, remove the bool entirely
+        static bool doRender = true; // This bool exists because this function would render the logo on every nametag without exceptions. NEVER PUSH THIS SET TO TRUE UNLESS PROPER FILTERING IS IMPLEMENTED. In case of filter implementation, remove the bool entirely
 
         if (!doRender)
             return;
@@ -94,18 +94,26 @@ private:
         stack.pop();
     }
 
+    static bool contains(const std::vector<std::string>& vec, const std::string& str) {
+        return std::find(vec.begin(), vec.end(), str) != vec.end();
+    }
+
     static void BaseActorRenderer_renderTextCallback(ScreenContext* screenContext, ViewRenderData* viewData, NameTagRenderObject* tagData, Font* font, float size) {
-#ifndef NDEBUG
+
+        std::cout << Utils::removeNonAlphanumeric(Utils::removeColorCodes(tagData->nameTag)) << std::endl;
+        if(contains(Client::allPlayers, Utils::removeNonAlphanumeric(Utils::removeColorCodes(tagData->nameTag))))
         drawLogo(screenContext, viewData->cameraPos, viewData->cameraTargetPos, tagData->nameTag, tagData->pos, font);
-#endif
+
 
         funcOriginal(screenContext, viewData, tagData, font, size);
     }
 
     static void BaseActorRenderer_renderTextCallback40(ScreenContext* screenContext, ViewRenderData* viewData, NameTagRenderObject* tagData, Font* font, void* mesh) {
-#ifndef NDEBUG
+
+        std::cout << Utils::removeNonAlphanumeric(Utils::removeColorCodes(tagData->nameTag)) << std::endl;
+        if(contains(Client::allPlayers, Utils::removeNonAlphanumeric(Utils::removeColorCodes(tagData->nameTag))))
         drawLogo(screenContext, viewData->cameraPos, viewData->cameraTargetPos, tagData->nameTag, tagData->pos, font);
-#endif
+
 
         funcOriginal40(screenContext, viewData, tagData, font, mesh);
     }
