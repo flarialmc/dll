@@ -132,8 +132,14 @@ DWORD WINAPI init(HMODULE real)
         while(!Client::disable) {
             if(!Client::disable){
             Client::allPlayersJson = DownloadString("https://api.flarial.synthetix.host/servers");
-            nlohmann::json data = nlohmann::json::parse(Client::allPlayersJson);
-            Client::allPlayers = Client::getPlayersVector(data);
+
+            try {
+                nlohmann::json data = nlohmann::json::parse(Client::allPlayersJson);
+                Client::allPlayers = Client::getPlayersVector(data);
+            }  catch (const json::parse_error& e) {
+                                Logger::error(e.what());
+                                continue;
+            }
             Sleep(300000);
            } else break;
         }
