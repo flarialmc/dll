@@ -17,9 +17,14 @@
 
 std::string Client::settingspath = Utils::getRoamingPath() + R"(\Flarial\Config\main.flarial)";
 Settings Client::settings = Settings();
+std::vector<std::string> Client::allPlayers;
+std::string Client::allPlayersJson;
+
 bool notifiedOfConnectionIssue = false;
 
 std::string current_commit = COMMIT_HASH;
+
+
 
 void DownloadAndSave(const std::string& url, const std::string& path) {
 
@@ -38,6 +43,24 @@ void DownloadAndSave(const std::string& url, const std::string& path) {
 
     }
 
+}
+
+std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
+
+    // Iterate over each server in the JSON object
+    for (auto it = data.begin(); it != data.end(); ++it) {
+        if (it->contains("players")) {
+            // Get the "players" array for the server
+            const auto& players = it->at("players");
+
+            // Add each player to the allPlayers vector
+            for (const auto& player : players) {
+                allPlayers.push_back(player);
+            }
+        }
+    }
+
+    return allPlayers;
 }
 
 bool Client::disable = false;
