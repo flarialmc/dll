@@ -68,10 +68,14 @@
 #include <algorithm>
 
 #include "Modules/ItemPhysics/ItemPhysics.hpp"
+#include "Modules/Crosshair/Crosshair.hpp"
+#include "Modules/HiveStat/HiveStat.hpp"
 #include "Modules/OpponentReach/OpponentReach.hpp"
 #include "Modules/ViewModel/ViewModel.hpp"
 #include "Modules/PotionHUD/PotionHUD.hpp"
 #include "Modules/FasterInventory/FasterInventory.hpp"
+
+#include "Modules/EntityCounter/EntityCounter.hpp"
 
 namespace ModuleManager {
     std::unordered_map<size_t, Module*> moduleMap;
@@ -159,7 +163,8 @@ void ModuleManager::initialize() {
     //addModule(new MovableChat());
     //addModule(new CompactChat());
     addModule(new ItemPhysics());
-
+    
+    addModule(new HiveStat());
 
     EventHandler::registerListener(new GUIKeyListener("GuiKeyListener"));
     EventHandler::registerListener(new DiscordRPCListener("DiscordRPC"));
@@ -168,6 +173,7 @@ void ModuleManager::initialize() {
     EventHandler::registerListener(new CentreCursorListener("CentreCursor"));
     EventHandler::registerListener(new rgbListener("RGB Controller"));
     EventHandler::registerListener(new TextAliasListener("TextAlias"));
+    EventHandler::registerListener(new HiveModeCatcherListener("HiveModeCatcher"));
 
     initialized = true;
 }

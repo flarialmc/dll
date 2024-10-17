@@ -33,6 +33,9 @@ private:
     static void receiveCallbackContainerClose(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
                                              const std::shared_ptr<Packet>& packet);
 
+    static void receiveCallbackChangeDimension(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
+                                               const std::shared_ptr<Packet>& packet);
+
 public:
 
     static inline void* NetworkIdentifier;
@@ -52,6 +55,7 @@ public:
     static inline receive receivePacketInteractOriginal = nullptr;
     static inline receive receivePacketContainerOpenOriginal = nullptr;
     static inline receive receivePacketContainerCloseOriginal = nullptr;
+    static inline receive receivePacketChangeDimensionOriginal = nullptr;
 
     SendPacketHook() : Hook("sendPacket", GET_SIG("LoopbackPacketSender::sendPacket")) {}
 
