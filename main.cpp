@@ -121,6 +121,18 @@ DWORD WINAPI init(HMODULE real)
     });
     statusThread.detach();
 
+    std::thread announcementThread([]() {
+        while (!Client::disable) {
+            if(Client::disable) break;
+
+            if(SDK::clientInstance)
+            SDK::clientInstance->getGuiData()->displayClientMessage("§khiii §r §n§l§4FLARIAL §r §khiii §r  Donate to Flarial! https://flarial.xyz/donate\n§9Join our discord! https://flarial.xyz/discord");
+            Sleep(420000);
+        }
+    });
+
+    announcementThread.detach();
+
     while (true) {
         if (Client::disable) {
             break;
