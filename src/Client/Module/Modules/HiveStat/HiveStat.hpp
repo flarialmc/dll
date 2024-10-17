@@ -38,11 +38,13 @@ public:
     }
 
     void settingsRender() override {
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
-        FlarialGUI::KeybindSelector(0, toggleX + FlarialGUI::SettingsTextWidth("Overlay"), toggleY,
-                                    settings.getSettingByName<std::string>("Overlay")->value);
+
+        this->addHeader("Keybinds");
+        this->addKeybind("Toggle Overlay Keybind", "When setting, hold the new bind for 2 seconds", settings.getSettingByName<std::string>("Overlay")->value);
+        this->resetPadding();
     }
 };
 
