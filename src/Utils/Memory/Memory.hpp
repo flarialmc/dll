@@ -185,4 +185,8 @@ public:
     static uintptr_t GetAddressByIndex(uintptr_t vtable, int index) {
         return *reinterpret_cast<uintptr_t*>(vtable + 8 * index);
     }
+    static void SetProtection(uintptr_t addr, size_t size, DWORD protect) {
+        DWORD oldProtect;
+        VirtualProtect((LPVOID)addr, size, protect, &oldProtect);
+    }
 };
