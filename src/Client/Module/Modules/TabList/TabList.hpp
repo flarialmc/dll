@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 
 #include "../Module.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
@@ -76,141 +76,39 @@ public:
     }
 
     void settingsRender() override {
-        /* Border Start */
 
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
 
-        FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(5.5, textWidth), 2);
-        FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"),
+
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(1.0f, "height"));
+                                  Constraints::RelativeConstraint(0.88f, "height"));
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"UI Scale", textWidth * 6.9f,
-                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
+        this->addHeader("Main");
+        this->addSlider("UI Scale", "The Size of Tablist", this->settings.getSettingByName<float>("uiscale")->value, 1.25f);
+        this->addToggle("Border", "", this->settings.getSettingByName<bool>("border")->value);
+        this->addConditionalSlider(this->settings.getSettingByName<bool>("border")->value, "Border Width", "", this->settings.getSettingByName<float>("borderWidth")->value, 4);
+        this->addSlider("Rounding", "", this->settings.getSettingByName<float>("rounding")->value);
 
-        float percent = FlarialGUI::Slider(4, toggleX + FlarialGUI::SettingsTextWidth("UI Scale "),
-                                           toggleY,
-                                           this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
+        this->extraPadding();
 
-        this->settings.getSettingByName<float>("uiscale")->value = percent;
+        this->addHeader("Misc");
+        this->addToggle("Alphabetical Order", "", this->settings.getSettingByName<bool>("alphaOrder")->value);
+        this->addKeybind("Keybind", "", getKeybind());
 
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-        if (FlarialGUI::Toggle(0, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "border")->value))
-            this->settings.getSettingByName<bool>("border")->value = !this->settings.getSettingByName<bool>(
-                    "border")->value;
+        this->extraPadding();
 
-
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY, L"Border",
-                                        textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-
-        percent = FlarialGUI::Slider(5, toggleX + Constraints::SpacingConstraint(0.60, textWidth) +
-                                        FlarialGUI::SettingsTextWidth("Border "),
-                                     toggleY, this->settings.getSettingByName<float>("borderWidth")->value, 4);
-
-        this->settings.getSettingByName<float>("borderWidth")->value = percent;
-
-        /* Rounding Start */
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Rounding", textWidth * 6.9f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        percent = FlarialGUI::Slider(6, toggleX + FlarialGUI::SettingsTextWidth("Rounding "),
-                                     toggleY,
-                                     this->settings.getSettingByName<float>("rounding")->value);
-
-        this->settings.getSettingByName<float>("rounding")->value = percent;
-
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        FlarialGUI::KeybindSelector(0, toggleX, toggleY, getKeybind());
-
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        L"Alphabetical Order",
-                                        textWidth * 2.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        if (FlarialGUI::Toggle(2, toggleX, toggleY,
-                               this->settings.getSettingByName<bool>("alphaOrder")->value))
-            this->settings.getSettingByName<bool>("alphaOrder")->value = !this->settings.getSettingByName<bool>(
-                    "alphaOrder")->value;
-
-        /* Rounding End */
-
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        L"Translucency", textWidth * 6.9f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        if (FlarialGUI::Toggle(4, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "BlurEffect")->value))
-            this->settings.getSettingByName<bool>("BlurEffect")->value = !this->settings.getSettingByName<bool>(
-                    "BlurEffect")->value;
-
-        /* Color Pickers Start*/
-
-        toggleX = Constraints::PercentageConstraint(0.55, "left");
-        toggleY = Constraints::PercentageConstraint(0.10, "top");
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Background", textWidth * 6.9f,
-                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(0, toggleX + FlarialGUI::SettingsTextWidth("Background "),
-                                toggleY - Constraints::SpacingConstraint(0.017, textWidth),
-                                settings.getSettingByName<std::string>("bgColor")->value,
-                                settings.getSettingByName<bool>("bgRGB")->value);
-
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Text", textWidth * 6.9f,
-                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(1, toggleX + FlarialGUI::SettingsTextWidth("Text "), toggleY * 0.99f,
-                                settings.getSettingByName<std::string>("textColor")->value,
-                                settings.getSettingByName<bool>("textRGB")->value);
-
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Border", textWidth * 6.9f,
-                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(2, toggleX + FlarialGUI::SettingsTextWidth("Border "), toggleY * 0.99f,
-                                settings.getSettingByName<std::string>("borderColor")->value,
-                                settings.getSettingByName<bool>("borderRGB")->value);
+        this->addHeader("Colors");
+        this->addColorPicker("Background", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
+        this->addColorPicker("Text", "", settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
+        this->addColorPicker("Border", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
 
         FlarialGUI::UnsetScrollView();
-
-        FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("bgColor")->value,
-                                      settings.getSettingByName<float>("bgOpacity")->value,
-                                      settings.getSettingByName<bool>("bgRGB")->value);
-        FlarialGUI::ColorPickerWindow(1, settings.getSettingByName<std::string>("textColor")->value,
-                                      settings.getSettingByName<float>("textOpacity")->value,
-                                      settings.getSettingByName<bool>("textRGB")->value);
-        FlarialGUI::ColorPickerWindow(2, settings.getSettingByName<std::string>("borderColor")->value,
-                                      settings.getSettingByName<float>("borderOpacity")->value,
-                                      settings.getSettingByName<bool>("borderRGB")->value);
-
+        this->resetPadding();
     }
 
     void normalRender(int index, std::string& value) override {
@@ -219,8 +117,7 @@ public:
                 float keycardSize = Constraints::RelativeConstraint(
                         0.05f * this->settings.getSettingByName<float>("uiscale")->value, "height", true);
 
-                Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
-                                                      this->settings.getSettingByName<float>("percentageY")->value);
+                Vec2<float> settingperc{0, 0};
 
                 int i3 = 0;
                 float i2 = 0;
@@ -247,7 +144,6 @@ public:
                 int count = 0;
 
                 float fakex = realcenter.x;
-                float fixer = 0;
 
                 for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
 
@@ -255,11 +151,6 @@ public:
                     if (i3 % 10 == 1) {
                         i2 += 4.85;
                         count++;
-
-                        if (count != 1) {
-                            fakex -= ((5.f * keycardSize) / 2.0f);
-                            fixer += ((5.f * keycardSize) / 2.0f);
-                        }
                     }
                 }
 
@@ -271,22 +162,9 @@ public:
 
                 float totalWidth = i2 * keycardSize;
 
-                if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
-                    ClickGUIRenderer::editmenu)
-                    FlarialGUI::SetWindowRect(fakex, realcenter.y, totalWidth, keycardSize * 7.5f, index, fixer);
-
-                Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, totalWidth,
-                                                                keycardSize * 7.5f);
-
-                realcenter.x = vec2.x;
-                realcenter.y = vec2.y;
+                Vec2<float> vec2 = realcenter;
 
                 realcenter = realcenter;
-
-                Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y);
-
-                this->settings.setValue("percentageX", percentages.x);
-                this->settings.setValue("percentageY", percentages.y);
 
                 float fontSize = Constraints::SpacingConstraint(3, keycardSize);
 
@@ -504,11 +382,6 @@ public:
                 }
 
                 // TODO ModuleManager::getModule("ClickGUI") FIND ALL AND REPLACE!!!
-
-                if (ModuleManager::getModule("ClickGUI")->active ||
-                    ClickGUIRenderer::editmenu)
-
-                    FlarialGUI::UnsetWindowRect();
             }
         }
     }
