@@ -118,6 +118,7 @@ DWORD WINAPI init(HMODULE real)
             } else break;
         }
     });
+
     statusThread.detach();
     while (true) {
         if (Client::disable) {

@@ -215,6 +215,11 @@ public:
                         std::string name = Utils::removeColorCodes(pair.second.name);
                         if (name.empty()) continue;
 
+                        std::string clearedName = Utils::removeNonAlphanumeric(Utils::removeColorCodes(name));
+                        if (clearedName.empty()) clearedName = Utils::removeColorCodes(name);
+
+
+                        auto it = std::find(Client::onlinePlayers.begin(), Client::onlinePlayers.end(), clearedName);
 
                         /*
                         auto it = std::find(ModuleManager::onlineUsers.begin(), ModuleManager::onlineUsers.end(), name);
@@ -235,6 +240,24 @@ public:
                         }
 
                         float xx = 0;
+
+                        if (it != Client::onlinePlayers.end()) {
+                            static float p1 = 0.25;
+                            static float p2 = 0.28;
+                            static float p3 = 1;
+                            static float p4 = 1.1;
+
+                            FlarialGUI::image(IDR_RED_LOGO_PNG,
+                                              D2D1::RectF(fakex + Constraints::SpacingConstraint(p1, keycardSize),
+                                                          realcenter.y +
+                                                          Constraints::SpacingConstraint(p2, keycardSize),
+                                                          fakex + Constraints::SpacingConstraint(p3, keycardSize),
+                                                          realcenter.y +
+                                                          Constraints::SpacingConstraint(p4, keycardSize)));
+
+                            xx = Constraints::SpacingConstraint(0.5, keycardSize);
+
+                        }
 
                         /*
 
