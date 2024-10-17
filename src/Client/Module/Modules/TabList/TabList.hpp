@@ -98,7 +98,7 @@ public:
 
         this->addHeader("Misc");
         this->addToggle("Alphabetical Order", "", this->settings.getSettingByName<bool>("alphaOrder")->value);
-        this->addKeybind("Keybind", "", getKeybind());
+        this->addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
 
         this->extraPadding();
 

@@ -47,7 +47,7 @@ public:
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Misc");
-        this->addKeybind("Command Keybind", "", getKeybind());
+        this->addKeybind("Command Keybind", "Hold for 2 seconds!", getKeybind());
         this->addTextBox("Command to Send", "No need for /", settings.getSettingByName<std::string>("command")->value);
 
         FlarialGUI::UnsetScrollView();

@@ -51,7 +51,7 @@ public:
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Misc");
-        this->addKeybind("Freelook Keybind", "", getKeybind());
+        this->addKeybind("Freelook Keybind", "Hold for 2 seconds!", getKeybind());
 
         this->addToggle("Toggleable Mode", "Click to toggle or Hold to keep enabled", this->settings.getSettingByName<bool>("toggle")->value);
 

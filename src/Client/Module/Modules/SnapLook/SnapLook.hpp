@@ -41,7 +41,7 @@ public:
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Misc");
-        this->addKeybind("Keybind", "", getKeybind());
+        this->addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
 
         FlarialGUI::UnsetScrollView();
 
