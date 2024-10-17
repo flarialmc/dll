@@ -52,7 +52,7 @@ std::string WinrtUtils::getFormattedVersion() {
         return "1.21.02";
     }
 
-    if(version == "1.21.3.0") { // i cba for now #2
+    if(version == "1.21.3") { // i cba for now #2
         // 1.21.3.0 - 1.21.0 ".3"
         // 1.21.3003.0 - 1.21.30
         return "1.21.03";

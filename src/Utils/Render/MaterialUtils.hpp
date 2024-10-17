@@ -7,4 +7,5 @@ public:
     static void update();
 
     static mce::MaterialPtr* getUIFillColor();
+    static mce::MaterialPtr* getUITextured();
 };

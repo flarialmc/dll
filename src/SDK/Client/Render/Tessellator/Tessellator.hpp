@@ -19,6 +19,12 @@ public:
         func(this, x, y, z);
     }
 
+    void vertexUV(float x, float y, float z, float u, float v) {
+        using func_t = void(__fastcall*)(Tessellator*, float, float, float, float, float);
+        static auto func = reinterpret_cast<func_t>(GET_SIG_ADDRESS("Tessellator::vertexUV"));
+        func(this, x, y, z, u, v);
+    }
+
     void color(float r, float g, float b, float a) {
         using func_t = void(__fastcall*)(Tessellator*, float, float, float, float);
         static auto func = reinterpret_cast<func_t>(GET_SIG_ADDRESS("Tessellator::colorF"));

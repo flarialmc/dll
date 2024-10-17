@@ -98,7 +98,7 @@ public:
 
         this->addHeader("Misc");
         this->addToggle("Alphabetical Order", "", this->settings.getSettingByName<bool>("alphaOrder")->value);
-        this->addKeybind("Keybind", "", getKeybind());
+        this->addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
 
         this->extraPadding();
 
@@ -216,11 +216,13 @@ public:
                         if (name.empty()) continue;
 
 
+                        /*
                         auto it = std::find(ModuleManager::onlineUsers.begin(), ModuleManager::onlineUsers.end(), name);
                         auto it2 = std::find(ModuleManager::onlineDevs.begin(), ModuleManager::onlineDevs.end(), name);
                         auto it3 = std::find(ModuleManager::onlineCommites.begin(), ModuleManager::onlineCommites.end(), name);
                         auto it4 = std::find(ModuleManager::onlinePluses.begin(), ModuleManager::onlinePluses.end(), name);
                         auto it5 = std::find(ModuleManager::onlineStaff.begin(), ModuleManager::onlineStaff.end(), name);
+                        */
 
                         // Check if the string was found
 
