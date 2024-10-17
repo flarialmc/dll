@@ -17,6 +17,7 @@ class BaseActorRendererRenderTextHook : public Hook {
 private:
 
     static void drawLogo(ScreenContext* screenContext, const Vec3<float>& cameraPos, const Vec3<float>& cameraTargetPos, const std::string& nameTag, const Vec3<float>& tagPos, Font* font) {
+
         std::string clearedName = Utils::removeNonAlphanumeric(Utils::removeColorCodes(nameTag));
         if (clearedName.empty()) clearedName = Utils::removeColorCodes(nameTag); // nametag might contain some unclearable stuff
 
@@ -100,9 +101,15 @@ private:
         return std::find(vec.begin(), vec.end(), str) != vec.end();
     }
 
-    static void BaseActorRenderer_renderTextCallback(ScreenContext* screenContext, ViewRenderData* viewData, NameTagRenderObject* tagData, Font* font, float size) {
-        drawLogo(screenContext, viewData->cameraPos, viewData->cameraTargetPos, tagData->nameTag, tagData->pos, font);
+    static void printVector(const std::vector<std::string>& vec) {
+        for (const auto& str : vec) {
+            std::cout << str << std::endl;
+        }
+    }
 
+    static void BaseActorRenderer_renderTextCallback(ScreenContext* screenContext, ViewRenderData* viewData, NameTagRenderObject* tagData, Font* font, float size) {
+
+        drawLogo(screenContext, viewData->cameraPos, viewData->cameraTargetPos, tagData->nameTag, tagData->pos, font);
         funcOriginal(screenContext, viewData, tagData, font, size);
     }
 

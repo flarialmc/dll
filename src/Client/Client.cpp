@@ -45,30 +45,31 @@ void DownloadAndSave(const std::string& url, const std::string& path) {
 }
 
 std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
-    onlinePlayers.clear(); // needs mutex to not cause occasional flicker
+    std::vector<std::string> allPlayers;
+
     // Iterate over each server in the JSON object
-    for (const auto& server : data.items()) {
-        if (server.value().contains("players") || !server.value()["players"].is_array()) {
-            continue;
-        }
-        // Get the "players" array for the server
-        const auto& players = server.value()["players"];
+    for (auto it = data.begin(); it != data.end(); ++it) {
+        if (it->contains("players")) {
+            // Get the "players" array for the server
+            const auto& players = it->at("players");
 
-        // Add each player to the allPlayers vector
-        for (const auto& player : players) {
-            onlinePlayers.push_back(player.get<std::string>());
+            // Add each player to the allPlayers vector
+            for (const auto& player : players) {
+                allPlayers.push_back(player);
+            }
         }
-
     }
 
-    std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
+    if(SDK::clientInstance && SDK::clientInstance->getLocalPlayer()) {
+        std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
 
-    std::string clearedName = Utils::removeNonAlphanumeric(Utils::removeColorCodes(name));
-    if (clearedName.empty()) clearedName = Utils::removeColorCodes(name);
+        std::string clearedName = Utils::removeNonAlphanumeric(Utils::removeColorCodes(name));
+        if (clearedName.empty()) clearedName = Utils::removeColorCodes(name);
 
-    onlinePlayers.push_back(clearedName);
+        allPlayers.push_back(clearedName);
+    }
 
-    return onlinePlayers;
+    return allPlayers;
 }
 
 bool Client::disable = false;
