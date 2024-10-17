@@ -15,6 +15,7 @@
 
 std::chrono::steady_clock::time_point lastBeatTime;
 std::chrono::steady_clock::time_point lastOnlineUsersFetchTime;
+std::chrono::steady_clock::time_point lastAnnouncementTime;
 
 std::string replaceAll(std::string subject, const std::string& search,
                        const std::string& replace);
@@ -52,6 +53,8 @@ DWORD WINAPI init(HMODULE real)
             auto now = std::chrono::steady_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastBeatTime);
             auto onlineUsersFetchElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastOnlineUsersFetchTime);
+            auto onlineAnnouncementElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastAnnouncementTime);
+
 
             if(!Client::disable) {
                 if(SDK::hasInstanced && SDK::clientInstance != nullptr) {
@@ -105,29 +108,17 @@ DWORD WINAPI init(HMODULE real)
 
                             lastOnlineUsersFetchTime = now;
                         }
-                    }
-                }
-                Sleep(60);
 
+                        if(SDK::clientInstance && onlineAnnouncementElapsed >= std::chrono::minutes(3)) {
+                            SDK::clientInstance->getGuiData()->displayClientMessage("§khiii §r §n§l§4FLARIAL §r§khiii \n§r§cDonate to Flarial! §ehttps://flarial.xyz/donate\n§9Join our discord! §ehttps://flarial.xyz/discord");
+                      }
+                    }
+                  }
+                Sleep(60);
             } else break;
         }
     });
     statusThread.detach();
-
-    std::thread announcementThread([]() {
-        while (!Client::disable) {
-            if(Client::disable) break;
-
-            if(SDK::clientInstance)
-            SDK::clientInstance->getGuiData()->displayClientMessage("§khiii §r §n§l§4FLARIAL §r§khiii \n§r§cDonate to Flarial! §ehttps://flarial.xyz/donate\n§9Join our discord! §ehttps://flarial.xyz/discord");
-
-            if(SDK::clientInstance && SDK::clientInstance->getLocalPlayer())
-            Sleep(420000);
-        }
-    });
-
-    announcementThread.detach();
-
     while (true) {
         if (Client::disable) {
             break;
