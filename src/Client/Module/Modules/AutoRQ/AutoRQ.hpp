@@ -32,6 +32,22 @@ public:
             settings.addSetting("command", (std::string)"");
         if (settings.getSettingByName<bool>("solo") == nullptr)
             settings.addSetting("solo", false);
+        if (settings.getSettingByName<bool>("hub") == nullptr)
+            settings.addSetting("hub", false);
+        if (settings.getSettingByName<bool>("murderer") == nullptr)
+            settings.addSetting("murderer", false);
+        if (settings.getSettingByName<bool>("sheriff") == nullptr)
+            settings.addSetting("sheriff", false);
+        if (settings.getSettingByName<bool>("innocent") == nullptr)
+            settings.addSetting("innocent", false);
+        if (settings.getSettingByName<bool>("hider") == nullptr)
+            settings.addSetting("hider", false);
+        if (settings.getSettingByName<bool>("seeker") == nullptr)
+            settings.addSetting("seeker", false);
+        if (settings.getSettingByName<bool>("death") == nullptr)
+            settings.addSetting("death", false);
+        if (settings.getSettingByName<bool>("runner") == nullptr)
+            settings.addSetting("runner", false);
         if (settings.getSettingByName<bool>("AutoMapAvoider") == nullptr)
             settings.addSetting("AutoMapAvoider", false);
         if (settings.getSettingByName<std::string>("text") == nullptr) 
@@ -39,39 +55,41 @@ public:
     }
 
     void settingsRender() override {
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
 
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        L"Solo mode", textWidth * 6.9f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
 
-        if (FlarialGUI::Toggle(5, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "solo")->value))
-            this->settings.getSettingByName<bool>("solo")->value = !this->settings.getSettingByName<bool>(
-                    "solo")->value;
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(0.88f, "height"));
+        this->addHeader("General");
+        this->addToggle("Solo mode ", "Re-Q when you finish or die in a game. pls dont use while in a party", this->settings.getSettingByName<bool>("solo")->value);
+        this->addToggle("Use /hub instead of /q", "", this->settings.getSettingByName<bool>("hub")->value);
 
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        this->addHeader("Murder Mystery");
+        this->addToggle("Murder", "re q when you get murder", this->settings.getSettingByName<bool>("murderer")->value);
+        this->addToggle("Sheriff", "re q when you get sheriff", this->settings.getSettingByName<bool>("sheriff")->value);
+        this->addToggle("Innocent", "re q when you get innocent", this->settings.getSettingByName<bool>("innocent")->value);
 
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0, textWidth), toggleY,
-                                        L"Avoid Maps (Hive). Input one or more maps using comma's.", textWidth * 6.9f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
+        this->addHeader("Hide and Seek");
+        this->addToggle("Hider", "re q when you get hider", this->settings.getSettingByName<bool>("hider")->value);
+        this->addToggle("Seeker", "re q when you get seeker", this->settings.getSettingByName<bool>("seeker")->value);
 
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-        if (FlarialGUI::Toggle(0, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "AutoMapAvoider")->value))
-            this->settings.getSettingByName<bool>("AutoMapAvoider")->value = !this->settings.getSettingByName<bool>(
-                    "AutoMapAvoider")->value;
-        
-        FlarialGUI::TextBoxVisual(1, settings.getSettingByName<std::string>("text")->value, 256, toggleX +
-         Constraints::SpacingConstraint(0.60, textWidth), toggleY, "");
+        this->addHeader("Deathrun");
+        this->addToggle("Death", "re q when you get death", this->settings.getSettingByName<bool>("death")->value);
+        this->addToggle("Runner", "re q when you get runner", this->settings.getSettingByName<bool>("runner")->value);
 
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        this->addHeader("Map avoider");
+
+
+        this->addToggle("Avoid", "", this->settings.getSettingByName<bool>("AutoMapAvoider")->value);
+        this->addTextBox("Maps", "Avoid Maps (Hive). Input one or more maps using comma's.", settings.getSettingByName<std::string>("text")->value);
+
+        FlarialGUI::UnsetScrollView();
+        this->resetPadding();
     }
 };
 

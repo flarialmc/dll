@@ -7,7 +7,15 @@ FK(Gamemode)
 
 class Player : public Actor {
 public:
-    BUILD_ACCESS(this, PlayerInventory*, playerInventory, GET_OFFSET("Player::playerInventory")) // Player::getSupplies return x 8
-    BUILD_ACCESS(this, std::string, playerName, GET_OFFSET("Player::playerName"));
-    BUILD_ACCESS(this, Gamemode*, gamemode, GET_OFFSET("Player::gamemode"));
+    PlayerInventory* getSupplies() {
+        return hat::member_at<PlayerInventory*>(this, GET_OFFSET("Player::playerInventory"));
+    }
+
+    std::string& getPlayerName() {
+        return hat::member_at<std::string>(this, GET_OFFSET("Player::playerName"));
+    }
+
+    Gamemode* getGamemode() {
+        return hat::member_at<Gamemode*>(this, GET_OFFSET("Player::gamemode"));
+    }
 };

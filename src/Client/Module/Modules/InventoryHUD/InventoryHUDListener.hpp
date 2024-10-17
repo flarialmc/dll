@@ -28,17 +28,6 @@ public:
 
     Vec2<float> testOffset = Vec2<float>{0,0};
 
-
-
-    [[nodiscard]] Vec2<float> convert() const {
-
-        auto e = SDK::clientInstance->guiData;
-        Vec2<float> xd = Vec2<float>(e->ScreenSize.x, e->ScreenSize.y);
-        Vec2<float> LOL = Vec2<float>(e->ScreenSizeScaled.x, e->ScreenSizeScaled.y);
-
-        return Vec2<float>{currentPos.x * (LOL.x / xd.x), currentPos.y * (LOL.y / xd.y)};
-    }
-
     void onRender(RenderEvent &event) override {
         if (ClientInstance::getTopScreenName() == "hud_screen" &&
             module->isEnabled() ||
@@ -82,19 +71,21 @@ public:
             }
         }
 
-        if (SDK::currentScreen != "hud_screen") ClickGUIRenderer::editmenu = false;
+        if (SDK::getCurrentScreen() != "hud_screen") ClickGUIRenderer::editmenu = false;
     }
 
     void onSetupAndRender(SetupAndRenderEvent &event) override {
+
+        if(this->module->isEnabled())
         if (ClientInstance::getTopScreenName() == "hud_screen") {
             auto muirc = event.getMuirc();
-            BaseActorRenderContext barc(muirc->screenContext, muirc->clientInstance,
-                                        muirc->clientInstance->mcgame);
+            BaseActorRenderContext barc(muirc->getScreenContext(), muirc->getClientInstance(),
+                                        muirc->getClientInstance()->getMinecraftGame());
 
-            Vec2<float> convert = this->convert();
+            Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
 
             if (SDK::clientInstance->getLocalPlayer() != nullptr)
-                if (SDK::clientInstance->getLocalPlayer()->playerInventory != nullptr) {
+                if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
 
 
                     float spacing = 15 * module->settings.getSettingByName<float>("uiscale")->value;
@@ -105,13 +96,13 @@ public:
                     int counter = 0;
 
                     for (int i = 9; i < 36; i++) {
-                        if (SDK::clientInstance->getLocalPlayer()->playerInventory->getinventory()->getItem(i)->getItem() != nullptr) {
+                        if (SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(i)->getItem() != nullptr) {
                             //durabilities[i][1] = SDK::clientInstance->getLocalPlayer()->getArmor(i)->getMaxDamage();
                             //durabilities[i][0] = durabilities[i][1] - SDK::clientInstance->getLocalPlayer()->getArmor(i)->getDamageValue();
                             barc.itemRenderer->renderGuiItemNew(&barc,
-                                                                SDK::clientInstance->getLocalPlayer()->playerInventory->getinventory()->getItem(
+                                                                SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
                                                                         i), 0,
-                                                                convert.x + xmodifier, convert.y + ymodifier, 1.0f,
+                                                                scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
                                                                 module->settings.getSettingByName<float>(
                                                                         "uiscale")->value, false);
                         }

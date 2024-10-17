@@ -6,6 +6,10 @@
 
 class Client {
 public:
+    static std::vector<std::string> onlinePlayers;
+
+    static std::vector<std::string> getPlayersVector(const nlohmann::json &data);
+
     static void initialize();
 
     static bool disable;

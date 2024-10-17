@@ -39,41 +39,27 @@ public:
 
     void settingsRender() override {
 
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
-
-
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
 
-        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, textWidth), 2);
-        FlarialGUI::SetScrollView(x, y, Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(0.90, "height"));
-
-        FlarialGUI::Dropdown(0, x, y, std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"},
-                             this->settings.getSettingByName<std::string>("mode")->value, "Freelook mode");
-        FlarialGUI::SetIsInAdditionalYMode();
-
-        y += Constraints::SpacingConstraint(0.35, textWidth);
-
-        if (FlarialGUI::Toggle(1, x, y, this->settings.getSettingByName<bool>(
-                "toggle")->value))
-            this->settings.getSettingByName<bool>("toggle")->value = !this->settings.getSettingByName<bool>(
-                    "toggle")->value;
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
 
-        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.60, textWidth), y, L"Toggleable",
-                                        textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(0.88f, "height"));
 
-        y += Constraints::SpacingConstraint(0.35, textWidth);
+        this->addHeader("Misc");
+        this->addKeybind("Freelook Keybind", "Hold for 2 seconds!", getKeybind());
 
-        FlarialGUI::KeybindSelector(2, x, y, getKeybind());
+        this->addToggle("Toggleable Mode", "Click to toggle or Hold to keep enabled", this->settings.getSettingByName<bool>("toggle")->value);
 
+        this->addDropdown("Freelook View Mode", "", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, this->settings.getSettingByName<std::string>("mode")->value);
 
         FlarialGUI::UnsetScrollView();
-        FlarialGUI::UnSetIsInAdditionalYMode();
+
+        this->resetPadding();
 
     }
 };

@@ -3,7 +3,9 @@
 #include "EventHandler.hpp"
 #include "Render/RenderEvent.hpp"
 #include "Network/PacketEvent.hpp"
+#include "Render/RenderPotionHUDEvent.hpp"
 #include "../Client.hpp"
+
 // TODO: rewrite event stuff
  void EventHandler::registerListener(Listener *listener) {
     Logger::debug("[EventHandler] Added listener: " + listener->name);
@@ -93,15 +95,15 @@ void EventHandler::onKey(KeyEvent &event) {
 
     if (Client::disable) return;
     if (!ModuleManager::initialized) return;
-    if (SDK::currentScreen != "hud_screen" &&
-    SDK::currentScreen != "f1_screen" &&
-    SDK::currentScreen != "zoom_screen"&&
-    SDK::currentScreen != "start_screen"&&
-    SDK::currentScreen != "play_screen") return;
+    auto currentScreen = SDK::getCurrentScreen();
+    if (currentScreen != "hud_screen" &&
+        currentScreen != "f1_screen" &&
+        currentScreen != "zoom_screen"&&
+        currentScreen != "start_screen"&&
+        currentScreen != "play_screen") return;
 
     for (Listener *&listener: listeners) {
         listener->onKey(event);
-
     }
 
 }
@@ -149,7 +151,6 @@ void EventHandler::onSetupAndRender(SetupAndRenderEvent &event) {
     for (Listener *&listener: listeners) {
         listener->onSetupAndRender(event);
     }
-
 }
 
 void EventHandler::onGetViewPerspective(PerspectiveEvent &event) {
@@ -237,5 +238,21 @@ void EventHandler::onRaknetTick(RaknetTickEvent &event) {
     if (!ModuleManager::initialized) return;
     for (Listener *&listener: listeners) {
         listener->onRaknetTick(event);
+    }
+}
+
+void EventHandler::onGetTexture(GetTextureEvent &event) {
+    if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
+    for (Listener *&listener: listeners) {
+        listener->onGetTexture(event);
+    }
+}
+
+void EventHandler::onRenderPotionHUD(RenderPotionHUDEvent &event) {
+    if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
+    for (Listener *&listener: listeners) {
+        listener->onRenderPotionHUD(event);
     }
 }
