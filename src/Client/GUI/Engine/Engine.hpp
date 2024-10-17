@@ -382,6 +382,8 @@ namespace FlarialGUI {
 
     bool LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HANDLE srv_cpu_handle, ID3D12Resource** out_tex_resource, LPCTSTR type);
 
+    void ExtractImageResource(int resourceId, std::string fileName, LPCTSTR type);
+
     void LoadFont(int resourceId);
 
     bool LoadFontFromFontFamily(std::string name, std::string weightedName, DWRITE_FONT_WEIGHT weight);
