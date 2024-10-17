@@ -23,12 +23,12 @@ Component *Actor::tryGet(uintptr_t addr) {
         auto func = reinterpret_cast<efunc>(addr);
         return func(basicReg, id);
     }else{
-        auto a1 = **(uintptr_t***)(this + 0x8);
-        auto a2 = *(uintptr_t*)(this + 0x10);
+        basicReg = **(uintptr_t***)(this + 0x8);
+        id = *(uintptr_t*)(this + 0x10);
 
-        using efunc = Component* (__thiscall*)(uintptr_t, uintptr_t*);
+        using efunc = Component* (__thiscall*)(uintptr_t, const EntityId &);
         auto func = reinterpret_cast<efunc>(addr);
-        return func(reinterpret_cast<uintptr_t>(a1), &a2);
+        return func(reinterpret_cast<uintptr_t>(basicReg), id);
     }
 }
 
