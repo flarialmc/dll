@@ -823,6 +823,38 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
     return fontedName;
 }
 
+void FlarialGUI::ExtractImageResource(int resourceId, std::string fileName, LPCTSTR type) {
+    LPVOID pFileData = NULL;
+    DWORD dwFileSize = 0;
+
+    HRSRC hRes = FindResource(Client::currentModule, MAKEINTRESOURCE(resourceId), type);
+    if (hRes == NULL)
+        return;
+
+    HGLOBAL hResData = LoadResource(Client::currentModule, hRes);
+    if (hResData == NULL)
+        return;
+
+    pFileData = LockResource(hResData);
+    if (pFileData == NULL)
+        return;
+
+    dwFileSize = SizeofResource(Client::currentModule, hRes);
+
+    std::string fileType(type);
+
+    std::string lpFileName = Utils::getRoamingPath() + "\\Flarial\\assets\\" + fileName;
+
+    std::ofstream outFile(lpFileName, std::ios::binary);
+    if (!outFile) {
+        return;
+    }
+
+    // Write the file data directly as binary
+    outFile.write(reinterpret_cast<const char*>(pFileData), dwFileSize);
+    outFile.close();
+}
+
 void FlarialGUI::LoadFont(int resourceId) {
     LPVOID pFontData = NULL;
     DWORD dwFontSize = 0;

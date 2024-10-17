@@ -17,9 +17,13 @@
 
 std::string Client::settingspath = Utils::getRoamingPath() + R"(\Flarial\Config\main.flarial)";
 Settings Client::settings = Settings();
+std::vector<std::string> Client::onlinePlayers;
+
 bool notifiedOfConnectionIssue = false;
 
 std::string current_commit = COMMIT_HASH;
+
+
 
 void DownloadAndSave(const std::string& url, const std::string& path) {
 
@@ -40,10 +44,36 @@ void DownloadAndSave(const std::string& url, const std::string& path) {
 
 }
 
+std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
+    onlinePlayers.clear(); // needs mutex to not cause occasional flicker
+    // Iterate over each server in the JSON object
+    for (const auto& server : data.items()) {
+        if (server.value().contains("players") || !server.value()["players"].is_array()) {
+            continue;
+        }
+        // Get the "players" array for the server
+        const auto& players = server.value()["players"];
+
+        // Add each player to the allPlayers vector
+        for (const auto& player : players) {
+            onlinePlayers.push_back(player.get<std::string>());
+        }
+
+    }
+
+    std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
+
+    std::string clearedName = Utils::removeNonAlphanumeric(Utils::removeColorCodes(name));
+    if (clearedName.empty()) clearedName = Utils::removeColorCodes(name);
+
+    onlinePlayers.push_back(clearedName);
+
+    return onlinePlayers;
+}
+
 bool Client::disable = false;
 
 void setWindowTitle(std::wstring title) {
-    using namespace winrt::Windows::UI::Notifications;
     using namespace winrt::Windows::UI::ViewManagement;
     using namespace winrt::Windows::ApplicationModel::Core;
 
@@ -164,6 +194,8 @@ void Client::initialize() {
 
     if (Client::settings.getSettingByName<std::string>("fontWeight") == nullptr)
         Client::settings.addSetting("fontWeight", (std::string) "Normal");
+
+    FlarialGUI::ExtractImageResource(IDR_RED_LOGO_PNG, "red-logo.png","PNG");
 
     FlarialGUI::LoadFont(IDR_FONT_TTF);
 
