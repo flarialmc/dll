@@ -119,7 +119,7 @@ DWORD WINAPI init(HMODULE real)
             if(Client::disable) break;
 
             if(SDK::clientInstance)
-            SDK::clientInstance->getGuiData()->displayClientMessage("§khiii §r §n§l§4FLARIAL §r §khiii §r  Donate to Flarial! https://flarial.xyz/donate\n§9Join our discord! https://flarial.xyz/discord");
+            SDK::clientInstance->getGuiData()->displayClientMessage("§khiii §r §n§l§4FLARIAL §r§khiii \n§r§cDonate to Flarial! §ehttps://flarial.xyz/donate\n§9Join our discord! §ehttps://flarial.xyz/discord");
             Sleep(420000);
         }
     });
