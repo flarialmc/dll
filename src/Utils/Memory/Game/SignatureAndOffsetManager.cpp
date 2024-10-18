@@ -7,6 +7,10 @@ void SignatureAndOffsetManager::addSignature(unsigned int hash, const char* sig)
     sigs[hash] = { sig, 0 };
 }
 
+void SignatureAndOffsetManager::removeSignature(unsigned int hash) {
+    sigs.erase(hash);
+}
+
 const char* SignatureAndOffsetManager::getSig(unsigned int hash) const {
     auto it = sigs.find(hash);
     return it != sigs.end() ? it->second.first.c_str() : nullptr;
