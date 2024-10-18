@@ -48,10 +48,10 @@ std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
     std::vector<std::string> allPlayers;
 
     // Iterate over each server in the JSON object
-    for (auto it = data.begin(); it != data.end(); ++it) {
-        if (it->contains("players")) {
+    for (const auto & it : data) {
+        if (it.contains("players")) {
             // Get the "players" array for the server
-            const auto& players = it->at("players");
+            const auto& players = it.at("players");
 
             // Add each player to the allPlayers vector
             for (const auto& player : players) {
