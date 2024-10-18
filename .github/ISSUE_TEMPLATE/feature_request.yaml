@@ -15,7 +15,7 @@ body:
     id: reason
     attributes:
       label: Reason
-      render: Markdown
+      # render: Markdown
       description: Why do you think this feature should be added?
       placeholder: I think this feature should be added because [...]
   
@@ -23,7 +23,7 @@ body:
     id: usecase
     attributes:
       label: Use case
-      render: Markdown
+      # render: Markdown
       description: How would you use this feature?
       placeholder: I would use this feature to [...]
   
@@ -31,7 +31,7 @@ body:
     id: alternatives
     attributes:
       label: Alternatives
-      render: Markdown
+      # render: Markdown
       description: Have you considered any alternative solutions or features?
       placeholder: An alternative solution could be [...]
   
@@ -39,7 +39,7 @@ body:
     id: additional
     attributes:
       label: Additional context
-      render: Markdown
+      # render: Markdown
       description: Add any other context or screenshots about the feature request here.
       placeholder: |
         Add any other context or screenshots about the feature request here.
