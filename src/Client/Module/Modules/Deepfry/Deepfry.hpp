@@ -35,21 +35,24 @@ public:
 
     void settingsRender() override {
 
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        L"Paint Effect", textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
-        if (FlarialGUI::Toggle(1, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "paint")->value))
-            this->settings.getSettingByName<bool>("paint")->value = !this->settings.getSettingByName<bool>(
-                    "paint")->value;
+
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(0.88f, "height"));
+
+        this->addHeader("Misc");
+        this->addToggle("Paint Effect", "", this->settings.getSettingByName<bool>("paint")->value);
+
+        FlarialGUI::UnsetScrollView();
+
+        this->resetPadding();
 
 
     }

@@ -2,6 +2,7 @@
 
 #include "../../../Utils/Memory/Memory.hpp"
 #include "../../../Utils/Utils.hpp"
+#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 class GuiData {
 public:
@@ -11,4 +12,6 @@ public:
     BUILD_ACCESS(this, float, screenResRounded, GET_OFFSET("GuiData::screenResRounded"));
     BUILD_ACCESS(this, float, sliderAmount, GET_OFFSET("GuiData::sliderAmount"));
     BUILD_ACCESS(this, float, scalingMultiplier, GET_OFFSET("GuiData::scalingMultiplier"));
+
+    void displayClientMessage(const std::string &str);
 };

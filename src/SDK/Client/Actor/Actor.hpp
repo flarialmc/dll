@@ -14,6 +14,9 @@
 #include "EntityContext.hpp"
 #include "Components/ActorGameTypeComponent.hpp"
 #include "Components/AABBShapeComponent.hpp"
+#include "Components/RuntimeIDComponent.hpp"
+#include "Components/ActorDataFlagComponent.hpp"
+#include "Components/MobEffectsComponent.hpp"
 
 
 enum ActorFlags {
@@ -169,14 +172,13 @@ enum class ActorCategory {
 class Level;
 
 
-
 class Actor {
 public:
-//    BUILD_ACCESS(this, int32_t , bobOffset, 0x98);
-//    BUILD_ACCESS(this, int32_t , Age, 0x98);
-    BUILD_ACCESS(this, int16_t, hurtTime, GET_OFFSET("Actor::hurtTime"));
-    BUILD_ACCESS(this, Level*, level, GET_OFFSET("Actor::level"));
-    BUILD_ACCESS(this, ActorCategory, categories, GET_OFFSET("Actor::categories"));
+    int16_t getHurtTime();
+
+    Level* getLevel();
+
+    ActorCategory getCategories();
 
     template<typename Component>
     Component *tryGet(uintptr_t addr);
@@ -185,9 +187,7 @@ public:
 
     MoveInputComponent *getMoveInputHandler();
 
-    bool isAlive();
-
-    bool getActorFlag(int flag);
+    bool getActorFlag(ActorFlags flag);
 
     bool canSee(const Actor& actor);
 
@@ -203,9 +203,9 @@ public:
 
     bool hasCategory(ActorCategory category);
 
-    RenderPositionComponent *getRenderPositionComponent();
+    float getApproximateReach(Actor* target);
 
-    bool isValidTarget(Actor *actor);
+    RenderPositionComponent *getRenderPositionComponent();
 
     SimpleContainer *getArmorContainer();
 
@@ -216,4 +216,24 @@ public:
     AABBShapeComponent *getAABBShapeComponent();
 
     StateVectorComponent *getStateVectorComponent();
+
+    RuntimeIDComponent *getRuntimeIDComponent();
+
+    bool isValidAABB();
+
+    uint64_t getRuntimeID();
+
+    ActorDataFlagComponent *getActorDataFlagComponent();
+
+    void setHurtTime(int16_t hurtTime);
+
+    bool isOnGround();
+
+    bool IsOnSameTeam(Actor *actor);
+
+    Vec3<float> getLerpedPosition();
+
+    AABB getLerpedAABB(bool asHitbox = false);
+
+    std::vector<UnifiedMobEffectData> getMobEffects();
 };

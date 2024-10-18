@@ -36,9 +36,7 @@ struct BlurInputBuffer
 
 class Blur
 {
-private:
-    static inline ID3D11Device *pDevice = nullptr;
-    static inline ID3D11DeviceContext *pContext = nullptr;
+public:
 
     static inline ID3D11PixelShader *pUpsampleShader = nullptr;
     static inline ID3D11PixelShader *pDownsampleShader = nullptr;
@@ -56,11 +54,35 @@ private:
 
     static void RenderToRTV(ID3D11RenderTargetView *, ID3D11ShaderResourceView *, XMFLOAT2);
 
-public:
-    static void blur(ID3D11Device *);
+    static inline std::vector<ID3D11Texture2D *> framebuffers;
 
-    static void RenderBlur(ID3D11Texture2D *, ID3D11RenderTargetView *, int);
+    static inline bool hasDoneFrames = false;
+
+    static void RenderBlur(ID3D11RenderTargetView *, int, float);
 };
+
+class BlurDX12
+{
+public:
+
+    static inline ID3D11PixelShader *pUpsampleShader = nullptr;
+    static inline ID3D11PixelShader *pDownsampleShader = nullptr;
+    static inline ID3D11VertexShader *pVertexShader = nullptr;
+    static inline ID3D11InputLayout *pInputLayout = nullptr;
+
+    static inline ID3D11SamplerState *pSampler = nullptr;
+    static inline ID3D11Buffer *pVertexBuffer = nullptr;
+    static inline ID3D11Buffer *pConstantBuffer = nullptr;
+    static inline BlurInputBuffer constantBuffer;
+
+    // RAII
+    static void InitializePipeline();
+    //static void Cleanup();
+
+    static void RenderBlur(ID3D12GraphicsCommandList* commandList);
+};
+
+
 
 class Dimension {
 public:
@@ -109,6 +131,7 @@ namespace FlarialGUI {
     DWRITE_FONT_WEIGHT inline LoadModuleFontLaterWeight = DWRITE_FONT_WEIGHT_NORMAL;
 
     std::string GetWeightedName(std::string name, DWRITE_FONT_WEIGHT weight);
+    DWRITE_FONT_WEIGHT GetFontWeightFromString(const std::string& weightStr);
 
     inline WindowRect WindowRects[1000];
     inline SliderRect SliderRects[2500];
@@ -136,9 +159,13 @@ namespace FlarialGUI {
 
     extern std::unordered_map<std::string, ToolTipStruct> tooltips;
     extern std::unordered_map<std::string, float> TextSizes;
+    extern std::unordered_map<std::string, Vec2<float>> TextSizesXY;
+
     extern LRUCache<UINT32, winrt::com_ptr<ID2D1SolidColorBrush>> brushCache;
     extern LRUCache<uint64_t, winrt::com_ptr<IDWriteTextLayout>> textLayoutCache;
     extern LRUCache<UINT32, winrt::com_ptr<IDWriteTextFormat>> textFormatCache;
+    extern LRUCache<std::wstring, std::string> fromWideCache;
+    extern LRUCache<std::string, std::wstring> toWideCache;
     //extern std::unordered_map<std::string, winrt::com_ptr<ID2D1GradientStopCollection>> gradientStopCache;
     extern LRUCache<uint64_t, winrt::com_ptr<ID2D1LinearGradientBrush>> gradientBrushCache;
 
@@ -185,8 +212,7 @@ namespace FlarialGUI {
 
     void LoadImageFromFile(const wchar_t *filename, ID2D1Bitmap **bitmap);
 
-    void FlarialText(float x, float y, const wchar_t *text, float width, float height,
-                     DWRITE_TEXT_ALIGNMENT alignment);
+    void FlarialText(float x, float y, const wchar_t *text, float width, float height,DWRITE_TEXT_ALIGNMENT alignment);
 
     void SetScrollView(float x, float y, float width, float height);
 
@@ -229,9 +255,7 @@ namespace FlarialGUI {
 
     bool Toggle(int index, float x, float y, bool isEnabled, bool rgb);
 
-    float Slider(int index, float x, float y, float startingPoint = 50.0f, float maxValue = 100.0f,
-                 float minValue = 0.0f,
-                 bool zerosafe = true);
+    float Slider(int index, float x, float y, float& value, float maxValue = 100.0f, float minValue = 0.0f, bool zerosafe = true);
 
     void Circle(float x, float y, const D2D1_COLOR_F &color, float radius);
 
@@ -249,8 +273,7 @@ namespace FlarialGUI {
 
     std::string ColorFToHex(const D2D1_COLOR_F &color);
 
-    void
-    RoundedHollowRect(float x, float y, float borderWidth, D2D_COLOR_F color, float width,
+    void RoundedHollowRect(float x, float y, float borderWidth, D2D_COLOR_F color, float width,
                       float height, float radiusX,
                       float radiusY);
 
@@ -261,7 +284,7 @@ namespace FlarialGUI {
 
     D2D1::ColorF HSVtoColorF(float H, float s, float v);
 
-    void ColorPicker(const int index, float x, const float y, std::string &hex, bool &rgb);
+    void ColorPicker(const int index, float x, float y, std::string &hex, bool &rgb);
 
     void ColorPickerWindow(int index, std::string &hex, float &opacity, bool &rgb);
 
@@ -299,8 +322,7 @@ namespace FlarialGUI {
 
     void NotifyHeartbeat();
 
-    std::string
-    TextBoxVisual(int index, std::string &text, int limit, float x, float y, const std::string &real = "Text Format");
+    std::string TextBoxVisual(int index, std::string& text, int limit, float x, float y, const std::string& real = "");
 
     winrt::com_ptr<ID2D1SolidColorBrush> getBrush(D2D1_COLOR_F color);
 
@@ -360,6 +382,8 @@ namespace FlarialGUI {
 
     bool LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HANDLE srv_cpu_handle, ID3D12Resource** out_tex_resource, LPCTSTR type);
 
+    void ExtractImageResource(int resourceId, std::string fileName, LPCTSTR type);
+
     void LoadFont(int resourceId);
 
     bool LoadFontFromFontFamily(std::string name, std::string weightedName, DWRITE_FONT_WEIGHT weight);
@@ -369,4 +393,8 @@ namespace FlarialGUI {
                                      const float imageHeight);
 
     ImColor D2DColorToImColor(D2D1_COLOR_F color);
+
+    void OverrideAlphaValues(float percent);
+
+    void ResetOverrideAlphaValues();
 }

@@ -2,9 +2,15 @@
 
 #include "../../src/Utils/Memory/Memory.hpp"
 #include "Inventory.hpp"
+#include <libhat/Access.hpp>
 
 class PlayerInventory {
 public:
-    BUILD_ACCESS(this, int, SelectedSlot, GET_OFFSET("PlayerInventory::SelectedSlot"));
-    BUILD_ACCESS(this, Inventory*, inventory, GET_OFFSET("PlayerInventory::inventory"));
+    int getSelectedSlot() {
+        return hat::member_at<int>(this, GET_OFFSET("PlayerInventory::SelectedSlot"));
+    }
+
+    Inventory *getInventory() {
+        return hat::member_at<Inventory*>(this, GET_OFFSET("PlayerInventory::inventory"));
+    }
 };
