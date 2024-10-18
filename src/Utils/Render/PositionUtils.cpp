@@ -12,6 +12,11 @@ Vec2<float> PositionUtils::getScaledPos(Vec2<float> pos) {
     return pos.mul(uiScale);
 }
 
-Vec2<float> PositionUtils::getCustomScaledPos(Vec2<float> pos, float scale) {
-    return getScaledPos(pos).mul(scale);
+Vec2<float> PositionUtils::getScreenScaledPos(Vec2<float> pos) {
+    Vec2<float> uiScale = getUIScale();
+    return pos.div(uiScale);
+}
+
+Vec2<float> PositionUtils::getCustomScreenScaledPos(Vec2<float> pos, float scale) {
+    return getScreenScaledPos(pos).mul(scale);
 }

@@ -54,8 +54,34 @@ public:
 
     static void RenderToRTV(ID3D11RenderTargetView *, ID3D11ShaderResourceView *, XMFLOAT2);
 
+    static inline std::vector<ID3D11Texture2D *> framebuffers;
+
+    static inline bool hasDoneFrames = false;
+
     static void RenderBlur(ID3D11RenderTargetView *, int, float);
 };
+
+class BlurDX12
+{
+public:
+
+    static inline ID3D11PixelShader *pUpsampleShader = nullptr;
+    static inline ID3D11PixelShader *pDownsampleShader = nullptr;
+    static inline ID3D11VertexShader *pVertexShader = nullptr;
+    static inline ID3D11InputLayout *pInputLayout = nullptr;
+
+    static inline ID3D11SamplerState *pSampler = nullptr;
+    static inline ID3D11Buffer *pVertexBuffer = nullptr;
+    static inline ID3D11Buffer *pConstantBuffer = nullptr;
+    static inline BlurInputBuffer constantBuffer;
+
+    // RAII
+    static void InitializePipeline();
+    //static void Cleanup();
+
+    static void RenderBlur(ID3D12GraphicsCommandList* commandList);
+};
+
 
 
 class Dimension {
@@ -105,6 +131,7 @@ namespace FlarialGUI {
     DWRITE_FONT_WEIGHT inline LoadModuleFontLaterWeight = DWRITE_FONT_WEIGHT_NORMAL;
 
     std::string GetWeightedName(std::string name, DWRITE_FONT_WEIGHT weight);
+    DWRITE_FONT_WEIGHT GetFontWeightFromString(const std::string& weightStr);
 
     inline WindowRect WindowRects[1000];
     inline SliderRect SliderRects[2500];
@@ -132,6 +159,8 @@ namespace FlarialGUI {
 
     extern std::unordered_map<std::string, ToolTipStruct> tooltips;
     extern std::unordered_map<std::string, float> TextSizes;
+    extern std::unordered_map<std::string, Vec2<float>> TextSizesXY;
+
     extern LRUCache<UINT32, winrt::com_ptr<ID2D1SolidColorBrush>> brushCache;
     extern LRUCache<uint64_t, winrt::com_ptr<IDWriteTextLayout>> textLayoutCache;
     extern LRUCache<UINT32, winrt::com_ptr<IDWriteTextFormat>> textFormatCache;
@@ -352,6 +381,8 @@ namespace FlarialGUI {
     bool LoadImageFromResource(int resourceId, ID3D11ShaderResourceView** out_srv, LPCTSTR type);
 
     bool LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HANDLE srv_cpu_handle, ID3D12Resource** out_tex_resource, LPCTSTR type);
+
+    void ExtractImageResource(int resourceId, std::string fileName, LPCTSTR type);
 
     void LoadFont(int resourceId);
 

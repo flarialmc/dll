@@ -15,6 +15,8 @@
 #include "Components/ActorGameTypeComponent.hpp"
 #include "Components/AABBShapeComponent.hpp"
 #include "Components/RuntimeIDComponent.hpp"
+#include "Components/ActorDataFlagComponent.hpp"
+#include "Components/MobEffectsComponent.hpp"
 
 
 enum ActorFlags {
@@ -185,7 +187,7 @@ public:
 
     MoveInputComponent *getMoveInputHandler();
 
-    bool getActorFlag(int flag);
+    bool getActorFlag(ActorFlags flag);
 
     bool canSee(const Actor& actor);
 
@@ -200,6 +202,8 @@ public:
     std::string *getNametag();
 
     bool hasCategory(ActorCategory category);
+
+    float getApproximateReach(Actor* target);
 
     RenderPositionComponent *getRenderPositionComponent();
 
@@ -216,4 +220,20 @@ public:
     RuntimeIDComponent *getRuntimeIDComponent();
 
     bool isValidAABB();
+
+    uint64_t getRuntimeID();
+
+    ActorDataFlagComponent *getActorDataFlagComponent();
+
+    void setHurtTime(int16_t hurtTime);
+
+    bool isOnGround();
+
+    bool IsOnSameTeam(Actor *actor);
+
+    Vec3<float> getLerpedPosition();
+
+    AABB getLerpedAABB(bool asHitbox = false);
+
+    std::vector<UnifiedMobEffectData> getMobEffects();
 };

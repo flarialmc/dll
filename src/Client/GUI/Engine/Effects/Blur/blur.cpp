@@ -221,7 +221,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     dsd.StencilEnable = false;
     ID3D11DepthStencilState *pDepthStencilState;
     hr = SwapchainHook::d3d11Device->CreateDepthStencilState(&dsd, &pDepthStencilState);
-    if (FAILED(hr)) { pContext->Release(); return; }
+    if (FAILED(hr)) {  return; }
     pContext->OMSetDepthStencilState(pDepthStencilState, 0);
 
     void *null = nullptr;
@@ -255,7 +255,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
     ID3D11BlendState *pBlendState;
     hr = SwapchainHook::d3d11Device->CreateBlendState(&bd, &pBlendState);
-    if (FAILED(hr)) { pContext->Release(); pDepthStencilState->Release(); return; }
+    if (FAILED(hr)) {  pDepthStencilState->Release(); return; }
     pContext->OMSetBlendState(pBlendState, NULL, 0xffffffff);
     D3D11_RASTERIZER_DESC rd{};
     rd.FillMode = D3D11_FILL_SOLID;
@@ -264,7 +264,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     rd.ScissorEnable = false;
     ID3D11RasterizerState *pRasterizerState;
     hr = SwapchainHook::d3d11Device->CreateRasterizerState(&rd, &pRasterizerState);
-    if (FAILED(hr)) { pContext->Release(); pDepthStencilState->Release(); pBlendState->Release(); return; }
+    if (FAILED(hr)) {  pDepthStencilState->Release(); pBlendState->Release(); return; }
     pContext->RSSetState(pRasterizerState);
 
     pContext->PSSetShaderResources(0, 1, &pShaderResourceView);
@@ -290,7 +290,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
 void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iterations, float intensity)
 {
 
-    if(intensity < 1) return;
+    if(intensity < 0) return;
 
     if (!SwapchainHook::GetBackbuffer()) return;
 
@@ -299,13 +299,13 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 
     ID3D11DeviceContext* pContext = SwapchainHook::context;
 
-    std::vector<ID3D11Texture2D *> framebuffers;
     std::vector<ID3D11RenderTargetView *> renderTargetViews;
     std::vector<ID3D11ShaderResourceView *> shaderResourceViews;
     std::vector<XMFLOAT2> fbSizes;
     D3D11_TEXTURE2D_DESC desc;
     SwapchainHook::GetBackbuffer()->GetDesc(&desc);
 
+    if(!hasDoneFrames)
     framebuffers.reserve((size_t)iterations);
     renderTargetViews.reserve((size_t)iterations);
 
@@ -322,13 +322,18 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
         ID3D11RenderTargetView *pRenderTargetView;
         ID3D11ShaderResourceView *pShaderResourceView;
 
+
+        // create texture2d for each size and simply reuse to create rtvs & srvs
+        if(!hasDoneFrames)
         SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pFrameBuffer);
+        else pFrameBuffer = framebuffers[i];
         if (i == 0)
             pRenderTargetView = pDstRenderTargetView;
         else
             SwapchainHook::d3d11Device->CreateRenderTargetView(pFrameBuffer, nullptr, &pRenderTargetView);
         SwapchainHook::d3d11Device->CreateShaderResourceView(pFrameBuffer, nullptr, &pShaderResourceView);
 
+        if(!hasDoneFrames)
         framebuffers.push_back(pFrameBuffer);
         renderTargetViews.push_back(pRenderTargetView);
         shaderResourceViews.push_back(pShaderResourceView);
@@ -337,6 +342,8 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
         desc.Width /= 2;
         desc.Height /= 2;
     }
+
+    hasDoneFrames = true;
 
     constantBuffer.offset = XMFLOAT2(intensity * 3, intensity * 3);
     pContext->PSSetShader(pDownsampleShader, nullptr, 0);
@@ -356,17 +363,16 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 
     for (int i = 0; i < iterations; i++)
     {
+
         if (i != 0)
             renderTargetViews[i]->Release();
-        framebuffers[i]->Release();
         shaderResourceViews[i]->Release();
 
         renderTargetViews.clear();
-        framebuffers.clear();
         shaderResourceViews.clear();
         fbSizes.clear();
     }
 
-    pContext->Release();
+
     pOrigShaderResourceView->Release();
 }

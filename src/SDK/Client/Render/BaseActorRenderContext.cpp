@@ -4,7 +4,7 @@ BaseActorRenderContext::BaseActorRenderContext(class ScreenContext *screenCtx, C
                                                MinecraftGame *game) {
     memset(this, 0, sizeof(BaseActorRenderContext));
     using func = void (__fastcall *)(BaseActorRenderContext *, class ScreenContext *, ClientInstance *, MinecraftGame *);
-    static func efunc = reinterpret_cast<func>(Memory::findSig(GET_SIG("baseActorRenderContext")));
+    static func efunc = reinterpret_cast<func>(GET_SIG_ADDRESS("baseActorRenderContext"));
 
     efunc(this, screenCtx, clientInstance, game);
 }

@@ -24,6 +24,7 @@
 #include "Modules/PingCounter/PingCounter.hpp"
 #include "Modules/PotCounter/PotCounter.hpp"
 #include "Modules/ArrowCounter/ArrowCounter.hpp"
+#include "Modules/EntityCounter/EntityCounter.hpp"
 #include "Modules/SnapLook/SnapLook.hpp"
 #include "Modules/Freelook/Freelook.hpp"
 #include "Modules/ThirdPersonNametag/ThirdPerson.hpp"
@@ -66,13 +67,18 @@
 //#include "Modules/MovableChat/MovableChat.hpp"
 #include <algorithm>
 
+#include "Modules/ItemPhysics/ItemPhysics.hpp"
+#include "Modules/Crosshair/Crosshair.hpp"
+#include "Modules/HiveStat/HiveStat.hpp"
+#include "Modules/OpponentReach/OpponentReach.hpp"
+#include "Modules/ViewModel/ViewModel.hpp"
+#include "Modules/PotionHUD/PotionHUD.hpp"
+#include "Modules/FasterInventory/FasterInventory.hpp"
+
+#include "Modules/EntityCounter/EntityCounter.hpp"
+
 namespace ModuleManager {
     std::unordered_map<size_t, Module*> moduleMap;
-    std::vector<std::string> onlineUsers;
-    std::vector<std::string> onlineDevs;
-    std::vector<std::string> onlineCommites;
-    std::vector<std::string> onlinePluses;
-    std::vector<std::string> onlineStaff;
     bool initialized = false;
 }
 
@@ -113,6 +119,7 @@ void ModuleManager::initialize() {
     addModule(new PingCounter());
     addModule(new PotCounter());
     addModule(new ArrowCounter());
+    addModule(new EntityCounter());
     addModule(new Time());
     addModule(new MEM());
     addModule(new Fullbright());
@@ -126,13 +133,8 @@ void ModuleManager::initialize() {
     addModule(new HurtColor());
     addModule(new FogColor());
     addModule(new ArmorHUD());
-
     addModule(new TimeChanger());
-
-    if((WinrtUtils::check(20,30) && !WinrtUtils::check(20,40)) || WinrtUtils::check(20,50)) { // does not work in 1.20.4X
-        addModule(new RenderOptions());
-    }
-
+    addModule(new RenderOptions());
     addModule(new PaperDoll());
     addModule(new GuiScale());
     addModule(new WeatherChanger());
@@ -153,8 +155,16 @@ void ModuleManager::initialize() {
     addModule(new AutoRQ());
     addModule(new HitPing());
     addModule(new InstantHurtAnimation());
+    addModule(new OpponentReach());
+    addModule(new ViewModel());
+    addModule(new PotionHUD());
+    addModule(new FasterInventory());
+
     //addModule(new MovableChat());
     //addModule(new CompactChat());
+    addModule(new ItemPhysics());
+    
+    addModule(new HiveStat());
 
     EventHandler::registerListener(new GUIKeyListener("GuiKeyListener"));
     EventHandler::registerListener(new DiscordRPCListener("DiscordRPC"));
@@ -163,6 +173,7 @@ void ModuleManager::initialize() {
     EventHandler::registerListener(new CentreCursorListener("CentreCursor"));
     EventHandler::registerListener(new rgbListener("RGB Controller"));
     EventHandler::registerListener(new TextAliasListener("TextAlias"));
+    EventHandler::registerListener(new HiveModeCatcherListener("HiveModeCatcher"));
 
     initialized = true;
 }
@@ -170,7 +181,8 @@ void ModuleManager::initialize() {
 void ModuleManager::terminate() {
     initialized = false;
     for (const auto& pair : moduleMap) {
-        pair.second->terminate();
+        if (pair.second != nullptr)
+            pair.second->terminate();
     }
     moduleMap.clear();
 }
@@ -185,11 +197,14 @@ bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {
 
     bool result = false;
 
+    if(!ModuleManager::initialized) return false;
+
     for (const auto& pair : moduleMap) {
+        if(!pair.second) continue;
 
         if (pair.second->settings.getSettingByName<bool>(settingName) != nullptr)
             if (pair.second->settings.getSettingByName<bool>(settingName)->value &&
-                pair.second->isEnabled()) {
+                pair.second->isEnabled() && (pair.second->active || pair.second->defaultKeybind.empty())) {
                 result = true;
                 break;
             }

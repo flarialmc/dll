@@ -22,9 +22,10 @@ public:
         if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                 if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
+                    if(SDK::getCurrentScreen() != "hud_screen") return;
                     auto arrowsCount = 0;
 
-                    auto inventory = SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory;
+                    auto inventory = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory();
                     if(inventory == nullptr) return;
 
                     auto offhandItem = SDK::clientInstance->getLocalPlayer()->getOffhandSlot();

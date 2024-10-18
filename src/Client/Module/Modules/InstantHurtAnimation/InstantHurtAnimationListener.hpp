@@ -20,42 +20,6 @@ class InstantHurtAnimationListener : public Listener {
 
     Module *module;
 
-    static bool IsOnTeam(Actor *actor) {
-        auto player = SDK::clientInstance->getLocalPlayer();
-        if (!player) return false;
-
-        std::string playerName = *player->getNametag();
-        std::string actorName = *actor->getNametag();
-
-        if (playerName.empty() || actorName.empty()) return false;
-
-        auto cleanName = [](std::string &name) {
-            constexpr std::string tags[] = {"§r", "§l"};
-            for (const auto &tag : tags) {
-                size_t pos;
-                while ((pos = name.find(tag)) != std::string::npos) {
-                    name.erase(pos, tag.length());
-                }
-            }
-        };
-
-        cleanName(playerName);
-        cleanName(actorName);
-
-        size_t playerTeamPos = playerName.find("§");
-        if (playerTeamPos == std::string::npos) return false;
-
-        std::string playerTeam = playerName.substr(playerTeamPos + 2, 1);
-
-        size_t actorTeamPos = actorName.find("§");
-        if (actorTeamPos != std::string::npos) {
-            std::string actorTeam = actorName.substr(actorTeamPos + 2, 1);
-            return actorTeam == playerTeam;
-        }
-
-        return false;
-    }
-
     void onPacketReceive(PacketEvent &event) override {
         auto player = SDK::clientInstance->getLocalPlayer();
         if (!SDK::clientInstance->getLocalPlayer()) return;
@@ -82,8 +46,20 @@ class InstantHurtAnimationListener : public Listener {
 
 
     void onAttack(AttackEvent &event) override {
+        if(!event.getActor()->hasCategory(ActorCategory::Player)) return;
+        if(module->settings.getSettingByName<bool>("onlyWithArmor")->value) {
+            auto armorContainer = event.getActor()->getArmorContainer();
+            if(armorContainer == nullptr) return;
+
+            ItemStack* helmetItem = armorContainer->getItem(0);
+            ItemStack* chestplateItem = armorContainer->getItem(1);
+            ItemStack* leggingsItem = armorContainer->getItem(2);
+            ItemStack* bootsItem = armorContainer->getItem(3);
+
+            if (!helmetItem->item || !chestplateItem->item || !leggingsItem->item || !bootsItem->item) return;
+        }
         if(module->settings.getSettingByName<bool>("tryToExcludeTeam")->value)
-            if(IsOnTeam(event.getActor())) return;
+            if(event.getActor()->IsOnSameTeam(SDK::clientInstance->getLocalPlayer())) return;
 
         ClearOldHits();
 
@@ -106,10 +82,12 @@ class InstantHurtAnimationListener : public Listener {
 
         hitEntities[runtimeID] = now;
 
-        SendPacketHook::receivePacketEntityEventOriginal(SendPacketHook::PacketHandlerDispatcher,
-                                                         SendPacketHook::NetworkIdentifier,
-                                                         SendPacketHook::NetEventCallback,
-                                                         packet);
+        if(SendPacketHook::PacketHandlerDispatcher && SendPacketHook::NetworkIdentifier && SendPacketHook::NetEventCallback) {
+            SendPacketHook::receivePacketEntityEventOriginal(SendPacketHook::PacketHandlerDispatcher,
+                                                             SendPacketHook::NetworkIdentifier,
+                                                             SendPacketHook::NetEventCallback,
+                                                             packet);
+        }
     };
 
     void ClearOldHits() {

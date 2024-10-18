@@ -31,15 +31,6 @@ void FlarialGUI::image(const std::string& imageName, D2D1_RECT_F rect) {
 
     if (imageName == R"(\Flarial\assets\transparent.png)")
         interpolationMode = D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR;
-
-    if (isInScrollView) {
-        if (isRectInRect(ScrollViewRect, rect))
-            D2D::context->DrawBitmap(ImagesClass::eimages[imageName], imageRect, 1.0f,
-                                     interpolationMode);
-    } else {
-        D2D::context->DrawBitmap(ImagesClass::eimages[imageName], imageRect, 1.0f,
-                                 interpolationMode);
-    }
 }
 
 bool FlarialGUI::LoadImageFromResource(int resourceId, ID3D11ShaderResourceView** out_srv, LPCTSTR type) {
@@ -247,6 +238,13 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	fence->SetEventOnCompletion(1, event);
 	WaitForSingleObject(event, INFINITE);
 
+    cmdList->Release();
+    cmdAlloc->Release();
+    cmdQueue->Release();
+    CloseHandle(event);
+    fence->Release();
+    uploadBuffer->Release();
+
 	// Create a shader resource view for the texture
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	ZeroMemory(&srvDesc, sizeof(srvDesc));
@@ -289,7 +287,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
         LoadImageFromResource(resourceId, &ImagesClass::images[resourceId], type);
         */
 
-    if (SwapchainHook::d3d11Device != nullptr) {
+    if (SwapchainHook::queue == nullptr) {
 		if (ImagesClass::ImguiDX11Images[resourceId] == nullptr) {
             if (LoadImageFromResource(resourceId, &ImagesClass::ImguiDX11Images[resourceId], type)) {
             	//totalImageLoaded++;
@@ -319,7 +317,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 
 				D3D12_DESCRIPTOR_HEAP_DESC descriptorImGuiRender = {};
 				descriptorImGuiRender.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-				descriptorImGuiRender.NumDescriptors = 100; // MAY NEED TO CHANGE THIS IS WE GET MORE THAN 100 ASSETS
+				descriptorImGuiRender.NumDescriptors = MAX_IMAGE_ID; // MAY NEED TO CHANGE THIS IS WE GET MORE THAN 100 ASSETS
 				descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
 				ImageDevice4Fun->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&SwapchainHook::d3d12DescriptorHeapImGuiIMAGE));
@@ -338,7 +336,6 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 			if (!ret)
 				return;
 			ImagesClass::ImguiDX12Images[resourceId] = (ImTextureID)gpu.ptr;
-			ImageDevice4Fun->Release();
 
 		}
 		else {
@@ -379,7 +376,6 @@ void FlarialGUI::LoadAllImages() {
 			}
 		}
 
-		ImageDevice4Fun->Release();
 	} else {
 		for(int i = 100; i <= MAX_IMAGE_ID; i++) {
 			if(i != IDR_PATAR_JPG) LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "PNG");

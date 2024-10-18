@@ -96,11 +96,11 @@ public:
                     int counter = 0;
 
                     for (int i = 9; i < 36; i++) {
-                        if (SDK::clientInstance->getLocalPlayer()->getSupplies()->getinventory()->getItem(i)->getItem() != nullptr) {
+                        if (SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(i)->getItem() != nullptr) {
                             //durabilities[i][1] = SDK::clientInstance->getLocalPlayer()->getArmor(i)->getMaxDamage();
                             //durabilities[i][0] = durabilities[i][1] - SDK::clientInstance->getLocalPlayer()->getArmor(i)->getDamageValue();
                             barc.itemRenderer->renderGuiItemNew(&barc,
-                                                                SDK::clientInstance->getLocalPlayer()->getSupplies()->getinventory()->getItem(
+                                                                SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
                                                                         i), 0,
                                                                 scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
                                                                 module->settings.getSettingByName<float>(

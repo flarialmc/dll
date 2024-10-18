@@ -195,9 +195,16 @@ void Module::resetPadding() {
     toggleIndex = 0;
     dropdownIndex = 0;
     sliderIndex = 0;
-    colorPickerIndex = 0;
+
+    int i = 100;
+    for (int i = 100; i < colorPickerIndex; ++i) {
+        FlarialGUI::ColorPickerWindow(i, *color_pickers[i].value, *color_pickers[i].opacity, *color_pickers[i].rgb);
+    }
+
+    colorPickerIndex = 100;
     keybindIndex = 0;
     textboxIndex = 0;
+    FlarialGUI::UnSetIsInAdditionalYMode();
 }
 
 void Module::extraPadding() {
@@ -208,17 +215,25 @@ void Module::addHeader(std::string text) {
     float x = Constraints::PercentageConstraint(0.019, "left");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
+
     D2D1_COLOR_F col = colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6;
     col.a = o_colors_secondary6;
 
     std::string name = FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 500, 0, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.215f, "height", true), DWRITE_FONT_WEIGHT_BOLD, false);
+
+    if(FlarialGUI::shouldAdditionalY)
+        for (int i = 0; i < FlarialGUI::highestAddIndexes + 1; i++) {
+            if (FlarialGUI::DropDownMenus[i].isActive && i <= FlarialGUI::additionalIndex) {
+                y += FlarialGUI::additionalY[i];
+            }
+        }
     FlarialGUI::RoundedRect(x, y + Constraints::RelativeConstraint(0.023f, "width"), col, FlarialGUI::TextSizes[name] + Constraints::RelativeConstraint(0.01f, "width"), 3.0f, 0, 0);
 
     padding += Constraints::RelativeConstraint(0.055f, "height", true);
 }
 
-void Module::addColorPicker(std::string text, std::string subtext, std::string& value, bool& rgb) {
-    float elementX = Constraints::PercentageConstraint(0.285f, "right");
+void Module::addColorPicker(std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb) {
+    float elementX = Constraints::PercentageConstraint(0.195f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
     FlarialGUI::ColorPicker(colorPickerIndex, elementX, y, value, rgb);
@@ -226,6 +241,9 @@ void Module::addColorPicker(std::string text, std::string subtext, std::string& 
     Module::addElementText(text, subtext);
 
     padding += Constraints::RelativeConstraint(0.05f, "height", true);
+
+    DrDisrespect respect = { &value, &opacity, &rgb };
+    color_pickers[colorPickerIndex] = respect;
     colorPickerIndex++;
 }
 
@@ -247,7 +265,10 @@ void Module::addDropdown(std::string text, std::string subtext, const std::vecto
 
     FlarialGUI::Dropdown(dropdownIndex, elementX, y, options, value, "");
 
+
     Module::addElementText(text, subtext);
+
+    FlarialGUI::SetIsInAdditionalYMode();
 
     padding += Constraints::RelativeConstraint(0.05f, "height", true);
     dropdownIndex++;
@@ -317,6 +338,18 @@ void Module::addToggle(std::string text, std::string subtext, bool& value) {
     
     padding += Constraints::RelativeConstraint(0.05f, "height", true);
     toggleIndex++;
+}
+
+void Module::addKeybind(std::string text, std::string subtext, std::string& keybind) {
+    float elementX = Constraints::PercentageConstraint(0.13f, "right");
+    float y = Constraints::PercentageConstraint(0.08, "top") + padding;
+
+    FlarialGUI::KeybindSelector(keybindIndex, elementX, y, keybind);
+
+    Module::addElementText(text, subtext);
+
+    padding += Constraints::RelativeConstraint(0.05f, "height", true);
+    keybindIndex++;
 }
 
 void Module::loadDefaults() {

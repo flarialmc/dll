@@ -3,6 +3,66 @@
 #include "../../../Logger/Logger.hpp"
 #include "../SignatureAndOffsetManager.hpp"
 
+void OffsetInit::init2130() {
+    Logger::debug("[Offsets] Loading offsets for 1.21.3X");
+
+    ADD_OFFSET("Player::gamemode", 0xB18);
+    ADD_OFFSET("Player::playerName", 0xCA0);
+
+    ADD_OFFSET("Level::hitResult", 0x230);
+    ADD_OFFSET("Level::getPlayerMap", 0xC08);
+
+    ADD_OFFSET("ClientInstance::camera", 0x2A0);
+    ADD_OFFSET("ClientInstance::viewMatrix", 0x360);
+    ADD_OFFSET("ClientInstance::getFovX", 0x720);
+    ADD_OFFSET("ClientInstance::getFovY", 0x734);
+
+    ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x614);
+
+    ADD_OFFSET("ClientInstance::guiData", 0x588);
+
+    ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x1A0);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x690);
+
+    ADD_OFFSET("MoveInputComponent::forward", 0x2C);
+    ADD_OFFSET("MoveInputComponent::backward", 0x2D);
+    ADD_OFFSET("MoveInputComponent::left", 0x2E);
+    ADD_OFFSET("MoveInputComponent::right", 0x2F);
+}
+
+void OffsetInit::init2120() {
+    Logger::debug("[Offsets] Loading offsets for 1.21.2X");
+
+    ADD_OFFSET("Actor::hurtTime", 0x1F4);
+    ADD_OFFSET("Actor::level", 0x230);
+    ADD_OFFSET("Actor::categories", 0x268);
+
+    ADD_OFFSET("Player::playerInventory", 0x628);
+    ADD_OFFSET("Player::playerName", 0xC88);
+    ADD_OFFSET("Player::gamemode", 0xB00);
+
+    ADD_OFFSET("Actor::baseTickVft", 24);
+
+    ADD_OFFSET("PlayerInventory::inventory", 0xB8);
+
+    ADD_OFFSET("UIControl::x", 0x10);
+    ADD_OFFSET("UIControl::y", 0x14);
+    ADD_OFFSET("UIControl::LayerName", 0x20);
+    ADD_OFFSET("UIControl::scale", 0x48);
+
+    ADD_OFFSET("UIControl::children", 0x90);
+    ADD_OFFSET("UIControl::components", 0xB0);
+
+    ADD_OFFSET("RaknetConnector::JoinedIp", 0x390);
+
+    ADD_OFFSET("Level::hitResult", 0x220);
+    ADD_OFFSET("Level::getPlayerMap", 0xBF8);
+
+    ADD_OFFSET("ItemActor::stack", 0x408);
+
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x6D0);
+}
+
 void OffsetInit::init2100() {
     Logger::debug("[Offsets] Loading offsets for 1.21.0X");
 
@@ -19,7 +79,9 @@ void OffsetInit::init2100() {
     ADD_OFFSET("Weather::lightingLevel", 0x48);
 
     ADD_OFFSET("Level::hitResult", 0xB38);
-    ADD_OFFSET("Level::getPlayerMap", 0x1BC8);
+    ADD_OFFSET("Level::getPlayerMap", 0x1BC8); // getRuntimeActorList offset + B8 || Level::getPlayerList
+
+    ADD_OFFSET("ItemActor::stack", 0x448);
 }
 
 void OffsetInit::init2080() {
@@ -40,13 +102,14 @@ void OffsetInit::init2080() {
 
     ADD_OFFSET("Level::hitResult", 0xB30);
     ADD_OFFSET("Level::getPlayerMap", 0x1C88);
+
+    ADD_OFFSET("ItemActor::stack", 0x470);
 }
 
 void OffsetInit::init2070() {
     Logger::debug("[Offsets] Loading offsets for 1.20.7X");
 
     ADD_OFFSET("ClientInstance::getBlockSource", 28);
-    ADD_OFFSET("ClientInstance::getLocalPlayer", 29);
 
     ADD_OFFSET("Actor::hurtTime", 0x214);
     ADD_OFFSET("Actor::level", 0x258);
@@ -64,6 +127,7 @@ void OffsetInit::init2070() {
 
     ADD_OFFSET("Level::hitResult", 0xB18);
 
+    ADD_OFFSET("ItemActor::stack", 0x498);
 }
 
 void OffsetInit::init2060() {
@@ -82,18 +146,20 @@ void OffsetInit::init2060() {
     ADD_OFFSET("ClientInstance::getFovY", 0x704);
 
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x1A8);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x828);
 
     ADD_OFFSET("RakPeer::GetAveragePing", 44);
 
     ADD_OFFSET("Level::hitResult", 0xA98);
     ADD_OFFSET("Level::getPlayerMap", 0x1E98);
+
+    ADD_OFFSET("ItemActor::stack", 0x4D0);
 }
 
 void OffsetInit::init2050() {
     Logger::debug("[Offsets] Loading offsets for 1.20.5X");
 
     ADD_OFFSET("ClientInstance::getBlockSource", 27);
-    ADD_OFFSET("ClientInstance::getLocalPlayer", 28);
 
     ADD_OFFSET("Actor::hurtTime", 0x22C);
     ADD_OFFSET("Actor::level", 0x288);
@@ -112,6 +178,10 @@ void OffsetInit::init2050() {
 
     ADD_OFFSET("Level::hitResult", 0xA48);
     ADD_OFFSET("Level::getPlayerMap", 0x1EA8);
+
+    ADD_OFFSET("ItemActor::stack", 0x4C8);
+
+    ADD_OFFSET("OptionInfo::TranslateName", 0x158);
 }
 
 void OffsetInit::init2040() {
@@ -125,12 +195,15 @@ void OffsetInit::init2040() {
     ADD_OFFSET("Player::gamemode", 0xEB0);
 
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x190);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x818);
 
     ADD_OFFSET("Weather::lightingLevel",  0x48);
     ADD_OFFSET("Weather::rainLevel", 0x3C);
 
     ADD_OFFSET("Level::hitResult", 0xA68);
     ADD_OFFSET("Level::getPlayerMap", 0x25F0);
+
+    ADD_OFFSET("OptionInfo::TranslateName", 0x168);
 }
 
 void OffsetInit::init2030() {
@@ -151,7 +224,6 @@ void OffsetInit::init2030() {
     ADD_OFFSET("Inventory::getItem", 5);
 
     ADD_OFFSET("ClientInstance::getBlockSource", 26);
-    ADD_OFFSET("ClientInstance::getLocalPlayer", 27);
     ADD_OFFSET("ClientInstance::levelRenderer", 0xE0);
 
     ADD_OFFSET("ClientInstance::getFovX", 0x6F8);
@@ -160,7 +232,7 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("Packet::getId", 1);
 
-    ADD_OFFSET("Actor::hurtTime", 0x22C); // ?hurtEffects@Mob@@UEAAXAEBVActorDamageSource@@M_N1@Z Mob::hurtEffects 2nd after Actor::getHealth(void)
+    ADD_OFFSET("Actor::hurtTime", 0x204); // ?hurtEffects@Mob@@UEAAXAEBVActorDamageSource@@M_N1@Z Mob::hurtEffects 2nd after Actor::getHealth(void)
     ADD_OFFSET("Actor::level", 0x260);
     ADD_OFFSET("Actor::categories", 0x298);
     ADD_OFFSET("Actor::baseTickVft", 44);
@@ -180,11 +252,13 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("ClientInstance::minecraftGame", 0xC8);
     ADD_OFFSET("ClientInstance::guiData", 0x560);
+    ADD_OFFSET("ClientInstance::camera", 0x270);
     ADD_OFFSET("ClientInstance::viewMatrix", 0x330);
 
     ADD_OFFSET("Minecraft::timer", 0xD8);
 
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x188);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x810);
 
     ADD_OFFSET("Option::optionInformation", 0x8);
     ADD_OFFSET("Option::value", 0x10);
@@ -231,6 +305,11 @@ void OffsetInit::init2030() {
     ADD_OFFSET("MinecraftUIRenderContext::screenContext", 0x10);
     ADD_OFFSET("MinecraftUIRenderContext::textures", 0x48);
 
+    ADD_OFFSET("ScreenContext::colorHolder", 0x30);
+    ADD_OFFSET("ScreenContext::tessellator", 0xC0);
+
+    ADD_OFFSET("createMaterial", 1);
+
     ADD_OFFSET("TextureGroup::base", 0x18);
     ADD_OFFSET("TextureGroup::loadedTextures", 0x178);
 
@@ -245,9 +324,23 @@ void OffsetInit::init2030() {
     ADD_OFFSET("UIControl::x", 0x78);
     ADD_OFFSET("UIControl::y", 0x7C);
     ADD_OFFSET("UIControl::children", 0xA0);
+    ADD_OFFSET("UIControl::components", 0xC0);
 
     ADD_OFFSET("VisualTree::root", 0x8);
 
     ADD_OFFSET("Level::hitResult", 0xA48);
     ADD_OFFSET("Level::getPlayerMap", 0x2608);
+
+    ADD_OFFSET("ItemActor::stack", 0x4A0);
+
+    ADD_OFFSET("NameTagRenderObject::nameTag", 0x0);
+    ADD_OFFSET("NameTagRenderObject::pos", 0x60);
+
+    ADD_OFFSET("ViewRenderData::cameraPos", 0x0);
+    ADD_OFFSET("ViewRenderData::cameraTargetPos", 0xC);
+
+    ADD_OFFSET("Font::getLineLength", 6);
+    ADD_OFFSET("Font::getLineHeight", 7);
+
+    ADD_OFFSET("mce::Camera::worldMatrixStack", 0x40);
 }

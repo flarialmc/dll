@@ -34,17 +34,25 @@ public:
 
     void settingsRender() override {
 
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
 
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
-        FlarialGUI::KeybindSelector(0, toggleX, toggleY, getKeybind());
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::TextBoxVisual(5, settings.getSettingByName<std::string>("command")->value, 50, toggleX, toggleY);
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(0.88f, "height"));
 
+        this->addHeader("Misc");
+        this->addKeybind("Command Keybind", "Hold for 2 seconds!", getKeybind());
+        this->addTextBox("Command to Send", "No need for /", settings.getSettingByName<std::string>("command")->value);
+
+        FlarialGUI::UnsetScrollView();
+
+        this->resetPadding();
     }
 };
 

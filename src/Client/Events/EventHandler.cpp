@@ -3,7 +3,9 @@
 #include "EventHandler.hpp"
 #include "Render/RenderEvent.hpp"
 #include "Network/PacketEvent.hpp"
+#include "Render/RenderPotionHUDEvent.hpp"
 #include "../Client.hpp"
+
 // TODO: rewrite event stuff
  void EventHandler::registerListener(Listener *listener) {
     Logger::debug("[EventHandler] Added listener: " + listener->name);
@@ -149,7 +151,6 @@ void EventHandler::onSetupAndRender(SetupAndRenderEvent &event) {
     for (Listener *&listener: listeners) {
         listener->onSetupAndRender(event);
     }
-
 }
 
 void EventHandler::onGetViewPerspective(PerspectiveEvent &event) {
@@ -237,5 +238,21 @@ void EventHandler::onRaknetTick(RaknetTickEvent &event) {
     if (!ModuleManager::initialized) return;
     for (Listener *&listener: listeners) {
         listener->onRaknetTick(event);
+    }
+}
+
+void EventHandler::onGetTexture(GetTextureEvent &event) {
+    if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
+    for (Listener *&listener: listeners) {
+        listener->onGetTexture(event);
+    }
+}
+
+void EventHandler::onRenderPotionHUD(RenderPotionHUDEvent &event) {
+    if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
+    for (Listener *&listener: listeners) {
+        listener->onRenderPotionHUD(event);
     }
 }

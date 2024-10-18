@@ -9,5 +9,7 @@ public:
     static void init2070();
     static void init2080();
     static void init2100();
+    static void init2102();
     static void init2120();
+    static void init2130();
 };

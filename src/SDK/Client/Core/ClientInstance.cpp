@@ -3,8 +3,16 @@
 #include <libhat/Access.hpp>
 
 LocalPlayer *ClientInstance::getLocalPlayer() {
-    static int off = GET_OFFSET("ClientInstance::getLocalPlayer");
-    return Memory::CallVFuncI<LocalPlayer *>(off, this);
+    // Indig0r
+    static uintptr_t indexRef;
+
+    if (indexRef == 0) {
+        indexRef = GET_SIG_ADDRESS("ClientInstance::getLocalPlayerIndex");
+    }
+
+    int index = *reinterpret_cast<int*>(indexRef + 9) / 8;
+
+    return Memory::CallVFuncI<LocalPlayer *>(index, this);
 }
 
 BlockSource *ClientInstance::getBlockSource() {
@@ -17,7 +25,7 @@ void ClientInstance::grabMouse() {
     static uintptr_t indexRef;
 
     if (indexRef == 0) {
-        indexRef = Memory::findSig(GET_SIG("ClientInstance::grabMouse"));
+        indexRef = GET_SIG_ADDRESS("ClientInstance::grabMouse");
     }
 
     int index = *reinterpret_cast<int *>(indexRef + 3) / 8;
@@ -28,7 +36,7 @@ void ClientInstance::releaseMouse() {
     static uintptr_t indexRef;
 
     if (indexRef == 0) {
-        indexRef = Memory::findSig(GET_SIG("ClientInstance::grabMouse"));
+        indexRef = GET_SIG_ADDRESS("ClientInstance::grabMouse");
         if(indexRef == NULL) {
             return;
         }

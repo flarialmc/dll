@@ -14,6 +14,8 @@
 #include "../../../Module/Modules/Hitbox/HitboxListener.hpp"
 #include <format>
 
+#include "../../../../Utils/Render/MaterialUtils.hpp"
+
 __int64* oDrawImage = nullptr;
 
 class SetUpAndRenderHook : public Hook
@@ -51,6 +53,31 @@ private:
 		);
 	}
 
+	static void drawImageDetour2120(
+		MinecraftUIRenderContext* _this,
+		TexturePtr* texturePtr,
+		Vec2<float>& imagePos,
+		Vec2<float>& imageDimension,
+		Vec2<float>& uvPos,
+		Vec2<float>& uvSize,
+		bool unk
+	)
+	{
+		DrawImageEvent event(texturePtr, imagePos);
+		EventHandler::onDrawImage(event);
+
+		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(
+				oDrawImage,
+				_this,
+				texturePtr,
+				event.getImagePos(),
+				imageDimension,
+				uvPos,
+				uvSize,
+				unk
+		);
+	}
+
     static void hookDrawTextAndDrawImage(MinecraftUIRenderContext* muirc) {
         auto vTable = *(uintptr_t **) muirc;
 
@@ -59,12 +86,16 @@ private:
                              "drawText");
         }
 
-        if (oDrawImage == nullptr) {
-            Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour, (void **) &oDrawImage, "DrawImage");
-        }
+		if (oDrawImage == nullptr) {
+			if (WinrtUtils::check(21, 20))
+				Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour2120, (void **) &oDrawImage, "DrawImage");
+			else
+				Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour, (void **) &oDrawImage, "DrawImage");
+		}
     }
 
 	static void setUpAndRenderCallback(ScreenView* pScreenView, MinecraftUIRenderContext* muirc) {
+		MaterialUtils::update();
 
 		SDK::screenView = pScreenView;
         SDK::clientInstance = muirc->getClientInstance();
@@ -73,7 +104,7 @@ private:
         if(funcOriginalText == nullptr || oDrawImage == nullptr)
             hookDrawTextAndDrawImage(muirc);
 
-        std::string layer = pScreenView->VisualTree->root->LayerName;
+        std::string layer = pScreenView->VisualTree->root->getLayerName();
 
         if (layer != "debug_screen" && layer != "toast_screen"){ // start_screen, play_screen, world_loading_progress_screen, pause_screen, hud_screen
             SetTopScreenNameEvent event(layer);
@@ -89,22 +120,20 @@ private:
         if (player && SDK::clientInstance->getLevelRender())
         {
             origin = SDK::clientInstance->getLevelRender()->getOrigin();
-            pos = player->getRenderPositionComponent()->renderPos;
         }
 
-        FrameTransform transform = { SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov(), pos};
+        FrameTransform transform = { SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov() };
 
         SwapchainHook::frameTransformsMtx.lock();
         SwapchainHook::FrameTransforms.push(transform);
         SwapchainHook::frameTransformsMtx.unlock();
 
-        if(layer == "debug_screen" || layer == "hud_screen" || layer == "start_screen") {
-            SetupAndRenderEvent event(muirc);
-            funcOriginal(pScreenView, muirc);
-            EventHandler::onSetupAndRender(event);
-        } else {
-            funcOriginal(pScreenView, muirc);
-        }
+		funcOriginal(pScreenView, muirc);
+
+		if (layer != "debug_screen" && layer != "toast_screen") {
+			SetupAndRenderEvent event(muirc);
+			EventHandler::onSetupAndRender(event);
+		}
 	}
 
 

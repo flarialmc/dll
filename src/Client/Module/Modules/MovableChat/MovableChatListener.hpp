@@ -85,11 +85,11 @@ public:
         if(this->module->isEnabled())
 
 
-        if (SDK::screenView->VisualTree->root->LayerName == "hud_screen") {
+        if (SDK::screenView->VisualTree->root->getLayerName() == "hud_screen") {
 
             SDK::screenView->VisualTree->root->forEachControl([this](const std::shared_ptr<UIControl>& control) {
 
-                if (control->LayerName == "chat_panel" && module->isEnabled()) {
+                if (control->getLayerName() == "chat_panel" && module->isEnabled()) {
 
 
                     if (MovableChatListener::oriXy.x == 0.0f) {

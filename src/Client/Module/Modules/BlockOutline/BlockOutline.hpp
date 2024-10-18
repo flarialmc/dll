@@ -4,6 +4,7 @@
 #include "../../../Client.hpp"
 #include "../../../../Utils/Utils.hpp"
 #include "../../../../Utils/Memory/CustomAllocator/Buffer.hpp" // why its not hpp here ???
+#include "BlockOutlineListener.hpp"
 
 class BlockOutline : public Module {
 
@@ -19,16 +20,16 @@ private:
     static inline std::array<std::byte, 4> outlineColorNewRipRel;
 
 public:
-    BlockOutline() : Module("BlockOutline", "Changes the block outline color", IDR_BLOCK_PNG, "") {
+    BlockOutline() : Module("Block Outline", "Changes the block outline color", IDR_BLOCK_PNG, "") {
         Module::setup();
     };
 
     void onSetup() override { // init color just in case
-        highlightColorRipRelAddr = Memory::findSig(GET_SIG("blockHighlightColor")); // RIP REL 4BYTE FROM FUNC OFFSET ADDR
+        highlightColorRipRelAddr = GET_SIG_ADDRESS("blockHighlightColor"); // RIP REL 4BYTE FROM FUNC OFFSET ADDR
         if(highlightColorRipRelAddr == NULL) return;
         highlightColorOrigRipRel = *(UINT32*)highlightColorRipRelAddr;
 
-        outlineColorRipRelAddr = Memory::findSig(GET_SIG("mce::Color::BLACK"));
+        outlineColorRipRelAddr = GET_SIG_ADDRESS("mce::Color::BLACK");
         if(outlineColorRipRelAddr == NULL) return;
         outlineColorOrigRipRel = *(UINT32*)outlineColorRipRelAddr;
         // TODO: make it look better
@@ -69,11 +70,13 @@ public:
 
     void onEnable() override {
         onColorChange();
+        EventHandler::registerListener(new BlockOutlineListener("BlockOutline", this, selectionColor));
         patch();
         Module::onEnable();
     }
 
     void onDisable() override {
+        EventHandler::unregisterListener("BlockOutline");
         unpatch();
         Module::onDisable();
     }
@@ -88,23 +91,28 @@ public:
 
     void settingsRender() override {
 
-        float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
 
-        FlarialGUI::FlarialTextWithFont(x, y, L"Color", textWidth * 6.9f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(0, x + Constraints::SpacingConstraint(0.95, textWidth),
-                                y - Constraints::SpacingConstraint(0.017, textWidth),
-                                settings.getSettingByName<std::string>("color")->value,
-                                settings.getSettingByName<bool>("color_rgb")->value);
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
-        FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("color")->value,
+
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(0.88f, "height"));
+
+        this->addHeader("Colors");
+        this->addColorPicker("Outline Color", "", settings.getSettingByName<std::string>("color")->value,
                                       settings.getSettingByName<float>("colorOpacity")->value,
                                       settings.getSettingByName<bool>("color_rgb")->value);
+
+        FlarialGUI::UnsetScrollView();
+
+        this->resetPadding();
+
+
         if (settings.getSettingByName<bool>("enabled"))
             onColorChange();
     }

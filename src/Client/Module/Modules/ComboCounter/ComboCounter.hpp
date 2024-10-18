@@ -34,14 +34,14 @@ public:
 
         /* Border Start */
 
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
         const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
 
-        FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"),
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
@@ -50,7 +50,6 @@ public:
         this->addToggle("Border", "", settings.getSettingByName<bool>("border")->value);
         this->addConditionalSlider(settings.getSettingByName<bool>("border")->value, "Border Width", "", settings.getSettingByName<float>("borderWidth")->value, 4.f);
         this->addSlider("Rounding", "", this->settings.getSettingByName<float>("rounding")->value);
-        this->addToggle("Translucency", "", this->settings.getSettingByName<bool>("BlurEffect")->value);
         this->addToggle("Responsive Rectangle", "Resizes width with text", this->settings.getSettingByName<bool>("responsivewidth")->value);
         this->addSlider("Rotation", "", this->settings.getSettingByName<float>("rotation")->value, 359.f, 0.f, false);
         this->addSlider("Rectangle Width", "", this->settings.getSettingByName<float>("rectwidth")->value, 3.f);
@@ -66,15 +65,17 @@ public:
         this->addToggle("Reverse Padding Y", "", this->settings.getSettingByName<bool>("reversepaddingy")->value);
         this->addSlider("Padding X", "", this->settings.getSettingByName<float>("padx")->value, 1.f, 0.f, false);
         this->addSlider("Padding Y", "", this->settings.getSettingByName<float>("pady")->value, 1.f, 0.f, false);
-        
+
         this->extraPadding();
 
         this->addHeader("Colors");
-        this->addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<bool>("bgRGB")->value);
+        this->addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
+        this->addColorPicker("Text Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
+        this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
 
+        FlarialGUI::UnsetScrollView();
 
         this->resetPadding();
 
-        FlarialGUI::UnsetScrollView();
     }
 };

@@ -19,8 +19,10 @@ class ComboListener : public Listener {
     Module *module;
 
     void onAttack(AttackEvent &event) override {
-        Combo++;
-        last_hit = std::chrono::high_resolution_clock::now();
+        if(std::chrono::high_resolution_clock::now() - last_hit > std::chrono::milliseconds(480)) {
+            Combo++;
+            last_hit = std::chrono::high_resolution_clock::now();
+        }
     }
 
     void onTick(TickEvent &event) override {
@@ -35,12 +37,10 @@ class ComboListener : public Listener {
     }
 
     void onRender(RenderEvent &event) override {
-            if (module->isEnabled()) {
-                auto comboStr = std::to_string(Combo);
-                this->module->normalRender(8, comboStr);
-
-            }
-
+        if (module->isEnabled()) {
+            auto comboStr = std::to_string(Combo);
+            this->module->normalRender(8, comboStr);
+        }
     }
 
 public:

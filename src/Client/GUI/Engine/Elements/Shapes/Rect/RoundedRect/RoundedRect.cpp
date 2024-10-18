@@ -1,6 +1,4 @@
 #include "../../../../Engine.hpp"
-#include <imgui.h>
-#include <imgui_internal.h>
 
 void FlarialGUI::RoundedRect(float x, float y, const D2D_COLOR_F color, const float width, const float height, float radiusX,
                         float radiusY, ImDrawFlags flags) {

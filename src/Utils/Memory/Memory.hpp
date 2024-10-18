@@ -52,7 +52,7 @@ class Memory {
 public:
 
     template<unsigned int IIdx, typename TRet, typename... TArgs>
-    static inline auto CallVFunc(void *thisptr, TArgs... argList) -> TRet {
+    static auto CallVFunc(void *thisptr, TArgs... argList) -> TRet {
         using Fn = TRet(__thiscall *)(void *, decltype(argList)...);
         return (*static_cast<Fn **>(thisptr))[IIdx](thisptr, std::forward<TArgs>(argList)...);
     }
@@ -81,7 +81,7 @@ public:
     }
 
     template<typename R, typename... Args>
-    static inline R CallFunc(void *func, Args... args) {
+    static R CallFunc(void *func, Args... args) {
         return ((R(*)(Args...)) func)(args...);
     }
 
@@ -128,14 +128,37 @@ public:
         return addr;
     }
 
-    static void patchBytes(void *dst, void *src, unsigned int size) {
+    static void nopBytes(void* dst, const unsigned int size) {
+        if (dst == nullptr)
+            return;
+
+        DWORD oldprotect;
+        VirtualProtect(dst, size, PAGE_EXECUTE_READWRITE, &oldprotect);
+        memset(dst, 0x90, size);
+        VirtualProtect(dst, size, oldprotect, &oldprotect);
+    }
+
+    static void copyBytes(void* src, void* dst, const unsigned int size) {
+        if (src == nullptr || dst == nullptr)
+            return;
+
+        DWORD oldprotect;
+        VirtualProtect(src, size, PAGE_EXECUTE_READWRITE, &oldprotect);
+        memcpy(dst, src, size);
+        VirtualProtect(src, size, oldprotect, &oldprotect);
+    }
+
+    static void patchBytes(void *dst, const void *src, const unsigned int size) {
+        if (src == nullptr || dst == nullptr)
+            return;
+
         DWORD oldprotect;
         VirtualProtect(dst, size, PAGE_EXECUTE_READWRITE, &oldprotect);
         memcpy(dst, src, size);
         VirtualProtect(dst, size, oldprotect, &oldprotect);
     }
 
-    static inline uintptr_t offsetFromSig(uintptr_t sig, int offset) { // REL RIP ADDR RESOLVER
+    static uintptr_t offsetFromSig(uintptr_t sig, int offset) { // REL RIP ADDR RESOLVER
         // pointer is relative to the code it is in - it is how far to the left in bytes you need to move to get to the value it points to,
         // this function returns absolute address in memory ("(sig)A B C (+offset)? ? ? ?(+4)(from here + bytes to move to get to value pointer points to) D E F")
         // offset val = *reinterpret_cast<int *>(sig + offset)
@@ -143,7 +166,12 @@ public:
         return sig + offset + 4 + *reinterpret_cast<int *>(sig + offset);
     }
 
-    static inline std::array<std::byte, 4> getRipRel(uintptr_t instructionAddress, uintptr_t targetAddress) {
+    template<typename Ret>
+    static Ret getOffsetFromSig(const uintptr_t sig, const int offset) {
+        return reinterpret_cast<Ret>(offsetFromSig(sig, offset));
+    }
+
+    static std::array<std::byte, 4> getRipRel(uintptr_t instructionAddress, uintptr_t targetAddress) {
         uintptr_t relAddress = targetAddress - (instructionAddress + 4); // 4 bytes for RIP-relative addressing
         std::array<std::byte, 4> relRipBytes{};
 
@@ -154,7 +182,11 @@ public:
         return relRipBytes;
     }
 
-    static inline uintptr_t GetAddressByIndex(uintptr_t vtable, int index) {
-        return (*reinterpret_cast<uintptr_t*>(vtable + 8 * index));
+    static uintptr_t GetAddressByIndex(uintptr_t vtable, int index) {
+        return *reinterpret_cast<uintptr_t*>(vtable + 8 * index);
+    }
+    static void SetProtection(uintptr_t addr, size_t size, DWORD protect) {
+        DWORD oldProtect;
+        VirtualProtect((LPVOID)addr, size, protect, &oldProtect);
     }
 };

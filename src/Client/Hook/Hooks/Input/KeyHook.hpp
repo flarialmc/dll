@@ -7,10 +7,10 @@ class KeyHook : public Hook {
 private:
     static inline std::array<bool, 256> keys;
 
-    static void keyCallback(unsigned char key, int state);
+    static void keyCallback(int key, bool state);
 
 public:
-    typedef void(__thiscall *original)(unsigned char keyId, bool held);
+    typedef void(__thiscall *original)(int keyId, bool held);
 
     static inline original funcOriginal = nullptr;
 

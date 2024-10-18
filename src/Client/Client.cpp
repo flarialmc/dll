@@ -17,7 +17,13 @@
 
 std::string Client::settingspath = Utils::getRoamingPath() + R"(\Flarial\Config\main.flarial)";
 Settings Client::settings = Settings();
+std::vector<std::string> Client::onlinePlayers;
+
 bool notifiedOfConnectionIssue = false;
+
+std::string current_commit = COMMIT_HASH;
+
+
 
 void DownloadAndSave(const std::string& url, const std::string& path) {
 
@@ -38,10 +44,37 @@ void DownloadAndSave(const std::string& url, const std::string& path) {
 
 }
 
+std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
+    std::vector<std::string> allPlayers;
+
+    // Iterate over each server in the JSON object
+    for (const auto & it : data) {
+        if (it.contains("players")) {
+            // Get the "players" array for the server
+            const auto& players = it.at("players");
+
+            // Add each player to the allPlayers vector
+            for (const auto& player : players) {
+                allPlayers.push_back(player);
+            }
+        }
+    }
+
+    if(SDK::clientInstance && SDK::clientInstance->getLocalPlayer()) {
+        std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
+
+        std::string clearedName = Utils::removeNonAlphanumeric(Utils::removeColorCodes(name));
+        if (clearedName.empty()) clearedName = Utils::removeColorCodes(name);
+
+        allPlayers.push_back(clearedName);
+    }
+
+    return allPlayers;
+}
+
 bool Client::disable = false;
 
 void setWindowTitle(std::wstring title) {
-    using namespace winrt::Windows::UI::Notifications;
     using namespace winrt::Windows::UI::ViewManagement;
     using namespace winrt::Windows::ApplicationModel::Core;
 
@@ -51,7 +84,9 @@ void setWindowTitle(std::wstring title) {
 }
 
 void Client::initialize() {
-    setWindowTitle(L"Flarial");
+
+    std::string title = WinrtUtils::getFormattedVersion() + " " + current_commit;
+    setWindowTitle(L"Flarial " + FlarialGUI::to_wide(title));
     Logger::debug("[INIT] Initializing Flarial...");
     
     VersionUtils::init();
@@ -61,6 +96,8 @@ void Client::initialize() {
 
     if (!VersionUtils::isSupported(Client::version)) {
         Logger::debug("[INFO] Version not supported!");
+        MessageBox(NULL, "Flarial: this version is not supported!", "", MB_OK);
+        ModuleManager::terminate();
         Client::disable = true;
         return;
     }
@@ -100,7 +137,7 @@ void Client::initialize() {
         Client::settings.addSetting("blurintensity", 18.0f);
 
     if (Client::settings.getSettingByName<bool>("killdx") == nullptr)
-        Client::settings.addSetting("killdx", false);
+        Client::settings.addSetting("killdx", true); // TODO: Fix dx12 stuff and set this to false again
 
     if (Client::settings.getSettingByName<bool>("disable_alias") == nullptr)
         Client::settings.addSetting("disable_alias", false);
@@ -147,6 +184,20 @@ void Client::initialize() {
     if (Client::settings.getSettingByName<float>("rgb_value") == nullptr)
         Client::settings.addSetting("rgb_value", 1.0f);
 
+    if (Client::settings.getSettingByName<float>("modules_font_scale") == nullptr)
+        Client::settings.addSetting("modules_font_scale", 1.0f);
+
+    if (Client::settings.getSettingByName<float>("gui_font_scale") == nullptr)
+        Client::settings.addSetting("gui_font_scale", 1.0f);
+
+    if (Client::settings.getSettingByName<bool>("overrideFontWeight") == nullptr)
+        Client::settings.addSetting("overrideFontWeight", (bool)false);
+
+    if (Client::settings.getSettingByName<std::string>("fontWeight") == nullptr)
+        Client::settings.addSetting("fontWeight", (std::string) "Normal");
+
+    FlarialGUI::ExtractImageResource(IDR_RED_LOGO_PNG, "red-logo.png","PNG");
+
     FlarialGUI::LoadFont(IDR_FONT_TTF);
 
     FlarialGUI::LoadFont(IDR_FONT_BOLD_TTF);
@@ -158,11 +209,6 @@ void Client::initialize() {
     HookManager::initialize();
     ModuleManager::initialize();
     Logger::debug("[Client] Ready.");
-
-    if (!Client::disable) {
-        FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                "keybind")->value + " to open the menu in-game.");
-    }
 }
 
 std::string window = "Minecraft";

@@ -24,7 +24,7 @@ public:
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                 auto potsCount = 0;
                 if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
-                    auto inventory = SDK::clientInstance->getLocalPlayer()->getSupplies()->inventory;
+                    auto inventory = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory();
 
                     if (inventory != nullptr) {
                         for (int i = 0; i < 36; i++) {

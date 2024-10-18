@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <ranges>
 #include <string>
 #include <cstdlib>
 #include <cmath>
@@ -108,6 +109,10 @@ public:
 		return Vec2(this->x + Vec.x, this->y + Vec.y);
 	}
 
+    auto operator==(const Vec2<T> Vec) {
+        return this->x == Vec.x && this->y == Vec.y;
+    }
+
 	auto operator-(const Vec2<T> Vec) {
 		return Vec2(this->x - Vec.x, this->y - Vec.y);
 	}
@@ -142,7 +147,7 @@ public:
         return Vec3<T>(this->x - x, this->y - y, this->z - z);
     };
 
-    auto sub(const Vec3<T> &vec) -> Vec3<T> {
+    auto sub(const Vec3<T>& vec) const -> Vec3<T> {
         return Vec3<T>(this->x - vec.x, this->y - vec.y, this->z - vec.z);
     };
 
@@ -172,6 +177,10 @@ public:
 
     auto mul(const Vec3<T> &vec) -> Vec3<T> {
         return Vec3<T>(this->x * vec.x, this->y * vec.y, this->z * vec.z);
+    };
+
+    auto lerp(const Vec3<T> &vec, T t) -> Vec3<T> {
+        return Vec3<T>(std::lerp(this->x, vec.x, t), std::lerp(this->y, vec.y, t), std::lerp(this->z, vec.z, t));
     };
 
     auto mul(T v) -> Vec3<T> {
@@ -273,6 +282,17 @@ public:
             hash = ((hash << 5) + hash) + c; // hash * 33 + c
 
         return hash;
+    }
+
+    static std::wstring StrToWStr(const std::string &s);
+
+    static std::string WStrToStr(const std::wstring &ws);
+
+    static std::vector<std::string> splitString(const std::string& str, char delimiter) {
+        return str
+          | std::views::split(delimiter)
+          | std::views::transform([](auto&& token) { return std::string{token.begin(), token.end()}; })
+          | std::ranges::to<std::vector>();
     }
 };
 

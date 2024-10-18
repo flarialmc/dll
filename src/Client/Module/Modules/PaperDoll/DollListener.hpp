@@ -70,7 +70,7 @@ public:
         if(SDK::getCurrentScreen() == "hud_screen") {
             SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl>& control) {
 
-                if (control->LayerName == "hud_player") {
+                if (control->getLayerName() == "hud_player") {
 
                     if(DollListener::oriXY.x == 0.0f) {
                         DollListener::oriXY.x = control->x;
@@ -86,7 +86,7 @@ public:
 
 
                     if (module->settings.getSettingByName<bool>("alwaysshow")->value || ClickGUIRenderer::editmenu) {
-                        auto component = reinterpret_cast<CustomRenderComponent*>(control->components[4].get());
+                        auto component = reinterpret_cast<CustomRenderComponent*>(control->getComponents()[4].get());
                         component->renderer->state = 1.0f;
                     }
 
