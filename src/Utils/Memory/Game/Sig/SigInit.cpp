@@ -14,7 +14,6 @@ void SigInit::init2130() {
 
 
     ADD_SIG("tryGetPrefix3", "40 53 48 83 EC 40 48 8B");
-    ADD_SIG("Actor::getOnGroundFlagComponent", "DA BA A3 99 E2 C3");
 
     ADD_SIG("Actor::canSee", "E8 ? ? ? ? 84 C0 74 1C 48 8B 4B 48");
 
@@ -83,6 +82,8 @@ void SigInit::init2100() {
 
     ADD_SIG("glm_rotateRef", "E8 ? ? ? ? 41 BD ? ? ? ? 41 0F B6 46");
 
+    ADD_SIG("Actor::getOnGroundFlagComponent", "DA BA A3 99 E2 C3");
+
     ADD_SIG("glm_translateRef", "? ? ? ? ? 4C 8D 05 ? ? ? ? 44 0F 28 05");
     ADD_SIG("glm_translateRef2", "? ? ? ? ? C6 46 ? ? F3 0F 11 74 24 ? F3 0F 10 1D");
 
@@ -112,6 +113,7 @@ void SigInit::init2080() {
     ADD_SIG("ItemRenderer::render", "48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 ? ? 44 0F 29 ? ? 44 0F 29 ? ? ? ? ? 44 0F 29 ? ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 49 8B F8");
 
     DEPRECATE_SIG("Actor::getArmor");
+    DEPRECATE_SIG("Actor::getOffhandSlot");
 }
 
 void SigInit::init2070() {
@@ -144,8 +146,6 @@ void SigInit::init2060() {
     ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 C8 1C 00 00");
 
     ADD_SIG("ActorCollision::isOnGround", "E8 ? ? ? ? 84 C0 49 8B 87");
-
-    DEPRECATE_SIG("Actor::getOffhandSlot");
 }
 
 void SigInit::init2050() {
@@ -183,6 +183,8 @@ void SigInit::init2040() {
     Logger::debug("[Signatures] Loading sigs for 1.20.4X");
 
     ADD_SIG("LoopbackPacketSender::sendPacket", "48 83 EC ? 48 0F BE ? ? 48 83 C0 ? 74 27");
+
+    ADD_SIG("ActorCollision::isOnGround", "?");
 
     ADD_SIG("Options::getGamma", "? ? ? ? ? ? ? ? ? ? ? 48 8D 54 24 ? 48 8B 01 48 8B 40 ? 74 ? 41 B8 ? ? ? ? FF 15 ? ? ? ? 48 8B 10 48 85 D2 74 ? 48 8B 42 ? 48 8B 88 ? ? ? ? 48 85 C9 74 ? E8 ? ? ? ? 48 83 C4 ? C3 F3 0F 10 42 ? 48 83 C4 ? C3 41 B8 ? ? ? ? FF 15 ? ? ? ? 48 8B 10 48 85 D2 75 ? E8 ? ? ? ? CC E8 ? ? ? ? CC CC CC CC CC CC CC CC CC CC CC CC CC CC CC CC F3 0F 11 4C 24");
 

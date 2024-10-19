@@ -7,28 +7,41 @@
 #include "../../../Client/GUI/Engine/Engine.hpp"
 #include "Components/OnGroundFlagComponent.hpp"
 
-// TODO add comments to all components, replace their sigs with simpler ones ?       marioCST: use entt's try_get func in EntityContext instead of using sigs, there are no simpler sigs
-
 template<typename Component>
 Component *Actor::tryGet(uintptr_t addr) {
+    if(WinrtUtils::check(21, 00) || addr == 0) {
+        auto& ctx = GetEntityContextV1_20_50();
+        Component* component = ctx.tryGetComponent<Component>();
+        return component;
+    } else {
+        return tryGetOld<Component>(addr);
+    }
+}
 
-    uintptr_t* basicReg;
-    EntityId id;
-
+template<typename Component>
+Component *Actor::tryGetOld(uintptr_t addr) {
     if(WinrtUtils::check(20, 50)) {
         auto ctx = GetEntityContextV1_20_50();
-        id = ctx->id;
-        basicReg = &ctx->basicReg;
-        using efunc = Component *(__thiscall *)(uintptr_t *, const EntityId &);
+        EntityId id = ctx.entity;
+        using efunc = Component *(__thiscall *)(entt::basic_registry<EntityId>&, const EntityId &);
         auto func = reinterpret_cast<efunc>(addr);
-        return func(basicReg, id);
-    }else{
-        basicReg = **(uintptr_t***)(this + 0x8);
-        id = *(uintptr_t*)(this + 0x10);
+        return func(ctx.enttRegistry, id);
+    } else {
+        uintptr_t* basicReg = **(uintptr_t***)(this + 0x8);
+        uint32_t id = *(uintptr_t*)(this + 0x10);
 
-        using efunc = Component* (__thiscall*)(uintptr_t, const EntityId &);
+        using efunc = Component* (__thiscall*)(uintptr_t, uint32_t*);
         auto func = reinterpret_cast<efunc>(addr);
-        return func(reinterpret_cast<uintptr_t>(basicReg), id);
+        return func(reinterpret_cast<uintptr_t>(basicReg), &id);
+    }
+}
+
+template<typename Component>
+bool Actor::hasComponent(uintptr_t addr) {
+    if(WinrtUtils::check(21, 00) || addr == 0) {
+        return this->GetEntityContextV1_20_50().hasComponent<Component>();
+    } else {
+        return tryGetOld<Component>(addr) != nullptr;
     }
 }
 
@@ -64,7 +77,7 @@ bool Actor::canSee(const Actor& actor) {
 }
 
 uint64_t Actor::getRuntimeID() {
-    return this->GetEntityContextV1_20_50()->id;
+    return this->GetEntityContextV1_20_50().entity.mRawId;
 }
 
 ActorDataFlagComponent* Actor::getActorDataFlagComponent() {
@@ -178,8 +191,8 @@ RuntimeIDComponent *Actor::getRuntimeIDComponent() {
     return tryGet<RuntimeIDComponent>(sig);
 }
 
-V1_20_50::EntityContext *Actor::GetEntityContextV1_20_50() {
-    return reinterpret_cast<V1_20_50::EntityContext*>((uintptr_t)this + 0x8);
+V1_20_50::EntityContext &Actor::GetEntityContextV1_20_50() {
+    return hat::member_at<V1_20_50::EntityContext>(this, 0x8);
 }
 
 void Actor::setNametag(std::string *name) {
@@ -217,17 +230,9 @@ RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URen
 std::vector<UnifiedMobEffectData> Actor::getMobEffects() {
     static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMobEffectsComponent"));
     std::vector<UnifiedMobEffectData> unifiedEffects;
-    if (WinrtUtils::check(21, 30)) {
-        auto component =  tryGet<MobEffectsComponent1_21_30>(sig);
-        for (auto &effect : component->effects) {
-            unifiedEffects.emplace_back(effect.id, effect.duration, effect.amplifier);
-        }
-    } else {
-        auto component =  tryGet<MobEffectsComponent>(sig);
-
-        for (auto &effect : component->effects) {
-            unifiedEffects.emplace_back(effect.id, effect.duration, effect.amplifier);
-        }
+    auto component =  tryGet<MobEffectsComponent>(sig);
+    if(component) {
+        unifiedEffects = component->getUnifiedEffects();
     }
     return unifiedEffects;
 }
@@ -241,26 +246,25 @@ bool Actor::isValidAABB() {
 }
 
 bool Actor::isOnGround() {
-    if (WinrtUtils::check(21, 30)) {
-        static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix3")) + " " + GET_SIG("Actor::getOnGroundFlagComponent"));
-        auto component = tryGet<OnGroundFlagComponent>(sig);
-
-        return component != nullptr;
+    if (WinrtUtils::check(21, 0)) {
+        // might be needed when entt cant be used for .21
+        //static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix3")) + " " + GET_SIG("Actor::getOnGroundFlagComponent"));
+        return hasComponent<OnGroundFlagComponent>();
     } else {
         const auto ctx = this->GetEntityContextV1_20_50();
 
         if (WinrtUtils::check(20, 60)) {
-            using isOnGroundFunc = bool (__fastcall *)(uintptr_t &, EntityId &);
+            using isOnGroundFunc = bool (__fastcall *)(entt::basic_registry<EntityId> &, const EntityId &);
             static isOnGroundFunc isOnGround = Memory::getOffsetFromSig<isOnGroundFunc>(
                     GET_SIG_ADDRESS("ActorCollision::isOnGround"), 1);
 
             if (isOnGround)
-                return isOnGround(ctx->basicReg, ctx->id);
+                return isOnGround(ctx.enttRegistry, ctx.entity);
 
             return false;
         }
 
-        using isOnGroundFunc = bool (__fastcall *)(V1_20_50::EntityContext *);
+        using isOnGroundFunc = bool (__fastcall *)(const V1_20_50::EntityContext&);
         static isOnGroundFunc isOnGround = reinterpret_cast<isOnGroundFunc>(GET_SIG_ADDRESS("ActorCollision::isOnGround"));
 
         if (isOnGround)
