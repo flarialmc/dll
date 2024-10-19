@@ -8,7 +8,10 @@
 // text
 void SendPacketHook::callback(LoopbackPacketSender *pSender, Packet *pPacket) {
     PacketEvent event(pPacket);
-    EventHandler::onPacketSend(event);
+
+    if(SDK::clientInstance) {
+        EventHandler::onPacketSend(event);
+    }
 
     if (!event.isCancelled()) {
         sendPacketOriginal(pSender, pPacket);
