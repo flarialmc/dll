@@ -126,6 +126,7 @@ public:
 
             }
 
+            if(Client::settings.getSettingByName<float>("blurintensity")->value != 0.01)
             Blur::RenderBlur(event.RTV, 3, realBlurAmount / 2);
 
             float baseHeight = Constraints::RelativeConstraint(baseHeightReal);
