@@ -814,7 +814,7 @@ public:
                                                   thingYes.second + rectHeight + rectY + Constraints::RelativeConstraint(0.09), colorThing, textCol, L"Reset",
                                                   buttonWidth, buttonHeight, round.x, round.x)) {
                         auto currentModule = ModuleManager::getModule(ClickGUIRenderer::page.module);
-                        bool wasEnabled = module->isEnabled();
+                        bool wasEnabled = currentModule->isEnabled();
                         currentModule->onDisable();
                         currentModule->loadDefaults();
                         FlarialGUI::ResetShit();
