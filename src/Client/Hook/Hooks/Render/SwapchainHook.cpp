@@ -545,12 +545,16 @@ return funcOriginal(pSwapChain, syncInterval, flags);
 
 void SwapchainHook::DX12Blur() {
     /* Blur Stuff */
-
+    if(FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
+    else FlarialGUI::needsBackBuffer = false;
     /* Blur End */
 }
 
 void SwapchainHook::DX11Blur() {
     /* Blur Stuff */
+
+    if(FlarialGUI::inMenu || ModuleManager::getModule("Motion Blur")->active) FlarialGUI::needsBackBuffer = true;
+    else FlarialGUI::needsBackBuffer = false;
 
     /* Blur End */
 }
@@ -696,6 +700,9 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
 
   void SwapchainHook::SaveBackbuffer() {
 
+    if(!FlarialGUI::needsBackBuffer) return;
+    std::cout << "using" << std::endl;
+
     if(!SwapchainHook::queue) {
 
         Memory::SafeRelease(SavedD3D11BackBuffer);
@@ -703,43 +710,56 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
         ID3D11DeviceContext* deviceContext = SwapchainHook::context;
         IDXGISurface1* backBuffer = nullptr;
         HRESULT hr;
-        SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
+
+        hr = SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
+        if (FAILED(hr)) {
+            return; // Early exit on failure
+        }
 
         ID3D11Texture2D* buffer2D = nullptr;
-        if(FAILED(backBuffer->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&buffer2D)))) std::cout << "failed to get 2d" << std::endl;
+        if (FAILED(backBuffer->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&buffer2D)))) {
+            Memory::SafeRelease(backBuffer);
+            return; // Early exit on failure
+        }
 
         D3D11_TEXTURE2D_DESC desc;
         buffer2D->GetDesc(&desc);
-        HRESULT r;
 
-        if(!stageTex) {
+        if (!stageTex) {
             D3D11_TEXTURE2D_DESC stageDesc = desc;
             stageDesc.Usage = D3D11_USAGE_STAGING;
             stageDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
             stageDesc.BindFlags = 0;
-            r = SwapchainHook::d3d11Device->CreateTexture2D(&stageDesc, nullptr, &stageTex);
-            if (FAILED(r))  std::cout << "Failed to create stage texture: " << std::hex << r << std::endl;
-        }
-        deviceContext->CopyResource(stageTex, buffer2D);
 
-
-
-        D3D11_TEXTURE2D_DESC defaultDesc = desc;
-        defaultDesc.Usage = D3D11_USAGE_DEFAULT;
-        defaultDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-        defaultDesc.CPUAccessFlags = 0;
-
-        if(!SavedD3D11BackBuffer) {
-            hr = SwapchainHook::d3d11Device->CreateTexture2D(&defaultDesc, nullptr, &SavedD3D11BackBuffer);
+            hr = SwapchainHook::d3d11Device->CreateTexture2D(&stageDesc, nullptr, &stageTex);
             if (FAILED(hr)) {
-                std::cout << "Failed to create def texture: " << std::hex << r << std::endl;
+                Memory::SafeRelease(backBuffer);
+                Memory::SafeRelease(buffer2D);
+                return;
             }
         }
 
-        deviceContext->CopyResource(SavedD3D11BackBuffer, stageTex);
+        deviceContext->CopySubresourceRegion(stageTex, 0, 0, 0, 0, buffer2D, 0, nullptr);
+
+        if (!SavedD3D11BackBuffer) {
+            D3D11_TEXTURE2D_DESC defaultDesc = desc;
+            defaultDesc.Usage = D3D11_USAGE_DEFAULT;
+            defaultDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+            defaultDesc.CPUAccessFlags = 0;
+
+            hr = SwapchainHook::d3d11Device->CreateTexture2D(&defaultDesc, nullptr, &SavedD3D11BackBuffer);
+            if (FAILED(hr)) {
+                Memory::SafeRelease(backBuffer);
+                Memory::SafeRelease(buffer2D);
+                return;
+            }
+        }
+
+        deviceContext->CopySubresourceRegion(SavedD3D11BackBuffer, 0, 0, 0, 0, stageTex, 0, nullptr);
 
         Memory::SafeRelease(backBuffer);
         Memory::SafeRelease(buffer2D);
+
     } else {
 
 
