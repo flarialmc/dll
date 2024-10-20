@@ -195,9 +195,7 @@ class AutoRQListener : public Listener {
 
     void reQ() {
         if (!module->settings.getSettingByName<bool>("hub")->value) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-            FlarialGUI::Notify("Executing command /q " + HiveModeCatcherListener::currentGame);
+            FlarialGUI::Notify("Finding a new game of " + HiveModeCatcherListener::fullgamemodename);
 
             std::shared_ptr<Packet> packet = SDK::createPacket(77);
             auto *command_packet = reinterpret_cast<CommandRequestPacket *>(packet.get());
