@@ -592,7 +592,7 @@ void SwapchainHook::DX11Init() {
 
     }
 
-    SaveBackbuffer(true);
+    SaveBackbuffer();
 
     Blur::InitializePipeline();
     Memory::SafeRelease(eBackBuffer);
@@ -687,8 +687,6 @@ void SwapchainHook::DX12Init() {
                 Memory::SafeRelease(dxgiDevice);
                 Memory::SafeRelease(d2dFactory);
 
-                SaveBackbuffer(true);
-
                 Blur::InitializePipeline();
                 init = true;
             }
@@ -699,9 +697,9 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
     return SavedD3D11BackBuffer;
 }
 
-  void SwapchainHook::SaveBackbuffer(bool smth) {
+  void SwapchainHook::SaveBackbuffer() {
 
-    if(!smth) if(!FlarialGUI::needsBackBuffer) return;
+    if(!FlarialGUI::needsBackBuffer) return;
 
     if(!SwapchainHook::queue) {
 
@@ -756,7 +754,7 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
         }
 
         deviceContext->CopySubresourceRegion(SavedD3D11BackBuffer, 0, 0, 0, 0, stageTex, 0, nullptr);
-        SavedD3D11BackBuffer->GetDesc(&SwapchainHook::avgDesc);
+
         Memory::SafeRelease(backBuffer);
         Memory::SafeRelease(buffer2D);
 

@@ -292,7 +292,6 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 
     if(intensity < 0) return;
 
-    if(!SwapchainHook::GetBackbuffer()) return;
 
     ID3D11ShaderResourceView *pOrigShaderResourceView = MotionBlurListener::BackbufferToSRV();
     if (!pOrigShaderResourceView) return;
@@ -303,7 +302,6 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
     std::vector<ID3D11ShaderResourceView *> shaderResourceViews;
     std::vector<XMFLOAT2> fbSizes;
     D3D11_TEXTURE2D_DESC desc;
-    desc = SwapchainHook::avgDesc;
 
     if(!hasDoneFrames)
     framebuffers.reserve((size_t)iterations);
