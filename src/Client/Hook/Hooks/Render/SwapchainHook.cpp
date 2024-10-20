@@ -553,7 +553,7 @@ void SwapchainHook::DX12Blur() {
 void SwapchainHook::DX11Blur() {
     /* Blur Stuff */
 
-    if(FlarialGUI::inMenu || ModuleManager::getModule("Motion Blur")->active) FlarialGUI::needsBackBuffer = true;
+    if(FlarialGUI::inMenu || ModuleManager::getModule("Motion Blur")->isEnabled()) FlarialGUI::needsBackBuffer = true;
     else FlarialGUI::needsBackBuffer = false;
 
     /* Blur End */
