@@ -43,7 +43,7 @@ public:
                 previousFrames.erase(previousFrames.begin(), previousFrames.begin() + framesToRemove);
             }
 
-            ID3D11ShaderResourceView* buffer = BackbufferToSRV();
+            ID3D11ShaderResourceView* buffer = BackbufferToSRVExtraMode();
             if(buffer) previousFrames.push_back(buffer);
             else std::cout << "Couldn't save buffer for Motion Blur.";
 
@@ -81,7 +81,9 @@ public:
         ImGui::SetCursorScreenPos(ImVec2(pos.x + size.x, pos.y));
     }
 
-    static ID3D11ShaderResourceView* BackbufferToSRV() {
+    static ID3D11ShaderResourceView* BackbufferToSRVExtraMode() {
+
+        if(!FlarialGUI::needsBackBuffer) return nullptr;
 
         HRESULT hr;
 
@@ -95,6 +97,27 @@ public:
         srvDesc.Texture2D.MostDetailedMip = 0;
 
         if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::ExtraSavedD3D11BackBuffer, &srvDesc, &outSRV)))
+        {
+            std::cout << "Failed to create shader resource view: " << std::hex << hr << std::endl;
+        }
+
+        return outSRV;
+    }
+
+    static ID3D11ShaderResourceView* BackbufferToSRV() {
+
+        HRESULT hr;
+
+        D3D11_TEXTURE2D_DESC d;
+        SwapchainHook::SavedD3D11BackBuffer->GetDesc(&d);
+        ID3D11ShaderResourceView* outSRV;
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+        srvDesc.Format = d.Format;
+        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MipLevels = d.MipLevels;
+        srvDesc.Texture2D.MostDetailedMip = 0;
+
+        if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::SavedD3D11BackBuffer, &srvDesc, &outSRV)))
         {
             std::cout << "Failed to create shader resource view: " << std::hex << hr << std::endl;
         }
