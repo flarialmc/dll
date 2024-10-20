@@ -3,10 +3,12 @@
 #include "../../../../Hook/Hooks/Input/MouseHook.hpp"
 #include "../../../../Events/Listener.hpp"
 #include "../../../../Client.hpp"
+#include "../../HiveModeCatcher/HiveModeCatcherListener.hpp"
 
 class DiscordRPCListener : public Listener {
 public:
     std::string previousIp;
+    std::string previousgamemode = HiveModeCatcherListener::fullgamemodename;
 
     void onTick(TickEvent &event) override {
         handleServerIpChange();
@@ -26,7 +28,7 @@ public:
 private:
     void handleServerIpChange() {
         std::string ip = SDK::getServerIP();
-
+        std::string gamemode = HiveModeCatcherListener::fullgamemodename;
         if (ip != previousIp) {
             static std::string settingspath = Utils::getRoamingPath() + "\\Flarial\\serverip.txt";
 
@@ -34,6 +36,14 @@ private:
                 createSettingsFile(settingspath);
             }
             updateSettingsFile(settingspath, ip);
+        }
+        if (gamemode != previousgamemode) {
+            static std::string settingspath = Utils::getRoamingPath() + "\\Flarial\\gamemode.txt";
+
+            if (!std::filesystem::exists(settingspath)) {
+                createSettingsFile(settingspath);
+            }
+            updateSettingsFile(settingspath, gamemode);
         }
     }
 
