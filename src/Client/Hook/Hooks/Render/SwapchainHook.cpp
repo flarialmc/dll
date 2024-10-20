@@ -580,7 +580,7 @@ void SwapchainHook::DX11Init() {
 
     D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(
             D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
-            D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED), 96.0, 96.0);
+            D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), 96.0, 96.0);
     D2D::context->CreateBitmapFromDxgiSurface(eBackBuffer, props, &D2D1Bitmap);
     //ImGui Init
 
@@ -646,7 +646,7 @@ void SwapchainHook::DX12Init() {
 
                 D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(
                         D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
-                        D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED), dpi, dpi);
+                        D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), dpi, dpi);
 
                 D3D12_DESCRIPTOR_HEAP_DESC heapDescriptorBackBuffers = {};
                 heapDescriptorBackBuffers.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
@@ -668,7 +668,7 @@ void SwapchainHook::DX12Init() {
                     rtvHandle.ptr += rtvDescriptorSize;
 
 
-                    D3D11_RESOURCE_FLAGS d3d11_flags = {D3D11_BIND_RENDER_TARGET};
+                    D3D11_RESOURCE_FLAGS d3d11_flags = { D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE};
 
                     d3d11On12Device->CreateWrappedResource(backBufferPtr, &d3d11_flags,
                                                                           D3D12_RESOURCE_STATE_RENDER_TARGET,
@@ -727,8 +727,8 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
 
 
     } else {
-
-        D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&SavedD3D11BackBuffer));
-
+        HRESULT hr;
+        hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&SavedD3D11BackBuffer));
+        if (FAILED(hr))  std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
     }
 }

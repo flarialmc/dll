@@ -295,7 +295,9 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
     if (!SwapchainHook::GetBackbuffer()) return;
 
     ID3D11ShaderResourceView *pOrigShaderResourceView = MotionBlurListener::BackbufferToSRV();
-    if (!pOrigShaderResourceView) return;
+    if (!pOrigShaderResourceView) {
+        return;
+    }
 
     ID3D11DeviceContext* pContext = SwapchainHook::context;
 
