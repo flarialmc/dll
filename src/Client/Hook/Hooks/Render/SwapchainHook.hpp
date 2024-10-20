@@ -25,9 +25,10 @@ private:
                                                                  IDXGIOutput *pRestrictToOutput,
                                                                  IDXGISwapChain1 **ppSwapChain);
 
+
     static HRESULT CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknown *pDevice, IUnknown *pWindow,
-                                         DXGI_SWAP_CHAIN_DESC1 *pDesc, IDXGIOutput *pRestrictToOutput,
-                                         IDXGISwapChain1 **ppSwapChain);
+                                                DXGI_SWAP_CHAIN_DESC1 *pDesc, IDXGIOutput *pRestrictToOutput,
+                                                IDXGISwapChain1 **ppSwapChain);
 
     static HRESULT swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags);
 
@@ -44,7 +45,7 @@ public:
     static void DX12Init();
 
     static ID3D11Texture2D* GetBackbuffer();
-    static void SaveBackbuffer();
+    static void SaveBackbuffer(bool smth = false);
 
     typedef HRESULT(__thiscall *SwapchainOriginal)(IDXGISwapChain3 *, UINT, UINT);
 
@@ -55,6 +56,7 @@ public:
 
     void enableHook() override;
     static inline ID3D11Texture2D* SavedD3D11BackBuffer;
+    static inline D3D11_TEXTURE2D_DESC avgDesc;
     static ID3D12CommandQueue *queue;
     static inline std::vector<IDXGISurface1 *> DXGISurfaces;
     static inline std::vector<ID2D1Bitmap1 *> D2D1Bitmaps;
