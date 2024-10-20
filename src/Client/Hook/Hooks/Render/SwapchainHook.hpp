@@ -55,6 +55,8 @@ public:
 
     void enableHook() override;
     static inline ID3D11Texture2D* SavedD3D11BackBuffer;
+    static inline ID3D11Texture2D* ExtraSavedD3D11BackBuffer;
+
     static ID3D12CommandQueue *queue;
     static inline std::vector<IDXGISurface1 *> DXGISurfaces;
     static inline std::vector<ID2D1Bitmap1 *> D2D1Bitmaps;

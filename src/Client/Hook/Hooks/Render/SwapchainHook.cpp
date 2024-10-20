@@ -554,7 +554,7 @@ void SwapchainHook::DX12Blur() {
 void SwapchainHook::DX11Blur() {
     /* Blur Stuff */
 
-    if(FlarialGUI::inMenu || ModuleManager::getModule("Motion Blur")->isEnabled()) FlarialGUI::needsBackBuffer = true;
+    if(ModuleManager::getModule("Motion Blur")->isEnabled() && !FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
     else FlarialGUI::needsBackBuffer = false;
 
     /* Blur End */
@@ -701,13 +701,29 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
 
   void SwapchainHook::SaveBackbuffer() {
 
-    if(!FlarialGUI::needsBackBuffer) return;
-
     Memory::SafeRelease(SavedD3D11BackBuffer);
 
     if(!SwapchainHook::queue) {
 
         SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&SavedD3D11BackBuffer));
+
+        if(FlarialGUI::needsBackBuffer) {
+            D3D11_TEXTURE2D_DESC textureDesc = {};
+            textureDesc.Width = D2D::context->GetSize().width;
+            textureDesc.Height = D2D::context->GetSize().height;
+            textureDesc.MipLevels = 1;
+            textureDesc.ArraySize = 1;
+            textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            textureDesc.SampleDesc.Count = 1;
+            textureDesc.Usage = D3D11_USAGE_DEFAULT;
+            textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+            textureDesc.CPUAccessFlags = 0;
+
+            SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
+
+            context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
+        }
+
 
     } else {
 

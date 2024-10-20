@@ -86,7 +86,7 @@ public:
         HRESULT hr;
 
         D3D11_TEXTURE2D_DESC d;
-        SwapchainHook::GetBackbuffer()->GetDesc(&d);
+        SwapchainHook::ExtraSavedD3D11BackBuffer->GetDesc(&d);
         ID3D11ShaderResourceView* outSRV;
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
         srvDesc.Format = d.Format;
@@ -94,7 +94,7 @@ public:
         srvDesc.Texture2D.MipLevels = d.MipLevels;
         srvDesc.Texture2D.MostDetailedMip = 0;
 
-        if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::GetBackbuffer(), &srvDesc, &outSRV)))
+        if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::ExtraSavedD3D11BackBuffer, &srvDesc, &outSRV)))
         {
             std::cout << "Failed to create shader resource view: " << std::hex << hr << std::endl;
         }
