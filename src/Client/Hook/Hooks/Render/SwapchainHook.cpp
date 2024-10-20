@@ -702,6 +702,7 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
   void SwapchainHook::SaveBackbuffer() {
 
     Memory::SafeRelease(SavedD3D11BackBuffer);
+    Memory::SafeRelease(ExtraSavedD3D11BackBuffer);
 
     if(!SwapchainHook::queue) {
 
