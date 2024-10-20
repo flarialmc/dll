@@ -545,14 +545,15 @@ return funcOriginal(pSwapChain, syncInterval, flags);
 
 void SwapchainHook::DX12Blur() {
     /* Blur Stuff */
-
+    if(FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
+    else FlarialGUI::needsBackBuffer = false;
     /* Blur End */
 }
 
 void SwapchainHook::DX11Blur() {
     /* Blur Stuff */
 
-    if(ModuleManager::getModule("Motion Blur")->active) FlarialGUI::needsBackBuffer = true;
+    if(FlarialGUI::inMenu || ModuleManager::getModule("Motion Blur")->active) FlarialGUI::needsBackBuffer = true;
     else FlarialGUI::needsBackBuffer = false;
 
     /* Blur End */
