@@ -701,7 +701,6 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
   void SwapchainHook::SaveBackbuffer() {
 
     if(!FlarialGUI::needsBackBuffer) return;
-    std::cout << "using" << std::endl;
 
     if(!SwapchainHook::queue) {
 
