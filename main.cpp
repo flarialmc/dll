@@ -108,11 +108,6 @@ DWORD WINAPI init(HMODULE real)
 
                             lastOnlineUsersFetchTime = now;
                         }
-
-                        if(SDK::clientInstance && onlineAnnouncementElapsed >= std::chrono::minutes(10)) {
-                            SDK::clientInstance->getGuiData()->displayClientMessage("§khiii §r §n§l§4FLARIAL §r§khiii \n§r§cDonate to Flarial! §ehttps://flarial.xyz/donate\n§9Join our discord! §ehttps://flarial.xyz/discord");
-                            lastAnnouncementTime = now;
-                        }
                     }
                   }
                 Sleep(60);
