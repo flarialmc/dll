@@ -137,7 +137,7 @@ void Client::initialize() {
         Client::settings.addSetting("blurintensity", 18.0f);
 
     if (Client::settings.getSettingByName<bool>("killdx") == nullptr)
-        Client::settings.addSetting("killdx", true); // TODO: Fix dx12 stuff and set this to false again
+        Client::settings.addSetting("killdx", false);
 
     if (Client::settings.getSettingByName<bool>("disable_alias") == nullptr)
         Client::settings.addSetting("disable_alias", false);

@@ -554,12 +554,16 @@ void SwapchainHook::DX12Blur() {
 void SwapchainHook::DX11Blur() {
     /* Blur Stuff */
 
-    if(ModuleManager::getModule("Motion Blur")->isEnabled() && !FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
-    else FlarialGUI::needsBackBuffer = false;
-
+    if(ModuleManager::initialized) {
+        auto* module = ModuleManager::getModule("Motion Blur");
+        if(module) {
+            if(module->isEnabled() && !FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
+            else FlarialGUI::needsBackBuffer = false;
+        }
+    }
     /* Blur End */
-}
 
+}
 void SwapchainHook::DX11Init() {
     
     Logger::debug("[SwapChain] Not a DX12 device, running dx11 procedures");
