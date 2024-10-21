@@ -508,7 +508,7 @@ public:
 
                     c->addHeader("Rendering");
                     c->addToggle("Better Frames", "RTX Disabled, Restart Required.", Client::settings.getSettingByName<bool>("killdx")->value);
-                    c->addToggle("V-SYNC Disabler", "(Sometimes) Only works with Better Frames.", Client::settings.getSettingByName<bool>("vsync")->value);
+                    c->addToggle("V-SYNC Disabler", "Only works with Better Frames.", Client::settings.getSettingByName<bool>("vsync")->value);
                     c->addToggle("Disable Animations", "",  Client::settings.getSettingByName<bool>("disableanims")->value);
                     c->addSlider("UI Blur Intensity", "", Client::settings.getSettingByName<float>("blurintensity")->value, 25.f);
                     c->addSlider("Chroma / RGB Speed", "", Client::settings.getSettingByName<float>("rgb_speed")->value, 10.f);

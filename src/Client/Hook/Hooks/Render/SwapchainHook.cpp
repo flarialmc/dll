@@ -709,6 +709,8 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
         SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&SavedD3D11BackBuffer));
 
         if(FlarialGUI::needsBackBuffer) {
+
+        if(!ExtraSavedD3D11BackBuffer) {
             D3D11_TEXTURE2D_DESC textureDesc = {};
             textureDesc.Width = D2D::context->GetSize().width;
             textureDesc.Height = D2D::context->GetSize().height;
@@ -721,6 +723,7 @@ ID3D11Texture2D* SwapchainHook::GetBackbuffer()
             textureDesc.CPUAccessFlags = 0;
 
             SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
+        }
 
             context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
         }

@@ -26,7 +26,6 @@ public:
 
     static inline std::vector<ID3D11ShaderResourceView*> previousFrames;
 
-
     void onRender(RenderEvent &event) override {
 
         if(ModuleManager::getModule("ClickGUI")->isEnabled()) return;
@@ -45,7 +44,7 @@ public:
 
             ID3D11ShaderResourceView* buffer = BackbufferToSRVExtraMode();
             if(buffer) previousFrames.push_back(buffer);
-            else std::cout << "Couldn't save buffer for Motion Blur.";
+            else std::cout << "Couldn't save buffer for Motion Blur." << std::endl;
 
 
             float alpha = 0.3f;
@@ -63,6 +62,7 @@ public:
 
                 for (ID3D11ShaderResourceView* bitmap: previousFrames) Memory::SafeRelease(bitmap);
                 previousFrames.clear();
+
             }
         }
 
