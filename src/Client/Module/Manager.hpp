@@ -21,11 +21,5 @@ namespace ModuleManager {
     bool doesAnyModuleHave(const std::string& settingName);
 
     Module *getModule(const std::string& name);
-
-    extern std::vector<std::string> onlineUsers;
-    extern std::vector<std::string> onlineDevs;
-    extern std::vector<std::string> onlineCommites;
-    extern std::vector<std::string> onlinePluses;
-    extern std::vector<std::string> onlineStaff;
 }
 

@@ -18,8 +18,11 @@ public:
     };
 
     void onEnable() override {
-        EventHandler::registerPriorityListener(new MotionBlurListener("MotionBlurListener", this));
-        Module::onEnable();
+        if(SwapchainHook::queue) FlarialGUI::Notify("Please turn on Better Frames in Settings!");
+        else {
+            EventHandler::registerPriorityListener(new MotionBlurListener("MotionBlurListener", this));
+            Module::onEnable();
+        }
     }
 
     void onDisable() override {
@@ -34,43 +37,24 @@ public:
 
     void settingsRender() override {
 
-        float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
-        FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(5.5, textWidth), 2);
-        FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"),
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
+
+
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(1.0f, "height"));
+                                  Constraints::RelativeConstraint(0.88f, "height"));
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Bleed Factor", textWidth * 3.0f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        float percent = FlarialGUI::Slider(7, toggleX + FlarialGUI::SettingsTextWidth("Bleed Factor "),
-                                           toggleY, this->settings.getSettingByName<float>("intensity")->value, 1.0f, 0,
-                                           false);
-
-        this->settings.getSettingByName<float>("intensity")->value = percent;
-
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Intensity", textWidth * 3.0f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-
-        percent = FlarialGUI::Slider(8, toggleX + FlarialGUI::SettingsTextWidth("Intensity "),
-                                     toggleY, this->settings.getSettingByName<float>("intensity2")->value, 30);
-
-
-        this->settings.getSettingByName<float>("intensity2")->value = percent;
+        this->addHeader("Misc");
+        this->addSlider("Bleed Factor", "The scale at which previous frames bleed into the current one.", this->settings.getSettingByName<float>("intensity")->value, 1.0f, 0.f, true);
+        this->addSlider("Intensity", "Amount of previous frames to render.", this->settings.getSettingByName<float>("intensity2")->value, 30, 0, true);
 
         FlarialGUI::UnsetScrollView();
 
+        this->resetPadding();
     }
 };

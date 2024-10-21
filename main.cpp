@@ -11,8 +11,11 @@
 #include <wininet.h>
 
 #include "src/Client/Module/Modules/Nick/NickListener.hpp"
+#include "src/Utils/Logger/crashlogs.hpp"
 
 std::chrono::steady_clock::time_point lastBeatTime;
+std::chrono::steady_clock::time_point lastOnlineUsersFetchTime;
+std::chrono::steady_clock::time_point lastAnnouncementTime;
 
 std::string replaceAll(std::string subject, const std::string& search,
                        const std::string& replace);
@@ -21,59 +24,43 @@ std::string DownloadString(std::string URL);
 
 std::string removeColorCodes(const std::string& input);
 
+void printVector(const std::vector<std::string>& vec) {
+    for (const auto& str : vec) {
+        std::cout << str << std::endl;
+    }
+}
+
+
 DWORD WINAPI init(HMODULE real)
 {
-    if (GetConsoleWindow() == nullptr and true) {
+#ifndef NDEBUG
+    bool shouldDebug = true; // Change this bool locally, NEVER push it set to true
+
+    if (GetConsoleWindow() == nullptr && shouldDebug) {
         AllocConsole();
-        SetConsoleTitleA("Caspian-Debug");
+        SetConsoleTitleA("Flarial-Debugger");
         FILE *out;
         freopen_s(&out, ("CONOUT$"), ("w"), stdout);
     }
-
+#endif
 
     Client::initialize();
     Logger::info("[Client] Initializing");
 
     std::thread statusThread([]() {
-        while (true) {
+        while (!Client::disable) {
 
             auto now = std::chrono::steady_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastBeatTime);
+            auto onlineUsersFetchElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastOnlineUsersFetchTime);
+            auto onlineAnnouncementElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastAnnouncementTime);
+
 
             if(!Client::disable) {
                 if(SDK::hasInstanced && SDK::clientInstance != nullptr) {
                     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                        if(elapsed >= std::chrono::seconds(27)) {
-                            ModuleManager::onlineUsers.clear();
-                            std::string name = SDK::clientInstance->getLocalPlayer()->playerName;
-                            ModuleManager::onlineUsers.push_back(Utils::removeColorCodes(name));
-                            std::string pp = DownloadString("https://api.flarial.synthetix.host/users");
-
-                            json playersDict;
-
-                            try {
-                                playersDict = json::parse(pp);
-                            } catch (const json::parse_error& e) {
-                                Logger::error(e.what());
-                                lastBeatTime = now;
-                                continue;
-                            }
-
-                            int totalPlaytime = 0;
-                            int numberOfPlayers = 0;
-
-                            for (const auto& player : playersDict.items()) {
-                                try {
-                                    if (!player.value().contains("lastbeat") || !player.value()["lastbeat"].is_number()) {
-                                        std::cerr << "Invalid or missing 'lastbeat' for player: " << player.key() << std::endl;
-                                        continue;
-                                    }
-                                    ModuleManager::onlineUsers.push_back(Utils::removeNonAlphanumeric(player.key()));
-                                } catch (const std::exception& e) {
-                                    std::cerr << "Error processing player: " << player.key() << " - " << e.what() << std::endl;
-                                    continue;
-                                }
-                            }
+                        if(elapsed >= std::chrono::seconds(60)) {
+                            std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
 
                             std::string ipToSend = SDK::getServerIP();
 
@@ -86,25 +73,54 @@ DWORD WINAPI init(HMODULE real)
                             auto module = ModuleManager::getModule("Nick");
 
                             if(SDK::clientInstance != nullptr)
-                            if(SDK::clientInstance->getLocalPlayer() != nullptr)
-                            if (module->isEnabled()) {
-                                name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickListener::original));
-                            }
-                            // send thing
-                            std::cout << std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend) << std::endl;
-                            std::cout << DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",Utils::removeColorCodes(name),ipToSend)) << std::endl;
+                            if(SDK::clientInstance->getLocalPlayer() != nullptr) {
+                                if (module->isEnabled()) {
+                                    name = Utils::removeNonAlphanumeric(
+                                            Utils::removeColorCodes(NickListener::original));
+                                    name = replaceAll(name, "�", "");
 
-                            lastBeatTime = now;
+                                }
+                                std::string clearedName = Utils::removeNonAlphanumeric(Utils::removeColorCodes(name));
+                                if (clearedName.empty()) clearedName = Utils::removeColorCodes(name);
+                                if(clearedName == "skinStandardCust") return;
+                                // send thing
+                                DownloadString(
+                                        std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}", clearedName,
+                                                    ipToSend));
+
+                                lastBeatTime = now;
+                            }
+                        }
+                        if(onlineUsersFetchElapsed >= std::chrono::minutes(3)) {
+
+                            auto onlineUsersRaw = DownloadString("https://api.flarial.synthetix.host/servers");
+
+                            nlohmann::json playersDict;
+
+                            try {
+                                playersDict = nlohmann::json::parse(onlineUsersRaw);
+                                Client::onlinePlayers = Client::getPlayersVector(playersDict);
+                            }  catch (const json::parse_error& e) {
+                                Logger::error(e.what());
+                                lastOnlineUsersFetchTime = now;
+                                continue;
+                            }
+
+                            lastOnlineUsersFetchTime = now;
+                        }
+
+                        if(SDK::clientInstance && onlineAnnouncementElapsed >= std::chrono::minutes(10)) {
+                            SDK::clientInstance->getGuiData()->displayClientMessage("§khiii §r §n§l§4FLARIAL §r§khiii \n§r§cDonate to Flarial! §ehttps://flarial.xyz/donate\n§9Join our discord! §ehttps://flarial.xyz/discord");
+                            lastAnnouncementTime = now;
                         }
                     }
-                }
+                  }
                 Sleep(60);
-
             } else break;
         }
     });
-    statusThread.detach();
 
+    statusThread.detach();
 
     while (true) {
         if (Client::disable) {
@@ -120,35 +136,37 @@ DWORD WINAPI init(HMODULE real)
 
     EventHandler::unregisterAll();
 
-    ModuleManager::terminate();
-    HookManager::terminate();
+    ResizeHook::cleanShit();
 
     kiero::shutdown();
 
     Logger::debug("[Kiero] Shut down Kiero.");
 
-    ResizeHook::cleanShit();
+    ModuleManager::terminate();
+    HookManager::terminate();
 
     MH_DisableHook(MH_ALL_HOOKS);
     MH_Uninitialize();
 
+    glaiel::crashlogs::end_session();
+
     Logger::debug("[MinHook] Freeing Library.");
 
-    Sleep(100);
-
-    FreeLibraryAndExitThread(real, 1);
+    FreeLibraryAndExitThread(Client::currentModule, 0);
 }
+
 
 BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
-    switch (ul_reason_for_call)
-    {
-    case DLL_PROCESS_ATTACH:
-        Client::currentModule = instance;
-        CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)init, instance, 0, nullptr);
-        break;
-    case DLL_PROCESS_DETACH:
-        ModuleManager::terminate();
+
+    switch (ul_reason_for_call) {
+        case DLL_PROCESS_ATTACH:
+            DisableThreadLibraryCalls(instance);
+            Client::currentModule = instance;
+            CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE) init, instance, 0, nullptr);
+            break;
+        case DLL_PROCESS_DETACH:
+            break;
     }
 
     return TRUE;

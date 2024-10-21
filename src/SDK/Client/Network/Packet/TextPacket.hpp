@@ -21,8 +21,6 @@ enum class TextPacketType {
 
 class TextPacket : public Packet {
 public:
-    TextPacket();
-
     TextPacketType type;  // 0x28
 
     std::string name;           // 0x30
@@ -32,4 +30,6 @@ public:
 
     std::string xuid;
     std::string platformId;
+
+    TextPacket() = default;
 };

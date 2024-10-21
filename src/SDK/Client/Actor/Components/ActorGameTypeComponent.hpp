@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../EntityContext.hpp"
+
 enum class GameType : int {
     Survival = 0,
     Creative = 1,
@@ -10,6 +12,7 @@ enum class GameType : int {
     Spectator = 6,
 };
 
-struct ActorGameTypeComponent {
+struct ActorGameTypeComponent : IEntityComponent {
     GameType gameType;
 };
+static_assert(sizeof(ActorGameTypeComponent) == 0x4);

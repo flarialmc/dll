@@ -13,6 +13,7 @@ class HitboxListener : public Listener {
 
     Module *module;
     static inline std::vector<AABB> aabbsToRender;
+    static inline std::mutex renderMtx;
 public:
 
     void onRender(RenderEvent &event) override;

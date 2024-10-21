@@ -1,7 +1,11 @@
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "../EntityContext.hpp"
 
-struct MoveInputComponent {
+struct MoveInputComponent : IEntityComponent {
+private:
+    std::byte pad_0000[0x88];
     // ? calculateMoveVector@PlayerMovement
+public:
     BUILD_ACCESS(this, bool, forward, GET_OFFSET("MoveInputComponent::forward"));
     BUILD_ACCESS(this, bool, backward, GET_OFFSET("MoveInputComponent::backward"));
     BUILD_ACCESS(this, bool, left, GET_OFFSET("MoveInputComponent::left"));
@@ -12,3 +16,4 @@ struct MoveInputComponent {
     BUILD_ACCESS(this, bool, sprinting, GET_OFFSET("MoveInputComponent::sprinting"));
 
 };
+static_assert(sizeof(MoveInputComponent) == 0x88);

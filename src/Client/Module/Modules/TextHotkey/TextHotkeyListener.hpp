@@ -35,7 +35,7 @@ class TextHotkeyListener : public Listener {
                     akbar->platformId = "";
                     akbar->translationNeeded = false;
                     //akbar->xuid = xuid;
-                    akbar->name = player->playerName;
+                    akbar->name = player->getPlayerName();
 
                     SDK::clientInstance->getPacketSender()->sendToServer(akbar);
 

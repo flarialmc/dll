@@ -46,6 +46,7 @@ namespace glaiel::crashlogs {
         crashed = 1,
         ending = 2,
         normal_exit = 3,
+        end_session = 4
     };
     static std::atomic<program_status> status = program_status::running;
 
@@ -125,6 +126,9 @@ namespace glaiel::crashlogs {
         cv.wait(lk, [] { return status != program_status::running; });
         lk.unlock();
 
+        if(status == program_status::end_session)
+            return;
+
         //if it crashed, output the crash log
         if(status == program_status::crashed) {
             output_crash_log();
@@ -136,6 +140,8 @@ namespace glaiel::crashlogs {
     }
 
     static inline void crash_handler() {
+        if(status == program_status::end_session)
+            return;
         //if we crashed during a crash... ignore lol
         if(status != program_status::running) return;
 
@@ -194,7 +200,31 @@ namespace glaiel::crashlogs {
     static inline void normal_exit() {
         status = program_status::normal_exit;
         cv.notify_one();
-        output_thread.join();
+        if(output_thread.joinable())
+            output_thread.join();
+    }
+
+    void end_session() {
+        try {
+            SetUnhandledExceptionFilter(nullptr);
+            std::signal(SIGABRT, nullptr);
+            std::signal(SIGSEGV, nullptr);
+            std::signal(SIGILL, nullptr);
+            std::set_terminate(nullptr);
+            _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+            _set_purecall_handler(nullptr);
+            _set_invalid_parameter_handler(nullptr);
+
+            status = program_status::end_session;
+            cv.notify_all();
+
+            if (output_thread.joinable()) {
+                output_thread.join();
+            }
+        } catch (...) {
+            std::cerr << "Exception occurred during end_session" << std::endl;
+            throw;
+        }
     }
 
     //set up all the callbacks needed to get into the crash handler during a crash (borrowed from backward.cpp)

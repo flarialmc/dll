@@ -38,11 +38,23 @@ public:
     }
 
     void settingsRender() override {
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
-        FlarialGUI::KeybindSelector(0, toggleX, toggleY, getKeybind());
+
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(0.88f, "height"));
+
+        this->addHeader("Misc");
+        this->addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
+
+        FlarialGUI::UnsetScrollView();
+
+        this->resetPadding();
 
     }
 };

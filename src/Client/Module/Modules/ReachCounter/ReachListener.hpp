@@ -19,7 +19,7 @@ class ReachListener : public Listener {
     Module *module;
     // TODO: Better reach calculation
     void onAttack(AttackEvent &event) override {
-        Reach = event.getActor()->getlevel()->getHitResult().distance();
+        Reach = event.getActor()->getLevel()->getHitResult().distance();
         last_hit = std::chrono::high_resolution_clock::now();
     }
 
