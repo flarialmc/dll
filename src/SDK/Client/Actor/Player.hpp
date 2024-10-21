@@ -2,8 +2,7 @@
 
 #include "../Container/PlayerInventory.hpp"
 #include "Actor.hpp"
-
-FK(Gamemode)
+#include "Gamemode.hpp"
 
 class Player : public Actor {
 public:

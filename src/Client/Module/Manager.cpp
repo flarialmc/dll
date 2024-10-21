@@ -1,8 +1,7 @@
 ﻿#pragma once
 
 #include "Manager.hpp"
-#include "../Events/EventHandler.hpp"
-#include "Modules/Input/GUIKeyListener.hpp"
+#include "Modules/Misc/Input/GUIKeyListener.hpp"
 #include "Modules/Misc/SaveConfig/SaveConfigListener.hpp"
 #include "Modules/Misc/RGB/rgbListener.hpp"
 #include "Modules/Misc/TextAlias/TextAliasListener.hpp"
@@ -78,17 +77,13 @@
 #include "Modules/EntityCounter/EntityCounter.hpp"
 
 namespace ModuleManager {
-    std::unordered_map<size_t, Module*> moduleMap;
+    std::unordered_map<size_t, std::shared_ptr<Module>> moduleMap;
+    std::vector<std::shared_ptr<Listener>> services;
     bool initialized = false;
 }
 
-void ModuleManager::addModule(Module* module) {
-    size_t hash = std::hash<std::string>{}(module->name);
-    moduleMap[hash] = module;
-}
-
-std::vector<Module*> ModuleManager::getModules() {
-    std::vector<Module*> modulesVector;
+std::vector<std::shared_ptr<Module>> ModuleManager::getModules() {
+    std::vector<std::shared_ptr<Module>> modulesVector;
     for (const auto& pair : moduleMap) {
         modulesVector.push_back(pair.second);
     }
@@ -96,83 +91,83 @@ std::vector<Module*> ModuleManager::getModules() {
 }
 
 void ModuleManager::initialize() {
-    addModule(new MotionBlur());
+    addModule<MotionBlur>();
 
     // Screen effects
-    addModule(new Deepfry());
-    addModule(new HueChanger());
-    addModule(new PatarHD());
-    addModule(new DVD());
+    addModule<Deepfry>();
+    addModule<HueChanger>();
+    addModule<PatarHD>();
+    addModule<DVD>();
 
     // FOV Changers
-    addModule(new FOVChanger()); //1
-    addModule(new Zoom()); //2
-    addModule(new UpsideDown()); //3
+    addModule<FOVChanger>(); //1
+    addModule<Zoom>(); //2
+    addModule<UpsideDown>(); //3
 
-    addModule(new ClickGUI());
+    addModule<ClickGUI>();
 
-    addModule(new FPSCounter());
-    addModule(new CPSCounter());
-    addModule(new IPDisplay());
-    addModule(new ReachCounter());
-    addModule(new ComboCounter());
-    addModule(new PingCounter());
-    addModule(new PotCounter());
-    addModule(new ArrowCounter());
-    addModule(new EntityCounter());
-    addModule(new Time());
-    addModule(new MEM());
-    addModule(new Fullbright());
-    addModule(new ForceCoords());
-    addModule(new Keystrokes());
-    addModule(new Sneak());
-    addModule(new Sprint());
-    addModule(new Hitbox());
-    addModule(new ThirdPerson());
-    addModule(new SnapLook());
-    addModule(new HurtColor());
-    addModule(new FogColor());
-    addModule(new ArmorHUD());
-    addModule(new TimeChanger());
-    addModule(new RenderOptions());
-    addModule(new PaperDoll());
-    addModule(new GuiScale());
-    addModule(new WeatherChanger());
-    addModule(new TabList());
-    addModule(new AutoGG());
-    addModule(new TextHotkey());
-    addModule(new NickModule());
-    addModule(new FreeLook());
-    addModule(new SpeedDisplay());
-    addModule(new CPSLimiter());
-    addModule(new BlockBreakIndicator());
-    addModule(new Animations());
-    addModule(new BlockOutline());
-    addModule(new CommandHotkey());
-    addModule(new NoHurtCam());
-    addModule(new InventoryHUD());
-    //addModule(new OverlayModule());
-    addModule(new AutoRQ());
-    addModule(new HitPing());
-    addModule(new InstantHurtAnimation());
-    addModule(new OpponentReach());
-    addModule(new ViewModel());
-    addModule(new PotionHUD());
-    addModule(new FasterInventory());
+    addModule<FPSCounter>();
+    addModule<CPSCounter>();
+    addModule<IPDisplay>();
+    addModule<ReachCounter>();
+    addModule<ComboCounter>();
+    addModule<PingCounter>();
+    addModule<PotCounter>();
+    addModule<ArrowCounter>();
+    addModule<EntityCounter>();
+    addModule<Time>();
+    addModule<MEM>();
+    addModule<Fullbright>();
+    addModule<ForceCoords>();
+    addModule<Keystrokes>();
+    addModule<Sneak>();
+    addModule<Sprint>();
+    addModule<Hitbox>();
+    addModule<ThirdPerson>();
+    addModule<SnapLook>();
+    addModule<HurtColor>();
+    addModule<FogColor>();
+    addModule<ArmorHUD>();
+    addModule<TimeChanger>();
+    addModule<RenderOptions>();
+    addModule<PaperDoll>();
+    addModule<GuiScale>();
+    addModule<WeatherChanger>();
+    addModule<TabList>();
+    addModule<AutoGG>();
+    addModule<TextHotkey>();
+    addModule<NickModule>();
+    addModule<FreeLook>();
+    addModule<SpeedDisplay>();
+    addModule<CPSLimiter>();
+    addModule<BlockBreakIndicator>();
+    addModule<Animations>();
+    addModule<BlockOutline>();
+    addModule<CommandHotkey>();
+    addModule<NoHurtCam>();
+    addModule<InventoryHUD>();
+    // addModule<OverlayModule>();
+    addModule<AutoRQ>();
+    addModule<HitPing>();
+    addModule<InstantHurtAnimation>();
+    addModule<OpponentReach>();
+    addModule<ViewModel>();
+    addModule<PotionHUD>();
+    addModule<FasterInventory>();
 
-    //addModule(new MovableChat());
-    //addModule(new CompactChat());
-    addModule(new ItemPhysics());
-    
-    addModule(new HiveStat());
+    // addModule<MovableChat>();
+    // addModule<CompactChat>();
+    addModule<ItemPhysics>();
 
-    EventHandler::registerListener(new GUIKeyListener("GuiKeyListener"));
-    EventHandler::registerListener(new DiscordRPCListener("DiscordRPC"));
-    EventHandler::registerListener(new UninjectListener("Uninject"));
-    EventHandler::registerListener(new SaveConfigListener("SaveConfig"));
-    EventHandler::registerListener(new CentreCursorListener("CentreCursor"));
-    EventHandler::registerListener(new rgbListener("RGB Controller"));
-    EventHandler::registerListener(new HiveModeCatcherListener("HiveModeCatcher"));
+    addModule<HiveStat>();
+
+    addService<GUIKeyListener>();
+    addService<DiscordRPCListener>();
+    addService<UninjectListener>();
+    addService<SaveConfigListener>();
+    addService<CentreCursorListener>();
+    addService<rgbListener>();
+    addService<HiveModeCatcherListener>();
 
     initialized = true;
 }
@@ -184,6 +179,22 @@ void ModuleManager::terminate() {
             pair.second->terminate();
     }
     moduleMap.clear();
+    services.clear();
+}
+
+void ModuleManager::syncState() {
+    for (const auto& pair : moduleMap) {
+        auto& module = pair.second;
+        if (module != nullptr) {
+            if(module->enabledState != module->isEnabled()) {
+                if(module->enabledState) {
+                    module->onEnable();
+                } else {
+                    module->onDisable();
+                }
+            }
+        }
+    }
 }
 
 void ModuleManager::SaveModulesConfig() {
@@ -213,7 +224,7 @@ bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {
 
 }
 
-Module* ModuleManager::getModule(const std::string& name) {
+std::shared_ptr<Module> ModuleManager::getModule(const std::string& name) {
     size_t hash = std::hash<std::string>{}(name);
 
     return moduleMap[hash];

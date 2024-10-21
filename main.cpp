@@ -4,14 +4,14 @@
 #include <algorithm>
 
 #include "src/Client/Client.hpp"
-#include "src/Client/Events/EventHandler.hpp"
+#include "src/Client/Events/EventManager.hpp"
 #include "src/Client/Hook/Hooks/Render/ResizeHook.hpp"
 //#include "src/Client/Module/Modules/Nick/NickListener.hpp"
 #include <kiero.h>
 #include <wininet.h>
 
-#include "src/Client/Module/Modules/Nick/NickListener.hpp"
 #include "src/Utils/Logger/crashlogs.hpp"
+#include "src/Client/Module/Modules/Nick/NickModule.hpp"
 
 std::chrono::steady_clock::time_point lastBeatTime;
 std::chrono::steady_clock::time_point lastOnlineUsersFetchTime;
@@ -76,7 +76,7 @@ DWORD WINAPI init(HMODULE real)
                             if(SDK::clientInstance->getLocalPlayer() != nullptr) {
                                 if (module->isEnabled()) {
                                     name = Utils::removeNonAlphanumeric(
-                                            Utils::removeColorCodes(NickListener::original));
+                                            Utils::removeColorCodes(NickModule::original));
                                     name = replaceAll(name, "�", "");
 
                                 }
@@ -126,15 +126,14 @@ DWORD WINAPI init(HMODULE real)
         if (Client::disable) {
             break;
         } else {
-            Sleep(50);
+            ModuleManager::syncState();
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
         }
     }
 
     Client::SaveSettings();
 
     Logger::info("Uninitializing Client");
-
-    EventHandler::unregisterAll();
 
     ResizeHook::cleanShit();
 

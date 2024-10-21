@@ -1,33 +1,28 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "SpeedDisplayListener.hpp"
 #include "../../../Client.hpp"
 
 class SpeedDisplay : public Module {
-
+private:
+    Vec3<float> PrevPos{};
+    std::string speed;
 public:
-
-
     SpeedDisplay() : Module("Speed Display", "Displays your current travel speed in blocks/second.",
                             IDR_SPEED_PNG, "") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-
-        EventHandler::registerListener(new SpeedDisplayListener("SpeedDisplayListener", this));
+        Listen(this, RenderEvent, &SpeedDisplay::onRender)
+        Listen(this, TickEvent, &SpeedDisplay::onTick)
         Module::onEnable();
     }
 
     void onDisable() override {
-
-        EventHandler::unregisterListener("SpeedDisplayListener");
+        Deafen(this, RenderEvent, &SpeedDisplay::onRender)
+        Deafen(this, TickEvent, &SpeedDisplay::onTick)
         Module::onDisable();
-
     }
 
     void defaultConfig() override {
@@ -37,7 +32,7 @@ public:
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.00f);
     }
 
-       void settingsRender() override {
+    void settingsRender() override {
 
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
@@ -96,6 +91,20 @@ public:
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
+    }
+
+    void onRender(RenderEvent &event) {
+        this->normalRender(15, speed);
+    }
+
+    void onTick(TickEvent &event) {
+        if (!SDK::clientInstance->getLocalPlayer())
+            return;
+        auto stateVectorComponent = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent();
+        if(stateVectorComponent != nullptr) {
+            speed = std::format("{:.2f}", stateVectorComponent->Pos.dist(PrevPos) * 20);
+            PrevPos = stateVectorComponent->Pos;
+        }
     }
 };
 

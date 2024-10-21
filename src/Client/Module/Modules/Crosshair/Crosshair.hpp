@@ -1,34 +1,20 @@
 #pragma once
 
-#include "CrosshairListener.hpp"
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
 
 class Crosshair : public Module {
 public:
-    CrosshairListener* listener = nullptr;
 
     Crosshair() : Module("Crosshair", "Allows you to change crosshair behavior.", IDR_ITEM_PHYSICS_PNG, "") {
         Module::setup();
     }
 
     void onEnable() override {
-        listener = new CrosshairListener("Crosshair", this);
-
-        EventHandler::registerListener(listener);
-
-        listener->onEnable();
 
         Module::onEnable();
     }
 
     void onDisable() override {
-        if (listener != nullptr)
-            listener->onDisable();
-
-        EventHandler::unregisterListener("Crosshair");
-
-        delete listener;
 
         Module::onDisable();
     }

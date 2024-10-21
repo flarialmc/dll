@@ -4,10 +4,9 @@
 #include "../../../Client.hpp"
 #include "../../../../Utils/Utils.hpp"
 #include "../../../../Utils/Memory/CustomAllocator/Buffer.hpp" // why its not hpp here ???
-#include "BlockOutlineListener.hpp"
 
 class BlockOutline : public Module {
-
+// TODO: switch to renderOutlineSelection hook + 3D option
 private:
     static inline uintptr_t highlightColorRipRelAddr; // RIP REL 4BYTE FROM FUNC OFFSET ADDR
     static inline UINT32 highlightColorOrigRipRel;
@@ -70,14 +69,16 @@ public:
 
     void onEnable() override {
         onColorChange();
-        EventHandler::registerListener(new BlockOutlineListener("BlockOutline", this, selectionColor));
+
         patch();
+        Listen(this, TickEvent, &BlockOutline::onTick)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("BlockOutline");
+
         unpatch();
+        Listen(this, TickEvent, &BlockOutline::onTick)
         Module::onDisable();
     }
 
@@ -117,4 +118,8 @@ public:
             onColorChange();
     }
 
+    void onTick(TickEvent &event) {
+        if (this->settings.getSettingByName<bool>("color_rgb")->value)
+            onColorChange();
+    }
 };

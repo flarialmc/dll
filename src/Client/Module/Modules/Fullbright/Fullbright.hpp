@@ -1,29 +1,24 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "FullbrightListener.hpp"
 
 
 class Fullbright : public Module {
-
 public:
-
     Fullbright() : Module("Fullbright",
                           "No need for torches!\nProvides consistent and constant illumination.\nEffectively removing darkness and shadows.",
                           IDR_FULLBRIGHT_PNG, "") {
-
         Module::setup();
 
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new FullbrightListener("Fullbright", this));
+        Listen(this, GammaEvent, &Fullbright::onGetGamma)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("Fullbright");
+        Deafen(this, GammaEvent, &Fullbright::onGetGamma)
         Module::onDisable();
     }
 
@@ -55,4 +50,9 @@ public:
 
 
     }
+
+    // TODO: Make it changable
+    void onGetGamma(GammaEvent &event) {
+        event.setGamma(this->settings.getSettingByName<float>("gamma")->value);
+    };
 };

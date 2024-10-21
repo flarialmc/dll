@@ -1,29 +1,25 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "AutoGGListener.hpp"
+#include "../../../../SDK/Client/Network/Packet/PlaySoundPacket.hpp"
+#include "../../../../SDK/Client/Network/Packet/TextPacket.hpp"
 
 
 class AutoGG : public Module {
 
 public:
-
-
     AutoGG() : Module("Auto GG", "Automatically sends a message when you\nwin a game. (Doesn't work everywhere)",
                       IDR_LIKE_PNG, "") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new AutoGGListener("AutoGG", this));
+        Listen(this, PacketEvent, &AutoGG::onPacketReceive)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("AutoGG");
+        Deafen(this, PacketEvent, &AutoGG::onPacketReceive)
         Module::onDisable();
     }
 
@@ -51,6 +47,66 @@ public:
         FlarialGUI::UnsetScrollView();
 
         this->resetPadding();
+    }
+
+    void onPacketReceive(PacketEvent &event) {
+        bool triggered = false;
+        MinecraftPacketIds id = event.getPacket()->getId();
+
+        // TODO: add support for other servers (look for "won the game" text)
+        if (id == MinecraftPacketIds::PlaySoundA) {
+            auto *pkt = reinterpret_cast<PlaySoundPacket *>(event.getPacket());
+            if (pkt->mName == "ui.toast.challenge_complete_java") {
+                triggered = true;
+            }
+
+
+            if (triggered) {
+                std::string win_message = this->settings.getSettingByName<std::string>("text")->value;
+                if (!win_message.empty()) {
+                    auto player = SDK::clientInstance->getLocalPlayer();
+                    std::shared_ptr<Packet> packet = SDK::createPacket(9);
+                    auto *text = reinterpret_cast<TextPacket *>(packet.get());
+
+
+                    text->type = TextPacketType::CHAT;
+                    text->message = win_message;
+                    text->platformId = "";
+                    text->translationNeeded = false;
+                    text->xuid = "";
+                    text->name = player->getPlayerName();
+
+                    SDK::clientInstance->getPacketSender()->sendToServer(text);
+                }
+            }
+        }
+
+        else if (id == MinecraftPacketIds::Text) {
+            auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
+            if (pkt->message == "§c§l» §r§c§lGame OVER!") {
+                triggered = true;
+            }
+
+
+            if (triggered) {
+                std::string win_message = this->settings.getSettingByName<std::string>("text")->value;
+                if (!win_message.empty()) {
+                    auto player = SDK::clientInstance->getLocalPlayer();
+                    std::shared_ptr<Packet> packet = SDK::createPacket(9);
+                    auto *text = reinterpret_cast<TextPacket *>(packet.get());
+
+
+                    text->type = TextPacketType::CHAT;
+                    text->message = win_message;
+                    text->platformId = "";
+                    text->translationNeeded = false;
+                    text->xuid = "";
+                    text->name = player->getPlayerName();
+
+                    SDK::clientInstance->getPacketSender()->sendToServer(text);
+                }
+            }
+        }
     }
 };
 

@@ -1,11 +1,11 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include  "ComboListener.hpp"
 
 class ComboCounter : public Module {
-
+private:
+    int Combo = 0;
+    std::chrono::time_point<std::chrono::high_resolution_clock> last_hit;
 public:
 
     ComboCounter() : Module("Combo", "Keeps track of consecutive hits.", IDR_COMBO_PNG, "") {
@@ -15,12 +15,14 @@ public:
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new ComboListener("Combo", this));
+        Listen(this, AttackEvent, &ComboCounter::onAttack)
+        Listen(this, RenderEvent, &ComboCounter::onRender)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("Combo");
+        Deafen(this, AttackEvent, &ComboCounter::onAttack)
+        Deafen(this, RenderEvent, &ComboCounter::onRender)
         Module::onDisable();
     }
 
@@ -77,5 +79,30 @@ public:
 
         this->resetPadding();
 
+    }
+
+    void onAttack(AttackEvent &event) {
+        if(std::chrono::high_resolution_clock::now() - last_hit > std::chrono::milliseconds(480)) {
+            Combo++;
+            last_hit = std::chrono::high_resolution_clock::now();
+        }
+    }
+
+    void onTick(TickEvent &event) {
+        if (!SDK::clientInstance->getLocalPlayer())
+            return;
+
+        auto LP = reinterpret_cast<LocalPlayer *>(event.getActor());
+        if (LP->getHurtTime() != 0)
+            Combo = 0;
+        std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_hit;
+        if (duration.count() >= 15) Combo = 0;
+    }
+
+    void onRender(RenderEvent &event) {
+        if (this->isEnabled()) {
+            auto comboStr = std::to_string(Combo);
+            this->normalRender(8, comboStr);
+        }
     }
 };

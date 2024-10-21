@@ -1,6 +1,6 @@
 #include "../../../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
-#include "../../../../../Module/Modules/ClickGUI/ClickGUIRenderer.hpp"
 #include "../../../../../../Assets/Assets.hpp"
+#include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -254,7 +254,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
                                   L"", buttonWidth, buttonHeight, round.x,
                                   round.x)) {
         mod->toggle();
-                                  }
+    }
 
     FlarialGUI::FlarialTextWithFont((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.15f, paddingwidth), buttony - buttonHeight, FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, DWRITE_TEXT_ALIGNMENT_CENTER, buttonWidth * 1.08, DWRITE_FONT_WEIGHT_NORMAL, false);
 
@@ -266,13 +266,13 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         !MC::held) {
         FlarialGUI::TextBoxes[0].isActive = false;
         MC::mouseButton = MouseButton::None;
-        ClickGUIRenderer::page.type = "settings";
-        ClickGUIRenderer::page.module = mod->name;
+        ClickGUI::page.type = "settings";
+        ClickGUI::page.module = mod->name;
         FlarialGUI::TextBoxes[0].isActive = false;
         FlarialGUI::scrollpos = 0;
         FlarialGUI::barscrollpos = 0;
-        GUIMouseListener::accumilatedPos = 0;
-        GUIMouseListener::accumilatedBarPos = 0;
+        ClickGUI::accumilatedPos = 0;
+        ClickGUI::accumilatedBarPos = 0;
     }
     FlarialGUI::PopSize();
 }

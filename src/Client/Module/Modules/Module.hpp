@@ -38,6 +38,7 @@ public:
     }
 
     bool active = false;
+    bool enabledState = false;
     bool restricted = false;
     bool terminating = false;
 

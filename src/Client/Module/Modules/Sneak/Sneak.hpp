@@ -1,9 +1,6 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "SneakListener.hpp"
-
 
 class Sneak : public Module {
 
@@ -17,12 +14,14 @@ public:
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new SneakListener("Sneak", this));
+        Listen(this, KeyEvent, &Sneak::onKey)
+        Listen(this, TickEvent, &Sneak::onTick)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("Sneak");
+        Deafen(this, KeyEvent, &Sneak::onKey)
+        Deafen(this, TickEvent, &Sneak::onTick)
         Module::onDisable();
     }
 
@@ -56,6 +55,31 @@ public:
 
         this->resetPadding();
 
+    }
+
+    bool toggleSneaking = false;
+    bool toggled = false;
+
+    void onKey(KeyEvent &event) { // TODO: it lets sneak key up through (flickers sneak once)
+        if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
+            toggleSneaking = !toggleSneaking;
+        }
+    };
+
+    void onTick(TickEvent &event) {
+        if (SDK::clientInstance != nullptr) {
+            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                MoveInputComponent *handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
+                if (toggleSneaking) {
+                    handler->sneaking = true;
+                    toggled = true;
+                }
+                if (!toggleSneaking and toggled) {
+                    handler->sneaking = false;
+                    toggled = false;
+                }
+            }
+        }
     }
 };
 

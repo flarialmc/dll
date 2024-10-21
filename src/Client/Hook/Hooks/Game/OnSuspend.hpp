@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Hook.hpp"
-#include "../../../Events/EventHandler.hpp"
+
 #include "../../../../SDK/SDK.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
@@ -15,7 +15,7 @@ public:
 
     static inline original suspendOriginal = nullptr;
 
-    OnSuspendHook() : Hook("onSuspendHook", GET_SIG("MinecraftGame::onAppSuspended")) {}
+    OnSuspendHook() : Hook("onSuspendHook", GET_SIG_ADDRESS("MinecraftGame::onAppSuspended")) {}
 
     void enableHook() override;
 };

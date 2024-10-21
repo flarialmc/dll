@@ -1,34 +1,29 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "dvdListener.hpp"
-#include "../../../Events/EventHandler.hpp"
 
 
 class DVD : public Module {
-
+private:
+    int color = 1;
+    float x = 0;
+    float y = 0;
+    float xv = 1;
+    float yv = 1;
 public:
 
     DVD() : Module("DVD Screen", "Overlays the DVD Screensaver", IDR_SKULL_PNG, "") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-
-        EventHandler::registerListener(new dvdListener("dvdListener", this));
-
+        Listen(this, RenderEvent, &DVD::onRender)
         Module::onEnable();
-
     }
 
     void onDisable() override {
-
-        EventHandler::unregisterListener("dvdListener");
-
+        Deafen(this, RenderEvent, &DVD::onRender)
         Module::onDisable();
-
     }
 
     void defaultConfig() override {
@@ -65,5 +60,41 @@ public:
 
         this->resetPadding();
 
+    }
+
+    void onRender(RenderEvent &event) {
+        if (this->isEnabled() &&
+            ClientInstance::getTopScreenName() == "hud_screen") {
+            float height = 83 * this->settings.getSettingByName<float>("scale")->value;
+            float width = 187 * this->settings.getSettingByName<float>("scale")->value;
+
+            FlarialGUI::image(IDR_DVDLOGO_01_PNG - 1 + color,
+                              D2D1::RectF(x, y, x + width, y + height));
+
+            x += this->settings.getSettingByName<float>("xveloc")->value * xv;
+            y += this->settings.getSettingByName<float>("yveloc")->value * yv;
+
+            if (x >= MC::windowSize.x - width) {
+                xv = -1;
+                inc();
+            }
+            if (x < 0) {
+                xv = 1;
+                inc();
+            }
+            if (y >= MC::windowSize.y - height) {
+                yv = -1;
+                inc();
+            }
+            if (y < 0) {
+                yv = 1;
+                inc();
+            }
+        }
+    }
+
+    void inc() {
+        if (color == 8) color = 1;
+        else color++;
     }
 };

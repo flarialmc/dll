@@ -3,7 +3,7 @@
 #include <d3dcompiler.h>
 #include "../../Engine.hpp"
 #include "../../../../Hook/Hooks/Render/SwapchainHook.hpp"
-#include "../../../../Module/Modules/MotionBlur/MotionBlurListener.hpp"
+#include "../../../../Module/Modules/MotionBlur/MotionBlur.hpp"
 
 // CREDITS @MR CHIPS (@chyves)
 
@@ -294,7 +294,7 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 
     if (!SwapchainHook::GetBackbuffer()) return;
 
-    ID3D11ShaderResourceView *pOrigShaderResourceView = MotionBlurListener::BackbufferToSRV();
+    winrt::com_ptr<ID3D11ShaderResourceView>pOrigShaderResourceView = MotionBlur::BackbufferToSRV();
     if (!pOrigShaderResourceView) {
         return;
     }
@@ -349,7 +349,7 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 
     constantBuffer.offset = XMFLOAT2(intensity * 3, intensity * 3);
     pContext->PSSetShader(pDownsampleShader, nullptr, 0);
-    RenderToRTV(renderTargetViews[1], pOrigShaderResourceView, fbSizes[1]);
+    RenderToRTV(renderTargetViews[1], pOrigShaderResourceView.get(), fbSizes[1]);
 
     for (int i = 1; i < iterations; i++)
     {

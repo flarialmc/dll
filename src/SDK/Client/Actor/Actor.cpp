@@ -275,9 +275,6 @@ bool Actor::isOnGround() {
 }
 
 Vec3<float> Actor::getLerpedPosition() {
-//    if(SDK::clientInstance->getLocalPlayer() == this) { // only in first person
-//        return SDK::clientInstance->getLevelRender()->getOrigin();
-//    }
     return this->getRenderPositionComponent()->renderPos;
 }
 
@@ -295,7 +292,7 @@ AABB Actor::getLerpedAABB(bool asHitbox) {
     auto aabb = AABB(lower, upper);
 
     if(asHitbox)
-        return aabb.expandedXZ(0.1);
+        return aabb.expandedXYZ(0.1);
 
     return aabb;
 }

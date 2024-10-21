@@ -1,11 +1,10 @@
 #include <fstream>
 #include "ActorBaseTick.hpp"
-#include "../../../Events/EventHandler.hpp"
 #include "../../../Client.hpp"
 
 void ActorBaseTick::enableHook() {
 
-    auto base = Memory::findSig(this->signature); // Player vtable
+    auto base = address; // Player vtable
     int offset = *reinterpret_cast<int *>(base + 3);
     auto **vft = reinterpret_cast<uintptr_t **>(base + offset + 7);
 
@@ -15,7 +14,7 @@ void ActorBaseTick::enableHook() {
 
 }
 
-ActorBaseTick::ActorBaseTick() : Hook("ActorBaseTick", GET_SIG("Actor::baseTick")) {}
+ActorBaseTick::ActorBaseTick() : Hook("ActorBaseTick", GET_SIG_ADDRESS("Actor::baseTick")) {}
 
 void ActorBaseTick::callback(Actor *actor) {
     // TODO: Might be wrong, req checking
@@ -25,8 +24,8 @@ void ActorBaseTick::callback(Actor *actor) {
         if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                 if (actor == SDK::clientInstance->getLocalPlayer()) {
-                    TickEvent event(actor);
-                    EventHandler::onTick(event);
+                    auto event = nes::make_holder<TickEvent>(actor);
+                    eventMgr.trigger(event);
                 }
             }
         }

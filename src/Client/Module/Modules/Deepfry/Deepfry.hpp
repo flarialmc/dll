@@ -1,8 +1,6 @@
 #pragma once
 
-#include "DeepfryListener.hpp"
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
 
 
 class Deepfry : public Module {
@@ -14,19 +12,13 @@ public:
     };
 
     void onEnable() override {
-
-        EventHandler::registerPriorityListener(new DeepfryListener("Deepfry", this));
-
+        Listen(this, RenderEvent, &Deepfry::onRender)
         Module::onEnable();
-
     }
 
     void onDisable() override {
-
-        EventHandler::unregisterListener("Deepfry");
-
+        Deafen(this, RenderEvent, &Deepfry::onRender)
         Module::onDisable();
-
     }
 
     void defaultConfig() override {
@@ -53,7 +45,13 @@ public:
         FlarialGUI::UnsetScrollView();
 
         this->resetPadding();
+    }
 
+    void onRender(RenderEvent &event) {
+        if (this->isEnabled()) {
+            if (this->settings.getSettingByName<bool>("paint")->value) FlarialGUI::ApplyPaintEffect(10.0f);
+            else FlarialGUI::ApplyCombinedDeepFry();
 
+        }
     }
 };

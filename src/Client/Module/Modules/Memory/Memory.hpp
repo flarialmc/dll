@@ -1,28 +1,22 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "MemoryListener.hpp"
 
 
 class MEM : public Module {
-
 public:
-
-
     MEM() : Module("Memory", "Shows your current system RAM usage.", IDR_MEMORY_PNG, "") {
 
         Module::setup();
     };
 
     void onEnable() override {
-
-        EventHandler::registerListener(new MemoryListener("Memory", this));
+        Listen(this, RenderEvent, &MEM::onRender)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("Memory");
+        Deafen(this, RenderEvent, &MEM::onRender)
         Module::onDisable();
     }
 
@@ -32,7 +26,7 @@ public:
             settings.addSetting("text", (std::string) "{value}");
     }
 
-        void settingsRender() override {
+    void settingsRender() override {
 
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
@@ -91,6 +85,24 @@ public:
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
+    }
+
+    void onRender(RenderEvent &event) {
+        if (isEnabled()) {
+            //TODO: (Memory module) Do megabytes mode
+            MEMORYSTATUSEX memory_status;
+            memory_status.dwLength = sizeof(memory_status);
+            GlobalMemoryStatusEx(&memory_status);
+            DWORDLONG total_memory = memory_status.ullTotalPhys;
+            DWORDLONG free_memory = memory_status.ullAvailPhys;
+            DWORDLONG used_memory = total_memory - free_memory;
+
+            int sussymem = static_cast<int>((used_memory * 100) / total_memory);
+
+            std::string text = std::to_string(sussymem) + "%";
+
+            this->normalRender(4, text);
+        }
     }
 };
 

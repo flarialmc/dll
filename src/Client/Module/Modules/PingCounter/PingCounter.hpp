@@ -1,31 +1,22 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "PingListener.hpp"
 
 class PingCounter : public Module {
-
 public:
-
     PingCounter() : Module("Ping Counter", "Displays your current latency to the server.",
                            IDR_PING_PNG, "") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-
-        EventHandler::registerListener(new PingListener("Ping", this));
+        Listen(this, RenderEvent, &PingCounter::onRender)
         Module::onEnable();
     }
 
     void onDisable() override {
-
-        EventHandler::unregisterListener("Ping");
+        Deafen(this, RenderEvent, &PingCounter::onRender)
         Module::onDisable();
-
     }
 
     void defaultConfig() override {
@@ -36,7 +27,7 @@ public:
 
     }
 
-       void settingsRender() override {
+    void settingsRender() override {
 
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
@@ -95,5 +86,10 @@ public:
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
+    }
+
+    void onRender(RenderEvent &event) {
+        auto pingStr = std::to_string(SDK::getServerPing());
+        this->normalRender(11, pingStr);
     }
 };

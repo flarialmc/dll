@@ -1,28 +1,27 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "ReachListener.hpp"
 
 class ReachCounter : public Module {
-
+private:
+    float Reach = 0.0f;
+    std::chrono::time_point<std::chrono::high_resolution_clock> last_hit;
 public:
-
     ReachCounter() : Module("Reach Counter", "Displays your last hit range in blocks.", IDR_REACH_PNG,
                             "") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new ReachListener("Reach", this));
+        Listen(this, AttackEvent, &ReachCounter::onAttack)
+        Listen(this, TickEvent, &ReachCounter::onTick)
+        Listen(this, RenderEvent, &ReachCounter::onRender)
         Module::onEnable();
     }
 
     void onDisable() override {
 
-        EventHandler::unregisterListener("Reach");
+
         Module::onDisable();
 
     }
@@ -34,7 +33,7 @@ public:
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
     }
 
-       void settingsRender() override {
+    void settingsRender() override {
 
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
@@ -93,5 +92,28 @@ public:
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
+    }
+
+    void onAttack(AttackEvent &event) {
+        Reach = event.getActor()->getLevel()->getHitResult().distance();
+        last_hit = std::chrono::high_resolution_clock::now();
+    }
+
+    void onTick(TickEvent &event) {
+        std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_hit;
+        if (duration.count() >= 15) Reach = 0.0f;
+
+    }
+
+    void onRender(RenderEvent &event) {
+        if (this->isEnabled()) {
+
+            std::ostringstream oss;
+            oss << std::fixed << std::setprecision(2) << Reach;
+            std::string reachString = oss.str();
+
+            this->normalRender(9, reachString);
+
+        }
     }
 };

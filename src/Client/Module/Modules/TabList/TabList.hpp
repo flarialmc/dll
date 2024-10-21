@@ -2,31 +2,27 @@
 
 #include "../Module.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "TabListListener.hpp"
-#include "../Nick/NickListener.hpp"
 #include "../../Manager.hpp"
 #include "../../../Client.hpp"
-#include "../ClickGUI/ClickGUIRenderer.hpp"
+ #include "../Nick/NickModule.hpp"
 
 
-class TabList : public Module {
-
+ class TabList : public Module {
 public:
     TabList() : Module("Tab List", "Java-like tab list.\nLists the current online players on the server.",
                        IDR_LIST_PNG, "TAB") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new TabListListener("TabList", this));
+        Listen(this, RenderEvent, &TabList::onRender)
+        Listen(this, KeyEvent, &TabList::onKey)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("TabList");
+        Deafen(this, RenderEvent, &TabList::onRender)
+        Deafen(this, KeyEvent, &TabList::onKey)
         Module::onDisable();
     }
 
@@ -112,7 +108,7 @@ public:
     }
 
     void normalRender(int index, std::string& value) override {
-        if (SDK::hasInstanced && (active || ClickGUIRenderer::editmenu)) {
+        if (SDK::hasInstanced && (active || ClickGUI::editmenu)) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                 float keycardSize = Constraints::RelativeConstraint(
                         0.05f * this->settings.getSettingByName<float>("uiscale")->value, "height", true);
@@ -235,7 +231,7 @@ public:
                         auto module = ModuleManager::getModule("Nick");
 
                         if (module->isEnabled() &&
-                            name == Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickListener::original))) {
+                            name == Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickModule::original))) {
                             name = module->settings.getSettingByName<std::string>("nick")->value;
                         }
 
@@ -382,7 +378,7 @@ public:
                         auto module = ModuleManager::getModule("Nick");
 
                         if (module->isEnabled() &&
-                            name == NickListener::backupOri) {
+                            name == NickModule::backupOri) {
                             name = module->settings.getSettingByName<std::string>("nick")->value;
                         }
 
@@ -409,6 +405,20 @@ public:
             }
         }
     }
+
+     void onRender(RenderEvent &event) {
+         std::string text;
+         this->normalRender(20, text);
+     }
+
+     void onKey(KeyEvent &event) {
+         if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
+             this->active = !this->active;
+         }
+
+         if (!this->isKeybind(event.keys)) this->active = false;
+
+     };
 
     static std::vector<std::pair<mcUUID, PlayerListEntry>>
     copyMapInAlphabeticalOrder(const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap) {

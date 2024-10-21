@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "IPDisplayListener.hpp"
 #include "../../../Client.hpp"
 
 
@@ -18,12 +16,12 @@ public:
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new IPDisplayListener("IPDisplay", this));
+        Listen(this, RenderEvent, &IPDisplay::onRender)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("IPDisplay");
+        Deafen(this, RenderEvent, &IPDisplay::onRender)
         Module::onDisable();
     }
 
@@ -33,7 +31,7 @@ public:
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
     }
 
-        void settingsRender() override {
+    void settingsRender() override {
 
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
@@ -92,6 +90,11 @@ public:
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
+    }
+
+    void onRender(RenderEvent &event)  {
+        std::string IPStr = SDK::getServerIP();
+        this->normalRender(10, IPStr);
     }
 };
 

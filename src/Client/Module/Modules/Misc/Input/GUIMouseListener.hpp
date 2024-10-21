@@ -2,14 +2,11 @@
 
 #include <format>
 #include <Windows.h>
-#include "../../../Events/Listener.hpp"
-#include "../../../Events/Input/MouseEvent.hpp"
-#include "../../../../Utils/Logger/Logger.hpp"
-#include "../../../GUI/D2D.hpp"
+#include "../../../../Client.hpp"
 
 class GUIMouseListener : public Listener {
-
-    void onMouse(MouseEvent &event) override {
+public:
+    void onMouse(MouseEvent &event) {
 
         MC::mousePos.x = event.getMouseX();
         MC::mousePos.y = event.getMouseY();
@@ -21,8 +18,11 @@ class GUIMouseListener : public Listener {
 
     };
 
-public:
-    explicit GUIMouseListener(const char string[5]) {
-        this->name = string;
+    GUIMouseListener() {
+        Listen(this, MouseEvent, &GUIMouseListener::onMouse);
+    }
+
+    ~GUIMouseListener() {
+        Deafen(this, MouseEvent, &GUIMouseListener::onMouse);
     }
 };

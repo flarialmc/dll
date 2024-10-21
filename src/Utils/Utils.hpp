@@ -234,6 +234,10 @@ struct AABB {
         return {lower.sub(amount, 0.f, amount), upper.add(amount, 0.f, amount)};
     }
 
+    AABB expandedXYZ(const float amount) {
+        return { lower.sub(amount, 0.f, amount), upper.add(amount, amount, amount) };
+    }
+
     Vec3<float> centerPoint() {
         Vec3<float> diff = upper.sub(lower);
         return lower.add(diff.mul(0.5f));

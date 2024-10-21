@@ -6,10 +6,6 @@
 #include "../Module.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
 #include <Windows.h>
-#include "KeystrokesListener.hpp"
-#include "../CPS/CPSListener.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "../ClickGUI/ClickGUIRenderer.hpp"
 
 class Keystrokes : public Module {
 
@@ -45,12 +41,12 @@ public:
     }
 
     void onEnable() override {
-        EventHandler::registerListener(new KeystrokesListener("Keystrok", this));
+        Listen(this, RenderEvent, &Keystrokes::onRender)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("Keystrok");
+        Deafen(this, RenderEvent, &Keystrokes::onRender)
         Module::onDisable();
     }
 
@@ -210,7 +206,7 @@ public:
 
                 size_t pos = uppercaseSentence.find(search);
                 if (pos != std::string::npos) {
-                    lmbText.replace(pos, search.length(), std::to_string(CPSListener::GetLeftCPS()));
+                    lmbText.replace(pos, search.length(), std::to_string(CPSCounter::GetLeftCPS()));
                 }
 
                 // rmb
@@ -220,7 +216,7 @@ public:
 
                 pos = uppercaseSentence.find(search);
                 if (pos != std::string::npos) {
-                    rmbText.replace(pos, search.length(), std::to_string(CPSListener::GetRightCPS()));
+                    rmbText.replace(pos, search.length(), std::to_string(CPSCounter::GetRightCPS()));
                 }
 
                 float keycardSize = Constraints::RelativeConstraint(
@@ -252,7 +248,7 @@ public:
                 if (settings.getSettingByName<bool>("cps")->value) totalHeight += keycardSize + spacing;
 
                 if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
-                    ClickGUIRenderer::editmenu) { // makes module movable
+                    ClickGUI::editmenu) { // makes module movable
                     FlarialGUI::SetWindowRect(realcenter.x - (keycardSize + spacing), realcenter.y, totalWidth,
                                               totalHeight, index, keycardSize + spacing);
 
@@ -356,7 +352,7 @@ public:
                                                                           0.15f * FlarialGUI::frameFactor);
                 }
 
-                if (CPSListener::GetRightHeld()) {
+                if (CPSCounter::GetRightHeld()) {
                     states[Strokes::RMB] = FlarialGUI::LerpColor(states[Strokes::RMB], enabledColor,
                                                                  0.15f * FlarialGUI::frameFactor);
                     textStates[Strokes::RMB] = FlarialGUI::LerpColor(textStates[Strokes::RMB], textEnabledColor,
@@ -368,7 +364,7 @@ public:
                                                                      0.15f * FlarialGUI::frameFactor);
                 }
 
-                if (CPSListener::GetLeftHeld()) {
+                if (CPSCounter::GetLeftHeld()) {
                     states[Strokes::LMB] = FlarialGUI::LerpColor(states[Strokes::LMB], enabledColor,
                                                                  0.15f * FlarialGUI::frameFactor);
                     textStates[Strokes::LMB] = FlarialGUI::LerpColor(textStates[Strokes::LMB], textEnabledColor,
@@ -501,7 +497,7 @@ public:
                                                             DWRITE_FONT_WEIGHT_NORMAL, textStates[Strokes::LMB], true);
                     } else
                         FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
-                                                                std::to_string(CPSListener::GetLeftCPS())).c_str(),
+                                                                std::to_string(CPSCounter::GetLeftCPS())).c_str(),
                                                         keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
                                                         keycardSize - (keycardSize * 0.05f),
                                                         DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 +
@@ -553,7 +549,7 @@ public:
                                                             DWRITE_FONT_WEIGHT_NORMAL, textStates[Strokes::RMB], true);
                     } else
                         FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
-                                                                std::to_string(CPSListener::GetRightCPS())).c_str(),
+                                                                std::to_string(CPSCounter::GetRightCPS())).c_str(),
                                                         keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
                                                         keycardSize - (keycardSize * 0.05f),
                                                         DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 +
@@ -581,11 +577,16 @@ public:
                                         textStates[Strokes::SPACEBAR], childWidth, childHeight, 0, 0);
 
                 if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
-                    ClickGUIRenderer::editmenu)
+                    ClickGUI::editmenu)
 
                     FlarialGUI::UnsetWindowRect();
 
             }
         }
+    }
+
+    void onRender(RenderEvent &event) {
+        if(!this->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
+        this->normalRender(7, (std::string &) "");
     }
 };

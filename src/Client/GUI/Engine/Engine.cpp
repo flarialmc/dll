@@ -272,8 +272,8 @@ uint64_t generateUniqueLinearGradientBrushKey(float x, float hexPreviewSize, flo
 
     // Get gradient stops
     UINT32 stopCount = pGradientStops->GetGradientStopCount();
-    auto* gradientStops = new D2D1_GRADIENT_STOP[stopCount];
-    pGradientStops->GetGradientStops(gradientStops, stopCount);
+    auto gradientStops = std::make_shared<D2D1_GRADIENT_STOP[]>(stopCount);
+    pGradientStops->GetGradientStops(gradientStops.get(), stopCount);
 
     // Hash for gradient stops' colors
     std::hash<UINT32> colorHash;
@@ -295,7 +295,7 @@ uint64_t generateUniqueLinearGradientBrushKey(float x, float hexPreviewSize, flo
                           stopsHash(stopCount) ^
                           colorKey;
 
-    delete[] gradientStops;
+    gradientStops.reset();
 
     return combinedHash;
 }

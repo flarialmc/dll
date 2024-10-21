@@ -1,6 +1,6 @@
 #include "Module.hpp"
 #include "../../Client.hpp"
-#include "ClickGUI/ClickGUIRenderer.hpp"
+#include "ClickGUI/ClickGUI.hpp"
 
 #define colors_secondary6 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary6")->value)
 #define o_colors_secondary6 clickgui->settings.getSettingByName<float>("o_colors_secondary6")->value
@@ -87,7 +87,7 @@ void Module::normalRender(int index, std::string &value) {
                 "rectheight")->value);
 
     if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
-        ClickGUIRenderer::editmenu) {
+        ClickGUI::editmenu) {
         FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth,
                                   textHeight * this->settings.getSettingByName<float>("rectheight")->value, index);
 
@@ -186,7 +186,7 @@ void Module::normalRender(int index, std::string &value) {
     }
 
     if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
-        ClickGUIRenderer::editmenu)
+        ClickGUI::editmenu)
         FlarialGUI::UnsetWindowRect();
 }
 
@@ -412,14 +412,7 @@ void Module::checkSettingsFile() const {
 }
 
 void Module::toggle() {
-    bool& enabled = settings.getSettingByName<bool>("enabled")->value;
-    enabled = !enabled;
-    if (enabled) {
-        onEnable();
-    }
-    else {
-        onDisable();
-    }
+    enabledState = !enabledState;
 }
 
 void Module::setup() {
@@ -435,11 +428,13 @@ void Module::onSetup() { }
 
 // TODO: rename to Enable/Disable?
 void Module::onEnable() {
+    enabledState = true;
     settings.getSettingByName<bool>("enabled")->value = true;
     saveSettings();
 }
 
 void Module::onDisable() {
+    enabledState = false;
     active = false;
     if (!terminating) {
         settings.getSettingByName<bool>("enabled")->value = false;

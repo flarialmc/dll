@@ -1,10 +1,8 @@
 #include "SwapchainHook.hpp"
 #include "../../../GUI/D2D.hpp"
 #include "../../../Events/Render/RenderEvent.hpp"
-#include "../../../Events/EventHandler.hpp"
 #include "d2d1.h"
 #include "../../../Client.hpp"
-#include "../../../Module/Modules/CPS/CPSListener.hpp"
 #include <d3d11on12.h>
 #include <algorithm>
 #include <windows.h>
@@ -20,7 +18,7 @@
 #include "../../../../../lib/ImGui/imgui_impl_dx11.h"
 #include "../../../../../lib/ImGui/imgui_impl_dx12.h"
 
-SwapchainHook::SwapchainHook() : Hook("swapchain_hook", "") {}
+SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
 
 ID3D12CommandQueue *SwapchainHook::queue = nullptr;
 
@@ -396,10 +394,10 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                                 ID3D11RenderTargetView* mainRenderTargetView;
                                 d3d11Device->CreateRenderTargetView(buffer2D, NULL, &mainRenderTargetView);
 
-                                RenderEvent event{};
-                                event.RTV = mainRenderTargetView;
+                                auto event = nes::make_holder<RenderEvent>();
+                                event->RTV = mainRenderTargetView;
                                 //BlurDX12::RenderBlur(SwapchainHook::d3d12CommandList);
-                                EventHandler::onRender(event);
+                                eventMgr.trigger(event);
 
                                 if(!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
                                     FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
@@ -494,9 +492,10 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                         ImGui_ImplWin32_NewFrame();
                         ImGui::NewFrame();
 
-                        RenderEvent event;
-                        event.RTV = mainRenderTargetView;
-                        EventHandler::onRender(event);
+                        auto event = nes::make_holder<RenderEvent>();
+                        event->RTV = mainRenderTargetView;
+                        eventMgr.trigger(event);
+
 
                         if(!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
                             FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
@@ -555,7 +554,7 @@ void SwapchainHook::DX11Blur() {
     /* Blur Stuff */
 
     if(ModuleManager::initialized) {
-        auto* module = ModuleManager::getModule("Motion Blur");
+        auto module = ModuleManager::getModule("Motion Blur");
         if(module) {
             if(module->isEnabled() && !FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
             else FlarialGUI::needsBackBuffer = false;

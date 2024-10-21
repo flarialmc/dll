@@ -1,27 +1,25 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "PotListener.hpp"
 
 class PotCounter : public Module {
-
+private:
+    int pots = 0;
 public:
-
     PotCounter() : Module("Pot Counter", "Counts how much potions are\nin your inventory.",
                           IDR_POTION_PNG, "") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new PotListener("Pot", this));
+        Listen(this, TickEvent, &PotCounter::onTick)
+        Listen(this, RenderEvent, &PotCounter::onRender)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("Pot");
+        Deafen(this, TickEvent, &PotCounter::onTick)
+        Deafen(this, RenderEvent, &PotCounter::onRender)
         Module::onDisable();
     }
 
@@ -91,5 +89,35 @@ public:
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
+    }
+
+    void onTick(TickEvent& event) {
+        if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
+            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                auto potsCount = 0;
+                if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
+                    auto inventory = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory();
+
+                    if (inventory != nullptr) {
+                        for (int i = 0; i < 36; i++) {
+                            auto item = inventory->getItem(i);
+
+                            if (item->getItem() != nullptr) {
+                                if (item->getItem()->name == "splash_potion") {
+                                    potsCount++;
+                                }
+                            }
+                        }
+                    }
+
+                    pots = potsCount;
+                }
+            }
+        }
+    }
+
+    void onRender(RenderEvent& event) {
+        auto potsStr = std::to_string(pots);
+        this->normalRender(14, potsStr);
     }
 };

@@ -57,7 +57,7 @@ public:
     static inline receive receivePacketContainerCloseOriginal = nullptr;
     static inline receive receivePacketChangeDimensionOriginal = nullptr;
 
-    SendPacketHook() : Hook("sendPacket", GET_SIG("LoopbackPacketSender::sendPacket")) {}
+    SendPacketHook() : Hook("sendPacket", GET_SIG_ADDRESS("LoopbackPacketSender::sendPacket")) {}
 
     void enableHook() override;
 

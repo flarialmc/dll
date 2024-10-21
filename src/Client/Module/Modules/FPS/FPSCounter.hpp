@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "FPSListener.hpp"
 
 class FPSCounter : public Module {
 
@@ -10,18 +8,16 @@ public:
 
     FPSCounter() : Module("FPS", "Shows how much Frames Per Second (FPS)\nyour device is rendering.",
                           IDR_FPS_PNG, "") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new FPSListener("FPS", this));
+        Listen(this, RenderEvent, &FPSCounter::onRender)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("FPS");
+        Deafen(this, RenderEvent, &FPSCounter::onRender)
         Module::onDisable();
     }
 
@@ -34,7 +30,7 @@ public:
 
     }
 
-       void settingsRender() override {
+    void settingsRender() override {
 
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
@@ -50,35 +46,44 @@ public:
 
         this->addHeader("Main");
         this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
-        this->addToggle("Border", "",  this->settings.getSettingByName<bool>(
+        this->addToggle("Border", "", this->settings.getSettingByName<bool>(
                 "border")->value);
         this->addConditionalSlider(this->settings.getSettingByName<bool>(
-                "border")->value, "Border Thickness", "", this->settings.getSettingByName<float>("borderWidth")->value, 4.f);
-        this->addSlider("Rounding", "Rounding of the rectangle", this->settings.getSettingByName<float>("rounding")->value);
+                                           "border")->value, "Border Thickness", "", this->settings.getSettingByName<float>("borderWidth")->value,
+                                   4.f);
+        this->addSlider("Rounding", "Rounding of the rectangle",
+                        this->settings.getSettingByName<float>("rounding")->value);
 
         this->extraPadding();
 
         this->addHeader("Text");
         this->addTextBox("Format", "", settings.getSettingByName<std::string>("text")->value);
         this->addSlider("Text Scale", "", this->settings.getSettingByName<float>("textscale")->value, 2.0f);
-        this->addDropdown("Text Alignment", "",  std::vector<std::string>{"Left", "Center", "Right"}, this->settings.getSettingByName<std::string>("textalignment")->value);
-        this->addColorPicker("Color", "Text Color", settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
+        this->addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"},
+                          this->settings.getSettingByName<std::string>("textalignment")->value);
+        this->addColorPicker("Color", "Text Color", settings.getSettingByName<std::string>("textColor")->value,
+                             settings.getSettingByName<float>("textOpacity")->value,
+                             settings.getSettingByName<bool>("textRGB")->value);
 
         this->extraPadding();
 
         this->addHeader("Colors");
-        this->addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
-        this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
+        this->addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value,
+                             settings.getSettingByName<float>("bgOpacity")->value,
+                             settings.getSettingByName<bool>("bgRGB")->value);
+        this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value,
+                             settings.getSettingByName<float>("borderOpacity")->value,
+                             settings.getSettingByName<bool>("borderRGB")->value);
 
         this->extraPadding();
 
         this->addHeader("Misc Customizations");
 
-        this->addToggle("Reverse Padding X", "For Text Position",  this->settings.getSettingByName<bool>(
+        this->addToggle("Reverse Padding X", "For Text Position", this->settings.getSettingByName<bool>(
                 "reversepaddingx")->value);
 
-        this->addToggle("Reverse Padding Y", "For Text Position",  this->settings.getSettingByName<bool>(
-        "reversepaddingy")->value);
+        this->addToggle("Reverse Padding Y", "For Text Position", this->settings.getSettingByName<bool>(
+                "reversepaddingy")->value);
 
         this->addSlider("Padding X", "For Text Position", this->settings.getSettingByName<float>("padx")->value);
         this->addSlider("Padding Y", "For Text Position", this->settings.getSettingByName<float>("pady")->value);
@@ -86,12 +91,25 @@ public:
         this->addSlider("Rectangle Width", "", this->settings.getSettingByName<float>("rectwidth")->value);
         this->addSlider("Rectangle Height", "", this->settings.getSettingByName<float>("rectheight")->value);
 
-        this->addToggle("Responsive Rectangle", "Rectangle resizes with text",  this->settings.getSettingByName<bool>(
-"responsivewidth")->value);
+        this->addToggle("Responsive Rectangle", "Rectangle resizes with text", this->settings.getSettingByName<bool>(
+                "responsivewidth")->value);
 
-        this->addSlider("Rotation", "see for yourself!", this->settings.getSettingByName<float>("rotation")->value, 360.f, 0, false);
+        this->addSlider("Rotation", "see for yourself!", this->settings.getSettingByName<float>("rotation")->value,
+                        360.f, 0, false);
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
+    }
+
+    void onRender(RenderEvent &event) {
+        if (this->isEnabled()) {
+            int fps = (int) round(((float) MC::fps *
+                                   round(this->settings.getSettingByName<float>(
+                                           "fpsSpoofer")->value)));
+
+            auto fpsStr = std::to_string(fps);
+
+            this->normalRender(0, fpsStr);
+        }
     }
 };

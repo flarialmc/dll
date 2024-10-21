@@ -1,13 +1,11 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "BlockBreakIndicatorListener.hpp"
-#include "../CPS/CPSListener.hpp"
-#include "../../../Client.hpp"
 
 class BlockBreakIndicator : public Module {
-
+private:
+    float lastProgress = 0.0f;
+    float currentProgress = 0.0f;
 public:
     BlockBreakIndicator() : Module("Break Progress", "Visual indicator to show the progress\nof breaking a block.",
                                    IDR_BLOCK_BREAK_INDICATOR_PNG, "") {
@@ -15,12 +13,12 @@ public:
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new BlockBreakIndicatorListener("BlockBreakIndicatorListener", this));
+        Listen(this, RenderEvent, &BlockBreakIndicator::onRender)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("BlockBreakIndicatorListener");
+        Deafen(this, RenderEvent, &BlockBreakIndicator::onRender)
         Module::onDisable();
     }
 
@@ -412,7 +410,7 @@ public:
             }
 
             if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
-                ClickGUIRenderer::editmenu) {
+                ClickGUI::editmenu) {
                 FlarialGUI::SetWindowRect(coord.x, coord.y, pbwidth, pbheight, index);
 
                 Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(coord.x, coord.y, index, pbwidth, pbheight);
@@ -463,9 +461,36 @@ public:
                 );
 
             if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
-                ClickGUIRenderer::editmenu)
+                ClickGUI::editmenu)
                 FlarialGUI::UnsetWindowRect();
         } else Module::normalRender(index, value);
+    }
+
+    void onRender(RenderEvent &event) {
+        if (
+                SDK::hasInstanced && SDK::clientInstance != nullptr &&
+                SDK::clientInstance->getLocalPlayer() != nullptr &&
+                SDK::clientInstance->getLocalPlayer()->getGamemode() != nullptr
+                ) {
+
+            if(SDK::getCurrentScreen() != "hud_screen") return;
+
+            if (CPSCounter::GetLeftHeld()) {
+                Gamemode* gamemode = SDK::clientInstance->getLocalPlayer()->getGamemode();
+                auto progress = gamemode->getLastBreakProgress() * 100;
+                if(lastProgress != progress) {
+                    if(lastProgress < progress || progress == 0.f) {
+                        currentProgress = progress;
+                    }
+                    lastProgress = progress;
+                }
+            } else {
+                currentProgress = 0.0f;
+            }
+
+            std::string progress = std::format("{:.0f}%", currentProgress);
+            this->normalRender(16, progress);
+        }
     }
 };
 

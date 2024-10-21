@@ -6,7 +6,6 @@
 #include "../../../GUI/D2D.hpp"
 #include "SwapchainHook.hpp"
 #include "../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
-#include "../../../Module/Modules/MotionBlur/MotionBlurListener.hpp"
 #include "../../../Module/Manager.hpp"
 #include "../../../GUI/Engine/Elements/Structs/ImagesClass.hpp"
 #include "../../../../../lib/ImGui/imgui.h"
@@ -24,7 +23,7 @@ void ResizeHook::enableHook() {
 
 }
 
-ResizeHook::ResizeHook() : Hook("ResizeHook", "") {}
+ResizeHook::ResizeHook() : Hook("ResizeHook", 0) {}
 
 void ResizeHook::call() {
 

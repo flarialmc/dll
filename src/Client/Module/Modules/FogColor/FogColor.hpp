@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "FogColorListener.hpp"
 
 
 class FogColor : public Module {
@@ -10,18 +8,16 @@ class FogColor : public Module {
 public:
 
     FogColor() : Module("Fog Color", "Changes the color of the\nMinecraft fog.", IDR_SMOKE_PNG, "") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new FogColorListener("FogColor", this));
+        Listen(this, FogColorEvent, &FogColor::onGetFogColor)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("FogColor");
+        Deafen(this, FogColorEvent, &FogColor::onGetFogColor)
         Module::onDisable();
     }
 
@@ -56,5 +52,15 @@ public:
 
         this->resetPadding();
 
+    }
+
+    void onGetFogColor(FogColorEvent &event) {
+        D2D1_COLOR_F color;
+        if (this->settings.getSettingByName<bool>("color_rgb")->value)
+            color = FlarialGUI::rgbColor;
+        else
+            color = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color")->value);
+
+        event.setFogColorFromD2DColor(color, this->settings.getSettingByName<float>("colorOpacity")->value);
     }
 };

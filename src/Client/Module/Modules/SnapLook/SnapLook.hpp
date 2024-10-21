@@ -1,28 +1,22 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "SnapLookListener.hpp"
 
 class SnapLook : public Module {
-
 public:
-
     SnapLook() : Module("SnapLook", "Quickly look behind you.", IDR_EYE_PNG, "V") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-
-        EventHandler::registerListener(new SnapListener("Snap", this));
+        Listen(this, KeyEvent, &SnapLook::onKey)
+        Listen(this, PerspectiveEvent, &SnapLook::onGetViewPerspective)
         Module::onEnable();
-
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("Snap");
+        Deafen(this, KeyEvent, &SnapLook::onKey)
+        Deafen(this, PerspectiveEvent, &SnapLook::onGetViewPerspective)
         Module::onDisable();
     }
 
@@ -46,5 +40,18 @@ public:
         FlarialGUI::UnsetScrollView();
 
         this->resetPadding();
+    }
+
+    // TODO: make it togglable
+    void onKey(KeyEvent &event) {
+        if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key))
+            this->active = !this->active;
+
+        if (!this->isKeybind(event.keys)) this->active = false;
+    };
+
+    void onGetViewPerspective(PerspectiveEvent &event) {
+        if (this->active)
+            event.setPerspective(Perspective::ThirdPersonFront);
     }
 };

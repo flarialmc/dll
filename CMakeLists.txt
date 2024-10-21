@@ -22,6 +22,8 @@ add_definitions(-DCOMMIT_HASH="${COMMIT_HASH}")
 if(MSVC)
     add_compile_options(/MT)
 
+    add_compile_options(/bigobj)
+
     # Optimize for speed
     add_compile_options($<$<CONFIG:Release>:/O2>)
     add_compile_options($<$<CONFIG:Release>:/Ot>)

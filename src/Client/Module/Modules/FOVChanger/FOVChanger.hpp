@@ -1,12 +1,11 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
 #include "../../../Client.hpp"
-#include "FOVChangerListener.hpp"
 
 class FOVChanger : public Module {
-
+private:
+    bool notified150Fov = false;
 public:
     FOVChanger() : Module("FOV Changer", "Change your FOV beyond Minecraft's limits.",
                           IDR_FIELD_OF_VIEW_PNG, "") {
@@ -16,13 +15,13 @@ public:
     };
 
     void onEnable() override {
-        EventHandler::registerOrderedPriorityListener(new FOVChangerListener("FOVChange", this),1);
+        Listen(this, FOVEvent, &FOVChanger::onGetFOV)
         Module::onEnable();
 
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("FOVChange");
+        Deafen(this, FOVEvent, &FOVChanger::onGetFOV)
         Module::onDisable();
     }
 
@@ -53,6 +52,32 @@ public:
         FlarialGUI::UnsetScrollView();
 
         this->resetPadding();
+    }
+
+    void onGetFOV(FOVEvent &event) {
+        if(!this->settings.getSettingByName<bool>("fovaffectshand")->value){
+            if(event.getFOV() == 70) return;
+        }
+
+        bool inserver;
+
+        std::string serverIP = SDK::getServerIP();
+
+        if (serverIP.find("world") != std::string::npos) inserver = true;
+        else inserver = false;
+
+        auto fovSetting = this->settings.getSettingByName<float>("fovvalue")->value;
+
+        if (inserver) {
+            if (fovSetting > 150) {
+                if (!notified150Fov) {
+                    FlarialGUI::Notify("FOV Changer has been limmited to 150 on servers.");
+                    notified150Fov = true;
+                }
+                event.setFOV(150.0f);
+            }
+        }
+        event.setFOV(fovSetting);
     }
 };
 

@@ -126,11 +126,10 @@ public:
     static inline BaseActorRenderer_renderTextOriginal funcOriginal = nullptr;
     static inline BaseActorRenderer_renderTextOriginal40 funcOriginal40 = nullptr;
 
-    BaseActorRendererRenderTextHook() : Hook("BaseActorRenderer renderText Hook", GET_SIG("BaseActorRenderer::renderText")) {}
+    BaseActorRendererRenderTextHook() : Hook("BaseActorRenderer renderText Hook", GET_SIG_ADDRESS("BaseActorRenderer::renderText")) {}
 
     void enableHook() override {
-
-        static auto sig = Memory::offsetFromSig(Memory::findSig(this->signature), 1);
+        static auto sig = Memory::offsetFromSig(address, 1);
 
         if (WinrtUtils::check(20, 40))
             this->manualHook( (void*) sig, (void*) BaseActorRenderer_renderTextCallback40, (void **) &funcOriginal40);

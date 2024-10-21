@@ -1,28 +1,22 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "ViewModelListener.hpp"
-#include "../../../Events/EventHandler.hpp"
 
 
 class ViewModel : public Module {
-
 public:
-
     ViewModel() : Module("ViewModel", "Allows you to modify how item in hand looks.", IDR_MAGNIFY_PNG, "C") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-        EventHandler::registerOrderedPriorityListener(new ViewModelListener("ViewModel", this), 2);
+        Listen(this, FOVEvent, &ViewModel::onGetFOV)
         Module::onEnable();
 
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("ViewModel");
+        Deafen(this, FOVEvent, &ViewModel::onGetFOV)
         Module::onDisable();
     }
 
@@ -50,5 +44,12 @@ public:
 
         this->settings.getSettingByName<float>("itemfov")->value = value;
 
+    }
+
+    void onGetFOV(FOVEvent &event) {
+        auto fov = event.getFOV();
+        if (fov != 70) return;
+
+        event.setFOV(this->settings.getSettingByName<float>("itemfov")->value);
     }
 };

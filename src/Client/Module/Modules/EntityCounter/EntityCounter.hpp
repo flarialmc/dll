@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "EntityListener.hpp"
 
 class EntityCounter : public Module {
 
@@ -14,12 +12,12 @@ public:
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new EntityListener("Entity", this));
+        Listen(this, RenderEvent, &EntityCounter::onRender);
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("Entity");
+        Deafen(this, RenderEvent, &EntityCounter::onRender);
         Module::onDisable();
     }
 
@@ -89,5 +87,17 @@ public:
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
+    }
+
+    void onRender(RenderEvent &event) {
+        if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
+            if (SDK::clientInstance->getLocalPlayer() != nullptr && SDK::getCurrentScreen() == "hud_screen") {
+
+                int entityCount = (int)SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList().size();
+                std::string str = std::format("{}", entityCount);
+
+                this->normalRender(24, str);
+            }
+        }
     }
 };

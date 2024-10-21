@@ -21,16 +21,12 @@
 //#include "Hooks/Game/RenderItemGroup.hpp"
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 
-std::vector<Hook *> HookManager::hooks;
+std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
 std::string dxVersion[5] = {"Couldn't initialize", "DX9", "DX10", "DX11", "DX12"};
 
 void HookManager::initialize() {
-
-    //wouldnt be a bad idea to use a smart pointer for these like std::shared_ptr :)
-
     MH_Initialize();
-
 
     kiero::init(kiero::RenderType::D3D12);
 
@@ -43,48 +39,43 @@ void HookManager::initialize() {
 
     Logger::debug(std::format("[Kiero] Renderer: {}", dxVersion[kiero::getRenderType()]));
 
-    hooks.push_back(new KeyHook());
-    hooks.push_back(new MouseHook());
+    addHook<KeyHook>();
 
-    if (!Client::settings.getSettingByName<bool>("killdx")->value) hooks.push_back(new CommandListHook());
+    addHook<KeyHook>();
+    addHook<MouseHook>();
 
-    hooks.push_back(new SwapchainHook());
-    hooks.push_back(new ResizeHook());
+    if (!Client::settings.getSettingByName<bool>("killdx")->value)
+        addHook<CommandListHook>();
 
+    addHook<SwapchainHook>();
+    addHook<ResizeHook>();
 
-    hooks.push_back(new TextureGroup_getTextureHook());
-    hooks.push_back(new getViewPerspectiveHook());
-    // hooks.push_back(new RenderActorHook());
-    hooks.push_back(new RaknetTickHook());
-    hooks.push_back(new SetUpAndRenderHook());
-    hooks.push_back(new GameModeAttackHook());
+    addHook<TextureGroup_getTextureHook>();
+    addHook<getViewPerspectiveHook>();
+    addHook<RaknetTickHook>();
+    addHook<SetUpAndRenderHook>();
+    addHook<GameModeAttackHook>();
 
-    hooks.push_back(new getFovHook());
-    hooks.push_back(new ActorBaseTick());
-    hooks.push_back(new OnSuspendHook());
-    hooks.push_back(new getGammaHook());
-    hooks.push_back(new FontDrawTransformedHook());
-    hooks.push_back(new HurtColorHook());
-    hooks.push_back(new DimensionFogColorHook());
-    hooks.push_back(new OverworldFogColorHook());
-    hooks.push_back(new TimeChangerHook());
-    hooks.push_back(new SendPacketHook());
-    hooks.push_back(new getSensHook());
-    hooks.push_back(new HudMobEffectsRendererHook());
-    //hooks.push_back(new RenderItemGroupHook());
-    //hooks.push_back(new getCurrentSwingDuration());
-    hooks.push_back(new BaseActorRendererRenderTextHook());
+    addHook<getFovHook>();
+    addHook<ActorBaseTick>();
+    addHook<OnSuspendHook>();
+    addHook<getGammaHook>();
+    addHook<FontDrawTransformedHook>();
+    addHook<HurtColorHook>();
+    addHook<DimensionFogColorHook>();
+    addHook<OverworldFogColorHook>();
+    addHook<TimeChangerHook>();
+    addHook<SendPacketHook>();
+    addHook<getSensHook>();
+    addHook<HudMobEffectsRendererHook>();
+    addHook<BaseActorRendererRenderTextHook>();
 
-    for (auto hook: hooks)
+    for (const auto& hook: hooks)
         hook->enableHook();
 
 }
 
 void HookManager::terminate() {
-
-    for (auto hook: hooks)
-        delete hook;
-
     hooks.clear();
 }
 

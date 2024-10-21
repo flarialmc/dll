@@ -1,30 +1,26 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "SprintListener.hpp"
 
 
 class Sprint : public Module {
-
 public:
-
-
     Sprint() : Module("Toggle Sprint", "Automatically sprints for you!!!", IDR_AUTO_SPRINT_PNG, "SHIFT") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new SprintListener("Sprint", this));
+        Listen(this, KeyEvent, &Sprint::onKey)
+        Listen(this, RenderEvent, &Sprint::onRender)
+        Listen(this, TickEvent, &Sprint::onTick)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("Sprint");
+        Deafen(this, KeyEvent, &Sprint::onKey)
+        Deafen(this, RenderEvent, &Sprint::onRender)
+        Deafen(this, TickEvent, &Sprint::onTick)
         Module::onDisable();
-
     }
 
     void defaultConfig() override {
@@ -40,7 +36,7 @@ public:
         }
     }
 
-          void settingsRender() override {
+    void settingsRender() override {
 
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
@@ -105,6 +101,65 @@ public:
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
+    }
+
+    bool toggleSprinting = false;
+
+    void onKey(KeyEvent &event) {
+        if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
+            toggleSprinting = !toggleSprinting;
+        }
+    };
+
+    void onRender(RenderEvent &event) {
+        if(!this->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
+
+        if(!this->settings.getSettingByName<bool>("status")->value) return;
+
+        if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
+
+            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                std::string text = "Standing";
+                if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SNEAKING)) {
+                    text = "Sneaking";
+                    this->normalRender(5, text);
+                } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SWIMMING)) {
+                    text = "Swimming";
+                    this->normalRender(5, text);
+                } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_GLIDING)) {
+                    text = "Gliding";
+                    this->normalRender(5, text);
+                } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SLEEPING)) {
+                    text = "Sleeping";
+                    this->normalRender(5, text);
+                } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(ActorFlags::FLAG_SPRINTING)) {
+                    text = "Sprinting";
+                    this->normalRender(5, text);
+                } else if (SDK::clientInstance->getLocalPlayer()->getActorFlag(FLAG_MOVING)) {
+                    text = "Walking";
+                    this->normalRender(5, text);
+                } else {
+                    this->normalRender(5, text);
+                }
+
+            }
+        }
+    }
+
+    void onTick(TickEvent &event) {
+        if (SDK::clientInstance != nullptr) {
+            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                MoveInputComponent *handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
+
+                if (handler->forward) {
+                    if (this->settings.getSettingByName<bool>("always")->value) {
+                        handler->sprinting = true;
+                    } else {
+                        if (toggleSprinting) handler->sprinting = toggleSprinting;
+                    }
+                }
+            }
+        }
     }
 };
 

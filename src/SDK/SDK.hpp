@@ -8,9 +8,7 @@ namespace SDK {
     extern ClientInstance *clientInstance;
     extern ScreenView *screenView;
     extern bool hasInstanced;
-    extern std::mutex currentScreenMtx;
     extern std::string currentScreen;
-    extern std::chrono::steady_clock::time_point lastSetCurrentScreenTime;
     extern uint64_t serverPing;
 
     extern int getServerPing();

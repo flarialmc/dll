@@ -6,14 +6,11 @@
 ClientInstance *SDK::clientInstance = nullptr;
 ScreenView *SDK::screenView = nullptr;
 
-std::mutex SDK::currentScreenMtx;
 std::string SDK::currentScreen;
 
 bool SDK::hasInstanced = false;
 uint64_t SDK::serverPing = 0;
 
-
-std::chrono::steady_clock::time_point SDK::lastSetCurrentScreenTime;
 
 std::shared_ptr<Packet> SDK::createPacket(int id) {
 
@@ -29,12 +26,10 @@ std::shared_ptr<Packet> SDK::createPacket(int id) {
 
 // TODO: use CI::GetScreenName
 void SDK::setCurrentScreen(const std::string& layer) {
-    std::lock_guard<std::mutex> guard(currentScreenMtx);
     SDK::currentScreen = layer;
 }
 
 std::string SDK::getCurrentScreen() {
-    std::lock_guard<std::mutex> guard(currentScreenMtx);
     return SDK::currentScreen;
 }
 

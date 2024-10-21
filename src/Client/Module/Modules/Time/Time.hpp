@@ -1,31 +1,72 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "TimeListener.hpp"
 
+inline std::tm localtime_xp(std::time_t timer) {
+    std::tm bt{};
+    #if defined(__unix__)
+    localtime_r(&timer, &bt);
+    #elif defined(_MSC_VER)
+    localtime_s(&bt, &timer);
+    #else
+    static std::mutex mtx;
+    std::lock_guard<std::mutex> lock(mtx);
+    bt = *std::localtime(&timer);
+    #endif
+    return bt;
+}
 
 class Time : public Module {
 
 public:
-
-
-    Time() : Module("IRL Time", "Displays your current local time.", IDR_TIME_PNG, "") {
+    Time() : Module("Clock", "Displays your current local time.", IDR_TIME_PNG, "") {
 
         Module::setup();
 
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new TimeListener("Time", this));
+        Listen(this, RenderEvent, &Time::onRender)
         Module::onEnable();
     }
 
     void onDisable() override {
-
-        EventHandler::unregisterListener("Time");
+        Deafen(this, RenderEvent, &Time::onRender)
         Module::onDisable();
+    }
 
+    void onRender(RenderEvent &event) {
+        const auto now = std::time(nullptr);
+        const std::tm calendarTime = localtime_xp(now);
+
+        std::string meridiem;
+        std::string seperator;
+
+        int hour = calendarTime.tm_hour;
+        int minute = calendarTime.tm_min;
+
+        if (hour - 12 < 0) {
+            meridiem = "AM";
+        } else if (hour == 0) {
+            hour = 12;
+            meridiem = "AM";
+        } else if (hour == 12) {
+            hour = 12;
+            meridiem = "PM";
+        } else {
+            meridiem = "PM";
+            hour -= 12;
+        }
+        if (this->settings.getSettingByName<bool>("24")->value && meridiem == "PM") {
+            hour += 12;
+            meridiem = "";
+        } else if (this->settings.getSettingByName<bool>("24")->value && meridiem == "AM") meridiem = "";
+
+        seperator = minute < 10 ? ":0" : ":";
+
+        std::string time = std::to_string(hour) + seperator + std::to_string(minute) + " " + meridiem;
+
+        this->normalRender(3, time);
     }
 
     void defaultConfig() override {
@@ -40,7 +81,7 @@ public:
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
     }
 
-       void settingsRender() override {
+    void settingsRender() override {
 
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");

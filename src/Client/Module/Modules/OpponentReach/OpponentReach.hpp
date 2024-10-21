@@ -1,33 +1,38 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "OpponentReachListener.hpp"
+#include "../../../../SDK/Client/Network/Packet/EntityEventPacket.hpp"
 
 
 class OpponentReach : public Module {
+private:
+    std::chrono::time_point<std::chrono::high_resolution_clock> last_hit;
+    float opponentReach{};
 
+    std::map<int64_t, Actor*> hitActors;
 public:
-
-
     OpponentReach() : Module("Opponent Reach", "Shows your opponent's last hit range!",
                        IDR_LIKE_PNG, "") {
         Module::setup();
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new OpponentReachListener("OpponentReach", this));
+        Listen(this, RenderEvent, &OpponentReach::onRender)
+        Listen(this, PacketEvent, &OpponentReach::onPacketReceive)
+        Listen(this, TickEvent, &OpponentReach::onTick)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("OpponentReach");
+        Deafen(this, RenderEvent, &OpponentReach::onRender)
+        Deafen(this, PacketEvent, &OpponentReach::onPacketReceive)
+        Deafen(this, TickEvent, &OpponentReach::onTick)
         Module::onDisable();
     }
 
     void defaultConfig() override {
         if (settings.getSettingByName<std::string>("text") == nullptr)
-            settings.addSetting("text", (std::string) "Distance: {value}");
+            settings.addSetting("text", (std::string) "{value}");
 
         if (settings.getSettingByName<bool>("tryToExcludeTeam") == nullptr)
             settings.addSetting("tryToExcludeTeam", true);
@@ -36,7 +41,7 @@ public:
             settings.addSetting("textscale", 0.80f);
     }
 
-       void settingsRender() override {
+    void settingsRender() override {
 
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
@@ -95,6 +100,71 @@ public:
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
+    }
+
+    void onRender(RenderEvent &event) {
+        if (this->isEnabled()) {
+            auto delayStr = std::format("{:.2f}", opponentReach);
+            this->normalRender(22, delayStr);
+        }
+    }
+
+    void onPacketReceive(PacketEvent &event) {
+        if (event.getPacket()->getId() == MinecraftPacketIds::ActorEvent) {
+            auto packet = (EntityEventPacket *) event.getPacket();
+            if (packet->EventID == ActorEvent::Hurt) {
+
+                auto id = packet->RuntimeID;
+                if(id == SDK::clientInstance->getLocalPlayer()->getRuntimeIDComponent()->runtimeID) {
+                    auto excludeTeam = this->settings.getSettingByName<bool>("tryToExcludeTeam")->value;
+                    // we got hit
+                    auto player = SDK::clientInstance->getLocalPlayer();
+                    auto actors = SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList();
+                    // remove non players
+                    std::erase_if(actors, [](Actor* actor) {
+                        return !actor->hasCategory(ActorCategory::Player);
+                    });
+                    // remove actors that are too far or on our team
+                    std::erase_if(actors, [player, excludeTeam](Actor* actor) {
+                        if(actor == player) return true;
+                        auto distance = actor->getApproximateReach(player);
+                        if(distance > 10.f || distance == 0.f)
+                            return true;
+                        if(excludeTeam)
+                            if(actor->IsOnSameTeam(player))
+                                return true;
+                        return false;
+                    });
+                    // Sort the list by distance
+                    std::sort(actors.begin(), actors.end(), [&](Actor* a, Actor* b) {
+                        return a->getApproximateReach(player) < b->getApproximateReach(player);
+                    });
+
+                    // Create a vector to store actors within 5 blocks
+                    std::vector<Actor*> nearbyPlayers;
+
+                    // Iterate over the actors and check if they are within 5 blocks
+                    for (auto actor : actors) {
+                        if (actor->getApproximateReach(player) <= 5.5f) {
+                            nearbyPlayers.push_back(actor);
+                        }
+                    }
+
+                    if(!nearbyPlayers.empty()) {
+                        auto likelyOpponent = nearbyPlayers[0];
+                        opponentReach = likelyOpponent->getApproximateReach(player);
+                        last_hit = std::chrono::high_resolution_clock::now();
+                    }
+                }
+            }
+        }
+    }
+
+    void onTick(TickEvent &event) {
+        std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_hit;
+        if (duration.count() >= 15) {
+            opponentReach = 0;
+        };
     }
 };
 

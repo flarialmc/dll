@@ -1,16 +1,15 @@
 #include <format>
-#include "../../../Events/Listener.hpp"
-#include "../../../Events/Input/KeyEvent.hpp"
-#include "../../../../Utils/Logger/Logger.hpp"
-#include "../../../Client.hpp"
+#include "../../../../Events/Input/KeyEvent.hpp"
+#include "../../../../../Utils/Logger/Logger.hpp"
+#include "../../../../Client.hpp"
 #include <Windows.h>
 
 // TODO: LIKELY REQ A FIX
 class GUIKeyListener : public Listener {
-
+private:
     bool isCapital = false;
-
-    void onKey(KeyEvent &event) override {
+public:
+    void onKey(KeyEvent &event)  {
         if (!Client::disable) {
 
             if (ModuleManager::getModule("ClickGUI")->active) {
@@ -102,8 +101,10 @@ class GUIKeyListener : public Listener {
         }
     };
 
-public:
-    explicit GUIKeyListener(const char string[5]) {
-        this->name = string;
+    GUIKeyListener() {
+        Listen(this, KeyEvent, &GUIKeyListener::onKey);
+    }
+    ~GUIKeyListener() {
+        Deafen(this, KeyEvent, &GUIKeyListener::onKey);
     }
 };

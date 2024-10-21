@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
 
 
 class TimeChanger : public Module {
@@ -43,7 +42,5 @@ public:
         this->settings.getSettingByName<float>("time")->value = percent;
 
         FlarialGUI::UnsetScrollView();
-
-
     }
 };

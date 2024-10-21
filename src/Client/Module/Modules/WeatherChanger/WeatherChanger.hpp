@@ -1,28 +1,21 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "WeatherListener.hpp"
 
 
 class WeatherChanger : public Module {
-
 public:
-
-
     WeatherChanger() : Module("Weather Changer", "Changes the weather ingame.", IDR_CLOUDY_PNG, "") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new WeatherListener("Weather", this));
+        Listen(this, TickEvent, &WeatherChanger::onTick)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("Weather");
+        Deafen(this, TickEvent, &WeatherChanger::onTick)
         Module::onDisable();
     }
 
@@ -55,6 +48,30 @@ public:
         FlarialGUI::UnsetScrollView();
 
         this->resetPadding();
+    }
+
+    void onTick(TickEvent &event) {
+        if (!SDK::clientInstance->getBlockSource())
+            return;
+
+        if (this->isEnabled()) {
+            if (this->settings.getSettingByName<float>("rain")->value > 0.02f)
+                SDK::clientInstance->getBlockSource()->getDimension()->weather->rainLevel = this->settings.getSettingByName<float>(
+                        "rain")->value;
+            else SDK::clientInstance->getBlockSource()->getDimension()->weather->rainLevel = 0.0f;
+            if (this->settings.getSettingByName<float>("lighting")->value < 0.02f)
+                SDK::clientInstance->getBlockSource()->getDimension()->weather->lightingLevel = this->settings.getSettingByName<float>(
+                        "lighting")->value;
+            else SDK::clientInstance->getBlockSource()->getDimension()->weather->lightingLevel = 0.0f;
+
+            // TODO: When you set snow, it will stay even if on until game reload
+            if (this->settings.getSettingByName<bool>("snow")->value) {
+                Vec3<float> *pos = event.getActor()->getPosition();
+                Vec3<int> e((int)pos->x, (int)pos->y, (int)pos->z);
+
+                SDK::clientInstance->getBlockSource()->getBiome(e)->temparature = 0.0f;
+            }
+        }
     }
 };
 

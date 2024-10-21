@@ -32,10 +32,9 @@ public:
 
     static inline TimeChangerOriginal func_original = nullptr;
 
-    TimeChangerHook() : Hook("Time Changer Hook", GET_SIG("TimeChanger")) {}
+    TimeChangerHook() : Hook("Time Changer Hook", GET_SIG_ADDRESS("TimeChanger")) {}
 
     void enableHook() override {
-
         this->autoHook((void *) TimeChangerCallback, (void **) &func_original);
     }
 };

@@ -1,14 +1,10 @@
 #pragma once
 
-#include "GuiScaleListener.hpp"
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
 
 
 class GuiScale : public Module {
-
 public:
-
     GuiScale() : Module("MC GUI Scale", "Change your GUI Scale beyond\nMinecraft's restrictions.",
                         IDR_NAMETAG_PNG, "") {
 
@@ -16,13 +12,12 @@ public:
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new GuiScaleListener("GUIScale", this));
+        Listen(this, RenderEvent, &GuiScale::onRender)
         Module::onEnable();
-
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("GUIScale");
+        Deafen(this, RenderEvent, &GuiScale::onRender)
         Module::onDisable();
     }
 
@@ -49,5 +44,22 @@ public:
 
         this->settings.getSettingByName<float>("guiscale")->value = percent;
 
+    }
+
+    void onRender(RenderEvent &event) {
+        if (SDK::getCurrentScreen() == "hud_screen") {
+            if (SDK::clientInstance->getGuiData() != nullptr) {
+                if (this->settings.getSettingByName<bool>("enabled")->value) {
+                    float percent = this->settings.getSettingByName<float>("guiscale")->value;
+                    auto guiData = SDK::clientInstance->getGuiData();
+                    guiData->GuiScale = percent;
+                    guiData->ScreenSizeScaled = Vec2{
+                            guiData->ScreenSize.x * 1 / percent,
+                            guiData->ScreenSize.y * 1 / percent
+                    };
+                    guiData->scalingMultiplier = 1 / percent;
+                }
+            }
+        }
     }
 };

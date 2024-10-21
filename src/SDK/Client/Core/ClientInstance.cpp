@@ -47,7 +47,6 @@ void ClientInstance::releaseMouse() {
 }
 
 std::string ClientInstance::getTopScreenName() {
-    std::lock_guard<std::mutex> guard(SDK::currentScreenMtx);
     return SDK::currentScreen;
 }
 

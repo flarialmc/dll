@@ -1,0 +1,22 @@
+#include "Game/AttackEvent.hpp"
+#include "Game/FOVEvent.hpp"
+#include "Game/PerspectiveEvent.hpp"
+#include "Game/RaknetTickEvent.hpp"
+#include "Game/TickEvent.hpp"
+
+#include "Input/KeyEvent.hpp"
+#include "Input/MouseEvent.hpp"
+#include "Input/SensitivityEvent.hpp"
+
+#include "Network/PacketEvent.hpp"
+
+#include "Render/DrawImageEvent.hpp"
+#include "Render/DrawTextEvent.hpp"
+#include "Render/FogColorEvent.hpp"
+#include "Render/GammaEvent.hpp"
+#include "Render/GetTextureEvent.hpp"
+#include "Render/HurtColorEvent.hpp"
+#include "Render/RenderEvent.hpp"
+#include "Render/RenderPotionHUDEvent.hpp"
+#include "Render/SetTopScreenNameEvent.hpp"
+#include "Render/SetupAndRenderEvent.hpp"

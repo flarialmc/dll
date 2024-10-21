@@ -1,5 +1,4 @@
-#ifndef HIVE_STATS_HPP
-#define HIVE_STATS_HPP
+#pragma once
 
 #include <string>
 #include <windows.h>
@@ -9,9 +8,6 @@
 #include "Logger/Logger.hpp"
 
 #pragma comment(lib, "wininet.lib")
-
-
-
 
 const std::map<int, int> xpToLevelBedWars = {
         {0, 0},
@@ -395,10 +391,6 @@ namespace Hive {
         return subject;
     }
 
-
-
-
-
     ImVec4 calculateWinRateColor(float winrate){
         if(winrate < 25.0f ){
             return ImVec4(255.0f, 72.0f, 59.0f, 1.0f);
@@ -429,10 +421,6 @@ namespace Hive {
         auto prev = std::prev(it);
         return prev->second + 1;
     }
-
-
-
-
 
     Hive::PlayerStats GetStats(const std::string &gameId, const std::string &username) {
 
@@ -547,5 +535,3 @@ namespace Hive {
     }
 
 }
-
-#endif 

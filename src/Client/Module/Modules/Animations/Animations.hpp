@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "AnimationsListener.hpp"
 
 
 class Animations : public Module {
@@ -15,12 +13,12 @@ public:
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new AnimationsListener("Animations", this));
+        Listen(this, DrawImageEvent, &Animations::onDrawImage)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("Animations");
+        Deafen(this, DrawImageEvent, &Animations::onDrawImage)
         Module::onDisable();
     }
 
@@ -28,6 +26,24 @@ public:
 
         if (settings.getSettingByName<float>("hotbarSpeed") == nullptr) settings.addSetting("hotbarSpeed", 7.0f);
 
+    }
+
+    inline static float animate(float endPoint, float current, float speed) {
+        if (speed < 0.0) speed = 0.0;
+        else if (speed > 1.0) speed = 1.0;
+
+        float dif = (((endPoint) > (current)) ? (endPoint) : (current)) - (((endPoint) < (current)) ? (endPoint) : (current));
+        float factor = dif * speed;
+        return current + (endPoint > current ? factor : -factor);
+    }
+
+    void onDrawImage(DrawImageEvent &event) {
+        if (strcmp(event.getTexturePath().c_str(), "textures/ui/selected_hotbar_slot") == 0) {
+            auto pos = event.getImagePos();
+            static float lerpedPos = pos.x; // old pos
+            lerpedPos = animate(pos.x, lerpedPos, (0.016f * this->settings.getSettingByName<float>("hotbarSpeed")->value) * FlarialGUI::frameFactor);
+            event.setImagePos(Vec2<float>{lerpedPos, pos.y});
+        }
     }
 
     void settingsRender() override {
