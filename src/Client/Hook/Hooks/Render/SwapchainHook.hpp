@@ -29,6 +29,16 @@ private:
                                          DXGI_SWAP_CHAIN_DESC1 *pDesc, IDXGIOutput *pRestrictToOutput,
                                          IDXGISwapChain1 **ppSwapChain);
 
+    static void DX12Render();
+
+    static void RenderSync();
+
+    static void DX11Render();
+
+    static void Fonts();
+
+    static void FPSMeasure();
+
     static HRESULT swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags);
 
 

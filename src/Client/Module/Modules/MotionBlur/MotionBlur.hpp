@@ -45,7 +45,7 @@ public:
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Misc");
-        this->addSlider("Bleed Factor", "The scale at which previous frames bleed into the current one.", this->settings.getSettingByName<float>("intensity")->value, 1.0f, 0.f, true);
+        this->addSlider("Bleed Factor", "Scale of bleeding of previous frames into current.", this->settings.getSettingByName<float>("intensity")->value, 1.0f, 0.f, true);
         this->addSlider("Intensity", "Amount of previous frames to render.", this->settings.getSettingByName<float>("intensity2")->value, 30, 0, true);
 
         FlarialGUI::UnsetScrollView();
@@ -55,42 +55,41 @@ public:
 
     static inline std::vector<winrt::com_ptr<ID3D11ShaderResourceView>> previousFrames;
 
-    void onRender(RenderEvent &event) {
+    void onRender(RenderEvent& event) {
 
-        if(ModuleManager::getModule("ClickGUI")->isEnabled()) return;
+        if (ModuleManager::getModule("ClickGUI")->isEnabled()) return;
 
         int maxFrames = (int)round(this->settings.getSettingByName<float>("intensity2")->value);
 
         if (SDK::getCurrentScreen() == "hud_screen" && !SwapchainHook::queue && this->isEnabled()) {
-            if (previousFrames.size() >= static_cast<int>(maxFrames)) {
-                // Remove excess frames if maxFrames is reduced
-                int framesToRemove = (int)previousFrames.size() - static_cast<int>(maxFrames);
-                for (int i = 0; i < framesToRemove; ++i) {
-                    if(previousFrames[i]) previousFrames[i]->Release();
-                }
-                previousFrames.erase(previousFrames.begin(), previousFrames.begin() + framesToRemove);
+
+            // Remove excess frames if maxFrames is reduced
+            if (previousFrames.size() > static_cast<size_t>(maxFrames)) {
+                previousFrames.erase(previousFrames.begin(), previousFrames.begin() + (previousFrames.size() - maxFrames));
             }
 
+            // Capture the current back buffer
             auto buffer = BackbufferToSRVExtraMode();
-            if(buffer) previousFrames.push_back(BackbufferToSRVExtraMode());
-            else std::cout << "Couldn't save buffer for Motion Blur." << std::endl;
+            if (buffer) {
+                previousFrames.push_back(std::move(buffer));
+            } else {
+                std::cout << "Couldn't save buffer for Motion Blur." << std::endl;
+            }
 
-
+            // Render with opacity
             float alpha = 0.3f;
-
-            for (const auto& frame: previousFrames) {
-
-                if(!SwapchainHook::queue) {
+            for (const auto& frame : previousFrames) {
+                if (!SwapchainHook::queue) {
                     ImageWithOpacity(frame, {MC::windowSize.x, MC::windowSize.y}, alpha);
                 }
                 alpha *= this->settings.getSettingByName<float>("intensity")->value;
             }
 
-
         } else {
             previousFrames.clear();
         }
     }
+
 
     void ImageWithOpacity(const winrt::com_ptr<ID3D11ShaderResourceView>& srv, ImVec2 size, float opacity)
     {
