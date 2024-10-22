@@ -23,13 +23,18 @@ public:
 
     void onEnable() override {
         Listen(this, RaknetTickEvent, &FasterInventory::onRaknetTick)
-        Listen(this, PacketEvent, &FasterInventory::onPacketSend)
+        Listen(this, PacketSendEvent, &FasterInventory::onPacketSend)
+        Listen(this, PacketEvent, &FasterInventory::onPacketReceive)
+        Listen(this, TickEvent, &FasterInventory::onTick)
+
         Module::onEnable();
     }
 
     void onDisable() override {
         Deafen(this, RaknetTickEvent, &FasterInventory::onRaknetTick)
-        Deafen(this, PacketEvent, &FasterInventory::onPacketSend)
+        Deafen(this, PacketSendEvent, &FasterInventory::onPacketSend)
+        Deafen(this, PacketEvent, &FasterInventory::onPacketReceive)
+        Deafen(this, TickEvent, &FasterInventory::onTick)
         Module::onDisable();
     }
 
@@ -48,7 +53,7 @@ public:
 
     }
 
-    void onPacketSend(PacketEvent &event) {
+    void onPacketSend(PacketSendEvent &event) {
         if (!SDK::clientInstance->getLocalPlayer()) return;
         if(this->restricted || SDK::getServerPing() < 10) return;
         auto packet = event.getPacket();
@@ -113,6 +118,7 @@ public:
         }
         if(desyncTicks > 10) {
             CloseInventory();
+            desyncTicks = 0;
         }
     }
 

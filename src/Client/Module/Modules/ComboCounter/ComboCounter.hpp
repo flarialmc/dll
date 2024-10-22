@@ -16,12 +16,14 @@ public:
 
     void onEnable() override {
         Listen(this, AttackEvent, &ComboCounter::onAttack)
+        Listen(this, TickEvent, &ComboCounter::onTick)
         Listen(this, RenderEvent, &ComboCounter::onRender)
         Module::onEnable();
     }
 
     void onDisable() override {
         Deafen(this, AttackEvent, &ComboCounter::onAttack)
+        Deafen(this, TickEvent, &ComboCounter::onTick)
         Deafen(this, RenderEvent, &ComboCounter::onRender)
         Module::onDisable();
     }

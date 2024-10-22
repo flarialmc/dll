@@ -3,12 +3,14 @@
 #include "Game/PerspectiveEvent.hpp"
 #include "Game/RaknetTickEvent.hpp"
 #include "Game/TickEvent.hpp"
+#include "Game/TimeEvent.hpp"
 
 #include "Input/KeyEvent.hpp"
 #include "Input/MouseEvent.hpp"
 #include "Input/SensitivityEvent.hpp"
 
 #include "Network/PacketEvent.hpp"
+#include "Network/PacketSendEvent.hpp"
 
 #include "Render/DrawImageEvent.hpp"
 #include "Render/DrawTextEvent.hpp"

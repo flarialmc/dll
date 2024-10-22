@@ -19,6 +19,7 @@ public:
 
     void onEnable() override {
         Listen(this, DrawTextEvent, &NickModule::onDrawText)
+        Listen(this, RaknetTickEvent, &NickModule::onRaknetTick)
         Listen(this, TickEvent, &NickModule::onTick)
         Module::onEnable();
     }
