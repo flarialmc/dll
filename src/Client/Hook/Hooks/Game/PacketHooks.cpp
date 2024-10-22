@@ -5,7 +5,7 @@
 
 // text
 void SendPacketHook::callback(LoopbackPacketSender *pSender, Packet *pPacket) {
-    auto event = nes::make_holder<PacketEvent>(pPacket);
+    auto event = nes::make_holder<PacketSendEvent>(pPacket);
 
     if(SDK::clientInstance) {
         eventMgr.trigger(event);

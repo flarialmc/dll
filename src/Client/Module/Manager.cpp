@@ -82,7 +82,7 @@ namespace ModuleManager {
     bool initialized = false;
 }
 
-std::vector<std::shared_ptr<Module>> ModuleManager::getModules() {
+std::vector<std::shared_ptr<Module>> ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
     std::vector<std::shared_ptr<Module>> modulesVector;
     for (const auto& pair : moduleMap) {
         if(pair.second == nullptr) continue;
@@ -199,8 +199,8 @@ void ModuleManager::syncState() {
 }
 
 void ModuleManager::SaveModulesConfig() {
-    for (const auto& pair : moduleMap) {
-        pair.second->saveSettings();
+    for (const auto& module : getModules()) {
+        module->saveSettings();
     }
 }
 // TODO: use enums?

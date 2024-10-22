@@ -9,6 +9,7 @@
 #include "Input/SensitivityEvent.hpp"
 
 #include "Network/PacketEvent.hpp"
+#include "Network/PacketSendEvent.hpp"
 
 #include "Render/DrawImageEvent.hpp"
 #include "Render/DrawTextEvent.hpp"
