@@ -3,6 +3,7 @@
 #include "Game/PerspectiveEvent.hpp"
 #include "Game/RaknetTickEvent.hpp"
 #include "Game/TickEvent.hpp"
+#include "Game/TimeEvent.hpp"
 
 #include "Input/KeyEvent.hpp"
 #include "Input/MouseEvent.hpp"

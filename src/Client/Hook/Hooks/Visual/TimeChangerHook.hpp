@@ -12,19 +12,10 @@ private:
 
         float time = func_original(a1, a2, a3);
 
-        // TODO: USE EVENTS
+        auto event = nes::make_holder<TimeEvent>(time);
+        eventMgr.trigger(event);
 
-        if (ModuleManager::getModule("Time Changer") != nullptr) {
-
-            if (ModuleManager::getModule("Time Changer")->isEnabled()) {
-
-                time = ModuleManager::getModule("Time Changer")->settings.getSettingByName<float>("time")->value;
-
-            }
-        }
-
-        return time;
-
+        return event->getTime();
     }
 
 public:
