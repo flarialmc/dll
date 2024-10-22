@@ -2,7 +2,16 @@
 
 #include "Events.hpp"
 
-#define Listen(mod, type, listener) eventMgr.getDispatcher().listen<type, listener>(mod);
+enum struct EventOrder {
+    IMMEDIATE,
+    HIGH,
+    NORMAL,
+    LOW,
+    LAST
+};
+
+#define Listen(mod, type, listener) eventMgr.getDispatcher().listen<type, listener, EventOrder::NORMAL>(mod);
+#define ListenOrdered(mod, type, listener, priority) eventMgr.getDispatcher().listen<type, listener, priority>(mod);
 #define Deafen(mod, type, listener) eventMgr.getDispatcher().deafen<type, listener>(mod);
 
 class EventManager {
