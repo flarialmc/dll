@@ -8,4 +8,5 @@ public:
 
     static mce::MaterialPtr* getUIFillColor();
     static mce::MaterialPtr* getUITextured();
+    static mce::MaterialPtr* getParticlesAlpha();
 };

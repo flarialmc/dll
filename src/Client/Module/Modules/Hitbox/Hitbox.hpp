@@ -4,9 +4,15 @@
 #include "../../../Client.hpp"
 #include "../../../../Utils/Render/DrawUtils.hpp"
 
+struct AABBInfo {
+    AABB aabb;
+    AABB hitbox;
+    bool selected;
+};
+
 class Hitbox : public Module {
 private:
-    static inline std::vector<AABB> aabbsToRender;
+    static inline std::vector<AABBInfo> aabbsToRender;
     static inline std::mutex renderMtx;
 public:
 
@@ -79,24 +85,21 @@ public:
             !SDK::clientInstance->getLocalPlayer()->getLevel())
             return;
         auto player = SDK::clientInstance->getLocalPlayer();
+        auto selectedEntity = player->getLevel()->getHitResult().getEntity();
         for (const auto &ent: player->getLevel()->getRuntimeActorList()) {
-            if (ent != nullptr && ent != player /*&& ent->isPlayer() && ent->hasCategory(ActorCategory::Player)*/) {
+            if (ent != nullptr && ent != player && ent->hasCategory(ActorCategory::Mob) /*&& ent->isPlayer() && ent->hasCategory(ActorCategory::Player)*/) {
                 float dist = player->getPosition()->dist(*ent->getPosition());
                 // This may let through some entites
                 if (!ent->isValidAABB() || dist > 30 || !player->canSee(*ent) ||
                     ent->getActorFlag(ActorFlags::FLAG_INVISIBLE))
                     continue;
 
-                float mod = 0.f;
+                auto aabb = ent->getLerpedAABB();
+                auto hitbox = ent->getLerpedAABB(true);
 
-                if (ent->hasCategory(ActorCategory::Player))
-                    mod = 1.6f;
+                AABBInfo info = {aabb, hitbox, selectedEntity == ent};
 
-                auto& aabbSize = ent->getAABBShapeComponent()->size;
-                auto& renderPos = ent->getRenderPositionComponent()->renderPos;
-                auto lower = renderPos.sub(aabbSize.x / 2.f, mod, aabbSize.x / 2.f), upper = lower.add(aabbSize.x, aabbSize.y, aabbSize.x);
-
-                aabbsToRender.emplace_back(lower, upper);
+                aabbsToRender.emplace_back(info);
             }
         }
     }
@@ -118,7 +121,7 @@ public:
             else color2 = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color")->value);
 
             std::lock_guard<std::mutex> guard(renderMtx);
-            for (const auto &aabb: aabbsToRender) {
+            for (const auto &aabbInfo: aabbsToRender) {
                 // Retrieve the thickness setting value from the module settings
                 float thickness = this->settings.getSettingByName<float>("thickness")->value;
                 bool staticThickness = this->settings.getSettingByName<bool>("staticThickness")->value;
@@ -128,7 +131,7 @@ public:
 
                 if(!staticThickness) {
                     // Get the render position of the player and compute the distance to the AABB lower bound
-                    float distance = player->getRenderPositionComponent()->renderPos.dist(aabb.lower);
+                    float distance = player->getRenderPositionComponent()->renderPos.dist(aabbInfo.aabb.lower);
 
                     // Compute the scaling factor based on the distance, ensuring it does not exceed the max distance of 30
                     float scaleFactor = 1.f - (distance / 30.0f);
@@ -137,7 +140,9 @@ public:
                     lineWidth = thickness * scaleFactor;
                 }
 
-                DrawUtils::addBox(aabb.lower, aabb.upper, staticThickness ? thickness : lineWidth, outline ? 2 : 1, color2);
+                DrawUtils::addBox(aabbInfo.aabb.lower, aabbInfo.aabb.upper, staticThickness ? thickness : lineWidth, outline ? 2 : 1, color2);
+
+                DrawUtils::addBox(aabbInfo.hitbox.lower, aabbInfo.hitbox.upper, staticThickness ? thickness : lineWidth, outline ? 2 : 1, aabbInfo.selected ? FlarialGUI::rgbColor :color2);
             }
         }
     }
