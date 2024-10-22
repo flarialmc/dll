@@ -145,6 +145,9 @@ void Client::initialize() {
     if (Client::settings.getSettingByName<bool>("vsync") == nullptr)
         Client::settings.addSetting("vsync", false);
 
+    if (Client::settings.getSettingByName<bool>("promotions") == nullptr)
+        Client::settings.addSetting("promotions", true);
+
     if (Client::settings.getSettingByName<bool>("disableanims") == nullptr)
         Client::settings.addSetting("disableanims", false);
 

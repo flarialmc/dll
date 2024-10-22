@@ -70,7 +70,7 @@ public:
     void onSetup() override {
         Listen(this, MouseEvent, &ClickGUI::onMouse)
         Listen(this, KeyEvent, &ClickGUI::onKey)
-        ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
+        ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::LOW)
         Module::onEnable();
     }
 
@@ -1158,6 +1158,7 @@ public:
                     c->addHeader("Misc");
                     c->addToggle("Center Cursor", "Centers your cursor everytime you open your inventory, etc.", Client::settings.getSettingByName<bool>("centreCursor")->value);
                     c->addToggle("Anonymous on API", "Stay anonymous on Flarial's API.", Client::settings.getSettingByName<bool>("anonymousApi")->value);
+                    c->addToggle("Promotions", "To donate & join discord. (pls keep on)", Client::settings.getSettingByName<bool>("promotions")->value);
 
                     c->resetPadding();
 

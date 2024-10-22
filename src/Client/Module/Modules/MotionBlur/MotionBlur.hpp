@@ -16,7 +16,7 @@ public:
     void onEnable() override {
         if(SwapchainHook::queue) { if(!once) { FlarialGUI::Notify("Please turn on Better Frames in Settings!"); once = true; } }
         else {
-            ListenOrdered(this, RenderEvent, &MotionBlur::onRender, EventOrder::LOW)
+            ListenOrdered(this, RenderEvent, &MotionBlur::onRender, EventOrder::IMMEDIATE)
             Module::onEnable();
         }
     }
