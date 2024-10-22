@@ -134,7 +134,7 @@ void Client::initialize() {
         Client::settings.addSetting("mod_fontname", (std::string) "Space Grotesk");
 
     if (Client::settings.getSettingByName<float>("blurintensity") == nullptr)
-        Client::settings.addSetting("blurintensity", 18.0f);
+        Client::settings.addSetting("blurintensity", 2.0f);
 
     if (Client::settings.getSettingByName<bool>("killdx") == nullptr)
         Client::settings.addSetting("killdx", false);
