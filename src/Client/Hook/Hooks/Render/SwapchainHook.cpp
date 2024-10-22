@@ -139,7 +139,7 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 
     std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
 
-    if (bufferingMode == "Double Buffering") {
+    if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
         pDesc->BufferCount = 2;
     } else if (bufferingMode == "Triple Buffering") {
         pDesc->BufferCount = 3;
