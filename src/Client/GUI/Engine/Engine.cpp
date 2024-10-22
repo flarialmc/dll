@@ -1376,7 +1376,7 @@ void FlarialGUI::NotifyHeartbeat() {
             if(!n.arrived) {
 
                 FlarialGUI::RoundedRect(n.currentPos, n.currentPosY + posyModif, FlarialGUI::HexToColorF("ff2438"), n.width, height, round.x, round.x);
-                FlarialGUI::FlarialTextWithFont(n.currentPos + posxModif, n.currentPosY + posyModif + textposyModif, FlarialGUI::to_wide(n.text).c_str(), n.width, 25, DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL);
+                FlarialGUI::FlarialTextWithFont(n.currentPos + posxModif, n.currentPosY + posyModif, FlarialGUI::to_wide(n.text).c_str(), n.width, height, DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL);
                 FlarialGUI::lerp(n.currentPosY, Constraints::PercentageConstraint(0.1f, "bottom", true), FlarialGUI::frameFactor * 0.067f);
 
                 if(n.currentPosY <= Constraints::PercentageConstraint(0.08f, "bottom", true)) {
@@ -1392,7 +1392,7 @@ void FlarialGUI::NotifyHeartbeat() {
                 auto timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(current - n.time);
 
                 FlarialGUI::RoundedRect(n.currentPos, n.currentPosY + posyModif, FlarialGUI::HexToColorF("ff2438"), n.width, height, round.x, round.x);
-                FlarialGUI::FlarialTextWithFont(n.currentPos + posxModif, n.currentPosY + posyModif + textposyModif, FlarialGUI::to_wide(n.text).c_str(), n.width, 25, DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL);
+                FlarialGUI::FlarialTextWithFont(n.currentPos + posxModif, n.currentPosY + posyModif, FlarialGUI::to_wide(n.text).c_str(), n.width, height, DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL);
 
                 if (timeDifference.count() > 5000) {
                     FlarialGUI::lerp(n.currentPosY, MC::windowSize.y + 500, FlarialGUI::frameFactor * 0.052f);
