@@ -267,6 +267,7 @@ public:
         if(!ModuleManager::initialized) return;
 
         static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("ItemPhysics").get());
+        if(!mod) return;
         const auto pItemPhysics = mod;
         const auto renderData = pItemPhysics->renderData;
 
