@@ -263,12 +263,12 @@ void Module::addDropdown(std::string text, std::string subtext, const std::vecto
     float elementX = Constraints::PercentageConstraint(0.285f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-    FlarialGUI::Dropdown(dropdownIndex, elementX, y, options, value, "");
-
-
     Module::addElementText(text, subtext);
 
-    FlarialGUI::SetIsInAdditionalYMode();
+
+    FlarialGUI::Dropdown(dropdownIndex, elementX, y, options, value, "");
+
+    if(FlarialGUI::DropDownMenus[dropdownIndex].isActive || FlarialGUI::additionalY[dropdownIndex] > 0.f) FlarialGUI::SetIsInAdditionalYMode();
 
     padding += Constraints::RelativeConstraint(0.05f, "height", true);
     dropdownIndex++;

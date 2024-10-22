@@ -148,6 +148,16 @@ void Client::initialize() {
     if (Client::settings.getSettingByName<bool>("promotions") == nullptr)
         Client::settings.addSetting("promotions", true);
 
+    if (Client::settings.getSettingByName<bool>("donotwait") == nullptr)
+        Client::settings.addSetting("donotwait", true);
+
+    if (Client::settings.getSettingByName<std::string>("bufferingmode") == nullptr)
+        Client::settings.addSetting("bufferingmode", (std::string) "Double Buffering");
+
+    if (Client::settings.getSettingByName<std::string>("swapeffect") == nullptr)
+        Client::settings.addSetting("swapeffect", (std::string) "FLIP_DISCARD");
+
+
     if (Client::settings.getSettingByName<bool>("disableanims") == nullptr)
         Client::settings.addSetting("disableanims", false);
 

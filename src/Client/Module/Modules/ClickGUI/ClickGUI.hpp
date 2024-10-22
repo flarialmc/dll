@@ -1118,7 +1118,7 @@ public:
                     const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
 
-                    FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+                    FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(20.5, scrollviewWidth), 2);
                     FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"),
                                               Constraints::RelativeConstraint(1.0, "width"),
                                               Constraints::RelativeConstraint(0.88f, "height"));
@@ -1131,18 +1131,28 @@ public:
                     c->addHeader("Fonts");
                     c->addTextBox("ClickGUI", "", Client::settings.getSettingByName<std::string>("fontname")->value);
                     c->addSlider("Universal Font Scale", "", Client::settings.getSettingByName<float>("gui_font_scale")->value, 10.f, 0.f, true);
-
                     c->addTextBox("Modules", "", Client::settings.getSettingByName<std::string>("mod_fontname")->value);
                     c->addSlider("Universal Font Scale", "", Client::settings.getSettingByName<float>("modules_font_scale")->value, 10.f, 0.f, true);
-
                     c->addToggle("Override Font Weight", "", Client::settings.getSettingByName<bool>("overrideFontWeight")->value);
                     c->addDropdown("Font Weight", "Bold, Thin, etc.", {"Bold", "Normal", "SemiBold", "ExtraBold", "Medium", "Light", "ExtraLight"}, Client::settings.getSettingByName<std::string>("fontWeight")->value);
 
                     c->extraPadding();
 
                     c->addHeader("Rendering");
+                    c->addElementText("Following Requires Restart");
+                    c->extraPadding();
+
                     c->addToggle("Better Frames", "RTX Disabled, Restart Required.", Client::settings.getSettingByName<bool>("killdx")->value);
-                    c->addToggle("V-SYNC Disabler", "Only works with Better Frames.", Client::settings.getSettingByName<bool>("vsync")->value);
+                    c->addToggle("V-SYNC Disabler", "Works on all devices.", Client::settings.getSettingByName<bool>("vsync")->value);
+                    c->addToggle("Do Not Wait Flag", "May improve latency or performance.", Client::settings.getSettingByName<bool>("donotwait")->value);
+                    c->addDropdown("Buffering Mode", "May improve latency or performance.", {"Double Buffering", "Triple Buffering"}, Client::settings.getSettingByName<std::string>("bufferingmode")->value);
+                    c->addDropdown("Swap Effect", "May improve latency or performance.", {"FLIP_SEQUENTIAL", "FLIP_DISCARD"}, Client::settings.getSettingByName<std::string>("swapeffect")->value);
+
+                    c->extraPadding();
+
+                    c->addElementText("Following Does Not Require Restart");
+                    c->extraPadding();
+
                     c->addToggle("Disable Animations", "",  Client::settings.getSettingByName<bool>("disableanims")->value);
                     c->addSlider("UI Blur Intensity", "", Client::settings.getSettingByName<float>("blurintensity")->value, 25.f);
                     c->addSlider("Chroma / RGB Speed", "", Client::settings.getSettingByName<float>("rgb_speed")->value, 10.f);

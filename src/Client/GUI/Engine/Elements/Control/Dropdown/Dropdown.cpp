@@ -111,12 +111,11 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 
     if (FlarialGUI::DropDownMenus[index].isActive) {
         //y = originalY;
+        if(additionalY[additionalIndex] < 0) additionalY[additionalIndex] = 0;
 
-        if (!FlarialGUI::DropDownMenus[index].offsettedQ) {
-            //FlarialGUI::DropDownMenus[index].offsetted = additionalY + addYVal;
-            FlarialGUI::DropDownMenus[index].offsettedQ = true;
-            additionalY[additionalIndex] += addYVal;
-        }
+
+        FlarialGUI::lerp(additionalY[additionalIndex], addYVal, 0.25f * FlarialGUI::frameFactor);
+
         FlarialGUI::lerp(y, originalY, 0.25f * FlarialGUI::frameFactor);
         FlarialGUI::DropDownMenus[index].curColor = FlarialGUI::LerpColor(FlarialGUI::DropDownMenus[index].curColor,
                                                                           selectedCol, 0.1f * FlarialGUI::frameFactor);
@@ -129,11 +128,8 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     } else {
         //y = originalY - maxHeight;
 
-        if (FlarialGUI::DropDownMenus[index].offsettedQ) {
-            additionalY[additionalIndex] -= addYVal;
-            //FlarialGUI::DropDownMenus[index].offsetted = additionalY - addYVal;
-            FlarialGUI::DropDownMenus[index].offsettedQ = false;
-        }
+        FlarialGUI::lerp(additionalY[additionalIndex], -50.f, 0.1f * FlarialGUI::frameFactor);
+
         FlarialGUI::lerp(y, originalY - maxHeight, 0.25f * FlarialGUI::frameFactor);
         FlarialGUI::DropDownMenus[index].curColor = FlarialGUI::LerpColor(FlarialGUI::DropDownMenus[index].curColor,
                                                                           unselectedChildCol,

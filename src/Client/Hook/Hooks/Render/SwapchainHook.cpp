@@ -136,7 +136,26 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
     }
 
     pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+
+    std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
+
+    if (bufferingMode == "Double Buffering") {
+        pDesc->BufferCount = 2;
+    } else if (bufferingMode == "Triple Buffering") {
+        pDesc->BufferCount = 3;
+    }
+
+    std::string swapEffect = Client::settings.getSettingByName<std::string>("swapeffect")->value;
+
+    if (swapEffect == "FLIP_SEQUENTIAL") {
+        pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+    } else if (swapEffect == "FLIP_DISCARD") {
+        pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+    }
+
+
     pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
+    Logger::info("Swap Effect: " + std::to_string(pDesc->SwapEffect));
     MADECHAIN = TRUE;
     return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
 }
@@ -216,7 +235,12 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     } catch (const std::exception &ex) { return 0; }
 
     if (Client::settings.getSettingByName<bool>("vsync")->value) {
-        return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
+        flags |= DXGI_PRESENT_ALLOW_TEARING;
+        syncInterval = 0;
+    }
+
+    if (Client::settings.getSettingByName<bool>("donotwait")->value) {
+        flags |= DXGI_PRESENT_DO_NOT_WAIT;
     }
 
 return funcOriginal(pSwapChain, syncInterval, flags);
