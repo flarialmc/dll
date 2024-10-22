@@ -85,6 +85,7 @@ namespace ModuleManager {
 std::vector<std::shared_ptr<Module>> ModuleManager::getModules() {
     std::vector<std::shared_ptr<Module>> modulesVector;
     for (const auto& pair : moduleMap) {
+        if(pair.second == nullptr) continue;
         modulesVector.push_back(pair.second);
     }
     return modulesVector;
