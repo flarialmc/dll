@@ -70,7 +70,7 @@ public:
     void onSetup() override {
         Listen(this, MouseEvent, &ClickGUI::onMouse)
         Listen(this, KeyEvent, &ClickGUI::onKey)
-        Listen(this, RenderEvent, &ClickGUI::onRender)
+        ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
         Module::onEnable();
     }
 
