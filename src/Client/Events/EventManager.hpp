@@ -10,6 +10,11 @@ enum struct EventOrder {
     LAST
 };
 
+#define NES_PRIORITY_TYPE EventOrder
+
+#define NES_PRIORITY_TRAITS template<> struct nes::event_priority_traits<NES_PRIORITY_TYPE> { using priority_type = NES_PRIORITY_TYPE; static constexpr priority_type default_value = priority_type::NORMAL; };
+#include <nes/event_dispatcher.hpp>
+
 #define Listen(mod, type, listener) eventMgr.getDispatcher().listen<type, listener, EventOrder::NORMAL>(mod);
 #define ListenOrdered(mod, type, listener, priority) eventMgr.getDispatcher().listen<type, listener, priority>(mod);
 #define Deafen(mod, type, listener) eventMgr.getDispatcher().deafen<type, listener>(mod);
