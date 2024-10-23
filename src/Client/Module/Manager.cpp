@@ -90,6 +90,7 @@ void ModuleManager::addModule(Module* module) {
 std::vector<Module*> ModuleManager::getModules() {
     std::vector<Module*> modulesVector;
     for (const auto& pair : moduleMap) {
+        if(!pair.second) continue;
         modulesVector.push_back(pair.second);
     }
     return modulesVector;
@@ -197,6 +198,7 @@ void ModuleManager::terminate() {
 
 void ModuleManager::SaveModulesConfig() {
     for (const auto& pair : moduleMap) {
+        if(!pair.second) continue;
         pair.second->saveSettings();
     }
 }
