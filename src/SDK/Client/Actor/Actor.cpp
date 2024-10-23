@@ -124,7 +124,14 @@ ItemStack *Actor::getArmor(int slot) {
 
 MoveInputComponent *Actor::getMoveInputHandler() { //??$try_get@UMoveInputComponent
 
-    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMoveInputHandler"));
+    static uintptr_t sig = 0;
+    if(sig == NULL) {
+        if (WinrtUtils::check(21, 40)) {
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getMoveInputHandler"));
+        } else {
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMoveInputHandler"));
+        }
+    }
 
     return tryGet<MoveInputComponent>(sig);
 }
@@ -137,15 +144,27 @@ ActorGameTypeComponent *Actor::getGameModeType() {
 }
 
 AABBShapeComponent *Actor::getAABBShapeComponent() {
-
-    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getAABBShapeComponent"));
+    static uintptr_t sig = 0;
+    if(sig == NULL) {
+        if (WinrtUtils::check(21, 40)) {
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getAABBShapeComponent"));
+        } else {
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getAABBShapeComponent"));
+        }
+    }
 
     return tryGet<AABBShapeComponent>(sig);
 }
 
 StateVectorComponent *Actor::getStateVectorComponent() {
-
-    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getStateVectorComponent"));
+    static uintptr_t sig = 0;
+    if(sig == NULL) {
+        if (WinrtUtils::check(21, 40)) {
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getStateVectorComponent"));
+        } else {
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getStateVectorComponent"));
+        }
+    }
 
     return tryGet<StateVectorComponent>(sig);
 }
@@ -163,19 +182,6 @@ ItemStack *Actor::getOffhandSlot() {
         auto fn = reinterpret_cast<ItemStack *(__thiscall *)(Actor *)>(sig);
         return fn(this);
     }
-}
-
-RuntimeIDComponent *Actor::getRuntimeIDComponent() {
-    static uintptr_t sig;
-    if(sig == NULL) {
-        if (WinrtUtils::check(20, 50) && !WinrtUtils::check(20, 60)) {
-            sig = Memory::findSig(
-                    std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
-        } else {
-            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
-        }
-    }
-    return tryGet<RuntimeIDComponent>(sig);
 }
 
 V1_20_50::EntityContext *Actor::GetEntityContextV1_20_50() {
@@ -209,13 +215,27 @@ bool Actor::hasCategory(ActorCategory category) {
 }
 
 RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URenderPositionComponent
-    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRenderPositionComponent"));
+    static uintptr_t sig = 0;
+    if(sig == NULL) {
+        if (WinrtUtils::check(21, 40)) {
+            sig = Memory::findSig(std::string(GET_SIG("Actor::getRenderPositionComponent")));
+        } else {
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRenderPositionComponent"));
+        }
+    }
 
     return tryGet<RenderPositionComponent>(sig);
 }
 
 std::vector<UnifiedMobEffectData> Actor::getMobEffects() {
-    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMobEffectsComponent"));
+    static uintptr_t sig = 0;
+    if(sig == NULL) {
+        if (WinrtUtils::check(21, 40)) {
+            sig = Memory::findSig(std::string(GET_SIG("Actor::getMobEffectsComponent")));
+        } else {
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMobEffectsComponent"));
+        }
+    }
     std::vector<UnifiedMobEffectData> unifiedEffects;
     if (WinrtUtils::check(21, 30)) {
         auto component =  tryGet<MobEffectsComponent1_21_30>(sig);

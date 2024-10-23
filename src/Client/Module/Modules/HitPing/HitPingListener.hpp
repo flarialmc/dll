@@ -44,7 +44,7 @@ class HitPingListener : public Listener {
         auto playerPos = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent()->Pos;
         auto entity = event.getActor();
         auto hitActors = &actorsHit;
-        auto id = entity->getRuntimeIDComponent()->runtimeID;
+        auto id = entity->getRuntimeID();
 
         std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
 
@@ -91,7 +91,7 @@ class HitPingListener : public Listener {
                             hitDelay = time;
                             auto actors = SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList();
                             auto actor = std::find_if(actors.begin(), actors.end(), [&](auto &a) {
-                                return a->getRuntimeIDComponent()->runtimeID == id;
+                                return a->getRuntimeID() == id;
                             });
                             if(actor != actors.end()) {
 

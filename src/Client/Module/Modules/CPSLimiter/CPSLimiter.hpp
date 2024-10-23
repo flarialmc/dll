@@ -8,7 +8,7 @@ class CPSLimiter : public Module {
 public:
 
 
-    CPSLimiter() : Module("CPS Limiter", "Limit how many clicks you can\nregister per second.",
+    CPSLimiter() : Module("CPS Limiter", "Limit/cap how many clicks you can\nregister per second.",
                           IDR_STOP_PNG, "") {
 
         Module::setup();
@@ -18,12 +18,13 @@ public:
         if (settings.getSettingByName<float>("Left") == nullptr) settings.addSetting("Left", 16.0f);
 
         if (settings.getSettingByName<float>("Right") == nullptr) settings.addSetting("Right", 24.0f);
+
+        if (settings.getSettingByName<bool>("capMode") == nullptr) settings.addSetting("capMode", false);
     }
 
     void settingsRender() override {
 
         /* Border Start */
-
         float toggleX = Constraints::PercentageConstraint(0.019, "left");
         float toggleY = Constraints::PercentageConstraint(0.10, "top");
 

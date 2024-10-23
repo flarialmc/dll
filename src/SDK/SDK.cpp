@@ -39,6 +39,7 @@ std::string SDK::getCurrentScreen() {
 }
 
 int SDK::getServerPing() {
+    if(WinrtUtils::check(21, 40)) return -1;
     if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             if (SDK::clientInstance->getRakNetConnector() != nullptr) {
@@ -54,6 +55,7 @@ int SDK::getServerPing() {
 }
 
 std::string SDK::getServerIP() {
+    if(WinrtUtils::check(21, 40)) return "";
     if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             std::string ip{};

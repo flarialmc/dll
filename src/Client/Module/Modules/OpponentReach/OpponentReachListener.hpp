@@ -35,7 +35,7 @@ class OpponentReachListener : public Listener {
             if (packet->EventID == ActorEvent::Hurt) {
 
                 auto id = packet->RuntimeID;
-                if(id == SDK::clientInstance->getLocalPlayer()->getRuntimeIDComponent()->runtimeID) {
+                if(id == SDK::clientInstance->getLocalPlayer()->getRuntimeID()) {
                     auto excludeTeam = module->settings.getSettingByName<bool>("tryToExcludeTeam")->value;
                     // we got hit
                     auto player = SDK::clientInstance->getLocalPlayer();

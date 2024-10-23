@@ -58,6 +58,12 @@ public:
         if (getPacketSender() == nullptr)
             return nullptr;
 
+        if(getPacketSender()->networkSystem == nullptr)
+            return nullptr;
+
+        if(getPacketSender()->networkSystem->remoteConnectorComposite == nullptr)
+            return nullptr;
+
         return getPacketSender()->networkSystem->remoteConnectorComposite->rakNetConnector;
     }
 };

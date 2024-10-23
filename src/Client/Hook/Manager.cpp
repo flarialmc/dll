@@ -47,7 +47,7 @@ void HookManager::initialize() {
 
     if (!Client::settings.getSettingByName<bool>("killdx")->value) hooks.push_back(new CommandListHook());
 
-    hooks.push_back(new TextureGroup_getTextureHook());
+    //hooks.push_back(new TextureGroup_getTextureHook());
     hooks.push_back(new getViewPerspectiveHook());
     // hooks.push_back(new RenderActorHook());
     hooks.push_back(new RaknetTickHook());

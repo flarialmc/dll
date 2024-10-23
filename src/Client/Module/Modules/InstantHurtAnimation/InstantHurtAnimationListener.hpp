@@ -25,7 +25,7 @@ class InstantHurtAnimationListener : public Listener {
         if (!SDK::clientInstance->getLocalPlayer()) return;
         if(event.getPacket()->getId() == MinecraftPacketIds::ActorEvent) {
             auto ee = (EntityEventPacket *) event.getPacket();
-            if (ee->RuntimeID != player->getRuntimeIDComponent()->runtimeID) {
+            if (ee->RuntimeID != player->getRuntimeID()) {
                 if (ee->EventID == ActorEvent::Hurt) {
                     // Cancel hurt anim packet, that was caused by our hit
                     auto it = hitEntities.find(ee->RuntimeID);
@@ -63,7 +63,7 @@ class InstantHurtAnimationListener : public Listener {
 
         ClearOldHits();
 
-        auto runtimeID = event.getActor()->getRuntimeIDComponent()->runtimeID;
+        auto runtimeID = event.getActor()->getRuntimeID();
         auto now = std::chrono::steady_clock::now();
 
         auto it = hitEntities.find(runtimeID);

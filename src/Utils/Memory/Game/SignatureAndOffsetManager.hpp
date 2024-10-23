@@ -4,6 +4,12 @@
 #include <unordered_map>
 #include "../../../Utils/Utils.hpp"
 
+#define DEPRECATE_SIG(name) \
+    []{ \
+        constexpr unsigned int hash_val = Utils::hash(name); \
+        Mgr.removeSignature(hash_val); \
+    }()
+
 #define ADD_SIG(name, sig) \
     []{ \
         constexpr unsigned int hash_val = Utils::hash(name); \
@@ -40,6 +46,7 @@
 class SignatureAndOffsetManager {
 public:
     void addSignature(unsigned int hash, const char* sig);
+    void removeSignature(unsigned int hash);
     [[nodiscard]] const char* getSig(unsigned int hash) const;
     [[nodiscard]] uintptr_t getSigAddress(unsigned int hash) const;
 

@@ -13,6 +13,7 @@ void Hook::enableHook() {
 }
 
 bool Hook::autoHook(void *callbackPtr, void **funcOriginal) {
+    if(this->signature.empty()) return false;
     uintptr_t hookAddr = Memory::findSig(this->signature);
     return this->manualHook((void *) hookAddr, callbackPtr, funcOriginal);
 }

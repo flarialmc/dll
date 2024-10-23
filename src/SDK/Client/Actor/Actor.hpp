@@ -217,8 +217,6 @@ public:
 
     StateVectorComponent *getStateVectorComponent();
 
-    RuntimeIDComponent *getRuntimeIDComponent();
-
     bool isValidAABB();
 
     uint64_t getRuntimeID();

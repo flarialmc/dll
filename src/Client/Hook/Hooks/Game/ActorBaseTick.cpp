@@ -5,13 +5,10 @@
 
 void ActorBaseTick::enableHook() {
 
-    auto base = Memory::findSig(this->signature); // Player vtable
-    int offset = *reinterpret_cast<int *>(base + 3);
-    auto **vft = reinterpret_cast<uintptr_t **>(base + offset + 7);
-
+    auto vft = Memory::getOffsetFromSig<uintptr_t*>(Memory::findSig(this->signature), 3); // Player vtable
     static auto vftOffset = GET_OFFSET("Actor::baseTickVft");
 
-    this->manualHook(vft[vftOffset], (void *) callback, (void **) &funcOriginal);
+    this->manualHook((void*)vft[vftOffset], (void *) callback, (void **) &funcOriginal);
 
 }
 

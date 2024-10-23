@@ -113,10 +113,12 @@ void ModuleManager::initialize() {
 
     addModule(new FPSCounter());
     addModule(new CPSCounter());
-    addModule(new IPDisplay());
     addModule(new ReachCounter());
     addModule(new ComboCounter());
-    addModule(new PingCounter());
+    if(!WinrtUtils::check(21,40)) {
+        addModule(new IPDisplay());
+        addModule(new PingCounter());
+    }
     addModule(new PotCounter());
     addModule(new ArrowCounter());
     addModule(new Time());
@@ -126,43 +128,53 @@ void ModuleManager::initialize() {
     addModule(new Keystrokes());
     addModule(new Sneak());
     addModule(new Sprint());
-    addModule(new Hitbox());
-    addModule(new ThirdPerson());
+
+    if(!WinrtUtils::check(21,40)) {
+        addModule(new Hitbox());
+        addModule(new ThirdPerson());
+        addModule(new HurtColor());
+    }
+
     addModule(new SnapLook());
-    addModule(new HurtColor());
     addModule(new FogColor());
     addModule(new ArmorHUD());
     addModule(new TimeChanger());
     addModule(new RenderOptions());
     addModule(new PaperDoll());
     addModule(new GuiScale());
-    addModule(new WeatherChanger());
-    addModule(new TabList());
-    addModule(new AutoGG());
-    addModule(new TextHotkey());
-    addModule(new NickModule());
-    addModule(new FreeLook());
+    if(!WinrtUtils::check(21,40)) {
+        addModule(new WeatherChanger());
+        addModule(new TabList());
+        addModule(new AutoGG());
+        addModule(new TextHotkey());
+        addModule(new NickModule());
+        addModule(new FreeLook());
+    }
     addModule(new SpeedDisplay());
     addModule(new CPSLimiter());
     addModule(new BlockBreakIndicator());
     addModule(new Animations());
     addModule(new BlockOutline());
-    addModule(new CommandHotkey());
+    //addModule(new OverlayModule());
     addModule(new NoHurtCam());
     addModule(new InventoryHUD());
-    //addModule(new OverlayModule());
-    addModule(new AutoRQ());
-    addModule(new HitPing());
-    addModule(new InstantHurtAnimation());
-    addModule(new OpponentReach());
+    if(!WinrtUtils::check(21,40)) {
+        addModule(new CommandHotkey());
+        addModule(new AutoRQ());
+        addModule(new HitPing());
+        addModule(new InstantHurtAnimation());
+    }
+    ////addModule(new OpponentReach());
     addModule(new ViewModel());
-    addModule(new PotionHUD());
-    addModule(new FasterInventory());
+    if(!WinrtUtils::check(21,40)) {
+        addModule(new PotionHUD());
+        addModule(new FasterInventory());
+
+        addModule(new ItemPhysics());
+    }
 
     //addModule(new MovableChat());
     //addModule(new CompactChat());
-    addModule(new ItemPhysics());
-
 
     EventHandler::registerListener(new GUIKeyListener("GuiKeyListener"));
     EventHandler::registerListener(new DiscordRPCListener("DiscordRPC"));

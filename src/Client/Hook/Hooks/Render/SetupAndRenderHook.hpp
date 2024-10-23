@@ -119,7 +119,9 @@ private:
 
         if (player && SDK::clientInstance->getLevelRender())
         {
-            origin = SDK::clientInstance->getLevelRender()->getOrigin();
+            if(!WinrtUtils::check(21,40)){
+                origin = SDK::clientInstance->getLevelRender()->getOrigin();
+            }
         }
 
         FrameTransform transform = { SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov() };

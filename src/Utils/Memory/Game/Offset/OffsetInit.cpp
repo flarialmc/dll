@@ -3,6 +3,16 @@
 #include "../../../Logger/Logger.hpp"
 #include "../SignatureAndOffsetManager.hpp"
 
+void OffsetInit::init2140() {
+    Logger::debug("[Offsets] Loading offsets for 1.21.4X");
+    ADD_OFFSET("Level::hitResult", 0x248);
+    ADD_OFFSET("Player::gamemode", 0xB28);
+
+    ADD_OFFSET("ClientInstance::guiData", 0x590);
+
+    // raknet stuff, guidata,
+}
+
 void OffsetInit::init2130() {
     Logger::debug("[Offsets] Loading offsets for 1.21.3X");
 
