@@ -9,15 +9,18 @@ std::string RaknetTickHook::towriteip = "";
 
 void RaknetTickHook::callback(RaknetConnector *raknet) {
     if(getAveragePingOriginal == nullptr) {
-        uintptr_t getAveragePingAddr = Memory::GetAddressByIndex(raknet->peer->vTable, GET_OFFSET("RakPeer::GetAveragePing"));
-        Memory::hookFunc((void *) getAveragePingAddr, (void*)getAveragePingCallback,
-                         (void **) &getAveragePingOriginal, "RakPeer::GetAveragePing");
+        if (!WinrtUtils::check(21, 40)) {
+            uintptr_t getAveragePingAddr = Memory::GetAddressByIndex(raknet->peer->vTable,
+                                                                     GET_OFFSET("RakPeer::GetAveragePing"));
+            Memory::hookFunc((void *) getAveragePingAddr, (void *) getAveragePingCallback,
+                             (void **) &getAveragePingOriginal, "RakPeer::GetAveragePing");
+        }
     }
     raknetTickOriginal(raknet);
     if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
 
-            std::string ip = raknet->JoinedIp;
+            std::string ip = WinrtUtils::check(21, 40) ? "" : raknet->JoinedIp;
 
             if (ip.empty() && SDK::clientInstance == nullptr) {
                 ip = "none";
