@@ -115,10 +115,8 @@ void ModuleManager::initialize() {
     addModule(new CPSCounter());
     addModule(new ReachCounter());
     addModule(new ComboCounter());
-    if(!WinrtUtils::check(21,40)) {
-        addModule(new IPDisplay());
-        addModule(new PingCounter());
-    }
+    addModule(new IPDisplay());
+    addModule(new PingCounter());
     addModule(new PotCounter());
     addModule(new ArrowCounter());
     addModule(new Time());
@@ -142,11 +140,12 @@ void ModuleManager::initialize() {
     addModule(new RenderOptions());
     addModule(new PaperDoll());
     addModule(new GuiScale());
+    addModule(new TextHotkey());
+    addModule(new AutoGG());
+
     if(!WinrtUtils::check(21,40)) {
         addModule(new WeatherChanger());
         addModule(new TabList());
-        addModule(new AutoGG());
-        addModule(new TextHotkey());
         addModule(new NickModule());
         addModule(new FreeLook());
     }
@@ -158,18 +157,17 @@ void ModuleManager::initialize() {
     //addModule(new OverlayModule());
     addModule(new NoHurtCam());
     addModule(new InventoryHUD());
-    if(!WinrtUtils::check(21,40)) {
-        addModule(new CommandHotkey());
-        addModule(new AutoRQ());
-        addModule(new HitPing());
-        addModule(new InstantHurtAnimation());
-    }
+    addModule(new CommandHotkey());
+    addModule(new AutoRQ());
+
     ////addModule(new OpponentReach());
     addModule(new ViewModel());
-    if(!WinrtUtils::check(21,40)) {
-        addModule(new PotionHUD());
-        addModule(new FasterInventory());
 
+    if(!WinrtUtils::check(21,40)) {
+        addModule(new HitPing());
+        addModule(new InstantHurtAnimation());
+        addModule(new FasterInventory());
+        addModule(new PotionHUD());
         addModule(new ItemPhysics());
     }
 

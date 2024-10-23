@@ -45,10 +45,6 @@ DWORD WINAPI init(HMODULE real)
             auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastBeatTime);
 
             if(!Client::disable) {
-                if(WinrtUtils::check(21, 40)) {
-                    Sleep(60);
-                    continue;
-                }
                 if(SDK::hasInstanced && SDK::clientInstance != nullptr) {
                     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                         if(elapsed >= std::chrono::seconds(60)) {
@@ -100,7 +96,7 @@ DWORD WINAPI init(HMODULE real)
 
                             if(SDK::clientInstance != nullptr)
                             if(SDK::clientInstance->getLocalPlayer() != nullptr) {
-                                if (module->isEnabled()) {
+                                if (module && module->isEnabled()) {
                                     name = Utils::removeNonAlphanumeric(
                                             Utils::removeColorCodes(NickListener::original));
                                     name = replaceAll(name, "�", "");

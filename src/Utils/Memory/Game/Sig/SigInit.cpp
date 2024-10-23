@@ -28,8 +28,9 @@ void SigInit::init2140() {
     ADD_SIG("Actor::getMobEffectsComponent", "48 89 5C 24 08 48 89 74 24 10 48 89 7C 24 18 4C 89 6C 24 20 55 41 56 41 57 48 8D 6C 24 B9 48 81 EC E0"); // 10 BA 2F B4 D6 F7
     DEPRECATE_SIG("Actor::getRuntimeIDComponent"); // 10 BA 14 14 A1 3C ??
     ADD_SIG("Actor::getMoveInputHandler", "C8 25 2E CD 8B 46");
-    ADD_SIG("Actor::getRenderPositionComponent", "48 83 EC 38 48 8B 41 10 4C 8B C9 4C 8B 00 49 C1 E8 3B");
-    ADD_SIG("Actor::getOnGroundFlagComponent", ""); // 10 BA A3 99 E2 C3 ?
+    // 49 2B C0 8B 12 48 C1 F8 03 48 FF C8 49 23 C3 49 8B 0C C0 48 83 F9 FF 74 1A 66 90 48 C1 E1 05 46 39 5C 09 08 4A 8D 04 09 74 0D 48 8B 08 48 83 F9 FF 75 E8
+    ADD_SIG("Actor::getRenderPositionComponent", "4C 8B 41 48 41 BB 6E F3 E8 D4"); // 6E F3 E8 D4
+
 
     ADD_SIG("Tessellator::begin", "40 53 55 48 83 EC 28 80 B9");
     ADD_SIG("MeshHelpers::renderMeshImmediately", "40 53 55 56 57 41 56 48 81 EC 20 04 00 00 49 8B F1 4D 8B F0 48 8B FA 48 8B E9 80 BA 0D 02 00 00 00 0F 85 2E");
