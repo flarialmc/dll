@@ -88,7 +88,7 @@ void SigInit::init2130() {
 
     ADD_SIG("CameraAssignAngle", "F3 0F 11 43 08 C6 43 0C 01");
 
-    ADD_SIG("Level::getRuntimeActorList", "48 89 5C 24 18 55 56 57 41 56 41 57 48 83 EC 50 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 40 41 8B F0");
+    ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 50");
 
     ADD_SIG("ItemStack::getMaxDamage", "48 83 EC 28 48 8B 41 08 33 D2 48 85 C0 74 08 48 39 10 0F 94 C1 EB 05 B9 01 00 00 00 84 C9 75 20");
 

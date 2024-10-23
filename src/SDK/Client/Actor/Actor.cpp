@@ -64,7 +64,17 @@ bool Actor::canSee(const Actor& actor) {
 }
 
 uint64_t Actor::getRuntimeID() {
-    return this->GetEntityContextV1_20_50()->id;
+    if(WinrtUtils::check(21, 40)) return 0;
+    static uintptr_t sig;
+    if(sig == NULL) {
+        if (WinrtUtils::check(20, 50) && !WinrtUtils::check(20, 60)) {
+            sig = Memory::findSig(
+                    std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
+        } else {
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
+        }
+    }
+    return tryGet<RuntimeIDComponent>(sig)->runtimeID;
 }
 
 ActorDataFlagComponent* Actor::getActorDataFlagComponent() {
