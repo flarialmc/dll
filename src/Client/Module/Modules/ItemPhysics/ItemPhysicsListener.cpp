@@ -247,7 +247,7 @@ void ItemPhysicsListener::onEnable() {
     Memory::copyBytes(translateAddr, data, 5);
     Memory::nopBytes(translateAddr, 5);
 
-    if (WinrtUtils::check(21, 0)) {
+    if (WinrtUtils::checkAboveOrEqual(21, 0)) {
         static auto translateAddr2 = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef2"));
         Memory::copyBytes(translateAddr2, data2, 5);
         Memory::nopBytes(translateAddr2, 5);
@@ -268,7 +268,7 @@ void ItemPhysicsListener::onDisable() {
     static auto translateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef"));
     Memory::patchBytes(translateAddr, data, 5);
 
-    if (WinrtUtils::check(21, 0)) {
+    if (WinrtUtils::checkAboveOrEqual(21, 0)) {
         static auto translateAddr2 = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef2"));
         Memory::patchBytes(translateAddr2, data2, 5);
     }

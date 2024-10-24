@@ -4,6 +4,8 @@
 #include <functional>
 #include <map>
 #include "../../Render/TexturePtr.hpp"
+#include "../EntityContext.hpp"
+#include "../../../Utils/Versions/WinrtUtils.hpp"
 
 // LeviLamina
 
@@ -170,9 +172,9 @@ public:
     }
 };
 
-class MobEffectInstance {
+class MobEffectInstance1_21_20 {
 public:
-    MobEffectInstance() = delete;
+    MobEffectInstance1_21_20() = delete;
     MobEffect::EffectType id;
     int duration;
     int durationEasy;
@@ -185,7 +187,7 @@ public:
     bool effectVisible;
     char pad_0064[0x64];
 };
-static_assert(sizeof(MobEffectInstance) == 0x80);
+static_assert(sizeof(MobEffectInstance1_21_20) == 0x80);
 
 class MobEffectInstance1_21_30 {
 public:
@@ -205,16 +207,6 @@ public:
     char pad_0060[0x60];
 };
 static_assert(sizeof(MobEffectInstance1_21_30) == 0x88);
-
-struct MobEffectsComponent
-{
-    std::vector<MobEffectInstance> effects;
-};
-
-struct MobEffectsComponent1_21_30
-{
-    std::vector<MobEffectInstance1_21_30> effects;
-};
 
 struct UnifiedMobEffectData {
     MobEffect::EffectType id;
@@ -251,3 +243,42 @@ struct UnifiedMobEffectData {
         return location;
     }
 };
+
+struct MobEffectsComponent1_21_20
+{
+    static constexpr hat::fixed_string type_name = "struct MobEffectsComponent";
+    std::vector<MobEffectInstance1_21_20> effects;
+};
+
+struct MobEffectsComponent1_21_30
+{
+    static constexpr hat::fixed_string type_name = "struct MobEffectsComponent";
+    std::vector<MobEffectInstance1_21_30> effects;
+};
+
+class MobEffectInstance {};
+
+struct MobEffectsComponent : IEntityComponent {
+private:
+    std::vector<MobEffectInstance> effects;
+public:
+    [[nodiscard]] std::vector<UnifiedMobEffectData> getUnifiedEffects() const {
+        std::vector<UnifiedMobEffectData> unifiedEffects;
+        if (WinrtUtils::checkAboveOrEqual(21, 30)) {
+            auto& _effects =  hat::member_at<std::vector<MobEffectInstance1_21_30>>(this, 0x0);
+            for (auto &effect : _effects) {
+                unifiedEffects.emplace_back(effect.id, effect.duration, effect.amplifier);
+            }
+        } else {
+            auto& _effects =  hat::member_at<std::vector<MobEffectInstance1_21_20>>(this, 0x0);
+
+            for (auto &effect : _effects) {
+                unifiedEffects.emplace_back(effect.id, effect.duration, effect.amplifier);
+            }
+        }
+        return unifiedEffects;
+    }
+};
+static_assert(sizeof(MobEffectsComponent) == 0x18);
+
+

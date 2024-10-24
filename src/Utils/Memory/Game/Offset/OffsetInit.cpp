@@ -10,16 +10,25 @@ void OffsetInit::init2140() {
     ADD_OFFSET("Player::gamemode", 0xB28);
     ADD_OFFSET("Player::playerName", 0xCB0);
 
+    ADD_OFFSET("ClientInstance::levelRenderer", 0xE8);
+
+    //ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x0); No longer exists?
+
+    ADD_OFFSET("ClientInstance::viewMatrix", 0x368);
     ADD_OFFSET("ClientInstance::guiData", 0x590);
+
+    ADD_OFFSET("ClientInstance::getFovX", 0x728);
+    ADD_OFFSET("ClientInstance::getFovY", 0x73C);
 
     ADD_OFFSET("RaknetConnector::getPeer", 0x2A0);
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x398);
 
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x318);
+    ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x620);
+
     ADD_OFFSET("ClientInstance::getPacketSender", 0xF8);
     ADD_OFFSET("NetworkSystem::remoteConnectorComposite", 0x90);
     ADD_OFFSET("RemoteConnectorComposite::rakNetConnector", 0x70);
-
-    ADD_OFFSET("ClientInstance::levelRenderer", 0xE8);
 }
 
 void OffsetInit::init2130() {
@@ -31,6 +40,7 @@ void OffsetInit::init2130() {
     ADD_OFFSET("Level::hitResult", 0x230);
     ADD_OFFSET("Level::getPlayerMap", 0xC08);
 
+    ADD_OFFSET("ClientInstance::camera", 0x2A0);
     ADD_OFFSET("ClientInstance::viewMatrix", 0x360);
     ADD_OFFSET("ClientInstance::getFovX", 0x720);
     ADD_OFFSET("ClientInstance::getFovY", 0x734);
@@ -40,6 +50,7 @@ void OffsetInit::init2130() {
     ADD_OFFSET("ClientInstance::guiData", 0x588);
 
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x1A0);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x690);
 
     ADD_OFFSET("MoveInputComponent::forward", 0x2C);
     ADD_OFFSET("MoveInputComponent::backward", 0x2D);
@@ -76,6 +87,8 @@ void OffsetInit::init2120() {
     ADD_OFFSET("Level::getPlayerMap", 0xBF8);
 
     ADD_OFFSET("ItemActor::stack", 0x408);
+
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x6D0);
 }
 
 void OffsetInit::init2100() {
@@ -161,6 +174,7 @@ void OffsetInit::init2060() {
     ADD_OFFSET("ClientInstance::getFovY", 0x704);
 
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x1A8);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x828);
 
     ADD_OFFSET("RakPeer::GetAveragePing", 44);
 
@@ -209,6 +223,7 @@ void OffsetInit::init2040() {
     ADD_OFFSET("Player::gamemode", 0xEB0);
 
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x190);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x818);
 
     ADD_OFFSET("Weather::lightingLevel",  0x48);
     ADD_OFFSET("Weather::rainLevel", 0x3C);
@@ -265,11 +280,13 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("ClientInstance::minecraftGame", 0xC8);
     ADD_OFFSET("ClientInstance::guiData", 0x560);
+    ADD_OFFSET("ClientInstance::camera", 0x270);
     ADD_OFFSET("ClientInstance::viewMatrix", 0x330);
 
     ADD_OFFSET("Minecraft::timer", 0xD8);
 
     ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x188);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x810);
 
     ADD_OFFSET("Option::optionInformation", 0x8);
     ADD_OFFSET("Option::value", 0x10);
@@ -343,4 +360,15 @@ void OffsetInit::init2030() {
     ADD_OFFSET("Level::getPlayerMap", 0x2608);
 
     ADD_OFFSET("ItemActor::stack", 0x4A0);
+
+    ADD_OFFSET("NameTagRenderObject::nameTag", 0x0);
+    ADD_OFFSET("NameTagRenderObject::pos", 0x60);
+
+    ADD_OFFSET("ViewRenderData::cameraPos", 0x0);
+    ADD_OFFSET("ViewRenderData::cameraTargetPos", 0xC);
+
+    ADD_OFFSET("Font::getLineLength", 6);
+    ADD_OFFSET("Font::getLineHeight", 7);
+
+    ADD_OFFSET("mce::Camera::worldMatrixStack", 0x40);
 }

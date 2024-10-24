@@ -25,7 +25,7 @@ public:
         if(patched) return;
         patched = true;
         int size;
-        if (WinrtUtils::check(21, 30)) {
+        if (WinrtUtils::checkAboveOrEqual(21, 30)) {
             size = 5;
         } else {
             size = 3;
@@ -37,7 +37,7 @@ public:
         if(!patched) return;
         patched = false;
         int size;
-        if (WinrtUtils::check(21, 30)) {
+        if (WinrtUtils::checkAboveOrEqual(21, 30)) {
             size = 5;
         } else {
             size = 3;
@@ -76,7 +76,7 @@ public:
         this->module = module;
 
         int size;
-        if (WinrtUtils::check(21, 30)) {
+        if (WinrtUtils::checkAboveOrEqual(21, 30)) {
             size = 5;
         } else {
             size = 3;
@@ -85,7 +85,7 @@ public:
         originalCameraAngle.resize(size);
 
         if(sigOffset == NULL) {
-            if (WinrtUtils::check(21, 30)) {
+            if (WinrtUtils::checkAboveOrEqual(21, 30)) {
                 sigOffset = GET_SIG_ADDRESS("CameraAssignAngle");
             } else {
                 sigOffset = GET_SIG_ADDRESS("CameraAssignAngle") + 4;

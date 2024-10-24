@@ -85,11 +85,11 @@ if("${MSVC_RUNTIME}" STREQUAL "")
 endif()
 
 
-file(GLOB_RECURSE sources "main.cpp" "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp" "src/Client/GUI/Engine/*.cpp")
+file(GLOB_RECURSE sources "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp" "src/Client/GUI/Engine/*.cpp")
 
-add_library(${PROJECT_NAME} SHARED ${sources} src/SDK/Client/Render/Matrix.cpp src/Assets/Assets.rc)
+add_library(${PROJECT_NAME} SHARED ${sources} main.cpp src/Assets/Assets.rc)
 
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/" "${CMAKE_CURRENT_LIST_DIR}/lib/glm/")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/" "${CMAKE_CURRENT_LIST_DIR}/lib/glm/" "${CMAKE_CURRENT_LIST_DIR}/lib/ImGui")
 
 # Disable RTTI
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -102,12 +102,26 @@ add_library(MinHook SHARED IMPORTED GLOBAL)
 set_target_properties(MinHook PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/minhook/minhook.lib")
 
 FetchContent_Declare(
+        entt
+        GIT_REPOSITORY https://github.com/skypjack/entt.git
+        GIT_TAG f931687ff04d435871ac9664bb299f71f2a8fafc
+)
+
+FetchContent_Declare(
+        nes
+        GIT_REPOSITORY https://github.com/DisabledMallis/NuvolaEventSystem.git
+        GIT_TAG main
+)
+
+FetchContent_Declare(
         libhat
         GIT_REPOSITORY  https://github.com/BasedInc/libhat.git
         GIT_TAG         9ef05d6961ce37a4c801f11159de895aa21878a9
 )
+set(ENTT_BUILD_TESTING OFF)  # Disable building tests
+FetchContent_MakeAvailable(libhat entt nes)
 
-FetchContent_MakeAvailable(libhat)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE libhat windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version)
+target_link_libraries(${PROJECT_NAME} PRIVATE libhat EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version)
 target_link_libraries(${PROJECT_NAME} PUBLIC MinHook)
+
+target_precompile_headers(Flarial PRIVATE "src/PCH.cpp")

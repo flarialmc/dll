@@ -87,7 +87,7 @@ private:
         }
 
         if (oDrawImage == nullptr) {
-            if (WinrtUtils::check(21, 20))
+            if (WinrtUtils::checkAboveOrEqual(21, 20))
                 Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour2120, (void **) &oDrawImage, "DrawImage");
             else
                 Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour, (void **) &oDrawImage, "DrawImage");
@@ -119,9 +119,7 @@ private:
 
         if (player && SDK::clientInstance->getLevelRender())
         {
-            if(!WinrtUtils::check(21,40)){
-                origin = SDK::clientInstance->getLevelRender()->getOrigin();
-            }
+            origin = SDK::clientInstance->getLevelRender()->getOrigin();
         }
 
         FrameTransform transform = { SDK::clientInstance->getViewMatrix(), origin, SDK::clientInstance->getFov() };

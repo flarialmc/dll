@@ -32,10 +32,20 @@ Version WinrtUtils::getMCVersion() {
     return version;
 }
 
-bool WinrtUtils::check(const int m, const int b) {
+bool WinrtUtils::checkAboveOrEqual(const int m, const int b) {
     static auto [major, minor, build, error] = getMCVersion();
     if(m < minor) return true;
     return m <= minor && b <= build / 100;
+}
+
+bool WinrtUtils::checkBelowOrEqual(int m, int b) {
+    static auto [major, minor, build, error] = getMCVersion();
+    if(m < minor) return true;
+    return m >= minor && b >= build / 100;
+}
+
+bool WinrtUtils::checkBetween(int m1, int b1, int m2, int b2) {
+    return checkBelowOrEqual(m1, b1) && checkAboveOrEqual(m2, b2);
 }
 
 std::string WinrtUtils::getVersion() {
@@ -44,15 +54,15 @@ std::string WinrtUtils::getVersion() {
 }
 
 std::string WinrtUtils::getFormattedVersion() {
-    const std::string& version = getVersion();
+    const std::string &version = getVersion();
 
-    if(version == "1.21.202") { // i cba for now
+    if (version == "1.21.202") { // i cba for now
         // 1.21.202.0 - 1.21.2
         // 1.21.2003.0 - 1.21.20
         return "1.21.02";
     }
 
-    if(version == "1.21.3") { // i cba for now #2
+    if (version == "1.21.3") { // i cba for now #2
         // 1.21.3.0 - 1.21.0 ".3"
         // 1.21.3003.0 - 1.21.30
         return "1.21.03";

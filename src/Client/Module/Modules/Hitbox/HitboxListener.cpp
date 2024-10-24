@@ -4,13 +4,15 @@
 void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
     std::lock_guard<std::mutex> guard(renderMtx);
     aabbsToRender.clear();
-    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->getMinecraftGame()->mouseGrabbed ||
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
         !SDK::clientInstance->getLocalPlayer()->getLevel())
         return;
     auto player = SDK::clientInstance->getLocalPlayer();
     for (const auto &ent: player->getLevel()->getRuntimeActorList()) {
+        auto pos = ent->getPosition();
+        if(!pos) continue;
         if (ent != nullptr && ent != player /*&& ent->isPlayer() && ent->hasCategory(ActorCategory::Player)*/) {
-            float dist = player->getPosition()->dist(*ent->getPosition());
+            float dist = player->getPosition()->dist(*pos);
             // This may let through some entites
             if (!ent->isValidAABB() || dist > 30 || !player->canSee(*ent) ||
                 ent->getActorFlag(ActorFlags::FLAG_INVISIBLE))
@@ -32,7 +34,7 @@ void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
 
 void HitboxListener::onRender(RenderEvent &event) {
 
-    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->getMinecraftGame()->mouseGrabbed ||
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
         !SDK::clientInstance->getLocalPlayer()->getLevel())
         return;
 

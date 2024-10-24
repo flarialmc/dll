@@ -127,9 +127,9 @@ void ModuleManager::initialize() {
     addModule(new Keystrokes());
     addModule(new Sneak());
     addModule(new Sprint());
+    addModule(new Hitbox());
 
-    if(!WinrtUtils::check(21,40)) {
-        addModule(new Hitbox());
+    if(!WinrtUtils::checkAboveOrEqual(21,40)) {
         addModule(new ThirdPerson());
         addModule(new HurtColor());
     }
@@ -144,7 +144,7 @@ void ModuleManager::initialize() {
     addModule(new TextHotkey());
     addModule(new AutoGG());
 
-    if(!WinrtUtils::check(21,40)) {
+    if(!WinrtUtils::checkAboveOrEqual(21,40)) {
         addModule(new WeatherChanger());
         addModule(new TabList());
         addModule(new NickModule());
@@ -160,15 +160,14 @@ void ModuleManager::initialize() {
     addModule(new InventoryHUD());
     addModule(new CommandHotkey());
     addModule(new AutoRQ());
-
+    addModule(new HitPing());
+    addModule(new InstantHurtAnimation());
+    addModule(new FasterInventory());
+    addModule(new PotionHUD());
     ////addModule(new OpponentReach());
     addModule(new ViewModel());
 
-    if(!WinrtUtils::check(21,40)) {
-        addModule(new HitPing());
-        addModule(new InstantHurtAnimation());
-        addModule(new FasterInventory());
-        addModule(new PotionHUD());
+    if(!WinrtUtils::checkAboveOrEqual(21,40)) {
         addModule(new ItemPhysics());
     }
 

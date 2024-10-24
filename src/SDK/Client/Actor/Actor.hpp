@@ -10,7 +10,7 @@
 #include "../../../Utils/Utils.hpp"
 #include "Components/StateVectorComponent.hpp"
 #include "Components/RenderPositionComponent.hpp"
-#include "Components/ActorEquipmentComponent.h"
+#include "Components/ActorEquipmentComponent.hpp"
 #include "EntityContext.hpp"
 #include "Components/ActorGameTypeComponent.hpp"
 #include "Components/AABBShapeComponent.hpp"
@@ -181,7 +181,13 @@ public:
     ActorCategory getCategories();
 
     template<typename Component>
-    Component *tryGet(uintptr_t addr);
+    Component *tryGet(uintptr_t addr = 0);
+
+    template<typename Component>
+    Component *tryGetOld(uintptr_t addr);
+
+    template<typename Component>
+    bool hasComponent(uintptr_t addr = 0);
 
     ItemStack *getArmor(int slot);
 
@@ -195,7 +201,7 @@ public:
 
     ItemStack *getOffhandSlot();
 
-    V1_20_50::EntityContext *GetEntityContextV1_20_50();
+    V1_20_50::EntityContext &GetEntityContextV1_20_50();
 
     void setNametag(std::string *name);
 
@@ -216,6 +222,8 @@ public:
     AABBShapeComponent *getAABBShapeComponent();
 
     StateVectorComponent *getStateVectorComponent();
+
+    RuntimeIDComponent *getRuntimeIDComponent();
 
     bool isValidAABB();
 
