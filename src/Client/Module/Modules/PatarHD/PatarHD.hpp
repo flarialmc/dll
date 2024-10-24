@@ -1,29 +1,27 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "PatarHDListener.hpp"
-#include "../../../Events/EventHandler.hpp"
 
 
 class PatarHD : public Module {
-
+private:
+    float x = 0;
+    float y = 0;
+    float xv = 1;
+    float yv = 1;
 public:
 
     PatarHD() : Module("PatarHD", "Who is this now?", IDR_SKULL_PNG, "") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-
-        EventHandler::registerListener(new PatarHDListener("PatarHDListener", this));
+        Listen(this, RenderEvent, &PatarHD::onRender)
         Module::onEnable();
-
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("PatarHDListener");
+        Deafen(this, RenderEvent, &PatarHD::onRender)
         Module::onDisable();
     }
 
@@ -101,5 +99,29 @@ public:
 
         FlarialGUI::UnsetScrollView();
 
+    }
+
+    void onRender(RenderEvent &event) {
+        if (this->isEnabled() &&
+            ClientInstance::getTopScreenName() == "hud_screen") {
+            float s = Constraints::RelativeConstraint(0.35, "height", true) *
+                      this->settings.getSettingByName<float>("scale")->value;
+            if (this->settings.getSettingByName<bool>("dvdmode")->value) {
+                FlarialGUI::image(IDR_PATAR_JPG,
+                                  D2D1::RectF(x, y, x + s, y + s), "JPG");
+
+                x += this->settings.getSettingByName<float>("xveloc")->value * xv;
+                y += this->settings.getSettingByName<float>("yveloc")->value * yv;
+
+                if (x >= MC::windowSize.x - s) xv = -1;
+                if (x < 0) xv = 1;
+                if (y >= MC::windowSize.y - s) yv = -1;
+                if (y < 0) yv = 1;
+            } else {
+                Vec2<float> center = Constraints::CenterConstraint(s, s);
+                FlarialGUI::image(IDR_PATAR_JPG,
+                                  D2D1::RectF(center.x, center.y, center.x + s, center.y + s));
+            }
+        }
     }
 };

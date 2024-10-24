@@ -19,6 +19,26 @@ struct FrameContext {
 
 class SwapchainHook : public Hook {
 private:
+    static HRESULT (*IDXGIFactory2_CreateSwapChainForCoreWindow)(IDXGIFactory2 *This, IUnknown *pDevice,
+                                                                 IUnknown *pWindow,
+                                                                 const DXGI_SWAP_CHAIN_DESC1 *pDesc,
+                                                                 IDXGIOutput *pRestrictToOutput,
+                                                                 IDXGISwapChain1 **ppSwapChain);
+
+    static HRESULT CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknown *pDevice, IUnknown *pWindow,
+                                         DXGI_SWAP_CHAIN_DESC1 *pDesc, IDXGIOutput *pRestrictToOutput,
+                                         IDXGISwapChain1 **ppSwapChain);
+
+    static void DX12Render();
+
+    static void RenderSync();
+
+    static void DX11Render();
+
+    static void Fonts();
+
+    static void FPSMeasure();
+
     static HRESULT swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags);
 
 
@@ -33,6 +53,9 @@ public:
 
     static void DX12Init();
 
+    static ID3D11Texture2D* GetBackbuffer();
+    static void SaveBackbuffer();
+
     typedef HRESULT(__thiscall *SwapchainOriginal)(IDXGISwapChain3 *, UINT, UINT);
 
     static inline SwapchainOriginal funcOriginal = nullptr;
@@ -41,6 +64,8 @@ public:
     SwapchainHook();
 
     void enableHook() override;
+    static inline ID3D11Texture2D* SavedD3D11BackBuffer;
+    static inline ID3D11Texture2D* ExtraSavedD3D11BackBuffer;
 
     static ID3D12CommandQueue *queue;
     static inline std::vector<IDXGISurface1 *> DXGISurfaces;
@@ -56,6 +81,7 @@ public:
     static inline ID3D12GraphicsCommandList* DX12CommandLists;
     static bool hasResized;
     static int currentBitmap;
+    static inline ID3D11Texture2D* stageTex;
 
     static inline ID3D12Device5* d3d12Device5 = nullptr;
 
@@ -70,6 +96,7 @@ public:
     static inline uint64_t buffersCounts = 0;
     static inline std::vector<FrameContext> frameContexts = {};
 
+    static inline std::mutex frameTransformsMtx;
     static inline std::queue<FrameTransform> FrameTransforms;
     static inline int transformDelay = 3;
 

@@ -12,19 +12,10 @@ private:
 
         float time = func_original(a1, a2, a3);
 
-        // TODO: USE EVENTS
+        auto event = nes::make_holder<TimeEvent>(time);
+        eventMgr.trigger(event);
 
-        if (ModuleManager::getModule("Time Changer") != nullptr) {
-
-            if (ModuleManager::getModule("Time Changer")->isEnabled()) {
-
-                time = ModuleManager::getModule("Time Changer")->settings.getSettingByName<float>("time")->value;
-
-            }
-        }
-
-        return time;
-
+        return event->getTime();
     }
 
 public:
@@ -32,10 +23,9 @@ public:
 
     static inline TimeChangerOriginal func_original = nullptr;
 
-    TimeChangerHook() : Hook("Time Changer Hook", GET_SIG("TimeChanger")) {}
+    TimeChangerHook() : Hook("Time Changer Hook", GET_SIG_ADDRESS("TimeChanger")) {}
 
     void enableHook() override {
-
         this->autoHook((void *) TimeChangerCallback, (void **) &func_original);
     }
 };

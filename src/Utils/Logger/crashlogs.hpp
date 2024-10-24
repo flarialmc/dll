@@ -17,4 +17,5 @@ namespace glaiel::crashlogs {
     //if the folder doesn't exist, it will be created when the program crashes
     void set_crashlog_folder(std::string folderpath);
 
+    void end_session();
 }

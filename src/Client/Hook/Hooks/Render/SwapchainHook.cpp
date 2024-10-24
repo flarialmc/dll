@@ -1,10 +1,8 @@
 #include "SwapchainHook.hpp"
 #include "../../../GUI/D2D.hpp"
 #include "../../../Events/Render/RenderEvent.hpp"
-#include "../../../Events/EventHandler.hpp"
 #include "d2d1.h"
 #include "../../../Client.hpp"
-#include "../../../Module/Modules/CPS/CPSListener.hpp"
 #include <d3d11on12.h>
 #include <algorithm>
 #include <windows.h>
@@ -20,12 +18,14 @@
 #include "../../../../../lib/ImGui/imgui_impl_dx11.h"
 #include "../../../../../lib/ImGui/imgui_impl_dx12.h"
 
-SwapchainHook::SwapchainHook() : Hook("swapchain_hook", "") {}
+SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
 
 ID3D12CommandQueue *SwapchainHook::queue = nullptr;
 
 bool initImgui = false;
 bool allfontloaded = false;
+bool first = false;
+BOOL _ = FALSE, $ = FALSE, fEnabled = FALSE, fD3D11 = FALSE, MADECHAIN = FALSE;
 
 static std::chrono::high_resolution_clock fpsclock;
 static std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
@@ -85,6 +85,13 @@ void SwapchainHook::enableHook() {
         kiero::bind(8, (void**)&funcOriginal, (void*)swapchainCallback);
     }
 
+    // CREDIT @AETOPIA
+
+    IDXGIFactory2 *pFactory = NULL;
+    CreateDXGIFactory(IID_PPV_ARGS(&pFactory));
+    Memory::hookFunc((*(LPVOID **)pFactory)[16], (void*) CreateSwapChainForCoreWindow, (void**) &IDXGIFactory2_CreateSwapChainForCoreWindow, "CreateSwapchainForCoreWindow");
+    Memory::SafeRelease(pFactory);
+
     bool isRTSS = containsModule(L"RTSSHooks64.dll");
 
     if(isRTSS) {
@@ -95,53 +102,82 @@ void SwapchainHook::enableHook() {
         Client::disable = true;
         // }
     }
+
 }
 
 bool SwapchainHook::init = false;
 
+
+// CREDIT @AETOPIA
+
+HRESULT(*IDXGISwapChain_ResizeBuffers)
+(IDXGISwapChain *This, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags) = NULL;
+
+HRESULT (*IDXGISwapChain_Present)(IDXGISwapChain *, UINT, UINT) = NULL;
+
+HRESULT(*SwapchainHook::IDXGIFactory2_CreateSwapChainForCoreWindow)
+(IDXGIFactory2 *This, IUnknown *pDevice, IUnknown *pWindow, const DXGI_SWAP_CHAIN_DESC1 *pDesc,
+ IDXGIOutput *pRestrictToOutput, IDXGISwapChain1 **ppSwapChain) = NULL;
+
+HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknown *pDevice, IUnknown *pWindow,
+                                     DXGI_SWAP_CHAIN_DESC1 *pDesc, IDXGIOutput *pRestrictToOutput,
+                                     IDXGISwapChain1 **ppSwapChain)
+
+{
+
+    if (!fEnabled)
+        fEnabled = TRUE;
+
+    ID3D12CommandQueue *pCommandQueue = NULL;
+    if (Client::settings.getSettingByName<bool>("killdx")->value && !pDevice->QueryInterface(IID_PPV_ARGS(&pCommandQueue)))
+    {
+        pCommandQueue->Release();
+        return DXGI_ERROR_INVALID_CALL;
+    }
+
+    pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+
+    std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
+
+    if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
+        pDesc->BufferCount = 2;
+    } else if (bufferingMode == "Triple Buffering") {
+        pDesc->BufferCount = 3;
+    }
+
+    std::string swapEffect = Client::settings.getSettingByName<std::string>("swapeffect")->value;
+
+    if (swapEffect == "FLIP_SEQUENTIAL") {
+        pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+    } else if (swapEffect == "FLIP_DISCARD") {
+        pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+    }
+
+
+    pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
+    Logger::info("Swap Effect: " + std::to_string(pDesc->SwapEffect));
+    MADECHAIN = TRUE;
+    return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
+}
+
+// CREDIT @AETOPIA
+
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
+
+
+    if(!fEnabled) {
+        return DXGI_ERROR_DEVICE_RESET;
+    }
+
+    if(!MADECHAIN && fEnabled) {
+        return funcOriginal(pSwapChain, syncInterval, flags);
+    }
 
     swapchain = pSwapChain;
     flagsreal = flags;
 
-    if (Client::settings.getSettingByName<bool>("killdx")->value) {
-        ID3D12Device5 *d3d12device3;
+    FPSMeasure();
 
-        if (SUCCEEDED(pSwapChain->GetDevice(IID_PPV_ARGS(&d3d12device3)))) {
-            Logger::debug("[SwapChain] Removed d3d12 device");
-            pSwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
-            d3d12device3->RemoveDevice();
-
-            return funcOriginal(pSwapChain, syncInterval, flags);
-        }
-    }
-
-    std::chrono::duration<float> elapsed = std::chrono::high_resolution_clock::now() - start;
-    MC::frames += 1;
-
-
-    if (elapsed.count() >= 0.5f) {
-        // Calculate frame rate based on elapsed time
-        MC::fps = static_cast<int>((float)MC::frames / elapsed.count());
-        // Reset frame counter and update start time
-        MC::frames = 0;
-        start = std::chrono::high_resolution_clock::now();
-    }
-
-    constexpr float targetFrameRate = 60.0f;
-
-// Measure the elapsed frame time
-    std::chrono::duration<float> frameTime = std::chrono::high_resolution_clock::now() - previousFrameTime;
-    previousFrameTime = std::chrono::high_resolution_clock::now();
-
-// Calculate the current frame rate
-    float currentFrameRate = 1.0f / frameTime.count();
-
-// Calculate the frame factor as a percentage
-    FlarialGUI::frameFactor = targetFrameRate / currentFrameRate;
-
-// Limit the frame factor to a maximum of 1.0
-    FlarialGUI::frameFactor = std::min(FlarialGUI::frameFactor, 1.0f);
 
     if (!init) {
         /* INIT START */
@@ -156,113 +192,265 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
         }
 
-
         /* INIT END */
-        /* RENDERING START */
 
-    } else {
+    }
 
-
-        /* IMPORTANT FONT STUFF */
-        if (ImGui::GetCurrentContext()) {
-
-            bool fontLoaded = false;
-
-            if(FlarialGUI::DoLoadModuleFontLater) {
-                std::string font1 = FlarialGUI::LoadModuleFontLater;
-                std::transform(font1.begin(), font1.end(), font1.begin(), ::towlower);
-                std::string weightedName = FlarialGUI::GetWeightedName(font1, FlarialGUI::LoadModuleFontLaterWeight);
-                std::transform(weightedName.begin(), weightedName.end(), weightedName.begin(), ::towlower);
-                if (!FlarialGUI::FontMap[weightedName + "-1"]) {
-                    if (FlarialGUI::LoadFontFromFontFamily(font1, weightedName, FlarialGUI::LoadModuleFontLaterWeight)) {
-                        fontLoaded = true;
-                    }
-                }
-
-                FlarialGUI::DoLoadModuleFontLater = false;
-            }
-
-            if(FlarialGUI::DoLoadGUIFontLater) {
-                std::string font2 = FlarialGUI::LoadGUIFontLater;
-                std::transform(font2.begin(), font2.end(), font2.begin(), ::towlower);
-                std::string weightedName = FlarialGUI::GetWeightedName(font2, FlarialGUI::LoadGUIFontLaterWeight);
-                std::transform(weightedName.begin(), weightedName.end(), weightedName.begin(), ::towlower);
-                if (!FlarialGUI::FontMap[weightedName + "-1"]) {
-                    if (FlarialGUI::LoadFontFromFontFamily(font2, weightedName, FlarialGUI::LoadGUIFontLaterWeight)) {
-                        fontLoaded = true;
-                    }
-                }
-
-                FlarialGUI::DoLoadGUIFontLater = false;
-            }
-
-                //std::cout << FlarialGUI::WideToNarrow(FlarialGUI::GetFontFilePath(L"Dosis", DWRITE_FONT_WEIGHT_EXTRA_BLACK)).c_str() << std::endl;
-            /*
-            if(!allfontloaded) {
-                FlarialGUI::LoadFonts(FlarialGUI::FontMap);
-
-                allfontloaded = true;
-            }
-            */
-
-            if (!FlarialGUI::FontMap["162-1"]) {
-                ImFontConfig config;
-                FlarialGUI::FontMap["162-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 23, &config);
-                FlarialGUI::FontMap["162-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 40, &config);
-                fontLoaded = true;
-            }
-
-            if (!FlarialGUI::FontMap["163-1"]) {
-                ImFontConfig config;
-                FlarialGUI::FontMap["163-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "163" + ".ttf").c_str(), 23, &config);
-                FlarialGUI::FontMap["163-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "163" + ".ttf").c_str(), 40, &config);
-
-                fontLoaded = true;
-            }
-
-            if (!FlarialGUI::FontMap["164"]) {
-                FlarialGUI::FontMap["164"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 20);
-                fontLoaded = true;
-            }
-
-            if (fontLoaded) {
-                ImGui::GetIO().Fonts->Build();
-                if (d3d11Device) {
-                    ImGui_ImplDX11_InvalidateDeviceObjects();
-                    ImGui_ImplDX11_CreateDeviceObjects();
-                }
-                else {
-                    ImGui_ImplDX12_InvalidateDeviceObjects();
-                    ImGui_ImplDX12_CreateDeviceObjects();
-                }
-
-            }
-        }
-
-        /* IMPORTANT FONT STUFF */
-
-        /* RENDER SYNC */
-
-        if(init && initImgui)
-        while(FrameTransforms.size() > transformDelay)
-        {
-            MC::Transform = FrameTransforms.front();
-            FrameTransforms.pop();
-        }
-
-         /* RENDER SYNC */
+    else {
 
         /* EACH FRAME STUFF */
+        /* RENDERING START */
+
+
+        /* FONT */
+        Fonts();
+        /* FONT */
+
+        /* RENDER SYNC */
+        RenderSync();
+        /* RENDER SYNC */
+
 
         if (D2D::context != nullptr && !Client::disable) {
 
             if (queue != nullptr) {
 
-                currentBitmap = (int)pSwapChain->GetCurrentBackBufferIndex();
+                DX12Render();
+
+            } else {
+
+                DX11Render();
+                
+            }
+
+            Memory::SafeRelease(FlarialGUI::blurbrush);
+            Memory::SafeRelease(FlarialGUI::blur);
+        }
+    }
+
+    /* EACH FRAME STUFF */
+
+    try {
+        if(init && initImgui && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImages();
+    } catch (const std::exception &ex) { return 0; }
+
+//    if (Client::settings.getSettingByName<bool>("vsync")->value) {
+//        flags |= DXGI_PRESENT_ALLOW_TEARING;
+//        syncInterval = 0;
+//    }
+//
+//    if (Client::settings.getSettingByName<bool>("donotwait")->value) {
+//        flags |= DXGI_PRESENT_DO_NOT_WAIT;
+//    }
+
+    if (Client::settings.getSettingByName<bool>("vsync")->value) {
+        return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
+    }
+
+return funcOriginal(pSwapChain, syncInterval, flags);
+
+}
+
+void SwapchainHook::DX11Init() {
+    
+    Logger::debug("[SwapChain] Not a DX12 device, running dx11 procedures");
+
+    const D2D1_CREATION_PROPERTIES properties
+    {
+        D2D1_THREADING_MODE_MULTI_THREADED,
+        D2D1_DEBUG_LEVEL_NONE,
+        D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS
+};
+
+    swapchain->GetDevice(IID_PPV_ARGS(&d3d11Device));
+
+    IDXGISurface1 *eBackBuffer;
+    swapchain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
+
+    D2D1CreateDeviceContext(eBackBuffer, properties, &D2D::context);
+
+    D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(
+            D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
+            D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), 96.0, 96.0);
+    D2D::context->CreateBitmapFromDxgiSurface(eBackBuffer, props, &D2D1Bitmap);
+    //ImGui Init
+
+    if(!initImgui) {
+        ImGui::CreateContext();
+
+        d3d11Device->GetImmediateContext(&context);
+        ImGui_ImplWin32_Init(window);
+        ImGui_ImplDX11_Init(d3d11Device, context);
+        initImgui = true;
+
+    }
+
+    SaveBackbuffer();
+
+    Blur::InitializePipeline();
+    Memory::SafeRelease(eBackBuffer);
+    init = true;
+}
+
+
+void SwapchainHook::DX12Init() {
+
+
+                ID3D12Device5 *device;
+            swapchain->GetDevice(IID_PPV_ARGS(&d3d12Device5));
+
+            if (SUCCEEDED(swapchain->GetDevice(IID_PPV_ARGS(&device))) &&
+                kiero::getRenderType() == kiero::RenderType::D3D12) {
+                D3D11On12CreateDevice(device,
+                                      D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
+                                      (IUnknown **) &queue, 1, 0, &SwapchainHook::d3d11Device, &context,
+                                      nullptr);
+
+                d3d11Device->QueryInterface(IID_PPV_ARGS(&d3d11On12Device));
+
+                D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS;
+                ID2D1Factory7 *d2dFactory;
+                D2D1_FACTORY_OPTIONS factoryOptions{};
+                D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, __uuidof(ID2D1Factory7), &factoryOptions,
+                                  (void **) &d2dFactory);
+
+                IDXGIDevice *dxgiDevice;
+                d3d11On12Device->QueryInterface(__uuidof(IDXGIDevice), (void **) &dxgiDevice);
+
+                ID2D1Device6 *device2;
+                d2dFactory->CreateDevice(dxgiDevice, &device2);
+
+                device2->CreateDeviceContext(deviceOptions, &D2D::context);
+
+                Logger::debug("[SwapChain] Prepared.");
+
+                DXGI_SWAP_CHAIN_DESC1 swapChainDescription;
+                swapchain->GetDesc1(&swapChainDescription);
+
+                bufferCount = swapChainDescription.BufferCount;
+
+                DXGISurfaces.resize(bufferCount, nullptr);
+                D3D11Resources.resize(bufferCount, nullptr);
+                D2D1Bitmaps.resize(bufferCount, nullptr);
+
+                auto dpi = (float) GetDpiForSystem();
+
+                D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(
+                        D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
+                        D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), dpi, dpi);
+
+                D3D12_DESCRIPTOR_HEAP_DESC heapDescriptorBackBuffers = {};
+                heapDescriptorBackBuffers.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+                heapDescriptorBackBuffers.NumDescriptors = bufferCount;
+                heapDescriptorBackBuffers.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+                heapDescriptorBackBuffers.NodeMask = 1;
+
+                device->CreateDescriptorHeap(&heapDescriptorBackBuffers,
+                                             IID_PPV_ARGS(&D3D12DescriptorHeap));
+
+                uintptr_t rtvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+                D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = D3D12DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
+                for (int i = 0; i < bufferCount; i++) {
+
+                    ID3D12Resource *backBufferPtr;
+                    swapchain->GetBuffer(i, IID_PPV_ARGS(&backBufferPtr));
+                    device->CreateRenderTargetView(backBufferPtr, nullptr, rtvHandle);
+                    rtvHandle.ptr += rtvDescriptorSize;
+
+
+                    D3D11_RESOURCE_FLAGS d3d11_flags = { D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE};
+
+                    d3d11On12Device->CreateWrappedResource(backBufferPtr, &d3d11_flags,
+                                                                          D3D12_RESOURCE_STATE_RENDER_TARGET,
+                                                                          D3D12_RESOURCE_STATE_PRESENT, IID_PPV_ARGS(
+                                                                                  &D3D11Resources[i]));
+                    D3D11Resources[i]->QueryInterface(&DXGISurfaces[i]);
+
+                    D2D1Bitmaps[i] = nullptr; // Initialize to nullptr
+
+                    D2D::context->CreateBitmapFromDxgiSurface(DXGISurfaces[i], props,
+                                                              &(D2D1Bitmaps[i]));
+                    Memory::SafeRelease(backBufferPtr);
+
+                }
+
+                Memory::SafeRelease(device);
+                Memory::SafeRelease(device2);
+                Memory::SafeRelease(dxgiDevice);
+                Memory::SafeRelease(d2dFactory);
+
+                Blur::InitializePipeline();
+                init = true;
+            }
+}
+
+void SwapchainHook::DX11Render() {
+
+                DX11Blur();
+
+                SaveBackbuffer();
+
+                D2D::context->BeginDraw();
+
+                MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
+
+                ID3D11RenderTargetView* mainRenderTargetView = nullptr;
+	            ID3D11DeviceContext* ppContext = nullptr;
+	            ID3D11Texture2D* pBackBuffer = nullptr;
+
+	            d3d11Device->GetImmediateContext(&ppContext);
+
+	            if (ppContext)
+
+	            if (SUCCEEDED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer)))
+
+                    if (SUCCEEDED(d3d11Device->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView))) {
+
+                        ImGui_ImplDX11_NewFrame();
+                        ImGui_ImplWin32_NewFrame();
+                        ImGui::NewFrame();
+
+                        auto event = nes::make_holder<RenderEvent>();
+                        event->RTV = mainRenderTargetView;
+                        eventMgr.trigger(event);
+
+
+                        if(!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
+                            FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
+                         "keybind")->value + " to open the menu in-game.");
+
+                            FlarialGUI::Notify("Join our discord! https://flarial.xyz/discord");
+                            first = true;
+                        }
+
+                        D2D::context->EndDraw();
+
+                        ImGui::EndFrame();
+                        ImGui::Render();
+
+                        ppContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
+                        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+                    }
+
+                if (pBackBuffer) pBackBuffer->Release();
+
+	            if (mainRenderTargetView) mainRenderTargetView->Release();
+
+                Memory::SafeRelease(ppContext);
+
+}
+
+
+void SwapchainHook::DX12Render() {
+    
+                currentBitmap = (int)swapchain->GetCurrentBackBufferIndex();
 
                 ID3D11Resource *resource = D3D11Resources[currentBitmap];
                 d3d11On12Device->AcquireWrappedResources(&resource, 1);
 
+                SaveBackbuffer();
                 D2D::context->SetTarget(D2D1Bitmaps[currentBitmap]);
 
                 DX12Blur();
@@ -272,7 +460,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                 MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
                 DXGI_SWAP_CHAIN_DESC sdesc;
-	            pSwapChain->GetDesc(&sdesc);
+	            swapchain->GetDesc(&sdesc);
 	            sdesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	            sdesc.OutputWindow = window;
 	            sdesc.Windowed = ((GetWindowLongPtr(window, GWL_STYLE) & WS_POPUP) != 0) ? false : true;
@@ -311,7 +499,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                                     ID3D12Resource* pBackBuffer = nullptr;
 
                                     frameContexts[i].main_render_target_descriptor = rtvHandle;
-                                    pSwapChain->GetBuffer(i, IID_PPV_ARGS(&pBackBuffer));
+                                    swapchain->GetBuffer(i, IID_PPV_ARGS(&pBackBuffer));
                                     d3d12Device5->CreateRenderTargetView(pBackBuffer, nullptr, rtvHandle);
                                     frameContexts[i].main_render_target_resource = pBackBuffer;
                                     rtvHandle.ptr += rtvDescriptorSize;
@@ -335,8 +523,23 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                                 ImGui_ImplWin32_NewFrame();
                                 ImGui::NewFrame();
 
-                                RenderEvent event{};
-                                EventHandler::onRender(event);
+                                ID3D11Texture2D* buffer2D = nullptr;
+                                D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&buffer2D));
+
+                                ID3D11RenderTargetView* mainRenderTargetView;
+                                d3d11Device->CreateRenderTargetView(buffer2D, NULL, &mainRenderTargetView);
+
+                                auto event = nes::make_holder<RenderEvent>();
+                                event->RTV = mainRenderTargetView;
+                                //BlurDX12::RenderBlur(SwapchainHook::d3d12CommandList);
+                                eventMgr.trigger(event);
+
+                                if(!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
+                                    FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
+                                 "keybind")->value + " to open the menu in-game.");
+                                    FlarialGUI::Notify("Join our discord! https://flarial.xyz/discord");
+                                    first = true;
+                                }
 
 
                                 D2D::context->EndDraw();
@@ -347,19 +550,19 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
                                 context->Flush();
 
-                                frameContexts[pSwapChain->GetCurrentBackBufferIndex()].commandAllocator->Reset();;
+                                frameContexts[swapchain->GetCurrentBackBufferIndex()].commandAllocator->Reset();;
 
                                 D3D12_RESOURCE_BARRIER barrier;
                                 barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
                                 barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-                                barrier.Transition.pResource = frameContexts[pSwapChain->GetCurrentBackBufferIndex()].main_render_target_resource;
+                                barrier.Transition.pResource = frameContexts[swapchain->GetCurrentBackBufferIndex()].main_render_target_resource;
                                 barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
                                 barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
                                 barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 
-                                d3d12CommandList->Reset(frameContexts[pSwapChain->GetCurrentBackBufferIndex()].commandAllocator, nullptr);
+                                d3d12CommandList->Reset(frameContexts[swapchain->GetCurrentBackBufferIndex()].commandAllocator, nullptr);
                                 d3d12CommandList->ResourceBarrier(1, &barrier);
-                                d3d12CommandList->OMSetRenderTargets(1, &frameContexts[pSwapChain->GetCurrentBackBufferIndex()].main_render_target_descriptor, FALSE, nullptr);
+                                d3d12CommandList->OMSetRenderTargets(1, &frameContexts[swapchain->GetCurrentBackBufferIndex()].main_render_target_descriptor, FALSE, nullptr);
                                 d3d12CommandList->SetDescriptorHeaps(1, &d3d12DescriptorHeapImGuiRender);
 
                                 ImGui::EndFrame();
@@ -374,6 +577,9 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                                 d3d12CommandList->Close();
 
                                 queue->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList* const*>(&d3d12CommandList));
+
+                                Memory::SafeRelease(mainRenderTargetView);
+                                Memory::SafeRelease(buffer2D);
 
                             }
                     }
@@ -394,218 +600,197 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 	            }
 
 	            frameContexts.resize(0);
-
-            } else {
-
-                DX11Blur();
-
-                D2D::context->BeginDraw();
-
-                MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
-
-                ID3D11RenderTargetView* mainRenderTargetView = nullptr;
-	            ID3D11DeviceContext* ppContext = nullptr;
-	            ID3D11Texture2D* pBackBuffer = nullptr;
-
-	            d3d11Device->GetImmediateContext(&ppContext);
-
-	            if (ppContext)
-
-	            if (SUCCEEDED(pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer)))
-
-                    if (SUCCEEDED(d3d11Device->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView))) {
-
-                        ImGui_ImplDX11_NewFrame();
-                        ImGui_ImplWin32_NewFrame();
-                        ImGui::NewFrame();
-
-                        Blur::RenderBlur(pBackBuffer, mainRenderTargetView, 3);
-
-                        RenderEvent event;
-                        EventHandler::onRender(event);
-
-                        D2D::context->EndDraw();
-
-                        ImGui::EndFrame();
-                        ImGui::Render();
-
-                        ppContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
-                        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-                    }
-
-                if (pBackBuffer) pBackBuffer->Release();
-
-	            if (mainRenderTargetView) mainRenderTargetView->Release();
-
-	            if (ppContext) ppContext->Release();
-
-            }
-
-            Memory::SafeRelease(FlarialGUI::blurbrush);
-            Memory::SafeRelease(FlarialGUI::blur);
-        }
-    }
-
-    /* EACH FRAME STUFF */
-
-    if(init && initImgui && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImages();
-
-    //if(init && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImageToCache();
-
-    if (Client::settings.getSettingByName<bool>("vsync")->value) {
-        return funcOriginal(pSwapChain, 0, DXGI_PRESENT_DO_NOT_WAIT);
-    }
-
-    return funcOriginal(pSwapChain, syncInterval, flags);
-
-}
-
-
-void SwapchainHook::DX12Blur() {
-    /* Blur Stuff */
-
-    /* Blur End */
 }
 
 void SwapchainHook::DX11Blur() {
-    /* Blur Stuff */
-
-    /* Blur End */
-}
-
-void SwapchainHook::DX11Init() {
     
-    Logger::debug("[SwapChain] Not a DX12 device, running dx11 procedures");
-
-    const D2D1_CREATION_PROPERTIES properties
-    {
-        D2D1_THREADING_MODE_MULTI_THREADED,
-        D2D1_DEBUG_LEVEL_NONE,
-        D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS
-};
-
-    swapchain->GetDevice(IID_PPV_ARGS(&d3d11Device));
-
-    IDXGISurface1 *eBackBuffer;
-    swapchain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
-
-    D2D1CreateDeviceContext(eBackBuffer, properties, &D2D::context);
-
-    D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(
-            D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
-            D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED), 96.0, 96.0);
-    D2D::context->CreateBitmapFromDxgiSurface(eBackBuffer, props, &D2D1Bitmap);
-
-    //ImGui Init
-
-    if(!initImgui) {
-        ImGui::CreateContext();
-
-        ID3D11DeviceContext* ppContext = nullptr;
-        d3d11Device->GetImmediateContext(&ppContext);
-        ImGui_ImplWin32_Init(window);
-        ImGui_ImplDX11_Init(d3d11Device, ppContext);
-        ppContext->Release();
-
-        initImgui = true;
-
+    /* Blur Stuff */
+    if(ModuleManager::initialized) {
+        auto module = ModuleManager::getModule("Motion Blur");
+        if(module) {
+            if(module->isEnabled() && !FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
+            else FlarialGUI::needsBackBuffer = false;
+        }
     }
+    /* Blur End */
 
-    Blur::blur(d3d11Device);
+}
 
-    Memory::SafeRelease(eBackBuffer);
-    init = true;
+void SwapchainHook::DX12Blur() {
+    
+    /* Blur Stuff */
+    if(FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
+    else FlarialGUI::needsBackBuffer = false;
+    /* Blur End */
+    
 }
 
 
-void SwapchainHook::DX12Init() {
-                ID3D12Device5 *device;
-            swapchain->GetDevice(IID_PPV_ARGS(&d3d12Device5));
+void SwapchainHook::RenderSync() {
+    if(init && initImgui) {
+        frameTransformsMtx.lock();
+        while (FrameTransforms.size() > transformDelay) {
+            MC::Transform = FrameTransforms.front();
+            FrameTransforms.pop();
+        }
+        frameTransformsMtx.unlock();
+    }
+}
 
-            if (SUCCEEDED(swapchain->GetDevice(IID_PPV_ARGS(&device))) &&
-                kiero::getRenderType() == kiero::RenderType::D3D12) {
-                ID3D11Device *d3d11device;
-                D3D11On12CreateDevice(device,
-                                      D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
-                                      (IUnknown **) &queue, 1, 0, &d3d11device, &context,
-                                      nullptr);
+void SwapchainHook::Fonts() {
+            /* IMPORTANT FONT STUFF */
+        if (ImGui::GetCurrentContext()) {
 
-                d3d11device->QueryInterface(IID_PPV_ARGS(&d3d11On12Device));
+            bool fontLoaded = false;
 
-                D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS;
-                ID2D1Factory7 *d2dFactory;
-                D2D1_FACTORY_OPTIONS factoryOptions{};
-                D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, __uuidof(ID2D1Factory7), &factoryOptions,
-                                  (void **) &d2dFactory);
+            if(FlarialGUI::DoLoadModuleFontLater) {
+                if(Client::settings.getSettingByName<bool>("overrideFontWeight")->value) FlarialGUI::LoadModuleFontLaterWeight = FlarialGUI::GetFontWeightFromString(Client::settings.getSettingByName<std::string>("fontWeight")->value);
 
-                IDXGIDevice *dxgiDevice;
-                d3d11On12Device->QueryInterface(__uuidof(IDXGIDevice), (void **) &dxgiDevice);
-
-                ID2D1Device6 *device2;
-                d2dFactory->CreateDevice(dxgiDevice, &device2);
-
-                device2->CreateDeviceContext(deviceOptions, &D2D::context);
-
-                Logger::debug("[SwapChain] Prepared.");
-
-                DXGI_SWAP_CHAIN_DESC1 swapChainDescription;
-                swapchain->GetDesc1(&swapChainDescription);
-
-                bufferCount = swapChainDescription.BufferCount;
-
-                DXGISurfaces.resize(bufferCount, nullptr);
-                D3D11Resources.resize(bufferCount, nullptr);
-                D2D1Bitmaps.resize(bufferCount, nullptr);
-
-                auto dpi = (float) GetDpiForSystem();
-
-                D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(
-                        D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
-                        D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED), dpi, dpi);
-
-                D3D12_DESCRIPTOR_HEAP_DESC heapDescriptorBackBuffers = {};
-                heapDescriptorBackBuffers.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-                heapDescriptorBackBuffers.NumDescriptors = bufferCount;
-                heapDescriptorBackBuffers.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-                heapDescriptorBackBuffers.NodeMask = 1;
-
-                device->CreateDescriptorHeap(&heapDescriptorBackBuffers,
-                                             IID_PPV_ARGS(&D3D12DescriptorHeap));
-
-                uintptr_t rtvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-                D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = D3D12DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-
-                for (int i = 0; i < bufferCount; i++) {
-
-                    ID3D12Resource *backBufferPtr;
-                    swapchain->GetBuffer(i, IID_PPV_ARGS(&backBufferPtr));
-                    device->CreateRenderTargetView(backBufferPtr, nullptr, rtvHandle);
-                    rtvHandle.ptr += rtvDescriptorSize;
-
-
-                    D3D11_RESOURCE_FLAGS d3d11_flags = {D3D11_BIND_RENDER_TARGET};
-
-                    d3d11On12Device->CreateWrappedResource(backBufferPtr, &d3d11_flags,
-                                                                          D3D12_RESOURCE_STATE_RENDER_TARGET,
-                                                                          D3D12_RESOURCE_STATE_PRESENT, IID_PPV_ARGS(
-                                                                                  &D3D11Resources[i]));
-                    D3D11Resources[i]->QueryInterface(&DXGISurfaces[i]);
-
-                    D2D1Bitmaps[i] = nullptr; // Initialize to nullptr
-
-                    D2D::context->CreateBitmapFromDxgiSurface(DXGISurfaces[i], props,
-                                                              &(D2D1Bitmaps[i]));
-                    Memory::SafeRelease(backBufferPtr);
-
+                std::string font1 = FlarialGUI::LoadModuleFontLater;
+                std::transform(font1.begin(), font1.end(), font1.begin(), ::towlower);
+                std::string weightedName = FlarialGUI::GetWeightedName(font1, FlarialGUI::LoadModuleFontLaterWeight);
+                std::transform(weightedName.begin(), weightedName.end(), weightedName.begin(), ::towlower);
+                if (!FlarialGUI::FontMap[weightedName + "-1"]) {
+                    if (FlarialGUI::LoadFontFromFontFamily(font1, weightedName, FlarialGUI::LoadModuleFontLaterWeight)) {
+                        fontLoaded = true;
+                    }
                 }
 
-                Memory::SafeRelease(device);
-                Memory::SafeRelease(device2);
-                Memory::SafeRelease(d3d11device);
-                Memory::SafeRelease(dxgiDevice);
-                Memory::SafeRelease(d2dFactory);
-
-                init = true;
+                FlarialGUI::DoLoadModuleFontLater = false;
             }
+
+            if(FlarialGUI::DoLoadGUIFontLater) {
+
+                if(Client::settings.getSettingByName<bool>("overrideFontWeight")->value) FlarialGUI::LoadGUIFontLaterWeight = FlarialGUI::GetFontWeightFromString(Client::settings.getSettingByName<std::string>("fontWeight")->value);
+
+
+                std::string font2 = FlarialGUI::LoadGUIFontLater;
+                std::transform(font2.begin(), font2.end(), font2.begin(), ::towlower);
+                std::string weightedName = FlarialGUI::GetWeightedName(font2, FlarialGUI::LoadGUIFontLaterWeight);
+                std::transform(weightedName.begin(), weightedName.end(), weightedName.begin(), ::towlower);
+                if (!FlarialGUI::FontMap[weightedName + "-1"]) {
+                    if (FlarialGUI::LoadFontFromFontFamily(font2, weightedName, FlarialGUI::LoadGUIFontLaterWeight)) {
+                        fontLoaded = true;
+                    }
+                }
+
+                FlarialGUI::DoLoadGUIFontLater = false;
+            }
+
+                //std::cout << FlarialGUI::WideToNarrow(FlarialGUI::GetFontFilePath(L"Dosis", DWRITE_FONT_WEIGHT_EXTRA_BLACK)).c_str() << std::endl;
+            /*
+            if(!allfontloaded) {
+                FlarialGUI::LoadFonts(FlarialGUI::FontMap);
+
+                allfontloaded = true;
+            }
+            */
+
+            if (!FlarialGUI::FontMap["162-1"]) {
+                ImFontConfig config;
+                FlarialGUI::FontMap["162-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 23, &config);
+                FlarialGUI::FontMap["162-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 40, &config);
+                fontLoaded = true;
+            }
+
+            if (!FlarialGUI::FontMap["163-1"]) {
+                ImFontConfig config;
+                FlarialGUI::FontMap["163-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "163" + ".ttf").c_str(), 23, &config);
+                FlarialGUI::FontMap["163-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "163" + ".ttf").c_str(), 40, &config);
+
+                fontLoaded = true;
+            }
+
+            if (!FlarialGUI::FontMap["164-1"]) {
+                FlarialGUI::FontMap["164-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 23);
+                FlarialGUI::FontMap["164-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 40);
+
+                fontLoaded = true;
+            }
+
+            if (fontLoaded) {
+                ImGui::GetIO().Fonts->Build();
+                if (!queue) {
+                    ImGui_ImplDX11_InvalidateDeviceObjects();
+                    ImGui_ImplDX11_CreateDeviceObjects();
+                }
+                else {
+                    ImGui_ImplDX12_InvalidateDeviceObjects();
+                    ImGui_ImplDX12_CreateDeviceObjects();
+                }
+
+            }
+        }
+
+        /* IMPORTANT FONT STUFF */
+}
+
+void SwapchainHook::FPSMeasure() {
+
+    std::chrono::duration<float> elapsed = std::chrono::high_resolution_clock::now() - start;
+    MC::frames += 1;
+
+
+    if (elapsed.count() >= 0.5f) {
+        MC::fps = static_cast<int>((float)MC::frames / elapsed.count());
+        MC::frames = 0;
+        start = std::chrono::high_resolution_clock::now();
+    }
+
+    constexpr float targetFrameRate = 60.0f;
+
+    std::chrono::duration<float> frameTime = std::chrono::high_resolution_clock::now() - previousFrameTime;
+    previousFrameTime = std::chrono::high_resolution_clock::now();
+
+    float currentFrameRate = 1.0f / frameTime.count();
+
+    FlarialGUI::frameFactor = targetFrameRate / currentFrameRate;
+
+    FlarialGUI::frameFactor = std::min(FlarialGUI::frameFactor, 1.0f);
+
+}
+
+
+
+
+ID3D11Texture2D* SwapchainHook::GetBackbuffer()
+{
+    return SavedD3D11BackBuffer;
+}
+
+  void SwapchainHook::SaveBackbuffer() {
+
+    Memory::SafeRelease(SavedD3D11BackBuffer);
+    Memory::SafeRelease(ExtraSavedD3D11BackBuffer);
+
+    if(!SwapchainHook::queue) {
+
+        SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&SavedD3D11BackBuffer));
+
+        if(FlarialGUI::needsBackBuffer) {
+
+        if(!ExtraSavedD3D11BackBuffer) {
+            D3D11_TEXTURE2D_DESC textureDesc = {};
+            textureDesc.Width = D2D::context->GetSize().width;
+            textureDesc.Height = D2D::context->GetSize().height;
+            textureDesc.MipLevels = 1;
+            textureDesc.ArraySize = 1;
+            textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            textureDesc.SampleDesc.Count = 1;
+            textureDesc.Usage = D3D11_USAGE_DEFAULT;
+            textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+            textureDesc.CPUAccessFlags = 0;
+
+            SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
+        }
+
+            context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
+        }
+
+
+    } else {
+        HRESULT hr;
+        hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&SavedD3D11BackBuffer));
+        if (FAILED(hr))  std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
+    }
 }

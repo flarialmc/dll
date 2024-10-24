@@ -9,14 +9,12 @@
 class DimensionFogColorHook : public Hook {
 private:
 
-    static MCCColor &
-    DimensionFogColorCallback(Dimension *_this, MCCColor &result, MCCColor const &baseColor, float brightness) {
+    static MCCColor &DimensionFogColorCallback(Dimension *_this, MCCColor &result, MCCColor const &baseColor, float brightness) {
 
-        FogColorEvent event(funcOriginal(_this, result, baseColor, brightness));
-        EventHandler::onGetFogColor(event);
+        auto event = nes::make_holder<FogColorEvent>(funcOriginal(_this, result, baseColor, brightness));
+        eventMgr.trigger(event);
 
-        return event.getFogColor();
-
+        return event->getFogColor();
     }
 
 public:
@@ -24,7 +22,7 @@ public:
 
     static inline dimensionFogColorOriginal funcOriginal = nullptr;
 
-    DimensionFogColorHook() : Hook("Fog Color Hook", GET_SIG("Dimension::getBrightnessDependentFogColor")) {}
+    DimensionFogColorHook() : Hook("Fog Color Hook", GET_SIG_ADDRESS("Dimension::getBrightnessDependentFogColor")) {}
 
     void enableHook() override {
 

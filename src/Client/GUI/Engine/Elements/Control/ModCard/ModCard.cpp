@@ -1,6 +1,6 @@
 #include "../../../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
-#include "../../../../../Module/Modules/ClickGUI/ClickGUIRenderer.hpp"
 #include "../../../../../../Assets/Assets.hpp"
+#include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -74,12 +74,12 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     if (FlarialGUI::CursorInRect(x, realY, BottomRoundedWidth, BottomRoundedHeight)) {
 
-        FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.198f, "height", true),
+        FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.186f, "height", true),
                          0.15f * FlarialGUI::frameFactor);
         FlarialGUI::lerp(sizes[index].y, Constraints::RelativeConstraint(0.149f, "height", true),
                          0.15f * FlarialGUI::frameFactor);
 
-        diffX = (sizes[index].x - Constraints::RelativeConstraint(0.19f, "height", true)) / 2.0f;
+        diffX = (sizes[index].x - Constraints::RelativeConstraint(0.178f, "height", true)) / 2.0f;
         diffY = (sizes[index].y - Constraints::RelativeConstraint(0.141f, "height", true)) / 2.0f;
 
         FlarialGUI::lerp(shadowSizes[index].x, BottomRoundedWidth, 0.25f * FlarialGUI::frameFactor);
@@ -87,7 +87,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     } else {
 
-        FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.19f, "height", true),
+        FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.178f, "height", true),
                          0.15f * FlarialGUI::frameFactor);
         FlarialGUI::lerp(sizes[index].y, Constraints::RelativeConstraint(0.141f, "height", true),
                          0.15f * FlarialGUI::frameFactor);
@@ -95,7 +95,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         FlarialGUI::lerp(shadowSizes[index].x, 0.01f, 0.01f * FlarialGUI::frameFactor);
         FlarialGUI::lerp(shadowSizes[index].y, 0.01f, 0.01f * FlarialGUI::frameFactor);
 
-        diffX = (sizes[index].x - Constraints::RelativeConstraint(0.19f, "height", true)) / 2.0f;
+        diffX = (sizes[index].x - Constraints::RelativeConstraint(0.178f, "height", true)) / 2.0f;
         diffY = (sizes[index].y - Constraints::RelativeConstraint(0.141f, "height", true)) / 2.0f;
 
     }
@@ -132,7 +132,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     FlarialGUI::PushSize(x, y, BottomRoundedWidth, BottomRoundedHeight);
     // Mod Name
-    float textx = Constraints::PercentageConstraint(0.1405, "left");
+    float textx = Constraints::PercentageConstraint(0.119, "left");
     float texty = Constraints::PercentageConstraint(0.415, "top");
     float textWidth = Constraints::RelativeConstraint(1.0);
     float textHeight = Constraints::RelativeConstraint(0.2);
@@ -246,7 +246,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     buttonColor = D2D1::ColorF(FlarialGUI::buttonColors[index].r - FlarialGUI::darkenAmounts[index], FlarialGUI::buttonColors[index].g - FlarialGUI::darkenAmounts[index],
                                    FlarialGUI::buttonColors[index].b - FlarialGUI::darkenAmounts[index], FlarialGUI::buttonColors[index].a);
 
-    FlarialGUI::RoundedRect((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.155f, paddingwidth), buttony - buttonHeight,
+    FlarialGUI::RoundedRect((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.105f, paddingwidth), buttony - buttonHeight,
                                   buttonColor, buttonWidth - Constraints::SpacingConstraint(1.5, paddingwidth), buttonHeight, 0.f, 0.f);
 
     if (FlarialGUI::RoundedButton(index, buttonx - buttonWidth, buttony - buttonHeight,
@@ -254,25 +254,25 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
                                   L"", buttonWidth, buttonHeight, round.x,
                                   round.x)) {
         mod->toggle();
-                                  }
+    }
 
     FlarialGUI::FlarialTextWithFont((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.15f, paddingwidth), buttony - buttonHeight, FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, DWRITE_TEXT_ALIGNMENT_CENTER, buttonWidth * 1.08, DWRITE_FONT_WEIGHT_NORMAL, false);
 
     if (FlarialGUI::isInScrollView)
         buttony += FlarialGUI::scrollpos;
 
-    if (FlarialGUI::CursorInRect(buttonx - paddingspacing, (buttony - paddingwidth) - paddingheightspac,
-                                 paddingwidth, paddingwidth) && MC::mouseButton == MouseButton::Left &&
+    if (FlarialGUI::CursorInRect(settingx, buttony - buttonHeight,
+                                 paddingwidth + Constraints::RelativeConstraint(0.26), buttonHeight) && MC::mouseButton == MouseButton::Left &&
         !MC::held) {
         FlarialGUI::TextBoxes[0].isActive = false;
         MC::mouseButton = MouseButton::None;
-        ClickGUIRenderer::page.type = "settings";
-        ClickGUIRenderer::page.module = mod->name;
+        ClickGUI::page.type = "settings";
+        ClickGUI::page.module = mod->name;
         FlarialGUI::TextBoxes[0].isActive = false;
         FlarialGUI::scrollpos = 0;
         FlarialGUI::barscrollpos = 0;
-        GUIMouseListener::accumilatedPos = 0;
-        GUIMouseListener::accumilatedBarPos = 0;
+        ClickGUI::accumilatedPos = 0;
+        ClickGUI::accumilatedBarPos = 0;
     }
     FlarialGUI::PopSize();
 }

@@ -6,7 +6,6 @@
 #include "../../../GUI/D2D.hpp"
 #include "SwapchainHook.hpp"
 #include "../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
-#include "../../../Module/Modules/MotionBlur/MotionBlurListener.hpp"
 #include "../../../Module/Manager.hpp"
 #include "../../../GUI/Engine/Elements/Structs/ImagesClass.hpp"
 #include "../../../../../lib/ImGui/imgui.h"
@@ -24,7 +23,7 @@ void ResizeHook::enableHook() {
 
 }
 
-ResizeHook::ResizeHook() : Hook("ResizeHook", "") {}
+ResizeHook::ResizeHook() : Hook("ResizeHook", 0) {}
 
 void ResizeHook::call() {
 
@@ -33,6 +32,7 @@ void ResizeHook::call() {
 void
 ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT width, UINT height, DXGI_FORMAT newFormat,
                            UINT flags) {
+
     ResizeHook::cleanShit(true);
 
     SwapchainHook::init = false;
@@ -44,10 +44,18 @@ ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT wi
                 if(SDK::clientInstance!=nullptr)
                     SDK::clientInstance->releaseMouse();
 
-    return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, flags);
+    return funcOriginal(pSwapChain, bufferCount, width, height, newFormat,  DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
 }
+
 // TODO: get back to this to check
 void ResizeHook::cleanShit(bool isResize) {
+
+    Memory::SafeRelease(SwapchainHook::stageTex);
+    Memory::SafeRelease(SwapchainHook::SavedD3D11BackBuffer);
+    Memory::SafeRelease(SwapchainHook::ExtraSavedD3D11BackBuffer);
+
+    Blur::hasDoneFrames = false;
+    for(ID3D11Texture2D* tex : Blur::framebuffers){ Memory::SafeRelease(tex); Blur::framebuffers.clear();}
 
     for (auto &i: ClickGUIElements::images) {
         Memory::SafeRelease(i.second);

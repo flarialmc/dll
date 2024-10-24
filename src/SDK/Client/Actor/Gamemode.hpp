@@ -1,10 +1,15 @@
 #pragma once
 
 #include "../../src/Utils/Memory/Memory.hpp"
-#include "Player.hpp"
+
+FK(Player)
 
 class Gamemode {
 public:
-    BUILD_ACCESS(this, Player*, player, GET_OFFSET("Gamemode::player"));
-    BUILD_ACCESS(this, float, lastBreakProgress, GET_OFFSET("Gamemode::lastBreakProgress"));
+    Player* getPlayer() {
+        return hat::member_at<Player*>(this, GET_OFFSET("Gamemode::player"));
+    };
+    float getLastBreakProgress() {
+        return hat::member_at<float>(this, GET_OFFSET("Gamemode::lastBreakProgress"));
+    };
 };

@@ -5,35 +5,32 @@
 
 ClientInstance *SDK::clientInstance = nullptr;
 ScreenView *SDK::screenView = nullptr;
-std::string SDK::currentScreen;
-bool SDK::hasInstanced = false;
-__int64 SDK::serverPing = 0;
 
-std::chrono::steady_clock::time_point SDK::lastSetCurrentScreenTime;
+std::string SDK::currentScreen;
+
+bool SDK::hasInstanced = false;
+uint64_t SDK::serverPing = 0;
+
 
 std::shared_ptr<Packet> SDK::createPacket(int id) {
 
     static uintptr_t Address;
 
     if (Address == NULL) {
-        Address = Memory::findSig(GET_SIG("MinecraftPackets::createPacket"));
+        Address = GET_SIG_ADDRESS("MinecraftPackets::createPacket");
     }
 
     auto pFunction = reinterpret_cast<std::shared_ptr<Packet>(__fastcall *)(int)>(Address);
     return pFunction(id);
 }
 
+// TODO: use CI::GetScreenName
 void SDK::setCurrentScreen(const std::string& layer) {
     SDK::currentScreen = layer;
-    return;
-    // TODO: use CI::GetScreenName
-//    auto currentTime = std::chrono::steady_clock::now();
-//    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastSetCurrentScreenTime).count();
-//
-//    if (layer != SDK::currentScreen && elapsedTime >= (layer == SDK::currentScreen ? 16 : 500)) {
-//        lastSetCurrentScreenTime = std::chrono::steady_clock::now();
-//        SDK::currentScreen = layer;
-//    }
+}
+
+std::string SDK::getCurrentScreen() {
+    return SDK::currentScreen;
 }
 
 int SDK::getServerPing() {

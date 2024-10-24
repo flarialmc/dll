@@ -45,6 +45,9 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     const bool isAdditionalY = shouldAdditionalY;
     const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
     const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
+
+    y -= percHeight / 2.0f;
+
     float childHeights = Constraints::RelativeConstraint(0.030, "height", true);
     float maxHeight = ((float)options.size() - 1.0f) * childHeights + 2.0f;
     float addYVal = maxHeight + Constraints::SpacingConstraint(0.05, textWidth);
@@ -108,12 +111,11 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 
     if (FlarialGUI::DropDownMenus[index].isActive) {
         //y = originalY;
+        if(additionalY[additionalIndex] < 0) additionalY[additionalIndex] = 0;
 
-        if (!FlarialGUI::DropDownMenus[index].offsettedQ) {
-            //FlarialGUI::DropDownMenus[index].offsetted = additionalY + addYVal;
-            FlarialGUI::DropDownMenus[index].offsettedQ = true;
-            additionalY[additionalIndex] += addYVal;
-        }
+
+        FlarialGUI::lerp(additionalY[additionalIndex], addYVal, 0.25f * FlarialGUI::frameFactor);
+
         FlarialGUI::lerp(y, originalY, 0.25f * FlarialGUI::frameFactor);
         FlarialGUI::DropDownMenus[index].curColor = FlarialGUI::LerpColor(FlarialGUI::DropDownMenus[index].curColor,
                                                                           selectedCol, 0.1f * FlarialGUI::frameFactor);
@@ -126,11 +128,8 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     } else {
         //y = originalY - maxHeight;
 
-        if (FlarialGUI::DropDownMenus[index].offsettedQ) {
-            additionalY[additionalIndex] -= addYVal;
-            //FlarialGUI::DropDownMenus[index].offsetted = additionalY - addYVal;
-            FlarialGUI::DropDownMenus[index].offsettedQ = false;
-        }
+        FlarialGUI::lerp(additionalY[additionalIndex], -50.f, 0.1f * FlarialGUI::frameFactor);
+
         FlarialGUI::lerp(y, originalY - maxHeight, 0.25f * FlarialGUI::frameFactor);
         FlarialGUI::DropDownMenus[index].curColor = FlarialGUI::LerpColor(FlarialGUI::DropDownMenus[index].curColor,
                                                                           unselectedChildCol,
@@ -276,15 +275,22 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     D2D::context->SetTransform(oldTransform);
     */
 
+    if (FlarialGUI::isInScrollView) {
+        iy += FlarialGUI::scrollpos;
+    }
     auto rectf = D2D1::RectF(ix, iy, ix + is, iy + is);
 
     float rotationAngle = FlarialGUI::DropDownMenus[index].rotation;
-    ImVec2 rotationCenter(ix + is / 2.0f, iy + is / 2.0f);
+    ImVec2 rotationCenter(ix + is / 2, iy + is / 2);
 
     FlarialGUI::ImRotateStart();
-    FlarialGUI::image(IDR_DOWN_PNG, rectf, "PNG", true);
+    FlarialGUI::image(IDR_DOWN_PNG, rectf, "PNG", false);
     FlarialGUI::ImRotateEnd(rotationAngle, rotationCenter);
 
+
+    if (FlarialGUI::isInScrollView) {
+        iy -= FlarialGUI::scrollpos;
+    }
 
     FlarialGUI::RoundedRect(ix - 8, iy - 5,
                             FlarialGUI::DropDownMenus[index].isActive ? D2D1::ColorF(D2D1::ColorF::White)

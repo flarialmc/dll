@@ -14,7 +14,6 @@ private:
         color->b = 0.227451f;
         std::string txt("Flarial on top!");
         funcOriginal(_this, screenContext, txt, x, y, color, angle, s, centered, maxWidth);
-
     }
 
 public:
@@ -23,7 +22,7 @@ public:
 
     static inline FontDrawTransformedOriginal funcOriginal = nullptr;
 
-    FontDrawTransformedHook() : Hook("Font drawTransformed Hook",GET_SIG("Font::drawTransformed")) {}
+    FontDrawTransformedHook() : Hook("Font drawTransformed Hook",GET_SIG_ADDRESS("Font::drawTransformed")) {}
 
     void enableHook() override {
 

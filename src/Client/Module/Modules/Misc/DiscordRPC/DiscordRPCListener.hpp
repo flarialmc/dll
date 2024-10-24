@@ -1,26 +1,30 @@
 #pragma once
 
 #include "../../../../Hook/Hooks/Input/MouseHook.hpp"
-#include "../../../../Events/Listener.hpp"
 #include "../../../../Client.hpp"
 
 class DiscordRPCListener : public Listener {
-public:
+private:
     std::string previousIp;
-
-    void onTick(TickEvent &event) override {
+public:
+    void onTick(TickEvent &event) {
         handleServerIpChange();
     }
 
-    void onRender(RenderEvent &event) override {
+    void onRender(RenderEvent &event) {
         if (SDK::getServerPing() == -1) {
             handleServerIpChange();
         }
     }
 
-public:
-    explicit DiscordRPCListener(const char string[5]) {
-        this->name = string;
+    DiscordRPCListener() {
+        Listen(this, TickEvent, &DiscordRPCListener::onTick);
+        Listen(this, RenderEvent, &DiscordRPCListener::onRender);
+    }
+
+    ~DiscordRPCListener() {
+        Deafen(this, TickEvent, &DiscordRPCListener::onTick);
+        Deafen(this, RenderEvent, &DiscordRPCListener::onRender);
     }
 
 private:

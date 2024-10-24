@@ -1,9 +1,8 @@
 #include "MouseHook.hpp"
-#include "../../../Events/EventHandler.hpp"
 #include "../../../Client.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
-MouseHook::MouseHook() : Hook("mouse_hook",GET_SIG("MouseDevice::feed")) {
+MouseHook::MouseHook() : Hook("mouse_hook",GET_SIG_ADDRESS("MouseDevice::feed")) {
 }
 
 void MouseHook::enableHook() {
@@ -22,12 +21,11 @@ void MouseHook::mouseCallback(void *mouseDevice, char button, char action, short
     // rest -> Mouse button, state
 
     // parm_1, parm_8 (might be isScrolling?) -> ???
+    auto event = nes::make_holder<MouseEvent>(button, action, mouseX, mouseY);
+    eventMgr.trigger(event);
 
-    MouseEvent event(button, action, mouseX, mouseY);
-    EventHandler::onMouse(event);
-
-    if (!event.isCancelled()) {
-        return funcOriginal(mouseDevice, event.getButton(), event.getActionAsChar(), mouseX, mouseY, movementX,
+    if (!event->isCancelled()) {
+        return funcOriginal(mouseDevice, event->getButton(), event->getActionAsChar(), mouseX, mouseY, movementX,
                             movementY, a8);
     }
 }

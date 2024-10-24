@@ -1,5 +1,5 @@
 #include "../../../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
-#include "../../../../../Module/Modules/ClickGUI/ClickGUIRenderer.hpp"
+#include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -45,7 +45,7 @@ static std::string name = "";
 
 std::string ClickGUIElements::SearchBar(int index, std::string &text, int limit, float x, float y) {
 
-    if (ClickGUIRenderer::page.type == "normal" && ClickGUIRenderer::curr == "modules") {
+    if (ClickGUI::page.type == "normal" && ClickGUI::curr == "modules") {
 
         D2D1_COLOR_F col;
 

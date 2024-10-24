@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../../Module/Modules/ClickGUI/ClickGUIRenderer.hpp"
+#include "../../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
 
 void ClickGUIElements::convertImageToBitmap(ID2D1Image *pImg, D2D1_SIZE_U size) {
     ID2D1Image *oldTarget = nullptr;

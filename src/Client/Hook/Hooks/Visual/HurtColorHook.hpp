@@ -9,10 +9,10 @@ private:
 
     static MCCColor *HurtColorCallback(void *a1, MCCColor *color, void *a3) {
 
-        HurtColorEvent event(funcOriginal(a1, color, a3));
-        EventHandler::onGetHurtColor(event);
+        auto event = nes::make_holder<HurtColorEvent>(funcOriginal(a1, color, a3));
+        eventMgr.trigger(event);
 
-        return event.getHurtColor();
+        return event->getHurtColor();
 
     }
 
@@ -21,13 +21,10 @@ public:
 
     static inline HurtColorOriginal funcOriginal = nullptr;
 
-    HurtColorHook() : Hook("Hurt Color Hook", "") {}
+    HurtColorHook() : Hook("Hurt Color Hook", GET_SIG_ADDRESS("HurtColor")) {}
 
     void enableHook() override {
-
-        auto RefAddr = Memory::findSig(GET_SIG("HurtColor"));
-        auto RealFunc = Memory::offsetFromSig(RefAddr, 1);
-
+        auto RealFunc = Memory::offsetFromSig(address, 1);
 
         this->manualHook((void *) RealFunc, (void*)HurtColorCallback, (void **) &funcOriginal);
     }

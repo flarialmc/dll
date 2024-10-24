@@ -15,10 +15,10 @@ private:
             Options::initialize(a1);
         }
 
-        GammaEvent event(funcOriginal(a1));
-        EventHandler::onGetGamma(event);
+        auto event = nes::make_holder<GammaEvent>(funcOriginal(a1));
+        eventMgr.trigger(event);
 
-        return event.getGamma();
+        return event->getGamma();
     }
 
 public:
@@ -26,7 +26,7 @@ public:
 
     static inline getGammaOriginal funcOriginal = nullptr;
 
-    getGammaHook() : Hook("getGammaHook",GET_SIG("Options::getGamma")) {}
+    getGammaHook() : Hook("getGammaHook",GET_SIG_ADDRESS("Options::getGamma")) {}
 
     void enableHook() override {
         this->autoHook((void *) getGammaCallback, (void **) &funcOriginal);
