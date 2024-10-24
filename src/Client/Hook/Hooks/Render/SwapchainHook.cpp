@@ -234,13 +234,17 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         if(init && initImgui && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImages();
     } catch (const std::exception &ex) { return 0; }
 
-    if (Client::settings.getSettingByName<bool>("vsync")->value) {
-        flags |= DXGI_PRESENT_ALLOW_TEARING;
-        syncInterval = 0;
-    }
+//    if (Client::settings.getSettingByName<bool>("vsync")->value) {
+//        flags |= DXGI_PRESENT_ALLOW_TEARING;
+//        syncInterval = 0;
+//    }
+//
+//    if (Client::settings.getSettingByName<bool>("donotwait")->value) {
+//        flags |= DXGI_PRESENT_DO_NOT_WAIT;
+//    }
 
-    if (Client::settings.getSettingByName<bool>("donotwait")->value) {
-        flags |= DXGI_PRESENT_DO_NOT_WAIT;
+    if (Client::settings.getSettingByName<bool>("vsync")->value) {
+        return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
     }
 
 return funcOriginal(pSwapChain, syncInterval, flags);
