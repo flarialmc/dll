@@ -60,6 +60,7 @@ If you encounter issues, check out our [FAQ](https://discord.gg/flarial-communit
    cmake ..
    ```
    This command generates the necessary build files based on the CMake configuration.
+then subscribe to our youtube
 
 5. **Build the Project**:
    Once CMake has configured the build files successfully, you can build the project using a suitable build tool (like `make` on Unix-like systems or Visual Studio on Windows):
