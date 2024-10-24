@@ -3,13 +3,10 @@
 #include <string>
 #include <unordered_map>
 
-#include "../Actor/Actor.hpp"
 #include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include "libhat/Access.hpp"
 #include "HitResult.hpp"
 #include "../../../Utils/Versions/WinrtUtils.hpp"
-
-class Actor;
 
 class mcUUID {
 public:
@@ -41,16 +38,11 @@ public:
     HitResult &getHitResult() {
         static int offset = GET_OFFSET("Level::hitResult");
 
-        if (WinrtUtils::check(20, 60))
+        if (WinrtUtils::checkAboveOrEqual(20, 60))
             return *hat::member_at<std::shared_ptr<HitResult>>(this, offset);
 
         return hat::member_at<HitResult>(this, offset);
     }
 
-    std::vector<Actor *> getRuntimeActorList() {
-        // TODO prevent crashing !!!
-        static uintptr_t sig = GET_SIG_ADDRESS("Level::getRuntimeActorList");
-        static auto getRuntimeActorList = *(decltype(&Level::getRuntimeActorList) *) &sig;
-        return (this->*getRuntimeActorList)();
-    }
+    std::vector<Actor *> getRuntimeActorList();
 };

@@ -3,6 +3,34 @@
 #include "../../../Logger/Logger.hpp"
 #include "../SignatureAndOffsetManager.hpp"
 
+void OffsetInit::init2140() {
+    Logger::debug("[Offsets] Loading offsets for 1.21.4X");
+    ADD_OFFSET("Level::hitResult", 0x248);
+
+    ADD_OFFSET("Player::gamemode", 0xB28);
+    ADD_OFFSET("Player::playerName", 0xCB0);
+
+    ADD_OFFSET("ClientInstance::levelRenderer", 0xE8);
+
+    //ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x0); No longer exists?
+
+    ADD_OFFSET("ClientInstance::viewMatrix", 0x368);
+    ADD_OFFSET("ClientInstance::guiData", 0x590);
+
+    ADD_OFFSET("ClientInstance::getFovX", 0x728);
+    ADD_OFFSET("ClientInstance::getFovY", 0x73C);
+
+    ADD_OFFSET("RaknetConnector::getPeer", 0x2A0);
+    ADD_OFFSET("RaknetConnector::JoinedIp", 0x398);
+
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x318);
+    ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x620);
+
+    ADD_OFFSET("ClientInstance::getPacketSender", 0xF8);
+    ADD_OFFSET("NetworkSystem::remoteConnectorComposite", 0x90);
+    ADD_OFFSET("RemoteConnectorComposite::rakNetConnector", 0x70);
+}
+
 void OffsetInit::init2130() {
     Logger::debug("[Offsets] Loading offsets for 1.21.3X");
 

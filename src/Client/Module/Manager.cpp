@@ -124,21 +124,29 @@ void ModuleManager::initialize() {
     addModule<Sneak>();
     addModule<Sprint>();
     addModule<Hitbox>();
-    addModule<ThirdPerson>();
+
+    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
+        addModule<ThirdPerson>();
+        addModule<HurtColor>();
+    }
+
     addModule<SnapLook>();
-    addModule<HurtColor>();
     addModule<FogColor>();
     addModule<ArmorHUD>();
     addModule<TimeChanger>();
     addModule<RenderOptions>();
     addModule<PaperDoll>();
     addModule<GuiScale>();
-    addModule<WeatherChanger>();
-    addModule<TabList>();
+
+    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
+        addModule<TabList>();
+        addModule<WeatherChanger>();
+        addModule<NickModule>();
+        addModule<FreeLook>();
+    }
+
     addModule<AutoGG>();
     addModule<TextHotkey>();
-    addModule<NickModule>();
-    addModule<FreeLook>();
     addModule<SpeedDisplay>();
     addModule<CPSLimiter>();
     addModule<BlockBreakIndicator>();
@@ -158,7 +166,9 @@ void ModuleManager::initialize() {
 
     // addModule<MovableChat>();
     // addModule<CompactChat>();
-    addModule<ItemPhysics>();
+    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
+        addModule<ItemPhysics>();
+    }
 
     addModule<HiveStat>();
 

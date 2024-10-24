@@ -13,6 +13,7 @@ void Hook::enableHook() {
 }
 
 bool Hook::autoHook(void *callbackPtr, void **funcOriginal) {
+    if(address == 0) return false;
     return this->manualHook((void *) address, callbackPtr, funcOriginal);
 }
 

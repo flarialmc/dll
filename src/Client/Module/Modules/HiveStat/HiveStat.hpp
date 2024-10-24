@@ -157,7 +157,7 @@ public:
 
 
         if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() ||
-            !SDK::clientInstance->getMinecraftGame()->mouseGrabbed ||
+            SDK::getCurrentScreen() != "hud_screen" ||
             !SDK::clientInstance->getLocalPlayer()->getLevel()) {
             return;
         }

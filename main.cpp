@@ -74,7 +74,7 @@ DWORD WINAPI init(HMODULE real)
 
                             if(SDK::clientInstance != nullptr)
                             if(SDK::clientInstance->getLocalPlayer() != nullptr) {
-                                if (module->isEnabled()) {
+                                if (module && module->isEnabled()) {
                                     name = Utils::removeNonAlphanumeric(
                                             Utils::removeColorCodes(NickModule::original));
                                     name = replaceAll(name, "�", "");

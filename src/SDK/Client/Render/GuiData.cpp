@@ -13,7 +13,7 @@ void GuiData::displayClientMessage(const std::string &str) {
         sig = GET_SIG_ADDRESS("GuiData::displayClientMessage");
     }
 
-    if (WinrtUtils::check(21, 20)) {
+    if (WinrtUtils::checkAboveOrEqual(21, 20)) {
         char bruh[0x28]{};
 
         using func_t = void(*)(GuiData*, const std::string&, char*, bool);

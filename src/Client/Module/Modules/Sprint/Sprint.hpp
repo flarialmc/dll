@@ -149,7 +149,7 @@ public:
     void onTick(TickEvent &event) {
         if (SDK::clientInstance != nullptr) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                MoveInputComponent *handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
+                auto *handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
                 if (handler->forward) {
                     if (this->settings.getSettingByName<bool>("always")->value) {

@@ -131,7 +131,7 @@ public:
     void enableHook() override {
         static auto sig = Memory::offsetFromSig(address, 1);
 
-        if (WinrtUtils::check(20, 40))
+        if (WinrtUtils::checkAboveOrEqual(20, 40))
             this->manualHook( (void*) sig, (void*) BaseActorRenderer_renderTextCallback40, (void **) &funcOriginal40);
         else
             this->manualHook( (void*) sig, (void*) BaseActorRenderer_renderTextCallback, (void **) &funcOriginal);

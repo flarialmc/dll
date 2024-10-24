@@ -246,11 +246,13 @@ struct UnifiedMobEffectData {
 
 struct MobEffectsComponent1_21_20
 {
+    static constexpr hat::fixed_string type_name = "struct MobEffectsComponent";
     std::vector<MobEffectInstance1_21_20> effects;
 };
 
 struct MobEffectsComponent1_21_30
 {
+    static constexpr hat::fixed_string type_name = "struct MobEffectsComponent";
     std::vector<MobEffectInstance1_21_30> effects;
 };
 
@@ -262,7 +264,7 @@ private:
 public:
     [[nodiscard]] std::vector<UnifiedMobEffectData> getUnifiedEffects() const {
         std::vector<UnifiedMobEffectData> unifiedEffects;
-        if (WinrtUtils::check(21, 30)) {
+        if (WinrtUtils::checkAboveOrEqual(21, 30)) {
             auto& _effects =  hat::member_at<std::vector<MobEffectInstance1_21_30>>(this, 0x0);
             for (auto &effect : _effects) {
                 unifiedEffects.emplace_back(effect.id, effect.duration, effect.amplifier);

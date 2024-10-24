@@ -109,7 +109,7 @@ Add 0xB8 to 1st arg getRuntimeActorList gets called with and you get the offset
 
 ### Level::hitResult
 // for newer versions
-48 8b 81 ? ? ? ? 48 85 c0 74 ? 48 83 c0 ? 48 83 c4 - gives multiple results, last one is the correct one
+48 8b 81 ? ? ? ? 48 85 c0 74 ? 48 83 c0 ? 48 83 c4 - gives multiple results, last one is the correct one, as of .40 2nd from end is it
 48 8b 81 ? ? ? ? 48 85 c0 74 ? 48 83 c0 ? 48 83 c4 ? c3 e8 ? ? ? ? cc cc 48 8d 81 ? ? ? ? c3 cc cc cc cc cc cc cc cc 40 53
 48 8b 81 ? ? ? ? 48 85 c0 74 ? 48 83 c4 ? c3 e8 ? ? ? ? cc cc cc cc cc cc 48 83 ec ? 48 8b 81 ? ? ? ? 48 85 c0 74 ? 48 83 c0 ? 48 83 c4 ? c3 e8 ? ? ? ? cc cc 48 8d 81
 
@@ -149,6 +149,9 @@ Memory::GetAddressByIndex(vtableAddr, function
 
 
 # Sigs to functions
+### Font::drawTransformed
+splashes.json
+
 ### ItemRenderer::renderGuiItemNew
 textures/entity/shulker/shulker_
 xref out 1 time, then xref to last func and here you go
@@ -182,3 +185,10 @@ textures/ui/hud_mob_effect_background
 
 ### ActorCollision::isOnGround
 minecraft:arrow_spell_emitter
+
+### ItemStack::isEnchanted
+variable.is_enchanted (above that)
+48 83 EC 38 48 8B 49 10 48 85 C9 74 ?
+
+### ClientInstance::grabMouse
+accessibility.game.playerView (somewhere above that)

@@ -81,14 +81,16 @@ public:
     void onSetupAndRender(SetupAndRenderEvent &event) {
         std::lock_guard<std::mutex> guard(renderMtx);
         aabbsToRender.clear();
-        if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->getMinecraftGame()->mouseGrabbed ||
+        if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
             !SDK::clientInstance->getLocalPlayer()->getLevel())
             return;
         auto player = SDK::clientInstance->getLocalPlayer();
         auto selectedEntity = player->getLevel()->getHitResult().getEntity();
         for (const auto &ent: player->getLevel()->getRuntimeActorList()) {
-            if (ent != nullptr && ent != player && ent->hasCategory(ActorCategory::Mob) /*&& ent->isPlayer() && ent->hasCategory(ActorCategory::Player)*/) {
-                float dist = player->getPosition()->dist(*ent->getPosition());
+            auto pos = ent->getPosition();
+            if(!pos) continue;
+            if (ent != nullptr && ent != player && ent->hasCategory(ActorCategory::Mob)/*&& ent->isPlayer() && ent->hasCategory(ActorCategory::Player)*/) {
+                float dist = player->getPosition()->dist(*pos);
                 // This may let through some entites
                 if (!ent->isValidAABB() || dist > 30 || !player->canSee(*ent) ||
                     ent->getActorFlag(ActorFlags::FLAG_INVISIBLE))
@@ -106,7 +108,7 @@ public:
 
     void onRender(RenderEvent &event) {
 
-        if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->getMinecraftGame()->mouseGrabbed ||
+        if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
             !SDK::clientInstance->getLocalPlayer()->getLevel())
             return;
 
@@ -142,7 +144,7 @@ public:
 
                 DrawUtils::addBox(aabbInfo.aabb.lower, aabbInfo.aabb.upper, staticThickness ? thickness : lineWidth, outline ? 2 : 1, color2);
 
-                DrawUtils::addBox(aabbInfo.hitbox.lower, aabbInfo.hitbox.upper, staticThickness ? thickness : lineWidth, outline ? 2 : 1, aabbInfo.selected ? FlarialGUI::rgbColor :color2);
+                //DrawUtils::addBox(aabbInfo.hitbox.lower, aabbInfo.hitbox.upper, staticThickness ? thickness : lineWidth, outline ? 2 : 1, aabbInfo.selected ? FlarialGUI::rgbColor :color2);
             }
         }
     }

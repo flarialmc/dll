@@ -50,7 +50,7 @@ void HookManager::initialize() {
     addHook<SwapchainHook>();
     addHook<ResizeHook>();
 
-    addHook<TextureGroup_getTextureHook>();
+    //addHook<TextureGroup_getTextureHook>();
     addHook<getViewPerspectiveHook>();
     addHook<RaknetTickHook>();
     addHook<SetUpAndRenderHook>();
@@ -68,7 +68,7 @@ void HookManager::initialize() {
     addHook<SendPacketHook>();
     addHook<getSensHook>();
     addHook<HudMobEffectsRendererHook>();
-    addHook<BaseActorRendererRenderTextHook>();
+    //addHook<BaseActorRendererRenderTextHook>();
 
     for (const auto& hook: hooks)
         hook->enableHook();

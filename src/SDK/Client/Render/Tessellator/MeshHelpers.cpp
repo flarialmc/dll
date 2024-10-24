@@ -3,7 +3,7 @@
 #include "../../../../Utils/Versions/WinrtUtils.hpp"
 
 void MeshHelpers::renderMeshImmediately(ScreenContext* screenContext, Tessellator* tessellator, mce::MaterialPtr* material) {
-    if (WinrtUtils::check(21, 20)) {
+    if (WinrtUtils::checkAboveOrEqual(21, 20)) {
         char pad[0x58]{};
         static auto sig = Memory::offsetFromSig(GET_SIG_ADDRESS("MeshHelpers::renderMeshImmediately"), 1);
         using func_t = void(*)(ScreenContext*, Tessellator*, mce::MaterialPtr*, char*);
@@ -19,7 +19,7 @@ void MeshHelpers::renderMeshImmediately(ScreenContext* screenContext, Tessellato
 }
 
 void MeshHelpers::renderMeshImmediately2(ScreenContext* screenContext, Tessellator* tessellator, mce::MaterialPtr* material, BedrockTextureData& texture) {
-    if (WinrtUtils::check(21, 20)) {
+    if (WinrtUtils::checkAboveOrEqual(21, 20)) {
         char pad[0x58]{};
         static auto sig = GET_SIG_ADDRESS("MeshHelpers::renderMeshImmediately2");
         using func_t = void(*)(ScreenContext*, Tessellator*, mce::MaterialPtr*, BedrockTextureData&, char*);

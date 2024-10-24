@@ -289,7 +289,7 @@ public:
                 enabledColor.a = settings.getSettingByName<float>("enabledOpacity")->value;
                 textEnabledColor.a = settings.getSettingByName<float>("textEnabledOpacity")->value;
 
-                MoveInputComponent *handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
+                auto *handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
                 if (handler->forward) {
                     states[Strokes::W] = FlarialGUI::LerpColor(states[Strokes::W], enabledColor,

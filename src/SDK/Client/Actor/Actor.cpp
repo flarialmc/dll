@@ -6,10 +6,11 @@
 #include "../../SDK.hpp"
 #include "../../../Client/GUI/Engine/Engine.hpp"
 #include "Components/OnGroundFlagComponent.hpp"
+#include "Components/CameraComponent.hpp"
 
 template<typename Component>
 Component *Actor::tryGet(uintptr_t addr) {
-    if(WinrtUtils::check(21, 00) || addr == 0) {
+    if(WinrtUtils::checkAboveOrEqual(21, 00) || addr == 0) {
         auto& ctx = GetEntityContextV1_20_50();
         Component* component = ctx.tryGetComponent<Component>();
         return component;
@@ -20,7 +21,7 @@ Component *Actor::tryGet(uintptr_t addr) {
 
 template<typename Component>
 Component *Actor::tryGetOld(uintptr_t addr) {
-    if(WinrtUtils::check(20, 50)) {
+    if(WinrtUtils::checkAboveOrEqual(20, 50)) {
         auto ctx = GetEntityContextV1_20_50();
         EntityId id = ctx.entity;
         using efunc = Component *(__thiscall *)(entt::basic_registry<EntityId>&, const EntityId &);
@@ -38,7 +39,7 @@ Component *Actor::tryGetOld(uintptr_t addr) {
 
 template<typename Component>
 bool Actor::hasComponent(uintptr_t addr) {
-    if(WinrtUtils::check(21, 00) || addr == 0) {
+    if(WinrtUtils::checkAboveOrEqual(21, 00) || addr == 0) {
         return this->GetEntityContextV1_20_50().hasComponent<Component>();
     } else {
         return tryGetOld<Component>(addr) != nullptr;
@@ -66,7 +67,7 @@ bool Actor::canSee(const Actor& actor) {
     using canSeeFunc = bool (__fastcall *)(Actor *, const Actor&);
     static uintptr_t sig;
     if (sig == NULL) {
-        if (!WinrtUtils::check(20, 40)) {
+        if (!WinrtUtils::checkAboveOrEqual(20, 40)) {
             sig = GET_SIG_ADDRESS("Actor::canSee");
         } else {
             sig = Memory::offsetFromSig(GET_SIG_ADDRESS("Actor::canSee"), 1);
@@ -76,20 +77,22 @@ bool Actor::canSee(const Actor& actor) {
     return canSee(this, actor);
 }
 
-uint64_t Actor::getRuntimeID() {
-    return this->GetEntityContextV1_20_50().entity.mRawId;
-}
-
 ActorDataFlagComponent* Actor::getActorDataFlagComponent() {
-    if(!WinrtUtils::check(20, 80)) return nullptr;
+    if(!WinrtUtils::checkAboveOrEqual(20, 80)) return nullptr;
+    static uintptr_t sig;
 
-    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorDataFlagComponent"));
+    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+        if (sig == NULL) {
+            sig = Memory::findSig(
+                    std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorDataFlagComponent"));
+        }
+    }
 
     return tryGet<ActorDataFlagComponent>(sig);
 }
 
 bool Actor::getActorFlag(ActorFlags flag) {
-    if(WinrtUtils::check(21, 20)) {
+    if(WinrtUtils::checkAboveOrEqual(21, 20)) {
         auto actorDataFlagComponent = Actor::getActorDataFlagComponent();
 
         if(!actorDataFlagComponent) return false;
@@ -100,28 +103,50 @@ bool Actor::getActorFlag(ActorFlags flag) {
     return Memory::CallVFuncI<bool, int>(off, this, flag);
 }
 
+Vec3<float> Actor::getOrigin() {
+    auto* cameraComponent = this->tryGet<CameraComponent>();
+    if(cameraComponent) {
+        return cameraComponent->origin;
+    }
+    return Vec3<float>();
+}
+
 Vec3<float> *Actor::getPosition() {
     return &this->getStateVectorComponent()->Pos;
 }
 
 SimpleContainer* Actor::getArmorContainer() {
-    if(!WinrtUtils::check(20, 80)) return nullptr;
+    if(!WinrtUtils::checkAboveOrEqual(20, 80)) return nullptr;
 
-    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorEquipmentComponent"));
+    static uintptr_t sig;
+
+    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+        if (sig == NULL) {
+            sig = Memory::findSig(
+                    std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorEquipmentComponent"));
+        }
+    }
 
     return tryGet<ActorEquipmentComponent>(sig)->mArmorContainer;
 }
 
 SimpleContainer* Actor::getOffhandContainer() {
-    if(!WinrtUtils::check(20, 80)) return nullptr;
+    if(!WinrtUtils::checkAboveOrEqual(20, 80)) return nullptr;
 
-    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorEquipmentComponent"));
+    static uintptr_t sig;
+
+    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+        if (sig == NULL) {
+            sig = Memory::findSig(
+                    std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorEquipmentComponent"));
+        }
+    }
 
     return tryGet<ActorEquipmentComponent>(sig)->mOffhandContainer;
 }
 
 ItemStack *Actor::getArmor(int slot) {
-    if(WinrtUtils::check(20, 80)) {
+    if(WinrtUtils::checkAboveOrEqual(20, 80)) {
         return Actor::getArmorContainer()->getItem(slot);
     } else {
         static uintptr_t sig;
@@ -136,35 +161,56 @@ ItemStack *Actor::getArmor(int slot) {
 }
 
 MoveInputComponent *Actor::getMoveInputHandler() { //??$try_get@UMoveInputComponent
+    static uintptr_t sig;
 
-    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMoveInputHandler"));
+    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+        if (sig == NULL) {
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMoveInputHandler"));
+        }
+    }
 
     return tryGet<MoveInputComponent>(sig);
 }
 
 ActorGameTypeComponent *Actor::getGameModeType() {
+    static uintptr_t sig;
 
-    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getActorGameTypeComponent"));
+    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+        if (sig == NULL) {
+            sig = Memory::findSig(
+                    std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getActorGameTypeComponent"));
+        }
+    }
 
     return tryGet<ActorGameTypeComponent>(sig);
 }
 
 AABBShapeComponent *Actor::getAABBShapeComponent() {
+    static uintptr_t sig;
 
-    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getAABBShapeComponent"));
+    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+        if (sig == NULL) {
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getAABBShapeComponent"));
+        }
+    }
 
     return tryGet<AABBShapeComponent>(sig);
 }
 
 StateVectorComponent *Actor::getStateVectorComponent() {
+    static uintptr_t sig;
 
-    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getStateVectorComponent"));
+    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+        if (sig == NULL) {
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getStateVectorComponent"));
+        }
+    }
 
     return tryGet<StateVectorComponent>(sig);
 }
 
 ItemStack *Actor::getOffhandSlot() {
-    if(WinrtUtils::check(20, 80)) {
+    if(WinrtUtils::checkAboveOrEqual(20, 80)) {
         return getOffhandContainer()->getItem(1);
     } else {
         static uintptr_t sig;
@@ -180,12 +226,15 @@ ItemStack *Actor::getOffhandSlot() {
 
 RuntimeIDComponent *Actor::getRuntimeIDComponent() {
     static uintptr_t sig;
-    if(sig == NULL) {
-        if (WinrtUtils::check(20, 50) && !WinrtUtils::check(20, 60)) {
-            sig = Memory::findSig(
-                    std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
-        } else {
-            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
+    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+        if (sig == NULL) {
+            if (WinrtUtils::checkAboveOrEqual(20, 50) && !WinrtUtils::checkAboveOrEqual(20, 60)) {
+                sig = Memory::findSig(
+                        std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
+            } else {
+                sig = Memory::findSig(
+                        std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
+            }
         }
     }
     return tryGet<RuntimeIDComponent>(sig);
@@ -222,13 +271,27 @@ bool Actor::hasCategory(ActorCategory category) {
 }
 
 RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URenderPositionComponent
-    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRenderPositionComponent"));
+    static uintptr_t sig;
+
+    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+        if (sig == NULL) {
+            sig = Memory::findSig(
+                    std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRenderPositionComponent"));
+        }
+    }
 
     return tryGet<RenderPositionComponent>(sig);
 }
 
 std::vector<UnifiedMobEffectData> Actor::getMobEffects() {
-    static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMobEffectsComponent"));
+    static uintptr_t sig;
+
+    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+        if (sig == NULL) {
+            sig = Memory::findSig(
+                    std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMobEffectsComponent"));
+        }
+    }
     std::vector<UnifiedMobEffectData> unifiedEffects;
     auto component =  tryGet<MobEffectsComponent>(sig);
     if(component) {
@@ -246,14 +309,14 @@ bool Actor::isValidAABB() {
 }
 
 bool Actor::isOnGround() {
-    if (WinrtUtils::check(21, 0)) {
+    if (WinrtUtils::checkAboveOrEqual(21, 0)) {
         // might be needed when entt cant be used for .21
         //static uintptr_t sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix3")) + " " + GET_SIG("Actor::getOnGroundFlagComponent"));
         return hasComponent<OnGroundFlagComponent>();
     } else {
         const auto ctx = this->GetEntityContextV1_20_50();
 
-        if (WinrtUtils::check(20, 60)) {
+        if (WinrtUtils::checkAboveOrEqual(20, 60)) {
             using isOnGroundFunc = bool (__fastcall *)(entt::basic_registry<EntityId> &, const EntityId &);
             static isOnGroundFunc isOnGround = Memory::getOffsetFromSig<isOnGroundFunc>(
                     GET_SIG_ADDRESS("ActorCollision::isOnGround"), 1);
