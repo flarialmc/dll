@@ -155,7 +155,7 @@ void Client::initialize() {
         Client::settings.addSetting("bufferingmode", (std::string) "Double Buffering");
 
     if (Client::settings.getSettingByName<std::string>("swapeffect") == nullptr)
-        Client::settings.addSetting("swapeffect", (std::string) "FLIP_DISCARD");
+        Client::settings.addSetting("swapeffect", (std::string) "FLIP_SEQUENTIAL");
 
 
     if (Client::settings.getSettingByName<bool>("disableanims") == nullptr)
