@@ -12,7 +12,7 @@ enum class GameType : int {
     Spectator = 6,
 };
 
-struct ActorGameTypeComponent : IEntityComponent {
+struct ActorGameTypeComponent {
     GameType gameType;
 };
 static_assert(sizeof(ActorGameTypeComponent) == 0x4);

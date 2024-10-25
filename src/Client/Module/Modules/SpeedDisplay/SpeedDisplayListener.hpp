@@ -24,7 +24,7 @@ class SpeedDisplayListener : public Listener {
     }
 
     void onTick(TickEvent &event) override {
-        if (!SDK::clientInstance->getLocalPlayer())
+        if (!SDK::clientInstance->getLocalPlayer() && SDK::currentScreen != "hud_screen")
             return;
         auto stateVectorComponent = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent();
         if(stateVectorComponent != nullptr) {

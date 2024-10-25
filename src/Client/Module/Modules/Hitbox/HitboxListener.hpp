@@ -18,6 +18,8 @@ public:
 
     void onRender(RenderEvent &event) override;
 
+    static void fillDataToRender();
+
     void onSetupAndRender(SetupAndRenderEvent &event) override;
 
     explicit HitboxListener(const char string[5], Module *module) {

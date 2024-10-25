@@ -59,38 +59,43 @@ namespace V1_20_50 {
 
     class EntityContext {
     public:
-        EntityRegistry &registry;
-        entt::basic_registry<EntityId> &enttRegistry;
+        EntityRegistry *registry;
+        entt::basic_registry<EntityId> *enttRegistry;
         EntityId entity;
 
-        template<std::derived_from<IEntityComponent> T>
+        template<typename T>
         [[nodiscard]] T *tryGetComponent(EntityId id) {
-            return this->enttRegistry.try_get<T>(id);
+            return this->enttRegistry->try_get<T>(id);
         }
 
-        template<std::derived_from<IEntityComponent> T>
+        template<typename T>
         [[nodiscard]] T *tryGetComponent() {
-            return this->enttRegistry.try_get<T>(this->entity);
+            return this->enttRegistry->try_get<T>(this->entity);
         }
 
-        template<std::derived_from<IEntityComponent> T>
+        template<typename T>
         [[nodiscard]] const T *tryGetComponent() const {
-            return this->enttRegistry.try_get<T>(this->entity);
+            return this->enttRegistry->try_get<T>(this->entity);
         }
 
-        template<std::derived_from<IEntityComponent> T>
+        template<typename T>
         [[nodiscard]] bool hasComponent() const {
-            return this->enttRegistry.all_of<T>(this->entity);
+            return this->enttRegistry->all_of<T>(this->entity);
         }
 
-        template<std::derived_from<IEntityComponent> T>
+        template<typename T>
+        [[nodiscard]] bool hasComponent(EntityId id) const {
+            return this->enttRegistry->all_of<T>(id);
+        }
+
+        template<typename T>
         void addComponent() {
-            return this->enttRegistry.get_or_emplace<T>(this->entity);
+            return this->enttRegistry->get_or_emplace<T>(this->entity);
         }
 
-        template<std::derived_from<IEntityComponent> T>
+        template<typename T>
         void removeComponent() {
-            this->enttRegistry.remove<T>(this->entity);
+            this->enttRegistry->remove<T>(this->entity);
         }
     };
 }

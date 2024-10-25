@@ -3,7 +3,7 @@
 #include "../../../../Utils/Utils.hpp"
 #include "../EntityContext.hpp"
 
-struct AABBShapeComponent : IEntityComponent {
+struct AABBShapeComponent {
     AABB aabb;
     Vec2<float> size;
 };

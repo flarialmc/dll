@@ -258,7 +258,7 @@ struct MobEffectsComponent1_21_30
 
 class MobEffectInstance {};
 
-struct MobEffectsComponent : IEntityComponent {
+struct MobEffectsComponent {
 private:
     std::vector<MobEffectInstance> effects;
 public:

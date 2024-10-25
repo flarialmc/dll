@@ -1,7 +1,7 @@
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include "../EntityContext.hpp"
 
-struct MoveInputComponent : IEntityComponent {
+struct MoveInputComponent {
 private:
     std::byte pad_0000[0x88];
     // ? calculateMoveVector@PlayerMovement

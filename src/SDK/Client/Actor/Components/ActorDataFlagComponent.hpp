@@ -3,7 +3,7 @@
 #include <bitset>
 #include "../EntityContext.hpp"
 
-struct ActorDataFlagComponent : IEntityComponent {
+struct ActorDataFlagComponent {
     std::bitset<0x77> flags;
 };
 static_assert(sizeof(ActorDataFlagComponent) == 0x10);

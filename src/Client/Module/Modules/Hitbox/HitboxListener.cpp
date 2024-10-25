@@ -1,7 +1,10 @@
 #include "HitboxListener.hpp"
 #include "../../../../Utils/Render/DrawUtils.hpp"
+#include "../../../../SDK/Client/Actor/Components/ActorOwnerComponent.hpp"
 
 void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
+    if(SDK::getServerIP().find("cubecraft") != std::string::npos) return aabbsToRender.clear();
+    if(WinrtUtils::checkAboveOrEqual(21,40)) return HitboxListener::fillDataToRender();
     std::lock_guard<std::mutex> guard(renderMtx);
     aabbsToRender.clear();
     if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
@@ -69,6 +72,45 @@ void HitboxListener::onRender(RenderEvent &event) {
             }
 
             DrawUtils::addBox(aabb.lower, aabb.upper, staticThickness ? thickness : lineWidth, outline ? 2 : 1, color2);
+        }
+    }
+}
+
+void HitboxListener::fillDataToRender() {
+    std::lock_guard<std::mutex> guard(renderMtx);
+    aabbsToRender.clear();
+    if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
+        !SDK::clientInstance->getLocalPlayer()->getLevel())
+        return;
+    auto player = SDK::clientInstance->getLocalPlayer();
+    auto ctx = player->GetEntityContextV1_20_50();
+
+    if(!ctx) return;
+
+    auto view = ctx->enttRegistry->view<RenderPositionComponent, AABBShapeComponent, ActorOwnerComponent>();
+    for (auto entity : view) {
+        if(!ctx->hasComponent<RenderPositionComponent>(entity)) continue;
+        if(!ctx->hasComponent<AABBShapeComponent>(entity)) continue;
+        if(!ctx->hasComponent<ActorOwnerComponent>(entity)) continue;
+        auto [renderPos, aabb, owner] = view.operator[](entity);
+        static Vec3<float> zeroPos = Vec3<float>{0.f, 0.f, 0.f};
+        if(renderPos.renderPos == zeroPos) continue;
+        if (owner.actor != player /*&& ent->isPlayer() && ent->hasCategory(ActorCategory::Player)*/) {
+            float dist = player->getPosition()->dist(renderPos.renderPos);
+            // This may let through some entites
+            if (dist > 30 || !owner.actor->isValidAABB() || !player->canSee(*owner.actor) ||
+                    owner.actor->getActorFlag(ActorFlags::FLAG_INVISIBLE))
+                continue;
+
+            float mod = 0.f;
+
+            if (owner.actor->hasCategory(ActorCategory::Player))
+                mod = 1.6f;
+
+            auto& aabbSize = aabb.size;
+            auto lower = renderPos.renderPos.sub(aabbSize.x / 2.f, mod, aabbSize.x / 2.f), upper = lower.add(aabbSize.x, aabbSize.y, aabbSize.x);
+
+            aabbsToRender.emplace_back(lower, upper);
         }
     }
 }
