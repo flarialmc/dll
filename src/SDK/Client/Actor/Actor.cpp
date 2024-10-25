@@ -6,7 +6,6 @@
 #include "../../SDK.hpp"
 #include "../../../Client/GUI/Engine/Engine.hpp"
 #include "Components/OnGroundFlagComponent.hpp"
-#include "Components/CameraComponent.hpp"
 
 template<typename Component>
 Component *Actor::tryGet(uintptr_t addr) {
@@ -101,14 +100,6 @@ bool Actor::getActorFlag(ActorFlags flag) {
     }
     static int off = GET_OFFSET("Actor::getActorFlag");
     return Memory::CallVFuncI<bool, int>(off, this, flag);
-}
-
-Vec3<float> Actor::getOrigin() {
-    auto* cameraComponent = this->tryGet<CameraComponent>();
-    if(cameraComponent) {
-        return cameraComponent->origin;
-    }
-    return Vec3<float>();
 }
 
 Vec3<float> *Actor::getPosition() {
