@@ -4,7 +4,7 @@
 
 std::vector<Actor *> Level::getRuntimeActorList() {
 // TODO prevent crashing !!!
-    if (WinrtUtils::checkAboveOrEqual(21, 00)) {
+    if (WinrtUtils::checkAboveOrEqual(21, 40)) {
         std::vector<Actor *> actors;
         auto player = SDK::clientInstance->getLocalPlayer();
         if(!player) return actors;

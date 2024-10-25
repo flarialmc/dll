@@ -104,6 +104,7 @@ set_target_properties(MinHook PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE
 FetchContent_Declare(
         entt
         GIT_REPOSITORY https://github.com/skypjack/entt.git
+        GIT_TAG f931687ff04d435871ac9664bb299f71f2a8fafc
 )
 
 FetchContent_Declare(

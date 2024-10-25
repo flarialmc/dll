@@ -160,7 +160,6 @@ void ModuleManager::initialize() {
     addModule(new InventoryHUD());
     addModule(new CommandHotkey());
     addModule(new AutoRQ());
-    addModule(new HitPing());
     addModule(new InstantHurtAnimation());
     addModule(new FasterInventory());
     addModule(new PotionHUD());
@@ -168,6 +167,7 @@ void ModuleManager::initialize() {
     addModule(new ViewModel());
 
     if(!WinrtUtils::checkAboveOrEqual(21,40)) {
+        addModule(new HitPing());
         addModule(new ItemPhysics());
     }
 
