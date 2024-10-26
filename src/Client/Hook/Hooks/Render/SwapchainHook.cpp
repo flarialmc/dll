@@ -17,6 +17,7 @@
 #include "../../../../../lib/ImGui/imgui_impl_win32.h"
 #include "../../../../../lib/ImGui/imgui_impl_dx11.h"
 #include "../../../../../lib/ImGui/imgui_impl_dx12.h"
+#include "../../../Module/Modules/MotionBlur/MotionBlur.hpp"
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
 
@@ -411,8 +412,10 @@ void SwapchainHook::DX11Render() {
                         ImGui_ImplWin32_NewFrame();
                         ImGui::NewFrame();
 
+
                         auto event = nes::make_holder<RenderEvent>();
                         event->RTV = mainRenderTargetView;
+
                         eventMgr.trigger(event);
 
 
@@ -606,7 +609,7 @@ void SwapchainHook::DX11Blur() {
     
     /* Blur Stuff */
     if(ModuleManager::initialized) {
-        auto module = ModuleManager::getModule("Motion Blur");
+        auto  module = ModuleManager::getModule("Motion Blur");
         if(module) {
             if(module->isEnabled() && !FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
             else FlarialGUI::needsBackBuffer = false;

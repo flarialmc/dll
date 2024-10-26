@@ -59,7 +59,7 @@ public:
 
     void onRender(RenderEvent& event) {
 
-        if (ModuleManager::getModule("ClickGUI")->isEnabled()) return;
+        if (FlarialGUI::inMenu) return;
 
         int maxFrames = (int)round(this->settings.getSettingByName<float>("intensity2")->value);
 
