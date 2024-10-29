@@ -137,9 +137,9 @@ void ModuleManager::initialize() {
     addModule<RenderOptions>();
     addModule<PaperDoll>();
     addModule<GuiScale>();
+    addModule<TabList>();
 
     if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
-        addModule<TabList>();
         addModule<WeatherChanger>();
         addModule<NickModule>();
         addModule<FreeLook>();

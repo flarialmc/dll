@@ -230,7 +230,7 @@ public:
 
                         auto module = ModuleManager::getModule("Nick");
 
-                        if (module->isEnabled() &&
+                        if (module && module->isEnabled() &&
                             name == Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickModule::original))) {
                             name = module->settings.getSettingByName<std::string>("nick")->value;
                         }
@@ -377,7 +377,7 @@ public:
 
                         auto module = ModuleManager::getModule("Nick");
 
-                        if (module->isEnabled() &&
+                        if (module && module->isEnabled() &&
                             name == NickModule::backupOri) {
                             name = module->settings.getSettingByName<std::string>("nick")->value;
                         }
