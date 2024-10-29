@@ -125,10 +125,7 @@ void ModuleManager::initialize() {
     addModule<Sprint>();
     addModule<Hitbox>();
     addModule<HurtColor>();
-
-    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
-        addModule<ThirdPerson>();
-    }
+    addModule<ThirdPerson>();
 
     addModule<SnapLook>();
     addModule<FogColor>();
