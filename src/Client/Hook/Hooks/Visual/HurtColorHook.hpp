@@ -10,7 +10,15 @@ private:
     static MCCColor *HurtColorCallback(void *a1, MCCColor *color, void *a3) {
 
         HurtColorEvent event(funcOriginal(a1, color, a3));
-        EventHandler::onGetHurtColor(event);
+
+        if(WinrtUtils::checkAboveOrEqual(21,40)) {
+            auto actor = hat::member_at<Actor*>(a3, 0x38);
+            if(actor && actor->getHurtTime() > 0) {
+                EventHandler::onGetHurtColor(event);
+            }
+        } else {
+            EventHandler::onGetHurtColor(event);
+        }
 
         return event.getHurtColor();
 

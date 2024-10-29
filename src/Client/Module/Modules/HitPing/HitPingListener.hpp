@@ -40,6 +40,7 @@ class HitPingListener : public Listener {
     }
 
     void onAttack(AttackEvent &event) override { // only calculate ping on first hit
+        if(SDK::getServerIP().find("cubecraft") != std::string::npos) return ClearOldHits();
         ClearOldHits();
         auto playerPos = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent()->Pos;
         auto entity = event.getActor();
@@ -70,6 +71,7 @@ class HitPingListener : public Listener {
 
     void onPacketReceive(PacketEvent &event) override {
         if (event.getPacket()->getId() == MinecraftPacketIds::ActorEvent) {
+            if(SDK::getServerIP().find("cubecraft") != std::string::npos) return;
             auto packet = (EntityEventPacket *) event.getPacket();
             if (packet->EventID == ActorEvent::Hurt) {
                 auto id = packet->RuntimeID;

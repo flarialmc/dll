@@ -128,11 +128,8 @@ void ModuleManager::initialize() {
     addModule(new Sneak());
     addModule(new Sprint());
     addModule(new Hitbox());
-
-    if(!WinrtUtils::checkAboveOrEqual(21,40)) {
-        addModule(new ThirdPerson());
-        addModule(new HurtColor());
-    }
+    addModule(new ThirdPerson());
+    addModule(new HurtColor());
 
     addModule(new SnapLook());
     addModule(new FogColor());
@@ -143,10 +140,10 @@ void ModuleManager::initialize() {
     addModule(new GuiScale());
     addModule(new TextHotkey());
     addModule(new AutoGG());
+    addModule(new TabList());
 
     if(!WinrtUtils::checkAboveOrEqual(21,40)) {
         addModule(new WeatherChanger());
-        addModule(new TabList());
         addModule(new NickModule());
         addModule(new FreeLook());
     }
@@ -165,9 +162,9 @@ void ModuleManager::initialize() {
     addModule(new PotionHUD());
     ////addModule(new OpponentReach());
     addModule(new ViewModel());
+    addModule(new HitPing());
 
     if(!WinrtUtils::checkAboveOrEqual(21,40)) {
-        addModule(new HitPing());
         addModule(new ItemPhysics());
     }
 
