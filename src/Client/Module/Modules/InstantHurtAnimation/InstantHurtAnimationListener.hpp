@@ -47,7 +47,7 @@ class InstantHurtAnimationListener : public Listener {
 
     void onAttack(AttackEvent &event) override {
         if(!event.getActor()->hasCategory(ActorCategory::Player)) return;
-        if(module->settings.getSettingByName<bool>("onlyWithArmor")->value) {
+        if(module->settings.getSettingByName<bool>("onlyWithArmor")->value && SDK::getServerIP().find("cubecraft") == std::string::npos) {
             auto armorContainer = event.getActor()->getArmorContainer();
             if(armorContainer == nullptr) return;
 
