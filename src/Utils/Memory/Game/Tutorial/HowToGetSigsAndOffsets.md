@@ -190,5 +190,8 @@ minecraft:arrow_spell_emitter
 variable.is_enchanted (above that)
 48 83 EC 38 48 8B 49 10 48 85 C9 74 ?
 
+### Options::getSensitivity
+"AutoUpdate" / "gameLocale" / "Options"
+
 ### ClientInstance::grabMouse
 accessibility.game.playerView (somewhere above that)
