@@ -56,6 +56,8 @@ class TimeListener : public Listener {
 
         seperator = minute < 10 ? ":0" : ":";
 
+        if (hour == 24) hour = 0;
+
         std::string time = std::to_string(hour) + seperator + std::to_string(minute) + " " + meridiem;
 
         this->module->normalRender(3, time);
