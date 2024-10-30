@@ -232,6 +232,24 @@ void Module::addHeader(std::string text) {
     padding += Constraints::RelativeConstraint(0.055f, "height", true);
 }
 
+void Module::addButton(const std::string& text, const std::string& subtext, const std::string& buttonText, std::function<void()> action) {
+    float elementX = Constraints::PercentageConstraint(0.15f, "right");
+    float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+    const float width = Constraints::RelativeConstraint(0.09f, "height", true);
+    const float height = Constraints::RelativeConstraint(0.035, "height", true);
+    Vec2<float> round = Constraints::RoundingConstraint(13, 13);
+    D2D1_COLOR_F col = FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary1")->value);
+
+    if(FlarialGUI::RoundedButton(buttonIndex, elementX, y, col, D2D1::ColorF(D2D1::ColorF::White), FlarialGUI::to_wide(buttonText).c_str(), width, height, round.x, round.y)) {
+        action();
+    }
+
+    Module::addElementText(text, subtext);
+
+    padding += Constraints::RelativeConstraint(0.06f, "height", true);
+    buttonIndex++;
+}
+
 void Module::addColorPicker(std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb) {
     float elementX = Constraints::PercentageConstraint(0.195f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;

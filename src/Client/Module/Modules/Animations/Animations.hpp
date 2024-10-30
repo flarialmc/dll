@@ -60,6 +60,12 @@ public:
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Misc");
+        this->addButton("troll", "troll", "troll", []() {
+
+        });
+        this->addButton("troll", "troll", "even more", []() {
+
+        });
         this->addSlider("Hotbar", "", this->settings.getSettingByName<float>("hotbarSpeed")->value);
 
         FlarialGUI::UnsetScrollView();

@@ -50,6 +50,7 @@ public:
     int textboxIndex = 0;
     int keybindIndex = 0;
     int colorPickerIndex = 100;
+    int buttonIndex = 0;
 
     struct DrDisrespect {
         std::string* value;
@@ -65,6 +66,10 @@ public:
     void extraPadding();
     void addElementText(std::string text, std::string subtext = "");
     void addHeader(std::string text);
+
+    void addButton(const std::string &text, const std::string &subtext, const std::string &buttonText,
+                   std::function<void()> action);
+
     void addConditionalSlider(bool condition, std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
     void addSlider(std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
     void addToggle(std::string text, std::string subtext, bool& value);
