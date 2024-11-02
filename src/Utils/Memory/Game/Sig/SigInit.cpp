@@ -61,7 +61,7 @@ void SigInit::init2140() {
 
     ADD_SIG("HurtColor", "E8 ?? ?? ?? ?? 0F 28 05 ?? ?? ?? ?? 0F 11 85 68 02 00 00");
 
-    ADD_SIG("Level::getRuntimeActorList", "");
+    ADD_SIG("Level::getRuntimeActorList", "48 89 5C 24 18 55 56 57 48 83 EC 40 48 8B FA 48 89 54 24 30");
 
     ADD_SIG("Actor::baseTick", "48 8D 05 ? ? ? ? 48 89 01 ? ? ? ? 00 44 8D 4A 04 44 8D 42 02 66 C7 44 24 20 37 00 E8 ? ? ? ? 48 8B 8F 80 11 00 00"); // 8D 4A 04 44 8D 42 02 66
 

@@ -3,7 +3,6 @@
 #include "../../../../SDK/Client/Actor/Components/ActorOwnerComponent.hpp"
 
 void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
-    if(SDK::getServerIP().find("cubecraft") != std::string::npos) return aabbsToRender.clear();
     if(WinrtUtils::checkAboveOrEqual(21,40)) return HitboxListener::fillDataToRender();
     std::lock_guard<std::mutex> guard(renderMtx);
     aabbsToRender.clear();

@@ -3,8 +3,9 @@
 #include "../Actor/Components/ActorOwnerComponent.hpp"
 
 std::vector<Actor *> Level::getRuntimeActorList() {
-// TODO prevent crashing !!!
-    if (WinrtUtils::checkAboveOrEqual(21, 40)) {
+    // TODO prevent crashing !!!
+    bool sosUseTempSolution = false; // in case Level::getRuntimeActorList gets nuked :c
+    if (WinrtUtils::checkAboveOrEqual(21, 40) && sosUseTempSolution) {
         std::vector<Actor *> actors;
         auto player = SDK::clientInstance->getLocalPlayer();
         if(!player) return actors;
