@@ -63,6 +63,10 @@ namespace V1_20_50 {
         entt::basic_registry<EntityId> &enttRegistry;
         EntityId entity;
 
+        bool isValid() const {
+            return this->entity.isNull();
+        }
+
         template<std::derived_from<IEntityComponent> T>
         [[nodiscard]] T *tryGetComponent(EntityId id) {
             return this->enttRegistry.try_get<T>(id);
@@ -76,6 +80,11 @@ namespace V1_20_50 {
         template<std::derived_from<IEntityComponent> T>
         [[nodiscard]] const T *tryGetComponent() const {
             return this->enttRegistry.try_get<T>(this->entity);
+        }
+
+        template<std::derived_from<IEntityComponent> T>
+        [[nodiscard]] bool hasComponent(EntityId id) const {
+            return this->enttRegistry.all_of<T>(id);
         }
 
         template<std::derived_from<IEntityComponent> T>
