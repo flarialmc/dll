@@ -3,7 +3,7 @@
 #include "../../../../SDK/Client/Actor/Components/ActorOwnerComponent.hpp"
 
 void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
-    if(WinrtUtils::checkAboveOrEqual(21,40)) return HitboxListener::fillDataToRender();
+    // if(WinrtUtils::checkAboveOrEqual(21,40)) return HitboxListener::fillDataToRender();
     std::lock_guard<std::mutex> guard(renderMtx);
     aabbsToRender.clear();
     if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
