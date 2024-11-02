@@ -264,6 +264,18 @@ bool Actor::hasCategory(ActorCategory category) {
     return ((int) this->getCategories() & (int) category) != 0;
 }
 
+bool Actor::isValid() {
+    auto lp = SDK::clientInstance->getLocalPlayer();
+    if(!lp) return false;
+    auto level = lp->getLevel();
+    if(!level) return false;
+    auto runtimeActorList = level->getRuntimeActorList();
+    for (auto actor : runtimeActorList) {
+        if(actor == this) return true;
+    }
+    return false;
+}
+
 RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URenderPositionComponent
     static uintptr_t sig;
 

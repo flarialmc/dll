@@ -40,6 +40,7 @@ class HitPingListener : public Listener {
     }
 
     void onAttack(AttackEvent &event) override { // only calculate ping on first hit
+        if(!event.getActor()->isValid()) return;
         ClearOldHits();
         auto playerPos = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent()->Pos;
         auto entity = event.getActor();
