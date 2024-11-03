@@ -38,11 +38,12 @@ public:
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
+
         this->addHeader("Function");
         this->addButton("Add another Keybind", "Multi-Keybind command support!", "Add", [this] {
 
             std::string keybindName = "keybind-" + std::to_string(totalKeybinds);
-            std::string commandName = "command-" + std::to_string(totalKeybinds);
+            std::string commandName = "text-" + std::to_string(totalKeybinds);
 
             this->settings.addSetting(keybindName, (std::string)"");
             this->settings.addSetting(commandName, (std::string)"");
@@ -85,7 +86,7 @@ public:
         for (int i = 0; i < totalKeybinds; ++i) {
 
             std::string header = (i == 0) ? "Text" : "Text " + std::to_string(i);
-            std::string commandSettingName = (i == 0) ? "Text" : "Text-" + std::to_string(i);
+            std::string commandSettingName = (i == 0) ? "text" : "text-" + std::to_string(i);
 
             if(settings.getSettingByName<std::string>(commandSettingName) != nullptr) {
                 this->addHeader(header);
