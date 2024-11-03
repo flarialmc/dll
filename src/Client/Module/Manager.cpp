@@ -135,12 +135,9 @@ void ModuleManager::initialize() {
     addModule<PaperDoll>();
     addModule<GuiScale>();
     addModule<TabList>();
-
-    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
-        addModule<WeatherChanger>();
-        addModule<NickModule>();
-        addModule<FreeLook>();
-    }
+    addModule<WeatherChanger>();
+    addModule<NickModule>();
+    addModule<FreeLook>();
 
     addModule<AutoGG>();
     addModule<TextHotkey>();
@@ -152,7 +149,6 @@ void ModuleManager::initialize() {
     addModule<CommandHotkey>();
     addModule<NoHurtCam>();
     addModule<InventoryHUD>();
-    // addModule<OverlayModule>();
     addModule<AutoRQ>();
     addModule<HitPing>();
     addModule<InstantHurtAnimation>();

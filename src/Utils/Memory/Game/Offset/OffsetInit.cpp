@@ -9,6 +9,7 @@ void OffsetInit::init2140() {
 
     ADD_OFFSET("Player::gamemode", 0xB28);
     ADD_OFFSET("Player::playerName", 0xCB0);
+    ADD_OFFSET("ClientInstance::getBlockSource", 29);
 
     ADD_OFFSET("ClientInstance::levelRenderer", 0xE8);
 

@@ -9,7 +9,7 @@ Actor *HitResult::getEntity() {
 
     if (WinrtUtils::checkAboveOrEqual(21, 40)) {
         if (sig == NULL) {
-            sig = GET_SIG_ADDRESS("HitResult::getEntity");
+            sig = GET_SIG_ADDRESS("HitResult::_getEntity");
         }
 
         auto* something = hat::member_at<void*>(this, 0x38);

@@ -18,6 +18,7 @@
 #include "Hooks/Render/TextureGroup_getTextureHook.hpp"
 #include "Hooks/Render/HudMobEffectsRenderer.hpp"
 #include "Hooks/Visual/BaseActorRendererRenderTextHook.hpp"
+#include "Hooks/Game/UpdatePlayerHook.hpp"
 //#include "Hooks/Game/RenderItemGroup.hpp"
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 
@@ -68,7 +69,12 @@ void HookManager::initialize() {
     addHook<SendPacketHook>();
     addHook<getSensHook>();
     addHook<HudMobEffectsRendererHook>();
-    //addHook<BaseActorRendererRenderTextHook>();
+    if(WinrtUtils::checkBelowOrEqual(21, 40)) {
+        addHook<BaseActorRendererRenderTextHook>();
+    }
+    if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+        addHook<UpdatePlayerHook>();
+    }
 
     for (const auto& hook: hooks)
         hook->enableHook();
