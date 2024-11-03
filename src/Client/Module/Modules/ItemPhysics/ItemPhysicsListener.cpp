@@ -54,15 +54,10 @@ void ItemPhysicsListener::ItemRenderer_render(ItemRenderer* _this, BaseActorRend
     oFunc(_this, renderCtx, renderData);
 }
 
-glm::mat4x4& ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, float y, float z) {
-    if(!ModuleManager::initialized) mat;
-
+void ItemPhysicsListener::applyTransformation(glm::mat4x4& mat) {
     static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("ItemPhysics"));
     const auto listener = mod->listener;
     const auto renderData = listener->renderData;
-
-    if (renderData == nullptr)
-        return mat;
 
     auto curr = reinterpret_cast<ItemActor*>(renderData->actor);
 
@@ -187,9 +182,9 @@ glm::mat4x4& ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, floa
     mat = translate(mat, {pos.x, pos.y, pos.z});
 
     if(WinrtUtils::checkAboveOrEqual(21, 40)) {
-        rotate(mat, renderVec.x, {1.f, 0.f, 0.f});
-        rotate(mat, renderVec.y, {0.f, 1.f, 0.f});
-        rotate(mat, renderVec.z, {0.f, 0.f, 1.f});
+        mat = rotate(mat, glm::radians(renderVec.x), {1.f, 0.f, 0.f});
+        mat = rotate(mat, glm::radians(renderVec.y), {0.f, 1.f, 0.f});
+        mat = rotate(mat, glm::radians(renderVec.z), {0.f, 0.f, 1.f});
     } else {
         static auto rotateSig = GET_SIG_ADDRESS("glm_rotate");
         using glm_rotate_t = void (__fastcall *)(glm::mat4x4 &, float, float, float, float);
@@ -199,6 +194,35 @@ glm::mat4x4& ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, floa
         glm_rotate(mat, renderVec.y, 0.f, 1.f, 0.f);
         glm_rotate(mat, renderVec.z, 0.f, 0.f, 1.f);
     }
+}
+
+void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, float y, float z) {
+    if(!ModuleManager::initialized)
+        return;
+
+    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("ItemPhysics"));
+    const auto listener = mod->listener;
+    const auto renderData = listener->renderData;
+
+    if(renderData == nullptr)
+        return;
+
+    applyTransformation(mat);
+}
+
+glm::mat4x4 ItemPhysicsListener::glm_rotate2(glm::mat4x4& mat, float angle, const glm::vec3& axis) {
+    if(!ModuleManager::initialized)
+        return rotate(mat, angle, axis);
+
+    static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("ItemPhysics"));
+    const auto listener = mod->listener;
+    const auto renderData = listener->renderData;
+
+    if(renderData == nullptr)
+        return rotate(mat, angle, axis);
+
+    applyTransformation(mat);
+
     return mat;
 }
 
@@ -229,8 +253,14 @@ void ItemPhysicsListener::onEnable() {
 
     static auto rotateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_rotateRef"));
 
-    if (glm_rotateHook == nullptr)
-        glm_rotateHook = std::make_unique<INeedADecentHookClassForMemory>(rotateAddr, glm_rotate);
+    if (glm_rotateHook == nullptr) {
+        if (WinrtUtils::checkAboveOrEqual(21, 40)) {
+            glm_rotateHook = std::make_unique<INeedADecentHookClassForMemory>(rotateAddr, glm_rotate2);
+        }
+        else {
+            glm_rotateHook = std::make_unique<INeedADecentHookClassForMemory>(rotateAddr, glm_rotate);
+        }
+    }
 
     static auto ItemRenderer_renderAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("ItemRenderer::render"));
 
