@@ -65,11 +65,11 @@ public:
         const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
 
-        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::ScrollBar(x, y, 140, 800, 2);
         FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));
-        
+
         this->addHeader("Function");
         this->addButton("Add another Keybind", "Multi-Keybind command support!", "Add", [this] {
 
@@ -118,7 +118,7 @@ public:
 
                 this->addTextBox(
                     "Command to Send",
-                    "No need for /",
+                    "No need for /, And there's a spam limit!",
                     settings.getSettingByName<std::string>(commandSettingName)->value
                 );
                 this->extraPadding();
