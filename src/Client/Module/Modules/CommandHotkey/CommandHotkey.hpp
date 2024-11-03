@@ -69,9 +69,7 @@ public:
         FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));
-
-        std::cout << totalKeybinds << std::endl;
-
+        
         this->addHeader("Function");
         this->addButton("Add another Keybind", "Multi-Keybind command support!", "Add", [this] {
 
@@ -124,8 +122,6 @@ public:
                     settings.getSettingByName<std::string>(commandSettingName)->value
                 );
                 this->extraPadding();
-            } else {
-                std::cout << i << std::endl;
             }
         }
 
