@@ -6,6 +6,7 @@ static float maxDarkenAmount = 0.1;
 bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor,
                                const wchar_t *text, const float width, const float height, float radiusX, float radiusY,
                                bool glow) {
+
     if (isInScrollView) y += scrollpos;
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
@@ -23,6 +24,7 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
 
     D2D1_COLOR_F buttonColor;
 
+    std::cout << darkenAmounts[index] << std::endl;
     if (CursorInRect(x, y, width, height)) {
         buttonColor = D2D1::ColorF(color.r - darkenAmounts[index], color.g - darkenAmounts[index],
                                    color.b - darkenAmounts[index], color.a);
@@ -31,7 +33,6 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
         buttonColor = D2D1::ColorF(color.r - darkenAmounts[index], color.g - darkenAmounts[index],
                                    color.b - darkenAmounts[index], color.a);
         FadeEffect::ApplyFadeOutEffect(0.0055f * FlarialGUI::frameFactor, darkenAmounts[index]);
-
     }
 
     ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(x, y), ImVec2(x + width, y + height), D2DColorToImColor(buttonColor), radiusX);

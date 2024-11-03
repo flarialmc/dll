@@ -50,7 +50,7 @@ public:
     int textboxIndex = 0;
     int keybindIndex = 0;
     int colorPickerIndex = 100;
-    int buttonIndex = 0;
+    int buttonIndex = 3;
 
     struct DrDisrespect {
         std::string* value;
