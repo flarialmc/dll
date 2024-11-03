@@ -63,8 +63,14 @@ public:
 
         static auto rotateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_rotateRef"));
 
-        if (glm_rotateHook == nullptr)
-            glm_rotateHook = std::make_unique<INeedADecentHookClassForMemory>(rotateAddr, glm_rotate);
+        if (glm_rotateHook == nullptr) {
+            if (WinrtUtils::checkAboveOrEqual(21, 40)) {
+                glm_rotateHook = std::make_unique<INeedADecentHookClassForMemory>(rotateAddr, glm_rotate2);
+            }
+            else {
+                glm_rotateHook = std::make_unique<INeedADecentHookClassForMemory>(rotateAddr, glm_rotate);
+            }
+        }
 
         static auto ItemRenderer_renderAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("ItemRenderer::render"));
 
@@ -98,6 +104,8 @@ public:
     }
 
     void onDisable() override {
+        Deafen(this, SetupAndRenderEvent, &ItemPhysics::onSetupAndRender)
+
         if (patched) {
             static auto posAddr = GET_SIG_ADDRESS("ItemPositionConst") + 4;
 
@@ -254,25 +262,17 @@ public:
 
         if(!ModuleManager::initialized) return oFunc(_this, renderCtx, renderData);
 
-        renderData = renderData;
+        static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics").get());
+        if(!mod) return;
+        mod->renderData = renderData;
 
         oFunc(_this, renderCtx, renderData);
     }
 
-    static void glm_rotate(glm::mat4x4& mat, float angle, float x, float y, float z) {
-        static auto rotateSig = GET_SIG_ADDRESS("glm_rotate");
-        using glm_rotate_t = void(__fastcall*)(glm::mat4x4&, float, float, float, float);
-        static auto glm_rotate = reinterpret_cast<glm_rotate_t>(rotateSig);
-
-        if(!ModuleManager::initialized) return;
-
-        static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("ItemPhysics").get());
+    static void applyTransformation(glm::mat4x4& mat) {
+        static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics").get());
         if(!mod) return;
-        const auto pItemPhysics = mod;
-        const auto renderData = pItemPhysics->renderData;
-
-        if (renderData == nullptr)
-            return;
+        const auto renderData = mod->renderData;
 
         auto curr = reinterpret_cast<ItemActor*>(renderData->actor);
 
@@ -280,7 +280,7 @@ public:
 
         bool isOnGround = curr->isOnGround();
 
-        if (!pItemPhysics->actorData.contains(curr)) {
+        if (!mod->actorData.contains(curr)) {
             std::random_device rd;
             std::mt19937 gen(rd());
 
@@ -291,12 +291,12 @@ public:
             const auto sign = Vec3(dist(gen) * 2 - 1, dist(gen) * 2 - 1, dist(gen) * 2 - 1);
 
             auto def = std::tuple{ isOnGround ? 0.f : height, vec, sign};
-            pItemPhysics->actorData.emplace(curr, def);
+            mod->actorData.emplace(curr, def);
         }
 
         const float deltaTime = 1.f / static_cast<float>(MC::fps);
 
-        float& yMod = std::get<0>(pItemPhysics->actorData.at(curr));
+        float& yMod = std::get<0>(mod->actorData.at(curr));
 
         yMod -= height * deltaTime;
 
@@ -306,13 +306,14 @@ public:
         Vec3<float> pos = renderData->position;
         pos.y += yMod;
 
-        auto& vec = std::get<1>(pItemPhysics->actorData.at(curr));
-        auto& sign = std::get<2>(pItemPhysics->actorData.at(curr));
+        auto& vec = std::get<1>(mod->actorData.at(curr));
+        auto& sign = std::get<2>(mod->actorData.at(curr));
 
-        const auto speed = pItemPhysics->settings.getSettingByName<float>("speed")->value;
-        const auto xMul = pItemPhysics->settings.getSettingByName<float>("xmul")->value;
-        const auto yMul = pItemPhysics->settings.getSettingByName<float>("ymul")->value;
-        const auto zMul = pItemPhysics->settings.getSettingByName<float>("zmul")->value;
+        auto& settings = mod->settings;
+        const auto speed = settings.getSettingByName<float>("speed")->value;
+        const auto xMul = settings.getSettingByName<float>("xmul")->value;
+        const auto yMul = settings.getSettingByName<float>("ymul")->value;
+        const auto zMul = settings.getSettingByName<float>("zmul")->value;
 
         if (!isOnGround || yMod > 0.f) {
             vec.x += static_cast<float>(sign.x) * deltaTime * speed * xMul;
@@ -340,8 +341,8 @@ public:
 
         Vec3<float> renderVec = vec;
 
-        const auto smoothRotations = pItemPhysics->settings.getSettingByName<bool>("smoothrots")->value;
-        const auto preserveRotations = pItemPhysics->settings.getSettingByName<bool>("preserverots")->value;
+        const auto smoothRotations = settings.getSettingByName<bool>("smoothrots")->value;
+        const auto preserveRotations = settings.getSettingByName<bool>("preserverots")->value;
 
         if (isOnGround && yMod == 0.f && !preserveRotations && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
             if (smoothRotations && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
@@ -395,9 +396,49 @@ public:
 
         mat = translate(mat, {pos.x, pos.y, pos.z});
 
-        glm_rotate(mat, renderVec.x, 1.f, 0.f, 0.f);
-        glm_rotate(mat, renderVec.y, 0.f, 1.f, 0.f);
-        glm_rotate(mat, renderVec.z, 0.f, 0.f, 1.f);
+        if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+            mat = rotate(mat, glm::radians(renderVec.x), {1.f, 0.f, 0.f});
+            mat = rotate(mat, glm::radians(renderVec.y), {0.f, 1.f, 0.f});
+            mat = rotate(mat, glm::radians(renderVec.z), {0.f, 0.f, 1.f});
+        } else {
+            static auto rotateSig = GET_SIG_ADDRESS("glm_rotate");
+            using glm_rotate_t = void (__fastcall *)(glm::mat4x4 &, float, float, float, float);
+            static auto glm_rotate = reinterpret_cast<glm_rotate_t>(rotateSig);
+
+            glm_rotate(mat, renderVec.x, 1.f, 0.f, 0.f);
+            glm_rotate(mat, renderVec.y, 0.f, 1.f, 0.f);
+            glm_rotate(mat, renderVec.z, 0.f, 0.f, 1.f);
+        }
+    }
+
+    static void glm_rotate(glm::mat4x4& mat, float angle, float x, float y, float z) {
+        if(!ModuleManager::initialized)
+            return;
+
+        static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics").get());
+        if(!mod) return;
+        const auto renderData = mod->renderData;
+
+        if(renderData == nullptr)
+            return;
+
+        applyTransformation(mat);
+    }
+
+    static glm::mat4x4 glm_rotate2(glm::mat4x4& mat, float angle, const glm::vec3& axis) {
+        if(!ModuleManager::initialized)
+            return rotate(mat, angle, axis);
+
+        static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics").get());
+        if(!mod) return rotate(mat, angle, axis);
+        const auto renderData = mod->renderData;
+
+        if(renderData == nullptr)
+            return rotate(mat, angle, axis);
+
+        applyTransformation(mat);
+
+        return mat;
     }
 
     void onSetupAndRender(SetupAndRenderEvent& event) {
