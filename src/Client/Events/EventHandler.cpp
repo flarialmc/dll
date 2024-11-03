@@ -256,3 +256,11 @@ void EventHandler::onRenderPotionHUD(RenderPotionHUDEvent &event) {
         listener->onRenderPotionHUD(event);
     }
 }
+
+void EventHandler::onUpdatePlayer(UpdatePlayerEvent &event) {
+    if (Client::disable) return;
+    if (!ModuleManager::initialized) return;
+    for (Listener *&listener: listeners) {
+        listener->onUpdatePlayer(event);
+    }
+}

@@ -19,6 +19,7 @@
 #include "Game/RaknetTickEvent.hpp"
 #include "Render/GetTextureEvent.hpp"
 #include "Render/RenderPotionHUDEvent.hpp"
+#include "Game/UpdatePlayerEvent.hpp"
 
 class Listener {
 public:
@@ -63,6 +64,8 @@ public:
     virtual void onGetTexture(GetTextureEvent &event) {};
 
     virtual void onRenderPotionHUD(RenderPotionHUDEvent &event) {};
+
+    virtual void onUpdatePlayer(UpdatePlayerEvent &event) {};
 
     virtual void onUnregister() {};
 };

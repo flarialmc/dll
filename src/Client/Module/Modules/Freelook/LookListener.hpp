@@ -31,8 +31,10 @@ public:
         module->active = true;
         Memory::patchBytes((void *) yaw1, nop, 4);
         Memory::patchBytes((void *) yaw2, nop, 4);
-        Memory::patchBytes((void *) pitch, nop, 4);
-        Memory::patchBytes((void *) movement, nop, 4);
+        if(WinrtUtils::checkBelowOrEqual(21,30)) {
+            Memory::patchBytes((void *) pitch, nop, 4);
+            Memory::patchBytes((void *) movement, nop, 4);
+        }
     }
 
     void unpatch() const {
@@ -40,8 +42,16 @@ public:
         module->active = false;
         Memory::patchBytes((void *) yaw1, originalYaw1.data(), 4);
         Memory::patchBytes((void *) yaw2, originalYaw2.data(), 4);
-        Memory::patchBytes((void *) pitch, originalPitch.data(), 4);
-        Memory::patchBytes((void *) movement, originalMovement.data(), 4);
+        if(WinrtUtils::checkBelowOrEqual(21,30)) {
+            Memory::patchBytes((void *) pitch, originalPitch.data(), 4);
+            Memory::patchBytes((void *) movement, originalMovement.data(), 4);
+        }
+    }
+
+    void onUpdatePlayer(UpdatePlayerEvent &event) override {
+        if (module->active) {
+            event.cancel();
+        }
     }
 
     void onGetViewPerspective(PerspectiveEvent &event) override {
@@ -107,12 +117,16 @@ public:
 
         yaw1 = GET_SIG_ADDRESS("CameraYaw");
         yaw2 = GET_SIG_ADDRESS("CameraYaw2");
-        pitch = GET_SIG_ADDRESS("CameraPitch");
-        movement = GET_SIG_ADDRESS("CameraMovement");
 
-        originalYaw1 = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4])yaw1);
-        originalYaw2 = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4])yaw2);
-        originalPitch = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4])pitch);
-        originalMovement = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4])movement);
+        originalYaw1 = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4]) yaw1);
+        originalYaw2 = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4]) yaw2);
+
+        if(WinrtUtils::checkBelowOrEqual(21,30)) {
+            pitch = GET_SIG_ADDRESS("CameraPitch");
+            movement = GET_SIG_ADDRESS("CameraMovement");
+
+            originalPitch = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4]) pitch);
+            originalMovement = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4]) movement);
+        }
     }
 };

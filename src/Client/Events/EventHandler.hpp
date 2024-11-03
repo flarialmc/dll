@@ -72,5 +72,7 @@ public:
 
     static void onRenderPotionHUD(RenderPotionHUDEvent &event);
 
+    static void onUpdatePlayer(UpdatePlayerEvent &event);
+
     static void unregisterAll();
 };

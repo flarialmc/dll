@@ -141,18 +141,15 @@ void ModuleManager::initialize() {
     addModule(new TextHotkey());
     addModule(new AutoGG());
     addModule(new TabList());
+    addModule(new WeatherChanger());
+    addModule(new NickModule());
+    addModule(new FreeLook());
 
-    if(!WinrtUtils::checkAboveOrEqual(21,40)) {
-        addModule(new WeatherChanger());
-        addModule(new NickModule());
-        addModule(new FreeLook());
-    }
     addModule(new SpeedDisplay());
     addModule(new CPSLimiter());
     addModule(new BlockBreakIndicator());
     addModule(new Animations());
     addModule(new BlockOutline());
-    //addModule(new OverlayModule());
     addModule(new NoHurtCam());
     addModule(new InventoryHUD());
     addModule(new CommandHotkey());
