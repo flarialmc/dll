@@ -61,7 +61,7 @@ public:
 
         this->addHeader("Misc");
         this->addButton("troll", "troll", "troll", []() {
-
+            FlarialGUI::Notify("I trolled you");
         });
         this->addButton("troll", "troll", "even more", []() {
 
