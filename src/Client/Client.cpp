@@ -43,7 +43,6 @@ void DownloadAndSave(const std::string& url, const std::string& path) {
 bool Client::disable = false;
 
 void setWindowTitle(std::wstring title) {
-    using namespace winrt::Windows::UI::Notifications;
     using namespace winrt::Windows::UI::ViewManagement;
     using namespace winrt::Windows::ApplicationModel::Core;
 

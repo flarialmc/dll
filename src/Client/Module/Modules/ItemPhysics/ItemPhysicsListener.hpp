@@ -16,7 +16,9 @@ class ItemPhysicsListener : public Listener {
     ActorRenderData* renderData = nullptr;
 
     static void ItemRenderer_render(ItemRenderer* _this, BaseActorRenderContext* renderCtx, ActorRenderData* renderData);
-    static glm::mat4x4& glm_rotate(glm::mat4x4& mat, float angle, float x, float y, float z);
+    static void applyTransformation(glm::mat4x4& mat);
+    static void glm_rotate(glm::mat4x4& mat, float angle, float x, float y, float z);
+    static glm::mat4x4 glm_rotate2(glm::mat4x4& mat, float angle, const glm::vec3& axis);
 
 public:
     void onSetupAndRender(SetupAndRenderEvent& event) override;
