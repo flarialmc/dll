@@ -24,7 +24,6 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
 
     D2D1_COLOR_F buttonColor;
 
-    std::cout << darkenAmounts[index] << std::endl;
     if (CursorInRect(x, y, width, height)) {
         buttonColor = D2D1::ColorF(color.r - darkenAmounts[index], color.g - darkenAmounts[index],
                                    color.b - darkenAmounts[index], color.a);
