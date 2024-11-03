@@ -50,9 +50,17 @@ ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT wi
 // TODO: get back to this to check
 void ResizeHook::cleanShit(bool isResize) {
 
+
     Memory::SafeRelease(SwapchainHook::stageTex);
     Memory::SafeRelease(SwapchainHook::SavedD3D11BackBuffer);
     Memory::SafeRelease(SwapchainHook::ExtraSavedD3D11BackBuffer);
+    Memory::SafeRelease(Blur::pConstantBuffer);
+    Memory::SafeRelease(Blur::pSampler);
+    Memory::SafeRelease(Blur::pDownsampleShader);
+    Memory::SafeRelease(Blur::pInputLayout);
+    Memory::SafeRelease(Blur::pUpsampleShader);
+    Memory::SafeRelease(Blur::pVertexBuffer);
+    Memory::SafeRelease(Blur::pVertexShader);
 
     Blur::hasDoneFrames = false;
     for(ID3D11Texture2D* tex : Blur::framebuffers){ Memory::SafeRelease(tex); Blur::framebuffers.clear();}

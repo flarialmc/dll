@@ -294,7 +294,7 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 
     if (!SwapchainHook::GetBackbuffer()) return;
 
-    winrt::com_ptr<ID3D11ShaderResourceView>pOrigShaderResourceView = MotionBlur::BackbufferToSRV();
+    winrt::com_ptr<ID3D11ShaderResourceView> pOrigShaderResourceView = MotionBlur::BackbufferToSRV();
     if (!pOrigShaderResourceView) {
         return;
     }
@@ -374,7 +374,4 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
         shaderResourceViews.clear();
         fbSizes.clear();
     }
-
-
-    pOrigShaderResourceView->Release();
 }
