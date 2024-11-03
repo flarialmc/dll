@@ -54,19 +54,15 @@ void ItemPhysicsListener::ItemRenderer_render(ItemRenderer* _this, BaseActorRend
     oFunc(_this, renderCtx, renderData);
 }
 
-void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, float y, float z) {
-    static auto rotateSig = GET_SIG_ADDRESS("glm_rotate");
-    using glm_rotate_t = void(__fastcall*)(glm::mat4x4&, float, float, float, float);
-    static auto glm_rotate = reinterpret_cast<glm_rotate_t>(rotateSig);
-
-    if(!ModuleManager::initialized) return;
+glm::mat4x4& ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, float y, float z) {
+    if(!ModuleManager::initialized) mat;
 
     static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("ItemPhysics"));
     const auto listener = mod->listener;
     const auto renderData = listener->renderData;
 
     if (renderData == nullptr)
-        return;
+        return mat;
 
     auto curr = reinterpret_cast<ItemActor*>(renderData->actor);
 
@@ -190,9 +186,20 @@ void ItemPhysicsListener::glm_rotate(glm::mat4x4& mat, float angle, float x, flo
 
     mat = translate(mat, {pos.x, pos.y, pos.z});
 
-    glm_rotate(mat, renderVec.x, 1.f, 0.f, 0.f);
-    glm_rotate(mat, renderVec.y, 0.f, 1.f, 0.f);
-    glm_rotate(mat, renderVec.z, 0.f, 0.f, 1.f);
+    if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+        rotate(mat, renderVec.x, {1.f, 0.f, 0.f});
+        rotate(mat, renderVec.y, {0.f, 1.f, 0.f});
+        rotate(mat, renderVec.z, {0.f, 0.f, 1.f});
+    } else {
+        static auto rotateSig = GET_SIG_ADDRESS("glm_rotate");
+        using glm_rotate_t = void (__fastcall *)(glm::mat4x4 &, float, float, float, float);
+        static auto glm_rotate = reinterpret_cast<glm_rotate_t>(rotateSig);
+
+        glm_rotate(mat, renderVec.x, 1.f, 0.f, 0.f);
+        glm_rotate(mat, renderVec.y, 0.f, 1.f, 0.f);
+        glm_rotate(mat, renderVec.z, 0.f, 0.f, 1.f);
+    }
+    return mat;
 }
 
 void ItemPhysicsListener::onSetupAndRender(SetupAndRenderEvent& event) {

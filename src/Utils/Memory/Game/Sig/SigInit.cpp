@@ -40,9 +40,12 @@ void SigInit::init2140() {
     ADD_SIG("MeshHelpers::renderMeshImmediately", "40 53 55 56 57 41 56 48 81 EC 20 04 00 00 49 8B F1 4D 8B F0 48 8B FA 48 8B E9 80 BA 0D 02 00 00 00 0F 85 2E");
     ADD_SIG("MeshHelpers::renderMeshImmediately2", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 98 FC FF FF 48 81 EC 68 04 00 00 49"); // bruh it changed
 
-    ADD_SIG("glm_rotateRef", "");
-    ADD_SIG("glm_translateRef", "");
-    ADD_SIG("glm_translateRef2", "");
+    DEPRECATE_SIG("glm_rotate");
+    ADD_SIG("glm_rotateRef", "E8 ? ? ? ? 48 8B D0 8B 08 89 0B 8B 48 04 89 4B 04 8B 48 08 89 4B 08 8B 48 0C 89 4B 0C 8B 48 10 89 4B 10 8B 48 14 89 4B 14 8B 40 18 89 43 18 8B 42 1C 89 43 1C 8B 42 20 89 43 20 8B 42 24 89 43 24 8B 42 28 89 43 28 8B 42 2C 89 43 2C 8B 42 30 89 43 30 8B 42 34 89 43 34 8B 42 38 89 43 38 8B 42 3C 89 43 3C 0F B6 47 22");
+    ADD_SIG("glm_translateRef", "E8 ? ? ? ? 48 8D 15 ? ? ? ? 0F 28 35");
+    ADD_SIG("glm_translateRef2", "E8 ? ? ? ? C6 46 38 01 F3 0F 11 74 24 20 F3 0F 10 1D");
+
+    ADD_SIG("ItemPositionConst", "F3 0F 10 15 ? ? ? ? F3 0F 59 C2 F3 41 0F 58 C1");
 
     ADD_SIG("MinecraftUIRenderContext::getTexture", "");
 
@@ -55,8 +58,6 @@ void SigInit::init2140() {
     ADD_SIG("Actor::setNametag", "48 89 5C 24 18 48 89 74 24 20 57 48 83 EC 60 48 8B F2 48 8B F9 48 8B");
 
     ADD_SIG("BlockSource::getBiome", "48 89 5C 24 18 57 48 83 EC 60 48 8B DA 48 8B F9 48 8B"); // world_loading_progress_screen sub_14XXXXXX(arg) + 16;
-
-    ADD_SIG("ItemPositionConst", "");
 
     ADD_SIG("MinecraftPackets::createPacket", "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 81 EC A0 00 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 98 00 00 00 48 8B F9");
 

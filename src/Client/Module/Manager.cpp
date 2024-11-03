@@ -160,10 +160,7 @@ void ModuleManager::initialize() {
     ////addModule(new OpponentReach());
     addModule(new ViewModel());
     addModule(new HitPing());
-
-    if(!WinrtUtils::checkAboveOrEqual(21,40)) {
-        addModule(new ItemPhysics());
-    }
+    addModule(new ItemPhysics());
 
     //addModule(new MovableChat());
     //addModule(new CompactChat());
