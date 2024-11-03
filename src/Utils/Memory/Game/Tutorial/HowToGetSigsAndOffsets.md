@@ -195,3 +195,9 @@ variable.is_enchanted (above that)
 
 ### ClientInstance::grabMouse
 accessibility.game.playerView (somewhere above that)
+
+### Actor::setNametag
+"CustomNameVisible" 2nd ref above that is the func (2 arg)
+
+### BlockSource::getBiome
+world_loading_progress_screen sub_14XXXXXX(arg) + 16; last ref (has credits_screen too)
