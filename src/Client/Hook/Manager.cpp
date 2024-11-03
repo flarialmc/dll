@@ -68,7 +68,9 @@ void HookManager::initialize() {
     hooks.push_back(new SendPacketHook());
     hooks.push_back(new getSensHook());
     hooks.push_back(new HudMobEffectsRendererHook());
-    hooks.push_back(new UpdatePlayerHook());
+    if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+        hooks.push_back(new UpdatePlayerHook());
+    }
     //hooks.push_back(new RenderItemGroupHook());
     //hooks.push_back(new getCurrentSwingDuration());
 
