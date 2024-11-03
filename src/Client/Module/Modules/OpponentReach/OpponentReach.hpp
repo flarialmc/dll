@@ -122,7 +122,7 @@ public:
                     auto actors = SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList();
                     // remove non players
                     std::erase_if(actors, [](Actor* actor) {
-                        return !actor->hasCategory(ActorCategory::Player);
+                        return !actor->hasCategory(ActorCategory::Player) || !actor->isValidAABB();
                     });
                     // remove actors that are too far or on our team
                     std::erase_if(actors, [player, excludeTeam](Actor* actor) {

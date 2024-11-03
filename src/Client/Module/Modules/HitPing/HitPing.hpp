@@ -119,6 +119,8 @@ public:
     }
 
     void onAttack(AttackEvent &event) { // only calculate ping on first hit
+        if(!event.getActor()->isValid()) return;
+        if(!event.getActor()->isValidAABB()) return;
         ClearOldHits();
         auto playerPos = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent()->Pos;
         auto entity = event.getActor();

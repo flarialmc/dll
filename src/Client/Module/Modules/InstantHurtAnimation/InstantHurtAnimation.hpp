@@ -86,6 +86,8 @@ public:
     }
 
     void onAttack(AttackEvent &event) {
+        if(!event.getActor()->isValid()) return;
+        if(!event.getActor()->isValidAABB()) return;
         if(!event.getActor()->hasCategory(ActorCategory::Player)) return;
         if(this->settings.getSettingByName<bool>("onlyWithArmor")->value) {
             auto armorContainer = event.getActor()->getArmorContainer();
