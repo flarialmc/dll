@@ -36,7 +36,7 @@ class PatarHDListener : public Listener {
             } else {
                 Vec2<float> center = Constraints::CenterConstraint(s, s);
                 FlarialGUI::image(IDR_PATAR_JPG,
-                                  D2D1::RectF(center.x, center.y, center.x + s, center.y + s));
+                                  D2D1::RectF(center.x, center.y, center.x + s, center.y + s), "JPG");
             }
         }
 
