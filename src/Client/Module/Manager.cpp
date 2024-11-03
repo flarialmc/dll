@@ -156,13 +156,9 @@ void ModuleManager::initialize() {
     addModule<ViewModel>();
     addModule<PotionHUD>();
     addModule<FasterInventory>();
-
     // addModule<MovableChat>();
     // addModule<CompactChat>();
-    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
-        addModule<ItemPhysics>();
-    }
-
+    addModule<ItemPhysics>();
     addModule<HiveStat>();
 
     addService<GUIKeyListener>();

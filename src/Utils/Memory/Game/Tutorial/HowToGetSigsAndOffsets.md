@@ -30,6 +30,8 @@ Actor::getStateVectorComponent - tryGetPrefix + DA BA 91 3C C9 0E
 Actor::getRuntimeIDComponent - tryGetPrefix + DA BA 14 14 A1 3C
 Actor::getRenderPositionComponent - tryGetPrefix + DA BA 6E F3 E8 D4
 
+## To get actual try_get this could be used (.4X, might work on lower): 42 81 7C 09 08 + hash
+
 ### Actor::getActorDataFlagComponent
 its inside Player::BaseTick, under while(aGameplayemote) loop, above & 0x10000000
 Actor::basicReg offset is offset in first arg
@@ -191,7 +193,7 @@ variable.is_enchanted (above that)
 48 83 EC 38 48 8B 49 10 48 85 C9 74 ?
 
 ### Options::getSensitivity
-"AutoUpdate" / "gameLocale" / "Options"
+"AutoUpdate" / "gameLocale" / "Options" (used in the func that has those strings)
 
 ### ClientInstance::grabMouse
 accessibility.game.playerView (somewhere above that)
@@ -201,3 +203,12 @@ accessibility.game.playerView (somewhere above that)
 
 ### BlockSource::getBiome
 world_loading_progress_screen sub_14XXXXXX(arg) + 16; last ref (has credits_screen too)
+
+### ItemRenderer::render (for glm_rotateRef etc in ItemPhysics)
+entity_alphatest_change_color_glint to vtable then to ItemRenderer::render (like 3rd func in vtable)
+
+### Dimension::getBrightnessDependentFogColor
+"A dimension task group" (vtable ref to it)
+
+### ItemStack::getDamageValue
+used in a lot of func, could be found by looking through "Damage" string refs, should have something like v1 = *(_QWORD **)(a1 + 8) at the start
