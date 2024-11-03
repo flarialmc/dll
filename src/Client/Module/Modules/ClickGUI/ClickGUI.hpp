@@ -1278,7 +1278,7 @@ public:
             if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen")
                 this->active = false;
             else {
-                this->active = !this->active;
+            keybindActions[0]({});
             }
 
             if (this->active) {

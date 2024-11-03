@@ -38,6 +38,51 @@ public:
         Module::setup();
     };
 
+    void onSetup() override {
+        keybindActions.clear();
+
+        //enable action (key press)
+        keybindActions.push_back([this](std::vector<std::any> args) -> std::any {
+
+            std::string serverIP = SDK::getServerIP();
+if ((serverIP.find("hive") != std::string::npos ||
+serverIP.find("galaxite") != std::string::npos ||
+serverIP.find("venity") != std::string::npos)) { // TODO: make it only show once per server switch?
+FlarialGUI::Notify("Can't use freelook on " + serverIP); // TODO: move restrictions to API
+this->restricted = true;
+} else {
+this->restricted = false;
+}
+if (!this->restricted) {
+if (this->settings.getSettingByName<bool>("toggle")->value) {
+if (!this->active) {
+    patch();
+}else{
+    unpatch();
+}
+} else {
+patch();
+}
+} else {
+unpatch(); // module restricted
+}
+            return {};
+
+
+        });
+
+
+        //disable action (key release)
+        keybindActions.push_back([this](std::vector<std::any> args) -> std::any {
+
+            if (!this->settings.getSettingByName<bool>("toggle")->value)
+                unpatch();
+
+            return {};
+
+        });
+    }
+
     void onEnable() override {
         Listen(this, PerspectiveEvent, &FreeLook::onGetViewPerspective)
         Listen(this, UpdatePlayerEvent, &FreeLook::onUpdatePlayer)
@@ -136,33 +181,10 @@ public:
     // TODO: cancel event if its ment for this module ?
     void onKey(KeyEvent &event) {
         if (this->isKeyPartOfKeybind(event.key)) {
-            // TODO: for multiple key this might not work!!!
             if (this->isKeybind(event.keys)) { // key is defo pressed
-                std::string serverIP = SDK::getServerIP();
-                if ((serverIP.find("hive") != std::string::npos ||
-                     serverIP.find("galaxite") != std::string::npos ||
-                     serverIP.find("venity") != std::string::npos)) { // TODO: make it only show once per server switch?
-                    FlarialGUI::Notify("Can't use freelook on " + serverIP); // TODO: move restrictions to API
-                    this->restricted = true;
-                } else {
-                    this->restricted = false;
-                }
-                if (!this->restricted) {
-                    if (this->settings.getSettingByName<bool>("toggle")->value) {
-                        if (!this->active) {
-                            patch();
-                        }else{
-                            unpatch();
-                        }
-                    } else {
-                        patch();
-                    }
-                } else {
-                    unpatch(); // module restricted
-                }
+                keybindActions[0]({});
             } else { // key released
-                if (!this->settings.getSettingByName<bool>("toggle")->value)
-                    unpatch();
+                keybindActions[1]({});
             }
         }
 

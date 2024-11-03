@@ -413,7 +413,7 @@ public:
 
      void onKey(KeyEvent &event) {
          if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
-             this->active = !this->active;
+            keybindActions[0]({});
          }
 
          if (!this->isKeybind(event.keys)) this->active = false;

@@ -176,12 +176,13 @@ public:
 
     void onKey(KeyEvent &event) {
         if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
-            this->active = !this->active;
+            keybindActions[0]({});
             if (!this->settings.getSettingByName<bool>("SaveModifier")->value) zoomValue = 30.0f;
         }
 
         if (!this->isKeybind(event.keys)) this->active = false;
     };
+
     // TODO: add dolly zoom and world2screen zoom stabilization ?
     // TODO: if someone has disabled hand this will enable it unless changed in settings
     void onSetTopScreenName(SetTopScreenNameEvent &event) {

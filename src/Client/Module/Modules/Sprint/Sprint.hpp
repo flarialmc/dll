@@ -105,9 +105,16 @@ public:
 
     bool toggleSprinting = false;
 
+    void onSetup() override {
+        keybindActions.clear();
+        keybindActions.push_back([this](std::vector<std::any> args) -> std::any {
+            toggleSprinting = !toggleSprinting;
+            return {};
+        });
+    }
     void onKey(KeyEvent &event) {
         if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
-            toggleSprinting = !toggleSprinting;
+            keybindActions[0]({});
         }
     };
 

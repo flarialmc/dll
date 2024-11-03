@@ -400,14 +400,20 @@ void Module::loadSettings() {
     if (inputFile.is_open()) {
         ss << inputFile.rdbuf();
         inputFile.close();
-    }
-    else {
+    } else {
         Logger::error("File could not be opened. Maybe it doesn't exist?: " + settingspath);
         return;
     }
 
     std::string settingstring = ss.str();
     settings.FromJson(settingstring);
+
+    for (const auto& settingPair : settings.settings) {
+        const std::string& name = settingPair.first;
+        if (name.find("keybind") != std::string::npos) {
+            ++totalKeybinds;
+        }
+    }
 }
 
 void Module::checkSettingsFile() const {
@@ -437,8 +443,14 @@ void Module::toggle() {
 void Module::setup() {
     defaultConfig();
     Module::defaultConfig();
+    keybindActions.push_back([this] (std::vector<std::any> args)-> std::any {
+    this->active = !this->active;
+    return {};
+    });
+
     onSetup();
     // TODO: might call on enable twice
+
     if (settings.getSettingByName<bool>("enabled")->value)
         onEnable();
 }
@@ -483,11 +495,13 @@ void Module::setKeybind(const std::string& newKeybind) {
         settings.addSetting("keybind", newKeybind);
 }
 
-std::string& Module::getKeybind() {
-    auto key = settings.getSettingByName<std::string>("keybind");
+std::string& Module::getKeybind(const int keybindCount) {
+    std::string count;
+    if(keybindCount > 0) count = "-" + std::to_string(keybindCount);
+    auto key = settings.getSettingByName<std::string>("keybind" + count);
     if (key == nullptr)
         settings.addSetting("keybind", defaultKeybind);
-    return settings.getSettingByName<std::string>("keybind")->value;
+    return key->value;
 }
 
 void Module::defaultConfig() {
@@ -556,9 +570,13 @@ void Module::defaultConfig() {
 
 }
 
-bool Module::isKeybind(const std::array<bool, 256>& keys) {
+bool Module::isKeybind(const std::array<bool, 256>& keys, const int keybindCount) {
 
-    std::vector<int> keyCodes = Utils::getStringAsKeys(getKeybind());
+    std::string count = "keybind";
+    if(keybindCount > 0) count += "-" + std::to_string(keybindCount);
+    if(!settings.getSettingByName<std::string>(count)) { return false;}
+
+    std::vector<int> keyCodes = Utils::getStringAsKeys(getKeybind(keybindCount));
 
     for (int keyCode : keyCodes) {
         if (!keys[keyCode]) {
@@ -582,8 +600,6 @@ bool Module::isKeybind(const std::array<bool, 256>& keys) {
 
     for (int keyCode : keyCodes) {
         if (!keys[keyCode]) {
-
-            // Key is not being held down
             return false;
         }
     }
@@ -597,8 +613,8 @@ bool Module::isKeybind(const std::array<bool, 256>& keys) {
     return allInactive;
 }
 
-bool Module::isKeyPartOfKeybind(int keyCode) {
-    std::vector<int> keyCodes = Utils::getStringAsKeys(getKeybind());
+bool Module::isKeyPartOfKeybind(int keyCode, const int keybindCount) {
+    std::vector<int> keyCodes = Utils::getStringAsKeys(getKeybind(keybindCount));
     return std::find(keyCodes.begin(), keyCodes.end(), keyCode) != keyCodes.end();
 }
 
