@@ -75,6 +75,7 @@
 #include "Modules/FasterInventory/FasterInventory.hpp"
 
 #include "Modules/EntityCounter/EntityCounter.hpp"
+#include "Modules/PackChanger/PackChanger.hpp"
 
 namespace ModuleManager {
     std::unordered_map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -160,6 +161,9 @@ void ModuleManager::initialize() {
     // addModule<CompactChat>();
     addModule<ItemPhysics>();
     addModule<HiveStat>();
+    if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+    //    addModule<PackChanger>(); // tss, let it be a surprise!
+    }
 
     addService<GUIKeyListener>();
     addService<DiscordRPCListener>();

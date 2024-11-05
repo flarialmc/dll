@@ -5,6 +5,8 @@
 #include "Game/TickEvent.hpp"
 #include "Game/TimeEvent.hpp"
 #include "Game/UpdatePlayerEvent.hpp"
+#include "Game/isPreGameEvent.hpp"
+#include "Game/PacksLoadEvent.hpp"
 
 #include "Input/KeyEvent.hpp"
 #include "Input/MouseEvent.hpp"

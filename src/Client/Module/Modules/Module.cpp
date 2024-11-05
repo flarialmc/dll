@@ -1,5 +1,6 @@
 #include "Module.hpp"
 #include "../../Client.hpp"
+#include "../../Events/Events.hpp"
 #include "ClickGUI/ClickGUI.hpp"
 
 #define colors_secondary6 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary6")->value)

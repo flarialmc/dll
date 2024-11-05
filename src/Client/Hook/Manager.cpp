@@ -19,6 +19,8 @@
 #include "Hooks/Render/HudMobEffectsRenderer.hpp"
 #include "Hooks/Visual/BaseActorRendererRenderTextHook.hpp"
 #include "Hooks/Game/UpdatePlayerHook.hpp"
+#include "Hooks/Game/isPreGame.hpp"
+#include "Hooks/Game/composeFullStack.hpp"
 //#include "Hooks/Game/RenderItemGroup.hpp"
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 
@@ -73,6 +75,8 @@ void HookManager::initialize() {
     }
     if(WinrtUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
+        addHook<isPreGameHook>();
+        addHook<_composeFullStackHook>();
     }
 
     for (const auto& hook: hooks)

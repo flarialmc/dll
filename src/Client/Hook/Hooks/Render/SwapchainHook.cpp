@@ -26,6 +26,7 @@ ID3D12CommandQueue *SwapchainHook::queue = nullptr;
 bool initImgui = false;
 bool allfontloaded = false;
 bool first = false;
+bool imguiWindowInit = false;
 BOOL _ = FALSE, $ = FALSE, fEnabled = FALSE, fD3D11 = FALSE, MADECHAIN = FALSE;
 
 static std::chrono::high_resolution_clock fpsclock;
@@ -185,7 +186,24 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 // CREDIT @AETOPIA
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
-
+    if(queueReset) {
+        fEnabled = FALSE;
+        MADECHAIN = FALSE;
+        init = false;
+        initImgui = false;
+        FlarialGUI::hasLoadedAll = false;
+        allfontloaded = false;
+        first = false;
+        queueReset = false;
+        if (queue != nullptr) {
+            ImGui_ImplDX12_Shutdown();
+        } else {
+            ImGui_ImplDX11_Shutdown();
+        }
+        Memory::SafeRelease(D2D::context);
+        Memory::SafeRelease(context);
+        ImGui_ImplWin32_Shutdown();
+    }
 
     if(!fEnabled) {
         return DXGI_ERROR_DEVICE_RESET;
@@ -537,6 +555,7 @@ void SwapchainHook::DX12Render() {
                                     ImGui::CreateContext();
 
                                     ImGui_ImplWin32_Init(window);
+
                                     ImGui_ImplDX12_Init(d3d12Device5, buffersCounts,
                                         DXGI_FORMAT_R8G8B8A8_UNORM, d3d12DescriptorHeapImGuiRender,
                                         d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart(),
