@@ -1,5 +1,6 @@
 #include "../../../Engine.hpp"
 #include "../../../../../Module/Manager.hpp"
+#include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -40,9 +41,9 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
     D2D1_COLOR_F disabledColor = colors_primary3_rgb ? rgbColor : colors_primary3;
     D2D1_COLOR_F circleColor = colors_primary2_rgb ? rgbColor : colors_primary2;
 
-    color.a = o_colors_primary1;
-    disabledColor.a = o_colors_primary3;
-    circleColor.a = o_colors_primary2;
+    color.a = ClickGUI::settingsOpacity;
+    disabledColor.a = ClickGUI::settingsOpacity;
+    circleColor.a = ClickGUI::settingsOpacity;
 
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {

@@ -218,9 +218,11 @@ void Module::addHeader(std::string text) {
 
 
     D2D1_COLOR_F col = colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6;
-    col.a = o_colors_secondary6;
+    col.a = ClickGUI::settingsOpacity;
+    D2D1_COLOR_F textCol = D2D1::ColorF(D2D1::ColorF::White);
+    textCol.a = ClickGUI::settingsOpacity;;
 
-    std::string name = FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 500, 0, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.215f, "height", true), DWRITE_FONT_WEIGHT_BOLD, false);
+    std::string name = FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 500, 0, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.215f, "height", true), DWRITE_FONT_WEIGHT_BOLD, textCol, false);
 
     if(FlarialGUI::shouldAdditionalY)
         for (int i = 0; i < FlarialGUI::highestAddIndexes + 1; i++) {
@@ -240,6 +242,7 @@ void Module::addButton(const std::string& text, const std::string& subtext, cons
     const float height = Constraints::RelativeConstraint(0.035, "height", true);
     Vec2<float> round = Constraints::RoundingConstraint(13, 13);
     D2D1_COLOR_F col = FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary1")->value);
+    col.a = ClickGUI::settingsOpacity;
 
     if(FlarialGUI::RoundedButton(buttonIndex, elementX, y, col, D2D1::ColorF(D2D1::ColorF::White), FlarialGUI::to_wide(buttonText).c_str(), width, height, round.x, round.y)) {
         action();
@@ -330,8 +333,14 @@ void Module::addElementText(std::string text, std::string subtext) {
         y += Constraints::RelativeConstraint(0.0015f, "height", true);
     }
 
-    FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, false);
-    if (!subtext.empty()) FlarialGUI::FlarialTextWithFont(x, subtextY, FlarialGUI::to_wide(subtext).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, FlarialGUI::HexToColorF("473b3d"), false);
+    D2D1_COLOR_F textCol = D2D1::ColorF(D2D1::ColorF::White);
+    textCol.a = ClickGUI::settingsOpacity;
+    D2D1_COLOR_F subtextCol = FlarialGUI::HexToColorF("473b3d");
+    subtextCol.a = ClickGUI::settingsOpacity;
+
+
+    FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, textCol, false);
+    if (!subtext.empty()) FlarialGUI::FlarialTextWithFont(x, subtextY, FlarialGUI::to_wide(subtext).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, subtextCol, false);
 }
 
 void Module::addSlider(std::string text, std::string subtext, float& value, float maxVal, float minVal, bool zerosafe) {

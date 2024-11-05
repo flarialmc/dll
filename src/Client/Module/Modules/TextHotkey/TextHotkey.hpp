@@ -33,7 +33,7 @@ public:
         const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
 
-        FlarialGUI::ScrollBar(x, y, 140, 800, 2);
+        FlarialGUI::ScrollBar(x, y, 140, 5000, 2);
         FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));

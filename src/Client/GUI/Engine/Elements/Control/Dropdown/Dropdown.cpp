@@ -3,6 +3,7 @@
 #include "../../Structs/ImagesClass.hpp"
 #include "../../../../../Module/Manager.hpp"
 #include "../../../../../../Assets/Assets.hpp"
+#include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -70,10 +71,11 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     additionalIndex = index;
 
     D2D1_COLOR_F unselectedChildCol = colors_primary3_rgb ? rgbColor : colors_primary3;
-    unselectedChildCol.a = o_colors_primary3;
+    unselectedChildCol.a = ClickGUI::settingsOpacity;
+
 
     D2D1_COLOR_F selectedCol = colors_primary1_rgb ? rgbColor : colors_primary1;
-    selectedCol.a = o_colors_primary1;
+    selectedCol.a = ClickGUI::settingsOpacity;
 
     float originalY = y;
     if (!FlarialGUI::DropDownMenus[index].curColorDone) {

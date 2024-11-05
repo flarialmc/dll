@@ -1,5 +1,6 @@
 #include "../../../Engine.hpp"
 #include "../../../../../Module/Manager.hpp"
+#include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 #include "../../../animations/fadeinout.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
@@ -45,9 +46,10 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb) {
     D2D1_COLOR_F enabledColor = colors_primary1;
     D2D1_COLOR_F circleColor = colors_primary2;
 
-    disabledColor.a = o_colors_primary3;
-    enabledColor.a = o_colors_primary1;
-    circleColor.a = o_colors_primary2;
+    disabledColor.a = ClickGUI::settingsOpacity;
+    enabledColor.a = ClickGUI::settingsOpacity;
+    circleColor.a = ClickGUI::settingsOpacity;
+    toggleColors[index].a = ClickGUI::settingsOpacity;
 
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {

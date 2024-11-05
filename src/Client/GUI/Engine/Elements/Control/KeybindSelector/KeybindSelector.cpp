@@ -1,6 +1,7 @@
 #include "../../../Engine.hpp"
 #include "../../../Constraints.hpp"
 #include "../../../../../Module/Manager.hpp"
+#include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -59,7 +60,7 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
 
     D2D1_COLOR_F col = KeybindSelectors[index].isActive ? (colors_primary1_rgb ? rgbColor : colors_primary1)
                                                         : (colors_primary3_rgb ? rgbColor : colors_primary3);
-    col.a = KeybindSelectors[index].isActive ? o_colors_primary1 : o_colors_primary3;
+    col.a = ClickGUI::settingsOpacity;
 
     if (KeybindSelectors[index].isActive) {
         std::chrono::steady_clock::time_point currentOnKeyTime = std::chrono::steady_clock::now();
@@ -71,6 +72,7 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
 
     KeybindSelectors[index].curColor = FlarialGUI::LerpColor(KeybindSelectors[index].curColor, col,
                                                              0.1f * FlarialGUI::frameFactor);
+    KeybindSelectors[index].curColor.a = ClickGUI::settingsOpacity;
 
     std::string text;
 

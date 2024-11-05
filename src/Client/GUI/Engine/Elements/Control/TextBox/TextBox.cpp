@@ -1,5 +1,6 @@
 #include "../../../Engine.hpp"
 #include "../../../../../Module/Manager.hpp"
+#include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -77,6 +78,9 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
         col = colors_primary3;
         col.a = o_colors_primary3;
     }
+
+    col.a = ClickGUI::settingsOpacity;
+
 
     FlarialGUI::RoundedRect(x, y, col, Constraints::SpacingConstraint(1.55, textWidth), percHeight, round.x, round.x);
 
