@@ -983,24 +983,23 @@ public:
             std::string e = curr;
 
             if(page.type == "normal" && e == "modules") {
-                FlarialGUI::lerp(modcardOpacity, 1.0f, 0.1f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(modcardOpacity, 1.0f, 0.05f * FlarialGUI::frameFactor);
                 FlarialGUI::lerp(modcardOffset, 0.0f, 0.3f * FlarialGUI::frameFactor);
             } else {
-                FlarialGUI::lerp(modcardOpacity, 0.0f, 0.1f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(modcardOpacity, 0.0f, 0.05f * FlarialGUI::frameFactor);
                 FlarialGUI::lerp(modcardOffset, -Constraints::RelativeConstraint(0.5f, "height", true), 0.3f * FlarialGUI::frameFactor);
             }
 
 
             if(e == "settings" || page.type == "settings") {
-                FlarialGUI::lerp(settingsOpacity, 1.0f, 0.1f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(settingsOpacity, 1.0f, 0.05f * FlarialGUI::frameFactor);
                 FlarialGUI::lerp(settingsOffset, 0.0f, 0.3f * FlarialGUI::frameFactor);
             } else {
-                FlarialGUI::lerp(settingsOpacity, 0.0f, 0.1f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(settingsOpacity, 0.0f, 0.05f * FlarialGUI::frameFactor);
                 FlarialGUI::lerp(settingsOffset, -Constraints::RelativeConstraint(0.5f, "height", true), 0.3f * FlarialGUI::frameFactor);
             }
 
             if (page.type == "normal") {
-                if (e == "modules") {
 
                     float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
                     float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
@@ -1097,9 +1096,9 @@ public:
                     FlarialGUI::PopImClipRect();
 
                     //FlarialGUI::ShadowRect(Vec2{center.x, center.y}, Vec2{baseWidth, Constraints::RelativeConstraint(baseHeightReal, "height", true)}, FlarialGUI::HexToColorF("120e0f"), baseRound.x, 100);
-                }
 
-                if (e == "settings" && page.type != "settings") {
+
+                if (page.type != "settings") {
 
 
                     FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
@@ -1212,7 +1211,7 @@ public:
                 /* Mod Card End */
             }
 
-            if (page.type == "settings" && ModuleManager::getModule(page.module)) {
+            if (ModuleManager::getModule(page.module)) {
 
 
                 FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
