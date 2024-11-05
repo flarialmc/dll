@@ -243,8 +243,10 @@ void Module::addButton(const std::string& text, const std::string& subtext, cons
     Vec2<float> round = Constraints::RoundingConstraint(13, 13);
     D2D1_COLOR_F col = FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary1")->value);
     col.a = ClickGUI::settingsOpacity;
+    D2D1_COLOR_F f = D2D1::ColorF(D2D1::ColorF::White);
+    f.a = ClickGUI::settingsOpacity;
 
-    if(FlarialGUI::RoundedButton(buttonIndex, elementX, y, col, D2D1::ColorF(D2D1::ColorF::White), FlarialGUI::to_wide(buttonText).c_str(), width, height, round.x, round.y)) {
+    if(FlarialGUI::RoundedButton(buttonIndex, elementX, y, col, f, FlarialGUI::to_wide(buttonText).c_str(), width, height, round.x, round.y)) {
         action();
     }
 

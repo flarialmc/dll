@@ -59,7 +59,7 @@ public:
     static inline float modcardOpacity = 1.f;
     static inline float settingsOpacity = 0.f;
     static inline float modcardOffset = 0.f;
-    static inline float settingsOffset = -Constraints::RelativeConstraint(0.5f, "height", true);
+    static inline float settingsOffset = -Constraints::RelativeConstraint(2.f, "height", true);
     static inline PageType page;
     static inline std::string curr;
     static float inline accumilatedPos = 1;
@@ -983,20 +983,20 @@ public:
             std::string e = curr;
 
             if(page.type == "normal" && e == "modules") {
-                FlarialGUI::lerp(modcardOpacity, 1.0f, 0.05f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(modcardOpacity, 1.0f, 0.1f * FlarialGUI::frameFactor);
                 FlarialGUI::lerp(modcardOffset, 0.0f, 0.3f * FlarialGUI::frameFactor);
             } else {
-                FlarialGUI::lerp(modcardOpacity, 0.0f, 0.05f * FlarialGUI::frameFactor);
-                FlarialGUI::lerp(modcardOffset, -Constraints::RelativeConstraint(0.5f, "height", true), 0.3f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(modcardOpacity, 0.0f, 0.1f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(modcardOffset, -Constraints::RelativeConstraint(2.f, "height", true), 0.08f * FlarialGUI::frameFactor);
             }
 
 
             if(e == "settings" || page.type == "settings") {
-                FlarialGUI::lerp(settingsOpacity, 1.0f, 0.05f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(settingsOpacity, 1.0f, 0.1f * FlarialGUI::frameFactor);
                 FlarialGUI::lerp(settingsOffset, 0.0f, 0.3f * FlarialGUI::frameFactor);
             } else {
-                FlarialGUI::lerp(settingsOpacity, 0.0f, 0.05f * FlarialGUI::frameFactor);
-                FlarialGUI::lerp(settingsOffset, -Constraints::RelativeConstraint(0.5f, "height", true), 0.3f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(settingsOpacity, 0.0f, 0.1f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(settingsOffset, -Constraints::RelativeConstraint(2.f, "height", true), 0.08f * FlarialGUI::frameFactor);
             }
 
             if (page.type == "normal") {
@@ -1278,6 +1278,7 @@ public:
                                                                             buttonHeight);
 
 
+                    colorThing.a = settingsOpacity;
                     if (FlarialGUI::RoundedButton(0, spacingX + centered.first + rectX - settingsOffset,
                                                   thingYes.second + rectHeight + rectY - Constraints::RelativeConstraint(0.06f), colorThing, textCol, L"Reset",
                                                   buttonWidth, buttonHeight, round.x, round.x)) {
