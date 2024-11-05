@@ -1279,7 +1279,7 @@ public:
                                                                             buttonHeight);
 
 
-                    if (FlarialGUI::RoundedButton(0, spacingX + centered.first + rectX,
+                    if (FlarialGUI::RoundedButton(0, spacingX + centered.first + rectX - settingsOffset,
                                                   thingYes.second + rectHeight + rectY - Constraints::RelativeConstraint(0.06f), colorThing, textCol, L"Reset",
                                                   buttonWidth, buttonHeight, round.x, round.x)) {
                         auto currentModule = ModuleManager::getModule(page.module);
@@ -1292,7 +1292,7 @@ public:
                     }
 
 
-                    if (FlarialGUI::RoundedButton(1, -spacingX + centered.first + rectX + childWidth - buttonWidth,
+                    if (FlarialGUI::RoundedButton(1, -spacingX + centered.first + rectX + childWidth - buttonWidth - settingsOffset,
                                                   thingYes.second + rectHeight + rectY - Constraints::RelativeConstraint(0.06f), colorThing, textCol,
                                                   L"Copy From", buttonWidth, buttonHeight, round.x, round.x)) {
 
