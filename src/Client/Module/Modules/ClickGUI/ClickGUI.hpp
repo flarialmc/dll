@@ -1211,7 +1211,7 @@ public:
                 /* Mod Card End */
             }
 
-            if (ModuleManager::getModule(page.module)) {
+            if (ModuleManager::getModule(page.module) && page.type != "normal") {
 
 
                 FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
