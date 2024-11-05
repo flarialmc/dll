@@ -155,104 +155,107 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 
     if (isAdditionalY) UnSetIsInAdditionalYMode();
 
-    if(FlarialGUI::DropDownMenus[index].isActive) {
-        for (const std::string &op: options) {
-            if (op == FlarialGUI::DropDownMenus[index].selected) continue;
+    for (const std::string &op: options) {
+        if (op == FlarialGUI::DropDownMenus[index].selected) continue;
 
-            float curY = y + ((float)counter * childHeights) - ((float)counter * 0.1f) + 5.f;
+        float curY = y + ((float)counter * childHeights) - ((float)counter * 0.1f) + 5.f;
 
-            if (counter == 0) {
-                if (curY > (originalY - lastChildHeight + 20))
-                    FlarialGUI::RoundedRect(x + offset, curY, unselectedChildCol, Constraints::SpacingConstraint(1.55,
-                                                                                                                 curTextWidth),
-                                            childHeights, 0, 0);
+        if (counter == 0) {
+            if (curY > (originalY - lastChildHeight + 20))
+                FlarialGUI::RoundedRect(x + offset, curY, unselectedChildCol, Constraints::SpacingConstraint(1.55,
+                                                                                                             curTextWidth),
+                                        childHeights, 0, 0);
 
-                counter++;
-                curY = y + ((float)counter * childHeights) - ((float)counter * 0.1f) + 5.f;
-            }
-
-            if (curY < (originalY - lastChildHeight + 20)) continue;
-
-            float curClickingY = clickingY + ((float)counter * childHeights) + 5.f;
-
-            if (counter == options.size() - 1) {
-                FlarialGUI::RoundedRect(x + offset, curY, unselectedChildCol,
-                                        Constraints::SpacingConstraint(1.55, curTextWidth), lastChildHeight, 0, 0);
-                FlarialGUI::RoundedRect(x + offset, curY, unselectedChildCol,
-                                        Constraints::SpacingConstraint(1.55, curTextWidth), childHeights, round.x, round.y);
-            } else
-                FlarialGUI::RoundedRect(x + offset, curY, unselectedChildCol,
-                                        Constraints::SpacingConstraint(1.55, curTextWidth), childHeights, 0, 0);
-
-            if (CursorInRect(x + offset, curClickingY, Constraints::SpacingConstraint(1.55, curTextWidth), childHeights)) {
-                if (MC::mouseButton == MouseButton::Left && FlarialGUI::DropDownMenus[index].isActive) {
-                    MC::mouseButton = MouseButton::None;
-                    FlarialGUI::DropDownMenus[index].isActive = false;
-                    FlarialGUI::DropDownMenus[index].opacityHover = 0.0f;
-                    value = op;
-                } else {
-                    FlarialGUI::lerp(FlarialGUI::DropDownMenus[index].opacityHover, 1.0f, 0.25f * FlarialGUI::frameFactor);
-                }
-                FlarialGUI::DropDownMenus[index].hoveredIndex = counter;
-            }
             counter++;
+            curY = y + ((float)counter * childHeights) - ((float)counter * 0.1f) + 5.f;
         }
 
-        FlarialGUI::lerp(FlarialGUI::DropDownMenus[index].yHover,
-                         y + ((float)FlarialGUI::DropDownMenus[index].hoveredIndex * childHeights) - ((float)counter * 0.1f) + 5.f,
-                         0.25f * FlarialGUI::frameFactor);
+        if(!FlarialGUI::DropDownMenus[index].isActive) break;
 
-        if (FlarialGUI::DropDownMenus[index].yHover >= originalY &&
-            (originalY + percHeight + maxHeight) >= FlarialGUI::DropDownMenus[index].yHover) {
-            hoveredChildCol.a = FlarialGUI::DropDownMenus[index].opacityHover;
-            if (FlarialGUI::DropDownMenus[index].hoveredIndex == options.size() - 1) {
-                FlarialGUI::RoundedRect(x + offset, FlarialGUI::DropDownMenus[index].yHover, hoveredChildCol,
-                                        Constraints::SpacingConstraint(1.55, curTextWidth), lastChildHeight, 0, 0);
-                FlarialGUI::RoundedRect(x + offset, FlarialGUI::DropDownMenus[index].yHover, hoveredChildCol,
-                                        Constraints::SpacingConstraint(1.55, curTextWidth), childHeights, round.x, round.y);
+        if (curY < (originalY - lastChildHeight + 20)) continue;
+
+        float curClickingY = clickingY + ((float)counter * childHeights) + 5.f;
+
+        if (counter == options.size() - 1) {
+            FlarialGUI::RoundedRect(x + offset, curY, unselectedChildCol,
+                                    Constraints::SpacingConstraint(1.55, curTextWidth), lastChildHeight, 0, 0);
+            FlarialGUI::RoundedRect(x + offset, curY, unselectedChildCol,
+                                    Constraints::SpacingConstraint(1.55, curTextWidth), childHeights, round.x, round.y);
+        } else
+            FlarialGUI::RoundedRect(x + offset, curY, unselectedChildCol,
+                                    Constraints::SpacingConstraint(1.55, curTextWidth), childHeights, 0, 0);
+
+        if (CursorInRect(x + offset, curClickingY, Constraints::SpacingConstraint(1.55, curTextWidth), childHeights)) {
+            if (MC::mouseButton == MouseButton::Left && FlarialGUI::DropDownMenus[index].isActive) {
+                MC::mouseButton = MouseButton::None;
+                FlarialGUI::DropDownMenus[index].isActive = false;
+                FlarialGUI::DropDownMenus[index].opacityHover = 0.0f;
+                value = op;
             } else {
-                FlarialGUI::RoundedRect(x + offset, FlarialGUI::DropDownMenus[index].yHover, hoveredChildCol,
-                                        Constraints::SpacingConstraint(1.55, curTextWidth), childHeights, 0, 0);
+                FlarialGUI::lerp(FlarialGUI::DropDownMenus[index].opacityHover, 1.0f, 0.25f * FlarialGUI::frameFactor);
             }
-            }
-
-        counter = 1;
-
-        for (const std::string &op: options) {
-            if (op == FlarialGUI::DropDownMenus[index].selected) continue;
-
-            float curY = y + ((float)counter * childHeights) - ((float)counter * 0.1f) + 5.f;
-
-            if (curY < originalY) continue;
-
-            FlarialGUI::FlarialTextWithFont(x + offset + Constraints::SpacingConstraint(0.1, curTextWidth),
-                                            counter == options.size() - 1 ? curY - 2.5f : curY - 4.0f, to_wide(op).c_str(),
-                                            Constraints::SpacingConstraint(1.55, curTextWidth), percHeight,
-                                            DWRITE_TEXT_ALIGNMENT_LEADING,
-                                            Constraints::SpacingConstraint(1.0, curTextWidth),
-                                            DWRITE_FONT_WEIGHT_NORMAL);
-
-            counter++;
+            FlarialGUI::DropDownMenus[index].hoveredIndex = counter;
         }
-
-        // if (FlarialGUI::DropDownMenus[index].isActive) MC::mouseButton = MouseButton::None;
-
-        y = originalY;
-
-        FlarialGUI::RoundedRect(x, y, FlarialGUI::DropDownMenus[index].curColor,
-                                Constraints::SpacingConstraint(1.55, textWidth), percHeight, round.x, round.x);
-
-        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.1, textWidth), y,
-                                        FlarialGUI::to_wide(value).c_str(),
-                                        Constraints::SpacingConstraint(1.55, textWidth), percHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.0, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y,
-                                        FlarialGUI::to_wide(label).c_str(),
-                                        Constraints::SpacingConstraint(3, textWidth), percHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.00, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
+        counter++;
     }
+
+    FlarialGUI::lerp(FlarialGUI::DropDownMenus[index].yHover,
+                     y + ((float)FlarialGUI::DropDownMenus[index].hoveredIndex * childHeights) - ((float)counter * 0.1f) + 5.f,
+                     0.25f * FlarialGUI::frameFactor);
+
+    if (FlarialGUI::DropDownMenus[index].yHover >= originalY &&
+        (originalY + percHeight + maxHeight) >= FlarialGUI::DropDownMenus[index].yHover) {
+        hoveredChildCol.a = FlarialGUI::DropDownMenus[index].opacityHover;
+        if (FlarialGUI::DropDownMenus[index].hoveredIndex == options.size() - 1) {
+            FlarialGUI::RoundedRect(x + offset, FlarialGUI::DropDownMenus[index].yHover, hoveredChildCol,
+                                    Constraints::SpacingConstraint(1.55, curTextWidth), lastChildHeight, 0, 0);
+            FlarialGUI::RoundedRect(x + offset, FlarialGUI::DropDownMenus[index].yHover, hoveredChildCol,
+                                    Constraints::SpacingConstraint(1.55, curTextWidth), childHeights, round.x, round.y);
+        } else {
+            FlarialGUI::RoundedRect(x + offset, FlarialGUI::DropDownMenus[index].yHover, hoveredChildCol,
+                                    Constraints::SpacingConstraint(1.55, curTextWidth), childHeights, 0, 0);
+        }
+    }
+
+    counter = 1;
+
+    for (const std::string &op: options) {
+        if (op == FlarialGUI::DropDownMenus[index].selected) continue;
+
+        float curY = y + ((float)counter * childHeights) - ((float)counter * 0.1f) + 5.f;
+
+        if (curY < originalY) continue;
+
+        if(op != FlarialGUI::DropDownMenus[index].selected && !FlarialGUI::DropDownMenus[index].isActive) break;
+
+
+        FlarialGUI::FlarialTextWithFont(x + offset + Constraints::SpacingConstraint(0.1, curTextWidth),
+                                        counter == options.size() - 1 ? curY - 2.5f : curY - 4.0f, to_wide(op).c_str(),
+                                        Constraints::SpacingConstraint(1.55, curTextWidth), percHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        Constraints::SpacingConstraint(1.0, curTextWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        counter++;
+    }
+
+    // if (FlarialGUI::DropDownMenus[index].isActive) MC::mouseButton = MouseButton::None;
+
+    y = originalY;
+
+    FlarialGUI::RoundedRect(x, y, FlarialGUI::DropDownMenus[index].curColor,
+                            Constraints::SpacingConstraint(1.55, textWidth), percHeight, round.x, round.x);
+
+    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.1, textWidth), y,
+                                    FlarialGUI::to_wide(value).c_str(),
+                                    Constraints::SpacingConstraint(1.55, textWidth), percHeight,
+                                    DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.0, textWidth),
+                                    DWRITE_FONT_WEIGHT_NORMAL);
+    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y,
+                                    FlarialGUI::to_wide(label).c_str(),
+                                    Constraints::SpacingConstraint(3, textWidth), percHeight,
+                                    DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.00, textWidth),
+                                    DWRITE_FONT_WEIGHT_NORMAL);
 
     float is = percHeight / 2;
     float ix = x + Constraints::SpacingConstraint(1.5, textWidth) - is * 1.2f;
