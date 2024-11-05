@@ -68,7 +68,7 @@ void HookManager::initialize() {
     addHook<SendPacketHook>();
     addHook<getSensHook>();
     addHook<HudMobEffectsRendererHook>();
-    if(WinrtUtils::checkBelowOrEqual(21, 40)) {
+    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
         addHook<BaseActorRendererRenderTextHook>();
     }
     if(WinrtUtils::checkAboveOrEqual(21, 40)) {
