@@ -1088,8 +1088,8 @@ public:
                     FlarialGUI::UnsetScrollView();
 
                     //FlarialGUI::RoundedRect(center.x, center.y + navigationBarHeight, D2D1::ColorF(D2D1::ColorF::White), baseWidth, navigationBarHeight);
-                    FlarialGUI::PushImClipRect(D2D1::RectF(center.x, center.y + navigationBarHeight * 1.15f, center.x + baseWidth, center.y + navigationBarHeight * 2.15f));
-                    FlarialGUI::ShadowRect(Vec2{center.x, center.y + navigationBarHeight}, Vec2{baseWidth, Constraints::SpacingConstraint(0.25f, baseHeightReal)}, D2D1::ColorF(D2D1::ColorF::Black), 50, 100);
+                    FlarialGUI::PushImClipRect(D2D1::RectF(center.x, center.y + navigationBarHeight * 1.178f, center.x + baseWidth, center.y + navigationBarHeight * 2.15f));
+                    FlarialGUI::ShadowRect(Vec2{center.x + Constraints::SpacingConstraint(0.15f, baseWidth), center.y + navigationBarHeight}, Vec2{baseWidth * 0.74f, Constraints::SpacingConstraint(0.25f, baseHeightReal)}, D2D1::ColorF(D2D1::ColorF::Black), 50, 100);
                     FlarialGUI::PopImClipRect();
 
                     //FlarialGUI::RoundedRect(center.x, center.y + Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.85f, D2D1::ColorF(D2D1::ColorF::White), baseWidth, Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.35f);
@@ -1183,7 +1183,7 @@ public:
                     c->addToggle("Do Not Wait Flag", "May improve latency or performance.", Client::settings.getSettingByName<bool>("donotwait")->value);
                     c->addDropdown("Buffering Mode", "May improve latency or performance.", {"Double Buffering", "Triple Buffering"}, Client::settings.getSettingByName<std::string>("bufferingmode")->value);
                     c->addDropdown("Swap Effect", "May improve latency or performance.", {"FLIP_SEQUENTIAL", "FLIP_DISCARD"}, Client::settings.getSettingByName<std::string>("swapeffect")->value);
-c->addHeader("Test");
+
                     c->extraPadding();
 
                     c->addElementText("Following Does Not Require Restart");
