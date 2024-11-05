@@ -48,7 +48,7 @@ public:
 
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
 

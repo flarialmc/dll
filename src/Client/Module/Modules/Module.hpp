@@ -97,7 +97,7 @@ public:
     void setKeybind(const std::string& newKeybind);
     std::string& getKeybind(const int keybindCount = 0);
     virtual void defaultConfig();
-    virtual void settingsRender() {}
+    virtual void settingsRender(float settingsOffset) {}
     bool isKeybind(const std::array<bool, 256>& keys, const int keybindCount = 0);
     [[nodiscard]] bool isAdditionalKeybind(const std::array<bool, 256>& keys, const std::string& bind) const;
     bool isKeyPartOfKeybind(int keyCode, const int keybindCount = 0);

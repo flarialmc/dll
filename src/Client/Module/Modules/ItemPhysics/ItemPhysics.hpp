@@ -148,7 +148,7 @@ public:
             settings.addSetting("smoothrots", true);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
         /* Border Start */
 
         float xPos = Constraints::PercentageConstraint(0.019, "left");

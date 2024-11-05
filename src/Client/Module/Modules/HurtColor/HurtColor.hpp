@@ -26,7 +26,7 @@ public:
         if (settings.getSettingByName<float>("colorOpacity") == nullptr) settings.addSetting("colorOpacity", 0.65);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
         float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);

@@ -130,7 +130,7 @@ unpatch(); // module restricted
             settings.addSetting("mode", (std::string) "3rd Person back");
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
@@ -139,7 +139,7 @@ unpatch(); // module restricted
 
 
         FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));
 

@@ -32,7 +32,7 @@ public:
         if (settings.getSettingByName<float>("intensity2") == nullptr) settings.addSetting("intensity2", 6.0f);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
 
         float x = Constraints::PercentageConstraint(0.019, "left");
@@ -42,7 +42,7 @@ public:
 
 
         FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));
 

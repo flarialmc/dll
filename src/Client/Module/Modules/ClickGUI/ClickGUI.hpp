@@ -225,7 +225,7 @@ public:
             settings.addSetting("colors_mod4_rgb", false);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
         const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
@@ -1250,16 +1250,15 @@ public:
                                      rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth,
                                      rectHeight);
 
-                if (!this->active) {
 
                     FlarialGUI::SetScrollView(
                             rectXNoOff + Constraints::SpacingConstraint(0.0085, rectWidth),
                             rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
-                }
 
-                ModuleManager::getModule(page.module)->settingsRender();
 
-                if (!this->active) FlarialGUI::UnsetScrollView();
+                ModuleManager::getModule(page.module)->settingsRender(settingsOffset);
+
+                FlarialGUI::UnsetScrollView();
 
                 FlarialGUI::PopSize();
 

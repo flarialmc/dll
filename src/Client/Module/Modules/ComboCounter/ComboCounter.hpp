@@ -34,7 +34,7 @@ public:
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
         /* Border Start */
 
@@ -45,7 +45,7 @@ public:
 
 
         FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));
 

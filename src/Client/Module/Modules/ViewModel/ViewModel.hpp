@@ -24,7 +24,7 @@ public:
         if (settings.getSettingByName<float>("itemfov") == nullptr) settings.addSetting("itemfov", 70.0f);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
         float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
