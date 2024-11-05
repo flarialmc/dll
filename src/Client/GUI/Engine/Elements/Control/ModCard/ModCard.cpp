@@ -45,8 +45,9 @@ std::vector<Vec2<float>> sizes;
 std::vector<Vec2<float>> shadowSizes;
 
 void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const int index, bool visible) {
-    Vec2<float> round = Constraints::RoundingConstraint(34, 34);
 
+
+    Vec2<float> round = Constraints::RoundingConstraint(34, 34);
 
     if (index > sizes.size() - 1 || index == 0) {
         float nigga = Constraints::RelativeConstraint(0.19f, "height", true);
@@ -275,6 +276,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         MC::mouseButton = MouseButton::None;
         ClickGUI::page.type = "settings";
         ClickGUI::page.module = mod->name;
+        ClickGUI::curr = "settings";
         FlarialGUI::TextBoxes[0].isActive = false;
         FlarialGUI::scrollpos = 0;
         FlarialGUI::barscrollpos = 0;
