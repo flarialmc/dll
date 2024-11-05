@@ -746,7 +746,7 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
 
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
-            if (FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
+            if (i <= additionalIndex && additionalY[i] > 0.0f) {
                 y += additionalY[i];
             }
         }

@@ -43,7 +43,7 @@ static std::string ttext;
 std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, float x, float y, const std::string& real) {
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
-            if (FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
+            if (i <= additionalIndex && additionalY[i] > 0.0f) {
                 y += additionalY[i];
             }
         }

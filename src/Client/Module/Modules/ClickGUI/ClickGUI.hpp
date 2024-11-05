@@ -1170,7 +1170,8 @@ public:
                     c->addSlider("Universal Font Scale", "", Client::settings.getSettingByName<float>("modules_font_scale")->value, 10.f, 0.f, true);
                     c->addToggle("Override Font Weight", "", Client::settings.getSettingByName<bool>("overrideFontWeight")->value);
                     c->addDropdown("Font Weight", "Bold, Thin, etc.", {"Bold", "Normal", "SemiBold", "ExtraBold", "Medium", "Light", "ExtraLight"}, Client::settings.getSettingByName<std::string>("fontWeight")->value);
-
+                    c->addButton("Test", "Test", "test", [] () {
+                    });
                     c->extraPadding();
 
                     c->addHeader("Rendering");
@@ -1182,7 +1183,7 @@ public:
                     c->addToggle("Do Not Wait Flag", "May improve latency or performance.", Client::settings.getSettingByName<bool>("donotwait")->value);
                     c->addDropdown("Buffering Mode", "May improve latency or performance.", {"Double Buffering", "Triple Buffering"}, Client::settings.getSettingByName<std::string>("bufferingmode")->value);
                     c->addDropdown("Swap Effect", "May improve latency or performance.", {"FLIP_SEQUENTIAL", "FLIP_DISCARD"}, Client::settings.getSettingByName<std::string>("swapeffect")->value);
-
+c->addHeader("Test");
                     c->extraPadding();
 
                     c->addElementText("Following Does Not Require Restart");

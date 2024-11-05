@@ -58,7 +58,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
-            if (i != index && FlarialGUI::DropDownMenus[i].isActive) {
+            if (i != index && additionalY[i] > 0.0f) {
                 y += additionalY[i];
             }
         }

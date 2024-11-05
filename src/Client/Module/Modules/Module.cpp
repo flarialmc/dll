@@ -226,7 +226,7 @@ void Module::addHeader(std::string text) {
 
     if(FlarialGUI::shouldAdditionalY)
         for (int i = 0; i < FlarialGUI::highestAddIndexes + 1; i++) {
-            if (FlarialGUI::DropDownMenus[i].isActive && i <= FlarialGUI::additionalIndex) {
+            if (i <= FlarialGUI::additionalIndex && FlarialGUI::additionalY[i] > 0.0f) {
                 y += FlarialGUI::additionalY[i];
             }
         }
@@ -292,7 +292,7 @@ void Module::addDropdown(std::string text, std::string subtext, const std::vecto
 
     FlarialGUI::Dropdown(dropdownIndex, elementX, y, options, value, "");
 
-    if(FlarialGUI::DropDownMenus[dropdownIndex].isActive || FlarialGUI::additionalY[dropdownIndex] > 0.f) FlarialGUI::SetIsInAdditionalYMode();
+    if(FlarialGUI::additionalY[dropdownIndex] > 0.f) FlarialGUI::SetIsInAdditionalYMode();
 
     padding += Constraints::RelativeConstraint(0.05f, "height", true);
     dropdownIndex++;

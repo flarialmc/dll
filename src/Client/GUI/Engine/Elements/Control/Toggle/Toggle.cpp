@@ -53,7 +53,7 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb) {
 
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
-            if (FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
+            if (i <= additionalIndex && additionalY[i] > 0.0f) {
                 y += additionalY[i];
             }
         }
