@@ -1278,7 +1278,7 @@ public:
                                                                             buttonHeight);
 
 
-                    colorThing.a = settingsOpacity;
+                    textCol.a = settingsOpacity;
                     if (FlarialGUI::RoundedButton(0, spacingX + centered.first + rectX - settingsOffset,
                                                   thingYes.second + rectHeight + rectY - Constraints::RelativeConstraint(0.06f), colorThing, textCol, L"Reset",
                                                   buttonWidth, buttonHeight, round.x, round.x)) {
