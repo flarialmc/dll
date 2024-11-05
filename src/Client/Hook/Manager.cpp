@@ -40,7 +40,6 @@ void HookManager::initialize() {
 
     Logger::debug(std::format("[Kiero] Renderer: {}", dxVersion[kiero::getRenderType()]));
 
-    addHook<KeyHook>();
 
     addHook<KeyHook>();
     addHook<MouseHook>();

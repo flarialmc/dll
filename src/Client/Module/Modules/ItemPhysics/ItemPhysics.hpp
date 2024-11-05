@@ -110,10 +110,12 @@ public:
             static auto posAddr = GET_SIG_ADDRESS("ItemPositionConst") + 4;
 
             Memory::patchBytes(reinterpret_cast<void*>(posAddr), &origPosRel, 4);
-            FreeBuffer(newPosRel);
+            if(newPosRel) FreeBuffer(newPosRel);
         }
 
+        if(glm_rotateHook)
         glm_rotateHook->disable();
+        if(ItemRenderer_renderHook)
         ItemRenderer_renderHook->disable();
 
         static auto translateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef"));

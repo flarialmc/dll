@@ -8,7 +8,7 @@
 #include <windows.h>
 #include <iostream>
 #include <Psapi.h>
-
+#include <tlhelp32.h>
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_dx12.h>
@@ -76,8 +76,30 @@ bool containsModule(const std::wstring& moduleName) {
     return false;
 }
 
+HWND FindWindowByTitle(const std::string& titlePart) {
+    HWND hwnd = nullptr;
+    EnumWindows([](HWND hWnd, LPARAM lParam) -> BOOL {
+        char title[256];
+        GetWindowTextA(hWnd, title, sizeof(title));
+        if (strstr(title, reinterpret_cast<const char*>(lParam)) != nullptr) {
+            *reinterpret_cast<HWND*>(lParam) = hWnd;
+            return FALSE; // Stop enumeration when found
+        }
+        return TRUE; // Continue enumeration
+    }, reinterpret_cast<LPARAM>(titlePart.c_str()));
+    return hwnd;
+}
+
 void SwapchainHook::enableHook() {
 
+
+    if(!window) {
+        window = FindWindowByTitle("Minecraft");
+    }
+
+    if(!window) {
+        window = FindWindowByTitle("Flarial");
+    }
 
     if (kiero::getRenderType() == kiero::RenderType::D3D12) {
         kiero::bind(140, (void**)&funcOriginal, (void*)swapchainCallback);
@@ -125,7 +147,6 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
                                      IDXGISwapChain1 **ppSwapChain)
 
 {
-
     if (!fEnabled)
         fEnabled = TRUE;
 

@@ -47,6 +47,8 @@ DWORD WINAPI init(HMODULE real)
     Client::initialize();
     Logger::info("[Client] Initializing");
 
+
+
     std::thread statusThread([]() {
         while (!Client::disable) {
 
@@ -127,10 +129,9 @@ DWORD WINAPI init(HMODULE real)
     while (true) {
         if (Client::disable) {
             break;
-        } else {
-            ModuleManager::syncState();
-            std::this_thread::sleep_for(std::chrono::milliseconds(20));
         }
+
+        ModuleManager::syncState();
     }
 
     Client::SaveSettings();
@@ -141,7 +142,7 @@ DWORD WINAPI init(HMODULE real)
 
     kiero::shutdown();
 
-    Logger::debug("[Kiero] Shut down Kiero.");
+    Logger::debug("[Kiero] Kiero shut down.");
 
     ModuleManager::terminate();
     HookManager::terminate();
@@ -152,6 +153,8 @@ DWORD WINAPI init(HMODULE real)
     glaiel::crashlogs::end_session();
 
     Logger::debug("[MinHook] Freeing Library.");
+
+    Client::setWindowTitle(L"");
 
     FreeLibraryAndExitThread(Client::currentModule, 0);
 }

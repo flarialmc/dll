@@ -3,6 +3,12 @@
 //
 
 #include "ResizeHook.hpp"
+
+#include <imgui_impl_dx11.h>
+#include <imgui_impl_dx12.h>
+#include <imgui_impl_win32.h>
+#include <imgui_internal.h>
+
 #include "../../../GUI/D2D.hpp"
 #include "SwapchainHook.hpp"
 #include "../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
@@ -61,6 +67,15 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(Blur::pUpsampleShader);
     Memory::SafeRelease(Blur::pVertexBuffer);
     Memory::SafeRelease(Blur::pVertexShader);
+
+    if(!isResize) {
+        ImGui_ImplWin32_Shutdown();
+
+        if(!SwapchainHook::queue)
+            ImGui_ImplDX11_Shutdown();
+        else ImGui_ImplDX12_Shutdown();
+        ImGui::DestroyContext();
+    }
 
     Blur::hasDoneFrames = false;
     for(ID3D11Texture2D* tex : Blur::framebuffers){ Memory::SafeRelease(tex); Blur::framebuffers.clear();}
@@ -164,6 +179,7 @@ void ResizeHook::cleanShit(bool isResize) {
     }
 
     FlarialGUI::scrollposmodifier = 0;
+
 
     //ImGui::DestroyContext();
 }

@@ -8,7 +8,11 @@ class Client {
 public:
     static std::vector<std::string> onlinePlayers;
 
+    static std::string current_commit;
+
     static std::vector<std::string> getPlayersVector(const nlohmann::json &data);
+
+    static void setWindowTitle(std::wstring title);
 
     static void initialize();
 
