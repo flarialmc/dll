@@ -140,7 +140,7 @@ std::string ClickGUIElements::SearchBar(int index, std::string &text, int limit,
                                                 textWidth, percHeight,
                                                 DWRITE_TEXT_ALIGNMENT_LEADING,
                                                 Constraints::SpacingConstraint(0.60f, textWidth),
-                                                DWRITE_FONT_WEIGHT_NORMAL);
+                                                DWRITE_FONT_WEIGHT_NORMAL, false, true);
 
             }
 

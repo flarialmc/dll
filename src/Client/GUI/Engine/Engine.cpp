@@ -729,13 +729,13 @@ bool ifFontScale2(const float fontSize) {
 
 std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
-                                     const DWRITE_FONT_WEIGHT weight, bool moduleFont) {
+                                     const DWRITE_FONT_WEIGHT weight, bool moduleFont, bool troll) {
 
 
     D2D1_COLOR_F color = colors_text_rgb ? rgbColor : colors_text;
     color.a = o_colors_text;
 
-    if(FlarialGUI::inMenu) color.a = ClickGUI::settingsOpacity;
+    if(FlarialGUI::inMenu && !troll) color.a = ClickGUI::settingsOpacity;
 
     return FlarialTextWithFont(x, y, text, width, height, alignment, fontSize, weight, color, moduleFont);
 }

@@ -1170,11 +1170,14 @@ public:
                     c->addSlider("Universal Font Scale", "", Client::settings.getSettingByName<float>("modules_font_scale")->value, 10.f, 0.f, true);
                     c->addToggle("Override Font Weight", "", Client::settings.getSettingByName<bool>("overrideFontWeight")->value);
                     c->addDropdown("Font Weight", "Bold, Thin, etc.", {"Bold", "Normal", "SemiBold", "ExtraBold", "Medium", "Light", "ExtraLight"}, Client::settings.getSettingByName<std::string>("fontWeight")->value);
-                    c->addButton("Test", "Test", "test", [] () {
-                    });
                     c->extraPadding();
 
                     c->addHeader("Rendering");
+                    c->addButton("Force Reload Minecraft", "Forces the swapchain to recreate.", "RELOAD", [] () {
+
+                        SwapchainHook::queueReset = true;
+
+                    });
                     c->addElementText("Following Requires Restart");
                     c->extraPadding();
 
