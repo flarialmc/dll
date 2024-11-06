@@ -21,6 +21,7 @@
 #include "Hooks/Game/UpdatePlayerHook.hpp"
 #include "Hooks/Game/isPreGame.hpp"
 #include "Hooks/Game/composeFullStack.hpp"
+#include "Hooks/Render/RenderCurrentFrame.hpp"
 //#include "Hooks/Game/RenderItemGroup.hpp"
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 
@@ -77,6 +78,8 @@ void HookManager::initialize() {
         addHook<UpdatePlayerHook>();
         addHook<isPreGameHook>();
         addHook<_composeFullStackHook>();
+
+        addHook<RenderCurrentFrameHook>();
     }
 
     for (const auto& hook: hooks)

@@ -25,3 +25,4 @@
 #include "Render/RenderPotionHUDEvent.hpp"
 #include "Render/SetTopScreenNameEvent.hpp"
 #include "Render/SetupAndRenderEvent.hpp"
+#include "Render/RenderCurrentFrameEvent.hpp"

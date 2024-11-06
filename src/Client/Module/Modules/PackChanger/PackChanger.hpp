@@ -6,15 +6,19 @@ class PackChanger : public Module {
 private:
     bool patched = false;
     bool queueReset = false;
+    bool canRender = false;
+    std::chrono::steady_clock::time_point last_update = std::chrono::high_resolution_clock::now();
 public:
     PackChanger() : Module("PackChanger", "Allows you to change packs in world/server.", IDR_MAN_PNG, "") {
         Module::setup();
     };
 
     void onEnable() override {
+        canRender = true;
         Listen(this, SetupAndRenderEvent, &PackChanger::onSetupAndRender);
         Listen(this, isPreGameEvent, &PackChanger::onIsPreGame);
         Listen(this, PacksLoadEvent, &PackChanger::onPacksLoad);
+        Listen(this, RenderCurrentFrameEvent, &PackChanger::onRenderCurrentFrame);
         Module::onEnable();
     }
 
@@ -22,6 +26,8 @@ public:
         Deafen(this, SetupAndRenderEvent, &PackChanger::onSetupAndRender);
         Deafen(this, isPreGameEvent, &PackChanger::onIsPreGame);
         Deafen(this, PacksLoadEvent, &PackChanger::onPacksLoad);
+        Deafen(this, RenderCurrentFrameEvent, &PackChanger::onRenderCurrentFrame);
+        canRender = true;
         Module::onDisable();
         unpatch();
     }
@@ -37,6 +43,12 @@ public:
         if(!player->getLevel()) return; // means were not in the world
         // recreate swapchain
         queueReset = true;
+        last_update = std::chrono::high_resolution_clock::now();
+        canRender = false; // disable rendering
+    }
+
+    void onRenderCurrentFrame(RenderCurrentFrameEvent &event) {
+        if(!canRender) event.cancel();
     }
 
     void onSetupAndRender(SetupAndRenderEvent &event) {
@@ -44,10 +56,16 @@ public:
         if(!player) return unpatch();
         if(!player->getLevel()) return unpatch(); // means were not in the world
 
-        if(SDK::clientInstance->getTopScreenName() == "hud_screen") {
-            if(queueReset) {
+        auto name = SDK::clientInstance->getTopScreenName();
+
+        if(name == "pause_screen") {
+            if (queueReset) {
                 queueReset = false;
                 SwapchainHook::queueReset = true;
+                return;
+            }
+            if (!canRender && !SwapchainHook::queueReset && SwapchainHook::init) {
+                canRender = true;
             }
         }
 
