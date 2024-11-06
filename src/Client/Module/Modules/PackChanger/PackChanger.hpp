@@ -19,8 +19,8 @@ public:
         Listen(this, SetupAndRenderEvent, &PackChanger::onSetupAndRender);
         Listen(this, isPreGameEvent, &PackChanger::onIsPreGame);
         Listen(this, PacksLoadEvent, &PackChanger::onPacksLoad);
-        Listen(this, RenderCurrentFrameEvent, &PackChanger::onRenderCurrentFrame);
-        Listen(this, RebuildChunkEvent, &PackChanger::onRebuildChunk);
+        Listen(this, RenderOrderExecuteEvent, &PackChanger::onRenderOrderExecute);
+        Listen(this, RenderChunkCoordinatorPreRenderTickEvent, &PackChanger::onRenderChunkCoordinatorPreRenderTick);
         Module::onEnable();
     }
 
@@ -28,8 +28,8 @@ public:
         Deafen(this, SetupAndRenderEvent, &PackChanger::onSetupAndRender);
         Deafen(this, isPreGameEvent, &PackChanger::onIsPreGame);
         Deafen(this, PacksLoadEvent, &PackChanger::onPacksLoad);
-        Deafen(this, RenderCurrentFrameEvent, &PackChanger::onRenderCurrentFrame);
-        Deafen(this, RebuildChunkEvent, &PackChanger::onRebuildChunk);
+        Deafen(this, RenderOrderExecuteEvent, &PackChanger::onRenderOrderExecute);
+        Deafen(this, RenderChunkCoordinatorPreRenderTickEvent, &PackChanger::onRenderChunkCoordinatorPreRenderTick);
         canRender = true;
         Module::onDisable();
         unpatch();
@@ -49,11 +49,13 @@ public:
         canRender = false; // disable rendering
     }
 
-    void onRebuildChunk(RebuildChunkEvent &event) {
+    void onRenderChunkCoordinatorPreRenderTick(RenderChunkCoordinatorPreRenderTickEvent &event) {
+        // stops chunks from updating
         if(!canRender) event.cancel();
     }
 
-    void onRenderCurrentFrame(RenderCurrentFrameEvent &event) {
+    void onRenderOrderExecute(RenderOrderExecuteEvent &event) {
+        // stops most 3D level rendering
         if(!canRender) event.cancel();
     }
 

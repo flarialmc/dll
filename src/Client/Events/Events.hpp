@@ -25,5 +25,5 @@
 #include "Render/RenderPotionHUDEvent.hpp"
 #include "Render/SetTopScreenNameEvent.hpp"
 #include "Render/SetupAndRenderEvent.hpp"
-#include "Render/RenderCurrentFrameEvent.hpp"
-#include "Render/RebuildChunkEvent.hpp"
+#include "Render/RenderOrderExecuteEvent.hpp"
+#include "Render/RenderChunkCoordinatorPreRenderTickEvent.hpp"

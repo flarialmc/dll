@@ -3,4 +3,4 @@
 #include "../Event.hpp"
 #include "../Cancellable.hpp"
 
-class RebuildChunkEvent : public Event, public Cancellable {};
+class RenderOrderExecuteEvent : public Event, public Cancellable {};

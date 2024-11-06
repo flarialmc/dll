@@ -21,8 +21,8 @@
 #include "Hooks/Game/UpdatePlayerHook.hpp"
 #include "Hooks/Game/isPreGame.hpp"
 #include "Hooks/Game/composeFullStack.hpp"
-#include "Hooks/Render/RenderCurrentFrame.hpp"
-#include "Hooks/Render/RebuildChunkHook.hpp"
+#include "Hooks/Render/RenderOrderExecuteHook.hpp"
+#include "Hooks/Render/RenderChunkCoordinatorPreRenderTickHook.hpp"
 //#include "Hooks/Game/RenderItemGroup.hpp"
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 
@@ -80,8 +80,8 @@ void HookManager::initialize() {
         addHook<isPreGameHook>();
         addHook<_composeFullStackHook>();
 
-        addHook<RenderCurrentFrameHook>();
-        addHook<RebuildChunkHook>();
+        addHook<RenderOrderExecuteHook>();
+        addHook<RenderChunkCoordinatorPreRenderTickHook>();
     }
 
     for (const auto& hook: hooks)

@@ -3,10 +3,10 @@
 #include "../Hook.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
-class RenderCurrentFrameHook : public Hook {
+class RenderOrderExecuteHook : public Hook {
 private:
-    static void GameRenderer_renderCurrentFrame(void *_this, void* a1, void* a2) {
-        auto event = nes::make_holder<RenderCurrentFrameEvent>();
+    static void rendergraph_RenderOrder_execute(void *_this, void* a1, void* a2) {
+        auto event = nes::make_holder<RenderOrderExecuteEvent>();
         eventMgr.trigger(event);
         if(!event->isCancelled())
             funcOriginal(_this, a1, a2);
@@ -19,9 +19,9 @@ public:
 
     // Memory::offsetFromSig(
 
-    RenderCurrentFrameHook() : Hook("GameRenderer::renderCurrentFrameHook", GET_SIG_ADDRESS("GameRenderer::renderCurrentFrame")) {}
+    RenderOrderExecuteHook() : Hook("rendergraph::RenderOrder::executeHook", GET_SIG_ADDRESS("rendergraph::RenderOrder::execute")) {}
 
     void enableHook() override {
-        this->autoHook((void *) GameRenderer_renderCurrentFrame, (void **) &funcOriginal);
+        this->autoHook((void *) rendergraph_RenderOrder_execute, (void **) &funcOriginal);
     }
 };
