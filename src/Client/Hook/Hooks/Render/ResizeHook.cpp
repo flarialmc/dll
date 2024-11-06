@@ -56,8 +56,7 @@ ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT wi
 // TODO: get back to this to check
 void ResizeHook::cleanShit(bool isResize) {
 
-    FlarialGUI::DoLoadModuleFontLater = true;
-    FlarialGUI::DoLoadGUIFontLater = true;
+
     Memory::SafeRelease(SwapchainHook::stageTex);
     Memory::SafeRelease(SwapchainHook::SavedD3D11BackBuffer);
     Memory::SafeRelease(SwapchainHook::ExtraSavedD3D11BackBuffer);
@@ -70,20 +69,25 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(Blur::pVertexShader);
     Memory::SafeRelease(SwapchainHook::d3d11Device);
     Memory::SafeRelease(SwapchainHook::D2D1Bitmap);
-    Memory::SafeRelease(SwapchainHook::context);
     Memory::SafeRelease(D2D::context);
 
 
-    ImGui::GetIO().Fonts->Clear();
-    FlarialGUI::FontMap.clear();
+
 
     if(!isResize) {
+
+        ImGui::GetIO().Fonts->Clear();
+        FlarialGUI::FontMap.clear();
+
         ImGui_ImplWin32_Shutdown();
 
         if(!SwapchainHook::queue)
             ImGui_ImplDX11_Shutdown();
         else ImGui_ImplDX12_Shutdown();
         ImGui::DestroyContext();
+
+        FlarialGUI::DoLoadModuleFontLater = true;
+        FlarialGUI::DoLoadGUIFontLater = true;
     }
 
 
@@ -103,10 +107,12 @@ void ResizeHook::cleanShit(bool isResize) {
 
     ClickGUIElements::images.clear();
 
-    for(auto &i : ImagesClass::ImguiDX11Images) {
-        Memory::SafeRelease(i.second);
+    if(!isResize) {
+        for(auto &i : ImagesClass::ImguiDX11Images) {
+            Memory::SafeRelease(i.second);
+        }
+        ImagesClass::ImguiDX11Images.clear();
     }
-    ImagesClass::ImguiDX11Images.clear();
 
     for (auto i: ImagesClass::eimages) {
         Memory::SafeRelease(i.second);
