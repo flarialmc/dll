@@ -26,3 +26,4 @@
 #include "Render/SetTopScreenNameEvent.hpp"
 #include "Render/SetupAndRenderEvent.hpp"
 #include "Render/RenderCurrentFrameEvent.hpp"
+#include "Render/RebuildChunkEvent.hpp"

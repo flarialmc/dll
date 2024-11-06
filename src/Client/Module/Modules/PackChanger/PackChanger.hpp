@@ -20,6 +20,7 @@ public:
         Listen(this, isPreGameEvent, &PackChanger::onIsPreGame);
         Listen(this, PacksLoadEvent, &PackChanger::onPacksLoad);
         Listen(this, RenderCurrentFrameEvent, &PackChanger::onRenderCurrentFrame);
+        Listen(this, RebuildChunkEvent, &PackChanger::onRebuildChunk);
         Module::onEnable();
     }
 
@@ -28,6 +29,7 @@ public:
         Deafen(this, isPreGameEvent, &PackChanger::onIsPreGame);
         Deafen(this, PacksLoadEvent, &PackChanger::onPacksLoad);
         Deafen(this, RenderCurrentFrameEvent, &PackChanger::onRenderCurrentFrame);
+        Deafen(this, RebuildChunkEvent, &PackChanger::onRebuildChunk);
         canRender = true;
         Module::onDisable();
         unpatch();
@@ -47,6 +49,10 @@ public:
         canRender = false; // disable rendering
     }
 
+    void onRebuildChunk(RebuildChunkEvent &event) {
+        if(!canRender) event.cancel();
+    }
+
     void onRenderCurrentFrame(RenderCurrentFrameEvent &event) {
         if(!canRender) event.cancel();
     }
@@ -61,7 +67,8 @@ public:
 
         if(!canRender && enableFrameQueue) {
             if(frameQueue == 0) {
-                canRender = true;
+                if(!queueReset)
+                    canRender = true;
                 enableFrameQueue = false;
             } else {
                 if(frameQueue > 0) {
@@ -72,8 +79,14 @@ public:
 
         if(name == "pause_screen") {
             if (queueReset) {
-                queueReset = false;
-                SwapchainHook::queueReset = true;
+                if(!enableFrameQueue) {
+                    enableFrameQueue = true;
+                    frameQueue = 20;
+                }
+                if(frameQueue == 0) {
+                    queueReset = false;
+                    SwapchainHook::queueReset = true;
+                }
                 return;
             }
             if (!canRender && !SwapchainHook::queueReset && SwapchainHook::init) {

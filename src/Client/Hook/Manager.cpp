@@ -22,6 +22,7 @@
 #include "Hooks/Game/isPreGame.hpp"
 #include "Hooks/Game/composeFullStack.hpp"
 #include "Hooks/Render/RenderCurrentFrame.hpp"
+#include "Hooks/Render/RebuildChunkHook.hpp"
 //#include "Hooks/Game/RenderItemGroup.hpp"
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 
@@ -80,6 +81,7 @@ void HookManager::initialize() {
         addHook<_composeFullStackHook>();
 
         addHook<RenderCurrentFrameHook>();
+        addHook<RebuildChunkHook>();
     }
 
     for (const auto& hook: hooks)
