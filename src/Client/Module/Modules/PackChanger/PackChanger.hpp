@@ -23,6 +23,7 @@ public:
         Deafen(this, isPreGameEvent, &PackChanger::onIsPreGame);
         Deafen(this, PacksLoadEvent, &PackChanger::onPacksLoad);
         Module::onDisable();
+        unpatch();
     }
 
     void defaultConfig() override {}
@@ -43,7 +44,7 @@ public:
         if(!player) return unpatch();
         if(!player->getLevel()) return unpatch(); // means were not in the world
 
-        if(SDK::clientInstance->getTopScreenName() == "pause_screen") {
+        if(SDK::clientInstance->getTopScreenName() == "hud_screen") {
             if(queueReset) {
                 queueReset = false;
                 SwapchainHook::queueReset = true;

@@ -56,7 +56,8 @@ ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT wi
 // TODO: get back to this to check
 void ResizeHook::cleanShit(bool isResize) {
 
-
+    FlarialGUI::DoLoadModuleFontLater = true;
+    FlarialGUI::DoLoadGUIFontLater = true;
     Memory::SafeRelease(SwapchainHook::stageTex);
     Memory::SafeRelease(SwapchainHook::SavedD3D11BackBuffer);
     Memory::SafeRelease(SwapchainHook::ExtraSavedD3D11BackBuffer);
@@ -67,6 +68,14 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(Blur::pUpsampleShader);
     Memory::SafeRelease(Blur::pVertexBuffer);
     Memory::SafeRelease(Blur::pVertexShader);
+    Memory::SafeRelease(SwapchainHook::d3d11Device);
+    Memory::SafeRelease(SwapchainHook::D2D1Bitmap);
+    Memory::SafeRelease(SwapchainHook::context);
+    Memory::SafeRelease(D2D::context);
+
+
+    ImGui::GetIO().Fonts->Clear();
+    FlarialGUI::FontMap.clear();
 
     if(!isResize) {
         ImGui_ImplWin32_Shutdown();
@@ -76,6 +85,7 @@ void ResizeHook::cleanShit(bool isResize) {
         else ImGui_ImplDX12_Shutdown();
         ImGui::DestroyContext();
     }
+
 
     Blur::hasDoneFrames = false;
     for(ID3D11Texture2D* tex : Blur::framebuffers){ Memory::SafeRelease(tex); Blur::framebuffers.clear();}
@@ -93,9 +103,15 @@ void ResizeHook::cleanShit(bool isResize) {
 
     ClickGUIElements::images.clear();
 
-    for (auto &i: ImagesClass::eimages) {
+    for(auto &i : ImagesClass::ImguiDX11Images) {
         Memory::SafeRelease(i.second);
     }
+    ImagesClass::ImguiDX11Images.clear();
+
+    for (auto i: ImagesClass::eimages) {
+        Memory::SafeRelease(i.second);
+    }
+
 
     ImagesClass::eimages.clear();
 

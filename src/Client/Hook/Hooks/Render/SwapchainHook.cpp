@@ -13,6 +13,8 @@
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_dx12.h>
 #include <imgui_impl_win32.h>
+
+#include "ResizeHook.hpp"
 #include "../../../../../lib/ImGui/imgui.h"
 #include "../../../../../lib/ImGui/imgui_impl_win32.h"
 #include "../../../../../lib/ImGui/imgui_impl_dx11.h"
@@ -151,12 +153,12 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
     if (!fEnabled)
         fEnabled = TRUE;
 
-    ID3D12CommandQueue *pCommandQueue = NULL;
-    if (Client::settings.getSettingByName<bool>("killdx")->value && !pDevice->QueryInterface(IID_PPV_ARGS(&pCommandQueue)))
-    {
-        pCommandQueue->Release();
-        return DXGI_ERROR_INVALID_CALL;
-    }
+        ID3D12CommandQueue *pCommandQueue = NULL;
+        if (Client::settings.getSettingByName<bool>("killdx")->value && !pDevice->QueryInterface(IID_PPV_ARGS(&pCommandQueue)) && !queueReset)
+        {
+            pCommandQueue->Release();
+            return DXGI_ERROR_INVALID_CALL;
+        }
 
     pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
@@ -179,7 +181,9 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 
     pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
     Logger::info("Swap Effect: " + std::to_string(pDesc->SwapEffect));
+
     MADECHAIN = TRUE;
+    queueReset = false;
     return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
 }
 
@@ -187,22 +191,11 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
     if(queueReset) {
-        fEnabled = FALSE;
-        MADECHAIN = FALSE;
         init = false;
         initImgui = false;
-        FlarialGUI::hasLoadedAll = false;
-        allfontloaded = false;
-        first = false;
-        queueReset = false;
-        if (queue != nullptr) {
-            ImGui_ImplDX12_Shutdown();
-        } else {
-            ImGui_ImplDX11_Shutdown();
-        }
-        Memory::SafeRelease(D2D::context);
-        Memory::SafeRelease(context);
-        ImGui_ImplWin32_Shutdown();
+        std::cout << "Troll" << std::endl;
+        ResizeHook::cleanShit(false);
+        return DXGI_ERROR_DEVICE_RESET;
     }
 
     if(!fEnabled) {
@@ -212,6 +205,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     if(!MADECHAIN && fEnabled) {
         return funcOriginal(pSwapChain, syncInterval, flags);
     }
+
+
 
     swapchain = pSwapChain;
     flagsreal = flags;
@@ -235,6 +230,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         /* INIT END */
 
     }
+
 
     else {
 
@@ -274,14 +270,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         if(init && initImgui && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImages();
     } catch (const std::exception &ex) { return 0; }
 
-//    if (Client::settings.getSettingByName<bool>("vsync")->value) {
-//        flags |= DXGI_PRESENT_ALLOW_TEARING;
-//        syncInterval = 0;
-//    }
-//
-//    if (Client::settings.getSettingByName<bool>("donotwait")->value) {
-//        flags |= DXGI_PRESENT_DO_NOT_WAIT;
-//    }
 
     if (Client::settings.getSettingByName<bool>("vsync")->value) {
         return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
@@ -325,7 +313,7 @@ void SwapchainHook::DX11Init() {
 
     }
 
-    SaveBackbuffer();
+    //SaveBackbuffer();
 
     Blur::InitializePipeline();
     Memory::SafeRelease(eBackBuffer);

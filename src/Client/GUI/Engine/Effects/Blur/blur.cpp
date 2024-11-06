@@ -194,9 +194,6 @@ void Blur::InitializePipeline()
     shaderBlob = TryCompileShader(downsampleShaderSrc, "ps_4_0");
     SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pDownsampleShader);
 
-    shaderBlob = TryCompileShader(dbgDrawTextureShaderSrc, "ps_4_0");
-    SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &dbgShader);
-
     shaderBlob = TryCompileShader(vertexShaderSrc, "vs_4_0");
     SwapchainHook::d3d11Device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pVertexShader);
 

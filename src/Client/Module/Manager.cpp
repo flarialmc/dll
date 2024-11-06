@@ -162,7 +162,7 @@ void ModuleManager::initialize() {
     addModule<ItemPhysics>();
     addModule<HiveStat>();
     if(WinrtUtils::checkAboveOrEqual(21, 40)) {
-    //    addModule<PackChanger>(); // tss, let it be a surprise!
+        addModule<PackChanger>(); // tss, let it be a surprise!
     }
 
     addService<GUIKeyListener>();
