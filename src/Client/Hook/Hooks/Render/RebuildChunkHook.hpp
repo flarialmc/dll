@@ -3,7 +3,7 @@
 #include "../Hook.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
-class RebuildChunkHook : public Hook {
+class RenderCurrentFrameHook : public Hook {
 private:
     static void GameRenderer_renderCurrentFrame(void *_this, void* a1, void* a2) {
         auto event = nes::make_holder<RenderCurrentFrameEvent>();
@@ -19,7 +19,7 @@ public:
 
     // Memory::offsetFromSig(
 
-    RebuildChunkHook() : Hook("GameRenderer::renderCurrentFrameHook", GET_SIG_ADDRESS("GameRenderer::renderCurrentFrame")) {}
+    RenderCurrentFrameHook() : Hook("GameRenderer::renderCurrentFrameHook", GET_SIG_ADDRESS("GameRenderer::renderCurrentFrame")) {}
 
     void enableHook() override {
         this->autoHook((void *) GameRenderer_renderCurrentFrame, (void **) &funcOriginal);
