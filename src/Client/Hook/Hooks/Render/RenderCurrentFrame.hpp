@@ -5,15 +5,16 @@
 
 class RenderCurrentFrameHook : public Hook {
 private:
-    static void GameRenderer_renderCurrentFrame(void *_this, void* a1, void* a2, void* a3) {
+    static void* GameRenderer_renderCurrentFrame(void *_this, void* a1, void* a2) {
         auto event = nes::make_holder<RenderCurrentFrameEvent>();
         eventMgr.trigger(event);
         if(!event->isCancelled())
-            return funcOriginal(_this, a1, a2, a3);
+            return funcOriginal(_this, a1, a2);
+        return nullptr;
     }
 
 public:
-    typedef void(__thiscall *original)(void *_this, void* a1, void* a2, void* a3);
+    typedef void*(__thiscall *original)(void *_this, void* a1, void* a2);
 
     static inline original funcOriginal = nullptr;
 
