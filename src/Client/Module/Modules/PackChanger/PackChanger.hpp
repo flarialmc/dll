@@ -7,7 +7,8 @@ private:
     bool patched = false;
     bool queueReset = false;
     bool canRender = false;
-    std::chrono::steady_clock::time_point last_update = std::chrono::high_resolution_clock::now();
+    bool enableFrameQueue = false;
+    int frameQueue = 0;
 public:
     PackChanger() : Module("PackChanger", "Allows you to change packs in world/server.", IDR_MAN_PNG, "") {
         Module::setup();
@@ -43,7 +44,6 @@ public:
         if(!player->getLevel()) return; // means were not in the world
         // recreate swapchain
         queueReset = true;
-        last_update = std::chrono::high_resolution_clock::now();
         canRender = false; // disable rendering
     }
 
@@ -55,8 +55,20 @@ public:
         auto player = SDK::clientInstance->getLocalPlayer();
         if(!player) return unpatch();
         if(!player->getLevel()) return unpatch(); // means were not in the world
+        patch();
 
         auto name = SDK::clientInstance->getTopScreenName();
+
+        if(!canRender && enableFrameQueue) {
+            if(frameQueue == 0) {
+                canRender = true;
+                enableFrameQueue = false;
+            } else {
+                if(frameQueue > 0) {
+                    frameQueue--;
+                }
+            }
+        }
 
         if(name == "pause_screen") {
             if (queueReset) {
@@ -65,11 +77,12 @@ public:
                 return;
             }
             if (!canRender && !SwapchainHook::queueReset && SwapchainHook::init) {
-                canRender = true;
+                if(!enableFrameQueue) {
+                    enableFrameQueue = true;
+                    frameQueue = 20;
+                }
             }
         }
-
-        patch();
     }
 
     void onIsPreGame(isPreGameEvent &event) {
