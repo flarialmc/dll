@@ -2,10 +2,17 @@
 
 #include "../Module.hpp"
 
+struct Waypoint {
+    Vec3<float> position;
+    D2D1_COLOR_F color;
+    int index;
+    bool enabled;
+};
 
 class Waypoints : public Module {
 private:
     std::chrono::time_point<std::chrono::high_resolution_clock> last_used;
+    std::unordered_map<std::string, Waypoint> WaypointList;
 public:
     Waypoints() : Module("Waypoints", "Allows you to mark points in your world.", IDR_MAGNIFY_PNG, "") {
         Module::setup();
@@ -15,32 +22,41 @@ public:
         Listen(this, RenderEvent, &Waypoints::onRender)
         Module::onEnable();
     }
-
+    /*std::string count;
+      count = "-" + std::to_string(i);
+      this->settings.getSettingByName<std::string>("command" + count)->value;
+    */
+    void addWaypoint(int index, std::string name, std::string color, Vec3<float> position, bool state, bool config) {
+        if (config)
+        {
+            std::string end = "-" + index;
+            this->settings.addSetting("waypoint" + end, (std::string)"");
+            this->settings.addSetting("color" + end, (std::string)color);
+            this->settings.addSetting("x" + end, position.x);
+            this->settings.addSetting("y" + end, position.y);
+            this->settings.addSetting("z" + end, position.z);
+            this->settings.addSetting("state" + end, (bool)state);
+            this->saveSettings();
+        }
+        else {
+            Waypoint wp(position, FlarialGUI::HexToColorF(color), index, state);
+            WaypointList[ name ] = wp;
+        }
+    }
     void onSetup() override {
 
-        for (int i = 0; i < totalKeybinds; ++i) {
-            keybindActions.push_back([this, i](std::vector<std::any> args) -> std::any {
-
-                KeyEvent event = std::any_cast<KeyEvent>(args[0]);
-                std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
-                if (duration.count() >= 2.5) {
-                    std::string count;
-                    if (i > 0) count = "-" + std::to_string(i);
-                    if (this->isKeybind(event.keys, i) && this->isKeyPartOfKeybind(event.key, i)) {
-                        std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                        auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-                        command_packet->command = this->settings.getSettingByName<std::string>("command" + count)->value;
-                        command_packet->origin.type = CommandOriginType::Player;
-                        command_packet->InternalSource = true;
-                        SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-
-                        last_used = std::chrono::high_resolution_clock::now();
-                    }
-                }
-
-                return {};
-
-                });
+        for (int i = 1; i < totalWaypoints; ++i) {
+            std::string count;
+            count = "-" + std::to_string(i);
+            
+            addWaypoint(
+                i, 
+                this->settings.getSettingByName<std::string>("waypoint" + count)->value, 
+                this->settings.getSettingByName<std::string>("color" + count)->value, 
+                Vec3{ this->settings.getSettingByName<float>("x" + count)->value, this->settings.getSettingByName<float>("y" + count)->value, this->settings.getSettingByName<float>("z" + count)->value },
+                this->settings.getSettingByName<bool>("state" + count)->value,
+                false
+            );
         }
     }
 
@@ -69,42 +85,24 @@ public:
         this->addHeader("Function");
         this->addButton("Add another Waypoint", "Multi-Keybind command support!", "Add", [this] {
 
-            std::string keybindName = "keybind-" + std::to_string(totalKeybinds);
-            std::string commandName = "command-" + std::to_string(totalKeybinds);
+            int index = WaypointList.size();
+            addWaypoint(
+                index,
+                "waypoint-" + index,
+                "FFFFFF",
+                Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
+                true,
+                true
+            );
 
-            this->settings.addSetting(keybindName, (std::string)"");
-            this->settings.addSetting(commandName, (std::string)"");
-
-
-            keybindActions.push_back([this](std::vector<std::any> args) -> std::any {
-                KeyEvent event = std::any_cast<KeyEvent>(args[0]);
-                std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
-                if (duration.count() >= 2.5) {
-                    std::string count;
-                    if (totalKeybinds > 0) count = "-" + std::to_string(totalKeybinds);
-                    if (this->isKeybind(event.keys, totalKeybinds) && this->isKeyPartOfKeybind(event.key, totalKeybinds)) {
-                        std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                        auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-                        command_packet->command = this->settings.getSettingByName<std::string>("command" + count)->value;
-                        command_packet->origin.type = CommandOriginType::Player;
-                        command_packet->InternalSource = true;
-                        SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-
-                        last_used = std::chrono::high_resolution_clock::now();
-                    }
-                }
-                return {};
-                });
-
-            totalKeybinds++;
+            totalWaypoints++;
             FlarialGUI::Notify("Added! Scroll down for options.");
-            this->saveSettings();
         });
 
 
-        for (int i = 0; i < totalKeybinds; ++i) {
+        for (int i = 0; i < WaypointList.size(); ++i) {
 
-            std::string header = (i == 0) ? "Command" : "Command " + std::to_string(i);
+            std::string header = (i == 0) ? "Waypoint" : "Command " + std::to_string(i);
             std::string commandSettingName = (i == 0) ? "command" : "command-" + std::to_string(i);
 
             if (settings.getSettingByName<std::string>(commandSettingName) != nullptr) {
@@ -119,6 +117,11 @@ public:
                 );
                 this->extraPadding();
             }
+        }
+
+        for (const auto& pair : WaypointList) {
+            std::string name = pair.first;
+            Waypoint waypoint = pair.second;
         }
 
         FlarialGUI::UnsetScrollView();
@@ -140,7 +143,4 @@ public:
         }
     }
 
-    void addWaypoint() {
-        FlarialGUI::Notify("added new waypoint");
-    }
 };
