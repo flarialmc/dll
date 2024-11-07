@@ -193,10 +193,12 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     if(queueReset) {
         init = false;
         initImgui = false;
-        std::cout << "Troll" << std::endl;
+        Logger::debug("[SwapChain] RESETTING SWAPCHAIN!");
         ResizeHook::cleanShit(false);
         return DXGI_ERROR_DEVICE_RESET;
     }
+
+    if(Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
 
     if(!fEnabled) {
         return DXGI_ERROR_DEVICE_RESET;
