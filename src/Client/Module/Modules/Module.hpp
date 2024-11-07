@@ -27,6 +27,7 @@ public:
     std::string settingspath;
     std::vector<std::function<std::any(std::vector<std::any>)>> keybindActions;
     int totalKeybinds = 0;
+    int totalWaypoints = 0;
 
     Module(const std::string &ename, const std::string &edescription, int eicon, const std::string& ekey) {
         name = ename;
