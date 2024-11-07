@@ -494,6 +494,7 @@ void Module::terminate() {
 
 // TODO: find all getSettingByName<bool>("enabled")->value and replace!!!
 bool Module::isEnabled() {
+    if(!settings.getSettingByName<bool>("enabled")) return false;
     return settings.getSettingByName<bool>("enabled")->value;
 }
 
