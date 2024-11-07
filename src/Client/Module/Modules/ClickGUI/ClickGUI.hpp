@@ -1087,14 +1087,16 @@ public:
 
                     FlarialGUI::UnsetScrollView();
 
+                    D2D1_COLOR_F shadowCol = D2D1::ColorF(D2D1::ColorF::Black);
+                    shadowCol.a = modcardOpacity;
                     //FlarialGUI::RoundedRect(center.x, center.y + navigationBarHeight, D2D1::ColorF(D2D1::ColorF::White), baseWidth, navigationBarHeight);
                     FlarialGUI::PushImClipRect(D2D1::RectF(center.x, center.y + navigationBarHeight * 1.178f, center.x + baseWidth, center.y + navigationBarHeight * 2.15f));
-                    FlarialGUI::ShadowRect(Vec2{center.x + Constraints::SpacingConstraint(0.15f, baseWidth), center.y + navigationBarHeight}, Vec2{baseWidth * 0.74f, Constraints::SpacingConstraint(0.25f, baseHeightReal)}, D2D1::ColorF(D2D1::ColorF::Black), 50, 100);
+                    FlarialGUI::ShadowRect(Vec2{center.x + Constraints::SpacingConstraint(0.15f, baseWidth), center.y + navigationBarHeight}, Vec2{baseWidth * 0.74f, Constraints::SpacingConstraint(0.25f, baseHeightReal)}, shadowCol, 50, 100);
                     FlarialGUI::PopImClipRect();
 
                     //FlarialGUI::RoundedRect(center.x, center.y + Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.85f, D2D1::ColorF(D2D1::ColorF::White), baseWidth, Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.35f);
                     FlarialGUI::PushImClipRect(D2D1::RectF(center.x, center.y + Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.85f, center.x + baseWidth, center.y + (Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.651f) + Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.35f));
-                    FlarialGUI::ShadowRect(Vec2{center.x + Constraints::SpacingConstraint(0.15f, baseWidth), center.y + Constraints::RelativeConstraint(baseHeightReal, "height", true)}, Vec2{baseWidth * 0.74f, Constraints::SpacingConstraint(0.25f, baseHeightReal)}, D2D1::ColorF(D2D1::ColorF::Black), 50, 100);
+                    FlarialGUI::ShadowRect(Vec2{center.x + Constraints::SpacingConstraint(0.15f, baseWidth), center.y + Constraints::RelativeConstraint(baseHeightReal, "height", true)}, Vec2{baseWidth * 0.74f, Constraints::SpacingConstraint(0.25f, baseHeightReal)}, shadowCol, 50, 100);
                     FlarialGUI::PopImClipRect();
 
                     //FlarialGUI::ShadowRect(Vec2{center.x, center.y}, Vec2{baseWidth, Constraints::RelativeConstraint(baseHeightReal, "height", true)}, FlarialGUI::HexToColorF("120e0f"), baseRound.x, 100);
@@ -1119,7 +1121,7 @@ public:
                     D2D1_COLOR_F colorThing = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
                     colorThing.a = settingsOpacity;
 
-                    D2D1_RECT_F rect = { rectXNoOff, rectY, rectX + rectWidth + Constraints::RelativeConstraint(0.05f, "height", true), rectY + rectHeight + Constraints::RelativeConstraint(0.05f, "height", true)};
+                    D2D1_RECT_F rect = { rectXNoOff, rectY, rectXNoOff + anotherRectWidth, rectY + anotherRectHeight};
                     FlarialGUI::PushImClipRect(rect);
 
                     FlarialGUI::RoundedRect(rectX, rectY, colorThing,
@@ -1236,7 +1238,7 @@ public:
                 D2D1_COLOR_F colorThing = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
                 colorThing.a = settingsOpacity;
 
-                D2D1_RECT_F rect = { rectXNoOff, rectY, rectX + rectWidth + Constraints::RelativeConstraint(0.05f, "height", true), rectY + rectHeight + Constraints::RelativeConstraint(0.05f, "height", true)};
+                D2D1_RECT_F rect = { rectXNoOff, rectY, rectXNoOff + anotherRectWidth, rectY + anotherRectHeight};
                 FlarialGUI::PushImClipRect(rect);
 
                 FlarialGUI::RoundedRect(rectX, rectY, colorThing,
