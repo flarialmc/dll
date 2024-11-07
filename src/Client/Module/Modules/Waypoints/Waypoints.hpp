@@ -49,14 +49,12 @@ public:
     }
     void onSetup() override {
         for (int i = 0; i < this->settings.getSettingByName<int>("total")->value; ++i) {
-            std::string count;
-            count = "-" + std::to_string(i);
             addWaypoint(
                 i,
-                this->settings.getSettingByName<std::string>("waypoint" + count)->value,
-                this->settings.getSettingByName<std::string>("color" + count)->value,
-                Vec3 {this->settings.getSettingByName<float>("x" + count)->value, this->settings.getSettingByName<float>("y" + count)->value, this->settings.getSettingByName<float>("z" + count)->value},
-                this->settings.getSettingByName<bool>("state" + count)->value,
+                this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(i))->value,
+                this->settings.getSettingByName<std::string>("color-" + std::to_string(i))->value,
+                Vec3 {this->settings.getSettingByName<float>("x-" + std::to_string(i))->value, this->settings.getSettingByName<float>("y-" + std::to_string(i))->value, this->settings.getSettingByName<float>("z-" + std::to_string(i))->value},
+                this->settings.getSettingByName<bool>("state-" + std::to_string(i))->value,
                 false
             );
         }
