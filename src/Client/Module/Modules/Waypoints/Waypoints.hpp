@@ -29,14 +29,18 @@ public:
     void addWaypoint(int index, std::string name, std::string color, Vec3<float> position, bool state, bool config) {
         if (config)
         {
-            std::string end = "-" + index;
+            std::string end = "-" + std::to_string(index);
             this->settings.addSetting("waypoint" + end, (std::string)"");
             this->settings.addSetting("color" + end, (std::string)color);
             this->settings.addSetting("x" + end, position.x);
             this->settings.addSetting("y" + end, position.y);
             this->settings.addSetting("z" + end, position.z);
             this->settings.addSetting("state" + end, (bool)state);
+            this->settings.setValue("total", this->settings.getSettingByName<int>("total")->value + 1);
             this->saveSettings();
+            
+            Waypoint wp(position, FlarialGUI::HexToColorF(color), index, state);
+            WaypointList[name] = wp;
         }
         else {
             Waypoint wp(position, FlarialGUI::HexToColorF(color), index, state);
@@ -44,16 +48,14 @@ public:
         }
     }
     void onSetup() override {
-
-        for (int i = 1; i < totalWaypoints; ++i) {
+        for (int i = 0; i < this->settings.getSettingByName<int>("total")->value; ++i) {
             std::string count;
             count = "-" + std::to_string(i);
-            
             addWaypoint(
-                i, 
-                this->settings.getSettingByName<std::string>("waypoint" + count)->value, 
-                this->settings.getSettingByName<std::string>("color" + count)->value, 
-                Vec3{ this->settings.getSettingByName<float>("x" + count)->value, this->settings.getSettingByName<float>("y" + count)->value, this->settings.getSettingByName<float>("z" + count)->value },
+                i,
+                this->settings.getSettingByName<std::string>("waypoint" + count)->value,
+                this->settings.getSettingByName<std::string>("color" + count)->value,
+                Vec3 {this->settings.getSettingByName<float>("x" + count)->value, this->settings.getSettingByName<float>("y" + count)->value, this->settings.getSettingByName<float>("z" + count)->value},
                 this->settings.getSettingByName<bool>("state" + count)->value,
                 false
             );
@@ -66,7 +68,7 @@ public:
     }
 
     void defaultConfig() override {
-
+        if (settings.getSettingByName<int>("total") == nullptr) settings.addSetting("total", 0);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -88,19 +90,47 @@ public:
             int index = WaypointList.size();
             addWaypoint(
                 index,
-                "waypoint-" + index,
+                "waypoint-" + std::to_string(index),
                 "FFFFFF",
                 Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
                 true,
                 true
             );
-
-            totalWaypoints++;
             FlarialGUI::Notify("Added! Scroll down for options.");
         });
 
 
-        for (int i = 0; i < WaypointList.size(); ++i) {
+        for (const auto& pair : WaypointList) {
+            std::string name = pair.first;
+            Waypoint waypoint = pair.second;
+            this->addHeader(name);
+        }
+
+        FlarialGUI::UnsetScrollView();
+
+        this->resetPadding();
+    }
+
+    void onRender(RenderEvent& event) {
+        if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
+            !SDK::clientInstance->getLocalPlayer()->getLevel())
+            return;
+
+        if (FlarialGUI::inMenu || SDK::getCurrentScreen() != "hud_screen") return;
+
+        Vec2<float> screen;
+        for (const auto& pair : WaypointList) {
+            std::string name = pair.first;
+            Waypoint waypoint = pair.second;
+            std::wstring widename = std::wstring(name.begin(), name.end());
+            if (Matrix::WorldToScreen(waypoint.position, screen)) {
+                FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), 500, 0, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.215f, "height", true), DWRITE_FONT_WEIGHT_NORMAL, FlarialGUI::rgbColor, true);
+            }
+        }
+    }
+
+};
+/*for (int i = 0; i < WaypointList.size(); ++i) {
 
             std::string header = (i == 0) ? "Waypoint" : "Command " + std::to_string(i);
             std::string commandSettingName = (i == 0) ? "command" : "command-" + std::to_string(i);
@@ -117,30 +147,4 @@ public:
                 );
                 this->extraPadding();
             }
-        }
-
-        for (const auto& pair : WaypointList) {
-            std::string name = pair.first;
-            Waypoint waypoint = pair.second;
-        }
-
-        FlarialGUI::UnsetScrollView();
-
-        this->resetPadding();
-    }
-
-    void onRender(RenderEvent& event) {
-        if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
-            !SDK::clientInstance->getLocalPlayer()->getLevel())
-            return;
-
-        if (FlarialGUI::inMenu || SDK::getCurrentScreen() != "hud_screen") return;
-
-        Vec2<float> screen;
-
-        if (Matrix::WorldToScreen(Vec3{ 0.0F, 0.0F, 0.0F }, screen)) {
-            FlarialGUI::FlarialTextWithFont(screen.x, screen.y, L"waypoint 1", 500, 0, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.215f, "height", true), DWRITE_FONT_WEIGHT_NORMAL, FlarialGUI::rgbColor, true);
-        }
-    }
-
-};
+        }*/
