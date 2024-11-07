@@ -235,6 +235,7 @@ bool InHudScreen = false;
 bool toes = false;
 
 void Client::centerCursor() {
+    if(Client::disable) return;
     if (hWnd != nullptr && Client::settings.getSettingByName<bool>("centreCursor")->value) {
         if (!toes) {
             toes = true;
