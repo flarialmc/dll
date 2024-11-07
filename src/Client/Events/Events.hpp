@@ -7,6 +7,8 @@
 #include "Game/UpdatePlayerEvent.hpp"
 #include "Game/isPreGameEvent.hpp"
 #include "Game/PacksLoadEvent.hpp"
+#include "Game/AfterSettingsScreenOnExitEvent.hpp"
+#include "Game/BeforeSettingsScreenOnExitEvent.hpp"
 
 #include "Input/KeyEvent.hpp"
 #include "Input/MouseEvent.hpp"

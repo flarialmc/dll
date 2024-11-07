@@ -42,6 +42,8 @@ public:
 
     static std::string getTopScreenName();
 
+    std::string getScreenName();
+
     LevelRender *getLevelRender();
 
     float getFovX() {

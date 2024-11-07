@@ -23,6 +23,7 @@
 #include "Hooks/Game/composeFullStack.hpp"
 #include "Hooks/Render/RenderOrderExecuteHook.hpp"
 #include "Hooks/Render/RenderChunkCoordinatorPreRenderTickHook.hpp"
+#include "Hooks/Game/SettingsScreenOnExitHook.hpp"
 //#include "Hooks/Game/RenderItemGroup.hpp"
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 
@@ -82,6 +83,7 @@ void HookManager::initialize() {
 
         addHook<RenderOrderExecuteHook>();
         addHook<RenderChunkCoordinatorPreRenderTickHook>();
+        addHook<SettingsScreenOnExitHook>();
     }
 
     for (const auto& hook: hooks)
