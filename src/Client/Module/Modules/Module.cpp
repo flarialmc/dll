@@ -337,10 +337,14 @@ void Module::addElementText(std::string text, std::string subtext) {
     }
 
     D2D1_COLOR_F textCol = D2D1::ColorF(D2D1::ColorF::White);
-    textCol.a = ClickGUI::settingsOpacity;
     D2D1_COLOR_F subtextCol = FlarialGUI::HexToColorF("473b3d");
-    subtextCol.a = ClickGUI::settingsOpacity;
+    textCol.a = o_colors_text;
+    subtextCol.a = o_colors_text;
 
+    if(ClickGUI::settingsOpacity != 1) {
+        textCol.a = ClickGUI::settingsOpacity;
+        subtextCol.a = ClickGUI::settingsOpacity;
+    }
 
     FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, textCol, false);
     if (!subtext.empty()) FlarialGUI::FlarialTextWithFont(x, subtextY, FlarialGUI::to_wide(subtext).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, subtextCol, false);

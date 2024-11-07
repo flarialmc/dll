@@ -64,6 +64,7 @@ public:
     static inline std::string curr;
     static float inline accumilatedPos = 1;
     static float inline accumilatedBarPos = 1;
+    static bool inline isAnimatingModSet = false;
 
     ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {
         Module::setup();
@@ -998,6 +999,7 @@ public:
                 FlarialGUI::lerp(settingsOpacity, 0.0f, 0.1f * FlarialGUI::frameFactor);
                 FlarialGUI::lerp(settingsOffset, Constraints::RelativeConstraint(2.f, "height", true), 0.08f * FlarialGUI::frameFactor);
             }
+
 
             if (page.type == "normal") {
 
