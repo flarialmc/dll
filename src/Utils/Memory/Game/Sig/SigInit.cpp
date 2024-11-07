@@ -82,7 +82,11 @@ void SigInit::init2140() {
 
     ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 83 EC 50 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 40 48 8B F9 40");
     ADD_SIG("ClientInstance::isPreGame", "48 83 ec ? 48 8b 01 48 8b 80 ? ? ? ? ff 15 ? ? ? ? 48 85 c0 0f 94 c0");
-    ADD_SIG("ResourcePackManager::_composeFullStack_Patch1", "0f 84 ? ? ? ? 48 8b cf e8 ? ? ? ? 84 c0 74 ? 0f 57 c0"); // 84 to 85
+    ADD_SIG("ResourcePackManager::_composeFullStack_Patch", "0f 84 ? ? ? ? 48 8b cf e8 ? ? ? ? 84 c0 74 ? 0f 57 c0"); // 84 to 85
+    ADD_SIG("SettingsScreenOnExit", "40 57 48 83 EC 40 48 8B 79");
+    ADD_SIG("SettingsScreenOnExit_Patch", "74 ? 48 8b 8f ? ? ? ? e8 ? ? ? ? 33 c0");
+    ADD_SIG("GeneralSettingsScreenController::_setResourcePackStacks_Patch", "0f 84 ? ? ? ? 33 c0 0f 57 c9 f3 0f 7f 4c 24 ? 48 89 44 24 ? c7 44 24 ? ? ? ? ? 48 8b 8f");
+    ADD_SIG("GeneralSettingsScreenController::_processPendingImports_Patch", "0f 84 ? ? ? ? e8 ? ? ? ? 84 c0 0f 84 ? ? ? ? 0f 57 c0 33 c0");
 }
 
 void SigInit::init2130() {
