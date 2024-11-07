@@ -74,6 +74,7 @@
 #include "Modules/ViewModel/ViewModel.hpp"
 #include "Modules/PotionHUD/PotionHUD.hpp"
 #include "Modules/FasterInventory/FasterInventory.hpp"
+#include "Modules/Waypoints/Waypoints.hpp"
 
 #include "Modules/EntityCounter/EntityCounter.hpp"
 #include "Modules/PackChanger/PackChanger.hpp"
@@ -162,6 +163,7 @@ void ModuleManager::initialize() {
     // addModule<CompactChat>();
     addModule<ItemPhysics>();
     addModule<HiveStat>();
+    addModule<Waypoints>();
     if(WinrtUtils::checkAboveOrEqual(21, 40)) {
         addModule<PackChanger>(); // tss, let it be a surprise!
     }
