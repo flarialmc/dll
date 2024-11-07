@@ -80,11 +80,7 @@ void SigInit::init2140() {
 
     ADD_SIG("ScreenView::setupAndRender", "48 8B C4 48 89 58 18 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 98 FD");
 
-    ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 83 EC 50 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 40 48 8B F9 40");
-    ADD_SIG("ClientInstance::isPreGame", "48 83 ec ? 48 8b 01 48 8b 80 ? ? ? ? ff 15 ? ? ? ? 48 85 c0 0f 94 c0");
-    ADD_SIG("ResourcePackManager::_composeFullStack_Patch", "0f 84 ? ? ? ? 48 8b cf e8 ? ? ? ? 84 c0 74 ? 0f 57 c0"); // 84 to 85
     ADD_SIG("SettingsScreenOnExit", "40 57 48 83 EC 40 48 8B 79");
-    ADD_SIG("SettingsScreenOnExit_Patch", "74 ? 48 8b 8f ? ? ? ? e8 ? ? ? ? 33 c0");
     ADD_SIG("GeneralSettingsScreenController::_setResourcePackStacks_Patch", "0f 84 ? ? ? ? 33 c0 0f 57 c9 f3 0f 7f 4c 24 ? 48 89 44 24 ? c7 44 24 ? ? ? ? ? 48 8b 8f");
     ADD_SIG("GeneralSettingsScreenController::_processPendingImports_Patch", "0f 84 ? ? ? ? e8 ? ? ? ? 84 c0 0f 84 ? ? ? ? 0f 57 c0 33 c0");
 }
@@ -120,6 +116,8 @@ void SigInit::init2130() {
     ADD_SIG("mce::TextureGroup::getTexture", "40 55 53 56 57 41 54 41 56 41 57 48 8D 6C 24 E9 48 81 EC 00");
 
     DEPRECATE_SIG("ActorCollision::isOnGround");
+
+    ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 83 EC 50 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 40 48 8B F9 40");
 }
 
 void SigInit::init2120() {
@@ -151,7 +149,8 @@ void SigInit::init2120() {
     ADD_SIG("rendergraph::RenderOrder::execute", "4c 8b dc 53 56 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 44 24 ? 48 8b 71");
     ADD_SIG("RenderChunkCoordinator::preRenderTick", "E8 ?? ?? ?? ?? 48 8B 03 48 8B D8 48 3B C6 75 EC 4D 8B C6");
     // LevelRenderer::preRenderUpdate - 40 53 55 56 57 41 56 48 83 EC 50 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 48 4D 8B F0 48 8B EA
-    //
+
+    ADD_SIG("ResourcePackManager::_composeFullStack_Patch", "0f 84 ? ? ? ? 48 8b cf e8 ? ? ? ? 84 c0 74 ? 0f 57 c0"); // 84 to 85
 }
 
 void SigInit::init2102() {
@@ -422,4 +421,7 @@ void SigInit::init2030() {
     ADD_SIG("BaseActorRenderer::renderText", "E8 ? ? ? ? 48 83 C3 ? 48 3B DF 75 ? 48 8B 74 24 ? 48 8B 5C 24 ? 48 8B 6C 24");
 
     ADD_SIG("mce::MathUtility::getRotationFromNegZToVector", "48 8B C4 48 81 EC ? ? ? ? F3 0F 10 2A");
+
+    ADD_SIG("ClientInstance::isPreGame", "48 83 ec ? 48 8b 01 48 8b 80 ? ? ? ? ff 15 ? ? ? ? 48 85 c0 0f 94 c0");
+    ADD_SIG("SettingsScreenOnExit_Patch", "74 ? 48 8b 8f ? ? ? ? e8 ? ? ? ? 33 c0");
 }
