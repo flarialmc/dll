@@ -144,8 +144,8 @@ void SigInit::init2120() {
 
     ADD_SIG("MeshHelpers::renderMeshImmediately2", "48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 81 EC ? ? ? ? 49 8B F1 49 8B E8 48 8B FA 4C 8B F1");
 
-    ADD_SIG("GameRenderer::renderCurrentFrame", "4c 8b dc 53 56 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 44 24 ? 48 8b 71"); // is it tho?
-    ADD_SIG("RebuildChunk", "E8 ?? ?? ?? ?? 48 8B 03 48 8B D8 48 3B C6 75 EC 4D 8B C6");
+    ADD_SIG("rendergraph::RenderOrder::execute", "4c 8b dc 53 56 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 44 24 ? 48 8b 71");
+    ADD_SIG("RenderChunkCoordinator::preRenderTick", "E8 ?? ?? ?? ?? 48 8B 03 48 8B D8 48 3B C6 75 EC 4D 8B C6");
     // LevelRenderer::preRenderUpdate - 40 53 55 56 57 41 56 48 83 EC 50 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 48 4D 8B F0 48 8B EA
     //
 }
