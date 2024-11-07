@@ -59,7 +59,7 @@ public:
     static inline float modcardOpacity = 1.f;
     static inline float settingsOpacity = 0.f;
     static inline float modcardOffset = 0.f;
-    static inline float settingsOffset = -Constraints::RelativeConstraint(2.f, "height", true);
+    static inline float settingsOffset = Constraints::RelativeConstraint(2.f, "height", true);
     static inline PageType page;
     static inline std::string curr;
     static float inline accumilatedPos = 1;
@@ -996,7 +996,7 @@ public:
                 FlarialGUI::lerp(settingsOffset, 0.0f, 0.245f * FlarialGUI::frameFactor);
             } else {
                 FlarialGUI::lerp(settingsOpacity, 0.0f, 0.1f * FlarialGUI::frameFactor);
-                FlarialGUI::lerp(settingsOffset, -Constraints::RelativeConstraint(2.f, "height", true), 0.08f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(settingsOffset, Constraints::RelativeConstraint(2.f, "height", true), 0.08f * FlarialGUI::frameFactor);
             }
 
             if (page.type == "normal") {
