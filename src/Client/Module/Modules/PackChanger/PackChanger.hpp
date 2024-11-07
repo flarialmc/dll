@@ -4,11 +4,11 @@
 
 class PackChanger : public Module {
 private:
-    bool patched = false;
     bool queueReset = false;
     bool canRender = false;
     bool enableFrameQueue = false;
     int frameQueue = 0;
+    bool userRequestedReload = false;
 
     bool forcePreGame = false;
 
@@ -32,7 +32,7 @@ public:
     };
 
     void onEnable() override {
-        patch();
+        patchComposeFullStack();
         canRender = true;
         Listen(this, SetupAndRenderEvent, &PackChanger::onSetupAndRender);
         Listen(this, isPreGameEvent, &PackChanger::onIsPreGame);
@@ -45,6 +45,7 @@ public:
     }
 
     void onDisable() override {
+        unpatchComposeFullStack();
         Deafen(this, SetupAndRenderEvent, &PackChanger::onSetupAndRender);
         Deafen(this, isPreGameEvent, &PackChanger::onIsPreGame);
         Deafen(this, PacksLoadEvent, &PackChanger::onPacksLoad);
@@ -54,7 +55,6 @@ public:
         Deafen(this, AfterSettingsScreenOnExitEvent, &PackChanger::onAfterSettingsScreenOnExit);
         canRender = true;
         Module::onDisable();
-        unpatch();
     }
 
     void defaultConfig() override {}
@@ -62,15 +62,20 @@ public:
     void settingsRender(float settingsOffset) override {}
 
     void onBeforeSettingsScreenOnExit(BeforeSettingsScreenOnExitEvent &event) {
+        if(!SDK::clientInstance) return;
         auto player = SDK::clientInstance->getLocalPlayer();
         if(!player) return; // means were not in the world
         forcePreGame = true;
+        userRequestedReload = true;
+        patch();
     }
 
     void onAfterSettingsScreenOnExit(AfterSettingsScreenOnExitEvent &event) {
+        if(!SDK::clientInstance) return;
         auto player = SDK::clientInstance->getLocalPlayer();
         if(!player) return; // means were not in the world
         forcePreGame = false;
+        unpatch();
     }
 
     void onPacksLoad(PacksLoadEvent &event) {
@@ -78,9 +83,12 @@ public:
         auto player = SDK::clientInstance->getLocalPlayer();
         if(!player) return;
         // recreate swapchain
-        queueReset = true;
-        canRender = false; // disable rendering
-        forcePreGame = false;
+        if(userRequestedReload) {
+            queueReset = true;
+            canRender = false; // disable rendering
+            forcePreGame = false;
+            userRequestedReload = false;
+        }
     }
 
     void onRenderChunkCoordinatorPreRenderTick(RenderChunkCoordinatorPreRenderTickEvent &event) {
@@ -95,8 +103,7 @@ public:
 
     void onSetupAndRender(SetupAndRenderEvent &event) {
         auto player = SDK::clientInstance->getLocalPlayer();
-        if(!player) return unpatch();
-        patch();
+        if(!player) return;
 
         auto name = SDK::clientInstance->getTopScreenName();
 
@@ -141,31 +148,35 @@ public:
     }
 
     void patch() {
-        if(patched) return;
-        patched = true;
-        static auto dst = GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch");
         static auto dst1 = GET_SIG_ADDRESS("SettingsScreenOnExit_Patch");
         static auto dst2 = GET_SIG_ADDRESS("GeneralSettingsScreenController::_processPendingImports_Patch");
         static auto dst3 = GET_SIG_ADDRESS("GeneralSettingsScreenController::_setResourcePackStacks_Patch");
 
-        Memory::nopBytes((void*)dst, 6);
         Memory::nopBytes((void*)dst1, 2);
         Memory::patchBytes((void*)dst2, (BYTE*)"\x90\xE9", 2);  // make it always jump
         Memory::nopBytes((void*)dst3, 6);
     }
 
     void unpatch() {
-        if(!patched) return;
-        patched = false;
-        static auto dst = GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch");
         static auto dst1 = GET_SIG_ADDRESS("SettingsScreenOnExit_Patch");
         static auto dst2 = GET_SIG_ADDRESS("GeneralSettingsScreenController::_processPendingImports_Patch");
         static auto dst3 = GET_SIG_ADDRESS("GeneralSettingsScreenController::_setResourcePackStacks_Patch");
 
 
-        Memory::patchBytes((void*)dst, patch1Data.data(), patch1Data.size());
         Memory::patchBytes((void*)dst1, patch2Data.data(), patch2Data.size());
         Memory::patchBytes((void*)dst2, patch3Data.data(), patch3Data.size());
         Memory::patchBytes((void*)dst3, patch4Data.data(), patch4Data.size());
+    }
+
+    void patchComposeFullStack() {
+        static auto dst = GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch");
+
+        Memory::nopBytes((void*)dst, 6);
+    }
+
+    void unpatchComposeFullStack() {
+        static auto dst = GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch");
+
+        Memory::patchBytes((void*)dst, patch1Data.data(), patch1Data.size());
     }
 };
