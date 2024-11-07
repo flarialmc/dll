@@ -9,12 +9,17 @@ private:
     bool canRender = false;
     bool enableFrameQueue = false;
     int frameQueue = 0;
+
+    static inline std::array<std::byte, 6> originalData;
 public:
     PackChanger() : Module("PackChanger", "Allows you to change packs in world/server.", IDR_MAN_PNG, "") {
+        static auto src = GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch1");
+        Memory::copyBytes((void*)src, originalData.data(), 6);
         Module::setup();
     };
 
     void onEnable() override {
+        patch();
         canRender = true;
         Listen(this, SetupAndRenderEvent, &PackChanger::onSetupAndRender);
         Listen(this, isPreGameEvent, &PackChanger::onIsPreGame);
@@ -43,7 +48,6 @@ public:
         if(!SDK::clientInstance) return;
         auto player = SDK::clientInstance->getLocalPlayer();
         if(!player) return;
-        if(!player->getLevel()) return; // means were not in the world
         // recreate swapchain
         queueReset = true;
         canRender = false; // disable rendering
@@ -61,9 +65,7 @@ public:
 
     void onSetupAndRender(SetupAndRenderEvent &event) {
         auto player = SDK::clientInstance->getLocalPlayer();
-        if(!player) return unpatch();
-        if(!player->getLevel()) return unpatch(); // means were not in the world
-        patch();
+        if(!player) return; // means were not in the world
 
         auto name = SDK::clientInstance->getTopScreenName();
 
@@ -109,14 +111,14 @@ public:
     void patch() {
         if(patched) return;
         patched = true;
-        static auto dst = GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch1") + 1;
-        Memory::patchBytes((void*)dst, (BYTE*)"\x85", 1);
+        static auto dst = GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch1");
+        Memory::nopBytes((void*)dst, 6);
     }
 
     void unpatch() {
         if(!patched) return;
         patched = false;
-        static auto dst = GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch1") + 1;
-        Memory::patchBytes((void*)dst, (BYTE*)"\x84", 1);
+        static auto dst = GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch1");
+        Memory::patchBytes((void*)dst, originalData.data(), 6);
     }
 };
