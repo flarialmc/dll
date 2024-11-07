@@ -18,6 +18,11 @@
 #include "Hooks/Render/TextureGroup_getTextureHook.hpp"
 #include "Hooks/Render/HudMobEffectsRenderer.hpp"
 #include "Hooks/Visual/BaseActorRendererRenderTextHook.hpp"
+#include "Hooks/Game/UpdatePlayerHook.hpp"
+#include "Hooks/Game/isPreGame.hpp"
+#include "Hooks/Game/composeFullStack.hpp"
+#include "Hooks/Render/RenderOrderExecuteHook.hpp"
+#include "Hooks/Render/RenderChunkCoordinatorPreRenderTickHook.hpp"
 //#include "Hooks/Game/RenderItemGroup.hpp"
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 
@@ -39,7 +44,6 @@ void HookManager::initialize() {
 
     Logger::debug(std::format("[Kiero] Renderer: {}", dxVersion[kiero::getRenderType()]));
 
-    addHook<KeyHook>();
 
     addHook<KeyHook>();
     addHook<MouseHook>();
@@ -68,7 +72,17 @@ void HookManager::initialize() {
     addHook<SendPacketHook>();
     addHook<getSensHook>();
     addHook<HudMobEffectsRendererHook>();
-    //addHook<BaseActorRendererRenderTextHook>();
+    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
+        addHook<BaseActorRendererRenderTextHook>();
+    }
+    if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+        addHook<UpdatePlayerHook>();
+        addHook<isPreGameHook>();
+        addHook<_composeFullStackHook>();
+
+        addHook<RenderOrderExecuteHook>();
+        addHook<RenderChunkCoordinatorPreRenderTickHook>();
+    }
 
     for (const auto& hook: hooks)
         hook->enableHook();

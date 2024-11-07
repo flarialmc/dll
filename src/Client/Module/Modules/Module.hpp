@@ -14,6 +14,7 @@
 #include "../../GUI/Engine/Constraints.hpp"
 #include "../../../SDK/SDK.hpp"
 #include "../../../Assets/Assets.hpp"
+#include "../../Events/Input/KeyEvent.hpp"
 
 class Module {
 
@@ -24,6 +25,8 @@ public:
     std::string defaultKeybind;
     Settings settings;
     std::string settingspath;
+    std::vector<std::function<std::any(std::vector<std::any>)>> keybindActions;
+    int totalKeybinds = 0;
 
     Module(const std::string &ename, const std::string &edescription, int eicon, const std::string& ekey) {
         name = ename;
@@ -50,6 +53,7 @@ public:
     int textboxIndex = 0;
     int keybindIndex = 0;
     int colorPickerIndex = 100;
+    int buttonIndex = 3;
 
     struct DrDisrespect {
         std::string* value;
@@ -65,6 +69,10 @@ public:
     void extraPadding();
     void addElementText(std::string text, std::string subtext = "");
     void addHeader(std::string text);
+
+    void addButton(const std::string &text, const std::string &subtext, const std::string &buttonText,
+                   std::function<void()> action);
+
     void addConditionalSlider(bool condition, std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
     void addSlider(std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
     void addToggle(std::string text, std::string subtext, bool& value);
@@ -87,12 +95,12 @@ public:
     bool isEnabled();
     void setEnabled(bool enabled);
     void setKeybind(const std::string& newKeybind);
-    std::string& getKeybind();
+    std::string& getKeybind(const int keybindCount = 0);
     virtual void defaultConfig();
-    virtual void settingsRender() {}
-    bool isKeybind(const std::array<bool, 256>& keys);
+    virtual void settingsRender(float settingsOffset) {}
+    bool isKeybind(const std::array<bool, 256>& keys, const int keybindCount = 0);
     [[nodiscard]] bool isAdditionalKeybind(const std::array<bool, 256>& keys, const std::string& bind) const;
-    bool isKeyPartOfKeybind(int keyCode);
+    bool isKeyPartOfKeybind(int keyCode, const int keybindCount = 0);
     static bool isKeyPartOfAdditionalKeybind(int keyCode, const std::string& bind);
     virtual void normalRender(int index, std::string& value);
 };

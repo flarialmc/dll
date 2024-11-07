@@ -61,6 +61,7 @@
 #include "Modules/Misc/DiscordRPC/DiscordRPCListener.hpp"
 //#include "Modules/Overlay/OverlayModule.hpp"
 #include "Modules/AutoRQ/AutoRQ.hpp"
+#include "Modules/Misc/HiveModeCatcher/HiveModeCatcherListener.hpp"
 #include "Modules/HitPing/HitPing.hpp"
 #include "Modules/InstantHurtAnimation/InstantHurtAnimation.hpp"
 //#include "Modules/MovableChat/MovableChat.hpp"
@@ -75,6 +76,7 @@
 #include "Modules/FasterInventory/FasterInventory.hpp"
 
 #include "Modules/EntityCounter/EntityCounter.hpp"
+#include "Modules/PackChanger/PackChanger.hpp"
 
 namespace ModuleManager {
     std::unordered_map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -124,11 +126,8 @@ void ModuleManager::initialize() {
     addModule<Sneak>();
     addModule<Sprint>();
     addModule<Hitbox>();
-
-    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
-        addModule<ThirdPerson>();
-        addModule<HurtColor>();
-    }
+    addModule<HurtColor>();
+    addModule<ThirdPerson>();
 
     addModule<SnapLook>();
     addModule<FogColor>();
@@ -137,13 +136,10 @@ void ModuleManager::initialize() {
     addModule<RenderOptions>();
     addModule<PaperDoll>();
     addModule<GuiScale>();
-
-    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
-        addModule<TabList>();
-        addModule<WeatherChanger>();
-        addModule<NickModule>();
-        addModule<FreeLook>();
-    }
+    addModule<TabList>();
+    addModule<WeatherChanger>();
+    addModule<NickModule>();
+    addModule<FreeLook>();
 
     addModule<AutoGG>();
     addModule<TextHotkey>();
@@ -155,7 +151,6 @@ void ModuleManager::initialize() {
     addModule<CommandHotkey>();
     addModule<NoHurtCam>();
     addModule<InventoryHUD>();
-    // addModule<OverlayModule>();
     addModule<AutoRQ>();
     addModule<HitPing>();
     addModule<InstantHurtAnimation>();
@@ -163,14 +158,13 @@ void ModuleManager::initialize() {
     addModule<ViewModel>();
     addModule<PotionHUD>();
     addModule<FasterInventory>();
-
     // addModule<MovableChat>();
     // addModule<CompactChat>();
-    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
-        addModule<ItemPhysics>();
-    }
-
+    addModule<ItemPhysics>();
     addModule<HiveStat>();
+    if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+        addModule<PackChanger>(); // tss, let it be a surprise!
+    }
 
     addService<GUIKeyListener>();
     addService<DiscordRPCListener>();

@@ -30,7 +30,7 @@ public:
         if (settings.getSettingByName<bool>("tryToExcludeTeam") == nullptr) settings.addSetting("tryToExcludeTeam", true);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
         float toggleX = Constraints::PercentageConstraint(0.019, "left");
         float toggleY = Constraints::PercentageConstraint(0.10, "top");
@@ -86,6 +86,8 @@ public:
     }
 
     void onAttack(AttackEvent &event) {
+        if(!event.getActor()->isValid()) return;
+        if(!event.getActor()->isValidAABB()) return;
         if(!event.getActor()->hasCategory(ActorCategory::Player)) return;
         if(this->settings.getSettingByName<bool>("onlyWithArmor")->value) {
             auto armorContainer = event.getActor()->getArmorContainer();

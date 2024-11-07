@@ -3,6 +3,12 @@
 //
 
 #include "ResizeHook.hpp"
+
+#include <imgui_impl_dx11.h>
+#include <imgui_impl_dx12.h>
+#include <imgui_impl_win32.h>
+#include <imgui_internal.h>
+
 #include "../../../GUI/D2D.hpp"
 #include "SwapchainHook.hpp"
 #include "../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
@@ -44,15 +50,46 @@ ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT wi
                 if(SDK::clientInstance!=nullptr)
                     SDK::clientInstance->releaseMouse();
 
-    return funcOriginal(pSwapChain, bufferCount, width, height, newFormat,  DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
+    return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
 }
 
 // TODO: get back to this to check
 void ResizeHook::cleanShit(bool isResize) {
 
+
     Memory::SafeRelease(SwapchainHook::stageTex);
     Memory::SafeRelease(SwapchainHook::SavedD3D11BackBuffer);
     Memory::SafeRelease(SwapchainHook::ExtraSavedD3D11BackBuffer);
+    Memory::SafeRelease(Blur::pConstantBuffer);
+    Memory::SafeRelease(Blur::pSampler);
+    Memory::SafeRelease(Blur::pDownsampleShader);
+    Memory::SafeRelease(Blur::pInputLayout);
+    Memory::SafeRelease(Blur::pUpsampleShader);
+    Memory::SafeRelease(Blur::pVertexBuffer);
+    Memory::SafeRelease(Blur::pVertexShader);
+    Memory::SafeRelease(SwapchainHook::d3d11Device);
+    Memory::SafeRelease(SwapchainHook::D2D1Bitmap);
+    Memory::SafeRelease(D2D::context);
+
+
+
+
+    if(!isResize) {
+
+        ImGui::GetIO().Fonts->Clear();
+        FlarialGUI::FontMap.clear();
+
+        ImGui_ImplWin32_Shutdown();
+
+        if(!SwapchainHook::queue)
+            ImGui_ImplDX11_Shutdown();
+        else ImGui_ImplDX12_Shutdown();
+        ImGui::DestroyContext();
+
+        FlarialGUI::DoLoadModuleFontLater = true;
+        FlarialGUI::DoLoadGUIFontLater = true;
+    }
+
 
     Blur::hasDoneFrames = false;
     for(ID3D11Texture2D* tex : Blur::framebuffers){ Memory::SafeRelease(tex); Blur::framebuffers.clear();}
@@ -70,9 +107,17 @@ void ResizeHook::cleanShit(bool isResize) {
 
     ClickGUIElements::images.clear();
 
-    for (auto &i: ImagesClass::eimages) {
+    if(!isResize) {
+        for(auto &i : ImagesClass::ImguiDX11Images) {
+            Memory::SafeRelease(i.second);
+        }
+        ImagesClass::ImguiDX11Images.clear();
+    }
+
+    for (auto i: ImagesClass::eimages) {
         Memory::SafeRelease(i.second);
     }
+
 
     ImagesClass::eimages.clear();
 
@@ -156,6 +201,7 @@ void ResizeHook::cleanShit(bool isResize) {
     }
 
     FlarialGUI::scrollposmodifier = 0;
+
 
     //ImGui::DestroyContext();
 }

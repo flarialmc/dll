@@ -37,7 +37,7 @@ public:
             settings.addSetting("scale", 1.0f);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
         float toggleX = Constraints::PercentageConstraint(0.019, "left");
         float toggleY = Constraints::PercentageConstraint(0.10, "top");

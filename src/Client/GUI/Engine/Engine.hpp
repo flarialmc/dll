@@ -301,7 +301,7 @@ namespace FlarialGUI {
     std::string
     FlarialTextWithFont(float x, float y, const wchar_t *text, float width, float height,
                         DWRITE_TEXT_ALIGNMENT alignment, float fontSize,
-                        DWRITE_FONT_WEIGHT weight, bool moduleFont = false);
+                        DWRITE_FONT_WEIGHT weight, bool moduleFont = false, bool troll = false);
 
     std::string
     FlarialTextWithFont(float x, float y, const wchar_t *text, float width, float height,

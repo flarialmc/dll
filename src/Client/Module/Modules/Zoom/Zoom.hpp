@@ -53,7 +53,7 @@ public:
         if (settings.getSettingByName<float>("disableanim") == nullptr) settings.addSetting("disableanim", false);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
 
         float x = Constraints::PercentageConstraint(0.019, "left");
@@ -63,7 +63,7 @@ public:
 
 
         FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
@@ -176,12 +176,13 @@ public:
 
     void onKey(KeyEvent &event) {
         if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
-            this->active = !this->active;
+            keybindActions[0]({});
             if (!this->settings.getSettingByName<bool>("SaveModifier")->value) zoomValue = 30.0f;
         }
 
         if (!this->isKeybind(event.keys)) this->active = false;
     };
+
     // TODO: add dolly zoom and world2screen zoom stabilization ?
     // TODO: if someone has disabled hand this will enable it unless changed in settings
     void onSetTopScreenName(SetTopScreenNameEvent &event) {

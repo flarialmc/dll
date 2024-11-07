@@ -3,6 +3,7 @@
 #include "../../Structs/ImagesClass.hpp"
 #include "../../../../../Module/Manager.hpp"
 #include "../../../../../../Assets/Assets.hpp"
+#include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -57,7 +58,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
-            if (i != index && FlarialGUI::DropDownMenus[i].isActive) {
+            if (i != index && additionalY[i] > 0.0f) {
                 y += additionalY[i];
             }
         }
@@ -70,10 +71,11 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     additionalIndex = index;
 
     D2D1_COLOR_F unselectedChildCol = colors_primary3_rgb ? rgbColor : colors_primary3;
-    unselectedChildCol.a = o_colors_primary3;
+    unselectedChildCol.a = ClickGUI::settingsOpacity;
+
 
     D2D1_COLOR_F selectedCol = colors_primary1_rgb ? rgbColor : colors_primary1;
-    selectedCol.a = o_colors_primary1;
+    selectedCol.a = ClickGUI::settingsOpacity;
 
     float originalY = y;
     if (!FlarialGUI::DropDownMenus[index].curColorDone) {
@@ -168,6 +170,8 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
             curY = y + ((float)counter * childHeights) - ((float)counter * 0.1f) + 5.f;
         }
 
+        if(!FlarialGUI::DropDownMenus[index].isActive) break;
+
         if (curY < (originalY - lastChildHeight + 20)) continue;
 
         float curClickingY = clickingY + ((float)counter * childHeights) + 5.f;
@@ -221,6 +225,9 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
         float curY = y + ((float)counter * childHeights) - ((float)counter * 0.1f) + 5.f;
 
         if (curY < originalY) continue;
+
+        if(op != FlarialGUI::DropDownMenus[index].selected && !FlarialGUI::DropDownMenus[index].isActive) break;
+
 
         FlarialGUI::FlarialTextWithFont(x + offset + Constraints::SpacingConstraint(0.1, curTextWidth),
                                         counter == options.size() - 1 ? curY - 2.5f : curY - 4.0f, to_wide(op).c_str(),

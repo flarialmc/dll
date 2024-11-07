@@ -211,6 +211,8 @@ public:
 
     bool hasCategory(ActorCategory category);
 
+    bool isValid();
+
     float getApproximateReach(Actor* target);
 
     RenderPositionComponent *getRenderPositionComponent();

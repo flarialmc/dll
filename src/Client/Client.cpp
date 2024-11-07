@@ -21,7 +21,7 @@ std::vector<std::string> Client::onlinePlayers;
 
 bool notifiedOfConnectionIssue = false;
 
-std::string current_commit = COMMIT_HASH;
+std::string Client::current_commit = COMMIT_HASH;
 
 
 
@@ -74,7 +74,7 @@ std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
 
 bool Client::disable = false;
 
-void setWindowTitle(std::wstring title) {
+void Client::setWindowTitle(std::wstring title) {
     using namespace winrt::Windows::UI::ViewManagement;
     using namespace winrt::Windows::ApplicationModel::Core;
 

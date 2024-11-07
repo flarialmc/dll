@@ -1,5 +1,6 @@
 #include "Module.hpp"
 #include "../../Client.hpp"
+#include "../../Events/Events.hpp"
 #include "ClickGUI/ClickGUI.hpp"
 
 #define colors_secondary6 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary6")->value)
@@ -195,6 +196,7 @@ void Module::resetPadding() {
     toggleIndex = 0;
     dropdownIndex = 0;
     sliderIndex = 0;
+    buttonIndex = 3;
 
     int i = 100;
     for (int i = 100; i < colorPickerIndex; ++i) {
@@ -217,19 +219,42 @@ void Module::addHeader(std::string text) {
 
 
     D2D1_COLOR_F col = colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6;
-    col.a = o_colors_secondary6;
+    col.a = ClickGUI::settingsOpacity;
+    D2D1_COLOR_F textCol = D2D1::ColorF(D2D1::ColorF::White);
+    textCol.a = ClickGUI::settingsOpacity;;
 
-    std::string name = FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 500, 0, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.215f, "height", true), DWRITE_FONT_WEIGHT_BOLD, false);
+    std::string name = FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 500, 0, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.215f, "height", true), DWRITE_FONT_WEIGHT_BOLD, textCol, false);
 
     if(FlarialGUI::shouldAdditionalY)
         for (int i = 0; i < FlarialGUI::highestAddIndexes + 1; i++) {
-            if (FlarialGUI::DropDownMenus[i].isActive && i <= FlarialGUI::additionalIndex) {
+            if (i <= FlarialGUI::additionalIndex && FlarialGUI::additionalY[i] > 0.0f) {
                 y += FlarialGUI::additionalY[i];
             }
         }
     FlarialGUI::RoundedRect(x, y + Constraints::RelativeConstraint(0.023f, "width"), col, FlarialGUI::TextSizes[name] + Constraints::RelativeConstraint(0.01f, "width"), 3.0f, 0, 0);
 
     padding += Constraints::RelativeConstraint(0.055f, "height", true);
+}
+
+void Module::addButton(const std::string& text, const std::string& subtext, const std::string& buttonText, std::function<void()> action) {
+    float elementX = Constraints::PercentageConstraint(0.15f, "right");
+    float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+    const float width = Constraints::RelativeConstraint(0.09f, "height", true);
+    const float height = Constraints::RelativeConstraint(0.035, "height", true);
+    Vec2<float> round = Constraints::RoundingConstraint(13, 13);
+    D2D1_COLOR_F col = FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary1")->value);
+    col.a = ClickGUI::settingsOpacity;
+    D2D1_COLOR_F f = D2D1::ColorF(D2D1::ColorF::White);
+    f.a = ClickGUI::settingsOpacity;
+
+    if(FlarialGUI::RoundedButton(buttonIndex, elementX, y, col, f, FlarialGUI::to_wide(buttonText).c_str(), width, height, round.x, round.y)) {
+        action();
+    }
+
+    Module::addElementText(text, subtext);
+
+    padding += Constraints::RelativeConstraint(0.06f, "height", true);
+    buttonIndex++;
 }
 
 void Module::addColorPicker(std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb) {
@@ -268,7 +293,7 @@ void Module::addDropdown(std::string text, std::string subtext, const std::vecto
 
     FlarialGUI::Dropdown(dropdownIndex, elementX, y, options, value, "");
 
-    if(FlarialGUI::DropDownMenus[dropdownIndex].isActive || FlarialGUI::additionalY[dropdownIndex] > 0.f) FlarialGUI::SetIsInAdditionalYMode();
+    if(FlarialGUI::additionalY[dropdownIndex] > 0.f) FlarialGUI::SetIsInAdditionalYMode();
 
     padding += Constraints::RelativeConstraint(0.05f, "height", true);
     dropdownIndex++;
@@ -311,8 +336,14 @@ void Module::addElementText(std::string text, std::string subtext) {
         y += Constraints::RelativeConstraint(0.0015f, "height", true);
     }
 
-    FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, false);
-    if (!subtext.empty()) FlarialGUI::FlarialTextWithFont(x, subtextY, FlarialGUI::to_wide(subtext).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, FlarialGUI::HexToColorF("473b3d"), false);
+    D2D1_COLOR_F textCol = D2D1::ColorF(D2D1::ColorF::White);
+    textCol.a = ClickGUI::settingsOpacity;
+    D2D1_COLOR_F subtextCol = FlarialGUI::HexToColorF("473b3d");
+    subtextCol.a = ClickGUI::settingsOpacity;
+
+
+    FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, textCol, false);
+    if (!subtext.empty()) FlarialGUI::FlarialTextWithFont(x, subtextY, FlarialGUI::to_wide(subtext).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, subtextCol, false);
 }
 
 void Module::addSlider(std::string text, std::string subtext, float& value, float maxVal, float minVal, bool zerosafe) {
@@ -381,14 +412,20 @@ void Module::loadSettings() {
     if (inputFile.is_open()) {
         ss << inputFile.rdbuf();
         inputFile.close();
-    }
-    else {
+    } else {
         Logger::error("File could not be opened. Maybe it doesn't exist?: " + settingspath);
         return;
     }
 
     std::string settingstring = ss.str();
     settings.FromJson(settingstring);
+
+    for (const auto& settingPair : settings.settings) {
+        const std::string& name = settingPair.first;
+        if (name.find("keybind") != std::string::npos) {
+            ++totalKeybinds;
+        }
+    }
 }
 
 void Module::checkSettingsFile() const {
@@ -418,8 +455,14 @@ void Module::toggle() {
 void Module::setup() {
     defaultConfig();
     Module::defaultConfig();
+    keybindActions.push_back([this] (std::vector<std::any> args)-> std::any {
+    this->active = !this->active;
+    return {};
+    });
+
     onSetup();
     // TODO: might call on enable twice
+
     if (settings.getSettingByName<bool>("enabled")->value)
         onEnable();
 }
@@ -464,11 +507,13 @@ void Module::setKeybind(const std::string& newKeybind) {
         settings.addSetting("keybind", newKeybind);
 }
 
-std::string& Module::getKeybind() {
-    auto key = settings.getSettingByName<std::string>("keybind");
+std::string& Module::getKeybind(const int keybindCount) {
+    std::string count;
+    if(keybindCount > 0) count = "-" + std::to_string(keybindCount);
+    auto key = settings.getSettingByName<std::string>("keybind" + count);
     if (key == nullptr)
         settings.addSetting("keybind", defaultKeybind);
-    return settings.getSettingByName<std::string>("keybind")->value;
+    return key->value;
 }
 
 void Module::defaultConfig() {
@@ -537,9 +582,13 @@ void Module::defaultConfig() {
 
 }
 
-bool Module::isKeybind(const std::array<bool, 256>& keys) {
+bool Module::isKeybind(const std::array<bool, 256>& keys, const int keybindCount) {
 
-    std::vector<int> keyCodes = Utils::getStringAsKeys(getKeybind());
+    std::string count = "keybind";
+    if(keybindCount > 0) count += "-" + std::to_string(keybindCount);
+    if(!settings.getSettingByName<std::string>(count)) { return false;}
+
+    std::vector<int> keyCodes = Utils::getStringAsKeys(getKeybind(keybindCount));
 
     for (int keyCode : keyCodes) {
         if (!keys[keyCode]) {
@@ -563,8 +612,6 @@ bool Module::isKeybind(const std::array<bool, 256>& keys) {
 
     for (int keyCode : keyCodes) {
         if (!keys[keyCode]) {
-
-            // Key is not being held down
             return false;
         }
     }
@@ -578,8 +625,8 @@ bool Module::isKeybind(const std::array<bool, 256>& keys) {
     return allInactive;
 }
 
-bool Module::isKeyPartOfKeybind(int keyCode) {
-    std::vector<int> keyCodes = Utils::getStringAsKeys(getKeybind());
+bool Module::isKeyPartOfKeybind(int keyCode, const int keybindCount) {
+    std::vector<int> keyCodes = Utils::getStringAsKeys(getKeybind(keybindCount));
     return std::find(keyCodes.begin(), keyCodes.end(), keyCode) != keyCodes.end();
 }
 

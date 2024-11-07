@@ -56,6 +56,10 @@ private:
     float width3 = 0.000001f;
     std::string searchBarString;
 public:
+    static inline float modcardOpacity = 1.f;
+    static inline float settingsOpacity = 0.f;
+    static inline float modcardOffset = 0.f;
+    static inline float settingsOffset = Constraints::RelativeConstraint(2.f, "height", true);
     static inline PageType page;
     static inline std::string curr;
     static float inline accumilatedPos = 1;
@@ -221,7 +225,7 @@ public:
             settings.addSetting("colors_mod4_rgb", false);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
         const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
@@ -760,7 +764,7 @@ public:
 
             }
 
-            if(Client::settings.getSettingByName<float>("blurintensity")->value != 0.01f)
+            if(Client::settings.getSettingByName<float>("blurintensity")->value > 0.01f)
                 Blur::RenderBlur(event.RTV, 3, realBlurAmount / 2);
 
             float baseHeight = Constraints::RelativeConstraint(baseHeightReal);
@@ -978,9 +982,26 @@ public:
 
             std::string e = curr;
 
+            if(page.type == "normal" && e == "modules") {
+                FlarialGUI::lerp(modcardOpacity, 1.0f, 0.1f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(modcardOffset, 0.0f, 0.245f * FlarialGUI::frameFactor);
+            } else {
+                FlarialGUI::lerp(modcardOpacity, 0.0f, 0.1f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(modcardOffset, -Constraints::RelativeConstraint(2.f, "height", true), 0.08f * FlarialGUI::frameFactor);
+            }
+
+
+            if(e == "settings" || page.type == "settings") {
+                FlarialGUI::lerp(settingsOpacity, 1.0f, 0.1f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(settingsOffset, 0.0f, 0.245f * FlarialGUI::frameFactor);
+            } else {
+                FlarialGUI::lerp(settingsOpacity, 0.0f, 0.1f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(settingsOffset, Constraints::RelativeConstraint(2.f, "height", true), 0.08f * FlarialGUI::frameFactor);
+            }
+
             if (page.type == "normal") {
 
-                if (e == "modules") {
+                if(modcardOpacity > 0.05f){
 
                     float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
                     float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
@@ -1043,7 +1064,7 @@ public:
 
                             if (name.starts_with(search) ||
                                 name.find(search) != std::string::npos) {
-                                ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, pModule.get(),
+                                ClickGUIElements::ModCard(modcenter.x + xModifier + modcardOffset, modcenter.y + yModifier, pModule.get(),
                                                           pModule->icon, i, visible);
                                 xModifier += Constraints::SpacingConstraint(1.02f, modWidth);
                                 if ((++i % 3) == 0) {
@@ -1052,7 +1073,7 @@ public:
                                 }
                             }
                         } else {
-                            ClickGUIElements::ModCard(modcenter.x + xModifier, modcenter.y + yModifier, pModule.get(),
+                            ClickGUIElements::ModCard(modcenter.x + xModifier + modcardOffset, modcenter.y + yModifier, pModule.get(),
                                                       pModule->icon, i, visible);
 
                             xModifier += Constraints::SpacingConstraint(1.02f, modWidth);
@@ -1066,23 +1087,29 @@ public:
 
                     FlarialGUI::UnsetScrollView();
 
+                    D2D1_COLOR_F shadowCol = D2D1::ColorF(D2D1::ColorF::Black);
+                    shadowCol.a = modcardOpacity;
                     //FlarialGUI::RoundedRect(center.x, center.y + navigationBarHeight, D2D1::ColorF(D2D1::ColorF::White), baseWidth, navigationBarHeight);
-                    FlarialGUI::PushImClipRect(D2D1::RectF(center.x, center.y + navigationBarHeight * 1.15f, center.x + baseWidth, center.y + navigationBarHeight * 2.15f));
-                    FlarialGUI::ShadowRect(Vec2{center.x, center.y + navigationBarHeight}, Vec2{baseWidth, Constraints::SpacingConstraint(0.25f, baseHeightReal)}, D2D1::ColorF(D2D1::ColorF::Black), 50, 100);
+                    FlarialGUI::PushImClipRect(D2D1::RectF(center.x, center.y + navigationBarHeight * 1.178f, center.x + baseWidth, center.y + navigationBarHeight * 2.15f));
+                    FlarialGUI::ShadowRect(Vec2{center.x + Constraints::SpacingConstraint(0.15f, baseWidth), center.y + navigationBarHeight}, Vec2{baseWidth * 0.74f, Constraints::SpacingConstraint(0.25f, baseHeightReal)}, shadowCol, 50, 100);
                     FlarialGUI::PopImClipRect();
 
                     //FlarialGUI::RoundedRect(center.x, center.y + Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.85f, D2D1::ColorF(D2D1::ColorF::White), baseWidth, Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.35f);
                     FlarialGUI::PushImClipRect(D2D1::RectF(center.x, center.y + Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.85f, center.x + baseWidth, center.y + (Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.651f) + Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.35f));
-                    FlarialGUI::ShadowRect(Vec2{center.x + Constraints::SpacingConstraint(0.15f, baseWidth), center.y + Constraints::RelativeConstraint(baseHeightReal, "height", true)}, Vec2{baseWidth * 0.74f, Constraints::SpacingConstraint(0.25f, baseHeightReal)}, D2D1::ColorF(D2D1::ColorF::Black), 50, 100);
+                    FlarialGUI::ShadowRect(Vec2{center.x + Constraints::SpacingConstraint(0.15f, baseWidth), center.y + Constraints::RelativeConstraint(baseHeightReal, "height", true)}, Vec2{baseWidth * 0.74f, Constraints::SpacingConstraint(0.25f, baseHeightReal)}, shadowCol, 50, 100);
                     FlarialGUI::PopImClipRect();
 
                     //FlarialGUI::ShadowRect(Vec2{center.x, center.y}, Vec2{baseWidth, Constraints::RelativeConstraint(baseHeightReal, "height", true)}, FlarialGUI::HexToColorF("120e0f"), baseRound.x, 100);
-                } else if (e == "settings") {
+                    }
+
+
+                if (page.type != "settings" && settingsOpacity > 0.05f) {
 
 
                     FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
 
-                    float rectX = Constraints::PercentageConstraint(0.015, "left");
+                    float rectXNoOff = Constraints::PercentageConstraint(0.015, "left");
+                    float rectX = Constraints::PercentageConstraint(0.015, "left") + settingsOffset;
                     float rectY = Constraints::PercentageConstraint(0.167, "top");
                     float rectWidth = Constraints::RelativeConstraint(0.965, "width");
                     float rectHeight = Constraints::RelativeConstraint(0.85);
@@ -1092,10 +1119,15 @@ public:
                     float anotherRectWidth = Constraints::RelativeConstraint(0.972, "width");
 
                     D2D1_COLOR_F colorThing = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
-                    colorThing.a = o_colors_secondary2;
+                    colorThing.a = settingsOpacity;
+
+                    D2D1_RECT_F rect = { rectXNoOff, rectY, rectXNoOff + anotherRectWidth, rectY + anotherRectHeight};
+                    FlarialGUI::PushImClipRect(rect);
 
                     FlarialGUI::RoundedRect(rectX, rectY, colorThing,
                                             anotherRectWidth, anotherRectHeight, round.x, round.x);
+
+                    FlarialGUI::PopImClipRect();
 
                     D2D1_COLOR_F bruv = colors_secondary1_rgb ? FlarialGUI::rgbColor : colors_secondary1;
                     bruv.a = o_colors_secondary1;
@@ -1105,11 +1137,9 @@ public:
 
                     FlarialGUI::PopSize();
 
-                    FlarialGUI::PushSize(rectX + Constraints::SpacingConstraint(0.0085, rectWidth),
+                    FlarialGUI::PushSize(rectXNoOff + Constraints::SpacingConstraint(0.0085, rectWidth),
                                          rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth,
                                          rectHeight);
-
-                    Module* c = this->ghostMainModule;
 
 
                     float toggleX = Constraints::PercentageConstraint(0.019, "left");
@@ -1123,6 +1153,13 @@ public:
                                               Constraints::RelativeConstraint(1.0, "width"),
                                               Constraints::RelativeConstraint(0.88f, "height"));
 
+                    FlarialGUI::PopSize();
+
+                    FlarialGUI::PushSize(rectX + Constraints::SpacingConstraint(0.0085, rectWidth),
+                     rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth,
+                     rectHeight);
+
+                    Module* c = this->ghostMainModule;
                     c->addHeader("Keybinds");
                     c->addKeybind("Eject Keybind", "When setting, hold the new bind for 2 seconds", Client::settings.getSettingByName<std::string>("ejectKeybind")->value);
 
@@ -1135,10 +1172,14 @@ public:
                     c->addSlider("Universal Font Scale", "", Client::settings.getSettingByName<float>("modules_font_scale")->value, 10.f, 0.f, true);
                     c->addToggle("Override Font Weight", "", Client::settings.getSettingByName<bool>("overrideFontWeight")->value);
                     c->addDropdown("Font Weight", "Bold, Thin, etc.", {"Bold", "Normal", "SemiBold", "ExtraBold", "Medium", "Light", "ExtraLight"}, Client::settings.getSettingByName<std::string>("fontWeight")->value);
-
                     c->extraPadding();
 
                     c->addHeader("Rendering");
+                    c->addButton("Force Reload Minecraft", "Forces the swapchain to recreate.", "RELOAD", [] () {
+
+                        SwapchainHook::queueReset = true;
+
+                    });
                     c->addElementText("Following Requires Restart");
                     c->extraPadding();
 
@@ -1177,16 +1218,15 @@ public:
 
                 }
                 /* Mod Card End */
-            } else if (page.type == "settings") {
+            }
 
-                if (curr != "settings") {
-                    curr = "settings";
-                    //FlarialGUI::TextBoxes[0].isActive = false;
-                }
+            if (ModuleManager::getModule(page.module) && page.type != "normal" && settingsOpacity > 0.05f) {
+
 
                 FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
 
-                float rectX = Constraints::PercentageConstraint(0.015, "left");
+                float rectXNoOff = Constraints::PercentageConstraint(0.015, "left");
+                float rectX = Constraints::PercentageConstraint(0.015, "left") + settingsOffset;
                 float rectY = Constraints::PercentageConstraint(0.167, "top");
                 float rectWidth = Constraints::RelativeConstraint(0.965, "width");
                 float rectHeight = Constraints::RelativeConstraint(0.85);
@@ -1196,10 +1236,15 @@ public:
                 float anotherRectWidth = Constraints::RelativeConstraint(0.972, "width");
 
                 D2D1_COLOR_F colorThing = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
-                colorThing.a = o_colors_secondary2;
+                colorThing.a = settingsOpacity;
+
+                D2D1_RECT_F rect = { rectXNoOff, rectY, rectXNoOff + anotherRectWidth, rectY + anotherRectHeight};
+                FlarialGUI::PushImClipRect(rect);
 
                 FlarialGUI::RoundedRect(rectX, rectY, colorThing,
                                         anotherRectWidth, anotherRectHeight, round.x, round.x);
+
+                FlarialGUI::PopImClipRect();
 
                 D2D1_COLOR_F bruv = colors_secondary1_rgb ? FlarialGUI::rgbColor : colors_secondary1;
                 bruv.a = o_colors_secondary1;
@@ -1213,14 +1258,15 @@ public:
                                      rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth,
                                      rectHeight);
 
-                if (!this->active)
+
                     FlarialGUI::SetScrollView(
-                            rectX + Constraints::SpacingConstraint(0.0085, rectWidth),
+                            rectXNoOff + Constraints::SpacingConstraint(0.0085, rectWidth),
                             rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
 
-                ModuleManager::getModule(page.module)->settingsRender();
 
-                if (!this->active) FlarialGUI::UnsetScrollView();
+                ModuleManager::getModule(page.module)->settingsRender(settingsOffset);
+
+                FlarialGUI::UnsetScrollView();
 
                 FlarialGUI::PopSize();
 
@@ -1241,7 +1287,8 @@ public:
                                                                             buttonHeight);
 
 
-                    if (FlarialGUI::RoundedButton(0, spacingX + centered.first + rectX,
+                    textCol.a = settingsOpacity;
+                    if (FlarialGUI::RoundedButton(0, spacingX + centered.first + rectX - settingsOffset,
                                                   thingYes.second + rectHeight + rectY - Constraints::RelativeConstraint(0.06f), colorThing, textCol, L"Reset",
                                                   buttonWidth, buttonHeight, round.x, round.x)) {
                         auto currentModule = ModuleManager::getModule(page.module);
@@ -1254,7 +1301,7 @@ public:
                     }
 
 
-                    if (FlarialGUI::RoundedButton(1, -spacingX + centered.first + rectX + childWidth - buttonWidth,
+                    if (FlarialGUI::RoundedButton(1, -spacingX + centered.first + rectX + childWidth - buttonWidth - settingsOffset,
                                                   thingYes.second + rectHeight + rectY - Constraints::RelativeConstraint(0.06f), colorThing, textCol,
                                                   L"Copy From", buttonWidth, buttonHeight, round.x, round.x)) {
 
@@ -1278,7 +1325,7 @@ public:
             if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen")
                 this->active = false;
             else {
-                this->active = !this->active;
+            keybindActions[0]({});
             }
 
             if (this->active) {

@@ -57,7 +57,7 @@ public:
         if (settings.getSettingByName<bool>("particles") == nullptr) settings.addSetting("particles", true);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
         updateSetings();
 

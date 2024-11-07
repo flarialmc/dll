@@ -26,6 +26,8 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+
+#include "../../Module/Modules/ClickGUI/ClickGUI.hpp"
 //#include <misc/freetype/imgui_freetype.h>
 
 #define clickgui ModuleManager::getModule("ClickGUI")
@@ -727,11 +729,13 @@ bool ifFontScale2(const float fontSize) {
 
 std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
-                                     const DWRITE_FONT_WEIGHT weight, bool moduleFont) {
+                                     const DWRITE_FONT_WEIGHT weight, bool moduleFont, bool troll) {
 
 
     D2D1_COLOR_F color = colors_text_rgb ? rgbColor : colors_text;
     color.a = o_colors_text;
+
+    if(FlarialGUI::inMenu && !troll) color.a = ClickGUI::settingsOpacity;
 
     return FlarialTextWithFont(x, y, text, width, height, alignment, fontSize, weight, color, moduleFont);
 }
@@ -742,7 +746,7 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
 
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
-            if (FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
+            if (i <= additionalIndex && additionalY[i] > 0.0f) {
                 y += additionalY[i];
             }
         }

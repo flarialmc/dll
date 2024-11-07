@@ -67,7 +67,7 @@ public:
 
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
         /* Border Start */
 

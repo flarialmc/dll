@@ -4,6 +4,9 @@
 #include "Game/RaknetTickEvent.hpp"
 #include "Game/TickEvent.hpp"
 #include "Game/TimeEvent.hpp"
+#include "Game/UpdatePlayerEvent.hpp"
+#include "Game/isPreGameEvent.hpp"
+#include "Game/PacksLoadEvent.hpp"
 
 #include "Input/KeyEvent.hpp"
 #include "Input/MouseEvent.hpp"
@@ -22,3 +25,5 @@
 #include "Render/RenderPotionHUDEvent.hpp"
 #include "Render/SetTopScreenNameEvent.hpp"
 #include "Render/SetupAndRenderEvent.hpp"
+#include "Render/RenderOrderExecuteEvent.hpp"
+#include "Render/RenderChunkCoordinatorPreRenderTickEvent.hpp"

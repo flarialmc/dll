@@ -20,7 +20,7 @@ public:
         Module::onDisable();
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
 
         float x = Constraints::PercentageConstraint(0.019, "left");
@@ -30,7 +30,7 @@ public:
 
 
         FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(x, Constraints::PercentageConstraint(0.00, "top"),
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
@@ -45,7 +45,7 @@ public:
     // TODO: make it togglable
     void onKey(KeyEvent &event) {
         if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key))
-            this->active = !this->active;
+            keybindActions[0]({});
 
         if (!this->isKeybind(event.keys)) this->active = false;
     };

@@ -27,7 +27,7 @@ public:
         if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 0.5f);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
         const float textWidth = Constraints::RelativeConstraint(0.26, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);

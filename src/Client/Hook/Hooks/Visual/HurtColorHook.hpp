@@ -10,7 +10,15 @@ private:
     static MCCColor *HurtColorCallback(void *a1, MCCColor *color, void *a3) {
 
         auto event = nes::make_holder<HurtColorEvent>(funcOriginal(a1, color, a3));
-        eventMgr.trigger(event);
+
+        if(WinrtUtils::checkAboveOrEqual(21,40)) {
+            auto actor = hat::member_at<Actor*>(a3, 0x38);
+            if(actor && actor->getHurtTime() > 0) {
+                eventMgr.trigger(event);
+            }
+        } else {
+            eventMgr.trigger(event);
+        }
 
         return event->getHurtColor();
 

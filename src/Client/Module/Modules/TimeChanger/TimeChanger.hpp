@@ -23,7 +23,7 @@ public:
         if (settings.getSettingByName<float>("time") == nullptr) settings.addSetting("time", 0.5f);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
 
         float toggleX = Constraints::PercentageConstraint(0.019, "left");

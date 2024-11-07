@@ -9,10 +9,12 @@ void OffsetInit::init2140() {
 
     ADD_OFFSET("Player::gamemode", 0xB28);
     ADD_OFFSET("Player::playerName", 0xCB0);
+    ADD_OFFSET("ClientInstance::getBlockSource", 29);
 
     ADD_OFFSET("ClientInstance::levelRenderer", 0xE8);
 
     //ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x0); No longer exists?
+    ADD_OFFSET("Level::getPlayerMap", 0xBF0);
 
     ADD_OFFSET("ClientInstance::viewMatrix", 0x368);
     ADD_OFFSET("ClientInstance::guiData", 0x590);

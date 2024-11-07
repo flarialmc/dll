@@ -32,7 +32,11 @@ public:
 class Level {
 public:
     std::unordered_map<mcUUID, PlayerListEntry> &getPlayerMap() {
-        return hat::member_at<std::unordered_map<mcUUID, PlayerListEntry>>(this, GET_OFFSET("Level::getPlayerMap"));
+        if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+            return *hat::member_at<std::unordered_map<mcUUID, PlayerListEntry>*>(this, GET_OFFSET("Level::getPlayerMap"));
+        } else {
+            return hat::member_at<std::unordered_map<mcUUID, PlayerListEntry>>(this, GET_OFFSET("Level::getPlayerMap"));
+        }
     }
 
     HitResult &getHitResult() {
