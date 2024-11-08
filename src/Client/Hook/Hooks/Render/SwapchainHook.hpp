@@ -61,6 +61,7 @@ public:
     static inline SwapchainOriginal funcOriginal = nullptr;
     static bool init;
     static inline bool queueReset = false;
+    static inline bool currentVsyncState = true;
 
     SwapchainHook();
 
