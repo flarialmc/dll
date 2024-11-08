@@ -51,9 +51,11 @@ ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT wi
                 if(SDK::clientInstance!=nullptr)
                     SDK::clientInstance->releaseMouse();
 
-    auto new_flags = SwapchainHook::currentVsyncState ? 0 : DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+    if (SwapchainHook::currentVsyncState) {
+        return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, flags);
+    }
 
-    return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, new_flags);
+    return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
 }
 
 // TODO: get back to this to check
@@ -78,19 +80,20 @@ void ResizeHook::cleanShit(bool isResize) {
 
 
     if(!isResize) {
+        if (ImGui::GetCurrentContext()) {
+            ImGui::GetIO().Fonts->Clear();
+            FlarialGUI::FontMap.clear();
 
-        ImGui::GetIO().Fonts->Clear();
-        FlarialGUI::FontMap.clear();
+            ImGui_ImplWin32_Shutdown();
 
-        ImGui_ImplWin32_Shutdown();
+            if (!SwapchainHook::queue)
+                ImGui_ImplDX11_Shutdown();
+            else ImGui_ImplDX12_Shutdown();
+            ImGui::DestroyContext();
 
-        if(!SwapchainHook::queue)
-            ImGui_ImplDX11_Shutdown();
-        else ImGui_ImplDX12_Shutdown();
-        ImGui::DestroyContext();
-
-        FlarialGUI::DoLoadModuleFontLater = true;
-        FlarialGUI::DoLoadGUIFontLater = true;
+            FlarialGUI::DoLoadModuleFontLater = true;
+            FlarialGUI::DoLoadGUIFontLater = true;
+        }
     }
 
 
