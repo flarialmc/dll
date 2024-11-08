@@ -60,17 +60,17 @@ public:
         keybindActions.push_back([this](std::vector<std::any> args) -> std::any {
             KeyEvent event = std::any_cast<KeyEvent>(args[0]);
             int index = WaypointList.size();
-addWaypoint(
-    index,
-    "waypoint-" + std::to_string(index),
-    "FFFFFF",
-    Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y - 1, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
-    true,
-    true,
-    false,
-    100.0f
-);
-FlarialGUI::Notify("Added waypoint!");
+            addWaypoint(
+                index,
+                "waypoint-" + std::to_string(index),
+                "FFFFFF",
+                Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y - 1, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
+                true,
+                true,
+                false,
+                100.0f
+            );
+            FlarialGUI::Notify("Added waypoint!");
             return {};
         });
 
@@ -142,15 +142,15 @@ FlarialGUI::Notify("Added waypoint!");
             this->addTextBox("Name", "Change the name of the waypoint.", this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value);
             this->addButton("Delete Waypoint", "", "Delete", [this, index = pair.second.index]() {
                 std::string end = "-" + std::to_string(index);
-this->settings.deleteSetting("waypoint" + end);
-this->settings.deleteSetting("color" + end);
-this->settings.deleteSetting("x" + end);
-this->settings.deleteSetting("y" + end);
-this->settings.deleteSetting("z" + end);
-this->settings.deleteSetting("state" + end);
-this->settings.deleteSetting("rgb" + end);
-this->settings.deleteSetting("opacity" + end);
-this->saveSettings();
+                this->settings.deleteSetting("waypoint" + end);
+                this->settings.deleteSetting("color" + end);
+                this->settings.deleteSetting("x" + end);
+                this->settings.deleteSetting("y" + end);
+                this->settings.deleteSetting("z" + end);
+                this->settings.deleteSetting("state" + end);
+                this->settings.deleteSetting("rgb" + end);
+                this->settings.deleteSetting("opacity" + end);
+                this->saveSettings();
             
             });
         }
