@@ -733,9 +733,10 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
 
 
     D2D1_COLOR_F color = colors_text_rgb ? rgbColor : colors_text;
+
     color.a = o_colors_text;
 
-    if(FlarialGUI::inMenu && !troll && ClickGUI::settingsOpacity != 1) color.a = ClickGUI::settingsOpacity;
+    if(FlarialGUI::inMenu && !troll && ClickGUI::settingsOpacity != 1 && ClickGUI::curr != "modules") color.a = ClickGUI::settingsOpacity;
 
     return FlarialTextWithFont(x, y, text, width, height, alignment, fontSize, weight, color, moduleFont);
 }

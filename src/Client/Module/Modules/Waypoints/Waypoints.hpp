@@ -54,7 +54,9 @@ public:
         return Vec3{ this->settings.getSettingByName<float>("x-" + std::to_string(index))->value, this->settings.getSettingByName<float>("y-" + std::to_string(index))->value, this->settings.getSettingByName<float>("z-" + std::to_string(index))->value };
     }
     void onSetup() override {
+        if(this->settings.getSettingByName<float>("total")->value > 0)
         for (int i = 0; i < this->settings.getSettingByName<float>("total")->value; i++) {
+            std::cout << "waypoint-" + std::to_string(i) << std::endl;
             addWaypoint(
                 i,
                 this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(i))->value,
@@ -65,7 +67,6 @@ public:
                 this->settings.getSettingByName<bool>("rgb-" + std::to_string(i))->value,
                 this->settings.getSettingByName<float>("opacity-" + std::to_string(i))->value
             );
-            std::cout << "waypoint-" + std::to_string(i) << std::endl;
         }
     }
 
@@ -75,7 +76,7 @@ public:
     }
 
     void defaultConfig() override {
-        if (settings.getSettingByName<float>("distance") == nullptr) settings.addSetting("total", 1000.0f);
+        if (settings.getSettingByName<float>("distance") == nullptr) settings.addSetting("distance", 1000.0f);
         if (settings.getSettingByName<float>("total") == nullptr) settings.addSetting("total", 0.0f);
     }
 
@@ -100,7 +101,7 @@ public:
                 index,
                 "waypoint-" + std::to_string(index),
                 "FFFFFF",
-                Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
+                Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y - 1, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
                 true,
                 true,
                 false,
@@ -147,10 +148,11 @@ public:
 
                     std::wstring widename = std::wstring(name.begin(), name.end());
 
-                    float minFontSize = 100.0f;
-                    float maxFontSize = 400.0f;
+                    float minFontSize = Constraints::RelativeConstraint(0.09f, "height", true);
+                    float maxFontSize = Constraints::RelativeConstraint(0.14f, "height", true);
 
-                    float fontSize = std::max(maxFontSize - round(distance) * 5, minFontSize);
+                    float fontSize = maxFontSize - (maxFontSize - minFontSize) * (distance / this->settings.getSettingByName<float>("distance")->value);
+                    fontSize = std::max(minFontSize, std::min(fontSize, maxFontSize));
 
                     if (distance < this->settings.getSettingByName<float>("distance")->value)
                     {
