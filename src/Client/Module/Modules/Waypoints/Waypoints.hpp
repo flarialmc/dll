@@ -192,7 +192,14 @@ public:
 
                     if (distance < this->settings.getSettingByName<float>("distance")->value)
                     {
-                        FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), fontSize, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_NORMAL, FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value), waypoint.rgb);
+                        if (this->settings.getSettingByName<bool>("rgb-" + std::to_string(pair.second.index))->value)
+                        {
+                            FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), fontSize, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_NORMAL, FlarialGUI::rgbColor, true);
+                        }
+                        else
+                        {
+                            FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), fontSize, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_NORMAL, FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value), true);
+                        }
                     }
                 }
             }
