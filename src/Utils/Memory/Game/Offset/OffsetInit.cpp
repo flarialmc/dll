@@ -5,7 +5,10 @@
 
 void OffsetInit::init2140() {
     Logger::debug("[Offsets] Loading offsets for 1.21.4X");
+
     ADD_OFFSET("Level::hitResult", 0x248);
+    ADD_OFFSET("Level::worldFolderName", 0x2B8);
+    ADD_OFFSET("Level::getPlayerMap", 0xBF0);
 
     ADD_OFFSET("Player::gamemode", 0xB28);
     ADD_OFFSET("Player::playerName", 0xCB0);
@@ -14,7 +17,6 @@ void OffsetInit::init2140() {
     ADD_OFFSET("ClientInstance::levelRenderer", 0xE8);
 
     //ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x0); No longer exists?
-    ADD_OFFSET("Level::getPlayerMap", 0xBF0);
 
     ADD_OFFSET("ClientInstance::viewMatrix", 0x368);
     ADD_OFFSET("ClientInstance::guiData", 0x590);
@@ -237,6 +239,7 @@ void OffsetInit::init2040() {
 
     ADD_OFFSET("Level::hitResult", 0xA68);
     ADD_OFFSET("Level::getPlayerMap", 0x25F0);
+    ADD_OFFSET("Level::worldFolderName", 0x15A0);
 
     ADD_OFFSET("OptionInfo::TranslateName", 0x168);
 }
@@ -309,6 +312,7 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("Biome::temparature", 0x40);
 
+    ADD_OFFSET("Dimension::name", 0x20);
     ADD_OFFSET("Dimension::weather", 0x1A8);
 
     ADD_OFFSET("Weather::lightingLevel", 0x44);
@@ -362,7 +366,9 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("VisualTree::root", 0x8);
 
+    ADD_OFFSET("Level::biome", 0x850);
     ADD_OFFSET("Level::hitResult", 0xA48);
+    ADD_OFFSET("Level::worldFolderName", 0x15A0);
     ADD_OFFSET("Level::getPlayerMap", 0x2608);
 
     ADD_OFFSET("ItemActor::stack", 0x4A0);

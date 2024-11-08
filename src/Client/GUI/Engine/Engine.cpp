@@ -329,7 +329,7 @@ bool FlarialGUI::isRectInRect(const D2D1_RECT_F &outer, const D2D1_RECT_F &inner
 }
 
 void FlarialGUI::PushSize(float x, float y, float width, float height) {
-    Dimension size;
+    Dimensions size;
     size.x = x;
     size.y = y;
     size.width = width;

@@ -84,7 +84,7 @@ public:
 
 
 
-class Dimension {
+class Dimensions {
 public:
     float x = 0;
     float y = 0;
@@ -93,7 +93,7 @@ public:
 };
 
 namespace FlarialGUI {
-    std::stack<Dimension> inline dimensionStack;
+    std::stack<Dimensions> inline dimensionStack;
     std::vector<float> inline darkenAmounts(10000);
     std::vector<float> inline glowAlphas(10000);
     std::vector<float> inline opacityAmounts(100);
