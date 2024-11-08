@@ -4,9 +4,8 @@
 
 class UIControl {
 public:
-    BUILD_ACCESS(this, float, scale, GET_OFFSET("UIControl::scale"));
-    BUILD_ACCESS(this, float, x, GET_OFFSET("UIControl::x"));
-    BUILD_ACCESS(this, float, y, GET_OFFSET("UIControl::y"));
+    BUILD_ACCESS(this, Vec2<float>, sizeConstrains, GET_OFFSET("UIControl::sizeConstrains"));
+    BUILD_ACCESS(this, Vec2<float>, parentRelativePosition, GET_OFFSET("UIControl::parentRelativePosition"));
     BUILD_ACCESS(this, std::vector<std::shared_ptr<UIControl>>, children, GET_OFFSET("UIControl::children"));
 
     std::string& getLayerName() {

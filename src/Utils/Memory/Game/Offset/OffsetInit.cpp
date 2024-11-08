@@ -79,10 +79,9 @@ void OffsetInit::init2120() {
 
     ADD_OFFSET("PlayerInventory::inventory", 0xB8);
 
-    ADD_OFFSET("UIControl::x", 0x10);
-    ADD_OFFSET("UIControl::y", 0x14);
+    ADD_OFFSET("UIControl::parentRelativePosition", 0x10);
     ADD_OFFSET("UIControl::LayerName", 0x20);
-    ADD_OFFSET("UIControl::scale", 0x48);
+    ADD_OFFSET("UIControl::sizeConstrains", 0x48);
 
     ADD_OFFSET("UIControl::children", 0x90);
     ADD_OFFSET("UIControl::components", 0xB0);
@@ -356,9 +355,8 @@ void OffsetInit::init2030() {
     ADD_OFFSET("CustomRenderComponent::renderer", 0x18);
 
     ADD_OFFSET("UIControl::LayerName", 0x18);
-    ADD_OFFSET("UIControl::scale", 0x40);
-    ADD_OFFSET("UIControl::x", 0x78);
-    ADD_OFFSET("UIControl::y", 0x7C);
+    ADD_OFFSET("UIControl::sizeConstrains", 0x40);
+    ADD_OFFSET("UIControl::parentRelativePosition", 0x78);
     ADD_OFFSET("UIControl::children", 0xA0);
     ADD_OFFSET("UIControl::components", 0xC0);
 

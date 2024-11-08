@@ -7,6 +7,7 @@ private:
     Vec2<float> currentPos{};
     bool enabled = false;
     static inline Vec2<float> oriXY = Vec2<float>{0.0f, 0.0f};
+    Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
 public:
     PaperDoll() : Module("Movable Paperdoll", "Makes the Minecraft paperdoll movable.", IDR_MAN_PNG,
                          "") {
@@ -75,10 +76,8 @@ public:
             ClientInstance::getTopScreenName() == "pause_screen" &&
                     this->isEnabled()) {
 
-            float width = Constraints::RelativeConstraint(0.0052, "height", true) *
-                    this->settings.getSettingByName<float>("uiscale")->value;
-            float height = Constraints::RelativeConstraint(0.0040, "height", true) *
-                    this->settings.getSettingByName<float>("uiscale")->value;
+            float width = currentSize.x;
+            float height = currentSize.y;
 
 
             Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
@@ -112,25 +111,29 @@ public:
     }
 
     void onSetupAndRender(SetupAndRenderEvent &event) {
-
         if(this->isEnabled())
             if(SDK::getCurrentScreen() == "hud_screen") {
                 SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl>& control) {
 
                     if (control->getLayerName() == "hud_player") {
 
+                        auto pos = control->parentRelativePosition;
+
                         if(oriXY.x == 0.0f) {
-                            oriXY.x = control->x;
-                            oriXY.y = control->y;
+                            oriXY = pos;
                         }
 
                         Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
 
-                        control->x = scaledPos.x + 7;
-                        control->y = scaledPos.y;
+                        control->parentRelativePosition = Vec2<float>{scaledPos.x, scaledPos.y};
 
-                        control->scale = this->settings.getSettingByName<float>("uiscale")->value;
+                        auto scale = this->settings.getSettingByName<float>("uiscale")->value;
 
+                        auto size = Vec2<float>{scale, scale * 2};
+
+                        currentSize = PositionUtils::getScreenScaledPos(size);
+
+                        control->sizeConstrains = Vec2<float>{scale, scale};
 
                         if (this->settings.getSettingByName<bool>("alwaysshow")->value || ClickGUI::editmenu) {
                             auto component = reinterpret_cast<CustomRenderComponent*>(control->getComponents()[4].get());
