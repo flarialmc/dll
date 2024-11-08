@@ -75,7 +75,7 @@ public:
     }
 
     void defaultConfig() override {
-        if (settings.getSettingByName<float>("distance") == nullptr) settings.addSetting("total", 1000.0f);
+        if (settings.getSettingByName<float>("distance") == nullptr) settings.addSetting("distance", 1000.0f);
         if (settings.getSettingByName<float>("total") == nullptr) settings.addSetting("total", 0.0f);
     }
 
