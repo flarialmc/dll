@@ -55,7 +55,6 @@ public:
     }
     void onSetup() override {
         for (int i = 0; i < this->settings.getSettingByName<float>("total")->value; i++) {
-            //std::cout << "waypoint-" + std::to_string(i) << std::endl;
             addWaypoint(
                 i,
                 this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(i))->value,
@@ -76,6 +75,7 @@ public:
     }
 
     void defaultConfig() override {
+        if (settings.getSettingByName<float>("distance") == nullptr) settings.addSetting("total", 1000.0f);
         if (settings.getSettingByName<float>("total") == nullptr) settings.addSetting("total", 0.0f);
     }
 
@@ -108,12 +108,14 @@ public:
             );
             FlarialGUI::Notify("Added! Scroll down for options.");
         });
+        this->addSlider("Distance", "Change until which distance waypoints will be drawn.", this->settings.getSettingByName<float>("distance")->value);
 
 
         for (auto pair : WaypointList) {
             this->addHeader(this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value);
             this->addColorPicker("Color", "Change the color of the waypoint.", this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value, pair.second.opacity, pair.second.rgb);
             this->addTextBox("Name", "Change the name of the waypoint.", this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value);
+            this->addToggle("Enabled", "Change if the waypoint should be shown or not.", this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))->value);
         }
 
         FlarialGUI::UnsetScrollView();
@@ -131,29 +133,29 @@ public:
         Vec2<float> screen;
 
         for (auto pair : WaypointList) {
-            std::string name = this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value;
-            Waypoint waypoint = pair.second;
+            if (this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))->value)
+            {
+                std::string name = this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value;
+                Waypoint waypoint = pair.second;
 
-            Vec3<float> waypointPos = getPos(waypoint.index);
-            if (Matrix::WorldToScreen(waypointPos, screen)) {
+                Vec3<float> waypointPos = getPos(waypoint.index);
+                if (Matrix::WorldToScreen(waypointPos, screen)) {
 
-                Vec3<float> origin = MC::Transform.origin;
-                float distance = waypointPos.dist(origin);
-                name += " (" + std::to_string(int(round(distance))) + "m)";
+                    Vec3<float> origin = MC::Transform.origin;
+                    float distance = waypointPos.dist(origin);
+                    name += " (" + std::to_string(int(round(distance))) + "m)";
 
+                    std::wstring widename = std::wstring(name.begin(), name.end());
 
-                std::wstring widename = std::wstring(name.begin(), name.end());
+                    float minFontSize = 100.0f;
+                    float maxFontSize = 400.0f;
 
-                float minFontSize = 12.0f;
-                float maxFontSize = 36.0f;
-                float maxDistance = 1000.0f;
+                    float fontSize = std::max(maxFontSize - round(distance) * 5, minFontSize);
 
-                float fontSize = maxFontSize - (maxFontSize - minFontSize) * (distance / maxDistance);
-                fontSize = std::max(minFontSize, std::min(fontSize, maxFontSize));
-                fontSize = fontSize * 2.f;
-
-                if (screen.x >= 0 && screen.x <= MC::windowSize.x && screen.y >= 0 && screen.y <= MC::windowSize.y) {
-                    FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), fontSize, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_NORMAL, FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value), waypoint.rgb);
+                    if (distance < this->settings.getSettingByName<float>("distance")->value)
+                    {
+                        FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), fontSize, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_NORMAL, FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value), waypoint.rgb);
+                    }
                 }
             }
         }
