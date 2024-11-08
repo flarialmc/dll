@@ -114,11 +114,11 @@ void SwapchainHook::enableHook() {
 
     // CREDIT @AETOPIA
 
-    IDXGIFactory2 *pFactory = NULL;
-    CreateDXGIFactory(IID_PPV_ARGS(&pFactory));
-    Memory::hookFunc((*(LPVOID **) pFactory)[16], (void *) CreateSwapChainForCoreWindow,
+    // faster method im pretty sure.. - chyves
+    HMODULE hDXGI = LoadLibraryA("dxgi.dll");
+    void* csfcwofunc = reinterpret_cast<void*>(GetProcAddress(hDXGI, "CreateSwapChainForCoreWindow"));
+    Memory::hookFunc(csfcwofunc, (void *) CreateSwapChainForCoreWindow,
                      (void **) &IDXGIFactory2_CreateSwapChainForCoreWindow, "CreateSwapchainForCoreWindow");
-    Memory::SafeRelease(pFactory);
 
     bool isRTSS = containsModule(L"RTSSHooks64.dll");
 
