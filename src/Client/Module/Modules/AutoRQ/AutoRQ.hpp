@@ -101,7 +101,7 @@ public:
         MinecraftPacketIds id = event.getPacket()->getId();
 
         if (id == MinecraftPacketIds::SetTitle) {
-            if (module->settings.getSettingByName<bool>("solo")->value) {
+            if (this->settings.getSettingByName<bool>("solo")->value) {
                 auto *pkt = reinterpret_cast<SetTitlePacket *>(event.getPacket());
 
                 if (//pkt->text == "§cYou're a spectator!" || //this brobably isn't needed anymore
@@ -113,7 +113,7 @@ public:
             }
         }
         if (id == MinecraftPacketIds::Text) {
-            if (module->settings.getSettingByName<bool>("solo")->value) {
+            if (this->settings.getSettingByName<bool>("solo")->value) {
                 auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
                 if (pkt->message.substr(0,48) == "§a§l» §r§eYou finished all maps and came in" || //gravity
