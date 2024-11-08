@@ -436,9 +436,9 @@ void SwapchainHook::DX11Render() {
 
     d3d11Device->GetImmediateContext(&ppContext);
 
-    if (ppContext)
+    if (ppContext) {
 
-        if (SUCCEEDED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID *) &pBackBuffer)))
+        if (SUCCEEDED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID *) &pBackBuffer))) {
 
             if (SUCCEEDED(d3d11Device->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView))) {
 
@@ -469,8 +469,10 @@ void SwapchainHook::DX11Render() {
 
                 ppContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
                 ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
+                ppContext->Flush();
             }
+        }
+    }
 
     if (pBackBuffer) pBackBuffer->Release();
 
@@ -673,7 +675,6 @@ void SwapchainHook::DX12Blur() {
     /* Blur End */
 
 }
-
 
 void SwapchainHook::RenderSync() {
     if (init && initImgui) {
