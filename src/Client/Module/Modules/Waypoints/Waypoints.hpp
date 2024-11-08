@@ -129,12 +129,32 @@ public:
         if (FlarialGUI::inMenu || SDK::getCurrentScreen() != "hud_screen") return;
 
         Vec2<float> screen;
+
         for (auto pair : WaypointList) {
             std::string name = this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value;
             Waypoint waypoint = pair.second;
-            std::wstring widename = std::wstring(name.begin(), name.end());
-            if (Matrix::WorldToScreen(getPos(waypoint.index), screen)) {
-                FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), 500, 0, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.215f, "height", true), DWRITE_FONT_WEIGHT_NORMAL, FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value), waypoint.rgb);
+
+            Vec3<float> waypointPos = getPos(waypoint.index);
+            if (Matrix::WorldToScreen(waypointPos, screen)) {
+
+                Vec3<float> origin = MC::Transform.origin;
+                float distance = waypointPos.dist(origin);
+                name += " (" + std::to_string(int(round(distance))) + "m)";
+
+
+                std::wstring widename = std::wstring(name.begin(), name.end());
+
+                float minFontSize = 12.0f;
+                float maxFontSize = 36.0f;
+                float maxDistance = 1000.0f;
+
+                float fontSize = maxFontSize - (maxFontSize - minFontSize) * (distance / maxDistance);
+                fontSize = std::max(minFontSize, std::min(fontSize, maxFontSize));
+                fontSize = fontSize * 2.f;
+
+                if (screen.x >= 0 && screen.x <= MC::windowSize.x && screen.y >= 0 && screen.y <= MC::windowSize.y) {
+                    FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), fontSize, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_NORMAL, FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value), waypoint.rgb);
+                }
             }
         }
     }
