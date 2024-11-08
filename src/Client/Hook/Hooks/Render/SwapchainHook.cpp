@@ -161,7 +161,9 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
         return DXGI_ERROR_INVALID_CALL;
     }
 
-    pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+    auto vsync = !Client::settings.getSettingByName<bool>("vsync")->value;
+
+    pDesc->Flags = vsync ? 0 : DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
     std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
 
@@ -185,12 +187,15 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 
     MADECHAIN = TRUE;
     queueReset = false;
+    currentVsyncState = vsync;
     return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
 }
 
 // CREDIT @AETOPIA
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
+    if (Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
+
     if (queueReset) {
         init = false;
         initImgui = false;
@@ -199,13 +204,16 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         return DXGI_ERROR_DEVICE_RESET;
     }
 
-    if (Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
-
     if (!fEnabled) {
         return DXGI_ERROR_DEVICE_RESET;
     }
 
     if (!MADECHAIN && fEnabled) {
+        return funcOriginal(pSwapChain, syncInterval, flags);
+    }
+
+    if(currentVsyncState != !Client::settings.getSettingByName<bool>("vsync")->value) {
+        queueReset = true;
         return funcOriginal(pSwapChain, syncInterval, flags);
     }
 
