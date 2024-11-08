@@ -24,10 +24,7 @@ public:
         Listen(this, KeyEvent, &Waypoints::onKey);
         Module::onEnable();
     }
-    /*std::string count;
-      count = "-" + std::to_string(i);
-      this->settings.getSettingByName<std::string>("command" + count)->value;
-    */
+
     void addWaypoint(int index, std::string name, std::string color, Vec3<float> position, bool state, bool config, bool rgb, float opacity) {
         if (config)
         {
@@ -51,9 +48,11 @@ public:
             WaypointList[ name ] = wp;
         }
     }
+
     Vec3<float> getPos(int index) {
         return Vec3{ this->settings.getSettingByName<float>("x-" + std::to_string(index))->value, this->settings.getSettingByName<float>("y-" + std::to_string(index))->value, this->settings.getSettingByName<float>("z-" + std::to_string(index))->value };
     }
+
     void onSetup() override {
 
         keybindActions.clear();
@@ -77,7 +76,7 @@ public:
         if(this->settings.getSettingByName<float>("total")->value > 0)
         for (int i = 0; i < this->settings.getSettingByName<float>("total")->value; i++) {
             if(!this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(i))) continue;
-            std::cout << "waypoint-" + std::to_string(i) << std::endl;
+            std::cout << this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(i))->value << std::endl;
             addWaypoint(
                 i,
                 this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(i))->value,
