@@ -603,7 +603,6 @@ bool Module::isKeybind(const std::array<bool, 256>& keys, const int keybindCount
 
     for (int keyCode : keyCodes) {
         if (!keys[keyCode]) {
-            // Key is not being held down
             return false;
         }
     }

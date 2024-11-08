@@ -372,13 +372,15 @@ int Utils::getStringAsKey(const std::string &str) {
     if (str == "PG UP" || str == "pg up") return 33;
     if (str == "PG DOWN" || str == "pg down") return 34;
     if (str == "TAB") return 9;
-    if (str == "{") return 219;
-    if (str == "}") return 221;
-    if (str == "+") return 187;
-    if (str == ":") return 186;
-    if (str == "?") return 191;
-    if (str == "|") return 220;
-    if (str == "`" || str == "~") return 192;
+    if (str == "[" || str == "{") return 219;  // [ and { share the same key
+    if (str == "]" || str == "}") return 221;  // ] and } share the same key
+    if (str == "+" || str == "=") return 187;  // + and = share the same key
+    if (str == ";" || str == ":") return 186;  // ; and : share the same key
+    if (str == "/" || str == "?") return 191;  // / and ? share the same key
+    if (str == "\\" || str == "|") return 220; // \ and | share the same key
+    if (str == "`" || str == "~") return 192;  // ` and ~ share the same key
+    if (str == "'") return 222;                // ' and " share the same key
+    if (str == "\"") return 222;               // " detected as 222 too
     if (str == " ") return 32;
     if (str == "F1" || str == "f1") return 112;
     if (str == "F2" || str == "f2") return 113;
@@ -392,10 +394,15 @@ int Utils::getStringAsKey(const std::string &str) {
     if (str == "F10" || str == "f10") return 121;
     if (str == "F11" || str == "f11") return 122;
     if (str == "F12" || str == "f12") return 123;
-    char c = str[0];
 
-    return static_cast<int>(std::toupper(c));
+    if (str.length() == 1) {
+        char c = str[0];
+        return static_cast<int>(std::toupper(c));
+    }
+
+    return -1;
 }
+
 
  std::vector<int> Utils::getStringAsKeys(const std::string& str) {
     std::vector<int> keys;
