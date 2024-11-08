@@ -76,6 +76,7 @@ FlarialGUI::Notify("Added waypoint!");
 
         if(this->settings.getSettingByName<float>("total")->value > 0)
         for (int i = 0; i < this->settings.getSettingByName<float>("total")->value; i++) {
+            if(!this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(i))) continue;
             std::cout << "waypoint-" + std::to_string(i) << std::endl;
             addWaypoint(
                 i,
@@ -169,7 +170,7 @@ this->saveSettings();
         Vec2<float> screen;
 
         for (auto pair : WaypointList) {
-            if(!this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))) return;
+            if(!this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))) continue;
             if (this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))->value)
             {
                 std::string name = this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value;
