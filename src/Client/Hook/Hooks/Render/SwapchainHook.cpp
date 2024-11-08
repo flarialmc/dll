@@ -20,6 +20,7 @@
 #include "../../../../../lib/ImGui/imgui_impl_dx11.h"
 #include "../../../../../lib/ImGui/imgui_impl_dx12.h"
 #include "../../../Module/Modules/MotionBlur/MotionBlur.hpp"
+#include "imgui_freetype.h"
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
 
@@ -719,30 +720,38 @@ void SwapchainHook::Fonts() {
             }
             */
 
+            auto& io = ImGui::GetIO();
+
             if (!FlarialGUI::FontMap["162-1"]) {
                 ImFontConfig config;
-                FlarialGUI::FontMap["162-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 23, &config);
-                FlarialGUI::FontMap["162-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 40, &config);
+                config.OversampleH = 1;
+                config.OversampleV = 1;
+
+                config.FontBuilderFlags =  ImGuiFreeTypeBuilderFlags_MonoHinting | ImGuiFreeTypeBuilderFlags_MonoHinting;
+
+                FlarialGUI::FontMap["162-1"] = io.Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 23, &config, io.Fonts->GetGlyphRangesDefault());
+                FlarialGUI::FontMap["162-2.0"] = io.Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 40, &config, io.Fonts->GetGlyphRangesDefault());
                 fontLoaded = true;
             }
 
             if (!FlarialGUI::FontMap["163-1"]) {
                 ImFontConfig config;
-                FlarialGUI::FontMap["163-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "163" + ".ttf").c_str(), 23, &config);
-                FlarialGUI::FontMap["163-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "163" + ".ttf").c_str(), 40, &config);
+                FlarialGUI::FontMap["163-1"] = io.Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "163" + ".ttf").c_str(), 23, &config, io.Fonts->GetGlyphRangesDefault());
+                FlarialGUI::FontMap["163-2.0"] = io.Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "163" + ".ttf").c_str(), 40, &config, io.Fonts->GetGlyphRangesDefault());
 
                 fontLoaded = true;
             }
 
             if (!FlarialGUI::FontMap["164-1"]) {
-                FlarialGUI::FontMap["164-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 23);
-                FlarialGUI::FontMap["164-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 40);
+                ImFontConfig config;
+                FlarialGUI::FontMap["164-1"] = io.Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 24, &config, io.Fonts->GetGlyphRangesDefault());
+                FlarialGUI::FontMap["164-2.0"] = io.Fonts->AddFontFromFileTTF((Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 40, &config, io.Fonts->GetGlyphRangesDefault());
 
                 fontLoaded = true;
             }
 
             if (fontLoaded) {
-                ImGui::GetIO().Fonts->Build();
+                io.Fonts->Build();
                 if (!queue) {
                     ImGui_ImplDX11_InvalidateDeviceObjects();
                     ImGui_ImplDX11_CreateDeviceObjects();
