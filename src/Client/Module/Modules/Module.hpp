@@ -51,7 +51,7 @@ public:
     int sliderIndex = 0;
     std::vector<float> conditionalSliderAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
     int dropdownIndex = 0;
-    int textboxIndex = 0;
+    int textboxIndex = 100;
     int keybindIndex = 0;
     int colorPickerIndex = 100;
     int buttonIndex = 3;

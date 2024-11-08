@@ -205,7 +205,7 @@ void Module::resetPadding() {
 
     colorPickerIndex = 100;
     keybindIndex = 0;
-    textboxIndex = 0;
+    textboxIndex = 100;
     FlarialGUI::UnSetIsInAdditionalYMode();
 }
 

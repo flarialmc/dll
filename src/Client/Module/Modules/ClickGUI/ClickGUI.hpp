@@ -935,7 +935,7 @@ public:
 
             const float h = Constraints::RelativeConstraint(0.42, "height");
             const float allahY = (navy + navigationBarHeight / 2.0f - h / 2.0f);
-            ClickGUIElements::SearchBar(150, searchBarString, 12, Constraints::PercentageConstraint(0.022, "right"),
+            ClickGUIElements::SearchBar(0, searchBarString, 12, Constraints::PercentageConstraint(0.022, "right"),
                                         allahY);
 
             // radiobutton of editmenu
