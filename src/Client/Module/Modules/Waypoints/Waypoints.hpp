@@ -138,7 +138,7 @@ public:
             if(!this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))) continue;
             this->addHeader(this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value);
             this->addToggle("Enabled", "Change if the waypoint should be shown or not.", this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))->value);
-            this->addColorPicker("Color", "Change the color of the waypoint.", this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value, pair.second.opacity, pair.second.rgb);
+            this->addColorPicker("Color", "Change the color of the waypoint.", this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value, this->settings.getSettingByName<float>("opacity-" + std::to_string(pair.second.index))->value, this->settings.getSettingByName<bool>("rgb-" + std::to_string(pair.second.index))->value);
             this->addTextBox("Name", "Change the name of the waypoint.", this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value);
             this->addButton("Delete Waypoint", "", "Delete", [this, index = pair.second.index]() {
                 std::string end = "-" + std::to_string(index);
@@ -151,7 +151,6 @@ public:
                 this->settings.deleteSetting("rgb" + end);
                 this->settings.deleteSetting("opacity" + end);
                 this->saveSettings();
-            
             });
         }
 
