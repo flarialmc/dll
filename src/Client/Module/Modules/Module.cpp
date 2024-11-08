@@ -430,6 +430,12 @@ void Module::loadSettings() {
             ++totalKeybinds;
         }
     }
+    for (const auto& settingPair : settings.settings) {
+        const std::string& name = settingPair.first;
+        if (name.find("waypoint") != std::string::npos) {
+            ++totalWaypoints;
+        }
+    }
 }
 
 void Module::checkSettingsFile() const {
