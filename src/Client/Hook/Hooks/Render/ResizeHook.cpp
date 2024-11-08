@@ -15,7 +15,6 @@
 #include "../../../Module/Manager.hpp"
 #include "../../../GUI/Engine/Elements/Structs/ImagesClass.hpp"
 #include "../../../../../lib/ImGui/imgui.h"
-#include "../../../Client.hpp"
 
 void ResizeHook::enableHook() {
 
@@ -51,9 +50,7 @@ ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT wi
                 if(SDK::clientInstance!=nullptr)
                     SDK::clientInstance->releaseMouse();
 
-    auto new_flags = SwapchainHook::currentVsyncState ? 0 : DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-
-    return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, new_flags);
+    return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
 }
 
 // TODO: get back to this to check
