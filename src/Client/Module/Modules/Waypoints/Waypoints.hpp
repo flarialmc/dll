@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "../../../../Client/GUI/Engine/Engine.hpp"
 
 struct Waypoint {
     Vec3<float> position;
@@ -188,16 +189,37 @@ public:
 
                     float fontSize = maxFontSize - (maxFontSize - minFontSize) * (distance / this->settings.getSettingByName<float>("distance")->value);
                     fontSize = std::max(minFontSize, std::min(fontSize, maxFontSize));
-
                     if (distance < this->settings.getSettingByName<float>("distance")->value)
                     {
+                        D2D1_COLOR_F invis = FlarialGUI::HexToColorF("000000");
+                        invis.a = 0.0F;
+                        D2D1_COLOR_F rect = FlarialGUI::HexToColorF("000000");
+                        rect.a = 0.5F;
                         if (this->settings.getSettingByName<bool>("rgb-" + std::to_string(pair.second.index))->value)
                         {
-                            FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), fontSize, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_NORMAL, FlarialGUI::rgbColor, true);
+                            std::string name = FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), fontSize, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_NORMAL, invis, true);
+                            FlarialGUI::RoundedRect(
+                                screen.x - 5.0F,
+                                screen.y - 20.0F,
+                                rect,
+                                FlarialGUI::TextSizes[name] + 10.0F,
+                                40.0F
+                            );
+                            D2D1_COLOR_F color = FlarialGUI::rgbColor;
+                            FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), fontSize, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_NORMAL, color, true);
                         }
                         else
                         {
-                            FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), fontSize, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_NORMAL, FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value), true);
+                            std::string name = FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), fontSize, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_NORMAL, invis, true);
+                            FlarialGUI::RoundedRect(
+                                screen.x - 5.0F,
+                                screen.y - 20.0F,
+                                rect,
+                                FlarialGUI::TextSizes[name] + 10.0F, 
+                                40.0F
+                            );
+                            D2D1_COLOR_F color = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value);
+                            FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), fontSize, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_NORMAL, color, true);
                         }
                     }
                 }
