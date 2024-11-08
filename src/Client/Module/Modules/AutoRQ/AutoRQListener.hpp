@@ -50,7 +50,7 @@ class AutoRQListener : public Listener {
             if (module->settings.getSettingByName<bool>("solo")->value) {
                 auto *pkt = reinterpret_cast<SetTitlePacket *>(event.getPacket());
 
-                if (pkt->text == "§cYou're a spectator!" ||
+                if (//pkt->text == "§cYou're a spectator!" || //this brobably isn't needed anymore
                     pkt->text == "§cYou died!" ||
                     pkt->text == "§7You're spectating the §as§eh§6o§cw§7!") {
                     reQ();
@@ -58,11 +58,12 @@ class AutoRQListener : public Listener {
                 }
             }
         }
-        if (id == MinecraftPacketIds::PlaySoundA) {
+        if (id == MinecraftPacketIds::Text) {
             if (module->settings.getSettingByName<bool>("solo")->value) {
-                auto *pkt = reinterpret_cast<PlaySoundPacket *>(event.getPacket());
+                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
-                if (pkt->mName == "hive.grav.game.portal.reached.final") {
+                if (pkt->message.substr(0,48) == "§a§l» §r§eYou finished all maps and came in" || //gravity
+                    pkt->message.substr(0,30) == "§a§l» §r§eYou finished in") { //deathrun
                     reQ();
 
                 }
