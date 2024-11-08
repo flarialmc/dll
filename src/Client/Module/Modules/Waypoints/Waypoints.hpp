@@ -21,6 +21,7 @@ public:
 
     void onEnable() override {
         Listen(this, RenderEvent, &Waypoints::onRender)
+        Listen(this, KeyEvent, &Waypoints::onKey);
         Module::onEnable();
     }
     /*std::string count;
@@ -54,6 +55,25 @@ public:
         return Vec3{ this->settings.getSettingByName<float>("x-" + std::to_string(index))->value, this->settings.getSettingByName<float>("y-" + std::to_string(index))->value, this->settings.getSettingByName<float>("z-" + std::to_string(index))->value };
     }
     void onSetup() override {
+
+        keybindActions.clear();
+        keybindActions.push_back([this](std::vector<std::any> args) -> std::any {
+            KeyEvent event = std::any_cast<KeyEvent>(args[0]);
+            int index = WaypointList.size();
+addWaypoint(
+    index,
+    "waypoint-" + std::to_string(index),
+    "FFFFFF",
+    Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y - 1, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
+    true,
+    true,
+    false,
+    100.0f
+);
+FlarialGUI::Notify("Added waypoint!");
+            return {};
+        });
+
         if(this->settings.getSettingByName<float>("total")->value > 0)
         for (int i = 0; i < this->settings.getSettingByName<float>("total")->value; i++) {
             std::cout << "waypoint-" + std::to_string(i) << std::endl;
@@ -94,7 +114,7 @@ public:
             Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Function");
-        this->addButton("Add another Waypoint", "Multi-Keybind command support!", "Add", [this] {
+        this->addButton("Add another Waypoint", "", "Add", [this] {
 
             int index = WaypointList.size();
             addWaypoint(
@@ -109,14 +129,15 @@ public:
             );
             FlarialGUI::Notify("Added! Scroll down for options.");
         });
-        this->addSlider("Distance", "Change until which distance waypoints will be drawn.", this->settings.getSettingByName<float>("distance")->value);
+        this->addKeybind("Add waypoint keybind", "", getKeybind());
+        this->addSlider("Distance", "Change until which distance waypoints will be drawn.", this->settings.getSettingByName<float>("distance")->value, 10000.f, 0.f, true);
 
 
         for (auto pair : WaypointList) {
             this->addHeader(this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value);
+            this->addToggle("Enabled", "Change if the waypoint should be shown or not.", this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))->value);
             this->addColorPicker("Color", "Change the color of the waypoint.", this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value, pair.second.opacity, pair.second.rgb);
             this->addTextBox("Name", "Change the name of the waypoint.", this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value);
-            this->addToggle("Enabled", "Change if the waypoint should be shown or not.", this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))->value);
         }
 
         FlarialGUI::UnsetScrollView();
@@ -159,6 +180,16 @@ public:
                         FlarialGUI::FlarialTextWithFont(screen.x, screen.y, widename.c_str(), fontSize, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_NORMAL, FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value), waypoint.rgb);
                     }
                 }
+            }
+        }
+    }
+
+    void onKey(KeyEvent &event) {
+
+        if (this->isEnabled()) {
+            for (int i = 0; i <= totalKeybinds - 1; ++i) {
+                if(isKeybind(event.keys) && isKeyPartOfKeybind(event.key))
+                keybindActions[i]({ std::any(event) });
             }
         }
     }
