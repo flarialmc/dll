@@ -134,10 +134,24 @@ FlarialGUI::Notify("Added waypoint!");
 
 
         for (auto pair : WaypointList) {
+            if(!this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))) continue;
             this->addHeader(this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value);
             this->addToggle("Enabled", "Change if the waypoint should be shown or not.", this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))->value);
             this->addColorPicker("Color", "Change the color of the waypoint.", this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value, pair.second.opacity, pair.second.rgb);
             this->addTextBox("Name", "Change the name of the waypoint.", this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value);
+            this->addButton("Delete Waypoint", "", "Delete", [this, index = pair.second.index]() {
+                std::string end = "-" + std::to_string(index);
+this->settings.deleteSetting("waypoint" + end);
+this->settings.deleteSetting("color" + end);
+this->settings.deleteSetting("x" + end);
+this->settings.deleteSetting("y" + end);
+this->settings.deleteSetting("z" + end);
+this->settings.deleteSetting("state" + end);
+this->settings.deleteSetting("rgb" + end);
+this->settings.deleteSetting("opacity" + end);
+this->saveSettings();
+            
+            });
         }
 
         FlarialGUI::UnsetScrollView();
@@ -155,6 +169,7 @@ FlarialGUI::Notify("Added waypoint!");
         Vec2<float> screen;
 
         for (auto pair : WaypointList) {
+            if(!this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))) return;
             if (this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))->value)
             {
                 std::string name = this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value;

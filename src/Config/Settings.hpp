@@ -55,6 +55,16 @@ public:
         settings[name] = std::make_unique<SettingType<T>>(name, defaultValue);
     }
 
+    void deleteSetting(const std::string &name) {
+        auto it = settings.find(name);
+        if (it != settings.end()) {
+            settings.erase(it);
+        } else {
+            std::cerr << "Setting not found: " << name << std::endl;
+        }
+    }
+
+
     void reset() {
         settings.clear();
     }
