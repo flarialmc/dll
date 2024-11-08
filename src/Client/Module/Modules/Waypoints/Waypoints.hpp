@@ -139,7 +139,7 @@ public:
             Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Function");
-        this->addButton("Add another Waypoint", "yes", "Add", [this] {
+        this->addButton("Add another Waypoint", "", "Add", [this] {
 
             int index = WaypointList.size();
             addWaypoint(
@@ -156,7 +156,6 @@ public:
         });
         this->addKeybind("Add waypoint keybind", "", getKeybind());
         this->addSlider("Distance", "Change until which distance waypoints will be drawn.", this->settings.getSettingByName<float>("distance")->value, 10000.f, 0.f, true);
-        this->addToggle("Show meters", "", this->settings.getSettingByName<bool>("showmeters")->value);
         this->extraPadding();
 
         this->addHeader("Background");
@@ -271,7 +270,13 @@ public:
                         D2D1_COLOR_F rect;
                         if (this->settings.getSettingByName<bool>("bguse")->value)
                         {
-                            rect = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value);
+                            if (this->settings.getSettingByName<bool>("rgb-" + std::to_string(pair.second.index))->value)
+                            {
+                                rect = FlarialGUI::rgbColor;
+                            } else {
+                                rect = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value);
+                            }
+                            
                         }
                         else {
                             if (this->settings.getSettingByName<bool>("bgrgb")->value)
@@ -288,7 +293,13 @@ public:
                         D2D1_COLOR_F border;
                         if (this->settings.getSettingByName<bool>("borderuse")->value)
                         {
-                            border = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value);
+                            if (this->settings.getSettingByName<bool>("rgb-" + std::to_string(pair.second.index))->value)
+                            {
+                                border = FlarialGUI::rgbColor;
+                            }
+                            else {
+                                border = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value);
+                            }
                         }
                         else {
                             if (this->settings.getSettingByName<bool>("borderrgb")->value)
@@ -305,7 +316,13 @@ public:
                         D2D1_COLOR_F text;
                         if (this->settings.getSettingByName<bool>("textuse")->value)
                         {
-                            text = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value);
+                            if (this->settings.getSettingByName<bool>("rgb-" + std::to_string(pair.second.index))->value)
+                            {
+                                text = FlarialGUI::rgbColor;
+                            }
+                            else {
+                                text = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value);
+                            }
                         }
                         else {
                             if (this->settings.getSettingByName<bool>("textrgb")->value)
