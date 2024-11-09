@@ -10,7 +10,7 @@ private:
     bool triggered = false;
 public:
     AutoRQ() : Module("Auto RE Q", "Automatically requeues into a game (Hive)",
-                      IDR_RE_Q_PNG, "") {
+                      IDR_AUTORQ_PNG, "") {
         Module::setup();
     };
 
