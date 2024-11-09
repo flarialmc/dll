@@ -17,7 +17,7 @@ private:
     static inline std::array<std::byte, 2> patch3Data;
     static inline std::array<std::byte, 6> patch4Data;
 public:
-    PackChanger() : Module("PackChanger", "Allows you to change packs in world/server.", IDR_MAN_PNG, "") {
+    PackChanger() : Module("PackChanger", "Allows you to change packs in world/server.", IDR_AUTORQ_PNG, "") {
         static auto src = GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch");
         static auto src1 = GET_SIG_ADDRESS("SettingsScreenOnExit_Patch");
         static auto src2 = GET_SIG_ADDRESS("GeneralSettingsScreenController::_processPendingImports_Patch");

@@ -22,7 +22,7 @@ private:
     std::map<uint64_t, std::pair<bool, HitInfo>> actorsHit;
 public:
     HitPing() : Module("Hit ping", "Measures your hit delay!",
-                       IDR_LIKE_PNG, "") {
+                       IDR_PING_PNG, "") {
         Module::setup();
     };
 

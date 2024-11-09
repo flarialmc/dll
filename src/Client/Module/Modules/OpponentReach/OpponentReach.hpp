@@ -12,7 +12,7 @@ private:
     std::map<int64_t, Actor*> hitActors;
 public:
     OpponentReach() : Module("Opponent Reach", "Shows your opponent's last hit range!",
-                       IDR_LIKE_PNG, "") {
+                       IDR_REACH_PNG, "") {
         Module::setup();
     };
 

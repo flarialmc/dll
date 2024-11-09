@@ -6,7 +6,7 @@
 class GuiScale : public Module {
 public:
     GuiScale() : Module("MC GUI Scale", "Change your GUI Scale beyond\nMinecraft's restrictions.",
-                        IDR_NAMETAG_PNG, "") {
+                        IDR_SCALE_PNG, "") {
 
         Module::setup();
     };
