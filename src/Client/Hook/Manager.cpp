@@ -24,6 +24,7 @@
 #include "Hooks/Render/RenderOrderExecuteHook.hpp"
 #include "Hooks/Render/RenderChunkCoordinatorPreRenderTickHook.hpp"
 #include "Hooks/Game/SettingsScreenOnExitHook.hpp"
+#include "Hooks/Render/UIControl_updateCachedPositionHook.hpp"
 //#include "Hooks/Game/RenderItemGroup.hpp"
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 
@@ -78,6 +79,8 @@ void HookManager::initialize() {
     }
     if(WinrtUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
+        addHook<UIControl_updateCachedPositionHook>();
+
         addHook<isPreGameHook>();
         addHook<_composeFullStackHook>();
 

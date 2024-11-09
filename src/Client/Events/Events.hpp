@@ -29,3 +29,4 @@
 #include "Render/SetupAndRenderEvent.hpp"
 #include "Render/RenderOrderExecuteEvent.hpp"
 #include "Render/RenderChunkCoordinatorPreRenderTickEvent.hpp"
+#include "Render/UIControlGetPositionEvent.hpp"

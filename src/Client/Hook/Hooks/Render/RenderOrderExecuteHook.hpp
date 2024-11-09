@@ -17,8 +17,6 @@ public:
 
     static inline original funcOriginal = nullptr;
 
-    // Memory::offsetFromSig(
-
     RenderOrderExecuteHook() : Hook("rendergraph::RenderOrder::executeHook", GET_SIG_ADDRESS("rendergraph::RenderOrder::execute")) {}
 
     void enableHook() override {

@@ -78,6 +78,13 @@
 
 #include "Modules/EntityCounter/EntityCounter.hpp"
 #include "Modules/PackChanger/PackChanger.hpp"
+#include "Modules/MovableHUD/MovableHUD.hpp"
+#include "Modules/MovableScoreboard/MovableScoreboard.hpp"
+#include "Modules/MovableTitle/MovableTitle.hpp"
+#include "Modules/MovableBossbar/MovableBossbar.hpp"
+#include "Modules/MovableChat/MovableChat.hpp"
+#include "Modules/MovableCoordinates/MovableCoordinates.hpp"
+#include "Modules/MovableHotbar/MovableHotbar.hpp"
 
 namespace ModuleManager {
     std::unordered_map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -159,7 +166,13 @@ void ModuleManager::initialize() {
     addModule<ViewModel>();
     addModule<PotionHUD>();
     addModule<FasterInventory>();
-    // addModule<MovableChat>();
+    //addModule<MovableHUD>();
+    addModule<MovableScoreboard>();
+    addModule<MovableTitle>();
+    addModule<MovableBossbar>();
+    addModule<MovableChat>();
+    addModule<MovableCoordinates>();
+    addModule<MovableHotbar>();
     // addModule<CompactChat>();
     addModule<ItemPhysics>();
     addModule<HiveStat>();

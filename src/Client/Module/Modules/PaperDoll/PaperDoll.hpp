@@ -6,7 +6,7 @@ class PaperDoll : public Module {
 private:
     Vec2<float> currentPos{};
     bool enabled = false;
-    static inline Vec2<float> oriXY = Vec2<float>{0.0f, 0.0f};
+    static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
     Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
 public:
     PaperDoll() : Module("Movable Paperdoll", "Makes the Minecraft paperdoll movable.", IDR_MAN_PNG,
@@ -86,8 +86,8 @@ public:
             if (settingperc.x != 0)
                 currentPos = Vec2<float>(settingperc.x * MC::windowSize.x,
                                          settingperc.y * MC::windowSize.y);
-            else if (settingperc.x == 0 and oriXY.x != 0.0f)
-                currentPos = Vec2<float>{oriXY.x, oriXY.y};
+            else if (settingperc.x == 0 and originalPos.x != 0.0f)
+                currentPos = Vec2<float>{originalPos.x, originalPos.y};
 
             if (ClickGUI::editmenu)
                 FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 19);
@@ -114,13 +114,11 @@ public:
         if(this->isEnabled())
             if(SDK::getCurrentScreen() == "hud_screen") {
                 SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl>& control) {
-
                     if (control->getLayerName() == "hud_player") {
-
                         auto pos = control->parentRelativePosition;
 
-                        if(oriXY.x == 0.0f) {
-                            oriXY = pos;
+                        if(originalPos.x == 0.0f) {
+                            originalPos = PositionUtils::getScreenScaledPos(pos);
                         }
 
                         Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
@@ -140,8 +138,9 @@ public:
                             component->renderer->state = 1.0f;
                         }
 
-                        return; // dont go through other controls
+                        return true; // dont go through other controls
                     }
+                    return false;
                 });
             }
     }

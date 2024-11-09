@@ -2,25 +2,36 @@
 
 #include "../Module.hpp"
 
-class MovableChat : public Module {
+// TODO: combine into 1
+
+struct HUDElement {
+    std::string mcName;
+    Vec2<float> currentPos{};
+    bool* enabled{};
+    static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
+    Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
+};
+
+class MovableHUD : public Module {
 private:
+    std::array<HUDElement, 6> elements{};
     Vec2<float> currentPos{};
     bool enabled = false;
     static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
     Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
 public:
-    MovableChat() : Module("Movable Chat", "Makes the Minecraft Chat movable.", IDR_MAN_PNG, "") {
+    MovableHUD() : Module("Movable HUD", "Makes everything on screen movable!", IDR_MAN_PNG, "") {
         Module::setup();
     };
 
     void onEnable() override {
-        Listen(this, RenderEvent, &MovableChat::onRender)
-        Listen(this, SetupAndRenderEvent, &MovableChat::onSetupAndRender)
+        Listen(this, RenderEvent, &MovableHUD::onRender)
+        Listen(this, SetupAndRenderEvent, &MovableHUD::onSetupAndRender)
         if(WinrtUtils::checkAboveOrEqual(21,40)) {
-            Listen(this, UIControlGetPositionEvent, &MovableChat::onUIControlGetPosition)
+            Listen(this, UIControlGetPositionEvent, &MovableHUD::onUIControlGetPosition)
         }
         if (FlarialGUI::inMenu) {
-            FlarialGUI::Notify("To change the position of the Chat, Please click " +
+            FlarialGUI::Notify("To change the position HUD elements, Please click " +
                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                        "editmenubind")->value + " in the settings tab.");
         }
@@ -28,10 +39,10 @@ public:
     }
 
     void onDisable() override {
-        Deafen(this, RenderEvent, &MovableChat::onRender)
-        Deafen(this, SetupAndRenderEvent, &MovableChat::onSetupAndRender)
+        Deafen(this, RenderEvent, &MovableHUD::onRender)
+        Deafen(this, SetupAndRenderEvent, &MovableHUD::onSetupAndRender)
         if(WinrtUtils::checkAboveOrEqual(21,40)) {
-            Deafen(this, UIControlGetPositionEvent, &MovableChat::onUIControlGetPosition)
+            Deafen(this, UIControlGetPositionEvent, &MovableHUD::onUIControlGetPosition)
         }
         Module::onDisable();
     }
@@ -43,10 +54,11 @@ public:
         if (settings.getSettingByName<float>("percentageY") == nullptr) {
             settings.addSetting("percentageY", 0.0f);
         }
-
     }
 
-    void settingsRender(float settingsOffset) override {}
+    void settingsRender(float settingsOffset) override {
+
+    }
 
     void onRender(RenderEvent &event) {
 
@@ -68,9 +80,9 @@ public:
                 currentPos = Vec2<float>{originalPos.x, originalPos.y};
 
             if (ClickGUI::editmenu)
-                FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 26);
+                FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 25);
 
-            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 26, width, height);
+            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 25, width, height);
 
 
             currentPos.x = vec2.x;
@@ -91,7 +103,7 @@ public:
 
     void onUIControlGetPosition(UIControlGetPositionEvent &event) {
         auto control = event.getControl();
-        if (control->getLayerName() == "chat_panel") {
+        if (control->getLayerName() == "hud_title_text") {
             if(!(currentPos == Vec2<float>{0, 0})) {
                 Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
                 event.setPosition(scaledPos);
@@ -102,9 +114,16 @@ public:
     void onSetupAndRender(SetupAndRenderEvent &event) {
         if (SDK::getCurrentScreen() == "hud_screen") {
             SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl> &control) {
-                if (control->getLayerName() == "chat_panel") {
+                // centered_gui_elements_at_bottom_middle
+                // chat_panel
+                // sidebar
+                // bossbar
+                // hud_player
+                // hud_title_text
+                // coordinates
+                if (control->getLayerName() == "hud_title_text") {
                     updatePosition(control.get());
-                    return true; // dont go through other controls
+                    return false; // dont go through other controls
                 }
                 return false;
             });
@@ -134,7 +153,7 @@ public:
         auto scaledSize = PositionUtils::getScreenScaledPos(size);
 
         if (scaledSize == Vec2<float>{0, 0}) {
-            currentSize = PositionUtils::getScreenScaledPos(Vec2<float>{256.f, 12.0f});
+            currentSize = PositionUtils::getScreenScaledPos(Vec2<float>{100.f, 100.0f});
             return;
         }
 

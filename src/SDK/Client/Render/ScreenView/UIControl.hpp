@@ -16,6 +16,26 @@ public:
         return hat::member_at<std::vector<std::unique_ptr<UIComponent>>>(this, GET_OFFSET("UIControl::components"));
     }
 
+    void updatePosition(bool override = false) {
+        if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+             int& someFlag = hat::member_at<int>(this, 0x18);
+             someFlag |= 1;
+            using func = Vec2<float>*(__fastcall*)(UIControl*);
+            static auto setCachedPosition = reinterpret_cast<func>(GET_SIG_ADDRESS("UIControl::_setCachedPosition"));
+            if(override) {
+                auto newPos = parentRelativePosition;
+                auto* pos = setCachedPosition(this);
+                *pos = newPos;
+            } else {
+                setCachedPosition(this);
+            }
+            return;
+        }
+        using func = void(__fastcall*)(UIControl*);
+        static auto setCachedPosition = reinterpret_cast<func>(GET_SIG_ADDRESS("UIControl::_setCachedPosition"));
+        return setCachedPosition(this);
+    }
+
     void getAllControls(std::vector<std::shared_ptr<UIControl>>& list) {
         for (auto& control : this->children) {
             list.emplace_back(control);
@@ -23,13 +43,20 @@ public:
         }
     }
 
-    void forEachControl(std::function<void(std::shared_ptr<UIControl>&)>&& func) {
-
+    void forEachControl(std::function<bool(std::shared_ptr<UIControl>&)>&& func) {
         std::vector<std::shared_ptr<UIControl>> writeList;
         this->getAllControls(writeList);
 
         for (auto& control : writeList) {
+            bool res = func(control);
+            if(res) return;
+        }
+    }
+
+    void forEachChild(std::function<void(std::shared_ptr<UIControl>&)> func) {
+        for (auto& control : children) {
             func(control);
+            control->forEachChild(func);
         }
     }
 };
