@@ -85,6 +85,7 @@
 #include "Modules/MovableChat/MovableChat.hpp"
 #include "Modules/MovableCoordinates/MovableCoordinates.hpp"
 #include "Modules/MovableHotbar/MovableHotbar.hpp"
+#include "Modules/NullMovement/NullMovement.hpp"
 
 namespace ModuleManager {
     std::unordered_map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -180,6 +181,8 @@ void ModuleManager::initialize() {
     if(WinrtUtils::checkAboveOrEqual(21, 40)) {
         addModule<PackChanger>(); // tss, let it be a surprise!
     }
+
+    addModule<NullMovement>();
 
     addService<GUIKeyListener>();
     addService<DiscordRPCListener>();
