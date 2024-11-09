@@ -9,7 +9,7 @@ private:
     static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
     Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
 public:
-    MovableCoordinates() : Module("Movable Coordinates", "Makes the Minecraft Coordinates movable.", IDR_MAN_PNG, "") {
+    MovableCoordinates() : Module("Movable Coordinates", "Makes the Minecraft Coordinates movable.", IDR_MOVABLE_PNG, "") {
         Module::setup();
     };
 

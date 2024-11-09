@@ -9,7 +9,7 @@ private:
     static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
     Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
 public:
-    MovableChat() : Module("Movable Chat", "Makes the Minecraft Chat movable.", IDR_MAN_PNG, "") {
+    MovableChat() : Module("Movable Chat", "Makes the Minecraft Chat movable.", IDR_MOVABLE_PNG, "") {
         Module::setup();
     };
 

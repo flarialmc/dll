@@ -9,7 +9,7 @@ private:
     static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
     Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
 public:
-    MovableScoreboard() : Module("Movable Scoreboard", "Makes the Minecraft Scoreboard movable.", IDR_MAN_PNG, "") {
+    MovableScoreboard() : Module("Movable Scoreboard", "Makes the Minecraft Scoreboard movable.", IDR_MOVABLE_PNG, "") {
         Module::setup();
     };
 
