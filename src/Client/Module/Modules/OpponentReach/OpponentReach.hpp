@@ -56,6 +56,7 @@ public:
 
 
         this->addHeader("Main");
+        this->addToggle("Try to exclude your team", "Try to exclude teammates by nametag colors",  this->settings.getSettingByName<bool>("tryToExcludeTeam")->value);
         this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
         this->addToggle("Border", "",  this->settings.getSettingByName<bool>(
                 "border")->value);
@@ -93,8 +94,7 @@ public:
         this->addSlider("Rectangle Width", "", this->settings.getSettingByName<float>("rectwidth")->value, 2.f, 0.001f);
         this->addSlider("Rectangle Height", "", this->settings.getSettingByName<float>("rectheight")->value, 2.f, 0.001f);
 
-        this->addToggle("Responsive Rectangle", "Rectangle resizes with text",  this->settings.getSettingByName<bool>(
-"responsivewidth")->value);
+        this->addToggle("Responsive Rectangle", "Rectangle resizes with text",  this->settings.getSettingByName<bool>("responsivewidth")->value);
 
         this->addSlider("Rotation", "see for yourself!", this->settings.getSettingByName<float>("rotation")->value, 360.f, 0, false);
 
