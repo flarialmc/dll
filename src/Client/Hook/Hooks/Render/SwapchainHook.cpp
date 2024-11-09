@@ -362,6 +362,15 @@ void SwapchainHook::DX12Init() {
         DXGI_SWAP_CHAIN_DESC1 swapChainDescription;
         swapchain->GetDesc1(&swapChainDescription);
 
+        std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
+
+
+        if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
+            swapChainDescription.BufferCount = 2;
+        } else if (bufferingMode == "Triple Buffering") {
+            swapChainDescription.BufferCount = 3;
+        }
+
         bufferCount = swapChainDescription.BufferCount;
 
         DXGISurfaces.resize(bufferCount, nullptr);
@@ -504,6 +513,15 @@ void SwapchainHook::DX12Render() {
     sdesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
     sdesc.OutputWindow = window;
     sdesc.Windowed = ((GetWindowLongPtr(window, GWL_STYLE) & WS_POPUP) != 0) ? false : true;
+
+    std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
+
+
+    if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
+        sdesc.BufferCount = 2;
+    } else if (bufferingMode == "Triple Buffering") {
+        sdesc.BufferCount = 3;
+    }
 
     buffersCounts = sdesc.BufferCount;
     frameContexts.resize(buffersCounts);
