@@ -16,7 +16,7 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> last_used;
     std::unordered_map<std::string, Waypoint> WaypointList;
 public:
-    Waypoints() : Module("Waypoints", "Allows you to mark points in your world.", IDR_MAGNIFY_PNG, "") {
+    Waypoints() : Module("Waypoints", "Allows you to mark points in your world.", IDR_WAYPOINTS_PNG, "") {
         Module::setup();
     };
 
@@ -38,6 +38,8 @@ public:
             this->settings.addSetting("state" + end, (bool)state);
             this->settings.addSetting("rgb" + end, (bool)rgb);
             this->settings.addSetting("opacity" + end, (float)opacity);
+            this->settings.addSetting("world" + end, (std::string)SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName());
+            this->settings.addSetting("dimension" + end, (std::string)SDK::clientInstance->getBlockSource()->getDimension()->getName());
             this->settings.setValue("total", this->settings.getSettingByName<float>("total")->value + 1);
             this->saveSettings();
             
@@ -102,12 +104,12 @@ public:
 
 
         if (settings.getSettingByName<std::string>("bgcolor") == nullptr) settings.addSetting("bgcolor", (std::string)"000000");
-        if (settings.getSettingByName<float>("bgopacity") == nullptr) settings.addSetting("bgopacity", (float)0.5f);
+        if (settings.getSettingByName<float>("bgopacity") == nullptr) settings.addSetting("bgopacity", (float)0.25f);
         if (settings.getSettingByName<float>("bgrounding") == nullptr) settings.addSetting("bgrounding", (float)10.0f);
         if (settings.getSettingByName<bool>("bgrgb") == nullptr) settings.addSetting("bgrgb", (bool)false);
 
         if (settings.getSettingByName<std::string>("bordercolor") == nullptr) settings.addSetting("bordercolor", (std::string)"000000");
-        if (settings.getSettingByName<float>("borderthickness") == nullptr) settings.addSetting("borderthickness", (float)10.0f);
+        if (settings.getSettingByName<float>("borderthickness") == nullptr) settings.addSetting("borderthickness", (float)2.5f);
         if (settings.getSettingByName<bool>("borderrgb") == nullptr) settings.addSetting("borderrgb", (bool)false);
         if (settings.getSettingByName<float>("borderopacity") == nullptr) settings.addSetting("borderopacity", (float)1.0f);
 
@@ -117,10 +119,10 @@ public:
 
 
         if (settings.getSettingByName<bool>("textuse") == nullptr) settings.addSetting("textuse", (bool)true);
-        if (settings.getSettingByName<bool>("bguse") == nullptr) settings.addSetting("bguse", (bool)false);
+        if (settings.getSettingByName<bool>("bguse") == nullptr) settings.addSetting("bguse", (bool)true);
         if (settings.getSettingByName<bool>("borderuse") == nullptr) settings.addSetting("borderuse", (bool)true);
 
-        if (settings.getSettingByName<bool>("border") == nullptr) settings.addSetting("text", (bool)true);
+        if (settings.getSettingByName<bool>("border") == nullptr) settings.addSetting("border", (bool)true);
 
         if (this->settings.getSettingByName<bool>("showmeters") == nullptr) settings.addSetting("showmeters", (bool)true);
     }
@@ -174,7 +176,7 @@ public:
         if (this->settings.getSettingByName<bool>("border")->value)
         {
             this->addHeader("Border");
-            this->addSlider("Thickness", "Change the border thickness", this->settings.getSettingByName<float>("borderthickness")->value);
+            this->addSlider("Thickness", "Change the border thickness", this->settings.getSettingByName<float>("borderthickness")->value, 15.0F);
             this->addToggle("Waypoint color", "Whether the Border should be the waypoint's color.", this->settings.getSettingByName<bool>("borderuse")->value);
             if (!this->settings.getSettingByName<bool>("borderuse")->value)
             {
@@ -197,6 +199,7 @@ public:
         
         for (auto pair : WaypointList) {
             if(!this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))) continue;
+            if (this->settings.getSettingByName<std::string>("world-" + std::to_string(pair.second.index))->value != SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()) continue;
             this->addHeader(this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value);
             this->addToggle("Enabled", "Change if the waypoint should be shown or not.", this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))->value);
             this->addColorPicker("Color", "Change the color of the waypoint.", this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value, this->settings.getSettingByName<float>("opacity-" + std::to_string(pair.second.index))->value, this->settings.getSettingByName<bool>("rgb-" + std::to_string(pair.second.index))->value);
@@ -222,7 +225,7 @@ public:
 
     void onRender(RenderEvent& event) {
         if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
-            !SDK::clientInstance->getLocalPlayer()->getLevel())
+            !SDK::clientInstance->getLocalPlayer()->getLevel() || !SDK::clientInstance->getBlockSource()->getDimension())
             return;
 
         if (FlarialGUI::inMenu || SDK::getCurrentScreen() != "hud_screen") return;
@@ -232,6 +235,8 @@ public:
         invis.a = 0.0F;
         for (auto pair : WaypointList) {
             if(!this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))) continue; //check if its enabled
+            if (this->settings.getSettingByName<std::string>("world-" + std::to_string(pair.second.index))->value != SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()) continue;
+            if (this->settings.getSettingByName<std::string>("dimension-" + std::to_string(pair.second.index))->value != SDK::clientInstance->getBlockSource()->getDimension()->getName()) continue;
             if (this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))->value)
             { 
                 //get name

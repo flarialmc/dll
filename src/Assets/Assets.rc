@@ -63,6 +63,7 @@ IDR_TIME_PNG             PNG "Data\\time.png"
 IDR_TRANSPARENT_PNG      PNG "Data\\transparent.png"
 IDR_UPSIDE_DOWN_PNG      PNG "Data\\upside-down.png"
 IDR_ITEM_PHYSICS_PNG     PNG "Data\\item-physics.png"
+IDR_WAYPOINTS_PNG        PNG "Data\\waypoints.png"
 
 IDR_SETTINGS_PNG         PNG "Data\\settings.png"
 IDR_SETTINGS_WHITE_PNG   PNG "Data\\settingswhite.png"
