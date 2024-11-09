@@ -510,9 +510,6 @@ void SwapchainHook::DX12Render() {
 
     DXGI_SWAP_CHAIN_DESC sdesc;
     swapchain->GetDesc(&sdesc);
-    sdesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-    sdesc.OutputWindow = window;
-    sdesc.Windowed = ((GetWindowLongPtr(window, GWL_STYLE) & WS_POPUP) != 0) ? false : true;
 
     std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
 
