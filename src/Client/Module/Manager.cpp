@@ -69,6 +69,7 @@
 
 #include "Modules/ItemPhysics/ItemPhysics.hpp"
 #include "Modules/Crosshair/Crosshair.hpp"
+#include "Modules/CustomCrosshair/CustomCrosshair.hpp"
 #include "Modules/HiveStat/HiveStat.hpp"
 #include "Modules/OpponentReach/OpponentReach.hpp"
 #include "Modules/ViewModel/ViewModel.hpp"
@@ -183,6 +184,7 @@ void ModuleManager::initialize() {
     }
 
     addModule<NullMovement>();
+    addModule<CustomCrosshair>();
 
     addService<GUIKeyListener>();
     addService<DiscordRPCListener>();

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "../../../../SDK/Client/Render/Tessellator/MeshHelpers.hpp"
+#include "../../../../Utils/Render/MaterialUtils.hpp"
 #include "../../../Events/Game/TickEvent.hpp"
 
 
@@ -12,15 +14,17 @@ public:
         Module::setup();
     };
 
-    static bool isHoveringEnemy = false;
+    static inline bool isHoveringEnemy = false;
 
     void onEnable() override {
         Listen(this, TickEvent, &CustomCrosshair::onTick)
+        Listen(this, SetupAndRenderEvent, &CustomCrosshair::onSetupAndRender)
         Module::onEnable();
     }
 
     void onDisable() override {
         Deafen(this, TickEvent, &CustomCrosshair::onTick)
+        Deafen(this, SetupAndRenderEvent, &CustomCrosshair::onSetupAndRender)
         Module::onDisable();
     }
 
@@ -57,5 +61,38 @@ public:
 
     void onTick(TickEvent& event) {
         isHoveringEnemy = (SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult().type == HitResultType::Entity);
+    }
+
+    void onSetupAndRender(SetupAndRenderEvent& event) {
+
+        ScreenContext* screenContext = event.getMuirc()->getScreenContext();
+        const ResourceLocation loc("textures/ui/cross_hair", false);
+        const TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
+        const auto tess = screenContext->getTessellator();
+        tess->begin();
+
+        D2D1_COLOR_F enemyColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("enemyColor")->value);
+        enemyColor.a = settings.getSettingByName<float>("enemyOpacity")->value;
+
+        D2D1_COLOR_F defaultColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("defaultColor")->value);
+        defaultColor.a = settings.getSettingByName<float>("defaultOpacity")->value;
+
+        D2D1_COLOR_F color = isHoveringEnemy ? enemyColor : defaultColor;
+        tess->color(color.r, color.g, color.b, color.a);
+
+        Vec2<float> size = Vec2(50.f, 50.f);
+        Vec2<float> scaledSize = PositionUtils::getScreenScaledPos(size);
+        Vec2<float> pos = PositionUtils::getScaledPos(Vec2<float>((MC::windowSize.x / 2) - size.x, (MC::windowSize.y / 2) - size.y));
+
+        tess->vertexUV(pos.x, pos.y, 0.f, 0.f, 0.f);
+        tess->vertexUV(pos.x, pos.y + size.x, 0.f, 0.f, 1.f);
+        tess->vertexUV(pos.x + size.x, pos.y, 0.f, 1.f, 0.f);
+
+        tess->vertexUV(pos.x, pos.y + size.x, 0.f, 0.f, 1.f);
+        tess->vertexUV(pos.x + size.x, pos.y + size.y, 0.f, 1.f, 1.f);
+        tess->vertexUV(pos.x + size.x, pos.y, 0.f, 1.f, 0.f);
+
+        MeshHelpers::renderMeshImmediately2(screenContext, tess, MaterialUtils::getUITextured(), *ptr.clientTexture);
+
     }
 };
