@@ -34,7 +34,7 @@ public:
         if (settings.getSettingByName<float>("xveloc") == nullptr) settings.addSetting("xveloc", 1.0f);
         if (settings.getSettingByName<float>("yveloc") == nullptr) settings.addSetting("yveloc", 0.69f);
         if (settings.getSettingByName<float>("scale") == nullptr) settings.addSetting("scale", 1.0f);
-        if (this->settings.getSettingByName<bool>("jqms") == nullptr) settings.addSetting("jqms", false);
+        if (this->settings.getSettingByName<std::string>("mode") == nullptr) settings.addSetting("mode", (std::string)"Patar");
     }
 
     void settingsRender(float settingsOffset) override {
@@ -53,7 +53,7 @@ public:
         this->addHeader("General");
 
         this->addToggle("DVD Mode", "See for yourself", this->settings.getSettingByName<bool>("dvdmode")->value);
-        this->addToggle("Jqms Mode", "idk man i thought it was funny", this->settings.getSettingByName<bool>("jqms")->value);
+        this->addDropdown("Mode", "", std::vector<std::string>{"Patar", "Jqms", "Chyves", "treegfx"}, this->settings.getSettingByName<std::string>("mode")->value);
         this->addSlider("Scale", "", this->settings.getSettingByName<float>("scale")->value, 5.0F);
         if (this->settings.getSettingByName<bool>("dvdmode")->value) {
             this->addHeader("DVD Mode");
@@ -69,11 +69,11 @@ public:
         if (SDK::currentScreen != "hud_screen") return;
         float s = Constraints::RelativeConstraint(0.35, "height", true) * this->settings.getSettingByName<float>("scale")->value;
         int draw = 165;
-        if (this->settings.getSettingByName<bool>("jqms")->value)
+        if (this->settings.getSettingByName<std::string>("mode")->value == "Jqms")
         {
             if (getMs() >= 70) {
                 reset();
-                if (index == 32) {
+                if (index == 31) {
                     index = 0;
                 }
                 else
@@ -83,6 +83,10 @@ public:
             }
             
             draw = 184 + index;
+        } else if (this->settings.getSettingByName<std::string>("mode")->value == "Chyves") {
+            draw = 216;
+        } else if (this->settings.getSettingByName<std::string>("mode")->value == "treegfx") {
+            draw = 217;
         }
         if (this->settings.getSettingByName<bool>("dvdmode")->value) {
             FlarialGUI::image(draw, D2D1::RectF(x, y, x + s, y + s), "JPG");
