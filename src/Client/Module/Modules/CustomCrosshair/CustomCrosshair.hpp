@@ -119,7 +119,7 @@ public:
         tess->color(color.r, color.g, color.b, color.a);
 
         Vec2<float> size = Vec2<float>(16, 16);
-        Vec2<float> sizeOnScale = Vec2(size.x * settings.getSettingByName<float>("uiscale")->value, size.y * settings.getSettingByName<float>("uiscale")->value);
+        Vec2<float> sizeOnScale = Vec2(size.x, size.y);
 
         Vec2<float> sizeScaled = PositionUtils::getScreenScaledPos(sizeOnScale);
 
