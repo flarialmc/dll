@@ -75,8 +75,9 @@ public:
             if (y >= MC::windowSize.y - s) yv = -1;
             if (y < 0) yv = 1;
         } else {
-            Vec2<float> center = Constraints::CenterConstraint(s, s);
-            FlarialGUI::image(IDR_PATAR_JPG, D2D1::RectF(center.x, center.y, center.x + s, center.y + s));
+            float s2 = s/2 ;
+            Vec2<float> center = Vec2<float>{ MC::windowSize.x / 2, MC::windowSize.y / 2 };
+            FlarialGUI::image(IDR_PATAR_JPG, D2D1::RectF(center.x - s2, center.y - s2, center.x + s2, center.y + s2), "JPG");
         }
     }
 };
