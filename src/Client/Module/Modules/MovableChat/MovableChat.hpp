@@ -4,23 +4,27 @@
 
 class MovableChat : public Module {
 private:
+    static inline std::string layerName = "chat_panel";
     Vec2<float> currentPos{};
     bool enabled = false;
     static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
     Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
+    Vec2<float> lastAppliedPos = Vec2<float>{0.0f, 0.0f};
 public:
-    MovableChat() : Module("Movable Chat", "Makes the Minecraft Chat movable.", IDR_MOVABLE_PNG, "") {
+    static inline std::string name = "Chat";
+
+    MovableChat() : Module("Movable " + name, "Makes the Minecraft " + name + " movable.", IDR_MOVABLE_PNG, "") {
+        Listen(this, SetupAndRenderEvent, &MovableChat::onSetupAndRender)
         Module::setup();
     };
 
     void onEnable() override {
+        originalPos = Vec2<float>{0, 0};
         Listen(this, RenderEvent, &MovableChat::onRender)
-        Listen(this, SetupAndRenderEvent, &MovableChat::onSetupAndRender)
-        if(WinrtUtils::checkAboveOrEqual(21,40)) {
-            Listen(this, UIControlGetPositionEvent, &MovableChat::onUIControlGetPosition)
-        }
+        Listen(this, UIControlGetPositionEvent, &MovableChat::onUIControlGetPosition)
+
         if (FlarialGUI::inMenu) {
-            FlarialGUI::Notify("To change the position of the Chat, Please click " +
+            FlarialGUI::Notify("To change the position of the " + name +", Please click " +
                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                        "editmenubind")->value + " in the settings tab.");
         }
@@ -29,10 +33,8 @@ public:
 
     void onDisable() override {
         Deafen(this, RenderEvent, &MovableChat::onRender)
-        Deafen(this, SetupAndRenderEvent, &MovableChat::onSetupAndRender)
-        if(WinrtUtils::checkAboveOrEqual(21,40)) {
-            Deafen(this, UIControlGetPositionEvent, &MovableChat::onUIControlGetPosition)
-        }
+        Deafen(this, UIControlGetPositionEvent, &MovableChat::onUIControlGetPosition)
+
         Module::onDisable();
     }
 
@@ -43,7 +45,6 @@ public:
         if (settings.getSettingByName<float>("percentageY") == nullptr) {
             settings.addSetting("percentageY", 0.0f);
         }
-
     }
 
     void settingsRender(float settingsOffset) override {}
@@ -89,42 +90,62 @@ public:
         }
     }
 
-    void onUIControlGetPosition(UIControlGetPositionEvent &event) {
+    void onUIControlGetPosition(UIControlGetPositionEvent &event) { // happens when game updates control position
         auto control = event.getControl();
-        if (control->getLayerName() == "chat_panel") {
-            if(!(currentPos == Vec2<float>{0, 0})) {
-                Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
-                event.setPosition(scaledPos);
+        if (control->getLayerName() == layerName) {
+            if(!isEnabled()) return;
+            if (originalPos == Vec2<float>{0, 0}) {
+                originalPos = PositionUtils::getScreenScaledPos(control->parentRelativePosition);
+                return;
             }
+            Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
+            if(event.getPosition() == nullptr) { // 1.21.30 and below
+                control->parentRelativePosition = scaledPos;
+                control->forEachChild([](std::shared_ptr<UIControl> &child) {
+                    child->updatePosition();
+                });
+                return;
+            };
+            if(*event.getPosition() == PositionUtils::getScaledPos(currentPos)) return;
+
+            event.setPosition(scaledPos);
         }
     }
 
     void onSetupAndRender(SetupAndRenderEvent &event) {
-        if (SDK::getCurrentScreen() == "hud_screen") {
-            SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl> &control) {
-                if (control->getLayerName() == "chat_panel") {
-                    updatePosition(control.get());
-                    return true; // dont go through other controls
-                }
-                return false;
-            });
-        }
+        update();
     };
+
+    void update() {
+        if(!ClickGUI::editmenu)
+            if(lastAppliedPos == (isEnabled() ? currentPos : originalPos)) return;
+        if(SDK::getCurrentScreen() != "hud_screen") return;
+        SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl> &control) {
+            if (control->getLayerName() == layerName) {
+                updatePosition(control.get());
+                return true; // dont go through other controls
+            }
+            return false;
+        });
+    }
 
     void updatePosition(UIControl* control) {
         if (!(SDK::clientInstance && SDK::clientInstance->getLocalPlayer())) return;
 
         auto pos = control->parentRelativePosition;
 
-        if (originalPos.x == 0.0f) {
+        if (isEnabled() && originalPos == Vec2<float>{0, 0}) {
             originalPos = PositionUtils::getScreenScaledPos(pos);
         }
 
         Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
+        Vec2<float> scaledOriginalPos = PositionUtils::getScaledPos(originalPos);
 
-        control->parentRelativePosition = Vec2<float>{scaledPos.x, scaledPos.y};
-
-        control->updatePosition(true);
+        control->parentRelativePosition = isEnabled() ? scaledPos : scaledOriginalPos;
+        lastAppliedPos = isEnabled() ? currentPos : originalPos;
+        if(WinrtUtils::checkAboveOrEqual(21,40)) {
+            control->updatePosition(true);
+        }
         control->forEachChild([](std::shared_ptr<UIControl> &child) {
             child->updatePosition();
         });
@@ -134,11 +155,19 @@ public:
         auto scaledSize = PositionUtils::getScreenScaledPos(size);
 
         if (scaledSize == Vec2<float>{0, 0}) {
-            currentSize = PositionUtils::getScreenScaledPos(Vec2<float>{256.f, 12.0f});
+            currentSize = PositionUtils::getScreenScaledPos(Vec2<float>{100.f, 100.0f});
             return;
         }
 
-        currentSize = PositionUtils::getScreenScaledPos(size);
+        auto _scaledSize = PositionUtils::getScreenScaledPos(size);
+
+        if(_scaledSize.x < 10)
+            _scaledSize.x = 10;
+
+        if(_scaledSize.y < 10)
+            _scaledSize.y = 10;
+
+        currentSize = _scaledSize;
 
         return;
     }
