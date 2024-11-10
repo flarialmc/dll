@@ -119,11 +119,14 @@ public:
         tess->color(color.r, color.g, color.b, color.a);
 
         Vec2<float> size = Vec2<float>(16, 16);
-        Vec2<float> sizeOnScale = Vec2(size.x, size.y);
+        //auto scale = settings.getSettingByName<float>("uiscale")->value;
+        //Vec2<float> sizeOnScale = Vec2(size.x * scale, size.y * scale);
 
-        Vec2<float> sizeScaled = PositionUtils::getScreenScaledPos(sizeOnScale);
+        Vec2<float> sizeUnscaled = PositionUtils::getScreenScaledPos(size);
+        //Vec2<float> sizeScaled = PositionUtils::getScreenScaledPos(sizeOnScale);
 
-        Vec2<float> pos = PositionUtils::getScaledPos(Vec2<float>((MC::windowSize.x / 2) - (sizeScaled.x / 2), (MC::windowSize.y / 2) - (sizeScaled.y / 2)));
+        Vec2<float> pos = PositionUtils::getScaledPos(Vec2<float>((MC::windowSize.x / 2) - (sizeUnscaled.x / 2), (MC::windowSize.y / 2) - (sizeUnscaled.y / 2)));
+        //Vec2<float> posSizeScaled = PositionUtils::getScaledPos(Vec2<float>((MC::windowSize.x / 2) - (sizeScaled.x / 2), (MC::windowSize.y / 2) - (sizeScaled.y / 2)));
 
         auto useSolidColor = settings.getSettingByName<bool>("solidColor")->value;
         auto useSolidColorWhenHighlighted = settings.getSettingByName<bool>("solidColorWhenHighlighted")->value;
@@ -137,18 +140,17 @@ public:
             IntRectangle rect = IntRectangle(pos.x, pos.y, size.x, size.y);
             ScreenRenderer::blit(screenContext, &ptr, &rect, material);
         } else {
-            // Pack cursors have textures placed whereever so
-//            auto desc = ptr.clientTexture->textureDescription;
-//
-//            float u = size.x / desc.width;
-//            float v = size.x / desc.height;
+            //auto desc = ptr.clientTexture->textureDescription;
 
-            tess->vertexUV(pos.x, pos.y + sizeOnScale.y, 0.f, 0.f, 1.f);
-            tess->vertexUV(pos.x + sizeOnScale.x, pos.y + sizeOnScale.y, 0.f, 1.f, 1.f);
-            tess->vertexUV(pos.x + sizeOnScale.x, pos.y, 0.f, 1.f, 0.f);
-            tess->vertexUV(pos.x, pos.y, 0.f, 0.f, 0.f);
+            //float u = size.x / desc.width;
+            //float v = size.x / desc.height;
 
-            MeshHelpers::renderMeshImmediately2(screenContext, tess, material, *ptr.clientTexture);
+            //tess->vertexUV(pos.x, pos.y + sizeOnScale.y, 0.f, 0.f, 1.f);
+            //tess->vertexUV(pos.x + sizeOnScale.x, pos.y + sizeOnScale.y, 0.f, 1.f, 1.f);
+            //tess->vertexUV(pos.x + sizeOnScale.x, pos.y, 0.f, 1.f, 0.f);
+            //tess->vertexUV(pos.x, pos.y, 0.f, 0.f, 0.f);
+
+            //MeshHelpers::renderMeshImmediately2(screenContext, tess, material, *ptr.clientTexture);
         }
     }
 };
