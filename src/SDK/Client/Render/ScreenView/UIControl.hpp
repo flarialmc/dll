@@ -30,10 +30,11 @@ public:
                 setCachedPosition(this);
             }
             return;
+        } else {
+            using func = void (__fastcall *)(UIControl *);
+            static auto setCachedPosition = reinterpret_cast<func>(GET_SIG_ADDRESS("UIControl::_setCachedPosition"));
+            return setCachedPosition(this);
         }
-        using func = void(__fastcall*)(UIControl*);
-        static auto setCachedPosition = reinterpret_cast<func>(GET_SIG_ADDRESS("UIControl::_setCachedPosition"));
-        return setCachedPosition(this);
     }
 
     void getAllControls(std::vector<std::shared_ptr<UIControl>>& list) {

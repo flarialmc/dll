@@ -13,6 +13,10 @@ public:
         *this->position = newPos;
     }
 
+    Vec2<float>* getPosition() {
+        return this->position;
+    }
+
     UIControl* getControl() {
         return this->control;
     }

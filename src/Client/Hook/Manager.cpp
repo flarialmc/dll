@@ -76,21 +76,18 @@ void HookManager::initialize() {
     addHook<getSensHook>();
     addHook<HudMobEffectsRendererHook>();
     addHook<HudCursorRendererHook>();
+    addHook<BaseActorRendererRenderTextHook>();
+    addHook<UIControl_updateCachedPositionHook>();
 
-    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
-        addHook<BaseActorRendererRenderTextHook>();
-    }
+    addHook<isPreGameHook>();
+    addHook<_composeFullStackHook>();
+
+    addHook<RenderOrderExecuteHook>();
+    addHook<RenderChunkCoordinatorPreRenderTickHook>();
+    addHook<SettingsScreenOnExitHook>();
 
     if(WinrtUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
-        addHook<UIControl_updateCachedPositionHook>();
-
-        addHook<isPreGameHook>();
-        addHook<_composeFullStackHook>();
-
-        addHook<RenderOrderExecuteHook>();
-        addHook<RenderChunkCoordinatorPreRenderTickHook>();
-        addHook<SettingsScreenOnExitHook>();
     }
 
     for (const auto& hook: hooks)

@@ -13,16 +13,15 @@ void OffsetInit::init2140() {
     ADD_OFFSET("Player::gamemode", 0xB28);
     ADD_OFFSET("Player::playerName", 0xCB0);
     ADD_OFFSET("ClientInstance::getBlockSource", 29);
-
+    ADD_OFFSET("ClientInstance::minecraftGame", 0xD0);
     ADD_OFFSET("ClientInstance::levelRenderer", 0xE8);
-
-    //ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x0); No longer exists?
-
     ADD_OFFSET("ClientInstance::viewMatrix", 0x368);
     ADD_OFFSET("ClientInstance::guiData", 0x590);
-
     ADD_OFFSET("ClientInstance::getFovX", 0x728);
     ADD_OFFSET("ClientInstance::getFovY", 0x73C);
+
+    ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x1A0);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x650);
 
     ADD_OFFSET("RaknetConnector::getPeer", 0x2A0);
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x398);
@@ -35,6 +34,8 @@ void OffsetInit::init2140() {
     ADD_OFFSET("RemoteConnectorComposite::rakNetConnector", 0x70);
 
     ADD_OFFSET("ClientInstance::getScreenName", 266);
+
+    ADD_OFFSET("ScreenContext::tessellator", 0xC8);
 }
 
 void OffsetInit::init2130() {

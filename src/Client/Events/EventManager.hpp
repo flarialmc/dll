@@ -28,6 +28,7 @@ public:
     template <typename EventType>
     void trigger(EventType& event) {
         //if (Client::disable) return;
+        if (!SDK::clientInstance) return;
         if (!ModuleManager::initialized) return;
         dispatcher.trigger(event);
     }
