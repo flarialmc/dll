@@ -30,7 +30,10 @@ public:
     }
 
     void defaultConfig() override {
+        if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 1.f);
+
         if (settings.getSettingByName<bool>("highlightOnEntity") == nullptr) settings.addSetting("highlightOnEntity", false);
+        if (settings.getSettingByName<bool>("solidColorWhenHighlighted") == nullptr) settings.addSetting("solidColorWhenHighlighted", true);
         if (settings.getSettingByName<bool>("solidColor") == nullptr) settings.addSetting("solidColor", false);
         if (settings.getSettingByName<bool>("renderInThirdPerson") == nullptr) settings.addSetting("renderInThirdPerson", false);
 
@@ -59,7 +62,15 @@ public:
         this->addHeader("Main");
         this->addToggle("Solid Color", "Make crosshair a solid color / more visible", settings.getSettingByName<bool>("solidColor")->value);
         this->addToggle("Render in Third Person", "Weather or not to render in third person", settings.getSettingByName<bool>("renderInThirdPerson")->value);
-        this->addToggle("Highlight on Entity", "Highlight on entity", settings.getSettingByName<bool>("highlightOnEntity")->value);
+        this->addToggle("Highlight on Entity", "Highlight when enemy in reach", settings.getSettingByName<bool>("highlightOnEntity")->value);
+        if(settings.getSettingByName<bool>("highlightOnEntity")->value) {
+            this->addToggle("Solid Color When Highlighted", "Use solid color when highlighted",
+                            settings.getSettingByName<bool>("solidColorWhenHighlighted")->value);
+        }
+        this->extraPadding();
+
+        // this->addHeader("Misc");
+        // this->addSlider("UI Scale", "The size of the Crosshair (only for custom)", settings.getSettingByName<float>("uiscale")->value, 10.f, 0.f, true);
 
         this->extraPadding();
 
@@ -103,23 +114,41 @@ public:
         defaultColor.a = settings.getSettingByName<float>("defaultOpacity")->value;
 
         auto shouldHighlight = settings.getSettingByName<bool>("highlightOnEntity")->value;
-
         D2D1_COLOR_F color = isHoveringEnemy && shouldHighlight ? enemyColor : defaultColor;
 
         tess->color(color.r, color.g, color.b, color.a);
 
         Vec2<float> size = Vec2<float>(16, 16);
+        Vec2<float> sizeOnScale = Vec2(size.x * settings.getSettingByName<float>("uiscale")->value, size.y * settings.getSettingByName<float>("uiscale")->value);
 
-        Vec2<float> sizeScaled = PositionUtils::getScreenScaledPos(size);
+        Vec2<float> sizeScaled = PositionUtils::getScreenScaledPos(sizeOnScale);
 
         Vec2<float> pos = PositionUtils::getScaledPos(Vec2<float>((MC::windowSize.x / 2) - (sizeScaled.x / 2), (MC::windowSize.y / 2) - (sizeScaled.y / 2)));
 
-        IntRectangle rect = IntRectangle(pos.x, pos.y, size.x, size.y);
-
         auto useSolidColor = settings.getSettingByName<bool>("solidColor")->value;
+        auto useSolidColorWhenHighlighted = settings.getSettingByName<bool>("solidColorWhenHighlighted")->value;
 
-        auto material = isHoveringEnemy && shouldHighlight || useSolidColor ? MaterialUtils::getUITextured() : MaterialUtils::getUICrosshair() ;
+        auto material = isHoveringEnemy && shouldHighlight && useSolidColorWhenHighlighted || useSolidColor ? MaterialUtils::getUITextured() : MaterialUtils::getUICrosshair();
 
-        ScreenRenderer::blit(screenContext, &ptr, &rect, material);
+        bool isDefault = true;
+
+        if(isDefault) {
+            // Pack crosshairs have textures placed whereever so this will figure it out
+            IntRectangle rect = IntRectangle(pos.x, pos.y, size.x, size.y);
+            ScreenRenderer::blit(screenContext, &ptr, &rect, material);
+        } else {
+            // Pack cursors have textures placed whereever so
+//            auto desc = ptr.clientTexture->textureDescription;
+//
+//            float u = size.x / desc.width;
+//            float v = size.x / desc.height;
+
+            tess->vertexUV(pos.x, pos.y + sizeOnScale.y, 0.f, 0.f, 1.f);
+            tess->vertexUV(pos.x + sizeOnScale.x, pos.y + sizeOnScale.y, 0.f, 1.f, 1.f);
+            tess->vertexUV(pos.x + sizeOnScale.x, pos.y, 0.f, 1.f, 0.f);
+            tess->vertexUV(pos.x, pos.y, 0.f, 0.f, 0.f);
+
+            MeshHelpers::renderMeshImmediately2(screenContext, tess, material, *ptr.clientTexture);
+        }
     }
 };
