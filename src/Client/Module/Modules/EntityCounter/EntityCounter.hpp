@@ -7,7 +7,7 @@ class EntityCounter : public Module {
 public:
 
     EntityCounter() : Module("Entity Counter", "Counts the entities in the surrounding area",
-                            IDR_ARROW_PNG, "") {
+                            IDR_ENTITYCOUNTER_PNG, "") {
         Module::setup();
     };
 

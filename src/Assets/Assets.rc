@@ -68,6 +68,7 @@ IDR_MOVABLE_PNG          PNG "Data\\movable.png"
 IDR_AUTORQ_PNG           PNG "Data\\autorq.png"
 IDR_INVENTORY_PNG        PNG "Data\\inventory.png"
 IDR_SCALE_PNG            PNG "Data\\scale.png"
+IDR_ENTITYCOUNTER_PNG          PNG "Data\\creeper.png"
 
 IDR_SETTINGS_PNG         PNG "Data\\settings.png"
 IDR_SETTINGS_WHITE_PNG   PNG "Data\\settingswhite.png"
