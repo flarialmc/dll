@@ -18,16 +18,16 @@ public:
 
     void updatePosition(bool override = false) {
         if(WinrtUtils::checkAboveOrEqual(21, 40)) {
-             int& someFlag = hat::member_at<int>(this, 0x18);
-             someFlag |= 1;
+             int& flags = hat::member_at<int>(this, 0x18);
+            flags |= 1; // set cachedPositionDirty
             using func = Vec2<float>*(__fastcall*)(UIControl*);
-            static auto setCachedPosition = reinterpret_cast<func>(GET_SIG_ADDRESS("UIControl::_setCachedPosition"));
+            static auto getPosition = reinterpret_cast<func>(GET_SIG_ADDRESS("UIControl::getPosition"));
             if(override) {
                 auto newPos = parentRelativePosition;
-                auto* pos = setCachedPosition(this);
+                auto* pos = getPosition(this);
                 *pos = newPos;
             } else {
-                setCachedPosition(this);
+                getPosition(this);
             }
             return;
         } else {

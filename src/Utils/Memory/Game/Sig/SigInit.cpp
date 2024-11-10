@@ -88,6 +88,9 @@ void SigInit::init2140() {
     ADD_SIG("ScreenRenderer::blit", "48 89 5C 24 08 57 48 83 EC 60 0F 57");
 
     ADD_SIG("mce::RenderMaterialGroup::ui", "48 8B 05 ?? ?? ?? ?? 48 8D 55 90 48 8D 0D ?? ?? ?? ?? 48 8B 40 08 FF 15 ?? ?? ?? ?? 48 8B D8");
+
+    ADD_SIG("UIControl::getPosition", "48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 60 0F 29 74 24 50 0F 29 7C 24 40 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 30");
+    DEPRECATE_SIG("UIControl::_setCachedPosition");
 }
 
 void SigInit::init2130() {
