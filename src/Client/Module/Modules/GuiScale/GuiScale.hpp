@@ -4,20 +4,21 @@
 
 
 class GuiScale : public Module {
+private:
+    float originalScale = 0.f;
+    float lastAppliedScale = 0.f;
 public:
     GuiScale() : Module("MC GUI Scale", "Change your GUI Scale beyond\nMinecraft's restrictions.",
                         IDR_SCALE_PNG, "") {
-
+        Listen(this, SetupAndRenderEvent, &GuiScale::onSetupAndRender)
         Module::setup();
     };
 
     void onEnable() override {
-        Listen(this, RenderEvent, &GuiScale::onRender)
         Module::onEnable();
     }
 
     void onDisable() override {
-        Deafen(this, RenderEvent, &GuiScale::onRender)
         Module::onDisable();
     }
 
@@ -46,20 +47,29 @@ public:
 
     }
 
-    void onRender(RenderEvent &event) {
-        if (SDK::getCurrentScreen() == "hud_screen") {
-            if (SDK::clientInstance->getGuiData() != nullptr) {
-                if (this->settings.getSettingByName<bool>("enabled")->value) {
-                    float percent = this->settings.getSettingByName<float>("guiscale")->value;
-                    auto guiData = SDK::clientInstance->getGuiData();
-                    guiData->GuiScale = percent;
-                    guiData->ScreenSizeScaled = Vec2{
-                            guiData->ScreenSize.x * 1 / percent,
-                            guiData->ScreenSize.y * 1 / percent
-                    };
-                    guiData->scalingMultiplier = 1 / percent;
-                }
-            }
+    void onSetupAndRender(SetupAndRenderEvent &event) {
+        update();
+    };
+
+    void update() {
+        float currentScale = this->settings.getSettingByName<float>("guiscale")->value;
+        float targetScale = isEnabled() ? currentScale : originalScale;
+        if(lastAppliedScale == targetScale) return;
+        if(SDK::getCurrentScreen() != "hud_screen") return;
+        updateScale(targetScale);
+    }
+
+    void updateScale(float newScale) {
+        auto guiData = SDK::clientInstance->getGuiData();
+        if(originalScale == 0) {
+            originalScale = SDK::clientInstance->getGuiData()->GuiScale;
         }
+        guiData->GuiScale = newScale;
+        guiData->ScreenSizeScaled = Vec2{
+                guiData->ScreenSize.x * 1 / newScale,
+                guiData->ScreenSize.y * 1 / newScale
+        };
+        guiData->scalingMultiplier = 1 / newScale;
+        lastAppliedScale = newScale;
     }
 };
