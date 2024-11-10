@@ -29,6 +29,9 @@ public:
     }
 
     void defaultConfig() override {
+
+        if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 1.f);
+
         if (settings.getSettingByName<std::string>("defaultColor") == nullptr) settings.addSetting("defaultColor", (std::string) "fafafa");
         if (settings.getSettingByName<bool>("defaultColorRGB") == nullptr) settings.addSetting("defaultColorRGB", false);
         if (settings.getSettingByName<float>("defaultOpacity") == nullptr) settings.addSetting("defaultOpacity", 0.55f);
@@ -50,6 +53,10 @@ public:
         FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));
+
+        this->addHeader("Misc");
+        this->addSlider("UI Scale", "The size of the Crosshair", settings.getSettingByName<float>("uiscale")->value, 50.f, 0.f, true);
+        this->extraPadding();
 
         this->addHeader("Colors");
         this->addColorPicker("Default Color", "When the enemy is not in view.", settings.getSettingByName<std::string>("defaultColor")->value, settings.getSettingByName<float>("defaultOpacity")->value, settings.getSettingByName<bool>("defaultColorRGB")->value);
@@ -80,7 +87,7 @@ public:
         D2D1_COLOR_F color = isHoveringEnemy ? enemyColor : defaultColor;
         tess->color(color.r, color.g, color.b, color.a);
 
-        Vec2<float> size = Vec2(50.f, 50.f);
+        Vec2<float> size = Vec2(settings.getSettingByName<float>("uiscale")->value, settings.getSettingByName<float>("uiscale")->value);
         Vec2<float> scaledSize = PositionUtils::getScreenScaledPos(size);
         Vec2<float> pos = PositionUtils::getScaledPos(Vec2<float>((MC::windowSize.x / 2) - size.x, (MC::windowSize.y / 2) - size.y));
 
