@@ -19,12 +19,14 @@ public:
 
     void onEnable() override {
         Listen(this, PerspectiveEvent, &CustomCrosshair::onGetViewPerspective)
+        Listen(this, SetupAndRenderEvent, &CustomCrosshair::onSetupAndRender)
         Listen(this, HudCursorRendererRenderEvent, &CustomCrosshair::onHudCursorRendererRender)
         Module::onEnable();
     }
 
     void onDisable() override {
         Deafen(this, PerspectiveEvent, &CustomCrosshair::onGetViewPerspective)
+        Deafen(this, SetupAndRenderEvent, &CustomCrosshair::onSetupAndRender)
         Deafen(this, HudCursorRendererRenderEvent, &CustomCrosshair::onHudCursorRendererRender)
         Module::onDisable();
     }
@@ -91,15 +93,17 @@ public:
         currentPerspective = event.getPerspective();
     }
 
-    void onHudCursorRendererRender(HudCursorRendererRenderEvent& event) {
-        event.cancel();
+    void onSetupAndRender(SetupAndRenderEvent &event) {
         if(!SDK::clientInstance) return;
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if(!player) return;
+        if(SDK::getCurrentScreen() != "hud_screen") return;
 
         auto renderInThirdPerson = settings.getSettingByName<bool>("renderInThirdPerson")->value;
         if(!renderInThirdPerson && currentPerspective != Perspective::FirstPerson) return;
-        bool isHoveringEnemy = (SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult().type == HitResultType::Entity);
+        bool isHoveringEnemy = (player->getLevel()->getHitResult().type == HitResultType::Entity);
 
-        auto screenContext = event.getMinecraftUIRenderContext()->getScreenContext();
+        auto screenContext = event.getMuirc()->getScreenContext();
 
         const ResourceLocation loc("textures/ui/cross_hair", false);
         const TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
@@ -152,5 +156,9 @@ public:
 
             //MeshHelpers::renderMeshImmediately2(screenContext, tess, material, *ptr.clientTexture);
         }
+    }
+
+    void onHudCursorRendererRender(HudCursorRendererRenderEvent& event) {
+        event.cancel();
     }
 };
