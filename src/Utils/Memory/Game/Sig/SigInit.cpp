@@ -156,6 +156,7 @@ void SigInit::init2120() {
     ADD_SIG("RenderChunkCoordinator::preRenderTick", "E8 ? ? ? ? 48 8B 03 48 8B D8 48 3B C6 75 EC 4D 8B C6");
     // LevelRenderer::preRenderUpdate - 40 53 55 56 57 41 56 48 83 EC 50 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 48 4D 8B F0 48 8B EA
 
+    ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 10 48 89 6C 24 18 56 57 41 56 48 83 EC 50 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 40 48 8B F9 40");
     ADD_SIG("ResourcePackManager::_composeFullStack_Patch", "0f 84 ? ? ? ? 48 8b cf e8 ? ? ? ? 84 c0 74 ? 0f 57 c0"); // 84 to 85
 
     ADD_SIG("HudCursorRenderer::render", "48 8B C4 48 89 58 20 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 68 FA");
@@ -441,4 +442,8 @@ void SigInit::init2030() {
     ADD_SIG("UIControl::_setCachedPosition", "48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 60 0F 29 74 24 50 0F 29 7C 24 40 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 30");
     ADD_SIG("ScreenRenderer::blit", "48 83 EC 68 0F 57 C0 F3");
     ADD_SIG("HudCursorRenderer::render", "48 8B C4 48 89 58 20 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 88 F9 FF FF 48 81 EC 40 07 00 00 0F 29 70 B8 0F 29 78 A8 44");
+
+    ADD_SIG("RenderChunkCoordinator::preRenderTick", "E8 ?? ?? ?? ?? 48 8B 03 48 8B D8 48 3B C6 75 EC");
+
+    ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 50 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 40 48 8B F9 48 8B");
 }

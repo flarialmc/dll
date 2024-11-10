@@ -15,6 +15,7 @@ void OffsetInit::init2140() {
     ADD_OFFSET("ClientInstance::getBlockSource", 29);
     ADD_OFFSET("ClientInstance::minecraftGame", 0xD0);
     ADD_OFFSET("ClientInstance::levelRenderer", 0xE8);
+    ADD_OFFSET("ClientInstance::camera", 0x2A8);
     ADD_OFFSET("ClientInstance::viewMatrix", 0x368);
     ADD_OFFSET("ClientInstance::guiData", 0x590);
     ADD_OFFSET("ClientInstance::getFovX", 0x728);
