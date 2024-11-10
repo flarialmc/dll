@@ -84,6 +84,7 @@ void SigInit::init2140() {
     ADD_SIG("SettingsScreenOnExit", "40 57 48 83 EC 40 48 8B 79");
     ADD_SIG("GeneralSettingsScreenController::_setResourcePackStacks_Patch", "0f 84 ? ? ? ? 33 c0 0f 57 c9 f3 0f 7f 4c 24 ? 48 89 44 24 ? c7 44 24 ? ? ? ? ? 48 8b 8f");
     ADD_SIG("GeneralSettingsScreenController::_processPendingImports_Patch", "0f 84 ? ? ? ? e8 ? ? ? ? 84 c0 0f 84 ? ? ? ? 0f 57 c0 33 c0");
+    ADD_SIG("ScreenRenderer::blit", "48 89 5C 24 08 57 48 83 EC 60 0F 57");
 }
 
 void SigInit::init2130() {
@@ -119,6 +120,7 @@ void SigInit::init2130() {
     DEPRECATE_SIG("ActorCollision::isOnGround");
 
     ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 83 EC 50 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 40 48 8B F9 40");
+    ADD_SIG("HudCursorRenderer::render", "48 8b c4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8d a8 ? ? ? ? 48 81 ec ? ? ? ? 0f 29 70 ? 0f 29 78 ? 44 0f 29 40 ? 44 0f 29 48 ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 4c 89 8d");
 }
 
 void SigInit::init2120() {
@@ -152,6 +154,8 @@ void SigInit::init2120() {
     // LevelRenderer::preRenderUpdate - 40 53 55 56 57 41 56 48 83 EC 50 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 48 4D 8B F0 48 8B EA
 
     ADD_SIG("ResourcePackManager::_composeFullStack_Patch", "0f 84 ? ? ? ? 48 8b cf e8 ? ? ? ? 84 c0 74 ? 0f 57 c0"); // 84 to 85
+
+    ADD_SIG("HudCursorRenderer::render", "48 8B C4 48 89 58 20 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 68 FA");
 }
 
 void SigInit::init2102() {
@@ -234,6 +238,8 @@ void SigInit::init2060() {
     ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 C8 1C 00 00");
 
     ADD_SIG("ActorCollision::isOnGround", "E8 ? ? ? ? 84 C0 49 8B 87");
+
+    ADD_SIG("HudCursorRenderer::render", "48 8b c4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8d a8 ? ? ? ? 48 81 ec ? ? ? ? 0f 29 70 ? 0f 29 78 ? 44 0f 29 40 ? 44 0f 29 48 ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 4c 89 8d");
 }
 
 void SigInit::init2050() {
@@ -267,6 +273,8 @@ void SigInit::init2050() {
     ADD_SIG("ItemRenderer::render", "48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 90 ? ? ? ? 44 0F 29 98 ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 49 8B D8");
 
     ADD_SIG("Tessellator::vertexUV", "48 83 EC ? 80 B9 ? ? ? ? ? 0F 57 E4");
+
+    ADD_SIG("HudCursorRenderer::render", "48 8B C4 48 89 58 20 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 E8 F9");
 }
 
 void SigInit::init2040() {
@@ -283,8 +291,6 @@ void SigInit::init2040() {
     ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 78");
 
     ADD_SIG("ItemPositionConst", "F3 0F 59 05 ? ? ? ? F3 41 0F 58 87");
-
-    ADD_SIG("HudMobEffectsRenderer::render", "48 89 5C 24 08 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? EE");
 }
 
 void SigInit::init2030() {
@@ -427,4 +433,6 @@ void SigInit::init2030() {
     ADD_SIG("SettingsScreenOnExit_Patch", "74 ? 48 8b 8f ? ? ? ? e8 ? ? ? ? 33 c0");
 
     ADD_SIG("UIControl::_setCachedPosition", "48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 60 0F 29 74 24 50 0F 29 7C 24 40 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 30");
+    ADD_SIG("ScreenRenderer::blit", "48 83 EC 68 0F 57 C0 F3");
+    ADD_SIG("HudCursorRenderer::render", "48 8B C4 48 89 58 20 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 88 F9 FF FF 48 81 EC 40 07 00 00 0F 29 70 B8 0F 29 78 A8 44");
 }

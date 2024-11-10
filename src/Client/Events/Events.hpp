@@ -22,6 +22,7 @@
 #include "Render/FogColorEvent.hpp"
 #include "Render/GammaEvent.hpp"
 #include "Render/GetTextureEvent.hpp"
+#include "Render/HudCursorRendererRenderEvent.hpp"
 #include "Render/HurtColorEvent.hpp"
 #include "Render/RenderEvent.hpp"
 #include "Render/RenderPotionHUDEvent.hpp"
