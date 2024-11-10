@@ -156,7 +156,7 @@ public:
             );
             FlarialGUI::Notify("Added! Scroll down for options.");
         });
-        this->addKeybind("Add waypoint keybind", "", getKeybind());
+        this->addKeybind("Add waypoint keybind", "Hold for 2 seconds to set bind.", getKeybind());
         this->addSlider("Distance", "Change until which distance waypoints will be drawn.", this->settings.getSettingByName<float>("distance")->value, 10000.f, 0.f, true);
         this->extraPadding();
 
@@ -238,7 +238,7 @@ public:
             if (this->settings.getSettingByName<std::string>("world-" + std::to_string(pair.second.index))->value != SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()) continue;
             if (this->settings.getSettingByName<std::string>("dimension-" + std::to_string(pair.second.index))->value != SDK::clientInstance->getBlockSource()->getDimension()->getName()) continue;
             if (this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))->value)
-            { 
+            {
                 //get name
                 std::string name = this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value;
                 Waypoint waypoint = pair.second;
