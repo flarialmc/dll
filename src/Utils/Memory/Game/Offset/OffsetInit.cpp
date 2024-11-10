@@ -44,6 +44,7 @@ void OffsetInit::init2130() {
     ADD_OFFSET("Player::playerName", 0xCA0);
 
     ADD_OFFSET("Level::hitResult", 0x230);
+    ADD_OFFSET("Level::worldFolderName", 0x2A0);
     ADD_OFFSET("Level::getPlayerMap", 0xC08);
 
     ADD_OFFSET("ClientInstance::camera", 0x2A0);
@@ -91,6 +92,7 @@ void OffsetInit::init2120() {
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x390);
 
     ADD_OFFSET("Level::hitResult", 0x220);
+    ADD_OFFSET("Level::worldFolderName", 0x290);
     ADD_OFFSET("Level::getPlayerMap", 0xBF8);
 
     ADD_OFFSET("ItemActor::stack", 0x408);
@@ -138,6 +140,7 @@ void OffsetInit::init2080() {
     ADD_OFFSET("RaknetConnector::getPeer", 0x298);
 
     ADD_OFFSET("Level::hitResult", 0xB30);
+    ADD_OFFSET("Level::worldFolderName", 0x6C8);
     ADD_OFFSET("Level::getPlayerMap", 0x1C88);
 
     ADD_OFFSET("ItemActor::stack", 0x470);
@@ -163,6 +166,7 @@ void OffsetInit::init2070() {
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x5FC);
 
     ADD_OFFSET("Level::hitResult", 0xB18);
+    ADD_OFFSET("Level::worldFolderName", 0x6D0);
 
     ADD_OFFSET("ItemActor::stack", 0x498);
 }
@@ -188,6 +192,7 @@ void OffsetInit::init2060() {
     ADD_OFFSET("RakPeer::GetAveragePing", 44);
 
     ADD_OFFSET("Level::hitResult", 0xA98);
+    ADD_OFFSET("Level::worldFolderName", 0x650);
     ADD_OFFSET("Level::getPlayerMap", 0x1E98);
 
     ADD_OFFSET("ItemActor::stack", 0x4D0);
@@ -214,6 +219,7 @@ void OffsetInit::init2050() {
     ADD_OFFSET("NetworkSystem::remoteConnectorComposite", 0x80);
 
     ADD_OFFSET("Level::hitResult", 0xA48);
+    ADD_OFFSET("Level::worldFolderName", 0x678);
     ADD_OFFSET("Level::getPlayerMap", 0x1EA8);
 
     ADD_OFFSET("ItemActor::stack", 0x4C8);
