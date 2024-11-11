@@ -4,7 +4,7 @@
 
 class MovableCoordinates : public Module {
 private:
-    static inline std::string layerName = "coordinates";
+    static inline std::string layerName = "player_position";
     Vec2<float> currentPos{};
     bool enabled = false;
     static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
@@ -19,7 +19,6 @@ public:
     };
 
     void onEnable() override {
-        originalPos = Vec2<float>{0, 0};
         Listen(this, RenderEvent, &MovableCoordinates::onRender)
         Listen(this, UIControlGetPositionEvent, &MovableCoordinates::onUIControlGetPosition)
 
@@ -117,8 +116,11 @@ public:
     };
 
     void update() {
-        if(!ClickGUI::editmenu)
-            if(lastAppliedPos == (isEnabled() ? currentPos : originalPos)) return;
+        if(ClickGUI::editmenu) {
+            if (!isEnabled()) return;
+        } else {
+            if (lastAppliedPos != Vec2<float>{0, 0} && lastAppliedPos == (isEnabled() ? currentPos : originalPos)) return;
+        }
         if(SDK::getCurrentScreen() != "hud_screen") return;
         SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl> &control) {
             if (control->getLayerName() == layerName) {
@@ -136,6 +138,7 @@ public:
 
         if (isEnabled() && originalPos == Vec2<float>{0, 0}) {
             originalPos = PositionUtils::getScreenScaledPos(pos);
+            currentPos = originalPos;
         }
 
         Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);

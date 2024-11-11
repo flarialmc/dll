@@ -7,10 +7,10 @@ private:
     static inline std::string layerName = "sidebar";
     Vec2<float> currentPos{};
     bool enabled = false;
-    static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
     Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
     Vec2<float> lastAppliedPos = Vec2<float>{0.0f, 0.0f};
 public:
+    static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
     static inline std::string name = "Scoreboard";
 
     MovableScoreboard() : Module("Movable " + name, "Makes the Minecraft " + name + " movable.", IDR_MOVABLE_PNG, "") {
@@ -19,7 +19,6 @@ public:
     };
 
     void onEnable() override {
-        originalPos = Vec2<float>{0, 0};
         Listen(this, RenderEvent, &MovableScoreboard::onRender)
         Listen(this, UIControlGetPositionEvent, &MovableScoreboard::onUIControlGetPosition)
 
@@ -94,10 +93,6 @@ public:
         auto control = event.getControl();
         if (control->getLayerName() == layerName) {
             if(!isEnabled()) return;
-            if (originalPos == Vec2<float>{0, 0}) {
-                originalPos = PositionUtils::getScreenScaledPos(control->parentRelativePosition);
-                return;
-            }
             Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
             if(event.getPosition() == nullptr) { // 1.21.30 and below
                 control->parentRelativePosition = scaledPos;
@@ -117,8 +112,11 @@ public:
     };
 
     void update() {
-        if(!ClickGUI::editmenu)
-            if(lastAppliedPos == (isEnabled() ? currentPos : originalPos)) return;
+        if(ClickGUI::editmenu) {
+            if (!isEnabled()) return;
+        } else {
+            if (lastAppliedPos != Vec2<float>{0, 0} && lastAppliedPos == (isEnabled() ? currentPos : originalPos)) return;
+        }
         if(SDK::getCurrentScreen() != "hud_screen") return;
         SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl> &control) {
             if (control->getLayerName() == layerName) {
@@ -135,7 +133,12 @@ public:
         auto pos = control->parentRelativePosition;
 
         if (isEnabled() && originalPos == Vec2<float>{0, 0}) {
-            originalPos = PositionUtils::getScreenScaledPos(pos);
+            auto guiData = SDK::clientInstance->getGuiData();
+            auto scaledSize = guiData->ScreenSizeScaled;
+            auto centerScaled = Vec2 { scaledSize.x / 2, scaledSize.y / 2 };
+            auto recalculatedPos = Vec2<float>{ scaledSize.x - control->sizeConstrains.x, centerScaled.y - (control->sizeConstrains.y / 2) };
+            originalPos = PositionUtils::getScreenScaledPos(recalculatedPos);
+            currentPos = originalPos;
         }
 
         Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
