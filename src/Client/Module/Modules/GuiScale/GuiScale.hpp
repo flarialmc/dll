@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "../MovableScoreboard/MovableScoreboard.hpp"
 
 
 class GuiScale : public Module {
@@ -64,12 +65,59 @@ public:
         if(originalScale == 0) {
             originalScale = SDK::clientInstance->getGuiData()->GuiScale;
         }
+        float oldScale = guiData->GuiScale;
         guiData->GuiScale = newScale;
-        guiData->ScreenSizeScaled = Vec2{
+        guiData->ScreenSizeScaled = Vec2 {
                 guiData->ScreenSize.x * 1 / newScale,
                 guiData->ScreenSize.y * 1 / newScale
         };
         guiData->scalingMultiplier = 1 / newScale;
         lastAppliedScale = newScale;
+
+        auto scaledSize = guiData->ScreenSizeScaled;
+        auto centerScaled = Vec2 { scaledSize.x / 2, scaledSize.y / 2 };
+
+        auto movableBossbar = ModuleManager::getModule("Movable Bossbar");
+        auto movableScoreboard = ModuleManager::getModule("Movable Scoreboard");
+        auto movableHotbar = ModuleManager::getModule("Movable Hotbar");
+
+        // this is performance hell
+        SDK::screenView->VisualTree->root->forEachControl([&centerScaled, &scaledSize, &movableBossbar, &movableScoreboard, &movableHotbar](std::shared_ptr<UIControl> &control) {
+            if(control->getLayerName() == "boss_health_grid"){
+                if(movableBossbar && movableBossbar->isEnabled()) return false;
+                control->parentRelativePosition = Vec2<float> { centerScaled.x - (control->sizeConstrains.x / 2), scaledSize.y };
+                if(WinrtUtils::checkAboveOrEqual(21,40)) {
+                    control->updatePosition(true);
+                }
+                control->forEachChild([](std::shared_ptr<UIControl> &child) {
+                    child->updatePosition();
+                });
+                return false;
+            }
+            if(control->getLayerName() == "sidebar"){
+                if(movableScoreboard && movableScoreboard->isEnabled()) return false;
+                control->parentRelativePosition = Vec2<float> { scaledSize.x - control->sizeConstrains.x, centerScaled.y - (control->sizeConstrains.y / 2) };
+                if(WinrtUtils::checkAboveOrEqual(21,40)) {
+                    control->updatePosition(true);
+                }
+                control->forEachChild([](std::shared_ptr<UIControl> &child) {
+                    child->updatePosition();
+                });
+                return false;
+            }
+            if(control->getLayerName() == "centered_gui_elements_at_bottom_middle"){
+                if(movableHotbar && movableHotbar->isEnabled()) return false;
+                control->parentRelativePosition = Vec2<float> { centerScaled.x - (control->sizeConstrains.x / 2), scaledSize.y - control->sizeConstrains.y };
+                if(WinrtUtils::checkAboveOrEqual(21,40)) {
+                    control->updatePosition(true);
+                }
+                control->forEachChild([](std::shared_ptr<UIControl> &child) {
+                    child->updatePosition();
+                });
+                return false;
+            }
+
+            return false;
+        });
     }
 };
