@@ -5,8 +5,8 @@
 
 class UIControl_updateCachedPositionHook : public Hook {
 private:
-    static Vec2<float>* UIControl_updateCachedPosition(UIControl *_this) {
-        static auto setCachedPosition = reinterpret_cast<decltype(&UIControl_updateCachedPosition)>(funcOriginal);
+    static Vec2<float>* UIControl_getPosition(UIControl *_this) {
+        static auto setCachedPosition = reinterpret_cast<decltype(&UIControl_getPosition)>(funcOriginal);
 
         auto* res = setCachedPosition(_this);
 
@@ -30,11 +30,11 @@ private:
 public:
     static inline void* funcOriginal = nullptr;
 
-    UIControl_updateCachedPositionHook() : Hook("UIControl_updateCachedPositionHook", GET_SIG_ADDRESS("UIControl::_setCachedPosition")) {}
+    UIControl_updateCachedPositionHook() : Hook("UIControl_updateCachedPositionHook", WinrtUtils::checkAboveOrEqual(21,40) ? GET_SIG_ADDRESS("UIControl::getPosition") : GET_SIG_ADDRESS("UIControl::_setCachedPosition")) {}
 
     void enableHook() override {
         if(WinrtUtils::checkAboveOrEqual(21, 40)) {
-            this->autoHook((void *) UIControl_updateCachedPosition, (void **) &funcOriginal);
+            this->autoHook((void *) UIControl_getPosition, (void **) &funcOriginal);
         } else {
             this->autoHook((void *) UIControl_updateCachedPosition21_30, (void **) &funcOriginal);
         }

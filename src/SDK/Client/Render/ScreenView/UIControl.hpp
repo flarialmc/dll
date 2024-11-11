@@ -18,7 +18,7 @@ public:
 
     void updatePosition(bool override = false) {
         if(WinrtUtils::checkAboveOrEqual(21, 40)) {
-             int& flags = hat::member_at<int>(this, 0x18);
+            int& flags = hat::member_at<int>(this, 0x18);
             flags |= 1; // set cachedPositionDirty
             using func = Vec2<float>*(__fastcall*)(UIControl*);
             static auto getPosition = reinterpret_cast<func>(GET_SIG_ADDRESS("UIControl::getPosition"));
