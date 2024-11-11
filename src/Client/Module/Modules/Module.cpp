@@ -401,11 +401,11 @@ void Module::saveSettings() const {
             outputFile.close();
         }
         else {
-            Logger::error("Failed to open file. Maybe it doesn't exist?: " + settingspath);
+            Logger::error("Failed to open file. Maybe it doesn't exist?: {}", settingspath);
         }
     }
     catch (const std::exception& ex) {
-        Logger::error(ex.what());
+        Logger::error("An error occurred while saving settings: {}", ex.what());
     }
 }
 
@@ -417,7 +417,7 @@ void Module::loadSettings() {
         ss << inputFile.rdbuf();
         inputFile.close();
     } else {
-        Logger::error("File could not be opened. Maybe it doesn't exist?: " + settingspath);
+        Logger::error("Failed to open file. Maybe it doesn't exist?: {}", settingspath);
         return;
     }
 
@@ -450,7 +450,7 @@ void Module::checkSettingsFile() const {
             OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
         if (fileHandle == INVALID_HANDLE_VALUE) {
-            Logger::error("Failed to create file: " + settingspath);
+            Logger::error("Failed to create file: {}", settingspath);
             return;
         }
 

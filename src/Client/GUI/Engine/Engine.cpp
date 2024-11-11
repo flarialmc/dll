@@ -1422,7 +1422,7 @@ void FlarialGUI::CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to) {
         D2D1_BITMAP_PROPERTIES props = D2D1::BitmapProperties(from->GetPixelFormat());
         HRESULT hr = D2D::context->CreateBitmap(from->GetPixelSize(), props, to);
         if (FAILED(hr)) {
-            Logger::debug("Failed to create bitmap");
+            Logger::error("Failed to create bitmap");
             return;  // Handle the failure to create the bitmap
         }
     } else if (from->GetPixelSize() != (*to)->GetPixelSize()) {
@@ -1430,7 +1430,7 @@ void FlarialGUI::CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to) {
         D2D1_BITMAP_PROPERTIES props = D2D1::BitmapProperties(from->GetPixelFormat());
         HRESULT hr = D2D::context->CreateBitmap(from->GetPixelSize(), props, to);
         if (FAILED(hr)) {
-            Logger::debug("Failed to create bitmap");
+            Logger::error("Failed to create bitmap");
             return;  // Handle the failure to create the bitmap
         }
     }

@@ -66,18 +66,18 @@ public:
     static void hookFunc(void *pTarget, void *pDetour, void **ppOriginal, std::string name) {
 
         if (pTarget == nullptr) {
-            Logger::error(std::format("[vFunc Hook] {} has invalid address", name));
+            Logger::error("[vFunc Hook] {} has invalid address", name);
             return;
         }
 
         if (MH_CreateHook(pTarget, pDetour, ppOriginal) != MH_OK) {
-            Logger::error(std::format("[vFunc Hook] Failed to hook {} function", name));
+            Logger::error("[vFunc Hook] Failed to hook {} function", name);
             return;
         }
 
         MH_EnableHook(pTarget);
 
-        Logger::info(std::format("[vFunc Hook] Successfully hooked {} function at {}", name, pTarget));
+        Logger::info("[vFunc Hook] Successfully hooked {} at {}", name, pTarget);
     }
 
     template<typename R, typename... Args>
@@ -95,14 +95,14 @@ public:
     static uintptr_t findSig(std::string_view signature) {
         const auto parsed = hat::parse_signature(signature);
         if (!parsed.has_value()) {
-            Logger::debug("[ Runtime Scanner ] Failed to parse signature: " + std::string(signature));
+            Logger::custom(fg(fmt::color::crimson), "Signatures", "Failed to parse signature: {} ", signature);
             return 0u;
         }
 
         const auto result = hat::find_pattern(parsed.value());
 
         if (!result.has_result()) {
-            Logger::debug("[ Runtime Scanner ] Failed to find signature: " + std::string(signature));
+            Logger::custom(fg(fmt::color::crimson), "Signatures", "Failed to find signature: {} ", signature);
             return 0u;
         }
 
