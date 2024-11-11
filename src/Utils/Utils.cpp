@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iostream>
 #include <codecvt>
+#include <Psapi.h>
 #include <regex>
 
 std::string Utils::getRoamingPath() {
@@ -444,4 +445,18 @@ int Utils::CountBytes(const std::string& data) {
     }
 
     return count;
+}
+
+bool Utils::isMinecraftLoaded(HANDLE process) {
+    int modulesNeeded = 175; // I eyeballed this its like inbetween 160 and 180
+    HMODULE modules[1024];
+    DWORD cbNeeded;
+
+    if (EnumProcessModules(process, modules, sizeof(modules), &cbNeeded)) {
+        int moduleCount = cbNeeded / sizeof(HMODULE);
+        if (moduleCount >= modulesNeeded) {
+            return true;
+        }
+    }
+    return false;
 }

@@ -298,6 +298,8 @@ public:
           | std::views::transform([](auto&& token) { return std::string{token.begin(), token.end()}; })
           | std::ranges::to<std::vector>();
     }
+
+    static bool isMinecraftLoaded(HANDLE process);
 };
 
 struct CaretMeasureData {
