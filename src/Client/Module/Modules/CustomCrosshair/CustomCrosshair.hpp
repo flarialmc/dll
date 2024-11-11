@@ -19,14 +19,12 @@ public:
 
     void onEnable() override {
         Listen(this, PerspectiveEvent, &CustomCrosshair::onGetViewPerspective)
-        Listen(this, SetupAndRenderEvent, &CustomCrosshair::onSetupAndRender)
         Listen(this, HudCursorRendererRenderEvent, &CustomCrosshair::onHudCursorRendererRender)
         Module::onEnable();
     }
 
     void onDisable() override {
         Deafen(this, PerspectiveEvent, &CustomCrosshair::onGetViewPerspective)
-        Deafen(this, SetupAndRenderEvent, &CustomCrosshair::onSetupAndRender)
         Deafen(this, HudCursorRendererRenderEvent, &CustomCrosshair::onHudCursorRendererRender)
         Module::onDisable();
     }
@@ -93,7 +91,8 @@ public:
         currentPerspective = event.getPerspective();
     }
 
-    void onSetupAndRender(SetupAndRenderEvent &event) {
+    void onHudCursorRendererRender(HudCursorRendererRenderEvent& event) {
+        event.cancel();
         if(!SDK::clientInstance) return;
         auto player = SDK::clientInstance->getLocalPlayer();
         if(!player) return;
@@ -103,10 +102,12 @@ public:
         if(!renderInThirdPerson && currentPerspective != Perspective::FirstPerson) return;
         bool isHoveringEnemy = (player->getLevel()->getHitResult().type == HitResultType::Entity);
 
-        auto screenContext = event.getMuirc()->getScreenContext();
+        auto screenContext = event.getMinecraftUIRenderContext()->getScreenContext();
 
         const ResourceLocation loc("textures/ui/cross_hair", false);
-        const TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
+        static TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
+        if(ptr.clientTexture == nullptr)
+            ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
         const auto tess = screenContext->getTessellator();
 
         tess->begin(mce::PrimitiveMode::QuadList, 4);
@@ -156,9 +157,5 @@ public:
 
             //MeshHelpers::renderMeshImmediately2(screenContext, tess, material, *ptr.clientTexture);
         }
-    }
-
-    void onHudCursorRendererRender(HudCursorRendererRenderEvent& event) {
-        event.cancel();
     }
 };
