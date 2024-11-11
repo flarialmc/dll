@@ -150,7 +150,7 @@ public:
 
 
         this->addHeader("Main");
-        this->addSlider("UI Scale", "The Size of Tablist", this->settings.getSettingByName<float>("uiscale")->value, 1.25f);
+        this->addSlider("UI Scale", "The Size of Keystrokes", this->settings.getSettingByName<float>("uiscale")->value, 1.25f);
         this->addSlider("Rounding", "", this->settings.getSettingByName<float>("rounding")->value);
         this->addSlider("Key Spacing", "", this->settings.getSettingByName<float>("keySpacing")->value, 10.00);
         this->addSlider("Spacebar Width", "", this->settings.getSettingByName<float>("spacebarWidth")->value, 1.00, 0,false);
