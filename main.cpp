@@ -46,6 +46,17 @@ DWORD WINAPI init(HMODULE real) {
     }
     CloseHandle(hProcess);
 
+    DWORD processID = GetCurrentProcessId();
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
+
+    Logger::info("Waiting for Minecraft to load...");
+    while (!Utils::isMinecraftLoaded(hProcess)) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    Logger::info("Minecraft loaded!");
+
+    CloseHandle(hProcess);
+
     Client::initialize();
 
     std::thread statusThread([]() {
