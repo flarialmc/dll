@@ -19,5 +19,5 @@ public:
 
     static float FontScaler(float dimension);
 
-    static Vec2<float> CalculatePercentage(float x, float y);
+    static Vec2<float> CalculatePercentage(float x, float y, float adjustWidth = 0, float adjustHeight = 0);
 };
