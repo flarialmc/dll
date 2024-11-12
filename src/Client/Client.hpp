@@ -4,9 +4,8 @@
 #include "Module/Manager.hpp"
 #include <vector>
 
-class Client
-{
-  public:
+class Client {
+public:
     static std::vector<std::string> onlinePlayers;
 
     static std::string current_commit;
@@ -28,42 +27,29 @@ class Client
 
     static inline HMODULE currentModule = NULL;
 
-    static inline HANDLE mutex = NULL;
-
-    static void SaveSettings()
-    {
-        try
-        {
+    static void SaveSettings() {
+        try {
             std::ofstream outputFile(settingspath);
-            if (outputFile.is_open())
-            {
+            if (outputFile.is_open()) {
                 std::string jsonString = settings.ToJson();
                 outputFile << jsonString;
                 outputFile.close();
-            }
-            else
-            {
+            } else {
                 Logger::error("Failed to save open file. Maybe it doesn't exist?: {}", settingspath);
             }
-        }
-        catch (const std::exception &ex)
-        {
+        } catch (const std::exception &ex) {
             Logger::error("An error occurred while trying to save settings: {}", ex.what());
         }
     }
 
-    static void LoadSettings()
-    {
+    static void LoadSettings() {
         std::ifstream inputFile(settingspath);
         std::stringstream ss;
 
-        if (inputFile.is_open())
-        {
+        if (inputFile.is_open()) {
             ss << inputFile.rdbuf();
             inputFile.close();
-        }
-        else
-        {
+        } else {
             Logger::error("Failed to save open file. Maybe it doesn't exist?: {}", settingspath);
             return;
         }
@@ -72,21 +58,18 @@ class Client
         settings.FromJson(settingstring);
     }
 
-    static void CheckSettingsFile()
-    {
+    static void CheckSettingsFile() {
 
-        if (!std::filesystem::exists(settingspath))
-        {
+        if (!std::filesystem::exists(settingspath)) {
 
             std::filesystem::path filePath(settingspath);
             std::filesystem::create_directories(filePath.parent_path());
 
-            HANDLE fileHandle =
-                CreateFileA(settingspath.c_str(), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
-                            nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+            HANDLE fileHandle = CreateFileA(settingspath.c_str(), GENERIC_WRITE | GENERIC_READ,
+                                            FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                                            OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
-            if (fileHandle == INVALID_HANDLE_VALUE)
-            {
+            if (fileHandle == INVALID_HANDLE_VALUE) {
                 Logger::error("Failed to create file: {}", settingspath);
                 return;
             }
