@@ -94,7 +94,7 @@ file(GLOB_RECURSE sources "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp" "src/Clie
 
 add_library(${PROJECT_NAME} SHARED ${sources} main.cpp src/Assets/Assets.rc)
 
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/" "${CMAKE_CURRENT_LIST_DIR}/lib/glm/" "${CMAKE_CURRENT_LIST_DIR}/lib/ImGui")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/" "${CMAKE_CURRENT_LIST_DIR}/lib/glm/" "${CMAKE_CURRENT_LIST_DIR}/lib/ImGui" "${CMAKE_CURRENT_LIST_DIR}/lib/lua/include/")
 
 # Disable RTTI
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -107,6 +107,7 @@ add_library(MinHook SHARED IMPORTED GLOBAL)
 set_target_properties(MinHook PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/minhook/minhook.lib")
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/freetype/")
+add_subdirectory(lua)
 
 add_library(FreeType SHARED IMPORTED GLOBAL)
 set_target_properties(FreeType PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/freetype/libs/freetype.lib")
@@ -138,7 +139,7 @@ FetchContent_Declare(
 set(ENTT_BUILD_TESTING OFF)  # Disable building tests
 FetchContent_MakeAvailable(libhat entt nes fmt)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType)
+target_link_libraries(${PROJECT_NAME} PRIVATE lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType)
 target_link_libraries(${PROJECT_NAME} PUBLIC MinHook)
 
 target_precompile_headers(Flarial PRIVATE "src/PCH.cpp")

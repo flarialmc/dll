@@ -87,6 +87,7 @@
 #include "Modules/MovableCoordinates/MovableCoordinates.hpp"
 #include "Modules/MovableHotbar/MovableHotbar.hpp"
 #include "Modules/NullMovement/NullMovement.hpp"
+#include "../../Scripting/Scripting.hpp"
 
 namespace ModuleManager {
     std::unordered_map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -190,6 +191,8 @@ void ModuleManager::initialize() {
     addService<CentreCursorListener>();
     addService<rgbListener>();
     addService<HiveModeCatcherListener>();
+
+    Scripting::loadModules();
 
     initialized = true;
 }
