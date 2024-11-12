@@ -44,16 +44,14 @@ bool unloadDll(const wchar_t *moduleName) {
     HMODULE hModule = GetModuleHandleW(moduleName);
     if (hModule != nullptr) {
         if (FreeLibrary(hModule)) {
-            Logger::debug("[UNLOAD DLL] DLL unloaded!");
+            Logger::debug("DLL unloaded");
             return true;
-        } else {
-            Logger::debug("[UNLOAD DLL] Failed to FreeLibrary!");
-            return false;
         }
-    } else {
-        Logger::debug("[UNLOAD DLL] Failed to unload!");
+        Logger::error("Failed to FreeLibrary");
         return false;
     }
+    Logger::error("Failed to unload DLL");
+    return false;
 }
 
 bool containsModule(const std::wstring &moduleName) {
@@ -182,9 +180,9 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
         pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     }
 
-
     pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
-    Logger::info("Swap Effect: " + std::to_string(pDesc->SwapEffect));
+    // Gives error rn probably because fmt doesnt know how to handle it
+    //Logger::info("Swap Effect: {}", pDesc->SwapEffect);
 
     MADECHAIN = TRUE;
     queueReset = false;
@@ -200,7 +198,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         init = false;
         initImgui = false;
         queueReset = false;
-        Logger::debug("[SwapChain] RESETTING SWAPCHAIN!");
+        Logger::debug("Resetting SwapChain");
         ResizeHook::cleanShit(false);
         return DXGI_ERROR_DEVICE_RESET;
     }
@@ -286,8 +284,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 }
 
 void SwapchainHook::DX11Init() {
-
-    Logger::debug("[SwapChain] Not a DX12 device, running dx11 procedures");
+    Logger::debug("Not a DX12 device, running DX11 procedures");
 
     const D2D1_CREATION_PROPERTIES properties
             {
@@ -357,8 +354,6 @@ void SwapchainHook::DX12Init() {
         d2dFactory->CreateDevice(dxgiDevice, &device2);
 
         device2->CreateDeviceContext(deviceOptions, &D2D::context);
-
-        Logger::debug("[SwapChain] Prepared.");
 
         DXGI_SWAP_CHAIN_DESC1 swapChainDescription;
         swapchain->GetDesc1(&swapChainDescription);

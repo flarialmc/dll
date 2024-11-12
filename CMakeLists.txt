@@ -24,6 +24,9 @@ if(MSVC)
 
     add_compile_options(/bigobj)
 
+    # Needed for fmt library
+    add_compile_options(/utf-8)
+
     # Optimize for speed
     add_compile_options($<$<CONFIG:Release>:/O2>)
     add_compile_options($<$<CONFIG:Release>:/Ot>)
@@ -125,10 +128,17 @@ FetchContent_Declare(
         GIT_REPOSITORY  https://github.com/BasedInc/libhat.git
         GIT_TAG         9ef05d6961ce37a4c801f11159de895aa21878a9
 )
-set(ENTT_BUILD_TESTING OFF)  # Disable building tests
-FetchContent_MakeAvailable(libhat entt nes)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE libhat EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType)
+FetchContent_Declare(
+        fmt
+        GIT_REPOSITORY https://github.com/fmtlib/fmt
+        GIT_TAG        master
+)
+
+set(ENTT_BUILD_TESTING OFF)  # Disable building tests
+FetchContent_MakeAvailable(libhat entt nes fmt)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType)
 target_link_libraries(${PROJECT_NAME} PUBLIC MinHook)
 
 target_precompile_headers(Flarial PRIVATE "src/PCH.cpp")

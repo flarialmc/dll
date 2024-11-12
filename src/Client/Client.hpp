@@ -35,10 +35,10 @@ public:
                 outputFile << jsonString;
                 outputFile.close();
             } else {
-                Logger::error("Failed to open file. Maybe it doesn't exist?: " + settingspath);
+                Logger::error("Failed to save open file. Maybe it doesn't exist?: {}", settingspath);
             }
         } catch (const std::exception &ex) {
-            Logger::error(ex.what());
+            Logger::error("An error occurred while trying to save settings: {}", ex.what());
         }
     }
 
@@ -50,7 +50,7 @@ public:
             ss << inputFile.rdbuf();
             inputFile.close();
         } else {
-            Logger::error("File could not be opened. Maybe it doesn't exist?: " + settingspath);
+            Logger::error("Failed to save open file. Maybe it doesn't exist?: {}", settingspath);
             return;
         }
 
@@ -70,7 +70,7 @@ public:
                                             OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
             if (fileHandle == INVALID_HANDLE_VALUE) {
-                Logger::error("Failed to create file: " + settingspath);
+                Logger::error("Failed to create file: {}", settingspath);
                 return;
             }
 

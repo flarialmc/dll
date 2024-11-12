@@ -31,18 +31,20 @@ void printVector(const std::vector<std::string>& vec) {
 }
 
 
-DWORD WINAPI init(HMODULE real)
-{
-#ifndef NDEBUG
-    bool shouldDebug = true; // Change this bool locally, NEVER push it set to true
+DWORD WINAPI init(HMODULE real) {
+    Logger::initialize();
 
-    if (GetConsoleWindow() == nullptr && shouldDebug) {
-        AllocConsole();
-        SetConsoleTitleA("Flarial-Debugger");
-        FILE *out;
-        freopen_s(&out, ("CONOUT$"), ("w"), stdout);
+    DWORD processID = GetCurrentProcessId();
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
+
+    if (!Utils::isMinecraftLoaded(hProcess)) {
+        Logger::info("Waiting for Minecraft to load...");
+
+        while (!Utils::isMinecraftLoaded(hProcess)) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
     }
-#endif
+    CloseHandle(hProcess);
 
     DWORD processID = GetCurrentProcessId();
     HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
@@ -56,9 +58,6 @@ DWORD WINAPI init(HMODULE real)
     CloseHandle(hProcess);
 
     Client::initialize();
-    Logger::info("[Client] Initializing");
-
-
 
     std::thread statusThread([]() {
         while (!Client::disable) {
@@ -114,7 +113,7 @@ DWORD WINAPI init(HMODULE real)
                                 playersDict = nlohmann::json::parse(onlineUsersRaw);
                                 Client::onlinePlayers = Client::getPlayersVector(playersDict);
                             }  catch (const json::parse_error& e) {
-                                Logger::error(e.what());
+                                Logger::error("An error occurred while parsing online users: {}", e.what());
                                 lastOnlineUsersFetchTime = now;
                                 continue;
                             }
@@ -147,13 +146,11 @@ DWORD WINAPI init(HMODULE real)
 
     Client::SaveSettings();
 
-    Logger::info("Uninitializing Client");
-
     ResizeHook::cleanShit();
 
     kiero::shutdown();
 
-    Logger::debug("[Kiero] Kiero shut down.");
+    Logger::custom(fmt::fg(fmt::color::pink), "Kiero", "Shut down");
 
     ModuleManager::terminate();
     HookManager::terminate();
@@ -163,17 +160,17 @@ DWORD WINAPI init(HMODULE real)
 
     glaiel::crashlogs::end_session();
 
-    Logger::debug("[MinHook] Freeing Library.");
+    Logger::custom(fmt::fg(fmt::color::cadet_blue), "MinHook", "Freed Library");
 
     Client::setWindowTitle(L"");
+
+    Logger::shutdown();
 
     FreeLibraryAndExitThread(Client::currentModule, 0);
 }
 
 
-BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReserved)
-{
-
+BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH:
             DisableThreadLibraryCalls(instance);

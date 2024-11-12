@@ -130,9 +130,7 @@ public:
                 }
             }
         } catch (const std::exception &e) {
-
-            if (!jsonString.empty())
-                Logger::error(e.what());
+            Logger::error("An error occured while parsing settings: {}", e.what());
         }
     }
 
