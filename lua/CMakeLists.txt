@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(lua LANGUAGES C VERSION 5.4.5)
+project(lua LANGUAGES C VERSION 5.4.7)
 
 option(LUA_SUPPORT_DL "Support dynamic loading of compiled modules" OFF)
 option(LUA_BUILD_AS_CXX "Build lua as C++" OFF)
@@ -25,8 +25,8 @@ else()
     option(LUA_BUILD_COMPILER "Build luac compiler" ON)
 endif()
 
-add_subdirectory(lua-5.4.5)
+add_subdirectory(lua-${PROJECT_VERSION})
 
 if(LUA_ENABLE_TESTING)
-    add_test(NAME lua-testsuite COMMAND lua -e "_U=true" all.lua WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lua-5.4.5-tests)
+    add_test(NAME lua-testsuite COMMAND lua -e "_U=true" all.lua WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lua-${CMAKE_PROJECT_VERSION}-tests)
 endif()

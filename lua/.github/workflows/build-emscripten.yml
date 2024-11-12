@@ -1,0 +1,51 @@
+name: Build Emscripten
+
+on: [push, pull_request]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+ build-emsdk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: mymindstorm/setup-emsdk@v7
+      
+      - uses: actions/checkout@v2
+      
+      - name: Create Build Environment
+        # Some projects don't allow in-source building, so create a separate build directory
+        # We'll use this as our working directory for all subsequent commands
+        run: emcmake cmake -E make_directory ${{github.workspace}}/build
+
+      - name: Configure CMake
+        # Use a bash shell so we can use the same syntax for environment variable
+        # access regardless of the host operating system
+        shell: bash
+        working-directory: ${{github.workspace}}/build
+        # Note the current convention is to use the -S and -B options here to specify source 
+        # and build directories, but this is only available with CMake 3.13 and higher.  
+        # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
+        run: emcmake cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+      - name: Build
+        working-directory: ${{github.workspace}}/build
+        shell: bash
+        # Execute the build.  You can specify a specific target with "--target <NAME>"
+        run: cmake --build . --config $BUILD_TYPE
+
+      - name: Install
+        working-directory: ${{github.workspace}}/build
+        shell: bash
+        run: cmake --install . --prefix $GITHUB_WORKSPACE/sysroot
+
+      # - name: Configure Test of CMake Package
+      #   working-directory: ${{github.workspace}}
+      #   shell: bash
+      #   run: emcmake cmake -S $GITHUB_WORKSPACE/lua-config-package-tests -B build-pkg-test -DCMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/sysroot
+
+      # - name: Build Test of CMake Package
+      #   working-directory: ${{github.workspace}}
+      #   shell: bash
+      #   run: cmake --build build-pkg-test
