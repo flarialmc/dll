@@ -45,10 +45,6 @@ DWORD WINAPI init(HMODULE real) {
         }
     }
 
-    Logger::info("Waiting for Minecraft to load...");
-    while (!Utils::isMinecraftLoaded(hProcess)) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
     Logger::info("Minecraft loaded!");
     CloseHandle(hProcess);
 
