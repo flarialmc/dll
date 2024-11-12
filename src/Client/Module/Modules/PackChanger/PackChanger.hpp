@@ -14,19 +14,16 @@ private:
 
     static inline std::array<std::byte, 6> patch1Data;
     static inline std::array<std::byte, 2> patch2Data;
-    static inline std::array<std::byte, 2> patch3Data;
-    static inline std::array<std::byte, 6> patch4Data;
 public:
     PackChanger() : Module("PackChanger", "Allows you to change packs in world/server.", IDR_AUTORQ_PNG, "") {
-        static auto src = GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch");
-        static auto src1 = GET_SIG_ADDRESS("SettingsScreenOnExit_Patch");
-        static auto src2 = GET_SIG_ADDRESS("GeneralSettingsScreenController::_processPendingImports_Patch");
-        static auto src3 = GET_SIG_ADDRESS("GeneralSettingsScreenController::_setResourcePackStacks_Patch");
 
-        Memory::copyBytes((void*)src, patch1Data.data(), patch1Data.size());
+        if(WinrtUtils::checkAboveOrEqual(21,00)) {
+            static auto src = WinrtUtils::checkAboveOrEqual(21,20) ? GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch") : GET_SIG_ADDRESS("MinecraftGame::_onActiveResourcePacksChanged_Patch");
+            Memory::copyBytes((void*)src, patch1Data.data(), patch1Data.size());
+        }
+
+        static auto src1 = GET_SIG_ADDRESS("SettingsScreenOnExit_Patch");
         Memory::copyBytes((void*)src1, patch2Data.data(), patch2Data.size());
-        Memory::copyBytes((void*)src2, patch3Data.data(), patch3Data.size());
-        Memory::copyBytes((void*)src3, patch4Data.data(), patch4Data.size());
 
         Module::setup();
     };
@@ -34,18 +31,21 @@ public:
     void onEnable() override {
         patchComposeFullStack();
         canRender = true;
+        Listen(this, KeyEvent, &PackChanger::onKey);
         Listen(this, SetupAndRenderEvent, &PackChanger::onSetupAndRender);
-        Listen(this, isPreGameEvent, &PackChanger::onIsPreGame);
+        Listen(this, isPreGameEvent, &PackChanger::onIsPreGame); // unlocking buttons
         Listen(this, PacksLoadEvent, &PackChanger::onPacksLoad);
-        Listen(this, RenderOrderExecuteEvent, &PackChanger::onRenderOrderExecute);
-        Listen(this, RenderChunkCoordinatorPreRenderTickEvent, &PackChanger::onRenderChunkCoordinatorPreRenderTick);
+        Listen(this, RenderOrderExecuteEvent, &PackChanger::onRenderOrderExecute); // stops most 3D level rendering
+        Listen(this, RenderChunkCoordinatorPreRenderTickEvent, &PackChanger::onRenderChunkCoordinatorPreRenderTick); // stops chunks from re-generating
         Listen(this, BeforeSettingsScreenOnExitEvent, &PackChanger::onBeforeSettingsScreenOnExit);
         Listen(this, AfterSettingsScreenOnExitEvent, &PackChanger::onAfterSettingsScreenOnExit);
+        Listen(this, GeneralSettingsScreenControllerOnCreateEvent, &PackChanger::onGeneralSettingsScreenControllerOnCreate);
         Module::onEnable();
     }
 
     void onDisable() override {
         unpatchComposeFullStack();
+        Deafen(this, KeyEvent, &PackChanger::onKey);
         Deafen(this, SetupAndRenderEvent, &PackChanger::onSetupAndRender);
         Deafen(this, isPreGameEvent, &PackChanger::onIsPreGame);
         Deafen(this, PacksLoadEvent, &PackChanger::onPacksLoad);
@@ -53,19 +53,31 @@ public:
         Deafen(this, RenderChunkCoordinatorPreRenderTickEvent, &PackChanger::onRenderChunkCoordinatorPreRenderTick);
         Deafen(this, BeforeSettingsScreenOnExitEvent, &PackChanger::onBeforeSettingsScreenOnExit);
         Deafen(this, AfterSettingsScreenOnExitEvent, &PackChanger::onAfterSettingsScreenOnExit);
+        Deafen(this, GeneralSettingsScreenControllerOnCreateEvent, &PackChanger::onGeneralSettingsScreenControllerOnCreate);
         canRender = true;
         Module::onDisable();
+    }
+
+    void onKey(KeyEvent &event) {
+        if(!canRender) {
+            event.cancel(); // prevent users from closing pack loading menu
+        }
     }
 
     void defaultConfig() override {}
 
     void settingsRender(float settingsOffset) override {}
 
+    void onGeneralSettingsScreenControllerOnCreate(GeneralSettingsScreenControllerOnCreateEvent &event) {
+        event.unlockPackMenu();
+    }
+
     void onBeforeSettingsScreenOnExit(BeforeSettingsScreenOnExitEvent &event) {
         if(!SDK::clientInstance) return;
         auto player = SDK::clientInstance->getLocalPlayer();
         if(!player) return; // means were not in the world
         forcePreGame = true;
+        canRender = false; // disable rendering
         userRequestedReload = true;
         patch();
     }
@@ -85,7 +97,6 @@ public:
         // recreate swapchain
         if(userRequestedReload) {
             queueReset = true;
-            canRender = false; // disable rendering
             forcePreGame = false;
             userRequestedReload = false;
         }
@@ -105,7 +116,7 @@ public:
         auto player = SDK::clientInstance->getLocalPlayer();
         if(!player) return;
 
-        auto name = SDK::clientInstance->getTopScreenName();
+        auto name = SDK::clientInstance->getScreenName();
 
         if(!canRender && enableFrameQueue) {
             if(frameQueue == 0) {
@@ -127,7 +138,10 @@ public:
                 }
                 if(frameQueue == 0) {
                     queueReset = false;
-                    SwapchainHook::queueReset = true;
+
+                    SDK::clientInstance->getLevelRender()->getLevelRendererPlayer()->onDeviceLost();
+                    SDK::clientInstance->getMinecraftGame()->_onResumeWaitReloadActors();
+                    //SwapchainHook::queueReset = true;
                 }
                 return;
             }
@@ -149,33 +163,28 @@ public:
 
     void patch() {
         static auto dst1 = GET_SIG_ADDRESS("SettingsScreenOnExit_Patch");
-        static auto dst2 = GET_SIG_ADDRESS("GeneralSettingsScreenController::_processPendingImports_Patch");
-        static auto dst3 = GET_SIG_ADDRESS("GeneralSettingsScreenController::_setResourcePackStacks_Patch");
 
         Memory::nopBytes((void*)dst1, 2);
-        Memory::patchBytes((void*)dst2, (BYTE*)"\x90\xE9", 2);  // make it always jump
-        Memory::nopBytes((void*)dst3, 6);
     }
 
     void unpatch() {
         static auto dst1 = GET_SIG_ADDRESS("SettingsScreenOnExit_Patch");
-        static auto dst2 = GET_SIG_ADDRESS("GeneralSettingsScreenController::_processPendingImports_Patch");
-        static auto dst3 = GET_SIG_ADDRESS("GeneralSettingsScreenController::_setResourcePackStacks_Patch");
-
 
         Memory::patchBytes((void*)dst1, patch2Data.data(), patch2Data.size());
-        Memory::patchBytes((void*)dst2, patch3Data.data(), patch3Data.size());
-        Memory::patchBytes((void*)dst3, patch4Data.data(), patch4Data.size());
     }
 
     void patchComposeFullStack() {
-        static auto dst = GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch");
+        if(!WinrtUtils::checkAboveOrEqual(21,00)) return;
+
+        static auto dst = WinrtUtils::checkAboveOrEqual(21,20) ? GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch") : GET_SIG_ADDRESS("MinecraftGame::_onActiveResourcePacksChanged_Patch");
 
         Memory::nopBytes((void*)dst, 6);
     }
 
     void unpatchComposeFullStack() {
-        static auto dst = GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch");
+        if(!WinrtUtils::checkAboveOrEqual(21,00)) return;
+
+        static auto dst = WinrtUtils::checkAboveOrEqual(21,20) ? GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch") : GET_SIG_ADDRESS("MinecraftGame::_onActiveResourcePacksChanged_Patch");
 
         Memory::patchBytes((void*)dst, patch1Data.data(), patch1Data.size());
     }

@@ -21,6 +21,7 @@
 #include "Render/DrawTextEvent.hpp"
 #include "Render/FogColorEvent.hpp"
 #include "Render/GammaEvent.hpp"
+#include "Render/GeneralSettingsScreenControllerOnCreateEvent.hpp"
 #include "Render/GetTextureEvent.hpp"
 #include "Render/HudCursorRendererRenderEvent.hpp"
 #include "Render/HurtColorEvent.hpp"
