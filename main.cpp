@@ -34,19 +34,29 @@ DWORD WINAPI init(HMODULE real)
     uint64_t start = Utils::getCurrentMs();
     Logger::initialize();
 
-    DWORD processID = GetCurrentProcessId();
-    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
+    bool hatless = true;
 
-    if (!Utils::isMinecraftLoaded(hProcess))
-    {
-        Logger::info("Waiting for Minecraft to load...");
+    if (hatless) {
+        DWORD processID = GetCurrentProcessId();
+        HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
 
-        while (!Utils::isMinecraftLoaded(hProcess))
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        if (!Utils::isMinecraftLoaded(hProcess)) {
+            Logger::info("Waiting for Minecraft to load...");
+
+            while (!Utils::isMinecraftLoaded(hProcess)) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            }
+        }
+        CloseHandle(hProcess);
+    } else {
+        if (!Utils::isMinecraftLoadedAetopia()) {
+            Logger::info("Waiting for Minecraft to load...");
+
+            while (!Utils::isMinecraftLoadedAetopia()) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
         }
     }
-    CloseHandle(hProcess);
 
     Client::initialize();
 
