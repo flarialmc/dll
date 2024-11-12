@@ -3,11 +3,11 @@
 #include "../Event.hpp"
 #include "../Cancellable.hpp"
 
-enum class MouseAction {
-    Press,
-    Release,
-    ScrollUp,
-    ScrollDown
+enum MouseAction {
+    Press = 1,
+    Release = 2,
+    ScrollUp = 3,
+    ScrollDown = 4
 };
 
 enum MouseButton {
