@@ -234,11 +234,11 @@ public:
                 float totalWidth = keycardSize * 3 + spacing * 2;
                 float totalHeight = keycardSize * 2.0f + keycardSize / 2.0f + spacing * 2;
 
-
                 Vec2<float> realcenter;
 
                 if (settingperc.x != 0)
-                    realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x - totalWidth), settingperc.y * (MC::windowSize.y - totalHeight));                else realcenter = Constraints::CenterConstraint(keycardSize, keycardSize);
+                    realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x - totalWidth), settingperc.y * (MC::windowSize.y - totalHeight));
+                else realcenter = Constraints::CenterConstraint(keycardSize, keycardSize);
 
                 Vec2<float> rounde = Constraints::RoundingConstraint(
                         this->settings.getSettingByName<float>("rounding")->value *
@@ -248,8 +248,7 @@ public:
 
                 if (settings.getSettingByName<bool>("cps")->value) totalHeight += keycardSize + spacing;
 
-                if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
-                    ClickGUI::editmenu) { // makes module movable
+                if (ClickGUI::editmenu) { // makes module movable
                     FlarialGUI::SetWindowRect(realcenter.x - (keycardSize + spacing), realcenter.y, totalWidth,
                                               totalHeight, index, keycardSize + spacing);
 
@@ -576,9 +575,7 @@ public:
                 FlarialGUI::RoundedRect(realcenter.x + centeredChild.first, realcenter.y + centeredChild.second,
                                         textStates[Strokes::SPACEBAR], childWidth, childHeight, 0, 0);
 
-                if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
-                    ClickGUI::editmenu)
-
+                if (ClickGUI::editmenu)
                     FlarialGUI::UnsetWindowRect();
 
             }
