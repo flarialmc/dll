@@ -35,8 +35,7 @@ DWORD WINAPI init(HMODULE real)
 {
     Logger::initialize();
 
-    DWORD processID = GetCurrentProcessId();
-    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
+    HANDLE hProcess = GetCurrentProcess();
 
     if (!Utils::isMinecraftLoaded(hProcess))
     {
