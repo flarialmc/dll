@@ -35,6 +35,7 @@ std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 std::string dxVersion[5] = {"Couldn't initialize", "DX9", "DX10", "DX11", "DX12"};
 
 void HookManager::initialize() {
+    uint64_t start = Utils::getCurrentMs();
     MH_Initialize();
 
     kiero::init(kiero::RenderType::D3D12);
@@ -46,7 +47,7 @@ void HookManager::initialize() {
         Logger::debug("[Kiero] Trying d3d10");
     }
 
-    Logger::debug("[Kiero] Renderer: {}", dxVersion[kiero::getRenderType()]);
+    Logger::debug("Renderer: {}", dxVersion[kiero::getRenderType()]);
 
 
     addHook<KeyHook>();
@@ -94,9 +95,12 @@ void HookManager::initialize() {
         addHook<UpdatePlayerHook>();
     }
 
-    for (const auto& hook: hooks)
+    for (const auto& hook: hooks) {
         hook->enableHook();
+    }
 
+    float elapsed = (Utils::getCurrentMs() - start) / 1000.0;
+    Logger::custom(fg(fmt::color::deep_sky_blue), "Hook", "Initialized {} hooks in {:.2f}s", hooks.size(), elapsed);
 }
 
 void HookManager::terminate() {

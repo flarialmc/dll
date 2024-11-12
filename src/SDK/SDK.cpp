@@ -34,33 +34,29 @@ std::string SDK::getCurrentScreen() {
 }
 
 int SDK::getServerPing() {
-    if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
-        if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-            if (SDK::clientInstance->getRakNetConnector() != nullptr) {
-                if (SDK::clientInstance->getRakNetConnector()->JoinedIp.empty()) {
-                    return 0;
-                } else {
-                    return (int)SDK::serverPing;
-                }
-            }
-        }
-    }
-    return -1;
+    if (!SDK::hasInstanced || !SDK::clientInstance) return -1;
+
+    auto* localPlayer = SDK::clientInstance->getLocalPlayer();
+    auto* rakNetConnector = SDK::clientInstance->getRakNetConnector();
+
+    if (!localPlayer || !rakNetConnector) return -1;
+    return rakNetConnector->JoinedIp.empty() ? 0 : static_cast<int>(SDK::serverPing);
 }
 
 std::string SDK::getServerIP() {
-    if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
-        if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-            std::string ip{};
-            if (SDK::clientInstance->getRakNetConnector() != nullptr) {
-                ip = SDK::clientInstance->getRakNetConnector()->JoinedIp;
-                if (!ip.empty()) {
-                    return ip;
-                } else{
-                    return "world";
-                }
-            }
-        }
+    if (!SDK::hasInstanced || !SDK::clientInstance) {
+        return "none";
     }
-    return "none";
+
+    auto player = SDK::clientInstance->getLocalPlayer();
+    if (!player) {
+        return "none";
+    }
+
+    auto raknet = SDK::clientInstance->getRakNetConnector();
+    if (raknet && !raknet->JoinedIp.empty()) {
+        return raknet->JoinedIp;
+    }
+
+    return player ? "world" : "none";
 }
