@@ -55,6 +55,16 @@ public:
         settings[name] = std::make_unique<SettingType<T>>(name, defaultValue);
     }
 
+    void deleteSetting(const std::string &name) {
+        auto it = settings.find(name);
+        if (it != settings.end()) {
+            settings.erase(it);
+        } else {
+            std::cerr << "Setting not found: " << name << std::endl;
+        }
+    }
+
+
     void reset() {
         settings.clear();
     }
@@ -120,9 +130,7 @@ public:
                 }
             }
         } catch (const std::exception &e) {
-
-            if (!jsonString.empty())
-                Logger::error(e.what());
+            Logger::error("An error occured while parsing settings: {}", e.what());
         }
     }
 

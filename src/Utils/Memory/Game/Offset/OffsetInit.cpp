@@ -4,23 +4,25 @@
 #include "../SignatureAndOffsetManager.hpp"
 
 void OffsetInit::init2140() {
-    Logger::debug("[Offsets] Loading offsets for 1.21.4X");
+    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.21.4X");
+
     ADD_OFFSET("Level::hitResult", 0x248);
+    ADD_OFFSET("Level::worldFolderName", 0x2B8);
+    ADD_OFFSET("Level::getPlayerMap", 0xBF0);
 
     ADD_OFFSET("Player::gamemode", 0xB28);
     ADD_OFFSET("Player::playerName", 0xCB0);
     ADD_OFFSET("ClientInstance::getBlockSource", 29);
-
+    ADD_OFFSET("ClientInstance::minecraftGame", 0xD0);
     ADD_OFFSET("ClientInstance::levelRenderer", 0xE8);
-
-    //ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x0); No longer exists?
-    ADD_OFFSET("Level::getPlayerMap", 0xBF0);
-
+    ADD_OFFSET("ClientInstance::camera", 0x2A8);
     ADD_OFFSET("ClientInstance::viewMatrix", 0x368);
     ADD_OFFSET("ClientInstance::guiData", 0x590);
-
     ADD_OFFSET("ClientInstance::getFovX", 0x728);
     ADD_OFFSET("ClientInstance::getFovY", 0x73C);
+
+    ADD_OFFSET("MinecraftGame::mouseGrabbed", 0x1A0);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x650);
 
     ADD_OFFSET("RaknetConnector::getPeer", 0x2A0);
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x398);
@@ -31,15 +33,20 @@ void OffsetInit::init2140() {
     ADD_OFFSET("ClientInstance::getPacketSender", 0xF8);
     ADD_OFFSET("NetworkSystem::remoteConnectorComposite", 0x90);
     ADD_OFFSET("RemoteConnectorComposite::rakNetConnector", 0x70);
+
+    ADD_OFFSET("ClientInstance::getScreenName", 266);
+
+    ADD_OFFSET("ScreenContext::tessellator", 0xC8);
 }
 
 void OffsetInit::init2130() {
-    Logger::debug("[Offsets] Loading offsets for 1.21.3X");
+    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.21.3X");
 
     ADD_OFFSET("Player::gamemode", 0xB18);
     ADD_OFFSET("Player::playerName", 0xCA0);
 
     ADD_OFFSET("Level::hitResult", 0x230);
+    ADD_OFFSET("Level::worldFolderName", 0x2A0);
     ADD_OFFSET("Level::getPlayerMap", 0xC08);
 
     ADD_OFFSET("ClientInstance::camera", 0x2A0);
@@ -58,10 +65,12 @@ void OffsetInit::init2130() {
     ADD_OFFSET("MoveInputComponent::backward", 0x2D);
     ADD_OFFSET("MoveInputComponent::left", 0x2E);
     ADD_OFFSET("MoveInputComponent::right", 0x2F);
+
+    ADD_OFFSET("ClientInstance::getScreenName", 264);
 }
 
 void OffsetInit::init2120() {
-    Logger::debug("[Offsets] Loading offsets for 1.21.2X");
+    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.21.2X");
 
     ADD_OFFSET("Actor::hurtTime", 0x1F4);
     ADD_OFFSET("Actor::level", 0x230);
@@ -75,10 +84,9 @@ void OffsetInit::init2120() {
 
     ADD_OFFSET("PlayerInventory::inventory", 0xB8);
 
-    ADD_OFFSET("UIControl::x", 0x10);
-    ADD_OFFSET("UIControl::y", 0x14);
+    ADD_OFFSET("UIControl::parentRelativePosition", 0x10);
     ADD_OFFSET("UIControl::LayerName", 0x20);
-    ADD_OFFSET("UIControl::scale", 0x48);
+    ADD_OFFSET("UIControl::sizeConstrains", 0x48);
 
     ADD_OFFSET("UIControl::children", 0x90);
     ADD_OFFSET("UIControl::components", 0xB0);
@@ -86,6 +94,7 @@ void OffsetInit::init2120() {
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x390);
 
     ADD_OFFSET("Level::hitResult", 0x220);
+    ADD_OFFSET("Level::worldFolderName", 0x290);
     ADD_OFFSET("Level::getPlayerMap", 0xBF8);
 
     ADD_OFFSET("ItemActor::stack", 0x408);
@@ -94,7 +103,7 @@ void OffsetInit::init2120() {
 }
 
 void OffsetInit::init2100() {
-    Logger::debug("[Offsets] Loading offsets for 1.21.0X");
+    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.21.0X");
 
     ADD_OFFSET("Inventory::getItem", 7);
 
@@ -112,10 +121,12 @@ void OffsetInit::init2100() {
     ADD_OFFSET("Level::getPlayerMap", 0x1BC8); // getRuntimeActorList offset + B8 || Level::getPlayerList
 
     ADD_OFFSET("ItemActor::stack", 0x448);
+
+    ADD_OFFSET("ClientInstance::getScreenName", 260);
 }
 
 void OffsetInit::init2080() {
-    Logger::debug("[Offsets] Loading offsets for 1.20.8X");
+    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.20.8X");
 
     ADD_OFFSET("Actor::baseTickVft", 26);
 
@@ -131,13 +142,14 @@ void OffsetInit::init2080() {
     ADD_OFFSET("RaknetConnector::getPeer", 0x298);
 
     ADD_OFFSET("Level::hitResult", 0xB30);
+    ADD_OFFSET("Level::worldFolderName", 0x6C8);
     ADD_OFFSET("Level::getPlayerMap", 0x1C88);
 
     ADD_OFFSET("ItemActor::stack", 0x470);
 }
 
 void OffsetInit::init2070() {
-    Logger::debug("[Offsets] Loading offsets for 1.20.7X");
+    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.20.7X");
 
     ADD_OFFSET("ClientInstance::getBlockSource", 28);
 
@@ -156,12 +168,13 @@ void OffsetInit::init2070() {
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x5FC);
 
     ADD_OFFSET("Level::hitResult", 0xB18);
+    ADD_OFFSET("Level::worldFolderName", 0x6D0);
 
     ADD_OFFSET("ItemActor::stack", 0x498);
 }
 
 void OffsetInit::init2060() {
-    Logger::debug("[Offsets] Loading offsets for 1.20.6X");
+    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.20.6X");
 
     ADD_OFFSET("Actor::hurtTime", 0x234);
     ADD_OFFSET("Actor::level", 0x290);
@@ -181,13 +194,14 @@ void OffsetInit::init2060() {
     ADD_OFFSET("RakPeer::GetAveragePing", 44);
 
     ADD_OFFSET("Level::hitResult", 0xA98);
+    ADD_OFFSET("Level::worldFolderName", 0x650);
     ADD_OFFSET("Level::getPlayerMap", 0x1E98);
 
     ADD_OFFSET("ItemActor::stack", 0x4D0);
 }
 
 void OffsetInit::init2050() {
-    Logger::debug("[Offsets] Loading offsets for 1.20.5X");
+    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.20.5X");
 
     ADD_OFFSET("ClientInstance::getBlockSource", 27);
 
@@ -207,6 +221,7 @@ void OffsetInit::init2050() {
     ADD_OFFSET("NetworkSystem::remoteConnectorComposite", 0x80);
 
     ADD_OFFSET("Level::hitResult", 0xA48);
+    ADD_OFFSET("Level::worldFolderName", 0x678);
     ADD_OFFSET("Level::getPlayerMap", 0x1EA8);
 
     ADD_OFFSET("ItemActor::stack", 0x4C8);
@@ -215,8 +230,7 @@ void OffsetInit::init2050() {
 }
 
 void OffsetInit::init2040() {
-    // getGamma, combo &
-    Logger::debug("[Offsets] Loading offsets for 1.20.4X");
+    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.20.4X");
 
     ADD_OFFSET("Actor::hurtTime", 0x204);
     ADD_OFFSET("Actor::baseTickVft", 30);
@@ -232,12 +246,13 @@ void OffsetInit::init2040() {
 
     ADD_OFFSET("Level::hitResult", 0xA68);
     ADD_OFFSET("Level::getPlayerMap", 0x25F0);
+    ADD_OFFSET("Level::worldFolderName", 0x15A0);
 
     ADD_OFFSET("OptionInfo::TranslateName", 0x168);
 }
 
 void OffsetInit::init2030() {
-    Logger::debug("[Offsets] Loading offsets for 1.20.3X"); // quite some offsets are wrong
+    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.20.3X");
 
     ADD_OFFSET("MoveInputComponent::forward", 0x0A);
     ADD_OFFSET("MoveInputComponent::backward", 0x0B);
@@ -304,6 +319,7 @@ void OffsetInit::init2030() {
 
     ADD_OFFSET("Biome::temparature", 0x40);
 
+    ADD_OFFSET("Dimension::name", 0x20);
     ADD_OFFSET("Dimension::weather", 0x1A8);
 
     ADD_OFFSET("Weather::lightingLevel", 0x44);
@@ -350,15 +366,16 @@ void OffsetInit::init2030() {
     ADD_OFFSET("CustomRenderComponent::renderer", 0x18);
 
     ADD_OFFSET("UIControl::LayerName", 0x18);
-    ADD_OFFSET("UIControl::scale", 0x40);
-    ADD_OFFSET("UIControl::x", 0x78);
-    ADD_OFFSET("UIControl::y", 0x7C);
+    ADD_OFFSET("UIControl::sizeConstrains", 0x40);
+    ADD_OFFSET("UIControl::parentRelativePosition", 0x78);
     ADD_OFFSET("UIControl::children", 0xA0);
     ADD_OFFSET("UIControl::components", 0xC0);
 
     ADD_OFFSET("VisualTree::root", 0x8);
 
+    ADD_OFFSET("Level::biome", 0x850);
     ADD_OFFSET("Level::hitResult", 0xA48);
+    ADD_OFFSET("Level::worldFolderName", 0x15A0);
     ADD_OFFSET("Level::getPlayerMap", 0x2608);
 
     ADD_OFFSET("ItemActor::stack", 0x4A0);

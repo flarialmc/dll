@@ -10,7 +10,7 @@ private:
     bool triggered = false;
 public:
     AutoRQ() : Module("Auto RE Q", "Automatically requeues into a game (Hive)",
-                      IDR_RE_Q_PNG, "") {
+                      IDR_AUTORQ_PNG, "") {
         Module::setup();
     };
 
@@ -104,7 +104,7 @@ public:
             if (this->settings.getSettingByName<bool>("solo")->value) {
                 auto *pkt = reinterpret_cast<SetTitlePacket *>(event.getPacket());
 
-                if (pkt->text == "§cYou're a spectator!" ||
+                if (//pkt->text == "§cYou're a spectator!" || //this brobably isn't needed anymore
                     pkt->text == "§cYou died!" ||
                     pkt->text == "§7You're spectating the §as§eh§6o§cw§7!") {
                     reQ();
@@ -112,11 +112,12 @@ public:
                 }
             }
         }
-        if (id == MinecraftPacketIds::PlaySoundA) {
+        if (id == MinecraftPacketIds::Text) {
             if (this->settings.getSettingByName<bool>("solo")->value) {
-                auto *pkt = reinterpret_cast<PlaySoundPacket *>(event.getPacket());
+                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
-                if (pkt->mName == "hive.grav.game.portal.reached.final") {
+                if (pkt->message.substr(0,48) == "§a§l» §r§eYou finished all maps and came in" || //gravity
+                    pkt->message.substr(0,30) == "§a§l» §r§eYou finished in") { //deathrun
                     reQ();
 
                 }

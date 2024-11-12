@@ -87,15 +87,12 @@ void Client::initialize() {
 
     std::string title = WinrtUtils::getFormattedVersion() + " " + current_commit;
     setWindowTitle(L"Flarial " + FlarialGUI::to_wide(title));
-    Logger::debug("[INIT] Initializing Flarial...");
     
     VersionUtils::init();
     Client::version = WinrtUtils::getFormattedVersion();
-    Logger::debug("[INIT] Version: " + WinrtUtils::getVersion());
-    Logger::debug("[INIT] Formatted: " + Client::version);
 
     if (!VersionUtils::isSupported(Client::version)) {
-        Logger::debug("[INFO] Version not supported!");
+        Logger::fatal("Minecraft version is not supported!");
         MessageBox(NULL, "Flarial: this version is not supported!", "", MB_OK);
         ModuleManager::terminate();
         Client::disable = true;
@@ -217,11 +214,8 @@ void Client::initialize() {
 
     FlarialGUI::LoadFont(IDR_MINECRAFTIA_TTF);
 
-    Logger::initialize();
-
     HookManager::initialize();
     ModuleManager::initialize();
-    Logger::debug("[Client] Ready.");
 }
 
 std::string window = "Minecraft";
@@ -235,6 +229,7 @@ bool InHudScreen = false;
 bool toes = false;
 
 void Client::centerCursor() {
+    if(Client::disable) return;
     if (hWnd != nullptr && Client::settings.getSettingByName<bool>("centreCursor")->value) {
         if (!toes) {
             toes = true;

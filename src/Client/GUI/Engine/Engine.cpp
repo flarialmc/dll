@@ -329,7 +329,7 @@ bool FlarialGUI::isRectInRect(const D2D1_RECT_F &outer, const D2D1_RECT_F &inner
 }
 
 void FlarialGUI::PushSize(float x, float y, float width, float height) {
-    Dimension size;
+    Dimensions size;
     size.x = x;
     size.y = y;
     size.width = width;
@@ -733,9 +733,10 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
 
 
     D2D1_COLOR_F color = colors_text_rgb ? rgbColor : colors_text;
+
     color.a = o_colors_text;
 
-    if(FlarialGUI::inMenu && !troll) color.a = ClickGUI::settingsOpacity;
+    if(FlarialGUI::inMenu && !troll && ClickGUI::settingsOpacity != 1 && ClickGUI::curr != "modules") color.a = ClickGUI::settingsOpacity;
 
     return FlarialTextWithFont(x, y, text, width, height, alignment, fontSize, weight, color, moduleFont);
 }
@@ -1028,8 +1029,8 @@ bool FlarialGUI::LoadFontFromFontFamily(std::string name, std::string weightedNa
         if (fontFile) {
 
             ImFontConfig config;
-            FontMap[weightedName + "-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 23, &config);
-            FontMap[weightedName + "-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 40, &config);
+            FontMap[weightedName + "-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 200, &config);
+            FontMap[weightedName + "-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 200, &config);
             if(!FontMap[weightedName + "-1"]) return false;
             return true;
 
@@ -1421,7 +1422,7 @@ void FlarialGUI::CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to) {
         D2D1_BITMAP_PROPERTIES props = D2D1::BitmapProperties(from->GetPixelFormat());
         HRESULT hr = D2D::context->CreateBitmap(from->GetPixelSize(), props, to);
         if (FAILED(hr)) {
-            Logger::debug("Failed to create bitmap");
+            Logger::error("Failed to create bitmap");
             return;  // Handle the failure to create the bitmap
         }
     } else if (from->GetPixelSize() != (*to)->GetPixelSize()) {
@@ -1429,7 +1430,7 @@ void FlarialGUI::CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to) {
         D2D1_BITMAP_PROPERTIES props = D2D1::BitmapProperties(from->GetPixelFormat());
         HRESULT hr = D2D::context->CreateBitmap(from->GetPixelSize(), props, to);
         if (FAILED(hr)) {
-            Logger::debug("Failed to create bitmap");
+            Logger::error("Failed to create bitmap");
             return;  // Handle the failure to create the bitmap
         }
     }

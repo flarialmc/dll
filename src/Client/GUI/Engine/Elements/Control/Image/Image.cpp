@@ -294,7 +294,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
                 //Logger::debug("Image loaded");
             }
             else {
-                Logger::debug("couldn't load image");
+            	Logger::custom(fg(fmt::color::crimson), "Image", "Failed to load image");
             }
 		}
 		else if (ImagesClass::ImguiDX11Images[resourceId] != nullptr) {

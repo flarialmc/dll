@@ -22,7 +22,7 @@ private:
     std::map<uint64_t, std::pair<bool, HitInfo>> actorsHit;
 public:
     HitPing() : Module("Hit ping", "Measures your hit delay!",
-                       IDR_LIKE_PNG, "") {
+                       IDR_PING_PNG, "") {
         Module::setup();
     };
 
@@ -98,8 +98,8 @@ public:
         this->addSlider("Padding X", "For Text Position", this->settings.getSettingByName<float>("padx")->value);
         this->addSlider("Padding Y", "For Text Position", this->settings.getSettingByName<float>("pady")->value);
 
-        this->addSlider("Rectangle Width", "", this->settings.getSettingByName<float>("rectwidth")->value);
-        this->addSlider("Rectangle Height", "", this->settings.getSettingByName<float>("rectheight")->value);
+        this->addSlider("Rectangle Width", "", this->settings.getSettingByName<float>("rectwidth")->value, 2.f, 0.001f);
+        this->addSlider("Rectangle Height", "", this->settings.getSettingByName<float>("rectheight")->value, 2.f, 0.001f);
 
         this->addToggle("Responsive Rectangle", "Rectangle resizes with text",  this->settings.getSettingByName<bool>(
 "responsivewidth")->value);

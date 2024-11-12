@@ -23,6 +23,9 @@
 #include "Hooks/Game/composeFullStack.hpp"
 #include "Hooks/Render/RenderOrderExecuteHook.hpp"
 #include "Hooks/Render/RenderChunkCoordinatorPreRenderTickHook.hpp"
+#include "Hooks/Game/SettingsScreenOnExitHook.hpp"
+#include "Hooks/Render/UIControl_updateCachedPositionHook.hpp"
+#include "Hooks/Render/HudCursorRenderer.hpp"
 //#include "Hooks/Game/RenderItemGroup.hpp"
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 
@@ -42,7 +45,7 @@ void HookManager::initialize() {
         Logger::debug("[Kiero] Trying d3d10");
     }
 
-    Logger::debug(std::format("[Kiero] Renderer: {}", dxVersion[kiero::getRenderType()]));
+    Logger::debug("[Kiero] Renderer: {}", dxVersion[kiero::getRenderType()]);
 
 
     addHook<KeyHook>();
@@ -72,16 +75,19 @@ void HookManager::initialize() {
     addHook<SendPacketHook>();
     addHook<getSensHook>();
     addHook<HudMobEffectsRendererHook>();
-    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
-        addHook<BaseActorRendererRenderTextHook>();
-    }
+    addHook<HudCursorRendererHook>();
+    addHook<BaseActorRendererRenderTextHook>();
+    addHook<UIControl_updateCachedPositionHook>();
+
+    addHook<isPreGameHook>();
+    addHook<_composeFullStackHook>();
+
+    addHook<RenderOrderExecuteHook>();
+    addHook<RenderChunkCoordinatorPreRenderTickHook>();
+    addHook<SettingsScreenOnExitHook>();
+
     if(WinrtUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
-        addHook<isPreGameHook>();
-        addHook<_composeFullStackHook>();
-
-        addHook<RenderOrderExecuteHook>();
-        addHook<RenderChunkCoordinatorPreRenderTickHook>();
     }
 
     for (const auto& hook: hooks)

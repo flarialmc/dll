@@ -50,6 +50,13 @@ std::string ClientInstance::getTopScreenName() {
     return SDK::currentScreen;
 }
 
+std::string ClientInstance::getScreenName() {
+    std::string screen = "no_screen";
+    screen = Memory::CallVFuncI<std::string&, std::string&>(GET_OFFSET("ClientInstance::getScreenName"), this, screen);
+    return screen;
+}
+
+
 LevelRender *ClientInstance::getLevelRender() {
     return hat::member_at<LevelRender *>(this, GET_OFFSET("ClientInstance::levelRenderer"));
 }

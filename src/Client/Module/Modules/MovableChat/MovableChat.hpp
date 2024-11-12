@@ -1,95 +1,61 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../ClickGUI/ClickGUI.hpp"
-#include "../../../Events/EventManager.hpp"
 
 class MovableChat : public Module {
 private:
-    Vec2<float> currentPos{0.0f, 0.0f};
-    bool enabled = true;
-    static inline Vec2<float> oriXy = Vec2<float>{0.0f, 0.0f};
+    static inline std::string layerName = "chat_panel";
+    Vec2<float> currentPos{};
+    bool enabled = false;
+    static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
+    Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
+    Vec2<float> lastAppliedPos = Vec2<float>{0.0f, 0.0f};
 public:
+    static inline std::string name = "Chat";
 
-    MovableChat() : Module("Movable Chat", "Makes the Minecraft chat movable.", IDR_MAN_PNG, "") {
-
+    MovableChat() : Module("Movable " + name, "Makes the Minecraft " + name + " movable.", IDR_MOVABLE_PNG, "") {
+        Listen(this, SetupAndRenderEvent, &MovableChat::onSetupAndRender)
         Module::setup();
-
     };
 
     void onEnable() override {
         Listen(this, RenderEvent, &MovableChat::onRender)
-        Listen(this, SetupAndRenderEvent, &MovableChat::onSetupAndRender)
+        Listen(this, UIControlGetPositionEvent, &MovableChat::onUIControlGetPosition)
+
+        if (FlarialGUI::inMenu) {
+            FlarialGUI::Notify("To change the position of the " + name +", Please click " +
+                               ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
+                                       "editmenubind")->value + " in the settings tab.");
+        }
         Module::onEnable();
     }
 
     void onDisable() override {
-        Listen(this, RenderEvent, &MovableChat::onRender)
-        Listen(this, SetupAndRenderEvent, &MovableChat::onSetupAndRender)
+        Deafen(this, RenderEvent, &MovableChat::onRender)
+        Deafen(this, UIControlGetPositionEvent, &MovableChat::onUIControlGetPosition)
+
         Module::onDisable();
     }
 
     void defaultConfig() override {
-
-        if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 21.0f);
         if (settings.getSettingByName<float>("percentageX") == nullptr) {
             settings.addSetting("percentageX", 0.0f);
         }
         if (settings.getSettingByName<float>("percentageY") == nullptr) {
             settings.addSetting("percentageY", 0.0f);
         }
-        if (settings.getSettingByName<bool>("vertical") == nullptr) settings.addSetting("vertical", false);
-
     }
 
-    void settingsRender(float settingsOffset) override {
-
-        /* Border Start */
-
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
-
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
-
-        FlarialGUI::ScrollBar(toggleX, toggleY, 140, 40, 2);
-        FlarialGUI::SetScrollView(toggleX, toggleY, Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(0.90, "height"));
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"UI Scale", textWidth * 6.9f,
-                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        float percent = FlarialGUI::Slider(3, toggleX + Constraints::SpacingConstraint(0.65, textWidth),
-                                           toggleY,
-                                           this->settings.getSettingByName<float>("uiscale")->value, 40.0f);
-
-        this->settings.getSettingByName<float>("uiscale")->value = percent;
-
-        FlarialGUI::UnsetScrollView();
-    }
+    void settingsRender(float settingsOffset) override {}
 
     void onRender(RenderEvent &event) {
 
-        if (!this->isEnabled()) enabled = false;
+        auto name = SDK::getCurrentScreen();
 
-        if (ClientInstance::getTopScreenName() == "hud_screen" &&
-            this->isEnabled() ||
-            ClientInstance::getTopScreenName() == "pause_screen" &&
-            this->isEnabled()) {
+        if (name == "hud_screen" || name == "pause_screen") {
 
-            if (!enabled && FlarialGUI::inMenu) {
-                FlarialGUI::Notify("To change the position of the chat, Please click " +
-                                   ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                                           "editmenubind")->value);
-                enabled = true;
-            }
-
-            float width = Constraints::RelativeConstraint(0.0366, "height", true) *
-                          this->settings.getSettingByName<float>("uiscale")->value;
-            float height = Constraints::RelativeConstraint(0.015, "height", true) *
-                           this->settings.getSettingByName<float>("uiscale")->value;
+            float width = currentSize.x;
+            float height = currentSize.y;
 
 
             Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
@@ -98,13 +64,13 @@ public:
             if (settingperc.x != 0)
                 currentPos = Vec2<float>(settingperc.x * MC::windowSize.x,
                                          settingperc.y * MC::windowSize.y);
-            else if (settingperc.x == 0 and oriXy.x != 0.0f)
-                currentPos = Vec2<float>{oriXy.x, oriXy.y};
+            else if (settingperc.x == 0 and originalPos.x != 0.0f)
+                currentPos = Vec2<float>{originalPos.x, originalPos.y};
 
             if (ClickGUI::editmenu)
-                FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 21);
+                FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 26);
 
-            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 21, width, height);
+            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 26, width, height);
 
 
             currentPos.x = vec2.x;
@@ -120,35 +86,92 @@ public:
                                         height);
                 FlarialGUI::UnsetWindowRect();
             }
-        } else {
-            enabled = false;
+        }
+    }
+
+    void onUIControlGetPosition(UIControlGetPositionEvent &event) { // happens when game updates control position
+        auto control = event.getControl();
+        if (control->getLayerName() == layerName) {
+            if(!isEnabled()) return;
+            if (originalPos == Vec2<float>{0, 0}) {
+                originalPos = PositionUtils::getScreenScaledPos(control->parentRelativePosition);
+                return;
+            }
+            Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
+            if(event.getPosition() == nullptr) { // 1.21.30 and below
+                control->parentRelativePosition = scaledPos;
+                control->forEachChild([](std::shared_ptr<UIControl> &child) {
+                    child->updatePosition();
+                });
+                return;
+            };
+            if(*event.getPosition() == PositionUtils::getScaledPos(currentPos)) return;
+
+            event.setPosition(scaledPos);
         }
     }
 
     void onSetupAndRender(SetupAndRenderEvent &event) {
-        if (this->isEnabled()) {
+        update();
+    };
 
-            if (SDK::screenView->VisualTree->root->getLayerName() == "hud_screen") {
-
-                SDK::screenView->VisualTree->root->forEachControl([this](const std::shared_ptr<UIControl> &control) {
-
-                    if (control->getLayerName() == "chat_panel" && this->isEnabled()) {
-
-
-                        if (oriXy.x == 0.0f) {
-                            oriXy.x = control->x;
-                            oriXy.y = control->y;
-                        }
-
-                        Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
-
-                        control->x = scaledPos.x + 5;
-                        control->y = scaledPos.y;
-
-                        control->scale = this->settings.getSettingByName<float>("uiscale")->value + 100;
-                    }
-                });
-            }
+    void update() {
+        if(ClickGUI::editmenu) {
+            if (!isEnabled()) return;
+        } else {
+            if (lastAppliedPos != Vec2<float>{0, 0} && lastAppliedPos == (isEnabled() ? currentPos : originalPos)) return;
         }
+        if(SDK::getCurrentScreen() != "hud_screen") return;
+        SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl> &control) {
+            if (control->getLayerName() == layerName) {
+                updatePosition(control.get());
+                return true; // dont go through other controls
+            }
+            return false;
+        });
+    }
+
+    void updatePosition(UIControl* control) {
+        if (!(SDK::clientInstance && SDK::clientInstance->getLocalPlayer())) return;
+
+        auto pos = control->parentRelativePosition;
+
+        if (isEnabled() && originalPos == Vec2<float>{0, 0}) {
+            originalPos = PositionUtils::getScreenScaledPos(pos);
+            currentPos = originalPos;
+        }
+
+        Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
+        Vec2<float> scaledOriginalPos = PositionUtils::getScaledPos(originalPos);
+
+        control->parentRelativePosition = isEnabled() ? scaledPos : scaledOriginalPos;
+        lastAppliedPos = isEnabled() ? currentPos : originalPos;
+        if(WinrtUtils::checkAboveOrEqual(21,40)) {
+            control->updatePosition(true);
+        }
+        control->forEachChild([](std::shared_ptr<UIControl> &child) {
+            child->updatePosition();
+        });
+
+        auto size = control->sizeConstrains;
+
+        auto scaledSize = PositionUtils::getScreenScaledPos(size);
+
+        if (scaledSize == Vec2<float>{0, 0}) {
+            currentSize = PositionUtils::getScreenScaledPos(Vec2<float>{100.f, 100.0f});
+            return;
+        }
+
+        auto _scaledSize = PositionUtils::getScreenScaledPos(size);
+
+        if(_scaledSize.x < 10)
+            _scaledSize.x = 10;
+
+        if(_scaledSize.y < 10)
+            _scaledSize.y = 10;
+
+        currentSize = _scaledSize;
+
+        return;
     }
 };

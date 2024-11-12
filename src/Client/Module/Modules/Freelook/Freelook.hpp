@@ -27,7 +27,7 @@ public:
         originalYaw1 = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4]) yaw1);
         originalYaw2 = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4]) yaw2);
 
-        if(WinrtUtils::checkBelowOrEqual(21,30)) {
+        if (WinrtUtils::checkBelowOrEqual(21, 30)) {
             pitch = GET_SIG_ADDRESS("CameraPitch");
             movement = GET_SIG_ADDRESS("CameraMovement");
 
@@ -45,27 +45,27 @@ public:
         keybindActions.push_back([this](std::vector<std::any> args) -> std::any {
 
             std::string serverIP = SDK::getServerIP();
-if ((serverIP.find("hive") != std::string::npos ||
-serverIP.find("galaxite") != std::string::npos ||
-serverIP.find("venity") != std::string::npos)) { // TODO: make it only show once per server switch?
-FlarialGUI::Notify("Can't use freelook on " + serverIP); // TODO: move restrictions to API
-this->restricted = true;
-} else {
-this->restricted = false;
-}
-if (!this->restricted) {
-if (this->settings.getSettingByName<bool>("toggle")->value) {
-if (!this->active) {
-    patch();
-}else{
-    unpatch();
-}
-} else {
-patch();
-}
-} else {
-unpatch(); // module restricted
-}
+            if ((serverIP.find("hive") != std::string::npos ||
+                 serverIP.find("galaxite") != std::string::npos ||
+                 serverIP.find("venity") != std::string::npos)) { // TODO: make it only show once per server switch?
+                FlarialGUI::Notify("Can't use freelook on " + serverIP); // TODO: move restrictions to API
+                this->restricted = true;
+            } else {
+                this->restricted = false;
+            }
+            if (!this->restricted) {
+                if (this->settings.getSettingByName<bool>("toggle")->value) {
+                    if (!this->active) {
+                        patch();
+                    } else {
+                        unpatch();
+                    }
+                } else {
+                    patch();
+                }
+            } else {
+                unpatch(); // module restricted
+            }
             return {};
 
 
@@ -101,22 +101,22 @@ unpatch(); // module restricted
     }
 
     void patch() {
-        if(this->active) return;
+        if (this->active) return;
         this->active = true;
         Memory::patchBytes((void *) yaw1, nop, 4);
         Memory::patchBytes((void *) yaw2, nop, 4);
-        if(WinrtUtils::checkBelowOrEqual(21,30)) {
+        if (WinrtUtils::checkBelowOrEqual(21, 30)) {
             Memory::patchBytes((void *) pitch, nop, 4);
             Memory::patchBytes((void *) movement, nop, 4);
         }
     }
 
     void unpatch() {
-        if(!this->active) return;
+        if (!this->active) return;
         this->active = false;
         Memory::patchBytes((void *) yaw1, originalYaw1.data(), 4);
         Memory::patchBytes((void *) yaw2, originalYaw2.data(), 4);
-        if(WinrtUtils::checkBelowOrEqual(21,30)) {
+        if (WinrtUtils::checkBelowOrEqual(21, 30)) {
             Memory::patchBytes((void *) pitch, originalPitch.data(), 4);
             Memory::patchBytes((void *) movement, originalMovement.data(), 4);
         }
@@ -146,9 +146,12 @@ unpatch(); // module restricted
         this->addHeader("Misc");
         this->addKeybind("Freelook Keybind", "Hold for 2 seconds!", getKeybind());
 
-        this->addToggle("Toggleable Mode", "Click to toggle or Hold to keep enabled", this->settings.getSettingByName<bool>("toggle")->value);
+        this->addToggle("Toggleable Mode", "Click to toggle or Hold to keep enabled",
+                        this->settings.getSettingByName<bool>("toggle")->value);
 
-        this->addDropdown("Freelook View Mode", "", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, this->settings.getSettingByName<std::string>("mode")->value);
+        this->addDropdown("Freelook View Mode", "",
+                          std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"},
+                          this->settings.getSettingByName<std::string>("mode")->value);
 
         FlarialGUI::UnsetScrollView();
 
@@ -166,17 +169,18 @@ unpatch(); // module restricted
         if (this->active) {
             std::string setting = this->settings.getSettingByName<std::string>("mode")->value;
             // TODO: Let use F5 (perspective switch key)
-            if(setting == "1st Person") {
+            if (setting == "1st Person") {
                 event.setPerspective(Perspective::FirstPerson);
             }
-            if(setting == "3rd Person back") {
+            if (setting == "3rd Person back") {
                 event.setPerspective(Perspective::ThirdPersonBack);
             }
-            if(setting == "3rd Person front") {
+            if (setting == "3rd Person front") {
                 event.setPerspective(Perspective::ThirdPersonFront);
             }
         }
     }
+
     // TODO: better restriction systtem !!!
     // TODO: cancel event if its ment for this module ?
     void onKey(KeyEvent &event) {

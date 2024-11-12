@@ -69,14 +69,24 @@
 
 #include "Modules/ItemPhysics/ItemPhysics.hpp"
 #include "Modules/Crosshair/Crosshair.hpp"
+#include "Modules/CustomCrosshair/CustomCrosshair.hpp"
 #include "Modules/HiveStat/HiveStat.hpp"
 #include "Modules/OpponentReach/OpponentReach.hpp"
 #include "Modules/ViewModel/ViewModel.hpp"
 #include "Modules/PotionHUD/PotionHUD.hpp"
 #include "Modules/FasterInventory/FasterInventory.hpp"
+#include "Modules/Waypoints/Waypoints.hpp"
 
 #include "Modules/EntityCounter/EntityCounter.hpp"
 #include "Modules/PackChanger/PackChanger.hpp"
+#include "Modules/MovableHUD/MovableHUD.hpp"
+#include "Modules/MovableScoreboard/MovableScoreboard.hpp"
+#include "Modules/MovableTitle/MovableTitle.hpp"
+#include "Modules/MovableBossbar/MovableBossbar.hpp"
+#include "Modules/MovableChat/MovableChat.hpp"
+#include "Modules/MovableCoordinates/MovableCoordinates.hpp"
+#include "Modules/MovableHotbar/MovableHotbar.hpp"
+#include "Modules/NullMovement/NullMovement.hpp"
 
 namespace ModuleManager {
     std::unordered_map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -158,13 +168,23 @@ void ModuleManager::initialize() {
     addModule<ViewModel>();
     addModule<PotionHUD>();
     addModule<FasterInventory>();
-    // addModule<MovableChat>();
+    //addModule<MovableHUD>();
+    addModule<MovableScoreboard>();
+    addModule<MovableTitle>();
+    addModule<MovableBossbar>();
+    addModule<MovableChat>();
+    addModule<MovableCoordinates>();
+    addModule<MovableHotbar>();
     // addModule<CompactChat>();
     addModule<ItemPhysics>();
     addModule<HiveStat>();
+    addModule<Waypoints>();
     if(WinrtUtils::checkAboveOrEqual(21, 40)) {
         addModule<PackChanger>(); // tss, let it be a surprise!
     }
+
+    addModule<NullMovement>();
+    addModule<CustomCrosshair>();
 
     addService<GUIKeyListener>();
     addService<DiscordRPCListener>();

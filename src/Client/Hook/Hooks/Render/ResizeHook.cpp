@@ -15,6 +15,7 @@
 #include "../../../Module/Manager.hpp"
 #include "../../../GUI/Engine/Elements/Structs/ImagesClass.hpp"
 #include "../../../../../lib/ImGui/imgui.h"
+#include "../../../Client.hpp"
 
 void ResizeHook::enableHook() {
 
@@ -50,6 +51,19 @@ ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT wi
                 if(SDK::clientInstance!=nullptr)
                     SDK::clientInstance->releaseMouse();
 
+    std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
+
+
+    if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
+        bufferCount = 2;
+    } else if (bufferingMode == "Triple Buffering") {
+        bufferCount = 3;
+    }
+
+    if (SwapchainHook::currentVsyncState) {
+        return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, flags);
+    }
+
     return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
 }
 
@@ -75,19 +89,20 @@ void ResizeHook::cleanShit(bool isResize) {
 
 
     if(!isResize) {
+        if (ImGui::GetCurrentContext()) {
+            ImGui::GetIO().Fonts->Clear();
+            FlarialGUI::FontMap.clear();
 
-        ImGui::GetIO().Fonts->Clear();
-        FlarialGUI::FontMap.clear();
+            ImGui_ImplWin32_Shutdown();
 
-        ImGui_ImplWin32_Shutdown();
+            if (!SwapchainHook::queue)
+                ImGui_ImplDX11_Shutdown();
+            else ImGui_ImplDX12_Shutdown();
+            ImGui::DestroyContext();
 
-        if(!SwapchainHook::queue)
-            ImGui_ImplDX11_Shutdown();
-        else ImGui_ImplDX12_Shutdown();
-        ImGui::DestroyContext();
-
-        FlarialGUI::DoLoadModuleFontLater = true;
-        FlarialGUI::DoLoadGUIFontLater = true;
+            FlarialGUI::DoLoadModuleFontLater = true;
+            FlarialGUI::DoLoadGUIFontLater = true;
+        }
     }
 
 

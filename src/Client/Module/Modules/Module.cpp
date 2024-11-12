@@ -205,7 +205,7 @@ void Module::resetPadding() {
 
     colorPickerIndex = 100;
     keybindIndex = 0;
-    textboxIndex = 0;
+    textboxIndex = 300;
     FlarialGUI::UnSetIsInAdditionalYMode();
 }
 
@@ -337,10 +337,14 @@ void Module::addElementText(std::string text, std::string subtext) {
     }
 
     D2D1_COLOR_F textCol = D2D1::ColorF(D2D1::ColorF::White);
-    textCol.a = ClickGUI::settingsOpacity;
     D2D1_COLOR_F subtextCol = FlarialGUI::HexToColorF("473b3d");
-    subtextCol.a = ClickGUI::settingsOpacity;
+    textCol.a = o_colors_text;
+    subtextCol.a = o_colors_text;
 
+    if(ClickGUI::settingsOpacity != 1) {
+        textCol.a = ClickGUI::settingsOpacity;
+        subtextCol.a = ClickGUI::settingsOpacity;
+    }
 
     FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, textCol, false);
     if (!subtext.empty()) FlarialGUI::FlarialTextWithFont(x, subtextY, FlarialGUI::to_wide(subtext).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, subtextCol, false);
@@ -397,11 +401,11 @@ void Module::saveSettings() const {
             outputFile.close();
         }
         else {
-            Logger::error("Failed to open file. Maybe it doesn't exist?: " + settingspath);
+            Logger::error("Failed to open file. Maybe it doesn't exist?: {}", settingspath);
         }
     }
     catch (const std::exception& ex) {
-        Logger::error(ex.what());
+        Logger::error("An error occurred while saving settings: {}", ex.what());
     }
 }
 
@@ -413,7 +417,7 @@ void Module::loadSettings() {
         ss << inputFile.rdbuf();
         inputFile.close();
     } else {
-        Logger::error("File could not be opened. Maybe it doesn't exist?: " + settingspath);
+        Logger::error("Failed to open file. Maybe it doesn't exist?: {}", settingspath);
         return;
     }
 
@@ -424,6 +428,12 @@ void Module::loadSettings() {
         const std::string& name = settingPair.first;
         if (name.find("keybind") != std::string::npos) {
             ++totalKeybinds;
+        }
+    }
+    for (const auto& settingPair : settings.settings) {
+        const std::string& name = settingPair.first;
+        if (name.find("waypoint") != std::string::npos) {
+            ++totalWaypoints;
         }
     }
 }
@@ -440,7 +450,7 @@ void Module::checkSettingsFile() const {
             OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
         if (fileHandle == INVALID_HANDLE_VALUE) {
-            Logger::error("Failed to create file: " + settingspath);
+            Logger::error("Failed to create file: {}", settingspath);
             return;
         }
 
@@ -494,6 +504,7 @@ void Module::terminate() {
 
 // TODO: find all getSettingByName<bool>("enabled")->value and replace!!!
 bool Module::isEnabled() {
+    if(!settings.getSettingByName<bool>("enabled")) return false;
     return settings.getSettingByName<bool>("enabled")->value;
 }
 
@@ -592,7 +603,6 @@ bool Module::isKeybind(const std::array<bool, 256>& keys, const int keybindCount
 
     for (int keyCode : keyCodes) {
         if (!keys[keyCode]) {
-            // Key is not being held down
             return false;
         }
     }

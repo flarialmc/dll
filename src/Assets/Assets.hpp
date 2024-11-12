@@ -75,8 +75,48 @@
 #define IDR_RED_LOGO_PNG 175
 #define IDR_WHITE_LOGO_PNG 176
 #define IDR_YELLOW_LOGO_PNG 177
+#define IDR_WAYPOINTS_PNG 178
+#define IDR_MOVABLE_PNG 179
+#define IDR_AUTORQ_PNG 180
+#define IDR_INVENTORY_PNG 181
+#define IDR_SCALE_PNG 182
+#define IDR_ENTITYCOUNTER_PNG 183
+#define IDR_01_JPG 184
+#define IDR_02_JPG 185
+#define IDR_03_JPG 186
+#define IDR_04_JPG 187
+#define IDR_05_JPG 188
+#define IDR_06_JPG 189
+#define IDR_07_JPG 190
+#define IDR_08_JPG 191
+#define IDR_09_JPG 192
+#define IDR_10_JPG 193
+#define IDR_11_JPG 194
+#define IDR_12_JPG 195
+#define IDR_13_JPG 196
+#define IDR_14_JPG 197
+#define IDR_15_JPG 198
+#define IDR_16_JPG 199
+#define IDR_17_JPG 200
+#define IDR_18_JPG 201
+#define IDR_19_JPG 202
+#define IDR_20_JPG 203
+#define IDR_21_JPG 204
+#define IDR_22_JPG 205
+#define IDR_23_JPG 206
+#define IDR_24_JPG 207
+#define IDR_25_JPG 208
+#define IDR_26_JPG 209
+#define IDR_27_JPG 210
+#define IDR_28_JPG 211
+#define IDR_29_JPG 212
+#define IDR_30_JPG 213
+#define IDR_31_JPG 214
+#define IDR_32_JPG 215
+#define IDR_CHYVES_JPG 216
+#define IDR_TREEGFX_JPG 217
 
 
 // MAKE SURE YOU ALWAYS UPDATE THIS!
-#define MAX_IMAGE_ID IDR_YELLOW_LOGO_PNG
+#define MAX_IMAGE_ID IDR_TREEGFX_JPG
 

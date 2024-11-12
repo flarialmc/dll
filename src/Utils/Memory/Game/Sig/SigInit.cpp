@@ -4,7 +4,7 @@
 #include "../SignatureAndOffsetManager.hpp"
 
 void SigInit::init2140() {
-    Logger::debug("[Signatures] Loading sigs for 1.21.40");
+    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.21.40");
 
     ADD_SIG("tryGetPrefix", "48 89 5C 24 ? 57 48 83 EC 30 8B ?");
     ADD_SIG("tryGetPrefix2", "4c 8b 41 ? 4c 8b d1 48 8b 41 ? 4c 8b 49 ? 49 2b c0 8b 12 48 c1 f8 ? 48 ff");
@@ -29,7 +29,7 @@ void SigInit::init2140() {
     ADD_SIG("Actor::getStateVectorComponent", "C8 25 91 3C C9 0E");
 
     ADD_SIG("Actor::getMobEffectsComponent", "48 89 5C 24 08 48 89 74 24 10 48 89 7C 24 18 4C 89 6C 24 20 55 41 56 41 57 48 8D 6C 24 B9 48 81 EC E0"); // 10 BA 2F B4 D6 F7
-    DEPRECATE_SIG("Actor::getRuntimeIDComponent"); // 10 BA 14 14 A1 3C ??
+    DEPRECATE_SIG("Actor::getRuntimeIDComponent"); // 10 BA 14 14 A1 3C ?
     ADD_SIG("Actor::getMoveInputHandler", "C8 25 2E CD 8B 46");
     // 49 2B C0 8B 12 48 C1 F8 03 48 FF C8 49 23 C3 49 8B 0C C0 48 83 F9 FF 74 1A 66 90 48 C1 E1 05 46 39 5C 09 08 4A 8D 04 09 74 0D 48 8B 08 48 83 F9 FF 75 E8
     ADD_SIG("Actor::getRenderPositionComponent", "4C 8B 41 48 41 BB 6E F3 E8 D4"); // 6E F3 E8 D4
@@ -37,8 +37,9 @@ void SigInit::init2140() {
     ADD_SIG("ThirdPersonNametag", "0F 84 B5 05 00 00 49 8B 07 49 8B CF 48 8B 80 00 01 00 00");
 
     ADD_SIG("Tessellator::begin", "40 53 55 48 83 EC 28 80 B9");
-    ADD_SIG("MeshHelpers::renderMeshImmediately", "40 53 55 56 57 41 56 48 81 EC 20 04 00 00 49 8B F1 4D 8B F0 48 8B FA 48 8B E9 80 BA 0D 02 00 00 00 0F 85 2E");
-    ADD_SIG("MeshHelpers::renderMeshImmediately2", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 98 FC FF FF 48 81 EC 68 04 00 00 49"); // bruh it changed
+
+    ADD_SIG("MeshHelpers::renderMeshImmediately", "E8 ? ? ? ? 41 C6 44 24 38 01 F3 0F 10 1D");
+    ADD_SIG("MeshHelpers::renderMeshImmediately2", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 98 FC FF FF 48 81 EC 68 04 00 00 49");
 
     // entity_alphatest_change_color_glint to vtable then to ItemRenderer::render
     DEPRECATE_SIG("glm_rotate");
@@ -60,35 +61,43 @@ void SigInit::init2140() {
 
     ADD_SIG("BlockSource::getBiome", "48 89 5C 24 18 57 48 83 EC 60 48 8B DA 48 8B F9 48 8B"); // world_loading_progress_screen sub_14XXXXXX(arg) + 16;
 
-    ADD_SIG("MinecraftPackets::createPacket", "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 81 EC A0 00 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 98 00 00 00 48 8B F9");
+    ADD_SIG("MinecraftPackets::createPacket", "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 81 EC A0 00 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 98 00 00 00 48 8B F9");
 
     ADD_SIG("Options::getSensitivity", "48 83 EC 18 48 8B 41 08 4C 8B C9"); // "AutoUpdate" / "gameLocale" / "Options" has ref to it
 
     ADD_SIG("blockHighlightColor", "? ? ? ? 0F 11 85 78 02 00 00 0F 11 00");
 
-    ADD_SIG("HurtColor", "E8 ?? ?? ?? ?? 0F 28 05 ?? ?? ?? ?? 0F 11 85 68 02 00 00");
+    ADD_SIG("HurtColor", "E8 ? ? ? ? 0F 28 05 ? ? ? ? 0F 11 85 68 02 00 00");
 
     ADD_SIG("Level::getRuntimeActorList", "48 89 5C 24 18 55 56 57 48 83 EC 40 48 8B FA 48 89 54 24 30");
 
     ADD_SIG("Actor::baseTick", "48 8D 05 ? ? ? ? 48 89 01 ? ? ? ? 00 44 8D 4A 04 44 8D 42 02 66 C7 44 24 20 37 00 E8 ? ? ? ? 48 8B 8F 80 11 00 00"); // 8D 4A 04 44 8D 42 02 66
 
-    ADD_SIG("BaseActorRenderer::renderText", "E8 ? ? ? ? 48 83 C3 ? 48 3B DF 75 ? 48 8B 74 24 ? 48 8B 5C 24 ? 48 8B 6C 24");
+    ADD_SIG("BaseActorRenderer::renderText", "E8 ? ? ? ? 48 83 C3 70 48 3B DE 75 D3");
 
     DEPRECATE_SIG("HitResult::getEntity");
 
     ADD_SIG("HitResult::_getEntity", "40 55 57 41 54 41 56 41 57 48 83"); // params - weak ent ref at hitres+0x38 and 1 (true)
 
+
     ADD_SIG("ScreenView::setupAndRender", "48 8B C4 48 89 58 18 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 98 FD");
 
-    ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 83 EC 50 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 40 48 8B F9 40");
-    ADD_SIG("ClientInstance::isPreGame", "48 83 ec ? 48 8b 01 48 8b 80 ? ? ? ? ff 15 ? ? ? ? 48 85 c0 0f 94 c0");
-    ADD_SIG("ResourcePackManager::_composeFullStack_Patch1", "0f 84 ? ? ? ? 48 8b cf e8 ? ? ? ? 84 c0 74 ? 0f 57 c0"); // 84 to 85
+    ADD_SIG("SettingsScreenOnExit", "40 57 48 83 EC 40 48 8B 79");
+    ADD_SIG("GeneralSettingsScreenController::_setResourcePackStacks_Patch", "0f 84 ? ? ? ? 33 c0 0f 57 c9 f3 0f 7f 4c 24 ? 48 89 44 24 ? c7 44 24 ? ? ? ? ? 48 8b 8f");
+    ADD_SIG("GeneralSettingsScreenController::_processPendingImports_Patch", "0f 84 ? ? ? ? e8 ? ? ? ? 84 c0 0f 84 ? ? ? ? 0f 57 c0 33 c0");
+    ADD_SIG("ScreenRenderer::blit", "48 89 5C 24 08 57 48 83 EC 60 0F 57");
+
+    ADD_SIG("mce::RenderMaterialGroup::ui", "48 8B 05 ?? ?? ?? ?? 48 8D 55 90 48 8D 0D ?? ?? ?? ?? 48 8B 40 08 FF 15 ?? ?? ?? ?? 48 8B D8");
+
+    ADD_SIG("UIControl::getPosition", "48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 60 0F 29 74 24 50 0F 29 7C 24 40 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 30");
+    DEPRECATE_SIG("UIControl::_setCachedPosition");
 }
 
 void SigInit::init2130() {
-    Logger::debug("[Signatures] Loading sigs for 1.21.30");
+    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.21.30");
+
     ADD_SIG("Actor::baseTick", "48 8D 05 ? ? ? ? 48 89 01 BA 31 00 00 00 44 8D 4A 04 44 8D 42 02 66 C7 44 24 20 37 00 E8 ? ? ? ? 48 8B 8B 70 11 00 00");
-    ADD_SIG("ItemRenderer::renderGuiItemNew", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 D8 48 81 EC 28 01 00 00 0F 29 B4 24 10 01 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 45 00 44");
+    ADD_SIG("ItemRenderer::renderGuiItemNew", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 D8 48 81 EC 28 01 00 00 0F 29 B4 24 10 01 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 00 44");
 
     ADD_SIG("MinecraftGame::onAppSuspended", "48 89 5c 24 ? 48 89 74 24 ? 48 89 7c 24 ? 55 41 54 41 55 41 56 41 57 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? ? 8b ? 45 33 f6");
 
@@ -116,10 +125,13 @@ void SigInit::init2130() {
     ADD_SIG("mce::TextureGroup::getTexture", "40 55 53 56 57 41 54 41 56 41 57 48 8D 6C 24 E9 48 81 EC 00");
 
     DEPRECATE_SIG("ActorCollision::isOnGround");
+
+    ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 57 48 83 EC 50 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 40 48 8B F9 40");
+    ADD_SIG("HudCursorRenderer::render", "48 8b c4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8d a8 ? ? ? ? 48 81 ec ? ? ? ? 0f 29 70 ? 0f 29 78 ? 44 0f 29 40 ? 44 0f 29 48 ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 4c 89 8d");
 }
 
 void SigInit::init2120() {
-    Logger::debug("[Signatures] Loading sigs for 1.21.20");
+    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.21.20");
 
     ADD_SIG("Options::getGamma", "48 83 EC 28 80 B9 ? 17 00 00 00 48 8D 54 24 30 48 8B 01 48 8B 40 60 74 38 41 B8 19");
     ADD_SIG("mce::TextureGroup::getTexture", "40 55 53 56 57 41 55 41 56 41 57 48 8D 6C 24 E9 48 81 EC 00");
@@ -145,19 +157,23 @@ void SigInit::init2120() {
     ADD_SIG("MeshHelpers::renderMeshImmediately2", "48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 81 EC ? ? ? ? 49 8B F1 49 8B E8 48 8B FA 4C 8B F1");
 
     ADD_SIG("rendergraph::RenderOrder::execute", "4c 8b dc 53 56 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 44 24 ? 48 8b 71");
-    ADD_SIG("RenderChunkCoordinator::preRenderTick", "E8 ?? ?? ?? ?? 48 8B 03 48 8B D8 48 3B C6 75 EC 4D 8B C6");
-    // LevelRenderer::preRenderUpdate - 40 53 55 56 57 41 56 48 83 EC 50 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 48 4D 8B F0 48 8B EA
-    //
+    ADD_SIG("RenderChunkCoordinator::preRenderTick", "E8 ? ? ? ? 48 8B 03 48 8B D8 48 3B C6 75 EC 4D 8B C6");
+    // LevelRenderer::preRenderUpdate - 40 53 55 56 57 41 56 48 83 EC 50 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 48 4D 8B F0 48 8B EA
+
+    ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 10 48 89 6C 24 18 56 57 41 56 48 83 EC 50 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 40 48 8B F9 40");
+    ADD_SIG("ResourcePackManager::_composeFullStack_Patch", "0f 84 ? ? ? ? 48 8b cf e8 ? ? ? ? 84 c0 74 ? 0f 57 c0"); // 84 to 85
+
+    ADD_SIG("HudCursorRenderer::render", "48 8B C4 48 89 58 20 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 68 FA");
 }
 
 void SigInit::init2102() {
-    Logger::debug("[Signatures] Loading sigs for 1.21.02");
+    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.21.02");
 
     ADD_SIG("MinecraftPackets::createPacket", "40 53 48 83 EC ? 45 33 C0 48 8B D9 81 FA");
 }
 
 void SigInit::init2100() {
-    Logger::debug("[Signatures] Loading sigs for 1.21.0X");
+    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.21.0X");
 
     ADD_SIG("BlockSource::getBiome", "40 53 48 83 EC ? 48 8B D9 E8 ? ? ? ? 48 85 C0 75 ? 48 8B 03");
     ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 10");
@@ -174,10 +190,11 @@ void SigInit::init2100() {
     ADD_SIG("glm_translateRef2", "? ? ? ? ? C6 46 ? ? F3 0F 11 74 24 ? F3 0F 10 1D");
 
     ADD_SIG("ItemRenderer::render", "48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 49 8B D8");
+    ADD_SIG("HudMobEffectsRenderer::render", "48 89 5C 24 08 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 E0 EE FF FF");
 }
 
 void SigInit::init2080() {
-    Logger::debug("[Signatures] Loading sigs for 1.20.8X");
+    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.20.8X");
 
     ADD_SIG("tryGetPrefix2", "4C 8B 41 48 4C 8B C9 48 8B 41 50 4C 8B 51 68 49 2B C0 48 C1 F8 03 48 FF");
 
@@ -201,7 +218,7 @@ void SigInit::init2080() {
 }
 
 void SigInit::init2070() {
-    Logger::debug("[Signatures] Loading sigs for 1.20.7X");
+    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.20.7X");
 
     ADD_SIG("Dimension::getBrightnessDependentFogColor", "? ? ? ? ? ? C2 0F 11 02 C3 CC CC CC CC CC 48 89 54");
 
@@ -217,7 +234,7 @@ void SigInit::init2070() {
 }
 
 void SigInit::init2060() {
-    Logger::debug("[Signatures] Loading sigs for 1.20.6X");
+    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.20.6X");
 
     ADD_SIG("MinecraftGame::onAppSuspended", "48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 4C 8B E9 45 33 F6");
 
@@ -230,10 +247,12 @@ void SigInit::init2060() {
     ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 C8 1C 00 00");
 
     ADD_SIG("ActorCollision::isOnGround", "E8 ? ? ? ? 84 C0 49 8B 87");
+
+    ADD_SIG("HudCursorRenderer::render", "48 8b c4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8d a8 ? ? ? ? 48 81 ec ? ? ? ? 0f 29 70 ? 0f 29 78 ? 44 0f 29 40 ? 44 0f 29 48 ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 4c 89 8d");
 }
 
 void SigInit::init2050() {
-    Logger::debug("[Signatures] Loading sigs for 1.20.5X");
+    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.20.5X");
 
     ADD_SIG("tryGetPrefix", "48 89 5C 24 ? 57 48 83 EC ? 48 8B");
 
@@ -263,10 +282,12 @@ void SigInit::init2050() {
     ADD_SIG("ItemRenderer::render", "48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 90 ? ? ? ? 44 0F 29 98 ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 49 8B D8");
 
     ADD_SIG("Tessellator::vertexUV", "48 83 EC ? 80 B9 ? ? ? ? ? 0F 57 E4");
+
+    ADD_SIG("HudCursorRenderer::render", "48 8B C4 48 89 58 20 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 E8 F9");
 }
 
 void SigInit::init2040() {
-    Logger::debug("[Signatures] Loading sigs for 1.20.4X");
+    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.20.4X");
 
     ADD_SIG("LoopbackPacketSender::sendPacket", "48 83 EC ? 48 0F BE ? ? 48 83 C0 ? 74 27");
 
@@ -280,11 +301,11 @@ void SigInit::init2040() {
 
     ADD_SIG("ItemPositionConst", "F3 0F 59 05 ? ? ? ? F3 41 0F 58 87");
 
-    ADD_SIG("HudMobEffectsRenderer::render", "48 89 5C 24 08 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? EE");
+    ADD_SIG("HudMobEffectsRenderer::render", "48 89 5c 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8d ac 24 ? ? ? ? b8 ? ? ? ? e8 ? ? ? ? 48 2b e0 0f 29 b4 24 ? ? ? ? 0f 29 bc 24 ? ? ? ? 44 0f 29 84 24 ? ? ? ? 44 0f 29 8c 24 ? ? ? ? 44 0f 29 94 24 ? ? ? ? 44 0f 29 9c 24 ? ? ? ? 44 0f 29 a4 24 ? ? ? ? 44 0f 29 ac 24 ? ? ? ? 44 0f 29 b4 24 ? ? ? ? 44 0f 29 bc 24 ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 49 8b f1");
 }
 
 void SigInit::init2030() {
-    Logger::debug("[Signatures] Loading sigs for 1.20.3X");
+    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.20.3X");
 
     ADD_SIG("tryGetPrefix", "40 53 48 83 EC 20 48 8B");
 
@@ -418,4 +439,15 @@ void SigInit::init2030() {
     ADD_SIG("BaseActorRenderer::renderText", "E8 ? ? ? ? 48 83 C3 ? 48 3B DF 75 ? 48 8B 74 24 ? 48 8B 5C 24 ? 48 8B 6C 24");
 
     ADD_SIG("mce::MathUtility::getRotationFromNegZToVector", "48 8B C4 48 81 EC ? ? ? ? F3 0F 10 2A");
+
+    ADD_SIG("ClientInstance::isPreGame", "48 83 ec ? 48 8b 01 48 8b 80 ? ? ? ? ff 15 ? ? ? ? 48 85 c0 0f 94 c0");
+    ADD_SIG("SettingsScreenOnExit_Patch", "74 ? 48 8b 8f ? ? ? ? e8 ? ? ? ? 33 c0");
+
+    ADD_SIG("UIControl::_setCachedPosition", "48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 60 0F 29 74 24 50 0F 29 7C 24 40 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 30");
+    ADD_SIG("ScreenRenderer::blit", "48 83 EC 68 0F 57 C0 F3");
+    ADD_SIG("HudCursorRenderer::render", "48 8B C4 48 89 58 20 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 88 F9 FF FF 48 81 EC 40 07 00 00 0F 29 70 B8 0F 29 78 A8 44");
+
+    ADD_SIG("RenderChunkCoordinator::preRenderTick", "E8 ?? ?? ?? ?? 48 8B 03 48 8B D8 48 3B C6 75 EC");
+
+    ADD_SIG("ResourcePackManager::_composeFullStack", "48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 50 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 40 48 8B F9 48 8B");
 }

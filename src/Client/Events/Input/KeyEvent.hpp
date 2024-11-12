@@ -61,7 +61,7 @@ public:
                 if (!result.empty()) {
                     result += "+";
                 }
-                result += Utils::getKeyAsString(i, true);
+                result += Utils::getKeyAsString(i, false);
             }
 
             i++;
