@@ -35,13 +35,16 @@ void Scripting::executeFunction(lua_State* L, std::string functionName) {
         lua_pop(L, 1);
     }
 }
+void registerFunctions(lua_State* L){
+    lua_register(L, "Notify", lua_Notify);
+    lua_register(L, "onEvent", lua_register_event_handler);
+}
 
 void load(std::string name, std::string description, std::string mainclass) {
     lua_State* L = luaL_newstate();
     luaL_openlibs(L);
 
-    lua_register(L, "Notify", lua_Notify);
-    lua_register(L, "onEvent", lua_register_event_handler);
+    registerFunctions(L);
 
     const std::string path = Utils::getRoamingPath() + "\\Flarial\\scripts\\" + mainclass;
 
