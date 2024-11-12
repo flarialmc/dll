@@ -86,8 +86,7 @@ void Module::normalRender(int index, std::string &value) {
         realcenter = Constraints::CenterConstraint(rectWidth, textHeight * this->settings.getSettingByName<float>(
                 "rectheight")->value);
 
-    if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
-        ClickGUI::editmenu) {
+    if (ClickGUI::editmenu) {
         FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth,
                                   textHeight * this->settings.getSettingByName<float>("rectheight")->value, index);
 
@@ -184,8 +183,7 @@ void Module::normalRender(int index, std::string &value) {
         FlarialGUI::ImRotateEnd(rotation, rotationCenter);
     }
 
-    if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
-        ClickGUI::editmenu)
+    if (ClickGUI::editmenu)
         FlarialGUI::UnsetWindowRect();
 }
 
