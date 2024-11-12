@@ -99,6 +99,7 @@ void ResizeHook::cleanShit(bool isResize) {
             FlarialGUI::DoLoadModuleFontLater = true;
             FlarialGUI::DoLoadGUIFontLater = true;
         }
+        CloseHandle(SwapchainHook::fenceEvent);
     }
 
 
