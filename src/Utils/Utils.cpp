@@ -20,6 +20,18 @@ std::string Utils::getRoamingPath() {
     return std::string(path) + R"(\..\Local\Packages\Microsoft.MinecraftUWP_8wekyb3d8bbwe\RoamingState)"; // Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe Microsoft.MinecraftUWP_8wekyb3d8bbwe
 }
 
+std::string Utils::getLocalPath() {
+    char *path = nullptr;
+    size_t length;
+
+    _dupenv_s(&path, &length, "appdata");
+
+    if (path == nullptr)
+        return "";
+
+    return std::string(path) + R"(\..\Local\Packages\Microsoft.MinecraftUWP_8wekyb3d8bbwe\LocalState)";
+}
+
 bool Utils::hasEnding (std::string const &fullString, std::string const &ending) {
     if (fullString.length() >= ending.length()) {
         return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
@@ -459,6 +471,12 @@ bool Utils::isMinecraftLoaded(HANDLE process) {
         }
     }
     return false;
+}
+
+bool Utils::isMinecraftLoadedAetopia() {
+    const std::string path = Utils::getLocalPath() + "\\games\\com.mojang\\minecraftpe\\resource_init_lock";
+
+    return !std::filesystem::exists(path) || !std::filesystem::is_regular_file(path);
 }
 
 uint64_t Utils::getCurrentMs() {

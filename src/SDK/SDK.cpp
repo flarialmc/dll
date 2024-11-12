@@ -36,11 +36,11 @@ std::string SDK::getCurrentScreen() {
 int SDK::getServerPing() {
     if (!SDK::hasInstanced || !SDK::clientInstance) return -1;
 
-    auto* localPlayer = SDK::clientInstance->getLocalPlayer();
-    auto* rakNetConnector = SDK::clientInstance->getRakNetConnector();
+    auto player = SDK::clientInstance->getLocalPlayer();
+    auto raknet = SDK::clientInstance->getRakNetConnector();
 
-    if (!localPlayer || !rakNetConnector) return -1;
-    return rakNetConnector->JoinedIp.empty() ? 0 : static_cast<int>(SDK::serverPing);
+    if (!player || !raknet) return -1;
+    return raknet->JoinedIp.empty() ? 0 : static_cast<int>(SDK::serverPing);
 }
 
 std::string SDK::getServerIP() {
