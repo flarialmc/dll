@@ -106,8 +106,7 @@ public:
 
 
             if (settingperc.x != 0)
-                currentPos = Vec2<float>(settingperc.x * MC::windowSize.x,
-                                         settingperc.y * MC::windowSize.y);
+        currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
             else
                 currentPos = Constraints::CenterConstraint(150, 150);
 
@@ -125,7 +124,7 @@ public:
             currentPos.x = vec2.x;
             currentPos.y = vec2.y;
 
-            Vec2<float> percentages = Constraints::CalculatePercentage(currentPos.x, currentPos.y);
+            Vec2<float> percentages = Constraints::CalculatePercentage(currentPos.x, currentPos.y, width, height);
 
             this->settings.setValue("percentageX", percentages.x);
             this->settings.setValue("percentageY", percentages.y);

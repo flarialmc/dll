@@ -82,8 +82,7 @@ void Module::normalRender(int index, std::string &value) {
     Vec2<float> realcenter;
 
     if (settingperc.x != 0)
-        realcenter = Vec2<float>(settingperc.x * MC::windowSize.x, settingperc.y * MC::windowSize.y);
-    else
+        realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x - rectWidth), settingperc.y * (MC::windowSize.y - textHeight));    else
         realcenter = Constraints::CenterConstraint(rectWidth, textHeight * this->settings.getSettingByName<float>(
                 "rectheight")->value);
 
@@ -101,8 +100,7 @@ void Module::normalRender(int index, std::string &value) {
 
         realcenter = realcenter;
 
-        Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y);
-
+        Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y, rectWidth, textHeight);
         this->settings.setValue("percentageX", percentages.x);
         this->settings.setValue("percentageY", percentages.y);
     }

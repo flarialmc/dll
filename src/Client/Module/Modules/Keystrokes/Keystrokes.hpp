@@ -233,8 +233,7 @@ public:
                 Vec2<float> realcenter;
 
                 if (settingperc.x != 0)
-                    realcenter = Vec2<float>(settingperc.x * MC::windowSize.x, settingperc.y * MC::windowSize.y);
-                else realcenter = Constraints::CenterConstraint(keycardSize, keycardSize);
+                    realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x - rectWidth), settingperc.y * (MC::windowSize.y - textHeight));                else realcenter = Constraints::CenterConstraint(keycardSize, keycardSize);
 
                 Vec2<float> rounde = Constraints::RoundingConstraint(
                         this->settings.getSettingByName<float>("rounding")->value *
@@ -260,8 +259,7 @@ public:
 
                     realcenter = realcenter;
 
-                    Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y);
-
+                    Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y, rectWidth, textHeight);
                     this->settings.setValue("percentageX", percentages.x);
                     this->settings.setValue("percentageY", percentages.y);
                 }
