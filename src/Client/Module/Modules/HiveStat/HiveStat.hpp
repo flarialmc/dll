@@ -106,7 +106,7 @@ public:
 
 
             if (settingperc.x != 0)
-        currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
+        currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - 150), settingperc.y * (MC::windowSize.y - 50));
             else
                 currentPos = Constraints::CenterConstraint(150, 150);
 
