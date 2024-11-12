@@ -194,7 +194,7 @@ DWORD WINAPI init(HMODULE real)
 
 BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
-    if (ul_reason_for_call)
+    if (ul_reason_for_call == DLL_PROCESS_ATTACH)
     {
         /*
         https://learn.microsoft.com/en-us/windows/uwp/communication/sharing-named-objects
