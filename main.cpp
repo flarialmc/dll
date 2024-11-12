@@ -50,6 +50,7 @@ DWORD WINAPI init(HMODULE real) {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
     Logger::info("Minecraft loaded!");
+    CloseHandle(hProcess);
 
     Client::initialize();
 
