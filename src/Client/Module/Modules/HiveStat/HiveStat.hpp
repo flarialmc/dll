@@ -124,7 +124,7 @@ public:
             currentPos.x = vec2.x;
             currentPos.y = vec2.y;
 
-            Vec2<float> percentages = Constraints::CalculatePercentage(currentPos.x, currentPos.y, width, height);
+            Vec2<float> percentages = Constraints::CalculatePercentage(currentPos.x, currentPos.y, 150, 50);
 
             this->settings.setValue("percentageX", percentages.x);
             this->settings.setValue("percentageY", percentages.y);
