@@ -448,7 +448,7 @@ int Utils::CountBytes(const std::string& data) {
 }
 
 bool Utils::isMinecraftLoaded(HANDLE process) {
-    int modulesNeeded = 175; // I eyeballed this its like inbetween 160 and 180
+    int modulesNeeded = 170; // 160-180
     HMODULE modules[1024];
     DWORD cbNeeded;
 
@@ -459,4 +459,30 @@ bool Utils::isMinecraftLoaded(HANDLE process) {
         }
     }
     return false;
+}
+
+uint64_t Utils::getCurrentMs() {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+               std::chrono::steady_clock::now().time_since_epoch())
+        .count();
+}
+
+bool Utils::find(const std::string& str, const std::string& find) {
+    auto it = std::search(
+        str.begin(), str.end(),
+        find.begin(), find.end(),
+        [](char ch1, char ch2) {
+            return std::tolower(static_cast<unsigned char>(ch1)) == std::tolower(static_cast<unsigned char>(ch2));
+        }
+    );
+    return it != str.end();
+}
+
+std::string Utils::replaceAll(std::string str, std::string_view c1, std::string_view c2) {
+    size_t pos = 0;
+    while ((pos = str.find(c1, pos)) != std::string::npos) {
+        str.replace(pos, c1.length(), c2);
+        pos += c2.length();
+    }
+    return str;
 }

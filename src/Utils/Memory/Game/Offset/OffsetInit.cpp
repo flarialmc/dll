@@ -4,7 +4,7 @@
 #include "../SignatureAndOffsetManager.hpp"
 
 void OffsetInit::init2140() {
-    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.21.4X");
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.4X");
 
     ADD_OFFSET("Level::hitResult", 0x248);
     ADD_OFFSET("Level::worldFolderName", 0x2B8);
@@ -38,7 +38,7 @@ void OffsetInit::init2140() {
 }
 
 void OffsetInit::init2130() {
-    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.21.3X");
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.3X");
 
     ADD_OFFSET("Player::gamemode", 0xB18);
     ADD_OFFSET("Player::playerName", 0xCA0);
@@ -66,7 +66,7 @@ void OffsetInit::init2130() {
 }
 
 void OffsetInit::init2120() {
-    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.21.2X");
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.2X");
 
     ADD_OFFSET("Actor::hurtTime", 0x1F4);
     ADD_OFFSET("Actor::level", 0x230);
@@ -99,7 +99,7 @@ void OffsetInit::init2120() {
 }
 
 void OffsetInit::init2100() {
-    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.21.0X");
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.0X");
 
     ADD_OFFSET("Inventory::getItem", 7);
 
@@ -120,7 +120,7 @@ void OffsetInit::init2100() {
 }
 
 void OffsetInit::init2080() {
-    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.20.8X");
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.20.8X");
 
     ADD_OFFSET("Actor::baseTickVft", 26);
 
@@ -145,7 +145,7 @@ void OffsetInit::init2080() {
 }
 
 void OffsetInit::init2070() {
-    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.20.7X");
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.20.7X");
 
     ADD_OFFSET("ClientInstance::getBlockSource", 28);
 
@@ -170,7 +170,7 @@ void OffsetInit::init2070() {
 }
 
 void OffsetInit::init2060() {
-    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.20.6X");
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.20.6X");
 
     ADD_OFFSET("Actor::hurtTime", 0x234);
     ADD_OFFSET("Actor::level", 0x290);
@@ -197,7 +197,7 @@ void OffsetInit::init2060() {
 }
 
 void OffsetInit::init2050() {
-    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.20.5X");
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.20.5X");
 
     ADD_OFFSET("ClientInstance::getBlockSource", 27);
 
@@ -226,7 +226,7 @@ void OffsetInit::init2050() {
 }
 
 void OffsetInit::init2040() {
-    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.20.4X");
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.20.4X");
 
     ADD_OFFSET("Actor::hurtTime", 0x204);
     ADD_OFFSET("Actor::baseTickVft", 30);
@@ -248,7 +248,7 @@ void OffsetInit::init2040() {
 }
 
 void OffsetInit::init2030() {
-    Logger::custom(fmt::fg(fmt::color::aquamarine), "Offsets", "Loading offsets for 1.20.3X");
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.20.3X");
 
     ADD_OFFSET("MoveInputComponent::forward", 0x0A);
     ADD_OFFSET("MoveInputComponent::backward", 0x0B);

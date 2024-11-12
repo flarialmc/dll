@@ -178,8 +178,6 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
     }
 
     pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
-    // Gives error rn probably because fmt doesnt know how to handle it
-    //Logger::info("Swap Effect: {}", pDesc->SwapEffect);
 
     MADECHAIN = TRUE;
     queueReset = false;

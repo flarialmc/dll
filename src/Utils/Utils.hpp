@@ -300,6 +300,12 @@ public:
     }
 
     static bool isMinecraftLoaded(HANDLE process);
+
+    static uint64_t getCurrentMs();
+
+    static bool find(const std::string& str, const std::string& find);
+
+    static std::string replaceAll(std::string str, std::string_view c1, std::string_view c2);
 };
 
 struct CaretMeasureData {
