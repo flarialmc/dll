@@ -179,10 +179,7 @@ void ModuleManager::initialize() {
     addModule<ItemPhysics>();
     addModule<HiveStat>();
     addModule<Waypoints>();
-    if(WinrtUtils::checkAboveOrEqual(21, 40)) {
-        addModule<PackChanger>(); // tss, let it be a surprise!
-    }
-
+    addModule<PackChanger>();
     addModule<NullMovement>();
     addModule<CustomCrosshair>();
 

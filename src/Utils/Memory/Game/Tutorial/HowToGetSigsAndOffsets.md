@@ -144,6 +144,20 @@ Found near getActorFlag first param is basicReg, second is runtimeID
 # VTable Indexes
 Memory::GetAddressByIndex(vtableAddr, function
 
+### ClientInstance::getScreenName
+"content_area" x3 + "focus_reset_input_panel" + "ScreenVersion"
+at the end 2 arg func calls it by index:
+vxx1 = *(_QWORD *)(a1 + xxxx);
+v34 = sub_140xxxxx(*(_QWORD *)(a1 + xxxx), (__int64)&vxx2);
+Inside second virtual call is it, sig at .4X - 48 8B 80 58 08 00 00 FF 15 ?? ?? ?? ?? 90 BE FF FF FF FF
+
+also 48 8B ? ? ? ? ? FF 15 ? ? ? ? 90 41 8B ? 89 5D 
+
+### LevelRendererCamera__onDeviceLost
+It calls j_LevelRendererCamera___releaseResources second func from it is onDeviceLost aka _releaseResources + 2 = onDeviceLost
+Info on how to find _releaseResource is in sigs setion
+
+
 # Bobbing function
 0.017453292 find this and compare refs
 48 89 5C 24 10 48 89 74 24 20 4C 89 44 24 18 57 48 83 EC 60 0F 29 74 24 50 0F 29 1.21.30
@@ -212,3 +226,14 @@ entity_alphatest_change_color_glint to vtable then to ItemRenderer::render (like
 
 ### ItemStack::getDamageValue
 used in a lot of func, could be found by looking through "Damage" string refs, should have something like v1 = *(_QWORD **)(a1 + 8) at the start
+
+# GeneralSettingsScreenController::GeneralSettingsScreenController
+"GeneralSettingsScreenController", tho on some lower versions this string is not present
+
+# SettingsScreenOnExit
+search for "create_world_button" / "navigation_tab" first ref, go to "button.menu_exit", were in SettingsScreenController::_registerEventHandlers, above it is vtable, 3rd func is it (if lower then 21.2X its not inlined so go 1 layer deeper)
+
+# LevelRendererCamera::_releaseResources
+"Queueing renderchunk for build&sort" -> LevelBuilder::scheduleChunkBuild -> RenderChunkShared::startRebuild -> RenderChunkGeometry::RenderChunkGeometry -> RenderChunkGeometry::reset -> 4 refs to LevelRendererCamera::_releaseResources
+Or from its vtable at runtime, its near start
+Also OP sig to it: 48 89 ? ? ? 48 89 ? ? ? 57 48 83 EC ? 48 8B ? ? ? ? ? 48 8B ? 48 8B ? ? ? ? ? 48 8B ? ? ? ? ? 48 3B ? 74 ? 0F 1F

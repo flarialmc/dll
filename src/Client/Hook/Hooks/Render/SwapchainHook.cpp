@@ -157,10 +157,6 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
     }
 
     auto vsync = !Client::settings.getSettingByName<bool>("vsync")->value;
-    currentVsyncState = vsync;
-    if(vsync)
-        return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
-
 
     pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
@@ -186,6 +182,7 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 
     MADECHAIN = TRUE;
     queueReset = false;
+    fEnabled = true;
     return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
 }
 
@@ -203,16 +200,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         return DXGI_ERROR_DEVICE_RESET;
     }
 
-    if(currentVsyncState != !Client::settings.getSettingByName<bool>("vsync")->value) {
-        queueReset = true;
-        MADECHAIN = FALSE;
-        return funcOriginal(pSwapChain, syncInterval, flags);
-    } else {
-        MADECHAIN = TRUE;
-    }
-
-    if (!MADECHAIN) {
-        return funcOriginal(pSwapChain, syncInterval, flags);
+    if (!fEnabled) {
+        return DXGI_ERROR_DEVICE_RESET;
     }
 
     swapchain = pSwapChain;
@@ -275,7 +264,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     } catch (const std::exception &ex) { return 0; }
 
 
-    if (!currentVsyncState) {
+    if (Client::settings.getSettingByName<bool>("vsync")->value) {
         return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
     }
 
@@ -294,7 +283,6 @@ void SwapchainHook::DX11Init() {
             };
 
     swapchain->GetDevice(IID_PPV_ARGS(&d3d11Device));
-
     IDXGISurface1 *eBackBuffer;
     swapchain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
 

@@ -34,8 +34,6 @@ void OffsetInit::init2140() {
     ADD_OFFSET("NetworkSystem::remoteConnectorComposite", 0x90);
     ADD_OFFSET("RemoteConnectorComposite::rakNetConnector", 0x70);
 
-    ADD_OFFSET("ClientInstance::getScreenName", 266);
-
     ADD_OFFSET("ScreenContext::tessellator", 0xC8);
 }
 
@@ -65,8 +63,6 @@ void OffsetInit::init2130() {
     ADD_OFFSET("MoveInputComponent::backward", 0x2D);
     ADD_OFFSET("MoveInputComponent::left", 0x2E);
     ADD_OFFSET("MoveInputComponent::right", 0x2F);
-
-    ADD_OFFSET("ClientInstance::getScreenName", 264);
 }
 
 void OffsetInit::init2120() {
@@ -121,8 +117,6 @@ void OffsetInit::init2100() {
     ADD_OFFSET("Level::getPlayerMap", 0x1BC8); // getRuntimeActorList offset + B8 || Level::getPlayerList
 
     ADD_OFFSET("ItemActor::stack", 0x448);
-
-    ADD_OFFSET("ClientInstance::getScreenName", 260);
 }
 
 void OffsetInit::init2080() {
@@ -146,6 +140,8 @@ void OffsetInit::init2080() {
     ADD_OFFSET("Level::getPlayerMap", 0x1C88);
 
     ADD_OFFSET("ItemActor::stack", 0x470);
+
+    ADD_OFFSET("LevelRendererCamera::onDeviceLost", 4);
 }
 
 void OffsetInit::init2070() {
@@ -390,4 +386,6 @@ void OffsetInit::init2030() {
     ADD_OFFSET("Font::getLineHeight", 7);
 
     ADD_OFFSET("mce::Camera::worldMatrixStack", 0x40);
+
+    ADD_OFFSET("LevelRendererCamera::onDeviceLost", 7);
 }

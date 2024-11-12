@@ -60,10 +60,6 @@ ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT wi
         bufferCount = 3;
     }
 
-    if (SwapchainHook::currentVsyncState) {
-        return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, flags);
-    }
-
     return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
 }
 

@@ -52,7 +52,10 @@ std::string ClientInstance::getTopScreenName() {
 
 std::string ClientInstance::getScreenName() {
     std::string screen = "no_screen";
-    screen = Memory::CallVFuncI<std::string&, std::string&>(GET_OFFSET("ClientInstance::getScreenName"), this, screen);
+
+    static auto sig = GET_SIG_ADDRESS("ClientInstance::getScreenName");
+    auto fn = reinterpret_cast<std::string& (__thiscall *)(ClientInstance*, std::string&)>(sig);
+    screen = fn(this, screen);
     return screen;
 }
 

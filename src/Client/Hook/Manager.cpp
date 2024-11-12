@@ -26,6 +26,7 @@
 #include "Hooks/Game/SettingsScreenOnExitHook.hpp"
 #include "Hooks/Render/UIControl_updateCachedPositionHook.hpp"
 #include "Hooks/Render/HudCursorRenderer.hpp"
+#include "Hooks/Render/GeneralSettingsScreenControllerCtorHook.hpp"
 //#include "Hooks/Game/RenderItemGroup.hpp"
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 
@@ -76,8 +77,11 @@ void HookManager::initialize() {
     addHook<getSensHook>();
     addHook<HudMobEffectsRendererHook>();
     addHook<HudCursorRendererHook>();
-    addHook<BaseActorRendererRenderTextHook>();
+    if(WinrtUtils::checkAboveOrEqual(20, 60)) {
+        addHook<BaseActorRendererRenderTextHook>();
+    }
     addHook<UIControl_updateCachedPositionHook>();
+    addHook<GeneralSettingsScreenControllerCtorHook>();
 
     addHook<isPreGameHook>();
     addHook<_composeFullStackHook>();

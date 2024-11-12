@@ -230,10 +230,14 @@ public:
                 Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
                                                       this->settings.getSettingByName<float>("percentageY")->value);
 
+
+                float totalWidth = keycardSize * 3 + spacing * 2;
+                float totalHeight = keycardSize * 2.0f + keycardSize / 2.0f + spacing * 2;
+
                 Vec2<float> realcenter;
 
                 if (settingperc.x != 0)
-                    realcenter = Vec2<float>(settingperc.x * MC::windowSize.x, settingperc.y * MC::windowSize.y);
+                    realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x - totalWidth), settingperc.y * (MC::windowSize.y - totalHeight));
                 else realcenter = Constraints::CenterConstraint(keycardSize, keycardSize);
 
                 Vec2<float> rounde = Constraints::RoundingConstraint(
@@ -242,13 +246,9 @@ public:
                         this->settings.getSettingByName<float>("rounding")->value *
                         settings.getSettingByName<float>("uiscale")->value);
 
-                float totalWidth = keycardSize * 3 + spacing * 2;
-                float totalHeight = keycardSize * 2.0f + keycardSize / 2.0f + spacing * 2;
-
                 if (settings.getSettingByName<bool>("cps")->value) totalHeight += keycardSize + spacing;
 
-                if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
-                    ClickGUI::editmenu) { // makes module movable
+                if (ClickGUI::editmenu) { // makes module movable
                     FlarialGUI::SetWindowRect(realcenter.x - (keycardSize + spacing), realcenter.y, totalWidth,
                                               totalHeight, index, keycardSize + spacing);
 
@@ -260,8 +260,7 @@ public:
 
                     realcenter = realcenter;
 
-                    Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y);
-
+                    Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y, totalWidth, totalHeight);
                     this->settings.setValue("percentageX", percentages.x);
                     this->settings.setValue("percentageY", percentages.y);
                 }
@@ -576,9 +575,7 @@ public:
                 FlarialGUI::RoundedRect(realcenter.x + centeredChild.first, realcenter.y + centeredChild.second,
                                         textStates[Strokes::SPACEBAR], childWidth, childHeight, 0, 0);
 
-                if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
-                    ClickGUI::editmenu)
-
+                if (ClickGUI::editmenu)
                     FlarialGUI::UnsetWindowRect();
 
             }
