@@ -1235,13 +1235,13 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
             auto& otherRect = WindowRects[j];
 
             // Snap to the left edge of another rectangle
-            if (fabs(WindowRects[currentNum].movedX - otherRect.movedX + fixer) < alignmentThreshold) {
+            if (fabs(WindowRects[currentNum].movedX - otherRect.movedX - fixer) < alignmentThreshold) {
                 ImGui::GetBackgroundDrawList()->AddLine(ImVec2(otherRect.movedX, 0), ImVec2(otherRect.movedX, MC::windowSize.y), pink, 2.0f);
                 WindowRects[currentNum].movedX = otherRect.movedX + fixer;
             }
 
             // Snap to the right edge of another rectangle
-            if (fabs(WindowRects[currentNum].movedX + width - (otherRect.movedX + otherRect.width) + fixer) < alignmentThreshold) {
+            if (fabs(WindowRects[currentNum].movedX + width - (otherRect.movedX + otherRect.width) - fixer) < alignmentThreshold) {
                 ImGui::GetBackgroundDrawList()->AddLine(ImVec2(otherRect.movedX + otherRect.width, 0), ImVec2(otherRect.movedX + otherRect.width, MC::windowSize.y), pink, 2.0f);
                 WindowRects[currentNum].movedX = otherRect.movedX + otherRect.width - width + fixer;
             }
@@ -1259,7 +1259,7 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
             }
 
             // Snap to the center alignment with another rectangle horizontally
-            if (fabs((WindowRects[currentNum].movedX + width / 2.0f) - (otherRect.movedX + otherRect.width / 2.0f) + fixer) < alignmentThreshold) {
+            if (fabs((WindowRects[currentNum].movedX + width / 2.0f) - (otherRect.movedX + otherRect.width / 2.0f) - fixer) < alignmentThreshold) {
                 ImGui::GetBackgroundDrawList()->AddLine(ImVec2(otherRect.movedX + otherRect.width / 2.0f, 0), ImVec2(otherRect.movedX + otherRect.width / 2.0f, MC::windowSize.y), pink, 2.0f);
                 WindowRects[currentNum].movedX = otherRect.movedX + otherRect.width / 2.0f - width / 2.0f + fixer;
             }
@@ -1278,7 +1278,7 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
             WindowRects[currentNum].movedX = fixer; // Snap to left edge with `fixer`
         }
 
-        if (fabs(WindowRects[currentNum].movedX + width - MC::windowSize.x + fixer) < alignmentThreshold) {
+        if (fabs(WindowRects[currentNum].movedX + width - MC::windowSize.x - fixer) < alignmentThreshold) {
             ImGui::GetBackgroundDrawList()->AddLine(ImVec2(WindowRects[currentNum].movedX + width, 0),
                                                     ImVec2(WindowRects[currentNum].movedX + width, MC::windowSize.y), pink, 2.0f);
             WindowRects[currentNum].movedX = MC::windowSize.x - width + fixer; // Snap to right edge with `fixer`
@@ -1298,7 +1298,7 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
         }
 
         // Center align horizontally with fixer applied
-        if (fabs(WindowRects[currentNum].movedX + width / 2.0f - MC::windowSize.x / 2.0f) < alignmentThreshold) {
+        if (fabs((WindowRects[currentNum].movedX + width / 2.0f - MC::windowSize.x / 2.0f) - fixer) < alignmentThreshold) {
             ImGui::GetBackgroundDrawList()->AddLine(ImVec2(MC::windowSize.x / 2.0f, 0),
                                                     ImVec2(MC::windowSize.x / 2.0f, MC::windowSize.y), pink, 2.0f);
             WindowRects[currentNum].movedX = MC::windowSize.x / 2.0f - width / 2.0f + fixer;
