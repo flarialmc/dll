@@ -60,19 +60,23 @@ public:
 
         keybindActions.clear();
         keybindActions.push_back([this](std::vector<std::any> args) -> std::any {
-            KeyEvent event = std::any_cast<KeyEvent>(args[0]);
-            int index = WaypointList.size();
-            addWaypoint(
-                index,
-                "waypoint-" + std::to_string(index),
-                "FFFFFF",
-                Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y - 1, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
-                true,
-                true,
-                false,
-                100.0f
-            );
-            FlarialGUI::Notify("Added waypoint!");
+            std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
+            if (duration.count() >= 0.1) {
+                KeyEvent event = std::any_cast<KeyEvent>(args[0]);
+                int index = WaypointList.size();
+                addWaypoint(
+                    index,
+                    "waypoint-" + std::to_string(index),
+                    "FFFFFF",
+                    Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y - 1, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
+                    true,
+                    true,
+                    false,
+                    100.0f
+                );
+                FlarialGUI::Notify("Added waypoint!");
+                last_used = std::chrono::high_resolution_clock::now();
+            }
             return {};
         });
 
@@ -384,8 +388,8 @@ public:
 
         if (this->isEnabled()) {
             for (int i = 0; i <= totalKeybinds - 1; ++i) {
-                if(isKeybind(event.keys) && isKeyPartOfKeybind(event.key))
-                keybindActions[i]({ std::any(event) });
+                if (isKeybind(event.keys) && isKeyPartOfKeybind(event.key))
+                    keybindActions[i]({ std::any(event) });
             }
         }
     }
