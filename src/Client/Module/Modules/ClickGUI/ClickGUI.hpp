@@ -1182,6 +1182,13 @@ public:
                         SwapchainHook::queueReset = true;
 
                     });
+
+                    c->addButton("Force Reload Modules", "", "RELOAD", [] () {
+
+                        ModuleManager::restart();
+
+                    });
+
                     c->addElementText("Following Requires Restart");
                     c->extraPadding();
 

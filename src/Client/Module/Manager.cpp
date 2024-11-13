@@ -88,6 +88,7 @@
 #include "Modules/MovableHotbar/MovableHotbar.hpp"
 #include "Modules/NullMovement/NullMovement.hpp"
 #include "../../Scripting/Scripting.hpp"
+#include "../../Scripting/EventManager/ScriptingEventManager.hpp"
 
 namespace ModuleManager {
     std::unordered_map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -206,6 +207,15 @@ void ModuleManager::terminate() {
     moduleMap.clear();
     services.clear();
 }
+
+
+void ModuleManager::restart(){
+    ScriptingEventManager::clearHandlers();
+    ModuleManager::terminate();
+    ModuleManager::initialize();
+
+}
+
 
 void ModuleManager::syncState() {
     for (const auto& pair : moduleMap) {

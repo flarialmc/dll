@@ -20,6 +20,14 @@ public:
         Listen(this, TickEvent, &ScriptModuleBase::onTickEvent)
     };
 
+    void terminate() override {
+        Deafen(this, KeyEvent, &ScriptModuleBase::onKey)
+        Deafen(this, MouseEvent, &ScriptModuleBase::onMouse)
+        Deafen(this, PacketEvent, &ScriptModuleBase::onPacketReceive)
+        Deafen(this, TickEvent, &ScriptModuleBase::onTickEvent)
+        Module::terminate();
+    }
+
     void onEnable() override {
         Scripting::executeFunction(module_lua_state, "onEnable");
         Module::onEnable();

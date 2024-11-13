@@ -53,16 +53,13 @@ void ScriptingEventManager::triggerEvent(lua_State* L, const std::string& eventN
     }
 }
 
-void ScriptingEventManager::clearHandlers(lua_State* L) {
-    for (auto& [eventName, handlers] : eventHandlers) {
+void ScriptingEventManager::clearHandlers() {
+    for (auto &[eventName, handlers]: eventHandlers) {
         auto it = handlers.begin();
         while (it != handlers.end()) {
-            if (it->luaState == L) {
-                luaL_unref(L, LUA_REGISTRYINDEX, it->ref);
-                it = handlers.erase(it);
-            } else {
-                ++it;
-            }
+            luaL_unref(it->luaState, LUA_REGISTRYINDEX, it->ref);
+            it = handlers.erase(it);
+
         }
     }
 }

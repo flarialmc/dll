@@ -14,6 +14,7 @@ namespace ModuleManager {
     void initialize();
 
     void terminate();
+    void restart();
 
     template<typename T, typename... ArgsT>
     void addModule(ArgsT... args) {
