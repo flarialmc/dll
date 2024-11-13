@@ -1,0 +1,16 @@
+#pragma once
+
+#include <lua.hpp>
+#include "../../Client/GUI/Engine/Engine.hpp"
+
+namespace General {
+    int lua_Notify(lua_State* L) {
+        const char* message = luaL_checkstring(L, 1);
+        FlarialGUI::Notify(message);
+        return 0;
+    }
+
+    void registerGeneral(lua_State* L){
+        lua_register(L, "Notify", lua_Notify);
+    }
+}

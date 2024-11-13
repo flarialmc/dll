@@ -87,11 +87,14 @@
 #include "Modules/MovableCoordinates/MovableCoordinates.hpp"
 #include "Modules/MovableHotbar/MovableHotbar.hpp"
 #include "Modules/NullMovement/NullMovement.hpp"
+#include "../../Scripting/Scripting.hpp"
+#include "../../Scripting/EventManager/ScriptingEventManager.hpp"
 
 namespace ModuleManager {
     std::unordered_map<size_t, std::shared_ptr<Module>> moduleMap;
     std::vector<std::shared_ptr<Listener>> services;
     bool initialized = false;
+    bool restartModules = false;
 }
 
 std::vector<std::shared_ptr<Module>> ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
@@ -191,6 +194,8 @@ void ModuleManager::initialize() {
     addService<rgbListener>();
     addService<HiveModeCatcherListener>();
 
+    Scripting::loadModules();
+
     initialized = true;
 }
 
@@ -204,6 +209,14 @@ void ModuleManager::terminate() {
     services.clear();
 }
 
+
+void restart(){
+    ScriptingEventManager::clearHandlers();
+    ModuleManager::terminate();
+    ModuleManager::initialize();
+}
+
+
 void ModuleManager::syncState() {
     for (const auto& pair : moduleMap) {
         auto& module = pair.second;
@@ -216,6 +229,10 @@ void ModuleManager::syncState() {
                 }
             }
         }
+    }
+    if (ModuleManager::restartModules) {
+        ModuleManager::restartModules = false;
+        restart();
     }
 }
 

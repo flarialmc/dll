@@ -120,6 +120,10 @@ void Client::initialize() {
     if (!exists(folder_path4)) {
         create_directory(folder_path4);
     }
+    std::filesystem::path folder_path5(Utils::getRoamingPath() + "\\Flarial\\scripts");
+    if (!exists(folder_path5)) {
+        create_directory(folder_path5);
+    }
 
     Client::CheckSettingsFile();
     Client::LoadSettings();

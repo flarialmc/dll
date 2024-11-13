@@ -10,6 +10,7 @@ namespace ModuleManager {
     extern std::vector<std::shared_ptr<Listener>> services;
 
     extern bool initialized;
+    extern bool restartModules;
 
     void initialize();
 
