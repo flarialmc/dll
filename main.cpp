@@ -34,6 +34,7 @@ DWORD WINAPI init(HMODULE real)
     uint64_t start = Utils::getCurrentMs();
     Logger::initialize();
 
+    HANDLE hProcess = GetCurrentProcess();
     bool hatless = true;
 
     if (hatless) {
@@ -157,6 +158,7 @@ DWORD WINAPI init(HMODULE real)
 
     Logger::shutdown();
 
+    CloseHandle(Client::mutex);
     FreeLibraryAndExitThread(Client::currentModule, 0);
 }
 
@@ -169,12 +171,13 @@ BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReser
         Ensure a single instance of Flarial Client is loaded.
         Launchers may use this mutex to detect if the client is injected or not.
         */
-        HANDLE hMutex = CreateMutexW(NULL, FALSE, L"Flarial");
+        HANDLE mutex = CreateMutexW(NULL, FALSE, L"Flarial");
         if (GetLastError())
         {
-            CloseHandle(hMutex);
+            CloseHandle(mutex);
             return FALSE;
         }
+        Client::mutex = mutex;
 
         DisableThreadLibraryCalls(instance);
         Client::currentModule = instance;
