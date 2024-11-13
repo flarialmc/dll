@@ -1183,6 +1183,9 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
         i++;
     }
 
+    WindowRects[currentNum].width = width;
+    WindowRects[currentNum].height = height;
+
     if (!ye) {
 
         if ((CursorInRect(x, y, width, height) || WindowRects[currentNum].isMovingElement) && MC::held) {
@@ -1222,6 +1225,39 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
     if (WindowRects[currentNum].isMovingElement) {
         const float alignmentThreshold = 10.0f; // How close the window should be to align
         const ImColor pink(1.0f, 0.0f, 1.0f, 1.0f); // Pink color
+
+
+for (int j = 0; j < 1000; j++) {
+    if (j == currentNum) continue;
+
+    auto& otherRect = WindowRects[j];
+
+    if (fabs(WindowRects[currentNum].movedX - otherRect.movedX) < alignmentThreshold) {
+        ImGui::GetBackgroundDrawList()->AddLine(ImVec2(otherRect.movedX, 0), ImVec2(otherRect.movedX, MC::windowSize.y), pink, 2.0f);
+        WindowRects[currentNum].movedX = otherRect.movedX;
+    }
+    if (fabs(WindowRects[currentNum].movedX + width - (otherRect.movedX + otherRect.width)) < alignmentThreshold) {
+        ImGui::GetBackgroundDrawList()->AddLine(ImVec2(otherRect.movedX + otherRect.width, 0), ImVec2(otherRect.movedX + otherRect.width, MC::windowSize.y), pink, 2.0f);
+        WindowRects[currentNum].movedX = otherRect.movedX + otherRect.width - width;
+    }
+    if (fabs(WindowRects[currentNum].movedY - otherRect.movedY) < alignmentThreshold) {
+        ImGui::GetBackgroundDrawList()->AddLine(ImVec2(0, otherRect.movedY), ImVec2(MC::windowSize.x, otherRect.movedY), pink, 2.0f);
+        WindowRects[currentNum].movedY = otherRect.movedY;
+    }
+    if (fabs(WindowRects[currentNum].movedY + height - (otherRect.movedY + otherRect.height)) < alignmentThreshold) {
+        ImGui::GetBackgroundDrawList()->AddLine(ImVec2(0, otherRect.movedY + otherRect.height), ImVec2(MC::windowSize.x, otherRect.movedY + otherRect.height), pink, 2.0f);
+        WindowRects[currentNum].movedY = otherRect.movedY + otherRect.height - height;
+    }
+    if (fabs((WindowRects[currentNum].movedX + width / 2.0f) - (otherRect.movedX + otherRect.width / 2.0f)) < alignmentThreshold) {
+        ImGui::GetBackgroundDrawList()->AddLine(ImVec2(otherRect.movedX + otherRect.width / 2.0f, 0), ImVec2(otherRect.movedX + otherRect.width / 2.0f, MC::windowSize.y), pink, 2.0f);
+        WindowRects[currentNum].movedX = otherRect.movedX + otherRect.width / 2.0f - width / 2.0f;
+    }
+    if (fabs((WindowRects[currentNum].movedY + height / 2.0f) - (otherRect.movedY + otherRect.height / 2.0f)) < alignmentThreshold) {
+        ImGui::GetBackgroundDrawList()->AddLine(ImVec2(0, otherRect.movedY + otherRect.height / 2.0f), ImVec2(MC::windowSize.x, otherRect.movedY + otherRect.height / 2.0f), pink, 2.0f);
+        WindowRects[currentNum].movedY = otherRect.movedY + otherRect.height / 2.0f - height / 2.0f;
+    }
+}
+
 
         if (fabs(WindowRects[currentNum].movedX) < alignmentThreshold) {
             ImGui::GetBackgroundDrawList()->AddLine(ImVec2(WindowRects[currentNum].movedX, 0),
