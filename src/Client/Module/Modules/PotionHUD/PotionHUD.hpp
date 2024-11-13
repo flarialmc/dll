@@ -93,6 +93,8 @@ public:
                                         textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
                                         Constraints::SpacingConstraint(1.05, textWidth),
                                         DWRITE_FONT_WEIGHT_NORMAL);
+
+
         FlarialGUI::ColorPicker(0, toggleX + FlarialGUI::SettingsTextWidth("Main color "),
                                 toggleY - Constraints::SpacingConstraint(0.017, textWidth),
                                 settings.getSettingByName<std::string>("colorMain")->value,
