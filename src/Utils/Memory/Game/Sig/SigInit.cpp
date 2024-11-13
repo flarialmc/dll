@@ -4,7 +4,7 @@
 #include "../SignatureAndOffsetManager.hpp"
 
 void SigInit::init2140() {
-    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.21.40");
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading signatures for 1.21.40");
 
     ADD_SIG("tryGetPrefix", "48 89 5C 24 ? 57 48 83 EC 30 8B ?");
     ADD_SIG("tryGetPrefix2", "4c 8b 41 ? 4c 8b d1 48 8b 41 ? 4c 8b 49 ? 49 2b c0 8b 12 48 c1 f8 ? 48 ff");
@@ -98,7 +98,7 @@ void SigInit::init2140() {
 }
 
 void SigInit::init2130() {
-    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.21.30");
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading signatures for 1.21.30");
 
     ADD_SIG("Actor::baseTick", "48 8D 05 ? ? ? ? 48 89 01 BA 31 00 00 00 44 8D 4A 04 44 8D 42 02 66 C7 44 24 20 37 00 E8 ? ? ? ? 48 8B 8B 70 11 00 00");
     ADD_SIG("ItemRenderer::renderGuiItemNew", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 D8 48 81 EC 28 01 00 00 0F 29 B4 24 10 01 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 00 44");
@@ -135,7 +135,7 @@ void SigInit::init2130() {
 }
 
 void SigInit::init2120() {
-    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.21.20");
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading signatures for 1.21.20");
 
     ADD_SIG("Options::getGamma", "48 83 EC 28 80 B9 ? 17 00 00 00 48 8D 54 24 30 48 8B 01 48 8B 40 60 74 38 41 B8 19");
     ADD_SIG("mce::TextureGroup::getTexture", "40 55 53 56 57 41 55 41 56 41 57 48 8D 6C 24 E9 48 81 EC 00");
@@ -175,13 +175,13 @@ void SigInit::init2120() {
 }
 
 void SigInit::init2102() {
-    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.21.02");
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading signatures for 1.21.02");
 
     ADD_SIG("MinecraftPackets::createPacket", "40 53 48 83 EC ? 45 33 C0 48 8B D9 81 FA");
 }
 
 void SigInit::init2100() {
-    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.21.0X");
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading signatures for 1.21.0X");
 
     ADD_SIG("BlockSource::getBiome", "40 53 48 83 EC ? 48 8B D9 E8 ? ? ? ? 48 85 C0 75 ? 48 8B 03");
     ADD_SIG("Level::getRuntimeActorList", "40 53 48 83 EC 30 48 81 C1 10");
@@ -204,7 +204,7 @@ void SigInit::init2100() {
 }
 
 void SigInit::init2080() {
-    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.20.8X");
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading signatures for 1.20.8X");
 
     ADD_SIG("tryGetPrefix2", "4C 8B 41 48 4C 8B C9 48 8B 41 50 4C 8B 51 68 49 2B C0 48 C1 F8 03 48 FF");
 
@@ -229,7 +229,7 @@ void SigInit::init2080() {
 }
 
 void SigInit::init2070() {
-    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.20.7X");
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading signatures for 1.20.7X");
 
     ADD_SIG("Dimension::getBrightnessDependentFogColor", "? ? ? ? ? ? C2 0F 11 02 C3 CC CC CC CC CC 48 89 54");
 
@@ -245,7 +245,7 @@ void SigInit::init2070() {
 }
 
 void SigInit::init2060() {
-    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.20.6X");
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading signatures for 1.20.6X");
 
     ADD_SIG("MinecraftGame::onAppSuspended", "48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 4C 8B E9 45 33 F6");
 
@@ -263,7 +263,7 @@ void SigInit::init2060() {
 }
 
 void SigInit::init2050() {
-    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.20.5X");
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading signatures for 1.20.5X");
 
     ADD_SIG("tryGetPrefix", "48 89 5C 24 ? 57 48 83 EC ? 48 8B");
 
@@ -298,7 +298,7 @@ void SigInit::init2050() {
 }
 
 void SigInit::init2040() {
-    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.20.4X");
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading signatures for 1.20.4X");
 
     ADD_SIG("LoopbackPacketSender::sendPacket", "48 83 EC ? 48 0F BE ? ? 48 83 C0 ? 74 27");
 
@@ -316,7 +316,7 @@ void SigInit::init2040() {
 }
 
 void SigInit::init2030() {
-    Logger::custom(fmt::fg(fmt::color::blue_violet), "Signatures", "Loading signatures for 1.20.3X");
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading signatures for 1.20.3X");
 
     ADD_SIG("tryGetPrefix", "40 53 48 83 EC 20 48 8B");
 

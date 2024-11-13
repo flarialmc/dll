@@ -11,6 +11,7 @@ private:
     bool userRequestedReload = false;
 
     bool forcePreGame = false;
+    bool canUseKeys = false;
 
     static inline std::array<std::byte, 6> patch1Data;
     static inline std::array<std::byte, 2> patch2Data;
@@ -31,6 +32,7 @@ public:
     void onEnable() override {
         patchComposeFullStack();
         canRender = true;
+        canUseKeys = true;
         Listen(this, KeyEvent, &PackChanger::onKey);
         Listen(this, SetupAndRenderEvent, &PackChanger::onSetupAndRender);
         Listen(this, isPreGameEvent, &PackChanger::onIsPreGame); // unlocking buttons
@@ -55,11 +57,12 @@ public:
         Deafen(this, AfterSettingsScreenOnExitEvent, &PackChanger::onAfterSettingsScreenOnExit);
         Deafen(this, GeneralSettingsScreenControllerOnCreateEvent, &PackChanger::onGeneralSettingsScreenControllerOnCreate);
         canRender = true;
+        canUseKeys = true;
         Module::onDisable();
     }
 
     void onKey(KeyEvent &event) {
-        if(!canRender) {
+        if(!canUseKeys) {
             event.cancel(); // prevent users from closing pack loading menu
         }
     }
@@ -79,6 +82,7 @@ public:
         forcePreGame = true;
         canRender = false; // disable rendering
         userRequestedReload = true;
+        canUseKeys = false;
         patch();
     }
 
@@ -104,12 +108,12 @@ public:
 
     void onRenderChunkCoordinatorPreRenderTick(RenderChunkCoordinatorPreRenderTickEvent &event) {
         // stops chunks from updating
-        if(!canRender) event.cancel();
+        if(!canRender || queueReset || forcePreGame) event.cancel();
     }
 
     void onRenderOrderExecute(RenderOrderExecuteEvent &event) {
         // stops most 3D level rendering
-        if(!canRender) event.cancel();
+        if(!canRender || queueReset || forcePreGame) event.cancel();
     }
 
     void onSetupAndRender(SetupAndRenderEvent &event) {
@@ -120,8 +124,11 @@ public:
 
         if(!canRender && enableFrameQueue) {
             if(frameQueue == 0) {
-                if(!queueReset)
+                if(!queueReset) {
+                    forcePreGame = false;
                     canRender = true;
+                    canUseKeys = true;
+                }
                 enableFrameQueue = false;
             } else {
                 if(frameQueue > 0) {

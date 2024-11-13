@@ -70,6 +70,7 @@ public:
     static inline ID3D11Texture2D* ExtraSavedD3D11BackBuffer;
 
     static ID3D12CommandQueue *queue;
+    static HANDLE fenceEvent;
     static inline std::vector<IDXGISurface1 *> DXGISurfaces;
     static inline std::vector<ID2D1Bitmap1 *> D2D1Bitmaps;
     static inline std::vector<ID3D11Resource *> D3D11Resources;

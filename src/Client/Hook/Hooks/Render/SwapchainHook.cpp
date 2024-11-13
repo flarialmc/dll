@@ -25,6 +25,7 @@
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
 
 ID3D12CommandQueue *SwapchainHook::queue = nullptr;
+HANDLE SwapchainHook::fenceEvent = nullptr;
 
 bool initImgui = false;
 bool allfontloaded = false;
@@ -156,14 +157,6 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
         return DXGI_ERROR_INVALID_CALL;
     }
 
-    auto vsync = !Client::settings.getSettingByName<bool>("vsync")->value;
-    currentVsyncState = vsync;
-    if(vsync)
-        return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
-
-
-    pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-
     std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
 
     if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
@@ -181,11 +174,13 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
     }
 
     pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
+    pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
     // Gives error rn probably because fmt doesnt know how to handle it
     //Logger::info("Swap Effect: {}", pDesc->SwapEffect);
 
     MADECHAIN = TRUE;
     queueReset = false;
+    fEnabled = true;
     return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
 }
 
@@ -203,16 +198,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         return DXGI_ERROR_DEVICE_RESET;
     }
 
-    if(currentVsyncState != !Client::settings.getSettingByName<bool>("vsync")->value) {
-        queueReset = true;
-        MADECHAIN = FALSE;
-        return funcOriginal(pSwapChain, syncInterval, flags);
-    } else {
-        MADECHAIN = TRUE;
-    }
-
-    if (!MADECHAIN) {
-        return funcOriginal(pSwapChain, syncInterval, flags);
+    if (!fEnabled) {
+        return DXGI_ERROR_DEVICE_RESET;
     }
 
     swapchain = pSwapChain;
@@ -275,7 +262,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     } catch (const std::exception &ex) { return 0; }
 
 
-    if (!currentVsyncState) {
+    if (Client::settings.getSettingByName<bool>("vsync")->value) {
         return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
     }
 
@@ -294,7 +281,6 @@ void SwapchainHook::DX11Init() {
             };
 
     swapchain->GetDevice(IID_PPV_ARGS(&d3d11Device));
-
     IDXGISurface1 *eBackBuffer;
     swapchain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
 
@@ -326,12 +312,14 @@ void SwapchainHook::DX11Init() {
 
 void SwapchainHook::DX12Init() {
 
-
     ID3D12Device5 *device;
     swapchain->GetDevice(IID_PPV_ARGS(&d3d12Device5));
 
     if (SUCCEEDED(swapchain->GetDevice(IID_PPV_ARGS(&device))) &&
         kiero::getRenderType() == kiero::RenderType::D3D12) {
+
+        fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+
         D3D11On12CreateDevice(device,
                               D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
                               (IUnknown **) &queue, 1, 0, &SwapchainHook::d3d11Device, &context,
@@ -489,8 +477,12 @@ void SwapchainHook::DX11Render() {
 
 
 void SwapchainHook::DX12Render() {
-
     currentBitmap = (int) swapchain->GetCurrentBackBufferIndex();
+
+    ID3D12Fence* fence;
+
+    UINT64 fenceValue = 0;
+    d3d12Device5->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 
     ID3D11Resource *resource = D3D11Resources[currentBitmap];
     d3d11On12Device->AcquireWrappedResources(&resource, 1);
@@ -609,21 +601,22 @@ void SwapchainHook::DX12Render() {
 
                 context->Flush();
 
-                frameContexts[swapchain->GetCurrentBackBufferIndex()].commandAllocator->Reset();;
+                frameContexts[currentBitmap].commandAllocator->Reset();;
 
                 D3D12_RESOURCE_BARRIER barrier;
                 barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
                 barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-                barrier.Transition.pResource = frameContexts[swapchain->GetCurrentBackBufferIndex()].main_render_target_resource;
+                barrier.Transition.pResource = frameContexts[currentBitmap].main_render_target_resource;
                 barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
                 barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
                 barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+                d3d12CommandList->ResourceBarrier(1, &barrier);
 
                 d3d12CommandList->Reset(frameContexts[swapchain->GetCurrentBackBufferIndex()].commandAllocator,
                                         nullptr);
                 d3d12CommandList->ResourceBarrier(1, &barrier);
                 d3d12CommandList->OMSetRenderTargets(1,
-                                                     &frameContexts[swapchain->GetCurrentBackBufferIndex()].main_render_target_descriptor,
+                                                     &frameContexts[currentBitmap].main_render_target_descriptor,
                                                      FALSE, nullptr);
                 d3d12CommandList->SetDescriptorHeaps(1, &d3d12DescriptorHeapImGuiRender);
 
@@ -640,9 +633,16 @@ void SwapchainHook::DX12Render() {
 
                 queue->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList *const *>(&d3d12CommandList));
 
+                UINT64 currentFenceValue = ++fenceValue;
+                queue->Signal(fence, currentFenceValue);
+                if (fence->GetCompletedValue() < currentFenceValue) {
+                    fence->SetEventOnCompletion(currentFenceValue, fenceEvent);
+                    WaitForSingleObject(fenceEvent, INFINITE);
+                }
+
                 Memory::SafeRelease(mainRenderTargetView);
                 Memory::SafeRelease(buffer2D);
-
+                Memory::SafeRelease(fence);
             }
         }
     }

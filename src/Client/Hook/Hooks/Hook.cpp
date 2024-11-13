@@ -19,16 +19,16 @@ bool Hook::autoHook(void *callbackPtr, void **funcOriginal) {
 
 bool Hook::manualHook(void *hookAddr, void *callbackPtr, void **funcOriginal) {
     if (hookAddr == nullptr) {
-        Logger::custom(fmt::fg(fmt::color::crimson), "Hook", "Failed to find address of {}", this->name);
+        Logger::custom(fg(fmt::color::crimson), "Hook", "Failed to find address of {}", this->name);
         return false;
     }
 
     MH_CreateHook(hookAddr, callbackPtr, funcOriginal);
     if (MH_EnableHook(hookAddr) != MH_OK) {
-        Logger::custom(fmt::fg(fmt::color::crimson), "Hook", "Failed to find address of {}", this->name);
+        Logger::custom(fg(fmt::color::crimson), "Hook", "Failed to find address of {}", this->name);
         return false;
     }
 
-    Logger::custom(fmt::fg(fmt::color::green), "Hook", "Hooked {}", this->name);
+    Logger::custom(fg(fmt::color::deep_sky_blue), "Hook", "Hooked {}", this->name);
     return true;
 }
