@@ -18,6 +18,7 @@ public:
         Listen(this, MouseEvent, &ScriptModuleBase::onMouse)
         Listen(this, PacketEvent, &ScriptModuleBase::onPacketReceive)
         Listen(this, TickEvent, &ScriptModuleBase::onTickEvent)
+        Listen(this, RenderEvent, &ScriptModuleBase::onRenderEvent)
     };
 
     void terminate() override {
@@ -78,6 +79,15 @@ public:
         };
 
         ScriptingEventManager::triggerEvent(module_lua_state, "onTickEvent", args);
+    };
+
+    void onRenderEvent(RenderEvent &event) {
+        if(!this->isEnabled()) return;
+        std::vector<std::any> args = {
+
+        };
+
+        ScriptingEventManager::triggerEvent(module_lua_state, "onRenderEvent", args);
     };
 };
 

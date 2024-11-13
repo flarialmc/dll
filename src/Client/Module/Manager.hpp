@@ -10,11 +10,11 @@ namespace ModuleManager {
     extern std::vector<std::shared_ptr<Listener>> services;
 
     extern bool initialized;
+    extern bool restartModules;
 
     void initialize();
 
     void terminate();
-    void restart();
 
     template<typename T, typename... ArgsT>
     void addModule(ArgsT... args) {

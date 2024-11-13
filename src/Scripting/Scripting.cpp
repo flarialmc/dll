@@ -5,12 +5,9 @@
 #include "../Config/json/json.hpp"
 #include "../Client/Module/Manager.hpp"
 #include "ScriptModuleBase.hpp"
+#include "Functions/GUI.hpp"
+#include "Functions/General.hpp"
 
-int lua_Notify(lua_State* L) {
-    const char* message = luaL_checkstring(L, 1);
-    FlarialGUI::Notify(message);
-    return 0;
-}
 
 int lua_register_event_handler(lua_State* L) {
     const char* eventName = luaL_checkstring(L, 1);
@@ -20,7 +17,7 @@ int lua_register_event_handler(lua_State* L) {
         std::string err = std::string( "Expected function as second argument: ") + lua_tostring(L, -1);
         Logger::error(err);
         lua_error(L);
-        return 1;
+        return 0;
     }
 
     ScriptingEventManager::registerHandler(L, eventName);
@@ -36,8 +33,10 @@ void Scripting::executeFunction(lua_State* L, std::string functionName) {
     }
 }
 void registerFunctions(lua_State* L){
-    lua_register(L, "Notify", lua_Notify);
     lua_register(L, "onEvent", lua_register_event_handler);
+
+    General::registerGeneral(L);
+    GUI::registerGUI(L);
 }
 
 void load(std::string name, std::string description, std::string mainclass) {

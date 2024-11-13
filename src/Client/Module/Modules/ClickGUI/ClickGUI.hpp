@@ -1185,7 +1185,7 @@ public:
 
                     c->addButton("Force Reload Modules", "", "RELOAD", [] () {
 
-                        ModuleManager::restart();
+                        ModuleManager::restartModules = true;
 
                     });
 

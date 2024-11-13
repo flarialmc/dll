@@ -94,6 +94,7 @@ namespace ModuleManager {
     std::unordered_map<size_t, std::shared_ptr<Module>> moduleMap;
     std::vector<std::shared_ptr<Listener>> services;
     bool initialized = false;
+    bool restartModules = false;
 }
 
 std::vector<std::shared_ptr<Module>> ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
@@ -209,11 +210,10 @@ void ModuleManager::terminate() {
 }
 
 
-void ModuleManager::restart(){
+void restart(){
     ScriptingEventManager::clearHandlers();
     ModuleManager::terminate();
     ModuleManager::initialize();
-
 }
 
 
@@ -229,6 +229,10 @@ void ModuleManager::syncState() {
                 }
             }
         }
+    }
+    if (ModuleManager::restartModules) {
+        ModuleManager::restartModules = false;
+        restart();
     }
 }
 
