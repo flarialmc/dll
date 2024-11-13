@@ -17,8 +17,6 @@ std::chrono::steady_clock::time_point lastBeatTime;
 std::chrono::steady_clock::time_point lastOnlineUsersFetchTime;
 std::chrono::steady_clock::time_point lastAnnouncementTime;
 
-std::string replaceAll(std::string subject, const std::string &search, const std::string &replace);
-
 std::string DownloadString(std::string URL);
 
 std::string removeColorCodes(const std::string &input);
@@ -33,127 +31,97 @@ void printVector(const std::vector<std::string> &vec)
 
 DWORD WINAPI init(HMODULE real)
 {
+    uint64_t start = Utils::getCurrentMs();
     Logger::initialize();
 
-    DWORD processID = GetCurrentProcessId();
-    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
+    bool hatless = true;
 
-    if (!Utils::isMinecraftLoaded(hProcess))
-    {
-        Logger::info("Waiting for Minecraft to load...");
+    if (hatless) {
+        DWORD processID = GetCurrentProcessId();
+        HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
 
-        while (!Utils::isMinecraftLoaded(hProcess))
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        if (!Utils::isMinecraftLoaded(hProcess)) {
+            Logger::info("Waiting for Minecraft to load...");
+
+            while (!Utils::isMinecraftLoaded(hProcess)) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            }
+        }
+        CloseHandle(hProcess);
+    } else {
+        if (!Utils::isMinecraftLoadedAetopia()) {
+            Logger::info("Waiting for Minecraft to load...");
+
+            while (!Utils::isMinecraftLoadedAetopia()) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
         }
     }
 
-    Logger::info("Minecraft loaded!");
-    CloseHandle(hProcess);
-
     Client::initialize();
 
+    float elapsed = (Utils::getCurrentMs() - start) / 1000.0;
+
+    Logger::success("Flarial initialized in {:.2f}s", elapsed);
+    //Logger::printColors();
+
     std::thread statusThread([]() {
-        while (!Client::disable)
-        {
+    while (!Client::disable) {
+        auto now = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastBeatTime);
+        auto onlineUsersFetchElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastOnlineUsersFetchTime);
+        auto onlineAnnouncementElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastAnnouncementTime);
 
-            auto now = std::chrono::steady_clock::now();
-            auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastBeatTime);
-            auto onlineUsersFetchElapsed =
-                std::chrono::duration_cast<std::chrono::seconds>(now - lastOnlineUsersFetchTime);
-            auto onlineAnnouncementElapsed =
-                std::chrono::duration_cast<std::chrono::seconds>(now - lastAnnouncementTime);
-
-            if (!Client::disable)
-            {
-                if (SDK::hasInstanced && SDK::clientInstance != nullptr)
-                {
-                    if (SDK::clientInstance->getLocalPlayer() != nullptr)
-                    {
-                        if (elapsed >= std::chrono::seconds(60))
-                        {
-                            std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
-
-                            std::string ipToSend = SDK::getServerIP();
-
-                            if (!Client::settings.getSettingByName<bool>("anonymousApi")->value)
-                            {
-                                if (ipToSend.find("none") != std::string::npos)
-                                    ipToSend = "in.singleplayer";
-                                else if (!ipToSend.empty())
-                                    ;
-                                else
-                                    ipToSend = "in.singleplayer";
-                            }
-                            else
-                                ipToSend = "is.anonymous";
-
-                            auto module = ModuleManager::getModule("Nick");
-
-                            if (SDK::clientInstance != nullptr)
-                                if (SDK::clientInstance->getLocalPlayer() != nullptr)
-                                {
-                                    if (module && module->isEnabled())
-                                    {
-                                        name =
-                                            Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickModule::original));
-                                        name = replaceAll(name, "�", "");
-                                    }
-                                    std::string clearedName =
-                                        Utils::removeNonAlphanumeric(Utils::removeColorCodes(name));
-                                    if (clearedName.empty())
-                                        clearedName = Utils::removeColorCodes(name);
-                                    if (clearedName == "skinStandardCust")
-                                        return;
-                                    // send thing
-                                    DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}",
-                                                               clearedName, ipToSend));
-
-                                    lastBeatTime = now;
-                                }
-                        }
-                        if (onlineUsersFetchElapsed >= std::chrono::minutes(3))
-                        {
-
-                            auto onlineUsersRaw = DownloadString("https://api.flarial.synthetix.host/servers");
-
-                            nlohmann::json playersDict;
-
-                            try
-                            {
-                                playersDict = nlohmann::json::parse(onlineUsersRaw);
-                                Client::onlinePlayers = Client::getPlayersVector(playersDict);
-                            }
-                            catch (const json::parse_error &e)
-                            {
-                                Logger::error("An error occurred while parsing online users: {}", e.what());
-                                lastOnlineUsersFetchTime = now;
-                                continue;
-                            }
-
-                            lastOnlineUsersFetchTime = now;
-                        }
-
-                        if (ModuleManager::initialized)
-                        {
-                            if (SDK::clientInstance && onlineAnnouncementElapsed >= std::chrono::minutes(10))
-                            {
-                                if (Client::settings.getSettingByName<bool>("promotions")->value)
-                                    SDK::clientInstance->getGuiData()->displayClientMessage(
-                                        "§khiii §r §n§l§4FLARIAL §r§khiii \n§r§cDonate to Flarial! "
-                                        "§ehttps://flarial.xyz/donate\n§9Join our discord! "
-                                        "§ehttps://flarial.xyz/discord");
-                                lastAnnouncementTime = now;
-                            }
-                        }
-                    }
-                }
-                Sleep(60);
-            }
-            else
-                break;
+        if (!SDK::hasInstanced || SDK::clientInstance == nullptr || SDK::clientInstance->getLocalPlayer() == nullptr) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(60));
+            continue;
         }
-    });
+
+        if (elapsed >= std::chrono::seconds(60)) {
+            std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
+            std::string ipToSend = SDK::getServerIP();
+
+            if (Client::settings.getSettingByName<bool>("anonymousApi")->value) {
+                ipToSend = "is.anonymous";
+            } else if (ipToSend.find("none") != std::string::npos || ipToSend.empty()) {
+                ipToSend = "in.singleplayer";
+            }
+
+            auto module = ModuleManager::getModule("Nick");
+            if (module && module->isEnabled()) {
+                name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickModule::original));
+                name = Utils::replaceAll(name, "�", "");
+            }
+
+            std::string clearedName = Utils::removeNonAlphanumeric(Utils::removeColorCodes(name));
+            if (clearedName.empty()) clearedName = Utils::removeColorCodes(name);
+            if (clearedName != "skinStandardCust") {
+                DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}", clearedName, ipToSend));
+                lastBeatTime = now;
+            }
+        }
+
+        if (onlineUsersFetchElapsed >= std::chrono::minutes(3)) {
+            try {
+                auto onlineUsersRaw = DownloadString("https://api.flarial.synthetix.host/servers");
+                Client::onlinePlayers = Client::getPlayersVector(nlohmann::json::parse(onlineUsersRaw));
+                lastOnlineUsersFetchTime = now;
+            } catch (const nlohmann::json::parse_error &e) {
+                Logger::error("An error occurred while parsing online users: {}", e.what());
+            }
+        }
+
+        if (onlineAnnouncementElapsed >= std::chrono::minutes(10) && ModuleManager::initialized &&
+            Client::settings.getSettingByName<bool>("promotions")->value) {
+            SDK::clientInstance->getGuiData()->displayClientMessage(
+                "§khiii §r §n§l§4FLARIAL §r§khiii \n§r§cDonate to Flarial! §ehttps://flarial.xyz/donate\n§9Join our discord! §ehttps://flarial.xyz/discord"
+            );
+            lastAnnouncementTime = now;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(60));
+    }
+});
 
     statusThread.detach();
 
@@ -236,22 +204,11 @@ std::string DownloadString(std::string URL)
             } while (bytesRead);
             InternetCloseHandle(interwebs);
             InternetCloseHandle(urlFile);
-            std::string p = replaceAll(rtn, "|n", "\r\n");
+            std::string p = Utils::replaceAll(rtn, "|n", "\r\n");
             return p;
         }
     }
     InternetCloseHandle(interwebs);
-    std::string p = replaceAll(rtn, "|n", "\r\n");
+    std::string p = Utils::replaceAll(rtn, "|n", "\r\n");
     return p;
-}
-
-std::string replaceAll(std::string subject, const std::string &search, const std::string &replace)
-{
-    size_t pos = 0;
-    while ((pos = subject.find(search, pos)) != std::string::npos)
-    {
-        subject.replace(pos, search.length(), replace);
-        pos += replace.length();
-    }
-    return subject;
 }

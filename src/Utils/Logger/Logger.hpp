@@ -23,6 +23,7 @@ namespace Logger {
     void writeToFile(const std::string& string);
     void initialize();
     void shutdown();
+    void printColors();
 
     void print(const fmt::text_style& ts, const std::string& level, const std::string& fmt, auto&& ... args) {
         try {

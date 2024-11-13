@@ -66,18 +66,18 @@ public:
     static void hookFunc(void *pTarget, void *pDetour, void **ppOriginal, std::string name) {
 
         if (pTarget == nullptr) {
-            Logger::error("[vFunc Hook] {} has invalid address", name);
+            Logger::custom(fg(fmt::color::crimson), "vFunc Hook", "{} has invalid address", name);
             return;
         }
 
         if (MH_CreateHook(pTarget, pDetour, ppOriginal) != MH_OK) {
-            Logger::error("[vFunc Hook] Failed to hook {} function", name);
+            Logger::custom(fg(fmt::color::crimson), "vFunc Hook", "Failed to hook {}", name);
             return;
         }
 
         MH_EnableHook(pTarget);
 
-        Logger::info("[vFunc Hook] Successfully hooked {} at {}", name, pTarget);
+        Logger::custom(fg(fmt::color::dodger_blue), "vFunc Hook", "Hooked {} at {}", name, pTarget);
     }
 
     template<typename R, typename... Args>
