@@ -9,12 +9,12 @@ private:
     float y = 0;
     float xv = 1;
     float yv = 1;
-    int index = 0;
+    int pic = 0;
     int lastTime = 0;
     std::chrono::steady_clock::time_point time;
 public:
 
-    PatarHD() : Module("PatarHD", "Who is this now?", IDR_SKULL_PNG, "") {
+    PatarHD() : Module("PatarHD", "At this Point it should be called Staff Mod", IDR_SKULL_PNG, "") {
         Module::setup();
     };
 
@@ -53,7 +53,7 @@ public:
         this->addHeader("General");
 
         this->addToggle("DVD Mode", "See for yourself", this->settings.getSettingByName<bool>("dvdmode")->value);
-        this->addDropdown("Mode", "", std::vector<std::string>{"Patar", "Jqms", "Chyves", "treegfx"}, this->settings.getSettingByName<std::string>("mode")->value);
+        this->addDropdown("Mode", "", std::vector<std::string>{"Patar", "Jqms", "Chyves", "Nikita", "treegfx"}, this->settings.getSettingByName<std::string>("mode")->value);
         this->addSlider("Scale", "", this->settings.getSettingByName<float>("scale")->value, 5.0F);
         if (this->settings.getSettingByName<bool>("dvdmode")->value) {
             this->addHeader("DVD Mode");
@@ -69,27 +69,45 @@ public:
         if (SDK::currentScreen != "hud_screen") return;
         float s = Constraints::RelativeConstraint(0.35, "height", true) * this->settings.getSettingByName<float>("scale")->value;
         int draw = 165;
+        LPCSTR mode = "JPG";
         if (this->settings.getSettingByName<std::string>("mode")->value == "Jqms")
         {
+            mode = "JPG";
             if (getMs() >= 70) {
                 reset();
-                if (index == 31) {
-                    index = 0;
+                if (pic == 31) {
+                    pic = 0;
                 }
                 else
                 {
-                    index++;
+                    pic++;
                 }
             }
             
-            draw = 184 + index;
+            draw = 184 + pic;
         } else if (this->settings.getSettingByName<std::string>("mode")->value == "Chyves") {
+            mode = "JPG";
             draw = 216;
         } else if (this->settings.getSettingByName<std::string>("mode")->value == "treegfx") {
+            mode = "JPG";
             draw = 217;
+        } else if (this->settings.getSettingByName<std::string>("mode")->value == "Nikita")
+        {
+            mode = "PNG";
+            if (getMs() >= 30) {
+                reset();
+                if (pic == 14) {
+                    pic = 0;
+                }
+                else
+                {
+                    pic++;
+                }
+            }
+            draw = 218 + pic;
         }
         if (this->settings.getSettingByName<bool>("dvdmode")->value) {
-            FlarialGUI::image(draw, D2D1::RectF(x, y, x + s, y + s), "JPG");
+            FlarialGUI::image(draw, D2D1::RectF(x, y, x + s, y + s), mode);
 
             x += this->settings.getSettingByName<float>("xveloc")->value * xv;
             y += this->settings.getSettingByName<float>("yveloc")->value * yv;
@@ -101,7 +119,7 @@ public:
         } else {
             float s2 = s/2 ;
             Vec2<float> center = Vec2<float>{ MC::windowSize.x / 2, MC::windowSize.y / 2 };
-            FlarialGUI::image(draw, D2D1::RectF(center.x - s2, center.y - s2, center.x + s2, center.y + s2), "JPG");
+            FlarialGUI::image(draw, D2D1::RectF(center.x - s2, center.y - s2, center.x + s2, center.y + s2), mode);
         }
     }
 
