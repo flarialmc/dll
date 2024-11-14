@@ -140,6 +140,8 @@ namespace FlarialGUI {
     inline DropdownStruct DropDownMenus[2000];
     inline KeybindSelector KeybindSelectors[2000];
 
+    inline int maxRect = 0;
+
     inline std::map<std::string, ImFont*> FontMap = {};
     inline std::map<std::string, bool> FontsNotFound = {};
 

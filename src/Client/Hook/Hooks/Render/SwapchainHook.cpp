@@ -157,10 +157,6 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
         return DXGI_ERROR_INVALID_CALL;
     }
 
-    auto vsync = !Client::settings.getSettingByName<bool>("vsync")->value;
-
-    pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-
     std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
 
     if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
@@ -178,6 +174,9 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
     }
 
     pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
+    pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+    // Gives error rn probably because fmt doesnt know how to handle it
+    //Logger::info("Swap Effect: {}", pDesc->SwapEffect);
 
     MADECHAIN = TRUE;
     queueReset = false;
