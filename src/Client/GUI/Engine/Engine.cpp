@@ -848,7 +848,7 @@ void FlarialGUI::ExtractImageResource(int resourceId, std::string fileName, LPCT
 
     std::string fileType(type);
 
-    std::string lpFileName = Utils::getRoamingPath() + "\\Flarial\\assets\\" + fileName;
+    std::string lpFileName = Utils::getAssetsPath() + fileName;
 
     std::ofstream outFile(lpFileName, std::ios::binary);
     if (!outFile) {
@@ -878,7 +878,7 @@ void FlarialGUI::LoadFont(int resourceId) {
 
     dwFontSize = SizeofResource(Client::currentModule, hRes);
 
-    std::string lpFileName = Utils::getRoamingPath() + "\\Flarial\\assets\\" + std::to_string(resourceId) + ".ttf";
+    std::string lpFileName = fmt::format("{}\\{}.ttf", Utils::getAssetsPath(), resourceId);
 
     std::ofstream outFile(lpFileName, std::ios::binary);
     if (!outFile) {

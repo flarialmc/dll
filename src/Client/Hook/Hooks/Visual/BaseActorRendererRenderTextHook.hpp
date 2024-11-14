@@ -14,12 +14,10 @@
 #include "../../../../Utils/Utils.hpp"
 
 class BaseActorRendererRenderTextHook : public Hook {
-private:
-
     static void drawLogo(ScreenContext* screenContext, const Vec3<float>& cameraPos, const Vec3<float>& cameraTargetPos, const std::string& nameTag, const Vec3<float>& tagPos, Font* font) {
 
-        std::string clearedName = Utils::removeNonAlphanumeric(Utils::removeColorCodes(nameTag));
-        if (clearedName.empty()) clearedName = Utils::removeColorCodes(nameTag); // nametag might contain some unclearable stuff
+        std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(nameTag));
+        if (clearedName.empty()) clearedName = String::removeColorCodes(nameTag); // nametag might contain some unclearable stuff
 
         if(!contains(Client::onlinePlayers, clearedName)) return;
 
@@ -47,7 +45,7 @@ private:
         const auto mScale = 0.026666669f; // 0.16f
         matrix = scale(matrix, {mScale * -1, mScale * -1, mScale});
 
-        const ResourceLocation loc(Utils::getRoamingPath() + R"(\Flarial\assets\red-logo.png)", true); // The logo is the normal transparent Flarial logo, 128x128
+        const ResourceLocation loc(Utils::getAssetsPath() + "\\red-logo.png", true); // The logo is the normal transparent Flarial logo, 128x128
         const TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
 
         const float fontHeight = font->getLineHeight();
