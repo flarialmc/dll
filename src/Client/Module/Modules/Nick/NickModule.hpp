@@ -90,62 +90,54 @@ public:
     }
 
     void onDrawText(DrawTextEvent &event) {
-        if (SDK::clientInstance != nullptr) {
-            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                if (original.empty()) original = SDK::clientInstance->getLocalPlayer()->getPlayerName();
-                if (this->isEnabled() && !this->restricted) {
-                    std::string localPlayerName = original;
-                    size_t pos = event.getText()->find(localPlayerName);
-                    if (pos != std::string::npos) {
-                        std::string faketxt = *event.getText();
-                        faketxt.replace(pos, localPlayerName.length(),
-                                        "§o"+Utils::removeColorCodes(this->settings.getSettingByName<std::string>("nick")->value)+"§r");
-                        *event.getText() = faketxt;
-                    }
-                }
+        if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer())
+            return;
+
+        if (original.empty())
+            original = SDK::clientInstance->getLocalPlayer()->getPlayerName();
+
+        if (this->isEnabled() && !this->restricted) {
+            const std::string &localPlayerName = original;
+            size_t pos = event.getText()->find(localPlayerName);
+
+            if (pos != std::string::npos) {
+                std::string faketxt = *event.getText();
+                faketxt.replace(pos, localPlayerName.length(),
+                                "§o" + String::removeColorCodes(this->settings.getSettingByName<std::string>("nick")->value) + "§r");
+                *event.getText() = faketxt;
             }
         }
     }
 
     void onTick(TickEvent &event) {
-        if (!SDK::clientInstance->getLocalPlayer())
-            return;
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (!player) return;
 
-        if (original.empty()) original = SDK::clientInstance->getLocalPlayer()->getPlayerName();
-        if (original2.empty()) original2 = *SDK::clientInstance->getLocalPlayer()->getNametag();
-        if (backupOri.empty()) backupOri = *SDK::clientInstance->getLocalPlayer()->getNametag();
+        if (original.empty())
+            original = player->getPlayerName();
 
-        // TODO: this can be done better
-        if (enabled != this->isEnabled()) {
-            enabled = this->isEnabled();
+        if (original2.empty() || backupOri.empty()) {
+            original2 = *player->getNametag();
+            backupOri = original2;
+        }
 
-            if (!enabled) original2 = *SDK::clientInstance->getLocalPlayer()->getNametag();
+        bool currentlyEnabled = this->isEnabled();
+        if (enabled != currentlyEnabled) {
+            enabled = currentlyEnabled;
+            if (!enabled)
+                original2 = *player->getNametag();
         }
 
         if (enabled && !this->restricted) {
-
-            std::string val = "§o"+Utils::removeColorCodes(this->settings.getSettingByName<std::string>("nick")->value)+"§r";
-            SDK::clientInstance->getLocalPlayer()->setNametag(&val);
-            SDK::clientInstance->getLocalPlayer()->getPlayerName() = val;
-
+            std::string val = "§o" + String::removeColorCodes(this->settings.getSettingByName<std::string>("nick")->value) + "§r";
+            player->setNametag(&val);
+            player->getPlayerName() = val;
         } else {
+            if (original2 == this->settings.getSettingByName<std::string>("nick")->value)
+                original2 = backupOri;
 
-            std::string val = original;
-            std::string val2;
-
-            if (original2 != *SDK::clientInstance->getLocalPlayer()->getNametag()) {
-                original2 = *SDK::clientInstance->getLocalPlayer()->getNametag();
-                backupOri = *SDK::clientInstance->getLocalPlayer()->getNametag();
-            }
-            if (original2 == this->settings.getSettingByName<std::string>("nick")->value) original2 = backupOri;
-            val2 = original2;
-
-            //std::cout << original2 << std::endl;
-
-            SDK::clientInstance->getLocalPlayer()->setNametag(&val2);
-            SDK::clientInstance->getLocalPlayer()->getPlayerName() = val;
-
+            player->setNametag(&original2);
+            player->getPlayerName() = original;
         }
-
     }
 };

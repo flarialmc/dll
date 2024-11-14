@@ -14,8 +14,7 @@
 #include "winrt/Windows.UI.Core.h"
 #include "winrt/windows.system.h"
 
-
-std::string Client::settingspath = Utils::getRoamingPath() + R"(\Flarial\Config\main.flarial)";
+std::string Client::settingspath = Utils::getConfigsPath() + "\\main.flarial";
 Settings Client::settings = Settings();
 std::vector<std::string> Client::onlinePlayers;
 
@@ -23,49 +22,22 @@ bool notifiedOfConnectionIssue = false;
 
 std::string Client::current_commit = COMMIT_HASH;
 
-
-
-void DownloadAndSave(const std::string& url, const std::string& path) {
-
-    if (Client::settings.getSettingByName<bool>("dlassets")->value || !std::filesystem::exists(path)) {
-        char test[256];
-        strcpy_s(test, "https://flarialbackup.ashank.tech/");
-        if (InternetCheckConnectionA(test, FLAG_ICC_FORCE_CONNECTION, 0))
-            URLDownloadToFileW(nullptr, FlarialGUI::to_wide(url).c_str(), FlarialGUI::to_wide(path).c_str(), 0, nullptr);
-        else {
-            if(notifiedOfConnectionIssue) return;
-            notifiedOfConnectionIssue = true;
-            MessageBox(nullptr, "Flarial: Failed to download assets! Try using vpn.", "", MB_OK);
-            ModuleManager::terminate();
-            Client::disable = true;
-        }
-
-    }
-
-}
-
 std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
     std::vector<std::string> allPlayers;
 
-    // Iterate over each server in the JSON object
-    for (const auto & it : data) {
+    for (const auto& it : data) {
         if (it.contains("players")) {
-            // Get the "players" array for the server
-            const auto& players = it.at("players");
-
-            // Add each player to the allPlayers vector
-            for (const auto& player : players) {
+            for (const auto& player : it.at("players")) {
                 allPlayers.push_back(player);
             }
         }
     }
 
-    if(SDK::clientInstance && SDK::clientInstance->getLocalPlayer()) {
+    if (SDK::clientInstance && SDK::clientInstance->getLocalPlayer()) {
         std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
+        std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
 
-        std::string clearedName = Utils::removeNonAlphanumeric(Utils::removeColorCodes(name));
-        if (clearedName.empty()) clearedName = Utils::removeColorCodes(name);
-
+        if (clearedName.empty()) clearedName = String::removeColorCodes(name);
         allPlayers.push_back(clearedName);
     }
 
@@ -84,16 +56,14 @@ void Client::setWindowTitle(std::wstring title) {
 }
 
 void Client::initialize() {
+    setWindowTitle(L"Flarial " + String::StrToWStr(WinrtUtils::getFormattedVersion() + " " + current_commit));
 
-    std::string title = WinrtUtils::getFormattedVersion() + " " + current_commit;
-    setWindowTitle(L"Flarial " + FlarialGUI::to_wide(title));
-    
     VersionUtils::init();
     Client::version = WinrtUtils::getFormattedVersion();
 
     if (!VersionUtils::isSupported(Client::version)) {
         Logger::fatal("Minecraft version is not supported!");
-        MessageBox(NULL, "Flarial: this version is not supported!", "", MB_OK);
+        MessageBox(nullptr, "Flarial: this version is not supported!", "", MB_OK);
         ModuleManager::terminate();
         Client::disable = true;
         return;
@@ -101,24 +71,17 @@ void Client::initialize() {
 
     VersionUtils::addData();
 
-    std::filesystem::path folder_path(Utils::getRoamingPath() + "\\Flarial");
-    if (!exists(folder_path)) {
-        create_directory(folder_path);
-    }
+    std::vector<std::filesystem::path> directories = {
+        Utils::getRoamingPath() + "\\Flarial",
+        Utils::getRoamingPath() + "\\Flarial\\Assets",
+        Utils::getRoamingPath() + "\\Flarial\\Logs",
+        Utils::getRoamingPath() + "\\Flarial\\Configs"
+    };
 
-    std::filesystem::path folder_path2(Utils::getRoamingPath() + "\\Flarial\\assets");
-    if (!exists(folder_path2)) {
-        create_directory(folder_path2);
-    }
-
-    std::filesystem::path folder_path3(Utils::getRoamingPath() + "\\Flarial\\logs");
-    if (!exists(folder_path3)) {
-        create_directory(folder_path3);
-    }
-
-    std::filesystem::path folder_path4(Utils::getRoamingPath() + "\\Flarial\\Config");
-    if (!exists(folder_path4)) {
-        create_directory(folder_path4);
+    for (const auto& path : directories) {
+        if (!std::filesystem::exists(path)) {
+            std::filesystem::create_directory(path);
+        }
     }
 
     Client::CheckSettingsFile();

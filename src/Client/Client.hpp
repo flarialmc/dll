@@ -30,51 +30,37 @@ public:
     static void SaveSettings() {
         try {
             std::ofstream outputFile(settingspath);
-            if (outputFile.is_open()) {
-                std::string jsonString = settings.ToJson();
-                outputFile << jsonString;
-                outputFile.close();
+            if (outputFile) {
+                outputFile << settings.ToJson();
             } else {
-                Logger::error("Failed to save open file. Maybe it doesn't exist?: {}", settingspath);
+                Logger::error("Failed to open file for saving settings: {}", settingspath);
             }
-        } catch (const std::exception &ex) {
-            Logger::error("An error occurred while trying to save settings: {}", ex.what());
+        } catch (const std::exception& e) {
+            Logger::error("An error occurred while trying to save settings to {}: {}", settingspath, e.what());
         }
     }
 
     static void LoadSettings() {
         std::ifstream inputFile(settingspath);
-        std::stringstream ss;
 
-        if (inputFile.is_open()) {
-            ss << inputFile.rdbuf();
-            inputFile.close();
-        } else {
-            Logger::error("Failed to save open file. Maybe it doesn't exist?: {}", settingspath);
+        if (!inputFile) {
+            Logger::error("Failed to open settings file for loading: {}", settingspath);
             return;
         }
 
-        std::string settingstring = ss.str();
-        settings.FromJson(settingstring);
+        std::stringstream ss;
+        ss << inputFile.rdbuf();
+        settings.FromJson(ss.str());
     }
 
     static void CheckSettingsFile() {
-
         if (!std::filesystem::exists(settingspath)) {
+            std::filesystem::create_directories(std::filesystem::path(settingspath).parent_path());
 
-            std::filesystem::path filePath(settingspath);
-            std::filesystem::create_directories(filePath.parent_path());
-
-            HANDLE fileHandle = CreateFileA(settingspath.c_str(), GENERIC_WRITE | GENERIC_READ,
-                                            FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                                            OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-
-            if (fileHandle == INVALID_HANDLE_VALUE) {
-                Logger::error("Failed to create file: {}", settingspath);
-                return;
+            std::ofstream file(settingspath, std::ios::app);
+            if (!file) {
+                Logger::error("Failed to create settings file: {}", settingspath);
             }
-
-            CloseHandle(fileHandle);
         }
     }
 };
