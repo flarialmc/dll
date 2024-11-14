@@ -1,7 +1,8 @@
 ﻿#pragma once
 
 #include "Manager.hpp"
-#include "Modules/Misc/Input/GUIKeyListener.hpp"
+#include "../Events/EventHandler.hpp"
+#include "Modules/Input/GUIKeyListener.hpp"
 #include "Modules/Misc/SaveConfig/SaveConfigListener.hpp"
 #include "Modules/Misc/RGB/rgbListener.hpp"
 #include "Modules/Misc/TextAlias/TextAliasListener.hpp"
@@ -21,6 +22,8 @@
 #include "Modules/ComboCounter/ComboCounter.hpp"
 #include "Modules/IPDisplay/IPDisplay.hpp"
 #include "Modules/PingCounter/PingCounter.hpp"
+#include "Modules/AppleCounter/AppleCounter.hpp"
+#include "Modules/AppleCounter/AppleListener.hpp"
 #include "Modules/PotCounter/PotCounter.hpp"
 #include "Modules/ArrowCounter/ArrowCounter.hpp"
 #include "Modules/EntityCounter/EntityCounter.hpp"
@@ -61,7 +64,6 @@
 #include "Modules/Misc/DiscordRPC/DiscordRPCListener.hpp"
 //#include "Modules/Overlay/OverlayModule.hpp"
 #include "Modules/AutoRQ/AutoRQ.hpp"
-#include "Modules/Misc/HiveModeCatcher/HiveModeCatcherListener.hpp"
 #include "Modules/HitPing/HitPing.hpp"
 #include "Modules/InstantHurtAnimation/InstantHurtAnimation.hpp"
 //#include "Modules/MovableChat/MovableChat.hpp"
@@ -69,127 +71,112 @@
 
 #include "Modules/ItemPhysics/ItemPhysics.hpp"
 #include "Modules/Crosshair/Crosshair.hpp"
-#include "Modules/CustomCrosshair/CustomCrosshair.hpp"
 #include "Modules/HiveStat/HiveStat.hpp"
 #include "Modules/OpponentReach/OpponentReach.hpp"
 #include "Modules/ViewModel/ViewModel.hpp"
 #include "Modules/PotionHUD/PotionHUD.hpp"
 #include "Modules/FasterInventory/FasterInventory.hpp"
-#include "Modules/Waypoints/Waypoints.hpp"
 
 #include "Modules/EntityCounter/EntityCounter.hpp"
-#include "Modules/PackChanger/PackChanger.hpp"
-#include "Modules/MovableHUD/MovableHUD.hpp"
-#include "Modules/MovableScoreboard/MovableScoreboard.hpp"
-#include "Modules/MovableTitle/MovableTitle.hpp"
-#include "Modules/MovableBossbar/MovableBossbar.hpp"
-#include "Modules/MovableChat/MovableChat.hpp"
-#include "Modules/MovableCoordinates/MovableCoordinates.hpp"
-#include "Modules/MovableHotbar/MovableHotbar.hpp"
-#include "Modules/NullMovement/NullMovement.hpp"
 
 namespace ModuleManager {
-    std::unordered_map<size_t, std::shared_ptr<Module>> moduleMap;
-    std::vector<std::shared_ptr<Listener>> services;
+    std::unordered_map<size_t, Module*> moduleMap;
     bool initialized = false;
 }
 
-std::vector<std::shared_ptr<Module>> ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
-    std::vector<std::shared_ptr<Module>> modulesVector;
+void ModuleManager::addModule(Module* module) {
+    size_t hash = std::hash<std::string>{}(module->name);
+    moduleMap[hash] = module;
+}
+
+std::vector<Module*> ModuleManager::getModules() {
+    std::vector<Module*> modulesVector;
     for (const auto& pair : moduleMap) {
-        if(pair.second == nullptr) continue;
         modulesVector.push_back(pair.second);
     }
     return modulesVector;
 }
 
 void ModuleManager::initialize() {
-    addModule<MotionBlur>();
+    addModule(new MotionBlur());
 
     // Screen effects
-    addModule<Deepfry>();
-    addModule<HueChanger>();
-    addModule<PatarHD>();
-    addModule<DVD>();
+    addModule(new Deepfry());
+    addModule(new HueChanger());
+    addModule(new PatarHD());
+    addModule(new DVD());
 
     // FOV Changers
-    addModule<FOVChanger>(); //1
-    addModule<Zoom>(); //2
-    addModule<UpsideDown>(); //3
+    addModule(new FOVChanger()); //1
+    addModule(new Zoom()); //2
+    addModule(new UpsideDown()); //3
 
-    addModule<ClickGUI>();
+    addModule(new ClickGUI());
 
-    addModule<FPSCounter>();
-    addModule<CPSCounter>();
-    addModule<IPDisplay>();
-    addModule<ReachCounter>();
-    addModule<ComboCounter>();
-    addModule<PingCounter>();
-    addModule<PotCounter>();
-    addModule<ArrowCounter>();
-    addModule<EntityCounter>();
-    addModule<Time>();
-    addModule<MEM>();
-    addModule<Fullbright>();
-    addModule<ForceCoords>();
-    addModule<Keystrokes>();
-    addModule<Sneak>();
-    addModule<Sprint>();
-    addModule<Hitbox>();
-    addModule<HurtColor>();
-    addModule<ThirdPerson>();
+    addModule(new FPSCounter());
+    addModule(new AppleCounter());
+    addModule(new CPSCounter());
+    addModule(new IPDisplay());
+    addModule(new ReachCounter());
+    addModule(new ComboCounter());
+    addModule(new PingCounter());
+    addModule(new PotCounter());
+    addModule(new ArrowCounter());
+    addModule(new EntityCounter());
+    addModule(new Time());
+    addModule(new MEM());
+    addModule(new Fullbright());
+    addModule(new ForceCoords());
+    addModule(new Keystrokes());
+    addModule(new Sneak());
+    addModule(new Sprint());
+    addModule(new Hitbox());
+    addModule(new ThirdPerson());
+    addModule(new SnapLook());
+    addModule(new HurtColor());
+    addModule(new FogColor());
+    addModule(new ArmorHUD());
+    addModule(new TimeChanger());
+    addModule(new RenderOptions());
+    addModule(new PaperDoll());
+    addModule(new GuiScale());
+    addModule(new WeatherChanger());
+    addModule(new TabList());
+    addModule(new AutoGG());
+    addModule(new TextHotkey());
+    addModule(new NickModule());
+    addModule(new FreeLook());
+    addModule(new SpeedDisplay());
+    addModule(new CPSLimiter());
+    addModule(new BlockBreakIndicator());
+    addModule(new Animations());
+    addModule(new BlockOutline());
+    addModule(new CommandHotkey());
+    addModule(new NoHurtCam());
+    addModule(new InventoryHUD());
+    //addModule(new OverlayModule());
+    addModule(new AutoRQ());
+    addModule(new HitPing());
+    addModule(new InstantHurtAnimation());
+    addModule(new OpponentReach());
+    addModule(new ViewModel());
+    addModule(new PotionHUD());
+    addModule(new FasterInventory());
 
-    addModule<SnapLook>();
-    addModule<FogColor>();
-    addModule<ArmorHUD>();
-    addModule<TimeChanger>();
-    addModule<RenderOptions>();
-    addModule<PaperDoll>();
-    addModule<GuiScale>();
-    addModule<TabList>();
-    addModule<WeatherChanger>();
-    addModule<NickModule>();
-    addModule<FreeLook>();
+    //addModule(new MovableChat());
+    //addModule(new CompactChat());
+    addModule(new ItemPhysics());
+    
+    
+    addModule(new HiveStat());
 
-    addModule<AutoGG>();
-    addModule<TextHotkey>();
-    addModule<SpeedDisplay>();
-    addModule<CPSLimiter>();
-    addModule<BlockBreakIndicator>();
-    addModule<Animations>();
-    addModule<BlockOutline>();
-    addModule<CommandHotkey>();
-    addModule<NoHurtCam>();
-    addModule<InventoryHUD>();
-    addModule<AutoRQ>();
-    addModule<HitPing>();
-    addModule<InstantHurtAnimation>();
-    addModule<OpponentReach>();
-    addModule<ViewModel>();
-    addModule<PotionHUD>();
-    addModule<FasterInventory>();
-    //addModule<MovableHUD>();
-    addModule<MovableScoreboard>();
-    addModule<MovableTitle>();
-    addModule<MovableBossbar>();
-    addModule<MovableChat>();
-    addModule<MovableCoordinates>();
-    addModule<MovableHotbar>();
-    // addModule<CompactChat>();
-    addModule<ItemPhysics>();
-    addModule<HiveStat>();
-    addModule<Waypoints>();
-    addModule<PackChanger>();
-    addModule<NullMovement>();
-    addModule<CustomCrosshair>();
-
-    addService<GUIKeyListener>();
-    addService<DiscordRPCListener>();
-    addService<UninjectListener>();
-    addService<SaveConfigListener>();
-    addService<CentreCursorListener>();
-    addService<rgbListener>();
-    addService<HiveModeCatcherListener>();
+    EventHandler::registerListener(new GUIKeyListener("GuiKeyListener"));
+    EventHandler::registerListener(new DiscordRPCListener("DiscordRPC"));
+    EventHandler::registerListener(new UninjectListener("Uninject"));
+    EventHandler::registerListener(new SaveConfigListener("SaveConfig"));
+    EventHandler::registerListener(new CentreCursorListener("CentreCursor"));
+    EventHandler::registerListener(new rgbListener("RGB Controller"));
+    EventHandler::registerListener(new HiveModeCatcherListener("HiveModeCatcher"));
 
     initialized = true;
 }
@@ -201,27 +188,11 @@ void ModuleManager::terminate() {
             pair.second->terminate();
     }
     moduleMap.clear();
-    services.clear();
-}
-
-void ModuleManager::syncState() {
-    for (const auto& pair : moduleMap) {
-        auto& module = pair.second;
-        if (module != nullptr) {
-            if(module->enabledState != module->isEnabled()) {
-                if(module->enabledState) {
-                    module->onEnable();
-                } else {
-                    module->onDisable();
-                }
-            }
-        }
-    }
 }
 
 void ModuleManager::SaveModulesConfig() {
-    for (const auto& module : getModules()) {
-        module->saveSettings();
+    for (const auto& pair : moduleMap) {
+        pair.second->saveSettings();
     }
 }
 // TODO: use enums?
@@ -246,7 +217,7 @@ bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {
 
 }
 
-std::shared_ptr<Module> ModuleManager::getModule(const std::string& name) {
+Module* ModuleManager::getModule(const std::string& name) {
     size_t hash = std::hash<std::string>{}(name);
 
     return moduleMap[hash];
