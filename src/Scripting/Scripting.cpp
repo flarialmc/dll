@@ -7,6 +7,7 @@
 #include "ScriptModuleBase.hpp"
 #include "Functions/GUI.hpp"
 #include "Functions/General.hpp"
+#include "Functions/Constraints.hpp"
 
 
 int lua_register_event_handler(lua_State* L) {
@@ -37,6 +38,7 @@ void registerFunctions(lua_State* L){
 
     General::registerGeneral(L);
     GUI::registerGUI(L);
+    LuaConstraints::registerConstraints(L);
 }
 
 void load(std::string name, std::string description, std::string mainclass) {
