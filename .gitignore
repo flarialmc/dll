@@ -32,3 +32,5 @@ _deps/
 *.dll
 *.ilk
 Makefile
+cmake-build-debug/
+Testing/
