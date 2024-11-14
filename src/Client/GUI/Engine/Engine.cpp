@@ -848,7 +848,7 @@ void FlarialGUI::ExtractImageResource(int resourceId, std::string fileName, LPCT
 
     std::string fileType(type);
 
-    std::string lpFileName = Utils::getAssetsPath() + fileName;
+    std::string lpFileName = fmt::format("{}\\{}", Utils::getAssetsPath(), fileName);
 
     std::ofstream outFile(lpFileName, std::ios::binary);
     if (!outFile) {
