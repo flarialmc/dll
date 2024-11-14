@@ -34,29 +34,26 @@ namespace GUI {
 
         return 0;
     }
-    const wchar_t* to_wchar_t(const std::string& str) {
-        std::wstring wstr(str.begin(), str.end());
-        return wstr.c_str();
+
+
+
+    int lua_GUI_FlarialTextWithFont(lua_State *L) {
+        int x = luaL_checkinteger(L, 1);
+        int y = luaL_checkinteger(L, 2);
+
+        std::string text = luaL_checkstring(L, 3);
+
+        float width = luaL_checknumber(L, 4);
+        float height = luaL_checknumber(L, 5);
+        float fontSize = luaL_checknumber(L, 6);
+
+
+        FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), width * 3.0f, height,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        fontSize,
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+        return 0;
     }
-
-
-
-//    int lua_GUI_FlarialTextWithFont(lua_State *L) {
-//        int x = luaL_checkinteger(L, 1);
-//        int y = luaL_checkinteger(L, 2);
-//
-//        std::string text = luaL_checkstring(L, 3);
-//
-//        float width = luaL_checknumber(L, 4);
-//        float height = luaL_checknumber(L, 5);
-//        float fontSize = luaL_checknumber(L, 6);
-//
-//        FlarialGUI::FlarialTextWithFont(x, y, to_wchar_t(text), width,
-//                                        height, DWRITE_TEXT_ALIGNMENT_LEADING,
-//                                        fontSize,
-//                                        DWRITE_FONT_WEIGHT_NORMAL);
-//        return 0;
-//    }
 
     int lua_GUI_RoundedHollowRect(lua_State *L) {
         float x = luaL_checkinteger(L, 1);
@@ -86,8 +83,8 @@ namespace GUI {
         lua_pushcfunction(L, lua_GUI_RoundedHollowRect);
         lua_setfield(L, -2, "RoundedHollowRect");
 
-//        lua_pushcfunction(L, lua_GUI_FlarialTextWithFont);
-//        lua_setfield(L, -2, "TextWithFont");
+        lua_pushcfunction(L, lua_GUI_FlarialTextWithFont);
+        lua_setfield(L, -2, "TextWithFont");
 
         lua_pushcfunction(L, lua_GUI_Color);
         lua_setfield(L, -2, "Color");        
