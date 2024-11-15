@@ -197,6 +197,7 @@ void ModuleManager::initialize() {
     Scripting::loadModules();
 
     initialized = true;
+    Scripting::instalized = true;
 }
 
 void ModuleManager::terminate() {
@@ -211,9 +212,24 @@ void ModuleManager::terminate() {
 
 
 void restart(){
+    Scripting::instalized = false;
     ScriptingEventManager::clearHandlers();
-    ModuleManager::terminate();
-    ModuleManager::initialize();
+    for (auto it = ModuleManager::moduleMap.begin(); it != ModuleManager::moduleMap.end(); ) {
+        if (it->second != nullptr && it->second->isScripting()) {
+            it->second->terminate();
+            it = ModuleManager::moduleMap.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    Scripting::loadModules();
+    for (const auto& pair : ModuleManager::moduleMap) {
+        if (pair.second != nullptr && it->second->isScripting())
+            pair.second->loadSettings();
+            pair.second->terminating = false;
+    }
+    Scripting::instalized = true;
 }
 
 

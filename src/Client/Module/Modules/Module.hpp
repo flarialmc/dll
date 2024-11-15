@@ -22,6 +22,7 @@ public:
     std::string name;
     std::string description;
     int icon;
+    bool isScriptingModule;
     std::string defaultKeybind;
     Settings settings;
     std::string settingspath;
@@ -29,7 +30,7 @@ public:
     int totalKeybinds = 0;
     int totalWaypoints = 0;
 
-    Module(const std::string &ename, const std::string &edescription, int eicon, const std::string& ekey) {
+    Module(const std::string &ename, const std::string &edescription, int eicon, const std::string& ekey, bool isScripting = false) {
         name = ename;
         description = edescription;
         icon = eicon;
@@ -39,6 +40,8 @@ public:
 
         checkSettingsFile();
         loadSettings();
+
+        isScriptingModule = isScripting;
     }
 
     bool active = false;
@@ -104,4 +107,5 @@ public:
     bool isKeyPartOfKeybind(int keyCode, const int keybindCount = 0);
     static bool isKeyPartOfAdditionalKeybind(int keyCode, const std::string& bind);
     virtual void normalRender(int index, std::string& value);
+    bool isScripting() { return isScriptingModule; }
 };
