@@ -16,7 +16,6 @@
 #include "../../../GUI/Engine/Elements/Structs/ImagesClass.hpp"
 #include "../../../../../lib/ImGui/imgui.h"
 #include "../../../Client.hpp"
-#include "../../../Module/Modules/GuiScale/GuiScale.hpp"
 
 void ResizeHook::enableHook() {
 
@@ -60,8 +59,6 @@ ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT wi
     } else if (bufferingMode == "Triple Buffering") {
         bufferCount = 3;
     }
-
-    GuiScale::troller = true;
 
     return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
 }

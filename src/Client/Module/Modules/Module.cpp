@@ -487,6 +487,7 @@ bool Module::isEnabled() {
 
 void Module::setEnabled(bool enabled) {
     settings.getSettingByName<bool>("enabled")->value = enabled;
+    enabledState = enabled;
 }
 
 void Module::setKeybind(const std::string& newKeybind) {

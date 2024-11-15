@@ -10,16 +10,18 @@ private:
     static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
     Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
     Vec2<float> lastAppliedPos = Vec2<float>{0.0f, 0.0f};
+    bool restored = false;
 public:
     static inline std::string name = "Bossbar";
 
     MovableBossbar() : Module("Movable " + name, "Makes the Minecraft " + name + " movable.", IDR_MOVABLE_PNG, "") {
-        Listen(this, SetupAndRenderEvent, &MovableBossbar::onSetupAndRender)
         Module::setup();
     };
 
     void onEnable() override {
         originalPos = Vec2<float>{0, 0};
+        restored = false;
+        Listen(this, SetupAndRenderEvent, &MovableBossbar::onSetupAndRender)
         Listen(this, RenderEvent, &MovableBossbar::onRender)
         Listen(this, UIControlGetPositionEvent, &MovableBossbar::onUIControlGetPosition)
 
@@ -32,6 +34,11 @@ public:
     }
 
     void onDisable() override {
+        if(!restored) {
+            delayDisable = true;
+            return;
+        }
+        Deafen(this, SetupAndRenderEvent, &MovableBossbar::onSetupAndRender)
         Deafen(this, RenderEvent, &MovableBossbar::onRender)
         Deafen(this, UIControlGetPositionEvent, &MovableBossbar::onUIControlGetPosition)
 
@@ -112,19 +119,25 @@ public:
     };
 
     void update() {
+        if(restored) return;
         if(ClickGUI::editmenu) {
-            if (!isEnabled()) return;
+            if (!enabledState) return;
         } else {
-            if (lastAppliedPos == (isEnabled() ? currentPos : originalPos)) return;
+            if (lastAppliedPos == (enabledState ? currentPos : originalPos)) return;
         }
         if(SDK::getCurrentScreen() != "hud_screen") return;
-        SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl> &control) {
+        SDK::screenView->VisualTree->root->forEachChild([this](std::shared_ptr<UIControl> &control) {
             if (control->getLayerName() == layerName) {
                 updatePosition(control.get());
                 return true; // dont go through other controls
             }
             return false;
         });
+
+        if(delayDisable) {
+            delayDisable = false;
+            restored = true;
+        }
     }
 
     void updatePosition(UIControl* control) {
@@ -145,7 +158,7 @@ public:
         Vec2<float> scaledOriginalPos = PositionUtils::getScaledPos(originalPos);
 
         control->parentRelativePosition = isEnabled() ? scaledPos : scaledOriginalPos;
-        lastAppliedPos = isEnabled() ? currentPos : originalPos;
+        lastAppliedPos = enabledState ? currentPos : originalPos;
         if(WinrtUtils::checkAboveOrEqual(21,40)) {
             control->updatePosition(true);
         }

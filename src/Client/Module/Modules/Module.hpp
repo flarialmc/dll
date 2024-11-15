@@ -44,6 +44,7 @@ public:
     bool active = false;
     bool enabledState = false;
     bool restricted = false;
+    bool delayDisable = false;
     bool terminating = false;
 
     float padding = 0;

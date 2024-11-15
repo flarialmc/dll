@@ -89,7 +89,7 @@
 #include "Modules/NullMovement/NullMovement.hpp"
 
 namespace ModuleManager {
-    std::unordered_map<size_t, std::shared_ptr<Module>> moduleMap;
+    std::map<size_t, std::shared_ptr<Module>> moduleMap;
     std::vector<std::shared_ptr<Listener>> services;
     bool initialized = false;
 }
@@ -206,7 +206,7 @@ void ModuleManager::terminate() {
 
 void ModuleManager::syncState() {
     for (const auto& [key, module] : moduleMap) {
-        if (!module || module->enabledState == module->isEnabled()) {
+        if (!module || module->enabledState == module->isEnabled() || module->delayDisable) {
             continue;
         }
 
