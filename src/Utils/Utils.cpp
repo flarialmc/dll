@@ -26,7 +26,7 @@ std::string Utils::getClientPath() {
 }
 
 std::string Utils::getConfigsPath() {
-    return Utils::getRoamingPath() + "\\Flarial\\Configs";
+    return Utils::getRoamingPath() + "\\Flarial\\Config";
 }
 
 std::string Utils::getAssetsPath() {
