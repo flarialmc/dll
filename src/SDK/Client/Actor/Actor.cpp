@@ -11,6 +11,7 @@ template<typename Component>
 Component *Actor::tryGet(uintptr_t addr) {
     if(WinrtUtils::checkAboveOrEqual(21, 00) || addr == 0) {
         auto& ctx = GetEntityContextV1_20_50();
+        if(!ctx.isValid()) return nullptr;
         Component* component = ctx.tryGetComponent<Component>();
         return component;
     } else {
@@ -39,7 +40,8 @@ Component *Actor::tryGetOld(uintptr_t addr) {
 template<typename Component>
 bool Actor::hasComponent(uintptr_t addr) {
     if(WinrtUtils::checkAboveOrEqual(21, 00) || addr == 0) {
-        return this->GetEntityContextV1_20_50().hasComponent<Component>();
+        auto ctx = this->GetEntityContextV1_20_50();
+        return ctx.hasComponent<Component>();
     } else {
         return tryGetOld<Component>(addr) != nullptr;
     }
@@ -266,11 +268,8 @@ bool Actor::isValid() {
     if(!lp) return false;
     auto level = lp->getLevel();
     if(!level) return false;
-    auto runtimeActorList = level->getRuntimeActorList();
-    for (auto actor : runtimeActorList) {
-        if(actor == this) return true;
-    }
-    return false;
+    if(!this->GetEntityContextV1_20_50().isValid()) return false;
+    return true;
 }
 
 RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URenderPositionComponent
