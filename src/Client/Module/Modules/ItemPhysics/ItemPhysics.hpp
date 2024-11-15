@@ -391,8 +391,16 @@ public:
         }
 
         if(isOnGround) {
-            if(curr->getStack().block == nullptr) {
-                pos.y -= 0.12;
+            if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+                if (curr->getStack().block == nullptr) {
+                    pos.y -= 0.12;
+                } else {
+                    pos.y -= 0.3;
+                }
+            } else {
+                if (curr->getStack().block == nullptr) {
+                    pos.y -= 0.12;
+                }
             }
         }
 
