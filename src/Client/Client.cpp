@@ -73,9 +73,9 @@ void Client::initialize() {
 
     std::vector<std::filesystem::path> directories = {
         Utils::getRoamingPath() + "\\Flarial",
-        Utils::getRoamingPath() + "\\Flarial\\Assets",
-        Utils::getRoamingPath() + "\\Flarial\\Logs",
-        Utils::getRoamingPath() + "\\Flarial\\Configs"
+        Utils::getRoamingPath() + "\\Flarial\\assets",
+        Utils::getRoamingPath() + "\\Flarial\\logs",
+        Utils::getRoamingPath() + "\\Flarial\\Config"
     };
 
     for (const auto& path : directories) {
