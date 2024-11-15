@@ -5,7 +5,6 @@
 class GuiScale : public Module {
 private:
     float originalScale = 0.f;
-    float lastAppliedScale = 0.f;
     bool restored = false;
 public:
     GuiScale() : Module("MC GUI Scale", "Change your GUI Scale beyond\nMinecraft's restrictions.",
@@ -68,12 +67,11 @@ public:
 
     void updateScale(float newScale) {
         if(restored) return;
-        lastAppliedScale = newScale;
 
         auto guiData = SDK::clientInstance->getGuiData();
 
         if(originalScale == 0) {
-            originalScale = SDK::clientInstance->getGuiData()->GuiScale;
+            originalScale = guiData->GuiScale;
         }
         float oldScale = guiData->GuiScale;
 
