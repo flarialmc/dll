@@ -4,15 +4,9 @@
 
 class GuiScale : public Module {
 private:
-
-public:
-
     float originalScale = 0.f;
     float lastAppliedScale = 0.f;
-    int troll = 0;
-    bool firstTime = true;
-    static inline bool troller = false;
-
+public:
     GuiScale() : Module("MC GUI Scale", "Change your GUI Scale beyond\nMinecraft's restrictions.",
                         IDR_SCALE_PNG, "") {
         Listen(this, SetupAndRenderEvent, &GuiScale::onSetupAndRender)
