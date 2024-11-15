@@ -205,19 +205,19 @@ void ModuleManager::terminate() {
 }
 
 void ModuleManager::syncState() {
-    for (const auto& pair : moduleMap) {
-        auto& module = pair.second;
-        if (module != nullptr) {
-            if(module->enabledState != module->isEnabled()) {
-                if(module->enabledState) {
-                    module->onEnable();
-                } else {
-                    module->onDisable();
-                }
-            }
+    for (const auto& [key, module] : moduleMap) {
+        if (!module || module->enabledState == module->isEnabled()) {
+            continue;
+        }
+
+        if (module->enabledState) {
+            module->onEnable();
+        } else {
+            module->onDisable();
         }
     }
 }
+
 
 void ModuleManager::SaveModulesConfig() {
     for (const auto& module : getModules()) {
