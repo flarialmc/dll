@@ -3,7 +3,7 @@
 #include "../../../../SDK/Client/Actor/Components/ActorOwnerComponent.hpp"
 
 void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
-    // if(WinrtUtils::checkAboveOrEqual(21,40)) return HitboxListener::fillDataToRender();
+    //if(WinrtUtils::checkAboveOrEqual(21,40)) return HitboxListener::fillDataToRender();
     std::lock_guard<std::mutex> guard(renderMtx);
     aabbsToRender.clear();
     if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
@@ -16,7 +16,7 @@ void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
         if (ent != nullptr && ent != player /*&& ent->isPlayer() && ent->hasCategory(ActorCategory::Player)*/) {
             float dist = player->getPosition()->dist(*pos);
             // This may let through some entites
-            if (!ent->isValidAABB() || dist > 30 || !player->canSee(*ent) ||
+            if (!ent->isValid() || !ent->isValidAABB() || dist > 30 || !player->canSee(*ent) ||
                 ent->getActorFlag(ActorFlags::FLAG_INVISIBLE))
                 continue;
 
@@ -84,16 +84,14 @@ void HitboxListener::fillDataToRender() {
     auto player = SDK::clientInstance->getLocalPlayer();
     auto ctx = player->GetEntityContextV1_20_50();
 
-    if(!ctx) return;
+    if(!ctx.isValid()) return;
 
-    auto view = ctx->enttRegistry->view<RenderPositionComponent, AABBShapeComponent, ActorOwnerComponent>();
+    auto view = ctx.enttRegistry.view<RenderPositionComponent, AABBShapeComponent, ActorOwnerComponent>();
     for (auto entity : view) {
-        if(!ctx->hasComponent<RenderPositionComponent>(entity)) continue;
-        if(!ctx->hasComponent<AABBShapeComponent>(entity)) continue;
-        if(!ctx->hasComponent<ActorOwnerComponent>(entity)) continue;
+        if(!ctx.hasComponent<RenderPositionComponent>(entity)) continue;
+        if(!ctx.hasComponent<AABBShapeComponent>(entity)) continue;
         auto [renderPos, aabb, owner] = view.operator[](entity);
-        static Vec3<float> zeroPos = Vec3<float>{0.f, 0.f, 0.f};
-        if(renderPos.renderPos == zeroPos) continue;
+        if(!owner.actor->isValid()) return;
         if (owner.actor != player /*&& ent->isPlayer() && ent->hasCategory(ActorCategory::Player)*/) {
             float dist = player->getPosition()->dist(renderPos.renderPos);
             // This may let through some entites

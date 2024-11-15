@@ -3,7 +3,7 @@
 #include "../../../../Utils/Utils.hpp"
 #include "../EntityContext.hpp"
 
-struct StateVectorComponent {
+struct StateVectorComponent : IEntityComponent {
 public:
     Vec3<float> Pos;
     Vec3<float> PrevPos;

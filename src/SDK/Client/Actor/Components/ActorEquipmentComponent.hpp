@@ -2,7 +2,7 @@
 
 #include "../EntityContext.hpp"
 
-struct ActorEquipmentComponent {
+struct ActorEquipmentComponent : IEntityComponent {
     class SimpleContainer* mOffhandContainer;
     class SimpleContainer* mArmorContainer;
 };

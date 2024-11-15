@@ -9,11 +9,10 @@
 
 template<typename Component>
 Component *Actor::tryGet(uintptr_t addr) {
-    if(WinrtUtils::checkAboveOrEqual(21, 40) || addr == 0) {
-        auto player = SDK::clientInstance->getLocalPlayer();
-        auto ctx = this->GetEntityContextV1_20_50();
-        if(!player->GetEntityContextV1_20_50()->registry->ownedRegistry.valid(ctx->entity)) return nullptr;
-        Component* component = ctx->tryGetComponent<Component>();
+    if(WinrtUtils::checkAboveOrEqual(21, 00) || addr == 0) {
+        auto& ctx = GetEntityContextV1_20_50();
+        if(!ctx.isValid()) return nullptr;
+        Component* component = ctx.tryGetComponent<Component>();
         return component;
     } else {
         return tryGetOld<Component>(addr);
@@ -24,10 +23,10 @@ template<typename Component>
 Component *Actor::tryGetOld(uintptr_t addr) {
     if(WinrtUtils::checkAboveOrEqual(20, 50)) {
         auto ctx = GetEntityContextV1_20_50();
-        EntityId id = ctx->entity;
-        using efunc = Component *(__thiscall *)(entt::basic_registry<EntityId>*, const EntityId &);
+        EntityId id = ctx.entity;
+        using efunc = Component *(__thiscall *)(entt::basic_registry<EntityId>&, const EntityId &);
         auto func = reinterpret_cast<efunc>(addr);
-        return func(ctx->enttRegistry, id);
+        return func(ctx.enttRegistry, id);
     } else {
         uintptr_t* basicReg = **(uintptr_t***)(this + 0x8);
         uint32_t id = *(uintptr_t*)(this + 0x10);
@@ -42,7 +41,7 @@ template<typename Component>
 bool Actor::hasComponent(uintptr_t addr) {
     if(WinrtUtils::checkAboveOrEqual(21, 40) || addr == 0) {
         auto ctx = this->GetEntityContextV1_20_50();
-        return ctx->hasComponent<Component>();
+        return ctx.hasComponent<Component>();
     } else {
         return tryGetOld<Component>(addr) != nullptr;
     }
@@ -234,8 +233,8 @@ RuntimeIDComponent *Actor::getRuntimeIDComponent() {
     return tryGet<RuntimeIDComponent>(sig);
 }
 
-V1_20_50::EntityContext *Actor::GetEntityContextV1_20_50() {
-    return &hat::member_at<V1_20_50::EntityContext>(this, 0x8);
+V1_20_50::EntityContext &Actor::GetEntityContextV1_20_50() {
+    return hat::member_at<V1_20_50::EntityContext>(this, 0x8);
 }
 
 void Actor::setNametag(std::string *name) {
@@ -269,11 +268,8 @@ bool Actor::isValid() {
     if(!lp) return false;
     auto level = lp->getLevel();
     if(!level) return false;
-    auto runtimeActorList = level->getRuntimeActorList();
-    for (auto actor : runtimeActorList) {
-        if(actor == this) return true;
-    }
-    return false;
+    if(!this->GetEntityContextV1_20_50().isValid()) return false;
+    return true;
 }
 
 RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URenderPositionComponent
@@ -345,17 +341,17 @@ bool Actor::isOnGround() {
         const auto ctx = this->GetEntityContextV1_20_50();
 
         if (WinrtUtils::checkAboveOrEqual(20, 60)) {
-            using isOnGroundFunc = bool (__fastcall *)(entt::basic_registry<EntityId> *, const EntityId &);
+            using isOnGroundFunc = bool (__fastcall *)(entt::basic_registry<EntityId> &, const EntityId &);
             static isOnGroundFunc isOnGround = Memory::getOffsetFromSig<isOnGroundFunc>(
                     GET_SIG_ADDRESS("ActorCollision::isOnGround"), 1);
 
             if (isOnGround)
-                return isOnGround(ctx->enttRegistry, ctx->entity);
+                return isOnGround(ctx.enttRegistry, ctx.entity);
 
             return false;
         }
 
-        using isOnGroundFunc = bool (__fastcall *)(const V1_20_50::EntityContext*);
+        using isOnGroundFunc = bool (__fastcall *)(const V1_20_50::EntityContext&);
         static isOnGroundFunc isOnGround = reinterpret_cast<isOnGroundFunc>(GET_SIG_ADDRESS("ActorCollision::isOnGround"));
 
         if (isOnGround)

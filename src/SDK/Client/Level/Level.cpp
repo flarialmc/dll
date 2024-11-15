@@ -9,13 +9,12 @@ std::vector<Actor *> Level::getRuntimeActorList() {
         std::vector<Actor *> actors;
         auto player = SDK::clientInstance->getLocalPlayer();
         if(!player) return actors;
-        auto* ctx = player->GetEntityContextV1_20_50();
+        auto& ctx = player->GetEntityContextV1_20_50();
+        if(!ctx.isValid()) return actors;
 
-        if(!ctx) return actors;
-
-        for (auto&& [id, owner ] : ctx->enttRegistry->view<ActorOwnerComponent>().each()) {
-            if(!ctx->registry->ownedRegistry.valid(id)) continue;
-            if(!ctx->hasComponent<RuntimeIDComponent>(id)) continue;
+        for (auto&& [id, owner ] : ctx.enttRegistry.view<ActorOwnerComponent>().each()) {
+            if(!ctx.enttRegistry.valid(id)) continue;
+            if(!ctx.hasComponent<RuntimeIDComponent>(id)) continue;
             actors.push_back(owner.actor);
         }
 

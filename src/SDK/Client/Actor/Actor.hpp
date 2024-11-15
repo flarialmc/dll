@@ -201,7 +201,7 @@ public:
 
     ItemStack *getOffhandSlot();
 
-    V1_20_50::EntityContext *GetEntityContextV1_20_50();
+    V1_20_50::EntityContext &GetEntityContextV1_20_50();
 
     void setNametag(std::string *name);
 
