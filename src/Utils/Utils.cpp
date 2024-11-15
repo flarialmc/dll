@@ -500,45 +500,46 @@ std::string String::WStrToStr(const std::wstring& ws) {
     return ret;
 }
 
-std::string String::removeColorCodes(const std::string& string) {
+std::string String::removeColorCodes(const std::string &input) {
     std::string result;
-    result.reserve(string.size());
 
-    for (size_t i = 0; i < string.size();) {
-        if (string[i] == '\xC2' && i + 1 < string.size() && string[i + 1] == '\xA7') {
+    bool skipNext = false;
+    for (size_t i = 0; i < input.size();) {
+        if (skipNext) {
+            skipNext = false;
+            ++i;
+        } else if (input[i] == '\xC2' && i + 1 < input.size() && input[i + 1] == '\xA7') {
+            skipNext = true;
             i += 2;
-        } else if ((string[i] & 0x80) == 0) {
-            result += string[i++];
         } else {
-            size_t bytes = 1;
-            while (i + bytes < string.size() && (string[i + bytes] & 0xC0) == 0x80) {
-                ++bytes;
+            if ((input[i] & 0xC0) == 0xC0) { // UTF-8 continuation byte
+                size_t bytesLeft = 0;
+                while ((input[i + bytesLeft] & 0xC0) == 0x80) {
+                    ++bytesLeft;
+                }
+                result.append(input, i, bytesLeft + 1);
+                i += bytesLeft + 1;
+            } else {
+                result += input[i];
+                ++i;
             }
-            result.append(string, i, bytes);
-            i += bytes;
         }
     }
+
     return result;
 }
 
-std::string String::removeNonAlphanumeric(const std::string& string) {
-    if (string.empty() || !std::isalpha(string[0]) || string.size() < 2 || string.size() > 16) {
+std::string String::removeNonAlphanumeric(const std::string &input) {
+    std::regex pattern("[A-Za-z][A-Za-z0-9 ]{2,16}");
+    std::smatch match;
+    if (std::regex_search(input, match, pattern)) {
+        std::string nickname = match.str();
+        // Remove trailing spaces
+        nickname.erase(nickname.find_last_not_of(" ") + 1);
+        return nickname;
+    } else {
         return "";
     }
-
-    std::string nickname;
-    nickname.reserve(string.size());
-
-    for (char c : string) {
-        if (std::isalnum(static_cast<unsigned char>(c)) || c == ' ') {
-            nickname += c;
-        } else {
-            return "";
-        }
-    }
-
-    nickname.erase(nickname.find_last_not_of(' ') + 1);
-    return nickname;
 }
 
 std::string String::removeNonNumeric(const std::string& string) {
