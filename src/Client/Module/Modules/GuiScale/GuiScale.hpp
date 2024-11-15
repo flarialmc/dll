@@ -6,18 +6,26 @@ class GuiScale : public Module {
 private:
     float originalScale = 0.f;
     float lastAppliedScale = 0.f;
+    bool restored = false;
 public:
     GuiScale() : Module("MC GUI Scale", "Change your GUI Scale beyond\nMinecraft's restrictions.",
                         IDR_SCALE_PNG, "") {
-        Listen(this, SetupAndRenderEvent, &GuiScale::onSetupAndRender)
         Module::setup();
     };
 
     void onEnable() override {
+        restored = false;
+        Listen(this, SetupAndRenderEvent, &GuiScale::onSetupAndRender)
         Module::onEnable();
     }
 
     void onDisable() override {
+        if(!restored) {
+            delayDisable = true;
+            return;
+        }
+        Deafen(this, SetupAndRenderEvent, &GuiScale::onSetupAndRender)
+
         Module::onDisable();
     }
 
@@ -51,16 +59,15 @@ public:
     };
 
     void update() {
-        float currentScale = this->settings.getSettingByName<float>("guiscale")->value;
-        float targetScale = isEnabled() ? currentScale : originalScale;
-        if(lastAppliedScale == targetScale) return;
-        if(SDK::getCurrentScreen() != "hud_screen") return;
-
+        float targetScale = delayDisable ? originalScale : this->settings.getSettingByName<float>("guiscale")->value;
+        auto guiData = SDK::clientInstance->getGuiData();
+        if(targetScale == guiData->GuiScale && !delayDisable) return;
 
         updateScale(targetScale);
     }
 
     void updateScale(float newScale) {
+        if(restored) return;
         lastAppliedScale = newScale;
 
         auto guiData = SDK::clientInstance->getGuiData();
@@ -73,6 +80,11 @@ public:
         auto screenSize = guiData->ScreenSize;
         static auto safeZone = Vec2<float>{ 0.f, 0.f };
 
-        SDK::clientInstance->_updateScreenSizeVariables(&screenSize, &safeZone, newScale);
+        SDK::clientInstance->_updateScreenSizeVariables(&screenSize, &safeZone, newScale < 1.f ? 1.f : newScale);
+
+        if(delayDisable) {
+            delayDisable = false;
+            restored = true;
+        }
     }
 };
