@@ -20,7 +20,7 @@ namespace Logger {
 
     void writeToFile(const std::string& message) {
         try {
-            const std::string path = Utils::getClientPath() + "\\latest.log";
+            const std::string path = Utils::getClientPath() + "\\logs\\latest.log";
 
             std::ofstream file(path, std::ios::app);
             if (!file.is_open()) {
@@ -37,7 +37,7 @@ namespace Logger {
     }
 
     void initialize() {
-        const std::string path = Utils::getClientPath() + "\\latest.log";
+        const std::string path = Utils::getClientPath() + "\\logs\\latest.log";
 
         glaiel::crashlogs::set_crashlog_folder(Utils::getLogsPath());
         glaiel::crashlogs::begin_monitoring();
