@@ -63,6 +63,7 @@ public:
         if((troller || firstTime) && SDK::getCurrentScreen() == "hud_screen") {
             if(troll > 150) {
                 troller = false;
+                firstTime = false;
                 troll = 0;
             } else {
                 troll++;
@@ -72,11 +73,12 @@ public:
         }
         if(lastAppliedScale == targetScale) return;
         if(SDK::getCurrentScreen() != "hud_screen") return;
+
+
         updateScale(targetScale);
     }
 
     void updateScale(float newScale) {
-
         lastAppliedScale = newScale;
 
         auto guiData = SDK::clientInstance->getGuiData();

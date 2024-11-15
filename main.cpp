@@ -88,10 +88,16 @@ DWORD WINAPI init() {
 
     statusThread.detach();
 
-    while (!Client::disable) {
-        ModuleManager::syncState();
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
+    std::thread syncThread([]() {
+        while (!Client::disable) {
+            ModuleManager::syncState();
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    });
+    syncThread.detach();
+
+    while(!Client::disable) std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
 
     Client::SaveSettings();
 
