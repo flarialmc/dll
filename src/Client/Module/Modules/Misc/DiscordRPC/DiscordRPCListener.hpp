@@ -32,7 +32,7 @@ private:
         std::string ip = SDK::getServerIP();
 
         if (ip != previousIp) {
-            static std::string settingspath = Utils::getRoamingPath() + "\\Flarial\\serverip.txt";
+            static std::string settingspath = Utils::getClientPath() + "\\serverip.txt";
 
             if (!std::filesystem::exists(settingspath)) {
                 createSettingsFile(settingspath);

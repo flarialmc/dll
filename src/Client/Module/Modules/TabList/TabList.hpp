@@ -208,11 +208,11 @@ public:
 
                         i++;
                         // std::string name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pair.second.name));
-                        std::string name = Utils::removeColorCodes(pair.second.name);
+                        std::string name = String::removeColorCodes(pair.second.name);
                         if (name.empty()) continue;
 
-                        std::string clearedName = Utils::removeNonAlphanumeric(Utils::removeColorCodes(name));
-                        if (clearedName.empty()) clearedName = Utils::removeColorCodes(name);
+                        std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
+                        if (clearedName.empty()) clearedName = String::removeColorCodes(name);
 
 
                         auto it = std::find(Client::onlinePlayers.begin(), Client::onlinePlayers.end(), clearedName);
@@ -231,7 +231,7 @@ public:
                         auto module = ModuleManager::getModule("Nick");
 
                         if (module && module->isEnabled() &&
-                            name == Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickModule::original))) {
+                            name == String::removeNonAlphanumeric(String::removeColorCodes(NickModule::original))) {
                             name = module->settings.getSettingByName<std::string>("nick")->value;
                         }
 
@@ -323,7 +323,7 @@ public:
                         FlarialGUI::FlarialTextWithFont(fakex + xx + Constraints::SpacingConstraint(0.5, keycardSize),
                                                         realcenter.y +
                                                         Constraints::SpacingConstraint(0.12, keycardSize),
-                                                        Utils::StrToWStr(name).c_str(),
+                                                        String::StrToWStr(name).c_str(),
                                                         keycardSize * 5, keycardSize,
                                                         DWRITE_TEXT_ALIGNMENT_LEADING, fontSize,
                                                         DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
@@ -385,8 +385,8 @@ public:
                         FlarialGUI::FlarialTextWithFont(fakex + Constraints::SpacingConstraint(0.5, keycardSize),
                                                         realcenter.y +
                                                         Constraints::SpacingConstraint(0.12, keycardSize),
-                                                        FlarialGUI::to_wide(Utils::removeNonAlphanumeric(
-                                                                Utils::removeColorCodes(name))).c_str(),
+                                                        FlarialGUI::to_wide(String::removeNonAlphanumeric(
+                                                                String::removeColorCodes(name))).c_str(),
                                                         keycardSize * 5, keycardSize,
                                                         DWRITE_TEXT_ALIGNMENT_LEADING, fontSize,
                                                         DWRITE_FONT_WEIGHT_NORMAL, textColor, true);

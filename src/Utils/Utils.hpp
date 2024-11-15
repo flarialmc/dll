@@ -255,26 +255,19 @@ struct AABB {
     }
 };
 
-
 class Utils {
 public:
     static std::string getRoamingPath();
-
-    static std::string getLocalPath();
-
-    static bool hasEnding(std::string const &fullString, std::string const &ending);
+    static std::string getClientPath();
+    static std::string getConfigsPath();
+    static std::string getAssetsPath();
+    static std::string getLogsPath();
 
     static std::string getKeyAsString(int key, bool isCapital = false, bool isKeybind = true);
 
     static int getStringAsKey(const std::string &str);
 
-    static std::string removeColorCodes(const std::string &input);
-
     static std::vector<int> getStringAsKeys(const std::string& str);
-
-    static std::string removeNonAlphanumeric(const std::string &input);
-
-    static std::string remomveNonNumeric(const std::string &input);
 
     static bool CursorInEllipse(float ellipseX, float ellipseY, float radiusX, float radiusY);
 
@@ -290,10 +283,6 @@ public:
         return hash;
     }
 
-    static std::wstring StrToWStr(const std::string &s);
-
-    static std::string WStrToStr(const std::wstring &ws);
-
     static std::vector<std::string> splitString(const std::string& str, char delimiter) {
         return str
           | std::views::split(delimiter)
@@ -303,13 +292,28 @@ public:
 
     static bool isMinecraftLoaded(HANDLE process);
 
-    static bool isMinecraftLoadedAetopia();
-
     static uint64_t getCurrentMs();
 
-    static bool find(const std::string& str, const std::string& find);
+    static std::string downloadFile(const std::string& url);
+};
 
-    static std::string replaceAll(std::string str, std::string_view c1, std::string_view c2);
+class String {
+public:
+    static std::string replaceAll(std::string& string, std::string_view c1, std::string_view c2);
+
+    static bool find(const std::string& string, const std::string& find);
+
+    static bool hasEnding(const std::string& string, const std::string& ending);
+
+    static std::wstring StrToWStr(std::string const& s);
+
+    static std::string WStrToStr(const std::wstring& ws);
+
+    static std::string removeColorCodes(const std::string& string);
+
+    static std::string removeNonAlphanumeric(const std::string& string);
+
+    static std::string removeNonNumeric(const std::string& string);
 };
 
 struct CaretMeasureData {
