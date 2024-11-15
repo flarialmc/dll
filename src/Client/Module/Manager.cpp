@@ -91,7 +91,7 @@
 #include "../../Scripting/EventManager/ScriptingEventManager.hpp"
 
 namespace ModuleManager {
-    std::unordered_map<size_t, std::shared_ptr<Module>> moduleMap;
+    std::map<size_t, std::shared_ptr<Module>> moduleMap;
     std::vector<std::shared_ptr<Listener>> services;
     bool initialized = false;
     bool restartModules = false;
@@ -197,6 +197,7 @@ void ModuleManager::initialize() {
     Scripting::loadModules();
 
     initialized = true;
+    Scripting::instalized = true;
 }
 
 void ModuleManager::terminate() {
@@ -211,23 +212,37 @@ void ModuleManager::terminate() {
 
 
 void restart(){
+    Scripting::instalized = false;
     ScriptingEventManager::clearHandlers();
-    ModuleManager::terminate();
-    ModuleManager::initialize();
+    for (auto it = ModuleManager::moduleMap.begin(); it != ModuleManager::moduleMap.end(); ) {
+        if (it->second != nullptr && it->second->isScripting()) {
+            it->second->terminate();
+            it = ModuleManager::moduleMap.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    Scripting::loadModules();
+    for (const auto& pair : ModuleManager::moduleMap) {
+        if (pair.second != nullptr && it->second->isScripting())
+            pair.second->loadSettings();
+            pair.second->terminating = false;
+    }
+    Scripting::instalized = true;
 }
 
 
 void ModuleManager::syncState() {
-    for (const auto& pair : moduleMap) {
-        auto& module = pair.second;
-        if (module != nullptr) {
-            if(module->enabledState != module->isEnabled()) {
-                if(module->enabledState) {
-                    module->onEnable();
-                } else {
-                    module->onDisable();
-                }
-            }
+    for (const auto& [key, module] : moduleMap) {
+        if (!module || module->enabledState == module->isEnabled() || module->delayDisable) {
+            continue;
+        }
+
+        if (module->enabledState) {
+            module->onEnable();
+        } else {
+            module->onDisable();
         }
     }
     if (ModuleManager::restartModules) {
@@ -235,6 +250,7 @@ void ModuleManager::syncState() {
         restart();
     }
 }
+
 
 void ModuleManager::SaveModulesConfig() {
     for (const auto& module : getModules()) {

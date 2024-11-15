@@ -848,7 +848,7 @@ void FlarialGUI::ExtractImageResource(int resourceId, std::string fileName, LPCT
 
     std::string fileType(type);
 
-    std::string lpFileName = Utils::getRoamingPath() + "\\Flarial\\assets\\" + fileName;
+    std::string lpFileName = fmt::format("{}\\{}", Utils::getAssetsPath(), fileName);
 
     std::ofstream outFile(lpFileName, std::ios::binary);
     if (!outFile) {
@@ -878,7 +878,7 @@ void FlarialGUI::LoadFont(int resourceId) {
 
     dwFontSize = SizeofResource(Client::currentModule, hRes);
 
-    std::string lpFileName = Utils::getRoamingPath() + "\\Flarial\\assets\\" + std::to_string(resourceId) + ".ttf";
+    std::string lpFileName = fmt::format("{}\\{}.ttf", Utils::getAssetsPath(), resourceId);
 
     std::ofstream outFile(lpFileName, std::ios::binary);
     if (!outFile) {
@@ -1335,6 +1335,10 @@ Vec2<float> FlarialGUI::CalculateMovedXY(float x, float y, int num, float rectWi
     if (x + rectWidth - WindowRects[num].fixer > MC::windowSize.x)
         x = MC::windowSize.x - rectWidth + WindowRects[num].fixer;
     if (y + rectHeight > MC::windowSize.y) y = MC::windowSize.y - rectHeight;
+
+    if(x == 0) x = 0.0001f;
+    if(y == 0) y = 0.0001f;
+
 
     return Vec2<float>{x, y};
 }

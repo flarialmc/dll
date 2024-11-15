@@ -176,7 +176,7 @@ public:
             ImGui::TableHeadersRow();
 
             for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
-                std::string name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(pair.second.name));
+                std::string name = String::removeNonAlphanumeric(String::removeColorCodes(pair.second.name));
 
                 auto it = std::find_if(playerStatsList.begin(), playerStatsList.end(),
                                        [&name](const std::pair<std::string, Hive::PlayerStats> &element) {

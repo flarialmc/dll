@@ -755,27 +755,26 @@ void SwapchainHook::Fonts() {
 
         if (!FlarialGUI::FontMap["162-1"]) {
             ImFontConfig config;
-            config.OversampleH = 1;
-            config.OversampleV = 1;
 
             config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting | ImGuiFreeTypeBuilderFlags_MonoHinting;
 
             FlarialGUI::FontMap["162-1"] = io.Fonts->AddFontFromFileTTF(
-                    (Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 23, &config,
+                    (Utils::getAssetsPath() + "\\162" + ".ttf").c_str(), 23, &config,
                     io.Fonts->GetGlyphRangesDefault());
             FlarialGUI::FontMap["162-2.0"] = io.Fonts->AddFontFromFileTTF(
-                    (Utils::getRoamingPath() + "\\Flarial\\assets\\" + "162" + ".ttf").c_str(), 40, &config,
+                    (Utils::getAssetsPath() + "\\162" + ".ttf").c_str(), 40, &config,
                     io.Fonts->GetGlyphRangesDefault());
             fontLoaded = true;
         }
 
         if (!FlarialGUI::FontMap["163-1"]) {
             ImFontConfig config;
+            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting | ImGuiFreeTypeBuilderFlags_MonoHinting;
             FlarialGUI::FontMap["163-1"] = io.Fonts->AddFontFromFileTTF(
-                    (Utils::getRoamingPath() + "\\Flarial\\assets\\" + "163" + ".ttf").c_str(), 23, &config,
+                    (Utils::getAssetsPath() + "\\163" + ".ttf").c_str(), 23, &config,
                     io.Fonts->GetGlyphRangesDefault());
             FlarialGUI::FontMap["163-2.0"] = io.Fonts->AddFontFromFileTTF(
-                    (Utils::getRoamingPath() + "\\Flarial\\assets\\" + "163" + ".ttf").c_str(), 40, &config,
+                    (Utils::getAssetsPath() + "\\163" + ".ttf").c_str(), 40, &config,
                     io.Fonts->GetGlyphRangesDefault());
 
             fontLoaded = true;
@@ -783,11 +782,12 @@ void SwapchainHook::Fonts() {
 
         if (!FlarialGUI::FontMap["164-1"]) {
             ImFontConfig config;
+            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting | ImGuiFreeTypeBuilderFlags_MonoHinting;
             FlarialGUI::FontMap["164-1"] = io.Fonts->AddFontFromFileTTF(
-                    (Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 24, &config,
+                    (Utils::getAssetsPath() + "\\164" + ".ttf").c_str(), 24, &config,
                     io.Fonts->GetGlyphRangesDefault());
             FlarialGUI::FontMap["164-2.0"] = io.Fonts->AddFontFromFileTTF(
-                    (Utils::getRoamingPath() + "\\Flarial\\assets\\" + "164" + ".ttf").c_str(), 40, &config,
+                    (Utils::getAssetsPath() + "\\164" + ".ttf").c_str(), 40, &config,
                     io.Fonts->GetGlyphRangesDefault());
 
             fontLoaded = true;

@@ -1183,7 +1183,7 @@ public:
 
                     });
 
-                    c->addButton("Force Reload Modules", "", "RELOAD", [] () {
+                    c->addButton("Reload Scripts", "", "RELOAD", [] () {
 
                         ModuleManager::restartModules = true;
 

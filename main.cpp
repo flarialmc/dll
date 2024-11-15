@@ -1,7 +1,4 @@
-#pragma once
-
 #include <windows.h>
-#include <algorithm>
 
 #include "src/Client/Client.hpp"
 #include "src/Client/Events/EventManager.hpp"
@@ -17,46 +14,11 @@ std::chrono::steady_clock::time_point lastBeatTime;
 std::chrono::steady_clock::time_point lastOnlineUsersFetchTime;
 std::chrono::steady_clock::time_point lastAnnouncementTime;
 
-std::string DownloadString(std::string URL);
+std::string DownloadString(const std::string& url);
 
-std::string removeColorCodes(const std::string &input);
-
-void printVector(const std::vector<std::string> &vec)
-{
-    for (const auto &str : vec)
-    {
-        std::cout << str << std::endl;
-    }
-}
-
-DWORD WINAPI init(HMODULE real)
-{
+DWORD WINAPI init() {
     uint64_t start = Utils::getCurrentMs();
     Logger::initialize();
-
-    bool hatless = true;
-
-    if (hatless) {
-        DWORD processID = GetCurrentProcessId();
-        HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
-
-        if (!Utils::isMinecraftLoaded(hProcess)) {
-            Logger::info("Waiting for Minecraft to load...");
-
-            while (!Utils::isMinecraftLoaded(hProcess)) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            }
-        }
-        CloseHandle(hProcess);
-    } else {
-        if (!Utils::isMinecraftLoadedAetopia()) {
-            Logger::info("Waiting for Minecraft to load...");
-
-            while (!Utils::isMinecraftLoadedAetopia()) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            }
-        }
-    }
 
     Client::initialize();
 
@@ -89,12 +51,13 @@ DWORD WINAPI init(HMODULE real)
 
             auto module = ModuleManager::getModule("Nick");
             if (module && module->isEnabled()) {
-                name = Utils::removeNonAlphanumeric(Utils::removeColorCodes(NickModule::original));
-                name = Utils::replaceAll(name, "�", "");
+                name = String::removeNonAlphanumeric(String::removeColorCodes(NickModule::original));
+                name = String::replaceAll(name, "�", "");
             }
 
-            std::string clearedName = Utils::removeNonAlphanumeric(Utils::removeColorCodes(name));
-            if (clearedName.empty()) clearedName = Utils::removeColorCodes(name);
+            std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
+            if (clearedName.empty()) clearedName = String::removeColorCodes(name);
+
             if (clearedName != "skinStandardCust") {
                 DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}", clearedName, ipToSend));
                 lastBeatTime = now;
@@ -103,7 +66,7 @@ DWORD WINAPI init(HMODULE real)
 
         if (onlineUsersFetchElapsed >= std::chrono::minutes(3)) {
             try {
-                auto onlineUsersRaw = DownloadString("https://api.flarial.synthetix.host/servers");
+                std::string onlineUsersRaw = Utils::downloadFile("https://api.flarial.synthetix.host/servers");
                 Client::onlinePlayers = Client::getPlayersVector(nlohmann::json::parse(onlineUsersRaw));
                 lastOnlineUsersFetchTime = now;
             } catch (const nlohmann::json::parse_error &e) {
@@ -125,15 +88,16 @@ DWORD WINAPI init(HMODULE real)
 
     statusThread.detach();
 
-    while (true)
-    {
-        if (Client::disable)
-        {
-            break;
+    std::thread syncThread([]() {
+        while (!Client::disable) {
+            ModuleManager::syncState();
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
+    });
+    syncThread.detach();
 
-        ModuleManager::syncState();
-    }
+    while(!Client::disable) std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
 
     Client::SaveSettings();
 
@@ -184,31 +148,23 @@ BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReser
     return TRUE;
 }
 
-std::string DownloadString(std::string URL)
-{
-    HINTERNET interwebs = InternetOpenA("Samsung Smart Fridge", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, NULL);
-    HINTERNET urlFile;
-    std::string rtn;
-    if (interwebs)
-    {
-        urlFile = InternetOpenUrlA(interwebs, URL.c_str(), NULL, NULL, NULL, NULL);
-        if (urlFile)
-        {
-            char buffer[2000];
-            DWORD bytesRead;
-            do
-            {
-                InternetReadFile(urlFile, buffer, 2000, &bytesRead);
-                rtn.append(buffer, bytesRead);
-                memset(buffer, 0, 2000);
-            } while (bytesRead);
-            InternetCloseHandle(interwebs);
-            InternetCloseHandle(urlFile);
-            std::string p = Utils::replaceAll(rtn, "|n", "\r\n");
-            return p;
-        }
+std::string DownloadString(const std::string& url) {
+    HINTERNET interwebs = InternetOpenA("Samsung Smart Fridge", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
+    if (!interwebs) {
+        return "";
     }
+
+    std::string rtn;
+    HINTERNET urlFile = InternetOpenUrlA(interwebs, url.c_str(), NULL, 0, INTERNET_FLAG_RELOAD, 0);
+    if (urlFile) {
+        char buffer[2000];
+        DWORD bytesRead;
+        while (InternetReadFile(urlFile, buffer, sizeof(buffer), &bytesRead) && bytesRead > 0) {
+            rtn.append(buffer, bytesRead);
+        }
+        InternetCloseHandle(urlFile);
+    }
+
     InternetCloseHandle(interwebs);
-    std::string p = Utils::replaceAll(rtn, "|n", "\r\n");
-    return p;
+    return String::replaceAll(rtn, "|n", "\r\n");
 }

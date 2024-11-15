@@ -9,7 +9,7 @@
 
 namespace GUI {
 
-    int lua_GUI_Color(lua_State *L) {
+    int lua_Color(lua_State *L) {
         float r = luaL_checknumber(L, 1);
         float g = luaL_checknumber(L, 2);
         float b = luaL_checknumber(L, 3);
@@ -20,7 +20,7 @@ namespace GUI {
         return 1;
     }
 
-    int lua_GUI_RoundedRect(lua_State *L) {
+    int lua_RoundedRect(lua_State *L) {
         int x = luaL_checkinteger(L, 1);
         int y = luaL_checkinteger(L, 2);
         auto color = static_cast<D2D1::ColorF *>(lua_touserdata(L, 3));
@@ -37,7 +37,7 @@ namespace GUI {
 
 
 
-    int lua_GUI_FlarialTextWithFont(lua_State *L) {
+    int lua_FlarialTextWithFont(lua_State *L) {
         int x = luaL_checkinteger(L, 1);
         int y = luaL_checkinteger(L, 2);
 
@@ -55,7 +55,7 @@ namespace GUI {
         return 0;
     }
 
-    int lua_GUI_RoundedHollowRect(lua_State *L) {
+    int lua_RoundedHollowRect(lua_State *L) {
         float x = luaL_checkinteger(L, 1);
         float y = luaL_checkinteger(L, 2);
         auto color = static_cast<D2D1::ColorF *>(lua_touserdata(L, 3));
@@ -77,16 +77,16 @@ namespace GUI {
 
     void registerGUI(lua_State *L) {
         lua_newtable(L);
-        lua_pushcfunction(L, lua_GUI_RoundedRect);
+        lua_pushcfunction(L, lua_RoundedRect);
         lua_setfield(L, -2, "RoundedRect");
 
-        lua_pushcfunction(L, lua_GUI_RoundedHollowRect);
+        lua_pushcfunction(L, lua_RoundedHollowRect);
         lua_setfield(L, -2, "RoundedHollowRect");
 
-        lua_pushcfunction(L, lua_GUI_FlarialTextWithFont);
+        lua_pushcfunction(L, lua_FlarialTextWithFont);
         lua_setfield(L, -2, "TextWithFont");
 
-        lua_pushcfunction(L, lua_GUI_Color);
+        lua_pushcfunction(L, lua_Color);
         lua_setfield(L, -2, "Color");        
 
         lua_setglobal(L, "GUI");

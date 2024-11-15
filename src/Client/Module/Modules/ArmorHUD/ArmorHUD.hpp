@@ -85,7 +85,7 @@ public:
 
         this->addHeader("Main");
 
-        this->addSlider("Size", "", this->settings.getSettingByName<float>("uiscale")->value);
+        this->addSlider("Size", "", this->settings.getSettingByName<float>("uiscale")->value, 5.f, 0.f, true);
         this->addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", this->settings.getSettingByName<bool>("vertical")->value);
         if(this->settings.getSettingByName<bool>("vertical")->value){
             this->addToggle("Durability to the left", "", this->settings.getSettingByName<bool>("durability_left")->value);

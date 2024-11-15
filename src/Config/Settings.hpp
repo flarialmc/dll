@@ -24,13 +24,11 @@ public:
 template<typename T>
 class SettingType : public Setting {
 public:
-    SettingType(std::string name, T defaultValue) : value(std::move(defaultValue)), name(std::move(std::move(name))) {}
+    SettingType(std::string name, T defaultValue)
+        : name(std::move(name)), value(std::move(defaultValue)) {}
 
     [[nodiscard]] json ToJson() const override {
-        json jsonData;
-        jsonData["name"] = name;
-        jsonData["value"] = value;
-        return jsonData;
+        return json{{"name", name}, {"value", value}};
     }
 
     void FromJson(const json &jsonData) override {
@@ -52,7 +50,7 @@ class Settings {
 public:
     template<typename T>
     void addSetting(const std::string &name, const T &defaultValue) {
-        settings[name] = std::make_unique<SettingType<T>>(name, defaultValue);
+        settings.emplace(name, std::make_unique<SettingType<T>>(name, defaultValue));
     }
 
     void deleteSetting(const std::string &name) {
@@ -60,31 +58,22 @@ public:
         if (it != settings.end()) {
             settings.erase(it);
         } else {
-            std::cerr << "Setting not found: " << name << std::endl;
+            Logger::error("Setting not found: {}", name);
         }
     }
-
 
     void reset() {
         settings.clear();
     }
 
     void copyFrom(const Settings &from) {
-
-        for (const auto &settingPair: from.settings) {
-            const std::string &name = settingPair.first;
-            const std::unique_ptr<Setting> &sourceSetting = settingPair.second;
-
-
-            settings[name] = sourceSetting->clone();
+        for (const auto &settingPair : from.settings) {
+            settings[settingPair.first] = settingPair.second->clone();
         }
-
     }
 
-
     template<typename T>
-    SettingType<T> *getSettingByName(const std::string &name) { // TODO: Crash if loaded in game, couldnt load settings? Module was null?
-
+    SettingType<T> *getSettingByName(const std::string &name) {
         auto it = settings.find(name);
         if (it != settings.end()) {
             return static_cast<SettingType<T> *>(it->second.get());
@@ -102,34 +91,39 @@ public:
 
     [[nodiscard]] std::string ToJson() const {
         json jsonData;
-        for (const auto &settingPair: settings) {
+        for (const auto &settingPair : settings) {
             jsonData.push_back(settingPair.second->ToJson());
         }
         return jsonData.dump(4);
     }
 
     void FromJson(const std::string &jsonString) {
+        if (jsonString.empty()) {
+            Logger::error("JSON string is empty");
+            return;
+        }
+
         try {
             json jsonData = json::parse(jsonString);
-            for (const auto &item: jsonData) {
+            std::unordered_map<std::string, std::unique_ptr<Setting>> newSettings;
+
+            for (const auto &item : jsonData) {
                 std::string name = item["name"].get<std::string>();
 
-                if (item["value"].is_number()) {
-                    float value = item["value"].get<float>();
-                    addSetting(name, value);
+                if (item["value"].is_number_float()) {
+                    newSettings.emplace(name, std::make_unique<SettingType<float>>(name, item["value"].get<float>()));
                 } else if (item["value"].is_string()) {
-                    std::string value = item["value"].get<std::string>();
-                    addSetting(name, value);
+                    newSettings.emplace(name, std::make_unique<SettingType<std::string>>(name, item["value"].get<std::string>()));
                 } else if (item["value"].is_boolean()) {
-                    bool value = item["value"].get<bool>();
-                    addSetting(name, value);
-                } else if (item["value"].is_null()) {
-                    // Handle null value if needed
+                    newSettings.emplace(name, std::make_unique<SettingType<bool>>(name, item["value"].get<bool>()));
                 } else {
-                    // Handle unsupported value type
+                    Logger::warn("Unsupported or null value type for setting '{}'", name);
                 }
             }
-        } catch (const std::exception &e) {
+
+            settings = std::move(newSettings);
+
+        } catch (const json::parse_error &e) {
             Logger::error("An error occured while parsing settings: {}", e.what());
         }
     }

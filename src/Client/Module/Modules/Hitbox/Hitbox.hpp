@@ -93,7 +93,7 @@ public:
             if (ent != nullptr && ent != player && ent->hasCategory(ActorCategory::Mob)/*&& ent->isPlayer() && ent->hasCategory(ActorCategory::Player)*/) {
                 float dist = player->getPosition()->dist(*pos);
                 // This may let through some entites
-                if (!ent->isValidAABB() || dist > 30 || !player->canSee(*ent) ||
+                if (!ent->isValid() || !ent->isValidAABB() || dist > 30 || !player->canSee(*ent) ||
                     ent->getActorFlag(ActorFlags::FLAG_INVISIBLE))
                     continue;
 

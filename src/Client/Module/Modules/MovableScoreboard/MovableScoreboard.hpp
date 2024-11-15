@@ -7,18 +7,21 @@ private:
     static inline std::string layerName = "sidebar";
     Vec2<float> currentPos{};
     bool enabled = false;
+    static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
     Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
     Vec2<float> lastAppliedPos = Vec2<float>{0.0f, 0.0f};
+    bool restored = false;
 public:
-    static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
     static inline std::string name = "Scoreboard";
 
     MovableScoreboard() : Module("Movable " + name, "Makes the Minecraft " + name + " movable.", IDR_MOVABLE_PNG, "") {
-        Listen(this, SetupAndRenderEvent, &MovableScoreboard::onSetupAndRender)
         Module::setup();
     };
 
     void onEnable() override {
+        originalPos = Vec2<float>{0, 0};
+        restored = false;
+        Listen(this, SetupAndRenderEvent, &MovableScoreboard::onSetupAndRender)
         Listen(this, RenderEvent, &MovableScoreboard::onRender)
         Listen(this, UIControlGetPositionEvent, &MovableScoreboard::onUIControlGetPosition)
 
@@ -31,6 +34,11 @@ public:
     }
 
     void onDisable() override {
+        if(!restored) {
+            delayDisable = true;
+            return;
+        }
+        Deafen(this, SetupAndRenderEvent, &MovableScoreboard::onSetupAndRender)
         Deafen(this, RenderEvent, &MovableScoreboard::onRender)
         Deafen(this, UIControlGetPositionEvent, &MovableScoreboard::onUIControlGetPosition)
 
@@ -91,7 +99,7 @@ public:
     void onUIControlGetPosition(UIControlGetPositionEvent &event) { // happens when game updates control position
         auto control = event.getControl();
         if (control->getLayerName() == layerName) {
-            if(!isEnabled()) return;
+            if(!enabledState) return;
             Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
             if(event.getPosition() == nullptr) { // 1.21.30 and below
                 control->parentRelativePosition = scaledPos;
@@ -111,19 +119,27 @@ public:
     };
 
     void update() {
-        if(ClickGUI::editmenu) {
-            if (!isEnabled()) return;
-        } else {
-            if (lastAppliedPos != Vec2<float>{0, 0} && lastAppliedPos == (isEnabled() ? currentPos : originalPos)) return;
+        if(restored) return;
+        if(!delayDisable) {
+            if (ClickGUI::editmenu) {
+                if (!enabledState) return;
+            } else {
+                if (lastAppliedPos == (enabledState ? currentPos : originalPos)) return;
+            }
+            if(SDK::getCurrentScreen() != "hud_screen") return;
         }
-        if(SDK::getCurrentScreen() != "hud_screen") return;
-        SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl> &control) {
+        SDK::screenView->VisualTree->root->forEachChild([this](std::shared_ptr<UIControl> &control) {
             if (control->getLayerName() == layerName) {
                 updatePosition(control.get());
                 return true; // dont go through other controls
             }
             return false;
         });
+
+        if(delayDisable) {
+            delayDisable = false;
+            restored = true;
+        }
     }
 
     void updatePosition(UIControl* control) {
@@ -131,7 +147,7 @@ public:
 
         auto pos = control->parentRelativePosition;
 
-        if (isEnabled() && originalPos == Vec2<float>{0, 0}) {
+        if (enabledState && originalPos == Vec2<float>{0, 0}) {
             auto guiData = SDK::clientInstance->getGuiData();
             auto scaledSize = guiData->ScreenSizeScaled;
             auto centerScaled = Vec2 { scaledSize.x / 2, scaledSize.y / 2 };
@@ -143,8 +159,8 @@ public:
         Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
         Vec2<float> scaledOriginalPos = PositionUtils::getScaledPos(originalPos);
 
-        control->parentRelativePosition = isEnabled() ? scaledPos : scaledOriginalPos;
-        lastAppliedPos = isEnabled() ? currentPos : originalPos;
+        control->parentRelativePosition = enabledState ? scaledPos : scaledOriginalPos;
+        lastAppliedPos = enabledState ? currentPos : originalPos;
         if(WinrtUtils::checkAboveOrEqual(21,40)) {
             control->updatePosition(true);
         }
