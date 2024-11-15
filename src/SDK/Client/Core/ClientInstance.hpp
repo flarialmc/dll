@@ -66,4 +66,6 @@ public:
 
         return getPacketSender()->networkSystem->remoteConnectorComposite->rakNetConnector;
     }
+
+    void _updateScreenSizeVariables(Vec2<float> *totalScreenSize, Vec2<float> *safeZone, float forcedGuiScale);
 };

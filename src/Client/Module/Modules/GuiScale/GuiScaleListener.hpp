@@ -4,19 +4,35 @@
 #include "../../../../SDK/SDK.hpp"
 
 class GuiScaleListener : public Listener {
-
+private:
+    float originalScale = 0.f;
     Module* module;
 public:
 
-    void onRender(RenderEvent& event) override {
-        if(SDK::getCurrentScreen() == "hud_screen")
-            if(SDK::clientInstance->getGuiData() != nullptr)
-        if (module->settings.getSettingByName<bool>("enabled")->value){
-        float percent = module->settings.getSettingByName<float>("guiscale")->value;
-        SDK::clientInstance->getGuiData()->GuiScale = percent;
-        SDK::clientInstance->getGuiData()->ScreenSizeScaled = Vec2{ SDK::clientInstance->getGuiData()->ScreenSize.x * 1 / percent, SDK::clientInstance->getGuiData()->ScreenSize.y * 1 / percent };
-        SDK::clientInstance->getGuiData()->scalingMultiplier = 1 / percent;
+    void onSetupAndRender(SetupAndRenderEvent& event) override {
+        update();
+    }
+
+    void update() {
+        float targetScale = module->settings.getSettingByName<float>("guiscale")->value;
+        auto guiData = SDK::clientInstance->getGuiData();
+        if(guiData->GuiScale == targetScale) return;
+
+        updateScale(targetScale);
+    }
+
+    void updateScale(float newScale) {
+        auto guiData = SDK::clientInstance->getGuiData();
+
+        if(originalScale == 0) {
+            originalScale = guiData->GuiScale;
         }
+        float oldScale = guiData->GuiScale;
+
+        auto screenSize = guiData->ScreenSize;
+        static auto safeZone = Vec2<float>{ 0.f, 0.f };
+
+        SDK::clientInstance->_updateScreenSizeVariables(&screenSize, &safeZone, newScale < 1.f ? 1.f : newScale);
     }
 
 
