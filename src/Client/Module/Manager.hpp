@@ -6,7 +6,7 @@
 
 // TODO make moduleMap AND modules but use moduleMap for search
 namespace ModuleManager {
-    extern std::unordered_map<size_t, std::shared_ptr<Module>> moduleMap;
+    extern std::map<size_t, std::shared_ptr<Module>> moduleMap;
     extern std::vector<std::shared_ptr<Listener>> services;
 
     extern bool initialized;

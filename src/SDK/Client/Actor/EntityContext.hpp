@@ -63,42 +63,49 @@ namespace V1_20_50 {
         entt::basic_registry<EntityId> &enttRegistry;
         EntityId entity;
 
-        bool isValid() const {
-            return this->entity.isNull();
+        [[nodiscard]] __forceinline bool isValid() const {
+            return this->enttRegistry.valid(entity);
         }
 
         template<std::derived_from<IEntityComponent> T>
         [[nodiscard]] T *tryGetComponent(EntityId id) {
+            if(!this->isValid()) return nullptr;
             return this->enttRegistry.try_get<T>(id);
         }
 
         template<std::derived_from<IEntityComponent> T>
         [[nodiscard]] T *tryGetComponent() {
+            if(!this->isValid()) return nullptr;
             return this->enttRegistry.try_get<T>(this->entity);
         }
 
         template<std::derived_from<IEntityComponent> T>
         [[nodiscard]] const T *tryGetComponent() const {
+            if(!this->isValid()) return nullptr;
             return this->enttRegistry.try_get<T>(this->entity);
         }
 
         template<std::derived_from<IEntityComponent> T>
         [[nodiscard]] bool hasComponent(EntityId id) const {
+            if(!this->isValid()) return false;
             return this->enttRegistry.all_of<T>(id);
         }
 
         template<std::derived_from<IEntityComponent> T>
         [[nodiscard]] bool hasComponent() const {
+            if(!this->isValid()) return false;
             return this->enttRegistry.all_of<T>(this->entity);
         }
 
         template<std::derived_from<IEntityComponent> T>
         void addComponent() {
+            if(!this->isValid()) return;
             return this->enttRegistry.get_or_emplace<T>(this->entity);
         }
 
         template<std::derived_from<IEntityComponent> T>
         void removeComponent() {
+            if(!this->isValid()) return;
             this->enttRegistry.remove<T>(this->entity);
         }
     };
