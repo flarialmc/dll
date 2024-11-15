@@ -35,7 +35,7 @@ public:
         icon = eicon;
         defaultKeybind = ekey;
         settings = Settings();
-        settingspath = Utils::getRoamingPath() + R"(\Flarial\Config\)" + name + ".flarial";
+        settingspath = fmt::format("{}\\{}.flarial", Utils::getConfigsPath(), name);
 
         checkSettingsFile();
         loadSettings();

@@ -391,66 +391,47 @@ void Module::loadDefaults() {
 void Module::saveSettings() const {
     try {
         std::ofstream outputFile(settingspath);
-        if (outputFile.is_open()) {
-            std::string jsonString = settings.ToJson();
-            outputFile << jsonString;
-            outputFile.close();
+        if (!outputFile) {
+            Logger::error("Failed to open file: {}", settingspath);
+            return;
         }
-        else {
-            Logger::error("Failed to open file. Maybe it doesn't exist?: {}", settingspath);
-        }
-    }
-    catch (const std::exception& ex) {
-        Logger::error("An error occurred while saving settings: {}", ex.what());
+        outputFile << settings.ToJson();
+    } catch (const std::exception& e) {
+        Logger::error("An error occurred while saving settings: {}", e.what());
     }
 }
 
 void Module::loadSettings() {
     std::ifstream inputFile(settingspath);
-    std::stringstream ss;
-
-    if (inputFile.is_open()) {
-        ss << inputFile.rdbuf();
-        inputFile.close();
-    } else {
-        Logger::error("Failed to open file. Maybe it doesn't exist?: {}", settingspath);
+    if (!inputFile) {
+        Logger::error("Failed to open file: {}", settingspath);
         return;
     }
 
-    std::string settingstring = ss.str();
-    settings.FromJson(settingstring);
+    std::stringstream ss;
+    ss << inputFile.rdbuf();
+    settings.FromJson(ss.str());
+
+    totalKeybinds = 0;
+    totalWaypoints = 0;
 
     for (const auto& settingPair : settings.settings) {
         const std::string& name = settingPair.first;
         if (name.find("keybind") != std::string::npos) {
             ++totalKeybinds;
-        }
-    }
-    for (const auto& settingPair : settings.settings) {
-        const std::string& name = settingPair.first;
-        if (name.find("waypoint") != std::string::npos) {
+        } else if (name.find("waypoint") != std::string::npos) {
             ++totalWaypoints;
         }
     }
 }
 
 void Module::checkSettingsFile() const {
-
     if (!std::filesystem::exists(settingspath)) {
-
-        std::filesystem::path filePath(settingspath);
-        std::filesystem::create_directories(filePath.parent_path());
-
-        HANDLE fileHandle = CreateFileA(settingspath.c_str(), GENERIC_WRITE | GENERIC_READ,
-            FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-            OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-
-        if (fileHandle == INVALID_HANDLE_VALUE) {
+        std::filesystem::create_directories(std::filesystem::path(settingspath).parent_path());
+        std::ofstream outputFile(settingspath);
+        if (!outputFile) {
             Logger::error("Failed to create file: {}", settingspath);
-            return;
         }
-
-        CloseHandle(fileHandle);
     }
 }
 

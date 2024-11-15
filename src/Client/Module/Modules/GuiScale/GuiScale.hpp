@@ -1,25 +1,30 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../MovableScoreboard/MovableScoreboard.hpp"
-
 
 class GuiScale : public Module {
 private:
+
+public:
+
     float originalScale = 0.f;
     float lastAppliedScale = 0.f;
-public:
+    int troll = 0;
+    bool firstTime = true;
+    static inline bool troller = false;
+
     GuiScale() : Module("MC GUI Scale", "Change your GUI Scale beyond\nMinecraft's restrictions.",
                         IDR_SCALE_PNG, "") {
-        Listen(this, SetupAndRenderEvent, &GuiScale::onSetupAndRender)
         Module::setup();
     };
 
     void onEnable() override {
+        Listen(this, SetupAndRenderEvent, &GuiScale::onSetupAndRender)
         Module::onEnable();
     }
 
     void onDisable() override {
+        Deafen(this, SetupAndRenderEvent, &GuiScale::onSetupAndRender)
         Module::onDisable();
     }
 
@@ -55,12 +60,27 @@ public:
     void update() {
         float currentScale = this->settings.getSettingByName<float>("guiscale")->value;
         float targetScale = isEnabled() ? currentScale : originalScale;
+        if((troller || firstTime) && SDK::getCurrentScreen() == "hud_screen") {
+            if(troll > 150) {
+                troller = false;
+                firstTime = false;
+                troll = 0;
+            } else {
+                troll++;
+            }
+            updateScale(targetScale);
+            return;
+        }
         if(lastAppliedScale == targetScale) return;
         if(SDK::getCurrentScreen() != "hud_screen") return;
+
+
         updateScale(targetScale);
     }
 
     void updateScale(float newScale) {
+        lastAppliedScale = newScale;
+
         auto guiData = SDK::clientInstance->getGuiData();
         if(originalScale == 0) {
             originalScale = SDK::clientInstance->getGuiData()->GuiScale;
@@ -72,7 +92,6 @@ public:
                 guiData->ScreenSize.y * 1 / newScale
         };
         guiData->scalingMultiplier = 1 / newScale;
-        lastAppliedScale = newScale;
 
         auto scaledSize = guiData->ScreenSizeScaled;
         auto centerScaled = Vec2 { scaledSize.x / 2, scaledSize.y / 2 };
