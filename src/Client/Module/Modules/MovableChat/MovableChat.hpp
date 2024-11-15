@@ -118,7 +118,7 @@ public:
         if(ClickGUI::editmenu) {
             if (!isEnabled()) return;
         } else {
-            if (lastAppliedPos != Vec2<float>{0, 0} && lastAppliedPos == (isEnabled() ? currentPos : originalPos)) return;
+            if (lastAppliedPos == (isEnabled() ? currentPos : originalPos)) return;
         }
         if(SDK::getCurrentScreen() != "hud_screen") return;
         SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl> &control) {
