@@ -15,16 +15,15 @@ public:
 
     GuiScale() : Module("MC GUI Scale", "Change your GUI Scale beyond\nMinecraft's restrictions.",
                         IDR_SCALE_PNG, "") {
+        Listen(this, SetupAndRenderEvent, &GuiScale::onSetupAndRender)
         Module::setup();
     };
 
     void onEnable() override {
-        Listen(this, SetupAndRenderEvent, &GuiScale::onSetupAndRender)
         Module::onEnable();
     }
 
     void onDisable() override {
-        Deafen(this, SetupAndRenderEvent, &GuiScale::onSetupAndRender)
         Module::onDisable();
     }
 
