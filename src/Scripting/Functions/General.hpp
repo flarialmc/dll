@@ -10,13 +10,11 @@ namespace General {
         return 0;
     }
 
-int lua_getRoamingPath(lua_State* L) {
-    std::string path = Utils::getRoamingPath();
-
-    lua_pushstring(L, path.c_str());
-    
-    return 1;
-}
+    int lua_getRoamingPath(lua_State* L) {
+        std::string path = Utils::getRoamingPath();
+        lua_pushstring(L, path.c_str());
+        return 1;
+    }
 
     void registerGeneral(lua_State* L){
         lua_register(L, "Notify", lua_Notify);
