@@ -15,6 +15,8 @@
 #include "../../../../Utils/Render/MaterialUtils.hpp"
 
 __int64* oDrawImage = nullptr;
+__int64* oDrawNineSlice = nullptr;
+std::chrono::time_point<std::chrono::high_resolution_clock> last;
 
 class SetUpAndRenderHook : public Hook
 {
@@ -28,7 +30,9 @@ private:
         funcOriginalText(ctx, font, pos, text, color, alpha, textAlignment, textMeasureData, caretMeasureData);
 	}
 
+
 	static void drawImageDetour(
+		SetUpAndRenderHook* instance, // Pass an instance of the class
 		MinecraftUIRenderContext* _this,
 		TexturePtr* texturePtr,
 		Vec2<float>& imagePos,
@@ -41,7 +45,25 @@ private:
         eventMgr.trigger(event);
         auto newPos = event->getImagePos();
 
-        Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(
+		if (SDK::containsIgnoreCase(texturePtr->GetFilePath(), "hover") && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "nohover") && SDK::currentScreen != "hud_screen" && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "chat"))
+		{
+			Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Hand);
+			last = std::chrono::high_resolution_clock::now();
+		}
+		else if (SDK::containsIgnoreCase(texturePtr->GetFilePath(), "hover") && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "nohover") && SDK::currentScreen != "hud_screen" && SDK::containsIgnoreCase(texturePtr->GetFilePath(), "chat"))
+		{
+			Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::IBeam);
+			last = std::chrono::high_resolution_clock::now();
+		}
+		else if (SDK::currentScreen != "hud_screen")
+		{
+			std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last;
+			if (duration.count() >= 0.01) {
+				Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+			}
+		}
+		
+		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(
                 oDrawImage,
                 _this,
                 texturePtr,
@@ -51,7 +73,6 @@ private:
                 uvSize
 		);
 	}
-
 	static void drawImageDetour2120(
 		MinecraftUIRenderContext* _this,
 		TexturePtr* texturePtr,
@@ -65,6 +86,23 @@ private:
         auto event = nes::make_holder<DrawImageEvent>(texturePtr, imagePos);
         eventMgr.trigger(event);
         auto newPos = event->getImagePos();
+		if (SDK::containsIgnoreCase(texturePtr->GetFilePath(), "hover") && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "nohover") && SDK::currentScreen != "hud_screen" && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "chat"))
+		{
+			Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Hand);
+			last = std::chrono::high_resolution_clock::now();
+		}
+		else if (SDK::containsIgnoreCase(texturePtr->GetFilePath(), "hover") && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "nohover") && SDK::currentScreen != "hud_screen" && SDK::containsIgnoreCase(texturePtr->GetFilePath(), "chat"))
+		{
+			Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::IBeam);
+			last = std::chrono::high_resolution_clock::now();
+		}
+		else if (SDK::currentScreen != "hud_screen")
+		{
+			std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last;
+			if (duration.count() >= 0.01) {
+				Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+			}
+		}
 
 		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(
 				oDrawImage,
@@ -76,6 +114,33 @@ private:
 				uvSize,
 				unk
 		);
+	}
+
+
+	static void drawNineSliceDetour(
+		MinecraftUIRenderContext* _this, 
+		TexturePtr* texturePtr, 
+		void* nineSliceInfo
+	) 
+	{
+		if (SDK::containsIgnoreCase(texturePtr->GetFilePath(), "hover") && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "nohover") && SDK::currentScreen != "hud_screen" && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "chat"))
+		{
+			Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Hand);
+			last = std::chrono::high_resolution_clock::now();
+		}
+		else if (SDK::containsIgnoreCase(texturePtr->GetFilePath(), "hover") && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "nohover") && SDK::currentScreen != "hud_screen" && SDK::containsIgnoreCase(texturePtr->GetFilePath(), "chat"))
+		{
+			Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::IBeam);
+			last = std::chrono::high_resolution_clock::now();
+		}
+		else if (SDK::currentScreen != "hud_screen")
+		{
+			std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last;
+			if (duration.count() >= 0.01) {
+				Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+			}
+		}
+		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, void*>(oDrawNineSlice, _this, texturePtr, nineSliceInfo);
 	}
 
     static void hookDrawTextAndDrawImage(MinecraftUIRenderContext* muirc) {
@@ -91,6 +156,11 @@ private:
 				Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour2120, (void **) &oDrawImage, "DrawImage");
 			else
 				Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour, (void **) &oDrawImage, "DrawImage");
+		}
+
+		if (oDrawNineSlice == nullptr)
+		{
+			Memory::hookFunc((void*)vTable[8], (void*)drawNineSliceDetour, (void**)&oDrawNineSlice, "DrawNineSlice");
 		}
     }
 
