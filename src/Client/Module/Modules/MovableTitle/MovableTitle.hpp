@@ -81,8 +81,6 @@ public:
             this->settings.setValue("percentageY", percentages.y);
 
             if (ClickGUI::editmenu) {
-                FlarialGUI::RoundedRect(currentPos.x, currentPos.y, D2D1::ColorF(D2D1::ColorF::White, 0.2f), width,
-                                        height);
                 FlarialGUI::UnsetWindowRect();
             }
         }

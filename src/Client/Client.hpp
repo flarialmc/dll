@@ -3,6 +3,15 @@
 #include "Hook/Manager.hpp"
 #include "Module/Manager.hpp"
 #include <vector>
+//winrt :fire:
+#include "winrt/windows.applicationmodel.core.h"
+#include "winrt/Windows.UI.ViewManagement.h"
+#include "winrt/Windows.UI.Core.h"
+#include "winrt/windows.system.h"
+
+using namespace winrt::Windows::UI::ViewManagement;
+using namespace winrt::Windows::ApplicationModel::Core;
+using namespace winrt::Windows::UI::Core;
 
 class Client {
 public:
@@ -13,6 +22,7 @@ public:
     static std::vector<std::string> getPlayersVector(const nlohmann::json &data);
 
     static void setWindowTitle(std::wstring title);
+    static void changeCursor(CoreCursorType cur);
 
     static void initialize();
 

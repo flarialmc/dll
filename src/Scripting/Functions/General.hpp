@@ -11,7 +11,7 @@ namespace General {
     }
 
     int lua_getRoamingPath(lua_State* L) {
-        std::string path = Utils::getRoamingPath();
+        std::string path = Utils::getRoamingPath() + "\\Flarial";
         lua_pushstring(L, path.c_str());
         return 1;
     }

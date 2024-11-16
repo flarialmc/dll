@@ -8,6 +8,7 @@
 #include "Functions/GUI.hpp"
 #include "Functions/General.hpp"
 #include "Functions/Constraints.hpp"
+#include "Functions/Settings.hpp"
 
 
 int lua_register_event_handler(lua_State* L) {
@@ -25,20 +26,24 @@ int lua_register_event_handler(lua_State* L) {
     return 0;
 }
 
-void Scripting::executeFunction(lua_State* L, std::string functionName) {
+void Scripting::executeFunction(lua_State* L, std::string functionName, bool shitInLogsIfFunctionIsNotFound) {
     lua_getglobal(L, functionName.c_str());
     if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+        if(!shitInLogsIfFunctionIsNotFound) return;
         std::string err = "Error calling " + functionName + ": " + lua_tostring(L, -1);
         Logger::error(err);
         lua_pop(L, 1);
     }
 }
+
+
 void registerFunctions(lua_State* L){
     lua_register(L, "onEvent", lua_register_event_handler);
 
     General::registerGeneral(L);
     GUI::registerGUI(L);
     LuaConstraints::registerConstraints(L);
+    LuaSettings::registerSetting(L);
 }
 
 void load(std::string name, std::string description, std::string mainclass) {

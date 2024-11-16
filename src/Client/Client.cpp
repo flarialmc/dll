@@ -14,6 +14,10 @@
 #include "winrt/Windows.UI.Core.h"
 #include "winrt/windows.system.h"
 
+using namespace winrt::Windows::UI::ViewManagement;
+using namespace winrt::Windows::ApplicationModel::Core;
+using namespace winrt::Windows::UI::Core;
+
 std::string Client::settingspath = Utils::getConfigsPath() + "\\main.flarial";
 Settings Client::settings = Settings();
 std::vector<std::string> Client::onlinePlayers;
@@ -47,14 +51,17 @@ std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
 bool Client::disable = false;
 
 void Client::setWindowTitle(std::wstring title) {
-    using namespace winrt::Windows::UI::ViewManagement;
-    using namespace winrt::Windows::ApplicationModel::Core;
-
     CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([title = std::move(title)]() {
         ApplicationView::GetForCurrentView().Title(title);
-        });
+    });
 }
 
+void Client::changeCursor(CoreCursorType cur) {
+    CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([cur]() {
+        auto window = CoreApplication::MainView().CoreWindow();
+        window.PointerCursor(CoreCursor(cur, 0)); // Set the cursor
+    });
+}
 void Client::initialize() {
     setWindowTitle(L"Flarial " + String::StrToWStr(WinrtUtils::getFormattedVersion() + " " + current_commit));
 
@@ -172,6 +179,9 @@ void Client::initialize() {
 
     if (Client::settings.getSettingByName<std::string>("fontWeight") == nullptr)
         Client::settings.addSetting("fontWeight", (std::string) "Normal");
+
+    if (Client::settings.getSettingByName<bool>("fralier") == nullptr)
+        Client::settings.addSetting("fralier", (bool)false);
 
     FlarialGUI::ExtractImageResource(IDR_RED_LOGO_PNG, "red-logo.png","PNG");
 

@@ -233,6 +233,7 @@ public:
 
                 float totalWidth = keycardSize * 3 + spacing * 2;
                 float totalHeight = keycardSize * 2.0f + keycardSize / 2.0f + spacing * 2;
+                if (settings.getSettingByName<bool>("cps")->value) totalHeight += (keycardSize + spacing);
 
                 Vec2<float> realcenter;
 
@@ -246,7 +247,6 @@ public:
                         this->settings.getSettingByName<float>("rounding")->value *
                         settings.getSettingByName<float>("uiscale")->value);
 
-                if (settings.getSettingByName<bool>("cps")->value) totalHeight += keycardSize + spacing;
 
                 if (ClickGUI::editmenu) { // makes module movable
                     FlarialGUI::SetWindowRect(realcenter.x - (keycardSize + spacing), realcenter.y, totalWidth,
@@ -448,10 +448,11 @@ public:
 
                 bool hideCPS = settings.getSettingByName<bool>("hidecps")->value;
 
-
+                float originalY = 0.f;
                 if (!settings.getSettingByName<bool>("cps")->value) realcenter.y += (keycardSize + spacing);
                 else {
 
+                    originalY = realcenter.y;
                     realcenter.y += (keycardSize + spacing);
                     // LMB
                     if (settings.getSettingByName<bool>("BlurEffect") != nullptr)

@@ -225,7 +225,7 @@ void restart(){
 
     Scripting::loadModules();
     for (const auto& pair : ModuleManager::moduleMap) {
-        if (pair.second != nullptr && it->second->isScripting())
+        if (pair.second != nullptr && pair.second->isScripting())
             pair.second->loadSettings();
             pair.second->terminating = false;
     }
