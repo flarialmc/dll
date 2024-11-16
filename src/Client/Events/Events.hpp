@@ -18,6 +18,7 @@
 #include "Network/PacketSendEvent.hpp"
 
 #include "Render/DrawImageEvent.hpp"
+#include "Render/DrawNineSliceEvent.hpp"
 #include "Render/DrawTextEvent.hpp"
 #include "Render/FogColorEvent.hpp"
 #include "Render/GammaEvent.hpp"
