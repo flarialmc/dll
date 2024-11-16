@@ -472,5 +472,5 @@ void SigInit::init2030() {
     ADD_SIG("MinecraftGame::_onResumeWaitReloadActors", "48 89 5C 24 10 48 89 74 24 18 55 57 41 54 41 56 41 57 48 8D 6C 24 C9 48 81 EC 90 00 00 00 4C 8B F1 48 8B 81");
     ADD_SIG("ClientInstance::getScreenName", "48 89 ? ? ? 48 89 ? ? ? 57 48 83 EC ? 48 8B ? 33 DB 48 8B ? 48 8D ? ? ? 48 8B ? ? ? ? ? FF 15 ? ? ? ? 48 8B");
 
-    ADD_SIG("ClientInstance::_updateScreenSizeVariables", "48 8B C4 55 53 56 57 41 54 41 56 41 57 48 8D 68 A8 48 81 EC 20 01 00 00 0F 29 70");
+    ADD_SIG("ClientInstance::_updateScreenSizeVariables", "48 8B C4 55 53 56 57 41 54 41 56 41 57 48 8D 68 A8 48 81 EC 20 01 00 00 0F 29 70 B8 0F 29 78 A8 44");
 }
