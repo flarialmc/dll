@@ -51,9 +51,8 @@ std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
 bool Client::disable = false;
 
 void Client::setWindowTitle(std::wstring title) {
-    CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([]() {
-        auto window = CoreApplication::MainView().CoreWindow();
-        window.PointerCursor(CoreCursor(CoreCursorType::Hand, 0)); // Set the cursor
+    CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([title = std::move(title)]() {
+        ApplicationView::GetForCurrentView().Title(title);
     });
 }
 
