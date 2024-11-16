@@ -1173,6 +1173,12 @@ void FlarialGUI::UnsetScrollView() {
 void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int currentNum, float fixer) {
     isInWindowRect = true;
 
+    D2D1_COLOR_F c = D2D1::ColorF(D2D1::ColorF::White);
+    c.a = 0.5f;
+    FlarialGUI::RoundedRect(x, y, c, width, height, 0, 0);
+    c.a = 1.f;
+    FlarialGUI::RoundedHollowRect(x, y, Constraints::RelativeConstraint(0.003f, "height", true), c, width, height, 0, 0);
+
     if(currentNum > maxRect) maxRect = currentNum;
 
     int i = 0;
