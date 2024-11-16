@@ -4,13 +4,14 @@
 #include "../Cancellable.hpp"
 #include "../../../Utils/Utils.hpp"
 #include "../../../SDK/Client/Render/TexturePtr.hpp"
+#include "../../../SDK/Client/Render/NineSliceData.hpp"
 
 class DrawNineSliceEvent : public Event, Cancellable {
 private:
     TexturePtr* texturePtr;
-    void* nineSliceInfo;
+    NinesliceInfo* nineSliceInfo;
 public:
-    [[nodiscard]] void* getInfo() const {
+    [[nodiscard]] NinesliceInfo* getInfo() const {
         return nineSliceInfo;
     }
 
@@ -18,7 +19,7 @@ public:
         return texturePtr;
     }
 
-    explicit DrawNineSliceEvent(TexturePtr* texturePtr, void* nineSliceInfo)
+    explicit DrawNineSliceEvent(TexturePtr* texturePtr, NinesliceInfo* nineSliceInfo)
         : texturePtr(texturePtr), nineSliceInfo(nineSliceInfo) {
     }
 };

@@ -4,6 +4,7 @@
 #include "../../../../SDK/Client/Render/MinecraftUIRenderContext.hpp"
 #include "../../../../SDK/Client/Render/ScreenView/ScreenView.hpp"
 #include "../../../../SDK/Client/Render/BaseActorRenderContext.hpp"
+#include "../../../../SDK/Client/Render/NineSliceData.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "../Hook.hpp"
 #include "../../../../SDK/Client/Render/ItemRenderer.hpp"
@@ -41,7 +42,7 @@ private:
 		Vec2<float>& uvSize
 	)
 	{
-        auto event = nes::make_holder<DrawImageEvent>(texturePtr, imagePos);
+        auto event = nes::make_holder<DrawImageEvent>(texturePtr, imagePos, imageDimension);
         eventMgr.trigger(event);
         auto newPos = event->getImagePos();
 		
@@ -65,7 +66,7 @@ private:
 		bool unk
 	)
 	{
-        auto event = nes::make_holder<DrawImageEvent>(texturePtr, imagePos);
+        auto event = nes::make_holder<DrawImageEvent>(texturePtr, imagePos, imageDimension);
         eventMgr.trigger(event);
         auto newPos = event->getImagePos();
 
@@ -85,13 +86,13 @@ private:
 	static void drawNineSliceDetour(
 		MinecraftUIRenderContext* _this, 
 		TexturePtr* texturePtr, 
-		void* nineSliceInfo
+		NinesliceInfo* nineSliceInfo
 	) 
 	{
 		auto event = nes::make_holder<DrawNineSliceEvent>(texturePtr, nineSliceInfo);
 		eventMgr.trigger(event);
 
-		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, void*>(oDrawNineSlice, _this, texturePtr, nineSliceInfo);
+		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, NinesliceInfo*>(oDrawNineSlice, _this, texturePtr, nineSliceInfo);
 	}
 
 
