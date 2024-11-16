@@ -722,14 +722,30 @@ public:
     void onRender(RenderEvent &event) {
         float allahu = Constraints::RelativeConstraint(0.65);
         float akbar = Constraints::RelativeConstraint(0.25);
+
+        if(editmenu) {
+            D2D1_COLOR_F c = D2D1::ColorF(D2D1::ColorF::Black);
+            c.a = 0.75f;
+            FlarialGUI::RoundedRect(0, 0, c, MC::windowSize.x, MC::windowSize.y, 0, 0);
+        }
         Vec2<float> allahuakbar = Constraints::CenterConstraint(allahu, akbar, "y", 1.175, 1.175);
         // TODO: add inventory screen to onRender?
         // watermark
         if (SDK::getCurrentScreen() == "inventory_screen" || SDK::getCurrentScreen().find("chest") != std::string::npos)
             if (Client::settings.getSettingByName<bool>("watermark")->value)
-                FlarialGUI::image(IDR_FLARIAL_TITLE_PNG,
-                                  D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
-                                              allahuakbar.y + akbar));
+                if (Client::settings.getSettingByName<bool>("fralier")->value)
+                {
+                    FlarialGUI::image(IDR_FRALIER_TITLE_PNG,
+                        D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
+                            allahuakbar.y + akbar));
+                }
+                else
+                {
+                    FlarialGUI::image(IDR_FLARIAL_TITLE_PNG,
+                        D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
+                            allahuakbar.y + akbar));
+                }
+                
 
         if (FlarialGUI::scrollposmodifier == 0) {
             FlarialGUI::scrollposmodifier = Constraints::RelativeConstraint(0.1f);
@@ -1169,9 +1185,9 @@ public:
 
                     c->addHeader("Fonts");
                     c->addTextBox("ClickGUI", "", Client::settings.getSettingByName<std::string>("fontname")->value);
-                    c->addSlider("Universal Font Scale", "", Client::settings.getSettingByName<float>("gui_font_scale")->value, 10.f, 0.f, true);
+                    c->addSlider("Universal Font Scale", "", Client::settings.getSettingByName<float>("gui_font_scale")->value, 2.f, 0.f, true);
                     c->addTextBox("Modules", "", Client::settings.getSettingByName<std::string>("mod_fontname")->value);
-                    c->addSlider("Universal Font Scale", "", Client::settings.getSettingByName<float>("modules_font_scale")->value, 10.f, 0.f, true);
+                    c->addSlider("Universal Font Scale", "", Client::settings.getSettingByName<float>("modules_font_scale")->value, 2.f, 0.f, true);
                     c->addToggle("Override Font Weight", "", Client::settings.getSettingByName<bool>("overrideFontWeight")->value);
                     c->addDropdown("Font Weight", "Bold, Thin, etc.", {"Bold", "Normal", "SemiBold", "ExtraBold", "Medium", "Light", "ExtraLight"}, Client::settings.getSettingByName<std::string>("fontWeight")->value);
                     c->extraPadding();
@@ -1203,6 +1219,7 @@ public:
                     c->addElementText("Following Does Not Require Restart");
                     c->extraPadding();
 
+                    c->addToggle("Fralier mode", "", Client::settings.getSettingByName<bool>("fralier")->value);
                     c->addToggle("Disable Animations", "",  Client::settings.getSettingByName<bool>("disableanims")->value);
                     c->addSlider("UI Blur Intensity", "", Client::settings.getSettingByName<float>("blurintensity")->value, 25.f);
                     c->addSlider("Chroma / RGB Speed", "", Client::settings.getSettingByName<float>("rgb_speed")->value, 10.f);

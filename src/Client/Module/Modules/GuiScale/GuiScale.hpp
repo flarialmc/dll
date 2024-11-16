@@ -7,6 +7,7 @@ private:
     float originalScale = 0.f;
     bool restored = false;
 public:
+    static inline bool fixResize = false;
     GuiScale() : Module("MC GUI Scale", "Change your GUI Scale beyond\nMinecraft's restrictions.",
                         IDR_SCALE_PNG, "") {
         Module::setup();
@@ -60,14 +61,15 @@ public:
     void update() {
         float targetScale = delayDisable ? originalScale : this->settings.getSettingByName<float>("guiscale")->value;
         auto guiData = SDK::clientInstance->getGuiData();
-        if(targetScale == guiData->GuiScale && !delayDisable) return;
+        if(targetScale == guiData->GuiScale && !delayDisable && !fixResize) return;
 
         updateScale(targetScale);
     }
 
     void updateScale(float newScale) {
-        if(restored) return;
+        if(restored && !fixResize) return;
 
+        fixResize = false;
         auto guiData = SDK::clientInstance->getGuiData();
 
         if(originalScale == 0) {
