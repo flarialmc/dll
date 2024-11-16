@@ -89,6 +89,7 @@
 #include "Modules/NullMovement/NullMovement.hpp"
 #include "../../Scripting/Scripting.hpp"
 #include "../../Scripting/EventManager/ScriptingEventManager.hpp"
+#include "Modules/Cursor/Cursor.hpp"
 
 namespace ModuleManager {
     std::map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -185,6 +186,7 @@ void ModuleManager::initialize() {
     addModule<PackChanger>();
     addModule<NullMovement>();
     addModule<CustomCrosshair>();
+    addModule<Cursor>();
 
     addService<GUIKeyListener>();
     addService<DiscordRPCListener>();

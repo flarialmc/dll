@@ -44,24 +44,6 @@ private:
         auto event = nes::make_holder<DrawImageEvent>(texturePtr, imagePos);
         eventMgr.trigger(event);
         auto newPos = event->getImagePos();
-
-		if (SDK::containsIgnoreCase(texturePtr->GetFilePath(), "hover") && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "nohover") && SDK::currentScreen != "hud_screen" && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "chat"))
-		{
-			Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Hand);
-			last = std::chrono::high_resolution_clock::now();
-		}
-		else if (SDK::containsIgnoreCase(texturePtr->GetFilePath(), "hover") && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "nohover") && SDK::currentScreen != "hud_screen" && SDK::containsIgnoreCase(texturePtr->GetFilePath(), "chat"))
-		{
-			Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::IBeam);
-			last = std::chrono::high_resolution_clock::now();
-		}
-		else if (SDK::currentScreen != "hud_screen")
-		{
-			std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last;
-			if (duration.count() >= 0.01) {
-				Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Arrow);
-			}
-		}
 		
 		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(
                 oDrawImage,
@@ -86,23 +68,6 @@ private:
         auto event = nes::make_holder<DrawImageEvent>(texturePtr, imagePos);
         eventMgr.trigger(event);
         auto newPos = event->getImagePos();
-		if (SDK::containsIgnoreCase(texturePtr->GetFilePath(), "hover") && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "nohover") && SDK::currentScreen != "hud_screen" && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "chat"))
-		{
-			Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Hand);
-			last = std::chrono::high_resolution_clock::now();
-		}
-		else if (SDK::containsIgnoreCase(texturePtr->GetFilePath(), "hover") && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "nohover") && SDK::currentScreen != "hud_screen" && SDK::containsIgnoreCase(texturePtr->GetFilePath(), "chat"))
-		{
-			Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::IBeam);
-			last = std::chrono::high_resolution_clock::now();
-		}
-		else if (SDK::currentScreen != "hud_screen")
-		{
-			std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last;
-			if (duration.count() >= 0.01) {
-				Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Arrow);
-			}
-		}
 
 		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(
 				oDrawImage,
@@ -123,25 +88,12 @@ private:
 		void* nineSliceInfo
 	) 
 	{
-		if (SDK::containsIgnoreCase(texturePtr->GetFilePath(), "hover") && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "nohover") && SDK::currentScreen != "hud_screen" && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "chat"))
-		{
-			Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Hand);
-			last = std::chrono::high_resolution_clock::now();
-		}
-		else if (SDK::containsIgnoreCase(texturePtr->GetFilePath(), "hover") && !SDK::containsIgnoreCase(texturePtr->GetFilePath(), "nohover") && SDK::currentScreen != "hud_screen" && SDK::containsIgnoreCase(texturePtr->GetFilePath(), "chat"))
-		{
-			Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::IBeam);
-			last = std::chrono::high_resolution_clock::now();
-		}
-		else if (SDK::currentScreen != "hud_screen")
-		{
-			std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last;
-			if (duration.count() >= 0.01) {
-				Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Arrow);
-			}
-		}
+		auto event = nes::make_holder<DrawNineSliceEvent>(texturePtr, nineSliceInfo);
+		eventMgr.trigger(event);
+
 		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, void*>(oDrawNineSlice, _this, texturePtr, nineSliceInfo);
 	}
+
 
     static void hookDrawTextAndDrawImage(MinecraftUIRenderContext* muirc) {
         auto vTable = *(uintptr_t **) muirc;
