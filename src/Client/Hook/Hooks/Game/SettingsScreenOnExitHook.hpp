@@ -13,7 +13,7 @@ private:
 
         auto post_event = nes::make_holder<AfterSettingsScreenOnExitEvent>();
         eventMgr.trigger(post_event);
-
+        // testing lmfao Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Hand);
         return state;
     }
 

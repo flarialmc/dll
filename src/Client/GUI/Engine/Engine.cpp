@@ -1580,7 +1580,6 @@ void FlarialGUI::UnSetIsInAdditionalYMode() {
 
 float FlarialGUI::SettingsTextWidth(const std::string& text) {
 
-return 100;
+return 100; //what the fuck is this
 
 }
-
