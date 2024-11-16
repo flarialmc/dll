@@ -9,8 +9,9 @@
 
 class ScriptModuleBase : public Module {
 
-    lua_State* module_lua_state;
+
 public:
+    lua_State* module_lua_state;
     ScriptModuleBase(std::string name, std::string description, lua_State* lua_state) : Module(name, description, IDR_TIME_PNG, "", true) {
         this->module_lua_state = lua_state;
         Module::setup();
@@ -19,6 +20,7 @@ public:
         Listen(this, PacketEvent, &ScriptModuleBase::onPacketReceive)
         Listen(this, TickEvent, &ScriptModuleBase::onTickEvent)
         Listen(this, RenderEvent, &ScriptModuleBase::onRenderEvent)
+
     };
 
     void terminate() override {
@@ -30,15 +32,22 @@ public:
     }
 
     void onEnable() override {
-        Scripting::executeFunction(module_lua_state, "onEnable");
+        Scripting::executeFunction(module_lua_state, "onEnable", true);
         Module::onEnable();
 
     }
 
     void onDisable() override {
-        Scripting::executeFunction(module_lua_state, "onDisable");
+        Scripting::executeFunction(module_lua_state, "onDisable", true);
         Module::onDisable();
     }
+
+    void defaultConfig() override {
+        Scripting::executeFunction(module_lua_state, "defaultConfig", true);
+    };
+    void settingsRender(float settingsOffset) override {
+        //Scripting::executeFunction(module_lua_state, "settingsRender", true);
+    };
 
     void onKey(KeyEvent &event) {
         if(!Scripting::instalized) return;
@@ -94,5 +103,7 @@ public:
 
         ScriptingEventManager::triggerEvent(module_lua_state, "onRenderEvent", args);
     };
+
+
 };
 

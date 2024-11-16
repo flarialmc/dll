@@ -30,7 +30,7 @@ namespace GUI {
         float width = luaL_checknumber(L, 6);
         float height = luaL_checknumber(L, 7);
 
-        FlarialGUI::RoundedRect(x, y, *color, width, height, radiusX, radiusY);
+        FlarialGUI::RoundedRect(x, y, *color, radiusX, radiusY, width, height);
 
         return 0;
     }
