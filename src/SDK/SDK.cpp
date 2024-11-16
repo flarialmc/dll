@@ -2,6 +2,7 @@
 
 #include "SDK.hpp"
 #include "../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include <cctype>
 
 ClientInstance *SDK::clientInstance = nullptr;
 ScreenView *SDK::screenView = nullptr;
@@ -11,6 +12,14 @@ std::string SDK::currentScreen;
 bool SDK::hasInstanced = false;
 uint64_t SDK::serverPing = 0;
 
+bool SDK::containsIgnoreCase(const std::string& mainString, const std::string& searchString) {
+    auto it = std::search(
+        mainString.begin(), mainString.end(),
+        searchString.begin(), searchString.end(),
+        [](char ch1, char ch2) { return std::tolower(ch1) == std::tolower(ch2); }
+    );
+    return it != mainString.end();
+}
 
 std::shared_ptr<Packet> SDK::createPacket(int id) {
 
