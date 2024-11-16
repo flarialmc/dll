@@ -169,6 +169,9 @@ void Client::initialize() {
     if (Client::settings.getSettingByName<std::string>("fontWeight") == nullptr)
         Client::settings.addSetting("fontWeight", (std::string) "Normal");
 
+    if (Client::settings.getSettingByName<bool>("fralier") == nullptr)
+        Client::settings.addSetting("fralier", (bool)false);
+
     FlarialGUI::ExtractImageResource(IDR_RED_LOGO_PNG, "red-logo.png","PNG");
 
     FlarialGUI::LoadFont(IDR_FONT_TTF);

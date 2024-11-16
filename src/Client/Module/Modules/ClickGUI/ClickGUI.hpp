@@ -727,9 +727,19 @@ public:
         // watermark
         if (SDK::getCurrentScreen() == "inventory_screen" || SDK::getCurrentScreen().find("chest") != std::string::npos)
             if (Client::settings.getSettingByName<bool>("watermark")->value)
-                FlarialGUI::image(IDR_FLARIAL_TITLE_PNG,
-                                  D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
-                                              allahuakbar.y + akbar));
+                if (Client::settings.getSettingByName<bool>("fralier")->value)
+                {
+                    FlarialGUI::image(IDR_FRALIER_TITLE_PNG,
+                        D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
+                            allahuakbar.y + akbar));
+                }
+                else
+                {
+                    FlarialGUI::image(IDR_FLARIAL_TITLE_PNG,
+                        D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
+                            allahuakbar.y + akbar));
+                }
+                
 
         if (FlarialGUI::scrollposmodifier == 0) {
             FlarialGUI::scrollposmodifier = Constraints::RelativeConstraint(0.1f);
@@ -1196,6 +1206,7 @@ public:
                     c->addElementText("Following Does Not Require Restart");
                     c->extraPadding();
 
+                    c->addToggle("Fralier mode", "", Client::settings.getSettingByName<bool>("fralier")->value);
                     c->addToggle("Disable Animations", "",  Client::settings.getSettingByName<bool>("disableanims")->value);
                     c->addSlider("UI Blur Intensity", "", Client::settings.getSettingByName<float>("blurintensity")->value, 25.f);
                     c->addSlider("Chroma / RGB Speed", "", Client::settings.getSettingByName<float>("rgb_speed")->value, 10.f);
