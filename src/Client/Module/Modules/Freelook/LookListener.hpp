@@ -31,7 +31,7 @@ public:
         module->active = true;
         Memory::patchBytes((void *) yaw1, nop, 4);
         Memory::patchBytes((void *) yaw2, nop, 4);
-        if(WinrtUtils::checkBelowOrEqual(21,30)) {
+        if (!WinrtUtils::checkAboveOrEqual(21, 40)) {
             Memory::patchBytes((void *) pitch, nop, 4);
             Memory::patchBytes((void *) movement, nop, 4);
         }
@@ -42,7 +42,7 @@ public:
         module->active = false;
         Memory::patchBytes((void *) yaw1, originalYaw1.data(), 4);
         Memory::patchBytes((void *) yaw2, originalYaw2.data(), 4);
-        if(WinrtUtils::checkBelowOrEqual(21,30)) {
+        if (!WinrtUtils::checkAboveOrEqual(21, 40)) {
             Memory::patchBytes((void *) pitch, originalPitch.data(), 4);
             Memory::patchBytes((void *) movement, originalMovement.data(), 4);
         }
@@ -121,7 +121,7 @@ public:
         originalYaw1 = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4]) yaw1);
         originalYaw2 = std::bit_cast<std::array<std::byte, 4>>(*(std::byte(*)[4]) yaw2);
 
-        if(WinrtUtils::checkBelowOrEqual(21,30)) {
+        if (!WinrtUtils::checkAboveOrEqual(21, 40)) {
             pitch = GET_SIG_ADDRESS("CameraPitch");
             movement = GET_SIG_ADDRESS("CameraMovement");
 
