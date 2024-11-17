@@ -66,9 +66,9 @@ void load(std::string name, std::string description, std::string mainclass) {
 
 void Scripting::loadModules() {
      for (const auto& entry : std::filesystem::directory_iterator(Utils::getRoamingPath() + "\\Flarial\\scripts")) { 
-        for (auto &file : std::filesystem::directory_iterator(entry.path()){
-            if (file.path().extension() == ".json") {
-                std::ifstream file(entry.path());
+        
+            if (std::filesystem::exists(entry.path() + "main.json"){
+                std::ifstream file(entry.path() + "main.json");
                 nlohmann::json jsonData;
                 file >> jsonData;
 
@@ -80,7 +80,7 @@ void Scripting::loadModules() {
                 break;
         }else{
                 FlarialGUI::Notify("Could not find json file in script folder" + entry.path())
-        }
+        
         }
 
     }
