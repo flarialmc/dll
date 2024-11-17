@@ -43,6 +43,7 @@ public:
     }
 
     void onNineSliceDraw(DrawNineSliceEvent& event) {
+        Vec2<float> mouse(MC::mousePos.x / 2, MC::mousePos.y / 2);
         if (SDK::containsIgnoreCase(event.getTexturePtr()->GetFilePath(), "hover") && !SDK::containsIgnoreCase(event.getTexturePtr()->GetFilePath(), "nohover") && SDK::currentScreen != "hud_screen")
         {
             if (event.getTexturePtr()->GetFilePath().contains("edit_box"))
@@ -55,7 +56,7 @@ public:
             }
             last = std::chrono::high_resolution_clock::now();
         }
-        else if (event.getTexturePtr()->GetFilePath().contains("ScrollRail")  && SDK::isHovered(event.getPos(), Vec2<float>(MC::mousePos.x /2, MC::mousePos.y /2)))
+        else if (event.getTexturePtr()->GetFilePath().contains("ScrollRail")  && SDK::isHovered(event.getPos(), mouse))
         {
             Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::SizeNorthSouth);
             last = std::chrono::high_resolution_clock::now();
