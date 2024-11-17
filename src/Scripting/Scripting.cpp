@@ -67,7 +67,7 @@ void load(std::string name, std::string description, std::string mainclass) {
 void Scripting::loadModules() {
      for (const auto& entry : std::filesystem::directory_iterator(Utils::getRoamingPath() + "\\Flarial\\scripts")) { 
         
-            if (std::filesystem::exists(entry.path() + "main.json"){
+            if (std::filesystem::exists(entry.path() + "\\" + main.json"){
                 std::ifstream file(entry.path() + "main.json");
                 nlohmann::json jsonData;
                 file >> jsonData;
