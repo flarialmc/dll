@@ -65,17 +65,23 @@ void load(std::string name, std::string description, std::string mainclass) {
 }
 
 void Scripting::loadModules() {
-    for (const auto& entry : std::filesystem::directory_iterator(Utils::getRoamingPath() + "\\Flarial\\scripts")) {
-        if (entry.path().extension() == ".json") {
-            std::ifstream file(entry.path());
-            nlohmann::json jsonData;
-            file >> jsonData;
+     for (const auto& entry : std::filesystem::directory_iterator(Utils::getRoamingPath() + "\\Flarial\\scripts")) { 
+        for (auto &file : std::filesystem::directory_iterator(entry.path()){
+            if (file.path().extension() == ".json") {
+                std::ifstream file(entry.path());
+                nlohmann::json jsonData;
+                file >> jsonData;
 
-            std::string moduleName = jsonData["name"];
-            std::string description = jsonData["description"];
-            std::string mainClass = jsonData["main_class"];
+                std::string moduleName = jsonData["name"];
+                std::string description = jsonData["description"];
+                std::string mainClass = jsonData["main_class"];
 
-            load(moduleName, description, mainClass);
+                load(moduleName, description, mainClass);
+                break;
+        }else{
+                FlarialGUI::Notify("Could not find json file in script folder" + entry.path())
         }
+        }
+
     }
 }
