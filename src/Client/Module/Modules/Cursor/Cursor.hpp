@@ -54,14 +54,6 @@ public:
             }
             last = std::chrono::high_resolution_clock::now();
         }
-        else if (SDK::containsIgnoreCase(event.getTexturePtr()->GetFilePath(), "Scroll") && SDK::currentScreen != "hud_screen")
-        {
-            if (MC::mousePos.x < event.getInfo()->topLeft.x && MC::mousePos.x > event.getInfo()->bottomRight.x && MC::mousePos.y < event.getInfo()->topLeft.y && MC::mousePos.y > event.getInfo()->bottomRight.y)
-            {
-                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::UpArrow);
-                last = std::chrono::high_resolution_clock::now();
-            }
-        }
         else if (SDK::currentScreen != "hud_screen")
         {
             std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last;
@@ -74,7 +66,13 @@ public:
     void onDrawImage(DrawImageEvent& event) {
         if (SDK::containsIgnoreCase(event.getTexturePath(), "hover") && !SDK::containsIgnoreCase(event.getTexturePath(), "nohover") && SDK::currentScreen != "hud_screen")
         {
-            Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Hand);
+            if (SDK::currentScreen == "chat_screen" && MC::mousePos.y > MC::windowSize.y / 2 && MC::mousePos.x > MC::windowSize.x / 10.85)
+            {
+                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::IBeam);
+            }
+            else {
+                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Hand);
+            }
             last = std::chrono::high_resolution_clock::now();
         }
         else if (SDK::currentScreen != "hud_screen")
