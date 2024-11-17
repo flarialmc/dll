@@ -89,7 +89,12 @@ private:
 		NinesliceInfo* nineSliceInfo
 	) 
 	{
-		auto event = nes::make_holder<DrawNineSliceEvent>(texturePtr, nineSliceInfo);
+		float* x = reinterpret_cast<float*>((__int64)nineSliceInfo);
+		float* y = reinterpret_cast<float*>((__int64)nineSliceInfo + 0x4);
+		float* z = reinterpret_cast<float*>((__int64)nineSliceInfo + 0x60); // funny cuh offset
+		float* w = reinterpret_cast<float*>((__int64)nineSliceInfo + 0x64);
+		Vec4<float> position(*x, *y, *z, *w);
+		auto event = nes::make_holder<DrawNineSliceEvent>(texturePtr, position);
 		eventMgr.trigger(event);
 
 		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, NinesliceInfo*>(oDrawNineSlice, _this, texturePtr, nineSliceInfo);

@@ -20,7 +20,10 @@ bool SDK::containsIgnoreCase(const std::string& mainString, const std::string& s
     );
     return it != mainString.end();
 }
-
+bool SDK::isHovered(Vec4<float> box, Vec2<float> mouse) {
+    if (mouse.x >= box.x && mouse.y >= box.y && mouse.x <= box.z && mouse.y <= box.w) return true;
+    return false;
+}
 std::shared_ptr<Packet> SDK::createPacket(int id) {
 
     static uintptr_t Address;

@@ -9,17 +9,17 @@
 class DrawNineSliceEvent : public Event, Cancellable {
 private:
     TexturePtr* texturePtr;
-    NinesliceInfo* nineSliceInfo;
+    Vec4<float> position;
 public:
-    [[nodiscard]] NinesliceInfo* getInfo() const {
-        return nineSliceInfo;
+    [[nodiscard]] Vec4<float> getPos() const {
+        return position;
     }
 
     [[nodiscard]] TexturePtr* getTexturePtr() {
         return texturePtr;
     }
 
-    explicit DrawNineSliceEvent(TexturePtr* texturePtr, NinesliceInfo* nineSliceInfo)
-        : texturePtr(texturePtr), nineSliceInfo(nineSliceInfo) {
+    explicit DrawNineSliceEvent(TexturePtr* texturePtr, Vec4<float> position)
+        : texturePtr(texturePtr), position(position) {
     }
 };
