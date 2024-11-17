@@ -65,7 +65,6 @@ void load(std::string name, std::string description, std::string mainclass) {
 }
 
 void Scripting::loadModules() {
-    void loadModules() {
      for (const auto& entry : std::filesystem::directory_iterator(Utils::getRoamingPath() + "\\Flarial\\scripts")) { 
             
             if (std::filesystem::exists(entry.path().string() + "\\" + "main.json")){
@@ -80,8 +79,7 @@ void Scripting::loadModules() {
                 load(moduleName, description, entry.path().string() + "\\" + mainClass);
                 
         }else{
-            FlarialGUI::Notify("could not find main.json")
+            FlarialGUI::Notify("could not find main.json");
         }
     }
-}
 }
