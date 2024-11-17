@@ -33,7 +33,6 @@ private:
 
 
 	static void drawImageDetour(
-		SetUpAndRenderHook* instance, // Pass an instance of the class
 		MinecraftUIRenderContext* _this,
 		TexturePtr* texturePtr,
 		Vec2<float>& imagePos,
