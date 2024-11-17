@@ -9,7 +9,7 @@
 
 template<typename Component>
 Component *Actor::tryGet(uintptr_t addr) {
-    if(WinrtUtils::checkAboveOrEqual(21, 00) || addr == 0) {
+    if(WinrtUtils::checkAboveOrEqual(21, 40) || addr == 0) {
         auto& ctx = GetEntityContextV1_20_50();
         if(!ctx.isValid()) return nullptr;
         Component* component = ctx.tryGetComponent<Component>();
