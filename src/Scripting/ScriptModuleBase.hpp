@@ -43,10 +43,10 @@ public:
     }
 
     void defaultConfig() override {
-        Scripting::executeFunction(module_lua_state, "defaultConfig", true);
+        Scripting::executeFunction(module_lua_state, "defaultConfig", false);
     };
     void settingsRender(float settingsOffset) override {
-        //Scripting::executeFunction(module_lua_state, "settingsRender", true);
+        Scripting::executeFunction(module_lua_state, "settingsRender", false);
     };
 
     void onKey(KeyEvent &event) {

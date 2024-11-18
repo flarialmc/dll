@@ -14,24 +14,10 @@ namespace LuaSettings {
     int lua_CreateSetting(lua_State *L) {
         std::string name = luaL_checkstring(L, 1);
         float a = luaL_checkinteger(L, 2);
+        Module* script = Scripting::getModuleByState(L);
 
-        for (const auto &pair: ModuleManager::moduleMap) {
-            if (pair.second != nullptr) {
-                try {
-                    auto script = reinterpret_cast<ScriptModuleBase *>(pair.second.get());
-                    if(!script) continue;
-
-                    if (script->module_lua_state == L) {
-                        if (script->settings.getSettingByName<float>(name) == nullptr)
-                            script->settings.addSetting(name, a);
-                        break;
-                    }
-                } catch (const std::bad_cast &e) {
-
-                }
-
-            }
-        }
+        if (script->settings.getSettingByName<float>(name) == nullptr)
+            script->settings.addSetting(name, a);
 
         return 0;
     }

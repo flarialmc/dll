@@ -62,6 +62,9 @@ void load(std::string name, std::string description, std::string mainclass) {
     }
 
     ModuleManager::addModule<ScriptModuleBase>(name, description, L);
+    auto mod = ModuleManager::getModule(name).get();
+    Scripting::luaScriptModules.emplace_back(L, mod);
+    mod->defaultConfig();
 }
 
 void Scripting::loadModules() {

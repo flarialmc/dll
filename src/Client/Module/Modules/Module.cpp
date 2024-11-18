@@ -440,7 +440,7 @@ void Module::toggle() {
 }
 
 void Module::setup() {
-    defaultConfig();
+    if(!isScripting())  defaultConfig();
     Module::defaultConfig();
     keybindActions.push_back([this] (std::vector<std::any> args)-> std::any {
     this->active = !this->active;
