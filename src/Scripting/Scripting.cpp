@@ -52,7 +52,7 @@ void load(std::string name, std::string description, std::string mainclass) {
 
     registerFunctions(L);
 
-    const std::string path = Utils::getRoamingPath() + "\\Flarial\\scripts\\" + mainclass;
+    const std::string path = mainclass;
 
     if (luaL_dofile(L, path.c_str()) != LUA_OK) {
         std::string err = std::string("Error loading script: ") + lua_tostring(L, -1);
@@ -68,7 +68,7 @@ void Scripting::loadModules() {
      for (const auto& entry : std::filesystem::directory_iterator(Utils::getRoamingPath() + "\\Flarial\\scripts")) { 
             
             if (std::filesystem::exists(entry.path().string() + "\\" + "main.json")){
-                std::ifstream file(entry.path().string() + "main.json");
+                std::ifstream file(entry.path().string() + "\\" + "main.json");
                 nlohmann::json jsonData;
                 file >> jsonData;
 
