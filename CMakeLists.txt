@@ -126,7 +126,7 @@ FetchContent_Declare(
 FetchContent_Declare(
         libhat
         GIT_REPOSITORY  https://github.com/BasedInc/libhat.git
-        GIT_TAG         9ef05d6961ce37a4c801f11159de895aa21878a9
+        GIT_TAG         b7ceb3b2f4e6090f3a5e07c27685ce9f5d3d3f60
 )
 
 FetchContent_Declare(
