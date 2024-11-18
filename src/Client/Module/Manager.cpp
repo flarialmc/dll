@@ -90,6 +90,7 @@
 #include "../../Scripting/Scripting.hpp"
 #include "../../Scripting/EventManager/ScriptingEventManager.hpp"
 #include "Modules/Cursor/Cursor.hpp"
+#include "Modules/RawInputBuffer/RawInputBuffer.hpp"
 
 namespace ModuleManager {
     std::map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -187,6 +188,7 @@ void ModuleManager::initialize() {
     addModule<NullMovement>();
     addModule<CustomCrosshair>();
     addModule<Cursor>();
+    addModule<RawInputBuffer>();
 
     addService<GUIKeyListener>();
     addService<DiscordRPCListener>();

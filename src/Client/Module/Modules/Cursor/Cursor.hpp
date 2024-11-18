@@ -45,15 +45,21 @@ public:
     void onNineSliceDraw(DrawNineSliceEvent& event) {
         if (SDK::containsIgnoreCase(event.getTexturePtr()->GetFilePath(), "hover") && !SDK::containsIgnoreCase(event.getTexturePtr()->GetFilePath(), "nohover") && SDK::currentScreen != "hud_screen")
         {
-            if (SDK::currentScreen == "chat_screen" && MC::mousePos.y > MC::windowSize.y / 2 && MC::mousePos.x > MC::windowSize.x / 10.85)
+            if (event.getTexturePtr()->GetFilePath().contains("edit_box"))
             {
                 Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::IBeam);
             }
-            else {
+            else
+            {
                 Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Hand);
             }
             last = std::chrono::high_resolution_clock::now();
         }
+        /*else if (event.getTexturePtr()->GetFilePath().contains("ScrollRail"))
+        {
+            Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::SizeNorthSouth);
+            last = std::chrono::high_resolution_clock::now();
+        }*/
         else if (SDK::currentScreen != "hud_screen")
         {
             std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last;
@@ -64,9 +70,17 @@ public:
     }
 
     void onDrawImage(DrawImageEvent& event) {
+        Vec2<float> mouse(MC::mousePos.x / 2, MC::mousePos.y / 2);
         if (SDK::containsIgnoreCase(event.getTexturePath(), "hover") && !SDK::containsIgnoreCase(event.getTexturePath(), "nohover") && SDK::currentScreen != "hud_screen")
         {
-            Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Hand);
+            if (event.getTexturePath().contains("edit_box"))
+            {
+                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::IBeam);
+            }
+            else
+            {
+                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Hand);
+            }
             last = std::chrono::high_resolution_clock::now();
         }
         else if (SDK::currentScreen != "hud_screen")

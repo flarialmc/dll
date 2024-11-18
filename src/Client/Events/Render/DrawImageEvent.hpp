@@ -9,6 +9,7 @@ class DrawImageEvent : public Event, Cancellable {
 private:
     TexturePtr *texturePtr;
     Vec2<float> imagePos;
+    Vec2<float> imageDimension;
 public:
     [[nodiscard]] Vec2<float> getImagePos() const {
         return imagePos;
@@ -22,7 +23,11 @@ public:
         return this->texturePtr->GetFilePath();
     }
 
-    explicit DrawImageEvent(TexturePtr *texturePtr, Vec2<float> imagePos)
-            : texturePtr(texturePtr), imagePos(imagePos) {
+    [[nodiscard]] Vec2<float> getImageDimension() const {
+        return imageDimension;
+    }
+
+    explicit DrawImageEvent(TexturePtr *texturePtr, Vec2<float> imagePos, Vec2<float> imageDimension)
+            : texturePtr(texturePtr), imagePos(imagePos), imageDimension(imageDimension) {
     }
 };

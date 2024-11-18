@@ -21,4 +21,5 @@ namespace SDK {
     extern std::string getServerIP();
 
     extern std::shared_ptr<Packet> createPacket(int id);
+    extern bool isHovered(Vec4<float> box, Vec2<float> mouse);
 }

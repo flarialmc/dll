@@ -4,6 +4,7 @@
 #include "../../../../SDK/Client/Render/MinecraftUIRenderContext.hpp"
 #include "../../../../SDK/Client/Render/ScreenView/ScreenView.hpp"
 #include "../../../../SDK/Client/Render/BaseActorRenderContext.hpp"
+#include "../../../../SDK/Client/Render/NineSliceData.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "../Hook.hpp"
 #include "../../../../SDK/Client/Render/ItemRenderer.hpp"
@@ -32,7 +33,6 @@ private:
 
 
 	static void drawImageDetour(
-		SetUpAndRenderHook* instance, // Pass an instance of the class
 		MinecraftUIRenderContext* _this,
 		TexturePtr* texturePtr,
 		Vec2<float>& imagePos,
@@ -41,7 +41,7 @@ private:
 		Vec2<float>& uvSize
 	)
 	{
-        auto event = nes::make_holder<DrawImageEvent>(texturePtr, imagePos);
+        auto event = nes::make_holder<DrawImageEvent>(texturePtr, imagePos, imageDimension);
         eventMgr.trigger(event);
         auto newPos = event->getImagePos();
 		
@@ -65,7 +65,7 @@ private:
 		bool unk
 	)
 	{
-        auto event = nes::make_holder<DrawImageEvent>(texturePtr, imagePos);
+        auto event = nes::make_holder<DrawImageEvent>(texturePtr, imagePos, imageDimension);
         eventMgr.trigger(event);
         auto newPos = event->getImagePos();
 
@@ -85,13 +85,18 @@ private:
 	static void drawNineSliceDetour(
 		MinecraftUIRenderContext* _this, 
 		TexturePtr* texturePtr, 
-		void* nineSliceInfo
+		NinesliceInfo* nineSliceInfo
 	) 
 	{
-		auto event = nes::make_holder<DrawNineSliceEvent>(texturePtr, nineSliceInfo);
+		float* x = reinterpret_cast<float*>((__int64)nineSliceInfo);
+		float* y = reinterpret_cast<float*>((__int64)nineSliceInfo + 0x4);
+		float* z = reinterpret_cast<float*>((__int64)nineSliceInfo + 0x60); // funny cuh offset
+		float* w = reinterpret_cast<float*>((__int64)nineSliceInfo + 0x64);
+		Vec4<float> position(*x, *y, *z, *w);
+		auto event = nes::make_holder<DrawNineSliceEvent>(texturePtr, position);
 		eventMgr.trigger(event);
 
-		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, void*>(oDrawNineSlice, _this, texturePtr, nineSliceInfo);
+		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, NinesliceInfo*>(oDrawNineSlice, _this, texturePtr, nineSliceInfo);
 	}
 
 
