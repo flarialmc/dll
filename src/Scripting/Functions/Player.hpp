@@ -9,12 +9,40 @@
 
 
 namespace player {
-    int lua_getPlayerName(lua_State* L) {
+    int lua_getPlayerX(lua_State* L) {
         if (SDK::clientInstance != nullptr){
             return 0;
         }
-        lua_pushstring(L, SDK::clientInstance->getLocalPlayer()->getPlayerName().c_str());
+        lua_pushnumber(L, SDK::clientInstance->getLocalPlayer()->getPosition()->x);
         
+        return 1;
+    }
+
+    int lua_getPlayerY(lua_State* L) {
+        if (SDK::clientInstance != nullptr){
+            return 0;
+        }
+        lua_pushnumber(L, SDK::clientInstance->getLocalPlayer()->getPosition()->y);
+        
+        return 1;
+    }
+
+    int lua_getPlayerZ(lua_State* L) {
+        if (SDK::clientInstance != nullptr){
+            return 0;
+        }
+        lua_pushnumber(L, SDK::clientInstance->getLocalPlayer()->getPosition()->z);
+        
+        return 1;
+    }
+
+
+    int lua_getPlayerName(lua_State* L) {
+        if (SDK::clientInstance != nullptr) {
+            return 0;
+        }
+        lua_pushstring(L, SDK::clientInstance->getLocalPlayer()->getPlayerName().c_str());
+
         return 1;
     }
     
@@ -24,6 +52,15 @@ namespace player {
 
         lua_pushcfunction(L, lua_getPlayerName);
         lua_setfield(L, -2, "getPlayerName");
+
+        lua_pushcfunction(L, lua_getPlayerX);
+        lua_setfield(L, -2, "getX");
+
+        lua_pushcfunction(L, lua_getPlayerY);
+        lua_setfield(L, -2, "getY");
+
+        lua_pushcfunction(L, lua_getPlayerZ);
+        lua_setfield(L, -2, "getZ");
 
         lua_setglobal(L, "Player");
 
