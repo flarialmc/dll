@@ -54,6 +54,18 @@ namespace LuaSettings {
     }
 
 
+    int lua_Render_AddTextBox(lua_State *L) {
+        std::string name = luaL_checkstring(L, 1);
+        std::string guiName = luaL_checkstring(L, 2);
+        std::string guiDescription = luaL_checkstring(L, 3);
+        Module* script = Scripting::getModuleByState(L);
+
+        script->addTextBox(guiName, guiDescription, script->settings.getSettingByName<std::string>(name)->value);
+
+        return 0;
+    }
+
+
 
     void registerSetting(lua_State *L) {
         lua_newtable(L);
@@ -62,6 +74,9 @@ namespace LuaSettings {
 
         lua_pushcfunction(L, lua_GetSetting);
         lua_setfield(L, -2, "GetSetting");
+
+        lua_pushcfunction(L, lua_Render_AddTextBox);
+        lua_setfield(L, -2, "AddTextBox");
 
 
         lua_setglobal(L, "Settings");
