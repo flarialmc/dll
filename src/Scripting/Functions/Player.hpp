@@ -13,13 +13,20 @@ namespace player {
         if (SDK::clientInstance != nullptr){
             return 0;
         }
-        lua_pushstring(SDK::clientInstance->getLocalPlayer()->getPlayerName());
+        lua_pushstring(L, SDK::clientInstance->getLocalPlayer()->getPlayerName().c_str());
         
         return 1;
     }
     
     
     void registerPlayer(lua_State *L) {
-        lua_register(L, "getRoamingPath", lua_getPlayerName);
+        lua_newtable(L);
+
+        lua_pushcfunction(L, lua_getPlayerName);
+        lua_setfield(L, -2, "getPlayerName");
+
+        lua_setglobal(L, "Player");
+
+
     }
 }

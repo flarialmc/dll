@@ -22,20 +22,16 @@ namespace General {
     }
     int lua_keyCodeAsString(lua_State* L){
         int keycode = luaL_checknumber(L,1);
-        bool caps = luaL_toboolean(L,2);
-        bool keybind = luaL_toboolean(L,3);
-        std::string key = Utils::getKeyAsString(keycode,caps,keybind.c_str());
+        bool caps = lua_toboolean(L,2);
+        bool keybind = lua_toboolean(L,3);
+        std::string key = Utils::getKeyAsString(keycode, caps, keybind);
         lua_pushstring(L,key.c_str());
-        return 0;
+        return 1;
     }
 
     void registerGeneral(lua_State* L){
         lua_register(L, "Notify", lua_Notify);
         lua_register(L, "getRoamingPath", lua_getRoamingPath);
-        
-        
-        lua_newtable(L);
         lua_register(L,"keyCodeAsString", lua_keyCodeAsString);
-        lua_setfield(L, -2, "keyCodeAsString");
     }
 }

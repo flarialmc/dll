@@ -45,7 +45,7 @@ void registerFunctions(lua_State* L){
     GUI::registerGUI(L);
     LuaConstraints::registerConstraints(L);
     LuaSettings::registerSetting(L);
-    player::registerPlayer(*L);
+    player::registerPlayer(L);
 }
 
 void load(std::string name, std::string description, std::string mainclass) {
