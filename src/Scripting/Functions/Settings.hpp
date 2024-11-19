@@ -65,6 +65,17 @@ namespace LuaSettings {
         return 0;
     }
 
+    int lua_Render_AddToggle(lua_State *L) {
+        std::string name = luaL_checkstring(L, 1);
+        std::string guiName = luaL_checkstring(L, 2);
+        std::string guiDescription = luaL_checkstring(L, 3);
+        Module* script = Scripting::getModuleByState(L);
+
+        script->addToggle(guiName, guiDescription, script->settings.getSettingByName<bool>(name)->value);
+
+        return 0;
+    }
+
 
 
     void registerSetting(lua_State *L) {
@@ -77,6 +88,9 @@ namespace LuaSettings {
 
         lua_pushcfunction(L, lua_Render_AddTextBox);
         lua_setfield(L, -2, "AddTextBox");
+
+        lua_pushcfunction(L, lua_Render_AddToggle);
+        lua_setfield(L, -2, "AddToggle");
 
 
         lua_setglobal(L, "Settings");
