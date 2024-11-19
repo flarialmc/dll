@@ -4,12 +4,13 @@
 #include "Scripting.hpp"
 #include "../Config/json/json.hpp"
 #include "../Client/Module/Manager.hpp"
+#include "Functions/Player.hpp"
 #include "ScriptModuleBase.hpp"
 #include "Functions/GUI.hpp"
 #include "Functions/General.hpp"
 #include "Functions/Constraints.hpp"
 #include "Functions/Settings.hpp"
-
+#include "Functions/Player.hpp"
 
 int lua_register_event_handler(lua_State* L) {
     const char* eventName = luaL_checkstring(L, 1);
@@ -44,6 +45,7 @@ void registerFunctions(lua_State* L){
     GUI::registerGUI(L);
     LuaConstraints::registerConstraints(L);
     LuaSettings::registerSetting(L);
+    player::registerPlayer(*L);
 }
 
 void load(std::string name, std::string description, std::string mainclass) {
