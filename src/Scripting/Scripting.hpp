@@ -7,6 +7,7 @@
 namespace Scripting {
     inline bool instalized = false;
     inline std::vector<std::pair<lua_State*, Module*>> luaScriptModules;
+    inline std::vector<std::pair<lua_State*, int>> luaScriptSDKLevel;
     inline Module* getModuleByState(lua_State* L) {
         for (const auto& pair : Scripting::luaScriptModules) {
             if (pair.first == L) {
@@ -15,6 +16,14 @@ namespace Scripting {
         }
         return nullptr;
     }
+
+
+    inline bool canUseLvl2(){
+        std::string ip = SDK::getServerIP();
+        if(ip == "world" || ip == "none") return true;
+        return false;
+    }
+
     void loadModules();
     void executeFunction(lua_State* L, std::string functionName, bool shitInLogsIfFunctionIsNotFound);
 
