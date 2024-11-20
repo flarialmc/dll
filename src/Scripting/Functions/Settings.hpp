@@ -76,6 +76,28 @@ namespace LuaSettings {
         return 0;
     }
 
+    int lua_Render_AddHeader(lua_State *L) {
+        std::string name = luaL_checkstring(L, 1);
+        Module* script = Scripting::getModuleByState(L);
+
+        script->addHeader(name);
+
+        return 0;
+    }
+
+    int lua_Render_AddSlider(lua_State *L) {
+        std::string name = luaL_checkstring(L, 1);
+        std::string guiName = luaL_checkstring(L, 2);
+        std::string guiDescription = luaL_checkstring(L, 3);
+        float min = luaL_checknumber(L, 4);
+        float max = luaL_checknumber(L, 5);
+        Module* script = Scripting::getModuleByState(L);
+
+        script->addSlider(guiName, guiDescription, script->settings.getSettingByName<float>(name)->value, max, min);
+
+        return 0;
+    }
+
 
 
     void registerSetting(lua_State *L) {
@@ -91,6 +113,12 @@ namespace LuaSettings {
 
         lua_pushcfunction(L, lua_Render_AddToggle);
         lua_setfield(L, -2, "AddToggle");
+
+        lua_pushcfunction(L, lua_Render_AddHeader);
+        lua_setfield(L, -2, "AddHeader");
+
+        lua_pushcfunction(L, lua_Render_AddSlider);
+        lua_setfield(L, -2, "AddSlider");
 
 
         lua_setglobal(L, "Settings");
