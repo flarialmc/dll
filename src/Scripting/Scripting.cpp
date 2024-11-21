@@ -61,11 +61,13 @@ void load(std::string name, std::string description, std::string mainclass) {
     registerFunctions(L);
 
     const std::string path = mainclass;
+    Scripting::scriptsAmount++;
 
     if (luaL_dofile(L, path.c_str()) != LUA_OK) {
         std::string err = std::string("Error loading script: ") + lua_tostring(L, -1);
         Logger::error(err);
         lua_close(L);
+        Scripting::scriptsAmountWithErrors++;
         return;
     }
 
@@ -73,6 +75,7 @@ void load(std::string name, std::string description, std::string mainclass) {
     auto mod = ModuleManager::getModule(name).get();
     Scripting::luaScriptModules.emplace_back(L, mod);
     mod->defaultConfig();
+    Scripting::scriptsAmountWithoutErrors++;
 }
 
 void Scripting::loadModules() {
@@ -93,4 +96,6 @@ void Scripting::loadModules() {
             FlarialGUI::Notify("could not find main.json");
         }
     }
+
+    Logger::custom(fg(fmt::color::aqua), "Scripting", "Found {} scripts! Loded {} scripts without errors. Found errors in {} scripts.", Scripting::scriptsAmount, Scripting::scriptsAmountWithoutErrors, Scripting::scriptsAmountWithErrors);
 }
