@@ -99,7 +99,7 @@ public:
             return 0u;
         }
 
-        const auto result = hat::find_pattern(parsed.value());
+        const auto result = hat::find_pattern(parsed.value(), ".text");
 
         if (!result.has_result()) {
             Logger::debug("[ Runtime Scanner ] Failed to find signature: " + std::string(signature));

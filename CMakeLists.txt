@@ -116,7 +116,7 @@ FetchContent_Declare(
 FetchContent_Declare(
         libhat
         GIT_REPOSITORY  https://github.com/BasedInc/libhat.git
-        GIT_TAG         9ef05d6961ce37a4c801f11159de895aa21878a9
+        GIT_TAG         d6297514b05fd238f5b46d003325f108c22741e3
 )
 set(ENTT_BUILD_TESTING OFF)  # Disable building tests
 FetchContent_MakeAvailable(libhat entt nes)

@@ -3,7 +3,7 @@
 #include "../../../../SDK/Client/Actor/Components/ActorOwnerComponent.hpp"
 
 void HitboxListener::onSetupAndRender(SetupAndRenderEvent &event) {
-    //if(WinrtUtils::checkAboveOrEqual(21,40)) return HitboxListener::fillDataToRender();
+    if(WinrtUtils::checkAboveOrEqual(21,40)) return HitboxListener::fillDataToRender();
     std::lock_guard<std::mutex> guard(renderMtx);
     aabbsToRender.clear();
     if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
@@ -88,8 +88,6 @@ void HitboxListener::fillDataToRender() {
 
     auto view = ctx.enttRegistry.view<RenderPositionComponent, AABBShapeComponent, ActorOwnerComponent>();
     for (auto entity : view) {
-        if(!ctx.hasComponent<RenderPositionComponent>(entity)) continue;
-        if(!ctx.hasComponent<AABBShapeComponent>(entity)) continue;
         auto [renderPos, aabb, owner] = view.operator[](entity);
         if(!owner.actor->isValid()) return;
         if (owner.actor != player /*&& ent->isPlayer() && ent->hasCategory(ActorCategory::Player)*/) {

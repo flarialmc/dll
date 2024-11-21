@@ -2,7 +2,7 @@
 
 #include "../EntityContext.hpp"
 
-class ActorOwnerComponent : IEntityComponent {
+class ActorOwnerComponent : public IEntityComponent {
 public:
     class Actor* actor;
 };
