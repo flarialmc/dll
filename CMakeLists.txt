@@ -58,7 +58,7 @@ if(MSVC)
     add_compile_options($<$<CONFIG:Release>:/Ob2>)
 
 #    add_compile_options("$<$<CONFIG:RELEASE>:/Zi>")
-#    add_link_options("$<$<CONFIG:RELEASE>:/DEBUG>") # Enable debug symbols in release for edge cases.
+    add_link_options("$<$<CONFIG:RELEASE>:/DEBUG>") # Enable debug symbols in release for edge cases.
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 endif()
 
@@ -126,7 +126,7 @@ FetchContent_Declare(
 FetchContent_Declare(
         libhat
         GIT_REPOSITORY  https://github.com/BasedInc/libhat.git
-        GIT_TAG         b7ceb3b2f4e6090f3a5e07c27685ce9f5d3d3f60
+        GIT_TAG         d6297514b05fd238f5b46d003325f108c22741e3
 )
 
 FetchContent_Declare(
