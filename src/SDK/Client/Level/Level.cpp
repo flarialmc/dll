@@ -14,7 +14,7 @@ std::vector<Actor *> Level::getRuntimeActorList() {
 
         auto view = ctx.enttRegistry.view<ActorOwnerComponent>();
         for (auto entity : view) {
-            auto [owner] = view.operator[](entity);
+            auto [owner] = view[entity];
             actors.push_back(owner.actor);
         }
 
