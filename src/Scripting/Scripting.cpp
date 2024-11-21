@@ -11,9 +11,10 @@
 #include "Functions/Constraints.hpp"
 #include "Functions/Settings.hpp"
 #include "Functions/Player.hpp"
+#include "EventManager/ScriptEvents.hpp"
 
 int lua_register_event_handler(lua_State* L) {
-    const char* eventName = luaL_checkstring(L, 1);
+    const int eventName = luaL_checkinteger(L, 1);
 
     if (!lua_isfunction(L, 2)) {
         lua_pushstring(L, "Expected function as second argument");
@@ -46,7 +47,12 @@ void registerFunctions(lua_State* L){
     LuaConstraints::registerConstraints(L);
     LuaSettings::registerSetting(L);
     player::registerPlayer(L);
+    ScriptEvents::pushEventTypesToLua(L);
 }
+
+
+
+
 
 void load(std::string name, std::string description, std::string mainclass) {
     lua_State* L = luaL_newstate();

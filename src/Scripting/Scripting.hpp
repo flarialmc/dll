@@ -7,7 +7,7 @@
 namespace Scripting {
     inline bool instalized = false;
     inline std::vector<std::pair<lua_State*, Module*>> luaScriptModules;
-    inline std::vector<std::pair<lua_State*, int>> luaScriptSDKLevel;
+
     inline Module* getModuleByState(lua_State* L) {
         for (const auto& pair : Scripting::luaScriptModules) {
             if (pair.first == L) {

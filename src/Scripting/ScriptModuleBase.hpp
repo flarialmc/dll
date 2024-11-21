@@ -6,6 +6,7 @@
 #include "Scripting.hpp"
 #include "../Client/Events/EventManager.hpp"
 #include "EventManager/ScriptingEventManager.hpp"
+#include "EventManager/ScriptEvents.hpp"
 
 class ScriptModuleBase : public Module {
 
@@ -70,7 +71,7 @@ public:
                 event.getAction()
         };
 
-        ScriptingEventManager::triggerEvent(module_lua_state, "onKeyEvent", args);
+        ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onKeyEvent, args);
     };
     void onMouse(MouseEvent &event) {
         if(!Scripting::instalized) return;
@@ -84,7 +85,7 @@ public:
 
         };
 
-        ScriptingEventManager::triggerEvent(module_lua_state, "onMouseEvent", args);
+        ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onMouseEvent, args);
     };
 
     void onPacketReceive(PacketEvent &event) {
@@ -94,7 +95,7 @@ public:
                 (int)event.getPacket()->getId()
         };
 
-        ScriptingEventManager::triggerEvent(module_lua_state, "onPacketReceiveEvent", args);
+        ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onPacketReceiveEvent, args);
     };
 
     void onTickEvent(TickEvent &event) {
@@ -104,7 +105,7 @@ public:
 
         };
 
-        ScriptingEventManager::triggerEvent(module_lua_state, "onTickEvent", args);
+        ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onTickEvent, args);
     };
 
     void onRenderEvent(RenderEvent &event) {
@@ -114,7 +115,7 @@ public:
 
         };
 
-        ScriptingEventManager::triggerEvent(module_lua_state, "onRenderEvent", args);
+        ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onRenderEvent, args);
     };
 
 

@@ -2,9 +2,9 @@
 #include <type_traits>
 
 
-std::unordered_map<std::string, std::vector<ScriptingEventManager::EventEntry>> ScriptingEventManager::eventHandlers;
+std::unordered_map<int, std::vector<ScriptingEventManager::EventEntry>> ScriptingEventManager::eventHandlers;
 
-void ScriptingEventManager::registerHandler(lua_State* L, const std::string& eventName) {
+void ScriptingEventManager::registerHandler(lua_State* L, const int& eventName) {
     if (!lua_isfunction(L, -1)) {
         lua_pop(L, 1);
         return;
@@ -30,7 +30,7 @@ void pushAny(lua_State* L, const std::any& arg) {
     }
 }
 
-void ScriptingEventManager::triggerEvent(lua_State* L, const std::string& eventName, const std::vector<std::any>& args) {
+void ScriptingEventManager::triggerEvent(lua_State* L, int eventName, const std::vector<std::any>& args) {
     auto it = eventHandlers.find(eventName);
     if (it == eventHandlers.end()) return;
 
