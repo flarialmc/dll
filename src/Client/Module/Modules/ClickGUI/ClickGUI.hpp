@@ -79,6 +79,8 @@ public:
         Module::onEnable();
     }
 
+    void onEnable() override {}
+
     void onDisable() override {}
 
     void terminate() override {
@@ -769,7 +771,7 @@ public:
 
         if (SwapchainHook::init && baseHeightActual > 0.1f) {
 
-            this->settings.getSettingByName<bool>("enabled")->value = true;
+            setEnabled(true);
 
             /* Base Rectangle Start */
 
@@ -1337,7 +1339,7 @@ public:
             FlarialGUI::PopSize(); // Pops base rect
         }
 
-        if(realBlurAmount < 0.5f)  this->settings.getSettingByName<bool>("enabled")->value = false;
+        if(realBlurAmount < 0.5f) setEnabled(false);
 
         FlarialGUI::displayToolTips();
         FlarialGUI::NotifyHeartbeat();

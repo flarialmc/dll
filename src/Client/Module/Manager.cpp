@@ -238,6 +238,7 @@ void restart(){
 
 
 void ModuleManager::syncState() {
+    if(!ModuleManager::initialized) return;
     for (const auto& [key, module] : moduleMap) {
         if (!module || module->enabledState == module->isEnabled() || module->delayDisable) {
             continue;
