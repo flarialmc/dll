@@ -4,16 +4,17 @@
 
 std::vector<Actor *> Level::getRuntimeActorList() {
     // TODO prevent crashing !!!
-    bool sosUseTempSolution = false; // in case Level::getRuntimeActorList gets nuked :c
+    bool sosUseTempSolution = true; // in case Level::getRuntimeActorList gets nuked :c
     if (WinrtUtils::checkAboveOrEqual(21, 40) && sosUseTempSolution) {
         std::vector<Actor *> actors;
         auto player = SDK::clientInstance->getLocalPlayer();
         if(!player) return actors;
         auto& ctx = player->GetEntityContextV1_20_50();
+        if(!ctx.isValid()) return actors;
 
-        for (auto&& [id, owner ] : ctx.enttRegistry.view<ActorOwnerComponent>().each()) {
-            if(!ctx.registry.ownedRegistry.valid(id)) continue;
-            if(!ctx.hasComponent<RuntimeIDComponent>(id)) continue;
+        auto view = ctx.enttRegistry.view<ActorOwnerComponent>();
+        for (auto entity : view) {
+            auto [owner] = view[entity];
             actors.push_back(owner.actor);
         }
         return actors;
