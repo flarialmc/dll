@@ -29,9 +29,17 @@ namespace General {
         return 1;
     }
 
+    int lua_sendClientMessage(lua_State* L) {
+        if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->getLocalPlayer()->getLevel()) return 0;
+
+        SDK::clientInstance->getGuiData()->displayClientMessage(luaL_checkstring(L, 1));
+        return 0;
+    }
+
     void registerGeneral(lua_State* L){
         lua_register(L, "Notify", lua_Notify);
         lua_register(L, "getRoamingPath", lua_getRoamingPath);
-        lua_register(L,"keyCodeAsString", lua_keyCodeAsString);
+        lua_register(L, "keyCodeAsString", lua_keyCodeAsString);
+        lua_register(L, "sendClientMessage", lua_sendClientMessage);
     }
 }
