@@ -1,27 +1,21 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "HurtColorListener.hpp"
-
 
 class HurtColor : public Module {
 
 public:
-
     HurtColor() : Module("Hurt Color", "Change the color when you hit entities.", IDR_HURT_PNG, "") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new HurtColorListener("HurtColor", this));
+        Listen(this, HurtColorEvent, &HurtColor::onGetHurtColor)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("HurtColor");
+        Deafen(this, HurtColorEvent, &HurtColor::onGetHurtColor)
         Module::onDisable();
     }
 
@@ -32,7 +26,7 @@ public:
         if (settings.getSettingByName<float>("colorOpacity") == nullptr) settings.addSetting("colorOpacity", 0.65);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
         float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
@@ -52,5 +46,15 @@ public:
                                       settings.getSettingByName<float>("colorOpacity")->value,
                                       settings.getSettingByName<bool>("color_rgb")->value);
 
+    }
+
+    void onGetHurtColor(HurtColorEvent &event) {
+        D2D1_COLOR_F color;
+        if (this->settings.getSettingByName<bool>("color_rgb")->value)
+            color = FlarialGUI::rgbColor;
+        else
+            color = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color")->value);
+
+        event.setHurtColorFromD2DColor(color, this->settings.getSettingByName<float>("colorOpacity")->value);
     }
 };

@@ -8,7 +8,6 @@
 #include <wingdi.h>
 #include <wininet.h>
 
-
 //winrt stuff
 #include "winrt/windows.applicationmodel.core.h"
 #include "winrt/Windows.UI.ViewManagement.h"
@@ -19,57 +18,59 @@ using namespace winrt::Windows::UI::ViewManagement;
 using namespace winrt::Windows::ApplicationModel::Core;
 using namespace winrt::Windows::UI::Core;
 
-
-std::string Client::settingspath = Utils::getRoamingPath() + R"(\Flarial\Config\main.flarial)";
+std::string Client::settingspath = Utils::getConfigsPath() + "\\main.flarial";
 Settings Client::settings = Settings();
+std::vector<std::string> Client::onlinePlayers;
+
 bool notifiedOfConnectionIssue = false;
 
-std::string current_commit = COMMIT_HASH;
+std::string Client::current_commit = COMMIT_HASH;
 
-void DownloadAndSave(const std::string& url, const std::string& path) {
+std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
+    std::vector<std::string> allPlayers;
 
-    if (Client::settings.getSettingByName<bool>("dlassets")->value || !std::filesystem::exists(path)) {
-        char test[256];
-        strcpy_s(test, "https://flarialbackup.ashank.tech/");
-        if (InternetCheckConnectionA(test, FLAG_ICC_FORCE_CONNECTION, 0))
-            URLDownloadToFileW(nullptr, FlarialGUI::to_wide(url).c_str(), FlarialGUI::to_wide(path).c_str(), 0, nullptr);
-        else {
-            if(notifiedOfConnectionIssue) return;
-            notifiedOfConnectionIssue = true;
-            MessageBox(nullptr, "Flarial: Failed to download assets! Try using vpn.", "", MB_OK);
-            ModuleManager::terminate();
-            Client::disable = true;
+    for (const auto& it : data) {
+        if (it.contains("players")) {
+            for (const auto& player : it.at("players")) {
+                allPlayers.push_back(player);
+            }
         }
-
     }
 
+    if (SDK::clientInstance && SDK::clientInstance->getLocalPlayer()) {
+        std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
+        std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
+
+        if (clearedName.empty()) clearedName = String::removeColorCodes(name);
+        allPlayers.push_back(clearedName);
+    }
+
+    return allPlayers;
 }
 
 bool Client::disable = false;
 
-void setWindowTitle(std::wstring title) {
-    using namespace winrt::Windows::UI::ViewManagement;
-    using namespace winrt::Windows::ApplicationModel::Core;
-
+void Client::setWindowTitle(std::wstring title) {
     CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([title = std::move(title)]() {
         ApplicationView::GetForCurrentView().Title(title);
     });
 }
 
+void Client::changeCursor(CoreCursorType cur) {
+    CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([cur]() {
+        auto window = CoreApplication::MainView().CoreWindow();
+        window.PointerCursor(CoreCursor(cur, 0)); // Set the cursor
+    });
+}
 void Client::initialize() {
-
-    std::string title = WinrtUtils::getFormattedVersion() + " " + current_commit;
-    setWindowTitle(L"Flarial " + FlarialGUI::to_wide(title));
-    Logger::debug("[INIT] Initializing Flarial...");
+    setWindowTitle(L"Flarial " + String::StrToWStr(WinrtUtils::getFormattedVersion() + " " + current_commit));
 
     VersionUtils::init();
     Client::version = WinrtUtils::getFormattedVersion();
-    Logger::debug("[INIT] Version: " + WinrtUtils::getVersion());
-    Logger::debug("[INIT] Formatted: " + Client::version);
 
     if (!VersionUtils::isSupported(Client::version)) {
-        Logger::debug("[INFO] Version not supported!");
-        MessageBox(NULL, "Flarial: this version is not supported!", "", MB_OK);
+        Logger::fatal("Minecraft version is not supported!");
+        MessageBox(nullptr, "Flarial: this version is not supported!", "", MB_OK);
         ModuleManager::terminate();
         Client::disable = true;
         return;
@@ -77,24 +78,17 @@ void Client::initialize() {
 
     VersionUtils::addData();
 
-    std::filesystem::path folder_path(Utils::getRoamingPath() + "\\Flarial");
-    if (!exists(folder_path)) {
-        create_directory(folder_path);
-    }
+    std::vector<std::filesystem::path> directories = {
+        Utils::getRoamingPath() + "\\Flarial",
+        Utils::getRoamingPath() + "\\Flarial\\assets",
+        Utils::getRoamingPath() + "\\Flarial\\logs",
+        Utils::getRoamingPath() + "\\Flarial\\Config"
+    };
 
-    std::filesystem::path folder_path2(Utils::getRoamingPath() + "\\Flarial\\assets");
-    if (!exists(folder_path2)) {
-        create_directory(folder_path2);
-    }
-
-    std::filesystem::path folder_path3(Utils::getRoamingPath() + "\\Flarial\\logs");
-    if (!exists(folder_path3)) {
-        create_directory(folder_path3);
-    }
-
-    std::filesystem::path folder_path4(Utils::getRoamingPath() + "\\Flarial\\Config");
-    if (!exists(folder_path4)) {
-        create_directory(folder_path4);
+    for (const auto& path : directories) {
+        if (!std::filesystem::exists(path)) {
+            std::filesystem::create_directory(path);
+        }
     }
 
     Client::CheckSettingsFile();
@@ -107,16 +101,7 @@ void Client::initialize() {
         Client::settings.addSetting("mod_fontname", (std::string) "Space Grotesk");
 
     if (Client::settings.getSettingByName<float>("blurintensity") == nullptr)
-        Client::settings.addSetting("blurintensity", 18.0f);
-
-    if (Client::settings.getSettingByName<bool>("limitblurfps") == nullptr)
-        Client::settings.addSetting("limitblurfps", true);
-
-    if (Client::settings.getSettingByName<bool>("dynamicblurrquality") == nullptr)
-        Client::settings.addSetting("dynamicblurrquality", true);
-
-    if (Client::settings.getSettingByName<bool>("highqualityblur") == nullptr)
-        Client::settings.addSetting("highqualityblur", false);
+        Client::settings.addSetting("blurintensity", 2.0f);
 
     if (Client::settings.getSettingByName<bool>("killdx") == nullptr)
         Client::settings.addSetting("killdx", false);
@@ -126,6 +111,19 @@ void Client::initialize() {
 
     if (Client::settings.getSettingByName<bool>("vsync") == nullptr)
         Client::settings.addSetting("vsync", false);
+
+    if (Client::settings.getSettingByName<bool>("promotions") == nullptr)
+        Client::settings.addSetting("promotions", true);
+
+    if (Client::settings.getSettingByName<bool>("donotwait") == nullptr)
+        Client::settings.addSetting("donotwait", true);
+
+    if (Client::settings.getSettingByName<std::string>("bufferingmode") == nullptr)
+        Client::settings.addSetting("bufferingmode", (std::string) "Double Buffering");
+
+    if (Client::settings.getSettingByName<std::string>("swapeffect") == nullptr)
+        Client::settings.addSetting("swapeffect", (std::string) "FLIP_SEQUENTIAL");
+
 
     if (Client::settings.getSettingByName<bool>("disableanims") == nullptr)
         Client::settings.addSetting("disableanims", false);
@@ -166,29 +164,28 @@ void Client::initialize() {
     if (Client::settings.getSettingByName<float>("rgb_value") == nullptr)
         Client::settings.addSetting("rgb_value", 1.0f);
 
+    if (Client::settings.getSettingByName<float>("modules_font_scale") == nullptr)
+        Client::settings.addSetting("modules_font_scale", 1.0f);
+
+    if (Client::settings.getSettingByName<float>("gui_font_scale") == nullptr)
+        Client::settings.addSetting("gui_font_scale", 1.0f);
+
+    if (Client::settings.getSettingByName<bool>("overrideFontWeight") == nullptr)
+        Client::settings.addSetting("overrideFontWeight", (bool)false);
+
+    if (Client::settings.getSettingByName<std::string>("fontWeight") == nullptr)
+        Client::settings.addSetting("fontWeight", (std::string) "Normal");
+
+    FlarialGUI::ExtractImageResource(IDR_RED_LOGO_PNG, "red-logo.png","PNG");
+
     FlarialGUI::LoadFont(IDR_FONT_TTF);
 
     FlarialGUI::LoadFont(IDR_FONT_BOLD_TTF);
 
     FlarialGUI::LoadFont(IDR_MINECRAFTIA_TTF);
 
-    Logger::initialize();
-
     HookManager::initialize();
     ModuleManager::initialize();
-    Logger::debug("[Client] Ready.");
-
-    if (!Client::disable) {
-        FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                "keybind")->value + " to open the menu in-game.");
-    }
-}
-
-void Client::changeCursor(CoreCursorType cur) {
-    CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([cur]() {
-        auto window = CoreApplication::MainView().CoreWindow();
-        window.PointerCursor(CoreCursor(cur, 0)); // Set the cursor
-    });
 }
 
 std::string window = "Minecraft";
@@ -202,6 +199,7 @@ bool InHudScreen = false;
 bool toes = false;
 
 void Client::centerCursor() {
+    if(Client::disable) return;
     if (hWnd != nullptr && Client::settings.getSettingByName<bool>("centreCursor")->value) {
         if (!toes) {
             toes = true;

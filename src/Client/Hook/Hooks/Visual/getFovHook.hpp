@@ -6,8 +6,8 @@
 #include "../Game/RaknetTick.hpp"
 #include "../../../Client.hpp"
 #include "../../../Events/Game/FOVEvent.hpp"
-#include "../../../Events/EventHandler.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "../../../Events/EventManager.hpp"
 
 class getFovHook : public Hook {
 private:
@@ -16,10 +16,10 @@ private:
 
         float fov = funcOriginal(a1, f, a3, a4);
 
-        FOVEvent event(fov);
-        EventHandler::onGetFOV(event);
+        auto event = nes::make_holder<FOVEvent>(fov);
+        eventMgr.trigger(event);
 
-        return event.getFOV();
+        return event->getFOV();
     }
 
 public:
@@ -27,7 +27,7 @@ public:
 
     static inline getFovOriginal funcOriginal = nullptr;
 
-    getFovHook() : Hook("getFovHook", GET_SIG("LevelRendererPlayer::getFov")) {}
+    getFovHook() : Hook("getFovHook", GET_SIG_ADDRESS("LevelRendererPlayer::getFov")) {}
 
     void enableHook() override {
         this->autoHook((void *) getFovCallback, (void **) &funcOriginal);

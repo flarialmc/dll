@@ -1,14 +1,13 @@
 #include "RaknetTick.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "ActorBaseTick.hpp"
-#include "../../../Events/EventHandler.hpp"
 #include <filesystem>
 #include <fstream>
 
 std::string RaknetTickHook::towriteip = "";
 
 void RaknetTickHook::callback(RaknetConnector *raknet) {
-    if(getAveragePingOriginal == nullptr) {
+    if (getAveragePingOriginal == nullptr) {
         uintptr_t getAveragePingAddr = Memory::GetAddressByIndex(raknet->peer->vTable,
                                                                  GET_OFFSET("RakPeer::GetAveragePing"));
         Memory::hookFunc((void *) getAveragePingAddr, (void *) getAveragePingCallback,
@@ -31,12 +30,12 @@ void RaknetTickHook::callback(RaknetConnector *raknet) {
                 }
             }
 
-                towriteip = ip;
-            }
-
-            RaknetTickEvent event{};
-            EventHandler::onRaknetTick(event);
+            towriteip = ip;
         }
+
+        auto event = nes::make_holder<RaknetTickEvent>();
+        eventMgr.trigger(event);
+    }
 }
 
 __int64 RaknetTickHook::getAveragePingCallback(RakPeer *_this, void *guid) {

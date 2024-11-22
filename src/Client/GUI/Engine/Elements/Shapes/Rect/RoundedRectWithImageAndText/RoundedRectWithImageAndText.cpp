@@ -28,7 +28,7 @@ void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const 
     if (ImagesClass::eimages[imagePath] == nullptr) {
 
         std::string among = Utils::getRoamingPath() + "\\" + imagePath;
-        FlarialGUI::LoadImageFromFile(to_wide(among).c_str(), ImagesClass::eimages[imagePath].put());
+        FlarialGUI::LoadImageFromFile(to_wide(among).c_str(), &ImagesClass::eimages[imagePath]);
 
     } else if (ImagesClass::eimages[imagePath] != nullptr) {
 
@@ -54,7 +54,7 @@ void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const 
 
         imagerectf = D2D1::RectF(0, 0, imageWidth, imageHeight);
 
-        D2D::context->DrawBitmap(ImagesClass::eimages[imagePath].get(), imagerectf, 1.0, D2D1_INTERPOLATION_MODE_ANISOTROPIC);
+        D2D::context->DrawBitmap(ImagesClass::eimages[imagePath], imagerectf, 1.0, D2D1_INTERPOLATION_MODE_ANISOTROPIC);
 
         D2D::context->SetTransform(oldTransform);
     }
@@ -95,40 +95,5 @@ void FlarialGUI::RoundedRectWithImageAndText(int index, float x, float y, const 
 
     D2D::context->FillRoundedRectangle(roundedRect, brush);
 
-    x = x + (width - imageWidth) / 2.0f;
-    imageY = imageY + (height - imageHeight) / 2.0f;
 
-    D2D1_RECT_F imagerectf = D2D1::RectF(x, imageY, x + imageWidth, imageY + imageHeight);
-
-    if (ImagesClass::images[iconId] == nullptr) {
-        FlarialGUI::LoadImageFromResource(iconId, ImagesClass::images[iconId].put());
-
-    } else if (ImagesClass::images[iconId] != nullptr) {
-
-        D2D1_MATRIX_3X2_F oldTransform;
-        D2D::context->GetTransform(&oldTransform);
-
-        if (CursorInRect(x, y, width, height)) {
-
-            FlarialGUI::lerp(rotationAngles[index], rotationAngles[index] + 15, 0.5f * FlarialGUI::frameFactor);
-        }
-
-
-        float rotationAngle = rotationAngles[index];// Specify the rotation angle in degrees
-        D2D1_POINT_2F rotationCenter = D2D1::Point2F(imagerectf.left + imageWidth / 2.0f, imagerectf.top +
-                                                                                          imageHeight /
-                                                                                          2.0f);  // Specify the rotation center
-        D2D1_MATRIX_3X2_F rotationMatrix = D2D1::Matrix3x2F::Rotation(rotationAngle, rotationCenter);
-
-        D2D1_MATRIX_3X2_F translationMatrix = D2D1::Matrix3x2F::Translation(x, imageY);
-        D2D1_MATRIX_3X2_F combinedMatrix = translationMatrix * rotationMatrix;
-
-        D2D::context->SetTransform(combinedMatrix);
-
-        imagerectf = D2D1::RectF(0, 0, imageWidth, imageHeight);
-
-        D2D::context->DrawBitmap(ImagesClass::images[iconId].get(), imagerectf, 1.0, D2D1_INTERPOLATION_MODE_ANISOTROPIC);
-
-        D2D::context->SetTransform(oldTransform);
-    }
 }

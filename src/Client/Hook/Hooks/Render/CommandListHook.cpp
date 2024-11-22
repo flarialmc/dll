@@ -24,12 +24,14 @@ void CommandListHook::enableHook() {
 
 }
 
-CommandListHook::CommandListHook() : Hook("CommandListHook", "") {}
+CommandListHook::CommandListHook() : Hook("CommandListHook", 0) {}
 
 void CommandListHook::listCallback(ID3D12CommandQueue *queue, UINT numCommandLists,
                                    const ID3D12CommandList **ppCommandLists) {
 
     SwapchainHook::queue = queue;
+    SwapchainHook::DX12CommandLists = (ID3D12GraphicsCommandList*)*ppCommandLists;
+
 
     return funcOriginal(queue, numCommandLists, ppCommandLists);
 

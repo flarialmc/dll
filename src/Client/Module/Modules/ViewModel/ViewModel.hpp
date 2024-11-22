@@ -1,28 +1,22 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "ViewModelListener.hpp"
-#include "../../../Events/EventHandler.hpp"
 
 
 class ViewModel : public Module {
-
 public:
-
-    ViewModel() : Module("ViewModel", "Allows you to modify how item in hand looks.", IDR_MAGNIFY_PNG, "C") {
-
+    ViewModel() : Module("ViewModel", "Allows you to modify how item in hand looks.", IDR_EYE_PNG, "C") {
         Module::setup();
-
     };
 
     void onEnable() override {
-        EventHandler::registerOrderedPriorityListener(new ViewModelListener("ViewModel", this), 2);
+        Listen(this, FOVEvent, &ViewModel::onGetFOV)
         Module::onEnable();
 
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("ViewModel");
+        Deafen(this, FOVEvent, &ViewModel::onGetFOV)
         Module::onDisable();
     }
 
@@ -30,7 +24,7 @@ public:
         if (settings.getSettingByName<float>("itemfov") == nullptr) settings.addSetting("itemfov", 70.0f);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
         float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
@@ -50,5 +44,12 @@ public:
 
         this->settings.getSettingByName<float>("itemfov")->value = value;
 
+    }
+
+    void onGetFOV(FOVEvent &event) {
+        auto fov = event.getFOV();
+        if (fov != 70) return;
+
+        event.setFOV(this->settings.getSettingByName<float>("itemfov")->value);
     }
 };

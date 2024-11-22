@@ -26,3 +26,9 @@ cmake-build-visual-profile/
 clion/
 clion-ninja/
 *.zip
+localextras/
+_deps/
+*.pdb
+*.dll
+*.ilk
+Makefile

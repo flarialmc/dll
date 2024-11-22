@@ -1,21 +1,20 @@
 #include "UpdatePlayerHook.hpp"
-#include "../../../Events/EventHandler.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void UpdatePlayerHook::callback(void* a1, void* a2, void* a3) {
     //  Combo counter and reach counter logic will be done here in the next commit.
-    UpdatePlayerEvent event;
+    auto event = nes::make_holder<UpdatePlayerEvent>();
 
     if (SDK::clientInstance && SDK::clientInstance->getLocalPlayer() != nullptr) {
-        EventHandler::onUpdatePlayer(event);
+        eventMgr.trigger(event);
     }
 
-    if(!event.isCancelled())
+    if(!event->isCancelled())
         funcOriginal(a1, a2, a3);
 }
 
 
-UpdatePlayerHook::UpdatePlayerHook() : Hook("UpdatePlayerHook", GET_SIG("_updatePlayer")) {}
+UpdatePlayerHook::UpdatePlayerHook() : Hook("UpdatePlayerHook", GET_SIG_ADDRESS("_updatePlayer")) {}
 
 
 void UpdatePlayerHook::enableHook() {

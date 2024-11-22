@@ -1,8 +1,6 @@
 #pragma once
 
-#include "HueListener.hpp"
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
 
 
 class HueChanger : public Module {
@@ -11,19 +9,17 @@ public:
 
     HueChanger() : Module("Saturation", "A filter to saturate or\ndesaturate Minecraft.",
                           IDR_FULLBRIGHT_PNG, "") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-        EventHandler::registerPriorityListener(new HueListener("Hue", this));
+        Listen(this, RenderEvent, &HueChanger::onRender)
         Module::onEnable();
     }
 
 
     void onDisable() override {
-        EventHandler::unregisterListener("Hue");
+        Deafen(this, RenderEvent, &HueChanger::onRender)
         Module::onDisable();
     }
 
@@ -31,7 +27,7 @@ public:
         if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 0.5f);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
         const float textWidth = Constraints::RelativeConstraint(0.26, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
@@ -51,5 +47,11 @@ public:
         this->settings.getSettingByName<float>("intensity")->value = percent;
 
 
+    }
+
+    void onRender(RenderEvent &event) {
+        if (this->isEnabled()) {
+            FlarialGUI::ApplyHue(this->settings.getSettingByName<float>("intensity")->value);
+        }
     }
 };

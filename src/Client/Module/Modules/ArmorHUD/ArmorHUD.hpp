@@ -1,11 +1,17 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "ArmorHUDListener.hpp"
+#include "../../../../SDK/Client/Render/BaseActorRenderContext.hpp"
+#include "../../../../Utils/Render/PositionUtils.hpp"
 
 class ArmorHUD : public Module {
-
+private:
+    Vec2<float> currentPos;
+    bool enabled = false;
+    int durabilities[6][2] = {{0,0}};
+    // TODO: delete testing variables (or adjust and delete)
+    Vec2<float> testOffset = Vec2<float>{0,0};
+    float testSpacing = 15;
 public:
 
     ArmorHUD() : Module("ArmorHUD", "Displays the armor you're\ncurrently wearing.",
@@ -14,17 +20,19 @@ public:
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new ArmorHUDListener("ArmorHUD", this));
         if(FlarialGUI::inMenu){
-            FlarialGUI::Notify("To change the position of ArmorHUD, Please click " +
-                               ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                                       "editmenubind")->value + " in the settings tab.");
+            std::string s = "To change the position of ArmorHUD, Please click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("editmenubind")->value + " in the settings tab.";
+            std::cout << s << std::endl;
+            FlarialGUI::Notify(s);
         }
+        Listen(this, RenderEvent, &ArmorHUD::onRender)
+        Listen(this, SetupAndRenderEvent, &ArmorHUD::onSetupAndRender)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("ArmorHUD");
+        Deafen(this, RenderEvent, &ArmorHUD::onRender)
+        Deafen(this, SetupAndRenderEvent, &ArmorHUD::onSetupAndRender)
         Module::onDisable();
     }
 
@@ -61,158 +69,415 @@ public:
 
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
-        /* Border Start */
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"UI Scale", textWidth * 6.9f,
-                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(0.88f, "height"));
 
-        float percent = FlarialGUI::Slider(3, toggleX + FlarialGUI::SettingsTextWidth("UI Scale "),
-                                           toggleY,
-                                           this->settings.getSettingByName<float>("uiscale")->value, 3.0f);
 
-        this->settings.getSettingByName<float>("uiscale")->value = percent;
+        this->addHeader("Main");
 
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        L"Vertical", textWidth * 6.9f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        if (FlarialGUI::Toggle(2, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "vertical")->value))
-            this->settings.getSettingByName<bool>("vertical")->value = !this->settings.getSettingByName<bool>(
-                    "vertical")->value;
-
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        if(this->settings.getSettingByName<bool>("vertical")->value) {
-            FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                            L"Durability to the left", textWidth * 6.9f, textHeight,
-                                            DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
-                                            DWRITE_FONT_WEIGHT_NORMAL);
-
-            if (FlarialGUI::Toggle(6, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                    "durability_left")->value))
-                this->settings.getSettingByName<bool>("durability_left")->value = !this->settings.getSettingByName<bool>(
-                        "durability_left")->value;
-
-            toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        this->addSlider("Size", "", this->settings.getSettingByName<float>("uiscale")->value, 5.f, 0.f, true);
+        this->addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", this->settings.getSettingByName<bool>("vertical")->value);
+        if(this->settings.getSettingByName<bool>("vertical")->value){
+            this->addToggle("Durability to the left", "", this->settings.getSettingByName<bool>("durability_left")->value);
         }
 
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        L"Show offhand item", textWidth * 6.9f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
+        this->addToggle("Show offhand item", "", this->settings.getSettingByName<bool>("show_offhand")->value);
 
-        if (FlarialGUI::Toggle(7, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "show_offhand")->value))
-            this->settings.getSettingByName<bool>("show_offhand")->value = !this->settings.getSettingByName<bool>(
-                    "show_offhand")->value;
+        this->addToggle("Change Color", "", this->settings.getSettingByName<bool>("color")->value);
 
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        this->extraPadding();
+        this->addHeader("Text");
 
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        L"Show durability", textWidth * 6.9f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
+        this->addToggle("Show Durability", "", this->settings.getSettingByName<bool>("showdurability")->value);
+        this->addConditionalSlider(this->settings.getSettingByName<bool>("showdurability")->value, "Text Size", "Text size of Durability", this->settings.getSettingByName<float>("textSize")->value, 0.25f, 0.0f, true);
+        this->addToggle("Show Durability in %", "", this->settings.getSettingByName<bool>("percent")->value);
 
-        if (FlarialGUI::Toggle(3, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "showdurability")->value))
-            this->settings.getSettingByName<bool>("showdurability")->value = !this->settings.getSettingByName<bool>(
-                    "showdurability")->value;
+        this->extraPadding();
+        this->addHeader("Colors");
 
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        L"Use percent %", textWidth * 6.9f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        if (FlarialGUI::Toggle(4, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "percent")->value))
-            this->settings.getSettingByName<bool>("percent")->value = !this->settings.getSettingByName<bool>(
-                    "percent")->value;
-
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        L"Change color", textWidth * 6.9f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        if (FlarialGUI::Toggle(5, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "color")->value))
-            this->settings.getSettingByName<bool>("color")->value = !this->settings.getSettingByName<bool>(
-                    "color")->value;
-
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Text size ", textWidth * 3.0f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        float textSize = FlarialGUI::Slider(1, toggleX + FlarialGUI::SettingsTextWidth("Text size "),
-                                           toggleY, this->settings.getSettingByName<float>("textSize")->value, 0.25f,
-                                           0.f, false);
-
-        this->settings.getSettingByName<float>("textSize")->value = textSize;
-
-        /* Color Pickers Start*/
-
-        toggleX = Constraints::PercentageConstraint(0.55, "left");
-        toggleY = Constraints::PercentageConstraint(0.10, "top");
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Main color", textWidth * 6.9f,
-                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(0, toggleX + FlarialGUI::SettingsTextWidth("Main color "),
-                                toggleY - Constraints::SpacingConstraint(0.017, textWidth),
-                                settings.getSettingByName<std::string>("colorMain")->value,
-                                settings.getSettingByName<bool>("colorMain_rgb")->value);
-
-        toggleX = Constraints::PercentageConstraint(0.55, "left");
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"High durability", textWidth * 6.9f,
-                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(1, toggleX + FlarialGUI::SettingsTextWidth("High durability "), toggleY * 0.99f,
-                                settings.getSettingByName<std::string>("colorFull")->value,
-                                settings.getSettingByName<bool>("colorFull_rgb")->value);
-
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Low durability", textWidth * 6.9f,
-                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(2, toggleX + FlarialGUI::SettingsTextWidth("Low durability "), toggleY * 0.99f,
-                                settings.getSettingByName<std::string>("colorLow")->value,
-                                settings.getSettingByName<bool>("colorLow_rgb")->value);
-
-        FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("colorMain")->value,
+        this->addColorPicker("Main", "", settings.getSettingByName<std::string>("colorMain")->value,
                                       settings.getSettingByName<float>("bgOpacity")->value,
                                       settings.getSettingByName<bool>("colorMain_rgb")->value);
-        FlarialGUI::ColorPickerWindow(1, settings.getSettingByName<std::string>("colorFull")->value,
+
+        this->addColorPicker("Full", "", settings.getSettingByName<std::string>("colorFull")->value,
                                       settings.getSettingByName<float>("textOpacity")->value,
                                       settings.getSettingByName<bool>("colorFull_rgb")->value);
-        FlarialGUI::ColorPickerWindow(2, settings.getSettingByName<std::string>("colorLow")->value,
+
+        this->addColorPicker("Low", "", settings.getSettingByName<std::string>("colorLow")->value,
                                       settings.getSettingByName<float>("borderOpacity")->value,
                                       settings.getSettingByName<bool>("colorLow_rgb")->value);
-        /* Color Pickers End */
+
+        FlarialGUI::UnsetScrollView();
+        this->resetPadding();
+    }
+
+    // TODO: Make it look better
+    void renderDurability() {
+        if(FlarialGUI::inMenu) return;
+
+        auto rgb = this->settings.getSettingByName<bool>("colorFull_rgb")->value;
+        auto rgb1 = this->settings.getSettingByName<bool>("colorLow_rgb")->value;
+        auto rgb2 = this->settings.getSettingByName<bool>("colorMain_rgb")->value;
+
+        auto rgbColor = FlarialGUI::rgbColor;
+
+        auto showOffhand = this->settings.getSettingByName<bool>("show_offhand")->value;
+
+        auto fullColor = rgb ? rgbColor : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("colorFull")->value);
+        auto lowColor = rgb1 ? rgbColor : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("colorLow")->value);
+        auto mainColor = rgb2 ? rgbColor : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("colorMain")->value);
+
+        const float textWidth = Constraints::RelativeConstraint(this->settings.getSettingByName<float>("textSize")->value, "height", true);
+        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
+
+        if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
+            if (SDK::clientInstance->getLocalPlayer() != nullptr)
+                if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
+
+                    auto vertical = this->settings.getSettingByName<bool>("vertical")->value;
+                    auto durability_left = this->settings.getSettingByName<bool>("durability_left")->value;
+
+                    float spacing = testSpacing;
+
+                    auto scaledPos = PositionUtils::getCustomScreenScaledPos(Vec2<float>{spacing, spacing},
+                                                                             this->settings.getSettingByName<float>(
+                                                                                     "uiscale")->value);
+                    spacing = vertical ? scaledPos.y : scaledPos.x;
+
+                    float xmodifier = 0.0f;
+                    float ymodifier = 0.0f;
+
+                    for (int i = 2; i < 6; i++) {
+
+                        if (vertical) ymodifier += spacing;
+                        else xmodifier += spacing;
+
+                        if (SDK::clientInstance->getLocalPlayer()->getArmor(i - 2)->getItem() != nullptr) {
+
+                            std::string text;
+
+                            if (durabilities[i][1] != 0) { // for some servers with custom items with max durability of 0
+                                if (this->settings.getSettingByName<bool>("percent")->value)
+                                    text = std::to_string((int) std::round(
+                                            (float) durabilities[i][0] / (float) durabilities[i][1] * 100)) + "%";
+                                else
+                                    text = std::to_string(durabilities[i][0]) + "/" +
+                                           std::to_string(durabilities[i][1]);
+
+
+                                std::wstring widestr = std::wstring(text.begin(), text.end());
+
+                                const wchar_t *widecstr = widestr.c_str();
+
+                                D2D1_COLOR_F color = mainColor;
+
+                                if (this->settings.getSettingByName<bool>("color")->value) {
+                                    if (std::round((float) durabilities[i][0] / (float) durabilities[i][1] * 100) <=
+                                        15) {
+                                        color = lowColor;
+                                    } else {
+                                        color = fullColor;
+                                    }
+                                }
+
+                                float spacingX = vertical ? (durabilities[i][1] != 0 ? spacing : 0) : 0;
+                                if (durability_left) spacingX *= -1;
+                                float spacingY = vertical ? 0 : (durabilities[i][1] != 0 ? spacing : 0);
+
+                                FlarialGUI::FlarialTextWithFont(
+                                        currentPos.x + xmodifier + spacingX + testOffset.x,
+                                        currentPos.y + ymodifier + spacingY + testOffset.y, widecstr, textWidth * 6.9f,
+                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        textWidth,
+                                        DWRITE_FONT_WEIGHT_NORMAL, color, true);
+                            }
+                        }
+                    }
+
+                    if (SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
+                            SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot())->getItem() !=
+                        nullptr) {
+                        auto currentItem = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
+                                SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot());
+
+                        std::string text;
+
+                        if (durabilities[0][1] != 0) {
+                            if (this->settings.getSettingByName<bool>("percent")->value)
+                                text = std::to_string((int) std::round(
+                                        (float) durabilities[0][0] / (float) durabilities[0][1] * 100)) + "%";
+                            else
+                                text = std::to_string(durabilities[0][0]) + "/" + std::to_string(durabilities[0][1]);
+                        } else {
+                            text = std::to_string(currentItem->getcount());
+                        }
+
+                        std::wstring widestr = std::wstring(text.begin(), text.end());
+
+                        const wchar_t *widecstr = widestr.c_str();
+
+                        D2D1_COLOR_F color = mainColor;
+
+                        if (this->settings.getSettingByName<bool>("color")->value && durabilities[0][1] != 0) {
+                            if (std::round((float) durabilities[0][0] / (float) durabilities[0][1] * 100) <= 15) {
+                                color = lowColor;
+                            } else {
+                                color = fullColor;
+                            }
+                        }
+
+                        if (vertical) ymodifier += spacing;
+                        else xmodifier += spacing;
+
+                        float spacingX = vertical ? (durabilities[0][1] != 0 ? spacing : 0) : 0;
+                        if (durability_left) spacingX *= -1;
+                        float spacingY = vertical ? 0 : (durabilities[0][1] != 0 ? spacing : 0);
+
+                        FlarialGUI::FlarialTextWithFont(currentPos.x + testOffset.x + xmodifier + spacingX,
+                                                        currentPos.y + testOffset.y + ymodifier + spacingY,
+                                                        widecstr, textWidth * 6.9f,
+                                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                        textWidth,
+                                                        DWRITE_FONT_WEIGHT_NORMAL, color, true);
+
+                    }
+                    if (showOffhand) {
+                        if (SDK::clientInstance->getLocalPlayer()->getOffhandSlot() != nullptr &&
+                            SDK::clientInstance->getLocalPlayer()->getOffhandSlot()->getItem() != nullptr) {
+
+                            auto offhandItem = SDK::clientInstance->getLocalPlayer()->getOffhandSlot();
+
+                            std::string text;
+
+                            if (durabilities[1][1] != 0) {
+                                if (this->settings.getSettingByName<bool>("percent")->value)
+                                    text = std::to_string((int) std::round(
+                                            (float) durabilities[1][0] / (float) durabilities[1][1] * 100)) + "%";
+                                else
+                                    text = std::to_string(durabilities[1][0]) + "/" +
+                                           std::to_string(durabilities[1][1]);
+                            } else {
+                                text = std::to_string(offhandItem->getcount());
+                            }
+
+                            std::wstring widestr = std::wstring(text.begin(), text.end());
+
+                            const wchar_t *widecstr = widestr.c_str();
+
+                            D2D1_COLOR_F color = mainColor;
+
+                            if (this->settings.getSettingByName<bool>("color")->value && durabilities[1][1] != 0) {
+                                if (std::round((float) durabilities[1][0] / (float) durabilities[1][1] * 100) <= 15) {
+                                    color = lowColor;
+                                } else {
+                                    color = fullColor;
+                                }
+                            }
+
+                            if (vertical) ymodifier += spacing;
+                            else xmodifier += spacing;
+
+                            float spacingX = vertical ? (durabilities[1][1] != 0 ? spacing : 0) : 0;
+                            if (durability_left) spacingX *= -1;
+                            float spacingY = vertical ? 0 : (durabilities[1][1] != 0 ? spacing : 0);
+
+                            FlarialGUI::FlarialTextWithFont(currentPos.x + testOffset.x + xmodifier + spacingX,
+                                                            currentPos.y + testOffset.y + ymodifier + spacingY,
+                                                            widecstr, textWidth * 6.9f,
+                                                            textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
+                                                            textWidth,
+                                                            DWRITE_FONT_WEIGHT_NORMAL, color, true);
+
+                        }
+                    }
+                }
+        }
+    }
+
+    void onRender(RenderEvent &event) {
+        if (ClientInstance::getTopScreenName() == "hud_screen" &&
+                this->isEnabled()) {
+
+            float s = Constraints::RelativeConstraint(0.04, "height", true) *
+                    this->settings.getSettingByName<float>("uiscale")->value;
+
+            float spacing = Constraints::RelativeConstraint(0.0135, "height", true) *
+                            this->settings.getSettingByName<float>("uiscale")->value;
+
+            Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
+                                                  this->settings.getSettingByName<float>("percentageY")->value);
+
+            float width;
+            float height;
+
+            if (!this->settings.getSettingByName<bool>("vertical")->value) {
+                width = s * 3 + spacing * 3;
+                height = s;
+            }else{
+                width = s;
+                height = s * 3 + spacing * 3;
+            }
+
+            if (settingperc.x != 0)
+        currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
+            else
+                currentPos = Constraints::CenterConstraint(width, height);
+
+            if (ClickGUI::editmenu) {
+                // bounding boxes
+                FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 18);
+            }
+
+            Vec2<float> vec2;
+            // bounding boxes
+            vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 18, width, height);
+
+            currentPos.x = vec2.x;
+            currentPos.y = vec2.y;
+
+            Vec2<float> percentages = Constraints::CalculatePercentage(currentPos.x, currentPos.y, width, height);
+
+            this->settings.setValue("percentageX", percentages.x);
+            this->settings.setValue("percentageY", percentages.y);
+
+            if (ClickGUI::editmenu) {
+                FlarialGUI::UnsetWindowRect();
+            }
+
+            if(this->settings.getSettingByName<bool>("showdurability")->value)
+                renderDurability();
+        }
+
+        if (SDK::getCurrentScreen() != "hud_screen") ClickGUI::editmenu = false;
+    }
+
+    void onSetupAndRender(SetupAndRenderEvent &event) {
+        if (this->isEnabled())
+            if (ClientInstance::getTopScreenName() == "hud_screen") {
+                auto muirc = event.getMuirc();
+                BaseActorRenderContext barc(muirc->getScreenContext(), muirc->getClientInstance(),
+                                            muirc->getClientInstance()->getMinecraftGame());
+
+                Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
+
+                float spacing = 15 * this->settings.getSettingByName<float>("uiscale")->value;
+
+                float xmodifier = 0.0f;
+                float ymodifier = 0.0f;
+
+                if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
+                    if (SDK::clientInstance->getLocalPlayer() != nullptr)
+                        if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
+                            for (int i = 2; i < 6; i++) {
+
+                                if (this->settings.getSettingByName<bool>("vertical")->value) ymodifier += spacing;
+                                else xmodifier += spacing;
+
+                                auto armorSlot = SDK::clientInstance->getLocalPlayer()->getArmor(i-2);
+
+                                if (armorSlot->getItem() != nullptr) {
+
+                                    auto maxDamage = armorSlot->getMaxDamage();
+                                    auto durabilityLeft = maxDamage - armorSlot->getDamageValue();
+
+                                    durabilities[i][1] = maxDamage;
+                                    durabilities[i][0] = durabilityLeft;
+
+                                    barc.itemRenderer->renderGuiItemNew(&barc,
+                                                                        armorSlot,
+                                                                        0,
+                                                                        scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
+                                                                        this->settings.getSettingByName<float>(
+                                                                                "uiscale")->value, false);
+
+                                    if(armorSlot->isEnchanted()) {
+                                        barc.itemRenderer->renderGuiItemNew(&barc,
+                                                                            armorSlot,
+                                                                            0,
+                                                                            scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
+                                                                            this->settings.getSettingByName<float>(
+                                                                                    "uiscale")->value,
+                                                                            true);
+                                    }
+                                }
+                            }
+
+                            if (SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
+                                    SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot())->getItem() !=
+                                nullptr) {
+                                auto item = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
+                                        SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot());
+
+                                auto maxDamage = item->getMaxDamage();
+                                auto durabilityLeft = maxDamage - item->getDamageValue();
+
+                                durabilities[0][1] = maxDamage;
+                                durabilities[0][0] = durabilityLeft;
+
+                                if (this->settings.getSettingByName<bool>("vertical")->value) ymodifier += spacing;
+                                else xmodifier += spacing;
+
+                                barc.itemRenderer->renderGuiItemNew(&barc,
+                                                                    item,
+                                                                    0, scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
+                                                                    this->settings.getSettingByName<float>(
+                                                                            "uiscale")->value,
+                                                                    false);
+
+                                if(item->isEnchanted()) {
+                                    barc.itemRenderer->renderGuiItemNew(&barc,
+                                                                        item,
+                                                                        0, scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
+                                                                        this->settings.getSettingByName<float>(
+                                                                                "uiscale")->value,
+                                                                        true);
+                                }
+                            }
+
+                            auto showOffhand = this->settings.getSettingByName<bool>("show_offhand")->value;
+                            if(showOffhand) {
+                                if (SDK::clientInstance->getLocalPlayer()->getOffhandSlot() != nullptr &&
+                                    SDK::clientInstance->getLocalPlayer()->getOffhandSlot()->getItem() != nullptr) {
+                                    auto item = SDK::clientInstance->getLocalPlayer()->getOffhandSlot();
+
+                                    auto maxDamage = item->getMaxDamage();
+                                    auto durabilityLeft = maxDamage - item->getDamageValue();
+
+                                    durabilities[1][1] = maxDamage;
+                                    durabilities[1][0] = durabilityLeft;
+
+                                    if (this->settings.getSettingByName<bool>("vertical")->value) ymodifier += spacing;
+                                    else xmodifier += spacing;
+
+                                    barc.itemRenderer->renderGuiItemNew(&barc,
+                                                                        item,
+                                                                        0, scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
+                                                                        this->settings.getSettingByName<float>(
+                                                                                "uiscale")->value,
+                                                                        false);
+
+                                    if (item->isEnchanted()) {
+                                        barc.itemRenderer->renderGuiItemNew(&barc,
+                                                                            item,
+                                                                            0, scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
+                                                                            this->settings.getSettingByName<float>(
+                                                                                    "uiscale")->value,
+                                                                            true);
+                                    }
+                                }
+                            }
+                        }
+                }
+            }
     }
 };

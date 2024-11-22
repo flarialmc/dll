@@ -4,13 +4,10 @@
 #include "../../../../Client.hpp"
 
 class UninjectListener : public Listener {
-
-public:
-
-    Module *module{};
+private:
     std::string curKeybind = Client::settings.getSettingByName<std::string>("ejectKeybind")->value;
-
-    void onKey(KeyEvent &event) override {
+public:
+    void onKey(KeyEvent &event) {
         if (curKeybind != Client::settings.getSettingByName<std::string>("ejectKeybind")->value) {
             curKeybind = Client::settings.getSettingByName<std::string>("ejectKeybind")->value;
             return;
@@ -18,13 +15,14 @@ public:
         if (event.getKey() ==
             Utils::getStringAsKey(Client::settings.getSettingByName<std::string>("ejectKeybind")->value) &&
             static_cast<ActionType>(event.getAction()) == ActionType::Released) {
-            ModuleManager::terminate();
             Client::disable = true;
         }
     }
 
-public:
-    explicit UninjectListener(const char string[5]) {
-        this->name = string;
+    UninjectListener() {
+        Listen(this, KeyEvent, &UninjectListener::onKey);
+    }
+    ~UninjectListener() {
+        Deafen(this, KeyEvent, &UninjectListener::onKey);
     }
 };

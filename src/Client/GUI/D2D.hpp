@@ -8,15 +8,14 @@
 #include <initguid.h>
 #include <d2d1.h>
 #include <d2d1_3.h>
-#include <winrt/base.h>
 #include "../../Utils/Utils.hpp"
 #include "../Events/Input/MouseEvent.hpp"
 #include "../../Utils/Logger/Logger.hpp"
 #include "../../SDK/Client/Render/FrameTransform.hpp"
 
 namespace D2D {
-    inline winrt::com_ptr<ID2D1DeviceContext> context;
-    inline winrt::com_ptr<IDXGISurface1> surface = nullptr;
+    inline ID2D1DeviceContext *context;
+    inline IDXGISurface1 *surface = nullptr;
 }
 
 class MC {

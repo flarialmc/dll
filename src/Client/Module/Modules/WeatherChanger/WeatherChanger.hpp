@@ -1,28 +1,21 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "WeatherListener.hpp"
 
 
 class WeatherChanger : public Module {
-
 public:
-
-
     WeatherChanger() : Module("Weather Changer", "Changes the weather ingame.", IDR_CLOUDY_PNG, "") {
-
         Module::setup();
-
     };
 
     void onEnable() override {
-        EventHandler::registerListener(new WeatherListener("Weather", this));
+        Listen(this, TickEvent, &WeatherChanger::onTick)
         Module::onEnable();
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("Weather");
+        Deafen(this, TickEvent, &WeatherChanger::onTick)
         Module::onDisable();
     }
 
@@ -34,48 +27,51 @@ public:
         if (settings.getSettingByName<bool>("snow") == nullptr) settings.addSetting("snow", false);
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
-        /* Border Start */
 
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Rain", textWidth * 3.0f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
 
-        float percent = FlarialGUI::Slider(4, toggleX + FlarialGUI::SettingsTextWidth("Rain "),
-                                           toggleY, this->settings.getSettingByName<float>("rain")->value, 10.0f);
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(0.88f, "height"));
 
-        this->settings.getSettingByName<float>("rain")->value = percent;
+        this->addHeader("Misc");
+        this->addSlider("Rain Intensity", "", this->settings.getSettingByName<float>("rain")->value);
+        this->addSlider("Snow Intensity", "", this->settings.getSettingByName<float>("snow")->value);
 
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        FlarialGUI::UnsetScrollView();
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Lightning", textWidth * 3.0f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
+        this->resetPadding();
+    }
 
-        percent = FlarialGUI::Slider(5, toggleX + FlarialGUI::SettingsTextWidth("Lightning "),
-                                     toggleY, this->settings.getSettingByName<float>("lighting")->value, 10.0f);
+    void onTick(TickEvent &event) {
+        if (!SDK::clientInstance->getBlockSource())
+            return;
 
-        this->settings.getSettingByName<float>("lighting")->value = percent;
+        if (this->isEnabled()) {
+            if (this->settings.getSettingByName<float>("rain")->value > 0.02f)
+                SDK::clientInstance->getBlockSource()->getDimension()->weather->rainLevel = this->settings.getSettingByName<float>(
+                        "rain")->value;
+            else SDK::clientInstance->getBlockSource()->getDimension()->weather->rainLevel = 0.0f;
+            if (this->settings.getSettingByName<float>("lighting")->value < 0.02f)
+                SDK::clientInstance->getBlockSource()->getDimension()->weather->lightingLevel = this->settings.getSettingByName<float>(
+                        "lighting")->value;
+            else SDK::clientInstance->getBlockSource()->getDimension()->weather->lightingLevel = 0.0f;
 
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-        if (FlarialGUI::Toggle(0, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "snow")->value))
-            this->settings.getSettingByName<bool>("snow")->value = !this->settings.getSettingByName<bool>(
-                    "snow")->value;
+            // TODO: When you set snow, it will stay even if on until game reload
+            if (this->settings.getSettingByName<bool>("snow")->value) {
+                Vec3<float> *pos = event.getActor()->getPosition();
+                Vec3<int> e((int)pos->x, (int)pos->y, (int)pos->z);
 
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        L"Snow (intensity depends on rain)", textWidth * 6.9f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
+                SDK::clientInstance->getBlockSource()->getBiome(e)->temparature = 0.0f;
+            }
+        }
     }
 };
 

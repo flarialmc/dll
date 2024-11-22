@@ -16,8 +16,15 @@ void FlarialGUI::RoundedHollowRect(float x, float y, float borderWidth, const D2
             rect.bottom + borderWidth / 2.0f
     );
 
-    radiusX += borderWidth / 2.0f;
-    radiusY += borderWidth / 2.0f;
+    if(radiusX != 0) {
+        radiusX += borderWidth / 2.0f;
+        radiusY += borderWidth / 2.0f;
+    }
 
-    D2D::context->DrawRoundedRectangle(D2D1::RoundedRect(borderRect, radiusX, radiusY), brush, borderWidth);
+    ImVec2 pos(rect.left, rect.top);
+    ImVec2 size(rect.right - rect.left, rect.bottom - rect.top);
+    ImVec2 max(pos.x + size.x, pos.y + size.y);
+
+    //D2D::context->DrawRoundedRectangle(D2D1::RoundedRect(borderRect, radiusX, radiusY), brush, borderWidth);
+    ImGui::GetBackgroundDrawList()->AddRect(pos, max, D2DColorToImColor(color), radiusX, 0, borderWidth);
 }

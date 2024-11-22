@@ -1,49 +1,43 @@
 #pragma once
 
 #include "../../../../Hook/Hooks/Input/MouseHook.hpp"
-#include "../../../../Events/Listener.hpp"
 #include "../../../../Client.hpp"
-#include "../../HiveModeCatcher/HiveModeCatcherListener.hpp"
 
 class DiscordRPCListener : public Listener {
-public:
+private:
     std::string previousIp;
-    std::string previousgamemode = HiveModeCatcherListener::fullgamemodename;
-
-    void onTick(TickEvent &event) override {
+public:
+    void onTick(TickEvent &event) {
         handleServerIpChange();
     }
 
-    void onRender(RenderEvent &event) override {
+    void onRender(RenderEvent &event) {
         if (SDK::getServerPing() == -1) {
             handleServerIpChange();
         }
     }
 
-public:
-    explicit DiscordRPCListener(const char string[5]) {
-        this->name = string;
+    DiscordRPCListener() {
+        Listen(this, TickEvent, &DiscordRPCListener::onTick);
+        Listen(this, RenderEvent, &DiscordRPCListener::onRender);
+    }
+
+    ~DiscordRPCListener() {
+        Deafen(this, TickEvent, &DiscordRPCListener::onTick);
+        Deafen(this, RenderEvent, &DiscordRPCListener::onRender);
     }
 
 private:
     void handleServerIpChange() {
         std::string ip = SDK::getServerIP();
-        std::string gamemode = HiveModeCatcherListener::fullgamemodename;
+
         if (ip != previousIp) {
-            static std::string settingspath = Utils::getRoamingPath() + "\\Flarial\\serverip.txt";
+            static std::string settingspath = Utils::getClientPath() + "\\serverip.txt";
 
             if (!std::filesystem::exists(settingspath)) {
                 createSettingsFile(settingspath);
             }
             updateSettingsFile(settingspath, ip);
-        }
-        if (gamemode != previousgamemode) {
-            static std::string settingspath = Utils::getRoamingPath() + "\\Flarial\\gamemode.txt";
-
-            if (!std::filesystem::exists(settingspath)) {
-                createSettingsFile(settingspath);
-            }
-            updateSettingsFile(settingspath, gamemode);
         }
     }
 
@@ -55,7 +49,7 @@ private:
                                         OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
         if (fileHandle == INVALID_HANDLE_VALUE) {
-            Logger::error("Failed to create file: " + settingspath);
+            Logger::error("Failed to create file: {}", settingspath);
             return;
         }
 
@@ -69,7 +63,7 @@ private:
             previousIp = ip;
             outputFile.close();
         } else {
-            Logger::error("Failed to open file: " + settingspath);
+            Logger::error("Failed to open file: {}", settingspath);
         }
     }
 };

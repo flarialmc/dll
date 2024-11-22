@@ -1,15 +1,10 @@
 #pragma once
 
-#include "../../../../Events/Listener.hpp"
 #include "../../../../Client.hpp"
 
 class SaveConfigListener : public Listener {
-
 public:
-
-    Module *module{};
-
-    void onKey(KeyEvent &event) override {
+    void onKey(KeyEvent &event) {
         if (event.getKey() == VK_F7 && static_cast<ActionType>(event.getAction()) == ActionType::Released) {
             ModuleManager::SaveModulesConfig();
             Client::SaveSettings();
@@ -17,8 +12,11 @@ public:
         }
     }
 
-public:
-    explicit SaveConfigListener(const char string[5]) {
-        this->name = string;
+    SaveConfigListener() {
+        Listen(this, KeyEvent, &SaveConfigListener::onKey);
+    }
+
+    ~SaveConfigListener() {
+        Deafen(this, KeyEvent, &SaveConfigListener::onKey);
     }
 };

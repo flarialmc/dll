@@ -1,12 +1,11 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
 #include "../../../Client.hpp"
-#include "FOVChangerListener.hpp"
 
 class FOVChanger : public Module {
-
+private:
+    bool notified150Fov = false;
 public:
     FOVChanger() : Module("FOV Changer", "Change your FOV beyond Minecraft's limits.",
                           IDR_FIELD_OF_VIEW_PNG, "") {
@@ -16,13 +15,13 @@ public:
     };
 
     void onEnable() override {
-        EventHandler::registerOrderedPriorityListener(new FOVChangerListener("FOVChange", this),1);
+        Listen(this, FOVEvent, &FOVChanger::onGetFOV)
         Module::onEnable();
 
     }
 
     void onDisable() override {
-        EventHandler::unregisterListener("FOVChange");
+        Deafen(this, FOVEvent, &FOVChanger::onGetFOV)
         Module::onDisable();
     }
 
@@ -32,43 +31,53 @@ public:
 
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
-        FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(5.5, textWidth), 2);
-        FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"),
+
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(1.0f, "height"));
+                                  Constraints::RelativeConstraint(0.88f, "height"));
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"FOV Value", textWidth * 3.0f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        float percent = FlarialGUI::Slider(0, toggleX + FlarialGUI::SettingsTextWidth("FOV Value "),
-                                           toggleY, this->settings.getSettingByName<float>("fovvalue")->value, 359.0f,
+        this->addHeader("Misc");
+        this->addSlider("FOV Value", "", this->settings.getSettingByName<float>("fovvalue")->value, 359.0f,
                                            0, false);
-
-        this->settings.getSettingByName<float>("fovvalue")->value = percent;
-
-        toggleY += Constraints::SpacingConstraint(0.25, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        L"Affect hand size", textWidth * 3.0f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-        if (FlarialGUI::Toggle(1, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "fovaffectshand")->value))
-            this->settings.getSettingByName<bool>("fovaffectshand")->value = !this->settings.getSettingByName<bool>(
-                    "fovaffectshand")->value;
+        this->addToggle("Affect Hand Size", "Keep normal hand size or not.", this->settings.getSettingByName<bool>("fovaffectshand")->value);
 
         FlarialGUI::UnsetScrollView();
+
+        this->resetPadding();
+    }
+
+    void onGetFOV(FOVEvent &event) {
+        if(!this->settings.getSettingByName<bool>("fovaffectshand")->value){
+            if(event.getFOV() == 70) return;
+        }
+
+        bool inserver;
+
+        std::string serverIP = SDK::getServerIP();
+
+        if (serverIP.find("world") != std::string::npos) inserver = true;
+        else inserver = false;
+
+        auto fovSetting = this->settings.getSettingByName<float>("fovvalue")->value;
+
+        if (inserver) {
+            if (fovSetting > 150) {
+                if (!notified150Fov) {
+                    FlarialGUI::Notify("FOV Changer has been limmited to 150 on servers.");
+                    notified150Fov = true;
+                }
+                event.setFOV(150.0f);
+            }
+        }
+        event.setFOV(fovSetting);
     }
 };
 

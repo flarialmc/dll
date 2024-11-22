@@ -17,20 +17,26 @@
 #include "Hooks/Game/getSensHook.hpp"
 #include "Hooks/Render/TextureGroup_getTextureHook.hpp"
 #include "Hooks/Render/HudMobEffectsRenderer.hpp"
+#include "Hooks/Visual/BaseActorRendererRenderTextHook.hpp"
 #include "Hooks/Game/UpdatePlayerHook.hpp"
+#include "Hooks/Game/isPreGame.hpp"
+#include "Hooks/Game/composeFullStack.hpp"
+#include "Hooks/Render/RenderOrderExecuteHook.hpp"
+#include "Hooks/Render/RenderChunkCoordinatorPreRenderTickHook.hpp"
+#include "Hooks/Game/SettingsScreenOnExitHook.hpp"
+#include "Hooks/Render/UIControl_updateCachedPositionHook.hpp"
+#include "Hooks/Render/HudCursorRenderer.hpp"
+#include "Hooks/Render/GeneralSettingsScreenControllerCtorHook.hpp"
 //#include "Hooks/Game/RenderItemGroup.hpp"
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 
-std::vector<Hook *> HookManager::hooks;
+std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
 std::string dxVersion[5] = {"Couldn't initialize", "DX9", "DX10", "DX11", "DX12"};
 
 void HookManager::initialize() {
-
-    //wouldnt be a bad idea to use a smart pointer for these like std::shared_ptr :)
-
+    uint64_t start = Utils::getCurrentMs();
     MH_Initialize();
-
 
     kiero::init(kiero::RenderType::D3D12);
 
@@ -41,49 +47,63 @@ void HookManager::initialize() {
         Logger::debug("[Kiero] Trying d3d10");
     }
 
-    Logger::debug(std::format("[Kiero] Renderer: {}", dxVersion[kiero::getRenderType()]));
+    Logger::debug("Renderer: {}", dxVersion[kiero::getRenderType()]);
 
-    hooks.push_back(new KeyHook());
-    hooks.push_back(new MouseHook());
 
-    if (!Client::settings.getSettingByName<bool>("killdx")->value) hooks.push_back(new CommandListHook());
+    addHook<KeyHook>();
+    addHook<MouseHook>();
 
-    //hooks.push_back(new TextureGroup_getTextureHook());
-    hooks.push_back(new getViewPerspectiveHook());
-    // hooks.push_back(new RenderActorHook());
-    hooks.push_back(new RaknetTickHook());
-    hooks.push_back(new SetUpAndRenderHook());
-    hooks.push_back(new GameModeAttackHook());
-    hooks.push_back(new SwapchainHook());
-    hooks.push_back(new ResizeHook());
-    hooks.push_back(new getFovHook());
-    hooks.push_back(new ActorBaseTick());
-    hooks.push_back(new OnSuspendHook());
-    hooks.push_back(new getGammaHook());
-    hooks.push_back(new FontDrawTransformedHook());
-    hooks.push_back(new HurtColorHook());
-    hooks.push_back(new DimensionFogColorHook());
-    hooks.push_back(new OverworldFogColorHook());
-    hooks.push_back(new TimeChangerHook());
-    hooks.push_back(new SendPacketHook());
-    hooks.push_back(new getSensHook());
-    hooks.push_back(new HudMobEffectsRendererHook());
-    if(WinrtUtils::checkAboveOrEqual(21, 40)) {
-        hooks.push_back(new UpdatePlayerHook());
+    if (!Client::settings.getSettingByName<bool>("killdx")->value)
+        addHook<CommandListHook>();
+
+    addHook<SwapchainHook>();
+    addHook<ResizeHook>();
+
+    //addHook<TextureGroup_getTextureHook>();
+    addHook<getViewPerspectiveHook>();
+    addHook<RaknetTickHook>();
+    addHook<SetUpAndRenderHook>();
+    addHook<GameModeAttackHook>();
+
+    addHook<getFovHook>();
+    addHook<ActorBaseTick>();
+    addHook<OnSuspendHook>();
+    addHook<getGammaHook>();
+    addHook<FontDrawTransformedHook>();
+    addHook<HurtColorHook>();
+    addHook<DimensionFogColorHook>();
+    addHook<OverworldFogColorHook>();
+    addHook<TimeChangerHook>();
+    addHook<SendPacketHook>();
+    addHook<getSensHook>();
+    addHook<HudMobEffectsRendererHook>();
+    addHook<HudCursorRendererHook>();
+    if(WinrtUtils::checkAboveOrEqual(20, 60)) {
+        addHook<BaseActorRendererRenderTextHook>();
     }
-    //hooks.push_back(new RenderItemGroupHook());
-    //hooks.push_back(new getCurrentSwingDuration());
+    addHook<UIControl_updateCachedPositionHook>();
+    addHook<GeneralSettingsScreenControllerCtorHook>();
 
-    for (auto hook: hooks)
+    addHook<isPreGameHook>();
+    addHook<_composeFullStackHook>();
+
+    addHook<RenderOrderExecuteHook>();
+    addHook<RenderChunkCoordinatorPreRenderTickHook>();
+    addHook<SettingsScreenOnExitHook>();
+
+    if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+        addHook<UpdatePlayerHook>();
+    }
+
+    for (const auto& hook: hooks) {
         hook->enableHook();
+    }
 
+    float elapsed = (Utils::getCurrentMs() - start) / 1000.0;
+    Logger::custom(fg(fmt::color::deep_sky_blue), "Hook", "Initialized {} hooks in {:.2f}s", hooks.size(), elapsed);
 }
 
 void HookManager::terminate() {
-
-    for (auto hook: hooks)
-        delete hook;
-
     hooks.clear();
 }
 

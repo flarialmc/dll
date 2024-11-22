@@ -10,7 +10,7 @@ float Constraints::PercentageConstraint(float percentage, const std::string &edg
 
     // Check if there is a dimension stack and use the top element's dimensions instead
     if (!FlarialGUI::dimensionStack.empty() && !ignore_stack) {
-        Dimension &top = FlarialGUI::dimensionStack.top();
+        Dimensions &top = FlarialGUI::dimensionStack.top();
         screenWidth = top.width;
         screenHeight = top.height;
         x = top.x;
@@ -120,9 +120,10 @@ float Constraints::FontScaler(float dimension) {
 
 }
 
-Vec2<float> Constraints::CalculatePercentage(float x, float y) {
-    return Vec2<float>{x / MC::windowSize.x, y / MC::windowSize.y};
+Vec2<float> Constraints::CalculatePercentage(float x, float y, float adjustWidth, float adjustHeight) {
+    return Vec2<float>{x / (MC::windowSize.x - adjustWidth), y / (MC::windowSize.y - adjustHeight)};
 }
+
 
 float Constraints::SpacingConstraint(float percentage, float dimension) {
 

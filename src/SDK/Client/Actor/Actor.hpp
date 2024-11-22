@@ -197,6 +197,8 @@ public:
 
     bool canSee(const Actor& actor);
 
+    Vec3<float> getOrigin();
+
     Vec3<float> *getPosition();
 
     ItemStack *getOffhandSlot();
@@ -228,8 +230,6 @@ public:
     RuntimeIDComponent *getRuntimeIDComponent();
 
     bool isValidAABB();
-
-    uint64_t getRuntimeID();
 
     ActorDataFlagComponent *getActorDataFlagComponent();
 

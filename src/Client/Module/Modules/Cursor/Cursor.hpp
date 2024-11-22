@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
-#include "CursorListener.hpp"
 
 
 class Cursor : public Module {
@@ -14,34 +12,83 @@ public:
         Module::setup();
     };
 
-    void onSetup() override {
-        EventHandler::registerListener(new CursorListener("Cursor", this));
-    }
-
     void onEnable() override {
+        Listen(this, DrawNineSliceEvent, &Cursor::onNineSliceDraw)
+        Listen(this, DrawImageEvent, &Cursor::onDrawImage)
         Module::onEnable();
     }
 
     void onDisable() override {
+        Deafen(this, DrawNineSliceEvent, &Cursor::onNineSliceDraw)
+        Deafen(this, DrawImageEvent, &Cursor::onDrawImage);
         Module::onDisable();
     }
 
-    void settingsRender() override {
+    void settingsRender(float settingsOffset) override {
 
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
-        FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(5.5, textWidth), 2);
-        FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"),
-            Constraints::RelativeConstraint(1.0, "width"),
-            Constraints::RelativeConstraint(1.0f, "height"));
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Troll", textWidth * 3.0f, textHeight,
-            DWRITE_TEXT_ALIGNMENT_LEADING,
-            Constraints::RelativeConstraint(0.12, "height", true),
-            DWRITE_FONT_WEIGHT_NORMAL);
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(0.88f, "height"));
+
+        FlarialGUI::UnsetScrollView();
+
+        this->resetPadding();
+    }
+
+    void onNineSliceDraw(DrawNineSliceEvent& event) {
+        if (SDK::containsIgnoreCase(event.getTexturePtr()->GetFilePath(), "hover") && !SDK::containsIgnoreCase(event.getTexturePtr()->GetFilePath(), "nohover") && SDK::currentScreen != "hud_screen")
+        {
+            if (event.getTexturePtr()->GetFilePath().contains("edit_box"))
+            {
+                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::IBeam);
+            }
+            else
+            {
+                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Hand);
+            }
+            last = std::chrono::high_resolution_clock::now();
+        }
+        /*else if (event.getTexturePtr()->GetFilePath().contains("ScrollRail"))
+        {
+            Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::SizeNorthSouth);
+            last = std::chrono::high_resolution_clock::now();
+        }*/
+        else if (SDK::currentScreen != "hud_screen")
+        {
+            std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last;
+            if (duration.count() >= 0.01) {
+                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+            }
+        }
+    }
+
+    void onDrawImage(DrawImageEvent& event) {
+        Vec2<float> mouse(MC::mousePos.x / 2, MC::mousePos.y / 2);
+        if (SDK::containsIgnoreCase(event.getTexturePath(), "hover") && !SDK::containsIgnoreCase(event.getTexturePath(), "nohover") && SDK::currentScreen != "hud_screen")
+        {
+            if (event.getTexturePath().contains("edit_box"))
+            {
+                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::IBeam);
+            }
+            else
+            {
+                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Hand);
+            }
+            last = std::chrono::high_resolution_clock::now();
+        }
+        else if (SDK::currentScreen != "hud_screen")
+        {
+            std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last;
+            if (duration.count() >= 0.01) {
+                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+            }
+        }
     }
 };

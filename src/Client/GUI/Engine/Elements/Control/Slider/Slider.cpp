@@ -1,5 +1,6 @@
 #include "../../../Engine.hpp"
 #include "../../../../../Module/Manager.hpp"
+#include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -35,19 +36,24 @@
 #define o_colors_secondary7 clickgui->settings.getSettingByName<float>("o_colors_secondary7")->value
 #define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
 
-float FlarialGUI::Slider(int index, float x, float y, float startingPoint, const float maxValue, const float minValue,
-                         const bool zerosafe) {
+float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, const float maxValue, const float minValue, const bool zerosafe) {
     D2D1_COLOR_F color = colors_primary1_rgb ? rgbColor : colors_primary1;
     D2D1_COLOR_F disabledColor = colors_primary3_rgb ? rgbColor : colors_primary3;
     D2D1_COLOR_F circleColor = colors_primary2_rgb ? rgbColor : colors_primary2;
-
     color.a = o_colors_primary1;
     disabledColor.a = o_colors_primary3;
     circleColor.a = o_colors_primary2;
 
+
+    if(ClickGUI::settingsOpacity != 1) {
+        color.a = ClickGUI::settingsOpacity;
+        disabledColor.a = ClickGUI::settingsOpacity;
+        circleColor.a = ClickGUI::settingsOpacity;
+    }
+
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
-            if (FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
+            if (i <= additionalIndex && additionalY[i] > 0.0f) {
                 y += additionalY[i];
             }
         }
@@ -76,6 +82,8 @@ float FlarialGUI::Slider(int index, float x, float y, float startingPoint, const
     const float percWidth = Constraints::RelativeConstraint(0.056, "height", true);
     const float percHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
+    y -= percHeight / 2.0f;
+
     std::string text;
 
     if (isAdditionalY) UnSetIsInAdditionalYMode();
@@ -92,15 +100,14 @@ float FlarialGUI::Slider(int index, float x, float y, float startingPoint, const
         text = stream.str();
     }
 
-    if (!TextBoxes[30 + index].isActive)
-        FlarialGUI::RoundedRect(x, y, disabledColor, percWidth, percHeight, round.x, round.x);
+    if (!TextBoxes[30 + index].isActive) FlarialGUI::RoundedRect(x, y, disabledColor, percWidth, percHeight, round.x, round.x);
     else FlarialGUI::RoundedRect(x, y, color, percWidth, percHeight, round.x, round.x);
 
 
     int limit = 5;
     if (text.find('-') != std::string::npos) limit = 6;
     text = FlarialGUI::TextBox(30 + index, text, limit, x, y, percWidth, percHeight);
-    text = Utils::remomveNonNumeric(text);
+    text = String::removeNonNumeric(text);
 
 
     if (startingPoint > maxValue) {
@@ -238,5 +245,6 @@ float FlarialGUI::Slider(int index, float x, float y, float startingPoint, const
 
     if (isAdditionalY) SetIsInAdditionalYMode();
 
+    startingPoint = percentage;
     return percentage;
 }

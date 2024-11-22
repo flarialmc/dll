@@ -5,17 +5,17 @@ void FlarialGUI::ApplyDeepFry(float intensity) {
 
     if (SwapchainHook::init) {
 
-        winrt::com_ptr<ID2D1Effect> cum = nullptr;
+        ID2D1Effect *cum = nullptr;
 
-        D2D::context->CreateEffect(CLSID_D2D1Morphology, cum.put());
+        D2D::context->CreateEffect(CLSID_D2D1EdgeDetection, &cum);
 
-        winrt::com_ptr<ID2D1Bitmap> bitmap = nullptr;
+        ID2D1Bitmap *bitmap = nullptr;
 
         if (SwapchainHook::queue != nullptr)
-            FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap].get(), bitmap.put());
-        else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap.get(), bitmap.put());
+            FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap], &bitmap);
+        else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap, &bitmap);
 
-        cum->SetInput(0, bitmap.get());
+        cum->SetInput(0, bitmap);
 
         // Set blur intensity
         cum->SetValue(D2D1_EDGEDETECTION_PROP_STRENGTH, intensity);
@@ -24,6 +24,9 @@ void FlarialGUI::ApplyDeepFry(float intensity) {
         cum->SetValue(D2D1_EDGEDETECTION_PROP_OVERLAY_EDGES, false);
         cum->SetValue(D2D1_EDGEDETECTION_PROP_ALPHA_MODE, D2D1_ALPHA_MODE_PREMULTIPLIED);
         // Draw the image with the Gaussian blur effect
-        D2D::context->DrawImage(cum.get());
+        D2D::context->DrawImage(cum);
+
+        Memory::SafeRelease(bitmap);
+        Memory::SafeRelease(cum);
     }
 }

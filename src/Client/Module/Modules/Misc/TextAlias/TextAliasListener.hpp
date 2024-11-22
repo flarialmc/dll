@@ -1,13 +1,10 @@
 #pragma once
 
 #include "../../../../Hook/Hooks/Input/MouseHook.hpp"
-#include "../../../../Events/Listener.hpp"
 #include "../../../../Client.hpp"
 
 class TextAliasListener : public Listener {
-
-public:
-
+private:
     std::map<std::string, D2D1_TEXT_ANTIALIAS_MODE> aliases = {
             {"Default", D2D1_TEXT_ANTIALIAS_MODE_DEFAULT},
             {"Cleartype", D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE},
@@ -15,8 +12,8 @@ public:
             {"Aliased", D2D1_TEXT_ANTIALIAS_MODE_ALIASED}
     };
     std::string curAliasMode;
-
-    void onTick(TickEvent &event) override {
+public:
+    void onTick(TickEvent &event) {
         if (!SwapchainHook::init) {
             if (D2D::context != nullptr &&
                 curAliasMode != Client::settings.getSettingByName<std::string>("aliasingMode")->value) {
@@ -29,8 +26,11 @@ public:
         }
     }
 
-public:
-    explicit TextAliasListener(const char string[5]) {
-        this->name = string;
+    TextAliasListener() {
+        Listen(this, TickEvent, &TextAliasListener::onTick);
+    }
+
+    ~TextAliasListener() {
+        Deafen(this, TickEvent, &TextAliasListener::onTick);
     }
 };

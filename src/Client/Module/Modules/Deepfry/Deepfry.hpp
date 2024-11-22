@@ -1,8 +1,6 @@
 #pragma once
 
-#include "DeepfryListener.hpp"
 #include "../Module.hpp"
-#include "../../../Events/EventHandler.hpp"
 
 
 class Deepfry : public Module {
@@ -14,43 +12,46 @@ public:
     };
 
     void onEnable() override {
-
-        EventHandler::registerPriorityListener(new DeepfryListener("Deepfry", this));
-
+        Listen(this, RenderEvent, &Deepfry::onRender)
         Module::onEnable();
-
     }
 
     void onDisable() override {
-
-        EventHandler::unregisterListener("Deepfry");
-
+        Deafen(this, RenderEvent, &Deepfry::onRender)
         Module::onDisable();
-
     }
 
     void defaultConfig() override {
         if (settings.getSettingByName<bool>("paint") == nullptr) settings.addSetting("paint", false);
     }
 
-    void settingsRender() override {
-
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
-
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
-
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        L"Paint Effect", textWidth * 3.0f, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        if (FlarialGUI::Toggle(1, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "paint")->value))
-            this->settings.getSettingByName<bool>("paint")->value = !this->settings.getSettingByName<bool>(
-                    "paint")->value;
+    void settingsRender(float settingsOffset) override {
 
 
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
+
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
+
+
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(0.88f, "height"));
+
+        this->addHeader("Misc");
+        this->addToggle("Paint Effect", "", this->settings.getSettingByName<bool>("paint")->value);
+
+        FlarialGUI::UnsetScrollView();
+
+        this->resetPadding();
+    }
+
+    void onRender(RenderEvent &event) {
+        if (this->isEnabled()) {
+            if (this->settings.getSettingByName<bool>("paint")->value) FlarialGUI::ApplyPaintEffect(10.0f);
+            else FlarialGUI::ApplyCombinedDeepFry();
+
+        }
     }
 };

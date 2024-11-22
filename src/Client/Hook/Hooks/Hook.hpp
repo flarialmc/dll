@@ -6,13 +6,14 @@
 
 #include "../../../Utils/Logger/Logger.hpp"
 #include "../../../Utils/Memory/Memory.hpp"
+#include "../../Events/EventManager.hpp"
 
 class Hook {
 public:
-    std::string signature;
+    uintptr_t address;
     std::string name;
 
-    Hook(std::string name, std::string signature);
+    Hook(std::string name, uintptr_t address);
 
     virtual ~Hook();
 
