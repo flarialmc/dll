@@ -97,5 +97,5 @@ void Scripting::loadModules() {
         }
     }
 
-    Logger::custom(fg(fmt::color::aqua), "Scripting", "Found {} scripts! Loded {} scripts without errors. Found errors in {} scripts.", Scripting::scriptsAmount, Scripting::scriptsAmountWithoutErrors, Scripting::scriptsAmountWithErrors);
+    Logger::custom(fg(fmt::color::aqua), "Scripting", "Found {} scripts! Loaded {} scripts without errors. Found errors in {} scripts.", Scripting::scriptsAmount, Scripting::scriptsAmountWithoutErrors, Scripting::scriptsAmountWithErrors);
 }
