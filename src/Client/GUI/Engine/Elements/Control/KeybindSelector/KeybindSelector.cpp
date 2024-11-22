@@ -1,7 +1,6 @@
 #include "../../../Engine.hpp"
 #include "../../../Constraints.hpp"
 #include "../../../../../Module/Manager.hpp"
-#include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -41,7 +40,7 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
 
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
-            if (i <= additionalIndex && additionalY[i] > 0.0f) {
+            if (FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
                 y += additionalY[i];
             }
         }
@@ -60,7 +59,7 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
 
     D2D1_COLOR_F col = KeybindSelectors[index].isActive ? (colors_primary1_rgb ? rgbColor : colors_primary1)
                                                         : (colors_primary3_rgb ? rgbColor : colors_primary3);
-    col.a = ClickGUI::settingsOpacity;
+    col.a = KeybindSelectors[index].isActive ? o_colors_primary1 : o_colors_primary3;
 
     if (KeybindSelectors[index].isActive) {
         std::chrono::steady_clock::time_point currentOnKeyTime = std::chrono::steady_clock::now();
@@ -72,7 +71,6 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
 
     KeybindSelectors[index].curColor = FlarialGUI::LerpColor(KeybindSelectors[index].curColor, col,
                                                              0.1f * FlarialGUI::frameFactor);
-    KeybindSelectors[index].curColor.a = ClickGUI::settingsOpacity;
 
     std::string text;
 
@@ -94,12 +92,15 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
     if (isAdditionalY) UnSetIsInAdditionalYMode();
     FlarialGUI::RoundedRect(x, y, KeybindSelectors[index].curColor, percWidth, percHeight, round.x, round.x);
 
-    if(text != "" & text != " ")
     FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), percWidth, percHeight,
                                     DWRITE_TEXT_ALIGNMENT_CENTER, textWidth, DWRITE_FONT_WEIGHT_NORMAL);
-    else  FlarialGUI::FlarialTextWithFont(x, y, L"unset", percWidth, percHeight,
-                                    DWRITE_TEXT_ALIGNMENT_CENTER, textWidth, DWRITE_FONT_WEIGHT_NORMAL);
 
+
+    FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.25, textWidth / 2.0f), y,
+                                    L"Keybind (Hold for 2 seconds)",
+                                    Constraints::SpacingConstraint(6.9f, textWidth), percHeight,
+                                    DWRITE_TEXT_ALIGNMENT_LEADING, textWidth,
+                                    DWRITE_FONT_WEIGHT_NORMAL);
 
     if (isAdditionalY) SetIsInAdditionalYMode();
 

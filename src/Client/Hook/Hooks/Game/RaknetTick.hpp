@@ -18,7 +18,7 @@ public:
     static inline original raknetTickOriginal = nullptr;
     static inline originalRakPeer getAveragePingOriginal = nullptr;
 
-    RaknetTickHook() : Hook("RaknetTick", GET_SIG_ADDRESS("RaknetTick")) {}
+    RaknetTickHook() : Hook("RaknetTick", GET_SIG("RaknetTick")) {}
 
     void enableHook() override;
 };

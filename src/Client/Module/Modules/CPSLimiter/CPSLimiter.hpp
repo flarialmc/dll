@@ -1,14 +1,16 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "../../../Events/EventHandler.hpp"
 
 class CPSLimiter : public Module {
 
 public:
 
 
-    CPSLimiter() : Module("CPS Limiter", "Limit how many clicks you can\nregister per second.",
+    CPSLimiter() : Module("CPS Limiter", "Limit/cap how many clicks you can\nregister per second.",
                           IDR_STOP_PNG, "") {
+
         Module::setup();
     };
 
@@ -16,29 +18,41 @@ public:
         if (settings.getSettingByName<float>("Left") == nullptr) settings.addSetting("Left", 16.0f);
 
         if (settings.getSettingByName<float>("Right") == nullptr) settings.addSetting("Right", 24.0f);
+
+        if (settings.getSettingByName<bool>("capMode") == nullptr) settings.addSetting("capMode", false);
     }
 
-    void settingsRender(float settingsOffset) override {
+    void settingsRender() override {
 
-        float x = Constraints::PercentageConstraint(0.019, "left");
-        float y = Constraints::PercentageConstraint(0.10, "top");
+        /* Border Start */
+        float toggleX = Constraints::PercentageConstraint(0.019, "left");
+        float toggleY = Constraints::PercentageConstraint(0.10, "top");
 
-        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
+        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Left", textWidth * 3.0f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        Constraints::RelativeConstraint(0.12, "height", true),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
-        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                                  Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(0.88f, "height"));
+        float percent = FlarialGUI::Slider(4, toggleX + FlarialGUI::SettingsTextWidth("Left "),
+                                           toggleY, this->settings.getSettingByName<float>("Left")->value, 100.0f,
+                                           1.00f, false);
 
-        this->addHeader("Limiter");
-        this->addSlider("Left Click", "Limit for your LMB.", this->settings.getSettingByName<float>("Left")->value);
-        this->addSlider("Right Click", "Right for your RMB.", this->settings.getSettingByName<float>("Right")->value);
+        this->settings.getSettingByName<float>("Left")->value = percent;
 
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
 
-        FlarialGUI::UnsetScrollView();
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Right", textWidth * 3.0f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        Constraints::RelativeConstraint(0.12, "height", true),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
 
-        this->resetPadding();
+        percent = FlarialGUI::Slider(5, toggleX + FlarialGUI::SettingsTextWidth("Right "),
+                                     toggleY, this->settings.getSettingByName<float>("Right")->value, 100.0f, 1.00f, false);
+
+        this->settings.getSettingByName<float>("Right")->value = percent;
     }
 };
 

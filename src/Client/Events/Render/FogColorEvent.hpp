@@ -6,9 +6,9 @@
 
 class FogColorEvent : public Event, Cancellable {
 private:
-    MCCColor fogColor;
+    MCCColor& fogColor;
 public:
-    [[nodiscard]] MCCColor& getFogColor() {
+    [[nodiscard]] MCCColor& getFogColor() const {
         return this->fogColor;
     }
 

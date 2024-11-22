@@ -6,7 +6,7 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
                                     float radiusY, const std::string &radioNum, const std::string &currentNum) {
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
-            if (i <= additionalIndex && additionalY[i] > 0.0f) {
+            if (FlarialGUI::DropDownMenus[i].isActive && i <= additionalIndex) {
                 y += additionalY[i];
             }
         }
@@ -18,15 +18,22 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
     if (isAdditionalY) UnSetIsInAdditionalYMode();
 
     D2D1_COLOR_F buttonColor;
-    buttonColor = D2D1::ColorF(color.r, color.g, color.b, 255.f);
 
-    FlarialGUI::RoundedRect(x, y, buttonColor, width, height, radiusX, radiusY);
+    if (radioNum != currentNum) {
+        FadeEffect::ApplyFadeInEffect(0.03f * FlarialGUI::frameFactor, 1, opacityAmounts[index]);
+        buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[index]);
+    } else {
+        FadeEffect::ApplyFadeOutEffect(0.03f * FlarialGUI::frameFactor, opacityAmounts[index]);
+        buttonColor = D2D1::ColorF(color.r, color.g, color.b, color.a - opacityAmounts[index]);
+    }
 
-    x += Constraints::SpacingConstraint(0.097, width);
+    D2D1_ROUNDED_RECT roundedRect = D2D1::RoundedRect(D2D1::RectF(x, y, x + width, y + height), radiusX, radiusY);
+    D2D::context->FillRoundedRectangle(roundedRect, FlarialGUI::getBrush(buttonColor).get());
+
+    x += Constraints::SpacingConstraint(0.077, width);
     //D2D::context->DrawText(text, (UINT32)wcslen(text), textFormat, D2D1::RectF(x, y, x + width, y + height), textBrush);
     // TODO: check if this correct
-
-    if(radioNum == currentNum) FlarialGUI::FlarialTextWithFont(x, y, text, width, height, DWRITE_TEXT_ALIGNMENT_CENTER, width * 1.05,
+    FlarialGUI::FlarialTextWithFont(x, y, text, width, height, DWRITE_TEXT_ALIGNMENT_CENTER, width * 0.84f,
                                     DWRITE_FONT_WEIGHT_REGULAR, textColor);
 
     if (isAdditionalY) SetIsInAdditionalYMode();

@@ -12,6 +12,4 @@ struct WindowRect {
     float oriMouseX = -1;
     float oriMouseY = -1;
     float fixer = 0;
-    float width = 0;
-    float height = 0;
 };

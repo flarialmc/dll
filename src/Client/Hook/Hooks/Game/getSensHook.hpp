@@ -14,10 +14,10 @@ private:
 
         float sensitivity = funcOriginal(a1, a2);
 
-        auto event = nes::make_holder<SensitivityEvent>(sensitivity);
-        eventMgr.trigger(event);
+        SensitivityEvent event(sensitivity);
+        EventHandler::onGetSensitivity(event);
 
-        return event->getSensitivity();
+        return event.getSensitivity();
     }
 
 public:
@@ -25,7 +25,7 @@ public:
 
     static inline getSensOriginal funcOriginal = nullptr;
 
-    getSensHook() : Hook("getSensHook", GET_SIG_ADDRESS("Options::getSensitivity")) {}
+    getSensHook() : Hook("getSensHook", GET_SIG("Options::getSensitivity")) {}
 
     void enableHook() override {
         this->autoHook((void *) getSensCallback, (void **) &funcOriginal);

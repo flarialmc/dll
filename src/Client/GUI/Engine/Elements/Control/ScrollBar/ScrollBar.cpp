@@ -1,18 +1,18 @@
 #include "../../../Engine.hpp"
-#include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
+#include "../../../../../Module/Modules/ClickGUI/GUIMouseListener.hpp"
 
 void FlarialGUI::ScrollBar(float x, float y, float width, float height, float radius) {
     float whiteY;
 
-    if (y - ClickGUI::accumilatedPos > y + height) {
-        ClickGUI::accumilatedPos += scrollposmodifier;
+    if (y - GUIMouseListener::accumilatedPos > y + height) {
+        GUIMouseListener::accumilatedPos += scrollposmodifier;
     }
 
-    if (y + ClickGUI::accumilatedPos > y) {
-        ClickGUI::accumilatedPos = 0;
+    if (y + GUIMouseListener::accumilatedPos > y) {
+        GUIMouseListener::accumilatedPos = 0;
     }
 
-    FlarialGUI::lerp(FlarialGUI::scrollpos, ClickGUI::accumilatedPos, 0.30f * FlarialGUI::frameFactor);
+    FlarialGUI::lerp(FlarialGUI::scrollpos, GUIMouseListener::accumilatedPos, 0.30f * FlarialGUI::frameFactor);
 
     /*
     // Draw the gray bar

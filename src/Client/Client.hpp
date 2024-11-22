@@ -3,7 +3,7 @@
 #include "Hook/Manager.hpp"
 #include "Module/Manager.hpp"
 #include <vector>
-//winrt :fire:
+//winrt stuff
 #include "winrt/windows.applicationmodel.core.h"
 #include "winrt/Windows.UI.ViewManagement.h"
 #include "winrt/Windows.UI.Core.h"
@@ -15,15 +15,6 @@ using namespace winrt::Windows::UI::Core;
 
 class Client {
 public:
-    static std::vector<std::string> onlinePlayers;
-
-    static std::string current_commit;
-
-    static std::vector<std::string> getPlayersVector(const nlohmann::json &data);
-
-    static void setWindowTitle(std::wstring title);
-    static void changeCursor(CoreCursorType cur);
-
     static void initialize();
 
     static bool disable;
@@ -37,40 +28,56 @@ public:
 
     static inline HMODULE currentModule = NULL;
 
+    static void changeCursor(CoreCursorType cur);
+
     static void SaveSettings() {
         try {
             std::ofstream outputFile(settingspath);
-            if (outputFile) {
-                outputFile << settings.ToJson();
+            if (outputFile.is_open()) {
+                std::string jsonString = settings.ToJson();
+                outputFile << jsonString;
+                outputFile.close();
             } else {
-                Logger::error("Failed to open file for saving settings: {}", settingspath);
+                Logger::error("Failed to open file. Maybe it doesn't exist?: " + settingspath);
             }
-        } catch (const std::exception& e) {
-            Logger::error("An error occurred while trying to save settings to {}: {}", settingspath, e.what());
+        } catch (const std::exception &ex) {
+            Logger::error(ex.what());
         }
     }
 
     static void LoadSettings() {
         std::ifstream inputFile(settingspath);
+        std::stringstream ss;
 
-        if (!inputFile) {
-            Logger::error("Failed to open settings file for loading: {}", settingspath);
+        if (inputFile.is_open()) {
+            ss << inputFile.rdbuf();
+            inputFile.close();
+        } else {
+            Logger::error("File could not be opened. Maybe it doesn't exist?: " + settingspath);
             return;
         }
 
-        std::stringstream ss;
-        ss << inputFile.rdbuf();
-        settings.FromJson(ss.str());
+        std::string settingstring = ss.str();
+        settings.FromJson(settingstring);
     }
 
     static void CheckSettingsFile() {
-        if (!std::filesystem::exists(settingspath)) {
-            std::filesystem::create_directories(std::filesystem::path(settingspath).parent_path());
 
-            std::ofstream file(settingspath, std::ios::app);
-            if (!file) {
-                Logger::error("Failed to create settings file: {}", settingspath);
+        if (!std::filesystem::exists(settingspath)) {
+
+            std::filesystem::path filePath(settingspath);
+            std::filesystem::create_directories(filePath.parent_path());
+
+            HANDLE fileHandle = CreateFileA(settingspath.c_str(), GENERIC_WRITE | GENERIC_READ,
+                                            FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                                            OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+
+            if (fileHandle == INVALID_HANDLE_VALUE) {
+                Logger::error("Failed to create file: " + settingspath);
+                return;
             }
+
+            CloseHandle(fileHandle);
         }
     }
 };

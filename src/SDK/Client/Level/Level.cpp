@@ -17,6 +17,7 @@ std::vector<Actor *> Level::getRuntimeActorList() {
             auto [owner] = view[entity];
             actors.push_back(owner.actor);
         }
+
         return actors;
     } else {
         static uintptr_t sig = GET_SIG_ADDRESS("Level::getRuntimeActorList");

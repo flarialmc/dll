@@ -1,6 +1,9 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "../../../Events/EventHandler.hpp"
+#include "SneakListener.hpp"
+
 
 class Sneak : public Module {
 
@@ -14,14 +17,12 @@ public:
     };
 
     void onEnable() override {
-        Listen(this, KeyEvent, &Sneak::onKey)
-        Listen(this, TickEvent, &Sneak::onTick)
+        EventHandler::registerListener(new SneakListener("Sneak", this));
         Module::onEnable();
     }
 
     void onDisable() override {
-        Deafen(this, KeyEvent, &Sneak::onKey)
-        Deafen(this, TickEvent, &Sneak::onTick)
+        EventHandler::unregisterListener("Sneak");
         Module::onDisable();
     }
 
@@ -36,50 +37,13 @@ public:
         }
     }
 
-    void settingsRender(float settingsOffset) override {
-        float x = Constraints::PercentageConstraint(0.019, "left");
-        float y = Constraints::PercentageConstraint(0.10, "top");
+    void settingsRender() override {
 
-        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
+        float toggleX = Constraints::PercentageConstraint(0.019, "left");
+        float toggleY = Constraints::PercentageConstraint(0.10, "top");
 
+        FlarialGUI::KeybindSelector(0, toggleX, toggleY, getKeybind());
 
-        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                                  Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(0.88f, "height"));
-
-        this->addHeader("Misc");
-        this->addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
-
-        FlarialGUI::UnsetScrollView();
-
-        this->resetPadding();
-
-    }
-
-    bool toggleSneaking = false;
-    bool toggled = false;
-
-    void onKey(KeyEvent &event) { // TODO: it lets sneak key up through (flickers sneak once)
-        if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
-            toggleSneaking = !toggleSneaking;
-        }
-    };
-
-    void onTick(TickEvent &event) {
-        if (SDK::clientInstance != nullptr) {
-            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                auto *handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
-                if (toggleSneaking) {
-                    handler->sneaking = true;
-                    toggled = true;
-                }
-                if (!toggleSneaking and toggled) {
-                    handler->sneaking = false;
-                    toggled = false;
-                }
-            }
-        }
     }
 };
 

@@ -9,5 +9,4 @@ struct ToolTipStruct {
     float hoverX{};
     float hoverY{};
     bool in = false;
-    std::string textName;
 };

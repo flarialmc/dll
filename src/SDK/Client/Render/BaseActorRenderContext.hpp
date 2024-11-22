@@ -1,8 +1,9 @@
 #pragma once
 
-#include "ItemRenderer.hpp"
 #include "../Core/ClientInstance.hpp"
 #include "../../../Utils/Memory/Memory.hpp"
+
+FK(ItemRenderer)
 
 class BaseActorRenderContext {
 private:

@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "../../../Events/EventHandler.hpp"
 #include "../../../Client.hpp"
+#include "UpsideDownListener.hpp"
 
 class UpsideDown : public Module {
 
@@ -15,19 +17,14 @@ public:
     };
 
     void onEnable() override {
-        Listen(this, FOVEvent, &UpsideDown::onGetFOV)
+        EventHandler::registerOrderedPriorityListener(new UpsideDownListener("UpsideDown", this), 3);
         Module::onEnable();
     }
 
     void onDisable() override {
-        Deafen(this, FOVEvent, &UpsideDown::onGetFOV)
+        EventHandler::unregisterListener("UpsideDown");
         Module::onDisable();
     }
 
-    void onGetFOV(FOVEvent &event) {
-        auto fov = event.getFOV();
-        fov = 360 - fov;
-        event.setFOV(fov);
-    }
 };
 

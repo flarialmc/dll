@@ -1,29 +1,34 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "dvdListener.hpp"
+#include "../../../Events/EventHandler.hpp"
 
 
 class DVD : public Module {
-private:
-    int color = 1;
-    float x = 0;
-    float y = 0;
-    float xv = 1;
-    float yv = 1;
+
 public:
 
     DVD() : Module("DVD Screen", "Overlays the DVD Screensaver", IDR_SKULL_PNG, "") {
+
         Module::setup();
+
     };
 
     void onEnable() override {
-        Listen(this, RenderEvent, &DVD::onRender)
+
+        EventHandler::registerListener(new dvdListener("dvdListener", this));
+
         Module::onEnable();
+
     }
 
     void onDisable() override {
-        Deafen(this, RenderEvent, &DVD::onRender)
+
+        EventHandler::unregisterListener("dvdListener");
+
         Module::onDisable();
+
     }
 
     void defaultConfig() override {
@@ -37,64 +42,55 @@ public:
 
     }
 
-    void settingsRender(float settingsOffset) override {
+    void settingsRender() override {
 
 
-        float x = Constraints::PercentageConstraint(0.019, "left");
-        float y = Constraints::PercentageConstraint(0.10, "top");
+        float toggleX = Constraints::PercentageConstraint(0.019, "left");
+        float toggleY = Constraints::PercentageConstraint(0.10, "top");
 
-        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
+        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
-
-        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+        FlarialGUI::ScrollBar(toggleX, toggleY, 140, Constraints::SpacingConstraint(7.5, textWidth), 2);
+        FlarialGUI::SetScrollView(toggleX, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(0.88f, "height"));
+                                  Constraints::RelativeConstraint(1.0f, "height"));
 
-        this->addHeader("Sizes");
-        this->addSlider("Scale", "", this->settings.getSettingByName<float>("scale")->value);
-        this->addSlider("X Velocity", "", this->settings.getSettingByName<float>("xveloc")->value);
-        this->addSlider("Y Velocity", "", this->settings.getSettingByName<float>("yveloc")->value);
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"X Velocity", textWidth * 3.0f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        Constraints::RelativeConstraint(0.12, "height", true),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        float percent = FlarialGUI::Slider(0, toggleX + FlarialGUI::SettingsTextWidth("X Velocity "),
+                                           toggleY, this->settings.getSettingByName<float>("xveloc")->value, 25.0f);
+
+        this->settings.getSettingByName<float>("xveloc")->value = percent;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Y Velocity", textWidth * 3.0f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        Constraints::RelativeConstraint(0.12, "height", true),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        percent = FlarialGUI::Slider(1, toggleX + FlarialGUI::SettingsTextWidth("Y Velocity "),
+                                     toggleY, this->settings.getSettingByName<float>("yveloc")->value, 25.0f);
+
+        this->settings.getSettingByName<float>("yveloc")->value = percent;
+
+        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+
+        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Scale", textWidth * 3.0f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                                        Constraints::RelativeConstraint(0.12, "height", true),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+
+        percent = FlarialGUI::Slider(2, toggleX + FlarialGUI::SettingsTextWidth("Scale "),
+                                     toggleY, this->settings.getSettingByName<float>("scale")->value, 5.0f);
+
+        this->settings.getSettingByName<float>("scale")->value = percent;
 
         FlarialGUI::UnsetScrollView();
 
-        this->resetPadding();
-
-    }
-
-    void onRender(RenderEvent &event) {
-        if (this->isEnabled() &&
-            ClientInstance::getTopScreenName() == "hud_screen") {
-            float height = 83 * this->settings.getSettingByName<float>("scale")->value;
-            float width = 187 * this->settings.getSettingByName<float>("scale")->value;
-
-            FlarialGUI::image(IDR_DVDLOGO_01_PNG - 1 + color,
-                              D2D1::RectF(x, y, x + width, y + height));
-
-            x += this->settings.getSettingByName<float>("xveloc")->value * xv;
-            y += this->settings.getSettingByName<float>("yveloc")->value * yv;
-
-            if (x >= MC::windowSize.x - width) {
-                xv = -1;
-                inc();
-            }
-            if (x < 0) {
-                xv = 1;
-                inc();
-            }
-            if (y >= MC::windowSize.y - height) {
-                yv = -1;
-                inc();
-            }
-            if (y < 0) {
-                yv = 1;
-                inc();
-            }
-        }
-    }
-
-    void inc() {
-        if (color == 8) color = 1;
-        else color++;
     }
 };

@@ -4,20 +4,14 @@
 void FlarialGUI::BlurRect(D2D1_ROUNDED_RECT rect) {
 
 
-    /*
-
     if (SwapchainHook::init && FlarialGUI::blurbrush != nullptr) {
 
-        if (factory == nullptr) D2D::context->GetFactory(&factory);
+        if (factory == nullptr) D2D::context->GetFactory(factory.put());
 
-        ID2D1RoundedRectangleGeometry *geo;
-        factory->CreateRoundedRectangleGeometry(rect, &geo);
+        winrt::com_ptr<ID2D1RoundedRectangleGeometry> geo;
+        factory->CreateRoundedRectangleGeometry(rect, geo.put());
 
-        D2D::context->FillGeometry(geo, FlarialGUI::blurbrush);
-
-        Memory::SafeRelease(factory);
-        //Memory::SafeRelease(geo); factory does not need to be destroyed
+        D2D::context->FillGeometry(geo.get(), FlarialGUI::blurbrush.get());
     }
-    */
 
 }

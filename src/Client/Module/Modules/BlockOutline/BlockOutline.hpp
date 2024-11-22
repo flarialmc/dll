@@ -4,9 +4,10 @@
 #include "../../../Client.hpp"
 #include "../../../../Utils/Utils.hpp"
 #include "../../../../Utils/Memory/CustomAllocator/Buffer.hpp" // why its not hpp here ???
+#include "BlockOutlineListener.hpp"
 
 class BlockOutline : public Module {
-// TODO: switch to renderOutlineSelection hook + 3D option
+
 private:
     static inline uintptr_t highlightColorRipRelAddr; // RIP REL 4BYTE FROM FUNC OFFSET ADDR
     static inline UINT32 highlightColorOrigRipRel;
@@ -19,7 +20,7 @@ private:
     static inline std::array<std::byte, 4> outlineColorNewRipRel;
 
 public:
-    BlockOutline() : Module("Block Outline", "Changes the block outline color", IDR_BLOCK_PNG, "") {
+    BlockOutline() : Module("BlockOutline", "Changes the block outline color", IDR_BLOCK_PNG, "") {
         Module::setup();
     };
 
@@ -69,16 +70,14 @@ public:
 
     void onEnable() override {
         onColorChange();
-
+        EventHandler::registerListener(new BlockOutlineListener("BlockOutline", this, selectionColor));
         patch();
-        Listen(this, TickEvent, &BlockOutline::onTick)
         Module::onEnable();
     }
 
     void onDisable() override {
-
+        EventHandler::unregisterListener("BlockOutline");
         unpatch();
-        Listen(this, TickEvent, &BlockOutline::onTick)
         Module::onDisable();
     }
 
@@ -90,36 +89,27 @@ public:
 
     }
 
-    void settingsRender(float settingsOffset) override {
+    void settingsRender() override {
 
+        float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
 
-        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
+        FlarialGUI::FlarialTextWithFont(x, y, L"Color", textWidth * 6.9f, textHeight,
+                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
+                                        DWRITE_FONT_WEIGHT_NORMAL);
+        FlarialGUI::ColorPicker(0, x + Constraints::SpacingConstraint(0.95, textWidth),
+                                y - Constraints::SpacingConstraint(0.017, textWidth),
+                                settings.getSettingByName<std::string>("color")->value,
+                                settings.getSettingByName<bool>("color_rgb")->value);
 
-
-        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                                  Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(0.88f, "height"));
-
-        this->addHeader("Colors");
-        this->addColorPicker("Outline Color", "", settings.getSettingByName<std::string>("color")->value,
+        FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("color")->value,
                                       settings.getSettingByName<float>("colorOpacity")->value,
                                       settings.getSettingByName<bool>("color_rgb")->value);
-
-        FlarialGUI::UnsetScrollView();
-
-        this->resetPadding();
-
-
         if (settings.getSettingByName<bool>("enabled"))
             onColorChange();
     }
 
-    void onTick(TickEvent &event) {
-        if (this->settings.getSettingByName<bool>("color_rgb")->value)
-            onColorChange();
-    }
 };

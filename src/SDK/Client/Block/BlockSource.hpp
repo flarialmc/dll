@@ -8,7 +8,7 @@
 
 class BlockSource {
 public:
-    Dimension* getDimension();
+    mcDimension* getDimension();
 
     Biome *getBiome(const Vec3<int> &);
 };

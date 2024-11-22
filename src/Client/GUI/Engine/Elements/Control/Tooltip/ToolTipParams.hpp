@@ -7,5 +7,4 @@ struct ToolTipParams {
     float width;
     float height;
     bool relative;
-    std::string textSize;
 };

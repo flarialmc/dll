@@ -1,6 +1,9 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "../../../Events/EventHandler.hpp"
+#include "RenderOptionsListener.hpp"
+
 
 class RenderOptions : public Module {
 
@@ -27,7 +30,7 @@ public:
             if(disableEntities != nullptr) disableEntities->setvalue(!settings.getSettingByName<bool>("entity")->value);
             if(disableBlockEntities != nullptr) disableBlockEntities->setvalue(!settings.getSettingByName<bool>("blockentity")->value);
             if(disableParticles != nullptr) disableParticles->setvalue(!settings.getSettingByName<bool>("particles")->value);
-        } else {
+        }else{
             if(showChunkMap != nullptr) showChunkMap->setvalue(false);
             if(disableSky != nullptr) disableSky->setvalue(false);
             if(disableWeather != nullptr) disableWeather->setvalue(false);
@@ -38,12 +41,15 @@ public:
     }
 
     void onEnable() override {
-        Listen(this, TickEvent, &RenderOptions::onTick)
         Module::onEnable();
+        if(!Options::isInitialized()) { // Wait for options to load and update them
+            EventHandler::registerListener(new RenderOptionsListener("RenderOptions", this));
+        } else {
+            updateSetings();
+        }
     }
 
     void onDisable() override {
-        Deafen(this, TickEvent, &RenderOptions::onTick)
         Module::onDisable();
         updateSetings();
     }
@@ -57,7 +63,7 @@ public:
         if (settings.getSettingByName<bool>("particles") == nullptr) settings.addSetting("particles", true);
     }
 
-    void settingsRender(float settingsOffset) override {
+    void settingsRender() override {
 
         updateSetings();
 
@@ -144,11 +150,5 @@ public:
                     "weather")->value;
 
         FlarialGUI::UnsetScrollView();
-    }
-
-    void onTick(TickEvent &event) {
-        if(Options::isInitialized()) {
-            updateSetings();
-        };
     }
 };

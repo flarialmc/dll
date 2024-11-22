@@ -4,6 +4,11 @@
 SignatureAndOffsetManager Mgr;
 
 void SignatureAndOffsetManager::addSignature(unsigned int hash, const char* sig) {
+    std::string sig_str(sig);
+    if(sig_str.empty()) {
+        Logger::debug("[ Sig/Offset Manager ] Empty signature!");
+        return;
+    }
     sigs[hash] = { sig, 0 };
 }
 

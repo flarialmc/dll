@@ -47,18 +47,9 @@ void ClientInstance::releaseMouse() {
 }
 
 std::string ClientInstance::getTopScreenName() {
+    std::lock_guard<std::mutex> guard(SDK::currentScreenMtx);
     return SDK::currentScreen;
 }
-
-std::string ClientInstance::getScreenName() {
-    std::string screen = "no_screen";
-
-    static auto sig = GET_SIG_ADDRESS("ClientInstance::getScreenName");
-    auto fn = reinterpret_cast<std::string& (__thiscall *)(ClientInstance*, std::string&)>(sig);
-    screen = fn(this, screen);
-    return screen;
-}
-
 
 LevelRender *ClientInstance::getLevelRender() {
     return hat::member_at<LevelRender *>(this, GET_OFFSET("ClientInstance::levelRenderer"));

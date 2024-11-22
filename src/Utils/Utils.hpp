@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <ranges>
 #include <string>
 #include <cstdlib>
 #include <cmath>
@@ -147,7 +146,7 @@ public:
         return Vec3<T>(this->x - x, this->y - y, this->z - z);
     };
 
-    auto sub(const Vec3<T>& vec) const -> Vec3<T> {
+    auto sub(const Vec3<T> &vec) -> Vec3<T> {
         return Vec3<T>(this->x - vec.x, this->y - vec.y, this->z - vec.z);
     };
 
@@ -255,19 +254,24 @@ struct AABB {
     }
 };
 
+
 class Utils {
 public:
     static std::string getRoamingPath();
-    static std::string getClientPath();
-    static std::string getConfigsPath();
-    static std::string getAssetsPath();
-    static std::string getLogsPath();
+
+    static bool hasEnding(std::string const &fullString, std::string const &ending);
 
     static std::string getKeyAsString(int key, bool isCapital = false, bool isKeybind = true);
 
     static int getStringAsKey(const std::string &str);
 
+    static std::string removeColorCodes(const std::string &input);
+
     static std::vector<int> getStringAsKeys(const std::string& str);
+
+    static std::string removeNonAlphanumeric(const std::string &input);
+
+    static std::string remomveNonNumeric(const std::string &input);
 
     static bool CursorInEllipse(float ellipseX, float ellipseY, float radiusX, float radiusY);
 
@@ -283,37 +287,9 @@ public:
         return hash;
     }
 
-    static std::vector<std::string> splitString(const std::string& str, char delimiter) {
-        return str
-          | std::views::split(delimiter)
-          | std::views::transform([](auto&& token) { return std::string{token.begin(), token.end()}; })
-          | std::ranges::to<std::vector>();
-    }
+    static std::wstring StrToWStr(const std::string &s);
 
-    static bool isMinecraftLoaded(HANDLE process);
-
-    static uint64_t getCurrentMs();
-
-    static std::string downloadFile(const std::string& url);
-};
-
-class String {
-public:
-    static std::string replaceAll(std::string& string, std::string_view c1, std::string_view c2);
-
-    static bool find(const std::string& string, const std::string& find);
-
-    static bool hasEnding(const std::string& string, const std::string& ending);
-
-    static std::wstring StrToWStr(std::string const& s);
-
-    static std::string WStrToStr(const std::wstring& ws);
-
-    static std::string removeColorCodes(const std::string& string);
-
-    static std::string removeNonAlphanumeric(const std::string& string);
-
-    static std::string removeNonNumeric(const std::string& string);
+    static std::string WStrToStr(const std::wstring &ws);
 };
 
 struct CaretMeasureData {

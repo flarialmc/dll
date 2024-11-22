@@ -1,12 +1,14 @@
 #include "GameModeAttack.hpp"
+#include "../../../Events/EventHandler.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void GameModeAttackHook::callback(Gamemode *gamemode, Actor *actor) {
     //  Combo counter and reach counter logic will be done here in the next commit.
     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() == gamemode->getPlayer()) {
-            auto event = nes::make_holder<AttackEvent>(actor);
-            eventMgr.trigger(event);
+
+            AttackEvent event(actor);
+            EventHandler::onAttack(event);
         }
 
     }
@@ -14,11 +16,11 @@ void GameModeAttackHook::callback(Gamemode *gamemode, Actor *actor) {
 }
 
 
-GameModeAttackHook::GameModeAttackHook() : Hook("GameModeAttack", GET_SIG_ADDRESS("GameMode::attack")) {}
+GameModeAttackHook::GameModeAttackHook() : Hook("GameModeAttack", GET_SIG("GameMode::attack")) {}
 
 
 void GameModeAttackHook::enableHook() {
-    auto base = address;
+    auto base = Memory::findSig(this->signature);
     int offset = *reinterpret_cast<int *>(base + 3);
     auto **vft = reinterpret_cast<uintptr_t **>(base + offset + 7);
 

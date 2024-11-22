@@ -2,28 +2,19 @@
 
 #include "SDK.hpp"
 #include "../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
-#include <cctype>
 
 ClientInstance *SDK::clientInstance = nullptr;
 ScreenView *SDK::screenView = nullptr;
 
+std::mutex SDK::currentScreenMtx;
 std::string SDK::currentScreen;
 
 bool SDK::hasInstanced = false;
 uint64_t SDK::serverPing = 0;
 
-bool SDK::containsIgnoreCase(const std::string& mainString, const std::string& searchString) {
-    auto it = std::search(
-        mainString.begin(), mainString.end(),
-        searchString.begin(), searchString.end(),
-        [](char ch1, char ch2) { return std::tolower(ch1) == std::tolower(ch2); }
-    );
-    return it != mainString.end();
-}
-bool SDK::isHovered(Vec4<float> box, Vec2<float> mouse) {
-    if (mouse.x >= box.x && mouse.y >= box.y && mouse.x <= box.z && mouse.y <= box.w) return true;
-    return false;
-}
+
+std::chrono::steady_clock::time_point SDK::lastSetCurrentScreenTime;
+
 std::shared_ptr<Packet> SDK::createPacket(int id) {
 
     static uintptr_t Address;
@@ -38,37 +29,43 @@ std::shared_ptr<Packet> SDK::createPacket(int id) {
 
 // TODO: use CI::GetScreenName
 void SDK::setCurrentScreen(const std::string& layer) {
+    std::lock_guard<std::mutex> guard(currentScreenMtx);
     SDK::currentScreen = layer;
 }
 
 std::string SDK::getCurrentScreen() {
+    std::lock_guard<std::mutex> guard(currentScreenMtx);
     return SDK::currentScreen;
 }
 
 int SDK::getServerPing() {
-    if (!SDK::hasInstanced || !SDK::clientInstance) return -1;
-
-    auto player = SDK::clientInstance->getLocalPlayer();
-    auto raknet = SDK::clientInstance->getRakNetConnector();
-
-    if (!player || !raknet) return -1;
-    return raknet->JoinedIp.empty() ? 0 : static_cast<int>(SDK::serverPing);
+    if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
+        if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+            if (SDK::clientInstance->getRakNetConnector() != nullptr) {
+                if (SDK::clientInstance->getRakNetConnector()->JoinedIp.empty()) {
+                    return 0;
+                } else {
+                    return (int)SDK::serverPing;
+                }
+            }
+        }
+    }
+    return -1;
 }
 
 std::string SDK::getServerIP() {
-    if (!SDK::hasInstanced || !SDK::clientInstance) {
-        return "none";
+    if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
+        if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+            std::string ip{};
+            if (SDK::clientInstance->getRakNetConnector() != nullptr) {
+                ip = SDK::clientInstance->getRakNetConnector()->JoinedIp;
+                if (!ip.empty()) {
+                    return ip;
+                } else{
+                    return "world";
+                }
+            }
+        }
     }
-
-    auto player = SDK::clientInstance->getLocalPlayer();
-    if (!player) {
-        return "none";
-    }
-
-    auto raknet = SDK::clientInstance->getRakNetConnector();
-    if (raknet && !raknet->JoinedIp.empty()) {
-        return raknet->JoinedIp;
-    }
-
-    return player ? "world" : "none";
+    return "none";
 }

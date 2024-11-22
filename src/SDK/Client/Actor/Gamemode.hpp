@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../../src/Utils/Memory/Memory.hpp"
+#include "libhat/Access.hpp"
+#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 FK(Player)
 

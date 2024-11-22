@@ -9,7 +9,6 @@
 #include <vector>
 #include <winrt/base.h>
 #include <chrono>
-#include <imgui.h>
 #include <unordered_map>
 #include "../../../Utils/Memory/LRUCache.hpp"
 #include "Elements/Structs/Notification.hpp"
@@ -21,70 +20,8 @@
 #include "Elements/Windows/WindowRect.hpp"
 #include "Elements/Control/Tooltip/ToolTipStruct.hpp"
 #include "Elements/Structs/HSV.hpp"
-#include <imgui.h>
 
-using namespace DirectX;
-
-struct BlurInputBuffer
-{
-    XMFLOAT2 resolution;
-    XMFLOAT2 offset;
-    XMFLOAT2 halfpixel;
-    XMFLOAT2 _dummy;
-};
-
-
-class Blur
-{
-public:
-
-    static inline ID3D11PixelShader *pUpsampleShader = nullptr;
-    static inline ID3D11PixelShader *pDownsampleShader = nullptr;
-    static inline ID3D11VertexShader *pVertexShader = nullptr;
-    static inline ID3D11InputLayout *pInputLayout = nullptr;
-
-    static inline ID3D11SamplerState *pSampler = nullptr;
-    static inline ID3D11Buffer *pVertexBuffer = nullptr;
-    static inline ID3D11Buffer *pConstantBuffer = nullptr;
-    static inline BlurInputBuffer constantBuffer;
-
-    // RAII
-    static void InitializePipeline();
-    //static void Cleanup();
-
-    static void RenderToRTV(ID3D11RenderTargetView *, ID3D11ShaderResourceView *, XMFLOAT2);
-
-    static inline std::vector<ID3D11Texture2D *> framebuffers;
-
-    static inline bool hasDoneFrames = false;
-
-    static void RenderBlur(ID3D11RenderTargetView *, int, float);
-};
-
-class BlurDX12
-{
-public:
-
-    static inline ID3D11PixelShader *pUpsampleShader = nullptr;
-    static inline ID3D11PixelShader *pDownsampleShader = nullptr;
-    static inline ID3D11VertexShader *pVertexShader = nullptr;
-    static inline ID3D11InputLayout *pInputLayout = nullptr;
-
-    static inline ID3D11SamplerState *pSampler = nullptr;
-    static inline ID3D11Buffer *pVertexBuffer = nullptr;
-    static inline ID3D11Buffer *pConstantBuffer = nullptr;
-    static inline BlurInputBuffer constantBuffer;
-
-    // RAII
-    static void InitializePipeline();
-    //static void Cleanup();
-
-    static void RenderBlur(ID3D12GraphicsCommandList* commandList);
-};
-
-
-
-class Dimensions {
+class Dimension {
 public:
     float x = 0;
     float y = 0;
@@ -93,7 +30,7 @@ public:
 };
 
 namespace FlarialGUI {
-    std::stack<Dimensions> inline dimensionStack;
+    std::stack<Dimension> inline dimensionStack;
     std::vector<float> inline darkenAmounts(10000);
     std::vector<float> inline glowAlphas(10000);
     std::vector<float> inline opacityAmounts(100);
@@ -121,29 +58,12 @@ namespace FlarialGUI {
     float inline barscrollpos = 0;
     float inline barscrollposmodifier = 10.0f;
 
-    std::string inline LoadGUIFontLater = "";
-    bool inline DoLoadGUIFontLater = false;
-    DWRITE_FONT_WEIGHT inline LoadGUIFontLaterWeight = DWRITE_FONT_WEIGHT_NORMAL;
-
-
-    std::string inline LoadModuleFontLater = "";
-    bool inline DoLoadModuleFontLater = false;
-    DWRITE_FONT_WEIGHT inline LoadModuleFontLaterWeight = DWRITE_FONT_WEIGHT_NORMAL;
-
-    std::string GetWeightedName(std::string name, DWRITE_FONT_WEIGHT weight);
-    DWRITE_FONT_WEIGHT GetFontWeightFromString(const std::string& weightStr);
-
     inline WindowRect WindowRects[1000];
     inline SliderRect SliderRects[2500];
     inline TextBoxStruct TextBoxes[1000];
     inline ColorPicker ColorPickers[2000];
     inline DropdownStruct DropDownMenus[2000];
     inline KeybindSelector KeybindSelectors[2000];
-
-    inline int maxRect = 0;
-
-    inline std::map<std::string, ImFont*> FontMap = {};
-    inline std::map<std::string, bool> FontsNotFound = {};
 
     inline std::string currentKeybind;
 
@@ -152,30 +72,21 @@ namespace FlarialGUI {
     bool inline isInWindowRect = false;
     bool inline inMenu = false;
     bool inline resizing = false;
-    bool inline needsBackBuffer = false;
-    bool inline hasLoadedAll = false;
 
-    inline ID2D1Effect *blur = nullptr;
-    inline ID2D1Effect *shadow_blur = nullptr;
-    inline ID2D1Bitmap *screen_bitmap_cache = nullptr;
-    inline ID2D1Image *blur_bitmap_cache = nullptr;
+    inline winrt::com_ptr<ID2D1Effect> blur = nullptr;
+    inline winrt::com_ptr<ID2D1Effect> shadow_blur = nullptr;
+    inline winrt::com_ptr<ID2D1Bitmap> screen_bitmap_cache = nullptr;
+    inline winrt::com_ptr<ID2D1Image> blur_bitmap_cache = nullptr;
 
     extern std::unordered_map<std::string, ToolTipStruct> tooltips;
-    extern std::unordered_map<std::string, float> TextSizes;
-    extern std::unordered_map<std::string, Vec2<float>> TextSizesXY;
-
     extern LRUCache<UINT32, winrt::com_ptr<ID2D1SolidColorBrush>> brushCache;
     extern LRUCache<uint64_t, winrt::com_ptr<IDWriteTextLayout>> textLayoutCache;
     extern LRUCache<UINT32, winrt::com_ptr<IDWriteTextFormat>> textFormatCache;
-    extern LRUCache<std::wstring, std::string> fromWideCache;
-    extern LRUCache<std::string, std::wstring> toWideCache;
     //extern std::unordered_map<std::string, winrt::com_ptr<ID2D1GradientStopCollection>> gradientStopCache;
     extern LRUCache<uint64_t, winrt::com_ptr<ID2D1LinearGradientBrush>> gradientBrushCache;
 
     void PushSize(float x, float y, float width, float height);
-    void LoadFonts(std::map<std::string, ImFont*>& FontMap);
-    std::wstring GetFontFilePath(const std::wstring& fontName, DWRITE_FONT_WEIGHT weight);
-    std::string WideToNarrow(const std::wstring& wideStr);
+
     void PopSize();
 
     void PopAllStack();
@@ -193,15 +104,8 @@ namespace FlarialGUI {
                                                     float maxWidth = 500, float maxHeight = 500,
                                                     bool moduleFont = false);
 
-    void ImRotateStart();
-    ImVec2 ImRotationCenter();
-    void ImRotateEnd(float rad, ImVec2 center = ImRotationCenter());
-
-    void RoundedRect(float x, float y, D2D_COLOR_F color, float width = 160.0f, float height = 75.0,
-                     float radiusX = 10.0f, float radiusY = 10.0f, ImDrawFlags flags = ImDrawFlags_RoundCornersAll);
-
-    void RoundedRect(bool imgui, float x, float y, ImColor color, float width = 160.0f, float height = 75.0,
-        float radiusX = 10.0f, float radiusY = 10.0f);
+    void RoundedRect(float x, float y, D2D_COLOR_F color, float width = 160.0f, float height = 75,
+                     float radiusX = 10.0f, float radiusY = 10.0f);
 
     bool RoundedButton(int index, float x, float y, D2D_COLOR_F color, D2D_COLOR_F textColor,
                        const wchar_t *text, float width = 160.0f, float height = 100.0f,
@@ -215,7 +119,8 @@ namespace FlarialGUI {
 
     void LoadImageFromFile(const wchar_t *filename, ID2D1Bitmap **bitmap);
 
-    void FlarialText(float x, float y, const wchar_t *text, float width, float height,DWRITE_TEXT_ALIGNMENT alignment);
+    void FlarialText(float x, float y, const wchar_t *text, float width, float height,
+                     DWRITE_TEXT_ALIGNMENT alignment);
 
     void SetScrollView(float x, float y, float width, float height);
 
@@ -258,7 +163,9 @@ namespace FlarialGUI {
 
     bool Toggle(int index, float x, float y, bool isEnabled, bool rgb);
 
-    float Slider(int index, float x, float y, float& value, float maxValue = 100.0f, float minValue = 0.0f, bool zerosafe = true);
+    float Slider(int index, float x, float y, float startingPoint = 50.0f, float maxValue = 100.0f,
+                 float minValue = 0.0f,
+                 bool zerosafe = true);
 
     void Circle(float x, float y, const D2D1_COLOR_F &color, float radius);
 
@@ -276,7 +183,8 @@ namespace FlarialGUI {
 
     std::string ColorFToHex(const D2D1_COLOR_F &color);
 
-    void RoundedHollowRect(float x, float y, float borderWidth, D2D_COLOR_F color, float width,
+    void
+    RoundedHollowRect(float x, float y, float borderWidth, D2D_COLOR_F color, float width,
                       float height, float radiusX,
                       float radiusY);
 
@@ -287,7 +195,7 @@ namespace FlarialGUI {
 
     D2D1::ColorF HSVtoColorF(float H, float s, float v);
 
-    void ColorPicker(const int index, float x, float y, std::string &hex, bool &rgb);
+    void ColorPicker(const int index, float x, const float y, std::string &hex, bool &rgb);
 
     void ColorPickerWindow(int index, std::string &hex, float &opacity, bool &rgb);
 
@@ -295,17 +203,12 @@ namespace FlarialGUI {
 
     std::wstring to_wide(const std::string &str);
 
-    void PushImClipRect(D2D_RECT_F rect);
-    void PushImClipRect(ImVec2 pos, ImVec2 size);
-
-    void PopImClipRect();
-
-    std::string
+    void
     FlarialTextWithFont(float x, float y, const wchar_t *text, float width, float height,
                         DWRITE_TEXT_ALIGNMENT alignment, float fontSize,
-                        DWRITE_FONT_WEIGHT weight, bool moduleFont = false, bool troll = false);
+                        DWRITE_FONT_WEIGHT weight, bool moduleFont = false);
 
-    std::string
+    void
     FlarialTextWithFont(float x, float y, const wchar_t *text, float width, float height,
                         DWRITE_TEXT_ALIGNMENT alignment, float fontSize,
                         DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont = false);
@@ -325,17 +228,18 @@ namespace FlarialGUI {
 
     void NotifyHeartbeat();
 
-    std::string TextBoxVisual(int index, std::string& text, int limit, float x, float y, const std::string& real = "");
+    std::string
+    TextBoxVisual(int index, std::string &text, int limit, float x, float y, const std::string &real = "Text Format");
 
     winrt::com_ptr<ID2D1SolidColorBrush> getBrush(D2D1_COLOR_F color);
 
-    extern IDWriteFactory *writeFactory;
+    extern winrt::com_ptr<IDWriteFactory> writeFactory;
 
-    extern ID2D1ImageBrush *blurbrush;
-    extern ID2D1Factory *factory;
-    extern std::unordered_map<std::string, ID2D1Image *> cachedBitmaps;
+    extern winrt::com_ptr<ID2D1ImageBrush> blurbrush;
+    extern winrt::com_ptr<ID2D1Factory> factory;
+    extern std::unordered_map<std::string, winrt::com_ptr<ID2D1Image>> cachedBitmaps;
 
-    void ShadowRect(Vec2<float> pos, Vec2<float> size, D2D_COLOR_F color, float rounding, int shadowSize);
+    void ShadowRect(D2D1_ROUNDED_RECT rect, D2D1_COLOR_F color = D2D1::ColorF(0, 0, 0, 0.75f));
 
     void ApplySusGaussianBlur(float blurIntensity);
 
@@ -370,34 +274,20 @@ namespace FlarialGUI {
                                      const D2D1_COLOR_F color, const std::string &imagePath,
                                      const float imageWidth, const float imageHeight);
 
-    void LoadAllImages();
-
     std::string Dropdown(int index, float x, float y, const std::vector<std::string> &options, std::string &value,
                          const std::string &label);
 
-    void image(int resourceId, D2D1_RECT_F rect, LPCTSTR type = "PNG", bool shouldadd = true);
-
-    void LoadAllImageToCache();
+    void image(int resourceId, D2D1_RECT_F rect, LPCTSTR type = "PNG");
 
     void LoadImageFromResource(int resourceId, ID2D1Bitmap **bitmap, LPCTSTR type = "PNG");
 
-    bool LoadImageFromResource(int resourceId, ID3D11ShaderResourceView** out_srv, LPCTSTR type);
-
-    bool LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HANDLE srv_cpu_handle, ID3D12Resource** out_tex_resource, LPCTSTR type);
-
-    void ExtractImageResource(int resourceId, std::string fileName, LPCTSTR type);
-
     void LoadFont(int resourceId);
-
-    bool LoadFontFromFontFamily(std::string name, std::string weightedName, DWRITE_FONT_WEIGHT weight);
 
     void RoundedRectWithImageAndText(int index, float x, float y, const float width, const float height,
                                      const D2D1_COLOR_F color, int iconId, const float imageWidth,
                                      const float imageHeight);
 
-    ImColor D2DColorToImColor(D2D1_COLOR_F color);
+    void PrepareBlur(float intensity);
 
-    void OverrideAlphaValues(float percent);
-
-    void ResetOverrideAlphaValues();
+    void PrepareBlur(ID2D1Effect *effect, float intensity);
 }

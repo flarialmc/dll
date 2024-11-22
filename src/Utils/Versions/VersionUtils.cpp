@@ -47,33 +47,37 @@ void VersionUtils::init() {
     std::pair<std::string, std::pair<std::function<void()>, std::function<void()>>> p2030 = {"1.20.3", {SigInit::init2030, OffsetInit::init2030}};
     versions.push_back(p2030);
 
-    std::ranges::reverse(versions);
+    std::reverse(versions.begin(), versions.end());
 }
 
 bool VersionUtils::isSupported(const std::string& version) {
-    return std::ranges::any_of(versions, [&version](const auto& p) {
-        return p.first == version;
-    });
+    return std::find_if(versions.begin(), versions.end(),
+                        [version](const std::pair<std::string, std::pair<std::function<void()>, std::function<void()>>>& p) {
+                            return p.first == version;
+                        }) != versions.end();
 }
 
 void VersionUtils::addData() {
-    std::thread t1([&](){
-        for (const auto&[fst, snd] : versions) {
-            snd.first(); // Load signatures
-            if (fst == Client::version) {
-                break;
+    // load all offsets and sigs for each version
+    auto sigs = [&](){
+        for (const auto &item: versions) {
+            item.second.first();
+            if(item.first == Client::version) {
+                return;
             }
         }
-    });
+    };
+    auto offsets = [&](){
+        for (const auto &item: versions) {
+            item.second.second();
+            if(item.first == Client::version) {
+                return;
+            }
+        }
+    };
 
-    std::thread t2([&](){
-        for (const auto&[fst, snd] : versions) {
-            snd.second(); // Load offsets
-            if (fst == Client::version) {
-                break;
-            }
-        }
-    });
+    std::thread t1(sigs);
+    std::thread t2(offsets);
 
     t1.join();
     t2.join();

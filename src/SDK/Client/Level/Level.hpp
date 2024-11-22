@@ -48,7 +48,5 @@ public:
         return hat::member_at<HitResult>(this, offset);
     }
 
-    std::string getWorldFolderName() { return hat::member_at<std::string>(this, GET_OFFSET("Level::worldFolderName")); }
-
     std::vector<Actor *> getRuntimeActorList();
 };

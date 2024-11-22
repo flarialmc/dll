@@ -11,7 +11,6 @@
 #include "../Render/GLMatrix.hpp"
 #include "../Level/LevelRender/LevelRender.hpp"
 #include "../Network/Raknet/RaknetConnector.hpp"
-#include "../Render/Camera.hpp"
 
 class ClientInstance {
 public:
@@ -27,11 +26,6 @@ public:
         return hat::member_at<GLMatrix>(this, GET_OFFSET("ClientInstance::viewMatrix"));
     };
 
-    mce::Camera& getCamera() {
-        static int off = GET_OFFSET("ClientInstance::camera");
-        return hat::member_at<mce::Camera>(this, off);
-    }
-
     LocalPlayer *getLocalPlayer();
 
     BlockSource *getBlockSource();
@@ -41,8 +35,6 @@ public:
     void releaseMouse();
 
     static std::string getTopScreenName();
-
-    std::string getScreenName();
 
     LevelRender *getLevelRender();
 
@@ -64,6 +56,12 @@ public:
 
     RaknetConnector *getRakNetConnector() {
         if (getPacketSender() == nullptr)
+            return nullptr;
+
+        if(getPacketSender()->networkSystem == nullptr)
+            return nullptr;
+
+        if(getPacketSender()->networkSystem->remoteConnectorComposite == nullptr)
             return nullptr;
 
         return getPacketSender()->networkSystem->remoteConnectorComposite->rakNetConnector;

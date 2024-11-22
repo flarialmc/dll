@@ -1,19 +1,19 @@
 #pragma once
 
 #include "../../../../Hook/Hooks/Input/MouseHook.hpp"
+#include "../../../../Events/Listener.hpp"
 #include "../../../../Client.hpp"
 
 class CentreCursorListener : public Listener {
+
 public:
-    void onTick(TickEvent &event) {
+
+    void onTick(TickEvent &event) override {
         Client::centerCursor();
     }
 
-    CentreCursorListener() {
-        Listen(this, TickEvent, &CentreCursorListener::onTick);
-    }
-
-    ~CentreCursorListener() {
-        Deafen(this, TickEvent, &CentreCursorListener::onTick);
+public:
+    explicit CentreCursorListener(const char string[5]) {
+        this->name = string;
     }
 };

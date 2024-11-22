@@ -9,7 +9,7 @@
 
 template<typename Component>
 Component *Actor::tryGet(uintptr_t addr) {
-    if(WinrtUtils::checkAboveOrEqual(21, 00) || addr == 0) {
+    if(WinrtUtils::checkAboveOrEqual(21, 40) || addr == 0) {
         auto& ctx = GetEntityContextV1_20_50();
         if(!ctx.isValid()) return nullptr;
         Component* component = ctx.tryGetComponent<Component>();
@@ -39,7 +39,7 @@ Component *Actor::tryGetOld(uintptr_t addr) {
 
 template<typename Component>
 bool Actor::hasComponent(uintptr_t addr) {
-    if(WinrtUtils::checkAboveOrEqual(21, 00) || addr == 0) {
+    if(WinrtUtils::checkAboveOrEqual(21, 40) || addr == 0) {
         auto ctx = this->GetEntityContextV1_20_50();
         return ctx.hasComponent<Component>();
     } else {
@@ -82,7 +82,7 @@ ActorDataFlagComponent* Actor::getActorDataFlagComponent() {
     if(!WinrtUtils::checkAboveOrEqual(20, 80)) return nullptr;
     static uintptr_t sig;
 
-    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
         if (sig == NULL) {
             sig = Memory::findSig(
                     std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorDataFlagComponent"));
@@ -113,7 +113,7 @@ SimpleContainer* Actor::getArmorContainer() {
 
     static uintptr_t sig;
 
-    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
         if (sig == NULL) {
             sig = Memory::findSig(
                     std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorEquipmentComponent"));
@@ -128,7 +128,7 @@ SimpleContainer* Actor::getOffhandContainer() {
 
     static uintptr_t sig;
 
-    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
         if (sig == NULL) {
             sig = Memory::findSig(
                     std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getActorEquipmentComponent"));
@@ -156,7 +156,7 @@ ItemStack *Actor::getArmor(int slot) {
 MoveInputComponent *Actor::getMoveInputHandler() { //??$try_get@UMoveInputComponent
     static uintptr_t sig;
 
-    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
         if (sig == NULL) {
             sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMoveInputHandler"));
         }
@@ -168,7 +168,7 @@ MoveInputComponent *Actor::getMoveInputHandler() { //??$try_get@UMoveInputCompon
 ActorGameTypeComponent *Actor::getGameModeType() {
     static uintptr_t sig;
 
-    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
         if (sig == NULL) {
             sig = Memory::findSig(
                     std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getActorGameTypeComponent"));
@@ -181,7 +181,7 @@ ActorGameTypeComponent *Actor::getGameModeType() {
 AABBShapeComponent *Actor::getAABBShapeComponent() {
     static uintptr_t sig;
 
-    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
         if (sig == NULL) {
             sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getAABBShapeComponent"));
         }
@@ -193,7 +193,7 @@ AABBShapeComponent *Actor::getAABBShapeComponent() {
 StateVectorComponent *Actor::getStateVectorComponent() {
     static uintptr_t sig;
 
-    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
         if (sig == NULL) {
             sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getStateVectorComponent"));
         }
@@ -219,7 +219,7 @@ ItemStack *Actor::getOffhandSlot() {
 
 RuntimeIDComponent *Actor::getRuntimeIDComponent() {
     static uintptr_t sig;
-    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
         if (sig == NULL) {
             if (WinrtUtils::checkAboveOrEqual(20, 50) && !WinrtUtils::checkAboveOrEqual(20, 60)) {
                 sig = Memory::findSig(
@@ -275,7 +275,7 @@ bool Actor::isValid() {
 RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URenderPositionComponent
     static uintptr_t sig;
 
-    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
         if (sig == NULL) {
             sig = Memory::findSig(
                     std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRenderPositionComponent"));
@@ -288,7 +288,7 @@ RenderPositionComponent *Actor::getRenderPositionComponent() { //??$try_get@URen
 std::vector<UnifiedMobEffectData> Actor::getMobEffects() {
     static uintptr_t sig;
 
-    if(!WinrtUtils::checkAboveOrEqual(21, 00)) {
+    if(!WinrtUtils::checkAboveOrEqual(21, 40)) {
         if (sig == NULL) {
             sig = Memory::findSig(
                     std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMobEffectsComponent"));
@@ -308,6 +308,28 @@ bool Actor::isValidAABB() {
     auto size = AABBShapeComponent->size;
     if(size.x < 0.1f || size.y < 0.1f) return false;
     return true;
+}
+
+uint64_t Actor::getRuntimeID() {
+    static uintptr_t sig;
+
+    if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+        auto* component = this->tryGet<RuntimeIDComponent>();
+        return component ? component->runtimeID : 0;
+    } else {
+        if (sig == NULL) {
+            if (WinrtUtils::checkAboveOrEqual(20, 50) && !WinrtUtils::checkAboveOrEqual(20, 60)) {
+                sig = Memory::findSig(
+                        std::string(GET_SIG("tryGetPrefix2")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
+            } else {
+                sig = Memory::findSig(
+                        std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getRuntimeIDComponent"));
+            }
+        }
+
+        auto* component = tryGet<RuntimeIDComponent>(sig);
+        return component ? component->runtimeID : 0;
+    }
 }
 
 bool Actor::isOnGround() {

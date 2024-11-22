@@ -17,7 +17,9 @@ void DrawUtils::addLine(Vec2<float> start, Vec2<float> end, float lineWidth, D2D
         return;
     }
 
-    ImGui::GetBackgroundDrawList()->AddLine(ImVec2(start.x, start.y), ImVec2(end.x, end.y), FlarialGUI::D2DColorToImColor(color), lineWidth);
+    D2D::context->DrawLine(D2D1::Point2F(start.x, start.y), D2D1::Point2F(end.x, end.y), FlarialGUI::getBrush(color).get(),
+                           lineWidth);
+
 }
 
 void DrawUtils::addBox(Vec3<float> lower, Vec3<float> upper, float lineWidth, int mode, D2D_COLOR_F color) {

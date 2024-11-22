@@ -1,29 +1,24 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "../../../Events/EventHandler.hpp"
 
 
 class TimeChanger : public Module {
+
 public:
+
     TimeChanger() : Module("Time Changer", "Changes the ingame time.", IDR_TIME_PNG, "") {
+
         Module::setup();
+
     };
-
-    void onEnable() override {
-        Listen(this, TimeEvent, &TimeChanger::onTimeEvent)
-        Module::onEnable();
-    }
-
-    void onDisable() override {
-        Deafen(this, TimeEvent, &TimeChanger::onTimeEvent)
-        Module::onDisable();
-    }
 
     void defaultConfig() override {
         if (settings.getSettingByName<float>("time") == nullptr) settings.addSetting("time", 0.5f);
     }
 
-    void settingsRender(float settingsOffset) override {
+    void settingsRender() override {
 
 
         float toggleX = Constraints::PercentageConstraint(0.019, "left");
@@ -48,9 +43,7 @@ public:
         this->settings.getSettingByName<float>("time")->value = percent;
 
         FlarialGUI::UnsetScrollView();
-    }
 
-    void onTimeEvent(TimeEvent& event) {
-        event.setTime(this->settings.getSettingByName<float>("time")->value);
+
     }
 };

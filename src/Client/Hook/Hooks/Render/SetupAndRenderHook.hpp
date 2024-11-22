@@ -4,15 +4,16 @@
 #include "../../../../SDK/Client/Render/MinecraftUIRenderContext.hpp"
 #include "../../../../SDK/Client/Render/ScreenView/ScreenView.hpp"
 #include "../../../../SDK/Client/Render/BaseActorRenderContext.hpp"
-#include "../../../../SDK/Client/Render/NineSliceData.hpp"
 #include "../../../../SDK/SDK.hpp"
 #include "../Hook.hpp"
 #include "../../../../SDK/Client/Render/ItemRenderer.hpp"
+#include "../../../Module/Modules/CompactChat/CompactChatListener.hpp"
 #include "../Visual/getGammaHook.hpp"
 #include "../../../Module/Manager.hpp"
 #include "../../../../Utils/Render/DrawUtils.hpp"
+#include "../../../Module/Modules/Hitbox/HitboxListener.hpp"
 #include <format>
-
+#include "../../../../SDK/Client/Render/NineSliceData.hpp"
 #include "../../../../Utils/Render/MaterialUtils.hpp"
 
 __int64* oDrawImage = nullptr;
@@ -22,82 +23,78 @@ class SetUpAndRenderHook : public Hook
 {
 private:
 
-	static void drawTextCallback(MinecraftUIRenderContext* ctx, void* font, float* pos, std::string* text, float* color, float alpha, unsigned int textAlignment, void* textMeasureData, void* caretMeasureData) {
+    static void drawTextCallback(MinecraftUIRenderContext* ctx, void* font, float* pos, std::string* text, float* color, float alpha, unsigned int textAlignment, void* textMeasureData, void* caretMeasureData) {
 
-        auto event = nes::make_holder<DrawTextEvent>(text);
-        eventMgr.trigger(event);
+        DrawTextEvent event(text);
+        EventHandler::onDrawText(event);
 
         funcOriginalText(ctx, font, pos, text, color, alpha, textAlignment, textMeasureData, caretMeasureData);
-	}
+    }
 
+    static void drawImageDetour(
+            MinecraftUIRenderContext* _this,
+            TexturePtr* texturePtr,
+            Vec2<float>& imagePos,
+            Vec2<float>& imageDimension,
+            Vec2<float>& uvPos,
+            Vec2<float>& uvSize
+    )
+    {
+        DrawImageEvent event(texturePtr, imagePos);
+        EventHandler::onDrawImage(event);
 
-	static void drawImageDetour(
-		MinecraftUIRenderContext* _this,
-		TexturePtr* texturePtr,
-		Vec2<float>& imagePos,
-		Vec2<float>& imageDimension,
-		Vec2<float>& uvPos,
-		Vec2<float>& uvSize
-	)
-	{
-        auto event = nes::make_holder<DrawImageEvent>(texturePtr, imagePos, imageDimension);
-        eventMgr.trigger(event);
-        auto newPos = event->getImagePos();
-		
-		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(
+        Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(
                 oDrawImage,
                 _this,
                 texturePtr,
-                newPos,
+                event.getImagePos(),
                 imageDimension,
                 uvPos,
                 uvSize
-		);
-	}
-	static void drawImageDetour2120(
-		MinecraftUIRenderContext* _this,
-		TexturePtr* texturePtr,
-		Vec2<float>& imagePos,
-		Vec2<float>& imageDimension,
-		Vec2<float>& uvPos,
-		Vec2<float>& uvSize,
-		bool unk
-	)
-	{
-        auto event = nes::make_holder<DrawImageEvent>(texturePtr, imagePos, imageDimension);
-        eventMgr.trigger(event);
-        auto newPos = event->getImagePos();
+        );
+    }
 
-		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(
-				oDrawImage,
-				_this,
-				texturePtr,
-                newPos,
-				imageDimension,
-				uvPos,
-				uvSize,
-				unk
-		);
-	}
+    static void drawImageDetour2120(
+            MinecraftUIRenderContext* _this,
+            TexturePtr* texturePtr,
+            Vec2<float>& imagePos,
+            Vec2<float>& imageDimension,
+            Vec2<float>& uvPos,
+            Vec2<float>& uvSize,
+            bool unk
+    )
+    {
+        DrawImageEvent event(texturePtr, imagePos);
+        EventHandler::onDrawImage(event);
 
+        Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(
+                oDrawImage,
+                _this,
+                texturePtr,
+                event.getImagePos(),
+                imageDimension,
+                uvPos,
+                uvSize,
+                unk
+        );
+    }
 
-	static void drawNineSliceDetour(
-		MinecraftUIRenderContext* _this, 
-		TexturePtr* texturePtr, 
-		NinesliceInfo* nineSliceInfo
-	) 
-	{
-		float* x = reinterpret_cast<float*>((__int64)nineSliceInfo);
-		float* y = reinterpret_cast<float*>((__int64)nineSliceInfo + 0x4);
-		float* z = reinterpret_cast<float*>((__int64)nineSliceInfo + 0x60); // funny cuh offset
-		float* w = reinterpret_cast<float*>((__int64)nineSliceInfo + 0x64);
-		Vec4<float> position(*x, *y, *z, *w);
-		auto event = nes::make_holder<DrawNineSliceEvent>(texturePtr, position);
-		eventMgr.trigger(event);
+    static void drawNineSliceDetour(
+        MinecraftUIRenderContext* _this,
+        TexturePtr* texturePtr,
+        NinesliceInfo* nineSliceInfo
+    )
+    {
+        float* x = reinterpret_cast<float*>((__int64)nineSliceInfo);
+        float* y = reinterpret_cast<float*>((__int64)nineSliceInfo + 0x4);
+        float* z = reinterpret_cast<float*>((__int64)nineSliceInfo + 0x60); // funny cuh offset
+        float* w = reinterpret_cast<float*>((__int64)nineSliceInfo + 0x64);
+        Vec4<float> position(*x, *y, *z, *w);
+        DrawNineSliceEvent event(texturePtr, position);
+        EventHandler::onDrawNineSlice(event);
 
-		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, NinesliceInfo*>(oDrawNineSlice, _this, texturePtr, nineSliceInfo);
-	}
-
+        Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, NinesliceInfo*>(oDrawNineSlice, _this, texturePtr, nineSliceInfo);
+    }
 
     static void hookDrawTextAndDrawImage(MinecraftUIRenderContext* muirc) {
         auto vTable = *(uintptr_t **) muirc;
@@ -107,23 +104,23 @@ private:
                              "drawText");
         }
 
-		if (oDrawImage == nullptr) {
-			if (WinrtUtils::checkAboveOrEqual(21, 20))
-				Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour2120, (void **) &oDrawImage, "DrawImage");
-			else
-				Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour, (void **) &oDrawImage, "DrawImage");
-		}
+        if (oDrawImage == nullptr) {
+            if (WinrtUtils::checkAboveOrEqual(21, 20))
+                Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour2120, (void **) &oDrawImage, "DrawImage");
+            else
+                Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour, (void **) &oDrawImage, "DrawImage");
+        }
 
-		if (oDrawNineSlice == nullptr)
-		{
-			Memory::hookFunc((void*)vTable[8], (void*)drawNineSliceDetour, (void**)&oDrawNineSlice, "DrawNineSlice");
-		}
+        if (oDrawNineSlice == nullptr)
+        {
+            Memory::hookFunc((void*)vTable[8], (void*)drawNineSliceDetour, (void**)&oDrawNineSlice, "DrawNineSlice");
+        }
     }
 
-	static void setUpAndRenderCallback(ScreenView* pScreenView, MinecraftUIRenderContext* muirc) {
-		MaterialUtils::update();
+    static void setUpAndRenderCallback(ScreenView* pScreenView, MinecraftUIRenderContext* muirc) {
+        MaterialUtils::update();
 
-		SDK::screenView = pScreenView;
+        SDK::screenView = pScreenView;
         SDK::clientInstance = muirc->getClientInstance();
         SDK::hasInstanced = true;
 
@@ -133,9 +130,9 @@ private:
         std::string layer = pScreenView->VisualTree->root->getLayerName();
 
         if (layer != "debug_screen" && layer != "toast_screen"){ // start_screen, play_screen, world_loading_progress_screen, pause_screen, hud_screen
-            auto event = nes::make_holder<SetTopScreenNameEvent>(layer);
-            eventMgr.trigger(event);
-            SDK::setCurrentScreen(event->getLayer()); // updates every 16 ms
+            SetTopScreenNameEvent event(layer);
+            EventHandler::onSetTopScreenName(event);
+            SDK::setCurrentScreen(event.getLayer()); // updates every 16 ms
         }
 
         Vec3<float> origin{ 0, 0, 0 };
@@ -154,24 +151,24 @@ private:
         SwapchainHook::FrameTransforms.push(transform);
         SwapchainHook::frameTransformsMtx.unlock();
 
-		funcOriginal(pScreenView, muirc);
+        funcOriginal(pScreenView, muirc);
 
-		if (layer != "debug_screen" && layer != "toast_screen") {
-            auto event = nes::make_holder<SetupAndRenderEvent>(muirc);
-            eventMgr.trigger(event);
-		}
-	}
+        if (layer != "debug_screen" && layer != "toast_screen") {
+            SetupAndRenderEvent event(muirc);
+            EventHandler::onSetupAndRender(event);
+        }
+    }
 
 
 public:
-	typedef void(__thiscall* setUpAndRenderOriginal)(void*, MinecraftUIRenderContext*);
-	static inline  setUpAndRenderOriginal funcOriginal = nullptr;
+    typedef void(__thiscall* setUpAndRenderOriginal)(void*, MinecraftUIRenderContext*);
+    static inline  setUpAndRenderOriginal funcOriginal = nullptr;
 
-	typedef void(__thiscall* drawTextOriginal)(MinecraftUIRenderContext*, void*, float*, std::string*, float*, float, unsigned int, const void*, const void*);
-	static inline  drawTextOriginal funcOriginalText = nullptr;
-	SetUpAndRenderHook() : Hook("SetupAndRender", GET_SIG_ADDRESS("ScreenView::setupAndRender")) {}
+    typedef void(__thiscall* drawTextOriginal)(MinecraftUIRenderContext*, void*, float*, std::string*, float*, float, unsigned int, const void*, const void*);
+    static inline  drawTextOriginal funcOriginalText = nullptr;
+    SetUpAndRenderHook() : Hook("SetupAndRender", GET_SIG("ScreenView::setupAndRender")) {}
 
-	void enableHook( ) override {
-		this->autoHook((void *) setUpAndRenderCallback, (void**)&funcOriginal);
-	}
+    void enableHook( ) override {
+        this->autoHook((void *) setUpAndRenderCallback, (void**)&funcOriginal);
+    }
 };

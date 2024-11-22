@@ -3,20 +3,12 @@
 //
 
 #include "ResizeHook.hpp"
-
-#include <imgui_impl_dx11.h>
-#include <imgui_impl_dx12.h>
-#include <imgui_impl_win32.h>
-#include <imgui_internal.h>
-
 #include "../../../GUI/D2D.hpp"
 #include "SwapchainHook.hpp"
 #include "../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
+#include "../../../Module/Modules/MotionBlur/MotionBlurListener.hpp"
 #include "../../../Module/Manager.hpp"
 #include "../../../GUI/Engine/Elements/Structs/ImagesClass.hpp"
-#include "../../../../../lib/ImGui/imgui.h"
-#include "../../../Client.hpp"
-#include "../../../Module/Modules/GuiScale/GuiScale.hpp"
 
 void ResizeHook::enableHook() {
 
@@ -31,7 +23,7 @@ void ResizeHook::enableHook() {
 
 }
 
-ResizeHook::ResizeHook() : Hook("ResizeHook", 0) {}
+ResizeHook::ResizeHook() : Hook("ResizeHook", "") {}
 
 void ResizeHook::call() {
 
@@ -40,7 +32,6 @@ void ResizeHook::call() {
 void
 ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT width, UINT height, DXGI_FORMAT newFormat,
                            UINT flags) {
-
     ResizeHook::cleanShit(true);
 
     SwapchainHook::init = false;
@@ -52,171 +43,67 @@ ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT wi
                 if(SDK::clientInstance!=nullptr)
                     SDK::clientInstance->releaseMouse();
 
-    std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
-
-
-    if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
-        bufferCount = 2;
-    } else if (bufferingMode == "Triple Buffering") {
-        bufferCount = 3;
-    }
-
-    GuiScale::fixResize = true;
-
-    return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
+    return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, flags);
 }
-
 // TODO: get back to this to check
 void ResizeHook::cleanShit(bool isResize) {
-
-
-    Memory::SafeRelease(SwapchainHook::stageTex);
-    Memory::SafeRelease(SwapchainHook::SavedD3D11BackBuffer);
-    Memory::SafeRelease(SwapchainHook::ExtraSavedD3D11BackBuffer);
-    Memory::SafeRelease(Blur::pConstantBuffer);
-    Memory::SafeRelease(Blur::pSampler);
-    Memory::SafeRelease(Blur::pDownsampleShader);
-    Memory::SafeRelease(Blur::pInputLayout);
-    Memory::SafeRelease(Blur::pUpsampleShader);
-    Memory::SafeRelease(Blur::pVertexBuffer);
-    Memory::SafeRelease(Blur::pVertexShader);
-    Memory::SafeRelease(SwapchainHook::d3d11Device);
-    Memory::SafeRelease(SwapchainHook::D2D1Bitmap);
-    Memory::SafeRelease(D2D::context);
-
-
-
-
-    if(!isResize) {
-        if (ImGui::GetCurrentContext()) {
-            ImGui::GetIO().Fonts->Clear();
-            FlarialGUI::FontMap.clear();
-
-            ImGui_ImplWin32_Shutdown();
-
-            if (!SwapchainHook::queue)
-                ImGui_ImplDX11_Shutdown();
-            else ImGui_ImplDX12_Shutdown();
-            ImGui::DestroyContext();
-
-            FlarialGUI::DoLoadModuleFontLater = true;
-            FlarialGUI::DoLoadGUIFontLater = true;
-        }
-        CloseHandle(SwapchainHook::fenceEvent);
-    }
-
-
-    Blur::hasDoneFrames = false;
-    for(ID3D11Texture2D* tex : Blur::framebuffers){ Memory::SafeRelease(tex); Blur::framebuffers.clear();}
-
-    for (auto &i: ClickGUIElements::images) {
-        Memory::SafeRelease(i.second);
-    }
-
-    for (auto &entry: FlarialGUI::cachedBitmaps) {
-        ID2D1Image *bitmap = entry.second;
-        Memory::SafeRelease(bitmap);
-    }
-
     FlarialGUI::cachedBitmaps.clear();
 
     ClickGUIElements::images.clear();
 
-    if(!isResize) {
-        for(auto &i : ImagesClass::ImguiDX11Images) {
-            Memory::SafeRelease(i.second);
-        }
-        ImagesClass::ImguiDX11Images.clear();
-    }
-
-    for (auto i: ImagesClass::eimages) {
-        Memory::SafeRelease(i.second);
-    }
-
+    MotionBlurListener::previousFrames.clear();
 
     ImagesClass::eimages.clear();
 
-    for (auto &i: ImagesClass::images) {
-        Memory::SafeRelease(i.second);
-    }
-
     ImagesClass::images.clear();
-
-    //for (auto& i : FlarialGUI::brushCache) {
-    //	ID2D1SolidColorBrush* brush = i.second.get();
-    //	Memory::SafeRelease(brush);
-    //}
 
     FlarialGUI::brushCache.clear();
 
-    //for (auto& i : FlarialGUI::gradientBrushCache) {
-    //	ID2D1LinearGradientBrush* gradientBrush = i.second.get();
-    //	Memory::SafeRelease(gradientBrush);
-    //}
-
     FlarialGUI::gradientBrushCache.clear();
-
-    //for (auto& i : FlarialGUI::textLayoutCache) {
-    //	IDWriteTextFormat* textFormat = i.second.get();
-    //	Memory::SafeRelease(textFormat);
-    //}
 
     FlarialGUI::textFormatCache.clear();
     FlarialGUI::textLayoutCache.clear();
 
-    if (SwapchainHook::init && SwapchainHook::d3d11On12Device != nullptr) {
+    if (SwapchainHook::init) {
 
-        Memory::SafeRelease(SwapchainHook::D3D12DescriptorHeap);
+        SwapchainHook::D3D12DescriptorHeap.put_void();
 
-        for (ID2D1Bitmap1 *bitmap: SwapchainHook::D2D1Bitmaps) {
-            Memory::SafeRelease(bitmap);
+        if (!isResize && SwapchainHook::queue != nullptr && SwapchainHook::d3d11On12Device != nullptr) {
+            for (auto& resource : SwapchainHook::D3D11Resources) {
+                ID3D11Resource* rawResource = resource.get();
+                SwapchainHook::d3d11On12Device->ReleaseWrappedResources(&rawResource, 1);
+            }
         }
 
-        if (!isResize && SwapchainHook::queue != nullptr) {
-            SwapchainHook::d3d11On12Device->ReleaseWrappedResources(SwapchainHook::D3D11Resources.data(),
-                                                                    static_cast<UINT>(SwapchainHook::D3D11Resources.size()));
-        }
+        if(SwapchainHook::context != nullptr)
+            SwapchainHook::context->Flush();
 
-        for (ID3D11Resource *resource: SwapchainHook::D3D11Resources) {
-            Memory::SafeRelease(resource);
-        }
+        SwapchainHook::context.put_void();
 
-        for (IDXGISurface *surface: SwapchainHook::DXGISurfaces) {
-            Memory::SafeRelease(surface);
-        }
+        SwapchainHook::d3d11On12Device.put_void();
 
         SwapchainHook::D2D1Bitmaps.clear();
         SwapchainHook::D3D11Resources.clear();
         SwapchainHook::DXGISurfaces.clear();
 
-        SwapchainHook::context->Flush();
-        // TODO: release all render effects here
-        Memory::SafeRelease(SwapchainHook::context);
-        Memory::SafeRelease(D2D::surface);
-        Memory::SafeRelease(FlarialGUI::blur);
-        Memory::SafeRelease(FlarialGUI::shadow_blur);
-        Memory::SafeRelease(FlarialGUI::blurbrush);
-        Memory::SafeRelease(FlarialGUI::factory);
-        Memory::SafeRelease(FlarialGUI::writeFactory);
-        Memory::SafeRelease(FlarialGUI::screen_bitmap_cache);
-        Memory::SafeRelease(FlarialGUI::blur_bitmap_cache);
-
-        Memory::SafeRelease(SwapchainHook::d3d11On12Device);
-
         if (!isResize) Memory::SafeRelease(SwapchainHook::queue);
-
     }
 
-    Memory::SafeRelease(SwapchainHook::D2D1Bitmap);
+    // release all render effects here
 
-    if (SwapchainHook::init) {
+    D2D::surface.put_void();
+    FlarialGUI::blur.put_void();
+    FlarialGUI::shadow_blur.put_void();
+    FlarialGUI::blurbrush.put_void();
+    FlarialGUI::factory.put_void();
+    FlarialGUI::writeFactory.put_void();
+    FlarialGUI::screen_bitmap_cache.put_void();
+    FlarialGUI::blur_bitmap_cache.put_void();
 
-        Memory::SafeRelease(D2D::context);
+    SwapchainHook::D2D1Bitmap.put_void();
 
-    }
+    D2D::context.put_void();
 
     FlarialGUI::scrollposmodifier = 0;
 
-
-    //ImGui::DestroyContext();
 }

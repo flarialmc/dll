@@ -10,7 +10,5 @@ public:
     bool finished = false;
     bool arrived = false;
     float width = 0;
-    float textSize = 0;
-    bool firstTime = true;
     std::chrono::steady_clock::time_point time = std::chrono::steady_clock::now();
 };

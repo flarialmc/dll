@@ -1,61 +1,35 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "../../../Events/EventHandler.hpp"
+#include "ForceCoordsListener.hpp"
 #include "../../../Client.hpp"
 
 class ForceCoords : public Module {
-private:
-    // 1.20.12 - static inline uintptr_t option = Memory::findSig("80 78 ? ? 74 ? b0 ? 48 8b 5c 24 ? 48 83 c4 ? 5f c3 32 c0"); // cmp byte ptr [rax+04],00
-    static inline uintptr_t option;
-    bool mojanged = false;
-    bool patched = false;
 
-    static inline std::vector<uint8_t> original_option;
-    static inline std::vector<uint8_t> patched_option;
 public:
+
+
     ForceCoords() : Module("Coordinates", "Shows your ingame position. (XYZ)", IDR_COORDINATES_PNG,
                            "") {
-        option = GET_SIG_ADDRESS("ForceCoordsOption");
 
-        original_option.resize(4);
-        memcpy(original_option.data(), (LPVOID) option, 4);
-
-        // 4 nops
-        patched_option.push_back(0x90);
-        patched_option.push_back(0x90);
-        patched_option.push_back(0x90);
-        patched_option.push_back(0x90);
         Module::setup();
+
     };
 
     void onEnable() override {
-        Listen(this, RenderEvent, &ForceCoords::onRender)
+        EventHandler::registerListener(new ForceCoordsListener("ForceCoords", this));
         Module::onEnable();
     }
 
     void onDisable() override {
-        Deafen(this, RenderEvent, &ForceCoords::onRender)
-        unpatch();
+        ForceCoordsListener::unpatch();
+
+        EventHandler::unregisterListener("ForceCoords");
+
         Module::onDisable();
+
     }
-
-    void patch() {
-        if(patched) return;
-        patched = true;
-        DWORD oldProtect;
-        VirtualProtect((LPVOID) option, patched_option.size(), PAGE_EXECUTE_READWRITE, &oldProtect);
-        memcpy((LPVOID) option, patched_option.data(), patched_option.size());
-        VirtualProtect((LPVOID) option, patched_option.size(), oldProtect, &oldProtect);
-    };
-
-    void unpatch() {
-        if(!patched) return;
-        patched = false;
-        DWORD oldProtect;
-        VirtualProtect((LPVOID) option, original_option.size(), PAGE_EXECUTE_READWRITE, &oldProtect);
-        memcpy((LPVOID) option, original_option.data(), original_option.size());
-        VirtualProtect((LPVOID) option, original_option.size(), oldProtect, &oldProtect);
-    };
 
     void defaultConfig() override {
         if (settings.getSettingByName<std::string>("text") == nullptr)
@@ -67,7 +41,7 @@ public:
 
     }
 
-    void settingsRender(float settingsOffset) override {
+    void settingsRender() override {
 
         /* Border Start */
 
@@ -311,42 +285,6 @@ public:
                                       settings.getSettingByName<bool>("borderRGB")->value);
         /* Color Pickers End */
 
-    }
-
-    void onRender(RenderEvent &event) {
-        if (ClientInstance::getTopScreenName() == "hud_screen" &&
-            this->isEnabled()) {
-
-            if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
-
-                if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-
-                    if (this->settings.getSettingByName<bool>("MojangStyle")->value && !mojanged) {
-                        patch();
-                        mojanged = true;
-                    } else if (!this->settings.getSettingByName<bool>("MojangStyle")->value) {
-                        if (mojanged) {
-                            unpatch();
-                            mojanged = false;
-                        }
-
-                        Vec3<float> Pos = SDK::clientInstance->getLocalPlayer()->getAABBShapeComponent()->aabb.lower;
-                        //Vec3<float> PrevPos = SDK::clientInstance->getLocalPlayer()->stateVector->PrevPos;
-                        //Vec3<float> vel = SDK::clientInstance->getLocalPlayer()->stateVector->velocity;
-
-                        std::string cords = std::to_string(static_cast<int>(Pos.x)) + ", " +
-                                            std::to_string(static_cast<int>(Pos.y)) + ", " +
-                                            std::to_string(static_cast<int>(Pos.z));
-                        //std::string cords1 = std::to_string(static_cast<int>(PrevPos.x)) + ", " + std::to_string(static_cast<int>(PrevPos.y)) + ", " + std::to_string(static_cast<int>(PrevPos.z));
-                        //std::string cords2 = std::to_string(static_cast<int>(vel.x)) + ", " + std::to_string(static_cast<int>(vel.y)) + ", " + std::to_string(static_cast<int>(vel.z));
-                        this->normalRender(6, cords);
-                    }
-                }
-            }
-        } else if (mojanged) {
-            unpatch();
-            mojanged = false;
-        }
     }
 };
 
