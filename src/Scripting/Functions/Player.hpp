@@ -45,6 +45,16 @@ namespace player {
 
         return 1;
     }
+
+    int lua_isOnGround(lua_State* L) {
+        if (SDK::clientInstance != nullptr) {
+            return 0;
+        }
+
+        lua_pushboolean(L, SDK::clientInstance->getLocalPlayer()->isOnGround());
+
+        return 1;
+    }
     
     
     void registerPlayer(lua_State *L) {
@@ -61,6 +71,9 @@ namespace player {
 
         lua_pushcfunction(L, lua_getPlayerZ);
         lua_setfield(L, -2, "getZ");
+
+        lua_pushcfunction(L, lua_isOnGround);
+        lua_setfield(L, -2, "isOnGround");
 
         lua_setglobal(L, "Player");
 

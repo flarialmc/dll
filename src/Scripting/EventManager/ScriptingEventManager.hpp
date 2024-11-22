@@ -14,6 +14,13 @@ public:
     };
     static std::unordered_map<int, std::vector<EventEntry>> eventHandlers;
     static void registerHandler(lua_State* L, const int& eventName);
-    static void triggerEvent(lua_State* L, const int eventName, const std::vector<std::any>& args);
+
+    template <typename... Args>
+    static void triggerEvent(lua_State* L, int eventName, const Args&... args);
+
     static void clearHandlers();
+
+
+
+
 };

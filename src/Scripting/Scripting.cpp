@@ -12,6 +12,7 @@
 #include "Functions/Settings.hpp"
 #include "Functions/Player.hpp"
 #include "EventManager/ScriptEvents.hpp"
+#include "Packets/LuaTextPacket.hpp"
 
 int lua_register_event_handler(lua_State* L) {
     const int eventName = luaL_checkinteger(L, 1);
@@ -48,6 +49,9 @@ void registerFunctions(lua_State* L){
     LuaSettings::registerSetting(L);
     player::registerPlayer(L);
     ScriptEvents::pushEventTypesToLua(L);
+
+
+    LuaTextPacket::registerFunctions(L);
 }
 
 
@@ -57,6 +61,8 @@ void registerFunctions(lua_State* L){
 void load(std::string name, std::string description, std::string mainclass) {
     lua_State* L = luaL_newstate();
     luaL_openlibs(L);
+
+    lua_getglobal(L, "utf8");
 
     registerFunctions(L);
 
