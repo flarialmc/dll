@@ -89,6 +89,7 @@
 #include "Modules/NullMovement/NullMovement.hpp"
 #include "Modules/Cursor/Cursor.hpp"
 #include "Modules/RawInputBuffer/RawInputBuffer.hpp"
+#include "Modules/JavaDynamicFOV/JavaDynamicFOV.hpp"
 
 namespace ModuleManager {
     std::map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -140,6 +141,7 @@ void ModuleManager::initialize() {
     addModule<Hitbox>();
     addModule<HurtColor>();
     addModule<ThirdPerson>();
+    addModule<JavaDynamicFOV>();
 
     addModule<SnapLook>();
     addModule<FogColor>();
