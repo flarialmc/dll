@@ -25,7 +25,48 @@ DWORD WINAPI init() {
 
     float elapsed = (Utils::getCurrentMs() - start) / 1000.0;
 
+    Logger::info("Fetching Client Users", nullptr);
+    //fetch online users
+    try {
+        std::string onlineUsersRaw = Utils::downloadFile("https://api.flarial.synthetix.host/servers");
+        Client::onlinePlayers = Client::getPlayersVector(nlohmann::json::parse(onlineUsersRaw));
+    }
+    catch (const nlohmann::json::parse_error& e) {
+        Logger::error("An error occurred while parsing online users: {}", e.what());
+    }
+    //fetch online vips
+    try {
+        //std::string onlineVipsRaw = Utils::downloadFile("https://api.flarial.synthetix.host/vips"); //get online Vips through api
+
+        //static string for testing only until api endpoint is done
+        //feel free to enter your ign and try it out!
+        //"treegfx",
+
+        std::string onlineVipsRaw = R"({
+                    "Dev": [
+                        "FreezeEngine",
+                        "EpiclyRasp26",
+                        "TapeClientMC",
+                        "Withor2301"
+                    ],
+                    "Gamer": [
+                        "Gamer"
+                    ],
+                    "Booster": [
+                        "treegfx"
+                    ]
+                })";
+        Client::onlineVips = nlohmann::json::parse(onlineVipsRaw);
+        Logger::success("Fetched Vips", nullptr);
+    }
+    catch (const nlohmann::json::parse_error& e) {
+        Logger::error("An error occurred while parsing online vips: {}", e.what());
+    }
+
+
+
     Logger::success("Flarial initialized in {:.2f}s", elapsed);
+
     //Logger::printColors();
     std::thread statusThread([]() {
     while (!Client::disable) {
