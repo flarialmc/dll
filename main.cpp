@@ -82,7 +82,10 @@ DWORD WINAPI init() {
                 std::string onlineVipsRaw = R"({
                     "Dev": [
                         "treegfx",
-                        "FreezeEngine"
+                        "FreezeEngine",
+                        "EpiclyRasp26",
+                        "TapeClientMC",
+                        "Withor2301"
                     ]
                 })";
                 Client::onlineVips = nlohmann::json::parse(onlineVipsRaw);
