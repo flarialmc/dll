@@ -65,12 +65,34 @@ DWORD WINAPI init() {
         }
 
         if (onlineUsersFetchElapsed >= std::chrono::minutes(3)) {
+            //fetch online users
             try {
                 std::string onlineUsersRaw = Utils::downloadFile("https://api.flarial.synthetix.host/servers");
                 Client::onlinePlayers = Client::getPlayersVector(nlohmann::json::parse(onlineUsersRaw));
                 lastOnlineUsersFetchTime = now;
             } catch (const nlohmann::json::parse_error &e) {
                 Logger::error("An error occurred while parsing online users: {}", e.what());
+            }
+            //fetch online vips
+            try {
+                //std::string onlineVipsRaw = Utils::downloadFile("https://api.flarial.synthetix.host/vips");
+                
+                //static string for testing only until api endpoint is done
+                //feel free to enter your ign and try it out!
+                std::string onlineVipsRaw = R"({
+                    "Dev": [
+                        "treegfx",
+                        "FreezeEngine",
+                        "EpiclyRasp26",
+                        "TapeClientMC",
+                        "Withor2301"
+                    ]
+                })";
+                Client::onlineVips = nlohmann::json::parse(onlineVipsRaw);
+                lastOnlineUsersFetchTime = now;
+            }
+            catch (const nlohmann::json::parse_error& e) {
+                Logger::error("An error occurred while parsing online vips: {}", e.what());
             }
         }
 

@@ -13,10 +13,6 @@ private:
         color->g = 0.137255f;
         color->b = 0.227451f;
         std::string txt("Flarial on top!");
-        if (Client::settings.getSettingByName<bool>("fralier"))
-        {
-            txt = "Fralier on top!";
-        }
         funcOriginal(_this, screenContext, txt, x, y, color, angle, s, centered, maxWidth);
     }
 
