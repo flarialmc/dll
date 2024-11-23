@@ -40,7 +40,7 @@ bool Client::isGamer(std::string name) {
             return true;
         }
     }
-    return true;
+    return false;
 }
 bool Client::isBooster(std::string name) {
     if (Client::onlineVips.contains("Booster") && Client::onlineVips["Booster"].is_array()) {
@@ -48,7 +48,7 @@ bool Client::isBooster(std::string name) {
             return true;
         }
     }
-    return true;
+    return false;
 }
 std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
     std::vector<std::string> allPlayers;
