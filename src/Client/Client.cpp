@@ -33,6 +33,20 @@ bool Client::isDev(std::string name) {
         }
     }
 }
+bool Client::isGamer(std::string name) {
+    if (Client::onlineVips.contains("Gamer") && Client::onlineVips["Gamer"].is_array()) {
+        if (std::find(Client::onlineVips["Gamer"].begin(), Client::onlineVips["Gamer"].end(), name) != Client::onlineVips["Gamer"].end()) {
+            return true;
+        }
+    }
+}
+bool Client::isBooster(std::string name) {
+    if (Client::onlineVips.contains("Booster") && Client::onlineVips["Booster"].is_array()) {
+        if (std::find(Client::onlineVips["Booster"].begin(), Client::onlineVips["Booster"].end(), name) != Client::onlineVips["Booster"].end()) {
+            return true;
+        }
+    }
+}
 std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
     std::vector<std::string> allPlayers;
 
@@ -185,6 +199,8 @@ void Client::initialize() {
 
     FlarialGUI::ExtractImageResource(IDR_RED_LOGO_PNG, "red-logo.png","PNG");
     FlarialGUI::ExtractImageResource(IDR_CYAN_LOGO_PNG, "dev-logo.png", "PNG");
+    FlarialGUI::ExtractImageResource(IDR_GAMER_LOGO_PNG, "gamer-logo.png", "PNG");
+    FlarialGUI::ExtractImageResource(IDR_BOOSTER_LOGO_PNG, "booster-logo.png", "PNG");
 
     FlarialGUI::LoadFont(IDR_FONT_TTF);
 
