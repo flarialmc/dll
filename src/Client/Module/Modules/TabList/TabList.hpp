@@ -253,6 +253,24 @@ public:
                                         realcenter.y + Constraints::SpacingConstraint(p4, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize))
                                 );
                             }
+                            else if (Client::isGamer(clearedName))
+                            {
+                                FlarialGUI::image(
+                                    IDR_GAMER_LOGO_PNG,
+                                    D2D1::RectF(fakex + Constraints::SpacingConstraint(p1, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize), realcenter.y + width + Constraints::SpacingConstraint(0.17f, keycardSize),
+                                        fakex + Constraints::SpacingConstraint(p3, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
+                                        realcenter.y + Constraints::SpacingConstraint(p4, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize))
+                                );
+                            }
+                            else if (Client::isBooster(clearedName))
+                            {
+                                FlarialGUI::image(
+                                    IDR_BOOSTER_LOGO_PNG,
+                                    D2D1::RectF(fakex + Constraints::SpacingConstraint(p1, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize), realcenter.y + width + Constraints::SpacingConstraint(0.17f, keycardSize),
+                                        fakex + Constraints::SpacingConstraint(p3, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
+                                        realcenter.y + Constraints::SpacingConstraint(p4, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize))
+                                );
+                            }
                             else {
                                 FlarialGUI::image(
                                     IDR_RED_LOGO_PNG,

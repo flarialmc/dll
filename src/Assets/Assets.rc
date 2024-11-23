@@ -78,10 +78,11 @@ IDR_FOLDER_WHITE_PNG     PNG "Data\\folderwhite.png"
 IDR_FOLDER_PNG           PNG "Data\\folder.png"
 
 IDR_CYAN_LOGO_PNG        PNG "Data\\cyan-logo.png"
-IDR_PURPLE_LOGO_PNG      PNG "Data\\purple-logo.png"
 IDR_RED_LOGO_PNG         PNG "Data\\red-logo.png"
 IDR_WHITE_LOGO_PNG       PNG "Data\\white-logo.png"
 IDR_YELLOW_LOGO_PNG      PNG "Data\\yellow-logo.png"
+IDR_GAMER_LOGO_PNG       PNG "Data\\gamer-logo.png"
+IDR_BOOSTER_LOGO_PNG     PNG "Data\\booster-logo.png"
 
 IDR_NIKITA_01            PNG "Data\\nikita\\01.png"
 IDR_NIKITA_02            PNG "Data\\nikita\\02.png" 

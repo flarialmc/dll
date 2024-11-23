@@ -17,6 +17,7 @@ std::chrono::steady_clock::time_point lastAnnouncementTime;
 std::string DownloadString(const std::string& url);
 
 DWORD WINAPI init() {
+
     uint64_t start = Utils::getCurrentMs();
     Logger::initialize();
 
@@ -24,9 +25,10 @@ DWORD WINAPI init() {
 
     float elapsed = (Utils::getCurrentMs() - start) / 1000.0;
 
-    Logger::success("Flarial initialized in {:.2f}s", elapsed);
-    //Logger::printColors();
 
+    Logger::success("Flarial initialized in {:.2f}s", elapsed);
+
+    //Logger::printColors();
     std::thread statusThread([]() {
     while (!Client::disable) {
         auto now = std::chrono::steady_clock::now();
@@ -75,17 +77,24 @@ DWORD WINAPI init() {
             }
             //fetch online vips
             try {
-                //std::string onlineVipsRaw = Utils::downloadFile("https://api.flarial.synthetix.host/vips");
+                //std::string onlineVipsRaw = Utils::downloadFile("https://api.flarial.synthetix.host/vips"); //get online Vips through api
                 
                 //static string for testing only until api endpoint is done
                 //feel free to enter your ign and try it out!
+                //"treegfx",
+                
                 std::string onlineVipsRaw = R"({
                     "Dev": [
-                        "treegfx",
                         "FreezeEngine",
                         "EpiclyRasp26",
                         "TapeClientMC",
                         "Withor2301"
+                    ],
+                    "Gamer": [
+                        "Gamer"
+                    ],
+                    "Booster": [
+                        "treegfx"
                     ]
                 })";
                 Client::onlineVips = nlohmann::json::parse(onlineVipsRaw);
@@ -189,4 +198,8 @@ std::string DownloadString(const std::string& url) {
 
     InternetCloseHandle(interwebs);
     return String::replaceAll(rtn, "|n", "\r\n");
+}
+
+void fetchVips() {
+    auto now = std::chrono::steady_clock::now();
 }

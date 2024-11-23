@@ -50,6 +50,12 @@ class BaseActorRendererRenderTextHook : public Hook {
         if (Client::isDev(clearedName)) {
             loc = { Utils::getAssetsPath() + "\\dev-logo.png", true };
         }
+        else if(Client::isGamer(clearedName)) {
+            loc = { Utils::getAssetsPath() + "\\gamer-logo.png", true };
+        }
+        else if (Client::isBooster(clearedName)) {
+            loc = { Utils::getAssetsPath() + "\\booster-logo.png", true };
+        }
         TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
 
         const float fontHeight = font->getLineHeight();
