@@ -21,11 +21,18 @@ using namespace winrt::Windows::UI::Core;
 std::string Client::settingspath = Utils::getConfigsPath() + "\\main.flarial";
 Settings Client::settings = Settings();
 std::vector<std::string> Client::onlinePlayers;
+nlohmann::json Client::onlineVips;
 
 bool notifiedOfConnectionIssue = false;
 
 std::string Client::current_commit = COMMIT_HASH;
-
+bool Client::isDev(std::string name) {
+    if (Client::onlineVips.contains("Dev") && Client::onlineVips["Dev"].is_array()) {
+        if (std::find(Client::onlineVips["Dev"].begin(), Client::onlineVips["Dev"].end(), name) != Client::onlineVips["Dev"].end()) {
+            return true;
+        }
+    }
+}
 std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
     std::vector<std::string> allPlayers;
 
@@ -177,6 +184,7 @@ void Client::initialize() {
         Client::settings.addSetting("fontWeight", (std::string) "Normal");
 
     FlarialGUI::ExtractImageResource(IDR_RED_LOGO_PNG, "red-logo.png","PNG");
+    FlarialGUI::ExtractImageResource(IDR_CYAN_LOGO_PNG, "dev-logo.png", "PNG");
 
     FlarialGUI::LoadFont(IDR_FONT_TTF);
 
