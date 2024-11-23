@@ -88,13 +88,16 @@ DWORD WINAPI init() {
                         "FreezeEngine",
                         "EpiclyRasp26",
                         "TapeClientMC",
-                        "Withor2301"
+                        "Withor2301",
+                        "ANSHUL MASTER",
+                        "StoneHunter2020",
+                        "treegfx"
                     ],
                     "Gamer": [
                         "Gamer"
                     ],
                     "Booster": [
-                        "treegfx"
+                        "Booster"
                     ]
                 })";
                 Client::onlineVips = nlohmann::json::parse(onlineVipsRaw);
