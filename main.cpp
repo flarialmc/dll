@@ -88,6 +88,7 @@ DWORD WINAPI init() {
                         "FreezeEngine",
                         "EpiclyRasp26",
                         "TapeClientMC",
+                        "marioCST",
                         "Withor2301",
                         "ANSHUL MASTER",
                         "StoneHunter2020",
