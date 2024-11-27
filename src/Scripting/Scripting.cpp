@@ -13,6 +13,7 @@
 #include "Functions/Player.hpp"
 #include "EventManager/ScriptEvents.hpp"
 #include "Packets/LuaTextPacket.hpp"
+#include "Functions/OtherSettings.hpp"
 
 int lua_register_event_handler(lua_State* L) {
     const int eventName = luaL_checkinteger(L, 1);
@@ -47,6 +48,7 @@ void registerFunctions(lua_State* L){
     GUI::registerGUI(L);
     LuaConstraints::registerConstraints(L);
     LuaSettings::registerSetting(L);
+    LuaOtherSettings::registerSetting(L);
     player::registerPlayer(L);
     ScriptEvents::pushEventTypesToLua(L);
 

@@ -39,6 +39,7 @@ namespace General {
     void registerGeneral(lua_State* L){
         lua_register(L, "Notify", lua_Notify);
         lua_register(L, "getRoamingPath", lua_getRoamingPath);
+        lua_register(L, "getFlarialPath", lua_getFlarialPath);
         lua_register(L, "keyCodeAsString", lua_keyCodeAsString);
         lua_register(L, "sendClientMessage", lua_sendClientMessage);
     }
