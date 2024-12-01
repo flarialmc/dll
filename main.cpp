@@ -25,7 +25,7 @@ DWORD WINAPI init() {
 
     float elapsed = (Utils::getCurrentMs() - start) / 1000.0;
 
-
+    
     Logger::success("Flarial initialized in {:.2f}s", elapsed);
 
     //Logger::printColors();
@@ -69,7 +69,7 @@ DWORD WINAPI init() {
         if (onlineUsersFetchElapsed >= std::chrono::minutes(3)) {
             //fetch online users
             try {
-                std::string onlineUsersRaw = Utils::downloadFile("https://api.flarial.synthetix.host/servers");
+                std::string onlineUsersRaw = DownloadString("https://api.flarial.synthetix.host/servers");
                 Client::onlinePlayers = Client::getPlayersVector(nlohmann::json::parse(onlineUsersRaw));
                 lastOnlineUsersFetchTime = now;
             } catch (const nlohmann::json::parse_error &e) {
@@ -77,29 +77,9 @@ DWORD WINAPI init() {
             }
             //fetch online vips
             try {
-                //std::string onlineVipsRaw = Utils::downloadFile("https://api.flarial.synthetix.host/vips"); //get online Vips through api
-                
+                std::string onlineVipsRaw = DownloadString("https://api.flarial.synthetix.host/vips");  
                 //static string for testing only until api endpoint is done
                 //feel free to enter your ign and try it out!
-                //"treegfx",
-                
-                std::string onlineVipsRaw = R"({
-                    "Dev": [
-                        "FreezeEngine",
-                        "EpiclyRasp26",
-                        "TapeClientMC",
-                        "Withor2301",
-                        "ANSHUL MASTER",
-                        "StoneHunter2020",
-                        "treegfx"
-                    ],
-                    "Gamer": [
-                        "Gamer"
-                    ],
-                    "Booster": [
-                        "Booster"
-                    ]
-                })";
                 Client::onlineVips = nlohmann::json::parse(onlineVipsRaw);
                 lastOnlineUsersFetchTime = now;
             }
@@ -112,7 +92,7 @@ DWORD WINAPI init() {
             Client::settings.getSettingByName<bool>("promotions")->value) {
             SDK::clientInstance->getGuiData()->displayClientMessage(
                 "§khiii §r §n§l§4FLARIAL §r§khiii \n§r§cDonate to Flarial! §ehttps://flarial.xyz/donate\n§9Join our discord! §ehttps://flarial.xyz/discord"
-            );
+            ); 
             lastAnnouncementTime = now;
         }
 
