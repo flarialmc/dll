@@ -26,6 +26,20 @@ nlohmann::json Client::onlineVips;
 bool notifiedOfConnectionIssue = false;
 
 std::string Client::current_commit = COMMIT_HASH;
+int Client::fetchVips() {
+    try {
+        std::string onlineVipsRaw = Utils::DownloadString("https://api.flarial.xyz/vips");
+        //static string for testing only until api endpoint is done
+        //feel free to enter your ign and try it out!
+        Client::onlineVips = nlohmann::json::parse(onlineVipsRaw);
+        return 1;
+    }
+    catch (const nlohmann::json::parse_error& e) {
+        Logger::error("An error occurred while parsing online vips: {}", e.what());
+        return 0;
+    }
+    return 0;
+}
 bool Client::isDev(std::string name) {
     if (Client::onlineVips.contains("Dev") && Client::onlineVips["Dev"].is_array()) {
         if (std::find(Client::onlineVips["Dev"].begin(), Client::onlineVips["Dev"].end(), name) != Client::onlineVips["Dev"].end()) {

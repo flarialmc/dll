@@ -3,6 +3,7 @@
 #include "src/Client/Client.hpp"
 #include "src/Client/Events/EventManager.hpp"
 #include "src/Client/Hook/Hooks/Render/ResizeHook.hpp"
+#include "src/Client/Module/Modules/ClickGUI/ClickGUI.hpp"
 // #include "src/Client/Module/Modules/Nick/NickListener.hpp"
 #include <kiero.h>
 #include <wininet.h>
@@ -14,7 +15,6 @@ std::chrono::steady_clock::time_point lastBeatTime;
 std::chrono::steady_clock::time_point lastOnlineUsersFetchTime;
 std::chrono::steady_clock::time_point lastAnnouncementTime;
 
-std::string DownloadString(const std::string& url);
 
 DWORD WINAPI init() {
 
@@ -25,7 +25,6 @@ DWORD WINAPI init() {
 
     float elapsed = (Utils::getCurrentMs() - start) / 1000.0;
 
-    
     Logger::success("Flarial initialized in {:.2f}s", elapsed);
 
     //Logger::printColors();
@@ -61,7 +60,7 @@ DWORD WINAPI init() {
             if (clearedName.empty()) clearedName = String::removeColorCodes(name);
 
             if (clearedName != "skinStandardCust") {
-                DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}", clearedName, ipToSend));
+                Utils::DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}", clearedName, ipToSend));
                 lastBeatTime = now;
             }
         }
@@ -69,23 +68,16 @@ DWORD WINAPI init() {
         if (onlineUsersFetchElapsed >= std::chrono::minutes(3)) {
             //fetch online users
             try {
-                std::string onlineUsersRaw = DownloadString("https://api.flarial.synthetix.host/servers");
+                std::string onlineUsersRaw = Utils::DownloadString("https://api.flarial.xyz/servers");
                 Client::onlinePlayers = Client::getPlayersVector(nlohmann::json::parse(onlineUsersRaw));
                 lastOnlineUsersFetchTime = now;
             } catch (const nlohmann::json::parse_error &e) {
                 Logger::error("An error occurred while parsing online users: {}", e.what());
             }
-            //fetch online vips
-            try {
-                std::string onlineVipsRaw = DownloadString("https://api.flarial.synthetix.host/vips");  
-                //static string for testing only until api endpoint is done
-                //feel free to enter your ign and try it out!
-                Client::onlineVips = nlohmann::json::parse(onlineVipsRaw);
-                lastOnlineUsersFetchTime = now;
-            }
-            catch (const nlohmann::json::parse_error& e) {
-                Logger::error("An error occurred while parsing online vips: {}", e.what());
-            }
+            
+            Client::fetchVips();
+
+            lastOnlineUsersFetchTime = now;
         }
 
         if (onlineAnnouncementElapsed >= std::chrono::minutes(10) && ModuleManager::initialized &&
@@ -162,27 +154,5 @@ BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReser
     return TRUE;
 }
 
-std::string DownloadString(const std::string& url) {
-    HINTERNET interwebs = InternetOpenA("Samsung Smart Fridge", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
-    if (!interwebs) {
-        return "";
-    }
 
-    std::string rtn;
-    HINTERNET urlFile = InternetOpenUrlA(interwebs, url.c_str(), NULL, 0, INTERNET_FLAG_RELOAD, 0);
-    if (urlFile) {
-        char buffer[2000];
-        DWORD bytesRead;
-        while (InternetReadFile(urlFile, buffer, sizeof(buffer), &bytesRead) && bytesRead > 0) {
-            rtn.append(buffer, bytesRead);
-        }
-        InternetCloseHandle(urlFile);
-    }
 
-    InternetCloseHandle(interwebs);
-    return String::replaceAll(rtn, "|n", "\r\n");
-}
-
-void fetchVips() {
-    auto now = std::chrono::steady_clock::now();
-}
