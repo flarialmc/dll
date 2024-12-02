@@ -45,8 +45,18 @@ class BaseActorRendererRenderTextHook : public Hook {
         const auto mScale = 0.026666669f; // 0.16f
         matrix = scale(matrix, {mScale * -1, mScale * -1, mScale});
 
-        const ResourceLocation loc(Utils::getAssetsPath() + "\\red-logo.png", true); // The logo is the normal transparent Flarial logo, 128x128
-        const TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
+        ResourceLocation loc(Utils::getAssetsPath() + "\\red-logo.png", true); // The logo is the normal transparent Flarial logo, 128x128
+        
+        if (Client::isDev(clearedName)) {
+            loc = { Utils::getAssetsPath() + "\\dev-logo.png", true };
+        }
+        else if(Client::isGamer(clearedName)) {
+            loc = { Utils::getAssetsPath() + "\\gamer-logo.png", true };
+        }
+        else if (Client::isBooster(clearedName)) {
+            loc = { Utils::getAssetsPath() + "\\booster-logo.png", true };
+        }
+        TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
 
         const float fontHeight = font->getLineHeight();
         float x;

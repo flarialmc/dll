@@ -12,8 +12,15 @@ public:
         lua_State* luaState;
         int ref;
     };
-    static std::unordered_map<std::string, std::vector<EventEntry>> eventHandlers;
-    static void registerHandler(lua_State* L, const std::string& eventName);
-    static void triggerEvent(lua_State* L, const std::string& eventName, const std::vector<std::any>& args);
+    static std::unordered_map<int, std::vector<EventEntry>> eventHandlers;
+    static void registerHandler(lua_State* L, const int& eventName);
+
+    template <typename... Args>
+    static void triggerEvent(lua_State* L, int eventName, const Args&... args);
+
     static void clearHandlers();
+
+
+
+
 };

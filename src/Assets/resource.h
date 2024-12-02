@@ -77,7 +77,6 @@
 #define IDR_SETTINGS_WHITE_PNG          171
 #define IDR_ITEM_PHYSICS_PNG            172
 #define IDR_CYAN_LOGO_PNG               173
-#define IDR_PURPLE_LOGO_PNG             174
 #define IDR_RED_LOGO_PNG                175
 #define IDR_WHITE_LOGO_PNG              176
 #define IDR_YELLOW_LOGO_PNG             177

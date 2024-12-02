@@ -3,15 +3,15 @@
 #include "../Module.hpp"
 
 
-class ThirdPerson : public Module {
+class ItemUseDelayFix : public Module {
 private:
     static inline std::vector<uint8_t> original;
     static inline uintptr_t address;
 public:
-    ThirdPerson() : Module("Nametag", "Shows your nametag for you while\nin 3rd person mode.",
+    ItemUseDelayFix() : Module("Item Use Delay Fix", "Removes 200ms delay after attack on using items (e.g projectiles).",
                            IDR_NAMETAG_PNG, "") {
 
-        address = GET_SIG_ADDRESS("ThirdPersonNametag");
+        address = GET_SIG_ADDRESS("ClientInputCallbacks::handleBuildAction_onAttack_setNoBlockBreakUntil_CallPatch");
 
         original.resize(6);
         Memory::copyBytes((LPVOID) address, original.data(), 6);
@@ -30,7 +30,7 @@ public:
     }
 
     static void patch() {
-        Memory::nopBytes((void *)address, 6);
+        Memory::nopBytes((void *)address, original.size());
     }
 
     static void unpatch() {

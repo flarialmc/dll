@@ -11,9 +11,14 @@
 #include "Functions/Constraints.hpp"
 #include "Functions/Settings.hpp"
 #include "Functions/Player.hpp"
+#include "EventManager/ScriptEvents.hpp"
+#include "Packets/LuaTextPacket.hpp"
+#include "Functions/OtherSettings.hpp"
+#include "Functions/LuaModuleManager.hpp"
+#include "Functions/LuaClient.hpp"
 
 int lua_register_event_handler(lua_State* L) {
-    const char* eventName = luaL_checkstring(L, 1);
+    const int eventName = luaL_checkinteger(L, 1);
 
     if (!lua_isfunction(L, 2)) {
         lua_pushstring(L, "Expected function as second argument");
@@ -45,21 +50,36 @@ void registerFunctions(lua_State* L){
     GUI::registerGUI(L);
     LuaConstraints::registerConstraints(L);
     LuaSettings::registerSetting(L);
+    LuaOtherSettings::registerSetting(L);
     player::registerPlayer(L);
+    ScriptEvents::pushEventTypesToLua(L);
+    LuaModuleManager::registerModuleManager(L);
+    LuaClient::registerClient(L);
+
+
+    LuaTextPacket::registerFunctions(L);
 }
+
+
+
+
 
 void load(std::string name, std::string description, std::string mainclass) {
     lua_State* L = luaL_newstate();
     luaL_openlibs(L);
 
+    lua_getglobal(L, "utf8");
+
     registerFunctions(L);
 
     const std::string path = mainclass;
+    Scripting::scriptsAmount++;
 
     if (luaL_dofile(L, path.c_str()) != LUA_OK) {
         std::string err = std::string("Error loading script: ") + lua_tostring(L, -1);
         Logger::error(err);
         lua_close(L);
+        Scripting::scriptsAmountWithErrors++;
         return;
     }
 
@@ -67,6 +87,7 @@ void load(std::string name, std::string description, std::string mainclass) {
     auto mod = ModuleManager::getModule(name).get();
     Scripting::luaScriptModules.emplace_back(L, mod);
     mod->defaultConfig();
+    Scripting::scriptsAmountWithoutErrors++;
 }
 
 void Scripting::loadModules() {
@@ -87,4 +108,6 @@ void Scripting::loadModules() {
             FlarialGUI::Notify("could not find main.json");
         }
     }
+
+    Logger::custom(fg(fmt::color::aqua), "Scripting", "Found {} scripts! Loaded {} scripts without errors. Found errors in {} scripts.", Scripting::scriptsAmount, Scripting::scriptsAmountWithoutErrors, Scripting::scriptsAmountWithErrors);
 }
