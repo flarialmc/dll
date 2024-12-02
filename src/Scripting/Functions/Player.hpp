@@ -42,6 +42,7 @@ namespace player {
             //set item at index of player + 1 (lua arrays are not 0-indexed;
         };
         return 1;
+        //hehe
     }
 
 
