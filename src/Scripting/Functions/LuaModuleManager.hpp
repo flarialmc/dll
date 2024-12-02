@@ -20,6 +20,18 @@ namespace LuaModuleManager {
         return std::nullopt;
     }
 
+    int lua_GetModules(lua_State *L) {
+        lua_newtable(L);
+
+        lua_newtable(L);
+        const std::vector<std::shared_ptr<Module>> moduleList = ModuleManager::getModules();
+        for (const auto &module : moduleList){
+            lua_pushlightuserdata(L, module.get());
+            lua_rawseti(L, -2, std::distance((moduleList.begin()), std::find(moduleList.begin(), moduleList.end(),module))+1);
+        };
+        return 1;
+    }
+
 
     int lua_GetModuleByName(lua_State *L) {
         std::string name = luaL_checkstring(L, 1);
@@ -41,6 +53,10 @@ namespace LuaModuleManager {
 
         lua_pushcfunction(L, lua_GetModuleByName);
         lua_setfield(L, -2, "GetModuleByName");
+
+        lua_pushcfunction(L, lua_GetModules);
+        lua_setfield(L, -2, "GetModules");
+
 
         lua_setglobal(L, "ModuleManager");
     }

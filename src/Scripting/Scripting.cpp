@@ -16,6 +16,7 @@
 #include "Functions/OtherSettings.hpp"
 #include "Functions/LuaModuleManager.hpp"
 #include "Functions/LuaClient.hpp"
+#include "Functions/LuaModule.hpp"
 
 int lua_register_event_handler(lua_State* L) {
     const int eventName = luaL_checkinteger(L, 1);
@@ -55,6 +56,7 @@ void registerFunctions(lua_State* L){
     ScriptEvents::pushEventTypesToLua(L);
     LuaModuleManager::registerModuleManager(L);
     LuaClient::registerClient(L);
+    LuaModule::registerModule(L);
 
 
     LuaTextPacket::registerFunctions(L);
