@@ -27,6 +27,22 @@ namespace LuaModule {
         return 1;
     }
 
+    int lua_GetDescription(lua_State *L) {
+        Module* script = static_cast<Module *>(lua_touserdata(L, 1));
+
+        lua_pushstring(L, script->description.c_str());
+
+        return 1;
+    }
+
+    int lua_isEnabled(lua_State *L) {
+        Module* script = static_cast<Module *>(lua_touserdata(L, 1));
+
+        lua_pushboolean(L, script->isEnabled());
+
+        return 1;
+    }
+
     void registerModule(lua_State *L) {
         lua_newtable(L);
 
@@ -35,6 +51,12 @@ namespace LuaModule {
 
         lua_pushcfunction(L, lua_GetName);
         lua_setfield(L, -2, "getName");
+
+        lua_pushcfunction(L, lua_GetDescription);
+        lua_setfield(L, -2, "getDescription");
+
+        lua_pushcfunction(L, lua_isEnabled);
+        lua_setfield(L, -2, "isEnabled");
 
         lua_setglobal(L, "Module");
     }

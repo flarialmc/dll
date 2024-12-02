@@ -22,8 +22,6 @@ namespace LuaModuleManager {
 
     int lua_GetModules(lua_State *L) {
         lua_newtable(L);
-
-        lua_newtable(L);
         const std::vector<std::shared_ptr<Module>> moduleList = ModuleManager::getModules();
         for (const auto &module : moduleList){
             lua_pushlightuserdata(L, module.get());
