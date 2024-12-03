@@ -2,9 +2,11 @@
 
 #include "lua.hpp"
 #include "../Client/Module/Modules/Module.hpp"
+#include "Console/Console.hpp"
 #include <iostream>
 
 namespace Scripting {
+    inline ScriptingConsole console;
 
     inline int scriptsAmount = 0;
     inline int scriptsAmountWithoutErrors = 0;

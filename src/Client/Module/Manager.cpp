@@ -93,6 +93,7 @@
 #include "Modules/RawInputBuffer/RawInputBuffer.hpp"
 #include "Modules/JavaDynamicFOV/JavaDynamicFOV.hpp"
 #include "Modules/ItemUseDelayFix/ItemUseDelayFix.hpp"
+#include "../../Scripting/Console/ConsoleService.hpp"
 
 namespace ModuleManager {
     std::map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -202,6 +203,7 @@ void ModuleManager::initialize() {
     addService<rgbListener>();
     addService<HiveModeCatcherListener>();
 
+    addService<ConsoleService>();
     Scripting::loadModules();
 
     initialized = true;

@@ -95,6 +95,17 @@ namespace GUI {
         return 1;
     }
 
+    int lua_NormalRender(lua_State *L) {
+        Module* script = static_cast<Module *>(lua_touserdata(L, 1));
+
+        int index = luaL_checkinteger(L, 2);
+        std::string text = luaL_checkstring(L, 3);
+
+        script->normalRender(index, text);
+
+        return 0;
+    }
+
     void registerGUI(lua_State *L) {
         LUAHelper(L)
                 .getClass("GUI")
@@ -102,6 +113,7 @@ namespace GUI {
                 .registerFunction("RoundedHollowRect", lua_RoundedHollowRect)
                 .registerFunction("TextWithFont", lua_FlarialTextWithFont)
                 .registerFunction("Color", lua_Color)
-                .registerFunction("RoundedButton", lua_RoundedButton);
+                .registerFunction("RoundedButton", lua_RoundedButton)
+                .registerFunction("NormalRender", lua_NormalRender);
     }
 }
