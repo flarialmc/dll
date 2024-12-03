@@ -32,7 +32,7 @@ if(MSVC)
     add_compile_options($<$<CONFIG:Release>:/Oi>)
 
     # Enable link-time code generation for whole program optimization
-    add_compile_options($<$<CONFIG:Release>:/GL>)
+    # add_compile_options($<$<CONFIG:Release>:/GL>) # causes issues with libhat
 
     # Separate functions for the linker to improve the optimization process
     add_compile_options($<$<CONFIG:Release>:/Gy>)
