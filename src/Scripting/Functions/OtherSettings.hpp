@@ -57,7 +57,7 @@ namespace LuaOtherSettings {
     void registerSetting(lua_State *L) {
         LUAHelper(L)
                 .getClass("ModuleSettings")
-                .registerFunction("GetSetting", lua_GetSetting);
+                .registerFunction("GetSetting", lua_GetSetting)
                 .registerFunction("SetSetting", lua_SetSetting);
     }
 }
