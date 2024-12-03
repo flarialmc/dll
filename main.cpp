@@ -17,6 +17,7 @@ std::chrono::steady_clock::time_point lastAnnouncementTime;
 std::string DownloadString(const std::string& url);
 
 DWORD WINAPI init() {
+
     uint64_t start = Utils::getCurrentMs();
     Logger::initialize();
 
@@ -24,9 +25,10 @@ DWORD WINAPI init() {
 
     float elapsed = (Utils::getCurrentMs() - start) / 1000.0;
 
-    Logger::success("Flarial initialized in {:.2f}s", elapsed);
-    //Logger::printColors();
 
+    Logger::success("Flarial initialized in {:.2f}s", elapsed);
+
+    //Logger::printColors();
     std::thread statusThread([]() {
     while (!Client::disable) {
         auto now = std::chrono::steady_clock::now();
@@ -65,12 +67,44 @@ DWORD WINAPI init() {
         }
 
         if (onlineUsersFetchElapsed >= std::chrono::minutes(3)) {
+            //fetch online users
             try {
                 std::string onlineUsersRaw = Utils::downloadFile("https://api.flarial.synthetix.host/servers");
                 Client::onlinePlayers = Client::getPlayersVector(nlohmann::json::parse(onlineUsersRaw));
                 lastOnlineUsersFetchTime = now;
             } catch (const nlohmann::json::parse_error &e) {
                 Logger::error("An error occurred while parsing online users: {}", e.what());
+            }
+            //fetch online vips
+            try {
+                //std::string onlineVipsRaw = Utils::downloadFile("https://api.flarial.synthetix.host/vips"); //get online Vips through api
+                
+                //static string for testing only until api endpoint is done
+                //feel free to enter your ign and try it out!
+                //"treegfx",
+                
+                std::string onlineVipsRaw = R"({
+                    "Dev": [
+                        "FreezeEngine",
+                        "EpiclyRasp26",
+                        "TapeClientMC",
+                        "Withor2301",
+                        "ANSHUL MASTER",
+                        "StoneHunter2020",
+                        "treegfx"
+                    ],
+                    "Gamer": [
+                        "Gamer"
+                    ],
+                    "Booster": [
+                        "Booster"
+                    ]
+                })";
+                Client::onlineVips = nlohmann::json::parse(onlineVipsRaw);
+                lastOnlineUsersFetchTime = now;
+            }
+            catch (const nlohmann::json::parse_error& e) {
+                Logger::error("An error occurred while parsing online vips: {}", e.what());
             }
         }
 
@@ -167,4 +201,8 @@ std::string DownloadString(const std::string& url) {
 
     InternetCloseHandle(interwebs);
     return String::replaceAll(rtn, "|n", "\r\n");
+}
+
+void fetchVips() {
+    auto now = std::chrono::steady_clock::now();
 }

@@ -79,6 +79,8 @@ public:
         Module::onEnable();
     }
 
+    void onEnable() override {}
+
     void onDisable() override {}
 
     void terminate() override {
@@ -733,18 +735,7 @@ public:
         // watermark
         if (SDK::getCurrentScreen() == "inventory_screen" || SDK::getCurrentScreen().find("chest") != std::string::npos)
             if (Client::settings.getSettingByName<bool>("watermark")->value)
-                if (Client::settings.getSettingByName<bool>("fralier")->value)
-                {
-                    FlarialGUI::image(IDR_FRALIER_TITLE_PNG,
-                        D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
-                            allahuakbar.y + akbar));
-                }
-                else
-                {
-                    FlarialGUI::image(IDR_FLARIAL_TITLE_PNG,
-                        D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu,
-                            allahuakbar.y + akbar));
-                }
+                FlarialGUI::image(IDR_FLARIAL_TITLE_PNG, D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu, allahuakbar.y + akbar));
                 
 
         if (FlarialGUI::scrollposmodifier == 0) {
@@ -769,7 +760,7 @@ public:
 
         if (SwapchainHook::init && baseHeightActual > 0.1f) {
 
-            this->settings.getSettingByName<bool>("enabled")->value = true;
+            setEnabled(true);
 
             /* Base Rectangle Start */
 
@@ -1219,7 +1210,6 @@ public:
                     c->addElementText("Following Does Not Require Restart");
                     c->extraPadding();
 
-                    c->addToggle("Fralier mode", "", Client::settings.getSettingByName<bool>("fralier")->value);
                     c->addToggle("Disable Animations", "",  Client::settings.getSettingByName<bool>("disableanims")->value);
                     c->addSlider("UI Blur Intensity", "", Client::settings.getSettingByName<float>("blurintensity")->value, 25.f);
                     c->addSlider("Chroma / RGB Speed", "", Client::settings.getSettingByName<float>("rgb_speed")->value, 10.f);
@@ -1337,7 +1327,7 @@ public:
             FlarialGUI::PopSize(); // Pops base rect
         }
 
-        if(realBlurAmount < 0.5f)  this->settings.getSettingByName<bool>("enabled")->value = false;
+        if(realBlurAmount < 0.5f) setEnabled(false);
 
         FlarialGUI::displayToolTips();
         FlarialGUI::NotifyHeartbeat();

@@ -81,29 +81,48 @@ namespace player {
 
         return 1;
     }
+
+    int lua_isOnGround(lua_State* L) {
+        if (SDK::clientInstance != nullptr) {
+            return 0;
+        }
+
+        lua_pushboolean(L, SDK::clientInstance->getLocalPlayer()->isOnGround());
+
+        return 1;
+    }
     
     
     void registerPlayer(lua_State *L) {
-        lua_newtable(L);
+        
+    lua_newtable(L);
 
-        lua_pushcfunction(L, lua_getPlayerName);
-        lua_setfield(L, -2, "getPlayerName");
+    lua_pushcfunction(L, lua_getPlayerName);
+    lua_setfield(L, -2, "getPlayerName");
 
-        lua_pushcfunction(L, lua_getPlayerX);
-        lua_setfield(L, -2, "getX");
+    lua_pushcfunction(L, lua_getPlayerX);
+    lua_setfield(L, -2, "getX");
 
-        lua_pushcfunction(L, lua_getPlayerY);
-        lua_setfield(L, -2, "getY");
+    lua_pushcfunction(L, lua_getPlayerY);
+    lua_setfield(L, -2, "getY");
 
-        lua_pushcfunction(L, lua_getPlayerZ);
-        lua_setfield(L, -2, "getZ");
-        lua_pushcfunction(L, lua_getPlayerSlot);
-        lua_setfield(L, -2, "getSlot");
-        lua_pushcfunction(L, lua_returnPosArray);
-        lua_setfield(L, -2, "returnPosArray");
-        lua_pushcfunction(L, lua_returnPlayerList);
-        lua_setfield(L, -2, "returnPlayerList");
-        lua_setglobal(L, "Player");
+    lua_pushcfunction(L, lua_getPlayerZ);
+    lua_setfield(L, -2, "getZ");
+
+    lua_pushcfunction(L, lua_getPlayerSlot);
+    lua_setfield(L, -2, "getSlot");
+
+    lua_pushcfunction(L, lua_returnPosArray);
+    lua_setfield(L, -2, "returnPosArray");
+
+    lua_pushcfunction(L, lua_returnPlayerList);
+    lua_setfield(L, -2, "returnPlayerList");
+
+    lua_pushcfunction(L, lua_isOnGround);
+    lua_setfield(L, -2, "isOnGround");
+
+    lua_setglobal(L, "Player");
+
 
 
     }

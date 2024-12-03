@@ -4,7 +4,7 @@
 #include "Packet.hpp"
 #include <string>
 
-enum class TextPacketType {
+enum class TextPacketType : int {
     RAW = 0,
     CHAT = 1,
     TRANSLATION = 2,

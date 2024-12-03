@@ -93,13 +93,13 @@ public:
     }
 
     static uintptr_t findSig(std::string_view signature) {
-        const auto parsed = hat::parse_signature(signature);
+        auto parsed = hat::parse_signature(signature);
         if (!parsed.has_value()) {
             Logger::custom(fg(fmt::color::crimson), "Signatures", "Failed to parse signature: {} ", signature);
             return 0u;
         }
 
-        const auto result = hat::find_pattern(parsed.value());
+        auto result = hat::find_pattern(parsed.value(), ".text");
 
         if (!result.has_result()) {
             Logger::custom(fg(fmt::color::crimson), "Signatures", "Failed to find signature: {} ", signature);

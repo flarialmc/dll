@@ -16,10 +16,15 @@ using namespace winrt::Windows::UI::Core;
 class Client {
 public:
     static std::vector<std::string> onlinePlayers;
+    static nlohmann::json onlineVips;
 
     static std::string current_commit;
 
     static std::vector<std::string> getPlayersVector(const nlohmann::json &data);
+
+    static bool isDev(std::string name);
+    static bool isGamer(std::string name);
+    static bool isBooster(std::string name);
 
     static void setWindowTitle(std::wstring title);
     static void changeCursor(CoreCursorType cur);

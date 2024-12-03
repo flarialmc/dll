@@ -91,6 +91,8 @@
 #include "../../Scripting/EventManager/ScriptingEventManager.hpp"
 #include "Modules/Cursor/Cursor.hpp"
 #include "Modules/RawInputBuffer/RawInputBuffer.hpp"
+#include "Modules/JavaDynamicFOV/JavaDynamicFOV.hpp"
+#include "Modules/ItemUseDelayFix/ItemUseDelayFix.hpp"
 
 namespace ModuleManager {
     std::map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -143,6 +145,7 @@ void ModuleManager::initialize() {
     addModule<Hitbox>();
     addModule<HurtColor>();
     addModule<ThirdPerson>();
+    addModule<JavaDynamicFOV>();
 
     addModule<SnapLook>();
     addModule<FogColor>();
@@ -189,6 +192,7 @@ void ModuleManager::initialize() {
     addModule<CustomCrosshair>();
     addModule<Cursor>();
     addModule<RawInputBuffer>();
+    addModule<ItemUseDelayFix>();
 
     addService<GUIKeyListener>();
     addService<DiscordRPCListener>();
@@ -216,12 +220,14 @@ void ModuleManager::terminate() {
 
 
 void restart(){
+    ModuleManager::initialized = false;
     Scripting::instalized = false;
     ScriptingEventManager::clearHandlers();
     for (auto it = ModuleManager::moduleMap.begin(); it != ModuleManager::moduleMap.end(); ) {
         if (it->second != nullptr && it->second->isScripting()) {
             it->second->terminate();
             it = ModuleManager::moduleMap.erase(it);
+            ++it;
         } else {
             ++it;
         }
@@ -229,15 +235,17 @@ void restart(){
 
     Scripting::loadModules();
     for (const auto& pair : ModuleManager::moduleMap) {
-        if (pair.second != nullptr && pair.second->isScripting())
-            pair.second->loadSettings();
+        if (pair.second != nullptr && pair.second->isScripting()) {
             pair.second->terminating = false;
+        }
     }
     Scripting::instalized = true;
+    ModuleManager::initialized = true;
 }
 
 
 void ModuleManager::syncState() {
+    if(!ModuleManager::initialized) return;
     for (const auto& [key, module] : moduleMap) {
         if (!module || module->enabledState == module->isEnabled() || module->delayDisable) {
             continue;

@@ -21,11 +21,35 @@ using namespace winrt::Windows::UI::Core;
 std::string Client::settingspath = Utils::getConfigsPath() + "\\main.flarial";
 Settings Client::settings = Settings();
 std::vector<std::string> Client::onlinePlayers;
+nlohmann::json Client::onlineVips;
 
 bool notifiedOfConnectionIssue = false;
 
 std::string Client::current_commit = COMMIT_HASH;
-
+bool Client::isDev(std::string name) {
+    if (Client::onlineVips.contains("Dev") && Client::onlineVips["Dev"].is_array()) {
+        if (std::find(Client::onlineVips["Dev"].begin(), Client::onlineVips["Dev"].end(), name) != Client::onlineVips["Dev"].end()) {
+            return true;
+        }
+    }
+    return false;
+}
+bool Client::isGamer(std::string name) {
+    if (Client::onlineVips.contains("Gamer") && Client::onlineVips["Gamer"].is_array()) {
+        if (std::find(Client::onlineVips["Gamer"].begin(), Client::onlineVips["Gamer"].end(), name) != Client::onlineVips["Gamer"].end()) {
+            return true;
+        }
+    }
+    return false;
+}
+bool Client::isBooster(std::string name) {
+    if (Client::onlineVips.contains("Booster") && Client::onlineVips["Booster"].is_array()) {
+        if (std::find(Client::onlineVips["Booster"].begin(), Client::onlineVips["Booster"].end(), name) != Client::onlineVips["Booster"].end()) {
+            return true;
+        }
+    }
+    return false;
+}
 std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
     std::vector<std::string> allPlayers;
 
@@ -180,10 +204,10 @@ void Client::initialize() {
     if (Client::settings.getSettingByName<std::string>("fontWeight") == nullptr)
         Client::settings.addSetting("fontWeight", (std::string) "Normal");
 
-    if (Client::settings.getSettingByName<bool>("fralier") == nullptr)
-        Client::settings.addSetting("fralier", (bool)false);
-
     FlarialGUI::ExtractImageResource(IDR_RED_LOGO_PNG, "red-logo.png","PNG");
+    FlarialGUI::ExtractImageResource(IDR_CYAN_LOGO_PNG, "dev-logo.png", "PNG");
+    FlarialGUI::ExtractImageResource(IDR_GAMER_LOGO_PNG, "gamer-logo.png", "PNG");
+    FlarialGUI::ExtractImageResource(IDR_BOOSTER_LOGO_PNG, "booster-logo.png", "PNG");
 
     FlarialGUI::LoadFont(IDR_FONT_TTF);
 

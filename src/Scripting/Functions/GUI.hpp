@@ -75,6 +75,25 @@ namespace GUI {
         return 0;
     }
 
+    int lua_RoundedButton(lua_State *L) {
+        int index = luaL_checkinteger(L, 1);
+        float x = luaL_checknumber(L, 2);
+        float y = luaL_checknumber(L, 3);
+        auto color = static_cast<D2D1::ColorF *>(lua_touserdata(L, 4));
+        auto textColor = static_cast<D2D1::ColorF *>(lua_touserdata(L, 5));
+        std::wstring text = FlarialGUI::to_wide(luaL_checkstring(L, 6));
+        float width = luaL_checknumber(L, 7);
+        float height = luaL_checknumber(L, 8);
+        float radiusX = luaL_checknumber(L, 9);
+        float radiusY = luaL_checknumber(L, 10);
+        bool glow = lua_toboolean(L, 11);
+
+        bool result = FlarialGUI::RoundedButton(index, x, y, *color, *textColor, text.c_str(), width, height, radiusX, radiusY, glow);
+
+        lua_pushboolean(L, result);
+        return 1;
+    }
+
     void registerGUI(lua_State *L) {
         lua_newtable(L);
         lua_pushcfunction(L, lua_RoundedRect);
@@ -87,7 +106,10 @@ namespace GUI {
         lua_setfield(L, -2, "TextWithFont");
 
         lua_pushcfunction(L, lua_Color);
-        lua_setfield(L, -2, "Color");        
+        lua_setfield(L, -2, "Color");
+
+        lua_pushcfunction(L, lua_RoundedButton);
+        lua_setfield(L, -2, "RoundedButton");
 
         lua_setglobal(L, "GUI");
     }

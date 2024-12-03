@@ -17,7 +17,6 @@
 
 __int64* oDrawImage = nullptr;
 __int64* oDrawNineSlice = nullptr;
-std::chrono::time_point<std::chrono::high_resolution_clock> last;
 
 class SetUpAndRenderHook : public Hook
 {

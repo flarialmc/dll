@@ -1,10 +1,20 @@
 #include "ScriptingEventManager.hpp"
+#include "../../SDK/Client/Network/Packet/Packet.hpp"
+#include "../../SDK/Client/Network/Packet/TextPacket.hpp"
 #include <type_traits>
 
 
-std::unordered_map<std::string, std::vector<ScriptingEventManager::EventEntry>> ScriptingEventManager::eventHandlers;
+std::unordered_map<int, std::vector<ScriptingEventManager::EventEntry>> ScriptingEventManager::eventHandlers;
 
-void ScriptingEventManager::registerHandler(lua_State* L, const std::string& eventName) {
+
+
+template void ScriptingEventManager::triggerEvent<int, int>(lua_State* L, int eventName, const int& arg1, const int& arg2);
+template void ScriptingEventManager::triggerEvent<Packet*, int>(lua_State* L, int eventName, Packet* const& arg1, const int& arg2);
+template void ScriptingEventManager::triggerEvent<>(lua_State* L, int eventName);
+
+
+
+void ScriptingEventManager::registerHandler(lua_State* L, const int& eventName) {
     if (!lua_isfunction(L, -1)) {
         lua_pop(L, 1);
         return;
@@ -14,44 +24,52 @@ void ScriptingEventManager::registerHandler(lua_State* L, const std::string& eve
     eventHandlers[eventName].push_back({L, ref});
 }
 
-void pushAny(lua_State* L, const std::any& arg) {
-    if (arg.type() == typeid(int)) {
-        lua_pushinteger(L, std::any_cast<int>(arg));
-    } else if (arg.type() == typeid(double)) {
-        lua_pushnumber(L, std::any_cast<double>(arg));
-    } else if (arg.type() == typeid(std::string)) {
-        lua_pushstring(L, std::any_cast<std::string>(arg).c_str());
-    } else if (arg.type() == typeid(bool)) {
-        lua_pushboolean(L, std::any_cast<bool>(arg));
-    } else if (arg.type() == typeid(const char*)) {
-        lua_pushstring(L, std::any_cast<const char*>(arg));
-    } else {
+template<typename T>
+void pushToLua(lua_State* L, T arg) {
+    if constexpr (std::is_same_v<T, int>) {
+        lua_pushinteger(L, arg);
+    } else if constexpr (std::is_same_v<T, double>) {
+        lua_pushnumber(L, arg);
+    } else if constexpr (std::is_same_v<T, std::string>) {
+        lua_pushstring(L, arg.c_str());
+    } else if constexpr (std::is_same_v<T, bool>) {
+        lua_pushboolean(L, arg);
+    } else if constexpr (std::is_same_v<T, const char*>) {
+        lua_pushstring(L, arg);
+    }
+    else if constexpr (std::is_pointer_v<T>) {
+        lua_pushlightuserdata(L, static_cast<void *>(arg));
+    }
+    else {
+        Logger::error("Unsupported type passed to Lua in pushToLua.");
         lua_pushnil(L);
     }
 }
 
-void ScriptingEventManager::triggerEvent(lua_State* L, const std::string& eventName, const std::vector<std::any>& args) {
+
+
+template<typename... Args>
+void ScriptingEventManager::triggerEvent(lua_State* L, int eventName, const Args&... args) {
     auto it = eventHandlers.find(eventName);
     if (it == eventHandlers.end()) return;
 
     for (const auto& handler : it->second) {
-        if (handler.luaState != L){
+        if (handler.luaState != L) {
             continue;
         }
 
         lua_rawgeti(L, LUA_REGISTRYINDEX, handler.ref);
 
-        for (const auto& arg : args) {
-            pushAny(L, arg);
-        }
+        (pushToLua(L, args), ...);
 
-        if (lua_pcall(L, args.size(), 0, 0) != LUA_OK) {
+        if (lua_pcall(L, sizeof...(args), 0, 0) != LUA_OK) {
             std::string err = lua_tostring(L, -1);
             Logger::error("Lua error in event handler: " + err);
             lua_pop(L, 1);
         }
     }
 }
+
 
 void ScriptingEventManager::clearHandlers() {
     for (auto &[eventName, handlers]: eventHandlers) {
