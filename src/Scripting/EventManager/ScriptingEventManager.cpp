@@ -41,7 +41,6 @@ void pushToLua(lua_State* L, T arg) {
         lua_pushlightuserdata(L, static_cast<void *>(arg));
     }
     else {
-        Logger::error("Unsupported type passed to Lua in pushToLua.");
         lua_pushnil(L);
     }
 }

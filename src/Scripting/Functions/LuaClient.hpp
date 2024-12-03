@@ -5,6 +5,7 @@
 #include "../../Client/GUI/Engine/Engine.hpp"
 #include "../../Client/Module/Manager.hpp"
 #include "../ScriptModuleBase.hpp"
+#include "../LUAHelper.hpp"
 #include <string>
 #include <codecvt>
 
@@ -27,14 +28,9 @@ namespace LuaClient {
 
 
     void registerClient(lua_State *L) {
-        lua_newtable(L);
-
-        lua_pushcfunction(L, lua_Yeet);
-        lua_setfield(L, -2, "Yeet");
-
-        lua_pushcfunction(L, lua_MouseVisibility);
-        lua_setfield(L, -2, "setMouseVisible");
-
-        lua_setglobal(L, "Client");
+        LUAHelper(L)
+                .getClass("Client")
+                .registerFunction("Yeet", lua_Yeet)
+                .registerFunction("setMouseVisible", lua_MouseVisibility);
     }
 }

@@ -5,6 +5,7 @@
 #include "../../Client/GUI/Engine/Engine.hpp"
 #include "../../Client/Module/Manager.hpp"
 #include "../ScriptModuleBase.hpp"
+#include "../LUAHelper.hpp"
 #include <string>
 #include <codecvt>
 
@@ -101,26 +102,13 @@ namespace LuaSettings {
 
 
     void registerSetting(lua_State *L) {
-        lua_newtable(L);
-        lua_pushcfunction(L, lua_CreateSetting);
-        lua_setfield(L, -2, "CreateSetting");
-
-        lua_pushcfunction(L, lua_GetSetting);
-        lua_setfield(L, -2, "GetSetting");
-
-        lua_pushcfunction(L, lua_Render_AddTextBox);
-        lua_setfield(L, -2, "AddTextBox");
-
-        lua_pushcfunction(L, lua_Render_AddToggle);
-        lua_setfield(L, -2, "AddToggle");
-
-        lua_pushcfunction(L, lua_Render_AddHeader);
-        lua_setfield(L, -2, "AddHeader");
-
-        lua_pushcfunction(L, lua_Render_AddSlider);
-        lua_setfield(L, -2, "AddSlider");
-
-
-        lua_setglobal(L, "Settings");
+        LUAHelper(L)
+                .getClass("Settings")
+                .registerFunction("CreateSetting", lua_CreateSetting)
+                .registerFunction("GetSetting", lua_GetSetting)
+                .registerFunction("AddTextBox", lua_Render_AddTextBox)
+                .registerFunction("AddToggle", lua_Render_AddToggle)
+                .registerFunction("AddHeader", lua_Render_AddHeader)
+                .registerFunction("AddSlider", lua_Render_AddSlider);
     }
 }

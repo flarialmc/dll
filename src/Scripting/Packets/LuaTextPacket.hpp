@@ -18,15 +18,9 @@ namespace LuaTextPacket {
         return 1;
     }
     void registerFunctions(lua_State* L) {
-        lua_newtable(L);
-
-        lua_pushcfunction(L, lua_getMessage);
-        lua_setfield(L, -2, "getMessage");
-
-        lua_pushcfunction(L, lua_getType);
-        lua_setfield(L, -2, "getType");
-
-
-        lua_setglobal(L, "TextPacket");
+        LUAHelper(L)
+                .getClass("TextPacket")
+                .registerFunction("getMessage", lua_getMessage)
+                .registerFunction("getType", lua_getType);
     }
 }

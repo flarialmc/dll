@@ -5,6 +5,7 @@
 #include "../../Client/GUI/Engine/Engine.hpp"
 #include "../../Client/Module/Manager.hpp"
 #include "../ScriptModuleBase.hpp"
+#include "../LUAHelper.hpp"
 #include <string>
 #include <codecvt>
 
@@ -47,15 +48,9 @@ namespace LuaModuleManager {
 
 
     void registerModuleManager(lua_State *L) {
-        lua_newtable(L);
-
-        lua_pushcfunction(L, lua_GetModuleByName);
-        lua_setfield(L, -2, "GetModuleByName");
-
-        lua_pushcfunction(L, lua_GetModules);
-        lua_setfield(L, -2, "GetModules");
-
-
-        lua_setglobal(L, "ModuleManager");
+        LUAHelper(L)
+                .getClass("ModuleManager")
+                .registerFunction("GetModuleByName", lua_GetModuleByName)
+                .registerFunction("GetModules", lua_GetModules);
     }
 }

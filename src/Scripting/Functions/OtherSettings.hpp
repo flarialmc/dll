@@ -5,6 +5,7 @@
 #include "../../Client/GUI/Engine/Engine.hpp"
 #include "../../Client/Module/Manager.hpp"
 #include "../ScriptModuleBase.hpp"
+#include "../LUAHelper.hpp"
 #include <string>
 #include <codecvt>
 
@@ -31,11 +32,8 @@ namespace LuaOtherSettings {
     }
 
     void registerSetting(lua_State *L) {
-        lua_newtable(L);
-
-        lua_pushcfunction(L, lua_GetSetting);
-        lua_setfield(L, -2, "GetSetting");
-
-        lua_setglobal(L, "ModuleSettings");
+        LUAHelper(L)
+                .getClass("ModuleSettings")
+                .registerFunction("lua_GetSetting", lua_GetSetting);
     }
 }

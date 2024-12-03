@@ -3,6 +3,7 @@
 #include <lua.hpp>
 #include <d2d1helper.h>
 #include "../../Client/GUI/Engine/Engine.hpp"
+#include "../LUAHelper.hpp"
 #include <string>
 #include <codecvt>
 
@@ -95,22 +96,12 @@ namespace GUI {
     }
 
     void registerGUI(lua_State *L) {
-        lua_newtable(L);
-        lua_pushcfunction(L, lua_RoundedRect);
-        lua_setfield(L, -2, "RoundedRect");
-
-        lua_pushcfunction(L, lua_RoundedHollowRect);
-        lua_setfield(L, -2, "RoundedHollowRect");
-
-        lua_pushcfunction(L, lua_FlarialTextWithFont);
-        lua_setfield(L, -2, "TextWithFont");
-
-        lua_pushcfunction(L, lua_Color);
-        lua_setfield(L, -2, "Color");
-
-        lua_pushcfunction(L, lua_RoundedButton);
-        lua_setfield(L, -2, "RoundedButton");
-
-        lua_setglobal(L, "GUI");
+        LUAHelper(L)
+                .getClass("GUI")
+                .registerFunction("RoundedRect", lua_RoundedRect)
+                .registerFunction("RoundedHollowRect", lua_RoundedHollowRect)
+                .registerFunction("TextWithFont", lua_FlarialTextWithFont)
+                .registerFunction("Color", lua_Color)
+                .registerFunction("RoundedButton", lua_RoundedButton);
     }
 }

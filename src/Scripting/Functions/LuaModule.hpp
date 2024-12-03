@@ -5,6 +5,7 @@
 #include "../../Client/GUI/Engine/Engine.hpp"
 #include "../../Client/Module/Manager.hpp"
 #include "../ScriptModuleBase.hpp"
+#include "../LUAHelper.hpp"
 #include <string>
 #include <codecvt>
 
@@ -44,20 +45,11 @@ namespace LuaModule {
     }
 
     void registerModule(lua_State *L) {
-        lua_newtable(L);
-
-        lua_pushcfunction(L, lua_Toggle);
-        lua_setfield(L, -2, "Toggle");
-
-        lua_pushcfunction(L, lua_GetName);
-        lua_setfield(L, -2, "getName");
-
-        lua_pushcfunction(L, lua_GetDescription);
-        lua_setfield(L, -2, "getDescription");
-
-        lua_pushcfunction(L, lua_isEnabled);
-        lua_setfield(L, -2, "isEnabled");
-
-        lua_setglobal(L, "Module");
+        LUAHelper(L)
+            .getClass("Module")
+            .registerFunction("Toggle", lua_Toggle)
+            .registerFunction("getName", lua_GetName)
+            .registerFunction("getDescription", lua_GetDescription)
+            .registerFunction("isEnabled", lua_isEnabled);
     }
 }
