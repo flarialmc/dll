@@ -403,7 +403,26 @@ uint64_t Utils::getCurrentMs() {
                std::chrono::steady_clock::now().time_since_epoch())
         .count();
 }
+std::string Utils::DownloadString(const std::string& url) {
+    HINTERNET interwebs = InternetOpenA("Samsung Smart Fridge", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
+    if (!interwebs) {
+        return "";
+    }
 
+    std::string rtn;
+    HINTERNET urlFile = InternetOpenUrlA(interwebs, url.c_str(), NULL, 0, INTERNET_FLAG_RELOAD, 0);
+    if (urlFile) {
+        char buffer[2000];
+        DWORD bytesRead;
+        while (InternetReadFile(urlFile, buffer, sizeof(buffer), &bytesRead) && bytesRead > 0) {
+            rtn.append(buffer, bytesRead);
+        }
+        InternetCloseHandle(urlFile);
+    }
+
+    InternetCloseHandle(interwebs);
+    return String::replaceAll(rtn, "|n", "\r\n");
+}
 std::string Utils::downloadFile(const std::string& url) {
     auto internetCloser = [](HINTERNET handle) { if (handle) InternetCloseHandle(handle); };
 

@@ -45,7 +45,6 @@ struct PageType {
 
 class ClickGUI : public Module {
 private:
-    Module *ghostMainModule;
     float baseHeightReal = 0.f;
     float baseHeightActual = 0.00001f;
     float realBlurAmount = 0.00001f;
@@ -55,6 +54,7 @@ private:
     float width2 = 0.000001f;
     float width3 = 0.000001f;
     std::string searchBarString;
+    Module* ghostMainModule;
 public:
     static inline float modcardOpacity = 1.f;
     static inline float settingsOpacity = 0.f;
@@ -75,6 +75,7 @@ public:
     void onSetup() override {
         Listen(this, MouseEvent, &ClickGUI::onMouse)
         Listen(this, KeyEvent, &ClickGUI::onKey)
+        Listen(this, PacketEvent, &ClickGUI::onPacket)
         ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
         Module::onEnable();
     }
@@ -1460,6 +1461,17 @@ public:
         if ((this->active || editmenu) && SDK::getCurrentScreen() == "hud_screen")
             event.cancel(); // TODO: modules dont listen for canceled state!!!
 
+    }
+
+    void onPacket(PacketEvent& event) {
+        if (event.getPacket()->getId() == MinecraftPacketIds::StartGame)
+        {
+            Client::fetchVips();
+        }
+        if (event.getPacket()->getId() == MinecraftPacketIds::Login)
+        {
+            Client::fetchVips();
+        }
     }
 
     static bool compareEnabled(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {

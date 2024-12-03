@@ -192,7 +192,7 @@ void ModuleManager::initialize() {
     addModule<CustomCrosshair>();
     addModule<Cursor>();
     addModule<RawInputBuffer>();
-    addModule<ItemUseDelayFix>();
+    //addModule<ItemUseDelayFix>();
 
     addService<GUIKeyListener>();
     addService<DiscordRPCListener>();

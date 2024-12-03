@@ -295,6 +295,7 @@ public:
     static uint64_t getCurrentMs();
 
     static std::string downloadFile(const std::string& url);
+    static std::string DownloadString(const std::string& url);
 };
 
 class String {
