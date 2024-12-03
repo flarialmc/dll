@@ -53,7 +53,7 @@ DWORD WINAPI init(HMODULE real)
 
                             ModuleManager::onlineUsers.clear();
                             ModuleManager::onlineUsers.push_back(Utils::removeColorCodes(name));
-                            std::string pp = DownloadString("https://api.flarial.synthetix.host/users");
+                            std::string pp = DownloadString("https://flarial.xyz/users");
 
                             json playersDict;
 
@@ -106,7 +106,7 @@ DWORD WINAPI init(HMODULE real)
                                 if (clearedName.empty()) clearedName = Utils::removeColorCodes(name);
                                 // send thing
                                 std::cout << DownloadString(
-                                        std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}", clearedName,
+                                        std::format("https://flarial.xyz/heartbeat/{}/{}", clearedName,
                                                     ipToSend)) << std::endl;
 
                                 lastBeatTime = now;
