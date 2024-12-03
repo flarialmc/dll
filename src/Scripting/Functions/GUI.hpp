@@ -26,10 +26,10 @@ namespace GUI {
         int y = luaL_checkinteger(L, 2);
         auto color = static_cast<D2D1::ColorF *>(lua_touserdata(L, 3));
 
-        float radiusX = luaL_checknumber(L, 4);
-        float radiusY = luaL_checknumber(L, 5);
-        float width = luaL_checknumber(L, 6);
-        float height = luaL_checknumber(L, 7);
+        float width = luaL_checknumber(L, 4);
+        float height = luaL_checknumber(L, 5);
+        float radiusX = luaL_checknumber(L, 6);
+        float radiusY = luaL_checknumber(L, 7);
 
         FlarialGUI::RoundedRect(x, y, *color, radiusX, radiusY, width, height);
 
