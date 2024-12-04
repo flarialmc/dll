@@ -148,7 +148,9 @@ void ModuleManager::initialize() {
     addModule(new SpeedDisplay());
     addModule(new CPSLimiter());
     addModule(new BlockBreakIndicator());
-    addModule(new Animations());
+    if(!WinrtUtils::checkAboveOrEqual(21, 50)) {
+        addModule(new Animations());
+    }
     addModule(new BlockOutline());
     addModule(new NoHurtCam());
     addModule(new InventoryHUD());
