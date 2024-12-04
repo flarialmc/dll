@@ -51,7 +51,9 @@ public:
     }
 
     void drawImage(TexturePtr& texture, Vec2<float>& pos, Vec2<float>& size, Vec2<float>& uvPos, Vec2<float>& uvSize) {
-        if (WinrtUtils::checkAboveOrEqual(21, 20))
+        if (WinrtUtils::checkAboveOrEqual(21, 50))
+            Memory::CallVFunc<7, void, BedrockTextureData*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&, bool>(this, texture.clientTexture.get(), pos, size, uvPos, uvSize, false);
+        else if (WinrtUtils::checkAboveOrEqual(21, 20))
             Memory::CallVFunc<7, void, TexturePtr&, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&, bool>(this, texture, pos, size, uvPos, uvSize, false);
         else
             Memory::CallVFunc<7, void, TexturePtr&, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(this, texture, pos, size, uvPos, uvSize);

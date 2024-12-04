@@ -153,7 +153,7 @@ public:
                     auto size = Vec2<float>(18.0f * ui_scale, 18.0f * ui_scale);
                     static auto uvPos = Vec2<float>(0.f, 0.f);
                     static auto uvSize = Vec2<float>(1.0f, 1.0f);
-                    muirc->drawImage(texture, position, size,uvPos,uvSize);
+                    muirc->drawImage(texture, position, size, uvPos, uvSize);
                     static auto color = mce::Color();
                     static auto flushLayer = HashedString("ui_flush");
                     muirc->flushImages(color, 1.0f, flushLayer);

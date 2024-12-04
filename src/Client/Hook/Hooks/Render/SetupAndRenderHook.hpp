@@ -53,6 +53,31 @@ private:
         );
     }
 
+    static void drawImageDetour2150(
+            MinecraftUIRenderContext* _this,
+            BedrockTextureData* texture,
+            Vec2<float>& imagePos,
+            Vec2<float>& imageDimension,
+            Vec2<float>& uvPos,
+            Vec2<float>& uvSize,
+            bool unk
+    )
+    {
+        // DrawImageEvent event(texturePtr, imagePos);
+        // EventHandler::onDrawImage(event);
+
+        Memory::CallFunc<void*, MinecraftUIRenderContext*, BedrockTextureData*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(
+                oDrawImage,
+                _this,
+                texture,
+                imagePos,
+                imageDimension,
+                uvPos,
+                uvSize,
+                unk
+        );
+    }
+
     static void drawImageDetour2120(
             MinecraftUIRenderContext* _this,
             TexturePtr* texturePtr,
@@ -87,7 +112,9 @@ private:
         }
 
         if (oDrawImage == nullptr) {
-            if (WinrtUtils::checkAboveOrEqual(21, 20))
+            if (WinrtUtils::checkAboveOrEqual(21, 50))
+                Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour2150, (void **) &oDrawImage, "DrawImage");
+            else if (WinrtUtils::checkAboveOrEqual(21, 20))
                 Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour2120, (void **) &oDrawImage, "DrawImage");
             else
                 Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour, (void **) &oDrawImage, "DrawImage");
