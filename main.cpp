@@ -50,37 +50,43 @@ DWORD WINAPI init(HMODULE real)
                         if(elapsed >= std::chrono::seconds(60)) {
                             std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
 
+                            bool skipFetch = true;
 
-                            ModuleManager::onlineUsers.clear();
-                            ModuleManager::onlineUsers.push_back(Utils::removeColorCodes(name));
-                            std::string pp = DownloadString("https://flarial.xyz/users");
+                            if(!skipFetch) {
+                                ModuleManager::onlineUsers.clear();
+                                ModuleManager::onlineUsers.push_back(Utils::removeColorCodes(name));
+                                std::string pp = DownloadString("https://flarial.xyz/users");
 
-                            json playersDict;
+                                json playersDict;
 
-                            try {
-                                playersDict = json::parse(pp);
-                            } catch (const json::parse_error& e) {
-                                Logger::error(e.what());
-                                lastBeatTime = now;
-                                continue;
-                            }
-
-                            int totalPlaytime = 0;
-                            int numberOfPlayers = 0;
-
-                            for (const auto& player : playersDict.items()) {
                                 try {
-                                    if (!player.value().contains("lastbeat") || !player.value()["lastbeat"].is_number()) {
-                                        std::cerr << "Invalid or missing 'lastbeat' for player: " << player.key() << std::endl;
+                                    playersDict = json::parse(pp);
+                                } catch (const json::parse_error &e) {
+                                    Logger::error(e.what());
+                                    lastBeatTime = now;
+                                    continue;
+                                }
+
+                                int totalPlaytime = 0;
+                                int numberOfPlayers = 0;
+
+                                for (const auto &player: playersDict.items()) {
+                                    try {
+                                        if (!player.value().contains("lastbeat") ||
+                                            !player.value()["lastbeat"].is_number()) {
+                                            std::cerr << "Invalid or missing 'lastbeat' for player: " << player.key()
+                                                      << std::endl;
+                                            continue;
+                                        }
+
+                                        std::string name2 = Utils::removeNonAlphanumeric(player.key());
+                                        name2 = replaceAll(name2, "�", "");
+                                        ModuleManager::onlineUsers.push_back(name2);
+                                    } catch (const std::exception &e) {
+                                        std::cerr << "Error processing player: " << player.key() << " - " << e.what()
+                                                  << std::endl;
                                         continue;
                                     }
-
-                                    std::string name2 = Utils::removeNonAlphanumeric(player.key());
-                                    name2 = replaceAll(name2, "�", "");
-                                    ModuleManager::onlineUsers.push_back(name2);
-                                } catch (const std::exception& e) {
-                                    std::cerr << "Error processing player: " << player.key() << " - " << e.what() << std::endl;
-                                    continue;
                                 }
                             }
 
