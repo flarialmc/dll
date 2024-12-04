@@ -10,14 +10,21 @@ void OffsetInit::init2150() {
     ADD_OFFSET("Actor::level", 0x1D8);
     ADD_OFFSET("Actor::categories", 0x210);
 
-    ADD_OFFSET("Level::hitResult", 0x218);
-
     ADD_OFFSET("Player::gamemode", 0xB18);
     ADD_OFFSET("Player::playerName", 0xCA0);
 
     ADD_OFFSET("Player::playerInventory", 0x5D0);
 
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x6E4);
+
+    ADD_OFFSET("MoveInputComponent::forward", 0xD);
+    ADD_OFFSET("MoveInputComponent::backward", 0xE);
+    ADD_OFFSET("MoveInputComponent::left", 0xF);
+    ADD_OFFSET("MoveInputComponent::right", 0x10);
+
+    ADD_OFFSET("MoveInputComponent::sneaking", 0x28);
+    ADD_OFFSET("MoveInputComponent::jumping", 0x2F);
+    ADD_OFFSET("MoveInputComponent::sprinting", 0x30);
 }
 
 void OffsetInit::init2140() {

@@ -42,7 +42,7 @@ public:
     HitResult &getHitResult() {
         static int offset = GET_OFFSET("Level::hitResult");
 
-        if (WinrtUtils::checkAboveOrEqual(20, 60))
+        if (WinrtUtils::checkAboveOrEqual(20, 60) || !WinrtUtils::checkAboveOrEqual(21, 50))
             return *hat::member_at<std::shared_ptr<HitResult>>(this, offset);
 
         return hat::member_at<HitResult>(this, offset);
