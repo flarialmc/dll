@@ -167,8 +167,6 @@ void Client::initialize() {
 
     FlarialGUI::LoadFont(IDR_MINECRAFTIA_TTF);
 
-    Logger::initialize();
-
     HookManager::initialize();
     ModuleManager::initialize();
     Logger::debug("[Client] Ready.");

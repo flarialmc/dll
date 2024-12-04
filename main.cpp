@@ -34,7 +34,7 @@ DWORD WINAPI init(HMODULE real)
         freopen_s(&out, ("CONOUT$"), ("w"), stdout);
     }
 #endif
-
+    Logger::initialize();
     Client::initialize();
     Logger::info("[Client] Initializing");
 
