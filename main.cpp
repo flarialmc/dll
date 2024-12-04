@@ -112,7 +112,7 @@ DWORD WINAPI init(HMODULE real)
                                 if (clearedName.empty()) clearedName = Utils::removeColorCodes(name);
                                 // send thing
                                 std::cout << DownloadString(
-                                        std::format("https://flarial.xyz/heartbeat/{}/{}", clearedName,
+                                        std::format("https://api.flarial.xyz/heartbeat/{}/{}", clearedName,
                                                     ipToSend)) << std::endl;
 
                                 lastBeatTime = now;
