@@ -94,6 +94,7 @@
 #include "Modules/JavaDynamicFOV/JavaDynamicFOV.hpp"
 #include "Modules/ItemUseDelayFix/ItemUseDelayFix.hpp"
 #include "../../Scripting/Console/ConsoleService.hpp"
+#include "../Commands/CommandService.hpp"
 
 namespace ModuleManager {
     std::map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -202,6 +203,7 @@ void ModuleManager::initialize() {
     addService<CentreCursorListener>();
     addService<rgbListener>();
     addService<HiveModeCatcherListener>();
+    addService<CommandService>();
 
     addService<ConsoleService>();
     Scripting::loadModules();

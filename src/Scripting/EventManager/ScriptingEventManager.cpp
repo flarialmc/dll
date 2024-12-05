@@ -63,7 +63,7 @@ void ScriptingEventManager::triggerEvent(lua_State* L, int eventName, const Args
 
         if (lua_pcall(L, sizeof...(args), 0, 0) != LUA_OK) {
             std::string err = lua_tostring(L, -1);
-            Logger::error("Lua error in event handler: " + err);
+            Logger::error("Error while executing event handler: {}", err);
             lua_pop(L, 1);
         }
     }

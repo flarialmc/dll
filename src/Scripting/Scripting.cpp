@@ -18,6 +18,7 @@
 #include "Functions/LuaClient.hpp"
 #include "Functions/LuaModule.hpp"
 #include "Console/Console.hpp"
+#include "Functions/LuaOnCommand.hpp"
 
 
 int apiRevision = 1;
@@ -61,6 +62,7 @@ void registerFunctions(lua_State* L){
     LuaModuleManager::registerModuleManager(L);
     LuaClient::registerClient(L);
     LuaModule::registerModule(L);
+    LuaOnCommand::registerLuaOnCommand(L);
 
 
     LuaTextPacket::registerFunctions(L);
