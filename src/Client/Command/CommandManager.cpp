@@ -6,6 +6,7 @@
 #include "Commands/HelpCommand.hpp"
 #include "Commands/LuaCommand.hpp"
 #include "Commands/PathCommand.hpp"
+#include "Commands/OpenCommand.hpp"
 
 std::vector<std::unique_ptr<Command>> CommandManager::Commands = std::vector<std::unique_ptr<Command>>();
 CommandManager CommandManager::instance;
@@ -16,6 +17,7 @@ void CommandManager::initialize() {
     Commands.push_back(std::make_unique<PrefixCommand>());
     Commands.push_back(std::make_unique<LuaCommand>());
     Commands.push_back(std::make_unique<PathCommand>());
+    Commands.push_back(std::make_unique<OpenCommand>());
 Listen(&CommandManager::instance, PacketSendEvent, &CommandManager::onPacket);
 }
 

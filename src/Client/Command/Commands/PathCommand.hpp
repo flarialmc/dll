@@ -4,6 +4,6 @@
 
 class PathCommand : public Command {
 public:
-    PathCommand() : Command("path", "Copies the client directory to your clipboard") {}
+    PathCommand() : Command("path", "Opens the client directory in File Explorer") {}
     void execute(const std::vector<std::string>& args) override;
 };

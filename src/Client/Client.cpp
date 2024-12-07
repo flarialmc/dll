@@ -103,6 +103,7 @@ void Client::changeCursor(CoreCursorType cur) {
     });
 }
 void Client::initialize() {
+    winrt::init_apartment();
     setWindowTitle(L"Flarial " + String::StrToWStr(WinrtUtils::getFormattedVersion() + " " + current_commit));
 
     VersionUtils::init();
