@@ -18,6 +18,7 @@
 #include "Functions/LuaClient.hpp"
 #include "Functions/LuaModule.hpp"
 #include "Console/Console.hpp"
+#include "Commands/LuaOnCommand.hpp"
 
 
 int apiRevision = 1;
@@ -47,6 +48,43 @@ void Scripting::executeFunction(lua_State* L, std::string functionName, bool shi
     }
 }
 
+void Scripting::unloadModules(){
+    for (auto& scriptModule : Scripting::luaScriptModules) {
+        lua_State* L = scriptModule.first;
+        Module* module = scriptModule.second;
+
+        if (module) {
+            std::string name = module->name;
+            size_t hash = std::hash<std::string>{}(name);
+
+            auto it = ModuleManager::moduleMap.find(hash);
+            if (it != ModuleManager::moduleMap.end()) {
+                auto module = it->second;
+                if (module) {
+                    module->onDisable();
+                    module->terminate();
+                }
+                ModuleManager::moduleMap.erase(it);
+                Logger::info("Module '{}' has been unloaded.", name);
+            } else {
+                Logger::warn("Attempted to unload non-existent module '{}'.", name);
+            }
+        }
+
+        if (L) {
+            lua_close(L);
+        }
+    }
+
+    Scripting::luaScriptModules.clear();
+    Scripting::scriptsAmount = 0;
+    Scripting::scriptsAmountWithoutErrors = 0;
+    Scripting::scriptsAmountWithErrors = 0;
+
+    Logger::info("All scripts have been unloaded.");
+    Scripting::console.addLog("Scripting", "All scripts have been unloaded.", fg(fmt::color::yellow));
+}
+
 
 void registerFunctions(lua_State* L){
     lua_register(L, "onEvent", lua_register_event_handler);
@@ -61,6 +99,7 @@ void registerFunctions(lua_State* L){
     LuaModuleManager::registerModuleManager(L);
     LuaClient::registerClient(L);
     LuaModule::registerModule(L);
+    LuaOnCommand::registerLuaOnCommand(L);
 
     LuaTextPacket::registerFunctions(L);
 }
