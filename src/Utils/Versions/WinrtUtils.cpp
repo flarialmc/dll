@@ -8,12 +8,6 @@
 
 Version WinrtUtils::getMCVersion() {
     static Version version;
-
-    static bool done = false;
-
-    if (!done) {
-        winrt::init_apartment();
-
         try {
             const winrt::Windows::ApplicationModel::Package package = winrt::Windows::ApplicationModel::Package::Current();
             auto [major, minor, build, revision] = package.Id().Version();
@@ -25,10 +19,6 @@ Version WinrtUtils::getMCVersion() {
         catch (const winrt::hresult_error& ex) {
             version.error = "Error: " + to_string(ex.message());
         }
-
-        done = true;
-    }
-
     return version;
 }
 

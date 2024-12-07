@@ -1,13 +1,16 @@
 ﻿#include "Utils.hpp"
-#include "Logger/Logger.hpp"
+
 #include "../Client/GUI/Engine/Engine.hpp"
 #include <sstream>
 #include <algorithm>
-#include <iostream>
 #include <codecvt>
 #include <Psapi.h>
 #include <regex>
 #include <wininet.h>
+
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Storage.h>
+#include <winrt/Windows.System.h>
 
 std::string Utils::getRoamingPath() {
     char *path = nullptr;
@@ -461,6 +464,42 @@ std::string Utils::downloadFile(const std::string& url) {
     }
 
     return rtn;
+}
+
+void Utils::openFolder(const std::string& path) {
+    using namespace winrt;
+    using namespace Windows::Foundation;
+    using namespace Windows::Storage;
+    using namespace Windows::System;
+
+    try {
+        hstring hFolderPath = to_hstring(path);
+
+        StorageFolder folder = StorageFolder::GetFolderFromPathAsync(hFolderPath).get();
+
+        // Launch the folder in File Explorer
+        Launcher::LaunchFolderAsync(folder).get();
+    } catch (const winrt::hresult_error& e) {
+        Logger::error("An error occurred while trying to open {}: {} ({})", path, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
+    }
+}
+
+void Utils::openSubFolder(const std::string& path) {
+    using namespace winrt;
+    using namespace Windows::Storage;
+    using namespace Windows::System;
+
+    try {
+        StorageFolder roamingFolder = ApplicationData::Current().RoamingFolder();
+
+        // Get the specified subfolder inside RoamingState
+        auto folder = roamingFolder.GetFolderAsync(winrt::hstring(String::StrToWStr(path))).get();
+
+        // Launch the subfolder in File Explorer
+        Launcher::LaunchFolderAsync(folder).get();
+    } catch (const winrt::hresult_error& e) {
+        Logger::error("An error occurred while trying to open {}: {} ({})", path, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
+    }
 }
 
 std::string String::replaceAll(std::string& string, std::string_view c1, std::string_view c2) {
