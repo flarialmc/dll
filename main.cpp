@@ -10,6 +10,7 @@
 
 #include "src/Utils/Logger/crashlogs.hpp"
 #include "src/Client/Module/Modules/Nick/NickModule.hpp"
+#include "src/Client/Command/CommandManager.hpp"
 
 std::chrono::steady_clock::time_point lastBeatTime;
 std::chrono::steady_clock::time_point lastOnlineUsersFetchTime;
@@ -115,6 +116,7 @@ DWORD WINAPI init() {
 
     ModuleManager::terminate();
     HookManager::terminate();
+    CommandManager::terminate();
 
     MH_DisableHook(MH_ALL_HOOKS);
     MH_Uninitialize();

@@ -572,3 +572,28 @@ std::string String::removeNonNumeric(const std::string& string) {
     }
     return result;
 }
+
+std::vector<std::string> String::split(std::string_view str, char delimiter) {
+    std::vector<std::string> result;
+    size_t start = 0;
+    size_t end = 0;
+
+    while ((end = str.find(delimiter, start)) != std::string::npos) {
+        result.emplace_back(str.substr(start, end - start));
+        start = end + 1;
+    }
+
+    result.emplace_back(str.substr(start));
+
+    return result;
+}
+
+std::string String::toLower(std::string input) {
+    std::ranges::transform(input, input.begin(), ::tolower);
+    return input;
+}
+
+std::string String::toUpper(std::string input) {
+    std::ranges::transform(input, input.begin(), ::toupper);
+    return input;
+}

@@ -14,6 +14,8 @@
 #include "winrt/Windows.UI.Core.h"
 #include "winrt/windows.system.h"
 
+#include "Command/CommandManager.hpp"
+
 using namespace winrt::Windows::UI::ViewManagement;
 using namespace winrt::Windows::ApplicationModel::Core;
 using namespace winrt::Windows::UI::Core;
@@ -231,6 +233,7 @@ void Client::initialize() {
 
     HookManager::initialize();
     ModuleManager::initialize();
+    CommandManager::initialize();
 }
 
 std::string window = "Minecraft";
