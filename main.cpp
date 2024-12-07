@@ -60,7 +60,7 @@ DWORD WINAPI init() {
             if (clearedName.empty()) clearedName = String::removeColorCodes(name);
 
             if (clearedName != "skinStandardCust") {
-                Utils::DownloadString(std::format("https://api.flarial.synthetix.host/heartbeat/{}/{}", clearedName, ipToSend));
+                Utils::DownloadString(std::format("https://api.flarial.xyz/heartbeat/{}/{}", clearedName, ipToSend));
                 lastBeatTime = now;
             }
         }
