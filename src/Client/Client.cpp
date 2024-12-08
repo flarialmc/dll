@@ -13,6 +13,7 @@
 #include "winrt/Windows.UI.ViewManagement.h"
 #include "winrt/Windows.UI.Core.h"
 #include "winrt/windows.system.h"
+#include "Command/CommandManager.hpp"
 
 using namespace winrt::Windows::UI::ViewManagement;
 using namespace winrt::Windows::ApplicationModel::Core;
@@ -214,6 +215,9 @@ void Client::initialize() {
     if (Client::settings.getSettingByName<std::string>("fontWeight") == nullptr)
         Client::settings.addSetting("fontWeight", (std::string) "Normal");
 
+    if (Client::settings.getSettingByName<std::string>("prefix") == nullptr)
+        Client::settings.addSetting("prefix", (std::string) ".");
+
     FlarialGUI::ExtractImageResource(IDR_RED_LOGO_PNG, "red-logo.png","PNG");
     FlarialGUI::ExtractImageResource(IDR_CYAN_LOGO_PNG, "dev-logo.png", "PNG");
     FlarialGUI::ExtractImageResource(IDR_GAMER_LOGO_PNG, "gamer-logo.png", "PNG");
@@ -227,6 +231,7 @@ void Client::initialize() {
 
     HookManager::initialize();
     ModuleManager::initialize();
+    CommandManager::initialize();
 }
 
 std::string window = "Minecraft";

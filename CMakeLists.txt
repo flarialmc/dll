@@ -92,7 +92,7 @@ endif()
 
 file(GLOB_RECURSE sources "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp" "src/Client/GUI/Engine/*.cpp")
 
-add_library(${PROJECT_NAME} SHARED ${sources} main.cpp src/Assets/Assets.rc)
+add_library(${PROJECT_NAME} SHARED ${sources} main.cpp src/Assets/Assets.rc "src/Client/Command/Commands/Prefix/Prefix.cpp")
 
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/" "${CMAKE_CURRENT_LIST_DIR}/lib/glm/" "${CMAKE_CURRENT_LIST_DIR}/lib/ImGui")
 
