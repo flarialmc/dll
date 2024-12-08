@@ -41,6 +41,9 @@ public:
     }
 
     void defaultConfig() override {
+        if(settings.getSettingByName<std::string>("text") == nullptr)
+            settings.addSetting("text", (std::string) "{VALUE}");
+
         Scripting::executeFunction(module_lua_state, "defaultConfig", false);
     }
 

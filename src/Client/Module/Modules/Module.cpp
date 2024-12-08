@@ -518,6 +518,10 @@ void Module::defaultConfig() {
         settings.addSetting("percentageY", 0.0f);
     }
 
+    if (settings.getSettingByName<float>("textscale") == nullptr) {
+        settings.addSetting("textscale", 1.0f);
+    }
+
     if (settings.getSettingByName<bool>("border") == nullptr) {
         settings.addSetting("border", false);
         settings.addSetting("borderWidth", 1.0f);
