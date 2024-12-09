@@ -50,8 +50,8 @@ void Scripting::executeFunction(lua_State* L, std::string functionName, bool shi
 
 void Scripting::unloadModules(){
     for (auto& scriptModule : Scripting::luaScriptModules) {
-        lua_State* L = scriptModule.first;
-        Module* module = scriptModule.second;
+        lua_State *L = scriptModule.first;
+        Module *module = scriptModule.second;
 
         if (module) {
             std::string name = module->name;
@@ -60,10 +60,8 @@ void Scripting::unloadModules(){
             auto it = ModuleManager::moduleMap.find(hash);
             if (it != ModuleManager::moduleMap.end()) {
                 auto module = it->second;
-                if (module) {
-                    module->onDisable();
-                    module->terminate();
-                }
+                module->onDisable();
+                module->terminate();
                 ModuleManager::moduleMap.erase(it);
                 Logger::info("Module '{}' has been unloaded.", name);
             } else {

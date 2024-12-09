@@ -64,22 +64,32 @@ public:
     void onKey(KeyEvent& event) {
         if (!Scripting::instalized || !this->isEnabled()) return;
 
-        ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onKeyEvent,
+        bool canceled = ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onKeyEvent,
                                             event.getKey(), event.getAction());
+
+        if (canceled) {
+            event.cancel();
+        }
     }
 
     void onMouse(MouseEvent& event) {
         if (!Scripting::instalized || !this->isEnabled() || event.getButton() == 0 || event.getAction() == 0) return;
 
-        ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onMouseEvent,
+        bool canceled = ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onMouseEvent,
                                             (int)event.getButton(), (int)event.getAction());
+        if (canceled) {
+            event.cancel();
+        }
     }
 
     void onPacketReceive(PacketEvent &event) {
         if (!Scripting::instalized || !this->isEnabled()) return;
 
-        ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onPacketReceiveEvent,
+        bool canceled = ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onPacketReceiveEvent,
                                             event.getPacket(), (int)event.getPacket()->getId());
+        if (canceled) {
+            event.cancel();
+        }
     }
 
     void onTickEvent(TickEvent& event) {

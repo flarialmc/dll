@@ -224,12 +224,7 @@ void ModuleManager::terminate() {
 
 void restart(){
     Scripting::unloadModules();
-    for (const auto& [shit, module] : ModuleManager::moduleMap) {
-        if(module) {
-            Logger::info(module->name);
-        }
-    }
-    //Scripting::loadModules();
+    Scripting::loadModules();
 }
 
 
