@@ -38,12 +38,12 @@ namespace player {
             return 0;
         }
         lua_newtable(L); //create new table for players
-        const std::vector<Actor *> playerList = SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList();
-        for (const auto &player: playerList) {
-            lua_pushstring(L, player->getNametag()->c_str()); //push strng of player name to table
-            lua_rawseti(L, -2,
-                        std::distance((playerList.begin()), std::find(playerList.begin(), playerList.end(), player)) +
-                        1);
+
+        const std::vector<Actor *> playerList= SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList() ;
+        for (const auto &player : playerList){
+            lua_pushlightuserdata(L,player); //push strng of player name to table
+            lua_rawseti(L, -2, std::distance((playerList.begin()), std::find(playerList.begin(), playerList.end(),player))+1);
+
             //set item at index of player + 1 (lua arrays are not 0-indexed;
         };
         return 1;
