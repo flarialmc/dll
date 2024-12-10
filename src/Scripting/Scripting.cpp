@@ -42,7 +42,6 @@ void Scripting::executeFunction(lua_State* L, std::string functionName, bool shi
     }
 }
 
-
 void registerFunctions(lua_State* L){
     lua_register(L, "onEvent", lua_register_event_handler);
 
