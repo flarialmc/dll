@@ -1,6 +1,8 @@
 #pragma once
 
 #include "lua.h"
+#include <magic_enum/magic_enum_all.hpp>
+#include <string>
 
 namespace ScriptEvents {
 
@@ -15,22 +17,10 @@ namespace ScriptEvents {
     void pushEventTypesToLua(lua_State *L) {
         lua_newtable(L);
 
-        lua_pushinteger(L, onRenderEvent);
-        lua_setfield(L, -2, "onRenderEvent");
-
-        lua_pushinteger(L, onTickEvent);
-        lua_setfield(L, -2, "onTickEvent");
-
-        lua_pushinteger(L, onPacketReceiveEvent);
-        lua_setfield(L, -2, "onPacketReceiveEvent");
-
-        lua_pushinteger(L, onMouseEvent);
-        lua_setfield(L, -2, "onMouseEvent");
-
-        lua_pushinteger(L, onKeyEvent);
-        lua_setfield(L, -2, "onKeyEvent");
-
-
+        for (auto [event, name] : magic_enum::enum_entries<EventType>()) {
+            lua_pushinteger(L, static_cast<lua_Integer>(event));
+            lua_setfield(L, -2, name.data());
+        }
 
         lua_setglobal(L, "EventType");
     }

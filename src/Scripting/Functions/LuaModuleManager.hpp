@@ -5,6 +5,7 @@
 #include "../../Client/GUI/Engine/Engine.hpp"
 #include "../../Client/Module/Manager.hpp"
 #include "../ScriptModuleBase.hpp"
+#include "../LUAHelper.hpp"
 #include <string>
 #include <codecvt>
 
@@ -18,6 +19,16 @@ namespace LuaModuleManager {
             }
         }
         return std::nullopt;
+    }
+
+    int lua_GetModules(lua_State *L) {
+        lua_newtable(L);
+        const std::vector<std::shared_ptr<Module>> moduleList = ModuleManager::getModules();
+        for (const auto &module : moduleList){
+            lua_pushlightuserdata(L, module.get());
+            lua_rawseti(L, -2, std::distance((moduleList.begin()), std::find(moduleList.begin(), moduleList.end(),module))+1);
+        };
+        return 1;
     }
 
 
@@ -37,11 +48,9 @@ namespace LuaModuleManager {
 
 
     void registerModuleManager(lua_State *L) {
-        lua_newtable(L);
-
-        lua_pushcfunction(L, lua_GetModuleByName);
-        lua_setfield(L, -2, "GetModuleByName");
-
-        lua_setglobal(L, "ModuleManager");
+        LUAHelper(L)
+                .getClass("ModuleManager")
+                .registerFunction("GetModuleByName", lua_GetModuleByName)
+                .registerFunction("GetModules", lua_GetModules);
     }
 }

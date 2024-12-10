@@ -16,7 +16,7 @@ public:
     static void registerHandler(lua_State* L, const int& eventName);
 
     template <typename... Args>
-    static void triggerEvent(lua_State* L, int eventName, const Args&... args);
+    static bool triggerEvent(lua_State* L, int eventName, const Args&... args);
 
     static void clearHandlers();
 

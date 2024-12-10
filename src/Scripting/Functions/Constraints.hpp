@@ -90,26 +90,13 @@ namespace LuaConstraints {
     }
 
     void registerConstraints(lua_State *L) {
-        lua_newtable(L);
-
-        lua_pushcfunction(L, lua_PercentageConstraint);
-        lua_setfield(L, -2, "PercentageConstraint");
-
-        lua_pushcfunction(L, lua_RelativeConstraint);
-        lua_setfield(L, -2, "RelativeConstraint");
-
-        lua_pushcfunction(L, lua_CenterConstraint);
-        lua_setfield(L, -2, "CenterConstraint");
-
-        lua_pushcfunction(L, lua_RoundingConstraint);
-        lua_setfield(L, -2, "RoundingConstraint");
-
-        lua_pushcfunction(L, lua_FontScaler);
-        lua_setfield(L, -2, "FontScaler");
-
-        lua_pushcfunction(L, lua_CalculatePercentage);
-        lua_setfield(L, -2, "CalculatePercentage");
-
-        lua_setglobal(L, "Constraints");
+        LUAHelper(L)
+                .getClass("Constraints")
+                .registerFunction("PercentageConstraint", lua_PercentageConstraint)
+                .registerFunction("RelativeConstraint", lua_RelativeConstraint)
+                .registerFunction("CenterConstraint", lua_CenterConstraint)
+                .registerFunction("RoundingConstraint", lua_RoundingConstraint)
+                .registerFunction("FontScaler", lua_FontScaler)
+                .registerFunction("CalculatePercentage", lua_CalculatePercentage);
     }
 }

@@ -136,10 +136,17 @@ FetchContent_Declare(
         GIT_TAG        master
 )
 
-set(ENTT_BUILD_TESTING OFF)  # Disable building tests
-FetchContent_MakeAvailable(libhat entt nes fmt)
+FetchContent_Declare(
+        magic_enum
+        GIT_REPOSITORY https://github.com/Neargye/magic_enum
+        GIT_TAG        master
+)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType)
+
+set(ENTT_BUILD_TESTING OFF)  # Disable building tests
+FetchContent_MakeAvailable(libhat entt nes fmt magic_enum)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType magic_enum)
 target_link_libraries(${PROJECT_NAME} PUBLIC MinHook)
 
 target_precompile_headers(Flarial PRIVATE "src/PCH.cpp")

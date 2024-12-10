@@ -21,7 +21,7 @@ public:
     static std::string current_commit;
 
     static std::vector<std::string> getPlayersVector(const nlohmann::json &data);
-
+    static int fetchVips();
     static bool isDev(std::string name);
     static bool isGamer(std::string name);
     static bool isBooster(std::string name);

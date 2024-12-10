@@ -8,9 +8,9 @@ std::unordered_map<int, std::vector<ScriptingEventManager::EventEntry>> Scriptin
 
 
 
-template void ScriptingEventManager::triggerEvent<int, int>(lua_State* L, int eventName, const int& arg1, const int& arg2);
-template void ScriptingEventManager::triggerEvent<Packet*, int>(lua_State* L, int eventName, Packet* const& arg1, const int& arg2);
-template void ScriptingEventManager::triggerEvent<>(lua_State* L, int eventName);
+template bool ScriptingEventManager::triggerEvent<int, int>(lua_State* L, int eventName, const int& arg1, const int& arg2);
+template bool ScriptingEventManager::triggerEvent<Packet*, int>(lua_State* L, int eventName, Packet* const& arg1, const int& arg2);
+template bool ScriptingEventManager::triggerEvent<>(lua_State* L, int eventName);
 
 
 
@@ -41,7 +41,6 @@ void pushToLua(lua_State* L, T arg) {
         lua_pushlightuserdata(L, static_cast<void *>(arg));
     }
     else {
-        Logger::error("Unsupported type passed to Lua in pushToLua.");
         lua_pushnil(L);
     }
 }
@@ -49,9 +48,9 @@ void pushToLua(lua_State* L, T arg) {
 
 
 template<typename... Args>
-void ScriptingEventManager::triggerEvent(lua_State* L, int eventName, const Args&... args) {
+bool ScriptingEventManager::triggerEvent(lua_State* L, int eventName, const Args&... args) {
     auto it = eventHandlers.find(eventName);
-    if (it == eventHandlers.end()) return;
+    if (it == eventHandlers.end()) return false;
 
     for (const auto& handler : it->second) {
         if (handler.luaState != L) {
@@ -62,12 +61,22 @@ void ScriptingEventManager::triggerEvent(lua_State* L, int eventName, const Args
 
         (pushToLua(L, args), ...);
 
-        if (lua_pcall(L, sizeof...(args), 0, 0) != LUA_OK) {
+        if (lua_pcall(L, sizeof...(args), 1, 0) != LUA_OK) {
             std::string err = lua_tostring(L, -1);
-            Logger::error("Lua error in event handler: " + err);
+            Logger::error("Error while executing event handler: {}", err);
             lua_pop(L, 1);
         }
     }
+    if (lua_isboolean(L, -1)) {
+        bool cancel = lua_toboolean(L, -1);
+        lua_pop(L, 1);
+        if (cancel) {
+            return true;
+        }
+    } else {
+        lua_pop(L, 1);
+    }
+    return false;
 }
 
 

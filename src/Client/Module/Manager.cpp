@@ -1,6 +1,5 @@
-﻿#pragma once
+﻿#include "Manager.hpp"
 
-#include "Manager.hpp"
 #include "Modules/Misc/Input/GUIKeyListener.hpp"
 #include "Modules/Misc/SaveConfig/SaveConfigListener.hpp"
 #include "Modules/Misc/RGB/rgbListener.hpp"
@@ -93,6 +92,7 @@
 #include "Modules/RawInputBuffer/RawInputBuffer.hpp"
 #include "Modules/JavaDynamicFOV/JavaDynamicFOV.hpp"
 #include "Modules/ItemUseDelayFix/ItemUseDelayFix.hpp"
+#include "../../Scripting/Console/ConsoleService.hpp"
 
 namespace ModuleManager {
     std::map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -192,7 +192,7 @@ void ModuleManager::initialize() {
     addModule<CustomCrosshair>();
     addModule<Cursor>();
     addModule<RawInputBuffer>();
-    addModule<ItemUseDelayFix>();
+    //addModule<ItemUseDelayFix>();
 
     addService<GUIKeyListener>();
     addService<DiscordRPCListener>();
@@ -202,6 +202,7 @@ void ModuleManager::initialize() {
     addService<rgbListener>();
     addService<HiveModeCatcherListener>();
 
+    addService<ConsoleService>();
     Scripting::loadModules();
 
     initialized = true;
@@ -219,28 +220,11 @@ void ModuleManager::terminate() {
 }
 
 
-void restart(){
-    ModuleManager::initialized = false;
-    Scripting::instalized = false;
-    ScriptingEventManager::clearHandlers();
-    for (auto it = ModuleManager::moduleMap.begin(); it != ModuleManager::moduleMap.end(); ) {
-        if (it->second != nullptr && it->second->isScripting()) {
-            it->second->terminate();
-            it = ModuleManager::moduleMap.erase(it);
-            ++it;
-        } else {
-            ++it;
-        }
-    }
 
+
+void restart(){
+    Scripting::unloadModules();
     Scripting::loadModules();
-    for (const auto& pair : ModuleManager::moduleMap) {
-        if (pair.second != nullptr && pair.second->isScripting()) {
-            pair.second->terminating = false;
-        }
-    }
-    Scripting::instalized = true;
-    ModuleManager::initialized = true;
 }
 
 

@@ -16,6 +16,12 @@
 #include "Functions/OtherSettings.hpp"
 #include "Functions/LuaModuleManager.hpp"
 #include "Functions/LuaClient.hpp"
+#include "Functions/LuaModule.hpp"
+#include "Console/Console.hpp"
+#include "Commands/LuaOnCommand.hpp"
+
+
+int apiRevision = 1;
 
 int lua_register_event_handler(lua_State* L) {
     const int eventName = luaL_checkinteger(L, 1);
@@ -42,6 +48,44 @@ void Scripting::executeFunction(lua_State* L, std::string functionName, bool shi
     }
 }
 
+
+
+void Scripting::unloadModules(){
+    for (auto& scriptModule : Scripting::luaScriptModules) {
+        lua_State *L = scriptModule.first;
+        Module *module = scriptModule.second;
+
+        if (module) {
+            std::string name = module->name;
+            size_t hash = std::hash<std::string>{}(name);
+
+            auto it = ModuleManager::moduleMap.find(hash);
+            if (it != ModuleManager::moduleMap.end()) {
+                auto module = it->second;
+                module->onDisable();
+                module->terminate();
+                ModuleManager::moduleMap.erase(it);
+                Logger::info("Module '{}' has been unloaded.", name);
+            } else {
+                Logger::warn("Attempted to unload non-existent module '{}'.", name);
+            }
+        }
+
+        if (L) {
+            lua_close(L);
+        }
+    }
+
+    Scripting::luaScriptModules.clear();
+    Scripting::scriptsAmount = 0;
+    Scripting::scriptsAmountWithoutErrors = 0;
+    Scripting::scriptsAmountWithErrors = 0;
+
+    Logger::info("All scripts have been unloaded.");
+    Scripting::console.addLog("Scripting", "All scripts have been unloaded.", fg(fmt::color::yellow));
+}
+
+
 void registerFunctions(lua_State* L){
     lua_register(L, "onEvent", lua_register_event_handler);
 
@@ -54,7 +98,8 @@ void registerFunctions(lua_State* L){
     ScriptEvents::pushEventTypesToLua(L);
     LuaModuleManager::registerModuleManager(L);
     LuaClient::registerClient(L);
-
+    LuaModule::registerModule(L);
+    LuaOnCommand::registerLuaOnCommand(L);
 
     LuaTextPacket::registerFunctions(L);
 }
@@ -100,13 +145,22 @@ void Scripting::loadModules() {
                 std::string moduleName = jsonData["name"];
                 std::string description = jsonData["description"];
                 std::string mainClass = jsonData["main_class"];
+                int apiRev = jsonData["api_revision"];
+                if(apiRevision != apiRev) {
+                    FlarialGUI::Notify(moduleName + " is outdated");
+                    Scripting::console.addLog("Scripting loader", moduleName + " is outdated", fg(fmt::color::red));
+                    Scripting::scriptsAmountWithErrors++;
+                    continue;
+                }
 
                 load(moduleName, description, entry.path().string() + "\\" + mainClass);
                 
         }else{
             FlarialGUI::Notify("could not find main.json");
+            Scripting::console.addLog("Scripting loader", "could not find main.json", fg(fmt::color::red));
         }
     }
 
     Logger::custom(fg(fmt::color::aqua), "Scripting", "Found {} scripts! Loaded {} scripts without errors. Found errors in {} scripts.", Scripting::scriptsAmount, Scripting::scriptsAmountWithoutErrors, Scripting::scriptsAmountWithErrors);
+    Scripting::console.addLog("Scripting", "Found " + std::to_string(Scripting::scriptsAmount) + " scripts! Loaded "+ std::to_string(Scripting::scriptsAmountWithoutErrors) +" scripts without errors. Found errors in "+ std::to_string(Scripting::scriptsAmountWithErrors) +" scripts.", fg(fmt::color::aqua));
 }

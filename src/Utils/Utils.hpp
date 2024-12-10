@@ -295,6 +295,12 @@ public:
     static uint64_t getCurrentMs();
 
     static std::string downloadFile(const std::string& url);
+    static std::string DownloadString(const std::string& url);
+
+    // Don't use this its bad
+    static void openFolder(const std::string& path);
+
+    static void openSubFolder(const std::string& path);
 };
 
 class String {
@@ -314,6 +320,12 @@ public:
     static std::string removeNonAlphanumeric(const std::string& string);
 
     static std::string removeNonNumeric(const std::string& string);
+
+    static std::vector<std::string> split(std::string_view str, char delimiter);
+
+    static std::string toLower(std::string input);
+
+    static std::string toUpper(std::string input);
 };
 
 struct CaretMeasureData {
