@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Tessellator.hpp"
-#include "../BedrockTextureData.hpp"
-#include "../ScreenContext.hpp"
-#include "../Material/MaterialPtr.hpp"
+#include <SDK/Client/Render/BedrockTexture.hpp>
+#include <SDK/Client/Render/ScreenContext.hpp>
+#include <SDK/Client/Render/Material/MaterialPtr.hpp>
 
 class MeshHelpers {
 public:

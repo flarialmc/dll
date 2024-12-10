@@ -1,9 +1,8 @@
 #pragma once
 
 #include "PrimitiveMode.hpp"
-#include "../../../../Utils/Memory/Memory.hpp"
-#include "../../../../Utils/Utils.hpp"
-#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include <Utils/Utils.hpp>
+#include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
 class Tessellator {
 public:

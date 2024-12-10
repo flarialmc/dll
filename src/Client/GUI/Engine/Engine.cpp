@@ -3,7 +3,7 @@
 #include <utility>
 #include <winrt/base.h>
 #include <cmath>
-#include <imgui_internal.h>
+#include <imgui/imgui_internal.h>
 #include <variant>
 #include "Constraints.hpp"
 #include "animations/fadeinout.hpp"

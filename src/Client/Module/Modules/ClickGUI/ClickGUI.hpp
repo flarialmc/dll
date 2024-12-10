@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "../../../Client.hpp"
 #include "Elements/ClickGUIElements.hpp"
+#include <Utils/APIUtils.hpp>
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -1466,11 +1467,11 @@ public:
     void onPacket(PacketEvent& event) {
         if (event.getPacket()->getId() == MinecraftPacketIds::StartGame)
         {
-            Client::fetchVips();
+            APIUtils::getUsers();
         }
         if (event.getPacket()->getId() == MinecraftPacketIds::Login)
         {
-            Client::fetchVips();
+            APIUtils::getUsers();
         }
     }
 

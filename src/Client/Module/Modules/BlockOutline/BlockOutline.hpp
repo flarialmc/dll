@@ -1,9 +1,8 @@
 #pragma once
 
-#include "../Module.hpp"
-#include "../../../Client.hpp"
-#include "../../../../Utils/Utils.hpp"
-#include "../../../../Utils/Memory/CustomAllocator/Buffer.hpp" // why its not hpp here ???
+#include <Modules/Module.hpp>
+#include <Utils/Utils.hpp>
+#include <Utils/Memory/CustomAllocator/Buffer.hpp>
 
 class BlockOutline : public Module {
 // TODO: switch to renderOutlineSelection hook + 3D option

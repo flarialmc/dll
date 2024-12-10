@@ -142,7 +142,7 @@ install(TARGETS ${TARGETS_TO_INSTALL}
         EXPORT LuaTargets
 )
 
-install(DIRECTORY include/ TYPE INCLUDE)
+install(DIRECTORY include/ DESTINATION include)
 
 include(CMakePackageConfigHelpers)
 
@@ -160,7 +160,7 @@ install(EXPORT LuaTargets
 )
 
 configure_package_config_file(
-    LuaConfig.cmake.in
+        LuaConfig.cmake.in
     "${CMAKE_CURRENT_BINARY_DIR}/LuaConfig.cmake"
     INSTALL_DESTINATION "share/cmake/Lua"
 )

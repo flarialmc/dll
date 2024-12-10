@@ -1,10 +1,8 @@
 #pragma once
 
-
 #include "Item.hpp"
-#include "../Core/Ref.hpp"
-#include "../../src/Utils/Memory/Memory.hpp"
-#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include <SDK/Client/Core/Ref.hpp>
+#include <Utils/Memory/Memory.hpp>
 
 class ItemStack {
 public:

@@ -1,8 +1,8 @@
 #include "ItemRenderer.hpp"
 
+#include <Utils/Utils.hpp>
 
-void
-ItemRenderer::renderGuiItemNew(BaseActorRenderContext *BaseActorRenderCtx, ItemStack *item, int mode, float x, float y,
+void ItemRenderer::renderGuiItemNew(BaseActorRenderContext *BaseActorRenderCtx, ItemStack *item, int mode, float x, float y,
                                float opacity, float scale, bool isEnchanted) {
     using func = void (__fastcall *)(ItemRenderer *, BaseActorRenderContext *, ItemStack *, int, float, float, bool,
                                      float, float, float);

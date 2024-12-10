@@ -1,7 +1,8 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#include <glm/ext/matrix_transform.hpp>
+#include <glm/glm/glm.hpp>
+#include <glm/glm/ext/matrix_transform.hpp>
+#include <Utils/APIUtils.hpp>
 
 #include "../Hook.hpp"
 #include "../../../../SDK/Client/Render/Font.hpp"
@@ -19,7 +20,7 @@ class BaseActorRendererRenderTextHook : public Hook {
         std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(nameTag));
         if (clearedName.empty()) clearedName = String::removeColorCodes(nameTag); // nametag might contain some unclearable stuff
 
-        if(!contains(Client::onlinePlayers, clearedName)) return;
+        if (!contains(APIUtils::onlineUsers, clearedName)) return;
 
         if (MaterialUtils::getUITextured() == nullptr)
             MaterialUtils::update();
@@ -47,15 +48,19 @@ class BaseActorRendererRenderTextHook : public Hook {
 
         ResourceLocation loc(Utils::getAssetsPath() + "\\red-logo.png", true); // The logo is the normal transparent Flarial logo, 128x128
         
-        if (Client::isDev(clearedName)) {
-            loc = { Utils::getAssetsPath() + "\\dev-logo.png", true };
+        std::map<std::string, std::string> roleLogos = {
+            {"dev", "dev-logo.png"},
+            {"gamer", "gamer-logo.png"},
+            {"booster", "booster-logo.png"}
+        };
+
+        for (const auto& [role, logo] : roleLogos) {
+            if (APIUtils::hasRole(role, clearedName)) {
+                loc = { Utils::getAssetsPath() + "\\" + logo, true };
+                break;
+            }
         }
-        else if(Client::isGamer(clearedName)) {
-            loc = { Utils::getAssetsPath() + "\\gamer-logo.png", true };
-        }
-        else if (Client::isBooster(clearedName)) {
-            loc = { Utils::getAssetsPath() + "\\booster-logo.png", true };
-        }
+
         TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
 
         const float fontHeight = font->getLineHeight();
@@ -139,7 +144,7 @@ public:
     void enableHook() override {
         static auto sig = Memory::offsetFromSig(address, 1);
 
-        if (WinrtUtils::checkAboveOrEqual(20, 40))
+        if (VersionUtils::checkAboveOrEqual(20, 40))
             this->manualHook( (void*) sig, (void*) BaseActorRenderer_renderTextCallback40, (void **) &funcOriginal40);
         else
             this->manualHook( (void*) sig, (void*) BaseActorRenderer_renderTextCallback, (void **) &funcOriginal);

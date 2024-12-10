@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Utils/WinrtUtils.hpp>
+
 #include "../Module.hpp"
 
 
@@ -47,11 +49,11 @@ public:
         {
             if (event.getTexturePtr()->GetFilePath().contains("edit_box"))
             {
-                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::IBeam);
+                WinrtUtils::setCursorType(CoreCursorType::IBeam);
             }
             else
             {
-                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Hand);
+                WinrtUtils::setCursorType(CoreCursorType::Hand);
             }
             last = std::chrono::high_resolution_clock::now();
         }
@@ -64,7 +66,7 @@ public:
         {
             std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last;
             if (duration.count() >= 0.01) {
-                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+                WinrtUtils::setCursorType(CoreCursorType::Arrow);
             }
         }
     }
@@ -75,11 +77,11 @@ public:
         {
             if (event.getTexturePath().contains("edit_box"))
             {
-                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::IBeam);
+                WinrtUtils::setCursorType(CoreCursorType::IBeam);
             }
             else
             {
-                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Hand);
+                WinrtUtils::setCursorType(CoreCursorType::Hand);
             }
             last = std::chrono::high_resolution_clock::now();
         }
@@ -87,7 +89,7 @@ public:
         {
             std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last;
             if (duration.count() >= 0.01) {
-                Client::changeCursor(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+                WinrtUtils::setCursorType(CoreCursorType::Arrow);
             }
         }
     }

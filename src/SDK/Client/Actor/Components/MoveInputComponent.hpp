@@ -1,5 +1,9 @@
-#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
-#include "../EntityContext.hpp"
+#pragma once
+
+#include <Utils/Utils.hpp>
+#include <Utils/Memory/Memory.hpp>
+#include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
+#include <SDK/Client/Actor/EntityContext.hpp>
 
 struct MoveInputComponent : IEntityComponent {
 private:

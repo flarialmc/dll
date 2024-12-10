@@ -5,18 +5,15 @@
 #include <utility>
 #include <vector>
 #include <type_traits>
-#include <optional>
-#include <future>
-#include <execution>
 #include <format>
-#include "../Logger/Logger.hpp"
-#include "MinHook.h"
+
+#include <Utils//Logger/Logger.hpp>
+#include <minhook/MinHook.h>
 #include <libhat/Scanner.hpp>
 
 #define in_range(x, a, b) (x >= a && x <= b)
 #define get_bits(x) (in_range((x & (~0x20)), 'A', 'F') ? ((x & (~0x20)) - 'A' + 0xa) : (in_range(x, '0', '9') ? x - '0' : 0))
 #define get_byte(x) (get_bits(x[0]) << 4 | get_bits(x[1]))
-
 
 template<typename Ret, typename Type>
 Ret &direct_access(Type *type, size_t offset) {
@@ -33,7 +30,7 @@ Ret &direct_access(Type *type, size_t offset) {
 #define AS_FIELD(type, name, fn) __declspec(property(get = fn, put = set##name)) type name
 #define DEF_FIELD_RW(type, name) __declspec(property(get = get##name, put = set##name)) type name
 
-//fake class macro to avoid compile erros when using pragma once 
+//fake class macro to avoid compile errors when using pragma once
 
 #define FK(typep) \
 class typep;

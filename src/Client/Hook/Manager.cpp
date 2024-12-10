@@ -78,7 +78,7 @@ void HookManager::initialize() {
     addHook<getSensHook>();
     addHook<HudMobEffectsRendererHook>();
     addHook<HudCursorRendererHook>();
-    if(WinrtUtils::checkAboveOrEqual(20, 60)) {
+    if(VersionUtils::checkAboveOrEqual(20, 60)) {
         addHook<BaseActorRendererRenderTextHook>();
     }
     addHook<UIControl_updateCachedPositionHook>();
@@ -91,7 +91,7 @@ void HookManager::initialize() {
     addHook<RenderChunkCoordinatorPreRenderTickHook>();
     addHook<SettingsScreenOnExitHook>();
 
-    if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+    if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
     }
 

@@ -1,5 +1,6 @@
 #include "SignatureAndOffsetManager.hpp"
-#include "../Memory.hpp"
+
+#include <Utils/Memory/Memory.hpp>
 
 SignatureAndOffsetManager Mgr;
 

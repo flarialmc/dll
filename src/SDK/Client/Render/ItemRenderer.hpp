@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Item/ItemStack.hpp"
+#include <SDK/Client/Item/ItemStack.hpp>
 
 class ItemRenderer {
 public:

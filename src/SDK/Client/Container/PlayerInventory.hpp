@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../src/Utils/Memory/Memory.hpp"
 #include "Inventory.hpp"
+#include <Utils/Memory/Memory.hpp>
 #include <libhat/Access.hpp>
 
 class PlayerInventory {

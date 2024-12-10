@@ -1,7 +1,8 @@
 #include "SigInit.hpp"
-#include "../../../Logger/Logger.hpp"
 
-#include "../SignatureAndOffsetManager.hpp"
+#include <Utils/Utils.hpp>
+#include <Utils/Logger/Logger.hpp>
+#include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
 void SigInit::init2140() {
     Logger::custom(fg(fmt::color::gold), "Signatures", "Loading signatures for 1.21.40");

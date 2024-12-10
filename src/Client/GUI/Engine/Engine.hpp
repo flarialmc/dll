@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../../Utils/Logger/Logger.hpp"
 #include "../../../Utils/Utils.hpp"
 #include "../D2D.hpp"
 #include <wincodec.h>
@@ -8,8 +7,7 @@
 #include <map>
 #include <vector>
 #include <winrt/base.h>
-#include <chrono>
-#include <imgui.h>
+#include <imgui/imgui.h>
 #include <unordered_map>
 #include "../../../Utils/Memory/LRUCache.hpp"
 #include "Elements/Structs/Notification.hpp"
@@ -21,7 +19,6 @@
 #include "Elements/Windows/WindowRect.hpp"
 #include "Elements/Control/Tooltip/ToolTipStruct.hpp"
 #include "Elements/Structs/HSV.hpp"
-#include <imgui.h>
 
 using namespace DirectX;
 

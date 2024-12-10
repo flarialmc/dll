@@ -1,8 +1,8 @@
 #pragma once
 
-#include <memory>
-
 #include "RenderMaterialInfo.hpp"
+
+#include <memory>
 
 namespace mce {
     class MaterialPtr {

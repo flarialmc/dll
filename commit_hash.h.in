@@ -1,6 +1,0 @@
-#ifndef COMMIT_HASH_H
-#define COMMIT_HASH_H
-
-#define COMMIT_HASH "@COMMIT_HASH@"
-
-#endif  // COMMIT_HASH_H

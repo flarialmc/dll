@@ -1,6 +1,7 @@
 #include "LuaCommand.hpp"
 
-#include "../../../Scripting/Scripting.hpp"
+#include <Utils/WinrtUtils.hpp>
+#include <Scripting/Scripting.hpp>
 
 void LuaCommand::execute(const std::vector<std::string> &args) {
     if (args.size() != 1) {
@@ -11,7 +12,7 @@ void LuaCommand::execute(const std::vector<std::string> &args) {
     std::string action = String::toLower(args[0]);
 
     if (action == "path") {
-        Utils::openSubFolder("Flarial\\scripts");
+        WinrtUtils::openSubFolder("Flarial\\scripts");
     }
     if (action == "reload") {
         // nikita u do this

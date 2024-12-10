@@ -64,7 +64,7 @@ public:
         static auto rotateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_rotateRef"));
 
         if (glm_rotateHook == nullptr) {
-            if (WinrtUtils::checkAboveOrEqual(21, 40)) {
+            if (VersionUtils::checkAboveOrEqual(21, 40)) {
                 glm_rotateHook = std::make_unique<INeedADecentHookClassForMemory>(rotateAddr, glm_rotate2);
             }
             else {
@@ -94,7 +94,7 @@ public:
         Memory::copyBytes(translateAddr, data, 5);
         Memory::nopBytes(translateAddr, 5);
 
-        if (WinrtUtils::checkAboveOrEqual(21, 0)) {
+        if (VersionUtils::checkAboveOrEqual(21, 0)) {
             static auto translateAddr2 = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef2"));
             Memory::copyBytes(translateAddr2, data2, 5);
             Memory::nopBytes(translateAddr2, 5);
@@ -121,7 +121,7 @@ public:
         static auto translateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef"));
         Memory::patchBytes(translateAddr, data, 5);
 
-        if (WinrtUtils::checkAboveOrEqual(21, 0)) {
+        if (VersionUtils::checkAboveOrEqual(21, 0)) {
             static auto translateAddr2 = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef2"));
             Memory::patchBytes(translateAddr2, data2, 5);
         }
@@ -391,7 +391,7 @@ public:
         }
 
         if(isOnGround) {
-            if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+            if(VersionUtils::checkAboveOrEqual(21, 40)) {
                 if (curr->getStack().block == nullptr) {
                     pos.y -= 0.12;
                 } else {
@@ -406,7 +406,7 @@ public:
 
         mat = translate(mat, {pos.x, pos.y, pos.z});
 
-        if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+        if(VersionUtils::checkAboveOrEqual(21, 40)) {
             mat = rotate(mat, glm::radians(renderVec.x), {1.f, 0.f, 0.f});
             mat = rotate(mat, glm::radians(renderVec.y), {0.f, 1.f, 0.f});
             mat = rotate(mat, glm::radians(renderVec.z), {0.f, 0.f, 1.f});

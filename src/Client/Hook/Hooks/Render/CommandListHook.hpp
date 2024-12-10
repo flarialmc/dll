@@ -3,7 +3,7 @@
 #include <d3d12.h>
 #include <d3d11.h>
 #include <d3d11on12.h>
-#include "kiero.h"
+#include "kiero/kiero.h"
 #include "../Hook.hpp"
 
 class CommandListHook : public Hook {

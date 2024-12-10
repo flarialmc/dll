@@ -1,9 +1,21 @@
 cmake_minimum_required(VERSION 3.24.0)
-project(Flarial VERSION 1.0 LANGUAGES CXX)
-
-include(FetchContent)
+project(Flarial)
 
 set(CMAKE_CXX_STANDARD 23)
+
+set(CLIENT_VERSION "2.00") # Update this for every new release
+
+set(CLIENT_BUILD_TYPE "Release")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CLIENT_BUILD_TYPE "Debug")
+    add_compile_definitions(__DEBUG__)
+elseif (CMAKE_BUILD_TYPE STREQUAL "Test")
+    set(CLIENT_BUILD_TYPE "Test")
+    add_compile_definitions(__SCRIPTING__ __TEST__)
+else()
+    set(CLIENT_BUILD_TYPE "Release")
+    add_compile_definitions(__RELEASE__)
+endif()
 
 execute_process(
         COMMAND git rev-parse --short HEAD
@@ -11,142 +23,91 @@ execute_process(
         OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/commit_hash.h.in
-        ${CMAKE_CURRENT_BINARY_DIR}/commit_hash.h
-        @ONLY
+add_compile_definitions(COMMIT_HASH="${COMMIT_HASH}")
+
+add_compile_options(/bigobj)
+add_compile_options(/utf-8) # fmt lib
+add_compile_options($<$<CONFIG:Release>:/O2>) # optimize for speed
+add_compile_options($<$<CONFIG:Release>:/Oi>) # enable intrinsic functions
+add_compile_options($<$<CONFIG:Release>:/Gy>) # separate functions for linker
+add_compile_options($<$<CONFIG:Release>:/Gw>) # optimize global data
+add_compile_options($<$<CONFIG:Release>:/Gm->) # disable minimal rebuild
+add_compile_options($<$<CONFIG:Release>:/GF>) # enable string pooling
+add_compile_options($<$<CONFIG:Release>:/fp:fast>) # optimize floating point
+add_compile_options($<$<CONFIG:Release>:/GR->) # disable RTTI
+add_compile_options($<$<CONFIG:Release>:/Gd>) # use __cdecl for all functions
+add_compile_options($<$<CONFIG:Release>:/MT>) # use static multithreaded runtime
+add_compile_options($<$<CONFIG:Release>:/Ob2>) # inline any suitable function
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+
+# Generate version and build date
+string(TIMESTAMP BUILD_DATE "%Y %b %d %H:%M:%S")
+set(FLARIAL_VERSION "${CLIENT_VERSION} ${CLIENT_BUILD_TYPE}")
+set(FLARIAL_BUILD_DATE "${BUILD_DATE}")
+
+add_compile_definitions(
+        FLARIAL_VERSION=\"${FLARIAL_VERSION}\"
+        FLARIAL_BUILD_DATE=\"${FLARIAL_BUILD_DATE}\"
+        FLARIAL_BUILD_TYPE=\"${CLIENT_BUILD_TYPE}\"
 )
 
-add_definitions(-DCOMMIT_HASH="${COMMIT_HASH}")
 
-if(MSVC)
-    add_compile_options(/MT)
+file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")
+file(GLOB_RECURSE LIB_FILES "lib/*.cpp")
+add_library(Flarial SHARED main.cpp ${SOURCE_FILES} ${LIB_FILES} src/Assets/Assets.rc)
 
-    add_compile_options(/bigobj)
+target_include_directories(Flarial PRIVATE
+        "."
+        "src"
+        "src/Client/Module"
+        "lib"
+        "lib/lua/lua-5.4.7/include"
+)
 
-    # Needed for fmt library
-    add_compile_options(/utf-8)
-
-    # Optimize for speed
-    add_compile_options($<$<CONFIG:Release>:/O2>)
-    add_compile_options($<$<CONFIG:Release>:/Ot>)
-    add_compile_options($<$<CONFIG:Release>:/Ox>)
-    add_compile_options($<$<CONFIG:Release>:/Oy>)
-
-    # Enable intrinsic functions
-    add_compile_options($<$<CONFIG:Release>:/Oi>)
-
-    # Enable link-time code generation for whole program optimization
-    add_compile_options($<$<CONFIG:Release>:/GL>)
-
-    # Separate functions for the linker to improve the optimization process
-    add_compile_options($<$<CONFIG:Release>:/Gy>)
-
-    # Optimize global data to reduce the binary size
-    add_compile_options($<$<CONFIG:Release>:/Gw>)
-
-    # Enable string pooling to reduce binary size by consolidating duplicate strings
-    add_compile_options($<$<CONFIG:Release>:/GF>)
-
-    # Optimize floating point operations for speed (may introduce minor precision differences)
-    # add_compile_options($<$<CONFIG:Release>:/fp:fast>)
-
-    # Disable RTTI (Run-Time Type Information) to reduce binary size and possibly improve performance
-    add_compile_options($<$<CONFIG:Release>:/GR->)
-
-    # Inline any suitable function to improve performance by reducing function call overhead
-    add_compile_options($<$<CONFIG:Release>:/Ob2>)
-
-#    add_compile_options("$<$<CONFIG:RELEASE>:/Zi>")
-    # add_link_options("$<$<CONFIG:RELEASE>:/DEBUG>") # Enable debug symbols in release for edge cases.
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
-endif()
-
-
-
-# Default to statically-linked runtime.
-if("${MSVC_RUNTIME}" STREQUAL "")
-    set(MSVC_RUNTIME "static")
-
-    if(${MSVC_RUNTIME} STREQUAL "static")
-        message(STATUS
-                "MSVC -> forcing use of statically-linked runtime."
-        )
-        foreach(variable ${variables})
-            if(${variable} MATCHES "/MD")
-                string(REGEX REPLACE "/MD" "/MT" ${variable} "${${variable}}")
-            endif()
-        endforeach()
-    else()
-        message(STATUS
-                "MSVC -> forcing use of dynamically-linked runtime."
-        )
-        foreach(variable ${variables})
-            if(${variable} MATCHES "/MT")
-                string(REGEX REPLACE "/MT" "/MD" ${variable} "${${variable}}")
-            endif()
-        endforeach()
-    endif()
-endif()
-
-
-file(GLOB_RECURSE sources "src/**/*.cpp" "src/**/*.hpp" "lib/**/*.cpp" "src/Client/GUI/Engine/*.cpp")
-
-add_library(${PROJECT_NAME} SHARED ${sources} main.cpp src/Assets/Assets.rc)
-
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/lib/include/" "${CMAKE_CURRENT_LIST_DIR}/lib/glm/" "${CMAKE_CURRENT_LIST_DIR}/lib/ImGui" "${CMAKE_CURRENT_LIST_DIR}/lib/lua/include/")
-
-# Disable RTTI
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    target_compile_options(${PROJECT_NAME} PRIVATE -fno-rtti)
-elseif (MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /GR-)
-endif()
+add_subdirectory(lib/lua)
+add_subdirectory(lib/freetype)
 
 add_library(MinHook SHARED IMPORTED GLOBAL)
 set_target_properties(MinHook PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/minhook/minhook.lib")
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib/freetype/")
-add_subdirectory(lua)
-
 add_library(FreeType SHARED IMPORTED GLOBAL)
 set_target_properties(FreeType PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/freetype/libs/freetype.lib")
+
+target_link_libraries(Flarial PRIVATE lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType magic_enum)
+target_link_libraries(Flarial PUBLIC MinHook)
+
+target_precompile_headers(Flarial PRIVATE "src/PCH.cpp")
+
+include(FetchContent)
 
 FetchContent_Declare(
         entt
         GIT_REPOSITORY https://github.com/skypjack/entt.git
-        GIT_TAG f931687ff04d435871ac9664bb299f71f2a8fafc
+        GIT_TAG        f931687ff04d435871ac9664bb299f71f2a8fafc
 )
 
 FetchContent_Declare(
         nes
         GIT_REPOSITORY https://github.com/DisabledMallis/NuvolaEventSystem.git
-        GIT_TAG main
+        GIT_TAG        main
 )
 
 FetchContent_Declare(
         libhat
-        GIT_REPOSITORY  https://github.com/BasedInc/libhat.git
-        GIT_TAG         d6297514b05fd238f5b46d003325f108c22741e3
+        GIT_REPOSITORY https://github.com/BasedInc/libhat.git
+        GIT_TAG        d6297514b05fd238f5b46d003325f108c22741e3
 )
 
 FetchContent_Declare(
         fmt
-        GIT_REPOSITORY https://github.com/fmtlib/fmt
+        GIT_REPOSITORY https://github.com/fmtlib/fmt.git
         GIT_TAG        master
 )
 
 FetchContent_Declare(
         magic_enum
-        GIT_REPOSITORY https://github.com/Neargye/magic_enum
+        GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
         GIT_TAG        master
 )
 
-
-set(ENTT_BUILD_TESTING OFF)  # Disable building tests
 FetchContent_MakeAvailable(libhat entt nes fmt magic_enum)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType magic_enum)
-target_link_libraries(${PROJECT_NAME} PUBLIC MinHook)
-
-target_precompile_headers(Flarial PRIVATE "src/PCH.cpp")

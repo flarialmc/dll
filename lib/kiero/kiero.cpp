@@ -1,4 +1,4 @@
-#include "../include/kiero.h"
+#include "kiero.h"
 #include <Windows.h>
 #include <assert.h>
 
@@ -31,7 +31,7 @@
 #endif
 
 #if KIERO_USE_MINHOOK
-#include "MinHook.h"
+#include "minhook/MinHook.h"
 #endif
 
 #ifdef _UNICODE

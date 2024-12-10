@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UIComponent.hpp"
+#include <Utils/VersionUtils.hpp>
 
 class UIControl {
 public:
@@ -17,7 +18,7 @@ public:
     }
 
     void updatePosition(bool override = false) {
-        if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+        if (VersionUtils::checkAboveOrEqual(21, 40)) {
             int& flags = hat::member_at<int>(this, 0x18);
             flags |= 1; // set cachedPositionDirty
             using func = Vec2<float>*(__fastcall*)(UIControl*);
@@ -29,7 +30,6 @@ public:
             } else {
                 getPosition(this);
             }
-            return;
         } else {
             using func = void (__fastcall *)(UIControl *);
             static auto setCachedPosition = reinterpret_cast<func>(GET_SIG_ADDRESS("UIControl::_setCachedPosition"));

@@ -1,13 +1,14 @@
 #include "HitResult.hpp"
-#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
-#include "../../../Utils/Versions/WinrtUtils.hpp"
-#include "../../../Utils/Memory/Memory.hpp"
+
+#include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
+#include <Utils/VersionUtils.hpp>
+#include <Utils/Memory/Memory.hpp>
 #include "../../SDK.hpp"
 
 Actor *HitResult::getEntity() {
     static uintptr_t sig = NULL;
 
-    if (WinrtUtils::checkAboveOrEqual(21, 40)) {
+    if (VersionUtils::checkAboveOrEqual(21, 40)) {
         if (sig == NULL) {
             sig = GET_SIG_ADDRESS("HitResult::_getEntity");
         }
@@ -29,7 +30,7 @@ Actor *HitResult::getEntity() {
 
     } else {
         if (sig == NULL) {
-            if(WinrtUtils::checkAboveOrEqual(20, 50)) {
+            if(VersionUtils::checkAboveOrEqual(20, 50)) {
                 sig = GET_SIG_ADDRESS("HitResult::getEntity");
             } else {
                 sig = Memory::offsetFromSig(GET_SIG_ADDRESS("HitResult::getEntity"), 1);

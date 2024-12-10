@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../src/Utils/Memory/Memory.hpp"
+#include <Utils/Memory/Memory.hpp>
 
 FK(Player)
 

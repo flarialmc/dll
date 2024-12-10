@@ -108,7 +108,7 @@ private:
         }
 
 		if (oDrawImage == nullptr) {
-			if (WinrtUtils::checkAboveOrEqual(21, 20))
+			if (VersionUtils::checkAboveOrEqual(21, 20))
 				Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour2120, (void **) &oDrawImage, "DrawImage");
 			else
 				Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour, (void **) &oDrawImage, "DrawImage");

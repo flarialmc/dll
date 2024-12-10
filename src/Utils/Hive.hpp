@@ -3,9 +3,9 @@
 #include <string>
 #include <windows.h>
 #include <wininet.h>
-#include <iostream>
-#include "../Config/json/json.hpp"
-#include "Logger/Logger.hpp"
+#include <ImGui/imgui.h>
+#include <lib/json/json.hpp>
+#include <Utils/Logger/Logger.hpp>
 
 #pragma comment(lib, "wininet.lib")
 

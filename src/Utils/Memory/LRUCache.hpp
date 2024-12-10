@@ -1,10 +1,7 @@
 #pragma once
 
-#include <iostream>
 #include <unordered_map>
 #include <list>
-#include <functional>
-#include <tuple>
 
 template<typename Key, typename Value>
 class LRUCache {

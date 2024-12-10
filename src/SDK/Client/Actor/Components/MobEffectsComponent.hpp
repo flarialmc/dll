@@ -1,11 +1,10 @@
 #pragma once
 
 #include <cstdint>
-#include <functional>
 #include <map>
-#include "../../Render/TexturePtr.hpp"
-#include "../EntityContext.hpp"
-#include "../../../Utils/Versions/WinrtUtils.hpp"
+#include <SDK/Client/Render/TexturePtr.hpp>
+#include <SDK/Client/Actor/EntityContext.hpp>
+#include <Utils/VersionUtils.hpp>
 
 // LeviLamina
 
@@ -264,7 +263,7 @@ private:
 public:
     [[nodiscard]] std::vector<UnifiedMobEffectData> getUnifiedEffects() const {
         std::vector<UnifiedMobEffectData> unifiedEffects;
-        if (WinrtUtils::checkAboveOrEqual(21, 30)) {
+        if (VersionUtils::checkAboveOrEqual(21, 30)) {
             auto& _effects =  hat::member_at<std::vector<MobEffectInstance1_21_30>>(this, 0x0);
             for (auto &effect : _effects) {
                 unifiedEffects.emplace_back(effect.id, effect.duration, effect.amplifier);

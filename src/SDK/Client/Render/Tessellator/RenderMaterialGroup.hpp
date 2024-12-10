@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Material/MaterialPtr.hpp"
+#include <SDK/Client/Render/Material/MaterialPtr.hpp>
 
 namespace mce {
     class RenderMaterialGroup {

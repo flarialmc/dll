@@ -15,7 +15,7 @@ private:
 public:
     NoHurtCam() : Module("No Hurt Cam", "Disables hurt camera animation", IDR_REACH_PNG, "") {
         int size;
-        if (WinrtUtils::checkAboveOrEqual(21, 30)) {
+        if (VersionUtils::checkAboveOrEqual(21, 30)) {
             size = 5;
         } else {
             size = 3;
@@ -24,7 +24,7 @@ public:
         originalCameraAngle.resize(size);
 
         if(sigOffset == NULL) {
-            if (WinrtUtils::checkAboveOrEqual(21, 30)) {
+            if (VersionUtils::checkAboveOrEqual(21, 30)) {
                 sigOffset = GET_SIG_ADDRESS("CameraAssignAngle");
             } else {
                 sigOffset = GET_SIG_ADDRESS("CameraAssignAngle") + 4;
@@ -51,7 +51,7 @@ public:
         if(patched) return;
         patched = true;
         int size;
-        if (WinrtUtils::checkAboveOrEqual(21, 30)) {
+        if (VersionUtils::checkAboveOrEqual(21, 30)) {
             size = 5;
         } else {
             size = 3;
@@ -63,7 +63,7 @@ public:
         if(!patched) return;
         patched = false;
         int size;
-        if (WinrtUtils::checkAboveOrEqual(21, 30)) {
+        if (VersionUtils::checkAboveOrEqual(21, 30)) {
             size = 5;
         } else {
             size = 3;
