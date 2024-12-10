@@ -19,7 +19,7 @@ namespace LuaTextPacket {
     }
     int lua_getPacket(lua_State* L) {
 
-        auto pkt = static_cast<TextPacket*>(luaL_checkudata(L, 1, "TextPacket"));
+        auto pkt = static_cast<TextPacket*>(lua_touserdata(L, 1));
         //dict for storing packet info
         lua_newtable(L);
         //push values
@@ -27,7 +27,7 @@ namespace LuaTextPacket {
         pushKeyPair(L,"name", pkt->name.c_str());
         pushKeyPair(L,"message", pkt->message.c_str());
         pushKeyPair(L,"xuid", pkt->xuid.c_str());
-        pushKeyPair(L,"platformId", pkt->platformId.c_str());
+        pushKeyPair(L,"platformId", "Soon™");
         return 1;
     }
 
@@ -67,8 +67,8 @@ namespace LuaTextPacket {
 
         LUAHelper(L)
                 .getClass("TextPacket")
-                .registerFunction("getPacket", lua_getPacket);
-                .registerFunction("getType", lua_getType);
+                .registerFunction("getPacket", lua_getPacket)
+                .registerFunction("getType", lua_getType)
                 .registerFunction("sendPacket",lua_sendPacket);
                 
 
