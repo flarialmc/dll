@@ -29,10 +29,12 @@ namespace player {
         auto *player_data = static_cast<Player*>(lua_touserdata(L, 1));
         std::vector<float> position;
         //vec3 to vector
-        for (auto i : player_data->getPosition()) {
-            position.push_back(i);
-        }
-        LUAHelper::LuaClass::luaArray(position);
+        auto pos = player_data->getPosition();
+        position.push_back(pos->x);
+        position.push_back(pos->y);
+        position.push_back(pos->z);
+        
+        LuaPusher::luaArray(L, position);
 
         return 1;
     }
