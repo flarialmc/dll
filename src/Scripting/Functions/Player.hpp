@@ -14,7 +14,10 @@ namespace player {
         if (SDK::clientInstance == nullptr) {
             return 0;
         }
-        lua_pushnumber(L, SDK::clientInstance->getLocalPlayer()->getPosition()->x);
+        //initialize pointer to player data
+        auto *player_data = static_cast<Player*>(lua_touserdata(L, 1));
+
+        lua_pushnumber(L, player_data->getPosition()->x);
         return 1;
     }
 
