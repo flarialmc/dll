@@ -26,17 +26,17 @@ public:
             return *this;
         }
 
-        void luaArray(std::vector<int>& args) {
+        void luaArray(std::vector<float>& args) {
             lua_newtable(L);
             for (int i = 0; i < args.size(); i++) {
                 //push item of array
-                lua_pushinteger(L, args[i]);
+                lua_pushnumber(L, args[i]);
                 //set as item of lua array (+1 cuz lua arrays are stupid)
                 lua_rawseti(L, -2, i+1);
             }
         }
         //overloads
-        void luaArray(std::vector<std::string>& args) {
+        static void luaArray(std::vector<std::string>& args) {
             lua_newtable(L);
             for (int i = 0; i < args.size(); i++) {
                 lua_pushstring(L, args[i].c_str());
