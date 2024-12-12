@@ -42,7 +42,7 @@ public:
             this->settings.addSetting("dimension" + end, (std::string)SDK::clientInstance->getBlockSource()->getDimension()->getName());
             this->settings.setValue("total", this->settings.getSettingByName<float>("total")->value + 1);
             this->saveSettings();
-            
+
             Waypoint wp(position, false, 100.0f, index, state);
             WaypointList[name] = wp;
         }

@@ -14,7 +14,10 @@ namespace player {
         if (SDK::clientInstance == nullptr) {
             return 0;
         }
-        lua_pushnumber(L, SDK::clientInstance->getLocalPlayer()->getPosition()->x);
+        //initialize pointer to player data
+        auto *player_data = static_cast<Player*>(lua_touserdata(L, 1));
+
+        lua_pushnumber(L, player_data->getPosition()->x);
         return 1;
     }
 
@@ -23,13 +26,16 @@ namespace player {
             return 0;
         }
         //this should work
-        lua_newtable(L);
-        lua_pushnumber(L, SDK::clientInstance->getLocalPlayer()->getPosition()->x);
-        lua_rawseti(L, -2, 1);
-        lua_pushnumber(L, SDK::clientInstance->getLocalPlayer()->getPosition()->y);
-        lua_rawseti(L, -2, 2);
-        lua_pushnumber(L, SDK::clientInstance->getLocalPlayer()->getPosition()->z);
-        lua_rawseti(L, -2, 3);
+        auto *player_data = static_cast<Player*>(lua_touserdata(L, 1));
+        std::vector<float> position;
+        //vec3 to vector
+        auto pos = player_data->getPosition();
+        position.push_back(pos->x);
+        position.push_back(pos->y);
+        position.push_back(pos->z);
+
+        LuaPusher::luaArray(L, position);
+
         return 1;
     }
 
@@ -38,12 +44,12 @@ namespace player {
             return 0;
         }
         lua_newtable(L); //create new table for players
-        const std::vector<Actor *> playerList = SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList();
-        for (const auto &player: playerList) {
-            lua_pushstring(L, player->getNametag()->c_str()); //push strng of player name to table
-            lua_rawseti(L, -2,
-                        std::distance((playerList.begin()), std::find(playerList.begin(), playerList.end(), player)) +
-                        1);
+
+        const std::vector<Actor *> playerList= SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList() ;
+        for (int i=0; i < playerList.size(); i++) {
+            lua_pushlightuserdata(L,playerList[i]); //push strng of player name to table
+            lua_rawseti(L, -2, i+1);
+
             //set item at index of player + 1 (lua arrays are not 0-indexed;
         };
         return 1;
@@ -55,8 +61,9 @@ namespace player {
         if (SDK::clientInstance == nullptr) {
             return 0;
         }
-        lua_pushnumber(L, SDK::clientInstance->getLocalPlayer()->getPosition()->y);
+        auto *player_data = static_cast<Player*>(lua_touserdata(L, 1));
 
+        lua_pushnumber(L, player_data->getPosition()->y);
         return 1;
     }
 
@@ -73,7 +80,9 @@ namespace player {
         if (SDK::clientInstance == nullptr) {
             return 0;
         }
-        lua_pushnumber(L, SDK::clientInstance->getLocalPlayer()->getPosition()->z);
+        auto *player_data = static_cast<Player*>(lua_touserdata(L, 1));
+
+        lua_pushnumber(L, player_data->getPosition()->z);
 
         return 1;
     }
@@ -83,17 +92,20 @@ namespace player {
         if (SDK::clientInstance == nullptr) {
             return 0;
         }
-        lua_pushstring(L, SDK::clientInstance->getLocalPlayer()->getPlayerName().c_str());
+        auto *player_data = static_cast<Player*>(lua_touserdata(L, 1));
 
+        lua_pushstring(L,player_data->getPlayerName().c_str());
         return 1;
     }
 
-    int lua_isOnGround(lua_State *L) {
+    int lua_isOnGround(lua_State *L){
         if (SDK::clientInstance != nullptr) {
             return 0;
         }
+        auto *player_data = static_cast<Player*>(lua_touserdata(L, 1));
 
-        lua_pushboolean(L, SDK::clientInstance->getLocalPlayer()->isOnGround());
+
+        lua_pushboolean(L, player_data->isOnGround());
 
         return 1;
     }

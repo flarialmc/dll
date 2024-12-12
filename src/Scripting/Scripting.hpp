@@ -31,6 +31,7 @@ namespace Scripting {
     }
 
     void loadModules();
+    void unloadModules();
     void executeFunction(lua_State* L, std::string functionName, bool shitInLogsIfFunctionIsNotFound);
 
 };

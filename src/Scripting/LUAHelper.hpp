@@ -10,6 +10,8 @@ private:
 public:
     explicit LUAHelper(lua_State* state) : L(state) {}
 
+
+
     class LuaClass {
     private:
         lua_State* L;
@@ -33,5 +35,25 @@ public:
 
     LuaClass getClass(const std::string& className) {
         return LuaClass(L, className);
+    }
+};
+
+namespace LuaPusher {
+    void luaArray(lua_State* L, std::vector<float>& args) {
+        lua_newtable(L);
+        for (int i = 0; i < args.size(); i++) {
+            //push item of array
+            lua_pushnumber(L, args[i]);
+            //set as item of lua array (+1 cuz lua arrays are stupid)
+            lua_rawseti(L, -2, i+1);
+        }
+    }
+    //overloads
+    static void luaArray(lua_State* L, std::vector<std::string>& args) {
+        lua_newtable(L);
+        for (int i = 0; i < args.size(); i++) {
+            lua_pushstring(L, args[i].c_str());
+            lua_rawseti(L, -2, i+1);
+        }
     }
 };

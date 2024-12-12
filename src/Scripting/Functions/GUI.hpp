@@ -96,10 +96,10 @@ namespace GUI {
     }
 
     int lua_NormalRender(lua_State *L) {
-        Module* script = static_cast<Module *>(lua_touserdata(L, 1));
+        Module* script = Scripting::getModuleByState(L);
 
-        int index = luaL_checkinteger(L, 2);
-        std::string text = luaL_checkstring(L, 3);
+        int index = luaL_checkinteger(L, 1);
+        std::string text = luaL_checkstring(L, 2);
 
         script->normalRender(index, text);
 
