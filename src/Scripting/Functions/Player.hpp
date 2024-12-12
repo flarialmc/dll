@@ -33,7 +33,7 @@ namespace player {
         position.push_back(pos->x);
         position.push_back(pos->y);
         position.push_back(pos->z);
-        
+
         LuaPusher::luaArray(L, position);
 
         return 1;

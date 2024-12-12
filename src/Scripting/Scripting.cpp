@@ -21,7 +21,7 @@
 #include "Commands/LuaOnCommand.hpp"
 
 
-int apiRevision = 1;
+int apiRevision = 2;
 
 int lua_register_event_handler(lua_State* L) {
     const int eventName = luaL_checkinteger(L, 1);
