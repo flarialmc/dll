@@ -55,5 +55,31 @@ namespace LuaPusher {
             lua_pushstring(L, args[i].c_str());
             lua_rawseti(L, -2, i+1);
         }
+
+    }
+    //using auto for light user data etc..
+    static void luaArray(lua_State* L, std::vector<auto>& args) {
+        lua_newtable(L);
+        for (int i = 0; i < args.size(); i++) {
+            lua_pushlightuserdata(L, args[i]);
+            lua_rawseti(L, -2, i+1);
+        }
+
+    }
+    static void luaTable(lua_State* L, std::unordered_map<std::string, std::string>& args) {
+        lua_newtable(L);
+        for (const auto& e: args) {
+            lua_pushstring(L, e.first.c_str());
+            lua_pushstring(L, e.second.c_str());
+            lua_settable(L, -3);
+        }
+    }
+    static void luaTable(lua_State* L, std::unordered_map<std::string, float>& args) {
+        lua_newtable(L);
+        for (const auto& e: args) {
+            lua_pushstring(L, e.first.c_str());
+            lua_pushnumber(L, e.second);
+            lua_settable(L, -3);
+        }
     }
 };

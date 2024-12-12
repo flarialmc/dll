@@ -8,7 +8,7 @@
 namespace LuaPackets {
     void pushPacketTypesToLua(lua_State *L) {
         lua_newtable(L);
-
+        //this pushes an enum for packets to a lua table
         for (auto [packet, name] : magic_enum::enum_entries<MinecraftPacketIds>()) {
             lua_pushinteger(L, static_cast<lua_Integer>(packet));
             lua_setfield(L, -2, name.data());
@@ -16,4 +16,5 @@ namespace LuaPackets {
 
         lua_setglobal(L, "MinecraftPacketIds");
     }
+
 }

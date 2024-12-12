@@ -218,6 +218,9 @@ struct UnifiedMobEffectData {
     [[nodiscard]] bool isValid() const {
         return id != MobEffect::EffectType::Empty;
     }
+    [[nodiscard]] MobEffect::EffectType getId() const {
+        return id;
+    }
 
     [[nodiscard]] std::string getNameAndTime() const {
         std::string name = MobEffect::effectTypeToString(id);

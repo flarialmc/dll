@@ -74,6 +74,13 @@ namespace player {
         lua_pushinteger(L, SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot());
         return 1;
     }
+    int lua_getEffects(lua_State *L) {
+        if (SDK::clientInstance == nullptr) {
+            return 0;
+        }
+        auto *player_data = static_cast<Player*>(lua_touserdata(L, 1));
+        LuaPusher::luaArray(L, player_data->getMobEffects());
+    }
 
 
     int lua_getPlayerZ(lua_State *L) {
