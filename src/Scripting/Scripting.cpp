@@ -19,6 +19,7 @@
 #include "Functions/LuaModule.hpp"
 #include "Console/Console.hpp"
 #include "Commands/LuaOnCommand.hpp"
+#include "Packets/Packets.hpp"
 
 
 int apiRevision = 2;
@@ -100,6 +101,7 @@ void registerFunctions(lua_State* L){
     LuaClient::registerClient(L);
     LuaModule::registerModule(L);
     LuaOnCommand::registerLuaOnCommand(L);
+    LuaPackets::pushPacketTypesToLua(L);
 
     LuaTextPacket::registerFunctions(L);
 }
@@ -148,6 +150,7 @@ void Scripting::loadModules() {
                 int apiRev = jsonData["api_revision"];
                 if(apiRevision != apiRev) {
                     FlarialGUI::Notify(moduleName + " is outdated");
+                    Logger::custom(fg(fmt::color::red), "Scripting loader", "{} is outdated", moduleName);
                     Scripting::console.addLog("Scripting loader", moduleName + " is outdated", fg(fmt::color::red));
                     Scripting::scriptsAmountWithErrors++;
                     continue;
