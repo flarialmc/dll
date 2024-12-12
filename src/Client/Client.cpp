@@ -56,7 +56,7 @@ bool Client::disable = false;
 
 void Client::initialize() {
     winrt::init_apartment();
-    WinrtUtils::setWindowTitle(fmt::format("Flarial {}", FLARIAL_BUILD_TYPE));
+    WinrtUtils::setWindowTitle(fmt::format("Flarial v{} {}", FLARIAL_VERSION, FLARIAL_BUILD_TYPE));
 
     VersionUtils::initialize();
     version = VersionUtils::getFormattedVersion();

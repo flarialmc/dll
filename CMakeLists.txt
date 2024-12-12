@@ -11,7 +11,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(__DEBUG__)
 elseif (CMAKE_BUILD_TYPE STREQUAL "Test")
     set(CLIENT_BUILD_TYPE "Test")
-    add_compile_definitions(__SCRIPTING__ __TEST__)
+    add_compile_definitions(__TEST__)
 else()
     set(CLIENT_BUILD_TYPE "Release")
     add_compile_definitions(__RELEASE__)
@@ -26,29 +26,25 @@ execute_process(
 add_compile_definitions(COMMIT_HASH="${COMMIT_HASH}")
 
 add_compile_options(/bigobj)
-add_compile_options(/utf-8) # fmt lib
-add_compile_options($<$<CONFIG:Release>:/O2>) # optimize for speed
-add_compile_options($<$<CONFIG:Release>:/Oi>) # enable intrinsic functions
-add_compile_options($<$<CONFIG:Release>:/Gy>) # separate functions for linker
-add_compile_options($<$<CONFIG:Release>:/Gw>) # optimize global data
-add_compile_options($<$<CONFIG:Release>:/Gm->) # disable minimal rebuild
-add_compile_options($<$<CONFIG:Release>:/GF>) # enable string pooling
-add_compile_options($<$<CONFIG:Release>:/fp:fast>) # optimize floating point
-add_compile_options($<$<CONFIG:Release>:/GR->) # disable RTTI
-add_compile_options($<$<CONFIG:Release>:/Gd>) # use __cdecl for all functions
-add_compile_options($<$<CONFIG:Release>:/MT>) # use static multithreaded runtime
-add_compile_options($<$<CONFIG:Release>:/Ob2>) # inline any suitable function
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+add_compile_options(/utf-8)
+if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "Test")
+    # Optimize for performance
+    add_compile_options(/O2 /Oi /Gy /Gw /GF /fp:fast /GR- /Gd /MT /Ob2)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+elseif (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    # Optimize for build time
+    add_compile_options(/Od /Zi /MT) #/MTd causes static asserts to fail
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+endif()
 
 # Generate version and build date
 string(TIMESTAMP BUILD_DATE "%Y %b %d %H:%M:%S")
-set(FLARIAL_VERSION "${CLIENT_VERSION} ${CLIENT_BUILD_TYPE}")
 set(FLARIAL_BUILD_DATE "${BUILD_DATE}")
 
 add_compile_definitions(
-        FLARIAL_VERSION=\"${FLARIAL_VERSION}\"
-        FLARIAL_BUILD_DATE=\"${FLARIAL_BUILD_DATE}\"
+        FLARIAL_VERSION=\"${CLIENT_VERSION}\"
         FLARIAL_BUILD_TYPE=\"${CLIENT_BUILD_TYPE}\"
+        FLARIAL_BUILD_DATE=\"${FLARIAL_BUILD_DATE}\"
 )
 
 

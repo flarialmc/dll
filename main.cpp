@@ -30,7 +30,6 @@ DWORD WINAPI init() {
 
     Logger::success("Flarial initialized in {:.2f}s", elapsed);
 
-    //Logger::printColors();
     std::thread statusThread([]() {
     while (!Client::disable) {
         auto now = std::chrono::steady_clock::now();

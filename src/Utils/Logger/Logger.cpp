@@ -64,7 +64,7 @@ namespace Logger {
         }
 #endif
 
-        auto message = fmt::format("{}\n{}\n{}\n{}\n\n",
+        auto message = fmt::format("{}\n{}\n{}\n{}\n{}\n\n",
             fmt::format("Client Version: {}", FLARIAL_VERSION),
             fmt::format("Game Version:   {}", WinrtUtils::getFormattedVersion()),
             fmt::format("Commit:         {}", COMMIT_HASH),
