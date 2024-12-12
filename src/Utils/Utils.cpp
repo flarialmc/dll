@@ -430,6 +430,15 @@ std::string Utils::downloadFile(const std::string& url) {
     return rtn;
 }
 
+std::string Utils::sanitizeName(const std::string &name) {
+    std::string cleanedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
+    if (cleanedName.empty()) {
+        cleanedName = name;
+    }
+    return cleanedName;
+}
+
+
 std::string String::replaceAll(std::string& string, std::string_view c1, std::string_view c2) {
     size_t pos = 0;
     while ((pos = string.find(c1, pos)) != std::string::npos) {

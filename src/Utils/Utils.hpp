@@ -293,6 +293,8 @@ public:
     static uint64_t getCurrentMs();
 
     static std::string downloadFile(const std::string& url);
+
+    static std::string sanitizeName(const std::string& name);
 };
 
 class String {

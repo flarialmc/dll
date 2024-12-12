@@ -30,6 +30,7 @@ std::string APIUtils::get(const std::string &link) {
     } catch (const std::exception &e) {
         Logger::error(e.what());
     }
+    return "";
 }
 
 nlohmann::json APIUtils::getVips() {
@@ -41,7 +42,12 @@ nlohmann::json APIUtils::getVips() {
             return nlohmann::json::object();
         }
 
-        return nlohmann::json::parse(users);
+        if (nlohmann::json::accept(users)) {
+            return nlohmann::json::parse(users);
+        }
+
+        Logger::warn("VIP JSON rejected: {}", users);
+        return nlohmann::json::object();
     }
     catch (const nlohmann::json::parse_error& e) {
         Logger::error("An error occurred while parsing vip users: {}", e.what());
@@ -62,7 +68,12 @@ nlohmann::json APIUtils::getUsers() {
             return nlohmann::json::object();
         }
 
-        return nlohmann::json::parse(users);
+        if (nlohmann::json::accept(users)) {
+            return nlohmann::json::parse(users);
+        }
+
+        Logger::warn("Users JSON rejected: {}", users);
+        return nlohmann::json::object();
     }
     catch (const nlohmann::json::parse_error& e) {
         Logger::error("An error occurred while parsing online users: {}", e.what());
@@ -75,9 +86,10 @@ nlohmann::json APIUtils::getUsers() {
 }
 
 bool APIUtils::hasRole(const std::string& role, const std::string& name) {
-    nlohmann::json users = getUsers();
-    if (users.contains(role) && users[role].is_array()) {
-        return std::find(users[role].begin(), users[role].end(), name) != users[role].end();
+    try {
+        return std::ranges::find(onlineVips, name) != onlineVips.end();
+    } catch (const std::exception& e) {
+        Logger::error("An error occurred while checking roles: {}", e.what());
+        return false;
     }
-    return false;
 }

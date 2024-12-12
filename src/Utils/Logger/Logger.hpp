@@ -9,6 +9,7 @@
 #include <fmt/compile.h>
 #include <fmt/core.h>
 #include <fmt/os.h>
+#include <fmt/ranges.h>
 
 namespace Logger {
     namespace Color {

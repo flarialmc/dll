@@ -14,6 +14,7 @@
 #include "src/Client/Command/CommandManager.hpp"
 
 std::chrono::steady_clock::time_point lastBeatTime;
+std::chrono::steady_clock::time_point lastVipFetchTime;
 std::chrono::steady_clock::time_point lastOnlineUsersFetchTime;
 std::chrono::steady_clock::time_point lastAnnouncementTime;
 
@@ -36,6 +37,7 @@ DWORD WINAPI init() {
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastBeatTime);
         auto onlineUsersFetchElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastOnlineUsersFetchTime);
         auto onlineAnnouncementElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastAnnouncementTime);
+        auto vipFetchElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastVipFetchTime);
 
         if (!SDK::hasInstanced || SDK::clientInstance == nullptr || SDK::clientInstance->getLocalPlayer() == nullptr) {
             std::this_thread::sleep_for(std::chrono::milliseconds(60));
@@ -74,7 +76,29 @@ DWORD WINAPI init() {
             } catch (const nlohmann::json::parse_error &e) {
                 Logger::error("An error occurred while parsing online users: {}", e.what());
             }
-            APIUtils::onlineVips = APIUtils::getUsers();
+        }
+
+        if (vipFetchElapsed >= std::chrono::minutes(3)) {
+            try {
+                auto vipsJson = APIUtils::getVips();
+                std::vector<std::string> updatedVips;
+
+                // Flatten the JSON structure into a vector of strings
+                for (auto& [role, users] : vipsJson.items()) {
+                    if (users.is_array()) {
+                        for (auto& user : users) {
+                            if (user.is_string()) {
+                                updatedVips.push_back(user.get<std::string>());
+                            }
+                        }
+                    }
+                }
+
+                APIUtils::onlineVips = std::move(updatedVips);
+                lastVipFetchTime = now;
+            } catch (const std::exception& e) {
+                Logger::error("An error occurred while parsing VIP users: {}", e.what());
+            }
         }
 
         if (onlineAnnouncementElapsed >= std::chrono::minutes(10) && ModuleManager::initialized &&

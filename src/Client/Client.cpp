@@ -19,20 +19,33 @@ std::string Client::current_commit = COMMIT_HASH;
 std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
     std::vector<std::string> allPlayers;
 
-    for (const auto& it : data) {
-        if (it.contains("players")) {
-            for (const auto& player : it.at("players")) {
-                allPlayers.push_back(player);
+    try {
+        // Iterate through key-value pairs in the JSON object
+        for (const auto& [key, value] : data.items()) {
+            if (value.contains("players") && value.at("players").is_array()) {
+                for (const auto& player : value.at("players")) {
+                    if (player.is_string()) {
+                        allPlayers.push_back(player.get<std::string>());
+                    }
+                }
             }
         }
+    } catch (const nlohmann::json::exception& e) {
+        Logger::error("Error parsing players: {}", e.what());
     }
 
     if (SDK::clientInstance && SDK::clientInstance->getLocalPlayer()) {
-        std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
-        std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
+        try {
+            std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
+            std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
 
-        if (clearedName.empty()) clearedName = String::removeColorCodes(name);
-        allPlayers.push_back(clearedName);
+            if (clearedName.empty()) {
+                clearedName = String::removeColorCodes(name);
+            }
+            allPlayers.push_back(clearedName);
+        } catch (const std::exception& e) {
+            Logger::error("Error processing local player name: {}", e.what());
+        }
     }
 
     return allPlayers;

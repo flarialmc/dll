@@ -76,7 +76,6 @@ public:
     void onSetup() override {
         Listen(this, MouseEvent, &ClickGUI::onMouse)
         Listen(this, KeyEvent, &ClickGUI::onKey)
-        Listen(this, PacketEvent, &ClickGUI::onPacket)
         ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
         Module::onEnable();
     }
@@ -1462,17 +1461,6 @@ public:
         if ((this->active || editmenu) && SDK::getCurrentScreen() == "hud_screen")
             event.cancel(); // TODO: modules dont listen for canceled state!!!
 
-    }
-
-    void onPacket(PacketEvent& event) {
-        if (event.getPacket()->getId() == MinecraftPacketIds::StartGame)
-        {
-            APIUtils::getUsers();
-        }
-        if (event.getPacket()->getId() == MinecraftPacketIds::Login)
-        {
-            APIUtils::getUsers();
-        }
     }
 
     static bool compareEnabled(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
