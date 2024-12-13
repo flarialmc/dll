@@ -30,10 +30,10 @@ private:
 public:
     static inline void* funcOriginal = nullptr;
 
-    UIControl_updateCachedPositionHook() : Hook("UIControl_updateCachedPositionHook", WinrtUtils::checkAboveOrEqual(21,40) ? GET_SIG_ADDRESS("UIControl::getPosition") : GET_SIG_ADDRESS("UIControl::_setCachedPosition")) {}
+    UIControl_updateCachedPositionHook() : Hook("UIControl_updateCachedPositionHook", VersionUtils::checkAboveOrEqual(21,40) ? GET_SIG_ADDRESS("UIControl::getPosition") : GET_SIG_ADDRESS("UIControl::_setCachedPosition")) {}
 
     void enableHook() override {
-        if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+        if(VersionUtils::checkAboveOrEqual(21, 40)) {
             this->autoHook((void *) UIControl_getPosition, (void **) &funcOriginal);
         } else {
             this->autoHook((void *) UIControl_updateCachedPosition21_30, (void **) &funcOriginal);

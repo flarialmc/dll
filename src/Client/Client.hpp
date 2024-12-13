@@ -3,31 +3,16 @@
 #include "Hook/Manager.hpp"
 #include "Module/Manager.hpp"
 #include <vector>
-//winrt :fire:
-#include "winrt/windows.applicationmodel.core.h"
-#include "winrt/Windows.UI.ViewManagement.h"
-#include "winrt/Windows.UI.Core.h"
-#include "winrt/windows.system.h"
 
-using namespace winrt::Windows::UI::ViewManagement;
-using namespace winrt::Windows::ApplicationModel::Core;
-using namespace winrt::Windows::UI::Core;
+#define ADD_SETTING(setting, value) \
+if (Client::settings.getSettingByName<decltype(value)>(setting) == nullptr) \
+Client::settings.addSetting(setting, value);
 
 class Client {
 public:
-    static std::vector<std::string> onlinePlayers;
-    static nlohmann::json onlineVips;
-
     static std::string current_commit;
 
     static std::vector<std::string> getPlayersVector(const nlohmann::json &data);
-    static int fetchVips();
-    static bool isDev(std::string name);
-    static bool isGamer(std::string name);
-    static bool isBooster(std::string name);
-
-    static void setWindowTitle(std::wstring title);
-    static void changeCursor(CoreCursorType cur);
 
     static void initialize();
 
@@ -35,31 +20,29 @@ public:
 
     static void centerCursor();
 
-    static std::string settingspath;
     static Settings settings;
+    inline static std::string version;
+    inline static HMODULE currentModule = nullptr;
 
-    static inline std::string version;
-
-    static inline HMODULE currentModule = NULL;
-
+    inline static std::string path = Utils::getClientPath() + "\\main.flarial";
     static void SaveSettings() {
         try {
-            std::ofstream outputFile(settingspath);
+            std::ofstream outputFile(path);
             if (outputFile) {
                 outputFile << settings.ToJson();
             } else {
-                Logger::error("Failed to open file for saving settings: {}", settingspath);
+                Logger::error("Failed to open settings file: {}", path);
             }
         } catch (const std::exception& e) {
-            Logger::error("An error occurred while trying to save settings to {}: {}", settingspath, e.what());
+            Logger::error("An error occurred while trying to save settings to {}: {}", path, e.what());
         }
     }
 
     static void LoadSettings() {
-        std::ifstream inputFile(settingspath);
+        std::ifstream inputFile(path);
 
         if (!inputFile) {
-            Logger::error("Failed to open settings file for loading: {}", settingspath);
+            Logger::error("Failed to open settings file: {}", path);
             return;
         }
 
@@ -69,12 +52,12 @@ public:
     }
 
     static void CheckSettingsFile() {
-        if (!std::filesystem::exists(settingspath)) {
-            std::filesystem::create_directories(std::filesystem::path(settingspath).parent_path());
+        if (!std::filesystem::exists(path)) {
+            std::filesystem::create_directories(std::filesystem::path(path).parent_path());
 
-            std::ofstream file(settingspath, std::ios::app);
+            std::ofstream file(path, std::ios::app);
             if (!file) {
-                Logger::error("Failed to create settings file: {}", settingspath);
+                Logger::error("Failed to create settings file: {}", path);
             }
         }
     }

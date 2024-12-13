@@ -1,12 +1,7 @@
 ﻿#pragma once
 
-#include "MinHook.h"
-#include <string>
-#include <format>
-
-#include "../../../Utils/Logger/Logger.hpp"
-#include "../../../Utils/Memory/Memory.hpp"
-#include "../../Events/EventManager.hpp"
+#include <minhook/MinHook.h>
+#include <Client/Events/EventManager.hpp>
 
 class Hook {
 public:

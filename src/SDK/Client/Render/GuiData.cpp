@@ -1,7 +1,6 @@
 #include "GuiData.hpp"
 
-#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
-#include "../../../Utils/Versions/WinrtUtils.hpp"
+#include <Utils/VersionUtils.hpp>
 
 void GuiData::displayClientMessage(const std::string &str) {
     if (str.empty())
@@ -13,7 +12,7 @@ void GuiData::displayClientMessage(const std::string &str) {
         sig = GET_SIG_ADDRESS("GuiData::displayClientMessage");
     }
 
-    if (WinrtUtils::checkAboveOrEqual(21, 20)) {
+    if (VersionUtils::checkAboveOrEqual(21, 20)) {
         char bruh[0x28]{};
 
         using func_t = void(*)(GuiData*, const std::string&, char*, bool);

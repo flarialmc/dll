@@ -1,9 +1,9 @@
-#include <iostream>
-#include <lua.hpp>
-#include "../Client/GUI/Engine/Engine.hpp"
 #include "Scripting.hpp"
-#include "../Config/json/json.hpp"
-#include "../Client/Module/Manager.hpp"
+
+#include <Client/GUI/Engine/Engine.hpp>
+
+#include <json/json.hpp>
+#include <Client/Module/Manager.hpp>
 #include "Functions/Player.hpp"
 #include "ScriptModuleBase.hpp"
 #include "Functions/GUI.hpp"

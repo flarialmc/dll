@@ -1,16 +1,13 @@
 ﻿#include "Utils.hpp"
 
-#include "../Client/GUI/Engine/Engine.hpp"
+#include <Client/GUI/Engine/Engine.hpp>
+
 #include <sstream>
 #include <algorithm>
 #include <codecvt>
 #include <Psapi.h>
 #include <regex>
 #include <wininet.h>
-
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.Storage.h>
-#include <winrt/Windows.System.h>
 
 std::string Utils::getRoamingPath() {
     char *path = nullptr;
@@ -387,45 +384,12 @@ int Utils::CountBytes(const std::string& data) {
     return count;
 }
 
-bool Utils::isMinecraftLoaded(HANDLE process) {
-    int modulesNeeded = 176;
-    HMODULE modules[1024];
-    DWORD cbNeeded;
-
-    if (EnumProcessModules(process, modules, sizeof(modules), &cbNeeded)) {
-        int moduleCount = cbNeeded / sizeof(HMODULE);
-        if (moduleCount >= modulesNeeded) {
-            return true;
-        }
-    }
-    return false;
-}
-
 uint64_t Utils::getCurrentMs() {
     return std::chrono::duration_cast<std::chrono::milliseconds>(
                std::chrono::steady_clock::now().time_since_epoch())
         .count();
 }
-std::string Utils::DownloadString(const std::string& url) {
-    HINTERNET interwebs = InternetOpenA("Samsung Smart Fridge", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
-    if (!interwebs) {
-        return "";
-    }
 
-    std::string rtn;
-    HINTERNET urlFile = InternetOpenUrlA(interwebs, url.c_str(), NULL, 0, INTERNET_FLAG_RELOAD, 0);
-    if (urlFile) {
-        char buffer[2000];
-        DWORD bytesRead;
-        while (InternetReadFile(urlFile, buffer, sizeof(buffer), &bytesRead) && bytesRead > 0) {
-            rtn.append(buffer, bytesRead);
-        }
-        InternetCloseHandle(urlFile);
-    }
-
-    InternetCloseHandle(interwebs);
-    return String::replaceAll(rtn, "|n", "\r\n");
-}
 std::string Utils::downloadFile(const std::string& url) {
     auto internetCloser = [](HINTERNET handle) { if (handle) InternetCloseHandle(handle); };
 
@@ -466,41 +430,14 @@ std::string Utils::downloadFile(const std::string& url) {
     return rtn;
 }
 
-void Utils::openFolder(const std::string& path) {
-    using namespace winrt;
-    using namespace Windows::Foundation;
-    using namespace Windows::Storage;
-    using namespace Windows::System;
-
-    try {
-        hstring hFolderPath = to_hstring(path);
-
-        StorageFolder folder = StorageFolder::GetFolderFromPathAsync(hFolderPath).get();
-
-        // Launch the folder in File Explorer
-        Launcher::LaunchFolderAsync(folder).get();
-    } catch (const winrt::hresult_error& e) {
-        Logger::error("An error occurred while trying to open {}: {} ({})", path, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
+std::string Utils::sanitizeName(const std::string &name) {
+    std::string cleanedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
+    if (cleanedName.empty()) {
+        cleanedName = name;
     }
+    return cleanedName;
 }
 
-void Utils::openSubFolder(const std::string& path) {
-    using namespace winrt;
-    using namespace Windows::Storage;
-    using namespace Windows::System;
-
-    try {
-        StorageFolder roamingFolder = ApplicationData::Current().RoamingFolder();
-
-        // Get the specified subfolder inside RoamingState
-        auto folder = roamingFolder.GetFolderAsync(winrt::hstring(String::StrToWStr(path))).get();
-
-        // Launch the subfolder in File Explorer
-        Launcher::LaunchFolderAsync(folder).get();
-    } catch (const winrt::hresult_error& e) {
-        Logger::error("An error occurred while trying to open {}: {} ({})", path, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
-    }
-}
 
 std::string String::replaceAll(std::string& string, std::string_view c1, std::string_view c2) {
     size_t pos = 0;

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <glm/mat4x4.hpp>
-#include "../../../Utils/Utils.hpp"
+#include <glm/glm/mat4x4.hpp>
+#include <Utils/Utils.hpp>
 #include "GLMatrix.hpp"
 
 // By Intop

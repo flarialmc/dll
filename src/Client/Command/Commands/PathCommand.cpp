@@ -1,6 +1,7 @@
 #include "PathCommand.hpp"
-#include "imgui.h"
+
+#include <Utils/WinrtUtils.hpp>
 
 void PathCommand::execute(const std::vector<std::string> &args) {
-    Utils::openSubFolder("Flarial");
+    WinrtUtils::openSubFolder("Flarial");
 }

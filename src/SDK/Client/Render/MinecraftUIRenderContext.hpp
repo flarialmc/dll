@@ -1,21 +1,17 @@
 #pragma once
 
+#include <SDK/Client/Core/ClientInstance.hpp>
+#include <SDK/Client/Core/HashedString.hpp>
+#include <Client/Module/Manager.hpp>
+#include <Utils/Memory/Memory.hpp>
+#include <Utils/Utils.hpp>
 
-#include "../Core/ClientInstance.hpp"
-#include "../../../Utils/Memory/Memory.hpp"
-#include <cstdint>
-#include <string>
-#include "../../../Utils/Memory/Memory.hpp"
-#include "../../../Utils/Logger/Logger.hpp"
-#include "../Level/Level.hpp"
-#include "../Container/Inventory.hpp"
-#include "../../../Utils/Utils.hpp"
-#include "../../../Client/GUI/D2D.hpp"
 #include "TexturePtr.hpp"
 #include "TextureGroup.hpp"
-#include "../../../Client/Module/Manager.hpp"
 #include "ScreenContext.hpp"
-#include "../Core/HashedString.hpp"
+
+#include <cstdint>
+#include <string>
 
 class MinecraftUIRenderContext {
 public:
@@ -51,7 +47,7 @@ public:
     }
 
     void drawImage(TexturePtr& texture, Vec2<float>& pos, Vec2<float>& size, Vec2<float>& uvPos, Vec2<float>& uvSize) {
-        if (WinrtUtils::checkAboveOrEqual(21, 20))
+        if (VersionUtils::checkAboveOrEqual(21, 20))
             Memory::CallVFunc<7, void, TexturePtr&, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&, bool>(this, texture, pos, size, uvPos, uvSize, false);
         else
             Memory::CallVFunc<7, void, TexturePtr&, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(this, texture, pos, size, uvPos, uvSize);

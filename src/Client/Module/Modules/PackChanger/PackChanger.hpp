@@ -18,8 +18,8 @@ private:
 public:
     PackChanger() : Module("PackChanger", "Allows you to change packs in world/server.", IDR_AUTORQ_PNG, "") {
 
-        if(WinrtUtils::checkAboveOrEqual(21,00)) {
-            static auto src = WinrtUtils::checkAboveOrEqual(21,20) ? GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch") : GET_SIG_ADDRESS("MinecraftGame::_onActiveResourcePacksChanged_Patch");
+        if(VersionUtils::checkAboveOrEqual(21,00)) {
+            static auto src = VersionUtils::checkAboveOrEqual(21,20) ? GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch") : GET_SIG_ADDRESS("MinecraftGame::_onActiveResourcePacksChanged_Patch");
             Memory::copyBytes((void*)src, patch1Data.data(), patch1Data.size());
         }
 
@@ -181,17 +181,17 @@ public:
     }
 
     void patchComposeFullStack() {
-        if(!WinrtUtils::checkAboveOrEqual(21,00)) return;
+        if(!VersionUtils::checkAboveOrEqual(21,00)) return;
 
-        static auto dst = WinrtUtils::checkAboveOrEqual(21,20) ? GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch") : GET_SIG_ADDRESS("MinecraftGame::_onActiveResourcePacksChanged_Patch");
+        static auto dst = VersionUtils::checkAboveOrEqual(21,20) ? GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch") : GET_SIG_ADDRESS("MinecraftGame::_onActiveResourcePacksChanged_Patch");
 
         Memory::nopBytes((void*)dst, 6);
     }
 
     void unpatchComposeFullStack() {
-        if(!WinrtUtils::checkAboveOrEqual(21,00)) return;
+        if(!VersionUtils::checkAboveOrEqual(21,00)) return;
 
-        static auto dst = WinrtUtils::checkAboveOrEqual(21,20) ? GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch") : GET_SIG_ADDRESS("MinecraftGame::_onActiveResourcePacksChanged_Patch");
+        static auto dst = VersionUtils::checkAboveOrEqual(21,20) ? GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch") : GET_SIG_ADDRESS("MinecraftGame::_onActiveResourcePacksChanged_Patch");
 
         Memory::patchBytes((void*)dst, patch1Data.data(), patch1Data.size());
     }

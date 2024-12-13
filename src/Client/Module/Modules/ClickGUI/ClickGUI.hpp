@@ -3,6 +3,7 @@
 #include "../Module.hpp"
 #include "../../../Client.hpp"
 #include "Elements/ClickGUIElements.hpp"
+#include <Utils/APIUtils.hpp>
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -75,7 +76,6 @@ public:
     void onSetup() override {
         Listen(this, MouseEvent, &ClickGUI::onMouse)
         Listen(this, KeyEvent, &ClickGUI::onKey)
-        Listen(this, PacketEvent, &ClickGUI::onPacket)
         ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
         Module::onEnable();
     }
@@ -1461,17 +1461,6 @@ public:
         if ((this->active || editmenu) && SDK::getCurrentScreen() == "hud_screen")
             event.cancel(); // TODO: modules dont listen for canceled state!!!
 
-    }
-
-    void onPacket(PacketEvent& event) {
-        if (event.getPacket()->getId() == MinecraftPacketIds::StartGame)
-        {
-            Client::fetchVips();
-        }
-        if (event.getPacket()->getId() == MinecraftPacketIds::Login)
-        {
-            Client::fetchVips();
-        }
     }
 
     static bool compareEnabled(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {

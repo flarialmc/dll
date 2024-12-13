@@ -3,7 +3,6 @@
 #include "lua.hpp"
 #include "../Client/Module/Modules/Module.hpp"
 #include "Console/Console.hpp"
-#include <iostream>
 
 namespace Scripting {
     inline ScriptingConsole console;

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Actor/Actor.hpp"
-#include "../../../Utils/Utils.hpp"
+#include <SDK/Client/Actor/Actor.hpp>
+#include <Utils/Utils.hpp>
 
 struct ActorRenderData {
     Actor* actor;

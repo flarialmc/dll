@@ -9,18 +9,15 @@
 #include <iostream>
 #include <Psapi.h>
 #include <tlhelp32.h>
-#include <imgui.h>
-#include <imgui_impl_dx11.h>
-#include <imgui_impl_dx12.h>
-#include <imgui_impl_win32.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_dx11.h>
+#include <imgui/imgui_impl_dx12.h>
+#include <imgui/imgui_impl_win32.h>
+#include <imgui/imgui_freetype.h>
 
 #include "ResizeHook.hpp"
-#include "../../../../../lib/ImGui/imgui.h"
-#include "../../../../../lib/ImGui/imgui_impl_win32.h"
-#include "../../../../../lib/ImGui/imgui_impl_dx11.h"
-#include "../../../../../lib/ImGui/imgui_impl_dx12.h"
+
 #include "../../../Module/Modules/MotionBlur/MotionBlur.hpp"
-#include "imgui_freetype.h"
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
 

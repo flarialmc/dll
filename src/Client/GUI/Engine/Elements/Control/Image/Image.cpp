@@ -3,10 +3,10 @@
 #include "../../Structs/ImagesClass.hpp"
 #include "../../../../../../Assets/Assets.hpp"
 #include "../../../../../Client.hpp"
-#include <imgui.h>
+#include <imgui/imgui.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb.h>
+#include <imgui/stb.h>
 
 
 void FlarialGUI::image(const std::string& imageName, D2D1_RECT_F rect) {

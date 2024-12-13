@@ -113,7 +113,7 @@ void SendPacketHook::enableHook() {
     Memory::hookFunc((void *) setTitlePacket->packetHandler->vTable[1], (void*)receiveCallbackSetTitle,
                      (void **) &receiveSetTitlePacketOriginal, "ReceivePacketHook");
 
-    std::shared_ptr<Packet> playSoundPacket = SDK::createPacket((int) MinecraftPacketIds::PlaySoundA);
+    std::shared_ptr<Packet> playSoundPacket = SDK::createPacket((int) MinecraftPacketIds::PlaySound);
     Memory::hookFunc((void *) playSoundPacket->packetHandler->vTable[1], (void*)receiveCallbackPlaySound,
                      (void **) &receivePacketPlaySoundOriginal, "ReceivePacketHook");
 

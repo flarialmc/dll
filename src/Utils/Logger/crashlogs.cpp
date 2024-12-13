@@ -1,6 +1,7 @@
 #include "crashlogs.hpp"
-#include "../../Client/Module/Manager.hpp"
-#include "kiero.h"
+
+#include <Client/Module/Manager.hpp>
+#include <kiero/kiero.h>
 
 //needed to get a stack trace
 #include <stacktrace>

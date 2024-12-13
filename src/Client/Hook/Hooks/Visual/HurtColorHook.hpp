@@ -11,7 +11,7 @@ private:
 
         auto event = nes::make_holder<HurtColorEvent>(funcOriginal(a1, color, a3));
 
-        if(WinrtUtils::checkAboveOrEqual(21,40)) {
+        if(VersionUtils::checkAboveOrEqual(21,40)) {
             auto actor = hat::member_at<Actor*>(a3, 0x38);
             if(actor && actor->getHurtTime() > 0) {
                 eventMgr.trigger(event);

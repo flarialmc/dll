@@ -142,7 +142,7 @@ public:
 
         control->parentRelativePosition = isEnabled() ? scaledPos : scaledOriginalPos;
         lastAppliedPos = isEnabled() ? currentPos : originalPos;
-        if(WinrtUtils::checkAboveOrEqual(21,40)) {
+        if(VersionUtils::checkAboveOrEqual(21,40)) {
             control->updatePosition(true);
         }
         control->forEachChild([](std::shared_ptr<UIControl> &child) {

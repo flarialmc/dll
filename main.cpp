@@ -5,14 +5,16 @@
 #include "src/Client/Hook/Hooks/Render/ResizeHook.hpp"
 #include "src/Client/Module/Modules/ClickGUI/ClickGUI.hpp"
 // #include "src/Client/Module/Modules/Nick/NickListener.hpp"
-#include <kiero.h>
+#include <kiero/kiero.h>
 #include <wininet.h>
+#include <Utils/WinrtUtils.hpp>
 
 #include "src/Utils/Logger/crashlogs.hpp"
 #include "src/Client/Module/Modules/Nick/NickModule.hpp"
 #include "src/Client/Command/CommandManager.hpp"
 
 std::chrono::steady_clock::time_point lastBeatTime;
+std::chrono::steady_clock::time_point lastVipFetchTime;
 std::chrono::steady_clock::time_point lastOnlineUsersFetchTime;
 std::chrono::steady_clock::time_point lastAnnouncementTime;
 
@@ -28,13 +30,13 @@ DWORD WINAPI init() {
 
     Logger::success("Flarial initialized in {:.2f}s", elapsed);
 
-    //Logger::printColors();
     std::thread statusThread([]() {
     while (!Client::disable) {
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastBeatTime);
         auto onlineUsersFetchElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastOnlineUsersFetchTime);
         auto onlineAnnouncementElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastAnnouncementTime);
+        auto vipFetchElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastVipFetchTime);
 
         if (!SDK::hasInstanced || SDK::clientInstance == nullptr || SDK::clientInstance->getLocalPlayer() == nullptr) {
             std::this_thread::sleep_for(std::chrono::milliseconds(60));
@@ -61,24 +63,41 @@ DWORD WINAPI init() {
             if (clearedName.empty()) clearedName = String::removeColorCodes(name);
 
             if (clearedName != "skinStandardCust") {
-                Utils::DownloadString(std::format("https://api.flarial.xyz/heartbeat/{}/{}", clearedName, ipToSend));
+                APIUtils::get(std::format("https://api.flarial.xyz/heartbeat/{}/{}", clearedName, ipToSend));
                 lastBeatTime = now;
             }
         }
 
         if (onlineUsersFetchElapsed >= std::chrono::minutes(3)) {
-            //fetch online users
             try {
-                std::string onlineUsersRaw = Utils::DownloadString("https://api.flarial.xyz/servers");
-                Client::onlinePlayers = Client::getPlayersVector(nlohmann::json::parse(onlineUsersRaw));
+                APIUtils::onlineUsers = Client::getPlayersVector(APIUtils::getUsers());
                 lastOnlineUsersFetchTime = now;
             } catch (const nlohmann::json::parse_error &e) {
                 Logger::error("An error occurred while parsing online users: {}", e.what());
             }
-            
-            Client::fetchVips();
+        }
 
-            lastOnlineUsersFetchTime = now;
+        if (vipFetchElapsed >= std::chrono::minutes(3)) {
+            try {
+                auto vipsJson = APIUtils::getVips();
+                std::vector<std::string> updatedVips;
+
+                // Flatten the JSON structure into a vector of strings
+                for (auto& [role, users] : vipsJson.items()) {
+                    if (users.is_array()) {
+                        for (auto& user : users) {
+                            if (user.is_string()) {
+                                updatedVips.push_back(user.get<std::string>());
+                            }
+                        }
+                    }
+                }
+
+                APIUtils::onlineVips = std::move(updatedVips);
+                lastVipFetchTime = now;
+            } catch (const std::exception& e) {
+                Logger::error("An error occurred while parsing VIP users: {}", e.what());
+            }
         }
 
         if (onlineAnnouncementElapsed >= std::chrono::minutes(10) && ModuleManager::initialized &&
@@ -95,16 +114,10 @@ DWORD WINAPI init() {
 
     statusThread.detach();
 
-    std::thread syncThread([]() {
-        while (!Client::disable) {
-            ModuleManager::syncState();
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
-    });
-    syncThread.detach();
-
-    while(!Client::disable) std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
+    while (!Client::disable) {
+        ModuleManager::syncState();
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
 
     Client::SaveSettings();
 
@@ -125,25 +138,22 @@ DWORD WINAPI init() {
 
     Logger::custom(fmt::fg(fmt::color::cadet_blue), "MinHook", "Freed Library");
 
-    Client::setWindowTitle(L"");
+    WinrtUtils::setWindowTitle("");
 
     Logger::shutdown();
 
     FreeLibraryAndExitThread(Client::currentModule, 0);
 }
 
-BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReserved)
-{
-    if (ul_reason_for_call == DLL_PROCESS_ATTACH)
-    {
+BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReserved) {
+    if (ul_reason_for_call == DLL_PROCESS_ATTACH) {
         /*
         https://learn.microsoft.com/en-us/windows/uwp/communication/sharing-named-objects
         Ensure a single instance of Flarial Client is loaded.
         Launchers may use this mutex to detect if the client is injected or not.
         */
         HANDLE hMutex = CreateMutexW(NULL, FALSE, L"Flarial");
-        if (GetLastError())
-        {
+        if (GetLastError()) {
             CloseHandle(hMutex);
             return FALSE;
         }
@@ -155,6 +165,3 @@ BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReser
 
     return TRUE;
 }
-
-
-

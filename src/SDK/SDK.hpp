@@ -3,7 +3,6 @@
 #include "Client/Core/ClientInstance.hpp"
 #include "Client/Render/ScreenView/ScreenView.hpp"
 #include "Client/Network/Packet/Packet.hpp"
-#include <cctype>
 
 namespace SDK {
     extern ClientInstance *clientInstance;

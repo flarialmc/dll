@@ -1,13 +1,7 @@
 #pragma once
 
-
 #include "RakPeer.h"
-#include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
-#include "../../../../Utils/Versions/WinrtUtils.hpp"
-#include <string>
-#include <vector>
-#include <libhat/Access.hpp>
-
+#include <Utils/Memory/Memory.hpp>
 
 class RaknetConnector {
 public:

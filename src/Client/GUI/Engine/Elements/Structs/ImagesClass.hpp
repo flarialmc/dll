@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../../../D2D.hpp"
-#include <imgui.h>
+#include <Client/GUI/D2D.hpp>
 #include <map>
 
 class ImagesClass {

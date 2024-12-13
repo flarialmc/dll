@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../Core/HashedString.hpp"
+#include <SDK/Client/Core/HashedString.hpp>
 
 namespace mce {
     class RenderMaterialInfo : std::enable_shared_from_this<RenderMaterialInfo> {

@@ -290,17 +290,11 @@ public:
           | std::ranges::to<std::vector>();
     }
 
-    static bool isMinecraftLoaded(HANDLE process);
-
     static uint64_t getCurrentMs();
 
     static std::string downloadFile(const std::string& url);
-    static std::string DownloadString(const std::string& url);
 
-    // Don't use this its bad
-    static void openFolder(const std::string& path);
-
-    static void openSubFolder(const std::string& path);
+    static std::string sanitizeName(const std::string& name);
 };
 
 class String {

@@ -1,5 +1,5 @@
 #include <dxgi.h>
-#include "kiero.h"
+#include "kiero/kiero.h"
 #include "../Hook.hpp"
 
 class ResizeHook : public Hook {

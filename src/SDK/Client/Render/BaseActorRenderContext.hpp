@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ItemRenderer.hpp"
-#include "../Core/ClientInstance.hpp"
-#include "../../../Utils/Memory/Memory.hpp"
+#include <SDK/Client/Core/ClientInstance.hpp>
+#include <Utils/Memory/Memory.hpp>
 
 class BaseActorRenderContext {
 private:

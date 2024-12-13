@@ -1,88 +1,51 @@
-﻿#pragma once
+﻿#include "Client.hpp"
 
-#include "Client.hpp"
-#include "GUI/Engine/Engine.hpp"
-#include "../Utils/Versions/VersionUtils.hpp"
 #include <filesystem>
 #include <thread>
 #include <wingdi.h>
 #include <wininet.h>
 
-//winrt stuff
-#include "winrt/windows.applicationmodel.core.h"
-#include "winrt/Windows.UI.ViewManagement.h"
-#include "winrt/Windows.UI.Core.h"
-#include "winrt/windows.system.h"
+#include <Utils/VersionUtils.hpp>
+#include <Utils/WinrtUtils.hpp>
 
 #include "Command/CommandManager.hpp"
 
-using namespace winrt::Windows::UI::ViewManagement;
-using namespace winrt::Windows::ApplicationModel::Core;
-using namespace winrt::Windows::UI::Core;
-
-std::string Client::settingspath = Utils::getConfigsPath() + "\\main.flarial";
 Settings Client::settings = Settings();
-std::vector<std::string> Client::onlinePlayers;
-nlohmann::json Client::onlineVips;
 
 bool notifiedOfConnectionIssue = false;
 
 std::string Client::current_commit = COMMIT_HASH;
-int Client::fetchVips() {
-    try {
-        std::string onlineVipsRaw = Utils::DownloadString("https://api.flarial.xyz/vips");
-        //static string for testing only until api endpoint is done
-        //feel free to enter your ign and try it out!
-        Client::onlineVips = nlohmann::json::parse(onlineVipsRaw);
-        return 1;
-    }
-    catch (const nlohmann::json::parse_error& e) {
-        Logger::error("An error occurred while parsing online vips: {}", e.what());
-        return 0;
-    }
-    return 0;
-}
-bool Client::isDev(std::string name) {
-    if (Client::onlineVips.contains("Dev") && Client::onlineVips["Dev"].is_array()) {
-        if (std::find(Client::onlineVips["Dev"].begin(), Client::onlineVips["Dev"].end(), name) != Client::onlineVips["Dev"].end()) {
-            return true;
-        }
-    }
-    return false;
-}
-bool Client::isGamer(std::string name) {
-    if (Client::onlineVips.contains("Gamer") && Client::onlineVips["Gamer"].is_array()) {
-        if (std::find(Client::onlineVips["Gamer"].begin(), Client::onlineVips["Gamer"].end(), name) != Client::onlineVips["Gamer"].end()) {
-            return true;
-        }
-    }
-    return false;
-}
-bool Client::isBooster(std::string name) {
-    if (Client::onlineVips.contains("Booster") && Client::onlineVips["Booster"].is_array()) {
-        if (std::find(Client::onlineVips["Booster"].begin(), Client::onlineVips["Booster"].end(), name) != Client::onlineVips["Booster"].end()) {
-            return true;
-        }
-    }
-    return false;
-}
+
 std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
     std::vector<std::string> allPlayers;
 
-    for (const auto& it : data) {
-        if (it.contains("players")) {
-            for (const auto& player : it.at("players")) {
-                allPlayers.push_back(player);
+    try {
+        // Iterate through key-value pairs in the JSON object
+        for (const auto& [key, value] : data.items()) {
+            if (value.contains("players") && value.at("players").is_array()) {
+                for (const auto& player : value.at("players")) {
+                    if (player.is_string()) {
+                        allPlayers.push_back(player.get<std::string>());
+                    }
+                }
             }
         }
+    } catch (const nlohmann::json::exception& e) {
+        Logger::error("Error parsing players: {}", e.what());
     }
 
     if (SDK::clientInstance && SDK::clientInstance->getLocalPlayer()) {
-        std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
-        std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
+        try {
+            std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
+            std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
 
-        if (clearedName.empty()) clearedName = String::removeColorCodes(name);
-        allPlayers.push_back(clearedName);
+            if (clearedName.empty()) {
+                clearedName = String::removeColorCodes(name);
+            }
+            allPlayers.push_back(clearedName);
+        } catch (const std::exception& e) {
+            Logger::error("Error processing local player name: {}", e.what());
+        }
     }
 
     return allPlayers;
@@ -90,24 +53,18 @@ std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
 
 bool Client::disable = false;
 
-void Client::setWindowTitle(std::wstring title) {
-    CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([title = std::move(title)]() {
-        ApplicationView::GetForCurrentView().Title(title);
-    });
-}
 
-void Client::changeCursor(CoreCursorType cur) {
-    CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([cur]() {
-        auto window = CoreApplication::MainView().CoreWindow();
-        window.PointerCursor(CoreCursor(cur, 0)); // Set the cursor
-    });
-}
 void Client::initialize() {
     winrt::init_apartment();
-    setWindowTitle(L"Flarial " + String::StrToWStr(WinrtUtils::getFormattedVersion() + " " + current_commit));
 
-    VersionUtils::init();
-    Client::version = WinrtUtils::getFormattedVersion();
+#if defined(__TEST__)
+    WinrtUtils::setWindowTitle(fmt::format("Flarial v{} {} {}", FLARIAL_VERSION, FLARIAL_BUILD_TYPE, FLARIAL_BUILD_DATE));
+#else
+    WinrtUtils::setWindowTitle(fmt::format("Flarial v{} {}", FLARIAL_VERSION, FLARIAL_BUILD_TYPE));
+#endif
+
+    VersionUtils::initialize();
+    version = VersionUtils::getFormattedVersion();
 
     if (!VersionUtils::isSupported(Client::version)) {
         Logger::fatal("Minecraft version is not supported!");
@@ -123,7 +80,8 @@ void Client::initialize() {
         Utils::getRoamingPath() + "\\Flarial",
         Utils::getRoamingPath() + "\\Flarial\\assets",
         Utils::getRoamingPath() + "\\Flarial\\logs",
-        Utils::getRoamingPath() + "\\Flarial\\Config"
+        Utils::getRoamingPath() + "\\Flarial\\Config",
+        Utils::getRoamingPath() + "\\Flarial\\scripts",
     };
 
     for (const auto& path : directories) {
@@ -131,95 +89,37 @@ void Client::initialize() {
             std::filesystem::create_directory(path);
         }
     }
-    std::filesystem::path folder_path5(Utils::getRoamingPath() + "\\Flarial\\scripts");
-    if (!exists(folder_path5)) {
-        create_directory(folder_path5);
-    }
 
     Client::CheckSettingsFile();
     Client::LoadSettings();
 
-    if (Client::settings.getSettingByName<std::string>("fontname") == nullptr)
-        Client::settings.addSetting("fontname", (std::string) "Space Grotesk");
-
-    if (Client::settings.getSettingByName<std::string>("mod_fontname") == nullptr)
-        Client::settings.addSetting("mod_fontname", (std::string) "Space Grotesk");
-
-    if (Client::settings.getSettingByName<float>("blurintensity") == nullptr)
-        Client::settings.addSetting("blurintensity", 2.0f);
-
-    if (Client::settings.getSettingByName<bool>("killdx") == nullptr)
-        Client::settings.addSetting("killdx", false);
-
-    if (Client::settings.getSettingByName<bool>("disable_alias") == nullptr)
-        Client::settings.addSetting("disable_alias", false);
-
-    if (Client::settings.getSettingByName<bool>("vsync") == nullptr)
-        Client::settings.addSetting("vsync", false);
-
-    if (Client::settings.getSettingByName<bool>("promotions") == nullptr)
-        Client::settings.addSetting("promotions", true);
-
-    if (Client::settings.getSettingByName<bool>("donotwait") == nullptr)
-        Client::settings.addSetting("donotwait", true);
-
-    if (Client::settings.getSettingByName<std::string>("bufferingmode") == nullptr)
-        Client::settings.addSetting("bufferingmode", (std::string) "Double Buffering");
-
-    if (Client::settings.getSettingByName<std::string>("swapeffect") == nullptr)
-        Client::settings.addSetting("swapeffect", (std::string) "FLIP_SEQUENTIAL");
-
-
-    if (Client::settings.getSettingByName<bool>("disableanims") == nullptr)
-        Client::settings.addSetting("disableanims", false);
-
-    if (Client::settings.getSettingByName<bool>("anonymousApi") == nullptr)
-        Client::settings.addSetting("anonymousApi", false);
-
-    if (Client::settings.getSettingByName<bool>("dlassets") == nullptr)
-        Client::settings.addSetting("dlassets", true);
-
-    if (Client::settings.getSettingByName<bool>("noicons") == nullptr)
-        Client::settings.addSetting("noicons", false);
-
-    if (Client::settings.getSettingByName<bool>("noshadows") == nullptr)
-        Client::settings.addSetting("noshadows", false);
-
-    if (Client::settings.getSettingByName<bool>("watermark") == nullptr)
-        Client::settings.addSetting("watermark", true);
-
-    if (Client::settings.getSettingByName<bool>("centreCursor") == nullptr)
-        Client::settings.addSetting("centreCursor", false);
-
-    if (Client::settings.getSettingByName<std::string>("aliasingMode") == nullptr)
-        Client::settings.addSetting("aliasingMode", (std::string) "Default");
-
-    if (Client::settings.getSettingByName<std::string>("ejectKeybind") == nullptr)
-        Client::settings.addSetting("ejectKeybind", (std::string) "");
-
-    if (Client::settings.getSettingByName<bool>("enabledModulesOnTop") == nullptr)
-        Client::settings.addSetting("enabledModulesOnTop", false);
-
-    if (Client::settings.getSettingByName<float>("rgb_speed") == nullptr)
-        Client::settings.addSetting("rgb_speed", 1.0f);
-
-    if (Client::settings.getSettingByName<float>("rgb_saturation") == nullptr)
-        Client::settings.addSetting("rgb_saturation", 1.0f);
-
-    if (Client::settings.getSettingByName<float>("rgb_value") == nullptr)
-        Client::settings.addSetting("rgb_value", 1.0f);
-
-    if (Client::settings.getSettingByName<float>("modules_font_scale") == nullptr)
-        Client::settings.addSetting("modules_font_scale", 1.0f);
-
-    if (Client::settings.getSettingByName<float>("gui_font_scale") == nullptr)
-        Client::settings.addSetting("gui_font_scale", 1.0f);
-
-    if (Client::settings.getSettingByName<bool>("overrideFontWeight") == nullptr)
-        Client::settings.addSetting("overrideFontWeight", (bool)false);
-
-    if (Client::settings.getSettingByName<std::string>("fontWeight") == nullptr)
-        Client::settings.addSetting("fontWeight", (std::string) "Normal");
+    ADD_SETTING("fontname", std::string("Space Grotesk"));
+    ADD_SETTING("mod_fontname", std::string("Space Grotesk"));
+    ADD_SETTING("blurintensity", 2.0f);
+    ADD_SETTING("killdx", false);
+    ADD_SETTING("disable_alias", false);
+    ADD_SETTING("vsync", false);
+    ADD_SETTING("promotions", true);
+    ADD_SETTING("donotwait", true);
+    ADD_SETTING("bufferingmode", std::string("Double Buffering"));
+    ADD_SETTING("swapeffect", std::string("FLIP_SEQUENTIAL"));
+    ADD_SETTING("disableanims", false);
+    ADD_SETTING("anonymousApi", false);
+    ADD_SETTING("dlassets", true);
+    ADD_SETTING("noicons", false);
+    ADD_SETTING("noshadows", false);
+    ADD_SETTING("watermark", true);
+    ADD_SETTING("centreCursor", false);
+    ADD_SETTING("aliasingMode", std::string("Default"));
+    ADD_SETTING("ejectKeybind", std::string(""));
+    ADD_SETTING("enabledModulesOnTop", false);
+    ADD_SETTING("rgb_speed", 1.0f);
+    ADD_SETTING("rgb_saturation", 1.0f);
+    ADD_SETTING("rgb_value", 1.0f);
+    ADD_SETTING("modules_font_scale", 1.0f);
+    ADD_SETTING("gui_font_scale", 1.0f);
+    ADD_SETTING("overrideFontWeight", false);
+    ADD_SETTING("fontWeight", std::string("Normal"));
 
     FlarialGUI::ExtractImageResource(IDR_RED_LOGO_PNG, "red-logo.png","PNG");
     FlarialGUI::ExtractImageResource(IDR_CYAN_LOGO_PNG, "dev-logo.png", "PNG");

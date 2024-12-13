@@ -1,6 +1,7 @@
 #include "ItemStack.hpp"
-#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
-#include "../../../Utils/Versions/WinrtUtils.hpp"
+
+#include <Utils/VersionUtils.hpp>
+#include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
 bool ItemStack::isValid() const {
     return item.counter != nullptr;
@@ -20,7 +21,7 @@ short ItemStack::getDamageValue() {
     if (item.counter == nullptr)
         return 0;
 
-    if(WinrtUtils::checkAboveOrEqual(21, 40)) {
+    if(VersionUtils::checkAboveOrEqual(21, 40)) {
         using getDamageValueFunc = short (__fastcall *)(ItemStack *);
         static auto getDamageValue = reinterpret_cast<getDamageValueFunc>(GET_SIG_ADDRESS("ItemStack::getDamageValue"));
         return getDamageValue(this);

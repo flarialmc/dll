@@ -1,7 +1,8 @@
 #include "OffsetInit.hpp"
 
-#include "../../../Logger/Logger.hpp"
-#include "../SignatureAndOffsetManager.hpp"
+#include <Utils/Utils.hpp>
+#include <Utils/Logger/Logger.hpp>
+#include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
 void OffsetInit::init2140() {
     Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.4X");

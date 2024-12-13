@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "../../SDK/SDK.hpp"
 
 class Command {
@@ -11,9 +13,9 @@ public:
     //TODO: add it to config in the future?
     inline static std::string prefix = ".";
 
-    Command(const std::string& name, const std::string& description,
+    Command(std::string  name, std::string  description,
             const std::vector<std::string>& aliases = {})
-        : Name(name), Description(description), Aliases(aliases) {}
+        : Name(std::move(name)), Description(std::move(description)), Aliases(aliases) {}
 
     virtual ~Command() = default;
     virtual void execute(const std::vector<std::string>& args) = 0;

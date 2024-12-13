@@ -1,9 +1,8 @@
 ﻿#include "Logger.hpp"
 
-#include "../Utils.hpp"
-#include "../Versions/WinrtUtils.hpp"
+#include <Utils/Utils.hpp>
+#include <Utils/WinrtUtils.hpp>
 #include "crashlogs.hpp"
-#include <format>
 #include <filesystem>
 #include <fstream>
 
@@ -47,7 +46,7 @@ namespace Logger {
             ofs.close();
         }
 
-#ifndef NDEBUG
+#if defined(__DEBUG__)
         HWND console = GetConsoleWindow();
         if (!console) {
             AllocConsole();
@@ -65,11 +64,12 @@ namespace Logger {
         }
 #endif
 
-        auto message = fmt::format("{}\n{}\n{}\n{}\n\n",
-            fmt::format("===================="),
-            fmt::format("Game Version: {}", WinrtUtils::getVersion()),
-            fmt::format("Commit: {}", COMMIT_HASH),
-            fmt::format("====================")
+        auto message = fmt::format("{}\n{}\n{}\n{}\n{}\n\n",
+            fmt::format("Client Version: {}", FLARIAL_VERSION),
+            fmt::format("Game Version:   {}", WinrtUtils::getFormattedVersion()),
+            fmt::format("Commit:         {}", COMMIT_HASH),
+            fmt::format("Build Type:     {}", FLARIAL_BUILD_TYPE),
+            fmt::format("Build Date:     {}", FLARIAL_BUILD_DATE)
         );
         writeToFile(message);
     }
@@ -85,7 +85,6 @@ namespace Logger {
         }
     }
 
-    // Use this to see all colors fmt has
     void printColors() {
     struct ColorInfo {
         const char* name;

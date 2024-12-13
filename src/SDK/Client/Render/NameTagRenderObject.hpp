@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../../../Utils/Memory/Memory.hpp"
-#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include <Utils/Memory/Memory.hpp>
 
 struct NameTagRenderObject {
     BUILD_ACCESS(this, std::string, nameTag, GET_OFFSET("NameTagRenderObject::nameTag"));

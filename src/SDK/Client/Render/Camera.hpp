@@ -1,8 +1,7 @@
 #pragma once
 
 #include "MatrixStack.hpp"
-#include "../../../Utils/Memory/Memory.hpp"
-#include "../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
 namespace mce {
     class Camera {

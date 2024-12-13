@@ -26,11 +26,6 @@
 #include <stack>
 
 #include <libhat.hpp>
-
-#include <glm/glm.hpp>
-#include <glm/ext/matrix_transform.hpp>
-
+#include <glm/glm/glm.hpp>
+#include <glm/glm/ext/matrix_transform.hpp>
 #include <entt/entt.hpp>
-
-#include "Utils/Memory/Game/SignatureAndOffsetManager.hpp"
-#include "Utils/Logger/Logger.hpp"
