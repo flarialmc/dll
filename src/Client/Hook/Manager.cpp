@@ -82,8 +82,9 @@ void HookManager::initialize() {
         addHook<BaseActorRendererRenderTextHook>();
     }
     addHook<UIControl_updateCachedPositionHook>();
-    addHook<GeneralSettingsScreenControllerCtorHook>();
-
+    if (!VersionUtils::checkAboveOrEqual(21, 50)) {
+        addHook<GeneralSettingsScreenControllerCtorHook>();
+    }
     addHook<isPreGameHook>();
     addHook<_composeFullStackHook>();
 

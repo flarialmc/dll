@@ -186,7 +186,9 @@ void ModuleManager::initialize() {
     addModule<MovableCoordinates>();
     addModule<MovableHotbar>();
     // addModule<CompactChat>();
-    addModule<ItemPhysics>();
+    if (!VersionUtils::checkAboveOrEqual(21, 50)) {
+        addModule<ItemPhysics>();
+    }
     addModule<HiveStat>();
     addModule<Waypoints>();
     if (!VersionUtils::checkAboveOrEqual(21, 50)) {
