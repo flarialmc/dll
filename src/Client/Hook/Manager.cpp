@@ -78,7 +78,7 @@ void HookManager::initialize() {
     addHook<getSensHook>();
     addHook<HudMobEffectsRendererHook>();
     addHook<HudCursorRendererHook>();
-    if(VersionUtils::checkAboveOrEqual(20, 60)) {
+    if(VersionUtils::checkAboveOrEqual(20, 60) && !VersionUtils::checkAboveOrEqual(21, 50)) {
         addHook<BaseActorRendererRenderTextHook>();
     }
     addHook<UIControl_updateCachedPositionHook>();
