@@ -50,9 +50,9 @@ class BaseActorRendererRenderTextHook : public Hook {
         ResourceLocation loc(Utils::getAssetsPath() + "\\red-logo.png", true);
 
         std::map<std::string, std::string> roleLogos = {
-            {"dev", "dev-logo.png"},
-            {"gamer", "gamer-logo.png"},
-            {"booster", "booster-logo.png"}
+            {"Dev", "dev-logo.png"},
+            {"Gamer", "gamer-logo.png"},
+            {"Booster", "booster-logo.png"}
         };
 
         for (const auto& [role, logo] : roleLogos) {
