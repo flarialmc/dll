@@ -80,14 +80,13 @@ DWORD WINAPI init() {
         if (vipFetchElapsed >= std::chrono::minutes(3)) {
             try {
                 auto vipsJson = APIUtils::getVips();
-                std::vector<std::string> updatedVips;
+                std::map<std::string, std::string> updatedVips;
 
-                // Flatten the JSON structure into a vector of strings
-                for (auto& [role, users] : vipsJson.items()) {
+                for (const auto& [role, users] : vipsJson.items()) {
                     if (users.is_array()) {
-                        for (auto& user : users) {
+                        for (const auto& user : users) {
                             if (user.is_string()) {
-                                updatedVips.push_back(user.get<std::string>());
+                                updatedVips[user.get<std::string>()] = role;
                             }
                         }
                     }

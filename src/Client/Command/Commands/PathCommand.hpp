@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Command.hpp"
+#include <Command/Command.hpp>
 
 class PathCommand : public Command {
 public:

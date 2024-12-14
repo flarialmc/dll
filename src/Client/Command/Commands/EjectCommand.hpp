@@ -2,8 +2,8 @@
 
 #include <Command/Command.hpp>
 
-class LuaCommand : public Command {
+class EjectCommand : public Command {
 public:
-    LuaCommand() : Command("lua", "Manages scripts") {}
+    EjectCommand() : Command("eject", "Removes the client from the game") {}
     void execute(const std::vector<std::string>& args) override;
 };

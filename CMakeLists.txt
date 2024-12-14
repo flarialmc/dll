@@ -55,6 +55,7 @@ add_library(Flarial SHARED main.cpp ${SOURCE_FILES} ${LIB_FILES} src/Assets/Asse
 target_include_directories(Flarial PRIVATE
         "."
         "src"
+        "src/Client"
         "src/Client/Module"
         "lib"
         "lib/lua/lua-5.4.7/include"

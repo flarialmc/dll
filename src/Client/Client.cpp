@@ -53,7 +53,6 @@ std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
 
 bool Client::disable = false;
 
-
 void Client::initialize() {
     winrt::init_apartment();
 
