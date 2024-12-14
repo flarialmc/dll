@@ -166,7 +166,9 @@ void ModuleManager::initialize() {
     addModule<SpeedDisplay>();
     addModule<CPSLimiter>();
     addModule<BlockBreakIndicator>();
-    addModule<Animations>();
+    if (!VersionUtils::checkAboveOrEqual(21, 50)) {
+        addModule<Animations>();
+    }
     addModule<BlockOutline>();
     addModule<CommandHotkey>();
     addModule<NoHurtCam>();
@@ -195,8 +197,10 @@ void ModuleManager::initialize() {
         addModule<PackChanger>();
     }
     addModule<NullMovement>();
-    addModule<CustomCrosshair>();
-    addModule<Cursor>();
+    if (!VersionUtils::checkAboveOrEqual(21, 50)) {
+        addModule<CustomCrosshair>();
+        addModule<Cursor>();
+    }
     addModule<RawInputBuffer>();
     //addModule<ItemUseDelayFix>();
 
