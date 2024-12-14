@@ -4,6 +4,20 @@
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
+void SigInit::init2150() {
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading sigs for 1.21.50");
+    ADD_SIG("Actor::baseTick", "48 8D 05 ? ? ? ? 48 89 01 BA 31 00 00 00 44 8D 4A 04 44 8D 42 02 66 C7 44 24 20 37 00 E8 ? ? ? ? 48 8B 8F 70 11 00 00");
+    ADD_SIG("Options::getGamma", "48 83 EC 28 80 B9 20 18 00 00 00 48 8D 54 24 30 48 8B 01 48 8B 40 60 74 38 41 B8 1A");
+    ADD_SIG("MinecraftPackets::createPacket", "48 89 5C 24 10 48 89 74 24 18 55 57 41 56 48 8D 6C 24 B9 48 81 EC A0 00 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 3F 48 8B F9");
+    ADD_SIG("ThirdPersonNametag", "0F 84 F3 05 00 00 49 8B 04 24");
+    ADD_SIG("ClientInstance::grabMouse", "48 8B ? ? ? ? ? FF 15 ? ? ? ? 90 48 85 ? 74 ? 8B C7 F0 0F ? ? ? 83 F8 ? 75 ? 48 8B ? 48 8B ? 48 8B ? FF 15 ? ? ? ? 8B C7 F0 0F ? ? ? 83 F8 ? 75 ? 48 8B ? 48 8B ? 48 8B ? ? FF 15 ? ? ? ? 48 8B ? ? ? ? ? E8");
+    ADD_SIG("ClientInstance::_updateScreenSizeVariables", "48 8B C4 48 89 58 18 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 C8 FE FF FF 48 81 EC 00 02 00 00 0F 29 70 B8 0F 29 78 A8 44 0F 29 40 98 44 0F 29 48 88 44 0F 29 90 78 FF FF FF 44 0F 29 A0");
+    ADD_SIG("CameraYaw2", "F3 0F 11 10 48 8B 8F D8 01 00 00");
+    ADD_SIG("ItemRenderer::renderGuiItemNew", "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 A8 48 81 EC 58 01 00 00 0F 29 B4 24 40 01 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 30 44");
+    ADD_SIG("GuiData::displayClientMessage", "40 55 53 56 57 41 56 48 8D AC 24 A0 FE FF FF 48 81 EC 60 02 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 85 50 01 00 00 41");
+    ADD_SIG("MinecraftUIRenderContext::getTexture", "");
+}
+
 void SigInit::init2140() {
     Logger::custom(fg(fmt::color::gold), "Signatures", "Loading signatures for 1.21.40");
 

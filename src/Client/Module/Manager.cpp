@@ -142,7 +142,9 @@ void ModuleManager::initialize() {
     addModule<Keystrokes>();
     addModule<Sneak>();
     addModule<Sprint>();
-    addModule<Hitbox>();
+    if (!VersionUtils::checkAboveOrEqual(21, 50)) {
+        addModule<Hitbox>();
+    }
     addModule<HurtColor>();
     addModule<ThirdPerson>();
     addModule<JavaDynamicFOV>();
@@ -187,7 +189,9 @@ void ModuleManager::initialize() {
     addModule<ItemPhysics>();
     addModule<HiveStat>();
     addModule<Waypoints>();
-    addModule<PackChanger>();
+    if (!VersionUtils::checkAboveOrEqual(21, 50)) {
+        addModule<PackChanger>();
+    }
     addModule<NullMovement>();
     addModule<CustomCrosshair>();
     addModule<Cursor>();

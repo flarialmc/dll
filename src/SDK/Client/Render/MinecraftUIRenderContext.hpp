@@ -51,6 +51,9 @@ public:
             Memory::CallVFunc<7, void, TexturePtr&, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&, bool>(this, texture, pos, size, uvPos, uvSize, false);
         else
             Memory::CallVFunc<7, void, TexturePtr&, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(this, texture, pos, size, uvPos, uvSize);
+
+
+
     }
 
     void flushImages(mce::Color &color, float opacity, HashedString &hashedString) {

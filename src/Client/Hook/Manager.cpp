@@ -88,7 +88,9 @@ void HookManager::initialize() {
     addHook<_composeFullStackHook>();
 
     addHook<RenderOrderExecuteHook>();
-    addHook<RenderChunkCoordinatorPreRenderTickHook>();
+    if (!VersionUtils::checkAboveOrEqual(21, 50)) {
+        addHook<RenderChunkCoordinatorPreRenderTickHook>();
+    }
     addHook<SettingsScreenOnExitHook>();
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {

@@ -48,6 +48,7 @@ std::string VersionUtils::getFormattedVersion() {
 
 void VersionUtils::initialize() {
     versions = {
+        {"1.21.5", {SigInit::init2150, OffsetInit::init2150}},
         {"1.21.4", {SigInit::init2140, OffsetInit::init2140}},
         {"1.21.3", {SigInit::init2130, OffsetInit::init2130}},
         {"1.21.2", {SigInit::init2120, OffsetInit::init2120}},
