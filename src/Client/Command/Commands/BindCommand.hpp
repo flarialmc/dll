@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Command.hpp"
+#include <Command/Command.hpp>
 
 class BindCommand : public Command {
 public:

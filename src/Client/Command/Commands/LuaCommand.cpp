@@ -1,5 +1,6 @@
 #include "LuaCommand.hpp"
 
+#include <Manager.hpp>
 #include <Utils/WinrtUtils.hpp>
 #include <Scripting/Scripting.hpp>
 
@@ -15,7 +16,8 @@ void LuaCommand::execute(const std::vector<std::string> &args) {
         WinrtUtils::openSubFolder("Flarial\\scripts");
     }
     if (action == "reload") {
-        // nikita u do this
-        addCommandMessage("§aReloading scripts...");
+        Scripting::unloadModules();
+        Scripting::loadModules();
+        addCommandMessage("§aReloaded all scripts!");
     }
 }

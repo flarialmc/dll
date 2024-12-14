@@ -226,10 +226,10 @@ public:
 
                         if (it != APIUtils::onlineUsers.end()) {
                             std::map<std::string, int> roleLogos = {
-                                {"dev", IDR_CYAN_LOGO_PNG},
-                                {"gamer", IDR_GAMER_LOGO_PNG},
-                                {"booster", IDR_BOOSTER_LOGO_PNG},
-                                {"default", IDR_RED_LOGO_PNG}
+                                {"Dev", IDR_CYAN_LOGO_PNG},
+                                {"Gamer", IDR_GAMER_LOGO_PNG},
+                                {"Booster", IDR_BOOSTER_LOGO_PNG},
+                                {"Default", IDR_RED_LOGO_PNG}
                             };
 
                             static float p1 = 0.175;
@@ -239,7 +239,7 @@ public:
                             float width = Constraints::SpacingConstraint(p2, keycardSize);
 
                             // Default to the red logo
-                            int imageResource = roleLogos["default"];
+                            int imageResource = roleLogos["Default"];
 
                             for (const auto &[role, resource] : roleLogos) {
                                 if (APIUtils::hasRole(role, clearedName)) {

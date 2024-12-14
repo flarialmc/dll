@@ -46,8 +46,9 @@ class BaseActorRendererRenderTextHook : public Hook {
         const auto mScale = 0.026666669f; // 0.16f
         matrix = scale(matrix, {mScale * -1, mScale * -1, mScale});
 
-        ResourceLocation loc(Utils::getAssetsPath() + "\\red-logo.png", true); // The logo is the normal transparent Flarial logo, 128x128
-        
+        // Default to red logo if no matching role is found
+        ResourceLocation loc(Utils::getAssetsPath() + "\\red-logo.png", true);
+
         std::map<std::string, std::string> roleLogos = {
             {"dev", "dev-logo.png"},
             {"gamer", "gamer-logo.png"},

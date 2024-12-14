@@ -5,7 +5,7 @@
 #include <Utils/Logger/Logger.hpp>
 
 std::vector<std::string> APIUtils::onlineUsers;
-std::vector<std::string> APIUtils::onlineVips;
+std::map<std::string, std::string> APIUtils::onlineVips;
 
 std::string APIUtils::get(const std::string &link) {
     try {
@@ -87,7 +87,8 @@ nlohmann::json APIUtils::getUsers() {
 
 bool APIUtils::hasRole(const std::string& role, const std::string& name) {
     try {
-        return std::ranges::find(onlineVips, name) != onlineVips.end();
+        auto it = onlineVips.find(name);
+        return it != onlineVips.end() && it->second == role;
     } catch (const std::exception& e) {
         Logger::error("An error occurred while checking roles: {}", e.what());
         return false;
