@@ -1,7 +1,4 @@
 #include "PacketHooks.hpp"
-#include "../../../../SDK/SDK.hpp"
-#include "../../../../SDK/Client/Network/Packet/TextPacket.hpp"
-#include "../../../Events/Network/PacketEvent.hpp"
 
 // text
 void SendPacketHook::callback(LoopbackPacketSender *pSender, Packet *pPacket) {
@@ -113,7 +110,7 @@ void SendPacketHook::enableHook() {
     Memory::hookFunc((void *) setTitlePacket->packetHandler->vTable[1], (void*)receiveCallbackSetTitle,
                      (void **) &receiveSetTitlePacketOriginal, "ReceivePacketHook");
 
-    std::shared_ptr<Packet> playSoundPacket = SDK::createPacket((int) MinecraftPacketIds::PlaySound);
+    std::shared_ptr<Packet> playSoundPacket = SDK::createPacket((int) MinecraftPacketIds::PlaySoundPacket);
     Memory::hookFunc((void *) playSoundPacket->packetHandler->vTable[1], (void*)receiveCallbackPlaySound,
                      (void **) &receivePacketPlaySoundOriginal, "ReceivePacketHook");
 

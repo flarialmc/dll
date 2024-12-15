@@ -13,6 +13,8 @@
 #include "Functions/Player.hpp"
 #include "EventManager/ScriptEvents.hpp"
 #include "Packets/LuaTextPacket.hpp"
+#include "Packets/LuaPlaySoundPacket.hpp"
+#include "Packets/LuaSetTitlePacket.hpp"
 #include "Functions/OtherSettings.hpp"
 #include "Functions/LuaModuleManager.hpp"
 #include "Functions/LuaClient.hpp"
@@ -104,6 +106,8 @@ void registerFunctions(lua_State* L){
     LuaPackets::pushPacketTypesToLua(L);
 
     LuaTextPacket::registerFunctions(L);
+    LuaPlaySoundPacket::registerFunctions(L);
+    LuaSetTitlePacket::registerFunctions(L);
 }
 
 

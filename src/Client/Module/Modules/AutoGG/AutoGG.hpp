@@ -54,7 +54,7 @@ public:
         MinecraftPacketIds id = event.getPacket()->getId();
 
         // TODO: add support for other servers (look for "won the game" text)
-        if (id == MinecraftPacketIds::PlaySound) {
+        if (id == MinecraftPacketIds::PlaySoundPacket) {
             auto *pkt = reinterpret_cast<PlaySoundPacket *>(event.getPacket());
             if (pkt->mName == "ui.toast.challenge_complete_java") {
                 triggered = true;

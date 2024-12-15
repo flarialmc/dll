@@ -117,7 +117,7 @@ enum class MinecraftPacketIds : int {
     ResourcePackChunkData = 0x53,
     ResourcePackChunkRequest = 0x54,
     Transfer = 0x55,
-    PlaySound = 0x56,
+    PlaySoundPacket = 0x56,
     StopSound = 0x57,
     SetTitle = 0x58,
     AddBehaviorTree = 0x59,

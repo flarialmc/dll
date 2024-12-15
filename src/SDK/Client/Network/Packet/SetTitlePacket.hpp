@@ -3,7 +3,7 @@
 #include "Packet.hpp"
 #include <string>
 
-enum SetTitleType {
+enum SetTitleType : int{
 
     Clear,
     Reset_0,
