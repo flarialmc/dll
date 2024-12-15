@@ -26,6 +26,7 @@ namespace player {
     }
 
 
+
     void registerEffects(lua_State *L) {
 
         LUAHelper(L)
