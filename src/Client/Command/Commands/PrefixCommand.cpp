@@ -1,12 +1,7 @@
 #include "PrefixCommand.hpp"
 
 void PrefixCommand::execute(const std::vector<std::string> &args) {
-    if (args.empty()) {
-        addCommandMessage("§cUsage: .prefix <key>");
-        return;
-    }
-
-    if (args.size() > 1) {
+    if (args.size() != 1) {
         addCommandMessage("§cUsage: .prefix <key>");
         return;
     }

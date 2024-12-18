@@ -1,12 +1,8 @@
 #pragma once
 
-#include "winrt/windows.applicationmodel.core.h"
-#include "winrt/Windows.UI.ViewManagement.h"
-#include "winrt/windows.system.h"
-
-using namespace winrt::Windows::UI::ViewManagement;
-using namespace winrt::Windows::ApplicationModel::Core;
-using namespace winrt::Windows::UI::Core;
+#include <winrt/Windows.UI.Core.h>
+#include <winrt/Windows.Storage.h>
+#include <winrt/Windows.System.h>
 
 struct Version {
     int major = 0;
@@ -22,10 +18,17 @@ class WinrtUtils {
         static Version getGameVersion();
         static std::string toRawString(const Version& version);
     };
-    static void setCursorType(CoreCursorType cursor);
+    static void setCursorType(winrt::Windows::UI::Core::CoreCursorType cursor);
     static void setWindowTitle(const std::string& title);
-    static void openFolder(const std::string& path);
-    static void openSubFolder(const std::string& path);
     static std::string getFormattedVersion();
-    static int getRawGameVersion();
+
+    static winrt::Windows::Foundation::IAsyncOperation<winrt::Windows::Foundation::Collections::IVector<winrt::Windows::Storage::StorageFile>> pickFiles(std::wstring_view fileType = L"*");
+    static void launchURI(const std::string& uri);
+    static void openSubFolder(const std::string& subFolder);
+
+    static void setClipboard(const std::string& text);
+    static std::string getClipboard();
+
+    static void showMessageBox(const std::string& title, const std::string& message);
+    static void showNotification(const std::string& title, const std::string& message);
 };

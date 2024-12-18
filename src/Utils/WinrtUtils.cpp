@@ -5,59 +5,19 @@
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Utils.hpp>
 
+#include <winrt/base.h>
 #include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.Storage.h>
+#include <winrt/Windows.Storage.Pickers.h>
+#include <winrt/Windows.ApplicationModel.Core.h>
+#include <winrt/Windows.ApplicationModel.DataTransfer.h>
+#include <winrt/Windows.UI.Popups.h>
 #include <winrt/Windows.System.h>
 #include <winrt/Windows.UI.Core.h>
-
-void WinrtUtils::setWindowTitle(const std::string& title) {
-    CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([title]() {
-        ApplicationView::GetForCurrentView().Title(String::StrToWStr(title));
-    });
-}
-
-void WinrtUtils::setCursorType(CoreCursorType cursor) {
-    CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([cursor]() {
-        auto window = CoreApplication::MainView().CoreWindow();
-        window.PointerCursor(CoreCursor(cursor, 0));
-    });
-}
-
-void WinrtUtils::openFolder(const std::string& path) {
-    using namespace winrt;
-    using namespace Windows::Foundation;
-    using namespace Windows::Storage;
-    using namespace Windows::System;
-
-    try {
-        hstring hFolderPath = to_hstring(path);
-
-        auto folder = StorageFolder::GetFolderFromPathAsync(hFolderPath).get();
-
-        // Launch the folder in File Explorer
-        Launcher::LaunchFolderAsync(folder).get();
-    } catch (const winrt::hresult_error& e) {
-        Logger::error("An error occurred while trying to open {}: {} ({})", path, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
-    }
-}
-
-void WinrtUtils::openSubFolder(const std::string& path) {
-    using namespace winrt;
-    using namespace Windows::Storage;
-    using namespace Windows::System;
-
-    try {
-        StorageFolder roamingFolder = ApplicationData::Current().RoamingFolder();
-
-        // Get the specified subfolder inside RoamingState
-        auto folder = roamingFolder.GetFolderAsync(winrt::hstring(String::StrToWStr(path))).get();
-
-        // Launch the subfolder in File Explorer
-        Launcher::LaunchFolderAsync(folder).get();
-    } catch (const winrt::hresult_error& e) {
-        Logger::error("An error occurred while trying to open {}: {} ({})", path, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
-    }
-}
+#include <winrt/Windows.UI.Notifications.h>
+#include <winrt/Windows.UI.ViewManagement.h>
+#include <winrt/Windows.Data.Xml.Dom.h>
 
 Version WinrtUtils::impl::getGameVersion() {
     static Version version;
@@ -83,6 +43,19 @@ std::string WinrtUtils::impl::toRawString(const Version &version) {
     std::ostringstream oss;
     oss << version.major << "." << version.minor << "." << version.build;
     return oss.str();
+}
+
+void WinrtUtils::setCursorType(winrt::Windows::UI::Core::CoreCursorType cursor) {
+    winrt::Windows::ApplicationModel::Core::CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([cursor]() {
+        auto window = winrt::Windows::ApplicationModel::Core::CoreApplication::MainView().CoreWindow();
+        window.PointerCursor(winrt::Windows::UI::Core::CoreCursor(cursor, 0));
+    });
+}
+
+void WinrtUtils::setWindowTitle(const std::string& title) {
+    winrt::Windows::ApplicationModel::Core::CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([title]() {
+        winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView().Title(String::StrToWStr(title));
+    });
 }
 
 std::string WinrtUtils::getFormattedVersion() {
@@ -112,15 +85,98 @@ std::string WinrtUtils::getFormattedVersion() {
     return parts[0] + "." + parts[1] + "." + lastPart;
 }
 
-int WinrtUtils::getRawGameVersion() {
-    Version currentVersion = impl::getGameVersion();
-    std::string rawString = impl::toRawString(currentVersion);
+winrt::Windows::Foundation::IAsyncOperation<winrt::Windows::Foundation::Collections::IVector<winrt::Windows::Storage::StorageFile>> WinrtUtils::pickFiles(std::wstring_view fileType) {
+    using namespace winrt::Windows::Storage::Pickers;
+    using namespace winrt::Windows::Storage;
+    using namespace winrt::Windows::Foundation::Collections;
 
-    rawString.erase(std::ranges::remove(rawString, '.').begin(), rawString.end());
+    FileOpenPicker picker;
+    picker.SuggestedStartLocation(PickerLocationId::Downloads);
+    picker.FileTypeFilter().Append(fileType);
+
+    auto files = co_await picker.PickMultipleFilesAsync();
+
+    auto result = winrt::single_threaded_vector<StorageFile>();
+    for (auto const& file : files) {
+        result.Append(file);
+    }
+
+    co_return result;
+}
+
+void WinrtUtils::launchURI(const std::string &uri) {
+    using namespace winrt::Windows::Foundation;
+    using namespace winrt::Windows::System;
+
+    winrt::Windows::ApplicationModel::Core::CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([uri]() {
+        Launcher::LaunchUriAsync(Uri(winrt::to_hstring(uri))).get();
+    });
+}
+
+void WinrtUtils::openSubFolder(const std::string& subFolder) {
+    using namespace winrt;
+    using namespace Windows::Storage;
+    using namespace Windows::System;
 
     try {
-        return std::stoi(rawString);
-    } catch (...) {
-        return -1;
+        StorageFolder roamingFolder = ApplicationData::Current().RoamingFolder();
+
+        // Get the specified subfolder inside RoamingState
+        auto folder = roamingFolder.GetFolderAsync(winrt::hstring(String::StrToWStr(subFolder))).get();
+
+        // Launch the subfolder in File Explorer
+        Launcher::LaunchFolderAsync(folder).get();
+    } catch (const winrt::hresult_error& e) {
+        Logger::error("An error occurred while trying to open {}: {} ({})", subFolder, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
     }
 }
+
+void WinrtUtils::setClipboard(const std::string& text) {
+    using namespace winrt::Windows::ApplicationModel::DataTransfer;
+
+    winrt::Windows::ApplicationModel::Core::CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([text]() {
+        DataPackage dataPackage;
+        dataPackage.SetText(winrt::to_hstring(text));
+        Clipboard::SetContent(dataPackage);
+    });
+}
+
+std::string WinrtUtils::getClipboard() {
+    using namespace winrt::Windows::ApplicationModel::DataTransfer;
+
+    try {
+        auto dataPackageView = Clipboard::GetContent();
+        if (dataPackageView.Contains(StandardDataFormats::Text())) {
+            auto text = dataPackageView.GetTextAsync().get();
+            return winrt::to_string(text);
+        }
+    } catch (const winrt::hresult_error& e) {
+        Logger::error("Failed to get text from clipboard: {} ({})", winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
+    }
+    return "";
+}
+
+void WinrtUtils::showMessageBox(const std::string& title, const std::string& message) {
+    try {
+        winrt::Windows::UI::Popups::MessageDialog dialog(winrt::to_hstring(message), winrt::to_hstring(title));
+    dialog.ShowAsync();
+    } catch (const winrt::hresult_error& e) {
+        Logger::error("Failed to show message box {}: {} ({})", title, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
+    }
+}
+
+void WinrtUtils::showNotification(const std::string& title, const std::string& message) {
+    using namespace winrt::Windows::UI::Notifications;
+    try {
+        const auto notification = ToastNotification(ToastNotificationManager::GetTemplateContent(ToastTemplateType::ToastImageAndText02));
+
+        winrt::Windows::Data::Xml::Dom::IXmlNodeList element = notification.Content().GetElementsByTagName(L"text");
+        element.Item(0).InnerText(winrt::to_hstring(title));
+        element.Item(1).InnerText(winrt::to_hstring(message));
+
+        ToastNotificationManager::CreateToastNotifier().Show(notification);
+    } catch (const winrt::hresult_error& e) {
+        Logger::error("Failed to show notification {}: {} ({})", title, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
+    }
+}
+
