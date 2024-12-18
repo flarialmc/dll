@@ -144,8 +144,8 @@ void Scripting::loadModules() {
             
             if (std::filesystem::exists(entry.path().string() + "\\" + "main.json")){
                 std::ifstream file(entry.path().string() + "\\" + "main.json");
-                nlohmann::json jsonData;
-                file >> jsonData;
+                nlohmann::json::parser_callback_t parserCallback;
+                nlohmann::json jsonData = nlohmann::json::parse(file, nullptr, true, true);
 
                 std::string moduleName = jsonData["name"];
                 std::string description = jsonData["description"];
