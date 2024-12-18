@@ -233,8 +233,10 @@ void ModuleManager::terminate() {
 
 
 void restart(){
+    Scripting::instalized = false;
     Scripting::unloadModules();
     Scripting::loadModules();
+    Scripting::instalized = true;
 }
 
 

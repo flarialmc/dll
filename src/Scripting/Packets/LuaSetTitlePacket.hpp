@@ -16,6 +16,9 @@ namespace LuaSetTitlePacket {
     int lua_getPacket(lua_State* L) {
 
         auto pkt = static_cast<SetTitlePacket*>(lua_touserdata(L, 1));
+        if (!pkt){
+            throw LuaException("reinterpret packet cast", "SetTitlePacket is null did you pushed write packet?");
+        }
         lua_newtable(L);
         pushKeyPair(L,"text", pkt->text);
         pushKeyPair(L,"fadeInTime", std::to_string(pkt->fadeInTime));

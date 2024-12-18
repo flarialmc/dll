@@ -65,7 +65,6 @@ void Scripting::unloadModules(){
             auto it = ModuleManager::moduleMap.find(hash);
             if (it != ModuleManager::moduleMap.end()) {
                 auto module = it->second;
-                module->onDisable();
                 module->terminate();
                 ModuleManager::moduleMap.erase(it);
                 Logger::info("Module '{}' has been unloaded.", name);

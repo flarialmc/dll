@@ -3,6 +3,20 @@
 #include <lua.hpp>
 #include <string>
 
+class LuaException : public std::exception {
+private:
+    std::string whatwentwrong;
+    std::string message;
+public:
+    explicit LuaException(const std::string wh, const std::string msg) : whatwentwrong(wh), message(msg) {
+        Logger::error("Lua critical error while trying to " + wh + ", additional info: " + msg);
+    }
+
+    const char* what() const noexcept override {
+        return std::string("Lua critical error while trying to " + whatwentwrong + ", additional info: " + message).c_str();
+    }
+};
+
 class LUAHelper {
 private:
     lua_State* L;
@@ -27,6 +41,24 @@ public:
             lua_setfield(L, -2, functionName.c_str());
             return *this;
         }
+
+        LuaClass& registerLambdaFunction(const std::string& functionName, std::function<int(lua_State*)> handler) {
+            auto wrapper = [](lua_State* L) -> int {
+                auto* handlerPtr = static_cast<std::function<int(lua_State*)>*>(lua_touserdata(L, lua_upvalueindex(1)));
+                if (handlerPtr) {
+                    return (*handlerPtr)(L);
+                } else {
+                    throw LuaException("push function type", "handler pointer is null did you return anything?");
+                }
+            };
+
+            auto* handlerPtr = new std::function<int(lua_State*)>(handler);
+            lua_pushlightuserdata(L, handlerPtr);
+            lua_pushcclosure(L, wrapper, 1);
+            lua_setfield(L, -2, functionName.c_str());
+            return *this;
+        }
+
 
         ~LuaClass() {
             lua_setglobal(L, className.c_str());

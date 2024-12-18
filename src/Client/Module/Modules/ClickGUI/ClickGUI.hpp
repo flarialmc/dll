@@ -868,7 +868,6 @@ public:
 
 
             //radiobutton of modules
-
             if(curr != "modules") {
                 tabBgCol = FlarialGUI::LerpColor(tabBgCol, colors_secondary8_rgb ? FlarialGUI::rgbColor : colors_secondary8, 0.15f * FlarialGUI::frameFactor);
             } else {
@@ -1046,7 +1045,6 @@ public:
                     float yModifier = 0.0f;
 
                     int i = 0;
-
                     static auto modules = ModuleManager::getModules();
 
                     if (Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value)
