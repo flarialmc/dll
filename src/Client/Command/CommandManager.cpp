@@ -6,21 +6,22 @@
 #include "Commands/HelpCommand.hpp"
 #include "Commands/LuaCommand.hpp"
 #include "Commands/PathCommand.hpp"
-#include "Commands/OpenCommand.hpp"
 #include "Commands/EjectCommand.hpp"
+#include "Commands/TestCommand.hpp"
 
 std::vector<std::unique_ptr<Command>> CommandManager::Commands = std::vector<std::unique_ptr<Command>>();
 CommandManager CommandManager::instance;
 
 void CommandManager::initialize() {
+#if defined(__DEBUG__)
+    Commands.push_back(std::make_unique<TestCommand>());
+#endif
+
     Commands.push_back(std::make_unique<HelpCommand>());
     Commands.push_back(std::make_unique<BindCommand>());
     Commands.push_back(std::make_unique<PrefixCommand>());
     Commands.push_back(std::make_unique<LuaCommand>());
     Commands.push_back(std::make_unique<PathCommand>());
-#if defined(__DEBUG__) || (__TEST__)
-    Commands.push_back(std::make_unique<OpenCommand>());
-#endif
     Commands.push_back(std::make_unique<EjectCommand>());
 Listen(&CommandManager::instance, PacketSendEvent, &CommandManager::onPacket);
 }

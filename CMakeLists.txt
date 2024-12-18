@@ -47,7 +47,6 @@ add_compile_definitions(
         FLARIAL_BUILD_DATE=\"${FLARIAL_BUILD_DATE}\"
 )
 
-
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp" "src/*.hpp")
 file(GLOB_RECURSE LIB_FILES "lib/*.cpp")
 add_library(Flarial SHARED main.cpp ${SOURCE_FILES} ${LIB_FILES} src/Assets/Assets.rc)
@@ -59,6 +58,15 @@ target_include_directories(Flarial PRIVATE
         "src/Client/Module"
         "lib"
         "lib/lua/lua-5.4.7/include"
+)
+
+add_library(miniz STATIC lib/miniz/miniz.c)
+target_include_directories(miniz PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/lib/miniz")
+
+target_link_libraries(Flarial PRIVATE miniz)
+
+set_target_properties(miniz PROPERTIES
+        MSVC_RUNTIME_LIBRARY "MultiThreaded"
 )
 
 add_subdirectory(lib/lua)

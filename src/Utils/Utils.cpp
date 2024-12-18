@@ -1,6 +1,7 @@
 ﻿#include "Utils.hpp"
 
 #include <Client/GUI/Engine/Engine.hpp>
+#include <Utils/WinrtUtils.hpp>
 
 #include <sstream>
 #include <algorithm>
@@ -10,15 +11,9 @@
 #include <wininet.h>
 
 std::string Utils::getRoamingPath() {
-    char *path = nullptr;
-    size_t length;
+    using namespace winrt::Windows::Storage;
 
-    _dupenv_s(&path, &length, "appdata");
-
-    if (path == nullptr)
-        return "";
-
-    return std::string(path) + R"(\..\Local\Packages\Microsoft.MinecraftUWP_8wekyb3d8bbwe\RoamingState)"; // Microsoft.MinecraftWindowsBeta_8wekyb3d8bbwe Microsoft.MinecraftUWP_8wekyb3d8bbwe
+    return winrt::to_string(ApplicationData::Current().RoamingFolder().Path());
 }
 
 std::string Utils::getClientPath() {
@@ -30,11 +25,11 @@ std::string Utils::getConfigsPath() {
 }
 
 std::string Utils::getAssetsPath() {
-    return Utils::getRoamingPath() + "\\Flarial\\Assets";
+    return Utils::getRoamingPath() + "\\Flarial\\assets";
 }
 
 std::string Utils::getLogsPath() {
-    return Utils::getRoamingPath() + "\\Flarial\\Logs";
+    return Utils::getRoamingPath() + "\\Flarial\\logs";
 }
 
 std::string Utils::getKeyAsString(int key, bool isCapital, bool isKeybind) {

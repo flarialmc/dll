@@ -10,7 +10,6 @@ public:
     std::string Description;
     std::vector<std::string> Aliases;
 
-    //TODO: add it to config in the future?
     inline static std::string prefix = ".";
 
     Command(std::string  name, std::string  description,
