@@ -122,6 +122,10 @@ namespace player {
                 .registerFunction("getSlot", lua_getPlayerSlot)
                 .registerFunction("returnPosArray", lua_returnPosArray)
                 .registerFunction("returnPlayerList", lua_returnPlayerList)
-                .registerFunction("isOnGround", lua_isOnGround);
+                .registerFunction("isOnGround", lua_isOnGround)
+                .registerLambdaFunction("getLocalPlayer", [](lua_State* L) -> int {
+                    lua_pushlightuserdata(L, SDK::clientInstance->getLocalPlayer());
+                    return 1;
+                });
     }
 }
