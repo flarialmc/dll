@@ -16,7 +16,7 @@ namespace LuaPlaySoundPacket {
 
         auto pkt = static_cast<PlaySoundPacket*>(lua_touserdata(L, 1));
         if (!pkt){
-            throw LuaException("reinterpret packet cast", "PlaySoundPacket is null did you pushed write packet?");
+            //throw LuaException("reinterpret packet cast", "PlaySoundPacket is null did you pushed write packet?");
         }
         lua_newtable(L);
         pushKeyPair(L,"name", pkt->mName);

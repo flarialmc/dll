@@ -2,6 +2,7 @@
 #include "../../SDK/Client/Network/Packet/Packet.hpp"
 #include "../../SDK/Client/Network/Packet/TextPacket.hpp"
 #include <type_traits>
+#include <Scripting/LUAHelper.hpp>
 
 
 std::unordered_map<int, std::vector<ScriptingEventManager::EventEntry>> ScriptingEventManager::eventHandlers;
@@ -24,27 +25,6 @@ void ScriptingEventManager::registerHandler(lua_State* L, const int& eventName) 
     eventHandlers[eventName].push_back({L, ref});
 }
 
-template<typename T>
-void pushToLua(lua_State* L, T arg) {
-    if constexpr (std::is_same_v<T, int>) {
-        lua_pushinteger(L, arg);
-    } else if constexpr (std::is_same_v<T, double>) {
-        lua_pushnumber(L, arg);
-    } else if constexpr (std::is_same_v<T, std::string>) {
-        lua_pushstring(L, arg.c_str());
-    } else if constexpr (std::is_same_v<T, bool>) {
-        lua_pushboolean(L, arg);
-    } else if constexpr (std::is_same_v<T, const char*>) {
-        lua_pushstring(L, arg);
-    }
-    else if constexpr (std::is_pointer_v<T>) {
-        lua_pushlightuserdata(L, static_cast<void *>(arg));
-    }
-    else {
-        lua_pushnil(L);
-    }
-}
-
 
 
 template<typename... Args>
@@ -59,7 +39,7 @@ bool ScriptingEventManager::triggerEvent(lua_State* L, int eventName, const Args
 
         lua_rawgeti(L, LUA_REGISTRYINDEX, handler.ref);
 
-        (pushToLua(L, args), ...);
+        (LuaPusher::pushToLua(L, args), ...);
 
         if (lua_pcall(L, sizeof...(args), 1, 0) != LUA_OK) {
             std::string err = lua_tostring(L, -1);

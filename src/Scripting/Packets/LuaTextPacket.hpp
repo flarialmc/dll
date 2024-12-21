@@ -45,7 +45,7 @@ namespace LuaTextPacket {
         std::shared_ptr<Packet> packet = SDK::createPacket(9);
         auto *text = reinterpret_cast<TextPacket *>(packet.get());
         if (!text){
-            throw LuaException("reinterpret packet cast", "TextPacket is null did you pushed write packet?");
+            //throw LuaException("reinterpret packet cast", "TextPacket is null did you pushed write packet?");
         }
         //TODO: allow any packet type
         text->type = TextPacketType::CHAT;

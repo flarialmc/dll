@@ -3,20 +3,6 @@
 #include <lua.hpp>
 #include <string>
 
-class LuaException : public std::exception {
-private:
-    std::string whatwentwrong;
-    std::string message;
-public:
-    explicit LuaException(const std::string wh, const std::string msg) : whatwentwrong(wh), message(msg) {
-        Logger::error("Lua critical error while trying to " + wh + ", additional info: " + msg);
-    }
-
-    const char* what() const noexcept override {
-        return std::string("Lua critical error while trying to " + whatwentwrong + ", additional info: " + message).c_str();
-    }
-};
-
 class LUAHelper {
 private:
     lua_State* L;
@@ -48,7 +34,7 @@ public:
                 if (handlerPtr) {
                     return (*handlerPtr)(L);
                 } else {
-                    throw LuaException("push function type", "handler pointer is null did you return anything?");
+                    //throw LuaException("push function type", "handler pointer is null did you return anything?");
                 }
             };
 
@@ -68,10 +54,59 @@ public:
     LuaClass getClass(const std::string& className) {
         return LuaClass(L, className);
     }
+
+
+
+
+    class LuaLib {
+    private:
+        lua_State* L;
+        std::string libName;
+
+    public:
+        LuaLib(lua_State* state, const std::string& name)
+                : L(state), libName(name) {
+            lua_newtable(L);
+        }
+
+        inline LuaLib& registerFunction(const std::string& functionName, lua_CFunction func) {
+            lua_pushcfunction(L, func);
+            lua_setfield(L, -2, functionName.c_str());
+            return *this;
+        }
+
+        inline LuaLib& registerLambdaFunction(const std::string& functionName, const std::function<int(lua_State*)>& handler) {
+            auto wrapper = [](lua_State* L) -> int {
+                auto* handlerPtr = static_cast<std::function<int(lua_State*)>*>(lua_touserdata(L, lua_upvalueindex(1)));
+                if (handlerPtr) {
+                    return (*handlerPtr)(L);
+                } else {
+                    //throw LuaException("registerLambdaFunction", "Handler pointer is null");
+                }
+            };
+
+            auto* handlerPtr = new std::function<int(lua_State*)>(handler);
+            lua_pushlightuserdata(L, handlerPtr);
+            lua_pushcclosure(L, wrapper, 1);
+            lua_setfield(L, -2, functionName.c_str());
+            return *this;
+        }
+
+        ~LuaLib() {
+            luaL_getsubtable(L, LUA_REGISTRYINDEX, "_LOADED");
+            lua_pushvalue(L, -2);
+            lua_setfield(L, -2, libName.c_str());
+            lua_pop(L, 1);
+        }
+    };
+
+    LuaLib getLib(const std::string& libName) {
+        return LuaLib(L, libName);
+    }
 };
 
 namespace LuaPusher {
-    void luaArray(lua_State* L, std::vector<float>& args) {
+    inline void luaArray(lua_State* L, std::vector<float>& args) {
         lua_newtable(L);
         for (int i = 0; i < args.size(); i++) {
             //push item of array
@@ -81,11 +116,32 @@ namespace LuaPusher {
         }
     }
     //overloads
-    static void luaArray(lua_State* L, std::vector<std::string>& args) {
+    inline static void luaArray(lua_State* L, std::vector<std::string>& args) {
         lua_newtable(L);
         for (int i = 0; i < args.size(); i++) {
             lua_pushstring(L, args[i].c_str());
             lua_rawseti(L, -2, i+1);
+        }
+    }
+
+    template<typename T>
+    inline void pushToLua(lua_State* L, T arg) {
+        if constexpr (std::is_same_v<T, int>) {
+            lua_pushinteger(L, arg);
+        } else if constexpr (std::is_same_v<T, double>) {
+            lua_pushnumber(L, arg);
+        } else if constexpr (std::is_same_v<T, std::string>) {
+            lua_pushstring(L, arg.c_str());
+        } else if constexpr (std::is_same_v<T, bool>) {
+            lua_pushboolean(L, arg);
+        } else if constexpr (std::is_same_v<T, const char*>) {
+            lua_pushstring(L, arg);
+        }
+        else if constexpr (std::is_pointer_v<T>) {
+            lua_pushlightuserdata(L, static_cast<void *>(arg));
+        }
+        else {
+            lua_pushnil(L);
         }
     }
 };
