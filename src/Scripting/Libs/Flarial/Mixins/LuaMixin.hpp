@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include <lua.hpp>
+#include "lib/lua/lua-5.4.7/include/lua.hpp"
 #include <vector>
 #include <functional>
-#include <Scripting/Scripting.hpp>
+#include "src/Scripting/Scripting.hpp"
 #include "Scripting/LUAHelper.hpp"
 
 namespace LuaMixins {
