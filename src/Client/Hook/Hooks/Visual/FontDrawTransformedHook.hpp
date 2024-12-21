@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Scripting/Mixins/LuaMixin.hpp>
+#include <Scripting/Libs/Flarial/Mixins/LuaMixin.hpp>
 #include "../Hook.hpp"
 #include "../../../../Utils/Memory/Memory.hpp"
 

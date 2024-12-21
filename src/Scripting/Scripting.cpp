@@ -4,7 +4,7 @@
 
 #include <json/json.hpp>
 #include <Client/Module/Manager.hpp>
-#include <Scripting/Mixins/LuaMixin.hpp>
+#include <Scripting/Libs/Flarial/Mixins/LuaMixin.hpp>
 #include "Functions/Player.hpp"
 #include "ScriptModuleBase.hpp"
 #include "Functions/GUI.hpp"

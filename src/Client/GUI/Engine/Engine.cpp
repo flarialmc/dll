@@ -26,7 +26,7 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
-#include <Scripting/Mixins/LuaMixin.hpp>
+#include <Scripting/Libs/Flarial/Mixins/LuaMixin.hpp>
 
 #include "../../Module/Modules/ClickGUI/ClickGUI.hpp"
 //#include <misc/freetype/imgui_freetype.h>
