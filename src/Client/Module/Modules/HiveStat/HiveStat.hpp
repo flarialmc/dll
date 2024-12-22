@@ -191,26 +191,68 @@ public:
                     if( it->second.getCode() == 0) {
                         {
                             std::ostringstream oss;
-                            oss << std::fixed << std::setprecision(2) << it->second.getFKDR();
+                            float fkdr = it->second.getFKDR();
+                            oss << std::fixed << std::setprecision(2) << fkdr;
+                            if (fkdr >= 3) {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Green
+                            }else if (fkdr >= 1.5) {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 215, 0, 255)); // Gold
+                            } else {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255)); // Gray
+                            }
                             ImGui::Text("%s", oss.str().c_str());
+                            ImGui::PopStyleColor();
                         }
                         {
                             ImGui::TableSetColumnIndex(2);
+                            float kd = it->second.getKD();
                             std::ostringstream oss;
-                            oss << std::fixed << std::setprecision(2) << it->second.getKD();
+                            oss << std::fixed << std::setprecision(2) << kd;
+                            if (kd >= 2) {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Green
+                            }else if (kd >= 1.5) {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 215, 0, 255)); // Gold
+                            } else {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255)); // Gray
+                            }
                             ImGui::Text("%s", oss.str().c_str());
+                            ImGui::PopStyleColor();
                         }
                         {
                             ImGui::TableSetColumnIndex(3);
                             std::ostringstream oss;
-                            oss << std::fixed << std::setprecision(0) << it->second.getWinRate();
+                            float winrate = it->second.getWinRate() ;
+                            oss << std::fixed << std::setprecision(0) << winrate << "%";
+                            if (winrate >= 55) {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Green
+                            }else if (winrate >= 20) {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 215, 0, 255)); // Gold
+                            } else {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255)); // Gray
+                            }
                             ImGui::Text("%s", oss.str().c_str());
+                            ImGui::PopStyleColor();
                         }
                         {
                             ImGui::TableSetColumnIndex(4);
                             std::ostringstream oss;
-                            oss << std::fixed << std::setprecision(0) << it->second.getLevel();
+                            int level = it->second.getLevel();
+                            oss << std::fixed << std::setprecision(0) << level;
+                            if (level >= 50) {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Green
+                            } else if (level >= 30) {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 255, 255)); // Magenta
+                            } else if (level >= 25) {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 255, 255)); // Aqua
+                            } else if (level >= 20) {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255)); // Yellow
+                            } else if (level >= 10) {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 215, 0, 255)); // Gold
+                            } else {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255)); // Gray
+                            }
                             ImGui::Text("%s", oss.str().c_str());
+                            ImGui::PopStyleColor();
                         }
                     }else{
                         switch (it->second.getCode()){
