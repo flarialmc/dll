@@ -38,7 +38,7 @@ namespace GUI {
     int lua_drawImage(lua_State *L) {
         std::string path = luaL_checkstring(L, 1);
         //x, y, z
-        FlarialGUI::image(path, D2D1::RectF(luaL_checknumber(L,3),luaL_checknumber(L,4),luaL_checknumber(L,5))), luaL_checkstring(L,2));
+        FlarialGUI::image(path, D2D1::RectF(luaL_checknumber(L,3),luaL_checknumber(L,4),luaL_checknumber(L,5)));
     }
 
 
@@ -119,7 +119,7 @@ namespace GUI {
                 .registerFunction("Color", lua_Color)
                 .registerFunction("RoundedButton", lua_RoundedButton)
                 .registerFunction("NormalRender", lua_NormalRender)
-
+                .registerFunction("renderImage", lua_drawImage)
                 .registerLambdaFunction("getCurrentScreen",[](lua_State* L) -> int {
                     lua_pushstring(L, SDK::getCurrentScreen().c_str());
                     return 1;
