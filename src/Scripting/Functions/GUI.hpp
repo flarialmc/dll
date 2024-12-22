@@ -119,7 +119,7 @@ namespace GUI {
                 .registerFunction("Color", lua_Color)
                 .registerFunction("RoundedButton", lua_RoundedButton)
                 .registerFunction("NormalRender", lua_NormalRender)
-
+                .registerFunction("drawImage", lua_drawImage)
                 .registerLambdaFunction("getCurrentScreen",[](lua_State* L) -> int {
                     lua_pushstring(L, SDK::getCurrentScreen().c_str());
                     return 1;
