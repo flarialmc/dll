@@ -5,6 +5,7 @@
 #include <json/json.hpp>
 #include <Client/Module/Manager.hpp>
 #include <Scripting/Libs/Flarial/Mixins/LuaMixin.hpp>
+#include <Scripting/Libs/ocornut/imgui/ImGui.hpp>
 #include "Functions/Player.hpp"
 #include "ScriptModuleBase.hpp"
 #include "Functions/GUI.hpp"
@@ -108,7 +109,10 @@ void registerFunctions(lua_State* L){
     LuaTextPacket::registerFunctions(L);
     LuaPlaySoundPacket::registerFunctions(L);
     LuaSetTitlePacket::registerFunctions(L);
+
+    //libs
     LuaMixins::registerLib(L);
+    LuaImGui::registerLib(L);
 }
 
 
