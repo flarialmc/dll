@@ -8,9 +8,11 @@
 class AutoRQ : public Module {
 private:
     bool triggered = false;
+    std::string teamcolor= "THIS IS NEEDED TRUST!!!!!!!!!!!!!!";
+    std::string Copy_CS = "THIS IS NEEDED EVEN MORE TRUST!!!!";
 public:
-    AutoRQ() : Module("Auto RE Q", "Automatically requeues into a game (Hive)",
-                      IDR_AUTORQ_PNG, "") {
+    AutoRQ() : Module("Hive Utils", "Handy utilities for The Hive partnered server",
+                      IDR_AUTORQ_PNG, "") { //maybe we need a new icon??? let @treegfx cook
         Module::setup();
     };
 
@@ -27,8 +29,12 @@ public:
     void defaultConfig() override {
         if (settings.getSettingByName<std::string>("command") == nullptr)
             settings.addSetting("command", (std::string)"");
+        if (settings.getSettingByName<bool>("ReQ") == nullptr)
+            settings.addSetting("ReQ", true);
         if (settings.getSettingByName<bool>("solo") == nullptr)
             settings.addSetting("solo", false);
+        if (settings.getSettingByName<bool>("eliminated") == nullptr)
+            settings.addSetting("eliminated", true);
         if (settings.getSettingByName<bool>("hub") == nullptr)
             settings.addSetting("hub", false);
         if (settings.getSettingByName<bool>("murderer") == nullptr)
@@ -47,8 +53,16 @@ public:
             settings.addSetting("runner", false);
         if (settings.getSettingByName<bool>("AutoMapAvoider") == nullptr)
             settings.addSetting("AutoMapAvoider", false);
-        if (settings.getSettingByName<std::string>("text") == nullptr) 
+        if (settings.getSettingByName<std::string>("text") == nullptr)
             settings.addSetting("text", (std::string) "Input maps, like this");
+        if (settings.getSettingByName<bool>("promomessage") == nullptr)
+            settings.addSetting("promomessage", true);
+        if (settings.getSettingByName<bool>("replace") == nullptr)
+            settings.addSetting("replace", true);
+        if (settings.getSettingByName<bool>("copyCS") == nullptr)
+            settings.addSetting("copyCS", false);
+        if (settings.getSettingByName<bool>("includecommand") == nullptr)
+            settings.addSetting("includecommand", true);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -63,8 +77,14 @@ public:
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));
         this->addHeader("General");
-        this->addToggle("Solo mode ", "Re-Q when you finish or die in a game. pls dont use while in a party", this->settings.getSettingByName<bool>("solo")->value);
         this->addToggle("Use /hub instead of /q", "", this->settings.getSettingByName<bool>("hub")->value);
+
+        this->addHeader("Auto Re Q");
+        this->addToggle("Auto re-queue ", "Find a new game when the current game is over", this->settings.getSettingByName<bool>("ReQ")->value);
+        this->addToggle("Solo mode ", "Re-Q when you finish or die in a game. pls dont use while in a party", this->settings.getSettingByName<bool>("solo")->value);
+        this->addToggle("Re-Q on Team elimenation", "Re-Q when your team has been ELIMINATED", this->settings.getSettingByName<bool>("eliminated")->value);
+
+        this->addHeader("Role Avoider");
 
         this->addHeader("Murder Mystery");
         this->addToggle("Murder", "re q when you get murder", this->settings.getSettingByName<bool>("murderer")->value);
@@ -81,9 +101,15 @@ public:
 
         this->addHeader("Map avoider");
 
-
         this->addToggle("Avoid", "", this->settings.getSettingByName<bool>("AutoMapAvoider")->value);
         this->addTextBox("Maps", "Avoid Maps (Hive). Input one or more maps using comma's.", settings.getSettingByName<std::string>("text")->value);
+
+        this->addHeader("Copy Custom Server code");
+        this->addToggle("Copy CS code Keybind", "When setting, hold the new bind for 2 seconds", this->settings.getSettingByName<bool>("copyCS")->value);
+        this->addToggle("Include command", "Include /cs", this->settings.getSettingByName<bool>("includecommand")->value);
+
+        this->addHeader("Debloat chat");
+        this->addToggle("Promo message", "Removes all promo/info messages starting with [!]", this->settings.getSettingByName<bool>("promomessage")->value);
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
@@ -101,31 +127,68 @@ public:
         MinecraftPacketIds id = event.getPacket()->getId();
 
         if (id == MinecraftPacketIds::SetTitle) {
-            if (this->settings.getSettingByName<bool>("solo")->value) {
-                auto *pkt = reinterpret_cast<SetTitlePacket *>(event.getPacket());
+            auto *pkt = reinterpret_cast<SetTitlePacket *>(event.getPacket());
+            if (this->settings.getSettingByName<bool>("ReQ")->value) {
+                if (this->settings.getSettingByName<bool>("solo")->value) {
 
-                if (//pkt->text == "§cYou're a spectator!" || //this brobably isn't needed anymore
-                    pkt->text == "§cYou died!" ||
-                    pkt->text == "§7You're spectating the §as§eh§6o§cw§7!") {
-                    reQ();
 
+                    if (//pkt->text == "§cYou're a spectator!" || //this brobably isn't needed anymore
+                        pkt->text == "§cYou died!" ||
+                        pkt->text == "§7You're spectating the §as§eh§6o§cw§7!") {
+                        reQ();
+
+                    }
+                }
+            }
+            if (this->settings.getSettingByName<bool>("copyCS")->value)
+            {
+                if (!pkt->text.empty() && pkt->text.find(Copy_CS) == std::string::npos){
+                    if (pkt->text.length() >= 15 && pkt->text.substr(0, 13) == "§eJoin Code:") {
+                        Copy_CS = pkt->text;
+                        if (!this->settings.getSettingByName<bool>("includecommand")->value) {
+                            ImGui::SetClipboardText(pkt->text.substr(17, pkt->text.length()).c_str());
+                        }
+                        else{
+                            ImGui::SetClipboardText(("/cs " + pkt->text.substr(17, pkt->text.length())).c_str());
+                        }
+                        FlarialGUI::Notify("Compied CS Code to Clipboard");
+                    }
                 }
             }
         }
         if (id == MinecraftPacketIds::Text) {
-            if (this->settings.getSettingByName<bool>("solo")->value) {
-                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
-
-                if (pkt->message.substr(0,48) == "§a§l» §r§eYou finished all maps and came in" || //gravity
-                    pkt->message.substr(0,30) == "§a§l» §r§eYou finished in") { //deathrun
+            auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
+            if (this->settings.getSettingByName<bool>("ReQ")->value) {
+                //if(!module->settings.getSettingByName<bool>("solo")->value) {
+                if (pkt->message == "§c§l» §r§c§lGame OVER!") {
                     reQ();
+                    return;
+                }
+                if (this->settings.getSettingByName<bool>("eliminated")->value){
+                    if (pkt->message.length() > 27){
+                        if (pkt->message.substr(12, 15) == "You are on the "){
+                            teamcolor = pkt->message.substr(27, pkt->message.length() - 28);
 
+                            FlarialGUI::Notify("You are on the: " + teamcolor);
+                        }
+                    }
+
+                    if (pkt->message.find("§7has been §cELIMINATED§7!") != std::string::npos && pkt->message.find(teamcolor) != std::string::npos && !teamcolor.empty()){
+                        reQ();
+                        FlarialGUI::Notify("Your Team has been ELIMINATED");
+                        return;
+                    }
+                }
+                if (this->settings.getSettingByName<bool>("solo")->value) {
+
+                    if (pkt->message.substr(0,48) == "§a§l» §r§eYou finished all maps and came in" || //gravity
+                        pkt->message.substr(0,30) == "§a§l» §r§eYou finished in") { //deathrun
+                        reQ();
+
+                    }
                 }
             }
-        }
-        if (id == MinecraftPacketIds::Text) {
             if (this->settings.getSettingByName<bool>("murderer")->value) {
-                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
                 if (pkt->message == "§c§l» §r§c§lMurderer") {
                     reQ();
@@ -133,10 +196,7 @@ public:
 
                 }
             }
-        }
-        if (id == MinecraftPacketIds::Text) {
             if (this->settings.getSettingByName<bool>("sheriff")->value) {
-                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
                 if (pkt->message == "§9§l» §r§9§lSheriff") {
                     reQ();
@@ -144,10 +204,7 @@ public:
 
                 }
             }
-        }
-        if (id == MinecraftPacketIds::Text) {
             if (this->settings.getSettingByName<bool>("innocent")->value) {
-                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
                 if (pkt->message == "§a§l» §r§a§lInnocent") {
                     reQ();
@@ -155,10 +212,7 @@ public:
 
                 }
             }
-        }
-        if (id == MinecraftPacketIds::Text) {
             if (this->settings.getSettingByName<bool>("death")->value) {
-                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
                 if (pkt->message == "§d§l» §r§bYou are a §cDeath") {
                     reQ();
@@ -166,10 +220,7 @@ public:
 
                 }
             }
-        }
-        if (id == MinecraftPacketIds::Text) {
             if (this->settings.getSettingByName<bool>("runner")->value) {
-                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
                 if (pkt->message == "§d§l» §r§bYou are a §aRunner") {
                     reQ();
@@ -177,10 +228,7 @@ public:
 
                 }
             }
-        }
-        if (id == MinecraftPacketIds::Text) {
             if (this->settings.getSettingByName<bool>("hider")->value) {
-                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
                 if (pkt->message == "§e§l» §rYou are a §eHIDER") {
                     reQ();
@@ -188,10 +236,7 @@ public:
 
                 }
             }
-        }
-        if (id == MinecraftPacketIds::Text) {
             if (this->settings.getSettingByName<bool>("seeker")->value) {
-                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
 
                 if (pkt->message == "§c§l» §rYou are a §cSEEKER") {
                     reQ();
@@ -199,10 +244,7 @@ public:
 
                 }
             }
-        }
-        if (id == MinecraftPacketIds::Text) {
             if (this->settings.getSettingByName<bool>("AutoMapAvoider")->value) {
-                auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
                 std::string maps_to_avoid = this->settings.getSettingByName<std::string>("text")->value;
                 std::stringstream ss(maps_to_avoid);
                 std::string fixed_value = "§b§l» §r§e";
@@ -228,13 +270,11 @@ public:
                     }
                 }
             }
-        }
-        if (id == MinecraftPacketIds::Text) {
-            auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
-            //if(!module->settings.getSettingByName<bool>("solo")->value) {
-            if (pkt->message == "§c§l» §r§c§lGame OVER!") {
-                reQ();
-                return;
+
+            if (this->settings.getSettingByName<bool>("promomessage")->value) {
+                if (pkt->message.find("§6[§e!§6]")!= std::string::npos){
+                    event.cancel();
+                }
             }
         }
     }
