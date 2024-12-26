@@ -32,7 +32,7 @@ if(MSVC)
     add_compile_options($<$<CONFIG:Release>:/Oi>)
 
     # Enable link-time code generation for whole program optimization
-    # add_compile_options($<$<CONFIG:Release>:/GL>) # causes issues with libhat
+    add_compile_options($<$<CONFIG:Release>:/GL>)
 
     # Separate functions for the linker to improve the optimization process
     add_compile_options($<$<CONFIG:Release>:/Gy>)
@@ -116,7 +116,7 @@ FetchContent_Declare(
 FetchContent_Declare(
         libhat
         GIT_REPOSITORY  https://github.com/BasedInc/libhat.git
-        GIT_TAG         d6297514b05fd238f5b46d003325f108c22741e3
+        GIT_TAG         5cf79adf86152233371b43adab5a0f9db6daa4e7
 )
 set(ENTT_BUILD_TESTING OFF)  # Disable building tests
 FetchContent_MakeAvailable(libhat entt nes)
