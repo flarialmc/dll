@@ -141,7 +141,9 @@ void ModuleManager::initialize() {
     addModule(new TextHotkey());
     addModule(new AutoGG());
     addModule(new TabList());
-    addModule(new WeatherChanger());
+    if(!WinrtUtils::checkAboveOrEqual(21, 50)) {
+        addModule(new WeatherChanger());
+    }
     addModule(new NickModule());
     addModule(new FreeLook());
 
