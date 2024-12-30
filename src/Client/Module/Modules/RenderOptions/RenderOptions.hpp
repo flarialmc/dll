@@ -17,7 +17,7 @@ public:
 
     void updateSetings() {
         auto showChunkMap = Options::getOption("dev_showChunkMap");
-        auto disableSky = Options::getOption("dev_disableRenderSky");
+        //  auto disableSky = Options::getOption("dev_disableRenderSky");
         auto disableWeather = Options::getOption("dev_disableRenderWeather");
         auto disableEntities = Options::getOption("dev_disableRenderEntities");
         auto disableBlockEntities = Options::getOption("dev_disableRenderBlockEntities");
@@ -25,14 +25,14 @@ public:
 
         if(isEnabled()) {
             if(showChunkMap != nullptr) showChunkMap->setvalue(settings.getSettingByName<bool>("chunkborders")->value);
-            if(disableSky != nullptr) disableSky->setvalue(!settings.getSettingByName<bool>("sky")->value);
+            // if(disableSky != nullptr) disableSky->setvalue(!settings.getSettingByName<bool>("sky")->value);
             if(disableWeather != nullptr) disableWeather->setvalue(!settings.getSettingByName<bool>("weather")->value);
             if(disableEntities != nullptr) disableEntities->setvalue(!settings.getSettingByName<bool>("entity")->value);
             if(disableBlockEntities != nullptr) disableBlockEntities->setvalue(!settings.getSettingByName<bool>("blockentity")->value);
             if(disableParticles != nullptr) disableParticles->setvalue(!settings.getSettingByName<bool>("particles")->value);
         }else{
             if(showChunkMap != nullptr) showChunkMap->setvalue(false);
-            if(disableSky != nullptr) disableSky->setvalue(false);
+            // if(disableSky != nullptr) disableSky->setvalue(false);
             if(disableWeather != nullptr) disableWeather->setvalue(false);
             if(disableEntities != nullptr) disableEntities->setvalue(false);
             if(disableBlockEntities != nullptr) disableBlockEntities->setvalue(false);
