@@ -135,7 +135,7 @@ void ModuleManager::initialize() {
     addModule(new FogColor());
     addModule(new ArmorHUD());
     addModule(new TimeChanger());
-    addModule(new RenderOptions());
+    // addModule(new RenderOptions());
     addModule(new PaperDoll());
     addModule(new GuiScale());
     addModule(new TextHotkey());
