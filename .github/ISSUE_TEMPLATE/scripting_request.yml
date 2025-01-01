@@ -1,0 +1,51 @@
+name: Feature Request
+description: Suggest a new feature for Flarial's Scripting API
+title: "[FEATURE REQUEST] [SCRIPTING] "
+labels: ["enhancement", "scripting"]
+
+body:
+  - type: textarea
+    id: feature
+    attributes:
+      label: Feature description
+      description: A clear and concise description of what the feature is.
+      placeholder: I would like to see [...]
+  
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason
+      # render: Markdown
+      description: Why do you think this feature should be added?
+      placeholder: I think this feature should be added because [...]
+  
+  - type: textarea
+    id: usecase
+    attributes:
+      label: Use case
+      # render: Markdown
+      description: How would you use this feature?
+      placeholder: I would use this feature to [...]
+  - type: textarea
+    id: example
+    attributes:
+      label: Example Code
+      render: lua
+      description: Show an example of how you would use this feature.
+  
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      # render: Markdown
+      description: Have you considered any alternative solutions or features?
+      placeholder: An alternative solution could be [...]
+  
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      # render: Markdown
+      description: Add any other context or screenshots about the feature request here.
+      placeholder: |
+        Add any other context or screenshots about the feature request here.
