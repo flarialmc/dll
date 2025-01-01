@@ -28,6 +28,8 @@ body:
       label: Bug description
       description: A clear and concise description of what the bug is.
       placeholder: I was trying to [...] but [...]
+    validations:
+      required: true
   
   - type: textarea
     id: expected
@@ -36,7 +38,9 @@ body:
       label: Expected behavior
       description: A clear and concise description of what you expected to happen.
       placeholder: I expected [...]
-
+    validations:
+      required: true
+    
   - type: textarea
     id: actual
     attributes:
@@ -44,6 +48,8 @@ body:
       label: Actual behavior
       description: A clear and concise description of what actually happened.
       placeholder: Instead [...]
+    validations:
+      required: true
 
   - type: textarea
     id: steps
@@ -61,6 +67,8 @@ body:
         2. Click on '....'
         3. Scroll down to '....'
         4. See error
+    validations:
+      required: true
   
   - type: dropdown
     id: os
@@ -70,6 +78,8 @@ body:
       options:
         - Windows 10
         - Windows 11
+    validations:
+      required: true
   
   - type: textarea
     id: osversion
@@ -78,6 +88,8 @@ body:
       label: OS Version
       description: What version of the operating system are you using?
       placeholder: 21H1, 21H2, 22H1, etc.
+    validations:
+      required: true
   
   - type: textarea
     id: additional

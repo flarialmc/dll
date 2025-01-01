@@ -10,6 +10,8 @@ body:
       label: Feature description
       description: A clear and concise description of what the feature is.
       placeholder: I would like to see [...]
+    validations:
+      required: true
   
   - type: textarea
     id: reason
@@ -18,6 +20,8 @@ body:
       # render: Markdown
       description: Why do you think this feature should be added?
       placeholder: I think this feature should be added because [...]
+    validations:
+      required: true
   
   - type: textarea
     id: usecase
@@ -26,6 +30,8 @@ body:
       # render: Markdown
       description: How would you use this feature?
       placeholder: I would use this feature to [...]
+    validations:
+      required: true
   
   - type: textarea
     id: alternatives
