@@ -65,6 +65,8 @@
 #include "Modules/InstantHurtAnimation/InstantHurtAnimation.hpp"
 //#include "Modules/MovableChat/MovableChat.hpp"
 #include <algorithm>
+#include <Modules/Misc/InputImGUi/GUIMouseListener.hpp>
+#include <Modules/Misc/InputImGUi/GUIKeyListener.hpp>
 
 #include "Modules/ItemPhysics/ItemPhysics.hpp"
 #include "Modules/Crosshair/Crosshair.hpp"
@@ -211,6 +213,8 @@ void ModuleManager::initialize() {
     addService<CentreCursorListener>();
     addService<rgbListener>();
     addService<HiveModeCatcherListener>();
+    addService<ImGUIMouseListener>();
+    addService<ImGUIKeyListener>();
 
     addService<ConsoleService>();
     Scripting::loadModules();

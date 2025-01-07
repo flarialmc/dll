@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include <SDK/Client/Actor/Components/ActorRotationComponent.hpp>
 #include "../../../Utils/Memory/Memory.hpp"
 #include "../../../Utils/Logger/Logger.hpp"
 #include "Components/MoveInputComponent.hpp"
@@ -226,6 +227,8 @@ public:
     AABBShapeComponent *getAABBShapeComponent();
 
     StateVectorComponent *getStateVectorComponent();
+
+    ActorRotationComponent *getActorRotationComponent();
 
     RuntimeIDComponent *getRuntimeIDComponent();
 

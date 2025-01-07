@@ -200,6 +200,18 @@ StateVectorComponent *Actor::getStateVectorComponent() {
     return tryGet<StateVectorComponent>(sig);
 }
 
+ActorRotationComponent *Actor::getActorRotationComponent() {
+    static uintptr_t sig;
+
+    if(!VersionUtils::checkAboveOrEqual(21, 00)) {
+        if (sig == NULL) {
+            sig = Memory::findSig(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getActorRotationComponent"));
+        }
+    }
+
+    return tryGet<ActorRotationComponent>(sig);
+}
+
 ItemStack *Actor::getOffhandSlot() {
     if(VersionUtils::checkAboveOrEqual(20, 80)) {
         return getOffhandContainer()->getItem(1);

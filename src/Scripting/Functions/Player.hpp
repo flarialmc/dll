@@ -126,6 +126,14 @@ namespace player {
                 .registerLambdaFunction("getLocalPlayer", [](lua_State* L) -> int {
                     lua_pushlightuserdata(L, SDK::clientInstance->getLocalPlayer());
                     return 1;
+                })
+                .registerLambdaFunction("getYaw", [](lua_State* L) -> int {
+                    lua_pushnumber(L, SDK::clientInstance->getLocalPlayer()->getActorRotationComponent()->rot.y);
+                    return 1;
+                })
+                .registerLambdaFunction("getPitch", [](lua_State* L) -> int {
+                    lua_pushnumber(L, SDK::clientInstance->getLocalPlayer()->getActorRotationComponent()->rot.x);
+                    return 1;
                 });
     }
 }
