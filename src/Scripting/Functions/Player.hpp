@@ -128,10 +128,18 @@ namespace player {
                     return 1;
                 })
                 .registerLambdaFunction("getYaw", [](lua_State* L) -> int {
+                    if (SDK::clientInstance == nullptr || SDK::clientInstance->getLocalPlayer() == nullptr || SDK::clientInstance->getLocalPlayer()->getActorRotationComponent() == nullptr) {
+                        lua_pushnumber(L, 0);
+                        return 1;
+                    }
                     lua_pushnumber(L, SDK::clientInstance->getLocalPlayer()->getActorRotationComponent()->rot.y);
                     return 1;
                 })
                 .registerLambdaFunction("getPitch", [](lua_State* L) -> int {
+                    if (SDK::clientInstance == nullptr || SDK::clientInstance->getLocalPlayer() == nullptr || SDK::clientInstance->getLocalPlayer()->getActorRotationComponent() == nullptr) {
+                        lua_pushnumber(L, 0);
+                        return 1;
+                    }
                     lua_pushnumber(L, SDK::clientInstance->getLocalPlayer()->getActorRotationComponent()->rot.x);
                     return 1;
                 });

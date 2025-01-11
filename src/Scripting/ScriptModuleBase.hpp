@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Modules/ClickGUI/ClickGUI.hpp>
 #include "../Client/Module/Modules/Module.hpp"
 #include "lua.h"
 #include "Scripting.hpp"
@@ -62,7 +63,7 @@ public:
     }
 
     void onKey(KeyEvent& event) {
-        if (!Scripting::instalized || !this->isEnabled()) return;
+        if (!Scripting::instalized || !this->enabledState) return;
 
         bool canceled = ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onKeyEvent,
                                             event.getKey(), event.getAction());
@@ -73,7 +74,7 @@ public:
     }
 
     void onMouse(MouseEvent& event) {
-        if (!Scripting::instalized || !this->isEnabled() || event.getButton() == 0 || event.getAction() == 0) return;
+        if (!Scripting::instalized || !this->enabledState || event.getButton() == 0 || event.getAction() == 0) return;
 
         bool canceled = ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onMouseEvent,
                                             (int)event.getButton(), (int)event.getAction());
@@ -83,7 +84,7 @@ public:
     }
 
     void onPacketReceive(PacketEvent &event) {
-        if (!Scripting::instalized || !this->isEnabled()) return;
+        if (!Scripting::instalized || !this->enabledState) return;
 
         bool canceled = ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onPacketReceiveEvent,
                                             event.getPacket(), (int)event.getPacket()->getId());
@@ -93,13 +94,13 @@ public:
     }
 
     void onTickEvent(TickEvent& event) {
-        if (!Scripting::instalized || !this->isEnabled()) return;
+        if (!Scripting::instalized || !this->enabledState) return;
 
         ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onTickEvent);
     }
 
     void onRenderEvent(RenderEvent& event) {
-        if (!Scripting::instalized || !this->isEnabled()) return;
+        if (!Scripting::instalized || !this->enabledState) return;
 
         ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onRenderEvent);
     }
