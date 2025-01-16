@@ -22,7 +22,7 @@ void ScriptingEventManager::registerHandler(lua_State* L, const int& eventName) 
     }
 
     int ref = luaL_ref(L, LUA_REGISTRYINDEX);
-    eventHandlers[L][eventName] = ref;
+    eventHandlers[L][ref] = eventName;
 }
 
 
@@ -34,9 +34,9 @@ bool ScriptingEventManager::triggerEvent(lua_State* L, int eventName, const Args
 
     for (const auto& handler : it->second) {
 
-        if(eventName != handler.first) continue;
+        if(eventName != handler.second) continue;
 
-        lua_rawgeti(L, LUA_REGISTRYINDEX, handler.second);
+        lua_rawgeti(L, LUA_REGISTRYINDEX, handler.first);
 
         (LuaPusher::pushToLua(L, args), ...);
 
@@ -63,7 +63,7 @@ void ScriptingEventManager::clearHandlers() {
     for (auto &[L, handlers]: eventHandlers) {
         auto it = handlers.begin();
         while (it != handlers.end()) {
-            luaL_unref(L, LUA_REGISTRYINDEX, it->second);
+            luaL_unref(L, LUA_REGISTRYINDEX, it->first);
             it = handlers.erase(it);
 
         }
