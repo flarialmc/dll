@@ -166,7 +166,7 @@ public:
 
             const ImGuiKey key = keycodeToImGuiKey(event.getKey());
             io.AddKeyEvent(key, event.getAction());
-            io.SetKeyEventNativeData(key, static_cast<int>(event.getKey()), -1);
+            //io.SetKeyEventNativeData(key, static_cast<int>(event.getKey()), -1);
 
 
             int ch = ImGuiKeyToUnicode(mod);
@@ -175,9 +175,9 @@ public:
     };
 
     ImGUIKeyListener() {
-        //Listen(this, KeyEvent, &ImGUIKeyListener::onKey);
+        Listen(this, KeyEvent, &ImGUIKeyListener::onKey);
     }
     ~ImGUIKeyListener() {
-        //Deafen(this, KeyEvent, &ImGUIKeyListener::onKey);
+        Deafen(this, KeyEvent, &ImGUIKeyListener::onKey);
     }
 };

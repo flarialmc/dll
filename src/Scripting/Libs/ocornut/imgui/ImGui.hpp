@@ -18,7 +18,7 @@ namespace LuaImGui {
                     bool open = lua_toboolean(L, 2);
                     bool* p_open = open ? &open : nullptr;
 
-                    bool result = ImGui::Begin(name, p_open);
+                    bool result = ImGui::Begin(name, p_open, ImGuiWindowFlags_AlwaysAutoResize);
                     lua_pushboolean(L, result);
                     return 1;
                 })
