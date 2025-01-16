@@ -5,7 +5,7 @@
 #include <Scripting/LUAHelper.hpp>
 
 
-std::unordered_map<int, std::vector<ScriptingEventManager::EventEntry>> ScriptingEventManager::eventHandlers;
+std::unordered_map<lua_State*, std::unordered_map<int, int>> ScriptingEventManager::eventHandlers;
 
 
 
@@ -22,22 +22,21 @@ void ScriptingEventManager::registerHandler(lua_State* L, const int& eventName) 
     }
 
     int ref = luaL_ref(L, LUA_REGISTRYINDEX);
-    eventHandlers[eventName].push_back({L, ref});
+    eventHandlers[L][eventName] = ref;
 }
 
 
 
 template<typename... Args>
 bool ScriptingEventManager::triggerEvent(lua_State* L, int eventName, const Args&... args) {
-    auto it = eventHandlers.find(eventName);
+    auto it = eventHandlers.find(L);
     if (it == eventHandlers.end()) return false;
 
     for (const auto& handler : it->second) {
-        if (handler.luaState != L) {
-            continue;
-        }
 
-        lua_rawgeti(L, LUA_REGISTRYINDEX, handler.ref);
+        if(eventName != handler.first) continue;
+
+        lua_rawgeti(L, LUA_REGISTRYINDEX, handler.second);
 
         (LuaPusher::pushToLua(L, args), ...);
 
@@ -54,17 +53,17 @@ bool ScriptingEventManager::triggerEvent(lua_State* L, int eventName, const Args
             return true;
         }
     } else {
-        lua_pop(L, 1);
+        return false;
     }
     return false;
 }
 
 
 void ScriptingEventManager::clearHandlers() {
-    for (auto &[eventName, handlers]: eventHandlers) {
+    for (auto &[L, handlers]: eventHandlers) {
         auto it = handlers.begin();
         while (it != handlers.end()) {
-            luaL_unref(it->luaState, LUA_REGISTRYINDEX, it->ref);
+            luaL_unref(L, LUA_REGISTRYINDEX, it->second);
             it = handlers.erase(it);
 
         }

@@ -35,10 +35,11 @@ namespace GUI {
 
         return 0;
     }
+
     int lua_drawImage(lua_State *L) {
         std::string path = luaL_checkstring(L, 1);
         //x, y, z
-        FlarialGUI::image(path, D2D1::RectF(luaL_checknumber(L,2),luaL_checknumber(L,3),luaL_checknumber(L,4)));
+        FlarialGUI::image(path, D2D1::RectF(luaL_checknumber(L, 2), luaL_checknumber(L, 3), luaL_checknumber(L, 4)));
         return 1;
     }
 
@@ -76,7 +77,7 @@ namespace GUI {
         float width = luaL_checknumber(L, 5);
         float rounding = luaL_checknumber(L, 6);
         float shadowSize = luaL_checknumber(L, 7);
-        FlarialGUI::ShadowRect(Vec2(x,y), Vec2(height, width), d3dColorValue, rounding, shadowSize);
+        FlarialGUI::ShadowRect(Vec2(x, y), Vec2(height, width), d3dColorValue, rounding, shadowSize);
 
         return 0;
     }
@@ -94,14 +95,15 @@ namespace GUI {
         float radiusY = luaL_checknumber(L, 10);
         bool glow = lua_toboolean(L, 11);
 
-        bool result = FlarialGUI::RoundedButton(index, x, y, *color, *textColor, text.c_str(), width, height, radiusX, radiusY, glow);
+        bool result = FlarialGUI::RoundedButton(index, x, y, *color, *textColor, text.c_str(), width, height, radiusX,
+                                                radiusY, glow);
 
         lua_pushboolean(L, result);
         return 1;
     }
 
     int lua_NormalRender(lua_State *L) {
-        Module* script = Scripting::getModuleByState(L);
+        Module *script = Scripting::getModuleByState(L);
 
         int index = luaL_checkinteger(L, 1);
         std::string text = luaL_checkstring(L, 2);
@@ -121,7 +123,7 @@ namespace GUI {
                 .registerFunction("RoundedButton", lua_RoundedButton)
                 .registerFunction("NormalRender", lua_NormalRender)
                 .registerFunction("drawImage", lua_drawImage)
-                .registerLambdaFunction("getCurrentScreen",[](lua_State* L) -> int {
+                .registerLambdaFunction("getCurrentScreen", [](lua_State *L) -> int {
                     lua_pushstring(L, SDK::getCurrentScreen().c_str());
                     return 1;
                 });

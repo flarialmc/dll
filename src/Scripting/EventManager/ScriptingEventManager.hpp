@@ -8,11 +8,7 @@
 
 class ScriptingEventManager {
 public:
-    struct EventEntry {
-        lua_State* luaState;
-        int ref;
-    };
-    static std::unordered_map<int, std::vector<EventEntry>> eventHandlers;
+    static std::unordered_map<lua_State*, std::unordered_map<int, int>> eventHandlers;
     static void registerHandler(lua_State* L, const int& eventName);
 
     template <typename... Args>
