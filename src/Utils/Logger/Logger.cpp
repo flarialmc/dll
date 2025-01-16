@@ -38,8 +38,8 @@ namespace Logger {
     void initialize() {
         const std::string path = Utils::getClientPath() + "\\logs\\latest.log";
 
-//        glaiel::crashlogs::set_crashlog_folder(Utils::getLogsPath());
-//        glaiel::crashlogs::begin_monitoring();
+        glaiel::crashlogs::set_crashlog_folder(Utils::getLogsPath());
+        glaiel::crashlogs::begin_monitoring();
 
         if (std::filesystem::exists(path)) {
             std::ofstream ofs(path, std::ofstream::out | std::ofstream::trunc);
