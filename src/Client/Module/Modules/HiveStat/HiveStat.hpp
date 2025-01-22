@@ -16,6 +16,7 @@ private:
     bool renderOverlay = true;
     Vec2<float> currentPos;
     bool shoudReset = false;
+    std::map<std::string, std::thread> playerThreads;
 public:
     HiveStat() : Module("HiveOverlay", "",
                       IDR_RE_Q_PNG, "O") {
@@ -26,7 +27,6 @@ public:
         Listen(this, RenderEvent, &HiveStat::onRender)
         Listen(this, PacketEvent, &HiveStat::onPacketReceive)
         Listen(this, KeyEvent, &HiveStat::onKey)
-        fetchThread = std::thread(&HiveStat::workerThread, this);
         Module::onEnable();
         FlarialGUI::Notify("Hive Overlay works only in sky, bed, mm, ctf");
         FlarialGUI::Notify("To change the position of Hive Overlay, Please click " +
@@ -36,6 +36,12 @@ public:
 
     void onDisable() override {
         stopThread = true;
+        for (auto& [name, thread] : playerThreads) {
+            if (thread.joinable()) {
+                thread.join();
+            }
+        }
+        playerThreads.clear();
         Deafen(this, RenderEvent, &HiveStat::onRender)
         Deafen(this, PacketEvent, &HiveStat::onPacketReceive)
         Deafen(this, KeyEvent, &HiveStat::onKey)
@@ -72,24 +78,6 @@ public:
         Hive::PlayerStats stats = Hive::GetStats(cg, playerName);
         std::unique_lock<std::shared_mutex> lock(queueMutex);
         playerStatsList.emplace_back(playerName, stats);
-    }
-
-    void workerThread() {
-        while (!stopThread) {
-            std::string playerName;
-
-            {
-                std::unique_lock<std::shared_mutex> lock(queueMutex);
-                queueCondition.wait(lock, [this] { return !queueList.empty() || stopThread; });
-
-                if (stopThread && queueList.empty()) break;
-
-                playerName = queueList.front();
-                queueList.erase(queueList.begin());
-            }
-
-            fetchPlayerStats(playerName);
-        }
     }
 
     void onRender(RenderEvent &event) {
@@ -278,7 +266,10 @@ public:
                     std::unique_lock<std::shared_mutex> lock(queueMutex);
                     if (std::find(queueList.begin(), queueList.end(), name) == queueList.end()) {
                         queueList.push_back(name);
-                        queueCondition.notify_one();
+                        playerThreads[name] = std::thread([this, name]() {
+                            fetchPlayerStats(name);
+                        });
+                        playerThreads[name].detach();
                     }
                     ImGui::Text("Loading stats...");
                     ImGui::TableSetColumnIndex(2);
@@ -302,7 +293,8 @@ public:
 
         if (shoudReset) {
             if (id == MinecraftPacketIds::ChangeDimension) {
-                std::unique_lock<std::shared_mutex> lock(queueMutex);
+                //std::unique_lock<std::shared_mutex> lock(queueMutex);
+                playerThreads.clear();
                 playerStatsList.clear();
                 queueList.clear();
             }
@@ -317,6 +309,7 @@ public:
             static_cast<ActionType>(event.getAction()) == ActionType::Released) {
             renderOverlay = !renderOverlay;
             if(renderOverlay){
+                playerThreads.clear();
                 playerStatsList.clear();
                 queueList.clear();
             }

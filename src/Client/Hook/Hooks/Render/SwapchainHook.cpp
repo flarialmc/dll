@@ -434,6 +434,7 @@ void SwapchainHook::DX11Render() {
 
                 ImGui_ImplDX11_NewFrame();
                 ImGui_ImplWin32_NewFrame();
+
                 ImGui::NewFrame();
 
 

@@ -87,6 +87,8 @@
 // Using XInput for gamepad (will load DLL dynamically)
 #ifndef IMGUI_IMPL_WIN32_DISABLE_GAMEPAD
 #include <xinput.h>
+#include <GUI/D2D.hpp>
+
 typedef DWORD(WINAPI* PFN_XInputGetCapabilities)(DWORD, DWORD, XINPUT_CAPABILITIES*);
 typedef DWORD(WINAPI* PFN_XInputGetState)(DWORD, XINPUT_STATE*);
 #endif
@@ -308,7 +310,7 @@ static void ImGui_ImplWin32_UpdateMouseData()
         // (Optional) Set OS mouse position from Dear ImGui if requested (rarely used, only when ImGuiConfigFlags_NavEnableSetMousePos is enabled by user)
         if (io.WantSetMousePos)
         {
-            POINT pos = { (int)io.MousePos.x, (int)io.MousePos.y };
+            POINT pos = { (int)MC::mousePos.x, (int)MC::mousePos.y };
             if (::ClientToScreen(bd->hWnd, &pos))
                 ::SetCursorPos(pos.x, pos.y);
         }
@@ -319,7 +321,7 @@ static void ImGui_ImplWin32_UpdateMouseData()
         {
             POINT pos;
             if (::GetCursorPos(&pos) && ::ScreenToClient(bd->hWnd, &pos))
-                io.AddMousePosEvent((float)pos.x, (float)pos.y);
+                io.AddMousePosEvent((float)MC::mousePos.x, (float)MC::mousePos.y);
         }
     }
 }
@@ -399,7 +401,7 @@ void    ImGui_ImplWin32_NewFrame()
     bd->Time = current_time;
 
     // Update OS mouse position
-    //ImGui_ImplWin32_UpdateMouseData();
+    ImGui_ImplWin32_UpdateMouseData();
 
     // Process workarounds for known Windows key handling issues
     ImGui_ImplWin32_ProcessKeyEventsWorkarounds();
