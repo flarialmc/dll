@@ -223,6 +223,11 @@ public:
                 {
                     fullgamemodename = "Ghost Invasion";
                 }
+                // MOBGAME
+                else if (fullgamemodename == "MOB")
+                {
+                    fullgamemodename = "Mob Game";
+                }
             } else if (pkt->message.find(textToCheckToSilence) != std::string::npos) {
                 event.cancel();
             }
