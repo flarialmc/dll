@@ -363,16 +363,24 @@ public:
 
      };
 
-    static std::vector<std::pair<mcUUID, PlayerListEntry>>
-    copyMapInAlphabeticalOrder(const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap) {
-        std::vector<std::pair<mcUUID, PlayerListEntry>> sortedPairs(sourceMap.begin(), sourceMap.end());
+     static std::vector<std::pair<mcUUID, PlayerListEntry>>
+     copyMapInAlphabeticalOrder(const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap) {
+         std::vector<std::pair<mcUUID, PlayerListEntry>> sortedPairs(sourceMap.begin(), sourceMap.end());
 
-        // Sort the vector based on the 'name' field
-        std::sort(sortedPairs.begin(), sortedPairs.end(), [](const auto &a, const auto &b) {
-            return a.second.name < b.second.name;
-        });
+         // Sort the vector based on the 'name' field in a case-insensitive manner
+         std::sort(sortedPairs.begin(), sortedPairs.end(), [](const auto &a, const auto &b) {
+             // store names in strings and make them only lowercase there
+             std::string nameA = a.second.name;
+             std::string nameB = b.second.name;
 
-        return sortedPairs;
-    }
+             // put the lowercase versions of the names in alphabetical order
+             return std::lexicographical_compare(nameA.begin(), nameA.end(), nameB.begin(), nameB.end(),
+                 [](char c1, char c2) {
+                     return std::tolower(c1) < std::tolower(c2);
+                 });
+         });
+
+         return sortedPairs;
+     }
 };
 
