@@ -12,7 +12,7 @@ private:
     std::string Copy_CS = "THIS IS NEEDED EVEN MORE TRUST!!!!";
 public:
     AutoRQ() : Module("Hive Utils", "Handy utilities for The Hive partnered server",
-                      IDR_AUTORQ_PNG, "") { //maybe we need a new icon??? let @treegfx cook
+                      IDR_HIVE_PNG, "") {
         Module::setup();
     };
 
@@ -92,6 +92,7 @@ public:
                                   Constraints::RelativeConstraint(0.88f, "height"));
         this->addHeader("General");
         this->addToggle("Use /hub instead of /q", "", this->settings.getSettingByName<bool>("hub")->value);
+        // this->addDropdown("Command to use", "Command to execute when somthing gets triggered",  std::vector<std::string>{"Re-Q same game", "Q a Random game", "Go back to the hub"}, this->settings.getSettingByName<std::string>("commandtouse")->value);
 
         this->addHeader("Auto Re Q");
         this->addToggle("Auto re-queue ", "Find a new game when the current game is over", this->settings.getSettingByName<bool>("ReQ")->value);

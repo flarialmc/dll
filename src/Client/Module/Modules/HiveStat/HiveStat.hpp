@@ -18,8 +18,8 @@ private:
     bool shoudReset = false;
     std::map<std::string, std::thread> playerThreads;
 public:
-    HiveStat() : Module("HiveOverlay", "",
-                      IDR_RE_Q_PNG, "O") {
+    HiveStat() : Module("Hive Statistics", "Show players statistics in game",
+                      IDR_HIVE_STATS_PNG, "O") {
         Module::setup();
     };
 
