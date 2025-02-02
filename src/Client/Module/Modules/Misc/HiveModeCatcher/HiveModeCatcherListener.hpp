@@ -55,7 +55,7 @@ public:
                 {
                     fullgamemodename = "Hub";
                 }
-                // REPLAYCINEMA (NEEDS TO GET TESTED)
+                // REPLAYCINEMA
                 if (fullgamemodename == "REPLAY")
                 {
                     fullgamemodename = "Replay Cinema";
@@ -76,6 +76,10 @@ public:
                 else if (fullgamemodename == "BED-SQUADS")
                 {
                     fullgamemodename = "Bedwars Squads";
+                }
+                else if (fullgamemodename == "BED-MANOR")
+                {
+                    fullgamemodename = "Bedwars Manor";
                 }
                 // SKYWARS
                 else if (fullgamemodename == "HUB-SKY")
