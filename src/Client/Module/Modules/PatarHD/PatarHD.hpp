@@ -53,7 +53,7 @@ public:
         this->addHeader("General");
 
         this->addToggle("DVD Mode", "See for yourself", this->settings.getSettingByName<bool>("dvdmode")->value);
-        this->addDropdown("Mode", "", std::vector<std::string>{"Patar", "Jqms", "Chyves", "Nikita", "treegfx"}, this->settings.getSettingByName<std::string>("mode")->value);
+        this->addDropdown("Mode", "", std::vector<std::string>{"Patar", "Jqms", "Chyves", "Nikita", "treegfx", "FreezeEngine", "StoneHunter"}, this->settings.getSettingByName<std::string>("mode")->value);
         this->addSlider("Scale", "", this->settings.getSettingByName<float>("scale")->value, 5.0F);
         if (this->settings.getSettingByName<bool>("dvdmode")->value) {
             this->addHeader("DVD Mode");
@@ -91,6 +91,12 @@ public:
         } else if (this->settings.getSettingByName<std::string>("mode")->value == "treegfx") {
             mode = "JPG";
             draw = 217;
+        }else if (this->settings.getSettingByName<std::string>("mode")->value == "FreezeEngine") {
+            mode = "PNG";
+            draw = 238;
+        }else if (this->settings.getSettingByName<std::string>("mode")->value == "StoneHunter") {
+            mode = "PNG";
+            draw = 239;
         } else if (this->settings.getSettingByName<std::string>("mode")->value == "Nikita")
         {
             mode = "PNG";
