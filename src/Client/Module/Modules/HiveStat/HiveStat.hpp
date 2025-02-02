@@ -226,7 +226,12 @@ public:
                             std::ostringstream oss;
                             int level = it->second.getLevel();
                             oss << std::fixed << std::setprecision(0) << level;
-                            if (level >= 50) {
+
+                            if (level >= 100) {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 170, 255)); // Dark blue
+                            }else if (level >= 80) {
+                                ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 85, 85, 255)); // Red
+                            } else if (level >= 50) {
                                 ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 255, 0, 255)); // Green
                             } else if (level >= 30) {
                                 ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 255, 255)); // Magenta
