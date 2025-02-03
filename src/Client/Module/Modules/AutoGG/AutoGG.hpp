@@ -3,12 +3,13 @@
 #include "../Module.hpp"
 #include "../../../../SDK/Client/Network/Packet/PlaySoundPacket.hpp"
 #include "../../../../SDK/Client/Network/Packet/TextPacket.hpp"
+#include "../../../../SDK/Client/Network/Packet/SetTitlePacket.hpp"
 
 
 class AutoGG : public Module {
 
 public:
-    AutoGG() : Module("Auto GG", "Automatically sends a message when you\nwin a game. (Doesn't work everywhere)",
+    AutoGG() : Module("Auto GG", "Automatically sends a message when you win a game.\nWorkes on Hive, Zeqa, CubeCraft, LifeBoat. ",
                       IDR_LIKE_PNG, "") {
         Module::setup();
     };
@@ -50,62 +51,42 @@ public:
     }
 
     void onPacketReceive(PacketEvent &event) {
-        bool triggered = false;
         MinecraftPacketIds id = event.getPacket()->getId();
 
         // TODO: add support for other servers (look for "won the game" text)
-        if (id == MinecraftPacketIds::PlaySoundPacket) {
-            auto *pkt = reinterpret_cast<PlaySoundPacket *>(event.getPacket());
-            if (pkt->mName == "ui.toast.challenge_complete_java") {
-                triggered = true;
-            }
-
-
-            if (triggered) {
-                std::string win_message = this->settings.getSettingByName<std::string>("text")->value;
-                if (!win_message.empty()) {
-                    auto player = SDK::clientInstance->getLocalPlayer();
-                    std::shared_ptr<Packet> packet = SDK::createPacket(9);
-                    auto *text = reinterpret_cast<TextPacket *>(packet.get());
-
-
-                    text->type = TextPacketType::CHAT;
-                    text->message = win_message;
-                    text->platformId = "";
-                    text->translationNeeded = false;
-                    text->xuid = "";
-                    text->name = player->getPlayerName();
-
-                    SDK::clientInstance->getPacketSender()->sendToServer(text);
-                }
+        if (id == MinecraftPacketIds::SetTitle) {
+            auto *pkt = reinterpret_cast<SetTitlePacket *>(event.getPacket());
+            if (pkt->text == "§f§aYou won the game!" || //Zeqa
+                pkt->text == "§f§cYou lost the game!" ) { //Zeqa
+                SendGG();
             }
         }
 
-        else if (id == MinecraftPacketIds::Text) {
+        if (id == MinecraftPacketIds::Text) {
             auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
-            if (pkt->message == "§c§l» §r§c§lGame OVER!") {
-                triggered = true;
+            if (pkt->message == "§c§l» §r§c§lGame OVER!" || //Hive
+                pkt->message.find("§r§a won the game!")!= std::string::npos || //CubeCraft
+                pkt->message.find("§a has won the game!")!= std::string::npos){ //LifeBoat
+                SendGG();
             }
+        }
+    }
+    void SendGG(){
+        std::string win_message = this->settings.getSettingByName<std::string>("text")->value;
+        if (!win_message.empty()) {
+            auto player = SDK::clientInstance->getLocalPlayer();
+            std::shared_ptr<Packet> packet = SDK::createPacket(9);
+            auto *text = reinterpret_cast<TextPacket *>(packet.get());
 
 
-            if (triggered) {
-                std::string win_message = this->settings.getSettingByName<std::string>("text")->value;
-                if (!win_message.empty()) {
-                    auto player = SDK::clientInstance->getLocalPlayer();
-                    std::shared_ptr<Packet> packet = SDK::createPacket(9);
-                    auto *text = reinterpret_cast<TextPacket *>(packet.get());
+            text->type = TextPacketType::CHAT;
+            text->message = win_message;
+            text->platformId = "";
+            text->translationNeeded = false;
+            text->xuid = "";
+            text->name = player->getPlayerName();
 
-
-                    text->type = TextPacketType::CHAT;
-                    text->message = win_message;
-                    text->platformId = "";
-                    text->translationNeeded = false;
-                    text->xuid = "";
-                    text->name = player->getPlayerName();
-
-                    SDK::clientInstance->getPacketSender()->sendToServer(text);
-                }
-            }
+            SDK::clientInstance->getPacketSender()->sendToServer(text);
         }
     }
 };
