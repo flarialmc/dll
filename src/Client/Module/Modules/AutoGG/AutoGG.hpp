@@ -9,7 +9,7 @@
 class AutoGG : public Module {
 
 public:
-    AutoGG() : Module("Auto GG", "Automatically sends a message when you win a game.\nWorkes on Hive, Zeqa, CubeCraft, LifeBoat. ",
+    AutoGG() : Module("Auto GG", "Automatically sends a message when you win a game.\nWorkes on Hive, Zeqa, CubeCraft, LifeBoat and Galaxite. ",
                       IDR_LIKE_PNG, "") {
         Module::setup();
     };
@@ -56,8 +56,18 @@ public:
         // TODO: add support for other servers (look for "won the game" text)
         if (id == MinecraftPacketIds::SetTitle) {
             auto *pkt = reinterpret_cast<SetTitlePacket *>(event.getPacket());
-            if (pkt->text == "§f§aYou won the game!" || //Zeqa
-                pkt->text == "§f§cYou lost the game!" ) { //Zeqa
+            static const std::regex rgxChRu(R"(Is The §6§l(Chronos|Rush) (Champion|Champions)!)");
+            if (
+                //Zeqa
+                pkt->text == "§f§aYou won the game!" ||
+                pkt->text == "§f§cYou lost the game!" ||
+                //Galaxite CREDIT @1unar-Eclipse
+                pkt->text.find("Team§r§a won the game!")!= std::string::npos ||
+                pkt->text.find("§bHiders§r§f Win")!= std::string::npos ||
+                pkt->text.find("§eSeekers§r§f Win")!= std::string::npos ||
+                pkt->text == "Finished" ||
+                pkt->text == "Out of Time!" ||
+                std::regex_search(pkt->text, rgxChRu)) {
                 SendGG();
             }
         }
