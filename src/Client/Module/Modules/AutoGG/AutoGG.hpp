@@ -9,7 +9,7 @@
 class AutoGG : public Module {
 
 public:
-    AutoGG() : Module("Auto GG", "Automatically sends a message when you win a game.\nWorkes on Hive, Zeqa, CubeCraft, LifeBoat and Galaxite. ",
+    AutoGG() : Module("Auto GG", "Automatically sends a message when you win a game. Workes on\nThe Hive, Zeqa, CubeCraft, Lifeboat, Galaxite and Mineville. ",
                       IDR_LIKE_PNG, "") {
         Module::setup();
     };
@@ -67,16 +67,20 @@ public:
                 pkt->text.find("§eSeekers§r§f Win")!= std::string::npos ||
                 pkt->text == "Finished" ||
                 pkt->text == "Out of Time!" ||
-                std::regex_search(pkt->text, rgxChRu)) {
+                std::regex_search(pkt->text, rgxChRu) ||
+                //Mineville
+                pkt->text == "§aYou Win!" ||
+                pkt->text == "§cGame Over!") {
+
                 SendGG();
             }
         }
 
         if (id == MinecraftPacketIds::Text) {
             auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
-            if (pkt->message == "§c§l» §r§c§lGame OVER!" || //Hive
+            if (pkt->message == "§c§l» §r§c§lGame OVER!" || //The Hive
                 pkt->message.find("§r§a won the game!")!= std::string::npos || //CubeCraft
-                pkt->message.find("§a has won the game!")!= std::string::npos){ //LifeBoat
+                pkt->message.find("§a has won the game!")!= std::string::npos){ //Lifeboat
                 SendGG();
             }
         }
