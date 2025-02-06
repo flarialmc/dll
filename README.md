@@ -29,7 +29,7 @@ If you encounter issues, check out our [FAQ](https://discord.gg/flarial-communit
 # Powered by [Sear](https://sear.host)
 <img src="https://cdn.sear.host/synthetixlogov2-removebg-preview.png" width="100">
 
-## Fast and affordable host with great customer service
+### Fast and affordable host with great customer service
 
 ## Build Guide
 
