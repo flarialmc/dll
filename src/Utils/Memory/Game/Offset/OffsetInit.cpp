@@ -3,6 +3,30 @@
 #include "../../../Logger/Logger.hpp"
 #include "../SignatureAndOffsetManager.hpp"
 
+void OffsetInit::init2160() {
+    Logger::debug("[Offsets] Loading offsets for 1.21.6X");
+
+    ADD_OFFSET("Player::gamemode", 0xAD8);
+    ADD_OFFSET("Player::playerName", 0xC58);
+    ADD_OFFSET("Player::playerInventory", 0x5C8);
+
+    ADD_OFFSET("GuiData::ScreenSize", 0x40);
+    ADD_OFFSET("GuiData::ScreenSizeScaled", 0x50);
+    ADD_OFFSET("GuiData::GuiScale", 0x5C);
+    ADD_OFFSET("GuiData::screenResRounded", 0x48);
+    ADD_OFFSET("GuiData::sliderAmount", 0x5C);
+    ADD_OFFSET("GuiData::scalingMultiplier", 0x60);
+
+    ADD_OFFSET("Item::AtlasTextureFile", 0xB0);
+    ADD_OFFSET("Item::Namespace", 0x100);
+    ADD_OFFSET("Item::name",0xD8);
+
+    ADD_OFFSET("Level::getPlayerMap", 0xB68);
+
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x328);
+    ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x610);
+}
+
 void OffsetInit::init2150() {
     Logger::debug("[Offsets] Loading offsets for 1.21.5X");
 

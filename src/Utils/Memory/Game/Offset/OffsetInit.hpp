@@ -13,4 +13,5 @@ public:
     static void init2130();
     static void init2140();
     static void init2150();
+    static void init2160();
 };

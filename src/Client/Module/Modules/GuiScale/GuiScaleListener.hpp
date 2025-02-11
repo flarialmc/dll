@@ -27,7 +27,6 @@ public:
         if(originalScale == 0) {
             originalScale = guiData->GuiScale;
         }
-        float oldScale = guiData->GuiScale;
 
         auto screenSize = guiData->ScreenSize;
         static auto safeZone = Vec2<float>{ 0.f, 0.f };
