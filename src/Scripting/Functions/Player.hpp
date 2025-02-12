@@ -99,7 +99,7 @@ namespace player {
     }
 
     int lua_isOnGround(lua_State *L){
-        if (SDK::clientInstance != nullptr) {
+        if (SDK::clientInstance == nullptr) {
             return 0;
         }
         auto *player_data = static_cast<Player*>(lua_touserdata(L, 1));
@@ -141,6 +141,13 @@ namespace player {
                         return 1;
                     }
                     lua_pushnumber(L, SDK::clientInstance->getLocalPlayer()->getActorRotationComponent()->rot.x);
+                    return 1;
+                }).registerLambdaFunction("getInventory", [](lua_State* L) -> int {
+                    if (SDK::clientInstance == nullptr || SDK::clientInstance->getLocalPlayer() == nullptr || SDK::clientInstance->getLocalPlayer()->getSupplies() == nullptr || SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory() == nullptr) {
+                        return 0;
+                    }
+
+                    lua_pushlightuserdata(L, SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory());
                     return 1;
                 });
     }

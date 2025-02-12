@@ -21,6 +21,7 @@
 #include "Functions/LuaModuleManager.hpp"
 #include "Functions/LuaClient.hpp"
 #include "Functions/LuaModule.hpp"
+#include "Functions/Inventory.hpp"
 #include "Console/Console.hpp"
 #include "Commands/LuaOnCommand.hpp"
 #include "Packets/Packets.hpp"
@@ -105,6 +106,9 @@ void registerFunctions(lua_State* L){
     LuaModule::registerModule(L);
     LuaOnCommand::registerLuaOnCommand(L);
     LuaPackets::pushPacketTypesToLua(L);
+
+    LuaInventory::registerFunctions(L);
+    LuaItem::registerFunctions(L);
 
     LuaTextPacket::registerFunctions(L);
     LuaPlaySoundPacket::registerFunctions(L);

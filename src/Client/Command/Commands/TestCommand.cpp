@@ -1,6 +1,7 @@
 #include "TestCommand.hpp"
 
 #include <Utils/WinrtUtils.hpp>
+#include <Scripting/Scripting.hpp>
 
 void TestCommand::execute(const std::vector<std::string> &args) {
     if (args.empty()) {
@@ -33,4 +34,7 @@ void TestCommand::execute(const std::vector<std::string> &args) {
             WinrtUtils::setClipboard(args[2]);
         }
     }
+
+
+
 }

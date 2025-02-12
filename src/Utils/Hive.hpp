@@ -529,7 +529,7 @@ namespace Hive {
 
 
             if(gameId == "ctf") {
-                if(!jsonData.contains("kills") || !jsonData.contains("deaths") || !jsonData.contains("victories") || !jsonData.contains("played") || !jsonData.contains("xp") || !jsonData.contains("flags_captured") || !jsonData.contains("flags_returned")){
+                if(!jsonData.contains("kills") || !jsonData.contains("deaths") || !jsonData.contains("victories") || !jsonData.contains("played") || !jsonData.contains("xp")){
                     stats.setCode(2);
                     return stats;
                 }
@@ -539,9 +539,9 @@ namespace Hive {
                 int victories = jsonData["victories"].get<int>();
                 int played = jsonData["played"].get<int>();
                 int xp = jsonData["xp"].get<int>();
-                int flagsCaptured = jsonData["flags_captured"].get<int>();
-                int flagsReturned = jsonData["flags_returned"].get<int>();
-                int assists = jsonData["assists"].get<int>();
+//                int flagsCaptured = jsonData["flags_captured"].get<int>();
+//                int flagsReturned = jsonData["flags_returned"].get<int>();
+//                int assists = jsonData["assists"].get<int>();
 
                 stats.setKD(roundToSecond((float) kills / (float) deaths));
 
