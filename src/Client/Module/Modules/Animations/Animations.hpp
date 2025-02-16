@@ -4,7 +4,8 @@
 
 
 class Animations : public Module {
-
+private:
+    BedrockTextureData* selectedHotbarSlotTexturePtr = nullptr;
 public:
 
     Animations() : Module("Animations", "Animate your selected slot square\nwhile you switch slots.",
@@ -14,11 +15,13 @@ public:
 
     void onEnable() override {
         Listen(this, DrawImageEvent, &Animations::onDrawImage)
+        Listen(this, GetTextureEvent, &Animations::onGetTexture)
         Module::onEnable();
     }
 
     void onDisable() override {
         Deafen(this, DrawImageEvent, &Animations::onDrawImage)
+        Deafen(this, GetTextureEvent, &Animations::onGetTexture)
         Module::onDisable();
     }
 
@@ -37,11 +40,30 @@ public:
         return current + (endPoint > current ? factor : -factor);
     }
 
+    void onGetTexture(GetTextureEvent &event) {
+        if(event.location->filePath == "textures/ui/selected_hotbar_slot") {
+            selectedHotbarSlotTexturePtr = event.textureData;
+        }
+    }
+
     void onDrawImage(DrawImageEvent &event) {
-        if (strcmp(event.getTexturePath().c_str(), "textures/ui/selected_hotbar_slot") == 0) {
+        bool shouldAnimate = false;
+        if(VersionUtils::checkAboveOrEqual(21, 50)) {
+            if(selectedHotbarSlotTexturePtr == event.getTextureData()) {
+                shouldAnimate = true;
+            }
+        } else {
+            if (event.getTexturePath() == "textures/ui/selected_hotbar_slot") {
+                shouldAnimate = true;
+            }
+        }
+
+        if(shouldAnimate) {
             auto pos = event.getImagePos();
             static float lerpedPos = pos.x; // old pos
-            lerpedPos = animate(pos.x, lerpedPos, (0.016f * this->settings.getSettingByName<float>("hotbarSpeed")->value) * FlarialGUI::frameFactor);
+            lerpedPos = animate(pos.x, lerpedPos,
+                                (0.016f * this->settings.getSettingByName<float>("hotbarSpeed")->value) *
+                                FlarialGUI::frameFactor);
             event.setImagePos(Vec2<float>{lerpedPos, pos.y});
         }
     }
@@ -60,13 +82,7 @@ public:
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Misc");
-        this->addButton("troll", "troll", "troll", []() {
-            FlarialGUI::Notify("I trolled you");
-        });
-        this->addButton("troll", "troll", "even more", []() {
-
-        });
-        this->addSlider("Hotbar", "", this->settings.getSettingByName<float>("hotbarSpeed")->value);
+        this->addSlider("Hotbar Selected Slot Speed", "", this->settings.getSettingByName<float>("hotbarSpeed")->value);
 
         FlarialGUI::UnsetScrollView();
 

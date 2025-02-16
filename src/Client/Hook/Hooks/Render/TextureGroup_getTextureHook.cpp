@@ -11,9 +11,12 @@ void TextureGroup_getTextureHook::enableHook() {
 TexturePtr* TextureGroup_getTextureHook::TextureGroup_getTextureCallback(TextureGroup *_this, TexturePtr *result,
                                                                   ResourceLocation *location, bool forceReload,
                                                                   void *a5, int a6, void *a7) {
+    if(result == nullptr) return nullptr;
 
-    auto event = nes::make_holder<GetTextureEvent>(location);
+    auto retTexture = funcOriginal(_this, result, location, forceReload, a5, a6, a7);
+
+    auto event = nes::make_holder<GetTextureEvent>(location, retTexture->clientTexture.get());
     eventMgr.trigger(event);
 
-    return funcOriginal(_this, result, event->location, forceReload, a5, a6, a7);
+    return retTexture;
 }

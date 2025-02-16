@@ -22,7 +22,7 @@
 #include "Hooks/Game/isPreGame.hpp"
 #include "Hooks/Game/composeFullStack.hpp"
 #include "Hooks/Render/RenderOrderExecuteHook.hpp"
-#include "Hooks/Render/RenderChunkCoordinatorPreRenderTickHook.hpp"
+#include "Hooks/Render/RenderChunkCoordinatorHandleVisibilityUpdatesHook.hpp"
 #include "Hooks/Game/SettingsScreenOnExitHook.hpp"
 #include "Hooks/Render/UIControl_updateCachedPositionHook.hpp"
 #include "Hooks/Render/HudCursorRenderer.hpp"
@@ -59,7 +59,7 @@ void HookManager::initialize() {
     addHook<SwapchainHook>();
     addHook<ResizeHook>();
 
-    //addHook<TextureGroup_getTextureHook>();
+    addHook<TextureGroup_getTextureHook>();
     addHook<getViewPerspectiveHook>();
     addHook<RaknetTickHook>();
     addHook<SetUpAndRenderHook>();
@@ -78,20 +78,18 @@ void HookManager::initialize() {
     addHook<getSensHook>();
     addHook<HudMobEffectsRendererHook>();
     addHook<HudCursorRendererHook>();
-    if(VersionUtils::checkAboveOrEqual(20, 60) && !VersionUtils::checkAboveOrEqual(21, 50)) {
+    if(VersionUtils::checkAboveOrEqual(20, 60)) {
         addHook<BaseActorRendererRenderTextHook>();
     }
     addHook<UIControl_updateCachedPositionHook>();
-    if (!VersionUtils::checkAboveOrEqual(21, 50)) {
-        addHook<GeneralSettingsScreenControllerCtorHook>();
-    }
+    addHook<GeneralSettingsScreenControllerCtorHook>();
+
     addHook<isPreGameHook>();
     addHook<_composeFullStackHook>();
 
     addHook<RenderOrderExecuteHook>();
-    if (!VersionUtils::checkAboveOrEqual(21, 50)) {
-        addHook<RenderChunkCoordinatorPreRenderTickHook>();
-    }
+    addHook<RenderChunkCoordinatorHandleVisibilityUpdatesHook>();
+
     addHook<SettingsScreenOnExitHook>();
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {

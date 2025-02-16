@@ -2,7 +2,6 @@
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
 void GameModeAttackHook::callback(Gamemode *gamemode, Actor *actor) {
-    //  Combo counter and reach counter logic will be done here in the next commit.
     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() == gamemode->getPlayer()) {
             auto event = nes::make_holder<AttackEvent>(actor);

@@ -8,6 +8,7 @@
 class DrawImageEvent : public Event, Cancellable {
 private:
     TexturePtr *texturePtr;
+    BedrockTextureData* textureData;
     Vec2<float> imagePos;
     Vec2<float> imageDimension;
 public:
@@ -15,11 +16,16 @@ public:
         return imagePos;
     }
 
+    BedrockTextureData* getTextureData() {
+        return textureData;
+    }
+
     void setImagePos(Vec2<float> newPos) {
         this->imagePos = newPos;
     }
 
     [[nodiscard]] std::string getTexturePath() {
+        if(!this->texturePtr) return "";
         return this->texturePtr->GetFilePath();
     }
 
@@ -28,6 +34,9 @@ public:
     }
 
     explicit DrawImageEvent(TexturePtr *texturePtr, Vec2<float> imagePos, Vec2<float> imageDimension)
-            : texturePtr(texturePtr), imagePos(imagePos), imageDimension(imageDimension) {
+            : texturePtr(texturePtr), textureData(nullptr), imagePos(imagePos), imageDimension(imageDimension) {
+    }
+    explicit DrawImageEvent(BedrockTextureData* textureData, Vec2<float> imagePos, Vec2<float> imageDimension)
+            : texturePtr(nullptr), textureData(textureData), imagePos(imagePos), imageDimension(imageDimension) {
     }
 };

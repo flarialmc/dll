@@ -80,6 +80,32 @@ private:
 		);
 	}
 
+    static void drawImageDetour2150(
+            MinecraftUIRenderContext* _this,
+            BedrockTextureData* textureData,
+            Vec2<float>& imagePos,
+            Vec2<float>& imageDimension,
+            Vec2<float>& uvPos,
+            Vec2<float>& uvSize,
+            bool unk
+    )
+    {
+        auto event = nes::make_holder<DrawImageEvent>(textureData, imagePos, imageDimension);
+        eventMgr.trigger(event);
+        auto newPos = event->getImagePos();
+
+        Memory::CallFunc<void*, MinecraftUIRenderContext*, BedrockTextureData*, Vec2<float>&, Vec2<float>&, Vec2<float>&, Vec2<float>&>(
+                oDrawImage,
+                _this,
+                textureData,
+                newPos,
+                imageDimension,
+                uvPos,
+                uvSize,
+                unk
+        );
+    }
+
 
 	static void drawNineSliceDetour(
 		MinecraftUIRenderContext* _this, 
@@ -98,6 +124,23 @@ private:
 		Memory::CallFunc<void*, MinecraftUIRenderContext*, TexturePtr*, NinesliceInfo*>(oDrawNineSlice, _this, texturePtr, nineSliceInfo);
 	}
 
+    static void drawNineSlice2150Detour(
+            MinecraftUIRenderContext* _this,
+            BedrockTextureData* textureData,
+            NinesliceInfo* nineSliceInfo
+    )
+    {
+        float* x = reinterpret_cast<float*>((__int64)nineSliceInfo);
+        float* y = reinterpret_cast<float*>((__int64)nineSliceInfo + 0x4);
+        float* z = reinterpret_cast<float*>((__int64)nineSliceInfo + 0x60); // funny cuh offset
+        float* w = reinterpret_cast<float*>((__int64)nineSliceInfo + 0x64);
+        Vec4<float> position(*x, *y, *z, *w);
+        auto event = nes::make_holder<DrawNineSliceEvent>(textureData, position);
+        eventMgr.trigger(event);
+
+        Memory::CallFunc<void*, MinecraftUIRenderContext*, BedrockTextureData*, NinesliceInfo*>(oDrawNineSlice, _this, textureData, nineSliceInfo);
+    }
+
 
     static void hookDrawTextAndDrawImage(MinecraftUIRenderContext* muirc) {
         auto vTable = *(uintptr_t **) muirc;
@@ -108,7 +151,9 @@ private:
         }
 
 		if (oDrawImage == nullptr) {
-			if (VersionUtils::checkAboveOrEqual(21, 20))
+            if (VersionUtils::checkAboveOrEqual(21, 50))
+                Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour2150, (void **) &oDrawImage, "DrawImage");
+			else if (VersionUtils::checkAboveOrEqual(21, 20))
 				Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour2120, (void **) &oDrawImage, "DrawImage");
 			else
 				Memory::hookFunc((void *) vTable[7], (void *) drawImageDetour, (void **) &oDrawImage, "DrawImage");
@@ -116,7 +161,10 @@ private:
 
 		if (oDrawNineSlice == nullptr)
 		{
-			Memory::hookFunc((void*)vTable[8], (void*)drawNineSliceDetour, (void**)&oDrawNineSlice, "DrawNineSlice");
+            if (VersionUtils::checkAboveOrEqual(21, 50))
+			    return; // Memory::hookFunc((void*)vTable[8], (void*)drawImageDetour2150, (void**)&oDrawNineSlice, "DrawNineSlice");
+            else
+                Memory::hookFunc((void*)vTable[8], (void*)drawNineSliceDetour, (void**)&oDrawNineSlice, "DrawNineSlice");
 		}
     }
 

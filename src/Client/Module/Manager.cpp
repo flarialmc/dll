@@ -67,6 +67,7 @@
 #include <algorithm>
 #include <Modules/Misc/InputImGUi/GUIMouseListener.hpp>
 #include <Modules/Misc/InputImGUi/GUIKeyListener.hpp>
+#include <Modules/Misc/PackChanger/PackChanger.hpp>
 
 #include "Modules/ItemPhysics/ItemPhysics.hpp"
 #include "Modules/Crosshair/Crosshair.hpp"
@@ -79,7 +80,6 @@
 #include "Modules/Waypoints/Waypoints.hpp"
 
 #include "Modules/EntityCounter/EntityCounter.hpp"
-#include "Modules/PackChanger/PackChanger.hpp"
 #include "Modules/MovableHUD/MovableHUD.hpp"
 #include "Modules/MovableScoreboard/MovableScoreboard.hpp"
 #include "Modules/MovableTitle/MovableTitle.hpp"
@@ -144,9 +144,7 @@ void ModuleManager::initialize() {
     addModule<Keystrokes>();
     addModule<Sneak>();
     addModule<Sprint>();
-    if (!VersionUtils::checkAboveOrEqual(21, 50)) {
-        addModule<Hitbox>();
-    }
+    addModule<Hitbox>();
     addModule<HurtColor>();
     addModule<ThirdPerson>();
     addModule<JavaDynamicFOV>();
@@ -168,9 +166,8 @@ void ModuleManager::initialize() {
     addModule<SpeedDisplay>();
     addModule<CPSLimiter>();
     addModule<BlockBreakIndicator>();
-    if (!VersionUtils::checkAboveOrEqual(21, 50)) {
-        addModule<Animations>();
-    }
+    addModule<Animations>();
+
     addModule<BlockOutline>();
     addModule<CommandHotkey>();
     addModule<NoHurtCam>();
@@ -190,23 +187,26 @@ void ModuleManager::initialize() {
     addModule<MovableCoordinates>();
     addModule<MovableHotbar>();
     // addModule<CompactChat>();
-    if (!VersionUtils::checkAboveOrEqual(21, 50)) {
-        addModule<ItemPhysics>();
-    }
+    addModule<ItemPhysics>();
+
     addModule<HiveStat>();
     addModule<Waypoints>();
-    if (!VersionUtils::checkAboveOrEqual(21, 50)) {
-        addModule<PackChanger>();
-    }
+
     addModule<NullMovement>();
+    addModule<CustomCrosshair>();
+
     if (!VersionUtils::checkAboveOrEqual(21, 50)) {
-        addModule<CustomCrosshair>();
         addModule<Cursor>();
     }
+
+
     addModule<RawInputBuffer>();
     //addModule<ItemUseDelayFix>();
 
     addService<GUIKeyListener>();
+    if (!VersionUtils::checkAboveOrEqual(21, 60)) {
+        addService<PackChanger>();
+    }
     addService<DiscordRPCListener>();
     addService<UninjectListener>();
     addService<SaveConfigListener>();

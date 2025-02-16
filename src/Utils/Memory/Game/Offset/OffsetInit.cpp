@@ -4,16 +4,54 @@
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
+void OffsetInit::init2160() {
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.6X");
+    ADD_OFFSET("Player::gamemode", 0xAD8);
+    ADD_OFFSET("Player::playerName", 0xC58);
+    ADD_OFFSET("Player::playerInventory", 0x5C8);
+
+    ADD_OFFSET("GuiData::ScreenSize", 0x40);
+    ADD_OFFSET("GuiData::ScreenSizeScaled", 0x50);
+    ADD_OFFSET("GuiData::GuiScale", 0x5C);
+    ADD_OFFSET("GuiData::screenResRounded", 0x48);
+    ADD_OFFSET("GuiData::sliderAmount", 0x5C);
+    ADD_OFFSET("GuiData::scalingMultiplier", 0x60);
+
+    ADD_OFFSET("Item::AtlasTextureFile", 0xB0);
+    ADD_OFFSET("Item::Namespace", 0x100);
+    ADD_OFFSET("Item::name",0xD8);
+
+    ADD_OFFSET("Level::getPlayerMap", 0xB68);
+
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x328);
+    ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x610);
+
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x6B8);
+}
+
 void OffsetInit::init2150() {
     Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.5X");
     ADD_OFFSET("Actor::hurtTime", 0x19C);
     ADD_OFFSET("Actor::level", 0x1D8);
     ADD_OFFSET("Actor::categories", 0x210);
-    ADD_OFFSET("Level::hitResult", 0x218);
+
     ADD_OFFSET("Player::gamemode", 0xB18);
     ADD_OFFSET("Player::playerName", 0xCA0);
+
     ADD_OFFSET("Player::playerInventory", 0x5D0);
+
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x6E4);
+
+    ADD_OFFSET("MoveInputComponent::forward", 0xD);
+    ADD_OFFSET("MoveInputComponent::backward", 0xE);
+    ADD_OFFSET("MoveInputComponent::left", 0xF);
+    ADD_OFFSET("MoveInputComponent::right", 0x10);
+
+    ADD_OFFSET("MoveInputComponent::sneaking", 0x28);
+    ADD_OFFSET("MoveInputComponent::jumping", 0x2F);
+    ADD_OFFSET("MoveInputComponent::sprinting", 0x30);
+
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x760);
 }
 
 void OffsetInit::init2140() {

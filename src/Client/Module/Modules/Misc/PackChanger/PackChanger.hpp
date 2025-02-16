@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Module.hpp"
+#include "src/Client/Module/Modules/Module.hpp"
 
-class PackChanger : public Module {
+class PackChanger : public Listener {
 private:
     bool queueReset = false;
     bool canRender = false;
@@ -13,11 +13,12 @@ private:
     bool forcePreGame = false;
     bool canUseKeys = false;
 
+    std::string last_tab = "";
+
     static inline std::array<std::byte, 6> patch1Data;
     static inline std::array<std::byte, 2> patch2Data;
 public:
-    PackChanger() : Module("PackChanger", "Allows you to change packs in world/server.", IDR_AUTORQ_PNG, "") {
-
+    PackChanger() {
         if(VersionUtils::checkAboveOrEqual(21,00)) {
             static auto src = VersionUtils::checkAboveOrEqual(21,20) ? GET_SIG_ADDRESS("ResourcePackManager::_composeFullStack_Patch") : GET_SIG_ADDRESS("MinecraftGame::_onActiveResourcePacksChanged_Patch");
             Memory::copyBytes((void*)src, patch1Data.data(), patch1Data.size());
@@ -26,10 +27,14 @@ public:
         static auto src1 = GET_SIG_ADDRESS("SettingsScreenOnExit_Patch");
         Memory::copyBytes((void*)src1, patch2Data.data(), patch2Data.size());
 
-        Module::setup();
+        Init();
     };
 
-    void onEnable() override {
+    ~PackChanger() {
+        Deactivate();
+    }
+
+    void Init() {
         patchComposeFullStack();
         canRender = true;
         canUseKeys = true;
@@ -38,27 +43,25 @@ public:
         Listen(this, isPreGameEvent, &PackChanger::onIsPreGame); // unlocking buttons
         Listen(this, PacksLoadEvent, &PackChanger::onPacksLoad);
         Listen(this, RenderOrderExecuteEvent, &PackChanger::onRenderOrderExecute); // stops most 3D level rendering
-        Listen(this, RenderChunkCoordinatorPreRenderTickEvent, &PackChanger::onRenderChunkCoordinatorPreRenderTick); // stops chunks from re-generating
+        Listen(this, HandleVisibilityUpdatesEvent, &PackChanger::onHandleVisibilityUpdates); // stops chunks from re-generating
         Listen(this, BeforeSettingsScreenOnExitEvent, &PackChanger::onBeforeSettingsScreenOnExit);
         Listen(this, AfterSettingsScreenOnExitEvent, &PackChanger::onAfterSettingsScreenOnExit);
         Listen(this, GeneralSettingsScreenControllerOnCreateEvent, &PackChanger::onGeneralSettingsScreenControllerOnCreate);
-        Module::onEnable();
     }
 
-    void onDisable() override {
+    void Deactivate() {
         unpatchComposeFullStack();
         Deafen(this, KeyEvent, &PackChanger::onKey);
         Deafen(this, SetupAndRenderEvent, &PackChanger::onSetupAndRender);
         Deafen(this, isPreGameEvent, &PackChanger::onIsPreGame);
         Deafen(this, PacksLoadEvent, &PackChanger::onPacksLoad);
         Deafen(this, RenderOrderExecuteEvent, &PackChanger::onRenderOrderExecute);
-        Deafen(this, RenderChunkCoordinatorPreRenderTickEvent, &PackChanger::onRenderChunkCoordinatorPreRenderTick);
+        Deafen(this, HandleVisibilityUpdatesEvent, &PackChanger::onHandleVisibilityUpdates);
         Deafen(this, BeforeSettingsScreenOnExitEvent, &PackChanger::onBeforeSettingsScreenOnExit);
         Deafen(this, AfterSettingsScreenOnExitEvent, &PackChanger::onAfterSettingsScreenOnExit);
         Deafen(this, GeneralSettingsScreenControllerOnCreateEvent, &PackChanger::onGeneralSettingsScreenControllerOnCreate);
         canRender = true;
         canUseKeys = true;
-        Module::onDisable();
     }
 
     void onKey(KeyEvent &event) {
@@ -66,10 +69,6 @@ public:
             event.cancel(); // prevent users from closing pack loading menu
         }
     }
-
-    void defaultConfig() override {}
-
-    void settingsRender(float settingsOffset) override {}
 
     void onGeneralSettingsScreenControllerOnCreate(GeneralSettingsScreenControllerOnCreateEvent &event) {
         event.unlockPackMenu();
@@ -106,7 +105,7 @@ public:
         }
     }
 
-    void onRenderChunkCoordinatorPreRenderTick(RenderChunkCoordinatorPreRenderTickEvent &event) {
+    void onHandleVisibilityUpdates(HandleVisibilityUpdatesEvent &event) {
         // stops chunks from updating
         if(!canRender || queueReset || forcePreGame) event.cancel();
     }
@@ -141,7 +140,7 @@ public:
             if (queueReset) {
                 if(!enableFrameQueue) {
                     enableFrameQueue = true;
-                    frameQueue = 20;
+                    frameQueue = 2;
                 }
                 if(frameQueue == 0) {
                     queueReset = false;
@@ -155,7 +154,7 @@ public:
             if (!canRender && !SwapchainHook::queueReset && SwapchainHook::init) {
                 if(!enableFrameQueue) {
                     enableFrameQueue = true;
-                    frameQueue = 20;
+                    frameQueue = 2;
                 }
             }
         }
@@ -164,7 +163,12 @@ public:
     void onIsPreGame(isPreGameEvent &event) {
         if(!SDK::clientInstance) return;
         auto name = SDK::clientInstance->getScreenName();
-        bool value = event.getState() || forcePreGame || name == "screen_world_controls_and_settings - global_texture_pack_tab";
+        auto topScreenName = SDK::clientInstance->getTopScreenName();
+        if(name.find("screen_world_controls_and_settings - ") != std::string::npos) {
+            last_tab = name;
+        };
+        static std::string tab = "screen_world_controls_and_settings - global_texture_pack_tab";
+        bool value = event.getState() || forcePreGame || name == tab || last_tab == tab && name == "screen";
         event.setState(value);
     }
 

@@ -227,13 +227,22 @@ entity_alphatest_change_color_glint to vtable then to ItemRenderer::render (like
 ### ItemStack::getDamageValue
 used in a lot of func, could be found by looking through "Damage" string refs, should have something like v1 = *(_QWORD **)(a1 + 8) at the start
 
-# GeneralSettingsScreenController::GeneralSettingsScreenController
+### GeneralSettingsScreenController::GeneralSettingsScreenController
 "GeneralSettingsScreenController", tho on some lower versions this string is not present
 
-# SettingsScreenOnExit
+### SettingsScreenOnExit
 search for "create_world_button" / "navigation_tab" first ref, go to "button.menu_exit", were in SettingsScreenController::_registerEventHandlers, above it is vtable, 3rd func is it (if lower then 21.2X its not inlined so go 1 layer deeper)
 
-# LevelRendererCamera::_releaseResources
+### LevelRendererCamera::_releaseResources
 "Queueing renderchunk for build&sort" -> LevelBuilder::scheduleChunkBuild -> RenderChunkShared::startRebuild -> RenderChunkGeometry::RenderChunkGeometry -> RenderChunkGeometry::reset -> 4 refs to LevelRendererCamera::_releaseResources
 Or from its vtable at runtime, its near start
 Also OP sig to it: 48 89 ? ? ? 48 89 ? ? ? 57 48 83 EC ? 48 8B ? ? ? ? ? 48 8B ? 48 8B ? ? ? ? ? 48 8B ? ? ? ? ? 48 3B ? 74 ? 0F 1F
+
+### MinecraftPackets::createPacket
+"UnknownPacket" - above it
+
+### RenderChunkCoordinator::preRenderTick
+"renderChunkShared marked dirty"
+
+### LevelRenderer::preRenderUpdate
+1 ref out from RenderChunkCoordinator::preRenderTick

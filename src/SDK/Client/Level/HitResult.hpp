@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SDK/Client/Actor/EntityContext.hpp>
 #include "../../../Utils/Utils.hpp"
 
 struct BlockPos {
@@ -23,6 +24,10 @@ enum class FacingID : char {
     East = 5,
 };
 
+struct WeakStorageEntity {
+    std::weak_ptr<V1_20_50::EntityContext> registry;
+    EntityId id;
+};
 
 class HitResult {
 public:
@@ -32,6 +37,12 @@ public:
     FacingID facing;
     BlockPos blockPos;
     Vec3<float> pos;
+    WeakStorageEntity entity;
+    bool isHitLiquid;
+    FacingID liquidFacing;
+    BlockPos liquid;
+    Vec3<float> liquidPos;
+    bool indirectHit;
 
     class Actor* getEntity();
     [[nodiscard]] float distance() const;

@@ -31,5 +31,5 @@
 #include "Render/SetTopScreenNameEvent.hpp"
 #include "Render/SetupAndRenderEvent.hpp"
 #include "Render/RenderOrderExecuteEvent.hpp"
-#include "Render/RenderChunkCoordinatorPreRenderTickEvent.hpp"
+#include "Render/HandleVisibilityUpdatesEvent.hpp"
 #include "Render/UIControlGetPositionEvent.hpp"
