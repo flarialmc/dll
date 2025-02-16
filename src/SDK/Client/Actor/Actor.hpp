@@ -247,4 +247,6 @@ public:
     AABB getLerpedAABB(bool asHitbox = false);
 
     std::vector<UnifiedMobEffectData> getMobEffects();
+
+    //class SerializedSkin* getSkin();
 };

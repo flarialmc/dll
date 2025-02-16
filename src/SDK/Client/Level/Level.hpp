@@ -26,7 +26,6 @@ public:
     std::string name, XUID, platformOnlineId;
     int buildPlatform;
     char filler[0x164];
-    //SerializedSkin skin;
     bool isTeacher, isHost;
 };
 

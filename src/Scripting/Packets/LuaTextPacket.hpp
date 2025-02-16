@@ -24,10 +24,15 @@ namespace LuaTextPacket {
         lua_newtable(L);
         //push values
         pushKeyPair(L,"type", TextPacket::typeToString(pkt->type).c_str());
-        pushKeyPair(L,"name", pkt->name.c_str());
-        pushKeyPair(L,"message", pkt->message.c_str());
-        pushKeyPair(L,"xuid", pkt->xuid.c_str());
-        pushKeyPair(L,"platformId", "Soon™");
+
+        const char* nameStr = pkt->name.c_str();
+        pushKeyPair(L, "name", (nameStr && *nameStr) ? nameStr : ":)");
+
+        const char* messageStr = pkt->message.c_str();
+        pushKeyPair(L, "message", (messageStr && *messageStr) ? messageStr : ":)");
+
+        const char* xuidStr = pkt->xuid.c_str();
+        pushKeyPair(L, "xuid", (xuidStr && *xuidStr) ? xuidStr : ":)");
         return 1;
     }
 
