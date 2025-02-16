@@ -25,6 +25,36 @@ class BaseActorRendererRenderTextHook : public Hook {
         if (MaterialUtils::getUITextured() == nullptr)
             MaterialUtils::update();
 
+        static std::map<std::string, std::string> roleLogos = {
+                {"Regular", "red-logo.png"},
+                {"Dev", "dev-logo.png"},
+                {"Gamer", "gamer-logo.png"},
+                {"Booster", "booster-logo.png"}
+        };
+
+        static std::map<std::string, TexturePtr> roleLogoTextures{};
+
+        TexturePtr ptr{};
+
+        for (const auto& [role, logo] : roleLogos) {
+            if (APIUtils::hasRole(role, clearedName)) {
+                ResourceLocation loc = { Utils::getAssetsPath() + "\\" + logo, true };
+                auto has_value = roleLogoTextures.find(role) != roleLogoTextures.end();
+                if(!has_value) {
+                    roleLogoTextures[role] = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
+                    ptr = roleLogoTextures[role];
+                } else {
+                    ptr = roleLogoTextures[role];
+                    if(ptr.clientTexture == nullptr)
+                        ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
+                }
+                break;
+            }
+        }
+
+        if(ptr.clientTexture == nullptr)
+            return;
+
         constexpr float DEG_RAD = 180.0f / 3.1415927f;
 
         const auto rotPos = cameraPos.sub(tagPos);
@@ -45,24 +75,6 @@ class BaseActorRendererRenderTextHook : public Hook {
 
         const auto mScale = 0.026666669f; // 0.16f
         matrix = scale(matrix, {mScale * -1, mScale * -1, mScale});
-
-        // Default to red logo if no matching role is found
-        ResourceLocation loc(Utils::getAssetsPath() + "\\red-logo.png", true);
-
-        std::map<std::string, std::string> roleLogos = {
-            {"Dev", "dev-logo.png"},
-            {"Gamer", "gamer-logo.png"},
-            {"Booster", "booster-logo.png"}
-        };
-
-        for (const auto& [role, logo] : roleLogos) {
-            if (APIUtils::hasRole(role, clearedName)) {
-                loc = { Utils::getAssetsPath() + "\\" + logo, true };
-                break;
-            }
-        }
-
-        TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
 
         const float fontHeight = font->getLineHeight();
         float x;

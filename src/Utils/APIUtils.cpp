@@ -88,7 +88,9 @@ nlohmann::json APIUtils::getUsers() {
 bool APIUtils::hasRole(const std::string& role, const std::string& name) {
     try {
         auto it = onlineVips.find(name);
-        return it != onlineVips.end() && it->second == role;
+        bool onlineVip = it != onlineVips.end() && it->second == role;
+        bool online = std::find(onlineUsers.begin(), onlineUsers.end(), name) != onlineUsers.end();
+        return onlineVip || (!onlineVip && online && role == "Regular");
     } catch (const std::exception& e) {
         Logger::error("An error occurred while checking roles: {}", e.what());
         return false;
