@@ -147,6 +147,11 @@ HRESULT (*SwapchainHook::IDXGIFactory2_CreateSwapChainForCoreWindow)
 HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknown *pDevice, IUnknown *pWindow,
                                                     DXGI_SWAP_CHAIN_DESC1 *pDesc, IDXGIOutput *pRestrictToOutput,
                                                     IDXGISwapChain1 **ppSwapChain) {
+    auto vsync = !Client::settings.getSettingByName<bool>("vsync")->value;
+    currentVsyncState = vsync;
+    if(vsync)
+        return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
+
     ID3D12CommandQueue *pCommandQueue = NULL;
     if (Client::settings.getSettingByName<bool>("killdx")->value &&
         !pDevice->QueryInterface(IID_PPV_ARGS(&pCommandQueue)) && !queueReset) {
@@ -195,8 +200,9 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         return DXGI_ERROR_DEVICE_RESET;
     }
 
-    if (!fEnabled) {
-        return DXGI_ERROR_DEVICE_RESET;
+    if(currentVsyncState != !Client::settings.getSettingByName<bool>("vsync")->value) {
+        queueReset = true;
+        return funcOriginal(pSwapChain, syncInterval, flags);
     }
 
     swapchain = pSwapChain;
@@ -259,7 +265,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     } catch (const std::exception &ex) { return 0; }
 
 
-    if (Client::settings.getSettingByName<bool>("vsync")->value) {
+    if (!SwapchainHook::currentVsyncState) {
         return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
     }
 
@@ -754,7 +760,7 @@ void SwapchainHook::Fonts() {
         if (!FlarialGUI::FontMap["162-1"]) {
             ImFontConfig config;
 
-            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting | ImGuiFreeTypeBuilderFlags_MonoHinting;
+            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_Monochrome | ImGuiFreeTypeBuilderFlags_MonoHinting;
 
             FlarialGUI::FontMap["162-1"] = io.Fonts->AddFontFromFileTTF(
                     (Utils::getAssetsPath() + "\\162" + ".ttf").c_str(), 23, &config,
@@ -767,7 +773,7 @@ void SwapchainHook::Fonts() {
 
         if (!FlarialGUI::FontMap["163-1"]) {
             ImFontConfig config;
-            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting | ImGuiFreeTypeBuilderFlags_MonoHinting;
+            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_Monochrome | ImGuiFreeTypeBuilderFlags_MonoHinting;
             FlarialGUI::FontMap["163-1"] = io.Fonts->AddFontFromFileTTF(
                     (Utils::getAssetsPath() + "\\163" + ".ttf").c_str(), 23, &config,
                     io.Fonts->GetGlyphRangesDefault());
@@ -780,7 +786,7 @@ void SwapchainHook::Fonts() {
 
         if (!FlarialGUI::FontMap["164-1"]) {
             ImFontConfig config;
-            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting | ImGuiFreeTypeBuilderFlags_MonoHinting;
+            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_Monochrome | ImGuiFreeTypeBuilderFlags_MonoHinting;
             FlarialGUI::FontMap["164-1"] = io.Fonts->AddFontFromFileTTF(
                     (Utils::getAssetsPath() + "\\164" + ".ttf").c_str(), 24, &config,
                     io.Fonts->GetGlyphRangesDefault());
