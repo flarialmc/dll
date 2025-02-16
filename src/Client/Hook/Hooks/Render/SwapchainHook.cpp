@@ -147,10 +147,6 @@ HRESULT (*SwapchainHook::IDXGIFactory2_CreateSwapChainForCoreWindow)
 HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknown *pDevice, IUnknown *pWindow,
                                                     DXGI_SWAP_CHAIN_DESC1 *pDesc, IDXGIOutput *pRestrictToOutput,
                                                     IDXGISwapChain1 **ppSwapChain) {
-    auto vsync = !Client::settings.getSettingByName<bool>("vsync")->value;
-    currentVsyncState = vsync;
-    if(vsync)
-        return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
 
     ID3D12CommandQueue *pCommandQueue = NULL;
     if (Client::settings.getSettingByName<bool>("killdx")->value &&
@@ -158,6 +154,13 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
         pCommandQueue->Release();
         return DXGI_ERROR_INVALID_CALL;
     }
+
+    pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
+
+    auto vsync = !Client::settings.getSettingByName<bool>("vsync")->value;
+    currentVsyncState = vsync;
+    if(vsync)
+        return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
 
     std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
 
@@ -175,7 +178,6 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
         pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     }
 
-    pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
     pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
     // Gives error rn probably because fmt doesnt know how to handle it
     //Logger::info("Swap Effect: {}", pDesc->SwapEffect);
@@ -190,6 +192,11 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
     if (Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
+
+    if(!fD3D11 && Client::settings.getSettingByName<bool>("killdx")->value) {
+        fD3D11 = true;
+        return DXGI_ERROR_DEVICE_RESET;
+    }
 
     if (queueReset) {
         init = false;
@@ -286,6 +293,8 @@ void SwapchainHook::DX11Init() {
     swapchain->GetDevice(IID_PPV_ARGS(&d3d11Device));
     IDXGISurface1 *eBackBuffer;
     swapchain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
+
+    if(!eBackBuffer) return;
 
     D2D1CreateDeviceContext(eBackBuffer, properties, &D2D::context);
 
