@@ -38,12 +38,13 @@ public:
     }
 
     void onEnable() override {
-        Listen(this, TickEvent, &RenderOptions::onTick)
+        Listen(this, SetupAndRenderEvent, &RenderOptions::onSetupAndRender)
         Module::onEnable();
+        updateSetings();
     }
 
     void onDisable() override {
-        Deafen(this, TickEvent, &RenderOptions::onTick)
+        Deafen(this, SetupAndRenderEvent, &RenderOptions::onSetupAndRender)
         Module::onDisable();
         updateSetings();
     }
@@ -146,7 +147,7 @@ public:
         FlarialGUI::UnsetScrollView();
     }
 
-    void onTick(TickEvent &event) {
+    void onSetupAndRender(SetupAndRenderEvent &event) {
         if(Options::isInitialized()) {
             updateSetings();
         };
