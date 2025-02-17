@@ -6,6 +6,7 @@
 #include <Client/Module/Manager.hpp>
 #include <Scripting/Libs/Flarial/Mixins/LuaMixin.hpp>
 #include <Scripting/Libs/ocornut/imgui/ImGui.hpp>
+#include <Scripting/Libs/Flarial/Utils/DrawUtil.hpp>
 #include "Functions/Player.hpp"
 #include "ScriptModuleBase.hpp"
 #include "Functions/GUI.hpp"
@@ -57,10 +58,10 @@ void Scripting::executeFunction(lua_State* L, std::string functionName, bool shi
 
 
 void Scripting::unloadModules(){
+    ScriptingEventManager::clearHandlers();
     for (auto& scriptModule : Scripting::luaScriptModules) {
-        lua_State *L = scriptModule.first;
-        Module *module = scriptModule.second;
-
+        std::shared_ptr<lua_State> L = scriptModule.first;
+        Module *module = scriptModule.second.get();
         if (module) {
             std::string name = module->name;
             size_t hash = std::hash<std::string>{}(name);
@@ -75,9 +76,8 @@ void Scripting::unloadModules(){
                 Logger::warn("Attempted to unload non-existent module '{}'.", name);
             }
         }
-
         if (L) {
-            lua_close(L);
+            lua_close(L.get());
         }
     }
 
@@ -117,6 +117,7 @@ void registerFunctions(lua_State* L){
     //libs
     LuaMixins::registerLib(L);
     LuaImGui::registerLib(L);
+    LuaDrawUtil::registerLib(L);
 }
 
 
@@ -143,7 +144,7 @@ void load(std::string name, std::string description, std::string mainclass) {
     }
 
     ModuleManager::addModule<ScriptModuleBase>(name, description, L);
-    auto mod = ModuleManager::getModule(name).get();
+    auto mod = ModuleManager::getModule(name);
     Scripting::luaScriptModules.emplace_back(L, mod);
     mod->defaultConfig();
     Scripting::scriptsAmountWithoutErrors++;

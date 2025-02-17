@@ -1,3 +1,4 @@
+#include <Scripting/Scripting.hpp>
 #include "Module.hpp"
 #include "../../Client.hpp"
 #include "../../Events/Events.hpp"
@@ -443,8 +444,8 @@ void Module::setup() {
     if(!isScripting())  defaultConfig();
     Module::defaultConfig();
     keybindActions.push_back([this] (std::vector<std::any> args)-> std::any {
-    this->active = !this->active;
-    return {};
+        this->active = !this->active;
+        return {};
     });
 
     onSetup();
@@ -481,6 +482,7 @@ void Module::terminate() {
 
 // TODO: find all getSettingByName<bool>("enabled")->value and replace!!!
 bool Module::isEnabled() {
+    if(isScripting() && !Scripting::instalized) return false;
     if(!settings.getSettingByName<bool>("enabled")) return false;
     return settings.getSettingByName<bool>("enabled")->value;
 }

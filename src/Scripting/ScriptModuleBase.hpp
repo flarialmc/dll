@@ -10,7 +10,7 @@
 
 class ScriptModuleBase : public Module {
 public:
-    lua_State* module_lua_state;
+    std::shared_ptr<lua_State> module_lua_state;
 
     ScriptModuleBase(const std::string& name, const std::string& description, lua_State* lua_state)
             : Module(name, description, IDR_TIME_PNG, "", true), module_lua_state(lua_state) {
@@ -32,12 +32,12 @@ public:
     }
 
     void onEnable() override {
-        Scripting::executeFunction(module_lua_state, "onEnable", true);
+        Scripting::executeFunction(module_lua_state.get(), "onEnable", true);
         Module::onEnable();
     }
 
     void onDisable() override {
-        Scripting::executeFunction(module_lua_state, "onDisable", true);
+        Scripting::executeFunction(module_lua_state.get(), "onDisable", true);
         Module::onDisable();
     }
 
@@ -45,7 +45,7 @@ public:
         if(settings.getSettingByName<std::string>("text") == nullptr)
             settings.addSetting("text", (std::string) "{VALUE}");
 
-        Scripting::executeFunction(module_lua_state, "defaultConfig", false);
+        Scripting::executeFunction(module_lua_state.get(), "defaultConfig", false);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -57,7 +57,7 @@ public:
         FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));
-        Scripting::executeFunction(module_lua_state, "settingsRender", false);
+        Scripting::executeFunction(module_lua_state.get(), "settingsRender", false);
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
     }
@@ -65,7 +65,7 @@ public:
     void onKey(KeyEvent& event) {
         if (!Scripting::instalized || !this->enabledState) return;
 
-        bool canceled = ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onKeyEvent,
+        bool canceled = ScriptingEventManager::triggerEvent(module_lua_state.get(), ScriptEvents::EventType::onKeyEvent,
                                             event.getKey(), event.getAction());
 
         if (canceled) {
@@ -76,7 +76,7 @@ public:
     void onMouse(MouseEvent& event) {
         if (!Scripting::instalized || !this->enabledState || event.getButton() == 0 || event.getAction() == 0) return;
 
-        bool canceled = ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onMouseEvent,
+        bool canceled = ScriptingEventManager::triggerEvent(module_lua_state.get(), ScriptEvents::EventType::onMouseEvent,
                                             (int)event.getButton(), (int)event.getAction());
         if (canceled) {
             event.cancel();
@@ -86,7 +86,7 @@ public:
     void onPacketReceive(PacketEvent &event) {
         if (!Scripting::instalized || !this->enabledState) return;
 
-        bool canceled = ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onPacketReceiveEvent,
+        bool canceled = ScriptingEventManager::triggerEvent(module_lua_state.get(), ScriptEvents::EventType::onPacketReceiveEvent,
                                             event.getPacket(), (int)event.getPacket()->getId());
         if (canceled) {
             event.cancel();
@@ -96,12 +96,12 @@ public:
     void onTickEvent(TickEvent& event) {
         if (!Scripting::instalized || !this->enabledState) return;
 
-        ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onTickEvent);
+        ScriptingEventManager::triggerEvent(module_lua_state.get(), ScriptEvents::EventType::onTickEvent);
     }
 
     void onRenderEvent(RenderEvent& event) {
         if (!Scripting::instalized || !this->enabledState) return;
 
-        ScriptingEventManager::triggerEvent(module_lua_state, ScriptEvents::EventType::onRenderEvent);
+        ScriptingEventManager::triggerEvent(module_lua_state.get(), ScriptEvents::EventType::onRenderEvent);
     }
 };

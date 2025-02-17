@@ -12,12 +12,12 @@ namespace Scripting {
     inline int scriptsAmountWithErrors = 0;
 
     inline bool instalized = false;
-    inline std::vector<std::pair<lua_State*, Module*>> luaScriptModules;
+    inline std::vector<std::pair<std::shared_ptr<lua_State>, std::shared_ptr<Module>>> luaScriptModules;
 
     inline Module* getModuleByState(lua_State* L) {
         for (const auto& pair : Scripting::luaScriptModules) {
-            if (pair.first == L) {
-                return pair.second;
+            if (pair.first.get() == L) {
+                return pair.second.get();
             }
         }
         return nullptr;
