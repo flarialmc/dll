@@ -13,6 +13,7 @@
 #include <string>
 
 #include <miniz/miniz.h>
+#include <Manager.hpp>
 
 std::string scriptPath() {
     using namespace winrt::Windows::Storage;
@@ -137,8 +138,7 @@ void LuaCommand::execute(const std::vector<std::string> &args) {
     } else if (action == "path") {
         WinrtUtils::openSubFolder("Flarial\\scripts");
     } else if (action == "reload") {
-        Scripting::unloadModules();
-        Scripting::loadModules();
+        ModuleManager::restartModules = true;
         addCommandMessage("§aReloaded scripts!");
     } else if (action == "import") {
         [this]() -> winrt::fire_and_forget {
