@@ -59,7 +59,9 @@ void HookManager::initialize() {
     addHook<SwapchainHook>();
     addHook<ResizeHook>();
 
-    addHook<TextureGroup_getTextureHook>();
+    if(VersionUtils::checkAboveOrEqual(21, 40)) {
+        addHook<TextureGroup_getTextureHook>();
+    }
     addHook<getViewPerspectiveHook>();
     addHook<RaknetTickHook>();
     addHook<SetUpAndRenderHook>();
