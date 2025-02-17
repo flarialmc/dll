@@ -769,7 +769,7 @@ void SwapchainHook::Fonts() {
         if (!FlarialGUI::FontMap["162-1"]) {
             ImFontConfig config;
 
-            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_Monochrome | ImGuiFreeTypeBuilderFlags_MonoHinting;
+            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
 
             FlarialGUI::FontMap["162-1"] = io.Fonts->AddFontFromFileTTF(
                     (Utils::getAssetsPath() + "\\162" + ".ttf").c_str(), 23, &config,
@@ -782,7 +782,7 @@ void SwapchainHook::Fonts() {
 
         if (!FlarialGUI::FontMap["163-1"]) {
             ImFontConfig config;
-            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_Monochrome | ImGuiFreeTypeBuilderFlags_MonoHinting;
+            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
             FlarialGUI::FontMap["163-1"] = io.Fonts->AddFontFromFileTTF(
                     (Utils::getAssetsPath() + "\\163" + ".ttf").c_str(), 23, &config,
                     io.Fonts->GetGlyphRangesDefault());
