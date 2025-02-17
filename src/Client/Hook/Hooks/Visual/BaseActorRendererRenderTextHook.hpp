@@ -45,14 +45,14 @@ class BaseActorRendererRenderTextHook : public Hook {
                     ptr = roleLogoTextures[role];
                 } else {
                     ptr = roleLogoTextures[role];
-                    if(ptr.clientTexture == nullptr)
+                    if(ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr)
                         ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
                 }
                 break;
             }
         }
 
-        if(ptr.clientTexture == nullptr)
+        if(ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr)
             return;
 
         constexpr float DEG_RAD = 180.0f / 3.1415927f;
