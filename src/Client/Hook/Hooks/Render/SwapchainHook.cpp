@@ -193,7 +193,7 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
     if (Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
 
-    if(!fD3D11 && Client::settings.getSettingByName<bool>("killdx")->value) {
+    if(!fEnabled && !fD3D11 && Client::settings.getSettingByName<bool>("killdx")->value) {
         fD3D11 = true;
         return DXGI_ERROR_DEVICE_RESET;
     }
