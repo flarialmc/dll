@@ -26,13 +26,13 @@ namespace LuaTextPacket {
         pushKeyPair(L,"type", TextPacket::typeToString(pkt->type).c_str());
 
         const char* nameStr = pkt->name.c_str();
-        pushKeyPair(L, "name", (nameStr && *nameStr) ? nameStr : ":)");
+        pushKeyPair(L, "name", (nameStr && *nameStr && strlen(nameStr) > 0) ? nameStr : ":)");
 
         const char* messageStr = pkt->message.c_str();
-        pushKeyPair(L, "message", (messageStr && *messageStr) ? messageStr : ":)");
+        pushKeyPair(L, "message", (messageStr && *messageStr && strlen(messageStr) > 0) ? messageStr : ":)");
 
         const char* xuidStr = pkt->xuid.c_str();
-        pushKeyPair(L, "xuid", (xuidStr && *xuidStr) ? xuidStr : ":)");
+        pushKeyPair(L, "xuid", (xuidStr && *xuidStr && strlen(xuidStr) > 0) ? xuidStr : ":)");
         return 1;
     }
 
