@@ -7,6 +7,7 @@
 #include "Game/UpdatePlayerEvent.hpp"
 #include "Game/isPreGameEvent.hpp"
 #include "Game/PacksLoadEvent.hpp"
+#include "Game/ContainerSlotHovered.hpp"
 #include "Game/AfterSettingsScreenOnExitEvent.hpp"
 #include "Game/BeforeSettingsScreenOnExitEvent.hpp"
 
