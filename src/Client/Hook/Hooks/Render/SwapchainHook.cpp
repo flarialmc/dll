@@ -196,6 +196,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     if(!fEnabled && !fD3D11 && Client::settings.getSettingByName<bool>("killdx")->value) {
         fD3D11 = true;
         return DXGI_ERROR_DEVICE_RESET;
+    } else {
+        fEnabled = true;
     }
 
     if (queueReset) {
