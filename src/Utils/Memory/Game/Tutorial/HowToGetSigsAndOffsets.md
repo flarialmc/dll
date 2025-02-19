@@ -144,6 +144,9 @@ Found near getActorFlag first param is basicReg, second is runtimeID
 # VTable Indexes
 Memory::GetAddressByIndex(vtableAddr, function
 
+### ContainerScreenController::_handlePlaceAll
+"#is_creative_and_recipe_book_layout" (CraftingScreenController::_registerBindings) xref out -> CraftingScreenController::CraftingScreenController -> CraftingScreenController::`vftable' -> _handlePlaceAll
+
 ### ClientInstance::getScreenName
 "content_area" x3 + "focus_reset_input_panel" + "ScreenVersion"
 at the end 2 arg func calls it by index:
@@ -246,3 +249,13 @@ Also OP sig to it: 48 89 ? ? ? 48 89 ? ? ? 57 48 83 EC ? 48 8B ? ? ? ? ? 48 8B ?
 
 ### LevelRenderer::preRenderUpdate
 1 ref out from RenderChunkCoordinator::preRenderTick
+
+### ContainerScreenController::_handleTakeAll
+
+"button.anvil_take_all_place_all" ->
+v81 = off_144EA79E0; <- the vtable
+v82 = v74;
+v84 = &v81;
+sub_1403E13C0(v56, 2 <- make sure its 2, (__int64)&v81, (__int64)&v77, 0);
+
+Then to 3rd func in vtable -> first 3arg func there (or 1 func deeper if below 1.21.40)

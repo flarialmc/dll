@@ -78,6 +78,7 @@
 #include "Modules/PotionHUD/PotionHUD.hpp"
 #include "Modules/FasterInventory/FasterInventory.hpp"
 #include "Modules/Waypoints/Waypoints.hpp"
+#include "Modules/JavaInventoryHotkeys/JavaInventoryHotkeys.hpp"
 
 #include "Modules/EntityCounter/EntityCounter.hpp"
 #include "Modules/MovableHUD/MovableHUD.hpp"
@@ -188,6 +189,10 @@ void ModuleManager::initialize() {
     addModule<MovableHotbar>();
     // addModule<CompactChat>();
     addModule<ItemPhysics>();
+
+    if (VersionUtils::checkAboveOrEqual(21, 60)) {
+        addModule<JavaInventoryHotkeys>();
+    }
 
     addModule<HiveStat>();
     addModule<Waypoints>();

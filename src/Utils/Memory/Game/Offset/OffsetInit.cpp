@@ -114,6 +114,9 @@ void OffsetInit::init2130() {
     ADD_OFFSET("MoveInputComponent::backward", 0x2D);
     ADD_OFFSET("MoveInputComponent::left", 0x2E);
     ADD_OFFSET("MoveInputComponent::right", 0x2F);
+
+    // 48 8B ? ? ? ? ? EB ? 48 8B ? ? ? ? ? FF 15 ? ? ? ? 44 8B ? ? 48 8B
+    ADD_OFFSET("ContainerScreenController::_handlePlaceAll", 56);
 }
 
 void OffsetInit::init2120() {

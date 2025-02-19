@@ -15,7 +15,7 @@
 #include "Hooks/Visual/OverworldFogColorHook.hpp"
 #include "Hooks/Visual/TimeChangerHook.hpp"
 #include "Hooks/Game/getSensHook.hpp"
-#include "Hooks/Game/onContainerSlotHoveredHook.hpp"
+#include "Hooks/Game/ContainerScreenControllerHook.hpp"
 #include "Hooks/Render/TextureGroup_getTextureHook.hpp"
 #include "Hooks/Render/HudMobEffectsRenderer.hpp"
 #include "Hooks/Visual/BaseActorRendererRenderTextHook.hpp"
@@ -87,7 +87,7 @@ void HookManager::initialize() {
     addHook<UIControl_updateCachedPositionHook>();
     addHook<GeneralSettingsScreenControllerCtorHook>();
     if(VersionUtils::checkAboveOrEqual(21, 60)) {
-        addHook<getCollectionIndexHook>();
+        addHook<ContainerScreenControllerHook>();
     }
 
     addHook<isPreGameHook>();
