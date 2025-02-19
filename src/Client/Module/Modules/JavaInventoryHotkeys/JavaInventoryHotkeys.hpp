@@ -100,8 +100,10 @@ public:
     void onContainerTick(ContainerScreenControllerTickEvent &event) {
         auto controller = event.getContainerScreenController();
         if(!controller) return;
+
         for (moveRequests; !moveRequests.empty(); moveRequests.pop()) {
             auto request = moveRequests.front();
+
             controller->swap(request.collectionName, request.hoveredSlot, "hotbar_items", request.destSlot);
         }
     };
