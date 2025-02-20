@@ -12,6 +12,7 @@
 #include "src/Utils/Logger/crashlogs.hpp"
 #include "src/Client/Module/Modules/Nick/NickModule.hpp"
 #include "src/Client/Command/CommandManager.hpp"
+#include "src/SDK/Client/Options/OptionsParser.hpp"
 
 std::chrono::steady_clock::time_point lastBeatTime;
 std::chrono::steady_clock::time_point lastVipFetchTime;
@@ -29,6 +30,9 @@ DWORD WINAPI init() {
     float elapsed = (Utils::getCurrentMs() - start) / 1000.0;
 
     Logger::success("Flarial initialized in {:.2f}s", elapsed);
+
+    OptionsParser parser;
+    parser.parseOptionsFile();
 
     std::thread statusThread([]() {
     while (!Client::disable) {
