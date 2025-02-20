@@ -3,7 +3,6 @@
 #include "../../../Client.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 
-
 KeyHook::KeyHook() : Hook("key_hook", GET_SIG_ADDRESS("Keyboard::feed")) {}
 
 void KeyHook::enableHook() {

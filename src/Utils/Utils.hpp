@@ -258,7 +258,6 @@ struct AABB {
 class Utils {
 public:
     static std::string getRoamingPath();
-    static std::string getLocalPath();
     static std::string getClientPath();
     static std::string getConfigsPath();
     static std::string getAssetsPath();
