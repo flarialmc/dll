@@ -996,7 +996,7 @@ public:
             radioX = navx - Constraints::SpacingConstraint(-0.36f, logoWidth);
             radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
 
-            radioPushAmount2 = Constraints::SpacingConstraint(0.9f * 6.45f, logoWidth) + width1 + width2 + width3;
+            radioPushAmount2 = Constraints::SpacingConstraint(0.9f * 6.45f, logoWidth) + width1 + width2;
             radioX += radioPushAmount2;
             round = Constraints::RoundingConstraint(17.5f, 17.5f);
 
