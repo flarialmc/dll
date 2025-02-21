@@ -103,6 +103,72 @@ public:
     LuaLib getLib(const std::string& libName) {
         return LuaLib(L, libName);
     }
+
+
+    class LuaDynamicClass {
+    private:
+        lua_State* L;
+        std::string className;
+
+        static int indexFunction(lua_State* L) {
+            lua_getmetatable(L, 1);
+            lua_pushvalue(L, 2);
+            lua_rawget(L, -2);
+            return 1;
+        }
+
+        static int newInstance(lua_State* L) {
+            luaL_checktype(L, 1, LUA_TTABLE);
+            lua_newtable(L);
+            lua_pushvalue(L, 1);
+            lua_setmetatable(L, -2);
+            return 1;
+        }
+
+    public:
+        LuaDynamicClass(lua_State* state, const std::string& name) : L(state), className(name) {
+            luaL_newmetatable(L, className.c_str());
+
+            lua_pushcfunction(L, indexFunction);
+            lua_setfield(L, -2, "__index");
+
+            lua_pushcfunction(L, newInstance);
+            lua_setfield(L, -2, "new");
+        }
+
+        LuaDynamicClass& registerFunction(const std::string& functionName, lua_CFunction func) {
+            lua_pushcfunction(L, func);
+            lua_setfield(L, -2, functionName.c_str());
+            return *this;
+        }
+
+        LuaDynamicClass& registerLambdaFunction(const std::string& functionName, std::function<int(lua_State*)> handler) {
+            auto wrapper = [](lua_State* L) -> int {
+                auto* handlerPtr = static_cast<std::function<int(lua_State*)>*>(lua_touserdata(L, lua_upvalueindex(1)));
+                return handlerPtr ? (*handlerPtr)(L) : 0;
+            };
+
+            auto* handlerPtr = new std::function<int(lua_State*)>(handler);
+            lua_pushlightuserdata(L, handlerPtr);
+            lua_pushcclosure(L, wrapper, 1);
+            lua_setfield(L, -2, functionName.c_str());
+            return *this;
+        }
+
+        void pushInstanceToLua() {
+            lua_newtable(L);
+            luaL_getmetatable(L, className.c_str());
+            lua_setmetatable(L, -2);
+        }
+
+        ~LuaDynamicClass() {
+            lua_setglobal(L, className.c_str());
+        }
+    };
+
+    LuaDynamicClass getDynamicClass(const std::string& className) {
+        return LuaDynamicClass(L, className);
+    }
 };
 
 namespace LuaPusher {

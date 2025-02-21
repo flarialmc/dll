@@ -7,6 +7,7 @@
 #include <Scripting/Libs/Flarial/Mixins/LuaMixin.hpp>
 #include <Scripting/Libs/ocornut/imgui/ImGui.hpp>
 #include <Scripting/Libs/Flarial/Utils/DrawUtil.hpp>
+#include <Scripting/Libs/Flarial/Utils/LuaAudio.hpp>
 #include "Functions/Player.hpp"
 #include "ScriptModuleBase.hpp"
 #include "Functions/GUI.hpp"
@@ -106,10 +107,10 @@ void registerFunctions(lua_State* L){
     LuaModule::registerModule(L);
     LuaOnCommand::registerLuaOnCommand(L);
     LuaPackets::pushPacketTypesToLua(L);
-
     LuaInventory::registerFunctions(L);
     LuaItem::registerFunctions(L);
 
+    // Packets
     LuaTextPacket::registerFunctions(L);
     LuaPlaySoundPacket::registerFunctions(L);
     LuaSetTitlePacket::registerFunctions(L);
@@ -118,6 +119,7 @@ void registerFunctions(lua_State* L){
     LuaMixins::registerLib(L);
     LuaImGui::registerLib(L);
     LuaDrawUtil::registerLib(L);
+    LuaAudio::registerLib(L);
 }
 
 

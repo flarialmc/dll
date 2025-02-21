@@ -44,7 +44,7 @@ public:
         if (settings.getSettingByName<float>("thickness") == nullptr) settings.addSetting("thickness", 1.1f);
         if (settings.getSettingByName<bool>("staticThickness") == nullptr) settings.addSetting("staticThickness", false);
         if (settings.getSettingByName<bool>("outline") == nullptr) settings.addSetting("outline", false);
-        
+
     }
 
     void settingsRender(float settingsOffset) override {

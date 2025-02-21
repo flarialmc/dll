@@ -8,6 +8,7 @@
 #include <kiero/kiero.h>
 #include <wininet.h>
 #include <Utils/WinrtUtils.hpp>
+#include <Utils/Audio.hpp>
 
 #include "src/Utils/Logger/crashlogs.hpp"
 #include "src/Client/Module/Modules/Nick/NickModule.hpp"
@@ -24,7 +25,7 @@ DWORD WINAPI init() {
 
     uint64_t start = Utils::getCurrentMs();
     Logger::initialize();
-
+    Audio::init();
     Client::initialize();
 
     float elapsed = (Utils::getCurrentMs() - start) / 1000.0;
@@ -133,6 +134,8 @@ DWORD WINAPI init() {
     ModuleManager::terminate();
     HookManager::terminate();
     CommandManager::terminate();
+
+    Audio::cleanup();
 
     MH_DisableHook(MH_ALL_HOOKS);
     MH_Uninitialize();
