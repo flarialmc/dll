@@ -23,6 +23,7 @@ class WinrtUtils {
     static std::string getFormattedVersion();
 
     static winrt::Windows::Foundation::IAsyncOperation<winrt::Windows::Foundation::Collections::IVector<winrt::Windows::Storage::StorageFile>> pickFiles(std::wstring_view fileType = L"*");
+    static winrt::Windows::Foundation::IAsyncAction pickAndCopyFiles(std::wstring_view fileType, std::string path);
     static void launchURI(const std::string& uri);
     static void openSubFolder(const std::string& subFolder);
 

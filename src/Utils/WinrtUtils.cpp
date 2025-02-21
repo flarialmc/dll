@@ -4,6 +4,7 @@
 
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Utils.hpp>
+#include "../Client/GUI/Engine/Engine.hpp"
 
 #include <winrt/base.h>
 #include <winrt/Windows.Foundation.h>
@@ -103,6 +104,25 @@ winrt::Windows::Foundation::IAsyncOperation<winrt::Windows::Foundation::Collecti
 
     co_return result;
 }
+
+winrt::Windows::Foundation::IAsyncAction WinrtUtils::pickAndCopyFiles(std::wstring_view type = L"*", std::string path = "") {
+    using namespace winrt::Windows::Storage;
+    
+    StorageFolder targetFolder = co_await StorageFolder::GetFolderFromPathAsync(FlarialGUI::to_wide(Utils::getClientPath() + path));
+    auto pick = co_await WinrtUtils::pickFiles();
+
+    winrt::Windows::Storage::StorageFile file = pick.Size() > 0 ? pick.GetAt(0) : nullptr;
+
+    try {
+        co_await file.CopyAsync(targetFolder, file.Name(), NameCollisionOption::ReplaceExisting);
+    }
+    catch (winrt::hresult_error const& ex) {
+        Logger::error("Failed to copy file {}: {}", winrt::to_string(file.Name()), winrt::to_string(ex.message()));
+    }
+
+    co_return;
+}
+
 
 void WinrtUtils::launchURI(const std::string &uri) {
     using namespace winrt::Windows::Foundation;

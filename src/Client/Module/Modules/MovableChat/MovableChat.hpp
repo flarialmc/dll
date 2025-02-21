@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "../../Utils/WinrtUtils.hpp"
 
 class MovableChat : public Module {
 private:
@@ -12,9 +13,8 @@ private:
     Vec2<float> lastAppliedPos = Vec2<float>{0.0f, 0.0f};
     bool restored = false;
 public:
-    static inline std::string name = "Chat";
 
-    MovableChat() : Module("Movable " + name, "Makes the Minecraft " + name + " movable.", IDR_MOVABLE_PNG, "") {
+    MovableChat() : Module("Chat Tweaks", "Makes the Minecraft chat better.", IDR_MOVABLE_PNG, "") {
         Module::setup();
     };
 
@@ -24,6 +24,7 @@ public:
         Listen(this, SetupAndRenderEvent, &MovableChat::onSetupAndRender)
         Listen(this, RenderEvent, &MovableChat::onRender)
         Listen(this, UIControlGetPositionEvent, &MovableChat::onUIControlGetPosition)
+        Listen(this, PacketEvent, &MovableChat::onPacket)
 
         if (FlarialGUI::inMenu) {
             FlarialGUI::Notify("To change the position of the " + name +", Please click " +
@@ -41,6 +42,7 @@ public:
         Deafen(this, SetupAndRenderEvent, &MovableChat::onSetupAndRender)
         Deafen(this, RenderEvent, &MovableChat::onRender)
         Deafen(this, UIControlGetPositionEvent, &MovableChat::onUIControlGetPosition)
+        Deafen(this, PacketEvent, &MovableChat::onPacket)
 
         Module::onDisable();
     }
@@ -52,9 +54,52 @@ public:
         if (settings.getSettingByName<float>("percentageY") == nullptr) {
             settings.addSetting("percentageY", 0.0f);
         }
+        if (settings.getSettingByName<bool>("here") == nullptr) settings.addSetting("here", true);
+        if (settings.getSettingByName<bool>("pingsound") == nullptr) settings.addSetting("pingsound", true);
+        if (this->settings.getSettingByName<std::string>("sound") == nullptr) settings.addSetting("sound", (std::string)"Xp Orb");
+    }
+    void pac() {
+        WinrtUtils::pickAndCopyFiles(L"*", "\\assets");
+    }
+    void settingsRender(float settingsOffset) override {
+
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
+
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
+
+
+        FlarialGUI::ScrollBar(x, y, 140, 5000, 2);
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+            Constraints::RelativeConstraint(1.0, "width"),
+            Constraints::RelativeConstraint(0.88f, "height"));
+
+        this->addHeader("Misc");
+        this->addToggle("Ping Sound", "Plays a sound when you're mentioned in the chat.", settings.getSettingByName<bool>("pingsound")->value);
+        if (settings.getSettingByName<bool>("pingsound")->value)
+        {
+            this->addHeader("Ping Sound");
+            this->addDropdown("Sound", "Choose which sound to play", std::vector<std::string>{"Xp Orb", "Custom"}, this->settings.getSettingByName<std::string>("mode")->value);
+            
+            this->addButton("Choose Sound", "Choose a custom sound", "Choose", [this] {
+                pac();
+            });
+            this->addToggle("@here", "Plays the sound when you are mentioned via @here", settings.getSettingByName<bool>("here")->value);
+        }
+        FlarialGUI::UnsetScrollView();
+        this->resetPadding();
     }
 
-    void settingsRender(float settingsOffset) override {}
+    void onPacket(PacketEvent& event) {
+        Packet* packet = event.getPacket();
+        if (packet->getId() != MinecraftPacketIds::Text) return;
+
+        auto pkt = reinterpret_cast<TextPacket*>(packet);
+        std::string msg = pkt->message;
+        if (!pkt || msg.empty() || pkt->type != TextPacketType::CHAT) return;
+
+
+    }
 
     void onRender(RenderEvent &event) {
 

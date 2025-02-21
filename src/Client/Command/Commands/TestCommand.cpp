@@ -17,6 +17,9 @@ void TestCommand::execute(const std::vector<std::string> &args) {
     if (action == "pick") {
         WinrtUtils::pickFiles();
     }
+    if (action == "copy") {
+        WinrtUtils::pickAndCopyFiles(L"*", "\\assets");
+    }
     if (action == "notification") {
         WinrtUtils::showNotification("Flarial", "Hi");
     }
