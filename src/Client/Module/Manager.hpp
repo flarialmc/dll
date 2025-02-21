@@ -11,7 +11,7 @@ namespace ModuleManager {
 
     extern bool initialized;
     extern bool restartModules;
-    extern bool cguiRefresh = false;
+    extern bool cguiRefresh;
 
     void initialize();
 

@@ -166,8 +166,11 @@ public:
         }
     };
 
-    LuaDynamicClass getDynamicClass(const std::string& className) {
-        return LuaDynamicClass(L, className);
+    std::shared_ptr<LuaDynamicClass> getDynamicClass() {
+        auto now = std::chrono::system_clock::now();
+        auto duration = now.time_since_epoch();
+        auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+        return std::make_shared<LuaDynamicClass>(L, std::string("dc_" + std::to_string(timestamp)));
     }
 };
 
