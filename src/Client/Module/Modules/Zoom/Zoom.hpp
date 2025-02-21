@@ -16,8 +16,9 @@ private:
 
     static inline bool fisrtTime = true;
 
-    static inline bool animationFinished = false;
 public:
+    static inline bool animationFinished = true;
+    static inline bool jdfAnimationFinished = true;
     Zoom() : Module("Zoom", "Allows you to see distant places.", IDR_MAGNIFY_PNG, "C") {
         Module::setup();
     };
@@ -88,7 +89,14 @@ public:
     void onGetFOV(FOVEvent &event) {
         auto fov = event.getFOV();
         if(fov == 70) return;
-        realFov = fov;
+        
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (!player) return;
+
+        if (player->getActorFlag(ActorFlags::FLAG_SPRINTING))
+        {
+            fov = ModuleManager::getModule("Java Dynamic FOV").get()->settings.getSettingByName<float>("fov_target")->value;
+        }
 
         if(fisrtTime){ // so that it doesn't unzoom on module load
             currentZoomVal = fov;
@@ -110,6 +118,10 @@ public:
         } else {
             if ((!animationFinished || alwaysanim) && !disableanim) {
                 // Only lerp if animation hasn't finished
+                if (!jdfAnimationFinished)
+                {
+                    jdfAnimationFinished = true;
+                }
                 currentZoomVal = std::lerp(currentZoomVal, fov, animspeed * FlarialGUI::frameFactor);
                 if (currentZoomVal == zoomValue || std::abs(fov - currentZoomVal) < animspeed + unzoomAnimDisableTreshold) { // when fov changes due to sprinting animation used to play
                     // Set animationFinished to true only when reaching original fov

@@ -2,7 +2,7 @@
 
 #include "../Module.hpp"
 #include "../../../../SDK/Client/Core/Options.hpp"
-
+#include "../Zoom/Zoom.hpp"
 
 class JavaDynamicFOV : public Module {
 private:
@@ -13,8 +13,8 @@ private:
 
     static inline bool firstTime = true;
 
-    static inline bool animationFinished = false;
 public:
+    static inline bool animationFinished = true;
     JavaDynamicFOV() : Module("Java Dynamic FOV", "Enhances dynamic FOV in bedrock.", IDR_MAGNIFY_PNG, "C") {
         Module::setup();
     };
@@ -68,6 +68,10 @@ public:
         if(fov == 70) return;
         realFov = fov;
 
+        if (ModuleManager::getModule("Zoom").get()->active || !Zoom::animationFinished)
+        {
+            return;
+        }
         if(firstTime){ // so that it doesn't unzoom on module load
             currentFOVVal = fov;
             firstTime = false;
@@ -84,19 +88,19 @@ public:
         bool alwaysanim = false;
 
         if (player->getActorFlag(ActorFlags::FLAG_SPRINTING)) {
-            animationFinished = false;
+            Zoom::jdfAnimationFinished = false;
             if (fov > 180) {
                 currentFOVVal = disableanim ? fov + fovTarget : std::lerp(currentFOVVal, fov + fovTarget, animspeed * FlarialGUI::frameFactor);
             } else {
                 currentFOVVal = disableanim ? fovTarget : std::lerp(currentFOVVal, fovTarget, animspeed * FlarialGUI::frameFactor);
             }
         } else {
-            if ((!animationFinished || alwaysanim) && !disableanim) {
+            if ((!Zoom::jdfAnimationFinished || alwaysanim) && !disableanim) {
                 // Only lerp if animation hasn't finished
                 currentFOVVal = std::lerp(currentFOVVal, fov, animspeed * FlarialGUI::frameFactor);
                 if (currentFOVVal == fovTarget || std::abs(fov - currentFOVVal) < animspeed + animDisableTreshold) { // when fov changes due to sprinting animation used to play
                     // Set animationFinished to true only when reaching original fov
-                    animationFinished = true;
+                    Zoom::jdfAnimationFinished = true;
                 }
             } else {
                 currentFOVVal = fov;
