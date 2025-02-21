@@ -987,8 +987,8 @@ public:
             radioY += Constraints::SpacingConstraint(0.29f, logoWidth);
 
             if (!Client::settings.getSettingByName<bool>("noicons")->value) {
-                if(curr == "scripting") FlarialGUI::image(IDR_FOLDER_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
-                else FlarialGUI::image(IDR_FOLDER_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+                if(curr == "scripting") FlarialGUI::image(IDR_SCRIPTINGWHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+                else FlarialGUI::image(IDR_SCRIPTING_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
 
             }
 

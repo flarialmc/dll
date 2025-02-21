@@ -72,6 +72,8 @@ IDR_ENTITYCOUNTER_PNG    PNG "Data\\creeper.png"
 IDR_HIVE_PNG             PNG "Data\\hive.png"
 IDR_HIVE_STATS_PNG       PNG "Data\\hivestats.png"
 IDR_SCRIPTING_PNG        PNG "Data\\scripting.png"
+IDR_SCRIPTING_WHITE_PNG        PNG "Data\\scriptingwhite.png"
+IDR_SCRIPT_PNG        PNG "Data\\script.png"
 
 IDR_SETTINGS_PNG         PNG "Data\\settings.png"
 IDR_SETTINGS_WHITE_PNG   PNG "Data\\settingswhite.png"

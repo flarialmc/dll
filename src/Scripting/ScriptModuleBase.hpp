@@ -13,7 +13,7 @@ public:
     std::shared_ptr<lua_State> module_lua_state;
 
     ScriptModuleBase(const std::string& name, const std::string& description, lua_State* lua_state)
-            : Module(name, description, IDR_TIME_PNG, "", true), module_lua_state(lua_state) {
+            : Module(name, description, IDR_SCRIPT_PNG, "", true), module_lua_state(lua_state) {
         Module::setup();
 
         Listen(this, KeyEvent, &ScriptModuleBase::onKey);
