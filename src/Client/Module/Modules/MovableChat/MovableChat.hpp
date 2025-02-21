@@ -58,9 +58,7 @@ public:
         if (settings.getSettingByName<bool>("pingsound") == nullptr) settings.addSetting("pingsound", true);
         if (this->settings.getSettingByName<std::string>("sound") == nullptr) settings.addSetting("sound", (std::string)"Xp Orb");
     }
-    void pac() {
-        WinrtUtils::pickAndCopyFiles(L"*", "\\assets");
-    }
+
     void settingsRender(float settingsOffset) override {
 
         float x = Constraints::PercentageConstraint(0.019, "left");
@@ -82,7 +80,7 @@ public:
             this->addDropdown("Sound", "Choose which sound to play", std::vector<std::string>{"Xp Orb", "Custom"}, this->settings.getSettingByName<std::string>("mode")->value);
             
             this->addButton("Choose Sound", "Choose a custom sound", "Choose", [this] {
-                pac();
+                WinrtUtils::pickAndCopyFiles(L"*", "\\assets");
             });
             this->addToggle("@here", "Plays the sound when you are mentioned via @here", settings.getSettingByName<bool>("here")->value);
         }
