@@ -35,3 +35,4 @@
 #include "Render/RenderOrderExecuteEvent.hpp"
 #include "Render/HandleVisibilityUpdatesEvent.hpp"
 #include "Render/UIControlGetPositionEvent.hpp"
+#include "Misc/ProtocolEvent.hpp"

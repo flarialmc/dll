@@ -10,6 +10,17 @@
 
 #include "Command/CommandManager.hpp"
 
+#include <winrt/Windows.UI.Core.h>
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.ApplicationModel.Core.h>
+#include <winrt/Windows.ApplicationModel.Activation.h>
+#include <winrt/Windows.Foundation.Collections.h>
+
+using namespace winrt::Windows::UI::Core;
+using namespace winrt::Windows::Foundation;
+using namespace winrt::Windows::ApplicationModel::Activation;
+using namespace winrt::Windows::ApplicationModel::Core;
+
 Settings Client::settings = Settings();
 
 bool notifiedOfConnectionIssue = false;
@@ -131,6 +142,25 @@ void Client::initialize() {
 
     FlarialGUI::LoadFont(IDR_MINECRAFTIA_TTF);
 
+    CoreApplication::MainView().Activated([](const auto &, const IActivatedEventArgs &context) {
+        if (context.Kind() != ActivationKind::Protocol)
+            return;
+
+        auto uri = winrt::unbox_value<ProtocolActivatedEventArgs>(context).Uri();
+
+        std::vector<std::pair<std::wstring, std::wstring>> dataList;
+
+        for (const auto& dataContext : uri.QueryParsed()) {
+            std::wstring name = dataContext.Name().c_str();
+            std::wstring value = dataContext.Value().c_str();
+
+            dataList.emplace_back(name, value);
+        }
+
+
+        auto event = nes::make_holder<ProtocolEvent>(uri.Host().c_str(), dataList);
+        eventMgr.trigger(event);
+    });
     HookManager::initialize();
     ModuleManager::initialize();
     CommandManager::initialize();
