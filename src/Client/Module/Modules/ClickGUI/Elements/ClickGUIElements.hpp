@@ -13,7 +13,7 @@ public:
 
     static std::string SearchBar(int index, std::string &text, int limit, float x, float y);
 
-    static void ModCard(float x, float y, Module *mod, int iconId, const int index, bool visible = true);
+    static void ModCard(float x, float y, Module *mod, int iconId, const int index, bool visible = true, float opacity = -600.f);
 
     static void RotatingGear(int index, float x, float y, float width, float height, float imageWidth, float imageHeight);
 };

@@ -44,9 +44,10 @@ std::map<int, ID2D1Bitmap *> ClickGUIElements::images;
 std::vector<Vec2<float>> sizes;
 std::vector<Vec2<float>> shadowSizes;
 
-void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const int index, bool visible) {
+void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const int index, bool visible, float opacity) {
 
 
+    if (opacity == -600.f) opacity = ClickGUI::modcardOpacity;
     Vec2<float> round = Constraints::RoundingConstraint(34, 34);
 
     if (index > sizes.size() - 1 || index == 0) {
@@ -121,11 +122,11 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     D2D1_COLOR_F mod1Col = colors_mod1_rgb ? FlarialGUI::rgbColor : colors_mod1;
     mod1Col.a = o_colors_mod1;
-    mod1Col.a = ClickGUI::modcardOpacity;
+    mod1Col.a = opacity;
 
     D2D1_COLOR_F mod2Col = colors_mod2_rgb ? FlarialGUI::rgbColor : colors_mod2;
     mod2Col.a = o_colors_mod2;
-    mod2Col.a = ClickGUI::modcardOpacity;
+    mod2Col.a = opacity;
 
     FlarialGUI::RoundedRect(x, y, mod1Col, BottomRoundedWidth, BottomRoundedHeight, round.x, round.x);
 
@@ -140,7 +141,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     float textWidth = Constraints::RelativeConstraint(1.0);
     float textHeight = Constraints::RelativeConstraint(0.2);
     D2D1_COLOR_F textCol = FlarialGUI::HexToColorF("8b767a");
-    textCol.a = ClickGUI::modcardOpacity;
+    textCol.a = opacity;
 
     FlarialGUI::FlarialTextWithFont(textx, texty, FlarialGUI::to_wide(mod->name).c_str(), textWidth, textHeight,
                                     DWRITE_TEXT_ALIGNMENT_CENTER,
@@ -151,7 +152,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     D2D1_COLOR_F mod3Col = colors_mod3_rgb ? FlarialGUI::rgbColor : colors_mod3;
     mod3Col.a = o_colors_mod3;
-    mod3Col.a = ClickGUI::modcardOpacity;
+    mod3Col.a = opacity;
 
     float modiconx = Constraints::PercentageConstraint(0.40, "left");
     float modicony = Constraints::PercentageConstraint(0.11, "top");
@@ -210,7 +211,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     D2D1_COLOR_F mod4Col = colors_mod4_rgb ? FlarialGUI::rgbColor : colors_mod4;
     mod4Col.a = o_colors_mod4;
-    mod4Col.a = ClickGUI::modcardOpacity;
+    mod4Col.a = opacity;
 
     if (!Client::settings.getSettingByName<bool>("noicons")->value) {
         RotatingGear(index, settingx2, (buttony - buttonHeight) + Constraints::SpacingConstraint(0.162, paddingwidth), settingswidth, settingswidth, iconwidth, iconwidth);
@@ -247,12 +248,12 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     round = Constraints::RoundingConstraint(22, 22);
 
     D2D1_COLOR_F textCol2 = colors_text_rgb ? FlarialGUI::rgbColor : colors_text;
-    textCol2.a = ClickGUI::modcardOpacity;
+    textCol2.a = opacity;
 
     D2D1_COLOR_F buttonColor;
     buttonColor = D2D1::ColorF(FlarialGUI::buttonColors[index].r - FlarialGUI::darkenAmounts[index], FlarialGUI::buttonColors[index].g - FlarialGUI::darkenAmounts[index],
                                    FlarialGUI::buttonColors[index].b - FlarialGUI::darkenAmounts[index], FlarialGUI::buttonColors[index].a);
-    buttonColor.a = ClickGUI::modcardOpacity;
+    buttonColor.a = opacity;
 
     FlarialGUI::RoundedRect((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.105f, paddingwidth), buttony - buttonHeight,
                                   buttonColor, buttonWidth - Constraints::SpacingConstraint(1.5, paddingwidth), buttonHeight, 0.f, 0.f);
@@ -261,6 +262,9 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
                                   FlarialGUI::buttonColors[index], textCol2,
                                   L"", buttonWidth, buttonHeight, round.x,
                                   round.x)) {
+
+        if(mod->isScriptingModule)
+        mod->settings.getSettingByName<bool>("enabled")->value = !mod->settings.getSettingByName<bool>("enabled")->value;
         mod->toggle();
     }
 

@@ -14,6 +14,7 @@
 #include "src/Client/Module/Modules/Nick/NickModule.hpp"
 #include "src/Client/Command/CommandManager.hpp"
 #include "src/SDK/Client/Options/OptionsParser.hpp"
+#include "Utils/APIUtils.hpp"
 
 std::chrono::steady_clock::time_point lastBeatTime;
 std::chrono::steady_clock::time_point lastVipFetchTime;

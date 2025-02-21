@@ -145,8 +145,7 @@ void load(std::string name, std::string description, std::string mainclass) {
         return;
     }
 
-    ModuleManager::addModule<ScriptModuleBase>(name, description, L);
-    auto mod = ModuleManager::getModule(name);
+    auto mod = ModuleManager::makeModule<ScriptModuleBase>(name, description, L);
     Scripting::luaScriptModules.emplace_back(L, mod);
     mod->defaultConfig();
     Scripting::scriptsAmountWithoutErrors++;

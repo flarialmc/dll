@@ -24,6 +24,12 @@ namespace ModuleManager {
     }
 
     template<typename T, typename... ArgsT>
+std::shared_ptr<T> makeModule(ArgsT... args) {
+        return std::make_shared<T>(args...);
+    }
+
+
+    template<typename T, typename... ArgsT>
     void addService(ArgsT... args) {
         auto servicePtr = std::make_shared<T>(args...);
         services.emplace_back(servicePtr);

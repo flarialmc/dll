@@ -3,7 +3,8 @@
 #include "../Module.hpp"
 #include "../../../Client.hpp"
 #include "Elements/ClickGUIElements.hpp"
-#include <Utils/APIUtils.hpp>
+#include "Scripting/Scripting.hpp"
+#include "Utils/APIUtils.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -59,8 +60,11 @@ private:
 public:
     static inline float modcardOpacity = 1.f;
     static inline float settingsOpacity = 0.f;
+    static inline float scriptingOpacity = 0.f;
     static inline float modcardOffset = 0.f;
     static inline float settingsOffset = Constraints::RelativeConstraint(2.f, "height", true);
+    static inline float scriptingOffset = Constraints::RelativeConstraint(4.f, "height", true);
+
     static inline PageType page;
     static inline std::string curr;
     static float inline accumilatedPos = 1;
@@ -737,7 +741,7 @@ public:
         if (SDK::getCurrentScreen() == "inventory_screen" || SDK::getCurrentScreen().find("chest") != std::string::npos)
             if (Client::settings.getSettingByName<bool>("watermark")->value)
                 FlarialGUI::image(IDR_FLARIAL_TITLE_PNG, D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu, allahuakbar.y + akbar));
-                
+
 
         if (FlarialGUI::scrollposmodifier == 0) {
             FlarialGUI::scrollposmodifier = Constraints::RelativeConstraint(0.1f);
@@ -861,13 +865,17 @@ public:
             static D2D1_COLOR_F tabBgCol = colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6;
             static D2D1_COLOR_F tabBgCol2 = colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6;
             static D2D1_COLOR_F tabBgCol3 = colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6;
+            static D2D1_COLOR_F tabBgCol4 = colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6;
+
 
             tabBgCol.a = o_colors_secondary6;
             tabBgCol2.a = o_colors_secondary6;
             tabBgCol3.a = o_colors_secondary6;
+            tabBgCol4.a = o_colors_secondary6;
 
 
             //radiobutton of modules
+
             if(curr != "modules") {
                 tabBgCol = FlarialGUI::LerpColor(tabBgCol, colors_secondary8_rgb ? FlarialGUI::rgbColor : colors_secondary8, 0.15f * FlarialGUI::frameFactor);
             } else {
@@ -963,7 +971,7 @@ public:
             FlarialGUI::ShadowRect(Vec2{radioX, radioY + Constraints::SpacingConstraint(0.115f, logoWidth)}, Vec2{width3, RadioButtonHeight + Constraints::SpacingConstraint(0.015f, logoWidth)}, D2D1::ColorF(D2D1::ColorF::Black), round.x, 3);
             if (!FlarialGUI::activeColorPickerWindows && FlarialGUI::RoundedRadioButton(2, radioX, radioY,
                                                                                         tabBgCol3,
-                                                                                        modTextCol, L"",
+                                                                                        modTextCol, L"Scripting",
                                                                                         width3,
                                                                                         RadioButtonHeight, round.x,
                                                                                         round.x, "editmenu",
@@ -983,6 +991,43 @@ public:
 
             }
 
+            // radiobutton of scripting
+
+            radioX = navx - Constraints::SpacingConstraint(-0.36f, logoWidth);
+            radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
+
+            radioPushAmount2 = Constraints::SpacingConstraint(0.9f * 6.45f, logoWidth) + width1 + width2 + width3;
+            radioX += radioPushAmount2;
+            round = Constraints::RoundingConstraint(17.5f, 17.5f);
+
+            if(curr != "scripting") {
+                tabBgCol4 = FlarialGUI::LerpColor(tabBgCol4, colors_secondary8_rgb ? FlarialGUI::rgbColor : colors_secondary8, 0.15f * FlarialGUI::frameFactor);
+            } else {
+                tabBgCol4 = FlarialGUI::LerpColor(tabBgCol4, colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6, 0.15f * FlarialGUI::frameFactor);
+            }
+
+            FlarialGUI::ShadowRect(Vec2{radioX, radioY + Constraints::SpacingConstraint(0.115f, logoWidth)}, Vec2{width3, RadioButtonHeight + Constraints::SpacingConstraint(0.015f, logoWidth)}, D2D1::ColorF(D2D1::ColorF::Black), round.x, 3);
+            if (!FlarialGUI::activeColorPickerWindows && FlarialGUI::RoundedRadioButton(3, radioX, radioY,
+                                                                                        tabBgCol4,
+                                                                                        modTextCol, L"Scripting",
+                                                                                        width3,
+                                                                                        RadioButtonHeight, round.x,
+                                                                                        round.x, "scripting",
+                                                                                        curr)) {
+
+                curr = "scripting";
+
+            }
+
+            radioX += Constraints::SpacingConstraint(0.29f, logoWidth);
+            radioY += Constraints::SpacingConstraint(0.29f, logoWidth);
+
+            if (!Client::settings.getSettingByName<bool>("noicons")->value) {
+                if(curr == "scripting") FlarialGUI::image(IDR_FOLDER_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+                else FlarialGUI::image(IDR_FOLDER_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+
+            }
+
             /* tab buttons end */
 
             FlarialGUI::PopSize(); // Pops nav bar
@@ -998,6 +1043,14 @@ public:
                 FlarialGUI::lerp(modcardOffset, -Constraints::RelativeConstraint(2.f, "height", true), 0.08f * FlarialGUI::frameFactor);
             }
 
+            if(page.type == "normal" && e == "scripting") {
+                FlarialGUI::lerp(scriptingOpacity, 1.0f, 0.1f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(scriptingOffset, 0.0f, 0.245f * FlarialGUI::frameFactor);
+            } else {
+                FlarialGUI::lerp(scriptingOpacity, 0.0f, 0.1f * FlarialGUI::frameFactor);
+                FlarialGUI::lerp(scriptingOffset, -Constraints::RelativeConstraint(4.f, "height", true), 0.08f * FlarialGUI::frameFactor);
+            }
+
 
             if(e == "settings" || page.type == "settings") {
                 FlarialGUI::lerp(settingsOpacity, 1.0f, 0.1f * FlarialGUI::frameFactor);
@@ -1009,6 +1062,9 @@ public:
 
 
             if (page.type == "normal") {
+
+
+                /* MODCARD RENDER */
 
                 if(modcardOpacity > 0.05f){
 
@@ -1045,6 +1101,7 @@ public:
                     float yModifier = 0.0f;
 
                     int i = 0;
+
                     static auto modules = ModuleManager::getModules();
 
                     if (Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value)
@@ -1110,8 +1167,11 @@ public:
                     //FlarialGUI::ShadowRect(Vec2{center.x, center.y}, Vec2{baseWidth, Constraints::RelativeConstraint(baseHeightReal, "height", true)}, FlarialGUI::HexToColorF("120e0f"), baseRound.x, 100);
                     }
 
+                /* MODCARD RENDER END */
 
-                if (page.type != "settings" && settingsOpacity > 0.05f) {
+                /* SETTINGS RENDER */
+
+                if (settingsOpacity > 0.05f) {
 
 
                     FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
@@ -1191,9 +1251,9 @@ public:
 
                     c->addButton("Reload Scripts", "", "RELOAD", [] () {
 
-                        ModuleManager::restartModules = true;
+    ModuleManager::restartModules = true;
 
-                    });
+});
 
                     c->addElementText("Following Requires Restart");
                     c->extraPadding();
@@ -1232,6 +1292,103 @@ public:
                     FlarialGUI::PopSize();
 
                 }
+
+                   if(scriptingOpacity > 0.05f){
+
+                    float modWidth = Constraints::RelativeConstraint(0.19f, "height", true);
+                    float modHeight = Constraints::RelativeConstraint(0.1369f, "height", true);
+
+                    Vec2<float> modcenter = Constraints::CenterConstraint(modWidth, modHeight, "both", -0.58,
+                                                                          -0.52);
+
+                    FlarialGUI::PushSize(center.x, center.y, baseWidth,
+                                         Constraints::RelativeConstraint(baseHeightReal, "height", true));
+
+                    float scrollWidth = Constraints::RelativeConstraint(1.12);
+                    float scrollHeight = Constraints::RelativeConstraint(0.84);
+                    Vec2<float> scrollcenter = Constraints::CenterConstraint(scrollWidth, scrollHeight, "y", 0.0,
+                                                                             1);
+
+                    FlarialGUI::PopSize();
+
+                    int i3 = 0;
+                    float i2 = 0;
+
+                    for (const auto& pair : ModuleManager::moduleMap) {
+                        if ((++i3 % 3) == 0) {
+                            i2 += Constraints::SpacingConstraint(0.8, modWidth);
+                        }
+                    }
+
+                    FlarialGUI::ScrollBar(120, scrollcenter.y, 10, modHeight + i2, 2);
+
+                    FlarialGUI::SetScrollView(scrollcenter.x, scrollcenter.y, scrollWidth, scrollHeight);
+
+                    float xModifier = 0.0f;
+                    float yModifier = 0.0f;
+
+                    int i = 0;
+
+                    static auto modules = Scripting::luaScriptModules;
+
+                    for (const auto& pModule: modules) {
+                        bool visible = (modcenter.y + yModifier + FlarialGUI::scrollpos + 55 > center.y) &&
+                                       (modcenter.y + yModifier + FlarialGUI::scrollpos - 200) <
+                                       center.y + Constraints::RelativeConstraint(baseHeightReal);
+
+                        if (!searchBarString.empty()) {
+                            std::string name = pModule.second->name;
+
+                            for (char &c: name) {
+                                c = (char)std::tolower(c);
+                            }
+
+                            std::string search = searchBarString;
+
+                            for (char &c: search) {
+                                c = (char)std::tolower(c);
+                            }
+
+                            if (name.starts_with(search) ||
+                                name.find(search) != std::string::npos) {
+                                ClickGUIElements::ModCard(modcenter.x + xModifier + scriptingOffset, modcenter.y + yModifier, pModule.second.get(),
+                                                          pModule.second->icon, i, visible, ClickGUI::scriptingOpacity);
+                                xModifier += Constraints::SpacingConstraint(1.02f, modWidth);
+                                if ((++i % 3) == 0) {
+                                    yModifier += Constraints::SpacingConstraint(0.8, modWidth);
+                                    xModifier = 0.0f;
+                                }
+                            }
+                        } else {
+                            ClickGUIElements::ModCard(modcenter.x + xModifier + scriptingOffset, modcenter.y + yModifier, pModule.second.get(),
+                                                      pModule.second->icon, i, visible, ClickGUI::scriptingOpacity);
+
+                            xModifier += Constraints::SpacingConstraint(1.02f, modWidth);
+                            if ((++i % 3) == 0) {
+                                yModifier += Constraints::SpacingConstraint(0.8, modWidth);
+                                xModifier = 0.0f;
+                            }
+
+                        }
+                    }
+
+                    FlarialGUI::UnsetScrollView();
+
+                    D2D1_COLOR_F shadowCol = D2D1::ColorF(D2D1::ColorF::Black);
+                    shadowCol.a = scriptingOpacity;
+                    //FlarialGUI::RoundedRect(center.x, center.y + navigationBarHeight, D2D1::ColorF(D2D1::ColorF::White), baseWidth, navigationBarHeight);
+                    FlarialGUI::PushImClipRect(D2D1::RectF(center.x, center.y + navigationBarHeight * 1.178f, center.x + baseWidth, center.y + navigationBarHeight * 2.15f));
+                    FlarialGUI::ShadowRect(Vec2{center.x + Constraints::SpacingConstraint(0.15f, baseWidth), center.y + navigationBarHeight}, Vec2{baseWidth * 0.74f, Constraints::SpacingConstraint(0.25f, baseHeightReal)}, shadowCol, 50, 100);
+                    FlarialGUI::PopImClipRect();
+
+                    //FlarialGUI::RoundedRect(center.x, center.y + Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.85f, D2D1::ColorF(D2D1::ColorF::White), baseWidth, Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.35f);
+                    FlarialGUI::PushImClipRect(D2D1::RectF(center.x, center.y + Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.85f, center.x + baseWidth, center.y + (Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.651f) + Constraints::RelativeConstraint(baseHeightReal, "height", true) * 0.35f));
+                    FlarialGUI::ShadowRect(Vec2{center.x + Constraints::SpacingConstraint(0.15f, baseWidth), center.y + Constraints::RelativeConstraint(baseHeightReal, "height", true)}, Vec2{baseWidth * 0.74f, Constraints::SpacingConstraint(0.25f, baseHeightReal)}, shadowCol, 50, 100);
+                    FlarialGUI::PopImClipRect();
+
+                    //FlarialGUI::ShadowRect(Vec2{center.x, center.y}, Vec2{baseWidth, Constraints::RelativeConstraint(baseHeightReal, "height", true)}, FlarialGUI::HexToColorF("120e0f"), baseRound.x, 100);
+                    }
+                /* SETTINGS RENDER END */
                 /* Mod Card End */
             }
 
