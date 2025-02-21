@@ -58,24 +58,15 @@ void Scripting::executeFunction(lua_State* L, std::string functionName, bool shi
 
 
 
-void Scripting::unloadModules(){
+void Scripting::unloadModules() {
     ScriptingEventManager::clearHandlers();
-    for (auto& scriptModule : Scripting::luaScriptModules) {
+    for (auto &scriptModule: Scripting::luaScriptModules) {
         std::shared_ptr<lua_State> L = scriptModule.first;
         Module *module = scriptModule.second.get();
         if (module) {
             std::string name = module->name;
-            size_t hash = std::hash<std::string>{}(name);
-
-            auto it = ModuleManager::moduleMap.find(hash);
-            if (it != ModuleManager::moduleMap.end()) {
-                auto module = it->second;
-                module->terminate();
-                ModuleManager::moduleMap.erase(it);
-                Logger::info("Module '{}' has been unloaded.", name);
-            } else {
-                Logger::warn("Attempted to unload non-existent module '{}'.", name);
-            }
+            module->terminate();
+            Logger::info("Module '{}' has been unloaded.", name);
         }
         if (L) {
             lua_close(L.get());
