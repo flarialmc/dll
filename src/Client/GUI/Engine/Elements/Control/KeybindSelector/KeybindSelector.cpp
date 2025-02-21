@@ -37,6 +37,12 @@
 #define o_colors_secondary7 clickgui->settings.getSettingByName<float>("o_colors_secondary7")->value
 #define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
 
+std::wstring formatDuration(long ms) {
+    std::wostringstream woss;
+    woss << ms / 1000 << L"." << (ms % 1000) / 100;
+    return woss.str();
+}
+
 void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string &keybind) {
 
     if (shouldAdditionalY) {
@@ -61,17 +67,20 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string 
     D2D1_COLOR_F col = KeybindSelectors[index].isActive ? (colors_primary1_rgb ? rgbColor : colors_primary1)
                                                         : (colors_primary3_rgb ? rgbColor : colors_primary3);
     col.a = ClickGUI::settingsOpacity;
-
+    float texty = y;
     if (KeybindSelectors[index].isActive) {
         std::chrono::steady_clock::time_point currentOnKeyTime = std::chrono::steady_clock::now();
         auto timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(
                 currentOnKeyTime - KeybindSelectors[index].currentOnKeyTime);
 
+        FlarialGUI::FlarialTextWithFont(x, y - (percHeight * 0.8), formatDuration(2000.0 - timeDifference.count()).c_str(), percWidth, percHeight, DWRITE_TEXT_ALIGNMENT_CENTER, textWidth, DWRITE_FONT_WEIGHT_NORMAL);
+        
         if (timeDifference.count() > 2000) KeybindSelectors[index].isActive = false;
     }
 
     KeybindSelectors[index].curColor = FlarialGUI::LerpColor(KeybindSelectors[index].curColor, col,
-                                                             0.1f * FlarialGUI::frameFactor);
+        2.0f * FlarialGUI::frameFactor);
+
     KeybindSelectors[index].curColor.a = ClickGUI::settingsOpacity;
 
     std::string text;

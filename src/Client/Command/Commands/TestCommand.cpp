@@ -12,16 +12,16 @@ void TestCommand::execute(const std::vector<std::string> &args) {
     const std::string action = String::toLower(args[0]);
 
     if (action == "uri") {
-        WinrtUtils::launchURI("https://pornhub.com");
+        WinrtUtils::launchURI("https://flarial.xyz");
     }
     if (action == "pick") {
         WinrtUtils::pickFiles();
     }
     if (action == "notification") {
-        WinrtUtils::showNotification("Nigger", "Hi");
+        WinrtUtils::showNotification("Flarial", "Hi");
     }
     if (action == "box") {
-        WinrtUtils::showMessageBox("Nigger", "Hi your version isnt supported :(");
+        WinrtUtils::showMessageBox("Flarial", "Your Minecraft version is not supported.");
     }
     if (action == "clipboard") {
         if (args[1].empty()) return;
