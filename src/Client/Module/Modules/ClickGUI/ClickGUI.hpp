@@ -849,7 +849,7 @@ public:
             if(curr == "settings") FlarialGUI::lerp(width2, RadioButtonWidth, 0.15f * FlarialGUI::frameFactor);
             else FlarialGUI::lerp(width2, shit, 0.15f * FlarialGUI::frameFactor);
 
-            if(curr == "editmenu") FlarialGUI::lerp(width3, RadioButtonWidth, 0.15f * FlarialGUI::frameFactor);
+            if(curr == "scripting") FlarialGUI::lerp(width3, RadioButtonWidth, 0.15f * FlarialGUI::frameFactor);
             else FlarialGUI::lerp(width3, shit, 0.15f * FlarialGUI::frameFactor);
 
             float radioX = navx - Constraints::SpacingConstraint(-0.85, logoWidth);
@@ -968,11 +968,11 @@ public:
                 tabBgCol3 = FlarialGUI::LerpColor(tabBgCol3, colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6, 0.15f * FlarialGUI::frameFactor);
             }
 
-            FlarialGUI::ShadowRect(Vec2{radioX, radioY + Constraints::SpacingConstraint(0.115f, logoWidth)}, Vec2{width3, RadioButtonHeight + Constraints::SpacingConstraint(0.015f, logoWidth)}, D2D1::ColorF(D2D1::ColorF::Black), round.x, 3);
+            FlarialGUI::ShadowRect(Vec2{radioX, radioY + Constraints::SpacingConstraint(0.115f, logoWidth)}, Vec2{shit, RadioButtonHeight + Constraints::SpacingConstraint(0.015f, logoWidth)}, D2D1::ColorF(D2D1::ColorF::Black), round.x, 3);
             if (!FlarialGUI::activeColorPickerWindows && FlarialGUI::RoundedRadioButton(2, radioX, radioY,
                                                                                         tabBgCol3,
-                                                                                        modTextCol, L"Scripting",
-                                                                                        width3,
+                                                                                        modTextCol, L"",
+                                                                                        shit,
                                                                                         RadioButtonHeight, round.x,
                                                                                         round.x, "editmenu",
                                                                                         curr)) {
