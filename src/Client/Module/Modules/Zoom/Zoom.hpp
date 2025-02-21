@@ -93,9 +93,11 @@ public:
         auto player = SDK::clientInstance->getLocalPlayer();
         if (!player) return;
 
-        if (player->getActorFlag(ActorFlags::FLAG_SPRINTING))
-        {
-            fov = ModuleManager::getModule("Java Dynamic FOV").get()->settings.getSettingByName<float>("fov_target")->value;
+        if(ModuleManager::getModule("Java Dynamic FOV").get()->isEnabled()) {
+            if (player->getActorFlag(ActorFlags::FLAG_SPRINTING)) {
+                fov = ModuleManager::getModule("Java Dynamic FOV").get()->settings.getSettingByName<float>(
+                        "fov_target")->value;
+            }
         }
 
         if(fisrtTime){ // so that it doesn't unzoom on module load
