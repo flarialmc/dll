@@ -11,6 +11,7 @@ namespace ModuleManager {
 
     extern bool initialized;
     extern bool restartModules;
+    extern bool cguiRefresh = false;
 
     void initialize();
 
@@ -21,6 +22,7 @@ namespace ModuleManager {
         auto modulePtr = std::make_shared<T>(args...);
         size_t hash = std::hash<std::string>{}(modulePtr->name);
         moduleMap[hash] = modulePtr;
+        ModuleManager::cguiRefresh = true;
     }
 
     template<typename T, typename... ArgsT>

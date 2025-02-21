@@ -953,12 +953,51 @@ public:
             ClickGUIElements::SearchBar(0, searchBarString, 12, Constraints::PercentageConstraint(0.022, "right"),
                                         allahY);
 
-            // radiobutton of editmenu
+
+
+            // radiobutton of scripting
 
             radioX = navx - Constraints::SpacingConstraint(-0.36f, logoWidth);
             radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
 
             radioPushAmount2 = Constraints::SpacingConstraint(0.9f * 5.69f, logoWidth) + width1 + width2;
+            radioX += radioPushAmount2;
+            round = Constraints::RoundingConstraint(17.5f, 17.5f);
+
+            if(curr != "scripting") {
+                tabBgCol4 = FlarialGUI::LerpColor(tabBgCol4, colors_secondary8_rgb ? FlarialGUI::rgbColor : colors_secondary8, 0.15f * FlarialGUI::frameFactor);
+            } else {
+                tabBgCol4 = FlarialGUI::LerpColor(tabBgCol4, colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6, 0.15f * FlarialGUI::frameFactor);
+            }
+
+            FlarialGUI::ShadowRect(Vec2{radioX, radioY + Constraints::SpacingConstraint(0.115f, logoWidth)}, Vec2{width3, RadioButtonHeight + Constraints::SpacingConstraint(0.015f, logoWidth)}, D2D1::ColorF(D2D1::ColorF::Black), round.x, 3);
+            if (!FlarialGUI::activeColorPickerWindows && FlarialGUI::RoundedRadioButton(3, radioX, radioY,
+                                                                                        tabBgCol4,
+                                                                                        modTextCol, L"Scripts",
+                                                                                        width3,
+                                                                                        RadioButtonHeight, round.x,
+                                                                                        round.x, "scripting",
+                                                                                        curr)) {
+
+                curr = "scripting";
+
+            }
+
+            radioX += Constraints::SpacingConstraint(0.29f, logoWidth);
+            radioY += Constraints::SpacingConstraint(0.29f, logoWidth);
+
+            if (!Client::settings.getSettingByName<bool>("noicons")->value) {
+                if(curr == "scripting") FlarialGUI::image(IDR_FOLDER_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+                else FlarialGUI::image(IDR_FOLDER_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+
+            }
+
+ // radiobutton of editmenu
+
+            radioX = navx - Constraints::SpacingConstraint(-0.36f, logoWidth);
+            radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
+
+            radioPushAmount2 = Constraints::SpacingConstraint(0.9f * 6.45f, logoWidth) + width1 + width2 + width3;
             radioX += radioPushAmount2;
             round = Constraints::RoundingConstraint(17.5f, 17.5f);
 
@@ -988,43 +1027,6 @@ public:
             if (!Client::settings.getSettingByName<bool>("noicons")->value) {
                 if(curr == "editmenu") FlarialGUI::image(IDR_STYLUS_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
                 else FlarialGUI::image(IDR_STYLUS_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
-
-            }
-
-            // radiobutton of scripting
-
-            radioX = navx - Constraints::SpacingConstraint(-0.36f, logoWidth);
-            radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
-
-            radioPushAmount2 = Constraints::SpacingConstraint(0.9f * 6.45f, logoWidth) + width1 + width2;
-            radioX += radioPushAmount2;
-            round = Constraints::RoundingConstraint(17.5f, 17.5f);
-
-            if(curr != "scripting") {
-                tabBgCol4 = FlarialGUI::LerpColor(tabBgCol4, colors_secondary8_rgb ? FlarialGUI::rgbColor : colors_secondary8, 0.15f * FlarialGUI::frameFactor);
-            } else {
-                tabBgCol4 = FlarialGUI::LerpColor(tabBgCol4, colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6, 0.15f * FlarialGUI::frameFactor);
-            }
-
-            FlarialGUI::ShadowRect(Vec2{radioX, radioY + Constraints::SpacingConstraint(0.115f, logoWidth)}, Vec2{width3, RadioButtonHeight + Constraints::SpacingConstraint(0.015f, logoWidth)}, D2D1::ColorF(D2D1::ColorF::Black), round.x, 3);
-            if (!FlarialGUI::activeColorPickerWindows && FlarialGUI::RoundedRadioButton(3, radioX, radioY,
-                                                                                        tabBgCol4,
-                                                                                        modTextCol, L"Scripting",
-                                                                                        width3,
-                                                                                        RadioButtonHeight, round.x,
-                                                                                        round.x, "scripting",
-                                                                                        curr)) {
-
-                curr = "scripting";
-
-            }
-
-            radioX += Constraints::SpacingConstraint(0.29f, logoWidth);
-            radioY += Constraints::SpacingConstraint(0.29f, logoWidth);
-
-            if (!Client::settings.getSettingByName<bool>("noicons")->value) {
-                if(curr == "scripting") FlarialGUI::image(IDR_FOLDER_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
-                else FlarialGUI::image(IDR_FOLDER_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
 
             }
 
@@ -1103,6 +1105,12 @@ public:
                     int i = 0;
 
                     static auto modules = ModuleManager::getModules();
+                    if(ModuleManager::cguiRefresh) {
+modules = ModuleManager::getModules();
+                        ModuleManager::cguiRefresh = false;
+}
+
+
 
                     if (Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value)
                         std::sort(modules.begin(), modules.end(), compareEnabled);

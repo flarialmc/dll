@@ -102,7 +102,9 @@ namespace ModuleManager {
     std::vector<std::shared_ptr<Listener>> services;
     bool initialized = false;
     bool restartModules = false;
+    bool cguiRefresh = false;
 }
+
 
 std::vector<std::shared_ptr<Module>> ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
     std::vector<std::shared_ptr<Module>> modulesVector;
@@ -114,6 +116,7 @@ std::vector<std::shared_ptr<Module>> ModuleManager::getModules() { // TODO: some
 }
 
 void ModuleManager::initialize() {
+
     addModule<MotionBlur>();
 
     // Screen effects
