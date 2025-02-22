@@ -8,5 +8,5 @@ class OptionsParser
 {
 public:
 	std::map<std::string, std::string> options;
-	 std::map<std::string, std::string> parseOptionsFile();
+    std::map<std::string, std::string> parseOptionsFile();
 };
