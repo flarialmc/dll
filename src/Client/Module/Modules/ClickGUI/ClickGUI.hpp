@@ -1119,7 +1119,7 @@ modules = ModuleManager::getModules();
 
                     for (const auto& pModule: modules) {
                         bool visible = (modcenter.y + yModifier + FlarialGUI::scrollpos + 55 > center.y) &&
-                                       (modcenter.y + yModifier + FlarialGUI::scrollpos - 200) <
+                                       (modcenter.y + yModifier + FlarialGUI::scrollpos - 300) <
                                        center.y + Constraints::RelativeConstraint(baseHeightReal);
 
                         if (!searchBarString.empty()) {
@@ -1341,7 +1341,7 @@ modules = ModuleManager::getModules();
 
                     for (const auto& pModule: modules) {
                         bool visible = (modcenter.y + yModifier + FlarialGUI::scrollpos + 55 > center.y) &&
-                                       (modcenter.y + yModifier + FlarialGUI::scrollpos - 200) <
+                                       (modcenter.y + yModifier + FlarialGUI::scrollpos - 300) <
                                        center.y + Constraints::RelativeConstraint(baseHeightReal);
 
                         if (!searchBarString.empty()) {
