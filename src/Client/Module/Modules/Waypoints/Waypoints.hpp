@@ -57,7 +57,6 @@ public:
     }
 
     void onSetup() override {
-
         keybindActions.clear();
         keybindActions.push_back([this](std::vector<std::any> args) -> std::any {
             std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
@@ -83,7 +82,6 @@ public:
         if(this->settings.getSettingByName<float>("total")->value > 0)
         for (int i = 0; i < this->settings.getSettingByName<float>("total")->value; i++) {
             if(!this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(i))) continue;
-            std::cout << this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(i))->value << std::endl;
             addWaypoint(
                 i,
                 this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(i))->value,
@@ -99,6 +97,7 @@ public:
 
     void onDisable() override {
         Deafen(this, RenderEvent, &Waypoints::onRender)
+        Deafen(this, KeyEvent, &Waypoints::onKey);
         Module::onDisable();
     }
 
