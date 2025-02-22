@@ -720,8 +720,6 @@ void SwapchainHook::prepareBlur() {
     if ((ModuleManager::doesAnyModuleHave("BlurEffect") &&
         blurIntensity > 1) && !FlarialGUI::inMenu) {
 
-        std::cout << "Running" << std::endl;
-
         FlarialGUI::PrepareBlur(blurIntensity);
 
         D2D1_IMAGE_BRUSH_PROPERTIES props = D2D1::ImageBrushProperties(
