@@ -33,8 +33,8 @@ public:
         this->key = e;
     }
 
-    [[nodiscard]] int getAction() const {
-        return this->action;
+    [[nodiscard]] ActionType getAction() const {
+        return (ActionType)this->action;
     }
 
     [[nodiscard]] std::string getKeyAsString(bool isCapital) const {

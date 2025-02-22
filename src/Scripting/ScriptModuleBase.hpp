@@ -66,7 +66,7 @@ public:
         if (!Scripting::instalized || !this->enabledState) return;
 
         bool canceled = ScriptingEventManager::triggerEvent(module_lua_state.get(), ScriptEvents::EventType::onKeyEvent,
-                                            event.getKey(), event.getAction());
+                                            event.getKey(), (int)event.getAction());
 
         if (canceled) {
             event.cancel();

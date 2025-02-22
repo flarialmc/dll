@@ -12,7 +12,7 @@ public:
     bool enabled = false;
 
     void onKey(KeyEvent &event) {
-        if (event.getAction() != 1) return;
+        if (event.getAction() != ActionType::Pressed) return;
         if (event.getKey() != 123) return;
         enabled = !enabled;
         if(enabled) {

@@ -154,7 +154,7 @@ public:
             const ImGuiKey mod = keycodeToImGuiMod(event.getKey());
             if (mod != ImGuiKey_None)
             {
-                io.AddKeyEvent(mod, event.getAction());
+                io.AddKeyEvent(mod, (int)event.getAction());
             }
             else
             {
@@ -165,7 +165,7 @@ public:
             }
 
             const ImGuiKey key = keycodeToImGuiKey(event.getKey());
-            io.AddKeyEvent(key, event.getAction());
+            io.AddKeyEvent(key, (int)event.getAction());
             //io.SetKeyEventNativeData(key, static_cast<int>(event.getKey()), -1);
 
 

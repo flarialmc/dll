@@ -1501,7 +1501,7 @@ modules = ModuleManager::getModules();
 
         //TODO: MAKE module->setActive() module->isActive() module->isRestricted()
 
-        if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key) && event.getAction() == (int)ActionType::Pressed) {
+        if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key) && event.getAction() == ActionType::Pressed) {
             if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen")
                 this->active = false;
             else {
@@ -1523,7 +1523,7 @@ modules = ModuleManager::getModules();
         }
 
         // if clicked esc
-        if ((event.getKey() == VK_ESCAPE && event.getAction() == (int) ActionType::Released)) {
+        if ((event.getKey() == VK_ESCAPE && event.getAction() == ActionType::Released)) {
             if (!editmenu) {
                 if (this->active) {
                     // exit ClickGUI
@@ -1549,7 +1549,7 @@ modules = ModuleManager::getModules();
 
             // auto search? TODO: make it optional
             if (page.type == "normal" && curr == "modules" &&
-                event.getAction() == (int) ActionType::Pressed) {
+                event.getAction() == ActionType::Pressed) {
 
                 //FlarialGUI::TextBoxes[0].isActive = true;
                 // you searching

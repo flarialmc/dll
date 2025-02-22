@@ -14,7 +14,7 @@ public:
 
             if (ModuleManager::getModule("ClickGUI")->active) {
 
-                if (event.getKey() == 20 && event.getAction() == (int) ActionType::Pressed ||
+                if (event.getKey() == 20 && event.getAction() == ActionType::Pressed ||
                         event.getKey() == VK_SHIFT)
                     isCapital = !isCapital;
 
@@ -34,17 +34,17 @@ public:
                         box.isActive = false;
 
                     if (event.getKey() == VK_BACK)
-                        if (event.getAction() == (int) ActionType::Released) {
+                        if (event.getAction() == ActionType::Released) {
                             box.isDeleting = false;
                         }
 
-                    if (box.isActive && event.getAction() == (int) ActionType::Pressed)
+                    if (box.isActive && event.getAction() == ActionType::Pressed)
 
                         if (event.getKey() != VK_BACK && event.getPressedKeysAsString() != "CTRL+V") {
                             box.text += event.getKeyAsString(isCapital);
                         } else if (event.getKey() == VK_BACK) {
 
-                            if (event.getAction() == (int) ActionType::Pressed) {
+                            if (event.getAction() == ActionType::Pressed) {
 
                                 std::thread t([&box]() {
 
