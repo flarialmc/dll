@@ -1,7 +1,7 @@
-name: Feature Request
-description: Suggest a new feature for Flarial
-title: "[FEATURE REQUEST] "
-labels: ["enhancement"]
+name: Scripting Feature Request
+description: Suggest a new feature for Flarial's Scripting API
+title: "[FEATURE REQUEST] [SCRIPTING] "
+labels: ["enhancement", "scripting"]
 
 body:
   - type: textarea
@@ -30,6 +30,14 @@ body:
       # render: Markdown
       description: How would you use this feature?
       placeholder: I would use this feature to [...]
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Example Code
+      render: lua
+      description: Show an example of how you would use this feature.
     validations:
       required: true
   

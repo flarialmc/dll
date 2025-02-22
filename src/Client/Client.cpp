@@ -5,16 +5,17 @@
 #include <wingdi.h>
 #include <wininet.h>
 
+
 #include <Utils/VersionUtils.hpp>
 #include <Utils/WinrtUtils.hpp>
-
 #include "Command/CommandManager.hpp"
-
 #include <winrt/Windows.UI.Core.h>
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.ApplicationModel.Core.h>
 #include <winrt/Windows.ApplicationModel.Activation.h>
 #include <winrt/Windows.Foundation.Collections.h>
+#include "winrt/Windows.UI.ViewManagement.h"
+#include "winrt/windows.system.h"
 
 using namespace winrt::Windows::UI::Core;
 using namespace winrt::Windows::Foundation;
@@ -130,6 +131,9 @@ void Client::initialize() {
     ADD_SETTING("gui_font_scale", 1.0f);
     ADD_SETTING("overrideFontWeight", false);
     ADD_SETTING("fontWeight", std::string("Normal"));
+
+    if (Client::settings.getSettingByName<std::string>("prefix") == nullptr)
+        Client::settings.addSetting("prefix", (std::string) ".");
 
     FlarialGUI::ExtractImageResource(IDR_RED_LOGO_PNG, "red-logo.png","PNG");
     FlarialGUI::ExtractImageResource(IDR_CYAN_LOGO_PNG, "dev-logo.png", "PNG");

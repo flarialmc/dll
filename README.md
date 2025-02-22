@@ -1,7 +1,7 @@
+
 # Flarial Client
 Welcome to **Flarial Client**, the ultimate modded client designed specifically for Minecraft Bedrock Edition (MCBE). Flarial Client enhances your gameplay with a suite of tools and features that optimize performance, improve visual quality, and provide a smoother gaming experience.
 ## Support us on Ko-Fi! https://ko-fi.com/flarialmc
-
 
 ## Installation Options
 
@@ -26,6 +26,11 @@ Flarial Client is available in two forms:
 If you encounter issues, check out our [FAQ](https://discord.gg/flarial-community-1049946152092586054) or join our community on [Discord](https://discord.gg/flarial-community-1049946152092586054). We’re here to help!
 
 ---
+# Powered by [Sear](https://sear.host)
+<img src="https://cdn.sear.host/synthetixlogov2-removebg-preview.png" width="100">
+
+### Fast and affordable host with great customer service
+
 ## Build Guide
 
 ### Prerequisites:

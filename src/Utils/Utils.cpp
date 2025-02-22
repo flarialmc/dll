@@ -567,4 +567,6 @@ std::string String::toLower(std::string input) {
 std::string String::toUpper(std::string input) {
     std::ranges::transform(input, input.begin(), ::toupper);
     return input;
+
 }
+

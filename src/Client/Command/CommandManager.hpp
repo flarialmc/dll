@@ -12,4 +12,5 @@ public:
     static void initialize();
     static void terminate();
     void onPacket(PacketSendEvent &event);
+
 };

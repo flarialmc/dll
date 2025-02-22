@@ -1,3 +1,4 @@
+
 #include "CommandManager.hpp"
 
 #include "../../SDK/Client/Network/Packet/TextPacket.hpp"
@@ -9,10 +10,12 @@
 #include "Commands/EjectCommand.hpp"
 #include "Commands/TestCommand.hpp"
 
+
 std::vector<std::unique_ptr<Command>> CommandManager::Commands = std::vector<std::unique_ptr<Command>>();
 CommandManager CommandManager::instance;
 
 void CommandManager::initialize() {
+
 #if defined(__DEBUG__)
     Commands.push_back(std::make_unique<TestCommand>());
 #endif
@@ -27,11 +30,14 @@ Listen(&CommandManager::instance, PacketSendEvent, &CommandManager::onPacket);
 }
 
 void CommandManager::onPacket(PacketSendEvent &event) {
+
     MinecraftPacketIds id = event.getPacket()->getId();
     if (id != MinecraftPacketIds::Text) return;
 
     auto pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-    if (!pkt || pkt->message.empty() || pkt->message[0] != Command::prefix[0]) return;
+
+    if (!pkt || pkt->message.empty() || pkt->message[0] != Client::settings.getSettingByName<std::string>("prefix")->value[0]) return;
+
 
     event.setCancelled(true);
 
@@ -51,6 +57,7 @@ void CommandManager::onPacket(PacketSendEvent &event) {
         // Check if any alias matches the commandName
         return std::ranges::any_of(command->Aliases, [&](const std::string& alias) {
             return alias == commandName;
+
         });
     });
 
@@ -69,3 +76,4 @@ void CommandManager::onPacket(PacketSendEvent &event) {
 void CommandManager::terminate() {
     Deafen(&CommandManager::instance, PacketSendEvent, &CommandManager::onPacket);
 }
+
