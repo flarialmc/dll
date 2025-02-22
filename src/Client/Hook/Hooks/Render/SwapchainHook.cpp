@@ -261,9 +261,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                 DX11Render();
 
             }
-
-            Memory::SafeRelease(FlarialGUI::blurbrush);
-            Memory::SafeRelease(FlarialGUI::blur);
         }
     }
 
@@ -682,6 +679,7 @@ void SwapchainHook::DX12Render() {
 void SwapchainHook::DX11Blur() {
 
     /* Blur Stuff */
+    prepareBlur();
     if (ModuleManager::initialized) {
         auto module = ModuleManager::getModule("Motion Blur");
         if (module) {
@@ -696,6 +694,7 @@ void SwapchainHook::DX11Blur() {
 void SwapchainHook::DX12Blur() {
 
     /* Blur Stuff */
+    prepareBlur();
     if (FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
     else FlarialGUI::needsBackBuffer = false;
     /* Blur End */
@@ -712,6 +711,26 @@ void SwapchainHook::RenderSync() {
         frameTransformsMtx.unlock();
     }
 }
+
+void SwapchainHook::prepareBlur() {
+    /* Blur Stuff */
+
+    auto blurIntensity = Client::settings.getSettingByName<float>("blurintensity")->value;
+
+    if ((ModuleManager::doesAnyModuleHave("BlurEffect") &&
+        blurIntensity > 1 ||
+        !FlarialGUI::notifications.empty() &&
+        blurIntensity > 1) && !FlarialGUI::inMenu) {
+
+        FlarialGUI::PrepareBlur(blurIntensity);
+
+        D2D1_IMAGE_BRUSH_PROPERTIES props = D2D1::ImageBrushProperties(
+                D2D1::RectF(0, 0, MC::windowSize.x, MC::windowSize.y));
+        D2D::context->CreateImageBrush(FlarialGUI::blur_bitmap_cache.get(), props, FlarialGUI::blurbrush.put());
+        }
+    /* Blur End */
+}
+
 
 void SwapchainHook::Fonts() {
     /* IMPORTANT FONT STUFF */

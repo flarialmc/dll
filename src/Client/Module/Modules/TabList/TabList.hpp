@@ -87,6 +87,8 @@ public:
         this->addHeader("Main");
         this->addSlider("UI Scale", "The Size of Tablist", this->settings.getSettingByName<float>("uiscale")->value, 1.25f);
         this->addToggle("Border", "", this->settings.getSettingByName<bool>("border")->value);
+        this->addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", this->settings.getSettingByName<bool>(
+   "BlurEffect")->value);
         this->addConditionalSlider(this->settings.getSettingByName<bool>("border")->value, "Border Width", "", this->settings.getSettingByName<float>("borderWidth")->value, 4);
         this->addSlider("Rounding", "", this->settings.getSettingByName<float>("rounding")->value);
 

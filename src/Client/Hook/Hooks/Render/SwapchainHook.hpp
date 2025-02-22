@@ -33,6 +33,8 @@ private:
 
     static void RenderSync();
 
+    static void prepareBlur();
+
     static void DX11Render();
 
     static void Fonts();

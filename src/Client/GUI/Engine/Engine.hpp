@@ -152,10 +152,10 @@ namespace FlarialGUI {
     bool inline needsBackBuffer = false;
     bool inline hasLoadedAll = false;
 
-    inline ID2D1Effect *blur = nullptr;
-    inline ID2D1Effect *shadow_blur = nullptr;
-    inline ID2D1Bitmap *screen_bitmap_cache = nullptr;
-    inline ID2D1Image *blur_bitmap_cache = nullptr;
+    inline winrt::com_ptr<ID2D1Effect> blur = nullptr;
+    inline winrt::com_ptr<ID2D1Effect> shadow_blur = nullptr;
+    inline winrt::com_ptr<ID2D1Bitmap> screen_bitmap_cache = nullptr;
+    inline winrt::com_ptr<ID2D1Image> blur_bitmap_cache = nullptr;
 
     extern std::unordered_map<std::string, ToolTipStruct> tooltips;
     extern std::unordered_map<std::string, float> TextSizes;
@@ -294,6 +294,8 @@ namespace FlarialGUI {
 
     void PushImClipRect(D2D_RECT_F rect);
     void PushImClipRect(ImVec2 pos, ImVec2 size);
+    void PrepareBlur(float intensity);
+
 
     void PopImClipRect();
 
@@ -328,7 +330,7 @@ namespace FlarialGUI {
 
     extern IDWriteFactory *writeFactory;
 
-    extern ID2D1ImageBrush *blurbrush;
+    extern winrt::com_ptr<ID2D1ImageBrush>  blurbrush;
     extern ID2D1Factory *factory;
     extern std::unordered_map<std::string, ID2D1Image *> cachedBitmaps;
 

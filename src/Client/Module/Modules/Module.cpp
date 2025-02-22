@@ -135,13 +135,14 @@ void Module::normalRender(int index, std::string &value) {
 
 
 
-    if (settings.getSettingByName<bool>("BlurEffect")->value)
+    if (settings.getSettingByName<bool>("BlurEffect")->value) {
         FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y,
                                                            realcenter.x + rectWidth,
                                                            realcenter.y + (textHeight) *
                                                                           this->settings.getSettingByName<float>(
                                                                                   "rectheight")->value), rounde.x,
                                                rounde.x));
+    }
 
     FlarialGUI::RoundedRect(
             realcenter.x,

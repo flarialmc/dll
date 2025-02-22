@@ -46,8 +46,9 @@ public:
 
         this->addHeader("Main");
         this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
-        this->addToggle("Border", "", this->settings.getSettingByName<bool>(
-                "border")->value);
+        this->addToggle("Border", "", this->settings.getSettingByName<bool>("border")->value);
+        this->addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", this->settings.getSettingByName<bool>(
+        "BlurEffect")->value);
         this->addConditionalSlider(this->settings.getSettingByName<bool>(
                                            "border")->value, "Border Thickness", "", this->settings.getSettingByName<float>("borderWidth")->value,
                                    4.f);
