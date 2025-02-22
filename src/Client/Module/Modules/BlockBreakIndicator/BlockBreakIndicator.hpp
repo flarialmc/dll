@@ -110,7 +110,7 @@ public:
     float currentHeight = 0.0f;
 
     void normalRender(int index, std::string& value) override {
-        if(SDK::getCurrentScreen() != "hud_screen") return;
+        if (SDK::getCurrentScreen() != "hud_screen") return;
 
         if (settings.getSettingByName<bool>("pbmode")->value) {
             if (settings.getSettingByName<bool>("onlyShowWhileBreaking")->value && value == "0%") return;
@@ -166,8 +166,7 @@ public:
                 std::swap(pbwidth, pbheight);
             }
 
-            if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
-                ClickGUI::editmenu) {
+            if (ClickGUI::editmenu) {
                 FlarialGUI::SetWindowRect(coord.x, coord.y, pbwidth, pbheight, index);
 
                 Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(coord.x, coord.y, index, pbwidth, pbheight);
@@ -194,7 +193,7 @@ public:
 
             FlarialGUI::RoundedRect(coord.x, coord.y, bgColor, pbwidth, pbheight, rounde.x, rounde.y);
 
-            if(currentHeight > 0.5f) {
+            if (currentHeight > 0.5f) {
                 if (orientation == "Horizontal")
                     FlarialGUI::RoundedRect(coord.x, coord.y, barFill, currentHeight, pbheight, rounde.x, rounde.y);
                 else
@@ -203,7 +202,7 @@ public:
                                             rounde.x, rounde.y);
             }
 
-            if (this->settings.getSettingByName<bool>("border")->value)
+            if (this->settings.getSettingByName<bool>("border")->value) {
                 FlarialGUI::RoundedHollowRect(
                         coord.x,
                         coord.y,
@@ -216,12 +215,17 @@ public:
                         rounde.x,
                         rounde.y
                 );
+            }
+        }
+        else {
+            Module::normalRender(index, value);
+        }
 
-        if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
-            ClickGUI::editmenu)
+        if (ClickGUI::editmenu) {
             FlarialGUI::UnsetWindowRect();
-        } else Module::normalRender(index, value);
+        }
     }
+
 
     void onRender(RenderEvent &event) {
         if (
