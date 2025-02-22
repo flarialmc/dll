@@ -217,9 +217,9 @@ public:
                         rounde.y
                 );
 
-            if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
-                ClickGUI::editmenu)
-                FlarialGUI::UnsetWindowRect();
+        if (ModuleManager::getModule("ClickGUI")->isEnabled() ||
+            ClickGUI::editmenu)
+            FlarialGUI::UnsetWindowRect();
         } else Module::normalRender(index, value);
     }
 

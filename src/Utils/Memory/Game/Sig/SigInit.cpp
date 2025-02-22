@@ -63,6 +63,10 @@ void SigInit::init2150() {
     ADD_SIG("GeneralSettingsScreenController::GeneralSettingsScreenController", "48 89 ? ? ? 55 56 57 41 ? 41 ? 41 ? 41 ? 48 8D ? ? ? ? ? ? 48 81 EC ? ? ? ? 48 8B ? ? ? ? ? 48 33 ? 48 89 ? ? ? ? ? 45 0F ? ? 45 0F ? ? 44 88");
 
     ADD_SIG("mce::TextureGroup::getTexture", "48 89 5C 24 20 55 56 57 41 54 41 55 41 56 41 57 48 81 EC F0 00 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 E0 00 00 00");
+
+    ADD_SIG("GameMode::attack", "48 89 ? ? ? 48 89 ? ? ? 48 89 ? ? ? 55 41 ? 41 ? 41 ? 41 ? 48 8D ? ? ? ? ? ? 48 81 EC ? ? ? ? 48 8B ? ? ? ? ? 48 33 ? 48 89 ? ? ? ? ? 45 0F ? ? 4C 8B ? 48 8B");
+
+    DEPRECATE_SIG("GameMode::vtable"); // its not broken but not used anymore
 }
 
 void SigInit::init2140() {
