@@ -193,7 +193,7 @@ void ModuleManager::initialize() {
     // addModule<CompactChat>();
     addModule<ItemPhysics>();
 
-    if (VersionUtils::checkAboveOrEqual(21, 60)) {
+    if (VersionUtils::checkAboveOrEqual(21, 40)) {
         addModule<JavaInventoryHotkeys>();
     }
 

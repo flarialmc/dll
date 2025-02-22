@@ -86,7 +86,7 @@ void HookManager::initialize() {
     }
     addHook<UIControl_updateCachedPositionHook>();
     addHook<GeneralSettingsScreenControllerCtorHook>();
-    if(VersionUtils::checkAboveOrEqual(21, 60)) {
+    if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<ContainerScreenControllerHook>();
     }
 
