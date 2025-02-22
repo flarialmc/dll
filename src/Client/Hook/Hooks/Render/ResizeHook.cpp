@@ -193,14 +193,22 @@ void ResizeHook::cleanShit(bool isResize) {
         // TODO: release all render effects here
         Memory::SafeRelease(SwapchainHook::context);
         Memory::SafeRelease(D2D::surface);
+
         Memory::SafeRelease(FlarialGUI::factory);
         Memory::SafeRelease(FlarialGUI::writeFactory);
+
 
         Memory::SafeRelease(SwapchainHook::d3d11On12Device);
 
         if (!isResize) Memory::SafeRelease(SwapchainHook::queue);
 
     }
+
+    Memory::SafeRelease(FlarialGUI::blur);
+    Memory::SafeRelease(FlarialGUI::shadow_blur);
+    Memory::SafeRelease(FlarialGUI::blurbrush);
+    Memory::SafeRelease(FlarialGUI::screen_bitmap_cache);
+    Memory::SafeRelease(FlarialGUI::blur_bitmap_cache);
 
     Memory::SafeRelease(SwapchainHook::D2D1Bitmap);
 

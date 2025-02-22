@@ -718,15 +718,15 @@ void SwapchainHook::prepareBlur() {
     auto blurIntensity = Client::settings.getSettingByName<float>("blurintensity")->value;
 
     if ((ModuleManager::doesAnyModuleHave("BlurEffect") &&
-        blurIntensity > 1 ||
-        !FlarialGUI::notifications.empty() &&
         blurIntensity > 1) && !FlarialGUI::inMenu) {
+
+        std::cout << "Running" << std::endl;
 
         FlarialGUI::PrepareBlur(blurIntensity);
 
         D2D1_IMAGE_BRUSH_PROPERTIES props = D2D1::ImageBrushProperties(
                 D2D1::RectF(0, 0, MC::windowSize.x, MC::windowSize.y));
-        D2D::context->CreateImageBrush(FlarialGUI::blur_bitmap_cache.get(), props, FlarialGUI::blurbrush.put());
+        D2D::context->CreateImageBrush(FlarialGUI::blur_bitmap_cache, props, &FlarialGUI::blurbrush);
         }
     /* Blur End */
 }

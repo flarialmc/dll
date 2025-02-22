@@ -118,7 +118,7 @@ std::map<int, ImTextureID> ImagesClass::ImguiDX12Images;
 // TODO: release it !!!
 ID2D1Factory *FlarialGUI::factory;
 IDWriteFactory *FlarialGUI::writeFactory;
-winrt::com_ptr<ID2D1ImageBrush> FlarialGUI::blurbrush;
+ID2D1ImageBrush* FlarialGUI::blurbrush;
 std::unordered_map<std::string, float> FlarialGUI::TextSizes;
 std::unordered_map<std::string, Vec2<float>> FlarialGUI::TextSizesXY;
 
