@@ -56,7 +56,7 @@ public:
         }
         if (settings.getSettingByName<bool>("here") == nullptr) settings.addSetting("here", true);
         if (settings.getSettingByName<bool>("pingsound") == nullptr) settings.addSetting("pingsound", true);
-        if (this->settings.getSettingByName<std::string>("sound") == nullptr) settings.addSetting("sound", (std::string)"Xp Orb");
+        if (this->settings.getSettingByName<std::string>("mode") == nullptr) settings.addSetting("mode", (std::string)"Xp Orb");
     }
 
     void settingsRender(float settingsOffset) override {
@@ -74,6 +74,7 @@ public:
 
         this->addHeader("Misc");
         this->addToggle("Ping Sound", "Plays a sound when you're mentioned in the chat.", settings.getSettingByName<bool>("pingsound")->value);
+        if (settings.getSettingByName<bool>("pingsound"))
         if (settings.getSettingByName<bool>("pingsound")->value)
         {
             this->addHeader("Ping Sound");
