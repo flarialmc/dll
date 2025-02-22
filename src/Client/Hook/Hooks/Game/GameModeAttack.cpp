@@ -13,7 +13,7 @@ void GameModeAttackHook::callback(Gamemode *gamemode, Actor *actor) {
 }
 
 
-GameModeAttackHook::GameModeAttackHook() : Hook("GameModeAttack", GET_SIG_ADDRESS("GameMode::attack")) {}
+GameModeAttackHook::GameModeAttackHook() : Hook("GameModeAttack", GET_SIG_ADDRESS("GameMode::vtable")) {}
 
 
 void GameModeAttackHook::enableHook() {
