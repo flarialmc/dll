@@ -80,13 +80,14 @@ public:
             this->settings.addSetting(commandName, (std::string)"");
 
 
-            keybindActions.push_back([this](std::vector<std::any> args) -> std::any {
+            int i = totalKeybinds;
+            keybindActions.push_back([this, i](std::vector<std::any> args) -> std::any {
                 KeyEvent event = std::any_cast<KeyEvent>(args[0]);
                 std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
                 if (duration.count() >= 2.5) {
                     std::string count;
-                    if (totalKeybinds > 0) count = "-" + std::to_string(totalKeybinds);
-                    if (this->isKeybind(event.keys, totalKeybinds) && this->isKeyPartOfKeybind(event.key, totalKeybinds)) {
+                    if (i > 0) count = "-" + std::to_string(i);
+                    if (this->isKeybind(event.keys, i) && this->isKeyPartOfKeybind(event.key, i)) {
                         std::shared_ptr<Packet> packet = SDK::createPacket(77);
                         auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
                         command_packet->command = this->settings.getSettingByName<std::string>("command" + count)->value;
