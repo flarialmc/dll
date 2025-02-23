@@ -435,6 +435,7 @@ void Module::checkSettingsFile() const {
         if (!outputFile.is_open()) {
             Logger::error("Failed to create file: {}", settingspath.string());
         }
+        outputFile.close();
     }
 }
 
