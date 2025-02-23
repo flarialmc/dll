@@ -640,6 +640,11 @@ modules = ModuleManager::getModules();
 
                     static auto modules = Scripting::luaScriptModules;
 
+                       if(ModuleManager::cguiRefresh) {
+                           modules = Scripting::luaScriptModules;
+                           ModuleManager::cguiRefresh = false;
+                       }
+
                     for (const auto& pModule: modules) {
                         bool visible = (modcenter.y + yModifier + FlarialGUI::scrollpos + 55 > center.y) &&
                                        (modcenter.y + yModifier + FlarialGUI::scrollpos - 300) <
