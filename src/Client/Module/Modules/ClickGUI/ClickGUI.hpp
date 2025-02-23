@@ -45,6 +45,11 @@ struct PageType {
     std::string module;
 };
 
+struct ScrollInfo {
+    float scrollpos = 0;
+    float barscrollpos = 0;
+};
+
 class ClickGUI : public Module {
 private:
     float baseHeightReal = 0.f;
@@ -66,7 +71,8 @@ public:
     static inline float scriptingOffset = Constraints::RelativeConstraint(4.f, "height", true);
 
     static inline PageType page;
-    static inline std::string curr;
+    static inline std::string curr = "modules";
+    static inline std::map<std::string, ScrollInfo> scrollInfo;
     static float inline accumilatedPos = 1;
     static float inline accumilatedBarPos = 1;
     static bool inline isAnimatingModSet = false;
@@ -74,7 +80,10 @@ public:
     ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {
         Module::setup();
         this->ghostMainModule = new Module("main", "troll", IDR_COMBO_PNG, "");
-        curr = "modules";
+
+        scrollInfo["modules"] = { 0, 0 };
+        scrollInfo["scripting"] = { 0, 0 };
+        scrollInfo["settings"] = { 0, 0 };
     };
 
     void onSetup() override {
@@ -889,14 +898,20 @@ public:
                                                                                         width1,
                                                                                         RadioButtonHeight, round.x,
                                                                                         round.x, "modules", curr)) {
+                auto& _scrollData = scrollInfo[curr];
+                _scrollData.scrollpos = FlarialGUI::scrollpos;
+                _scrollData.barscrollpos = FlarialGUI::barscrollpos;
+
                 curr = "modules";
                 page.type = "normal";
                 FlarialGUI::ResetShit();
 
-                FlarialGUI::scrollpos = 0;
-                FlarialGUI::barscrollpos = 0;
-                accumilatedPos = 0;
-                accumilatedBarPos = 0;
+                auto& scrollData = scrollInfo[curr];
+
+                FlarialGUI::scrollpos = scrollData.scrollpos;
+                FlarialGUI::barscrollpos = scrollData.barscrollpos;
+                accumilatedPos = scrollData.scrollpos;
+                accumilatedBarPos = scrollData.barscrollpos;
             }
 
 
@@ -936,8 +951,18 @@ public:
                                                                                         RadioButtonHeight, round.x,
                                                                                         round.x, "settings",
                                                                                         curr)) {
+                auto& _scrollData = scrollInfo[curr];
+                _scrollData.scrollpos = FlarialGUI::scrollpos;
+                _scrollData.barscrollpos = FlarialGUI::barscrollpos;
+
                 FlarialGUI::TextBoxes[0].isActive = false;
                 curr = "settings";
+                FlarialGUI::ResetShit();
+
+                FlarialGUI::scrollpos = 0;
+                FlarialGUI::barscrollpos = 0;
+                accumilatedPos = 0;
+                accumilatedBarPos = 0;
             }
 
             radioX += Constraints::SpacingConstraint(0.29f, logoWidth);
@@ -978,9 +1003,20 @@ public:
                                                                                         RadioButtonHeight, round.x,
                                                                                         round.x, "scripting",
                                                                                         curr)) {
+                auto& _scrollData = scrollInfo[curr];
+                _scrollData.scrollpos = FlarialGUI::scrollpos;
+                _scrollData.barscrollpos = FlarialGUI::barscrollpos;
 
                 curr = "scripting";
+                page.type = "normal";
+                FlarialGUI::ResetShit();
 
+                auto& scrollData = scrollInfo[curr];
+
+                FlarialGUI::scrollpos = scrollData.scrollpos;
+                FlarialGUI::barscrollpos = scrollData.barscrollpos;
+                accumilatedPos = scrollData.scrollpos;
+                accumilatedBarPos = scrollData.barscrollpos;
             }
 
             radioX += Constraints::SpacingConstraint(0.29f, logoWidth);
@@ -1558,7 +1594,6 @@ modules = ModuleManager::getModules();
                     FlarialGUI::barscrollpos = 0;
                     accumilatedPos = 0;
                     accumilatedBarPos = 0;
-
                 }
             }
 

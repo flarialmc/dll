@@ -4,9 +4,9 @@
 void FlarialGUI::ScrollBar(float x, float y, float width, float height, float radius) {
     float whiteY;
 
-    if (y - ClickGUI::accumilatedPos > y + height) {
-        ClickGUI::accumilatedPos += scrollposmodifier;
-    }
+//    if (y - ClickGUI::accumilatedPos > y + height) {
+//        ClickGUI::accumilatedPos += scrollposmodifier;
+//    }
 
     if (y + ClickGUI::accumilatedPos > y) {
         ClickGUI::accumilatedPos = 0;
