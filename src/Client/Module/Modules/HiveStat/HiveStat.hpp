@@ -108,7 +108,6 @@ public:
 
             Vec2<float> vec2;
             vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 123, 150, 50);
-            checkForRightClickAndOpenSettings(currentPos.x, currentPos.y, 150, 50);
 
             currentPos.x = vec2.x;
             currentPos.y = vec2.y;

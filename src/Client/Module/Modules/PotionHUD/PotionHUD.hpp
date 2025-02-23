@@ -201,7 +201,7 @@ public:
             Vec2<float> vec2;
             // bounding boxes
             vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 23, width, height);
-            checkForRightClickAndOpenSettings(currentPos.x, currentPos.y, width, height);
+
 
             currentPos.x = vec2.x;
             currentPos.y = vec2.y;

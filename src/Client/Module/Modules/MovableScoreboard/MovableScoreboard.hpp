@@ -78,7 +78,7 @@ public:
                 FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 29);
 
             Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 29, width, height);
-            checkForRightClickAndOpenSettings(currentPos.x, currentPos.y, width, height);
+
 
             currentPos.x = vec2.x;
             currentPos.y = vec2.y;

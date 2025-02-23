@@ -129,12 +129,15 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     mod2Col.a = opacity;
 
     FlarialGUI::RoundedRect(x, y, mod1Col, BottomRoundedWidth, BottomRoundedHeight, round.x, round.x);
+    mod->checkForRightClickAndOpenSettings(x, realY, BottomRoundedWidth, BottomRoundedHeight);
+
 
     // Top rounded rect
 
     float TopRoundedHeight = Constraints::SpacingConstraint(sizes[index].y, 0.635f);
 
     FlarialGUI::PushSize(x, y, BottomRoundedWidth, BottomRoundedHeight);
+
     // Mod Name
     float textx = Constraints::PercentageConstraint(0.119, "left");
     float texty = Constraints::PercentageConstraint(0.415, "top");

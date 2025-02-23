@@ -49,7 +49,8 @@ add_compile_definitions(
 
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp" "src/*.hpp")
 file(GLOB_RECURSE LIB_FILES "lib/*.cpp" "lib/*.h")
-add_library(Flarial SHARED main.cpp ${SOURCE_FILES} ${LIB_FILES} src/Assets/Assets.rc)
+add_library(Flarial SHARED main.cpp ${SOURCE_FILES} ${LIB_FILES} src/Assets/Assets.rc
+        src/Client/Module/Modules/ClickGUI/ClickGUI.cpp)
 
 target_include_directories(Flarial PRIVATE
         "."

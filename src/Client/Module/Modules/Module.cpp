@@ -631,9 +631,10 @@ bool Module::isKeyPartOfAdditionalKeybind(int keyCode, const std::string& bind) 
 }
 
 void Module::checkForRightClickAndOpenSettings(float x, float y, float width, float height) {
-    if(FlarialGUI::CursorInRect(x, y, width, height) && MC::mouseButton == MouseButton::Right && MC::held) {
+    if(FlarialGUI::CursorInRect(x, y, width, height) && MC::mouseButton == MouseButton::Right && MC::held ) {
         auto module = ModuleManager::getModule("ClickGUI");
         if(module != nullptr) {
+
             module->active = true;
             ClickGUI::editmenu = false;
             FlarialGUI::TextBoxes[0].isActive = false;
