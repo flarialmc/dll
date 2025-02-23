@@ -74,7 +74,8 @@ public:
 
     int isSlotKeybind(std::string key) {
         for (int i = 0; i < 9; i++) {
-            auto value = parser.options["keyboard_type_0_key.hotbar." + std::to_string(i + 1)];
+            std::string option =  parser.options["ctrl_fullkeyboardgameplay"] == "1" ? "keyboard_type_1_key.hotbar." : "keyboard_type_0_key.hotbar.";
+            auto value = parser.options[option + std::to_string(i + 1)];
             if (value == key) return i;
         }
 
