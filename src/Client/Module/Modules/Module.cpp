@@ -88,12 +88,12 @@ void Module::normalRender(int index, std::string &value) {
                 "rectheight")->value);
 
     if (ClickGUI::editmenu) {
+        auto height = textHeight * this->settings.getSettingByName<float>("rectheight")->value;
         FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth,
-                                  textHeight * this->settings.getSettingByName<float>("rectheight")->value, index);
+                                  height, index);
 
-        Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, rectWidth, textHeight *
-                                                                                                      this->settings.getSettingByName<float>(
-                                                                                                              "rectheight")->value);
+        Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, rectWidth, height);
+        checkForRightClickAndOpenSettings(realcenter.x, realcenter.y, rectWidth, height);
 
         realcenter.x = vec2.x;
         realcenter.y = vec2.y;
@@ -628,4 +628,23 @@ bool Module::isKeyPartOfKeybind(int keyCode, const int keybindCount) {
 bool Module::isKeyPartOfAdditionalKeybind(int keyCode, const std::string& bind) {
     std::vector<int> keyCodes = Utils::getStringAsKeys(bind);
     return std::find(keyCodes.begin(), keyCodes.end(), keyCode) != keyCodes.end();
+}
+
+void Module::checkForRightClickAndOpenSettings(float x, float y, float width, float height) {
+    if(FlarialGUI::CursorInRect(x, y, width, height) && MC::mouseButton == MouseButton::Right && !MC::held) {
+        auto module = ModuleManager::getModule("ClickGUI");
+        if(module != nullptr) {
+            module->active = true;
+            ClickGUI::editmenu = false;
+            FlarialGUI::TextBoxes[0].isActive = false;
+            MC::mouseButton = MouseButton::None;
+            ClickGUI::page.type = "settings";
+            ClickGUI::page.module = this->name;
+            ClickGUI::curr = "settings";
+            FlarialGUI::scrollpos = 0;
+            FlarialGUI::barscrollpos = 0;
+            ClickGUI::accumilatedPos = 0;
+            ClickGUI::accumilatedBarPos = 0;
+        }
+    }
 }

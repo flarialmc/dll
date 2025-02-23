@@ -254,6 +254,8 @@ public:
 
                     Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, totalWidth,
                                                                     totalHeight);
+                    checkForRightClickAndOpenSettings(realcenter.x - (keycardSize + spacing), realcenter.y, totalWidth,
+                                                      totalHeight);
 
                     realcenter.x = vec2.x;
                     realcenter.y = vec2.y;

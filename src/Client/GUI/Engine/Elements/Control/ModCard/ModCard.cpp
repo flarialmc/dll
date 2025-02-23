@@ -281,7 +281,6 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         ClickGUI::page.type = "settings";
         ClickGUI::page.module = mod->name;
         ClickGUI::curr = "settings";
-        FlarialGUI::TextBoxes[0].isActive = false;
         FlarialGUI::scrollpos = 0;
         FlarialGUI::barscrollpos = 0;
         ClickGUI::accumilatedPos = 0;

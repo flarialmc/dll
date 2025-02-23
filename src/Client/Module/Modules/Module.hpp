@@ -108,5 +108,6 @@ public:
     bool isKeyPartOfKeybind(int keyCode, const int keybindCount = 0);
     static bool isKeyPartOfAdditionalKeybind(int keyCode, const std::string& bind);
     virtual void normalRender(int index, std::string& value);
+    void checkForRightClickAndOpenSettings(float x, float y, float width, float height);
     bool isScripting() { return isScriptingModule; }
 };

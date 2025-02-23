@@ -1197,7 +1197,7 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 
     if (!ye) {
 
-        if ((CursorInRect(x, y, width, height) || WindowRects[currentNum].isMovingElement) && MC::held) {
+        if ((CursorInRect(x, y, width, height) || WindowRects[currentNum].isMovingElement) && MC::held && MC::mouseButton == MouseButton::Left) {
 
             if (!WindowRects[currentNum].isMovingElement) {
                 WindowRects[currentNum].oriMouseX = (MC::mousePos.x - ((x + width / 2.0f)));

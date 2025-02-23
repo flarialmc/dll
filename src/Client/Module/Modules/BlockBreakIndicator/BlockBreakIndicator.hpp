@@ -170,6 +170,7 @@ public:
                 FlarialGUI::SetWindowRect(coord.x, coord.y, pbwidth, pbheight, index);
 
                 Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(coord.x, coord.y, index, pbwidth, pbheight);
+                checkForRightClickAndOpenSettings(coord.x, coord.y, pbwidth, pbheight);
 
                 coord.x = vec2.x;
                 coord.y = vec2.y;

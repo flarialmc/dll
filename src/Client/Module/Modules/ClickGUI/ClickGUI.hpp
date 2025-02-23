@@ -957,7 +957,6 @@ public:
 
                 FlarialGUI::TextBoxes[0].isActive = false;
                 curr = "settings";
-                FlarialGUI::ResetShit();
 
                 FlarialGUI::scrollpos = 0;
                 FlarialGUI::barscrollpos = 0;
