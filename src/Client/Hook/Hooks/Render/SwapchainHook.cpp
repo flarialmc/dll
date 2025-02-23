@@ -790,24 +790,38 @@ void SwapchainHook::Fonts() {
 
             config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
 
-            FlarialGUI::FontMap["162-1"] = io.Fonts->AddFontFromFileTTF(
-                    (Utils::getAssetsPath() + "\\162" + ".ttf").c_str(), 23, &config,
-                    io.Fonts->GetGlyphRangesDefault());
-            FlarialGUI::FontMap["162-2.0"] = io.Fonts->AddFontFromFileTTF(
-                    (Utils::getAssetsPath() + "\\162" + ".ttf").c_str(), 40, &config,
-                    io.Fonts->GetGlyphRangesDefault());
+            std::filesystem::path path(Utils::getAssetsPath() + "\\162" + ".ttf");
+            static auto fontData = Memory::readFile(path);
+            config.FontDataOwnedByAtlas = false;
+
+            if(!fontData.empty()) {
+                FlarialGUI::FontMap["162-1"] = io.Fonts->AddFontFromMemoryTTF(
+                        fontData.data(), fontData.size(), 23, &config,
+                        io.Fonts->GetGlyphRangesDefault());
+                FlarialGUI::FontMap["162-2.0"] = io.Fonts->AddFontFromMemoryTTF(
+                        fontData.data(), fontData.size(), 40, &config,
+                        io.Fonts->GetGlyphRangesDefault());
+            }
+
             fontLoaded = true;
         }
 
         if (!FlarialGUI::FontMap["163-1"]) {
             ImFontConfig config;
             config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
-            FlarialGUI::FontMap["163-1"] = io.Fonts->AddFontFromFileTTF(
-                    (Utils::getAssetsPath() + "\\163" + ".ttf").c_str(), 23, &config,
-                    io.Fonts->GetGlyphRangesDefault());
-            FlarialGUI::FontMap["163-2.0"] = io.Fonts->AddFontFromFileTTF(
-                    (Utils::getAssetsPath() + "\\163" + ".ttf").c_str(), 40, &config,
-                    io.Fonts->GetGlyphRangesDefault());
+
+            std::filesystem::path path(Utils::getAssetsPath() + "\\163" + ".ttf");
+            static auto fontData = Memory::readFile(path);
+            config.FontDataOwnedByAtlas = false;
+
+            if(!fontData.empty()) {
+                FlarialGUI::FontMap["163-1"] = io.Fonts->AddFontFromMemoryTTF(
+                        fontData.data(), fontData.size(), 23, &config,
+                        io.Fonts->GetGlyphRangesDefault());
+                FlarialGUI::FontMap["163-2.0"] = io.Fonts->AddFontFromMemoryTTF(
+                        fontData.data(), fontData.size(), 40, &config,
+                        io.Fonts->GetGlyphRangesDefault());
+            }
 
             fontLoaded = true;
         }
@@ -815,12 +829,19 @@ void SwapchainHook::Fonts() {
         if (!FlarialGUI::FontMap["164-1"]) {
             ImFontConfig config;
             config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_Monochrome | ImGuiFreeTypeBuilderFlags_MonoHinting;
-            FlarialGUI::FontMap["164-1"] = io.Fonts->AddFontFromFileTTF(
-                    (Utils::getAssetsPath() + "\\164" + ".ttf").c_str(), 24, &config,
-                    io.Fonts->GetGlyphRangesDefault());
-            FlarialGUI::FontMap["164-2.0"] = io.Fonts->AddFontFromFileTTF(
-                    (Utils::getAssetsPath() + "\\164" + ".ttf").c_str(), 40, &config,
-                    io.Fonts->GetGlyphRangesDefault());
+
+            std::filesystem::path path(Utils::getAssetsPath() + "\\164" + ".ttf");
+            static auto fontData = Memory::readFile(path);
+            config.FontDataOwnedByAtlas = false;
+
+            if(!fontData.empty()) {
+                FlarialGUI::FontMap["164-1"] = io.Fonts->AddFontFromMemoryTTF(
+                        fontData.data(), fontData.size(), 23, &config,
+                        io.Fonts->GetGlyphRangesDefault());
+                FlarialGUI::FontMap["164-2.0"] = io.Fonts->AddFontFromMemoryTTF(
+                        fontData.data(), fontData.size(), 40, &config,
+                        io.Fonts->GetGlyphRangesDefault());
+            }
 
             fontLoaded = true;
         }

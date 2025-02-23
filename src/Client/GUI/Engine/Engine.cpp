@@ -849,9 +849,9 @@ void FlarialGUI::ExtractImageResource(int resourceId, std::string fileName, LPCT
 
     std::string fileType(type);
 
-    std::string lpFileName = fmt::format("{}\\{}", Utils::getAssetsPath(), fileName);
+    std::filesystem::path path(fmt::format("{}\\{}", Utils::getAssetsPath(), fileName));
 
-    std::ofstream outFile(lpFileName, std::ios::binary);
+    std::ofstream outFile(path, std::ios::binary);
     if (!outFile) {
         return;
     }
@@ -880,6 +880,8 @@ void FlarialGUI::LoadFont(int resourceId) {
     dwFontSize = SizeofResource(Client::currentModule, hRes);
 
     std::string lpFileName = fmt::format("{}\\{}.ttf", Utils::getAssetsPath(), resourceId);
+
+    if(std::filesystem::exists(lpFileName)) return;
 
     std::ofstream outFile(lpFileName, std::ios::binary);
     if (!outFile) {
@@ -1027,7 +1029,7 @@ bool FlarialGUI::LoadFontFromFontFamily(std::string name, std::string weightedNa
     if (!fontFilePath.empty()) {
 
         std::ifstream fontFile(fontFilePath, std::ios::binary);
-        if (fontFile) {
+        if (fontFile.is_open()) {
 
             ImFontConfig config;
             FontMap[weightedName + "-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 200, &config);

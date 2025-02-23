@@ -186,4 +186,21 @@ public:
         DWORD oldProtect;
         VirtualProtect((LPVOID)addr, size, protect, &oldProtect);
     }
+
+    static std::vector<std::byte> readFile(std::filesystem::path path) {
+
+        std::ifstream file(path, std::ios::binary);
+        if (!file.is_open()) {
+            return {};
+        }
+        file.seekg(0, std::ios::end);
+        std::streampos fileSize = file.tellg();
+        file.seekg(0, std::ios::beg);
+
+        std::vector<std::byte> buffer(fileSize);
+        file.read(reinterpret_cast<char*>(buffer.data()), fileSize);
+        file.close();
+
+        return buffer;
+    }
 };

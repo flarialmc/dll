@@ -393,8 +393,8 @@ void Module::loadDefaults() {
 void Module::saveSettings() const {
     try {
         std::ofstream outputFile(settingspath);
-        if (!outputFile) {
-            Logger::error("Failed to open file: {}", settingspath);
+        if (!outputFile.is_open()) {
+            Logger::error("Failed to open file: {}", settingspath.string());
             return;
         }
         outputFile << settings.ToJson();
@@ -405,13 +405,14 @@ void Module::saveSettings() const {
 
 void Module::loadSettings() {
     std::ifstream inputFile(settingspath);
-    if (!inputFile) {
-        Logger::error("Failed to open file: {}", settingspath);
+    if (!inputFile.is_open()) {
+        Logger::error("Failed to open file: {}", settingspath.string());
         return;
     }
 
     std::stringstream ss;
     ss << inputFile.rdbuf();
+    inputFile.close();
     settings.FromJson(ss.str());
 
     totalKeybinds = 0;
@@ -429,10 +430,10 @@ void Module::loadSettings() {
 
 void Module::checkSettingsFile() const {
     if (!std::filesystem::exists(settingspath)) {
-        std::filesystem::create_directories(std::filesystem::path(settingspath).parent_path());
+        std::filesystem::create_directories(settingspath.parent_path());
         std::ofstream outputFile(settingspath);
-        if (!outputFile) {
-            Logger::error("Failed to create file: {}", settingspath);
+        if (!outputFile.is_open()) {
+            Logger::error("Failed to create file: {}", settingspath.string());
         }
     }
 }

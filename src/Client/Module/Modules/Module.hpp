@@ -25,7 +25,7 @@ public:
     bool isScriptingModule;
     std::string defaultKeybind;
     Settings settings;
-    std::string settingspath;
+    std::filesystem::path settingspath;
     std::vector<std::function<std::any(std::vector<std::any>)>> keybindActions;
     int totalKeybinds = 0;
     int totalWaypoints = 0;

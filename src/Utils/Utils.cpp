@@ -13,23 +13,29 @@
 std::string Utils::getRoamingPath() {
     using namespace winrt::Windows::Storage;
 
-    return winrt::to_string(ApplicationData::Current().RoamingFolder().Path());
+    std::filesystem::path path(ApplicationData::Current().RoamingFolder().Path().c_str());
+
+    return path.string();
 }
 
 std::string Utils::getClientPath() {
-    return Utils::getRoamingPath() + "\\Flarial";
+    std::filesystem::path path(Utils::getRoamingPath() + "\\Flarial");
+    return path.string();
 }
 
 std::string Utils::getConfigsPath() {
-    return Utils::getRoamingPath() + "\\Flarial\\Config";
+    std::filesystem::path path(Utils::getRoamingPath() + "\\Flarial\\Config");
+    return path.string();
 }
 
 std::string Utils::getAssetsPath() {
-    return Utils::getRoamingPath() + "\\Flarial\\assets";
+    std::filesystem::path path(Utils::getRoamingPath() + "\\Flarial\\assets");
+    return path.string();
 }
 
 std::string Utils::getLogsPath() {
-    return Utils::getRoamingPath() + "\\Flarial\\logs";
+    std::filesystem::path path(Utils::getRoamingPath() + "\\Flarial\\logs");
+    return path.string();
 }
 
 std::string Utils::getKeyAsString(int key, bool isCapital, bool isKeybind) {

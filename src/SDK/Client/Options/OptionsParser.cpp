@@ -6,12 +6,16 @@
 #include <map>
 #include "../../Utils/Logger/Logger.hpp"
 #include <Utils/WinrtUtils.hpp>
+#include <Utils/Utils.hpp>
 
 std::map<std::string, std::string> OptionsParser::parseOptionsFile() {
-    std::ifstream file(winrt::to_string(winrt::Windows::Storage::ApplicationData::Current().LocalFolder().Path()) + "\\games\\com.mojang\\minecraftpe\\options.txt");
+
+    std::filesystem::path path((winrt::Windows::Storage::ApplicationData::Current().LocalFolder().Path() + L"\\games\\com.mojang\\minecraftpe\\options.txt").c_str());
+    std::ifstream file(path);
     
-    if (!file) {
+    if (!file.is_open()) {
         Logger::error("Failed to open options.txt");
+        return OptionsParser::options;
     }
 
     std::string line;

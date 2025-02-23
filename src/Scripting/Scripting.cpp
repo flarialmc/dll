@@ -143,7 +143,7 @@ void load(std::string name, std::string description, std::string mainclass) {
 }
 
 void Scripting::loadModules() {
-     for (const auto& entry : std::filesystem::directory_iterator(Utils::getRoamingPath() + "\\Flarial\\scripts")) { 
+     for (const auto& entry : std::filesystem::directory_iterator((Utils::getRoamingPath() + "\\Flarial\\scripts").c_str())) {
             
             if (std::filesystem::exists(entry.path().string() + "\\" + "main.json")){
                 std::ifstream file(entry.path().string() + "\\" + "main.json");
