@@ -3,7 +3,8 @@
 #include "../Module.hpp"
 
 class EntityCounter : public Module {
-
+private:
+    int entityCount = 0;
 public:
 
     EntityCounter() : Module("Entity Counter", "Counts the entities in the surrounding area",
@@ -13,11 +14,13 @@ public:
 
     void onEnable() override {
         Listen(this, RenderEvent, &EntityCounter::onRender);
+        Listen(this, SetupAndRenderEvent, &EntityCounter::onSetupAndRender);
         Module::onEnable();
     }
 
     void onDisable() override {
         Deafen(this, RenderEvent, &EntityCounter::onRender);
+        Deafen(this, SetupAndRenderEvent, &EntityCounter::onSetupAndRender);
         Module::onDisable();
     }
 
@@ -90,15 +93,18 @@ public:
         this->resetPadding();
     }
 
+    void onSetupAndRender(SetupAndRenderEvent &event) {
+        if (SDK::clientInstance->getLocalPlayer()) {
+            entityCount = (int)SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList().size();
+        }
+    }
+
     void onRender(RenderEvent &event) {
-        if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
-            if (SDK::clientInstance->getLocalPlayer() != nullptr && SDK::getCurrentScreen() == "hud_screen") {
+        if (SDK::clientInstance->getLocalPlayer() && SDK::getCurrentScreen() == "hud_screen") {
 
-                int entityCount = (int)SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList().size();
-                std::string str = std::format("{}", entityCount);
+            std::string str = std::format("{}", entityCount);
 
-                this->normalRender(24, str);
-            }
+            this->normalRender(24, str);
         }
     }
 };
