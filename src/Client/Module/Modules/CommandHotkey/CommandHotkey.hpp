@@ -132,9 +132,8 @@ public:
     }
 
     void onKey(KeyEvent &event) {
-
+        if(!SDK::clientInstance->getLocalPlayer()) return;
         if (this->isEnabled()) {
-
                 for (int i = 0; i <= totalKeybinds; ++i) {
                     keybindActions[i]({ std::any(event) });
                 }
