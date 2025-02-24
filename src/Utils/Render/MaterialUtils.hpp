@@ -10,4 +10,5 @@ public:
     static mce::MaterialPtr* getUITextured();
     static mce::MaterialPtr* getParticlesAlpha();
     static mce::MaterialPtr* getUICrosshair();
+    static mce::MaterialPtr* getNametag();
 };

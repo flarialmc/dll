@@ -118,7 +118,7 @@ class BaseActorRendererRenderTextHook : public Hook {
         tess->vertexUV(x + size, y + size, 0.f, 1.f, 1.f);
         tess->vertexUV(x + size, y, 0.f, 1.f, 0.f);
 
-        MeshHelpers::renderMeshImmediately2(screenContext, tess, MaterialUtils::getUITextured(), *ptr.clientTexture);
+        MeshHelpers::renderMeshImmediately2(screenContext, tess, MaterialUtils::getNametag(), *ptr.clientTexture);
 
         stack.pop();
     }
