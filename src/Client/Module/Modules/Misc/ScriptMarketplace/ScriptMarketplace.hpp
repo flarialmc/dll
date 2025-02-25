@@ -36,6 +36,8 @@ public:
                     file.close();
                     Utils::extractFromFile(Utils::getRoamingPath() + "\\Flarial\\tmpd.tmp", scriptPath() + "\\" + id);
                     std::filesystem::remove(Utils::getRoamingPath() + "\\Flarial\\tmpd.tmp");
+
+                    ModuleManager::restartModules = true;
                 }
             }
         }
