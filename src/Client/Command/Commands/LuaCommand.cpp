@@ -76,41 +76,7 @@ void flatten(const std::string& targetPath) {
     removeDirectories(targetDir);
 }
 
-void extractFromFile(const std::string& zipFilePath, const std::string& destinationFolder) {
-    mz_zip_archive zip_archive = {};
 
-    if (!mz_zip_reader_init_file(&zip_archive, zipFilePath.c_str(), 0)) {
-        Logger::error("Failed to open zip file: {}", zipFilePath);
-        return;
-    }
-
-    std::string baseDir = destinationFolder;
-    if (!baseDir.empty() && baseDir.back() != '\\') {
-        baseDir.push_back('\\');
-    }
-
-    int file_count = static_cast<int>(mz_zip_reader_get_num_files(&zip_archive));
-    for (int i = 0; i < file_count; i++) {
-        mz_zip_archive_file_stat file_stat;
-        if (!mz_zip_reader_file_stat(&zip_archive, i, &file_stat)) {
-            // Could not get file info for this entry, skip it
-            continue;
-        }
-
-        std::string filename(file_stat.m_filename);
-
-        if (mz_zip_reader_is_file_a_directory(&zip_archive, i)) {
-            std::filesystem::create_directories(baseDir + filename);
-        } else {
-            // Not a directory aka a file
-            std::filesystem::path fullPath = baseDir + filename;
-            std::filesystem::create_directories(fullPath.parent_path());
-
-            mz_zip_reader_extract_to_file(&zip_archive, i, fullPath.string().c_str(), 0);
-        }
-    }
-    mz_zip_reader_end(&zip_archive);
-}
 
 winrt::Windows::Foundation::IAsyncAction extract(winrt::Windows::Storage::StorageFile storageFile, std::string destinationFolder) {
     using namespace winrt::Windows::Storage;
@@ -119,7 +85,7 @@ winrt::Windows::Foundation::IAsyncAction extract(winrt::Windows::Storage::Storag
     auto copiedFile = co_await storageFile.CopyAsync(localFolder, L"temp.zip", NameCollisionOption::ReplaceExisting);
 
     std::string localZipPath = winrt::to_string(copiedFile.Path());
-    extractFromFile(localZipPath, destinationFolder);
+    Utils::extractFromFile(localZipPath, destinationFolder);
     co_await copiedFile.DeleteAsync();
 }
 

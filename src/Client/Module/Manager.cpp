@@ -68,6 +68,7 @@
 #include <Modules/Misc/InputImGUi/GUIMouseListener.hpp>
 #include <Modules/Misc/InputImGUi/GUIKeyListener.hpp>
 #include <Modules/Misc/PackChanger/PackChanger.hpp>
+#include <Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp>
 
 #include "Modules/ItemPhysics/ItemPhysics.hpp"
 #include "Modules/Crosshair/Crosshair.hpp"
@@ -223,6 +224,7 @@ void ModuleManager::initialize() {
     addService<HiveModeCatcherListener>();
     addService<ImGUIMouseListener>();
     addService<ImGUIKeyListener>();
+    addService<ScriptMarketplace>();
 
     addService<ConsoleService>();
     Scripting::loadModules();

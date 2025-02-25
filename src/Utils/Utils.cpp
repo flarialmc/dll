@@ -9,6 +9,7 @@
 #include <Psapi.h>
 #include <regex>
 #include <wininet.h>
+#include <miniz/miniz.h>
 
 std::string Utils::getRoamingPath() {
     using namespace winrt::Windows::Storage;
@@ -389,6 +390,42 @@ uint64_t Utils::getCurrentMs() {
     return std::chrono::duration_cast<std::chrono::milliseconds>(
                std::chrono::steady_clock::now().time_since_epoch())
         .count();
+}
+
+void Utils::extractFromFile(const std::string& zipFilePath, const std::string& destinationFolder) {
+    mz_zip_archive zip_archive = {};
+
+    if (!mz_zip_reader_init_file(&zip_archive, zipFilePath.c_str(), 0)) {
+        Logger::error("Failed to open zip file: {}", zipFilePath);
+        return;
+    }
+
+    std::string baseDir = destinationFolder;
+    if (!baseDir.empty() && baseDir.back() != '\\') {
+        baseDir.push_back('\\');
+    }
+
+    int file_count = static_cast<int>(mz_zip_reader_get_num_files(&zip_archive));
+    for (int i = 0; i < file_count; i++) {
+        mz_zip_archive_file_stat file_stat;
+        if (!mz_zip_reader_file_stat(&zip_archive, i, &file_stat)) {
+            // Could not get file info for this entry, skip it
+            continue;
+        }
+
+        std::string filename(file_stat.m_filename);
+
+        if (mz_zip_reader_is_file_a_directory(&zip_archive, i)) {
+            std::filesystem::create_directories(baseDir + filename);
+        } else {
+            // Not a directory aka a file
+            std::filesystem::path fullPath = baseDir + filename;
+            std::filesystem::create_directories(fullPath.parent_path());
+
+            mz_zip_reader_extract_to_file(&zip_archive, i, fullPath.string().c_str(), 0);
+        }
+    }
+    mz_zip_reader_end(&zip_archive);
 }
 
 std::string Utils::downloadFile(const std::string& url) {

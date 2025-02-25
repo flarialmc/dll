@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Scripting/Scripting.hpp>
 #include "../../../../Client.hpp"
 
 class SaveConfigListener : public Listener {
@@ -8,6 +9,7 @@ public:
         if (event.getKey() == VK_F7 && static_cast<ActionType>(event.getAction()) == ActionType::Released) {
             ModuleManager::SaveModulesConfig();
             Client::SaveSettings();
+            Scripting::SaveSettings();
             FlarialGUI::Notify("Config Saved");
         }
     }

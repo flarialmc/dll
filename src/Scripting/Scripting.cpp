@@ -174,3 +174,11 @@ void Scripting::loadModules() {
     Logger::custom(fg(fmt::color::aqua), "Scripting", "Found {} scripts! Loaded {} scripts without errors. Found errors in {} scripts.", Scripting::scriptsAmount, Scripting::scriptsAmountWithoutErrors, Scripting::scriptsAmountWithErrors);
     Scripting::console.addLog("Scripting", "Found " + std::to_string(Scripting::scriptsAmount) + " scripts! Loaded "+ std::to_string(Scripting::scriptsAmountWithoutErrors) +" scripts without errors. Found errors in "+ std::to_string(Scripting::scriptsAmountWithErrors) +" scripts.", fg(fmt::color::aqua));
 }
+
+
+void Scripting::SaveSettings() {
+    for (auto &scriptModule: luaScriptModules) {
+        Module *module = scriptModule.second.get();
+        module->saveSettings();
+    }
+}

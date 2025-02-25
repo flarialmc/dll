@@ -295,6 +295,8 @@ public:
     static std::string downloadFile(const std::string& url);
 
     static std::string sanitizeName(const std::string& name);
+
+    static void extractFromFile(const std::string& zipFilePath, const std::string& destinationFolder);
 };
 
 class String {
