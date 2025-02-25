@@ -61,7 +61,7 @@ nlohmann::json APIUtils::getVips() {
 
 nlohmann::json APIUtils::getUsers() {
     try {
-        std::string users = get("https://api.flarial.xyz/servers");
+        std::string users = get("https://api.flarial.xyz/allOnlineUsers");
 
         if (users.empty()) {
             Logger::warn("Unable to fetch users, API is down or you are not connected to the internet.");
