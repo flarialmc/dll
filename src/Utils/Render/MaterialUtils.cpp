@@ -6,6 +6,7 @@ static mce::MaterialPtr* uiFillColor = nullptr;
 static mce::MaterialPtr* uiTextured = nullptr;
 static mce::MaterialPtr* particlesAlpha = nullptr;
 static mce::MaterialPtr* uiCrosshair = nullptr;
+static mce::MaterialPtr* nametagDepthTested = nullptr;
 
 void MaterialUtils::update() {
     if (uiFillColor == nullptr)
@@ -19,6 +20,8 @@ void MaterialUtils::update() {
 
     if (uiCrosshair == nullptr)
         uiCrosshair = mce::RenderMaterialGroup::createUI(HashedString("ui_crosshair"));
+    if (nametagDepthTested == nullptr)
+        nametagDepthTested = mce::RenderMaterialGroup::createUI(HashedString("name_tag_depth_tested"));
 }
 
 mce::MaterialPtr* MaterialUtils::getUIFillColor() {
@@ -36,3 +39,8 @@ mce::MaterialPtr* MaterialUtils::getParticlesAlpha() {
 mce::MaterialPtr* MaterialUtils::getUICrosshair() {
     return uiCrosshair;
 }
+
+mce::MaterialPtr* MaterialUtils::getNametag() {
+    return nametagDepthTested;
+}
+
