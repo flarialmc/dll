@@ -19,6 +19,7 @@
 #include "Packets/LuaTextPacket.hpp"
 #include "Packets/LuaPlaySoundPacket.hpp"
 #include "Packets/LuaSetTitlePacket.hpp"
+#include "Packets/LuaChangeDimensionPacket.hpp"
 #include "Functions/OtherSettings.hpp"
 #include "Functions/LuaModuleManager.hpp"
 #include "Functions/LuaClient.hpp"
@@ -105,6 +106,7 @@ void registerFunctions(lua_State* L){
     LuaTextPacket::registerFunctions(L);
     LuaPlaySoundPacket::registerFunctions(L);
     LuaSetTitlePacket::registerFunctions(L);
+    LuaChangeDimensionPacket::registerFunctions(L);
 
     //libs
     LuaMixins::registerLib(L);
