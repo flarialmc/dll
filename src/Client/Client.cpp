@@ -31,15 +31,15 @@ std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
     std::vector<std::string> allPlayers;
 
     try {
-        // Iterate through key-value pairs in the JSON object
-        for (const auto& [key, value] : data.items()) {
-            if (value.contains("players") && value.at("players").is_array()) {
-                for (const auto& player : value.at("players")) {
-                    if (player.is_string()) {
-                        allPlayers.push_back(player.get<std::string>());
-                    }
+        // Check if the JSON is an array of players
+        if (data.is_array()) {
+            for (const auto& player : data) {
+                if (player.is_string()) {
+                    allPlayers.push_back(player.get<std::string>());
                 }
             }
+        } else {
+            Logger::error("Invalid JSON format: expected an array of players.");
         }
     } catch (const nlohmann::json::exception& e) {
         Logger::error("Error parsing players: {}", e.what());
@@ -61,6 +61,7 @@ std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
 
     return allPlayers;
 }
+
 
 bool Client::disable = false;
 
