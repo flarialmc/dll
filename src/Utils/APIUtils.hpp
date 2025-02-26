@@ -7,6 +7,8 @@ class APIUtils {
   static std::vector<std::string> onlineUsers;
   static std::map<std::string, std::string> onlineVips;
 
+  static std::string legacyGet(const std::string &URL);
+
   static std::string get(const std::string& link);
   static nlohmann::json getVips();
   static nlohmann::json getUsers();

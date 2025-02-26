@@ -69,7 +69,7 @@ DWORD WINAPI init() {
             if (clearedName.empty()) clearedName = String::removeColorCodes(name);
 
             if (clearedName != "skinStandardCust") {
-                APIUtils::get(std::format("https://api.flarial.xyz/heartbeat/{}/{}", clearedName, ipToSend));
+                APIUtils::legacyGet(std::format("https://api.flarial.xyz/heartbeat/{}/{}", clearedName, ipToSend));
                 lastBeatTime = now;
             }
         }

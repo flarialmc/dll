@@ -10,6 +10,31 @@ std::vector<std::string> APIUtils::onlineUsers;
 std::map<std::string, std::string> APIUtils::onlineVips;
 
 
+std::string APIUtils::legacyGet(const std::string &URL) {
+    try {
+        HINTERNET interwebs = InternetOpenA("Samsung Smart Fridge", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
+        if (!interwebs) {
+            return "";
+        }
+
+        std::string rtn;
+        HINTERNET urlFile = InternetOpenUrlA(interwebs, URL.c_str(), NULL, 0, INTERNET_FLAG_RELOAD, 0);
+        if (urlFile) {
+            char buffer[2000];
+            DWORD bytesRead;
+            while (InternetReadFile(urlFile, buffer, sizeof(buffer), &bytesRead) && bytesRead > 0) {
+                rtn.append(buffer, bytesRead);
+            }
+            InternetCloseHandle(urlFile);
+        }
+
+        InternetCloseHandle(interwebs);
+        return String::replaceAll(rtn, "|n", "\r\n");
+    } catch (const std::exception &e) {
+        Logger::error(e.what());
+    }
+    return "";
+}
 
      std::string APIUtils::get(const std::string &link) {
         try {
@@ -98,7 +123,6 @@ std::map<std::string, std::string> APIUtils::onlineVips;
 nlohmann::json APIUtils::getVips() {
     try {
         std::string users = get("https://api.flarial.xyz/vips");
-        std::cout << users << std::endl;
 
         if (users.empty()) {
             Logger::warn("Unable to fetch vips, API is down or you are not connected to the internet.");
