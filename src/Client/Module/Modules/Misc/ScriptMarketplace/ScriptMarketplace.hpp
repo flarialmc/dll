@@ -1,9 +1,36 @@
 #pragma once
 
 #include <winrt/impl/windows.storage.2.h>
+#include <wininet.h>
 #include "../../../../Client.hpp"
 
 class ScriptMarketplace : public Listener {
+private:
+    std::string GetString(const std::string &URL) {
+        try {
+            HINTERNET interwebs = InternetOpenA("Samsung Smart Fridge", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
+            if (!interwebs) {
+                return "";
+            }
+
+            std::string rtn;
+            HINTERNET urlFile = InternetOpenUrlA(interwebs, URL.c_str(), NULL, 0, INTERNET_FLAG_RELOAD, 0);
+            if (urlFile) {
+                char buffer[2000];
+                DWORD bytesRead;
+                while (InternetReadFile(urlFile, buffer, sizeof(buffer), &bytesRead) && bytesRead > 0) {
+                    rtn.append(buffer, bytesRead);
+                }
+                InternetCloseHandle(urlFile);
+            }
+
+            InternetCloseHandle(interwebs);
+            return String::replaceAll(rtn, "|n", "\r\n");
+        } catch (const std::exception &e) {
+            Logger::error(e.what());
+        }
+        return "";
+    }
 public:
     ScriptMarketplace() {
         Listen(this, ProtocolEvent, &ScriptMarketplace::onProtocol);
@@ -29,7 +56,7 @@ public:
                     std::string id = String::WStrToStr(pair.second);
                     Logger::info("script id {}", id);
                     std::string url = "http://node2.sear.host:5019/api/scripts/" + id + "/download";
-                    std::string data = APIUtils::get(url);
+                    std::string data = GetString(url);
                     std::ofstream file(Utils::getRoamingPath() + "\\Flarial\\tmpd.tmp", std::ios::binary);
                     Logger::info("data: {}", data.c_str());
                     file.write(data.c_str(), data.size());
