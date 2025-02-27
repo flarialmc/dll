@@ -22,7 +22,7 @@ private:
 public:
     JavaInventoryHotkeys() : Module("Java Hotkeys",
                           "Allows to swap items in your inventory java-like.",
-                          IDR_FULLBRIGHT_PNG, "") {
+                          IDR_KEYBOARD_PNG, "") {
         Module::setup();
     };
 
