@@ -13,6 +13,12 @@
 
 inline ScriptSettingManager gScriptSettingManager;
 
+// onEnable, onDisable and enabled checks are broken due to unfinished setting system & ClickGUI
+// I can't fix it until ClickGUI can properly render scripts, so this bool allows you
+// to still use events and reload scripts.
+// There's no way to check if the script is enabled or not so events don't fire.
+const bool ALWAYS_ENABLE = true;
+
 class ScriptModuleBase : public Module {
 public:
     lua_State* moduleLuaState;
@@ -81,34 +87,34 @@ public:
     }
 
     void onKey(KeyEvent& event) {
-        if (!ScriptManager::initialized || !enabledState) return;
+        if (!ScriptManager::initialized || (!ALWAYS_ENABLE && !enabledState)) return;
 
         bool cancelled = ScriptEventManager::triggerEvent("onKey", event.getKey(), (int)event.getAction());
         if (cancelled) event.cancel();
     }
 
     void onMouse(MouseEvent& event) {
-        if (!ScriptManager::initialized || !enabledState || event.getButton() == 0 || event.getAction() == 0) return;
+        if (!ScriptManager::initialized || (!ALWAYS_ENABLE && !enabledState) || event.getButton() == 0 || event.getAction() == 0) return;
 
         bool cancelled = ScriptEventManager::triggerEvent("onMouse", (int)event.getButton(), (int)event.getAction());
         if (cancelled) event.cancel();
     }
 
     void onPacketReceive(PacketEvent &event) {
-        if (!ScriptManager::initialized || !enabledState) return;
+        if (!ScriptManager::initialized || (!ALWAYS_ENABLE && !enabledState)) return;
 
         bool cancelled = ScriptEventManager::triggerEvent("onPacketReceive", event.getPacket(), (int)event.getPacket()->getId());
         if (cancelled) event.cancel();
     }
 
     void onTickEvent(TickEvent& event) {
-        if (!ScriptManager::initialized || !enabledState) return;
+        if (!ScriptManager::initialized || (!ALWAYS_ENABLE && !enabledState)) return;
 
         ScriptEventManager::triggerEvent("onTick");
     }
 
     void onRenderEvent(RenderEvent& event) {
-        if (!ScriptManager::initialized || !enabledState) return;
+        if (!ScriptManager::initialized || (!ALWAYS_ENABLE && !enabledState)) return;
 
         ScriptEventManager::triggerEvent("onRender");
     }
