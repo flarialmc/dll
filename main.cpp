@@ -22,6 +22,19 @@ std::chrono::steady_clock::time_point lastVipFetchTime;
 std::chrono::steady_clock::time_point lastOnlineUsersFetchTime;
 std::chrono::steady_clock::time_point lastAnnouncementTime;
 
+void SavePlayerCache() {
+    std::string playersListString = APIUtils::VectorToList(APIUtils::onlineUsers);
+
+    std::string filePath = Utils::getRoamingPath() + "/Flarial/playerscache.txt";
+    std::ofstream cacheFile(filePath);
+    if (cacheFile.is_open()) {
+        cacheFile << playersListString;
+        cacheFile.close();
+        Logger::success("Cached player list.");
+    } else {
+        Logger::error("Could not open file for writing: " + filePath);
+    }
+}
 
 DWORD WINAPI init() {
 
@@ -82,6 +95,7 @@ DWORD WINAPI init() {
                 std::string data = APIUtils::VectorToList(APIUtils::onlineUsers);
                 std::pair<long, std::string> post = APIUtils::POST_Simple("https://api.flarial.xyz/allOnlineUsers", data);
                 APIUtils::onlineUsers = APIUtils::UpdateVector(APIUtils::onlineUsers, post.second);
+                SavePlayerCache();
                 lastOnlineUsersFetchTime = now;
             } catch (const std::exception &ex) {
                 Logger::error("An error occurred while parsing online users: {}", ex.what());

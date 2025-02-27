@@ -29,18 +29,6 @@ public:
     inline static std::string path = Utils::getClientPath() + "\\main.flarial";
     static void SaveSettings() {
 
-        std::string playersListString = APIUtils::VectorToList(APIUtils::onlineUsers);
-
-        std::string filePath = Utils::getRoamingPath() + "/Flarial/playerscache.txt";
-        std::ofstream cacheFile(filePath);
-        if (cacheFile.is_open()) {
-            cacheFile << playersListString;
-            cacheFile.close();
-            Logger::success("Cached player list.");
-        } else {
-            Logger::error("Could not open file for writing: " + filePath);
-        }
-
         try {
             std::ofstream outputFile(path);
             if (outputFile) {

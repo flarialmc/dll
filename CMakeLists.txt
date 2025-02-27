@@ -84,7 +84,7 @@ add_library(libcurl SHARED IMPORTED GLOBAL)
 set_target_properties(libcurl PROPERTIES
         MSVC_RUNTIME_LIBRARY "MultiThreaded"
 )
-set_target_properties(libcurl PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/curl/libcurl-d.lib")
+set_target_properties(libcurl PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/curl/libcurl.lib")
 
 add_library(zlib SHARED IMPORTED GLOBAL)
 set_target_properties(zlib PROPERTIES
