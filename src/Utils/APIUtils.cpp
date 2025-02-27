@@ -8,6 +8,8 @@
 #include <curl/curl/curl.h>
 #include <curl/curl/easy.h>
 
+#include "SDK/SDK.hpp"
+
 std::vector<std::string> APIUtils::onlineUsers;
 std::map<std::string, std::string> APIUtils::onlineVips;
 
@@ -313,6 +315,21 @@ std::vector<std::string> APIUtils::UpdateVector(
             }
         }
     }
+
+    if (SDK::clientInstance && SDK::clientInstance->getLocalPlayer()) {
+        try {
+            std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
+            std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
+
+            if (clearedName.empty()) {
+                clearedName = String::removeColorCodes(name);
+            }
+            result.push_back(clearedName);
+        } catch (const std::exception& e) {
+            Logger::error("Error processing local player name: {}", e.what());
+        }
+    }
+
 
     return result;
 }
