@@ -73,11 +73,24 @@ set_target_properties(miniz PROPERTIES
 add_subdirectory(lib/lua)
 add_subdirectory(lib/freetype)
 
+
 add_library(MinHook SHARED IMPORTED GLOBAL)
 set_target_properties(MinHook PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/minhook/minhook.lib")
 
 add_library(FreeType SHARED IMPORTED GLOBAL)
 set_target_properties(FreeType PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/freetype/libs/freetype.lib")
+
+add_library(libcurl SHARED IMPORTED GLOBAL)
+set_target_properties(libcurl PROPERTIES
+        MSVC_RUNTIME_LIBRARY "MultiThreaded"
+)
+set_target_properties(libcurl PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/curl/libcurl-d.lib")
+
+add_library(zlib SHARED IMPORTED GLOBAL)
+set_target_properties(zlib PROPERTIES
+        MSVC_RUNTIME_LIBRARY "MultiThreaded"
+)
+set_target_properties(zlib PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/curl/zlib.lib")
 
 target_precompile_headers(Flarial PRIVATE "src/PCH.cpp")
 
@@ -115,5 +128,5 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(libhat entt nes fmt magic_enum)
 
-target_link_libraries(Flarial PRIVATE lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType magic_enum)
+target_link_libraries(Flarial PRIVATE libcurl ws2_32.lib crypt32.lib normaliz.lib wldap32.lib lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType magic_enum)
 target_link_libraries(Flarial PUBLIC MinHook)

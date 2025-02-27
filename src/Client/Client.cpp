@@ -16,6 +16,8 @@
 #include <winrt/Windows.ApplicationModel.Activation.h>
 #include <winrt/Windows.Foundation.Collections.h>
 
+#include "Utils/APIUtils.hpp"
+
 using namespace winrt::Windows::UI::Core;
 using namespace winrt::Windows::Foundation;
 using namespace winrt::Windows::ApplicationModel::Activation;
@@ -94,6 +96,28 @@ void Client::initialize() {
         Utils::getRoamingPath() + "\\Flarial\\Config",
         Utils::getRoamingPath() + "\\Flarial\\scripts",
     };
+
+    std::string playersList;
+    std::string filePath = Utils::getRoamingPath() + "\\Flarial\\playerscache.txt";
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        std::ofstream createFile(filePath);
+        if (!createFile.is_open()) {
+           Logger::error("Could not create file: ");
+        } else {
+            createFile.close();
+            file.open(filePath);
+            if (!file.is_open()) {
+                Logger::error("Could not open file for reading after creation: ");
+            }
+        }
+    }
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    playersList = buffer.str();
+    file.close();
+    APIUtils::onlineUsers = APIUtils::ListToVector(playersList);
+
 
     for (const auto& path : directories) {
         if (!std::filesystem::exists(path)) {

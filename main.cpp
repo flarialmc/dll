@@ -10,6 +10,7 @@
 #include <Utils/WinrtUtils.hpp>
 #include <Utils/Audio.hpp>
 
+#include "curl/curl/curl.h"
 #include "src/Utils/Logger/crashlogs.hpp"
 #include "src/Client/Module/Modules/Nick/NickModule.hpp"
 #include "src/Client/Command/CommandManager.hpp"
@@ -28,10 +29,12 @@ DWORD WINAPI init() {
     Logger::initialize();
     Audio::init();
     Client::initialize();
-
     float elapsed = (Utils::getCurrentMs() - start) / 1000.0;
 
     Logger::success("Flarial initialized in {:.2f}s", elapsed);
+
+
+
 
     OptionsParser parser;
     parser.parseOptionsFile();
@@ -76,10 +79,12 @@ DWORD WINAPI init() {
 
         if (onlineUsersFetchElapsed >= std::chrono::minutes(3)) {
             try {
-                APIUtils::onlineUsers = Client::getPlayersVector(APIUtils::getUsers());
+                std::string data = APIUtils::VectorToList(APIUtils::onlineUsers);
+                std::pair<long, std::string> post = APIUtils::POST_Simple("https://api.flarial.xyz/allOnlineUsers", data);
+                APIUtils::onlineUsers = APIUtils::UpdateVector(APIUtils::onlineUsers, post.second);
                 lastOnlineUsersFetchTime = now;
-            } catch (const nlohmann::json::parse_error &e) {
-                Logger::error("An error occurred while parsing online users: {}", e.what());
+            } catch (const std::exception &ex) {
+                Logger::error("An error occurred while parsing online users: {}", ex.what());
             }
         }
 
