@@ -15,6 +15,7 @@
 #include <winrt/Windows.ApplicationModel.Core.h>
 #include <winrt/Windows.ApplicationModel.Activation.h>
 #include <winrt/Windows.Foundation.Collections.h>
+#include <Scripting/ScriptManager.hpp>
 
 using namespace winrt::Windows::UI::Core;
 using namespace winrt::Windows::Foundation;
@@ -91,7 +92,7 @@ void Client::initialize() {
         Utils::getRoamingPath() + "\\Flarial\\assets",
         Utils::getRoamingPath() + "\\Flarial\\logs",
         Utils::getRoamingPath() + "\\Flarial\\Config",
-        Utils::getRoamingPath() + "\\Flarial\\scripts",
+        Utils::getRoamingPath() + "\\Flarial\\Scripts",
     };
 
     for (const auto& path : directories) {
@@ -164,6 +165,7 @@ void Client::initialize() {
     HookManager::initialize();
     ModuleManager::initialize();
     CommandManager::initialize();
+    ScriptManager::initialize();
 }
 
 std::string window = "Minecraft";

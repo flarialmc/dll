@@ -1,8 +1,9 @@
-#include <Scripting/Scripting.hpp>
 #include "Module.hpp"
+
 #include "../../Client.hpp"
 #include "../../Events/Events.hpp"
 #include "ClickGUI/ClickGUI.hpp"
+#include "Scripting/ScriptManager.hpp"
 
 #define colors_secondary6 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary6")->value)
 #define o_colors_secondary6 clickgui->settings.getSettingByName<float>("o_colors_secondary6")->value
@@ -444,7 +445,7 @@ void Module::toggle() {
 }
 
 void Module::setup() {
-    if(!isScripting())  defaultConfig();
+    if (!isScripting())  defaultConfig();
     Module::defaultConfig();
     keybindActions.push_back([this] (std::vector<std::any> args)-> std::any {
         this->active = !this->active;
@@ -485,7 +486,7 @@ void Module::terminate() {
 
 // TODO: find all getSettingByName<bool>("enabled")->value and replace!!!
 bool Module::isEnabled() {
-    if(isScripting() && !Scripting::instalized) return false;
+    if (isScripting() && !ScriptManager::initialized) return false;
     if(!settings.getSettingByName<bool>("enabled")) return false;
     return settings.getSettingByName<bool>("enabled")->value;
 }

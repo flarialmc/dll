@@ -1,5 +1,8 @@
 #include "ClickGUI.hpp"
 
+#include "Scripting/ScriptManager.hpp"
+#include "Scripting/ScriptModuleBase.hpp"
+
 void ClickGUI::onRender(RenderEvent &event) {
 
         float allahu = Constraints::RelativeConstraint(0.65);
@@ -638,10 +641,10 @@ modules = ModuleManager::getModules();
 
                     int i = 0;
 
-                    static auto modules = Scripting::luaScriptModules;
+                       static auto modules = ScriptManager::getLoadedModules();
 
                        if(ModuleManager::cguiRefresh) {
-                           modules = Scripting::luaScriptModules;
+                           modules = ScriptManager::getLoadedModules();
                            ModuleManager::cguiRefresh = false;
                        }
 
@@ -651,7 +654,7 @@ modules = ModuleManager::getModules();
                                        center.y + Constraints::RelativeConstraint(baseHeightReal);
 
                         if (!searchBarString.empty()) {
-                            std::string name = pModule.second->name;
+                            std::string name = pModule->name;
 
                             for (char &c: name) {
                                 c = (char)std::tolower(c);
@@ -665,8 +668,8 @@ modules = ModuleManager::getModules();
 
                             if (name.starts_with(search) ||
                                 name.find(search) != std::string::npos) {
-                                ClickGUIElements::ModCard(modcenter.x + xModifier + scriptingOffset, modcenter.y + yModifier, pModule.second.get(),
-                                                          pModule.second->icon, i, visible, ClickGUI::scriptingOpacity);
+                                ClickGUIElements::ModCard(modcenter.x + xModifier + scriptingOffset, modcenter.y + yModifier, pModule.get(),
+                                                          pModule->icon, i, visible, ClickGUI::scriptingOpacity);
                                 xModifier += Constraints::SpacingConstraint(1.02f, modWidth);
                                 if ((++i % 3) == 0) {
                                     yModifier += Constraints::SpacingConstraint(0.8, modWidth);
@@ -674,8 +677,8 @@ modules = ModuleManager::getModules();
                                 }
                             }
                         } else {
-                            ClickGUIElements::ModCard(modcenter.x + xModifier + scriptingOffset, modcenter.y + yModifier, pModule.second.get(),
-                                                      pModule.second->icon, i, visible, ClickGUI::scriptingOpacity);
+                            ClickGUIElements::ModCard(modcenter.x + xModifier + scriptingOffset, modcenter.y + yModifier, pModule.get(),
+                                                      pModule->icon, i, visible, ClickGUI::scriptingOpacity);
 
                             xModifier += Constraints::SpacingConstraint(1.02f, modWidth);
                             if ((++i % 3) == 0) {

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Scripting/Libs/Flarial/Mixins/LuaMixin.hpp>
 #include "../Hook.hpp"
 #include "../../../../Utils/Memory/Memory.hpp"
 
@@ -14,10 +13,6 @@ private:
         color->g = 0.137255f;
         color->b = 0.227451f;
         std::string txt("Flarial on top!");
-        auto patch = LuaMixins::patchAndAcceptValue("TitleScreen", "splashText");
-        if(patch != std::nullopt) {
-            txt = patch->c_str();
-        }
         funcOriginal(_this, screenContext, txt, x, y, color, angle, s, centered, maxWidth);
     }
 

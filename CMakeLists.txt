@@ -24,7 +24,6 @@ execute_process(
 )
 
 add_compile_definitions(COMMIT_HASH="${COMMIT_HASH}")
-
 add_compile_options(/bigobj)
 add_compile_options(/utf-8)
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "Test")
@@ -49,8 +48,7 @@ add_compile_definitions(
 
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp" "src/*.hpp")
 file(GLOB_RECURSE LIB_FILES "lib/*.cpp" "lib/*.h")
-add_library(Flarial SHARED main.cpp ${SOURCE_FILES} ${LIB_FILES} src/Assets/Assets.rc
-        src/Client/Module/Modules/ClickGUI/ClickGUI.cpp)
+add_library(Flarial SHARED main.cpp ${SOURCE_FILES} ${LIB_FILES} src/Assets/Assets.rc)
 
 target_include_directories(Flarial PRIVATE
         "."

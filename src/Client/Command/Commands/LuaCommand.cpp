@@ -7,7 +7,7 @@
 #include <winrt/Windows.Storage.h>
 
 #include <Utils/WinrtUtils.hpp>
-#include <Scripting/Scripting.hpp>
+#include <Scripting/ScriptManager.hpp>
 
 #include <shlobj.h>
 #include <string>

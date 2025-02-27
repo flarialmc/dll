@@ -3,7 +3,6 @@
 #include "../Module.hpp"
 #include "../../../Client.hpp"
 #include "Elements/ClickGUIElements.hpp"
-#include "Scripting/Scripting.hpp"
 #include "Utils/APIUtils.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")

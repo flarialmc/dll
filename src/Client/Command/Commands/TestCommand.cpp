@@ -1,7 +1,6 @@
 #include "TestCommand.hpp"
 
 #include <Utils/WinrtUtils.hpp>
-#include <Scripting/Scripting.hpp>
 
 void TestCommand::execute(const std::vector<std::string> &args) {
     if (args.empty()) {
