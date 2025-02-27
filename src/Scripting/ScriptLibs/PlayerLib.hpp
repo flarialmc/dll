@@ -26,5 +26,25 @@ public:
 
             return 1;
         }, "getPosition", "player");
+        registerFunction(state, [](lua_State* L) -> int {
+            auto lp = SDK::clientInstance->getLocalPlayer();
+            if (!lp) return 0;
+
+            std::string name = lp->getPlayerName();
+            if (name.empty()) return 0;
+
+            lua_pushstring(L, name.c_str());
+
+            return 1;
+        }, "getPlayerName", "player");
+        registerFunction(state, [](lua_State* L) -> int {
+            auto lp = SDK::clientInstance->getLocalPlayer();
+            if (!lp) return 0;
+
+            bool onGround = lp->isOnGround();
+            lua_pushboolean(L, onGround);
+
+            return 1;
+        }, "isOnGround", "player");
     }
 };

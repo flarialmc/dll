@@ -30,15 +30,18 @@ public:
         Listen(this, KeyEvent, &ScriptModuleBase::onKey);
         Listen(this, MouseEvent, &ScriptModuleBase::onMouse);
         Listen(this, PacketEvent, &ScriptModuleBase::onPacketReceive);
-        Listen(this, TickEvent, &ScriptModuleBase::onTickEvent);
-        Listen(this, RenderEvent, &ScriptModuleBase::onRenderEvent);
+        Listen(this, TickEvent, &ScriptModuleBase::onTick);
+        Listen(this, RenderEvent, &ScriptModuleBase::onRender);
+        Listen(this, SetupAndRenderEvent, &ScriptModuleBase::onSetupAndRender);
     }
 
     void terminate() override {
         Deafen(this, KeyEvent, &ScriptModuleBase::onKey);
         Deafen(this, MouseEvent, &ScriptModuleBase::onMouse);
         Deafen(this, PacketEvent, &ScriptModuleBase::onPacketReceive);
-        Deafen(this, TickEvent, &ScriptModuleBase::onTickEvent);
+        Deafen(this, TickEvent, &ScriptModuleBase::onTick);
+        Deafen(this, RenderEvent, &ScriptModuleBase::onRender);
+        Deafen(this, SetupAndRenderEvent, &ScriptModuleBase::onSetupAndRender);
         Module::terminate();
     }
 
@@ -89,7 +92,7 @@ public:
     void onKey(KeyEvent& event) {
         if (!ScriptManager::initialized || (!ALWAYS_ENABLE && !enabledState)) return;
 
-        bool cancelled = ScriptEventManager::triggerEvent("onKey", event.getKey(), (int)event.getAction());
+        bool cancelled = ScriptEventManager::triggerEvent("onKey", event.getVirtualKey(), (int)event.getAction());
         if (cancelled) event.cancel();
     }
 
@@ -107,15 +110,21 @@ public:
         if (cancelled) event.cancel();
     }
 
-    void onTickEvent(TickEvent& event) {
+    void onTick(TickEvent& event) {
         if (!ScriptManager::initialized || (!ALWAYS_ENABLE && !enabledState)) return;
 
         ScriptEventManager::triggerEvent("onTick");
     }
 
-    void onRenderEvent(RenderEvent& event) {
+    void onRender(RenderEvent& event) {
         if (!ScriptManager::initialized || (!ALWAYS_ENABLE && !enabledState)) return;
 
         ScriptEventManager::triggerEvent("onRender");
+    }
+
+    void onSetupAndRender(SetupAndRenderEvent& event) {
+        if (!ScriptManager::initialized || (!ALWAYS_ENABLE && !enabledState)) return;
+
+        ScriptEventManager::triggerEvent("onSetupAndRender");
     }
 };
