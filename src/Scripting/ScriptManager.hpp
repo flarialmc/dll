@@ -14,12 +14,10 @@ public:
     static void reloadScripts();
 
     static std::vector<std::shared_ptr<FlarialScript>> getLoadedScripts() {
-        std::lock_guard lock(mMutex);
         return mLoadedScripts;
     }
 
     static std::vector<std::shared_ptr<ScriptModuleBase>> getLoadedModules() {
-        std::lock_guard lock(mMutex);
         return mLoadedModules;
     }
 
@@ -28,5 +26,4 @@ public:
 private:
     static std::vector<std::shared_ptr<FlarialScript>> mLoadedScripts;
     static std::vector<std::shared_ptr<ScriptModuleBase>> mLoadedModules;
-    static std::mutex mMutex;
 };

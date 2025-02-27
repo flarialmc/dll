@@ -10,7 +10,7 @@ void ScriptEventManager::registerEventAPI(lua_State* L) {
 }
 
 void ScriptEventManager::clearAll() {
-    for (auto& [name, vec] : mListeners) {
+    for (auto &vec: mListeners | std::views::values) {
         for (auto& [luaState, funcRef] : vec) {
             luaL_unref(luaState, LUA_REGISTRYINDEX, funcRef);
         }

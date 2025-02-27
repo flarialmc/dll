@@ -8,7 +8,6 @@
 
 std::vector<std::shared_ptr<FlarialScript>> ScriptManager::mLoadedScripts;
 std::vector<std::shared_ptr<ScriptModuleBase>> ScriptManager::mLoadedModules;
-std::mutex ScriptManager::mMutex;
 
 void ScriptManager::initialize() {
     const std::filesystem::path p(Utils::getClientPath() + "\\Scripts");
@@ -28,7 +27,6 @@ void ScriptManager::initialize() {
 }
 
 void ScriptManager::shutdown() {
-    std::lock_guard lock(mMutex);
 
     for (const auto& mod : mLoadedModules) {
         mod->terminate();
@@ -41,7 +39,6 @@ void ScriptManager::shutdown() {
 }
 
 void ScriptManager::loadScripts() {
-    std::lock_guard<std::mutex> lock(mMutex);
     mLoadedScripts.clear();
 
     std::filesystem::path modulePath = Utils::getClientPath() + "\\Scripts\\Modules\\";
@@ -92,19 +89,12 @@ void ScriptManager::saveSettings() {
 }
 
 void ScriptManager::reloadScripts() {
-    std::lock_guard lock(mMutex);
-
     for (const auto& mod : mLoadedModules) {
         mod->terminate();
     }
 
-    Logger::info("1");
     mLoadedModules.clear();
-    Logger::info("2");
     mLoadedScripts.clear();
-    Logger::info("3");
     ScriptEventManager::clearAll();
-    Logger::info("4");
     loadScripts();
-    Logger::info("5");
 }
