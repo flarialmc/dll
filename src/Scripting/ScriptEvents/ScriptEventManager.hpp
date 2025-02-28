@@ -39,8 +39,6 @@ public:
                     lua_pushboolean(luaState, val);
                 } else if constexpr (std::is_same_v<T, void*>) {
                     lua_pushlightuserdata(luaState, val);
-                } else if constexpr (std::is_pointer_v<T>) {
-                    lua_pushlightuserdata(luaState, const_cast<void*>(static_cast<const void*>(val)));
                 } else {
                     lua_pushnil(luaState);
                 }

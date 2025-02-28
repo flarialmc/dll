@@ -149,92 +149,92 @@ public:
                     return ImGui::IsMouseReleased(button);
                 })
             .endNamespace()
-        .beginClass<ImDrawList>("ImDrawList")
-            .addFunction("AddLine", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& colorTable, float thickness) {
-                ImVec2 p1 = toImVec2(p1Table);
-                ImVec2 p2 = toImVec2(p2Table);
-                ImColor color = toColor(colorTable);
-                drawList->AddLine(p1, p2, color, thickness);
-            })
-            .addFunction("AddRect", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& colorTable, float rounding, ImDrawFlags flags, float thickness) {
-                ImVec2 p1 = toImVec2(p1Table);
-                ImVec2 p2 = toImVec2(p2Table);
-                ImColor color = toColor(colorTable);
-                drawList->AddRect(p1, p2, color, rounding, flags, thickness);
-            })
-            .addFunction("AddRectFilled", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& colorTable, float rounding, ImDrawFlags flags) {
-                ImVec2 p1 = toImVec2(p1Table);
-                ImVec2 p2 = toImVec2(p2Table);
-                ImColor color = toColor(colorTable);
-                drawList->AddRectFilled(p1, p2, color, rounding, flags);
-            })
-            .addFunction("AddCircle", [](ImDrawList* drawList, const LuaRef& centerTable, float radius, const LuaRef& colorTable, int numSegments, float thickness) {
-                ImVec2 center = toImVec2(centerTable);
-                ImColor color = toColor(colorTable);
-                drawList->AddCircle(center, radius, color, numSegments, thickness);
-            })
-            .addFunction("AddCircleFilled", [](ImDrawList* drawList, const LuaRef& centerTable, float radius, const LuaRef& colorTable, int numSegments) {
-                ImVec2 center = toImVec2(centerTable);
-                ImColor color = toColor(colorTable);
-                drawList->AddCircleFilled(center, radius, color, numSegments);
-            })
-            .addFunction("AddText", [](ImDrawList* drawList, const LuaRef& posTable, const LuaRef& colorTable, const char* text_begin, const char* text_end) {
-                ImVec2 pos = toImVec2(posTable);
-                ImColor color = toColor(colorTable);
-                drawList->AddText(pos, color, text_begin, text_end);
-            })
-            .addFunction("AddTriangleFilled", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& colorTable) {
-                ImVec2 p1 = toImVec2(p1Table);
-                ImVec2 p2 = toImVec2(p2Table);
-                ImVec2 p3 = toImVec2(p3Table);
-                ImColor color = toColor(colorTable);
-                drawList->AddTriangleFilled(p1, p2, p3, color);
-            })
-            .addFunction("AddTriangle", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& colorTable, float thickness) {
-                ImVec2 p1 = toImVec2(p1Table);
-                ImVec2 p2 = toImVec2(p2Table);
-                ImVec2 p3 = toImVec2(p3Table);
-                ImColor color = toColor(colorTable);
-                drawList->AddTriangle(p1, p2, p3, color, thickness);
-            })
-            .addFunction("AddQuadFilled", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& p4Table, const LuaRef& colorTable) {
-                ImVec2 p1 = toImVec2(p1Table);
-                ImVec2 p2 = toImVec2(p2Table);
-                ImVec2 p3 = toImVec2(p3Table);
-                ImVec2 p4 = toImVec2(p4Table);
-                ImColor color = toColor(colorTable);
-                drawList->AddQuadFilled(p1, p2, p3, p4, color);
-            })
-            .addFunction("AddQuad", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& p4Table, const LuaRef& colorTable, float thickness) {
-                ImVec2 p1 = toImVec2(p1Table);
-                ImVec2 p2 = toImVec2(p2Table);
-                ImVec2 p3 = toImVec2(p3Table);
-                ImVec2 p4 = toImVec2(p4Table);
-                ImColor color = toColor(colorTable);
-                drawList->AddQuad(p1, p2, p3, p4, color, thickness);
-            })
-        .endClass()
-        .beginClass<ImGuiIO>("ImGuiIO")
-            .addProperty("DisplaySize", &ImGuiIO::DisplaySize)
-            .addProperty("DeltaTime", &ImGuiIO::DeltaTime)
-            .addProperty("Framerate", &ImGuiIO::Framerate)
-        .endClass()
-        .beginClass<std::vector<ImVec2>>("ImVec2Vector")
-            .addFunction("size", &std::vector<ImVec2>::size)
-            .addFunction("get", [](std::vector<ImVec2>* vec, size_t index) -> ImVec2 {
-            if (index < 1 || index > vec->size()) {
-                return ImVec2();
-            }
-            return (*vec)[index - 1];
-            })
-            .addFunction("__len", &std::vector<ImVec2>::size)
-            .addFunction("__index", [](std::vector<ImVec2>* vec, size_t index) -> ImVec2 {
-            if (index < 1 || index > vec->size()) {
-                return ImVec2();
-            }
-            return (*vec)[index - 1];
-            })
-        .endClass();
+            .beginClass<ImDrawList>("ImDrawList")
+                .addFunction("AddLine", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& colorTable, float thickness) {
+                    ImVec2 p1 = toImVec2(p1Table);
+                    ImVec2 p2 = toImVec2(p2Table);
+                    ImColor color = toColor(colorTable);
+                    drawList->AddLine(p1, p2, color, thickness);
+                })
+                .addFunction("AddRect", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& colorTable, float rounding, ImDrawFlags flags, float thickness) {
+                    ImVec2 p1 = toImVec2(p1Table);
+                    ImVec2 p2 = toImVec2(p2Table);
+                    ImColor color = toColor(colorTable);
+                    drawList->AddRect(p1, p2, color, rounding, flags, thickness);
+                })
+                .addFunction("AddRectFilled", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& colorTable, float rounding, ImDrawFlags flags) {
+                    ImVec2 p1 = toImVec2(p1Table);
+                    ImVec2 p2 = toImVec2(p2Table);
+                    ImColor color = toColor(colorTable);
+                    drawList->AddRectFilled(p1, p2, color, rounding, flags);
+                })
+                .addFunction("AddCircle", [](ImDrawList* drawList, const LuaRef& centerTable, float radius, const LuaRef& colorTable, int numSegments, float thickness) {
+                    ImVec2 center = toImVec2(centerTable);
+                    ImColor color = toColor(colorTable);
+                    drawList->AddCircle(center, radius, color, numSegments, thickness);
+                })
+                .addFunction("AddCircleFilled", [](ImDrawList* drawList, const LuaRef& centerTable, float radius, const LuaRef& colorTable, int numSegments) {
+                    ImVec2 center = toImVec2(centerTable);
+                    ImColor color = toColor(colorTable);
+                    drawList->AddCircleFilled(center, radius, color, numSegments);
+                })
+                .addFunction("AddText", [](ImDrawList* drawList, const LuaRef& posTable, const LuaRef& colorTable, const char* text_begin, const char* text_end) {
+                    ImVec2 pos = toImVec2(posTable);
+                    ImColor color = toColor(colorTable);
+                    drawList->AddText(pos, color, text_begin, text_end);
+                })
+                .addFunction("AddTriangleFilled", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& colorTable) {
+                    ImVec2 p1 = toImVec2(p1Table);
+                    ImVec2 p2 = toImVec2(p2Table);
+                    ImVec2 p3 = toImVec2(p3Table);
+                    ImColor color = toColor(colorTable);
+                    drawList->AddTriangleFilled(p1, p2, p3, color);
+                })
+                .addFunction("AddTriangle", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& colorTable, float thickness) {
+                    ImVec2 p1 = toImVec2(p1Table);
+                    ImVec2 p2 = toImVec2(p2Table);
+                    ImVec2 p3 = toImVec2(p3Table);
+                    ImColor color = toColor(colorTable);
+                    drawList->AddTriangle(p1, p2, p3, color, thickness);
+                })
+                .addFunction("AddQuadFilled", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& p4Table, const LuaRef& colorTable) {
+                    ImVec2 p1 = toImVec2(p1Table);
+                    ImVec2 p2 = toImVec2(p2Table);
+                    ImVec2 p3 = toImVec2(p3Table);
+                    ImVec2 p4 = toImVec2(p4Table);
+                    ImColor color = toColor(colorTable);
+                    drawList->AddQuadFilled(p1, p2, p3, p4, color);
+                })
+                .addFunction("AddQuad", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& p4Table, const LuaRef& colorTable, float thickness) {
+                    ImVec2 p1 = toImVec2(p1Table);
+                    ImVec2 p2 = toImVec2(p2Table);
+                    ImVec2 p3 = toImVec2(p3Table);
+                    ImVec2 p4 = toImVec2(p4Table);
+                    ImColor color = toColor(colorTable);
+                    drawList->AddQuad(p1, p2, p3, p4, color, thickness);
+                })
+            .endClass()
+            .beginClass<ImGuiIO>("ImGuiIO")
+                .addProperty("DisplaySize", &ImGuiIO::DisplaySize)
+                .addProperty("DeltaTime", &ImGuiIO::DeltaTime)
+                .addProperty("Framerate", &ImGuiIO::Framerate)
+            .endClass()
+            .beginClass<std::vector<ImVec2>>("ImVec2Vector")
+                .addFunction("size", &std::vector<ImVec2>::size)
+                .addFunction("get", [](std::vector<ImVec2>* vec, size_t index) -> ImVec2 {
+                    if (index < 1 || index > vec->size()) {
+                        return {};
+                    }
+                    return (*vec)[index - 1];
+                })
+                .addFunction("__len", &std::vector<ImVec2>::size)
+                .addFunction("__index", [](std::vector<ImVec2>* vec, size_t index) -> ImVec2 {
+                    if (index < 1 || index > vec->size()) {
+                        return {};
+                    }
+                    return (*vec)[index - 1];
+                })
+            .endClass();
     }
 private:
     static ImVec2 toImVec2(const luabridge::LuaRef& table) {
