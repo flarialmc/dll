@@ -4,6 +4,8 @@
 #include "Module/Manager.hpp"
 #include <vector>
 
+#include "Utils/APIUtils.hpp"
+
 #define ADD_SETTING(setting, value) \
 if (Client::settings.getSettingByName<decltype(value)>(setting) == nullptr) \
 Client::settings.addSetting(setting, value);
@@ -26,6 +28,7 @@ public:
 
     inline static std::string path = Utils::getClientPath() + "\\main.flarial";
     static void SaveSettings() {
+
         try {
             std::ofstream outputFile(path);
             if (outputFile) {

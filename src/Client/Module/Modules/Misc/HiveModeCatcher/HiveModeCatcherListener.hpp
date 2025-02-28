@@ -1,6 +1,7 @@
 #pragma once
 
 #include <regex>
+#include <SDK/Client/Network/Packet/ChangeDimensionPacket.hpp>
 #include "../../../../Events/Network/PacketEvent.hpp"
 #include "../../../../../SDK/Client/Network/Packet/CommandRequestPacket.hpp"
 #include "../../../../../SDK/Client/Network/Packet/TextPacket.hpp"
@@ -16,7 +17,8 @@ public:
         MinecraftPacketIds id = event.getPacket()->getId();
 
         if (id == MinecraftPacketIds::ChangeDimension) {
-            if (connectionExecuted) {
+            auto *pkt = reinterpret_cast<ChangeDimensionPacket *>(event.getPacket());
+            if (pkt->mDimensionId == 0) {
                 listenForServer = true;
                 connectionExecuted = false;
                 std::shared_ptr<Packet> packet = SDK::createPacket(77);
@@ -30,8 +32,6 @@ public:
 
 
                 SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
-            } else {
-                connectionExecuted = true;
             }
         }
 

@@ -24,6 +24,7 @@ execute_process(
 )
 
 add_compile_definitions(COMMIT_HASH="${COMMIT_HASH}")
+
 add_compile_options(/bigobj)
 add_compile_options(/utf-8)
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "Test")
@@ -48,7 +49,8 @@ add_compile_definitions(
 
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp" "src/*.hpp")
 file(GLOB_RECURSE LIB_FILES "lib/*.cpp" "lib/*.h")
-add_library(Flarial SHARED main.cpp ${SOURCE_FILES} ${LIB_FILES} src/Assets/Assets.rc)
+add_library(Flarial SHARED main.cpp ${SOURCE_FILES} ${LIB_FILES} src/Assets/Assets.rc
+        src/Client/Module/Modules/ClickGUI/ClickGUI.cpp)
 
 target_include_directories(Flarial PRIVATE
         "."
@@ -71,14 +73,24 @@ set_target_properties(miniz PROPERTIES
 add_subdirectory(lib/lua)
 add_subdirectory(lib/freetype)
 
+
 add_library(MinHook SHARED IMPORTED GLOBAL)
 set_target_properties(MinHook PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/minhook/minhook.lib")
 
 add_library(FreeType SHARED IMPORTED GLOBAL)
 set_target_properties(FreeType PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/freetype/libs/freetype.lib")
 
-target_link_libraries(Flarial PRIVATE lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType magic_enum LuaBridge)
-target_link_libraries(Flarial PUBLIC MinHook)
+add_library(libcurl SHARED IMPORTED GLOBAL)
+set_target_properties(libcurl PROPERTIES
+        MSVC_RUNTIME_LIBRARY "MultiThreaded"
+)
+set_target_properties(libcurl PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/curl/libcurl.lib")
+
+add_library(zlib SHARED IMPORTED GLOBAL)
+set_target_properties(zlib PROPERTIES
+        MSVC_RUNTIME_LIBRARY "MultiThreaded"
+)
+set_target_properties(zlib PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/curl/zlib.lib")
 
 target_precompile_headers(Flarial PRIVATE "src/PCH.cpp")
 
@@ -114,10 +126,7 @@ FetchContent_Declare(
         GIT_TAG        master
 )
 
-FetchContent_Declare(
-        LuaBridge
-        GIT_REPOSITORY https://github.com/kunitoki/LuaBridge3.git
-        GIT_TAG        master
-)
+FetchContent_MakeAvailable(libhat entt nes fmt magic_enum)
 
-FetchContent_MakeAvailable(libhat entt nes fmt magic_enum LuaBridge)
+target_link_libraries(Flarial PRIVATE libcurl ws2_32.lib crypt32.lib normaliz.lib wldap32.lib lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType magic_enum)
+target_link_libraries(Flarial PUBLIC MinHook)

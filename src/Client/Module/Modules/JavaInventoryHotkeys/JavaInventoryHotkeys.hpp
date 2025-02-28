@@ -20,9 +20,9 @@ private:
     void* lastContainer = nullptr;
     bool isInPauseOrGame = false;
 public:
-    JavaInventoryHotkeys() : Module("Java Inventory Hotkeys",
+    JavaInventoryHotkeys() : Module("Java Hotkeys",
                           "Allows to swap items in your inventory java-like.",
-                          IDR_FULLBRIGHT_PNG, "") {
+                          IDR_KEYBOARD_PNG, "") {
         Module::setup();
     };
 

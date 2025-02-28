@@ -10,6 +10,7 @@
 #include <Utils/WinrtUtils.hpp>
 #include <Utils/Audio.hpp>
 
+#include "curl/curl/curl.h"
 #include "src/Utils/Logger/crashlogs.hpp"
 #include "src/Client/Module/Modules/Nick/NickModule.hpp"
 #include "src/Client/Command/CommandManager.hpp"
@@ -21,6 +22,19 @@ std::chrono::steady_clock::time_point lastVipFetchTime;
 std::chrono::steady_clock::time_point lastOnlineUsersFetchTime;
 std::chrono::steady_clock::time_point lastAnnouncementTime;
 
+void SavePlayerCache() {
+    std::string playersListString = APIUtils::VectorToList(APIUtils::onlineUsers);
+
+    std::string filePath = Utils::getRoamingPath() + "/Flarial/playerscache.txt";
+    std::ofstream cacheFile(filePath);
+    if (cacheFile.is_open()) {
+        cacheFile << playersListString;
+        cacheFile.close();
+        Logger::success("Cached player list.");
+    } else {
+        Logger::error("Could not open file for writing: " + filePath);
+    }
+}
 
 DWORD WINAPI init() {
 
@@ -28,10 +42,12 @@ DWORD WINAPI init() {
     Logger::initialize();
     Audio::init();
     Client::initialize();
-
     float elapsed = (Utils::getCurrentMs() - start) / 1000.0;
 
     Logger::success("Flarial initialized in {:.2f}s", elapsed);
+
+
+
 
     OptionsParser parser;
     parser.parseOptionsFile();
@@ -69,17 +85,20 @@ DWORD WINAPI init() {
             if (clearedName.empty()) clearedName = String::removeColorCodes(name);
 
             if (clearedName != "skinStandardCust") {
-                APIUtils::get(std::format("https://api.flarial.xyz/heartbeat/{}/{}", clearedName, ipToSend));
+                APIUtils::legacyGet(std::format("https://api.flarial.xyz/heartbeat/{}/{}", clearedName, ipToSend));
                 lastBeatTime = now;
             }
         }
 
         if (onlineUsersFetchElapsed >= std::chrono::minutes(3)) {
             try {
-                APIUtils::onlineUsers = Client::getPlayersVector(APIUtils::getUsers());
+                std::string data = APIUtils::VectorToList(APIUtils::onlineUsers);
+                std::pair<long, std::string> post = APIUtils::POST_Simple("https://api.flarial.xyz/allOnlineUsers", data);
+                APIUtils::onlineUsers = APIUtils::UpdateVector(APIUtils::onlineUsers, post.second);
+                SavePlayerCache();
                 lastOnlineUsersFetchTime = now;
-            } catch (const nlohmann::json::parse_error &e) {
-                Logger::error("An error occurred while parsing online users: {}", e.what());
+            } catch (const std::exception &ex) {
+                Logger::error("An error occurred while parsing online users: {}", ex.what());
             }
         }
 

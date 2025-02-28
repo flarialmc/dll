@@ -17,6 +17,8 @@
 #include <winrt/Windows.Foundation.Collections.h>
 #include <Scripting/ScriptManager.hpp>
 
+#include "Utils/APIUtils.hpp"
+
 using namespace winrt::Windows::UI::Core;
 using namespace winrt::Windows::Foundation;
 using namespace winrt::Windows::ApplicationModel::Activation;
@@ -32,15 +34,15 @@ std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
     std::vector<std::string> allPlayers;
 
     try {
-        // Iterate through key-value pairs in the JSON object
-        for (const auto& [key, value] : data.items()) {
-            if (value.contains("players") && value.at("players").is_array()) {
-                for (const auto& player : value.at("players")) {
-                    if (player.is_string()) {
-                        allPlayers.push_back(player.get<std::string>());
-                    }
+        // Check if the JSON is an array of players
+        if (data.is_array()) {
+            for (const auto& player : data) {
+                if (player.is_string()) {
+                    allPlayers.push_back(player.get<std::string>());
                 }
             }
+        } else {
+            Logger::error("Invalid JSON format: expected an array of players.");
         }
     } catch (const nlohmann::json::exception& e) {
         Logger::error("Error parsing players: {}", e.what());
@@ -62,6 +64,7 @@ std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
 
     return allPlayers;
 }
+
 
 bool Client::disable = false;
 
@@ -94,6 +97,28 @@ void Client::initialize() {
         Utils::getRoamingPath() + "\\Flarial\\Config",
         Utils::getRoamingPath() + "\\Flarial\\Scripts",
     };
+
+    std::string playersList;
+    std::string filePath = Utils::getRoamingPath() + "\\Flarial\\playerscache.txt";
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        std::ofstream createFile(filePath);
+        if (!createFile.is_open()) {
+           Logger::error("Could not create file: ");
+        } else {
+            createFile.close();
+            file.open(filePath);
+            if (!file.is_open()) {
+                Logger::error("Could not open file for reading after creation: ");
+            }
+        }
+    }
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    playersList = buffer.str();
+    file.close();
+    APIUtils::onlineUsers = APIUtils::ListToVector(playersList);
+
 
     for (const auto& path : directories) {
         if (!std::filesystem::exists(path)) {
