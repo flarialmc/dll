@@ -8,6 +8,7 @@
 #include "Commands/PathCommand.hpp"
 #include "Commands/EjectCommand.hpp"
 #include "Commands/TestCommand.hpp"
+#include "Commands/SkinStealCommand.hpp"
 
 std::vector<std::unique_ptr<Command>> CommandManager::Commands = std::vector<std::unique_ptr<Command>>();
 CommandManager CommandManager::instance;
@@ -23,6 +24,7 @@ void CommandManager::initialize() {
     Commands.push_back(std::make_unique<LuaCommand>());
     Commands.push_back(std::make_unique<PathCommand>());
     Commands.push_back(std::make_unique<EjectCommand>());
+    Commands.push_back(std::make_unique<SkinStealCommand>());
 Listen(&CommandManager::instance, PacketSendEvent, &CommandManager::onPacket);
 }
 
