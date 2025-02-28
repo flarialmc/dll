@@ -6,32 +6,23 @@
 class SettingsLib : public ScriptLib {
 public:
     void initialize(lua_State* state) override {
-        registerFunction(state, [](lua_State* L) -> int {
-            const char* name = luaL_checkstring(L, 1);
-            const char* desc = luaL_checkstring(L, 2);
-            bool defValue = lua_toboolean(L, 3);
+        using namespace luabridge;
+/*
+        getGlobalNamespace(state)
+            .beginNamespace("settings")
+                .addFunction("addBool", [state](const std::string& name, const std::string& desc, bool defValue) -> BoolSetting* {
+                    LuaRef scriptNameRef = getGlobal(state, "__scriptName");
+                    std::string scriptName = "Unknown";
 
-            lua_getglobal(L, "__scriptName");
-            std::string scriptName = "Unknown";
-            if (lua_isstring(L, -1)) {
-                scriptName = lua_tostring(L, -1);
-            }
-            lua_pop(L, 1);
+                    if (scriptNameRef.isString()) {
+                        scriptName = scriptNameRef.cast<std::string>();
+                    }
 
-            auto* ptr = gScriptSettingManager.addSetting<BoolSetting>(
-                scriptName,
-                name,
-                desc,
-                defValue
-            );
+                    auto* BoolSetting = gScriptSettingManager.addSetting<BoolSetting>(scriptName, name, desc, defValue);
 
-            auto** ud = static_cast<BoolSetting**>(lua_newuserdata(L, sizeof(BoolSetting*)));
-            *ud = ptr;
-
-            luaL_setmetatable(L, "BoolSettingMeta");
-            lua_setmetatable(L, -2);
-
-            return 1;
-        }, "addBool", "settings");
+                    return BoolSetting;
+                })
+            .endNamespace();
+     */
     }
 };

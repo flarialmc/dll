@@ -7,18 +7,46 @@
 class FSLib : public ScriptLib {
 public:
     void initialize(lua_State* state) override {
-        registerFunction(state, [](lua_State* L) -> int {
-            const char* path = luaL_checkstring(L, 1);
-            const bool exists = std::filesystem::exists(Utils::getClientPath() + "\\" + path);
-            lua_pushboolean(L, exists);
-            return 1;
-        }, "exists", "fs");
+        using namespace luabridge;
 
-        registerFunction(state, [](lua_State* L) -> int {
-            const char* path = luaL_checkstring(L, 1);
-            const bool create = std::filesystem::create_directory(Utils::getClientPath() + "\\" + path);
-            lua_pushboolean(L, create);
-            return 1;
-        }, "create", "fs");
+        getGlobalNamespace(state)
+            .beginClass<FSLib>("fs")
+                .addStaticFunction("exists", [](const std::string& path) -> bool {
+                    return std::filesystem::exists(path);
+                })
+                .addStaticFunction("isDirectory", [](const std::string& path) -> bool {
+                    return std::filesystem::is_directory(path);
+                })
+                .addStaticFunction("create", [](const std::string& path) -> bool {
+                    return std::filesystem::create_directory(path);
+                })
+                .addStaticFunction("remove", [](const std::string& path) -> bool {
+                    return std::filesystem::remove(path);
+                })
+                .addStaticFunction("readFile", [](const std::string& path) -> std::string {
+                    std::ifstream file(path, std::ios::in);
+                    if (!file.is_open()) {
+                        throw std::runtime_error("Failed to open file for reading: " + path);
+                    }
+                    std::string content((std::istreambuf_iterator<char>(file)),
+                                         std::istreambuf_iterator<char>());
+                    return content;
+                })
+                .addStaticFunction("writeFile", [](const std::string& path, const std::string& content) -> bool {
+                    std::ofstream file(path, std::ios::out);
+                    if (!file.is_open()) {
+                        return false;
+                    }
+                    file << content;
+                    return true;
+                })
+                .addStaticFunction("listDirectory", [](const std::string& path) -> std::vector<std::string> {
+                    std::vector<std::string> files;
+                    for (const auto& entry : std::filesystem::directory_iterator(path)) {
+                        files.push_back(entry.path().string());
+                    }
+                    return files;
+                })
+            .endClass();
     }
 };

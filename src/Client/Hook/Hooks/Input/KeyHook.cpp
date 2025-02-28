@@ -12,8 +12,7 @@ void KeyHook::enableHook() {
 void KeyHook::keyCallback(int key, bool state) {
     keys[key] = state;
 
-    int vkKey = MapVirtualKeyA(key, MAPVK_VSC_TO_VK);
-    auto event = nes::make_holder<KeyEvent>(key, vkKey, state ? 1 : 0, keys);
+    auto event = nes::make_holder<KeyEvent>(key, state ? 1 : 0, keys);
 
     eventMgr.trigger(event);
 

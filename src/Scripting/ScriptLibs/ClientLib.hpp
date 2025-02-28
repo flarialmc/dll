@@ -8,10 +8,14 @@
 class ClientLib : public ScriptLib {
 public:
     void initialize(lua_State* state) override {
-        registerFunction(state, [](lua_State* L) -> int {
-            const char* message = luaL_checkstring(L, 1);
-            FlarialGUI::Notify(message);
-            return 1;
-        }, "notify", "client");
+        using namespace luabridge;
+
+        getGlobalNamespace(state)
+            .beginNamespace("client")
+                .addFunction("notify", [](const std::string& message) {
+                    if (message.empty()) return;
+                    FlarialGUI::Notify(message);
+                })
+            .endNamespace();
     }
 };

@@ -2,196 +2,272 @@
 
 #include "ScriptLib.hpp"
 #include <ImGui/imgui.h>
-#include <ImGui/imgui_internal.h>
 
 class ImGuiLib : public ScriptLib {
 public:
     void initialize(lua_State* state) override {
-        registerFunction(state, [](lua_State* L) -> int {
-            const char* title = luaL_checkstring(L, 1);
-            bool open = true;
-            if (lua_gettop(L) >= 2) {
-                open = lua_toboolean(L, 2);
+        using namespace luabridge;
+
+        getGlobalNamespace(state)
+            .beginNamespace("ImGui")
+                .addFunction("Begin", [](const char* name) {
+                    ImGui::Begin(name);
+                })
+                .addFunction("End", []() {
+                    ImGui::End();
+                })
+                .addFunction("BeginChild", [](const char* name, const LuaRef& sizeTable, bool border, ImGuiWindowFlags flags) {
+                    ImVec2 size = toImVec2(sizeTable);
+                    ImGui::BeginChild(name, size, border, flags);
+                })
+                .addFunction("BeginChildID", [](ImGuiID id, const LuaRef& sizeTable, bool border, ImGuiWindowFlags flags) {
+                    ImVec2 size = toImVec2(sizeTable);
+                    ImGui::BeginChild(id, size, border, flags);
+                })
+                .addFunction("BeginChildFrame", [](ImGuiID id, const LuaRef& sizeTable, ImGuiWindowFlags flags) {
+                    ImVec2 size = toImVec2(sizeTable);
+                    ImGui::BeginChildFrame(id, size, flags);
+                })
+                .addFunction("BeginCombo", [](const char* name, const char* previewValue, ImGuiComboFlags flags) {
+                    ImGui::BeginCombo(name, previewValue, flags);
+                })
+                .addFunction("BeginDragDropSource", [](ImGuiDragDropFlags flags) {
+                    ImGui::BeginDragDropSource(flags);
+                })
+                .addFunction("BeginDragDropTarget", []() {
+                    ImGui::BeginDragDropTarget();
+                })
+                .addFunction("BeginGroup", []() {
+                    ImGui::BeginGroup();
+                })
+                .addFunction("BeginMainMenuBar", []() {
+                    ImGui::BeginMainMenuBar();
+                })
+                .addFunction("BeginMenu", [](const char* name, bool enabled) {
+                    ImGui::BeginMenu(name, enabled);
+                })
+                .addFunction("BeginMenuBar", []() {
+                    ImGui::BeginMenuBar();
+                })
+                .addFunction("BeginPopup", [](const char* name) {
+                    ImGui::BeginPopup(name);
+                })
+                .addFunction("BeginPopupContextItem", [](const char* name, ImGuiPopupFlags popup_flags) {
+                    ImGui::BeginPopupContextItem(name, popup_flags);
+                })
+                .addFunction("BeginPopupContextVoid", [](const char* name, ImGuiPopupFlags popup_flags) {
+                    ImGui::BeginPopupContextVoid(name, popup_flags);
+                })
+                .addFunction("BeginTabBar", [](const char* name, ImGuiTabBarFlags flags) {
+                    ImGui::BeginTabBar(name, flags);
+                })
+                .addFunction("BeginTable", [](const char* name, int column, ImGuiTableFlags flags) {
+                    ImGui::BeginTable(name, column, flags); //TODO: size
+                })
+                .addFunction("BeginTooltip", []() {
+                    ImGui::BeginTooltip();
+                })
+                .addFunction("Bullet", []() {
+                    ImGui::Bullet();
+                })
+                .addFunction("BulletText", [](const char* text) {
+                    ImGui::BulletText(text);
+                })
+                .addFunction("Button", [](const char* label, const LuaRef& sizeTable) {
+                    ImVec2 size = toImVec2(sizeTable);
+                    return ImGui::Button(label, size);
+                })
+                .addFunction("CloseCurrentPopup", []() {
+                    ImGui::CloseCurrentPopup();
+                })
+                .addFunction("CollapsingHeader", [](const char* label, ImGuiTreeNodeFlags flags) {
+                    return ImGui::CollapsingHeader(label, flags);
+                })
+                .addFunction("ColorButton", [](const char* desc_id, const LuaRef& colTable, ImGuiColorEditFlags flags, const LuaRef& sizeTable) {
+                    ImVec4 col = toImVec4(colTable);
+                    ImVec2 size = toImVec2(sizeTable);
+                    return ImGui::ColorButton(desc_id, col, flags, size);
+                })
+                .addFunction("Text", [](const char* text) {
+                    ImGui::Text(text);
+                })
+                .addFunction("GetBackgroundDrawList", []() {
+                    return ImGui::GetBackgroundDrawList();
+                })
+                .addFunction("GetForegroundDrawList", []() {
+                    return ImGui::GetForegroundDrawList();
+                })
+                .addFunction("GetWindowDrawList", []() {
+                    return ImGui::GetWindowDrawList();
+                })
+                .addFunction("SameLine", [](float offset_from_start_x, float spacing) {
+                    return ImGui::SameLine(offset_from_start_x, spacing);
+                })
+                .addFunction("GetIO", []() {
+                    return &ImGui::GetIO();
+                })
+                .addFunction("GetDrawData", []() {
+                    return ImGui::GetDrawData();
+                })
+                .addFunction("SetNextWindowSize", [](const LuaRef& sizeTable) {
+                    ImVec2 size = toImVec2(sizeTable);
+                    ImGui::SetNextWindowSize(size);
+                })
+                .addFunction("SetNextWindowPos", [](const LuaRef& posTable) {
+                    ImVec2 pos = toImVec2(posTable);
+                    ImGui::SetNextWindowPos(pos);
+                })
+                .addFunction("SetNextWindowBgAlpha", [](float alpha) {
+                    ImGui::SetNextWindowBgAlpha(alpha);
+                })
+                .addFunction("SetNextWindowCollapsed", [](bool collapsed) {
+                    ImGui::SetNextWindowCollapsed(collapsed);
+                })
+                .addFunction("SetNextWindowFocus", []() {
+                    ImGui::SetNextWindowFocus();
+                })
+                .addFunction("SetNextWindowContentSize", [](const LuaRef& sizeTable) {
+                    ImVec2 size = toImVec2(sizeTable);
+                    ImGui::SetNextWindowContentSize(size);
+                })
+                .addFunction("IsKeyDown", [](int key) {
+                    return ImGui::IsKeyDown(static_cast<ImGuiKey>(key));
+                })
+                .addFunction("IsKeyPressed", [](int key) {
+                    return ImGui::IsKeyPressed(static_cast<ImGuiKey>(key));
+                })
+                .addFunction("IsKeyReleased", [](int key) {
+                    return ImGui::IsKeyReleased(static_cast<ImGuiKey>(key));
+                })
+                .addFunction("IsMouseDown", [](int button) {
+                    return ImGui::IsMouseDown(button);
+                })
+                .addFunction("IsMouseClicked", [](int button) {
+                    return ImGui::IsMouseClicked(button);
+                })
+                .addFunction("IsMouseReleased", [](int button) {
+                    return ImGui::IsMouseReleased(button);
+                })
+            .endNamespace()
+        .beginClass<ImDrawList>("ImDrawList")
+            .addFunction("AddLine", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& colorTable, float thickness) {
+                ImVec2 p1 = toImVec2(p1Table);
+                ImVec2 p2 = toImVec2(p2Table);
+                ImColor color = toColor(colorTable);
+                drawList->AddLine(p1, p2, color, thickness);
+            })
+            .addFunction("AddRect", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& colorTable, float rounding, ImDrawFlags flags, float thickness) {
+                ImVec2 p1 = toImVec2(p1Table);
+                ImVec2 p2 = toImVec2(p2Table);
+                ImColor color = toColor(colorTable);
+                drawList->AddRect(p1, p2, color, rounding, flags, thickness);
+            })
+            .addFunction("AddRectFilled", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& colorTable, float rounding, ImDrawFlags flags) {
+                ImVec2 p1 = toImVec2(p1Table);
+                ImVec2 p2 = toImVec2(p2Table);
+                ImColor color = toColor(colorTable);
+                drawList->AddRectFilled(p1, p2, color, rounding, flags);
+            })
+            .addFunction("AddCircle", [](ImDrawList* drawList, const LuaRef& centerTable, float radius, const LuaRef& colorTable, int numSegments, float thickness) {
+                ImVec2 center = toImVec2(centerTable);
+                ImColor color = toColor(colorTable);
+                drawList->AddCircle(center, radius, color, numSegments, thickness);
+            })
+            .addFunction("AddCircleFilled", [](ImDrawList* drawList, const LuaRef& centerTable, float radius, const LuaRef& colorTable, int numSegments) {
+                ImVec2 center = toImVec2(centerTable);
+                ImColor color = toColor(colorTable);
+                drawList->AddCircleFilled(center, radius, color, numSegments);
+            })
+            .addFunction("AddText", [](ImDrawList* drawList, const LuaRef& posTable, const LuaRef& colorTable, const char* text_begin, const char* text_end) {
+                ImVec2 pos = toImVec2(posTable);
+                ImColor color = toColor(colorTable);
+                drawList->AddText(pos, color, text_begin, text_end);
+            })
+            .addFunction("AddTriangleFilled", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& colorTable) {
+                ImVec2 p1 = toImVec2(p1Table);
+                ImVec2 p2 = toImVec2(p2Table);
+                ImVec2 p3 = toImVec2(p3Table);
+                ImColor color = toColor(colorTable);
+                drawList->AddTriangleFilled(p1, p2, p3, color);
+            })
+            .addFunction("AddTriangle", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& colorTable, float thickness) {
+                ImVec2 p1 = toImVec2(p1Table);
+                ImVec2 p2 = toImVec2(p2Table);
+                ImVec2 p3 = toImVec2(p3Table);
+                ImColor color = toColor(colorTable);
+                drawList->AddTriangle(p1, p2, p3, color, thickness);
+            })
+            .addFunction("AddQuadFilled", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& p4Table, const LuaRef& colorTable) {
+                ImVec2 p1 = toImVec2(p1Table);
+                ImVec2 p2 = toImVec2(p2Table);
+                ImVec2 p3 = toImVec2(p3Table);
+                ImVec2 p4 = toImVec2(p4Table);
+                ImColor color = toColor(colorTable);
+                drawList->AddQuadFilled(p1, p2, p3, p4, color);
+            })
+            .addFunction("AddQuad", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& p4Table, const LuaRef& colorTable, float thickness) {
+                ImVec2 p1 = toImVec2(p1Table);
+                ImVec2 p2 = toImVec2(p2Table);
+                ImVec2 p3 = toImVec2(p3Table);
+                ImVec2 p4 = toImVec2(p4Table);
+                ImColor color = toColor(colorTable);
+                drawList->AddQuad(p1, p2, p3, p4, color, thickness);
+            })
+        .endClass()
+        .beginClass<ImGuiIO>("ImGuiIO")
+            .addProperty("DisplaySize", &ImGuiIO::DisplaySize)
+            .addProperty("DeltaTime", &ImGuiIO::DeltaTime)
+            .addProperty("Framerate", &ImGuiIO::Framerate)
+        .endClass()
+        .beginClass<std::vector<ImVec2>>("ImVec2Vector")
+            .addFunction("size", &std::vector<ImVec2>::size)
+            .addFunction("get", [](std::vector<ImVec2>* vec, size_t index) -> ImVec2 {
+            if (index < 1 || index > vec->size()) {
+                return ImVec2();
             }
-            bool ret = ImGui::Begin(title, &open);
-            lua_pushboolean(L, ret);
-            return 1;
-        }, "Begin", "ImGui");
-
-        registerFunction(state, [](lua_State* L) -> int {
-            ImGui::End();
-            return 0;
-        }, "End", "ImGui");
-
-        registerFunction(state, [](lua_State* L) -> int {
-            const char* text = luaL_checkstring(L, 1);
-            ImGui::Text("%s", text);
-            return 0;
-        }, "Text", "ImGui");
-
-        registerFunction(state, [](lua_State* L) -> int {
-            const char* label = luaL_checkstring(L, 1);
-            bool pressed = ImGui::Button(label);
-            lua_pushboolean(L, pressed);
-            return 1;
-        }, "Button", "ImGui");
-
-        registerFunction(state, [](lua_State* L) -> int {
-            const char* label = luaL_checkstring(L, 1);
-            bool value = lua_toboolean(L, 2);
-            ImGui::Checkbox(label, &value);
-            lua_pushboolean(L, value);
-            return 1;
-        }, "Checkbox", "ImGui");
-
-        registerFunction(state, [](lua_State* L) -> int {
-            const char* label = luaL_checkstring(L, 1);
-            float value = (float)luaL_checknumber(L, 2);
-            float min = (float)luaL_checknumber(L, 3);
-            float max = (float)luaL_checknumber(L, 4);
-            ImGui::SliderFloat(label, &value, min, max);
-            lua_pushnumber(L, value);
-            return 1;
-        }, "SliderFloat", "ImGui");
-
-        registerFunction(state, [](lua_State* L) -> int {
-            const char* label = luaL_checkstring(L, 1);
-            const char* text = luaL_checkstring(L, 2);
-            char buffer[256];
-            std::strncpy(buffer, text, sizeof(buffer));
-            buffer[255] = '\0';
-            if (ImGui::InputText(label, buffer, sizeof(buffer))) {
-                lua_pushstring(L, buffer);
-            } else {
-                lua_pushstring(L, text);
+            return (*vec)[index - 1];
+            })
+            .addFunction("__len", &std::vector<ImVec2>::size)
+            .addFunction("__index", [](std::vector<ImVec2>* vec, size_t index) -> ImVec2 {
+            if (index < 1 || index > vec->size()) {
+                return ImVec2();
             }
-            return 1;
-        }, "InputText", "ImGui");
+            return (*vec)[index - 1];
+            })
+        .endClass();
+    }
+private:
+    static ImVec2 toImVec2(const luabridge::LuaRef& table) {
+        if (!table.isTable() || table.length() < 2) return {0, 0};
+        if (!table[1].isNumber() || !table[2].isNumber()) return {0, 0};
 
-        registerFunction(state, [](lua_State* L) -> int {
-            float x = (float)luaL_checknumber(L, 1);
-            float y = (float)luaL_checknumber(L, 2);
-            ImGui::SetCursorPos(ImVec2(x, y));
-            return 0;
-        }, "SetCursorPos", "ImGui");
+        float x = table[1].cast<float>().value();
+        float y = table[2].cast<float>().value();
 
-        registerFunction(state, [](lua_State* L) -> int {
-            ImDrawList* drawList = ImGui::GetForegroundDrawList();
+        return {x, y};
+    }
 
-            float x1 = (float)luaL_checknumber(L, 2);
-            float y1 = (float)luaL_checknumber(L, 3);
-            float x2 = (float)luaL_checknumber(L, 4);
-            float y2 = (float)luaL_checknumber(L, 5);
+    static ImVec4 toImVec4(const luabridge::LuaRef& table) {
+        if (!table.isTable() || table.length() < 4) return {0, 0, 0, 0};
+        if (!table[1].isNumber() || !table[2].isNumber() || !table[3].isNumber() || !table[4].isNumber()) return {0, 0, 0, 0};
 
-            luaL_checktype(L, 6, LUA_TTABLE);
-            lua_rawgeti(L, 6, 1);
-            int r = luaL_checkinteger(L, -1);
-            lua_pop(L, 1);
-            lua_rawgeti(L, 6, 2);
-            int g = luaL_checkinteger(L, -1);
-            lua_pop(L, 1);
-            lua_rawgeti(L, 6, 3);
-            int b = luaL_checkinteger(L, -1);
-            lua_pop(L, 1);
-            lua_rawgeti(L, 6, 4);
-            int a = luaL_optinteger(L, -1, 255);
-            lua_pop(L, 1);
-            float thickness = (float)luaL_optnumber(L, 7, 1.0f);
+        float x = table[1].cast<float>().value();
+        float y = table[2].cast<float>().value();
+        float z = table[3].cast<float>().value();
+        float w = table[4].cast<float>().value();
 
-            ImU32 col = IM_COL32(r, g, b, a);
-            drawList->AddLine(ImVec2(x1, y1), ImVec2(x2, y2), col, thickness);
+        return {x, y, z, w};
+    }
 
-            return 0;
-        }, "AddLine", "ImGui.DrawList");
+    static ImU32 toColor(const luabridge::LuaRef& table) {
+        if (!table.isTable() || table.length() < 4) return IM_COL32(255, 255, 255, 255);
+        if (!table[1].isNumber() || !table[2].isNumber() || !table[3].isNumber() || !table[4].isNumber()) return IM_COL32(255, 255, 255, 255);
 
-        registerFunction(state, [](lua_State* L) -> int {
-            ImDrawList* drawList = ImGui::GetForegroundDrawList();
+        int r = table[1].cast<int>().value();
+        int g = table[2].cast<int>().value();
+        int b = table[3].cast<int>().value();
+        int a = table[4].cast<int>().value();
 
-            float x1 = (float)luaL_checknumber(L, 2);
-            float y1 = (float)luaL_checknumber(L, 3);
-            float x2 = (float)luaL_checknumber(L, 4);
-            float y2 = (float)luaL_checknumber(L, 5);
-
-            luaL_checktype(L, 6, LUA_TTABLE);
-            lua_rawgeti(L, 6, 1);
-            int r = luaL_checkinteger(L, -1);
-            lua_pop(L, 1);
-            lua_rawgeti(L, 6, 2);
-            int g = luaL_checkinteger(L, -1);
-            lua_pop(L, 1);
-            lua_rawgeti(L, 6, 3);
-            int b = luaL_checkinteger(L, -1);
-            lua_pop(L, 1);
-            lua_rawgeti(L, 6, 4);
-            int a = luaL_optinteger(L, -1, 255);
-            lua_pop(L, 1);
-            float rounding = (float)luaL_optnumber(L, 7, 0.0f);
-            int flags = (int)luaL_optnumber(L, 8, 0);
-            float thickness = (float)luaL_optnumber(L, 9, 1.0f);
-
-            ImU32 col = IM_COL32(r, g, b, a);
-            drawList->AddRect(ImVec2(x1, y1), ImVec2(x2, y2), col, rounding, flags, thickness);
-
-            return 0;
-        }, "AddRect", "ImGui.DrawList");
-
-        registerFunction(state, [](lua_State* L) -> int {
-            ImDrawList* drawList = ImGui::GetForegroundDrawList();
-
-            float x = (float)luaL_checknumber(L, 2); // Start at 2, since self is at 1
-            float y = (float)luaL_checknumber(L, 3);
-
-            luaL_checktype(L, 4, LUA_TTABLE);
-            lua_rawgeti(L, 4, 1);
-            int r = luaL_checkinteger(L, -1);
-            lua_pop(L, 1);
-            lua_rawgeti(L, 4, 2);
-            int g = luaL_checkinteger(L, -1);
-            lua_pop(L, 1);
-            lua_rawgeti(L, 4, 3);
-            int b = luaL_checkinteger(L, -1);
-            lua_pop(L, 1);
-            lua_rawgeti(L, 4, 4);
-            int a = luaL_optinteger(L, -1, 255);
-            lua_pop(L, 1);
-            const char* text = luaL_checkstring(L, 5);
-
-            ImU32 col = IM_COL32(r, g, b, a);
-            drawList->AddText(ImVec2(x, y), col, text);
-
-            return 0;
-        }, "AddText", "ImGui.DrawList");
-
-        registerFunction(state, [](lua_State* L) -> int {
-            ImGuiIO& io = ImGui::GetIO();
-            lua_pushnumber(L, io.Framerate);
-            return 1;
-        }, "FPS", "ImGui.IO");
-
-        registerFunction(state, [](lua_State* L) -> int {
-            ImGuiIO& io = ImGui::GetIO();
-            lua_pushnumber(L, io.DeltaTime);
-            return 1;
-        }, "DeltaTime", "ImGui.IO");
-
-        registerFunction(state, [](lua_State* L) -> int {
-            ImGuiIO& io = ImGui::GetIO();
-            lua_newtable(L);
-            lua_pushnumber(L, io.DisplaySize.x);
-            lua_setfield(L, -2, "x");
-            lua_pushnumber(L, io.DisplaySize.y);
-            lua_setfield(L, -2, "y");
-            return 1;
-        }, "DisplaySize", "ImGui.IO");
-
-        registerFunction(state, [](lua_State* L) -> int {
-            ImGuiIO& io = ImGui::GetIO();
-            lua_newtable(L);
-            lua_pushnumber(L, io.MousePos.x);
-            lua_setfield(L, -2, "x");
-            lua_pushnumber(L, io.MousePos.y);
-            lua_setfield(L, -2, "y");
-            return 1;
-        }, "MousePos", "ImGui.IO");
+        return IM_COL32(r, g, b, a);
     }
 };

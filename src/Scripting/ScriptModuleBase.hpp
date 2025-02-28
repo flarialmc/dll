@@ -92,7 +92,7 @@ public:
     void onKey(KeyEvent& event) {
         if (!ScriptManager::initialized || (!ALWAYS_ENABLE && !enabledState)) return;
 
-        bool cancelled = ScriptEventManager::triggerEvent("onKey", event.getVirtualKey(), (int)event.getAction());
+        bool cancelled = ScriptEventManager::triggerEvent("onKey", event.getKey(), (int)event.getAction());
         if (cancelled) event.cancel();
     }
 

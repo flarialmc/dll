@@ -15,23 +15,17 @@ class KeyEvent : public Event, public Cancellable {
 
 public:
     int key;
-    int vkKey;
     int action;
     std::array<bool, 256> keys{};
 
-    KeyEvent(int key, int vk, int action, const std::array<bool, 256> &keys) : Event() {
+    KeyEvent(int key, int action, const std::array<bool, 256> &keys) : Event() {
         this->key = key;
-        this->vkKey = vk;
         this->action = action;
         this->keys = keys;
     };
 
     [[nodiscard]] int getKey() const {
         return key;
-    }
-
-    [[nodiscard]] int getVirtualKey() const {
-        return vkKey;
     }
 
     void setKey(int e) {

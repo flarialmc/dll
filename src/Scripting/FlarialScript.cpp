@@ -12,6 +12,7 @@
 #include "ScriptLibs/PlayerLib.hpp"
 #include "ScriptLibs/ImGuiLib.hpp"
 #include "ScriptLibs/GlobalsLib.hpp"
+#include "ScriptLibs/UtilLib.hpp"
 
 static int customPrint(lua_State* L) {
     int args = lua_gettop(L);
@@ -48,6 +49,7 @@ FlarialScript::FlarialScript(std::string filePath, std::string code)
     ScriptLib::registerLib<PlayerLib>(mState);
     ScriptLib::registerLib<ImGuiLib>(mState);
     ScriptLib::registerLib<GlobalsLib>(mState);
+    ScriptLib::registerLib<UtilLib>(mState);
 
     // Setting system is so scuffed rn
     ScriptSettingManager::createBoolSetting(mState);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Scripting/ScriptModuleBase.hpp>
+#include <LuaBridge/LuaBridge.h>
 
 class ScriptLib {
 public:
@@ -14,8 +15,4 @@ public:
         T lib;
         lib.initialize(L);
     }
-protected:
-    static void registerFunction(lua_State* L, const std::function<int(lua_State*)> &callback, const char* functionName, const char* tablePath);
-    static void registerFunction(lua_State* L, const std::function<int(lua_State*)> &callback, const char* functionName);
-    static void createNestedTable(lua_State* L, const std::string& path);
 };
