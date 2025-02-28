@@ -244,8 +244,16 @@ std::vector<std::string> APIUtils::ListToVector(const std::string& commandListSt
     std::string segment;
 
     std::string trimmedStr = commandListStr;
-    if (trimmedStr.front() == '[') trimmedStr.erase(0, 1);
-    if (trimmedStr.back() == ']') trimmedStr.pop_back();
+    std::string prefix = "{\"players\": [";
+    std::string suffix = "]}";
+
+    if (trimmedStr.rfind(prefix, 0) == 0) {
+        trimmedStr.erase(0, prefix.length());
+    }
+
+    if (trimmedStr.rfind(suffix) == trimmedStr.length() - suffix.length()) {
+        trimmedStr.erase(trimmedStr.length() - suffix.length());
+    }
 
     std::stringstream trimmed_ss(trimmedStr);
 
