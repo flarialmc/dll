@@ -80,6 +80,7 @@
 #include "Modules/FasterInventory/FasterInventory.hpp"
 #include "Modules/Waypoints/Waypoints.hpp"
 #include "Modules/JavaInventoryHotkeys/JavaInventoryHotkeys.hpp"
+#include "Modules/TPS/TPSCounter.hpp"
 
 #include "Modules/EntityCounter/EntityCounter.hpp"
 #include "Modules/MovableHUD/MovableHUD.hpp"
@@ -153,6 +154,7 @@ void ModuleManager::initialize() {
     addModule<HurtColor>();
     addModule<ThirdPerson>();
     addModule<JavaDynamicFOV>();
+    addModule<TPSCounter>();
 
     addModule<SnapLook>();
     addModule<FogColor>();
