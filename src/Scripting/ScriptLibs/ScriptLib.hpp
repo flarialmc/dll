@@ -49,4 +49,21 @@ public:
 
         return IM_COL32(r, g, b, a);
     }
+
+    static D2D1_RECT_F toD2D1Rect(const luabridge::LuaRef& table) {
+        if (!table.isTable() || table.length() < 4) {
+            return D2D1::RectF(0.0f, 0.0f, 0.0f, 0.0f);
+        }
+        if (!table[1].isNumber() || !table[2].isNumber() ||
+            !table[3].isNumber() || !table[4].isNumber()) {
+            return D2D1::RectF(0.0f, 0.0f, 0.0f, 0.0f);
+            }
+
+        float left = table[1].cast<float>().value();
+        float top = table[2].cast<float>().value();
+        float right = table[3].cast<float>().value();
+        float bottom = table[4].cast<float>().value();
+
+        return D2D1::RectF(left, top, right, bottom);
+    }
 };
