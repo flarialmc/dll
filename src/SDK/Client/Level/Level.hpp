@@ -8,6 +8,7 @@
 
 #include <Utils/VersionUtils.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
+#include <SDK/Client/Util/mce.hpp>
 
 class mcUUID {
 public:
@@ -25,8 +26,11 @@ public:
     mcUUID UUID;
     std::string name, XUID, platformOnlineId;
     int buildPlatform;
-    char filler[0x164];
-    bool isTeacher, isHost;
+    PlayerSkin playerSkin;
+    bool isTeacher, isHost, isSubClient;
+    PlayerListEntry& operator=(const PlayerListEntry& other) {
+        return *this;
+    }
 };
 
 class Level {
