@@ -1,7 +1,6 @@
 #include "SkinStealCommand.hpp"
 
 #include <Utils/WinrtUtils.hpp>
-#include <Scripting/Scripting.hpp>
 
 #ifndef SVPNG_LINKAGE
 #define SVPNG_LINKAGE

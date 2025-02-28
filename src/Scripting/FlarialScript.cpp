@@ -14,6 +14,8 @@
 #include "ScriptLibs/GlobalsLib.hpp"
 #include "ScriptLibs/UtilLib.hpp"
 #include "ScriptLibs/StructsLib.hpp"
+#include "ScriptLibs/FlarialGUILib.hpp"
+#include "ScriptLibs/ConstraintsLib.hpp"
 
 static int customPrint(lua_State* L) {
     int args = lua_gettop(L);
@@ -52,6 +54,8 @@ FlarialScript::FlarialScript(std::string filePath, std::string code)
     ScriptLib::registerLib<GlobalsLib>(mState);
     ScriptLib::registerLib<UtilLib>(mState);
     ScriptLib::registerLib<StructsLib>(mState);
+    ScriptLib::registerLib<FlarialGUILib>(mState);
+    ScriptLib::registerLib<ConstraintsLib>(mState);
 
     // Setting system is so scuffed rn
     ScriptSettingManager::createBoolSetting(mState);
@@ -62,6 +66,9 @@ bool FlarialScript::compile() {
         // Load and validate the code
         if (luaL_loadstring(mState, mCode.c_str()) != LUA_OK) {
             Logger::error("Syntax error in {}: {}", mFilePath, lua_tostring(mState, -1));
+            if (SDK::clientInstance && SDK::clientInstance->getGuiData()) {
+                SDK::clientInstance->getGuiData()->displayClientMessage("§3[§1Lua§3] §cSyntax error in " + mFilePath + ": " + lua_tostring(mState, -1));
+            }
             lua_pop(mState, 1);
             return false;
         }
@@ -69,6 +76,9 @@ bool FlarialScript::compile() {
         // Execute the script
         if (lua_pcall(mState, 0, 0, 0) != LUA_OK) {
             Logger::error("Runtime error in {}: {}", mFilePath, lua_tostring(mState, -1));
+            if (SDK::clientInstance && SDK::clientInstance->getGuiData()) {
+                SDK::clientInstance->getGuiData()->displayClientMessage("§3[§1Lua§3] §cRuntime error in " + mFilePath + ": " + lua_tostring(mState, -1));
+            }
             lua_pop(mState, 1);
             return false;
         }
