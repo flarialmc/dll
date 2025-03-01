@@ -11,62 +11,62 @@ public:
         getGlobalNamespace(state)
             .beginNamespace("ImGui")
                 .addFunction("Begin", [](const char* name) {
-                    ImGui::Begin(name);
+                    return ImGui::Begin(name);
                 })
                 .addFunction("End", []() {
                     ImGui::End();
                 })
                 .addFunction("BeginChild", [](const char* name, const LuaRef& sizeTable, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0) {
                     ImVec2 size = toImVec2(sizeTable);
-                    ImGui::BeginChild(name, size, child_flags, window_flags);
+                    return ImGui::BeginChild(name, size, child_flags, window_flags);
                 })
                 .addFunction("BeginChildID", [](ImGuiID id, const LuaRef& sizeTable, ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0) {
                     ImVec2 size = toImVec2(sizeTable);
-                    ImGui::BeginChild(id, size, child_flags, window_flags);
+                    return ImGui::BeginChild(id, size, child_flags, window_flags);
                 })
                 .addFunction("BeginChildFrame", [](ImGuiID id, const LuaRef& sizeTable, ImGuiWindowFlags flags = 0) {
                     ImVec2 size = toImVec2(sizeTable);
-                    ImGui::BeginChildFrame(id, size, flags);
+                    return ImGui::BeginChildFrame(id, size, flags);
                 })
                 .addFunction("BeginCombo", [](const char* name, const char* previewValue, ImGuiComboFlags flags = 0) {
-                    ImGui::BeginCombo(name, previewValue, flags);
+                    return ImGui::BeginCombo(name, previewValue, flags);
                 })
                 .addFunction("BeginDragDropSource", [](ImGuiDragDropFlags flags = 0) {
-                    ImGui::BeginDragDropSource(flags);
+                    return ImGui::BeginDragDropSource(flags);
                 })
                 .addFunction("BeginDragDropTarget", []() {
-                    ImGui::BeginDragDropTarget();
+                    return ImGui::BeginDragDropTarget();
                 })
                 .addFunction("BeginGroup", []() {
                     ImGui::BeginGroup();
                 })
                 .addFunction("BeginMainMenuBar", []() {
-                    ImGui::BeginMainMenuBar();
+                    return ImGui::BeginMainMenuBar();
                 })
                 .addFunction("BeginMenu", [](const char* name, bool enabled = true) {
-                    ImGui::BeginMenu(name, enabled);
+                    return ImGui::BeginMenu(name, enabled);
                 })
                 .addFunction("BeginMenuBar", []() {
-                    ImGui::BeginMenuBar();
+                    return ImGui::BeginMenuBar();
                 })
                 .addFunction("BeginPopup", [](const char* str_id, ImGuiWindowFlags flags = 0) {
-                    ImGui::BeginPopup(str_id, flags);
+                    return ImGui::BeginPopup(str_id, flags);
                 })
                 .addFunction("BeginPopupContextItem", [](const char* str_id = 0, ImGuiPopupFlags popup_flags = 1) {
-                    ImGui::BeginPopupContextItem(str_id, popup_flags);
+                    return ImGui::BeginPopupContextItem(str_id, popup_flags);
                 })
                 .addFunction("BeginPopupContextVoid", [](const char* str_id = 0, ImGuiPopupFlags popup_flags = 1) {
-                    ImGui::BeginPopupContextVoid(str_id, popup_flags);
+                    return ImGui::BeginPopupContextVoid(str_id, popup_flags);
                 })
                 .addFunction("BeginTabBar", [](const char* str_id, ImGuiTabBarFlags flags = 0) {
-                    ImGui::BeginTabBar(str_id, flags);
+                    return ImGui::BeginTabBar(str_id, flags);
                 })
                 .addFunction("BeginTable", [](const char* name, int column, const LuaRef& outer_sizeTable, float inner_width = 0) {
                     ImVec2 outer_size = toImVec2(outer_sizeTable);
-                    ImGui::BeginTable(name, column, 0, outer_size, inner_width);
+                    return ImGui::BeginTable(name, column, 0, outer_size, inner_width);
                 })
                 .addFunction("BeginTooltip", []() {
-                    ImGui::BeginTooltip();
+                    return ImGui::BeginTooltip();
                 })
                 .addFunction("Bullet", []() {
                     ImGui::Bullet();
