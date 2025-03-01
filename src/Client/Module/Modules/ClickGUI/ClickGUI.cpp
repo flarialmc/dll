@@ -1,6 +1,6 @@
 #include "ClickGUI.hpp"
 
-#include "cmake-build-release-visual-studio/_deps/fmt-src/include/fmt/ostream.h"
+#include <Scripting/ScriptManager.hpp>
 
 void ClickGUI::onRender(RenderEvent &event) {
 
@@ -640,10 +640,10 @@ modules = ModuleManager::getModules();
 
                     int i = 0;
 
-                    static auto modules = Scripting::luaScriptModules;
+                    static auto modules = ScriptManager::getLoadedModules();
 
-                       if(ModuleManager::cguiRefresh) {
-                           modules = Scripting::luaScriptModules;
+                       if (ModuleManager::cguiRefresh) {
+                           modules = ScriptManager::getLoadedModules();
                            ModuleManager::cguiRefresh = false;
                        }
 
@@ -653,7 +653,7 @@ modules = ModuleManager::getModules();
                                        center.y + Constraints::RelativeConstraint(baseHeightReal);
 
                         if (!searchBarString.empty()) {
-                            std::string name = pModule.second->name;
+                            std::string name = pModule->name;
 
                             for (char &c: name) {
                                 c = (char)std::tolower(c);
@@ -667,8 +667,8 @@ modules = ModuleManager::getModules();
 
                             if (name.starts_with(search) ||
                                 name.find(search) != std::string::npos) {
-                                ClickGUIElements::ModCard(modcenter.x + xModifier + scriptingOffset, modcenter.y + yModifier, pModule.second.get(),
-                                                          pModule.second->icon, i, visible, ClickGUI::scriptingOpacity);
+                                ClickGUIElements::ModCard(modcenter.x + xModifier + scriptingOffset, modcenter.y + yModifier, pModule.get(),
+                                                          pModule->icon, i, visible, ClickGUI::scriptingOpacity);
                                 xModifier += Constraints::SpacingConstraint(1.02f, modWidth);
                                 if ((++i % 3) == 0) {
                                     yModifier += Constraints::SpacingConstraint(0.8, modWidth);
@@ -676,8 +676,8 @@ modules = ModuleManager::getModules();
                                 }
                             }
                         } else {
-                            ClickGUIElements::ModCard(modcenter.x + xModifier + scriptingOffset, modcenter.y + yModifier, pModule.second.get(),
-                                                      pModule.second->icon, i, visible, ClickGUI::scriptingOpacity);
+                            ClickGUIElements::ModCard(modcenter.x + xModifier + scriptingOffset, modcenter.y + yModifier, pModule.get(),
+                                                      pModule->icon, i, visible, ClickGUI::scriptingOpacity);
 
                             xModifier += Constraints::SpacingConstraint(1.02f, modWidth);
                             if ((++i % 3) == 0) {
@@ -710,7 +710,7 @@ modules = ModuleManager::getModules();
 
             std::shared_ptr<Module> settingMod = ModuleManager::getModule(page.module);
             if (!settingMod) {
-                settingMod = Scripting::FindModuleByName(Scripting::luaScriptModules, page.module);
+                settingMod = ScriptManager::FindModuleByName(ScriptManager::getLoadedModules(), page.module);
             }
             
 

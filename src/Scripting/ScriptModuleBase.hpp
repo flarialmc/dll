@@ -1,23 +1,15 @@
 #pragma once
 
-#include <Scripting/ScriptManager.hpp>
-#include <Scripting/ScriptEvents/ScriptEventManager.hpp>
 #include <Scripting/ScriptSettings/ScriptSettingManager.hpp>
 #include <Scripting/ScriptSettings/ScriptSettingTypes.hpp>
+#include <Scripting/FlarialScript.hpp>
 
 #include <Modules/ClickGUI/ClickGUI.hpp>
 #include <Client/Module/Modules/Module.hpp>
 
 #include <lua.hpp>
 
-
 inline ScriptSettingManager gScriptSettingManager;
-
-// onEnable, onDisable and enabled checks are broken due to unfinished setting system & ClickGUI
-// I can't fix it until ClickGUI can properly render scripts, so this bool allows you
-// to still use events and reload scripts.
-// There's no way to check if the script is enabled or not so events don't fire.
-const bool ALWAYS_ENABLE = false;
 
 class ScriptModuleBase : public Module {
 public:
@@ -36,7 +28,7 @@ public:
         Listen(this, SetupAndRenderEvent, &ScriptModuleBase::onSetupAndRender);
     }
 
-    bool isEnabled() const { return linkedScript && linkedScript->isEnabled(); }
+
 
     void terminate() override {
         Deafen(this, KeyEvent, &ScriptModuleBase::onKey);
@@ -48,14 +40,10 @@ public:
         Module::terminate();
     }
 
-    void onEnable() override {
-        ScriptManager::executeFunction(moduleLuaState, "onEnable");
-        Module::onEnable();
-    }
+    [[nodiscard]] bool isEnabled() const { return linkedScript && linkedScript->isEnabled(); }
+    void onEnable() override;
 
-    void onDisable() override {
-        ScriptManager::executeFunction(moduleLuaState, "onDisable");
-    }
+    void onDisable() override;
 
     void defaultConfig() override {
     }
@@ -92,48 +80,10 @@ public:
         this->resetPadding();
     }
 
-    void onKey(KeyEvent& event) {
-        //if (!ScriptManager::initialized || (!ALWAYS_ENABLE && !enabledState)) return;
-        if (!ScriptManager::initialized || !isEnabled()) return;
-
-        bool cancelled = ScriptEventManager::triggerEvent("onKey", event.getKey(), (int)event.getAction());
-        if (cancelled) event.cancel();
-    }
-
-    void onMouse(MouseEvent& event) {
-        //if (!ScriptManager::initialized || (!ALWAYS_ENABLE && !enabledState) || event.getButton() == 0 || event.getAction() == 0) return;
-        if (!ScriptManager::initialized || !isEnabled() || event.getButton() == 0 || event.getAction() == 0) return;
-
-        bool cancelled = ScriptEventManager::triggerEvent("onMouse", (int)event.getButton(), (int)event.getAction());
-        if (cancelled) event.cancel();
-    }
-
-    void onPacketReceive(PacketEvent &event) {
-        //if (!ScriptManager::initialized || (!ALWAYS_ENABLE && !enabledState)) return;
-        if (!ScriptManager::initialized || !isEnabled()) return;
-
-        bool cancelled = ScriptEventManager::triggerEvent("onPacketReceive", event.getPacket(), (int)event.getPacket()->getId());
-        if (cancelled) event.cancel();
-    }
-
-    void onTick(TickEvent& event) {
-        //if (!ScriptManager::initialized || (!ALWAYS_ENABLE && !enabledState)) return;
-        if (!ScriptManager::initialized || !isEnabled()) return;
-
-        ScriptEventManager::triggerEvent("onTick");
-    }
-
-    void onRender(RenderEvent& event) {
-        //if (!ScriptManager::initialized || (!ALWAYS_ENABLE && !enabledState)) return;
-        if (!ScriptManager::initialized || !isEnabled()) return;
-
-        ScriptEventManager::triggerEvent("onRender");
-    }
-
-    void onSetupAndRender(SetupAndRenderEvent& event) {
-        //if (!ScriptManager::initialized || (!ALWAYS_ENABLE && !enabledState)) return;
-        if (!ScriptManager::initialized || !isEnabled()) return;
-
-        ScriptEventManager::triggerEvent("onSetupAndRender");
-    }
+    void onKey(KeyEvent& event);
+    void onMouse(MouseEvent& event);
+    void onPacketReceive(PacketEvent &event);
+    void onTick(TickEvent& event);
+    void onRender(RenderEvent& event);
+    void onSetupAndRender(SetupAndRenderEvent& event);
 };

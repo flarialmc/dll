@@ -4,7 +4,6 @@
 #include <Client/Module/Manager.hpp>
 
 #include "ScriptModuleBase.hpp"
-#include "ScriptEvents/ScriptEventManager.hpp"
 
 std::vector<std::shared_ptr<FlarialScript>> ScriptManager::mLoadedScripts;
 std::vector<std::shared_ptr<ScriptModuleBase>> ScriptManager::mLoadedModules;
@@ -34,7 +33,6 @@ void ScriptManager::shutdown() {
 
     mLoadedModules.clear();
     mLoadedScripts.clear();
-    ScriptEventManager::clearAll();
     initialized = false;
 }
 
@@ -96,7 +94,6 @@ void ScriptManager::reloadScripts() {
 
     mLoadedModules.clear();
     mLoadedScripts.clear();
-    ScriptEventManager::clearAll();
     loadScripts();
 }
 
@@ -116,4 +113,16 @@ bool ScriptManager::toggleScript(const std::string& scriptName) {
         }
     }
     return false;
+}
+
+std::shared_ptr<Module> ScriptManager::FindModuleByName(
+    const std::vector<std::shared_ptr<ScriptModuleBase>>& modules,
+    const std::string& moduleName)
+{
+    for (const auto& mod : modules) {
+        if (mod && mod->name == moduleName) {
+            return std::static_pointer_cast<Module>(mod);
+        }
+    }
+    return nullptr;
 }

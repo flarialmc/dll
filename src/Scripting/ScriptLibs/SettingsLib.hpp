@@ -9,6 +9,11 @@ public:
         using namespace luabridge;
 
         getGlobalNamespace(state)
+            .beginClass<BoolSetting>("BoolSetting")
+                .addProperty("value", &BoolSetting::defaultValue)
+            .endClass();
+
+        getGlobalNamespace(state)
             .beginNamespace("settings")
                 .addFunction("addBool", [state](const std::string& name, const std::string& desc, bool defValue) -> BoolSetting* {
                     LuaRef scriptNameRef = getGlobal(state, "__scriptName");

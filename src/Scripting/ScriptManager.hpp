@@ -1,8 +1,8 @@
 #pragma once
 
 #include "FlarialScript.hpp"
-
-class ScriptModuleBase;
+#include "ScriptModuleBase.hpp"
+#include <Module/Modules/Module.hpp>
 
 class ScriptManager {
 public:
@@ -23,6 +23,7 @@ public:
     }
 
     static inline bool initialized = false;
+    static std::shared_ptr<Module> FindModuleByName(const std::vector<std::shared_ptr<ScriptModuleBase>>& modules, const std::string& moduleName);
 
 private:
     static std::vector<std::shared_ptr<FlarialScript>> mLoadedScripts;

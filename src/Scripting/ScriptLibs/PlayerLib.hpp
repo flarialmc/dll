@@ -6,19 +6,43 @@
 #include <SDK/SDK.hpp>
 #include <SDK/Client/Actor/Actor.hpp>
 
+// LuaBridge needs to link against this class.
+// Normal Actor class doesn't seem to work for me.
+// sLocalPlayer - script local player
 class sLocalPlayer {
 public:
     static std::string name() {
-        auto player = SDK::clientInstance->getLocalPlayer();
-        return player ? *player->getNametag() : "";
+        auto* player = SDK::clientInstance->getLocalPlayer();
+        if (!player || !player->getNametag()) return "Unknown";
+        return *player->getNametag();
     }
-    static Vec3<float> position() {
+    static int position(lua_State* L) {
         auto player = SDK::clientInstance->getLocalPlayer();
-        return player ? *player->getPosition() : Vec3<float>(0.0f, 0.0f, 0.0f);
+
+        if (!player || !player->getPosition()) {
+            lua_pushnumber(L, 0.0f);
+            lua_pushnumber(L, 0.0f);
+            lua_pushnumber(L, 0.0f);
+            return 3;
+        }
+
+        // clion is stupid dont remove static cast pls u will crash 100%
+        Vec3<float> pos = *player->getPosition();
+        lua_pushnumber(L, static_cast<double>(pos.x));
+        lua_pushnumber(L, static_cast<double>(pos.y));
+        lua_pushnumber(L, static_cast<double>(pos.z));
+
+        return 3;
     }
     static int hurtTime() {
         auto player = SDK::clientInstance->getLocalPlayer();
-        return player ? player->getHurtTime() : 0;
+        if (!player) return 0;
+        return player->getHurtTime();
+    }
+    static bool grounded() {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (!player) return false;
+        return player->isOnGround();
     }
 };
 
@@ -32,6 +56,7 @@ public:
                 .addStaticFunction("name", &sLocalPlayer::name)
                 .addStaticFunction("hurtTime", &sLocalPlayer::hurtTime)
                 .addStaticFunction("position", &sLocalPlayer::position)
+                .addStaticFunction("grounded", &sLocalPlayer::grounded)
             .endClass();
     }
 };

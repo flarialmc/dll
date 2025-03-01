@@ -3,8 +3,8 @@
 #include <Utils/Logger/Logger.hpp>
 
 #include "ScriptSettings/ScriptSettingManager.hpp"
-#include "ScriptEvents/ScriptEventManager.hpp"
 #include "ScriptLibs/ScriptLib.hpp"
+#include "ScriptManager.hpp"
 
 #include "ScriptLibs/FSLib.hpp"
 #include "ScriptLibs/SettingsLib.hpp"
@@ -17,13 +17,48 @@
 #include "ScriptLibs/FlarialGUILib.hpp"
 #include "ScriptLibs/ConstraintsLib.hpp"
 
+template<typename Func, typename... Args>
+bool TryCallWrapper(Func func, Args&&... args) {
+    __try
+    {
+        func(std::forward<Args>(args)...);
+        return true;
+    } __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+}
+
+#define TRY_CALL(func, ...) \
+[&]() { \
+bool result = TryCallWrapper([&]() { func(__VA_ARGS__); }); \
+if (!result) { \
+Logger::error("Exception thrown in {} at line {} in {}", __FUNCTION__, __LINE__, __FILE__); \
+} \
+return result; \
+}()
+
 static int customPrint(lua_State* L) {
     int args = lua_gettop(L);
-
     std::string msg;
+
     for (int i = 1; i <= args; i++) {
-        const char* arg = luaL_checkstring(L, i);
-        msg += arg;
+        if (lua_isnil(L, i)) {
+            msg += "nil";
+        }
+        else if (lua_isboolean(L, i)) {
+            msg += lua_toboolean(L, i) ? "true" : "false";
+        }
+        else if (lua_isnumber(L, i)) {
+            msg += std::to_string(lua_tonumber(L, i));
+        }
+        else if (lua_isstring(L, i)) {
+            msg += lua_tostring(L, i);
+        }
+        else {
+            msg += "[Unsupported Type]";
+        }
+
         if (i < args) {
             msg += " ";
         }
@@ -45,7 +80,6 @@ FlarialScript::FlarialScript(std::string filePath, std::string code)
     lua_pushcfunction(mState, customPrint);
     lua_setglobal(mState, "print");
 
-    ScriptEventManager::registerEventAPI(mState);
     ScriptLib::registerLib<FSLib>(mState);
     ScriptLib::registerLib<SettingsLib>(mState);
     ScriptLib::registerLib<ClientLib>(mState);
@@ -66,19 +100,39 @@ bool FlarialScript::compile() {
         // Load and validate the code
         if (luaL_loadstring(mState, mCode.c_str()) != LUA_OK) {
             Logger::error("Syntax error in {}: {}", mFilePath, lua_tostring(mState, -1));
-            if (SDK::clientInstance && SDK::clientInstance->getGuiData()) {
-                SDK::clientInstance->getGuiData()->displayClientMessage("§3[§1Lua§3] §cSyntax error in " + mFilePath + ": " + lua_tostring(mState, -1));
-            }
+            ADD_ERROR_MESSAGE("Syntax error: " + std::string(lua_tostring(mState, -1)));
             lua_pop(mState, 1);
             return false;
         }
 
+        registerModuleFunction("onEvent", [](lua_State* L) {
+                const char* eventName = luaL_checkstring(L, 1);
+
+                if (!lua_isfunction(L, 2)) {
+                    luaL_error(L, "Expected a function as the second argument");
+                }
+
+                lua_getglobal(L, "eventHandlers");
+                if (lua_isnil(L, -1)) {
+                    lua_pop(L, 1);
+                    lua_newtable(L);
+                    lua_setglobal(L, "eventHandlers");
+                    lua_getglobal(L, "eventHandlers");
+                }
+
+                lua_pushstring(L, eventName);
+                lua_pushvalue(L, 2);
+                lua_settable(L, -3);
+
+                lua_pop(L, 1);
+
+                return LUA_OK;
+            });
+
         // Execute the script
         if (lua_pcall(mState, 0, 0, 0) != LUA_OK) {
             Logger::error("Runtime error in {}: {}", mFilePath, lua_tostring(mState, -1));
-            if (SDK::clientInstance && SDK::clientInstance->getGuiData()) {
-                SDK::clientInstance->getGuiData()->displayClientMessage("§3[§1Lua§3] §cRuntime error in " + mFilePath + ": " + lua_tostring(mState, -1));
-            }
+            ADD_ERROR_MESSAGE("Runtime error: " + std::string(lua_tostring(mState, -1)));
             lua_pop(mState, 1);
             return false;
         }
@@ -92,7 +146,6 @@ bool FlarialScript::compile() {
         mName = lua_tostring(mState, -1);
         lua_pop(mState, 1);
 
-        // Easily get script name :))
         lua_pushstring(mState, mName.c_str());
         lua_setglobal(mState, "__scriptName");
 
@@ -129,4 +182,33 @@ void FlarialScript::setEnabled(bool enabled) {
     } else {
         ScriptManager::executeFunction(mState, "onDisable");
     }
+}
+
+void FlarialScript::registerEvent(const std::string& eventName) {
+    std::lock_guard lock(eventMutex);
+
+    lua_getglobal(mState, "eventHandlers");
+    if (lua_istable(mState, -1)) {
+        lua_pushstring(mState, eventName.c_str());
+        lua_gettable(mState, -2);
+
+        if (lua_isfunction(mState, -1)) {
+            if (!TRY_CALL([&]() {
+                if (lua_pcall(mState, 0, 0, 0) != LUA_OK) {
+                    Logger::error("Error executing event {}: {}", eventName, lua_tostring(mState, -1));
+                    ADD_ERROR_MESSAGE("Error executing event " + eventName + ": " + std::string(lua_tostring(mState, -1)));
+                    lua_pop(mState, 1);
+                }
+            })) {
+                Logger::error("An error occurred while executing event {} in {}", eventName, mName);
+                ADD_ERROR_MESSAGE("An error occurred while executing event " + eventName + "in " + mName);
+            }
+        } else {
+            lua_pop(mState, 1);
+        }
+    } else {
+        Logger::error("eventHandlers table is missing or not valid.");
+        ADD_ERROR_MESSAGE("eventHandlers table is missing or not valid.");
+    }
+    lua_pop(mState, 1);
 }
