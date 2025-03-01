@@ -12,6 +12,7 @@ public:
     static void executeFunction(lua_State* L, const char* functionName);
     static void saveSettings();
     static void reloadScripts();
+    static bool toggleScript(const std::string& scriptName);
 
     static std::vector<std::shared_ptr<FlarialScript>> getLoadedScripts() {
         return mLoadedScripts;

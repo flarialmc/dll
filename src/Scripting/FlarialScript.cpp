@@ -119,3 +119,14 @@ bool FlarialScript::compile() {
         return false;
     }
 }
+
+void FlarialScript::setEnabled(bool enabled) {
+    if (mEnabled == enabled) return;
+
+    mEnabled = enabled;
+    if (mEnabled) {
+        ScriptManager::executeFunction(mState, "onEnable");
+    } else {
+        ScriptManager::executeFunction(mState, "onDisable");
+    }
+}

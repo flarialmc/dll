@@ -61,7 +61,8 @@ void ScriptManager::loadScripts() {
             auto mod = ModuleManager::makeModule<ScriptModuleBase>(
                 script->getName(),
                 script->getDescription(),
-                script->getState());
+                script->getState(),
+                script.get());
 
             mLoadedModules.emplace_back(mod);
         }
@@ -97,4 +98,22 @@ void ScriptManager::reloadScripts() {
     mLoadedScripts.clear();
     ScriptEventManager::clearAll();
     loadScripts();
+}
+
+bool ScriptManager::toggleScript(const std::string& scriptName) {
+    std::string normalizedInput = scriptName;
+    normalizedInput = String::replaceAll(normalizedInput, " ", "");
+    normalizedInput = String::toLower(normalizedInput);
+
+    for (const auto& script : mLoadedScripts) {
+        std::string scriptStoredName = script->getName();
+        scriptStoredName = String::replaceAll(scriptStoredName, " ", "");
+        scriptStoredName = String::toLower(scriptStoredName);
+
+        if (scriptStoredName == normalizedInput) {
+            script->setEnabled(!script->isEnabled());
+            return true;
+        }
+    }
+    return false;
 }
