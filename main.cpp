@@ -14,6 +14,8 @@
 #include "src/Utils/Logger/crashlogs.hpp"
 
 std::chrono::steady_clock::time_point lastBeatTime;
+std::chrono::steady_clock::time_point lastAnncTime;
+
 
 std::string replaceAll(std::string subject, const std::string& search,
                        const std::string& replace);
@@ -43,16 +45,24 @@ DWORD WINAPI init(HMODULE real)
 
             auto now = std::chrono::steady_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastBeatTime);
+            auto elapsedAnnc = std::chrono::duration_cast<std::chrono::seconds>(now - lastAnncTime);
+
 
             if(!Client::disable) {
                 if(SDK::hasInstanced && SDK::clientInstance != nullptr) {
                     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+
+                        if (elapsedAnnc >- std::chrono::minutes(5)) {
+                            SDK::clientInstance->getGuiData()->displayClientMessage(
+"§khiii §r §n§l§4FLARIAL V2 BETA §r§khiii \n§r§cGet Better UI & More Modules (Java Inventory Hotkeys, etc.) - §ehttps://flarial.xyz/beta\n§9Join our discord! §ehttps://flarial.xyz/discord"
+);
+                            lastAnncTime = now;
+                        }
+
                         if(elapsed >= std::chrono::seconds(60)) {
                             std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
 
-                            SDK::clientInstance->getGuiData()->displayClientMessage(
-     "§khiii §r §n§l§4FLARIAL V2 BETA §r§khiii \n§r§cGet Better UI & More Modules (Java Inventory Hotkeys, etc.) - §ehttps://flarial.xyz/beta\n§9Join our discord! §ehttps://flarial.xyz/discord"
- );
+
 
                             bool skipFetch = true;
 
