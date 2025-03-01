@@ -32,6 +32,7 @@ namespace Scripting {
 
     void loadModules();
     void unloadModules();
+    std::shared_ptr<Module> FindModuleByName(const std::vector<std::pair<std::shared_ptr<lua_State>, std::shared_ptr<Module>>>& lmao, const std::string& moduleName);
     void SaveSettings();
     void executeFunction(lua_State* L, std::string functionName, bool shitInLogsIfFunctionIsNotFound);
 

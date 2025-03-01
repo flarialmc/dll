@@ -57,7 +57,20 @@ void Scripting::executeFunction(lua_State* L, std::string functionName, bool shi
     }
 }
 
+std::shared_ptr<Module> Scripting::FindModuleByName(
+    const std::vector<std::pair<std::shared_ptr<lua_State>, std::shared_ptr<Module>>>& lmao,
+    const std::string& moduleName)
+{
+    auto it = std::find_if(lmao.begin(), lmao.end(),
+        [&moduleName](const std::pair<std::shared_ptr<lua_State>, std::shared_ptr<Module>>& pair) {
+            return pair.second && pair.second->name == moduleName;
+        });
 
+    if (it != lmao.end()) {
+        return it->second;
+    }
+    return nullptr; // Not found
+}
 
 void Scripting::unloadModules() {
     ScriptingEventManager::clearHandlers();

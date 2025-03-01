@@ -1,5 +1,7 @@
 #include "ClickGUI.hpp"
 
+#include "cmake-build-release-visual-studio/_deps/fmt-src/include/fmt/ostream.h"
+
 void ClickGUI::onRender(RenderEvent &event) {
 
         float allahu = Constraints::RelativeConstraint(0.65);
@@ -706,7 +708,13 @@ modules = ModuleManager::getModules();
                 /* Mod Card End */
             }
 
-            if (ModuleManager::getModule(page.module) && page.type != "normal" && settingsOpacity > 0.05f) {
+            std::shared_ptr<Module> settingMod = ModuleManager::getModule(page.module);
+            if (!settingMod) {
+                settingMod = Scripting::FindModuleByName(Scripting::luaScriptModules, page.module);
+            }
+            
+
+            if (settingMod && page.type != "normal" && settingsOpacity > 0.05f) {
 
 
                 FlarialGUI::PushSize(center.x, center.y, baseWidth, baseHeight);
@@ -750,7 +758,7 @@ modules = ModuleManager::getModules();
                             rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth, rectHeight);
 
 
-                ModuleManager::getModule(page.module)->settingsRender(settingsOffset);
+                settingMod->settingsRender(settingsOffset);
 
                 FlarialGUI::UnsetScrollView();
 
