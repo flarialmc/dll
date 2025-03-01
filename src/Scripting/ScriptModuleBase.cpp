@@ -1,6 +1,7 @@
 #include "ScriptModuleBase.hpp"
 
 #include "ScriptManager.hpp"
+#include <SDK/Client/Network/Packet/TextPacket.hpp>
 
 void ScriptModuleBase::onEnable() {
     ScriptManager::executeFunction(moduleLuaState, "onEnable");
@@ -49,4 +50,19 @@ void ScriptModuleBase::onSetupAndRender(SetupAndRenderEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
 
     linkedScript->registerEvent("onSetupAndRender");
+}
+
+void ScriptModuleBase::onChat(PacketEvent& event) {
+    if (!isEnabled() || !ScriptManager::initialized) return;
+
+    if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
+    const auto *pkt = reinterpret_cast<TextPacket*>(event.getPacket());
+
+    std::string msg = pkt->message;
+    std::string name = pkt->name;
+    auto type = pkt->type;
+    std::string xuid = pkt->xuid;
+
+    bool cancelled = linkedScript->registerCancellableEvent("onChat", msg, name, static_cast<int>(type), xuid);
+    if (cancelled) event.cancel();
 }

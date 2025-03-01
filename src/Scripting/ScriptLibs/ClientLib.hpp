@@ -16,6 +16,21 @@ public:
                     if (message.empty()) return;
                     FlarialGUI::Notify(message);
                 })
+                .addFunction("crash", []() {
+                    __fastfail(0);
+                })
+                .addFunction("freeMouse", []() {
+                    if (!SDK::clientInstance) return;
+                    SDK::clientInstance->releaseMouse();
+                })
+                .addFunction("grabMouse", []() {
+                    if (!SDK::clientInstance) return;
+                    SDK::clientInstance->grabMouse();
+                })
+                .addFunction("getScreenName", []() -> std::string {
+                    if (!SDK::clientInstance) return "";
+                    return SDK::clientInstance->getScreenName();
+                })
             .endNamespace();
     }
 };

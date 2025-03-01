@@ -5,6 +5,7 @@
 #include <Utils/Utils.hpp>
 #include <SDK/SDK.hpp>
 #include <SDK/Client/Actor/Actor.hpp>
+#include <SDK/Client/Network/Packet/TextPacket.hpp>
 
 // LuaBridge needs to link against this class.
 // Normal Actor class doesn't seem to work for me.
@@ -44,6 +45,28 @@ public:
         if (!player) return false;
         return player->isOnGround();
     }
+    static int say(lua_State* L) {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (!player) return 0;
+
+        if (!lua_isstring(L, 1)) return 0;
+
+        std::string msg = lua_tostring(L, 1);
+
+        std::shared_ptr<Packet> packet = SDK::createPacket(9);
+        auto* pkt = reinterpret_cast<TextPacket*>(packet.get());
+
+        pkt->type = TextPacketType::CHAT;
+        pkt->message = msg;
+        pkt->platformId = "";
+        pkt->translationNeeded = false;
+        pkt->xuid = "";
+        pkt->name = player->getPlayerName();
+
+        SDK::clientInstance->getPacketSender()->sendToServer(pkt);
+
+        return 0;
+    }
 };
 
 class PlayerLib : public ScriptLib {
@@ -57,6 +80,7 @@ public:
                 .addStaticFunction("hurtTime", &sLocalPlayer::hurtTime)
                 .addStaticFunction("position", &sLocalPlayer::position)
                 .addStaticFunction("grounded", &sLocalPlayer::grounded)
+                .addStaticFunction("say", &sLocalPlayer::say)
             .endClass();
     }
 };

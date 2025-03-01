@@ -26,6 +26,7 @@ public:
         Listen(this, TickEvent, &ScriptModuleBase::onTick);
         Listen(this, RenderEvent, &ScriptModuleBase::onRender);
         Listen(this, SetupAndRenderEvent, &ScriptModuleBase::onSetupAndRender);
+        Listen(this, PacketEvent, &ScriptModuleBase::onChat);
     }
 
 
@@ -37,6 +38,7 @@ public:
         Deafen(this, TickEvent, &ScriptModuleBase::onTick);
         Deafen(this, RenderEvent, &ScriptModuleBase::onRender);
         Deafen(this, SetupAndRenderEvent, &ScriptModuleBase::onSetupAndRender);
+        Deafen(this, PacketEvent, &ScriptModuleBase::onChat);
         Module::terminate();
     }
 
@@ -86,4 +88,5 @@ public:
     void onTick(TickEvent& event);
     void onRender(RenderEvent& event);
     void onSetupAndRender(SetupAndRenderEvent& event);
+    void onChat(PacketEvent& event);
 };
