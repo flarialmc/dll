@@ -92,6 +92,17 @@ public:
                 .addFunction("Text", [](const char* text) {
                     ImGui::Text(text);
                 })
+                .addFunction("InputText", [](const char* label, std::string buf) -> std::string {
+                    char buffer[256];
+                    std::strncpy(buffer, buf.c_str(), sizeof(buffer) - 1);
+                    buffer[sizeof(buffer) - 1] = '\0';
+
+                    if (ImGui::InputText(label, buffer, sizeof(buffer))) {
+                        return std::string(buffer);
+                    }
+
+                    return buf;
+                })
                 .addFunction("GetBackgroundDrawList", []() {
                     return ImGui::GetBackgroundDrawList();
                 })
