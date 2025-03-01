@@ -50,6 +50,10 @@ DWORD WINAPI init(HMODULE real)
                         if(elapsed >= std::chrono::seconds(60)) {
                             std::string name = SDK::clientInstance->getLocalPlayer()->getPlayerName();
 
+                            SDK::clientInstance->getGuiData()->displayClientMessage(
+     "§khiii §r §n§l§4FLARIAL V2 BETA §r§khiii \n§r§cGet Better UI & More Modules (Java Inventory Hotkeys, etc.) - §ehttps://flarial.xyz/beta\n§9Join our discord! §ehttps://flarial.xyz/discord"
+ );
+
                             bool skipFetch = true;
 
                             if(!skipFetch) {
