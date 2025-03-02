@@ -117,7 +117,7 @@ public:
         this->addHeader("Map avoider");
 
         this->addToggle("Avoid", "", this->settings.getSettingByName<bool>("AutoMapAvoider")->value);
-        this->addTextBox("Maps", "Avoid Maps (Hive). Input one or more maps using comma's.", settings.getSettingByName<std::string>("text")->value);
+        this->addTextBox("Maps", "Avoid Maps (Hive). Input one or more maps using comma's.", settings.getSettingByName<std::string>("text")->value, 100);
 
         this->addHeader("Copy Custom Server code");
         this->addToggle("Copy CS code Keybind", "When setting, hold the new bind for 2 seconds", this->settings.getSettingByName<bool>("copyCS")->value);

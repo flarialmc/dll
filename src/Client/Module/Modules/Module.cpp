@@ -271,11 +271,11 @@ void Module::addColorPicker(std::string text, std::string subtext, std::string& 
     colorPickerIndex++;
 }
 
-void Module::addTextBox(std::string text, std::string subtext, std::string& value) {
+void Module::addTextBox(std::string text, std::string subtext, std::string& value, int limit) {
     float elementX = Constraints::PercentageConstraint(0.285f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-    FlarialGUI::TextBoxVisual(textboxIndex, value, 16, elementX , y);
+    FlarialGUI::TextBoxVisual(textboxIndex, value, limit, elementX , y);
 
     Module::addElementText(text, subtext);
 

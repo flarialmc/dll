@@ -193,9 +193,10 @@ void ModuleManager::initialize() {
     // addModule<CompactChat>();
     addModule<ItemPhysics>();
 
-    if (VersionUtils::checkAboveOrEqual(21, 40)) {
+    if (VersionUtils::checkAboveOrEqual(21, 40) && VersionUtils::checkBetween(21, 50, 21, 59) == false) {
         addModule<JavaInventoryHotkeys>();
     }
+
 
     addModule<HiveStat>();
     addModule<Waypoints>();
