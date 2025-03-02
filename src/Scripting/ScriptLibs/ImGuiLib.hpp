@@ -161,6 +161,10 @@ public:
                 .addFunction("IsMouseReleased", [](int button) {
                     return ImGui::IsMouseReleased(button);
                 })
+                .addFunction("GetMousePos", []() {
+                    ImVec2 pos = ImGui::GetMousePos();
+                    return Vec2(pos.x, pos.y);
+                })
             .endNamespace()
             .beginClass<ImDrawList>("ImDrawList")
                 .addFunction("AddLine", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& colorTable, float thickness = 1) {
@@ -191,10 +195,13 @@ public:
                     ImColor color = toColor(colorTable);
                     drawList->AddCircleFilled(center, radius, color, numSegments);
                 })
-                .addFunction("AddText", [](ImDrawList* drawList, const LuaRef& posTable, const LuaRef& colorTable, const char* text_begin, const char* text_end = 0) {
+                .addFunction("AddText", [](ImDrawList* drawList, const LuaRef& posTable, const LuaRef& colorTable, float font_size, const char* text) {
+                    if (!drawList) return;
+
                     ImVec2 pos = toImVec2(posTable);
                     ImColor color = toColor(colorTable);
-                    drawList->AddText(pos, color, text_begin, text_end);
+
+                    drawList->AddText(ImGui::GetFont(), font_size, pos, color, text);
                 })
                 .addFunction("AddTriangleFilled", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& colorTable) {
                     ImVec2 p1 = toImVec2(p1Table);
