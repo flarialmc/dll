@@ -6,7 +6,11 @@
 class NullMovement : public Module {
     OptionsParser parser;
     int lastKey;
+    int lastLastKey;
+    std::array<bool, 256> lastKeys;
     ActionType lastAction;
+    std::vector<int> movementKeyStack;
+    bool unpresser = false;
 
 public:
     NullMovement() : Module("Null Movement", "Only registers the latest movement key.",
@@ -18,14 +22,12 @@ public:
     void onEnable() override {
         parser.parseOptionsFile();
         Listen(this, KeyEvent, &NullMovement::onKey)
-        Listen(this, TickEvent, &NullMovement::onTick)
 
         Module::onEnable();
     }
 
     void onDisable() override {
         Deafen(this, KeyEvent, &NullMovement::onKey)
-        Deafen(this, TickEvent, &NullMovement::onTick)
         Module::onDisable();
     }
 
@@ -33,57 +35,56 @@ public:
     }
 
 
+
     void onKey(KeyEvent &event) {
         lastKey = event.getKey();
+        lastKeys = event.keys;
         lastAction = event.getAction();
+
+
+        static int forwardKey  = safe_stoi(parser.options["keyboard_type_0_key.forward"]);
+        static int backwardKey = safe_stoi(parser.options["keyboard_type_0_key.back"]);
+        static int leftKey     = safe_stoi(parser.options["keyboard_type_0_key.left"]);
+        static int rightKey    = safe_stoi(parser.options["keyboard_type_0_key.right"]);
+
+
+        bool isMovementKey = (lastKey == forwardKey ||
+                              lastKey == backwardKey ||
+                              lastKey == leftKey ||
+                              lastKey == rightKey);
+
+        if (lastAction == ActionType::Pressed && isMovementKey) unpresser = true;
+
+        if (!isMovementKey)
+            return;
+        if (lastAction == ActionType::Pressed) {
+            auto it = std::find(movementKeyStack.begin(), movementKeyStack.end(), lastKey);
+            if (it != movementKeyStack.end()) {
+                movementKeyStack.erase(it);
+            }
+            movementKeyStack.push_back(lastKey);
+        } else if (lastAction == ActionType::Released) {
+            movementKeyStack.erase(
+                std::remove(movementKeyStack.begin(), movementKeyStack.end(), lastKey),
+                movementKeyStack.end()
+            );
         }
 
-    void onTick(TickEvent &event) {
-                    if (SDK::clientInstance && SDK::clientInstance->getLocalPlayer() && SDK::clientInstance->getLocalPlayer()->getMoveInputHandler()){
-                auto *handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
+        if (!movementKeyStack.empty()) {
+            int lastKey = movementKeyStack.back();
+            if (lastKey == forwardKey)  KeyHook::funcOriginal(backwardKey, 0);
+            else if (lastKey == backwardKey) KeyHook::funcOriginal(forwardKey, 0);
+            else if (lastKey == leftKey) KeyHook::funcOriginal(rightKey, 0);
+            else if (lastKey == rightKey) KeyHook::funcOriginal(leftKey, 0);
+        }
+        }
 
-                static std::vector<int> movementKeyStack;
-                std::string forwardKey  = parser.options["keyboard_type_0_key.forward"];
-                std::string backwardKey = parser.options["keyboard_type_0_key.backward"];
-                std::string leftKey     = parser.options["keyboard_type_0_key.left"];
-                std::string rightKey    = parser.options["keyboard_type_0_key.right"];
-                std::string eventkey = std::to_string(lastKey);
-                bool isMovementKey = (eventkey == forwardKey ||
-                                      eventkey == backwardKey ||
-                                      eventkey == leftKey ||
-                                      eventkey == rightKey);
-                if (!isMovementKey)
-                    return;
-                if (lastAction == ActionType::Pressed) {
-                    auto it = std::find(movementKeyStack.begin(), movementKeyStack.end(), lastKey);
-                    if (it != movementKeyStack.end()) {
-                        movementKeyStack.erase(it);
-                    }
-                    movementKeyStack.push_back(lastKey);
-                } else if (lastAction == ActionType::Released) {
-                    movementKeyStack.erase(
-                        std::remove(movementKeyStack.begin(), movementKeyStack.end(), lastKey),
-                        movementKeyStack.end()
-                    );
-                }
-                handler->forward  = false;
-                handler->backward = false;
-                handler->left     = false;
-                handler->right    = false;
-                if (!movementKeyStack.empty()) {
-                    std::string lastKey = std::to_string(movementKeyStack.back());
-                    if (lastKey == forwardKey)
-                        handler->forward = true;
-                    else if (lastKey == backwardKey)
-                        handler->backward = true;
-                    else if (lastKey == leftKey)
-                        handler->left = true;
-                    else if (lastKey == rightKey)
-                        handler->right = true;
-                }
-            }
+    int safe_stoi(const std::string& str) {
+        char* end;
+        long value = std::strtol(str.c_str(), &end, 10);
+        if (*end != '\0') {
+            throw std::invalid_argument("Invalid integer: " + str);
+        }
+        return static_cast<int>(value);
     }
-
-
-
 };
