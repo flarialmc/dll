@@ -81,6 +81,7 @@ void ScriptManager::executeFunction(lua_State *L, const char* functionName) {
     if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
         std::string err = lua_tostring(L, -1);
         Logger::error("Error calling Lua function '{}': {}", functionName, err);
+        ADD_ERROR_MESSAGE("Error calling Lua function '" + std::string(functionName) + "': " + err);
         lua_pop(L, 1);
     }
 }
