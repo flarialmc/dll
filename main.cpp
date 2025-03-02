@@ -105,6 +105,7 @@ DWORD WINAPI init() {
         if (vipFetchElapsed >= std::chrono::minutes(3)) {
             try {
                 auto vipsJson = APIUtils::getVips();
+                std::cout << vipsJson << std::endl;
                 std::map<std::string, std::string> updatedVips;
 
                 for (const auto& [role, users] : vipsJson.items()) {
