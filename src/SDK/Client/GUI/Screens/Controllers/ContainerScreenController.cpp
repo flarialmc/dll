@@ -45,9 +45,7 @@ void ContainerScreenController::_handleTakeAll(std::string collectionName, int32
 }
 
 void ContainerScreenController::swap(std::string srcCollectionName, int32_t srcSlot, std::string dstCollectionName, int32_t dstSlot) {
-
-    std::cout << srcCollectionName << " " << srcSlot << " " << dstCollectionName << std::endl;
-
+    
     if (srcCollectionName.find("hotbar_items") != std::string::npos ||
         srcCollectionName.find("inventory_items") != std::string::npos) {
         auto srcItem = getContainerItem(srcCollectionName, srcSlot);
