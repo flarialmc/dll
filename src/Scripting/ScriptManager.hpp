@@ -10,7 +10,6 @@ public:
     static void shutdown();
     static void loadScripts();
     static void executeFunction(lua_State* L, const char* functionName);
-    static void saveSettings();
     static void reloadScripts();
 
     static std::vector<std::shared_ptr<FlarialScript>> getLoadedScripts() {

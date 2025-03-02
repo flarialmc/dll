@@ -75,7 +75,7 @@ void LuaCommand::execute(const std::vector<std::string>& args) {
     } else if (action == "path") {
         WinrtUtils::openSubFolder("Flarial\\Scripts");
     } else if (action == "reload") {
-        ModuleManager::restartModules = true;
+        ScriptManager::reloadScripts();
         addCommandMessage("§aReloaded scripts!");
     } else if (action == "import") {
         if (args.size() < 2) {

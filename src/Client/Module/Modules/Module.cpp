@@ -481,7 +481,6 @@ void Module::terminate() {
     terminating = true;
     onDisable();
     active = false;
-//    settings.getSettingByName<bool>("enabled")->value = false;
 }
 
 // TODO: find all getSettingByName<bool>("enabled")->value and replace!!!

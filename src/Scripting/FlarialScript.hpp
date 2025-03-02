@@ -17,7 +17,6 @@ public:
     FlarialScript(std::string filePath, std::string code);
 
     bool compile();
-    void setEnabled(bool enabled);
 
     [[nodiscard]] const std::string& getName() const { return mName; }
     [[nodiscard]] const std::string& getDescription() const { return mDescription; }
@@ -25,9 +24,12 @@ public:
     [[nodiscard]] lua_State* getState() const { return mState; }
 
     ~FlarialScript() {
+        mIsDestroyed = true;
+        std::lock_guard lock(eventMutex);
         if (mState) {
+            lua_pushnil(mState);
+            lua_setglobal(mState, "eventHandlers");
             lua_close(mState);
-            mState = nullptr;
         }
     }
 
@@ -41,6 +43,7 @@ public:
     template <typename... Args>
     bool registerCancellableEvent(const std::string& eventName, Args&&... args) {
         std::lock_guard lock(eventMutex);
+        if (mIsDestroyed) return false;
 
         bool cancelled = false;
         lua_getglobal(mState, "eventHandlers");
@@ -86,6 +89,7 @@ private:
     std::string mFilePath;
     std::string mCode;
     lua_State* mState = nullptr;
+    std::atomic<bool> mIsDestroyed = false;
 
     // Values extracted from script
     std::string mName;

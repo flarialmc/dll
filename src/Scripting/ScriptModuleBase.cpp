@@ -4,50 +4,73 @@
 #include <SDK/Client/Network/Packet/TextPacket.hpp>
 
 void ScriptModuleBase::onEnable() {
-    ScriptManager::executeFunction(moduleLuaState, "onEnable");
+    if (const auto& script = linkedScript.lock()) {
+        if (script->getState()) {
+            ScriptManager::executeFunction(script->getState(), "onEnable");
+        }
+    }
+    Module::onEnable();
 }
 
 void ScriptModuleBase::onDisable() {
-    ScriptManager::executeFunction(moduleLuaState, "onDisable");
+    if (const auto& script = linkedScript.lock()) {
+        if (script->getState()) {
+            ScriptManager::executeFunction(script->getState(), "onDisable");
+        }
+    }
+    Module::onDisable();
 }
 
 void ScriptModuleBase::onKey(KeyEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
 
-    bool cancelled = linkedScript->registerCancellableEvent("onKey", event.getKey(), static_cast<int>(event.getAction()));
-    if (cancelled) event.cancel();
+    if (const auto& script = linkedScript.lock()) {
+        bool cancelled = script->registerCancellableEvent("onKey", event.getKey(), static_cast<int>(event.getAction()));
+        if (cancelled) event.cancel();
+    }
 }
 
 void ScriptModuleBase::onMouse(MouseEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized || event.getButton() == 0 || event.getAction() == 0) return;
 
-    bool cancelled = linkedScript->registerCancellableEvent("onMouse", static_cast<int>(event.getButton()), static_cast<int>(event.getAction()));
-    if (cancelled) event.cancel();
+    if (const auto& script = linkedScript.lock()) {
+        bool cancelled = script->registerCancellableEvent("onMouse", static_cast<int>(event.getButton()), static_cast<int>(event.getAction()));
+        if (cancelled) event.cancel();
+    }
+
 }
 
 void ScriptModuleBase::onPacketReceive(PacketEvent &event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
 
-    bool cancelled = linkedScript->registerCancellableEvent("onPacketReceive", event.getPacket(), static_cast<int>(event.getPacket()->getId()));
-    if (cancelled) event.cancel();
+    if (const auto& script = linkedScript.lock()) {
+        bool cancelled = script->registerCancellableEvent("onPacketReceive", event.getPacket(), static_cast<int>(event.getPacket()->getId()));
+        if (cancelled) event.cancel();
+    }
 }
 
 void ScriptModuleBase::onTick(TickEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
 
-    linkedScript->registerEvent("onTick");
+    if (const auto& script = linkedScript.lock()) {
+        script->registerEvent("onTick");
+    }
 }
 
 void ScriptModuleBase::onRender(RenderEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
 
-    linkedScript->registerEvent("onRender");
+    if (const auto& script = linkedScript.lock()) {
+        script->registerEvent("onRender");
+    }
 }
 
 void ScriptModuleBase::onSetupAndRender(SetupAndRenderEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
 
-    linkedScript->registerEvent("onSetupAndRender");
+    if (const auto& script = linkedScript.lock()) {
+        script->registerEvent("onSetupAndRender");
+    }
 }
 
 void ScriptModuleBase::onChat(PacketEvent& event) {
@@ -61,6 +84,8 @@ void ScriptModuleBase::onChat(PacketEvent& event) {
     auto type = pkt->type;
     std::string xuid = pkt->xuid;
 
-    bool cancelled = linkedScript->registerCancellableEvent("onChat", msg, name, static_cast<int>(type), xuid);
-    if (cancelled) event.cancel();
+    if (const auto& script = linkedScript.lock()) {
+        bool cancelled = script->registerCancellableEvent("onChat", msg, name, static_cast<int>(type), xuid);
+        if (cancelled) event.cancel();
+    }
 }

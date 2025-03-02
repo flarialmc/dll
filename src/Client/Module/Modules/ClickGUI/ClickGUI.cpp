@@ -640,14 +640,10 @@ modules = ModuleManager::getModules();
 
                     int i = 0;
 
-                    static auto modules = ScriptManager::getLoadedModules();
 
-                       if (ModuleManager::cguiRefresh) {
-                           modules = ScriptManager::getLoadedModules();
-                           ModuleManager::cguiRefresh = false;
-                       }
+                       auto scriptModules = ScriptManager::getLoadedModules();
 
-                    for (const auto& pModule: modules) {
+                    for (const auto& pModule: scriptModules) {
                         bool visible = (modcenter.y + yModifier + FlarialGUI::scrollpos + 55 > center.y) &&
                                        (modcenter.y + yModifier + FlarialGUI::scrollpos - 300) <
                                        center.y + Constraints::RelativeConstraint(baseHeightReal);

@@ -13,10 +13,10 @@ inline ScriptSettingManager gScriptSettingManager;
 
 class ScriptModuleBase : public Module {
 public:
-    lua_State* moduleLuaState;
-    FlarialScript* linkedScript;
+    lua_State* moduleLuaState = nullptr;
+    std::weak_ptr<FlarialScript> linkedScript;
 
-    ScriptModuleBase(const std::string& name, const std::string& description, lua_State* luaState, FlarialScript* script)
+    ScriptModuleBase(const std::string& name, const std::string& description, lua_State* luaState, std::shared_ptr<FlarialScript> script)
     : Module(name, description, IDR_SCRIPT_PNG, "", true), moduleLuaState(luaState), linkedScript(script) {
 
         Module::setup();

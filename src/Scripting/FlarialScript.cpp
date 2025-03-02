@@ -16,6 +16,7 @@
 #include "ScriptLibs/StructsLib.hpp"
 #include "ScriptLibs/FlarialGUILib.hpp"
 #include "ScriptLibs/ConstraintsLib.hpp"
+#include "ScriptLibs/PacketsLib.hpp"
 
 template<typename Func, typename... Args>
 bool TryCallWrapper(Func func, Args&&... args) {
@@ -90,6 +91,7 @@ FlarialScript::FlarialScript(std::string filePath, std::string code)
     ScriptLib::registerLib<StructsLib>(mState);
     ScriptLib::registerLib<FlarialGUILib>(mState);
     ScriptLib::registerLib<ConstraintsLib>(mState);
+    ScriptLib::registerLib<PacketsLib>(mState);
 }
 
 bool FlarialScript::compile() {
@@ -169,6 +171,7 @@ bool FlarialScript::compile() {
 
 void FlarialScript::registerEvent(const std::string& eventName) {
     std::lock_guard lock(eventMutex);
+    if (mIsDestroyed) return;
 
     lua_getglobal(mState, "eventHandlers");
     if (lua_istable(mState, -1)) {

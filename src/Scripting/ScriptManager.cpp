@@ -60,16 +60,17 @@ void ScriptManager::loadScripts() {
                 script->getName(),
                 script->getDescription(),
                 script->getState(),
-                script.get());
+                script);
 
             mLoadedModules.emplace_back(mod);
             mod->defaultConfig();
+            mod->loadSettings();
         }
-        ModuleManager::cguiRefresh = true;
     }
 }
 
 void ScriptManager::executeFunction(lua_State *L, const char* functionName) {
+    if (!L || lua_status(L) != LUA_OK) return;
     lua_getglobal(L, functionName);
 
     if (!lua_isfunction(L, -1)) {
@@ -84,13 +85,11 @@ void ScriptManager::executeFunction(lua_State *L, const char* functionName) {
     }
 }
 
-void ScriptManager::saveSettings() {
-
-}
-
 void ScriptManager::reloadScripts() {
-    for (const auto& mod : mLoadedModules) {
-        mod->terminate();
+    for (auto& mod : mLoadedModules) {
+        if (mod) {
+            mod->terminate();
+        }
     }
 
     mLoadedModules.clear();
@@ -102,8 +101,10 @@ Module* ScriptManager::getModuleByState(lua_State *L) {
     for (const auto& script : mLoadedScripts) {
         if (script->getState() == L) {
             for (const auto& module : mLoadedModules) {
-                if (module->linkedScript == script.get()) {
-                    return module.get();
+                if (auto sp = module->linkedScript.lock()) {
+                    if (sp.get() == script.get()) {
+                        return module.get();
+                    }
                 }
             }
         }
