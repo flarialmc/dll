@@ -32,6 +32,35 @@ public:
     }
 
     void defaultConfig() override {
+
+        if (settings.getSettingByName<bool>("horizontal") == nullptr) settings.addSetting("horizontal", true);
+        if (settings.getSettingByName<bool>("vertical") == nullptr) settings.addSetting("vertical", false);
+
+    }
+
+
+    void settingsRender(float settingsOffset) override {
+
+
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
+
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
+
+
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+                                  Constraints::RelativeConstraint(1.0, "width"),
+                                  Constraints::RelativeConstraint(0.88f, "height"));
+
+        this->addHeader("Misc");
+        this->addToggle("Vertical Nulling", "W & S keys", settings.getSettingByName<bool>("vertical")->value);
+        this->addToggle("Horizontal Nulling", "A & D keys", settings.getSettingByName<bool>("horizontal")->value);
+
+        FlarialGUI::UnsetScrollView();
+
+        this->resetPadding();
+
     }
 
 
@@ -72,10 +101,10 @@ public:
 
         if (!movementKeyStack.empty()) {
             int lastKey = movementKeyStack.back();
-            if (lastKey == forwardKey)  KeyHook::funcOriginal(backwardKey, 0);
-            else if (lastKey == backwardKey) KeyHook::funcOriginal(forwardKey, 0);
-            else if (lastKey == leftKey) KeyHook::funcOriginal(rightKey, 0);
-            else if (lastKey == rightKey) KeyHook::funcOriginal(leftKey, 0);
+            if (lastKey == forwardKey && settings.getSettingByName<bool>("vertical")->value)  KeyHook::funcOriginal(backwardKey, 0);
+            else if (lastKey == backwardKey && settings.getSettingByName<bool>("vertical")->value) KeyHook::funcOriginal(forwardKey, 0);
+            else if (lastKey == leftKey && settings.getSettingByName<bool>("horizontal")->value) KeyHook::funcOriginal(rightKey, 0);
+            else if (lastKey == rightKey && settings.getSettingByName<bool>("horizontal")->value) KeyHook::funcOriginal(leftKey, 0);
         }
         }
 
