@@ -63,6 +63,7 @@ void ScriptManager::loadScripts() {
                 script.get());
 
             mLoadedModules.emplace_back(mod);
+            mod->defaultConfig();
         }
         ModuleManager::cguiRefresh = true;
     }
@@ -97,22 +98,17 @@ void ScriptManager::reloadScripts() {
     loadScripts();
 }
 
-bool ScriptManager::toggleScript(const std::string& scriptName) {
-    std::string normalizedInput = scriptName;
-    normalizedInput = String::replaceAll(normalizedInput, " ", "");
-    normalizedInput = String::toLower(normalizedInput);
-
+Module* ScriptManager::getModuleByState(lua_State *L) {
     for (const auto& script : mLoadedScripts) {
-        std::string scriptStoredName = script->getName();
-        scriptStoredName = String::replaceAll(scriptStoredName, " ", "");
-        scriptStoredName = String::toLower(scriptStoredName);
-
-        if (scriptStoredName == normalizedInput) {
-            script->setEnabled(!script->isEnabled());
-            return true;
+        if (script->getState() == L) {
+            for (const auto& module : mLoadedModules) {
+                if (module->linkedScript == script.get()) {
+                    return module.get();
+                }
+            }
         }
     }
-    return false;
+    return nullptr;
 }
 
 std::shared_ptr<Module> ScriptManager::FindModuleByName(

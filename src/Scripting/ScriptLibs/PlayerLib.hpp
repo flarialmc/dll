@@ -67,6 +67,24 @@ public:
 
         return 0;
     }
+    static float getYaw() {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (!player) return 0.0f;
+
+        auto rot = player->getActorRotationComponent();
+        if (!rot) return 0.0f;
+
+        return rot->rot.y;
+    }
+    static float getPitch() {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (!player) return 0.0f;
+
+        auto rot = player->getActorRotationComponent();
+        if (!rot) return 0.0f;
+
+        return rot->rot.x;
+    }
 };
 
 class PlayerLib : public ScriptLib {
@@ -81,6 +99,8 @@ public:
                 .addStaticFunction("position", &sLocalPlayer::position)
                 .addStaticFunction("grounded", &sLocalPlayer::grounded)
                 .addStaticFunction("say", &sLocalPlayer::say)
+                .addStaticFunction("getYaw", &sLocalPlayer::getYaw)
+                .addStaticFunction("getPitch", &sLocalPlayer::getPitch)
             .endClass();
     }
 };

@@ -4,6 +4,7 @@
 
 #include <Utils/Utils.hpp>
 #include <GUI/Engine/Engine.hpp>
+#include <Scripting/ScriptManager.hpp>
 
 class FlarialGUILib : public ScriptLib {
 public:
@@ -50,6 +51,10 @@ public:
                 })
                 .addStaticFunction("UnsetWindowRect", []() {
                     FlarialGUI::UnsetWindowRect();
+                })
+                .addStaticFunction("NormalRender", [](int index, std::string text, lua_State* L) {
+                    auto* script = ScriptManager::getModuleByState(L);
+                    script->normalRender(index, text);
                 })
             .endClass();
     }

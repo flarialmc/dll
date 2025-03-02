@@ -12,7 +12,6 @@ public:
     static void executeFunction(lua_State* L, const char* functionName);
     static void saveSettings();
     static void reloadScripts();
-    static bool toggleScript(const std::string& scriptName);
 
     static std::vector<std::shared_ptr<FlarialScript>> getLoadedScripts() {
         return mLoadedScripts;
@@ -21,6 +20,8 @@ public:
     static std::vector<std::shared_ptr<ScriptModuleBase>> getLoadedModules() {
         return mLoadedModules;
     }
+
+    static Module* getModuleByState(lua_State* L);
 
     static inline bool initialized = false;
     static std::shared_ptr<Module> FindModuleByName(const std::vector<std::shared_ptr<ScriptModuleBase>>& modules, const std::string& moduleName);

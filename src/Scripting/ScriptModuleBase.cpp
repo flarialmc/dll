@@ -5,12 +5,10 @@
 
 void ScriptModuleBase::onEnable() {
     ScriptManager::executeFunction(moduleLuaState, "onEnable");
-    linkedScript->setEnabled(true);
 }
 
 void ScriptModuleBase::onDisable() {
     ScriptManager::executeFunction(moduleLuaState, "onDisable");
-    linkedScript->setEnabled(false);
 }
 
 void ScriptModuleBase::onKey(KeyEvent& event) {

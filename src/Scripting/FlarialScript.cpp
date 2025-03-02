@@ -90,9 +90,6 @@ FlarialScript::FlarialScript(std::string filePath, std::string code)
     ScriptLib::registerLib<StructsLib>(mState);
     ScriptLib::registerLib<FlarialGUILib>(mState);
     ScriptLib::registerLib<ConstraintsLib>(mState);
-
-    // Setting system is so scuffed rn
-    ScriptSettingManager::createBoolSetting(mState);
 }
 
 bool FlarialScript::compile() {
@@ -146,9 +143,6 @@ bool FlarialScript::compile() {
         mName = lua_tostring(mState, -1);
         lua_pop(mState, 1);
 
-        lua_pushstring(mState, mName.c_str());
-        lua_setglobal(mState, "__scriptName");
-
         lua_getglobal(mState, "description");
         if (!lua_isstring(mState, -1)) {
             Logger::error("Script {} is missing 'description'", mFilePath);
@@ -170,17 +164,6 @@ bool FlarialScript::compile() {
     } catch (const std::exception& e) {
         Logger::error("Failed to compile script '{}': {}", mFilePath, e.what());
         return false;
-    }
-}
-
-void FlarialScript::setEnabled(bool enabled) {
-    if (mEnabled == enabled) return;
-
-    mEnabled = enabled;
-    if (mEnabled) {
-        ScriptManager::executeFunction(mState, "onEnable");
-    } else {
-        ScriptManager::executeFunction(mState, "onDisable");
     }
 }
 

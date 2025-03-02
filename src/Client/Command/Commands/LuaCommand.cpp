@@ -72,7 +72,6 @@ void LuaCommand::execute(const std::vector<std::string>& args) {
         addCommandMessage("§bpath §8- §7Opens the script directory in File Explorer");
         addCommandMessage("§breload §8- §7Reloads all currently loaded scripts");
         addCommandMessage("§bimport §8- §7Automatically imports scripts for you");
-        addCommandMessage("§btoggle §8- §7A temporary fix for toggling scripts due to ClickGui being broken");
     } else if (action == "path") {
         WinrtUtils::openSubFolder("Flarial\\Scripts");
     } else if (action == "reload") {
@@ -93,23 +92,5 @@ void LuaCommand::execute(const std::vector<std::string>& args) {
         [=]() -> winrt::fire_and_forget {
             co_await importScript(category);
         }();
-    } else if (action == "toggle") {
-        if (args.size() < 2) {
-            addCommandMessage("§cUsage: .lua toggle <name>");
-            addCommandMessage("§7If your script name has a space, enter it without any.");
-            return;
-        }
-
-        std::string scriptName = args[1];
-        scriptName = String::replaceAll(scriptName, " ", "");
-        scriptName = String::toLower(scriptName);
-
-        if (ScriptManager::toggleScript(scriptName)) {
-            addCommandMessage("§aToggled script: {}", scriptName);
-        } else {
-            addCommandMessage("§cScript '{}' not found", scriptName);
-        }
-    } else {
-        addCommandMessage("§cUsage: .lua <help/reload/path/import>");
     }
 }

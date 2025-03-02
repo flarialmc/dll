@@ -29,8 +29,6 @@ public:
         Listen(this, PacketEvent, &ScriptModuleBase::onChat);
     }
 
-
-
     void terminate() override {
         Deafen(this, KeyEvent, &ScriptModuleBase::onKey);
         Deafen(this, MouseEvent, &ScriptModuleBase::onMouse);
@@ -42,12 +40,13 @@ public:
         Module::terminate();
     }
 
-    [[nodiscard]] bool isEnabled() const { return linkedScript && linkedScript->isEnabled(); }
     void onEnable() override;
 
     void onDisable() override;
 
     void defaultConfig() override {
+        if(settings.getSettingByName<std::string>("text") == nullptr)
+            settings.addSetting("text", static_cast<std::string>("{VALUE}"));
     }
 
     void settingsRender(float settingsOffset) override {
@@ -66,7 +65,7 @@ public:
                 switch (settingPtr->type) {
                     case ScriptSettingType::Bool: {
                         auto* boolSet = dynamic_cast<BoolSetting*>(settingPtr.get());
-                        this->addToggle(boolSet->name, boolSet->description, boolSet->defaultValue);
+                        this->addToggle(boolSet->displayName, boolSet->description, boolSet->defaultValue);
                         break;
                     }
                     case ScriptSettingType::Float: {

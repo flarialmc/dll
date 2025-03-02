@@ -16,15 +16,16 @@ public:
         getGlobalNamespace(state)
             .beginNamespace("settings")
                 .addFunction("addBool", [state](const std::string& name, const std::string& desc, bool defValue) -> BoolSetting* {
-                    LuaRef scriptNameRef = getGlobal(state, "__scriptName");
-                    LuaRef scriptName = LuaRef(state, "Unknown");
+                    lua_getglobal(state, "name");
+                    std::string scriptName = "Unknown";
 
-                    if (scriptNameRef.isString()) {
-                        scriptName = scriptNameRef.cast<std::string>();
+                    if (lua_isstring(state, -1)) {
+                        scriptName = lua_tostring(state, -1);
                     }
+                    lua_pop(state, 1);
 
                     auto* setting = gScriptSettingManager.addSetting<BoolSetting>(
-                        scriptName.cast<std::string>().value(), name, desc, defValue
+                        scriptName, name, desc, defValue
                     );
                     return setting;
                 })

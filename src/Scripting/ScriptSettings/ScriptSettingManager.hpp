@@ -16,7 +16,7 @@ public:
             return dynamic_cast<T*>(settings[uniqueKey].get());
         }
 
-        auto setting = std::make_unique<T>(uniqueKey, settingDescription, std::forward<Args>(args)...);
+        auto setting = std::make_unique<T>(settingName, uniqueKey, settingDescription, std::forward<Args>(args)...);
         Logger::info("Creating new setting '{}' with default value: {}", uniqueKey, setting->defaultValue);
 
         T* ptr = setting.get();
@@ -33,9 +33,6 @@ public:
     }
 
     [[nodiscard]] const auto& getAllSettings() const { return settings; }
-
-    static void createBoolSetting(lua_State* L);
-
 private:
     std::unordered_map<std::string, std::unique_ptr<BaseSetting>> settings;
 };
