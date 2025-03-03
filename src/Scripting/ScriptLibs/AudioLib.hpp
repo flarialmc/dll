@@ -11,11 +11,10 @@ public:
         using namespace luabridge;
 
         getGlobalNamespace(state)
-            .beginClass<AudioLib>("audio")
+            .beginNamespace("audio")
                 .addFunction("play", [](const std::string& path) {
-                    std::string fullPath = Utils::getClientPath() + path;
-                    Audio::play(&fullPath[0]);
+                    Audio::play(Utils::getClientPath() + path);
                 })
-            .endClass();
+            .endNamespace();
     }
 };

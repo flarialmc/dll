@@ -12,8 +12,8 @@ namespace Audio {
         }
     }
 
-    void play(char* audio) {
-        if (ma_engine_play_sound(&engine, audio, NULL) != MA_SUCCESS) {
+    void play(std::string audio) {
+        if (ma_engine_play_sound(&engine, audio.c_str(), NULL) != MA_SUCCESS) {
             Logger::error("Failed to play audio file: {}", audio);
             ma_engine_uninit(&engine);
         }

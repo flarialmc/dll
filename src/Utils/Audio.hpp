@@ -7,6 +7,6 @@ namespace Audio {
     extern ma_engine engine;
 
     void init();
-    void play(char* audio);
+    void play(std::string audio);
     void cleanup();
 }
