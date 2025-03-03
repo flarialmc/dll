@@ -218,6 +218,7 @@ void ResizeHook::cleanShit(bool isResize) {
 
     }
 
+    SwapchainHook::init = false;
     FlarialGUI::scrollposmodifier = 0;
 
 

@@ -6,6 +6,7 @@
 class RenderOrderExecuteHook : public Hook {
 private:
     static void rendergraph_RenderOrder_execute(void *_this, void* a1, void* a2) {
+        if (Client::disable) return;
         auto event = nes::make_holder<RenderOrderExecuteEvent>();
         eventMgr.trigger(event);
         if(!event->isCancelled())

@@ -149,7 +149,7 @@ public:
 
 
     void onKey(KeyEvent &event)  {
-        if (!SwapchainHook::init) return;
+        if (!SwapchainHook::init || !ImGui::GetCurrentContext()) return;
         if (!Client::disable) {
             ImGuiIO& io = ImGui::GetIO();
             const ImGuiKey mod = keycodeToImGuiMod(event.getKey());

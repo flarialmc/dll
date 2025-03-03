@@ -148,20 +148,26 @@ DWORD WINAPI init() {
 
     Client::SaveSettings();
 
+    ModuleManager::terminate();
+    Logger::custom(fmt::fg(fmt::color::pink), "ModuleManager", "Shut down");
+    HookManager::terminate();
+    Logger::custom(fmt::fg(fmt::color::pink), "HookManager", "Shut down");
+    CommandManager::terminate();
+    Logger::custom(fmt::fg(fmt::color::pink), "CommandManager", "Shut down");
+
     ResizeHook::cleanShit();
 
     kiero::shutdown();
 
     Logger::custom(fmt::fg(fmt::color::pink), "Kiero", "Shut down");
 
-    ModuleManager::terminate();
-    HookManager::terminate();
-    CommandManager::terminate();
-
     Scripting::unloadModules();
     ScriptingEventManager::clearHandlers();
 
     Audio::cleanup();
+
+    Logger::custom(fmt::fg(fmt::color::pink), "Audio", "Shut down");
+
 
     MH_DisableHook(MH_ALL_HOOKS);
     MH_Uninitialize();
