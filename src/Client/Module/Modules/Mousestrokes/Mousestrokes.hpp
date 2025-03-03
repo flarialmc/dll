@@ -121,7 +121,7 @@ public:
 
     void onRender(RenderEvent& event) {
         if (!this->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
-        this->normalRender(78653, (std::string&)"");
+        this->normalRender(25, (std::string&)"");
     }
 
     void onMouse(MouseEvent& event) {
@@ -144,7 +144,40 @@ public:
         float scale = this->settings.getSettingByName<float>("uiscale")->value;
 
         Vec2 RectSize = Vec2(Constraints::PercentageConstraint(0.15, "top") * scale, Constraints::PercentageConstraint(0.15, "top") * scale);
-        Vec2<float> RectPos = Vec2(Constraints::PercentageConstraint(this->settings.getSettingByName<float>("percentageX")->value, "left"), Constraints::PercentageConstraint(this->settings.getSettingByName<float>("percentageY")->value, "top"));
+
+
+        Vec2<float> settingperc = Vec2<float>(
+        this->settings.getSettingByName<float>("percentageX")->value,
+        this->settings.getSettingByName<float>("percentageY")->value
+);
+
+        Vec2<float> realcenter;
+
+        if (settingperc.x != 0)
+            realcenter = Vec2(settingperc.x * (MC::windowSize.x - RectSize.x), settingperc.y * (MC::windowSize.y - RectSize.y));    else
+                realcenter = Constraints::CenterConstraint(RectSize.y, RectSize.y * this->settings.getSettingByName<float>(
+                        "rectheight")->value);
+
+        if (ClickGUI::editmenu) {
+            auto height = RectSize.y * this->settings.getSettingByName<float>("rectheight")->value;
+            FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, RectSize.x,
+                                      height, index);
+
+            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, RectSize.x, height);
+            checkForRightClickAndOpenSettings(realcenter.x, realcenter.y, RectSize.x, height);
+
+            realcenter.x = vec2.x;
+            realcenter.y = vec2.y;
+
+            realcenter = realcenter;
+
+            Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y, RectSize.x, RectSize.y);
+            this->settings.setValue("percentageX", percentages.x);
+            this->settings.setValue("percentageY", percentages.y);
+        }
+
+
+        Vec2<float> RectPos = realcenter;
 
         FlarialGUI::lerp<float>(CurrentCursorPos.x, X * (Constraints::PercentageConstraint(1, "top") / 1080) * scale, FlarialGUI::frameFactor * 0.25);
         FlarialGUI::lerp<float>(CurrentCursorPos.y, Y * (Constraints::PercentageConstraint(1, "top") / 1080) * scale, FlarialGUI::frameFactor * 0.25);
@@ -219,11 +252,10 @@ public:
             CursorColor.a *= 0.9;
 
             if (CursorColor.a < 0.0001) {
-                trails.pop_back(); 
+                trails.pop_back();
                 return;
             }
         }
-        
     }
 
     int X = 0;
