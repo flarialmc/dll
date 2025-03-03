@@ -19,7 +19,6 @@ public:
     void onEnable() override {
         Listen(this, RenderEvent, &Mousestrokes::onRender);
         Listen(this, MouseEvent, &Mousestrokes::onMouse);
-        //Listen(this, TickEvent, &Mousestrokes::onTick);
         Module::onEnable();
 
         std::thread normalizeCursor([&]() {
@@ -37,7 +36,6 @@ public:
     void onDisable() override {
         Deafen(this, RenderEvent, &Mousestrokes::onRender);
         Deafen(this, MouseEvent, &Mousestrokes::onMouse);
-        Deafen(this, TickEvent, &Mousestrokes::onTick);
         Module::onDisable();
     }
 
