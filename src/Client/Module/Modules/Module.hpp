@@ -84,7 +84,7 @@ public:
 
     void addKeybind(std::string text, std::string subtext, std::string &keybind);
 
-    void addTextBox(std::string text, std::string subtext, std::string& value);
+    void addTextBox(std::string text, std::string subtext, std::string& value, int limit = 16);
     void addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value);
     void addColorPicker(std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb);
     virtual void loadDefaults();

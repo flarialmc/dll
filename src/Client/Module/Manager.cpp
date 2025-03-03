@@ -97,6 +97,7 @@
 #include "Modules/JavaDynamicFOV/JavaDynamicFOV.hpp"
 #include "Modules/ItemUseDelayFix/ItemUseDelayFix.hpp"
 #include "../../Scripting/Console/ConsoleService.hpp"
+
 #include "Modules/Mousestrokes/Mousestrokes.hpp"
 
 namespace ModuleManager {
@@ -197,9 +198,10 @@ void ModuleManager::initialize() {
 
     addModule<Mousestrokes>();
 
-    if (VersionUtils::checkAboveOrEqual(21, 40)) {
+    if (VersionUtils::checkAboveOrEqual(21, 40) && VersionUtils::checkBetween(21, 50, 21, 59) == false) {
         addModule<JavaInventoryHotkeys>();
     }
+
 
     addModule<HiveStat>();
     addModule<Waypoints>();

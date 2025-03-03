@@ -100,16 +100,22 @@ void VersionUtils::addData() {
 
 bool VersionUtils::checkAboveOrEqual(const int m, const int b) {
     static auto [major, minor, build, error] = WinrtUtils::impl::getGameVersion();
-    if(m < minor) return true;
-    return m <= minor && b <= build / 100;
+    if (minor > m)
+        return true;
+    if (minor == m)
+        return (build / 100) >= b;
+    return false;
 }
 
 bool VersionUtils::checkBelowOrEqual(const int m, const int b) {
     static auto [major, minor, build, error] = WinrtUtils::impl::getGameVersion();
-    if(m < minor) return true;
-    return m >= minor && b >= build / 100;
+    if (minor < m)
+        return true;
+    if (minor == m)
+        return (build / 100) <= b;
+    return false;
 }
 
 bool VersionUtils::checkBetween(const int m1, const int b1, const int m2, const int b2) {
-    return checkBelowOrEqual(m1, b1) && checkAboveOrEqual(m2, b2);
+    return checkAboveOrEqual(m1, b1) && checkBelowOrEqual(m2, b2);
 }

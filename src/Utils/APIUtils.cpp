@@ -55,7 +55,6 @@ std::pair<long, std::string> APIUtils::POST_Simple(const std::string& url, const
         std::cerr << "curl_easy_perform() failed in POST_Simple: " << curl_easy_strerror(res) << std::endl;
     } else {
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
-        std::cout << "POST_Simple Response Code: " << responseCode << std::endl; // Output response code
     }
 
     curl_slist_free_all(headers);

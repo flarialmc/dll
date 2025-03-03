@@ -103,8 +103,10 @@ public:
     }
 
     void onContainerSlotHovered(ContainerSlotHoveredEvent &event) {
+        if (event.getCollectionName().find("_items") == std::string::npos) return;
         currentHoveredSlot = event.getHoveredSlot();
         currentCollectionName = event.getCollectionName();
+
     };
 
     void onContainerTick(ContainerScreenControllerTickEvent &event) {

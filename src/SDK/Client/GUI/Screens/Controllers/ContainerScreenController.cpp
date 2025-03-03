@@ -45,17 +45,19 @@ void ContainerScreenController::_handleTakeAll(std::string collectionName, int32
 }
 
 void ContainerScreenController::swap(std::string srcCollectionName, int32_t srcSlot, std::string dstCollectionName, int32_t dstSlot) {
-    auto srcItem = getContainerItem(srcCollectionName, srcSlot);
-    auto dstItem = getContainerItem(dstCollectionName, dstSlot);
 
-    if(!srcItem && dstItem) {
-        _handleTakeAll(dstCollectionName, dstSlot);
-        _handlePlaceAll(srcCollectionName, srcSlot);
+        auto srcItem = getContainerItem(srcCollectionName, srcSlot);
+        auto dstItem = getContainerItem(dstCollectionName, dstSlot);
+
+        if(!srcItem && dstItem) {
+            _handleTakeAll(dstCollectionName, dstSlot);
+            _handlePlaceAll(srcCollectionName, srcSlot);
+            _handlePlaceAll(dstCollectionName, dstSlot);
+            return;
+        }
+
+        _handleTakeAll(srcCollectionName, srcSlot);
         _handlePlaceAll(dstCollectionName, dstSlot);
-        return;
-    }
+        _handlePlaceAll(srcCollectionName, srcSlot);
 
-    _handleTakeAll(srcCollectionName, srcSlot);
-    _handlePlaceAll(dstCollectionName, dstSlot);
-    _handlePlaceAll(srcCollectionName, srcSlot);
 }

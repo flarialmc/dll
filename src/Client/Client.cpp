@@ -87,7 +87,9 @@ void Client::initialize() {
         return;
     }
 
+
     VersionUtils::addData();
+
 
     std::vector<std::filesystem::path> directories = {
         Utils::getRoamingPath() + "\\Flarial",
@@ -97,27 +99,33 @@ void Client::initialize() {
         Utils::getRoamingPath() + "\\Flarial\\scripts",
     };
 
-    std::string playersList;
-    std::string filePath = Utils::getRoamingPath() + "\\Flarial\\playerscache.txt";
-    std::ifstream file(filePath);
-    if (!file.is_open()) {
-        std::ofstream createFile(filePath);
-        if (!createFile.is_open()) {
-           Logger::error("Could not create file: ");
-        } else {
-            createFile.close();
-            file.open(filePath);
-            if (!file.is_open()) {
-                Logger::error("Could not open file for reading after creation: ");
+    std::thread updateThread([]() {
+        std::string playersList;
+        std::string filePath = Utils::getRoamingPath() + "\\Flarial\\playerscache.txt";
+        std::ifstream file(filePath);
+        if (!file.is_open()) {
+            std::ofstream createFile(filePath);
+            if (!createFile.is_open()) {
+               Logger::error("Could not create file: ");
+            } else {
+                createFile.close();
+                file.open(filePath);
+                if (!file.is_open()) {
+                    Logger::error("Could not open file for reading after creation: ");
+                }
             }
         }
-    }
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    playersList = buffer.str();
-    file.close();
-    APIUtils::onlineUsers = APIUtils::ListToVector(playersList);
 
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        playersList = buffer.str();
+        file.close();
+
+        APIUtils::onlineUsers = APIUtils::ListToVector(playersList);
+    });
+
+    updateThread.detach();
+    
 
     for (const auto& path : directories) {
         if (!std::filesystem::exists(path)) {
@@ -127,6 +135,9 @@ void Client::initialize() {
 
     Client::CheckSettingsFile();
     Client::LoadSettings();
+
+    Logger::success("4");
+
 
     ADD_SETTING("fontname", std::string("Space Grotesk"));
     ADD_SETTING("mod_fontname", std::string("Space Grotesk"));
