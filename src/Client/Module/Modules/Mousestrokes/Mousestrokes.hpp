@@ -141,9 +141,30 @@ public:
         Y += event.getMouseMovementY();
     }
 
+    struct CircleTrail {
+        float x, y, opacity;
+    };
+
+    std::vector<CircleTrail> trails = {};
+
+    float MousePosX, MousePosY;
+
     void normalRender(int index, std::string& value) override {
         if (!SDK::hasInstanced) return;
         if (SDK::clientInstance->getLocalPlayer() == nullptr) return;
+
+        const float interpolationFactor = 0.15f * FlarialGUI::frameFactor;
+
+        for (auto it = trails.begin(); it != trails.end(); ) {
+            FlarialGUI::lerp(it->opacity, 0.0f, interpolationFactor);
+
+            if (it->opacity <= 0.0f) {
+                it = trails.erase(it);
+            }
+            else {
+                ++it;
+            }
+        }
 
         Vec2 RectSize = Vec2(Constraints::PercentageConstraint(0.15, "top"), Constraints::PercentageConstraint(0.15, "top"));
         Vec2<float> RectPos(0, 0);
@@ -160,11 +181,13 @@ public:
         if (CursorPos.x > RectPos.add(RectSize).x) CursorPos.x = RectPos.add(RectSize).x;
         if (CursorPos.y > RectPos.add(RectSize).y) CursorPos.y = RectPos.add(RectSize).y;
 
-        D2D1_COLOR_F color;
-        color.r = 1;
-        color.g = 1;
-        color.b = 1;
-        color.a = 1;
+        CircleTrail balls;
+
+        balls.x = CursorPos.x;
+        balls.y = CursorPos.y;
+        balls.opacity = 1;
+
+        trails.insert(trails.begin(), balls);
 
         D2D1_COLOR_F colorR;
         colorR.r = 0;
@@ -172,22 +195,26 @@ public:
         colorR.b = 0;
         colorR.a = 0.5;
 
+        float Opai = 1;
+
         FlarialGUI::RoundedRect(RectPos.x, RectPos.y, colorR, RectSize.x, RectSize.y);
-        ImGui::GetForegroundDrawList()->AddLine(ImVec2(Centre.x, Centre.y), ImVec2(CursorPos.x, CursorPos.y), ImColor(255, 255, 255), 2);
-        FlarialGUI::Circle(CursorPos.x, CursorPos.y, color, Constraints::PercentageConstraint(0.0074, "top"));
-    }
+        for (CircleTrail BariNudes : trails) {
+            D2D1_COLOR_F color;
+            color.r = 1;
+            color.g = 1;
+            color.b = 1;
+            color.a = Opai;
 
-    void onTick(TickEvent& event) {
-        X *= 0.1;
-        Y *= 0.1;
+            Opai *= 0.9;
 
-        /*
-        if (X > 0) X++;
-        else X--;
+            FlarialGUI::Circle(BariNudes.x, BariNudes.y, color, Constraints::PercentageConstraint(0.0074, "top"));
 
-        if (Y > 0) Y++;
-        else Y--;
-        */
+            if (Opai < 0.0001) { 
+                trails.pop_back(); 
+                return;
+            }
+        }
+        
     }
 
     int X = 0;
