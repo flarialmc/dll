@@ -22,6 +22,8 @@ std::chrono::steady_clock::time_point lastBeatTime;
 std::chrono::steady_clock::time_point lastVipFetchTime;
 std::chrono::steady_clock::time_point lastOnlineUsersFetchTime;
 std::chrono::steady_clock::time_point lastAnnouncementTime;
+static HANDLE mutex;
+
 
 void SavePlayerCache() {
     std::string playersListString = APIUtils::VectorToList(APIUtils::onlineUsers);
@@ -172,8 +174,10 @@ DWORD WINAPI init() {
 
     Logger::shutdown();
 
+    CloseHandle(mutex);
     FreeLibraryAndExitThread(Client::currentModule, 0);
 }
+
 
 BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReserved) {
     if (ul_reason_for_call == DLL_PROCESS_ATTACH) {
@@ -182,9 +186,9 @@ BOOL APIENTRY DllMain(HMODULE instance, DWORD ul_reason_for_call, LPVOID lpReser
         Ensure a single instance of Flarial Client is loaded.
         Launchers may use this mutex to detect if the client is injected or not.
         */
-        HANDLE hMutex = CreateMutexW(NULL, FALSE, L"Flarial");
+        mutex = CreateMutexW(NULL, FALSE, L"Flarial");
         if (GetLastError()) {
-            CloseHandle(hMutex);
+            CloseHandle(mutex);
             return FALSE;
         }
 
