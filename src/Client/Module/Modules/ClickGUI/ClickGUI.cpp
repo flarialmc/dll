@@ -1,7 +1,5 @@
 #include "ClickGUI.hpp"
 
-#include "cmake-build-release-visual-studio/_deps/fmt-src/include/fmt/ostream.h"
-
 void ClickGUI::onRender(RenderEvent &event) {
 
         float allahu = Constraints::RelativeConstraint(0.65);

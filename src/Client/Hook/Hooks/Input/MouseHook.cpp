@@ -21,7 +21,7 @@ void MouseHook::mouseCallback(void *mouseDevice, char button, char action, short
     // rest -> Mouse button, state
 
     // parm_1, parm_8 (might be isScrolling?) -> ???
-    auto event = nes::make_holder<MouseEvent>(button, action, mouseX, mouseY);
+    auto event = nes::make_holder<MouseEvent>(button, action, mouseX, mouseY, movementX, movementY);
     eventMgr.trigger(event);
 
     if (!event->isCancelled()) {

@@ -98,6 +98,8 @@
 #include "Modules/ItemUseDelayFix/ItemUseDelayFix.hpp"
 #include "../../Scripting/Console/ConsoleService.hpp"
 
+#include "Modules/Mousestrokes/Mousestrokes.hpp"
+
 namespace ModuleManager {
     std::map<size_t, std::shared_ptr<Module>> moduleMap;
     std::vector<std::shared_ptr<Listener>> services;
@@ -193,6 +195,8 @@ void ModuleManager::initialize() {
     addModule<MovableHotbar>();
     // addModule<CompactChat>();
     addModule<ItemPhysics>();
+
+    addModule<Mousestrokes>();
 
     if (VersionUtils::checkAboveOrEqual(21, 40) && VersionUtils::checkBetween(21, 50, 21, 59) == false) {
         addModule<JavaInventoryHotkeys>();
