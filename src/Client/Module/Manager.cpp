@@ -97,6 +97,7 @@
 #include "Modules/JavaDynamicFOV/JavaDynamicFOV.hpp"
 #include "Modules/ItemUseDelayFix/ItemUseDelayFix.hpp"
 #include "../../Scripting/Console/ConsoleService.hpp"
+#include "Modules/Mousestrokes/Mousestrokes.hpp"
 
 namespace ModuleManager {
     std::map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -193,6 +194,8 @@ void ModuleManager::initialize() {
     addModule<MovableHotbar>();
     // addModule<CompactChat>();
     addModule<ItemPhysics>();
+
+    addModule<Mousestrokes>();
 
     if (VersionUtils::checkAboveOrEqual(21, 40)) {
         addModule<JavaInventoryHotkeys>();
