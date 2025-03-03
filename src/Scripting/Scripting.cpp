@@ -47,7 +47,7 @@ int lua_register_event_handler(lua_State* L) {
     return 0;
 }
 
-void Scripting::executeFunction(lua_State* L, std::string functionName, bool shitInLogsIfFunctionIsNotFound) {
+void    Scripting::executeFunction(lua_State* L, std::string functionName, bool shitInLogsIfFunctionIsNotFound) {
     lua_getglobal(L, functionName.c_str());
     if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
         if(!shitInLogsIfFunctionIsNotFound) return;
@@ -156,6 +156,7 @@ void load(std::string name, std::string description, std::string mainclass) {
     mod->defaultConfig();
     Scripting::scriptsAmountWithoutErrors++;
 }
+
 
 void Scripting::loadModules() {
      for (const auto& entry : std::filesystem::directory_iterator((Utils::getRoamingPath() + "\\Flarial\\scripts").c_str())) {

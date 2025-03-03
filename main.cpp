@@ -11,6 +11,7 @@
 #include <Utils/Audio.hpp>
 
 #include "curl/curl/curl.h"
+#include "Scripting/EventManager/ScriptingEventManager.hpp"
 #include "src/Utils/Logger/crashlogs.hpp"
 #include "src/Client/Module/Modules/Nick/NickModule.hpp"
 #include "src/Client/Command/CommandManager.hpp"
@@ -154,6 +155,9 @@ DWORD WINAPI init() {
     ModuleManager::terminate();
     HookManager::terminate();
     CommandManager::terminate();
+
+    Scripting::unloadModules();
+    ScriptingEventManager::clearHandlers();
 
     Audio::cleanup();
 

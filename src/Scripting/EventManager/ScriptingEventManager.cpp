@@ -25,8 +25,6 @@ void ScriptingEventManager::registerHandler(lua_State* L, const int& eventName) 
     eventHandlers[L][ref] = eventName;
 }
 
-
-
 template<typename... Args>
 bool ScriptingEventManager::triggerEvent(lua_State* L, int eventName, const Args&... args) {
     auto it = eventHandlers.find(L);
@@ -68,4 +66,6 @@ void ScriptingEventManager::clearHandlers() {
 
         }
     }
+
+    eventHandlers.clear();
 }
