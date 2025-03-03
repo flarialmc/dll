@@ -121,7 +121,7 @@ public:
 
     void onRender(RenderEvent& event) {
         if (!this->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
-        this->normalRender(25, (std::string&)"");
+        this->normalRender(31, (std::string&)"");
     }
 
     void onMouse(MouseEvent& event) {
