@@ -13,7 +13,9 @@ public:
         getGlobalNamespace(state)
             .beginNamespace("audio")
                 .addFunction("play", [](const std::string& path) {
-                    Audio::play(Utils::getClientPath() + path);
+                    std::string file = Utils::getClientPath() + "\\" + file;
+                    if (!std::filesystem::exists(file)) return;
+                    Audio::play(file);
                 })
             .endNamespace();
     }
