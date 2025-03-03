@@ -373,12 +373,23 @@ void FlarialGUI::LoadAllImages() {
 				D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetGPUDescriptorHandleForHeapStart();
 				gpu.ptr += (handle_increment * descriptor_index);
 				if(LoadImageFromResource(i, cpu, &my_texture, "PNG")) ImagesClass::ImguiDX12Images[i] = (ImTextureID)gpu.ptr;
+			} else {
+				ID3D12Resource* my_texture = NULL;
+
+				UINT handle_increment = ImageDevice4Fun->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				int descriptor_index = ImagesClass::ImguiDX12Images.size();
+				D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetCPUDescriptorHandleForHeapStart();
+				cpu.ptr += (handle_increment * descriptor_index);
+				D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetGPUDescriptorHandleForHeapStart();
+				gpu.ptr += (handle_increment * descriptor_index);
+				if(LoadImageFromResource(i, cpu, &my_texture, "JPG")) ImagesClass::ImguiDX12Images[i] = (ImTextureID)gpu.ptr;
 			}
 		}
 
 	} else {
 		for(int i = 1000; i <= MAX_IMAGE_ID; i++) {
 			if(i != IDR_PATAR_JPG) LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "PNG");
+			else LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "JPG");
 		}
 	}
 
