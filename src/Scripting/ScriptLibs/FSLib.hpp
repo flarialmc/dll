@@ -12,19 +12,19 @@ public:
         getGlobalNamespace(state)
             .beginClass<FSLib>("fs")
                 .addStaticFunction("exists", [](const std::string& path) -> bool {
-                    return std::filesystem::exists(path);
+                    return std::filesystem::exists(Utils::getClientPath() + path);
                 })
                 .addStaticFunction("isDirectory", [](const std::string& path) -> bool {
-                    return std::filesystem::is_directory(path);
+                    return std::filesystem::is_directory(Utils::getClientPath() + path);
                 })
                 .addStaticFunction("create", [](const std::string& path) -> bool {
-                    return std::filesystem::create_directory(path);
+                    return std::filesystem::create_directory(Utils::getClientPath() + path);
                 })
                 .addStaticFunction("remove", [](const std::string& path) -> bool {
-                    return std::filesystem::remove(path);
+                    return std::filesystem::remove(Utils::getClientPath() + path);
                 })
                 .addStaticFunction("readFile", [](const std::string& path) -> std::string {
-                    std::ifstream file(path, std::ios::in);
+                    std::ifstream file(Utils::getClientPath() + path, std::ios::in);
                     if (!file.is_open()) {
                         throw std::runtime_error("Failed to open file for reading: " + path);
                     }
@@ -33,7 +33,7 @@ public:
                     return content;
                 })
                 .addStaticFunction("writeFile", [](const std::string& path, const std::string& content) -> bool {
-                    std::ofstream file(path, std::ios::out);
+                    std::ofstream file(Utils::getClientPath() + path, std::ios::out);
                     if (!file.is_open()) {
                         return false;
                     }
@@ -42,7 +42,7 @@ public:
                 })
                 .addStaticFunction("listDirectory", [](const std::string& path) -> std::vector<std::string> {
                     std::vector<std::string> files;
-                    for (const auto& entry : std::filesystem::directory_iterator(path)) {
+                    for (const auto& entry : std::filesystem::directory_iterator(Utils::getClientPath() + path)) {
                         files.push_back(entry.path().string());
                     }
                     return files;
