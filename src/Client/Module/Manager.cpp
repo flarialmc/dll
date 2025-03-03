@@ -147,7 +147,6 @@ void ModuleManager::initialize() {
     addModule<Time>();
     addModule<MEM>();
     addModule<Fullbright>();
-    addModule<ForceCoords>();
     addModule<Keystrokes>();
     addModule<Sneak>();
     addModule<Sprint>();
