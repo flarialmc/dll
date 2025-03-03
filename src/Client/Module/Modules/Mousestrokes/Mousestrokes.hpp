@@ -44,7 +44,12 @@ public:
             settings.addSetting("text", (std::string)"FPS: {value}");
 
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
-        if (settings.getSettingByName<float>("fpsSpoofer") == nullptr) settings.addSetting("fpsSpoofer", 1.0f);
+
+        if (settings.getSettingByName<float>("cursorColor") == nullptr) {
+            settings.addSetting("cursorColor", (std::string)"ffffff");
+            settings.addSetting("cursorOpacity", 1.0f);
+            settings.addSetting("cursorRGB", false);
+        }
 
     }
 
@@ -75,17 +80,6 @@ public:
 
         this->extraPadding();
 
-        this->addHeader("Text");
-        this->addTextBox("Format", "", settings.getSettingByName<std::string>("text")->value);
-        this->addSlider("Text Scale", "", this->settings.getSettingByName<float>("textscale")->value, 2.0f);
-        this->addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"},
-            this->settings.getSettingByName<std::string>("textalignment")->value);
-        this->addColorPicker("Color", "Text Color", settings.getSettingByName<std::string>("textColor")->value,
-            settings.getSettingByName<float>("textOpacity")->value,
-            settings.getSettingByName<bool>("textRGB")->value);
-
-        this->extraPadding();
-
         this->addHeader("Colors");
         this->addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value,
             settings.getSettingByName<float>("bgOpacity")->value,
@@ -93,6 +87,9 @@ public:
         this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value,
             settings.getSettingByName<float>("borderOpacity")->value,
             settings.getSettingByName<bool>("borderRGB")->value);
+        this->addColorPicker("Cursor Color", "", settings.getSettingByName<std::string>("cursorColor")->value,
+            settings.getSettingByName<float>("cursorOpacity")->value,
+            settings.getSettingByName<bool>("cursorRGB")->value);
 
         this->extraPadding();
 
@@ -123,15 +120,8 @@ public:
     std::chrono::steady_clock::time_point previousFrameTime = std::chrono::high_resolution_clock::now();
 
     void onRender(RenderEvent& event) {
-        if (this->isEnabled()) {
-            int fps = (int)round(((float)MC::fps *
-                round(this->settings.getSettingByName<float>(
-                    "fpsSpoofer")->value)));
-
-            auto fpsStr = std::to_string(fps);
-
-            this->normalRender(0, fpsStr);
-        }
+        if (!this->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
+        this->normalRender(78653, (std::string&)"");
     }
 
     void onMouse(MouseEvent& event) {
@@ -151,24 +141,13 @@ public:
         if (!SDK::hasInstanced) return;
         if (SDK::clientInstance->getLocalPlayer() == nullptr) return;
 
-        const float interpolationFactor = 0.15f * FlarialGUI::frameFactor;
+        float scale = this->settings.getSettingByName<float>("uiscale")->value;
 
-        for (auto it = trails.begin(); it != trails.end(); ) {
-            FlarialGUI::lerp(it->opacity, 0.0f, interpolationFactor);
+        Vec2 RectSize = Vec2(Constraints::PercentageConstraint(0.15, "top") * scale, Constraints::PercentageConstraint(0.15, "top") * scale);
+        Vec2<float> RectPos = Vec2(Constraints::PercentageConstraint(this->settings.getSettingByName<float>("percentageX")->value, "left"), Constraints::PercentageConstraint(this->settings.getSettingByName<float>("percentageY")->value, "top"));
 
-            if (it->opacity <= 0.0f) {
-                it = trails.erase(it);
-            }
-            else {
-                ++it;
-            }
-        }
-
-        Vec2 RectSize = Vec2(Constraints::PercentageConstraint(0.15, "top"), Constraints::PercentageConstraint(0.15, "top"));
-        Vec2<float> RectPos(0, 0);
-
-        FlarialGUI::lerp<float>(CurrentCursorPos.x, X * Constraints::PercentageConstraint(1, "top") / 1080, FlarialGUI::frameFactor * 0.25);
-        FlarialGUI::lerp<float>(CurrentCursorPos.y, Y * Constraints::PercentageConstraint(1, "top") / 1080, FlarialGUI::frameFactor * 0.25);
+        FlarialGUI::lerp<float>(CurrentCursorPos.x, X * (Constraints::PercentageConstraint(1, "top") / 1080) * scale, FlarialGUI::frameFactor * 0.25);
+        FlarialGUI::lerp<float>(CurrentCursorPos.y, Y * (Constraints::PercentageConstraint(1, "top") / 1080) * scale, FlarialGUI::frameFactor * 0.25);
 
         Vec2 CursorPos(RectSize.div(Vec2<float>(2, 2)).add(RectPos).add(CurrentCursorPos));
         Vec2 Centre = RectSize.div(Vec2<float>(2, 2));
@@ -187,27 +166,59 @@ public:
 
         trails.insert(trails.begin(), balls);
 
-        D2D1_COLOR_F colorR;
-        colorR.r = 0;
-        colorR.g = 0;
-        colorR.b = 0;
-        colorR.a = 0.5;
+        D2D1_COLOR_F bgColor = settings.getSettingByName<bool>("bgRGB")->value ? FlarialGUI::rgbColor
+            : FlarialGUI::HexToColorF(
+                settings.getSettingByName<std::string>("bgColor")->value);
 
-        float Opai = 1;
+        bgColor.a = settings.getSettingByName<float>("bgOpacity")->value;
 
-        FlarialGUI::RoundedRect(RectPos.x, RectPos.y, colorR, RectSize.x, RectSize.y);
+        D2D1_COLOR_F CursorColor = settings.getSettingByName<bool>("cursorRGB")->value ? FlarialGUI::rgbColor
+            : FlarialGUI::HexToColorF(
+                settings.getSettingByName<std::string>("cursorColor")->value);
+
+        CursorColor.a = settings.getSettingByName<float>("cursorOpacity")->value;
+
+        D2D1_COLOR_F borderColor = settings.getSettingByName<bool>("borderRGB")->value ? FlarialGUI::rgbColor
+            : FlarialGUI::HexToColorF(
+                settings.getSettingByName<std::string>("borderColor")->value);
+        borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
+
+
+        Vec2<float> rounde = Constraints::RoundingConstraint(this->settings.getSettingByName<float>("rounding")->value *
+            settings.getSettingByName<float>("uiscale")->value,
+            this->settings.getSettingByName<float>("rounding")->value *
+            settings.getSettingByName<float>("uiscale")->value);
+
+        if (settings.getSettingByName<bool>("BlurEffect")->value) {
+            FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(RectPos.x, RectPos.y,
+                RectPos.x + RectSize.x,
+                RectPos.y + RectSize.y), rounde.x, rounde.x));
+        }
+
+        FlarialGUI::RoundedRect(RectPos.x, RectPos.y, bgColor, RectSize.x, RectSize.y, rounde.x, rounde.x);
+
+        if (this->settings.getSettingByName<bool>("border")->value) {
+            FlarialGUI::RoundedHollowRect(
+                RectPos.x,
+                RectPos.y,
+                Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value *
+                    settings.getSettingByName<float>("uiscale")->value) / 100.0f,
+                    "height", true),
+                borderColor,
+                RectSize.x,
+                RectSize.y,
+                rounde.x,
+                rounde.x
+            );
+        }
+
         for (CircleTrail BariNudes : trails) {
-            D2D1_COLOR_F color;
-            color.r = 1;
-            color.g = 1;
-            color.b = 1;
-            color.a = Opai;
 
-            Opai *= 0.9;
+            FlarialGUI::Circle(BariNudes.x, BariNudes.y, CursorColor, Constraints::PercentageConstraint(0.0074, "top") * scale);
 
-            FlarialGUI::Circle(BariNudes.x, BariNudes.y, color, Constraints::PercentageConstraint(0.0074, "top"));
+            CursorColor.a *= 0.9;
 
-            if (Opai < 0.0001) { 
+            if (CursorColor.a < 0.0001) {
                 trails.pop_back(); 
                 return;
             }
