@@ -299,6 +299,7 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
     }
 
     ID3D11DeviceContext* pContext = SwapchainHook::context;
+    if (!pContext) return;
 
     std::vector<ID3D11RenderTargetView *> renderTargetViews;
     std::vector<ID3D11ShaderResourceView *> shaderResourceViews;

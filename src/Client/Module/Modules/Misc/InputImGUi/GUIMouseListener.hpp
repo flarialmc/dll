@@ -7,6 +7,7 @@
 class ImGUIMouseListener : public Listener {
 public:
     void onMouse(MouseEvent &event) {
+        if (!SwapchainHook::init) return;
         ImGuiIO& io = ImGui::GetIO();
         const int button = event.getButton();
         //io.AddMousePosEvent(event.getMouseX(), event.getMouseY());
