@@ -215,6 +215,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
 {
     HRESULT hr;
     ID3D11DeviceContext* pContext = SwapchainHook::context;
+    if (!pContext) return;
     D3D11_DEPTH_STENCIL_DESC dsd{};
     dsd.DepthEnable = false;
     dsd.StencilEnable = false;
