@@ -11,8 +11,8 @@ class Mousestrokes : public Module {
 
 public:
 
-    Mousestrokes() : Module("Mouse Strokes", "stroking yo shit",
-        IDR_FPS_PNG, "") {
+    Mousestrokes() : Module("Mouse Strokes", "Visualizes the position of your mouse.",
+        IDR_CURSOR_PNG, "") {
         Module::setup();
     };
 
