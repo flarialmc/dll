@@ -44,8 +44,24 @@ void ScriptModuleBase::onPacketReceive(PacketEvent &event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
 
     if (const auto& script = linkedScript.lock()) {
-        bool cancelled = script->registerCancellableEvent("onPacketReceive", event.getPacket(), static_cast<int>(event.getPacket()->getId()));
-        if (cancelled) event.cancel();
+        bool cancel = false;
+
+        bool onPacketReceive = script->registerCancellableEvent("onPacketReceive", event.getPacket(), static_cast<int>(event.getPacket()->getId()));
+        if (onPacketReceive) cancel = true;
+
+        if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
+            const auto *pkt = reinterpret_cast<TextPacket*>(event.getPacket());
+            if (pkt) {
+                std::string msg = pkt->message;
+                std::string name = pkt->name;
+                auto type = pkt->type;
+                std::string xuid = pkt->xuid;
+
+                bool onChat = script->registerCancellableEvent("onChat", msg, name, static_cast<int>(type), xuid);
+                if (onChat) cancel = true;
+            }
+        }
+        if (cancel) event.cancel();
     }
 }
 
@@ -70,22 +86,5 @@ void ScriptModuleBase::onSetupAndRender(SetupAndRenderEvent& event) {
 
     if (const auto& script = linkedScript.lock()) {
         script->registerEvent("onSetupAndRender");
-    }
-}
-
-void ScriptModuleBase::onChat(PacketEvent& event) {
-    if (!isEnabled() || !ScriptManager::initialized) return;
-
-    if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
-    const auto *pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-
-    std::string msg = pkt->message;
-    std::string name = pkt->name;
-    auto type = pkt->type;
-    std::string xuid = pkt->xuid;
-
-    if (const auto& script = linkedScript.lock()) {
-        bool cancelled = script->registerCancellableEvent("onChat", msg, name, static_cast<int>(type), xuid);
-        if (cancelled) event.cancel();
     }
 }
