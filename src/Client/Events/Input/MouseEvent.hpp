@@ -22,15 +22,19 @@ private:
     char actionRaw;
     short mouseX;
     short mouseY;
+    short MouseMovementX;
+    short MouseMovementY;
 public:
 
-    MouseEvent(char button, char action, short mouseX, short mouseY) : Event() {
+    MouseEvent(char button, char action, short mouseX, short mouseY, short MouseMovementX, short MouseMovementY) : Event() {
         this->button = (MouseButton) button;
         this->action = (MouseAction) action;
         this->setActionFromChar(action);
         this->actionRaw = action;
         this->mouseX = mouseX;
         this->mouseY = mouseY;
+        this->MouseMovementX = MouseMovementX;
+        this->MouseMovementY = MouseMovementY;
     };
 
     [[nodiscard]] auto getButton() const -> MouseButton {
@@ -104,5 +108,13 @@ public:
 
     void setMouseY(short newMouseY) {
         this->mouseY = newMouseY;
+    }
+
+    [[nodiscard]] auto getMouseMovementX() const {
+        return this->MouseMovementX;
+    }
+
+    [[nodiscard]] auto getMouseMovementY() const {
+        return this->MouseMovementY;
     }
 };

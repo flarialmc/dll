@@ -80,7 +80,7 @@ public:
         this->addDropdown("Orientation", "", std::vector<std::string>{"Vertical", "Horizontal"}, this->settings.getSettingByName<std::string>("orientation")->value);
         this->addColorPicker("Color", "", settings.getSettingByName<std::string>("barFill")->value, settings.getSettingByName<float>("barFillOpacity")->value, settings.getSettingByName<bool>("barFillRGB")->value);
         this->addSlider("Width", "", settings.getSettingByName<float>("pbwidth")->value);
-        this->addSlider("Width", "", settings.getSettingByName<float>("pbheight")->value);
+        this->addSlider("Height", "", settings.getSettingByName<float>("pbheight")->value);
         this->extraPadding();
 
         this->addHeader("Colors");

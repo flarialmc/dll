@@ -26,6 +26,9 @@ public:
         patched_option.push_back(0x90);
         patched_option.push_back(0x90);
         Module::setup();
+
+        checkSettingsFile();
+        loadSettings();
     };
 
     void onEnable() override {
@@ -58,6 +61,8 @@ public:
     };
 
     void defaultConfig() override {
+        if (settings.getSettingByName<bool>("enabled") == nullptr) settings.addSetting("enabled", false);
+
         if (settings.getSettingByName<std::string>("text") == nullptr)
             settings.addSetting("text", (std::string) "{value}");
 
@@ -314,8 +319,9 @@ public:
     }
 
     void onRender(RenderEvent &event) {
-        if (ClientInstance::getTopScreenName() == "hud_screen" &&
-            this->isEnabled()) {
+
+
+        if (ClientInstance::getTopScreenName() == "hud_screen") {
 
             if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
 

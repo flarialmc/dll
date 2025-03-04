@@ -152,6 +152,7 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
     if (Client::settings.getSettingByName<bool>("killdx")->value &&
         !pDevice->QueryInterface(IID_PPV_ARGS(&pCommandQueue)) && !queueReset) {
         pCommandQueue->Release();
+        queue = nullptr;
         return DXGI_ERROR_INVALID_CALL;
     }
 
@@ -179,8 +180,6 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
     }
 
     pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-    // Gives error rn probably because fmt doesnt know how to handle it
-    //Logger::info("Swap Effect: {}", pDesc->SwapEffect);
 
     MADECHAIN = TRUE;
     queueReset = false;
