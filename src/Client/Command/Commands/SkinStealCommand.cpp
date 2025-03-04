@@ -109,7 +109,7 @@ void SaveSkin(std::string name, Image image, Image capeImage) {
 
 void SkinStealCommand::execute(const std::vector<std::string>& args) {
     if (args.size() != 1) {
-        addCommandMessage("Usage: .steal <playerName>");
+        addCommandMessage("§cUsage: .steal <playerName>");
         return;
     }
     std::string playerName = String::toLower(args[0]);
