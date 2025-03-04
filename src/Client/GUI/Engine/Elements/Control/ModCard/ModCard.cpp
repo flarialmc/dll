@@ -266,10 +266,15 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
                                   L"", buttonWidth, buttonHeight, round.x,
                                   round.x)) {
 
-        if(mod->isScriptingModule) {
-            if (mod->settings.getSettingByName<bool>("enabled")->value) mod->onEnable();
-            else mod->onDisable();
-            mod->settings.getSettingByName<bool>("enabled")->value = !mod->settings.getSettingByName<bool>("enabled")->value;
+        if (mod->isScriptingModule) {
+            bool newState = !mod->settings.getSettingByName<bool>("enabled")->value;
+            if (newState) {
+                mod->onEnable();
+                mod->settings.getSettingByName<bool>("enabled")->value = newState;
+            } else {
+                mod->onDisable();
+                mod->settings.getSettingByName<bool>("enabled")->value = newState;
+            }
         }
         mod->toggle();
     }

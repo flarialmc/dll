@@ -7,18 +7,18 @@ void ScriptModuleBase::onEnable() {
     if (const auto& script = linkedScript.lock()) {
         if (script->getState()) {
             ScriptManager::executeFunction(script->getState(), "onEnable");
+            Module::onEnable();
         }
     }
-    Module::onEnable();
 }
 
 void ScriptModuleBase::onDisable() {
     if (const auto& script = linkedScript.lock()) {
         if (script->getState()) {
             ScriptManager::executeFunction(script->getState(), "onDisable");
+            Module::onDisable();
         }
     }
-    Module::onDisable();
 }
 
 void ScriptModuleBase::onKey(KeyEvent& event) {
