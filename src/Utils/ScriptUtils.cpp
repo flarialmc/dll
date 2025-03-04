@@ -4,7 +4,7 @@
 
 #include "ScriptUtils.hpp"
 
-#include "lua.h"
+#include "lua.hpp"
 #include "Logger/Logger.hpp"
 
 namespace ScriptUtils {
