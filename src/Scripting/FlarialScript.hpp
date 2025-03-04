@@ -34,7 +34,7 @@ public:
     }
 
     void registerModuleFunction(const std::string& functionName, lua_CFunction function) {
-        lua_pushcfunction(mState, function, functionName.c_str());
+        lua_pushcfunction(mState, function);
         lua_setglobal(mState, functionName.c_str());
     }
 

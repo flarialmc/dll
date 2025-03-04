@@ -32,6 +32,12 @@ public:
         return nullptr;
     }
 
+    void clearSettingsForModule(const std::string& module) {
+        std::erase_if(settings, [&module](const auto& pair) {
+            return pair.first.starts_with(module + ".");
+        });
+    }
+
     [[nodiscard]] const auto& getAllSettings() const { return settings; }
 private:
     std::unordered_map<std::string, std::unique_ptr<BaseSetting>> settings;

@@ -29,6 +29,7 @@ public:
     }
 
     void terminate() override {
+        gScriptSettingManager.clearSettingsForModule(this->name);
         Deafen(this, KeyEvent, &ScriptModuleBase::onKey);
         Deafen(this, MouseEvent, &ScriptModuleBase::onMouse);
         Deafen(this, PacketEvent, &ScriptModuleBase::onPacketReceive);
