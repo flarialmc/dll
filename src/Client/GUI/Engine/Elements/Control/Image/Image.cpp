@@ -25,6 +25,9 @@ void FlarialGUI::image(const std::string& imageName, D2D1_RECT_F rect) {
     if (ImagesClass::eimages[imageName] == nullptr)
         LoadImageFromFile(FlarialGUI::to_wide(among).c_str(), &ImagesClass::eimages[imageName]);
 
+	if (ImagesClass::eimages[imageName] == nullptr) return;
+
+
     // Draw image
     D2D1_RECT_F imageRect = D2D1::RectF(rect.left, rect.top, rect.right, rect.bottom);
     D2D1_BITMAP_INTERPOLATION_MODE interpolationMode = D2D1_BITMAP_INTERPOLATION_MODE_LINEAR;
@@ -297,12 +300,12 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
             	Logger::custom(fg(fmt::color::crimson), "Image", "Failed to load image");
             }
 		}
-		else if (ImagesClass::ImguiDX11Images[resourceId] != nullptr) {
+		else  {
 			ImGui::GetBackgroundDrawList()->AddImage(ImagesClass::ImguiDX11Images[resourceId], ImVec2(imageRect.left, imageRect.top), ImVec2(imageRect.right, imageRect.bottom), ImVec2(0, 0), ImVec2(1, 1), IM_COL32_WHITE);
 		}
         return;
 	}
-	else {
+
 		if (ImagesClass::ImguiDX12Images[resourceId] == nullptr) {
 			static_assert(sizeof(ImTextureID) >= sizeof(D3D12_CPU_DESCRIPTOR_HANDLE), "D3D12_CPU_DESCRIPTOR_HANDLE is too large to fit in an ImTextureID");
 
@@ -312,6 +315,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 
 			ID3D12Device* ImageDevice4Fun;
 			SwapchainHook::swapchain->GetDevice(IID_PPV_ARGS(&ImageDevice4Fun));
+			if (!ImageDevice4Fun) return;
 
 			if(!SwapchainHook::d3d12DescriptorHeapImGuiIMAGE) {
 
@@ -341,7 +345,6 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 		else {
 			ImGui::GetBackgroundDrawList()->AddImage(ImagesClass::ImguiDX12Images[resourceId], ImVec2(imageRect.left, imageRect.top), ImVec2(imageRect.right, imageRect.bottom), ImVec2(0, 0), ImVec2(1, 1), IM_COL32_WHITE);
 		}
-	}
 
 
 }
