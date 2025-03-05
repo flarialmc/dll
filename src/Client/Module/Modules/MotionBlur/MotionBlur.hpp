@@ -104,7 +104,7 @@ public:
         ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
         ImVec2 pos = {0, 0};
         ImU32 col = IM_COL32(255, 255, 255, static_cast<int>(opacity * 255));
-        draw_list->AddImage(srv.get(), pos, ImVec2(pos.x + size.x, pos.y + size.y), ImVec2(0, 0), ImVec2(1, 1), col);
+        draw_list->AddImage(ImTextureID(srv.get()), pos, ImVec2(pos.x + size.x, pos.y + size.y), ImVec2(0, 0), ImVec2(1, 1), col);
         ImGui::SetCursorScreenPos(ImVec2(pos.x + size.x, pos.y));
     }
 

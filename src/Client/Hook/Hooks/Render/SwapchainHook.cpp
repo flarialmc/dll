@@ -358,13 +358,6 @@ void SwapchainHook::DX12Init() {
 
         std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
 
-
-        if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
-            swapChainDescription.BufferCount = 2;
-        } else if (bufferingMode == "Triple Buffering") {
-            swapChainDescription.BufferCount = 3;
-        }
-
         bufferCount = swapChainDescription.BufferCount;
 
         DXGISurfaces.resize(bufferCount, nullptr);
@@ -510,15 +503,6 @@ void SwapchainHook::DX12Render() {
     DXGI_SWAP_CHAIN_DESC sdesc;
     swapchain->GetDesc(&sdesc);
 
-    std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
-
-
-    if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
-        sdesc.BufferCount = 2;
-    } else if (bufferingMode == "Triple Buffering") {
-        sdesc.BufferCount = 3;
-    }
-
     buffersCounts = sdesc.BufferCount;
     frameContexts.resize(buffersCounts);
 
@@ -578,11 +562,12 @@ void SwapchainHook::DX12Render() {
                                         DXGI_FORMAT_R8G8B8A8_UNORM, d3d12DescriptorHeapImGuiRender,
                                         d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart(),
                                         d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart());
-                }
+                } ID3D12CommandQueue* cmdQueue;
 
                 ImGui_ImplDX12_NewFrame();
                 ImGui_ImplWin32_NewFrame();
                 ImGui::NewFrame();
+                ImGui::Begin("lol");
 
                 ID3D11Texture2D *buffer2D = nullptr;
                 D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&buffer2D));
@@ -631,6 +616,7 @@ void SwapchainHook::DX12Render() {
                                                      FALSE, nullptr);
                 d3d12CommandList->SetDescriptorHeaps(1, &d3d12DescriptorHeapImGuiRender);
 
+                ImGui::End();
                 ImGui::EndFrame();
                 ImGui::Render();
 
