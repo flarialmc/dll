@@ -567,7 +567,8 @@ void SwapchainHook::DX12Render() {
                 ImGui_ImplDX12_NewFrame();
                 ImGui_ImplWin32_NewFrame();
                 ImGui::NewFrame();
-                ImGui::Begin("lol");
+
+                ImGui::Begin("t", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
 
                 ID3D11Texture2D *buffer2D = nullptr;
                 D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&buffer2D));
