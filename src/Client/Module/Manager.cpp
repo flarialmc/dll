@@ -70,6 +70,7 @@
 #include <Modules/Misc/PackChanger/PackChanger.hpp>
 #include <Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp>
 
+#include "Modules/202020/202020.hpp"
 #include "Modules/ItemPhysics/ItemPhysics.hpp"
 #include "Modules/Crosshair/Crosshair.hpp"
 #include "Modules/CustomCrosshair/CustomCrosshair.hpp"
@@ -134,7 +135,7 @@ void ModuleManager::initialize() {
     addModule<UpsideDown>(); //3
 
     addModule<ClickGUI>();
-
+    addModule<202020>();
     addModule<FPSCounter>();
     addModule<CPSCounter>();
     addModule<IPDisplay>();
