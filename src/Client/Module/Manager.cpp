@@ -135,7 +135,6 @@ void ModuleManager::initialize() {
     addModule<UpsideDown>(); //3
 
     addModule<ClickGUI>();
-    addModule<202020>();
     addModule<FPSCounter>();
     addModule<CPSCounter>();
     addModule<IPDisplay>();
