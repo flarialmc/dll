@@ -336,6 +336,8 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 			D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetGPUDescriptorHandleForHeapStart();
 			gpu.ptr += (handle_increment * descriptor_index);
 
+			Memory::SafeRelease(ImageDevice4Fun);
+
 			ret = LoadImageFromResource(resourceId, cpu, &my_texture, type);
 			if (!ret)
 				return;
@@ -345,6 +347,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 		else {
 			ImGui::GetBackgroundDrawList()->AddImage(ImagesClass::ImguiDX12Images[resourceId], ImVec2(imageRect.left, imageRect.top), ImVec2(imageRect.right, imageRect.bottom), ImVec2(0, 0), ImVec2(1, 1), IM_COL32_WHITE);
 		}
+
 
 
 }
