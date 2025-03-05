@@ -523,8 +523,17 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 
 		}
 		else {
-			ImGui::GetBackgroundDrawList()->AddImage(ImagesClass::ImguiDX12Images[resourceId], ImVec2(imageRect.left, imageRect.top), ImVec2(imageRect.right, imageRect.bottom), ImVec2(0, 0), ImVec2(1, 1), FlarialGUI::D2DColorToImColor(FlarialGUI::HexToColorF("FAFAFA")));
+			try {
+				ImGui::GetBackgroundDrawList()->AddImage(ImagesClass::ImguiDX12Images[resourceId],
+														 ImVec2(imageRect.left, imageRect.top),
+														 ImVec2(imageRect.right, imageRect.bottom), ImVec2(0, 0),
+														 ImVec2(1, 1),
+														 FlarialGUI::D2DColorToImColor(
+															 FlarialGUI::HexToColorF("FAFAFA")));
+			} catch (std::exception ex) { Logger::error("error addming image: ", ex.what()); }
 		}
+
+
 
 
 

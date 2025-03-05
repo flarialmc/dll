@@ -442,6 +442,8 @@ void SwapchainHook::DX11Render() {
                 ImGui_ImplWin32_NewFrame();
 
                 ImGui::NewFrame();
+                ImGui::Begin("t", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
+
 
 
                 auto event = nes::make_holder<RenderEvent>();
@@ -461,6 +463,7 @@ void SwapchainHook::DX11Render() {
 
                 D2D::context->EndDraw();
 
+                ImGui::End();
                 ImGui::EndFrame();
                 ImGui::Render();
 
