@@ -100,20 +100,15 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
  const unsigned char* pImageFile = nullptr;
  DWORD imageFileSize = 0;
 
-	ID3D12Device* ImageDevice4Fun = nullptr;
 
 	if (!SwapchainHook::swapchain) {
 		std::cout << "Error: SwapchainHook::swapchain is null." << std::endl;
 		return false;
 	}
 
-	HRESULT hrDevice = SwapchainHook::swapchain->GetDevice(IID_PPV_ARGS(&ImageDevice4Fun));
-	if (FAILED(hrDevice)) {
-		std::cout << "Error: Failed to get device from swapchain. HRESULT: " << hrDevice << std::endl;
-		return false;
-	}
-    if (!ImageDevice4Fun) {
-        std::cout << "Error: ImageDevice4Fun is null after GetDevice." << std::endl;
+
+    if (!SwapchainHook::d3d12Device5) {
+        std::cout << "Error: SwapchainHook::d3d12Device5 is null after GetDevice." << std::endl;
         return false;
     }
 
@@ -169,7 +164,7 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
 	ID3D12Resource* pTexture = nullptr;
-	HRESULT hrCreateTexture = ImageDevice4Fun->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
+	HRESULT hrCreateTexture = SwapchainHook::d3d12Device5->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
 		D3D12_RESOURCE_STATE_COPY_DEST, NULL, IID_PPV_ARGS(&pTexture));
 	if (FAILED(hrCreateTexture)) {
 		std::cout << "Error: CreateCommittedResource (Texture) failed. HRESULT: " << hrCreateTexture << std::endl;
@@ -202,7 +197,7 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
 
 	ID3D12Resource* uploadBuffer = nullptr;
-	HRESULT hrCreateUploadBuffer = ImageDevice4Fun->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
+	HRESULT hrCreateUploadBuffer = SwapchainHook::d3d12Device5->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
 		D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&uploadBuffer));
 	if (FAILED(hrCreateUploadBuffer)) {
 		std::cout << "Error: CreateCommittedResource (Upload Buffer) failed. HRESULT: " << hrCreateUploadBuffer << std::endl;
@@ -263,7 +258,7 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 
 	ID3D12Fence* fence = nullptr;
-	HRESULT hrCreateFence = ImageDevice4Fun->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+	HRESULT hrCreateFence = SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 	if (FAILED(hrCreateFence)) {
 		std::cout << "Error: CreateFence failed. HRESULT: " << hrCreateFence << std::endl;
 		uploadBuffer->Release();
@@ -296,7 +291,7 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	queueDesc.NodeMask = 1;
 
 	ID3D12CommandQueue* cmdQueue = nullptr;
-	HRESULT hrCreateCommandQueue = ImageDevice4Fun->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cmdQueue));
+	HRESULT hrCreateCommandQueue = SwapchainHook::d3d12Device5->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cmdQueue));
 	if (FAILED(hrCreateCommandQueue)) {
 		std::cout << "Error: CreateCommandQueue failed. HRESULT: " << hrCreateCommandQueue << std::endl;
 		CloseHandle(event);
@@ -318,7 +313,7 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 
 
 	ID3D12CommandAllocator* cmdAlloc = nullptr;
-	HRESULT hrCreateCommandAllocator = ImageDevice4Fun->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAlloc));
+	HRESULT hrCreateCommandAllocator = SwapchainHook::d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAlloc));
 	if (FAILED(hrCreateCommandAllocator)) {
 		std::cout << "Error: CreateCommandAllocator failed. HRESULT: " << hrCreateCommandAllocator << std::endl;
 		cmdQueue->Release();
@@ -342,7 +337,7 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 
 
 	ID3D12GraphicsCommandList* cmdList = nullptr;
-	HRESULT hrCreateCommandList = ImageDevice4Fun->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAlloc, NULL, IID_PPV_ARGS(&cmdList));
+	HRESULT hrCreateCommandList = SwapchainHook::d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAlloc, NULL, IID_PPV_ARGS(&cmdList));
 	if (FAILED(hrCreateCommandList)) {
 		std::cout << "Error: CreateCommandList failed. HRESULT: " << hrCreateCommandList << std::endl;
 		cmdAlloc->Release();
@@ -409,7 +404,7 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
-	ImageDevice4Fun->CreateShaderResourceView(pTexture, &srvDesc, srv_cpu_handle);
+	SwapchainHook::d3d12Device5->CreateShaderResourceView(pTexture, &srvDesc, srv_cpu_handle);
     if (!srv_cpu_handle.ptr) {
         std::cout << "Warning: srv_cpu_handle is null, SRV might not be created correctly, but continuing." << std::endl;
     }
@@ -485,9 +480,8 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 			int my_image_height = 0;
 			ID3D12Resource* my_texture = NULL;
 
-			ID3D12Device* ImageDevice4Fun;
-			SwapchainHook::swapchain->GetDevice(IID_PPV_ARGS(&ImageDevice4Fun));
-			if (!ImageDevice4Fun){ Logger::error("Image device does not exist."); return;}
+
+			if (!SwapchainHook::d3d12Device5){ Logger::error("Image device does not exist."); return;}
 
 			if(!SwapchainHook::d3d12DescriptorHeapImGuiIMAGE) {
 
@@ -496,7 +490,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 				descriptorImGuiRender.NumDescriptors = MAX_IMAGE_ID;
 				descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
-				HRESULT hr = ImageDevice4Fun->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&SwapchainHook::d3d12DescriptorHeapImGuiIMAGE));
+				HRESULT hr = SwapchainHook::d3d12Device5->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&SwapchainHook::d3d12DescriptorHeapImGuiIMAGE));
 
 				if (FAILED(hr)) {
 					Logger::error("Fail at creating d3d12DescriptorHeapImGuiIMAGE: ");
@@ -506,7 +500,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 
 			bool ret = false;
 
-			UINT handle_increment = ImageDevice4Fun->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			UINT handle_increment = SwapchainHook::d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			int descriptor_index = ImagesClass::ImguiDX12Images.size();
 			D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetCPUDescriptorHandleForHeapStart();
 			cpu.ptr += (handle_increment * descriptor_index);
@@ -514,7 +508,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 			D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetGPUDescriptorHandleForHeapStart();
 			gpu.ptr += (handle_increment * descriptor_index);
 
-			Memory::SafeRelease(ImageDevice4Fun);
+			//Memory::SafeRelease(SwapchainHook::d3d12Device5);
 
 			ret = LoadImageFromResource(resourceId, cpu, &my_texture, type);
 			if (!ret)
@@ -541,8 +535,6 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 
 void FlarialGUI::LoadAllImages() {
 	if(SwapchainHook::queue) {
-		ID3D12Device* ImageDevice4Fun;
-		SwapchainHook::swapchain->GetDevice(IID_PPV_ARGS(&ImageDevice4Fun));
 
 		if(!SwapchainHook::d3d12DescriptorHeapImGuiIMAGE) {
 
@@ -551,14 +543,14 @@ void FlarialGUI::LoadAllImages() {
 			descriptorImGuiRender.NumDescriptors = MAX_IMAGE_ID;
 			descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
-			ImageDevice4Fun->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&SwapchainHook::d3d12DescriptorHeapImGuiIMAGE));
+			SwapchainHook::d3d12Device5->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&SwapchainHook::d3d12DescriptorHeapImGuiIMAGE));
 		}
 
 		for(int i = 100; i <= MAX_IMAGE_ID; i++) {
 			if(i != IDR_PATAR_JPG) {
 				ID3D12Resource* my_texture = NULL;
 
-				UINT handle_increment = ImageDevice4Fun->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				UINT handle_increment = SwapchainHook::d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				int descriptor_index = ImagesClass::ImguiDX12Images.size();
 				D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetCPUDescriptorHandleForHeapStart();
 				cpu.ptr += (handle_increment * descriptor_index);
@@ -568,7 +560,7 @@ void FlarialGUI::LoadAllImages() {
 			} else {
 				ID3D12Resource* my_texture = NULL;
 
-				UINT handle_increment = ImageDevice4Fun->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				UINT handle_increment = SwapchainHook::d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 				int descriptor_index = ImagesClass::ImguiDX12Images.size();
 				D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetCPUDescriptorHandleForHeapStart();
 				cpu.ptr += (handle_increment * descriptor_index);
