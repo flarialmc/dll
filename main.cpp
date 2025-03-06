@@ -120,7 +120,9 @@ DWORD WINAPI init() {
                     }
                 }
 
-                APIUtils::onlineVips = std::move(updatedVips);
+                if (!updatedVips.empty()) {
+                    APIUtils::onlineVips = std::move(updatedVips);
+                }
                 lastVipFetchTime = now;
             } catch (const std::exception& e) {
                 Logger::error("An error occurred while parsing VIP users: {}", e.what());
