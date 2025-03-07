@@ -21,4 +21,6 @@ jobs:
         uses: symbitic/install-cmake@master
       - name: test
         run:
+          tree
           cmake ..
+            
