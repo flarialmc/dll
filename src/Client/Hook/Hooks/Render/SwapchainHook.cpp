@@ -5,6 +5,7 @@
 #include "../../../Client.hpp"
 #include <d3d11on12.h>
 #include <algorithm>
+#include <codecvt>
 #include <windows.h>
 #include <iostream>
 #include <Psapi.h>
@@ -114,6 +115,21 @@ void SwapchainHook::enableHook() {
     CreateDXGIFactory(IID_PPV_ARGS(&pFactory));
     Memory::hookFunc((*(LPVOID **) pFactory)[16], (void *) CreateSwapChainForCoreWindow,
                      (void **) &IDXGIFactory2_CreateSwapChainForCoreWindow, "CreateSwapchainForCoreWindow");
+
+
+    winrt::com_ptr<IDXGIAdapter> adapter;
+    pFactory->EnumAdapters(0, adapter.put());
+    DXGI_ADAPTER_DESC desc;
+    adapter->GetDesc(&desc);
+    std::wstring gpuNameW(desc.Description);
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    std::string gpuName = converter.to_bytes(gpuNameW);
+    Logger::info("GPU name: {}", gpuName.c_str());
+    if (gpuName.contains("Intel") != std::string::npos) {
+        fD3D11 = true; queueReset = true;
+        Client::settings.getSettingByName<bool>("killdx")->value = true;
+    }
+
     Memory::SafeRelease(pFactory);
 
     bool isRTSS = containsModule(L"RTSSHooks64.dll");
