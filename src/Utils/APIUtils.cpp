@@ -9,6 +9,7 @@
 #include <curl/curl/easy.h>
 
 #include "SDK/SDK.hpp"
+#include <ctime>
 
 std::vector<std::string> APIUtils::onlineUsers;
 std::map<std::string, std::string> APIUtils::onlineVips;
@@ -200,29 +201,41 @@ nlohmann::json APIUtils::getVips() {
 
 nlohmann::json APIUtils::getUsers() {
     try {
-        std::string users = get("https://api.flarial.xyz/allOnlineUsers");
+        // Add timestamp
+        std::string timestamp = std::to_string(std::time(nullptr) * 1000);
 
-        if (users.empty()) {
-            Logger::warn("Unable to fetch users, API is down or you are not connected to the internet.");
+        // Create request body
+        std::string playerListJson = VectorToList(onlineUsers);
+
+        // Use POST_Simple
+        auto [responseCode, responseBody] = POST_Simple("https://api.flarial.xyz/allOnlineUsers", playerListJson);
+
+        if (responseCode != 200 || responseBody.empty()) {
+            Logger::warn("Unable to fetch users, API returned: " + std::to_string(responseCode));
             return nlohmann::json::object();
         }
 
-        if (nlohmann::json::accept(users)) {
-            return nlohmann::json::parse(users);
+
+        if (nlohmann::json::accept(responseBody)) {
+            nlohmann::json responseJson = nlohmann::json::parse(responseBody);
+            std::vector<std::string> changes = responseJson.get<std::vector<std::string>>();
+            onlineUsers = UpdateVectorFast(onlineUsers, changes);
+            return responseJson; // Return the changes for debugging if needed
         }
 
-        Logger::warn("Users JSON rejected: {}", users);
+        Logger::warn("Users JSON rejected: {}", responseBody);
         return nlohmann::json::object();
     }
     catch (const nlohmann::json::parse_error& e) {
-        Logger::error("An error occurred while parsing online users: {}", e.what());
+        Logger::error("JSON parse error in getUsers: {}", e.what());
         return nlohmann::json::object();
     }
     catch (const std::exception& e) {
-        Logger::error("An unexpected error occurred: {}", e.what());
+        Logger::error("An unexpected error occurred in getUsers: {}", e.what());
         return nlohmann::json::object();
     }
 }
+
 
 bool APIUtils::hasRole(const std::string& role, const std::string& name) {
     try {
