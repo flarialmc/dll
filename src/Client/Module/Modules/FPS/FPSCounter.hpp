@@ -65,6 +65,13 @@ public:
         this->addColorPicker("Color", "Text Color", settings.getSettingByName<std::string>("textColor")->value,
                              settings.getSettingByName<float>("textOpacity")->value,
                              settings.getSettingByName<bool>("textRGB")->value);
+        this->addToggle("Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
+        this->addColorPicker("Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value,
+            settings.getSettingByName<float>("textShadowOpacity")->value,
+            settings.getSettingByName<bool>("textShadowRGB")->value);
+        this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
+
+
 
         this->extraPadding();
 
@@ -72,9 +79,16 @@ public:
         this->addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value,
                              settings.getSettingByName<float>("bgOpacity")->value,
                              settings.getSettingByName<bool>("bgRGB")->value);
+        this->addToggle("Background Shadow", "Displays a shadow under the background", settings.getSettingByName<bool>("rectShadow")->value);
+        this->addColorPicker("Shadow Color", "Background Shadow Color", settings.getSettingByName<std::string>("rectShadowCol")->value,
+            settings.getSettingByName<float>("rectShadowOpacity")->value,
+            settings.getSettingByName<bool>("rectShadowRGB")->value);
+        this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("rectShadowOffset")->value, 0.02f, 0.001f);
+
         this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value,
                              settings.getSettingByName<float>("borderOpacity")->value,
                              settings.getSettingByName<bool>("borderRGB")->value);
+
 
         this->extraPadding();
 

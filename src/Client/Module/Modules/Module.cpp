@@ -142,7 +142,59 @@ void Module::normalRender(int index, std::string &value) {
                                                                           this->settings.getSettingByName<float>(
                                                                                   "rectheight")->value), rounde.x,
                                                rounde.x));
+
+
     }
+
+
+
+    if (this->settings.getSettingByName<bool>("textShadow")->value) {
+        textColor = settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textShadowCol")->value);
+        textColor.a = settings.getSettingByName<float>("textShadowOpacity")->value;
+        FlarialGUI::FlarialTextWithFont(
+            realcenter.x + Constraints::SpacingConstraint(paddingX, textWidth) + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
+            realcenter.y + Constraints::SpacingConstraint(paddingY, textWidth) + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
+            FlarialGUI::to_wide(text).c_str(),
+            rectWidth,
+            textHeight,
+            alignment,
+            textSize, DWRITE_FONT_WEIGHT_NORMAL,
+            textColor,
+            true
+        );
+    }
+
+    if (this->settings.getSettingByName<bool>("rectShadow")->value) {
+        bgColor = settings.getSettingByName<bool>("rectShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("rectShadowCol")->value);
+        bgColor.a = settings.getSettingByName<float>("rectShadowOpacity")->value;
+
+
+        FlarialGUI::RoundedRect(
+            realcenter.x + Constraints::RelativeConstraint(settings.getSettingByName<float>("rectShadowOffset")->value),
+            realcenter.y + Constraints::RelativeConstraint(settings.getSettingByName<float>("rectShadowOffset")->value),
+            bgColor,
+            rectWidth,
+            textHeight * this->settings.getSettingByName<float>("rectheight")->value,
+            rounde.x,
+            rounde.x
+        );
+    }
+
+
+
+    bgColor = settings.getSettingByName<bool>("bgRGB")->value ? FlarialGUI::rgbColor
+        : FlarialGUI::HexToColorF(
+            settings.getSettingByName<std::string>("bgColor")->value);
+    textColor = settings.getSettingByName<bool>("textRGB")->value ? FlarialGUI::rgbColor
+        : FlarialGUI::HexToColorF(
+            settings.getSettingByName<std::string>("textColor")->value);
+    borderColor = settings.getSettingByName<bool>("borderRGB")->value ? FlarialGUI::rgbColor
+        : FlarialGUI::HexToColorF(
+            settings.getSettingByName<std::string>("borderColor")->value);
+
+    bgColor.a = settings.getSettingByName<float>("bgOpacity")->value;
+    textColor.a = settings.getSettingByName<float>("textOpacity")->value;
+    borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
 
     FlarialGUI::RoundedRect(
             realcenter.x,
@@ -165,6 +217,7 @@ void Module::normalRender(int index, std::string &value) {
             textColor,
             true
     );
+
 
     if (this->settings.getSettingByName<bool>("border")->value) {
         FlarialGUI::RoundedHollowRect(
@@ -551,7 +604,27 @@ void Module::defaultConfig() {
         settings.addSetting("bgColor", (std::string)"000000");
         settings.addSetting("textColor", (std::string)"fafafa");
         settings.addSetting("borderColor", (std::string)"000000");
+    }   
+
+    
+    
+        if (settings.getSettingByName<std::string>("textShadowCol") == nullptr) {
+        settings.addSetting("textShadow", false);
+        settings.addSetting("rectShadow", false);
+        settings.addSetting("textShadowRGB", false);
+        settings.addSetting("rectShadowRGB", false);
+        settings.addSetting("textShadowCol", (std::string)"00000");
+        settings.addSetting("rectShadowCol", (std::string)"00000");
+        settings.addSetting("textShadowOffset", 0.003f);
+        settings.addSetting("rectShadowOffset", 0.003f);
+        settings.addSetting("rectShadowOpacity", 0.55f);
+        settings.addSetting("textShadowOpacity", 0.55f);
+
+
     }
+
+    
+
 
     if (settings.getSettingByName<float>("bgOpacity") == nullptr) {
         settings.addSetting("bgOpacity", 0.55f);
