@@ -1,0 +1,28 @@
+name: make hashbrowns
+
+on:
+  push:
+    paths:
+      - 'dll/latest.dll'  
+      - 'dll/beta.dll'    
+  workflow_dispatch:
+
+jobs:
+  check_hash:
+    runs-on: windows-latest
+
+    steps:
+      - name: checkut repo
+        uses: actions/checkout@v3
+
+      - name: check if files exist
+        id: check_files
+        run: |
+          if [ ! -f "dll/latest.dll" ]; then
+            echo "File latest.dll not found!"
+            exit 1
+          fi
+          if [ ! -f "dll/beta.dll" ]; then
+            echo "File beta.dll not found!"
+            exit 1
+          fi
