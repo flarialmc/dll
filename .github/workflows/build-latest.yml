@@ -16,13 +16,9 @@ jobs:
       - name: checkut repo
         uses: actions/checkout@v3
 
-      - name: Build & Test
-        uses: ashutoshvarma/action-cmake-build@master
-        with:
-          build-dir: ${{ runner.workspace }}/build
-          # will set the CC & CXX for cmake
-          build-type: Release
-      - name: tree
-        run:
-          tree
       
+      - name: Get CMake
+        uses: symbitic/install-cmake@master
+      - name: test
+        run:
+          cmake ..
