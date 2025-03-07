@@ -175,7 +175,7 @@ std::string APIUtils::legacyGet(const std::string &URL) {
 
 nlohmann::json APIUtils::getVips() {
     try {
-        std::string users = get("https://api.flarial.xyz/vips");
+        std::string users = get("http://node2.sear.host:5005/vips");
 
         if (users.empty()) {
             Logger::warn("Unable to fetch vips, API is down or you are not connected to the internet.");
@@ -208,7 +208,7 @@ nlohmann::json APIUtils::getUsers() {
         std::string playerListJson = VectorToList(onlineUsers);
 
         // Use POST_Simple
-        auto [responseCode, responseBody] = POST_Simple("https://api.flarial.xyz/allOnlineUsers", playerListJson);
+        auto [responseCode, responseBody] = POST_Simple("http://node2.sear.host:5005/allOnlineUsers", playerListJson);
 
         if (responseCode != 200 || responseBody.empty()) {
             Logger::warn("Unable to fetch users, API returned: " + std::to_string(responseCode));
