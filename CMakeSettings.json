@@ -19,8 +19,8 @@
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeCommandArgs": "-DCMAKE_CXX_STANDARD=20",
       "buildCommandArgs": "",
-      "ctestCommandArgs": ""
-      
+      "ctestCommandArgs": "",
+      "inheritEnvironments": ["msvc_x64_x64"]
     }
   ]
 }
