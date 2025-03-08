@@ -24,7 +24,7 @@ jobs:
           cmake .
       - name: Build DLL
         run: 
-          cmake --build . --config Release
+          mkdir build && cmake -S . -B build/ && cmake --build build/ --config Release
           && tree
             
       
