@@ -15,8 +15,12 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Set up CMake
-        uses: actions/setup-cmake@v3
+  # Option 2: specify 'latest' or 'latestrc' in the input version arguments:
+      - name: Get latest CMake and Ninja
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: latestrc      # <--= optional, use the latest release candidate (notice the 'rc' suffix).
+          ninjaVersion: latest        # <--= optional, use the latest release (non candidate).
 
       - name: Create Build Directory
         run: mkdir build
@@ -27,7 +31,7 @@ jobs:
 
       - name: Build DLL
         working-directory: ./build
-        run: cmake --build . --config Release
+        run: cmake --build .
 
       - name: List Directory Contents
         run: tree
