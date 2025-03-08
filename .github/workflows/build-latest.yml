@@ -27,11 +27,11 @@ jobs:
 
       - name: Configure CMake
         working-directory: ./build
-        run: cmake .. -G "Ninja"
+        run: cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo ../..
 
       - name: Build DLL
         working-directory: ./build
-        run: cmake --build .
+        run: Ninja
 
       - name: List Directory Contents
         run: tree
