@@ -24,3 +24,6 @@ jobs:
     - name: Build DLL
       run: |
           cmake --build build
+    - name : tree
+      run: | 
+        tree
