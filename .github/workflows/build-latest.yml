@@ -47,11 +47,11 @@ jobs:
             SOURCE_DIRECTORY: Flarial_DLL  
             DESTINATION_GITHUB_USERNAME: "TTF-fog"
             DESTINATION_REPOSITORY_NAME: "newcdn"
-            USER_EMAIL: "ttf431@proton.me"
+            USER_EMAIL: "adh.ishaan10@gmail.com"
             USER_NAME: "TTF-fog"
             DESTINATION_REPOSITORY_USERNAME: "TTF-fog"  
             GITHUB_SERVER: "github.com"
-            TARGET_BRANCH: "nightly"  
+            TARGET_BRANCH: "main"  
             COMMIT_MESSAGE: "Your commit message"
             TARGET_DIRECTORY: ""  
             CREATE_TARGET_BRANCH_IF_NEEDED: "true"  
