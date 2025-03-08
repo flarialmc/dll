@@ -167,8 +167,7 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
                                                     IDXGISwapChain1 **ppSwapChain) {
 
     ID3D12CommandQueue *pCommandQueue = NULL;
-    if (Client::settings.getSettingByName<bool>("killdx")->value &&
-        !pDevice->QueryInterface(IID_PPV_ARGS(&pCommandQueue)) && !queueReset) {
+    if (Client::settings.getSettingByName<bool>("killdx")->value && SUCCEEDED(pDevice->QueryInterface(IID_PPV_ARGS(&pCommandQueue)))) {
         pCommandQueue->Release();
         queue = nullptr;
         return DXGI_ERROR_INVALID_CALL;
@@ -209,13 +208,6 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
     if (Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
-
-    if(!fEnabled && !fD3D11 && Client::settings.getSettingByName<bool>("killdx")->value) {
-        fD3D11 = true;
-        return DXGI_ERROR_DEVICE_RESET;
-    } else {
-        fEnabled = true;
-    }
 
     if (queueReset) {
         init = false;
