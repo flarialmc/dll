@@ -18,7 +18,7 @@ jobs:
 
       
       - name: Get CMake
-        uses: symbitic/install-cmake@master
+        uses: lukka/get-cmake@latest
       - name: test
         run:
           
