@@ -175,11 +175,6 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 
     pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
 
-    auto vsync = !Client::settings.getSettingByName<bool>("vsync")->value;
-    currentVsyncState = vsync;
-    if(vsync)
-        return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
-
     std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
 
     if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
@@ -216,11 +211,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         Logger::debug("Resetting SwapChain");
         ResizeHook::cleanShit(false);
         return DXGI_ERROR_DEVICE_RESET;
-    }
-
-    if(currentVsyncState != !Client::settings.getSettingByName<bool>("vsync")->value) {
-        queueReset = true;
-        return funcOriginal(pSwapChain, syncInterval, flags);
     }
 
     swapchain = pSwapChain;
@@ -280,7 +270,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     } catch (const std::exception &ex) { Logger::error("Fail at loading all images: ", ex.what()); }
 
 
-    if (!SwapchainHook::currentVsyncState) {
+    if (Client::settings.getSettingByName<bool>("vsync")->value) {
         return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
     }
 

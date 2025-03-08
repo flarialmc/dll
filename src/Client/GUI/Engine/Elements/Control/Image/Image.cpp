@@ -572,7 +572,6 @@ void FlarialGUI::LoadAllImages() {
 
 	} else {
 		for(int i = 100; i <= MAX_IMAGE_ID; i++) {
-			std::cout << i << std::endl;
 			if(i != IDR_PATAR_JPG) LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "PNG");
 			else LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "JPG");
 		}
