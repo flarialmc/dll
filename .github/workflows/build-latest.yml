@@ -31,6 +31,6 @@ jobs:
       uses: actions/upload-artifact@v4.6.1
       with:
         name: Flarial DLL
-        path: D:\a        
+        path: D:\a\dll\dll\dll\build\Flarial.dll
                 
     
