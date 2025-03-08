@@ -36,37 +36,37 @@ jobs:
     steps:
         - name: Download dll
           uses: actions/download-artifact@v4.1.9
-        # - name: checkkout cdn
-        #   uses: actions/checkout@v4
-        #   with:
-        #     repository: 'TTF-fog/newcdn'
-        #     ref: 'main'
-        #     token:  ${{secrets.ACTIONS_GITHUB_TOKEN}}
-        # - name: setup git config
-        #   run: |
-        #     git config user.name "GitHub Actions Bot"
-        #     git config user.email "actions@example.com"
-        #     ls
-        #     cd newcdn
-        #     ls
-        #     sudo cp ~/Flarial_DLL ./
-        #     git push origin main
-        - name: Upload to CDN
+        - name: checkkout cdn
+          uses: actions/checkout@v4
+          with:
+            repository: 'TTF-fog/newcdn'
+            ref: 'main'
+            token:  ${{secrets.ACTIONS_GITHUB_TOKEN}}
+        - name: setup git config
+          run: |
+            git config user.name "GitHub Actions Bot"
+            git config user.email "actions@example.com"
+            ls
+            cd newcdn
+            ls
+            sudo cp ~/Flarial_DLL ./
+            git push origin main
+        # - name: Upload to CDN
         
-          uses: cpina/github-action-push-to-another-repository@main
-          env:
-            SSH_DEPLOY_KEY: ${{secrets.SSH_DEPLOY_KEY}}
-            SOURCE_BEFORE_DIRECTORY: D:\a\dll\dll\build\  
-            SOURCE_DIRECTORY: Flarial_DLL  
-            DESTINATION_GITHUB_USERNAME: "TTF-fog"
-            DESTINATION_REPOSITORY_NAME: "newcdn"
-            USER_EMAIL: "ttf431@proton.me"
-            USER_NAME: "TTF-fog"
-            DESTINATION_REPOSITORY_USERNAME: "TTF-fog"  
-            GITHUB_SERVER: "github.com"
-            TARGET_BRANCH: "main"  
-            COMMIT_MESSAGE: "Your commit message"  
-            CREATE_TARGET_BRANCH_IF_NEEDED: "true"  
+          # uses: cpina/github-action-push-to-another-repository@main
+          # env:
+          #   SSH_DEPLOY_KEY: ${{secrets.SSH_DEPLOY_KEY}}
+          #   SOURCE_BEFORE_DIRECTORY: D:\a\dll\dll\build\  
+          #   SOURCE_DIRECTORY: Flarial_DLL  
+          #   DESTINATION_GITHUB_USERNAME: "TTF-fog"
+          #   DESTINATION_REPOSITORY_NAME: "newcdn"
+          #   USER_EMAIL: "ttf431@proton.me"
+          #   USER_NAME: "TTF-fog"
+          #   DESTINATION_REPOSITORY_USERNAME: "TTF-fog"  
+          #   GITHUB_SERVER: "github.com"
+          #   TARGET_BRANCH: "main"  
+          #   COMMIT_MESSAGE: "Your commit message"  
+          #   CREATE_TARGET_BRANCH_IF_NEEDED: "true"  
         
           
         - name: Test get variable exported by push-to-another-repository
