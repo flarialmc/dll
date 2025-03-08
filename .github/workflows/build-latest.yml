@@ -36,26 +36,26 @@ jobs:
     steps:
         - name: Download dll
           uses: actions/download-artifact@v4.1.9
-        - name: checkkout cdn
-          uses: actions/checkout@v4
-          with:
-            repository: 'TTF-fog/newcdn'
-            ref: 'main'
-            token:  ${{secrets.ACTIONS_GITHUB_TOKEN}}
-        - name: setup git config
-          run: |
-            git config user.name "GitHub Actions Bot"
-            git config user.email "actions@example.com"
-            ls
-            cd newcdn
-            ls
-            sudo cp ~/Flarial_DLL ./
-            git push origin main
+        # - name: checkkout cdn
+        #   uses: actions/checkout@v4
+        #   with:
+        #     repository: 'TTF-fog/newcdn'
+        #     ref: 'main'
+        #     token:  ${{secrets.ACTIONS_GITHUB_TOKEN}}
+        # - name: setup git config
+        #   run: |
+        #     git config user.name "GitHub Actions Bot"
+        #     git config user.email "actions@example.com"
+        #     ls
+        #     cd newcdn
+        #     ls
+        #     sudo cp ~/Flarial_DLL ./
+        #     git push origin main
         - name: Upload to CDN
         
           uses: cpina/github-action-push-to-another-repository@main
           env:
-            SSH_DEPLOY_KEY: ${{secrets.DEPLOY_PRIVATE_KEY}}
+            SSH_DEPLOY_KEY: ${{secrets.SSH_DEPLOY_KEY}}
             SOURCE_BEFORE_DIRECTORY: D:\a\dll\dll\build\  
             SOURCE_DIRECTORY: Flarial_DLL  
             DESTINATION_GITHUB_USERNAME: "TTF-fog"
