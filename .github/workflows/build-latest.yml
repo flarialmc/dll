@@ -8,23 +8,26 @@ on:
   workflow_dispatch:
 
 jobs:
-  
   build_files:
     runs-on: windows-latest
 
     steps:
-      - name: checkut repo
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      
-      - name: Get CMake
-        uses: lukka/get-cmake@latest
-      - name: Load cmake cache
-        run:
-          cmake .
+      - name: Set up CMake
+        uses: actions/setup-cmake@v3
+
+      - name: Create Build Directory
+        run: mkdir build
+
+      - name: Configure CMake
+        working-directory: ./build
+        run: cmake .. -G "Visual Studio 17 2022"
+
       - name: Build DLL
-        run: 
-          mkdir build && cmake -S . -B build/ && cmake --build build/ --config Release
-          && tree
-            
-      
+        working-directory: ./build
+        run: cmake --build . --config Release
+
+      - name: List Directory Contents
+        run: tree
