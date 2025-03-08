@@ -1,5 +1,10 @@
-name: C/C++ CI
+name: Build Flarial and UPLOAD to newcdn
 on:
+  
+  push:
+    branches: [ "main","scripting-v2" ]
+  pull_request:
+    branches: [ "main","scripting-v2" ]
 
   workflow_dispatch:
 
