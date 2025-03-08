@@ -1,16 +1,26 @@
 name: C/C++ CI
 
 on:
-   workflow_dispatch:
+  workflow_dispatch:
+
 jobs:
-  ubuntu-build:
+  windows-build:
     runs-on: windows-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: CMAKE Cache
-      run:
-          cmake . -G Ninja
-    - name: Build
-      run:
-         Ninja
+    
+name: Checkout Repository
+    uses: actions/checkout@v4
+
+    
+name: Set Up MSVC Environment
+    uses: ilammy/msvc-dev-cmd@v1
+
+    
+name: Configure CMake
+    run: |
+      cmake -S . -B build -G "Ninja" -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_STANDARD=23
+
+    
+name: Build DLL
+    run: |
+      cmake --build build
