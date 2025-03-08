@@ -19,15 +19,12 @@ jobs:
       
       - name: Get CMake
         uses: lukka/get-cmake@latest
-      - name: Build DLL
+      - name: Load cmake cache
         run:
-          
           cmake .
-          | cmake --build . --config Release
-
-      - name: Upload DLL
+      - name: Build DLL
         run: 
-          tree
-          
+          cmake --build . --config Release
+          && tree
             
       
