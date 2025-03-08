@@ -35,4 +35,4 @@ jobs:
         run: make ..
 
       - name: List Directory Contents
-        run: tree
+        run: ls
