@@ -35,9 +35,6 @@ jobs:
     steps:
         - name: Download dll
           uses: actions/download-artifact@v4.1.9
-          with:
-            # Name of the artifact to download. If unspecified, all artifacts for the run are downloaded.
-            name: "Flarial_DLL"
         - name: List
           run: |
             ls
