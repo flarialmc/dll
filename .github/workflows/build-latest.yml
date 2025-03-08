@@ -50,6 +50,7 @@ jobs:
         - name: push changes
           run: |
             ls
+            git commit -m "womp"
             git push origin main
         # - name: Upload to CDN
         
