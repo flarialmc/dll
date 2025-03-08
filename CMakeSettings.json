@@ -1,10 +1,10 @@
-﻿{
+{
   "configurations": [
     {
       "name": "x64-Debug",
       "generator": "Ninja",
       "configurationType": "Debug",
-      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "inheritEnvironments": ["msvc_x64_x64"],
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeCommandArgs": "",
@@ -17,10 +17,10 @@
       "configurationType": "RelWithDebInfo",
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "-std=c++20 -stdlib=libc++",
-      "buildCommandArgs": "-std=c++20 -stdlib=libc++",
+      "cmakeCommandArgs": "-DCMAKE_CXX_STANDARD=20",
+      "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "msvc_x64_x64" ]
+      "inheritEnvironments": ["msvc_x64_x64"]
     }
   ]
 }
