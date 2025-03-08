@@ -1,38 +1,38 @@
-name: make hashbrowns
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+name: Build Latite from source
 
 on:
   push:
-    paths:
-      - 'dll/latest.dll'  
-      - 'dll/beta.dll'    
-  workflow_dispatch:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: .
+
+  # Configuration type to build.
+  # You can convert this to a build matrix if you need coverage of multiple configuration types.
+  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  BUILD_CONFIGURATION: Nightly
+
+permissions:
+  contents: read
 
 jobs:
-  build_files:
+  build:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-  # Option 2: specify 'latest' or 'latestrc' in the input version arguments:
-      - name: Get latest CMake and Ninja
-        uses: lukka/get-cmake@latest
-        with:
-          cmakeVersion: latestrc      # <--= optional, use the latest release candidate (notice the 'rc' suffix).
-          ninjaVersion: latest        # <--= optional, use the latest release (non candidate).
+    - name: Add MSBuild to PAT
 
-      - name: Create Build Directory
-        run: mkdir build
-
-      - name: Configure CMake
-        working-directory: ./build
-        run: cmake .. #-G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_STANDARD_REQUIRED=ON
-
-
-      - name: Build DLL
-        working-directory: ./build
-        run: cmake --build . 
-
-      - name: List Directory Contents
-        run: ls
+    - name: Build Latite
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: msbuild /m && tree
+      
+   
