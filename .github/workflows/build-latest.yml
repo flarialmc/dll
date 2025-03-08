@@ -42,16 +42,20 @@ jobs:
         - name: Upload to CDN
           uses: cpina/github-action-push-to-another-repository@main
           env:
-             SSH_DEPLOY_KEY: ${{ secrets.DEPLOY_PRIVATE_KEY }}
-    
-          with:
-              # GitHub Action output files
-              source-directory: D:\a\dll\dll\build\
-              destination-github-username: "TTF-fog"
-              destination-repository-name: "newcdn"
-              user-email: "ttf431@proton.me"
-              target-directory: ""
-              github-server: "github.com" # who woulda guessed
-    
+            SSH_DEPLOY_KEY: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+            SOURCE_BEFORE_DIRECTORY: D:\a\dll\dll\build\  
+            SOURCE_DIRECTORY: Flarial_DLL  
+            DESTINATION_GITHUB_USERNAME: "TTF-fog"
+            DESTINATION_REPOSITORY_NAME: "newcdn"
+            USER_EMAIL: "ttf431@proton.me"
+            USER_NAME: "TTF-fog"
+            DESTINATION_REPOSITORY_USERNAME: "TTF-fog"  
+            GITHUB_SERVER: "github.com"
+            TARGET_BRANCH: "nightly"  
+            COMMIT_MESSAGE: "Your commit message"
+            TARGET_DIRECTORY: ""  
+            CREATE_TARGET_BRANCH_IF_NEEDED: "true"  
+        
+          
         - name: Test get variable exported by push-to-another-repository
           run: echo $DESTINATION_CLONED_DIRECTORY
