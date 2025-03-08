@@ -29,26 +29,30 @@ jobs:
       with:
         name: Flarial DLL
         path: D:\a\dll\dll\build\Flarial.dll
-                
+  
+  upload-to-cdn:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Download dll
+          uses: actions/download-artifact@v4.1.9
+          with:
+            # Name of the artifact to download. If unspecified, all artifacts for the run are downloaded.
+            name: "Flarial.dll"
+        - name: List
+          run: |
+            ls
+        - name: Upload to CDN
+          uses: cpina/github-action-push-to-another-repository@main
+          env:
+             SSH_DEPLOY_KEY: ${{ secrets.DEPLOY_PRIVATE_KEY }}
     
-    - name: Upload to CDN
-      uses: cpina/github-action-push-to-another-repository@main
-      env:
-         
-          # Way 2: using SSH deploy keys
-          # @see https://cpina.github.io/push-to-another-repository-docs/setup-using-ssh-deploy-keys.html#setup-ssh-deploy-keys
-          
-         
-          
-        SSH_DEPLOY_KEY: ${{ secrets.DEPLOY_PRIVATE_KEY }}
-
-      with:
-          # GitHub Action output files
-          source-directory: D:\a\dll\dll\build\
-          destination-github-username: "TTF-fog"
-          destination-repository-name: "newcdn"
-          user-email: "ttf431@proton.me"
-          
-
-    - name: Test get variable exported by push-to-another-repository
-      run: echo $DESTINATION_CLONED_DIRECTORY
+          with:
+              # GitHub Action output files
+              source-directory: D:\a\dll\dll\build\
+              destination-github-username: "TTF-fog"
+              destination-repository-name: "newcdn"
+              user-email: "ttf431@proton.me"
+              
+    
+        - name: Test get variable exported by push-to-another-repository
+          run: echo $DESTINATION_CLONED_DIRECTORY
