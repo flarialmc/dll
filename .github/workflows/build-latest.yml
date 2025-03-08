@@ -24,9 +24,6 @@ jobs:
     - name: Build DLL
       run: |
           cmake --build build
-    - name : tree
-      run: | 
-        ls  D:\a\dll\dll\build
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4.6.1
       with:
@@ -34,3 +31,24 @@ jobs:
         path: D:\a\dll\dll\build\Flarial.dll
                 
     
+    - name: Upload to CDN
+      uses: cpina/github-action-push-to-another-repository@main
+      env:
+         
+          # Way 2: using SSH deploy keys
+          # @see https://cpina.github.io/push-to-another-repository-docs/setup-using-ssh-deploy-keys.html#setup-ssh-deploy-keys
+          
+         
+          
+        SSH_DEPLOY_KEY: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+
+      with:
+          # GitHub Action output files
+          source-directory: D:\a\dll\dll\build\
+          destination-github-username: "TTF-fog"
+          destination-repository-name: "newcdn"
+          user-email: "ttf431@proton.me"
+          
+
+    - name: Test get variable exported by push-to-another-repository
+      run: echo $DESTINATION_CLONED_DIRECTORY
