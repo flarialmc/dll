@@ -32,7 +32,7 @@ jobs:
 
       - name: Build DLL
         working-directory: ./build
-        run: make 
+        run: cmake --build . 
 
       - name: List Directory Contents
         run: ls
