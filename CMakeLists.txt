@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24.0)
 project(Flarial)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 
 set(CLIENT_VERSION "2.00") # Update this for every new release
 
