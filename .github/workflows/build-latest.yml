@@ -27,7 +27,7 @@ jobs:
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4.6.1
       with:
-        name: Flarial DLL
+        name: Flarial_DLL
         path: D:\a\dll\dll\build\Flarial.dll
   
   upload-to-cdn:
@@ -37,7 +37,7 @@ jobs:
           uses: actions/download-artifact@v4.1.9
           with:
             # Name of the artifact to download. If unspecified, all artifacts for the run are downloaded.
-            name: "Flarial.dll"
+            name: "Flarial_DLL"
         - name: List
           run: |
             ls
