@@ -27,7 +27,7 @@ jobs:
 
       - name: Configure CMake
         working-directory: ./build
-        run: cmake .. -G "Visual Studio 17 2022"
+        run: cmake .. -G "Ninja"
 
       - name: Build DLL
         working-directory: ./build
