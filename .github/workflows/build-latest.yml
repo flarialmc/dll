@@ -13,4 +13,5 @@ jobs:
           cmake . 
     - name: Build
       run:
-         cmake . --build
+         ./build.bat &&
+         cmake --build .
