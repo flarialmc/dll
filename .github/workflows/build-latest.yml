@@ -26,11 +26,11 @@ jobs:
           cmake --build build
     - name : tree
       run: | 
-        ls
+        ls  D:\a\dll\dll\build
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4.6.1
       with:
         name: Flarial DLL
-        path: D:\dll\dll\dll\build\Flarial.dll
+        path: D:\a\dll\dll\build\Flarial.dll
                 
     
