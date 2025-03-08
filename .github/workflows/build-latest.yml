@@ -65,8 +65,7 @@ jobs:
             DESTINATION_REPOSITORY_USERNAME: "TTF-fog"  
             GITHUB_SERVER: "github.com"
             TARGET_BRANCH: "main"  
-            COMMIT_MESSAGE: "Your commit message"
-            TARGET_DIRECTORY: ""  
+            COMMIT_MESSAGE: "Your commit message"  
             CREATE_TARGET_BRANCH_IF_NEEDED: "true"  
         
           
