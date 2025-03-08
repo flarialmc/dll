@@ -51,6 +51,7 @@ jobs:
               destination-repository-name: "newcdn"
               user-email: "ttf431@proton.me"
               target-directory: ""
+              github-server: "github.com" # who woulda guessed
     
         - name: Test get variable exported by push-to-another-repository
           run: echo $DESTINATION_CLONED_DIRECTORY
