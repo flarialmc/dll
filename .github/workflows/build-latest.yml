@@ -7,7 +7,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@latest
+      uses: actions/checkout@v4
     - name: CMAKE Cache
       run:
          cd dll && cmake . 
