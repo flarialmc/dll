@@ -27,7 +27,7 @@ jobs:
 
       - name: Configure CMake
         working-directory: ./build
-        run: cmake .. -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo 
+        run: cmake .. -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_STANDARD=20
 
       - name: Build DLL
         working-directory: ./build
