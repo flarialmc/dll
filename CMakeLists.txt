@@ -25,8 +25,6 @@ execute_process(
 
 add_compile_definitions(COMMIT_HASH="${COMMIT_HASH}")
 
-add_compile_options(/bigobj)
-add_compile_options(/utf-8)
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "Test")
     # Optimize for performance
     add_compile_options(/O2 /Oi /Gy /Gw /GF /fp:fast /GR- /Gd /MT /Ob2)
