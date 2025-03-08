@@ -50,6 +50,7 @@ jobs:
         - name: push changes
           run: |
             ls
+            git add Flarial_DLL
             git commit -m "womp"
             git push origin main
         # - name: Upload to CDN
