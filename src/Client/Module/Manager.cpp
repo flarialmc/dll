@@ -100,6 +100,7 @@
 #include "../../Scripting/Console/ConsoleService.hpp"
 
 #include "Modules/Mousestrokes/Mousestrokes.hpp"
+#include "Modules/ZeqaUtils/ZeqaUtils.hpp"
 
 namespace ModuleManager {
     std::map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -216,6 +217,7 @@ void ModuleManager::initialize() {
 
     addModule<RawInputBuffer>();
     //addModule<ItemUseDelayFix>();
+    //addModule<ZeqaUtils>();
 
     addService<GUIKeyListener>();
     if (!VersionUtils::checkAboveOrEqual(21, 60)) {
