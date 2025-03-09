@@ -165,11 +165,12 @@ HRESULT (*SwapchainHook::IDXGIFactory2_CreateSwapChainForCoreWindow)
 HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknown *pDevice, IUnknown *pWindow,
                                                     DXGI_SWAP_CHAIN_DESC1 *pDesc, IDXGIOutput *pRestrictToOutput,
                                                     IDXGISwapChain1 **ppSwapChain) {
-
     ID3D12CommandQueue *pCommandQueue = NULL;
+    if (Client::settings.getSettingByName<bool>("killdx")->value) queue = nullptr;
     if (Client::settings.getSettingByName<bool>("killdx")->value && SUCCEEDED(pDevice->QueryInterface(IID_PPV_ARGS(&pCommandQueue)))) {
         pCommandQueue->Release();
         queue = nullptr;
+        Logger::success("Fell back to DX11");
         return DXGI_ERROR_INVALID_CALL;
     }
 
