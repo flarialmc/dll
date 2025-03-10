@@ -45,7 +45,8 @@ uint64_t Client::start;
 DWORD WINAPI init() {
     Client::start = Utils::getCurrentMs();
     Logger::initialize();
-    Audio::init();
+    std::thread lol([]() { Audio::init(); });
+    lol.detach();
     Client::initialize();
 
     Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;

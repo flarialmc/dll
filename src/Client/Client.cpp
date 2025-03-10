@@ -103,6 +103,7 @@ void Client::UnregisterActivationHandler()
 void Client::initialize() {
     winrt::init_apartment();
 
+
 #if defined(__TEST__)
     WinrtUtils::setWindowTitle(fmt::format("Flarial v{} {} {}", FLARIAL_VERSION, FLARIAL_BUILD_TYPE, FLARIAL_BUILD_DATE));
 #else
@@ -112,6 +113,8 @@ void Client::initialize() {
     VersionUtils::initialize();
     version = VersionUtils::getFormattedVersion();
 
+
+
     if (!VersionUtils::isSupported(Client::version)) {
         Logger::fatal("Minecraft version is not supported!");
         MessageBox(nullptr, "Flarial: this version is not supported!", "", MB_OK);
@@ -119,15 +122,11 @@ void Client::initialize() {
         Client::disable = true;
         return;
     }
-    Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
 
-    Logger::success("Time: {:.2f}s", Client::elapsed);
 
     VersionUtils::addData();
 
-    Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
 
-    Logger::success("Time: {:.2f}s", Client::elapsed);
     std::vector<std::filesystem::path> directories = {
         Utils::getRoamingPath() + "\\Flarial",
         Utils::getRoamingPath() + "\\Flarial\\assets",
@@ -163,25 +162,22 @@ void Client::initialize() {
         APIUtils::onlineUsers = APIUtils::ListToVector(playersList);
     });
 
-    updateThread.detach();    Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
+    updateThread.detach();
 
-    Logger::success("Time: {:.2f}s", Client::elapsed);
 
 
     for (const auto& path : directories) {
         if (!std::filesystem::exists(path)) {
             std::filesystem::create_directory(path);
         }
-    }    Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
+    }
 
-    Logger::success("Time: {:.2f}s", Client::elapsed);
 
     Client::CheckSettingsFile();
     Client::LoadSettings();
 
-    Logger::success("4");    Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
+    Logger::success("4");
 
-    Logger::success("Time: {:.2f}s", Client::elapsed);
 
 
     ADD_SETTING("fontname", std::string("Space Grotesk"));
@@ -231,6 +227,7 @@ void Client::initialize() {
 
 RegisterActivationHandler();
     HookManager::initialize();
+    MH_ApplyQueued();
     ModuleManager::initialize();
     CommandManager::initialize();
 }

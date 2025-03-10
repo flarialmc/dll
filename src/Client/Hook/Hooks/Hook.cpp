@@ -24,7 +24,7 @@ bool Hook::manualHook(void *hookAddr, void *callbackPtr, void **funcOriginal) {
     }
 
     MH_CreateHook(hookAddr, callbackPtr, funcOriginal);
-    if (MH_EnableHook(hookAddr) != MH_OK) {
+    if (MH_QueueEnableHook(hookAddr) != MH_OK) {
         Logger::custom(fg(fmt::color::crimson), "Hook", "Failed to find address of {}", this->name);
         return false;
     }

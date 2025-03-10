@@ -38,27 +38,24 @@ void SignatureAndOffsetManager::clear() {
 
 void SignatureAndOffsetManager::scanAllSignatures() {
     const unsigned int numThreads = std::thread::hardware_concurrency();
-    std::vector<std::future<void>> futures;
+    std::vector<std::thread> threads;
+    std::atomic<size_t> index{0};
 
-    size_t totalSize = sigs.size();
-    size_t chunkSize = totalSize / numThreads;
+    auto worker = [this, &index]() {
+        while (true) {
+            size_t i = index.fetch_add(1, std::memory_order_relaxed);
+            if (i >= sigs.size()) break;  // No more work
 
-    auto it = sigs.begin();
+            auto& sigPair = *(std::next(sigs.begin(), i));
+            sigPair.second.second = Memory::findSig(sigPair.second.first);
+        }
+    };
+
     for (unsigned int i = 0; i < numThreads; ++i) {
-        size_t currentChunk = (i == numThreads - 1) ? (totalSize - i * chunkSize) : chunkSize;
-        auto endIt = std::next(it, currentChunk);
-
-        futures.push_back(std::async(std::launch::async,
-            [this](auto begin, auto end) {
-                for (auto iter = begin; iter != end; ++iter) {
-                    iter->second.second = Memory::findSig(iter->second.first);
-                }
-            }, it, endIt));
-
-        it = endIt;
+        threads.emplace_back(worker);
     }
 
-    for (auto& f : futures) {
-        f.wait();
+    for (auto& t : threads) {
+        t.join();
     }
 }
