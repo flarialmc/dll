@@ -4,6 +4,7 @@
 #include "../../../Client.hpp"
 #include "Elements/ClickGUIElements.hpp"
 #include "Scripting/Scripting.hpp"
+#include "SDK/Client/Network/Packet/TextPacket.hpp"
 #include "Utils/APIUtils.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
@@ -87,7 +88,7 @@ public:
     void onPacketReceive(PacketEvent &event) {
         if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
             auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
-            if (containsAny(String::removeNonAlphanumeric(String::removeColorCodes(pkt->message)))){ pkt->message = "§f[§4FLARIAL§f]§r " + pkt->message;}
+            if (ClickGUI::containsAny(String::removeNonAlphanumeric(String::removeColorCodes(pkt->message)))){ pkt->message = "§f[§4FLARIAL§f]§r " + pkt->message;}
         }
     }
 
@@ -102,6 +103,7 @@ public:
     void onSetup() override {
         Listen(this, MouseEvent, &ClickGUI::onMouse)
         Listen(this, KeyEvent, &ClickGUI::onKey)
+        if (!Client::settings.getSettingByName<bool>("nochaticon")->value) Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
         ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
         Module::onEnable();
     }
@@ -114,6 +116,7 @@ public:
         Deafen(this, MouseEvent, &ClickGUI::onMouse)
         Deafen(this, KeyEvent, &ClickGUI::onKey)
         Deafen(this, RenderEvent, &ClickGUI::onRender)
+        Deafen(this, PacketEvent, &ClickGUI::onPacketReceive)
         Module::terminate();
     }
 
@@ -758,9 +761,10 @@ public:
             if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen")
                 this->active = false;
             else {
-                if (!Client::settings.getSettingByName<bool>("nochaticon")->value) Listen(this, PacketEvent, &onPacketReceive)
-                else Deafen(this, PacketEvent, &onPacketReceive);
-                
+
+                if (!Client::settings.getSettingByName<bool>("nochaticon")->value) Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
+                else Deafen(this, PacketEvent, &ClickGUI::onPacketReceive);
+
                 keybindActions[0]({});
             }
 
