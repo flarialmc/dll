@@ -163,6 +163,7 @@ DWORD WINAPI init() {
     Logger::custom(fmt::fg(fmt::color::pink), "CommandManager", "Shut down");
 
     ResizeHook::cleanShit();
+    Logger::custom(fmt::fg(fmt::color::pink), "DirectX", "Cleaning");
 
     kiero::shutdown();
 

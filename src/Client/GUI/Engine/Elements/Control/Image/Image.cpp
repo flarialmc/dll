@@ -102,38 +102,32 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 
 
 	if (!SwapchainHook::swapchain) {
-		std::cout << "Error: SwapchainHook::swapchain is null." << std::endl;
 		return false;
 	}
 
 
     if (!SwapchainHook::d3d12Device5) {
-        std::cout << "Error: SwapchainHook::d3d12Device5 is null after GetDevice." << std::endl;
         return false;
     }
 
 
  imageResHandle = FindResource(Client::currentModule, MAKEINTRESOURCE(resourceId), type);
 	if (imageResHandle == nullptr) {
-		std::cout << "Error: FindResource failed for resourceId: " << resourceId << " type: " << type << std::endl;
 		return false;
 	}
 
  imageResDataHandle = LoadResource(Client::currentModule, imageResHandle);
 	if (imageResDataHandle == nullptr) {
-		std::cout << "Error: LoadResource failed for resourceId: " << resourceId << std::endl;
 		return false;
 	}
 
  pImageFile = (const unsigned char*)LockResource(imageResDataHandle);
 	if (pImageFile == nullptr) {
-		std::cout << "Error: LockResource failed for resourceId: " << resourceId << std::endl;
 		return false;
 	}
 
  imageFileSize = SizeofResource(Client::currentModule, imageResHandle);
 	if (imageFileSize == 0) {
-		std::cout << "Error: SizeofResource returned 0 for resourceId: " << resourceId << std::endl;
 		return false;
 	}
 
@@ -141,7 +135,6 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	int image_height = 0;
 	unsigned char* image_data = stbi_load_from_memory(pImageFile, imageFileSize, &image_width, &image_height, NULL, 4);
 	if (image_data == nullptr) {
-		std::cout << "Error: stbi_load_from_memory failed for resourceId: " << resourceId << std::endl;
 		return false;
 	}
 
@@ -167,12 +160,10 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	HRESULT hrCreateTexture = SwapchainHook::d3d12Device5->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
 		D3D12_RESOURCE_STATE_COPY_DEST, NULL, IID_PPV_ARGS(&pTexture));
 	if (FAILED(hrCreateTexture)) {
-		std::cout << "Error: CreateCommittedResource (Texture) failed. HRESULT: " << hrCreateTexture << std::endl;
 		stbi_image_free(image_data);
 		return false;
 	}
     if (!pTexture) {
-        std::cout << "Error: pTexture is null after CreateCommittedResource (Texture)." << std::endl;
         stbi_image_free(image_data);
         return false;
     }
@@ -200,13 +191,11 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	HRESULT hrCreateUploadBuffer = SwapchainHook::d3d12Device5->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
 		D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&uploadBuffer));
 	if (FAILED(hrCreateUploadBuffer)) {
-		std::cout << "Error: CreateCommittedResource (Upload Buffer) failed. HRESULT: " << hrCreateUploadBuffer << std::endl;
 		pTexture->Release();
 		stbi_image_free(image_data);
 		return false;
 	}
     if (!uploadBuffer) {
-        std::cout << "Error: uploadBuffer is null after CreateCommittedResource (Upload Buffer)." << std::endl;
         pTexture->Release();
         stbi_image_free(image_data);
         return false;
@@ -217,14 +206,12 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	D3D12_RANGE range = { 0, uploadSize };
 	HRESULT hrMap = uploadBuffer->Map(0, &range, &mapped);
 	if (FAILED(hrMap)) {
-		std::cout << "Error: uploadBuffer->Map failed. HRESULT: " << hrMap << std::endl;
 		uploadBuffer->Release();
 		pTexture->Release();
 		stbi_image_free(image_data);
 		return false;
 	}
     if (!mapped) {
-        std::cout << "Error: mapped pointer is null after uploadBuffer->Map." << std::endl;
         uploadBuffer->Release();
         pTexture->Release();
         stbi_image_free(image_data);
@@ -260,14 +247,12 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	ID3D12Fence* fence = nullptr;
 	HRESULT hrCreateFence = SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 	if (FAILED(hrCreateFence)) {
-		std::cout << "Error: CreateFence failed. HRESULT: " << hrCreateFence << std::endl;
 		uploadBuffer->Release();
 		pTexture->Release();
 		stbi_image_free(image_data);
 		return false;
 	}
     if (!fence) {
-        std::cout << "Error: fence is null after CreateFence." << std::endl;
         uploadBuffer->Release();
         pTexture->Release();
         stbi_image_free(image_data);
@@ -293,7 +278,6 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	ID3D12CommandQueue* cmdQueue = nullptr;
 	HRESULT hrCreateCommandQueue = SwapchainHook::d3d12Device5->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cmdQueue));
 	if (FAILED(hrCreateCommandQueue)) {
-		std::cout << "Error: CreateCommandQueue failed. HRESULT: " << hrCreateCommandQueue << std::endl;
 		CloseHandle(event);
 		fence->Release();
 		uploadBuffer->Release();
@@ -302,7 +286,6 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 		return false;
 	}
     if (!cmdQueue) {
-        std::cout << "Error: cmdQueue is null after CreateCommandQueue." << std::endl;
         CloseHandle(event);
         fence->Release();
         uploadBuffer->Release();
@@ -315,7 +298,6 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	ID3D12CommandAllocator* cmdAlloc = nullptr;
 	HRESULT hrCreateCommandAllocator = SwapchainHook::d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAlloc));
 	if (FAILED(hrCreateCommandAllocator)) {
-		std::cout << "Error: CreateCommandAllocator failed. HRESULT: " << hrCreateCommandAllocator << std::endl;
 		cmdQueue->Release();
 		CloseHandle(event);
 		fence->Release();
@@ -325,7 +307,6 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 		return false;
 	}
     if (!cmdAlloc) {
-        std::cout << "Error: cmdAlloc is null after CreateCommandAllocator." << std::endl;
         cmdQueue->Release();
         CloseHandle(event);
         fence->Release();
@@ -339,7 +320,6 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	ID3D12GraphicsCommandList* cmdList = nullptr;
 	HRESULT hrCreateCommandList = SwapchainHook::d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAlloc, NULL, IID_PPV_ARGS(&cmdList));
 	if (FAILED(hrCreateCommandList)) {
-		std::cout << "Error: CreateCommandList failed. HRESULT: " << hrCreateCommandList << std::endl;
 		cmdAlloc->Release();
 		cmdQueue->Release();
 		CloseHandle(event);
@@ -350,7 +330,6 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 		return false;
 	}
     if (!cmdList) {
-        std::cout << "Error: cmdList is null after CreateCommandList." << std::endl;
         cmdAlloc->Release();
         cmdQueue->Release();
         CloseHandle(event);
@@ -367,7 +346,6 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 
 	HRESULT hrCloseCommandList = cmdList->Close();
 	if (FAILED(hrCloseCommandList)) {
-		std::cout << "Error: cmdList->Close failed. HRESULT: " << hrCloseCommandList << std::endl;
 		cmdList->Release();
 		cmdAlloc->Release();
 		cmdQueue->Release();
@@ -382,7 +360,6 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 	cmdQueue->ExecuteCommandLists(1, (ID3D12CommandList* const*)&cmdList);
 	HRESULT hrSignal = cmdQueue->Signal(fence, 1);
 	if (FAILED(hrSignal)) {
-		std::cout << "Error: cmdQueue->Signal failed. HRESULT: " << hrSignal << std::endl;
 		cmdList->Release();
 		cmdAlloc->Release();
 		cmdQueue->Release();
@@ -406,13 +383,11 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 
 	SwapchainHook::d3d12Device5->CreateShaderResourceView(pTexture, &srvDesc, srv_cpu_handle);
     if (!srv_cpu_handle.ptr) {
-        std::cout << "Warning: srv_cpu_handle is null, SRV might not be created correctly, but continuing." << std::endl;
     }
 
 
 	*out_tex_resource = pTexture;
     if (!*out_tex_resource) {
-        std::cout << "Error: out_tex_resource is still null after all operations, something went wrong." << std::endl;
         cmdList->Release();
         cmdAlloc->Release();
         cmdQueue->Release();

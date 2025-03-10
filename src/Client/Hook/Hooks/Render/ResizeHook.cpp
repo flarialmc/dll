@@ -69,7 +69,8 @@ ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT wi
 // TODO: get back to this to check
 void ResizeHook::cleanShit(bool isResize) {
 
-
+    bool isDX12 = false;
+    if (SwapchainHook::queue) isDX12 = true;
     Memory::SafeRelease(SwapchainHook::stageTex);
     Memory::SafeRelease(SwapchainHook::SavedD3D11BackBuffer);
     Memory::SafeRelease(SwapchainHook::ExtraSavedD3D11BackBuffer);
@@ -83,27 +84,6 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(SwapchainHook::d3d11Device);
     Memory::SafeRelease(SwapchainHook::D2D1Bitmap);
     Memory::SafeRelease(D2D::context);
-
-
-
-
-    if(!isResize) {
-        if (ImGui::GetCurrentContext()) {
-            ImGui::GetIO().Fonts->Clear();
-            FlarialGUI::FontMap.clear();
-
-            ImGui_ImplWin32_Shutdown();
-
-            if (!SwapchainHook::queue)
-                ImGui_ImplDX11_Shutdown();
-            else ImGui_ImplDX12_Shutdown();
-            ImGui::DestroyContext();
-
-            FlarialGUI::DoLoadModuleFontLater = true;
-            FlarialGUI::DoLoadGUIFontLater = true;
-        }
-        CloseHandle(SwapchainHook::fenceEvent);
-    }
 
 
     Blur::hasDoneFrames = false;
@@ -222,5 +202,29 @@ void ResizeHook::cleanShit(bool isResize) {
     FlarialGUI::scrollposmodifier = 0;
 
 
+    if(!isResize) {
+
+
+        Memory::SafeRelease(SwapchainHook::D3D12DescriptorHeap);         Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapBackBuffers);
+        Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapImGuiRender); Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapImGuiIMAGE);
+
+        if (ImGui::GetCurrentContext()) {
+            ImGui::GetIO().Fonts->Clear();
+            FlarialGUI::FontMap.clear();
+
+            ImGui_ImplWin32_Shutdown();
+
+            if (!isDX12)
+                ImGui_ImplDX11_Shutdown();
+            else { ImGui_ImplDX12_Shutdown(); }
+
+            FlarialGUI::DoLoadModuleFontLater = true;
+            FlarialGUI::DoLoadGUIFontLater = true;
+            ImGui::DestroyContext();
+
+        }
+
+        CloseHandle(SwapchainHook::fenceEvent);
+    }
     //ImGui::DestroyContext();
 }
