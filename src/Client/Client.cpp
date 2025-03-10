@@ -67,6 +67,39 @@ std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
 
 bool Client::disable = false;
 
+winrt::event_token activationToken;
+
+void RegisterActivationHandler()
+{
+    activationToken = CoreApplication::MainView().Activated(
+        [](const auto &, const IActivatedEventArgs &context) {
+            if (context.Kind() != ActivationKind::Protocol)
+                return;
+
+            auto uri = winrt::unbox_value<ProtocolActivatedEventArgs>(context).Uri();
+
+            std::vector<std::pair<std::wstring, std::wstring>> dataList;
+
+            for (const auto& dataContext : uri.QueryParsed()) {
+                std::wstring name = dataContext.Name().c_str();
+                std::wstring value = dataContext.Value().c_str();
+
+                dataList.emplace_back(name, value);
+            }
+
+            auto event = nes::make_holder<ProtocolEvent>(uri.Host().c_str(), dataList);
+            eventMgr.trigger(event);
+        });
+}
+
+void Client::UnregisterActivationHandler()
+{
+    if (activationToken) // Check if the token is valid
+    {
+        CoreApplication::MainView().Activated(activationToken); // Unregister using the token
+    }
+}
+
 void Client::initialize() {
     winrt::init_apartment();
 
@@ -167,6 +200,9 @@ void Client::initialize() {
     ADD_SETTING("overrideFontWeight", false);
     ADD_SETTING("fontWeight", std::string("Normal"));
 
+    Logger::success("5");
+
+
     FlarialGUI::ExtractImageResource(IDR_RED_LOGO_PNG, "red-logo.png","PNG");
     FlarialGUI::ExtractImageResource(IDR_CYAN_LOGO_PNG, "dev-logo.png", "PNG");
     FlarialGUI::ExtractImageResource(IDR_GAMER_LOGO_PNG, "gamer-logo.png", "PNG");
@@ -178,25 +214,10 @@ void Client::initialize() {
 
     FlarialGUI::LoadFont(IDR_MINECRAFTIA_TTF);
 
-    CoreApplication::MainView().Activated([](const auto &, const IActivatedEventArgs &context) {
-        if (context.Kind() != ActivationKind::Protocol)
-            return;
-
-        auto uri = winrt::unbox_value<ProtocolActivatedEventArgs>(context).Uri();
-
-        std::vector<std::pair<std::wstring, std::wstring>> dataList;
-
-        for (const auto& dataContext : uri.QueryParsed()) {
-            std::wstring name = dataContext.Name().c_str();
-            std::wstring value = dataContext.Value().c_str();
-
-            dataList.emplace_back(name, value);
-        }
+    Logger::success("6");
 
 
-        auto event = nes::make_holder<ProtocolEvent>(uri.Host().c_str(), dataList);
-        eventMgr.trigger(event);
-    });
+RegisterActivationHandler();
     HookManager::initialize();
     ModuleManager::initialize();
     CommandManager::initialize();

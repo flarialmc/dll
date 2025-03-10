@@ -150,6 +150,7 @@ DWORD WINAPI init() {
 
     Client::SaveSettings();
 
+    Client::UnregisterActivationHandler();
     ModuleManager::terminate();
     Logger::custom(fmt::fg(fmt::color::pink), "ModuleManager", "Shut down");
     HookManager::terminate();

@@ -16,6 +16,8 @@ public:
 
     static std::vector<std::string> getPlayersVector(const nlohmann::json &data);
 
+    static void UnregisterActivationHandler();
+
     static void initialize();
 
     static bool disable;
