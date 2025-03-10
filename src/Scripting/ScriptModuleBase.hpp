@@ -30,6 +30,7 @@ public:
 
     void terminate() override {
         if (const auto script = linkedScript.lock()) {
+            gScriptSettingManager.saveSettings(script.get());
             gScriptSettingManager.clearSettingsForScript(script.get());
         }
         Deafen(this, KeyEvent, &ScriptModuleBase::onKey);
@@ -45,8 +46,9 @@ public:
     void onDisable() override;
 
     void defaultConfig() override {
-        if(settings.getSettingByName<std::string>("text") == nullptr)
-            settings.addSetting("text", static_cast<std::string>("{VALUE}"));
+        if (const auto script = linkedScript.lock()) {
+            gScriptSettingManager.loadSettings(script.get());
+        }
     }
 
     void settingsRender(float settingsOffset) override {
@@ -61,12 +63,18 @@ public:
 
         if (const auto script = linkedScript.lock()) {
             const auto& settings = gScriptSettingManager.getAllSettings();
+
             if (const auto it = settings.find(script.get()); it != settings.end()) {
                 for (const auto &settingPtr: it->second | std::views::values) {
+
                     switch (settingPtr->type) {
                         case ScriptSettingType::Bool: {
                             if (auto* boolSet = dynamic_cast<BoolSetting*>(settingPtr.get()); boolSet) {
-                                this->addToggle(boolSet->displayName, boolSet->description, boolSet->defaultValue);
+                                if (auto* setting = gScriptSettingManager.getSetting<BoolSetting>(script.get(), boolSet->name)) {
+                                    this->addToggle(boolSet->displayName, boolSet->description, setting->value);
+                                } else {
+                                    this->addToggle(boolSet->displayName, boolSet->description, boolSet->defaultValue);
+                                }
                             }
                             break;
                         }

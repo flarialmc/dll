@@ -102,7 +102,6 @@ public:
                 .addStaticFunction("position", &sLocalPlayer::position)
                 .addStaticFunction("grounded", &sLocalPlayer::grounded)
                 .addStaticFunction("say", &sLocalPlayer::say)
-                .addStaticFunction("position", &sLocalPlayer::position)
                 .addStaticFunction("rotation", &sLocalPlayer::rotation)
             .endClass();
     }

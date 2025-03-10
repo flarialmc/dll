@@ -266,6 +266,8 @@ void ModuleManager::SaveModulesConfig() {
     for (const auto& module : getModules()) {
         module->saveSettings();
     }
+
+    ScriptManager::saveSettings();
 }
 // TODO: use enums?
 bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {

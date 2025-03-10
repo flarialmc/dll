@@ -19,10 +19,8 @@ public:
             .beginNamespace("settings")
                 .addFunction("addBool", [state](const std::string& name, const std::string& desc, bool defValue) -> BoolSetting* {
                     auto* script = ScriptManager::getScriptByState(state);
-                    if (!script) {
-                        Logger::error("[SettingsLib::addBool] ScriptManager::getScriptByState returned nullptr");
-                        return nullptr;
-                    }
+                    if (!script) return nullptr;
+
                     auto* setting = gScriptSettingManager.addSetting<BoolSetting>(script, name, desc, defValue);
                     return setting;
                 })

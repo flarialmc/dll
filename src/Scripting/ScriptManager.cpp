@@ -103,6 +103,14 @@ void ScriptManager::reloadScripts() {
     loadScripts();
 }
 
+void ScriptManager::saveSettings() {
+    for (const auto& module : mLoadedModules) {
+        if (!module) return;
+        Logger::info("saving settings");
+        module->saveSettings();
+    }
+}
+
 FlarialScript* ScriptManager::getScriptByState(lua_State* L) {
     for (const auto& script : mLoadedScripts) {
         if (script->getState() == L) {

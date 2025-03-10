@@ -34,6 +34,9 @@ public:
         return nullptr;
     }
 
+    void loadSettings(FlarialScript* script);
+    void saveSettings(const FlarialScript* script);
+
     void clearSettingsForScript(const FlarialScript* script) {
         settings.erase(script);
     }
