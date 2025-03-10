@@ -207,6 +207,8 @@ void Client::initialize() {
     ADD_SETTING("gui_font_scale", 1.0f);
     ADD_SETTING("overrideFontWeight", false);
     ADD_SETTING("fontWeight", std::string("Normal"));
+    ADD_SETTING("nologoicon", false);
+    ADD_SETTING("nochaticon", false);
 
     Logger::success("5");
 

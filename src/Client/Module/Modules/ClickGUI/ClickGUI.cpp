@@ -594,6 +594,8 @@ modules = ModuleManager::getModules();
                     c->addToggle("Center Cursor", "Centers your cursor everytime you open your inventory, etc.", Client::settings.getSettingByName<bool>("centreCursor")->value);
                     c->addToggle("Anonymous on API", "Stay anonymous on Flarial's API.", Client::settings.getSettingByName<bool>("anonymousApi")->value);
                     c->addToggle("Promotions", "To donate & join discord. (pls keep on)", Client::settings.getSettingByName<bool>("promotions")->value);
+                    c->addToggle("No Flarial Logo", "No Logo next to Nametag </3", Client::settings.getSettingByName<bool>("nologoicon")->value);
+                    c->addToggle("No Flarial Chat Icon", "No [FLARIAL] in chat </3", Client::settings.getSettingByName<bool>("nochaticon")->value);
 
                     c->resetPadding();
 

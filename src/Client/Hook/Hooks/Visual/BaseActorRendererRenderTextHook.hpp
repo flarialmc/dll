@@ -135,13 +135,15 @@ class BaseActorRendererRenderTextHook : public Hook {
 
     static void BaseActorRenderer_renderTextCallback(ScreenContext* screenContext, ViewRenderData* viewData, NameTagRenderObject* tagData, Font* font, float size) {
 
+        if (!Client::settings.getSettingByName<bool>("nologoicon")->value)
         drawLogo(screenContext, viewData->cameraPos, viewData->cameraTargetPos, tagData->nameTag, tagData->pos, font);
         funcOriginal(screenContext, viewData, tagData, font, size);
     }
 
     static void BaseActorRenderer_renderTextCallback40(ScreenContext* screenContext, ViewRenderData* viewData, NameTagRenderObject* tagData, Font* font, void* mesh) {
-        drawLogo(screenContext, viewData->cameraPos, viewData->cameraTargetPos, tagData->nameTag, tagData->pos, font);
 
+        if (!Client::settings.getSettingByName<bool>("nologoicon")->value)
+        drawLogo(screenContext, viewData->cameraPos, viewData->cameraTargetPos, tagData->nameTag, tagData->pos, font);
         funcOriginal40(screenContext, viewData, tagData, font, mesh);
     }
 

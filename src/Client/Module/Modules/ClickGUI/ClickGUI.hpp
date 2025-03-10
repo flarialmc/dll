@@ -40,6 +40,8 @@
 #define o_colors_secondary8 clickgui->settings.getSettingByName<float>("o_colors_secondary8")->value
 #define colors_secondary8_rgb clickgui->settings.getSettingByName<bool>("colors_secondary8_rgb")->value
 
+class TextPacket;
+
 struct PageType {
     std::string type = "normal";
     std::string module;
@@ -77,10 +79,21 @@ public:
     static float inline accumilatedBarPos = 1;
     static bool inline isAnimatingModSet = false;
 
+    bool containsAny(const std::string& str) {
+        return std::any_of(APIUtils::onlineUsers.begin(), APIUtils::onlineUsers.end(),
+                           [&](const std::string& user) { return str.find(user) != std::string::npos; });
+    }
+
+    void onPacketReceive(PacketEvent &event) {
+        if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
+            auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
+            if (containsAny(String::removeNonAlphanumeric(String::removeColorCodes(pkt->message)))){ pkt->message = "§f[§4FLARIAL§f]§r " + pkt->message;}
+        }
+    }
+
     ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {
         Module::setup();
         this->ghostMainModule = new Module("main", "troll", IDR_COMBO_PNG, "");
-
         scrollInfo["modules"] = { 0, 0 };
         scrollInfo["scripting"] = { 0, 0 };
         scrollInfo["settings"] = { 0, 0 };
@@ -745,7 +758,10 @@ public:
             if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen")
                 this->active = false;
             else {
-            keybindActions[0]({});
+                if (!Client::settings.getSettingByName<bool>("nochaticon")->value) Listen(this, PacketEvent, &onPacketReceive)
+                else Deafen(this, PacketEvent, &onPacketReceive);
+                
+                keybindActions[0]({});
             }
 
             if (this->active) {
