@@ -33,8 +33,8 @@ public:
             settings.addSetting("join", false);
         if (settings.getSettingByName<bool>("leave") == nullptr)
             settings.addSetting("leave", false);
-        if (settings.getSettingByName<bool>("winstreak") == nullptr)
-            settings.addSetting("winstreak", false);
+        if (settings.getSettingByName<bool>("killstreak") == nullptr)
+            settings.addSetting("killstreak", false);
 
         if (settings.getSettingByName<bool>("friendaccept") == nullptr)
             settings.addSetting("friendaccept", false);
@@ -63,7 +63,7 @@ public:
         this->addToggle("Promo message", "Removes all promo/info messages", this->settings.getSettingByName<bool>("promomessage")->value);
         this->addToggle("player join", "Removes player join message", this->settings.getSettingByName<bool>("join")->value);
         this->addToggle("player leave", "Removes player leave message", this->settings.getSettingByName<bool>("leave")->value);
-        this->addToggle("WinStreak", "Removes all messages by non ranked players", this->settings.getSettingByName<bool>("winstreak")->value);
+        this->addToggle("Killstreak", "Removes Message indicating a player has gotten a killstreak", this->settings.getSettingByName<bool>("killstreak")->value);
 
         this->addHeader("Auto accept");
         this->addToggle("Friend request", "Automatically accept incoming friend requests.", this->settings.getSettingByName<bool>("friendaccept")->value);
@@ -94,17 +94,17 @@ public:
             }
             if (this->settings.getSettingByName<bool>("join")->value) {
 
-                if (pkt->message.find("§8[§a+§8]§a")!= std::string::npos) {
+                if (pkt->message.substr(0,15) == "§8[§a+§8]§a") {
                     event.cancel();
                 }
             }
             if (this->settings.getSettingByName<bool>("leave")->value) {
 
-                if (pkt->message.find("§8[§c-§8]§c")!= std::string::npos) {
+                if (pkt->message.substr(0,15) == "§8[§c-§8]§c") {
                     event.cancel();
                 }
             }
-            if (this->settings.getSettingByName<bool>("winstreak")->value) {
+            if (this->settings.getSettingByName<bool>("killstreak")->value) {
                 if (pkt->message.contains("§g has gotten a ") && pkt->message.contains("§g killstreak")){
                     event.cancel();
                 }
@@ -121,7 +121,7 @@ public:
                     // command_packet->InternalSource = true;
                     // SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
                     //
-                    FlarialGUI::Notify("Accepted friend invite from: " + pkt->message.substr(54, pkt->message.length() - 5));  //untested
+                    FlarialGUI::Notify("Accepted friend invite from: " + pkt->message.substr(55, pkt->message.length() - 5));  //untested
                 }
             }
             if (this->settings.getSettingByName<bool>("partyaccept")->value) {
@@ -136,7 +136,7 @@ public:
                 //     command_packet->InternalSource = true;
                 //     SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
                 //
-                FlarialGUI::Notify("Accepted party invite from: " + pkt->message.substr(45, pkt->message.length())); //untested
+                FlarialGUI::Notify("Accepted party invite from: " + pkt->message.substr(48, pkt->message.length())); //untested
                 }
             }
         }
