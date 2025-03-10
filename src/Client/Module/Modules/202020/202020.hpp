@@ -8,8 +8,7 @@ public:
     std::chrono::steady_clock::time_point last;
     std::chrono::seconds elapsed;
 
-    Module202020() : Module("20 20 20", "Reminds you to look at \nsomething 20ft away every 20m",
-                          IDR_TIME_PNG, "") {
+    Module202020() : Module("Meds", "Implements the medical 202020 rule\ninto minecraft.", IDR_TIME_PNG, "") {
         Module::setup();
     };
 
@@ -33,7 +32,7 @@ public:
         now = std::chrono::steady_clock::now();
         elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - last);
 
-        if (elapsed >= std::chrono::seconds(1200)) {
+        if (elapsed >= std::chrono::minutes(20)) {
             FlarialGUI::Notify("Look at something 20 feet away for 20 seconds!");
             last = now;
         }

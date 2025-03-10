@@ -93,7 +93,6 @@
 #include "Modules/NullMovement/NullMovement.hpp"
 #include "../../Scripting/Scripting.hpp"
 #include "../../Scripting/EventManager/ScriptingEventManager.hpp"
-#include "Modules/Cursor/Cursor.hpp"
 #include "Modules/RawInputBuffer/RawInputBuffer.hpp"
 #include "Modules/JavaDynamicFOV/JavaDynamicFOV.hpp"
 #include "Modules/ItemUseDelayFix/ItemUseDelayFix.hpp"
@@ -209,11 +208,6 @@ void ModuleManager::initialize() {
 
     addModule<NullMovement>();
     addModule<CustomCrosshair>();
-
-    if (!VersionUtils::checkAboveOrEqual(21, 50)) {
-        addModule<Cursor>();
-    }
-
 
     addModule<RawInputBuffer>();
     //addModule<ItemUseDelayFix>();
