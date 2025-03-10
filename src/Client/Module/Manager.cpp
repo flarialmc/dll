@@ -91,12 +91,9 @@
 #include "Modules/MovableCoordinates/MovableCoordinates.hpp"
 #include "Modules/MovableHotbar/MovableHotbar.hpp"
 #include "Modules/NullMovement/NullMovement.hpp"
-#include "../../Scripting/Scripting.hpp"
-#include "../../Scripting/EventManager/ScriptingEventManager.hpp"
 #include "Modules/RawInputBuffer/RawInputBuffer.hpp"
 #include "Modules/JavaDynamicFOV/JavaDynamicFOV.hpp"
 #include "Modules/ItemUseDelayFix/ItemUseDelayFix.hpp"
-#include "../../Scripting/Console/ConsoleService.hpp"
 
 #include "Modules/Mousestrokes/Mousestrokes.hpp"
 #include "Modules/ZeqaUtils/ZeqaUtils.hpp"
@@ -227,11 +224,7 @@ void ModuleManager::initialize() {
     addService<ImGUIKeyListener>();
     addService<ScriptMarketplace>();
 
-    addService<ConsoleService>();
-    Scripting::loadModules();
-
     initialized = true;
-    Scripting::instalized = true;
 }
 
 void ModuleManager::terminate() {
@@ -243,17 +236,6 @@ void ModuleManager::terminate() {
     moduleMap.clear();
     services.clear();
 }
-
-
-
-
-void restart(){
-    Scripting::instalized = false;
-    Scripting::unloadModules();
-    Scripting::loadModules();
-    Scripting::instalized = true;
-}
-
 
 void ModuleManager::syncState() {
     if(!ModuleManager::initialized) return;
@@ -270,7 +252,6 @@ void ModuleManager::syncState() {
     }
     if (ModuleManager::restartModules) {
         ModuleManager::restartModules = false;
-        restart();
     }
 }
 
