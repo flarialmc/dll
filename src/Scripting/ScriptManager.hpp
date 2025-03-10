@@ -20,10 +20,11 @@ public:
         return mLoadedModules;
     }
 
+    static FlarialScript* getScriptByState(lua_State* L);
     static Module* getModuleByState(lua_State* L);
-
+    static std::shared_ptr<Module> getModuleByName(const std::vector<std::shared_ptr<ScriptModuleBase>>& modules, const std::string& moduleName);
     static inline bool initialized = false;
-    static std::shared_ptr<Module> FindModuleByName(const std::vector<std::shared_ptr<ScriptModuleBase>>& modules, const std::string& moduleName);
+
 
 private:
     static std::vector<std::shared_ptr<FlarialScript>> mLoadedScripts;

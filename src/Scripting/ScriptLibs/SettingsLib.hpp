@@ -1,12 +1,14 @@
 #pragma once
 
 #include "ScriptLib.hpp"
+#include <Scripting/ScriptManager.hpp>
 #include <Scripting/ScriptSettings/ScriptSettingManager.hpp>
 
 class SettingsLib : public ScriptLib {
 public:
     void initialize(lua_State* state) override {
         using namespace luabridge;
+
 
         getGlobalNamespace(state)
             .beginClass<BoolSetting>("BoolSetting")
@@ -16,17 +18,12 @@ public:
         getGlobalNamespace(state)
             .beginNamespace("settings")
                 .addFunction("addBool", [state](const std::string& name, const std::string& desc, bool defValue) -> BoolSetting* {
-                    lua_getglobal(state, "name");
-                    std::string scriptName = "Unknown";
-
-                    if (lua_isstring(state, -1)) {
-                        scriptName = lua_tostring(state, -1);
+                    auto* script = ScriptManager::getScriptByState(state);
+                    if (!script) {
+                        Logger::error("[SettingsLib::addBool] ScriptManager::getScriptByState returned nullptr");
+                        return nullptr;
                     }
-                    lua_pop(state, 1);
-
-                    auto* setting = gScriptSettingManager.addSetting<BoolSetting>(
-                        scriptName, name, desc, defValue
-                    );
+                    auto* setting = gScriptSettingManager.addSetting<BoolSetting>(script, name, desc, defValue);
                     return setting;
                 })
             .endNamespace();

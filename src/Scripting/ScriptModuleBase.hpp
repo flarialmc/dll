@@ -29,7 +29,9 @@ public:
     }
 
     void terminate() override {
-        gScriptSettingManager.clearSettingsForModule(this->name);
+        if (const auto script = linkedScript.lock()) {
+            gScriptSettingManager.clearSettingsForScript(script.get());
+        }
         Deafen(this, KeyEvent, &ScriptModuleBase::onKey);
         Deafen(this, MouseEvent, &ScriptModuleBase::onMouse);
         Deafen(this, PacketEvent, &ScriptModuleBase::onPacketReceive);
@@ -57,19 +59,22 @@ public:
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
-        auto& settings = gScriptSettingManager.getAllSettings();
-        for (auto& [uniqueKey, settingPtr] : settings) {
-            if (uniqueKey.rfind(this->name + ".", 0) == 0) {
-                switch (settingPtr->type) {
-                    case ScriptSettingType::Bool: {
-                        auto* boolSet = dynamic_cast<BoolSetting*>(settingPtr.get());
-                        this->addToggle(boolSet->displayName, boolSet->description, boolSet->defaultValue);
-                        break;
-                    }
-                    case ScriptSettingType::Float: {
-                        break;
-                    }
-                    default: {
+        if (const auto script = linkedScript.lock()) {
+            const auto& settings = gScriptSettingManager.getAllSettings();
+            if (const auto it = settings.find(script.get()); it != settings.end()) {
+                for (const auto &settingPtr: it->second | std::views::values) {
+                    switch (settingPtr->type) {
+                        case ScriptSettingType::Bool: {
+                            if (auto* boolSet = dynamic_cast<BoolSetting*>(settingPtr.get()); boolSet) {
+                                this->addToggle(boolSet->displayName, boolSet->description, boolSet->defaultValue);
+                            }
+                            break;
+                        }
+                        case ScriptSettingType::Float: {
+                            break;
+                        }
+                        default:
+                            break;
                     }
                 }
             }

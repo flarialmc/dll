@@ -706,7 +706,7 @@ modules = ModuleManager::getModules();
 
             std::shared_ptr<Module> settingMod = ModuleManager::getModule(page.module);
             if (!settingMod) {
-                settingMod = ScriptManager::FindModuleByName(ScriptManager::getLoadedModules(), page.module);
+                settingMod = ScriptManager::getModuleByName(ScriptManager::getLoadedModules(), page.module);
             }
             
 

@@ -52,8 +52,11 @@ void ScriptManager::loadScripts() {
             code
         );
 
+        // Be careful if you try to access fields like getName()
+        // before the script compiles. (Won't crash but you get the point)
+        mLoadedScripts.push_back(script);
+
         if (script->compile()) {
-            mLoadedScripts.push_back(script);
             Logger::info("Successfully loaded script '{}'", script->getName());
 
             auto mod = ModuleManager::makeModule<ScriptModuleBase>(
@@ -65,6 +68,8 @@ void ScriptManager::loadScripts() {
             mLoadedModules.emplace_back(mod);
             mod->defaultConfig();
             mod->loadSettings();
+        } else {
+            mLoadedScripts.pop_back();
         }
     }
 }
@@ -98,7 +103,16 @@ void ScriptManager::reloadScripts() {
     loadScripts();
 }
 
-Module* ScriptManager::getModuleByState(lua_State *L) {
+FlarialScript* ScriptManager::getScriptByState(lua_State* L) {
+    for (const auto& script : mLoadedScripts) {
+        if (script->getState() == L) {
+            return script.get();
+        }
+    }
+    return nullptr;
+}
+
+Module* ScriptManager::getModuleByState(lua_State* L) {
     for (const auto& script : mLoadedScripts) {
         if (script->getState() == L) {
             for (const auto& module : mLoadedModules) {
@@ -113,10 +127,7 @@ Module* ScriptManager::getModuleByState(lua_State *L) {
     return nullptr;
 }
 
-std::shared_ptr<Module> ScriptManager::FindModuleByName(
-    const std::vector<std::shared_ptr<ScriptModuleBase>>& modules,
-    const std::string& moduleName)
-{
+std::shared_ptr<Module> ScriptManager::getModuleByName(const std::vector<std::shared_ptr<ScriptModuleBase>>& modules,const std::string& moduleName) {
     for (const auto& mod : modules) {
         if (mod && mod->name == moduleName) {
             return std::static_pointer_cast<Module>(mod);

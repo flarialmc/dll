@@ -32,7 +32,6 @@ public:
         lua_pushnumber(L, static_cast<double>(pos.x));
         lua_pushnumber(L, static_cast<double>(pos.y));
         lua_pushnumber(L, static_cast<double>(pos.z));
-
         return 3;
     }
     static int hurtTime() {
@@ -67,23 +66,27 @@ public:
 
         return 0;
     }
-    static float getYaw() {
+    static int rotation(lua_State* L) {
         auto player = SDK::clientInstance->getLocalPlayer();
-        if (!player) return 0.0f;
 
-        auto rot = player->getActorRotationComponent();
-        if (!rot) return 0.0f;
+        if (!player || !player->getActorRotationComponent()) {
+            lua_newtable(L);
+            lua_pushnumber(L, 0.0f);
+            lua_setfield(L, -2, "x");
+            lua_pushnumber(L, 0.0f);
+            lua_setfield(L, -2, "y");
+            return 1;
+        }
 
-        return rot->rot.y;
-    }
-    static float getPitch() {
-        auto player = SDK::clientInstance->getLocalPlayer();
-        if (!player) return 0.0f;
+        Vec2<float> rot = player->getActorRotationComponent()->rot;
 
-        auto rot = player->getActorRotationComponent();
-        if (!rot) return 0.0f;
+        lua_newtable(L);
+        lua_pushnumber(L, static_cast<double>(rot.x));
+        lua_setfield(L, -2, "x");
+        lua_pushnumber(L, static_cast<double>(rot.y));
+        lua_setfield(L, -2, "y");
 
-        return rot->rot.x;
+        return 1;
     }
 };
 
@@ -99,8 +102,8 @@ public:
                 .addStaticFunction("position", &sLocalPlayer::position)
                 .addStaticFunction("grounded", &sLocalPlayer::grounded)
                 .addStaticFunction("say", &sLocalPlayer::say)
-                .addStaticFunction("getYaw", &sLocalPlayer::getYaw)
-                .addStaticFunction("getPitch", &sLocalPlayer::getPitch)
+                .addStaticFunction("position", &sLocalPlayer::position)
+                .addStaticFunction("rotation", &sLocalPlayer::rotation)
             .endClass();
     }
 };
