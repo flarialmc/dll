@@ -109,6 +109,8 @@ void ResizeHook::cleanShit(bool isResize) {
         ImagesClass::ImguiDX11Images.clear();
     }
 
+    ImagesClass::ImguiDX12Images.clear();
+
     for (auto i: ImagesClass::eimages) {
         Memory::SafeRelease(i.second);
     }
