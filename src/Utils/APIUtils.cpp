@@ -129,8 +129,9 @@ std::string APIUtils::legacyGet(const std::string &URL) {
                         isGzipEncoded = true;
                     }
                 } else {
+                    // hi
                     DWORD lastError = GetLastError();
-                    Logger::error("HttpQueryInfoA(HTTP_QUERY_CONTENT_ENCODING) failed, assuming no gzip or plain text. LastError: " + std::to_string(lastError));
+                    //Logger::error("HttpQueryInfoA(HTTP_QUERY_CONTENT_ENCODING) failed, assuming no gzip or plain text. LastError: " + std::to_string(lastError));
                 }
 
 

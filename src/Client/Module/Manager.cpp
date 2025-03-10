@@ -70,6 +70,7 @@
 #include <Modules/Misc/PackChanger/PackChanger.hpp>
 #include <Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp>
 
+#include "Modules/202020/202020.hpp"
 #include "Modules/ItemPhysics/ItemPhysics.hpp"
 #include "Modules/Crosshair/Crosshair.hpp"
 #include "Modules/CustomCrosshair/CustomCrosshair.hpp"
@@ -90,14 +91,15 @@
 #include "Modules/MovableCoordinates/MovableCoordinates.hpp"
 #include "Modules/MovableHotbar/MovableHotbar.hpp"
 #include "Modules/NullMovement/NullMovement.hpp"
-#include "Modules/Cursor/Cursor.hpp"
+#include "../../Scripting/Scripting.hpp"
+#include "../../Scripting/EventManager/ScriptingEventManager.hpp"
 #include "Modules/RawInputBuffer/RawInputBuffer.hpp"
 #include "Modules/JavaDynamicFOV/JavaDynamicFOV.hpp"
 #include "Modules/ItemUseDelayFix/ItemUseDelayFix.hpp"
-
-#include <Scripting/ScriptManager.hpp>
+#include "../../Scripting/Console/ConsoleService.hpp"
 
 #include "Modules/Mousestrokes/Mousestrokes.hpp"
+#include "Modules/ZeqaUtils/ZeqaUtils.hpp"
 
 namespace ModuleManager {
     std::map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -133,7 +135,7 @@ void ModuleManager::initialize() {
     addModule<UpsideDown>(); //3
 
     addModule<ClickGUI>();
-
+    addModule<Module202020>();
     addModule<FPSCounter>();
     addModule<CPSCounter>();
     addModule<IPDisplay>();
@@ -207,13 +209,9 @@ void ModuleManager::initialize() {
     addModule<NullMovement>();
     addModule<CustomCrosshair>();
 
-    if (!VersionUtils::checkAboveOrEqual(21, 50)) {
-        addModule<Cursor>();
-    }
-
-
     addModule<RawInputBuffer>();
     //addModule<ItemUseDelayFix>();
+    //addModule<ZeqaUtils>();
 
     addService<GUIKeyListener>();
     if (!VersionUtils::checkAboveOrEqual(21, 60)) {
@@ -229,7 +227,11 @@ void ModuleManager::initialize() {
     addService<ImGUIKeyListener>();
     addService<ScriptMarketplace>();
 
+    addService<ConsoleService>();
+    Scripting::loadModules();
+
     initialized = true;
+    Scripting::instalized = true;
 }
 
 void ModuleManager::terminate() {
@@ -241,6 +243,17 @@ void ModuleManager::terminate() {
     moduleMap.clear();
     services.clear();
 }
+
+
+
+
+void restart(){
+    Scripting::instalized = false;
+    Scripting::unloadModules();
+    Scripting::loadModules();
+    Scripting::instalized = true;
+}
+
 
 void ModuleManager::syncState() {
     if(!ModuleManager::initialized) return;
@@ -257,7 +270,7 @@ void ModuleManager::syncState() {
     }
     if (ModuleManager::restartModules) {
         ModuleManager::restartModules = false;
-        ScriptManager::reloadScripts();
+        restart();
     }
 }
 
@@ -266,8 +279,6 @@ void ModuleManager::SaveModulesConfig() {
     for (const auto& module : getModules()) {
         module->saveSettings();
     }
-
-    ScriptManager::saveSettings();
 }
 // TODO: use enums?
 bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {

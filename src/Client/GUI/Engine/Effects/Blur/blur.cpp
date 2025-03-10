@@ -407,7 +407,6 @@ void FlarialGUI::PrepareBlur(float intensity) {
     // Create Gaussian blur effect
     if (FlarialGUI::blur == nullptr) {
 
-        std::cout << "lol" << std::endl;
         D2D::context->CreateEffect(CLSID_D2D1GaussianBlur, &FlarialGUI::blur);
 
         FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);

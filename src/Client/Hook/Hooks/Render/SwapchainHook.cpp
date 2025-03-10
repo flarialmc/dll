@@ -5,6 +5,7 @@
 #include "../../../Client.hpp"
 #include <d3d11on12.h>
 #include <algorithm>
+#include <codecvt>
 #include <windows.h>
 #include <iostream>
 #include <Psapi.h>
@@ -114,6 +115,23 @@ void SwapchainHook::enableHook() {
     CreateDXGIFactory(IID_PPV_ARGS(&pFactory));
     Memory::hookFunc((*(LPVOID **) pFactory)[16], (void *) CreateSwapChainForCoreWindow,
                      (void **) &IDXGIFactory2_CreateSwapChainForCoreWindow, "CreateSwapchainForCoreWindow");
+
+
+    winrt::com_ptr<IDXGIAdapter> adapter;
+    pFactory->EnumAdapters(0, adapter.put());
+    DXGI_ADAPTER_DESC desc;
+    adapter->GetDesc(&desc);
+    std::wstring gpuNameW(desc.Description);
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+    std::string gpuName = converter.to_bytes(gpuNameW);
+    Logger::info("GPU name: {}", gpuName.c_str());
+    if (gpuName.contains("Intel")) {
+        fD3D11 = true;
+        queueReset = true;
+        Client::settings.getSettingByName<bool>("killdx")->value = true;
+    }
+
+
     Memory::SafeRelease(pFactory);
 
     bool isRTSS = containsModule(L"RTSSHooks64.dll");
@@ -147,21 +165,16 @@ HRESULT (*SwapchainHook::IDXGIFactory2_CreateSwapChainForCoreWindow)
 HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknown *pDevice, IUnknown *pWindow,
                                                     DXGI_SWAP_CHAIN_DESC1 *pDesc, IDXGIOutput *pRestrictToOutput,
                                                     IDXGISwapChain1 **ppSwapChain) {
-
     ID3D12CommandQueue *pCommandQueue = NULL;
-    if (Client::settings.getSettingByName<bool>("killdx")->value &&
-        !pDevice->QueryInterface(IID_PPV_ARGS(&pCommandQueue)) && !queueReset) {
+    if (Client::settings.getSettingByName<bool>("killdx")->value) queue = nullptr;
+    if (Client::settings.getSettingByName<bool>("killdx")->value && SUCCEEDED(pDevice->QueryInterface(IID_PPV_ARGS(&pCommandQueue)))) {
         pCommandQueue->Release();
         queue = nullptr;
+        Logger::success("Fell back to DX11");
         return DXGI_ERROR_INVALID_CALL;
     }
 
     pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
-
-    auto vsync = !Client::settings.getSettingByName<bool>("vsync")->value;
-    currentVsyncState = vsync;
-    if(vsync)
-        return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
 
     std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
 
@@ -192,13 +205,6 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
     if (Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
 
-    if(!fEnabled && !fD3D11 && Client::settings.getSettingByName<bool>("killdx")->value) {
-        fD3D11 = true;
-        return DXGI_ERROR_DEVICE_RESET;
-    } else {
-        fEnabled = true;
-    }
-
     if (queueReset) {
         init = false;
         initImgui = false;
@@ -206,11 +212,6 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         Logger::debug("Resetting SwapChain");
         ResizeHook::cleanShit(false);
         return DXGI_ERROR_DEVICE_RESET;
-    }
-
-    if(currentVsyncState != !Client::settings.getSettingByName<bool>("vsync")->value) {
-        queueReset = true;
-        return funcOriginal(pSwapChain, syncInterval, flags);
     }
 
     swapchain = pSwapChain;
@@ -266,11 +267,11 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     /* EACH FRAME STUFF */
 
     try {
-        if (init && initImgui && !FlarialGUI::hasLoadedAll) FlarialGUI::LoadAllImages();
-    } catch (const std::exception &ex) { return 0; }
+        if (init && initImgui && !FlarialGUI::hasLoadedAll) { FlarialGUI::LoadAllImages(); FlarialGUI::hasLoadedAll = true; }
+    } catch (const std::exception &ex) { Logger::error("Fail at loading all images: ", ex.what()); }
 
 
-    if (!SwapchainHook::currentVsyncState) {
+    if (Client::settings.getSettingByName<bool>("vsync")->value) {
         return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
     }
 
@@ -358,13 +359,6 @@ void SwapchainHook::DX12Init() {
 
         std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
 
-
-        if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
-            swapChainDescription.BufferCount = 2;
-        } else if (bufferingMode == "Triple Buffering") {
-            swapChainDescription.BufferCount = 3;
-        }
-
         bufferCount = swapChainDescription.BufferCount;
 
         DXGISurfaces.resize(bufferCount, nullptr);
@@ -449,6 +443,8 @@ void SwapchainHook::DX11Render() {
                 ImGui_ImplWin32_NewFrame();
 
                 ImGui::NewFrame();
+                ImGui::Begin("t", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
+
 
 
                 auto event = nes::make_holder<RenderEvent>();
@@ -468,6 +464,7 @@ void SwapchainHook::DX11Render() {
 
                 D2D::context->EndDraw();
 
+                ImGui::End();
                 ImGui::EndFrame();
                 ImGui::Render();
 
@@ -509,15 +506,6 @@ void SwapchainHook::DX12Render() {
 
     DXGI_SWAP_CHAIN_DESC sdesc;
     swapchain->GetDesc(&sdesc);
-
-    std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
-
-
-    if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
-        sdesc.BufferCount = 2;
-    } else if (bufferingMode == "Triple Buffering") {
-        sdesc.BufferCount = 3;
-    }
 
     buffersCounts = sdesc.BufferCount;
     frameContexts.resize(buffersCounts);
@@ -578,11 +566,13 @@ void SwapchainHook::DX12Render() {
                                         DXGI_FORMAT_R8G8B8A8_UNORM, d3d12DescriptorHeapImGuiRender,
                                         d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart(),
                                         d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart());
-                }
+                } ID3D12CommandQueue* cmdQueue;
 
                 ImGui_ImplDX12_NewFrame();
                 ImGui_ImplWin32_NewFrame();
                 ImGui::NewFrame();
+
+                ImGui::Begin("t", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
 
                 ID3D11Texture2D *buffer2D = nullptr;
                 D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&buffer2D));
@@ -631,6 +621,7 @@ void SwapchainHook::DX12Render() {
                                                      FALSE, nullptr);
                 d3d12CommandList->SetDescriptorHeaps(1, &d3d12DescriptorHeapImGuiRender);
 
+                ImGui::End();
                 ImGui::EndFrame();
                 ImGui::Render();
 

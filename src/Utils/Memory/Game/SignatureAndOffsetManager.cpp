@@ -37,7 +37,25 @@ void SignatureAndOffsetManager::clear() {
 }
 
 void SignatureAndOffsetManager::scanAllSignatures() {
-    for (auto& pair : sigs) {
-        pair.second.second = Memory::findSig(pair.second.first);
+    const unsigned int numThreads = std::thread::hardware_concurrency();
+    std::vector<std::thread> threads;
+    std::atomic<size_t> index{0};
+
+    auto worker = [this, &index]() {
+        while (true) {
+            size_t i = index.fetch_add(1, std::memory_order_relaxed);
+            if (i >= sigs.size()) break;  // No more work
+
+            auto& sigPair = *(std::next(sigs.begin(), i));
+            sigPair.second.second = Memory::findSig(sigPair.second.first);
+        }
+    };
+
+    for (unsigned int i = 0; i < numThreads; ++i) {
+        threads.emplace_back(worker);
+    }
+
+    for (auto& t : threads) {
+        t.join();
     }
 }

@@ -34,7 +34,7 @@ class BaseActorRendererRenderTextHook : public Hook {
 
         static std::map<std::string, TexturePtr> roleLogoTextures{};
 
-        TexturePtr ptr{};
+        TexturePtr* ptr{};
 
         for (const auto& [role, logo] : roleLogos) {
             if (APIUtils::hasRole(role, clearedName)) {
@@ -42,17 +42,17 @@ class BaseActorRendererRenderTextHook : public Hook {
                 auto has_value = roleLogoTextures.find(role) != roleLogoTextures.end();
                 if(!has_value) {
                     roleLogoTextures[role] = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
-                    ptr = roleLogoTextures[role];
+                    ptr = &roleLogoTextures[role];
                 } else {
-                    ptr = roleLogoTextures[role];
-                    if(ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr)
-                        ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
+                    ptr = &roleLogoTextures[role];
+                    if(ptr->clientTexture == nullptr || ptr->clientTexture->clientTexture.resourcePointerBlock == nullptr)
+                        roleLogoTextures[role] = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
                 }
                 break;
             }
         }
 
-        if(ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr)
+        if(!ptr || ptr->clientTexture == nullptr || ptr->clientTexture->clientTexture.resourcePointerBlock == nullptr)
             return;
 
         constexpr float DEG_RAD = 180.0f / 3.1415927f;
@@ -118,7 +118,7 @@ class BaseActorRendererRenderTextHook : public Hook {
         tess->vertexUV(x + size, y + size, 0.f, 1.f, 1.f);
         tess->vertexUV(x + size, y, 0.f, 1.f, 0.f);
 
-        MeshHelpers::renderMeshImmediately2(screenContext, tess, MaterialUtils::getNametag(), *ptr.clientTexture);
+        MeshHelpers::renderMeshImmediately2(screenContext, tess, MaterialUtils::getNametag(), ptr->clientTexture.get());
 
         stack.pop();
     }
@@ -135,13 +135,15 @@ class BaseActorRendererRenderTextHook : public Hook {
 
     static void BaseActorRenderer_renderTextCallback(ScreenContext* screenContext, ViewRenderData* viewData, NameTagRenderObject* tagData, Font* font, float size) {
 
+        if (!Client::settings.getSettingByName<bool>("nologoicon")->value)
         drawLogo(screenContext, viewData->cameraPos, viewData->cameraTargetPos, tagData->nameTag, tagData->pos, font);
         funcOriginal(screenContext, viewData, tagData, font, size);
     }
 
     static void BaseActorRenderer_renderTextCallback40(ScreenContext* screenContext, ViewRenderData* viewData, NameTagRenderObject* tagData, Font* font, void* mesh) {
-        drawLogo(screenContext, viewData->cameraPos, viewData->cameraTargetPos, tagData->nameTag, tagData->pos, font);
 
+        if (!Client::settings.getSettingByName<bool>("nologoicon")->value)
+        drawLogo(screenContext, viewData->cameraPos, viewData->cameraTargetPos, tagData->nameTag, tagData->pos, font);
         funcOriginal40(screenContext, viewData, tagData, font, mesh);
     }
 
