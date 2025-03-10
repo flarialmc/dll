@@ -119,11 +119,15 @@ void Client::initialize() {
         Client::disable = true;
         return;
     }
+    Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
 
+    Logger::success("Time: {:.2f}s", Client::elapsed);
 
     VersionUtils::addData();
 
+    Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
 
+    Logger::success("Time: {:.2f}s", Client::elapsed);
     std::vector<std::filesystem::path> directories = {
         Utils::getRoamingPath() + "\\Flarial",
         Utils::getRoamingPath() + "\\Flarial\\assets",
@@ -131,6 +135,7 @@ void Client::initialize() {
         Utils::getRoamingPath() + "\\Flarial\\Config",
         Utils::getRoamingPath() + "\\Flarial\\scripts",
     };
+
 
     std::thread updateThread([]() {
         std::string playersList;
@@ -149,6 +154,7 @@ void Client::initialize() {
             }
         }
 
+
         std::stringstream buffer;
         buffer << file.rdbuf();
         playersList = buffer.str();
@@ -157,19 +163,25 @@ void Client::initialize() {
         APIUtils::onlineUsers = APIUtils::ListToVector(playersList);
     });
 
-    updateThread.detach();
-    
+    updateThread.detach();    Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
+
+    Logger::success("Time: {:.2f}s", Client::elapsed);
+
 
     for (const auto& path : directories) {
         if (!std::filesystem::exists(path)) {
             std::filesystem::create_directory(path);
         }
-    }
+    }    Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
+
+    Logger::success("Time: {:.2f}s", Client::elapsed);
 
     Client::CheckSettingsFile();
     Client::LoadSettings();
 
-    Logger::success("4");
+    Logger::success("4");    Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
+
+    Logger::success("Time: {:.2f}s", Client::elapsed);
 
 
     ADD_SETTING("fontname", std::string("Space Grotesk"));

@@ -13,6 +13,8 @@ Client::settings.addSetting(setting, value);
 class Client {
 public:
     static std::string current_commit;
+    static float elapsed;
+    static uint64_t start;
 
     static std::vector<std::string> getPlayersVector(const nlohmann::json &data);
 

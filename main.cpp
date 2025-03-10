@@ -39,15 +39,18 @@ void SavePlayerCache() {
     }
 }
 
-DWORD WINAPI init() {
+float Client::elapsed;
+uint64_t Client::start;
 
-    uint64_t start = Utils::getCurrentMs();
+DWORD WINAPI init() {
+    Client::start = Utils::getCurrentMs();
     Logger::initialize();
     Audio::init();
     Client::initialize();
-    float elapsed = (Utils::getCurrentMs() - start) / 1000.0;
 
-    Logger::success("Flarial initialized in {:.2f}s", elapsed);
+    Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
+
+    Logger::success("Flarial initialized in {:.2f}s", Client::elapsed);
 
 
 
