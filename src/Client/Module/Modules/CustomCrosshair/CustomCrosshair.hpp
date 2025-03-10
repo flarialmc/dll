@@ -43,7 +43,7 @@ public:
 
         if (settings.getSettingByName<std::string>("enemyColor") == nullptr) settings.addSetting("enemyColor", (std::string) "FF0000");
         if (settings.getSettingByName<bool>("enemyColorRGB") == nullptr) settings.addSetting("enemyColorRGB", false);
-        if (settings.getSettingByName<float>("enemyOpacity") == nullptr) settings.addSetting("enemyOpacity", 0.55f);
+        if (settings.getSettingByName<float>("enemyOpacity") == nullptr) settings.addSetting("enemyOpacity", 1.f);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -138,7 +138,13 @@ public:
         auto useSolidColor = settings.getSettingByName<bool>("solidColor")->value;
         auto useSolidColorWhenHighlighted = settings.getSettingByName<bool>("solidColorWhenHighlighted")->value;
 
-        auto material = isHoveringEnemy && shouldHighlight && useSolidColorWhenHighlighted || useSolidColor ? MaterialUtils::getUITextured() : MaterialUtils::getUICrosshair();
+        bool useSolid = false;
+
+        if(isHoveringEnemy && shouldHighlight && useSolidColorWhenHighlighted || (!isHoveringEnemy && useSolidColor)) {
+            useSolid = true;
+        }
+
+        auto material = useSolid ? MaterialUtils::getUITextured() : MaterialUtils::getUICrosshair();
 
         bool isDefault = true;
 

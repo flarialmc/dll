@@ -28,7 +28,8 @@ public:
 
     void enable() const {
         if (valid)
-            MH_EnableHook(pointer);
+            MH_QueueEnableHook(pointer);
+        MH_ApplyQueued();
     }
 
     void disable() const {

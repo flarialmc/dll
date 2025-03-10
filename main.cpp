@@ -39,15 +39,19 @@ void SavePlayerCache() {
     }
 }
 
+float Client::elapsed;
+uint64_t Client::start;
+
 DWORD WINAPI init() {
-
-    uint64_t start = Utils::getCurrentMs();
+    Client::start = Utils::getCurrentMs();
     Logger::initialize();
-    Audio::init();
+    std::thread lol([]() { Audio::init(); });
+    lol.detach();
     Client::initialize();
-    float elapsed = (Utils::getCurrentMs() - start) / 1000.0;
 
-    Logger::success("Flarial initialized in {:.2f}s", elapsed);
+    Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
+
+    Logger::success("Flarial initialized in {:.2f}s", Client::elapsed);
 
 
 
@@ -120,7 +124,9 @@ DWORD WINAPI init() {
                     }
                 }
 
-                APIUtils::onlineVips = std::move(updatedVips);
+                if (!updatedVips.empty()) {
+                    APIUtils::onlineVips = std::move(updatedVips);
+                }
                 lastVipFetchTime = now;
             } catch (const std::exception& e) {
                 Logger::error("An error occurred while parsing VIP users: {}", e.what());
@@ -148,6 +154,7 @@ DWORD WINAPI init() {
 
     Client::SaveSettings();
 
+    Client::UnregisterActivationHandler();
     ModuleManager::terminate();
     Logger::custom(fmt::fg(fmt::color::pink), "ModuleManager", "Shut down");
     HookManager::terminate();

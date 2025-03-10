@@ -70,6 +70,7 @@
 #include <Modules/Misc/PackChanger/PackChanger.hpp>
 #include <Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp>
 
+#include "Modules/202020/202020.hpp"
 #include "Modules/ItemPhysics/ItemPhysics.hpp"
 #include "Modules/Crosshair/Crosshair.hpp"
 #include "Modules/CustomCrosshair/CustomCrosshair.hpp"
@@ -92,13 +93,13 @@
 #include "Modules/NullMovement/NullMovement.hpp"
 #include "../../Scripting/Scripting.hpp"
 #include "../../Scripting/EventManager/ScriptingEventManager.hpp"
-#include "Modules/Cursor/Cursor.hpp"
 #include "Modules/RawInputBuffer/RawInputBuffer.hpp"
 #include "Modules/JavaDynamicFOV/JavaDynamicFOV.hpp"
 #include "Modules/ItemUseDelayFix/ItemUseDelayFix.hpp"
 #include "../../Scripting/Console/ConsoleService.hpp"
 
 #include "Modules/Mousestrokes/Mousestrokes.hpp"
+#include "Modules/ZeqaUtils/ZeqaUtils.hpp"
 
 namespace ModuleManager {
     std::map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -134,7 +135,7 @@ void ModuleManager::initialize() {
     addModule<UpsideDown>(); //3
 
     addModule<ClickGUI>();
-
+    addModule<Module202020>();
     addModule<FPSCounter>();
     addModule<CPSCounter>();
     addModule<IPDisplay>();
@@ -208,13 +209,9 @@ void ModuleManager::initialize() {
     addModule<NullMovement>();
     addModule<CustomCrosshair>();
 
-    if (!VersionUtils::checkAboveOrEqual(21, 50)) {
-        addModule<Cursor>();
-    }
-
-
     addModule<RawInputBuffer>();
     //addModule<ItemUseDelayFix>();
+    //addModule<ZeqaUtils>();
 
     addService<GUIKeyListener>();
     if (!VersionUtils::checkAboveOrEqual(21, 60)) {
