@@ -1,0 +1,80 @@
+name: Build Flarial and UPLOAD to newcdn
+on:
+  
+  push:
+    branches: [ "main","scripting-v2" ]
+  pull_request:
+    branches: [ "main","scripting-v2" ]
+
+  workflow_dispatch:
+
+jobs:
+  windows-build:
+    runs-on: windows-latest
+    steps:
+    
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    
+    - name: Set Up MSVC Environment
+      uses: ilammy/msvc-dev-cmd@v1
+
+    
+    - name: Configure CMake
+      run: |
+        cmake -S . -B build -G "Ninja" -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_STANDARD=23 -DCMAKE_BUILD_TYPE=Release
+
+    
+    - name: Build DLL
+      run: |
+          cmake --build build
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v4.6.1
+      with:
+        name: Flarial_DLL
+        path: D:\a\dll\dll\build\Flarial.dll
+  
+  upload-to-cdn:
+    runs-on: ubuntu-latest
+    needs: windows-build
+    steps:
+      
+        - name: checkkout cdn
+          uses: actions/checkout@v4
+          with:
+            repository: 'TTF-fog/newcdn'
+            ref: 'main'
+            token:  ${{secrets.ACTIONS_GITHUB_TOKEN}}
+        - name: setup git config
+          run: |
+            git config user.name "GitHub Actions Bot"
+            git config user.email "actions@example.com"
+        - name: Download dll
+          uses: actions/download-artifact@v4.1.9
+        - name: push changes
+          run: |
+            ls
+            git add Flarial_DLL
+            git commit -m "womp"
+            git push origin main
+        # - name: Upload to CDN
+        
+          # uses: cpina/github-action-push-to-another-repository@main
+          # env:
+          #   SSH_DEPLOY_KEY: ${{secrets.SSH_DEPLOY_KEY}}
+          #   SOURCE_BEFORE_DIRECTORY: D:\a\dll\dll\build\  
+          #   SOURCE_DIRECTORY: Flarial_DLL  
+          #   DESTINATION_GITHUB_USERNAME: "TTF-fog"
+          #   DESTINATION_REPOSITORY_NAME: "newcdn"
+          #   USER_EMAIL: "ttf431@proton.me"
+          #   USER_NAME: "TTF-fog"
+          #   DESTINATION_REPOSITORY_USERNAME: "TTF-fog"  
+          #   GITHUB_SERVER: "github.com"
+          #   TARGET_BRANCH: "main"  
+          #   COMMIT_MESSAGE: "Your commit message"  
+          #   CREATE_TARGET_BRANCH_IF_NEEDED: "true"  
+        
+          
+        - name: Test get variable exported by push-to-another-repository
+          run: echo $DESTINATION_CLONED_DIRECTORY
