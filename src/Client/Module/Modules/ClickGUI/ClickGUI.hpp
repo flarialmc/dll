@@ -88,7 +88,7 @@ public:
     void onPacketReceive(PacketEvent &event) {
         if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
             auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
-            if(pkt->message != ""){
+            if(pkt->message.data() != nullptr && !pkt->message.length() != 0){
                 if (ClickGUI::containsAny(String::removeNonAlphanumeric(String::removeColorCodes(pkt->message)))){ pkt->message = "§f[§4FLARIAL§f]§r " + pkt->message;}
             }
         }
