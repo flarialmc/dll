@@ -53,7 +53,7 @@ jobs:
         - name: checkkout cdn
           uses: actions/checkout@v4
           with:
-            repository: 'TTF-fog/newcdn'
+            repository: 'flarialmc/newcdn'
             ref: 'main'
             token:  ${{secrets.ACTIONS_GITHUB_TOKEN}}
         - name: setup git config
