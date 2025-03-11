@@ -568,7 +568,12 @@ void Module::defaultConfig() {
     getKeybind();
 
     if (settings.getSettingByName<bool>("enabled") == nullptr) {
-        settings.addSetting("enabled", false);
+        if (name == "Zoom" or name == "Tab List") {
+            settings.addSetting("enabled", true);
+        }
+        else {
+            settings.addSetting("enabled", false);
+        }
     }
 
     if (settings.getSettingByName<float>("percentageX") == nullptr) {
