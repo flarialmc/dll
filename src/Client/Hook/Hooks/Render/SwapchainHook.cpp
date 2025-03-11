@@ -207,7 +207,7 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 // CREDIT @AETOPIA
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
-    if (Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
+    if (Client::disable) return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
 
     if (queueReset) {
         init = false;
@@ -270,7 +270,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     /* EACH FRAME STUFF */
 
     try {
-        if (init && initImgui && !FlarialGUI::hasLoadedAll) { FlarialGUI::LoadAllImages(); FlarialGUI::hasLoadedAll = true; }
+        if (init && initImgui && !FlarialGUI::hasLoadedAll && !queue) { FlarialGUI::LoadAllImages(); FlarialGUI::hasLoadedAll = true; }
     } catch (const std::exception &ex) { Logger::error("Fail at loading all images: ", ex.what()); }
 
 
@@ -278,7 +278,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
     }
 
-    return funcOriginal(pSwapChain, syncInterval, flags);
+    return funcOriginal(pSwapChain, syncInterval, syncInterval ? flags : DXGI_PRESENT_ALLOW_TEARING);
 
 }
 
