@@ -278,7 +278,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
     }
 
-    return funcOriginal(pSwapChain, syncInterval, flags);
+    return funcOriginal(pSwapChain, syncInterval, syncInterval ? flags : DXGI_PRESENT_ALLOW_TEARING);
 
 }
 
