@@ -16,7 +16,17 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    
+    - name: "Check if build commit"
+      run: |
+        
+        if ( "${{ github.event.head_commit.message }}" -like "*build:*" )
+        {echo "Continuing to build"}
+        else 
+        {
+        echo "Not a build commit, exiting"
+        exit 0
+        }
+        
     - name: Set Up MSVC Environment
       uses: ilammy/msvc-dev-cmd@v1
 
@@ -43,7 +53,7 @@ jobs:
         - name: checkkout cdn
           uses: actions/checkout@v4
           with:
-            repository: 'flarialmc/newcdn'
+            repository: 'TTF-fog/newcdn'
             ref: 'main'
             token:  ${{secrets.ACTIONS_GITHUB_TOKEN}}
         - name: setup git config
@@ -54,27 +64,15 @@ jobs:
           uses: actions/download-artifact@v4.1.9
         - name: push changes
           run: |
+            
+            name="Nightly_${GITHUB_SHA:0:6}_Add:$(echo '${{ github.event.head_commit.message }}')"
+            echo $name
+            name="${name//:/_}" 
+            name="${name// /_}"
+            mv ./Flarial_DLL "./$name"
             ls
-            git add Flarial_DLL
-            git commit -m "Nightly for '${{ github.event.head_commit.message }}' commit hash: '${{ github.sha }}'"
+            git add $name
+            git commit -m "Add Nightly for Build Commit: '${{ github.event.head_commit.message }}'"
             git push origin main
-        # - name: Upload to CDN
-        
-          # uses: cpina/github-action-push-to-another-repository@main
-          # env:
-          #   SSH_DEPLOY_KEY: ${{secrets.SSH_DEPLOY_KEY}}
-          #   SOURCE_BEFORE_DIRECTORY: D:\a\dll\dll\build\  
-          #   SOURCE_DIRECTORY: Flarial_DLL  
-          #   DESTINATION_GITHUB_USERNAME: "TTF-fog"
-          #   DESTINATION_REPOSITORY_NAME: "newcdn"
-          #   USER_EMAIL: "ttf431@proton.me"
-          #   USER_NAME: "TTF-fog"
-          #   DESTINATION_REPOSITORY_USERNAME: "TTF-fog"  
-          #   GITHUB_SERVER: "github.com"
-          #   TARGET_BRANCH: "main"  
-          #   COMMIT_MESSAGE: "Your commit message"  
-          #   CREATE_TARGET_BRANCH_IF_NEEDED: "true"  
-        
-          
-        - name: Test get variable exported by push-to-another-repository
-          run: echo $DESTINATION_CLONED_DIRECTORY
+
+       
