@@ -56,7 +56,7 @@ jobs:
           run: |
             ls
             git add Flarial_DLL
-            git commit -m "womp"
+            git commit -m "Nightly for '${{ github.event.head_commit.message }}' commit hash: '${{ github.sha }}'"
             git push origin main
         # - name: Upload to CDN
         
