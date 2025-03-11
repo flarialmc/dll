@@ -508,68 +508,47 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 
 }
 
-#include <future>
-#include <vector>
-#include <atomic>
-
 void FlarialGUI::LoadAllImages() {
-    if (SwapchainHook::queue) {
-        if (!SwapchainHook::d3d12DescriptorHeapImGuiIMAGE) {
-            D3D12_DESCRIPTOR_HEAP_DESC descriptorImGuiRender = {};
-            descriptorImGuiRender.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-            descriptorImGuiRender.NumDescriptors = MAX_IMAGE_ID;
-            descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	if(SwapchainHook::queue) {
 
-            SwapchainHook::d3d12Device5->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&SwapchainHook::d3d12DescriptorHeapImGuiIMAGE));
-        }
+		if(!SwapchainHook::d3d12DescriptorHeapImGuiIMAGE) {
 
-        // Use an atomic counter to safely increment the descriptor index across threads.
-        std::atomic<int> descriptorIndexCounter{ static_cast<int>(ImagesClass::ImguiDX12Images.size()) };
+			D3D12_DESCRIPTOR_HEAP_DESC descriptorImGuiRender = {};
+			descriptorImGuiRender.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+			descriptorImGuiRender.NumDescriptors = MAX_IMAGE_ID;
+			descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
-        // Vector to hold asynchronous tasks.
-        std::vector<std::future<void>> tasks;
+			SwapchainHook::d3d12Device5->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&SwapchainHook::d3d12DescriptorHeapImGuiIMAGE));
+		}
 
-        // Launch asynchronous tasks for each image.
-        for (int i = 100; i <= MAX_IMAGE_ID; i++) {
-            tasks.push_back(std::async(std::launch::async, [i, &descriptorIndexCounter]() {
-                ID3D12Resource* my_texture = nullptr;
-                UINT handleIncrement = SwapchainHook::d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-                // Get a unique descriptor index atomically.
-                int descriptorIndex = descriptorIndexCounter.fetch_add(1, std::memory_order_relaxed);
+		for(int i = 100; i <= MAX_IMAGE_ID; i++) {
+			if(i != IDR_PATAR_JPG) {
+				ID3D12Resource* my_texture = NULL;
 
-                D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetCPUDescriptorHandleForHeapStart();
-                cpuHandle.ptr += (handleIncrement * descriptorIndex);
+				UINT handle_increment = SwapchainHook::d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				int descriptor_index = ImagesClass::ImguiDX12Images.size();
+				D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetCPUDescriptorHandleForHeapStart();
+				cpu.ptr += (handle_increment * descriptor_index);
+				D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetGPUDescriptorHandleForHeapStart();
+				gpu.ptr += (handle_increment * descriptor_index);
+				if(LoadImageFromResource(i, cpu, &my_texture, "PNG")) ImagesClass::ImguiDX12Images[i] = (ImTextureID)gpu.ptr;
+			} else {
+				ID3D12Resource* my_texture = NULL;
 
-                D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetGPUDescriptorHandleForHeapStart();
-                gpuHandle.ptr += (handleIncrement * descriptorIndex);
+				UINT handle_increment = SwapchainHook::d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				int descriptor_index = ImagesClass::ImguiDX12Images.size();
+				D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetCPUDescriptorHandleForHeapStart();
+				cpu.ptr += (handle_increment * descriptor_index);
+				D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetGPUDescriptorHandleForHeapStart();
+				gpu.ptr += (handle_increment * descriptor_index);
+				if(LoadImageFromResource(i, cpu, &my_texture, "JPG")) ImagesClass::ImguiDX12Images[i] = (ImTextureID)gpu.ptr;
+			}
+		}
 
-                bool loaded = false;
-                // Load PNG images by default, JPG for the specific image.
-                if (i != IDR_PATAR_JPG) {
-                    loaded = LoadImageFromResource(i, cpuHandle, &my_texture, "PNG");
-                } else {
-                    loaded = LoadImageFromResource(i, cpuHandle, &my_texture, "JPG");
-                }
-                // If loading succeeded, assign the GPU descriptor to the global container.
-                if (loaded) {
-                    // Note: Ensure that writing to ImagesClass::ImguiDX12Images[i] is thread-safe.
-                    ImagesClass::ImguiDX12Images[i] = (ImTextureID)gpuHandle.ptr;
-                }
-            }));
-        }
-
-        // Wait for all asynchronous tasks to complete.
-        for (auto& task : tasks) {
-            task.get();
-        }
-    } else {
-        // For the non-queue case, processing remains synchronous.
-        for (int i = 100; i <= MAX_IMAGE_ID; i++) {
-            if (i != IDR_PATAR_JPG) {
-                LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "PNG");
-            } else {
-                LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "JPG");
-            }
-        }
-    }
+	} else {
+		for(int i = 100; i <= MAX_IMAGE_ID; i++) {
+			if(i != IDR_PATAR_JPG) LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "PNG");
+			else LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "JPG");
+		}
+	}
 }
