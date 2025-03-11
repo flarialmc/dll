@@ -269,9 +269,9 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     /* EACH FRAME STUFF */
 
-    try {
+    /*try {
         if (init && initImgui && !FlarialGUI::hasLoadedAll) { FlarialGUI::LoadAllImages(); FlarialGUI::hasLoadedAll = true; }
-    } catch (const std::exception &ex) { Logger::error("Fail at loading all images: ", ex.what()); }
+    } catch (const std::exception &ex) { Logger::error("Fail at loading all images: ", ex.what()); }*/
 
 
     if (Client::settings.getSettingByName<bool>("vsync")->value) {
