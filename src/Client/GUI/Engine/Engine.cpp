@@ -796,6 +796,8 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
     float sizeMultiplier = 1.0f;
     if(hasEnding(weightedName, "2.0")) sizeMultiplier = 0.6f;
 
+    if (!FontMap[weightedName]) return "";
+    if (FontMap[weightedName]->Scale <= 0.0f || !FontMap[weightedName]->IsLoaded()) return "";
     ImGui::PushFont(FontMap[weightedName]);
     float fSize = ((fontSize * Client::settings.getSettingByName<float>(moduleFont ? "modules_font_scale" : "gui_font_scale")->value) / 135) * sizeMultiplier;
 

@@ -563,16 +563,33 @@ std::string String::removeColorCodes(const std::string &input) {
 }
 
 std::string String::removeNonAlphanumeric(const std::string &input) {
-    std::regex pattern("[A-Za-z][A-Za-z0-9 ]{2,16}");
-    std::smatch match;
-    if (std::regex_search(input, match, pattern)) {
-        std::string nickname = match.str();
-        // Remove trailing spaces
-        nickname.erase(nickname.find_last_not_of(" ") + 1);
-        return nickname;
-    } else {
-        return "";
+    // Need at least 3 characters: 1 letter + 2 more
+    for (size_t i = 0; i <= input.size() - 3; ++i) {
+        // Check if current character is a letter
+        if (std::isalpha(static_cast<unsigned char>(input[i]))) {
+            // Check if next two characters are alphanumeric or space
+            if ((std::isalnum(static_cast<unsigned char>(input[i + 1])) || input[i + 1] == ' ') &&
+                (std::isalnum(static_cast<unsigned char>(input[i + 2])) || input[i + 2] == ' ')) {
+                // Find the end of the sequence of valid characters
+                size_t p = i + 1;
+                while (p < input.size() &&
+                       (std::isalnum(static_cast<unsigned char>(input[p])) || input[p] == ' ')) {
+                    ++p;
+                       }
+                // Length after initial letter (max 16), total length <= 17
+                size_t m = std::min(static_cast<size_t>(16), p - i - 1);
+                // Extract substring: from i, length is m + 1 (including initial letter)
+                std::string nickname = input.substr(i, m + 1);
+                // Trim trailing spaces
+                size_t last = nickname.find_last_not_of(' ');
+                if (last != std::string::npos) {
+                    nickname = nickname.substr(0, last + 1);
+                }
+                return nickname;
+                }
+        }
     }
+    return "";
 }
 
 std::string String::removeNonNumeric(const std::string& string) {
