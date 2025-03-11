@@ -207,7 +207,7 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 // CREDIT @AETOPIA
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
-    if (Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
+    if (Client::disable) return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
 
     if (queueReset) {
         init = false;
