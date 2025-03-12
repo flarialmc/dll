@@ -300,6 +300,9 @@ public:
 };
 
 class String {
+    static inline std::map<std::string, std::string> cacheRemoveColor;
+    static inline std::map<std::string, std::string> cacheRemoveAlnum;
+    static inline std::mutex cacheMutex;
 public:
     static std::string replaceAll(std::string& string, std::string_view c1, std::string_view c2);
 
