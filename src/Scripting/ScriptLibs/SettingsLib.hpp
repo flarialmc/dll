@@ -12,7 +12,7 @@ public:
 
         getGlobalNamespace(state)
             .beginClass<BoolSetting>("BoolSetting")
-                .addProperty("value", &BoolSetting::defaultValue)
+                .addProperty("value", &BoolSetting::value)
             .endClass();
 
         getGlobalNamespace(state)

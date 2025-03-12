@@ -97,6 +97,7 @@
 
 #include "Modules/Mousestrokes/Mousestrokes.hpp"
 #include "Modules/ZeqaUtils/ZeqaUtils.hpp"
+#include "Scripting/ScriptManager.hpp"
 
 namespace ModuleManager {
     std::map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -260,6 +261,8 @@ void ModuleManager::SaveModulesConfig() {
     for (const auto& module : getModules()) {
         module->saveSettings();
     }
+
+    ScriptManager::saveSettings();
 }
 // TODO: use enums?
 bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {

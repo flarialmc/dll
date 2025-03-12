@@ -49,6 +49,10 @@ public:
         if (const auto script = linkedScript.lock()) {
             gScriptSettingManager.loadSettings(script.get());
         }
+
+        if (settings.getSettingByName<std::string>("text") == nullptr) {
+            settings.addSetting("text", static_cast<std::string>("{VALUE}"));
+        }
     }
 
     void settingsRender(float settingsOffset) override {
@@ -70,11 +74,7 @@ public:
                     switch (settingPtr->type) {
                         case ScriptSettingType::Bool: {
                             if (auto* boolSet = dynamic_cast<BoolSetting*>(settingPtr.get()); boolSet) {
-                                if (auto* setting = gScriptSettingManager.getSetting<BoolSetting>(script.get(), boolSet->name)) {
-                                    this->addToggle(boolSet->displayName, boolSet->description, setting->value);
-                                } else {
-                                    this->addToggle(boolSet->displayName, boolSet->description, boolSet->defaultValue);
-                                }
+                                this->addToggle(boolSet->displayName, boolSet->description, boolSet->value);
                             }
                             break;
                         }

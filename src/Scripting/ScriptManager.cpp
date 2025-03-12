@@ -59,7 +59,7 @@ void ScriptManager::loadScripts() {
         if (script->compile()) {
             Logger::info("Successfully loaded script '{}'", script->getName());
 
-            auto mod = ModuleManager::makeModule<ScriptModuleBase>(
+            auto mod = std::make_shared<ScriptModuleBase>(
                 script->getName(),
                 script->getDescription(),
                 script->getState(),
@@ -67,7 +67,7 @@ void ScriptManager::loadScripts() {
 
             mLoadedModules.emplace_back(mod);
             mod->defaultConfig();
-            mod->loadSettings();
+            ModuleManager::cguiRefresh = true;
         } else {
             mLoadedScripts.pop_back();
         }
