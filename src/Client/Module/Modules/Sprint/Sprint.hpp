@@ -5,7 +5,7 @@
 
 class Sprint : public Module {
 public:
-    Sprint() : Module("Toggle Sprint", "Automatically sprints for you!!!", IDR_AUTO_SPRINT_PNG, "SHIFT") {
+    Sprint() : Module("Toggle Sprint", "Automatically sprints for you!!!", IDR_AUTO_SPRINT_PNG, "CTRL") {
         Module::setup();
     };
 
@@ -51,6 +51,7 @@ public:
 
 
         this->addHeader("Sprint Function");
+        this->addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
         this->addToggle("Always Sprint", "Also known as auto sprint", this->settings.getSettingByName<bool>("always")->value);
         this->addToggle("Show Status", "",  this->settings.getSettingByName<bool>("status")->value);
 
