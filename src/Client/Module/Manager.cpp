@@ -201,7 +201,7 @@ void ModuleManager::initialize() {
 
     addModule<Mousestrokes>();
 
-    if (VersionUtils::checkAboveOrEqual(21, 40) && VersionUtils::checkBetween(21, 50, 21, 59) == false) {
+    if (VersionUtils::checkAboveOrEqual(21, 40)) {
         addModule<JavaInventoryHotkeys>();
     }
 

@@ -207,10 +207,10 @@ public:
                         SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()
                         );
 
-                    for (const auto &pair : vecmap) {
+                    for (const auto &rawName : vecmap) {
                         i++;
 
-                        std::string name = String::removeColorCodes(pair.second.name);
+                        std::string name = String::removeColorCodes(rawName);
                         if (name.empty()) continue;
 
                         std::string clearedName = String::removeNonAlphanumeric(name);
@@ -365,16 +365,18 @@ public:
 
      };
 
-     static std::vector<std::pair<mcUUID, PlayerListEntry>>
-  copyMapInAlphabeticalOrder(const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap) {
-         // Copy the unordered_map into a vector
-         std::vector<std::pair<mcUUID, PlayerListEntry>> sortedPairs(sourceMap.begin(), sourceMap.end());
+     static std::vector<std::string> copyMapInAlphabeticalOrder(const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap) {
+         std::vector<std::string> names;
+
+         for (const auto &pair: sourceMap) {
+             names.push_back(pair.second.name);
+         }
 
          // Sort the vector by name in a case-insensitive manner
-         std::sort(sortedPairs.begin(), sortedPairs.end(), [](const auto &a, const auto &b) {
+         std::sort(names.begin(), names.end(), [](const auto &a, const auto &b) {
              // Use references to avoid copying strings
-             const auto& nameA = a.second.name;
-             const auto& nameB = b.second.name;
+             const auto& nameA = a;
+             const auto& nameB = b;
 
              // Compare names case-insensitively
              return std::lexicographical_compare(nameA.begin(), nameA.end(), nameB.begin(), nameB.end(),
@@ -383,7 +385,7 @@ public:
                  });
          });
 
-         return sortedPairs;
+         return names;
      }
 };
 

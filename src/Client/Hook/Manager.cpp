@@ -80,15 +80,14 @@ void HookManager::initialize() {
     addHook<SendPacketHook>();
     addHook<getSensHook>();
     addHook<HudMobEffectsRendererHook>();
-    addHook<HudCursorRendererHook>();
-    if(VersionUtils::checkAboveOrEqual(20, 60)) {
+    if(VersionUtils::checkAboveOrEqual(20, 60)) { // due to texture group offset
+        addHook<HudCursorRendererHook>();
         addHook<BaseActorRendererRenderTextHook>();
     }
     addHook<UIControl_updateCachedPositionHook>();
     addHook<GeneralSettingsScreenControllerCtorHook>();
-    if(VersionUtils::checkAboveOrEqual(21, 40)) {
-        addHook<ContainerScreenControllerHook>();
-    }
+
+    addHook<ContainerScreenControllerHook>();
 
     addHook<isPreGameHook>();
     addHook<_composeFullStackHook>();
