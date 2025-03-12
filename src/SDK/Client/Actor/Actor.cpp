@@ -278,7 +278,7 @@ bool Actor::isValid() {
     if(!lp) return false;
     auto level = lp->getLevel();
     if(!level) return false;
-    if(!this->GetEntityContextV1_20_50().isValid()) return false;
+    //if(!this->GetEntityContextV1_20_50().isValid()) return false;
     return true;
 }
 

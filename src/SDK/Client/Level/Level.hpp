@@ -26,7 +26,7 @@ public:
     mcUUID UUID;
     std::string name, XUID, platformOnlineId;
     int buildPlatform;
-    PlayerSkin playerSkin;
+    PlayerSkin playerSkin; // req backporting
     bool isTeacher, isHost, isSubClient;
     PlayerListEntry& operator=(const PlayerListEntry& other) {
         return *this;
