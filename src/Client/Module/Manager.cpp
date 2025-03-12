@@ -100,6 +100,7 @@
 
 #include "Modules/Mousestrokes/Mousestrokes.hpp"
 #include "Modules/ZeqaUtils/ZeqaUtils.hpp"
+#include "Modules/AutoPerspective/AutoPerspective.hpp"
 
 namespace ModuleManager {
     std::map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -167,6 +168,8 @@ void ModuleManager::initialize() {
     addModule<WeatherChanger>();
     addModule<NickModule>();
     addModule<FreeLook>();
+
+    addModule<AutoPerspective>();
 
     addModule<AutoGG>();
     addModule<TextHotkey>();
