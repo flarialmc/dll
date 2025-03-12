@@ -534,62 +534,122 @@ std::string String::WStrToStr(const std::wstring& ws) {
 }
 
 std::string String::removeColorCodes(const std::string &input) {
-    std::string result;
-
-    bool skipNext = false;
-    for (size_t i = 0; i < input.size();) {
-        if (skipNext) {
-            skipNext = false;
-            ++i;
-        } else if (input[i] == '\xC2' && i + 1 < input.size() && input[i + 1] == '\xA7') {
-            skipNext = true;
-            i += 2;
-        } else {
-            if ((input[i] & 0xC0) == 0xC0) { // UTF-8 continuation byte
-                size_t bytesLeft = 0;
-                while ((input[i + bytesLeft] & 0xC0) == 0x80) {
-                    ++bytesLeft;
-                }
-                result.append(input, i, bytesLeft + 1);
-                i += bytesLeft + 1;
-            } else {
-                result += input[i];
-                ++i;
-            }
-        }
+    {
+        std::lock_guard<std::mutex> lock(cacheMutex);
+        auto it = cacheRemoveColor.find(input);
+        if (it != cacheRemoveColor.end()) return it->second;
     }
 
-    return result;
+    const unsigned int numThreads = std::thread::hardware_concurrency();
+    const unsigned int threads = (numThreads == 0) ? 2 : numThreads;
+    size_t segmentSize = input.size() / threads;
+
+    std::vector<std::future<std::string>> futures;
+    std::vector<std::string> results(threads);
+
+    for (unsigned int t = 0; t < threads; ++t) {
+        size_t start = t * segmentSize;
+        size_t end = (t == threads - 1) ? input.size() : std::min(input.size(), (t + 1) * segmentSize);
+
+        while (start > 0 && (input[start] & 0xC0) == 0x80) ++start;
+        while (end < input.size() && (input[end] & 0xC0) == 0x80) ++end;
+
+        futures.push_back(std::async(std::launch::async, [&, start, end]() -> std::string {
+            std::string result;
+            result.reserve(end - start);
+            bool skipNext = false;
+
+            for (size_t i = start; i < end;) {
+                if (skipNext) {
+                    skipNext = false;
+                    ++i;
+                } else if (i + 1 < input.size() && input[i] == '\xC2' && input[i + 1] == '\xA7') {
+                    skipNext = true;
+                    i += 2;
+                } else {
+                    result += input[i];
+                    ++i;
+                }
+            }
+            return result;
+        }));
+    }
+
+    size_t totalSize = 0;
+    for (auto &f : futures) {
+        results.push_back(f.get());
+        totalSize += results.back().size();
+    }
+
+    std::string finalResult;
+    finalResult.reserve(totalSize);
+    for (const auto &part : results) {
+        finalResult.append(part);
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(cacheMutex);
+        cacheRemoveColor[input] = finalResult;
+    }
+    return finalResult;
 }
 
 std::string String::removeNonAlphanumeric(const std::string &input) {
-    // Need at least 3 characters: 1 letter + 2 more
-    for (size_t i = 0; i <= input.size() - 3; ++i) {
-        // Check if current character is a letter
-        if (std::isalpha(static_cast<unsigned char>(input[i]))) {
-            // Check if next two characters are alphanumeric or space
-            if ((std::isalnum(static_cast<unsigned char>(input[i + 1])) || input[i + 1] == ' ') &&
-                (std::isalnum(static_cast<unsigned char>(input[i + 2])) || input[i + 2] == ' ')) {
-                // Find the end of the sequence of valid characters
-                size_t p = i + 1;
-                while (p < input.size() &&
-                       (std::isalnum(static_cast<unsigned char>(input[p])) || input[p] == ' ')) {
-                    ++p;
-                       }
-                // Length after initial letter (max 16), total length <= 17
-                size_t m = std::min(static_cast<size_t>(16), p - i - 1);
-                // Extract substring: from i, length is m + 1 (including initial letter)
-                std::string nickname = input.substr(i, m + 1);
-                // Trim trailing spaces
-                size_t last = nickname.find_last_not_of(' ');
-                if (last != std::string::npos) {
-                    nickname = nickname.substr(0, last + 1);
+    {
+        std::lock_guard<std::mutex> lock(cacheMutex);
+        auto it = cacheRemoveAlnum.find(input);
+        if (it != cacheRemoveAlnum.end()) return it->second;
+    }
+
+    if (input.size() < 3) return "";
+
+    const unsigned int numThreads = std::thread::hardware_concurrency();
+    const unsigned int threads = numThreads == 0 ? 2 : numThreads;
+    size_t segmentSize = input.size() / threads;
+
+    std::vector<std::future<std::pair<size_t, std::string>>> futures;
+    for (unsigned int t = 0; t < threads; ++t) {
+        size_t start = t * segmentSize;
+        size_t end = (t == threads - 1) ? input.size() : std::min(input.size(), (t + 1) * segmentSize + 2);
+
+        futures.push_back(std::async(std::launch::async, [&, start, end]() -> std::pair<size_t, std::string> {
+            for (size_t i = start; i + 2 < end; ++i) {
+                if (std::isalpha(static_cast<unsigned char>(input[i]))) {
+                    if ((std::isalnum(static_cast<unsigned char>(input[i + 1])) || input[i + 1] == ' ') &&
+                        (std::isalnum(static_cast<unsigned char>(input[i + 2])) || input[i + 2] == ' ')) {
+
+                        size_t p = i + 1;
+                        while (p < input.size() && (std::isalnum(static_cast<unsigned char>(input[p])) || input[p] == ' ')) {
+                            ++p;
+                        }
+                        size_t m = std::min(static_cast<size_t>(16), p - i - 1);
+                        std::string nickname = input.substr(i, m + 1);
+
+                        size_t last = nickname.find_last_not_of(' ');
+                        if (last != std::string::npos) {
+                            nickname = nickname.substr(0, last + 1);
+                        }
+                        return {i, nickname};
+                    }
                 }
-                return nickname;
-                }
+            }
+            return {std::string::npos, ""};
+        }));
+    }
+
+    std::pair<size_t, std::string> bestResult {std::string::npos, ""};
+    for (auto &f : futures) {
+        auto res = f.get();
+        if (res.first != std::string::npos && (bestResult.first == std::string::npos || res.first < bestResult.first)) {
+            bestResult = res;
         }
     }
-    return "";
+
+    {
+        std::lock_guard<std::mutex> lock(cacheMutex);
+        cacheRemoveAlnum[input] = bestResult.second;
+    }
+    return bestResult.second;
 }
 
 std::string String::removeNonNumeric(const std::string& string) {

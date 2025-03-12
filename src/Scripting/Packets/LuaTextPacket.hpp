@@ -31,8 +31,8 @@ namespace LuaTextPacket {
         const char* messageStr = pkt->message.c_str();
         pushKeyPair(L, "message", (messageStr && *messageStr && strlen(messageStr) > 0) ? messageStr : ":)");
 
-        const char* xuidStr = pkt->xuid.c_str();
-        pushKeyPair(L, "xuid", (xuidStr && *xuidStr && strlen(xuidStr) > 0) ? xuidStr : ":)");
+        // const char* xuidStr = pkt->xuid.c_str();
+        // pushKeyPair(L, "xuid", (xuidStr && *xuidStr && strlen(xuidStr) > 0) ? xuidStr : ":)");
         return 1;
     }
 
