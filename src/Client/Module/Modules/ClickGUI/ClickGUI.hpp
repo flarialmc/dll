@@ -41,6 +41,18 @@
 #define o_colors_secondary8 clickgui->settings.getSettingByName<float>("o_colors_secondary8")->value
 #define colors_secondary8_rgb clickgui->settings.getSettingByName<bool>("colors_secondary8_rgb")->value
 
+#define colors_FlarialLogo FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_FlarialLogo")->value)
+#define o_colors_FlarialLogo clickgui->settings.getSettingByName<float>("o_colors_FlarialLogo")->value
+#define colors_FlarialLogo_rgb clickgui->settings.getSettingByName<bool>("colors_FlarialLogo_rgb")->value
+
+#define colors_radiobutton_enabled FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_radiobutton_enabled")->value)
+#define o_colors_radiobutton_enabled clickgui->settings.getSettingByName<float>("o_colors_radiobutton_enabled")->value
+#define colors_radiobutton_enabled_rgb clickgui->settings.getSettingByName<bool>("colors_radiobutton_enabled_rgb")->value
+
+#define colors_radiobutton_disabled FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_radiobutton_disabled")->value)
+#define o_colors_radiobutton_disabled clickgui->settings.getSettingByName<float>("o_colors_radiobutton_disabled")->value
+#define colors_radiobutton_disabled_rgb clickgui->settings.getSettingByName<bool>("colors_radiobutton_disabled_rgb")->value
+
 class TextPacket;
 
 struct PageType {
@@ -80,16 +92,18 @@ public:
     static float inline accumilatedBarPos = 1;
     static bool inline isAnimatingModSet = false;
 
-    bool containsAny(const std::string& str) {
+    static bool containsAny(const std::string& str) {
         return std::any_of(APIUtils::onlineUsers.begin(), APIUtils::onlineUsers.end(),
-                           [&](const std::string& user) { return str.find(user) != std::string::npos; });
+                            [&](const std::string& user) {
+                                return !user.empty() && str.find(user) != std::string::npos;
+                            });
     }
 
     void onPacketReceive(PacketEvent &event) {
         if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
             auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
-            if(pkt->message.length() != 0){
-                if (ClickGUI::containsAny(String::removeNonAlphanumeric(String::removeColorCodes(pkt->message)))){ pkt->message = "§f[§4FLARIAL§f]§r " + pkt->message;}
+            if(!pkt->message.empty()){
+                if (containsAny(String::removeNonAlphanumeric(String::removeColorCodes(pkt->message)))){ pkt->message = "§f[§4FLARIAL§f]§r " + pkt->message;}
             }
         }
     }
@@ -258,6 +272,41 @@ public:
             settings.addSetting("o_colors_mod4", 1.0f);
         if (settings.getSettingByName<bool>("colors_mod4_rgb") == nullptr)
             settings.addSetting("colors_mod4_rgb", false);
+
+        if (settings.getSettingByName<std::string>("colors_modicon") == nullptr)
+            settings.addSetting("colors_modicon", (std::string)"1A1313");
+        if (settings.getSettingByName<float>("o_colors_modicon") == nullptr)
+            settings.addSetting("o_colors_modicon", 1.0f);
+        if (settings.getSettingByName<bool>("colors_modicon_rgb") == nullptr)
+            settings.addSetting("colors_modicon_rgb", false);
+
+        if (settings.getSettingByName<std::string>("colors_FlarialLogo") == nullptr)
+            settings.addSetting("colors_FlarialLogo", (std::string)"FE4443");
+        if (settings.getSettingByName<float>("o_colors_FlarialLogo") == nullptr)
+            settings.addSetting("o_colors_FlarialLogo", 1.0f);
+        if (settings.getSettingByName<bool>("colors_FlarialLogo_rgb") == nullptr)
+            settings.addSetting("colors_FlarialLogo_rgb", false);
+
+        if (settings.getSettingByName<std::string>("colors_mod_settings_icon") == nullptr)
+            settings.addSetting("colors_mod_settings_icon", (std::string)"FFFFFF");
+        if (settings.getSettingByName<float>("o_colors_mod_settings_icon") == nullptr)
+            settings.addSetting("o_colors_mod_settings_icon", 1.0f);
+        if (settings.getSettingByName<bool>("colors_mod_settings_icon_rgb") == nullptr)
+            settings.addSetting("colors_mod_settings_icon_rgb", false);
+
+        if (settings.getSettingByName<std::string>("colors_radiobutton_enabled") == nullptr)
+            settings.addSetting("colors_radiobutton_enabled", (std::string)"D0A0A8");
+        if (settings.getSettingByName<float>("o_colors_radiobutton_enabled") == nullptr)
+            settings.addSetting("o_colors_radiobutton_enabled", 1.0f);
+        if (settings.getSettingByName<bool>("colors_radiobutton_enabled_rgb") == nullptr)
+            settings.addSetting("colors_radiobutton_enabled_rgb", false);
+
+        if (settings.getSettingByName<std::string>("colors_radiobutton_disabled") == nullptr)
+            settings.addSetting("colors_radiobutton_disabled", (std::string)"FFFFFF");
+        if (settings.getSettingByName<float>("o_colors_radiobutton_disabled") == nullptr)
+            settings.addSetting("o_colors_radiobutton_disabled", 1.0f);
+        if (settings.getSettingByName<bool>("colors_radiobutton_disabled_rgb") == nullptr)
+            settings.addSetting("colors_radiobutton_disabled_rgb", false);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -274,100 +323,130 @@ public:
             Constraints::RelativeConstraint(1.0, "width"),
             Constraints::RelativeConstraint(0.88f, "height"));
 
+        this->addHeader("Keybinds");
+        this->addKeybind("Open Menu Bind", "", settings.getSettingByName<std::string>("keybind")->value);
+        this->addKeybind("Edit Menu Bind", "", settings.getSettingByName<std::string>("editmenubind")->value);
 
-        ModuleManager::getModule("ClickGUI")->addKeybind("Edit Menu Bind", "", settings.getSettingByName<std::string>("editmenubind")->value);
-
-        ModuleManager::getModule("ClickGUI")->addHeader("Colors");
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Text Color", "",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_text")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_text")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_text_rgb")->value
+        this->extraPadding();
+        
+        this->addHeader("Colors");
+        this->addColorPicker("Logo Color", "Color of the client's logo",
+            this->settings.getSettingByName<std::string>("colors_FlarialLogo")->value,
+            this->settings.getSettingByName<float>("o_colors_FlarialLogo")->value,
+            this->settings.getSettingByName<bool>("colors_FlarialLogo_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Enabled", "",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_enabled")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_enabled")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_enabled_rgb")->value
+        this->addColorPicker("Radio Button Icon Disabled", "",
+            this->settings.getSettingByName<std::string>("colors_radiobutton_enabled")->value,
+            this->settings.getSettingByName<float>("o_colors_radiobutton_enabled")->value,
+            this->settings.getSettingByName<bool>("colors_radiobutton_enabled_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Disabled", "",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_disabled")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_disabled")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_enabled_rgb")->value
+        this->addColorPicker("Radio Button Icon Enabled", "",
+            this->settings.getSettingByName<std::string>("colors_radiobutton_disabled")->value,
+            this->settings.getSettingByName<float>("o_colors_radiobutton_disabled")->value,
+            this->settings.getSettingByName<bool>("colors_radiobutton_disabled_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Primary 1", "Color of active elements, main color of sliders , background color of enabled toggles",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_primary1")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_primary1")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_primary1_rgb")->value
+        this->addColorPicker("Text Color", "",
+            this->settings.getSettingByName<std::string>("colors_text")->value,
+            this->settings.getSettingByName<float>("o_colors_text")->value,
+            this->settings.getSettingByName<bool>("colors_text_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Primary 2", "Minor color of toggles and sliders, text Indicator color",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_primary2")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_primary2")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_primary2_rgb")->value
+        this->addColorPicker("Enabled", "",
+            this->settings.getSettingByName<std::string>("colors_enabled")->value,
+            this->settings.getSettingByName<float>("o_colors_enabled")->value,
+            this->settings.getSettingByName<bool>("colors_enabled_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Primary 3", "Color of inactive elements, unfilled slider bar color, inner color of color pickers, background color of disabled toggles",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_primary3")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_primary3")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_primary3_rgb")->value
+        this->addColorPicker("Disabled", "",
+            this->settings.getSettingByName<std::string>("colors_disabled")->value,
+            this->settings.getSettingByName<float>("o_colors_disabled")->value,
+            this->settings.getSettingByName<bool>("colors_enabled_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Primary 4", "Base color of color pickers, hover color of dropdown childrens",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_primary4")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_primary4")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_primary4_rgb")->value
+        this->addColorPicker("Primary 1", "Color of active elements, main color of sliders , background color of enabled toggles",
+            this->settings.getSettingByName<std::string>("colors_primary1")->value,
+            this->settings.getSettingByName<float>("o_colors_primary1")->value,
+            this->settings.getSettingByName<bool>("colors_primary1_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Secondary 1", "Background color of settings",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary1")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary1")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary1_rgb")->value
+        this->addColorPicker("Primary 2", "Minor color of toggles and sliders, text Indicator color",
+            this->settings.getSettingByName<std::string>("colors_primary2")->value,
+            this->settings.getSettingByName<float>("o_colors_primary2")->value,
+            this->settings.getSettingByName<bool>("colors_primary2_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Secondary 2", "Background color of navigation bar, tooltips, and buttons",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary2")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_secondary2")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
+        this->addColorPicker("Primary 3", "Color of inactive elements, unfilled slider bar color, inner color of color pickers, background color of disabled toggles",
+            this->settings.getSettingByName<std::string>("colors_primary3")->value,
+            this->settings.getSettingByName<float>("o_colors_primary3")->value,
+            this->settings.getSettingByName<bool>("colors_primary3_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Secondary 3", "Background color of base Click GUI rectangle",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary3")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary3")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary3_rgb")->value
+        this->addColorPicker("Primary 4", "Base color of color pickers, hover color of dropdown childrens",
+            this->settings.getSettingByName<std::string>("colors_primary4")->value,
+            this->settings.getSettingByName<float>("o_colors_primary4")->value,
+            this->settings.getSettingByName<bool>("colors_primary4_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Secondary 4", "Background color of active Modules search bar",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary4")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary4")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary4_rgb")->value
+        this->addColorPicker("Secondary 1", "Background color of settings",
+            this->settings.getSettingByName<std::string>("colors_secondary1")->value,
+            this->settings.getSettingByName<float>("o_colors_secondary1")->value,
+            this->settings.getSettingByName<bool>("colors_secondary1_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Secondary 5", "Background color of navigation bar icons",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary5")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary5")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary5_rgb")->value
+        this->addColorPicker("Secondary 2", "Background color of navigation bar, tooltips, and buttons",
+            this->settings.getSettingByName<std::string>("colors_secondary2")->value,
+            this->settings.getSettingByName<float>("o_secondary2")->value,
+            this->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Secondary 6", "Background color of active navigation bar buttons",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary6")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary6")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary6_rgb")->value
+        this->addColorPicker("Secondary 3", "Background color of base Click GUI rectangle",
+            this->settings.getSettingByName<std::string>("colors_secondary3")->value,
+            this->settings.getSettingByName<float>("o_colors_secondary3")->value,
+            this->settings.getSettingByName<bool>("colors_secondary3_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Secondary 7", "Outline color of tooltips",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_secondary7")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_secondary7")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
+        this->addColorPicker("Secondary 4", "Background color of active Modules search bar",
+            this->settings.getSettingByName<std::string>("colors_secondary4")->value,
+            this->settings.getSettingByName<float>("o_colors_secondary4")->value,
+            this->settings.getSettingByName<bool>("colors_secondary4_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Modcard 1", "Color of top rounded rectangle",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_mod1")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_mod1")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_mod1_rgb")->value
+        this->addColorPicker("Secondary 5", "Background color of navigation bar icons",
+            this->settings.getSettingByName<std::string>("colors_secondary5")->value,
+            this->settings.getSettingByName<float>("o_colors_secondary5")->value,
+            this->settings.getSettingByName<bool>("colors_secondary5_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Modcard 2", "Color of bottom rounded rectangle",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_mod2")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_mod2")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_mod2_rgb")->value
+        this->addColorPicker("Secondary 6", "Background color of active navigation bar buttons",
+            this->settings.getSettingByName<std::string>("colors_secondary6")->value,
+            this->settings.getSettingByName<float>("o_colors_secondary6")->value,
+            this->settings.getSettingByName<bool>("colors_secondary6_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Modcard 3", "Background color of module icons, outer color of module settings icon",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_mod3")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_mod3")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_mod3_rgb")->value
+        this->addColorPicker("Secondary 7", "Outline color of tooltips",
+            this->settings.getSettingByName<std::string>("colors_secondary7")->value,
+            this->settings.getSettingByName<float>("o_colors_secondary7")->value,
+            this->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
         );
-        ModuleManager::getModule("ClickGUI")->addColorPicker("Modcard 4", "Inner color of module settings icon",
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("colors_mod4")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<float>("o_colors_mod4")->value,
-            ModuleManager::getModule("ClickGUI")->settings.getSettingByName<bool>("colors_mod4_rgb")->value
+        this->addColorPicker("Modcard 1", "Color of top rounded rectangle",
+            this->settings.getSettingByName<std::string>("colors_mod1")->value,
+            this->settings.getSettingByName<float>("o_colors_mod1")->value,
+            this->settings.getSettingByName<bool>("colors_mod1_rgb")->value
         );
+        this->addColorPicker("Modcard 2", "Color of bottom rounded rectangle",
+            this->settings.getSettingByName<std::string>("colors_mod2")->value,
+            this->settings.getSettingByName<float>("o_colors_mod2")->value,
+            this->settings.getSettingByName<bool>("colors_mod2_rgb")->value
+        );
+        this->addColorPicker("Modcard 3", "Background color of module icons, outer color of module settings icon",
+            this->settings.getSettingByName<std::string>("colors_mod3")->value,
+            this->settings.getSettingByName<float>("o_colors_mod3")->value,
+            this->settings.getSettingByName<bool>("colors_mod3_rgb")->value
+        );
+        this->addColorPicker("Modcard 4", "Inner color of module settings icon",
+            this->settings.getSettingByName<std::string>("colors_mod4")->value,
+            this->settings.getSettingByName<float>("o_colors_mod4")->value,
+            this->settings.getSettingByName<bool>("colors_mod4_rgb")->value
+        );
+        this->addColorPicker("Modcard Icon", "Color of the mod's icon",
+            this->settings.getSettingByName<std::string>("colors_modicon")->value,
+            this->settings.getSettingByName<float>("o_colors_modicon")->value,
+            this->settings.getSettingByName<bool>("colors_modicon_rgb")->value
+        );
+        this->addColorPicker("Setting Icon Color", "Color of the mod's settings icon",
+            this->settings.getSettingByName<std::string>("colors_mod_settings_icon")->value,
+            this->settings.getSettingByName<float>("o_colors_mod_settings_icon")->value,
+            this->settings.getSettingByName<bool>("colors_mod_settings_icon_rgb")->value
+        );
+        FlarialGUI::UnsetScrollView();
+        this->resetPadding();
     }
 
     static inline bool editmenu = false;

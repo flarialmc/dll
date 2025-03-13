@@ -40,6 +40,14 @@
 #define o_colors_mod4 clickgui->settings.getSettingByName<float>("o_colors_mod4")->value
 #define colors_mod4_rgb clickgui->settings.getSettingByName<bool>("colors_mod4_rgb")->value
 
+#define colors_modicon FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_modicon")->value)
+#define o_colors_modicon clickgui->settings.getSettingByName<float>("o_colors_modicon")->value
+#define colors_modicon_rgb clickgui->settings.getSettingByName<bool>("colors_modicon_rgb")->value
+
+#define colors_mod_settings_icon FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_mod_settings_icon")->value)
+#define o_colors_mod_settings_icon clickgui->settings.getSettingByName<float>("o_colors_mod_settings_icon")->value
+#define colors_mod_settings_icon_rgb clickgui->settings.getSettingByName<bool>("colors_mod_settings_icon_rgb")->value
+
 std::map<int, ID2D1Bitmap *> ClickGUIElements::images;
 std::vector<Vec2<float>> sizes;
 std::vector<Vec2<float>> shadowSizes;
@@ -162,7 +170,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     float paddingSize = Constraints::RelativeConstraint(0.28);
 
-    FlarialGUI::Tooltip("mod_" + std::to_string(index), x, realY, mod->description, BottomRoundedWidth,
+    FlarialGUI::Tooltip("mod_" + FlarialGUI::cached_to_string(index), x, realY, mod->description, BottomRoundedWidth,
                         TopRoundedHeight);
 
     FlarialGUI::RoundedRect(modiconx, modicony, mod3Col,
@@ -238,8 +246,10 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
                                                                     modicony + paddingSize));
     }
     */
-
-    FlarialGUI::image(iconId, D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize));
+    D2D1_COLOR_F modicon = colors_modicon_rgb ? FlarialGUI::rgbColor : colors_modicon;
+    modicon.a = o_colors_modicon;
+    modicon.a = opacity;
+    FlarialGUI::image(iconId, D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize), "PNG", true, FlarialGUI::D2DColorToImColor(modicon)); //, FlarialGUI::D2DColorToImColor(modicon)
 
     // actually button
 
@@ -324,8 +334,11 @@ void ClickGUIElements::RotatingGear(int index, float x, float y, float width, fl
         float rotationAngle = FlarialGUI::rotationAngles[index];
         ImVec2 rotationCenter(x + imageWidth / 2.0f, imageY + imageHeight / 2.0f);
 
+        D2D1_COLOR_F settingicon = colors_mod_settings_icon_rgb ? FlarialGUI::rgbColor : colors_mod_settings_icon;
+        settingicon.a = o_colors_mod_settings_icon;
+
         FlarialGUI::ImRotateStart();
-        FlarialGUI::image(IDR_SETTINGS_WHITE_PNG, imagerectf, "PNG", false);
+        FlarialGUI::image(IDR_SETTINGS_WHITE_PNG, imagerectf, "PNG", false, FlarialGUI::D2DColorToImColor(settingicon));
         FlarialGUI::ImRotateEnd(rotationAngle, rotationCenter);
     }
 }

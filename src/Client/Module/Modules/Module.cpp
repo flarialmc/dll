@@ -556,7 +556,7 @@ void Module::setKeybind(const std::string& newKeybind) {
 
 std::string& Module::getKeybind(const int keybindCount) {
     std::string count;
-    if(keybindCount > 0) count = "-" + std::to_string(keybindCount);
+    if(keybindCount > 0) count = "-" + FlarialGUI::cached_to_string(keybindCount);
     auto key = settings.getSettingByName<std::string>("keybind" + count);
     if (key == nullptr)
         settings.addSetting("keybind", defaultKeybind);
@@ -661,7 +661,7 @@ void Module::defaultConfig() {
 bool Module::isKeybind(const std::array<bool, 256>& keys, const int keybindCount) {
 
     std::string count = "keybind";
-    if(keybindCount > 0) count += "-" + std::to_string(keybindCount);
+    if(keybindCount > 0) count += "-" + FlarialGUI::cached_to_string(keybindCount);
     if(!settings.getSettingByName<std::string>(count)) { return false;}
 
     std::vector<int> keyCodes = Utils::getStringAsKeys(getKeybind(keybindCount));

@@ -113,7 +113,7 @@ public:
 
     void onRender(RenderEvent &event) {
         if (this->isEnabled()) {
-            auto comboStr = std::to_string(Combo);
+            auto comboStr = FlarialGUI::cached_to_string(Combo);
             this->normalRender(8, comboStr);
         }
     }

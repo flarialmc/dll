@@ -75,7 +75,7 @@ public:
     int isSlotKeybind(std::string key) {
         for (int i = 0; i < 9; i++) {
             std::string option =  parser.options["ctrl_fullkeyboardgameplay"] == "1" ? "keyboard_type_1_key.hotbar." : "keyboard_type_0_key.hotbar.";
-            auto value = parser.options[option + std::to_string(i + 1)];
+            auto value = parser.options[option + FlarialGUI::cached_to_string(i + 1)];
             if (value == key) return i;
         }
 
@@ -86,7 +86,7 @@ public:
         if(event.getAction() != MouseAction::Press) return;
         if(isInPauseOrGame) return;
 
-        auto targetSlot = isSlotKeybind(std::to_string(-100 + (int)event.getButton()));
+        auto targetSlot = isSlotKeybind(FlarialGUI::cached_to_string(-100 + (int)event.getButton()));
         if (targetSlot == -1) return;
 
         moveRequests.push({targetSlot, currentHoveredSlot, currentCollectionName});
@@ -96,7 +96,7 @@ public:
         if(event.getAction() != ActionType::Pressed) return;
         if(isInPauseOrGame) return;
 
-        auto targetSlot = isSlotKeybind(std::to_string(event.getKey()));
+        auto targetSlot = isSlotKeybind(FlarialGUI::cached_to_string(event.getKey()));
         if (targetSlot == -1) return;
 
         moveRequests.push({targetSlot, currentHoveredSlot, currentCollectionName});

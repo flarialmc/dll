@@ -120,7 +120,7 @@ public:
             int fps = (int)round(((float)MC::fps * round(fpsSpooferValue)));
 
             // Convert fps to string for rendering
-            auto fpsStr = std::to_string(fps);
+            auto fpsStr = FlarialGUI::cached_to_string(fps);
 
             // Render the FPS text
             this->normalRender(0, fpsStr);

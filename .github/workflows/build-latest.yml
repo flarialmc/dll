@@ -1,79 +1,103 @@
-name: Build Flarial and UPLOAD to newcdn
+name: Build Flarial and upload to newcdn
 on:
-  
+
   push:
     branches: [ "main","scripting-v2" ]
   pull_request:
     branches: [ "main","scripting-v2" ]
 
   workflow_dispatch:
+env:
+    GH_TOKEN: ${{ github.ACTIONS_GITHUB_TOKEN }}
 jobs:
   windows-build:
     runs-on: windows-latest
+    outputs:
+      type: ${{ steps.type.outputs.status }}
+
     steps:
-    
+
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: "Check if build commit"
+    - name: "Check commit type"
+      id: type
       run: |
         
-        if ( "${{ github.event.head_commit.message }}" -like "*build:*" )
-        {echo "Continuing to build"}
-        else 
-        {
-        echo "Not a build commit, exiting (note: this may take 5-10 seconds) and will result in cancelled instead of success"
+        if [[ "${{ github.event.head_commit.message }}" == *"build:"* ]]; then
+            echo "Continuing to build as nightly"
+            echo status=build >> "$GITHUB_OUTPUT"
+        elif  [[ "${{ github.event.head_commit.message }}" == *"release:"* ]]; then
+            echo "Continuing to build as release"
+            echo status=release >> "$GITHUB_OUTPUT"
+        else
+        echo "Not a build commit, exiting (note: this may take 5-10 seconds)"
         gh run cancel ${{ github.run_id }}
         gh run watch ${{ github.run_id }}
-        exit 0
-        }
-      
+        fi
+        
+       
+        
+
+      shell: bash
       env:
         GH_TOKEN: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
     - name: Set Up MSVC Environment
       uses: ilammy/msvc-dev-cmd@v1
     - name: Configure CMake
       run: |
-        cmake -S . -B build -G "Ninja" -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_STANDARD=23 -DCMAKE_BUILD_TYPE=Release
-
-    
+          cmake -S . -B build -G "Ninja" -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_STANDARD=23 -DCMAKE_BUILD_TYPE=Release
     - name: Build DLL
       run: |
-          cmake --build build
+           cmake --build build
+
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4.6.1
       with:
-        name: Flarial_DLL
-        path: D:\a\dll\dll\build\Flarial.dll
-  
+         name: Flarial_DLL
+         path: D:\a\dll\dll\build\Flarial.dll
+
   upload-to-cdn:
     runs-on: ubuntu-latest
     needs: windows-build
     steps:
-      
+
+        - env:
+            OUTPUT1: ${{needs.windows-build.outputs.type}}
+          run: echo ${{ env.OUTPUT1 }}
         - name: checkkout cdn
           uses: actions/checkout@v4
           with:
             repository: 'flarialmc/newcdn'
             ref: 'main'
             token:  ${{secrets.ACTIONS_GITHUB_TOKEN}}
-        - name: setup git config
+        - name: setup git configs
           run: |
             git config user.name "GitHub Actions Bot"
             git config user.email "actions@example.com"
         - name: Download dll
           uses: actions/download-artifact@v4.1.9
         - name: push changes
+          env:
+            OUTPUT1: ${{needs.windows-build.outputs.type}}
           run: |
+            if [[ "${{ env.OUTPUT1 }}" == "release" ]]; then
+                mv -f Flarial_DLL/Flarial.dll "./dll/beta.dll"
+                ls ./dll
+                git add ./dll/beta.dll
+                git commit -m "Add Beta Release for Build Commit: '${{ github.event.head_commit.message }}'"
+                git push origin main
+            else
+              name="Nightly_${GITHUB_SHA:0:6}_Add:$(echo '${{ github.event.head_commit.message }}')"
+              name="${name//:/_}" 
+              name="${name// /_}"
+              mv ./Flarial_DLL "./$name"
+              ls
+              git add $name
+              git commit -m "Add Nightly for Build Commit: '${{ github.event.head_commit.message }}'"
+              git push origin main
+            fi
             
-            name="Nightly_${GITHUB_SHA:0:6}_Add:$(echo '${{ github.event.head_commit.message }}')"
-            echo $name
-            name="${name//:/_}" 
-            name="${name// /_}"
-            mv ./Flarial_DLL "./$name"
-            ls
-            git add $name
-            git commit -m "Add Nightly for Build Commit: '${{ github.event.head_commit.message }}'"
-            git push origin main
+           
 
        
