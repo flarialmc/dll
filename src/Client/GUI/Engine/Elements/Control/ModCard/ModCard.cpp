@@ -44,6 +44,10 @@
 #define o_colors_modicon clickgui->settings.getSettingByName<float>("o_colors_modicon")->value
 #define colors_modicon_rgb clickgui->settings.getSettingByName<bool>("colors_modicon_rgb")->value
 
+#define colors_mod_settings_icon FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_mod_settings_icon")->value)
+#define o_colors_mod_settings_icon clickgui->settings.getSettingByName<float>("o_colors_mod_settings_icon")->value
+#define colors_mod_settings_icon_rgb clickgui->settings.getSettingByName<bool>("colors_mod_settings_icon_rgb")->value
+
 std::map<int, ID2D1Bitmap *> ClickGUIElements::images;
 std::vector<Vec2<float>> sizes;
 std::vector<Vec2<float>> shadowSizes;
@@ -330,8 +334,11 @@ void ClickGUIElements::RotatingGear(int index, float x, float y, float width, fl
         float rotationAngle = FlarialGUI::rotationAngles[index];
         ImVec2 rotationCenter(x + imageWidth / 2.0f, imageY + imageHeight / 2.0f);
 
+        D2D1_COLOR_F settingicon = colors_mod_settings_icon_rgb ? FlarialGUI::rgbColor : colors_mod_settings_icon;
+        settingicon.a = o_colors_mod_settings_icon;
+
         FlarialGUI::ImRotateStart();
-        FlarialGUI::image(IDR_SETTINGS_WHITE_PNG, imagerectf, "PNG", false);
+        FlarialGUI::image(IDR_SETTINGS_WHITE_PNG, imagerectf, "PNG", false, FlarialGUI::D2DColorToImColor(settingicon));
         FlarialGUI::ImRotateEnd(rotationAngle, rotationCenter);
     }
 }

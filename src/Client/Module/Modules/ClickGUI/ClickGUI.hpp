@@ -41,6 +41,18 @@
 #define o_colors_secondary8 clickgui->settings.getSettingByName<float>("o_colors_secondary8")->value
 #define colors_secondary8_rgb clickgui->settings.getSettingByName<bool>("colors_secondary8_rgb")->value
 
+#define colors_FlarialLogo FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_FlarialLogo")->value)
+#define o_colors_FlarialLogo clickgui->settings.getSettingByName<float>("o_colors_FlarialLogo")->value
+#define colors_FlarialLogo_rgb clickgui->settings.getSettingByName<bool>("colors_FlarialLogo_rgb")->value
+
+#define colors_radiobutton_enabled FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_radiobutton_enabled")->value)
+#define o_colors_radiobutton_enabled clickgui->settings.getSettingByName<float>("o_colors_radiobutton_enabled")->value
+#define colors_radiobutton_enabled_rgb clickgui->settings.getSettingByName<bool>("colors_radiobutton_enabled_rgb")->value
+
+#define colors_radiobutton_disabled FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_radiobutton_disabled")->value)
+#define o_colors_radiobutton_disabled clickgui->settings.getSettingByName<float>("o_colors_radiobutton_disabled")->value
+#define colors_radiobutton_disabled_rgb clickgui->settings.getSettingByName<bool>("colors_radiobutton_disabled_rgb")->value
+
 class TextPacket;
 
 struct PageType {
@@ -262,11 +274,39 @@ public:
             settings.addSetting("colors_mod4_rgb", false);
 
         if (settings.getSettingByName<std::string>("colors_modicon") == nullptr)
-            settings.addSetting("colors_modicon", (std::string)"705d60");
+            settings.addSetting("colors_modicon", (std::string)"1A1313");
         if (settings.getSettingByName<float>("o_colors_modicon") == nullptr)
             settings.addSetting("o_colors_modicon", 1.0f);
         if (settings.getSettingByName<bool>("colors_modicon_rgb") == nullptr)
             settings.addSetting("colors_modicon_rgb", false);
+
+        if (settings.getSettingByName<std::string>("colors_FlarialLogo") == nullptr)
+            settings.addSetting("colors_FlarialLogo", (std::string)"FE4443");
+        if (settings.getSettingByName<float>("o_colors_FlarialLogo") == nullptr)
+            settings.addSetting("o_colors_FlarialLogo", 1.0f);
+        if (settings.getSettingByName<bool>("colors_FlarialLogo_rgb") == nullptr)
+            settings.addSetting("colors_FlarialLogo_rgb", false);
+
+        if (settings.getSettingByName<std::string>("colors_mod_settings_icon") == nullptr)
+            settings.addSetting("colors_mod_settings_icon", (std::string)"FFFFFF");
+        if (settings.getSettingByName<float>("o_colors_mod_settings_icon") == nullptr)
+            settings.addSetting("o_colors_mod_settings_icon", 1.0f);
+        if (settings.getSettingByName<bool>("colors_mod_settings_icon_rgb") == nullptr)
+            settings.addSetting("colors_mod_settings_icon_rgb", false);
+
+        if (settings.getSettingByName<std::string>("colors_radiobutton_enabled") == nullptr)
+            settings.addSetting("colors_radiobutton_enabled", (std::string)"D0A0A8");
+        if (settings.getSettingByName<float>("o_colors_radiobutton_enabled") == nullptr)
+            settings.addSetting("o_colors_radiobutton_enabled", 1.0f);
+        if (settings.getSettingByName<bool>("colors_radiobutton_enabled_rgb") == nullptr)
+            settings.addSetting("colors_radiobutton_enabled_rgb", false);
+
+        if (settings.getSettingByName<std::string>("colors_radiobutton_disabled") == nullptr)
+            settings.addSetting("colors_radiobutton_disabled", (std::string)"FFFFFF");
+        if (settings.getSettingByName<float>("o_colors_radiobutton_disabled") == nullptr)
+            settings.addSetting("o_colors_radiobutton_disabled", 1.0f);
+        if (settings.getSettingByName<bool>("colors_radiobutton_disabled_rgb") == nullptr)
+            settings.addSetting("colors_radiobutton_disabled_rgb", false);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -290,6 +330,21 @@ public:
         this->extraPadding();
         
         this->addHeader("Colors");
+        this->addColorPicker("Logo Color", "Color of the client's logo",
+            this->settings.getSettingByName<std::string>("colors_FlarialLogo")->value,
+            this->settings.getSettingByName<float>("o_colors_FlarialLogo")->value,
+            this->settings.getSettingByName<bool>("colors_FlarialLogo_rgb")->value
+        );
+        this->addColorPicker("Radio Button Icon Disabled", "",
+            this->settings.getSettingByName<std::string>("colors_radiobutton_enabled")->value,
+            this->settings.getSettingByName<float>("o_colors_radiobutton_enabled")->value,
+            this->settings.getSettingByName<bool>("colors_radiobutton_enabled_rgb")->value
+        );
+        this->addColorPicker("Radio Button Icon Enabled", "",
+            this->settings.getSettingByName<std::string>("colors_radiobutton_disabled")->value,
+            this->settings.getSettingByName<float>("o_colors_radiobutton_disabled")->value,
+            this->settings.getSettingByName<bool>("colors_radiobutton_disabled_rgb")->value
+        );
         this->addColorPicker("Text Color", "",
             this->settings.getSettingByName<std::string>("colors_text")->value,
             this->settings.getSettingByName<float>("o_colors_text")->value,
@@ -384,6 +439,11 @@ public:
             this->settings.getSettingByName<std::string>("colors_modicon")->value,
             this->settings.getSettingByName<float>("o_colors_modicon")->value,
             this->settings.getSettingByName<bool>("colors_modicon_rgb")->value
+        );
+        this->addColorPicker("Setting Icon Color", "Color of the mod's settings icon",
+            this->settings.getSettingByName<std::string>("colors_mod_settings_icon")->value,
+            this->settings.getSettingByName<float>("o_colors_mod_settings_icon")->value,
+            this->settings.getSettingByName<bool>("colors_mod_settings_icon_rgb")->value
         );
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
