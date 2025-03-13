@@ -86,17 +86,44 @@ public:
                 for (const auto &settingPtr: it->second | std::views::values) {
 
                     switch (settingPtr->type) {
-                        case ScriptSettingType::Bool: {
-                            if (auto* boolSet = dynamic_cast<BoolSetting*>(settingPtr.get()); boolSet) {
-                                this->addToggle(boolSet->displayName, boolSet->description, boolSet->value);
-                            }
+                        case ScriptSettingType::Toggle: {
+                            auto* toggleSet = dynamic_cast<ToggleSetting*>(settingPtr.get());
+                            if (!toggleSet) return;
+
+                            this->addToggle(toggleSet->name, toggleSet->description, toggleSet->value);
                             break;
                         }
-                        case ScriptSettingType::Float: {
+                        case ScriptSettingType::Button: {
+                            auto* buttonSet = dynamic_cast<ButtonSetting*>(settingPtr.get());
+                            if (!buttonSet) return;
+
+                            this->addButton(buttonSet->name, buttonSet->description, buttonSet->buttonText, buttonSet->action);
                             break;
                         }
-                        default:
+                        case ScriptSettingType::Slider: {
+                            auto* sliderSet = dynamic_cast<SliderSetting*>(settingPtr.get());
+                            if (!sliderSet) return;
+
+                            this->addSlider(sliderSet->name, sliderSet->description, sliderSet->value, sliderSet->maxValue, sliderSet->minValue, sliderSet->zerosafe);
                             break;
+                        }
+                        case ScriptSettingType::TextBox: {
+                            auto* textBoxSet = dynamic_cast<TextBoxSetting*>(settingPtr.get());
+                            if (!textBoxSet) return;
+
+                            this->addTextBox(textBoxSet->name, textBoxSet->description, textBoxSet->value, textBoxSet->characterLimit);
+                            break;
+                        }
+                        case ScriptSettingType::Keybind: {
+                            auto* keybindSet = dynamic_cast<KeybindSetting*>(settingPtr.get());
+                            if (!keybindSet) return;
+
+                            this->addKeybind(keybindSet->name, keybindSet->description, keybindSet->keybind);
+                            break;
+                        }
+                        default: {
+                            break;
+                        }
                     }
                 }
             }

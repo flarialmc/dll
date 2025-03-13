@@ -25,18 +25,21 @@ public:
                 })
                 .addStaticFunction("readFile", [](const std::string& path) -> std::string {
                     std::ifstream file(Utils::getClientPath() + "\\" + path, std::ios::in);
+
                     if (!file.is_open()) {
                         throw std::runtime_error("Failed to open file for reading: " + path);
                     }
-                    std::string content((std::istreambuf_iterator<char>(file)),
-                                         std::istreambuf_iterator<char>());
+
+                    std::string content((std::istreambuf_iterator(file)), std::istreambuf_iterator<char>());
                     return content;
                 })
                 .addStaticFunction("writeFile", [](const std::string& path, const std::string& content) -> bool {
-                    std::ofstream file(Utils::getClientPath() + "\\" + path, std::ios::out);
+                    std::ofstream file(Utils::getClientPath() + "\\" + path, std::ios::app);
+
                     if (!file.is_open()) {
                         return false;
                     }
+
                     file << content;
                     return true;
                 })

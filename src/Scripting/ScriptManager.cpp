@@ -48,7 +48,7 @@ void ScriptManager::loadScripts() {
         std::string code((std::istreambuf_iterator<char>(scriptFile)), std::istreambuf_iterator<char>());
 
         auto script = std::make_shared<FlarialScript>(
-            entry.path().string(),
+            entry.path().filename().string(),
             code
         );
 
@@ -106,7 +106,6 @@ void ScriptManager::reloadScripts() {
 void ScriptManager::saveSettings() {
     for (const auto& module : mLoadedModules) {
         if (!module) return;
-        Logger::info("saving settings");
         module->saveSettings();
     }
 }

@@ -70,7 +70,7 @@ void LuaCommand::execute(const std::vector<std::string>& args) {
 
     if (action == "help") {
         addCommandMessage("§bpath §8- §7Opens the script directory in File Explorer");
-        addCommandMessage("§breload §8- §7Reloads all currently loaded scripts");
+        addCommandMessage("§breload §8- §7Reloads all scripts");
         addCommandMessage("§bimport §8- §7Automatically imports scripts for you");
     } else if (action == "path") {
         WinrtUtils::openSubFolder("Flarial\\Scripts");
@@ -85,12 +85,14 @@ void LuaCommand::execute(const std::vector<std::string>& args) {
 
         std::string category = String::toLower(args[1]);
         if (category != "module" && category != "command") {
-            addCommandMessage("§cInvalid category. Use 'module' or 'command'.");
+            addCommandMessage("§cUsage: .lua import <module/command>");
             return;
         }
 
         [=]() -> winrt::fire_and_forget {
             co_await importScript(category);
         }();
+    } else {
+        addCommandMessage("§cUsage: .lua <help/reload/path/import>");
     }
 }

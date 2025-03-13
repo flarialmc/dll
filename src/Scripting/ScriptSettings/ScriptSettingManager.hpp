@@ -41,6 +41,10 @@ public:
         settings.erase(script);
     }
 
+    ButtonSetting* addButton(const FlarialScript* script, const std::string& name, const std::string& description, const std::string& buttonText, std::function<void()> action);
+    TextBoxSetting* addTextBox(const FlarialScript* script, const std::string& name, const std::string& description, const std::string& defaultValue, int limit);
+    KeybindSetting* addKeybind(const FlarialScript* script, const std::string& name, const std::string& description, const std::string& defaultKey);
+
     const auto& getAllSettings() const { return settings; }
 private:
     std::unordered_map<const FlarialScript*, std::unordered_map<std::string, std::unique_ptr<BaseSetting>>> settings;
