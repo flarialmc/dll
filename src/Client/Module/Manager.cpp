@@ -237,6 +237,7 @@ void ModuleManager::terminate() {
 
 
 void ModuleManager::restart(){
+    initialized = false;
     for (const auto& pair : moduleMap) {
         if (pair.second) {
             std::shared_ptr mod = ModuleManager::getModule(pair.second->name);
@@ -252,6 +253,9 @@ void ModuleManager::restart(){
             }
         }
     }
+    initialized = true;
+
+    ScriptManager::reloadScripts();
 }
 
 

@@ -544,6 +544,8 @@ bool Module::isEnabled() {
 }
 
 void Module::setEnabled(bool enabled) {
+    if (!settings.getSettingByName<bool>("enabled")) return;
+
     settings.getSettingByName<bool>("enabled")->value = enabled;
     enabledState = enabled;
 }

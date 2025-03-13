@@ -52,6 +52,7 @@ void ScriptManager::loadScripts() {
             code
         );
 
+
         // Be careful if you try to access fields like getName()
         // before the script compiles. (Won't crash but you get the point)
         mLoadedScripts.push_back(script);
@@ -92,6 +93,7 @@ void ScriptManager::executeFunction(lua_State *L, const char* functionName) {
 }
 
 void ScriptManager::reloadScripts() {
+    initialized = false;
     for (auto& mod : mLoadedModules) {
         if (mod) {
             mod->terminate();
@@ -101,6 +103,8 @@ void ScriptManager::reloadScripts() {
     mLoadedModules.clear();
     mLoadedScripts.clear();
     loadScripts();
+    initialized = false;
+
 }
 
 void ScriptManager::saveSettings() {

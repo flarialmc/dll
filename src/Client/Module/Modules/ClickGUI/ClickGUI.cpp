@@ -421,7 +421,7 @@ void ClickGUI::onRender(RenderEvent &event) {
                     int i = 0;
 
                     static auto modules = ModuleManager::getModules();
-                    if(ModuleManager::cguiRefresh) {
+                    if(ModuleManager::cguiRefresh && ScriptManager::initialized && ModuleManager::initialized) {
 modules = ModuleManager::getModules();
                         ModuleManager::cguiRefresh = false;
 }
@@ -579,10 +579,8 @@ modules = ModuleManager::getModules();
 
                         });
 
-                    c->addButton("Reload Scripts", "", "RELOAD", [] () {
-
-                        ScriptManager::reloadScripts();
-
+                    c->addButton("Reload Scripts", "", "RELOAD", [&] () {
+                        ModuleManager::restartModules = true;
                     });
 
                     c->addElementText("Following Requires Restart");
