@@ -417,7 +417,7 @@ namespace FlarialGUI {
     std::string Dropdown(int index, float x, float y, const std::vector<std::string> &options, std::string &value,
                          const std::string &label);
 
-    void image(int resourceId, D2D1_RECT_F rect, LPCTSTR type = "PNG", bool shouldadd = true);
+    void image(int resourceId, D2D1_RECT_F rect, LPCTSTR type = "PNG", bool shouldadd = true, ImColor col = IM_COL32_WHITE);
 
     void LoadAllImageToCache();
 

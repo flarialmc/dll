@@ -413,7 +413,7 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
 
 //void FlarialGUI::LoadImageFromResource()
 
-void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shouldadd) {
+void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shouldadd, ImColor col) {
 
 	if(Client::settings.getSettingByName<bool>("noicons")->value) return;
 
@@ -442,7 +442,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 		if (ImagesClass::ImguiDX11Images[resourceId] == nullptr) {
             if (!LoadImageFromResource(resourceId, &ImagesClass::ImguiDX11Images[resourceId], type)) Logger::custom(fg(fmt::color::crimson), "Image", "Failed to load image");
 		} else  {
-			ImGui::GetBackgroundDrawList()->AddImage(ImTextureID(ImagesClass::ImguiDX11Images[resourceId]), ImVec2(imageRect.left, imageRect.top), ImVec2(imageRect.right, imageRect.bottom), ImVec2(0, 0), ImVec2(1, 1), IM_COL32_WHITE);
+			ImGui::GetBackgroundDrawList()->AddImage(ImTextureID(ImagesClass::ImguiDX11Images[resourceId]), ImVec2(imageRect.left, imageRect.top), ImVec2(imageRect.right, imageRect.bottom), ImVec2(0, 0), ImVec2(1, 1), col);
 		}
         return;
 	}
@@ -497,8 +497,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 														 ImVec2(imageRect.left, imageRect.top),
 														 ImVec2(imageRect.right, imageRect.bottom), ImVec2(0, 0),
 														 ImVec2(1, 1),
-														 FlarialGUI::D2DColorToImColor(
-															 FlarialGUI::HexToColorF("FAFAFA")));
+														 col);
 			} catch (std::exception ex) { Logger::error("error addming image: ", ex.what()); }
 		}
 

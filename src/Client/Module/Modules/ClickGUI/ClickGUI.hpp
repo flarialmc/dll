@@ -260,6 +260,13 @@ public:
             settings.addSetting("o_colors_mod4", 1.0f);
         if (settings.getSettingByName<bool>("colors_mod4_rgb") == nullptr)
             settings.addSetting("colors_mod4_rgb", false);
+
+        if (settings.getSettingByName<std::string>("colors_modicon") == nullptr)
+            settings.addSetting("colors_modicon", (std::string)"705d60");
+        if (settings.getSettingByName<float>("o_colors_modicon") == nullptr)
+            settings.addSetting("o_colors_modicon", 1.0f);
+        if (settings.getSettingByName<bool>("colors_modicon_rgb") == nullptr)
+            settings.addSetting("colors_modicon_rgb", false);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -373,7 +380,11 @@ public:
             this->settings.getSettingByName<float>("o_colors_mod4")->value,
             this->settings.getSettingByName<bool>("colors_mod4_rgb")->value
         );
-
+        this->addColorPicker("Modcard Icon", "Color of the mod's icon",
+            this->settings.getSettingByName<std::string>("colors_modicon")->value,
+            this->settings.getSettingByName<float>("o_colors_modicon")->value,
+            this->settings.getSettingByName<bool>("colors_modicon_rgb")->value
+        );
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
     }

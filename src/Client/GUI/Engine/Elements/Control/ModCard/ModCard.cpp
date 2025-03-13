@@ -40,6 +40,10 @@
 #define o_colors_mod4 clickgui->settings.getSettingByName<float>("o_colors_mod4")->value
 #define colors_mod4_rgb clickgui->settings.getSettingByName<bool>("colors_mod4_rgb")->value
 
+#define colors_modicon FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_modicon")->value)
+#define o_colors_modicon clickgui->settings.getSettingByName<float>("o_colors_modicon")->value
+#define colors_modicon_rgb clickgui->settings.getSettingByName<bool>("colors_modicon_rgb")->value
+
 std::map<int, ID2D1Bitmap *> ClickGUIElements::images;
 std::vector<Vec2<float>> sizes;
 std::vector<Vec2<float>> shadowSizes;
@@ -238,8 +242,10 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
                                                                     modicony + paddingSize));
     }
     */
-
-    FlarialGUI::image(iconId, D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize));
+    //D2D1_COLOR_F modicon = colors_modicon_rgb ? FlarialGUI::rgbColor : colors_modicon;
+    //modicon.a = o_colors_modicon;
+    //modicon.a = opacity;
+    FlarialGUI::image(iconId, D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize), "PNG", true); //, FlarialGUI::D2DColorToImColor(modicon)
 
     // actually button
 
