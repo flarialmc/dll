@@ -8,6 +8,7 @@
 #include <codecvt>
 #include <Psapi.h>
 #include <regex>
+#include <shared_mutex>
 #include <wininet.h>
 #include <miniz/miniz.h>
 
@@ -534,7 +535,20 @@ std::string String::WStrToStr(const std::wstring& ws) {
 }
 
 std::string String::removeColorCodes(const std::string &input) {
+    // Static cache and mutex for thread-safe caching.
+    static std::unordered_map<std::string, std::string> cache;
+    static std::shared_mutex cacheMutex;
+
+    { // First, attempt a shared (read) lock.
+        std::shared_lock lock(cacheMutex);
+        auto it = cache.find(input);
+        if (it != cache.end()) {
+            return it->second;
+        }
+    }
+
     std::string result;
+    result.reserve(input.size());
 
     bool skipNext = false;
     for (size_t i = 0; i < input.size();) {
@@ -545,34 +559,54 @@ std::string String::removeColorCodes(const std::string &input) {
             skipNext = true;
             i += 2;
         } else {
-            if ((input[i] & 0xC0) == 0xC0) { // UTF-8 continuation byte
+            if ((input[i] & 0xC0) == 0xC0) {
                 size_t bytesLeft = 0;
-                while ((input[i + bytesLeft] & 0xC0) == 0x80) {
+                while (i + bytesLeft < input.size() && (input[i + bytesLeft] & 0xC0) == 0x80) {
                     ++bytesLeft;
                 }
                 result.append(input, i, bytesLeft + 1);
                 i += bytesLeft + 1;
             } else {
-                result += input[i];
+                result.push_back(input[i]);
                 ++i;
             }
         }
     }
 
+    {
+        std::unique_lock lock(cacheMutex);
+        cache[input] = result;
+    }
     return result;
 }
 
 std::string String::removeNonAlphanumeric(const std::string &input) {
-    std::regex pattern("[A-Za-z][A-Za-z0-9 ]{2,16}");
-    std::smatch match;
-    if (std::regex_search(input, match, pattern)) {
-        std::string nickname = match.str();
-        // Remove trailing spaces
-        nickname.erase(nickname.find_last_not_of(" ") + 1);
-        return nickname;
-    } else {
-        return "";
+    // Static cache and mutex for thread-safe caching.
+    static std::unordered_map<std::string, std::string> cache;
+    static std::shared_mutex cacheMutex;
+
+    {
+        std::shared_lock lock(cacheMutex);
+        auto it = cache.find(input);
+        if (it != cache.end()) {
+            return it->second;
+        }
     }
+
+    static const std::regex pattern("[A-Za-z][A-Za-z0-9 ]{2,16}");
+    std::smatch match;
+    std::string nickname;
+    if (std::regex_search(input, match, pattern)) {
+        nickname = match.str();
+        // Remove trailing spaces.
+        nickname.erase(nickname.find_last_not_of(" ") + 1);
+    }
+
+    {
+        std::unique_lock lock(cacheMutex);
+        cache[input] = nickname;
+    }
+    return nickname;
 }
 
 std::string String::removeNonNumeric(const std::string& string) {

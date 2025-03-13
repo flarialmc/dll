@@ -135,7 +135,7 @@ public:
     }
 
     void onRender(RenderEvent& event) {
-        auto potsStr = std::to_string(pots);
+        auto potsStr = FlarialGUI::cached_to_string(pots);
         this->normalRender(14, potsStr);
     }
 };

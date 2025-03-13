@@ -29,7 +29,7 @@ bool initImgui = false;
 bool allfontloaded = false;
 bool first = false;
 bool imguiWindowInit = false;
-BOOL _ = FALSE, $ = FALSE, fEnabled = FALSE, fD3D11 = FALSE, MADECHAIN = FALSE;
+BOOL _ = FALSE, $ = FALSE;
 
 static std::chrono::high_resolution_clock fpsclock;
 static std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
@@ -113,6 +113,7 @@ void SwapchainHook::enableHook() {
 
     IDXGIFactory2 *pFactory = NULL;
     CreateDXGIFactory(IID_PPV_ARGS(&pFactory));
+    if (!pFactory) std::cout << "Factory null??" << std::endl;
     Memory::hookFunc((*(LPVOID **) pFactory)[16], (void *) CreateSwapChainForCoreWindow,
                      (void **) &IDXGIFactory2_CreateSwapChainForCoreWindow, "CreateSwapchainForCoreWindow");
 
@@ -126,7 +127,6 @@ void SwapchainHook::enableHook() {
     std::string gpuName = converter.to_bytes(gpuNameW);
     Logger::info("GPU name: {}", gpuName.c_str());
     if (gpuName.contains("Intel")) {
-        fD3D11 = true;
         queueReset = true;
         Client::settings.getSettingByName<bool>("killdx")->value = true;
     }
@@ -148,6 +148,7 @@ void SwapchainHook::enableHook() {
 }
 
 bool SwapchainHook::init = false;
+bool SwapchainHook::currentVsyncState;
 
 
 // CREDIT @AETOPIA
@@ -165,6 +166,8 @@ HRESULT (*SwapchainHook::IDXGIFactory2_CreateSwapChainForCoreWindow)
 HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknown *pDevice, IUnknown *pWindow,
                                                     DXGI_SWAP_CHAIN_DESC1 *pDesc, IDXGIOutput *pRestrictToOutput,
                                                     IDXGISwapChain1 **ppSwapChain) {
+
+
     ID3D12CommandQueue *pCommandQueue = NULL;
     if (Client::settings.getSettingByName<bool>("killdx")->value) queue = nullptr;
     if (Client::settings.getSettingByName<bool>("killdx")->value && SUCCEEDED(pDevice->QueryInterface(IID_PPV_ARGS(&pCommandQueue)))) {
@@ -176,27 +179,32 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 
     pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
 
-    std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
 
-    if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
-        pDesc->BufferCount = 2;
-    } else if (bufferingMode == "Triple Buffering") {
-        pDesc->BufferCount = 3;
+    if (Client::settings.getSettingByName<bool>("killdx")->value) {
+        std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
+
+        if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
+            pDesc->BufferCount = 2;
+        } else if (bufferingMode == "Triple Buffering") {
+            pDesc->BufferCount = 3;
+        }
+
+        std::string swapEffect = Client::settings.getSettingByName<std::string>("swapeffect")->value;
+
+        if (swapEffect == "FLIP_SEQUENTIAL") {
+            pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+        } else if (swapEffect == "FLIP_DISCARD") {
+            pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+        }
     }
 
-    std::string swapEffect = Client::settings.getSettingByName<std::string>("swapeffect")->value;
+    auto vsync = Client::settings.getSettingByName<bool>("vsync")->value;
+    currentVsyncState = vsync;
 
-    if (swapEffect == "FLIP_SEQUENTIAL") {
-        pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
-    } else if (swapEffect == "FLIP_DISCARD") {
-        pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-    }
+    if(vsync) pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
-    pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
-    MADECHAIN = TRUE;
     queueReset = false;
-    fEnabled = true;
     return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
 }
 
@@ -205,20 +213,24 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
     if (Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
 
+    if (currentVsyncState != Client::settings.getSettingByName<bool>("vsync")->value) {
+        queueReset = true;
+    }
+
     if (queueReset) {
         init = false;
         initImgui = false;
-        queueReset = false;
         Logger::debug("Resetting SwapChain");
         ResizeHook::cleanShit(false);
         return DXGI_ERROR_DEVICE_RESET;
     }
 
+
+
     swapchain = pSwapChain;
     flagsreal = flags;
 
     FPSMeasure();
-
 
     if (!init) {
         /* INIT START */
@@ -267,11 +279,11 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     /* EACH FRAME STUFF */
 
     try {
-        if (init && initImgui && !FlarialGUI::hasLoadedAll) { FlarialGUI::LoadAllImages(); FlarialGUI::hasLoadedAll = true; }
+        if (init && initImgui && !FlarialGUI::hasLoadedAll && !queue) { FlarialGUI::LoadAllImages(); FlarialGUI::hasLoadedAll = true; }
     } catch (const std::exception &ex) { Logger::error("Fail at loading all images: ", ex.what()); }
 
 
-    if (Client::settings.getSettingByName<bool>("vsync")->value) {
+    if (currentVsyncState) {
         return funcOriginal(pSwapChain, 0, DXGI_PRESENT_ALLOW_TEARING);
     }
 
@@ -356,8 +368,6 @@ void SwapchainHook::DX12Init() {
 
         DXGI_SWAP_CHAIN_DESC1 swapChainDescription;
         swapchain->GetDesc1(&swapChainDescription);
-
-        std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
 
         bufferCount = swapChainDescription.BufferCount;
 

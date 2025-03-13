@@ -146,7 +146,7 @@ public:
     }
 
     void onRender(RenderEvent &event) {
-        auto arrowsStr = std::to_string(arrows);
+        auto arrowsStr = FlarialGUI::cached_to_string(arrows);
         this->normalRender(13, arrowsStr);
     }
 };

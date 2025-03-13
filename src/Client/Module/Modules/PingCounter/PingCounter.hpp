@@ -107,7 +107,7 @@ public:
     }
 
     void onRender(RenderEvent &event) {
-        auto pingStr = std::to_string(SDK::getServerPing());
+        auto pingStr = FlarialGUI::cached_to_string(SDK::getServerPing());
         this->normalRender(11, pingStr);
     }
 };

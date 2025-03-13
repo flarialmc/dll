@@ -131,7 +131,7 @@ std::string APIUtils::legacyGet(const std::string &URL) {
                 } else {
                     // hi
                     DWORD lastError = GetLastError();
-                    //Logger::error("HttpQueryInfoA(HTTP_QUERY_CONTENT_ENCODING) failed, assuming no gzip or plain text. LastError: " + std::to_string(lastError));
+                    //Logger::error("HttpQueryInfoA(HTTP_QUERY_CONTENT_ENCODING) failed, assuming no gzip or plain text. LastError: " + FlarialGUI::cached_to_string(lastError));
                 }
 
 
@@ -152,7 +152,7 @@ std::string APIUtils::legacyGet(const std::string &URL) {
                         rtn = std::string(reinterpret_cast<const char*>(uncompressedBuffer.data()), finalUncompressedSize);
                     } else {
                         InternetCloseHandle(interwebs);
-                        Logger::error("mz_uncompress failed with status: " + std::to_string(status));
+                        Logger::error("mz_uncompress failed with status: " + FlarialGUI::cached_to_string(status));
                         return ""; // Decompression failed
                     }
                 } else {

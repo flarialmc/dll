@@ -442,4 +442,6 @@ void OffsetInit::init2030() {
     ADD_OFFSET("mce::Camera::worldMatrixStack", 0x40);
 
     ADD_OFFSET("LevelRendererCamera::onDeviceLost", 7);
+
+    //ADD_OFFSET("ContainerScreenController::_handlePlaceAll", X);
 }

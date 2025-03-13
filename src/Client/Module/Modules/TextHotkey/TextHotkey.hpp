@@ -42,8 +42,8 @@ public:
         this->addHeader("Function");
         this->addButton("Add another Keybind", "Multi-Keybind command support!", "Add", [this] {
 
-            std::string keybindName = "keybind-" + std::to_string(totalKeybinds);
-            std::string commandName = "text-" + std::to_string(totalKeybinds);
+            std::string keybindName = "keybind-" + FlarialGUI::cached_to_string(totalKeybinds);
+            std::string commandName = "text-" + FlarialGUI::cached_to_string(totalKeybinds);
 
             this->settings.addSetting(keybindName, (std::string)"");
             this->settings.addSetting(commandName, (std::string)"");
@@ -54,7 +54,7 @@ public:
                 std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
                 if (duration.count() >= 2.5) {
                     std::string count;
-                    if (i > 0) count = "-" + std::to_string(i);
+                    if (i > 0) count = "-" + FlarialGUI::cached_to_string(i);
                     if (this->isKeybind(event.keys, i) && this->isKeyPartOfKeybind(event.key, i)) {
                         auto player = SDK::clientInstance->getLocalPlayer();
                         //std::string xuid = *player->getXuid(&xuid);
@@ -85,8 +85,8 @@ public:
 
         for (int i = 0; i < totalKeybinds; ++i) {
 
-            std::string header = (i == 0) ? "Text" : "Text " + std::to_string(i);
-            std::string commandSettingName = (i == 0) ? "text" : "text-" + std::to_string(i);
+            std::string header = (i == 0) ? "Text" : "Text " + FlarialGUI::cached_to_string(i);
+            std::string commandSettingName = (i == 0) ? "text" : "text-" + FlarialGUI::cached_to_string(i);
 
             if(settings.getSettingByName<std::string>(commandSettingName) != nullptr) {
                 this->addHeader(header);
@@ -115,7 +115,7 @@ public:
                 std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
                 if (duration.count() >= 2.5) {
                     std::string count;
-                    if (i > 0) count = "-" + std::to_string(i);
+                    if (i > 0) count = "-" + FlarialGUI::cached_to_string(i);
                     if (this->isKeybind(event.keys, i) && this->isKeyPartOfKeybind(event.key, i)) {
                         auto player = SDK::clientInstance->getLocalPlayer();
                         //std::string xuid = *player->getXuid(&xuid);

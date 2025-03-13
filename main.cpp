@@ -46,15 +46,12 @@ DWORD WINAPI init() {
     Client::start = Utils::getCurrentMs();
     Logger::initialize();
     std::thread lol([]() { Audio::init(); });
-    lol.detach();
+    lol.detach(); // ???
     Client::initialize();
 
     Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
 
     Logger::success("Flarial initialized in {:.2f}s", Client::elapsed);
-
-
-
 
     OptionsParser parser;
     parser.parseOptionsFile();
@@ -164,6 +161,7 @@ DWORD WINAPI init() {
     Logger::custom(fmt::fg(fmt::color::pink), "CommandManager", "Shut down");
 
     ResizeHook::cleanShit();
+    Logger::custom(fmt::fg(fmt::color::pink), "DirectX", "Cleaning");
 
     kiero::shutdown();
 

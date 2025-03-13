@@ -175,6 +175,48 @@ namespace FlarialGUI {
     void LoadFonts(std::map<std::string, ImFont*>& FontMap);
     std::wstring GetFontFilePath(const std::wstring& fontName, DWRITE_FONT_WEIGHT weight);
     std::string WideToNarrow(const std::wstring& wideStr);
+
+#ifndef CACHED_TO_STRING_HPP
+#define CACHED_TO_STRING_HPP
+
+#include <string>
+#include <unordered_map>
+#include <mutex>
+
+    namespace detail {
+        template<typename T>
+        inline std::unordered_map<T, std::string>& getCache() {
+            static std::unordered_map<T, std::string> cache;
+            return cache;
+        }
+
+        template<typename T>
+        inline std::mutex& getMutex() {
+            static std::mutex m;
+            return m;
+        }
+    }
+
+    template<typename T>
+    inline std::string cached_to_string(const T& value) {
+        auto& cache = detail::getCache<T>();
+        {
+            std::lock_guard<std::mutex> lock(detail::getMutex<T>());
+            auto it = cache.find(value);
+            if (it != cache.end()) {
+                return it->second;
+            }
+        }
+        std::string result = std::to_string(value);
+        {
+            std::lock_guard<std::mutex> lock(detail::getMutex<T>());
+            cache[value] = result;
+        }
+        return result;
+    }
+
+#endif
+    
     void PopSize();
 
     void PopAllStack();
@@ -375,7 +417,7 @@ namespace FlarialGUI {
     std::string Dropdown(int index, float x, float y, const std::vector<std::string> &options, std::string &value,
                          const std::string &label);
 
-    void image(int resourceId, D2D1_RECT_F rect, LPCTSTR type = "PNG", bool shouldadd = true);
+    void image(int resourceId, D2D1_RECT_F rect, LPCTSTR type = "PNG", bool shouldadd = true, ImColor col = IM_COL32_WHITE);
 
     void LoadAllImageToCache();
 
