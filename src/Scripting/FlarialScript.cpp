@@ -20,27 +20,6 @@
 #include "ScriptLibs/AudioLib.hpp"
 #include "ScriptLibs/NetworkLib.hpp"
 
-template<typename Func, typename... Args>
-bool TryCallWrapper(Func func, Args&&... args) {
-    __try
-    {
-        func(std::forward<Args>(args)...);
-        return true;
-    } __except (EXCEPTION_EXECUTE_HANDLER)
-    {
-        return false;
-    }
-}
-
-#define TRY_CALL(func, ...) \
-[&]() { \
-bool result = TryCallWrapper([&]() { func(__VA_ARGS__); }); \
-if (!result) { \
-Logger::error("Exception thrown in {} at line {} in {}", __FUNCTION__, __LINE__, __FILE__); \
-} \
-return result; \
-}()
-
 static int customPrint(lua_State* L) {
     int args = lua_gettop(L);
     std::string msg;
@@ -178,27 +157,24 @@ void FlarialScript::registerEvent(const std::string& eventName) {
     if (mIsDestroyed) return;
 
     lua_getglobal(mState, "eventHandlers");
-    if (lua_istable(mState, -1)) {
-        lua_pushstring(mState, eventName.c_str());
-        lua_gettable(mState, -2);
-
-        if (lua_isfunction(mState, -1)) {
-            if (!TRY_CALL([&]() {
-                if (lua_pcall(mState, 0, 0, 0) != LUA_OK) {
-                    Logger::error("Error executing event {}: {}", eventName, lua_tostring(mState, -1));
-                    ADD_ERROR_MESSAGE("Error executing event " + eventName + ": " + std::string(lua_tostring(mState, -1)));
-                    lua_pop(mState, 1);
-                }
-            })) {
-                Logger::error("An error occurred while executing event {} in {}", eventName, mName);
-                ADD_ERROR_MESSAGE("An error occurred while executing event " + eventName + "in " + mName);
-            }
-        } else {
-            lua_pop(mState, 1);
-        }
-    } else {
-        Logger::error("eventHandlers table is missing or not valid.");
-        ADD_ERROR_MESSAGE("eventHandlers table is missing or not valid.");
+    if (!lua_istable(mState, -1)) {
+        lua_pop(mState, 1);
+        return;
     }
+
+    lua_pushstring(mState, eventName.c_str());
+    lua_gettable(mState, -2);
+
+    if (!lua_isfunction(mState, -1)) {
+        lua_pop(mState, 2);
+        return;
+    }
+
+    if (lua_pcall(mState, 0, 0, 0) != LUA_OK) {
+        Logger::error("Error executing event {}: {}", eventName, lua_tostring(mState, -1));
+        ADD_ERROR_MESSAGE("Error executing event " + eventName + ": " + std::string(lua_tostring(mState, -1)));
+        lua_pop(mState, 1);
+    }
+
     lua_pop(mState, 1);
 }
