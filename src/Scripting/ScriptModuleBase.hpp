@@ -60,6 +60,7 @@ public:
         Scripting::executeFunction(module_lua_state.get(), "settingsRender", false);
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
+        //i am hopeful
     }
 
     void onKey(KeyEvent& event) {
