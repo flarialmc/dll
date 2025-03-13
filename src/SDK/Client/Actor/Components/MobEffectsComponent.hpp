@@ -6,6 +6,8 @@
 #include <SDK/Client/Actor/EntityContext.hpp>
 #include <Utils/VersionUtils.hpp>
 
+#include "GUI/Engine/Engine.hpp"
+
 // LeviLamina
 
 class MobEffect {
@@ -166,7 +168,7 @@ public:
             case 4:
                 return "V";
             default:
-                return std::to_string(amplifier);
+                return FlarialGUI::cached_to_string(amplifier);
         }
     }
 };

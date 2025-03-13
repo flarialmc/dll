@@ -29,7 +29,7 @@ public:
     void addWaypoint(int index, std::string name, std::string color, Vec3<float> position, bool state, bool config, bool rgb, float opacity) {
         if (config)
         {
-            std::string end = "-" + std::to_string(index);
+            std::string end = "-" + FlarialGUI::cached_to_string(index);
             this->settings.addSetting("waypoint" + end, (std::string)name);
             this->settings.addSetting("color" + end, (std::string)color);
             this->settings.addSetting("x" + end, position.x);
@@ -53,7 +53,7 @@ public:
     }
 
     Vec3<float> getPos(int index) {
-        return Vec3{ this->settings.getSettingByName<float>("x-" + std::to_string(index))->value, this->settings.getSettingByName<float>("y-" + std::to_string(index))->value, this->settings.getSettingByName<float>("z-" + std::to_string(index))->value };
+        return Vec3{ this->settings.getSettingByName<float>("x-" + FlarialGUI::cached_to_string(index))->value, this->settings.getSettingByName<float>("y-" + FlarialGUI::cached_to_string(index))->value, this->settings.getSettingByName<float>("z-" + FlarialGUI::cached_to_string(index))->value };
     }
 
     void onSetup() override {
@@ -65,7 +65,7 @@ public:
                 int index = WaypointList.size();
                 addWaypoint(
                     index,
-                    "waypoint-" + std::to_string(index),
+                    "waypoint-" + FlarialGUI::cached_to_string(index),
                     "FFFFFF",
                     Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y - 1, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
                     true,
@@ -81,16 +81,16 @@ public:
 
         if(this->settings.getSettingByName<float>("total")->value > 0)
         for (int i = 0; i < this->settings.getSettingByName<float>("total")->value; i++) {
-            if(!this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(i))) continue;
+            if(!this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(i))) continue;
             addWaypoint(
                 i,
-                this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(i))->value,
-                this->settings.getSettingByName<std::string>("color-" + std::to_string(i))->value,
-                Vec3 {this->settings.getSettingByName<float>("x-" + std::to_string(i))->value, this->settings.getSettingByName<float>("y-" + std::to_string(i))->value, this->settings.getSettingByName<float>("z-" + std::to_string(i))->value},
-                this->settings.getSettingByName<bool>("state-" + std::to_string(i))->value,
+                this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(i))->value,
+                this->settings.getSettingByName<std::string>("color-" + FlarialGUI::cached_to_string(i))->value,
+                Vec3 {this->settings.getSettingByName<float>("x-" + FlarialGUI::cached_to_string(i))->value, this->settings.getSettingByName<float>("y-" + FlarialGUI::cached_to_string(i))->value, this->settings.getSettingByName<float>("z-" + FlarialGUI::cached_to_string(i))->value},
+                this->settings.getSettingByName<bool>("state-" + FlarialGUI::cached_to_string(i))->value,
                 false,
-                this->settings.getSettingByName<bool>("rgb-" + std::to_string(i))->value,
-                this->settings.getSettingByName<float>("opacity-" + std::to_string(i))->value
+                this->settings.getSettingByName<bool>("rgb-" + FlarialGUI::cached_to_string(i))->value,
+                this->settings.getSettingByName<float>("opacity-" + FlarialGUI::cached_to_string(i))->value
             );
         }
     }
@@ -149,7 +149,7 @@ public:
             int index = WaypointList.size();
             addWaypoint(
                 index,
-                "waypoint-" + std::to_string(index),
+                "waypoint-" + FlarialGUI::cached_to_string(index),
                 "FFFFFF",
                 Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y - 1, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
                 true,
@@ -201,14 +201,14 @@ public:
         }
         
         for (auto pair : WaypointList) {
-            if(!this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))) continue;
-            if (this->settings.getSettingByName<std::string>("world-" + std::to_string(pair.second.index))->value != SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()) continue;
-            this->addHeader(this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value);
-            this->addToggle("Enabled", "Change if the waypoint should be shown or not.", this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))->value);
-            this->addColorPicker("Color", "Change the color of the waypoint.", this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value, this->settings.getSettingByName<float>("opacity-" + std::to_string(pair.second.index))->value, this->settings.getSettingByName<bool>("rgb-" + std::to_string(pair.second.index))->value);
-            this->addTextBox("Name", "Change the name of the waypoint.", this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value);
+            if(!this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(pair.second.index))) continue;
+            if (this->settings.getSettingByName<std::string>("world-" + FlarialGUI::cached_to_string(pair.second.index))->value != SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()) continue;
+            this->addHeader(this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(pair.second.index))->value);
+            this->addToggle("Enabled", "Change if the waypoint should be shown or not.", this->settings.getSettingByName<bool>("state-" + FlarialGUI::cached_to_string(pair.second.index))->value);
+            this->addColorPicker("Color", "Change the color of the waypoint.", this->settings.getSettingByName<std::string>("color-" + FlarialGUI::cached_to_string(pair.second.index))->value, this->settings.getSettingByName<float>("opacity-" + FlarialGUI::cached_to_string(pair.second.index))->value, this->settings.getSettingByName<bool>("rgb-" + FlarialGUI::cached_to_string(pair.second.index))->value);
+            this->addTextBox("Name", "Change the name of the waypoint.", this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(pair.second.index))->value);
             this->addButton("Delete Waypoint", "", "Delete", [this, index = pair.second.index]() {
-                std::string end = "-" + std::to_string(index);
+                std::string end = "-" + FlarialGUI::cached_to_string(index);
                 this->settings.deleteSetting("waypoint" + end);
                 this->settings.deleteSetting("color" + end);
                 this->settings.deleteSetting("x" + end);
@@ -237,13 +237,13 @@ public:
         D2D1_COLOR_F invis = FlarialGUI::HexToColorF("000000");
         invis.a = 0.0F;
         for (auto pair : WaypointList) {
-            if(!this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))) continue; //check if its enabled
-            if (this->settings.getSettingByName<std::string>("world-" + std::to_string(pair.second.index))->value != SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()) continue;
-            if (this->settings.getSettingByName<std::string>("dimension-" + std::to_string(pair.second.index))->value != SDK::clientInstance->getBlockSource()->getDimension()->getName()) continue;
-            if (this->settings.getSettingByName<bool>("state-" + std::to_string(pair.second.index))->value)
+            if(!this->settings.getSettingByName<bool>("state-" + FlarialGUI::cached_to_string(pair.second.index))) continue; //check if its enabled
+            if (this->settings.getSettingByName<std::string>("world-" + FlarialGUI::cached_to_string(pair.second.index))->value != SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()) continue;
+            if (this->settings.getSettingByName<std::string>("dimension-" + FlarialGUI::cached_to_string(pair.second.index))->value != SDK::clientInstance->getBlockSource()->getDimension()->getName()) continue;
+            if (this->settings.getSettingByName<bool>("state-" + FlarialGUI::cached_to_string(pair.second.index))->value)
             {
                 //get name
-                std::string name = this->settings.getSettingByName<std::string>("waypoint-" + std::to_string(pair.second.index))->value;
+                std::string name = this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(pair.second.index))->value;
                 Waypoint waypoint = pair.second;
 
                 //get pos
@@ -258,7 +258,7 @@ public:
                     //create name/check if meters
                     if (this->settings.getSettingByName<bool>("showmeters"))
                     {
-                        name += " (" + std::to_string(int(round(distance))) + "m)";
+                        name += " (" + FlarialGUI::cached_to_string(int(round(distance))) + "m)";
                     }
                     //wide
                     std::wstring widename = std::wstring(name.begin(), name.end());
@@ -278,11 +278,11 @@ public:
                         D2D1_COLOR_F rect;
                         if (this->settings.getSettingByName<bool>("bguse")->value)
                         {
-                            if (this->settings.getSettingByName<bool>("rgb-" + std::to_string(pair.second.index))->value)
+                            if (this->settings.getSettingByName<bool>("rgb-" + FlarialGUI::cached_to_string(pair.second.index))->value)
                             {
                                 rect = FlarialGUI::rgbColor;
                             } else {
-                                rect = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value);
+                                rect = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + FlarialGUI::cached_to_string(pair.second.index))->value);
                             }
                             
                         }
@@ -301,12 +301,12 @@ public:
                         D2D1_COLOR_F border;
                         if (this->settings.getSettingByName<bool>("borderuse")->value)
                         {
-                            if (this->settings.getSettingByName<bool>("rgb-" + std::to_string(pair.second.index))->value)
+                            if (this->settings.getSettingByName<bool>("rgb-" + FlarialGUI::cached_to_string(pair.second.index))->value)
                             {
                                 border = FlarialGUI::rgbColor;
                             }
                             else {
-                                border = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value);
+                                border = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + FlarialGUI::cached_to_string(pair.second.index))->value);
                             }
                         }
                         else {
@@ -324,12 +324,12 @@ public:
                         D2D1_COLOR_F text;
                         if (this->settings.getSettingByName<bool>("textuse")->value)
                         {
-                            if (this->settings.getSettingByName<bool>("rgb-" + std::to_string(pair.second.index))->value)
+                            if (this->settings.getSettingByName<bool>("rgb-" + FlarialGUI::cached_to_string(pair.second.index))->value)
                             {
                                 text = FlarialGUI::rgbColor;
                             }
                             else {
-                                text = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value);
+                                text = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + FlarialGUI::cached_to_string(pair.second.index))->value);
                             }
                         }
                         else {
@@ -381,7 +381,7 @@ public:
             }
         }
     }
-    //get waypoint color D2D1_COLOR_F color = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + std::to_string(pair.second.index))->value);
+    //get waypoint color D2D1_COLOR_F color = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + FlarialGUI::cached_to_string(pair.second.index))->value);
 
     void onKey(KeyEvent &event) {
 

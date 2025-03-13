@@ -66,7 +66,7 @@ public:
 
         if (hour == 24) hour = 0;
 
-        std::string time = std::to_string(hour) + seperator + std::to_string(minute) + " " + meridiem;
+        std::string time = FlarialGUI::cached_to_string(hour) + seperator + FlarialGUI::cached_to_string(minute) + " " + meridiem;
 
         this->normalRender(3, time);
     }

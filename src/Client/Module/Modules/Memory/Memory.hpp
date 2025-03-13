@@ -117,7 +117,7 @@ public:
 
             int sussymem = static_cast<int>((used_memory * 100) / total_memory);
 
-            std::string text = std::to_string(sussymem) + "%";
+            std::string text = FlarialGUI::cached_to_string(sussymem) + "%";
 
             this->normalRender(4, text);
         }

@@ -130,7 +130,7 @@ public:
 
     void onRender(RenderEvent &event) {
         if (this->isEnabled()) {
-            auto delayStr = std::to_string(pingReach)+"\n"+std::to_string((int)round(hitDelay.count() * 1000));
+            auto delayStr = FlarialGUI::cached_to_string(pingReach)+"\n"+FlarialGUI::cached_to_string((int)round(hitDelay.count() * 1000));
 
             this->normalRender(21, delayStr);
         }

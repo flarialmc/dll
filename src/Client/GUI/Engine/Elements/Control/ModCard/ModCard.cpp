@@ -162,7 +162,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     float paddingSize = Constraints::RelativeConstraint(0.28);
 
-    FlarialGUI::Tooltip("mod_" + std::to_string(index), x, realY, mod->description, BottomRoundedWidth,
+    FlarialGUI::Tooltip("mod_" + FlarialGUI::cached_to_string(index), x, realY, mod->description, BottomRoundedWidth,
                         TopRoundedHeight);
 
     FlarialGUI::RoundedRect(modiconx, modicony, mod3Col,

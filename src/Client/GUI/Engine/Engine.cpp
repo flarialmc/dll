@@ -305,14 +305,18 @@ uint64_t generateUniqueLinearGradientBrushKey(float x, float hexPreviewSize, flo
 
 std::string WideToNarrow_creator(const std::wstring& wideStr) {
     int narrowStrLen = WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, nullptr, 0, nullptr, nullptr);
-    std::vector<char> narrowStr(narrowStrLen);
-    WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, narrowStr.data(), narrowStrLen, nullptr, nullptr);
-    return std::string(narrowStr.data());
+    if (narrowStrLen <= 0)
+        return {};
+
+    std::string result(narrowStrLen - 1, '\0');
+    WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, &result[0], narrowStrLen, nullptr, nullptr);
+    return result;
 }
 
 std::string FlarialGUI::WideToNarrow(const std::wstring& wideStr) {
  return fromWideCache.getOrInsert(WideToNarrow_creator, wideStr, wideStr);
 }
+
 
 bool FlarialGUI::CursorInRect(float rectX, float rectY, float width, float height) {
     if (MC::mousePos.x >= rectX && MC::mousePos.x <= rectX + width && MC::mousePos.y >= rectY &&
@@ -680,40 +684,46 @@ DWRITE_FONT_WEIGHT FlarialGUI::GetFontWeightFromString(const std::string& weight
 }
 
 
-std::string FlarialGUI::GetWeightedName(std::string name, DWRITE_FONT_WEIGHT weight) {
 
-    std::string adder;
-    if(Client::settings.getSettingByName<bool>("overrideFontWeight")->value) {
-        return name + "-" + Client::settings.getSettingByName<std::string>("fontWeight")->value;
+struct PairHash {
+    std::size_t operator()(const std::pair<std::string, DWRITE_FONT_WEIGHT>& p) const {
+        return std::hash<std::string>()(p.first) ^ (std::hash<int>()(static_cast<int>(p.second)) << 1);
+    }
+};
+
+std::string FlarialGUI::GetWeightedName(std::string name, DWRITE_FONT_WEIGHT weight) {
+    static std::unordered_map<std::pair<std::string, DWRITE_FONT_WEIGHT>, std::string, PairHash> cache;
+
+    auto key = std::make_pair(name, weight);
+    auto it = cache.find(key);
+    if (it != cache.end()) {
+        return it->second;
     }
 
-    if(!name.contains("-")) {
-        switch (weight) {
+    if (Client::settings.getSettingByName<bool>("overrideFontWeight")->value) {
+        std::string overrideValue = name + "-" + Client::settings.getSettingByName<std::string>("fontWeight")->value;
+        cache[key] = overrideValue;
+        return overrideValue;
+    }
 
-            case DWRITE_FONT_WEIGHT_BOLD:
-                return name + "-Bold";
-            break;
-            case DWRITE_FONT_WEIGHT_NORMAL:
-                return name + "-Normal";
-            break;
-            case DWRITE_FONT_WEIGHT_SEMI_BOLD:
-                return name + "-SemiBold";
-            break;
-            case DWRITE_FONT_WEIGHT_EXTRA_BOLD:
-                return name + "-ExtraBold";
-            break;
-            case DWRITE_FONT_WEIGHT_MEDIUM:
-                return name + "-Medium";
-            break;
-            case DWRITE_FONT_WEIGHT_LIGHT:
-                return name + "-Light";
-            break;
-            case DWRITE_FONT_WEIGHT_EXTRA_LIGHT:
-                return name + "-ExtraLight";
-            break;
+    std::string weightedName = name;
+    if (!name.contains("-")) {
+        switch (weight) {
+            case DWRITE_FONT_WEIGHT_BOLD: weightedName += "-Bold"; break;
+            case DWRITE_FONT_WEIGHT_NORMAL: weightedName += "-Normal"; break;
+            case DWRITE_FONT_WEIGHT_SEMI_BOLD: weightedName += "-SemiBold"; break;
+            case DWRITE_FONT_WEIGHT_EXTRA_BOLD: weightedName += "-ExtraBold"; break;
+            case DWRITE_FONT_WEIGHT_MEDIUM: weightedName += "-Medium"; break;
+            case DWRITE_FONT_WEIGHT_LIGHT: weightedName += "-Light"; break;
+            case DWRITE_FONT_WEIGHT_EXTRA_LIGHT: weightedName += "-ExtraLight"; break;
+            default: weightedName += "-Normal"; break;
         }
-      }
-    return name + "-Normal";
+    } else {
+        weightedName += "-Normal";
+    }
+
+    cache[key] = weightedName;
+    return weightedName;
 }
 
 bool hasEnding (std::string const &fullString, std::string const &ending) {
@@ -802,9 +812,9 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
     float fSize = ((fontSize * Client::settings.getSettingByName<float>(moduleFont ? "modules_font_scale" : "gui_font_scale")->value) / 135) * sizeMultiplier;
 
 	ImGui::SetWindowFontScale(fSize);
-    std::string stringText = WideToNarrow(text).c_str();
+    std::string stringText = WideToNarrow(text);
     ImVec2 size = ImGui::CalcTextSize(stringText.c_str());
-    std::string fontedName = weightedName + std::to_string(fSize);
+    std::string fontedName = weightedName + FlarialGUI::cached_to_string(fSize);
 
 
 	switch (alignment) {

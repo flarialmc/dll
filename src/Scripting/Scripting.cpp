@@ -188,7 +188,7 @@ void Scripting::loadModules() {
 
     ModuleManager::cguiRefresh = true;
     Logger::custom(fg(fmt::color::aqua), "Scripting", "Found {} scripts! Loaded {} scripts without errors. Found errors in {} scripts.", Scripting::scriptsAmount, Scripting::scriptsAmountWithoutErrors, Scripting::scriptsAmountWithErrors);
-    Scripting::console.addLog("Scripting", "Found " + std::to_string(Scripting::scriptsAmount) + " scripts! Loaded "+ std::to_string(Scripting::scriptsAmountWithoutErrors) +" scripts without errors. Found errors in "+ std::to_string(Scripting::scriptsAmountWithErrors) +" scripts.", fg(fmt::color::aqua));
+    Scripting::console.addLog("Scripting", "Found " + FlarialGUI::cached_to_string(Scripting::scriptsAmount) + " scripts! Loaded "+ FlarialGUI::cached_to_string(Scripting::scriptsAmountWithoutErrors) +" scripts without errors. Found errors in "+ FlarialGUI::cached_to_string(Scripting::scriptsAmountWithErrors) +" scripts.", fg(fmt::color::aqua));
 }
 
 

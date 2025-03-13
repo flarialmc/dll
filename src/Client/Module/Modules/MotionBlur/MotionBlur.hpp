@@ -96,7 +96,7 @@ public:
     void ImageWithOpacity(const winrt::com_ptr<ID3D11ShaderResourceView>& srv, ImVec2 size, float opacity)
     {
         if (opacity <= 0.0f) {
-            //std::cout << "alpha: " + std::to_string(opacity) << std::endl;
+            //std::cout << "alpha: " + FlarialGUI::cached_to_string(opacity) << std::endl;
             return;
         }
 
