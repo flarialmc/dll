@@ -1,5 +1,7 @@
 #include "ClickGUI.hpp"
 
+#include "Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp"
+
 void ClickGUI::onRender(RenderEvent &event) {
 
         float allahu = Constraints::RelativeConstraint(0.65);
@@ -567,6 +569,12 @@ modules = ModuleManager::getModules();
                         SwapchainHook::queueReset = true;
 
                     });
+
+                    c->addButton("Reload Configs", "Reloads the configs of all modules.", "RELOAD", [] () {
+
+                        ScriptMarketplace::reloadAllConfigs();
+
+                        });
 
                     c->addButton("Reload Scripts", "", "RELOAD", [] () {
 
