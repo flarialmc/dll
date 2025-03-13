@@ -18,6 +18,7 @@
 #include "ScriptLibs/ConstraintsLib.hpp"
 #include "ScriptLibs/PacketsLib.hpp"
 #include "ScriptLibs/AudioLib.hpp"
+#include "ScriptLibs/NetworkLib.hpp"
 
 template<typename Func, typename... Args>
 bool TryCallWrapper(Func func, Args&&... args) {
@@ -94,6 +95,7 @@ FlarialScript::FlarialScript(std::string filePath, std::string code)
     ScriptLib::registerLib<ConstraintsLib>(mState);
     ScriptLib::registerLib<PacketsLib>(mState);
     ScriptLib::registerLib<AudioLib>(mState);
+    ScriptLib::registerLib<NetworkLib>(mState);
 }
 
 bool FlarialScript::compile() {
