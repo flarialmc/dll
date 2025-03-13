@@ -45,6 +45,20 @@ public:
     void onEnable() override;
     void onDisable() override;
 
+    void saveSettings() {
+        if (const auto script = linkedScript.lock()) gScriptSettingManager.saveSettings(script.get());
+        try {
+            std::ofstream outputFile(settingspath);
+            if (!outputFile.is_open()) {
+                Logger::error("Failed to open file: {}", settingspath.string());
+                return;
+            }
+            outputFile << settings.ToJson();
+        } catch (const std::exception& e) {
+            Logger::error("An error occurred while saving settings: {}", e.what());
+        }
+    }
+
     void defaultConfig() override {
         if (const auto script = linkedScript.lock()) {
             gScriptSettingManager.loadSettings(script.get());

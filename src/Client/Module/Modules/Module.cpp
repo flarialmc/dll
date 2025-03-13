@@ -444,7 +444,7 @@ void Module::loadDefaults() {
     setup();
 }
 
-void Module::saveSettings() const {
+void Module::saveSettings() {
     try {
         std::ofstream outputFile(settingspath);
         if (!outputFile.is_open()) {
