@@ -181,7 +181,6 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 
 
     if (Client::settings.getSettingByName<bool>("killdx")->value) {
-        std::cout << "yes sir" << std::endl;
         std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
 
         if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
