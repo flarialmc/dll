@@ -80,16 +80,18 @@ public:
     static float inline accumilatedBarPos = 1;
     static bool inline isAnimatingModSet = false;
 
-    bool containsAny(const std::string& str) {
+    static bool containsAny(const std::string& str) {
         return std::any_of(APIUtils::onlineUsers.begin(), APIUtils::onlineUsers.end(),
-                           [&](const std::string& user) { return str.find(user) != std::string::npos; });
+                            [&](const std::string& user) {
+                                return !user.empty() && str.find(user) != std::string::npos;
+                            });
     }
 
     void onPacketReceive(PacketEvent &event) {
         if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
             auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
-            if(pkt->message.length() != 0){
-                if (ClickGUI::containsAny(String::removeNonAlphanumeric(String::removeColorCodes(pkt->message)))){ pkt->message = "§f[§4FLARIAL§f]§r " + pkt->message;}
+            if(!pkt->message.empty()){
+                if (containsAny(String::removeNonAlphanumeric(String::removeColorCodes(pkt->message)))){ pkt->message = "§f[§4FLARIAL§f]§r " + pkt->message;}
             }
         }
     }
