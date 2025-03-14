@@ -14,7 +14,7 @@ private:
     bool restored = false;
 public:
 
-    MovableChat() : Module("Chat Tweaks", "Makes the Minecraft chat better.", IDR_MOVABLE_PNG, "") {
+    MovableChat() : Module("Movable Chat", "Ability to move the chat.", IDR_MOVABLE_PNG, "") {
         Module::setup();
     };
 
