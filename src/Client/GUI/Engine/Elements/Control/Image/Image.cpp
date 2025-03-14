@@ -448,11 +448,8 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 	}
 
 		if (!ImagesClass::ImguiDX12Images[resourceId]) {
-			if (sizeof(ImTextureID) >= sizeof(D3D12_CPU_DESCRIPTOR_HANDLE)) { return; }
-			//static_assert(sizeof(ImTextureID) >= sizeof(D3D12_CPU_DESCRIPTOR_HANDLE), "D3D12_CPU_DESCRIPTOR_HANDLE is too large to fit in an ImTextureID");
 
-			int my_image_width = 0;
-			int my_image_height = 0;
+
 			ID3D12Resource* my_texture = NULL;
 
 
