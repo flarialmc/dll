@@ -29,6 +29,7 @@ Settings Client::settings = Settings();
 bool notifiedOfConnectionIssue = false;
 
 std::string Client::current_commit = COMMIT_HASH;
+std::vector<std::string> Client::availableConfigs;
 
 std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
     std::vector<std::string> allPlayers;
@@ -98,6 +99,32 @@ void Client::UnregisterActivationHandler()
     if (activationToken) // Check if the token is valid
     {
         CoreApplication::MainView().Activated(activationToken); // Unregister using the token
+    }
+}
+
+void Client::createConfig(std::string name) {
+    std::string to = Utils::getRoamingPath() + "\\Flarial\\Config\\" + name;
+    if (!std::filesystem::exists(to)) {
+        std::filesystem::create_directory(to);
+    }
+}
+
+void Client::loadAvailableConfigs() {
+    availableConfigs.push_back("default");
+    WIN32_FIND_DATAA findData;
+    HANDLE hFind = FindFirstFileA(Utils::getConfigsPath().c_str(), &findData);
+
+    if (hFind != INVALID_HANDLE_VALUE) {
+        do {
+            if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+                std::string folderName = findData.cFileName;
+                if (folderName != "." && folderName != "..") {
+                    availableConfigs.push_back(folderName);
+                }
+            }
+        } while (FindNextFileA(hFind, &findData));
+
+        FindClose(hFind);
     }
 }
 
@@ -173,13 +200,10 @@ void Client::initialize() {
         }
     }
 
-
     Client::CheckSettingsFile();
     Client::LoadSettings();
 
     Logger::success("4");
-
-
 
     ADD_SETTING("fontname", std::string("Space Grotesk"));
     ADD_SETTING("mod_fontname", std::string("Space Grotesk"));
@@ -210,6 +234,9 @@ void Client::initialize() {
     ADD_SETTING("fontWeight", std::string("Normal"));
     ADD_SETTING("nologoicon", false);
     ADD_SETTING("nochaticon", false);
+    ADD_SETTING("currentConfig", "default");
+
+    loadAvailableConfigs();
 
     Logger::success("5");
 

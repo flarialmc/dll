@@ -445,6 +445,10 @@ void Module::loadDefaults() {
 }
 
 void Module::saveSettings() {
+    if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
+        settingspath = fmt::format("{}\\{}\\{}.flarial", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
+        checkSettingsFile();
+    }
     try {
         std::ofstream outputFile(settingspath);
         if (!outputFile.is_open()) {
@@ -458,6 +462,11 @@ void Module::saveSettings() {
 }
 
 void Module::loadSettings() {
+    if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
+        settingspath = fmt::format("{}\\{}\\{}.flarial", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
+        checkSettingsFile();
+    }
+
     std::ifstream inputFile(settingspath);
     if (!inputFile.is_open()) {
         Logger::error("Failed to open file: {}", settingspath.string());
@@ -576,6 +585,10 @@ void Module::defaultConfig() {
         else {
             settings.addSetting("enabled", false);
         }
+    }
+
+    if (settings.getSettingByName<bool>("favorite") == nullptr) {
+        settings.addSetting("favorite", false);
     }
 
     if (settings.getSettingByName<float>("percentageX") == nullptr) {

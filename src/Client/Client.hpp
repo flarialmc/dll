@@ -16,9 +16,15 @@ public:
     static float elapsed;
     static uint64_t start;
 
+    static std::vector<std::string> availableConfigs;
+
     static std::vector<std::string> getPlayersVector(const nlohmann::json &data);
 
     static void UnregisterActivationHandler();
+
+    static void createConfig(std::string name);
+
+    static void loadAvailableConfigs();
 
     static void initialize();
 

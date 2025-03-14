@@ -96,6 +96,8 @@ public:
     }
 
     static void reloadAllConfigs() {
+        Client::availableConfigs.clear();
+        Client::loadAvailableConfigs();
         ModuleManager::restartModules = true;
     }
 };

@@ -1,5 +1,6 @@
 #include "ClickGUI.hpp"
 
+#include <random>
 #include <Scripting/ScriptManager.hpp>
 
 #include "Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp"
@@ -552,6 +553,30 @@ modules = ModuleManager::getModules();
                      rectHeight);
 
                     Module* c = this->ghostMainModule;
+                    c->addHeader("Config Manager");
+                    c->addDropdown("Selected Config", "", Client::availableConfigs, Client::settings.getSettingByName<std::string>("currentConfig")->value);
+
+                    c->addButton("Add a new config", "", "ADD", [] () {
+                        std::random_device rd;
+                        std::mt19937 gen(rd());
+
+                        std::uniform_int_distribution<> distrib(1000, 9000);
+
+                        int random_number = distrib(gen);
+                        std::string configname = "config-" + std::to_string(random_number);
+                        Client::createConfig(configname);
+                        Client::settings.getSettingByName<std::string>("currentConfig")->value = configname;
+                        FlarialGUI::Notify("Created & loaded: " + configname);
+                        ScriptMarketplace::reloadAllConfigs();
+                    });
+                    c->addButton("Remove selected config", "DELETES YOUR CURRENT CONFIG", "DELETE", [] () {
+                        ScriptMarketplace::reloadAllConfigs();
+                    });
+                    c->addButton("Reload Configs", "Reloads the configs of all modules.", "RELOAD", [] () {
+                        ScriptMarketplace::reloadAllConfigs();
+                    });
+                    c->extraPadding();
+
                     c->addHeader("Keybinds");
                     c->addKeybind("Eject Keybind", "When setting, hold the new bind for 2 seconds", Client::settings.getSettingByName<std::string>("ejectKeybind")->value);
 
@@ -573,11 +598,6 @@ modules = ModuleManager::getModules();
 
                     });
 
-                    c->addButton("Reload Configs", "Reloads the configs of all modules.", "RELOAD", [] () {
-
-                        ScriptMarketplace::reloadAllConfigs();
-
-                        });
 
                     c->addButton("Reload Scripts", "", "RELOAD", [&] () {
                         ModuleManager::restartModules = true;
