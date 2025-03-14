@@ -206,10 +206,10 @@ void ModuleManager::initialize() {
     addModule<ItemPhysics>();
 
     addModule<Mousestrokes>();
-    addModule<BlockHit>();
 
     if (VersionUtils::checkAboveOrEqual(21, 40)) {
         addModule<JavaInventoryHotkeys>();
+        addModule<BlockHit>();
     }
 
 
