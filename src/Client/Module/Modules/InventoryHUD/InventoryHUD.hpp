@@ -86,7 +86,7 @@ public:
 
             Vec2<float> vec2;
 
-            vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 25, s * 3 + spacing * 3, s);
+            vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 40, s * 3 + spacing * 3, s);
 
             currentPos.x = vec2.x;
             currentPos.y = vec2.y;
