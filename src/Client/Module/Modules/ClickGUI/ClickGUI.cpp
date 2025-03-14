@@ -423,21 +423,12 @@ void ClickGUI::onRender(RenderEvent &event) {
 
                     int i = 0;
 
-                    static auto modules = ModuleManager::getModules();
                     if(ModuleManager::cguiRefresh && ScriptManager::initialized && ModuleManager::initialized) {
-                        modules = ModuleManager::getModules();
+                        ModuleManager::updateModulesVector();
                         ModuleManager::cguiRefresh = false;
                     }
+                    auto modules = ModuleManager::modulesVector;
 
-
-
-                    if (Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value)
-                        std::sort(modules.begin(), modules.end(), compareEnabled);
-                    else std::sort(modules.begin(), modules.end(), compareNames);
-
-                    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - favoriteStart);
-                    if (elapsed.count() > 100)
-                    std::sort(modules.begin(), modules.end(), compareFavorite);
 
 
                     for (const auto& pModule: modules) {

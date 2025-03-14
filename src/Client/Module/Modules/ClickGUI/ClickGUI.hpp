@@ -471,7 +471,7 @@ public:
 
                 if (!Client::settings.getSettingByName<bool>("nochaticon")->value) Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
                 else Deafen(this, PacketEvent, &ClickGUI::onPacketReceive);
-
+                ModuleManager::cguiRefresh = true;
                 keybindActions[0]({});
             }
 
@@ -590,20 +590,5 @@ public:
         if ((this->active || editmenu) && SDK::getCurrentScreen() == "hud_screen")
             event.cancel(); // TODO: modules dont listen for canceled state!!!
 
-    }
-
-    static bool compareEnabled(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
-        return obj1->isEnabled() >
-               obj2->isEnabled();
-    }
-
-    static bool compareFavorite(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
-        return obj1->settings.getSettingByName<bool>("favorite")->value >
-               obj2->settings.getSettingByName<bool>("favorite")->value;
-    }
-
-
-    static bool compareNames(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
-        return obj1->name < obj2->name;
     }
 };

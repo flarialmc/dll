@@ -94,23 +94,38 @@
 #include "Modules/AutoPerspective/AutoPerspective.hpp"
 
 
-namespace ModuleManager {
-    std::map<size_t, std::shared_ptr<Module>> moduleMap;
-    std::vector<std::shared_ptr<Listener>> services;
-    bool initialized = false;
-    bool restartModules = false;
-    bool cguiRefresh = false;
-}
-
-
 std::vector<std::shared_ptr<Module>> ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
-    std::vector<std::shared_ptr<Module>> modulesVector;
     for (const auto& pair : moduleMap) {
         if(pair.second == nullptr) continue;
         modulesVector.push_back(pair.second);
     }
     return modulesVector;
 }
+
+bool compareEnabled(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
+    return obj1->isEnabled() >
+           obj2->isEnabled();
+}
+
+bool compareFavorite(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
+    return obj1->settings.getSettingByName<bool>("favorite")->value >
+           obj2->settings.getSettingByName<bool>("favorite")->value;
+}
+
+
+bool compareNames(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
+    return obj1->name < obj2->name;
+}
+
+
+void ModuleManager::updateModulesVector() {
+    if (modulesVector.empty()) getModules();
+    if (Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value)
+        std::sort(modulesVector.begin(), modulesVector.end(), compareEnabled);
+    else std::sort(modulesVector.begin(), modulesVector.end(), compareNames);
+    std::sort(modulesVector.begin(), modulesVector.end(), compareFavorite);
+}
+
 
 void ModuleManager::initialize() {
 
