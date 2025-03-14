@@ -37,7 +37,7 @@ std::shared_ptr<T> makeModule(ArgsT... args) {
         services.emplace_back(servicePtr);
     }
 
-    std::vector<std::shared_ptr<Module>> getModules();
+    void getModules();
 
     void syncState();
 

@@ -94,12 +94,11 @@
 #include "Modules/AutoPerspective/AutoPerspective.hpp"
 
 
-std::vector<std::shared_ptr<Module>> ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
+void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
     for (const auto& pair : moduleMap) {
         if(pair.second == nullptr) continue;
         modulesVector.push_back(pair.second);
     }
-    return modulesVector;
 }
 
 bool compareEnabled(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
@@ -120,7 +119,6 @@ bool compareNames(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) 
 
 void ModuleManager::updateModulesVector() {
     if (modulesVector.empty()) getModules();
-    else return;
     if (Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value)
         std::sort(modulesVector.begin(), modulesVector.end(), compareEnabled);
     else std::sort(modulesVector.begin(), modulesVector.end(), compareNames);
@@ -298,7 +296,7 @@ void ModuleManager::syncState() {
 
 
 void ModuleManager::SaveModulesConfig() {
-    for (const auto& module : getModules()) {
+    for (const auto& module : modulesVector) {
         module->saveSettings();
     }
 
