@@ -120,6 +120,7 @@ bool compareNames(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) 
 
 void ModuleManager::updateModulesVector() {
     if (modulesVector.empty()) getModules();
+    else return;
     if (Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value)
         std::sort(modulesVector.begin(), modulesVector.end(), compareEnabled);
     else std::sort(modulesVector.begin(), modulesVector.end(), compareNames);
