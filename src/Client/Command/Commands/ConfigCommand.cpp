@@ -86,6 +86,7 @@ winrt::Windows::Foundation::IAsyncAction import() {
         mz_zip_reader_end(&zip_archive);
         Logger::success("Extracted zip file: {} to {}", zipFileName, extractionDir.string());
         FlarialGUI::Notify("Created & loaded: " + zipFileName);
+        ModuleManager::restartModules = true;
     }
     co_return;
 }
