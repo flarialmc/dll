@@ -6,7 +6,8 @@
 #include "Modules/Misc/TextAlias/TextAliasListener.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/Module.hpp"
-#include "Modules/FPS/FPSCounter.hpp"
+#include "Modules/FPS/FPS.hpp"
+#include "Modules/Waila/Waila.hpp"
 #include "Modules/CPS/CPSCounter.hpp"
 #include "Modules/Zoom/Zoom.hpp"
 #include "Modules/Time/Time.hpp"
@@ -143,7 +144,7 @@ void ModuleManager::initialize() {
 
     addModule<ClickGUI>();
     addModule<Module202020>();
-    addModule<FPSCounter>();
+    addModule<FPS>();
     addModule<CPSCounter>();
     addModule<IPDisplay>();
     addModule<ReachCounter>();
@@ -218,6 +219,7 @@ void ModuleManager::initialize() {
 
     addModule<NullMovement>();
     addModule<CustomCrosshair>();
+    addModule<Waila>();
 
     addModule<RawInputBuffer>();
     //addModule<ItemUseDelayFix>();
