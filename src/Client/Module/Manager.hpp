@@ -37,14 +37,21 @@ std::shared_ptr<T> makeModule(ArgsT... args) {
         services.emplace_back(servicePtr);
     }
 
-    std::vector<std::shared_ptr<Module>> getModules();
+    void getModules();
 
     void syncState();
 
     void SaveModulesConfig();
 
     bool doesAnyModuleHave(const std::string& settingName);
-
+    void updateModulesVector();
     std::shared_ptr<Module> getModule(const std::string& name);
+
+    inline std::map<size_t, std::shared_ptr<Module>> moduleMap;
+    inline std::vector<std::shared_ptr<Listener>> services;
+    inline std::vector<std::shared_ptr<Module>> modulesVector;
+    inline bool initialized = false;
+    inline bool restartModules = false;
+    inline bool cguiRefresh = false;
 }
 

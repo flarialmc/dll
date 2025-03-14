@@ -52,6 +52,7 @@ std::map<int, ID2D1Bitmap *> ClickGUIElements::images;
 std::vector<Vec2<float>> sizes;
 std::vector<Vec2<float>> shadowSizes;
 
+
 void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const int index, bool visible, float opacity) {
 
 
@@ -249,6 +250,9 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     D2D1_COLOR_F modicon = colors_modicon_rgb ? FlarialGUI::rgbColor : colors_modicon;
     modicon.a = o_colors_modicon;
     modicon.a = opacity;
+    if (mod->settings.getSettingByName<bool>("favorite")->value || FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
+        modicon = D2D1::ColorF(D2D1::ColorF::Gold);
+    }
     FlarialGUI::image(iconId, D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize), "PNG", true, FlarialGUI::D2DColorToImColor(modicon)); //, FlarialGUI::D2DColorToImColor(modicon)
 
     // actually button
@@ -291,8 +295,19 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     FlarialGUI::FlarialTextWithFont((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.15f, paddingwidth), buttony - buttonHeight, FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, DWRITE_TEXT_ALIGNMENT_CENTER, buttonWidth * 1.08, DWRITE_FONT_WEIGHT_NORMAL, textCol2, false);
 
+    D2D1::RectF();
     if (FlarialGUI::isInScrollView)
         buttony += FlarialGUI::scrollpos;
+
+
+    static bool fix;
+    if (MC::mouseAction == Release) fix = false;
+    if (FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize) && MC::mouseButton == Left && MC::mouseAction == Press && !fix) {
+        fix = true;
+        mod->settings.getSettingByName<bool>("favorite")->value = !mod->settings.getSettingByName<bool>("favorite")->value;
+            FlarialGUI::Notify("Reopen this menu to view changes.");
+            ClickGUI::favoriteStart = std::chrono::high_resolution_clock::now();
+      }
 
     if (FlarialGUI::CursorInRect(settingx, buttony - buttonHeight,
                                  paddingwidth + Constraints::RelativeConstraint(0.26), buttonHeight) && MC::mouseButton == MouseButton::Left &&

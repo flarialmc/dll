@@ -5,6 +5,8 @@
 
 #include "Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp"
 
+std::chrono::time_point<std::chrono::high_resolution_clock> ClickGUI::favoriteStart;
+
 
 void ClickGUI::onRender(RenderEvent &event) {
 
@@ -421,18 +423,13 @@ void ClickGUI::onRender(RenderEvent &event) {
 
                     int i = 0;
 
-                    static auto modules = ModuleManager::getModules();
                     if(ModuleManager::cguiRefresh && ScriptManager::initialized && ModuleManager::initialized) {
-modules = ModuleManager::getModules();
+                        ModuleManager::updateModulesVector();
                         ModuleManager::cguiRefresh = false;
-}
+                    }
+                    auto modules = ModuleManager::modulesVector;
 
 
-
-                    if (Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value)
-                        std::sort(modules.begin(), modules.end(), compareEnabled);
-                    else
-                        std::sort(modules.begin(), modules.end(), compareNames);
 
                     for (const auto& pModule: modules) {
                         bool visible = (modcenter.y + yModifier + FlarialGUI::scrollpos + 55 > center.y) &&
