@@ -26,7 +26,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
 
         if (settings.getSettingByName<float>("xveloc") == nullptr)
             settings.addSetting("xveloc", 1.0f);

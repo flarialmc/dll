@@ -19,7 +19,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<bool>("thirdpersoncrosshair") == nullptr)
             settings.addSetting("thirdpersoncrosshair", true);
     }

@@ -59,7 +59,7 @@ public:
         }
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (const auto script = linkedScript.lock()) {
             gScriptSettingManager.loadSettings(script.get());
         }

@@ -48,7 +48,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
 
         if (settings.getSettingByName<std::string>("nick") == nullptr)
             settings.addSetting<std::string>("nick", "Flarial User");
