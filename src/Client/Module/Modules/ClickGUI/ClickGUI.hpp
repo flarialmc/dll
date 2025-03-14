@@ -598,7 +598,7 @@ public:
 
     static bool compareFavorite(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
         return obj1->settings.getSettingByName<bool>("favorite")->value >
-               obj1->settings.getSettingByName<bool>("favorite")->value;
+               obj2->settings.getSettingByName<bool>("favorite")->value;
     }
 
 

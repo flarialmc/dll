@@ -423,9 +423,9 @@ void ClickGUI::onRender(RenderEvent &event) {
 
                     static auto modules = ModuleManager::getModules();
                     if(ModuleManager::cguiRefresh && ScriptManager::initialized && ModuleManager::initialized) {
-modules = ModuleManager::getModules();
+                        modules = ModuleManager::getModules();
                         ModuleManager::cguiRefresh = false;
-}
+                    }
 
 
 
@@ -434,7 +434,7 @@ modules = ModuleManager::getModules();
                     else
                         std::sort(modules.begin(), modules.end(), compareNames);
 
-                    std::ranges::sort(modules, compareFavorite);
+                    std::sort(modules.begin(), modules.end(), compareFavorite);
 
                     for (const auto& pModule: modules) {
                         bool visible = (modcenter.y + yModifier + FlarialGUI::scrollpos + 55 > center.y) &&
