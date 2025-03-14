@@ -92,7 +92,7 @@
 #include "Modules/Mousestrokes/Mousestrokes.hpp"
 #include "Scripting/ScriptManager.hpp"
 #include "Modules/AutoPerspective/AutoPerspective.hpp"
-
+#include "Modules/BlockHit/BlockHit.hpp"
 
 namespace ModuleManager {
     std::map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -192,6 +192,7 @@ void ModuleManager::initialize() {
     addModule<ItemPhysics>();
 
     addModule<Mousestrokes>();
+    addModule<BlockHit>();
 
     if (VersionUtils::checkAboveOrEqual(21, 40)) {
         addModule<JavaInventoryHotkeys>();
