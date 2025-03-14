@@ -90,6 +90,7 @@ public:
     static float inline accumilatedPos = 1;
     static float inline accumilatedBarPos = 1;
     static bool inline isAnimatingModSet = false;
+    static std::chrono::time_point<std::chrono::high_resolution_clock> favoriteStart;
 
     static bool containsAny(const std::string& str) {
         return std::any_of(APIUtils::onlineUsers.begin(), APIUtils::onlineUsers.end(),

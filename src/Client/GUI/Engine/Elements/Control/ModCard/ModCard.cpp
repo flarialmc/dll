@@ -52,6 +52,7 @@ std::map<int, ID2D1Bitmap *> ClickGUIElements::images;
 std::vector<Vec2<float>> sizes;
 std::vector<Vec2<float>> shadowSizes;
 
+
 void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const int index, bool visible, float opacity) {
 
 
@@ -299,10 +300,11 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         buttony += FlarialGUI::scrollpos;
 
 
-    if (FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize) && MC::mouseButton == MouseButton::Left &&
-        !MC::held) {
+
+    if (FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize) && MC::mouseButton == Left && !MC::held) {
             mod->settings.getSettingByName<bool>("favorite")->value = !mod->settings.getSettingByName<bool>("favorite")->value;
-        }
+            ClickGUI::favoriteStart = std::chrono::high_resolution_clock::now();
+      }
 
     if (FlarialGUI::CursorInRect(settingx, buttony - buttonHeight,
                                  paddingwidth + Constraints::RelativeConstraint(0.26), buttonHeight) && MC::mouseButton == MouseButton::Left &&
