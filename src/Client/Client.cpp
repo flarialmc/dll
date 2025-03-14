@@ -109,6 +109,14 @@ void Client::createConfig(std::string name) {
     }
 }
 
+void Client::deleteConfig(std::string name) {
+    std::string to = Utils::getRoamingPath() + "\\Flarial\\Config\\" + name;
+    if (std::filesystem::exists(to)) {
+        std::filesystem::remove_all(to);
+    }
+}
+
+
 void Client::loadAvailableConfigs() {
     availableConfigs.push_back("default");
     const std::string directoryPath = Utils::getConfigsPath();

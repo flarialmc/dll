@@ -1,5 +1,6 @@
 #pragma once
 
+#include <random>
 #include <winrt/impl/windows.storage.2.h>
 #include <wininet.h>
 #include "../../../../Client.hpp"
@@ -86,8 +87,20 @@ public:
                     Logger::info("data: {}", data.c_str());
                     file.write(data.c_str(), data.size());
                     file.close();
-                    Utils::extractFromFile(Utils::getRoamingPath() + "\\Flarial\\tmpd.tmp", Utils::getRoamingPath() + "\\Flarial\\Config");
+                    std::random_device rd;
+                    std::mt19937 gen(rd());
+
+                    std::uniform_int_distribution<> distrib(1000, 9000);
+
+                    int random_number = distrib(gen);
+                    std::string configname = "config-" + std::to_string(random_number);
+                    Client::createConfig(configname);
+                    std::string to = Utils::getRoamingPath() + "\\Flarial\\Config\\" + configname;
+
+                    Utils::extractFromFile(Utils::getRoamingPath() + "\\Flarial\\tmpd.tmp", to);
                     std::filesystem::remove(Utils::getRoamingPath() + "\\Flarial\\tmpd.tmp");
+
+                    FlarialGUI::Notify("Imported Config as: " + configname);
 
                     reloadAllConfigs();
                 }

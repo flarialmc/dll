@@ -24,6 +24,10 @@ public:
 
     static void createConfig(std::string name);
 
+    static void deleteConfg(std::string name);
+
+    static void deleteConfig(std::string name);
+
     static void loadAvailableConfigs();
 
     static void initialize();

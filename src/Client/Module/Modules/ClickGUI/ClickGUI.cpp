@@ -572,10 +572,22 @@ modules = ModuleManager::getModules();
 
                     });
                     c->addButton("Remove selected config", "DELETES YOUR CURRENT CONFIG", "DELETE", [] () {
-                        //ScriptMarketplace::reloadAllConfigs();
+                        if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
+                            std::string to = Client::settings.getSettingByName<std::string>("currentConfig")->value;
+                            Client::settings.getSettingByName<std::string>("currentConfig")->value = "default";
+                            Client::deleteConfig(to);
+                            ScriptMarketplace::reloadAllConfigs();
+                            FlarialGUI::Notify("Deleted " + to);
+
+                        } else {
+                            FlarialGUI::Notify("Cannot delete default config.");
+                        }
                     });
                     c->addButton("Reload Configs", "Reloads the configs of all modules.", "RELOAD", [] () {
                         ScriptMarketplace::reloadAllConfigs();
+                        std::string to = Client::settings.getSettingByName<std::string>("currentConfig")->value;
+                        FlarialGUI::Notify("Reloaded " + to);
+
                     });
                     c->extraPadding();
 

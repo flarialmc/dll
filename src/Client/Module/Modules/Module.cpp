@@ -448,6 +448,9 @@ void Module::saveSettings() {
     if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
         settingspath = fmt::format("{}\\{}\\{}.flarial", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
         checkSettingsFile();
+    } else {
+        settingspath = fmt::format("{}\\{}.flarial", Utils::getConfigsPath(), name);
+        checkSettingsFile();
     }
     try {
         std::ofstream outputFile(settingspath);
@@ -464,6 +467,9 @@ void Module::saveSettings() {
 void Module::loadSettings() {
     if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
         settingspath = fmt::format("{}\\{}\\{}.flarial", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
+        checkSettingsFile();
+    }   else {
+        settingspath = fmt::format("{}\\{}.flarial", Utils::getConfigsPath(), name);
         checkSettingsFile();
     }
 

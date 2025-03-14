@@ -247,7 +247,6 @@ void ModuleManager::restart(){
                 bool old = mod->enabledState;
                 mod->enabledState = mod->isEnabled();
                 if (old != mod->enabledState) {
-                    std::cout << "yes sir" << std::endl;
                     if (mod->enabledState) mod->onEnable();
                     else mod->onDisable();
                 }
