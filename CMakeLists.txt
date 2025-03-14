@@ -46,9 +46,6 @@ add_compile_options($<$<CONFIG:Release>:/GF>)
 # Optimize floating point operations for speed (may introduce minor precision differences)
 # add_compile_options($<$<CONFIG:Release>:/fp:fast>)
 
-# Disable RTTI (Run-Time Type Information) to reduce binary size and possibly improve performance
-add_compile_options($<$<CONFIG:Release>:/GR->)
-
 # Inline any suitable function to improve performance by reducing function call overhead
 add_compile_options($<$<CONFIG:Release>:/Ob2>)
 
