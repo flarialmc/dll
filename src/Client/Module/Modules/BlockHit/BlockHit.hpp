@@ -8,7 +8,7 @@ class BlockHit : public Module {
 
 public:
     BlockHit() : Module("Block Hit", "Sword Blocking Animation like Java (visual only)",
-                      IDR_LIKE_PNG, "") {
+                      IDR_SWORD_PNG, "") {
         Module::setup();
     };
 

@@ -10,7 +10,7 @@ private:
     bool ranked = false;
 public:
     ZeqaUtils() : Module("Zeqa Utils", "Handy utilities for Zeqa",
-                      IDR_TIME_PNG, "") {
+                      IDR_ZEQA_PNG, "") {
         Module::setup();
     };
 
