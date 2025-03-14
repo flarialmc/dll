@@ -144,14 +144,14 @@ public:
             useSolid = true;
         }
 
-        std::shared_ptr<mce::MaterialPtr> material = useSolid ? std::shared_ptr<mce::MaterialPtr>(MaterialUtils::getUITextured()) : std::shared_ptr<mce::MaterialPtr>(MaterialUtils::getUICrosshair());
+        mce::MaterialPtr *material = useSolid ? MaterialUtils::getUITextured() : MaterialUtils::getUICrosshair();
 
         bool isDefault = true;
 
         if(isDefault) {
             // Pack crosshairs have textures placed whereever so this will figure it out
             IntRectangle rect = IntRectangle(pos.x, pos.y, size.x, size.y);
-            ScreenRenderer::blit(screenContext, &ptr, &rect, material.get());
+            ScreenRenderer::blit(screenContext, &ptr, &rect, material);
         } else {
             //auto desc = ptr.clientTexture->textureDescription;
 
