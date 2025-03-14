@@ -10,11 +10,6 @@
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 #include <SDK/Client/Util/mce.hpp>
 
-class mcUUID {
-public:
-    uint64_t mostSig, leastSig;
-};
-
 enum PlayerListPacketType : int8_t {
     AddPlayerEntry = 0x0,  // The names are just add and removed but i dont want to cause issues
     RemovePlayerEntry = 0x1,
