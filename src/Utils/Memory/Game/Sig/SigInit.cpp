@@ -549,4 +549,6 @@ void SigInit::init2030() {
 
     //     ADD_SIG("ContainerScreenController::_onContainerSlotHovered", "48 89 ? ? ? 57 41 ? 41 ? 48 83 EC ? 45 8B ? 48 8B ? 48 8B ? 44 39");
     ADD_SIG("ContainerScreenController::_onContainerSlotHovered", "40 53 48 83 EC 40 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 30 41 8B D8");// "40 ? 55 56 57 41 ? 48 81 EC ? ? ? ? 41 8B ? 48 8B");
+
+    ADD_SIG("BobView", "40 53 56 48 83 EC 78 ? ? 7C");
 }
