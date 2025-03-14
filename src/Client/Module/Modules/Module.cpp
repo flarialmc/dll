@@ -522,7 +522,6 @@ void Module::setup() {
     Module::defaultConfig();
     keybindActions.push_back([this] (std::vector<std::any> args)-> std::any {
         this->active = !this->active;
-        this->enabledState = !this->enabledState;
         return {};
     });
 
