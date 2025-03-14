@@ -11,7 +11,7 @@
 
 #include <shlobj.h>
 #include <string>
-
+#include <winrt/Windows.Storage.Streams.h>
 #include <miniz/miniz.h>
 #include <Manager.hpp>
 
@@ -22,7 +22,7 @@ winrt::Windows::Foundation::IAsyncAction import() {
 
     const auto selectedFiles = co_await WinrtUtils::pickFiles(L".zip");
     if (selectedFiles.Size() == 0) co_return;
-
+    std::cout << "Trying" << std::endl;
     for (uint32_t i = 0; i < selectedFiles.Size(); i++)
     {
         auto zipFile = selectedFiles.GetAt(i);
@@ -41,9 +41,14 @@ winrt::Windows::Foundation::IAsyncAction import() {
         std::string zipFilePath = winrt::to_string(zipFilePathW);
         mz_zip_archive zip_archive;
         memset(&zip_archive, 0, sizeof(zip_archive));
-        if (!mz_zip_reader_init_file(&zip_archive, zipFilePath.c_str(), 0))
+        auto stream = co_await zipFile.OpenAsync(FileAccessMode::Read);
+        auto buffer = co_await FileIO::ReadBufferAsync(zipFile);
+        std::vector<uint8_t> data(buffer.Length());
+        winrt::Windows::Storage::Streams::DataReader::FromBuffer(buffer).ReadBytes(data);
+
+        if (!mz_zip_reader_init_mem(&zip_archive, data.data(), data.size(), 0))
         {
-            Logger::error("Failed to initialize zip archive: {}", zipFileName);
+            Logger::error("Failed to initialize zip archive from memory: {}", zipFileName);
             continue;
         }
         int fileCount = static_cast<int>(mz_zip_reader_get_num_files(&zip_archive));
@@ -86,16 +91,20 @@ winrt::Windows::Foundation::IAsyncAction import() {
 }
 
 void ConfigCommand::execute(const std::vector<std::string>& args) {
-    std::string action = String::toLower(args[0]);
+    if (!args.empty()) {
+        std::string action = String::toLower(args[0]);
 
-    if (action == "reload") ScriptMarketplace::reloadAllConfigs();
-    else if (action == "create" && args.size() == 2) { Client::createConfig(args[1]); FlarialGUI::Notify("Created " + args[1]); }
-    else if (action == "delete" && args.size() == 2) { Client::deleteConfig(args[1]); FlarialGUI::Notify("Deleted " + args[1]); }
-    else if (action == "select" && args.size() == 2) { if (std::filesystem::exists(Utils::getRoamingPath() + "\\Flarial\\Config\\" + args[1])) {Client::settings.getSettingByName<std::string>("currentConfig")->value = args[1]; FlarialGUI::Notify("Selected " + args[1]);} }
-    else if (action == "import") {
-        [=]() -> winrt::fire_and_forget {
-            co_await import();
-        }();
+        if (action == "reload") ScriptMarketplace::reloadAllConfigs();
+        else if (action == "create" && args.size() == 2) { Client::createConfig(args[1]); FlarialGUI::Notify("Created " + args[1]); }
+        else if (action == "delete" && args.size() == 2) { Client::deleteConfig(args[1]); FlarialGUI::Notify("Deleted " + args[1]); }
+        else if (action == "select" && args.size() == 2) { if (std::filesystem::exists(Utils::getRoamingPath() + "\\Flarial\\Config\\" + args[1])) {Client::settings.getSettingByName<std::string>("currentConfig")->value = args[1]; FlarialGUI::Notify("Selected " + args[1]);} }
+        else if (action == "import") {
+            [=]() -> winrt::fire_and_forget {
+                co_await import();
+            }();
+        }
+    } else {
+        addCommandMessage("§cUsage: .config <create/delete/reload/import>");
     }
 }
 
