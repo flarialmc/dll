@@ -249,7 +249,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     D2D1_COLOR_F modicon = colors_modicon_rgb ? FlarialGUI::rgbColor : colors_modicon;
     modicon.a = o_colors_modicon;
     modicon.a = opacity;
-    if (mod->settings.getSettingByName<bool>("favorite")->value || FlarialGUI::CursorInRect(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize)) {
+    if (mod->settings.getSettingByName<bool>("favorite")->value || FlarialGUI::CursorInRect(modiconx, modicony, paddingSize, paddingSize)) {
         modicon = D2D1::ColorF(D2D1::ColorF::Gold);
     }
     FlarialGUI::image(iconId, D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize), "PNG", true, FlarialGUI::D2DColorToImColor(modicon)); //, FlarialGUI::D2DColorToImColor(modicon)
