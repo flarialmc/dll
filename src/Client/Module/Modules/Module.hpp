@@ -90,7 +90,7 @@ public:
     virtual void loadDefaults();
     void saveSettings();
     void loadSettings();
-    void checkSettingsFile() const;
+    void checkSettingsFile();
     virtual void toggle();
     virtual void setup();
     virtual void onSetup();

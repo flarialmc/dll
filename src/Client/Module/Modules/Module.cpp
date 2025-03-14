@@ -476,7 +476,10 @@ void Module::loadSettings() {
     std::stringstream ss;
     ss << inputFile.rdbuf();
     inputFile.close();
-    settings.FromJson(ss.str());
+
+    if (!ss.str().empty() && ss.str() != "null") settings.FromJson(ss.str());
+    else { }
+
 
     totalKeybinds = 0;
     totalWaypoints = 0;
@@ -491,7 +494,7 @@ void Module::loadSettings() {
     }
 }
 
-void Module::checkSettingsFile() const {
+void Module::checkSettingsFile() {
     if (!std::filesystem::exists(settingspath)) {
         std::filesystem::create_directories(settingspath.parent_path());
         std::ofstream outputFile(settingspath);
@@ -526,6 +529,7 @@ void Module::onSetup() { }
 // TODO: rename to Enable/Disable?
 void Module::onEnable() {
     enabledState = true;
+    if (settings.getSettingByName<bool>("enabled"))
     settings.getSettingByName<bool>("enabled")->value = true;
     saveSettings();
 }
@@ -534,6 +538,7 @@ void Module::onDisable() {
     enabledState = false;
     active = false;
     if (!terminating) {
+        if (settings.getSettingByName<bool>("enabled"))
         settings.getSettingByName<bool>("enabled")->value = false;
     }
     saveSettings();

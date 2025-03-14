@@ -240,7 +240,7 @@ void ModuleManager::restart(){
     initialized = false;
     for (const auto& pair : moduleMap) {
         if (pair.second) {
-            std::shared_ptr mod = ModuleManager::getModule(pair.second->name);
+            std::shared_ptr mod = getModule(pair.second->name);
             if (mod != nullptr) {
                 mod->settings.reset();
                 mod->loadSettings();

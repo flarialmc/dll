@@ -557,6 +557,7 @@ modules = ModuleManager::getModules();
                     c->addDropdown("Selected Config", "", Client::availableConfigs, Client::settings.getSettingByName<std::string>("currentConfig")->value);
 
                     c->addButton("Add a new config", "", "ADD", [] () {
+
                         std::random_device rd;
                         std::mt19937 gen(rd());
 
@@ -568,6 +569,7 @@ modules = ModuleManager::getModules();
                         Client::settings.getSettingByName<std::string>("currentConfig")->value = configname;
                         FlarialGUI::Notify("Created & loaded: " + configname);
                         ScriptMarketplace::reloadAllConfigs();
+
                     });
                     c->addButton("Remove selected config", "DELETES YOUR CURRENT CONFIG", "DELETE", [] () {
                         ScriptMarketplace::reloadAllConfigs();

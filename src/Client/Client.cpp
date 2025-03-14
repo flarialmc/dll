@@ -111,20 +111,15 @@ void Client::createConfig(std::string name) {
 
 void Client::loadAvailableConfigs() {
     availableConfigs.push_back("default");
-    WIN32_FIND_DATAA findData;
-    HANDLE hFind = FindFirstFileA(Utils::getConfigsPath().c_str(), &findData);
-
-    if (hFind != INVALID_HANDLE_VALUE) {
-        do {
-            if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-                std::string folderName = findData.cFileName;
-                if (folderName != "." && folderName != "..") {
-                    availableConfigs.push_back(folderName);
-                }
+    const std::string directoryPath = Utils::getConfigsPath();
+    if (std::filesystem::exists(directoryPath) && std::filesystem::is_directory(directoryPath)) {
+        for (const auto& entry : std::filesystem::directory_iterator(directoryPath)) {
+            if (is_directory(entry.path())) {
+                availableConfigs.push_back(entry.path().filename().string());
             }
-        } while (FindNextFileA(hFind, &findData));
-
-        FindClose(hFind);
+        }
+    } else {
+        std::cerr << "Directory does not exist: " << directoryPath << std::endl;
     }
 }
 
@@ -234,7 +229,7 @@ void Client::initialize() {
     ADD_SETTING("fontWeight", std::string("Normal"));
     ADD_SETTING("nologoicon", false);
     ADD_SETTING("nochaticon", false);
-    ADD_SETTING("currentConfig", "default");
+    ADD_SETTING("currentConfig", std::string("default"));
 
     loadAvailableConfigs();
 
