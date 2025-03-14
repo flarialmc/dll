@@ -369,6 +369,7 @@ namespace Hive {
         int kills;
         int deaths;
         int code = 0;
+        int prestige = 0;
 
     public:
         PlayerStats(float fkdr = 0.0f, float kd = 0.0f, float winRate = 0.0f)
@@ -383,6 +384,7 @@ namespace Hive {
         void setLosses(int lossesValue){ losses = lossesValue; }
         void setKills(int killsValue){ kills = killsValue; }
         void setDeaths(int deathsValue){ deaths = deathsValue; }
+        void setPrestige(int pres){ prestige = pres; }
 
         float getFKDR() const { return fkdr; }
         float getKD() const { return kd; }
@@ -393,6 +395,18 @@ namespace Hive {
         int getKills() const { return kills; }
         int getDeaths() const { return deaths; }
         int getCode() const { return code; };
+        int getIntPrestige() const { return prestige; }
+        std::string getPrestige() const {
+            std::string p = "";
+            if(prestige != 0) p = "[";
+            if(prestige == 1) p += "I";
+            if(prestige == 2) p += "II";
+            if(prestige == 3) p += "III";
+            if(prestige == 4) p += "IV";
+            if(prestige == 5) p += "V";
+            if(prestige != 0) p += "] ";
+            return p;
+        };
     };
 
     double roundToSecond(float value) {
@@ -501,6 +515,8 @@ namespace Hive {
                 stats.setLosses(played - victories);
                 stats.setKills(kills);
                 stats.setDeaths(deaths);
+                // for future:
+                // if(jsonData.contains("prestige")) stats.setPrestige(jsonData["prestige"].get<int>());
             }
 
             if(gameId == "sky") {
@@ -526,6 +542,7 @@ namespace Hive {
                 stats.setLosses(played - victories);
                 stats.setKills(kills);
                 stats.setDeaths(deaths);
+                if(jsonData.contains("prestige")) stats.setPrestige(jsonData["prestige"].get<int>());
             }
             if(gameId == "murder") {
                 if(!jsonData.contains("murders") || !jsonData.contains("murderer_eliminations") || !jsonData.contains("deaths") || !jsonData.contains("victories") || !jsonData.contains("played") || !jsonData.contains("xp")){
@@ -555,6 +572,8 @@ namespace Hive {
                 stats.setKills(eliminations);
 
                 stats.setDeaths(deaths);
+
+                if(jsonData.contains("prestige")) stats.setPrestige(jsonData["prestige"].get<int>());
             }
 
 

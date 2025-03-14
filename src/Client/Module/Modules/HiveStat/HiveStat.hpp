@@ -329,7 +329,7 @@ public:
                                     } else {
                                         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(128, 128, 128, 255)); // Gray
                                     }
-                                    ImGui::Text("%s", oss.str().c_str());
+                                    ImGui::Text("%s%s", it->second.getPrestige(), oss.str().c_str());
                                     ImGui::PopStyleColor();
                                     columnIndex++;
                                 }
