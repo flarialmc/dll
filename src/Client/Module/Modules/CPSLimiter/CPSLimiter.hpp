@@ -12,7 +12,7 @@ public:
         Module::setup();
     };
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<float>("Left") == nullptr) settings.addSetting("Left", 16.0f);
 
         if (settings.getSettingByName<float>("Right") == nullptr) settings.addSetting("Right", 24.0f);

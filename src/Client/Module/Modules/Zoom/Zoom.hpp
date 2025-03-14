@@ -41,7 +41,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<bool>("alwaysanim") == nullptr) settings.addSetting("alwaysanim", false);
 
         if (settings.getSettingByName<bool>("SaveModifier") == nullptr) settings.addSetting("SaveModifier", true);

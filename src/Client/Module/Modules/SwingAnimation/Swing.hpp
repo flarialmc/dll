@@ -47,7 +47,7 @@ public:
 
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<float>("modifier") == nullptr) settings.addSetting("modifier", 10.0f);
     }
 

@@ -72,10 +72,12 @@ public:
 
     template<typename T>
     SettingType<T> *getSettingByName(const std::string &name) {
+
         auto it = settings.find(name);
         if (it != settings.end()) {
             return static_cast<SettingType<T> *>(it->second.get());
         }
+
         return nullptr;
     }
 

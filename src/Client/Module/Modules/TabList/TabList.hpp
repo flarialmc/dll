@@ -26,7 +26,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<bool>("alphaOrder") == nullptr) settings.addSetting<bool>("alphaOrder", true);
 
         if (settings.getSettingByName<float>("percentageX") == nullptr) {

@@ -131,7 +131,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<float>("speed") == nullptr)
             settings.addSetting("speed", 8.f);
 

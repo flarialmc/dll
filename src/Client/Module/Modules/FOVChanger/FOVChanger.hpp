@@ -26,6 +26,7 @@ public:
     }
 
     void defaultConfig() override {
+        Module::defaultConfig();
         if (settings.getSettingByName<float>("fovvalue") == nullptr) settings.addSetting("fovvalue", 60.00f);
         if (settings.getSettingByName<float>("fovaffectshand") == nullptr) settings.addSetting("fovaffectshand", false);
 

@@ -32,7 +32,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
 
         if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 1.0f);
 

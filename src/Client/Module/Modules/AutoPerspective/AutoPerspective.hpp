@@ -19,7 +19,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<bool>("elytra") == nullptr) {
             settings.addSetting("elytra", false);
             settings.addSetting("elytraMode", (std::string)"3rd Person back");

@@ -49,7 +49,7 @@ public:
         updateSetings();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<bool>("chunkborders") == nullptr) settings.addSetting("chunkborders", false);
         if (settings.getSettingByName<bool>("sky") == nullptr) settings.addSetting("sky", true);
         if (settings.getSettingByName<bool>("weather") == nullptr) settings.addSetting("weather", true);

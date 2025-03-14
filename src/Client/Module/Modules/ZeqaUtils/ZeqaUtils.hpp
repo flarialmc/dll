@@ -24,7 +24,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         // if (settings.getSettingByName<bool>("req") == nullptr)
         //     settings.addSetting("req", false);
         if (settings.getSettingByName<bool>("promomessage") == nullptr)

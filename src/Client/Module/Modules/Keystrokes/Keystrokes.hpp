@@ -50,7 +50,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<float>("rounding") == nullptr)
             settings.addSetting("rounding", 11.0f);
 

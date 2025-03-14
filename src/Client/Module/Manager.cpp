@@ -244,6 +244,7 @@ void ModuleManager::restart(){
             if (mod != nullptr) {
                 mod->settings.reset();
                 mod->loadSettings();
+                mod->defaultConfig();
                 bool old = mod->enabledState;
                 mod->enabledState = mod->isEnabled();
                 if (old != mod->enabledState) {

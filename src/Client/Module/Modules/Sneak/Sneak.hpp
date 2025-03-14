@@ -25,7 +25,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
 
         if (settings.getSettingByName<bool>("status") == nullptr) settings.addSetting("status", false);
 

@@ -19,7 +19,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<float>("time") == nullptr) settings.addSetting("time", 0.5f);
     }
 

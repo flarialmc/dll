@@ -60,7 +60,7 @@ public:
         VirtualProtect((LPVOID) option, original_option.size(), oldProtect, &oldProtect);
     };
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<bool>("enabled") == nullptr) settings.addSetting("enabled", false);
 
         if (settings.getSettingByName<std::string>("text") == nullptr)

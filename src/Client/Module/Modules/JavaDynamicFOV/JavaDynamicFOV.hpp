@@ -33,7 +33,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<float>("fov_target") == nullptr) settings.addSetting("fov_target", 120.0f);
         if (settings.getSettingByName<float>("anim") == nullptr) settings.addSetting("anim", 0.40f);
     }

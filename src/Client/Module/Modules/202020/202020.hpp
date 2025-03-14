@@ -24,7 +24,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {}
+    void defaultConfig() override { Module::defaultConfig(); }
 
     void settingsRender(float settingsOffset) override {}
     

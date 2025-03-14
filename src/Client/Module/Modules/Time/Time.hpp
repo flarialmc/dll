@@ -71,7 +71,7 @@ public:
         this->normalRender(3, time);
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<bool>("24") == nullptr) {
             settings.addSetting("24", false);
         }

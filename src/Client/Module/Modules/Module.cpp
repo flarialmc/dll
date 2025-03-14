@@ -642,7 +642,7 @@ void Module::defaultConfig() {
 
     
     
-        if (settings.getSettingByName<std::string>("textShadowCol") == nullptr) {
+        if (settings.getSettingByName<std::string>("textShadow") == nullptr) {
         settings.addSetting("textShadow", false);
         settings.addSetting("rectShadow", false);
         settings.addSetting("textShadowRGB", false);
