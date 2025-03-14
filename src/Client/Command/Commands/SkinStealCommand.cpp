@@ -121,5 +121,5 @@ void SkinStealCommand::execute(const std::vector<std::string>& args) {
             addCommandMessage("Succesfully stole {}'s skin! Saved at Roamingstate/Flarial/Skins.", pair.second.name);
             SaveSkin(pair.second.name, pair.second.playerSkin.mSkinImage, pair.second.playerSkin.mCapeImage);
         }
-    }
+    } // release
 }
