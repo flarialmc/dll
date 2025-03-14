@@ -572,7 +572,7 @@ modules = ModuleManager::getModules();
 
                     });
                     c->addButton("Remove selected config", "DELETES YOUR CURRENT CONFIG", "DELETE", [] () {
-                        ScriptMarketplace::reloadAllConfigs();
+                        //ScriptMarketplace::reloadAllConfigs();
                     });
                     c->addButton("Reload Configs", "Reloads the configs of all modules.", "RELOAD", [] () {
                         ScriptMarketplace::reloadAllConfigs();

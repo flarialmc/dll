@@ -478,7 +478,9 @@ void Module::loadSettings() {
     inputFile.close();
 
     if (!ss.str().empty() && ss.str() != "null") settings.FromJson(ss.str());
-    else { }
+    else {
+        this->loadDefaults();
+    }
 
 
     totalKeybinds = 0;
@@ -514,6 +516,7 @@ void Module::setup() {
     Module::defaultConfig();
     keybindActions.push_back([this] (std::vector<std::any> args)-> std::any {
         this->active = !this->active;
+        this->enabledState = !this->enabledState;
         return {};
     });
 

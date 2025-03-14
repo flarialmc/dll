@@ -113,14 +113,16 @@ public:
         scrollInfo["modules"] = { 0, 0 };
         scrollInfo["scripting"] = { 0, 0 };
         scrollInfo["settings"] = { 0, 0 };
-    };
 
-    void onSetup() override {
         Listen(this, MouseEvent, &ClickGUI::onMouse)
         Listen(this, KeyEvent, &ClickGUI::onKey)
         if (!Client::settings.getSettingByName<bool>("nochaticon")->value) Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
         ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
         Module::onEnable();
+    };
+
+    void onSetup() override {
+
     }
 
     void onEnable() override {}
