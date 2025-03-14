@@ -15,6 +15,7 @@
 #include <winrt/Windows.ApplicationModel.Core.h>
 #include <winrt/Windows.ApplicationModel.Activation.h>
 #include <winrt/Windows.Foundation.Collections.h>
+#include <Scripting/ScriptManager.hpp>
 
 #include "Utils/APIUtils.hpp"
 
@@ -28,6 +29,7 @@ Settings Client::settings = Settings();
 bool notifiedOfConnectionIssue = false;
 
 std::string Client::current_commit = COMMIT_HASH;
+std::vector<std::string> Client::availableConfigs;
 
 std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
     std::vector<std::string> allPlayers;
@@ -100,6 +102,35 @@ void Client::UnregisterActivationHandler()
     }
 }
 
+void Client::createConfig(std::string name) {
+    std::string to = Utils::getRoamingPath() + "\\Flarial\\Config\\" + name;
+    if (!std::filesystem::exists(to)) {
+        std::filesystem::create_directory(to);
+    }
+}
+
+void Client::deleteConfig(std::string name) {
+    std::string to = Utils::getRoamingPath() + "\\Flarial\\Config\\" + name;
+    if (std::filesystem::exists(to)) {
+        std::filesystem::remove_all(to);
+    }
+}
+
+
+void Client::loadAvailableConfigs() {
+    availableConfigs.push_back("default");
+    const std::string directoryPath = Utils::getConfigsPath();
+    if (std::filesystem::exists(directoryPath) && std::filesystem::is_directory(directoryPath)) {
+        for (const auto& entry : std::filesystem::directory_iterator(directoryPath)) {
+            if (is_directory(entry.path())) {
+                availableConfigs.push_back(entry.path().filename().string());
+            }
+        }
+    } else {
+        std::cerr << "Directory does not exist: " << directoryPath << std::endl;
+    }
+}
+
 void Client::initialize() {
     winrt::init_apartment();
 
@@ -132,7 +163,7 @@ void Client::initialize() {
         Utils::getRoamingPath() + "\\Flarial\\assets",
         Utils::getRoamingPath() + "\\Flarial\\logs",
         Utils::getRoamingPath() + "\\Flarial\\Config",
-        Utils::getRoamingPath() + "\\Flarial\\scripts",
+        Utils::getRoamingPath() + "\\Flarial\\Scripts",
     };
 
 
@@ -172,13 +203,10 @@ void Client::initialize() {
         }
     }
 
-
     Client::CheckSettingsFile();
     Client::LoadSettings();
 
     Logger::success("4");
-
-
 
     ADD_SETTING("fontname", std::string("Space Grotesk"));
     ADD_SETTING("mod_fontname", std::string("Space Grotesk"));
@@ -209,6 +237,9 @@ void Client::initialize() {
     ADD_SETTING("fontWeight", std::string("Normal"));
     ADD_SETTING("nologoicon", false);
     ADD_SETTING("nochaticon", false);
+    ADD_SETTING("currentConfig", std::string("default"));
+
+    loadAvailableConfigs();
 
     Logger::success("5");
 
@@ -232,6 +263,7 @@ RegisterActivationHandler();
     MH_ApplyQueued();
     ModuleManager::initialize();
     CommandManager::initialize();
+    ScriptManager::initialize();
 }
 
 std::string window = "Minecraft";

@@ -25,15 +25,39 @@ execute_process(
 
 add_compile_definitions(COMMIT_HASH="${COMMIT_HASH}")
 
+# Optimize for speed
+add_compile_options($<$<CONFIG:Release>:/O2>)
+add_compile_options($<$<CONFIG:Release>:/Ot>)
+add_compile_options($<$<CONFIG:Release>:/Ox>)
+add_compile_options($<$<CONFIG:Release>:/Oy>)
+
+# Enable intrinsic functions
+add_compile_options($<$<CONFIG:Release>:/Oi>)
+
+# Separate functions for the linker to improve the optimization process
+add_compile_options($<$<CONFIG:Release>:/Gy>)
+
+# Optimize global data to reduce the binary size
+add_compile_options($<$<CONFIG:Release>:/Gw>)
+
+# Enable string pooling to reduce binary size by consolidating duplicate strings
+add_compile_options($<$<CONFIG:Release>:/GF>)
+
+# Optimize floating point operations for speed (may introduce minor precision differences)
+# add_compile_options($<$<CONFIG:Release>:/fp:fast>)
+
+# Inline any suitable function to improve performance by reducing function call overhead
+add_compile_options($<$<CONFIG:Release>:/Ob2>)
+
 add_compile_options(/bigobj)
 add_compile_options(/utf-8)
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "Test")
     # Optimize for performance
-    add_compile_options(/O2 /Oi /Gy /Gw /GF /fp:fast /GR- /Gd /MT /Ob2)
+    add_compile_options(/O2 /Oi /Gy /Gw /GF /fp:fast /Gd /MT /Ob2)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 elseif (CMAKE_BUILD_TYPE STREQUAL "Debug")
     # Optimize for build time
-    add_compile_options(/Od /Zi /MT) #/MTd causes static asserts to fail
+    add_compile_options(/Od /Zi /MT)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 endif()
 
@@ -50,7 +74,8 @@ add_compile_definitions(
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp" "src/*.hpp")
 file(GLOB_RECURSE LIB_FILES "lib/*.cpp" "lib/*.h")
 add_library(Flarial SHARED main.cpp ${SOURCE_FILES} ${LIB_FILES} src/Assets/Assets.rc
-        src/Client/Module/Modules/ClickGUI/ClickGUI.cpp)
+        src/Client/Command/Commands/ConfigCommand.cpp
+        src/Client/Command/Commands/ConfigCommand.hpp)
 
 target_include_directories(Flarial PRIVATE
         "."
@@ -126,7 +151,13 @@ FetchContent_Declare(
         GIT_TAG        master
 )
 
-FetchContent_MakeAvailable(libhat entt nes fmt magic_enum)
+FetchContent_Declare(
+        LuaBridge
+        GIT_REPOSITORY https://github.com/kunitoki/LuaBridge3.git
+        GIT_TAG        master
+)
 
-target_link_libraries(Flarial PRIVATE libcurl ws2_32.lib crypt32.lib normaliz.lib wldap32.lib lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType magic_enum)
+FetchContent_MakeAvailable(libhat entt nes fmt magic_enum LuaBridge)
+
+target_link_libraries(Flarial PRIVATE libcurl ws2_32.lib crypt32.lib normaliz.lib wldap32.lib LuaBridge lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType magic_enum)
 target_link_libraries(Flarial PUBLIC MinHook)

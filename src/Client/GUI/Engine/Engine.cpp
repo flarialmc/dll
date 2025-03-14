@@ -26,7 +26,6 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
-#include <Scripting/Libs/Flarial/Mixins/LuaMixin.hpp>
 
 #include "../../Module/Modules/ClickGUI/ClickGUI.hpp"
 //#include <misc/freetype/imgui_freetype.h>
@@ -1455,14 +1454,12 @@ void FlarialGUI::PopImClipRect() {
 void FlarialGUI::Notify(const std::string& text) {
 
     if(SwapchainHook::init) {
-        if(LuaMixins::patch("FlarialGUI", "Notify", text)) { return; }
         Notification e;
         e.text = text;
         e.finished = false;
         e.currentPosY = MC::windowSize.y;
         e.arrived = false;
         e.finished = false;
-
         notifications.push_back(e);
     }
 

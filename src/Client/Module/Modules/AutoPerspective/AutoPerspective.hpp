@@ -5,7 +5,7 @@
 
 class AutoPerspective : public Module {
 public:
-    AutoPerspective() : Module("Auto Perspective", "Changes your perspective on specific events.", IDR_CURSOR_PNG, "") {
+    AutoPerspective() : Module("Auto Perspective", "Changes your perspective on specific events.", IDR_PERSPECTIVE_PNG, "") {
         Module::setup();
     };
 
@@ -19,7 +19,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<bool>("elytra") == nullptr) {
             settings.addSetting("elytra", false);
             settings.addSetting("elytraMode", (std::string)"3rd Person back");

@@ -14,7 +14,7 @@ private:
     bool restored = false;
 public:
 
-    MovableChat() : Module("Chat Tweaks", "Makes the Minecraft chat better.", IDR_MOVABLE_PNG, "") {
+    MovableChat() : Module("Movable Chat", "Ability to move the chat.", IDR_MOVABLE_PNG, "") {
         Module::setup();
     };
 
@@ -47,7 +47,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<float>("percentageX") == nullptr) {
             settings.addSetting("percentageX", 0.0f);
         }

@@ -3,7 +3,6 @@
 #include "../Module.hpp"
 #include "../../../Client.hpp"
 #include "Elements/ClickGUIElements.hpp"
-#include "Scripting/Scripting.hpp"
 #include "SDK/Client/Network/Packet/TextPacket.hpp"
 #include "Utils/APIUtils.hpp"
 
@@ -91,6 +90,7 @@ public:
     static float inline accumilatedPos = 1;
     static float inline accumilatedBarPos = 1;
     static bool inline isAnimatingModSet = false;
+    static std::chrono::time_point<std::chrono::high_resolution_clock> favoriteStart;
 
     static bool containsAny(const std::string& str) {
         return std::any_of(APIUtils::onlineUsers.begin(), APIUtils::onlineUsers.end(),
@@ -114,14 +114,16 @@ public:
         scrollInfo["modules"] = { 0, 0 };
         scrollInfo["scripting"] = { 0, 0 };
         scrollInfo["settings"] = { 0, 0 };
-    };
 
-    void onSetup() override {
         Listen(this, MouseEvent, &ClickGUI::onMouse)
         Listen(this, KeyEvent, &ClickGUI::onKey)
         if (!Client::settings.getSettingByName<bool>("nochaticon")->value) Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
         ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
         Module::onEnable();
+    };
+
+    void onSetup() override {
+
     }
 
     void onEnable() override {}
@@ -136,7 +138,7 @@ public:
         Module::terminate();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<std::string>("editmenubind") == nullptr)
             settings.addSetting("editmenubind", (std::string) "L");
 
@@ -469,7 +471,7 @@ public:
 
                 if (!Client::settings.getSettingByName<bool>("nochaticon")->value) Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
                 else Deafen(this, PacketEvent, &ClickGUI::onPacketReceive);
-
+                ModuleManager::cguiRefresh = true;
                 keybindActions[0]({});
             }
 
@@ -588,14 +590,5 @@ public:
         if ((this->active || editmenu) && SDK::getCurrentScreen() == "hud_screen")
             event.cancel(); // TODO: modules dont listen for canceled state!!!
 
-    }
-
-    static bool compareEnabled(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
-        return obj1->isEnabled() >
-               obj2->isEnabled();
-    }
-
-    static bool compareNames(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
-        return obj1->name < obj2->name;
     }
 };

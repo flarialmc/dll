@@ -58,13 +58,10 @@
 #include "Modules/NoHurtCam/NoHurtCam.hpp"
 #include "Modules/CommandHotkey/CommandHotkey.hpp"
 #include "Modules/Misc/DiscordRPC/DiscordRPCListener.hpp"
-//#include "Modules/Overlay/OverlayModule.hpp"
 #include "Modules/AutoRQ/AutoRQ.hpp"
 #include "Modules/Misc/HiveModeCatcher/HiveModeCatcherListener.hpp"
 #include "Modules/HitPing/HitPing.hpp"
 #include "Modules/InstantHurtAnimation/InstantHurtAnimation.hpp"
-//#include "Modules/MovableChat/MovableChat.hpp"
-#include <algorithm>
 #include <Modules/Misc/InputImGUi/GUIMouseListener.hpp>
 #include <Modules/Misc/InputImGUi/GUIKeyListener.hpp>
 #include <Modules/Misc/PackChanger/PackChanger.hpp>
@@ -72,7 +69,6 @@
 
 #include "Modules/202020/202020.hpp"
 #include "Modules/ItemPhysics/ItemPhysics.hpp"
-#include "Modules/Crosshair/Crosshair.hpp"
 #include "Modules/CustomCrosshair/CustomCrosshair.hpp"
 #include "Modules/HiveStat/HiveStat.hpp"
 #include "Modules/OpponentReach/OpponentReach.hpp"
@@ -81,9 +77,6 @@
 #include "Modules/FasterInventory/FasterInventory.hpp"
 #include "Modules/Waypoints/Waypoints.hpp"
 #include "Modules/JavaInventoryHotkeys/JavaInventoryHotkeys.hpp"
-
-#include "Modules/EntityCounter/EntityCounter.hpp"
-#include "Modules/MovableHUD/MovableHUD.hpp"
 #include "Modules/MovableScoreboard/MovableScoreboard.hpp"
 #include "Modules/MovableTitle/MovableTitle.hpp"
 #include "Modules/MovableBossbar/MovableBossbar.hpp"
@@ -91,34 +84,47 @@
 #include "Modules/MovableCoordinates/MovableCoordinates.hpp"
 #include "Modules/MovableHotbar/MovableHotbar.hpp"
 #include "Modules/NullMovement/NullMovement.hpp"
-#include "../../Scripting/Scripting.hpp"
-#include "../../Scripting/EventManager/ScriptingEventManager.hpp"
+
 #include "Modules/RawInputBuffer/RawInputBuffer.hpp"
 #include "Modules/JavaDynamicFOV/JavaDynamicFOV.hpp"
 #include "Modules/ItemUseDelayFix/ItemUseDelayFix.hpp"
-#include "../../Scripting/Console/ConsoleService.hpp"
 
 #include "Modules/Mousestrokes/Mousestrokes.hpp"
-#include "Modules/ZeqaUtils/ZeqaUtils.hpp"
+#include "Scripting/ScriptManager.hpp"
 #include "Modules/AutoPerspective/AutoPerspective.hpp"
+#include "Modules/BlockHit/BlockHit.hpp"
 
-namespace ModuleManager {
-    std::map<size_t, std::shared_ptr<Module>> moduleMap;
-    std::vector<std::shared_ptr<Listener>> services;
-    bool initialized = false;
-    bool restartModules = false;
-    bool cguiRefresh = false;
-}
-
-
-std::vector<std::shared_ptr<Module>> ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
-    std::vector<std::shared_ptr<Module>> modulesVector;
+void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
     for (const auto& pair : moduleMap) {
         if(pair.second == nullptr) continue;
         modulesVector.push_back(pair.second);
     }
-    return modulesVector;
 }
+
+bool compareEnabled(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
+    return obj1->isEnabled() >
+           obj2->isEnabled();
+}
+
+bool compareFavorite(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
+    return obj1->settings.getSettingByName<bool>("favorite")->value >
+           obj2->settings.getSettingByName<bool>("favorite")->value;
+}
+
+
+bool compareNames(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
+    return obj1->name < obj2->name;
+}
+
+
+void ModuleManager::updateModulesVector() {
+    if (modulesVector.empty()) getModules();
+    if (Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value)
+        std::sort(modulesVector.begin(), modulesVector.end(), compareEnabled);
+    else std::sort(modulesVector.begin(), modulesVector.end(), compareNames);
+    std::sort(modulesVector.begin(), modulesVector.end(), compareFavorite);
+}
+
 
 void ModuleManager::initialize() {
 
@@ -203,6 +209,7 @@ void ModuleManager::initialize() {
 
     if (VersionUtils::checkAboveOrEqual(21, 40)) {
         addModule<JavaInventoryHotkeys>();
+        addModule<BlockHit>();
     }
 
 
@@ -230,11 +237,7 @@ void ModuleManager::initialize() {
     addService<ImGUIKeyListener>();
     addService<ScriptMarketplace>();
 
-    addService<ConsoleService>();
-    Scripting::loadModules();
-
     initialized = true;
-    Scripting::instalized = true;
 }
 
 void ModuleManager::terminate() {
@@ -248,18 +251,37 @@ void ModuleManager::terminate() {
 }
 
 
+void ModuleManager::restart(){
+    initialized = false;
+    for (const auto& pair : moduleMap) {
+        if (pair.second) {
+            std::shared_ptr mod = getModule(pair.second->name);
+            if (mod != nullptr) {
+                mod->settings.reset();
+                mod->loadSettings();
+                mod->defaultConfig();
+                bool old = mod->enabledState;
+                mod->enabledState = mod->isEnabled();
+                if (old != mod->enabledState) {
+                    if (mod->enabledState) mod->onEnable();
+                    else mod->onDisable();
+                }
+            }
+        }
+    }
+    initialized = true;
 
-
-void restart(){
-    Scripting::instalized = false;
-    Scripting::unloadModules();
-    Scripting::loadModules();
-    Scripting::instalized = true;
+    ScriptManager::reloadScripts();
 }
 
 
 void ModuleManager::syncState() {
-    if(!ModuleManager::initialized) return;
+    if(!initialized) return;
+    if (restartModules) {
+        restartModules = false;
+        restart();
+        return;
+    }
     for (const auto& [key, module] : moduleMap) {
         if (!module || module->enabledState == module->isEnabled() || module->delayDisable) {
             continue;
@@ -271,17 +293,15 @@ void ModuleManager::syncState() {
             module->onDisable();
         }
     }
-    if (ModuleManager::restartModules) {
-        ModuleManager::restartModules = false;
-        restart();
-    }
 }
 
 
 void ModuleManager::SaveModulesConfig() {
-    for (const auto& module : getModules()) {
+    for (const auto& module : modulesVector) {
         module->saveSettings();
     }
+
+    ScriptManager::saveSettings();
 }
 // TODO: use enums?
 bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {

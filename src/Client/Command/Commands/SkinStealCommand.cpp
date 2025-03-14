@@ -1,7 +1,6 @@
 #include "SkinStealCommand.hpp"
 
 #include <Utils/WinrtUtils.hpp>
-#include <Scripting/Scripting.hpp>
 
 #ifndef SVPNG_LINKAGE
 #define SVPNG_LINKAGE
@@ -108,19 +107,60 @@ void SaveSkin(std::string name, Image image, Image capeImage) {
 
 
 void SkinStealCommand::execute(const std::vector<std::string>& args) {
-    if (args.size() != 1) {
-        addCommandMessage("§cUsage: .steal <playerName>");
+    if (args.empty()) {
+        addCommandMessage("Usage: .steal <playerName>");
         return;
     }
-    std::string playerName = String::toLower(args[0]);
+
+    std::string playerName;
+
+    if (args[0].front() == '"') {
+        playerName = args[0].substr(1);
+        bool closingQuoteFound = false;
+
+        if (!playerName.empty() && playerName.back() == '"') {
+            playerName.pop_back();
+            closingQuoteFound = true;
+        } else {
+            for (size_t i = 1; i < args.size(); ++i) {
+                playerName += " " + args[i];
+                if (!args[i].empty() && args[i].back() == '"') {
+                    playerName.pop_back();
+                    closingQuoteFound = true;
+                    break;
+                }
+            }
+        }
+        if (!closingQuoteFound) {
+            addCommandMessage("Usage: .steal \"<playerName>\"  (missing closing quote)");
+            return;
+        }
+    } else if (args.size() > 1) {
+        playerName = args[0];
+        for (size_t i = 1; i < args.size(); ++i) {
+            playerName += " " + args[i];
+        }
+    } else {
+        playerName = args[0];
+    }
+
+    playerName = String::toLower(playerName);
+
     if (playerName == "path") {
         WinrtUtils::openSubFolder("Flarial\\Skins");
         return;
     }
+
+    bool found = false;
     for (const auto& pair : SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
         if (String::toLower(pair.second.name) == playerName) {
-            addCommandMessage("Succesfully stole {}'s skin!", pair.second.name);
+            addCommandMessage("Successfully stole {}'s skin! Saved at Roamingstate/Flarial/Skins.", pair.second.name);
             SaveSkin(pair.second.name, pair.second.playerSkin.mSkinImage, pair.second.playerSkin.mCapeImage);
+            found = true;
+            break;
         }
+    }
+    if (!found) {
+        addCommandMessage("Player {} not found", playerName);
     }
 }

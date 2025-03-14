@@ -107,3 +107,8 @@ public:
     Image                                                mSkinImage;                      // this+0xA0
     Image                                                mCapeImage;                      // this+0xC0
 };
+
+class mcUUID {
+public:
+    uint64_t mostSig, leastSig;
+};

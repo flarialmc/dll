@@ -20,7 +20,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
         if (settings.getSettingByName<std::string>("text") == nullptr)
             settings.addSetting("text", (std::string) "{value}");

@@ -1,108 +1,143 @@
 #pragma once
 
+#include <Scripting/ScriptSettings/ScriptSettingManager.hpp>
+#include <Scripting/ScriptSettings/ScriptSettingTypes.hpp>
+#include <Scripting/FlarialScript.hpp>
+
 #include <Modules/ClickGUI/ClickGUI.hpp>
-#include "../Client/Module/Modules/Module.hpp"
-#include "lua.h"
-#include "Scripting.hpp"
-#include "../Client/Events/EventManager.hpp"
-#include "EventManager/ScriptingEventManager.hpp"
-#include "EventManager/ScriptEvents.hpp"
+#include <Client/Module/Modules/Module.hpp>
+
+#include <lua.hpp>
+
+inline ScriptSettingManager gScriptSettingManager;
 
 class ScriptModuleBase : public Module {
 public:
-    std::shared_ptr<lua_State> module_lua_state;
+    lua_State* moduleLuaState = nullptr;
+    std::weak_ptr<FlarialScript> linkedScript;
 
-    ScriptModuleBase(const std::string& name, const std::string& description, lua_State* lua_state)
-            : Module(name, description, IDR_SCRIPT_PNG, "", true), module_lua_state(lua_state) {
+    ScriptModuleBase(const std::string& name, const std::string& description, lua_State* luaState, std::shared_ptr<FlarialScript> script)
+    : Module(name, description, IDR_SCRIPT_PNG, "", true), moduleLuaState(luaState), linkedScript(script) {
+
         Module::setup();
-
         Listen(this, KeyEvent, &ScriptModuleBase::onKey);
         Listen(this, MouseEvent, &ScriptModuleBase::onMouse);
         Listen(this, PacketEvent, &ScriptModuleBase::onPacketReceive);
-        Listen(this, TickEvent, &ScriptModuleBase::onTickEvent);
-        Listen(this, RenderEvent, &ScriptModuleBase::onRenderEvent);
+        Listen(this, TickEvent, &ScriptModuleBase::onTick);
+        Listen(this, RenderEvent, &ScriptModuleBase::onRender);
+        Listen(this, SetupAndRenderEvent, &ScriptModuleBase::onSetupAndRender);
     }
 
     void terminate() override {
+        if (const auto script = linkedScript.lock()) {
+            gScriptSettingManager.saveSettings(script.get());
+            gScriptSettingManager.clearSettingsForScript(script.get());
+        }
         Deafen(this, KeyEvent, &ScriptModuleBase::onKey);
         Deafen(this, MouseEvent, &ScriptModuleBase::onMouse);
         Deafen(this, PacketEvent, &ScriptModuleBase::onPacketReceive);
-        Deafen(this, TickEvent, &ScriptModuleBase::onTickEvent);
+        Deafen(this, TickEvent, &ScriptModuleBase::onTick);
+        Deafen(this, RenderEvent, &ScriptModuleBase::onRender);
+        Deafen(this, SetupAndRenderEvent, &ScriptModuleBase::onSetupAndRender);
         Module::terminate();
     }
 
-    void onEnable() override {
-        Scripting::executeFunction(module_lua_state.get(), "onEnable", true);
-        Module::onEnable();
+    void onEnable() override;
+    void onDisable() override;
+
+    void saveSettings() {
+        if (const auto script = linkedScript.lock()) gScriptSettingManager.saveSettings(script.get());
+        try {
+            std::ofstream outputFile(settingspath);
+            if (!outputFile.is_open()) {
+                Logger::error("Failed to open file: {}", settingspath.string());
+                return;
+            }
+            outputFile << settings.ToJson();
+        } catch (const std::exception& e) {
+            Logger::error("An error occurred while saving settings: {}", e.what());
+        }
     }
 
-    void onDisable() override {
-        Scripting::executeFunction(module_lua_state.get(), "onDisable", true);
-        Module::onDisable();
-    }
+    void defaultConfig() override { Module::defaultConfig();
+        if (const auto script = linkedScript.lock()) {
+            gScriptSettingManager.loadSettings(script.get());
+        }
 
-    void defaultConfig() override {
-        if(settings.getSettingByName<std::string>("text") == nullptr)
-            settings.addSetting("text", (std::string) "{VALUE}");
-
-        Scripting::executeFunction(module_lua_state.get(), "defaultConfig", false);
+        if (settings.getSettingByName<std::string>("text") == nullptr) {
+            settings.addSetting("text", static_cast<std::string>("{VALUE}"));
+        }
     }
 
     void settingsRender(float settingsOffset) override {
-        float x = Constraints::PercentageConstraint(0.019, "left");
-        float y = Constraints::PercentageConstraint(0.10, "top");
-        const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
+        const float x = Constraints::PercentageConstraint(0.019, "left");
+        const float y = Constraints::PercentageConstraint(0.10, "top");
+        const float scrollViewWidth = Constraints::RelativeConstraint(0.5, "height", true);
 
-        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollViewWidth), 2);
         FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));
-        Scripting::executeFunction(module_lua_state.get(), "settingsRender", false);
+
+        if (const auto script = linkedScript.lock()) {
+            const auto& settings = gScriptSettingManager.getAllSettings();
+
+            if (const auto it = settings.find(script.get()); it != settings.end()) {
+                for (const auto &settingPtr: it->second | std::views::values) {
+
+                    switch (settingPtr->type) {
+                        case ScriptSettingType::Toggle: {
+                            auto* toggleSet = dynamic_cast<ToggleSetting*>(settingPtr.get());
+                            if (!toggleSet) return;
+
+                            this->addToggle(toggleSet->name, toggleSet->description, toggleSet->value);
+                            break;
+                        }
+                        case ScriptSettingType::Button: {
+                            auto* buttonSet = dynamic_cast<ButtonSetting*>(settingPtr.get());
+                            if (!buttonSet) return;
+
+                            this->addButton(buttonSet->name, buttonSet->description, buttonSet->buttonText, buttonSet->action);
+                            break;
+                        }
+                        case ScriptSettingType::Slider: {
+                            auto* sliderSet = dynamic_cast<SliderSetting*>(settingPtr.get());
+                            if (!sliderSet) return;
+
+                            this->addSlider(sliderSet->name, sliderSet->description, sliderSet->value, sliderSet->maxValue, sliderSet->minValue, sliderSet->zerosafe);
+                            break;
+                        }
+                        case ScriptSettingType::TextBox: {
+                            auto* textBoxSet = dynamic_cast<TextBoxSetting*>(settingPtr.get());
+                            if (!textBoxSet) return;
+
+                            this->addTextBox(textBoxSet->name, textBoxSet->description, textBoxSet->value, textBoxSet->characterLimit);
+                            break;
+                        }
+                        case ScriptSettingType::Keybind: {
+                            auto* keybindSet = dynamic_cast<KeybindSetting*>(settingPtr.get());
+                            if (!keybindSet) return;
+
+                            this->addKeybind(keybindSet->name, keybindSet->description, keybindSet->keybind);
+                            break;
+                        }
+                        default: {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
         //i am hopeful
     }
 
-    void onKey(KeyEvent& event) {
-        if (!Scripting::instalized || !this->enabledState) return;
-
-        bool canceled = ScriptingEventManager::triggerEvent(module_lua_state.get(), ScriptEvents::EventType::onKeyEvent,
-                                            event.getKey(), (int)event.getAction());
-
-        if (canceled) {
-            event.cancel();
-        }
-    }
-
-    void onMouse(MouseEvent& event) {
-        if (!Scripting::instalized || !this->enabledState || event.getButton() == 0 || event.getAction() == 0) return;
-
-        bool canceled = ScriptingEventManager::triggerEvent(module_lua_state.get(), ScriptEvents::EventType::onMouseEvent,
-                                            (int)event.getButton(), (int)event.getAction());
-        if (canceled) {
-            event.cancel();
-        }
-    }
-
-    void onPacketReceive(PacketEvent &event) {
-        if (!Scripting::instalized || !this->enabledState) return;
-
-        bool canceled = ScriptingEventManager::triggerEvent(module_lua_state.get(), ScriptEvents::EventType::onPacketReceiveEvent,
-                                            event.getPacket(), (int)event.getPacket()->getId());
-        if (canceled) {
-            event.cancel();
-        }
-    }
-
-    void onTickEvent(TickEvent& event) {
-        if (!Scripting::instalized || !this->enabledState) return;
-
-        ScriptingEventManager::triggerEvent(module_lua_state.get(), ScriptEvents::EventType::onTickEvent);
-    }
-
-    void onRenderEvent(RenderEvent& event) {
-        if (!Scripting::instalized || !this->enabledState) return;
-
-        ScriptingEventManager::triggerEvent(module_lua_state.get(), ScriptEvents::EventType::onRenderEvent);
-    }
+    void onKey(KeyEvent& event);
+    void onMouse(MouseEvent& event);
+    void onPacketReceive(PacketEvent &event);
+    void onTick(TickEvent& event);
+    void onRender(RenderEvent& event);
+    void onSetupAndRender(SetupAndRenderEvent& event);
 };

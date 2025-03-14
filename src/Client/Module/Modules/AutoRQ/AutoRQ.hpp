@@ -26,7 +26,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<std::string>("command") == nullptr)
             settings.addSetting("command", (std::string)"");
         if (settings.getSettingByName<bool>("ReQ") == nullptr)

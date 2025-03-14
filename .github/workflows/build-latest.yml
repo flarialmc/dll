@@ -2,9 +2,9 @@ name: Build Flarial and upload to newcdn
 on:
 
   push:
-    branches: [ "main","scripting-v2" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main","scripting-v2" ]
+    branches: [ "main"]
 
   workflow_dispatch:
 env:

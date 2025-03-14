@@ -1,8 +1,9 @@
-#include <Scripting/Scripting.hpp>
 #include "Module.hpp"
+
 #include "../../Client.hpp"
 #include "../../Events/Events.hpp"
 #include "ClickGUI/ClickGUI.hpp"
+#include "Scripting/ScriptManager.hpp"
 
 #define colors_secondary6 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary6")->value)
 #define o_colors_secondary6 clickgui->settings.getSettingByName<float>("o_colors_secondary6")->value
@@ -443,7 +444,14 @@ void Module::loadDefaults() {
     setup();
 }
 
-void Module::saveSettings() const {
+void Module::saveSettings() {
+    if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
+        settingspath = fmt::format("{}\\{}\\{}.flarial", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
+        checkSettingsFile();
+    } else {
+        settingspath = fmt::format("{}\\{}.flarial", Utils::getConfigsPath(), name);
+        checkSettingsFile();
+    }
     try {
         std::ofstream outputFile(settingspath);
         if (!outputFile.is_open()) {
@@ -457,6 +465,14 @@ void Module::saveSettings() const {
 }
 
 void Module::loadSettings() {
+    if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
+        settingspath = fmt::format("{}\\{}\\{}.flarial", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
+        checkSettingsFile();
+    }   else {
+        settingspath = fmt::format("{}\\{}.flarial", Utils::getConfigsPath(), name);
+        checkSettingsFile();
+    }
+
     std::ifstream inputFile(settingspath);
     if (!inputFile.is_open()) {
         Logger::error("Failed to open file: {}", settingspath.string());
@@ -466,7 +482,12 @@ void Module::loadSettings() {
     std::stringstream ss;
     ss << inputFile.rdbuf();
     inputFile.close();
-    settings.FromJson(ss.str());
+
+    if (!ss.str().empty() && ss.str() != "null") settings.FromJson(ss.str());
+    else {
+        this->loadDefaults();
+    }
+
 
     totalKeybinds = 0;
     totalWaypoints = 0;
@@ -481,7 +502,7 @@ void Module::loadSettings() {
     }
 }
 
-void Module::checkSettingsFile() const {
+void Module::checkSettingsFile() {
     if (!std::filesystem::exists(settingspath)) {
         std::filesystem::create_directories(settingspath.parent_path());
         std::ofstream outputFile(settingspath);
@@ -497,7 +518,7 @@ void Module::toggle() {
 }
 
 void Module::setup() {
-    if(!isScripting())  defaultConfig();
+    if (!isScripting())  defaultConfig();
     Module::defaultConfig();
     keybindActions.push_back([this] (std::vector<std::any> args)-> std::any {
         this->active = !this->active;
@@ -516,6 +537,7 @@ void Module::onSetup() { }
 // TODO: rename to Enable/Disable?
 void Module::onEnable() {
     enabledState = true;
+    if (settings.getSettingByName<bool>("enabled"))
     settings.getSettingByName<bool>("enabled")->value = true;
     saveSettings();
 }
@@ -524,6 +546,7 @@ void Module::onDisable() {
     enabledState = false;
     active = false;
     if (!terminating) {
+        if (settings.getSettingByName<bool>("enabled"))
         settings.getSettingByName<bool>("enabled")->value = false;
     }
     saveSettings();
@@ -533,17 +556,18 @@ void Module::terminate() {
     terminating = true;
     onDisable();
     active = false;
-//    settings.getSettingByName<bool>("enabled")->value = false;
 }
 
 // TODO: find all getSettingByName<bool>("enabled")->value and replace!!!
 bool Module::isEnabled() {
-    if(isScripting() && !Scripting::instalized) return false;
+    if (isScripting() && !ScriptManager::initialized) return false;
     if(!settings.getSettingByName<bool>("enabled")) return false;
     return settings.getSettingByName<bool>("enabled")->value;
 }
 
 void Module::setEnabled(bool enabled) {
+    if (!settings.getSettingByName<bool>("enabled")) return;
+
     settings.getSettingByName<bool>("enabled")->value = enabled;
     enabledState = enabled;
 }
@@ -574,6 +598,10 @@ void Module::defaultConfig() {
         else {
             settings.addSetting("enabled", false);
         }
+    }
+
+    if (settings.getSettingByName<bool>("favorite") == nullptr) {
+        settings.addSetting("favorite", false);
     }
 
     if (settings.getSettingByName<float>("percentageX") == nullptr) {
@@ -613,7 +641,7 @@ void Module::defaultConfig() {
 
     
     
-        if (settings.getSettingByName<std::string>("textShadowCol") == nullptr) {
+        if (settings.getSettingByName<std::string>("textShadow") == nullptr) {
         settings.addSetting("textShadow", false);
         settings.addSetting("rectShadow", false);
         settings.addSetting("textShadowRGB", false);

@@ -24,7 +24,6 @@ public:
         this->keys = keys;
     };
 
-
     [[nodiscard]] int getKey() const {
         return key;
     }

@@ -42,7 +42,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<std::string>("text") == nullptr)
             settings.addSetting("text", (std::string) "{value} ms");
 

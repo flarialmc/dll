@@ -2,6 +2,7 @@
 
 #include "../../SDK/Client/Network/Packet/TextPacket.hpp"
 #include "Commands/BindCommand.hpp"
+#include "Commands/ConfigCommand.hpp"
 #include "Commands/PrefixCommand.hpp"
 #include "Commands/HelpCommand.hpp"
 #include "Commands/LuaCommand.hpp"
@@ -25,6 +26,7 @@ void CommandManager::initialize() {
     Commands.push_back(std::make_unique<PathCommand>());
     Commands.push_back(std::make_unique<EjectCommand>());
     Commands.push_back(std::make_unique<SkinStealCommand>());
+    Commands.push_back(std::make_unique<ConfigCommand>());
 Listen(&CommandManager::instance, PacketSendEvent, &CommandManager::onPacket);
 }
 

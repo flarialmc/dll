@@ -1,5 +1,13 @@
 #include "ClickGUI.hpp"
 
+#include <random>
+#include <Scripting/ScriptManager.hpp>
+
+#include "Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp"
+
+std::chrono::time_point<std::chrono::high_resolution_clock> ClickGUI::favoriteStart;
+
+
 void ClickGUI::onRender(RenderEvent &event) {
 
         float allahu = Constraints::RelativeConstraint(0.65);
@@ -415,18 +423,13 @@ void ClickGUI::onRender(RenderEvent &event) {
 
                     int i = 0;
 
-                    static auto modules = ModuleManager::getModules();
-                    if(ModuleManager::cguiRefresh) {
-modules = ModuleManager::getModules();
+                    if(ModuleManager::cguiRefresh && ScriptManager::initialized && ModuleManager::initialized) {
+                        ModuleManager::updateModulesVector();
                         ModuleManager::cguiRefresh = false;
-}
+                    }
+                    auto modules = ModuleManager::modulesVector;
 
 
-
-                    if (Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value)
-                        std::sort(modules.begin(), modules.end(), compareEnabled);
-                    else
-                        std::sort(modules.begin(), modules.end(), compareNames);
 
                     for (const auto& pModule: modules) {
                         bool visible = (modcenter.y + yModifier + FlarialGUI::scrollpos + 55 > center.y) &&
@@ -547,6 +550,44 @@ modules = ModuleManager::getModules();
                      rectHeight);
 
                     Module* c = this->ghostMainModule;
+                    c->addHeader("Config Manager");
+                    c->addDropdown("Selected Config", "", Client::availableConfigs, Client::settings.getSettingByName<std::string>("currentConfig")->value);
+
+                    c->addButton("Add a new config", "", "ADD", [] () {
+
+                        std::random_device rd;
+                        std::mt19937 gen(rd());
+
+                        std::uniform_int_distribution<> distrib(1000, 9000);
+
+                        int random_number = distrib(gen);
+                        std::string configname = "config-" + std::to_string(random_number);
+                        Client::createConfig(configname);
+                        Client::settings.getSettingByName<std::string>("currentConfig")->value = configname;
+                        FlarialGUI::Notify("Created & loaded: " + configname);
+                        ScriptMarketplace::reloadAllConfigs();
+
+                    });
+                    c->addButton("Remove selected config", "DELETES YOUR CURRENT CONFIG", "DELETE", [] () {
+                        if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
+                            std::string to = Client::settings.getSettingByName<std::string>("currentConfig")->value;
+                            Client::settings.getSettingByName<std::string>("currentConfig")->value = "default";
+                            Client::deleteConfig(to);
+                            ScriptMarketplace::reloadAllConfigs();
+                            FlarialGUI::Notify("Deleted " + to);
+
+                        } else {
+                            FlarialGUI::Notify("Cannot delete default config.");
+                        }
+                    });
+                    c->addButton("Reload Configs", "Reloads the configs of all modules.", "RELOAD", [] () {
+                        ScriptMarketplace::reloadAllConfigs();
+                        std::string to = Client::settings.getSettingByName<std::string>("currentConfig")->value;
+                        FlarialGUI::Notify("Reloaded " + to);
+
+                    });
+                    c->extraPadding();
+
                     c->addHeader("Keybinds");
                     c->addKeybind("Eject Keybind", "When setting, hold the new bind for 2 seconds", Client::settings.getSettingByName<std::string>("ejectKeybind")->value);
 
@@ -568,11 +609,10 @@ modules = ModuleManager::getModules();
 
                     });
 
-                    c->addButton("Reload Scripts", "", "RELOAD", [] () {
 
-    ModuleManager::restartModules = true;
-
-});
+                    c->addButton("Reload Scripts", "", "RELOAD", [&] () {
+                        ModuleManager::restartModules = true;
+                    });
 
                     c->addElementText("Following Requires Restart");
                     c->extraPadding();
@@ -650,20 +690,16 @@ modules = ModuleManager::getModules();
 
                     int i = 0;
 
-                    static auto modules = Scripting::luaScriptModules;
 
-                       if(ModuleManager::cguiRefresh) {
-                           modules = Scripting::luaScriptModules;
-                           ModuleManager::cguiRefresh = false;
-                       }
+                       auto scriptModules = ScriptManager::getLoadedModules();
 
-                    for (const auto& pModule: modules) {
+                    for (const auto& pModule: scriptModules) {
                         bool visible = (modcenter.y + yModifier + FlarialGUI::scrollpos + 55 > center.y) &&
                                        (modcenter.y + yModifier + FlarialGUI::scrollpos - 300) <
                                        center.y + Constraints::RelativeConstraint(baseHeightReal);
 
                         if (!searchBarString.empty()) {
-                            std::string name = pModule.second->name;
+                            std::string name = pModule->name;
 
                             for (char &c: name) {
                                 c = (char)std::tolower(c);
@@ -677,8 +713,8 @@ modules = ModuleManager::getModules();
 
                             if (name.starts_with(search) ||
                                 name.find(search) != std::string::npos) {
-                                ClickGUIElements::ModCard(modcenter.x + xModifier + scriptingOffset, modcenter.y + yModifier, pModule.second.get(),
-                                                          pModule.second->icon, i, visible, ClickGUI::scriptingOpacity);
+                                ClickGUIElements::ModCard(modcenter.x + xModifier + scriptingOffset, modcenter.y + yModifier, pModule.get(),
+                                                          pModule->icon, i, visible, ClickGUI::scriptingOpacity);
                                 xModifier += Constraints::SpacingConstraint(1.02f, modWidth);
                                 if ((++i % 3) == 0) {
                                     yModifier += Constraints::SpacingConstraint(0.8, modWidth);
@@ -686,8 +722,8 @@ modules = ModuleManager::getModules();
                                 }
                             }
                         } else {
-                            ClickGUIElements::ModCard(modcenter.x + xModifier + scriptingOffset, modcenter.y + yModifier, pModule.second.get(),
-                                                      pModule.second->icon, i, visible, ClickGUI::scriptingOpacity);
+                            ClickGUIElements::ModCard(modcenter.x + xModifier + scriptingOffset, modcenter.y + yModifier, pModule.get(),
+                                                      pModule->icon, i, visible, ClickGUI::scriptingOpacity);
 
                             xModifier += Constraints::SpacingConstraint(1.02f, modWidth);
                             if ((++i % 3) == 0) {
@@ -720,7 +756,7 @@ modules = ModuleManager::getModules();
 
             std::shared_ptr<Module> settingMod = ModuleManager::getModule(page.module);
             if (!settingMod) {
-                settingMod = Scripting::FindModuleByName(Scripting::luaScriptModules, page.module);
+                settingMod = ScriptManager::getModuleByName(ScriptManager::getLoadedModules(), page.module);
             }
             
 

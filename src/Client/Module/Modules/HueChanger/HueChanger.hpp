@@ -23,7 +23,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 0.5f);
     }
 

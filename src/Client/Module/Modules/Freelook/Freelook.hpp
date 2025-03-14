@@ -122,7 +122,7 @@ public:
         }
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
 
         if (settings.getSettingByName<std::string>("toggle") == nullptr) settings.addSetting("toggle", false);
 

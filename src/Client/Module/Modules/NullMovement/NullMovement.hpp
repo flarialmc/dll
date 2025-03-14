@@ -31,7 +31,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
 
         if (settings.getSettingByName<bool>("horizontal") == nullptr) settings.addSetting("horizontal", true);
         if (settings.getSettingByName<bool>("vertical") == nullptr) settings.addSetting("vertical", false);

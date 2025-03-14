@@ -29,7 +29,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 1.f);
 
         if (settings.getSettingByName<bool>("highlightOnEntity") == nullptr) settings.addSetting("highlightOnEntity", false);
@@ -144,7 +144,7 @@ public:
             useSolid = true;
         }
 
-        auto material = useSolid ? MaterialUtils::getUITextured() : MaterialUtils::getUICrosshair();
+        mce::MaterialPtr *material = useSolid ? MaterialUtils::getUITextured() : MaterialUtils::getUICrosshair();
 
         bool isDefault = true;
 

@@ -101,7 +101,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<float>("distance") == nullptr) settings.addSetting("distance", (float)1000.0f);
         if (settings.getSettingByName<float>("total") == nullptr) settings.addSetting("total", (float)0.0f);
 

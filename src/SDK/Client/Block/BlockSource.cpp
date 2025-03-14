@@ -1,5 +1,9 @@
 #include "BlockSource.hpp"
 
+Block *BlockSource::getBlock(const BlockPos & pos) {
+    return Memory::CallVFuncI<Block *>(GET_OFFSET("BlockSource::getBlock"), this, pos);
+}
+
 Dimension *BlockSource::getDimension() {
     return hat::member_at<Dimension *>(this, GET_OFFSET("BlockSource::dimension"));
 }

@@ -33,7 +33,7 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override {
+    void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<bool>("rightcps") == nullptr) {
             settings.addSetting("rightcps", false);
         }
