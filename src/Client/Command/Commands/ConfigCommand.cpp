@@ -91,16 +91,20 @@ winrt::Windows::Foundation::IAsyncAction import() {
 }
 
 void ConfigCommand::execute(const std::vector<std::string>& args) {
-    std::string action = String::toLower(args[0]);
+    if (!args.empty()) {
+        std::string action = String::toLower(args[0]);
 
-    if (action == "reload") ScriptMarketplace::reloadAllConfigs();
-    else if (action == "create" && args.size() == 2) { Client::createConfig(args[1]); FlarialGUI::Notify("Created " + args[1]); }
-    else if (action == "delete" && args.size() == 2) { Client::deleteConfig(args[1]); FlarialGUI::Notify("Deleted " + args[1]); }
-    else if (action == "select" && args.size() == 2) { if (std::filesystem::exists(Utils::getRoamingPath() + "\\Flarial\\Config\\" + args[1])) {Client::settings.getSettingByName<std::string>("currentConfig")->value = args[1]; FlarialGUI::Notify("Selected " + args[1]);} }
-    else if (action == "import") {
-        [=]() -> winrt::fire_and_forget {
-            co_await import();
-        }();
+        if (action == "reload") ScriptMarketplace::reloadAllConfigs();
+        else if (action == "create" && args.size() == 2) { Client::createConfig(args[1]); FlarialGUI::Notify("Created " + args[1]); }
+        else if (action == "delete" && args.size() == 2) { Client::deleteConfig(args[1]); FlarialGUI::Notify("Deleted " + args[1]); }
+        else if (action == "select" && args.size() == 2) { if (std::filesystem::exists(Utils::getRoamingPath() + "\\Flarial\\Config\\" + args[1])) {Client::settings.getSettingByName<std::string>("currentConfig")->value = args[1]; FlarialGUI::Notify("Selected " + args[1]);} }
+        else if (action == "import") {
+            [=]() -> winrt::fire_and_forget {
+                co_await import();
+            }();
+        }
+    } else {
+        addCommandMessage("§cUsage: .config <create/delete/reload/import>");
     }
 }
 
