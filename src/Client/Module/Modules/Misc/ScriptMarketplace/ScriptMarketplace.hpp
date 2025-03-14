@@ -61,12 +61,10 @@ public:
                     Logger::info("script id {}", id);
                     std::string url = "http://node2.sear.host:5019/api/scripts/" + id + "/download";
                     std::string data = GetString(url);
-                    std::ofstream file(Utils::getRoamingPath() + "\\Flarial\\tmpd.tmp", std::ios::binary);
+                    std::ofstream file(Utils::getClientPath() + "\\Scripts\\Modules\\tmpd.tmp", std::ios::binary);
                     Logger::info("data: {}", data.c_str());
                     file.write(data.c_str(), data.size());
                     file.close();
-                    Utils::extractFromFile(Utils::getRoamingPath() + "\\Flarial\\tmpd.tmp", scriptPath() + "\\" + id);
-                    std::filesystem::remove(Utils::getRoamingPath() + "\\Flarial\\tmpd.tmp");
 
                     ModuleManager::restartModules = true;
                 }

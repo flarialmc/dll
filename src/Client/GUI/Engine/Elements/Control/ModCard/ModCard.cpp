@@ -300,6 +300,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         buttony += FlarialGUI::scrollpos;
 
 
+    // release
     static bool fix;
     if (MC::mouseAction == Release) fix = false;
     if (FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize) && MC::mouseButton == Left && MC::mouseAction == Press && !fix) {
