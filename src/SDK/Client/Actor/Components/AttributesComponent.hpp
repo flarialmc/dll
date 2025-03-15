@@ -32,12 +32,12 @@ public:
 
 	AttributeInstance* getInstance(unsigned int id) {
 		using func_t = AttributeInstance & (*)(BaseAttributeMap*, unsigned int);
-		static auto func = reinterpret_cast<func_t>(GET_SIG_ADDRESS("BaseAttributeMap_getInstance"));
+		static auto func = reinterpret_cast<func_t>(Memory::offsetFromSig(GET_SIG_ADDRESS("BaseAttributeMap_getInstance"), 1));
 		return &func(this, id);
 	}
 };
 
-class AttributesComponent : public IEntityComponent{
+struct AttributesComponent : IEntityComponent{
 public:
 	BaseAttributeMap baseAttributes{};
 };

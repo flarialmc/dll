@@ -431,19 +431,20 @@ AttributesComponent* Actor::getAttributesComponent() {
 }
 
 float Actor::getHealth() {
-    Attribute(GET_OFFSET("Attribute::Hunger"), "minecraft:hunger");
-    auto attri = Attribute(GET_OFFSET("Attribute::Hunger"), "minecraft:hunger").mIDValue;
-    auto health = getAttributesComponent()->baseAttributes.getInstance(attri);
-    return 20.f;
+    auto attri = Attribute(GET_OFFSET("Attribute::Health"), "minecraft:health").mIDValue;
+    auto comp = getAttributesComponent();
+    if (!comp) return 20.f;
+    auto health = comp->baseAttributes.getInstance(attri);
+g
     if (!health) return 20.f;
     return health->GetValue();
 
 }
 
 float Actor::getHunger() {
-    return getAttributesComponent()->baseAttributes.getInstance(Attribute(GET_OFFSET("Attribute::Saturation"), "minecraft:saturation").mIDValue)->GetValue();
+    return getAttributesComponent()->baseAttributes.getInstance(Attribute(GET_OFFSET("Attribute::Hunger"), "minecraft:hunger").mIDValue)->GetValue();
 }
 
 float Actor::getSaturation() {
-    return getAttributesComponent()->baseAttributes.getInstance(Attribute(GET_OFFSET("Attribute::Health"), "minecraft:health").mIDValue)->GetValue();
+    return getAttributesComponent()->baseAttributes.getInstance(Attribute(GET_OFFSET("Attribute::Saturation"), "minecraft:saturation").mIDValue)->GetValue();
 }
