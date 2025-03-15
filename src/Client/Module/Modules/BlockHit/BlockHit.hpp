@@ -41,12 +41,10 @@ public:
           switch(perspective) {
               case Perspective::FirstPerson:
 
-                  matrix = glm::translate<float>(matrix, glm::vec3(0.42222223281, 0.0, -0.16666666269302368));
-                  matrix = glm::translate<float>(matrix, glm::vec3(-0.1f, 0.15f, -0.2f));
-                  matrix = glm::translate<float>(matrix, glm::vec3(-0.24F, 0.25f, -0.20F));
-                  matrix = glm::rotate<float>(matrix, -1.98F, glm::vec3(0.0F, 1.0F, 0.0F));
-                  matrix = glm::rotate<float>(matrix, 1.30F, glm::vec3(4.0F, 0.0F, 0.0F));
-                  matrix = glm::rotate<float>(matrix, 60.0F, glm::vec3(0.0F, 1.0F, 0.0F));
+                  matrix = glm::translate<float>(matrix, glm::vec3(-0.5f, 0.2f, 0.0f));
+                  matrix = glm::rotate<float>(matrix, glm::radians(30.f), glm::vec3(0.f, 1.f, 0.f));
+                  matrix = glm::rotate<float>(matrix, glm::radians(-80.f), glm::vec3(1.f, 0.f, 0.f));
+                  matrix = glm::rotate<float>(matrix, glm::radians(60.f), glm::vec3(0.f, 1.f, 0.f));
 
                   break;
               case Perspective::ThirdPersonBack:
