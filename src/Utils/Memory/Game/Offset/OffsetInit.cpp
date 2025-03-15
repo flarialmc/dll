@@ -28,10 +28,7 @@ void OffsetInit::init2160() {
 
     ADD_OFFSET("MinecraftGame::textureGroup", 0x6B8);
 
-    ADD_OFFSET("Block::blockLegacy", 0x78);
 
-    ADD_OFFSET("BlockLegacy::name", 0x98);
-    ADD_OFFSET("BlockLegacy::namespace", 0xC0);
 }
 
 void OffsetInit::init2150() {
@@ -42,6 +39,11 @@ void OffsetInit::init2150() {
 
     ADD_OFFSET("Player::gamemode", 0xB18);
     ADD_OFFSET("Player::playerName", 0xCA0);
+
+    ADD_OFFSET("Block::blockLegacy", 0x78);
+
+    ADD_OFFSET("BlockLegacy::name", 0x98);
+    ADD_OFFSET("BlockLegacy::namespace", 0xC0);
 
     ADD_OFFSET("Player::playerInventory", 0x5D0);
 

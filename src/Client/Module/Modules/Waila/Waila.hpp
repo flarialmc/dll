@@ -105,7 +105,11 @@ public:
         if (!SDK::clientInstance->getLocalPlayer()->getLevel()) return;
         if (!SDK::clientInstance->getBlockSource()) return;
         HitResult result = SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult();
-        BlockPos pos = { result.pos.x - 1, result.pos.y - 1, result.pos.z - 1 };
+
+        BlockPos pos = { static_cast<int>(result.blockPos.x),
+                         static_cast<int>(result.blockPos.y) ,
+                         static_cast<int>(result.blockPos.z)};
+        std::cout << std::to_string(static_cast<int>(result.blockPos.x)) + " " + std::to_string(static_cast<int>(result.blockPos.y)) + " " + std::to_string(static_cast<int>(result.blockPos.z)) << std::endl;
         BlockSource* blockSource = SDK::clientInstance->getBlockSource();
         try {
             BlockLegacy* block = blockSource->getBlock(pos)->getBlockLegacy();
@@ -120,7 +124,7 @@ public:
 
     void onRender(RenderEvent& event) {
         if (this->isEnabled()) {
-            this->normalRender(0, name);
+            this->normalRender(32, name);
         }
     }
 };
