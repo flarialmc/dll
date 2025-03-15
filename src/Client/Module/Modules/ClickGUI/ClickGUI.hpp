@@ -129,15 +129,26 @@ public:
             { "Regular", "§4" }
         };
 
-        std::string insert = roleColors["Default"];
+        std::string prefix = "§f[" + roleColors["Regular"] + "FLARIAL§f]§r "; // Default prefix
+        std::string nameColor = ""; // Default name color, change it if u want lel
 
         for (const auto& [role, color] : roleColors) {
             if (APIUtils::hasRole(role, name.first)) {
-                insert = "§f[" + color + "FLARIAL§f]§r ";
+                prefix = "§f[" + color + "FLARIAL§f]§r ";
+                nameColor = color; // set the color of da player's name :>
                 break;
             }
         }
-        pkt->message = message.insert(name.second, insert);
+
+        // 
+        message.insert(name.second, prefix);
+
+        // Apply color to the player's name
+        size_t nameEnd = name.second + prefix.length() + name.first.length();
+        message.insert(name.second + prefix.length(), nameColor);
+        message.insert(nameEnd + nameColor.length(), "§r"); // reset the text color after name ends.    
+
+        pkt->message = message;
     }
 
     ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {
