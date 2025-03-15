@@ -168,11 +168,11 @@ public:
 
                             if (durabilities[i][1] != 0) { // for some servers with custom items with max durability of 0
                                 if (this->settings.getSettingByName<bool>("percent")->value)
-                                    text = std::to_string((int) std::round(
+                                    text = FlarialGUI::cached_to_string((int) std::round(
                                             (float) durabilities[i][0] / (float) durabilities[i][1] * 100)) + "%";
                                 else
-                                    text = std::to_string(durabilities[i][0]) + "/" +
-                                           std::to_string(durabilities[i][1]);
+                                    text = FlarialGUI::cached_to_string(durabilities[i][0]) + "/" +
+                                           FlarialGUI::cached_to_string(durabilities[i][1]);
 
 
                                 std::wstring widestr = std::wstring(text.begin(), text.end());
@@ -214,12 +214,12 @@ public:
 
                         if (durabilities[0][1] != 0) {
                             if (this->settings.getSettingByName<bool>("percent")->value)
-                                text = std::to_string((int) std::round(
+                                text = FlarialGUI::cached_to_string((int) std::round(
                                         (float) durabilities[0][0] / (float) durabilities[0][1] * 100)) + "%";
                             else
-                                text = std::to_string(durabilities[0][0]) + "/" + std::to_string(durabilities[0][1]);
+                                text = FlarialGUI::cached_to_string(durabilities[0][0]) + "/" + FlarialGUI::cached_to_string(durabilities[0][1]);
                         } else {
-                            text = std::to_string(currentItem->getcount());
+                            text = FlarialGUI::cached_to_string(currentItem->getcount());
                         }
 
                         std::wstring widestr = std::wstring(text.begin(), text.end());
@@ -261,13 +261,13 @@ public:
 
                             if (durabilities[1][1] != 0) {
                                 if (this->settings.getSettingByName<bool>("percent")->value)
-                                    text = std::to_string((int) std::round(
+                                    text = FlarialGUI::cached_to_string((int) std::round(
                                             (float) durabilities[1][0] / (float) durabilities[1][1] * 100)) + "%";
                                 else
-                                    text = std::to_string(durabilities[1][0]) + "/" +
-                                           std::to_string(durabilities[1][1]);
+                                    text = FlarialGUI::cached_to_string(durabilities[1][0]) + "/" +
+                                           FlarialGUI::cached_to_string(durabilities[1][1]);
                             } else {
-                                text = std::to_string(offhandItem->getcount());
+                                text = FlarialGUI::cached_to_string(offhandItem->getcount());
                             }
 
                             std::wstring widestr = std::wstring(text.begin(), text.end());

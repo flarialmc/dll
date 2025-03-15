@@ -3,6 +3,9 @@
 #include <Scripting/ScriptManager.hpp>
 #include <Scripting/ModuleScript.hpp>
 
+#include "Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp"
+
+
 void ClickGUI::onRender(RenderEvent &event) {
 
         float allahu = Constraints::RelativeConstraint(0.65);
@@ -102,19 +105,29 @@ void ClickGUI::onRender(RenderEvent &event) {
 
 
             float logoWidth = Constraints::RelativeConstraint(1.21);
+            float logoWidthButReal = Constraints::RelativeConstraint(0.5);
 
-            float logoX = navx - Constraints::SpacingConstraint(0.05, logoWidth);
-            float logoY = (navy + navigationBarHeight / 2.0f - logoWidth / 2.0f);
+            float logoX = navx - Constraints::SpacingConstraint(0.05, logoWidthButReal) + (logoWidthButReal * 0.6);
+            float logoY = (navy + navigationBarHeight / 2.0f - logoWidthButReal / 2.0f);
+
+            D2D1_COLOR_F fLARIALlOGO = colors_FlarialLogo_rgb ? FlarialGUI::rgbColor : colors_FlarialLogo;
+            fLARIALlOGO.a = o_colors_FlarialLogo;
 
             if (!Client::settings.getSettingByName<bool>("noicons")->value)
-                FlarialGUI::image(IDR_LOGO_PNG,
-                                  D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth));
+                FlarialGUI::image(IDR_WHITE_LOGO_PNG,
+                                  D2D1::RectF(logoX, logoY, logoX + logoWidthButReal, logoY + logoWidthButReal), "PNG", true, FlarialGUI::D2DColorToImColor(fLARIALlOGO));
 
-            FlarialGUI::Tooltip("easter egg", logoX, logoY, "Never gonna give you up", logoWidth, logoWidth);
+            FlarialGUI::Tooltip("easter egg", logoX, logoY, "Never gonna give you up", logoWidthButReal, logoWidthButReal);
 
             /* Logo End */
 
             /* tab buttons start */
+
+            D2D1_COLOR_F RadioButtonEnabled = colors_radiobutton_enabled_rgb ? FlarialGUI::rgbColor : colors_radiobutton_enabled;
+            RadioButtonEnabled.a = o_colors_radiobutton_enabled;
+
+            D2D1_COLOR_F RadioButtonDisabled = colors_radiobutton_disabled_rgb ? FlarialGUI::rgbColor : colors_radiobutton_disabled;
+            RadioButtonDisabled.a = o_colors_radiobutton_disabled;
 
             float shit = Constraints::RelativeConstraint(0.448f);
 
@@ -190,8 +203,8 @@ void ClickGUI::onRender(RenderEvent &event) {
             radioY += Constraints::SpacingConstraint(0.29f, logoWidth);
 
             if (!Client::settings.getSettingByName<bool>("noicons")->value) {
-                if(curr == "modules") FlarialGUI::image(IDR_FOLDER_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
-                else FlarialGUI::image(IDR_FOLDER_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+                if(curr == "modules") FlarialGUI::image(IDR_FOLDER_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth), "PNG", true, FlarialGUI::D2DColorToImColor(RadioButtonDisabled));
+                else FlarialGUI::image(IDR_FOLDER_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth), "PNG", true, FlarialGUI::D2DColorToImColor(RadioButtonEnabled));
             }
 
             // radiobutton of settings
@@ -237,8 +250,8 @@ void ClickGUI::onRender(RenderEvent &event) {
             radioY += Constraints::SpacingConstraint(0.29f, logoWidth);
 
             if (!Client::settings.getSettingByName<bool>("noicons")->value) {
-                if(curr == "settings") FlarialGUI::image(IDR_SETTINGS_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
-                else FlarialGUI::image(IDR_SETTINGS_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+                if(curr == "settings") FlarialGUI::image(IDR_SETTINGS_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth), "PNG", true, FlarialGUI::D2DColorToImColor(RadioButtonDisabled));
+                else FlarialGUI::image(IDR_SETTINGS_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth), "PNG", true, FlarialGUI::D2DColorToImColor(RadioButtonEnabled));
             }
 
             const float h = Constraints::RelativeConstraint(0.42, "height");
@@ -291,8 +304,8 @@ void ClickGUI::onRender(RenderEvent &event) {
             radioY += Constraints::SpacingConstraint(0.29f, logoWidth);
 
             if (!Client::settings.getSettingByName<bool>("noicons")->value) {
-                if(curr == "scripting") FlarialGUI::image(IDR_SCRIPTING_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
-                else FlarialGUI::image(IDR_SCRIPTING_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+                if(curr == "scripting") FlarialGUI::image(IDR_SCRIPTING_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth), "PNG", true, FlarialGUI::D2DColorToImColor(RadioButtonDisabled));
+                else FlarialGUI::image(IDR_SCRIPTING_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth), "PNG", true, FlarialGUI::D2DColorToImColor(RadioButtonEnabled));
 
             }
 
@@ -329,8 +342,8 @@ void ClickGUI::onRender(RenderEvent &event) {
             radioY += Constraints::SpacingConstraint(0.29f, logoWidth);
 
             if (!Client::settings.getSettingByName<bool>("noicons")->value) {
-                if(curr == "editmenu") FlarialGUI::image(IDR_STYLUS_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
-                else FlarialGUI::image(IDR_STYLUS_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth));
+                if (curr == "editmenu") FlarialGUI::image(IDR_STYLUS_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth), "PNG", true, FlarialGUI::D2DColorToImColor(RadioButtonDisabled));
+                else FlarialGUI::image(IDR_STYLUS_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth), "PNG", true, FlarialGUI::D2DColorToImColor(RadioButtonEnabled));
 
             }
 
@@ -561,11 +574,17 @@ modules = ModuleManager::getModules();
 
                     });
 
+                    c->addButton("Reload Configs", "Reloads the configs of all modules.", "RELOAD", [] () {
+
+                        ScriptMarketplace::reloadAllConfigs();
+
+                        });
+
                     c->addButton("Reload Scripts", "", "RELOAD", [] () {
 
-    ModuleManager::restartModules = true;
+                        ScriptManager::reloadScripts();
 
-});
+                    });
 
                     c->addElementText("Following Requires Restart");
                     c->extraPadding();

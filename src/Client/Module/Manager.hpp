@@ -14,7 +14,7 @@ namespace ModuleManager {
     extern bool cguiRefresh;
 
     void initialize();
-
+    void restart();
     void terminate();
 
     template<typename T, typename... ArgsT>

@@ -30,7 +30,7 @@ public:
     inline static std::string version;
     inline static HMODULE currentModule = nullptr;
 
-    inline static std::string path = Utils::getClientPath() + "\\main.flarial";
+    inline static std::string path = Utils::getConfigsPath() + "\\main.flarial";
     static void SaveSettings() {
 
         try {

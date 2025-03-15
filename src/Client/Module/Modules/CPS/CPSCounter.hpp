@@ -164,10 +164,10 @@ public:
     void onRender(RenderEvent &event) {
         if (this->isEnabled()) {
             if (!this->settings.getSettingByName<bool>("rightcps")->value) {
-                std::string leftCPS = std::to_string(GetLeftCPS());
+                std::string leftCPS = FlarialGUI::cached_to_string(GetLeftCPS());
                 this->normalRender(1, leftCPS);
             } else {
-                std::string leftAndRightCPS = std::to_string(GetLeftCPS()) + " | " + std::to_string(GetRightCPS());
+                std::string leftAndRightCPS = FlarialGUI::cached_to_string(GetLeftCPS()) + " | " + FlarialGUI::cached_to_string(GetRightCPS());
                 this->normalRender(1, leftAndRightCPS);
             }
 

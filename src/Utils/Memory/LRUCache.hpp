@@ -42,17 +42,23 @@ LRUCache<Key, Value>::LRUCache(std::size_t capacity) : capacity(capacity) {}
 template<typename Key, typename Value>
 template<typename F, typename... Args>
 Value LRUCache<Key, Value>::getOrInsert(F createValueFunc, const Key key, const Args &... args) {
-
     auto it = cache.find(key);
     if (it != cache.end()) {
-        updateOrder(it->first);
+        order.splice(order.begin(), order, it->second.position);
         return it->second.value;
-    } else {
-        const auto value = createValueFunc(args...);
-        insert(key, value);
-        return value;
     }
 
+    Value value = createValueFunc(args...);
+
+    if (cache.size() >= capacity) {
+        Key lruKey = order.back();
+        order.pop_back();
+        cache.erase(lruKey);
+    }
+
+    order.push_front(key);
+    cache.emplace(key, CacheValue{order.begin(), std::move(value)});
+    return cache[key].value;
 }
 
 template<typename Key, typename Value>

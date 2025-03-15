@@ -207,10 +207,10 @@ public:
                         SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()
                         );
 
-                    for (const auto &pair : vecmap) {
+                    for (const auto &rawName : vecmap) {
                         i++;
 
-                        std::string name = String::removeColorCodes(pair.second.name);
+                        std::string name = String::removeColorCodes(rawName);
                         if (name.empty()) continue;
 
                         std::string clearedName = String::removeNonAlphanumeric(name);
@@ -365,24 +365,27 @@ public:
 
      };
 
-     static std::vector<std::pair<mcUUID, PlayerListEntry>>
-     copyMapInAlphabeticalOrder(const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap) {
-         std::vector<std::pair<mcUUID, PlayerListEntry>> sortedPairs(sourceMap.begin(), sourceMap.end());
+     static std::vector<std::string> copyMapInAlphabeticalOrder(const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap) {
+         std::vector<std::string> names;
 
-         // Sort the vector based on the 'name' field in a case-insensitive manner
-         std::sort(sortedPairs.begin(), sortedPairs.end(), [](const auto &a, const auto &b) {
-             // store names in strings and make them only lowercase there
-             std::string nameA = a.second.name;
-             std::string nameB = b.second.name;
+         for (const auto &pair: sourceMap) {
+             names.push_back(pair.second.name);
+         }
 
-             // put the lowercase versions of the names in alphabetical order
+         // Sort the vector by name in a case-insensitive manner
+         std::sort(names.begin(), names.end(), [](const auto &a, const auto &b) {
+             // Use references to avoid copying strings
+             const auto& nameA = a;
+             const auto& nameB = b;
+
+             // Compare names case-insensitively
              return std::lexicographical_compare(nameA.begin(), nameA.end(), nameB.begin(), nameB.end(),
                  [](char c1, char c2) {
-                     return std::tolower(c1) < std::tolower(c2);
+                     return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
                  });
          });
 
-         return sortedPairs;
+         return names;
      }
 };
 

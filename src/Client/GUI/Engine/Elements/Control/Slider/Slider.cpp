@@ -112,10 +112,10 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 
     if (startingPoint > maxValue) {
         startingPoint = maxValue;
-        TextBoxes[30 + index].text = std::to_string(startingPoint);
+        TextBoxes[30 + index].text = FlarialGUI::cached_to_string(startingPoint);
     } else if (startingPoint < minValue) {
         startingPoint = zerosafe ? 0.001f : minValue;
-        TextBoxes[30 + index].text = std::to_string(startingPoint);
+        TextBoxes[30 + index].text = FlarialGUI::cached_to_string(startingPoint);
     } else if (!text.empty()) startingPoint = std::stof(text);
 
     FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), percWidth, percHeight,

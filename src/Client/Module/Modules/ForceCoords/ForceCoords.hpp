@@ -340,11 +340,11 @@ public:
                         //Vec3<float> PrevPos = SDK::clientInstance->getLocalPlayer()->stateVector->PrevPos;
                         //Vec3<float> vel = SDK::clientInstance->getLocalPlayer()->stateVector->velocity;
 
-                        std::string cords = std::to_string(static_cast<int>(Pos.x)) + ", " +
-                                            std::to_string(static_cast<int>(Pos.y)) + ", " +
-                                            std::to_string(static_cast<int>(Pos.z));
-                        //std::string cords1 = std::to_string(static_cast<int>(PrevPos.x)) + ", " + std::to_string(static_cast<int>(PrevPos.y)) + ", " + std::to_string(static_cast<int>(PrevPos.z));
-                        //std::string cords2 = std::to_string(static_cast<int>(vel.x)) + ", " + std::to_string(static_cast<int>(vel.y)) + ", " + std::to_string(static_cast<int>(vel.z));
+                        std::string cords = FlarialGUI::cached_to_string(static_cast<int>(Pos.x)) + ", " +
+                                            FlarialGUI::cached_to_string(static_cast<int>(Pos.y)) + ", " +
+                                            FlarialGUI::cached_to_string(static_cast<int>(Pos.z));
+                        //std::string cords1 = FlarialGUI::cached_to_string(static_cast<int>(PrevPos.x)) + ", " + FlarialGUI::cached_to_string(static_cast<int>(PrevPos.y)) + ", " + FlarialGUI::cached_to_string(static_cast<int>(PrevPos.z));
+                        //std::string cords2 = FlarialGUI::cached_to_string(static_cast<int>(vel.x)) + ", " + FlarialGUI::cached_to_string(static_cast<int>(vel.y)) + ", " + FlarialGUI::cached_to_string(static_cast<int>(vel.z));
                         this->normalRender(6, cords);
                     }
                 }

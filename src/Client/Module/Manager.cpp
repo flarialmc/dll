@@ -58,13 +58,10 @@
 #include "Modules/NoHurtCam/NoHurtCam.hpp"
 #include "Modules/CommandHotkey/CommandHotkey.hpp"
 #include "Modules/Misc/DiscordRPC/DiscordRPCListener.hpp"
-//#include "Modules/Overlay/OverlayModule.hpp"
 #include "Modules/AutoRQ/AutoRQ.hpp"
 #include "Modules/Misc/HiveModeCatcher/HiveModeCatcherListener.hpp"
 #include "Modules/HitPing/HitPing.hpp"
 #include "Modules/InstantHurtAnimation/InstantHurtAnimation.hpp"
-//#include "Modules/MovableChat/MovableChat.hpp"
-#include <algorithm>
 #include <Modules/Misc/InputImGUi/GUIMouseListener.hpp>
 #include <Modules/Misc/InputImGUi/GUIKeyListener.hpp>
 #include <Modules/Misc/PackChanger/PackChanger.hpp>
@@ -72,7 +69,6 @@
 
 #include "Modules/202020/202020.hpp"
 #include "Modules/ItemPhysics/ItemPhysics.hpp"
-#include "Modules/Crosshair/Crosshair.hpp"
 #include "Modules/CustomCrosshair/CustomCrosshair.hpp"
 #include "Modules/HiveStat/HiveStat.hpp"
 #include "Modules/OpponentReach/OpponentReach.hpp"
@@ -81,9 +77,6 @@
 #include "Modules/FasterInventory/FasterInventory.hpp"
 #include "Modules/Waypoints/Waypoints.hpp"
 #include "Modules/JavaInventoryHotkeys/JavaInventoryHotkeys.hpp"
-
-#include "Modules/EntityCounter/EntityCounter.hpp"
-#include "Modules/MovableHUD/MovableHUD.hpp"
 #include "Modules/MovableScoreboard/MovableScoreboard.hpp"
 #include "Modules/MovableTitle/MovableTitle.hpp"
 #include "Modules/MovableBossbar/MovableBossbar.hpp"
@@ -91,13 +84,15 @@
 #include "Modules/MovableCoordinates/MovableCoordinates.hpp"
 #include "Modules/MovableHotbar/MovableHotbar.hpp"
 #include "Modules/NullMovement/NullMovement.hpp"
+
 #include "Modules/RawInputBuffer/RawInputBuffer.hpp"
 #include "Modules/JavaDynamicFOV/JavaDynamicFOV.hpp"
 #include "Modules/ItemUseDelayFix/ItemUseDelayFix.hpp"
 
 #include "Modules/Mousestrokes/Mousestrokes.hpp"
-#include "Modules/ZeqaUtils/ZeqaUtils.hpp"
 #include "Scripting/ScriptManager.hpp"
+#include "Modules/AutoPerspective/AutoPerspective.hpp"
+
 
 namespace ModuleManager {
     std::map<size_t, std::shared_ptr<Module>> moduleMap;
@@ -166,6 +161,8 @@ void ModuleManager::initialize() {
     addModule<NickModule>();
     addModule<FreeLook>();
 
+    addModule<AutoPerspective>();
+
     addModule<AutoGG>();
     addModule<TextHotkey>();
     addModule<SpeedDisplay>();
@@ -196,7 +193,7 @@ void ModuleManager::initialize() {
 
     addModule<Mousestrokes>();
 
-    if (VersionUtils::checkAboveOrEqual(21, 40) && VersionUtils::checkBetween(21, 50, 21, 59) == false) {
+    if (VersionUtils::checkAboveOrEqual(21, 40)) {
         addModule<JavaInventoryHotkeys>();
     }
 
@@ -238,8 +235,33 @@ void ModuleManager::terminate() {
     services.clear();
 }
 
+
+void ModuleManager::restart(){
+    for (const auto& pair : moduleMap) {
+        if (pair.second) {
+            std::shared_ptr mod = ModuleManager::getModule(pair.second->name);
+            if (mod != nullptr) {
+                mod->settings.reset();
+                mod->loadSettings();
+                bool old = mod->enabledState;
+                mod->enabledState = mod->isEnabled();
+                if (old != mod->enabledState) {
+                    if (mod->enabledState) mod->onEnable();
+                    else mod->onDisable();
+                }
+            }
+        }
+    }
+}
+
+
 void ModuleManager::syncState() {
-    if(!ModuleManager::initialized) return;
+    if(!initialized) return;
+    if (restartModules) {
+        restartModules = false;
+        restart();
+        return;
+    }
     for (const auto& [key, module] : moduleMap) {
         if (!module || module->enabledState == module->isEnabled() || module->delayDisable) {
             continue;
@@ -250,9 +272,6 @@ void ModuleManager::syncState() {
         } else {
             module->onDisable();
         }
-    }
-    if (ModuleManager::restartModules) {
-        ModuleManager::restartModules = false;
     }
 }
 

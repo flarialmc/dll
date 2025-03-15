@@ -206,7 +206,7 @@ public:
 
                 size_t pos = uppercaseSentence.find(search);
                 if (pos != std::string::npos) {
-                    lmbText.replace(pos, search.length(), std::to_string(CPSCounter::GetLeftCPS()));
+                    lmbText.replace(pos, search.length(), FlarialGUI::cached_to_string(CPSCounter::GetLeftCPS()));
                 }
 
                 // rmb
@@ -216,7 +216,7 @@ public:
 
                 pos = uppercaseSentence.find(search);
                 if (pos != std::string::npos) {
-                    rmbText.replace(pos, search.length(), std::to_string(CPSCounter::GetRightCPS()));
+                    rmbText.replace(pos, search.length(), FlarialGUI::cached_to_string(CPSCounter::GetRightCPS()));
                 }
 
                 float keycardSize = Constraints::RelativeConstraint(
@@ -498,7 +498,7 @@ public:
                                                             DWRITE_FONT_WEIGHT_NORMAL, textStates[Strokes::LMB], true);
                     } else
                         FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
-                                                                std::to_string(CPSCounter::GetLeftCPS())).c_str(),
+                                                                FlarialGUI::cached_to_string(CPSCounter::GetLeftCPS())).c_str(),
                                                         keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
                                                         keycardSize - (keycardSize * 0.05f),
                                                         DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 +
@@ -550,7 +550,7 @@ public:
                                                             DWRITE_FONT_WEIGHT_NORMAL, textStates[Strokes::RMB], true);
                     } else
                         FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
-                                                                std::to_string(CPSCounter::GetRightCPS())).c_str(),
+                                                                FlarialGUI::cached_to_string(CPSCounter::GetRightCPS())).c_str(),
                                                         keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
                                                         keycardSize - (keycardSize * 0.05f),
                                                         DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 +
