@@ -80,8 +80,8 @@ bool Script::compile() {
     try {
         // Load and validate the code
         if (luaL_loadstring(mState, mCode.c_str()) != LUA_OK) {
-            Logger::error("Syntax error in {}: {}", mFilePath, lua_tostring(mState, -1));
-            ADD_ERROR_MESSAGE("Syntax error: " + std::string(lua_tostring(mState, -1)));
+            Logger::error("Error in {}: {}", mFilePath, lua_tostring(mState, -1));
+            ADD_ERROR_MESSAGE("Error: " + std::string(lua_tostring(mState, -1)));
             lua_pop(mState, 1);
             return false;
         }
@@ -111,9 +111,7 @@ bool Script::compile() {
             });
 
         // Execute the script
-        if (lua_pcall(mState, 0, 0, 0) != LUA_OK) {
-            Logger::error("Runtime error in {}: {}", mFilePath, lua_tostring(mState, -1));
-            ADD_ERROR_MESSAGE("Runtime error: " + std::string(lua_tostring(mState, -1)));
+        if (safeCall(0, 0) != LUA_OK) {
             lua_pop(mState, 1);
             return false;
         }
@@ -142,11 +140,64 @@ bool Script::compile() {
         }
         lua_pop(mState, 1);
 
+        lua_getglobal(mState, "debug");
+        if (lua_isboolean(mState, -1)) {
+            mDebug = lua_toboolean(mState, -1);
+        }
+        lua_pop(mState, 1);
+
         return true;
     } catch (const std::exception& e) {
         Logger::error("Failed to compile script '{}': {}", mFilePath, e.what());
         return false;
     }
+}
+
+int Script::traceback(lua_State* L) {
+    if (!lua_isstring(L, 1)) return 1;
+
+    luaL_traceback(L, L, lua_tostring(L, 1), 1);
+    return 1;
+}
+
+int Script::safeCall(int nargs, int nresults) {
+    if (!mState || mIsDestroyed) return LUA_ERRRUN;
+
+    const bool debugEnabled = isDebugEnabled();
+    // Index where we pushed the function we want to call is (top - nargs).
+    int base = lua_gettop(mState) - nargs;
+
+    if (debugEnabled) {
+        // Push the traceback function above the function/arguments.
+        lua_pushcfunction(mState, traceback);
+        // Move it just below the function we’re about to call.
+        lua_insert(mState, base);
+    }
+
+    int status = lua_pcall(mState, nargs, nresults, debugEnabled ? base : 0);
+
+    if (status != LUA_OK) {
+        std::string error = lua_tostring(mState, -1);
+
+        for (char& c : error) {
+            if (c == '\t') { // Weird formatting in game.
+                c = ' ';
+            }
+        }
+
+        Logger::error("[{}] Error: {}", mName, error);
+        ADD_ERROR_MESSAGE("Error: " + error);
+        lua_pop(mState, 1);
+        if (debugEnabled) {
+            lua_remove(mState, base);
+        }
+    } else {
+        if (debugEnabled) {
+            lua_remove(mState, base);
+        }
+    }
+
+    return status;
 }
 
 void Script::registerEvent(const std::string& eventName) {
@@ -167,11 +218,6 @@ void Script::registerEvent(const std::string& eventName) {
         return;
     }
 
-    if (lua_pcall(mState, 0, 0, 0) != LUA_OK) {
-        Logger::error("Error executing event {}: {}", eventName, lua_tostring(mState, -1));
-        ADD_ERROR_MESSAGE("Error executing event " + eventName + ": " + std::string(lua_tostring(mState, -1)));
-        lua_pop(mState, 1);
-    }
-
+    safeCall(0, 0);
     lua_pop(mState, 1);
 }
