@@ -22,6 +22,10 @@ public:
     [[nodiscard]] const std::string& getDescription() const { return mDescription; }
     [[nodiscard]] const std::string& getAuthor() const { return mAuthor; }
     [[nodiscard]] lua_State* getState() const { return mState; }
+    [[nodiscard]] bool isDebugEnabled() const { return mDebug; }
+
+    static int traceback(lua_State* L);
+    int safeCall(int nargs, int nresults);
 
     ~Script() {
         mIsDestroyed = true;
@@ -79,10 +83,7 @@ public:
 
         (pushArg(std::forward<Args>(args)), ...);
 
-        if (lua_pcall(mState, sizeof...(Args), 1, 0) != LUA_OK) {
-            Logger::error("Error in event {}: {}", eventName, lua_tostring(mState, -1));
-            ADD_ERROR_MESSAGE("Error in event " + eventName + ": " + std::string(lua_tostring(mState, -1)));
-            lua_pop(mState, 1);
+        if (safeCall(sizeof...(Args), 1) != LUA_OK) {
             return false;
         }
 
@@ -92,43 +93,6 @@ public:
         lua_pop(mState, 1);
         return cancelled;
     }
-
-    void registerCommandEvent(const std::string& eventName, const std::vector<std::string>& args) {
-        std::lock_guard lock(eventMutex);
-        if (mIsDestroyed) return;
-
-        bool cancelled = false;
-
-        lua_getglobal(mState, "eventHandlers");
-        if (!lua_istable(mState, -1)) {
-            lua_pop(mState, 1);
-            return;
-        }
-        lua_pushstring(mState, eventName.c_str());
-        lua_gettable(mState, -2);
-        lua_remove(mState, -2);
-
-        if (!lua_isfunction(mState, -1)) {
-            lua_pop(mState, 1);
-            return;
-        }
-
-        lua_newtable(mState);
-        int index = 1;
-        for (auto &str : args) {
-            lua_pushstring(mState, str.c_str());
-            lua_seti(mState, -2, index++);
-        }
-
-        if (lua_pcall(mState, 1, 0, 0) != LUA_OK) {
-            Logger::error("Error in event {}: {}", eventName, lua_tostring(mState, -1));
-            ADD_ERROR_MESSAGE("Error in event " + eventName + ": " + std::string(lua_tostring(mState, -1)));
-            lua_pop(mState, 1);
-            return;
-        }
-        lua_pop(mState, 1);
-    }
-
 private:
     std::string mFilePath;
     std::string mCode;
@@ -139,4 +103,5 @@ private:
     std::string mName;
     std::string mDescription;
     std::string mAuthor = "Unknown";
+    bool mDebug = false;
 };

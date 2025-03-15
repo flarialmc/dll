@@ -28,11 +28,7 @@ public:
                 lua_rawseti(L, -2, idx++);
             }
 
-            if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
-                Logger::error("Error calling 'execute': {}", lua_tostring(L, -1));
-                ADD_ERROR_MESSAGE("Error calling command function 'execute': " + std::string(lua_tostring(L, -1)));
-                lua_pop(L, 1);
-            }
+            script->safeCall(1, 0);
         }
     }
 };
