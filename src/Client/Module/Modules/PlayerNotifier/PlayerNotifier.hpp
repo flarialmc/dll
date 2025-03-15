@@ -26,14 +26,12 @@ public:
     void onEnable() override {
         Module::onEnable();
         Listen(this, TickEvent, &PlayerNotifier::onTick);
-        Listen(this, PacketEvent, &PlayerNotifier::onPacketReceive);
 
     }
 
     void onDisable() override {
         Module::onDisable();
         Deafen(this, TickEvent, &PlayerNotifier::onTick);
-        Deafen(this, PacketEvent, &PlayerNotifier::onPacketReceive);
     }
 
     void loadSettings() override {
@@ -47,7 +45,7 @@ public:
         }
     }
 
-    auto lastRun = std::chrono::steady_clock::now();
+    std::chrono::time_point<std::chrono::high_resolution_clock> lastRun = std::chrono::steady_clock::now();
 
     void onTick(TickEvent& event) {
         constexpr double intervalSeconds = 5.0; // Change this to the desired interval
@@ -58,7 +56,7 @@ public:
         if (elapsed.count() >= intervalSeconds) {
             lastRun = now; // Reset the timer
 
-            std::unordered_map<mcUUID, PlayerListEntry>& playerMap = getPlayerMap();
+            std::unordered_map<mcUUID, PlayerListEntry>& playerMap = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
 
             for (const auto& [uuid, entry] : playerMap) {
                 for (int i = 0; i < totalPlayers; i++) {
