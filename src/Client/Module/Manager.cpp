@@ -93,6 +93,7 @@
 #include "Scripting/ScriptManager.hpp"
 #include "Modules/AutoPerspective/AutoPerspective.hpp"
 #include "Modules/BlockHit/BlockHit.hpp"
+#include "Modules/ZeqaUtils/ZeqaUtils.hpp"
 
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
     for (const auto& pair : moduleMap) {
@@ -221,7 +222,7 @@ void ModuleManager::initialize() {
 
     addModule<RawInputBuffer>();
     //addModule<ItemUseDelayFix>();
-    //addModule<ZeqaUtils>();
+    addModule<ZeqaUtils>();
 
     addService<GUIKeyListener>();
     if (!VersionUtils::checkAboveOrEqual(21, 60)) {
