@@ -47,21 +47,26 @@ public:
         }
     }
 
-    void onTick(TickEvent &event) {
-        if(!SDK::clientInstance) return;
-        if(!SDK::clientInstance->getLocalPlayer()) return;
-        if(!SDK::clientInstance->getLocalPlayer()->getLevel()) return;
+    auto lastRun = std::chrono::steady_clock::now();
 
-        static bool first = false;
-        if (!first) {
-            first = true;
-            std::unordered_map<mcUUID, PlayerListEntry> &playerMap = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
+    void onTick(TickEvent& event) {
+        constexpr double intervalSeconds = 5.0; // Change this to the desired interval
 
-            for (const auto &[uuid, entry] : playerMap) {
+        auto now = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed = now - lastRun;
+
+        if (elapsed.count() >= intervalSeconds) {
+            lastRun = now; // Reset the timer
+
+            std::unordered_map<mcUUID, PlayerListEntry>& playerMap = getPlayerMap();
+
+            for (const auto& [uuid, entry] : playerMap) {
                 for (int i = 0; i < totalPlayers; i++) {
-                    if (this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")->value)
-                        if (entry.name.find(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value) != std::string::npos) {}
+                    if (this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")->value) {
+                        if (entry.name.find(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value) != std::string::npos) {
                             FlarialGUI::Notify(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value + " is online!");
+                        }
+                    }
                 }
             }
         }

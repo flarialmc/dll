@@ -2,7 +2,7 @@
 
 #include "Packet.hpp"
 #include "Utils/Utils.hpp"
-#include <pointer.hpp>
+#include <memory>
 #include "../../Util/json.hpp"
 
 
@@ -41,7 +41,7 @@ class GameServerToken {
 public:
     // member variables
     // NOLINTBEGIN
-    std::unique_ptr<Certificate >> mCertificate;
+    std::unique_ptr<Certificate> mCertificate;
 };
 
 enum class SubClientId : char {
