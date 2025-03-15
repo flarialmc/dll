@@ -129,24 +129,18 @@ public:
             { "Regular", "§4" }
         };
 
-        std::string prefix = "§f[" + roleColors["Regular"] + "FLARIAL§f]§r "; // Default prefix
-        std::string nameColor = ""; // Default name color, change it if u want lel
+        std::string prefix = "§f[" + roleColors["Regular"] + "FLARIAL§f]§r ";
 
         for (const auto& [role, color] : roleColors) {
             if (APIUtils::hasRole(role, name.first)) {
                 prefix = "§f[" + color + "FLARIAL§f]§r ";
-                nameColor = color; // set the color of da player's name :>
                 break;
             }
         }
 
-        // 
-        message.insert(name.second, prefix);
+        if (message[name.second - 2] == '§') name.second = name.second - 3;
 
-        // Apply color to the player's name
-        size_t nameEnd = name.second + prefix.length() + name.first.length();
-        message.insert(name.second + prefix.length(), nameColor);
-        message.insert(nameEnd + nameColor.length(), "§r"); // reset the text color after name ends.    
+        message.insert(name.second, prefix);
 
         pkt->message = message;
     }
