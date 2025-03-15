@@ -126,7 +126,7 @@ public:
     }
 
     void onRender(RenderEvent& event) {
-        if (this->isEnabled()) {
+        if (this->isEnabled() && name != "air") {
             this->normalRender(32, name);
         }
     }
