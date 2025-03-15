@@ -81,12 +81,12 @@ public:
                 currentPos = Constraints::CenterConstraint(s * 3 + spacing * 3, s);
 
             if (ClickGUI::editmenu) {
-                FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, s * 3 + spacing * 3, s, 25);
+                FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, s * 3 + spacing * 3, s, 40);
             }
 
             Vec2<float> vec2;
 
-            vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 25, s * 3 + spacing * 3, s);
+            vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 40, s * 3 + spacing * 3, s);
 
             currentPos.x = vec2.x;
             currentPos.y = vec2.y;

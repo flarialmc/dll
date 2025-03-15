@@ -31,7 +31,7 @@ void SigInit::init2160() {
 
     ADD_SIG("ResourcePackManager::_composeFullStack_Patch", "0F 84 C7 01 00 00 0F 57 C0 0F 11 44 24 30"); // nop 6
 
-    ADD_SIG("BobView", "48 89 5C 24 ? 57 48 81 EC ? ? ? ? 0F 29 B4 24 ? ? ? ? 48 81 C1 ? ? ? ?");
+    ADD_SIG("BaseAttributeMap_getInstance", "E8 ? ? ? ? 4C 8B F8 48 89 45 ? 48 8B 56");
 
     ADD_SIG("ItemInHandRenderer::renderItem", "E8 ?? ?? ?? ?? 41 0F 11 76 ??");
 
@@ -72,6 +72,8 @@ void SigInit::init2150() {
 
 void SigInit::init2140() {
     Logger::custom(fg(fmt::color::gold), "Signatures", "Loading signatures for 1.21.4X");
+
+    ADD_SIG("BobView", "48 89 5C 24 ? 57 48 81 EC ? ? ? ? 0F 29 B4 24 ? ? ? ? 48 81 C1 ? ? ? ?");
 
     ADD_SIG("tryGetPrefix", "48 89 5C 24 ? 57 48 83 EC 30 8B ?");
     ADD_SIG("tryGetPrefix2", "4c 8b 41 ? 4c 8b d1 48 8b 41 ? 4c 8b 49 ? 49 2b c0 8b 12 48 c1 f8 ? 48 ff");
@@ -385,6 +387,8 @@ void SigInit::init2040() {
     ADD_SIG("ItemPositionConst", "F3 0F 59 05 ? ? ? ? F3 41 0F 58 87");
 
     ADD_SIG("HudMobEffectsRenderer::render", "48 89 5c 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8d ac 24 ? ? ? ? b8 ? ? ? ? e8 ? ? ? ? 48 2b e0 0f 29 b4 24 ? ? ? ? 0f 29 bc 24 ? ? ? ? 44 0f 29 84 24 ? ? ? ? 44 0f 29 8c 24 ? ? ? ? 44 0f 29 94 24 ? ? ? ? 44 0f 29 9c 24 ? ? ? ? 44 0f 29 a4 24 ? ? ? ? 44 0f 29 ac 24 ? ? ? ? 44 0f 29 b4 24 ? ? ? ? 44 0f 29 bc 24 ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 49 8b f1");
+
+    ADD_SIG("BaseAttributeMap_getInstance", "e8 ? ? ? ? 48 8d 54 24 ? f3 0f 10 b0");
 }
 
 void SigInit::init2030() {

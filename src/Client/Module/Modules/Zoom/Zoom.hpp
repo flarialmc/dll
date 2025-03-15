@@ -195,14 +195,6 @@ public:
         }
 
         if (!this->isKeybind(event.keys)) this->active = false;
-        /*
-        if (SDK::clientInstance->getLocalPlayer()) {
-            auto sigma = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
-            for (auto alpha : sigma) {
-                auto capeImage = alpha.second.playerSkin.mCapeImage;
-                std::cout << capeImage.mWidth << capeImage.mHeight;
-            }
-        }*/
      };
 
     // TODO: add dolly zoom and world2screen zoom stabilization ?

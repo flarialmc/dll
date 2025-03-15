@@ -6,6 +6,7 @@
 #include "../../SDK.hpp"
 #include "../../../Client/GUI/Engine/Engine.hpp"
 #include "Components/OnGroundFlagComponent.hpp"
+#include "EntityContext.hpp"
 
 template<typename Component>
 Component *Actor::tryGet(uintptr_t addr) {
@@ -417,4 +418,33 @@ bool Actor::IsOnSameTeam(Actor *actor) {
     }
 
     return false;
+}
+
+AttributesComponent* Actor::getAttributesComponent() {
+    static uintptr_t sig;
+
+    if (!VersionUtils::checkAboveOrEqual(21, 00)) {
+        return nullptr;
+    }
+
+    return tryGet<AttributesComponent>(sig);
+}
+
+float Actor::getHealth() {
+    auto attri = Attribute(GET_OFFSET("Attribute::Health"), "minecraft:health").mIDValue;
+    auto comp = getAttributesComponent();
+    if (!comp) return 20.f;
+    auto health = comp->baseAttributes.getInstance(attri);
+
+    if (!health) return 20.f;
+    return health->GetValue();
+
+}
+
+float Actor::getHunger() {
+    return getAttributesComponent()->baseAttributes.getInstance(Attribute(GET_OFFSET("Attribute::Hunger"), "minecraft:hunger").mIDValue)->GetValue();
+}
+
+float Actor::getSaturation() {
+    return getAttributesComponent()->baseAttributes.getInstance(Attribute(GET_OFFSET("Attribute::Saturation"), "minecraft:saturation").mIDValue)->GetValue();
 }

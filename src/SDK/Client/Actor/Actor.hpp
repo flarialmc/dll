@@ -18,6 +18,7 @@
 #include "Components/RuntimeIDComponent.hpp"
 #include "Components/ActorDataFlagComponent.hpp"
 #include "Components/MobEffectsComponent.hpp"
+#include "Components/AttributesComponent.hpp"
 
 
 enum ActorFlags {
@@ -232,6 +233,8 @@ public:
 
     RuntimeIDComponent *getRuntimeIDComponent();
 
+    AttributesComponent* getAttributesComponent();
+
     bool isValidAABB();
 
     ActorDataFlagComponent *getActorDataFlagComponent();
@@ -247,6 +250,12 @@ public:
     AABB getLerpedAABB(bool asHitbox = false);
 
     std::vector<UnifiedMobEffectData> getMobEffects();
+
+    float getHealth();
+
+    float getHunger();
+
+    float getSaturation();
 
     //class SerializedSkin* getSkin();
 };

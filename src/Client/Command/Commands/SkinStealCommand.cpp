@@ -108,7 +108,7 @@ void SaveSkin(std::string name, Image image, Image capeImage) {
 
 void SkinStealCommand::execute(const std::vector<std::string>& args) {
     if (args.empty()) {
-        addCommandMessage("Usage: .steal <playerName>");
+        addCommandMessage("§cUsage: .steal <playerName>");
         return;
     }
 
@@ -132,7 +132,7 @@ void SkinStealCommand::execute(const std::vector<std::string>& args) {
             }
         }
         if (!closingQuoteFound) {
-            addCommandMessage("Usage: .steal \"<playerName>\"  (missing closing quote)");
+            addCommandMessage("§cUsage: .steal \"<playerName>\"  (missing closing quote)");
             return;
         }
     } else if (args.size() > 1) {
@@ -154,7 +154,7 @@ void SkinStealCommand::execute(const std::vector<std::string>& args) {
     bool found = false;
     for (const auto& pair : SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
         if (String::toLower(pair.second.name) == playerName) {
-            addCommandMessage("Successfully stole {}'s skin! Saved at Roamingstate/Flarial/Skins.", pair.second.name);
+            addCommandMessage("§aSuccessfully stole {}'s skin! Saved at Roamingstate/Flarial/Skins.", pair.second.name);
             SaveSkin(pair.second.name, pair.second.playerSkin.mSkinImage, pair.second.playerSkin.mCapeImage);
             found = true;
             break;

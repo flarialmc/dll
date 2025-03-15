@@ -2,22 +2,22 @@
 
 #include "../Module.hpp"
 
-class FPSCounter : public Module {
+class FPS : public Module {
 
 public:
 
-    FPSCounter() : Module("FPS", "Shows how much Frames Per Second (FPS)\nyour device is rendering.",
+    FPS() : Module("FPS", "Shows how much Frames Per Second (FPS)\nyour device is rendering.",
         IDR_FPS_PNG, "") {
         Module::setup();
     };
 
     void onEnable() override {
-        Listen(this, RenderEvent, &FPSCounter::onRender)
+        Listen(this, RenderEvent, &FPS::onRender)
             Module::onEnable();
     }
 
     void onDisable() override {
-        Deafen(this, RenderEvent, &FPSCounter::onRender)
+        Deafen(this, RenderEvent, &FPS::onRender)
             Module::onDisable();
     }
 

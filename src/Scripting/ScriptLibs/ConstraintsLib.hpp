@@ -15,7 +15,7 @@ public:
                 .addStaticFunction("PercentageConstraint", [](float percentage, const std::string &edge, bool ignore_stack = false) {
                     return Constraints::PercentageConstraint(percentage, edge, ignore_stack);
                 })
-                .addStaticFunction("RelativeConstraint", [](float percent, const std::string& dimension, bool ignore_stack = false) {
+                .addStaticFunction("RelativeConstraint", [](float percent, const std::string& dimension = "height", bool ignore_stack = false) {
                     return Constraints::RelativeConstraint(percent, dimension, ignore_stack);
                 })
                 .addStaticFunction("CenterConstraint", [](float width, float height, const std::string &axis = "no", float xModifier = 0.f, float yModifier = 0.f, bool ignoreStack = false) {

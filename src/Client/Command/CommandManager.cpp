@@ -11,7 +11,7 @@
 #include "Commands/TestCommand.hpp"
 #include "Commands/SkinStealCommand.hpp"
 
-std::vector<std::unique_ptr<Command>> CommandManager::Commands = std::vector<std::unique_ptr<Command>>();
+std::vector<std::shared_ptr<Command>> CommandManager::Commands = std::vector<std::shared_ptr<Command>>();
 CommandManager CommandManager::instance;
 
 void CommandManager::initialize() {

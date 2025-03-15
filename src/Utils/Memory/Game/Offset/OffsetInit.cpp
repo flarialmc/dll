@@ -27,6 +27,8 @@ void OffsetInit::init2160() {
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x610);
 
     ADD_OFFSET("MinecraftGame::textureGroup", 0x6B8);
+
+    ADD_OFFSET("AttributeInstance::Value", 0x7C);
 }
 
 void OffsetInit::init2150() {
@@ -37,6 +39,11 @@ void OffsetInit::init2150() {
 
     ADD_OFFSET("Player::gamemode", 0xB18);
     ADD_OFFSET("Player::playerName", 0xCA0);
+
+    ADD_OFFSET("Block::blockLegacy", 0x78);
+
+    ADD_OFFSET("BlockLegacy::name", 0x98);
+    ADD_OFFSET("BlockLegacy::namespace", 0xC0);
 
     ADD_OFFSET("Player::playerInventory", 0x5D0);
 
@@ -52,6 +59,7 @@ void OffsetInit::init2150() {
     ADD_OFFSET("MoveInputComponent::sprinting", 0x30);
 
     ADD_OFFSET("MinecraftGame::textureGroup", 0x760);
+    ADD_OFFSET("Attribute::Health", 1);
 }
 
 void OffsetInit::init2140() {
@@ -150,6 +158,9 @@ void OffsetInit::init2120() {
     ADD_OFFSET("ItemActor::stack", 0x408);
 
     ADD_OFFSET("MinecraftGame::textureGroup", 0x6D0);
+
+    ADD_OFFSET("BlockLegacy::name", 0x50);
+    ADD_OFFSET("BlockLegacy::namespace", 0x78);
 }
 
 void OffsetInit::init2100() {
@@ -171,6 +182,11 @@ void OffsetInit::init2100() {
     ADD_OFFSET("Level::getPlayerMap", 0x1BC8); // getRuntimeActorList offset + B8 || Level::getPlayerList
 
     ADD_OFFSET("ItemActor::stack", 0x448);
+
+    ADD_OFFSET("BlockLegacy::name", 0x28);
+    ADD_OFFSET("BlockLegacy::namespace", 0xA0);
+
+    ADD_OFFSET("Block::blockLegacy", 0x30);
 }
 
 void OffsetInit::init2080() {
@@ -277,6 +293,8 @@ void OffsetInit::init2050() {
     ADD_OFFSET("ItemActor::stack", 0x4C8);
 
     ADD_OFFSET("OptionInfo::TranslateName", 0x158);
+
+    ADD_OFFSET("AttributeInstance::Value", 0x84);
 }
 
 void OffsetInit::init2040() {
@@ -299,6 +317,11 @@ void OffsetInit::init2040() {
     ADD_OFFSET("Level::worldFolderName", 0x15A0);
 
     ADD_OFFSET("OptionInfo::TranslateName", 0x168);
+
+    ADD_OFFSET("AttributeInstance::Value", 0x88);
+    ADD_OFFSET("Attribute::Hunger", 2);
+    ADD_OFFSET("Attribute::Saturation", 3);
+    ADD_OFFSET("Attribute::Health", 7);
 }
 
 void OffsetInit::init2030() {
@@ -442,6 +465,13 @@ void OffsetInit::init2030() {
     ADD_OFFSET("mce::Camera::worldMatrixStack", 0x40);
 
     ADD_OFFSET("LevelRendererCamera::onDeviceLost", 7);
+
+    ADD_OFFSET("AttributeInstance::Value", 0x84);
+    ADD_OFFSET("Attribute::Hunger", 1);
+    ADD_OFFSET("Attribute::Saturation", 2);
+    ADD_OFFSET("Attribute::Health", 6);
+
+    ADD_OFFSET("BlockSource::getBlock", 2); // might be incorrect, bounds of versions unknown
 
     //ADD_OFFSET("ContainerScreenController::_handlePlaceAll", X);
 }

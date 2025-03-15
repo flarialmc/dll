@@ -2,6 +2,7 @@
 
 #include <random>
 #include <Scripting/ScriptManager.hpp>
+#include <Scripting/ModuleScript.hpp>
 
 #include "Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp"
 
