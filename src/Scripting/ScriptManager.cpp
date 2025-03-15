@@ -59,20 +59,21 @@ void ScriptManager::loadModuleScripts() {
         // before the script compiles. (Won't crash but you get the point)
         mLoadedScripts.push_back(script);
 
-        if (script->compile()) {
-            auto mod = std::make_shared<ModuleScript>(
-                script->getName(),
-                script->getDescription(),
-                script->getState(),
-                script);
-
-            mLoadedModules.emplace_back(mod);
-            mod->defaultConfig();
-            ModuleManager::cguiRefresh = true;
-            Logger::info("Loaded module script '{}'", script->getName());
-        } else {
+        if (!script->compile()) {
             mLoadedScripts.pop_back();
+            continue;
         }
+
+        auto mod = std::make_shared<ModuleScript>(
+            script->getName(),
+            script->getDescription(),
+            script->getState(),
+            script);
+
+        mLoadedModules.emplace_back(mod);
+        mod->defaultConfig();
+        ModuleManager::cguiRefresh = true;
+        Logger::info("Loaded module script '{}'", script->getName());
     }
 }
 
@@ -90,39 +91,52 @@ void ScriptManager::loadCommandScripts() {
             code
         );
 
-        if (script->compile()) {
-            if (script->getName().find(' ') != std::string::npos) {
-                Logger::error("Command script '{}' has a space", script->getName());
-                return;
-            }
+        if (!script->compile()) return;
 
-            std::vector<std::string> aliases; {
-                lua_State* L = script->getState();
-                lua_getglobal(L, "aliases");
-
-                if (lua_istable(L, -1)) {
-                    lua_pushnil(L);
-                    while (lua_next(L, -2) != 0) {
-                        if (lua_isstring(L, -1)) {
-                            aliases.emplace_back(lua_tostring(L, -1));
-                        }
-                        lua_pop(L, 1);
-                    }
-                }
-                lua_pop(L, 1);
-            }
-
-            auto command = std::make_shared<CommandScript>(
-                script->getName(),
-                script->getDescription(),
-                aliases,
-                script);
-
-            mLoadedScripts.push_back(script);
-            mLoadedCommands.emplace_back(command);
-            CommandManager::Commands.push_back(command);
-            Logger::info("Loaded command script '{}'", script->getName());
+        if (script->getName().find(' ') != std::string::npos) {
+            Logger::error("Command script '{}' has a space", script->getName());
+            continue;
         }
+
+        std::vector<std::string> aliases; {
+            lua_State* L = script->getState();
+            lua_getglobal(L, "aliases");
+
+            if (lua_istable(L, -1)) {
+                lua_pushnil(L);
+                while (lua_next(L, -2) != 0) {
+                    if (lua_isstring(L, -1)) {
+                        aliases.emplace_back(lua_tostring(L, -1));
+                    }
+                    lua_pop(L, 1);
+                }
+            }
+            lua_pop(L, 1);
+        }
+
+        bool hasSpace = false;
+        for (const auto& alias : aliases) {
+            if (alias.find(' ') != std::string::npos) {
+                Logger::error("Command script '{}' has an alias containing a space: '{}'", script->getName(), alias);
+                hasSpace = true;
+                break;
+            }
+        }
+
+        if (hasSpace) {
+            continue;
+        }
+
+        auto command = std::make_shared<CommandScript>(
+            script->getName(),
+            script->getDescription(),
+            aliases,
+            script);
+
+        mLoadedScripts.push_back(script);
+        mLoadedCommands.emplace_back(command);
+        CommandManager::Commands.push_back(command);
+        Logger::info("Loaded command script '{}'", script->getName());
     }
 }
 
@@ -152,6 +166,7 @@ void ScriptManager::_reloadScripts() {
     initialized = false;
 
     CommandManager::terminate();
+    CommandManager::Commands.clear();
 
     for (auto& mod : mLoadedModules) {
         if (mod) {
