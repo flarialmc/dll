@@ -435,7 +435,7 @@ float Actor::getHealth() {
     auto comp = getAttributesComponent();
     if (!comp) return 20.f;
     auto health = comp->baseAttributes.getInstance(attri);
-g
+
     if (!health) return 20.f;
     return health->GetValue();
 

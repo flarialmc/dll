@@ -94,6 +94,7 @@
 #include "Scripting/ScriptManager.hpp"
 #include "Modules/AutoPerspective/AutoPerspective.hpp"
 #include "Modules/BlockHit/BlockHit.hpp"
+#include "Modules/LowHealthIndicator/LowHealthIndicator.hpp"
 #include "Modules/ZeqaUtils/ZeqaUtils.hpp"
 
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
@@ -223,6 +224,7 @@ void ModuleManager::initialize() {
     addModule<Waila>();
 
     addModule<RawInputBuffer>();
+    addModule<LowHealthIndicator>();
     //addModule<ItemUseDelayFix>();
     addModule<ZeqaUtils>();
 
