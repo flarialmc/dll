@@ -152,3 +152,5 @@ IDR_CHYVES_JPG            JPG "Data\\chyves.jpg"
 IDR_TREEGFX_JPG           JPG "Data\\treegfx.jpg"
 IDR_FREEZEENGINE_PNG      PNG "Data\\freezeengine.png"
 IDR_STONEHUNTER_PNG       PNG "Data\\stonehunter.png"
+IDR_BEAVER_PNG       PNG "Data\\beaver.png"
+

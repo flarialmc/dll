@@ -53,7 +53,7 @@ public:
         this->addHeader("General");
 
         this->addToggle("DVD Mode", "See for yourself", this->settings.getSettingByName<bool>("dvdmode")->value);
-        this->addDropdown("Mode", "", std::vector<std::string>{"Patar", "Jqms", "Chyves", "Nikita", "treegfx", "FreezeEngine", "StoneHunter"}, this->settings.getSettingByName<std::string>("mode")->value);
+        this->addDropdown("Mode", "", std::vector<std::string>{"Patar", "Jqms", "Chyves", "Nikita", "treegfx", "FreezeEngine", "StoneHunter", "beaver"}, this->settings.getSettingByName<std::string>("mode")->value);
         this->addSlider("Scale", "", this->settings.getSettingByName<float>("scale")->value, 5.0F);
         if (this->settings.getSettingByName<bool>("dvdmode")->value) {
             this->addHeader("DVD Mode");
@@ -111,6 +111,9 @@ public:
                 }
             }
             draw = 218 + pic;
+        }else if (this->settings.getSettingByName<std::string>("mode")->value == "beaver") {
+            mode = "PNG";
+            draw = 246;
         }
         if (this->settings.getSettingByName<bool>("dvdmode")->value) {
             FlarialGUI::image(draw, D2D1::RectF(x, y, x + s, y + s), mode);
