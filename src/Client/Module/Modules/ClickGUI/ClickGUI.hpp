@@ -133,7 +133,7 @@ public:
 
         for (const auto& [role, color] : roleColors) {
             if (APIUtils::hasRole(role, name.first)) {
-                insert = "§f[" + color + "FLARIAL§f]§r";
+                insert = "§f[" + color + "FLARIAL§f]§r ";
                 break;
             }
         }
