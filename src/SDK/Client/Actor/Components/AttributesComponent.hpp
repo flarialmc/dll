@@ -21,13 +21,6 @@ public:
 	Attribute(int id, std::string const& name) : mIDValue(id), mName(name) {}
 };
 
-class Attributes {
-public:
-	inline static Attribute Hunger = Attribute(GET_OFFSET("Attribute::Hunger"), "minecraft:hunger");
-	inline static Attribute Saturation = Attribute(GET_OFFSET("Attribute::Hunger"), "minecraft:saturation");
-	inline static Attribute Health = Attribute(GET_OFFSET("Attribute::Health"), "minecraft:health");
-};
-
 class BaseAttributeMap {
 public:
 	std::unordered_map<unsigned int, AttributeInstance> instances;

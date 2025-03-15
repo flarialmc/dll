@@ -195,8 +195,6 @@ public:
         }
 
         if (!this->isKeybind(event.keys)) this->active = false;
-        
-        //std::cout << SDK::clientInstance->getLocalPlayer()->getAttributesComponent()->baseAttributes.getInstance(Attributes::Health.mIDValue)->GetValue() << std::endl;
      };
 
     // TODO: add dolly zoom and world2screen zoom stabilization ?

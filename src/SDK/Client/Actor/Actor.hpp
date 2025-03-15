@@ -251,5 +251,11 @@ public:
 
     std::vector<UnifiedMobEffectData> getMobEffects();
 
+    float getHealth();
+
+    float getHunger();
+
+    float getSaturation();
+
     //class SerializedSkin* getSkin();
 };
