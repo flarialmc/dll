@@ -165,6 +165,16 @@ public:
                     ImVec2 pos = ImGui::GetMousePos();
                     return Vec2(pos.x, pos.y);
                 })
+                .addFunction("GetDisplaySize", []() {
+                    ImVec2 size = ImGui::GetIO().DisplaySize;
+                    return Vec2(size.x, size.y);
+                })
+                .addFunction("GetFramerate", []() {
+                    return ImGui::GetIO().Framerate;
+                })
+                .addFunction("GetDeltaTime", []() {
+                    return ImGui::GetIO().DeltaTime;
+                })
             .endNamespace()
             .beginClass<ImDrawList>("ImDrawList")
                 .addFunction("AddLine", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& colorTable, float thickness = 1) {
@@ -232,27 +242,6 @@ public:
                     ImVec2 p4 = toImVec2(p4Table);
                     ImColor color = toColor(colorTable);
                     drawList->AddQuad(p1, p2, p3, p4, color, thickness);
-                })
-            .endClass()
-            .beginClass<ImGuiIO>("ImGuiIO")
-                .addProperty("DisplaySize", &ImGuiIO::DisplaySize)
-                .addProperty("DeltaTime", &ImGuiIO::DeltaTime)
-                .addProperty("Framerate", &ImGuiIO::Framerate)
-            .endClass()
-            .beginClass<std::vector<ImVec2>>("ImVec2Vector")
-                .addFunction("size", &std::vector<ImVec2>::size)
-                .addFunction("get", [](std::vector<ImVec2>* vec, size_t index) -> ImVec2 {
-                    if (index < 1 || index > vec->size()) {
-                        return {};
-                    }
-                    return (*vec)[index - 1];
-                })
-                .addFunction("__len", &std::vector<ImVec2>::size)
-                .addFunction("__index", [](std::vector<ImVec2>* vec, size_t index) -> ImVec2 {
-                    if (index < 1 || index > vec->size()) {
-                        return {};
-                    }
-                    return (*vec)[index - 1];
                 })
             .endClass();
     }
