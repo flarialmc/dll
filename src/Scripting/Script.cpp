@@ -112,7 +112,6 @@ bool Script::compile() {
 
         // Execute the script
         if (safeCall(0, 0) != LUA_OK) {
-            lua_pop(mState, 1);
             return false;
         }
 
