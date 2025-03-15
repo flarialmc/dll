@@ -2,7 +2,7 @@
 
 #include <Scripting/ScriptSettings/ScriptSettingManager.hpp>
 #include <Scripting/ScriptSettings/ScriptSettingTypes.hpp>
-#include <Scripting/FlarialScript.hpp>
+#include <Scripting/Script.hpp>
 
 #include <Modules/ClickGUI/ClickGUI.hpp>
 #include <Client/Module/Modules/Module.hpp>
@@ -11,21 +11,22 @@
 
 inline ScriptSettingManager gScriptSettingManager;
 
-class ScriptModuleBase : public Module {
+class ModuleScript : public Module {
 public:
     lua_State* moduleLuaState = nullptr;
-    std::weak_ptr<FlarialScript> linkedScript;
+    std::weak_ptr<Script> linkedScript;
 
-    ScriptModuleBase(const std::string& name, const std::string& description, lua_State* luaState, std::shared_ptr<FlarialScript> script)
+    ModuleScript(const std::string& name, const std::string& description, lua_State* luaState, std::shared_ptr<Script> script)
     : Module(name, description, IDR_SCRIPT_PNG, "", true), moduleLuaState(luaState), linkedScript(script) {
 
         Module::setup();
-        Listen(this, KeyEvent, &ScriptModuleBase::onKey);
-        Listen(this, MouseEvent, &ScriptModuleBase::onMouse);
-        Listen(this, PacketEvent, &ScriptModuleBase::onPacketReceive);
-        Listen(this, TickEvent, &ScriptModuleBase::onTick);
-        Listen(this, RenderEvent, &ScriptModuleBase::onRender);
-        Listen(this, SetupAndRenderEvent, &ScriptModuleBase::onSetupAndRender);
+        Listen(this, KeyEvent, &ModuleScript::onKey);
+        Listen(this, MouseEvent, &ModuleScript::onMouse);
+        Listen(this, PacketEvent, &ModuleScript::onPacketReceive);
+        Listen(this, PacketSendEvent, &ModuleScript::onPacketSent);
+        Listen(this, TickEvent, &ModuleScript::onTick);
+        Listen(this, RenderEvent, &ModuleScript::onRender);
+        Listen(this, SetupAndRenderEvent, &ModuleScript::onSetupAndRender);
     }
 
     void terminate() override {
@@ -33,12 +34,14 @@ public:
             gScriptSettingManager.saveSettings(script.get());
             gScriptSettingManager.clearSettingsForScript(script.get());
         }
-        Deafen(this, KeyEvent, &ScriptModuleBase::onKey);
-        Deafen(this, MouseEvent, &ScriptModuleBase::onMouse);
-        Deafen(this, PacketEvent, &ScriptModuleBase::onPacketReceive);
-        Deafen(this, TickEvent, &ScriptModuleBase::onTick);
-        Deafen(this, RenderEvent, &ScriptModuleBase::onRender);
-        Deafen(this, SetupAndRenderEvent, &ScriptModuleBase::onSetupAndRender);
+
+        Deafen(this, KeyEvent, &ModuleScript::onKey);
+        Deafen(this, MouseEvent, &ModuleScript::onMouse);
+        Deafen(this, PacketEvent, &ModuleScript::onPacketReceive);
+        Deafen(this, PacketSendEvent, &ModuleScript::onPacketSent);
+        Deafen(this, TickEvent, &ModuleScript::onTick);
+        Deafen(this, RenderEvent, &ModuleScript::onRender);
+        Deafen(this, SetupAndRenderEvent, &ModuleScript::onSetupAndRender);
         Module::terminate();
     }
 
@@ -135,7 +138,8 @@ public:
 
     void onKey(KeyEvent& event);
     void onMouse(MouseEvent& event);
-    void onPacketReceive(PacketEvent &event);
+    void onPacketReceive(PacketEvent& event);
+    void onPacketSent(PacketSendEvent& event);
     void onTick(TickEvent& event);
     void onRender(RenderEvent& event);
     void onSetupAndRender(SetupAndRenderEvent& event);

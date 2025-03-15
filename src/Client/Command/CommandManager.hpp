@@ -7,7 +7,7 @@
 class CommandManager {
 public:
     static CommandManager instance;
-    static std::vector<std::unique_ptr<Command>> Commands;
+    static std::vector<std::shared_ptr<Command>> Commands;
 
     static void initialize();
     static void terminate();

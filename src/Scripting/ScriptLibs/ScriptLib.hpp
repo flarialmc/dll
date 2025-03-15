@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Scripting/ScriptModuleBase.hpp>
+#include <Scripting/ModuleScript.hpp>
 #include <LuaBridge/LuaBridge.h>
 
 class ScriptLib {

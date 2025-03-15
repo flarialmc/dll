@@ -1,6 +1,7 @@
 #include "ClickGUI.hpp"
 
 #include <Scripting/ScriptManager.hpp>
+#include <Scripting/ModuleScript.hpp>
 
 void ClickGUI::onRender(RenderEvent &event) {
 

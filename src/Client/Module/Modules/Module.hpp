@@ -19,6 +19,8 @@
 class Module {
 
 public:
+    virtual ~Module() = default;
+
     std::string name;
     std::string description;
     int icon;

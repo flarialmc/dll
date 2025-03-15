@@ -1,4 +1,4 @@
-#include "FlarialScript.hpp"
+#include "Script.hpp"
 
 #include <Utils/Logger/Logger.hpp>
 
@@ -53,7 +53,7 @@ static int customPrint(lua_State* L) {
     return 0;
 }
 
-FlarialScript::FlarialScript(std::string filePath, std::string code)
+Script::Script(std::string filePath, std::string code)
     : mFilePath(std::move(filePath)), mCode(std::move(code)) {
 
     mState = luaL_newstate();
@@ -77,7 +77,7 @@ FlarialScript::FlarialScript(std::string filePath, std::string code)
     ScriptLib::registerLib<NetworkLib>(mState);
 }
 
-bool FlarialScript::compile() {
+bool Script::compile() {
     try {
         // Load and validate the code
         if (luaL_loadstring(mState, mCode.c_str()) != LUA_OK) {
@@ -87,7 +87,7 @@ bool FlarialScript::compile() {
             return false;
         }
 
-        registerModuleFunction("onEvent", [](lua_State* L) {
+        registerFunction("onEvent", [](lua_State* L) {
                 const char* eventName = luaL_checkstring(L, 1);
 
                 if (!lua_isfunction(L, 2)) {
@@ -121,7 +121,7 @@ bool FlarialScript::compile() {
 
         lua_getglobal(mState, "name");
         if (!lua_isstring(mState, -1)) {
-            Logger::error("Script {} is missing 'name'", mFilePath);
+            Logger::error("Script '{}' is missing 'name'", mFilePath);
             lua_pop(mState, 1);
             return false;
         }
@@ -130,7 +130,7 @@ bool FlarialScript::compile() {
 
         lua_getglobal(mState, "description");
         if (!lua_isstring(mState, -1)) {
-            Logger::error("Script {} is missing 'description'", mFilePath);
+            Logger::error("Script '{}' is missing 'description'", mFilePath);
             lua_pop(mState, 1);
             return false;
         }
@@ -152,7 +152,7 @@ bool FlarialScript::compile() {
     }
 }
 
-void FlarialScript::registerEvent(const std::string& eventName) {
+void Script::registerEvent(const std::string& eventName) {
     std::lock_guard lock(eventMutex);
     if (mIsDestroyed) return;
 
