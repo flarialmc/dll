@@ -13,14 +13,14 @@ public:
 
     void onEnable() override {
         Module::onEnable();
-        Listen(this, SetupAndRenderEvent, &onSetupAndRender);
-        Listen(this, RenderEvent, &onRender);
+        Listen(this, SetupAndRenderEvent, &LowHealthIndicator::onSetupAndRender);
+        Listen(this, RenderEvent, &LowHealthIndicator::onRender);
     }
 
     void onDisable() override {
         Module::onDisable();
-        Deafen(this, SetupAndRenderEvent, &onSetupAndRender);
-        Deafen(this, RenderEvent, &onRender);
+        Deafen(this, SetupAndRenderEvent, &LowHealthIndicator::onSetupAndRender);
+        Deafen(this, RenderEvent, &LowHealthIndicator::onRender);
     }
 
     void onSetupAndRender(SetupAndRenderEvent& event) {

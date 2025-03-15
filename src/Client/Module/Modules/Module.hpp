@@ -91,7 +91,8 @@ public:
     void addColorPicker(std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb);
     virtual void loadDefaults();
     void saveSettings();
-    void loadSettings();
+
+    virtual void loadSettings();
     void checkSettingsFile();
     virtual void toggle();
     virtual void setup();
