@@ -1,33 +1,36 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "../../../../SDK/Client/Block/BlockLegacy.hpp"
+#include "../../../../SDK/Client/Block/BlockSource.hpp"
+#include "../../../../SDK/Client/Block/Block.hpp"
 
-class FPSCounter : public Module {
-
+class Waila : public Module {
 public:
+    std::string name;
 
-    FPSCounter() : Module("FPS", "Shows how much Frames Per Second (FPS)\nyour device is rendering.",
-        IDR_FPS_PNG, "") {
+    Waila() : Module("Waila", "Shows what you are looking at.", IDR_EYE_PNG, "") {
         Module::setup();
     };
 
     void onEnable() override {
-        Listen(this, RenderEvent, &FPSCounter::onRender)
-            Module::onEnable();
+        Listen(this, SetupAndRenderEvent, &Waila::onSetupAndRender)
+        Listen(this, RenderEvent, &Waila::onRender)
+        Module::onEnable();
     }
 
     void onDisable() override {
-        Deafen(this, RenderEvent, &FPSCounter::onRender)
-            Module::onDisable();
+        Deafen(this, SetupAndRenderEvent, &Waila::onSetupAndRender)
+        Deafen(this, RenderEvent, &Waila::onRender)
+        Module::onDisable();
     }
 
     void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<std::string>("text") == nullptr)
-            settings.addSetting("text", (std::string)"FPS: {value}");
-
+            settings.addSetting("text", (std::string)"{value}");
+        this->settings.getSettingByName<bool>("responsivewidth")->value = true;
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
-        if (settings.getSettingByName<float>("fpsSpoofer") == nullptr) settings.addSetting("fpsSpoofer", 1.0f);
-
+        if (this->settings.getSettingByName<bool>("advanced") == nullptr) this->settings.addSetting("advanced", false);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -42,17 +45,14 @@ public:
             Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Main");
+        this->addToggle("Advanced Mode", "", this->settings.getSettingByName<bool>("advanced")->value);
         this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
         this->addToggle("Border", "", this->settings.getSettingByName<bool>("border")->value);
         this->addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", this->settings.getSettingByName<bool>("BlurEffect")->value);
         this->addConditionalSlider(this->settings.getSettingByName<bool>("border")->value, "Border Thickness", "", this->settings.getSettingByName<float>("borderWidth")->value, 4.f);
         this->addSlider("Rounding", "Rounding of the rectangle", this->settings.getSettingByName<float>("rounding")->value);
-        this->addSlider("FPS Spoofer", "Adjusts the displayed FPS.", this->settings.getSettingByName<float>("fpsSpoofer")->value, 10.0f);
         this->extraPadding();
-
-        // Add FPS Spoofer Slider
         
-
         this->addHeader("Text");
         this->addTextBox("Format", "", settings.getSettingByName<std::string>("text")->value);
         this->addSlider("Text Scale", "", this->settings.getSettingByName<float>("textscale")->value, 2.0f);
@@ -97,34 +97,37 @@ public:
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
-    }  //testing if it works
+    }
 
 
-    void onRender(RenderEvent& event) {
-        if (this->isEnabled()) {
-            // Get the fpsSpoofer value
-            float fpsSpooferValue = this->settings.getSettingByName<float>("fpsSpoofer")->value;
+    void onSetupAndRender(SetupAndRenderEvent& event) { 
+        if (!SDK::clientInstance->getLocalPlayer()) return;
+        if (!SDK::clientInstance->getLocalPlayer()->getLevel()) return;
+        if (!SDK::clientInstance->getBlockSource()) return;
+        HitResult result = SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult();
 
-            // Ensure the value doesn't exceed 10 and is at least 1
-            if (fpsSpooferValue > 10.0f) {
-                fpsSpooferValue = 10.0f;
+        BlockPos pos = { result.blockPos.x,
+                         result.blockPos.y ,
+                         result.blockPos.z};
+        BlockSource* blockSource = SDK::clientInstance->getBlockSource();
+        try {
+            BlockLegacy* block = blockSource->getBlock(pos)->getBlockLegacy();
+            if (!block) return;
+            try {
+
+                if (!this->settings.getSettingByName<bool>("advanced")->value) name = block->getName();
+                else name = block->getNamespace();
             }
-            if (fpsSpooferValue < 1.0f) {
-                fpsSpooferValue = 1.0f;
-            }
-
-            // Save the clamped value (if changed)
-            this->settings.getSettingByName<float>("fpsSpoofer")->value = fpsSpooferValue;
-
-            // Apply the multiplier
-            int fps = (int)round(((float)MC::fps * round(fpsSpooferValue)));
-
-            // Convert fps to string for rendering
-            auto fpsStr = FlarialGUI::cached_to_string(fps);
-
-            // Render the FPS text
-            this->normalRender(0, fpsStr);
+            catch (const std::exception& e) { Logger::error("Failed to get block name: {}", e.what()); }
+        }
+        catch (const std::exception& e) {
+            Logger::error("Failed to get block: {}", e.what());
         }
     }
 
+    void onRender(RenderEvent& event) {
+        if (this->isEnabled() && name != "air") {
+            this->normalRender(32, name);
+        }
+    }
 };

@@ -25,6 +25,30 @@ execute_process(
 
 add_compile_definitions(COMMIT_HASH="${COMMIT_HASH}")
 
+# Optimize for speed
+add_compile_options($<$<CONFIG:Release>:/O2>)
+add_compile_options($<$<CONFIG:Release>:/Ot>)
+add_compile_options($<$<CONFIG:Release>:/Ox>)
+add_compile_options($<$<CONFIG:Release>:/Oy>)
+
+# Enable intrinsic functions
+add_compile_options($<$<CONFIG:Release>:/Oi>)
+
+# Separate functions for the linker to improve the optimization process
+add_compile_options($<$<CONFIG:Release>:/Gy>)
+
+# Optimize global data to reduce the binary size
+add_compile_options($<$<CONFIG:Release>:/Gw>)
+
+# Enable string pooling to reduce binary size by consolidating duplicate strings
+add_compile_options($<$<CONFIG:Release>:/GF>)
+
+# Optimize floating point operations for speed (may introduce minor precision differences)
+# add_compile_options($<$<CONFIG:Release>:/fp:fast>)
+
+# Inline any suitable function to improve performance by reducing function call overhead
+add_compile_options($<$<CONFIG:Release>:/Ob2>)
+
 add_compile_options(/bigobj)
 add_compile_options(/utf-8)
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "Test")
@@ -49,9 +73,7 @@ add_compile_definitions(
 
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp" "src/*.hpp")
 file(GLOB_RECURSE LIB_FILES "lib/*.cpp" "lib/*.h")
-add_library(Flarial SHARED main.cpp ${SOURCE_FILES} ${LIB_FILES} src/Assets/Assets.rc
-        src/Client/Command/Commands/ConfigCommand.cpp
-        src/Client/Command/Commands/ConfigCommand.hpp)
+add_library(Flarial SHARED main.cpp ${SOURCE_FILES} ${LIB_FILES} src/Assets/Assets.rc)
 
 target_include_directories(Flarial PRIVATE
         "."

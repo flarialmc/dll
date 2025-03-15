@@ -6,7 +6,8 @@
 #include "Modules/Misc/TextAlias/TextAliasListener.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/Module.hpp"
-#include "Modules/FPS/FPSCounter.hpp"
+#include "Modules/FPS/FPS.hpp"
+#include "Modules/Waila/Waila.hpp"
 #include "Modules/CPS/CPSCounter.hpp"
 #include "Modules/Zoom/Zoom.hpp"
 #include "Modules/Time/Time.hpp"
@@ -93,6 +94,7 @@
 #include "Scripting/ScriptManager.hpp"
 #include "Modules/AutoPerspective/AutoPerspective.hpp"
 #include "Modules/BlockHit/BlockHit.hpp"
+#include "Modules/ZeqaUtils/ZeqaUtils.hpp"
 
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
     for (const auto& pair : moduleMap) {
@@ -143,7 +145,7 @@ void ModuleManager::initialize() {
 
     addModule<ClickGUI>();
     addModule<Module202020>();
-    addModule<FPSCounter>();
+    addModule<FPS>();
     addModule<CPSCounter>();
     addModule<IPDisplay>();
     addModule<ReachCounter>();
@@ -218,10 +220,11 @@ void ModuleManager::initialize() {
 
     addModule<NullMovement>();
     addModule<CustomCrosshair>();
+    addModule<Waila>();
 
     addModule<RawInputBuffer>();
     //addModule<ItemUseDelayFix>();
-    //addModule<ZeqaUtils>();
+    addModule<ZeqaUtils>();
 
     addService<GUIKeyListener>();
     if (!VersionUtils::checkAboveOrEqual(21, 60)) {

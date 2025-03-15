@@ -353,13 +353,23 @@ const std::map<int, int> xpToLevelCTF = {
 
 namespace Hive {
 
+    struct httpResponse {
+        std::string response;
+        int httpCode;
+    };
+
     class PlayerStats {
     private:
         float fkdr;
         float kd;
         float winRate;
         int level;
+        int victories;
+        int losses;
+        int kills;
+        int deaths;
         int code = 0;
+        int prestige = 0;
 
     public:
         PlayerStats(float fkdr = 0.0f, float kd = 0.0f, float winRate = 0.0f)
@@ -370,27 +380,50 @@ namespace Hive {
         void setWinRate(double winRateValue) { winRate = winRateValue; }
         void setCode(int codeValue){ code = codeValue; }
         void setLevel(int levelValue){ level = levelValue; }
+        void setVictories(int victoriesValue){ victories = victoriesValue; }
+        void setLosses(int lossesValue){ losses = lossesValue; }
+        void setKills(int killsValue){ kills = killsValue; }
+        void setDeaths(int deathsValue){ deaths = deathsValue; }
+        void setPrestige(int pres){ prestige = pres; }
 
         float getFKDR() const { return fkdr; }
         float getKD() const { return kd; }
         float getWinRate() const { return winRate; }
         int getLevel() const { return level; }
+        int getVictories() const { return victories; }
+        int getLosses() const { return losses; }
+        int getKills() const { return kills; }
+        int getDeaths() const { return deaths; }
         int getCode() const { return code; };
+        int getIntPrestige() const { return prestige; }
+        std::string getPrestige() const {
+            std::string p = "";
+            if(prestige != 0) p = "[";
+            if(prestige == 1) p += "I";
+            if(prestige == 2) p += "II";
+            if(prestige == 3) p += "III";
+            if(prestige == 4) p += "IV";
+            if(prestige == 5) p += "V";
+            if(prestige != 0) p += "] ";
+            return p;
+        };
     };
 
     double roundToSecond(float value) {
         return std::round(value * 100.0f) / 100.0f;
     }
 
-
-
-    std::string GetString(const std::string &URL) {
+    httpResponse GetString(const std::string &URL) {
         HINTERNET interwebs = InternetOpenA("Samsung Smart Fridge", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, NULL);
         HINTERNET urlFile;
         std::string rtn;
+        DWORD statusCode = 0;
+        DWORD bufferSize = sizeof(statusCode);
+        DWORD randomShit = 0;
 
         if (interwebs) {
             urlFile = InternetOpenUrlA(interwebs, URL.c_str(), NULL, NULL, NULL, NULL);
+            HttpQueryInfoA(urlFile, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &statusCode, &bufferSize, &randomShit);
             if (urlFile) {
                 char buffer[2000];
                 DWORD bytesRead;
@@ -404,7 +437,7 @@ namespace Hive {
             InternetCloseHandle(interwebs);
         }
 
-        return rtn;
+        return {rtn, (int)statusCode};
     }
 
     std::string replaceAll(std::string subject, const std::string &search, const std::string &replace) {
@@ -414,18 +447,6 @@ namespace Hive {
             pos += replace.length();
         }
         return subject;
-    }
-
-    ImVec4 calculateWinRateColor(float winrate){
-        if(winrate < 25.0f ){
-            return ImVec4(255.0f, 72.0f, 59.0f, 1.0f);
-        }
-        else if(winrate < 50.0f ){
-            return ImVec4(251.0f, 255.0f, 38.0f, 1.0f);
-        }else {
-            return ImVec4(61.0f, 255.0f, 43.0f, 1.0f);
-        }
-
     }
 
     int getLevelForXP(int xp, const std::map<int, int>& xpToLevel) {
@@ -453,14 +474,21 @@ namespace Hive {
 
         try {
             std::string url = "https://api.playhive.com/v0/game/all/" + gameId + "/" + username;
-            std::string jsonResponse = GetString(url);
 
+            httpResponse response = GetString(url);
+            std::string jsonResponse = response.response;
+
+            // Logger::info("{}", response.httpCode);
+            if (response.httpCode != 200) {
+                stats.setCode(response.httpCode == 404 ? 1:3);
+                return stats;
+            }
 
             nlohmann::json jsonData = nlohmann::json::parse(jsonResponse);
 
-            Logger::info(jsonResponse);
+            // Logger::info("{}", jsonResponse);
             if(!jsonData.contains("first_played")){
-                stats.setCode(1);
+                stats.setCode(2);
                 return stats;
             }
 
@@ -483,6 +511,12 @@ namespace Hive {
                 stats.setKD(roundToSecond((float) kills / (float) deaths));
                 stats.setWinRate(std::round(((float) victories / (float) played) * 100.0f));
                 stats.setLevel(getLevelForXP(xp, xpToLevelBedWars));
+                stats.setVictories(victories);
+                stats.setLosses(played - victories);
+                stats.setKills(kills);
+                stats.setDeaths(deaths);
+                // for future:
+                // if(jsonData.contains("prestige")) stats.setPrestige(jsonData["prestige"].get<int>());
             }
 
             if(gameId == "sky") {
@@ -504,6 +538,11 @@ namespace Hive {
                 stats.setKD(roundToSecond((float) kills / (float) deaths));
                 stats.setWinRate(std::round(((float) victories / (float) played) * 100.0f));
                 stats.setLevel(getLevelForXP(xp, xpToLevelSkyWars));
+                stats.setVictories(victories);
+                stats.setLosses(played - victories);
+                stats.setKills(kills);
+                stats.setDeaths(deaths);
+                if(jsonData.contains("prestige")) stats.setPrestige(jsonData["prestige"].get<int>());
             }
             if(gameId == "murder") {
                 if(!jsonData.contains("murders") || !jsonData.contains("murderer_eliminations") || !jsonData.contains("deaths") || !jsonData.contains("victories") || !jsonData.contains("played") || !jsonData.contains("xp")){
@@ -525,6 +564,16 @@ namespace Hive {
                 stats.setWinRate(std::round(((float) victories / (float) played) * 100.0f));
 
                 stats.setLevel(getLevelForXP(xp, xpToLevelMurderMystery));
+
+                stats.setVictories(victories);
+
+                stats.setLosses(played - victories);
+
+                stats.setKills(eliminations);
+
+                stats.setDeaths(deaths);
+
+                if(jsonData.contains("prestige")) stats.setPrestige(jsonData["prestige"].get<int>());
             }
 
 
@@ -550,6 +599,14 @@ namespace Hive {
                 stats.setWinRate(std::round(((float) victories / (float) played) * 100.0f));
 
                 stats.setLevel(getLevelForXP(xp, xpToLevelCTF));
+
+                stats.setVictories(victories);
+
+                stats.setLosses(played - victories);
+
+                stats.setKills(kills);
+
+                stats.setDeaths(deaths);
             }
 
 
