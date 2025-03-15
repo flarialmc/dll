@@ -13,7 +13,7 @@
 #include "ScriptLibs/ImGuiLib.hpp"
 #include "ScriptLibs/GlobalsLib.hpp"
 #include "ScriptLibs/UtilLib.hpp"
-#include "ScriptLibs/StructsLib.hpp"
+#include "ScriptLibs/ObjectsLib.hpp"
 #include "ScriptLibs/FlarialGUILib.hpp"
 #include "ScriptLibs/ConstraintsLib.hpp"
 #include "ScriptLibs/PacketsLib.hpp"
@@ -69,7 +69,7 @@ Script::Script(std::string filePath, std::string code)
     ScriptLib::registerLib<ImGuiLib>(mState);
     ScriptLib::registerLib<GlobalsLib>(mState);
     ScriptLib::registerLib<UtilLib>(mState);
-    ScriptLib::registerLib<StructsLib>(mState);
+    ScriptLib::registerLib<ObjectsLib>(mState);
     ScriptLib::registerLib<FlarialGUILib>(mState);
     ScriptLib::registerLib<ConstraintsLib>(mState);
     ScriptLib::registerLib<PacketsLib>(mState);
