@@ -36,7 +36,7 @@ public:
 
         if (itemStack->item.get() != nullptr && CPSCounter::GetRightHeld() && itemStack->getItem()->name.contains("sword")) {
 
-          //Add cases for third person, and fix up first person transforms
+          //TO-DO : Add cases for third person
 
           switch(perspective) {
               case Perspective::FirstPerson:
@@ -50,6 +50,7 @@ public:
               case Perspective::ThirdPersonBack:
                   break;
               case Perspective::ThirdPersonFront:
+
                   break;
           }
         }
