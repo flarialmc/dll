@@ -6,6 +6,7 @@
 #include "../../SDK.hpp"
 #include "../../../Client/GUI/Engine/Engine.hpp"
 #include "Components/OnGroundFlagComponent.hpp"
+#include "EntityContext.hpp"
 
 template<typename Component>
 Component *Actor::tryGet(uintptr_t addr) {
@@ -417,4 +418,14 @@ bool Actor::IsOnSameTeam(Actor *actor) {
     }
 
     return false;
+}
+
+AttributesComponent* Actor::getAttributesComponent() {
+    static uintptr_t sig;
+
+    if (!VersionUtils::checkAboveOrEqual(21, 00)) {
+        return nullptr;
+    }
+
+    return tryGet<AttributesComponent>(sig);
 }

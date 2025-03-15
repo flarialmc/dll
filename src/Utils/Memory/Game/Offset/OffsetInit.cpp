@@ -27,6 +27,8 @@ void OffsetInit::init2160() {
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x610);
 
     ADD_OFFSET("MinecraftGame::textureGroup", 0x6B8);
+
+    ADD_OFFSET("AttributeInstance::Value", 0x7C);
 }
 
 void OffsetInit::init2150() {
@@ -52,6 +54,7 @@ void OffsetInit::init2150() {
     ADD_OFFSET("MoveInputComponent::sprinting", 0x30);
 
     ADD_OFFSET("MinecraftGame::textureGroup", 0x760);
+    ADD_OFFSET("Attribute::Health", 1);
 }
 
 void OffsetInit::init2140() {
@@ -277,6 +280,8 @@ void OffsetInit::init2050() {
     ADD_OFFSET("ItemActor::stack", 0x4C8);
 
     ADD_OFFSET("OptionInfo::TranslateName", 0x158);
+
+    ADD_OFFSET("AttributeInstance::Value", 0x84);
 }
 
 void OffsetInit::init2040() {
@@ -299,6 +304,11 @@ void OffsetInit::init2040() {
     ADD_OFFSET("Level::worldFolderName", 0x15A0);
 
     ADD_OFFSET("OptionInfo::TranslateName", 0x168);
+
+    ADD_OFFSET("AttributeInstance::Value", 0x88);
+    ADD_OFFSET("Attribute::Hunger", 2);
+    ADD_OFFSET("Attribute::Saturation", 3);
+    ADD_OFFSET("Attribute::Health", 7);
 }
 
 void OffsetInit::init2030() {
@@ -442,6 +452,11 @@ void OffsetInit::init2030() {
     ADD_OFFSET("mce::Camera::worldMatrixStack", 0x40);
 
     ADD_OFFSET("LevelRendererCamera::onDeviceLost", 7);
+
+    ADD_OFFSET("AttributeInstance::Value", 0x84);
+    ADD_OFFSET("Attribute::Hunger", 1);
+    ADD_OFFSET("Attribute::Saturation", 2);
+    ADD_OFFSET("Attribute::Health", 6);
 
     //ADD_OFFSET("ContainerScreenController::_handlePlaceAll", X);
 }

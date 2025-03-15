@@ -18,6 +18,7 @@
 #include "Components/RuntimeIDComponent.hpp"
 #include "Components/ActorDataFlagComponent.hpp"
 #include "Components/MobEffectsComponent.hpp"
+#include "Components/AttributesComponent.hpp"
 
 
 enum ActorFlags {
@@ -231,6 +232,8 @@ public:
     ActorRotationComponent *getActorRotationComponent();
 
     RuntimeIDComponent *getRuntimeIDComponent();
+
+    AttributesComponent* getAttributesComponent();
 
     bool isValidAABB();
 
