@@ -13,10 +13,14 @@ public:
 
     void onEnable() override {
         Module::onEnable();
+        Listen(this, SetupAndRenderEvent, &onSetupAndRender);
+        Listen(this, RenderEvent, &onRender);
     }
 
     void onDisable() override {
         Module::onDisable();
+        Deafen(this, SetupAndRenderEvent, &onSetupAndRender);
+        Deafen(this, RenderEvent, &onRender);
     }
 
     void onSetupAndRender(SetupAndRenderEvent& event) {
@@ -26,6 +30,7 @@ public:
 
     void onRender(RenderEvent& event) {
         if (this->isEnabled() && this->health < 7) {
+
             D2D1_COLOR_F color2 = D2D1::ColorF(D2D1::ColorF::Red);
             color2.a = 0.2f;
             FlarialGUI::RoundedRect(0, 0, color2, MC::windowSize.x, MC::windowSize.y, 0, 0);
