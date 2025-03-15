@@ -4,7 +4,6 @@
 
 #include "ScriptSettings/ScriptSettingManager.hpp"
 #include "ScriptLibs/ScriptLib.hpp"
-#include "ScriptManager.hpp"
 
 #include "ScriptLibs/FSLib.hpp"
 #include "ScriptLibs/SettingsLib.hpp"

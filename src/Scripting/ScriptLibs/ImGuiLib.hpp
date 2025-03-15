@@ -178,31 +178,45 @@ public:
             .endNamespace()
             .beginClass<ImDrawList>("ImDrawList")
                 .addFunction("AddLine", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& colorTable, float thickness = 1) {
+                    if (!drawList) return;
+
                     ImVec2 p1 = toImVec2(p1Table);
                     ImVec2 p2 = toImVec2(p2Table);
                     ImColor color = toColor(colorTable);
+
                     drawList->AddLine(p1, p2, color, thickness);
                 })
-                .addFunction("AddRect", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& colorTable, float rounding = 0, ImDrawFlags flags = 0, float thickness = 1) {
+                .addFunction("AddRect", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& colorTable, float rounding = 0, float thickness = 1, ImDrawFlags flags = 0) {
+                    if (!drawList) return;
+
                     ImVec2 p1 = toImVec2(p1Table);
                     ImVec2 p2 = toImVec2(p2Table);
                     ImColor color = toColor(colorTable);
+
                     drawList->AddRect(p1, p2, color, rounding, flags, thickness);
                 })
                 .addFunction("AddRectFilled", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& colorTable, float rounding = 0, ImDrawFlags flags = 0) {
+                    if (!drawList) return;
+
                     ImVec2 p1 = toImVec2(p1Table);
                     ImVec2 p2 = toImVec2(p2Table);
                     ImColor color = toColor(colorTable);
+
                     drawList->AddRectFilled(p1, p2, color, rounding, flags);
                 })
                 .addFunction("AddCircle", [](ImDrawList* drawList, const LuaRef& centerTable, float radius, const LuaRef& colorTable, int numSegments = 0, float thickness = 1) {
+                    if (!drawList) return;
                     ImVec2 center = toImVec2(centerTable);
                     ImColor color = toColor(colorTable);
+
                     drawList->AddCircle(center, radius, color, numSegments, thickness);
                 })
                 .addFunction("AddCircleFilled", [](ImDrawList* drawList, const LuaRef& centerTable, float radius, const LuaRef& colorTable, int numSegments = 0) {
+                    if (!drawList) return;
+
                     ImVec2 center = toImVec2(centerTable);
                     ImColor color = toColor(colorTable);
+
                     drawList->AddCircleFilled(center, radius, color, numSegments);
                 })
                 .addFunction("AddText", [](ImDrawList* drawList, const LuaRef& posTable, const LuaRef& colorTable, float font_size, const char* text) {
@@ -214,33 +228,45 @@ public:
                     drawList->AddText(ImGui::GetFont(), font_size, pos, color, text);
                 })
                 .addFunction("AddTriangleFilled", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& colorTable) {
+                    if (!drawList) return;
+
                     ImVec2 p1 = toImVec2(p1Table);
                     ImVec2 p2 = toImVec2(p2Table);
                     ImVec2 p3 = toImVec2(p3Table);
                     ImColor color = toColor(colorTable);
+
                     drawList->AddTriangleFilled(p1, p2, p3, color);
                 })
                 .addFunction("AddTriangle", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& colorTable, float thickness = 1) {
+                    if (!drawList) return;
+
                     ImVec2 p1 = toImVec2(p1Table);
                     ImVec2 p2 = toImVec2(p2Table);
                     ImVec2 p3 = toImVec2(p3Table);
                     ImColor color = toColor(colorTable);
+
                     drawList->AddTriangle(p1, p2, p3, color, thickness);
                 })
                 .addFunction("AddQuadFilled", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& p4Table, const LuaRef& colorTable) {
+                    if (!drawList) return;
+
                     ImVec2 p1 = toImVec2(p1Table);
                     ImVec2 p2 = toImVec2(p2Table);
                     ImVec2 p3 = toImVec2(p3Table);
                     ImVec2 p4 = toImVec2(p4Table);
                     ImColor color = toColor(colorTable);
+
                     drawList->AddQuadFilled(p1, p2, p3, p4, color);
                 })
                 .addFunction("AddQuad", [](ImDrawList* drawList, const LuaRef& p1Table, const LuaRef& p2Table, const LuaRef& p3Table, const LuaRef& p4Table, const LuaRef& colorTable, float thickness = 1) {
+                    if (!drawList) return;
+
                     ImVec2 p1 = toImVec2(p1Table);
                     ImVec2 p2 = toImVec2(p2Table);
                     ImVec2 p3 = toImVec2(p3Table);
                     ImVec2 p4 = toImVec2(p4Table);
                     ImColor color = toColor(colorTable);
+
                     drawList->AddQuad(p1, p2, p3, p4, color, thickness);
                 })
             .endClass();
