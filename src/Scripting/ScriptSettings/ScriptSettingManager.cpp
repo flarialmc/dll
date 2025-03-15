@@ -1,8 +1,9 @@
 #include "ScriptSettingManager.hpp"
 
 #include <Scripting/ScriptManager.hpp>
+#include <Client/Module/Modules/Module.hpp>
 
-void ScriptSettingManager::loadSettings(FlarialScript* script) {
+void ScriptSettingManager::loadSettings(Script* script) {
     if (!script) return;
 
     auto* module = ScriptManager::getModuleByState(script->getState());
@@ -81,7 +82,7 @@ void ScriptSettingManager::loadSettings(FlarialScript* script) {
     }
 }
 
-void ScriptSettingManager::saveSettings(const FlarialScript* script) {
+void ScriptSettingManager::saveSettings(const Script* script) {
     if (!script) return;
 
     auto* module = ScriptManager::getModuleByState(script->getState());
@@ -124,7 +125,7 @@ void ScriptSettingManager::saveSettings(const FlarialScript* script) {
     }
 }
 
-ButtonSetting* ScriptSettingManager::addButton(const FlarialScript* script, const std::string& name, const std::string& description, const std::string& buttonText, std::function<void()> action) {
+ButtonSetting* ScriptSettingManager::addButton(const Script* script, const std::string& name, const std::string& description, const std::string& buttonText, std::function<void()> action) {
     auto& scriptSettings = settings[script];
 
     if (scriptSettings.contains(name)) {
@@ -137,7 +138,7 @@ ButtonSetting* ScriptSettingManager::addButton(const FlarialScript* script, cons
     return ptr;
 }
 
-TextBoxSetting* ScriptSettingManager::addTextBox(const FlarialScript* script, const std::string& name, const std::string& description, const std::string& defaultValue, int limit) {
+TextBoxSetting* ScriptSettingManager::addTextBox(const Script* script, const std::string& name, const std::string& description, const std::string& defaultValue, int limit) {
     auto& scriptSettings = settings[script];
 
     if (scriptSettings.contains(name)) {
@@ -150,7 +151,7 @@ TextBoxSetting* ScriptSettingManager::addTextBox(const FlarialScript* script, co
     return ptr;
 }
 
-KeybindSetting* ScriptSettingManager::addKeybind(const FlarialScript* script, const std::string& name, const std::string& description, const std::string& defaultKey) {
+KeybindSetting* ScriptSettingManager::addKeybind(const Script* script, const std::string& name, const std::string& description, const std::string& defaultKey) {
     auto& scriptSettings = settings[script];
 
     if (scriptSettings.contains(name)) {

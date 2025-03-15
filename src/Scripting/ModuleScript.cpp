@@ -1,9 +1,9 @@
-#include "ScriptModuleBase.hpp"
+#include "ModuleScript.hpp"
 
 #include "ScriptManager.hpp"
 #include <SDK/Client/Network/Packet/TextPacket.hpp>
 
-void ScriptModuleBase::onEnable() {
+void ModuleScript::onEnable() {
     if (const auto& script = linkedScript.lock()) {
         if (script->getState()) {
             ScriptManager::executeFunction(script->getState(), "onEnable");
@@ -12,7 +12,7 @@ void ScriptModuleBase::onEnable() {
     }
 }
 
-void ScriptModuleBase::onDisable() {
+void ModuleScript::onDisable() {
     if (const auto& script = linkedScript.lock()) {
         if (script->getState()) {
             ScriptManager::executeFunction(script->getState(), "onDisable");
@@ -21,7 +21,7 @@ void ScriptModuleBase::onDisable() {
     }
 }
 
-void ScriptModuleBase::onKey(KeyEvent& event) {
+void ModuleScript::onKey(KeyEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
 
     if (const auto& script = linkedScript.lock()) {
@@ -30,7 +30,7 @@ void ScriptModuleBase::onKey(KeyEvent& event) {
     }
 }
 
-void ScriptModuleBase::onMouse(MouseEvent& event) {
+void ModuleScript::onMouse(MouseEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized || event.getButton() == 0 || event.getAction() == 0) return;
 
     if (const auto& script = linkedScript.lock()) {
@@ -40,7 +40,7 @@ void ScriptModuleBase::onMouse(MouseEvent& event) {
 
 }
 
-void ScriptModuleBase::onPacketReceive(PacketEvent &event) {
+void ModuleScript::onPacketReceive(PacketEvent &event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
 
     if (const auto& script = linkedScript.lock()) {
@@ -57,15 +57,40 @@ void ScriptModuleBase::onPacketReceive(PacketEvent &event) {
                 auto type = pkt->type;
                 std::string xuid = pkt->xuid;
 
-                bool onChat = script->registerCancellableEvent("onChat", msg, name, static_cast<int>(type), xuid);
-                if (onChat) cancel = true;
+                bool ChatReceived = script->registerCancellableEvent("ChatReceived", msg, name, static_cast<int>(type), xuid);
+                if (ChatReceived) cancel = true;
             }
         }
         if (cancel) event.cancel();
     }
 }
 
-void ScriptModuleBase::onTick(TickEvent& event) {
+void ModuleScript::onPacketSent(PacketSendEvent &event) {
+    if (!isEnabled() || !ScriptManager::initialized) return;
+
+    if (const auto& script = linkedScript.lock()) {
+        bool cancel = false;
+
+        bool onPacketSent = script->registerCancellableEvent("onPacketSent", event.getPacket(), static_cast<int>(event.getPacket()->getId()));
+        if (onPacketSent) cancel = true;
+
+        if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
+            const auto *pkt = reinterpret_cast<TextPacket*>(event.getPacket());
+            if (pkt) {
+                std::string msg = pkt->message;
+                std::string name = pkt->name;
+                auto type = pkt->type;
+                std::string xuid = pkt->xuid;
+
+                bool ChatSent = script->registerCancellableEvent("ChatSent", msg, name, static_cast<int>(type), xuid);
+                if (ChatSent) cancel = true;
+            }
+        }
+        if (cancel) event.cancel();
+    }
+}
+
+void ModuleScript::onTick(TickEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
 
     if (const auto& script = linkedScript.lock()) {
@@ -73,7 +98,7 @@ void ScriptModuleBase::onTick(TickEvent& event) {
     }
 }
 
-void ScriptModuleBase::onRender(RenderEvent& event) {
+void ModuleScript::onRender(RenderEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
 
     if (const auto& script = linkedScript.lock()) {
@@ -81,7 +106,7 @@ void ScriptModuleBase::onRender(RenderEvent& event) {
     }
 }
 
-void ScriptModuleBase::onSetupAndRender(SetupAndRenderEvent& event) {
+void ModuleScript::onSetupAndRender(SetupAndRenderEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
 
     if (const auto& script = linkedScript.lock()) {
