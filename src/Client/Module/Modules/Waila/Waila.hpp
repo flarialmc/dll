@@ -30,7 +30,7 @@ public:
             settings.addSetting("text", (std::string)"{value}");
         this->settings.getSettingByName<bool>("responsivewidth")->value = true;
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
-        if (this->settings.getSettingByName<bool>("simple") == nullptr) this->settings.addSetting("simple", false);
+        if (this->settings.getSettingByName<bool>("advanced") == nullptr) this->settings.addSetting("advanced", false);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -45,7 +45,7 @@ public:
             Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Main");
-        this->addToggle("Enabled", "", this->settings.getSettingByName<bool>("simple")->value);
+        this->addToggle("Advanced Mode", "", this->settings.getSettingByName<bool>("advanced")->value);
         this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
         this->addToggle("Border", "", this->settings.getSettingByName<bool>("border")->value);
         this->addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", this->settings.getSettingByName<bool>("BlurEffect")->value);
@@ -114,7 +114,11 @@ public:
         try {
             BlockLegacy* block = blockSource->getBlock(pos)->getBlockLegacy();
             if (!block) return;
-            try { name = block->getName(); }
+            try {
+
+                if (!this->settings.getSettingByName<bool>("advanced")->value) name = block->getName();
+                else name = block->getNamespace();
+            }
             catch (const std::exception& e) { Logger::error("Failed to get block name: {}", e.what()); }
         }
         catch (const std::exception& e) {
