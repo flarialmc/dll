@@ -99,13 +99,45 @@ public:
                             });
     }
 
-    void onPacketReceive(PacketEvent &event) {
-        if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
-            auto *pkt = reinterpret_cast<TextPacket *>(event.getPacket());
-            if(!pkt->message.empty()){
-                if (containsAny(String::removeNonAlphanumeric(String::removeColorCodes(pkt->message)))){ pkt->message = "§f[§4FLARIAL§f]§r " + pkt->message;}
+    std::pair<std::string, size_t> findFirstOf(std::string text, std::vector<std::string> words) {
+        size_t first_pos = std::string::npos;
+        std::string first;
+
+        for (const auto& word : words) {
+            size_t pos = text.find(word);
+            if (pos != std::string::npos && pos < first_pos) {
+                first_pos = pos;
+                first = word;
             }
         }
+        std::pair<std::string, size_t> pair{ first, first_pos };
+        return pair;
+    }
+
+    void onPacketReceive(PacketEvent& event) {
+        if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
+        auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
+        std::string message = pkt->message;
+        if (!message.empty() && !containsAny(String::removeNonAlphanumeric(String::removeColorCodes(message)))) return;
+
+        std::pair<std::string, size_t> name = findFirstOf(message, APIUtils::onlineUsers);
+
+        static std::map<std::string, std::string> roleColors = {
+            { "Dev", "§b" },
+            { "Gamer", "§5" },
+            { "Booster", "§d" },
+            { "Regular", "§4" }
+        };
+
+        std::string insert = roleColors["Default"];
+
+        for (const auto& [role, color] : roleColors) {
+            if (APIUtils::hasRole(role, name.first)) {
+                insert = "§f[" + color + "FLARIAL§f]§r";
+                break;
+            }
+        }
+        pkt->message = message.insert(name.second, insert);
     }
 
     ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {
@@ -122,9 +154,7 @@ public:
         Module::onEnable();
     };
 
-    void onSetup() override {
-
-    }
+    void onSetup() override {}
 
     void onEnable() override {}
 
