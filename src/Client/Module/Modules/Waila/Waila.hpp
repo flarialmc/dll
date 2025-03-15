@@ -9,7 +9,7 @@ class Waila : public Module {
 public:
     std::string name;
 
-    Waila() : Module("Waila", "Shows what you are looking at.", IDR_EYE_PNG, "") {
+    Waila() : Module("Waila", "Shows what you are looking at.", IDR_WAILA_PNG, "") {
         Module::setup();
     };
 
