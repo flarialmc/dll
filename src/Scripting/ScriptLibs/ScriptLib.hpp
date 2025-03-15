@@ -66,4 +66,21 @@ public:
 
         return D2D1::RectF(left, top, right, bottom);
     }
+
+    static D2D1_COLOR_F toD2D1ColorF(const luabridge::LuaRef& table) {
+        if (!table.isTable() || table.length() < 4) return D2D1::ColorF(D2D1::ColorF::White);
+
+        if (!table[1].isNumber() || !table[2].isNumber() ||
+            !table[3].isNumber() || !table[4].isNumber()) {
+            return D2D1::ColorF(D2D1::ColorF::White);
+            }
+
+        float r = static_cast<float>(table[1].cast<int>().value()) / 255.0f;
+        float g = static_cast<float>(table[2].cast<int>().value()) / 255.0f;
+        float b = static_cast<float>(table[3].cast<int>().value()) / 255.0f;
+        float a = static_cast<float>(table[4].cast<int>().value()) / 255.0f;
+
+        // Return a Direct2D color
+        return D2D1::ColorF(r, g, b, a);
+    }
 };
