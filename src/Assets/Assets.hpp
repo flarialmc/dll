@@ -142,8 +142,9 @@
 #define IDR_SWORD_PNG           243
 #define IDR_PERSPECTIVE_PNG     244
 #define IDR_ZEQA_PNG            245
-#define IDR_BEAVER_PNG 246
+#define IDR_BEAVER_PNG          246
+#define IDR_WAILA_PNG           247
 
 
 // MAKE SURE YOU ALWAYS UPDATE THIS!
-#define MAX_IMAGE_ID IDR_BEAVER_PNG
+#define MAX_IMAGE_ID IDR_WAILA_PNG

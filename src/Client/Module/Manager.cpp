@@ -279,7 +279,10 @@ void ModuleManager::restart(){
 
 
 void ModuleManager::syncState() {
-    if(!initialized) return;
+    if (!initialized) return;
+
+    ScriptManager::_reloadScripts();
+
     if (restartModules) {
         restartModules = false;
         restart();

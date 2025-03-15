@@ -36,6 +36,7 @@ void ScriptManager::shutdown() {
     }
 
     mLoadedModules.clear();
+    mLoadedCommands.clear();
     mLoadedScripts.clear();
     initialized = false;
 }
@@ -54,14 +55,11 @@ void ScriptManager::loadModuleScripts() {
             code
         );
 
-
         // Be careful if you try to access fields like getName()
         // before the script compiles. (Won't crash but you get the point)
         mLoadedScripts.push_back(script);
 
         if (script->compile()) {
-            Logger::info("Successfully loaded module script '{}'", script->getName());
-
             auto mod = std::make_shared<ModuleScript>(
                 script->getName(),
                 script->getDescription(),
@@ -71,6 +69,7 @@ void ScriptManager::loadModuleScripts() {
             mLoadedModules.emplace_back(mod);
             mod->defaultConfig();
             ModuleManager::cguiRefresh = true;
+            Logger::info("Loaded module script '{}'", script->getName());
         } else {
             mLoadedScripts.pop_back();
         }
@@ -91,30 +90,41 @@ void ScriptManager::loadCommandScripts() {
             code
         );
 
-        mLoadedScripts.push_back(script);
-
         if (script->compile()) {
             if (script->getName().find(' ') != std::string::npos) {
                 Logger::error("Command script '{}' has a space", script->getName());
                 return;
             }
 
-            Logger::info("Successfully loaded command script '{}'", script->getName());
+            std::vector<std::string> aliases; {
+                lua_State* L = script->getState();
+                lua_getglobal(L, "aliases");
+
+                if (lua_istable(L, -1)) {
+                    lua_pushnil(L);
+                    while (lua_next(L, -2) != 0) {
+                        if (lua_isstring(L, -1)) {
+                            aliases.emplace_back(lua_tostring(L, -1));
+                        }
+                        lua_pop(L, 1);
+                    }
+                }
+                lua_pop(L, 1);
+            }
 
             auto command = std::make_shared<CommandScript>(
                 script->getName(),
                 script->getDescription(),
-                std::vector<std::string>{},
+                aliases,
                 script);
 
+            mLoadedScripts.push_back(script);
             mLoadedCommands.emplace_back(command);
             CommandManager::Commands.push_back(command);
-        } else {
-            mLoadedScripts.pop_back();
+            Logger::info("Loaded command script '{}'", script->getName());
         }
     }
 }
-
 
 void ScriptManager::executeFunction(lua_State *L, const char* functionName) {
     if (!L || lua_status(L) != LUA_OK) return;
@@ -134,7 +144,15 @@ void ScriptManager::executeFunction(lua_State *L, const char* functionName) {
 }
 
 void ScriptManager::reloadScripts() {
+    pendingReload = true;
+}
+
+void ScriptManager::_reloadScripts() {
+    if (!pendingReload) return;
     initialized = false;
+
+    CommandManager::terminate();
+
     for (auto& mod : mLoadedModules) {
         if (mod) {
             mod->terminate();
@@ -147,7 +165,13 @@ void ScriptManager::reloadScripts() {
 
     loadModuleScripts();
     loadCommandScripts();
+
+    CommandManager::initialize();
+
+    initialized = true;
+    pendingReload = false;
 }
+
 
 void ScriptManager::saveSettings() {
     for (const auto& module : mLoadedModules) {

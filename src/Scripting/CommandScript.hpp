@@ -12,7 +12,27 @@ public:
 
     void execute(const std::vector<std::string>& args) override {
         if (auto script = linkedScript.lock()) {
-            script->registerCommandEvent("execute", args);
+            lua_State* L = script->getState();
+            if (!L) return;
+
+            lua_getglobal(L, "execute");
+            if (!lua_isfunction(L, -1)) {
+                lua_pop(L, 1);
+                return;
+            }
+
+            lua_newtable(L);
+            int idx = 1;
+            for (auto &arg : args) {
+                lua_pushstring(L, arg.c_str());
+                lua_rawseti(L, -2, idx++);
+            }
+
+            if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
+                Logger::error("Error calling 'execute': {}", lua_tostring(L, -1));
+                ADD_ERROR_MESSAGE("Error calling command function 'execute': " + std::string(lua_tostring(L, -1)));
+                lua_pop(L, 1);
+            }
         }
     }
 };

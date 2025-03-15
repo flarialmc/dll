@@ -143,9 +143,7 @@ bool Script::compile() {
         }
         lua_pop(mState, 1);
 
-        Logger::info("Successfully compiled script '{}'", mName);
         return true;
-
     } catch (const std::exception& e) {
         Logger::error("Failed to compile script '{}': {}", mFilePath, e.what());
         return false;

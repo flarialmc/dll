@@ -14,6 +14,7 @@ public:
     static void loadCommandScripts();
     static void executeFunction(lua_State* L, const char* functionName);
     static void reloadScripts();
+    static void _reloadScripts();
     static void saveSettings();
 
     static std::vector<std::shared_ptr<Script>> getLoadedScripts() {
@@ -33,4 +34,5 @@ private:
     static std::vector<std::shared_ptr<Script>> mLoadedScripts;
     static std::vector<std::shared_ptr<ModuleScript>> mLoadedModules;
     static std::vector<std::shared_ptr<CommandScript>> mLoadedCommands;
+    static inline std::atomic<bool> pendingReload = false;
 };
