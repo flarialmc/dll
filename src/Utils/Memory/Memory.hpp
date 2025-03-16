@@ -72,7 +72,7 @@ public:
             return;
         }
 
-        MH_QueueEnableHook(pTarget);
+        MH_EnableHook(pTarget);
 
         Logger::custom(fg(fmt::color::dodger_blue), "vFunc Hook", "Hooked {} at {}", name, pTarget);
     }

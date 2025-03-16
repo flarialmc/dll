@@ -12,15 +12,20 @@ class PlayerNotifier : public Module {
 public:
     PlayerNotifier() : Module("Player Notifier", "Notifies you when a player is in the server.", IDR_CURSOR_PNG, "") {
         Module::setup();
+        defaultConfig();
+        loadSettings();
+
     };
 
     void defaultConfig() override {
+        Module::defaultConfig();
         if (!this->settings.getSettingByName<float>("duration")){
             settings.addSetting<float>("duration", 80);
         }
-        if (!this->settings.getSettingByName<std::string>("player1")) {
-            settings.addSetting<std::string>("player1", "TheBarii");
+        if (!this->settings.getSettingByName<std::string>("player0")) {
+            settings.addSetting<std::string>("player0", "TheBarii");
             settings.addSetting<bool>("player1Enabled", true);
+            totalPlayers++;
         }
     }
     void onEnable() override {
