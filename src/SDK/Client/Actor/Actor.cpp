@@ -431,6 +431,7 @@ AttributesComponent* Actor::getAttributesComponent() {
 }
 
 float Actor::getHealth() {
+    if (SDK::getCurrentScreen() != "hud_screen") return 20.f;
     auto attri = Attribute(GET_OFFSET("Attribute::Health"), "minecraft:health").mIDValue;
     auto comp = getAttributesComponent();
     if (!comp) return 20.f;
