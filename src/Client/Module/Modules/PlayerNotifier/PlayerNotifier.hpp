@@ -59,7 +59,7 @@ public:
         auto now = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed = now - lastRun;
 
-        if (elapsed.count() >= intervalSeconds || first) {
+        if ((elapsed.count() >= intervalSeconds || first) && SDK::getCurrentScreen() == "hud_screen") {
             lastRun = now;
             first = false;
 
@@ -67,7 +67,6 @@ public:
 
             for (const auto& [uuid, entry] : playerMap) {
                 for (int i = 0; i < totalPlayers; i++) {
-
                     if(!this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")) continue;
                     if (this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")->value) {
                         if (entry.name.find(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value) != std::string::npos) {
