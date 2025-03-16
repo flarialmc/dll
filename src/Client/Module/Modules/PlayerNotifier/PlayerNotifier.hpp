@@ -8,7 +8,7 @@
 
 
 class PlayerNotifier : public Module {
-    int totalPlayers;
+    int totalPlayers = 0;
 public:
     PlayerNotifier() : Module("Player Notifier", "Notifies you when a player is in the server.", IDR_CURSOR_PNG, "") {
         Module::setup();
@@ -24,8 +24,7 @@ public:
         }
         if (!this->settings.getSettingByName<std::string>("player0")) {
             settings.addSetting<std::string>("player0", "TheBarii");
-            settings.addSetting<bool>("player1Enabled", true);
-            totalPlayers++;
+            settings.addSetting<bool>("player0Enabled", true);
         }
     }
     void onEnable() override {
@@ -41,30 +40,34 @@ public:
 
     void loadSettings() override {
 
+        Logger::debug("Loading settings... Player nptifier");
         Module::loadSettings();
         for (const auto& settingPair : settings.settings) {
             const std::string& name = settingPair.first;
-            if (name.find("player") != std::string::npos) {
+            if (name.find("player") != std::string::npos && name.find("Enabled") == std::string::npos) {
                 ++totalPlayers;
             }
         }
+
     }
 
     std::chrono::time_point<std::chrono::high_resolution_clock> lastRun = std::chrono::steady_clock::now();
 
     void onTick(TickEvent& event) {
-        constexpr double intervalSeconds = 5.0; // Change this to the desired interval
+        double intervalSeconds = this->settings.getSettingByName<float>("duration")->value;
 
         auto now = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed = now - lastRun;
 
         if (elapsed.count() >= intervalSeconds) {
-            lastRun = now; // Reset the timer
+            lastRun = now;
 
             std::unordered_map<mcUUID, PlayerListEntry>& playerMap = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
 
             for (const auto& [uuid, entry] : playerMap) {
                 for (int i = 0; i < totalPlayers; i++) {
+
+                    if(!this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")) continue;
                     if (this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")->value) {
                         if (entry.name.find(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value) != std::string::npos) {
                             FlarialGUI::Notify(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value + " is online!");
