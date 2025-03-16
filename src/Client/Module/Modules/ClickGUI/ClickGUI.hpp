@@ -424,7 +424,7 @@ public:
         );
         this->addColorPicker("Secondary 2", "Background color of navigation bar, tooltips, and buttons",
             this->settings.getSettingByName<std::string>("colors_secondary2")->value,
-            this->settings.getSettingByName<float>("o_secondary2")->value,
+            this->settings.getSettingByName<float>("o_colors_secondary2")->value,
             this->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
         );
         this->addColorPicker("Secondary 3", "Background color of base Click GUI rectangle",
