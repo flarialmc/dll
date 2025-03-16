@@ -104,13 +104,14 @@ public:
 
         this->addHeader("General");
         this->addButton("Add new player", "", "ADD", [&]() {
-            totalPlayers++;
             this->settings.addSetting<std::string>("player" + FlarialGUI::cached_to_string(totalPlayers), "player" + FlarialGUI::cached_to_string(totalPlayers));
             this->settings.addSetting<bool>("player" + FlarialGUI::cached_to_string(totalPlayers) + "Enabled", true);
+            totalPlayers++;
         });
         this->addSlider("Recheck", "(Seconds) After how long should it recheck for players", this->settings.getSettingByName<float>("duration")->value, 500, 30, true);
 
         for (int i = 0; i < totalPlayers; i++) {
+            std::cout << "hi " + std::to_string(i) << std::endl;
             this->addHeader(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value);
             this->addToggle("Enabled", "Should it notify you?", this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")->value);
             this->addTextBox("Player Name", "", this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value);
