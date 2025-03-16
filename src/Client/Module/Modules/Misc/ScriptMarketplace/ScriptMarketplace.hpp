@@ -84,12 +84,7 @@ public:
                     Logger::info("data: {}", data.c_str());
                     file.write(data.c_str(), data.size());
                     file.close();
-                    std::random_device rd;
-                    std::mt19937 gen(rd());
 
-                    std::uniform_int_distribution<> distrib(1000, 9000);
-
-                    int random_number = distrib(gen);
                     std::string configname = id;
                     Client::createConfig(configname);
                     std::string to = Utils::getRoamingPath() + "\\Flarial\\Config\\" + configname;
