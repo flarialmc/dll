@@ -116,10 +116,13 @@ void ClickGUI::onRender(RenderEvent &event) {
             D2D1_COLOR_F fLARIALlOGO = colors_FlarialLogo_rgb ? FlarialGUI::rgbColor : colors_FlarialLogo;
             fLARIALlOGO.a = o_colors_FlarialLogo;
 
-            if (!Client::settings.getSettingByName<bool>("noicons")->value)
-                FlarialGUI::image(IDR_WHITE_LOGO_PNG,
-                                  D2D1::RectF(logoX, logoY, logoX + logoWidthButReal, logoY + logoWidthButReal), "PNG", true, FlarialGUI::D2DColorToImColor(fLARIALlOGO));
-
+            if (!Client::settings.getSettingByName<bool>("noicons")->value) {
+                if (this->settings.getSettingByName<bool>("custom_logo")->value) {
+                    FlarialGUI::image("Flarial\\assets\\custom-logo.png", D2D1::RectF(logoX, logoY, logoX + logoWidthButReal, logoY + logoWidthButReal));
+                } else {
+                    FlarialGUI::image(IDR_WHITE_LOGO_PNG, D2D1::RectF(logoX, logoY, logoX + logoWidthButReal, logoY + logoWidthButReal), "PNG", true, FlarialGUI::D2DColorToImColor(fLARIALlOGO));
+                }
+            }
             FlarialGUI::Tooltip("easter egg", logoX, logoY, "Never gonna give you up", logoWidthButReal, logoWidthButReal);
 
             /* Logo End */

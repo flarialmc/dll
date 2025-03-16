@@ -497,11 +497,6 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 														 col);
 			} catch (std::exception ex) { Logger::error("error addming image: ", ex.what()); }
 		}
-
-
-
-
-
 }
 
 void FlarialGUI::LoadAllImages() {
