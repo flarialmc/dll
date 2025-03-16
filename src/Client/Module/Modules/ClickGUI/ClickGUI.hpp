@@ -129,15 +129,20 @@ public:
             { "Regular", "§4" }
         };
 
-        std::string insert = roleColors["Default"];
+        std::string prefix = "§f[" + roleColors["Regular"] + "FLARIAL§f]§r ";
 
         for (const auto& [role, color] : roleColors) {
             if (APIUtils::hasRole(role, name.first)) {
-                insert = "§f[" + color + "FLARIAL§f]§r ";
+                prefix = "§f[" + color + "FLARIAL§f]§r ";
                 break;
             }
         }
-        pkt->message = message.insert(name.second, insert);
+
+        if (message[name.second - 2] == '§') name.second = name.second - 3;
+
+        message.insert(name.second, prefix);
+
+        pkt->message = message;
     }
 
     ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {

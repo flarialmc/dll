@@ -30,7 +30,7 @@
 #include "Hooks/Render/GeneralSettingsScreenControllerCtorHook.hpp"
 //#include "Hooks/Game/RenderItemGroup.hpp"
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
-#include "Hooks/Game/BobView.hpp"
+#include "Hooks/Game/ItemInHandRendererRenderItem.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
@@ -97,7 +97,8 @@ void HookManager::initialize() {
     addHook<RenderChunkCoordinatorHandleVisibilityUpdatesHook>();
 
     addHook<SettingsScreenOnExitHook>();
-    addHook<BobView>();
+
+    HookManager::addHook<ItemInHandRendererRenderItem>();
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();

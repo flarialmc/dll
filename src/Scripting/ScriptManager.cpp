@@ -141,20 +141,17 @@ void ScriptManager::loadCommandScripts() {
 }
 
 void ScriptManager::executeFunction(lua_State *L, const char* functionName) {
-    if (!L || lua_status(L) != LUA_OK) return;
-    lua_getglobal(L, functionName);
+    Script* script = getScriptByState(L);
+    if (!script) return;
 
+    lua_getglobal(L, functionName);
     if (!lua_isfunction(L, -1)) {
         lua_pop(L, 1);
         return;
     }
 
-    if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
-        std::string err = lua_tostring(L, -1);
-        Logger::error("Error calling Lua function '{}': {}", functionName, err);
-        ADD_ERROR_MESSAGE("Error calling Lua function '" + std::string(functionName) + "': " + err);
-        lua_pop(L, 1);
-    }
+    // nargs = 0, nresults = 0 means no arguments, no returns.
+    script->safeCall(0, 0);
 }
 
 void ScriptManager::reloadScripts() {
@@ -186,7 +183,6 @@ void ScriptManager::_reloadScripts() {
     initialized = true;
     pendingReload = false;
 }
-
 
 void ScriptManager::saveSettings() {
     for (const auto& module : mLoadedModules) {

@@ -2,11 +2,12 @@
 
 #include "../Module.hpp"
 #include "../CPS/CPSCounter.hpp"
-#include "../../../Events/Game/BobViewEvent.hpp"
+#include "../../../Events/Game/RenderItemInHandEvent.hpp"
 
 class BlockHit : public Module {
-
 public:
+    Perspective perspective;
+
     BlockHit() : Module("Block Hit", "Sword Blocking Animation like Java (visual only)",
                       IDR_SWORD_PNG, "") {
         Module::setup();
@@ -14,35 +15,45 @@ public:
 
     void onEnable() override {
         Module::onEnable();
-        Listen(this, BobViewEvent, &BlockHit::onBobView);
+        Listen(this, RenderItemInHandEvent, &BlockHit::onItemInHandRender);
+        Listen(this, PerspectiveEvent, &BlockHit::onPerspectiveChange);
     }
 
     void onDisable() override {
-        Deafen(this, BobViewEvent, &BlockHit::onBobView);
+        Deafen(this, RenderItemInHandEvent, &BlockHit::onItemInHandRender);
+        Deafen(this, PerspectiveEvent, &BlockHit::onPerspectiveChange);
         Module::onDisable();
     }
 
-    void onBobView(BobViewEvent& event) {
+    void onPerspectiveChange(PerspectiveEvent& event) {
+        this->perspective = event.getPerspective();
+    }
 
-        auto& matrix = event.matrix;
-        auto lp = SDK::clientInstance->getLocalPlayer();
+    void onItemInHandRender(RenderItemInHandEvent& event) {
 
-        if(lp != nullptr) {
+        auto& matrix = SDK::clientInstance->getCamera().getWorldMatrixStack().top().matrix;
+        auto itemStack = event.itemStack;
 
-            auto itemStack = lp->getSupplies()->getInventory()->getItem(lp->getSupplies()->getSelectedSlot());
+        if (itemStack->item.get() != nullptr && CPSCounter::GetRightHeld() && itemStack->getItem()->name.contains("sword")) {
 
-            if(itemStack->item.get() != nullptr) {
-                if (CPSCounter::GetRightHeld() && itemStack->getItem()->name.contains("sword")) {
-                    *matrix = glm::translate<float>(*matrix, glm::vec3(0.42222223281, 0.0, -0.16666666269302368));
-                    *matrix = glm::translate<float>(*matrix, glm::vec3(-0.1f, 0.15f, -0.2f));
-                    *matrix = glm::translate<float>(*matrix, glm::vec3(-0.24F, 0.25f, -0.20F));
-                    *matrix = glm::rotate<float>(*matrix, -1.98F, glm::vec3(0.0F, 1.0F, 0.0F));
-                    *matrix = glm::rotate<float>(*matrix, 1.30F, glm::vec3(4.0F, 0.0F, 0.0F));
-                    *matrix = glm::rotate<float>(*matrix, 60.0F, glm::vec3(0.0F, 1.0F, 0.0F));
-                }
-            }
+          //TO-DO : Add cases for third person
+
+          switch(perspective) {
+              case Perspective::FirstPerson:
+
+                  matrix = glm::translate<float>(matrix, glm::vec3(-0.5f, 0.2f, 0.0f));
+                  matrix = glm::rotate<float>(matrix, glm::radians(30.f), glm::vec3(0.f, 1.f, 0.f));
+                  matrix = glm::rotate<float>(matrix, glm::radians(-80.f), glm::vec3(1.f, 0.f, 0.f));
+                  matrix = glm::rotate<float>(matrix, glm::radians(60.f), glm::vec3(0.f, 1.f, 0.f));
+
+                  break;
+              case Perspective::ThirdPersonBack:
+                  break;
+              case Perspective::ThirdPersonFront:
+
+                  break;
+          }
         }
-
     }
 
     void defaultConfig() override { Module::defaultConfig();

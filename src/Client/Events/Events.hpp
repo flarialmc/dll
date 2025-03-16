@@ -36,4 +36,4 @@
 #include "Render/HandleVisibilityUpdatesEvent.hpp"
 #include "Render/UIControlGetPositionEvent.hpp"
 #include "Misc/ProtocolEvent.hpp"
-#include "Game/BobViewEvent.hpp"
+#include "Game/RenderItemInHandEvent.hpp"
