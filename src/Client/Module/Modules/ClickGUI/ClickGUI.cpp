@@ -553,6 +553,17 @@ void ClickGUI::onRender(RenderEvent &event) {
                      rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth,
                      rectHeight);
 
+                    static std::string troll = "";
+                    if (troll.empty()) troll = Client::settings.getSettingByName<std::string>("currentConfig")->value;
+
+                    if (troll != Client::settings.getSettingByName<std::string>("currentConfig")->value && troll != "") {
+                        troll = Client::settings.getSettingByName<std::string>("currentConfig")->value;
+                        FlarialGUI::UnsetScrollView();
+                        ModuleManager::restartModules = true;
+                        FlarialGUI::PopSize();
+                        FlarialGUI::PopSize();
+                        return;
+                    }
                     Module* c = this->ghostMainModule;
                     c->addHeader("Config Manager");
                     c->addDropdown("Selected Config", "", Client::availableConfigs, Client::settings.getSettingByName<std::string>("currentConfig")->value);
