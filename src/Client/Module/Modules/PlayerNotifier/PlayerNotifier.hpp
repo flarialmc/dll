@@ -40,7 +40,6 @@ public:
 
     void loadSettings() override {
 
-        Logger::debug("Loading settings... Player nptifier");
         Module::loadSettings();
         for (const auto& settingPair : settings.settings) {
             const std::string& name = settingPair.first;
@@ -52,6 +51,7 @@ public:
     }
 
     std::chrono::time_point<std::chrono::high_resolution_clock> lastRun = std::chrono::steady_clock::now();
+    bool first = true;
 
     void onTick(TickEvent& event) {
         double intervalSeconds = this->settings.getSettingByName<float>("duration")->value;
@@ -59,8 +59,9 @@ public:
         auto now = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed = now - lastRun;
 
-        if (elapsed.count() >= intervalSeconds) {
+        if (elapsed.count() >= intervalSeconds || first) {
             lastRun = now;
+            first = false;
 
             std::unordered_map<mcUUID, PlayerListEntry>& playerMap = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
 
@@ -111,7 +112,6 @@ public:
         this->addSlider("Recheck", "(Seconds) After how long should it recheck for players", this->settings.getSettingByName<float>("duration")->value, 500, 30, true);
 
         for (int i = 0; i < totalPlayers; i++) {
-            std::cout << "hi " + std::to_string(i) << std::endl;
             this->addHeader(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value);
             this->addToggle("Enabled", "Should it notify you?", this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")->value);
             this->addTextBox("Player Name", "", this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value);
