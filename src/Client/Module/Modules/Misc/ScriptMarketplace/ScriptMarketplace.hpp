@@ -56,7 +56,7 @@ public:
     void onProtocol(ProtocolEvent event) {
         if (event.getPath() == std::wstring(L"flarial-scripting")) {
             for (const auto &pair: event.getProtocolArgs()) {
-                if (pair.first == std::wstring(L"scriptId")) {
+                if (pair.first == std::wstring(L"scriptName")) {
                     std::string id = String::WStrToStr(pair.second);
                     Logger::info("script id {}", id);
                     std::string url = "http://node2.sear.host:5019/api/scripts/" + id + "/download";
@@ -73,13 +73,14 @@ public:
     }
 
     void onProtocolConfig(ProtocolEvent event) {
-
+        std::wcout << event.getPath() << std::endl;
         if (event.getPath() == std::wstring(L"flarial-configs")) {
-            for (const auto &pair: event.getProtocolArgs()) {
-                if (pair.first == std::wstring(L"scriptId")) {
+        std::cout << "ye" << std::endl;
+             for (const auto &pair: event.getProtocolArgs()) {
+                if (pair.first == std::wstring(L"configName")) {
                     std::string id = String::WStrToStr(pair.second);
-                    Logger::info("script id {}", id);
-                    std::string url = "http://node2.sear.host:5019/api/configs/" + id + "/download";
+                    Logger::info("config name {}", id);
+                    std::string url = "https://cdn.discordapp.com/attachments/1135964340768485486/1350763645772103761/DarkUI.zip?ex=67d7ec2d&is=67d69aad&hm=e38178f5450c153c38772a3108b5a843a93c3075e2ac0ace0c6f0254f12de712&";
                     std::string data = ScriptMarketplace::GetString(url);
                     std::ofstream file(Utils::getRoamingPath() + "\\Flarial\\tmpd.tmp", std::ios::binary);
                     Logger::info("data: {}", data.c_str());
@@ -91,7 +92,7 @@ public:
                     std::uniform_int_distribution<> distrib(1000, 9000);
 
                     int random_number = distrib(gen);
-                    std::string configname = "config-" + std::to_string(random_number);
+                    std::string configname = id;
                     Client::createConfig(configname);
                     std::string to = Utils::getRoamingPath() + "\\Flarial\\Config\\" + configname;
 
