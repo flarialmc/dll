@@ -13,17 +13,17 @@ public:
 
     void onEnable() override {
         Module::onEnable();
-        Listen(this, SetupAndRenderEvent, &LowHealthIndicator::onSetupAndRender);
+        Listen(this, TickEvent, &LowHealthIndicator::onTick);
         Listen(this, RenderEvent, &LowHealthIndicator::onRender);
     }
 
     void onDisable() override {
         Module::onDisable();
-        Deafen(this, SetupAndRenderEvent, &LowHealthIndicator::onSetupAndRender);
+        Deafen(this, TickEvent, &LowHealthIndicator::onTick);
         Deafen(this, RenderEvent, &LowHealthIndicator::onRender);
     }
 
-    void onSetupAndRender(SetupAndRenderEvent& event) {
+    void onTick(TickEvent& event) {
         if (SDK::clientInstance) if (SDK::clientInstance->getLocalPlayer())
         health = SDK::clientInstance->getLocalPlayer()->getHealth();
     }

@@ -4,7 +4,6 @@
 
 class AttributeInstance{
 public:
-	// AttributeInstance::getCurrentValue
 	float GetValue() {
 		return hat::member_at<float>(this, GET_OFFSET("AttributeInstance::Value"));
 	}
@@ -26,7 +25,7 @@ public:
 	std::unordered_map<unsigned int, AttributeInstance> instances;
 
 private:
-	char pad[0x18];
+	char pad[0x20];
 
 public:
 
@@ -38,6 +37,6 @@ public:
 };
 
 struct AttributesComponent : IEntityComponent{
-public:
 	BaseAttributeMap baseAttributes{};
 };
+static_assert(sizeof(AttributesComponent) == 96);
