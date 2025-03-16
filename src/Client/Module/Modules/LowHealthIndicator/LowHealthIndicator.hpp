@@ -7,7 +7,7 @@
 class LowHealthIndicator : public Module {
     int health = 20.f;
 public:
-    LowHealthIndicator() : Module("Low Health", "Warns you when you are at low health.", IDR_CURSOR_PNG, "") {
+    LowHealthIndicator() : Module("Low Health", "Warns you when you are at low health.", IDR_HEART_PNG, "") {
         Module::setup();
     };
 

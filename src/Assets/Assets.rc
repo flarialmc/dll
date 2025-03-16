@@ -78,6 +78,7 @@ IDR_SWORD_PNG            PNG "Data\\sword.png"
 IDR_PERSPECTIVE_PNG      PNG "Data\\perspective.png"
 IDR_ZEQA_PNG             PNG "Data\\zeqa.png"
 IDR_WAILA_PNG            PNG "Data\\waila.png"
+IDR_HEART_PNG            PNG "Data\\heart.png"
 
 IDR_SETTINGS_PNG         PNG "Data\\settings.png"
 IDR_SETTINGS_WHITE_PNG   PNG "Data\\settingswhite.png"
