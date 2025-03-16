@@ -132,6 +132,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
 			ImColor(255, 0, 0)
 		};
 
+		/* HUE SELECTOR */
 		for (int i = 0; i < 6; ++i)
 		{
 			ImGui::GetBackgroundDrawList()->AddRectFilledMultiColor(
@@ -143,12 +144,39 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
 				colors[i]
 			);
 		}
+		/* HUE SELECTOR */
+
+		/* OPACITY */
+		float currentHue = (ColorPickers[index].hueX / hlwidth) * 360.0f;
+
+		D2D1_COLOR_F lol = HSVtoColorF(currentHue, 1.0f, 1.0f);
+		ImColor hueColor = ImColor(lol.r, lol.g, lol.g, lol.a);
+
+		ImU32 col_left  = IM_COL32((int)(hueColor.Value.x * 255), (int)(hueColor.Value.y * 255), (int)(hueColor.Value.z * 255), 0);
+		ImU32 col_right = IM_COL32((int)(hueColor.Value.x * 255), (int)(hueColor.Value.y * 255), (int)(hueColor.Value.z * 255), 255);
+
+		ImVec2 rect_min(x, y + hexPreviewSize * 2.31 + Constraints::SpacingConstraint(0.3f, hexPreviewSize));
+		ImVec2 rect_max(x + hlwidth, y + hexPreviewSize * 2.31 + Constraints::SpacingConstraint(0.4f, hexPreviewSize));
+
+
+		ImGui::GetBackgroundDrawList()->AddRectFilledMultiColor(
+			rect_min,
+			rect_max,
+			col_left,
+			col_right,
+			col_right,
+			col_left
+		);
+		/* OPACITY */
+
 
 		y = Constraints::PercentageConstraint(0.10, "top");
 		float originalY = y;
 
+		// COOLOR PICKER ALLCOLORS
 		ImGui::GetBackgroundDrawList()->AddRectFilledMultiColor(ImVec2(x + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize), y), ImVec2(x + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize) + shadePickerWidth, y + shadePickerHeight), IM_COL32_WHITE, ImColor(ImColor::HSV(ColorPickers[index].hueX / hlwidth, 1.0f, 1.0f)), ImColor(ImColor::HSV(ColorPickers[index].hueX / hlwidth, 1.0f, 1.0f)), IM_COL32_WHITE);
 		ImGui::GetBackgroundDrawList()->AddRectFilledMultiColor(ImVec2(x + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize), y), ImVec2(x + hexPreviewSize + Constraints::SpacingConstraint(0.1, hexPreviewSize) + shadePickerWidth, y + shadePickerHeight), 0, 0, IM_COL32_BLACK, IM_COL32_BLACK);
+		// COLOR PICKER ALL COLORS
 
 		y = Constraints::PercentageConstraint(0.10, "top");
 
