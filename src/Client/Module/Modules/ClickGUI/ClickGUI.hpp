@@ -173,7 +173,7 @@ public:
         Module::terminate();
     }
 
-    void defaultConfig() override { Module::defaultConfig();
+    void defaultConfig() override {
         if (settings.getSettingByName<std::string>("editmenubind") == nullptr)
             settings.addSetting("editmenubind", (std::string) "L");
 
