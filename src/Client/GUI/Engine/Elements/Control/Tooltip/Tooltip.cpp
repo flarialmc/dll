@@ -38,12 +38,11 @@
 
 std::unordered_map<std::string, ToolTipParams> tooltipsList;
 
-void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::string& text, float width, float height, bool push,
-                         bool relative) {
+void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::string& text, float width, float height, bool push, bool relative, std::chrono::milliseconds duration) {
 
     if (relative && isInScrollView) y += scrollpos;
     if (push) {
-        tooltipsList[id] = ToolTipParams{x, y, text, width, height, relative, ""};
+        tooltipsList[id] = ToolTipParams{x, y, text, width, height, relative, "", duration};
         return;
     }
 
@@ -77,7 +76,7 @@ void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::str
         std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
         auto timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(current - tooltips[id].time);
 
-        if (timeDifference.count() > 999) {
+        if (timeDifference > tooltipsList[id].duration) {
             if (!tooltips[id].hovering) {
                 tooltips[id].hovering = true;
                 tooltips[id].hoverX = MC::mousePos.x;
@@ -100,7 +99,7 @@ void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::str
         lerp(tooltips[id].opac, 0.0f, 0.35f * frameFactor);
     }
 
-    if (tooltips[id].opac > 0) {
+    if (tooltips[id].opac > 0.01f) { //this used to continue rendering the tooltip at a really low opacity
         Vec2<float> round = Constraints::RoundingConstraint(10, 10);
 
         RoundedRect(tooltips[id].hoverX + offset, tooltips[id].hoverY - offset, bgCol, rectWidth, rectHeight, round.x,
@@ -112,6 +111,7 @@ void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::str
                             FlarialGUI::to_wide(text).c_str(), rectWidth * 6.9f, rectHeight,
                             DWRITE_TEXT_ALIGNMENT_LEADING, fontSize1, DWRITE_FONT_WEIGHT_REGULAR, textCol);
     }
+        
 
 }
 

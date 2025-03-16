@@ -400,9 +400,8 @@ namespace FlarialGUI {
     winrt::com_ptr<ID2D1LinearGradientBrush> getLinearGradientBrush(float x, float hexPreviewSize, float shadePickerWidth,
                                                      ID2D1GradientStopCollection *pGradientStops);
 
-    void Tooltip(const std::string &id, float x, float y, const std::string &text, float width, float height,
-                 bool push = true,
-                 bool relative = false);
+    void Tooltip(const std::string &id, float x, float y, const std::string &text, float width, float height, bool push = true, bool relative = false, 
+        std::chrono::milliseconds duration = std::chrono::milliseconds(1000));
 
     void displayToolTips();
 

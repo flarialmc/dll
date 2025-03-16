@@ -10,4 +10,5 @@ struct ToolTipStruct {
     float hoverY{};
     bool in = false;
     std::string textName;
+    std::chrono::milliseconds duration;
 };

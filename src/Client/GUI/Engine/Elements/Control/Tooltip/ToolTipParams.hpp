@@ -8,4 +8,5 @@ struct ToolTipParams {
     float height;
     bool relative;
     std::string textSize;
+    std::chrono::milliseconds duration;
 };

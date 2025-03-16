@@ -170,7 +170,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     float modicony = Constraints::PercentageConstraint(0.11, "top");
 
     float paddingSize = Constraints::RelativeConstraint(0.28);
-    if (!FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
+    if (!FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize) && !FlarialGUI::CursorInRect(Constraints::PercentageConstraint(0.43, "left"), Constraints::PercentageConstraint(0.15, "top") + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
         FlarialGUI::Tooltip("mod_" + FlarialGUI::cached_to_string(index), x, realY, mod->description, BottomRoundedWidth, TopRoundedHeight);
     }
 
@@ -254,7 +254,9 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         if (mod->settings.getSettingByName<bool>("favorite")->value && !FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
             modicon = D2D1::ColorF(D2D1::ColorF::Gold);
         }
-        FlarialGUI::Tooltip("favorite_" + FlarialGUI::cached_to_string(index), x, realY, mod->settings.getSettingByName<bool>("favorite")->value ? "Unfavorite?" : "Favorite?", BottomRoundedWidth, TopRoundedHeight);
+        if (FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
+            FlarialGUI::Tooltip("favorite_" + FlarialGUI::cached_to_string(index), x, realY, mod->settings.getSettingByName<bool>("favorite")->value ? "Unfavorite?" : "Favorite?", BottomRoundedWidth, TopRoundedHeight, true, false, std::chrono::milliseconds(1));
+        }
     }
     FlarialGUI::image(iconId, D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize), "PNG", true, FlarialGUI::D2DColorToImColor(modicon)); //, FlarialGUI::D2DColorToImColor(modicon)
 
