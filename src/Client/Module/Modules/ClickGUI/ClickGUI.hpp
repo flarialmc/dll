@@ -5,6 +5,7 @@
 #include "Elements/ClickGUIElements.hpp"
 #include "SDK/Client/Network/Packet/TextPacket.hpp"
 #include "Utils/APIUtils.hpp"
+#include "Utils/WinrtUtils.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -177,6 +178,9 @@ public:
         if (settings.getSettingByName<std::string>("editmenubind") == nullptr)
             settings.addSetting("editmenubind", (std::string) "L");
 
+        if (settings.getSettingByName<bool>("custom_logo") == nullptr)
+            settings.addSetting("custom_logo", false);
+
         if (settings.getSettingByName<std::string>("colors_text") == nullptr)
             settings.addSetting("colors_text", (std::string) "ffffff");
         if (settings.getSettingByName<float>("o_colors_text") == nullptr)
@@ -345,7 +349,7 @@ public:
         if (settings.getSettingByName<bool>("colors_radiobutton_disabled_rgb") == nullptr)
             settings.addSetting("colors_radiobutton_disabled_rgb", false);
     }
-
+    
     void settingsRender(float settingsOffset) override {
         if (settings.getSettingByName<std::string>("editmenubind")->value.empty())
             settings.getSettingByName<std::string>("editmenubind")->value = "L";
@@ -366,12 +370,21 @@ public:
 
         this->extraPadding();
         
+        this->addHeader("Logo");
+        this->addToggle("Custom logo", "", this->settings.getSettingByName<bool>("custom_logo")->value);
+        if (!this->settings.getSettingByName<bool>("custom_logo")->value) {
+            this->addColorPicker("Logo Color", "Color of the client's logo",
+                this->settings.getSettingByName<std::string>("colors_FlarialLogo")->value,
+                this->settings.getSettingByName<float>("o_colors_FlarialLogo")->value,
+                this->settings.getSettingByName<bool>("colors_FlarialLogo_rgb")->value
+            );
+        } else {
+            this->addButton("Pick Files", "Select files to copy to assets folder", "Pick Files", [this]() {
+                FlarialGUI::Notify("this doesn't work yet :/ for now, just change the color");
+            });
+        }
+        
         this->addHeader("Colors");
-        this->addColorPicker("Logo Color", "Color of the client's logo",
-            this->settings.getSettingByName<std::string>("colors_FlarialLogo")->value,
-            this->settings.getSettingByName<float>("o_colors_FlarialLogo")->value,
-            this->settings.getSettingByName<bool>("colors_FlarialLogo_rgb")->value
-        );
         this->addColorPicker("Radio Button Icon Disabled", "",
             this->settings.getSettingByName<std::string>("colors_radiobutton_enabled")->value,
             this->settings.getSettingByName<float>("o_colors_radiobutton_enabled")->value,

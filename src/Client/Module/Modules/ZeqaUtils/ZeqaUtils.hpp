@@ -2,12 +2,10 @@
 
 #include "../Module.hpp"
 #include "../../../../SDK/Client/Network/Packet/SetTitlePacket.hpp"
-
+#include "../../../../SDK/Client/Network/Packet/ModalFormRequestPacket.hpp"
+#include <lib/json/json.hpp>
 
 class ZeqaUtils : public Module {
-private:
-    std::string gamemode;
-    bool ranked = false;
 public:
     ZeqaUtils() : Module("Zeqa Utils", "Handy utilities for Zeqa",
                       IDR_ZEQA_PNG, "") {
@@ -26,11 +24,7 @@ public:
 
     void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<bool>("req") == nullptr)
-            settings.addSetting("req", false);
-        if (settings.getSettingByName<std::string>("gamemode") == nullptr)
-            settings.addSetting("gamemode", (std::string)"FireballMace");
-        if (settings.getSettingByName<std::string>("rank") == nullptr)
-            settings.addSetting("rank", (std::string)"unranked");
+            settings.addSetting("req", true);
 
         if (settings.getSettingByName<bool>("promomessage") == nullptr)
             settings.addSetting("promomessage", false);
@@ -60,51 +54,12 @@ public:
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
 
-        this->addHeader("Auto re queue"); //TODO: cancel ui packet with playagain, request remach etc
+        this->addHeader("Auto re queue");
         this->addToggle("Auto re queue", "Queue selected duel when the current one is over.", this->settings.getSettingByName<bool>("req")->value);
-        this->addDropdown("Gamemode", "Gamemode to re-q  to",  std::vector<std::string>{
-            "FireballMace",
-           "CrystalPvP",
-           "TopFight",
-           "Parkour",
-           "MidFight",
-           "Invaded",
-           "Boxing",
-           "FireballFight",
-           "BedFight",
-           "Nodebuff",
-           "Bridge",
-           "BattleRush",
-           "Sumo",
-           "Combo",
-           "BuildUHC",
-           "Classic",
-           "FinalUHC",
-           "MLGRush",
-           "Archer",
-           "CaveUHC",
-           "NetherUHC",
-           "Skywars",
-           "Spleef",
-           "PearlFight",
-           "Fist",
-           "Gapple",
-           "StickFight",
-           "Soup",
-           "SnowballSumo",
-           "Debuff",
-           "Wrath",
-           "SG"
-        }, this->settings.getSettingByName<std::string>("gamemode")->value);
 
-        this->addDropdown("(un)ranked","Re-q for ranked or unranked",  std::vector<std::string>{
-            "ranked",
-            "unranked"
-        },this->settings.getSettingByName<std::string>("rank")->value);
 
         this->addHeader("Auto accept");
         this->addToggle("Friend request", "Automatically accept incoming friend requests.", this->settings.getSettingByName<bool>("friendaccept")->value);
-        // this->addToggle("Party request", "Automatically accept incoming party requests.", this->settings.getSettingByName<bool>("partyaccept")->value); //ok so an accept party command doesn't exist?
         this->addToggle("duel request", "Automatically accept incoming duel requests.", this->settings.getSettingByName<bool>("duelaccept")->value);
 
         this->addHeader("Debloat chat");
@@ -168,7 +123,7 @@ public:
                     command_packet->InternalSource = true;
                     SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
 
-                    FlarialGUI::Notify("Accepted friend invite from: " + pkt->message.substr(61, pkt->message.length() - 68));  //untested
+                    FlarialGUI::Notify("Accepted friend invite from: " + pkt->message.substr(61, pkt->message.length() - 68));
                 }
             }
             if (this->settings.getSettingByName<bool>("duelaccept")->value) {
@@ -183,32 +138,53 @@ public:
                     command_packet->InternalSource = true;
                     SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
 
-                    FlarialGUI::Notify("Accepted duel invite from: " + pkt->message.substr(23, pkt->message.length() - 48)); //untested
+                    FlarialGUI::Notify("Accepted duel invite from: " + pkt->message.substr(23, pkt->message.length() - 48));
                 }
             }
         }
-        if (id == MinecraftPacketIds::SetTitle){
-            auto *pkt = reinterpret_cast<SetTitlePacket *>(event.getPacket());
-            if (this->settings.getSettingByName<bool>("req")->value){
-                if (pkt->text == "§f§aYou won the game!" || //pre s8
-                    pkt->text == "§f§cYou lost the game!" || //pre s8
-                    pkt->text == "   " || //s8
-                    pkt->text == "   "){ //s8
-                    std::thread t([this]() { //make a thread to not make whole mc sleep
-                        std::this_thread::sleep_for(std::chrono::milliseconds(2500)); //wait for the player to be teleported to the hub where they can execute queue command (timing not perfect yet Can anyone help test?)
+        if (id == MinecraftPacketIds::ShowModalForm) {
+            if (this->settings.getSettingByName<bool>("req")->value) { //I know someone is going to copy paste this please leave some credit this took a lot of time
+                auto *pkt = reinterpret_cast<ModalFormRequestPacket *>(event.getPacket());
+                // ImGui::SetClipboardText(pkt->mFormJSON.c_str());
 
-                        std::shared_ptr<Packet> packet = SDK::createPacket(77);
-                        auto *command_packet = reinterpret_cast<CommandRequestPacket *>(packet.get());
-                        command_packet->command = "/q " + this->settings.getSettingByName<std::string>("gamemode")->value + " " + this->settings.getSettingByName<std::string>("rank")->value;
+                nlohmann::json jsonData = nlohmann::json::parse(pkt->mFormJSON);
 
-                        command_packet->origin.type = CommandOriginType::Player;
+                if (jsonData.contains("buttons") && jsonData["buttons"].is_array()) {
+                    for (const auto& button : jsonData["buttons"]) {
+                        if (button.contains("text") && button["text"] == "\u00a7gPlay \u00a7fAgain") {
+                            // Cancel ui from showing
+                            event.cancel();
 
-                        command_packet->InternalSource = true;
-                        SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+                            std::string content = jsonData["content"];
 
-                        FlarialGUI::Notify("Joined the queue for " + this->settings.getSettingByName<std::string>("gamemode")->value + " " + this->settings.getSettingByName<std::string>("rank")->value);
-                    });
-                    t.detach();
+                            // clean the content of color codes
+                            std::string cleanContent = String::removeColorCodes(content);
+
+                            std::string gamemode = "";
+
+                            if (cleanContent.find("Unranked") != std::string::npos) {
+                                cleanContent = cleanContent.substr(15); // Remove "Unranked"
+                                gamemode = cleanContent + " Unranked"; //add Unranked back but at the end this time
+                            }
+                            else if (cleanContent.find("Ranked") != std::string::npos) {
+                                cleanContent = cleanContent.substr(13); // Remove "Ranked"
+                                gamemode = cleanContent + " Ranked"; //add Ranked back but at the end this time
+                            }
+
+                            if (!gamemode.empty()) {
+                                std::shared_ptr<Packet> packet = SDK::createPacket(77);
+                                auto *command_packet = reinterpret_cast<CommandRequestPacket *>(packet.get());
+                                command_packet->command = "/q " + gamemode;
+
+                                command_packet->origin.type = CommandOriginType::Player;
+
+                                command_packet->InternalSource = true;
+                                SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+
+                                FlarialGUI::Notify("Joined the queue for " + gamemode);
+                            }
+                        }
+                    }
                 }
             }
         }

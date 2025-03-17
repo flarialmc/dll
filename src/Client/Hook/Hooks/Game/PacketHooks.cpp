@@ -91,6 +91,15 @@ void SendPacketHook::receiveCallbackChangeDimension(void *packetHandlerDispatche
         receivePacketChangeDimensionOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
 }
 
+void SendPacketHook::receiveCallbackModalFormRequest(void *packetHandlerDispatcher, void *networkIdentifier, void *netEventCallback,
+                                                    const std::shared_ptr<Packet>& packet) {
+    SendPacketHook::setVariables(packetHandlerDispatcher, networkIdentifier, netEventCallback);
+    auto event = nes::make_holder<PacketEvent>(packet.get());
+    eventMgr.trigger(event);
+    if (!event->isCancelled())
+        receivePacketModalFormRequestOriginal(packetHandlerDispatcher, networkIdentifier, netEventCallback, packet);
+}
+
 
 void SendPacketHook::enableHook() {
     /*for (int num = 1; num <= (int)MinecraftPacketIds::PacketViolationWarning; num++) {
@@ -133,6 +142,10 @@ void SendPacketHook::enableHook() {
     std::shared_ptr<Packet> changeDimensionPacket = SDK::createPacket((int) MinecraftPacketIds::ChangeDimension);
     Memory::hookFunc((void *) changeDimensionPacket->packetHandler->vTable[1], (void *)receiveCallbackChangeDimension,
                      (void **) &receivePacketChangeDimensionOriginal, "ReceivePacketHook");
+
+    std::shared_ptr<Packet> ModalFormRequestPacket = SDK::createPacket((int) MinecraftPacketIds::ShowModalForm);
+    Memory::hookFunc((void *) ModalFormRequestPacket->packetHandler->vTable[1], (void *)receiveCallbackModalFormRequest,
+                     (void **) &receivePacketModalFormRequestOriginal, "ReceivePacketHook");
 
     this->autoHook((void *) callback, (void **) &sendPacketOriginal);
 }
