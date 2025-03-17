@@ -61,14 +61,14 @@ public:
             for (const auto &pair: event.getProtocolArgs()) {
                 if (pair.first == std::wstring(L"scriptName")) {
                     std::string id = String::WStrToStr(pair.second);
-                    Logger::info("script id {}", id);
+                    Logger::info("script name {}", id);
                     std::string url = "http://node2.sear.host:5019/api/scripts/" + id + "/download";
                     std::string data = GetString(url);
-                    std::ofstream file(Utils::getClientPath() + "\\Scripts\\Modules\\tmpd.tmp", std::ios::binary);
+                    std::ofstream file(Utils::getClientPath() + "\\Scripts\\Modules\\" + id + ".lua", std::ios::binary);
                     Logger::info("data: {}", data.c_str());
                     file.write(data.c_str(), data.size());
                     file.close();
-
+                    FlarialGUI::Notify("Imported new script: " + id);
                     ModuleManager::restartModules = true;
                 }
             }

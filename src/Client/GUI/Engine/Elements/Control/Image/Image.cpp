@@ -449,7 +449,6 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 
 		if (!ImagesClass::ImguiDX12Images[resourceId]) {
 
-
 			ID3D12Resource* my_texture = NULL;
 
 
