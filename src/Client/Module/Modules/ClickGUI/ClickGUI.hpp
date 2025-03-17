@@ -513,15 +513,21 @@ public:
         //TODO: MAKE module->setActive() module->isActive() module->isRestricted()
 
         if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key) && event.getAction() == ActionType::Pressed) {
+
+#if !defined(__DEBUG__)
             if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen")
                 this->active = false;
             else {
-
-                if (!Client::settings.getSettingByName<bool>("nochaticon")->value) Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
-                else Deafen(this, PacketEvent, &ClickGUI::onPacketReceive);
-                ModuleManager::cguiRefresh = true;
-                keybindActions[0]({});
+#endif
+                if (!editmenu) {
+                    if (!Client::settings.getSettingByName<bool>("nochaticon")->value) Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
+                    else Deafen(this, PacketEvent, &ClickGUI::onPacketReceive);
+                    ModuleManager::cguiRefresh = true;
+                    keybindActions[0]({});
+                }
+#if !defined(__DEBUG__)
             }
+#endif
 
             if (this->active) {
                 accumilatedPos = 0;
@@ -630,10 +636,12 @@ public:
 
         if (this->active) event.cancel();
 
-        if(SDK::getCurrentScreen() != "hud_screen"){
+#if !defined(__DEBUG__)
+        if(SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen"){
             if(this->active)
                 this->active = false;
         }
+#endif
 
         if ((this->active || editmenu) && SDK::getCurrentScreen() == "hud_screen")
             event.cancel(); // TODO: modules dont listen for canceled state!!!
