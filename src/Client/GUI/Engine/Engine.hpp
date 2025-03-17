@@ -127,6 +127,9 @@ namespace FlarialGUI {
     bool inline DoLoadModuleFontLater = false;
     DWRITE_FONT_WEIGHT inline LoadModuleFontLaterWeight = DWRITE_FONT_WEIGHT_NORMAL;
 
+    float inline LoadModuleFontLaterSize = 0.f;
+    float inline LoadGUIFontLaterSize = 0.f;
+
     std::string GetWeightedName(std::string name, DWRITE_FONT_WEIGHT weight);
     DWRITE_FONT_WEIGHT GetFontWeightFromString(const std::string& weightStr);
 
@@ -352,6 +355,10 @@ namespace FlarialGUI {
     FlarialTextWithFont(float x, float y, const wchar_t *text, float width, float height,
                         DWRITE_TEXT_ALIGNMENT alignment, float fontSize,
                         DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont = false);
+
+    void RebuildFontAtlas();
+
+    bool LoadFontVariant(const std::string &font, const std::string &weightedName, DWRITE_FONT_WEIGHT weight, int size);
 
     void ResetShit();
 

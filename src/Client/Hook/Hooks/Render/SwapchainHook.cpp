@@ -733,8 +733,31 @@ void SwapchainHook::prepareBlur() {
 void SwapchainHook::Fonts() {
     /* IMPORTANT FONT STUFF */
     if (ImGui::GetCurrentContext()) {
-
         bool fontLoaded = false;
+        std::vector<int> fontAtlasSizes = { 24,32,48,64,96,128 };
+        auto& io = ImGui::GetIO();
+
+        auto LoadDefaultFont = [&](const std::string& baseName) {
+            for (int size : fontAtlasSizes) {
+                std::string fontKey = baseName + "-s" + std::to_string(size);
+                if (!FlarialGUI::FontMap[fontKey]) {
+                    ImFontConfig config;
+                    config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LightHinting | ImGuiFreeTypeBuilderFlags_LoadColor;
+                    std::filesystem::path path(Utils::getAssetsPath() + "\\" + baseName + ".ttf");
+                    static auto fontData = Memory::readFile(path);
+                    config.FontDataOwnedByAtlas = false;
+
+                    if (!fontData.empty()) {
+                        FlarialGUI::FontMap[fontKey] = io.Fonts->AddFontFromMemoryTTF(
+                            fontData.data(), fontData.size(), (float)size, &config,
+                            io.Fonts->GetGlyphRangesDefault());
+                        if (FlarialGUI::FontMap[fontKey]) {
+                            fontLoaded = true;
+                        }
+                    }
+                }
+            }
+        };
 
         if (FlarialGUI::DoLoadModuleFontLater) {
             if (Client::settings.getSettingByName<bool>("overrideFontWeight")->value)
@@ -745,106 +768,54 @@ void SwapchainHook::Fonts() {
             std::transform(font1.begin(), font1.end(), font1.begin(), ::towlower);
             std::string weightedName = FlarialGUI::GetWeightedName(font1, FlarialGUI::LoadModuleFontLaterWeight);
             std::transform(weightedName.begin(), weightedName.end(), weightedName.begin(), ::towlower);
-            if (!FlarialGUI::FontMap[weightedName + "-1"]) {
-                if (FlarialGUI::LoadFontFromFontFamily(font1, weightedName, FlarialGUI::LoadModuleFontLaterWeight)) {
-                    fontLoaded = true;
+            bool anySizeLoaded = false;
+            for (int size : fontAtlasSizes) {
+                if (!FlarialGUI::FontMap[weightedName + "-s" + std::to_string(size)]) {
+                    if (FlarialGUI::LoadFontFromFontFamily(font1, weightedName, FlarialGUI::LoadModuleFontLaterWeight)) {
+                        fontLoaded = true;
+                        anySizeLoaded = true;
+                        break; // Load all sizes at once in LoadFontFromFontFamily
+                    }
+                    break; // Break after the first attempt as LoadFontFromFontFamily loads all sizes
+                } else {
+                    anySizeLoaded = true;
                 }
             }
+            if (anySizeLoaded) fontLoaded = true;
 
             FlarialGUI::DoLoadModuleFontLater = false;
         }
 
         if (FlarialGUI::DoLoadGUIFontLater) {
-
             if (Client::settings.getSettingByName<bool>("overrideFontWeight")->value)
                 FlarialGUI::LoadGUIFontLaterWeight = FlarialGUI::GetFontWeightFromString(
                         Client::settings.getSettingByName<std::string>("fontWeight")->value);
-
 
             std::string font2 = FlarialGUI::LoadGUIFontLater;
             std::transform(font2.begin(), font2.end(), font2.begin(), ::towlower);
             std::string weightedName = FlarialGUI::GetWeightedName(font2, FlarialGUI::LoadGUIFontLaterWeight);
             std::transform(weightedName.begin(), weightedName.end(), weightedName.begin(), ::towlower);
-            if (!FlarialGUI::FontMap[weightedName + "-1"]) {
-                if (FlarialGUI::LoadFontFromFontFamily(font2, weightedName, FlarialGUI::LoadGUIFontLaterWeight)) {
-                    fontLoaded = true;
+            bool anySizeLoaded = false;
+            for (int size : fontAtlasSizes) {
+                if (!FlarialGUI::FontMap[weightedName + "-s" + std::to_string(size)]) {
+                    if (FlarialGUI::LoadFontFromFontFamily(font2, weightedName, FlarialGUI::LoadGUIFontLaterWeight)) {
+                        fontLoaded = true;
+                        anySizeLoaded = true;
+                        break; // Load all sizes at once
+                    }
+                    break; // Break after the first attempt
+                } else {
+                    anySizeLoaded = true;
                 }
             }
+            if (anySizeLoaded) fontLoaded = true;
 
             FlarialGUI::DoLoadGUIFontLater = false;
         }
 
-        //std::cout << FlarialGUI::WideToNarrow(FlarialGUI::GetFontFilePath(L"Dosis", DWRITE_FONT_WEIGHT_EXTRA_BLACK)).c_str() << std::endl;
-        /*
-        if(!allfontloaded) {
-            FlarialGUI::LoadFonts(FlarialGUI::FontMap);
-
-            allfontloaded = true;
-        }
-        */
-
-        auto &io = ImGui::GetIO();
-
-        if (!FlarialGUI::FontMap["162-1"]) {
-            ImFontConfig config;
-
-            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
-
-            std::filesystem::path path(Utils::getAssetsPath() + "\\162" + ".ttf");
-            static auto fontData = Memory::readFile(path);
-            config.FontDataOwnedByAtlas = false;
-
-            if(!fontData.empty()) {
-                FlarialGUI::FontMap["162-1"] = io.Fonts->AddFontFromMemoryTTF(
-                        fontData.data(), fontData.size(), 23, &config,
-                        io.Fonts->GetGlyphRangesDefault());
-                FlarialGUI::FontMap["162-2.0"] = io.Fonts->AddFontFromMemoryTTF(
-                        fontData.data(), fontData.size(), 40, &config,
-                        io.Fonts->GetGlyphRangesDefault());
-            }
-
-            fontLoaded = true;
-        }
-
-        if (!FlarialGUI::FontMap["163-1"]) {
-            ImFontConfig config;
-            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
-
-            std::filesystem::path path(Utils::getAssetsPath() + "\\163" + ".ttf");
-            static auto fontData = Memory::readFile(path);
-            config.FontDataOwnedByAtlas = false;
-
-            if(!fontData.empty()) {
-                FlarialGUI::FontMap["163-1"] = io.Fonts->AddFontFromMemoryTTF(
-                        fontData.data(), fontData.size(), 23, &config,
-                        io.Fonts->GetGlyphRangesDefault());
-                FlarialGUI::FontMap["163-2.0"] = io.Fonts->AddFontFromMemoryTTF(
-                        fontData.data(), fontData.size(), 40, &config,
-                        io.Fonts->GetGlyphRangesDefault());
-            }
-
-            fontLoaded = true;
-        }
-
-        if (!FlarialGUI::FontMap["164-1"]) {
-            ImFontConfig config;
-            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_Monochrome | ImGuiFreeTypeBuilderFlags_MonoHinting;
-
-            std::filesystem::path path(Utils::getAssetsPath() + "\\164" + ".ttf");
-            static auto fontData = Memory::readFile(path);
-            config.FontDataOwnedByAtlas = false;
-
-            if(!fontData.empty()) {
-                FlarialGUI::FontMap["164-1"] = io.Fonts->AddFontFromMemoryTTF(
-                        fontData.data(), fontData.size(), 23, &config,
-                        io.Fonts->GetGlyphRangesDefault());
-                FlarialGUI::FontMap["164-2.0"] = io.Fonts->AddFontFromMemoryTTF(
-                        fontData.data(), fontData.size(), 40, &config,
-                        io.Fonts->GetGlyphRangesDefault());
-            }
-
-            fontLoaded = true;
-        }
+        LoadDefaultFont("162");
+        LoadDefaultFont("163");
+        LoadDefaultFont("164");
 
         if (fontLoaded) {
             io.Fonts->Build();
@@ -855,13 +826,10 @@ void SwapchainHook::Fonts() {
                 ImGui_ImplDX12_InvalidateDeviceObjects();
                 ImGui_ImplDX12_CreateDeviceObjects();
             }
-
         }
     }
-
     /* IMPORTANT FONT STUFF */
 }
-
 void SwapchainHook::FPSMeasure() {
 
     std::chrono::duration<float> elapsed = std::chrono::high_resolution_clock::now() - start;
