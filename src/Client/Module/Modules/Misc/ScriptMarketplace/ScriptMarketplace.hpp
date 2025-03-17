@@ -75,27 +75,39 @@ public:
         }
     }
 
-    size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
-        std::ofstream* ofs = reinterpret_cast<std::ofstream*>(userp);
+    // Ensure this callback is declared as static if it's inside a class.
+    static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
+        std::ofstream* ofs = static_cast<std::ofstream*>(userp);
+        if (!ofs || !ofs->is_open()) {
+            // If the stream is not valid or open, return 0 to signal an error.
+            return 0;
+        }
         size_t totalSize = size * nmemb;
-        ofs->write(reinterpret_cast<char*>(contents), totalSize);
+        try {
+            ofs->write(static_cast<const char*>(contents), totalSize);
+        } catch (const std::ios_base::failure& e) {
+            // Optionally log the error here.
+            return 0;
+        }
         return totalSize;
     }
-
 
     bool DownloadFile(const std::string& url, const std::string& localFilePath) {
         CURL* curl = curl_easy_init();
         if (!curl) {
-            std::cerr << "Failed to initialize libcurl." << std::endl;
+            std::cout << "Failed to initialize libcurl." << std::endl;
             return false;
         }
 
+        // Open the file for binary writing.
         std::ofstream ofs(localFilePath, std::ios::binary);
         if (!ofs.is_open()) {
-            std::cerr << "Failed to open file for writing: " << localFilePath << std::endl;
+            std::cout << "Failed to open file for writing: " << localFilePath << std::endl;
             curl_easy_cleanup(curl);
             return false;
         }
+        // Optionally set exceptions on the stream so that failures throw
+        ofs.exceptions(std::ios::failbit | std::ios::badbit);
 
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &ScriptMarketplace::WriteCallback);
@@ -105,7 +117,7 @@ public:
 
         CURLcode res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
-            std::cerr << "Error during download: " << curl_easy_strerror(res) << std::endl;
+            std::cout << "Error during download: " << curl_easy_strerror(res) << std::endl;
             ofs.close();
             curl_easy_cleanup(curl);
             return false;
@@ -125,6 +137,7 @@ void onProtocolConfig(ProtocolEvent event) {
                     Logger::info("config name {}", id);
 
                     std::string url = "http://node2.sear.host:5019/api/configs/" + id + "/download";
+                    url.erase(std::remove(url.begin(), url.end(), ' '), url.end());
 
                     std::filesystem::path tempZipPath = std::filesystem::temp_directory_path() / (id + ".zip");
 
