@@ -12,8 +12,8 @@ public:
 
     void defaultConfig() override { Module::defaultConfig();
 
-        if (settings.getSettingByName<float>("health") == nullptr) this->settings.addSetting("health", 6.0f);
-        if (settings.getSettingByName<float>("maxopacity") == nullptr) this->settings.addSetting("maxopacity", 0.3f);
+        if (settings.getSettingByName<float>("health") == nullptr) this->settings.addSetting("health", 12.0f);
+        if (settings.getSettingByName<float>("maxopacity") == nullptr) this->settings.addSetting("maxopacity", 0.7f);
         if (settings.getSettingByName<std::string>("color") == nullptr) this->settings.addSetting("color", (std::string) "FF0000");
         if (settings.getSettingByName<bool>("rgb") == nullptr) this->settings.addSetting("rgb", false);
 	}
@@ -70,7 +70,11 @@ public:
                                   FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color")->value);
             color2.a = std::clamp(opacity, 0.0f, maxOpacity);
 
-            FlarialGUI::RoundedRect(0, 0, color2, MC::windowSize.x, MC::windowSize.y, 0, 0);
+            //FlarialGUI::RoundedRect(0, 0, color2, MC::windowSize.x, MC::windowSize.y, 0, 0);
+            D2D1_ROUNDED_RECT roundedrect;
+            roundedrect.rect = { 0, 0, Constraints::PercentageConstraint(1, "left"), Constraints::PercentageConstraint(1, "top") };
+            auto ShadowSize = Constraints::PercentageConstraint(0.8, "top") * (1.0f - (this->health / maxHealth));
+            FlarialGUI::InnerShadowRect(roundedrect, ShadowSize, color2);
             }
     }
 };
