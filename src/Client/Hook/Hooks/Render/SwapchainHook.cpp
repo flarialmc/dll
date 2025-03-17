@@ -279,7 +279,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     /* EACH FRAME STUFF */
 
     try {
-        if (init && initImgui && !FlarialGUI::hasLoadedAll && !queue) { FlarialGUI::LoadAllImages(); FlarialGUI::hasLoadedAll = true; }
+        if (init && initImgui && !FlarialGUI::hasLoadedAll) { FlarialGUI::LoadAllImages(); FlarialGUI::hasLoadedAll = true; }
     } catch (const std::exception &ex) { Logger::error("Fail at loading all images: ", ex.what()); }
 
 
