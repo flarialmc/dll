@@ -734,7 +734,7 @@ void SwapchainHook::Fonts() {
     /* IMPORTANT FONT STUFF */
     if (ImGui::GetCurrentContext()) {
         bool fontLoaded = false;
-        std::vector<int> fontAtlasSizes = { 24,32,48,64,96,128 };
+        std::vector<int> fontAtlasSizes = { 23,40,96,128 };
         auto& io = ImGui::GetIO();
 
         auto LoadDefaultFont = [&](const std::string& baseName) {

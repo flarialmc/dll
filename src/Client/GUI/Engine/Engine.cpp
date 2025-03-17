@@ -776,7 +776,7 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
     std::string weightedName = GetWeightedName(font, weight);
     std::transform(weightedName.begin(), weightedName.end(), weightedName.begin(), ::towlower);
 
-    std::vector<int> fontAtlasSizes = { 24,32,48,64,96,128 };
+    std::vector<int> fontAtlasSizes = { 23,40,96,128 };
     int bestAtlasSize = 0;
     float requestedScale = Client::settings.getSettingByName<float>(moduleFont ? "modules_font_scale" : "gui_font_scale")->value;
     float effectiveSize = fontSize * requestedScale;
@@ -1095,7 +1095,7 @@ bool FlarialGUI::LoadFontFromFontFamily(std::string name, std::string weightedNa
     if (!fontFilePath.empty()) {
         std::ifstream fontFile(fontFilePath, std::ios::binary);
         if (fontFile.is_open()) {
-            std::vector<int> fontAtlasSizes = { 24,32,48,64,96,128 };
+            std::vector<int> fontAtlasSizes = { 23,40,96,128 };;
             bool allSizesLoaded = true;
 
             for (int size : fontAtlasSizes) {
