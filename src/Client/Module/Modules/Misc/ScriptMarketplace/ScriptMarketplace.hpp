@@ -63,6 +63,7 @@ public:
                     std::string id = String::WStrToStr(pair.second);
                     Logger::info("script name {}", id);
                     std::string url = "http://node2.sear.host:5019/api/scripts/" + id + "/download";
+                    url.erase(std::remove(url.begin(), url.end(), ' '), url.end());
                     std::string data = GetString(url);
                     std::ofstream file(Utils::getClientPath() + "\\Scripts\\Modules\\" + id + ".lua", std::ios::binary);
                     Logger::info("data: {}", data.c_str());
