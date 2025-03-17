@@ -2,11 +2,9 @@
 
 #include "../Module.hpp"
 #include "Events/Render/RenderEvent.hpp"
-#include "Events/Render/SetupAndRenderEvent.hpp"
 
 class LowHealthIndicator : public Module {
     int health = 20.f;
-    ClickGUI cgui;
 public:
     LowHealthIndicator() : Module("Low Health", "Warns you when you are at low health.", IDR_HEART_PNG, "") {
         Module::setup();
@@ -60,7 +58,7 @@ public:
 
     void onRender(RenderEvent& event) {
         if (this->isEnabled() && this->health <= this->settings.getSettingByName<float>("health")->value &&
-            SDK::currentScreen == "hud_screen" && !cgui.isEnabled()) {
+            SDK::currentScreen == "hud_screen" && !ModuleManager::getModule("ClickGUI")->isEnabled()) {
 
             float maxOpacity = this->settings.getSettingByName<float>("maxopacity")->value;
 
