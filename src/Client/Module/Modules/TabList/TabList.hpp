@@ -112,8 +112,9 @@ public:
     void normalRender(int index, std::string& value) override {
         if (SDK::hasInstanced && (active || ClickGUI::editmenu)) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+                float resScale = MC::windowSize.x / 1920;
                 float keycardSize = Constraints::RelativeConstraint(
-                        0.05f * this->settings.getSettingByName<float>("uiscale")->value, "height", true);
+                        0.05f * (this->settings.getSettingByName<float>("uiscale")->value * resScale), "height", true);
 
                 Vec2<float> settingperc{0, 0};
 
@@ -154,9 +155,9 @@ public:
 
                 Vec2<float> rounde = Constraints::RoundingConstraint(
                         this->settings.getSettingByName<float>("rounding")->value *
-                        settings.getSettingByName<float>("uiscale")->value,
+                        settings.getSettingByName<float>("uiscale")->value * resScale,
                         this->settings.getSettingByName<float>("rounding")->value *
-                        settings.getSettingByName<float>("uiscale")->value);
+                        settings.getSettingByName<float>("uiscale")->value * resScale);
 
                 float totalWidth = i2 * keycardSize;
 
@@ -190,7 +191,7 @@ public:
                 if (this->settings.getSettingByName<bool>("border")->value) {
                     FlarialGUI::RoundedHollowRect(fakex, realcenter.y, Constraints::RelativeConstraint(
                                                           (this->settings.getSettingByName<float>("borderWidth")->value *
-                                                           (settings.getSettingByName<float>("uiscale")->value) / 100.0f), "height", true),
+                                                           (settings.getSettingByName<float>("uiscale")->value * resScale) / 100.0f), "height", true),
                                                   borderColor, totalWidth, 7.5f * keycardSize,
                                                   rounde.x, rounde.x);
                 }
