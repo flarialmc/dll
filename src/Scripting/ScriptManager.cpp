@@ -50,13 +50,7 @@ void ScriptManager::loadModuleScripts() {
         std::ifstream scriptFile(entry.path());
         std::string code((std::istreambuf_iterator(scriptFile)), std::istreambuf_iterator<char>());
 
-        auto script = std::make_shared<Script>(
-            entry.path().filename().string(),
-            code
-        );
-
-        // Be careful if you try to access fields like getName()
-        // before the script compiles. (Won't crash but you get the point)
+        auto script = std::make_shared<Script>(entry.path().filename().string(), code);
         mLoadedScripts.push_back(script);
 
         if (!script->compile()) {
@@ -74,6 +68,8 @@ void ScriptManager::loadModuleScripts() {
         mod->defaultConfig();
         ModuleManager::cguiRefresh = true;
         Logger::info("Loaded module script '{}'", script->getName());
+
+        executeFunction(script->getState(), "onLoad");
     }
 }
 
@@ -137,6 +133,8 @@ void ScriptManager::loadCommandScripts() {
         mLoadedCommands.emplace_back(command);
         CommandManager::Commands.push_back(command);
         Logger::info("Loaded command script '{}'", script->getName());
+
+        executeFunction(script->getState(), "onLoad");
     }
 }
 
@@ -150,7 +148,6 @@ void ScriptManager::executeFunction(lua_State *L, const char* functionName) {
         return;
     }
 
-    // nargs = 0, nresults = 0 means no arguments, no returns.
     script->safeCall(0, 0);
 }
 
@@ -163,7 +160,6 @@ void ScriptManager::_reloadScripts() {
     initialized = false;
 
     CommandManager::terminate();
-    CommandManager::Commands.clear();
 
     for (auto& mod : mLoadedModules) {
         if (mod) {

@@ -72,4 +72,5 @@ void CommandManager::onPacket(PacketSendEvent &event) {
 
 void CommandManager::terminate() {
     Deafen(&CommandManager::instance, PacketSendEvent, &CommandManager::onPacket);
+    Commands.clear();
 }

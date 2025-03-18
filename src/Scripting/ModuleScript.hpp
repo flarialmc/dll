@@ -11,7 +11,7 @@
 
 inline ScriptSettingManager gScriptSettingManager;
 
-class ModuleScript : public Module {
+class ModuleScript : public Module, public std::enable_shared_from_this<ModuleScript> {
 public:
     lua_State* moduleLuaState = nullptr;
     std::weak_ptr<Script> linkedScript;
