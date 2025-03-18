@@ -96,8 +96,8 @@ static int registerCommand(lua_State* L) {
     auto commandPtr = std::make_shared<ModuleCommand>(
         cmdName,
         std::string("Lua module command"),
-        std::vector<std::string>{}, // you can parse alias info as well
-        std::weak_ptr<ModuleScript>(moduleScript->shared_from_this())
+        std::vector<std::string>{},
+        std::weak_ptr(moduleScript->shared_from_this())
     );
 
     CommandManager::Commands.push_back(commandPtr);
