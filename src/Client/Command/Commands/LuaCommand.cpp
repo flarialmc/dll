@@ -142,7 +142,7 @@ void LuaCommand::execute(const std::vector<std::string>& args) {
         auto scriptsFolder = std::filesystem::path(roamingFolder) / "Flarial" / "Scripts";
 
         std::error_code ec;
-        std::filesystem::create_directories(scriptsFolder, ec);
+        create_directories(scriptsFolder, ec);
         if (ec) {
             addCommandMessage("§cFailed to create Scripts folder: " + ec.message());
             return;

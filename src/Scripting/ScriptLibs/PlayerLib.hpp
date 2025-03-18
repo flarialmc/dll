@@ -6,6 +6,7 @@
 #include <SDK/SDK.hpp>
 #include <SDK/Client/Actor/Actor.hpp>
 #include <SDK/Client/Network/Packet/TextPacket.hpp>
+#include <SDK/Client/Network/Packet/CommandRequestPacket.hpp>
 
 // LuaBridge needs to link against this class.
 // Normal Actor class doesn't seem to work for me.
@@ -14,7 +15,7 @@ class sLocalPlayer {
 public:
     static std::string name() {
         auto* player = SDK::clientInstance->getLocalPlayer();
-        if (!player || !player->getNametag()) return "Unknown";
+        if (!player || !player->getNametag()) return "";
         return *player->getNametag();
     }
     static int position(lua_State* L) {
@@ -88,6 +89,24 @@ public:
 
         return 1;
     }
+    static int executeCommand(lua_State* L) {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (!player) return 0;
+
+        if (!lua_isstring(L, 1)) return 0;
+
+        std::string command = lua_tostring(L, 1);
+
+        std::shared_ptr<Packet> packet = SDK::createPacket(77);
+        auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
+        command_packet->command = command;
+        command_packet->origin.type = CommandOriginType::Player;
+        command_packet->InternalSource = true;
+
+        SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
+
+        return 0;
+    }
 };
 
 class PlayerLib : public ScriptLib {
@@ -103,6 +122,7 @@ public:
                 .addStaticFunction("grounded", &sLocalPlayer::grounded)
                 .addStaticFunction("say", &sLocalPlayer::say)
                 .addStaticFunction("rotation", &sLocalPlayer::rotation)
+                .addStaticFunction("executeCommand", &sLocalPlayer::executeCommand)
             .endClass();
     }
 };
