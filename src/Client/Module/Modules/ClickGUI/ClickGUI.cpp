@@ -315,7 +315,7 @@ void ClickGUI::onRender(RenderEvent &event) {
 
             }
 
- // radiobutton of editmenu
+            // radiobutton of editmenu
 
             radioX = navx - Constraints::SpacingConstraint(-0.36f, logoWidth);
             radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);

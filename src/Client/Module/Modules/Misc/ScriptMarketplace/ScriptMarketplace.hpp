@@ -60,16 +60,24 @@ public:
         if (event.getPath() == std::wstring(L"flarial-scripting")) {
             for (const auto &pair: event.getProtocolArgs()) {
                 if (pair.first == std::wstring(L"scriptName")) {
-                    std::string id = String::WStrToStr(pair.second);
-                    Logger::info("script id {}", id);
-                    std::string url = "http://node2.sear.host:5019/api/scripts/" + id + "/download";
-                    std::string data = GetString(url);
-                    std::ofstream file(Utils::getClientPath() + "\\Scripts\\Modules\\tmpd.tmp", std::ios::binary);
-                    Logger::info("data: {}", data.c_str());
-                    file.write(data.c_str(), data.size());
-                    file.close();
+                    FlarialGUI::Notify("Importing...");
+                    std::thread([this, pair]() {
+                        std::string id = String::WStrToStr(pair.second);
+                        Logger::info("script name {}", id);
 
-                    ModuleManager::restartModules = true;
+                        std::string url = "http://node2.sear.host:5019/api/scripts/" + id + "/download";
+                        url.erase(std::remove(url.begin(), url.end(), ' '), url.end());
+
+                        std::string data = GetString(url);
+
+                        std::ofstream file(Utils::getClientPath() + "\\Scripts\\Modules\\" + id + ".lua", std::ios::binary);
+                        Logger::info("data: {}", data.c_str());
+                        file.write(data.c_str(), data.size());
+                        file.close();
+
+                        FlarialGUI::Notify("Imported new script: " + id);
+                        ModuleManager::restartModules = true;
+                    }).detach();
                 }
             }
         }
@@ -132,7 +140,8 @@ void onProtocolConfig(ProtocolEvent event) {
     if (event.getPath() == std::wstring(L"flarial-configs")) {
         for (const auto &pair : event.getProtocolArgs()) {
             if (pair.first == std::wstring(L"configName")) {
-
+                FlarialGUI::Notify("Importing...");
+                std::thread([this, pair]() {
                     std::string id = String::WStrToStr(pair.second);
                     Logger::info("config name {}", id);
 
@@ -198,7 +207,7 @@ void onProtocolConfig(ProtocolEvent event) {
                     FlarialGUI::Notify("Imported Config as: " + configname);
                     ModuleManager::restartModules = true;
                     reloadAllConfigs();
-
+                }).detach();
             }
         }
     }

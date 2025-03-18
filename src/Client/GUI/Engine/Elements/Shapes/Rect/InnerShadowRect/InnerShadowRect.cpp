@@ -28,7 +28,7 @@ void FlarialGUI::InnerShadowRect(D2D1_ROUNDED_RECT rect, float shadowSize, D2D1_
             size - offset - offset,
             fadedShadowColor,
             2.0f,
-            rounding + (1-progress)*shadowSize,
+            0,
             240
         );
     }
@@ -38,7 +38,7 @@ void FlarialGUI::InnerShadowRect(D2D1_ROUNDED_RECT rect, float shadowSize, D2D1_
         size,
         ImColor(color.r, color.g, color.b, color.a),
         1.0f,
-        rounding,
+        0,
         240
     );
 }

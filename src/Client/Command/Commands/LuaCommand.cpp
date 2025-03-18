@@ -15,6 +15,50 @@
 #include <miniz/miniz.h>
 #include <Manager.hpp>
 
+#include "embedded.h"
+
+bool extractAutoComplete(const std::filesystem::path& output) {
+    try {
+        std::filesystem::path autoCompletePath = output / "AutoComplete";
+        if (exists(autoCompletePath)) {
+            remove_all(autoCompletePath);
+        }
+
+        mz_zip_archive zipArchive = {};
+        if (!mz_zip_reader_init_mem(&zipArchive, autocomplete_zip, sizeof(autocomplete_zip), 0)) {
+            Logger::error("Failed to initialize zip archive");
+            return false;
+        }
+
+        int fileCount = static_cast<int>(mz_zip_reader_get_num_files(&zipArchive));
+        for (int i = 0; i < fileCount; i++) {
+            mz_zip_archive_file_stat fileStat;
+            if (!mz_zip_reader_file_stat(&zipArchive, i, &fileStat)) {
+                continue;
+            }
+
+            std::filesystem::path filePath = output / fileStat.m_filename;
+
+            if (mz_zip_reader_is_file_a_directory(&zipArchive, i)) {
+                create_directories(filePath);
+            } else {
+                create_directories(filePath.parent_path());
+
+                if (!mz_zip_reader_extract_to_file(&zipArchive, i, filePath.string().c_str(), 0)) {
+                    Logger::error("Failed to extract the AutoComplete folder");
+                }
+            }
+        }
+
+        mz_zip_reader_end(&zipArchive);
+        return true;
+    }
+    catch (const std::exception& e) {
+        Logger::error("Error extracting AutoComplete: {}", e.what());
+        return false;
+    }
+}
+
 std::string scriptPath(const std::string& category) {
     const auto roamingFolder = to_string(winrt::Windows::Storage::ApplicationData::Current().RoamingFolder().Path());
 
@@ -72,6 +116,7 @@ void LuaCommand::execute(const std::vector<std::string>& args) {
         addCommandMessage("§bpath §8- §7Opens the script directory in File Explorer");
         addCommandMessage("§breload §8- §7Reloads all scripts");
         addCommandMessage("§bimport §8- §7Automatically imports scripts for you");
+        addCommandMessage("§bautocomplete §8- §7Extracts the latest AutoComplete docs");
     } else if (action == "path") {
         WinrtUtils::openSubFolder("Flarial\\Scripts");
     } else if (action == "reload") {
@@ -92,6 +137,26 @@ void LuaCommand::execute(const std::vector<std::string>& args) {
         [=]() -> winrt::fire_and_forget {
             co_await importScript(category);
         }();
+    } else if (action == "autocomplete") {
+        auto roamingFolder = to_string(winrt::Windows::Storage::ApplicationData::Current().RoamingFolder().Path());
+        auto scriptsFolder = std::filesystem::path(roamingFolder) / "Flarial" / "Scripts";
+
+        std::error_code ec;
+        create_directories(scriptsFolder, ec);
+        if (ec) {
+            addCommandMessage("§cFailed to create Scripts folder: " + ec.message());
+            return;
+        }
+
+        if (extractAutoComplete(scriptsFolder)) {
+            addCommandMessage("§aImported the AutoComplete folder successfully.");
+            addCommandMessage("Press Win + R and paste to set up your visual studio code workspace.");
+
+            std::string clipboardText = "code --install-extension \"sumneko.lua\" & code \"" + scriptsFolder.string() + "\"";
+            WinrtUtils::setClipboard(clipboardText);
+        } else {
+            addCommandMessage("§cFailed to import the AutoComplete folder.");
+        }
     } else {
         addCommandMessage("§cUsage: .lua <help/reload/path/import>");
     }

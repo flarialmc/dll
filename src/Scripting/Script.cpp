@@ -5,6 +5,9 @@
 #include "ScriptSettings/ScriptSettingManager.hpp"
 #include "ScriptLibs/ScriptLib.hpp"
 
+#include <Command/CommandManager.hpp>
+#include "ModuleCommandScript.hpp"
+
 #include "ScriptLibs/FSLib.hpp"
 #include "ScriptLibs/SettingsLib.hpp"
 #include "ScriptLibs/ClientLib.hpp"
@@ -52,6 +55,56 @@ static int customPrint(lua_State* L) {
     return 0;
 }
 
+static int registerCommand(lua_State* L) {
+    Module* mod = ScriptManager::getModuleByState(L);
+    if (!mod) {
+        lua_pushstring(L, "registerCommand() called, but could not find associated module!");
+        lua_error(L);
+        return 0;
+    }
+
+    auto moduleScript = dynamic_cast<ModuleScript*>(mod);
+    if (!moduleScript) {
+        lua_pushstring(L, "registerCommand() called on non-ModuleScript!");
+        lua_error(L);
+        return 0;
+    }
+
+    // Parse args
+    const char* cmdName = luaL_checkstring(L, 1);
+    if (!lua_isfunction(L, 2)) {
+        lua_pushstring(L, "registerCommand() requires a function as the second arg");
+        lua_error(L);
+        return 0;
+    }
+
+    // Store the function
+    lua_getglobal(L, "commandHandlers");
+    if (!lua_istable(L, -1)) {
+        lua_pop(L, 1);
+        lua_newtable(L);
+        lua_setglobal(L, "commandHandlers");
+        lua_getglobal(L, "commandHandlers");
+    }
+
+    lua_pushstring(L, cmdName); // push key
+    lua_pushvalue(L, 2); // push copy of user function
+    lua_settable(L, -3); // commandHandlers[cmdName] = function
+
+    lua_pop(L, 1);
+
+    auto commandPtr = std::make_shared<ModuleCommand>(
+        cmdName,
+        std::string("Lua module command"),
+        std::vector<std::string>{},
+        std::weak_ptr(moduleScript->shared_from_this())
+    );
+
+    CommandManager::Commands.push_back(commandPtr);
+
+    return 0;
+}
+
 Script::Script(std::string filePath, std::string code)
     : mFilePath(std::move(filePath)), mCode(std::move(code)) {
 
@@ -60,6 +113,9 @@ Script::Script(std::string filePath, std::string code)
 
     lua_pushcfunction(mState, customPrint);
     lua_setglobal(mState, "print");
+
+    lua_pushcfunction(mState, registerCommand);
+    lua_setglobal(mState, "registerCommand");
 
     ScriptLib::registerLib<FSLib>(mState);
     ScriptLib::registerLib<SettingsLib>(mState);

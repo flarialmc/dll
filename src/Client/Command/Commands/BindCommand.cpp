@@ -5,5 +5,4 @@ void BindCommand::execute(const std::vector<std::string> &args) {
         addCommandMessage("§cUsage: .bind <module> <key>");
         return;
     }
-    addCommandMessage("This command isnt finished yet");
 }

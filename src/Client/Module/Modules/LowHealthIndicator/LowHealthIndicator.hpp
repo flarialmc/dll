@@ -74,6 +74,8 @@ public:
             D2D1_ROUNDED_RECT roundedrect;
             roundedrect.rect = { 0, 0, Constraints::PercentageConstraint(1, "left"), Constraints::PercentageConstraint(1, "top") };
             auto ShadowSize = Constraints::PercentageConstraint(0.8, "top") * (1.0f - (this->health / maxHealth));
+            roundedrect.radiusX = 0;
+            roundedrect.radiusY = 0;
             FlarialGUI::InnerShadowRect(roundedrect, ShadowSize, color2);
             }
     }
