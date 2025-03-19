@@ -20,7 +20,7 @@ public:
                 })
                 .addStaticFunction("Image", [](const std::string& file, const LuaRef& rectTable) {
                     D2D1_RECT_F rect = toD2D1Rect(rectTable);
-                    if (!std::filesystem::exists(file)) return;
+                    if (!std::filesystem::exists(Utils::getClientPath() + "\\" + file)) return;
                     FlarialGUI::image(file, rect);
                 })
                 .addStaticFunction("Text", [](const LuaRef& posTable, const std::string& text, float width, float height, float fontSize = 200) {
@@ -30,7 +30,9 @@ public:
                         fontSize,
                         static_cast<DWRITE_FONT_WEIGHT>(static_cast<int>(DWRITE_FONT_WEIGHT_NORMAL)));
                 })
-                .addStaticFunction("Render", [](std::string text, int index = 0, lua_State* L = nullptr) {
+                .addStaticFunction("Render", [](lua_State* L) {
+                    std::string text = lua_tostring(L, 1);
+                    int index = luaL_optinteger(L, 2, 0);
                     auto* script = ScriptManager::getModuleByState(L);
                     if (!script) return;
                     script->normalRender(index, text);

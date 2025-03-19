@@ -25,19 +25,20 @@ void ModuleScript::onKey(KeyEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
 
     if (const auto& script = linkedScript.lock()) {
-        bool cancelled = script->registerCancellableEvent("KeyEvent", event.getKey(), static_cast<int>(event.getAction()));
+        bool down = static_cast<int>(event.getAction()) == 1;
+        bool cancelled = script->registerCancellableEvent("KeyEvent", event.getKey(), down);
         if (cancelled) event.cancel();
     }
 }
 
 void ModuleScript::onMouse(MouseEvent& event) {
-    if (!isEnabled() || !ScriptManager::initialized || event.getButton() == 0 || event.getAction() == 0) return;
+    if (!isEnabled() || !ScriptManager::initialized) return;
 
     if (const auto& script = linkedScript.lock()) {
-        bool cancelled = script->registerCancellableEvent("MouseEvent", static_cast<int>(event.getButton()), static_cast<int>(event.getAction()));
+        bool down = static_cast<int>(event.getAction()) == 1;
+        bool cancelled = script->registerCancellableEvent("MouseEvent", static_cast<int>(event.getButton()), down);
         if (cancelled) event.cancel();
     }
-
 }
 
 void ModuleScript::onPacketReceive(PacketEvent &event) {
@@ -46,18 +47,14 @@ void ModuleScript::onPacketReceive(PacketEvent &event) {
     if (const auto& script = linkedScript.lock()) {
         bool cancel = false;
 
-        bool onPacketReceive = script->registerCancellableEvent("PacketReceiveEvent", event.getPacket(), static_cast<int>(event.getPacket()->getId()));
-        if (onPacketReceive) cancel = true;
-
         if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
             const auto *pkt = reinterpret_cast<TextPacket*>(event.getPacket());
             if (pkt) {
                 std::string msg = pkt->message;
                 std::string name = pkt->name;
                 auto type = pkt->type;
-                std::string xuid = pkt->xuid;
 
-                bool ChatReceive = script->registerCancellableEvent("ChatReceiveEvent", msg, name, static_cast<int>(type), xuid);
+                bool ChatReceive = script->registerCancellableEvent("ChatReceiveEvent", msg, name, static_cast<int>(type));
                 if (ChatReceive) cancel = true;
             }
         }
