@@ -32,11 +32,10 @@ void ModuleScript::onKey(KeyEvent& event) {
 }
 
 void ModuleScript::onMouse(MouseEvent& event) {
-    if (!isEnabled() || !ScriptManager::initialized) return;
+    if (!isEnabled() || !ScriptManager::initialized || event.getButton() == 0 || event.getAction() == 0) return;
 
     if (const auto& script = linkedScript.lock()) {
-        bool down = static_cast<int>(event.getAction()) == 1;
-        bool cancelled = script->registerCancellableEvent("MouseEvent", static_cast<int>(event.getButton()), down);
+        bool cancelled = script->registerCancellableEvent("MouseEvent", static_cast<int>(event.getButton()), static_cast<int>(event.getAction()));
         if (cancelled) event.cancel();
     }
 }
