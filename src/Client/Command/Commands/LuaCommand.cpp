@@ -171,17 +171,11 @@ void LuaCommand::execute(const std::vector<std::string>& args) {
         }
 
         [=]() -> winrt::fire_and_forget {
-            try {
-                bool success = co_await extractAutoComplete();
-                if (success) {
-                    Logger::success("Successfully imported AutoComplete.");
-                } else {
-                    Logger::error("Failed to import AutoComplete.");
-                }
-            } catch (const winrt::hresult_error& e) {
-                Logger::error("Winrt error in autocomplete: {}", to_string(e.message()));
-            } catch (const std::exception& e) {
-                Logger::error("Standard error in autocomplete: {}", e.what());
+            bool success = co_await extractAutoComplete();
+            if (success) {
+                Logger::success("Successfully imported AutoComplete.");
+            } else {
+                Logger::error("Failed to import AutoComplete.");
             }
         }();
 

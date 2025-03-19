@@ -14,6 +14,9 @@ public:
         if (auto mod = linkedModule.lock()) {
             if (!mod->isEnabled()) {
                 Logger::info("Module '{}' is disabled", mod->name);
+                if (SDK::clientInstance) {
+                    SDK::clientInstance->getGuiData()->displayClientMessage("Module '" + mod->name + "' is disabled");
+                }
                 return;
             }
 

@@ -71,8 +71,16 @@ static int registerCommand(lua_State* L) {
 
     // Parse args
     const char* cmdName = luaL_checkstring(L, 1);
-    if (!lua_isfunction(L, 2)) {
-        lua_pushstring(L, "registerCommand() requires a function as the second arg");
+    const char* cmdDescription = luaL_checkstring(L, 2);
+
+    if (!lua_isfunction(L, 3)) {
+        lua_pushstring(L, "registerCommand() requires a function as the third argument");
+        lua_error(L);
+        return 0;
+    }
+
+    if (std::string(cmdName).find(' ') != std::string::npos) {
+        lua_pushstring(L, "registerCommand() failed: Command name cannot contain spaces.");
         lua_error(L);
         return 0;
     }
@@ -87,14 +95,14 @@ static int registerCommand(lua_State* L) {
     }
 
     lua_pushstring(L, cmdName); // push key
-    lua_pushvalue(L, 2); // push copy of user function
+    lua_pushvalue(L, 3); // push copy of user function
     lua_settable(L, -3); // commandHandlers[cmdName] = function
 
     lua_pop(L, 1);
 
     auto commandPtr = std::make_shared<ModuleCommand>(
         cmdName,
-        std::string("Lua module command"),
+        cmdDescription,
         std::vector<std::string>{},
         std::weak_ptr(moduleScript->shared_from_this())
     );
