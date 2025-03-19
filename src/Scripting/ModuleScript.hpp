@@ -23,7 +23,7 @@ public:
         Listen(this, KeyEvent, &ModuleScript::onKey);
         Listen(this, MouseEvent, &ModuleScript::onMouse);
         Listen(this, PacketEvent, &ModuleScript::onPacketReceive);
-        Listen(this, PacketSendEvent, &ModuleScript::onPacketSent);
+        Listen(this, PacketSendEvent, &ModuleScript::onPacketSend);
         Listen(this, TickEvent, &ModuleScript::onTick);
         Listen(this, RenderEvent, &ModuleScript::onRender);
         Listen(this, SetupAndRenderEvent, &ModuleScript::onSetupAndRender);
@@ -38,7 +38,7 @@ public:
         Deafen(this, KeyEvent, &ModuleScript::onKey);
         Deafen(this, MouseEvent, &ModuleScript::onMouse);
         Deafen(this, PacketEvent, &ModuleScript::onPacketReceive);
-        Deafen(this, PacketSendEvent, &ModuleScript::onPacketSent);
+        Deafen(this, PacketSendEvent, &ModuleScript::onPacketSend);
         Deafen(this, TickEvent, &ModuleScript::onTick);
         Deafen(this, RenderEvent, &ModuleScript::onRender);
         Deafen(this, SetupAndRenderEvent, &ModuleScript::onSetupAndRender);
@@ -140,7 +140,7 @@ public:
     void onKey(KeyEvent& event);
     void onMouse(MouseEvent& event);
     void onPacketReceive(PacketEvent& event);
-    void onPacketSent(PacketSendEvent& event);
+    void onPacketSend(PacketSendEvent& event);
     void onTick(TickEvent& event);
     void onRender(RenderEvent& event);
     void onSetupAndRender(SetupAndRenderEvent& event);
