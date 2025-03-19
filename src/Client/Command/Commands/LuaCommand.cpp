@@ -5,29 +5,46 @@
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.Storage.h>
+#include <winrt/Windows.Web.Http.h>
 
 #include <Utils/WinrtUtils.hpp>
 #include <Scripting/ScriptManager.hpp>
 
-#include <shlobj.h>
 #include <string>
 
 #include <miniz/miniz.h>
 #include <Manager.hpp>
 
-#include "embedded.h"
+winrt::Windows::Foundation::IAsyncOperation<bool> extractAutoComplete() {
+    auto roamingFolder = winrt::Windows::Storage::ApplicationData::Current().RoamingFolder();
+    auto autoCompleteFolder = std::filesystem::path(to_string(roamingFolder.Path())) / "Flarial" / "Scripts" / "AutoComplete";
 
-bool extractAutoComplete(const std::filesystem::path& output) {
     try {
-        std::filesystem::path autoCompletePath = output / "AutoComplete";
-        if (exists(autoCompletePath)) {
-            remove_all(autoCompletePath);
+        winrt::Windows::Web::Http::HttpClient httpClient;
+        auto response = co_await httpClient.GetAsync(winrt::Windows::Foundation::Uri(L"https://github.com/flarialmc/scripting-wiki/archive/refs/heads/main.zip"));
+        if (response.StatusCode() != winrt::Windows::Web::Http::HttpStatusCode::Ok) {
+            Logger::error("Failed to download repository zip from GitHub");
+            co_return false;
         }
 
+        auto tempFile = co_await roamingFolder.CreateFileAsync(L"repo.zip", winrt::Windows::Storage::CreationCollisionOption::ReplaceExisting);
+        auto stream = co_await tempFile.OpenAsync(winrt::Windows::Storage::FileAccessMode::ReadWrite);
+        co_await response.Content().WriteToStreamAsync(stream);
+        stream.Close();
+
+        std::string tempFilePath = to_string(tempFile.Path());
+        std::string prefix = "scripting-wiki-main/autocomplete/";
+
+        if (exists(autoCompleteFolder)) {
+            remove_all(autoCompleteFolder);
+        }
+        create_directories(autoCompleteFolder);
+
         mz_zip_archive zipArchive = {};
-        if (!mz_zip_reader_init_mem(&zipArchive, autocomplete_zip, sizeof(autocomplete_zip), 0)) {
-            Logger::error("Failed to initialize zip archive");
-            return false;
+        if (!mz_zip_reader_init_file(&zipArchive, tempFilePath.c_str(), 0)) {
+            Logger::error("Failed to initialize zip archive from downloaded file");
+            co_await tempFile.DeleteAsync();
+            co_return false;
         }
 
         int fileCount = static_cast<int>(mz_zip_reader_get_num_files(&zipArchive));
@@ -37,25 +54,30 @@ bool extractAutoComplete(const std::filesystem::path& output) {
                 continue;
             }
 
-            std::filesystem::path filePath = output / fileStat.m_filename;
+            std::string fileName = fileStat.m_filename;
+            if (fileName.starts_with(prefix)) {
+                std::string relativePath = fileName.substr(prefix.length());
+                std::filesystem::path localPath = autoCompleteFolder / relativePath;
 
-            if (mz_zip_reader_is_file_a_directory(&zipArchive, i)) {
-                create_directories(filePath);
-            } else {
-                create_directories(filePath.parent_path());
-
-                if (!mz_zip_reader_extract_to_file(&zipArchive, i, filePath.string().c_str(), 0)) {
-                    Logger::error("Failed to extract the AutoComplete folder");
+                // If it's a directory, create it.
+                if (mz_zip_reader_is_file_a_directory(&zipArchive, i)) {
+                    create_directories(localPath);
+                } else {
+                    // Create the parent directory.
+                    create_directories(localPath.parent_path());
+                    if (!mz_zip_reader_extract_to_file(&zipArchive, i, localPath.string().c_str(), 0)) {
+                        Logger::error("Failed to extract file: {}", fileName);
+                    }
                 }
             }
         }
 
         mz_zip_reader_end(&zipArchive);
-        return true;
-    }
-    catch (const std::exception& e) {
+        co_await tempFile.DeleteAsync();
+        co_return true;
+    } catch (const std::exception& e) {
         Logger::error("Error extracting AutoComplete: {}", e.what());
-        return false;
+        co_return false;
     }
 }
 
@@ -106,7 +128,7 @@ winrt::Windows::Foundation::IAsyncAction importScript(std::string category) {
 
 void LuaCommand::execute(const std::vector<std::string>& args) {
     if (args.empty()) {
-        addCommandMessage("§cUsage: .lua <help/reload/path/import>");
+        addCommandMessage("§cUsage: .lua <help/reload/path/import/autocomplete>");
         return;
     }
 
@@ -116,7 +138,7 @@ void LuaCommand::execute(const std::vector<std::string>& args) {
         addCommandMessage("§bpath §8- §7Opens the script directory in File Explorer");
         addCommandMessage("§breload §8- §7Reloads all scripts");
         addCommandMessage("§bimport §8- §7Automatically imports scripts for you");
-        addCommandMessage("§bautocomplete §8- §7Extracts the latest AutoComplete docs");
+        addCommandMessage("§bautocomplete §8- §7Imports the latest AutoComplete docs");
     } else if (action == "path") {
         WinrtUtils::openSubFolder("Flarial\\Scripts");
     } else if (action == "reload") {
@@ -148,16 +170,26 @@ void LuaCommand::execute(const std::vector<std::string>& args) {
             return;
         }
 
-        if (extractAutoComplete(scriptsFolder)) {
-            addCommandMessage("§aImported the AutoComplete folder successfully.");
-            addCommandMessage("Press Win + R and paste to set up your Visual Studio Code workspace.");
+        [=]() -> winrt::fire_and_forget {
+            try {
+                bool success = co_await extractAutoComplete();
+                if (success) {
+                    Logger::success("Successfully imported AutoComplete.");
+                } else {
+                    Logger::error("Failed to import AutoComplete.");
+                }
+            } catch (const winrt::hresult_error& e) {
+                Logger::error("Winrt error in autocomplete: {}", to_string(e.message()));
+            } catch (const std::exception& e) {
+                Logger::error("Standard error in autocomplete: {}", e.what());
+            }
+        }();
 
-            std::string clipboardText = "code --install-extension \"sumneko.lua\" & code \"" + scriptsFolder.string() + "\"";
-            WinrtUtils::setClipboard(clipboardText);
-        } else {
-            addCommandMessage("§cFailed to import the AutoComplete folder.");
-        }
+        addCommandMessage("§aImported the AutoComplete folder successfully.");
+        addCommandMessage("Press Win + R and paste to set up your Visual Studio Code workspace.");
+        std::string clipboardText = "code --install-extension \"sumneko.lua\" & code \"" + scriptsFolder.string() + "\"";
+        WinrtUtils::setClipboard(clipboardText);
     } else {
-        addCommandMessage("§cUsage: .lua <help/reload/path/import>");
+        addCommandMessage("§cUsage: .lua <help/reload/path/import/autocomplete>");
     }
 }
