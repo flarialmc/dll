@@ -34,6 +34,7 @@ public:
             lua_pushnil(mState);
             lua_setglobal(mState, "eventHandlers");
             lua_close(mState);
+            mState = nullptr;
         }
     }
 
@@ -42,7 +43,7 @@ public:
         lua_setglobal(mState, functionName.c_str());
     }
 
-    std::mutex eventMutex;
+    std::recursive_mutex eventMutex;
     void registerEvent(const std::string& eventName);
 
     template <typename... Args>
