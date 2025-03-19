@@ -25,7 +25,7 @@ public:
         using namespace winrt::Windows::Storage;
 
         auto roamingFolder = Utils::getRoamingPath();
-        std::filesystem::path scriptsDir = std::filesystem::path(roamingFolder) / "Flarial" / "scripts";
+        std::filesystem::path scriptsDir = std::filesystem::path(roamingFolder) / "Flarial" / "Scripts";
 
         return scriptsDir.string();
     }

@@ -150,7 +150,7 @@ void LuaCommand::execute(const std::vector<std::string>& args) {
 
         if (extractAutoComplete(scriptsFolder)) {
             addCommandMessage("§aImported the AutoComplete folder successfully.");
-            addCommandMessage("Press Win + R and paste to set up your visual studio code workspace.");
+            addCommandMessage("Press Win + R and paste to set up your Visual Studio Code workspace.");
 
             std::string clipboardText = "code --install-extension \"sumneko.lua\" & code \"" + scriptsFolder.string() + "\"";
             WinrtUtils::setClipboard(clipboardText);
