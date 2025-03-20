@@ -25,8 +25,7 @@ void ModuleScript::onKey(KeyEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
 
     if (const auto& script = linkedScript.lock()) {
-        bool down = static_cast<int>(event.getAction()) == 1;
-        bool cancelled = script->registerCancellableEvent("KeyEvent", event.getKey(), down);
+        bool cancelled = script->registerCancellableEvent("KeyEvent", event.getKey(), static_cast<int>(event.getAction()));
         if (cancelled) event.cancel();
     }
 }

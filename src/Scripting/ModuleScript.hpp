@@ -121,7 +121,7 @@ public:
                             auto* keybindSet = dynamic_cast<KeybindSetting*>(settingPtr.get());
                             if (!keybindSet) return;
 
-                            this->addKeybind(keybindSet->name, keybindSet->description, keybindSet->keybind);
+                            this->addKeybind(keybindSet->name, keybindSet->description, keybindSet->value);
                             break;
                         }
                         default: {
@@ -134,7 +134,6 @@ public:
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
-        //i am hopeful
     }
 
     void onKey(KeyEvent& event);

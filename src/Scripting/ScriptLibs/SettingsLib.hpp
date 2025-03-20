@@ -20,7 +20,13 @@ public:
                 .addProperty("value", &TextBoxSetting::value)
             .endClass()
             .beginClass<KeybindSetting>("KeybindSetting")
-                .addProperty("value", &KeybindSetting::keybind)
+                .addProperty("value",
+                    [](const KeybindSetting* self) -> int {
+                        return Utils::stringToKey(self->value);
+                    },
+                    [](KeybindSetting* self, const int key) {
+                        self->value = Utils::keyToString(key);
+                    })
             .endClass();
 
         getGlobalNamespace(state)
