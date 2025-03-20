@@ -71,7 +71,7 @@ jobs:
       - name: Checkout newcdn repository
         uses: actions/checkout@v4
         with:
-          repository: 'TTF-fog/newcdn'
+          repository: 'flarialmc/newcdn'
           ref: 'main'
           token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
       - name: Download dll
@@ -88,7 +88,7 @@ jobs:
           tag_name: ${{ env.TAG_NAME}}
           body: ${{ github.event.head_commit.message }}
           name: "Nightly Release"
-          repository: TTF-fog/newcdn
+          repository: flarialmc/newcdn
           token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
         if: ${{ env.OUTPUT1 == 0 }}
         env:
