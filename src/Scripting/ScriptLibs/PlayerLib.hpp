@@ -28,7 +28,6 @@ public:
             return 3;
         }
 
-        // clion is stupid dont remove static cast pls u will crash 100%
         Vec3<float> pos = *player->getPosition();
         lua_pushnumber(L, static_cast<double>(pos.x));
         lua_pushnumber(L, static_cast<double>(pos.y));

@@ -20,6 +20,7 @@
 #include "ScriptLibs/ConstraintsLib.hpp"
 #include "ScriptLibs/AudioLib.hpp"
 #include "ScriptLibs/NetworkLib.hpp"
+#include "ScriptLibs/ServerLib.hpp"
 
 static int customPrint(lua_State* L) {
     int args = lua_gettop(L);
@@ -136,6 +137,7 @@ Script::Script(std::string filePath, std::string code)
     ScriptLib::registerLib<ConstraintsLib>(mState);
     ScriptLib::registerLib<AudioLib>(mState);
     ScriptLib::registerLib<NetworkLib>(mState);
+    ScriptLib::registerLib<ServerLib>(mState);
 }
 
 bool Script::compile() {
