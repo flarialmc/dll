@@ -16,7 +16,7 @@
 #include "ScriptLibs/GlobalsLib.hpp"
 #include "ScriptLibs/UtilLib.hpp"
 #include "ScriptLibs/ObjectsLib.hpp"
-#include "ScriptLibs/FlarialGUILib.hpp"
+#include "ScriptLibs/GUILib.hpp"
 #include "ScriptLibs/ConstraintsLib.hpp"
 #include "ScriptLibs/AudioLib.hpp"
 #include "ScriptLibs/NetworkLib.hpp"
@@ -132,7 +132,7 @@ Script::Script(std::string filePath, std::string code)
     ScriptLib::registerLib<GlobalsLib>(mState);
     ScriptLib::registerLib<UtilLib>(mState);
     ScriptLib::registerLib<ObjectsLib>(mState);
-    ScriptLib::registerLib<FlarialGUILib>(mState);
+    ScriptLib::registerLib<GUILib>(mState);
     ScriptLib::registerLib<ConstraintsLib>(mState);
     ScriptLib::registerLib<AudioLib>(mState);
     ScriptLib::registerLib<NetworkLib>(mState);
