@@ -91,7 +91,9 @@ void HookManager::initialize() {
     addHook<UIControl_updateCachedPositionHook>();
     addHook<GeneralSettingsScreenControllerCtorHook>();
 
-    addHook<ContainerScreenControllerHook>();
+    if (VersionUtils::checkAboveOrEqual(21, 40)) {
+        addHook<ContainerScreenControllerHook>();
+    }
 
     addHook<isPreGameHook>();
     addHook<_composeFullStackHook>();
@@ -101,7 +103,7 @@ void HookManager::initialize() {
 
     addHook<SettingsScreenOnExitHook>();
 
-    HookManager::addHook<ItemInHandRendererRenderItem>();
+    addHook<ItemInHandRendererRenderItem>();
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();
