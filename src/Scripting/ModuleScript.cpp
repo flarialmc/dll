@@ -1,5 +1,6 @@
 #include "ModuleScript.hpp"
 
+#include "ScriptUtils.hpp"
 #include "ScriptManager.hpp"
 #include <SDK/Client/Network/Packet/TextPacket.hpp>
 
@@ -23,6 +24,12 @@ void ModuleScript::onDisable() {
 
 void ModuleScript::onKey(KeyEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
+
+    if (static_cast<int>(event.getAction()) == 1) {
+        ScriptUtils::onKeyPressed(event.getKey());
+    } else if (static_cast<int>(event.getAction()) == 0) {
+        ScriptUtils::onKeyReleased(event.getKey());
+    }
 
     if (const auto& script = linkedScript.lock()) {
         bool cancelled = script->registerCancellableEvent("KeyEvent", event.getKey(), static_cast<int>(event.getAction()));

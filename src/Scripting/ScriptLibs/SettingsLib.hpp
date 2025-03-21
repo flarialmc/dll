@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ScriptLib.hpp"
+#include <Scripting/ScriptUtils.hpp>
 #include <Scripting/ScriptManager.hpp>
 #include <Scripting/ScriptSettings/ScriptSettingManager.hpp>
 
@@ -21,11 +22,12 @@ public:
             .endClass()
             .beginClass<KeybindSetting>("KeybindSetting")
                 .addProperty("value",
-                    [](const KeybindSetting* self) -> int {
-                        return Utils::stringToKey(self->value);
+                    [](const KeybindSetting* self) {
+                        int key = Utils::getStringAsKey(self->value);
+                        return ScriptUtils::isKeyDown(key);
                     },
-                    [](KeybindSetting* self, const int key) {
-                        self->value = Utils::keyToString(key);
+                    [](KeybindSetting* self, const std::string& key) {
+                        self->value = key;
                     })
             .endClass();
 

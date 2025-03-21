@@ -264,8 +264,6 @@ public:
     static std::string getLogsPath();
 
     static std::string getKeyAsString(int key, bool isCapital = false, bool isKeybind = true);
-    static std::string keyToString(int key);
-    static int stringToKey(const std::string& key);
 
     static int getStringAsKey(const std::string &str);
 

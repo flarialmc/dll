@@ -7,10 +7,6 @@
 #include <Client/Module/Modules/Module.hpp>
 #include <Client/Command/CommandManager.hpp>
 
-std::vector<std::shared_ptr<Script>> ScriptManager::mLoadedScripts;
-std::vector<std::shared_ptr<ModuleScript>> ScriptManager::mLoadedModules;
-std::vector<std::shared_ptr<CommandScript>> ScriptManager::mLoadedCommands;
-
 void ScriptManager::initialize() {
     const std::filesystem::path p(Utils::getClientPath() + "\\Scripts");
     const std::vector scriptPaths = {
