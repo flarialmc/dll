@@ -103,10 +103,8 @@ public:
     }
 
     void onContainerSlotHovered(ContainerSlotHoveredEvent &event) {
-        if (event.getCollectionName().find("_items") == std::string::npos) return;
         currentHoveredSlot = event.getHoveredSlot();
         currentCollectionName = event.getCollectionName();
-
     };
 
     void onContainerTick(ContainerScreenControllerTickEvent &event) {
@@ -120,9 +118,17 @@ public:
         for (moveRequests; !moveRequests.empty(); moveRequests.pop()) {
             auto request = moveRequests.front();
 
+            if (!canSwap(request.collectionName)) continue;
             controller->swap(request.collectionName, request.hoveredSlot, "hotbar_items", request.destSlot);
         }
     };
+
+    bool canSwap(std::string_view collectionName) {
+        bool isItemContainer = collectionName.find("_item") != std::string_view::npos;
+        bool isRecipeContainer = collectionName.find("recipe_") != std::string_view::npos;
+        bool isSearchContainerOrBar = collectionName.find("search") != std::string_view::npos;
+        return isItemContainer || (isRecipeContainer && !isSearchContainerOrBar);
+    }
 
     void clearQueue() {
         for (moveRequests; !moveRequests.empty(); moveRequests.pop()) {}

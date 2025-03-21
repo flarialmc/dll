@@ -332,12 +332,14 @@ std::vector<std::string> APIUtils::UpdateVector(
             if (clearedName.empty()) {
                 clearedName = String::removeColorCodes(name);
             }
-            result.push_back(clearedName);
+
+            if (std::find(result.begin(), result.end(), clearedName) == result.end()) {
+                result.push_back(clearedName);
+            }
         } catch (const std::exception& e) {
             Logger::error("Error processing local player name: {}", e.what());
         }
     }
-
 
     return result;
 }
