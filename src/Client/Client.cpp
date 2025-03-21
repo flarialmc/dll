@@ -215,6 +215,7 @@ void Client::initialize() {
     ADD_SETTING("disable_alias", false);
     ADD_SETTING("vsync", false);
     ADD_SETTING("promotions", true);
+    ADD_SETTING("apiusage", true);
     ADD_SETTING("donotwait", true);
     ADD_SETTING("bufferingmode", std::string("Double Buffering"));
     ADD_SETTING("swapeffect", std::string("FLIP_SEQUENTIAL"));

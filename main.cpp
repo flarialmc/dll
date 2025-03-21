@@ -94,7 +94,7 @@ DWORD WINAPI init() {
             }
         }
 
-        if (onlineUsersFetchElapsed >= std::chrono::minutes(3)) {
+        if (onlineUsersFetchElapsed >= std::chrono::minutes(3) && Client::settings.getSettingByName<bool>("apiusage")->value) {
             try {
                 std::string data = APIUtils::VectorToList(APIUtils::onlineUsers);
                 std::pair<long, std::string> post = APIUtils::POST_Simple("https://api.flarial.xyz/allOnlineUsers", data);
@@ -106,7 +106,7 @@ DWORD WINAPI init() {
             }
         }
 
-        if (vipFetchElapsed >= std::chrono::minutes(3)) {
+        if (vipFetchElapsed >= std::chrono::minutes(3) && Client::settings.getSettingByName<bool>("apiusage")->value) {
             try {
                 auto vipsJson = APIUtils::getVips();
                 std::map<std::string, std::string> updatedVips;
