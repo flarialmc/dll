@@ -6,7 +6,8 @@
 #include "ScriptLibs/ScriptLib.hpp"
 
 #include <Command/CommandManager.hpp>
-#include "ModuleCommandScript.hpp"
+
+#include "CommandScript.hpp"
 
 #include "ScriptLibs/FSLib.hpp"
 #include "ScriptLibs/SettingsLib.hpp"
@@ -56,37 +57,51 @@ static int customPrint(lua_State* L) {
 }
 
 static int registerCommand(lua_State* L) {
-    Module* mod = ScriptManager::getModuleByState(L);
-    if (!mod) {
-        lua_pushstring(L, "registerCommand() called, but could not find associated module!");
-        lua_error(L);
+    lua_getglobal(L, "_script_instance");
+    if (!lua_islightuserdata(L, -1)) {
+        luaL_error(L, "Script instance not found.");
+        return 0;
+    }
+    auto* script = static_cast<Script*>(lua_touserdata(L, -1));
+    lua_pop(L, 1);
+
+    int nargs = lua_gettop(L);
+    std::string name = luaL_checkstring(L, 1);
+    std::string description;
+    int funcIndex;
+
+    if (nargs == 2) {
+        // registerCommand(name, function)
+        if (!lua_isfunction(L, 2)) {
+            luaL_error(L, "Second argument must be a function.");
+            return 0;
+        }
+        funcIndex = 2;
+
+        lua_getglobal(L, "description");
+        if (lua_isstring(L, -1)) {
+            description = lua_tostring(L, -1);
+        }
+        lua_pop(L, 1);
+    } else if (nargs == 3) {
+        // registerCommand(name, description, function)
+        description = luaL_checkstring(L, 2);
+        if (!lua_isfunction(L, 3)) {
+            luaL_error(L, "Third argument must be a function.");
+            return 0;
+        }
+        funcIndex = 3;
+    } else {
+        luaL_error(L, "Invalid number of arguments for registerCommand().");
         return 0;
     }
 
-    auto moduleScript = dynamic_cast<ModuleScript*>(mod);
-    if (!moduleScript) {
-        lua_pushstring(L, "registerCommand() called on non-ModuleScript!");
-        lua_error(L);
+    if (name.find(' ') != std::string::npos) {
+        luaL_error(L, "Command name cannot contain spaces.");
         return 0;
     }
 
-    // Parse args
-    const char* cmdName = luaL_checkstring(L, 1);
-    const char* cmdDescription = luaL_checkstring(L, 2);
-
-    if (!lua_isfunction(L, 3)) {
-        lua_pushstring(L, "registerCommand() requires a function as the third argument");
-        lua_error(L);
-        return 0;
-    }
-
-    if (std::string(cmdName).find(' ') != std::string::npos) {
-        lua_pushstring(L, "registerCommand() failed: Command name cannot contain spaces.");
-        lua_error(L);
-        return 0;
-    }
-
-    // Store the function
+    // Store the function in commandHandlers
     lua_getglobal(L, "commandHandlers");
     if (!lua_istable(L, -1)) {
         lua_pop(L, 1);
@@ -95,20 +110,18 @@ static int registerCommand(lua_State* L) {
         lua_getglobal(L, "commandHandlers");
     }
 
-    lua_pushstring(L, cmdName); // push key
-    lua_pushvalue(L, 3); // push copy of user function
-    lua_settable(L, -3); // commandHandlers[cmdName] = function
-
+    lua_pushstring(L, name.c_str());
+    lua_pushvalue(L, funcIndex);
+    lua_settable(L, -3);
     lua_pop(L, 1);
 
-    auto commandPtr = std::make_shared<ModuleCommand>(
-        cmdName,
-        cmdDescription,
+    auto command = std::make_shared<CommandScript>(
+        name,
+        description,
         std::vector<std::string>{},
-        std::weak_ptr(moduleScript->shared_from_this())
+        script->shared_from_this()
     );
-
-    CommandManager::Commands.push_back(commandPtr);
+    CommandManager::Commands.push_back(command);
 
     return 0;
 }
@@ -118,6 +131,9 @@ Script::Script(std::string filePath, std::string code)
 
     mState = luaL_newstate();
     luaL_openlibs(mState);
+
+    lua_pushlightuserdata(mState, this);
+    lua_setglobal(mState, "_script_instance");
 
     lua_pushcfunction(mState, customPrint);
     lua_setglobal(mState, "print");

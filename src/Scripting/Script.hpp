@@ -12,7 +12,7 @@ SDK::clientInstance->getGuiData()->displayClientMessage(std::string("§3[§1Lua�
 } while(0)
 
 
-class Script {
+class Script : public std::enable_shared_from_this<Script> {
 public:
     Script(std::string filePath, std::string code);
 

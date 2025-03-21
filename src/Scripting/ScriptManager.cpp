@@ -87,7 +87,7 @@ void ScriptManager::loadCommandScripts() {
             code
         );
 
-        if (!script->compile()) return;
+        if (!script->compile()) continue;
 
         if (script->getName().find(' ') != std::string::npos) {
             Logger::error("Command script '{}' has a space", script->getName());
