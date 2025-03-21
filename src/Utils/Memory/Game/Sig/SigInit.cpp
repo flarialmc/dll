@@ -31,8 +31,6 @@ void SigInit::init2160() {
 
     ADD_SIG("ResourcePackManager::_composeFullStack_Patch", "0F 84 C7 01 00 00 0F 57 C0 0F 11 44 24 30"); // nop 6
 
-    ADD_SIG("BaseAttributeMap_getInstance", "E8 ? ? ? ? 4C 8B F8 48 89 45 ? 48 8B 56");
-
     ADD_SIG("ItemInHandRenderer::renderItem", "E8 ?? ?? ?? ?? 41 0F 11 76 ??");
 
     // vfunc index is inside of it, then inside of that last func call 3arg (container specific onHover will be ContainerScreenController::_onContainerSlotHovered
@@ -369,6 +367,8 @@ void SigInit::init2050() {
     ADD_SIG("Tessellator::vertexUV", "48 83 EC ? 80 B9 ? ? ? ? ? 0F 57 E4");
 
     ADD_SIG("HudCursorRenderer::render", "48 8B C4 48 89 58 20 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 E8 F9");
+
+    ADD_SIG("BaseAttributeMap_getInstance", "4C 8B C9 89 54 24 10 48 B9 B3 01 00 00 00 01 00 00 44 0F B6 C2 48 B8 25 23 22 84 E4 9C F2 CB 4C 33 C0 0F B6 44 24 11 4C 0F AF C1 4C 33 C0 0F B6 44 24 12 4C 0F AF C1 4C 33 C0 0F B6 44 24 13 4C 0F AF C1 4C 33 C0 4C 0F AF C1 49 8B 49 30 49 23 C8 4D 8B 41 08 48 C1 E1 04 49 03 49 18 48 8B 41 08 49 3B C0 74 1A 48 8B 09 3B 50 10 74 14 66 90 48 3B C1 74 0B 48 8B 40 08 3B 50 10 75 F2 EB 02 33 C0 48 85 C0 48 8D 15 ?? ?? ?? ??");
 }
 
 void SigInit::init2040() {
@@ -387,8 +387,6 @@ void SigInit::init2040() {
     ADD_SIG("ItemPositionConst", "F3 0F 59 05 ? ? ? ? F3 41 0F 58 87");
 
     ADD_SIG("HudMobEffectsRenderer::render", "48 89 5c 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8d ac 24 ? ? ? ? b8 ? ? ? ? e8 ? ? ? ? 48 2b e0 0f 29 b4 24 ? ? ? ? 0f 29 bc 24 ? ? ? ? 44 0f 29 84 24 ? ? ? ? 44 0f 29 8c 24 ? ? ? ? 44 0f 29 94 24 ? ? ? ? 44 0f 29 9c 24 ? ? ? ? 44 0f 29 a4 24 ? ? ? ? 44 0f 29 ac 24 ? ? ? ? 44 0f 29 b4 24 ? ? ? ? 44 0f 29 bc 24 ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 49 8b f1");
-
-    ADD_SIG("BaseAttributeMap_getInstance", "e8 ? ? ? ? 48 8d 54 24 ? f3 0f 10 b0");
 }
 
 void SigInit::init2030() {
