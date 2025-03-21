@@ -15,7 +15,9 @@ TexturePtr* TextureGroup_getTextureHook::TextureGroup_getTextureCallback(Texture
 
     auto retTexture = funcOriginal(_this, result, location, forceReload, a5, a6, a7);
 
-    auto event = nes::make_holder<GetTextureEvent>(location, retTexture->clientTexture.get());
+    BedrockTextureData* bypassRefIncrement = *(BedrockTextureData**)&retTexture->clientTexture;
+
+    auto event = nes::make_holder<GetTextureEvent>(location, bypassRefIncrement);
     eventMgr.trigger(event);
 
     return retTexture;
