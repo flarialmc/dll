@@ -64,14 +64,14 @@ void ScriptSettingManager::loadSettings(Script* script) {
                 if (!keyBindSetting) return;
 
                 if (module->settings.getSettingByName<std::string>(name) == nullptr) {
-                    module->settings.addSetting<std::string>(name, keyBindSetting->defaultKeybind);
+                    module->settings.addSetting<std::string>(name, keyBindSetting->defaultValue);
                 }
 
-                auto* textBoxValue = module->settings.getSettingByName<std::string>(name);
-                if (textBoxValue) {
-                    keyBindSetting->keybind = textBoxValue->value;
+                auto* keybindValue = module->settings.getSettingByName<std::string>(name);
+                if (keybindValue) {
+                    keyBindSetting->value = keybindValue->value;
                 } else {
-                    keyBindSetting->keybind = keyBindSetting->defaultKeybind;
+                    keyBindSetting->value = keyBindSetting->defaultValue;
                 }
                 break;
             }
@@ -115,7 +115,7 @@ void ScriptSettingManager::saveSettings(const Script* script) {
                 auto* keybindSetting = dynamic_cast<KeybindSetting*>(setting.get());
                 if (!keybindSetting) return;
 
-                module->settings.getSettingByName<std::string>(name)->value = keybindSetting->keybind;
+                module->settings.getSettingByName<std::string>(name)->value = keybindSetting->value;
                 break;
             }
             default: {

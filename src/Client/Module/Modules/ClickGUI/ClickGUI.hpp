@@ -139,11 +139,12 @@ public:
             }
         }
 
-        if (message[name.second - 2] == '§') name.second = name.second - 3;
+        if (name.second >= 2 && message[name.second - 2] == '§') name.second -= 3;
 
-        message.insert(name.second, prefix);
-
-        pkt->message = message;
+        if (name.second < message.size()) {
+            message.insert(name.second, prefix);
+            pkt->message = message;
+        }
     }
 
     ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {

@@ -117,8 +117,11 @@ void ClickGUI::onRender(RenderEvent &event) {
             fLARIALlOGO.a = o_colors_FlarialLogo;
 
             if (!Client::settings.getSettingByName<bool>("noicons")->value) {
-                if (this->settings.getSettingByName<bool>("custom_logo")->value) {
-                    FlarialGUI::image("Flarial\\assets\\custom-logo.png", D2D1::RectF(logoX, logoY, logoX + logoWidthButReal, logoY + logoWidthButReal));
+                if (this->settings.getSettingByName<bool>("custom_logo")->value && std::filesystem::exists(Utils::getRoamingPath() + "\\Flarial\\assets\\custom-logo.png")) {
+                    FlarialGUI::image("Flarial\\assets\\custom-logo.png",
+                                          D2D1::RectF(logoX, logoY, logoX + logoWidthButReal,
+                                                      logoY + logoWidthButReal));
+
                 } else {
                     FlarialGUI::image(IDR_WHITE_LOGO_PNG, D2D1::RectF(logoX, logoY, logoX + logoWidthButReal, logoY + logoWidthButReal), "PNG", true, FlarialGUI::D2DColorToImColor(fLARIALlOGO));
                 }
