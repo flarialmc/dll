@@ -27,6 +27,9 @@ public:
         Listen(this, TickEvent, &ModuleScript::onTick);
         Listen(this, RenderEvent, &ModuleScript::onRender);
         Listen(this, SetupAndRenderEvent, &ModuleScript::onSetupAndRender);
+        Listen(this, AttackEvent, &ModuleScript::onAttack);
+        Listen(this, FOVEvent, &ModuleScript::onFOV);
+        Listen(this, PerspectiveEvent, &ModuleScript::onPerspective);
     }
 
     void terminate() override {
@@ -42,6 +45,9 @@ public:
         Deafen(this, TickEvent, &ModuleScript::onTick);
         Deafen(this, RenderEvent, &ModuleScript::onRender);
         Deafen(this, SetupAndRenderEvent, &ModuleScript::onSetupAndRender);
+        Deafen(this, AttackEvent, &ModuleScript::onAttack);
+        Deafen(this, FOVEvent, &ModuleScript::onFOV);
+        Deafen(this, PerspectiveEvent, &ModuleScript::onPerspective);
         Module::terminate();
     }
 
@@ -143,4 +149,7 @@ public:
     void onTick(TickEvent& event);
     void onRender(RenderEvent& event);
     void onSetupAndRender(SetupAndRenderEvent& event);
+    void onAttack(AttackEvent& event);
+    void onFOV(FOVEvent& event);
+    void onPerspective(PerspectiveEvent& event);
 };

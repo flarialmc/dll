@@ -12,15 +12,6 @@
 #include <fmt/ranges.h>
 
 namespace Logger {
-    namespace Color {
-        fmt::color success();
-        fmt::color debug();
-        fmt::color info();
-        fmt::color warn();
-        fmt::color error();
-        fmt::color fatal();
-    }
-
     void writeToFile(const std::string& string);
     void initialize();
     void shutdown();
@@ -74,30 +65,38 @@ namespace Logger {
     }
 
     void success(const std::string& fmt, auto&& ... args) {
-        Logger::print(fg(Color::success()), "SUCCESS", fmt, args...);
+        Logger::print(fg(fmt::color::forest_green), "SUCCESS", fmt, args...);
     }
 
     void debug(const std::string& fmt, auto&& ... args) {
-        Logger::print(fg(Color::debug()), "DEBUG", fmt, args...);
+        Logger::print(fg(fmt::color::orchid), "DEBUG", fmt, args...);
     }
 
     void info(const std::string& fmt, auto&& ... args) {
-        Logger::print(fg(Color::info()), "INFO", fmt, args...);
+        Logger::print(fg(fmt::color::light_steel_blue), "INFO", fmt, args...);
     }
 
     void warn(const std::string& fmt, auto&& ... args) {
-        Logger::print(fg(Color::warn()), "WARN", fmt, args...);
+        Logger::print(fg(fmt::color::orange), "WARN", fmt, args...);
     }
 
     void error(const std::string& fmt, auto&& ... args) {
-        Logger::print(fg(Color::error()), "ERROR", fmt, args...);
+        Logger::print(fg(fmt::color::crimson), "ERROR", fmt, args...);
     }
 
     void fatal(const std::string& fmt, auto&& ... args) {
-        Logger::print(fg(Color::fatal()), "FATAL", fmt, args...);
+        Logger::print(fg(fmt::color::rebecca_purple), "FATAL", fmt, args...);
     }
 
     void custom(const fmt::text_style& ts, const std::string& level, const std::string& fmt, auto&& ... args) {
         Logger::print(ts, level, fmt, args...);
+    }
+
+    void script(const bool error, const std::string& fmt, auto&& ... args) {
+        if (!error) {
+            Logger::print(fg(fmt::color::aqua), "SCRIPT", fmt, args...);
+        } else {
+            Logger::print(fg(fmt::color::crimson), "SCRIPT ERROR", fmt, args...);
+        }
     }
 };

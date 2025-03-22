@@ -3,6 +3,7 @@
 #include "ScriptUtils.hpp"
 #include "ScriptManager.hpp"
 #include <SDK/Client/Network/Packet/TextPacket.hpp>
+#include <SDK/Client/Network/Packet/SetTitlePacket.hpp>
 
 void ModuleScript::onEnable() {
     if (const auto& script = linkedScript.lock()) {
@@ -51,16 +52,47 @@ void ModuleScript::onPacketReceive(PacketEvent &event) {
 
     if (const auto& script = linkedScript.lock()) {
         bool cancel = false;
+        auto id = event.getPacket()->getId();
 
-        if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
-            const auto *pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-            if (pkt) {
-                std::string msg = pkt->message;
-                std::string name = pkt->name;
-                auto type = pkt->type;
+        if (id == MinecraftPacketIds::Text) {
+            const auto* tp = reinterpret_cast<TextPacket*>(event.getPacket());
+            if (tp) {
+                std::string msg = tp->message;
+                std::string name = tp->name;
+                int type = static_cast<int>(tp->type);
 
-                bool ChatReceiveEvent = script->registerCancellableEvent("ChatReceiveEvent", msg, name, static_cast<int>(type));
+                bool ChatReceiveEvent = script->registerCancellableEvent("ChatReceiveEvent", msg, name, type);
                 if (ChatReceiveEvent) cancel = true;
+            }
+        }
+        if (id == MinecraftPacketIds::ChangeDimension) {
+            bool ChangeDimensionEvent = script->registerCancellableEvent("ChangeDimensionEvent");
+            if (ChangeDimensionEvent) cancel = true;
+        }
+        if (id == MinecraftPacketIds::Login) {
+            bool LoginEvent = script->registerCancellableEvent("LoginEvent");
+            if (LoginEvent) cancel = true;
+        }
+        if (id == MinecraftPacketIds::Disconnect) {
+            bool DisconnectEvent = script->registerCancellableEvent("DisconnectEvent");
+            if (DisconnectEvent) cancel = true;
+        }
+        if (id == MinecraftPacketIds::ContainerOpen) {
+            bool ContainerOpenEvent = script->registerCancellableEvent("ContainerOpenEvent");
+            if (ContainerOpenEvent) cancel = true;
+        }
+        if (id == MinecraftPacketIds::ContainerClose) {
+            bool ContainerCloseEvent = script->registerCancellableEvent("ContainerCloseEvent");
+            if (ContainerCloseEvent) cancel = true;
+        }
+        if (id == MinecraftPacketIds::SetTitle) {
+            const auto* stp = reinterpret_cast<SetTitlePacket*>(event.getPacket());
+            if (stp) {
+                std::string text = stp->text;
+                int type = stp->type;
+
+                bool SetTitleEvent = script->registerCancellableEvent("SetTitleEvent", text, type);
+                if (SetTitleEvent) cancel = true;
             }
         }
         if (cancel) event.cancel();
@@ -109,5 +141,29 @@ void ModuleScript::onSetupAndRender(SetupAndRenderEvent& event) {
 
     if (const auto& script = linkedScript.lock()) {
         script->registerEvent("SetupAndRenderEvent");
+    }
+}
+
+void ModuleScript::onAttack(AttackEvent& event) {
+    if (!isEnabled() || !ScriptManager::initialized) return;
+
+    if (const auto& script = linkedScript.lock()) {
+        script->registerEvent("AttackEvent");
+    }
+}
+
+void ModuleScript::onFOV(FOVEvent& event) {
+    if (!isEnabled() || !ScriptManager::initialized) return;
+
+    if (const auto& script = linkedScript.lock()) {
+        script->registerEvent("FOVEvent", event.getFOV());
+    }
+}
+
+void ModuleScript::onPerspective(PerspectiveEvent& event) {
+    if (!isEnabled() || !ScriptManager::initialized) return;
+
+    if (const auto& script = linkedScript.lock()) {
+        script->registerEvent("PerspectiveEvent", static_cast<int>(event.getPerspective()));
     }
 }

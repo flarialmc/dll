@@ -143,7 +143,6 @@ void LuaCommand::execute(const std::vector<std::string>& args) {
         WinrtUtils::openSubFolder("Flarial\\Scripts");
     } else if (action == "reload") {
         ScriptManager::reloadScripts();
-        addCommandMessage("§aReloaded scripts!");
     } else if (action == "import") {
         if (args.size() < 2) {
             addCommandMessage("§cUsage: .lua import <module/command>");
@@ -170,17 +169,22 @@ void LuaCommand::execute(const std::vector<std::string>& args) {
             return;
         }
 
-        [=]() -> winrt::fire_and_forget {
+        std::weak_ptr weakSelf = shared_from_this();
+
+        [weakSelf]() -> winrt::fire_and_forget {
+            auto self = weakSelf.lock();
+            if (!self) co_return;  // The object was destroyed
+
             bool success = co_await extractAutoComplete();
             if (success) {
-                Logger::success("Successfully imported AutoComplete.");
+                self->addCommandMessage("§aImported the AutoComplete folder successfully.");
+                self->addCommandMessage("Press Win + R and paste to set up your Visual Studio Code workspace.");
             } else {
-                Logger::error("Failed to import AutoComplete.");
+                self->addCommandMessage("§cFailed to import AutoComplete.");
+                self->addCommandMessage("§o§7Send your logs to the nearest developer!");
             }
         }();
 
-        addCommandMessage("§aImported the AutoComplete folder successfully.");
-        addCommandMessage("Press Win + R and paste to set up your Visual Studio Code workspace.");
         std::string clipboardText = "code --install-extension \"sumneko.lua\" & code \"" + scriptsFolder.string() + "\"";
         WinrtUtils::setClipboard(clipboardText);
     } else {

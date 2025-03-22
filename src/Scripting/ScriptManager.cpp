@@ -64,7 +64,7 @@ void ScriptManager::loadModuleScripts() {
         mLoadedModules.emplace_back(mod);
         mod->defaultConfig();
         ModuleManager::cguiRefresh = true;
-        Logger::info("Loaded module script '{}'", script->getName());
+        Logger::script(false, "Loaded module script '{}'", script->getName());
 
         executeFunction(script->getState(), "onLoad");
     }
@@ -87,7 +87,7 @@ void ScriptManager::loadCommandScripts() {
         if (!script->compile()) continue;
 
         if (script->getName().find(' ') != std::string::npos) {
-            Logger::error("Command script '{}' has a space", script->getName());
+            Logger::script(true, "Command script '{}' has a space", script->getName());
             continue;
         }
 
@@ -110,7 +110,7 @@ void ScriptManager::loadCommandScripts() {
         bool hasSpace = false;
         for (const auto& alias : aliases) {
             if (alias.find(' ') != std::string::npos) {
-                Logger::error("Command script '{}' has an alias containing a space: '{}'", script->getName(), alias);
+                Logger::script(true, "Command script '{}' has an alias containing a space: '{}'", script->getName(), alias);
                 hasSpace = true;
                 break;
             }
@@ -129,7 +129,7 @@ void ScriptManager::loadCommandScripts() {
         mLoadedScripts.push_back(script);
         mLoadedCommands.emplace_back(command);
         CommandManager::Commands.push_back(command);
-        Logger::info("Loaded command script '{}'", script->getName());
+        Logger::script(false, "Loaded command script '{}'", script->getName());
 
         executeFunction(script->getState(), "onLoad");
     }
