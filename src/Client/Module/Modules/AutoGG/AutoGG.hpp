@@ -59,8 +59,10 @@ public:
             static const std::regex rgxChRu(R"(Is The §6§l(Chronos|Rush) (Champion|Champions)!)");
             if (
                 //Zeqa
-                pkt->text == "§f§aYou won the game!" ||
-                pkt->text == "§f§cYou lost the game!" ||
+                pkt->text == "§f§aYou won the game!" || //pre s8
+                pkt->text == "§f§cYou lost the game!" || //pre s8
+                pkt->text == "   " || //s8
+                pkt->text == "   " || //s8
                 //Galaxite CREDIT @1unar-Eclipse
                 pkt->text.find("Team§r§a won the game!")!= std::string::npos ||
                 pkt->text.find("§bHiders§r§f Win")!= std::string::npos ||
