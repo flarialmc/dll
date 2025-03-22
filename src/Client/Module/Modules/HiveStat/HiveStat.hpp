@@ -227,6 +227,7 @@ public:
             ImGui::TableHeadersRow();
 
             for (const auto &pair: SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
+                if (pair.second.name.empty()) continue;
                 std::string name = String::removeNonAlphanumeric(String::removeColorCodes(pair.second.name));
 
                 auto it = std::find_if(playerStatsList.begin(), playerStatsList.end(),
