@@ -25,13 +25,20 @@ class BaseActorRendererRenderTextHook : public Hook {
         if (MaterialUtils::getUITextured() == nullptr)
             MaterialUtils::update();
 
-        static std::map<std::string, std::string> roleLogos = {
-                {"Regular", "red-logo.png"},
+        /*static std::map<std::string, std::string> roleLogos = {
                 {"Dev", "dev-logo.png"},
                 {"Staff", "white-logo.png"},
                 {"Gamer", "gamer-logo.png"},
-                {"Booster", "booster-logo.png"}
-        };
+                {"Booster", "booster-logo.png"},
+                {"Regular", "red-logo.png"}
+        };*/
+        static std::vector<std::pair<std::string, std::string>> roleLogos = {
+				{"Dev", "dev-logo.png"},
+				{"Staff", "white-logo.png"},
+				{"Gamer", "gamer-logo.png"},
+				{"Booster", "booster-logo.png"},
+				{"Regular", "red-logo.png"}
+		};
 
         static std::map<std::string, TexturePtr> roleLogoTextures{};
 
