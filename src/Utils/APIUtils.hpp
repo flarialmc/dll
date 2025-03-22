@@ -12,6 +12,8 @@ class APIUtils {
   static std::pair<long, std::string> POST(const std::string &url, const std::string &postData, const std::string &contentType = "application/x-www-form-urlencoded", const std::vector<std::string> &
                                                    additionalHeaders = {});
 
+  static std::pair<long, std::string> Request(const std::string& url, const std::string& method, const std::string& data = "", struct curl_slist* headers = nullptr);
+
   static std::string legacyGet(const std::string &URL);
 
   static std::string get(const std::string& link);

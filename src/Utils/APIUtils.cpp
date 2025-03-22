@@ -1,4 +1,4 @@
-#include "APIUtils.hpp"
+﻿#include "APIUtils.hpp"
 
 #include <wininet.h>
 #include <Utils/Utils.hpp>
@@ -18,6 +18,81 @@ size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* out
     size_t totalSize = size * nmemb;
     output->append(static_cast<char*>(contents), totalSize);
     return totalSize;
+}
+
+std::pair<long, std::string> APIUtils::Request(
+    const std::string& url,
+    const std::string& method,
+    const std::string& data,
+    struct curl_slist* headers
+) {
+    long responseCode = 0;
+    std::string responseBody;
+
+    static bool curlInitialized = false;
+    if (!curlInitialized) {
+        if (curl_global_init(CURL_GLOBAL_DEFAULT) != CURLE_OK) {
+            std::cerr << "[❌] curl_global_init failed!\n";
+            return { 0, "" };
+        }
+        curlInitialized = true;
+    }
+
+    CURL* curl = curl_easy_init();
+    if (!curl) {
+        std::cout << "[❌] curl_easy_init failed!\n";
+        return { 0, "" };
+    }
+
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "Samsung Smart Fridge");
+    curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "gzip");
+
+    // Ensure headers are initialized
+    if (!headers) {
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+    }
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseBody);
+
+    if (method == "GET") {
+        // No need for CURLOPT_CUSTOMREQUEST, GET is default
+    }
+    else if (method == "POST") {
+        curl_easy_setopt(curl, CURLOPT_POST, 1L);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
+    }
+    else if (method == "PUT") {
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
+    }
+    else if (method == "DELETE") {
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+    }
+    else {
+        std::cout << "[❌] Invalid HTTP method: " << method << "\n";
+        curl_easy_cleanup(curl);
+        return { 0, "" };
+    }
+
+    CURLcode res = curl_easy_perform(curl);
+    if (res != CURLE_OK) {
+        std::cout << "[❌] cURL request failed: " << curl_easy_strerror(res) << "\n";
+        responseBody = "[ERROR] cURL failed";
+    }
+    else {
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
+    }
+
+    // Free headers only if they were newly created inside this function
+    if (headers) {
+        curl_slist_free_all(headers);
+    }
+
+    curl_easy_cleanup(curl);
+    return { responseCode, responseBody };
 }
 
 std::pair<long, std::string> APIUtils::POST_Simple(const std::string& url, const std::string& postData) {
@@ -63,8 +138,6 @@ std::pair<long, std::string> APIUtils::POST_Simple(const std::string& url, const
 
     return {responseCode, responseBody};
 }
-
-
 
 std::string APIUtils::legacyGet(const std::string &URL) {
     try {
