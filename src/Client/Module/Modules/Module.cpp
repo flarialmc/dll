@@ -495,6 +495,7 @@ void Module::loadSettings() {
 
     totalKeybinds = 0;
     totalWaypoints = 0;
+    totalmaps = 0;
 
     for (const auto& settingPair : settings.settings) {
         const std::string& name = settingPair.first;
@@ -502,6 +503,9 @@ void Module::loadSettings() {
             ++totalKeybinds;
         } else if (name.find("waypoint") != std::string::npos) {
             ++totalWaypoints;
+        }
+        else if (name.find("map-") != std::string::npos) {
+            ++totalmaps;
         }
     }
 }

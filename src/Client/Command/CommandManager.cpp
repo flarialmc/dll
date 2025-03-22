@@ -10,6 +10,7 @@
 #include "Commands/EjectCommand.hpp"
 #include "Commands/TestCommand.hpp"
 #include "Commands/SkinStealCommand.hpp"
+#include "Commands/SpotifyCommand/SpotifyCommand.hpp"
 
 std::vector<std::shared_ptr<Command>> CommandManager::Commands = std::vector<std::shared_ptr<Command>>();
 CommandManager CommandManager::instance;
@@ -27,6 +28,7 @@ void CommandManager::initialize() {
     Commands.push_back(std::make_unique<EjectCommand>());
     Commands.push_back(std::make_unique<SkinStealCommand>());
     Commands.push_back(std::make_unique<ConfigCommand>());
+    Commands.push_back(std::make_unique<SpotifyCommand>());
 Listen(&CommandManager::instance, PacketSendEvent, &CommandManager::onPacket);
 }
 
