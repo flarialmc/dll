@@ -79,11 +79,11 @@ public:
                     auto* setting = gScriptSettingManager.addTextBox(script, name, desc, defaultValue, limit);
                     return setting;
                 })
-                .addFunction("addKeybind", [state](const std::string& name, const std::string& desc, const std::string& defaultKey) -> KeybindSetting* {
+                .addFunction("addKeybind", [state](const std::string& name, const std::string& desc) -> KeybindSetting* {
                     auto* script = ScriptManager::getScriptByState(state);
                     if (!script) return nullptr;
 
-                    auto* setting = gScriptSettingManager.addKeybind(script, name, desc, defaultKey);
+                    auto* setting = gScriptSettingManager.addKeybind(script, name, desc, "");
                     return setting;
                 })
             .endNamespace();

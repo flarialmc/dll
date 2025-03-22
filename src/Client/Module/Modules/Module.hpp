@@ -37,13 +37,12 @@ public:
         description = edescription;
         icon = eicon;
         defaultKeybind = ekey;
+        isScriptingModule = isScripting;
         settings = Settings();
-        settingspath = fmt::format("{}\\{}.flarial", Utils::getConfigsPath(), name);
+        settingspath = isScripting ? Utils::getClientPath() + "\\Scripts\\Configs\\" + name + ".flarial" : Utils::getConfigsPath() + "\\" + name + ".flarial";
 
         checkSettingsFile();
         loadSettings();
-
-        isScriptingModule = isScripting;
     }
 
     bool active = false;
@@ -112,5 +111,5 @@ public:
     static bool isKeyPartOfAdditionalKeybind(int keyCode, const std::string& bind);
     virtual void normalRender(int index, std::string& value);
     void checkForRightClickAndOpenSettings(float x, float y, float width, float height);
-    bool isScripting() { return isScriptingModule; }
+    bool isScripting() const { return isScriptingModule; }
 };

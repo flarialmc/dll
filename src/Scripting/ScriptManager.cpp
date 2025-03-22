@@ -9,15 +9,16 @@
 
 void ScriptManager::initialize() {
     const std::filesystem::path p(Utils::getClientPath() + "\\Scripts");
-    const std::vector scriptPaths = {
+    const std::vector paths = {
     p / "Modules",
     p / "Commands",
+    p / "Configs",
     p / "Data"
     };
 
-    for (const auto& scriptPath : scriptPaths) {
-        if (!exists(scriptPath)) {
-            create_directory(scriptPath);
+    for (const auto& path : paths) {
+        if (!exists(path)) {
+            create_directory(path);
         }
     }
 
