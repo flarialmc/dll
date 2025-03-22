@@ -215,6 +215,7 @@ void Client::initialize() {
     ADD_SETTING("disable_alias", false);
     ADD_SETTING("vsync", false);
     ADD_SETTING("promotions", true);
+    ADD_SETTING("apiusage", true);
     ADD_SETTING("donotwait", true);
     ADD_SETTING("bufferingmode", std::string("Double Buffering"));
     ADD_SETTING("swapeffect", std::string("FLIP_SEQUENTIAL"));
@@ -248,6 +249,7 @@ void Client::initialize() {
     FlarialGUI::ExtractImageResource(IDR_CYAN_LOGO_PNG, "dev-logo.png", "PNG");
     FlarialGUI::ExtractImageResource(IDR_GAMER_LOGO_PNG, "gamer-logo.png", "PNG");
     FlarialGUI::ExtractImageResource(IDR_BOOSTER_LOGO_PNG, "booster-logo.png", "PNG");
+    FlarialGUI::ExtractImageResource(IDR_WHITE_LOGO_PNG, "white-logo.png", "PNG");
 
     FlarialGUI::LoadFont(IDR_FONT_TTF);
 

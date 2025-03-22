@@ -5,7 +5,7 @@
 #include <Utils/Memory/Memory.hpp>
 #include <SDK/SDK.hpp>
 
-Item *ContainerScreenController::getContainerItem(std::string name, int slot) {
+Item *ContainerScreenController::getContainerItem(ContainerEnum type, int slot) {
     auto lp = SDK::clientInstance->getLocalPlayer();
     if(!lp) return nullptr;
 
@@ -15,11 +15,9 @@ Item *ContainerScreenController::getContainerItem(std::string name, int slot) {
     // src is where the item is
     bool srcAsDest = false;
 
-    auto container = getContainerType(name);
+    if(type == ContainerEnum::OTHER) return nullptr;
 
-    if(container == ContainerEnum::OTHER) return nullptr;
-
-    auto startSlot = container == ContainerEnum::HOTBAR ? 0 : 9;
+    auto startSlot = type == ContainerEnum::HOTBAR ? 0 : 9;
 
     auto itemStack = inventory->getItem(startSlot + slot);
 
@@ -46,10 +44,13 @@ void ContainerScreenController::_handleTakeAll(std::string collectionName, int32
 
 void ContainerScreenController::swap(std::string srcCollectionName, int32_t srcSlot, std::string dstCollectionName, int32_t dstSlot) {
 
-        auto srcItem = getContainerItem(srcCollectionName, srcSlot);
-        auto dstItem = getContainerItem(dstCollectionName, dstSlot);
+        auto srcContainerType = getContainerType(srcCollectionName);
+        auto dstContainerType = getContainerType(dstCollectionName);
 
-        if(!srcItem && dstItem) {
+        auto srcItem = getContainerItem(srcContainerType, srcSlot);
+        auto dstItem = getContainerItem(dstContainerType, dstSlot);
+
+        if((!srcItem && srcContainerType != ContainerEnum::OTHER) && dstItem) {
             _handleTakeAll(dstCollectionName, dstSlot);
             _handlePlaceAll(srcCollectionName, srcSlot);
             _handlePlaceAll(dstCollectionName, dstSlot);

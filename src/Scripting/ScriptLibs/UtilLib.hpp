@@ -12,9 +12,9 @@ public:
 
         getGlobalNamespace(state)
             .beginNamespace("util")
-                .addFunction("keyToString", [](double key, bool isCapital, bool isKeybind) -> std::string {
+                .addFunction("keyToString", [](double key) {
                     int intKey = static_cast<int>(std::floor(key));
-                    return Utils::getKeyAsString(intKey, isCapital, isKeybind);
+                    return Utils::getKeyAsString(intKey);
                 })
                 .addFunction("setClipboard", [](const std::string& text) {
                     WinrtUtils::setClipboard(text);

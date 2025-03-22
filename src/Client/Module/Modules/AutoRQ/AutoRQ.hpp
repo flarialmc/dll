@@ -27,8 +27,8 @@ public:
     }
 
     void defaultConfig() override { Module::defaultConfig();
-        if (settings.getSettingByName<std::string>("command") == nullptr)
-            settings.addSetting("command", (std::string)"");
+        if (settings.getSettingByName<std::string>("map") == nullptr)
+            settings.addSetting("map", (std::string)"");
         if (settings.getSettingByName<bool>("ReQ") == nullptr)
             settings.addSetting("ReQ", true);
         if (settings.getSettingByName<bool>("solo") == nullptr)
@@ -53,8 +53,6 @@ public:
             settings.addSetting("runner", false);
         if (settings.getSettingByName<bool>("AutoMapAvoider") == nullptr)
             settings.addSetting("AutoMapAvoider", false);
-        if (settings.getSettingByName<std::string>("text") == nullptr)
-            settings.addSetting("text", (std::string) "Input maps, like this");
         if (settings.getSettingByName<bool>("replace") == nullptr)
             settings.addSetting("replace", true);
         if (settings.getSettingByName<bool>("copyCS") == nullptr)
@@ -96,8 +94,40 @@ public:
 
         this->addHeader("Auto Re Q");
         this->addToggle("Auto re-queue ", "Find a new game when the current game is over", this->settings.getSettingByName<bool>("ReQ")->value);
-        this->addToggle("Solo mode ", "Re-Q when you finish a game or die and can't respawn.\nRecomended to disable if you are in a party.", this->settings.getSettingByName<bool>("solo")->value);
+        this->addToggle("Solo mode ", "Re-Q when you finish a game or die and can't respawn.\nNot recomended while in a party.", this->settings.getSettingByName<bool>("solo")->value);
         this->addToggle("Team Elimination", "Re-Q when the team your on is fully ELIMINATED.", this->settings.getSettingByName<bool>("eliminated")->value);
+
+        this->addHeader("Map avoider");
+
+        this->addToggle("Map Avoider", "Automatically finds you a new game when a specific map has won the vote", this->settings.getSettingByName<bool>("AutoMapAvoider")->value);
+        // this->addTextBox("Maps", " Input one or more maps using comma's.", settings.getSettingByName<std::string>("text")->value, 100);
+        this->addButton("Add Map", "Add a map you want to avoid.", "Add Map", [this] {
+
+            // std::string keybindName = "keybind-" + FlarialGUI::cached_to_string(totalKeybinds);
+            std::string commandName = "map-" + FlarialGUI::cached_to_string(totalmaps);
+
+            // this->settings.addSetting(keybindName, (std::string)"");
+            this->settings.addSetting(commandName, (std::string)"");
+
+
+            int i = totalmaps;
+
+            this->saveSettings();
+            FlarialGUI::Notify("New textbox created, input a map to avoid!");
+            totalmaps++;
+        });
+
+        for (int i = 0; i < totalmaps; ++i) {
+            std::string commandSettingName = "map-" + FlarialGUI::cached_to_string(i);
+
+            if (settings.getSettingByName<std::string>(commandSettingName) != nullptr) {
+                this->addTextBox(
+                    "Map " + FlarialGUI::cached_to_string(i),
+                    "Input a map you would like to avoid.",
+                    settings.getSettingByName<std::string>(commandSettingName)->value
+                );
+            }
+        }
 
         this->addHeader("Role Avoider");
 
@@ -114,14 +144,9 @@ public:
         this->addToggle("Death", "re q when you get death", this->settings.getSettingByName<bool>("death")->value);
         this->addToggle("Runner", "re q when you get runner", this->settings.getSettingByName<bool>("runner")->value);
 
-        this->addHeader("Map avoider");
-
-        this->addToggle("Avoid", "", this->settings.getSettingByName<bool>("AutoMapAvoider")->value);
-        this->addTextBox("Maps", "Avoid Maps (Hive). Input one or more maps using comma's.", settings.getSettingByName<std::string>("text")->value, 100);
-
         this->addHeader("Copy Custom Server code");
-        this->addToggle("Copy CS code Keybind", "When setting, hold the new bind for 2 seconds", this->settings.getSettingByName<bool>("copyCS")->value);
-        this->addToggle("Include command", "Include /cs", this->settings.getSettingByName<bool>("includecommand")->value);
+        this->addToggle("Copy CS code", "Automatically copy custom server code to your clipboard", this->settings.getSettingByName<bool>("copyCS")->value);
+        this->addToggle("Include command", "Include /cs when copying custom server code", this->settings.getSettingByName<bool>("includecommand")->value);
 
         this->addHeader("Debloat chat");
         this->addToggle("Promo message", "Removes all promo/info messages starting with [!]", this->settings.getSettingByName<bool>("promomessage")->value);
@@ -137,13 +162,6 @@ public:
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
-    }
-
-
-    inline void ltrim(std::string &s) {
-        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
-            return !std::isspace(ch);
-        }));
     }
 
 
@@ -269,28 +287,28 @@ public:
                 }
             }
             if (this->settings.getSettingByName<bool>("AutoMapAvoider")->value) {
-                std::string maps_to_avoid = this->settings.getSettingByName<std::string>("text")->value;
-                std::stringstream ss(maps_to_avoid);
-                std::string fixed_value = "§b§l» §r§e";
-                std::vector<int> vect;
-                std::vector<std::string> result;
-                if (pkt->message.substr(0, 15) == fixed_value) {
-                    while (ss.good()) {
-                        std::string substr;
-                        getline(ss, substr, ',');
-                        ltrim(substr);
-                        result.push_back(substr);
-                    }
+                for (int i = 0; i < totalmaps; ++i)
+                {
+                    std::string count;
+                    /*if (i > 0) */count = "-" + FlarialGUI::cached_to_string(i);
 
-                    for (std::size_t i = 0; i < result.size(); i++) {
-                        std::string evaluate_string = fixed_value + result[i];
-                        std::transform(evaluate_string.begin(), evaluate_string.end(), evaluate_string.begin(),
-                                       ::tolower);
-                        std::transform(pkt->message.begin(), pkt->message.end(), pkt->message.begin(), ::tolower);
-                        if (pkt->message.substr(0, (evaluate_string.length())) == evaluate_string) {
-                            reQ();
-                            FlarialGUI::Notify("Found map: " + result[i]);
-                        }
+                    std::string map = this->settings.getSettingByName<std::string>("map" + count)->value;
+                    std::transform(map.begin(), map.end(), map.begin(), [](unsigned char c) {
+                        return std::tolower(c);
+                    });
+                    if (map.empty()) continue;
+
+                    std::string message =  pkt->message;
+                    std::transform(message.begin(), message.end(), message.begin(), [](unsigned char c) {
+                        return std::tolower(c);
+                    });
+
+                    if (message.find("§b§l» §r§e" + map)!= std::string::npos)
+                    {
+                        FlarialGUI::Notify("Found Map: " + map);
+                        ImGui::SetClipboardText(pkt->message.c_str());
+                        reQ();
+                        return;
                     }
                 }
             }

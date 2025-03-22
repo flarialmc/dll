@@ -30,9 +30,9 @@ public:
     void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<float>("itemfov") == nullptr) settings.addSetting("itemfov", 70.0f);
 
-        if (settings.getSettingByName<float>("posx") == nullptr) settings.addSetting("posx", 6.0f);
-        if (settings.getSettingByName<float>("posy") == nullptr) settings.addSetting("posy", 6.0f);
-        if (settings.getSettingByName<float>("posz") == nullptr) settings.addSetting("posz", 6.0f);
+        if (settings.getSettingByName<float>("posx") == nullptr) settings.addSetting("posx", 4.0f);
+        if (settings.getSettingByName<float>("posy") == nullptr) settings.addSetting("posy", 4.0f);
+        if (settings.getSettingByName<float>("posz") == nullptr) settings.addSetting("posz", 4.0f);
 
         if (settings.getSettingByName<float>("rotangle") == nullptr) settings.addSetting("rotangle", 0.0f);
 

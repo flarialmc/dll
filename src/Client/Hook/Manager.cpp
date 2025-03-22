@@ -28,6 +28,7 @@
 #include "Hooks/Render/UIControl_updateCachedPositionHook.hpp"
 #include "Hooks/Render/HudCursorRenderer.hpp"
 #include "Hooks/Render/GeneralSettingsScreenControllerCtorHook.hpp"
+#include "Hooks/Render/TickingTextureStageRenderHook.hpp"
 //#include "Hooks/Game/RenderItemGroup.hpp"
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 #include "Hooks/Game/ItemInHandRendererRenderItem.hpp"
@@ -84,11 +85,15 @@ void HookManager::initialize() {
     if(VersionUtils::checkAboveOrEqual(20, 60)) { // due to texture group offset
         addHook<HudCursorRendererHook>();
         addHook<BaseActorRendererRenderTextHook>();
+
+        addHook<TickingTextureStageRenderHook>(); // due to mv
     }
     addHook<UIControl_updateCachedPositionHook>();
     addHook<GeneralSettingsScreenControllerCtorHook>();
 
-    addHook<ContainerScreenControllerHook>();
+    if (VersionUtils::checkAboveOrEqual(21, 40)) {
+        addHook<ContainerScreenControllerHook>();
+    }
 
     addHook<isPreGameHook>();
     addHook<_composeFullStackHook>();
@@ -98,7 +103,7 @@ void HookManager::initialize() {
 
     addHook<SettingsScreenOnExitHook>();
 
-    HookManager::addHook<ItemInHandRendererRenderItem>();
+    addHook<ItemInHandRendererRenderItem>();
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();

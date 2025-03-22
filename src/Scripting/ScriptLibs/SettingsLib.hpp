@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ScriptLib.hpp"
+#include <Scripting/ScriptUtils.hpp>
 #include <Scripting/ScriptManager.hpp>
 #include <Scripting/ScriptSettings/ScriptSettingManager.hpp>
 
@@ -20,7 +21,14 @@ public:
                 .addProperty("value", &TextBoxSetting::value)
             .endClass()
             .beginClass<KeybindSetting>("KeybindSetting")
-                .addProperty("value", &KeybindSetting::keybind)
+                .addProperty("value",
+                    [](const KeybindSetting* self) {
+                        int key = Utils::getStringAsKey(self->value);
+                        return ScriptUtils::isKeyDown(key);
+                    },
+                    [](KeybindSetting* self, const std::string& key) {
+                        self->value = key;
+                    })
             .endClass();
 
         getGlobalNamespace(state)

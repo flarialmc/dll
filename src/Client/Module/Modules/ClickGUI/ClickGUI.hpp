@@ -125,6 +125,7 @@ public:
 
         static std::map<std::string, std::string> roleColors = {
             { "Dev", "§b" },
+            { "Staff", "§f" },
             { "Gamer", "§5" },
             { "Booster", "§d" },
             { "Regular", "§4" }
@@ -139,11 +140,12 @@ public:
             }
         }
 
-        if (message[name.second - 2] == '§') name.second = name.second - 3;
+        if (name.second >= 2 && message[name.second - 2] == '§') name.second -= 3;
 
-        message.insert(name.second, prefix);
-
-        pkt->message = message;
+        if (name.second < message.size()) {
+            message.insert(name.second, prefix);
+            pkt->message = message;
+        }
     }
 
     ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {

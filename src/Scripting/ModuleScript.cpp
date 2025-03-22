@@ -1,5 +1,6 @@
 #include "ModuleScript.hpp"
 
+#include "ScriptUtils.hpp"
 #include "ScriptManager.hpp"
 #include <SDK/Client/Network/Packet/TextPacket.hpp>
 
@@ -24,6 +25,12 @@ void ModuleScript::onDisable() {
 void ModuleScript::onKey(KeyEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
 
+    if (static_cast<int>(event.getAction()) == 1) {
+        ScriptUtils::onKeyPressed(event.getKey());
+    } else if (static_cast<int>(event.getAction()) == 0) {
+        ScriptUtils::onKeyReleased(event.getKey());
+    }
+
     if (const auto& script = linkedScript.lock()) {
         bool cancelled = script->registerCancellableEvent("KeyEvent", event.getKey(), static_cast<int>(event.getAction()));
         if (cancelled) event.cancel();
@@ -37,7 +44,6 @@ void ModuleScript::onMouse(MouseEvent& event) {
         bool cancelled = script->registerCancellableEvent("MouseEvent", static_cast<int>(event.getButton()), static_cast<int>(event.getAction()));
         if (cancelled) event.cancel();
     }
-
 }
 
 void ModuleScript::onPacketReceive(PacketEvent &event) {
@@ -46,34 +52,26 @@ void ModuleScript::onPacketReceive(PacketEvent &event) {
     if (const auto& script = linkedScript.lock()) {
         bool cancel = false;
 
-        bool onPacketReceive = script->registerCancellableEvent("PacketReceiveEvent", event.getPacket(), static_cast<int>(event.getPacket()->getId()));
-        if (onPacketReceive) cancel = true;
-
         if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
             const auto *pkt = reinterpret_cast<TextPacket*>(event.getPacket());
             if (pkt) {
                 std::string msg = pkt->message;
                 std::string name = pkt->name;
                 auto type = pkt->type;
-                std::string xuid = pkt->xuid;
 
-                bool ChatReceive = script->registerCancellableEvent("ChatReceiveEvent", msg, name, static_cast<int>(type), xuid);
-                if (ChatReceive) cancel = true;
+                bool ChatReceiveEvent = script->registerCancellableEvent("ChatReceiveEvent", msg, name, static_cast<int>(type));
+                if (ChatReceiveEvent) cancel = true;
             }
         }
         if (cancel) event.cancel();
     }
 }
 
-void ModuleScript::onPacketSent(PacketSendEvent& event) {
+void ModuleScript::onPacketSend(PacketSendEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
-    /*
 
     if (const auto& script = linkedScript.lock()) {
         bool cancel = false;
-
-        bool onPacketSent = script->registerCancellableEvent("PacketSendEvent", event.getPacket(), static_cast<int>(event.getPacket()->getId()));
-        if (onPacketSent) cancel = true;
 
         if (event.getPacket()->getId() == MinecraftPacketIds::Text) {
             const auto *pkt = reinterpret_cast<TextPacket*>(event.getPacket());
@@ -81,15 +79,13 @@ void ModuleScript::onPacketSent(PacketSendEvent& event) {
                 std::string msg = pkt->message;
                 std::string name = pkt->name;
                 auto type = pkt->type;
-                std::string xuid = pkt->xuid;
 
-                bool ChatSent = script->registerCancellableEvent("ChatSendEvent", msg, name, static_cast<int>(type), xuid);
-                if (ChatSent) cancel = true;
+                bool ChatSendEvent = script->registerCancellableEvent("ChatSendEvent", msg, name, static_cast<int>(type));
+                if (ChatSendEvent) cancel = true;
             }
         }
         if (cancel) event.cancel();
     }
-    */
 }
 
 void ModuleScript::onTick(TickEvent& event) {

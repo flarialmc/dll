@@ -31,8 +31,8 @@ public:
     static inline bool initialized = false;
 
 private:
-    static std::vector<std::shared_ptr<Script>> mLoadedScripts;
-    static std::vector<std::shared_ptr<ModuleScript>> mLoadedModules;
-    static std::vector<std::shared_ptr<CommandScript>> mLoadedCommands;
+    static inline std::vector<std::shared_ptr<Script>> mLoadedScripts;
+    static inline std::vector<std::shared_ptr<ModuleScript>> mLoadedModules;
+    static inline std::vector<std::shared_ptr<CommandScript>> mLoadedCommands;
     static inline std::atomic<bool> pendingReload = false;
 };

@@ -72,11 +72,11 @@ struct TextBoxSetting : BaseSetting {
 };
 
 struct KeybindSetting : BaseSetting {
-    std::string keybind;
-    std::string defaultKeybind;
+    std::string value;
+    std::string defaultValue;
 
-    KeybindSetting(const std::string& name, const std::string& description, std::string defaultKey)
-        : keybind(std::move(defaultKey)), defaultKeybind(std::move(defaultKey)) {
+    KeybindSetting(const std::string& name, const std::string& description, std::string defaultValue)
+        : value(std::move(defaultValue)), defaultValue(std::move(defaultValue)) {
         this->name = name;
         this->description = description;
         this->type = ScriptSettingType::Keybind;

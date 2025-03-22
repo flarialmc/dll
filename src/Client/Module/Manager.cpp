@@ -225,7 +225,9 @@ void ModuleManager::initialize() {
     addModule<Waila>();
 
     addModule<RawInputBuffer>();
-    addModule<LowHealthIndicator>();
+    if (VersionUtils::checkAboveOrEqual(21, 00)) { // Due to entt
+        addModule<LowHealthIndicator>();
+    }
     addModule<PlayerNotifier>();
     //addModule<ItemUseDelayFix>();
     addModule<ZeqaUtils>();

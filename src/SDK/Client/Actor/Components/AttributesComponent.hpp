@@ -31,7 +31,7 @@ public:
 
 	AttributeInstance* getInstance(unsigned int id) {
 		using func_t = AttributeInstance & (*)(BaseAttributeMap*, unsigned int);
-		static auto func = reinterpret_cast<func_t>(Memory::offsetFromSig(GET_SIG_ADDRESS("BaseAttributeMap_getInstance"), 1));
+		static auto func = reinterpret_cast<func_t>(GET_SIG_ADDRESS("BaseAttributeMap_getInstance"));
 		return &func(this, id);
 	}
 };
