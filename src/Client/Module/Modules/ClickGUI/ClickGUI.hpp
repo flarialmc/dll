@@ -380,11 +380,11 @@ public:
                 this->settings.getSettingByName<float>("o_colors_FlarialLogo")->value,
                 this->settings.getSettingByName<bool>("colors_FlarialLogo_rgb")->value
             );
-        } else {
-            this->addButton("Pick Files", "Select files to copy to assets folder", "Pick Files", [this]() {
-                FlarialGUI::Notify("this doesn't work yet :/ for now, just change the color");
+        } /*else {
+            this->addButton("", "To customize the logo, change the 'custom-logo.png' file in Flarial's Assets folder.", "Open Subfolder", [this]() {
+                WinrtUtils::openSubFolder("Flarial\\assets");
             });
-        }
+        }*/
         
         this->addHeader("Colors");
         this->addColorPicker("Radio Button Icon Disabled", "",

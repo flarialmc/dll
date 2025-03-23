@@ -8,15 +8,6 @@
 
 
 namespace Logger {
-    namespace Color {
-        fmt::color success() { return fmt::color::forest_green;  }
-        fmt::color debug() { return fmt::color::orchid; }
-        fmt::color info() { return fmt::color::light_steel_blue; }
-        fmt::color warn() { return fmt::color::orange; }
-        fmt::color error() { return fmt::color::crimson; }
-        fmt::color fatal() { return fmt::color::rebecca_purple; }
-    }
-
     void writeToFile(const std::string& message) {
         try {
             const std::string path = Utils::getClientPath() + "\\logs\\latest.log";

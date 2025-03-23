@@ -160,7 +160,7 @@ bool Script::compile() {
     try {
         // Load and validate the code
         if (luaL_loadstring(mState, mCode.c_str()) != LUA_OK) {
-            Logger::error("Error in {}: {}", mFilePath, lua_tostring(mState, -1));
+            Logger::script(true, "Error in {}: {}", mFilePath, lua_tostring(mState, -1));
             ADD_ERROR_MESSAGE("Error: " + std::string(lua_tostring(mState, -1)));
             lua_pop(mState, 1);
             return false;
@@ -197,7 +197,7 @@ bool Script::compile() {
 
         lua_getglobal(mState, "name");
         if (!lua_isstring(mState, -1)) {
-            Logger::error("Script '{}' is missing 'name'", mFilePath);
+            Logger::script(true, "Script '{}' is missing 'name'", mFilePath);
             lua_pop(mState, 1);
             return false;
         }
@@ -206,7 +206,7 @@ bool Script::compile() {
 
         lua_getglobal(mState, "description");
         if (!lua_isstring(mState, -1)) {
-            Logger::error("Script '{}' is missing 'description'", mFilePath);
+            Logger::script(true, "Script '{}' is missing 'description'", mFilePath);
             lua_pop(mState, 1);
             return false;
         }
@@ -227,7 +227,7 @@ bool Script::compile() {
 
         return true;
     } catch (const std::exception& e) {
-        Logger::error("Failed to compile script '{}': {}", mFilePath, e.what());
+        Logger::script(true, "Failed to compile script '{}': {}", mFilePath, e.what());
         return false;
     }
 }
@@ -264,7 +264,7 @@ int Script::safeCall(int nargs, int nresults) {
             }
         }
 
-        Logger::error("[{}] Error: {}", mName, error);
+        Logger::script(true, "[{}] Error: {}", mName, error);
         ADD_ERROR_MESSAGE("Error: " + error);
         lua_pop(mState, 1);
         if (debugEnabled) {
@@ -277,26 +277,4 @@ int Script::safeCall(int nargs, int nresults) {
     }
 
     return status;
-}
-
-void Script::registerEvent(const std::string& eventName) {
-    std::lock_guard lock(eventMutex);
-    if (mIsDestroyed) return;
-
-    lua_getglobal(mState, "eventHandlers");
-    if (!lua_istable(mState, -1)) {
-        lua_pop(mState, 1);
-        return;
-    }
-
-    lua_pushstring(mState, eventName.c_str());
-    lua_gettable(mState, -2);
-
-    if (!lua_isfunction(mState, -1)) {
-        lua_pop(mState, 2);
-        return;
-    }
-
-    safeCall(0, 0);
-    lua_pop(mState, 1);
 }

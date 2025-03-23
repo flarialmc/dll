@@ -1,12 +1,12 @@
 #pragma once
 
 #include <random>
-#include <winrt/impl/windows.storage.2.h>
 #include <wininet.h>
 
 #include "miniz.h"
 #include "../../../../Client.hpp"
 #include "curl/curl/curl.h"
+#include <Scripting/ScriptManager.hpp>
 
 class ScriptMarketplace : public Listener {
 
@@ -19,15 +19,6 @@ public:
     ~ScriptMarketplace() {
         Deafen(this, ProtocolEvent, &ScriptMarketplace::onProtocol);
         Deafen(this, ProtocolEvent, &ScriptMarketplace::onProtocolConfig);
-    }
-
-    std::string scriptPath() {
-        using namespace winrt::Windows::Storage;
-
-        auto roamingFolder = Utils::getRoamingPath();
-        std::filesystem::path scriptsDir = std::filesystem::path(roamingFolder) / "Flarial" / "Scripts";
-
-        return scriptsDir.string();
     }
 
     static std::string GetString(const std::string &URL) {
@@ -57,30 +48,70 @@ public:
     }
 
     void onProtocol(ProtocolEvent event) {
-        if (event.getPath() == std::wstring(L"flarial-scripting")) {
-            for (const auto &pair: event.getProtocolArgs()) {
-                if (pair.first == std::wstring(L"scriptName")) {
-                    FlarialGUI::Notify("Importing...");
-                    std::thread([this, pair]() {
-                        std::string id = String::WStrToStr(pair.second);
-                        Logger::info("script name {}", id);
+        if (event.getPath() != std::wstring(L"flarial-scripting")) return;
 
-                        std::string url = "http://node2.sear.host:5019/api/scripts/" + id + "/download";
-                        url.erase(std::remove(url.begin(), url.end(), ' '), url.end());
-
-                        std::string data = GetString(url);
-
-                        std::ofstream file(Utils::getClientPath() + "\\Scripts\\Modules\\" + id + ".lua", std::ios::binary);
-                        Logger::info("data: {}", data.c_str());
-                        file.write(data.c_str(), data.size());
-                        file.close();
-
-                        FlarialGUI::Notify("Imported new script: " + id);
-                        ModuleManager::restartModules = true;
-                    }).detach();
-                }
-            }
+        std::wstring scriptNameW, scriptTypeW;
+        for (const auto& [key, value] : event.getProtocolArgs()) {
+            if (key == L"scriptName") scriptNameW = value;
+            if (key == L"type") scriptTypeW = value;
         }
+
+        if (scriptNameW.empty() || scriptTypeW.empty()) {
+            Logger::error("Missing scriptName or type in protocol event");
+            return;
+        }
+
+        std::string scriptName = String::WStrToStr(scriptNameW);
+        std::string scriptType = String::WStrToStr(scriptTypeW);
+
+        std::thread([this, scriptName, scriptType]() {
+            std::string url = fmt::format("https://1klcjc8um5aq.flarial.xyz/api/scripts/{}/{}/download", scriptType, scriptName);
+            std::string data = GetString(url);
+
+            if (data.empty()) {
+                Logger::error("Failed to download script content for {}", scriptName);
+                FlarialGUI::Notify("Failed to import script '" + scriptName + "'");
+                return;
+            }
+
+            std::string destinationFolder;
+            if (scriptType == "module") {
+                destinationFolder = "\\Scripts\\Modules\\";
+            } else if (scriptType == "command") {
+                destinationFolder = "\\Scripts\\Commands\\";
+            } else {
+                Logger::error("Invalid script type: {}", scriptType);
+                FlarialGUI::Notify("Failed to import script '" + scriptName + "'");
+                return;
+            }
+
+            std::filesystem::path dirPath = std::filesystem::path(Utils::getClientPath()).string() + destinationFolder;
+            std::error_code ec;
+            std::filesystem::create_directories(dirPath, ec);
+
+            if (ec) {
+                Logger::error("Failed to create directory {}: {}", dirPath.string(), ec.message());
+                FlarialGUI::Notify("Failed to import script '" + scriptName + "'");
+                return;
+            }
+
+            // Write the script file
+            std::string filePath = dirPath.string() + scriptName + ".lua";
+            std::ofstream file(filePath, std::ios::binary);
+
+            if (!file.is_open()) {
+                Logger::error("Failed to open file for writing: {}", filePath);
+                FlarialGUI::Notify("Failed to import script '" + scriptName + "'");
+                return;
+            }
+
+            file.write(data.c_str(), data.size());
+            file.close();
+
+            FlarialGUI::Notify("Successfully imported script '" + scriptName + "'");
+            ModuleManager::restartModules = true;
+            ScriptManager::reloadScripts();
+        }).detach();
     }
 
     // Ensure this callback is declared as static if it's inside a class.
@@ -136,8 +167,9 @@ public:
         return true;
     }
 
-void onProtocolConfig(ProtocolEvent event) {
-    if (event.getPath() == std::wstring(L"flarial-configs")) {
+    void onProtocolConfig(ProtocolEvent event) {
+        if (event.getPath() != std::wstring(L"flarial-configs")) return;
+
         for (const auto &pair : event.getProtocolArgs()) {
             if (pair.first == std::wstring(L"configName")) {
                 FlarialGUI::Notify("Importing...");
@@ -211,8 +243,6 @@ void onProtocolConfig(ProtocolEvent event) {
             }
         }
     }
-}
-
 
     static void reloadAllConfigs() {
         Client::availableConfigs.clear();

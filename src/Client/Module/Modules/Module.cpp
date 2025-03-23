@@ -445,33 +445,37 @@ void Module::loadDefaults() {
 }
 
 void Module::saveSettings() {
-    if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
+    if (isScripting()) {
+        settingspath = fmt::format("{}\\Scripts\\Configs\\{}.flarial", Utils::getClientPath(), name);
+    } else if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
         settingspath = fmt::format("{}\\{}\\{}.flarial", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
-        checkSettingsFile();
     } else {
         settingspath = fmt::format("{}\\{}.flarial", Utils::getConfigsPath(), name);
-        checkSettingsFile();
     }
+    checkSettingsFile();
+
     try {
         std::ofstream outputFile(settingspath);
         if (!outputFile.is_open()) {
-            Logger::error("Failed to open file: {}", settingspath.string());
+            Logger::error("Failed to open file for writing: {}", settingspath.string());
             return;
         }
         outputFile << settings.ToJson();
+        outputFile.close();
     } catch (const std::exception& e) {
         Logger::error("An error occurred while saving settings: {}", e.what());
     }
 }
 
 void Module::loadSettings() {
-    if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
+    if (isScripting()) {
+        settingspath = fmt::format("{}\\Scripts\\Configs\\{}.flarial", Utils::getClientPath(), name);
+    } else if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
         settingspath = fmt::format("{}\\{}\\{}.flarial", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
-        checkSettingsFile();
-    }   else {
+    } else {
         settingspath = fmt::format("{}\\{}.flarial", Utils::getConfigsPath(), name);
-        checkSettingsFile();
     }
+    checkSettingsFile();
 
     std::ifstream inputFile(settingspath);
     if (!inputFile.is_open()) {
@@ -483,11 +487,11 @@ void Module::loadSettings() {
     ss << inputFile.rdbuf();
     inputFile.close();
 
-    if (!ss.str().empty() && ss.str() != "null") settings.FromJson(ss.str());
-    else {
+    if (!ss.str().empty() && ss.str() != "null") {
+        settings.FromJson(ss.str());
+    } else {
         this->loadDefaults();
     }
-
 
     totalKeybinds = 0;
     totalWaypoints = 0;
