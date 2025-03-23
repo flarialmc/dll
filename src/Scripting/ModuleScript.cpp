@@ -95,6 +95,10 @@ void ModuleScript::onPacketReceive(PacketEvent &event) {
                 if (SetTitleEvent) cancel = true;
             }
         }
+        if (id == MinecraftPacketIds::Respawn) {
+            bool RespawnEvent = script->registerCancellableEvent("RespawnEvent");
+            if (RespawnEvent) cancel = true;
+        }
         if (cancel) event.cancel();
     }
 }
@@ -156,6 +160,8 @@ void ModuleScript::onFOV(FOVEvent& event) {
     if (!isEnabled() || !ScriptManager::initialized) return;
 
     if (const auto& script = linkedScript.lock()) {
+        if (event.getFOV() == 70) return;
+
         script->registerEvent("FOVEvent", event.getFOV());
     }
 }
