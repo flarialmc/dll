@@ -5,6 +5,9 @@
 std::vector<std::string> argss = {};
 
 void SpotifyCommand::execute(const std::vector<std::string>& args) {
+    if (!spotify.SetupSuccess()) {
+        addCommandMessage("Spotify Credentials are not setup");
+    }
     argss = args;
     std::thread thread([&]() {
         std::string msg = "";

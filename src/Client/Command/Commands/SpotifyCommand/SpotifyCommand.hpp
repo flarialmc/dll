@@ -11,6 +11,7 @@ using json = nlohmann::json;
 
 class SpotifyController {
 private:
+    bool isFine = false;
     std::string client_id;
     std::string client_secret;
     std::string refresh_token;
@@ -34,10 +35,29 @@ private:
 
 
 public:
-    SpotifyController(const std::string& clientID, const std::string& clientSecret, const std::string& refreshToken)
-        : client_id(clientID), client_secret(clientSecret), refresh_token(refreshToken) {
+    SpotifyController() {
+
+        std::ifstream file(Utils::getClientPath() + "\\Spotify.json");
+        if (!file) {
+            std::cout << "Error opening file!" << std::endl;
+            return;
+        }
+
+        // Parse the JSON file
+        json j;
+        file >> j;
+
+        // Access string values
+        client_id = j["id"];
+        client_secret = j["secret"];
+        refresh_token = j["refresh_token"];
+
         refresh_access_token();
+
+        isFine = true;
     }
+
+    bool SetupSuccess(){ return isFine; }
 
     void refresh_access_token() {
         std::cout << "Refreshing token..." << std::endl;
@@ -131,7 +151,9 @@ public:
 
 class SpotifyCommand : public Command {
 public:
-    SpotifyController spotify = SpotifyController("", "", "");
-    SpotifyCommand() : Command("spotify", "Controlls spotify") {};
+    SpotifyController spotify;
+    SpotifyCommand() : Command("spotify", "Controlls spotify") {
+
+    };
     void execute(const std::vector<std::string>& args) override;
 };
