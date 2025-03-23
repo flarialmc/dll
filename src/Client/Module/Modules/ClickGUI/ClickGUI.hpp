@@ -372,7 +372,7 @@ public:
 
         this->extraPadding();
         
-        this->addHeader("Logo");
+        /*this->addHeader("Logo");
         this->addToggle("Custom logo", "", this->settings.getSettingByName<bool>("custom_logo")->value);
         if (!this->settings.getSettingByName<bool>("custom_logo")->value) {
             this->addColorPicker("Logo Color", "Color of the client's logo",
@@ -380,7 +380,7 @@ public:
                 this->settings.getSettingByName<float>("o_colors_FlarialLogo")->value,
                 this->settings.getSettingByName<bool>("colors_FlarialLogo_rgb")->value
             );
-        } /*else {
+        } else {
             this->addButton("", "To customize the logo, change the 'custom-logo.png' file in Flarial's Assets folder.", "Open Subfolder", [this]() {
                 WinrtUtils::openSubFolder("Flarial\\assets");
             });
