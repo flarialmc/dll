@@ -382,6 +382,8 @@ public:
             );
         } else {
             this->addButton("Pick Files", "Select files to copy to assets folder", "Pick Files", [this]() {
+                Client::asyncActionQueue.push_back([]() { return WinrtUtils::pickAndCopyFiles(L"*.png", "Images/"); });
+                    
                 FlarialGUI::Notify("this doesn't work yet :/ for now, just change the color");
             });
         }

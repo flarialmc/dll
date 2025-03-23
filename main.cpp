@@ -10,6 +10,10 @@
 #include <wininet.h>
 #include <Utils/WinrtUtils.hpp>
 #include <Utils/Audio.hpp>
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Storage.h>
+#include <vector>
+#include <functional>
 
 #include "curl/curl/curl.h"
 #include "Scripting/ScriptManager.hpp"
@@ -43,6 +47,11 @@ void SavePlayerCache() {
 float Client::elapsed;
 uint64_t Client::start;
 
+static winrt::Windows::Foundation::IAsyncAction runAllTasks() {
+    for (auto& task : Client::asyncActionQueue) {
+        co_await task();
+    }
+}
 DWORD WINAPI init() {
     Client::start = Utils::getCurrentMs();
     Logger::initialize();
@@ -59,6 +68,13 @@ DWORD WINAPI init() {
 
     std::thread statusThread([]() {
     while (!Client::disable) {
+
+        /*for (const auto action : Client::asyncActionQueue) {
+            Logger::info("Executing async action");
+            action();
+            Client::asyncActionQueue.pop_back();
+        }*/
+
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastBeatTime);
         auto onlineUsersFetchElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastOnlineUsersFetchTime);

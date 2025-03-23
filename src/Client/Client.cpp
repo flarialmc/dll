@@ -30,6 +30,7 @@ bool notifiedOfConnectionIssue = false;
 
 std::string Client::current_commit = COMMIT_HASH;
 std::vector<std::string> Client::availableConfigs;
+std::vector<std::function<winrt::Windows::Foundation::IAsyncAction()>> Client::asyncActionQueue;
 
 std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
     std::vector<std::string> allPlayers;

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Utils/APIUtils.hpp"
+#include "Utils/WinrtUtils.hpp"
 
 #define ADD_SETTING(setting, value) \
 if (Client::settings.getSettingByName<decltype(value)>(setting) == nullptr) \
@@ -18,13 +19,13 @@ public:
 
     static std::vector<std::string> availableConfigs;
 
+    static std::vector<std::function<winrt::Windows::Foundation::IAsyncAction()>> asyncActionQueue;
+
     static std::vector<std::string> getPlayersVector(const nlohmann::json &data);
 
     static void UnregisterActivationHandler();
 
     static void createConfig(std::string name);
-
-    static void deleteConfg(std::string name);
 
     static void deleteConfig(std::string name);
 
