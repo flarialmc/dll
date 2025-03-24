@@ -33,20 +33,23 @@ private:
 
 public:
     SpotifyController() {
-
         std::ifstream file(Utils::getClientPath() + "\\Spotify.json");
         if (!file) {
-            Logger::info("Spotify.json not found.");
+            Logger::custom(fg(fmt::color::light_green), "SPOTIFY", "Spotify.json not found.");
             return;
         }
 
-        json j;
-        file >> j;
-
-        client_id = j["id"];
-        client_secret = j["secret"];
-        refresh_token = j["refresh_token"];
-
+        try {
+            json j;
+            file >> j;
+            client_id = j["id"];
+            client_secret = j["secret"];
+            refresh_token = j["refresh_token"];
+        } catch (const std::exception& e) {
+            Logger::custom(fg(fmt::color::light_green), "SPOTIFY", "Failed to parse credentials: {}", e.what());
+            return;
+        }
+        
         refresh_access_token();
 
         isFine = true;
