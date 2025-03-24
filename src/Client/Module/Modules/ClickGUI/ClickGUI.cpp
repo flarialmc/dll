@@ -796,7 +796,7 @@ void ClickGUI::onRender(RenderEvent &event) {
                 float anotherRectWidth = Constraints::RelativeConstraint(0.972, "width");
 
                 D2D1_COLOR_F colorThing = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
-                colorThing.a = settingsOpacity;
+                colorThing.a = o_colors_secondary2;
 
                 D2D1_RECT_F rect = { rectXNoOff, rectY, rectXNoOff + anotherRectWidth, rectY + anotherRectHeight};
                 FlarialGUI::PushImClipRect(rect);
