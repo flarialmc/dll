@@ -711,10 +711,9 @@ bool Module::isKeybind(const std::array<bool, 256>& keys, const int keybindCount
     if (name != "ClickGUI")
         if (FlarialGUI::inMenu) return false;
     if (SDK::getCurrentScreen() == "chat_screen") return false;
-    bool allInactive = std::ranges::all_of(FlarialGUI::TextBoxes, [](const TextBoxStruct& i) {
-        return !i.isActive;
-        });
-    // All keys in the keybind are being held down
+    bool allInactive = std::ranges::all_of(FlarialGUI::TextBoxes, [](const auto& pair) {
+        return !pair.second.isActive;
+    });
     return allInactive;
 }
 
@@ -729,9 +728,9 @@ bool Module::isKeybind(const std::array<bool, 256>& keys, const int keybindCount
     if (name != "ClickGUI")
         if (FlarialGUI::inMenu) return false;
     if (SDK::getCurrentScreen() == "chat_screen") return false;
-    bool allInactive = std::ranges::all_of(FlarialGUI::TextBoxes, [](const TextBoxStruct& i) {
-        return !i.isActive;
-        });
+    bool allInactive = std::ranges::all_of(FlarialGUI::TextBoxes, [](const auto& pair) {
+        return !pair.second.isActive; // Access the value in the map
+    });
     // All keys in the keybind are being held down
     return allInactive;
 }

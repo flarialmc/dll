@@ -19,15 +19,16 @@ public:
                     isCapital = !isCapital;
 
                 for (auto &shi: FlarialGUI::KeybindSelectors) {
-                    shi.currentOnKeyTime = std::chrono::steady_clock::now();
+                    shi.second.currentOnKeyTime = std::chrono::steady_clock::now();
                 }
 
                 if (event.getPressedKeysAsString() != "no")
                     FlarialGUI::currentKeybind = event.getPressedKeysAsString();
                 else FlarialGUI::currentKeybind = "nothing";
 
-                for (auto &box: FlarialGUI::TextBoxes) {
+                for (auto &troll: FlarialGUI::TextBoxes) {
 
+                    auto& box = troll.second;
                     if (event.getKey() == VK_ESCAPE || ModuleManager::getModule("ClickGUI")->isKeybind(event.keys) &&
                                                                ModuleManager::getModule("ClickGUI")->isKeyPartOfKeybind(
                                                                        event.key))
@@ -95,7 +96,7 @@ public:
             } else {
                 // fix perfomace ? Worked even without this :/
                 for (auto &box: FlarialGUI::TextBoxes) {
-                    box.isActive = false;
+                    box.second.isActive = false;
                 }
             }
         }

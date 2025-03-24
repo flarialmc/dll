@@ -1198,7 +1198,7 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
     int i = 0;
     bool ye = false;
     for (auto &rect : WindowRects) {
-        if (rect.isMovingElement && i != currentNum) {
+        if (rect.second.isMovingElement && i != currentNum) {
             ye = true;
             break;
         }
@@ -1373,23 +1373,23 @@ Vec2<float> FlarialGUI::GetCenterXY(float rectWidth, float rectHeight) {
 void FlarialGUI::ResetShit() {
     // Reset the variables to their initial values or desired values here
     for (auto &i: WindowRects) {
-        i = WindowRect();
+        i.second = WindowRect();
     }
 
     for (auto &i: SliderRects) {
-        i = SliderRect();
+        i.second = SliderRect();
     }
 
     for (auto &i: TextBoxes) {
-        i = TextBoxStruct();
+        i.second = TextBoxStruct();
     }
 
     for (auto &i: ColorPickers) {
-        i = ::ColorPicker();
+        i.second = ::ColorPicker();
     }
 
     for (auto &i: DropDownMenus) {
-        i = DropdownStruct();
+        i.second = DropdownStruct();
     }
 
     activeColorPickerWindows = 0;

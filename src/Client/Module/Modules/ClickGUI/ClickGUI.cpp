@@ -43,7 +43,7 @@ void ClickGUI::onRender(RenderEvent &event) {
             FlarialGUI::lerp(baseHeightActual, 0.00001f, 0.30f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
             FlarialGUI::lerp(realBlurAmount, 0.00001f, 0.15f * FlarialGUI::frameFactor);
 
-            for (auto &box: FlarialGUI::TextBoxes) box.isActive = false;
+            for (auto &box: FlarialGUI::TextBoxes) box.second.isActive = false;
 
         }
 
