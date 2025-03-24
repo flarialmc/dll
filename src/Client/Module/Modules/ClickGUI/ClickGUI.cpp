@@ -43,7 +43,7 @@ void ClickGUI::onRender(RenderEvent &event) {
             FlarialGUI::lerp(baseHeightActual, 0.00001f, 0.30f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
             FlarialGUI::lerp(realBlurAmount, 0.00001f, 0.15f * FlarialGUI::frameFactor);
 
-            for (auto &box: FlarialGUI::TextBoxes) box.isActive = false;
+            for (auto &box: FlarialGUI::TextBoxes) box.second.isActive = false;
 
         }
 
@@ -516,7 +516,7 @@ void ClickGUI::onRender(RenderEvent &event) {
                     float anotherRectWidth = Constraints::RelativeConstraint(0.972, "width");
 
                     D2D1_COLOR_F colorThing = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
-                    colorThing.a = settingsOpacity;
+                    colorThing.a = o_colors_secondary2;
 
                     D2D1_RECT_F rect = { rectXNoOff, rectY, rectXNoOff + anotherRectWidth, rectY + anotherRectHeight};
                     FlarialGUI::PushImClipRect(rect);
@@ -659,6 +659,7 @@ void ClickGUI::onRender(RenderEvent &event) {
                     c->extraPadding();
 
                     c->addHeader("Misc");
+                    c->addToggle("Snapping Lines", "Y'know, those pink lines in edit mode.", Client::settings.getSettingByName<bool>("snappinglines")->value);
                     c->addToggle("Center Cursor", "Centers your cursor everytime you open your inventory, etc.", Client::settings.getSettingByName<bool>("centreCursor")->value);
                     c->addToggle("Anonymous on API", "Stay anonymous on Flarial's API.", Client::settings.getSettingByName<bool>("anonymousApi")->value);
                     c->addToggle("API Usage", "May disable some features..", Client::settings.getSettingByName<bool>("apiusage")->value);
@@ -795,7 +796,7 @@ void ClickGUI::onRender(RenderEvent &event) {
                 float anotherRectWidth = Constraints::RelativeConstraint(0.972, "width");
 
                 D2D1_COLOR_F colorThing = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
-                colorThing.a = settingsOpacity;
+                colorThing.a = o_colors_secondary2;
 
                 D2D1_RECT_F rect = { rectXNoOff, rectY, rectXNoOff + anotherRectWidth, rectY + anotherRectHeight};
                 FlarialGUI::PushImClipRect(rect);
