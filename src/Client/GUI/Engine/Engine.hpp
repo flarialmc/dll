@@ -130,12 +130,12 @@ namespace FlarialGUI {
     std::string GetWeightedName(std::string name, DWRITE_FONT_WEIGHT weight);
     DWRITE_FONT_WEIGHT GetFontWeightFromString(const std::string& weightStr);
 
-    inline WindowRect WindowRects[1000];
-    inline SliderRect SliderRects[2500];
-    inline TextBoxStruct TextBoxes[1000];
-    inline ColorPicker ColorPickers[2000];
-    inline DropdownStruct DropDownMenus[2000];
-    inline KeybindSelector KeybindSelectors[2000];
+    inline std::unordered_map<int, WindowRect> WindowRects;
+    inline std::unordered_map<int, SliderRect> SliderRects;
+    inline std::unordered_map<int, TextBoxStruct> TextBoxes;
+    inline std::unordered_map<int, ColorPicker> ColorPickers;
+    inline std::unordered_map<int, DropdownStruct> DropDownMenus;
+    inline std::unordered_map<int, KeybindSelector> KeybindSelectors;
 
     inline int maxRect = 0;
 
