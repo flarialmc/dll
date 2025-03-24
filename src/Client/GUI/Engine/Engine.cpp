@@ -1244,9 +1244,9 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
     WindowRects[currentNum].percentageX = WindowRects[currentNum].movedX / MC::windowSize.x;
     WindowRects[currentNum].percentageY = WindowRects[currentNum].movedY / MC::windowSize.y;
 
-    if (WindowRects[currentNum].isMovingElement) {
-        const float alignmentThreshold = 10.0f; // How close the window should be to align
-        const ImColor pink(1.0f, 0.0f, 1.0f, 1.0f); // Pink color
+    if (WindowRects[currentNum].isMovingElement && Client::settings.getSettingByName<bool>("snappinglines")->value) {
+        const float alignmentThreshold = 10.0f;
+        const ImColor pink(1.0f, 0.0f, 1.0f, 1.0f);
 
 
         for (int j = 0; j < maxRect; j++) {
