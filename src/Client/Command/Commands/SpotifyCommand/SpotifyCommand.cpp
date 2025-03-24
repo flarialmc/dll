@@ -7,8 +7,9 @@ std::vector<std::string> argss = {};
 void SpotifyCommand::execute(const std::vector<std::string>& args) {
     if (!spotify.SetupSuccess()) {
         addCommandMessage("Spotify Credentials are not setup");
+        return;
     }
-    argss = args;
+    argss = args; // ???
     std::thread thread([&]() {
         std::string msg = "";
         const std::string command = String::toLower(argss[0]);
@@ -33,12 +34,11 @@ void SpotifyCommand::execute(const std::vector<std::string>& args) {
             spotify.set_volume(argss[1]);
             msg = ("Volume set to " + argss[1] + "%");
         }
-
         else if (command == "play") {
             if (argss.size() <= 2) {
                 msg = ("Please give the name of song");
+                return;
             }
-
             std::ostringstream oss;
             for (size_t i = 1; i < argss.size(); ++i) {
                 if (i > 1) oss << " ";
@@ -58,14 +58,11 @@ void SpotifyCommand::execute(const std::vector<std::string>& args) {
 
             msg = ("Started playing " + spotify.get_song_name());
         }
-
         else if (command == "name") msg = ("Playing " + spotify.get_song_name());
+        else msg = ("Invalid Command. (Use .spotify help to get a list of commands!)");
 
-        else msg = ("Invalid Command.");
-
-
-        SDK::clientInstance->getGuiData()->displayClientMessage("§r§l§9spotify §3§l»§r " + msg);
-        });
+        addCommandMessage(msg);
+    });
 
     thread.detach();
 }

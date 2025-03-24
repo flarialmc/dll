@@ -29,6 +29,11 @@ static HANDLE mutex;
 void SavePlayerCache() {
     std::string playersListString = APIUtils::VectorToList(APIUtils::onlineUsers);
 
+    // Check if string size is greater than 1 MB (1,048,576 bytes)
+    if (playersListString.size() > 1048576) {
+        playersListString = "[]";
+    }
+
     std::string filePath = Utils::getRoamingPath() + "/Flarial/playerscache.txt";
     std::ofstream cacheFile(filePath);
     if (cacheFile.is_open()) {

@@ -3,6 +3,7 @@
 enum class ContainerEnum {
     INVENTORY,
     HOTBAR,
+    CONTAINER_OUTPUT,
     OTHER
 };
 

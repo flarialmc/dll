@@ -25,42 +25,40 @@ private:
         headers = curl_slist_append(headers, "Content-Type: application/json");
 
         auto [responseCode, responseBody] = APIUtils::Request(url, method, data, headers);
-        if (responseCode >= 200 && responseCode < 300) {
-            std::cout << "[✅] Request successful: " << responseBody << "\n";
-        }
-        else {
-            std::cout << "[❌] Request failed (" << responseCode << "): " << responseBody << "\n";
+        if (responseCode < 200 && responseCode >= 300) {
+            Logger::error("Spotify request failed ({}) : {}", responseCode, responseBody);
         }
     }
 
 
 public:
     SpotifyController() {
-
         std::ifstream file(Utils::getClientPath() + "\\Spotify.json");
         if (!file) {
-            std::cout << "Error opening file!" << std::endl;
+            Logger::custom(fg(fmt::color::light_green), "SPOTIFY", "Spotify.json not found.");
             return;
         }
 
-        // Parse the JSON file
-        json j;
-        file >> j;
-
-        // Access string values
-        client_id = j["id"];
-        client_secret = j["secret"];
-        refresh_token = j["refresh_token"];
-
+        try {
+            json j;
+            file >> j;
+            client_id = j["id"];
+            client_secret = j["secret"];
+            refresh_token = j["refresh_token"];
+        } catch (const std::exception& e) {
+            Logger::custom(fg(fmt::color::light_green), "SPOTIFY", "Failed to parse credentials: {}", e.what());
+            return;
+        }
+        
         refresh_access_token();
 
         isFine = true;
     }
 
-    bool SetupSuccess(){ return isFine; }
+    bool SetupSuccess(){ return isFine; } // ???
 
     void refresh_access_token() {
-        std::cout << "Refreshing token..." << std::endl;
+        Logger::custom(fg(fmt::color::light_green), "SPOTIFY", "Refreshing access token...");
 
         std::string post_data =
             "grant_type=refresh_token&refresh_token=" + refresh_token +
@@ -76,18 +74,17 @@ public:
             json jsonData = json::parse(responseBody);
             if (jsonData.contains("access_token")) {
                 access_token = jsonData["access_token"].get<std::string>();
-                std::cout << "[✅] Access token refreshed successfully!\n";
+                Logger::custom(fg(fmt::color::light_green), "SPOTIFY", "Access token refreshed successfully!");
             }
             else {
-                std::cerr << "[❌] Failed to refresh token: " << jsonData.dump(4) << "\n";
+                Logger::custom(fg(fmt::color::light_green), "SPOTIFY", "Failed to refresh token: {}", jsonData.dump(4));
             }
         }
         else {
-            std::cerr << "[❌] Token refresh failed with response code: " << responseCode << "\n";
+            Logger::custom(fg(fmt::color::light_green), "SPOTIFY", "Token refresh failed with response code: {}", responseCode);
         }
     }
 
-    // Spotify Controls
     void play() { send_request(api_url + "play"); }
     void pause() { send_request(api_url + "pause"); }
     void next_track() { send_request(api_url + "next", "POST"); }
@@ -96,6 +93,7 @@ public:
     void set_shuffle(bool enable) { send_request(api_url + "shuffle?state=" + (enable ? "true" : "false")); }
     void seek(int position_ms) { send_request(api_url + "seek?position_ms=" + std::to_string(position_ms)); }
     void set_repeat(const std::string& mode) { send_request(api_url + "repeat?state=" + mode); }
+
     std::string get_song_name() {
         std::string search_url = "https://api.spotify.com/v1/me/player/currently-playing";
 
@@ -107,17 +105,16 @@ public:
         if (responseCode >= 200 && responseCode < 300) {
             json jsonData = json::parse(responseBody);
             if (jsonData.contains("item")) {
-                std::string SongName = jsonData["item"]["name"].get<std::string>();
-                std::string Artist = jsonData["item"]["artists"][0]["name"].get<std::string>();
+                std::string songName = jsonData["item"]["name"].get<std::string>();
+                std::string artist = jsonData["item"]["artists"][0]["name"].get<std::string>();
 
-                return SongName + " by " + Artist;
+                return songName + " by " + artist;
             }
         }
 
         return "";
     }
 
-    // Search and Play a Song by Name
     void play_song_by_name(const std::string& song_name) {
         std::string search_url = "https://api.spotify.com/v1/search?q=" + song_name + "&type=track&limit=1";
 
@@ -125,7 +122,6 @@ public:
         headers = curl_slist_append(headers, ("Authorization: Bearer " + access_token).c_str());
         headers = curl_slist_append(headers, "Content-Type: application/json");
 
-        // Search for the song
         auto [responseCode, responseBody] = APIUtils::Request(search_url, "GET", "", headers);
 
         if (responseCode >= 200 && responseCode < 300) {
@@ -134,17 +130,15 @@ public:
                 std::string track_uri = jsonData["tracks"]["items"][0]["uri"].get<std::string>();
                 json play_data = { {"uris", {track_uri}} };
 
-                std::cout << "[🎵] Playing song: " << song_name << "\n";
-
-                // Play the song
                 send_request(api_url + "play", "PUT", play_data.dump());
+                Logger::custom(fg(fmt::color::light_green), "SPOTIFY", "Playing Song: {}", song_name);
             }
             else {
-                std::cerr << "[❌] No track found for: " << song_name << "\n";
+                Logger::custom(fg(fmt::color::light_green), "SPOTIFY", "No track found for: {}", song_name);
             }
         }
         else {
-            std::cerr << "[❌] Search failed with response code: " << responseCode << "\n";
+            Logger::custom(fg(fmt::color::light_green), "SPOTIFY", "Search failed with response code: {}", responseCode);
         }
     }
 };
@@ -152,8 +146,6 @@ public:
 class SpotifyCommand : public Command {
 public:
     SpotifyController spotify;
-    SpotifyCommand() : Command("spotify", "Controlls spotify") {
-
-    };
+    SpotifyCommand() : Command("spotify", "Controls spotify") {};
     void execute(const std::vector<std::string>& args) override;
 };

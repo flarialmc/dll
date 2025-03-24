@@ -84,7 +84,8 @@ public:
 
         this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value,
                              settings.getSettingByName<float>("borderOpacity")->value,
-                             settings.getSettingByName<bool>("borderRGB")->value);        this->addColorPicker("Text Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
+                             settings.getSettingByName<bool>("borderRGB")->value);
+        this->addColorPicker("Text Color", "", settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
         this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
 
         FlarialGUI::UnsetScrollView();
