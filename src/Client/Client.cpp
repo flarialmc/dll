@@ -214,6 +214,7 @@ void Client::initialize() {
     ADD_SETTING("killdx", false);
     ADD_SETTING("disable_alias", false);
     ADD_SETTING("vsync", false);
+    ADD_SETTING("recreateAtStart", true);
     ADD_SETTING("promotions", true);
     ADD_SETTING("snappinglines", true);
     ADD_SETTING("apiusage", true);

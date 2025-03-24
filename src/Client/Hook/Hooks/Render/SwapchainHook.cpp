@@ -94,6 +94,7 @@ HWND FindWindowByTitle(const std::string &titlePart) {
 
 void SwapchainHook::enableHook() {
 
+    queueReset = Client::settings.getSettingByName<bool>("recreateAtStart")->value;
 
     if (!window) {
         window = FindWindowByTitle("Minecraft");

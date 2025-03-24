@@ -637,7 +637,7 @@ void ClickGUI::onRender(RenderEvent &event) {
 
                     c->addToggle("Better Frames", "RTX Disabled, Restart Required.", Client::settings.getSettingByName<bool>("killdx")->value);
                     c->addToggle("V-SYNC Disabler", "Works on all devices.", Client::settings.getSettingByName<bool>("vsync")->value);
-                    c->addToggle("Do Not Wait Flag", "May improve latency or performance.", Client::settings.getSettingByName<bool>("donotwait")->value);
+                    c->addToggle("Recreate Swapchain At Start", "May help with RenderDragon", Client::settings.getSettingByName<bool>("recreateAtStart")->value);
                     c->addDropdown("Buffering Mode", "May improve latency or performance.", {"Double Buffering", "Triple Buffering"}, Client::settings.getSettingByName<std::string>("bufferingmode")->value);
                     c->addDropdown("Swap Effect", "May improve latency or performance.", {"FLIP_SEQUENTIAL", "FLIP_DISCARD"}, Client::settings.getSettingByName<std::string>("swapeffect")->value);
 
