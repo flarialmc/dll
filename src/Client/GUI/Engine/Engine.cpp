@@ -1256,6 +1256,7 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
         const ImColor pink(1.0f, 0.0f, 1.0f, 1.0f);
 
 
+        // test release lol
         for (int j = 0; j <= maxRect; j++) {
             if (j == currentNum) continue;
 
