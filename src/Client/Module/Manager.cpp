@@ -97,6 +97,7 @@
 #include "Modules/LowHealthIndicator/LowHealthIndicator.hpp"
 #include "Modules/PlayerNotifier/PlayerNotifier.hpp"
 #include "Modules/ZeqaUtils/ZeqaUtils.hpp"
+#include "Modules/MumbleLink/MumbleLink.hpp"
 
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
     for (const auto& pair : moduleMap) {
@@ -231,6 +232,7 @@ void ModuleManager::initialize() {
     addModule<PlayerNotifier>();
     //addModule<ItemUseDelayFix>();
     addModule<ZeqaUtils>();
+    addModule<MumbleLink>();
 
     addService<GUIKeyListener>();
     if (!VersionUtils::checkAboveOrEqual(21, 60)) {
