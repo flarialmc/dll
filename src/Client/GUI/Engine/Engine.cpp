@@ -136,6 +136,13 @@ std::unordered_map<int, float> FlarialGUI::additionalY;
 //std::unordered_map<std::string, winrt::com_ptr<ID2D1GradientStopCollection>> FlarialGUI::gradientStopCache;
 LRUCache<uint64_t, winrt::com_ptr<ID2D1LinearGradientBrush>> FlarialGUI::gradientBrushCache(300);
 
+std::unordered_map<int, WindowRect> FlarialGUI::WindowRects;
+std::unordered_map<int, SliderRect> FlarialGUI::SliderRects;
+std::unordered_map<int, TextBoxStruct> FlarialGUI::TextBoxes;
+std::unordered_map<int, ColorPicker> FlarialGUI::ColorPickers;
+std::unordered_map<int, DropdownStruct> FlarialGUI::DropDownMenus;
+std::unordered_map<int, KeybindSelector> FlarialGUI::KeybindSelectors;
+
 float b_o_colors_text;
 float b_o_colors_enabled;
 float b_o_colors_disabled;
@@ -1197,12 +1204,11 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 
     int i = 0;
     bool ye = false;
-    for (auto &rect : WindowRects) {
-        if (rect.second.isMovingElement && i != currentNum) {
+    for (const auto& [key, rect] : WindowRects) {
+        if (rect.isMovingElement && key != currentNum) {
             ye = true;
             break;
         }
-        i++;
     }
 
     WindowRects[currentNum].width = width;
@@ -1231,6 +1237,7 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
         }
     }
 
+
     // Check if outside of screen and constrain window
     WindowRects[currentNum].fixer = fixer;
     if (WindowRects[currentNum].movedX - fixer < 0) WindowRects[currentNum].movedX = 0.001f + fixer;
@@ -1249,45 +1256,48 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
         const ImColor pink(1.0f, 0.0f, 1.0f, 1.0f);
 
 
-        for (int j = 0; j < maxRect; j++) {
+        for (int j = 0; j <= maxRect; j++) {
             if (j == currentNum) continue;
 
-            auto& otherRect = WindowRects[j];
+            auto it = WindowRects.find(j);
+            if (it != WindowRects.end()) {
+                auto& otherRect = it->second;
 
-            // Snap to the left edge of another rectangle
-            if (fabs(WindowRects[currentNum].movedX - otherRect.movedX - fixer) < alignmentThreshold) {
-                ImGui::GetBackgroundDrawList()->AddLine(ImVec2(otherRect.movedX, 0), ImVec2(otherRect.movedX, MC::windowSize.y), pink, 2.0f);
-                WindowRects[currentNum].movedX = otherRect.movedX + fixer;
-            }
+                // Snap to the left edge of another rectangle
+                if (fabs(WindowRects[currentNum].movedX - otherRect.movedX - fixer) < alignmentThreshold) {
+                    ImGui::GetBackgroundDrawList()->AddLine(ImVec2(otherRect.movedX, 0), ImVec2(otherRect.movedX, MC::windowSize.y), pink, 2.0f);
+                    WindowRects[currentNum].movedX = otherRect.movedX + fixer;
+                }
 
-            // Snap to the right edge of another rectangle
-            if (fabs(WindowRects[currentNum].movedX + width - (otherRect.movedX + otherRect.width) - fixer) < alignmentThreshold) {
-                ImGui::GetBackgroundDrawList()->AddLine(ImVec2(otherRect.movedX + otherRect.width, 0), ImVec2(otherRect.movedX + otherRect.width, MC::windowSize.y), pink, 2.0f);
-                WindowRects[currentNum].movedX = otherRect.movedX + otherRect.width - width + fixer;
-            }
+                // Snap to the right edge of another rectangle
+                if (fabs(WindowRects[currentNum].movedX + width - (otherRect.movedX + otherRect.width) - fixer) < alignmentThreshold) {
+                    ImGui::GetBackgroundDrawList()->AddLine(ImVec2(otherRect.movedX + otherRect.width, 0), ImVec2(otherRect.movedX + otherRect.width, MC::windowSize.y), pink, 2.0f);
+                    WindowRects[currentNum].movedX = otherRect.movedX + otherRect.width - width + fixer;
+                }
 
-            // Snap to the top edge of another rectangle
-            if (fabs(WindowRects[currentNum].movedY - otherRect.movedY) < alignmentThreshold) {
-                ImGui::GetBackgroundDrawList()->AddLine(ImVec2(0, otherRect.movedY), ImVec2(MC::windowSize.x, otherRect.movedY), pink, 2.0f);
-                WindowRects[currentNum].movedY = otherRect.movedY;
-            }
+                // Snap to the top edge of another rectangle
+                if (fabs(WindowRects[currentNum].movedY - otherRect.movedY) < alignmentThreshold) {
+                    ImGui::GetBackgroundDrawList()->AddLine(ImVec2(0, otherRect.movedY), ImVec2(MC::windowSize.x, otherRect.movedY), pink, 2.0f);
+                    WindowRects[currentNum].movedY = otherRect.movedY;
+                }
 
-            // Snap to the bottom edge of another rectangle
-            if (fabs(WindowRects[currentNum].movedY + height - (otherRect.movedY + otherRect.height)) < alignmentThreshold) {
-                ImGui::GetBackgroundDrawList()->AddLine(ImVec2(0, otherRect.movedY + otherRect.height), ImVec2(MC::windowSize.x, otherRect.movedY + otherRect.height), pink, 2.0f);
-                WindowRects[currentNum].movedY = otherRect.movedY + otherRect.height - height;
-            }
+                // Snap to the bottom edge of another rectangle
+                if (fabs(WindowRects[currentNum].movedY + height - (otherRect.movedY + otherRect.height)) < alignmentThreshold) {
+                    ImGui::GetBackgroundDrawList()->AddLine(ImVec2(0, otherRect.movedY + otherRect.height), ImVec2(MC::windowSize.x, otherRect.movedY + otherRect.height), pink, 2.0f);
+                    WindowRects[currentNum].movedY = otherRect.movedY + otherRect.height - height;
+                }
 
-            // Snap to the center alignment with another rectangle horizontally
-            if (fabs((WindowRects[currentNum].movedX + width / 2.0f) - (otherRect.movedX + otherRect.width / 2.0f) - fixer) < alignmentThreshold) {
-                ImGui::GetBackgroundDrawList()->AddLine(ImVec2(otherRect.movedX + otherRect.width / 2.0f, 0), ImVec2(otherRect.movedX + otherRect.width / 2.0f, MC::windowSize.y), pink, 2.0f);
-                WindowRects[currentNum].movedX = otherRect.movedX + otherRect.width / 2.0f - width / 2.0f + fixer;
-            }
+                // Snap to the center alignment with another rectangle horizontally
+                if (fabs((WindowRects[currentNum].movedX + width / 2.0f) - (otherRect.movedX + otherRect.width / 2.0f) - fixer) < alignmentThreshold) {
+                    ImGui::GetBackgroundDrawList()->AddLine(ImVec2(otherRect.movedX + otherRect.width / 2.0f, 0), ImVec2(otherRect.movedX + otherRect.width / 2.0f, MC::windowSize.y), pink, 2.0f);
+                    WindowRects[currentNum].movedX = otherRect.movedX + otherRect.width / 2.0f - width / 2.0f + fixer;
+                }
 
-            // Snap to the center alignment with another rectangle vertically (no `fixer` on y-axis)
-            if (fabs((WindowRects[currentNum].movedY + height / 2.0f) - (otherRect.movedY + otherRect.height / 2.0f)) < alignmentThreshold) {
-                ImGui::GetBackgroundDrawList()->AddLine(ImVec2(0, otherRect.movedY + otherRect.height / 2.0f), ImVec2(MC::windowSize.x, otherRect.movedY + otherRect.height / 2.0f), pink, 2.0f);
-                WindowRects[currentNum].movedY = otherRect.movedY + otherRect.height / 2.0f - height / 2.0f;
+                // Snap to the center alignment with another rectangle vertically (no `fixer` on y-axis)
+                if (fabs((WindowRects[currentNum].movedY + height / 2.0f) - (otherRect.movedY + otherRect.height / 2.0f)) < alignmentThreshold) {
+                    ImGui::GetBackgroundDrawList()->AddLine(ImVec2(0, otherRect.movedY + otherRect.height / 2.0f), ImVec2(MC::windowSize.x, otherRect.movedY + otherRect.height / 2.0f), pink, 2.0f);
+                    WindowRects[currentNum].movedY = otherRect.movedY + otherRect.height / 2.0f - height / 2.0f;
+                }
             }
         }
 
