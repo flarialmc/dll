@@ -27,6 +27,7 @@ Item *ContainerScreenController::getContainerItem(ContainerEnum type, int slot) 
 ContainerEnum ContainerScreenController::getContainerType(std::string name) {
     if(name == "hotbar_items") return ContainerEnum::HOTBAR;
     if(name == "inventory_items") return ContainerEnum::INVENTORY;
+    if(name.find("_output") != std::string::npos) return ContainerEnum::CONTAINER_OUTPUT;
     return ContainerEnum::OTHER;
 }
 
@@ -50,7 +51,13 @@ void ContainerScreenController::swap(std::string srcCollectionName, int32_t srcS
         auto srcItem = getContainerItem(srcContainerType, srcSlot);
         auto dstItem = getContainerItem(dstContainerType, dstSlot);
 
-        if((!srcItem && srcContainerType != ContainerEnum::OTHER) && dstItem) {
+        if(srcContainerType == ContainerEnum::CONTAINER_OUTPUT) {
+            _handleTakeAll(srcCollectionName, srcSlot);
+            _handlePlaceAll(dstCollectionName, dstSlot);
+            return;
+        }
+
+        if(!srcItem && dstItem) {
             _handleTakeAll(dstCollectionName, dstSlot);
             _handlePlaceAll(srcCollectionName, srcSlot);
             _handlePlaceAll(dstCollectionName, dstSlot);
