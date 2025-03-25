@@ -114,9 +114,9 @@ void SendDataToServer()
 
 class MumbleLink : public Module {
 public:
+
     MumbleLink() : Module("Mumble Link", "Fixes Minecraft's default input delay", IDR_CURSOR_PNG, "") {
         Module::setup();
-    };
 
 	void onEnable() override {
 		Module::onEnable();
@@ -140,12 +140,17 @@ public:
 
                 }
 
-				Sleep(20);
-			}
-			});
+                Sleep(20);
+            }
+            });
 
-		serverthread.detach();
-		datathread.detach();
+        serverthread.detach();
+        datathread.detach();
+
+    };
+
+	void onEnable() override {
+		Module::onEnable();
 	}
 
     void onDisable() override {
@@ -167,7 +172,7 @@ public:
         const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
 		this->addHeader("General");
-		this->addTextBox("Context", "Players need to have same context for positional audio.", this->settings.getSettingByName<std::string>("context")->value);
+		this->addTextBox("Channel/Room", "Keep empty to use the Server IP.", this->settings.getSettingByName<std::string>("context")->value);
 
         FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
         FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
