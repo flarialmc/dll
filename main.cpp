@@ -52,7 +52,7 @@ DWORD WINAPI init(HMODULE real)
                 if(SDK::hasInstanced && SDK::clientInstance != nullptr) {
                     if (SDK::clientInstance->getLocalPlayer() != nullptr) {
 
-                        if (elapsedAnnc >= std::chrono::minutes(3i)) {
+                        if (elapsedAnnc >= std::chrono::minutes(3)) {
                             SDK::clientInstance->getGuiData()->displayClientMessage(
 "§khiii §r §n§l§4FLARIAL V2 BETA §r§khiii \n§r§cGet Better UI & More Modules (Java Inventory Hotkeys, etc.) - §ehttps://flarial.xyz/beta\n§9Join our discord! §ehttps://flarial.xyz/discord"
 );

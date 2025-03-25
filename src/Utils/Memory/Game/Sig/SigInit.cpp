@@ -6,7 +6,7 @@
 void SigInit::init2170() {
     Logger::debug("[Signatures] Loading sigs for 1.21.7X");
     ADD_SIG("ThirdPersonNametag", "0F 84 F9 05 00 00 49 8B 04 24");
-    ADD_SIG("Options::getGamma", "48 83 EC ? 80 B9 C8 18 00 00 ? 48 8D ? ? ? 48 8B ? 48 8B ? ? 74 ? 41 B8 ? ? ? ? FF 15 ? ? ? ? 48 8B ? 48 85 ? 74 ? 48 8B ? ? 48 8B ? ? ? ? ? 48 85 ? 74 ? E8 ? ? ? ? 48 83 C4 ? C3 F3 0F ? ? ? 48 83 C4 ? C3 41 B8");
+    ADD_SIG("Options::getGamma", "48 83 EC 28 80 B9 C8 18 00 00 00 48 8D 54 24 30 48 8B 01 48 8B 40 60 74 38 41 B8 1A");
     ADD_SIG("Actor::baseTick", "48 8D ? ? ? ? ? 48 89 ? BA ? ? ? ? 44 8D ? ? 44 8D ? ? 66 C7 44 24 20 ? ? E8 ? ? ? ? 48 8B");
 }
 
