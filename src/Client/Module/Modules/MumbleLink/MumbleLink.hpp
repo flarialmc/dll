@@ -117,6 +117,7 @@ public:
 
     MumbleLink() : Module("Mumble Link", "Fixes Minecraft's default input delay", IDR_CURSOR_PNG, "") {
         Module::setup();
+    }
 
 	void onEnable() override {
 		Module::onEnable();
@@ -148,10 +149,6 @@ public:
         datathread.detach();
 
     };
-
-	void onEnable() override {
-		Module::onEnable();
-	}
 
     void onDisable() override {
         Module::onDisable();
