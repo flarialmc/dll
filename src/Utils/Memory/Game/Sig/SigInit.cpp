@@ -4,6 +4,17 @@
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
+void SigInit::init2170() {
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading sigs for 1.21.7X");
+
+    ADD_SIG("ThirdPersonNametag", "0F 84 F9 05 00 00 49 8B 04 24");
+    ADD_SIG("ContainerScreenController::_onContainerSlotHovered", "48 89 ? ? ? 48 89 ? ? ? 41 ? 41 ? 41 ? 48 83 EC ? 45 33 ? 45 8B");
+    ADD_SIG("RenderChunkCoordinator::_handleVisibilityUpdates", "E8 ?? ?? ?? ?? 48 8B 03 48 8B D8 48 3B C7 75 EC 4D 8B C4");
+    ADD_SIG("Options::getGamma", "48 83 EC 28 80 B9 C8 18 00 00 00 48 8D 54 24 30 48 8B 01 48 8B 40 60 74 38 41 B8 1A");
+    ADD_SIG("GeneralSettingsScreenController::GeneralSettingsScreenController", "48 89 5C 24 18 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 20 FB FF FF 48 81 EC E0 05 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 85 D0 04 00 00 45");
+    ADD_SIG("Actor::baseTick", "48 8D ? ? ? ? ? 48 89 ? BA ? ? ? ? 44 8D ? ? 44 8D ? ? 66 C7 44 24 20 ? ? E8 ? ? ? ? 48 8B");
+}
+
 void SigInit::init2160() {
     Logger::custom(fg(fmt::color::gold), "Signatures", "Loading sigs for 1.21.6X");
 

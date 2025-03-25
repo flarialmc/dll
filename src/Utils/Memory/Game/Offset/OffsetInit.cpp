@@ -4,6 +4,31 @@
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
+void OffsetInit::init2170() {
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.7X");
+    ADD_OFFSET("ClientInstance::camera", 0x2C8);
+    ADD_OFFSET("ClientInstance::viewMatrix", 0x388);
+    ADD_OFFSET("ClientInstance::guiData", 0x5B0);
+    ADD_OFFSET("ClientInstance::getFovX", 0x748);
+    ADD_OFFSET("ClientInstance::getFovY", 0x75C);
+
+    ADD_OFFSET("mce::Camera::worldMatrixStack", 0x40);
+
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x6C0);
+
+    ADD_OFFSET("ClientInstance::guiData", 0x5B0);
+
+    ADD_OFFSET("Player::gamemode", 0xAD0);
+    ADD_OFFSET("Player::playerName", 0xC50);
+    ADD_OFFSET("Player::playerInventory", 0x5C0);
+
+    ADD_OFFSET("Level::hitResult", 0x240);
+    ADD_OFFSET("Level::worldFolderName", 0x2B0);
+    ADD_OFFSET("Level::getPlayerMap", 0xB98);
+
+    ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x65C);
+}
+
 void OffsetInit::init2160() {
     Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.6X");
     ADD_OFFSET("Player::gamemode", 0xAD8);
