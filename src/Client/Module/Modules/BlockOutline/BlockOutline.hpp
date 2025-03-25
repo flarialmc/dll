@@ -4,6 +4,8 @@
 #include <Utils/Utils.hpp>
 #include <Utils/Memory/CustomAllocator/Buffer.hpp>
 
+#include <Utils/Render/DrawUtil3D.hpp>
+
 class BlockOutline : public Module {
 // TODO: switch to renderOutlineSelection hook + 3D option
 private:
@@ -22,19 +24,7 @@ public:
         Module::setup();
     };
 
-    void onSetup() override { // init color just in case
-        highlightColorRipRelAddr = GET_SIG_ADDRESS("blockHighlightColor"); // RIP REL 4BYTE FROM FUNC OFFSET ADDR
-        if(highlightColorRipRelAddr == NULL) return;
-        highlightColorOrigRipRel = *(UINT32*)highlightColorRipRelAddr;
-
-        outlineColorRipRelAddr = GET_SIG_ADDRESS("mce::Color::BLACK");
-        if(outlineColorRipRelAddr == NULL) return;
-        outlineColorOrigRipRel = *(UINT32*)outlineColorRipRelAddr;
-        // TODO: make it look better
-        selectionColor = (MCCColor*)AllocateBuffer((void*)highlightColorRipRelAddr); // allocate space for color
-        highlightColorNewRipRel = Memory::getRipRel(highlightColorRipRelAddr, reinterpret_cast<uintptr_t>((void*)selectionColor));
-        outlineColorNewRipRel= Memory::getRipRel(outlineColorRipRelAddr, reinterpret_cast<uintptr_t>((void*)selectionColor));
-        *selectionColor = MCCColor{};
+    void onSetup() override {
     }
 
     void terminate() override { // free memory we took for color
@@ -67,17 +57,12 @@ public:
     }
 
     void onEnable() override {
-        onColorChange();
-
-        patch();
-        Listen(this, TickEvent, &BlockOutline::onTick)
+        Listen(this, RenderOutlineSelectionEvent, &BlockOutline::onOutlineSelection)
         Module::onEnable();
     }
 
     void onDisable() override {
-
-        unpatch();
-        Listen(this, TickEvent, &BlockOutline::onTick)
+        Deafen(this, RenderOutlineSelectionEvent, &BlockOutline::onOutlineSelection)
         Module::onDisable();
     }
 
@@ -117,8 +102,19 @@ public:
             onColorChange();
     }
 
-    void onTick(TickEvent &event) {
-        if (this->settings.getSettingByName<bool>("color_rgb")->value)
-            onColorChange();
+    void onOutlineSelection(RenderOutlineSelectionEvent &event) {
+        MCDrawUtil3D dc(SDK::clientInstance->getLevelRender(), event.getScreenContext());
+        D2D1_COLOR_F color;
+        if (settings.getSettingByName<bool>("color_rgb")->value) color = FlarialGUI::rgbColor;
+        else color = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("color")->value);
+
+        selectionColor->r = color.r;
+        selectionColor->g = color.g;
+        selectionColor->b = color.b;
+        selectionColor->a = settings.getSettingByName<float>("colorOpacity")->value;
+        dc.drawBox(event.getBox(), color);
+        dc.flush();
+
+        event.cancel();
     }
 };
