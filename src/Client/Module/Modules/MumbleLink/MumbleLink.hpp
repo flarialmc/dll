@@ -114,32 +114,36 @@ void SendDataToServer()
 
 class MumbleLink : public Module {
 public:
+
     MumbleLink() : Module("Mumble Link", "Fixes Minecraft's default input delay", IDR_CURSOR_PNG, "") {
         Module::setup();
+
+        std::thread serverthread([&]() {
+            if (this->isEnabled())
+            SendDataToServer();
+    });
+        std::thread datathread([&]() {
+            while (this->isEnabled()) {
+                if (SDK::clientInstance and SDK::clientInstance->getLocalPlayer()) {
+                    Pos = *SDK::clientInstance->getLocalPlayer()->getPosition();
+                    auto rot = SDK::clientInstance->getLocalPlayer()->getActorRotationComponent()->rot;
+                    yaw = rot.x;
+                    pitch = rot.y;
+                    PlayerName = SDK::clientInstance->getLocalPlayer()->getPlayerName();
+                    Context = this->settings.getSettingByName<std::string>("context")->value.empty() ? SDK::getServerIP() : this->settings.getSettingByName<std::string>("context")->value;
+                }
+
+                Sleep(20);
+            }
+            });
+
+        serverthread.detach();
+        datathread.detach();
+
     };
 
 	void onEnable() override {
 		Module::onEnable();
-		std::thread serverthread([&]() {
-            SendDataToServer();
-			});
-		std::thread datathread([&]() {
-			while (this->isEnabled()) {
-				if (SDK::clientInstance and SDK::clientInstance->getLocalPlayer()) {
-					Pos = *SDK::clientInstance->getLocalPlayer()->getPosition();
-                    auto rot = SDK::clientInstance->getLocalPlayer()->getActorRotationComponent()->rot;
-                    yaw = rot.x;
-                    pitch = rot.y;
-					PlayerName = SDK::clientInstance->getLocalPlayer()->getPlayerName();
-					Context = this->settings.getSettingByName<std::string>("context")->value.empty() ? SDK::getServerIP() : this->settings.getSettingByName<std::string>("context")->value;
-				}
-
-				Sleep(20);
-			}
-			});
-
-		serverthread.detach();
-		datathread.detach();
 	}
 
     void onDisable() override {
@@ -161,7 +165,7 @@ public:
         const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
 		this->addHeader("General");
-		this->addTextBox("Context", "Players with same context will hear the positional volume. (Keep empty to use server IP)", this->settings.getSettingByName<std::string>("context")->value);
+		this->addTextBox("Channel/Room", "Keep empty to use the Server IP.", this->settings.getSettingByName<std::string>("context")->value);
 
         FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
         FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
