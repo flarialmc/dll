@@ -5,6 +5,7 @@
 
 void OffsetInit::init2170() {
     Logger::debug("[Offsets] Loading offsets for 1.21.7X");
+
     ADD_OFFSET("ClientInstance::viewMatrix", 0x388);
     ADD_OFFSET("ClientInstance::guiData", 0x5B0);
     ADD_OFFSET("ClientInstance::getFovX", 0x748);
