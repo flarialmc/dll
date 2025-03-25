@@ -146,7 +146,8 @@
 #define IDR_WAILA_PNG           247
 #define IDR_HEART_PNG           248
 #define IDR_SPOTIFY_PNG         249
+#define IDR_MUMBLE_PNG          250
 
 
 // MAKE SURE YOU ALWAYS UPDATE THIS!
-#define MAX_IMAGE_ID IDR_SPOTIFY_PNG
+#define MAX_IMAGE_ID IDR_MUMBLE_PNG
