@@ -329,6 +329,7 @@ void SwapchainHook::DX11Init() {
     //SaveBackbuffer();
 
     Blur::InitializePipeline();
+    MotionBlur::initted = MotionBlurHelper::Initialize();
     Memory::SafeRelease(eBackBuffer);
     init = true;
 }

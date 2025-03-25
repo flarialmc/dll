@@ -1,14 +1,18 @@
 #pragma once
 
+#include "MotionBlurHelper.hpp"
 #include "../Module.hpp"
 
 
 class MotionBlur : public Module {
 public:
+    static inline bool initted = false;
+
     MotionBlur() : Module("Motion Blur",
                           "Make fast movements appear smoother and more realistic by\nblurring the image slightly in the direction of motion.",
                           IDR_BLUR_PNG, "") {
         Module::setup();
+
     };
 
     bool once = false;
@@ -59,11 +63,11 @@ public:
 
     void onRender(RenderEvent& event) {
 
-        if (FlarialGUI::inMenu) return;
+        //if (FlarialGUI::inMenu) return;
 
         int maxFrames = (int)round(this->settings.getSettingByName<float>("intensity2")->value);
 
-        if (SDK::getCurrentScreen() == "hud_screen" && !SwapchainHook::queue && this->isEnabled()) {
+        if (SDK::getCurrentScreen() == "hud_screen" && !SwapchainHook::queue && initted && this->isEnabled()) {
 
             // Remove excess frames if maxFrames is reduced
             if (previousFrames.size() > static_cast<size_t>(maxFrames)) {
@@ -74,18 +78,9 @@ public:
             auto buffer = BackbufferToSRVExtraMode();
             if (buffer) {
                 previousFrames.push_back(std::move(buffer));
-            } else {
-                std::cout << "Couldn't save buffer for Motion Blur." << std::endl;
             }
 
-            // Render with opacity
-            float alpha = 0.3f;
-            for (const auto& frame : previousFrames) {
-                if (!SwapchainHook::queue) {
-                    ImageWithOpacity(frame, {MC::windowSize.x, MC::windowSize.y}, alpha);
-                }
-                alpha *= this->settings.getSettingByName<float>("intensity")->value;
-            }
+            MotionBlurHelper::Render(event.RTV, previousFrames);
 
         } else {
             previousFrames.clear();
