@@ -80,6 +80,7 @@ IDR_ZEQA_PNG             PNG "Data\\zeqa.png"
 IDR_WAILA_PNG            PNG "Data\\waila.png"
 IDR_HEART_PNG            PNG "Data\\heart.png"
 IDR_SPOTIFY_PNG          PNG "Data\\spotify.png"
+IDR_MUMBLE_PNG          PNG "Data\\mumble.png"
 
 IDR_SETTINGS_PNG         PNG "Data\\settings.png"
 IDR_SETTINGS_WHITE_PNG   PNG "Data\\settingswhite.png"
