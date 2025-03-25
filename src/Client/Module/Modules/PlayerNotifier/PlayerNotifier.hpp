@@ -10,7 +10,7 @@
 class PlayerNotifier : public Module {
     int totalPlayers = 0;
 public:
-    PlayerNotifier() : Module("Player Notifier", "Notifies you when a player is in the server.", IDR_CURSOR_PNG, "") {
+    PlayerNotifier() : Module("Player Notifier", "Notifies you when a player is in the server.", IDR_CURSOR_PNG, "P") {
         Module::setup();
         defaultConfig();
         loadSettings();
@@ -26,16 +26,29 @@ public:
             settings.addSetting<std::string>("player0", "TheBarii");
             settings.addSetting<bool>("player0Enabled", true);
         }
+
+        if (!this->settings.getSettingByName<std::string>("keybind")) {
+            settings.addSetting<std::string>("keybind", "P");
+        }
     }
     void onEnable() override {
         Module::onEnable();
         Listen(this, TickEvent, &PlayerNotifier::onTick);
-
+        Listen(this, KeyEvent, &PlayerNotifier::onKey)
     }
 
     void onDisable() override {
         Module::onDisable();
         Deafen(this, TickEvent, &PlayerNotifier::onTick);
+        Deafen(this, KeyEvent, &PlayerNotifier::onKey);
+    }
+
+    void onSetup() override {
+        keybindActions.clear();
+        keybindActions.push_back([this](std::vector<std::any> args) -> std::any {
+            check();
+            return {};
+        });
     }
 
     void loadSettings() override {
@@ -53,6 +66,21 @@ public:
     std::chrono::time_point<std::chrono::high_resolution_clock> lastRun = std::chrono::steady_clock::now();
     bool first = true;
 
+    void check() {
+        std::unordered_map<mcUUID, PlayerListEntry>& playerMap = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
+
+        for (const auto& [uuid, entry] : playerMap) {
+            for (int i = 0; i < totalPlayers; i++) {
+                if(!this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")) continue;
+                if (this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")->value) {
+                    if (entry.name.find(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value) != std::string::npos) {
+                        FlarialGUI::Notify(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value + " is online!");
+                    }
+                }
+            }
+        }
+    }
+
     void onTick(TickEvent& event) {
         double intervalSeconds = this->settings.getSettingByName<float>("duration")->value;
 
@@ -63,18 +91,8 @@ public:
             lastRun = now;
             first = false;
 
-            std::unordered_map<mcUUID, PlayerListEntry>& playerMap = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
+            check();
 
-            for (const auto& [uuid, entry] : playerMap) {
-                for (int i = 0; i < totalPlayers; i++) {
-                    if(!this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")) continue;
-                    if (this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")->value) {
-                        if (entry.name.find(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value) != std::string::npos) {
-                            FlarialGUI::Notify(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value + " is online!");
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -103,13 +121,14 @@ public:
             Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("General");
+
         this->addButton("Add new player", "", "ADD", [&]() {
             this->settings.addSetting<std::string>("player" + FlarialGUI::cached_to_string(totalPlayers), "player" + FlarialGUI::cached_to_string(totalPlayers));
             this->settings.addSetting<bool>("player" + FlarialGUI::cached_to_string(totalPlayers) + "Enabled", true);
             totalPlayers++;
         });
         this->addSlider("Recheck", "(Seconds) After how long should it recheck for players", this->settings.getSettingByName<float>("duration")->value, 500, 30, true);
-
+        this->addKeybind("Recheck Keybind", "Hold for 2 seconds!", getKeybind());
         for (int i = 0; i < totalPlayers; i++) {
             this->addHeader(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value);
             this->addToggle("Enabled", "Should it notify you?", this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")->value);
@@ -120,4 +139,13 @@ public:
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
     }
+
+    void onKey(KeyEvent &event) {
+        if (this->isKeyPartOfKeybind(event.key)) {
+            if (this->isKeybind(event.keys)) { // key is defo pressed
+                keybindActions[0]({});
+            }
+        }
+
+    };
 };
