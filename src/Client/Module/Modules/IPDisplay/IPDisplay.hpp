@@ -29,6 +29,10 @@ public:
         if (settings.getSettingByName<std::string>("text") == nullptr)
             settings.addSetting("text", (std::string) "{value}");
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
+        if (settings.getSettingByName<bool>("port") == nullptr) settings.addSetting("port", false);
+
+        if (settings.getSettingByName<bool>("responsivewidth")) this->settings.getSettingByName<bool>("responsivewidth")->value = true;
+
     }
 
     void settingsRender(float settingsOffset) override {
@@ -46,6 +50,7 @@ public:
 
 
         this->addHeader("Main");
+        this->addToggle("Show Port", "", this->settings.getSettingByName<bool>("port")->value);
         this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
         this->addToggle("Border", "", this->settings.getSettingByName<bool>("border")->value);
         this->addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", this->settings.getSettingByName<bool>(
@@ -112,7 +117,10 @@ public:
 
     void onRender(RenderEvent &event)  {
         std::string IPStr = SDK::getServerIP();
-        this->normalRender(10, IPStr);
+        std::string port = SDK::getServerPort();
+        std::string fullstr = IPStr;
+        if (this->settings.getSettingByName<bool>("port")->value) fullstr += ":" + port;
+        this->normalRender(10, fullstr);
     }
 };
 

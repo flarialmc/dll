@@ -139,8 +139,8 @@ void SwapchainHook::enableHook() {
 
     if (isRTSS) {
         // if(!unloadDll(L"RTSSHooks64.dll")) { // causes a crash sometimes
-        // Logger::debug("[Swapchain] MSI Afterburner failed to unload!");
-        MessageBox(NULL, "Flarial: client failed to initialize, disable MSI Afterburner!", "", MB_OK);
+        Logger::debug("[Swapchain] MSI Afterburner failed to unload!");
+        Utils::MessageDialogW(L"Flarial: client failed to initialize, disable MSI Afterburner or RTSS!", L"Error!");
         ModuleManager::terminate();
         Client::disable = true;
         // }

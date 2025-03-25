@@ -260,6 +260,9 @@ public:
     static std::string getRoamingPath();
     static std::string getClientPath();
     static std::string getConfigsPath();
+
+    static void MessageDialogW(PCWSTR pText, PCWSTR pTitle);
+
     static std::string getAssetsPath();
     static std::string getLogsPath();
 

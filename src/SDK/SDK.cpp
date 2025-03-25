@@ -72,3 +72,21 @@ std::string SDK::getServerIP() {
 
     return player ? "world" : "none";
 }
+
+std::string SDK::getServerPort() {
+    if (!SDK::hasInstanced || !SDK::clientInstance) {
+        return "none";
+    }
+
+    auto player = SDK::clientInstance->getLocalPlayer();
+    if (!player) {
+        return "none";
+    }
+
+    auto raknet = SDK::clientInstance->getRakNetConnector();
+    if (raknet && !raknet->JoinedIp.empty()) {
+        return FlarialGUI::cached_to_string(raknet->port);
+    }
+
+    return "0";
+}

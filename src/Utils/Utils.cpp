@@ -11,6 +11,9 @@
 #include <shared_mutex>
 #include <wininet.h>
 #include <miniz/miniz.h>
+#include <winrt/Windows.UI.Popups.h>
+#include <winrt/Windows.ApplicationModel.Core.h>
+#include <winrt/Windows.UI.Core.h>
 
 std::string Utils::getRoamingPath() {
     using namespace winrt::Windows::Storage;
@@ -28,6 +31,19 @@ std::string Utils::getClientPath() {
 std::string Utils::getConfigsPath() {
     std::filesystem::path path(Utils::getRoamingPath() + "\\Flarial\\Config");
     return path.string();
+}
+
+void Utils::MessageDialogW(PCWSTR pText, PCWSTR pTitle)
+{
+    auto dispatcher = winrt::Windows::ApplicationModel::Core::CoreApplication::MainView()
+                          .CoreWindow()
+                          .Dispatcher();
+
+    dispatcher.TryRunAsync(winrt::Windows::UI::Core::CoreDispatcherPriority::High,
+                           [pText, pTitle]() {
+                               winrt::Windows::UI::Popups::MessageDialog dialog(pText, pTitle ? pTitle : L"");
+                               dialog.ShowAsync();
+                           });
 }
 
 std::string Utils::getAssetsPath() {

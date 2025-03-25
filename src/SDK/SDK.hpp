@@ -18,6 +18,7 @@ namespace SDK {
     extern std::string getCurrentScreen();
 
     extern std::string getServerIP();
+    extern std::string getServerPort();
 
     extern std::shared_ptr<Packet> createPacket(int id);
     extern bool isHovered(Vec4<float> box, Vec2<float> mouse);
