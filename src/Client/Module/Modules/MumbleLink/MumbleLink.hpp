@@ -51,13 +51,13 @@ void SendDataToServer()
         return;
     }
 
-    std::cout << "Connected to server!" << std::endl;
+    std::cout << "Connected to Mumble link!" << std::endl;
 
     // Data to send
 
 
     // Send data continuously
-    while (true) {
+    while (ModuleManager::getModule("Mumble Link")->settings.getSettingByName<bool>("enabled")->value) {
         // Send floats
         if (send(ConnectSocket, (char*)&Pos.x, sizeof(Pos.x), 0) == SOCKET_ERROR) {
             std::cout << "Send failed. Error: " << WSAGetLastError() << std::endl;
@@ -121,7 +121,10 @@ public:
 	void onEnable() override {
 		Module::onEnable();
 		std::thread serverthread([&]() {
-            SendDataToServer();
+            while (this->isEnabled()) {
+                SendDataToServer();
+                Sleep(5000);
+            }
 			});
 		std::thread datathread([&]() {
 			while (this->isEnabled()) {
@@ -133,6 +136,9 @@ public:
 					PlayerName = SDK::clientInstance->getLocalPlayer()->getPlayerName();
 					Context = this->settings.getSettingByName<std::string>("context")->value.empty() ? SDK::getServerIP() : this->settings.getSettingByName<std::string>("context")->value;
 				}
+                else {
+
+                }
 
 				Sleep(20);
 			}
@@ -161,7 +167,7 @@ public:
         const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
 		this->addHeader("General");
-		this->addTextBox("Context", "Players with same context will hear the positional volume. (Keep empty to use server IP)", this->settings.getSettingByName<std::string>("context")->value);
+		this->addTextBox("Context", "Players need to have same context for positional audio.", this->settings.getSettingByName<std::string>("context")->value);
 
         FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
         FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
