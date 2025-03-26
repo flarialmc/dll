@@ -127,8 +127,8 @@ public:
             this->settings.addSetting<bool>("player" + FlarialGUI::cached_to_string(totalPlayers) + "Enabled", true);
             totalPlayers++;
         });
-        this->addSlider("Recheck", "(Seconds) After how long should it recheck for players", this->settings.getSettingByName<float>("duration")->value, 500, 1, true);
-        this->addKeybind("Recheck Keybind", "Hold for 2 seconds!", getKeybind());
+        this->addSlider("Re-check", "(Seconds) After how long should it re-check for players", this->settings.getSettingByName<float>("duration")->value, 500, 1, true);
+        this->addKeybind("Re-check Keybind", "Hold for 2 seconds!", getKeybind());
         for (int i = 0; i < totalPlayers; i++) {
             this->addHeader(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value);
             this->addToggle("Enabled", "Should it notify you?", this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")->value);
