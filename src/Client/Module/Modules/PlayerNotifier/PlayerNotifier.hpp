@@ -139,7 +139,7 @@ public:
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
     }
-
+//
     void onKey(KeyEvent &event) {
         if (this->isKeyPartOfKeybind(event.key)) {
             if (this->isKeybind(event.keys)) { // key is defo pressed
