@@ -8,6 +8,7 @@ void SigInit::init2170() {
     ADD_SIG("ThirdPersonNametag", "0F 84 F9 05 00 00 49 8B 04 24");
     ADD_SIG("Options::getGamma", "48 83 EC 28 80 B9 C8 18 00 00 00 48 8D 54 24 30 48 8B 01 48 8B 40 60 74 38 41 B8 1A");
     ADD_SIG("Actor::baseTick", "48 8D ? ? ? ? ? 48 89 ? BA ? ? ? ? 44 8D ? ? 44 8D ? ? 66 C7 44 24 20 ? ? E8 ? ? ? ? 48 8B");
+    ADD_SIG("CameraAssignAngle", "76 0E F3 0F 5C C7");
 }
 
 void SigInit::init2160() {
