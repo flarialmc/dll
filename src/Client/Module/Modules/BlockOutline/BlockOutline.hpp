@@ -95,26 +95,25 @@ public:
             /* NORMAL MODE */
             if (settings.getSettingByName<bool>("showfulloutline")->value) dc.setMaterial(MaterialUtils::getParticlesAlpha());
             else dc.setMaterial(MaterialUtils::getNametag());
-            float epsilon = 0.0005f;  // Small offset to prevent clipping
 
             auto drawUp = [&](float width) {
                 float w = width;
                 float wi = 1 - w;
-                float y_base = bp.y + 1.f + epsilon;  // Offset y-coordinate outward
+                float y_base = bp.y + 1.001f;  // Offset y-coordinate outward
 
                 dc.fillQuad(Vec3<float>(bp.x , y_base, bp.z ),
-                    Vec3<float>(bp.x + 1.f , y_base, bp.z ),
-                    Vec3<float>(bp.x + 1.f , y_base, bp.z + w),
+                    Vec3<float>(bp.x + 1.002f , y_base, bp.z ),
+                    Vec3<float>(bp.x + 1.002f , y_base, bp.z + w),
                     Vec3<float>(bp.x , y_base, bp.z + w), color);
                 // Top Right (back edge): Extend x to meet south face
                 dc.fillQuad(Vec3<float>(bp.x , y_base, bp.z + wi),
-                    Vec3<float>(bp.x + 1.f , y_base, bp.z + wi),
-                    Vec3<float>(bp.x + 1.f , y_base, bp.z + 1 ),
+                    Vec3<float>(bp.x + 1.002f , y_base, bp.z + wi),
+                    Vec3<float>(bp.x + 1.002f , y_base, bp.z + 1 ),
                     Vec3<float>(bp.x , y_base, bp.z + 1 ), color);
                 // Top Top (right edge): Extend z to meet east face
                 dc.fillQuad(Vec3<float>(bp.x + wi, y_base, bp.z + w),
-                    Vec3<float>(bp.x + 1.f , y_base, bp.z + w),
-                    Vec3<float>(bp.x + 1.f , y_base, bp.z + wi),
+                    Vec3<float>(bp.x + 1.002f , y_base, bp.z + w),
+                    Vec3<float>(bp.x + 1.002f , y_base, bp.z + wi),
                     Vec3<float>(bp.x + wi, y_base, bp.z + wi), color);
                 // Top Bottom (left edge): Extend z to meet west face
                 dc.fillQuad(Vec3<float>(bp.x , y_base, bp.z + w),
@@ -126,20 +125,20 @@ public:
             auto drawDown = [&](float width) {
                 float w = width;
                 float wi = 1 - w;
-                float y_base = bp.y - epsilon;  // Offset y-coordinate outward
+                float y_base = bp.y ;  // Offset y-coordinate outward
                 dc.fillQuad(Vec3<float>(bp.x, y_base, bp.z),
-                    Vec3<float>(bp.x + 1.f, y_base, bp.z),
-                    Vec3<float>(bp.x + 1.f, y_base, bp.z + w),
+                    Vec3<float>(bp.x + 1.002f, y_base, bp.z),
+                    Vec3<float>(bp.x + 1.002f, y_base, bp.z + w),
                     Vec3<float>(bp.x, y_base, bp.z + w), color);
                 // Top Right (back edge): Extend x to meet south face
                 dc.fillQuad(Vec3<float>(bp.x, y_base, bp.z + wi),
-                    Vec3<float>(bp.x + 1.f, y_base, bp.z + wi),
-                    Vec3<float>(bp.x + 1.f, y_base, bp.z + 1),
+                    Vec3<float>(bp.x + 1.002f, y_base, bp.z + wi),
+                    Vec3<float>(bp.x + 1.002f, y_base, bp.z + 1),
                     Vec3<float>(bp.x, y_base, bp.z + 1), color);
                 // Top Top (right edge): Extend z to meet east face
                 dc.fillQuad(Vec3<float>(bp.x + wi, y_base, bp.z + w),
-                    Vec3<float>(bp.x + 1.f, y_base, bp.z + w),
-                    Vec3<float>(bp.x + 1.f, y_base, bp.z + wi),
+                    Vec3<float>(bp.x + 1.002f, y_base, bp.z + w),
+                    Vec3<float>(bp.x + 1.002f, y_base, bp.z + wi),
                     Vec3<float>(bp.x + wi, y_base, bp.z + wi), color);
                 // Top Bottom (left edge): Extend z to meet west face
                 dc.fillQuad(Vec3<float>(bp.x, y_base, bp.z + w),
@@ -151,55 +150,55 @@ public:
             auto drawEast = [&](float width) {
                 float w = width;
                 float wi = 1 - w;
-                float x_base = bp.x + 1.f + epsilon;
+                float x_base = bp.x  + 1.001f ;
                 // Bottom strip (along y = bp.y)
-                dc.fillQuad(Vec3<float>(x_base, bp.y, bp.z), Vec3<float>(x_base, bp.y + w, bp.z), Vec3<float>(x_base, bp.y + w, bp.z + 1.f), Vec3<float>(x_base, bp.y, bp.z + 1.f), color);
-                // Top strip (along y = bp.y + 1.f)
-                dc.fillQuad(Vec3<float>(x_base, bp.y + 1.f - w, bp.z), Vec3<float>(x_base, bp.y + 1.f, bp.z), Vec3<float>(x_base, bp.y + 1.f, bp.z + 1.f), Vec3<float>(x_base, bp.y + 1.f - w, bp.z + 1.f), color);
+                dc.fillQuad(Vec3<float>(x_base, bp.y, bp.z), Vec3<float>(x_base, bp.y + w, bp.z), Vec3<float>(x_base, bp.y + w, bp.z + 1.002f), Vec3<float>(x_base, bp.y, bp.z + 1.002f), color);
+                // Top strip (along y = bp.y + 1.002f)
+                dc.fillQuad(Vec3<float>(x_base, bp.y + 1.002f - w, bp.z), Vec3<float>(x_base, bp.y + 1.002f, bp.z), Vec3<float>(x_base, bp.y + 1.002f, bp.z + 1.002f), Vec3<float>(x_base, bp.y + 1.002f - w, bp.z + 1.002f), color);
                 // Front strip (along z = bp.z)
-                dc.fillQuad(Vec3<float>(x_base, bp.y + w, bp.z), Vec3<float>(x_base, bp.y + 1.f - w, bp.z), Vec3<float>(x_base, bp.y + 1.f - w, bp.z + w), Vec3<float>(x_base, bp.y + w, bp.z + w), color);
-                // Back strip (along z = bp.z + 1.f)
-                dc.fillQuad(Vec3<float>(x_base, bp.y + w, bp.z + 1.f - w), Vec3<float>(x_base, bp.y + 1.f - w, bp.z + 1.f - w), Vec3<float>(x_base, bp.y + 1.f - w, bp.z + 1.f), Vec3<float>(x_base, bp.y + w, bp.z + 1.f), color);
+                dc.fillQuad(Vec3<float>(x_base, bp.y + w, bp.z), Vec3<float>(x_base, bp.y + 1.002f - w, bp.z), Vec3<float>(x_base, bp.y + 1.002f - w, bp.z + w), Vec3<float>(x_base, bp.y + w, bp.z + w), color);
+                // Back strip (along z = bp.z + 1.002f)
+                dc.fillQuad(Vec3<float>(x_base, bp.y + w, bp.z + 1.002f - w), Vec3<float>(x_base, bp.y + 1.002f - w, bp.z + 1.002f - w), Vec3<float>(x_base, bp.y + 1.002f - w, bp.z + 1.002f), Vec3<float>(x_base, bp.y + w, bp.z + 1.002f), color);
                 };
 
             auto drawWest = [&](float width) {
                 float w = width;
                 float wi = 1 - w;
-                float x_base = bp.x - epsilon;  // Offset x-coordinate outward
+                float x_base = bp.x ;  // Offset x-coordinate outward
                 // Bottom strip (along y = bp.y)
-                dc.fillQuad(Vec3<float>(x_base, bp.y, bp.z), Vec3<float>(x_base, bp.y + w, bp.z), Vec3<float>(x_base, bp.y + w, bp.z + 1.f), Vec3<float>(x_base, bp.y, bp.z + 1.f), color);
-                // Top strip (along y = bp.y + 1.f)
-                dc.fillQuad(Vec3<float>(x_base, bp.y + 1.f - w, bp.z), Vec3<float>(x_base, bp.y + 1.f, bp.z), Vec3<float>(x_base, bp.y + 1.f, bp.z + 1.f), Vec3<float>(x_base, bp.y + 1.f - w, bp.z + 1.f), color);
+                dc.fillQuad(Vec3<float>(x_base, bp.y, bp.z), Vec3<float>(x_base, bp.y + w, bp.z), Vec3<float>(x_base, bp.y + w, bp.z + 1.002f), Vec3<float>(x_base, bp.y, bp.z + 1.002f), color);
+                // Top strip (along y = bp.y + 1.002f)
+                dc.fillQuad(Vec3<float>(x_base, bp.y + 1.002f - w, bp.z), Vec3<float>(x_base, bp.y + 1.002f, bp.z), Vec3<float>(x_base, bp.y + 1.002f, bp.z + 1.002f), Vec3<float>(x_base, bp.y + 1.002f - w, bp.z + 1.002f), color);
                 // Front strip (along z = bp.z)
-                dc.fillQuad(Vec3<float>(x_base, bp.y + w, bp.z), Vec3<float>(x_base, bp.y + 1.f - w, bp.z), Vec3<float>(x_base, bp.y + 1.f - w, bp.z + w), Vec3<float>(x_base, bp.y + w, bp.z + w), color);
-                // Back strip (along z = bp.z + 1.f)
-                dc.fillQuad(Vec3<float>(x_base, bp.y + w, bp.z + 1.f - w), Vec3<float>(x_base, bp.y + 1.f - w, bp.z + 1.f - w), Vec3<float>(x_base, bp.y + 1.f - w, bp.z + 1.f), Vec3<float>(x_base, bp.y + w, bp.z + 1.f), color);
+                dc.fillQuad(Vec3<float>(x_base, bp.y + w, bp.z), Vec3<float>(x_base, bp.y + 1.002f - w, bp.z), Vec3<float>(x_base, bp.y + 1.002f - w, bp.z + w), Vec3<float>(x_base, bp.y + w, bp.z + w), color);
+                // Back strip (along z = bp.z + 1.002f)
+                dc.fillQuad(Vec3<float>(x_base, bp.y + w, bp.z + 1.002f - w), Vec3<float>(x_base, bp.y + 1.002f - w, bp.z + 1.002f - w), Vec3<float>(x_base, bp.y + 1.002f - w, bp.z + 1.002f), Vec3<float>(x_base, bp.y + w, bp.z + 1.002f), color);
                 };
 
             auto drawSouth = [&](float width) {
                 float w = width;
-                float z_base = bp.z + 1.f + epsilon;  // Offset z-coordinate outward
+                float z_base = bp.z  + 1.001f ;  // Offset z-coordinate outward
                 // Bottom strip (along y = bp.y, z = bp.z + 1.f)
-                dc.fillQuad(Vec3<float>(bp.x, bp.y, z_base), Vec3<float>(bp.x + 1.f, bp.y, z_base), Vec3<float>(bp.x + 1.f, bp.y + w, z_base), Vec3<float>(bp.x, bp.y + w, z_base), color);
-                // Top strip (along y = bp.y + 1.f, z = bp.z + 1.f)
-                dc.fillQuad(Vec3<float>(bp.x, bp.y + 1.f - w, z_base), Vec3<float>(bp.x + 1.f, bp.y + 1.f - w, z_base), Vec3<float>(bp.x + 1.f, bp.y + 1.f, z_base), Vec3<float>(bp.x, bp.y + 1.f, z_base), color);
-                // Left strip (along x = bp.x, z = bp.z + 1.f)
-                dc.fillQuad(Vec3<float>(bp.x, bp.y + w, z_base), Vec3<float>(bp.x, bp.y + 1.f - w, z_base), Vec3<float>(bp.x + w, bp.y + 1.f - w, z_base), Vec3<float>(bp.x + w, bp.y + w, z_base), color);
-                // Right strip (along x = bp.x + 1.f, z = bp.z + 1.f)
-                dc.fillQuad(Vec3<float>(bp.x + 1.f - w, bp.y + w, z_base), Vec3<float>(bp.x + 1.f - w, bp.y + 1.f - w, z_base), Vec3<float>(bp.x + 1.f, bp.y + 1.f - w, z_base), Vec3<float>(bp.x + 1.f, bp.y + w, z_base), color);
+                dc.fillQuad(Vec3<float>(bp.x, bp.y, z_base), Vec3<float>(bp.x + 1.002f, bp.y, z_base), Vec3<float>(bp.x + 1.002f, bp.y + w, z_base), Vec3<float>(bp.x, bp.y + w, z_base), color);
+                // Top strip (along y = bp.y + 1.002f, z = bp.z + 1.002f)
+                dc.fillQuad(Vec3<float>(bp.x, bp.y + 1.002f - w, z_base), Vec3<float>(bp.x + 1.002f, bp.y + 1.002f - w, z_base), Vec3<float>(bp.x + 1.002f, bp.y + 1.002f, z_base), Vec3<float>(bp.x, bp.y + 1.002f, z_base), color);
+                // Left strip (along x = bp.x, z = bp.z + 1.002f)
+                dc.fillQuad(Vec3<float>(bp.x, bp.y + w, z_base), Vec3<float>(bp.x, bp.y + 1.002f - w, z_base), Vec3<float>(bp.x + w, bp.y + 1.002f - w, z_base), Vec3<float>(bp.x + w, bp.y + w, z_base), color);
+                // Right strip (along x = bp.x + 1.002f, z = bp.z + 1.002f)
+                dc.fillQuad(Vec3<float>(bp.x + 1.002f - w, bp.y + w, z_base), Vec3<float>(bp.x + 1.002f - w, bp.y + 1.002f - w, z_base), Vec3<float>(bp.x + 1.002f, bp.y + 1.002f - w, z_base), Vec3<float>(bp.x + 1.002f, bp.y + w, z_base), color);
                 };
 
             auto drawNorth = [&](float width) {
                 float w = width;
-                float z_base = bp.z - epsilon;  // Offset z-coordinate outward
+                float z_base = bp.z ;  // Offset z-coordinate outward
                 // Bottom strip (along y = bp.y, z = bp.z)
-                dc.fillQuad(Vec3<float>(bp.x, bp.y, z_base), Vec3<float>(bp.x + 1.f, bp.y, z_base), Vec3<float>(bp.x + 1.f, bp.y + w, z_base), Vec3<float>(bp.x, bp.y + w, z_base), color);
-                // Top strip (along y = bp.y + 1.f, z = bp.z)
-                dc.fillQuad(Vec3<float>(bp.x, bp.y + 1.f - w, z_base), Vec3<float>(bp.x + 1.f, bp.y + 1.f - w, z_base), Vec3<float>(bp.x + 1.f, bp.y + 1.f, z_base), Vec3<float>(bp.x, bp.y + 1.f, z_base), color);
+                dc.fillQuad(Vec3<float>(bp.x, bp.y, z_base), Vec3<float>(bp.x + 1.002f, bp.y, z_base), Vec3<float>(bp.x + 1.002f, bp.y + w, z_base), Vec3<float>(bp.x, bp.y + w, z_base), color);
+                // Top strip (along y = bp.y + 1.002f, z = bp.z)
+                dc.fillQuad(Vec3<float>(bp.x, bp.y + 1.002f - w, z_base), Vec3<float>(bp.x + 1.002f, bp.y + 1.002f - w, z_base), Vec3<float>(bp.x + 1.002f, bp.y + 1.002f, z_base), Vec3<float>(bp.x, bp.y + 1.002f, z_base), color);
                 // Left strip (along x = bp.x, z = bp.z)
-                dc.fillQuad(Vec3<float>(bp.x, bp.y + w, z_base), Vec3<float>(bp.x, bp.y + 1.f - w, z_base), Vec3<float>(bp.x + w, bp.y + 1.f - w, z_base), Vec3<float>(bp.x + w, bp.y + w, z_base), color);
-                // Right strip (along x = bp.x + 1.f, z = bp.z)
-                dc.fillQuad(Vec3<float>(bp.x + 1.f - w, bp.y + w, z_base), Vec3<float>(bp.x + 1.f - w, bp.y + 1.f - w, z_base), Vec3<float>(bp.x + 1.f, bp.y + 1.f - w, z_base), Vec3<float>(bp.x + 1.f, bp.y + w, z_base), color);
+                dc.fillQuad(Vec3<float>(bp.x, bp.y + w, z_base), Vec3<float>(bp.x, bp.y + 1.002f - w, z_base), Vec3<float>(bp.x + w, bp.y + 1.002f - w, z_base), Vec3<float>(bp.x + w, bp.y + w, z_base), color);
+                // Right strip (along x = bp.x + 1.002f, z = bp.z)
+                dc.fillQuad(Vec3<float>(bp.x + 1.002f - w, bp.y + w, z_base), Vec3<float>(bp.x + 1.002f - w, bp.y + 1.002f - w, z_base), Vec3<float>(bp.x + 1.002f, bp.y + 1.002f - w, z_base), Vec3<float>(bp.x + 1.002f, bp.y + w, z_base), color);
                 };
 
             float width = settings.getSettingByName<float>("outlinewidth")->value;
