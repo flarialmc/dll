@@ -4,6 +4,54 @@
 #include <assert.h>
 #include "Hook/Hooks/Render/SwapchainHook.hpp"
 
+const char* debugPixelShaderSrc = R"(
+        cbuffer CameraData : register(b0)
+        {
+            float4x4 preWorldViewProjection;
+            float4x4 invWorldViewProjection;
+            float intensity;
+            float3 padding;
+        };
+
+        Texture2D sceneTexture : register(t0);
+        SamplerState samplerState : register(s0);
+
+        struct VS_OUTPUT {
+            float4 Pos : SV_POSITION;
+            float2 Tex : TEXCOORD0;
+        };
+
+        float4 mainPS(VS_OUTPUT input) : SV_Target {
+            float2 uv = input.Tex;
+            float4 color = sceneTexture.Sample(samplerState, uv);
+
+            float4 H = float4(uv.x * 2 - 1, (1 - uv.y) * 2 - 1, 0, 1);
+            float4 worldPos = mul(H, invWorldViewProjection);
+            worldPos /= worldPos.w;
+
+            float4 previousPos = mul(worldPos, preWorldViewProjection);
+            previousPos /= previousPos.w;
+
+            float2 velocity = (H.xy - previousPos.xy) / 2.0;
+            velocity.y *= -1;
+
+            velocity *= intensity;
+
+            float4 finalColor = color;
+            int numSamples = 6;
+            [unroll]
+            for (int i = 1; i <= numSamples; i++) {
+                float2 sampleUV = uv + velocity * (i / (float)numSamples);
+                finalColor += sceneTexture.Sample(samplerState, sampleUV);
+            }
+            finalColor /= (numSamples + 1);
+
+            // Convert to black and white
+            float luminance = dot(finalColor.rgb, float3(0.299f, 0.587f, 0.114f));
+            return float4(luminance.xxx, finalColor.a);
+        }
+)";
+
 const char* realMotionBlurPixelShaderSrc = R"(
 cbuffer CameraData : register(b0)
 {
@@ -81,6 +129,7 @@ bool RealMotionBlurHelper::Initialize()
     HRESULT hr;
     ID3DBlob* vsBlob = nullptr;
     ID3DBlob* psBlob = nullptr;
+    ID3DBlob* debugBlob = nullptr;
 
     if (!CompileShader(realDrawTextureVertexShaderSrc, "mainVS", "vs_5_0", &vsBlob))
         return false;
@@ -109,6 +158,13 @@ bool RealMotionBlurHelper::Initialize()
         return false;
     hr = m_device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &m_pixelShader);
     psBlob->Release();
+    if (FAILED(hr))
+        return false;
+
+    if (!CompileShader(debugPixelShaderSrc, "mainPS", "ps_5_0", &debugBlob))
+        return false;
+    hr = m_device->CreatePixelShader(debugBlob->GetBufferPointer(), debugBlob->GetBufferSize(), nullptr, &m_debugShader);
+    debugBlob->Release();
     if (FAILED(hr))
         return false;
 
@@ -219,6 +275,80 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
     context->VSSetShader(m_vertexShader, nullptr, 0);
     context->PSSetShader(m_pixelShader, nullptr, 0);
+    context->PSSetConstantBuffers(0, 1, &m_constantBuffer);
+
+    context->PSSetShaderResources(0, 1, &sceneSRV);
+    ID3D11SamplerState* sampler = nullptr;
+    D3D11_SAMPLER_DESC sampDesc = {};
+    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+    sampDesc.MinLOD = 0;
+    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+    HRESULT hr = device->CreateSamplerState(&sampDesc, &sampler);
+    if (SUCCEEDED(hr)) {
+        context->PSSetSamplers(0, 1, &sampler);
+    }
+
+    context->Draw(4, 0);
+
+    ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
+    context->PSSetShaderResources(0, 1, nullSRV);
+    if (sampler)
+        sampler->Release();
+
+    memcpy(m_prevWorldMatrix, &currWVP[0][0], sizeof(m_prevWorldMatrix));
+}
+
+void RealMotionBlurHelper::DebugRender(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID3D11ShaderResourceView>& frame)
+{
+    ID3D11DeviceContext* context = SwapchainHook::context;
+    ID3D11Device* device = SwapchainHook::d3d11Device;
+    if (!context || !device || !rtv) {
+        return;
+    }
+
+    ID3D11Resource* resource = nullptr;
+    rtv->GetResource(&resource);
+    ID3D11Texture2D* texture = static_cast<ID3D11Texture2D*>(resource);
+    D3D11_TEXTURE2D_DESC desc;
+    texture->GetDesc(&desc);
+    resource->Release();
+
+    D3D11_VIEWPORT viewport = { 0 };
+    viewport.Width = static_cast<float>(desc.Width);
+    viewport.Height = static_cast<float>(desc.Height);
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+    context->RSSetViewports(1, &viewport);
+
+    context->OMSetRenderTargets(1, &rtv, nullptr);
+
+    // Use the single frame provided
+    ID3D11ShaderResourceView* sceneSRV = frame.get();
+
+    glm::mat4 currWVP = Matrix::getMatrixCorrection(MC::Transform.modelView);
+    glm::mat4 invCurrWVP = glm::inverse(currWVP);
+
+    auto module = ModuleManager::getModule("Motion Blur");
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    if (SUCCEEDED(context->Map(m_constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource))) {
+        CameraDataBuffer* pData = (CameraDataBuffer*)mappedResource.pData;
+        pData->intensity = module->settings.getSettingByName<float>("intensity2")->value * (1.0f / FlarialGUI::frameFactor);
+        memcpy(pData->preWorldViewProjection, m_prevWorldMatrix, sizeof(pData->preWorldViewProjection));
+        memcpy(pData->invWorldViewProjection, &invCurrWVP[0][0], sizeof(pData->invWorldViewProjection));
+        context->Unmap(m_constantBuffer, 0);
+    }
+
+    context->IASetInputLayout(m_inputLayout);
+    UINT stride = sizeof(float) * 5;
+    UINT offset = 0;
+    context->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+    context->VSSetShader(m_vertexShader, nullptr, 0);
+    context->PSSetShader(m_debugShader, nullptr, 0);
     context->PSSetConstantBuffers(0, 1, &m_constantBuffer);
 
     context->PSSetShaderResources(0, 1, &sceneSRV);

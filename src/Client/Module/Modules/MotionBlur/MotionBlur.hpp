@@ -37,6 +37,7 @@ public:
         if (settings.getSettingByName<float>("intensity2") == nullptr) settings.addSetting("intensity2", 6.0f);
         if (settings.getSettingByName<bool>("avgpixel") == nullptr) settings.addSetting("avgpixel", false);
         if (settings.getSettingByName<bool>("dynamic") == nullptr) settings.addSetting("dynamic", true);
+        if (settings.getSettingByName<bool>("debug") == nullptr) settings.addSetting("debug", false);
 
     }
 
@@ -58,7 +59,7 @@ public:
         this->addToggle("Average Pixel Mode", "Disabling this will likely look better on high FPS.", this->settings.getSettingByName<bool>("avgpixel")->value);
         if (this->settings.getSettingByName<bool>("avgpixel")->value) this->addToggle("Dynamic Mode", "Automatically adjusts intensity according to FPS", this->settings.getSettingByName<bool>("dynamic")->value);
         this->addConditionalSlider(!this->settings.getSettingByName<bool>("dynamic")->value, "Intensity", "Amount of previous frames to render.", this->settings.getSettingByName<float>("intensity2")->value, 30, 0, true);
-
+        if (FLARIAL_BUILD_TYPE == "Debug") this->addToggle("Debug", "Makes the screen greyscale for debugging purposes", this->settings.getSettingByName<bool>("debug")->value);
         FlarialGUI::UnsetScrollView();
 
         this->resetPadding();
@@ -67,10 +68,6 @@ public:
     static inline std::vector<winrt::com_ptr<ID3D11ShaderResourceView>> previousFrames;
 
     void onRender(RenderEvent& event) {
-
-        //if (FlarialGUI::inMenu) return;
-
-
         int maxFrames = (int)round(this->settings.getSettingByName<float>("intensity2")->value);
 
         if (this->settings.getSettingByName<bool>("dynamic")->value) {
@@ -94,7 +91,8 @@ public:
                 previousFrames.push_back(std::move(buffer));
             }
 
-            if (this->settings.getSettingByName<bool>("avgpixel")->value) AvgPixelMotionBlurHelper::Render(event.RTV, previousFrames);
+            if (this->settings.getSettingByName<bool>("debug")->value) RealMotionBlurHelper::DebugRender(event.RTV, previousFrames.front());
+            else if (this->settings.getSettingByName<bool>("avgpixel")->value) AvgPixelMotionBlurHelper::Render(event.RTV, previousFrames);
             else RealMotionBlurHelper::Render(event.RTV, previousFrames.front());
 
         } else {
