@@ -7,16 +7,23 @@
 #include <Utils/Render/DrawUtil3D.hpp>
 #include <Utils/Render/MaterialUtils.hpp>
 
+#include "SDK/Client/Options/OptionsParser.hpp"
+
 class BlockOutline : public Module {
 
 public:
+    OptionsParser options;
     BlockOutline() : Module("Block Outline", "Changes the block outline color", IDR_BLOCK_PNG, "") {
         Module::setup();
+        options.parseOptionsFile();
+
     };
 
     void onEnable() override {
+        options.parseOptionsFile();
         Listen(this, RenderOutlineSelectionEvent, &BlockOutline::onOutlineSelection)
         Module::onEnable();
+        if (options.options["gfx_classic_box_selection"] != "1") FlarialGUI::Notify("Enable 'Outline Selection' in Minecraft Video Settings for this to work.");
     }
 
     void onDisable() override {
@@ -70,7 +77,7 @@ public:
     }
 
     void onOutlineSelection(RenderOutlineSelectionEvent &event) {
-        
+
         D2D1_COLOR_F color;
         color = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("color")->value);
         color.a = settings.getSettingByName<float>("colorOpacity")->value;
@@ -84,9 +91,11 @@ public:
         auto bp = event.getPos();
 
         if (!settings.getSettingByName<bool>("overlay")->value) {
+
+            /* NORMAL MODE */
             if (settings.getSettingByName<bool>("showfulloutline")->value) dc.setMaterial(MaterialUtils::getParticlesAlpha());
             else dc.setMaterial(MaterialUtils::getNametag());
-            float epsilon = 0.001f;  // Small offset to prevent clipping
+            float epsilon = 0.0005f;  // Small offset to prevent clipping
 
             auto drawUp = [&](float width) {
                 float w = width;
@@ -142,7 +151,7 @@ public:
             auto drawEast = [&](float width) {
                 float w = width;
                 float wi = 1 - w;
-                float x_base = bp.x + 1.f + epsilon;  // Offset x-coordinate outward
+                float x_base = bp.x + 1.f + epsilon;
                 // Bottom strip (along y = bp.y)
                 dc.fillQuad(Vec3<float>(x_base, bp.y, bp.z), Vec3<float>(x_base, bp.y + w, bp.z), Vec3<float>(x_base, bp.y + w, bp.z + 1.f), Vec3<float>(x_base, bp.y, bp.z + 1.f), color);
                 // Top strip (along y = bp.y + 1.f)
@@ -202,30 +211,33 @@ public:
             drawUp(width);
             drawDown(width);
         }
+
+        /* OVERLAY MODE */
+
         else {
             // The else block remains unchanged as it draws full faces without offsets
             auto drawUp = [&]() {
-                dc.fillQuad(Vec3<float>(bp.x, bp.y + 1.002f, bp.z), Vec3<float>(bp.x + 1.f, bp.y + 1.002f, bp.z), Vec3<float>(bp.x + 1.f, bp.y + 1.002f, bp.z + 1.f), Vec3<float>(bp.x, bp.y + 1.002f, bp.z + 1.f), color);
+                dc.fillQuad(Vec3<float>(bp.x, bp.y , bp.z), Vec3<float>(bp.x + 1.f, bp.y , bp.z), Vec3<float>(bp.x + 1.f, bp.y , bp.z + 1.f), Vec3<float>(bp.x, bp.y , bp.z + 1.f), color);
                 };
 
             auto drawDown = [&]() {
-                dc.fillQuad(bp, Vec3<float>(bp.x + 1.f, bp.y - 0.001f, bp.z), Vec3<float>(bp.x + 1.f, bp.y - 0.001f, bp.z + 1.f), Vec3<float>(bp.x, bp.y - 0.001f, bp.z + 1.f), color);
+                dc.fillQuad(bp, Vec3<float>(bp.x + 1.f, bp.y , bp.z), Vec3<float>(bp.x + 1.f, bp.y , bp.z + 1.f), Vec3<float>(bp.x, bp.y , bp.z + 1.f), color);
                 };
 
             auto drawEast = [&]() {
-                dc.fillQuad(Vec3<float>(bp.x + 1.002f, bp.y, bp.z), Vec3<float>(bp.x + 1.002f, bp.y + 1.f, bp.z), Vec3<float>(bp.x + 1.002f, bp.y + 1.f, bp.z + 1.f), Vec3<float>(bp.x + 1.002f, bp.y, bp.z + 1.f), color);
+                dc.fillQuad(Vec3<float>(bp.x , bp.y, bp.z), Vec3<float>(bp.x , bp.y + 1.f, bp.z), Vec3<float>(bp.x , bp.y + 1.f, bp.z + 1.f), Vec3<float>(bp.x , bp.y, bp.z + 1.f), color);
                 };
 
             auto drawWest = [&]() {
-                dc.fillQuad(Vec3<float>(bp.x - 0.001f, bp.y, bp.z), Vec3<float>(bp.x - 0.001f, bp.y + 1.f, bp.z), Vec3<float>(bp.x - 0.001f, bp.y + 1.f, bp.z + 1.f), Vec3<float>(bp.x - 0.001f, bp.y, bp.z + 1.f), color);
+                dc.fillQuad(Vec3<float>(bp.x , bp.y, bp.z), Vec3<float>(bp.x , bp.y + 1.f, bp.z), Vec3<float>(bp.x , bp.y + 1.f, bp.z + 1.f), Vec3<float>(bp.x , bp.y, bp.z + 1.f), color);
                 };
 
             auto drawSouth = [&]() {
-                dc.fillQuad(Vec3<float>(bp.x, bp.y, bp.z + 1.002f), Vec3<float>(bp.x, bp.y + 1.f, bp.z + 1.002f), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + 1.002f), Vec3<float>(bp.x + 1.f, bp.y, bp.z + 1.002f), color);
+                dc.fillQuad(Vec3<float>(bp.x, bp.y, bp.z ), Vec3<float>(bp.x, bp.y + 1.f, bp.z ), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z ), Vec3<float>(bp.x + 1.f, bp.y, bp.z ), color);
                 };
 
             auto drawNorth = [&]() {
-                dc.fillQuad(Vec3<float>(bp.x, bp.y, bp.z - 0.001f), Vec3<float>(bp.x, bp.y + 1.f, bp.z - 0.001f), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z - 0.001f), Vec3<float>(bp.x + 1.f, bp.y, bp.z - 0.001f), color);
+                dc.fillQuad(Vec3<float>(bp.x, bp.y, bp.z ), Vec3<float>(bp.x, bp.y + 1.f, bp.z ), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z ), Vec3<float>(bp.x + 1.f, bp.y, bp.z ), color);
                 };
 
             if (!settings.getSettingByName<bool>("overlayfullblock")->value) {
