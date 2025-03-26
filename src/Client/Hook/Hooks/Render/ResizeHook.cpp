@@ -17,6 +17,8 @@
 #include "../../../../../lib/ImGui/imgui.h"
 #include "../../../Client.hpp"
 #include "../../../Module/Modules/GuiScale/GuiScale.hpp"
+#include "Modules/MotionBlur/MotionBlur.hpp"
+#include "Modules/MotionBlur/MotionBlurHelper.hpp"
 
 void ResizeHook::enableHook() {
 
@@ -74,6 +76,8 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(SwapchainHook::stageTex);
     Memory::SafeRelease(SwapchainHook::SavedD3D11BackBuffer);
     Memory::SafeRelease(SwapchainHook::ExtraSavedD3D11BackBuffer);
+
+
     Memory::SafeRelease(Blur::pConstantBuffer);
     Memory::SafeRelease(Blur::pSampler);
     Memory::SafeRelease(Blur::pDownsampleShader);
@@ -81,6 +85,17 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(Blur::pUpsampleShader);
     Memory::SafeRelease(Blur::pVertexBuffer);
     Memory::SafeRelease(Blur::pVertexShader);
+
+
+    Memory::SafeRelease(MotionBlurHelper::m_constantBuffer);
+    Memory::SafeRelease(MotionBlurHelper::m_inputLayout);
+    Memory::SafeRelease(MotionBlurHelper::m_pixelShader);
+    Memory::SafeRelease(MotionBlurHelper::m_vertexShader);
+    Memory::SafeRelease(MotionBlurHelper::m_vertexBuffer);
+    MotionBlur::initted = false;
+
+
+
     Memory::SafeRelease(SwapchainHook::d3d11Device);
     Memory::SafeRelease(SwapchainHook::D2D1Bitmap);
     Memory::SafeRelease(D2D::context);

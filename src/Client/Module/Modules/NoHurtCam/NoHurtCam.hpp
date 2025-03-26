@@ -51,19 +51,28 @@ public:
         if(patched) return;
         patched = true;
         int size;
-        if (VersionUtils::checkAboveOrEqual(21, 30)) {
+        if (VersionUtils::checkAboveOrEqual(21, 70)) {
+            size = 1;
+        } else if (VersionUtils::checkAboveOrEqual(21, 30)) {
             size = 5;
         } else {
             size = 3;
         }
-        Memory::nopBytes((LPVOID) sigOffset, size);
+        if (VersionUtils::checkAboveOrEqual(21, 70)) {
+            std::byte jump{0xEB};
+            Memory::patchBytes((LPVOID) sigOffset, &jump, size);
+        } else {
+            Memory::nopBytes((LPVOID) sigOffset, size);
+        }
     }
 
     static void unpatch() {
         if(!patched) return;
         patched = false;
         int size;
-        if (VersionUtils::checkAboveOrEqual(21, 30)) {
+        if (VersionUtils::checkAboveOrEqual(21, 70)) {
+            size = 1;
+        } else if (VersionUtils::checkAboveOrEqual(21, 30)) {
             size = 5;
         } else {
             size = 3;
