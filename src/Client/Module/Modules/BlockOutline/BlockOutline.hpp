@@ -7,54 +7,11 @@
 #include <Utils/Render/DrawUtil3D.hpp>
 
 class BlockOutline : public Module {
-// TODO: switch to renderOutlineSelection hook + 3D option
-private:
-    static inline uintptr_t highlightColorRipRelAddr; // RIP REL 4BYTE FROM FUNC OFFSET ADDR
-    static inline UINT32 highlightColorOrigRipRel;
-
-    static inline uintptr_t outlineColorRipRelAddr;
-    static inline UINT32 outlineColorOrigRipRel;
-    // TODO: make it look better
-    static inline MCCColor* selectionColor; // allocate space for color
-    static inline std::array<std::byte, 4> highlightColorNewRipRel;
-    static inline std::array<std::byte, 4> outlineColorNewRipRel;
 
 public:
     BlockOutline() : Module("Block Outline", "Changes the block outline color", IDR_BLOCK_PNG, "") {
         Module::setup();
     };
-
-    void onSetup() override {
-    }
-
-    void terminate() override { // free memory we took for color
-        FreeBuffer(selectionColor);
-        Module::terminate();
-    }
-
-    void onColorChange() {
-        // change our color
-        D2D1_COLOR_F color;
-        if (settings.getSettingByName<bool>("color_rgb")->value) color = FlarialGUI::rgbColor;
-        else color = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("color")->value);
-
-        selectionColor->r = color.r;
-        selectionColor->g = color.g;
-        selectionColor->b = color.b;
-        selectionColor->a = settings.getSettingByName<float>("colorOpacity")->value;
-    }
-
-    static void patch() { // change rel rip offset to ours
-        if(highlightColorRipRelAddr == NULL || outlineColorRipRelAddr == NULL) return;
-        Memory::patchBytes((void *) highlightColorRipRelAddr, highlightColorNewRipRel.data(), sizeof(UINT32));
-        Memory::patchBytes((void *) outlineColorRipRelAddr, outlineColorNewRipRel.data(), sizeof(UINT32));
-    }
-
-    static void unpatch() { // change rel rip offset to ours
-        if(highlightColorRipRelAddr == NULL || outlineColorRipRelAddr == NULL) return;
-        Memory::patchBytes((void *) highlightColorRipRelAddr, &highlightColorOrigRipRel, sizeof(UINT32));
-        Memory::patchBytes((void *) outlineColorRipRelAddr, &outlineColorOrigRipRel, sizeof(UINT32));
-    }
 
     void onEnable() override {
         Listen(this, RenderOutlineSelectionEvent, &BlockOutline::onOutlineSelection)
@@ -96,23 +53,47 @@ public:
         FlarialGUI::UnsetScrollView();
 
         this->resetPadding();
-
-
-        if (settings.getSettingByName<bool>("enabled"))
-            onColorChange();
     }
 
     void onOutlineSelection(RenderOutlineSelectionEvent &event) {
         MCDrawUtil3D dc(SDK::clientInstance->getLevelRender(), event.getScreenContext());
         D2D1_COLOR_F color;
-        if (settings.getSettingByName<bool>("color_rgb")->value) color = FlarialGUI::rgbColor;
-        else color = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("color")->value);
+        color = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("color")->value);
+        color.a = settings.getSettingByName<float>("colorOpacity")->value;
+        
+        auto bp = event.getPos();
 
-        selectionColor->r = color.r;
-        selectionColor->g = color.g;
-        selectionColor->b = color.b;
-        selectionColor->a = settings.getSettingByName<float>("colorOpacity")->value;
-        dc.drawBox(event.getBox(), color);
+        auto drawUp = [&]() {
+            dc.fillQuad(Vec3<float>(bp.x, bp.y + 1.f, bp.z), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + 1.f), Vec3<float>(bp.x, bp.y + 1.f, bp.z + 1.f ), color);
+            };
+
+        auto drawDown = [&]() {
+            dc.fillQuad(bp, Vec3<float>(bp.x + 1.f, bp.y, bp.z), Vec3<float>(bp.x + 1.f, bp.y, bp.z + 1.f), Vec3<float>(bp.x, bp.y, bp.z + 1.f), color);
+            };
+
+        auto drawEast = [&]() {
+            dc.fillQuad(Vec3<float>(bp.x + 1.f, bp.y, bp.z), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + 1.f), Vec3<float>(bp.x + 1.f, bp.y, bp.z + 1.f), color);
+            };
+
+        auto drawWest = [&]() {
+            dc.fillQuad(Vec3<float>(bp.x, bp.y, bp.z), Vec3<float>(bp.x, bp.y + 1.f, bp.z), Vec3<float>(bp.x, bp.y + 1.f, bp.z + 1.f), Vec3<float>(bp.x, bp.y, bp.z + 1.f), color);
+            };
+
+        auto drawSouth = [&]() {
+            dc.fillQuad(Vec3<float>(bp.x, bp.y, bp.z + 1.f), Vec3<float>(bp.x, bp.y + 1.f, bp.z + 1.f), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + 1.f), Vec3<float>(bp.x + 1.f, bp.y, bp.z + 1.f), color);
+            };
+
+        auto drawNorth = [&]() {
+            dc.fillQuad(Vec3<float>(bp.x, bp.y, bp.z), Vec3<float>(bp.x, bp.y + 1.f, bp.z), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z), Vec3<float>(bp.x + 1.f, bp.y, bp.z), color);
+            };
+
+        drawNorth();
+        drawEast();
+        drawSouth();
+        drawWest();
+        drawUp();
+        drawDown();
+
         dc.flush();
 
         event.cancel();

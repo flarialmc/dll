@@ -11,4 +11,5 @@ public:
     static mce::MaterialPtr* getParticlesAlpha();
     static mce::MaterialPtr* getUICrosshair();
     static mce::MaterialPtr* getNametag();
+    static mce::MaterialPtr* getSelectionOverlay();
 };

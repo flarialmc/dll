@@ -1,11 +1,12 @@
 #include "DrawUtil3D.hpp"
+#include "MaterialUtils.hpp"
 #include "../../SDK/Client/Render/Tessellator/MeshHelpers.hpp"
 
 MCDrawUtil3D::MCDrawUtil3D(LevelRender* renderer, ScreenContext* ctx, mce::MaterialPtr* material)
     : levelRenderer(renderer), screenContext(ctx), material(material) {
     
     if (!material) {
-        this->material = renderer->getLevelRendererPlayer()->getSelectionBoxMaterial();
+        this->material = MaterialUtils::getSelectionOverlay();
     }
 }
 
@@ -68,7 +69,7 @@ void MCDrawUtil3D::fillQuad(Vec3<float> p1, Vec3<float> p2, Vec3<float> p3, Vec3
 	
 	auto tess = scn->getTessellator();
 	*scn->getColorHolder() = { 1.f, 1.f, 1.f, 1.f };
-	tess->begin(mce::PrimitiveMode::LineStrip, 4); // linestrip
+	tess->begin(mce::PrimitiveMode::QuadList, 4); // linestrip
 	tess->color(color.r, color.g, color.b, color.a);
 	auto origin = levelRenderer->getOrigin();
 	Vec3<float> a = p1;

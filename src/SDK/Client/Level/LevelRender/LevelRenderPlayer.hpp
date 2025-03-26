@@ -14,6 +14,6 @@ public:
     }
 
     mce::MaterialPtr* getSelectionBoxMaterial() {
-        return hat::member_at<mce::MaterialPtr*>(this, 0x2F0);
+        return hat::member_at<mce::MaterialPtr*>(this, 0xF08);
     }
 };
