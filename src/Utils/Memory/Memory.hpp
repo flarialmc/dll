@@ -160,6 +160,8 @@ public:
         // this function returns absolute address in memory ("(sig)A B C (+offset)? ? ? ?(+4)(from here + bytes to move to get to value pointer points to) D E F")
         // offset val = *reinterpret_cast<int *>(sig + offset)
         // base = sig + offset + 4
+
+        if(sig == 0) return 0;
         return sig + offset + 4 + *reinterpret_cast<int *>(sig + offset);
     }
 
