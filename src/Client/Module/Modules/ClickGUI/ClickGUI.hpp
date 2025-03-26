@@ -467,6 +467,11 @@ public:
             this->settings.getSettingByName<float>("o_colors_secondary7")->value,
             this->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
         );
+        this->addColorPicker("Secondary 8", "Navigation bar background deactivated Color",
+            this->settings.getSettingByName<std::string>("colors_secondary8")->value,
+            this->settings.getSettingByName<float>("o_colors_secondary8")->value,
+            this->settings.getSettingByName<bool>("colors_secondary8_rgb")->value
+        );
         this->addColorPicker("Modcard 1", "Color of top rounded rectangle",
             this->settings.getSettingByName<std::string>("colors_mod1")->value,
             this->settings.getSettingByName<float>("o_colors_mod1")->value,

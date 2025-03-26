@@ -34,6 +34,8 @@ public:
     void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 0.88f);
         if (settings.getSettingByName<float>("intensity2") == nullptr) settings.addSetting("intensity2", 6.0f);
+        if (settings.getSettingByName<bool>("dynamic") == nullptr) settings.addSetting("dynamic", true);
+
     }
 
     void settingsRender(float settingsOffset) override {
@@ -51,8 +53,8 @@ public:
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Misc");
-        this->addSlider("Bleed Factor", "Scale of bleeding of previous frames into current.", this->settings.getSettingByName<float>("intensity")->value, 1.0f, 0.f, true);
-        this->addSlider("Intensity", "Amount of previous frames to render.", this->settings.getSettingByName<float>("intensity2")->value, 30, 0, true);
+        this->addToggle("Dynamic Mode", "Automatically adjusts intensity according to FPS", this->settings.getSettingByName<bool>("dynamic")->value);
+        this->addConditionalSlider(!this->settings.getSettingByName<bool>("dynamic")->value, "Intensity", "Amount of previous frames to render.", this->settings.getSettingByName<float>("intensity2")->value, 30, 0, true);
 
         FlarialGUI::UnsetScrollView();
 
@@ -65,7 +67,16 @@ public:
 
         //if (FlarialGUI::inMenu) return;
 
+
         int maxFrames = (int)round(this->settings.getSettingByName<float>("intensity2")->value);
+
+        if (this->settings.getSettingByName<bool>("dynamic")->value) {
+            if (MC::fps < 75) maxFrames = 1;
+            else if (MC::fps < 100) maxFrames = 2;
+            else if (MC::fps < 180) maxFrames = 3;
+            else if (MC::fps > 300) maxFrames = 4;
+            else if (MC::fps > 450) maxFrames = 5;
+        }
 
         if (SDK::getCurrentScreen() == "hud_screen" && !SwapchainHook::queue && initted && this->isEnabled()) {
 
