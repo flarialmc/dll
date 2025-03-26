@@ -1,38 +1,58 @@
-#include "MotionBlurHelper.hpp"
+#include "RealMotionBlurHelper.hpp"
 #include <d3dcompiler.h>
 #include <windows.h>
 #include <assert.h>
-
 #include "Hook/Hooks/Render/SwapchainHook.hpp"
 
 
-const char* drawTextureShaderSrc = R"(
-cbuffer FrameCountBuffer : register(b0)
+const char* realMotionBlurPixelShaderSrc = R"(
+cbuffer CameraData : register(b0)
 {
-    int numFrames;
+    float4x4 preWorldViewProjection;
+    float4x4 invWorldViewProjection;
+    float intensity;
     float3 padding;
 };
-Texture2D g_frames[50] : register(t0);
-SamplerState g_sampler : register(s0);
+
+Texture2D sceneTexture : register(t0);
+SamplerState samplerState : register(s0);
+
 struct VS_OUTPUT {
     float4 Pos : SV_POSITION;
     float2 Tex : TEXCOORD0;
 };
+
 float4 mainPS(VS_OUTPUT input) : SV_Target
 {
-    float4 color = float4(0, 0, 0, 0);
-    int safeNumFrames = max(numFrames, 1);
-    [unroll]
-    for (int i = 0; i < safeNumFrames; i++)
-    {
-        color += g_frames[i].Sample(g_sampler, input.Tex);
-    }
-    return color / safeNumFrames;
-}
+    float2 uv = input.Tex;
+    float4 color = sceneTexture.Sample(samplerState, uv);
 
+    float4 H = float4(uv.x * 2 - 1, (1 - uv.y) * 2 - 1, 0, 1);
+
+    float4 worldPos = mul(H, invWorldViewProjection);
+    worldPos /= worldPos.w;
+
+    float4 previousPos = mul(worldPos, preWorldViewProjection);
+    previousPos /= previousPos.w;
+
+    float2 velocity = (H.xy - previousPos.xy) / 2.0;
+    velocity.y *= -1;
+
+    velocity *= intensity;
+
+    float4 finalColor = color;
+    int numSamples = 6;
+    [unroll]
+    for (int i = 1; i <= numSamples; i++) {
+        float2 sampleUV = uv + velocity * (i / (float)numSamples);
+        finalColor += sceneTexture.Sample(samplerState, sampleUV);
+    }
+    return finalColor / (numSamples + 1);
+}
 )";
 
-const char* drawTextureVertexShaderSrc = R"(
+
+const char* realDrawTextureVertexShaderSrc = R"(
 struct VS_INPUT {
     float3 Pos : POSITION;
     float2 Tex : TEXCOORD0;
@@ -50,24 +70,27 @@ VS_OUTPUT mainVS(VS_INPUT input)
 }
 )";
 
-struct FrameCountBuffer {
-    int numFrames;
+struct CameraDataBuffer {
+    float preWorldViewProjection[16];
+    float invWorldViewProjection[16];
+    float intensity;
     float padding[3];
 };
 
-bool MotionBlurHelper::Initialize()
+bool RealMotionBlurHelper::Initialize()
 {
-    Logger::debug("initializing motion blur helper..");
+    Logger::debug("Initializing motion blur helper with WVP matrices...");
     HRESULT hr;
     ID3DBlob* vsBlob = nullptr;
     ID3DBlob* psBlob = nullptr;
-    Logger::debug("ye");
 
-    if (!CompileShader(drawTextureVertexShaderSrc, "mainVS", "vs_5_0", &vsBlob))
+    if (!CompileShader(realDrawTextureVertexShaderSrc, "mainVS", "vs_5_0", &vsBlob))
         return false;
     ID3D11Device* m_device = SwapchainHook::d3d11Device;
-    if (!m_device) { Logger::debug("Device is nullptr"); return false;}
-    Logger::debug("ye");
+    if (!m_device) {
+        Logger::debug("Device is nullptr");
+        return false;
+    }
     hr = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &m_vertexShader);
     if (FAILED(hr))
     {
@@ -83,15 +106,17 @@ bool MotionBlurHelper::Initialize()
     vsBlob->Release();
     if (FAILED(hr))
         return false;
-    if (!CompileShader(drawTextureShaderSrc, "mainPS", "ps_5_0", &psBlob))
+
+    if (!CompileShader(realMotionBlurPixelShaderSrc, "mainPS", "ps_5_0", &psBlob))
         return false;
     hr = m_device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &m_pixelShader);
     psBlob->Release();
     if (FAILED(hr))
         return false;
+
     D3D11_BUFFER_DESC cbDesc = {};
     cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    cbDesc.ByteWidth = 16;
+    cbDesc.ByteWidth = sizeof(CameraDataBuffer);
     cbDesc.Usage = D3D11_USAGE_DYNAMIC;
     cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     hr = m_device->CreateBuffer(&cbDesc, nullptr, &m_constantBuffer);
@@ -99,17 +124,17 @@ bool MotionBlurHelper::Initialize()
     {
         char errorMsg[256];
         sprintf_s(errorMsg, "Failed to create constant buffer: 0x%08X\n", hr);
-        std::cout << "umm what the sigma" << std::endl;
         OutputDebugStringA(errorMsg);
         return false;
     }
+
     struct Vertex { float x, y, z; float u, v; };
     Vertex vertices[] =
     {
-        { -1.0f,  1.0f, 0.0f,     0.0f, 0.0f },
-        {  1.0f,  1.0f, 0.0f,     1.0f, 0.0f },
-        { -1.0f, -1.0f, 0.0f,     0.0f, 1.0f },
-        {  1.0f, -1.0f, 0.0f,     1.0f, 1.0f },
+        { -1.0f,  1.0f, 0.0f, 0.0f, 0.0f },
+        {  1.0f,  1.0f, 0.0f, 1.0f, 0.0f },
+        { -1.0f, -1.0f, 0.0f, 0.0f, 1.0f },
+        {  1.0f, -1.0f, 0.0f, 1.0f, 1.0f },
     };
     D3D11_BUFFER_DESC vbDesc = {};
     vbDesc.Usage = D3D11_USAGE_IMMUTABLE;
@@ -120,10 +145,14 @@ bool MotionBlurHelper::Initialize()
     hr = m_device->CreateBuffer(&vbDesc, &initData, &m_vertexBuffer);
     if (FAILED(hr))
         return false;
+
+    memset(&m_prevWorldMatrix, 0, sizeof(m_prevWorldMatrix));
+    m_prevWorldMatrix[0] = m_prevWorldMatrix[5] = m_prevWorldMatrix[10] = m_prevWorldMatrix[15] = 1.0f;
+
     return true;
 }
 
-bool MotionBlurHelper::CompileShader(const char* srcData, const char* entryPoint, const char* shaderModel, ID3DBlob** blobOut)
+bool RealMotionBlurHelper::CompileShader(const char* srcData, const char* entryPoint, const char* shaderModel, ID3DBlob** blobOut)
 {
     UINT compileFlags = 0;
 #if defined( DEBUG ) || defined( _DEBUG )
@@ -140,11 +169,12 @@ bool MotionBlurHelper::CompileShader(const char* srcData, const char* entryPoint
         }
         return false;
     }
-    if (errorBlob) errorBlob->Release();
+    if (errorBlob)
+        errorBlob->Release();
     return true;
 }
 
-void MotionBlurHelper::Render(ID3D11RenderTargetView* rtv, std::vector<winrt::com_ptr<ID3D11ShaderResourceView>>& frames)
+void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, std::vector<winrt::com_ptr<ID3D11ShaderResourceView>>& frames)
 {
     ID3D11DeviceContext* context = SwapchainHook::context;
     ID3D11Device* device = SwapchainHook::d3d11Device;
@@ -152,7 +182,6 @@ void MotionBlurHelper::Render(ID3D11RenderTargetView* rtv, std::vector<winrt::co
         return;
     }
 
-    // Get size from the provided RTV
     ID3D11Resource* resource = nullptr;
     rtv->GetResource(&resource);
     ID3D11Texture2D* texture = static_cast<ID3D11Texture2D*>(resource);
@@ -160,7 +189,6 @@ void MotionBlurHelper::Render(ID3D11RenderTargetView* rtv, std::vector<winrt::co
     texture->GetDesc(&desc);
     resource->Release();
 
-    // Set the viewport
     D3D11_VIEWPORT viewport = {0};
     viewport.Width = static_cast<float>(desc.Width);
     viewport.Height = static_cast<float>(desc.Height);
@@ -168,21 +196,25 @@ void MotionBlurHelper::Render(ID3D11RenderTargetView* rtv, std::vector<winrt::co
     viewport.MaxDepth = 1.0f;
     context->RSSetViewports(1, &viewport);
 
-    // Set the render target
     context->OMSetRenderTargets(1, &rtv, nullptr);
 
-    const size_t numFrames = frames.size();
-    if (numFrames == 0) return;
+    if (frames.empty())
+        return;
+    ID3D11ShaderResourceView* sceneSRV = frames[0].get();
 
-    // Update constant buffer with number of frames
+    glm::mat4 currWVP = Matrix::getMatrixCorrection(MC::Transform.modelView);
+    glm::mat4 invCurrWVP = glm::inverse(currWVP);
+
+    auto module = ModuleManager::getModule("Motion Blur");
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     if (SUCCEEDED(context->Map(m_constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource))) {
-        FrameCountBuffer* pData = (FrameCountBuffer*)mappedResource.pData;
-        pData->numFrames = (int)numFrames;
+        CameraDataBuffer* pData = (CameraDataBuffer*)mappedResource.pData;
+        pData->intensity = module->settings.getSettingByName<float>("intensity2")->value * (1.0f / FlarialGUI::frameFactor);
+        memcpy(pData->preWorldViewProjection, m_prevWorldMatrix, sizeof(pData->preWorldViewProjection));
+        memcpy(pData->invWorldViewProjection, &invCurrWVP[0][0], sizeof(pData->invWorldViewProjection));
         context->Unmap(m_constantBuffer, 0);
     }
 
-    // Set up pipeline
     context->IASetInputLayout(m_inputLayout);
     UINT stride = sizeof(float) * 5;
     UINT offset = 0;
@@ -192,15 +224,7 @@ void MotionBlurHelper::Render(ID3D11RenderTargetView* rtv, std::vector<winrt::co
     context->PSSetShader(m_pixelShader, nullptr, 0);
     context->PSSetConstantBuffers(0, 1, &m_constantBuffer);
 
-    // Bind frames as shader resources
-    std::vector<ID3D11ShaderResourceView*> srvs;
-    srvs.reserve(numFrames);
-    for (auto& frame : frames) {
-        srvs.push_back(frame.get());
-    }
-    context->PSSetShaderResources(0, (UINT)numFrames, srvs.data());
-
-    // Set sampler
+    context->PSSetShaderResources(0, 1, &sceneSRV);
     ID3D11SamplerState* sampler = nullptr;
     D3D11_SAMPLER_DESC sampDesc = {};
     sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -215,11 +239,12 @@ void MotionBlurHelper::Render(ID3D11RenderTargetView* rtv, std::vector<winrt::co
         context->PSSetSamplers(0, 1, &sampler);
     }
 
-    // Draw
     context->Draw(4, 0);
 
-    std::vector<ID3D11ShaderResourceView*> nullSRVs(numFrames, nullptr);
-    context->PSSetShaderResources(0, static_cast<UINT>(numFrames), nullSRVs.data());
+    ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
+    context->PSSetShaderResources(0, 1, nullSRV);
+    if (sampler)
+        sampler->Release();
 
-    if (sampler) sampler->Release();
+    memcpy(m_prevWorldMatrix, &currWVP[0][0], sizeof(m_prevWorldMatrix));
 }

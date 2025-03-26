@@ -1,6 +1,7 @@
 #pragma once
 
-#include "MotionBlurHelper.hpp"
+#include "AvgPixelMotionBlurHelper.hpp"
+#include "RealMotionBlurHelper.hpp"
 #include "../Module.hpp"
 
 
@@ -34,6 +35,7 @@ public:
     void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 0.88f);
         if (settings.getSettingByName<float>("intensity2") == nullptr) settings.addSetting("intensity2", 6.0f);
+        if (settings.getSettingByName<bool>("avgpixel") == nullptr) settings.addSetting("avgpixel", false);
         if (settings.getSettingByName<bool>("dynamic") == nullptr) settings.addSetting("dynamic", true);
 
     }
@@ -53,7 +55,8 @@ public:
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Misc");
-        this->addToggle("Dynamic Mode", "Automatically adjusts intensity according to FPS", this->settings.getSettingByName<bool>("dynamic")->value);
+        this->addToggle("Average Pixel Mode", "Disabling this will likely look better on high FPS.", this->settings.getSettingByName<bool>("avgpixel")->value);
+        if (this->settings.getSettingByName<bool>("avgpixel")->value) this->addToggle("Dynamic Mode", "Automatically adjusts intensity according to FPS", this->settings.getSettingByName<bool>("dynamic")->value);
         this->addConditionalSlider(!this->settings.getSettingByName<bool>("dynamic")->value, "Intensity", "Amount of previous frames to render.", this->settings.getSettingByName<float>("intensity2")->value, 30, 0, true);
 
         FlarialGUI::UnsetScrollView();
@@ -91,7 +94,8 @@ public:
                 previousFrames.push_back(std::move(buffer));
             }
 
-            MotionBlurHelper::Render(event.RTV, previousFrames);
+            if (this->settings.getSettingByName<bool>("avgpixel")->value) AvgPixelMotionBlurHelper::Render(event.RTV, previousFrames);
+            else RealMotionBlurHelper::Render(event.RTV, previousFrames);
 
         } else {
             previousFrames.clear();

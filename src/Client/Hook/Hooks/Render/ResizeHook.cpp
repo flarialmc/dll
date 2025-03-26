@@ -18,7 +18,9 @@
 #include "../../../Client.hpp"
 #include "../../../Module/Modules/GuiScale/GuiScale.hpp"
 #include "Modules/MotionBlur/MotionBlur.hpp"
-#include "Modules/MotionBlur/MotionBlurHelper.hpp"
+#include "Modules/MotionBlur/AvgPixelMotionBlurHelper.hpp"
+#include "Modules/MotionBlur/RealMotionBlurHelper.hpp"
+
 
 void ResizeHook::enableHook() {
 
@@ -87,11 +89,17 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(Blur::pVertexShader);
 
 
-    Memory::SafeRelease(MotionBlurHelper::m_constantBuffer);
-    Memory::SafeRelease(MotionBlurHelper::m_inputLayout);
-    Memory::SafeRelease(MotionBlurHelper::m_pixelShader);
-    Memory::SafeRelease(MotionBlurHelper::m_vertexShader);
-    Memory::SafeRelease(MotionBlurHelper::m_vertexBuffer);
+    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_constantBuffer);
+    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_inputLayout);
+    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_pixelShader);
+    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_vertexShader);
+    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_vertexBuffer);
+
+    Memory::SafeRelease(RealMotionBlurHelper::m_constantBuffer);
+    Memory::SafeRelease(RealMotionBlurHelper::m_inputLayout);
+    Memory::SafeRelease(RealMotionBlurHelper::m_pixelShader);
+    Memory::SafeRelease(RealMotionBlurHelper::m_vertexShader);
+    Memory::SafeRelease(RealMotionBlurHelper::m_vertexBuffer);
     MotionBlur::initted = false;
 
 

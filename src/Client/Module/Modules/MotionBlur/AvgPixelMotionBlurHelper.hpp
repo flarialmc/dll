@@ -2,7 +2,7 @@
 #include <d3d11.h>
 #include <winrt/base.h>
 
-class MotionBlurHelper
+class AvgPixelMotionBlurHelper
 {
 public:
     static bool Initialize();
@@ -14,4 +14,5 @@ public:
     static inline ID3D11InputLayout*      m_inputLayout;
     static inline ID3D11Buffer*           m_constantBuffer;
     static inline ID3D11Buffer*           m_vertexBuffer;
+    static inline float                   m_prevWorldMatrix[16];
 };
