@@ -15,7 +15,6 @@ private:
     static void OutlineSelectioCallback(LevelRendererPlayer* obj, ScreenContext* scn, void* block, void* region, Vec3<int> pos) {
         Vec3<float> woah = Vec3<float>(pos.x, pos.y, pos.z);
         auto event = nes::make_holder<RenderOutlineSelectionEvent>(woah, scn);
-        std::cout << pos.x << "\n";
         eventMgr.trigger(event);
 
         if (!event->isCancelled()) funcOriginal(obj, scn, block, region, pos);

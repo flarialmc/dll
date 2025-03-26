@@ -22,7 +22,6 @@ winrt::Windows::Foundation::IAsyncAction import() {
 
     const auto selectedFiles = co_await WinrtUtils::pickFiles(L".zip");
     if (selectedFiles.Size() == 0) co_return;
-    std::cout << "Trying" << std::endl;
     for (uint32_t i = 0; i < selectedFiles.Size(); i++)
     {
         auto zipFile = selectedFiles.GetAt(i);
