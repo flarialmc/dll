@@ -28,6 +28,8 @@ public:
             settings.addSetting("color", (std::string) "FFFFFF");
         if (settings.getSettingByName<bool>("color_rgb") == nullptr) settings.addSetting("color_rgb", false);
         if (settings.getSettingByName<float>("colorOpacity") == nullptr) settings.addSetting("colorOpacity", 0.6f);
+        if (settings.getSettingByName<bool>("overlay") == nullptr) settings.addSetting("overlay", false);
+        if (settings.getSettingByName<bool>("overlayfullblock") == nullptr) settings.addSetting("overlayfullblock", false);
 
     }
 
@@ -45,8 +47,13 @@ public:
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
-        this->addHeader("Colors");
-        this->addColorPicker("Outline Color", "", settings.getSettingByName<std::string>("color")->value,
+        this->addHeader("Main");
+        this->addToggle("Overlay", "Overlays the face of block", settings.getSettingByName<bool>("overlay")->value);
+        std::string col = settings.getSettingByName<bool>("overlay")->value ? "Overlay" : "Outline";
+        if (settings.getSettingByName<bool>("overlay")->value) {
+            this->addToggle("Overlay Full Block", "Overlays the full block", settings.getSettingByName<bool>("overlayfullblock")->value);
+        }
+        this->addColorPicker(col + " Color", "", settings.getSettingByName<std::string>("color")->value,
                                       settings.getSettingByName<float>("colorOpacity")->value,
                                       settings.getSettingByName<bool>("color_rgb")->value);
 
@@ -94,6 +101,11 @@ public:
         drawUp();
         drawDown();
 
+        if(!settings.getSettingByName<bool>("overlay")->value)
+            dc.drawBox(event.getBox(), color);
+        else {
+
+        }
         dc.flush();
 
         event.cancel();
