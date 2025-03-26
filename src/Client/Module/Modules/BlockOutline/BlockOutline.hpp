@@ -4,80 +4,22 @@
 #include <Utils/Utils.hpp>
 #include <Utils/Memory/CustomAllocator/Buffer.hpp>
 
-class BlockOutline : public Module {
-// TODO: switch to renderOutlineSelection hook + 3D option
-private:
-    static inline uintptr_t highlightColorRipRelAddr; // RIP REL 4BYTE FROM FUNC OFFSET ADDR
-    static inline UINT32 highlightColorOrigRipRel;
+#include <Utils/Render/DrawUtil3D.hpp>
 
-    static inline uintptr_t outlineColorRipRelAddr;
-    static inline UINT32 outlineColorOrigRipRel;
-    // TODO: make it look better
-    static inline MCCColor* selectionColor; // allocate space for color
-    static inline std::array<std::byte, 4> highlightColorNewRipRel;
-    static inline std::array<std::byte, 4> outlineColorNewRipRel;
+class BlockOutline : public Module {
 
 public:
     BlockOutline() : Module("Block Outline", "Changes the block outline color", IDR_BLOCK_PNG, "") {
         Module::setup();
     };
 
-    void onSetup() override { // init color just in case
-        highlightColorRipRelAddr = GET_SIG_ADDRESS("blockHighlightColor"); // RIP REL 4BYTE FROM FUNC OFFSET ADDR
-        if(highlightColorRipRelAddr == NULL) return;
-        highlightColorOrigRipRel = *(UINT32*)highlightColorRipRelAddr;
-
-        outlineColorRipRelAddr = GET_SIG_ADDRESS("mce::Color::BLACK");
-        if(outlineColorRipRelAddr == NULL) return;
-        outlineColorOrigRipRel = *(UINT32*)outlineColorRipRelAddr;
-        // TODO: make it look better
-        selectionColor = (MCCColor*)AllocateBuffer((void*)highlightColorRipRelAddr); // allocate space for color
-        highlightColorNewRipRel = Memory::getRipRel(highlightColorRipRelAddr, reinterpret_cast<uintptr_t>((void*)selectionColor));
-        outlineColorNewRipRel= Memory::getRipRel(outlineColorRipRelAddr, reinterpret_cast<uintptr_t>((void*)selectionColor));
-        *selectionColor = MCCColor{};
-    }
-
-    void terminate() override { // free memory we took for color
-        FreeBuffer(selectionColor);
-        Module::terminate();
-    }
-
-    void onColorChange() {
-        // change our color
-        D2D1_COLOR_F color;
-        if (settings.getSettingByName<bool>("color_rgb")->value) color = FlarialGUI::rgbColor;
-        else color = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("color")->value);
-
-        selectionColor->r = color.r;
-        selectionColor->g = color.g;
-        selectionColor->b = color.b;
-        selectionColor->a = settings.getSettingByName<float>("colorOpacity")->value;
-    }
-
-    static void patch() { // change rel rip offset to ours
-        if(highlightColorRipRelAddr == NULL || outlineColorRipRelAddr == NULL) return;
-        Memory::patchBytes((void *) highlightColorRipRelAddr, highlightColorNewRipRel.data(), sizeof(UINT32));
-        Memory::patchBytes((void *) outlineColorRipRelAddr, outlineColorNewRipRel.data(), sizeof(UINT32));
-    }
-
-    static void unpatch() { // change rel rip offset to ours
-        if(highlightColorRipRelAddr == NULL || outlineColorRipRelAddr == NULL) return;
-        Memory::patchBytes((void *) highlightColorRipRelAddr, &highlightColorOrigRipRel, sizeof(UINT32));
-        Memory::patchBytes((void *) outlineColorRipRelAddr, &outlineColorOrigRipRel, sizeof(UINT32));
-    }
-
     void onEnable() override {
-        onColorChange();
-
-        patch();
-        Listen(this, TickEvent, &BlockOutline::onTick)
+        Listen(this, RenderOutlineSelectionEvent, &BlockOutline::onOutlineSelection)
         Module::onEnable();
     }
 
     void onDisable() override {
-
-        unpatch();
-        Listen(this, TickEvent, &BlockOutline::onTick)
+        Deafen(this, RenderOutlineSelectionEvent, &BlockOutline::onOutlineSelection)
         Module::onDisable();
     }
 
@@ -86,6 +28,9 @@ public:
             settings.addSetting("color", (std::string) "FFFFFF");
         if (settings.getSettingByName<bool>("color_rgb") == nullptr) settings.addSetting("color_rgb", false);
         if (settings.getSettingByName<float>("colorOpacity") == nullptr) settings.addSetting("colorOpacity", 0.6f);
+        if (settings.getSettingByName<bool>("overlay") == nullptr) settings.addSetting("overlay", false);
+        if (settings.getSettingByName<bool>("overlayfullblock") == nullptr) settings.addSetting("overlayfullblock", false);
+        if (settings.getSettingByName<float>("outlinewidth") == nullptr) settings.addSetting("outlinewidth", 0.01);
 
     }
 
@@ -103,22 +48,244 @@ public:
                                   Constraints::RelativeConstraint(1.0, "width"),
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
-        this->addHeader("Colors");
-        this->addColorPicker("Outline Color", "", settings.getSettingByName<std::string>("color")->value,
+        this->addHeader("Main");
+        this->addToggle("Overlay", "Overlays the face of block", settings.getSettingByName<bool>("overlay")->value);
+        std::string col = settings.getSettingByName<bool>("overlay")->value ? "Overlay" : "Outline";
+        if (settings.getSettingByName<bool>("overlay")->value) {
+            this->addToggle("Overlay Full Block", "Overlays the full block", settings.getSettingByName<bool>("overlayfullblock")->value);
+        }
+        else {
+            this->addSlider("Outline Width", "Thickness of the outline", settings.getSettingByName<float>("outlinewidth")->value, 0.5);
+        }
+        this->addColorPicker(col + " Color", "", settings.getSettingByName<std::string>("color")->value,
                                       settings.getSettingByName<float>("colorOpacity")->value,
                                       settings.getSettingByName<bool>("color_rgb")->value);
 
         FlarialGUI::UnsetScrollView();
 
         this->resetPadding();
-
-
-        if (settings.getSettingByName<bool>("enabled"))
-            onColorChange();
     }
 
-    void onTick(TickEvent &event) {
-        if (this->settings.getSettingByName<bool>("color_rgb")->value)
-            onColorChange();
+    void onOutlineSelection(RenderOutlineSelectionEvent &event) {
+        MCDrawUtil3D dc(SDK::clientInstance->getLevelRender(), event.getScreenContext());
+        D2D1_COLOR_F color;
+        color = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("color")->value);
+        color.a = settings.getSettingByName<float>("colorOpacity")->value;
+
+        auto face = (int)SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult().facing;
+
+        auto bp = event.getPos();
+
+        if (!settings.getSettingByName<bool>("overlay")->value) {
+
+            auto drawUp = [&](float width) {
+                float w = width;
+                float wi = 1 - w;
+                //Top Left 
+                dc.fillQuad(Vec3<float>(bp.x, bp.y + 1.f, bp.z), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + w), Vec3<float>(bp.x, bp.y + 1.f, bp.z + w), color);
+
+                //Top Right
+                dc.fillQuad(Vec3<float>(bp.x, bp.y + 1.f, bp.z + wi), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + wi), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + 1), Vec3<float>(bp.x, bp.y + 1.f, bp.z + 1), color);
+
+                //Top Top
+                dc.fillQuad(Vec3<float>(bp.x + wi, bp.y + 1.f, bp.z + w), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + w), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + 1 - w), Vec3<float>(bp.x + wi, bp.y + 1.f, bp.z + 1), color);
+
+                //Top Bottom
+                dc.fillQuad(Vec3<float>(bp.x, bp.y + 1.f, bp.z + w), Vec3<float>(bp.x + w, bp.y + 1.f, bp.z + w), Vec3<float>(bp.x + w, bp.y + 1.f, bp.z + 1 - w), Vec3<float>(bp.x, bp.y + 1.f, bp.z + 1 - w), color);
+                };
+
+            auto drawDown = [&](float width) {
+                float w = width;
+                float wi = 1 - w;
+                //Bottom Left 
+                dc.fillQuad(Vec3<float>(bp.x, bp.y, bp.z), Vec3<float>(bp.x + 1.f, bp.y, bp.z), Vec3<float>(bp.x + 1.f, bp.y, bp.z + w), Vec3<float>(bp.x, bp.y, bp.z + w), color);
+
+                //Bottom Right
+                dc.fillQuad(Vec3<float>(bp.x, bp.y, bp.z + wi), Vec3<float>(bp.x + 1.f, bp.y, bp.z + wi), Vec3<float>(bp.x + 1.f, bp.y, bp.z + 1), Vec3<float>(bp.x, bp.y, bp.z + 1), color);
+
+                //Bottom Top
+                dc.fillQuad(Vec3<float>(bp.x + wi, bp.y, bp.z + w), Vec3<float>(bp.x + 1.f, bp.y, bp.z + w), Vec3<float>(bp.x + 1.f, bp.y, bp.z + 1 - w), Vec3<float>(bp.x + wi, bp.y, bp.z + 1), color);
+
+                //Bottom Bottom
+                dc.fillQuad(Vec3<float>(bp.x, bp.y, bp.z + w), Vec3<float>(bp.x + w, bp.y, bp.z + w), Vec3<float>(bp.x + w, bp.y, bp.z + 1 - w), Vec3<float>(bp.x, bp.y, bp.z + 1 - w), color);
+
+                };
+            auto drawEast = [&](float width) {
+                float w = width;
+                float wi = 1 - w;
+                // Bottom strip (along y = bp.y)
+                dc.fillQuad(Vec3<float>(bp.x + 1.f, bp.y, bp.z),
+                    Vec3<float>(bp.x + 1.f, bp.y + w, bp.z),
+                    Vec3<float>(bp.x + 1.f, bp.y + w, bp.z + 1.f),
+                    Vec3<float>(bp.x + 1.f, bp.y, bp.z + 1.f), color);
+                // Top strip (along y = bp.y + 1.f)
+                dc.fillQuad(Vec3<float>(bp.x + 1.f, bp.y + 1.f - w, bp.z),
+                    Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z),
+                    Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + 1.f),
+                    Vec3<float>(bp.x + 1.f, bp.y + 1.f - w, bp.z + 1.f), color);
+                // Front strip (along z = bp.z)
+                dc.fillQuad(Vec3<float>(bp.x + 1.f, bp.y + w, bp.z),
+                    Vec3<float>(bp.x + 1.f, bp.y + 1.f - w, bp.z),
+                    Vec3<float>(bp.x + 1.f, bp.y + 1.f - w, bp.z + w),
+                    Vec3<float>(bp.x + 1.f, bp.y + w, bp.z + w), color);
+                // Back strip (along z = bp.z + 1.f)
+                dc.fillQuad(Vec3<float>(bp.x + 1.f, bp.y + w, bp.z + 1.f - w),
+                    Vec3<float>(bp.x + 1.f, bp.y + 1.f - w, bp.z + 1.f - w),
+                    Vec3<float>(bp.x + 1.f, bp.y + 1.f - w, bp.z + 1.f),
+                    Vec3<float>(bp.x + 1.f, bp.y + w, bp.z + 1.f), color);
+                };
+
+            auto drawWest = [&](float width) {
+                float w = width;
+                float wi = 1 - w;
+                // Bottom strip (along y = bp.y)
+                dc.fillQuad(Vec3<float>(bp.x, bp.y, bp.z),
+                    Vec3<float>(bp.x, bp.y + w, bp.z),
+                    Vec3<float>(bp.x, bp.y + w, bp.z + 1.f),
+                    Vec3<float>(bp.x, bp.y, bp.z + 1.f), color);
+                // Top strip (along y = bp.y + 1.f)
+                dc.fillQuad(Vec3<float>(bp.x, bp.y + 1.f - w, bp.z),
+                    Vec3<float>(bp.x, bp.y + 1.f, bp.z),
+                    Vec3<float>(bp.x, bp.y + 1.f, bp.z + 1.f),
+                    Vec3<float>(bp.x, bp.y + 1.f - w, bp.z + 1.f), color);
+                // Front strip (along z = bp.z)
+                dc.fillQuad(Vec3<float>(bp.x, bp.y + w, bp.z),
+                    Vec3<float>(bp.x, bp.y + 1.f - w, bp.z),
+                    Vec3<float>(bp.x, bp.y + 1.f - w, bp.z + w),
+                    Vec3<float>(bp.x, bp.y + w, bp.z + w), color);
+                // Back strip (along z = bp.z + 1.f)
+                dc.fillQuad(Vec3<float>(bp.x, bp.y + w, bp.z + 1.f - w),
+                    Vec3<float>(bp.x, bp.y + 1.f - w, bp.z + 1.f - w),
+                    Vec3<float>(bp.x, bp.y + 1.f - w, bp.z + 1.f),
+                    Vec3<float>(bp.x, bp.y + w, bp.z + 1.f), color);
+                };
+
+            auto drawSouth = [&](float width) {
+                float w = width;
+                // Bottom strip (along y = bp.y, z = bp.z + 1.f)
+                dc.fillQuad(Vec3<float>(bp.x, bp.y, bp.z + 1.f),           // Bottom-left
+                    Vec3<float>(bp.x + 1.f, bp.y, bp.z + 1.f),     // Bottom-right
+                    Vec3<float>(bp.x + 1.f, bp.y + w, bp.z + 1.f), // Top-right
+                    Vec3<float>(bp.x, bp.y + w, bp.z + 1.f),       // Top-left
+                    color);
+                // Top strip (along y = bp.y + 1.f, z = bp.z + 1.f)
+                dc.fillQuad(Vec3<float>(bp.x, bp.y + 1.f - w, bp.z + 1.f),     // Bottom-left
+                    Vec3<float>(bp.x + 1.f, bp.y + 1.f - w, bp.z + 1.f), // Bottom-right
+                    Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + 1.f),     // Top-right
+                    Vec3<float>(bp.x, bp.y + 1.f, bp.z + 1.f),           // Top-left
+                    color);
+                // Left strip (along x = bp.x, z = bp.z + 1.f)
+                dc.fillQuad(Vec3<float>(bp.x, bp.y + w, bp.z + 1.f),           // Bottom-left
+                    Vec3<float>(bp.x, bp.y + 1.f - w, bp.z + 1.f),     // Top-left
+                    Vec3<float>(bp.x + w, bp.y + 1.f - w, bp.z + 1.f), // Top-right
+                    Vec3<float>(bp.x + w, bp.y + w, bp.z + 1.f),       // Bottom-right
+                    color);
+                // Right strip (along x = bp.x + 1.f, z = bp.z + 1.f)
+                dc.fillQuad(Vec3<float>(bp.x + 1.f - w, bp.y + w, bp.z + 1.f),     // Bottom-left
+                    Vec3<float>(bp.x + 1.f - w, bp.y + 1.f - w, bp.z + 1.f), // Top-left
+                    Vec3<float>(bp.x + 1.f, bp.y + 1.f - w, bp.z + 1.f),     // Top-right
+                    Vec3<float>(bp.x + 1.f, bp.y + w, bp.z + 1.f),           // Bottom-right
+                    color);
+                };
+
+            auto drawNorth = [&](float width) {
+                float w = width;
+                // Bottom strip (along y = bp.y, z = bp.z)
+                dc.fillQuad(Vec3<float>(bp.x, bp.y, bp.z),           // Bottom-left
+                    Vec3<float>(bp.x + 1.f, bp.y, bp.z),     // Bottom-right
+                    Vec3<float>(bp.x + 1.f, bp.y + w, bp.z), // Top-right
+                    Vec3<float>(bp.x, bp.y + w, bp.z),       // Top-left
+                    color);
+                // Top strip (along y = bp.y + 1.f, z = bp.z)
+                dc.fillQuad(Vec3<float>(bp.x, bp.y + 1.f - w, bp.z),     // Bottom-left
+                    Vec3<float>(bp.x + 1.f, bp.y + 1.f - w, bp.z), // Bottom-right
+                    Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z),     // Top-right
+                    Vec3<float>(bp.x, bp.y + 1.f, bp.z),           // Top-left
+                    color);
+                // Left strip (along x = bp.x, z = bp.z)
+                dc.fillQuad(Vec3<float>(bp.x, bp.y + w, bp.z),           // Bottom-left
+                    Vec3<float>(bp.x, bp.y + 1.f - w, bp.z),     // Top-left
+                    Vec3<float>(bp.x + w, bp.y + 1.f - w, bp.z), // Top-right
+                    Vec3<float>(bp.x + w, bp.y + w, bp.z),       // Bottom-right
+                    color);
+                // Right strip (along x = bp.x + 1.f, z = bp.z)
+                dc.fillQuad(Vec3<float>(bp.x + 1.f - w, bp.y + w, bp.z),     // Bottom-left
+                    Vec3<float>(bp.x + 1.f - w, bp.y + 1.f - w, bp.z), // Top-left
+                    Vec3<float>(bp.x + 1.f, bp.y + 1.f - w, bp.z),     // Top-right
+                    Vec3<float>(bp.x + 1.f, bp.y + w, bp.z),           // Bottom-right
+                    color);
+                };
+
+
+            float width = settings.getSettingByName<float>("outlinewidth")->value;
+
+            drawNorth(width);
+            drawEast(width);
+            drawSouth(width);
+            drawWest(width);
+            drawUp(width);
+            drawDown(width);
+        }
+            
+        else {
+            auto drawUp = [&]() {
+                dc.fillQuad(Vec3<float>(bp.x, bp.y + 1.f, bp.z), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + 1.f), Vec3<float>(bp.x, bp.y + 1.f, bp.z + 1.f), color);
+                };
+
+            auto drawDown = [&]() {
+                dc.fillQuad(bp, Vec3<float>(bp.x + 1.f, bp.y, bp.z), Vec3<float>(bp.x + 1.f, bp.y, bp.z + 1.f), Vec3<float>(bp.x, bp.y, bp.z + 1.f), color);
+                };
+
+            auto drawEast = [&]() {
+                dc.fillQuad(Vec3<float>(bp.x + 1.f, bp.y, bp.z), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + 1.f), Vec3<float>(bp.x + 1.f, bp.y, bp.z + 1.f), color);
+                };
+
+            auto drawWest = [&]() {
+                dc.fillQuad(Vec3<float>(bp.x, bp.y, bp.z), Vec3<float>(bp.x, bp.y + 1.f, bp.z), Vec3<float>(bp.x, bp.y + 1.f, bp.z + 1.f), Vec3<float>(bp.x, bp.y, bp.z + 1.f), color);
+                };
+
+            auto drawSouth = [&]() {
+                dc.fillQuad(Vec3<float>(bp.x, bp.y, bp.z + 1.f), Vec3<float>(bp.x, bp.y + 1.f, bp.z + 1.f), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + 1.f), Vec3<float>(bp.x + 1.f, bp.y, bp.z + 1.f), color);
+                };
+
+            auto drawNorth = [&]() {
+                dc.fillQuad(Vec3<float>(bp.x, bp.y, bp.z), Vec3<float>(bp.x, bp.y + 1.f, bp.z), Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z), Vec3<float>(bp.x + 1.f, bp.y, bp.z), color);
+                };
+
+            if (!settings.getSettingByName<bool>("overlayfullblock")->value) {
+                switch (face) {
+                case 0:
+                    drawDown();
+                    break;
+                case 1: // up
+                    drawUp();
+                    break;
+                case 2: // north
+                    drawNorth();
+                    break;
+                case 3:
+                    drawSouth();
+                    break;
+                case 4:
+                    drawWest();
+                    break;
+                case 5:
+                    drawEast();
+                    break;
+                }
+            }
+            else {
+                drawNorth();
+                drawEast();
+                drawSouth();
+                drawWest();
+                drawUp();
+                drawDown();
+            }
+        }
+
+        dc.flush();
+
+        event.cancel();
     }
 };

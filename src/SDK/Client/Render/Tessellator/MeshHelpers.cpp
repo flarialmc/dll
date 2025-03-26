@@ -9,6 +9,18 @@ void MeshHelpers::renderMeshImmediately(ScreenContext* screenContext, Tessellato
         static auto sig = Memory::offsetFromSig(GET_SIG_ADDRESS("MeshHelpers::renderMeshImmediately"), 1);
         using func_t = void(*)(ScreenContext*, Tessellator*, mce::MaterialPtr*, char*);
         static auto func = reinterpret_cast<func_t>(sig);
+        if (!material) {
+            std::cout << "material nullptr\n";
+            return;
+        }
+        if (!tessellator) {
+            std::cout << "tesselator nullptr\n";
+            return;
+        }
+        if (!screenContext) {
+            std::cout << "screenContext nullptr\n";
+            return;
+        }
         func(screenContext, tessellator, material, pad);
     }
     else {

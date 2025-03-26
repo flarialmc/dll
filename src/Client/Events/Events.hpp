@@ -37,3 +37,4 @@
 #include "Render/UIControlGetPositionEvent.hpp"
 #include "Misc/ProtocolEvent.hpp"
 #include "Game/RenderItemInHandEvent.hpp"
+#include "Render/RenderOutlineSelectionEvent.hpp"
