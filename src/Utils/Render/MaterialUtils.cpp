@@ -24,7 +24,7 @@ void MaterialUtils::update() {
     if (nametagDepthTested == nullptr)
         nametagDepthTested = mce::RenderMaterialGroup::createUI(HashedString("name_tag_depth_tested"));
     if (selection_overlay_opaque == nullptr)
-        selection_overlay_opaque = mce::RenderMaterialGroup::createUI(HashedString("selection_overlay"));
+        selection_overlay_opaque = mce::RenderMaterialGroup::createUI(HashedString("selection_box"));
 }
 
 mce::MaterialPtr* MaterialUtils::getUIFillColor() {
