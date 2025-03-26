@@ -4,12 +4,11 @@
 #include <assert.h>
 #include "Hook/Hooks/Render/SwapchainHook.hpp"
 
-
 const char* realMotionBlurPixelShaderSrc = R"(
 cbuffer CameraData : register(b0)
 {
-    float4x4 preWorldViewProjection;
-    float4x4 invWorldViewProjection;
+    row_major matrix preWorldViewProjection;
+    row_major matrix invWorldViewProjection;
     float intensity;
     float3 padding;
 };
@@ -50,7 +49,6 @@ float4 mainPS(VS_OUTPUT input) : SV_Target
     return finalColor / (numSamples + 1);
 }
 )";
-
 
 const char* realDrawTextureVertexShaderSrc = R"(
 struct VS_INPUT {
@@ -174,7 +172,7 @@ bool RealMotionBlurHelper::CompileShader(const char* srcData, const char* entryP
     return true;
 }
 
-void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, std::vector<winrt::com_ptr<ID3D11ShaderResourceView>>& frames)
+void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID3D11ShaderResourceView>& frame)
 {
     ID3D11DeviceContext* context = SwapchainHook::context;
     ID3D11Device* device = SwapchainHook::d3d11Device;
@@ -198,9 +196,8 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, std::vector<winrt
 
     context->OMSetRenderTargets(1, &rtv, nullptr);
 
-    if (frames.empty())
-        return;
-    ID3D11ShaderResourceView* sceneSRV = frames[0].get();
+    // Use the single frame provided
+    ID3D11ShaderResourceView* sceneSRV = frame.get();
 
     glm::mat4 currWVP = Matrix::getMatrixCorrection(MC::Transform.modelView);
     glm::mat4 invCurrWVP = glm::inverse(currWVP);

@@ -7,7 +7,7 @@ class RealMotionBlurHelper
 public:
     static bool Initialize();
     static bool CompileShader(const char* srcData, const char* entryPoint, const char* shaderModel, ID3DBlob** blobOut);
-    static void Render(ID3D11RenderTargetView* rtv, std::vector<winrt::com_ptr<ID3D11ShaderResourceView>>& frames);
+    static void Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID3D11ShaderResourceView>& frame);
 
     static inline ID3D11PixelShader*      m_pixelShader;
     static inline ID3D11VertexShader*     m_vertexShader;

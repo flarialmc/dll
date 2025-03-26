@@ -85,17 +85,17 @@ public:
 
             // Remove excess frames if maxFrames is reduced
             if (previousFrames.size() > static_cast<size_t>(maxFrames)) {
-                previousFrames.erase(previousFrames.begin(), previousFrames.begin() + (previousFrames.size() - maxFrames));
+                previousFrames.erase(previousFrames.begin(),
+                                     previousFrames.begin() + (previousFrames.size() - maxFrames));
             }
 
-            // Capture the current back buffer
             auto buffer = BackbufferToSRVExtraMode();
             if (buffer) {
                 previousFrames.push_back(std::move(buffer));
             }
 
             if (this->settings.getSettingByName<bool>("avgpixel")->value) AvgPixelMotionBlurHelper::Render(event.RTV, previousFrames);
-            else RealMotionBlurHelper::Render(event.RTV, previousFrames);
+            else RealMotionBlurHelper::Render(event.RTV, previousFrames.front());
 
         } else {
             previousFrames.clear();
