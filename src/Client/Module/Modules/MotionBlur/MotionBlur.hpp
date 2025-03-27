@@ -79,6 +79,8 @@ public:
             else if (MC::fps > 450) maxFrames = 5;
         }
 
+        if (this->settings.getSettingByName<bool>("avgpixel")->value) maxFrames = 1;
+
         if (SDK::getCurrentScreen() == "hud_screen" && initted && this->isEnabled()) {
 
             // Remove excess frames if maxFrames is reduced
