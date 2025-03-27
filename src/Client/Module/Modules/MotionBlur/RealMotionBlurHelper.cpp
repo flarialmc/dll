@@ -202,6 +202,14 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     // Use the single frame provided
     ID3D11ShaderResourceView* sceneSRV = frame.get();
 
+    ID3D11Resource* frameResource = nullptr;
+    frame->GetResource(&frameResource);
+    ID3D11Texture2D* frameTexture = static_cast<ID3D11Texture2D*>(frameResource);
+    D3D11_TEXTURE2D_DESC frameDesc;
+    frameTexture->GetDesc(&frameDesc);
+    Logger::debug("Render target: {}x{}, Frame texture: {}x{}", desc.Width, desc.Height, frameDesc.Width, frameDesc.Height);
+    frameResource->Release();
+
     glm::mat4 currWVP = Matrix::getMatrixCorrection(MC::Transform.modelView);
     glm::mat4 invCurrWVP = glm::inverse(currWVP);
 

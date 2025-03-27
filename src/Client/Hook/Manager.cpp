@@ -33,6 +33,7 @@
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 #include "Hooks/Game/ItemInHandRendererRenderItem.hpp"
 #include "Hooks/Visual/RenderOutlineSelectionHook.hpp"
+#include "Hooks/Render/MinecraftGame_Update.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
@@ -107,6 +108,7 @@ void HookManager::initialize() {
     addHook<ItemInHandRendererRenderItem>();
 
     addHook<RenderOutlineSelectionHook>();
+    addHook< MinecraftGame_Update>();
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();

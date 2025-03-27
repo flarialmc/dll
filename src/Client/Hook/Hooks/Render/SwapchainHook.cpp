@@ -233,6 +233,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     FPSMeasure();
 
+    Logger::debug("Swapchain : {}", MC::frames);
+
     if (!init) {
         /* INIT START */
 
