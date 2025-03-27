@@ -179,27 +179,95 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
 {
     ID3D11DeviceContext* context = SwapchainHook::context;
     ID3D11Device* device = SwapchainHook::d3d11Device;
-    if (!context || !device || !rtv) {
+    if (!context || !device || !rtv)
+    {
         return;
     }
 
+    // Retrieve the texture description from the RTV's resource.
     ID3D11Resource* resource = nullptr;
     rtv->GetResource(&resource);
     ID3D11Texture2D* texture = static_cast<ID3D11Texture2D*>(resource);
-    D3D11_TEXTURE2D_DESC desc;
+    D3D11_TEXTURE2D_DESC desc = {};
     texture->GetDesc(&desc);
     resource->Release();
 
-    D3D11_VIEWPORT viewport = {0};
-    viewport.Width = static_cast<float>(desc.Width);
-    viewport.Height = static_cast<float>(desc.Height);
+    // Set up viewport based on the render target dimensions.
+    D3D11_VIEWPORT viewport = {};
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width    = static_cast<float>(desc.Width);
+    viewport.Height   = static_cast<float>(desc.Height);
     viewport.MinDepth = 0.0f;
     viewport.MaxDepth = 1.0f;
     context->RSSetViewports(1, &viewport);
 
+    // Clear render target.
+    FLOAT backgroundColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    context->ClearRenderTargetView(rtv, backgroundColor);
+
+    // Set render target.
     context->OMSetRenderTargets(1, &rtv, nullptr);
 
-    // Use the single frame provided
+    // -------------------------------
+    // Create and set Depth–Stencil State
+    // -------------------------------
+    D3D11_DEPTH_STENCIL_DESC dsd = {};
+    dsd.DepthEnable = false;
+    dsd.StencilEnable = false;
+    ID3D11DepthStencilState* pDepthStencilState = nullptr;
+    HRESULT hr = device->CreateDepthStencilState(&dsd, &pDepthStencilState);
+    if (FAILED(hr))
+    {
+        return;
+    }
+    context->OMSetDepthStencilState(pDepthStencilState, 0);
+
+    // -------------------------------
+    // Create and set Blend State
+    // -------------------------------
+    D3D11_BLEND_DESC bd = {};
+    ZeroMemory(&bd, sizeof(bd));
+    bd.AlphaToCoverageEnable = false;
+    bd.RenderTarget[0].BlendEnable = true;
+    bd.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    bd.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+    bd.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    bd.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+    bd.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+    bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    ID3D11BlendState* pBlendState = nullptr;
+    hr = device->CreateBlendState(&bd, &pBlendState);
+    if (FAILED(hr))
+    {
+        pDepthStencilState->Release();
+        return;
+    }
+    context->OMSetBlendState(pBlendState, nullptr, 0xffffffff);
+
+    // -------------------------------
+    // Create and set Rasterizer State
+    // -------------------------------
+    D3D11_RASTERIZER_DESC rd = {};
+    rd.FillMode = D3D11_FILL_SOLID;
+    rd.CullMode = D3D11_CULL_NONE;
+    rd.DepthClipEnable = false;
+    rd.ScissorEnable = false;
+    ID3D11RasterizerState* pRasterizerState = nullptr;
+    hr = device->CreateRasterizerState(&rd, &pRasterizerState);
+    if (FAILED(hr))
+    {
+        pDepthStencilState->Release();
+        pBlendState->Release();
+        return;
+    }
+    context->RSSetState(pRasterizerState);
+
+    // -------------------------------
+    // Process scene and update constant buffer.
+    // -------------------------------
+    // Use the single frame provided.
     ID3D11ShaderResourceView* sceneSRV = frame.get();
 
     glm::mat4 currWVP = Matrix::getMatrixCorrection(MC::Transform.modelView);
@@ -207,7 +275,8 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
 
     auto module = ModuleManager::getModule("Motion Blur");
     D3D11_MAPPED_SUBRESOURCE mappedResource;
-    if (SUCCEEDED(context->Map(m_constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource))) {
+    if (SUCCEEDED(context->Map(m_constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+    {
         CameraDataBuffer* pData = (CameraDataBuffer*)mappedResource.pData;
         pData->intensity = module->settings.getSettingByName<float>("intensity2")->value * (1.0f / FlarialGUI::frameFactor);
         memcpy(pData->preWorldViewProjection, m_prevWorldMatrix, sizeof(pData->preWorldViewProjection));
@@ -215,6 +284,9 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
         context->Unmap(m_constantBuffer, 0);
     }
 
+    // -------------------------------
+    // Set up pipeline states.
+    // -------------------------------
     context->IASetInputLayout(m_inputLayout);
     UINT stride = sizeof(float) * 5;
     UINT offset = 0;
@@ -224,7 +296,10 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     context->PSSetShader(m_pixelShader, nullptr, 0);
     context->PSSetConstantBuffers(0, 1, &m_constantBuffer);
 
+    // Bind scene resource.
     context->PSSetShaderResources(0, 1, &sceneSRV);
+
+    // Set up sampler state.
     ID3D11SamplerState* sampler = nullptr;
     D3D11_SAMPLER_DESC sampDesc = {};
     sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -234,17 +309,28 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     sampDesc.MinLOD = 0;
     sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
     sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-    HRESULT hr = device->CreateSamplerState(&sampDesc, &sampler);
-    if (SUCCEEDED(hr)) {
+    hr = device->CreateSamplerState(&sampDesc, &sampler);
+    if (SUCCEEDED(hr))
+    {
         context->PSSetSamplers(0, 1, &sampler);
     }
 
+    // -------------------------------
+    // Draw the geometry.
+    // -------------------------------
     context->Draw(4, 0);
 
+    // Unbind the shader resource.
     ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
     context->PSSetShaderResources(0, 1, nullSRV);
+
+    // Release states.
     if (sampler)
         sampler->Release();
+    pRasterizerState->Release();
+    pBlendState->Release();
+    pDepthStencilState->Release();
 
+    // Save the current matrix for the next frame.
     memcpy(m_prevWorldMatrix, &currWVP[0][0], sizeof(m_prevWorldMatrix));
 }

@@ -265,6 +265,13 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
         if (D2D::context != nullptr && !Client::disable) {
 
+            D3D11_VIEWPORT viewport = {};
+            viewport.TopLeftX = 0;
+            viewport.TopLeftY = 0;
+            viewport.Width = MC::windowSize.x;
+            viewport.Height = MC::windowSize.y;
+            context->RSSetViewports(1, &viewport);
+
             if (queue != nullptr) {
 
                 DX12Render();

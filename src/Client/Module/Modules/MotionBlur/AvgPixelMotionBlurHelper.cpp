@@ -152,74 +152,139 @@ void AvgPixelMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, std::vector<w
         return;
     }
 
+    // Set up viewport based on window size
     D3D11_VIEWPORT viewport = {};
     viewport.TopLeftX = 0;
     viewport.TopLeftY = 0;
     viewport.Width = MC::windowSize.x;
     viewport.Height = MC::windowSize.y;
-    DXGI_SWAP_CHAIN_DESC1 swapChainDescription;
-    SwapchainHook::swapchain->GetDesc1(&swapChainDescription);
-    UINT vpCount = 1;
-    D3D11_VIEWPORT vp;
-    context->RSGetViewports(&vpCount, &vp);
-    std::cout << "Viewport: " + std::to_string(vp.Height) << std::endl;
-    std::cout << "swapchain: " + std::to_string(swapChainDescription.Height) << std::endl;
     viewport.MaxDepth = 1.0f;
-    FLOAT backgroundColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
-    context->ClearRenderTargetView(rtv, backgroundColor);
     context->RSSetViewports(1, &viewport);
 
+    // Clear render target and set it
+    FLOAT backgroundColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+    context->ClearRenderTargetView(rtv, backgroundColor);
     context->OMSetRenderTargets(1, &rtv, nullptr);
 
-    const size_t numFrames = frames.size();
-    if (numFrames == 0) return;
+    // -------------------------------
+    // Create and set Depth-Stencil State
+    // -------------------------------
+    D3D11_DEPTH_STENCIL_DESC dsd{};
+    dsd.DepthEnable = false;
+    dsd.StencilEnable = false;
+    ID3D11DepthStencilState* pDepthStencilState = nullptr;
+    HRESULT hr = device->CreateDepthStencilState(&dsd, &pDepthStencilState);
+    if (FAILED(hr)) {
+        return;
+    }
+    context->OMSetDepthStencilState(pDepthStencilState, 0);
 
+    // -------------------------------
+    // Create and set Blend State
+    // -------------------------------
+    D3D11_BLEND_DESC bd{};
+    ZeroMemory(&bd, sizeof(bd));
+    bd.AlphaToCoverageEnable = false;
+    bd.RenderTarget[0].BlendEnable = true;
+    bd.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    bd.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+    bd.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    bd.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+    bd.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+    bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    ID3D11BlendState* pBlendState = nullptr;
+    hr = device->CreateBlendState(&bd, &pBlendState);
+    if (FAILED(hr)) {
+        pDepthStencilState->Release();
+        return;
+    }
+    context->OMSetBlendState(pBlendState, nullptr, 0xffffffff);
+
+    // -------------------------------
+    // Create and set Rasterizer State
+    // -------------------------------
+    D3D11_RASTERIZER_DESC rd{};
+    rd.FillMode = D3D11_FILL_SOLID;
+    rd.CullMode = D3D11_CULL_NONE;
+    rd.DepthClipEnable = false;
+    rd.ScissorEnable = false;
+    ID3D11RasterizerState* pRasterizerState = nullptr;
+    hr = device->CreateRasterizerState(&rd, &pRasterizerState);
+    if (FAILED(hr)) {
+        pDepthStencilState->Release();
+        pBlendState->Release();
+        return;
+    }
+    context->RSSetState(pRasterizerState);
+
+    // -------------------------------
     // Update constant buffer with number of frames
+    // -------------------------------
+    const size_t numFrames = frames.size();
+    if (numFrames == 0) {
+        // Clean up before exiting
+        pRasterizerState->Release();
+        pBlendState->Release();
+        pDepthStencilState->Release();
+        return;
+    }
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     if (SUCCEEDED(context->Map(m_constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource))) {
         FrameCountBuffer* pData = (FrameCountBuffer*)mappedResource.pData;
-        pData->numFrames = (int)numFrames;
+        pData->numFrames = static_cast<int>(numFrames);
         context->Unmap(m_constantBuffer, 0);
     }
 
-    // Set up pipeline
+    // -------------------------------
+    // Set up pipeline states
+    // -------------------------------
     context->IASetInputLayout(m_inputLayout);
     UINT stride = sizeof(float) * 5;
     UINT offset = 0;
     context->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+    context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
     context->VSSetShader(m_vertexShader, nullptr, 0);
     context->PSSetShader(m_pixelShader, nullptr, 0);
     context->PSSetConstantBuffers(0, 1, &m_constantBuffer);
 
+    // -------------------------------
     // Bind frames as shader resources
+    // -------------------------------
     std::vector<ID3D11ShaderResourceView*> srvs;
     srvs.reserve(numFrames);
     for (auto& frame : frames) {
         srvs.push_back(frame.get());
     }
-    context->PSSetShaderResources(0, (UINT)numFrames, srvs.data());
+    context->PSSetShaderResources(0, static_cast<UINT>(numFrames), srvs.data());
 
-    // Set sampler
+    // -------------------------------
+    // Set sampler state
+    // -------------------------------
     ID3D11SamplerState* sampler = nullptr;
     D3D11_SAMPLER_DESC sampDesc = {};
     sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
     sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
     sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-    sampDesc.MinLOD = 0;
-    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-    HRESULT hr = device->CreateSamplerState(&sampDesc, &sampler);
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+    hr = device->CreateSamplerState(&sampDesc, &sampler);
     if (SUCCEEDED(hr)) {
         context->PSSetSamplers(0, 1, &sampler);
     }
 
+    // -------------------------------
     // Draw
+    // -------------------------------
     context->Draw(4, 0);
 
+    // Unbind shader resources
     std::vector<ID3D11ShaderResourceView*> nullSRVs(numFrames, nullptr);
     context->PSSetShaderResources(0, static_cast<UINT>(numFrames), nullSRVs.data());
 
+    // Release created states
     if (sampler) sampler->Release();
+    pRasterizerState->Release();
+    pBlendState->Release();
+    pDepthStencilState->Release();
 }

@@ -19,11 +19,9 @@ public:
     bool once = false;
 
     void onEnable() override {
-        if(SwapchainHook::queue) { if(!once) { FlarialGUI::Notify("Please turn on Better Frames in Settings!"); once = true; } }
-        else {
+
             ListenOrdered(this, RenderEvent, &MotionBlur::onRender, EventOrder::IMMEDIATE)
             Module::onEnable();
-        }
     }
 
     void onDisable() override {
@@ -81,7 +79,7 @@ public:
             else if (MC::fps > 450) maxFrames = 5;
         }
 
-        if (SDK::getCurrentScreen() == "hud_screen" && !SwapchainHook::queue && initted && this->isEnabled()) {
+        if (SDK::getCurrentScreen() == "hud_screen" && initted && this->isEnabled()) {
 
             // Remove excess frames if maxFrames is reduced
             if (previousFrames.size() > static_cast<size_t>(maxFrames)) {
