@@ -94,8 +94,9 @@ public:
                 previousFrames.push_back(std::move(buffer));
             }
 
+
             if (this->settings.getSettingByName<bool>("avgpixel")->value) AvgPixelMotionBlurHelper::Render(event.RTV, previousFrames);
-            else RealMotionBlurHelper::Render(event.RTV, previousFrames.front());
+            else RealMotionBlurHelper::Render(event.RTV, previousFrames.back());
 
         } else {
             previousFrames.clear();
@@ -150,6 +151,7 @@ public:
         winrt::com_ptr<ID3D11ShaderResourceView> outSRV;
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
         srvDesc.Format = d.Format;
+
         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
         srvDesc.Texture2D.MipLevels = d.MipLevels;
         srvDesc.Texture2D.MostDetailedMip = 0;

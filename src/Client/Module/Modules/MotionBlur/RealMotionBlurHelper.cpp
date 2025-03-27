@@ -23,10 +23,10 @@ struct VS_OUTPUT {
 
 float4 mainPS(VS_OUTPUT input) : SV_Target
 {
-    float2 uv = input.Tex;
-    float4 color = sceneTexture.Sample(samplerState, uv);
+    float2 sampleCoord = input.Tex;
+    float4 color = sceneTexture.Sample(samplerState, sampleCoord);
 
-    float4 H = float4(uv.x * 2 - 1, (1 - uv.y) * 2 - 1, 0, 1);
+    float4 H = float4(sampleCoord.x * 2 - 1, (1 - sampleCoord.y) * 2 - 1, 0, 1);
 
     float4 worldPos = mul(H, invWorldViewProjection);
     worldPos /= worldPos.w;
@@ -34,20 +34,23 @@ float4 mainPS(VS_OUTPUT input) : SV_Target
     float4 previousPos = mul(worldPos, preWorldViewProjection);
     previousPos /= previousPos.w;
 
-    float2 velocity = (H.xy - previousPos.xy) / 2.0;
-    velocity.y *= -1;
-
+    int numSamples = 32;
+    float2 velocity = (H.xy - previousPos.xy) * float2(0.5f, -0.5f);
+    velocity /= numSamples;
     velocity *= intensity;
 
-    float4 finalColor = color;
-    int numSamples = 6;
     [unroll]
-    for (int i = 1; i <= numSamples; i++) {
-        float2 sampleUV = uv + velocity * (i / (float)numSamples);
-        finalColor += sceneTexture.Sample(samplerState, sampleUV);
+    for (int i = 1; i < numSamples; ++i) {
+        sampleCoord += velocity;
+        sampleCoord = clamp(sampleCoord, 0.0, 1.0);
+
+        float4 currentColor = sceneTexture.Sample(samplerState, sampleCoord);
+        color += currentColor;
     }
-    return finalColor / (numSamples + 1);
+
+    return color / (numSamples + 1); // Normalize color
 }
+
 )";
 
 const char* realDrawTextureVertexShaderSrc = R"(

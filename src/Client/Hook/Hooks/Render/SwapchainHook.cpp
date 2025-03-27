@@ -442,12 +442,11 @@ void SwapchainHook::DX11Render() {
     MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
     ID3D11RenderTargetView *mainRenderTargetView = nullptr;
-    ID3D11DeviceContext *ppContext = nullptr;
     ID3D11Texture2D *pBackBuffer = nullptr;
 
-    d3d11Device->GetImmediateContext(&ppContext);
+    d3d11Device->GetImmediateContext(&SwapchainHook::context);
 
-    if (ppContext) {
+    if (SwapchainHook::context) {
 
         if (SUCCEEDED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID *) &pBackBuffer))) {
 
@@ -482,9 +481,9 @@ void SwapchainHook::DX11Render() {
                 ImGui::EndFrame();
                 ImGui::Render();
 
-                ppContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
+                SwapchainHook::context->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
                 ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-                ppContext->Flush();
+                SwapchainHook::context->Flush();
             }
         }
     }
@@ -492,8 +491,6 @@ void SwapchainHook::DX11Render() {
     if (pBackBuffer) pBackBuffer->Release();
 
     if (mainRenderTargetView) mainRenderTargetView->Release();
-
-    Memory::SafeRelease(ppContext);
 
 }
 
@@ -908,18 +905,12 @@ void SwapchainHook::SaveBackbuffer() {
         if (FlarialGUI::needsBackBuffer) {
 
             if (!ExtraSavedD3D11BackBuffer) {
-                D3D11_TEXTURE2D_DESC textureDesc = {};
-                textureDesc.Width = D2D::context->GetSize().width;
-                textureDesc.Height = D2D::context->GetSize().height;
-                textureDesc.MipLevels = 1;
-                textureDesc.ArraySize = 1;
-                textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-                textureDesc.SampleDesc.Count = 1;
-                textureDesc.Usage = D3D11_USAGE_DEFAULT;
-                textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-                textureDesc.CPUAccessFlags = 0;
+                D3D11_TEXTURE2D_DESC desc;
+                SwapchainHook::GetBackbuffer()->GetDesc(&desc);
 
-                SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
+                desc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+
+                SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &ExtraSavedD3D11BackBuffer);
             }
 
             context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);

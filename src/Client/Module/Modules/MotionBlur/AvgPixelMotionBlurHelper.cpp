@@ -152,23 +152,23 @@ void AvgPixelMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, std::vector<w
         return;
     }
 
-    // Get size from the provided RTV
-    ID3D11Resource* resource = nullptr;
-    rtv->GetResource(&resource);
-    ID3D11Texture2D* texture = static_cast<ID3D11Texture2D*>(resource);
-    D3D11_TEXTURE2D_DESC desc;
-    texture->GetDesc(&desc);
-    resource->Release();
-
-    // Set the viewport
-    D3D11_VIEWPORT viewport = {0};
-    viewport.Width = static_cast<float>(desc.Width);
-    viewport.Height = static_cast<float>(desc.Height);
-    viewport.MinDepth = 0.0f;
+    D3D11_VIEWPORT viewport = {};
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = MC::windowSize.x;
+    viewport.Height = MC::windowSize.y;
+    DXGI_SWAP_CHAIN_DESC1 swapChainDescription;
+    SwapchainHook::swapchain->GetDesc1(&swapChainDescription);
+    UINT vpCount = 1;
+    D3D11_VIEWPORT vp;
+    context->RSGetViewports(&vpCount, &vp);
+    std::cout << "Viewport: " + std::to_string(vp.Height) << std::endl;
+    std::cout << "swapchain: " + std::to_string(swapChainDescription.Height) << std::endl;
     viewport.MaxDepth = 1.0f;
+    FLOAT backgroundColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+    context->ClearRenderTargetView(rtv, backgroundColor);
     context->RSSetViewports(1, &viewport);
 
-    // Set the render target
     context->OMSetRenderTargets(1, &rtv, nullptr);
 
     const size_t numFrames = frames.size();
