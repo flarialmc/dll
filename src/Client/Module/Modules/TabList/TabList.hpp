@@ -229,7 +229,7 @@ public:
                         if (it != APIUtils::onlineUsers.end()) {
                             std::map<std::string, int> roleLogos = {
                                 {"Dev", IDR_CYAN_LOGO_PNG},
-                                {"Staff", IDR_WHITE_LOGO_PNG},
+                                {"Staff", IDR_ORANGE_LOGO_PNG},
                                 {"Gamer", IDR_GAMER_LOGO_PNG},
                                 {"Booster", IDR_BOOSTER_LOGO_PNG},
                                 {"Default", IDR_RED_LOGO_PNG}

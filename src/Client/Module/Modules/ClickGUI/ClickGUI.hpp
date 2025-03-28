@@ -125,7 +125,7 @@ public:
 
         static std::map<std::string, std::string> roleColors = {
             { "Dev", "§b" },
-            { "Staff", "§f" },
+            { "Staff", "§6" },
             { "Gamer", "§5" },
             { "Booster", "§d" },
             { "Regular", "§4" }

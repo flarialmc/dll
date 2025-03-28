@@ -29,7 +29,7 @@ class BaseActorRendererRenderTextHook : public Hook {
 
         static std::map<std::string, std::string> roleLogos = {
                 {"Dev", "dev-logo.png"},
-                {"Staff", "white-logo.png"},
+                {"Staff", "orange-logo.png"},
                 {"Gamer", "gamer-logo.png"},
                 {"Booster", "booster-logo.png"},
                 {"Regular", "red-logo.png"}
