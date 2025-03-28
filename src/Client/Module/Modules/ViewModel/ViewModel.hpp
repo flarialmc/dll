@@ -2,7 +2,6 @@
 
 #include "../Module.hpp"
 
-
 class ViewModel : public Module {
 private:
     bool thirdperson = false;
