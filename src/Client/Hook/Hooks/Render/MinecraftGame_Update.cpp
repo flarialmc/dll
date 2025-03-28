@@ -10,12 +10,17 @@ void MinecraftGame_Update::MinecraftGame_UpdateDetour(
 
 
 
-    if (index == 0 && SwapchainHook::init) {
+    if (index == 1 && SwapchainHook::init) {
+
+
         RenderStateManager state;
         state.SaveRenderState();
+
         SwapchainHook::DX11Render();
-        SwapchainHook::context->Flush();
+
         state.RestoreRenderState();
+
+
         Logger::debug("needpresent {}", needpresent);
     }
     funcOriginal(a1, fbh, msaa, needpresent);

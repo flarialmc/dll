@@ -108,7 +108,7 @@ void HookManager::initialize() {
     addHook<ItemInHandRendererRenderItem>();
 
     addHook<RenderOutlineSelectionHook>();
-    addHook< MinecraftGame_Update>();
+    //addHook< MinecraftGame_Update>();
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();

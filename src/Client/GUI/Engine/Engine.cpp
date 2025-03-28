@@ -1611,6 +1611,11 @@ return 100; //what the fuck is this
 
 void RenderStateManager::SaveRenderState()
 {
+    // Release the previous state to avoid memory leaks
+    m_state.Release();
+
+    // **Rasterizer Stage**
+    // Save viewports
     UINT numViewports = 0;
     SwapchainHook::context->RSGetViewports(&numViewports, nullptr);
     m_state.viewports.resize(numViewports);
@@ -1619,6 +1624,7 @@ void RenderStateManager::SaveRenderState()
         SwapchainHook::context->RSGetViewports(&numViewports, m_state.viewports.data());
     }
 
+    // Save scissor rects
     UINT numScissorRects = 0;
     SwapchainHook::context->RSGetScissorRects(&numScissorRects, nullptr);
     m_state.scissorRects.resize(numScissorRects);
@@ -1627,167 +1633,187 @@ void RenderStateManager::SaveRenderState()
         SwapchainHook::context->RSGetScissorRects(&numScissorRects, m_state.scissorRects.data());
     }
 
-    // Use .put() to obtain the address for output
-    SwapchainHook::context->RSGetState(m_state.rasterizerState.put());
-    SwapchainHook::context->OMGetBlendState(m_state.blendState.put(), m_state.blendFactor, &m_state.sampleMask);
-    SwapchainHook::context->OMGetDepthStencilState(m_state.depthStencilState.put(), &m_state.stencilRef);
-    SwapchainHook::context->IAGetInputLayout(m_state.inputLayout.put());
+    // Save rasterizer state
+    SwapchainHook::context->RSGetState(&m_state.rasterizerState);
 
-    // Vertex Buffers – use a temporary array of raw pointers, then adopt each into winrt::com_ptr
+    // **Output Merger Stage**
+    // Save blend state
+    SwapchainHook::context->OMGetBlendState(&m_state.blendState, m_state.blendFactor, &m_state.sampleMask);
+
+    // Save depth stencil state
+    SwapchainHook::context->OMGetDepthStencilState(&m_state.depthStencilState, &m_state.stencilRef);
+
+    // Save render targets and depth stencil view
+    SwapchainHook::context->OMGetRenderTargets(RenderState::MAX_RENDER_TARGETS, m_state.renderTargetViews, &m_state.depthStencilView);
+    for (UINT i = 0; i < RenderState::MAX_RENDER_TARGETS; ++i)
+    {
+        if (m_state.renderTargetViews[i] == nullptr)
+        {
+            m_state.renderTargetCount = i;
+            break;
+        }
+        if (i == RenderState::MAX_RENDER_TARGETS - 1)
+        {
+            m_state.renderTargetCount = RenderState::MAX_RENDER_TARGETS;
+        }
+    }
+
+    // **Input Assembler Stage**
+    // Save input layout
+    SwapchainHook::context->IAGetInputLayout(&m_state.inputLayout);
+
+    // Save vertex buffers
     UINT maxVBs = RenderState::MAX_VERTEX_BUFFERS;
     m_state.vertexBufferCount = maxVBs;
-    ID3D11Buffer* rawVBs[RenderState::MAX_VERTEX_BUFFERS] = {};
-    SwapchainHook::context->IAGetVertexBuffers(0, maxVBs, reinterpret_cast<ID3D11Buffer**>(rawVBs), m_state.strides, m_state.offsets);
+    SwapchainHook::context->IAGetVertexBuffers(0, maxVBs, m_state.vertexBuffers, m_state.strides, m_state.offsets);
     for (UINT i = 0; i < maxVBs; ++i)
     {
-        if (!rawVBs[i])
+        if (m_state.vertexBuffers[i] == nullptr)
         {
             m_state.vertexBufferCount = i;
             break;
         }
-        // Attach the raw pointer to take ownership (without AddRef)
-        m_state.vertexBuffers[i].attach(rawVBs[i]);
     }
 
-    SwapchainHook::context->IAGetIndexBuffer(m_state.indexBuffer.put(), &m_state.indexFormat, &m_state.indexOffset);
+    // Save index buffer
+    SwapchainHook::context->IAGetIndexBuffer(&m_state.indexBuffer, &m_state.indexFormat, &m_state.indexOffset);
+
+    // Save primitive topology
     SwapchainHook::context->IAGetPrimitiveTopology(&m_state.primitiveTopology);
 
-    // Vertex Shader and its class instances
+    // **Shader Stages**
+    // Vertex Shader
     {
         ID3D11VertexShader* vs = nullptr;
         const UINT maxClassInstances = 256;
         ID3D11ClassInstance* classInstances[maxClassInstances] = {};
-        UINT count = maxClassInstances;
+        UINT count = 0;
         SwapchainHook::context->VSGetShader(&vs, classInstances, &count);
-        if (vs)
-        {
-            m_state.vertexShader.attach(vs);
-        }
+        m_state.vertexShader = vs;
         m_state.vsClassInstances.resize(count);
         for (UINT i = 0; i < count; ++i)
         {
-            if (classInstances[i])
-            {
-                // Attach each class instance
-                m_state.vsClassInstances[i].attach(classInstances[i]);
-            }
+            m_state.vsClassInstances[i] = classInstances[i];
         }
         m_state.vsClassInstanceCount = count;
     }
 
-    // Pixel Shader and its class instances
+    // Pixel Shader
     {
         ID3D11PixelShader* ps = nullptr;
         const UINT maxClassInstances = 256;
         ID3D11ClassInstance* classInstances[maxClassInstances] = {};
-        UINT count = maxClassInstances;
+        UINT count = 0;
         SwapchainHook::context->PSGetShader(&ps, classInstances, &count);
-        if (ps)
-        {
-            m_state.pixelShader.attach(ps);
-        }
+        m_state.pixelShader = ps;
         m_state.psClassInstances.resize(count);
         for (UINT i = 0; i < count; ++i)
         {
-            if (classInstances[i])
-            {
-                m_state.psClassInstances[i].attach(classInstances[i]);
-            }
+            m_state.psClassInstances[i] = classInstances[i];
         }
         m_state.psClassInstanceCount = count;
     }
 
-    // Geometry Shader and its class instances
+    // Geometry Shader
     {
         ID3D11GeometryShader* gs = nullptr;
         const UINT maxClassInstances = 256;
         ID3D11ClassInstance* classInstances[maxClassInstances] = {};
-        UINT count = maxClassInstances;
+        UINT count = 0;
         SwapchainHook::context->GSGetShader(&gs, classInstances, &count);
-        if (gs)
-        {
-            m_state.geometryShader.attach(gs);
-        }
+        m_state.geometryShader = gs;
         m_state.gsClassInstances.resize(count);
         for (UINT i = 0; i < count; ++i)
         {
-            if (classInstances[i])
-            {
-                m_state.gsClassInstances[i].attach(classInstances[i]);
-            }
+            m_state.gsClassInstances[i] = classInstances[i];
         }
         m_state.gsClassInstanceCount = count;
     }
 
-    // Hull Shader and its class instances
+    // Hull Shader
     {
         ID3D11HullShader* hs = nullptr;
         const UINT maxClassInstances = 256;
         ID3D11ClassInstance* classInstances[maxClassInstances] = {};
-        UINT count = maxClassInstances;
+        UINT count = 0;
         SwapchainHook::context->HSGetShader(&hs, classInstances, &count);
-        if (hs)
-        {
-            m_state.hullShader.attach(hs);
-        }
+        m_state.hullShader = hs;
         m_state.hsClassInstances.resize(count);
         for (UINT i = 0; i < count; ++i)
         {
-            if (classInstances[i])
-            {
-                m_state.hsClassInstances[i].attach(classInstances[i]);
-            }
+            m_state.hsClassInstances[i] = classInstances[i];
         }
         m_state.hsClassInstanceCount = count;
     }
 
-    // Domain Shader and its class instances
+    // Domain Shader
     {
         ID3D11DomainShader* ds = nullptr;
         const UINT maxClassInstances = 256;
         ID3D11ClassInstance* classInstances[maxClassInstances] = {};
-        UINT count = maxClassInstances;
+        UINT count = 0;
         SwapchainHook::context->DSGetShader(&ds, classInstances, &count);
-        if (ds)
-        {
-            m_state.domainShader.attach(ds);
-        }
+        m_state.domainShader = ds;
         m_state.dsClassInstances.resize(count);
         for (UINT i = 0; i < count; ++i)
         {
-            if (classInstances[i])
-            {
-                m_state.dsClassInstances[i].attach(classInstances[i]);
-            }
+            m_state.dsClassInstances[i] = classInstances[i];
         }
         m_state.dsClassInstanceCount = count;
     }
 
-    // Compute Shader and its class instances
+    // Compute Shader
     {
         ID3D11ComputeShader* cs = nullptr;
         const UINT maxClassInstances = 256;
         ID3D11ClassInstance* classInstances[maxClassInstances] = {};
-        UINT count = maxClassInstances;
+        UINT count = 0;
         SwapchainHook::context->CSGetShader(&cs, classInstances, &count);
-        if (cs)
-        {
-            m_state.computeShader.attach(cs);
-        }
+        m_state.computeShader = cs;
         m_state.csClassInstances.resize(count);
         for (UINT i = 0; i < count; ++i)
         {
-            if (classInstances[i])
-            {
-                m_state.csClassInstances[i].attach(classInstances[i]);
-            }
+            m_state.csClassInstances[i] = classInstances[i];
         }
         m_state.csClassInstanceCount = count;
     }
+
+    // **Shader Resources**
+    // Vertex Shader Resources
+    SwapchainHook::context->VSGetConstantBuffers(0, ShaderStageState::MAX_CONSTANT_BUFFERS, m_state.vsState.constantBuffers);
+    SwapchainHook::context->VSGetShaderResources(0, ShaderStageState::MAX_SRVS, m_state.vsState.srvs);
+    SwapchainHook::context->VSGetSamplers(0, ShaderStageState::MAX_SAMPLERS, m_state.vsState.samplers);
+
+    // Pixel Shader Resources
+    SwapchainHook::context->PSGetConstantBuffers(0, ShaderStageState::MAX_CONSTANT_BUFFERS, m_state.psState.constantBuffers);
+    SwapchainHook::context->PSGetShaderResources(0, ShaderStageState::MAX_SRVS, m_state.psState.srvs);
+    SwapchainHook::context->PSGetSamplers(0, ShaderStageState::MAX_SAMPLERS, m_state.psState.samplers);
+
+    // Geometry Shader Resources
+    SwapchainHook::context->GSGetConstantBuffers(0, ShaderStageState::MAX_CONSTANT_BUFFERS, m_state.gsState.constantBuffers);
+    SwapchainHook::context->GSGetShaderResources(0, ShaderStageState::MAX_SRVS, m_state.gsState.srvs);
+    SwapchainHook::context->GSGetSamplers(0, ShaderStageState::MAX_SAMPLERS, m_state.gsState.samplers);
+
+    // Hull Shader Resources
+    SwapchainHook::context->HSGetConstantBuffers(0, ShaderStageState::MAX_CONSTANT_BUFFERS, m_state.hsState.constantBuffers);
+    SwapchainHook::context->HSGetShaderResources(0, ShaderStageState::MAX_SRVS, m_state.hsState.srvs);
+    SwapchainHook::context->HSGetSamplers(0, ShaderStageState::MAX_SAMPLERS, m_state.hsState.samplers);
+
+    // Domain Shader Resources
+    SwapchainHook::context->DSGetConstantBuffers(0, ShaderStageState::MAX_CONSTANT_BUFFERS, m_state.dsState.constantBuffers);
+    SwapchainHook::context->DSGetShaderResources(0, ShaderStageState::MAX_SRVS, m_state.dsState.srvs);
+    SwapchainHook::context->DSGetSamplers(0, ShaderStageState::MAX_SAMPLERS, m_state.dsState.samplers);
+
+    // Compute Shader Resources
+    SwapchainHook::context->CSGetConstantBuffers(0, ShaderStageState::MAX_CONSTANT_BUFFERS, m_state.csState.constantBuffers);
+    SwapchainHook::context->CSGetShaderResources(0, ShaderStageState::MAX_SRVS, m_state.csState.srvs);
+    SwapchainHook::context->CSGetSamplers(0, ShaderStageState::MAX_SAMPLERS, m_state.csState.samplers);
+    SwapchainHook::context->CSGetUnorderedAccessViews(0, ComputeStageState::MAX_UAVS, m_state.csState.uavs);
 }
 
 void RenderStateManager::RestoreRenderState()
 {
+    // **Rasterizer Stage**
     if (!m_state.viewports.empty())
     {
         SwapchainHook::context->RSSetViewports(static_cast<UINT>(m_state.viewports.size()), m_state.viewports.data());
@@ -1796,81 +1822,105 @@ void RenderStateManager::RestoreRenderState()
     {
         SwapchainHook::context->RSSetScissorRects(static_cast<UINT>(m_state.scissorRects.size()), m_state.scissorRects.data());
     }
-    SwapchainHook::context->RSSetState(m_state.rasterizerState.get());
-    SwapchainHook::context->OMSetBlendState(m_state.blendState.get(), m_state.blendFactor, m_state.sampleMask);
-    SwapchainHook::context->OMSetDepthStencilState(m_state.depthStencilState.get(), m_state.stencilRef);
-    SwapchainHook::context->IASetInputLayout(m_state.inputLayout.get());
-    SwapchainHook::context->IASetVertexBuffers(0, m_state.vertexBufferCount,
-        // Extract the raw pointers from the winrt::com_ptr objects.
-        reinterpret_cast<ID3D11Buffer**>([&]()
-        {
-            static ID3D11Buffer* rawVBs[RenderState::MAX_VERTEX_BUFFERS];
-            for (UINT i = 0; i < m_state.vertexBufferCount; ++i)
-            {
-                rawVBs[i] = m_state.vertexBuffers[i].get();
-            }
-            return rawVBs;
-        }()), m_state.strides, m_state.offsets);
-    SwapchainHook::context->IASetIndexBuffer(m_state.indexBuffer.get(), m_state.indexFormat, m_state.indexOffset);
+    SwapchainHook::context->RSSetState(m_state.rasterizerState);
+
+    // **Output Merger Stage**
+    SwapchainHook::context->OMSetBlendState(m_state.blendState, m_state.blendFactor, m_state.sampleMask);
+    SwapchainHook::context->OMSetDepthStencilState(m_state.depthStencilState, m_state.stencilRef);
+    SwapchainHook::context->OMSetRenderTargets(m_state.renderTargetCount, m_state.renderTargetViews, m_state.depthStencilView);
+
+    // **Input Assembler Stage**
+    SwapchainHook::context->IASetInputLayout(m_state.inputLayout);
+    SwapchainHook::context->IASetVertexBuffers(0, m_state.vertexBufferCount, m_state.vertexBuffers, m_state.strides, m_state.offsets);
+    SwapchainHook::context->IASetIndexBuffer(m_state.indexBuffer, m_state.indexFormat, m_state.indexOffset);
     SwapchainHook::context->IASetPrimitiveTopology(m_state.primitiveTopology);
 
-    // Vertex Shader restoration
+    // **Shader Stages**
+    // Vertex Shader
     {
         std::vector<ID3D11ClassInstance*> classInstances(m_state.vsClassInstanceCount);
         for (UINT i = 0; i < m_state.vsClassInstanceCount; ++i)
         {
-            classInstances[i] = m_state.vsClassInstances[i].get();
+            classInstances[i] = m_state.vsClassInstances[i];
         }
-        SwapchainHook::context->VSSetShader(m_state.vertexShader.get(), classInstances.data(), m_state.vsClassInstanceCount);
+        SwapchainHook::context->VSSetShader(m_state.vertexShader, classInstances.data(), m_state.vsClassInstanceCount);
     }
 
-    // Pixel Shader restoration
+    // Pixel Shader
     {
         std::vector<ID3D11ClassInstance*> classInstances(m_state.psClassInstanceCount);
         for (UINT i = 0; i < m_state.psClassInstanceCount; ++i)
         {
-            classInstances[i] = m_state.psClassInstances[i].get();
+            classInstances[i] = m_state.psClassInstances[i];
         }
-        SwapchainHook::context->PSSetShader(m_state.pixelShader.get(), classInstances.data(), m_state.psClassInstanceCount);
+        SwapchainHook::context->PSSetShader(m_state.pixelShader, classInstances.data(), m_state.psClassInstanceCount);
     }
 
-    // Geometry Shader restoration
+    // Geometry Shader
     {
         std::vector<ID3D11ClassInstance*> classInstances(m_state.gsClassInstanceCount);
         for (UINT i = 0; i < m_state.gsClassInstanceCount; ++i)
         {
-            classInstances[i] = m_state.gsClassInstances[i].get();
+            classInstances[i] = m_state.gsClassInstances[i];
         }
-        SwapchainHook::context->GSSetShader(m_state.geometryShader.get(), classInstances.data(), m_state.gsClassInstanceCount);
+        SwapchainHook::context->GSSetShader(m_state.geometryShader, classInstances.data(), m_state.gsClassInstanceCount);
     }
 
-    // Hull Shader restoration
+    // Hull Shader
     {
         std::vector<ID3D11ClassInstance*> classInstances(m_state.hsClassInstanceCount);
         for (UINT i = 0; i < m_state.hsClassInstanceCount; ++i)
         {
-            classInstances[i] = m_state.hsClassInstances[i].get();
+            classInstances[i] = m_state.hsClassInstances[i];
         }
-        SwapchainHook::context->HSSetShader(m_state.hullShader.get(), classInstances.data(), m_state.hsClassInstanceCount);
+        SwapchainHook::context->HSSetShader(m_state.hullShader, classInstances.data(), m_state.hsClassInstanceCount);
     }
 
-    // Domain Shader restoration
+    // Domain Shader
     {
         std::vector<ID3D11ClassInstance*> classInstances(m_state.dsClassInstanceCount);
         for (UINT i = 0; i < m_state.dsClassInstanceCount; ++i)
         {
-            classInstances[i] = m_state.dsClassInstances[i].get();
+            classInstances[i] = m_state.dsClassInstances[i];
         }
-        SwapchainHook::context->DSSetShader(m_state.domainShader.get(), classInstances.data(), m_state.dsClassInstanceCount);
+        SwapchainHook::context->DSSetShader(m_state.domainShader, classInstances.data(), m_state.dsClassInstanceCount);
     }
 
-    // Compute Shader restoration
+    // Compute Shader
     {
         std::vector<ID3D11ClassInstance*> classInstances(m_state.csClassInstanceCount);
         for (UINT i = 0; i < m_state.csClassInstanceCount; ++i)
         {
-            classInstances[i] = m_state.csClassInstances[i].get();
+            classInstances[i] = m_state.csClassInstances[i];
         }
-        SwapchainHook::context->CSSetShader(m_state.computeShader.get(), classInstances.data(), m_state.csClassInstanceCount);
+        SwapchainHook::context->CSSetShader(m_state.computeShader, classInstances.data(), m_state.csClassInstanceCount);
     }
+
+
+    SwapchainHook::context->VSSetConstantBuffers(0, ShaderStageState::MAX_CONSTANT_BUFFERS, m_state.vsState.constantBuffers);
+    SwapchainHook::context->VSSetShaderResources(0, ShaderStageState::MAX_SRVS, m_state.vsState.srvs);
+    SwapchainHook::context->VSSetSamplers(0, ShaderStageState::MAX_SAMPLERS, m_state.vsState.samplers);
+
+    SwapchainHook::context->PSSetConstantBuffers(0, ShaderStageState::MAX_CONSTANT_BUFFERS, m_state.psState.constantBuffers);
+    SwapchainHook::context->PSSetShaderResources(0, ShaderStageState::MAX_SRVS, m_state.psState.srvs);
+    SwapchainHook::context->PSSetSamplers(0, ShaderStageState::MAX_SAMPLERS, m_state.psState.samplers);
+
+    SwapchainHook::context->GSSetConstantBuffers(0, ShaderStageState::MAX_CONSTANT_BUFFERS, m_state.gsState.constantBuffers);
+    SwapchainHook::context->GSSetShaderResources(0, ShaderStageState::MAX_SRVS, m_state.gsState.srvs);
+    SwapchainHook::context->GSSetSamplers(0, ShaderStageState::MAX_SAMPLERS, m_state.gsState.samplers);
+
+    SwapchainHook::context->HSSetConstantBuffers(0, ShaderStageState::MAX_CONSTANT_BUFFERS, m_state.hsState.constantBuffers);
+    SwapchainHook::context->HSSetShaderResources(0, ShaderStageState::MAX_SRVS, m_state.hsState.srvs);
+    SwapchainHook::context->HSSetSamplers(0, ShaderStageState::MAX_SAMPLERS, m_state.hsState.samplers);
+
+    SwapchainHook::context->DSSetConstantBuffers(0, ShaderStageState::MAX_CONSTANT_BUFFERS, m_state.dsState.constantBuffers);
+    SwapchainHook::context->DSSetShaderResources(0, ShaderStageState::MAX_SRVS, m_state.dsState.srvs);
+    SwapchainHook::context->DSSetSamplers(0, ShaderStageState::MAX_SAMPLERS, m_state.dsState.samplers);
+
+    SwapchainHook::context->CSSetConstantBuffers(0, ShaderStageState::MAX_CONSTANT_BUFFERS, m_state.csState.constantBuffers);
+    SwapchainHook::context->CSSetShaderResources(0, ShaderStageState::MAX_SRVS, m_state.csState.srvs);
+    SwapchainHook::context->CSSetSamplers(0, ShaderStageState::MAX_SAMPLERS, m_state.csState.samplers);
+    UINT initialCounts[ComputeStageState::MAX_UAVS];
+    std::fill_n(initialCounts, ComputeStageState::MAX_UAVS, -1); // -1 means no change to UAV counters
+    SwapchainHook::context->CSSetUnorderedAccessViews(0, ComputeStageState::MAX_UAVS, m_state.csState.uavs, initialCounts);
 }

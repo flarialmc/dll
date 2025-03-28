@@ -20,6 +20,7 @@
 #include "ResizeHook.hpp"
 
 #include "../../../Module/Modules/MotionBlur/MotionBlur.hpp"
+#include "SDK/Client/Options/OptionsParser.hpp"
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
 
@@ -93,6 +94,8 @@ HWND FindWindowByTitle(const std::string &titlePart) {
     return hwnd;
 }
 
+
+
 void SwapchainHook::enableHook() {
 
     queueReset = Client::settings.getSettingByName<bool>("recreateAtStart")->value;
@@ -110,6 +113,7 @@ void SwapchainHook::enableHook() {
     } else if (kiero::getRenderType() == kiero::RenderType::D3D11) {
         kiero::bind(8, (void **) &funcOriginal, (void *) swapchainCallback);
     }
+
 
     // CREDIT @AETOPIA
 
@@ -151,6 +155,7 @@ void SwapchainHook::enableHook() {
 
 bool SwapchainHook::init = false;
 bool SwapchainHook::currentVsyncState;
+
 
 
 // CREDIT @AETOPIA
@@ -212,6 +217,80 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknow
 
 // CREDIT @AETOPIA
 
+
+static int index = 0;
+typedef void (STDMETHODCALLTYPE* ClearDepthStencilViewDX11)(
+    ID3D11DeviceContext* pContext,
+    ID3D11DepthStencilView* pDSV,
+    UINT ClearFlags,
+    FLOAT Depth,
+    UINT8 Stencil
+);
+
+ClearDepthStencilViewDX11 oClearDepthStencilViewDX11 = nullptr;
+OptionsParser parser;
+
+void STDMETHODCALLTYPE hkClearDepthStencilViewDX11(
+    ID3D11DeviceContext* pContext,
+    ID3D11DepthStencilView* pDSV,
+    UINT ClearFlags,
+    FLOAT Depth,
+    UINT8 Stencil)
+{
+
+    index++;
+
+    int neededIndex = 2;
+    parser.parseOptionsFile();
+    Logger::debug("troll up: {}", index);
+    oClearDepthStencilViewDX11(pContext, pDSV, ClearFlags, Depth, Stencil);
+
+
+
+    static ID3D11Texture2D* pFinalTexture = nullptr;
+
+    if (!pFinalTexture && SwapchainHook::init) {
+        D3D11_TEXTURE2D_DESC desc = {};
+        desc.Width              = MC::windowSize.x;
+        desc.Height             = MC::windowSize.y;
+        desc.MipLevels          = 1;
+        desc.ArraySize          = 1;
+        desc.Format             = DXGI_FORMAT_R8G8B8A8_UNORM;
+        desc.SampleDesc.Count   = 1;         // No MSAA
+        desc.SampleDesc.Quality = 0;
+        desc.Usage              = D3D11_USAGE_DEFAULT;
+        desc.BindFlags          = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+        desc.CPUAccessFlags     = 0;
+        desc.MiscFlags          = 0;
+
+        SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pFinalTexture);
+
+
+    }
+
+
+    if (parser.options["gfx_msaa"] != "1" && SwapchainHook::init) {
+        ID3D11Texture2D* pBackBuffer = nullptr;
+        SwapchainHook::swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
+        neededIndex = 3;
+        SwapchainHook::context->ResolveSubresource(
+       pFinalTexture,
+        0,
+         pBackBuffer,
+         0,
+         DXGI_FORMAT_R8G8B8A8_UNORM
+    );
+    }
+    if (index == neededIndex && SwapchainHook::init) {
+        RenderStateManager state;
+        state.SaveRenderState();
+        SwapchainHook::DX11Render();
+        state.RestoreRenderState();
+    }
+
+}
+
+
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
     if (Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
 
@@ -227,7 +306,21 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         return DXGI_ERROR_DEVICE_RESET;
     }
 
-    MinecraftGame_Update::index = 0;
+    index = 0;
+
+    static bool onc = false;
+    if (!onc && context) {
+        parser.parseOptionsFile();
+        onc = true;
+        void** vtable = *reinterpret_cast<void***>(context);
+        const size_t INDEX_CLEAR_DEPTH_STENCIL_VIEW = 53;
+        Memory::hookFunc(
+            vtable[INDEX_CLEAR_DEPTH_STENCIL_VIEW],
+            hkClearDepthStencilViewDX11,
+            (void**)&oClearDepthStencilViewDX11,
+            "ClearDepthStencilView"
+        );
+    }
 
 
     swapchain = pSwapChain;
@@ -444,66 +537,63 @@ void SwapchainHook::DX12Init() {
 }
 
 void SwapchainHook::DX11Render() {
-
     DX11Blur();
-
     SaveBackbuffer();
 
     D2D::context->BeginDraw();
-
     MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
-    ID3D11RenderTargetView *mainRenderTargetView = nullptr;
-    ID3D11Texture2D *pBackBuffer = nullptr;
+    ID3D11RenderTargetView* originalRenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { nullptr };
+    UINT numRenderTargets = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;
+    ID3D11DepthStencilView* originalDepthStencilView = nullptr;
 
     d3d11Device->GetImmediateContext(&SwapchainHook::context);
+    if (!SwapchainHook::context) return;
 
-    if (SwapchainHook::context) {
+    SwapchainHook::context->OMGetRenderTargets(numRenderTargets, originalRenderTargetViews, &originalDepthStencilView);
 
-        if (SUCCEEDED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID *) &pBackBuffer))) {
+    ID3D11RenderTargetView* mainRenderTargetView = nullptr;
+    ID3D11Texture2D* pBackBuffer = nullptr;
 
-            if (SUCCEEDED(d3d11Device->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView))) {
+    if (SUCCEEDED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer))) {
+        if (SUCCEEDED(d3d11Device->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView))) {
+            ImGui_ImplDX11_NewFrame();
+            ImGui_ImplWin32_NewFrame();
+            ImGui::NewFrame();
+            ImGui::Begin("t", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+                ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
 
-                ImGui_ImplDX11_NewFrame();
-                ImGui_ImplWin32_NewFrame();
+            auto event = nes::make_holder<RenderEvent>();
+            event->RTV = mainRenderTargetView;
+            eventMgr.trigger(event);
 
-                ImGui::NewFrame();
-                ImGui::Begin("t", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
-
-
-
-                auto event = nes::make_holder<RenderEvent>();
-                event->RTV = mainRenderTargetView;
-
-                eventMgr.trigger(event);
-
-
-                if (!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
-                    FlarialGUI::Notify(
-                            "Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                                    "keybind")->value + " to open the menu in-game.");
-
-                    FlarialGUI::Notify("Join our discord! https://flarial.xyz/discord");
-                    first = true;
-                }
-
-                D2D::context->EndDraw();
-
-                ImGui::End();
-                ImGui::EndFrame();
-                ImGui::Render();
-
-                SwapchainHook::context->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
-                ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-                SwapchainHook::context->Flush();
+            if (!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
+                FlarialGUI::Notify("Click " +
+                    ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("keybind")->value +
+                    " to open the menu in-game.");
+                FlarialGUI::Notify("Join our discord! https://flarial.xyz/discord");
+                first = true;
             }
+
+            D2D::context->EndDraw();
+            ImGui::End();
+            ImGui::EndFrame();
+            ImGui::Render();
+
+            SwapchainHook::context->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
+            ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+            SwapchainHook::context->Flush();
         }
     }
 
+    SwapchainHook::context->OMSetRenderTargets(numRenderTargets, originalRenderTargetViews, originalDepthStencilView);
+
     if (pBackBuffer) pBackBuffer->Release();
-
     if (mainRenderTargetView) mainRenderTargetView->Release();
-
+    if (originalDepthStencilView) originalDepthStencilView->Release();
+    for (UINT i = 0; i < numRenderTargets; ++i) {
+        if (originalRenderTargetViews[i]) originalRenderTargetViews[i]->Release();
+    }
 }
 
 

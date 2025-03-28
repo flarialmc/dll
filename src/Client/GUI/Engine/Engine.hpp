@@ -456,60 +456,150 @@ public:
     void RestoreRenderState();
 
 private:
+    // Structure to hold shader stage resources
+    struct ShaderStageState
+    {
+        static const UINT MAX_CONSTANT_BUFFERS = D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT; // 14
+        static const UINT MAX_SRVS = D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT;                // 128
+        static const UINT MAX_SAMPLERS = D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT;                   // 16
+        ID3D11Buffer* constantBuffers[MAX_CONSTANT_BUFFERS] = { nullptr };
+        ID3D11ShaderResourceView* srvs[MAX_SRVS] = { nullptr };
+        ID3D11SamplerState* samplers[MAX_SAMPLERS] = { nullptr };
+    };
+
+    struct ComputeStageState : ShaderStageState
+    {
+        static const UINT MAX_UAVS = 8;
+        ID3D11UnorderedAccessView* uavs[MAX_UAVS] = { nullptr };
+    };
+
     struct RenderState
     {
         std::vector<D3D11_VIEWPORT> viewports;
         std::vector<D3D11_RECT> scissorRects;
-        winrt::com_ptr<ID3D11RasterizerState> rasterizerState;
-        winrt::com_ptr<ID3D11BlendState> blendState;
-        float blendFactor[4];
-        UINT sampleMask;
-        winrt::com_ptr<ID3D11DepthStencilState> depthStencilState;
-        UINT stencilRef;
-        winrt::com_ptr<ID3D11InputLayout> inputLayout;
+        ID3D11RasterizerState* rasterizerState = nullptr;
+        ID3D11BlendState* blendState = nullptr;
+        float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        UINT sampleMask = 0xffffffff;
+        ID3D11DepthStencilState* depthStencilState = nullptr;
+        UINT stencilRef = 0;
+        ID3D11InputLayout* inputLayout = nullptr;
         static const UINT MAX_VERTEX_BUFFERS = 8;
-        winrt::com_ptr<ID3D11Buffer> vertexBuffers[MAX_VERTEX_BUFFERS];
-        UINT strides[MAX_VERTEX_BUFFERS];
-        UINT offsets[MAX_VERTEX_BUFFERS];
-        UINT vertexBufferCount;
-        winrt::com_ptr<ID3D11Buffer> indexBuffer;
-        DXGI_FORMAT indexFormat;
-        UINT indexOffset;
-        D3D11_PRIMITIVE_TOPOLOGY primitiveTopology;
-        winrt::com_ptr<ID3D11VertexShader> vertexShader;
-        std::vector<winrt::com_ptr<ID3D11ClassInstance>> vsClassInstances;
-        UINT vsClassInstanceCount;
-        winrt::com_ptr<ID3D11PixelShader> pixelShader;
-        std::vector<winrt::com_ptr<ID3D11ClassInstance>> psClassInstances;
-        UINT psClassInstanceCount;
-        winrt::com_ptr<ID3D11GeometryShader> geometryShader;
-        std::vector<winrt::com_ptr<ID3D11ClassInstance>> gsClassInstances;
-        UINT gsClassInstanceCount;
-        winrt::com_ptr<ID3D11HullShader> hullShader;
-        std::vector<winrt::com_ptr<ID3D11ClassInstance>> hsClassInstances;
-        UINT hsClassInstanceCount;
-        winrt::com_ptr<ID3D11DomainShader> domainShader;
-        std::vector<winrt::com_ptr<ID3D11ClassInstance>> dsClassInstances;
-        UINT dsClassInstanceCount;
-        winrt::com_ptr<ID3D11ComputeShader> computeShader;
-        std::vector<winrt::com_ptr<ID3D11ClassInstance>> csClassInstances;
-        UINT csClassInstanceCount;
+        ID3D11Buffer* vertexBuffers[MAX_VERTEX_BUFFERS] = { nullptr };
+        UINT strides[MAX_VERTEX_BUFFERS] = { 0 };
+        UINT offsets[MAX_VERTEX_BUFFERS] = { 0 };
+        UINT vertexBufferCount = 0;
+        ID3D11Buffer* indexBuffer = nullptr;
+        DXGI_FORMAT indexFormat = DXGI_FORMAT_UNKNOWN;
+        UINT indexOffset = 0;
+        D3D11_PRIMITIVE_TOPOLOGY primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+        ID3D11VertexShader* vertexShader = nullptr;
+        std::vector<ID3D11ClassInstance*> vsClassInstances;
+        UINT vsClassInstanceCount = 0;
+        ID3D11PixelShader* pixelShader = nullptr;
+        std::vector<ID3D11ClassInstance*> psClassInstances;
+        UINT psClassInstanceCount = 0;
+        ID3D11GeometryShader* geometryShader = nullptr;
+        std::vector<ID3D11ClassInstance*> gsClassInstances;
+        UINT gsClassInstanceCount = 0;
+        ID3D11HullShader* hullShader = nullptr;
+        std::vector<ID3D11ClassInstance*> hsClassInstances;
+        UINT hsClassInstanceCount = 0;
+        ID3D11DomainShader* domainShader = nullptr;
+        std::vector<ID3D11ClassInstance*> dsClassInstances;
+        UINT dsClassInstanceCount = 0;
+        ID3D11ComputeShader* computeShader = nullptr;
+        std::vector<ID3D11ClassInstance*> csClassInstances;
+        UINT csClassInstanceCount = 0;
+        static const UINT MAX_RENDER_TARGETS = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; // 8
+        ID3D11RenderTargetView* renderTargetViews[MAX_RENDER_TARGETS] = { nullptr };
+        ID3D11DepthStencilView* depthStencilView = nullptr;
+        UINT renderTargetCount = 0;
+        ShaderStageState vsState;
+        ShaderStageState psState;
+        ShaderStageState gsState;
+        ShaderStageState hsState;
+        ShaderStageState dsState;
+        ComputeStageState csState;
 
-        RenderState()
+        ~RenderState()
         {
-            std::memset(blendFactor, 0, sizeof(blendFactor));
-            sampleMask = 0xffffffff;
-            stencilRef = 0;
-            indexFormat = DXGI_FORMAT_UNKNOWN;
-            indexOffset = 0;
-            primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
-            vertexBufferCount = 0;
-            vsClassInstanceCount = 0;
-            psClassInstanceCount = 0;
-            gsClassInstanceCount = 0;
-            hsClassInstanceCount = 0;
-            dsClassInstanceCount = 0;
-            csClassInstanceCount = 0;
+            Release();
+        }
+
+        void Release()
+        {
+            // Release all pipeline state objects
+            if (rasterizerState) { rasterizerState->Release(); rasterizerState = nullptr; }
+            if (blendState) { blendState->Release(); blendState = nullptr; }
+            if (depthStencilState) { depthStencilState->Release(); depthStencilState = nullptr; }
+            if (inputLayout) { inputLayout->Release(); inputLayout = nullptr; }
+            for (UINT i = 0; i < MAX_VERTEX_BUFFERS; ++i)
+            {
+                if (vertexBuffers[i]) { vertexBuffers[i]->Release(); vertexBuffers[i] = nullptr; }
+            }
+            if (indexBuffer) { indexBuffer->Release(); indexBuffer = nullptr; }
+            if (vertexShader) { vertexShader->Release(); vertexShader = nullptr; }
+            for (auto& ci : vsClassInstances) { if (ci) { ci->Release(); ci = nullptr; } }
+            if (pixelShader) { pixelShader->Release(); pixelShader = nullptr; }
+            for (auto& ci : psClassInstances) { if (ci) { ci->Release(); ci = nullptr; } }
+            if (geometryShader) { geometryShader->Release(); geometryShader = nullptr; }
+            for (auto& ci : gsClassInstances) { if (ci) { ci->Release(); ci = nullptr; } }
+            if (hullShader) { hullShader->Release(); hullShader = nullptr; }
+            for (auto& ci : hsClassInstances) { if (ci) { ci->Release(); ci = nullptr; } }
+            if (domainShader) { domainShader->Release(); domainShader = nullptr; }
+            for (auto& ci : dsClassInstances) { if (ci) { ci->Release(); ci = nullptr; } }
+            if (computeShader) { computeShader->Release(); computeShader = nullptr; }
+            for (auto& ci : csClassInstances) { if (ci) { ci->Release(); ci = nullptr; } }
+            for (UINT i = 0; i < MAX_RENDER_TARGETS; ++i)
+            {
+                if (renderTargetViews[i]) { renderTargetViews[i]->Release(); renderTargetViews[i] = nullptr; }
+            }
+            if (depthStencilView) { depthStencilView->Release(); depthStencilView = nullptr; }
+
+            // Release shader stage resources
+            ReleaseShaderStageState(vsState);
+            ReleaseShaderStageState(psState);
+            ReleaseShaderStageState(gsState);
+            ReleaseShaderStageState(hsState);
+            ReleaseShaderStageState(dsState);
+            ReleaseComputeStageState(csState);
+
+            // Clear vectors
+            viewports.clear();
+            scissorRects.clear();
+            vsClassInstances.clear();
+            psClassInstances.clear();
+            gsClassInstances.clear();
+            hsClassInstances.clear();
+            dsClassInstances.clear();
+            csClassInstances.clear();
+        }
+
+    private:
+        void ReleaseShaderStageState(ShaderStageState& state)
+        {
+            for (UINT i = 0; i < ShaderStageState::MAX_CONSTANT_BUFFERS; ++i)
+            {
+                if (state.constantBuffers[i]) { state.constantBuffers[i]->Release(); state.constantBuffers[i] = nullptr; }
+            }
+            for (UINT i = 0; i < ShaderStageState::MAX_SRVS; ++i)
+            {
+                if (state.srvs[i]) { state.srvs[i]->Release(); state.srvs[i] = nullptr; }
+            }
+            for (UINT i = 0; i < ShaderStageState::MAX_SAMPLERS; ++i)
+            {
+                if (state.samplers[i]) { state.samplers[i]->Release(); state.samplers[i] = nullptr; }
+            }
+        }
+
+        void ReleaseComputeStageState(ComputeStageState& state)
+        {
+            ReleaseShaderStageState(state);
+            for (UINT i = 0; i < ComputeStageState::MAX_UAVS; ++i)
+            {
+                if (state.uavs[i]) { state.uavs[i]->Release(); state.uavs[i] = nullptr; }
+            }
         }
     };
 
