@@ -28,6 +28,8 @@ public:
     static inline MouseButton mouseButton;
     static inline bool held;
 
+    static inline std::string GPU;
+
     static inline int frames;
     static inline int fps;
 };

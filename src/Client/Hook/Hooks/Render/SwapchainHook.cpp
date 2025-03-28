@@ -126,6 +126,7 @@ void SwapchainHook::enableHook() {
     std::wstring gpuNameW(desc.Description);
     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
     std::string gpuName = converter.to_bytes(gpuNameW);
+    MC::GPU = gpuName;
     Logger::info("GPU name: {}", gpuName.c_str());
     if (gpuName.contains("Intel") && Client::settings.getSettingByName<bool>("forceIntel")->value) {
         queueReset = true;
