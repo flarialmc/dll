@@ -25,42 +25,27 @@ class BaseActorRendererRenderTextHook : public Hook {
         if (MaterialUtils::getUITextured() == nullptr)
             MaterialUtils::update();
 
-        /*static std::map<std::string, std::string> roleLogos = {
+        // Default to red logo if no matching role is found
+        ResourceLocation loc(Utils::getAssetsPath() + "\\red-logo.png", true);
+
+        static std::map<std::string, std::string> roleLogos = {
                 {"Dev", "dev-logo.png"},
                 {"Staff", "white-logo.png"},
                 {"Gamer", "gamer-logo.png"},
                 {"Booster", "booster-logo.png"},
                 {"Regular", "red-logo.png"}
-        };*/
-        static std::vector<std::pair<std::string, std::string>> roleLogos = {
-				{"Dev", "dev-logo.png"},
-				{"Staff", "white-logo.png"},
-				{"Gamer", "gamer-logo.png"},
-				{"Booster", "booster-logo.png"},
-				{"Regular", "red-logo.png"}
-		};
-
-        static std::map<std::string, TexturePtr> roleLogoTextures{};
-
-        TexturePtr* ptr{};
+        };
 
         for (const auto& [role, logo] : roleLogos) {
             if (APIUtils::hasRole(role, clearedName)) {
-                ResourceLocation loc = { Utils::getAssetsPath() + "\\" + logo, true };
-                auto has_value = roleLogoTextures.find(role) != roleLogoTextures.end();
-                if(!has_value) {
-                    roleLogoTextures[role] = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
-                    ptr = &roleLogoTextures[role];
-                } else {
-                    ptr = &roleLogoTextures[role];
-                    if(ptr->clientTexture == nullptr || ptr->clientTexture->clientTexture.resourcePointerBlock == nullptr)
-                        roleLogoTextures[role] = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
-                }
+                loc = { Utils::getAssetsPath() + "\\" + logo, true };
                 break;
             }
         }
 
-        if(!ptr || ptr->clientTexture == nullptr || ptr->clientTexture->clientTexture.resourcePointerBlock == nullptr)
+        TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
+
+        if(ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr)
             return;
 
         constexpr float DEG_RAD = 180.0f / 3.1415927f;
@@ -126,7 +111,7 @@ class BaseActorRendererRenderTextHook : public Hook {
         tess->vertexUV(x + size, y + size, 0.f, 1.f, 1.f);
         tess->vertexUV(x + size, y, 0.f, 1.f, 0.f);
 
-        MeshHelpers::renderMeshImmediately2(screenContext, tess, MaterialUtils::getNametag(), ptr->clientTexture.get());
+        MeshHelpers::renderMeshImmediately2(screenContext, tess, MaterialUtils::getNametag(), *ptr.clientTexture);
 
         stack.pop();
     }

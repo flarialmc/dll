@@ -105,9 +105,8 @@ public:
         auto screenContext = event.getMinecraftUIRenderContext()->getScreenContext();
 
         const ResourceLocation loc("textures/ui/cross_hair", false);
-        static TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
+        TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
         if(ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr) {
-            ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
             return;
         }
         const auto tess = screenContext->getTessellator();
