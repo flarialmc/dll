@@ -115,7 +115,7 @@ void SendDataToServer()
 class MumbleLink : public Module {
 public:
 
-    MumbleLink() : Module("Mumble Link", "Fixes Minecraft's default input delay", IDR_MUMBLE_PNG, "") {
+    MumbleLink() : Module("Mumble Link", "Use proximity chat in Flarial with the help of Mumble", IDR_MUMBLE_PNG, "") {
         Module::setup();
     }
 

@@ -26,15 +26,21 @@ class BaseActorRendererRenderTextHook : public Hook {
             MaterialUtils::update();
 
         ResourceLocation loc(Utils::getAssetsPath() + "\\red-logo.png", true);
-
-        static std::map<std::string, std::string> roleLogos = {
+        // maintaining the old structure below, can be used in future
+        /*static std::map<std::string, std::string> roleLogos = {      
                 {"Dev", "dev-logo.png"},
                 {"Staff", "orange-logo.png"},
                 {"Gamer", "gamer-logo.png"},
                 {"Booster", "booster-logo.png"},
                 {"Regular", "red-logo.png"}
+        };*/
+        static std::vector<std::pair<std::string, std::string>> roleLogos = {
+                    {"Dev", "dev-logo.png"},
+                    {"Staff", "orange-logo.png"},
+                    {"Gamer", "gamer-logo.png"},
+                    {"Booster", "booster-logo.png"},
+                    {"Regular", "red-logo.png"}
         };
-
         for (const auto& [role, logo] : roleLogos) {
             if (APIUtils::hasRole(role, clearedName)) {
                 loc = { Utils::getAssetsPath() + "\\" + logo, true };
