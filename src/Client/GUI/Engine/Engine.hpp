@@ -19,8 +19,12 @@
 #include "Elements/Windows/WindowRect.hpp"
 #include "Elements/Control/Tooltip/ToolTipStruct.hpp"
 #include "Elements/Structs/HSV.hpp"
+#include <d3d11.h>
+#include <wrl/client.h>
+#include <vector>
 
 using namespace DirectX;
+using Microsoft::WRL::ComPtr;
 
 struct BlurInputBuffer
 {
@@ -442,3 +446,73 @@ namespace FlarialGUI {
 
     void ResetOverrideAlphaValues();
 }
+
+class RenderStateManager
+{
+public:
+    RenderStateManager() = default;
+    ~RenderStateManager() = default;
+
+    void SaveRenderState();
+    void RestoreRenderState();
+
+private:
+    struct RenderState
+    {
+        std::vector<D3D11_VIEWPORT> viewports;
+        std::vector<D3D11_RECT> scissorRects;
+        ComPtr<ID3D11RasterizerState> rasterizerState;
+        ComPtr<ID3D11BlendState> blendState;
+        float blendFactor[4];
+        UINT sampleMask;
+        ComPtr<ID3D11DepthStencilState> depthStencilState;
+        UINT stencilRef;
+        ComPtr<ID3D11InputLayout> inputLayout;
+        static const UINT MAX_VERTEX_BUFFERS = 8;
+        ComPtr<ID3D11Buffer> vertexBuffers[MAX_VERTEX_BUFFERS];
+        UINT strides[MAX_VERTEX_BUFFERS];
+        UINT offsets[MAX_VERTEX_BUFFERS];
+        UINT vertexBufferCount;
+        ComPtr<ID3D11Buffer> indexBuffer;
+        DXGI_FORMAT indexFormat;
+        UINT indexOffset;
+        D3D11_PRIMITIVE_TOPOLOGY primitiveTopology;
+        ComPtr<ID3D11VertexShader> vertexShader;
+        std::vector<ComPtr<ID3D11ClassInstance>> vsClassInstances;
+        UINT vsClassInstanceCount;
+        ComPtr<ID3D11PixelShader> pixelShader;
+        std::vector<ComPtr<ID3D11ClassInstance>> psClassInstances;
+        UINT psClassInstanceCount;
+        ComPtr<ID3D11GeometryShader> geometryShader;
+        std::vector<ComPtr<ID3D11ClassInstance>> gsClassInstances;
+        UINT gsClassInstanceCount;
+        ComPtr<ID3D11HullShader> hullShader;
+        std::vector<ComPtr<ID3D11ClassInstance>> hsClassInstances;
+        UINT hsClassInstanceCount;
+        ComPtr<ID3D11DomainShader> domainShader;
+        std::vector<ComPtr<ID3D11ClassInstance>> dsClassInstances;
+        UINT dsClassInstanceCount;
+        ComPtr<ID3D11ComputeShader> computeShader;
+        std::vector<ComPtr<ID3D11ClassInstance>> csClassInstances;
+        UINT csClassInstanceCount;
+
+        RenderState()
+        {
+            ZeroMemory(blendFactor, sizeof(blendFactor));
+            sampleMask = 0xffffffff;
+            stencilRef = 0;
+            indexFormat = DXGI_FORMAT_UNKNOWN;
+            indexOffset = 0;
+            primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+            vertexBufferCount = 0;
+            vsClassInstanceCount = 0;
+            psClassInstanceCount = 0;
+            gsClassInstanceCount = 0;
+            hsClassInstanceCount = 0;
+            dsClassInstanceCount = 0;
+            csClassInstanceCount = 0;
+        }
+    };
+
+    RenderState m_state;
+};
