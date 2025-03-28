@@ -135,8 +135,8 @@ void WinrtUtils::launchURI(const std::string &uri) {
 
 void WinrtUtils::openSubFolder(const std::string& subFolder) {
     using namespace winrt;
-    using namespace Windows::Storage;
-    using namespace Windows::System;
+    using namespace winrt::Windows::Storage;
+    using namespace winrt::Windows::System;
 
     try {
         StorageFolder roamingFolder = ApplicationData::Current().RoamingFolder();
