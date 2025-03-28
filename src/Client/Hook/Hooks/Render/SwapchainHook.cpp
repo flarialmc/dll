@@ -242,44 +242,13 @@ void STDMETHODCALLTYPE hkClearDepthStencilViewDX11(
 
     int neededIndex = 2;
     parser.parseOptionsFile();
-    Logger::debug("troll up: {}", index);
-    oClearDepthStencilViewDX11(pContext, pDSV, ClearFlags, Depth, Stencil);
-
-
-
-    static ID3D11Texture2D* pFinalTexture = nullptr;
-
-    if (!pFinalTexture && SwapchainHook::init) {
-        D3D11_TEXTURE2D_DESC desc = {};
-        desc.Width              = MC::windowSize.x;
-        desc.Height             = MC::windowSize.y;
-        desc.MipLevels          = 1;
-        desc.ArraySize          = 1;
-        desc.Format             = DXGI_FORMAT_R8G8B8A8_UNORM;
-        desc.SampleDesc.Count   = 1;         // No MSAA
-        desc.SampleDesc.Quality = 0;
-        desc.Usage              = D3D11_USAGE_DEFAULT;
-        desc.BindFlags          = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-        desc.CPUAccessFlags     = 0;
-        desc.MiscFlags          = 0;
-
-        SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pFinalTexture);
-
-
-    }
+    Logger::debug("troll up: {}", MC::windowSize.x);
 
 
     if (parser.options["gfx_msaa"] != "1" && SwapchainHook::init) {
         ID3D11Texture2D* pBackBuffer = nullptr;
         SwapchainHook::swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
         neededIndex = 3;
-        SwapchainHook::context->ResolveSubresource(
-       pFinalTexture,
-        0,
-         pBackBuffer,
-         0,
-         DXGI_FORMAT_R8G8B8A8_UNORM
-    );
     }
     if (index == neededIndex && SwapchainHook::init) {
         RenderStateManager state;
@@ -287,6 +256,9 @@ void STDMETHODCALLTYPE hkClearDepthStencilViewDX11(
         SwapchainHook::DX11Render();
         state.RestoreRenderState();
     }
+
+    oClearDepthStencilViewDX11(pContext, pDSV, ClearFlags, Depth, Stencil);
+
 
 }
 
@@ -580,7 +552,7 @@ void SwapchainHook::DX11Render() {
             ImGui::EndFrame();
             ImGui::Render();
 
-            SwapchainHook::context->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
+            SwapchainHook::context->OMSetRenderTargets(1, &mainRenderTargetView, originalDepthStencilView);
             ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
             SwapchainHook::context->Flush();
         }

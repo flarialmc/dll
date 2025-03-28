@@ -224,9 +224,14 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     if (FAILED(hr)) {  return; }
     pContext->OMSetDepthStencilState(pDepthStencilState, 0);
 
+    ID3D11RenderTargetView* originalRenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { nullptr };
+    UINT numRenderTargets = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;
+    ID3D11DepthStencilView* originalDepthStencilView = nullptr;
+    SwapchainHook::context->OMGetRenderTargets(numRenderTargets, originalRenderTargetViews, &originalDepthStencilView);
+
     void *null = nullptr;
     pContext->PSSetShaderResources(0, 1, (ID3D11ShaderResourceView **)&null);
-    pContext->OMSetRenderTargets(1, &pRenderTargetView, nullptr);
+    pContext->OMSetRenderTargets(1, &pRenderTargetView, originalDepthStencilView);
 
     constantBuffer.resolution = rtvSize;
     constantBuffer.halfpixel = XMFLOAT2(0.5 / rtvSize.x, 0.5 / rtvSize.y);
@@ -280,7 +285,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
     pContext->RSSetViewports(1, &viewport);
     pContext->Draw(sizeof(quadVertices) / sizeof(quadVertices[0]), 0);
     ID3D11RenderTargetView* kajgd = nullptr;
-    pContext->OMSetRenderTargets(1, &kajgd, nullptr);
+    SwapchainHook::context->OMSetRenderTargets(1, &kajgd, originalDepthStencilView);
 
     pDepthStencilState->Release();
     pBlendState->Release();
