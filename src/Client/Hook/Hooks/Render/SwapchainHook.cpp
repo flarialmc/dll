@@ -16,6 +16,7 @@
 #include <imgui/imgui_impl_win32.h>
 #include <imgui/imgui_freetype.h>
 
+#include "MinecraftGame_Update.hpp"
 #include "ResizeHook.hpp"
 
 #include "../../../Module/Modules/MotionBlur/MotionBlur.hpp"
@@ -226,6 +227,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         return DXGI_ERROR_DEVICE_RESET;
     }
 
+    MinecraftGame_Update::index = 0;
 
 
     swapchain = pSwapChain;
@@ -279,6 +281,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
                 DX12Render();
 
             } else {
+
 
                 //DX11Render();
 

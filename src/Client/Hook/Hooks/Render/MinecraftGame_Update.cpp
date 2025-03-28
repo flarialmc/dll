@@ -3,14 +3,25 @@
 #include <kiero/kiero.h>
 #include "SwapchainHook.hpp"
 
+
+
 void MinecraftGame_Update::MinecraftGame_UpdateDetour(
-    __int64 a1, unsigned __int16 a2, bool a3, bool a4) {
+    __int64 a1, FrameBufferHandle fbh, bool msaa, bool needpresent) {
 
-    Logger::debug("{} {}", a4, a3);
 
-    return funcOriginal(a1, a2, a3, a4);
 
-    if (SwapchainHook::init) SwapchainHook::DX11Render();
+    if (index == 0 && SwapchainHook::init) {
+        RenderStateManager state;
+        state.SaveRenderState();
+        SwapchainHook::DX11Render();
+        SwapchainHook::context->Flush();
+        state.RestoreRenderState();
+        Logger::debug("needpresent {}", needpresent);
+    }
+    funcOriginal(a1, fbh, msaa, needpresent);
+
+    index++;
+
 }
 
 void MinecraftGame_Update::enableHook() {
