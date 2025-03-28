@@ -24,7 +24,6 @@
 #include <vector>
 
 using namespace DirectX;
-using Microsoft::WRL::ComPtr;
 
 struct BlurInputBuffer
 {
@@ -461,44 +460,44 @@ private:
     {
         std::vector<D3D11_VIEWPORT> viewports;
         std::vector<D3D11_RECT> scissorRects;
-        ComPtr<ID3D11RasterizerState> rasterizerState;
-        ComPtr<ID3D11BlendState> blendState;
+        winrt::com_ptr<ID3D11RasterizerState> rasterizerState;
+        winrt::com_ptr<ID3D11BlendState> blendState;
         float blendFactor[4];
         UINT sampleMask;
-        ComPtr<ID3D11DepthStencilState> depthStencilState;
+        winrt::com_ptr<ID3D11DepthStencilState> depthStencilState;
         UINT stencilRef;
-        ComPtr<ID3D11InputLayout> inputLayout;
+        winrt::com_ptr<ID3D11InputLayout> inputLayout;
         static const UINT MAX_VERTEX_BUFFERS = 8;
-        ComPtr<ID3D11Buffer> vertexBuffers[MAX_VERTEX_BUFFERS];
+        winrt::com_ptr<ID3D11Buffer> vertexBuffers[MAX_VERTEX_BUFFERS];
         UINT strides[MAX_VERTEX_BUFFERS];
         UINT offsets[MAX_VERTEX_BUFFERS];
         UINT vertexBufferCount;
-        ComPtr<ID3D11Buffer> indexBuffer;
+        winrt::com_ptr<ID3D11Buffer> indexBuffer;
         DXGI_FORMAT indexFormat;
         UINT indexOffset;
         D3D11_PRIMITIVE_TOPOLOGY primitiveTopology;
-        ComPtr<ID3D11VertexShader> vertexShader;
-        std::vector<ComPtr<ID3D11ClassInstance>> vsClassInstances;
+        winrt::com_ptr<ID3D11VertexShader> vertexShader;
+        std::vector<winrt::com_ptr<ID3D11ClassInstance>> vsClassInstances;
         UINT vsClassInstanceCount;
-        ComPtr<ID3D11PixelShader> pixelShader;
-        std::vector<ComPtr<ID3D11ClassInstance>> psClassInstances;
+        winrt::com_ptr<ID3D11PixelShader> pixelShader;
+        std::vector<winrt::com_ptr<ID3D11ClassInstance>> psClassInstances;
         UINT psClassInstanceCount;
-        ComPtr<ID3D11GeometryShader> geometryShader;
-        std::vector<ComPtr<ID3D11ClassInstance>> gsClassInstances;
+        winrt::com_ptr<ID3D11GeometryShader> geometryShader;
+        std::vector<winrt::com_ptr<ID3D11ClassInstance>> gsClassInstances;
         UINT gsClassInstanceCount;
-        ComPtr<ID3D11HullShader> hullShader;
-        std::vector<ComPtr<ID3D11ClassInstance>> hsClassInstances;
+        winrt::com_ptr<ID3D11HullShader> hullShader;
+        std::vector<winrt::com_ptr<ID3D11ClassInstance>> hsClassInstances;
         UINT hsClassInstanceCount;
-        ComPtr<ID3D11DomainShader> domainShader;
-        std::vector<ComPtr<ID3D11ClassInstance>> dsClassInstances;
+        winrt::com_ptr<ID3D11DomainShader> domainShader;
+        std::vector<winrt::com_ptr<ID3D11ClassInstance>> dsClassInstances;
         UINT dsClassInstanceCount;
-        ComPtr<ID3D11ComputeShader> computeShader;
-        std::vector<ComPtr<ID3D11ClassInstance>> csClassInstances;
+        winrt::com_ptr<ID3D11ComputeShader> computeShader;
+        std::vector<winrt::com_ptr<ID3D11ClassInstance>> csClassInstances;
         UINT csClassInstanceCount;
 
         RenderState()
         {
-            ZeroMemory(blendFactor, sizeof(blendFactor));
+            std::memset(blendFactor, 0, sizeof(blendFactor));
             sampleMask = 0xffffffff;
             stencilRef = 0;
             indexFormat = DXGI_FORMAT_UNKNOWN;
