@@ -25,7 +25,6 @@ class BaseActorRendererRenderTextHook : public Hook {
         if (MaterialUtils::getUITextured() == nullptr)
             MaterialUtils::update();
 
-        // Default to red logo if no matching role is found
         ResourceLocation loc(Utils::getAssetsPath() + "\\red-logo.png", true);
 
         static std::map<std::string, std::string> roleLogos = {
