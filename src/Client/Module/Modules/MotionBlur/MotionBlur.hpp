@@ -35,7 +35,7 @@ public:
     void defaultConfig() override { Module::defaultConfig();
         if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 0.88f);
         if (settings.getSettingByName<float>("intensity2") == nullptr) settings.addSetting("intensity2", 6.0f);
-        if (settings.getSettingByName<bool>("avgpixel") == nullptr) settings.addSetting("avgpixel", false);
+        if (settings.getSettingByName<bool>("avgpixel") == nullptr) settings.addSetting("avgpixel", true);
         if (settings.getSettingByName<bool>("dynamic") == nullptr) settings.addSetting("dynamic", true);
         if (settings.getSettingByName<bool>("debug") == nullptr) settings.addSetting("debug", false);
 
