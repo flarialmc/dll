@@ -233,7 +233,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     FPSMeasure();
 
-    Logger::debug("Swapchain : {}", MC::frames);
+    //Logger::debug("Swapchain : {}", MC::frames);
 
     if (!init) {
         /* INIT START */
@@ -280,7 +280,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
             } else {
 
-                DX11Render();
+                //DX11Render();
 
             }
         }

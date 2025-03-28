@@ -18,7 +18,7 @@ struct FrameContext {
 };
 
 class SwapchainHook : public Hook {
-private:
+public:
     static HRESULT (*IDXGIFactory2_CreateSwapChainForCoreWindow)(IDXGIFactory2 *This, IUnknown *pDevice,
                                                                  IUnknown *pWindow,
                                                                  const DXGI_SWAP_CHAIN_DESC1 *pDesc,

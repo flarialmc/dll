@@ -1,14 +1,20 @@
 #include "MinecraftGame_Update.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
+#include <kiero/kiero.h>
+#include "SwapchainHook.hpp"
 
-void* MinecraftGame_Update::MinecraftGame_UpdateDetour(void* _this) {
-    Logger::debug("GamesUpdate : {}", MC::frames);
+void MinecraftGame_Update::MinecraftGame_UpdateDetour(
+    __int64 a1, unsigned __int16 a2, bool a3, bool a4) {
 
-    FlarialGUI::RoundedRect(true, 0, 0, IM_COL32_WHITE, 500, 500);
+    Logger::debug("{} {}", a4, a3);
 
-    return funcOriginal(_this);
+    return funcOriginal(a1, a2, a3, a4);
+
+    if (SwapchainHook::init) SwapchainHook::DX11Render();
 }
 
 void MinecraftGame_Update::enableHook() {
-    this->autoHook((void*)MinecraftGame_UpdateDetour, (void**)&funcOriginal);
+
+    this->autoHook(MinecraftGame_UpdateDetour, (void**)&funcOriginal);
+
 }
