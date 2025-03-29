@@ -140,8 +140,6 @@ public:
             }
         }
 
-        if (name.second >= 2 && message[name.second - 2] == '§') name.second -= 3;
-
         if (name.second < message.size()) {
             message.insert(name.second, prefix);
             pkt->message = message;
