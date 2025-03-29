@@ -1,6 +1,7 @@
 #include "SwapchainHook.hpp"
 #include "../../../GUI/D2D.hpp"
 #include "../../../Events/Render/RenderEvent.hpp"
+#include "../../../Events/Render/RenderUnderUIEvent.hpp"
 #include "d2d1.h"
 #include "../../../Client.hpp"
 #include <d3d11on12.h>
@@ -395,7 +396,7 @@ void SwapchainHook::DX12Init() {
     }
 }
 
-void SwapchainHook::DX11Render() {
+void SwapchainHook::DX11Render(bool underui) {
 
     DX11Blur();
 
@@ -425,10 +426,19 @@ void SwapchainHook::DX11Render() {
 
 
 
-                auto event = nes::make_holder<RenderEvent>();
-                event->RTV = mainRenderTargetView;
+                if (!underui) {
 
-                eventMgr.trigger(event);
+                    auto event = nes::make_holder<RenderEvent>();
+                    event->RTV = mainRenderTargetView;
+                    eventMgr.trigger(event);
+
+                } else {
+
+                    auto event = nes::make_holder<RenderUnderUIEvent>();
+                    event->RTV = mainRenderTargetView;
+                    eventMgr.trigger(event);
+
+                }
 
 
                 if (!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
@@ -462,7 +472,7 @@ void SwapchainHook::DX11Render() {
 }
 
 
-void SwapchainHook::DX12Render() {
+void SwapchainHook::DX12Render(bool underui) {
     currentBitmap = (int) swapchain->GetCurrentBackBufferIndex();
 
     ID3D12Fence* fence;
@@ -558,10 +568,19 @@ void SwapchainHook::DX12Render() {
                 ID3D11RenderTargetView *mainRenderTargetView;
                 d3d11Device->CreateRenderTargetView(buffer2D, NULL, &mainRenderTargetView);
 
-                auto event = nes::make_holder<RenderEvent>();
-                event->RTV = mainRenderTargetView;
-                //BlurDX12::RenderBlur(SwapchainHook::d3d12CommandList);
-                eventMgr.trigger(event);
+                if (!underui) {
+
+                    auto event = nes::make_holder<RenderEvent>();
+                    event->RTV = mainRenderTargetView;
+                    eventMgr.trigger(event);
+
+                } else {
+
+                    auto event = nes::make_holder<RenderUnderUIEvent>();
+                    event->RTV = mainRenderTargetView;
+                    eventMgr.trigger(event);
+
+                }
 
                 if (!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
                     FlarialGUI::Notify(

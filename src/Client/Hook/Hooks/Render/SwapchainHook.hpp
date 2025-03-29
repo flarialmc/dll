@@ -18,15 +18,11 @@ struct FrameContext {
 };
 
 class SwapchainHook : public Hook {
-private:
-
-    static void DX12Render();
 
     static void RenderSync();
 
     static void prepareBlur();
 
-    static void DX11Render();
 
     static void Fonts();
 
@@ -37,6 +33,9 @@ private:
 
 
 public:
+    static void DX12Render(bool underui = false);
+
+    static void DX11Render(bool underui = false);
 
     static void DX12Blur();
 

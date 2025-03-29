@@ -54,7 +54,7 @@ void ClearDepthStencilViewHook::ClearDepthStencilViewCallbackDX11(
     UINT8                  Stencil) {
 
 
-    //Logger::debug("Working!");
+    SwapchainHook::DX11Render(true);
     funcOriginalDX11(pContext, pDepthStencilView, ClearFlags, Depth, Stencil);
 
 }
@@ -68,7 +68,7 @@ void ClearDepthStencilViewHook::ClearDepthStencilViewCallbackDX12(
     UINT                        NumRects,
     const D3D12_RECT            *pRects) {
 
-    //Logger::debug("Working!");
+    SwapchainHook::DX12Render(true);
     funcOriginalDX12(cmdList, pDepthStencilView, ClearFlags, Depth, Stencil, NumRects, pRects);
 
 }
