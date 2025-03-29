@@ -10,6 +10,11 @@
 
 void ClearDepthStencilViewHook::enableHook() {
 
+    bool queue;
+    if (SwapchainHook::queue) queue = true;
+    else queue = false;
+    Logger::debug("Queue value: {}", queue);
+
     if (!SwapchainHook::queue) {
 
         /* DX11 */
@@ -28,7 +33,6 @@ void ClearDepthStencilViewHook::enableHook() {
     } else {
 
         /* DX12 */
-
 
         void** vtable = *reinterpret_cast<void***>(SwapchainHook::DX12CommandLists);
         const size_t INDEX_CLEAR_DEPTH_STENCIL_VIEW = 47;
@@ -54,7 +58,8 @@ void ClearDepthStencilViewHook::ClearDepthStencilViewCallbackDX11(
     UINT8                  Stencil) {
 
 
-    SwapchainHook::DX11Render(true);
+    index++;
+    if (index == 2 && SwapchainHook::init) SwapchainHook::DX11Render(true);
     funcOriginalDX11(pContext, pDepthStencilView, ClearFlags, Depth, Stencil);
 
 }
@@ -68,7 +73,10 @@ void ClearDepthStencilViewHook::ClearDepthStencilViewCallbackDX12(
     UINT                        NumRects,
     const D3D12_RECT            *pRects) {
 
-    SwapchainHook::DX12Render(true);
+
+    index++;
+    if (index == 2 && SwapchainHook::init) SwapchainHook::DX12Render(true);
+
     funcOriginalDX12(cmdList, pDepthStencilView, ClearFlags, Depth, Stencil, NumRects, pRects);
 
 }

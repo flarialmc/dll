@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Events/Render/RenderUnderUIEvent.hpp"
 
 class FPS : public Module {
 
@@ -13,12 +14,14 @@ public:
 
     void onEnable() override {
         Listen(this, RenderEvent, &FPS::onRender)
-            Module::onEnable();
+        Listen(this, RenderUnderUIEvent, &FPS::onRenderUnderUI)
+        Module::onEnable();
     }
 
     void onDisable() override {
         Deafen(this, RenderEvent, &FPS::onRender)
-            Module::onDisable();
+        Deafen(this, RenderUnderUIEvent, &FPS::onRenderUnderUI)
+        Module::onDisable();
     }
 
     void defaultConfig() override { Module::defaultConfig();
@@ -100,6 +103,9 @@ public:
     }  //testing if it works
 
 
+    void onRenderUnderUI(RenderUnderUIEvent& event) {
+        FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(0), 500, 500);
+    }
     void onRender(RenderEvent& event) {
         if (this->isEnabled()) {
             // Get the fpsSpoofer value

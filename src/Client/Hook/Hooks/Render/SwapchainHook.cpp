@@ -183,7 +183,9 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     swapchain = pSwapChain;
     flagsreal = flags;
-    
+
+    ClearDepthStencilViewHook::index = 0;
+
     if (D2D::context)
     MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
@@ -492,6 +494,8 @@ void SwapchainHook::DX12Render(bool underui) {
 
     D2D::context->BeginDraw();
 
+    MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
+
     DXGI_SWAP_CHAIN_DESC sdesc;
     swapchain->GetDesc(&sdesc);
 
@@ -554,7 +558,7 @@ void SwapchainHook::DX12Render(bool underui) {
                                         DXGI_FORMAT_R8G8B8A8_UNORM, d3d12DescriptorHeapImGuiRender,
                                         d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart(),
                                         d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart());
-                } ID3D12CommandQueue* cmdQueue;
+                }
 
                 ImGui_ImplDX12_NewFrame();
                 ImGui_ImplWin32_NewFrame();
