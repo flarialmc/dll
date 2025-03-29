@@ -133,8 +133,8 @@ public:
                 leftClickHeld = true;
                 if (limiter->settings.getSettingByName<bool>("enabled")) {
                     float LT = limiter->settings.getSettingByName<float>("Left")->value;
-                    if (GetLeftCPS() > (int) LT and limiter->isEnabled()) {
-                        MC::held = !MC::held;
+                    if (GetLeftCPS() > (int) LT && limiter->isEnabled()) {
+                        //MC::held = !MC::held;
                         event.cancel();
                         return;
                     }
@@ -149,8 +149,8 @@ public:
                 rightClickHeld = true;
                 if (limiter->settings.getSettingByName<bool>("enabled")) {
                     float RT = limiter->settings.getSettingByName<float>("Right")->value;
-                    if (GetRightCPS() > (int) RT and limiter->isEnabled()) {
-                        MC::held = !MC::held;
+                    if (GetRightCPS() > (int) RT && limiter->isEnabled()) {
+                        //MC::held = !MC::held;
                         event.cancel();
                         return;
                     }

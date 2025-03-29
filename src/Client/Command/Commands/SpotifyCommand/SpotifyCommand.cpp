@@ -18,15 +18,15 @@ void SpotifyCommand::execute(const std::vector<std::string>& args) {
             spotify.play();
             msg = ("Started Playing.");
         }
-        else if (command == "pause") {
+        else if (command == "pause" || command == "stop") {
             spotify.pause();
             msg = ("Stopped Playing.");
         }
-        else if (command == "next") {
+        else if (command == "next" || command == "skip") {
             spotify.next_track();
             msg = ("Skipped to next track.");
         }
-        else if (command == "previous") {
+        else if (command == "previous" || command == "back") {
             spotify.previous_track();
             msg = ("Playing the previous track.");
         }
