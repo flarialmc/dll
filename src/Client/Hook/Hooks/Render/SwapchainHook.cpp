@@ -183,6 +183,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     swapchain = pSwapChain;
     flagsreal = flags;
+    MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
+
 
     /* UNDER UI HOOK - CLEARDEPTHSTENCILVIEW */
 
@@ -404,8 +406,6 @@ void SwapchainHook::DX11Render(bool underui) {
 
     D2D::context->BeginDraw();
 
-    MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
-
     ID3D11RenderTargetView *mainRenderTargetView = nullptr;
     ID3D11DeviceContext *ppContext = nullptr;
     ID3D11Texture2D *pBackBuffer = nullptr;
@@ -489,8 +489,6 @@ void SwapchainHook::DX12Render(bool underui) {
     DX12Blur();
 
     D2D::context->BeginDraw();
-
-    MC::windowSize = Vec2<float>(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
     DXGI_SWAP_CHAIN_DESC sdesc;
     swapchain->GetDesc(&sdesc);
