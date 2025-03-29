@@ -16,6 +16,8 @@
 #include <imgui/imgui_impl_win32.h>
 #include <imgui/imgui_freetype.h>
 
+#include "ClearDepthStencilViewHook.hpp"
+#include "CreateSwapchainForCoreWindowHook.hpp"
 #include "ResizeHook.hpp"
 
 #include "../../../Module/Modules/MotionBlur/MotionBlur.hpp"
@@ -110,14 +112,18 @@ void SwapchainHook::enableHook() {
         kiero::bind(8, (void **) &funcOriginal, (void *) swapchainCallback);
     }
 
-    // CREDIT @AETOPIA
+    /* CREATE SWAPCHAIN FOR CORE WINDOW HOOK */
 
     IDXGIFactory2 *pFactory = NULL;
     CreateDXGIFactory(IID_PPV_ARGS(&pFactory));
-    if (!pFactory) std::cout << "Factory null??" << std::endl;
-    Memory::hookFunc((*(LPVOID **) pFactory)[16], (void *) CreateSwapChainForCoreWindow,
-                     (void **) &IDXGIFactory2_CreateSwapChainForCoreWindow, "CreateSwapchainForCoreWindow");
+    if (!pFactory) Logger::error("Factory not created");
 
+    CreateSwapchainForCoreWindowHook::hook(pFactory);
+
+    /* CREATE SWAPCHAIN FOR CORE WINDOW HOOK */
+
+
+    /* FORCE DX11 ON INTEL DEVICES */
 
     winrt::com_ptr<IDXGIAdapter> adapter;
     pFactory->EnumAdapters(0, adapter.put());
@@ -132,9 +138,12 @@ void SwapchainHook::enableHook() {
         queueReset = true;
         Client::settings.getSettingByName<bool>("killdx")->value = true;
     }
+    /* FORCE DX11 ON INTEL DEVICES */
 
 
     Memory::SafeRelease(pFactory);
+
+    /* OVERLAYS CHECK */
 
     bool isRTSS = containsModule(L"RTSSHooks64.dll");
 
@@ -147,72 +156,16 @@ void SwapchainHook::enableHook() {
         // }
     }
 
+    /* OVERLAYS CHECK */
+
 }
 
 bool SwapchainHook::init = false;
 bool SwapchainHook::currentVsyncState;
 
 
-// CREDIT @AETOPIA
-
-HRESULT (*IDXGISwapChain_ResizeBuffers)
-        (IDXGISwapChain *This, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat,
-         UINT SwapChainFlags) = NULL;
-
-HRESULT (*IDXGISwapChain_Present)(IDXGISwapChain *, UINT, UINT) = NULL;
-
-HRESULT (*SwapchainHook::IDXGIFactory2_CreateSwapChainForCoreWindow)
-        (IDXGIFactory2 *This, IUnknown *pDevice, IUnknown *pWindow, const DXGI_SWAP_CHAIN_DESC1 *pDesc,
-         IDXGIOutput *pRestrictToOutput, IDXGISwapChain1 **ppSwapChain) = NULL;
-
-HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2 *This, IUnknown *pDevice, IUnknown *pWindow,
-                                                    DXGI_SWAP_CHAIN_DESC1 *pDesc, IDXGIOutput *pRestrictToOutput,
-                                                    IDXGISwapChain1 **ppSwapChain) {
-
-
-    ID3D12CommandQueue *pCommandQueue = NULL;
-    if (Client::settings.getSettingByName<bool>("killdx")->value) queue = nullptr;
-    if (Client::settings.getSettingByName<bool>("killdx")->value && SUCCEEDED(pDevice->QueryInterface(IID_PPV_ARGS(&pCommandQueue)))) {
-        pCommandQueue->Release();
-        queue = nullptr;
-        Logger::success("Fell back to DX11");
-        return DXGI_ERROR_INVALID_CALL;
-    }
-
-    pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
-
-
-    if (Client::settings.getSettingByName<bool>("killdx")->value) {
-        std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
-
-        if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
-            pDesc->BufferCount = 2;
-        } else if (bufferingMode == "Triple Buffering") {
-            pDesc->BufferCount = 3;
-        }
-
-        std::string swapEffect = Client::settings.getSettingByName<std::string>("swapeffect")->value;
-
-        if (swapEffect == "FLIP_SEQUENTIAL") {
-            pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
-        } else if (swapEffect == "FLIP_DISCARD") {
-            pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-        }
-    }
-
-    auto vsync = Client::settings.getSettingByName<bool>("vsync")->value;
-    currentVsyncState = vsync;
-
-    if(vsync) pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-
-
-    queueReset = false;
-    return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);
-}
-
-// CREDIT @AETOPIA
-
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
+
     if (Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
 
     if (currentVsyncState != Client::settings.getSettingByName<bool>("vsync")->value) {
@@ -227,10 +180,20 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         return DXGI_ERROR_DEVICE_RESET;
     }
 
-
-
     swapchain = pSwapChain;
     flagsreal = flags;
+
+    /* UNDER UI HOOK - CLEARDEPTHSTENCILVIEW */
+
+    static bool hooker = false;
+
+    if (!hooker && ((queue && DX12CommandLists) || (!queue && context))) {
+        ClearDepthStencilViewHook hook;
+        hook.enableHook();
+        hooker = true;
+    }
+
+    /* UNDER UI HOOK - CLEARDEPTHSTENCILVIEW */
 
     FPSMeasure();
 
