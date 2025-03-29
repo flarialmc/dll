@@ -20,12 +20,12 @@ public:
 
     void onEnable() override {
 
-            ListenOrdered(this, RenderUnderUIEvent, &MotionBlur::onRender, EventOrder::IMMEDIATE)
+            ListenOrdered(this, RenderEvent, &MotionBlur::onRender, EventOrder::IMMEDIATE)
             Module::onEnable();
     }
 
     void onDisable() override {
-        Deafen(this, RenderUnderUIEvent, &MotionBlur::onRender)
+        Deafen(this, RenderEvent, &MotionBlur::onRender)
         previousFrames.clear();
         Module::onDisable();
     }
@@ -64,7 +64,10 @@ public:
 
     static inline std::vector<winrt::com_ptr<ID3D11ShaderResourceView>> previousFrames;
 
-    void onRender(RenderUnderUIEvent& event) {
+    void onRender(RenderEvent& event) {
+
+        //if (FlarialGUI::inMenu) return;
+
 
         int maxFrames = (int)round(this->settings.getSettingByName<float>("intensity2")->value);
 

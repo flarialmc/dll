@@ -30,7 +30,6 @@
 #include "Render/HurtColorEvent.hpp"
 #include "Render/RenderEvent.hpp"
 #include "Render/RenderPotionHUDEvent.hpp"
-#include "Render/RenderUnderUIEvent.hpp"
 #include "Render/SetTopScreenNameEvent.hpp"
 #include "Render/SetupAndRenderEvent.hpp"
 #include "Render/RenderOrderExecuteEvent.hpp"
