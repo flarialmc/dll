@@ -411,12 +411,14 @@ void SwapchainHook::DX11Render(bool underui) {
     D2D::context->BeginDraw();
 
     ID3D11RenderTargetView *mainRenderTargetView = nullptr;
-    ID3D11DeviceContext *ppContext = nullptr;
     ID3D11Texture2D *pBackBuffer = nullptr;
 
-    d3d11Device->GetImmediateContext(&ppContext);
+    ID3D11RenderTargetView* originalRenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { nullptr };
+    UINT numRenderTargets = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;
+    ID3D11DepthStencilView* originalDepthStencilView = nullptr;
+    context->OMGetRenderTargets(numRenderTargets, originalRenderTargetViews, &originalDepthStencilView);
 
-    if (ppContext) {
+    if (context) {
 
         if (SUCCEEDED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID *) &pBackBuffer))) {
 
@@ -460,9 +462,9 @@ void SwapchainHook::DX11Render(bool underui) {
                 ImGui::EndFrame();
                 ImGui::Render();
 
-                ppContext->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
+                context->OMSetRenderTargets(1, &mainRenderTargetView, originalDepthStencilView);
                 ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-                ppContext->Flush();
+                context->Flush();
             }
         }
     }
@@ -471,7 +473,12 @@ void SwapchainHook::DX11Render(bool underui) {
 
     if (mainRenderTargetView) mainRenderTargetView->Release();
 
-    Memory::SafeRelease(ppContext);
+    context->OMSetRenderTargets(numRenderTargets, originalRenderTargetViews, originalDepthStencilView);
+
+    if (originalDepthStencilView) originalDepthStencilView->Release();
+    for (UINT i = 0; i < numRenderTargets; ++i) {
+        if (originalRenderTargetViews[i]) originalRenderTargetViews[i]->Release();
+    }
 
 }
 

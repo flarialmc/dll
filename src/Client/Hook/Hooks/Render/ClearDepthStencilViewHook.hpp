@@ -1,6 +1,7 @@
 #pragma once
 #include "../Hook.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
+#include "SDK/Client/Options/OptionsParser.hpp"
 
 class ClearDepthStencilViewHook : public Hook {
     static void ClearDepthStencilViewCallbackDX11(
@@ -48,4 +49,6 @@ public:
     ClearDepthStencilViewHook() : Hook("ClearDepthStencilView", 0) {}
 
     void enableHook() override;
+
+    static OptionsParser options;
 };

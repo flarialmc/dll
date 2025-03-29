@@ -1,5 +1,6 @@
 #include "ClearDepthStencilViewHook.hpp"
 #include "SwapchainHook.hpp"
+#include "SDK/Client/Options/OptionsParser.hpp"
 
 /*
  * THIS IS HOOKED THROUGH SWAPCHAIN!
@@ -48,7 +49,7 @@ void ClearDepthStencilViewHook::enableHook() {
     }
 }
 
-
+OptionsParser ClearDepthStencilViewHook::options;
 
 void ClearDepthStencilViewHook::ClearDepthStencilViewCallbackDX11(
     ID3D11DeviceContext* pContext,
@@ -58,8 +59,15 @@ void ClearDepthStencilViewHook::ClearDepthStencilViewCallbackDX11(
     UINT8                  Stencil) {
 
 
+
     index++;
-    if (index == 2 && SwapchainHook::init) SwapchainHook::DX11Render(true);
+    options.parseOptionsFile();
+    int neededIndex = options.options["gfx_msaa"] != "1" ? 3 : 2;
+
+    if (index == neededIndex && SwapchainHook::init) {
+        SwapchainHook::DX11Render(true);
+    }
+
     funcOriginalDX11(pContext, pDepthStencilView, ClearFlags, Depth, Stencil);
 
 }
