@@ -14,6 +14,8 @@ private:
     static inline std::vector<ClickData> rightClickList;
     static inline bool rightClickHeld;
     static inline bool leftClickHeld;
+    static inline std::chrono::time_point<std::chrono::high_resolution_clock> lastRightClick;
+    static inline std::chrono::time_point<std::chrono::high_resolution_clock> lastLeftClick;
 public:
     CPSCounter() : Module("CPS", "Counts your Clicks per second.", IDR_CURSOR_PNG, "") {
         Module::setup();
@@ -123,42 +125,90 @@ public:
         this->resetPadding();
     }
 
-    void onMouse(MouseEvent &event) {
+    void onMouse(MouseEvent& event) {
         auto limiter = ModuleManager::getModule("CPS Limiter");
         if (limiter == nullptr) return;
-        if (event.getButton() == MouseButton::Left) {
-            if (!MC::held) {
-                leftClickHeld = false;
-            } else {
-                leftClickHeld = true;
-                if (limiter->settings.getSettingByName<bool>("enabled")) {
-                    float LT = limiter->settings.getSettingByName<float>("Left")->value;
-                    if (GetLeftCPS() > (int) LT && limiter->isEnabled()) {
-                        //MC::held = !MC::held;
-                        event.cancel();
-                        return;
-                    }
+        /*
+            legacy method
+        */
+        if (!limiter->settings.getSettingByName<bool>("legacy")) {
+            if (event.getButton() == MouseButton::Left) {
+                if (!MC::held) {
+                    leftClickHeld = false;
                 }
-                AddLeftClick();
+                else {
+                    leftClickHeld = true;
+                    if (limiter->settings.getSettingByName<bool>("enabled")) {
+                        std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - lastLeftClick;
+                        float LT = 1.3f / limiter->settings.getSettingByName<float>("Left")->value;
+                        if (duration.count() < LT and limiter->isEnabled()) {
+                            MC::held = !MC::held;
+                            event.cancel();
+                            return;
+                        }
+                    }
+                    AddLeftClick();
+                    lastLeftClick = std::chrono::high_resolution_clock::now();
+                }
+            }
+            if (event.getButton() == MouseButton::Right) {
+                if (!MC::held) {
+                    rightClickHeld = false;
+                }
+                else {
+                    rightClickHeld = true;
+                    if (limiter->settings.getSettingByName<bool>("enabled")) {
+                        std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - lastRightClick;
+                        float RT = 1 / limiter->settings.getSettingByName<float>("Right")->value;
+                        if (duration.count() < RT and limiter->isEnabled()) {
+                            MC::held = !MC::held;
+                            event.cancel();
+                            return;
+                        }
+                    }
+                    AddRightClick();
+                    lastRightClick = std::chrono::high_resolution_clock::now();
+                }
+            }
+        } else {
+        /*
+            new method
+        */
+            if (event.getButton() == MouseButton::Left) {
+                if (!MC::held) {
+                    leftClickHeld = false;
+                }
+                else {
+                    leftClickHeld = true;
+                    if (limiter->settings.getSettingByName<bool>("enabled")) {
+                        float LT = limiter->settings.getSettingByName<float>("Left")->value;
+                        if (GetLeftCPS() > (int)LT && limiter->isEnabled()) {
+                            MC::held = !MC::held;
+                            event.cancel();
+                            return;
+                        }
+                    }
+                    AddLeftClick();
+                }
+            }
+            if (event.getButton() == MouseButton::Right) {
+                if (!MC::held) {
+                    rightClickHeld = false;
+                }
+                else {
+                    rightClickHeld = true;
+                    if (limiter->settings.getSettingByName<bool>("enabled")) {
+                        float RT = limiter->settings.getSettingByName<float>("Right")->value;
+                        if (GetRightCPS() > (int)RT && limiter->isEnabled()) {
+                            MC::held = !MC::held;
+                            event.cancel();
+                            return;
+                        }
+                    }
+                    AddRightClick();
+                }
             }
         }
-        if (event.getButton() == MouseButton::Right) {
-            if (!MC::held) {
-                rightClickHeld = false;
-            } else {
-                rightClickHeld = true;
-                if (limiter->settings.getSettingByName<bool>("enabled")) {
-                    float RT = limiter->settings.getSettingByName<float>("Right")->value;
-                    if (GetRightCPS() > (int) RT && limiter->isEnabled()) {
-                        //MC::held = !MC::held;
-                        event.cancel();
-                        return;
-                    }
-                }
-                AddRightClick();
-            }
-        }
-
     }
 
     void onRender(RenderEvent &event) {
