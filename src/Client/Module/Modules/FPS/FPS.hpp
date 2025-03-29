@@ -104,14 +104,12 @@ public:
 
 
     void onRenderUnderUI(RenderUnderUIEvent& event) {
-        FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(0), 500, 500);
+        //Blur::RenderBlur(event.RTV, 3, 5.f);
     }
     void onRender(RenderEvent& event) {
         if (this->isEnabled()) {
-            // Get the fpsSpoofer value
             float fpsSpooferValue = this->settings.getSettingByName<float>("fpsSpoofer")->value;
 
-            // Ensure the value doesn't exceed 10 and is at least 1
             if (fpsSpooferValue > 10.0f) {
                 fpsSpooferValue = 10.0f;
             }
@@ -119,16 +117,12 @@ public:
                 fpsSpooferValue = 1.0f;
             }
 
-            // Save the clamped value (if changed)
             this->settings.getSettingByName<float>("fpsSpoofer")->value = fpsSpooferValue;
 
-            // Apply the multiplier
             int fps = (int)round(((float)MC::fps * round(fpsSpooferValue)));
 
-            // Convert fps to string for rendering
             auto fpsStr = FlarialGUI::cached_to_string(fps);
 
-            // Render the FPS text
             this->normalRender(0, fpsStr);
         }
     }

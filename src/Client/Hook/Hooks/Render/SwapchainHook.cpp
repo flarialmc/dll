@@ -297,7 +297,7 @@ void SwapchainHook::DX11Init() {
 
     }
 
-    //SaveBackbuffer();
+    SaveBackbuffer();
 
     Blur::InitializePipeline();
     MotionBlur::initted = AvgPixelMotionBlurHelper::Initialize();
@@ -406,6 +406,7 @@ void SwapchainHook::DX11Render(bool underui) {
 
     DX11Blur();
 
+    if (underui)
     SaveBackbuffer();
 
     D2D::context->BeginDraw();
@@ -418,11 +419,14 @@ void SwapchainHook::DX11Render(bool underui) {
     ID3D11DepthStencilView* originalDepthStencilView = nullptr;
     context->OMGetRenderTargets(numRenderTargets, originalRenderTargetViews, &originalDepthStencilView);
 
+
+
+
     if (context) {
 
         if (SUCCEEDED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID *) &pBackBuffer))) {
 
-            if (SUCCEEDED(d3d11Device->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView))) {
+            if (SUCCEEDED(d3d11Device->CreateRenderTargetView(pBackBuffer, nullptr, &mainRenderTargetView))) {
 
                 ImGui_ImplDX11_NewFrame();
                 ImGui_ImplWin32_NewFrame();
@@ -464,7 +468,7 @@ void SwapchainHook::DX11Render(bool underui) {
 
                 context->OMSetRenderTargets(1, &mainRenderTargetView, originalDepthStencilView);
                 ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-                context->Flush();
+                //context->Flush();
             }
         }
     }
@@ -897,27 +901,26 @@ void SwapchainHook::SaveBackbuffer() {
 
     if (!SwapchainHook::queue) {
 
-        SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&SavedD3D11BackBuffer));
-
-        if (FlarialGUI::needsBackBuffer) {
-
-            if (!ExtraSavedD3D11BackBuffer) {
-                D3D11_TEXTURE2D_DESC textureDesc = {};
-                textureDesc.Width = D2D::context->GetSize().width;
-                textureDesc.Height = D2D::context->GetSize().height;
-                textureDesc.MipLevels = 1;
-                textureDesc.ArraySize = 1;
-                textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-                textureDesc.SampleDesc.Count = 1;
-                textureDesc.Usage = D3D11_USAGE_DEFAULT;
-                textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-                textureDesc.CPUAccessFlags = 0;
-
-                SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
-            }
-
-            context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
+        HRESULT hr = SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&SavedD3D11BackBuffer));
+        if (FAILED(hr)) {
+            printf("GetBuffer failed with HRESULT: 0x%08X\n", hr);
         }
+
+        if (!ExtraSavedD3D11BackBuffer) {
+            D3D11_TEXTURE2D_DESC textureDesc = {};
+            SavedD3D11BackBuffer->GetDesc(&textureDesc);
+            textureDesc.Usage = D3D11_USAGE_DEFAULT;
+            textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+            textureDesc.CPUAccessFlags = 0;
+
+            hr = SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
+            if (FAILED(hr)) {
+                printf("CreateTexture2D failed with HRESULT: 0x%08X\n", hr);
+            }
+        }
+
+        context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
+
 
 
     } else {

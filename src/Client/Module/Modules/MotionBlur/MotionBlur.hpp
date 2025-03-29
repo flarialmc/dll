@@ -91,7 +91,6 @@ public:
                 previousFrames.push_back(std::move(buffer));
             }
 
-
             if (this->settings.getSettingByName<bool>("avgpixel")->value) AvgPixelMotionBlurHelper::Render(event.RTV, previousFrames);
             else RealMotionBlurHelper::Render(event.RTV, previousFrames.back());
 
