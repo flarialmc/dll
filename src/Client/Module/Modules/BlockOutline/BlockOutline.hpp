@@ -164,7 +164,7 @@ public:
             auto drawWest = [&](float width) {
                 float w = width;
                 float wi = 1 - w;
-                float x_base = bp.x ;  // Offset x-coordinate outward
+                float x_base = bp.x - 0.001f;  // Offset x-coordinate outward
                 // Bottom strip (along y = bp.y)
                 dc.fillQuad(Vec3<float>(x_base, bp.y, bp.z), Vec3<float>(x_base, bp.y + w, bp.z), Vec3<float>(x_base, bp.y + w, bp.z + 1.002f), Vec3<float>(x_base, bp.y, bp.z + 1.002f), color);
                 // Top strip (along y = bp.y + 1.002f)
@@ -190,7 +190,7 @@ public:
 
             auto drawNorth = [&](float width) {
                 float w = width;
-                float z_base = bp.z ;  // Offset z-coordinate outward
+                float z_base = bp.z - 0.001f;  // Offset z-coordinate outward
                 // Bottom strip (along y = bp.y, z = bp.z)
                 dc.fillQuad(Vec3<float>(bp.x, bp.y, z_base), Vec3<float>(bp.x + 1.002f, bp.y, z_base), Vec3<float>(bp.x + 1.002f, bp.y + w, z_base), Vec3<float>(bp.x, bp.y + w, z_base), color);
                 // Top strip (along y = bp.y + 1.002f, z = bp.z)
