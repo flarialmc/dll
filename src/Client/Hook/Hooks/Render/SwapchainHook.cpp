@@ -183,6 +183,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     swapchain = pSwapChain;
     flagsreal = flags;
+    
+    if (D2D::context)
     MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
 
