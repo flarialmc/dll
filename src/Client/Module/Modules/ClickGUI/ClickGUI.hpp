@@ -123,7 +123,7 @@ public:
 
         std::pair<std::string, size_t> name = findFirstOf(message, APIUtils::onlineUsers);
 
-        static std::map<std::string, std::string> roleColors = {
+        static std::vector<std::pair<std::string, std::string>> roleColors = {
             { "Dev", "§b" },
             { "Staff", "§6" },
             { "Gamer", "§5" },
@@ -131,7 +131,7 @@ public:
             { "Regular", "§4" }
         };
 
-        std::string prefix = "§f[" + roleColors["Regular"] + "FLARIAL§f]§r ";
+        std::string prefix = "§f[§4FLARIAL§f]§r ";
 
         for (const auto& [role, color] : roleColors) {
             if (APIUtils::hasRole(role, name.first)) {
