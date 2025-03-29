@@ -146,6 +146,6 @@ public:
 class SpotifyCommand : public Command {
 public:
     SpotifyController spotify;
-    SpotifyCommand() : Command("spotify", "Controls spotify") {};
+    SpotifyCommand() : Command("spotify", "Controls spotify", {"s"}) {};
     void execute(const std::vector<std::string>& args) override;
 };
