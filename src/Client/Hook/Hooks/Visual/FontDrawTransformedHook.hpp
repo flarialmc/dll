@@ -14,8 +14,8 @@ class FontDrawTransformedHook : public Hook {
 private:
 
     static void
-    FontDrawTransformedCallback(void *_this, void *screenContext, std::string &str, float x, float y, MCCColor* color,
-                                int angle, float s, bool centered, float maxWidth) {
+    FontDrawTransformedCallback(void *_this, void *screenContext, std::string &str, float x, float y, MCCColor* color, int angle, float s, bool centered, float maxWidth) {
+
         color->r = colors_primary1.r;
         color->g = colors_primary1.g;
         color->b = colors_primary1.b;
