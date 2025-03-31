@@ -78,7 +78,7 @@ public:
         this->addToggle("Save Modifier", "Saves the last zoom amount.", this->settings.getSettingByName<bool>("SaveModifier")->value);
         this->addToggle("Hide Hand", "Hide hand when zooming.", this->settings.getSettingByName<bool>("hidehand")->value);
         this->addToggle("Hide Modules", "Hides other modules when zooming.", this->settings.getSettingByName<bool>("hidemodules")->value);
-        this->addToggle("Always Animate", "idk what this does tbh", this->settings.getSettingByName<bool>("alwaysanim")->value);
+        this->addToggle("Always Animate", "Smooth zoom animation while sprinting", this->settings.getSettingByName<bool>("alwaysanim")->value);
         
 
         FlarialGUI::UnsetScrollView();
