@@ -103,12 +103,18 @@ public:
         auto [responseCode, responseBody] = APIUtils::Request(search_url, "GET", "", headers);
 
         if (responseCode >= 200 && responseCode < 300) {
-            json jsonData = json::parse(responseBody);
-            if (jsonData.contains("item")) {
-                std::string songName = jsonData["item"]["name"].get<std::string>();
-                std::string artist = jsonData["item"]["artists"][0]["name"].get<std::string>();
+            try {
+                json jsonData = json::parse(responseBody);
+                if (jsonData.contains("item")) {
+                    std::string songName = jsonData["item"]["name"].get<std::string>();
+                    std::string artist = jsonData["item"]["artists"][0]["name"].get<std::string>();
 
-                return songName + " by " + artist;
+                    return songName + " by " + artist;
+                }
+            } catch (const json::parse_error& e) {
+                Logger::error("JSON Parse Error: " + std::string(e.what()));
+            } catch (const json::type_error& e) {
+                Logger::error("JSON Type Error: " + std::string(e.what()));
             }
         }
 

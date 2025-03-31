@@ -36,7 +36,8 @@ void SpotifyCommand::execute(const std::vector<std::string>& args) {
         }
         else if (command == "play") {
             if (argss.size() <= 2) {
-                msg = ("Please give the name of song");
+                msg = "Please provide the name of the song you want to play.";
+                addCommandMessage(msg);
                 return;
             }
             std::ostringstream oss;
@@ -56,7 +57,13 @@ void SpotifyCommand::execute(const std::vector<std::string>& args) {
             }
             spotify.play_song_by_name(output);
 
-            msg = ("Started playing " + spotify.get_song_name());
+            std::this_thread::sleep_for(std::chrono::seconds(1)); //needed or else it will print previous song name
+            std::string songName = spotify.get_song_name();
+            if (songName.empty()) {
+                msg = "Started playing, but could not retrieve song info.";
+            } else {
+                msg = "Started playing " + songName;
+            }
         }
         else if (command == "name") msg = ("Playing " + spotify.get_song_name());
         else msg = ("Invalid Command. (Use .spotify help to get a list of commands!)");
