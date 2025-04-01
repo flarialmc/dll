@@ -249,10 +249,12 @@ void ClickGUI::onRender(RenderEvent &event) {
                 FlarialGUI::TextBoxes[0].isActive = false;
                 curr = "settings";
 
-                FlarialGUI::scrollpos = 0;
-                FlarialGUI::barscrollpos = 0;
-                accumilatedPos = 0;
-                accumilatedBarPos = 0;
+                auto& scrollData = scrollInfo[curr];
+
+                FlarialGUI::scrollpos = scrollData.scrollpos;
+                FlarialGUI::barscrollpos = scrollData.barscrollpos;
+                accumilatedPos = scrollData.scrollpos;
+                accumilatedBarPos = scrollData.barscrollpos;
             }
 
             radioX += Constraints::SpacingConstraint(0.29f, logoWidth);
