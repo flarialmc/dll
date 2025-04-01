@@ -1050,8 +1050,8 @@ bool FlarialGUI::LoadFontFromFontFamily(std::string name, std::string weightedNa
         if (fontFile.is_open()) {
 
             ImFontConfig config;
-            FontMap[weightedName + "-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 200, &config);
-            FontMap[weightedName + "-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 200, &config);
+            FontMap[weightedName + "-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 23, &config);
+            FontMap[weightedName + "-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 40, &config);
             if(!FontMap[weightedName + "-1"]) return false;
             return true;
 
