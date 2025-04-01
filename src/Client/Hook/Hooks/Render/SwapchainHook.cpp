@@ -179,7 +179,7 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2* This, IUnknow
         return DXGI_ERROR_INVALID_CALL;
     }
 
-    pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
+    //pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
 
 
     if (Client::settings.getSettingByName<bool>("killdx")->value) {
@@ -333,7 +333,7 @@ void SwapchainHook::DX11Init() {
 
     }
 
-    //SaveBackbuffer();
+    SaveBackbuffer();
 
     Blur::InitializePipeline();
     Memory::SafeRelease(eBackBuffer);
