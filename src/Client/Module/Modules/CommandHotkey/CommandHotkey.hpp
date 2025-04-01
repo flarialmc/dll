@@ -71,7 +71,7 @@ public:
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Function");
-        this->addButton("Add another Keybind", "Multi-Keybind command support!", "Add", [this] {
+        this->addButton("Add another Keybind", "Multi-Keybind command support!", "Add", [&] {
 
             std::string keybindName = "keybind-" + FlarialGUI::cached_to_string(totalKeybinds);
             std::string commandName = "command-" + FlarialGUI::cached_to_string(totalKeybinds);
