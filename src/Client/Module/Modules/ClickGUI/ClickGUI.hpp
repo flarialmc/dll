@@ -146,7 +146,7 @@ public:
         }
     }
 
-    ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {
+    ClickGUI() : Module("ClickGUI", "Graphical user interface for managing modules.", IDR_CLICKGUI_PNG, "K") {
         Module::setup();
         this->ghostMainModule = new Module("main", "troll", IDR_COMBO_PNG, "");
         scrollInfo["modules"] = { 0, 0 };
