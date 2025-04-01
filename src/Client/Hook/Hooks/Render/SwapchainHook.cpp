@@ -95,6 +95,7 @@ HWND FindWindowByTitle(const std::string& titlePart) {
 void SwapchainHook::enableHook() {
 
     queueReset = Client::settings.getSettingByName<bool>("recreateAtStart")->value;
+    queueReset = Client::settings.getSettingByName<bool>("killdx")->value;
 
     if (!window) {
         window = FindWindowByTitle("Minecraft");
@@ -179,7 +180,7 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2* This, IUnknow
         return DXGI_ERROR_INVALID_CALL;
     }
 
-    pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
+    //pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
 
 
     if (Client::settings.getSettingByName<bool>("killdx")->value) {
@@ -333,7 +334,7 @@ void SwapchainHook::DX11Init() {
 
     }
 
-    //SaveBackbuffer();
+    SaveBackbuffer();
 
     Blur::InitializePipeline();
     Memory::SafeRelease(eBackBuffer);
@@ -691,7 +692,7 @@ void SwapchainHook::DX11Blur() {
     if (ModuleManager::initialized) {
         auto module = ModuleManager::getModule("Motion Blur");
         if (module) {
-            if (module->isEnabled() && !FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
+            if (module->isEnabled() || FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
             else FlarialGUI::needsBackBuffer = false;
         }
     }
@@ -905,7 +906,6 @@ void SwapchainHook::SaveBackbuffer() {
 
     Memory::SafeRelease(SavedD3D11BackBuffer);
     Memory::SafeRelease(ExtraSavedD3D11BackBuffer);
-
     if (!SwapchainHook::queue) {
 
         SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&SavedD3D11BackBuffer));
@@ -914,12 +914,7 @@ void SwapchainHook::SaveBackbuffer() {
 
             if (!ExtraSavedD3D11BackBuffer) {
                 D3D11_TEXTURE2D_DESC textureDesc = {};
-                textureDesc.Width = D2D::context->GetSize().width;
-                textureDesc.Height = D2D::context->GetSize().height;
-                textureDesc.MipLevels = 1;
-                textureDesc.ArraySize = 1;
-                textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-                textureDesc.SampleDesc.Count = 1;
+                SavedD3D11BackBuffer->GetDesc(&textureDesc);
                 textureDesc.Usage = D3D11_USAGE_DEFAULT;
                 textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
                 textureDesc.CPUAccessFlags = 0;
@@ -934,6 +929,7 @@ void SwapchainHook::SaveBackbuffer() {
     }
     else {
         HRESULT hr;
+
         hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&SavedD3D11BackBuffer));
         if (FAILED(hr)) std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
     }

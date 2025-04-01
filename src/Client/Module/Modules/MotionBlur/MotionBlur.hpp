@@ -117,7 +117,7 @@ public:
     static winrt::com_ptr<ID3D11ShaderResourceView> BackbufferToSRVExtraMode() {
 
         if (!FlarialGUI::needsBackBuffer) return nullptr;
-
+        if (SwapchainHook::queue) return BackbufferToSRV();
         HRESULT hr;
 
         D3D11_TEXTURE2D_DESC d;
