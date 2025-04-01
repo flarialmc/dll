@@ -128,7 +128,6 @@ public:
 static inline double lastLeftAllowed  = 0.0;
 static inline double lastRightAllowed = 0.0;
 
-// Helper to get the current time in seconds (using high resolution clock).
 double getCurrentTime() {
     using namespace std::chrono;
     return duration<double>(high_resolution_clock::now().time_since_epoch()).count();
