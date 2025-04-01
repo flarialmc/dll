@@ -29,8 +29,8 @@ static HANDLE mutex;
 void SavePlayerCache() {
     std::string playersListString = APIUtils::VectorToList(APIUtils::onlineUsers);
 
-    // Check if string size is greater than 1 MB (1,048,576 bytes)
-    if (playersListString.size() > 1048576) {
+    // Check if string size is greater than 15 KB (15,360 bytes)
+    if (playersListString.size() > 15360) {
         playersListString = "[]";
     }
 
