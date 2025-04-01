@@ -145,7 +145,7 @@ void onMouse(MouseEvent& event) {
         } else {
             leftClickHeld = true;
 
-            if (limiter->settings.getSettingByName<bool>("enabled")) {
+            if (limiter->settings.getSettingByName<bool>("enabled")->value) {
                 float leftCpsLimit = limiter->settings.getSettingByName<float>("Left")->value;
                 double leftInterval = 1.0 / leftCpsLimit;
 
