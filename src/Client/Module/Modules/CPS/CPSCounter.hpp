@@ -179,7 +179,7 @@ void onMouse(MouseEvent& event) {
         }
     }
 }
-
+//
     void onRender(RenderEvent &event) {
         if (this->isEnabled()) {
             if (!this->settings.getSettingByName<bool>("rightcps")->value) {
