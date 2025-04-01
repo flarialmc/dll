@@ -165,7 +165,7 @@ void onMouse(MouseEvent& event) {
         } else {
             rightClickHeld = true;
 
-            if (limiter->settings.getSettingByName<bool>("enabled")) {
+            if (limiter->settings.getSettingByName<bool>("enabled")->value) {
                 float rightCpsLimit = limiter->settings.getSettingByName<float>("Right")->value;
                 double rightInterval = 1.0 / rightCpsLimit;
 
