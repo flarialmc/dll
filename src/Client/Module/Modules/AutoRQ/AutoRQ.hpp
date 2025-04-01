@@ -210,8 +210,6 @@ public:
                     if (pkt->message.length() > 27){
                         if (pkt->message.substr(12, 15) == "You are on the "){
                             teamcolor = pkt->message.substr(27, pkt->message.length() - 28);
-
-                            FlarialGUI::Notify("You are on the: " + teamcolor);
                         }
                     }
 
