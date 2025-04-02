@@ -799,6 +799,7 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
 
     FontKey fontK = {font, weight, baseFontSize};
 
+
     if(fontK.name.contains("minecraft")) fontK.name = "164";
     if(!FontMap[fontK] && fontK.weight == DWRITE_FONT_WEIGHT_NORMAL) fontK.weight = DWRITE_FONT_WEIGHT_MEDIUM;
     if(fontK.name == "162" && weight == DWRITE_FONT_WEIGHT_BOLD) fontK.name = "163";
@@ -808,7 +809,7 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
         DoLoadFontLater = true;
     }
 
-    if (!FontMap[fontK] || font == "Space Grotesk") fontK.name = "162";
+    if (!FontMap[fontK] || fontK.name == "Space Grotesk") fontK.name = "162";
 
     if(!FontMap[fontK] && !FontsNotFound[fontK]) {
         LoadFontLater = fontK;
