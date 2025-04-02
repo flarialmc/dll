@@ -28,6 +28,12 @@ class UnderUIHooks : public Hook {
         void* a3,
         void* a4);
 
+    static void callBackRenderContextD3D12Submit(
+        bgfx::RenderContextD3D12* a1,
+        void* a2,
+        void* a3,
+        void* a4);
+
 public:
     typedef void (__thiscall* originalDX11)(
     ID3D11DeviceContext* pContext,
@@ -58,6 +64,15 @@ public:
         );
 
     static inline originalRenderContextD3D11Submit funcoriginalRenderContextD3D11Submit = nullptr;
+
+    typedef void(__thiscall* originalRenderContextD3D12Submit)(
+        bgfx::RenderContextD3D12* a1,
+        void* a2,
+        void* a3,
+        void* a4
+        );
+
+    static inline originalRenderContextD3D12Submit funcoriginalRenderContextD3D12Submit = nullptr;
 
     static inline int index = 0;
 
