@@ -12,8 +12,12 @@ private:
     bool listenForServer = false;
 public:
     void onPacketReceive(PacketEvent &event)  {
+        if (SDK::getServerIP().find("hive") == std::string::npos){
+            HiveModeCatcherListener::fullgamemodename = "";
+            HiveModeCatcherListener::currentGame = "";
+            return;
+        }
 
-        if (SDK::getServerIP().find("hive") == std::string::npos) return;
         MinecraftPacketIds id = event.getPacket()->getId();
 
         if (id == MinecraftPacketIds::ChangeDimension) {

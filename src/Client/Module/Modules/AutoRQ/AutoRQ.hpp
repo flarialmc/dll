@@ -207,6 +207,11 @@ public:
                     return;
                 }
                 if (this->settings.getSettingByName<bool>("eliminated")->value){
+                    if (pkt->message.length() > 27){
+                        if (pkt->message.substr(12, 15) == "You are on the "){
+                            teamcolor = pkt->message.substr(27, pkt->message.length() - 28);
+                        }
+                    }
 
                     if (pkt->message.find("§7has been §cELIMINATED§7!") != std::string::npos && pkt->message.find(teamcolor) != std::string::npos && !teamcolor.empty()){
                         reQ();
