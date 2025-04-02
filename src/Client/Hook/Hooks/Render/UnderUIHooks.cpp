@@ -118,14 +118,6 @@ void UnderUIHooks::enableHook() {
             (void**)&funcOriginalDX12,
             "ClearDepthStencilViewDX12"
         );
-
-        Memory::hookFunc(
-            (void*)GET_SIG_ADDRESS("bgfx::rendercontextd3d12::submit"),
-            callBackRenderContextD3D12Submit,
-            (void**)&funcoriginalRenderContextD3D12Submit,
-            "Bgfx_d3d12_submit_hook"
-        );
-
         /* DX12 */
 
     }
