@@ -17,7 +17,7 @@
 #include <imgui/imgui_impl_win32.h>
 #include <imgui/imgui_freetype.h>
 
-#include "ClearDepthStencilViewHook.hpp"
+#include "UnderUIHooks.hpp"
 #include "CreateSwapchainForCoreWindowHook.hpp"
 #include "ResizeHook.hpp"
 
@@ -184,7 +184,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     swapchain = pSwapChain;
     flagsreal = flags;
 
-    ClearDepthStencilViewHook::index = 0;
+    UnderUIHooks::index = 0;
 
     if (D2D::context)
     MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
@@ -195,7 +195,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     static bool hooker = false;
 
     if (!hooker && ((queue && DX12CommandLists) || (!queue && context))) {
-        ClearDepthStencilViewHook hook;
+        UnderUIHooks hook;
         hook.enableHook();
         hooker = true;
     }
@@ -447,8 +447,6 @@ void SwapchainHook::DX11Render(bool underui) {
                     auto event = nes::make_holder<RenderUnderUIEvent>();
                     event->RTV = mainRenderTargetView;
                     eventMgr.trigger(event);
-
-                    //FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black), 500, 500);
 
                 }
 

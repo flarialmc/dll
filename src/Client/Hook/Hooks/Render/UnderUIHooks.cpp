@@ -1,4 +1,4 @@
-#include "ClearDepthStencilViewHook.hpp"
+#include "UnderUIHooks.hpp"
 #include "SwapchainHook.hpp"
 #include "SDK/Client/Options/OptionsParser.hpp"
 
@@ -9,7 +9,7 @@
  * Yes, this is the hook needed for Under UI.
  */
 
-void ClearDepthStencilViewHook::enableHook() {
+void UnderUIHooks::enableHook() {
 
     bool queue;
     if (SwapchainHook::queue) queue = true;
@@ -56,11 +56,11 @@ void ClearDepthStencilViewHook::enableHook() {
     }
 }
 
-OptionsParser ClearDepthStencilViewHook::options;
+OptionsParser UnderUIHooks::options;
 
 ID3D11Texture2D* msaaRT = nullptr;
 
-void ClearDepthStencilViewHook::callBackRenderContextD3D11Submit(
+void UnderUIHooks::callBackRenderContextD3D11Submit(
     bgfx::RenderContextD3D11* a1,
     void* a2,
     void* a3,
@@ -71,7 +71,7 @@ void ClearDepthStencilViewHook::callBackRenderContextD3D11Submit(
     funcoriginalRenderContextD3D11Submit(a1, a2, a3, a4);
 }
 
-void ClearDepthStencilViewHook::ClearDepthStencilViewCallbackDX11(
+void UnderUIHooks::ClearDepthStencilViewCallbackDX11(
     ID3D11DeviceContext* pContext,
     ID3D11DepthStencilView *pDepthStencilView,
     UINT                   ClearFlags,
@@ -92,7 +92,7 @@ void ClearDepthStencilViewHook::ClearDepthStencilViewCallbackDX11(
 
 }
 
-void ClearDepthStencilViewHook::ClearDepthStencilViewCallbackDX12(
+void UnderUIHooks::ClearDepthStencilViewCallbackDX12(
     ID3D12GraphicsCommandList* cmdList,
     D3D12_CPU_DESCRIPTOR_HANDLE pDepthStencilView,
     D3D12_CLEAR_FLAGS           ClearFlags,

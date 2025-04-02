@@ -4,7 +4,7 @@
 #include "SDK/Client/Options/OptionsParser.hpp"
 #include "../../../GUI/Engine/bgfx.hpp"
 
-class ClearDepthStencilViewHook : public Hook {
+class UnderUIHooks : public Hook {
     static void ClearDepthStencilViewCallbackDX11(
     ID3D11DeviceContext* pContext,
     ID3D11DepthStencilView *pDepthStencilView,
@@ -60,7 +60,7 @@ public:
 
     static inline int index = 0;
 
-    ClearDepthStencilViewHook() : Hook("ClearDepthStencilView", 0) {}
+    UnderUIHooks() : Hook("ClearDepthStencilView", 0) {}
 
     void enableHook() override;
 
