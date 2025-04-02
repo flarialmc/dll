@@ -1596,19 +1596,19 @@ void FlarialGUI::NotifyHeartbeat() {
             logoY -= Constraints::SpacingConstraint(0.105, logoWidth);
 
             FlarialGUI::FlarialTextWithFont(
-                logoX, 
-                logoY, 
-                L"Notification", 
-                rectWidth, 
-                logoWidth, 
-                DWRITE_TEXT_ALIGNMENT_LEADING, 
-                Constraints::SpacingConstraint(0.45, Constraints::RelativeConstraint(0.45, "height", true)), 
+                logoX,
+                logoY,
+                L"Notification",
+                rectWidth,
+                logoWidth,
+                DWRITE_TEXT_ALIGNMENT_LEADING,
+                Constraints::SpacingConstraint(0.45, Constraints::RelativeConstraint(0.45, "height", true)),
                 DWRITE_FONT_WEIGHT_BOLD
             );
 
             logoY += Constraints::SpacingConstraint(0.185, logoWidth);
             FlarialGUI::FlarialTextWithFont(
-                logoX, 
+                logoX,
                 logoY,
                 FlarialGUI::to_wide(notif.text).c_str(),
                 rectWidth, logoWidth,
