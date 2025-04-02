@@ -1,7 +1,3 @@
-//
-// Created by User on 6/8/2023.
-//
-
 #include "ResizeHook.hpp"
 
 #include <imgui/imgui_impl_dx11.h>
@@ -17,10 +13,6 @@
 #include "../../../../../lib/ImGui/imgui.h"
 #include "../../../Client.hpp"
 #include "../../../Module/Modules/GuiScale/GuiScale.hpp"
-#include "Modules/MotionBlur/MotionBlur.hpp"
-#include "Modules/MotionBlur/AvgPixelMotionBlurHelper.hpp"
-#include "Modules/MotionBlur/RealMotionBlurHelper.hpp"
-
 
 void ResizeHook::enableHook() {
 
@@ -29,9 +21,9 @@ void ResizeHook::enableHook() {
     if (kiero::getRenderType() == kiero::RenderType::D3D12) index = 145;
     else index = 13;
 
-    auto resizePtr = (void *) kiero::getMethodsTable()[index];
+    auto resizePtr = (void*)kiero::getMethodsTable()[index];
 
-    this->manualHook(resizePtr, (void *) resizeCallback, (void **) &funcOriginal);
+    this->manualHook(resizePtr, (void*)resizeCallback, (void**)&funcOriginal);
 
 }
 
@@ -42,28 +34,19 @@ void ResizeHook::call() {
 }
 
 void
-ResizeHook::resizeCallback(IDXGISwapChain *pSwapChain, UINT bufferCount, UINT width, UINT height, DXGI_FORMAT newFormat,
-                           UINT flags) {
+ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UINT width, UINT height, DXGI_FORMAT newFormat,
+    UINT flags) {
 
     ResizeHook::cleanShit(true);
 
     SwapchainHook::init = false;
-    // F11 on loading screen fix?
+    // F11 on loading screen fix?//
     auto module = ModuleManager::getModule("ClickGUI");
-    if(module!=nullptr)
+    if (module != nullptr)
         if (ModuleManager::getModule("ClickGUI")->active)
-            if(SDK::hasInstanced)
-                if(SDK::clientInstance!=nullptr)
+            if (SDK::hasInstanced)
+                if (SDK::clientInstance != nullptr)
                     SDK::clientInstance->releaseMouse();
-
-    std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
-
-
-    if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
-        bufferCount = 2;
-    } else if (bufferingMode == "Triple Buffering") {
-        bufferCount = 3;
-    }
 
     GuiScale::fixResize = true;
 
@@ -78,8 +61,6 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(SwapchainHook::stageTex);
     Memory::SafeRelease(SwapchainHook::SavedD3D11BackBuffer);
     Memory::SafeRelease(SwapchainHook::ExtraSavedD3D11BackBuffer);
-
-
     Memory::SafeRelease(Blur::pConstantBuffer);
     Memory::SafeRelease(Blur::pSampler);
     Memory::SafeRelease(Blur::pDownsampleShader);
@@ -87,37 +68,20 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(Blur::pUpsampleShader);
     Memory::SafeRelease(Blur::pVertexBuffer);
     Memory::SafeRelease(Blur::pVertexShader);
-
-
-    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_constantBuffer);
-    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_inputLayout);
-    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_pixelShader);
-    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_vertexShader);
-    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_vertexBuffer);
-
-    Memory::SafeRelease(RealMotionBlurHelper::m_constantBuffer);
-    Memory::SafeRelease(RealMotionBlurHelper::m_inputLayout);
-    Memory::SafeRelease(RealMotionBlurHelper::m_pixelShader);
-    Memory::SafeRelease(RealMotionBlurHelper::m_vertexShader);
-    Memory::SafeRelease(RealMotionBlurHelper::m_vertexBuffer);
-    MotionBlur::initted = false;
-
-
-
     Memory::SafeRelease(SwapchainHook::d3d11Device);
     Memory::SafeRelease(SwapchainHook::D2D1Bitmap);
     Memory::SafeRelease(D2D::context);
 
 
     Blur::hasDoneFrames = false;
-    for(ID3D11Texture2D* tex : Blur::framebuffers){ Memory::SafeRelease(tex); Blur::framebuffers.clear();}
+    for (ID3D11Texture2D* tex : Blur::framebuffers) { Memory::SafeRelease(tex); Blur::framebuffers.clear(); }
 
-    for (auto &i: ClickGUIElements::images) {
+    for (auto& i : ClickGUIElements::images) {
         Memory::SafeRelease(i.second);
     }
 
-    for (auto &entry: FlarialGUI::cachedBitmaps) {
-        ID2D1Image *bitmap = entry.second;
+    for (auto& entry : FlarialGUI::cachedBitmaps) {
+        ID2D1Image* bitmap = entry.second;
         Memory::SafeRelease(bitmap);
     }
 
@@ -125,8 +89,8 @@ void ResizeHook::cleanShit(bool isResize) {
 
     ClickGUIElements::images.clear();
 
-    if(!isResize) {
-        for(auto &i : ImagesClass::ImguiDX11Images) {
+    if (!isResize) {
+        for (auto& i : ImagesClass::ImguiDX11Images) {
             Memory::SafeRelease(i.second);
         }
         ImagesClass::ImguiDX11Images.clear();
@@ -134,14 +98,14 @@ void ResizeHook::cleanShit(bool isResize) {
 
     ImagesClass::ImguiDX12Images.clear();
 
-    for (auto i: ImagesClass::eimages) {
+    for (auto i : ImagesClass::eimages) {
         Memory::SafeRelease(i.second);
     }
 
 
     ImagesClass::eimages.clear();
 
-    for (auto &i: ImagesClass::images) {
+    for (auto& i : ImagesClass::images) {
         Memory::SafeRelease(i.second);
     }
 
@@ -173,20 +137,20 @@ void ResizeHook::cleanShit(bool isResize) {
 
         Memory::SafeRelease(SwapchainHook::D3D12DescriptorHeap);
 
-        for (ID2D1Bitmap1 *bitmap: SwapchainHook::D2D1Bitmaps) {
+        for (ID2D1Bitmap1* bitmap : SwapchainHook::D2D1Bitmaps) {
             Memory::SafeRelease(bitmap);
         }
 
         if (!isResize && SwapchainHook::queue != nullptr) {
             SwapchainHook::d3d11On12Device->ReleaseWrappedResources(SwapchainHook::D3D11Resources.data(),
-                                                                    static_cast<UINT>(SwapchainHook::D3D11Resources.size()));
+                static_cast<UINT>(SwapchainHook::D3D11Resources.size()));
         }
 
-        for (ID3D11Resource *resource: SwapchainHook::D3D11Resources) {
+        for (ID3D11Resource* resource : SwapchainHook::D3D11Resources) {
             Memory::SafeRelease(resource);
         }
 
-        for (IDXGISurface *surface: SwapchainHook::DXGISurfaces) {
+        for (IDXGISurface* surface : SwapchainHook::DXGISurfaces) {
             Memory::SafeRelease(surface);
         }
 
@@ -227,15 +191,14 @@ void ResizeHook::cleanShit(bool isResize) {
     FlarialGUI::scrollposmodifier = 0;
 
 
-    if(!isResize) {
+    if (!isResize) {
 
 
         Memory::SafeRelease(SwapchainHook::D3D12DescriptorHeap);         Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapBackBuffers);
         Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapImGuiRender); Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapImGuiIMAGE);
 
+
         if (ImGui::GetCurrentContext()) {
-            ImGui::GetIO().Fonts->Clear();
-            FlarialGUI::FontMap.clear();
 
             ImGui_ImplWin32_Shutdown();
 
@@ -243,8 +206,6 @@ void ResizeHook::cleanShit(bool isResize) {
                 ImGui_ImplDX11_Shutdown();
             else { ImGui_ImplDX12_Shutdown(); }
 
-            FlarialGUI::DoLoadModuleFontLater = true;
-            FlarialGUI::DoLoadGUIFontLater = true;
             ImGui::DestroyContext();
 
         }

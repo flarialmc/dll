@@ -88,6 +88,28 @@ public:
     float height = 0;
     float width = 0;
 };
+struct FontKey {
+    std::string name;
+    DWRITE_FONT_WEIGHT weight;
+    int size;
+
+    bool operator==(const FontKey& other) const {
+        return weight == other.weight && size == other.size && name == other.name;
+    }
+};
+
+namespace std {
+    template <>
+    struct hash<FontKey> {
+        std::size_t operator()(const FontKey& key) const {
+            std::size_t h1 = std::hash<std::string>{}(key.name);
+            std::size_t h2 = std::hash<int>{}(static_cast<int>(key.weight));
+            std::size_t h3 = std::hash<int>{}(key.size);
+            // Combine the hash values using a method such as XOR and bit shifting.
+            return h1 ^ (h2 << 1) ^ (h3 << 2);
+        }
+    };
+}
 
 namespace FlarialGUI {
     std::stack<Dimensions> inline dimensionStack;
@@ -118,15 +140,6 @@ namespace FlarialGUI {
     float inline barscrollpos = 0;
     float inline barscrollposmodifier = 10.0f;
 
-    std::string inline LoadGUIFontLater = "";
-    bool inline DoLoadGUIFontLater = false;
-    DWRITE_FONT_WEIGHT inline LoadGUIFontLaterWeight = DWRITE_FONT_WEIGHT_NORMAL;
-
-
-    std::string inline LoadModuleFontLater = "";
-    bool inline DoLoadModuleFontLater = false;
-    DWRITE_FONT_WEIGHT inline LoadModuleFontLaterWeight = DWRITE_FONT_WEIGHT_NORMAL;
-
     std::string GetWeightedName(std::string name, DWRITE_FONT_WEIGHT weight);
     DWRITE_FONT_WEIGHT GetFontWeightFromString(const std::string& weightStr);
 
@@ -139,8 +152,18 @@ namespace FlarialGUI {
 
     inline int maxRect = 0;
 
-    inline std::map<std::string, ImFont*> FontMap = {};
-    inline std::map<std::string, bool> FontsNotFound = {};
+
+
+    inline std::unordered_map<FontKey, ImFont*> FontMap = {};
+    inline std::unordered_map<FontKey, bool> FontsNotFound = {};
+
+    FontKey inline LoadFontLater;
+    bool inline DoLoadFontLater;
+    bool inline HasAFontLoaded = false;
+    std::vector<std::pair<std::vector<std::byte>, FontKey>> inline FontMemoryToLoad;
+    void queueFontMemoryLoad(std::wstring filepath, FontKey fontK);
+
+
 
     inline std::string currentKeybind;
 
@@ -172,7 +195,6 @@ namespace FlarialGUI {
     extern LRUCache<uint64_t, winrt::com_ptr<ID2D1LinearGradientBrush>> gradientBrushCache;
 
     void PushSize(float x, float y, float width, float height);
-    void LoadFonts(std::map<std::string, ImFont*>& FontMap);
     std::wstring GetFontFilePath(const std::wstring& fontName, DWRITE_FONT_WEIGHT weight);
     std::string WideToNarrow(const std::wstring& wideStr);
 
@@ -216,7 +238,7 @@ namespace FlarialGUI {
     }
 
 #endif
-    
+
     void PopSize();
 
     void PopAllStack();
@@ -400,7 +422,7 @@ namespace FlarialGUI {
     winrt::com_ptr<ID2D1LinearGradientBrush> getLinearGradientBrush(float x, float hexPreviewSize, float shadePickerWidth,
                                                      ID2D1GradientStopCollection *pGradientStops);
 
-    void Tooltip(const std::string &id, float x, float y, const std::string &text, float width, float height, bool push = true, bool relative = false, 
+    void Tooltip(const std::string &id, float x, float y, const std::string &text, float width, float height, bool push = true, bool relative = false,
         std::chrono::milliseconds duration = std::chrono::milliseconds(1000));
 
     void displayToolTips();
@@ -430,7 +452,7 @@ namespace FlarialGUI {
 
     void LoadFont(int resourceId);
 
-    bool LoadFontFromFontFamily(std::string name, std::string weightedName, DWRITE_FONT_WEIGHT weight);
+    bool LoadFontFromFontFamily(FontKey fontK);
 
     void RoundedRectWithImageAndText(int index, float x, float y, const float width, const float height,
                                      const D2D1_COLOR_F color, int iconId, const float imageWidth,
