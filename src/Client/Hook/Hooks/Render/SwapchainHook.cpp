@@ -684,7 +684,7 @@ void SwapchainHook::DX11Blur() {
     if (ModuleManager::initialized) {
         auto module = ModuleManager::getModule("Motion Blur");
         if (module) {
-            if (module->isEnabled() && !FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
+            if (module->isEnabled() || FlarialGUI::inMenu) FlarialGUI::needsBackBuffer = true;
             else FlarialGUI::needsBackBuffer = false;
         }
     }

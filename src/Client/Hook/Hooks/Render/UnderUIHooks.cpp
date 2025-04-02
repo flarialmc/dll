@@ -82,9 +82,8 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX11(
 
     index++;
     options.parseOptionsFile();
-    int neededIndex = msaaRT ? 3 : 2;
 
-    if (index == neededIndex && SwapchainHook::init) {
+    if (ClearFlags == D3D11_CLEAR_DEPTH && SwapchainHook::init) {
         SwapchainHook::DX11Render(true);
     }
 
@@ -103,7 +102,7 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX12(
 
 
     index++;
-    if (index == 2 && SwapchainHook::init) SwapchainHook::DX12Render(true);
+    if (ClearFlags == D3D12_CLEAR_FLAG_DEPTH && SwapchainHook::init) SwapchainHook::DX12Render(true);
 
     funcOriginalDX12(cmdList, pDepthStencilView, ClearFlags, Depth, Stencil, NumRects, pRects);
 
