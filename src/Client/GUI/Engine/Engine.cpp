@@ -758,7 +758,6 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
 std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
                                      const DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont) {
-
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
             if (i <= additionalIndex && additionalY[i] > 0.0f) {
@@ -767,18 +766,29 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
         }
     }
     if (isInScrollView) y += scrollpos;
-
     if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return "no";
 
     std::string font = Client::settings.getSettingByName<std::string>(moduleFont ? "mod_fontname" : "fontname")->value;
-    float fSize = (fontSize * Client::settings.getSettingByName<float>(moduleFont ? "modules_font_scale" : "gui_font_scale")->value) * 0.18f;
 
-    FontKey fontK = {font, weight, int(fSize)};
+    float guiScale = Client::settings.getSettingByName<float>(moduleFont ? "modules_font_scale" : "gui_font_scale")->value;
+    float targetFontSize = (fontSize * guiScale) * 0.18f;
+
+    const std::vector<int> fontSizeBuckets = {16, 32, 64, 128, 256};
+
+    int baseFontSize = fontSizeBuckets.back();
+    for (size_t i = 0; i < fontSizeBuckets.size(); i++) {
+        if (targetFontSize <= fontSizeBuckets[i]) {
+            baseFontSize = fontSizeBuckets[i];
+            break;
+        }
+    }
+
+    float scaleFactor = targetFontSize / static_cast<float>(baseFontSize);
+
+    FontKey fontK = {font, weight, baseFontSize};
 
     if(fontK.name.contains("minecraft")) fontK.name = "164";
-
     if(!FontMap[fontK] && fontK.weight == DWRITE_FONT_WEIGHT_NORMAL) fontK.weight = DWRITE_FONT_WEIGHT_MEDIUM;
-
     if(fontK.name == "162" && weight == DWRITE_FONT_WEIGHT_BOLD) fontK.name = "163";
 
     if(!FontMap[fontK] && !FontsNotFound[fontK]) {
@@ -787,46 +797,43 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
     }
 
     if (!FontMap[fontK] || font == "Space Grotesk") fontK.name = "162";
-//
+
     if(!FontMap[fontK] && !FontsNotFound[fontK]) {
         LoadFontLater = fontK;
         DoLoadFontLater = true;
     }
 
-
-    //std::cout << weightedName << std::endl;
-
     if (!FontMap[fontK]) return "";
     if (FontMap[fontK]->Scale <= 0.0f || !FontMap[fontK]->IsLoaded()) return "";
 
-
     ImGui::PushFont(FontMap[fontK]);
+    ImGui::SetWindowFontScale(scaleFactor);
 
     std::string stringText = WideToNarrow(text);
     ImVec2 size = ImGui::CalcTextSize(stringText.c_str());
-    std::string fontedName = fontK.name + cached_to_string(fSize);
+    std::string fontedName = fontK.name + cached_to_string(targetFontSize);
 
-
-	switch (alignment) {
+    switch (alignment) {
         case DWRITE_TEXT_ALIGNMENT_LEADING:
-			break;
-
+            break;
         case DWRITE_TEXT_ALIGNMENT_CENTER: {
-			x += (width / 2) - (size.x / 2);
-			break;
-		}
-
-		case DWRITE_TEXT_ALIGNMENT_TRAILING: {
-			x += (width - size.x);
-			break;
-		}
-	}
+            x += (width / 2) - (size.x / 2);
+            break;
+        }
+        case DWRITE_TEXT_ALIGNMENT_TRAILING: {
+            x += (width - size.x);
+            break;
+        }
+    }
 
     TextSizes[fontedName] = size.x;
     TextSizesXY[fontedName] = Vec2<float>(size.x, size.y);
-	y += (height / 2) - (size.y / 2);
-	ImGui::GetBackgroundDrawList()->AddText(ImVec2(x, y), ImColor(color.r, color.g, color.b, color.a), stringText.c_str());
-	ImGui::PopFont();
+    y += (height / 2) - (size.y / 2);
+
+    ImGui::GetBackgroundDrawList()->AddText(ImVec2(x, y), ImColor(color.r, color.g, color.b, color.a), stringText.c_str());
+
+    ImGui::SetWindowFontScale(1.0);
+    ImGui::PopFont();
 
     return fontedName;
 }
