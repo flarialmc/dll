@@ -406,7 +406,6 @@ void SwapchainHook::DX11Render(bool underui) {
 
     DX11Blur();
 
-    if (underui)
     SaveBackbuffer();
 
     D2D::context->BeginDraw();
@@ -898,33 +897,30 @@ void SwapchainHook::SaveBackbuffer() {
 
     Memory::SafeRelease(SavedD3D11BackBuffer);
     Memory::SafeRelease(ExtraSavedD3D11BackBuffer);
-
     if (!SwapchainHook::queue) {
 
-        HRESULT hr = SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&SavedD3D11BackBuffer));
-        if (FAILED(hr)) {
-            printf("GetBuffer failed with HRESULT: 0x%08X\n", hr);
-        }
+        SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&SavedD3D11BackBuffer));
 
-        if (!ExtraSavedD3D11BackBuffer) {
-            D3D11_TEXTURE2D_DESC textureDesc = {};
-            SavedD3D11BackBuffer->GetDesc(&textureDesc);
-            textureDesc.Usage = D3D11_USAGE_DEFAULT;
-            textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-            textureDesc.CPUAccessFlags = 0;
+        if (FlarialGUI::needsBackBuffer) {
 
-            hr = SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
-            if (FAILED(hr)) {
-                printf("CreateTexture2D failed with HRESULT: 0x%08X\n", hr);
+            if (!ExtraSavedD3D11BackBuffer) {
+                D3D11_TEXTURE2D_DESC textureDesc = {};
+                SavedD3D11BackBuffer->GetDesc(&textureDesc);
+                textureDesc.Usage = D3D11_USAGE_DEFAULT;
+                textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+                textureDesc.CPUAccessFlags = 0;
+
+                SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
             }
+
+            context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
         }
 
-        context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
 
-
-
-    } else {
+    }
+    else {
         HRESULT hr;
+
         hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&SavedD3D11BackBuffer));
         if (FAILED(hr)) std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
     }

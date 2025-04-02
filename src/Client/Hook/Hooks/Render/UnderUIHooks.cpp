@@ -82,7 +82,7 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX11(
 
     index++;
     options.parseOptionsFile();
-    int neededIndex = options.options["gfx_msaa"] != "1" ? 3 : 2;
+    int neededIndex = msaaRT ? 3 : 2;
 
     if (index == neededIndex && SwapchainHook::init) {
         SwapchainHook::DX11Render(true);
