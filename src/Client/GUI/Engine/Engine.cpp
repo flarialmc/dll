@@ -775,7 +775,6 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
 
     FontKey fontK = {font, weight, int(fSize)};
 
-
     if(fontK.name.contains("minecraft")) fontK.name = "164";
 
     if(!FontMap[fontK] && fontK.weight == DWRITE_FONT_WEIGHT_NORMAL) fontK.weight = DWRITE_FONT_WEIGHT_MEDIUM;
@@ -789,6 +788,10 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
 
     if (!FontMap[fontK] || font == "Space Grotesk") fontK.name = "162";
 //
+    if(!FontMap[fontK] && !FontsNotFound[fontK]) {
+        LoadFontLater = fontK;
+        DoLoadFontLater = true;
+    }
 
 
     //std::cout << weightedName << std::endl;
@@ -1012,8 +1015,6 @@ std::wstring FlarialGUI::GetFontFilePath(const std::wstring& fontName, DWRITE_FO
         return L"";
     }
 
-    std::cout << FlarialGUI::WideToNarrow(std::wstring(filePathBuffer.data(), filePathLength)).c_str() << std::endl;
-
     return std::wstring(filePathBuffer.data(), filePathLength);
 }
 
@@ -1022,6 +1023,7 @@ void FlarialGUI::queueFontMemoryLoad(std::wstring filepath, FontKey fontK) {
     std::thread([tral, filepath, fontK]() {
         std::ifstream fontFile(tral, std::ios::binary);
         if (fontFile.is_open()) {
+            Logger::debug("Path {}", tral);
             std::vector<std::byte> fontData = Memory::readFile(filepath);
             fontFile.close();
             FontMemoryToLoad.push_back(std::pair(fontData, fontK));
@@ -1033,6 +1035,7 @@ bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
 
     if (!FlarialGUI::FontMemoryToLoad.empty()) {
         for (auto it = FlarialGUI::FontMemoryToLoad.begin(); it != FlarialGUI::FontMemoryToLoad.end(); ) {
+            Logger::debug("Loading font: {}", fontK.name);
             ImFontConfig config;
             config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
             config.FontDataOwnedByAtlas = false;
