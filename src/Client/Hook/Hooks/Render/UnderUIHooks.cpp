@@ -67,12 +67,12 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX12(
 
 
     index++;
-    funcOriginalDX12(cmdList, pDepthStencilView, ClearFlags, Depth, Stencil, NumRects, pRects);
 
     if (ClearFlags == D3D12_CLEAR_FLAG_DEPTH && SwapchainHook::init){
         savedpDethStencilView = pDepthStencilView;
         SwapchainHook::DX12Render(true);
     }
+    funcOriginalDX12(cmdList, pDepthStencilView, ClearFlags, Depth, Stencil, NumRects, pRects);
 
 }
 
@@ -110,6 +110,7 @@ void UnderUIHooks::enableHook() {
 
         /* DX12 */
 
+        /*
         void** vtable = *reinterpret_cast<void***>(SwapchainHook::DX12CommandLists);
         const size_t INDEX_CLEAR_DEPTH_STENCIL_VIEW = 47;
         Memory::hookFunc(
@@ -117,7 +118,8 @@ void UnderUIHooks::enableHook() {
             ClearDepthStencilViewCallbackDX12,
             (void**)&funcOriginalDX12,
             "ClearDepthStencilViewDX12"
-        );
+        );*/
+
         /* DX12 */
 
     }
