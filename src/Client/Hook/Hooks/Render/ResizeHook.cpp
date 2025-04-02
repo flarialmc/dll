@@ -13,6 +13,7 @@
 #include "../../../../../lib/ImGui/imgui.h"
 #include "../../../Client.hpp"
 #include "../../../Module/Modules/GuiScale/GuiScale.hpp"
+#include "Modules/MotionBlur/MotionBlur.hpp"
 
 void ResizeHook::enableHook() {
 
@@ -71,6 +72,19 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(SwapchainHook::d3d11Device);
     Memory::SafeRelease(SwapchainHook::D2D1Bitmap);
     Memory::SafeRelease(D2D::context);
+
+    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_constantBuffer);
+    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_inputLayout);
+    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_pixelShader);
+    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_vertexShader);
+    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_vertexBuffer);
+
+    Memory::SafeRelease(RealMotionBlurHelper::m_constantBuffer);
+    Memory::SafeRelease(RealMotionBlurHelper::m_inputLayout);
+    Memory::SafeRelease(RealMotionBlurHelper::m_pixelShader);
+    Memory::SafeRelease(RealMotionBlurHelper::m_vertexShader);
+    Memory::SafeRelease(RealMotionBlurHelper::m_vertexBuffer);
+    MotionBlur::initted = false;
 
 
     Blur::hasDoneFrames = false;
@@ -199,6 +213,10 @@ void ResizeHook::cleanShit(bool isResize) {
 
 
         if (ImGui::GetCurrentContext()) {
+            if (!isResize) {
+                ImGui::GetIO().Fonts->Clear();
+                FlarialGUI::FontMap.clear();
+            }
 
             ImGui_ImplWin32_Shutdown();
 

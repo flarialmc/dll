@@ -24,6 +24,7 @@ void UnderUIHooks::callBackRenderContextD3D11Submit(
     funcoriginalRenderContextD3D11Submit(a1, a2, a3, a4);
 }
 
+ID3D11DepthStencilView* UnderUIHooks::savedDepthStencilView = nullptr;
 void UnderUIHooks::ClearDepthStencilViewCallbackDX11(
     ID3D11DeviceContext* pContext,
     ID3D11DepthStencilView *pDepthStencilView,
@@ -32,6 +33,10 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX11(
     UINT8                  Stencil) {
 
     index++;
+
+    if (index == 2) {
+        savedDepthStencilView = pDepthStencilView;
+    }
 
     if (ClearFlags == D3D11_CLEAR_DEPTH && SwapchainHook::init) {
         SwapchainHook::DX11Render(true);
@@ -52,7 +57,10 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX12(
 
 
     index++;
-    if (ClearFlags == D3D12_CLEAR_FLAG_DEPTH && SwapchainHook::init) SwapchainHook::DX12Render(true);
+    if (ClearFlags == D3D12_CLEAR_FLAG_DEPTH && SwapchainHook::init){
+        Logger::debug("Hey guy {}", index);
+        SwapchainHook::DX12Render(true);
+    }
     funcOriginalDX12(cmdList, pDepthStencilView, ClearFlags, Depth, Stencil, NumRects, pRects);
 
 }

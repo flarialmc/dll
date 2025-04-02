@@ -35,6 +35,8 @@ public:
         if (settings.getSettingByName<float>("intensity2") == nullptr) settings.addSetting("intensity2", 6.0f);
         if (settings.getSettingByName<bool>("avgpixel") == nullptr) settings.addSetting("avgpixel", false);
         if (settings.getSettingByName<bool>("dynamic") == nullptr) settings.addSetting("dynamic", true);
+        if (settings.getSettingByName<float>("samples") == nullptr) settings.addSetting("samples", 64.f);
+
 
     }
 
@@ -54,9 +56,15 @@ public:
 
         this->addHeader("Misc");
         this->addToggle("Average Pixel Mode", "Disabling this will likely look better on high FPS.", this->settings.getSettingByName<bool>("avgpixel")->value);
-        if (this->settings.getSettingByName<bool>("avgpixel")->value) this->addToggle("Dynamic Mode", "Automatically adjusts intensity according to FPS", this->settings.getSettingByName<bool>("dynamic")->value);
-        this->addConditionalSlider(!this->settings.getSettingByName<bool>("dynamic")->value, "Intensity", "Amount of previous frames to render.", this->settings.getSettingByName<float>("intensity2")->value, 30, 0, true);
+        if (this->settings.getSettingByName<bool>("avgpixel")->value) {
 
+            this->addToggle("Dynamic Mode", "Automatically adjusts intensity according to FPS", this->settings.getSettingByName<bool>("dynamic")->value);
+            this->addConditionalSlider(!this->settings.getSettingByName<bool>("dynamic")->value, "Intensity", "Amount of previous frames to render.", this->settings.getSettingByName<float>("intensity2")->value, 30, 0, true);
+
+        } else {
+          this->addSlider("Intensity", "Control how strong the motion blur is.", this->settings.getSettingByName<float>("intensity")->value, 2, 0.05f, true);
+          this->addSlider("Samples", "", this->settings.getSettingByName<float>("samples")->value, 256, 8, true);
+        }
         FlarialGUI::UnsetScrollView();
 
         this->resetPadding();
