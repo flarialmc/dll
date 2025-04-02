@@ -24,16 +24,20 @@ void UnderUIHooks::callBackRenderContextD3D11Submit(
     funcoriginalRenderContextD3D11Submit(a1, a2, a3, a4);
 }
 
+bgfx::RenderContextD3D12* UnderUIHooks::bgfxCtxDX12 = nullptr;
+int UnderUIHooks::index2 = 0;
+
 void UnderUIHooks::callBackRenderContextD3D12Submit(
     bgfx::RenderContextD3D12* a1,
     void* a2,
     void* a3,
     void* a4) {
 
+    index2++;
+    bgfxCtxDX12 = a1;
     funcoriginalRenderContextD3D12Submit(a1, a2, a3, a4);
 }
 
-ID3D11DepthStencilView* UnderUIHooks::savedDepthStencilView = nullptr;
 void UnderUIHooks::ClearDepthStencilViewCallbackDX11(
     ID3D11DeviceContext* pContext,
     ID3D11DepthStencilView *pDepthStencilView,
@@ -43,10 +47,6 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX11(
 
     index++;
 
-    if (index == 2) {
-        savedDepthStencilView = pDepthStencilView;
-    }
-
     if (ClearFlags == D3D11_CLEAR_DEPTH && SwapchainHook::init) {
         SwapchainHook::DX11Render(true);
     }
@@ -55,6 +55,7 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX11(
 
 }
 
+D3D12_CPU_DESCRIPTOR_HANDLE UnderUIHooks::savedpDethStencilView;
 void UnderUIHooks::ClearDepthStencilViewCallbackDX12(
     ID3D12GraphicsCommandList* cmdList,
     D3D12_CPU_DESCRIPTOR_HANDLE pDepthStencilView,
@@ -66,11 +67,12 @@ void UnderUIHooks::ClearDepthStencilViewCallbackDX12(
 
 
     index++;
+    funcOriginalDX12(cmdList, pDepthStencilView, ClearFlags, Depth, Stencil, NumRects, pRects);
+
     if (ClearFlags == D3D12_CLEAR_FLAG_DEPTH && SwapchainHook::init){
-        Logger::debug("Hey guy {}", index);
+        savedpDethStencilView = pDepthStencilView;
         SwapchainHook::DX12Render(true);
     }
-    funcOriginalDX12(cmdList, pDepthStencilView, ClearFlags, Depth, Stencil, NumRects, pRects);
 
 }
 

@@ -12,6 +12,7 @@ class UnderUIHooks : public Hook {
     FLOAT                  Depth,
     UINT8                  Stencil);
 
+
     static void ClearDepthStencilViewCallbackDX12(
     ID3D12GraphicsCommandList* cmdList,
     D3D12_CPU_DESCRIPTOR_HANDLE pDepthStencilView,
@@ -28,6 +29,8 @@ class UnderUIHooks : public Hook {
         void* a3,
         void* a4);
 
+
+
     static void callBackRenderContextD3D12Submit(
         bgfx::RenderContextD3D12* a1,
         void* a2,
@@ -43,7 +46,6 @@ public:
     UINT8                  Stencil);
 
     static inline originalDX11 funcOriginalDX11 = nullptr;
-    static ID3D11DepthStencilView *savedDepthStencilView;
 
 
     typedef void (__thiscall* originalDX12)(
@@ -56,6 +58,8 @@ public:
     const D3D12_RECT            *pRects);
 
     static inline originalDX12 funcOriginalDX12 = nullptr;
+    static bgfx::RenderContextD3D12 *bgfxCtxDX12;
+
 
     typedef void(__thiscall* originalRenderContextD3D11Submit)(
         bgfx::RenderContextD3D11* a1,
@@ -74,8 +78,10 @@ public:
         );
 
     static inline originalRenderContextD3D12Submit funcoriginalRenderContextD3D12Submit = nullptr;
+    static D3D12_CPU_DESCRIPTOR_HANDLE savedpDethStencilView;
 
     static inline int index = 0;
+    static int index2;
 
     UnderUIHooks() : Hook("ClearDepthStencilView", 0) {}
 

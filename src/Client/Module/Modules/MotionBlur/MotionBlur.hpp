@@ -19,9 +19,11 @@ public:
     bool once = false;
 
     void onEnable() override {
-
+        if (SwapchainHook::queue) { if (!once) { FlarialGUI::Notify("Please turn on Better Frames in Settings!"); once = true; } }
+        else {
             ListenOrdered(this, RenderUnderUIEvent, &MotionBlur::onRender, EventOrder::IMMEDIATE)
             Module::onEnable();
+        }
     }
 
     void onDisable() override {
@@ -73,6 +75,8 @@ public:
     static inline std::vector<winrt::com_ptr<ID3D11ShaderResourceView>> previousFrames;
 
     void onRender(RenderUnderUIEvent& event) {
+
+        if (SwapchainHook::queue) return;
 
         int maxFrames = (int)round(this->settings.getSettingByName<float>("intensity2")->value);
 
