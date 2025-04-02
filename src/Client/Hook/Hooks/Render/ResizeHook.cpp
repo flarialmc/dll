@@ -197,9 +197,8 @@ void ResizeHook::cleanShit(bool isResize) {
         Memory::SafeRelease(SwapchainHook::D3D12DescriptorHeap);         Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapBackBuffers);
         Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapImGuiRender); Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapImGuiIMAGE);
 
+
         if (ImGui::GetCurrentContext()) {
-            ImGui::GetIO().Fonts->Clear();
-            FlarialGUI::FontMap.clear();
 
             ImGui_ImplWin32_Shutdown();
 
@@ -207,8 +206,6 @@ void ResizeHook::cleanShit(bool isResize) {
                 ImGui_ImplDX11_Shutdown();
             else { ImGui_ImplDX12_Shutdown(); }
 
-            FlarialGUI::DoLoadModuleFontLater = true;
-            FlarialGUI::DoLoadGUIFontLater = true;
             ImGui::DestroyContext();
 
         }

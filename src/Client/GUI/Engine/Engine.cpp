@@ -28,6 +28,7 @@
 #include <algorithm>
 
 #include "../../Module/Modules/ClickGUI/ClickGUI.hpp"
+#include "imgui/imgui_freetype.h"
 //#include <misc/freetype/imgui_freetype.h>
 
 #define clickgui ModuleManager::getModule("ClickGUI")
@@ -740,10 +741,6 @@ bool hasEnding (std::string const &fullString, std::string const &ending) {
     }
 }
 
-bool ifFontScale2(const float fontSize) {
-    return fontSize / 135 > 1;
-}
-
 std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
                                      const DWRITE_FONT_WEIGHT weight, bool moduleFont, bool troll) {
@@ -774,53 +771,38 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
     if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return "no";
 
     std::string font = Client::settings.getSettingByName<std::string>(moduleFont ? "mod_fontname" : "fontname")->value;
-    std::string weightedName = GetWeightedName(font, weight);
-    std::transform(weightedName.begin(), weightedName.end(), weightedName.begin(), ::towlower);
+    float fSize = (fontSize * Client::settings.getSettingByName<float>(moduleFont ? "modules_font_scale" : "gui_font_scale")->value) * 0.18f;
 
-    if(!FontMap[weightedName + "-1"] && !FontsNotFound[weightedName + "-1"]) {
+    FontKey fontK = {font, weight, int(fSize)};
 
-        if(moduleFont) {
-            DoLoadModuleFontLater = true;
-            LoadModuleFontLater = font;
-            LoadModuleFontLaterWeight = weight;
-        } else {
-            DoLoadGUIFontLater = true;
-            LoadGUIFontLater = font;
-            LoadGUIFontLaterWeight = weight;
-        }
+
+    if(fontK.name.contains("minecraft")) fontK.name = "164";
+
+    if(!FontMap[fontK] && fontK.weight == DWRITE_FONT_WEIGHT_NORMAL) fontK.weight = DWRITE_FONT_WEIGHT_MEDIUM;
+
+    if (!FontMap[fontK] || font == "Space Grotesk") fontK.name = "162";
+
+    if(fontK.name == "162" && weight == DWRITE_FONT_WEIGHT_BOLD) fontK.name = "163";
+
+    if(!FontMap[fontK] && !FontsNotFound[fontK]) {
+        LoadFontLater = fontK;
+        DoLoadFontLater = true;
     }
 
 //
 
-    if(weightedName.contains("minecraft")) weightedName = "164";
-
-    if(ifFontScale2(fontSize)) weightedName += "-2.0";
-    else weightedName += "-1";
-
-    if(!FontMap[weightedName] && weightedName.contains("Normal")) replace(weightedName, "Normal", "Medium");
-
-    if (!FontMap[weightedName] || font == "Space Grotesk") weightedName = "162-1";
-
-    if((weightedName == "162-1" || weightedName == "162") && weight == DWRITE_FONT_WEIGHT_BOLD) weightedName = "163-2.0";
-
-    if(weightedName == "162") weightedName = "162-1";
-
-    if(weightedName.contains("-1") && ifFontScale2(fontSize)) replace(weightedName, "-1", "-2.0");
 
     //std::cout << weightedName << std::endl;
 
-    float sizeMultiplier = 1.0f;
-    if(hasEnding(weightedName, "2.0")) sizeMultiplier = 0.6f;
+    if (!FontMap[fontK]) return "";
+    if (FontMap[fontK]->Scale <= 0.0f || !FontMap[fontK]->IsLoaded()) return "";
 
-    if (!FontMap[weightedName]) return "";
-    if (FontMap[weightedName]->Scale <= 0.0f || !FontMap[weightedName]->IsLoaded()) return "";
-    ImGui::PushFont(FontMap[weightedName]);
-    float fSize = ((fontSize * Client::settings.getSettingByName<float>(moduleFont ? "modules_font_scale" : "gui_font_scale")->value) / 135) * sizeMultiplier;
 
-	ImGui::SetWindowFontScale(fSize);
+    ImGui::PushFont(FontMap[fontK]);
+
     std::string stringText = WideToNarrow(text);
     ImVec2 size = ImGui::CalcTextSize(stringText.c_str());
-    std::string fontedName = weightedName + FlarialGUI::cached_to_string(fSize);
+    std::string fontedName = fontK.name + cached_to_string(fSize);
 
 
 	switch (alignment) {
@@ -873,7 +855,6 @@ void FlarialGUI::ExtractImageResource(int resourceId, std::string fileName, LPCT
     if (!outFile) {
         return;
     }
-
     // Write the file data directly as binary
     outFile.write(reinterpret_cast<const char*>(pFileData), dwFileSize);
     outFile.close();
@@ -1037,60 +1018,64 @@ std::wstring FlarialGUI::GetFontFilePath(const std::wstring& fontName, DWRITE_FO
     return std::wstring(filePathBuffer.data(), filePathLength);
 }
 
+void FlarialGUI::queueFontMemoryLoad(std::wstring filepath, FontKey fontK) {
+    std::string tral = WideToNarrow(filepath);
+    std::thread([tral, filepath, fontK]() {
+        std::ifstream fontFile(tral, std::ios::binary);
+        if (fontFile.is_open()) {
+            std::vector<std::byte> fontData = Memory::readFile(filepath);
+            fontFile.close();
+            FontMemoryToLoad.push_back(std::pair(fontData, fontK));
+        }
+    }).detach();
+}
 
-bool FlarialGUI::LoadFontFromFontFamily(std::string name, std::string weightedName, DWRITE_FONT_WEIGHT weight) {
+bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
+
+    if (!FlarialGUI::FontMemoryToLoad.empty()) {
+        for (auto it = FlarialGUI::FontMemoryToLoad.begin(); it != FlarialGUI::FontMemoryToLoad.end(); ) {
+            ImFontConfig config;
+            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
+            config.FontDataOwnedByAtlas = false;
+            FontMap[it->second] = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(it->first.data(), static_cast<int>(it->first.size()), it->second.size, &config,ImGui::GetIO().Fonts->GetGlyphRangesDefault());
+            it = FlarialGUI::FontMemoryToLoad.erase(it);
+            HasAFontLoaded = true;
+        }
+    }
+
+    std::string name = fontK.name;
     std::transform(name.begin(), name.end(), name.begin(), ::towlower);
     std::wstring fontName = FlarialGUI::to_wide(name);
-    std::wstring fontFilePath = GetFontFilePath(fontName, weight);
-    //std::cout << WideToNarrow(fontFilePath).c_str() << std::endl;
+    std::wstring fontFilePath = GetFontFilePath(fontName, fontK.weight);
+    std::string path;
+
+    if (fontK.name == "162") {
+        path = Utils::getAssetsPath() + "\\162" + ".ttf";
+        fontFilePath = std::wstring(path.begin(), path.end());
+    } else if (fontK.name == "163") {
+        path = Utils::getAssetsPath() + "\\163" + ".ttf";
+        fontFilePath = std::wstring(path.begin(), path.end());
+    } else if (fontK.name == "164") {
+        path = Utils::getAssetsPath() + "\\164" + ".ttf";
+        fontFilePath = std::wstring(path.begin(), path.end());
+    }
 
     if (!fontFilePath.empty()) {
 
         std::ifstream fontFile(fontFilePath, std::ios::binary);
         if (fontFile.is_open()) {
 
-            ImFontConfig config;
-            FontMap[weightedName + "-1"] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 23, &config);
-            FontMap[weightedName + "-2.0"] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), 40, &config);
-            if(!FontMap[weightedName + "-1"]) return false;
-            return true;
+            //FontMap[fontK] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), fontK.size, &config);
+            queueFontMemoryLoad(fontFilePath, fontK);
 
+            return true;
         }
     }
 
-    FontsNotFound[weightedName] = true;
+    FontsNotFound[fontK] = true;
     return false;
 }
 
-
-void FlarialGUI::LoadFonts(std::map<std::string, ImFont*>& FontMap) {
-    namespace fs = std::filesystem;
-    // Directories to search for fonts
-    std::vector<std::wstring> fontDirectories = {
-        std::wstring(_wgetenv(L"USERPROFILE")) + L"\\AppData\\Local\\Microsoft\\Windows\\Fonts"
-    };
-    ImGuiIO& io = ImGui::GetIO();
-
-    ImFontConfig config;
-    //config.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_ForceAutoHint;
-
-    for (const auto& dir : fontDirectories) {
-        for (const auto& entry : fs::directory_iterator(dir)) {
-
-            if (entry.is_regular_file() && entry.path().extension() == L".ttf" && !entry.path().filename().string().contains("fon")) {
-
-                std::cout << entry.path().string() << std::endl;
-
-                std::wstring fontPath = entry.path().wstring();
-                std::string fontName = WideToNarrow(entry.path().stem().wstring());
-
-                FontMap[fontName] = io.Fonts->AddFontFromFileTTF(
-                    WideToNarrow(fontPath).c_str(), 30, &config
-                );
-            }
-        }
-    }
-}
 
 void FlarialGUI::LoadImageFromResource(int resourceId, ID2D1Bitmap **bitmap, LPCTSTR type) {
     IWICBitmapDecoder *pDecoder = nullptr;
