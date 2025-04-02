@@ -643,9 +643,6 @@ void ClickGUI::onRender(RenderEvent &event) {
                         c->addToggle("Force Intel DX11", "May help with Better RenderDragon", Client::settings.getSettingByName<bool>("forceIntel")->value);
                     }
                     c->addToggle("Recreate Swapchain At Start", "May help with Better RenderDragon", Client::settings.getSettingByName<bool>("recreateAtStart")->value);
-                    c->addDropdown("Buffering Mode", "May improve latency or performance.", {"Double Buffering", "Triple Buffering"}, Client::settings.getSettingByName<std::string>("bufferingmode")->value);
-                    c->addDropdown("Swap Effect", "May improve latency or performance.", {"FLIP_SEQUENTIAL", "FLIP_DISCARD"}, Client::settings.getSettingByName<std::string>("swapeffect")->value);
-
                     c->extraPadding();
 
                     c->addElementText("Following Does Not Require Restart");

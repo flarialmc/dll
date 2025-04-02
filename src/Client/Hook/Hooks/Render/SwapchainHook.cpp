@@ -182,32 +182,10 @@ HRESULT SwapchainHook::CreateSwapChainForCoreWindow(IDXGIFactory2* This, IUnknow
 
     //pDesc->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
 
-
-    if (Client::settings.getSettingByName<bool>("killdx")->value) {
-        std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
-
-        if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
-            pDesc->BufferCount = 2;
-        }
-        else if (bufferingMode == "Triple Buffering") {
-            pDesc->BufferCount = 3;
-        }
-
-        std::string swapEffect = Client::settings.getSettingByName<std::string>("swapeffect")->value;
-
-        if (swapEffect == "FLIP_SEQUENTIAL") {
-            pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
-        }
-        else if (swapEffect == "FLIP_DISCARD") {
-            pDesc->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-        }
-    }
-
     auto vsync = Client::settings.getSettingByName<bool>("vsync")->value;
     currentVsyncState = vsync;
 
     if (vsync) pDesc->Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-
 
     queueReset = false;
     return IDXGIFactory2_CreateSwapChainForCoreWindow(This, pDevice, pWindow, pDesc, pRestrictToOutput, ppSwapChain);

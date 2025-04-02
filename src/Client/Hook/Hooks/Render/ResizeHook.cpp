@@ -48,16 +48,6 @@ ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UINT wi
                 if (SDK::clientInstance != nullptr)
                     SDK::clientInstance->releaseMouse();
 
-    std::string bufferingMode = Client::settings.getSettingByName<std::string>("bufferingmode")->value;
-
-
-    if (bufferingMode == "Double Buffering" && !SwapchainHook::queue) {
-        bufferCount = 2;
-    }
-    else if (bufferingMode == "Triple Buffering") {
-        bufferCount = 3;
-    }
-
     GuiScale::fixResize = true;
 
     return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, SwapchainHook::currentVsyncState ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : flags);
