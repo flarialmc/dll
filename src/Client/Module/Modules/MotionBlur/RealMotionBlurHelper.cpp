@@ -28,7 +28,7 @@ float4 mainPS(VS_OUTPUT input) : SV_Target
 {
     float2 sampleCoord = input.Tex;
 
-    float depth = depthTexture.Sample(depthSampler, sampleCoord).r;
+    float depth = 1.0;
 
     float4 H = float4(sampleCoord.x * 2 - 1,
                       (1 - sampleCoord.y) * 2 - 1,
@@ -204,52 +204,6 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     ID3D11DepthStencilView* originalDepthStencilView = nullptr;
     context->OMGetRenderTargets(numRenderTargets, originalRenderTargetViews, &originalDepthStencilView);
 
-    ID3D11ShaderResourceView* depthSRV = nullptr;
-    if (UnderUIHooks::savedDepthStencilView)
-    {
-        ID3D11Resource* depthResource = nullptr;
-        UnderUIHooks::savedDepthStencilView->GetResource(&depthResource);
-
-        D3D11_TEXTURE2D_DESC depthDesc = {};
-        ID3D11Texture2D* depthTex = reinterpret_cast<ID3D11Texture2D*>(depthResource);
-        depthTex->GetDesc(&depthDesc);
-
-        D3D11_TEXTURE2D_DESC srvTexDesc = depthDesc;
-        srvTexDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
-
-        srvTexDesc.Usage = D3D11_USAGE_DEFAULT;
-        srvTexDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
-        srvTexDesc.CPUAccessFlags = 0;
-        srvTexDesc.MiscFlags = 0;
-
-        ID3D11Texture2D* srvTexture = nullptr;
-        HRESULT hr = device->CreateTexture2D(&srvTexDesc, nullptr, &srvTexture);
-        if (FAILED(hr))
-        {
-            std::cout << "Failed to create new texture: " << std::hex << hr << std::endl;
-            depthResource->Release();
-            return;
-        }
-
-
-        context->CopyResource(srvTexture, depthResource);
-
-        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-        srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Texture2D.MostDetailedMip = 0;
-        srvDesc.Texture2D.MipLevels = 1;
-
-        hr = device->CreateShaderResourceView(srvTexture, &srvDesc, &depthSRV);
-        if (FAILED(hr))
-        {
-            std::cout << "Failed to CreateShaderResourceView: " << std::hex << hr << std::endl;
-        }
-
-        srvTexture->Release();
-        depthResource->Release();
-    }
-
 
     D3D11_VIEWPORT viewport = {};
     viewport.TopLeftX = 0;
@@ -359,10 +313,6 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     context->PSSetConstantBuffers(0, 1, &m_constantBuffer);
 
     context->PSSetShaderResources(0, 1, &sceneSRV);
-    if (depthSRV)
-    {
-        context->PSSetShaderResources(1, 1, &depthSRV);
-    }
 
     ID3D11SamplerState* sampler = nullptr;
     D3D11_SAMPLER_DESC sampDesc = {};
@@ -399,8 +349,5 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     for (UINT i = 0; i < numRenderTargets; ++i) {
         if (originalRenderTargetViews[i]) originalRenderTargetViews[i]->Release();
     }
-    if (depthSRV)
-        depthSRV->Release();
-
     memcpy(m_prevWorldMatrix, &currWVP[0][0], sizeof(m_prevWorldMatrix));
 }
