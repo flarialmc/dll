@@ -29,6 +29,13 @@ void ClearDepthStencilViewHook::enableHook() {
             "ClearDepthStencilViewDX11"
         );
 
+        Memory::hookFunc(
+            (void*)GET_SIG_ADDRESS("bgfx::rendercontextd3d11::submit"),
+            callBackRenderContextD3D11Submit,
+            (void**)&funcoriginalRenderContextD3D11Submit,
+            "Bgfx_d3d11_submit_hook"
+        );
+
         /* DX11 */
 
     } else {
@@ -50,6 +57,19 @@ void ClearDepthStencilViewHook::enableHook() {
 }
 
 OptionsParser ClearDepthStencilViewHook::options;
+
+ID3D11Texture2D* msaaRT = nullptr;
+
+void ClearDepthStencilViewHook::callBackRenderContextD3D11Submit(
+    bgfx::RenderContextD3D11* a1,
+    void* a2,
+    void* a3,
+    void* a4) {
+
+    msaaRT = a1->m_msaart;
+
+    funcoriginalRenderContextD3D11Submit(a1, a2, a3, a4);
+}
 
 void ClearDepthStencilViewHook::ClearDepthStencilViewCallbackDX11(
     ID3D11DeviceContext* pContext,

@@ -2,6 +2,7 @@
 #include "../Hook.hpp"
 #include "../../../../Utils/Memory/Game/SignatureAndOffsetManager.hpp"
 #include "SDK/Client/Options/OptionsParser.hpp"
+#include "../../../GUI/Engine/bgfx.hpp"
 
 class ClearDepthStencilViewHook : public Hook {
     static void ClearDepthStencilViewCallbackDX11(
@@ -19,6 +20,12 @@ class ClearDepthStencilViewHook : public Hook {
     UINT8                       Stencil,
     UINT                        NumRects,
     const D3D12_RECT            *pRects);
+
+    static void callBackRenderContextD3D11Submit(
+        bgfx::RenderContextD3D11* a1,
+        void* a2,
+        void* a3,
+        void* a4);
 
 public:
     typedef void (__thiscall* originalDX11)(
@@ -42,7 +49,14 @@ public:
 
     static inline originalDX12 funcOriginalDX12 = nullptr;
 
+    typedef void(__thiscall* originalRenderContextD3D11Submit)(
+        bgfx::RenderContextD3D11* a1,
+        void* a2,
+        void* a3,
+        void* a4
+        );
 
+    static inline originalRenderContextD3D11Submit funcoriginalRenderContextD3D11Submit = nullptr;
 
     static inline int index = 0;
 
