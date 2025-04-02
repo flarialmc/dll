@@ -37,7 +37,7 @@ BOOL _ = FALSE, $ = FALSE;
 static std::chrono::high_resolution_clock fpsclock;
 static std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 static std::chrono::steady_clock::time_point previousFrameTime = std::chrono::high_resolution_clock::now();
-
+//
 auto window = (HWND) FindWindowA(nullptr, (LPCSTR) "Minecraft");
 
 int SwapchainHook::currentBitmap;
