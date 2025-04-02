@@ -43,6 +43,7 @@ public:
     UINT8                  Stencil);
 
     static inline originalDX11 funcOriginalDX11 = nullptr;
+    static ID3D11DepthStencilView *savedDepthStencilView;
 
 
     typedef void (__thiscall* originalDX12)(

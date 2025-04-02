@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <assert.h>
 #include "Hook/Hooks/Render/SwapchainHook.hpp"
+#include "Hook/Hooks/Render/UnderUIHooks.hpp"
 
 const char* realMotionBlurPixelShaderSrc = R"(
 cbuffer CameraData : register(b0)
@@ -15,6 +16,8 @@ cbuffer CameraData : register(b0)
 
 Texture2D sceneTexture : register(t0);
 SamplerState samplerState : register(s0);
+Texture2D depthTexture : register(t1);
+SamplerState depthSampler : register(s1);
 
 struct VS_OUTPUT {
     float4 Pos : SV_POSITION;
@@ -24,9 +27,13 @@ struct VS_OUTPUT {
 float4 mainPS(VS_OUTPUT input) : SV_Target
 {
     float2 sampleCoord = input.Tex;
-    float4 color = sceneTexture.Sample(samplerState, sampleCoord);
 
-    float4 H = float4(sampleCoord.x * 2 - 1, (1 - sampleCoord.y) * 2 - 1, 0, 1);
+    float depth = 1.0;
+
+    float4 H = float4(sampleCoord.x * 2 - 1,
+                      (1 - sampleCoord.y) * 2 - 1,
+                      depth * 2 - 1,
+                      1);
 
     float4 worldPos = mul(H, invWorldViewProjection);
     worldPos /= worldPos.w;
@@ -35,21 +42,21 @@ float4 mainPS(VS_OUTPUT input) : SV_Target
     previousPos /= previousPos.w;
 
     int numSamples = 32;
-    float2 velocity = (H.xy - previousPos.xy) * float2(0.5f, -0.5f);
-    velocity /= numSamples;
+    float2 velocity = ((H.xy - previousPos.xy) / numSamples) * float2(0.5f, -0.5f);
     velocity *= intensity;
 
+    float4 color = sceneTexture.Sample(samplerState, sampleCoord);
     [unroll]
-    for (int i = 1; i < numSamples; ++i) {
+    for (int i = 1; i < numSamples; ++i)
+    {
         sampleCoord += velocity;
         sampleCoord = clamp(sampleCoord, 0.0, 1.0);
-
-        float4 currentColor = sceneTexture.Sample(samplerState, sampleCoord);
-        color += currentColor;
+        color += sceneTexture.Sample(samplerState, sampleCoord);
     }
 
-    return color / (numSamples + 1); // Normalize color
+    return color / (numSamples);
 }
+
 
 )";
 
@@ -197,7 +204,7 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     ID3D11DepthStencilView* originalDepthStencilView = nullptr;
     context->OMGetRenderTargets(numRenderTargets, originalRenderTargetViews, &originalDepthStencilView);
 
-    // Set up viewport based on the render target dimensions.
+
     D3D11_VIEWPORT viewport = {};
     viewport.TopLeftX = 0;
     viewport.TopLeftY = 0;
@@ -207,11 +214,9 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     viewport.MaxDepth = 1.0f;
     context->RSSetViewports(1, &viewport);
 
-    // Clear render target.
     FLOAT backgroundColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
     context->ClearRenderTargetView(rtv, backgroundColor);
 
-    // Set render target.
     context->OMSetRenderTargets(1, &rtv, originalDepthStencilView);
 
     // -------------------------------
@@ -272,7 +277,6 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     // -------------------------------
     // Process scene and update constant buffer.
     // -------------------------------
-    // Use the single frame provided.
     ID3D11ShaderResourceView* sceneSRV = frame.get();
 
     ID3D11Resource* frameResource = nullptr;
@@ -280,7 +284,6 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     ID3D11Texture2D* frameTexture = static_cast<ID3D11Texture2D*>(frameResource);
     D3D11_TEXTURE2D_DESC frameDesc;
     frameTexture->GetDesc(&frameDesc);
-    Logger::debug("Render target: {}x{}, Frame texture: {}x{}", desc.Width, desc.Height, frameDesc.Width, frameDesc.Height);
     frameResource->Release();
 
     glm::mat4 currWVP = Matrix::getMatrixCorrection(MC::Transform.modelView);
@@ -291,7 +294,7 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     if (SUCCEEDED(context->Map(m_constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
     {
         CameraDataBuffer* pData = (CameraDataBuffer*)mappedResource.pData;
-        pData->intensity = module->settings.getSettingByName<float>("intensity2")->value * (1.0f / FlarialGUI::frameFactor);
+        pData->intensity = module->settings.getSettingByName<float>("intensity")->value;
         memcpy(pData->preWorldViewProjection, m_prevWorldMatrix, sizeof(pData->preWorldViewProjection));
         memcpy(pData->invWorldViewProjection, &invCurrWVP[0][0], sizeof(pData->invWorldViewProjection));
         context->Unmap(m_constantBuffer, 0);
@@ -309,10 +312,8 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     context->PSSetShader(m_pixelShader, nullptr, 0);
     context->PSSetConstantBuffers(0, 1, &m_constantBuffer);
 
-    // Bind scene resource.
     context->PSSetShaderResources(0, 1, &sceneSRV);
 
-    // Set up sampler state.
     ID3D11SamplerState* sampler = nullptr;
     D3D11_SAMPLER_DESC sampDesc = {};
     sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -326,6 +327,8 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     if (SUCCEEDED(hr))
     {
         context->PSSetSamplers(0, 1, &sampler);
+        // Also set the same sampler for the depth SRV on slot 1.
+        context->PSSetSamplers(1, 1, &sampler);
     }
 
     // -------------------------------
@@ -333,11 +336,10 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     // -------------------------------
     context->Draw(4, 0);
 
-    // Unbind the shader resource.
     ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
     context->PSSetShaderResources(0, 1, nullSRV);
+    context->PSSetShaderResources(1, 1, nullSRV);
 
-    // Release states.
     if (sampler)
         sampler->Release();
     pRasterizerState->Release();
@@ -347,6 +349,5 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     for (UINT i = 0; i < numRenderTargets; ++i) {
         if (originalRenderTargetViews[i]) originalRenderTargetViews[i]->Release();
     }
-    // Save the current matrix for the next frame.
     memcpy(m_prevWorldMatrix, &currWVP[0][0], sizeof(m_prevWorldMatrix));
 }
