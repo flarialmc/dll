@@ -130,8 +130,8 @@ std::unordered_map<std::string, ID2D1Image *> FlarialGUI::cachedBitmaps;
 LRUCache<uint64_t, winrt::com_ptr<IDWriteTextLayout>> FlarialGUI::textLayoutCache(4000);
 LRUCache<UINT32, winrt::com_ptr<IDWriteTextFormat>> FlarialGUI::textFormatCache(300);
 
-LRUCache<std::wstring, std::string> FlarialGUI::fromWideCache(4000);
-LRUCache<std::string, std::wstring> FlarialGUI::toWideCache(4000);
+LRUCache<std::wstring, std::string> FlarialGUI::fromWideCache(10000);
+LRUCache<std::string, std::wstring> FlarialGUI::toWideCache(10000);
 
 std::unordered_map<int, float> FlarialGUI::additionalY;
 //std::unordered_map<std::string, winrt::com_ptr<ID2D1GradientStopCollection>> FlarialGUI::gradientStopCache;
@@ -311,10 +311,22 @@ uint64_t generateUniqueLinearGradientBrushKey(float x, float hexPreviewSize, flo
 }
 
 std::string WideToNarrow_creator(const std::wstring& wideStr) {
+    bool isAscii = true;
+    for (wchar_t wc : wideStr) {
+        if (wc > 127) {
+            isAscii = false;
+            break;
+        }
+    }
+    if (isAscii) {
+        std::string result(wideStr.size(), '\0');
+        for (size_t i = 0; i < wideStr.size(); ++i) {
+            result[i] = static_cast<char>(wideStr[i]);
+        }
+        return result;
+    }
     int narrowStrLen = WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, nullptr, 0, nullptr, nullptr);
-    if (narrowStrLen <= 0)
-        return {};
-
+    if (narrowStrLen <= 0) return {};
     std::string result(narrowStrLen - 1, '\0');
     WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, &result[0], narrowStrLen, nullptr, nullptr);
     return result;
@@ -824,6 +836,7 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
             x += (width - size.x);
             break;
         }
+        default: ;
     }
 
     TextSizes[fontedName] = size.x;
@@ -1487,14 +1500,17 @@ void FlarialGUI::NotifyHeartbeat() {
     int i = 0;
     for (Notification& n : notifications) {
 
+
         float posyModif = -((height + Constraints::RelativeConstraint(0.01f, "height", true)) * i);
 
         if (n.firstTime) {
             float TrollSize = Constraints::RelativeConstraint(0.128, "height", true);
             std::string sizeName = FlarialGUI::FlarialTextWithFont(n.currentPos, n.currentPosY, FlarialGUI::to_wide(n.text).c_str(), 10, 25, DWRITE_TEXT_ALIGNMENT_CENTER, TrollSize, DWRITE_FONT_WEIGHT_NORMAL, D2D1::ColorF(0, 0, 0, 0));
-            n.width = FlarialGUI::TextSizes[sizeName] + Constraints::RelativeConstraint(0.0345f, "height", true);
-            n.currentPos = Constraints::CenterConstraint(n.width, 0).x;
-            n.firstTime = false;
+            if (FlarialGUI::TextSizes[sizeName] != 0) {
+                n.width = FlarialGUI::TextSizes[sizeName] + Constraints::RelativeConstraint(0.0345f, "height", true);
+                n.currentPos = Constraints::CenterConstraint(n.width, 0).x;
+                n.firstTime = false;
+            }
         }
 
         if (!n.finished) {
