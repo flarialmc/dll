@@ -11,6 +11,7 @@
 
 
 bgfx::RenderContextD3D11* UnderUIHooks::bgfxCtx = nullptr;
+ID3D11DepthStencilView* UnderUIHooks::savedDepthStencilView = nullptr;
 
 void UnderUIHooks::callBackRenderContextD3D11Submit(
     bgfx::RenderContextD3D11* a1,

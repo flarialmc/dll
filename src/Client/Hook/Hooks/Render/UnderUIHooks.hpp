@@ -89,4 +89,6 @@ public:
 
     static bgfx::RenderContextD3D11 *bgfxCtx;
 
+    static ID3D11DepthStencilView* savedDepthStencilView;
+
 };

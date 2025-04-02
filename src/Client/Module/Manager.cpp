@@ -235,7 +235,7 @@ void ModuleManager::initialize() {
     addModule<ZeqaUtils>();
     addModule<MumbleLink>();
 
-    addModule<DepthOfField>();
+    //addModule<DepthOfField>();
 
     addService<GUIKeyListener>();
     if (!VersionUtils::checkAboveOrEqual(21, 60)) {
