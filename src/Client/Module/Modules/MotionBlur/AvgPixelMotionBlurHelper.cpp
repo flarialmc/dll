@@ -164,7 +164,13 @@ void AvgPixelMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, std::vector<w
     // Clear render target and set it
     FLOAT backgroundColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
     context->ClearRenderTargetView(rtv, backgroundColor);
-    context->OMSetRenderTargets(1, &rtv, nullptr);
+
+    ID3D11RenderTargetView* originalRenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { nullptr };
+    UINT numRenderTargets = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;
+    ID3D11DepthStencilView* originalDepthStencilView = nullptr;
+    context->OMGetRenderTargets(numRenderTargets, originalRenderTargetViews, &originalDepthStencilView);
+
+    context->OMSetRenderTargets(1, &rtv, originalDepthStencilView);
 
     // -------------------------------
     // Create and set Depth-Stencil State
@@ -287,4 +293,8 @@ void AvgPixelMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, std::vector<w
     pRasterizerState->Release();
     pBlendState->Release();
     pDepthStencilState->Release();
+    if (originalDepthStencilView) originalDepthStencilView->Release();
+    for (UINT i = 0; i < numRenderTargets; ++i) {
+        if (originalRenderTargetViews[i]) originalRenderTargetViews[i]->Release();
+    }
 }

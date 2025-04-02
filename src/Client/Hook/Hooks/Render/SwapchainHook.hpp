@@ -46,7 +46,7 @@ public:
     static void DX12Init();
 
     static ID3D11Texture2D* GetBackbuffer();
-    static void SaveBackbuffer();
+    static void SaveBackbuffer(bool underui = false);
 
     typedef HRESULT(__thiscall *SwapchainOriginal)(IDXGISwapChain3 *, UINT, UINT);
 

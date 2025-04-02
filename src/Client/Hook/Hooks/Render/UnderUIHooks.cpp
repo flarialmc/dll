@@ -9,6 +9,55 @@
  * Yes, this is the hook needed for Under UI.
  */
 
+
+bgfx::RenderContextD3D11* UnderUIHooks::bgfxCtx = nullptr;
+
+void UnderUIHooks::callBackRenderContextD3D11Submit(
+    bgfx::RenderContextD3D11* a1,
+    void* a2,
+    void* a3,
+    void* a4) {
+
+    bgfxCtx = a1;
+
+
+    funcoriginalRenderContextD3D11Submit(a1, a2, a3, a4);
+}
+
+void UnderUIHooks::ClearDepthStencilViewCallbackDX11(
+    ID3D11DeviceContext* pContext,
+    ID3D11DepthStencilView *pDepthStencilView,
+    UINT                   ClearFlags,
+    FLOAT                  Depth,
+    UINT8                  Stencil) {
+
+    index++;
+
+    if (ClearFlags == D3D11_CLEAR_DEPTH && SwapchainHook::init) {
+        SwapchainHook::DX11Render(true);
+    }
+
+    funcOriginalDX11(pContext, pDepthStencilView, ClearFlags, Depth, Stencil);
+
+}
+
+void UnderUIHooks::ClearDepthStencilViewCallbackDX12(
+    ID3D12GraphicsCommandList* cmdList,
+    D3D12_CPU_DESCRIPTOR_HANDLE pDepthStencilView,
+    D3D12_CLEAR_FLAGS           ClearFlags,
+    FLOAT                       Depth,
+    UINT8                       Stencil,
+    UINT                        NumRects,
+    const D3D12_RECT            *pRects) {
+
+
+    index++;
+    if (ClearFlags == D3D12_CLEAR_FLAG_DEPTH && SwapchainHook::init) SwapchainHook::DX12Render(true);
+    funcOriginalDX12(cmdList, pDepthStencilView, ClearFlags, Depth, Stencil, NumRects, pRects);
+
+}
+
+
 void UnderUIHooks::enableHook() {
 
     bool queue;
@@ -55,56 +104,3 @@ void UnderUIHooks::enableHook() {
 
     }
 }
-
-OptionsParser UnderUIHooks::options;
-
-ID3D11Texture2D* msaaRT = nullptr;
-
-void UnderUIHooks::callBackRenderContextD3D11Submit(
-    bgfx::RenderContextD3D11* a1,
-    void* a2,
-    void* a3,
-    void* a4) {
-
-    msaaRT = a1->m_msaart;
-
-    funcoriginalRenderContextD3D11Submit(a1, a2, a3, a4);
-}
-
-void UnderUIHooks::ClearDepthStencilViewCallbackDX11(
-    ID3D11DeviceContext* pContext,
-    ID3D11DepthStencilView *pDepthStencilView,
-    UINT                   ClearFlags,
-    FLOAT                  Depth,
-    UINT8                  Stencil) {
-
-
-
-    index++;
-    options.parseOptionsFile();
-
-    if (ClearFlags == D3D11_CLEAR_DEPTH && SwapchainHook::init) {
-        SwapchainHook::DX11Render(true);
-    }
-
-    funcOriginalDX11(pContext, pDepthStencilView, ClearFlags, Depth, Stencil);
-
-}
-
-void UnderUIHooks::ClearDepthStencilViewCallbackDX12(
-    ID3D12GraphicsCommandList* cmdList,
-    D3D12_CPU_DESCRIPTOR_HANDLE pDepthStencilView,
-    D3D12_CLEAR_FLAGS           ClearFlags,
-    FLOAT                       Depth,
-    UINT8                       Stencil,
-    UINT                        NumRects,
-    const D3D12_RECT            *pRects) {
-
-
-    index++;
-    if (ClearFlags == D3D12_CLEAR_FLAG_DEPTH && SwapchainHook::init) SwapchainHook::DX12Render(true);
-
-    funcOriginalDX12(cmdList, pDepthStencilView, ClearFlags, Depth, Stencil, NumRects, pRects);
-
-}
-

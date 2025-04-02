@@ -21,6 +21,7 @@ class UnderUIHooks : public Hook {
     UINT                        NumRects,
     const D3D12_RECT            *pRects);
 
+
     static void callBackRenderContextD3D11Submit(
         bgfx::RenderContextD3D11* a1,
         void* a2,
@@ -64,5 +65,6 @@ public:
 
     void enableHook() override;
 
-    static OptionsParser options;
+    static bgfx::RenderContextD3D11 *bgfxCtx;
+
 };

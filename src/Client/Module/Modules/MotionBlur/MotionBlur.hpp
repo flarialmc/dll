@@ -20,12 +20,12 @@ public:
 
     void onEnable() override {
 
-            ListenOrdered(this, RenderEvent, &MotionBlur::onRender, EventOrder::IMMEDIATE)
+            ListenOrdered(this, RenderUnderUIEvent, &MotionBlur::onRender, EventOrder::IMMEDIATE)
             Module::onEnable();
     }
 
     void onDisable() override {
-        Deafen(this, RenderEvent, &MotionBlur::onRender)
+        Deafen(this, RenderUnderUIEvent, &MotionBlur::onRender)
         previousFrames.clear();
         Module::onDisable();
     }
@@ -64,7 +64,7 @@ public:
 
     static inline std::vector<winrt::com_ptr<ID3D11ShaderResourceView>> previousFrames;
 
-    void onRender(RenderEvent& event) {
+    void onRender(RenderUnderUIEvent& event) {
 
         int maxFrames = (int)round(this->settings.getSettingByName<float>("intensity2")->value);
 

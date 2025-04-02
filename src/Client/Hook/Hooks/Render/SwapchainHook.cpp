@@ -406,7 +406,7 @@ void SwapchainHook::DX11Render(bool underui) {
 
     DX11Blur();
 
-    SaveBackbuffer();
+    SaveBackbuffer(underui);
 
     D2D::context->BeginDraw();
 
@@ -805,7 +805,7 @@ ID3D11Texture2D *SwapchainHook::GetBackbuffer() {
     return SavedD3D11BackBuffer;
 }
 
-void SwapchainHook::SaveBackbuffer() {
+void SwapchainHook::SaveBackbuffer(bool underui) {
 
     Memory::SafeRelease(SavedD3D11BackBuffer);
     Memory::SafeRelease(ExtraSavedD3D11BackBuffer);
@@ -825,7 +825,17 @@ void SwapchainHook::SaveBackbuffer() {
                 SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
             }
 
-            context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
+            if (underui) {
+
+                if (UnderUIHooks::bgfxCtx->m_msaart) {
+                    context->ResolveSubresource(ExtraSavedD3D11BackBuffer, 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+                } else {
+                    context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
+                }
+
+            } else {
+                context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
+            }
         }
 
 

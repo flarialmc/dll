@@ -192,6 +192,11 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     texture->GetDesc(&desc);
     resource->Release();
 
+    ID3D11RenderTargetView* originalRenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { nullptr };
+    UINT numRenderTargets = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;
+    ID3D11DepthStencilView* originalDepthStencilView = nullptr;
+    context->OMGetRenderTargets(numRenderTargets, originalRenderTargetViews, &originalDepthStencilView);
+
     // Set up viewport based on the render target dimensions.
     D3D11_VIEWPORT viewport = {};
     viewport.TopLeftX = 0;
@@ -207,7 +212,7 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     context->ClearRenderTargetView(rtv, backgroundColor);
 
     // Set render target.
-    context->OMSetRenderTargets(1, &rtv, nullptr);
+    context->OMSetRenderTargets(1, &rtv, originalDepthStencilView);
 
     // -------------------------------
     // Create and set Depth–Stencil State
@@ -338,7 +343,10 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     pRasterizerState->Release();
     pBlendState->Release();
     pDepthStencilState->Release();
-
+    if (originalDepthStencilView) originalDepthStencilView->Release();
+    for (UINT i = 0; i < numRenderTargets; ++i) {
+        if (originalRenderTargetViews[i]) originalRenderTargetViews[i]->Release();
+    }
     // Save the current matrix for the next frame.
     memcpy(m_prevWorldMatrix, &currWVP[0][0], sizeof(m_prevWorldMatrix));
 }
