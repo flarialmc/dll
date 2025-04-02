@@ -177,19 +177,44 @@ bool DepthMapGenerator::GenerateDepthMap(ID3D11Texture2D* depthTexture)
     ID3D11DeviceContext* context = SwapchainHook::context;
     if (!device || !context || !depthTexture)
         return false;
-    Logger::debug("ERROR {} {} {}", device, context, depthTexture);
+    Logger::debug("ERROR {} {} {}", (void*)device, (void*)context, (void*)depthTexture);
 
     // Create shader resource view for depth texture
     D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-    srvDesc.Format = DXGI_FORMAT_R32_FLOAT; // Adjust if your depth format is different (e.g., DXGI_FORMAT_R24_UNORM_X8_TYPELESS)
     srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Texture2D.MipLevels = 1;
     srvDesc.Texture2D.MostDetailedMip = 0;
     ID3D11ShaderResourceView* depthSRV = nullptr;
-    HRESULT hr = device->CreateShaderResourceView(depthTexture, &srvDesc, &depthSRV);
-    if (FAILED(hr))
+
+    D3D11_TEXTURE2D_DESC depthDesc;
+    depthTexture->GetDesc(&depthDesc);
+
+    switch (depthDesc.Format) {
+    case DXGI_FORMAT_R32_TYPELESS:
+    case DXGI_FORMAT_D32_FLOAT:
+        srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
+        break;
+    case DXGI_FORMAT_R24G8_TYPELESS:
+    case DXGI_FORMAT_D24_UNORM_S8_UINT:
+        srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+        break;
+    case DXGI_FORMAT_R16_TYPELESS:
+    case DXGI_FORMAT_D16_UNORM:
+        srvDesc.Format = DXGI_FORMAT_R16_UNORM;
+        break;
+    default:
+        Logger::debug("ERROR: Unsupported depth texture format: {}", (int)depthDesc.Format);
         return false;
-    std::cout << "hellow2!\n";
+    }
+
+    Logger::debug("Depth texture format: {}, Width: {}, Height: {}, Bind flags: {}",
+        (int)depthDesc.Format, depthDesc.Width, depthDesc.Height, depthDesc.BindFlags);
+
+    HRESULT hr = device->CreateShaderResourceView(depthTexture, &srvDesc, &depthSRV);
+    if (FAILED(hr)) {
+        Logger::debug("ERROR {}", hr);
+        return false;
+    }
     // Save original pipeline state
     ID3D11RenderTargetView* originalRTVs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { nullptr };
     ID3D11DepthStencilView* originalDSV = nullptr;
