@@ -40,7 +40,7 @@ ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UINT wi
     ResizeHook::cleanShit(true);
 
     SwapchainHook::init = false;
-    // F11 on loading screen fix?
+    // F11 on loading screen fix?//
     auto module = ModuleManager::getModule("ClickGUI");
     if (module != nullptr)
         if (ModuleManager::getModule("ClickGUI")->active)
