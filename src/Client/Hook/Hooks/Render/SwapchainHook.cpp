@@ -446,9 +446,9 @@ void SwapchainHook::DX11Render(bool underui) {
 
                     auto event = nes::make_holder<RenderUnderUIEvent>();
                     event->RTV = mainRenderTargetView;
-                    //eventMgr.trigger(event);
+                    eventMgr.trigger(event);
 
-                    FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black), 500, 500);
+                    //FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black), 500, 500);
 
                 }
 
