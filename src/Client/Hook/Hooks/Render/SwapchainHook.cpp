@@ -740,9 +740,10 @@ void SwapchainHook::Fonts() {
         if (FlarialGUI::DoLoadFontLater) {
 
             FontKey fontK = FlarialGUI::LoadFontLater;
-            if (!FlarialGUI::FontMap[fontK]) {
-                FlarialGUI::LoadFontFromFontFamily(fontK);
-            }
+            if (Client::settings.getSettingByName<bool>("overrideFontWeight")->value) fontK.weight = FlarialGUI::GetFontWeightFromString(Client::settings.getSettingByName<std::string>("fontWeight")->value);
+                if (!FlarialGUI::FontMap[fontK]) {
+                    FlarialGUI::LoadFontFromFontFamily(fontK);
+                }
             FlarialGUI::DoLoadFontLater = false;
 
         }
