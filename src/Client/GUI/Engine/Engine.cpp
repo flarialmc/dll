@@ -1549,6 +1549,7 @@ void FlarialGUI::NotifyHeartbeat() {
         }
     }
 }
+
 /*void FlarialGUI::NotifyHeartbeat() {                                                        //feel free to finish this whenever, i didnt get blur rect to work so it looked ass
     float rectHeight = Constraints::RelativeConstraint(0.09, "height", true);
     float y = Constraints::PercentageConstraint(0.25, "bottom", true);
@@ -1557,37 +1558,35 @@ void FlarialGUI::NotifyHeartbeat() {
     int i = 0;
 
     for (auto& notif : FlarialGUI::notifications) {
-        float rectWidth = notif.width;
-        float x = Constraints::PercentageConstraint(0.3, "right", true);
-        D2D1::ColorF col = FlarialGUI::HexToColorF("000000");
+        float rectWidth = notif.width;Constraints::PercentageConstraint(0.3, "right", true);
+        D2D1::ColorF col = colors_secondary3;
         col.a = 0.4f;
 
         if (notif.firstTime) {
+             //   this fixes a bug where a part of the text would be off the screen on smaller screen sizes
+             //  idk how to explain it but
+             //   it just works
             float TrollSize = Constraints::RelativeConstraint(0.128, "height", true);
-            std::string sizeName = FlarialGUI::FlarialTextWithFont(notif.currentPos, notif.currentPosY, FlarialGUI::to_wide(notif.text + "notification").c_str(), 10, 25, DWRITE_TEXT_ALIGNMENT_CENTER, TrollSize, DWRITE_FONT_WEIGHT_NORMAL, D2D1::ColorF(0, 0, 0, 0));
-            notif.width = FlarialGUI::TextSizes[sizeName] + Constraints::RelativeConstraint(0.0345f, "height", true);
-            notif.currentPos = Constraints::PercentageConstraint(0.01, "right", true);
-            notif.firstTime = false;
-            rectWidth = notif.width;
-            notif.currentPos = x;
+            std::string sizeName = FlarialGUI::FlarialTextWithFont(notif.currentPos, notif.currentPosY, FlarialGUI::to_wide(notif.text + "troll troll troll troll troll").c_str(), 10, 25, DWRITE_TEXT_ALIGNMENT_CENTER, TrollSize, DWRITE_FONT_WEIGHT_NORMAL, D2D1::ColorF(0, 0, 0, 0));
+            if (FlarialGUI::TextSizes[sizeName] != 0 && Constraints::PercentageConstraint(0.3, "right", true) > MC::windowSize.x - FlarialGUI::TextSizes[sizeName]) {
+                notif.currentPos = Constraints::PercentageConstraint(0.4, "right", true);
+                notif.firstTime = false;
+            } else notif.currentPos = Constraints::PercentageConstraint(0.3, "right", true);
+            
+            // end of wierd ahh method
+
+            notif.width = MC::windowSize.x; // js have it be as long as possible for it to go off the screen
         }
         if (!notif.arrived) {
 
-            FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
-                col, rectWidth, rectHeight, rounding.x, rounding.y);
-
-            FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
-                FlarialGUI::HexToColorF("ff233a"), rounding.x + 1.0f, rectHeight, 0.0f, 0.0f);
+            FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY, col, notif.width, rectHeight, rounding.x, rounding.y);
+            FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY, colors_primary1_rgb ? FlarialGUI::rgbColor : colors_primary1, rounding.x + 1.0f, rectHeight, 0.0f, 0.0f);
 
             D2D::context->PopAxisAlignedClip();
+            FlarialGUI::PushSize(notif.currentPos, notif.currentPosY, notif.width, rectHeight);
 
-            FlarialGUI::PushSize(notif.currentPos, notif.currentPosY,
-                rectWidth, rectHeight);
-
-            float logoX = Constraints::PercentageConstraint(0.01, "left") -
-                Constraints::SpacingConstraint(0.18, rectHeight);
-            float logoY = Constraints::PercentageConstraint(0.01, "top") -
-                Constraints::SpacingConstraint(0.10, rectHeight);
+            float logoX = Constraints::PercentageConstraint(0.01, "left") - Constraints::SpacingConstraint(0.18, rectHeight);
+            float logoY = Constraints::PercentageConstraint(0.01, "top") - Constraints::SpacingConstraint(0.10, rectHeight);
             float logoWidth = Constraints::RelativeConstraint(1.25);
 
             FlarialGUI::image(IDR_LOGO_PNG, D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth));
@@ -1599,7 +1598,7 @@ void FlarialGUI::NotifyHeartbeat() {
                 logoX,
                 logoY,
                 L"Notification",
-                rectWidth,
+                notif.width,
                 logoWidth,
                 DWRITE_TEXT_ALIGNMENT_LEADING,
                 Constraints::SpacingConstraint(0.45, Constraints::RelativeConstraint(0.45, "height", true)),
@@ -1607,87 +1606,75 @@ void FlarialGUI::NotifyHeartbeat() {
             );
 
             logoY += Constraints::SpacingConstraint(0.185, logoWidth);
+
             FlarialGUI::FlarialTextWithFont(
                 logoX,
                 logoY,
                 FlarialGUI::to_wide(notif.text).c_str(),
-                rectWidth, logoWidth,
+                notif.width, logoWidth,
                 DWRITE_TEXT_ALIGNMENT_LEADING,
                 Constraints::SpacingConstraint(0.3, Constraints::RelativeConstraint(0.45, "height", true)),
                 DWRITE_FONT_WEIGHT_NORMAL
             );
 
+            Logger::debug("{}", MC::mousePos.y);
+
             FlarialGUI::PopSize();
+            FlarialGUI::lerp(notif.currentPosY, y, 0.20f * FlarialGUI::frameFactor);
 
-            // Position animation
-            //FlarialGUI::lerp(notif.currentPos, x, 0.12f * FlarialGUI::frameFactor);
-            FlarialGUI::lerp(notif.currentPosY, y - 10.0f, 0.20f * FlarialGUI::frameFactor);
-
-            if (notif.currentPosY <= y) {
+            if (abs(notif.currentPosY - y) < 10.0f) {
+                Logger::debug("arrived");
                 notif.arrived = true;
                 notif.time = std::chrono::steady_clock::now();
             }
 
             i++;
-        }
-        else {
-            // Display phase
-            std::chrono::steady_clock::time_point current =
-                std::chrono::steady_clock::now();
-            auto timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(
-                current - notif.time);
+        } else {
+            //std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
 
-            FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
-                col, rectWidth, rectHeight, rounding.x, rounding.x);
+            //auto timeDifference = std::chrono::duration_cast<std::chrono::milliseconds>(current - notif.time);
 
-            FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY,
-                FlarialGUI::HexToColorF("ff233a"), rounding.x + 1.0f, rectHeight, 0.0f, 0.0f);
-
+            FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY, col, notif.width, rectHeight, rounding.x, rounding.x);
+            FlarialGUI::RoundedRect(notif.currentPos, notif.currentPosY, colors_primary1_rgb ? FlarialGUI::rgbColor : colors_primary1, rounding.x + 1.0f, rectHeight, 0.0f, 0.0f);
 
             D2D::context->PopAxisAlignedClip();
+            FlarialGUI::PushSize(notif.currentPos, notif.currentPosY, notif.width, rectHeight);
 
-            // Draw notification text and logo
-            FlarialGUI::PushSize(notif.currentPos, notif.currentPosY,
-                rectWidth, rectHeight);
-
-            float logoX = Constraints::PercentageConstraint(0.01, "left") -
-                Constraints::SpacingConstraint(0.18, rectHeight);
-            float logoY = Constraints::PercentageConstraint(0.01, "top") -
-                Constraints::SpacingConstraint(0.10, rectHeight);
+            float logoX = Constraints::PercentageConstraint(0.01, "left") - Constraints::SpacingConstraint(0.18, rectHeight);
+            float logoY = Constraints::PercentageConstraint(0.01, "top") - Constraints::SpacingConstraint(0.10, rectHeight);
             float logoWidth = Constraints::RelativeConstraint(1.25);
 
-            FlarialGUI::image(IDR_LOGO_PNG,
-                D2D1::RectF(logoX, logoY, logoX + logoWidth,
-                    logoY + logoWidth));
+            FlarialGUI::image(IDR_LOGO_PNG, D2D1::RectF(logoX, logoY, logoX + logoWidth, logoY + logoWidth));
 
             logoX += Constraints::SpacingConstraint(0.85, logoWidth);
             logoY -= Constraints::SpacingConstraint(0.105, logoWidth);
 
             FlarialGUI::FlarialTextWithFont(logoX, logoY, L"Notification",
-                rectWidth, logoWidth,
+                notif.width, logoWidth,
                 DWRITE_TEXT_ALIGNMENT_LEADING,
                 Constraints::SpacingConstraint(0.45,
                     Constraints::RelativeConstraint(0.45, "height", true)),
-                DWRITE_FONT_WEIGHT_BOLD);
+                DWRITE_FONT_WEIGHT_BOLD
+            );
 
             logoY += Constraints::SpacingConstraint(0.185, logoWidth);
             FlarialGUI::FlarialTextWithFont(logoX, logoY,
                 FlarialGUI::to_wide(notif.text).c_str(),
-                rectWidth, logoWidth,
+                notif.width, logoWidth,
                 DWRITE_TEXT_ALIGNMENT_LEADING,
                 Constraints::SpacingConstraint(0.3,
                     Constraints::RelativeConstraint(0.45, "height", true)),
-                DWRITE_FONT_WEIGHT_NORMAL);
+                DWRITE_FONT_WEIGHT_NORMAL
+            );
 
             FlarialGUI::PopSize();
 
             // Fade out animation
-            if (timeDifference.count() > 5000) {
+            //if (timeDifference.count() > 2000) {
                 FlarialGUI::lerp(notif.currentPos, Constraints::PercentageConstraint(0.01, "right", true) + 50, 0.12f * FlarialGUI::frameFactor);
-            }
+            //}
 
-            if (notif.currentPos > Constraints::PercentageConstraint(0.01, "right", true))
-                notif.finished = true;
+            if (notif.currentPos > Constraints::PercentageConstraint(0.01, "right", true)) notif.finished = true;
         }
 
         y -= Constraints::SpacingConstraint(1.25, rectHeight);
@@ -1697,24 +1684,24 @@ void FlarialGUI::NotifyHeartbeat() {
 
 void FlarialGUI::CopyBitmap(ID2D1Bitmap1 *from, ID2D1Bitmap **to) {
     if (from == nullptr) {
-        Logger::debug("from is nullptr");
-        return;  // Handle the case where 'from' is nullptr
+        Logger::custom(fg(fmt::color::dark_golden_rod), "CopyBitmap",  "From is nullptr");
+        return;
     }
 
     if (*to == nullptr) {
         D2D1_BITMAP_PROPERTIES props = D2D1::BitmapProperties(from->GetPixelFormat());
         HRESULT hr = D2D::context->CreateBitmap(from->GetPixelSize(), props, to);
         if (FAILED(hr)) {
-            Logger::error("Failed to create bitmap");
-            return;  // Handle the failure to create the bitmap
+            Logger::custom(fg(fmt::color::dark_golden_rod), "CopyBitmap", "From is nullptr");
+            return;
         }
     } else if (from->GetPixelSize() != (*to)->GetPixelSize()) {
         (*to)->Release();
         D2D1_BITMAP_PROPERTIES props = D2D1::BitmapProperties(from->GetPixelFormat());
         HRESULT hr = D2D::context->CreateBitmap(from->GetPixelSize(), props, to);
         if (FAILED(hr)) {
-            Logger::error("Failed to create bitmap");
-            return;  // Handle the failure to create the bitmap
+        Logger::custom(fg(fmt::color::dark_golden_rod), "CopyBitmap",  "From is nullptr");
+            return;
         }
     }
 
