@@ -40,7 +40,7 @@ public:
         defaultKeybind = ekey;
         isScriptingModule = isScripting;
         settings = Settings();
-        settingspath = isScripting ? Utils::getClientPath() + "\\Scripts\\Configs\\" + name + ".flarial" : Utils::getConfigsPath() + "\\" + name + ".flarial";
+        settingspath = isScripting ? Utils::getClientPath() + "\\Scripts\\Configs\\" + name + ".json" : Utils::getConfigsPath() + "\\" + name + ".json";
 
         checkSettingsFile();
         loadSettings();
