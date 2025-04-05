@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <string>
 #include <unordered_map>
@@ -14,7 +14,7 @@ public:
 
     [[nodiscard]] virtual json ToJson() const = 0;
 
-    virtual void FromJson(const json &jsonData) = 0;
+    virtual void FromJson(const json& jsonData) = 0;
 
     [[nodiscard]] virtual std::unique_ptr<Setting> clone() const = 0;
 };
@@ -26,14 +26,15 @@ public:
         : name(std::move(name)), value(std::move(defaultValue)) {}
 
     [[nodiscard]] json ToJson() const override {
-        return json{{"name", name}, {"value", value}};
+        return value;
     }
 
-    void FromJson(const json &jsonData) override {
-        if (jsonData.is_object() && jsonData.contains("name") && jsonData.contains("value")) {
-            name = jsonData["name"].get<std::string>();
-            value = jsonData["value"].get<T>();
+    void FromJson(const json& jsonData) override {
+        if (!jsonData.is_primitive()) {
+            Logger::error("Invalid JSON format for setting '{}'", name);
+            return;
         }
+        value = jsonData.get<T>();
     }
 
     [[nodiscard]] std::unique_ptr<Setting> clone() const override {
@@ -47,15 +48,16 @@ public:
 class Settings {
 public:
     template<typename T>
-    void addSetting(const std::string &name, const T &defaultValue) {
+    void addSetting(const std::string& name, const T& defaultValue) {
         settings.emplace(name, std::make_unique<SettingType<T>>(name, defaultValue));
     }
 
-    void deleteSetting(const std::string &name) {
+    void deleteSetting(const std::string& name) {
         auto it = settings.find(name);
         if (it != settings.end()) {
             settings.erase(it);
-        } else {
+        }
+        else {
             Logger::error("Setting not found: {}", name);
         }
     }
@@ -64,25 +66,23 @@ public:
         settings.clear();
     }
 
-    void copyFrom(const Settings &from) {
-        for (const auto &settingPair : from.settings) {
+    void copyFrom(const Settings& from) {
+        for (const auto& settingPair : from.settings) {
             settings[settingPair.first] = settingPair.second->clone();
         }
     }
 
     template<typename T>
-    SettingType<T> *getSettingByName(const std::string &name) {
-
+    SettingType<T>* getSettingByName(const std::string& name) {
         auto it = settings.find(name);
         if (it != settings.end()) {
             return static_cast<SettingType<T> *>(it->second.get());
         }
-
         return nullptr;
     }
 
     template<typename T>
-    void setValue(const std::string &name, const T &value) {
+    void setValue(const std::string& name, const T& value) {
         auto setting = getSettingByName<T>(name);
         if (setting) {
             setting->value = value;
@@ -91,13 +91,13 @@ public:
 
     [[nodiscard]] std::string ToJson() const {
         json jsonData;
-        for (const auto &settingPair : settings) {
-            jsonData.push_back(settingPair.second->ToJson());
+        for (const auto& settingPair : settings) {
+            jsonData[settingPair.first] = settingPair.second->ToJson();
         }
         return jsonData.dump(4);
     }
 
-    void FromJson(const std::string &jsonString) {
+    void FromJson(const std::string& jsonString) {
         if (jsonString.empty()) {
             Logger::error("JSON string is empty");
             return;
@@ -105,26 +105,32 @@ public:
 
         try {
             json jsonData = json::parse(jsonString);
+
+            if (!jsonData.is_object()) {
+                throw json::type_error::create(302, "Root JSON must be an object", nullptr);
+            }
+
             std::unordered_map<std::string, std::unique_ptr<Setting>> newSettings;
 
-            for (const auto &item : jsonData) {
-                std::string name = item["name"].get<std::string>();
-
-                if (item["value"].is_number_float()) {
-                    newSettings.emplace(name, std::make_unique<SettingType<float>>(name, item["value"].get<float>()));
-                } else if (item["value"].is_string()) {
-                    newSettings.emplace(name, std::make_unique<SettingType<std::string>>(name, item["value"].get<std::string>()));
-                } else if (item["value"].is_boolean()) {
-                    newSettings.emplace(name, std::make_unique<SettingType<bool>>(name, item["value"].get<bool>()));
-                } else {
-                    Logger::warn("Unsupported or null value type for setting '{}'", name);
+            for (const auto& [key, value] : jsonData.items()) {
+                if (value.is_number_float()) {
+                    newSettings.emplace(key, std::make_unique<SettingType<float>>(key, value.get<float>()));
+                }
+                else if (value.is_string()) {
+                    newSettings.emplace(key, std::make_unique<SettingType<std::string>>(key, value.get<std::string>()));
+                }
+                else if (value.is_boolean()) {
+                    newSettings.emplace(key, std::make_unique<SettingType<bool>>(key, value.get<bool>()));
+                }
+                else {
+                    Logger::warn("Unsupported or null value type for setting '{}'", key);
                 }
             }
 
             settings = std::move(newSettings);
-
-        } catch (const json::parse_error &e) {
-            Logger::error("An error occured while parsing settings: {}", e.what());
+        }
+        catch (const json::parse_error& e) {
+            Logger::error("An error occurred while parsing settings: {}", e.what());
         }
     }
 

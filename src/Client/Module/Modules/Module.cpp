@@ -469,11 +469,11 @@ void Module::saveSettings() {
 
 void Module::loadSettings() {
     if (isScripting()) {
-        settingspath = fmt::format("{}\\Scripts\\Configs\\{}.flarial", Utils::getClientPath(), name);
+        settingspath = fmt::format("{}\\scripts\\Configs\\{}.json", Utils::getClientPath(), name);
     } else if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
-        settingspath = fmt::format("{}\\{}\\{}.flarial", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
+        settingspath = fmt::format("{}\\{}\\{}.json", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
     } else {
-        settingspath = fmt::format("{}\\{}.flarial", Utils::getConfigsPath(), name);
+        settingspath = fmt::format("{}\\{}.json", Utils::getConfigsPath(), name);
     }
     checkSettingsFile();
 

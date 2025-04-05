@@ -162,8 +162,8 @@ void Client::initialize() {
         Utils::getRoamingPath() + "\\Flarial",
         Utils::getRoamingPath() + "\\Flarial\\assets",
         Utils::getRoamingPath() + "\\Flarial\\logs",
-        Utils::getRoamingPath() + "\\Flarial\\Config",
-        Utils::getRoamingPath() + "\\Flarial\\Scripts",
+        Utils::getRoamingPath() + "\\Flarial\\config",
+        Utils::getRoamingPath() + "\\Flarial\\scripts",
     };
 
 
