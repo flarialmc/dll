@@ -99,6 +99,8 @@
 #include "Modules/ZeqaUtils/ZeqaUtils.hpp"
 #include "Modules/MumbleLink/MumbleLink.hpp"
 
+#include "Modules/Cosmetics/CosmeticManager.hpp"
+
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
     for (const auto& pair : moduleMap) {
         if(pair.second == nullptr) continue;
@@ -247,6 +249,7 @@ void ModuleManager::initialize() {
     addService<ImGUIMouseListener>();
     addService<ImGUIKeyListener>();
     addService<ScriptMarketplace>();
+    addService<CosmeticManager>();
 
     initialized = true;
 }

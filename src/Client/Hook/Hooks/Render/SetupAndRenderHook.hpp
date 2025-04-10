@@ -172,6 +172,7 @@ private:
 		MaterialUtils::update();
 
 		SDK::screenView = pScreenView;
+        SDK::scn = muirc->getScreenContext();
         SDK::clientInstance = muirc->getClientInstance();
         SDK::hasInstanced = true;
 

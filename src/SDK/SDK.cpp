@@ -6,6 +6,7 @@
 
 ClientInstance *SDK::clientInstance = nullptr;
 ScreenView *SDK::screenView = nullptr;
+ScreenContext* SDK::scn = nullptr;
 
 std::string SDK::currentScreen;
 

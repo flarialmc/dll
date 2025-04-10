@@ -3,10 +3,12 @@
 #include "Client/Core/ClientInstance.hpp"
 #include "Client/Render/ScreenView/ScreenView.hpp"
 #include "Client/Network/Packet/Packet.hpp"
+#include "Client/Render/ScreenContext.hpp"
 
 namespace SDK {
     extern ClientInstance *clientInstance;
     extern ScreenView *screenView;
+    extern ScreenContext* scn;
     extern bool hasInstanced;
     extern std::string currentScreen;
     extern uint64_t serverPing;

@@ -33,6 +33,7 @@
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 #include "Hooks/Game/ItemInHandRendererRenderItem.hpp"
 #include "Hooks/Visual/RenderOutlineSelectionHook.hpp"
+#include "Hooks/Visual/ActorRenderDispatcher_Render.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
@@ -107,6 +108,8 @@ void HookManager::initialize() {
     addHook<ItemInHandRendererRenderItem>();
 
     addHook<RenderOutlineSelectionHook>();
+
+    addHook<ActorRenderDispatcher_Render>();
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();

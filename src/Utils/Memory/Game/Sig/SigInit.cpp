@@ -49,6 +49,8 @@ void SigInit::init2160() {
 
     ADD_SIG("bgfx::rendercontextd3d12::submit", "40 55 53 56 57 41 54 41 55 41 56 41 57 B8");
 
+    ADD_SIG("LevelRenderer::renderLevel", "48 89 5C 24 ? 48 89 74 24 ? 55 57 41 56 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 49 8B F0 48 8B DA 4C 8B F1");
+
     // vfunc index is inside of it, then inside of that last func call 3arg (container specific onHover will be ContainerScreenController::_onContainerSlotHovered
     // ADD_SIG("CourseScreenController::_getCollectionIndex", "48 89 ? ? ? 57 48 83 EC ? 48 8B ? ? ? ? ? 48 33 ? 48 89 ? ? ? 48 8B ? 48 8B ? 48 8B ? ? 48 8B ? 4C 8B ? 48 8D ? ? ? 48 8B ? ? ? ? ? FF 15 ? ? ? ? 90 48 8D ? ? 80 79 08 ? 75 ? 48 8D ? ? ? ? ? E8 ? ? ? ? 0F BE ? ? 8D 4A ? 80 F9 ? 77 ? 85 D2 74 ? 83 EA ? 74 ? 83 EA ? 74 ? 83 EA ? 74 ? 45 33 ? 83 FA ? 75 ? 44 38 ? 41 0F ? ? EB ? F2 44 ? ? ? EB ? 44 8B ? EB ? 45 33 ? EB ? 41 B8 ? ? ? ? 48 8B ? ? 48 8B ? 48 8D ? ? ? 48 8B ? ? ? ? ? FF 15 ? ? ? ? 8B D8 48 8B ? ? ? 48 83 FA ? 76 ? 48 FF ? 48 8B ? ? ? 48 8B ? 48 81 FA ? ? ? ? 72 ? 48 83 C2 ? 48 8B ? ? 48 2B ? 48 83 C0 ? 48 83 F8 ? 76 ? FF 15 ? ? ? ? CC E8 ? ? ? ? 8B C3 48 8B ? ? ? 48 33 ? E8 ? ? ? ? 48 8B ? ? ? 48 83 C4 ? 5F C3 CC CC 48 8D ? ? ? ? ? 48 89 ? 48 8B ? ? 48 89 ? ? 48 8B ? C3 CC CC CC CC CC CC CC CC CC CC 48 8D ? ? ? ? ? C3 CC CC CC CC CC CC CC CC 48 8B");
 }
@@ -185,6 +187,8 @@ void SigInit::init2140() {
     ADD_SIG("ContainerScreenController::_onContainerSlotHovered", "48 89 ? ? ? 57 41 ? 41 ? 48 83 EC ? 45 8B ? 48 8B ? 48 8B ? 44 39");
 
     ADD_SIG("LevelRendererPlayer::renderOutlineSelection", "E8 ? ? ? ? 90 48 8D 8D ? ? ? ? E8 ? ? ? ? 48 8B 86 ? ? ? ? 48 85 C0 0F 84 ? ? ? ? 80 38 ? 0F 84 ? ? ? ? 48 8B 86 ? ? ? ? 48 85 C0 74 ? F0 FF 40 ? 48 8B 86");
+
+    ADD_SIG("LevelRenderer::renderLevel", "48 89 5C 24 ? 48 89 74 24 ? 55 57 41 56 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 49 8B F0 48 8B DA 4C 8B F1");
 }
 
 void SigInit::init2130() {
@@ -316,6 +320,8 @@ void SigInit::init2080() {
     DEPRECATE_SIG("Actor::getArmor");
     DEPRECATE_SIG("Actor::getOffhandSlot");
     ADD_SIG("GeneralSettingsScreenController::GeneralSettingsScreenController", "48 89 5C 24 18 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 50 FC FF FF 48 81 EC B0 04 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 A0 03 00 00 41");
+
+    ADD_SIG("ActorRenderDispatcher::render", "E8 ? ? ? ? 8B 43 ? 89 44 ? ? 48 8D ? ? ? 48 8B ? ? E8 ? ? ? ? 48 85 ? 0F 84 ? ? ? ? F3 44");
 }
 
 void SigInit::init2070() {
