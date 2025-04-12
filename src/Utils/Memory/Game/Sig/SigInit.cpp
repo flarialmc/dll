@@ -410,6 +410,8 @@ void SigInit::init2040() {
 void SigInit::init2030() {
     Logger::custom(fg(fmt::color::gold), "Signatures", "Loading signatures for 1.20.3X");
 
+    ADD_SIG("MinimalViewBobbing", "FF 15 ? ? ? ? 80 7C 24 60 ? 0F 84 ? ? ? ? 48 89");
+    
     ADD_SIG("tryGetPrefix", "40 53 48 83 EC 20 48 8B");
 
     ADD_SIG("Keyboard::feed", "? ? ? ? ? ? ? 4C 8D 05 ? ? ? ? 89 54 24 20 88");
