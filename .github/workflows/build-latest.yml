@@ -19,28 +19,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: "Check commit type"
-        id: type
-        run: |
-          if [[ "${{ github.event.head_commit.message }}" == *"nightly:"* ]]; then
-              echo "Continuing to build as nightly"
-              echo "status=0" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.head_commit.message }}" == *"release:"* ]]; then
-              echo "Continuing to build as release"
-              echo "status=1" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.head_commit.message }}" == *"beta:"* ]]; then
-              echo "Continuing to build as beta"
-              echo "status=2" >> "$GITHUB_OUTPUT"
-          else
-              echo "Not a build commit, exiting"
-              gh run cancel ${{ github.run_id }}
-              gh run watch ${{ github.run_id }}f
-              exit 0
-          fi
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Set Up MSVC Environment
         uses: ilammy/msvc-dev-cmd@v1
 
