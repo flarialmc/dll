@@ -99,6 +99,8 @@
 #include "Modules/ZeqaUtils/ZeqaUtils.hpp"
 #include "Modules/MumbleLink/MumbleLink.hpp"
 
+#include "Modules/MinimalViewBobbing/MinimalViewBobbing.hpp"
+
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
     for (const auto& pair : moduleMap) {
         if(pair.second == nullptr) continue;
@@ -233,6 +235,8 @@ void ModuleManager::initialize() {
     //addModule<ItemUseDelayFix>();
     addModule<ZeqaUtils>();
     addModule<MumbleLink>();
+
+    addModule<MinimalViewBobbing>();
 
     addService<GUIKeyListener>();
     if (!VersionUtils::checkAboveOrEqual(21, 60)) {
