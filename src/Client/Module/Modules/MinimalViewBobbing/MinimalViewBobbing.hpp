@@ -8,8 +8,8 @@ private:
     static inline std::vector<uint8_t> original;
     static inline uintptr_t address;
 public:
-    MinimalViewBobbing() : Module("MinimalViewBobbing", "Prevent camera shake when view bobbing is on.",
-                           IDR_NAMETAG_PNG, "") {
+    MinimalViewBobbing() : Module("Minimal View Bobbing", "Prevent camera shake when view bobbing is on.",
+                           IDR_EYE_PNG, "") {
 
         address = GET_SIG_ADDRESS("MinimalViewBobbing");
 
