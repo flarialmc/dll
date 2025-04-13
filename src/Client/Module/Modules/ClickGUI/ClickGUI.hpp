@@ -119,6 +119,13 @@ public:
         if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
         auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
         std::string message = pkt->message;
+        if (message == " " ||
+            message == " " ||
+            message == " " || //remove onix promotion
+            message == " " ||
+            message == " ") {
+            event.cancel();
+        }
         if (!message.empty() && !containsAny(String::removeNonAlphanumeric(String::removeColorCodes(message)))) return;
 
         std::pair<std::string, size_t> name = findFirstOf(message, APIUtils::onlineUsers);
