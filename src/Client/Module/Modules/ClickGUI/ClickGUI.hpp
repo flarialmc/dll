@@ -119,13 +119,8 @@ public:
         if (event.getPacket()->getId() != MinecraftPacketIds::Text) return;
         auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
         std::string message = pkt->message;
-        if (message == " " ||
-            message == " " ||
-            message == " " || //remove onix promotion
-            message == " " ||
-            message == " ") {
-            event.cancel();
-        }
+        if (message == " ") event.cancel(); //remove onix promotion on zeqa
+        if (!Client::settings.getSettingByName<bool>("nochaticon")->value) return;
         if (!message.empty() && !containsAny(String::removeNonAlphanumeric(String::removeColorCodes(message)))) return;
 
         std::pair<std::string, size_t> name = findFirstOf(message, APIUtils::onlineUsers);
@@ -162,7 +157,7 @@ public:
 
         Listen(this, MouseEvent, &ClickGUI::onMouse)
         Listen(this, KeyEvent, &ClickGUI::onKey)
-        if (!Client::settings.getSettingByName<bool>("nochaticon")->value) Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
+        ListenOrdered(this, PacketEvent, &ClickGUI::onPacketReceive, EventOrder::IMMEDIATE)
         ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
         Module::onEnable();
     };
