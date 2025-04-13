@@ -4,6 +4,7 @@
 #include "../Module.hpp"
 #include "Cosmetics/Cosmetic.hpp"  // Add this to include the base Cosmetic class
 #include "Cosmetics/RedBandanna.hpp"
+#include "Cosmetics/FlarialBandanna.hpp"
 #include <map>
 #include <memory>  // Add this for std::shared_ptr and std::make_shared
 
@@ -29,6 +30,7 @@ public:
 private:
     void Initialize() {
         addCosmetic<RedBandanna>();  // Correct syntax with ()
+        addCosmetic<FlarialBandanna>();
     }
 
     void onGetViewPerspective(PerspectiveEvent& event) {
@@ -46,7 +48,7 @@ private:
             float pitchRadians = (rot.x * -1) * 3.14159f / 180.0f;
 
             auto pos = SDK::clientInstance->getLocalPlayer()->getLerpedPosition();
-            getCosmetic("Red Bandanna")->render(pos.add(-.25, 0, -.25), dc, yawRadians, pitchRadians);
+            getCosmetic("Flarial Bandanna")->render(pos.add(-.25, 0, -.25), dc, yawRadians, pitchRadians);
             dc.flush();
         }
     }
