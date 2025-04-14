@@ -979,21 +979,35 @@ void FlarialGUI::queueFontMemoryLoad(std::wstring filepath, FontKey fontK) {
  * @return True if the font was loaded successfully, false otherwise
  */
 bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
+    // Load any pending fonts from memory first
     if (!FontMemoryToLoad.empty()) {
         for (auto it = FontMemoryToLoad.begin(); it != FontMemoryToLoad.end(); ) {
             ImFontConfig config;
             config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
             config.FontDataOwnedByAtlas = false;
-            FontMap[it->second] = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(it->first.data(), static_cast<int>(it->first.size()), it->second.size, &config, ImGui::GetIO().Fonts->GetGlyphRangesDefault());
-            it = FontMemoryToLoad.erase(it);
-            HasAFontLoaded = true;
+            ImFont* font = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(
+                it->first.data(), static_cast<int>(it->first.size()), it->second.size, &config,
+                ImGui::GetIO().Fonts->GetGlyphRangesDefault());
+            if (font) {
+                FontMap[it->second] = font;
+                HasAFontLoaded = true;
+                it = FontMemoryToLoad.erase(it);
+            }
+            else {
+                Logger::custom(fg(fmt::color::red), "FontLoadError", "Failed to load font from memory");
+                ++it;
+            }
         }
     }
+
+    // Prepare font name and path
     std::string name = fontK.name;
     std::transform(name.begin(), name.end(), name.begin(), ::towlower);
     std::wstring fontName = to_wide(name);
     std::wstring fontFilePath = GetFontFilePath(fontName, fontK.weight);
     std::string path;
+
+    // Handle special cases for Minecraft fonts
     if (fontK.name == "162") {
         path = Utils::getAssetsPath() + "\\162" + ".ttf";
         fontFilePath = std::wstring(path.begin(), path.end());
@@ -1006,13 +1020,30 @@ bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
         path = Utils::getAssetsPath() + "\\164" + ".ttf";
         fontFilePath = std::wstring(path.begin(), path.end());
     }
+
+    // Check if font file exists
     if (!fontFilePath.empty()) {
-        std::ifstream fontFile(fontFilePath, std::ios::binary);
+        std::ifstream fontFile(fontFilePath, std::ios::binary | std::ios::ate);
         if (fontFile.is_open()) {
-            queueFontMemoryLoad(fontFilePath, fontK);
-            return true;
+            size_t fileSize = fontFile.tellg();
+            fontFile.seekg(0);
+            std::vector<std::byte> fontData(fileSize);
+            fontFile.read(reinterpret_cast<char*>(fontData.data()), fileSize);
+            if (fontFile.gcount() == fileSize) {
+                // Queue the font data for loading
+                queueFontMemoryLoad(fontFilePath, fontK);
+                return true;
+            }
+            else {
+                Logger::custom(fg(fmt::color::red), "FontLoadError", "Incomplete font data read");
+            }
+        }
+        else {
+            Logger::custom(fg(fmt::color::red), "FontLoadError", "Font file not found or inaccessible");
         }
     }
+
+    // If loading fails, mark the font as not found
     FontsNotFound[fontK] = true;
     return false;
 }
