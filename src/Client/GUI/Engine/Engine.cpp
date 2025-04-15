@@ -962,13 +962,15 @@ std::wstring FlarialGUI::GetFontFilePath(const std::wstring& fontName, DWRITE_FO
  * @param fontK Font key identifying the font
  */
 void FlarialGUI::queueFontMemoryLoad(std::wstring filepath, FontKey fontK) {
-    std::string tral = WideToNarrow(filepath);
-    std::thread([tral, filepath, fontK]() {
-        std::ifstream fontFile(tral, std::ios::binary);
+    std::thread([filepath, fontK]() {
+        std::ifstream fontFile(filepath, std::ios::binary);
         if (fontFile.is_open()) {
             std::vector<std::byte> fontData = Memory::readFile(filepath);
             fontFile.close();
             FontMemoryToLoad.push_back(std::pair(fontData, fontK));
+        }
+        else {
+            Logger::custom(fg(fmt::color::red), "FontLoadError", "Failed to read font in thread");
         }
         }).detach();
 }
@@ -1023,20 +1025,11 @@ bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
 
     // Check if font file exists
     if (!fontFilePath.empty()) {
-        std::ifstream fontFile(fontFilePath, std::ios::binary | std::ios::ate);
+        std::ifstream fontFile(fontFilePath, std::ios::binary);
         if (fontFile.is_open()) {
-            size_t fileSize = fontFile.tellg();
-            fontFile.seekg(0);
-            std::vector<std::byte> fontData(fileSize);
-            fontFile.read(reinterpret_cast<char*>(fontData.data()), fileSize);
-            if (fontFile.gcount() == fileSize) {
-                // Queue the font data for loading
-                queueFontMemoryLoad(fontFilePath, fontK);
-                return true;
-            }
-            else {
-                Logger::custom(fg(fmt::color::red), "FontLoadError", "Incomplete font data read");
-            }
+            fontFile.close();
+            queueFontMemoryLoad(fontFilePath, fontK);
+            return true;
         }
         else {
             Logger::custom(fg(fmt::color::red), "FontLoadError", "Font file not found or inaccessible");
