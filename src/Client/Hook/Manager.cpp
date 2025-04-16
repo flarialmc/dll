@@ -33,6 +33,7 @@
 //#include "Hooks/Game/getCurrentSwingDuration.hpp"
 #include "Hooks/Game/ItemInHandRendererRenderItem.hpp"
 #include "Hooks/Visual/RenderOutlineSelectionHook.hpp"
+#include "Hooks/Game/displayClientMessage.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
@@ -72,6 +73,7 @@ void HookManager::initialize() {
     addHook<GameModeAttackHook>();
 
     addHook<getFovHook>();
+    addHook<displayClientMessageHook>();
     addHook<ActorBaseTick>();
     addHook<OnSuspendHook>();
     addHook<getGammaHook>();
