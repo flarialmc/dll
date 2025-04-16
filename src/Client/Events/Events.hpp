@@ -11,6 +11,7 @@
 #include "Game/ContainerScreenControllerTickEvent.hpp"
 #include "Game/AfterSettingsScreenOnExitEvent.hpp"
 #include "Game/BeforeSettingsScreenOnExitEvent.hpp"
+#include "Game/displayClientMessageEvent.hpp"
 
 #include "Input/KeyEvent.hpp"
 #include "Input/MouseEvent.hpp"
