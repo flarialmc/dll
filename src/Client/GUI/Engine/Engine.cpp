@@ -1059,6 +1059,10 @@ bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
             ImFontConfig config;
             config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
             config.FontDataOwnedByAtlas = false;
+            int FontDataSize = static_cast<int>(it->first.size());
+
+            if (FontDataSize < 100) return false;
+
             FontMap[it->second] = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(it->first.data(), static_cast<int>(it->first.size()), it->second.size, &config,ImGui::GetIO().Fonts->GetGlyphRangesDefault());
             it = FlarialGUI::FontMemoryToLoad.erase(it);
             HasAFontLoaded = true;
