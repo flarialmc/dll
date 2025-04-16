@@ -29,7 +29,7 @@ float Constraints::PercentageConstraint(float percentage, const std::string &edg
         position = percentage * screenWidth;
         position += x;
     } else if (edge == "right") {
-        position = screenWidth - (percentage * screenWidth);
+        position = screenWidth - (percentage * screenWidth); 
         position += x;
     }
 
