@@ -52,7 +52,7 @@ DWORD WINAPI init() {
     Client::start = Utils::getCurrentMs();
     Logger::initialize();
     std::thread lol([]() { Audio::init(); });
-    lol.detach(); // ???
+    lol.detach();
     Client::initialize();
 
     Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
