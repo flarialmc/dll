@@ -214,13 +214,16 @@ public:
         /* OVERLAY MODE */
 
         else {
+
+            bp.sub(0.0015);
+
             // The else block remains unchanged as it draws full faces without offsets
             auto drawUp = [&]() {
                 dc.fillQuad(
-                    Vec3<float>(bp.x, bp.y + 1.f, bp.z),
-                    Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z),
-                    Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + 1.f),
-                    Vec3<float>(bp.x, bp.y + 1.f, bp.z + 1.f),
+                    Vec3<float>(bp.x, bp.y + 1.003f, bp.z),
+                    Vec3<float>(bp.x + 1.003f, bp.y + 1.003f, bp.z),
+                    Vec3<float>(bp.x + 1.003f, bp.y + 1.003f, bp.z + 1.003f),
+                    Vec3<float>(bp.x, bp.y + 1.003f, bp.z + 1.003f),
                     color
                 );
                 };
@@ -228,19 +231,19 @@ public:
             auto drawDown = [&]() {
                 dc.fillQuad(
                     Vec3<float>(bp.x, bp.y, bp.z),
-                    Vec3<float>(bp.x + 1.f, bp.y, bp.z),
-                    Vec3<float>(bp.x + 1.f, bp.y, bp.z + 1.f),
-                    Vec3<float>(bp.x, bp.y, bp.z + 1.f),
+                    Vec3<float>(bp.x + 1.003f, bp.y, bp.z),
+                    Vec3<float>(bp.x + 1.003f, bp.y, bp.z + 1.003f),
+                    Vec3<float>(bp.x, bp.y, bp.z + 1.003f),
                     color
                 );
                 };
 
             auto drawEast = [&]() {
                 dc.fillQuad(
-                    Vec3<float>(bp.x + 1.f, bp.y, bp.z),
-                    Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z),
-                    Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + 1.f),
-                    Vec3<float>(bp.x + 1.f, bp.y, bp.z + 1.f),
+                    Vec3<float>(bp.x + 1.003f, bp.y, bp.z),
+                    Vec3<float>(bp.x + 1.003f, bp.y + 1.003f, bp.z),
+                    Vec3<float>(bp.x + 1.003f, bp.y + 1.003f, bp.z + 1.003f),
+                    Vec3<float>(bp.x + 1.003f, bp.y, bp.z + 1.003f),
                     color
                 );
                 };
@@ -248,19 +251,19 @@ public:
             auto drawWest = [&]() {
                 dc.fillQuad(
                     Vec3<float>(bp.x, bp.y, bp.z),
-                    Vec3<float>(bp.x, bp.y + 1.f, bp.z),
-                    Vec3<float>(bp.x, bp.y + 1.f, bp.z + 1.f),
-                    Vec3<float>(bp.x, bp.y, bp.z + 1.f),
+                    Vec3<float>(bp.x, bp.y + 1.003f, bp.z),
+                    Vec3<float>(bp.x, bp.y + 1.003f, bp.z + 1.003f),
+                    Vec3<float>(bp.x, bp.y, bp.z + 1.003f),
                     color
                 );
                 };
 
             auto drawSouth = [&]() {
                 dc.fillQuad(
-                    Vec3<float>(bp.x, bp.y, bp.z + 1.f),
-                    Vec3<float>(bp.x, bp.y + 1.f, bp.z + 1.f),
-                    Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z + 1.f),
-                    Vec3<float>(bp.x + 1.f, bp.y, bp.z + 1.f),
+                    Vec3<float>(bp.x, bp.y, bp.z + 1.003f),
+                    Vec3<float>(bp.x, bp.y + 1.003f, bp.z + 1.003f),
+                    Vec3<float>(bp.x + 1.003f, bp.y + 1.003f, bp.z + 1.003f),
+                    Vec3<float>(bp.x + 1.003f, bp.y, bp.z + 1.003f),
                     color
                 );
                 };
@@ -268,9 +271,9 @@ public:
             auto drawNorth = [&]() {
                 dc.fillQuad(
                     Vec3<float>(bp.x, bp.y, bp.z),
-                    Vec3<float>(bp.x, bp.y + 1.f, bp.z),
-                    Vec3<float>(bp.x + 1.f, bp.y + 1.f, bp.z),
-                    Vec3<float>(bp.x + 1.f, bp.y, bp.z),
+                    Vec3<float>(bp.x, bp.y + 1.003f, bp.z),
+                    Vec3<float>(bp.x + 1.003f, bp.y + 1.003f, bp.z),
+                    Vec3<float>(bp.x + 1.003f, bp.y, bp.z),
                     color
                 );
                 };
