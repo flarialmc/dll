@@ -902,7 +902,7 @@ void FlarialGUI::LoadFont(int resourceId) {
 
     std::string lpFileName = fmt::format("{}\\{}.ttf", Utils::getAssetsPath(), resourceId);
 
-    if(std::filesystem::exists(lpFileName)) return;
+    if(std::filesystem::exists(lpFileName)) std::filesystem::remove(lpFileName);
 
     std::ofstream outFile(lpFileName, std::ios::binary);
     if (!outFile) {
@@ -1061,7 +1061,10 @@ bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
             config.FontDataOwnedByAtlas = false;
             int FontDataSize = static_cast<int>(it->first.size());
 
-            if (FontDataSize < 100) return false;
+            if (FontDataSize < 100) {
+                Logger::error("Error Loading Font. Font size is less than 100");
+                return false;
+            };
 
             FontMap[it->second] = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(it->first.data(), static_cast<int>(it->first.size()), it->second.size, &config,ImGui::GetIO().Fonts->GetGlyphRangesDefault());
             it = FlarialGUI::FontMemoryToLoad.erase(it);
