@@ -11,6 +11,7 @@
 #include "Commands/TestCommand.hpp"
 #include "Commands/SkinStealCommand.hpp"
 #include "Commands/SpotifyCommand/SpotifyCommand.hpp"
+#include "Commands/IRCChat.hpp"
 
 std::vector<std::shared_ptr<Command>> CommandManager::Commands = std::vector<std::shared_ptr<Command>>();
 CommandManager CommandManager::instance;
@@ -29,6 +30,7 @@ void CommandManager::initialize() {
     Commands.push_back(std::make_unique<SkinStealCommand>());
     Commands.push_back(std::make_unique<ConfigCommand>());
     Commands.push_back(std::make_unique<SpotifyCommand>());
+    //Commands.push_back(std::make_unique<IRCChat>());
 Listen(&CommandManager::instance, PacketSendEvent, &CommandManager::onPacket);
 }
 
