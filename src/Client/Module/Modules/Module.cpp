@@ -406,6 +406,9 @@ void Module::addSlider(std::string text, std::string subtext, float& value, floa
     float elementX = Constraints::PercentageConstraint(0.33f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
+    if (value > maxVal) value = maxVal;
+    else if (value < minVal) value = minVal;
+
     FlarialGUI::Slider(sliderIndex, elementX, y, value, maxVal, minVal, zerosafe);
 
     Module::addElementText(text, subtext);
