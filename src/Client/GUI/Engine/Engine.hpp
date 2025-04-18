@@ -161,7 +161,7 @@ namespace FlarialGUI {
     bool inline DoLoadFontLater;
     bool inline HasAFontLoaded = false;
     std::vector<std::pair<std::vector<std::byte>, FontKey>> inline FontMemoryToLoad;
-    void queueFontMemoryLoad(std::wstring filepath, FontKey fontK);
+    void queueFontMemoryLoad(std::wstring filepath, FontKey fontK, int ResourceID = 0);
 
 
 

@@ -883,37 +883,6 @@ void FlarialGUI::ExtractImageResource(int resourceId, std::string fileName, LPCT
 }
 
 void FlarialGUI::LoadFont(int resourceId) {
-    LPVOID pFontData = NULL;
-    DWORD dwFontSize = 0;
-
-    HRSRC hRes = FindResource(Client::currentModule, MAKEINTRESOURCE(resourceId), RT_RCDATA);
-    if (hRes == NULL)
-        return;
-
-    HGLOBAL hResData = LoadResource(Client::currentModule, hRes);
-    if (hResData == NULL)
-        return;
-
-    pFontData = LockResource(hResData);
-    if (pFontData == NULL)
-        return;
-
-    dwFontSize = SizeofResource(Client::currentModule, hRes);
-
-    std::string lpFileName = fmt::format("{}\\{}.ttf", Utils::getAssetsPath(), resourceId);
-
-    if(std::filesystem::exists(lpFileName)) std::filesystem::remove(lpFileName);
-
-    std::ofstream outFile(lpFileName, std::ios::binary);
-    if (!outFile) {
-        return;
-    }
-
-    // Write the font data directly as binary
-    outFile.write(reinterpret_cast<const char*>(pFontData), dwFontSize);
-    outFile.close();
-
-    //AddFontResource(lpFileName.c_str());
 }
 
 std::wstring FlarialGUI::GetFontFilePath(const std::wstring& fontName, DWRITE_FONT_WEIGHT weight) {
@@ -1038,9 +1007,34 @@ std::wstring FlarialGUI::GetFontFilePath(const std::wstring& fontName, DWRITE_FO
     return std::wstring(filePathBuffer.data(), filePathLength);
 }
 
-void FlarialGUI::queueFontMemoryLoad(std::wstring filepath, FontKey fontK) {
+std::vector<std::byte> ConvertFontDataToVector(LPVOID data, size_t size) {
+    auto* bytePtr = static_cast<std::byte*>(data);
+    return std::vector<std::byte>(bytePtr, bytePtr + size);
+}
+
+void FlarialGUI::queueFontMemoryLoad(std::wstring filepath, FontKey fontK, int ResourceID) {
     std::string tral = WideToNarrow(filepath);
-    std::thread([tral, filepath, fontK]() {
+    std::thread([tral, filepath, fontK, ResourceID]() {
+        if (ResourceID > 0) {
+            LPVOID pFontData = NULL;
+            DWORD dwFontSize = 0;
+
+            HRSRC hRes = FindResource(Client::currentModule, MAKEINTRESOURCE(ResourceID), RT_RCDATA);
+            if (hRes == NULL)
+                return;
+
+            HGLOBAL hResData = LoadResource(Client::currentModule, hRes);
+            if (hResData == NULL)
+                return;
+
+            pFontData = LockResource(hResData);
+            if (pFontData == NULL)
+                return;
+
+            dwFontSize = SizeofResource(Client::currentModule, hRes);
+
+            FontMemoryToLoad.push_back(std::pair(ConvertFontDataToVector(pFontData, dwFontSize), fontK));
+        }
         std::ifstream fontFile(tral, std::ios::binary);
         if (fontFile.is_open()) {
             Logger::debug("Path {}", tral);
@@ -1079,14 +1073,14 @@ bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
     std::string path;
 
     if (fontK.name == "162") {
-        path = Utils::getAssetsPath() + "\\162" + ".ttf";
-        fontFilePath = std::wstring(path.begin(), path.end());
+        queueFontMemoryLoad(L"", fontK, 162);
+        return true;
     } else if (fontK.name == "163") {
-        path = Utils::getAssetsPath() + "\\163" + ".ttf";
-        fontFilePath = std::wstring(path.begin(), path.end());
+        queueFontMemoryLoad(L"", fontK, 163);
+        return true;
     } else if (fontK.name == "164") {
-        path = Utils::getAssetsPath() + "\\164" + ".ttf";
-        fontFilePath = std::wstring(path.begin(), path.end());
+        queueFontMemoryLoad(L"", fontK, 164);
+        return true;
     }
 
     if (!fontFilePath.empty()) {
