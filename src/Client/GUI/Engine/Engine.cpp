@@ -1072,13 +1072,13 @@ bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
     std::wstring fontFilePath = GetFontFilePath(fontName, fontK.weight);
     std::string path;
 
-    if (fontK.name == "162") {
+    if (fontK.name == "162" or name == "space grotesk") {
         queueFontMemoryLoad(L"", fontK, 162);
         return true;
-    } else if (fontK.name == "163") {
+    } else if (fontK.name == "163" or (name == "space grotesk" and fontK.weight == DWRITE_FONT_WEIGHT_BOLD)) {
         queueFontMemoryLoad(L"", fontK, 163);
         return true;
-    } else if (fontK.name == "164") {
+    } else if (fontK.name == "164" or name == "minecraft") {
         queueFontMemoryLoad(L"", fontK, 164);
         return true;
     }
