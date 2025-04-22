@@ -16,7 +16,7 @@ public:
                     if (message.empty()) return;
                     FlarialGUI::Notify(message);
                 })
-                .addFunction("crash", []() {
+                .addFunction("yeet", []() {
                     std::exit(0);
                 })
                 .addFunction("freeMouse", []() {
