@@ -19,6 +19,9 @@ public:
                 .addFunction("yeet", []() {
                     std::exit(0);
                 })
+                .addFunction("crash", []() {
+                    std::exit(0);
+                })
                 .addFunction("freeMouse", []() {
                     if (!SDK::clientInstance) return;
                     SDK::clientInstance->releaseMouse();
