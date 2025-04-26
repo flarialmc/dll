@@ -125,6 +125,30 @@ void ScriptSettingManager::saveSettings(const Script* script) {
     }
 }
 
+HeaderSetting* ScriptSettingManager::addHeader(const Script* script, const std::string& text) {
+    auto& scriptSettings = settings[script];
+
+    std::string headerKey = "__header_" + std::to_string(scriptSettings.size());
+
+    auto setting = std::make_unique<HeaderSetting>(text);
+    HeaderSetting* ptr = setting.get();
+    scriptSettings.emplace(headerKey, std::move(setting));
+    insertionOrder[script].push_back(headerKey);
+    return ptr;
+}
+
+ExtraPaddingSetting* ScriptSettingManager::extraPadding(const Script* script) {
+    auto& scriptSettings = settings[script];
+
+    std::string paddingKey = "__padding_" + std::to_string(scriptSettings.size());
+
+    auto setting = std::make_unique<ExtraPaddingSetting>();
+    ExtraPaddingSetting* ptr = setting.get();
+    scriptSettings.emplace(paddingKey, std::move(setting));
+    insertionOrder[script].push_back(paddingKey);
+    return ptr;
+}
+
 ButtonSetting* ScriptSettingManager::addButton(const Script* script, const std::string& name, const std::string& description, const std::string& buttonText, std::function<void()> action) {
     auto& scriptSettings = settings[script];
 
@@ -135,6 +159,7 @@ ButtonSetting* ScriptSettingManager::addButton(const Script* script, const std::
     auto setting = std::make_unique<ButtonSetting>(name, description, buttonText, std::move(action));
     ButtonSetting* ptr = setting.get();
     scriptSettings.emplace(name, std::move(setting));
+    insertionOrder[script].push_back(name);
     return ptr;
 }
 
@@ -148,6 +173,7 @@ TextBoxSetting* ScriptSettingManager::addTextBox(const Script* script, const std
     auto setting = std::make_unique<TextBoxSetting>(name, description, defaultValue, limit);
     TextBoxSetting* ptr = setting.get();
     scriptSettings.emplace(name, std::move(setting));
+    insertionOrder[script].push_back(name);
     return ptr;
 }
 
@@ -161,5 +187,6 @@ KeybindSetting* ScriptSettingManager::addKeybind(const Script* script, const std
     auto setting = std::make_unique<KeybindSetting>(name, description, defaultKey);
     KeybindSetting* ptr = setting.get();
     scriptSettings.emplace(name, std::move(setting));
+    insertionOrder[script].push_back(name);
     return ptr;
 }
