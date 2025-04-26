@@ -11,73 +11,73 @@ void ScriptSettingManager::loadSettings(Script* script) {
 
     for (auto& [name, setting] : settings[script]) {
         switch (setting->type) {
-        case ScriptSettingType::Toggle: {
-            auto* toggleSetting = dynamic_cast<ToggleSetting*>(setting.get());
-            if (!toggleSetting) return;
+            case ScriptSettingType::Toggle: {
+                auto* toggleSetting = dynamic_cast<ToggleSetting*>(setting.get());
+                if (!toggleSetting) return;
 
-            if (module->settings.getSettingByName<bool>(name) == nullptr) {
-                module->settings.addSetting<bool>(name, toggleSetting->defaultValue);
-            }
+                if (module->settings.getSettingByName<bool>(name) == nullptr) {
+                    module->settings.addSetting<bool>(name, toggleSetting->defaultValue);
+                }
 
-            auto* toggleValue = module->settings.getSettingByName<bool>(name);
-            if (toggleValue) {
-                toggleSetting->value = toggleValue->value;
-            } else {
-                toggleSetting->value = toggleSetting->defaultValue;
+                auto* toggleValue = module->settings.getSettingByName<bool>(name);
+                if (toggleValue) {
+                    toggleSetting->value = toggleValue->value;
+                } else {
+                    toggleSetting->value = toggleSetting->defaultValue;
+                }
+                break;
             }
-            break;
-        }
-        case ScriptSettingType::Slider: {
-            auto* sliderSetting = dynamic_cast<SliderSetting*>(setting.get());
-            if (!sliderSetting) return;
+            case ScriptSettingType::Slider: {
+                auto* sliderSetting = dynamic_cast<SliderSetting*>(setting.get());
+                if (!sliderSetting) return;
 
-            if (module->settings.getSettingByName<float>(name) == nullptr) {
-                module->settings.addSetting<float>(name, sliderSetting->defaultValue);
-            }
+                if (module->settings.getSettingByName<float>(name) == nullptr) {
+                    module->settings.addSetting<float>(name, sliderSetting->defaultValue);
+                }
 
-            auto* sliderValue = module->settings.getSettingByName<float>(name);
-            if (sliderValue) {
-                sliderSetting->value = sliderValue->value;
-            } else {
-                sliderSetting->value = sliderSetting->defaultValue;
+                auto* sliderValue = module->settings.getSettingByName<float>(name);
+                if (sliderValue) {
+                    sliderSetting->value = sliderValue->value;
+                } else {
+                    sliderSetting->value = sliderSetting->defaultValue;
+                }
+                break;
             }
-            break;
-        }
-        case ScriptSettingType::TextBox: {
-            auto* textBoxSetting = dynamic_cast<TextBoxSetting*>(setting.get());
-            if (!textBoxSetting) return;
+            case ScriptSettingType::TextBox: {
+                auto* textBoxSetting = dynamic_cast<TextBoxSetting*>(setting.get());
+                if (!textBoxSetting) return;
 
-            if (module->settings.getSettingByName<std::string>(name) == nullptr) {
-                module->settings.addSetting<std::string>(name, textBoxSetting->defaultValue);
-            }
+                if (module->settings.getSettingByName<std::string>(name) == nullptr) {
+                    module->settings.addSetting<std::string>(name, textBoxSetting->defaultValue);
+                }
 
-            auto* textBoxValue = module->settings.getSettingByName<std::string>(name);
-            if (textBoxValue) {
-                textBoxSetting->value = textBoxValue->value;
-            } else {
-                textBoxSetting->value = textBoxSetting->defaultValue;
+                auto* textBoxValue = module->settings.getSettingByName<std::string>(name);
+                if (textBoxValue) {
+                    textBoxSetting->value = textBoxValue->value;
+                } else {
+                    textBoxSetting->value = textBoxSetting->defaultValue;
+                }
+                break;
             }
-            break;
-        }
-        case ScriptSettingType::Keybind: {
-            auto* keyBindSetting = dynamic_cast<KeybindSetting*>(setting.get());
-            if (!keyBindSetting) return;
+            case ScriptSettingType::Keybind: {
+                auto* keyBindSetting = dynamic_cast<KeybindSetting*>(setting.get());
+                if (!keyBindSetting) return;
 
-            if (module->settings.getSettingByName<std::string>(name) == nullptr) {
-                module->settings.addSetting<std::string>(name, keyBindSetting->defaultValue);
-            }
+                if (module->settings.getSettingByName<std::string>(name) == nullptr) {
+                    module->settings.addSetting<std::string>(name, keyBindSetting->defaultValue);
+                }
 
-            auto* keybindValue = module->settings.getSettingByName<std::string>(name);
-            if (keybindValue) {
-                keyBindSetting->value = keybindValue->value;
-            } else {
-                keyBindSetting->value = keyBindSetting->defaultValue;
+                auto* keybindValue = module->settings.getSettingByName<std::string>(name);
+                if (keybindValue) {
+                    keyBindSetting->value = keybindValue->value;
+                } else {
+                    keyBindSetting->value = keyBindSetting->defaultValue;
+                }
+                break;
             }
-            break;
-        }
-        default: {
-            break;
-        }
+            default: {
+                break;
+            }
         }
     }
 }
@@ -90,37 +90,37 @@ void ScriptSettingManager::saveSettings(const Script* script) {
 
     for (const auto& [name, setting] : settings[script]) {
         switch (setting->type) {
-        case ScriptSettingType::Toggle: {
-            auto* boolSetting = dynamic_cast<ToggleSetting*>(setting.get());
-            if (!boolSetting) return;
+            case ScriptSettingType::Toggle: {
+                auto* boolSetting = dynamic_cast<ToggleSetting*>(setting.get());
+                if (!boolSetting) return;
 
-            module->settings.getSettingByName<bool>(name)->value = boolSetting->value;
-            break;
-        }
-        case ScriptSettingType::Slider: {
-            auto* sliderSetting = dynamic_cast<SliderSetting*>(setting.get());
-            if (!sliderSetting) return;
+                module->settings.getSettingByName<bool>(name)->value = boolSetting->value;
+                break;
+            }
+            case ScriptSettingType::Slider: {
+                auto* sliderSetting = dynamic_cast<SliderSetting*>(setting.get());
+                if (!sliderSetting) return;
 
-            module->settings.getSettingByName<float>(name)->value = sliderSetting->value;
-            break;
-        }
-        case ScriptSettingType::TextBox: {
-            auto* textBoxSetting = dynamic_cast<TextBoxSetting*>(setting.get());
-            if (!textBoxSetting) return;
+                module->settings.getSettingByName<float>(name)->value = sliderSetting->value;
+                break;
+            }
+            case ScriptSettingType::TextBox: {
+                auto* textBoxSetting = dynamic_cast<TextBoxSetting*>(setting.get());
+                if (!textBoxSetting) return;
 
-            module->settings.getSettingByName<std::string>(name)->value = textBoxSetting->value;
-            break;
-        }
-        case ScriptSettingType::Keybind: {
-            auto* keybindSetting = dynamic_cast<KeybindSetting*>(setting.get());
-            if (!keybindSetting) return;
+                module->settings.getSettingByName<std::string>(name)->value = textBoxSetting->value;
+                break;
+            }
+            case ScriptSettingType::Keybind: {
+                auto* keybindSetting = dynamic_cast<KeybindSetting*>(setting.get());
+                if (!keybindSetting) return;
 
-            module->settings.getSettingByName<std::string>(name)->value = keybindSetting->value;
-            break;
-        }
-        default: {
-            break;
-        }
+                module->settings.getSettingByName<std::string>(name)->value = keybindSetting->value;
+                break;
+            }
+            default: {
+                break;
+            }
         }
     }
 }
