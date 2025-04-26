@@ -33,6 +33,18 @@ public:
 
         getGlobalNamespace(state)
             .beginNamespace("settings")
+                .addFunction("addHeader", [state](const std::string& text) {
+                    auto* script = ScriptManager::getScriptByState(state);
+                    if (!script) return;
+
+                    gScriptSettingManager.addHeader(script, text);
+                })
+                .addFunction("extraPadding", [state]() {
+                    auto* script = ScriptManager::getScriptByState(state);
+                    if (!script) return;
+
+                    gScriptSettingManager.extraPadding(script);
+                })
                 .addFunction("addToggle", [state](const std::string& name, const std::string& desc, bool defValue) -> ToggleSetting* {
                     auto* script = ScriptManager::getScriptByState(state);
                     if (!script) return nullptr;
@@ -83,7 +95,10 @@ public:
                     auto* script = ScriptManager::getScriptByState(state);
                     if (!script) return nullptr;
 
-                    auto* setting = gScriptSettingManager.addKeybind(script, name, desc, "");
+                    int numArgs = lua_gettop(state);
+                    std::string defaultKey = (numArgs >= 3) ? lua_tostring(state, 3) : "";
+
+                    auto* setting = gScriptSettingManager.addKeybind(script, name, desc, defaultKey);
                     return setting;
                 })
             .endNamespace();

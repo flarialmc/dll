@@ -5,6 +5,8 @@
 #include <LuaBridge/LuaBridge.h>
 
 enum class ScriptSettingType {
+    Header,
+    ExtraPadding,
     Toggle,
     Button,
     Slider,
@@ -17,6 +19,20 @@ struct BaseSetting {
     std::string description;
     ScriptSettingType type;
     virtual ~BaseSetting() = default;
+};
+
+struct HeaderSetting : BaseSetting {
+    std::string text;
+    HeaderSetting(const std::string& text)
+        : text(text) {
+        this->type = ScriptSettingType::Header;
+    }
+};
+
+struct ExtraPaddingSetting : BaseSetting {
+    ExtraPaddingSetting() {
+        this->type = ScriptSettingType::ExtraPadding;
+    }
 };
 
 struct ToggleSetting : BaseSetting {
@@ -64,7 +80,7 @@ struct TextBoxSetting : BaseSetting {
     int characterLimit;
 
     TextBoxSetting(const std::string& name, const std::string& description, std::string defaultValue, const int limit)
-        : value(std::move(defaultValue)), defaultValue(defaultValue), characterLimit(limit) {
+        : value(defaultValue), defaultValue(defaultValue), characterLimit(limit) {
         this->name = name;
         this->description = description;
         this->type = ScriptSettingType::TextBox;
@@ -76,7 +92,7 @@ struct KeybindSetting : BaseSetting {
     std::string defaultValue;
 
     KeybindSetting(const std::string& name, const std::string& description, std::string defaultValue)
-        : value(std::move(defaultValue)), defaultValue(std::move(defaultValue)) {
+        : value(defaultValue), defaultValue(defaultValue) {
         this->name = name;
         this->description = description;
         this->type = ScriptSettingType::Keybind;
