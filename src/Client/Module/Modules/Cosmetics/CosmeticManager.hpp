@@ -7,10 +7,12 @@
 #include "Cosmetics/FlarialBandanna.hpp"
 #include <map>
 #include <memory>  // Add this for std::shared_ptr and std::make_shared
+#include "../../../Cosmetics/ModelLoader.hpp"
 
 class CosmeticManager : public Listener {
     std::map<size_t, std::shared_ptr<Cosmetic>> cosmetics = {};
     bool RenderCosmeticsForLocaluser = true;
+    std::unique_ptr<cosmetic::JsonModel> model;
 
 public:
     void Init() {
@@ -23,6 +25,7 @@ public:
     }
 
     CosmeticManager() {
+        model = cosmetic::ModelLoader::LoadFromFile(Utils::getAssetsPath() + "\\wisp.geo.json", "geometry.wisp");
         Init();
         Initialize();  // Call Initialize to set up the cosmetics map
     }
@@ -39,17 +42,14 @@ private:
     }
 
     void onRenderLevel(ActorRenderDispatcherEvent& event) {
-        if (event.getEntity() == SDK::clientInstance->getLocalPlayer() and RenderCosmeticsForLocaluser) {
-            mce::MaterialPtr* material = MaterialUtils::getNametag();
-            MCDrawUtil3D dc(SDK::clientInstance->getLevelRender(), SDK::scn, material);
+        if (event.getEntity() ==SDK::clientInstance->getLocalPlayer()) {
+            ResourceLocation loc(Utils::getAssetsPath() + "\\wisp.png", true);
+            TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
 
-            auto rot = event.getRot();
-            float yawRadians = ((360 - rot.y) + 180) * 3.14159f / 180.0f;
-            float pitchRadians = (rot.x * -1) * 3.14159f / 180.0f;
+            if (ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr)
+                return;
 
-            auto pos = SDK::clientInstance->getLocalPlayer()->getLerpedPosition();
-            getCosmetic("Flarial Bandanna")->render(pos.add(-.25, 0, -.25), dc, yawRadians, pitchRadians);
-            dc.flush();
+            model->render(SDK::scn, *ptr.clientTexture, Vec3<float>(0, 100, 0), Vec3<float>(), Vec3<float>(1, 1, 1), true);
         }
     }
 
