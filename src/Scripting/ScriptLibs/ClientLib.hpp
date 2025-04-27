@@ -16,6 +16,9 @@ public:
                     if (message.empty()) return;
                     FlarialGUI::Notify(message);
                 })
+                .addFunction("yeet", []() {
+                    std::exit(0);
+                })
                 .addFunction("crash", []() {
                     std::exit(0);
                 })

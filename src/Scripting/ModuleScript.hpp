@@ -89,50 +89,61 @@ public:
                                   Constraints::RelativeConstraint(0.88f, "height"));
 
         if (const auto script = linkedScript.lock()) {
-            const auto& settings = gScriptSettingManager.getAllSettings();
+            const auto& scriptSettings = gScriptSettingManager.getAllSettings();
+            const auto& order = gScriptSettingManager.getInsertionOrder(script.get());
 
-            if (const auto it = settings.find(script.get()); it != settings.end()) {
-                for (const auto &settingPtr: it->second | std::views::values) {
+            for (const auto& name : order) {
+                auto it = scriptSettings.at(script.get()).find(name);
+                if (it == scriptSettings.at(script.get()).end()) continue;
 
-                    switch (settingPtr->type) {
-                        case ScriptSettingType::Toggle: {
-                            auto* toggleSet = dynamic_cast<ToggleSetting*>(settingPtr.get());
-                            if (!toggleSet) return;
+                auto& settingPtr = it->second;
+                switch (settingPtr->type) {
+                    case ScriptSettingType::Header: {
+                        auto* headerSet = dynamic_cast<HeaderSetting*>(settingPtr.get());
+                        if (headerSet) this->addHeader(headerSet->text);
+                        break;
+                    }
+                    case ScriptSettingType::ExtraPadding: {
+                        this->extraPadding();
+                        break;
+                    }
+                    case ScriptSettingType::Toggle: {
+                        auto* toggleSet = dynamic_cast<ToggleSetting*>(settingPtr.get());
+                        if (!toggleSet) return;
 
-                            this->addToggle(toggleSet->name, toggleSet->description, toggleSet->value);
-                            break;
-                        }
-                        case ScriptSettingType::Button: {
-                            auto* buttonSet = dynamic_cast<ButtonSetting*>(settingPtr.get());
-                            if (!buttonSet) return;
+                        this->addToggle(toggleSet->name, toggleSet->description, toggleSet->value);
+                        break;
+                    }
+                    case ScriptSettingType::Button: {
+                        auto* buttonSet = dynamic_cast<ButtonSetting*>(settingPtr.get());
+                        if (!buttonSet) return;
 
-                            this->addButton(buttonSet->name, buttonSet->description, buttonSet->buttonText, buttonSet->action);
-                            break;
-                        }
-                        case ScriptSettingType::Slider: {
-                            auto* sliderSet = dynamic_cast<SliderSetting*>(settingPtr.get());
-                            if (!sliderSet) return;
+                        this->addButton(buttonSet->name, buttonSet->description, buttonSet->buttonText, buttonSet->action);
+                        break;
+                    }
+                    case ScriptSettingType::Slider: {
+                        auto* sliderSet = dynamic_cast<SliderSetting*>(settingPtr.get());
+                        if (!sliderSet) return;
 
-                            this->addSlider(sliderSet->name, sliderSet->description, sliderSet->value, sliderSet->maxValue, sliderSet->minValue, sliderSet->zerosafe);
-                            break;
-                        }
-                        case ScriptSettingType::TextBox: {
-                            auto* textBoxSet = dynamic_cast<TextBoxSetting*>(settingPtr.get());
-                            if (!textBoxSet) return;
+                        this->addSlider(sliderSet->name, sliderSet->description, sliderSet->value, sliderSet->maxValue, sliderSet->minValue, sliderSet->zerosafe);
+                        break;
+                    }
+                    case ScriptSettingType::TextBox: {
+                        auto* textBoxSet = dynamic_cast<TextBoxSetting*>(settingPtr.get());
+                        if (!textBoxSet) return;
 
-                            this->addTextBox(textBoxSet->name, textBoxSet->description, textBoxSet->value, textBoxSet->characterLimit);
-                            break;
-                        }
-                        case ScriptSettingType::Keybind: {
-                            auto* keybindSet = dynamic_cast<KeybindSetting*>(settingPtr.get());
-                            if (!keybindSet) return;
+                        this->addTextBox(textBoxSet->name, textBoxSet->description, textBoxSet->value, textBoxSet->characterLimit);
+                        break;
+                    }
+                    case ScriptSettingType::Keybind: {
+                        auto* keybindSet = dynamic_cast<KeybindSetting*>(settingPtr.get());
+                        if (!keybindSet) return;
 
-                            this->addKeybind(keybindSet->name, keybindSet->description, keybindSet->value);
-                            break;
-                        }
-                        default: {
-                            break;
-                        }
+                        this->addKeybind(keybindSet->name, keybindSet->description, keybindSet->value);
+                        break;
+                    }
+                    default: {
+                        break;
                     }
                 }
             }
