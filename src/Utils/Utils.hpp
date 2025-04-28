@@ -293,6 +293,8 @@ public:
           | std::ranges::to<std::vector>();
     }
 
+    static std::string getResourceData(int id, LPCTSTR type);
+
     static uint64_t getCurrentMs();
 
     static std::string downloadFile(const std::string& url);

@@ -81,6 +81,8 @@
 #define IDR_WHITE_LOGO_PNG              176
 #define IDR_YELLOW_LOGO_PNG             177
 #define IDR_WAYPOINT_PNG                178
+#define IDR_LANG_DE_DE                  179
+#define IDR_LANG_EN_US                  180
 
 // Next default values for new objects
 // 

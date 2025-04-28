@@ -159,3 +159,8 @@ IDR_FREEZEENGINE_PNG      PNG "Data\\freezeengine.png"
 IDR_STONEHUNTER_PNG       PNG "Data\\stonehunter.png"
 IDR_BEAVER_PNG            PNG "Data\\beaver.png"
 
+// Languages
+
+IDR_LANG_EN_US            RCDATA "Data\\Lang\\en_US.json"
+IDR_LANG_DE_DE           RCDATA "Data\\Lang\\de_DE.json"
+

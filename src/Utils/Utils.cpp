@@ -1,6 +1,7 @@
 ﻿#include "Utils.hpp"
 
 #include <Client/GUI/Engine/Engine.hpp>
+#include <Client.hpp>
 #include <Utils/WinrtUtils.hpp>
 
 #include <sstream>
@@ -483,6 +484,20 @@ std::string Utils::downloadFile(const std::string& url) {
     }
 
     return rtn;
+}
+
+std::string Utils::getResourceData(int id, LPCTSTR type) {
+    HRSRC res = FindResource(Client::currentModule, MAKEINTRESOURCE(id), type);
+    if (res == NULL) Logger::error("can't find resource {}", id);  return {};
+
+    HGLOBAL resData = LoadResource(Client::currentModule, res);
+    if (resData == NULL) Logger::error("can't load resource {}", id);  return {};
+
+
+    DWORD dwFileSize = SizeofResource(Client::currentModule, res);
+    LPVOID pFileData = LockResource(resData);
+
+    return std::string(static_cast<const char*>(pFileData), dwFileSize);
 }
 
 std::string Utils::sanitizeName(const std::string &name) {
