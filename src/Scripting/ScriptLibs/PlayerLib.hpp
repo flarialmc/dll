@@ -34,6 +34,12 @@ public:
         lua_pushnumber(L, static_cast<double>(pos.z));
         return 3;
     }
+    static int health(lua_State* L) {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (!player) return 0;
+        lua_pushnumber(L, static_cast<float>(player->getHealth()));
+        return 1;
+    }
     static int hurtTime() {
         auto player = SDK::clientInstance->getLocalPlayer();
         if (!player) return 0;
@@ -118,6 +124,7 @@ public:
                 .addStaticFunction("name", &sLocalPlayer::name)
                 .addStaticFunction("hurtTime", &sLocalPlayer::hurtTime)
                 .addStaticFunction("position", &sLocalPlayer::position)
+                .addStaticFunction("health", &sLocalPlayer::health)
                 .addStaticFunction("grounded", &sLocalPlayer::grounded)
                 .addStaticFunction("say", &sLocalPlayer::say)
                 .addStaticFunction("rotation", &sLocalPlayer::rotation)
