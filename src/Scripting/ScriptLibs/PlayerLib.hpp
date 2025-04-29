@@ -36,11 +36,8 @@ public:
     }
     static int health(lua_State* L) {
         auto player = SDK::clientInstance->getLocalPlayer();
-        if (!player || !player->getHealth()) {
-			lua_pushnumber(L, -1.0f);
-            return 1;
-        }
-
+        if (!player || !player->getHealth()) lua_pushnumber(L, 0.0f); return 1;
+        
         lua_pushnumber(L, static_cast<float>(player->getHealth()));
         return 1;
     }
