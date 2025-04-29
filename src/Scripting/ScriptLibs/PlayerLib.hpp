@@ -37,7 +37,7 @@ public:
     static int health(lua_State* L) {
         auto player = SDK::clientInstance->getLocalPlayer();
         if (!player || !player->getHealth()) {
-			lua_pushnumber(L, 21.0f); // 21 because 0 health indicates player death
+			lua_pushnumber(L, -1.0f);
             return 1;
         }
 
