@@ -264,6 +264,6 @@ public:
             .addStaticFunction("say", &sLocalPlayer::say)
             .addStaticFunction("rotation", &sLocalPlayer::rotation)
             .addStaticFunction("executeCommand", &sLocalPlayer::executeCommand)
-            .endClass();
+        .endClass();
     }
 };
