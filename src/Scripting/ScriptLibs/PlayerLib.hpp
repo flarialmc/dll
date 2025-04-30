@@ -61,74 +61,9 @@ public:
 
     static int health(lua_State* L) {
         auto player = SDK::clientInstance->getLocalPlayer();
-        if (!player || !player->getHealth()) {
-            lua_pushnumber(L, -1.0f);
-            return 1;
-        }
-        lua_pushnumber(L, player->getHealth());
-        return 1;
-    }
-
-    static int hunger(lua_State* L) {
-        auto player = SDK::clientInstance->getLocalPlayer();
-        if (!player || !player->getHunger()) {
-            lua_pushnumber(L, -1.0f);
-            return 1;
-        }
-        lua_pushnumber(L, player->getHunger());
-        return 1;
-    }
-
-    static int armor(lua_State* L) {
-		auto player = SDK::clientInstance->getLocalPlayer();
-        const char* pieces[4] = {"helmet", "chestplate", "leggings", "boots"};
-        lua_newtable(L);
-
-        if (!player) {
-            for (int i = 0; i < 4; i++) {
-                pushNullArmorTable(pieces, i, L);
-            }
-            return 1;
-        }
-
-        SimpleContainer* armor = player->getArmorContainer();
-        if (!armor) {
-            for (int i = 0; i < 4; i++) {
-                pushNullArmorTable(pieces, i, L);
-            }
-            return 1;
-        }
-
-        for (int i = 0; i < 4; i++) {
-            ItemStack* piece = armor->getItem(i);
-            
-            if (!piece || !piece->isValid()) {
-                pushNullArmorTable(pieces, i, L);
-            }
-            else {
-                lua_pushstring(L, pieces[i]);
-                lua_newtable(L);
-
-                lua_pushstring(L, "name");
-                lua_pushstring(L, piece->getItem()->getname().data());
-                lua_settable(L, -3);
-
-                lua_pushstring(L, "maxDurability");
-                lua_pushnumber(L, static_cast<int>(piece->getMaxDamage()));
-                lua_settable(L, -3);
-
-                lua_pushstring(L, "damage");
-                lua_pushnumber(L, static_cast<int>(piece->getDamageValue()));
-                lua_settable(L, -3);
-
-                lua_pushstring(L, "isEnchanted");
-                lua_pushboolean(L, piece->isEnchanted());
-                lua_settable(L, -3);
-
-                lua_settable(L, -3);
-            }
-        }
-
+        if (!player || !player->getHealth()) lua_pushnumber(L, 0.0f); return 1;
+        
+        lua_pushnumber(L, static_cast<float>(player->getHealth()));
         return 1;
     }
 
