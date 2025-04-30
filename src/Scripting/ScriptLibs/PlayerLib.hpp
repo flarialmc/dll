@@ -11,8 +11,27 @@
 // LuaBridge needs to link against this class.
 // Normal Actor class doesn't seem to work for me.
 // sLocalPlayer - script local player
-
 class sLocalPlayer {
+
+private:
+
+    static void pushNullArmorTable(const char*(pieces)[4], int i, lua_State* L) {
+        lua_pushstring(L, pieces[i]);
+        lua_newtable(L);
+        lua_pushstring(L, "name");
+        lua_pushstring(L, "empty");
+        lua_settable(L, -3);
+        lua_pushstring(L, "maxDurability");
+        lua_pushnumber(L, -1);
+        lua_settable(L, -3);
+        lua_pushstring(L, "damage");
+        lua_pushnumber(L, -1);
+        lua_settable(L, -3);
+        lua_pushstring(L, "isEnchanted");
+        lua_pushnumber(L, -1);
+        lua_settable(L, -3);
+        lua_settable(L, -3);
+    }
 
 public:
 
@@ -56,6 +75,59 @@ public:
             return 1;
         }
         lua_pushnumber(L, player->getHunger());
+        return 1;
+    }
+
+    static int armor(lua_State* L) {
+		auto player = SDK::clientInstance->getLocalPlayer();
+        const char* pieces[4] = {"helmet", "chestplate", "leggings", "boots"};
+        lua_newtable(L);
+
+        if (!player) {
+            for (int i = 0; i < 4; i++) {
+                pushNullArmorTable(pieces, i, L);
+            }
+            return 1;
+        }
+
+        SimpleContainer* armor = player->getArmorContainer();
+        if (!armor) {
+            for (int i = 0; i < 4; i++) {
+                pushNullArmorTable(pieces, i, L);
+            }
+            return 1;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            ItemStack* piece = armor->getItem(i);
+            
+            if (!piece || !piece->isValid()) {
+                pushNullArmorTable(pieces, i, L);
+            }
+            else {
+                lua_pushstring(L, pieces[i]);
+                lua_newtable(L);
+
+                lua_pushstring(L, "name");
+                lua_pushstring(L, piece->getItem()->getname().data());
+                lua_settable(L, -3);
+
+                lua_pushstring(L, "maxDurability");
+                lua_pushnumber(L, static_cast<int>(piece->getMaxDamage()));
+                lua_settable(L, -3);
+
+                lua_pushstring(L, "damage");
+                lua_pushnumber(L, static_cast<int>(piece->getDamageValue()));
+                lua_settable(L, -3);
+
+                lua_pushstring(L, "isEnchanted");
+                lua_pushboolean(L, piece->isEnchanted());
+                lua_settable(L, -3);
+
+                lua_settable(L, -3);
+            }
+        }
+
         return 1;
     }
 
@@ -144,15 +216,16 @@ public:
 
         getGlobalNamespace(state)
             .beginClass<sLocalPlayer>("player")
-            .addStaticFunction("name", &sLocalPlayer::name)
-            .addStaticFunction("hurtTime", &sLocalPlayer::hurtTime)
-            .addStaticFunction("position", &sLocalPlayer::position)
-            .addStaticFunction("health", &sLocalPlayer::health)
-            .addStaticFunction("hunger", &sLocalPlayer::hunger)
-            .addStaticFunction("grounded", &sLocalPlayer::grounded)
-            .addStaticFunction("say", &sLocalPlayer::say)
-            .addStaticFunction("rotation", &sLocalPlayer::rotation)
-            .addStaticFunction("executeCommand", &sLocalPlayer::executeCommand)
+                .addStaticFunction("name", &sLocalPlayer::name)
+                .addStaticFunction("hurtTime", &sLocalPlayer::hurtTime)
+                .addStaticFunction("position", &sLocalPlayer::position)
+                .addStaticFunction("health", &sLocalPlayer::health)
+                .addStaticFunction("hunger", &sLocalPlayer::hunger)
+                .addStaticFunction("armor", &sLocalPlayer::armor)
+                .addStaticFunction("grounded", &sLocalPlayer::grounded)
+                .addStaticFunction("say", &sLocalPlayer::say)
+                .addStaticFunction("rotation", &sLocalPlayer::rotation)
+                .addStaticFunction("executeCommand", &sLocalPlayer::executeCommand)
             .endClass();
     }
 };
