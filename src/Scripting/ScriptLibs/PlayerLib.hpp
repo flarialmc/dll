@@ -14,26 +14,6 @@
 
 class sLocalPlayer {
 
-private:
-
-    static void pushNullArmorTable(const char*(pieces)[4], int i, lua_State* L) {
-        lua_pushstring(L, pieces[i]);
-        lua_newtable(L);
-        lua_pushstring(L, "name");
-        lua_pushstring(L, "empty");
-        lua_settable(L, -3);
-        lua_pushstring(L, "maxDurability");
-        lua_pushnumber(L, -1);
-        lua_settable(L, -3);
-        lua_pushstring(L, "damage");
-        lua_pushnumber(L, -1);
-        lua_settable(L, -3);
-        lua_pushstring(L, "isEnchanted");
-        lua_pushnumber(L, -1);
-        lua_settable(L, -3);
-        lua_settable(L, -3);
-    }
-
 public:
 
     static std::string name() {
@@ -61,9 +41,21 @@ public:
 
     static int health(lua_State* L) {
         auto player = SDK::clientInstance->getLocalPlayer();
-        if (!player || !player->getHealth()) lua_pushnumber(L, 0.0f); return 1;
-        
-        lua_pushnumber(L, static_cast<float>(player->getHealth()));
+        if (!player || !player->getHealth()) {
+            lua_pushnumber(L, -1.0f);
+            return 1;
+        }
+        lua_pushnumber(L, player->getHealth());
+        return 1;
+    }
+
+    static int hunger(lua_State* L) {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (!player || !player->getHunger()) {
+            lua_pushnumber(L, -1.0f);
+            return 1;
+        }
+        lua_pushnumber(L, player->getHunger());
         return 1;
     }
 
@@ -152,16 +144,15 @@ public:
 
         getGlobalNamespace(state)
             .beginClass<sLocalPlayer>("player")
-                .addStaticFunction("name", &sLocalPlayer::name)
-                .addStaticFunction("hurtTime", &sLocalPlayer::hurtTime)
-                .addStaticFunction("position", &sLocalPlayer::position)
-                .addStaticFunction("health", &sLocalPlayer::health)
-                .addStaticFunction("hunger", &sLocalPlayer::hunger)
-                .addStaticFunction("armor", &sLocalPlayer::armor)
-                .addStaticFunction("grounded", &sLocalPlayer::grounded)
-                .addStaticFunction("say", &sLocalPlayer::say)
-                .addStaticFunction("rotation", &sLocalPlayer::rotation)
-                .addStaticFunction("executeCommand", &sLocalPlayer::executeCommand)
+            .addStaticFunction("name", &sLocalPlayer::name)
+            .addStaticFunction("hurtTime", &sLocalPlayer::hurtTime)
+            .addStaticFunction("position", &sLocalPlayer::position)
+            .addStaticFunction("health", &sLocalPlayer::health)
+            .addStaticFunction("hunger", &sLocalPlayer::hunger)
+            .addStaticFunction("grounded", &sLocalPlayer::grounded)
+            .addStaticFunction("say", &sLocalPlayer::say)
+            .addStaticFunction("rotation", &sLocalPlayer::rotation)
+            .addStaticFunction("executeCommand", &sLocalPlayer::executeCommand)
             .endClass();
     }
 };
