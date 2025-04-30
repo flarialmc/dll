@@ -253,17 +253,17 @@ public:
 
         getGlobalNamespace(state)
             .beginClass<sLocalPlayer>("player")
-            .addStaticFunction("name", &sLocalPlayer::name)
-            .addStaticFunction("hurtTime", &sLocalPlayer::hurtTime)
-            .addStaticFunction("position", &sLocalPlayer::position)
-            .addStaticFunction("health", &sLocalPlayer::health)
-            .addStaticFunction("hunger", &sLocalPlayer::hunger)
-            .addStaticFunction("armor", &sLocalPlayer::armor)
-            .addStaticFunction("offhand", &sLocalPlayer::offhand)
-            .addStaticFunction("grounded", &sLocalPlayer::grounded)
-            .addStaticFunction("say", &sLocalPlayer::say)
-            .addStaticFunction("rotation", &sLocalPlayer::rotation)
-            .addStaticFunction("executeCommand", &sLocalPlayer::executeCommand)
-        .endClass();
+                .addStaticFunction("name", &sLocalPlayer::name)
+                .addStaticFunction("hurtTime", &sLocalPlayer::hurtTime)
+                .addStaticFunction("position", &sLocalPlayer::position)
+                .addStaticFunction("health", &sLocalPlayer::health)
+                .addStaticFunction("hunger", &sLocalPlayer::hunger)
+                .addStaticFunction("armor", &sLocalPlayer::armor)
+                .addStaticFunction("offhand", &sLocalPlayer::offhand)
+                .addStaticFunction("grounded", &sLocalPlayer::grounded)
+                .addStaticFunction("say", &sLocalPlayer::say)
+                .addStaticFunction("rotation", &sLocalPlayer::rotation)
+                .addStaticFunction("executeCommand", &sLocalPlayer::executeCommand)
+            .endClass();
     }
 };
