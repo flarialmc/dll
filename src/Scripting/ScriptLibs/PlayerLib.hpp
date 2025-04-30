@@ -15,7 +15,7 @@ class sLocalPlayer {
 
 private:
 
-    static void pushNullArmorTable(const char*(pieces)[4], int i, lua_State* L) {
+    static void pushNullArmorTable(const char* (pieces)[4], int i, lua_State* L) {
         lua_pushstring(L, pieces[i]);
         lua_newtable(L);
         lua_pushstring(L, "name");
@@ -31,6 +31,17 @@ private:
         lua_pushnumber(L, -1);
         lua_settable(L, -3);
         lua_settable(L, -3);
+    }
+
+    static void pushNullItemTable(lua_State* L) {
+        lua_pushstring(L, "empty");
+        lua_setfield(L, -2, "name");
+        lua_pushnumber(L, -1);
+        lua_setfield(L, -2, "maxDurability");
+        lua_pushnumber(L, -1);
+        lua_setfield(L, -2, "damage");
+        lua_pushnumber(L, -1);
+        lua_setfield(L, -2, "isEnchanted");
     }
 
 public:
@@ -79,8 +90,8 @@ public:
     }
 
     static int armor(lua_State* L) {
-		auto player = SDK::clientInstance->getLocalPlayer();
-        const char* pieces[4] = {"helmet", "chestplate", "leggings", "boots"};
+        auto player = SDK::clientInstance->getLocalPlayer();
+        const char* pieces[4] = { "helmet", "chestplate", "leggings", "boots" };
         lua_newtable(L);
 
         if (!player) {
@@ -100,7 +111,7 @@ public:
 
         for (int i = 0; i < 4; i++) {
             ItemStack* piece = armor->getItem(i);
-            
+
             if (!piece || !piece->isValid()) {
                 pushNullArmorTable(pieces, i, L);
             }
@@ -129,6 +140,32 @@ public:
         }
 
         return 1;
+    }
+
+    static int offhand(lua_State* L) {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        ItemStack* offhand = player->getOffhandSlot();
+        lua_newtable(L);
+
+        if (!offhand || !offhand->isValid()) {
+            pushNullItemTable(L);
+            return 1;
+        }
+
+        lua_pushstring(L, offhand->getItem()->getname().data());
+        lua_setfield(L, -2, "name");
+
+        lua_pushnumber(L, static_cast<int>(offhand->getMaxDamage()));
+        lua_setfield(L, -2, "maxDurability");
+
+        lua_pushnumber(L, static_cast<int>(offhand->getDamageValue()));
+        lua_setfield(L, -2, "damage");
+
+        lua_pushboolean(L, offhand->isEnchanted());
+        lua_setfield(L, -2, "isEnchanted");
+
+        return 1;
+
     }
 
     static int hurtTime() {
@@ -216,16 +253,17 @@ public:
 
         getGlobalNamespace(state)
             .beginClass<sLocalPlayer>("player")
-                .addStaticFunction("name", &sLocalPlayer::name)
-                .addStaticFunction("hurtTime", &sLocalPlayer::hurtTime)
-                .addStaticFunction("position", &sLocalPlayer::position)
-                .addStaticFunction("health", &sLocalPlayer::health)
-                .addStaticFunction("hunger", &sLocalPlayer::hunger)
-                .addStaticFunction("armor", &sLocalPlayer::armor)
-                .addStaticFunction("grounded", &sLocalPlayer::grounded)
-                .addStaticFunction("say", &sLocalPlayer::say)
-                .addStaticFunction("rotation", &sLocalPlayer::rotation)
-                .addStaticFunction("executeCommand", &sLocalPlayer::executeCommand)
+            .addStaticFunction("name", &sLocalPlayer::name)
+            .addStaticFunction("hurtTime", &sLocalPlayer::hurtTime)
+            .addStaticFunction("position", &sLocalPlayer::position)
+            .addStaticFunction("health", &sLocalPlayer::health)
+            .addStaticFunction("hunger", &sLocalPlayer::hunger)
+            .addStaticFunction("armor", &sLocalPlayer::armor)
+            .addStaticFunction("offhand", &sLocalPlayer::offhand)
+            .addStaticFunction("grounded", &sLocalPlayer::grounded)
+            .addStaticFunction("say", &sLocalPlayer::say)
+            .addStaticFunction("rotation", &sLocalPlayer::rotation)
+            .addStaticFunction("executeCommand", &sLocalPlayer::executeCommand)
             .endClass();
     }
 };
