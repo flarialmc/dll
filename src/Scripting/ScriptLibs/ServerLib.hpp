@@ -12,6 +12,9 @@ public:
                 .addFunction("ip", []() {
                     return SDK::getServerIP();
                 })
+                .addFunction("port", []() {
+			        return SDK::getServerPort();
+                })
                 .addFunction("ping", []() {
                     return SDK::getServerPing();
                 })
