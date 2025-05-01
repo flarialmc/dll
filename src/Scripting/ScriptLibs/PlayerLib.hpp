@@ -159,12 +159,12 @@ public:
     }
 
     static int dimension(lua_State* L) {
-        BlockSource* blocksrc =  SDK::clientInstance->getBlockSource();
+        BlockSource* blocksrc = SDK::clientInstance->getBlockSource();
         if (!blocksrc || !blocksrc->getDimension()) {
             lua_pushstring(L, "unknown");
             return 1;
         }
-		lua_pushstring(L, blocksrc->getDimension()->getName().data());
+        lua_pushstring(L, blocksrc->getDimension()->getName().data());
         return 1;
     }
 
