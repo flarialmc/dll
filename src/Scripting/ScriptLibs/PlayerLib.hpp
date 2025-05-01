@@ -158,6 +158,16 @@ public:
         return 1;
     }
 
+    static int dimension(lua_State* L) {
+        BlockSource* blocksrc =  SDK::clientInstance->getBlockSource();
+        if (!blocksrc || !blocksrc->getDimension()) {
+            lua_pushstring(L, "unknown");
+            return 1;
+        }
+		lua_pushstring(L, blocksrc->getDimension()->getName().data());
+        return 1;
+    }
+
     static int hurtTime() {
         auto player = SDK::clientInstance->getLocalPlayer();
         if (!player) return 0;
@@ -250,6 +260,7 @@ public:
                 .addStaticFunction("hunger", &sLocalPlayer::hunger)
                 .addStaticFunction("armor", &sLocalPlayer::armor)
                 .addStaticFunction("offhand", &sLocalPlayer::offhand)
+                .addStaticFunction("dimension", &sLocalPlayer::dimension)
                 .addStaticFunction("grounded", &sLocalPlayer::grounded)
                 .addStaticFunction("say", &sLocalPlayer::say)
                 .addStaticFunction("rotation", &sLocalPlayer::rotation)
