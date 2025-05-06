@@ -664,7 +664,7 @@ void ClickGUI::onRender(RenderEvent &event) {
                     c->addToggle("Snapping Lines", "Y'know, those pink lines in edit mode.", Client::settings.getSettingByName<bool>("snappinglines")->value);
                     c->addToggle("Center Cursor", "Centers your cursor everytime you open your inventory, etc.", Client::settings.getSettingByName<bool>("centreCursor")->value);
                     c->addToggle("Anonymous on API", "Stay anonymous on Flarial's API.", Client::settings.getSettingByName<bool>("anonymousApi")->value);
-                    c->addToggle("API Usage", "May disable some features..", Client::settings.getSettingByName<bool>("apiusage")->value);
+                    c->addToggle("API Usage", "Might disable some features when turned off.", Client::settings.getSettingByName<bool>("apiusage")->value);
                     c->addToggle("Promotions", "To donate & join discord. (pls keep on)", Client::settings.getSettingByName<bool>("promotions")->value);
                     c->addToggle("No Flarial Logo", "No Logo next to Nametag </3", Client::settings.getSettingByName<bool>("nologoicon")->value);
                     c->addToggle("No Flarial Chat Icon", "No [FLARIAL] in chat </3", Client::settings.getSettingByName<bool>("nochaticon")->value);
