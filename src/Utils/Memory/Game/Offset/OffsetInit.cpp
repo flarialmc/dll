@@ -3,6 +3,26 @@
 #include "../../../Logger/Logger.hpp"
 #include "../SignatureAndOffsetManager.hpp"
 
+void OffsetInit::init2180() {
+    Logger::debug("[Offsets] Loading offsets for 1.21.8X");
+    ADD_OFFSET("ClientInstance::getBlockSource", 31);
+
+    //ADD_OFFSET("ClientInstance::viewMatrix", 0x388);
+    ADD_OFFSET("ClientInstance::guiData", 0x5B8);
+    //ADD_OFFSET("ClientInstance::getFovX", 0x748);
+    //ADD_OFFSET("ClientInstance::getFovY", 0x75C);
+
+    ADD_OFFSET("RaknetConnector::getPeer", 0x48);
+    ADD_OFFSET("RaknetConnector::JoinedIp", 0x3E8);
+
+    ADD_OFFSET("Player::gamemode", 0xA88);
+    ADD_OFFSET("Player::playerName", 0xC08);
+    ADD_OFFSET("Player::playerInventory", 0x5C8);
+
+    ADD_OFFSET("Level::hitResult", 0x250);
+    //ADD_OFFSET("Level::getPlayerMap", 0xB98);
+}
+
 void OffsetInit::init2170() {
     Logger::debug("[Offsets] Loading offsets for 1.21.7X");
 

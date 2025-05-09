@@ -27,7 +27,7 @@ std::string removeColorCodes(const std::string& input);
 DWORD WINAPI init(HMODULE real)
 {
 #ifndef NDEBUG
-    bool shouldDebug = false; // Change this bool locally, NEVER push it set to true
+    bool shouldDebug = true; // Change this bool locally, NEVER push it set to true
 
     if (GetConsoleWindow() == nullptr && shouldDebug) {
         AllocConsole();
@@ -46,7 +46,6 @@ DWORD WINAPI init(HMODULE real)
             auto now = std::chrono::steady_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastBeatTime);
             auto elapsedAnnc = std::chrono::duration_cast<std::chrono::seconds>(now - lastAnncTime);
-
 
             if(!Client::disable) {
                 if(SDK::hasInstanced && SDK::clientInstance != nullptr) {
