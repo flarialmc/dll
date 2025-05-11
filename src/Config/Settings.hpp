@@ -94,7 +94,8 @@ public:
         for (const auto& settingPair : settings) {
             jsonData[settingPair.first] = settingPair.second->ToJson();
         }
-        return jsonData.dump(4);
+        auto dump = jsonData.dump(4);
+        return dump;
     }
 
     void FromJson(const std::string& jsonString) {
@@ -107,29 +108,26 @@ public:
             json jsonData = json::parse(jsonString);
 
             if (!jsonData.is_object()) {
-                throw json::type_error::create(302, "Root JSON must be an object", nullptr);
+                Logger::error("JSON must be an object");
+                return;
             }
 
             std::unordered_map<std::string, std::unique_ptr<Setting>> newSettings;
 
             for (const auto& [key, value] : jsonData.items()) {
-                if (value.is_number_float()) {
-                    newSettings.emplace(key, std::make_unique<SettingType<float>>(key, value.get<float>()));
-                }
-                else if (value.is_string()) {
-                    newSettings.emplace(key, std::make_unique<SettingType<std::string>>(key, value.get<std::string>()));
-                }
-                else if (value.is_boolean()) {
-                    newSettings.emplace(key, std::make_unique<SettingType<bool>>(key, value.get<bool>()));
-                }
-                else {
-                    Logger::warn("Unsupported or null value type for setting '{}'", key);
+                if (value.is_boolean()) {
+                    newSettings[key] = std::make_unique<SettingType<bool>>(key, value.get<bool>());
+                } else if (value.is_number_float()) {
+                    newSettings[key] = std::make_unique<SettingType<float>>(key, value.get<float>());
+                } else if (value.is_string()) {
+                    newSettings[key] = std::make_unique<SettingType<std::string>>(key, value.get<std::string>());
+                } else {
+                    Logger::warn("Unsupported value type for setting '{}'", key);
                 }
             }
 
             settings = std::move(newSettings);
-        }
-        catch (const json::parse_error& e) {
+        } catch (const json::parse_error& e) {
             Logger::error("An error occurred while parsing settings: {}", e.what());
         }
     }

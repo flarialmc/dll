@@ -6,7 +6,7 @@
 class Deepfry : public Module {
 
 public:
-    Deepfry() : Module("Deepfry", "Theres only one way to find out.", IDR_FRYING_PAN_PNG, "") {
+    Deepfry() : Module("Deepfry", "Theres only one way to find out.", IDR_FRYING_PAN_PNG, "", false, false) {
 
         Module::setup();
     };

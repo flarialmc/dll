@@ -26,8 +26,6 @@ public:
         patched_option.push_back(0x90);
         patched_option.push_back(0x90);
         Module::setup();
-
-        checkSettingsFile();
         loadSettings();
     };
 

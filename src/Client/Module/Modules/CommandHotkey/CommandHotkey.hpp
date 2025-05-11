@@ -8,7 +8,7 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> last_used;
 public:
     CommandHotkey() : Module("Command Hotkey", "Send command with a\nclick of a button!",
-                             IDR_TEXT_BOX_PNG, "") {
+                             IDR_TEXT_BOX_PNG, "", false, false) {
 
         Module::setup();
     };
@@ -103,7 +103,7 @@ public:
 
             totalKeybinds++;
             FlarialGUI::Notify("Added! Scroll down for options.");
-            this->saveSettings();
+            Client::SaveSettings();
         });
 
 

@@ -11,7 +11,7 @@ public:
 
     MotionBlur() : Module("Motion Blur",
                           "Make fast movements appear smoother and more realistic by\nblurring the image slightly in the direction of motion.",
-                          IDR_BLUR_PNG, "") {
+                          IDR_BLUR_PNG, "", false, false) {
         Module::setup();
 
     };

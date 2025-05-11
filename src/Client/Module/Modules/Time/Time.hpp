@@ -19,7 +19,7 @@ inline std::tm localtime_xp(std::time_t timer) {
 class Time : public Module {
 
 public:
-    Time() : Module("Clock", "Displays your current local time.", IDR_TIME_PNG, "") {
+    Time() : Module("Clock", "Displays your current local time.", IDR_TIME_PNG, "", false, false) {
 
         Module::setup();
 

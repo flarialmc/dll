@@ -25,6 +25,7 @@ public:
     std::string description;
     int icon;
     bool isScriptingModule;
+    bool isHud;
     std::string defaultKeybind;
     Settings settings;
     std::filesystem::path settingspath;
@@ -33,16 +34,16 @@ public:
     int totalWaypoints = 0;
     int totalmaps = 0;
 
-    Module(const std::string &ename, const std::string &edescription, int eicon, const std::string& ekey, bool isScripting = false) {
+    Module(const std::string &ename, const std::string &edescription, int eicon, const std::string& ekey, bool isScripting = false, bool hud = true) {
         name = ename;
         description = edescription;
         icon = eicon;
         defaultKeybind = ekey;
         isScriptingModule = isScripting;
         settings = Settings();
-        settingspath = isScripting ? Utils::getClientPath() + "\\Scripts\\Configs\\" + name + ".json" : Utils::getConfigsPath() + "\\" + name + ".json";
+        settingspath = isScripting ? Utils::getClientPath() + "\\Scripts\\Configs\\" + name + ".json" : "this is unused for non scripting modules";
+        isHud = hud;
 
-        checkSettingsFile();
         loadSettings();
     }
 
@@ -90,10 +91,8 @@ public:
     void addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value);
     void addColorPicker(std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb);
     virtual void loadDefaults();
-    void saveSettings();
 
     virtual void loadSettings();
-    void checkSettingsFile();
     virtual void toggle();
     virtual void setup();
     virtual void onSetup();

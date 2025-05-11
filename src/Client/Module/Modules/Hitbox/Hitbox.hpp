@@ -16,7 +16,7 @@ private:
     static inline std::mutex renderMtx;
 public:
 
-    Hitbox() : Module("Hitbox", "Displays hitboxes of entities", IDR_BLOCK_PNG, "") {
+    Hitbox() : Module("Hitbox", "Displays hitboxes of entities", IDR_BLOCK_PNG, "", false, false) {
 
         Module::setup();
 

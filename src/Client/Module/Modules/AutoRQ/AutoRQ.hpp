@@ -12,7 +12,7 @@ private:
     std::string Copy_CS = "THIS IS NEEDED EVEN MORE TRUST!!!!";
 public:
     AutoRQ() : Module("Hive Utils", "Handy utilities for The Hive partnered server",
-                      IDR_HIVE_PNG, "") {
+                      IDR_HIVE_PNG, "", false, false) {
         Module::setup();
     };
 
@@ -112,7 +112,7 @@ public:
 
             int i = totalmaps;
 
-            this->saveSettings();
+            Client::SaveSettings();
             FlarialGUI::Notify("New textbox created, input a map to avoid!");
             totalmaps++;
         });

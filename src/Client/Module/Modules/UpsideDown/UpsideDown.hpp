@@ -8,7 +8,7 @@ class UpsideDown : public Module {
 public:
 
 
-    UpsideDown() : Module("Upside Down", "No need to flip your monitor!!", IDR_UPSIDE_DOWN_PNG, "") {
+    UpsideDown() : Module("Upside Down", "No need to flip your monitor!!", IDR_UPSIDE_DOWN_PNG, "", false, false) {
 
         Module::setup();
 

@@ -13,7 +13,7 @@ private:
     static inline uintptr_t sigOffset;
     static inline std::vector<uint8_t> originalCameraAngle;
 public:
-    NoHurtCam() : Module("No Hurt Cam", "Disables hurt camera animation", IDR_REACH_PNG, "") {
+    NoHurtCam() : Module("No Hurt Cam", "Disables hurt camera animation", IDR_REACH_PNG, "", false, false) {
         int size;
         if (VersionUtils::checkAboveOrEqual(21, 30)) {
             size = 5;

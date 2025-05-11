@@ -4,7 +4,7 @@
 
 class SnapLook : public Module {
 public:
-    SnapLook() : Module("SnapLook", "Quickly look behind you.", IDR_EYE_PNG, "V") {
+    SnapLook() : Module("SnapLook", "Quickly look behind you.", IDR_EYE_PNG, "V", false, false) {
         Module::setup();
     };
 

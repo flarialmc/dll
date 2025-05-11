@@ -543,7 +543,6 @@ public:
             }
             else {
                 FlarialGUI::ResetShit();
-                ModuleManager::SaveModulesConfig();
                 Client::SaveSettings();
             }
         }
@@ -560,7 +559,7 @@ public:
                     curr = "modules";
 
                     FlarialGUI::ResetShit();
-                    ModuleManager::SaveModulesConfig();
+                    
                     Client::SaveSettings();
                 }
             } else {

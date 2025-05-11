@@ -309,14 +309,6 @@ void ModuleManager::syncState() {
     }
 }
 
-
-void ModuleManager::SaveModulesConfig() {
-    for (const auto& module : modulesVector) {
-        module->saveSettings();
-    }
-
-    ScriptManager::saveSettings();
-}
 // TODO: use enums?
 bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {
 

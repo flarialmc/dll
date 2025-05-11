@@ -444,54 +444,10 @@ void Module::loadDefaults() {
     setup();
 }
 
-void Module::saveSettings() {
-    if (isScripting()) {
-        settingspath = fmt::format("{}\\Scripts\\Configs\\{}.json", Utils::getClientPath(), name);
-    } else if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
-        settingspath = fmt::format("{}\\{}\\{}.json", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
-    } else {
-        settingspath = fmt::format("{}\\{}.json", Utils::getConfigsPath(), name);
-    }
-    checkSettingsFile();
-
-    try {
-        std::ofstream outputFile(settingspath);
-        if (!outputFile.is_open()) {
-            Logger::error("Failed to open file for writing: {}", settingspath.string());
-            return;
-        }
-        outputFile << settings.ToJson();
-        outputFile.close();
-    } catch (const std::exception& e) {
-        Logger::error("An error occurred while saving settings: {}", e.what());
-    }
-}
-
 void Module::loadSettings() {
-    if (isScripting()) {
-        settingspath = fmt::format("{}\\scripts\\Configs\\{}.json", Utils::getClientPath(), name);
-    } else if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
-        settingspath = fmt::format("{}\\{}\\{}.json", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
-    } else {
-        settingspath = fmt::format("{}\\{}.json", Utils::getConfigsPath(), name);
-    }
-    checkSettingsFile();
-
-    std::ifstream inputFile(settingspath);
-    if (!inputFile.is_open()) {
-        Logger::error("Failed to open file: {}", settingspath.string());
-        return;
-    }
-
-    std::stringstream ss;
-    ss << inputFile.rdbuf();
-    inputFile.close();
-
-    if (!ss.str().empty() && ss.str() != "null") {
-        settings.FromJson(ss.str());
-    } else {
-        this->loadDefaults();
-    }
+    try { settings.FromJson(Client::globalSettings[name].dump()); } 
+    catch (std::exception& e) { Logger::error("Couldn't load module settings: {}", e.what()); }
+    
 
     totalKeybinds = 0;
     totalWaypoints = 0;
@@ -510,17 +466,6 @@ void Module::loadSettings() {
     }
 }
 
-void Module::checkSettingsFile() {
-    if (!std::filesystem::exists(settingspath)) {
-        std::filesystem::create_directories(settingspath.parent_path());
-        std::ofstream outputFile(settingspath);
-        if (!outputFile.is_open()) {
-            Logger::error("Failed to create file: {}", settingspath.string());
-        }
-        outputFile.close();
-    }
-}
-
 void Module::toggle() {
     enabledState = !enabledState;
 }
@@ -528,6 +473,7 @@ void Module::toggle() {
 void Module::setup() {
     if (!isScripting())  defaultConfig();
     Module::defaultConfig();
+
     keybindActions.push_back([this] (std::vector<std::any> args)-> std::any {
         this->active = !this->active;
         return {};
@@ -547,7 +493,7 @@ void Module::onEnable() {
     enabledState = true;
     if (settings.getSettingByName<bool>("enabled"))
     settings.getSettingByName<bool>("enabled")->value = true;
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void Module::onDisable() {
@@ -557,7 +503,7 @@ void Module::onDisable() {
         if (settings.getSettingByName<bool>("enabled"))
         settings.getSettingByName<bool>("enabled")->value = false;
     }
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void Module::terminate() {
@@ -600,7 +546,7 @@ void Module::defaultConfig() {
     getKeybind();
 
     if (settings.getSettingByName<bool>("enabled") == nullptr) {
-        if (name == "Zoom" or name == "Tab List") {
+        if (name == "Zoom" || name == "Tab List") {
             settings.addSetting("enabled", true);
         }
         else {
@@ -611,6 +557,8 @@ void Module::defaultConfig() {
     if (settings.getSettingByName<bool>("favorite") == nullptr) {
         settings.addSetting("favorite", false);
     }
+
+    if (!isHud) return;
 
     if (settings.getSettingByName<float>("percentageX") == nullptr) {
         settings.addSetting("percentageX", 0.0f);
@@ -647,9 +595,7 @@ void Module::defaultConfig() {
         settings.addSetting("borderColor", (std::string)"000000");
     }   
 
-    
-    
-        if (settings.getSettingByName<std::string>("textShadow") == nullptr) {
+    if (settings.getSettingByName<std::string>("textShadow") == nullptr) {
         settings.addSetting("textShadow", false);
         settings.addSetting("rectShadow", false);
         settings.addSetting("textShadowRGB", false);
@@ -660,13 +606,8 @@ void Module::defaultConfig() {
         settings.addSetting("rectShadowOffset", 0.003f);
         settings.addSetting("rectShadowOpacity", 0.55f);
         settings.addSetting("textShadowOpacity", 0.55f);
-
-
     }
-
     
-
-
     if (settings.getSettingByName<float>("bgOpacity") == nullptr) {
         settings.addSetting("bgOpacity", 0.55f);
         settings.addSetting("textOpacity", 1.0f);
@@ -691,7 +632,6 @@ void Module::defaultConfig() {
     if (settings.getSettingByName<bool>("BlurEffect") == nullptr) {
         settings.addSetting("BlurEffect", false);
     }
-
 }
 
 bool Module::isKeybind(const std::array<bool, 256>& keys, const int keybindCount) {

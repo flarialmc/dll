@@ -12,7 +12,7 @@ private:
     float yv = 1;
 public:
 
-    DVD() : Module("DVD Screen", "Overlays the DVD Screensaver", IDR_SKULL_PNG, "") {
+    DVD() : Module("DVD Screen", "Overlays the DVD Screensaver", IDR_SKULL_PNG, "", false, false) {
         Module::setup();
     };
 

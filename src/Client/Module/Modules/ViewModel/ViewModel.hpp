@@ -6,7 +6,7 @@ class ViewModel : public Module {
 private:
     bool thirdperson = false;
 public:
-    ViewModel() : Module("View Model", "Allows you to modify how item in hand looks.", IDR_EYE_PNG, "C") {
+    ViewModel() : Module("View Model", "Allows you to modify how item in hand looks.", IDR_EYE_PNG, "C", false, false) {
         Module::setup();
     };
 

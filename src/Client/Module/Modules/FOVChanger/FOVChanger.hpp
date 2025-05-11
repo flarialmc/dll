@@ -8,7 +8,7 @@ private:
     bool notified150Fov = false;
 public:
     FOVChanger() : Module("FOV Changer", "Change your FOV beyond Minecraft's limits.",
-                          IDR_FIELD_OF_VIEW_PNG, "") {
+                          IDR_FIELD_OF_VIEW_PNG, "", false, false) {
 
         Module::setup();
 

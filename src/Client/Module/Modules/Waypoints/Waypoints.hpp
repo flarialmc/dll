@@ -16,7 +16,7 @@ private:
     std::chrono::time_point<std::chrono::high_resolution_clock> last_used;
     std::unordered_map<std::string, Waypoint> WaypointList;
 public:
-    Waypoints() : Module("Waypoints", "Allows you to mark points in your world.", IDR_WAYPOINTS_PNG, "") {
+    Waypoints() : Module("Waypoints", "Allows you to mark points in your world.", IDR_WAYPOINTS_PNG, "", false, false) {
         Module::setup();
     };
 
@@ -41,7 +41,7 @@ public:
             this->settings.addSetting("world" + end, (std::string)SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName());
             this->settings.addSetting("dimension" + end, (std::string)SDK::clientInstance->getBlockSource()->getDimension()->getName());
             this->settings.setValue("total", this->settings.getSettingByName<float>("total")->value + 1);
-            this->saveSettings();
+            Client::SaveSettings();
 
             Waypoint wp(position, false, 100.0f, index, state);
             WaypointList[name] = wp;
@@ -217,7 +217,7 @@ public:
                 this->settings.deleteSetting("state" + end);
                 this->settings.deleteSetting("rgb" + end);
                 this->settings.deleteSetting("opacity" + end);
-                this->saveSettings();
+                Client::SaveSettings();
             });
         }
 

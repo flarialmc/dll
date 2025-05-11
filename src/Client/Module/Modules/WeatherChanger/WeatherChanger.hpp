@@ -5,7 +5,7 @@
 
 class WeatherChanger : public Module {
 public:
-    WeatherChanger() : Module("Weather Changer", "Changes the weather ingame.", IDR_CLOUDY_PNG, "") {
+    WeatherChanger() : Module("Weather Changer", "Changes the weather ingame.", IDR_CLOUDY_PNG, "", false, false) {
         Module::setup();
     };
 

@@ -51,7 +51,7 @@ private:
     std::unordered_map<Actor*, std::tuple<float, Vec3<float>, Vec3<int>>> actorData;
     ActorRenderData* renderData = nullptr;
 public:
-    ItemPhysics() : Module("Item Physics", "Changes rotation behavior of dropped items", IDR_ITEM_PHYSICS_PNG, "") {
+    ItemPhysics() : Module("Item Physics", "Changes rotation behavior of dropped items", IDR_ITEM_PHYSICS_PNG, "", false, false) {
         Module::setup();
     }
 

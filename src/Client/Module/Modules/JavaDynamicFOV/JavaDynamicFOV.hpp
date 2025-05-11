@@ -15,7 +15,7 @@ private:
 
 public:
     static inline bool animationFinished = true;
-    JavaDynamicFOV() : Module("Java Dynamic FOV", "Enhances dynamic FOV in bedrock.", IDR_MAGNIFY_PNG, "C") {
+    JavaDynamicFOV() : Module("Java Dynamic FOV", "Enhances dynamic FOV in bedrock.", IDR_MAGNIFY_PNG, "", false, false) {
         Module::setup();
     };
 

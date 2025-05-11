@@ -9,7 +9,7 @@ private:
     static inline uintptr_t address;
 public:
     ThirdPerson() : Module("Nametag", "Shows your nametag for you while\nin 3rd person mode.",
-                           IDR_NAMETAG_PNG, "") {
+                           IDR_NAMETAG_PNG, "", false, false) {
 
         address = GET_SIG_ADDRESS("ThirdPersonNametag");
 

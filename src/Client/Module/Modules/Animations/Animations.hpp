@@ -9,7 +9,7 @@ private:
 public:
 
     Animations() : Module("Animations", "Animate your selected slot square\nwhile you switch slots.",
-                          IDR_ANIMATIONS_PNG, "") {
+                          IDR_ANIMATIONS_PNG, "", false, false) {
         Module::setup();
     };
 

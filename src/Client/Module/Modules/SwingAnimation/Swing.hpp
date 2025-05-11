@@ -14,7 +14,7 @@ public:
 
     Swing() : Module("Swing", "Swing", IDR_LIKE_PNG, "") {
 
-        Module::setup();
+        Module::setup(false);
 
     };
 

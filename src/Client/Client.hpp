@@ -2,6 +2,7 @@
 
 #include "Hook/Manager.hpp"
 #include "Module/Manager.hpp"
+#include "Scripting/ScriptManager.hpp"
 #include <vector>
 
 #include "Utils/APIUtils.hpp"
@@ -35,6 +36,7 @@ public:
     static void centerCursor();
 
     static Settings settings;
+    inline static nlohmann::json globalSettings;
     inline static std::string version;
     inline static HMODULE currentModule = nullptr;
 
@@ -42,28 +44,45 @@ public:
 
     static void SaveSettings() {
         try {
-            std::ofstream outputFile(path);
-            if (outputFile) {
-                outputFile << settings.ToJson();
-            } else {
-                Logger::error("Failed to open settings file: {}", path);
+            std::ofstream cls(path, std::ofstream::out | std::ofstream::trunc); cls.close(); //clear
+
+            std::ofstream cFile(path, std::ios::app);
+            cFile << "{ \n";
+            for (const auto& pair : ModuleManager::moduleMap) {
+                cFile << '"' << pair.second->name << "\": " << pair.second->settings.ToJson() << ", \n";
             }
+            cFile << "\"main\":" << settings.ToJson() << "\n }";
+
         } catch (const std::exception& e) {
-            Logger::error("An error occurred while trying to save settings to {}: {}", path, e.what());
+            Logger::error("An error occurred while trying to save settings: {}", e.what());
         }
+
+        ScriptManager::saveSettings();
     }
 
     static void LoadSettings() {
         std::ifstream inputFile(path);
-
-        if (!inputFile) {
-            Logger::error("Failed to open settings file: {}", path);
-            return;
-        }
+        if (!inputFile) return;
 
         std::stringstream ss;
         ss << inputFile.rdbuf();
-        settings.FromJson(ss.str());
+        inputFile.close();
+        std::string str = ss.str();
+
+        if (str.empty()) {
+            Logger::error("Settings String is empty");
+            return;
+        }
+
+        try { globalSettings = nlohmann::json::parse(str); } 
+        catch (const nlohmann::json::parse_error& e) {
+            Logger::error("Failed to parse JSON: {}", e.what());
+        }
+        try {
+            settings.FromJson(globalSettings["main"].dump());
+        }
+        catch (const std::exception& e) { Logger::error(e.what()); }
+        
     }
 
     static void CheckSettingsFile() {

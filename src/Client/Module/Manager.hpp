@@ -41,8 +41,6 @@ std::shared_ptr<T> makeModule(ArgsT... args) {
 
     void syncState();
 
-    void SaveModulesConfig();
-
     bool doesAnyModuleHave(const std::string& settingName);
     void updateModulesVector();
     std::shared_ptr<Module> getModule(const std::string& name);

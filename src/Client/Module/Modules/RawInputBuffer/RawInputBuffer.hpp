@@ -5,7 +5,7 @@
 
 class RawInputBuffer : public Module {
 public:
-    RawInputBuffer() : Module("Raw Input Buffer", "Fixes Minecraft's default input delay", IDR_CURSOR_PNG, "") {
+    RawInputBuffer() : Module("Raw Input Buffer", "Fixes Minecraft's default input delay", IDR_CURSOR_PNG, "", false, false) {
         Module::setup();
     };
 
