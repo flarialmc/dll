@@ -801,16 +801,11 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
 
     if(fontK.name.contains("minecraft")) fontK.name = "164";
     if(!FontMap[fontK] && fontK.weight == DWRITE_FONT_WEIGHT_NORMAL) fontK.weight = DWRITE_FONT_WEIGHT_MEDIUM;
+    if (!FontMap[fontK] || font == "Space Grotesk") {fontK.name = "162"; font = "162"; }
     if(fontK.name == "162" && weight == DWRITE_FONT_WEIGHT_BOLD) fontK.name = "163";
 
     if(!FontMap[fontK] && !FontsNotFound[fontK]) {
-        LoadFontLater = fontK;
-        DoLoadFontLater = true;
-    }
 
-    if (!FontMap[fontK] || font == "Space Grotesk") fontK.name = "162";
-
-    if(!FontMap[fontK] && !FontsNotFound[fontK]) {
         LoadFontLater = fontK;
         DoLoadFontLater = true;
     }
@@ -1049,19 +1044,32 @@ bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
 
     if (!FlarialGUI::FontMemoryToLoad.empty()) {
         for (auto it = FlarialGUI::FontMemoryToLoad.begin(); it != FlarialGUI::FontMemoryToLoad.end(); ) {
-            Logger::debug("Loading font: {}", fontK.name);
-            ImFontConfig config;
-            config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
-            config.FontDataOwnedByAtlas = false;
-            int FontDataSize = static_cast<int>(it->first.size());
+            if (fontK.name == "Space Grotesk") fontK.name = "162";
+            auto ogit = it;
+            if (!FontMap[it->second])
+            {
+                Logger::debug("Loading font: {}, {}, {}", fontK.name, cached_to_string(fontK.weight), fontK.size);
+                ImFontConfig config;
+                config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
+                config.FontDataOwnedByAtlas = false;
+                int FontDataSize = static_cast<int>(it->first.size());
 
-            if (FontDataSize < 100) {
-                Logger::error("Error Loading Font. Font size is less than 100");
-                return false;
-            };
+                if (FontDataSize < 100) {
+                    Logger::error("Error Loading Font. Font size is less than 100");
+                    return false;
+                };
+                const std::vector<int> fontSizeBuckets = {16, 32, 64, 128, 256};
+                FontKey og = it->second;
+                for (int rsize : fontSizeBuckets) {
+                    it->second.size = rsize;
+                    Logger::debug(FlarialGUI::cached_to_string(rsize));
+                    if (!FontMap[fontK])
+                    FontMap[it->second] = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(it->first.data(), static_cast<int>(it->first.size()), it->second.size, &config,ImGui::GetIO().Fonts->GetGlyphRangesDefault());
+                }
+                it->second.size = og.size;
+            }
 
-            FontMap[it->second] = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(it->first.data(), static_cast<int>(it->first.size()), it->second.size, &config,ImGui::GetIO().Fonts->GetGlyphRangesDefault());
-            it = FlarialGUI::FontMemoryToLoad.erase(it);
+            it = FlarialGUI::FontMemoryToLoad.erase(ogit);
             HasAFontLoaded = true;
         }
     }
