@@ -79,7 +79,7 @@ public:
     void onOutlineSelection(RenderOutlineSelectionEvent &event) {
 
         D2D1_COLOR_F color;
-        color = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("color")->value);
+        color = settings.getSettingByName<bool>("color_rgb")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("color")->value);
         color.a = settings.getSettingByName<float>("colorOpacity")->value;
 
         mce::MaterialPtr* material = MaterialUtils::getNametag();
