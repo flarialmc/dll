@@ -103,31 +103,35 @@ void Client::UnregisterActivationHandler()
 }
 
 void Client::createConfig(std::string name) {
-    std::string to = Utils::getRoamingPath() + "\\Flarial\\Config\\" + name;
-    if (!std::filesystem::exists(to)) {
-        std::filesystem::create_directory(to);
-    }
+    std::ofstream file(Utils::getConfigsPath() + "\\" + name + ".json", std::ios::app);
+    if (!file) Logger::error("Failed to create new config file '{}'", name);
+    Client::switchConfig(name, false);
+    Client::SaveSettings();
+    Client::LoadSettings();
 }
 
 void Client::deleteConfig(std::string name) {
-    std::string to = Utils::getRoamingPath() + "\\Flarial\\Config\\" + name;
+    Client::settings.getSettingByName<std::string>("currentConfig")->value = "default";
+    std::string to = Utils::getConfigsPath() + "\\" + name + ".json";
     if (std::filesystem::exists(to)) {
         std::filesystem::remove_all(to);
     }
 }
 
+void Client::switchConfig(std::string name, bool reload) {
+    path = Utils::getConfigsPath() + "\\" + settings.getSettingByName<std::string>("currentConfig")->value + ".json";
+    if (reload) Client::LoadSettings();
+}
 
 void Client::loadAvailableConfigs() {
     availableConfigs.push_back("default");
     const std::string directoryPath = Utils::getConfigsPath();
     if (std::filesystem::exists(directoryPath) && std::filesystem::is_directory(directoryPath)) {
         for (const auto& entry : std::filesystem::directory_iterator(directoryPath)) {
-            if (is_directory(entry.path())) {
+            if (entry.path().string().contains(".json")) {
                 availableConfigs.push_back(entry.path().filename().string());
             }
         }
-    } else {
-        std::cerr << "Directory does not exist: " << directoryPath << std::endl;
     }
 }
 
