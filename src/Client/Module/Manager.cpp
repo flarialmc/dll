@@ -146,7 +146,9 @@ void ModuleManager::initialize() {
     if(!WinrtUtils::checkAboveOrEqual(21, 50)) {
         addModule(new WeatherChanger());
     }
-    addModule(new NickModule());
+    if(!WinrtUtils::checkAboveOrEqual(21, 80)) {
+        addModule(new NickModule());
+    }
     addModule(new FreeLook());
 
     addModule(new SpeedDisplay());
