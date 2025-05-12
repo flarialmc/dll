@@ -179,7 +179,10 @@ void ModuleManager::initialize() {
     addModule<GuiScale>();
     addModule<TabList>();
     addModule<WeatherChanger>();
-    addModule<NickModule>();
+    if (!VersionUtils::checkAboveOrEqual(21, 80))
+    {
+        addModule<NickModule>();
+    }
     addModule<FreeLook>();
 
     addModule<AutoPerspective>();
