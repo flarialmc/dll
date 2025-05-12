@@ -32,7 +32,7 @@ GameModeAttackHook::GameModeAttackHook() : Hook("GameModeAttack", GET_SIG("GameM
 void GameModeAttackHook::enableHook() {
     if(WinrtUtils::checkAboveOrEqual(21, 50)) {
         static auto addr = GET_SIG_ADDRESS("GameMode::attack");
-        this->manualHook((void *) addr, (void *) callback, (void **) &funcOriginal);
+        this->manualHook((void *) addr, (void *) callback1_21_50, (void **) &funcOriginal);
     } else {
         static auto base = GET_SIG_ADDRESS("GameMode::vtable");
         int offset = *reinterpret_cast<int *>(base + 3);
