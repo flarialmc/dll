@@ -21,6 +21,8 @@ void OffsetInit::init2180() {
     ADD_OFFSET("Player::playerName", 0xC08);
     ADD_OFFSET("Player::playerInventory", 0x5C8);
 
+    ADD_OFFSET("Attribute::Health", 6);
+
     ADD_OFFSET("Level::hitResult", 0x250);
     ADD_OFFSET("Level::getPlayerMap", 0x960);
 }
