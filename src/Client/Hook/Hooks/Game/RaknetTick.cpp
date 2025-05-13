@@ -9,9 +9,11 @@ std::string RaknetTickHook::towriteip = "";
 void RaknetTickHook::callback(RaknetConnector *raknet) {
     if (getAveragePingOriginal == nullptr) {
         uintptr_t getAveragePingAddr = Memory::GetAddressByIndex(raknet->peer->vTable,
-                                                                 GET_OFFSET("RakPeer::GetAveragePing"));
-        Memory::hookFunc((void *) getAveragePingAddr, (void *) getAveragePingCallback,
-                         (void **) &getAveragePingOriginal, "RakPeer::GetAveragePing");
+
+
+        GET_OFFSET("RakPeer::GetAveragePing"));
+
+
     }
     raknetTickOriginal(raknet);
     if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
@@ -46,4 +48,6 @@ __int64 RaknetTickHook::getAveragePingCallback(RakPeer *_this, void *guid) {
 
 void RaknetTickHook::enableHook() {
     this->autoHook((void *) callback, (void **) &raknetTickOriginal);
+    this->manualHook(reinterpret_cast<void*>(GET_SIG_ADDRESS("RakPeer::GetAveragePing")), (void *) getAveragePingCallback, (void **) &getAveragePingOriginal);
+
 }

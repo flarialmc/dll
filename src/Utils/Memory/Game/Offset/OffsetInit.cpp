@@ -11,7 +11,6 @@ void OffsetInit::init2180() {
     ADD_OFFSET("ClientInstance::guiData", 0x5B8);
     ADD_OFFSET("ClientInstance::getFovX", 0x740);
     ADD_OFFSET("ClientInstance::getFovY", 0x754);
-
     ADD_OFFSET("RaknetConnector::getPeer", 0x48);
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x3E8);
 

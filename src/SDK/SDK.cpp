@@ -51,6 +51,7 @@ int SDK::getServerPing() {
     auto player = SDK::clientInstance->getLocalPlayer();
     auto raknet = SDK::clientInstance->getRakNetConnector();
 
+
     if (!player || !raknet) return -1;
     return raknet->JoinedIp.empty() ? 0 : static_cast<int>(SDK::serverPing);
 }
