@@ -151,7 +151,6 @@ public:
             auto centerScaled = Vec2 { scaledSize.x / 2, scaledSize.y / 2 };
             auto recalculatedPos = Vec2<float>{ centerScaled.x - (control->sizeConstrains.x / 2), scaledSize.y - control->sizeConstrains.y };
             originalPos = PositionUtils::getScreenScaledPos(recalculatedPos);
-            Logger::debug("OG Pos {}", originalPos.x);
             currentPos = originalPos;
         }
 
