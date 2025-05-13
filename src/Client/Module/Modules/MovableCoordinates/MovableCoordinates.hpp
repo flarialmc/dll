@@ -5,7 +5,7 @@
 class MovableCoordinates : public Module {
 private:
     static inline std::string layerName = "player_position";
-    Vec2<float> currentPos{};
+    Vec2<float> currentPos{-120.0f, -120.0f};;
     bool enabled = false;
     static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
     Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
@@ -19,7 +19,6 @@ public:
     };
 
     void onEnable() override {
-        originalPos = Vec2<float>{0, 0};
         restored = false;
         Listen(this, SetupAndRenderEvent, &MovableCoordinates::onSetupAndRender)
         Listen(this, RenderEvent, &MovableCoordinates::onRender)
@@ -77,16 +76,19 @@ public:
             if (ClickGUI::editmenu)
                 FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 27);
 
-            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 27, width, height);
+            if (currentPos.x != -120.0f)
+            {
+                Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 27, width, height);
 
 
-            currentPos.x = vec2.x;
-            currentPos.y = vec2.y;
+                currentPos.x = vec2.x;
+                currentPos.y = vec2.y;
 
-            Vec2<float> percentages = Constraints::CalculatePercentage(currentPos.x, currentPos.y, width, height);
+                Vec2<float> percentages = Constraints::CalculatePercentage(currentPos.x, currentPos.y, width, height);
 
-            this->settings.setValue("percentageX", percentages.x);
-            this->settings.setValue("percentageY", percentages.y);
+                this->settings.setValue("percentageX", percentages.x);
+                this->settings.setValue("percentageY", percentages.y);
+            }
 
             if (ClickGUI::editmenu) {
                 FlarialGUI::UnsetWindowRect();

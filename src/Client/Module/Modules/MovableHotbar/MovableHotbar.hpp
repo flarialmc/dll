@@ -5,7 +5,7 @@
 class MovableHotbar : public Module {
 private:
     static inline std::string layerName = "centered_gui_elements_at_bottom_middle";
-    Vec2<float> currentPos{};
+    Vec2<float> currentPos{-120.0f, -120.0f};;
     bool enabled = false;
     static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
     Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
@@ -19,7 +19,6 @@ public:
     };
 
     void onEnable() override {
-        originalPos = Vec2<float>{0, 0};
         restored = false;
         Listen(this, SetupAndRenderEvent, &MovableHotbar::onSetupAndRender)
         Listen(this, RenderEvent, &MovableHotbar::onRender)
@@ -79,15 +78,16 @@ public:
 
             Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 28, width, height);
 
+            if (currentPos.x != -120.0f)
+            {
+                currentPos.x = vec2.x;
+                currentPos.y = vec2.y;
 
-            currentPos.x = vec2.x;
-            currentPos.y = vec2.y;
+                Vec2<float> percentages = Constraints::CalculatePercentage(currentPos.x, currentPos.y, width, height);
 
-            Vec2<float> percentages = Constraints::CalculatePercentage(currentPos.x, currentPos.y, width, height);
-
-            this->settings.setValue("percentageX", percentages.x);
-            this->settings.setValue("percentageY", percentages.y);
-
+                this->settings.setValue("percentageX", percentages.x);
+                this->settings.setValue("percentageY", percentages.y);
+            }
             if (ClickGUI::editmenu) {
                 FlarialGUI::UnsetWindowRect();
             }
@@ -151,11 +151,13 @@ public:
             auto centerScaled = Vec2 { scaledSize.x / 2, scaledSize.y / 2 };
             auto recalculatedPos = Vec2<float>{ centerScaled.x - (control->sizeConstrains.x / 2), scaledSize.y - control->sizeConstrains.y };
             originalPos = PositionUtils::getScreenScaledPos(recalculatedPos);
+            Logger::debug("OG Pos {}", originalPos.x);
             currentPos = originalPos;
         }
 
         Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
         Vec2<float> scaledOriginalPos = PositionUtils::getScaledPos(originalPos);
+
 
         control->parentRelativePosition = enabledState ? scaledPos : scaledOriginalPos;
         lastAppliedPos = enabledState ? currentPos : originalPos;

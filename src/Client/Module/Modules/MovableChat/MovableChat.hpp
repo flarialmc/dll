@@ -6,7 +6,7 @@
 class MovableChat : public Module {
 private:
     static inline std::string layerName = "chat_panel";
-    Vec2<float> currentPos{};
+    Vec2<float> currentPos{-120.0f, -120.0f};;
     bool enabled = false;
     static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
     Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
@@ -19,7 +19,6 @@ public:
     };
 
     void onEnable() override {
-        originalPos = Vec2<float>{0, 0};
         restored = false;
         Listen(this, SetupAndRenderEvent, &MovableChat::onSetupAndRender)
         Listen(this, RenderEvent, &MovableChat::onRender)
@@ -123,15 +122,16 @@ public:
 
             Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 26, width, height);
 
+            if (currentPos.x != -120.0f)
+            {
+                currentPos.x = vec2.x;
+                currentPos.y = vec2.y;
 
+                Vec2<float> percentages = Constraints::CalculatePercentage(currentPos.x, currentPos.y, width, height);
 
-            currentPos.x = vec2.x;
-            currentPos.y = vec2.y;
-
-            Vec2<float> percentages = Constraints::CalculatePercentage(currentPos.x, currentPos.y, width, height);
-
-            this->settings.setValue("percentageX", percentages.x);
-            this->settings.setValue("percentageY", percentages.y);
+                this->settings.setValue("percentageX", percentages.x);
+                this->settings.setValue("percentageY", percentages.y);
+            }
 
             if (ClickGUI::editmenu) {
                 FlarialGUI::UnsetWindowRect();
