@@ -521,20 +521,16 @@ public:
 
         if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key) && event.getAction() == ActionType::Pressed) {
 
-#if !defined(__DEBUG__)
             if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen")
                 this->active = false;
             else {
-#endif
                 if (!editmenu) {
                     if (!Client::settings.getSettingByName<bool>("nochaticon")->value) Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
                     else Deafen(this, PacketEvent, &ClickGUI::onPacketReceive);
                     ModuleManager::cguiRefresh = true;
                     keybindActions[0]({});
                 }
-#if !defined(__DEBUG__)
             }
-#endif
 
             if (this->active) {
                 accumilatedPos = 0;
@@ -544,6 +540,7 @@ public:
                 curr = "modules";
             }
             else {
+                SDK::clientInstance->grabMouse();
                 FlarialGUI::ResetShit();
                 ModuleManager::SaveModulesConfig();
                 Client::SaveSettings();
