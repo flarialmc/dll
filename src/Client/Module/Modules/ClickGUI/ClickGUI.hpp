@@ -120,7 +120,7 @@ public:
         auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
         std::string message = pkt->message;
         if (message == " ") event.cancel(); //remove onix promotion on zeqa
-        if (!Client::settings.getSettingByName<bool>("nochaticon")->value) return;
+        if (Client::settings.getSettingByName<bool>("nochaticon")->value) return;
         if (!message.empty() && !containsAny(String::removeNonAlphanumeric(String::removeColorCodes(message)))) return;
 
         std::pair<std::string, size_t> name = findFirstOf(message, APIUtils::onlineUsers);
