@@ -148,7 +148,8 @@
 #define IDR_SPOTIFY_PNG         249
 #define IDR_MUMBLE_PNG          250
 #define IDR_ORANGE_LOGO_PNG     251
-
+#define IDR_LEWIS_PNG           252
+#define IDR_LEWIS_MP3           253
 
 // MAKE SURE YOU ALWAYS UPDATE THIS!
-#define MAX_IMAGE_ID IDR_ORANGE_LOGO_PNG
+#define MAX_IMAGE_ID IDR_LEWIS_MP3
