@@ -57,7 +57,7 @@ public:
                 // HUB
                 if (fullgamemodename == "HUB")
                 {
-                    fullgamemodename = "Hub";
+                    fullgamemodename = "The Hub";
                 }
                 // REPLAYCINEMA
                 if (fullgamemodename == "REPLAY")
@@ -123,22 +123,30 @@ public:
                 {
                     fullgamemodename = "Parkour world";
                 }
-                // JUSTBUILD
+                // BUILDBATTLE
+                else if (fullgamemodename == "HUB-BUILD")
+                {
+                    fullgamemodename = "Build Battle Hub";
+                }
                 else if (fullgamemodename == "BUILD")
                 {
-                    fullgamemodename = "Just Build Solo";
+                    fullgamemodename = "Build Battle Solo";
                 }
                 else if (fullgamemodename == "BUILD-DUOS")
                 {
-                    fullgamemodename = "Just Build Duos";
+                    fullgamemodename = "Build Battle Duos";
                 }
                 else if (fullgamemodename == "BUILDX")
                 {
-                    fullgamemodename = "Just Build Double Build Time Solo";
+                    fullgamemodename = "Build Battle Solo Extended";
                 }
                 else if (fullgamemodename == "BUILD-DUOSX")
                 {
-                    fullgamemodename = "Just Build Double Build Time Duos";
+                    fullgamemodename = "Build Battle Duos Extended";
+                }
+                else if (fullgamemodename == "BUILD-SPEED")
+                {
+                    fullgamemodename = "Speed Builders";
                 }
                 // MURDER MYSTERY
                 else if (fullgamemodename == "MURDER")
