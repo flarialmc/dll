@@ -100,6 +100,7 @@
 #include "Modules/MumbleLink/MumbleLink.hpp"
 
 #include "Modules/MinimalViewBobbing/MinimalViewBobbing.hpp"
+#include "Modules/Lewis/Lewis.hpp"
 
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
     for (const auto& pair : moduleMap) {
@@ -240,6 +241,8 @@ void ModuleManager::initialize() {
     addModule<MumbleLink>();
 
     addModule<MinimalViewBobbing>();
+
+    addModule<Lewis>();
 
     addService<GUIKeyListener>();
     if (!VersionUtils::checkAboveOrEqual(21, 60)) {

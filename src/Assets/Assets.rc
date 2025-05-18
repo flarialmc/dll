@@ -158,4 +158,6 @@ IDR_TREEGFX_JPG           JPG "Data\\treegfx.jpg"
 IDR_FREEZEENGINE_PNG      PNG "Data\\freezeengine.png"
 IDR_STONEHUNTER_PNG       PNG "Data\\stonehunter.png"
 IDR_BEAVER_PNG            PNG "Data\\beaver.png"
+IDR_LEWIS_PNG             PNG "Data\\lewis.png"
+IDR_LEWIS_MP3             MP3 "Data\\Audio\\Lewis.mp3"
 
