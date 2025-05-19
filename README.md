@@ -5,7 +5,7 @@ Welcome to **Flarial Client**, the ultimate modded client designed specifically 
 
 ## Installation Options
 
-Flarial Client is available in two forms:
+Flarial Client is available in 2 forms:
 
 ### Flarial Launcher (Recommended)
 - A user-friendly launcher that manages Flarial and other MCBE clients.

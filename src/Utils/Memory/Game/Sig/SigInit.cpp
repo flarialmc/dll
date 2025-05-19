@@ -13,6 +13,7 @@ void SigInit::init2180() {
     ADD_SIG("ItemRenderer::renderGuiItemNew", "40 ? 53 56 57 41 ? 41 ? 41 ? 41 ? 48 8D ? ? ? ? ? ? 48 81 EC ? ? ? ? 48 8B ? ? ? ? ? 48 33 ? 48 89 ? ? ? ? ? 44 89 ? ? 49 8B");
     ADD_SIG("GameMode::attack", "48 89 ? ? ? 48 89 ? ? ? 48 89 ? ? ? 55 41 ? 41 ? 41 ? 41 ? 48 8D ? ? ? ? ? ? 48 81 EC ? ? ? ? 48 8B ? ? ? ? ? 48 33 ? 48 89 ? ? ? ? ? 45 0F ? ? 4C 8B ? 48 8B ? 45 33 ? 44 89");
     ADD_SIG("ItemInHandRenderer::renderItem", "E8 ? ? ? ? 41 0F 11 B6 80 00 00 00");
+    ADD_SIG("Actor::setNametag", "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B F2 48 8B F9 48 8B 89 ? ? ? ? 48 85 C9");
     //ADD_SIG("ResourcePackManager::_composeFullStack_Patch", "");
     //ADD_SIG("ResourcePackManager::_composeFullStack", "");
     //ADD_SIG("GeneralSettingsScreenController::GeneralSettingsScreenController", "");
