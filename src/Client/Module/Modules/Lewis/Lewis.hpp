@@ -36,7 +36,7 @@ class Lewis : public Module {
 
 public:
 
-    Lewis() : Module("Lewis", "Lewis, the one and only...",
+    Lewis() : Module("Lewis", "Lewis, king of Hippos. (Brought to you by the one and only, Oblitqrated)",
         IDR_FPS_PNG, "") {
         Module::setup();
 
