@@ -128,8 +128,9 @@ public:
         static std::vector<std::pair<std::string, std::string>> roleColors = {
             { "Dev", "§b" },
             { "Staff", "§f" },
-            { "Gamer", "§5" },
+            { "Gamer", "§u" },
             { "Booster", "§d" },
+            { "Supporter", "§5" },
             { "Regular", "§4" }
         };
 

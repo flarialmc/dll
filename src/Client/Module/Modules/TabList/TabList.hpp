@@ -232,6 +232,7 @@ public:
                                 {"Staff", IDR_WHITE_LOGO_PNG},
                                 {"Gamer", IDR_GAMER_LOGO_PNG},
                                 {"Booster", IDR_BOOSTER_LOGO_PNG},
+                                {"Supporter", IDR_SUPPORTER_LOGO_PNG},
                                 {"Default", IDR_RED_LOGO_PNG}
                             };
 

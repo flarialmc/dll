@@ -39,6 +39,7 @@ class BaseActorRendererRenderTextHook : public Hook {
                     {"Staff", "white-logo.png"},
                     {"Gamer", "gamer-logo.png"},
                     {"Booster", "booster-logo.png"},
+                    {"Supporter", "supporter-logo.png"},
                     {"Regular", "red-logo.png"}
         };
         for (const auto& [role, logo] : roleLogos) {
