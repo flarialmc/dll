@@ -80,7 +80,7 @@
 #define IDR_RED_LOGO_PNG                175
 #define IDR_WHITE_LOGO_PNG              176
 #define IDR_YELLOW_LOGO_PNG             177
-#define IDR_WAYPOINT_PNG                178
+#define IDR_WAYPOINT_PNG               178
 #define IDR_SUPPORTER_LOGO_PNG		179
 
 // Next default values for new objects
