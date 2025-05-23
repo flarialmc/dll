@@ -154,109 +154,28 @@ public:
     void settingsRender(float settingsOffset) override {
         /* Border Start */
 
-        float xPos = Constraints::PercentageConstraint(0.019, "left");
-        float yPos = Constraints::PercentageConstraint(0.10, "top");
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
-        /* Speed Start */
 
-        FlarialGUI::FlarialTextWithFont(xPos, yPos, L"Speed", textWidth * 6.9f,
-                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+            Constraints::RelativeConstraint(1.0, "width"),
+            Constraints::RelativeConstraint(0.88f, "height"));
 
-        float speed = FlarialGUI::Slider(0, xPos + FlarialGUI::SettingsTextWidth("Speed "),
-                                         yPos,
-                                         this->settings.getSettingByName<float>("speed")->value, 15.f, 3.f);
+        this->addHeader("Settings");
+        this->addSlider("Speed", "", this->settings.getSettingByName<float>("speed")->value, 15.f, 3.f, false);
+        this->addSlider("X Multiplier", "", this->settings.getSettingByName<float>("xmul")->value, 30.f, 7.f, false);
+        this->addSlider("Y Multiplier", "", this->settings.getSettingByName<float>("ymul")->value, 30.f, 7.f, false);
+        this->addSlider("Z Multiplier", "", this->settings.getSettingByName<float>("zmul")->value, 30.f, 7.f, false);
+        this->addToggle("Preserve Rotations", "", settings.getSettingByName<bool>("preserverots")->value);
+        this->addToggle("Smooth Rotations", "", settings.getSettingByName<bool>("smoothrots")->value);
 
-        this->settings.getSettingByName<float>("speed")->value = speed;
+        FlarialGUI::UnsetScrollView();
 
-        /* Speed End */
-
-        yPos += Constraints::SpacingConstraint(0.35, textWidth);
-
-        /* X Multiplier Start */
-
-        FlarialGUI::FlarialTextWithFont(xPos, yPos + 0.05f, L"X Multiplier", textWidth * 6.9f,
-                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        float xmul = FlarialGUI::Slider(1, xPos + FlarialGUI::SettingsTextWidth("X Multiplier "),
-                                        yPos,
-                                        this->settings.getSettingByName<float>("xmul")->value, 30.f, 7.f);
-
-        this->settings.getSettingByName<float>("xmul")->value = xmul;
-
-        /* X Multiplier End */
-
-        yPos += Constraints::SpacingConstraint(0.35, textWidth);
-
-        /* Y Multiplier Start */
-
-        FlarialGUI::FlarialTextWithFont(xPos, yPos + 0.1f, L"Y Multiplier", textWidth * 6.9f,
-                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        float ymul = FlarialGUI::Slider(1, xPos + FlarialGUI::SettingsTextWidth("Y Multiplier "),
-                                        yPos,
-                                        this->settings.getSettingByName<float>("ymul")->value, 30.f, 7.f);
-
-        this->settings.getSettingByName<float>("ymul")->value = ymul;
-
-        /* Y Multiplier End */
-
-        yPos += Constraints::SpacingConstraint(0.35, textWidth);
-
-        /* Z Multiplier Start */
-
-        FlarialGUI::FlarialTextWithFont(xPos, yPos + 0.15f, L"Z Multiplier", textWidth * 6.9f,
-                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        float zmul = FlarialGUI::Slider(2, xPos + FlarialGUI::SettingsTextWidth("Z Multiplier "),
-                                        yPos,
-                                        this->settings.getSettingByName<float>("zmul")->value, 30.f, 7.f);
-
-        this->settings.getSettingByName<float>("zmul")->value = zmul;
-
-        /* Z Multiplier End */
-
-        yPos += Constraints::SpacingConstraint(0.35, textWidth);
-
-        /* Preserve Rotations Start */
-
-        FlarialGUI::FlarialTextWithFont(xPos + Constraints::SpacingConstraint(0.60, textWidth), yPos,
-                                        L"Preserve Rotations", textWidth * 6.9f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        if (FlarialGUI::Toggle(0, xPos, yPos, this->settings.getSettingByName<bool>(
-                "preserverots")->value))
-            this->settings.getSettingByName<bool>("preserverots")->value = !this->settings.getSettingByName<bool>(
-                    "preserverots")->value;
-
-        /* Preserve Rotations End */
-
-        yPos += Constraints::SpacingConstraint(0.35, textWidth);
-
-        /* Smooth Rotations Start */
-
-        FlarialGUI::FlarialTextWithFont(xPos + Constraints::SpacingConstraint(0.60, textWidth), yPos,
-                                        L"Smooth Rotations", textWidth * 6.9f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        if (FlarialGUI::Toggle(1, xPos, yPos, this->settings.getSettingByName<bool>(
-                "smoothrots")->value))
-            this->settings.getSettingByName<bool>("smoothrots")->value = !this->settings.getSettingByName<bool>(
-                    "smoothrots")->value;
-
-        /* Smooth Rotations End */
+        this->resetPadding();
     }
 
     static void ItemRenderer_render(ItemRenderer* _this, BaseActorRenderContext* renderCtx, ActorRenderData* renderData) {
@@ -274,7 +193,7 @@ public:
 
     static void applyTransformation(glm::mat4x4& mat) {
         static auto mod = reinterpret_cast<ItemPhysics*>(ModuleManager::getModule("Item Physics").get());
-        if(!mod) return;
+        if (!mod) return;
         const auto renderData = mod->renderData;
 
         auto curr = reinterpret_cast<ItemActor*>(renderData->actor);
@@ -293,7 +212,7 @@ public:
             const auto vec = Vec3<float>(dist2(gen), dist2(gen), dist2(gen));
             const auto sign = Vec3(dist(gen) * 2 - 1, dist(gen) * 2 - 1, dist(gen) * 2 - 1);
 
-            auto def = std::tuple{ isOnGround ? 0.f : height, vec, sign};
+            auto def = std::tuple{ isOnGround ? 0.f : height, vec, sign };
             mod->actorData.emplace(curr, def);
         }
 
@@ -391,29 +310,21 @@ public:
             }
         }
 
-        if(isOnGround) {
-            if(VersionUtils::checkAboveOrEqual(21, 40)) {
-                if (curr->getStack().block == nullptr) {
-                    pos.y -= 0.12;
-                } else {
-                    pos.y -= 0.3;
-                }
-            } else {
-                if (curr->getStack().block == nullptr) {
-                    pos.y -= 0.12;
-                }
-            }
+        if (isOnGround && yMod == 0.f) {
+            // Ensure item lands on the block surface without additional offset
+            pos.y = renderData->position.y; // Align with the block's surface
         }
 
-        mat = translate(mat, {pos.x, pos.y, pos.z});
+        mat = translate(mat, { pos.x, pos.y, pos.z });
 
-        if(VersionUtils::checkAboveOrEqual(21, 40)) {
-            mat = rotate(mat, glm::radians(renderVec.x), {1.f, 0.f, 0.f});
-            mat = rotate(mat, glm::radians(renderVec.y), {0.f, 1.f, 0.f});
-            mat = rotate(mat, glm::radians(renderVec.z), {0.f, 0.f, 1.f});
-        } else {
+        if (VersionUtils::checkAboveOrEqual(21, 40)) {
+            mat = rotate(mat, glm::radians(renderVec.x), { 1.f, 0.f, 0.f });
+            mat = rotate(mat, glm::radians(renderVec.y), { 0.f, 1.f, 0.f });
+            mat = rotate(mat, glm::radians(renderVec.z), { 0.f, 0.f, 1.f });
+        }
+        else {
             static auto rotateSig = GET_SIG_ADDRESS("glm_rotate");
-            using glm_rotate_t = void (__fastcall *)(glm::mat4x4 &, float, float, float, float);
+            using glm_rotate_t = void(__fastcall*)(glm::mat4x4&, float, float, float, float);
             static auto glm_rotate = reinterpret_cast<glm_rotate_t>(rotateSig);
 
             glm_rotate(mat, renderVec.x, 1.f, 0.f, 0.f);

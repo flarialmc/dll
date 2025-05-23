@@ -62,6 +62,30 @@ public:
 
         updateSetings();
 
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
+
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
+
+
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+            Constraints::RelativeConstraint(1.0, "width"),
+            Constraints::RelativeConstraint(0.88f, "height"));
+
+        this->addHeader("Settings");
+        this->addToggle("Chunk Borders", "", settings.getSettingByName<bool>("chunkborders")->value);
+        this->addToggle("Render Sky", "", settings.getSettingByName<bool>("sky")->value);
+        this->addToggle("Render Entities", "", settings.getSettingByName<bool>("entity")->value);
+        this->addToggle("Render Block Entities", "", settings.getSettingByName<bool>("blockentity")->value);
+        this->addToggle("Render Particles", "", settings.getSettingByName<bool>("particles")->value);
+        this->addToggle("Render Weather", "", settings.getSettingByName<bool>("weather")->value);
+
+        FlarialGUI::UnsetScrollView();
+
+        this->resetPadding();
+
+        /*
         const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
         const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
@@ -145,6 +169,8 @@ public:
                     "weather")->value;
 
         FlarialGUI::UnsetScrollView();
+        
+        */
     }
 
     void onSetupAndRender(SetupAndRenderEvent &event) {

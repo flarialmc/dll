@@ -39,10 +39,14 @@ public:
         if (settings.getSettingByName<std::string>("colorMain") == nullptr)
             settings.addSetting("colorMain", (std::string) "FFFFFF");
 
+        if (settings.getSettingByName<float>("colorMain_opacity") == nullptr) settings.addSetting("colorMain_opacity", 1.0f);
+
         if (settings.getSettingByName<bool>("colorMain_rgb") == nullptr) settings.addSetting("colorMain_rgb", false);
 
         if (settings.getSettingByName<std::string>("colorLow") == nullptr)
             settings.addSetting("colorLow", (std::string) "FF0000");
+
+        if (settings.getSettingByName<float>("colorLow_opacity") == nullptr) settings.addSetting("colorLow_opacity", 1.0f);
 
         if (settings.getSettingByName<bool>("colorLow_rgb") == nullptr) settings.addSetting("colorLow_rgb", false);
 
@@ -51,73 +55,36 @@ public:
     }
 
     void settingsRender(float settingsOffset) override {
-
         /* Border Start */
 
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"UI Scale", textWidth * 6.9f,
-                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        float percent = FlarialGUI::Slider(3, toggleX + FlarialGUI::SettingsTextWidth("UI Scale "),
-                                           toggleY,
-                                           this->settings.getSettingByName<float>("uiscale")->value, 3.0f);
-
-        this->settings.getSettingByName<float>("uiscale")->value = percent;
-
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Text size ", textWidth * 3.0f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::RelativeConstraint(0.12, "height", true),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-
-        float textSize = FlarialGUI::Slider(1, toggleX + FlarialGUI::SettingsTextWidth("Text size "),
-                                           toggleY, this->settings.getSettingByName<float>("textSize")->value, 0.25f,
-                                           0.f, false);
-
-        this->settings.getSettingByName<float>("textSize")->value = textSize;
-
-        /* Color Pickers Start*/
-
-        toggleX = Constraints::PercentageConstraint(0.55, "left");
-        toggleY = Constraints::PercentageConstraint(0.10, "top");
-
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Main color", textWidth * 6.9f,
-                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
 
-        FlarialGUI::ColorPicker(0, toggleX + FlarialGUI::SettingsTextWidth("Main color "),
-                                toggleY - Constraints::SpacingConstraint(0.017, textWidth),
-                                settings.getSettingByName<std::string>("colorMain")->value,
-                                settings.getSettingByName<bool>("colorMain_rgb")->value);
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+            Constraints::RelativeConstraint(1.0, "width"),
+            Constraints::RelativeConstraint(0.88f, "height"));
 
-        toggleX = Constraints::PercentageConstraint(0.55, "left");
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        this->addHeader("Visual");
+        this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 3.f, 0.f, true);
+        this->addSlider("Text Size", "", this->settings.getSettingByName<float>("textSize")->value, 0.25f, 0.f, false);
 
-        FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Effect about to expire", textWidth * 6.9f,
-                                        textHeight, DWRITE_TEXT_ALIGNMENT_LEADING,
-                                        Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
-        FlarialGUI::ColorPicker(2, toggleX + FlarialGUI::SettingsTextWidth("Effect about to expire "), toggleY * 0.99f,
-                                settings.getSettingByName<std::string>("colorLow")->value,
-                                settings.getSettingByName<bool>("colorLow_rgb")->value);
+        this->extraPadding();
 
-        FlarialGUI::ColorPickerWindow(0, settings.getSettingByName<std::string>("colorMain")->value,
-                                      settings.getSettingByName<float>("bgOpacity")->value,
-                                      settings.getSettingByName<bool>("colorMain_rgb")->value);
-        FlarialGUI::ColorPickerWindow(2, settings.getSettingByName<std::string>("colorLow")->value,
-                                      settings.getSettingByName<float>("borderOpacity")->value,
-                                      settings.getSettingByName<bool>("colorLow_rgb")->value);
-        /* Color Pickers End */
+        this->addHeader("Colors");
+        this->addColorPicker("Main Color", "", settings.getSettingByName<std::string>("colorMain")->value,
+            settings.getSettingByName<float>("colorMain_opacity")->value,
+            settings.getSettingByName<bool>("colorMain_rgb")->value);
+        this->addColorPicker("Effect About to Expire", "", settings.getSettingByName<std::string>("colorLow")->value,
+            settings.getSettingByName<float>("colorLow_opacity")->value,
+            settings.getSettingByName<bool>("colorLow_rgb")->value);
+
+        FlarialGUI::UnsetScrollView();
+
+        this->resetPadding();
     }
 
     void renderText() {
@@ -130,6 +97,9 @@ public:
 
         auto lowColor = rgb1 ? rgbColor : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("colorLow")->value);
         auto mainColor = rgb2 ? rgbColor : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("colorMain")->value);
+
+        lowColor.a = settings.getSettingByName<float>("colorLow_opacity")->value;
+        mainColor.a = settings.getSettingByName<float>("colorMain_opacity")->value;
 
         int warning_seconds = 5;
 

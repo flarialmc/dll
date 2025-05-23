@@ -47,6 +47,7 @@
 #include "Modules/Misc/CentreCursor/CentreCursorListener.hpp"
 #include "Modules/Misc/Uninject/UninjectListener.hpp"
 #include "Modules/CPSLimiter/CPSLimiter.hpp"
+#include "Modules/Coordinates/Coordinates.hpp"
 #include "Modules/BlockBreakIndicator/BlockBreakIndicator.hpp"
 //#include "Modules/CompactChat/CompactChat.hpp"
 #include "Modules/FOVChanger/FOVChanger.hpp"
@@ -170,6 +171,7 @@ void ModuleManager::initialize() {
     addModule<HurtColor>();
     addModule<ThirdPerson>();
     addModule<JavaDynamicFOV>();
+    addModule<Coordinates>();
 
     addModule<SnapLook>();
     addModule<FogColor>();

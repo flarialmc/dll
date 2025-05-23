@@ -31,34 +31,26 @@ public:
     }
 
     void settingsRender(float settingsOffset) override {
+        /* Border Start */
 
-        float toggleX = Constraints::PercentageConstraint(0.019, "left");
-        float toggleY = Constraints::PercentageConstraint(0.10, "top");
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
-        const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-        const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        L"Try to exclude team", textWidth * 6.9f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
 
-        if (FlarialGUI::Toggle(0, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "tryToExcludeTeam")->value))
-            this->settings.getSettingByName<bool>("tryToExcludeTeam")->value = !this->settings.getSettingByName<bool>(
-                    "tryToExcludeTeam")->value;
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+            Constraints::RelativeConstraint(1.0, "width"),
+            Constraints::RelativeConstraint(0.88f, "height"));
 
-        toggleY += Constraints::SpacingConstraint(0.35, textWidth);
+        this->addHeader("Settings");
+        this->addToggle("Try to exclude team", "", settings.getSettingByName<bool>("tryToExcludeTeam")->value);
+        this->addToggle("Only with armor", "", settings.getSettingByName<bool>("onlyWithArmor")->value);
 
-        FlarialGUI::FlarialTextWithFont(toggleX + Constraints::SpacingConstraint(0.60, textWidth), toggleY,
-                                        L"Only with armor", textWidth * 6.9f, textHeight,
-                                        DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, textWidth),
-                                        DWRITE_FONT_WEIGHT_NORMAL);
+        FlarialGUI::UnsetScrollView();
 
-        if (FlarialGUI::Toggle(1, toggleX, toggleY, this->settings.getSettingByName<bool>(
-                "onlyWithArmor")->value))
-            this->settings.getSettingByName<bool>("onlyWithArmor")->value = !this->settings.getSettingByName<bool>(
-                    "onlyWithArmor")->value;
+        this->resetPadding();
     }
 
     void onPacketReceive(PacketEvent &event) {
