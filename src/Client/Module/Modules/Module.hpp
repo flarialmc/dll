@@ -110,6 +110,7 @@ public:
     [[nodiscard]] bool isAdditionalKeybind(const std::array<bool, 256>& keys, const std::string& bind) const;
     bool isKeyPartOfKeybind(int keyCode, const int keybindCount = 0);
     static bool isKeyPartOfAdditionalKeybind(int keyCode, const std::string& bind);
+    virtual void normalRenderCore(int index, std::string& text);
     virtual void normalRender(int index, std::string& value);
     void checkForRightClickAndOpenSettings(float x, float y, float width, float height);
     bool isScripting() const { return isScriptingModule; }

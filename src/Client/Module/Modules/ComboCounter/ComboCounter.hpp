@@ -28,7 +28,8 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override { Module::defaultConfig();
+    void defaultConfig() override { 
+        Module::defaultConfig();
         if (settings.getSettingByName<std::string>("text") == nullptr)
             settings.addSetting("text", (std::string) "Combo: {value}");
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);

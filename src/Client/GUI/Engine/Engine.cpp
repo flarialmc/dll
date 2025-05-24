@@ -672,8 +672,6 @@ void FlarialGUI::LoadAllImageToCache() {
 
 }
 
-
-
 bool replace(std::string& str, const std::string& from, const std::string& to) {
     size_t start_pos = str.find(from);
     if(start_pos == std::string::npos)
@@ -701,8 +699,6 @@ DWRITE_FONT_WEIGHT FlarialGUI::GetFontWeightFromString(const std::string& weight
         return DWRITE_FONT_WEIGHT_NORMAL;
     }
 }
-
-
 
 struct PairHash {
     std::size_t operator()(const std::pair<std::string, DWRITE_FONT_WEIGHT>& p) const {
@@ -753,6 +749,47 @@ bool hasEnding (std::string const &fullString, std::string const &ending) {
     }
 }
 
+ImVec2 FlarialGUI::getFlarialTextSize(const wchar_t* text, const float width, const float height,
+    const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
+    const DWRITE_FONT_WEIGHT weight, bool moduleFont, bool troll) {
+
+    std::string font = Client::settings.getSettingByName<std::string>(moduleFont ? "mod_fontname" : "fontname")->value;
+
+    const std::vector<int> fontSizeBuckets = { 16, 32, 64, 128, 256 };
+    float guiScale = Client::settings.getSettingByName<float>(moduleFont ? "modules_font_scale" : "gui_font_scale")->value;
+    float targetFontSize = (fontSize * guiScale) * 0.18f;
+    int baseFontSize = fontSizeBuckets.back();
+
+    float scaleFactor = targetFontSize / static_cast<float>(baseFontSize);
+
+    FontKey fontK = { font, weight, baseFontSize };
+
+    if (fontK.name.contains("minecraft")) fontK.name = "164";
+    if (!FontMap[fontK] && fontK.weight == DWRITE_FONT_WEIGHT_NORMAL) fontK.weight = DWRITE_FONT_WEIGHT_MEDIUM;
+    if (!FontMap[fontK] || font == "Space Grotesk") { fontK.name = "162"; font = "162"; }
+    if (fontK.name == "162" && weight == DWRITE_FONT_WEIGHT_BOLD) fontK.name = "163";
+
+    if (!FontMap[fontK] && !FontsNotFound[fontK]) {
+
+        LoadFontLater = fontK;
+        DoLoadFontLater = true;
+    }
+
+    if (!FontMap[fontK]) return ImVec2{ 0, 0 };
+    if (FontMap[fontK]->Scale <= 0.0f || !FontMap[fontK]->IsLoaded()) return ImVec2{ 0, 0 };
+
+    ImGui::PushFont(FontMap[fontK]);
+    ImGui::SetWindowFontScale(scaleFactor);
+
+    std::string stringText = WideToNarrow(text);
+    ImVec2 size = ImGui::CalcTextSize(stringText.c_str());
+
+    ImGui::SetWindowFontScale(1.0);
+    ImGui::PopFont();
+
+    return size;
+}
+
 std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
                                      const DWRITE_FONT_WEIGHT weight, bool moduleFont, bool troll) {
@@ -766,6 +803,8 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
 
     return FlarialTextWithFont(x, y, text, width, height, alignment, fontSize, weight, color, moduleFont);
 }
+
+
 
 std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *text, const float width, const float height,
                                      const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,

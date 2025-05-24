@@ -47,7 +47,6 @@
 #include "Modules/Misc/CentreCursor/CentreCursorListener.hpp"
 #include "Modules/Misc/Uninject/UninjectListener.hpp"
 #include "Modules/CPSLimiter/CPSLimiter.hpp"
-#include "Modules/Coordinates/Coordinates.hpp"
 #include "Modules/BlockBreakIndicator/BlockBreakIndicator.hpp"
 //#include "Modules/CompactChat/CompactChat.hpp"
 #include "Modules/FOVChanger/FOVChanger.hpp"
@@ -102,6 +101,7 @@
 
 #include "Modules/MinimalViewBobbing/MinimalViewBobbing.hpp"
 #include "Modules/Lewis/Lewis.hpp"
+#include "Modules/Coords/Coords.hpp"
 
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
     for (const auto& pair : moduleMap) {
@@ -171,7 +171,6 @@ void ModuleManager::initialize() {
     addModule<HurtColor>();
     addModule<ThirdPerson>();
     addModule<JavaDynamicFOV>();
-    addModule<Coordinates>();
 
     addModule<SnapLook>();
     addModule<FogColor>();
@@ -242,6 +241,7 @@ void ModuleManager::initialize() {
     addModule<MinimalViewBobbing>();
 
     addModule<Lewis>();
+    addModule<Coords>();
 
     addService<GUIKeyListener>();
     if (!VersionUtils::checkAboveOrEqual(21, 60)) {

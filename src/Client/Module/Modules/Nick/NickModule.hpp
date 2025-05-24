@@ -12,22 +12,22 @@ public:
     static inline std::string backupOri;
 
     NickModule() : Module("Nick",
-                          "Hides your username and replace it with something else.\nWorks everywhere (chat, pause, third person, etc)\nOther people will not be able to see your nick.",
-                          IDR_ICOGNITO_PNG, "") {
+        "Hides your username and replace it with something else.\nWorks everywhere (chat, pause, third person, etc)\nOther people will not be able to see your nick.",
+        IDR_ICOGNITO_PNG, "") {
         Module::setup();
     };
 
     void onEnable() override {
         Listen(this, DrawTextEvent, &NickModule::onDrawText)
-        Listen(this, RaknetTickEvent, &NickModule::onRaknetTick)
-        Listen(this, TickEvent, &NickModule::onTick)
-        Module::onEnable();
+            Listen(this, RaknetTickEvent, &NickModule::onRaknetTick)
+            Listen(this, TickEvent, &NickModule::onTick)
+            Module::onEnable();
     }
 
     void onDisable() override {
         Deafen(this, DrawTextEvent, &NickModule::onDrawText)
-        Deafen(this, TickEvent, &NickModule::onTick)
-        std::string val = original;
+            Deafen(this, TickEvent, &NickModule::onTick)
+            std::string val = original;
         std::string val2;
 
         if (SDK::clientInstance)
@@ -48,11 +48,55 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override { Module::defaultConfig();
+    std::map<std::string, std::string> textColors = {
+        {"White", "§f"},
+        {"Black", "§0"},
+        {"Netherite", "§j"},
+        {"Gray", "§7"},
+        {"Iron", "§i"},
+        {"Quartz", "§h"},
+        {"Dark Gray", "§8"},
+        {"Red", "§c"},
+        {"Dark Red", "§4"},
+        {"Copper", "§n"},
+        {"Redstone", "§m"},
+        {"Gold", "§6"},
+        {"Material Gold", "§p"},
+        {"Yellow", "§e"},
+        {"Minecoin Gold", "§g"},
+        {"Green", "§a"},
+        {"Dark Green", "§2"},
+        {"Emerald", "§q"},
+        {"Diamond", "§s"},
+        {"Aqua", "§b"},
+        {"Dark Aqua", "§3"},
+        {"Blue", "§9"},
+        {"Dark Blue", "§1"},
+        {"Lapis", "§t"},
+        {"Light Purple", "§d"},
+        {"Dark Purple", "§5"},
+        {"Amethyst", "§u"}
+    };
+
+    void defaultConfig() override {
+        Module::defaultConfig();
 
         if (settings.getSettingByName<std::string>("nick") == nullptr)
             settings.addSetting<std::string>("nick", "Flarial User");
 
+        if (settings.getSettingByName<bool>("italic") == nullptr)
+            settings.addSetting<bool>("italic", false);
+
+        if (settings.getSettingByName<bool>("bold") == nullptr)
+            settings.addSetting<bool>("bold", false);
+
+        if (settings.getSettingByName<bool>("obfuscated") == nullptr)
+            settings.addSetting<bool>("obfuscated", false);
+
+        if (settings.getSettingByName<std::string>("textColor") == nullptr)
+            settings.addSetting<std::string>("textColor", "White");
+        else if (settings.getSettingByName<std::string>("textColor")->value == "fafafa")
+            settings.setValue<std::string>("textColor", "White");
     }
 
     void settingsRender(float settingsOffset) override {
@@ -62,34 +106,63 @@ public:
 
         const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
-
         FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
         FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                                  Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(0.88f, "height"));
+            Constraints::RelativeConstraint(1.0, "width"),
+            Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Misc");
         this->addTextBox("Nickname", "", settings.getSettingByName<std::string>("nick")->value);
-        FlarialGUI::UnsetScrollView();
+        this->addToggle("Italic", "", settings.getSettingByName<bool>("italic")->value);
+        this->addToggle("Bold", "", settings.getSettingByName<bool>("bold")->value);
+        this->addToggle("Obfuscated", "", settings.getSettingByName<bool>("obfuscated")->value);
+        this->addDropdown("Text Color", "", std::vector<std::string>{
+            "White",
+                "Black",
+                "Netherite",
+                "Gray",
+                "Iron",
+                "Quartz",
+                "Dark Gray",
+                "Red",
+                "Dark Red",
+                "Copper",
+                "Redstone",
+                "Gold",
+                "Material Gold",
+                "Green",
+                "Dark Green",
+                "Emerald",
+                "Diamond",
+                "Aqua",
+                "Dark Aqua",
+                "Blue",
+                "Dark Blue",
+                "Lapis",
+                "Light Purple",
+                "Dark Purple",
+                "Amethyst"
+        }, settings.getSettingByName<std::string>("textColor")->value);
 
+        FlarialGUI::UnsetScrollView();
         this->resetPadding();
     }
 
-    void onRaknetTick(RaknetTickEvent &event) {
-//        if (module->isEnabled()) {
-//            std::string serverIP = SDK::getServerIP();
-//            if(serverIP.find("cubecraft") != std::string::npos) {
-//                if(!module->restricted) {
-//                    FlarialGUI::Notify("Can't use Nick on " + serverIP); // TODO: move restrictions to API
-//                    module->restricted = true;
-//                }
-//            } else {
-//                module->restricted = false;
-//            }
-//        }
+    void onRaknetTick(RaknetTickEvent& event) {
+        //        if (module->isEnabled()) {
+        //            std::string serverIP = SDK::getServerIP();
+        //            if(serverIP.find("cubecraft") != std::string::npos) {
+        //                if(!module->restricted) {
+        //                    FlarialGUI::Notify("Can't use Nick on " + serverIP); // TODO: move restrictions to API
+        //                    module->restricted = true;
+        //                }
+        //            } else {
+        //                module->restricted = false;
+        //            }
+        //        }
     }
 
-    void onDrawText(DrawTextEvent &event) {
+    void onDrawText(DrawTextEvent& event) {
         if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer())
             return;
 
@@ -97,19 +170,32 @@ public:
             original = SDK::clientInstance->getLocalPlayer()->getPlayerName();
 
         if (this->isEnabled() && !this->restricted) {
-            const std::string &localPlayerName = original;
+            const std::string& localPlayerName = original;
             size_t pos = event.getText()->find(localPlayerName);
+
+            auto it = textColors.find(settings.getSettingByName<std::string>("textColor")->value);
+
+            if (it == textColors.end()) {
+                settings.setValue<std::string>("textColor", "White");
+                it = textColors.find(settings.getSettingByName<std::string>("textColor")->value);
+            }
+
+            std::string prefix = it->second;
+
+            if (settings.getSettingByName<bool>("italic")->value) prefix += "§o";
+            if (settings.getSettingByName<bool>("bold")->value) prefix += "§l";
+            if (settings.getSettingByName<bool>("obfuscated")->value) prefix += "§k";
 
             if (pos != std::string::npos) {
                 std::string faketxt = *event.getText();
                 faketxt.replace(pos, localPlayerName.length(),
-                                "§o" + String::removeColorCodes(this->settings.getSettingByName<std::string>("nick")->value) + "§r");
+                    prefix + String::removeColorCodes(this->settings.getSettingByName<std::string>("nick")->value) + "§r");
                 *event.getText() = faketxt;
             }
         }
     }
 
-    void onTick(TickEvent &event) {
+    void onTick(TickEvent& event) {
         auto player = SDK::clientInstance->getLocalPlayer();
         if (!player) return;
 
@@ -129,10 +215,17 @@ public:
         }
 
         if (enabled && !this->restricted) {
-            std::string val = "§o" + String::removeColorCodes(this->settings.getSettingByName<std::string>("nick")->value) + "§r";
+            std::string prefix = textColors.find(settings.getSettingByName<std::string>("textColor")->value)->second;
+
+            if (settings.getSettingByName<bool>("italic")->value) prefix += "§o";
+            if (settings.getSettingByName<bool>("bold")->value) prefix += "§l";
+            if (settings.getSettingByName<bool>("obfuscated")->value) prefix += "§k";
+
+            std::string val = prefix + String::removeColorCodes(this->settings.getSettingByName<std::string>("nick")->value) + "§r";
             player->setNametag(&val);
             player->getPlayerName() = val;
-        } else {
+        }
+        else {
             if (original2 == this->settings.getSettingByName<std::string>("nick")->value)
                 original2 = backupOri;
 

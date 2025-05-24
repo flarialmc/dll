@@ -325,7 +325,7 @@ namespace FlarialGUI {
 
     void Circle(float x, float y, const D2D1_COLOR_F &color, float radius);
 
-    std::string TextBox(int index, const std::string &text, int limit, float x, float y, float width, float height);
+    std::string TextBox(int index, const std::string& text, int limit, float x, float y, float width, float height, int special = 0);
 
     void ColorWheel(float x, float y, float radius);
 
@@ -364,6 +364,10 @@ namespace FlarialGUI {
 
 
     void PopImClipRect();
+
+    ImVec2 getFlarialTextSize(const wchar_t* text, const float width, const float height,
+        const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
+        const DWRITE_FONT_WEIGHT weight, bool moduleFont = false, bool troll = false);
 
     std::string
     FlarialTextWithFont(float x, float y, const wchar_t *text, float width, float height,

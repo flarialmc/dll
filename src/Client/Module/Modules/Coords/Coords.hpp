@@ -1,35 +1,42 @@
 #pragma once
 
+#include <cmath>
+#include <sstream>
+#include <iomanip>
 #include "../Module.hpp"
 #include "Events/Render/RenderUnderUIEvent.hpp"
 
-class Coordinates : public Module {
+class Coords : public Module {
 
 public:
 
-    Coordinates() : Module("Coordinates", "Shows your XYZ position in game.",
+    Coords() : Module("Coords", "Shows your XYZ position in game.",
         IDR_COORDINATES_PNG, "") {
         Module::setup();
     };
 
     void onEnable() override {
-        Listen(this, RenderEvent, &Coordinates::onRender)
-            Listen(this, RenderUnderUIEvent, &Coordinates::onRenderUnderUI)
+        Listen(this, RenderEvent, &Coords::onRender)
+            Listen(this, RenderUnderUIEvent, &Coords::onRenderUnderUI)
             Module::onEnable();
     }
 
     void onDisable() override {
-        Deafen(this, RenderEvent, &Coordinates::onRender)
-            Deafen(this, RenderUnderUIEvent, &Coordinates::onRenderUnderUI)
+        Deafen(this, RenderEvent, &Coords::onRender)
+            Deafen(this, RenderUnderUIEvent, &Coords::onRenderUnderUI)
             Module::onDisable();
     }
 
     void defaultConfig() override {
+        if (settings.getSettingByName<bool>("responsivewidth") == nullptr) settings.addSetting("responsivewidth", true);
         Module::defaultConfig();
         if (settings.getSettingByName<std::string>("text") == nullptr)
             settings.addSetting("text", (std::string)"X: {X} Y: {Y} Z: {Z}");
 
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
+
+        if (settings.getSettingByName<bool>("showDecimals") == nullptr) settings.addSetting("showDecimals", false);
+        if (settings.getSettingByName<float>("decimalCount") == nullptr) settings.addSetting("decimalCount", 2.f);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -64,6 +71,8 @@ public:
             settings.getSettingByName<float>("textShadowOpacity")->value,
             settings.getSettingByName<bool>("textShadowRGB")->value);
         this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
+        this->addToggle("Show Decimals", "", this->settings.getSettingByName<bool>("showDecimals")->value);
+        this->addConditionalSlider(this->settings.getSettingByName<bool>("showDecimals")->value, "# of Decimals", "", this->settings.getSettingByName<float>("decimalCount")->value, 6.f, 1.f);
 
         this->extraPadding();
 
@@ -102,25 +111,31 @@ public:
         //Blur::RenderBlur(event.RTV, 3, 5.f);
     }
     void onRender(RenderEvent& event) {
-        if (this->isEnabled()) {
+        if (this->isEnabled() && SDK::clientInstance->getLocalPlayer() && SDK::getCurrentScreen() == "hud_screen") {
             Vec3<float> *pos = SDK::clientInstance->getLocalPlayer()->getPosition();
 
-            auto coordStr = this->settings.getSettingByName<std::string>("text")->value;
+            std::string coord = this->settings.getSettingByName<std::string>("text")->value;
 
-            size_t posX = coordStr.find("{X}");
-            if (posX != std::string::npos) {
-                coordStr.replace(posX, 3, std::to_string(pos->x));
-            }
-            size_t posY = coordStr.find("{Y}");
-            if (posY != std::string::npos) {
-                coordStr.replace(posY, 3, std::to_string(pos->y));
-            }
-            size_t posZ = coordStr.find("{Z}");
-            if (posZ != std::string::npos) {
-                coordStr.replace(posZ, 3, std::to_string(pos->z));
-            }
+            int decimalsToShow = this->settings.getSettingByName<bool>("showDecimals")->value ? std::floor(this->settings.getSettingByName<float>("decimalCount")->value) : -1;
 
-            this->normalRender(0, coordStr);
+            //std::ostringstream xStream, yStream, zStream;
+            //xStream << std::fixed << std::setprecision(0) << pos->x;
+            //yStream << std::fixed << std::setprecision(0) << pos->y;
+            //zStream << std::fixed << std::setprecision(0) << pos->z;
+
+            std::string xstr = std::to_string(pos->x);
+            std::string ystr = std::to_string(pos->y);
+            std::string zstr = std::to_string(pos->z);
+
+            xstr.erase(xstr.size() - (6 - decimalsToShow));
+            ystr.erase(ystr.size() - (6 - decimalsToShow));
+            zstr.erase(zstr.size() - (6 - decimalsToShow));
+
+            coord = std::regex_replace(coord, std::regex("\\{X\\}"), xstr);
+            coord = std::regex_replace(coord, std::regex("\\{Y\\}"), ystr);
+            coord = std::regex_replace(coord, std::regex("\\{Z\\}"), zstr);
+
+            this->normalRenderCore(33, coord);
         }
     }
 

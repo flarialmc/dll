@@ -60,8 +60,7 @@ float Constraints::RelativeConstraint(float percent, const std::string &dimensio
 }
 
 Vec2<float>
-Constraints::CenterConstraint(float width, float height, const std::string &axis, float xModifier, float yModifier,
-                              bool ignoreStack) {
+Constraints::CenterConstraint(float width, float height, const std::string &axis, float xModifier, float yModifier, bool ignoreStack) {
     Vec2<float> xy;
 
     float screenWidth;

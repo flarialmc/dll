@@ -47,6 +47,14 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex
     // then load the setting as uint32_t instead of string
     // but when saving, it should be converted to string.
 
+    if (shouldAdditionalY) {
+        for (int i = 0; i < highestAddIndexes + 1; i++) {
+            if (i <= additionalIndex && additionalY[i] > 0.0f) {
+                y += additionalY[i];
+            }
+        }
+    }
+
     if (FlarialGUI::TextBoxes[index].isActive) {
         if (FlarialGUI::TextBoxes[index].isAt1)
             FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, -1.0f, 0.05f * FlarialGUI::frameFactor);
@@ -98,7 +106,7 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex
 
     std::string text;
     hex = FlarialGUI::TextBox(index, hex, 6, x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, s * 3.f,
-                              s * 0.82f);
+                              s * 0.82f, 1);
 
     text = "#" + hex;
     //textLayout->Release();
@@ -108,10 +116,25 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex
 
     cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
 
+    if (shouldAdditionalY) {
+        for (int i = 0; i < highestAddIndexes + 1; i++) {
+            if (i <= additionalIndex && additionalY[i] > 0.0f) {
+                y -= additionalY[i];
+            }
+        }
+    }
 
     sizes[text] = FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.0025f,
                                     FlarialGUI::to_wide(text).c_str(), s * 4.3f, s * 1.1f,
                                     DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f, DWRITE_FONT_WEIGHT_NORMAL);
+
+    if (shouldAdditionalY) {
+        for (int i = 0; i < highestAddIndexes + 1; i++) {
+            if (i <= additionalIndex && additionalY[i] > 0.0f) {
+                y += additionalY[i];
+            }
+        }
+    }
 
     FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorX,
                  x + Constraints::SpacingConstraint(0.555f, s) + TextSizes[sizes[text]] +

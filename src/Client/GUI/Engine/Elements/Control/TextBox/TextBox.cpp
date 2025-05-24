@@ -69,7 +69,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
 
     if (isAdditionalY) UnSetIsInAdditionalYMode();
 
-    text = FlarialGUI::TextBox(index, text, limit, x, y, Constraints::SpacingConstraint(1.55, textWidth), percHeight);
+    text = FlarialGUI::TextBox(index, text, limit, x, y, Constraints::SpacingConstraint(1.85, textWidth), percHeight);
 
     if (TextBoxes[index].isActive) {
         col = colors_primary1;
@@ -81,13 +81,13 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
 
     col.a = ClickGUI::settingsOpacity;
 
-
-    FlarialGUI::RoundedRect(x, y, col, Constraints::SpacingConstraint(1.55, textWidth), percHeight, round.x, round.x);
+    // rectangle bounds
+    FlarialGUI::RoundedRect(x, y, col, Constraints::SpacingConstraint(1.85, textWidth), percHeight, round.x, round.x);
 
     float textSize = Constraints::SpacingConstraint(1.0, textWidth);
 
-    ttext = FlarialGUI::FlarialTextWithFont(x + Constraints::RelativeConstraint(0.05f), y, FlarialGUI::to_wide(text).c_str(),
-                                    Constraints::SpacingConstraint(1.55, textWidth), percHeight,
+    ttext = FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.1, textWidth), y, FlarialGUI::to_wide(text).c_str(),
+                                    Constraints::SpacingConstraint(1.85, textWidth), percHeight,
                                     DWRITE_TEXT_ALIGNMENT_LEADING, textSize, DWRITE_FONT_WEIGHT_NORMAL);
 
     D2D1_COLOR_F cursorCol = colors_primary2_rgb ? rgbColor : colors_primary2;
@@ -96,16 +96,17 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
     cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
 
     FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorX,
-                     x + FlarialGUI::TextSizes[ttext] + Constraints::RelativeConstraint(0.055f),
+                     x + FlarialGUI::TextSizes[ttext] + Constraints::SpacingConstraint(0.11, textWidth),
                      0.420f * FlarialGUI::frameFactor);
 
+    // white cursor blinky
     if (FlarialGUI::TextBoxes[index].cursorX > x)
         FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX,
-                                y + Constraints::RelativeConstraint(0.045f) / 2.0f, cursorCol,
+                                y + Constraints::RelativeConstraint(0.035f) / 2.0f, cursorCol,
                                 Constraints::RelativeConstraint(0.005f),
-                                percHeight - Constraints::RelativeConstraint(0.045f), 0, 0);
+                                percHeight - Constraints::RelativeConstraint(0.032f), 0, 0);
 
-    rReal = FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.70, textWidth), y,
+    rReal = FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.1, textWidth), y,
                                     FlarialGUI::to_wide(real).c_str(),
                                     Constraints::SpacingConstraint(6.9, textWidth), percHeight,
                                     DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.00, textWidth),
@@ -116,32 +117,39 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
     return "";
 }
 
-std::string FlarialGUI::TextBox(int index, const std::string& text, int limit, float x, float y, float width, float height) {
+std::string FlarialGUI::TextBox(int index, const std::string& text, int limit, float x, float y, float width, float height, int special) {
     if (isInScrollView) y += scrollpos;
+
+    const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
+    float textSize = Constraints::SpacingConstraint(1.0, textWidth);
+    const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
+
+    ImVec2 size = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(text).c_str(),
+        Constraints::SpacingConstraint(1.85, textWidth), percHeight,
+        DWRITE_TEXT_ALIGNMENT_LEADING, textSize, DWRITE_FONT_WEIGHT_NORMAL);
 
     if (CursorInRect(x, y, width, height) && MC::mouseAction == MouseAction::Press &&
         MC::mouseButton == MouseButton::Left && !activeColorPickerWindows) {
 
         FlarialGUI::TextBoxes[index].isActive = true;
+        if (special == 2) FlarialGUI::TextBoxes[index].text = "";
 
     } else if (!CursorInRect(x, y, width, height) && MC::mouseAction == MouseAction::Press &&
                MC::mouseButton == MouseButton::Left) {
-
         FlarialGUI::TextBoxes[index].isActive = false;
         FlarialGUI::TextBoxes[index].text = text;
-
     } else if (!FlarialGUI::TextBoxes[index].isActive && !activeColorPickerWindows) {
-
         FlarialGUI::TextBoxes[index].text = text;
     }
-
 
     if (FlarialGUI::TextBoxes[index].text.empty() && FlarialGUI::TextBoxes[index].firstTime) {
         FlarialGUI::TextBoxes[index].firstTime = false;
         FlarialGUI::TextBoxes[index].text = text;
     }
 
-    FlarialGUI::TextBoxes[index].text = FlarialGUI::TextBoxes[index].text.substr(0, limit);
+    if ((size.x > (width - 0.35 * textWidth)) && !FlarialGUI::TextBoxes[index].text.empty() && !special) FlarialGUI::TextBoxes[index].text.pop_back();
+    if (special == 1) FlarialGUI::TextBoxes[index].text = FlarialGUI::TextBoxes[index].text.substr(0, 6);
+    if (special == 2) FlarialGUI::TextBoxes[index].text = FlarialGUI::TextBoxes[index].text.substr(0, limit);
 
     return FlarialGUI::TextBoxes[index].text;
 }

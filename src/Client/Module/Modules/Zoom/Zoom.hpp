@@ -48,6 +48,7 @@ public:
         if (settings.getSettingByName<bool>("hidehand") == nullptr) settings.addSetting("hidehand", true);
         if (settings.getSettingByName<bool>("hidemodules") == nullptr) settings.addSetting("hidemodules", false);
         if (settings.getSettingByName<bool>("UseScroll") == nullptr) settings.addSetting("UseScroll", true);
+        if (settings.getSettingByName<bool>("lowsens") == nullptr) settings.addSetting("lowsens", true);
         //if (settings.getSettingByName<bool>("hidehud") == nullptr) settings.addSetting("hidehud", false);
         if (settings.getSettingByName<float>("modifier") == nullptr) settings.addSetting("modifier", 10.0f);
         if (settings.getSettingByName<float>("anim") == nullptr) settings.addSetting("anim", 0.20f);
@@ -78,8 +79,8 @@ public:
         this->addToggle("Save Modifier", "Saves the last zoom amount.", this->settings.getSettingByName<bool>("SaveModifier")->value);
         this->addToggle("Hide Hand", "Hide hand when zooming.", this->settings.getSettingByName<bool>("hidehand")->value);
         this->addToggle("Hide Modules", "Hides other modules when zooming.", this->settings.getSettingByName<bool>("hidemodules")->value);
-        this->addToggle("Always Animate", "Smooth zoom animation while sprinting", this->settings.getSettingByName<bool>("alwaysanim")->value);
-        
+        this->addToggle("Always Animate", "Smooth zoom animation while sprinting.", this->settings.getSettingByName<bool>("alwaysanim")->value);
+        this->addToggle("Low Sensitivity", "Lower sensitivity when in zoom.", this->settings.getSettingByName<bool>("lowsens")->value);
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
@@ -95,8 +96,7 @@ public:
 
         if(ModuleManager::getModule("Java Dynamic FOV").get()->isEnabled()) {
             if (player->getActorFlag(ActorFlags::FLAG_SPRINTING)) {
-                fov = ModuleManager::getModule("Java Dynamic FOV").get()->settings.getSettingByName<float>(
-                        "fov_target")->value;
+                fov = ModuleManager::getModule("Java Dynamic FOV").get()->settings.getSettingByName<float>("fov_target")->value;
             }
         }
 
@@ -145,7 +145,7 @@ public:
                 currentSensitivity = event.getSensitivity();
             }
             // TODO: smoothstep
-            event.setSensitivity(currentSensitivity - (currentSensitivity * (((realFov - (zoomValue - 1)) / realFov) / 1.0f)));
+            if (this->settings.getSettingByName<bool>("lowsens")->value) event.setSensitivity(currentSensitivity - (currentSensitivity * (((realFov - (zoomValue - 1)) / realFov) / 1.0f)));
         } else if (saved) {
             saved = false;
         }
