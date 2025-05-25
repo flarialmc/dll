@@ -594,6 +594,7 @@ public:
 
                 if (!editmenu) {
                     this->active = false;
+                    FlarialGUI::Notify("Right click a module to directly go to their settings page.");
                     FlarialGUI::Notify("To disable this menu press ESC or " +
                                                this->settings.getSettingByName<std::string>("editmenubind")->value);
                     editmenu = true;

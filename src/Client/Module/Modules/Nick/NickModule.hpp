@@ -26,8 +26,8 @@ public:
 
     void onDisable() override {
         Deafen(this, DrawTextEvent, &NickModule::onDrawText)
-            Deafen(this, TickEvent, &NickModule::onTick)
-            std::string val = original;
+        Deafen(this, TickEvent, &NickModule::onTick)
+        std::string val = original;
         std::string val2;
 
         if (SDK::clientInstance)
@@ -36,8 +36,7 @@ public:
                     original2 = *SDK::clientInstance->getLocalPlayer()->getNametag();
                     backupOri = *SDK::clientInstance->getLocalPlayer()->getNametag();
                 }
-                if (original2 == this->settings.getSettingByName<std::string>("nick")->value)
-                    original2 = backupOri;
+                if (original2 == this->settings.getSettingByName<std::string>("nick")->value) original2 = backupOri;
 
                 val2 = original2;
 
@@ -84,9 +83,6 @@ public:
         if (settings.getSettingByName<std::string>("nick") == nullptr)
             settings.addSetting<std::string>("nick", "Flarial User");
 
-        if (settings.getSettingByName<bool>("italic") == nullptr)
-            settings.addSetting<bool>("italic", false);
-
         if (settings.getSettingByName<bool>("bold") == nullptr)
             settings.addSetting<bool>("bold", false);
 
@@ -113,7 +109,6 @@ public:
 
         this->addHeader("Misc");
         this->addTextBox("Nickname", "", settings.getSettingByName<std::string>("nick")->value);
-        this->addToggle("Italic", "", settings.getSettingByName<bool>("italic")->value);
         this->addToggle("Bold", "", settings.getSettingByName<bool>("bold")->value);
         this->addToggle("Obfuscated", "", settings.getSettingByName<bool>("obfuscated")->value);
         this->addDropdown("Text Color", "", std::vector<std::string>{
@@ -182,7 +177,7 @@ public:
 
             std::string prefix = it->second;
 
-            if (settings.getSettingByName<bool>("italic")->value) prefix += "§o";
+            prefix += "§o";
             if (settings.getSettingByName<bool>("bold")->value) prefix += "§l";
             if (settings.getSettingByName<bool>("obfuscated")->value) prefix += "§k";
 
@@ -217,7 +212,7 @@ public:
         if (enabled && !this->restricted) {
             std::string prefix = textColors.find(settings.getSettingByName<std::string>("textColor")->value)->second;
 
-            if (settings.getSettingByName<bool>("italic")->value) prefix += "§o";
+            prefix += "§o";
             if (settings.getSettingByName<bool>("bold")->value) prefix += "§l";
             if (settings.getSettingByName<bool>("obfuscated")->value) prefix += "§k";
 

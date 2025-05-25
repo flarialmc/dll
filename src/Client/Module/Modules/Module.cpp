@@ -62,7 +62,6 @@ void Module::normalRenderCore(int index, std::string& text) {
         );
 
     Vec2<float> realcenter;
-
     
     if (settingperc.x != 0) {
         realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x - rectWidth), settingperc.y * (MC::windowSize.y - textHeight));
@@ -71,7 +70,6 @@ void Module::normalRenderCore(int index, std::string& text) {
 
     if (ClickGUI::editmenu) {
         auto height = textHeight * this->settings.getSettingByName<float>("rectheight")->value;
-
 
         FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, height, index);
 
@@ -346,7 +344,6 @@ void Module::addDropdown(std::string text, std::string subtext, const std::vecto
 }
 
 void Module::addConditionalSlider(bool condition, std::string text, std::string subtext, float& value, float maxVal, float minVal, bool zerosafe) {
-    
     FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalSliderAnims[sliderIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
 
     if (condition) {

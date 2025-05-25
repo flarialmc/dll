@@ -7,7 +7,7 @@
 
 class Waila : public Module {
 public:
-    std::string name;
+    std::string lookingAt;
 
     Waila() : Module("Waila", "Shows what you are looking at.", IDR_WAILA_PNG, "") {
         Module::setup();
@@ -115,8 +115,8 @@ public:
             if (!block) return;
             try {
 
-                if (!this->settings.getSettingByName<bool>("advanced")->value) name = block->getName();
-                else name = block->getNamespace();
+                if (!this->settings.getSettingByName<bool>("advanced")->value) lookingAt = block->getName();
+                else lookingAt = block->getNamespace();
             }
             catch (const std::exception& e) { Logger::error("Failed to get block name: {}", e.what()); }
         }
@@ -126,8 +126,8 @@ public:
     }
 
     void onRender(RenderEvent& event) {
-        if (this->isEnabled() && name != "air") {
-            this->normalRender(32, name);
+        if (this->isEnabled() && lookingAt != "air") {
+            this->normalRender(32, lookingAt);
         }
     }
 };

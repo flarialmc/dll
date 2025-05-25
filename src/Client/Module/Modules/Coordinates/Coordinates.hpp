@@ -8,24 +8,22 @@
 
 typedef std::unordered_map<std::string, std::string> StringMap;
 
-class Coords : public Module {
+class Coordinates : public Module {
 
 public:
 
-    Coords() : Module("Coords", "Shows your XYZ position in game.",
+    Coordinates() : Module("Coordinates", "Shows your XYZ position in game.",
         IDR_COORDINATES_PNG, "") {
         Module::setup();
     };
 
     void onEnable() override {
-        Listen(this, RenderEvent, &Coords::onRender)
-            Listen(this, RenderUnderUIEvent, &Coords::onRenderUnderUI)
+        Listen(this, RenderEvent, &Coordinates::onRender)
             Module::onEnable();
     }
 
     void onDisable() override {
-        Deafen(this, RenderEvent, &Coords::onRender)
-            Deafen(this, RenderUnderUIEvent, &Coords::onRenderUnderUI)
+        Deafen(this, RenderEvent, &Coordinates::onRender)
             Module::onDisable();
     }
 
@@ -123,11 +121,6 @@ public:
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
     }  //testing if it works
-
-
-    void onRenderUnderUI(RenderUnderUIEvent& event) {
-        //Blur::RenderBlur(event.RTV, 3, 5.f);
-    }
 
     StringMap getCoords(float multiplier) {
         Vec3<float>* pos = SDK::clientInstance->getLocalPlayer()->getPosition();

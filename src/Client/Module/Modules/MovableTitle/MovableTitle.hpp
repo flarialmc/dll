@@ -11,9 +11,9 @@ private:
     Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
     Vec2<float> lastAppliedPos = Vec2<float>{0.0f, 0.0f};
 public:
-    static inline std::string name = "Title";
+    static inline std::string mname = "Title"; // dont use "name" var pls cuz it will override this->name so Module("name here") would be useless
 
-    MovableTitle() : Module("Movable " + name, "Makes the Minecraft " + name + " movable.", IDR_MOVABLE_PNG, "") {
+    MovableTitle() : Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "") {
         Listen(this, SetupAndRenderEvent, &MovableTitle::onSetupAndRender)
         Module::setup();
     };
@@ -23,7 +23,7 @@ public:
         Listen(this, UIControlGetPositionEvent, &MovableTitle::onUIControlGetPosition)
 
         if (FlarialGUI::inMenu) {
-            FlarialGUI::Notify("To change the position of the " + name +", Please click " +
+            FlarialGUI::Notify("To change the position of the " + mname +", Please click " +
                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                        "editmenubind")->value + " in the settings tab.");
         }

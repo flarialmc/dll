@@ -101,7 +101,7 @@
 
 #include "Modules/MinimalViewBobbing/MinimalViewBobbing.hpp"
 #include "Modules/Lewis/Lewis.hpp"
-#include "Modules/Coords/Coords.hpp"
+#include "Modules/Coordinates/Coordinates.hpp"
 
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
     for (const auto& pair : moduleMap) {
@@ -241,7 +241,7 @@ void ModuleManager::initialize() {
     addModule<MinimalViewBobbing>();
 
     addModule<Lewis>();
-    addModule<Coords>();
+    addModule<Coordinates>();
 
     addService<GUIKeyListener>();
     if (!VersionUtils::checkAboveOrEqual(21, 60)) {

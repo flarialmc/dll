@@ -12,9 +12,9 @@ private:
     Vec2<float> lastAppliedPos = Vec2<float>{0.0f, 0.0f};
     bool restored = false;
 public:
-    static inline std::string name = "Coordinates";
+    static inline std::string mname = "Coordinates"; // dont use "name" var pls cuz it will override this->name so Module("name here") would be useless
 
-    MovableCoordinates() : Module("Movable " + name, "Makes the Minecraft " + name + " movable.", IDR_MOVABLE_PNG, "") {
+    MovableCoordinates() : Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "") {
         Module::setup();
     };
 
@@ -25,7 +25,7 @@ public:
         Listen(this, UIControlGetPositionEvent, &MovableCoordinates::onUIControlGetPosition)
 
         if (FlarialGUI::inMenu) {
-            FlarialGUI::Notify("To change the position of the " + name +", Please click " +
+            FlarialGUI::Notify("To change the position of the " + mname +", Please click " +
                                ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
                                        "editmenubind")->value + " in the settings tab.");
         }
