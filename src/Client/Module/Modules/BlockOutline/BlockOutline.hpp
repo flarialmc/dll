@@ -22,18 +22,19 @@ public:
     void onEnable() override {
         options.parseOptionsFile();
         Listen(this, RenderOutlineSelectionEvent, &BlockOutline::onOutlineSelection)
-        Module::onEnable();
+            Module::onEnable();
         if (options.options["gfx_classic_box_selection"] != "1") FlarialGUI::Notify("Enable 'Outline Selection' in Minecraft Video Settings for this to work.");
     }
 
     void onDisable() override {
         Deafen(this, RenderOutlineSelectionEvent, &BlockOutline::onOutlineSelection)
-        Module::onDisable();
+            Module::onDisable();
     }
 
-    void defaultConfig() override { Module::defaultConfig();
+    void defaultConfig() override {
+        Module::defaultConfig();
         if (settings.getSettingByName<std::string>("color") == nullptr)
-            settings.addSetting("color", (std::string) "FFFFFF");
+            settings.addSetting("color", (std::string)"FFFFFF");
         if (settings.getSettingByName<bool>("color_rgb") == nullptr) settings.addSetting("color_rgb", false);
         if (settings.getSettingByName<float>("colorOpacity") == nullptr) settings.addSetting("colorOpacity", 0.6f);
         if (settings.getSettingByName<bool>("overlay") == nullptr) settings.addSetting("overlay", false);
@@ -54,8 +55,8 @@ public:
 
         FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
         FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                                  Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(0.88f, "height"));
+            Constraints::RelativeConstraint(1.0, "width"),
+            Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Main");
         this->addToggle("Overlay", "Overlays the face of block", settings.getSettingByName<bool>("overlay")->value);
@@ -68,15 +69,15 @@ public:
             this->addToggle("3D Outline", "Shows outline through blocks.", settings.getSettingByName<bool>("showfulloutline")->value);
         }
         this->addColorPicker(col + " Color", "", settings.getSettingByName<std::string>("color")->value,
-                                      settings.getSettingByName<float>("colorOpacity")->value,
-                                      settings.getSettingByName<bool>("color_rgb")->value);
+            settings.getSettingByName<float>("colorOpacity")->value,
+            settings.getSettingByName<bool>("color_rgb")->value);
 
         FlarialGUI::UnsetScrollView();
 
         this->resetPadding();
     }
 
-    void onOutlineSelection(RenderOutlineSelectionEvent &event) {
+    void onOutlineSelection(RenderOutlineSelectionEvent& event) {
 
         D2D1_COLOR_F color;
         color = settings.getSettingByName<bool>("color_rgb")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("color")->value);
@@ -101,31 +102,31 @@ public:
                 float wi = 1 - w;
                 float y_base = bp.y + 1.001f;  // Offset y-coordinate outward
 
-                dc.fillQuad(Vec3<float>(bp.x , y_base, bp.z ),
-                    Vec3<float>(bp.x + 1.002f , y_base, bp.z ),
-                    Vec3<float>(bp.x + 1.002f , y_base, bp.z + w),
-                    Vec3<float>(bp.x , y_base, bp.z + w), color);
+                dc.fillQuad(Vec3<float>(bp.x, y_base, bp.z),
+                    Vec3<float>(bp.x + 1.002f, y_base, bp.z),
+                    Vec3<float>(bp.x + 1.002f, y_base, bp.z + w),
+                    Vec3<float>(bp.x, y_base, bp.z + w), color);
                 // Top Right (back edge): Extend x to meet south face
-                dc.fillQuad(Vec3<float>(bp.x , y_base, bp.z + wi),
-                    Vec3<float>(bp.x + 1.002f , y_base, bp.z + wi),
-                    Vec3<float>(bp.x + 1.002f , y_base, bp.z + 1 ),
-                    Vec3<float>(bp.x , y_base, bp.z + 1 ), color);
+                dc.fillQuad(Vec3<float>(bp.x, y_base, bp.z + wi),
+                    Vec3<float>(bp.x + 1.002f, y_base, bp.z + wi),
+                    Vec3<float>(bp.x + 1.002f, y_base, bp.z + 1),
+                    Vec3<float>(bp.x, y_base, bp.z + 1), color);
                 // Top Top (right edge): Extend z to meet east face
                 dc.fillQuad(Vec3<float>(bp.x + wi, y_base, bp.z + w),
-                    Vec3<float>(bp.x + 1.002f , y_base, bp.z + w),
-                    Vec3<float>(bp.x + 1.002f , y_base, bp.z + wi),
+                    Vec3<float>(bp.x + 1.002f, y_base, bp.z + w),
+                    Vec3<float>(bp.x + 1.002f, y_base, bp.z + wi),
                     Vec3<float>(bp.x + wi, y_base, bp.z + wi), color);
                 // Top Bottom (left edge): Extend z to meet west face
-                dc.fillQuad(Vec3<float>(bp.x , y_base, bp.z + w),
+                dc.fillQuad(Vec3<float>(bp.x, y_base, bp.z + w),
                     Vec3<float>(bp.x + w, y_base, bp.z + w),
                     Vec3<float>(bp.x + w, y_base, bp.z + wi),
-                    Vec3<float>(bp.x , y_base, bp.z + wi), color);
+                    Vec3<float>(bp.x, y_base, bp.z + wi), color);
                 };
 
             auto drawDown = [&](float width) {
                 float w = width;
                 float wi = 1 - w;
-                float y_base = bp.y ;  // Offset y-coordinate outward
+                float y_base = bp.y;  // Offset y-coordinate outward
                 dc.fillQuad(Vec3<float>(bp.x, y_base, bp.z),
                     Vec3<float>(bp.x + 1.002f, y_base, bp.z),
                     Vec3<float>(bp.x + 1.002f, y_base, bp.z + w),
@@ -150,7 +151,7 @@ public:
             auto drawEast = [&](float width) {
                 float w = width;
                 float wi = 1 - w;
-                float x_base = bp.x  + 1.001f ;
+                float x_base = bp.x + 1.001f;
                 // Bottom strip (along y = bp.y)
                 dc.fillQuad(Vec3<float>(x_base, bp.y, bp.z), Vec3<float>(x_base, bp.y + w, bp.z), Vec3<float>(x_base, bp.y + w, bp.z + 1.002f), Vec3<float>(x_base, bp.y, bp.z + 1.002f), color);
                 // Top strip (along y = bp.y + 1.002f)
@@ -177,7 +178,7 @@ public:
 
             auto drawSouth = [&](float width) {
                 float w = width;
-                float z_base = bp.z  + 1.001f ;  // Offset z-coordinate outward
+                float z_base = bp.z + 1.001f;  // Offset z-coordinate outward
                 // Bottom strip (along y = bp.y, z = bp.z + 1.f)
                 dc.fillQuad(Vec3<float>(bp.x, bp.y, z_base), Vec3<float>(bp.x + 1.002f, bp.y, z_base), Vec3<float>(bp.x + 1.002f, bp.y + w, z_base), Vec3<float>(bp.x, bp.y + w, z_base), color);
                 // Top strip (along y = bp.y + 1.002f, z = bp.z + 1.002f)
@@ -228,12 +229,12 @@ public:
                 );
                 };
 
-            auto drawDown = [&]() {
+            auto drawDown = [&]() { // y offset (bugged side)
                 dc.fillQuad(
-                    Vec3<float>(bp.x, bp.y, bp.z),
-                    Vec3<float>(bp.x + 1.003f, bp.y, bp.z),
-                    Vec3<float>(bp.x + 1.003f, bp.y, bp.z + 1.003f),
-                    Vec3<float>(bp.x, bp.y, bp.z + 1.003f),
+                    Vec3<float>(bp.x, bp.y - 0.001f, bp.z),
+                    Vec3<float>(bp.x + 1.003f, bp.y - 0.001f, bp.z),
+                    Vec3<float>(bp.x + 1.003f, bp.y - 0.001f, bp.z + 1.003f),
+                    Vec3<float>(bp.x, bp.y - 0.001f, bp.z + 1.003f),
                     color
                 );
                 };
@@ -248,12 +249,12 @@ public:
                 );
                 };
 
-            auto drawWest = [&]() {
+            auto drawWest = [&]() { // x offset (bugged side)
                 dc.fillQuad(
-                    Vec3<float>(bp.x, bp.y, bp.z),
-                    Vec3<float>(bp.x, bp.y + 1.003f, bp.z),
-                    Vec3<float>(bp.x, bp.y + 1.003f, bp.z + 1.003f),
-                    Vec3<float>(bp.x, bp.y, bp.z + 1.003f),
+                    Vec3<float>(bp.x - 0.001f, bp.y, bp.z),
+                    Vec3<float>(bp.x - 0.001f, bp.y + 1.003f, bp.z),
+                    Vec3<float>(bp.x - 0.001f, bp.y + 1.003f, bp.z + 1.003f),
+                    Vec3<float>(bp.x - 0.001f, bp.y, bp.z + 1.003f),
                     color
                 );
                 };
@@ -268,12 +269,12 @@ public:
                 );
                 };
 
-            auto drawNorth = [&]() {
+            auto drawNorth = [&]() { // z offset (bugged side)
                 dc.fillQuad(
-                    Vec3<float>(bp.x, bp.y, bp.z),
-                    Vec3<float>(bp.x, bp.y + 1.003f, bp.z),
-                    Vec3<float>(bp.x + 1.003f, bp.y + 1.003f, bp.z),
-                    Vec3<float>(bp.x + 1.003f, bp.y, bp.z),
+                    Vec3<float>(bp.x, bp.y, bp.z - 0.001f),
+                    Vec3<float>(bp.x, bp.y + 1.003f, bp.z - 0.001f),
+                    Vec3<float>(bp.x + 1.003f, bp.y + 1.003f, bp.z - 0.001f),
+                    Vec3<float>(bp.x + 1.003f, bp.y, bp.z - 0.001f),
                     color
                 );
                 };
