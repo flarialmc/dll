@@ -4,6 +4,7 @@
 #include "../../Events/Events.hpp"
 #include "ClickGUI/ClickGUI.hpp"
 #include "Scripting/ScriptManager.hpp"
+#include <vector>
 
 #define colors_secondary6 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary6")->value)
 #define o_colors_secondary6 clickgui->settings.getSettingByName<float>("o_colors_secondary6")->value
@@ -408,16 +409,17 @@ void Module::addSlider(std::string text, std::string subtext, float& value, floa
     sliderIndex++;
 }
 
-void Module::addToggle(std::string text, std::string subtext, bool& value) {
+void Module::addToggle(std::string text, std::string subtext, bool& value, std::string moduleName, std::string settingName) {
     float x = Constraints::PercentageConstraint(0.019, "left");
     float elementX = Constraints::PercentageConstraint(0.119f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-    if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false)) value = !value;
+    if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false, moduleName, settingName)) value = !value;
 
     Module::addElementText(text, subtext);
     
     padding += Constraints::RelativeConstraint(0.05f, "height", true);
+
     toggleIndex++;
 }
 

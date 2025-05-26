@@ -41,7 +41,7 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled) {
     return FlarialGUI::Toggle(index, x, y, isEnabled, false);
 }
 
-bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb) {
+bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, std::string moduleName, std::string settingName) {
     D2D1_COLOR_F disabledColor = colors_primary3;
     D2D1_COLOR_F enabledColor = colors_primary1;
     D2D1_COLOR_F circleColor = colors_primary2;
@@ -101,10 +101,20 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb) {
     if (isAdditionalY) SetIsInAdditionalYMode();
 
     if (isInScrollView) y += FlarialGUI::scrollpos;
-    if (CursorInRect(x, y, rectWidth, rectHeight) && MC::mouseButton == MouseButton::Left && !MC::held &&
-        (!activeColorPickerWindows || index == 123)) {
-        MC::mouseButton = MouseButton::None;
-        return true;
+
+    if (CursorInRect(x, y, rectWidth, rectHeight)) {
+        if (MC::mouseButton == MouseButton::Left && !MC::held && (!activeColorPickerWindows || index == 123)) {
+            MC::mouseButton = MouseButton::None;
+            return true;
+        }
+        else if (MC::mouseButton == MouseButton::Right && !MC::held && (!activeColorPickerWindows || index == 123)) {
+			if (moduleName != "nil" && settingName != "nil") {
+                auto mod = ModuleManager::getModule(moduleName);
+                mod->settings.deleteSetting(settingName);
+				mod->defaultConfig();
+				return mod->settings.getSettingByName<bool>(settingName)->value;
+			}
+        }
     }
 
     return false;

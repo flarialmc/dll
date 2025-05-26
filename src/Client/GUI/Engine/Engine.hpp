@@ -319,7 +319,7 @@ namespace FlarialGUI {
 
     bool Toggle(int index, float x, float y, bool isEnabled);
 
-    bool Toggle(int index, float x, float y, bool isEnabled, bool rgb);
+    bool Toggle(int index, float x, float y, bool isEnabled, bool rgb, std::string moduleName = "nil", std::string settingName = "nil");
 
     float Slider(int index, float x, float y, float& value, float maxValue = 100.0f, float minValue = 0.0f, bool zerosafe = true);
 

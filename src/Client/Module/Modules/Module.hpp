@@ -54,6 +54,7 @@ public:
 
     float padding = 0;
     int toggleIndex = 0;
+
     int sliderIndex = 0;
     std::vector<float> conditionalSliderAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
     int dropdownIndex = 0;
@@ -82,7 +83,7 @@ public:
 
     void addConditionalSlider(bool condition, std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
     void addSlider(std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
-    void addToggle(std::string text, std::string subtext, bool& value);
+    void addToggle(std::string text, std::string subtext, bool& value, std::string moduleName = "nil", std::string settingName = "nil");
 
     void addKeybind(std::string text, std::string subtext, std::string &keybind);
 
