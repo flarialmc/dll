@@ -41,6 +41,9 @@ public:
 		if (settings.getSettingByName<bool>("showOtherDimCoords") == nullptr) settings.addSetting("showOtherDimCoords", false);
         if (settings.getSettingByName<bool>("showDimName") == nullptr) settings.addSetting("showDimName", false);
 
+		if (settings.getSettingByName<bool>("useSameDimensionFormat") == nullptr) settings.addSetting("useSameDimensionFormat", true);
+
+		if (settings.getSettingByName<std::string>("defaultDimFormat") == nullptr) settings.addSetting("defaultDimFormat", (std::string)"{dim}");
         if (settings.getSettingByName<std::string>("OverworldFormat") == nullptr) settings.addSetting("OverworldFormat", (std::string)"{dim}");
         if (settings.getSettingByName<std::string>("NetherFormat") == nullptr) settings.addSetting("NetherFormat", (std::string)"{dim}");
         if (settings.getSettingByName<std::string>("TheEndFormat") == nullptr) settings.addSetting("TheEndFormat", (std::string)"{dim}");
@@ -86,9 +89,15 @@ public:
         this->addHeader("Module Settings");
 		this->addToggle("Show Other Dimension Coords", "Shows the other dimension\'s coordinates along with overworld coordinates.", this->settings.getSettingByName<bool>("showOtherDimCoords")->value);
         this->addToggle("Show Dimension Name", "Shows the dimension name.", this->settings.getSettingByName<bool>("showDimName")->value);
-        this->addTextBox("Overworld Dimension Format", "", settings.getSettingByName<std::string>("OverworldFormat")->value);
-        this->addTextBox("Nether Dimension Format", "", settings.getSettingByName<std::string>("NetherFormat")->value);
-        this->addTextBox("TheEnd Dimension Format", "", settings.getSettingByName<std::string>("TheEndFormat")->value);
+		this->addToggle("Use Same Dimension Format", "Uses the same format for all dimensions.", this->settings.getSettingByName<bool>("useSameDimensionFormat")->value);
+        if (this->settings.getSettingByName<bool>("useSameDimensionFormat")->value) {
+			this->addTextBox("Dimension Format", "", settings.getSettingByName<std::string>("defaultDimFormat")->value);
+        }
+        else {
+            this->addTextBox("Overworld Dimension Format", "", settings.getSettingByName<std::string>("OverworldFormat")->value);
+            this->addTextBox("Nether Dimension Format", "", settings.getSettingByName<std::string>("NetherFormat")->value);
+            this->addTextBox("TheEnd Dimension Format", "", settings.getSettingByName<std::string>("TheEndFormat")->value);
+        }
 
         this->extraPadding();
 
