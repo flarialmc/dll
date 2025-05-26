@@ -38,24 +38,28 @@ public:
 
           //TO-DO : Add cases for third person
 
-          switch(perspective) {
-              case Perspective::FirstPerson:
+            switch(perspective) {
+                case Perspective::FirstPerson:
 
-                  matrix = glm::translate<float>(matrix, glm::vec3(-0.5f, 0.2f, 0.0f));
-                  matrix = glm::rotate<float>(matrix, glm::radians(30.f), glm::vec3(0.f, 1.f, 0.f));
-                  matrix = glm::rotate<float>(matrix, glm::radians(-80.f), glm::vec3(1.f, 0.f, 0.f));
-                  matrix = glm::rotate<float>(matrix, glm::radians(60.f), glm::vec3(0.f, 1.f, 0.f));
+                    matrix = glm::translate<float>(matrix, glm::vec3(-0.5f, 0.2f, 0.0f));
+                    matrix = glm::rotate<float>(matrix, glm::radians(30.f), glm::vec3(0.f, 1.f, 0.f));
+                    matrix = glm::rotate<float>(matrix, glm::radians(-80.f), glm::vec3(1.f, 0.f, 0.f));
+                    matrix = glm::rotate<float>(matrix, glm::radians(60.f), glm::vec3(0.f, 1.f, 0.f));
 
-                  break;
-              case Perspective::ThirdPersonBack:
-                  break;
-              case Perspective::ThirdPersonFront:
-                matrix = glm::translate<float>(matrix, glm::vec3(-0.5f, 0.2f, 0.0f));
-                matrix = glm::rotate<float>(matrix, glm::radians(90.f), glm::vec3(0.f, 1.f, 0.f));
-                matrix = glm::rotate<float>(matrix, glm::radians(-100.f), glm::vec3(1.f, 0.f, 0.f));
-                matrix = glm::rotate<float>(matrix, glm::radians(130.f), glm::vec3(0.f, 1.f, 0.f));
-                  break;
-          }
+                    break;
+
+                case Perspective::ThirdPersonBack:
+                    break;
+
+                case Perspective::ThirdPersonFront:
+
+                    matrix = glm::translate<float>(matrix, glm::vec3(-0.5f, 0.2f, 0.2f));
+                    matrix = glm::rotate<float>(matrix, glm::radians(105.f), glm::vec3(0.f, 1.f, 0.f));
+                    matrix = glm::rotate<float>(matrix, glm::radians(-100.f), glm::vec3(1.f, 0.f, 0.f));
+                    matrix = glm::rotate<float>(matrix, glm::radians(130.f), glm::vec3(0.f, 1.f, 0.f));
+
+                    break;
+            }
         }
     }
 
