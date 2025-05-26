@@ -69,7 +69,6 @@ public:
 
     void defaultConfig() override {
         Module::defaultConfig();
-        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"GG");
     }
 
     void settingsRender(float settingsOffset) override {
