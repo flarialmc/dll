@@ -9,7 +9,7 @@ public:
     Perspective perspective;
 
     BlockHit() : Module("Block Hit", "Sword Blocking Animation like Java (visual only)",
-                      IDR_SWORD_PNG, "") {
+        IDR_SWORD_PNG, "") {
         Module::setup();
     };
 
@@ -36,35 +36,40 @@ public:
 
         if (itemStack->item.get() != nullptr && CPSCounter::GetRightHeld() && itemStack->getItem()->name.contains("sword")) {
 
-          //TO-DO : Add cases for third person
+            switch (perspective) {
+            case Perspective::FirstPerson:
 
-            switch(perspective) {
-                case Perspective::FirstPerson:
+                matrix = glm::translate<float>(matrix, glm::vec3(-0.5f, 0.2f, 0.0f));
+                matrix = glm::rotate<float>(matrix, glm::radians(30.f), glm::vec3(0.f, 1.f, 0.f));
+                matrix = glm::rotate<float>(matrix, glm::radians(-80.f), glm::vec3(1.f, 0.f, 0.f));
+                matrix = glm::rotate<float>(matrix, glm::radians(60.f), glm::vec3(0.f, 1.f, 0.f));
 
-                    matrix = glm::translate<float>(matrix, glm::vec3(-0.5f, 0.2f, 0.0f));
-                    matrix = glm::rotate<float>(matrix, glm::radians(30.f), glm::vec3(0.f, 1.f, 0.f));
-                    matrix = glm::rotate<float>(matrix, glm::radians(-80.f), glm::vec3(1.f, 0.f, 0.f));
-                    matrix = glm::rotate<float>(matrix, glm::radians(60.f), glm::vec3(0.f, 1.f, 0.f));
+                break;
 
-                    break;
+            case Perspective::ThirdPersonBack:
 
-                case Perspective::ThirdPersonBack:
-                    break;
+                matrix = glm::translate<float>(matrix, glm::vec3(-0.5f, 0.2f, 0.2f));
+                matrix = glm::rotate<float>(matrix, glm::radians(105.f), glm::vec3(0.f, 1.f, 0.f));
+                matrix = glm::rotate<float>(matrix, glm::radians(-100.f), glm::vec3(1.f, 0.f, 0.f));
+                matrix = glm::rotate<float>(matrix, glm::radians(130.f), glm::vec3(0.f, 1.f, 0.f));
 
-                case Perspective::ThirdPersonFront:
+                break;
 
-                    matrix = glm::translate<float>(matrix, glm::vec3(-0.5f, 0.2f, 0.2f));
-                    matrix = glm::rotate<float>(matrix, glm::radians(105.f), glm::vec3(0.f, 1.f, 0.f));
-                    matrix = glm::rotate<float>(matrix, glm::radians(-100.f), glm::vec3(1.f, 0.f, 0.f));
-                    matrix = glm::rotate<float>(matrix, glm::radians(130.f), glm::vec3(0.f, 1.f, 0.f));
+            case Perspective::ThirdPersonFront:
 
-                    break;
+                matrix = glm::translate<float>(matrix, glm::vec3(-0.5f, 0.2f, 0.2f));
+                matrix = glm::rotate<float>(matrix, glm::radians(105.f), glm::vec3(0.f, 1.f, 0.f));
+                matrix = glm::rotate<float>(matrix, glm::radians(-100.f), glm::vec3(1.f, 0.f, 0.f));
+                matrix = glm::rotate<float>(matrix, glm::radians(130.f), glm::vec3(0.f, 1.f, 0.f));
+
+                break;
             }
         }
     }
 
-    void defaultConfig() override { Module::defaultConfig();
-        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string) "GG");
+    void defaultConfig() override {
+        Module::defaultConfig();
+        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"GG");
     }
 
     void settingsRender(float settingsOffset) override {
@@ -78,8 +83,8 @@ public:
 
         FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
         FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                                  Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(0.88f, "height"));
+            Constraints::RelativeConstraint(1.0, "width"),
+            Constraints::RelativeConstraint(0.88f, "height"));
 
         FlarialGUI::UnsetScrollView();
 
