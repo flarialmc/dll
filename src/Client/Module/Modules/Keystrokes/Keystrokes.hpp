@@ -251,10 +251,10 @@ public:
                 if (ClickGUI::editmenu) { // makes module movable
                     FlarialGUI::SetWindowRect(realcenter.x - (keycardSize + spacing), realcenter.y, totalWidth,
                                               totalHeight, index, keycardSize + spacing);
+                    checkForRightClickAndOpenSettings(realcenter.x - (keycardSize + spacing), realcenter.y, totalWidth, totalHeight);
 
                     Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, totalWidth,
                                                                     totalHeight);
-
 
                     realcenter.x = vec2.x;
                     realcenter.y = vec2.y;
