@@ -5,6 +5,8 @@
 #include "../../Manager.hpp"
 #include "../../../Client.hpp"
 #include "../Nick/NickModule.hpp"
+#include <vector>
+#include <algorithm>
 
 class TabList : public Module {
 public:
@@ -28,6 +30,7 @@ public:
     void defaultConfig() override {
         Module::defaultConfig();
         if (settings.getSettingByName<bool>("alphaOrder") == nullptr) settings.addSetting<bool>("alphaOrder", true);
+        if (settings.getSettingByName<bool>("flarialFirst") == nullptr) settings.addSetting<bool>("flarialFirst", true);
 
         if (settings.getSettingByName<float>("percentageX") == nullptr) {
             settings.addSetting("percentageX", 0.0f);
@@ -90,6 +93,7 @@ public:
 
         this->addHeader("Misc");
         this->addToggle("Alphabetical Order", "", this->settings.getSettingByName<bool>("alphaOrder")->value);
+        this->addToggle("Flarial First", "Prioritize Flarial users (Dev > Gamer > Booster > Supporter > Default) at the top", this->settings.getSettingByName<bool>("flarialFirst")->value);
         this->addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
 
         this->extraPadding();
@@ -101,6 +105,106 @@ public:
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
+    }
+
+    // Helper function to assign priority based on role using ApiUtils
+    static int getRolePriority(const std::string& name) {
+        std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
+        if (clearedName.empty()) return 5; // Lowest priority for invalid names
+
+        auto it = std::ranges::find(APIUtils::onlineUsers, clearedName);
+        if (it == APIUtils::onlineUsers.end()) return 5; // Non-Flarial users
+
+        // Check roles in order of priority using ApiUtils
+        if (APIUtils::hasRole("Dev", clearedName)) return 0;
+        if (APIUtils::hasRole("Gamer", clearedName)) return 1;
+        if (APIUtils::hasRole("Booster", clearedName)) return 2;
+        if (APIUtils::hasRole("Supporter", clearedName)) return 3;
+        return 4; // Default Flarial user (in onlineUsers but no specific role)
+    }
+
+    // Helper function to sort players by Flarial hierarchy
+    static std::vector<std::pair<mcUUID, PlayerListEntry>> sortByFlarialHierarchy(const std::unordered_map<mcUUID, PlayerListEntry>& sourceMap) {
+        std::vector<std::pair<mcUUID, PlayerListEntry>> players(sourceMap.begin(), sourceMap.end());
+        std::sort(players.begin(), players.end(), [](const auto& a, const auto& b) {
+            int priorityA = getRolePriority(a.second.name);
+            int priorityB = getRolePriority(b.second.name);
+            if (priorityA != priorityB) return priorityA < priorityB;
+            // If priorities are equal, sort alphabetically
+            return std::lexicographical_compare(
+                a.second.name.begin(), a.second.name.end(),
+                b.second.name.begin(), b.second.name.end(),
+                [](char c1, char c2) {
+                    return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
+                });
+            });
+        return players;
+    }
+
+    // Updated function to handle Flarial First in alphabetical order
+    static std::vector<std::string> copyMapInAlphabeticalOrder(const std::unordered_map<mcUUID, PlayerListEntry>& sourceMap, bool flarialFirst) {
+        std::vector<std::string> names;
+        std::vector<std::string> flarialNames;
+        std::vector<std::string> nonFlarialNames;
+
+        // Split players into Flarial and non-Flarial groups
+        for (const auto& pair : sourceMap) {
+            std::string name = pair.second.name;
+            if (name.empty()) continue;
+
+            std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
+            if (clearedName.empty()) clearedName = name;
+
+            auto it = std::ranges::find(APIUtils::onlineUsers, clearedName);
+            if (flarialFirst && it != APIUtils::onlineUsers.end()) {
+                flarialNames.push_back(name);
+            }
+            else {
+                nonFlarialNames.push_back(name);
+            }
+        }
+
+        if (flarialFirst) {
+            // Sort Flarial users by hierarchy using ApiUtils
+            std::sort(flarialNames.begin(), flarialNames.end(), [](const auto& a, const auto& b) {
+                int priorityA = getRolePriority(a);
+                int priorityB = getRolePriority(b);
+                if (priorityA != priorityB) return priorityA < priorityB;
+                // If priorities are equal, sort alphabetically
+                return std::lexicographical_compare(
+                    a.begin(), a.end(), b.begin(), b.end(),
+                    [](char c1, char c2) {
+                        return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
+                    });
+                });
+
+            // Sort non-Flarial users alphabetically
+            std::sort(nonFlarialNames.begin(), nonFlarialNames.end(), [](const auto& a, const auto& b) {
+                return std::lexicographical_compare(
+                    a.begin(), a.end(), b.begin(), b.end(),
+                    [](char c1, char c2) {
+                        return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
+                    });
+                });
+
+            // Combine: Flarial users first, then non-Flarial
+            names.insert(names.end(), flarialNames.begin(), flarialNames.end());
+            names.insert(names.end(), nonFlarialNames.begin(), nonFlarialNames.end());
+        }
+        else {
+            // Standard alphabetical sort for all players
+            names = nonFlarialNames;
+            names.insert(names.end(), flarialNames.begin(), flarialNames.end());
+            std::sort(names.begin(), names.end(), [](const auto& a, const auto& b) {
+                return std::lexicographical_compare(
+                    a.begin(), a.end(), b.begin(), b.end(),
+                    [](char c1, char c2) {
+                        return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
+                    });
+                });
+        }
+
+        return names;
     }
 
     void normalRender(int index, std::string& value) override {
@@ -174,6 +278,7 @@ public:
 
                 int i = 0;
                 bool alphaOrder = settings.getSettingByName<bool>("alphaOrder")->value;
+                bool flarialFirst = settings.getSettingByName<bool>("flarialFirst")->value;
 
                 // Define role logos for reuse in both branches
                 std::map<std::string, int> roleLogos = {
@@ -186,7 +291,7 @@ public:
                 };
 
                 if (alphaOrder) {
-                    auto vecmap = copyMapInAlphabeticalOrder(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap());
+                    auto vecmap = copyMapInAlphabeticalOrder(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap(), flarialFirst);
 
                     for (const auto& rawName : vecmap) {
                         i++;
@@ -254,7 +359,12 @@ public:
                     }
                 }
                 else {
-                    for (const auto& pair : SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap()) {
+                    // Use Flarial hierarchy sorting if flarialFirst is enabled
+                    auto players = flarialFirst ? sortByFlarialHierarchy(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap())
+                        : std::vector<std::pair<mcUUID, PlayerListEntry>>(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap().begin(),
+                            SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap().end());
+
+                    for (const auto& pair : players) {
                         i++;
                         std::string name = pair.second.name;
                         if (name.empty()) continue;
@@ -332,26 +442,5 @@ public:
         }
 
         if (!this->isKeybind(event.keys)) this->active = false;
-    }
-
-    static std::vector<std::string> copyMapInAlphabeticalOrder(const std::unordered_map<mcUUID, PlayerListEntry>& sourceMap) {
-        std::vector<std::string> names;
-
-        for (const auto& pair : sourceMap) {
-            std::string name = pair.second.name;
-            if (!name.empty()) {
-                names.push_back(name);
-            }
-        }
-
-        std::sort(names.begin(), names.end(), [](const auto& a, const auto& b) {
-            return std::lexicographical_compare(
-                a.begin(), a.end(), b.begin(), b.end(),
-                [](char c1, char c2) {
-                    return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
-                });
-            });
-
-        return names;
     }
 };
