@@ -38,13 +38,14 @@ public:
 
 	void defaultConfig() override {
 		if (settings.getSettingByName<float>("textSize") == nullptr) settings.addSetting("textSize", 0.05f);
-		Module::defaultConfig();
+		
 
 		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 2.0f);
-		if (settings.getSettingByName<float>("percentageX") == nullptr) {
-			settings.addSetting("percentageX", 0.0f);
-			settings.addSetting("percentageY", 0.0f);
-		}
+		if (settings.getSettingByName<float>("percentageX") == nullptr) settings.addSetting("percentageX", 0.0f);
+		if (settings.getSettingByName<float>("percentageY") == nullptr) settings.addSetting("percentageY", 0.0f);
+		
+		Module::defaultConfig();
+
 		if (settings.getSettingByName<bool>("show_offhand") == nullptr) settings.addSetting("show_offhand", true);
 		if (settings.getSettingByName<bool>("vertical") == nullptr) settings.addSetting("vertical", false);
 		if (settings.getSettingByName<bool>("durability_left") == nullptr) settings.addSetting("durability_left", false);
@@ -227,11 +228,13 @@ public:
 								else if (durabilities[i][0] != durabilities[i][1]) finalColor = staticDurBarColor;
 							}
 
+							finalColor.a = this->settings.getSettingByName<float>("durBarOpacity")->value;
+
 							if (this->settings.getSettingByName<bool>("showDurBar")->value && (settings.getSettingByName<bool>("showDurBarMax")->value || durabilities[i][0] != durabilities[i][1]) && durabilities[i][1] != 0) {
 								FlarialGUI::RoundedRect(
 									currentPos.x + xmodifier + (durBarOffsetX * uiscale * guiscale),
 									currentPos.y + ymodifier + (durBarOffsetY * uiscale * guiscale),
-									D2D1::ColorF(D2D1::ColorF::Black),
+									D2D1::ColorF(D2D1::ColorF::Black, this->settings.getSettingByName<float>("durBarOpacity")->value),
 									guiscale * uiscale * 13.f,
 									guiscale * uiscale * 2.f,
 									0, 0
@@ -296,12 +299,13 @@ public:
 							else if (durabilities[0][0] != durabilities[0][1]) finalColor = staticDurBarColor;
 						}
 
+						finalColor.a = this->settings.getSettingByName<float>("durBarOpacity")->value;
 						
 						if (this->settings.getSettingByName<bool>("showDurBar")->value && (settings.getSettingByName<bool>("showDurBarMax")->value || durabilities[0][0] != durabilities[0][1]) && durabilities[0][1] != 0) {
 							FlarialGUI::RoundedRect(
 								currentPos.x + xmodifier + (durBarOffsetX * uiscale * guiscale),
 								currentPos.y + ymodifier + (durBarOffsetY * uiscale * guiscale),
-								D2D1::ColorF(D2D1::ColorF::Black),
+								D2D1::ColorF(D2D1::ColorF::Black, this->settings.getSettingByName<float>("durBarOpacity")->value),
 								guiscale * uiscale * 13.f,
 								guiscale * uiscale * 2.f,
 								0, 0
@@ -364,12 +368,13 @@ public:
 								else if (durabilities[1][0] != durabilities[1][1]) finalColor = staticDurBarColor;
 							}
 
+							finalColor.a = this->settings.getSettingByName<float>("durBarOpacity")->value;
 
 							if (this->settings.getSettingByName<bool>("showDurBar")->value && (settings.getSettingByName<bool>("showDurBarMax")->value || durabilities[1][0] != durabilities[1][1]) && durabilities[1][1] != 0) {
 								FlarialGUI::RoundedRect(
 									currentPos.x + xmodifier + (durBarOffsetX * uiscale * guiscale),
 									currentPos.y + ymodifier + (durBarOffsetY * uiscale * guiscale),
-									D2D1::ColorF(D2D1::ColorF::Black),
+									D2D1::ColorF(D2D1::ColorF::Black, this->settings.getSettingByName<float>("durBarOpacity")->value),
 									guiscale * uiscale * 13.f,
 									guiscale * uiscale * 2.f,
 									0, 0
@@ -424,10 +429,8 @@ public:
 				height = s * 5 * spacing + s;
 			}
 
-			if (settingperc.x != 0)
-				currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
-			else
-				currentPos = Constraints::CenterConstraint(width, height);
+			if (settingperc.x != 0) currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
+			else currentPos = Constraints::CenterConstraint(width, height);
 
 			if (ClickGUI::editmenu) {
 				// bounding boxes

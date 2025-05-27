@@ -132,23 +132,12 @@ public:
     }
 
     void defaultConfig() override { Module::defaultConfig();
-        if (settings.getSettingByName<float>("speed") == nullptr)
-            settings.addSetting("speed", 8.f);
-
-        if (settings.getSettingByName<float>("xmul") == nullptr)
-            settings.addSetting("xmul", 18.f);
-
-        if (settings.getSettingByName<float>("ymul") == nullptr)
-            settings.addSetting("ymul", 16.f);
-
-        if (settings.getSettingByName<float>("zmul") == nullptr)
-            settings.addSetting("zmul", 18.f);
-
-        if (settings.getSettingByName<bool>("preserverots") == nullptr)
-            settings.addSetting("preserverots", false);
-
-        if (settings.getSettingByName<bool>("smoothrots") == nullptr)
-            settings.addSetting("smoothrots", true);
+        if (settings.getSettingByName<float>("speed") == nullptr) settings.addSetting("speed", 8.f);
+        if (settings.getSettingByName<float>("xmul") == nullptr) settings.addSetting("xmul", 18.f);
+        if (settings.getSettingByName<float>("ymul") == nullptr) settings.addSetting("ymul", 16.f);
+        if (settings.getSettingByName<float>("zmul") == nullptr) settings.addSetting("zmul", 18.f);
+        if (settings.getSettingByName<bool>("preserverots") == nullptr) settings.addSetting("preserverots", false);
+        if (settings.getSettingByName<bool>("smoothrots") == nullptr) settings.addSetting("smoothrots", true);
     }
 
     void settingsRender(float settingsOffset) override {

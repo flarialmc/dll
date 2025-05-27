@@ -25,9 +25,7 @@ public:
     }
 
     void defaultConfig() override { Module::defaultConfig();
-        if (settings.getSettingByName<std::string>("text") == nullptr)
-            settings.addSetting("text", (std::string)"FPS: {value}");
-
+        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"FPS: {value}");
         if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
         if (settings.getSettingByName<float>("fpsSpoofer") == nullptr) settings.addSetting("fpsSpoofer", 1.0f);
 

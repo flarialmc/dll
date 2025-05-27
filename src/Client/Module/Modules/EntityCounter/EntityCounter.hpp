@@ -4,124 +4,123 @@
 
 class EntityCounter : public Module {
 private:
-    int entityCount = 0;
+	int entityCount = 0;
 public:
 
-    EntityCounter() : Module("Entity Counter", "Counts the entities in the surrounding area",
-                            IDR_ENTITYCOUNTER_PNG, "") {
-        Module::setup();
-    };
+	EntityCounter() : Module("Entity Counter", "Counts the entities in the surrounding area",
+		IDR_ENTITYCOUNTER_PNG, "") {
+		Module::setup();
+	};
 
-    void onEnable() override {
-        Listen(this, RenderEvent, &EntityCounter::onRender);
-        Listen(this, SetupAndRenderEvent, &EntityCounter::onSetupAndRender);
-        Module::onEnable();
-    }
+	void onEnable() override {
+		Listen(this, RenderEvent, &EntityCounter::onRender);
+		Listen(this, SetupAndRenderEvent, &EntityCounter::onSetupAndRender);
+		Module::onEnable();
+	}
 
-    void onDisable() override {
-        Deafen(this, RenderEvent, &EntityCounter::onRender);
-        Deafen(this, SetupAndRenderEvent, &EntityCounter::onSetupAndRender);
-        Module::onDisable();
-    }
+	void onDisable() override {
+		Deafen(this, RenderEvent, &EntityCounter::onRender);
+		Deafen(this, SetupAndRenderEvent, &EntityCounter::onSetupAndRender);
+		Module::onDisable();
+	}
 
-    void defaultConfig() override { Module::defaultConfig();
-        if (settings.getSettingByName<std::string>("text") == nullptr)
-            settings.addSetting("text", (std::string) "{value} Entities");
+	void defaultConfig() override {
+		Module::defaultConfig();
+		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value} Entities");
+		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
+	}
 
-        if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
-    }
+	void settingsRender(float settingsOffset) override {
 
-    void settingsRender(float settingsOffset) override {
+		float x = Constraints::PercentageConstraint(0.019, "left");
+		float y = Constraints::PercentageConstraint(0.10, "top");
 
-        float x = Constraints::PercentageConstraint(0.019, "left");
-        float y = Constraints::PercentageConstraint(0.10, "top");
-
-        const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
-
-
-        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                                  Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(0.88f, "height"));
+		const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
 
 
-        this->addHeader("Main");
-        this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
-        this->addToggle("Border", "", this->settings.getSettingByName<bool>("border")->value);
-        this->addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", this->settings.getSettingByName<bool>(
-        "BlurEffect")->value);
-        this->addConditionalSlider(this->settings.getSettingByName<bool>(
-                "border")->value, "Border Thickness", "", this->settings.getSettingByName<float>("borderWidth")->value, 4.f);
-        this->addSlider("Rounding", "Rounding of the rectangle", this->settings.getSettingByName<float>("rounding")->value);
+		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+			Constraints::RelativeConstraint(1.0, "width"),
+			Constraints::RelativeConstraint(0.88f, "height"));
 
-        this->extraPadding();
 
-        this->addHeader("Text");
-        this->addTextBox("Format", "", settings.getSettingByName<std::string>("text")->value);
-        this->addSlider("Text Scale", "", this->settings.getSettingByName<float>("textscale")->value, 2.0f);
-        this->addDropdown("Text Alignment", "",  std::vector<std::string>{"Left", "Center", "Right"}, this->settings.getSettingByName<std::string>("textalignment")->value);
-        this->addColorPicker("Color", "Text Color", settings.getSettingByName<std::string>("textColor")->value,
-                             settings.getSettingByName<float>("textOpacity")->value,
-                             settings.getSettingByName<bool>("textRGB")->value);
-        this->addToggle("Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
-        this->addColorPicker("Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value,
-            settings.getSettingByName<float>("textShadowOpacity")->value,
-            settings.getSettingByName<bool>("textShadowRGB")->value);
-        this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
+		this->addHeader("Main");
+		this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
+		this->addToggle("Border", "", this->settings.getSettingByName<bool>("border")->value);
+		this->addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", this->settings.getSettingByName<bool>(
+			"BlurEffect")->value);
+		this->addConditionalSlider(this->settings.getSettingByName<bool>(
+			"border")->value, "Border Thickness", "", this->settings.getSettingByName<float>("borderWidth")->value, 4.f);
+		this->addSlider("Rounding", "Rounding of the rectangle", this->settings.getSettingByName<float>("rounding")->value);
 
-        this->extraPadding();
+		this->extraPadding();
 
-        this->addHeader("Colors");
-        this->addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value,
-                             settings.getSettingByName<float>("bgOpacity")->value,
-                             settings.getSettingByName<bool>("bgRGB")->value);
-        this->addToggle("Background Shadow", "Displays a shadow under the background", settings.getSettingByName<bool>("rectShadow")->value);
-        this->addColorPicker("Shadow Color", "Background Shadow Color", settings.getSettingByName<std::string>("rectShadowCol")->value,
-            settings.getSettingByName<float>("rectShadowOpacity")->value,
-            settings.getSettingByName<bool>("rectShadowRGB")->value);
-        this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("rectShadowOffset")->value, 0.02f, 0.001f);
+		this->addHeader("Text");
+		this->addTextBox("Format", "", settings.getSettingByName<std::string>("text")->value);
+		this->addSlider("Text Scale", "", this->settings.getSettingByName<float>("textscale")->value, 2.0f);
+		this->addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, this->settings.getSettingByName<std::string>("textalignment")->value);
+		this->addColorPicker("Color", "Text Color", settings.getSettingByName<std::string>("textColor")->value,
+			settings.getSettingByName<float>("textOpacity")->value,
+			settings.getSettingByName<bool>("textRGB")->value);
+		this->addToggle("Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
+		this->addColorPicker("Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value,
+			settings.getSettingByName<float>("textShadowOpacity")->value,
+			settings.getSettingByName<bool>("textShadowRGB")->value);
+		this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
 
-        this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value,
-                             settings.getSettingByName<float>("borderOpacity")->value,
-                             settings.getSettingByName<bool>("borderRGB")->value);        this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
+		this->extraPadding();
 
-        this->extraPadding();
+		this->addHeader("Colors");
+		this->addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value,
+			settings.getSettingByName<float>("bgOpacity")->value,
+			settings.getSettingByName<bool>("bgRGB")->value);
+		this->addToggle("Background Shadow", "Displays a shadow under the background", settings.getSettingByName<bool>("rectShadow")->value);
+		this->addColorPicker("Shadow Color", "Background Shadow Color", settings.getSettingByName<std::string>("rectShadowCol")->value,
+			settings.getSettingByName<float>("rectShadowOpacity")->value,
+			settings.getSettingByName<bool>("rectShadowRGB")->value);
+		this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("rectShadowOffset")->value, 0.02f, 0.001f);
 
-        this->addHeader("Misc Customizations");
+		this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value,
+			settings.getSettingByName<float>("borderOpacity")->value,
+			settings.getSettingByName<bool>("borderRGB")->value);        this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
 
-        this->addToggle("Reverse Padding X", "For Text Position",  this->settings.getSettingByName<bool>(
-                "reversepaddingx")->value);
+		this->extraPadding();
 
-        this->addToggle("Reverse Padding Y", "For Text Position",  this->settings.getSettingByName<bool>(
-        "reversepaddingy")->value);
+		this->addHeader("Misc Customizations");
 
-        this->addSlider("Padding X", "For Text Position", this->settings.getSettingByName<float>("padx")->value);
-        this->addSlider("Padding Y", "For Text Position", this->settings.getSettingByName<float>("pady")->value);
+		this->addToggle("Reverse Padding X", "For Text Position", this->settings.getSettingByName<bool>(
+			"reversepaddingx")->value);
 
-        this->addSlider("Rectangle Width", "", this->settings.getSettingByName<float>("rectwidth")->value, 2.f, 0.001f);
-        this->addSlider("Rectangle Height", "", this->settings.getSettingByName<float>("rectheight")->value, 2.f, 0.001f);
+		this->addToggle("Reverse Padding Y", "For Text Position", this->settings.getSettingByName<bool>(
+			"reversepaddingy")->value);
 
-        this->addToggle("Responsive Rectangle", "Rectangle resizes with text",  this->settings.getSettingByName<bool>(
-"responsivewidth")->value);
+		this->addSlider("Padding X", "For Text Position", this->settings.getSettingByName<float>("padx")->value);
+		this->addSlider("Padding Y", "For Text Position", this->settings.getSettingByName<float>("pady")->value);
 
-        this->addSlider("Rotation", "see for yourself!", this->settings.getSettingByName<float>("rotation")->value, 360.f, 0, false);
+		this->addSlider("Rectangle Width", "", this->settings.getSettingByName<float>("rectwidth")->value, 2.f, 0.001f);
+		this->addSlider("Rectangle Height", "", this->settings.getSettingByName<float>("rectheight")->value, 2.f, 0.001f);
 
-        FlarialGUI::UnsetScrollView();
-        this->resetPadding();
-    }
+		this->addToggle("Responsive Rectangle", "Rectangle resizes with text", this->settings.getSettingByName<bool>(
+			"responsivewidth")->value);
 
-    void onSetupAndRender(SetupAndRenderEvent &event) {
-        if (SDK::clientInstance->getLocalPlayer()) {
-            entityCount = (int)SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList().size();
-        }
-    }
+		this->addSlider("Rotation", "see for yourself!", this->settings.getSettingByName<float>("rotation")->value, 360.f, 0, false);
 
-    void onRender(RenderEvent &event) {
-        if (SDK::clientInstance->getLocalPlayer() && SDK::getCurrentScreen() == "hud_screen") {
+		FlarialGUI::UnsetScrollView();
+		this->resetPadding();
+	}
 
-            std::string str = std::format("{}", entityCount);
+	void onSetupAndRender(SetupAndRenderEvent& event) {
+		if (SDK::clientInstance->getLocalPlayer()) {
+			entityCount = (int)SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList().size();
+		}
+	}
 
-            this->normalRender(24, str);
-        }
-    }
+	void onRender(RenderEvent& event) {
+		if (SDK::clientInstance->getLocalPlayer() && SDK::getCurrentScreen() == "hud_screen") {
+
+			std::string str = std::format("{}", entityCount);
+
+			this->normalRender(24, str);
+		}
+	}
 };

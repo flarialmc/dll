@@ -34,11 +34,10 @@ public:
         if (settings.getSettingByName<float>("xveloc") == nullptr) settings.addSetting("xveloc", 1.0f);
         if (settings.getSettingByName<float>("yveloc") == nullptr) settings.addSetting("yveloc", 0.69f);
         if (settings.getSettingByName<float>("scale") == nullptr) settings.addSetting("scale", 1.0f);
-        if (this->settings.getSettingByName<std::string>("mode") == nullptr) settings.addSetting("mode", (std::string)"Patar");
+        if (settings.getSettingByName<std::string>("mode") == nullptr) settings.addSetting("mode", (std::string)"Patar");
     }
 
     void settingsRender(float settingsOffset) override {
-
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
 
