@@ -68,8 +68,7 @@ public:
     void onSetupAndRender(SetupAndRenderEvent &event) {
         auto screen = SDK::getCurrentScreen();
         isInPauseOrGame = screen == "hud_screen" || screen == "pause_screen";
-        if(isInPauseOrGame)
-            clearQueue();
+        if(isInPauseOrGame) clearQueue();
     }
 
     int isSlotKeybind(std::string key) {
@@ -124,6 +123,7 @@ public:
     };
 
     bool canSwap(std::string_view collectionName) {
+        Logger::debug("{}", collectionName);
         bool isItemContainer = collectionName.find("_item") != std::string_view::npos;
         bool isRecipeContainer = collectionName.find("recipe_") != std::string_view::npos;
         bool isSearchContainerOrBar = collectionName.find("search") != std::string_view::npos;
