@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Module.hpp"
 #include <Events/Render/RenderEvent.hpp>
@@ -85,6 +85,7 @@ public:
     }
 
     void settingsRender(float settingsOffset) override {
+
         float x = Constraints::PercentageConstraint(0.019, "left");
         float y = Constraints::PercentageConstraint(0.10, "top");
 
