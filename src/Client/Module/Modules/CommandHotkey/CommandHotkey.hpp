@@ -130,7 +130,7 @@ public:
 
 	void onKey(KeyEvent& event) {
 		if (!SDK::clientInstance->getLocalPlayer()) return;
-		if (this->isEnabled()) {
+		if (this->isEnabled() && SDK::getCurrentScreen() == "hud_screen") {
 			for (int i = 0; i <= totalKeybinds; ++i) {
 				keybindActions[i]({ std::any(event) });
 			}
