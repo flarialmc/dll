@@ -60,9 +60,7 @@ public:
                              settings.getSettingByName<float>("textOpacity")->value,
                              settings.getSettingByName<bool>("textRGB")->value);
         this->addToggle("Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
-        this->addColorPicker("Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value,
-            settings.getSettingByName<float>("textShadowOpacity")->value,
-            settings.getSettingByName<bool>("textShadowRGB")->value);
+
         this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
 
         this->extraPadding();
@@ -80,7 +78,9 @@ public:
         this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value,
                              settings.getSettingByName<float>("borderOpacity")->value,
                              settings.getSettingByName<bool>("borderRGB")->value);        this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
-
+        this->addColorPicker("Text Shadow Color", "", settings.getSettingByName<std::string>("textShadowCol")->value,
+            settings.getSettingByName<float>("textShadowOpacity")->value,
+            settings.getSettingByName<bool>("textShadowRGB")->value);
         this->extraPadding();
 
         this->addHeader("Misc Customizations");

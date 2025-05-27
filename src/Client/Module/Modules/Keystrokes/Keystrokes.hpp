@@ -209,7 +209,7 @@ public:
                     lmbText.replace(pos, search.length(), FlarialGUI::cached_to_string(CPSCounter::GetLeftCPS()));
                 }
 
-                // rmb
+                // rmb (who cares ong)
                 std::string rmbText = settings.getSettingByName<std::string>("rmbtext")->value;
                 uppercaseSentence = "";
                 for (char c: rmbText) uppercaseSentence += (char)std::toupper(c);

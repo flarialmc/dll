@@ -73,13 +73,7 @@ public:
         this->addSlider("Text Scale", "", this->settings.getSettingByName<float>("textscale")->value, 2.0f);
         this->addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"},
             this->settings.getSettingByName<std::string>("textalignment")->value);
-        this->addColorPicker("Color", "Text Color", settings.getSettingByName<std::string>("textColor")->value,
-            settings.getSettingByName<float>("textOpacity")->value,
-            settings.getSettingByName<bool>("textRGB")->value);
         this->addToggle("Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
-        this->addColorPicker("Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value,
-            settings.getSettingByName<float>("textShadowOpacity")->value,
-            settings.getSettingByName<bool>("textShadowRGB")->value);
         this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
         this->addToggle("Show Decimals", "", this->settings.getSettingByName<bool>("showDecimals")->value);
         this->addConditionalSlider(this->settings.getSettingByName<bool>("showDecimals")->value, "# of Decimals", "", this->settings.getSettingByName<float>("decimalCount")->value, 6.f, 1.f);
@@ -110,11 +104,15 @@ public:
             settings.getSettingByName<float>("rectShadowOpacity")->value,
             settings.getSettingByName<bool>("rectShadowRGB")->value);
         this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("rectShadowOffset")->value, 0.02f, 0.001f);
-
         this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value,
             settings.getSettingByName<float>("borderOpacity")->value,
             settings.getSettingByName<bool>("borderRGB")->value);
-
+        this->addColorPicker("Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value,
+            settings.getSettingByName<float>("textShadowOpacity")->value,
+            settings.getSettingByName<bool>("textShadowRGB")->value);
+        this->addColorPicker("Color", "Text Color", settings.getSettingByName<std::string>("textColor")->value,
+            settings.getSettingByName<float>("textOpacity")->value,
+            settings.getSettingByName<bool>("textRGB")->value);
         this->extraPadding();
 
         this->addHeader("Misc Customizations");
