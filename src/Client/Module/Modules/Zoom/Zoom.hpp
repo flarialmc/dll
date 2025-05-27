@@ -49,6 +49,7 @@ public:
 		if (settings.getSettingByName<bool>("hidemodules") == nullptr) settings.addSetting("hidemodules", false);
 		if (settings.getSettingByName<bool>("UseScroll") == nullptr) settings.addSetting("UseScroll", true);
 		if (settings.getSettingByName<bool>("lowsens") == nullptr) settings.addSetting("lowsens", true);
+		if (settings.getSettingByName<bool>("toggleZoom") == nullptr) settings.addSetting("toggleZoom", false);
 		//if (settings.getSettingByName<bool>("hidehud") == nullptr) settings.addSetting("hidehud", false);
 		if (settings.getSettingByName<float>("modifier") == nullptr) settings.addSetting("modifier", 10.0f);
 		if (settings.getSettingByName<float>("anim") == nullptr) settings.addSetting("anim", 0.20f);
@@ -72,6 +73,7 @@ public:
 		this->addHeader("Main");
 		this->addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
 		this->addToggle("Use Scroll", "Allows to adjust zoom with scroll wheel.", this->settings.getSettingByName<bool>("UseScroll")->value);
+		this->addToggle("Toggle Zoom", "No need to hold the keybind to zoom.", this->settings.getSettingByName<bool>("toggleZoom")->value);
 		this->addSlider("Modifier", "How much to Zoom each time you scroll.", this->settings.getSettingByName<float>("modifier")->value, 30, 0, false);
 		this->addToggle("Disable Animation", "The animation when you zoom", this->settings.getSettingByName<bool>("disableanim")->value);
 		this->addSlider("Animation Speed", "Speed at which scroll zoom acts.", this->settings.getSettingByName<float>("anim")->value, 0.40);
@@ -192,12 +194,14 @@ public:
 	}
 
 	void onKey(KeyEvent& event) {
-		if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
+		
+		if (this->isKeybind(event.keys) && 
+			this->isKeyPartOfKeybind(event.key) && 
+			(this->settings.getSettingByName<bool>("toggleZoom")->value ? event.getAction() == ActionType::Pressed : true)
+			) {
 			keybindActions[0]({});
 			if (!this->settings.getSettingByName<bool>("SaveModifier")->value) zoomValue = 30.0f;
-		}
-
-		if (!this->isKeybind(event.keys)) this->active = false;
+		} else if (this->settings.getSettingByName<bool>("toggleZoom")->value ? (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) : !this->isKeybind(event.keys) && (this->settings.getSettingByName<bool>("toggleZoom")->value ? event.getAction() == ActionType::Pressed : true)) this->active = false;
 	};
 
 	// TODO: add dolly zoom and world2screen zoom stabilization ?
