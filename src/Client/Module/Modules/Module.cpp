@@ -392,16 +392,21 @@ void Module::addElementText(std::string text, std::string subtext) {
 
     FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, textCol, false);
     if (!subtext.empty()) FlarialGUI::FlarialTextWithFont(x, subtextY, FlarialGUI::to_wide(subtext).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, subtextCol, false);
+
 }
 
-void Module::addSlider(std::string text, std::string subtext, float& value, float maxVal, float minVal, bool zerosafe) {
+void Module::addSlider(std::string text, std::string subtext, float& value, float maxVal, float minVal, bool zerosafe, std::string moduleName, std::string settingName) {
     float elementX = Constraints::PercentageConstraint(0.33f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+    if (settingName == "outlinewidth") {
+        //Logger::success(std::to_string(value));
+    }
 
     if (value > maxVal) value = maxVal;
     else if (value < minVal) value = minVal;
 
-    FlarialGUI::Slider(sliderIndex, elementX, y, value, maxVal, minVal, zerosafe);
+    FlarialGUI::Slider(sliderIndex, elementX, y, value, maxVal, minVal, zerosafe, moduleName, settingName);
 
     Module::addElementText(text, subtext);
     
