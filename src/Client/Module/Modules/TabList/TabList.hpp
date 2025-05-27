@@ -54,11 +54,7 @@ public:
 
 		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 0.65f);
 		if (settings.getSettingByName<bool>("BlurEffect") == nullptr) settings.addSetting("BlurEffect", false);
-	}
-
-        if (settings.getSettingByName<bool>("BlurEffect") == nullptr) {
-            settings.addSetting("BlurEffect", false);
-        }
+        if (settings.getSettingByName<bool>("BlurEffect") == nullptr) settings.addSetting("BlurEffect", false);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -237,10 +233,6 @@ public:
 				D2D1_COLOR_F disabledColor = settings.getSettingByName<bool>("bgRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
 				D2D1_COLOR_F textColor = settings.getSettingByName<bool>("textRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textColor")->value);
 				D2D1_COLOR_F borderColor = settings.getSettingByName<bool>("borderRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
-
-                D2D1_COLOR_F borderColor;
-                if (settings.getSettingByName<bool>("borderRGB")->value) borderColor = FlarialGUI::rgbColor;
-                else borderColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
 
                 disabledColor.a = settings.getSettingByName<float>("bgOpacity")->value;
                 textColor.a = settings.getSettingByName<float>("textOpacity")->value;
