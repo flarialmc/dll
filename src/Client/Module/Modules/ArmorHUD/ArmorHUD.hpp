@@ -38,12 +38,11 @@ public:
 
 	void defaultConfig() override {
 		if (settings.getSettingByName<float>("textSize") == nullptr) settings.addSetting("textSize", 0.05f);
-		
-
+		if (settings.getSettingByName<bool>("textShadow") == nullptr)  settings.addSetting("textShadow", true);
 		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 2.0f);
 		if (settings.getSettingByName<float>("percentageX") == nullptr) settings.addSetting("percentageX", 0.0f);
 		if (settings.getSettingByName<float>("percentageY") == nullptr) settings.addSetting("percentageY", 0.0f);
-		
+
 		Module::defaultConfig();
 
 		if (settings.getSettingByName<bool>("show_offhand") == nullptr) settings.addSetting("show_offhand", true);
@@ -64,6 +63,11 @@ public:
 		if (settings.getSettingByName<std::string>("specialMaxDurBarColor") == nullptr) settings.addSetting("specialMaxDurBarColor", (std::string)"FFFFFF");
 		if (settings.getSettingByName<float>("specialMaxDurBarColor_opacity") == nullptr) settings.addSetting("specialMaxDurBarColor_opacity", 1.f);
 		if (settings.getSettingByName<bool>("specialMaxDurBarColor_rgb") == nullptr) settings.addSetting("specialMaxDurBarColor_rgb", false);
+
+		if (settings.getSettingByName<std::string>("textShadowCol") == nullptr) settings.addSetting("textShadowCol", 0.015f);
+		if (settings.getSettingByName<float>("textShadowOffset") == nullptr) settings.addSetting("textShadowOffset", 0.015f);
+		if (settings.getSettingByName<bool>("textShadowRGB") == nullptr) settings.addSetting("textShadowRGB", false);
+		if (settings.getSettingByName<float>("textShadowOpacity") == nullptr) settings.addSetting("textShadowRGB", 0.55f);
 
 		if (settings.getSettingByName<bool>("fillGaps") == nullptr) settings.addSetting("fillGaps", true);
 
@@ -118,6 +122,8 @@ public:
 			this->addSlider("Text Size", "", this->settings.getSettingByName<float>("textSize")->value, 0.25f, 0.0f, true);
 			this->addToggle("Show Durability in %", "", this->settings.getSettingByName<bool>("percent")->value);
 			if (!this->settings.getSettingByName<bool>("percent")->value) this->addToggle("Hide Max Durability Text", "", this->settings.getSettingByName<bool>("hideMaxDurText")->value);
+			this->addToggle("Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
+			this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
 		}
 		this->addToggle("Durability Bar", "", this->settings.getSettingByName<bool>("showDurBar")->value);
 		if (this->settings.getSettingByName<bool>("showDurBar")->value) {
@@ -136,6 +142,9 @@ public:
 		this->addColorPicker("Normal Color", "", settings.getSettingByName<std::string>("colorMain")->value,
 			settings.getSettingByName<float>("colorMain_opacity")->value,
 			settings.getSettingByName<bool>("colorMain_rgb")->value);
+		this->addColorPicker("Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value,
+			settings.getSettingByName<float>("textShadowOpacity")->value,
+			settings.getSettingByName<bool>("textShadowRGB")->value);
 		this->addToggle("Enable Static Durability Bar Color", "", this->settings.getSettingByName<bool>("showStaticDurBarColor")->value);
 		if (this->settings.getSettingByName<bool>("showStaticDurBarColor")->value) {
 			this->addColorPicker("Static Durability Bar Color", "", settings.getSettingByName<std::string>("staticDurBarColor")->value,
@@ -188,6 +197,7 @@ public:
 		bool showSpecialMaxDurBarCol = this->settings.getSettingByName<bool>("showSpecialMaxDurBarCol")->value;
 		bool overrideSpecialMaxDurBarCol = this->settings.getSettingByName<bool>("overrideSpecialMaxDurBarCol")->value;
 		bool showStaticDurBarColor = this->settings.getSettingByName<bool>("showStaticDurBarColor")->value;
+		bool showTextShadow = this->settings.getSettingByName<bool>("textShadow")->value;
 
 		if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
 			if (SDK::clientInstance->getLocalPlayer() != nullptr)
@@ -238,7 +248,7 @@ public:
 									guiscale * uiscale * 13.f,
 									guiscale * uiscale * 2.f,
 									0, 0
-									);
+								);
 								FlarialGUI::RoundedRect(
 									currentPos.x + xmodifier + (durBarOffsetX * uiscale * guiscale),
 									currentPos.y + ymodifier + (durBarOffsetY * uiscale * guiscale),
@@ -249,14 +259,33 @@ public:
 								);
 							}
 
+							float textX = currentPos.x + (xmodifier + (textOffsetX * uiscale * guiscale)) * (durability_left ? -1 : 1);
+							float textY = currentPos.y + ymodifier + (textOffsetY * uiscale * guiscale);
+
 							// armor
-							if (this->settings.getSettingByName<bool>("showdurability")->value) FlarialGUI::FlarialTextWithFont(
-								currentPos.x + (xmodifier + (textOffsetX * uiscale * guiscale)) * (durability_left ? -1 : 1),
-								currentPos.y + ymodifier + (textOffsetY * uiscale * guiscale), widecstr,
-								16 * uiscale * guiscale,
-								0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
-								textSize * uiscale * guiscale,
-								DWRITE_FONT_WEIGHT_NORMAL, finalColor, true);
+							if (this->settings.getSettingByName<bool>("showdurability")->value) {
+								if (showTextShadow) {
+									D2D_COLOR_F shadowCol = settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textShadowCol")->value);
+									shadowCol.a = settings.getSettingByName<float>("textShadowOpacity")->value;
+									FlarialGUI::FlarialTextWithFont(
+										textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
+										textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
+										widecstr,
+										16 * uiscale * guiscale,
+										0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
+										textSize * uiscale * guiscale, DWRITE_FONT_WEIGHT_NORMAL,
+										shadowCol,
+										true
+									);
+								}
+								FlarialGUI::FlarialTextWithFont(
+									textX,
+									textY, widecstr,
+									16 * uiscale * guiscale,
+									0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
+									textSize * uiscale * guiscale,
+									DWRITE_FONT_WEIGHT_NORMAL, finalColor, true);
+							}
 							if (fillGaps) {
 								if (vertical) ymodifier += spacing;
 								else xmodifier += spacing;
@@ -300,7 +329,7 @@ public:
 						}
 
 						finalColor.a = this->settings.getSettingByName<float>("durBarOpacity")->value;
-						
+
 						if (this->settings.getSettingByName<bool>("showDurBar")->value && (settings.getSettingByName<bool>("showDurBarMax")->value || durabilities[0][0] != durabilities[0][1]) && durabilities[0][1] != 0) {
 							FlarialGUI::RoundedRect(
 								currentPos.x + xmodifier + (durBarOffsetX * uiscale * guiscale),
@@ -320,14 +349,33 @@ public:
 							);
 						}
 
+						float textX = currentPos.x + (xmodifier + (textOffsetX * uiscale * guiscale)) * (durability_left ? -1 : 1);
+						float textY = currentPos.y + ymodifier + (textOffsetY * uiscale * guiscale);
+
 						// main hand
-						if (this->settings.getSettingByName<bool>("showdurability")->value) FlarialGUI::FlarialTextWithFont(
-							currentPos.x + (xmodifier + (textOffsetX * uiscale * guiscale)) * (durability_left ? -1 : 1),
-							currentPos.y + ymodifier + (textOffsetY * uiscale * guiscale), widecstr,
-							16 * uiscale * guiscale,
-							0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
-							textSize * uiscale * guiscale,
-							DWRITE_FONT_WEIGHT_NORMAL, finalColor, true);
+						if (this->settings.getSettingByName<bool>("showdurability")->value) {
+							if (showTextShadow) {
+								D2D_COLOR_F shadowCol = settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textShadowCol")->value);
+								shadowCol.a = settings.getSettingByName<float>("textShadowOpacity")->value;
+								FlarialGUI::FlarialTextWithFont(
+									textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
+									textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
+									widecstr,
+									16 * uiscale * guiscale,
+									0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
+									textSize * uiscale * guiscale, DWRITE_FONT_WEIGHT_NORMAL,
+									shadowCol,
+									true
+								);
+							}
+							FlarialGUI::FlarialTextWithFont(
+								textX,
+								textY, widecstr,
+								16 * uiscale * guiscale,
+								0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
+								textSize * uiscale * guiscale,
+								DWRITE_FONT_WEIGHT_NORMAL, finalColor, true);
+						}
 
 						if (fillGaps) {
 							if (vertical) ymodifier += spacing;
@@ -389,14 +437,33 @@ public:
 								);
 							}
 
+							float textX = currentPos.x + (xmodifier + (textOffsetX * uiscale * guiscale)) * (durability_left ? -1 : 1);
+							float textY = currentPos.y + ymodifier + (textOffsetY * uiscale * guiscale);
+
 							// offhand
-							if (this->settings.getSettingByName<bool>("showdurability")->value) FlarialGUI::FlarialTextWithFont(
-								currentPos.x + (xmodifier + (textOffsetX * uiscale * guiscale)) * (durability_left ? -1 : 1),
-								currentPos.y + ymodifier + (textOffsetY * uiscale * guiscale), widecstr,
-								16 * uiscale * guiscale,
-								0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
-								textSize * uiscale * guiscale,
-								DWRITE_FONT_WEIGHT_NORMAL, finalColor, true);
+							if (this->settings.getSettingByName<bool>("showdurability")->value) {
+								if (showTextShadow) {
+									D2D_COLOR_F shadowCol = settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textShadowCol")->value);
+									shadowCol.a = settings.getSettingByName<float>("textShadowOpacity")->value;
+									FlarialGUI::FlarialTextWithFont(
+										textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
+										textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
+										widecstr,
+										16 * uiscale * guiscale,
+										0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
+										textSize * uiscale * guiscale, DWRITE_FONT_WEIGHT_NORMAL,
+										shadowCol,
+										true
+									);
+								}
+								FlarialGUI::FlarialTextWithFont(
+									textX,
+									textY, widecstr,
+									16 * uiscale * guiscale,
+									0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
+									textSize * uiscale * guiscale,
+									DWRITE_FONT_WEIGHT_NORMAL, finalColor, true);
+							}
 						}
 					}
 				}
