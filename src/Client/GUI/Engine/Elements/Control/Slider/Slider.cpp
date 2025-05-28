@@ -44,8 +44,7 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
     disabledColor.a = o_colors_primary3;
     circleColor.a = o_colors_primary2;
 
-
-    if(ClickGUI::settingsOpacity != 1) {
+    if (ClickGUI::settingsOpacity != 1) {
         color.a = ClickGUI::settingsOpacity;
         disabledColor.a = ClickGUI::settingsOpacity;
         circleColor.a = ClickGUI::settingsOpacity;
@@ -100,9 +99,7 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
         text = stream.str();
     }
 
-    if (!TextBoxes[30 + index].isActive) FlarialGUI::RoundedRect(x, y, disabledColor, percWidth, percHeight, round.x, round.x);
-    else FlarialGUI::RoundedRect(x, y, color, percWidth, percHeight, round.x, round.x);
-
+    FlarialGUI::RoundedRect(x, y, TextBoxes[30 + index].isActive ? color : disabledColor, percWidth, percHeight, round.x, round.x);
 
     int limit = 5;
     if (text.find('-') != std::string::npos) limit = 6;
@@ -167,8 +164,7 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 
     float circleY;
 
-    if (FlarialGUI::isInScrollView)
-        circleY = (y + scrollpos) + height / 2.0f;
+    if (FlarialGUI::isInScrollView) circleY = (y + scrollpos) + height / 2.0f;
     else circleY = y + height / 2.0f;
 
     float rectangleLeft = farLeftX;
@@ -209,12 +205,9 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 
     SliderRects[index].percentageX = percentage;
 
-    if (isInScrollView) {
-        y += scrollpos;
-        circleY += scrollpos;
-    }
+    if (isInScrollView) y += scrollpos;
 
-    if (CursorInRect(farLeftX, y, totalWidth, height) && MC::held &&
+    if (CursorInRect(farLeftX, y - (height * 3) / 2, totalWidth, height * 3) && MC::held &&
         (SliderRects[index].isMovingElement || activeSliders == 0)) {
 
         SliderRects[index].movedX = MC::mousePos.x;
@@ -244,10 +237,8 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
         if (MC::mousePos.x < farLeftX) SliderRects[index].movedX = farLeftX;
         else if (MC::mousePos.x > farRightX) SliderRects[index].movedX = farRightX;
 
-        percentage =
-                ((SliderRects[index].movedX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
+        percentage = ((SliderRects[index].movedX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
         SliderRects[index].percentageX = percentage;
-
     } else if (MC::held && SliderRects[index].isMovingElement) {
 
         if (MC::mousePos.x > farLeftX && MC::mousePos.x < farRightX) {
