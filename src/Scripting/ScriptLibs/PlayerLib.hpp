@@ -158,6 +158,22 @@ public:
         return 1;
     }
 
+    static int mainhand(lua_State* L) {
+        auto player = SDK::clientInstance->getLocalPlayer();
+        if (!player) {
+            pushNullItemTable(L);
+        }
+        
+        ItemStack* mainhand = player->getSupplies()->getInventory()->getItem(player->getSupplies()->getSelectedSlot());
+        if (!mainhand || !mainhand->isValid()) {
+            pushNullItemTable(L);
+            return 1;
+        }
+        pushItemTable(L, mainhand);
+
+        return 1;
+    }
+
     static int dimension(lua_State* L) {
         BlockSource* blocksrc = SDK::clientInstance->getBlockSource();
         if (!blocksrc || !blocksrc->getDimension()) {
