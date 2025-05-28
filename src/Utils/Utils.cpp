@@ -63,6 +63,10 @@ std::string Utils::getKeyAsString(int key, bool isCapital, bool isKeybind) {
 
 	// extra
 	switch (key) {
+	case 37: return "LEFT";
+	case 38: return "UP";
+	case 39: return "RIGHT";
+	case 40: return "DOWN";
 	case 97: return "NUM 1";
 	case 98: return "NUM 2";
 	case 99: return "NUM 3";
