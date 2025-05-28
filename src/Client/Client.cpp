@@ -79,7 +79,7 @@ void RegisterActivationHandler()
                 return;
 
             auto uri = winrt::unbox_value<ProtocolActivatedEventArgs>(context).Uri();
-
+            
             std::vector<std::pair<std::wstring, std::wstring>> dataList;
 
             for (const auto& dataContext : uri.QueryParsed()) {

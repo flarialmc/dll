@@ -4,143 +4,135 @@
 
 class PaperDoll : public Module {
 private:
-    Vec2<float> currentPos{};
-    bool enabled = false;
-    static inline Vec2<float> originalPos = Vec2<float>{0.0f, 0.0f};
-    Vec2<float> currentSize = Vec2<float>{0.0f, 0.0f};
+	Vec2<float> currentPos{};
+	bool enabled = false;
+	static inline Vec2<float> originalPos = Vec2<float>{ 0.0f, 0.0f };
+	Vec2<float> currentSize = Vec2<float>{ 0.0f, 0.0f };
 public:
-    PaperDoll() : Module("Movable Paperdoll", "Makes the Minecraft paperdoll movable.", IDR_MAN_PNG,
-                         "") {
-        Module::setup();
-    };
+	PaperDoll() : Module("Movable Paperdoll", "Makes the Minecraft paperdoll movable.", IDR_MAN_PNG,
+		"") {
+		Module::setup();
+	};
 
-    void onEnable() override {
-        Listen(this, RenderEvent, &PaperDoll::onRender)
-        Listen(this, SetupAndRenderEvent, &PaperDoll::onSetupAndRender)
-        if(FlarialGUI::inMenu) {
-            FlarialGUI::Notify("To change the position of the Paperdoll, Please click " +
-                               ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                                       "editmenubind")->value + " in the settings tab.");
-        }
-        Module::onEnable();
-    }
+	void onEnable() override {
+		Listen(this, RenderEvent, &PaperDoll::onRender)
+			Listen(this, SetupAndRenderEvent, &PaperDoll::onSetupAndRender)
+			if (FlarialGUI::inMenu) {
+				FlarialGUI::Notify("To change the position of the Paperdoll, Please click " +
+					ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
+						"editmenubind")->value + " in the settings tab.");
+			}
+		Module::onEnable();
+	}
 
-    void onDisable() override {
-        Deafen(this, RenderEvent, &PaperDoll::onRender)
-        Deafen(this, SetupAndRenderEvent, &PaperDoll::onSetupAndRender)
-        Module::onDisable();
-    }
+	void onDisable() override {
+		Deafen(this, RenderEvent, &PaperDoll::onRender)
+			Deafen(this, SetupAndRenderEvent, &PaperDoll::onSetupAndRender)
+			Module::onDisable();
+	}
 
-    void defaultConfig() override { Module::defaultConfig();
+	void defaultConfig() override {
+		Module::defaultConfig();
+		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 21.0f);
+		if (settings.getSettingByName<bool>("alwaysshow") == nullptr) settings.addSetting("alwaysshow", false);
+		if (settings.getSettingByName<float>("percentageX") == nullptr) settings.addSetting("percentageX", 0.0f);
+		if (settings.getSettingByName<float>("percentageY") == nullptr) settings.addSetting("percentageY", 0.0f);
+	}
 
-        if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 21.0f);
-        if (settings.getSettingByName<bool>("alwaysshow") == nullptr) settings.addSetting("alwaysshow", false);
-        if (settings.getSettingByName<float>("percentageX") == nullptr) {
-            settings.addSetting("percentageX", 0.0f);
-        }
-        if (settings.getSettingByName<float>("percentageY") == nullptr) {
-            settings.addSetting("percentageY", 0.0f);
-        }
+	void settingsRender(float settingsOffset) override {
+		float x = Constraints::PercentageConstraint(0.019, "left");
+		float y = Constraints::PercentageConstraint(0.10, "top");
 
-    }
+		const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
-    void settingsRender(float settingsOffset) override {
+		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+			Constraints::RelativeConstraint(1.0, "width"),
+			Constraints::RelativeConstraint(0.88f, "height"));
 
+		this->addHeader("Misc");
+		this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value);
 
-        float x = Constraints::PercentageConstraint(0.019, "left");
-        float y = Constraints::PercentageConstraint(0.10, "top");
+		this->addToggle("Always Show", "", this->settings.getSettingByName<bool>("alwaysshow")->value);
 
-        const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
+		FlarialGUI::UnsetScrollView();
 
+		this->resetPadding();
 
-        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                                  Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(0.88f, "height"));
+	}
 
-        this->addHeader("Misc");
-        this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value);
+	void onRender(RenderEvent& event) {
 
-        this->addToggle("Always Show", "", this->settings.getSettingByName<bool>("alwaysshow")->value);
+		if (ClientInstance::getTopScreenName() == "hud_screen" &&
+			this->isEnabled() ||
+			ClientInstance::getTopScreenName() == "pause_screen" &&
+			this->isEnabled()) {
 
-        FlarialGUI::UnsetScrollView();
-
-        this->resetPadding();
-
-    }
-
-    void onRender(RenderEvent &event) {
-
-        if (ClientInstance::getTopScreenName() == "hud_screen" &&
-            this->isEnabled() ||
-            ClientInstance::getTopScreenName() == "pause_screen" &&
-                    this->isEnabled()) {
-
-            float width = currentSize.x;
-            float height = currentSize.y;
+			float width = currentSize.x;
+			float height = currentSize.y;
 
 
-            Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
-                                                  this->settings.getSettingByName<float>("percentageY")->value);
+			Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
+				this->settings.getSettingByName<float>("percentageY")->value);
 
-            if (settingperc.x != 0)
-        currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
-            else if (settingperc.x == 0 and originalPos.x != 0.0f)
-                currentPos = Vec2<float>{originalPos.x, originalPos.y};
+			if (settingperc.x != 0)
+				currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
+			else if (settingperc.x == 0 and originalPos.x != 0.0f)
+				currentPos = Vec2<float>{ originalPos.x, originalPos.y };
 
-            if (ClickGUI::editmenu)
-                FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 19);
+			if (ClickGUI::editmenu)
+				FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 19);
 
-            Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 19, width, height);
+			Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 19, width, height);
 
 
 
-            currentPos.x = vec2.x;
-            currentPos.y = vec2.y;
+			currentPos.x = vec2.x;
+			currentPos.y = vec2.y;
 
-            Vec2<float> percentages = Constraints::CalculatePercentage(currentPos.x, currentPos.y, width, height);
+			Vec2<float> percentages = Constraints::CalculatePercentage(currentPos.x, currentPos.y, width, height);
 
-            this->settings.setValue("percentageX", percentages.x);
-            this->settings.setValue("percentageY", percentages.y);
+			this->settings.setValue("percentageX", percentages.x);
+			this->settings.setValue("percentageY", percentages.y);
 
-            if (ClickGUI::editmenu) {
-                FlarialGUI::UnsetWindowRect();
-            }
-        }
-    }
+			if (ClickGUI::editmenu) {
+				FlarialGUI::UnsetWindowRect();
+			}
+		}
+	}
 
-    void onSetupAndRender(SetupAndRenderEvent &event) {
-        if(this->isEnabled())
-            if(SDK::getCurrentScreen() == "hud_screen") {
-                SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl>& control) {
-                    if (control->getLayerName() == "hud_player") {
-                        auto pos = control->parentRelativePosition;
+	void onSetupAndRender(SetupAndRenderEvent& event) {
+		if (this->isEnabled())
+			if (SDK::getCurrentScreen() == "hud_screen") {
+				SDK::screenView->VisualTree->root->forEachControl([this](std::shared_ptr<UIControl>& control) {
+					if (control->getLayerName() == "hud_player") {
+						auto pos = control->parentRelativePosition;
 
-                        if(originalPos.x == 0.0f) {
-                            originalPos = PositionUtils::getScreenScaledPos(pos);
-                        }
+						if (originalPos.x == 0.0f) {
+							originalPos = PositionUtils::getScreenScaledPos(pos);
+						}
 
-                        Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
+						Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
 
-                        control->parentRelativePosition = Vec2<float>{scaledPos.x, scaledPos.y};
+						control->parentRelativePosition = Vec2<float>{ scaledPos.x, scaledPos.y };
 
-                        auto scale = this->settings.getSettingByName<float>("uiscale")->value;
+						auto scale = this->settings.getSettingByName<float>("uiscale")->value;
 
-                        auto size = Vec2<float>{scale, scale * 2};
+						auto size = Vec2<float>{ scale, scale * 2 };
 
-                        currentSize = PositionUtils::getScreenScaledPos(size);
+						currentSize = PositionUtils::getScreenScaledPos(size);
 
-                        control->sizeConstrains = Vec2<float>{scale, scale};
+						control->sizeConstrains = Vec2<float>{ scale, scale };
 
-                        if (this->settings.getSettingByName<bool>("alwaysshow")->value || ClickGUI::editmenu) {
-                            auto component = reinterpret_cast<CustomRenderComponent*>(control->getComponents()[4].get());
-                            component->renderer->state = 1.0f;
-                        }
+						if (this->settings.getSettingByName<bool>("alwaysshow")->value || ClickGUI::editmenu) {
+							auto component = reinterpret_cast<CustomRenderComponent*>(control->getComponents()[4].get());
+							component->renderer->state = 1.0f;
+						}
 
-                        return true; // dont go through other controls
-                    }
-                    return false;
-                });
-            }
-    }
+						return true; // dont go through other controls
+					}
+					return false;
+					});
+			}
+	}
 };

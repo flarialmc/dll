@@ -20,20 +20,14 @@ public:
     }
 
     void defaultConfig() override { Module::defaultConfig();
-        if (settings.getSettingByName<bool>("elytra") == nullptr) {
-            settings.addSetting("elytra", false);
-            settings.addSetting("elytraMode", (std::string)"3rd Person back");
-        }
+        if (settings.getSettingByName<bool>("elytra") == nullptr) settings.addSetting("elytra", false);
+        if (settings.getSettingByName<std::string>("elytraMode") == nullptr) settings.addSetting("elytraMode", (std::string)"3rd Person back");
 
-        if (settings.getSettingByName<bool>("swimming") == nullptr) {
-            settings.addSetting("swimming", false);
-            settings.addSetting("swimmingMode", (std::string)"3rd Person back");
-        }
-
-        if (settings.getSettingByName<bool>("riding") == nullptr) {
-            settings.addSetting("riding", false);
-            settings.addSetting("ridingMode", (std::string)"3rd Person back");
-        }
+        if (settings.getSettingByName<bool>("swimming") == nullptr) settings.addSetting("swimming", false);
+        if (settings.getSettingByName<std::string>("swimmingMode") == nullptr) settings.addSetting("swimmingMode", (std::string)"3rd Person back");
+        
+        if (settings.getSettingByName<bool>("riding") == nullptr) settings.addSetting("riding", false);
+        if (settings.getSettingByName<std::string>("ridingMode") == nullptr) settings.addSetting("ridingMode", (std::string)"3rd Person back");
     }
 
     void settingsRender(float settingsOffset) override {
