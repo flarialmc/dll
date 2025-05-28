@@ -40,10 +40,7 @@ public:
         if (settings.getSettingByName<bool>("overlay") == nullptr) settings.addSetting("overlay", false);
         if (settings.getSettingByName<bool>("overlayfullblock") == nullptr) settings.addSetting("overlayfullblock", false);
         if (settings.getSettingByName<bool>("showfulloutline") == nullptr) settings.addSetting("showfulloutline", false);
-        if (settings.getSettingByName<float>("outlinewidth") == nullptr) {
-            settings.addSetting("outlinewidth", 0.01f);
-            //Logger::info("HI P{LEASE CALL PLEASE");
-        }
+        if (settings.getSettingByName<float>("outlinewidth") == nullptr) settings.addSetting("outlinewidth", 0.01f);
 
     }
 
@@ -68,7 +65,7 @@ public:
             this->addToggle("Overlay Full Block", "Overlays the full block", settings.getSettingByName<bool>("overlayfullblock")->value);
         }
         else {
-            this->addSlider("Outline Width", "Thickness of the outline", settings.getSettingByName<float>("outlinewidth")->value, 0.5, 0.0, true, this->name, "outlinewidth"); // TEST SLIDER
+            this->addResettableSlider("Outline Width", "Thickness of the outline", "outlinewidth", 0.5); // test slider
             this->addToggle("3D Outline", "Shows outline through blocks.", settings.getSettingByName<bool>("showfulloutline")->value);
         }
         this->addColorPicker(col + " Color", "", settings.getSettingByName<std::string>("color")->value,

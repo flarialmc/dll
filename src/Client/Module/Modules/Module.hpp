@@ -82,8 +82,10 @@ public:
                    std::function<void()> action);
 
     void addConditionalSlider(bool condition, std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
-    void addSlider(std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true, std::string moduleName = "nil", std::string settingName = "nil");
-    void addToggle(std::string text, std::string subtext, bool& value, std::string moduleName = "nil", std::string settingName = "nil");
+    void addSlider(std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true, std::string settingName = "");
+    void addResettableSlider(std::string text, std::string subtext, std::string settingName, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
+    void addToggle(std::string text, std::string subtext, bool& value, std::string settingName = "");
+    void addResettableToggle(std::string text, std::string subtext, std::string settingName = "");
 
     void addKeybind(std::string text, std::string subtext, std::string &keybind);
 

@@ -395,18 +395,14 @@ void Module::addElementText(std::string text, std::string subtext) {
 
 }
 
-void Module::addSlider(std::string text, std::string subtext, float& value, float maxVal, float minVal, bool zerosafe, std::string moduleName, std::string settingName) {
+void Module::addSlider(std::string text, std::string subtext, float& value, float maxVal, float minVal, bool zerosafe, std::string settingName) {
     float elementX = Constraints::PercentageConstraint(0.33f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
-
-    if (settingName == "outlinewidth") {
-        //Logger::success(std::to_string(value));
-    }
 
     if (value > maxVal) value = maxVal;
     else if (value < minVal) value = minVal;
 
-    FlarialGUI::Slider(sliderIndex, elementX, y, value, maxVal, minVal, zerosafe, moduleName, settingName);
+    FlarialGUI::Slider(sliderIndex, elementX, y, value, maxVal, minVal, zerosafe, this->name, settingName);
 
     Module::addElementText(text, subtext);
     
@@ -414,15 +410,48 @@ void Module::addSlider(std::string text, std::string subtext, float& value, floa
     sliderIndex++;
 }
 
-void Module::addToggle(std::string text, std::string subtext, bool& value, std::string moduleName, std::string settingName) {
+void Module::addResettableSlider(std::string text, std::string subtext, std::string settingName, float maxVal, float minVal, bool zerosafe) {
+    float elementX = Constraints::PercentageConstraint(0.33f, "right");
+    float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+	float& value = settings.getSettingByName<float>(settingName)->value;
+
+    if (value > maxVal) value = maxVal;
+    else if (value < minVal) value = minVal;
+
+    FlarialGUI::Slider(sliderIndex, elementX, y, value, maxVal, minVal, zerosafe, this->name, settingName);
+
+    Module::addElementText(text, subtext);
+
+    padding += Constraints::RelativeConstraint(0.05f, "height", true);
+    sliderIndex++;
+}
+
+void Module::addToggle(std::string text, std::string subtext, bool& value, std::string settingName) {
     float x = Constraints::PercentageConstraint(0.019, "left");
     float elementX = Constraints::PercentageConstraint(0.119f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-    if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false, moduleName, settingName)) value = !value;
+    if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false, this->name, settingName)) value = !value;
 
     Module::addElementText(text, subtext);
     
+    padding += Constraints::RelativeConstraint(0.05f, "height", true);
+
+    toggleIndex++;
+}
+
+void Module::addResettableToggle(std::string text, std::string subtext, std::string settingName) {
+    float x = Constraints::PercentageConstraint(0.019, "left");
+    float elementX = Constraints::PercentageConstraint(0.119f, "right");
+    float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+	bool& value = settings.getSettingByName<bool>(settingName)->value;
+
+    if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false, this->name, settingName)) value = !value;
+
+    Module::addElementText(text, subtext);
+
     padding += Constraints::RelativeConstraint(0.05f, "height", true);
 
     toggleIndex++;
