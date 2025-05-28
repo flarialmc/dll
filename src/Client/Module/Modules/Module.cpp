@@ -442,19 +442,20 @@ void Module::addToggle(std::string text, std::string subtext, bool& value, std::
 }
 
 void Module::addResettableToggle(std::string text, std::string subtext, std::string settingName) {
-    float x = Constraints::PercentageConstraint(0.019, "left");
-    float elementX = Constraints::PercentageConstraint(0.119f, "right");
-    float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+	float x = Constraints::PercentageConstraint(0.019, "left");
+	float elementX = Constraints::PercentageConstraint(0.119f, "right");
+	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
 	bool& value = settings.getSettingByName<bool>(settingName)->value;
 
-    if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false, this->name, settingName)) value = !value;
+	if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false, this->name, settingName)) value = !value;
 
-    Module::addElementText(text, subtext);
+	Module::addElementText(text, subtext);
 
-    padding += Constraints::RelativeConstraint(0.05f, "height", true);
+	padding += Constraints::RelativeConstraint(0.05f, "height", true);
 
-    toggleIndex++;
+	toggleIndex++;
+}
 
 void Module::addKeybind(std::string text, std::string subtext, std::string& keybind) {
 	float elementX = Constraints::PercentageConstraint(0.13f, "right");
