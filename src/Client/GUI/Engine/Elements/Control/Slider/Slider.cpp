@@ -116,7 +116,7 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
     int limit = 5;
     if (text.find('-') != std::string::npos) limit = 6;
     
-    text = FlarialGUI::TextBox(30 + index, text, limit, x, y, percWidth, percHeight, 2); // e
+    text = FlarialGUI::TextBox(30 + index, text, limit, x, y, percWidth, percHeight, 2);
     text = String::removeNonNumeric(text);
     if (text == ".") {
         if (zerosafe) text = "0.01";
