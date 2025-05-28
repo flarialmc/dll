@@ -223,6 +223,7 @@ public:
 			if (ClickGUI::editmenu) {
 				// bounding boxes
 				FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 23);
+				checkForRightClickAndOpenSettings(currentPos.x, currentPos.y, width, height);
 			}
 
 			Vec2<float> vec2;
