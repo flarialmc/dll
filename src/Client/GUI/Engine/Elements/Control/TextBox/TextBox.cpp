@@ -129,7 +129,8 @@ std::string FlarialGUI::TextBox(int index, std::string& text, int limit, float x
         DWRITE_TEXT_ALIGNMENT_LEADING, textSize, DWRITE_FONT_WEIGHT_NORMAL);
 
     if (CursorInRect(x, y, width, height) && FlarialGUI::TextBoxes[index].isActive && MC::mouseButton == MouseButton::Right && !MC::held) {
-        if (moduleName != "" && settingName != "") {
+        bool resettableSettingsEnabled = Client::settings.getSettingByName<bool>("resettableSettings")->value;
+        if (resettableSettingsEnabled && moduleName != "" && settingName != "") {
             auto mod = ModuleManager::getModule(moduleName);
             mod->settings.deleteSetting(settingName);
             mod->defaultConfig();

@@ -59,16 +59,16 @@ public:
             Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Main");
-        this->addToggle("Overlay", "Overlays the face of block", settings.getSettingByName<bool>("overlay")->value);
+        this->addResettableToggle("Overlay", "Overlays the face of block", "overlay");
         std::string col = settings.getSettingByName<bool>("overlay")->value ? "Overlay" : "Outline";
         if (settings.getSettingByName<bool>("overlay")->value) {
-            this->addToggle("Overlay Full Block", "Overlays the full block", settings.getSettingByName<bool>("overlayfullblock")->value);
+            this->addResettableToggle("Overlay Full Block", "Overlays the full block", "overlayfullblock");
         }
         else {
-            this->addResettableSlider("Outline Width", "Thickness of the outline", "outlinewidth", 0.5); // test slider
-            this->addToggle("3D Outline", "Shows outline through blocks.", settings.getSettingByName<bool>("showfulloutline")->value);
+            this->addResettableSlider("Outline Width", "Thickness of the outline", "outlinewidth", 0.5);
+            this->addResettableToggle("3D Outline", "Shows outline through blocks.", "showfulloutline");
         }
-        this->addColorPicker(col + " Color", "", settings.getSettingByName<std::string>("color")->value,
+        this->addResettableColorPicker(col + " Color", "", "color",
             settings.getSettingByName<float>("colorOpacity")->value,
             settings.getSettingByName<bool>("color_rgb")->value);
 

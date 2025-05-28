@@ -94,6 +94,7 @@ public:
     void addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value);
     void addResettableDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string settingName);
     void addColorPicker(std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb);
+    void addResettableColorPicker(std::string text, std::string subtext, std::string settingName, float& opacity, bool& rgb);
     virtual void loadDefaults();
     void saveSettings();
 

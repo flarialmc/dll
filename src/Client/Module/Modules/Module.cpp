@@ -317,6 +317,23 @@ void Module::addColorPicker(std::string text, std::string subtext, std::string& 
 	colorPickerIndex++;
 }
 
+void Module::addResettableColorPicker(std::string text, std::string subtext, std::string settingName, float& opacity, bool& rgb) {
+	float elementX = Constraints::PercentageConstraint(0.195f, "right");
+	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+	std::string& value = this->settings.getSettingByName<std::string>(settingName)->value;
+
+	FlarialGUI::ColorPicker(colorPickerIndex, elementX, y, value, rgb, this->name, settingName);
+
+	Module::addElementText(text, subtext);
+
+	padding += Constraints::RelativeConstraint(0.05f, "height", true);
+
+	DrDisrespect respect = { &value, &opacity, &rgb };
+	color_pickers[colorPickerIndex] = respect;
+	colorPickerIndex++;
+}
+
 void Module::addTextBox(std::string text, std::string subtext, std::string& value, int limit) {
 	float x = Constraints::PercentageConstraint(0.33f, "right");
 	float y = Constraints::PercentageConstraint(0.10, "top") + padding;

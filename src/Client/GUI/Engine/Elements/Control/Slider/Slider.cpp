@@ -89,7 +89,8 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
     if (isAdditionalY) UnSetIsInAdditionalYMode();
 
     if (CursorInRect(x, y, percWidth, percHeight) && TextBoxes[30 + index].isActive && MC::mouseButton == MouseButton::Right && !MC::held) {
-        if (moduleName != "" && settingName != "") {
+        bool resettableSettingsEnabled = Client::settings.getSettingByName<bool>("resettableSettings")->value;
+        if (resettableSettingsEnabled && moduleName != "" && settingName != "") {
             auto mod = ModuleManager::getModule(moduleName);
             mod->settings.deleteSetting(settingName);
             mod->defaultConfig();

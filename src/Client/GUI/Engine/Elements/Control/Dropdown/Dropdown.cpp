@@ -88,7 +88,8 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     hoveredChildCol.a = o_colors_primary4;
 
     if (CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), percHeight + maxHeight) && FlarialGUI::DropDownMenus[index].isActive && MC::mouseButton == MouseButton::Right && !MC::held) {
-		if (moduleName != "" && settingName != "") {
+        bool resettableSettingsEnabled = Client::settings.getSettingByName<bool>("resettableSettings")->value;
+        if (resettableSettingsEnabled && moduleName != "" && settingName != "") {
 		    auto mod = ModuleManager::getModule(moduleName);
 			mod->settings.deleteSetting(settingName);
 			mod->defaultConfig();
