@@ -84,7 +84,7 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		this->addHeader("Misc");
-		this->addSlider("Hotbar Selected Slot Speed", "", this->settings.getSettingByName<float>("hotbarSpeed")->value);
+		this->addResettableSlider("Hotbar Selected Slot Speed", "", "hotbarSpeed");
 
 		FlarialGUI::UnsetScrollView();
 
