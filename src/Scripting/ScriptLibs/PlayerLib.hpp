@@ -276,6 +276,7 @@ public:
                 .addStaticFunction("hunger", &sLocalPlayer::hunger)
                 .addStaticFunction("armor", &sLocalPlayer::armor)
                 .addStaticFunction("offhand", &sLocalPlayer::offhand)
+                .addStaticFunction("mainhand", &sLocalPlayer::mainhand)
                 .addStaticFunction("dimension", &sLocalPlayer::dimension)
                 .addStaticFunction("grounded", &sLocalPlayer::grounded)
                 .addStaticFunction("say", &sLocalPlayer::say)
