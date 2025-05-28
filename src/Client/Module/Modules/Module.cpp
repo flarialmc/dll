@@ -437,7 +437,6 @@ void Module::addToggle(std::string text, std::string subtext, bool& value, std::
     Module::addElementText(text, subtext);
     
     padding += Constraints::RelativeConstraint(0.05f, "height", true);
-
     toggleIndex++;
 }
 
@@ -453,7 +452,6 @@ void Module::addResettableToggle(std::string text, std::string subtext, std::str
 	Module::addElementText(text, subtext);
 
 	padding += Constraints::RelativeConstraint(0.05f, "height", true);
-
 	toggleIndex++;
 }
 
