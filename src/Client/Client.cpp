@@ -242,6 +242,7 @@ void Client::initialize() {
     ADD_SETTING("nologoicon", false);
     ADD_SETTING("nochaticon", false);
     ADD_SETTING("currentConfig", std::string("default"));
+    ADD_SETTING("resettableSettings", true);
 
     loadAvailableConfigs();
 

@@ -67,9 +67,9 @@ public:
 		}
 	}
 
-	void defaultConfig() override {
-		Module::defaultConfig();
-	}
+    void defaultConfig() override {
+        Module::defaultConfig();
+    }
 
 	void settingsRender(float settingsOffset) override {
 
