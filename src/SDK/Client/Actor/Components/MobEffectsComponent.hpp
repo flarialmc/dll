@@ -220,10 +220,16 @@ struct UnifiedMobEffectData {
         return id != MobEffect::EffectType::Empty;
     }
 
+    [[nodiscard]] std::string getName() const {
+        return MobEffect::effectTypeToString(id);
+    }
+
+    [[nodiscard]] int getAmplifier() const {
+        return amplifier;
+    }
+
     [[nodiscard]] std::string getNameAndTime() const {
-        std::string name = MobEffect::effectTypeToString(id);
-        name += " " + MobEffect::amplifierToString(amplifier) + "\n" + getTime();
-        return name;
+        return getName() + MobEffect::amplifierToString(getAmplifier()) + "\n" + getTime();
     }
 
     [[nodiscard]] std::string getTime() const {

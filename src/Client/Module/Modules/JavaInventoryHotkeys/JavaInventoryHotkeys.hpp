@@ -123,7 +123,6 @@ public:
     };
 
     bool canSwap(std::string_view collectionName) {
-        Logger::debug("{}", collectionName);
         bool isItemContainer = collectionName.find("_item") != std::string_view::npos;
         bool isRecipeContainer = collectionName.find("recipe_") != std::string_view::npos;
         bool isSearchContainerOrBar = collectionName.find("search") != std::string_view::npos;
