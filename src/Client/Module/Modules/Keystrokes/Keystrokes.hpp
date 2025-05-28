@@ -108,7 +108,8 @@ public:
 		this->addSlider("Key Spacing", "", this->settings.getSettingByName<float>("keySpacing")->value, 10.00);
 		this->addSlider("Spacebar Width", "", this->settings.getSettingByName<float>("spacebarWidth")->value, 1.00, 0, false);
 		this->addSlider("Spacebar Height", "", this->settings.getSettingByName<float>("spacebarHeight")->value, 1.00, 0, false);
-
+		this->addToggle("Border", "", this->settings.getSettingByName<bool>("border")->value);
+		this->addConditionalSlider(this->settings.getSettingByName<bool>("border")->value, "Border Thickness", "", this->settings.getSettingByName<float>("borderWidth")->value, 4.f);
 		this->extraPadding();
 
 		this->addHeader("Mouse Buttons");
@@ -135,7 +136,7 @@ public:
 		this->addColorPicker("Background Enabled", "", settings.getSettingByName<std::string>("enabledColor")->value, settings.getSettingByName<float>("enabledOpacity")->value, settings.getSettingByName<bool>("enabledRGB")->value);
 		this->addColorPicker("Text Disabled", "", settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
 		this->addColorPicker("Text Enabled", "", settings.getSettingByName<std::string>("textEnabledColor")->value, settings.getSettingByName<float>("textEnabledOpacity")->value, settings.getSettingByName<bool>("textEnabledRGB")->value);
-
+		this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
 
 		FlarialGUI::UnsetScrollView();
 		this->resetPadding();
@@ -150,6 +151,9 @@ public:
 	void normalRender(int index, std::string& value) override {
 		if (SDK::hasInstanced) {
 			if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+				D2D1_COLOR_F borderColor = settings.getSettingByName<bool>("borderRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
+				borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
+
 				// lmb
 				std::string lmbText = settings.getSettingByName<std::string>("lmbtext")->value;
 				std::string uppercaseSentence;
@@ -343,6 +347,21 @@ public:
 							D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize,
 								realcenter.y + keycardSize), rounde.x, rounde.x));
 
+				if (this->settings.getSettingByName<bool>("border")->value) {
+					FlarialGUI::RoundedHollowRect(
+						realcenter.x,
+						realcenter.y,
+						Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value *
+							settings.getSettingByName<float>("uiscale")->value) / 100.0f,
+							"height", true),
+						borderColor,
+						keycardSize,
+						keycardSize,
+						rounde.x,
+						rounde.x
+					);
+				}
+
 				FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::W], keycardSize, keycardSize,
 					rounde.x,
 					rounde.x);
@@ -361,6 +380,19 @@ public:
 							D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize,
 								realcenter.y + keycardSize), rounde.x, rounde.x));
 
+				if (this->settings.getSettingByName<bool>("border")->value) {
+					FlarialGUI::RoundedHollowRect(
+						realcenter.x,
+						realcenter.y,
+						Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value *settings.getSettingByName<float>("uiscale")->value) / 100.0f,"height", true),
+						borderColor,
+						keycardSize,
+						keycardSize,
+						rounde.x,
+						rounde.x
+					);
+				}
+
 				FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::S], keycardSize, keycardSize,
 					rounde.x,
 					rounde.x);
@@ -377,6 +409,20 @@ public:
 						FlarialGUI::BlurRect(D2D1::RoundedRect(
 							D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize,
 								realcenter.y + keycardSize), rounde.x, rounde.x));
+
+				if (this->settings.getSettingByName<bool>("border")->value) {
+					FlarialGUI::RoundedHollowRect(
+						realcenter.x,
+						realcenter.y,
+						Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
+						borderColor,
+						keycardSize,
+						keycardSize,
+						rounde.x,
+						rounde.x
+					);
+				}
+
 				FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::A], keycardSize, keycardSize,
 					rounde.x,
 					rounde.x);
@@ -393,6 +439,19 @@ public:
 						FlarialGUI::BlurRect(D2D1::RoundedRect(
 							D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize,
 								realcenter.y + keycardSize), rounde.x, rounde.x));
+
+				if (this->settings.getSettingByName<bool>("border")->value) {
+					FlarialGUI::RoundedHollowRect(
+						realcenter.x,
+						realcenter.y,
+						Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
+						borderColor,
+						keycardSize,
+						keycardSize,
+						rounde.x,
+						rounde.x
+					);
+				}
 
 				FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::D], keycardSize, keycardSize,
 					rounde.x,
@@ -424,6 +483,19 @@ public:
 									spacing / 2.0f,
 									realcenter.y + keycardSize - (keycardSize * 0.05f)),
 									rounde.x, rounde.x));
+
+					if (this->settings.getSettingByName<bool>("border")->value) {
+						FlarialGUI::RoundedHollowRect(
+							realcenter.x,
+							realcenter.y,
+							Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
+							borderColor,
+							keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
+							keycardSize - (keycardSize * 0.05f),
+							rounde.x,
+							rounde.x
+						);
+					}
 
 					FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::LMB],
 						keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
@@ -478,6 +550,20 @@ public:
 									spacing / 2.0f,
 									realcenter.y + keycardSize - (keycardSize * 0.05f)),
 									rounde.x, rounde.x));
+
+					if (this->settings.getSettingByName<bool>("border")->value) {
+						FlarialGUI::RoundedHollowRect(
+							realcenter.x,
+							realcenter.y,
+							Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
+							borderColor,
+							keycardSize + (keycardSize / 2) + spacing / 2.0f,
+							keycardSize - (keycardSize * 0.05f),
+							rounde.x,
+							rounde.x
+						);
+					}
+
 					FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::RMB],
 						keycardSize + (keycardSize / 2) + spacing / 2.0f,
 						keycardSize - (keycardSize * 0.05f),
@@ -528,6 +614,20 @@ public:
 						FlarialGUI::BlurRect(D2D1::RoundedRect(
 							D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + spacebarWidth,
 								realcenter.y + spacebarHeight), rounde.x, rounde.x));
+
+				if (this->settings.getSettingByName<bool>("border")->value) {
+					FlarialGUI::RoundedHollowRect(
+						realcenter.x,
+						realcenter.y,
+						Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
+						borderColor,
+						spacebarWidth,
+						spacebarHeight,
+						rounde.x,
+						rounde.x
+					);
+				}
+
 				FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::SPACEBAR], spacebarWidth,
 					spacebarHeight, rounde.x, rounde.x);
 				float childHeight = Constraints::SpacingConstraint(
@@ -536,6 +636,7 @@ public:
 					this->settings.getSettingByName<float>("spacebarWidth")->value, spacebarWidth);
 				std::pair<float, float> centeredChild = centerChildRectangle(spacebarWidth, spacebarHeight, childWidth,
 					childHeight);
+
 				FlarialGUI::RoundedRect(realcenter.x + centeredChild.first, realcenter.y + centeredChild.second,
 					textStates[Strokes::SPACEBAR], childWidth, childHeight, 0, 0);
 
