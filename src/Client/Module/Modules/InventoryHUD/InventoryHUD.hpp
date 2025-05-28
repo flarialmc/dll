@@ -47,29 +47,24 @@ public:
 		if (settings.getSettingByName<bool>("showStaticDurBarColor") == nullptr)  settings.addSetting("showStaticDurBarColor", false);
 		if (settings.getSettingByName<bool>("overrideSpecialMaxDurBarCol") == nullptr)  settings.addSetting("overrideSpecialMaxDurBarCol", false);
 		if (settings.getSettingByName<bool>("showSpecialMaxDurBarCol") == nullptr)  settings.addSetting("showSpecialMaxDurBarCol", false);
-		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 2.0f);
-
-		Module::defaultConfig();
+		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 1.0f);
 
 		if (settings.getSettingByName<float>("percentageX") == nullptr) settings.addSetting("percentageX", 2.0f);
 		if (settings.getSettingByName<float>("percentageY") == nullptr) settings.addSetting("percentageY", 2.0f);
 
-		if (settings.getSettingByName<std::string>("textColor") == nullptr) settings.addSetting("textColor", (std::string)"#FFFFFF");
+		if (settings.getSettingByName<std::string>("textColor") == nullptr) settings.addSetting("textColor", (std::string)"FFFFFF");
 		if (settings.getSettingByName<float>("textColor_opacity") == nullptr) settings.addSetting("textColor_opacity", 1.0f);
 		if (settings.getSettingByName<bool>("textColor_rgb") == nullptr) settings.addSetting("textColor_rgb", false);
 
-		if (settings.getSettingByName<std::string>("staticDurBarColor") == nullptr) settings.addSetting("staticDurBarColor", (std::string)"#FFFFFF");
+		if (settings.getSettingByName<std::string>("staticDurBarColor") == nullptr) settings.addSetting("staticDurBarColor", (std::string)"FFFFFF");
 		if (settings.getSettingByName<float>("staticDurBarColor_opacity") == nullptr) settings.addSetting("staticDurBarColor_opacity", 1.f);
 		if (settings.getSettingByName<bool>("staticDurBarColor_rgb") == nullptr) settings.addSetting("staticDurBarColor_rgb", false);
 
-		if (settings.getSettingByName<std::string>("specialMaxDurBarColor") == nullptr) settings.addSetting("specialMaxDurBarColor", (std::string)"#FFFFFF");
+		if (settings.getSettingByName<std::string>("specialMaxDurBarColor") == nullptr) settings.addSetting("specialMaxDurBarColor", (std::string)"FFFFFF");
 		if (settings.getSettingByName<float>("specialMaxDurBarColor_opacity") == nullptr) settings.addSetting("specialMaxDurBarColor_opacity", 1.f);
 		if (settings.getSettingByName<bool>("specialMaxDurBarColor_rgb") == nullptr) settings.addSetting("specialMaxDurBarColor_rgb", false);
 
-		if (settings.getSettingByName<std::string>("textShadowCol") == nullptr) settings.addSetting("textShadowCol", 0.015f);
-		if (settings.getSettingByName<float>("textShadowOffset") == nullptr) settings.addSetting("textShadowOffset", 0.015f);
-		if (settings.getSettingByName<bool>("textShadowRGB") == nullptr) settings.addSetting("textShadowRGB", false);
-		if (settings.getSettingByName<float>("textShadowOpacity") == nullptr) settings.addSetting("textShadowRGB", 0.55f);
+		if (settings.getSettingByName<bool>("textShadow") == nullptr) settings.addSetting("textShadow", true);
 
 		if (settings.getSettingByName<float>("spacing") == nullptr) settings.addSetting("spacing", 1.f);
 		if (settings.getSettingByName<float>("textOffsetX") == nullptr) settings.addSetting("textOffsetX", 16.19f);
@@ -82,6 +77,8 @@ public:
 		if (settings.getSettingByName<float>("0color") == nullptr) settings.addSetting("0color", 0.f);
 
 		if (settings.getSettingByName<bool>("showDurBarMax") == nullptr) settings.addSetting("showDurBarMax", false);
+
+		Module::defaultConfig();
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -115,8 +112,8 @@ public:
 		this->addSlider("Text Offset X", "", this->settings.getSettingByName<float>("textOffsetX")->value, 50.f, 0.0f, false);
 		this->addSlider("Text Offset Y", "", this->settings.getSettingByName<float>("textOffsetY")->value, 50.f, 0.0f, false);
 		this->addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, this->settings.getSettingByName<std::string>("textalignment")->value);
-		this->addToggle("Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
-		this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
+		this->addToggle("Text Shadow", "Displays a shadow under the text", this->settings.getSettingByName<bool>("textShadow")->value);
+		if (this->settings.getSettingByName<bool>("textShadow")->value) this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
 		this->extraPadding();
 
 		this->addHeader("Colors");
@@ -126,7 +123,7 @@ public:
 		this->addColorPicker("Text Color", "", settings.getSettingByName<std::string>("textColor")->value,
 			settings.getSettingByName<float>("textColor_opacity")->value,
 			settings.getSettingByName<bool>("textColor_rgb")->value);
-		this->addColorPicker("Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value,
+		if (this->settings.getSettingByName<bool>("textShadow")->value) this->addColorPicker("Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value,
 			settings.getSettingByName<float>("textShadowOpacity")->value,
 			settings.getSettingByName<bool>("textShadowRGB")->value);
 		this->addToggle("Show Special Max Durability Bar Color", "", this->settings.getSettingByName<bool>("showSpecialMaxDurBarCol")->value);
@@ -289,8 +286,7 @@ public:
 			this->isEnabled()) {
 			float spacing = this->settings.getSettingByName<float>("spacing")->value;
 
-			Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
-				this->settings.getSettingByName<float>("percentageY")->value);
+			Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value, this->settings.getSettingByName<float>("percentageY")->value);
 
 			float uiscale = this->settings.getSettingByName<float>("uiscale")->value;
 			float guiscale = SDK::clientInstance->getGuiData()->getGuiScale();
