@@ -71,6 +71,43 @@ void saveImage(const char* filename, const unsigned char* img, int width, int he
     fclose(fp);
 }
 
+std::vector<unsigned char> cropHead(const Image& originalImage) {
+    // Assuming originalImage.mWidth and originalImage.mHeight are 64x64
+    // Head location: (8, 8) with width and height of 8
+    const int headX = 8;
+    const int headY = 8;
+    const int headWidth = 8;
+    const int headHeight = 8;
+    const int bytesPerPixel = 4; // RGBA
+
+    // Check if the original image is large enough to contain the head
+    if (originalImage.mWidth < (headX + headWidth) || originalImage.mHeight < (headY + headHeight)) {
+        Logger::debug("Error: Original image is too small to crop head.");
+        return std::vector<unsigned char>(); // Return an empty/invalid Image
+    }
+
+    std::vector<unsigned char> headImageBytes(headWidth * headHeight * bytesPerPixel);
+
+    for (int y = 0; y < headHeight; ++y) {
+        for (int x = 0; x < headWidth; ++x) {
+            // Calculate the index in the original image
+            int originalX = headX + x;
+            int originalY = headY + y;
+            int originalIndex = (originalY * originalImage.mWidth + originalX) * bytesPerPixel;
+
+            // Calculate the index in the new head image
+            int headIndex = (y * headWidth + x) * bytesPerPixel;
+
+            // Copy pixel data (RGBA)
+            for (int i = 0; i < bytesPerPixel; ++i) {
+                headImageBytes[headIndex + i] = originalImage.mImageBytes.data()[originalIndex + i];
+            }
+        }
+    }
+
+    return headImageBytes;
+}
+
 void SaveSkin(std::string name, Image image, Image capeImage) {
     const auto imageBytes = image.mImageBytes.data();
     std::filesystem::path folder_path(Utils::getRoamingPath() + "\\Flarial\\Skins");
@@ -78,7 +115,6 @@ void SaveSkin(std::string name, Image image, Image capeImage) {
     {
         create_directory(folder_path);
     }
-
 
     std::string path = Utils::getRoamingPath() + "\\Flarial\\Skins\\" + name + ".png";
 
