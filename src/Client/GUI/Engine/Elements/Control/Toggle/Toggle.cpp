@@ -45,7 +45,7 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, s
     D2D1_COLOR_F disabledColor = colors_primary3;
     D2D1_COLOR_F enabledColor = colors_primary1;
     D2D1_COLOR_F circleColor = colors_primary2;
-
+    
     disabledColor.a = ClickGUI::settingsOpacity;
     enabledColor.a = ClickGUI::settingsOpacity;
     circleColor.a = ClickGUI::settingsOpacity;
@@ -108,7 +108,7 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, s
             return true;
         }
         else if (MC::mouseButton == MouseButton::Right && !MC::held && (!activeColorPickerWindows || index == 123)) {
-			if (moduleName != "nil" && settingName != "nil") {
+			if (moduleName != "" && settingName != "") {
                 auto mod = ModuleManager::getModule(moduleName);
                 mod->settings.deleteSetting(settingName);
 				mod->defaultConfig();

@@ -70,10 +70,9 @@ public:
         this->extraPadding();
 
         this->addHeader("Text");
-        this->addTextBox("Format", "", settings.getSettingByName<std::string>("text")->value);
+        this->addResettableTextBox("Format", "", "text"); // Test Textbox
         this->addSlider("Text Scale", "", this->settings.getSettingByName<float>("textscale")->value, 2.0f);
-        this->addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"},
-            this->settings.getSettingByName<std::string>("textalignment")->value);
+		this->addResettableDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, "textalignment"); // Test Dropdown
         this->addToggle("Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
         this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
         this->addToggle("Show Decimals", "", this->settings.getSettingByName<bool>("showDecimals")->value);

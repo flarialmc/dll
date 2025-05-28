@@ -40,7 +40,7 @@
 static std::string rReal;
 static std::string ttext;
 
-std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, float x, float y, const std::string& real) {
+std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, float x, float y, const std::string& real, std::string moduleName, std::string settingName) {
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
             if (i <= additionalIndex && additionalY[i] > 0.0f) {
@@ -69,7 +69,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
 
     if (isAdditionalY) UnSetIsInAdditionalYMode();
 
-    text = FlarialGUI::TextBox(index, text, limit, x, y, Constraints::SpacingConstraint(1.85, textWidth), percHeight);
+    text = FlarialGUI::TextBox(index, text, limit, x, y, Constraints::SpacingConstraint(1.85, textWidth), percHeight, 0, moduleName, settingName);
 
     if (TextBoxes[index].isActive) {
         col = colors_primary1;
@@ -117,7 +117,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
     return "";
 }
 
-std::string FlarialGUI::TextBox(int index, const std::string& text, int limit, float x, float y, float width, float height, int special) {
+std::string FlarialGUI::TextBox(int index, std::string& text, int limit, float x, float y, float width, float height, int special, std::string moduleName, std::string settingName) {
     if (isInScrollView) y += scrollpos;
 
     const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
@@ -127,6 +127,16 @@ std::string FlarialGUI::TextBox(int index, const std::string& text, int limit, f
     ImVec2 size = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(text).c_str(),
         Constraints::SpacingConstraint(1.85, textWidth), percHeight,
         DWRITE_TEXT_ALIGNMENT_LEADING, textSize, DWRITE_FONT_WEIGHT_NORMAL);
+
+    if (CursorInRect(x, y, width, height) && FlarialGUI::TextBoxes[index].isActive && MC::mouseButton == MouseButton::Right && !MC::held) {
+        if (moduleName != "" && settingName != "") {
+            auto mod = ModuleManager::getModule(moduleName);
+            mod->settings.deleteSetting(settingName);
+            mod->defaultConfig();
+            text = mod->settings.getSettingByName<std::string>(settingName)->value;
+            FlarialGUI::TextBoxes[index].text = text;
+        }
+    }
 
     if (CursorInRect(x, y, width, height) && MC::mouseAction == MouseAction::Press &&
         MC::mouseButton == MouseButton::Left && !activeColorPickerWindows) {

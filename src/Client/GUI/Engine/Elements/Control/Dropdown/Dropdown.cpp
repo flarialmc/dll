@@ -39,8 +39,7 @@
 #define o_colors_secondary7 clickgui->settings.getSettingByName<float>("o_colors_secondary7")->value
 #define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
 
-std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<std::string>& options, std::string &value,
-                     const std::string& label) {
+std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<std::string>& options, std::string &value, const std::string& label, std::string moduleName, std::string settingName) {
 
     Vec2<float> round = Constraints::RoundingConstraint(13, 13);
     const bool isAdditionalY = shouldAdditionalY;
@@ -87,6 +86,15 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 
     D2D1_COLOR_F hoveredChildCol = colors_primary4_rgb ? rgbColor : colors_primary4;
     hoveredChildCol.a = o_colors_primary4;
+
+    if (CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), percHeight + maxHeight) && FlarialGUI::DropDownMenus[index].isActive && MC::mouseButton == MouseButton::Right && !MC::held) {
+		if (moduleName != "" && settingName != "") {
+		    auto mod = ModuleManager::getModule(moduleName);
+			mod->settings.deleteSetting(settingName);
+			mod->defaultConfig();
+			value = mod->settings.getSettingByName<std::string>(settingName)->value;
+		}
+    }
 
     if (!activeColorPickerWindows &&
         CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), percHeight + maxHeight)) {

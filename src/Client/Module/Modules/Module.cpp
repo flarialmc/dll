@@ -321,7 +321,21 @@ void Module::addTextBox(std::string text, std::string subtext, std::string& valu
 	float x = Constraints::PercentageConstraint(0.33f, "right");
 	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-	FlarialGUI::TextBoxVisual(textboxIndex, value, limit, x, y);
+	FlarialGUI::TextBoxVisual(textboxIndex, value, limit, x, y, "");
+
+	Module::addElementText(text, subtext);
+
+	padding += Constraints::RelativeConstraint(0.05f, "height", true);
+	textboxIndex++;
+}
+
+void Module::addResettableTextBox(std::string text, std::string subtext, std::string settingName, int limit) {
+	float x = Constraints::PercentageConstraint(0.33f, "right");
+	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+	std::string& value = settings.getSettingByName<std::string>(settingName)->value;
+
+	FlarialGUI::TextBoxVisual(textboxIndex, value, limit, x, y, "", this->name, settingName);
 
 	Module::addElementText(text, subtext);
 
@@ -337,6 +351,22 @@ void Module::addDropdown(std::string text, std::string subtext, const std::vecto
 
 
 	FlarialGUI::Dropdown(dropdownIndex, x, y, options, value, "");
+
+	if (FlarialGUI::additionalY[dropdownIndex] > 0.f) FlarialGUI::SetIsInAdditionalYMode();
+
+	padding += Constraints::RelativeConstraint(0.05f, "height", true);
+	dropdownIndex++;
+}
+
+void Module::addResettableDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string settingName) {
+	float x = Constraints::PercentageConstraint(0.33f, "right");
+	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+	Module::addElementText(text, subtext);
+
+	std::string& value = this->settings.getSettingByName<std::string>(settingName)->value;
+
+	FlarialGUI::Dropdown(dropdownIndex, x, y, options, value, "", this->name, settingName);
 
 	if (FlarialGUI::additionalY[dropdownIndex] > 0.f) FlarialGUI::SetIsInAdditionalYMode();
 
@@ -395,14 +425,14 @@ void Module::addElementText(std::string text, std::string subtext) {
 
 }
 
-void Module::addSlider(std::string text, std::string subtext, float& value, float maxVal, float minVal, bool zerosafe, std::string settingName) {
+void Module::addSlider(std::string text, std::string subtext, float& value, float maxVal, float minVal, bool zerosafe) {
     float elementX = Constraints::PercentageConstraint(0.33f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
 	if (value > maxVal) value = maxVal;
 	else if (value < minVal) value = minVal;
 
-    FlarialGUI::Slider(sliderIndex, elementX, y, value, maxVal, minVal, zerosafe, this->name, settingName);
+    FlarialGUI::Slider(sliderIndex, elementX, y, value, maxVal, minVal, zerosafe);
 
 	Module::addElementText(text, subtext);
 
@@ -427,12 +457,12 @@ void Module::addResettableSlider(std::string text, std::string subtext, std::str
     sliderIndex++;
 }
 
-void Module::addToggle(std::string text, std::string subtext, bool& value, std::string settingName) {
+void Module::addToggle(std::string text, std::string subtext, bool& value) {
     float x = Constraints::PercentageConstraint(0.019, "left");
     float elementX = Constraints::PercentageConstraint(0.119f, "right");
     float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-    if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false, this->name, settingName)) value = !value;
+    if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false)) value = !value;
 
     Module::addElementText(text, subtext);
     

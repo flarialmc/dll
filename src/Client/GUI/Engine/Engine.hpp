@@ -319,13 +319,13 @@ namespace FlarialGUI {
 
     bool Toggle(int index, float x, float y, bool isEnabled);
 
-    bool Toggle(int index, float x, float y, bool isEnabled, bool rgb, std::string moduleName = "nil", std::string settingName = "nil");
+    bool Toggle(int index, float x, float y, bool isEnabled, bool rgb, std::string moduleName = "", std::string settingName = "");
 
-    float Slider(int index, float x, float y, float& value, float maxValue = 100.0f, float minValue = 0.0f, bool zerosafe = true, std::string moduleName = "nil", std::string settingName = "nil");
+    float Slider(int index, float x, float y, float& value, float maxValue = 100.0f, float minValue = 0.0f, bool zerosafe = true, std::string moduleName = "", std::string settingName = "");
 
     void Circle(float x, float y, const D2D1_COLOR_F &color, float radius);
 
-    std::string TextBox(int index, const std::string& text, int limit, float x, float y, float width, float height, int special = 0);
+    std::string TextBox(int index, std::string& text, int limit, float x, float y, float width, float height, int special = 0, std::string moduleName = "", std::string settingName = "");
 
     void ColorWheel(float x, float y, float radius);
 
@@ -394,7 +394,7 @@ namespace FlarialGUI {
 
     void NotifyHeartbeat();
 
-    std::string TextBoxVisual(int index, std::string& text, int limit, float x, float y, const std::string& real = "");
+    std::string TextBoxVisual(int index, std::string& text, int limit, float x, float y, const std::string& real = "", std::string moduleName = "", std::string settingName = "");
 
     winrt::com_ptr<ID2D1SolidColorBrush> getBrush(D2D1_COLOR_F color);
 
@@ -439,8 +439,7 @@ namespace FlarialGUI {
 
     void LoadAllImages();
 
-    std::string Dropdown(int index, float x, float y, const std::vector<std::string> &options, std::string &value,
-                         const std::string &label);
+    std::string Dropdown(int index, float x, float y, const std::vector<std::string> &options, std::string &value, const std::string &label, std::string moduleName = "", std::string settingName = "");
 
     void image(int resourceId, D2D1_RECT_F rect, LPCTSTR type = "PNG", bool shouldadd = true, ImColor col = IM_COL32_WHITE);
 
