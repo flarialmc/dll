@@ -1,3 +1,4 @@
+#include "../../../Engine.hpp"
 #include "../../../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
 #include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 
@@ -80,6 +81,10 @@ std::string ClickGUIElements::SearchBar(int index, std::string &text, int limit,
             text = FlarialGUI::TextBox(index, text, limit, x - textWidth, y, textWidth, percHeight);
 
             if (!text.empty()) FlarialGUI::TextBoxes[index].isActive = true;
+
+            if (FlarialGUI::CursorInRect(x - textWidth, y, textWidth, percHeight) && MC::mouseButton == MouseButton::Right && !MC::held) {
+                FlarialGUI::TextBoxes[index].text = "";
+            }
 
             if (FlarialGUI::TextBoxes[index].isActive) {
 
