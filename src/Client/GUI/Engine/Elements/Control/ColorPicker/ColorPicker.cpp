@@ -1,5 +1,6 @@
 #include "../../../Engine.hpp"
 #include "../../../../../Module/Manager.hpp"
+#include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -37,7 +38,7 @@
 
 static std::map<std::string, std::string> sizes;
 
-void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex, bool &rgb) {
+void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex, bool &rgb, std::string moduleName, std::string settingName) {
 
     // Accepts hex, so for e.g. fps counter bg color wants to be changed then you'd have to give a modifyable hex value
     // Preferably save every color in config as a hex (string)
@@ -147,6 +148,17 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex
 
     float clickingY = y;
     if (isInScrollView) clickingY += scrollpos;
+
+    if (CursorInRect(x + Constraints::SpacingConstraint(0.1, s), clickingY + s * 0.21f, s * 0.85f, s * 0.85f) && MC::mouseButton == MouseButton::Right && !MC::held) {
+        bool resettableSettingsEnabled = Client::settings.getSettingByName<bool>("resettableSettings")->value;
+        if (resettableSettingsEnabled && moduleName != "" && settingName != "") {
+            auto mod = ModuleManager::getModule(moduleName);
+            mod->settings.deleteSetting(settingName);
+            mod->defaultConfig();
+            hex = mod->settings.getSettingByName<std::string>(settingName)->value;
+            text = "#" + hex;
+        }
+    }
 
     if (!activeColorPickerWindows &&
         CursorInRect(x + Constraints::SpacingConstraint(0.1, s), clickingY + s * 0.21f, s * 0.85f, s * 0.85f) &&

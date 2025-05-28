@@ -54,6 +54,7 @@ public:
 
     float padding = 0;
     int toggleIndex = 0;
+
     int sliderIndex = 0;
     std::vector<float> conditionalSliderAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
     int dropdownIndex = 0;
@@ -82,13 +83,18 @@ public:
 
     void addConditionalSlider(bool condition, std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
     void addSlider(std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
+    void addResettableSlider(std::string text, std::string subtext, std::string settingName, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
     void addToggle(std::string text, std::string subtext, bool& value);
+    void addResettableToggle(std::string text, std::string subtext, std::string settingName = "");
 
     void addKeybind(std::string text, std::string subtext, std::string &keybind);
 
     void addTextBox(std::string text, std::string subtext, std::string& value, int limit = 16);
+    void addResettableTextBox(std::string text, std::string subtext, std::string settingName, int limit = 16);
     void addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value);
+    void addResettableDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string settingName);
     void addColorPicker(std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb);
+    void addResettableColorPicker(std::string text, std::string subtext, std::string settingName, float& opacity, bool& rgb);
     virtual void loadDefaults();
     void saveSettings();
 
