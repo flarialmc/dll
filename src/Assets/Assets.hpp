@@ -151,6 +151,6 @@
 #define IDR_LEWIS_PNG           252
 #define IDR_LEWIS_MP3           253
 #define IDR_SUPPORTER_LOGO_PNG	254
-
+#define IDR_F3_PNG              255
 // MAKE SURE YOU ALWAYS UPDATE THIS!
 #define MAX_IMAGE_ID IDR_LEWIS_MP3
