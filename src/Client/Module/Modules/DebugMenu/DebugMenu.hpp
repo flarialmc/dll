@@ -348,11 +348,6 @@ public:
         if (settings.getSettingByName<bool>("showLocalTime") == nullptr) settings.addSetting<bool>("showLocalTime", true);
         if (settings.getSettingByName<bool>("showTPS") == nullptr) settings.addSetting<bool>("showTPS", true);
         if (settings.getSettingByName<bool>("showUptime") == nullptr) settings.addSetting<bool>("showUptime", true);
-
-        Logger::debug("JavaDebugMenu: Default config applied - showFPS: {}, percentageX: {}, percentageY: {}",
-            settings.getSettingByName<bool>("showFPS")->value,
-            settings.getSettingByName<float>("percentageX")->value,
-            settings.getSettingByName<float>("percentageY")->value);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -379,7 +374,6 @@ public:
         this->addToggle("Show Biome", "", this->settings.getSettingByName<bool>("showBiome")->value);
         this->addToggle("Show Light Level", "", this->settings.getSettingByName<bool>("showLight")->value);
         this->addToggle("Show Weather", "", this->settings.getSettingByName<bool>("showWeather")->value);
-        this->addToggle("Show Local Time", "", this->settings.getSettingByName<bool>("showLocalTime")->value);
         this->addToggle("Show TPS", "", this->settings.getSettingByName<bool>("showTPS")->value);
         this->addToggle("Show Uptime", "", this->settings.getSettingByName<bool>("showUptime")->value);
         this->extraPadding();
@@ -392,19 +386,6 @@ public:
     }
 
     void normalRender(int index, std::string& value) override {
-        if (!SDK::hasInstanced) {
-            Logger::debug("JavaDebugMenu: SDK not instanced");
-            return;
-        }
-        if (!active && !ClickGUI::editmenu) {
-            Logger::debug("JavaDebugMenu: Module not active and not in edit menu");
-            return;
-        }
-        if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) {
-            Logger::debug("JavaDebugMenu: Client instance or local player not available");
-            return;
-        }
-
         // Calculate FPS
         frameCount++;
         float currentTime = ImGui::GetTime();
@@ -494,16 +475,6 @@ public:
         rightDebugLines.push_back(cpuArch);
         rightDebugLines.push_back(gpuName);
 
-        Logger::debug("JavaDebugMenu: System info - RAM Used: {}, RAM Available: {}, CPU Usage: {}, CPU: {}, Arch: {}, GPU: {}",
-            used, available, cpuUsageStr, cpuName, cpuArch, gpuName);
-
-        if (leftDebugLines.empty() && rightDebugLines.empty()) {
-            Logger::debug("JavaDebugMenu: No debug lines to render");
-            return;
-        }
-
-        Logger::debug("JavaDebugMenu: Rendering - Left lines: {}, Right lines: {}", leftDebugLines.size(), rightDebugLines.size());
-
         const float uiscale = 0.5f;
         const float textsize = this->settings.getSettingByName<float>("textSize")->value;
         const float textspacing = 0.2f;
@@ -517,9 +488,6 @@ public:
         float posYRight = posYLeft;
 
         D2D1_COLOR_F textColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-        Logger::debug("JavaDebugMenu: Left text - X: {}, Y: {}", posXLeft, posYLeft);
-        Logger::debug("JavaDebugMenu: Right text - X: {}, Y: {}", posXRight, posYRight);
 
         // Left column: Render Minecraft details as plain text
         float yOffsetBaseLeft = posYLeft;
@@ -550,7 +518,6 @@ public:
                 yOffsetBaseLeft += lineHeight;
             }
         }
-        Logger::debug("JavaDebugMenu: Rendered left text with {} lines", leftDebugLines.size());
 
         // Right column: Render system info as plain text
         float yOffsetBaseRight = posYRight;
@@ -581,7 +548,6 @@ public:
                 yOffsetBaseRight += lineHeight;
             }
         }
-        Logger::debug("JavaDebugMenu: Rendered right text with {} lines", rightDebugLines.size());
     }
 
     void onRender(RenderEvent& event) {
