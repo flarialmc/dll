@@ -736,7 +736,6 @@ void SwapchainHook::Fonts() {
     /* IMPORTANT FONT STUFF */
     if (ImGui::GetCurrentContext()) {
 
-
         if (FlarialGUI::DoLoadFontLater) {
 
             FontKey fontK = FlarialGUI::LoadFontLater;

@@ -769,7 +769,6 @@ ImVec2 FlarialGUI::getFlarialTextSize(const wchar_t* text, const float width, co
     FontKey fontK = { font, weight, baseFontSize };
 
     if (fontK.name.contains("minecraft")) fontK.name = "164";
-    if (!FontMap[fontK] && fontK.weight == DWRITE_FONT_WEIGHT_NORMAL) fontK.weight = DWRITE_FONT_WEIGHT_MEDIUM;
     if (!FontMap[fontK] || font == "Space Grotesk") { fontK.name = "162"; font = "162"; }
     if (fontK.name == "162" && weight == DWRITE_FONT_WEIGHT_BOLD) fontK.name = "163";
 
@@ -778,6 +777,8 @@ ImVec2 FlarialGUI::getFlarialTextSize(const wchar_t* text, const float width, co
         LoadFontLater = fontK;
         DoLoadFontLater = true;
     }
+
+    if (!FontMap[fontK] && fontK.weight == DWRITE_FONT_WEIGHT_NORMAL) fontK.weight = DWRITE_FONT_WEIGHT_MEDIUM;
 
     if (!FontMap[fontK]) return ImVec2{ 0, 0 };
     if (FontMap[fontK]->Scale <= 0.0f || !FontMap[fontK]->IsLoaded()) return ImVec2{ 0, 0 };
@@ -844,8 +845,15 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t *tex
 
     if(fontK.name.contains("minecraft")) fontK.name = "164";
     if(!FontMap[fontK] && fontK.weight == DWRITE_FONT_WEIGHT_NORMAL) fontK.weight = DWRITE_FONT_WEIGHT_MEDIUM;
-    if (!FontMap[fontK] || font == "Space Grotesk") {fontK.name = "162"; font = "162"; }
     if(fontK.name == "162" && weight == DWRITE_FONT_WEIGHT_BOLD) fontK.name = "163";
+
+    if(!FontMap[fontK] && !FontsNotFound[fontK] && font != "Space Grotesk" && font != "162" && font != "163") {
+
+        LoadFontLater = fontK;
+        DoLoadFontLater = true;
+    }
+
+    if (!FontMap[fontK] || font == "Space Grotesk") {fontK.name = "162"; font = "162"; }
 
     if(!FontMap[fontK] && !FontsNotFound[fontK]) {
 
@@ -1091,7 +1099,8 @@ bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
             auto ogit = it;
             if (!FontMap[it->second])
             {
-                Logger::debug("Loading font: {}, {}, {}", fontK.name, cached_to_string(fontK.weight), fontK.size);
+
+                Logger::debug("Loading font: {}, {}, {}", it->second.name, cached_to_string(it->second.weight), it->second.size);
                 ImFontConfig config;
                 config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
                 config.FontDataOwnedByAtlas = false;
@@ -1105,8 +1114,7 @@ bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
                 FontKey og = it->second;
                 for (int rsize : fontSizeBuckets) {
                     it->second.size = rsize;
-                    Logger::debug(FlarialGUI::cached_to_string(rsize));
-                    if (!FontMap[fontK])
+                    if (!FontMap[it->second])
                     FontMap[it->second] = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(it->first.data(), static_cast<int>(it->first.size()), it->second.size, &config,ImGui::GetIO().Fonts->GetGlyphRangesDefault());
                 }
                 it->second.size = og.size;
@@ -1119,7 +1127,7 @@ bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
 
     std::string name = fontK.name;
     std::transform(name.begin(), name.end(), name.begin(), ::towlower);
-    std::wstring fontName = FlarialGUI::to_wide(name);
+    std::wstring fontName = to_wide(name);
     std::wstring fontFilePath = GetFontFilePath(fontName, fontK.weight);
     std::string path;
 
@@ -1138,7 +1146,7 @@ bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
 
         std::ifstream fontFile(fontFilePath, std::ios::binary);
         if (fontFile.is_open()) {
-
+            Logger::debug("Path {}", WideToNarrow(fontFilePath));
             //FontMap[fontK] = ImGui::GetIO().Fonts->AddFontFromFileTTF(WideToNarrow(fontFilePath).c_str(), fontK.size, &config);
             queueFontMemoryLoad(fontFilePath, fontK);
 
