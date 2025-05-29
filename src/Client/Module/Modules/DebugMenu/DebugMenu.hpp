@@ -306,7 +306,6 @@ public:
     JavaDebugMenu() : Module("Java Debug Menu", "Displays Java-style debug information.\nSimilar to F3 menu in Minecraft Java Edition.",
         IDR_F3_PNG, "F3") {
         Module::setup();
-        // defaultConfig(); // Apply default config immediately
         // Initialize CPU usage tracking
         lastCpuUpdate = ImGui::GetTime();
         updateCpuUsage(); // Get initial times
