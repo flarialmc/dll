@@ -347,6 +347,27 @@ std::string Utils::getKeyAsString(int key, bool isCapital, bool isKeybind) {
 }
 
 int Utils::getStringAsKey(const std::string& str) {
+	if (str == "CAPS LOCK" || str == "caps lock") return 20;
+	if (str == "NUM LOCK" || str == "num lock") return 144;
+
+	if (str == "LEFT" || str == "left") return 37;
+	if (str == "UP" || str == "up") return 38;
+	if (str == "RIGHT" || str == "right") return 39;
+	if (str == "DOWN" || str == "down") return 40;
+	if (str == "NUM 1" || str == "num 1") return 97;
+	if (str == "NUM 2" || str == "num 2") return 98;
+	if (str == "NUM 3" || str == "num 3") return 99;
+	if (str == "NUM 4" || str == "num 4") return 100;
+	if (str == "NUM 5" || str == "num 5") return 101;
+	if (str == "NUM 6" || str == "num 6") return 102;
+	if (str == "NUM 7" || str == "num 7") return 103;
+	if (str == "NUM 8" || str == "num 8") return 104;
+	if (str == "NUM 9" || str == "num 9") return 105;
+	if (str == "NUM *" || str == "num *") return 106;
+	if (str == "NUM +" || str == "num +") return 107;
+	if (str == "NUM -" || str == "num -") return 109;
+	if (str == "NUM ." || str == "num .") return 110;
+	if (str == "NUM /" || str == "num /") return 111;
 	if (str == "ALT" || str == "alt") return 18;
 	if (str == "CTRL" || str == "ctrl") return 17;
 	if (str == "SHIFT" || str == "shift") return 16;
