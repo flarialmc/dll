@@ -82,7 +82,7 @@
 #define IDR_YELLOW_LOGO_PNG             177
 #define IDR_WAYPOINT_PNG                178
 #define IDR_SUPPORTER_LOGO_PNG		179
-
+#define IDR_F3_PNG                      180
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

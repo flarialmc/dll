@@ -4,6 +4,7 @@
 #include "../../Events/Events.hpp"
 #include "ClickGUI/ClickGUI.hpp"
 #include "Scripting/ScriptManager.hpp"
+#include <vector>
 
 #define colors_secondary6 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary6")->value)
 #define o_colors_secondary6 clickgui->settings.getSettingByName<float>("o_colors_secondary6")->value
@@ -317,11 +318,42 @@ void Module::addColorPicker(std::string text, std::string subtext, std::string& 
 	colorPickerIndex++;
 }
 
+void Module::addResettableColorPicker(std::string text, std::string subtext, std::string settingName, float& opacity, bool& rgb) {
+	float elementX = Constraints::PercentageConstraint(0.195f, "right");
+	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+	std::string& value = this->settings.getSettingByName<std::string>(settingName)->value;
+
+	FlarialGUI::ColorPicker(colorPickerIndex, elementX, y, value, rgb, this->name, settingName);
+
+	Module::addElementText(text, subtext);
+
+	padding += Constraints::RelativeConstraint(0.05f, "height", true);
+
+	DrDisrespect respect = { &value, &opacity, &rgb };
+	color_pickers[colorPickerIndex] = respect;
+	colorPickerIndex++;
+}
+
 void Module::addTextBox(std::string text, std::string subtext, std::string& value, int limit) {
 	float x = Constraints::PercentageConstraint(0.33f, "right");
 	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-	FlarialGUI::TextBoxVisual(textboxIndex, value, limit, x, y);
+	FlarialGUI::TextBoxVisual(textboxIndex, value, limit, x, y, "");
+
+	Module::addElementText(text, subtext);
+
+	padding += Constraints::RelativeConstraint(0.05f, "height", true);
+	textboxIndex++;
+}
+
+void Module::addResettableTextBox(std::string text, std::string subtext, std::string settingName, int limit) {
+	float x = Constraints::PercentageConstraint(0.33f, "right");
+	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+	std::string& value = settings.getSettingByName<std::string>(settingName)->value;
+
+	FlarialGUI::TextBoxVisual(textboxIndex, value, limit, x, y, "", this->name, settingName);
 
 	Module::addElementText(text, subtext);
 
@@ -471,18 +503,19 @@ void Module::addElementText(std::string text, std::string subtext) {
 		subtextCol.a = ClickGUI::settingsOpacity;
 	}
 
-	FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, textCol, false);
-	if (!subtext.empty()) FlarialGUI::FlarialTextWithFont(x, subtextY, FlarialGUI::to_wide(subtext).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, subtextCol, false);
+    FlarialGUI::FlarialTextWithFont(x, y, FlarialGUI::to_wide(text).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize, DWRITE_FONT_WEIGHT_MEDIUM, textCol, false);
+    if (!subtext.empty()) FlarialGUI::FlarialTextWithFont(x, subtextY, FlarialGUI::to_wide(subtext).c_str(), 200, 0, DWRITE_TEXT_ALIGNMENT_LEADING, fontSize2, DWRITE_FONT_WEIGHT_MEDIUM, subtextCol, false);
+
 }
 
 void Module::addSlider(std::string text, std::string subtext, float& value, float maxVal, float minVal, bool zerosafe) {
-	float elementX = Constraints::PercentageConstraint(0.33f, "right");
-	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+    float elementX = Constraints::PercentageConstraint(0.33f, "right");
+    float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
 	if (value > maxVal) value = maxVal;
 	else if (value < minVal) value = minVal;
 
-	FlarialGUI::Slider(sliderIndex, elementX, y, value, maxVal, minVal, zerosafe);
+    FlarialGUI::Slider(sliderIndex, elementX, y, value, maxVal, minVal, zerosafe);
 
 	Module::addElementText(text, subtext);
 
@@ -490,12 +523,44 @@ void Module::addSlider(std::string text, std::string subtext, float& value, floa
 	sliderIndex++;
 }
 
+void Module::addResettableSlider(std::string text, std::string subtext, std::string settingName, float maxVal, float minVal, bool zerosafe) {
+    float elementX = Constraints::PercentageConstraint(0.33f, "right");
+    float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+	float& value = settings.getSettingByName<float>(settingName)->value;
+
+    if (value > maxVal) value = maxVal;
+    else if (value < minVal) value = minVal;
+
+    FlarialGUI::Slider(sliderIndex, elementX, y, value, maxVal, minVal, zerosafe, this->name, settingName);
+
+    Module::addElementText(text, subtext);
+
+    padding += Constraints::RelativeConstraint(0.05f, "height", true);
+    sliderIndex++;
+}
+
 void Module::addToggle(std::string text, std::string subtext, bool& value) {
+    float x = Constraints::PercentageConstraint(0.019, "left");
+    float elementX = Constraints::PercentageConstraint(0.119f, "right");
+    float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+    if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false)) value = !value;
+
+    Module::addElementText(text, subtext);
+    
+    padding += Constraints::RelativeConstraint(0.05f, "height", true);
+    toggleIndex++;
+}
+
+void Module::addResettableToggle(std::string text, std::string subtext, std::string settingName) {
 	float x = Constraints::PercentageConstraint(0.019, "left");
 	float elementX = Constraints::PercentageConstraint(0.119f, "right");
 	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-	if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false)) value = !value;
+	bool& value = settings.getSettingByName<bool>(settingName)->value;
+
+	if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false, this->name, settingName)) value = !value;
 
 	Module::addElementText(text, subtext);
 

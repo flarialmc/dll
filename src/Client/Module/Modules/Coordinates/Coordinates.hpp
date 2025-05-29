@@ -43,21 +43,22 @@ public:
 		if (settings.getSettingByName<bool>("useSameDimensionFormat") == nullptr) settings.addSetting("useSameDimensionFormat", true);
 
 		if (settings.getSettingByName<std::string>("defaultDimFormat") == nullptr) settings.addSetting("defaultDimFormat", (std::string)"{dim}");
-		if (settings.getSettingByName<std::string>("OverworldFormat") == nullptr) settings.addSetting("OverworldFormat", (std::string)"{dim}");
-		if (settings.getSettingByName<std::string>("NetherFormat") == nullptr) settings.addSetting("NetherFormat", (std::string)"{dim}");
-		if (settings.getSettingByName<std::string>("TheEndFormat") == nullptr) settings.addSetting("TheEndFormat", (std::string)"{dim}");
-	}
 
-	void settingsRender(float settingsOffset) override {
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
+        if (settings.getSettingByName<std::string>("OverworldFormat") == nullptr) settings.addSetting("OverworldFormat", (std::string)"{dim}");
+        if (settings.getSettingByName<std::string>("NetherFormat") == nullptr) settings.addSetting("NetherFormat", (std::string)"{dim}");
+        if (settings.getSettingByName<std::string>("TheEndFormat") == nullptr) settings.addSetting("TheEndFormat", (std::string)"{dim}");
+    }
 
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
+    void settingsRender(float settingsOffset) override {
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
 
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
+
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+            Constraints::RelativeConstraint(1.0, "width"),
+            Constraints::RelativeConstraint(0.88f, "height"));
 
 		this->addHeader("Main");
 		this->defaultAddSettings("main");
