@@ -198,7 +198,7 @@ public:
 		if (this->isKeybind(event.keys) && 
 			this->isKeyPartOfKeybind(event.key) && 
 			(this->settings.getSettingByName<bool>("toggleZoom")->value ? event.getAction() == ActionType::Pressed : true)
-			) {
+			&& SDK::getCurrentScreen() == "hud_screen") {
 			keybindActions[0]({});
 			if (!this->settings.getSettingByName<bool>("SaveModifier")->value) zoomValue = 30.0f;
 		} else if (this->settings.getSettingByName<bool>("toggleZoom")->value ? (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) : !this->isKeybind(event.keys) && (this->settings.getSettingByName<bool>("toggleZoom")->value ? event.getAction() == ActionType::Pressed : true)) this->active = false;
@@ -209,7 +209,7 @@ public:
 	void onSetTopScreenName(SetTopScreenNameEvent& event) {
 		auto hideHand = Options::getOption("hidehand");
 		auto hideHud = Options::getOption("hidehud");
-		if (this->active && SDK::getCurrentScreen() == "hud_screen") {
+		if (this->active) {
 			if (this->settings.getSettingByName<bool>("hidemodules")->value) {
 				event.setCustomLayer("zoom_screen");
 			}
