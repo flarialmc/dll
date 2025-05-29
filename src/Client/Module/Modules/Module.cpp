@@ -838,10 +838,8 @@ void Module::defaultConfig() {
 	if (settings.getSettingByName<float>("rotation") == nullptr) settings.addSetting("rotation", 0.0f);
 	if (settings.getSettingByName<bool>("BlurEffect") == nullptr) settings.addSetting("BlurEffect", false);
 
-	if (settings.getSettingByName<float>("glowAmount") == nullptr) settings.addSetting("glowAmount", 5.0f);
-	if (settings.getSettingByName<bool>("glow") == nullptr) settings.addSetting("glow", false);
-
 	if (settings.getSettingByName<float>("glowAmount") == nullptr) settings.addSetting("glowAmount", 30.0f);
+	if (settings.getSettingByName<bool>("glow") == nullptr) settings.addSetting("glow", false);
 	if (settings.getSettingByName<float>("glowSpeed") == nullptr) settings.addSetting("glowSpeed", 1.0f);
 }
 
