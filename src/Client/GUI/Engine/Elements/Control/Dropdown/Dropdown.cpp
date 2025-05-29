@@ -70,11 +70,19 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     additionalIndex = index;
 
     D2D1_COLOR_F unselectedChildCol = colors_primary3_rgb ? rgbColor : colors_primary3;
-    unselectedChildCol.a = ClickGUI::settingsOpacity;
-
+    unselectedChildCol.a = o_colors_primary3;
 
     D2D1_COLOR_F selectedCol = colors_primary1_rgb ? rgbColor : colors_primary1;
-    selectedCol.a = ClickGUI::settingsOpacity;
+    selectedCol.a = o_colors_primary1;
+
+    D2D1_COLOR_F hoveredChildCol = colors_primary4_rgb ? rgbColor : colors_primary4;
+    hoveredChildCol.a = o_colors_primary4;
+
+    if (ClickGUI::settingsOpacity != 1) {
+        unselectedChildCol.a = ClickGUI::settingsOpacity;
+        selectedCol.a = ClickGUI::settingsOpacity;
+        hoveredChildCol.a = ClickGUI::settingsOpacity;
+    }
 
     float originalY = y;
     if (!FlarialGUI::DropDownMenus[index].curColorDone) {
@@ -84,8 +92,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
         FlarialGUI::DropDownMenus[index].curColorDone = true;
     } else y = FlarialGUI::DropDownMenus[index].yChilds;
 
-    D2D1_COLOR_F hoveredChildCol = colors_primary4_rgb ? rgbColor : colors_primary4;
-    hoveredChildCol.a = o_colors_primary4;
+    
 
     if (CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), percHeight + maxHeight) && FlarialGUI::DropDownMenus[index].isActive && MC::mouseButton == MouseButton::Right && !MC::held) {
         bool resettableSettingsEnabled = Client::settings.getSettingByName<bool>("resettableSettings")->value;

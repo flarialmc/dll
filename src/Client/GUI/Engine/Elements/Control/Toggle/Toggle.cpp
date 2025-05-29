@@ -45,11 +45,17 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, s
     D2D1_COLOR_F disabledColor = colors_primary3;
     D2D1_COLOR_F enabledColor = colors_primary1;
     D2D1_COLOR_F circleColor = colors_primary2;
-    
-    disabledColor.a = ClickGUI::settingsOpacity;
-    enabledColor.a = ClickGUI::settingsOpacity;
-    circleColor.a = ClickGUI::settingsOpacity;
-    toggleColors[index].a = ClickGUI::settingsOpacity;
+
+    enabledColor.a = o_colors_primary1;
+    disabledColor.a = o_colors_primary3;
+    circleColor.a = o_colors_primary2;
+
+    if (ClickGUI::settingsOpacity != 1) {
+        disabledColor.a = ClickGUI::settingsOpacity;
+        enabledColor.a = ClickGUI::settingsOpacity;
+        circleColor.a = ClickGUI::settingsOpacity;
+        toggleColors[index].a = ClickGUI::settingsOpacity;
+    }
 
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
@@ -102,12 +108,12 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, s
 
     if (isInScrollView) y += FlarialGUI::scrollpos;
 
-    if (CursorInRect(x, y, rectWidth, rectHeight)) {
+    if (CursorInRect(x, y, rectWidth, rectHeight) && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
         if (MC::mouseButton == MouseButton::Left && !MC::held && (!activeColorPickerWindows || index == 123)) {
             MC::mouseButton = MouseButton::None;
             return true;
         }
-        else if (MC::mouseButton == MouseButton::Right && !MC::held && (!activeColorPickerWindows || index == 123)) {
+        else if (MC::mouseButton == MouseButton::Right && !MC::held && (!activeColorPickerWindows || index == 123) && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
 			bool resettableSettingsEnabled = Client::settings.getSettingByName<bool>("resettableSettings")->value;
 			if (resettableSettingsEnabled && moduleName != "" && settingName != "") {
                 auto mod = ModuleManager::getModule(moduleName);

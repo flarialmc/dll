@@ -352,6 +352,9 @@ public:
 			settings.addSetting("o_colors_radiobutton_disabled", 1.0f);
 		if (settings.getSettingByName<bool>("colors_radiobutton_disabled_rgb") == nullptr)
 			settings.addSetting("colors_radiobutton_disabled_rgb", false);
+
+		if (settings.getSettingByName<float>("_overrideAlphaValues_") == nullptr)
+			settings.addSetting("_overrideAlphaValues_", 1.0f);
 	}
 
 	void settingsRender(float settingsOffset) override {

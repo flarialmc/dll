@@ -90,8 +90,8 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex
         );
     } else {
         D2D1_COLOR_F color = FlarialGUI::HexToColorF(hex);
-        FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, color, s * 0.85f, s * 0.85f,
-                                round.x, round.x);
+        color.a = clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+        FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, color, s * 0.85f, s * 0.85f, round.x, round.x);
     }
 
     round = Constraints::RoundingConstraint(11.5, 11.5);

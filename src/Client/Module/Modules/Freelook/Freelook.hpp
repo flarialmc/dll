@@ -148,12 +148,8 @@ public:
 
 		this->addHeader("Misc");
 		this->addKeybind("Freelook Keybind", "Hold for 2 seconds!", getKeybind());
-
 		this->addToggle("Toggleable Mode", "Click to toggle or Hold to keep enabled", this->settings.getSettingByName<bool>("toggle")->value);
-
-		this->addDropdown("Freelook View Mode", "",
-			std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"},
-			this->settings.getSettingByName<std::string>("mode")->value);
+		this->addDropdown("Freelook View Mode", "",std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"},this->settings.getSettingByName<std::string>("mode")->value);
 
 		FlarialGUI::UnsetScrollView();
 

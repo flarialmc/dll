@@ -60,69 +60,32 @@ public:
             Constraints::RelativeConstraint(1.0, "width"),
             Constraints::RelativeConstraint(0.88f, "height"));
 
-        this->addHeader("Main");
-        this->addResettableSlider("UI Scale", "", "uiscale", 2.0f);
-        this->addResettableToggle("Border", "", "border");
-        this->addResettableToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", "BlurEffect");
-        this->addConditionalSlider(this->settings.getSettingByName<bool>("border")->value, "Border Thickness", "", this->settings.getSettingByName<float>("borderWidth")->value, 4.f);
-        this->addResettableSlider("Rounding", "Rounding of the rectangle", "rounding");
-        this->extraPadding();
+		this->addHeader("Main");
+		this->defaultAddSettings("main");
+		this->extraPadding();
 
-        this->addHeader("Text");
-        this->addResettableTextBox("Format", "", "text");
-        this->addResettableSlider("Text Scale", "", "textscale", 2.0f);
-		this->addResettableDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, "textalignment");
-        this->addResettableToggle("Text Shadow", "Displays a shadow under the text", "textShadow");
-        this->addResettableSlider("Shadow Offset", "How far the shadow will be.", "textShadowOffset", 0.02f, 0.001f);
-        this->addResettableToggle("Show Decimals", "", "showDecimals");
-        this->addConditionalSlider(this->settings.getSettingByName<bool>("showDecimals")->value, "# of Decimals", "", this->settings.getSettingByName<float>("decimalCount")->value, 6.f, 1.f);
-
+		this->addHeader("Text");
+		this->defaultAddSettings("text");
+		this->addToggle("Show Decimals", "", this->settings.getSettingByName<bool>("showDecimals")->value);
+		this->addConditionalSlider(this->settings.getSettingByName<bool>("showDecimals")->value, "Number of Decimals", "", this->settings.getSettingByName<float>("decimalCount")->value, 6.f, 1.f);
 		this->extraPadding();
 
 		this->addHeader("Module Settings");
-		this->addResettableToggle("Show Other Dimension Coords", "Shows the other dimension\'s coordinates along with overworld coordinates.", "showOtherDimCoords");
-		this->addResettableToggle("Show Dimension Name", "Shows the dimension name.", "showDimName");
-		this->addResettableToggle("Use Same Dimension Format", "Uses the same format for all dimensions.", "useSameDimensionFormat");
-		if (this->settings.getSettingByName<bool>("useSameDimensionFormat")->value) {
-			this->addResettableTextBox("Dimension Format", "", "defaultDimFormat");
-		}
-		else {
-			this->addResettableTextBox("Overworld Dimension Format", "", "OverworldFormat");
-			this->addResettableTextBox("Nether Dimension Format", "", "NetherFormat");
-			this->addResettableTextBox("TheEnd Dimension Format", "", "TheEndFormat");
-		}
-
+		this->addToggle("Show Other Dimension Coords", "Shows the other dimension\'s coordinates along with overworld coordinates.", this->settings.getSettingByName<bool>("showOtherDimCoords")->value);
+		this->addToggle("Show Dimension Name", "Shows the dimension name.", this->settings.getSettingByName<bool>("showDimName")->value);
+		this->addToggle("Use Same Dimension Format", "Uses the same format for all dimensions.", this->settings.getSettingByName<bool>("useSameDimensionFormat")->value);
+		this->addConditionalTextBox(this->settings.getSettingByName<bool>("useSameDimensionFormat")->value, "Dimension Format", "", this->settings.getSettingByName<std::string>("defaultDimFormat")->value);
+		this->addConditionalTextBox(!this->settings.getSettingByName<bool>("useSameDimensionFormat")->value, "Overworld Dimension Format", "", this->settings.getSettingByName<std::string>("OverworldFormat")->value);
+		this->addConditionalTextBox(!this->settings.getSettingByName<bool>("useSameDimensionFormat")->value, "Nether Dimension Format", "", this->settings.getSettingByName<std::string>("NetherFormat")->value);
+		this->addConditionalTextBox(!this->settings.getSettingByName<bool>("useSameDimensionFormat")->value, "TheEnd Dimension Format", "", this->settings.getSettingByName<std::string>("TheEndFormat")->value);
 		this->extraPadding();
 
-        this->addHeader("Colors");
-        this->addResettableColorPicker("Background Color", "", "bgColor",
-            settings.getSettingByName<float>("bgOpacity")->value,
-            settings.getSettingByName<bool>("bgRGB")->value);
-        this->addResettableToggle("Background Shadow", "Displays a shadow under the background", "rectShadow");
-        this->addResettableColorPicker("Shadow Color", "Background Shadow Color", "rectShadowCol",
-            settings.getSettingByName<float>("rectShadowOpacity")->value,
-            settings.getSettingByName<bool>("rectShadowRGB")->value);
-        this->addResettableSlider("Shadow Offset", "How far the shadow will be.", "rectShadowOffset", 0.02f, 0.001f);
-        this->addResettableColorPicker("Border Color", "", "borderColor",
-            settings.getSettingByName<float>("borderOpacity")->value,
-            settings.getSettingByName<bool>("borderRGB")->value);
-        this->addResettableColorPicker("Shadow Color", "Text Shadow Color", "textShadowCol",
-            settings.getSettingByName<float>("textShadowOpacity")->value,
-            settings.getSettingByName<bool>("textShadowRGB")->value);
-        this->addResettableColorPicker("Color", "Text Color", "textColor",
-            settings.getSettingByName<float>("textOpacity")->value,
-            settings.getSettingByName<bool>("textRGB")->value);
-        this->extraPadding();
+		this->addHeader("Colors");
+		this->defaultAddSettings("colors");
+		this->extraPadding();
 
-        this->addHeader("Misc Customizations");
-        this->addResettableToggle("Reverse Padding X", "For Text Position", "reversepaddingx");
-		this->addResettableToggle("Reverse Padding Y", "For Text Position", "reversepaddingy");
-		this->addResettableSlider("Padding X", "For Text Position", "padx");
-		this->addResettableSlider("Padding Y", "For Text Position", "pady");
-		this->addResettableSlider("Rectangle Width", "", "rectwidth", 2.f, 0.001f);
-		this->addResettableSlider("Rectangle Height", "", "rectheight", 2.f, 0.001f);
-		this->addResettableToggle("Responsive Rectangle", "Rectangle resizes with text", "responsivewidth");
-        this->addResettableSlider("Rotation", "see for yourself!", "rotation", 360.f, 0, false);
+		this->addHeader("Misc");
+		this->defaultAddSettings("misc");
 
 		FlarialGUI::UnsetScrollView();
 		this->resetPadding();
