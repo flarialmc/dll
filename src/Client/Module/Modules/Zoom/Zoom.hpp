@@ -209,7 +209,7 @@ public:
 	void onSetTopScreenName(SetTopScreenNameEvent& event) {
 		auto hideHand = Options::getOption("hidehand");
 		auto hideHud = Options::getOption("hidehud");
-		if (this->active) {
+		if (this->active && SDK::getCurrentScreen() == "hud_screen") {
 			if (this->settings.getSettingByName<bool>("hidemodules")->value) {
 				event.setCustomLayer("zoom_screen");
 			}
