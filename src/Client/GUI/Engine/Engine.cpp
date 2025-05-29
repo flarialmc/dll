@@ -204,6 +204,8 @@ void FlarialGUI::OverrideAlphaValues(float percent) {
     o_colors_mod2 = percent * b_o_colors_mod2;
     o_colors_mod3 = percent * b_o_colors_mod3;
     o_colors_mod4 = percent * b_o_colors_mod4;
+
+    clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value = percent;
 }
 
 void FlarialGUI::ResetOverrideAlphaValues() {
@@ -226,6 +228,8 @@ void FlarialGUI::ResetOverrideAlphaValues() {
     o_colors_mod2 = b_o_colors_mod2;
     o_colors_mod3 = b_o_colors_mod3;
     o_colors_mod4 = b_o_colors_mod4;
+
+    clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value = 1.f;
 }
 
 UINT32 ColorValueToUInt(const D3DCOLORVALUE &color) {

@@ -51,67 +51,42 @@ public:
 
 
 		this->addHeader("Main");
-
-		this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
-		this->addToggle("Border", "", this->settings.getSettingByName<bool>(
-			"border")->value);
-		this->addConditionalSlider(this->settings.getSettingByName<bool>(
-			"border")->value, "Border Thickness", "", this->settings.getSettingByName<float>("borderWidth")->value, 4.f);
-		this->addSlider("Rounding", "Rounding of the rectangle", this->settings.getSettingByName<float>("rounding")->value);
 		this->addToggle("Progress Bar", "Whether to show a Progress Bar or text", this->settings.getSettingByName<bool>("pbmode")->value);
+		this->defaultAddSettings("main");
 		this->extraPadding();
 
-		this->addHeader("Text");
-
-		this->addTextBox("Format", "", settings.getSettingByName<std::string>("text")->value);
-		this->addSlider("Text Scale", "", this->settings.getSettingByName<float>("textscale")->value, 2.0f);
-		this->addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, this->settings.getSettingByName<std::string>("textalignment")->value);
-		this->addColorPicker("Color", "Text Color", settings.getSettingByName<std::string>("textColor")->value,
-			settings.getSettingByName<float>("textOpacity")->value,
-			settings.getSettingByName<bool>("textRGB")->value);
-		this->addToggle("Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
-		this->addColorPicker("Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value,
-			settings.getSettingByName<float>("textShadowOpacity")->value,
-			settings.getSettingByName<bool>("textShadowRGB")->value);
-		this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
-		this->extraPadding();
-
-		this->addHeader("Bar");
-		this->addToggle("Only show while breaking", "", this->settings.getSettingByName<bool>("onlyShowWhileBreaking")->value);
-		this->addDropdown("Orientation", "", std::vector<std::string>{"Vertical", "Horizontal"}, this->settings.getSettingByName<std::string>("orientation")->value);
-		this->addColorPicker("Color", "", settings.getSettingByName<std::string>("barFill")->value, settings.getSettingByName<float>("barFillOpacity")->value, settings.getSettingByName<bool>("barFillRGB")->value);
-		this->addSlider("Width", "", settings.getSettingByName<float>("pbwidth")->value);
-		this->addSlider("Height", "", settings.getSettingByName<float>("pbheight")->value);
-		this->extraPadding();
+		if (!this->settings.getSettingByName<bool>("pbmode")->value) {
+			this->addHeader("Text");
+			this->defaultAddSettings("text");
+			this->extraPadding();
+		}
+		else {
+			this->addHeader("Bar");
+			this->addToggle("Only show while breaking", "", this->settings.getSettingByName<bool>("onlyShowWhileBreaking")->value);
+			this->addDropdown("Orientation", "", std::vector<std::string>{"Vertical", "Horizontal"}, this->settings.getSettingByName<std::string>("orientation")->value);
+			this->addColorPicker("Color", "", settings.getSettingByName<std::string>("barFill")->value, settings.getSettingByName<float>("barFillOpacity")->value, settings.getSettingByName<bool>("barFillRGB")->value);
+			this->addSlider("Width", "", settings.getSettingByName<float>("pbwidth")->value, 20.f);
+			this->addSlider("Height", "", settings.getSettingByName<float>("pbheight")->value, 10.f);
+			this->extraPadding();
+		}
 
 		this->addHeader("Colors");
-
-		this->addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value,
-			settings.getSettingByName<float>("bgOpacity")->value,
-			settings.getSettingByName<bool>("bgRGB")->value);
-		this->addToggle("Background Shadow", "Displays a shadow under the background", settings.getSettingByName<bool>("rectShadow")->value);
-		this->addColorPicker("Shadow Color", "Background Shadow Color", settings.getSettingByName<std::string>("rectShadowCol")->value,
-			settings.getSettingByName<float>("rectShadowOpacity")->value,
-			settings.getSettingByName<bool>("rectShadowRGB")->value);
-		this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("rectShadowOffset")->value, 0.02f, 0.001f);
-
-		this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value,
-			settings.getSettingByName<float>("borderOpacity")->value,
-			settings.getSettingByName<bool>("borderRGB")->value);        this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
+		this->addConditionalColorPicker(!this->settings.getSettingByName<bool>("pbmode")->value, "Text Color", "", this->settings.getSettingByName<std::string>("textColor")->value, this->settings.getSettingByName<float>("textOpacity")->value, this->settings.getSettingByName<bool>("textRGB")->value);
+		this->addColorPicker("Background Color", "", this->settings.getSettingByName<std::string>("bgColor")->value, this->settings.getSettingByName<float>("bgOpacity")->value, this->settings.getSettingByName<bool>("bgRGB")->value);
+		this->addConditionalColorPicker(this->settings.getSettingByName<bool>("rectShadow")->value, "Background Shadow Color", "Background Shadow Color", this->settings.getSettingByName<std::string>("rectShadowCol")->value, this->settings.getSettingByName<float>("rectShadowOpacity")->value, this->settings.getSettingByName<bool>("rectShadowRGB")->value);
+		this->addConditionalColorPicker(this->settings.getSettingByName<bool>("textShadow")->value, "Text Shadow Color", "Text Shadow Color", this->settings.getSettingByName<std::string>("textShadowCol")->value, this->settings.getSettingByName<float>("textShadowOpacity")->value, this->settings.getSettingByName<bool>("textShadowRGB")->value);
+		this->addConditionalColorPicker(this->settings.getSettingByName<bool>("border")->value, "Border Color", "", this->settings.getSettingByName<std::string>("borderColor")->value, this->settings.getSettingByName<float>("borderOpacity")->value, this->settings.getSettingByName<bool>("borderRGB")->value);
+		this->addConditionalColorPicker(this->settings.getSettingByName<bool>("glow")->value, "Glow Color", "", this->settings.getSettingByName<std::string>("glowColor")->value, this->settings.getSettingByName<float>("glowOpacity")->value, this->settings.getSettingByName<bool>("glowRGB")->value);
 		this->extraPadding();
 
-		this->addHeader("Misc Customizations");
-
-		this->addToggle("Reverse Padding X", "For Text Position", this->settings.getSettingByName<bool>(
-			"reversepaddingx")->value);
-		this->addToggle("Reverse Padding Y", "For Text Position", this->settings.getSettingByName<bool>(
-			"reversepaddingy")->value);
-		this->addSlider("Padding X", "For Text Position", this->settings.getSettingByName<float>("padx")->value);
-		this->addSlider("Padding Y", "For Text Position", this->settings.getSettingByName<float>("pady")->value);
-		this->addSlider("Rectangle Width", "", this->settings.getSettingByName<float>("rectwidth")->value, 2.f, 0.001f);
-		this->addSlider("Rectangle Height", "", this->settings.getSettingByName<float>("rectheight")->value, 2.f, 0.001f);
-		this->addToggle("Responsive Rectangle", "Rectangle resizes with text", this->settings.getSettingByName<bool>(
-			"responsivewidth")->value);
+		this->addHeader("Misc");
+		this->addConditionalToggle(!this->settings.getSettingByName<bool>("pbmode")->value, "Reverse Padding X", "For Text Position", this->settings.getSettingByName<bool>("reversepaddingx")->value);
+		this->addConditionalToggle(!this->settings.getSettingByName<bool>("pbmode")->value, "Reverse Padding Y", "For Text Position", this->settings.getSettingByName<bool>("reversepaddingy")->value);
+		this->addConditionalSlider(!this->settings.getSettingByName<bool>("pbmode")->value, "Padding X", "For Text Position", this->settings.getSettingByName<float>("padx")->value);
+		this->addConditionalSlider(!this->settings.getSettingByName<bool>("pbmode")->value, "Padding Y", "For Text Position", this->settings.getSettingByName<float>("pady")->value);
+		this->addConditionalSlider(!this->settings.getSettingByName<bool>("pbmode")->value, "Rectangle Width", "", this->settings.getSettingByName<float>("rectwidth")->value, 2.f, 0.001f);
+		this->addConditionalSlider(!this->settings.getSettingByName<bool>("pbmode")->value, "Rectangle Height", "", this->settings.getSettingByName<float>("rectheight")->value, 2.f, 0.001f);
+		this->addConditionalToggle(!this->settings.getSettingByName<bool>("pbmode")->value, "Responsive Rectangle", "Rectangle resizes with text", this->settings.getSettingByName<bool>("responsivewidth")->value);
 		this->addSlider("Rotation", "see for yourself!", this->settings.getSettingByName<float>("rotation")->value, 360.f, 0, false);
 
 		FlarialGUI::UnsetScrollView();
@@ -179,6 +154,7 @@ public:
 
 			if (ClickGUI::editmenu) {
 				FlarialGUI::SetWindowRect(coord.x, coord.y, pbwidth, pbheight, index);
+				checkForRightClickAndOpenSettings(coord.x, coord.y, pbwidth, pbheight);
 
 				Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(coord.x, coord.y, index, pbwidth, pbheight);
 
@@ -197,6 +173,12 @@ public:
 
 			FlarialGUI::lerp(currentHeight, filledHeight, 0.5f * FlarialGUI::frameFactor);
 
+			if (this->settings.getSettingByName<bool>("glow")->value) {
+				D2D1_COLOR_F glowColor = settings.getSettingByName<bool>("glowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("glowColor")->value);
+				glowColor.a = settings.getSettingByName<float>("glowOpacity")->value;
+				FlarialGUI::ShadowRect(Vec2<float>(coord.x, coord.y), Vec2<float>(pbwidth, pbheight), glowColor, rounde.x, this->settings.getSettingByName<float>("glowAmount")->value);
+			}
+				
 			if (settings.getSettingByName<bool>("BlurEffect")->value)
 				FlarialGUI::BlurRect(
 					D2D1::RoundedRect(D2D1::RectF(coord.x, coord.y, coord.x + pbwidth, coord.y + pbheight),

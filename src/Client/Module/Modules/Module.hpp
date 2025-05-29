@@ -56,6 +56,10 @@ public:
     int toggleIndex = 0;
     int sliderIndex = 0;
     std::vector<float> conditionalSliderAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+    std::vector<float> conditionalToggleAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+    std::vector<float> conditionalDropdownAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+    std::vector<float> conditionalTextBoxAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+    std::vector<float> conditionalColorPickerAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
     int dropdownIndex = 0;
     int textboxIndex = 300;
     int keybindIndex = 0;
@@ -70,8 +74,6 @@ public:
 
     std::unordered_map<int, DrDisrespect> color_pickers;
 
-
-
     void resetPadding();
     void extraPadding();
     void addElementText(std::string text, std::string subtext = "");
@@ -80,6 +82,10 @@ public:
     void addButton(const std::string &text, const std::string &subtext, const std::string &buttonText,
                    std::function<void()> action);
 
+    void addConditionalTextBox(bool condition, std::string text, std::string subtext, std::string& value, int limit = 16);
+    void addConditionalColorPicker(bool condition, std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb);
+    void addConditionalDropdown(bool condition, std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value);
+    void addConditionalToggle(bool condition, std::string text, std::string subtext, bool& value);
     void addConditionalSlider(bool condition, std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
     void addSlider(std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
     void addToggle(std::string text, std::string subtext, bool& value);
@@ -105,6 +111,7 @@ public:
     void setKeybind(const std::string& newKeybind);
     std::string& getKeybind(const int keybindCount = 0);
     virtual void defaultConfig();
+    virtual void defaultAddSettings(std::string type);
     virtual void settingsRender(float settingsOffset) {}
     bool isKeybind(const std::array<bool, 256>& keys, const int keybindCount = 0);
     [[nodiscard]] bool isAdditionalKeybind(const std::array<bool, 256>& keys, const std::string& bind) const;

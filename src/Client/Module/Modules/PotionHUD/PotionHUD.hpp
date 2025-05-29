@@ -68,28 +68,19 @@ public:
 		this->addToggle("Bottom Up Mode", "New effects appear ontop instead", this->settings.getSettingByName<bool>("bottomUp")->value);
 		this->addSlider("Spacing", "", this->settings.getSettingByName<float>("spacing")->value, 10.f, 0.0f, true);
 		this->addToggle("Show Text", "", this->settings.getSettingByName<bool>("showText")->value);
-		if (this->settings.getSettingByName<bool>("showText")->value) {
-			this->addSlider("Text Size", "", this->settings.getSettingByName<float>("textSize")->value, 0.25f, 0.0f, true);
-			this->addSlider("Text Offset X", "", this->settings.getSettingByName<float>("textOffsetX")->value, 50.f, 0.0f, false);
-			this->addToggle("Text to the left", "", this->settings.getSettingByName<bool>("textLeft")->value);
-			this->addToggle("Text Shadow", "Displays a shadow under the text", this->settings.getSettingByName<bool>("textShadow")->value);
-			if (this->settings.getSettingByName<bool>("textShadow")->value) this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
-		}
+		this->addConditionalSlider(this->settings.getSettingByName<bool>("showText")->value, "Text Size", "", this->settings.getSettingByName<float>("textSize")->value, 0.25f, 0.0f, true);
+		this->addConditionalSlider(this->settings.getSettingByName<bool>("showText")->value, "Text Offset X", "", this->settings.getSettingByName<float>("textOffsetX")->value, 50.f, 0.0f, false);
+		this->addConditionalToggle(this->settings.getSettingByName<bool>("showText")->value, "Text to the left", "", this->settings.getSettingByName<bool>("textLeft")->value);
+		this->addConditionalToggle(this->settings.getSettingByName<bool>("showText")->value, "Text Shadow", "Displays a shadow under the text", this->settings.getSettingByName<bool>("textShadow")->value);
+		this->addConditionalSlider(this->settings.getSettingByName<bool>("showText")->value && this->settings.getSettingByName<bool>("textShadow")->value, "Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
 		this->extraPadding();
 
 		this->addHeader("Colors");
-		this->addColorPicker("Main Color", "", this->settings.getSettingByName<std::string>("colorMain")->value,
-			settings.getSettingByName<float>("colorMain_opacity")->value,
-			settings.getSettingByName<bool>("colorMain_rgb")->value);
-		if (this->settings.getSettingByName<bool>("textShadow")->value) this->addColorPicker("Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value,
-			settings.getSettingByName<float>("textShadowOpacity")->value,
-			settings.getSettingByName<bool>("textShadowRGB")->value);
-		this->addColorPicker("Effect About to Expire", "", settings.getSettingByName<std::string>("colorLow")->value,
-			settings.getSettingByName<float>("colorLow_opacity")->value,
-			settings.getSettingByName<bool>("colorLow_rgb")->value);
+		this->addColorPicker("Main Color", "", this->settings.getSettingByName<std::string>("colorMain")->value,settings.getSettingByName<float>("colorMain_opacity")->value,settings.getSettingByName<bool>("colorMain_rgb")->value);
+		this->addConditionalColorPicker(this->settings.getSettingByName<bool>("textShadow")->value, "Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value,settings.getSettingByName<float>("textShadowOpacity")->value,settings.getSettingByName<bool>("textShadowRGB")->value);
+		this->addColorPicker("Effect About to Expire", "", settings.getSettingByName<std::string>("colorLow")->value,settings.getSettingByName<float>("colorLow_opacity")->value,settings.getSettingByName<bool>("colorLow_rgb")->value);
 
 		FlarialGUI::UnsetScrollView();
-
 		this->resetPadding();
 	}
 

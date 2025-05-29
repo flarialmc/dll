@@ -69,25 +69,20 @@ public:
             Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Main");
-        this->addSlider("UI Scale", "The Size of Tablist", this->settings.getSettingByName<float>("uiscale")->value, 1.25f);
-        this->addToggle("Border", "", this->settings.getSettingByName<bool>("border")->value);
-        this->addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", this->settings.getSettingByName<bool>("BlurEffect")->value);
-        this->addConditionalSlider(this->settings.getSettingByName<bool>("border")->value, "Border Width", "", this->settings.getSettingByName<float>("borderWidth")->value, 4);
-        this->addSlider("Rounding", "", this->settings.getSettingByName<float>("rounding")->value);
-
+        this->defaultAddSettings("main");
 		this->extraPadding();
 
         this->addHeader("Misc");
         this->addToggle("Alphabetical Order", "", this->settings.getSettingByName<bool>("alphaOrder")->value);
         this->addToggle("Flarial First", "Prioritize Flarial users (Dev > Gamer > Booster > Supporter > Default) at the top", this->settings.getSettingByName<bool>("flarialFirst")->value);
         this->addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
-
 		this->extraPadding();
 
 		this->addHeader("Colors");
-		this->addColorPicker("Background", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
-		this->addColorPicker("Text", "", settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
-		this->addColorPicker("Border", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
+		this->addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
+		this->addColorPicker("Text Color", "", settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
+		this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
+        this->addColorPicker("Glow Color", "", settings.getSettingByName<std::string>("glowColor")->value, settings.getSettingByName<float>("glowOpacity")->value, settings.getSettingByName<bool>("glowRGB")->value);
 
 		FlarialGUI::UnsetScrollView();
 		this->resetPadding();
@@ -212,12 +207,8 @@ public:
                 }
 
                 Vec2<float> realcenter;
-                if (settingperc.x != 0 || settingperc.y != 0) {
-                    realcenter = Vec2<float>(settingperc.x * MC::windowSize.x, settingperc.y * MC::windowSize.y);
-                }
-                else {
-                    realcenter = Constraints::CenterConstraint(i2 * keycardSize, 7.5f * keycardSize, "y", 0.0f, -0.85f);
-                }
+                if (settingperc.x != 0 || settingperc.y != 0) realcenter = Vec2<float>(settingperc.x * MC::windowSize.x, settingperc.y * MC::windowSize.y);
+                else realcenter = Constraints::CenterConstraint(i2 * keycardSize, 7.5f * keycardSize, "y", 0.0f, -0.85f);
 
                 i3 = 0;
                 float fakex = realcenter.x;
@@ -237,6 +228,12 @@ public:
                 disabledColor.a = settings.getSettingByName<float>("bgOpacity")->value;
                 textColor.a = settings.getSettingByName<float>("textOpacity")->value;
                 borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
+
+                if (this->settings.getSettingByName<bool>("glow")->value) {
+                    D2D1_COLOR_F glowColor = settings.getSettingByName<bool>("glowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("glowColor")->value);
+                    glowColor.a = settings.getSettingByName<float>("glowOpacity")->value;
+                    FlarialGUI::ShadowRect(Vec2<float>(fakex, realcenter.y), Vec2<float>(totalWidth, 7.5f * keycardSize), glowColor, rounde.x, this->settings.getSettingByName<float>("glowAmount")->value);
+                }
 
                 if (settings.getSettingByName<bool>("BlurEffect")->value) {
                     FlarialGUI::BlurRect(D2D1::RoundedRect(

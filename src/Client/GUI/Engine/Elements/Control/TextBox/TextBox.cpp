@@ -79,7 +79,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
         col.a = o_colors_primary3;
     }
 
-    col.a = ClickGUI::settingsOpacity;
+    if (ClickGUI::settingsOpacity != 1) col.a = ClickGUI::settingsOpacity;
 
     // rectangle bounds
     FlarialGUI::RoundedRect(x, y, col, Constraints::SpacingConstraint(1.85, textWidth), percHeight, round.x, round.x);
@@ -129,16 +129,16 @@ std::string FlarialGUI::TextBox(int index, const std::string& text, int limit, f
         DWRITE_TEXT_ALIGNMENT_LEADING, textSize, DWRITE_FONT_WEIGHT_NORMAL);
 
     if (CursorInRect(x, y, width, height) && MC::mouseAction == MouseAction::Press &&
-        MC::mouseButton == MouseButton::Left && !activeColorPickerWindows) {
+        MC::mouseButton == MouseButton::Left && !activeColorPickerWindows && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
 
         FlarialGUI::TextBoxes[index].isActive = true;
         if (special == 2) FlarialGUI::TextBoxes[index].text = "";
 
     } else if (!CursorInRect(x, y, width, height) && MC::mouseAction == MouseAction::Press &&
-               MC::mouseButton == MouseButton::Left) {
+               MC::mouseButton == MouseButton::Left && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
         FlarialGUI::TextBoxes[index].isActive = false;
         FlarialGUI::TextBoxes[index].text = text;
-    } else if (!FlarialGUI::TextBoxes[index].isActive && !activeColorPickerWindows) {
+    } else if (!FlarialGUI::TextBoxes[index].isActive && !activeColorPickerWindows && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
         FlarialGUI::TextBoxes[index].text = text;
     }
 

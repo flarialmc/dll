@@ -104,7 +104,7 @@ public:
 		this->addSlider("Size", "", this->settings.getSettingByName<float>("uiscale")->value, 5.f, 0.f, true);
 		this->addSlider("Spacing", "", this->settings.getSettingByName<float>("spacing")->value, 10.f, 0.f, true);
 		this->addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", this->settings.getSettingByName<bool>("vertical")->value);
-		if (this->settings.getSettingByName<bool>("vertical")->value) this->addToggle("Durability to the left", "", this->settings.getSettingByName<bool>("durability_left")->value);
+		this->addConditionalToggle(this->settings.getSettingByName<bool>("vertical")->value, "Durability to the left", "", this->settings.getSettingByName<bool>("durability_left")->value);
 		this->addToggle("Show offhand item", "", this->settings.getSettingByName<bool>("show_offhand")->value);
 		this->addToggle("Fill Empty Slots", "Fill gaps when a piece of armor isn't equipped", this->settings.getSettingByName<bool>("fillGaps")->value);
 		this->addToggle("Change Color", "", this->settings.getSettingByName<bool>("color")->value);
@@ -113,46 +113,31 @@ public:
 
 		this->addHeader("Durability");
 		this->addToggle("Durability Text", "", this->settings.getSettingByName<bool>("showdurability")->value);
-		if (this->settings.getSettingByName<bool>("showdurability")->value) {
-			if (this->settings.getSettingByName<bool>("vertical")->value) this->addSlider("Text Offset X", "", this->settings.getSettingByName<float>("textOffsetX")->value, 50.f, 0.0f, false);
-			else this->addSlider("Text Offset Y", "", this->settings.getSettingByName<float>("textOffsetY")->value, 50.f, 0.0f, false);
-			this->addSlider("Text Size", "", this->settings.getSettingByName<float>("textSize")->value, 0.25f, 0.0f, true);
-			this->addToggle("Show Durability in %", "", this->settings.getSettingByName<bool>("percent")->value);
-			if (!this->settings.getSettingByName<bool>("percent")->value) this->addToggle("Hide Max Durability Text", "", this->settings.getSettingByName<bool>("hideMaxDurText")->value);
-			this->addToggle("Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
-			if (this->settings.getSettingByName<bool>("textShadow")->value) this->addSlider("Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
-		}
+		this->addConditionalSlider(this->settings.getSettingByName<bool>("showdurability")->value && this->settings.getSettingByName<bool>("vertical")->value, "Text Offset X", "", this->settings.getSettingByName<float>("textOffsetX")->value, 50.f, 0.0f, false);
+		this->addConditionalSlider(this->settings.getSettingByName<bool>("showdurability")->value && !this->settings.getSettingByName<bool>("vertical")->value, "Text Offset Y", "", this->settings.getSettingByName<float>("textOffsetY")->value, 50.f, 0.0f, false);
+		this->addConditionalSlider(this->settings.getSettingByName<bool>("showdurability")->value, "Text Size", "", this->settings.getSettingByName<float>("textSize")->value, 0.25f, 0.0f, true);
+		this->addConditionalToggle(this->settings.getSettingByName<bool>("showdurability")->value, "Show Durability in %", "", this->settings.getSettingByName<bool>("percent")->value);
+		this->addConditionalToggle(this->settings.getSettingByName<bool>("showdurability")->value && !this->settings.getSettingByName<bool>("percent")->value, "Hide Max Durability Text", "", this->settings.getSettingByName<bool>("hideMaxDurText")->value);
+		this->addConditionalToggle(this->settings.getSettingByName<bool>("showdurability")->value, "Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
+		this->addConditionalSlider(this->settings.getSettingByName<bool>("showdurability")->value && this->settings.getSettingByName<bool>("textShadow")->value, "Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
+		
 		this->addToggle("Durability Bar", "", this->settings.getSettingByName<bool>("showDurBar")->value);
-		if (this->settings.getSettingByName<bool>("showDurBar")->value) {
-			this->addSlider("Durability Bar Offset X", "", this->settings.getSettingByName<float>("durBarOffsetX")->value, 50.f, 0.0f, false);
-			this->addSlider("Durability Bar Offset Y", "", this->settings.getSettingByName<float>("durBarOffsetY")->value, 50.f, 0.0f, false);
-			this->addSlider("Durability Bar Opacity", "", this->settings.getSettingByName<float>("durBarOpacity")->value, 1.f, 0.0f, false);
-			this->addToggle("Show Max Durability Bar", "", this->settings.getSettingByName<bool>("showDurBarMax")->value);
-		}
+		this->addConditionalSlider(this->settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Offset X", "", this->settings.getSettingByName<float>("durBarOffsetX")->value, 50.f, 0.0f, false);
+		this->addConditionalSlider(this->settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Offset Y", "", this->settings.getSettingByName<float>("durBarOffsetY")->value, 50.f, 0.0f, false);
+		this->addConditionalSlider(this->settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Opacity", "", this->settings.getSettingByName<float>("durBarOpacity")->value, 1.f, 0.0f, false);
+		this->addConditionalToggle(this->settings.getSettingByName<bool>("showDurBar")->value, "Show Max Durability Bar", "", this->settings.getSettingByName<bool>("showDurBarMax")->value);
 
 		this->extraPadding();
 		this->addHeader("Colors");
 		this->addToggle("Show Special Max Durability Bar Color", "", this->settings.getSettingByName<bool>("showSpecialMaxDurBarCol")->value);
-		if (this->settings.getSettingByName<bool>("showSpecialMaxDurBarCol")->value) this->addColorPicker("Special Max Durability Bar Color", "", settings.getSettingByName<std::string>("specialMaxDurBarColor")->value,
-			settings.getSettingByName<float>("specialMaxDurBarColor_opacity")->value,
-			settings.getSettingByName<bool>("specialMaxDurBarColor_rgb")->value);
-		this->addColorPicker("Normal Color", "", settings.getSettingByName<std::string>("colorMain")->value,
-			settings.getSettingByName<float>("colorMain_opacity")->value,
-			settings.getSettingByName<bool>("colorMain_rgb")->value);
-		if (this->settings.getSettingByName<bool>("textShadow")->value) this->addColorPicker("Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value,
-			settings.getSettingByName<float>("textShadowOpacity")->value,
-			settings.getSettingByName<bool>("textShadowRGB")->value);
+		this->addConditionalColorPicker(this->settings.getSettingByName<bool>("showSpecialMaxDurBarCol")->value, "Special Max Durability Bar Color", "", settings.getSettingByName<std::string>("specialMaxDurBarColor")->value, settings.getSettingByName<float>("specialMaxDurBarColor_opacity")->value, settings.getSettingByName<bool>("specialMaxDurBarColor_rgb")->value);
+		this->addColorPicker("Normal Color", "", settings.getSettingByName<std::string>("colorMain")->value, settings.getSettingByName<float>("colorMain_opacity")->value, settings.getSettingByName<bool>("colorMain_rgb")->value);
+		this->addConditionalColorPicker(this->settings.getSettingByName<bool>("textShadow")->value, "Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value, settings.getSettingByName<float>("textShadowOpacity")->value, settings.getSettingByName<bool>("textShadowRGB")->value);
 		this->addToggle("Enable Static Durability Bar Color", "", this->settings.getSettingByName<bool>("showStaticDurBarColor")->value);
-		if (this->settings.getSettingByName<bool>("showStaticDurBarColor")->value) {
-			this->addColorPicker("Static Durability Bar Color", "", settings.getSettingByName<std::string>("staticDurBarColor")->value,
-				settings.getSettingByName<float>("staticDurBarColor_opacity")->value,
-				settings.getSettingByName<bool>("staticDurBarColor_rgb")->value);
-			this->addToggle("Override Special Max Durability Bar Color", "", this->settings.getSettingByName<bool>("overrideSpecialMaxDurBarCol")->value);
-		}
-		else {
-			this->addSlider("100% Durability Bar Color", "Hue in degrees", this->settings.getSettingByName<float>("100color")->value, 360.f, 0.0f, false);
-			this->addSlider("0% Durability Bar Color", "Hue in degrees", this->settings.getSettingByName<float>("0color")->value, 360.f, 0.0f, false);
-		}
+		this->addConditionalColorPicker(this->settings.getSettingByName<bool>("showStaticDurBarColor")->value, "Static Durability Bar Color", "", settings.getSettingByName<std::string>("staticDurBarColor")->value, settings.getSettingByName<float>("staticDurBarColor_opacity")->value, settings.getSettingByName<bool>("staticDurBarColor_rgb")->value);
+		this->addConditionalToggle(this->settings.getSettingByName<bool>("showStaticDurBarColor")->value, "Override Special Max Durability Bar Color", "", this->settings.getSettingByName<bool>("overrideSpecialMaxDurBarCol")->value);
+		this->addConditionalSlider(!this->settings.getSettingByName<bool>("showStaticDurBarColor")->value, "100% Durability Bar Color", "Hue in degrees", this->settings.getSettingByName<float>("100color")->value, 360.f, 0.0f, false);
+		this->addConditionalSlider(!this->settings.getSettingByName<bool>("showStaticDurBarColor")->value, "0% Durability Bar Color", "Hue in degrees", this->settings.getSettingByName<float>("0color")->value, 360.f, 0.0f, false);
 
 		FlarialGUI::UnsetScrollView();
 		this->resetPadding();

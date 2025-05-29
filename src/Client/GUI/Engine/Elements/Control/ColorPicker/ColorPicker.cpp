@@ -38,7 +38,6 @@
 static std::map<std::string, std::string> sizes;
 
 void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex, bool &rgb) {
-
     // Accepts hex, so for e.g. fps counter bg color wants to be changed then you'd have to give a modifyable hex value
     // Preferably save every color in config as a hex (string)
     // before rendering just convert the config's color to hex and yeah do it dat way.
@@ -89,8 +88,8 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex
         );
     } else {
         D2D1_COLOR_F color = FlarialGUI::HexToColorF(hex);
-        FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, color, s * 0.85f, s * 0.85f,
-                                round.x, round.x);
+        color.a = clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+        FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, color, s * 0.85f, s * 0.85f, round.x, round.x);
     }
 
     round = Constraints::RoundingConstraint(11.5, 11.5);
