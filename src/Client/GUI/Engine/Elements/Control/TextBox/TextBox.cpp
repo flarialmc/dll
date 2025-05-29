@@ -143,7 +143,7 @@ std::string FlarialGUI::TextBox(int index, std::string& text, int limit, float x
         MC::mouseButton == MouseButton::Left && !activeColorPickerWindows && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
 
         FlarialGUI::TextBoxes[index].isActive = true;
-        if (special == 2) FlarialGUI::TextBoxes[index].text = "";
+        if (special == 2 && Client::settings.getSettingByName<bool>("clearTextBoxWhenClicked")->value) FlarialGUI::TextBoxes[index].text = "";
 
     } else if (!CursorInRect(x, y, width, height) && MC::mouseAction == MouseAction::Press &&
                MC::mouseButton == MouseButton::Left && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
