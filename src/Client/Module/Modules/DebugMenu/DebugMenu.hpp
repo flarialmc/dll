@@ -302,47 +302,11 @@ private:
         return std::format("CPU Usage: {:.1f}%", cpuUsage);
     }
 
-    // Helper function to get GPU name using DXGI
-    static std::string getGpuName() {
-        HRESULT hr = S_OK;
-        IDXGIFactory* factory = nullptr;
-        IDXGIAdapter* adapter = nullptr;
-        std::wstring gpuName;
-
-        hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory);
-        if (FAILED(hr)) {
-            Logger::error("Failed to create DXGI factory");
-            return "GPU: Unknown";
-        }
-
-        hr = factory->EnumAdapters(0, &adapter);
-        if (FAILED(hr)) {
-            Logger::error("Failed to enumerate DXGI adapters");
-            factory->Release();
-            return "GPU: Unknown";
-        }
-
-        DXGI_ADAPTER_DESC desc;
-        hr = adapter->GetDesc(&desc);
-        if (FAILED(hr)) {
-            Logger::error("Failed to get DXGI adapter description");
-            adapter->Release();
-            factory->Release();
-            return "GPU: Unknown";
-        }
-
-        gpuName = desc.Description;
-        adapter->Release();
-        factory->Release();
-
-        return "GPU: " + std::string(gpuName.begin(), gpuName.end());
-    }
-
 public:
     JavaDebugMenu() : Module("Java Debug Menu", "Displays Java-style debug information.\nSimilar to F3 menu in Minecraft Java Edition.",
         IDR_F3_PNG, "F3") {
         Module::setup();
-        defaultConfig(); // Apply default config immediately
+        // defaultConfig(); // Apply default config immediately
         // Initialize CPU usage tracking
         lastCpuUpdate = ImGui::GetTime();
         updateCpuUsage(); // Get initial times
@@ -369,20 +333,21 @@ public:
 
     void defaultConfig() override {
         Module::defaultConfig();
-        settings.addSetting<float>("textSize", 0.3f);
-        settings.addSetting<bool>("showVersionInfo", true);
-        settings.addSetting<bool>("showFPS", true);
-        settings.addSetting<bool>("showDimension", true);
-        settings.addSetting<bool>("showCoords", true);
-        settings.addSetting<bool>("showSpeed", true);
-        settings.addSetting<bool>("showFacing", true);
-        settings.addSetting<bool>("showLookingAt", true);
-        settings.addSetting<bool>("showAdvancedLookingAt", false);
-        settings.addSetting<bool>("showBiome", true);
-        settings.addSetting<bool>("showLight", true);
-        settings.addSetting<bool>("showWeather", true);
-        settings.addSetting<bool>("showTPS", true);
-        settings.addSetting<bool>("showUptime", true);
+        if (settings.getSettingByName<float>("textSize") == nullptr) settings.addSetting<float>("textSize", 0.3f);
+        if (settings.getSettingByName<bool>("showVersionInfo") == nullptr) settings.addSetting<bool>("showVersionInfo", true);
+        if (settings.getSettingByName<bool>("showFPS") == nullptr) settings.addSetting<bool>("showFPS", true);
+        if (settings.getSettingByName<bool>("showDimension") == nullptr) settings.addSetting<bool>("showDimension", true);
+        if (settings.getSettingByName<bool>("showCoords") == nullptr) settings.addSetting<bool>("showCoords", true);
+        if (settings.getSettingByName<bool>("showSpeed") == nullptr) settings.addSetting<bool>("showSpeed", true);
+        if (settings.getSettingByName<bool>("showFacing") == nullptr) settings.addSetting<bool>("showFacing", true);
+        if (settings.getSettingByName<bool>("showLookingAt") == nullptr) settings.addSetting<bool>("showLookingAt", true);
+        if (settings.getSettingByName<bool>("showAdvancedLookingAt") == nullptr) settings.addSetting<bool>("showAdvancedLookingAt", false);
+        if (settings.getSettingByName<bool>("showBiome") == nullptr) settings.addSetting<bool>("showBiome", true);
+        if (settings.getSettingByName<bool>("showLight") == nullptr) settings.addSetting<bool>("showLight", true);
+        if (settings.getSettingByName<bool>("showWeather") == nullptr) settings.addSetting<bool>("showWeather", true);
+        if (settings.getSettingByName<bool>("showLocalTime") == nullptr) settings.addSetting<bool>("showLocalTime", true);
+        if (settings.getSettingByName<bool>("showTPS") == nullptr) settings.addSetting<bool>("showTPS", true);
+        if (settings.getSettingByName<bool>("showUptime") == nullptr) settings.addSetting<bool>("showUptime", true);
 
         Logger::debug("JavaDebugMenu: Default config applied - showFPS: {}, percentageX: {}, percentageY: {}",
             settings.getSettingByName<bool>("showFPS")->value,
@@ -523,7 +488,7 @@ public:
         std::string cpuUsageStr = getCpuUsage();
         std::string cpuName = "CPU: " + getCpuName();
         std::string cpuArch = getCpuArchitecture();
-        std::string gpuName = getGpuName();
+        std::string gpuName = MC::GPU;
         rightDebugLines.push_back(cpuUsageStr);
         rightDebugLines.push_back(cpuName);
         rightDebugLines.push_back(cpuArch);
