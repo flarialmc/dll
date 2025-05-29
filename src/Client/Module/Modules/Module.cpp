@@ -116,7 +116,7 @@ void Module::normalRenderCore(int index, std::string& text) {
 	if (this->settings.getSettingByName<bool>("glow")->value) {
 		D2D1_COLOR_F glowColor = settings.getSettingByName<bool>("glowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("glowColor")->value);
 		glowColor.a = settings.getSettingByName<float>("glowOpacity")->value;
-		FlarialGUI::ShadowRect(Vec2<float>(realcenter.x, realcenter.y), Vec2<float>(rectWidth, textHeight * this->settings.getSettingByName<float>("rectheight")->value), glowColor, rounde.x, this->settings.getSettingByName<float>("glowAmount")->value);
+		FlarialGUI::ShadowRect(Vec2<float>(realcenter.x, realcenter.y), Vec2<float>(rectWidth, textHeight * this->settings.getSettingByName<float>("rectheight")->value), glowColor, rounde.x, (this->settings.getSettingByName<float>("glowAmount")->value/ 100.f) * Constraints::PercentageConstraint(0.1f, "top"));
 	}
 		
 	if (settings.getSettingByName<bool>("BlurEffect")->value) {
@@ -811,7 +811,7 @@ void Module::defaultConfig() {
 	if (settings.getSettingByName<std::string>("bgColor") == nullptr) settings.addSetting("bgColor", (std::string)"000000");
 	if (settings.getSettingByName<std::string>("textColor") == nullptr) settings.addSetting("textColor", (std::string)"fafafa");
 	if (settings.getSettingByName<std::string>("borderColor") == nullptr) settings.addSetting("borderColor", (std::string)"000000");
-	if (settings.getSettingByName<std::string>("glowColor") == nullptr) settings.addSetting("glowColor", (std::string)"000000");
+	if (settings.getSettingByName<std::string>("glowColor") == nullptr) settings.addSetting("glowColor", (std::string)"F0F0F0");
 	
 	if (settings.getSettingByName<bool>("textShadow") == nullptr) settings.addSetting("textShadow", false);
 	if (settings.getSettingByName<bool>("rectShadow") == nullptr) settings.addSetting("rectShadow", false);

@@ -232,7 +232,7 @@ public:
                 if (this->settings.getSettingByName<bool>("glow")->value) {
                     D2D1_COLOR_F glowColor = settings.getSettingByName<bool>("glowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("glowColor")->value);
                     glowColor.a = settings.getSettingByName<float>("glowOpacity")->value;
-                    FlarialGUI::ShadowRect(Vec2<float>(fakex, realcenter.y), Vec2<float>(totalWidth, 7.5f * keycardSize), glowColor, rounde.x, this->settings.getSettingByName<float>("glowAmount")->value);
+                    FlarialGUI::ShadowRect(Vec2<float>(fakex, realcenter.y), Vec2<float>(totalWidth, 7.5f * keycardSize), glowColor, rounde.x, (this->settings.getSettingByName<float>("glowAmount")->value/100.f) *  Constraints::PercentageConstraint(0.1f, "top"));
                 }
 
                 if (settings.getSettingByName<bool>("BlurEffect")->value) {
