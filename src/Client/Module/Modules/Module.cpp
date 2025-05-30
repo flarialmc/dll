@@ -58,7 +58,7 @@ void Module::normalRenderCore(int index, std::string& text) {
 
 	realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x), settingperc.y * (MC::windowSize.y));
 
-	if (prevAlignment != alignment) {
+	/*if (prevAlignment != alignment) {
 		float toAdjust;
 		if (prevAlignment == DWRITE_TEXT_ALIGNMENT_CENTER) {
 			if (alignment == DWRITE_TEXT_ALIGNMENT_LEADING) toAdjust = rectWidth / -2.f;
@@ -79,12 +79,12 @@ void Module::normalRenderCore(int index, std::string& text) {
 		realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x), settingperc.y * (MC::windowSize.y));
 	}
 
-	prevAlignment = alignment;
+	prevAlignment = alignment;*/
 
-	if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
+	/*if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
 		if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) realcenter.x -= rectWidth;
 		else realcenter.x -= rectWidth / 2.f;
-	}
+	}*/
 
 	if (ClickGUI::editmenu) {
 		FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, rectHeight, index);
@@ -93,10 +93,10 @@ void Module::normalRenderCore(int index, std::string& text) {
 
 		checkForRightClickAndOpenSettings(realcenter.x, realcenter.y, rectWidth, rectHeight);
 
-		if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
+		/*if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
 			if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) vec2.x += rectWidth;
 			else vec2.x += rectWidth / 2.f;
-		}
+		}*/
 
 		realcenter.x = vec2.x;
 		realcenter.y = vec2.y;
@@ -107,10 +107,10 @@ void Module::normalRenderCore(int index, std::string& text) {
 		this->settings.setValue("percentageX", percentages.x);
 		this->settings.setValue("percentageY", percentages.y);
 
-		if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
+		/*if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
 			if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) realcenter.x -= rectWidth;
 			else realcenter.x -= rectWidth / 2.f;
-		}
+		}*/
 	}
 
 	Vec2<float> rounde = Constraints::RoundingConstraint(this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value, this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value);
