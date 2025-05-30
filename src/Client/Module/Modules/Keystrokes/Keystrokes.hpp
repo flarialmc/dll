@@ -743,13 +743,13 @@ public:
 						if (enableTextShadow) FlarialGUI::FlarialTextWithFont(
 							realcenter.x + textShadowOffset,
 							realcenter.y + textShadowOffset,
-							FlarialGUI::to_wide(settings.getSettingByName<std::string>("mainlmbtext")->value).c_str(), 
-							keycardSize + (keycardSize / 2.0f) + spacing / 2.0f, 
+							FlarialGUI::to_wide(settings.getSettingByName<std::string>("mainlmbtext")->value).c_str(),
+							keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
 							Constraints::SpacingConstraint(hideCPS ? 1.0f : 0.65f, keycardSize - (keycardSize * 0.05f)),
-							DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 + Constraints::SpacingConstraint(0.48, keycardSize), 
+							DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 + Constraints::SpacingConstraint(0.48, keycardSize),
 							DWRITE_FONT_WEIGHT_NORMAL, shadowStates[Strokes::LMB], true);
 
-						FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, 
+						FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y,
 							FlarialGUI::to_wide(settings.getSettingByName<std::string>("mainlmbtext")->value).c_str(),
 							keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
 							Constraints::SpacingConstraint(hideCPS ? 1.0f : 0.65f, keycardSize - (keycardSize * 0.05f)),
@@ -761,15 +761,15 @@ public:
 								realcenter.y + Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)) + textShadowOffset,
 								FlarialGUI::to_wide(lmbText).c_str(), keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
 								Constraints::SpacingConstraint(0.35, keycardSize - (keycardSize * 0.05f)),
-								DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 + Constraints::SpacingConstraint( -0.96f, keycardSize),
+								DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 + Constraints::SpacingConstraint(-0.96f, keycardSize),
 								DWRITE_FONT_WEIGHT_NORMAL, shadowStates[Strokes::LMB], true);
-							FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y +
-								Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)),
-								FlarialGUI::to_wide(lmbText).c_str(), keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
-								Constraints::SpacingConstraint(0.35, keycardSize - (keycardSize * 0.05f)),
-								DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 +
-								Constraints::SpacingConstraint( -0.96f, keycardSize),
-								DWRITE_FONT_WEIGHT_NORMAL, textStates[Strokes::LMB], true);
+						FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y +
+							Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)),
+							FlarialGUI::to_wide(lmbText).c_str(), keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
+							Constraints::SpacingConstraint(0.35, keycardSize - (keycardSize * 0.05f)),
+							DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 +
+							Constraints::SpacingConstraint(-0.96f, keycardSize),
+							DWRITE_FONT_WEIGHT_NORMAL, textStates[Strokes::LMB], true);
 					}
 					else
 						FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
@@ -820,7 +820,7 @@ public:
 							Constraints::SpacingConstraint(hideCPS ? 1.0f : 0.65f, keycardSize - (keycardSize * 0.05f)),
 							DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 + Constraints::SpacingConstraint(0.48, keycardSize),
 							DWRITE_FONT_WEIGHT_NORMAL, shadowStates[Strokes::RMB], true);
-						FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, 
+						FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y,
 							FlarialGUI::to_wide(settings.getSettingByName<std::string>("mainrmbtext")->value).c_str(),
 							keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
 							Constraints::SpacingConstraint(hideCPS ? 1.0f : 0.65f, keycardSize - (keycardSize * 0.05f)),
@@ -837,14 +837,14 @@ public:
 								DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 +
 								Constraints::SpacingConstraint(-0.96f, keycardSize),
 								DWRITE_FONT_WEIGHT_NORMAL, shadowStates[Strokes::RMB], true);
-							FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y +
-								Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)),
-								FlarialGUI::to_wide(rmbText).c_str(),
-								keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
-								Constraints::SpacingConstraint(0.35, keycardSize - (keycardSize * 0.05f)),
-								DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 +
-								Constraints::SpacingConstraint( -0.96f, keycardSize),
-								DWRITE_FONT_WEIGHT_NORMAL, textStates[Strokes::RMB], true);
+						FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y +
+							Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)),
+							FlarialGUI::to_wide(rmbText).c_str(),
+							keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
+							Constraints::SpacingConstraint(0.35, keycardSize - (keycardSize * 0.05f)),
+							DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 +
+							Constraints::SpacingConstraint(-0.96f, keycardSize),
+							DWRITE_FONT_WEIGHT_NORMAL, textStates[Strokes::RMB], true);
 					}
 					else
 						FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
@@ -884,9 +884,13 @@ public:
 					this->settings.getSettingByName<float>("spacebarHeight")->value, spacebarHeight);
 				float childWidth = Constraints::SpacingConstraint(
 					this->settings.getSettingByName<float>("spacebarWidth")->value, spacebarWidth);
-				std::pair<float, float> centeredChild = centerChildRectangle(spacebarWidth, spacebarHeight, childWidth,
-					childHeight);
 
+				std::pair<float, float> centeredChild = centerChildRectangle(spacebarWidth, spacebarHeight, childWidth, childHeight);
+
+				if (enableTextShadow) FlarialGUI::RoundedRect(
+					realcenter.x + centeredChild.first + textShadowOffset,
+					realcenter.y + centeredChild.second + textShadowOffset,
+					shadowStates[Strokes::SPACEBAR], childWidth, childHeight, 0, 0);
 				FlarialGUI::RoundedRect(realcenter.x + centeredChild.first, realcenter.y + centeredChild.second,
 					textStates[Strokes::SPACEBAR], childWidth, childHeight, 0, 0);
 
