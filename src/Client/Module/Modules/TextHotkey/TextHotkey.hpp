@@ -21,8 +21,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"");
+		Module::defaultConfig("core");
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -38,7 +37,7 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 
-		this->addHeader("Function");
+		this->addHeader("Text Hotkey");
 		this->addButton("Add another Keybind", "Multi-Keybind command support!", "Add", [this] {
 
 			std::string keybindName = "keybind-" + FlarialGUI::cached_to_string(totalKeybinds);

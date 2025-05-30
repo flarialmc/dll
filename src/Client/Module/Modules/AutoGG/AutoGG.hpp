@@ -25,7 +25,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"GG");
 	}
 
@@ -43,7 +43,7 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Misc");
+		this->addHeader("Auto GG");
 		this->addTextBox("Text", "The text to send.", settings.getSettingByName<std::string>("text")->value);
 
 		FlarialGUI::UnsetScrollView();

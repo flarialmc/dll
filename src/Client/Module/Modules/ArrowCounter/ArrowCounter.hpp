@@ -25,13 +25,11 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value} Arrows");
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
+		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"Arrows: {value}");
+		Module::defaultConfig("all");
 	}
 
 	void settingsRender(float settingsOffset) override {
-
 		float x = Constraints::PercentageConstraint(0.019, "left");
 		float y = Constraints::PercentageConstraint(0.10, "top");
 
@@ -43,23 +41,23 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Main");
-		this->defaultAddSettings("main");
-		this->extraPadding();
+		addHeader("Arrow Counter");
+		defaultAddSettings("main");
+		extraPadding();
 
-		this->addHeader("Text");
-		this->defaultAddSettings("text");
-		this->extraPadding();
+		addHeader("Text");
+		defaultAddSettings("text");
+		extraPadding();
 
-		this->addHeader("Colors");
-		this->defaultAddSettings("colors");
-		this->extraPadding();
+		addHeader("Colors");
+		defaultAddSettings("colors");
+		extraPadding();
 
-		this->addHeader("Misc");
-		this->defaultAddSettings("misc");
+		addHeader("Misc");
+		defaultAddSettings("misc");
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 

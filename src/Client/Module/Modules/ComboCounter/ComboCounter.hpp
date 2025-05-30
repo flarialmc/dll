@@ -29,8 +29,8 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
 		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"Combo: {value}");
+		Module::defaultConfig("all");
 		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
 	}
 
@@ -49,23 +49,23 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Main");
-		this->defaultAddSettings("main");
-		this->extraPadding();
+		addHeader("Combo Counter");
+		defaultAddSettings("main");
+		extraPadding();
 
-		this->addHeader("Text");
-		this->defaultAddSettings("text");
-		this->extraPadding();
+		addHeader("Text");
+		defaultAddSettings("text");
+		extraPadding();
 
-		this->addHeader("Colors");
-		this->defaultAddSettings("colors");
+		addHeader("Colors");
+		defaultAddSettings("colors");
 
-		this->addHeader("Misc");
-		this->defaultAddSettings("misc");
+		addHeader("Misc");
+		defaultAddSettings("misc");
 		
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 
 	}
 

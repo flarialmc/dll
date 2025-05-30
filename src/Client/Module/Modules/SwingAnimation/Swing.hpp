@@ -42,30 +42,27 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<float>("modifier") == nullptr) settings.addSetting("modifier", 10.0f);
 	}
 
-	void settingsRender() override {
-		float toggleX = Constraints::PercentageConstraint(0.019, "left");
-		float toggleY = Constraints::PercentageConstraint(0.10, "top");
+	void settingsRender(float settingsOffset) override {
+		float x = Constraints::PercentageConstraint(0.019, "left");
+		float y = Constraints::PercentageConstraint(0.10, "top");
 
-		float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
-		const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
-
-
-		FlarialGUI::FlarialTextWithFont(toggleX, toggleY, L"Modifier", textWidth * 3.0f, textHeight,
-			DWRITE_TEXT_ALIGNMENT_LEADING,
-			Constraints::RelativeConstraint(0.12, "height", true),
-			DWRITE_FONT_WEIGHT_NORMAL);
+		const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
 
 
-		float percent = FlarialGUI::Slider(7, toggleX + FlarialGUI::SettingsTextWidth("Modifier "),
-			toggleY, this->settings.getSettingByName<float>("modifier")->value, 360, 0,
-			false);
+		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+			Constraints::RelativeConstraint(1.0, "width"),
+			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->settings.getSettingByName<float>("modifier")->value = percent;
+		addHeader("Toggle Sprint");
+		addSlider("Modifier", "", settings.getSettingByName<float>("modifier")->value, 360.f, 0.f, false);
 
+		FlarialGUI::UnsetScrollView();
+		resetPadding();
 	}
 };
 

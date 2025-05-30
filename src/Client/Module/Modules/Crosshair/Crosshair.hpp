@@ -20,7 +20,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<bool>("thirdpersoncrosshair") == nullptr) settings.addSetting("thirdpersoncrosshair", true);
 	}
 
@@ -37,11 +37,11 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Misc");
-		this->addToggle("Third Person Crosshair", "", this->settings.getSettingByName<bool>("thirdpersoncrosshair")->value);
+		addHeader("Crosshair");
+		addToggle("Third Person Crosshair", "", settings.getSettingByName<bool>("thirdpersoncrosshair")->value);
 
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 	}
 };

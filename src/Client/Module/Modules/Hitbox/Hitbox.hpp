@@ -37,7 +37,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<std::string>("color") == nullptr) settings.addSetting("color", (std::string)"FFFFFF");
 		if (settings.getSettingByName<bool>("color_rgb") == nullptr) settings.addSetting("color_rgb", false);
 		if (settings.getSettingByName<float>("colorOpacity") == nullptr) settings.addSetting("colorOpacity", 0.6f);
@@ -59,22 +59,20 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Main");
+		addHeader("Hitbox");
+		addToggle("2D Mode", "", settings.getSettingByName<bool>("outline")->value);
+		addToggle("Static Thickness", "", settings.getSettingByName<bool>("staticThickness")->value);
+		addSlider("Thickness", "", settings.getSettingByName<float>("thickness")->value);
+		extraPadding();
 
-		this->addToggle("2D Mode", "", this->settings.getSettingByName<bool>("outline")->value);
-		this->addToggle("Static Thickness", "", this->settings.getSettingByName<bool>("staticThickness")->value);
-
-		this->addSlider("Thickness", "", this->settings.getSettingByName<float>("thickness")->value);
-
-		this->extraPadding();
-		this->addHeader("Colors");
-		this->addColorPicker("Hitbox Color", "", settings.getSettingByName<std::string>("color")->value,
+		addHeader("Colors");
+		addColorPicker("Hitbox Color", "", settings.getSettingByName<std::string>("color")->value,
 			settings.getSettingByName<float>("colorOpacity")->value,
 			settings.getSettingByName<bool>("color_rgb")->value);
 
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 
 	}
 

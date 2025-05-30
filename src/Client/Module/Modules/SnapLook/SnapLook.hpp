@@ -20,6 +20,11 @@ public:
 			Module::onDisable();
 	}
 
+	void defaultConfig() override {
+		getKeybind();
+		Module::defaultConfig("core");
+	}
+
 	void settingsRender(float settingsOffset) override {
 		float x = Constraints::PercentageConstraint(0.019, "left");
 		float y = Constraints::PercentageConstraint(0.10, "top");
@@ -32,12 +37,12 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Misc");
-		this->addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
+		addHeader("SnapLook");
+		addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
 
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 	}
 
 	// TODO: make it togglable

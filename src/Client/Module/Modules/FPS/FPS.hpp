@@ -7,83 +7,82 @@ class FPS : public Module {
 
 public:
 
-    FPS() : Module("FPS", "Shows how much Frames Per Second (FPS)\nyour device is rendering.",
-        IDR_FPS_PNG, "") {
-        Module::setup();
-    };
+	FPS() : Module("FPS", "Shows how much Frames Per Second (FPS)\nyour device is rendering.",
+		IDR_FPS_PNG, "") {
+		Module::setup();
+	};
 
-    void onEnable() override {
-        Listen(this, RenderEvent, &FPS::onRender)
-        Listen(this, RenderUnderUIEvent, &FPS::onRenderUnderUI)
-        Module::onEnable();
-    }
+	void onEnable() override {
+		Listen(this, RenderEvent, &FPS::onRender)
+			Listen(this, RenderUnderUIEvent, &FPS::onRenderUnderUI)
+			Module::onEnable();
+	}
 
-    void onDisable() override {
-        Deafen(this, RenderEvent, &FPS::onRender)
-        Deafen(this, RenderUnderUIEvent, &FPS::onRenderUnderUI)
-        Module::onDisable();
-    }
+	void onDisable() override {
+		Deafen(this, RenderEvent, &FPS::onRender)
+			Deafen(this, RenderUnderUIEvent, &FPS::onRenderUnderUI)
+			Module::onDisable();
+	}
 
-    void defaultConfig() override { Module::defaultConfig();
-        if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"FPS: {value}");
-        if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
-        if (settings.getSettingByName<float>("fpsSpoofer") == nullptr) settings.addSetting("fpsSpoofer", 1.0f);
+	void defaultConfig() override {
+		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"FPS: {value}");
+		Module::defaultConfig("all");
+		if (settings.getSettingByName<float>("fpsSpoofer") == nullptr) settings.addSetting("fpsSpoofer", 1.0f);
+	}
 
-    }
+	void settingsRender(float settingsOffset) override {
+		float x = Constraints::PercentageConstraint(0.019, "left");
+		float y = Constraints::PercentageConstraint(0.10, "top");
 
-    void settingsRender(float settingsOffset) override {
-        float x = Constraints::PercentageConstraint(0.019, "left");
-        float y = Constraints::PercentageConstraint(0.10, "top");
+		const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
 
-        const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
+		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+			Constraints::RelativeConstraint(1.0, "width"),
+			Constraints::RelativeConstraint(0.88f, "height"));
 
-        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-            Constraints::RelativeConstraint(1.0, "width"),
-            Constraints::RelativeConstraint(0.88f, "height"));
-        
-        this->addHeader("Main");
-        this->defaultAddSettings("main");
-        this->addSlider("FPS Spoofer", "Adjusts the displayed FPS.", this->settings.getSettingByName<float>("fpsSpoofer")->value, 10.0f);
-        this->extraPadding();
+		addHeader("FPS Counter");
+		defaultAddSettings("main");
+		addSlider("FPS Spoofer", "Adjusts the displayed FPS.", settings.getSettingByName<float>("fpsSpoofer")->value, 10.0f);
+		extraPadding();
 
-        this->addHeader("Text");
-        this->defaultAddSettings("text");
-        this->extraPadding();
+		addHeader("Text");
+		defaultAddSettings("text");
+		extraPadding();
 
-        this->addHeader("Colors");
-        this->defaultAddSettings("colors");
-        this->extraPadding();
+		addHeader("Colors");
+		defaultAddSettings("colors");
+		extraPadding();
 
-        this->addHeader("Misc");
-        this->defaultAddSettings("misc");
+		addHeader("Misc");
+		defaultAddSettings("misc");
 
-        FlarialGUI::UnsetScrollView();
-        this->resetPadding();
-    }
+		FlarialGUI::UnsetScrollView();
+		resetPadding();
+	}
 
-    void onRenderUnderUI(RenderUnderUIEvent& event) {
-        //Blur::RenderBlur(event.RTV, 3, 5.f);
-    }
-    void onRender(RenderEvent& event) {
-        if (this->isEnabled()) {
-            float fpsSpooferValue = this->settings.getSettingByName<float>("fpsSpoofer")->value;
+	void onRenderUnderUI(RenderUnderUIEvent& event) {
+		//Blur::RenderBlur(event.RTV, 3, 5.f);
+	}
+	void onRender(RenderEvent& event) {
+		if (this->isEnabled()) {
+			float fpsSpooferValue = this->settings.getSettingByName<float>("fpsSpoofer")->value;
 
-            if (fpsSpooferValue > 10.0f) {
-                fpsSpooferValue = 10.0f;
-            }
-            if (fpsSpooferValue < 1.0f) {
-                fpsSpooferValue = 1.0f;
-            }
+			if (fpsSpooferValue > 10.0f) {
+				fpsSpooferValue = 10.0f;
+			}
+			if (fpsSpooferValue < 1.0f) {
+				fpsSpooferValue = 1.0f;
+			}
 
-            this->settings.getSettingByName<float>("fpsSpoofer")->value = fpsSpooferValue;
+			this->settings.getSettingByName<float>("fpsSpoofer")->value = fpsSpooferValue;
 
-            int fps = (int)round(((float)MC::fps * round(fpsSpooferValue)));
+			int fps = (int)round(((float)MC::fps * round(fpsSpooferValue)));
 
-            auto fpsStr = FlarialGUI::cached_to_string(fps);
+			auto fpsStr = FlarialGUI::cached_to_string(fps);
 
-            this->normalRender(0, fpsStr);
-        }
-    }
+			this->normalRender(0, fpsStr);
+		}
+	}
 
 };

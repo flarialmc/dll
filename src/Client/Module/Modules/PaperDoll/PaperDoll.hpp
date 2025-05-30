@@ -32,11 +32,10 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
+		Module::defaultConfig("pos");
 		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 21.0f);
 		if (settings.getSettingByName<bool>("alwaysshow") == nullptr) settings.addSetting("alwaysshow", false);
-		if (settings.getSettingByName<float>("percentageX") == nullptr) settings.addSetting("percentageX", 0.0f);
-		if (settings.getSettingByName<float>("percentageY") == nullptr) settings.addSetting("percentageY", 0.0f);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -50,15 +49,11 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Misc");
-		this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value);
-
-		this->addToggle("Always Show", "", this->settings.getSettingByName<bool>("alwaysshow")->value);
-
+		addHeader("Movable Paperdoll");
+		addSlider("UI Scale", "", settings.getSettingByName<float>("uiscale")->value);
+		addToggle("Always Show", "", settings.getSettingByName<bool>("alwaysshow")->value);
 		FlarialGUI::UnsetScrollView();
-
-		this->resetPadding();
-
+		resetPadding();
 	}
 
 	void onRender(RenderEvent& event) {

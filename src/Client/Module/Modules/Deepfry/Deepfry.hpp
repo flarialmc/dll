@@ -22,7 +22,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<bool>("paint") == nullptr) settings.addSetting("paint", false);
 	}
 
@@ -38,12 +38,12 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Misc");
-		this->addToggle("Paint Effect", "", this->settings.getSettingByName<bool>("paint")->value);
+		addHeader("Deepfry");
+		addToggle("Paint Effect", "", settings.getSettingByName<bool>("paint")->value);
 
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 	}
 
 	void onRender(RenderEvent& event) {

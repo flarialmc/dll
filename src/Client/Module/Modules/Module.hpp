@@ -116,6 +116,7 @@ public:
     void setEnabled(bool enabled);
     void setKeybind(const std::string& newKeybind);
     std::string& getKeybind(const int keybindCount = 0);
+    virtual void defaultConfig(std::string type);
     virtual void defaultConfig();
     virtual void defaultAddSettings(std::string type);
     virtual void settingsRender(float settingsOffset) {}

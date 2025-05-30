@@ -36,10 +36,9 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
-		if (settings.getSettingByName<bool>("rightcps") == nullptr) settings.addSetting("rightcps", false);
 		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"CPS: {value}");
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
+		if (settings.getSettingByName<bool>("rightcps") == nullptr) settings.addSetting("rightcps", false);
+		Module::defaultConfig("all");
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -56,7 +55,7 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 
-		this->addHeader("Main");
+		this->addHeader("CPS Counter");
 		this->defaultAddSettings("main");
 		this->addToggle("Right Click CPS", "", this->settings.getSettingByName<bool>("rightcps")->value);
 		this->extraPadding();

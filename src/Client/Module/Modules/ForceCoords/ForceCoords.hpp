@@ -61,13 +61,10 @@ public:
 	};
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("all");
 		if (settings.getSettingByName<bool>("enabled") == nullptr) settings.addSetting("enabled", false);
-
 		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value}");
-
 		if (settings.getSettingByName<bool>("MojangStyle") == nullptr) settings.addSetting("MojangStyle", false);
-
 		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.00f);
 
 	}

@@ -49,7 +49,8 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
+		Module::defaultConfig("pos");
 		if (settings.getSettingByName<std::string>("Overlay") == nullptr) settings.addSetting("Overlay", (std::string)"O");
 		if (settings.getSettingByName<bool>("showFKDR") == nullptr) settings.addSetting("showFKDR", true);
 		if (settings.getSettingByName<bool>("showKD") == nullptr) settings.addSetting("showKD", true);
@@ -73,19 +74,18 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Keybinds");
-		this->addKeybind("Toggle Overlay Keybind", "When setting, hold the new bind for 2 seconds", settings.getSettingByName<std::string>("Overlay")->value);
-		this->addHeader("Misc");
-		this->addToggle("Show FKDR", "Shows final kill final death ratio", settings.getSettingByName<bool>("showFKDR")->value);
-		this->addToggle("Show KD", "Shows the amount of kills per death", settings.getSettingByName<bool>("showKD")->value);
-		this->addToggle("Show Win Rate", "Shows the player's win rate as a percentage ", settings.getSettingByName<bool>("showWR")->value);
-		this->addToggle("Show Level", "Shows the level of a player", settings.getSettingByName<bool>("showLevel")->value);
-		this->addToggle("Show Victories", "Shows the amount of wins a player has", settings.getSettingByName<bool>("showWins")->value);
-		this->addToggle("Show Losses", "Shows the amount of losses a player has", settings.getSettingByName<bool>("showLosses")->value);
-		this->addToggle("Show Kills", "Shows the amount of kills a player has", settings.getSettingByName<bool>("showKills")->value);
-		this->addToggle("Show Deaths", "Shows the amount of deaths a player has", settings.getSettingByName<bool>("showDeaths")->value);
-
-		this->resetPadding();
+		addHeader("Hive Statistics");
+		addKeybind("Toggle Overlay Keybind", "When setting, hold the new bind for 2 seconds", settings.getSettingByName<std::string>("Overlay")->value);
+		addHeader("Misc");
+		addToggle("Show FKDR", "Shows final kill final death ratio", settings.getSettingByName<bool>("showFKDR")->value);
+		addToggle("Show KD", "Shows the amount of kills per death", settings.getSettingByName<bool>("showKD")->value);
+		addToggle("Show Win Rate", "Shows the player's win rate as a percentage ", settings.getSettingByName<bool>("showWR")->value);
+		addToggle("Show Level", "Shows the level of a player", settings.getSettingByName<bool>("showLevel")->value);
+		addToggle("Show Victories", "Shows the amount of wins a player has", settings.getSettingByName<bool>("showWins")->value);
+		addToggle("Show Losses", "Shows the amount of losses a player has", settings.getSettingByName<bool>("showLosses")->value);
+		addToggle("Show Kills", "Shows the amount of kills a player has", settings.getSettingByName<bool>("showKills")->value);
+		addToggle("Show Deaths", "Shows the amount of deaths a player has", settings.getSettingByName<bool>("showDeaths")->value);
+		resetPadding();
 	}
 
 	void fetchPlayerStats(const std::string& playerName) {

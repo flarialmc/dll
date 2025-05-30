@@ -80,6 +80,7 @@ public:
 	}
 
 	void defaultConfig() override {
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<bool>("lewisbounce") == nullptr) settings.addSetting("lewisbounce", false);
 		if (settings.getSettingByName<float>("lewisbouncesize") == nullptr) settings.addSetting("lewisbouncesize", 1.0f);
 		if (settings.getSettingByName<float>("lewisbouncespeed") == nullptr) settings.addSetting("lewisbouncespeed", 1.0f);
@@ -100,20 +101,17 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Lewis");
-		this->addToggle("Bouncing lewis", "", this->settings.getSettingByName<bool>("lewisbounce")->value);
-		this->addSlider("Bouncing lewis size", "", this->settings.getSettingByName<float>("lewisbouncesize")->value, 5);
-		this->addSlider("Bouncing lewis speed", "", this->settings.getSettingByName<float>("lewisbouncespeed")->value, 5);
-
-		this->addToggle("Crosshair lewis", "", this->settings.getSettingByName<bool>("lewiscrosshair")->value);
-		this->addSlider("Crosshair lewis size", "", this->settings.getSettingByName<float>("lewiscrosshairsize")->value, 5);
-
-		this->addToggle("Lewis Client Icon", "", this->settings.getSettingByName<bool>("lewislogo")->value);
-
-		this->addToggle("Lewis Scream", "", this->settings.getSettingByName<bool>("lewisscream")->value);
+		addHeader("Lewis");
+		addToggle("Bouncing lewis", "", settings.getSettingByName<bool>("lewisbounce")->value);
+		addSlider("Bouncing lewis size", "", settings.getSettingByName<float>("lewisbouncesize")->value, 5);
+		addSlider("Bouncing lewis speed", "", settings.getSettingByName<float>("lewisbouncespeed")->value, 5);
+		addToggle("Crosshair lewis", "", settings.getSettingByName<bool>("lewiscrosshair")->value);
+		addSlider("Crosshair lewis size", "", settings.getSettingByName<float>("lewiscrosshairsize")->value, 5);
+		addToggle("Lewis Client Icon", "", settings.getSettingByName<bool>("lewislogo")->value);
+		addToggle("Lewis Scream", "", settings.getSettingByName<bool>("lewisscream")->value);
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 	void onRender(RenderEvent& event) {
 		if (this->isEnabled()) {

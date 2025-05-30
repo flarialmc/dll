@@ -30,8 +30,8 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
 		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 1.f);
+		Module::defaultConfig("core");
 
 		if (settings.getSettingByName<bool>("highlightOnEntity") == nullptr) settings.addSetting("highlightOnEntity", false);
 		if (settings.getSettingByName<bool>("solidColorWhenHighlighted") == nullptr) settings.addSetting("solidColorWhenHighlighted", true);
@@ -60,32 +60,27 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Main");
-		this->addToggle("Solid Color", "Make crosshair a solid color / more visible", settings.getSettingByName<bool>("solidColor")->value);
-		this->addToggle("Render in Third Person", "Weather or not to render in third person", settings.getSettingByName<bool>("renderInThirdPerson")->value);
-		this->addToggle("Highlight on Entity", "Highlight when enemy in reach", settings.getSettingByName<bool>("highlightOnEntity")->value);
-		if (settings.getSettingByName<bool>("highlightOnEntity")->value) {
-			this->addToggle("Solid Color When Highlighted", "Use solid color when highlighted",
-				settings.getSettingByName<bool>("solidColorWhenHighlighted")->value);
-		}
-		this->extraPadding();
+		addHeader("Custom Crosshair");
+		addToggle("Solid Color", "Make crosshair a solid color / more visible", settings.getSettingByName<bool>("solidColor")->value);
+		addToggle("Render in Third Person", "Weather or not to render in third person", settings.getSettingByName<bool>("renderInThirdPerson")->value);
+		addToggle("Highlight on Entity", "Highlight when enemy in reach", settings.getSettingByName<bool>("highlightOnEntity")->value);
+		addConditionalToggle(settings.getSettingByName<bool>("highlightOnEntity")->value, "Solid Color When Highlighted", "Use solid color when highlighted", settings.getSettingByName<bool>("solidColorWhenHighlighted")->value);
+		extraPadding();
 
-		// this->addHeader("Misc");
-		// this->addSlider("UI Scale", "The size of the Crosshair (only for custom)", settings.getSettingByName<float>("uiscale")->value, 10.f, 0.f, true);
+		// addHeader("Misc");
+		// addSlider("UI Scale", "The size of the Crosshair (only for custom)", settings.getSettingByName<float>("uiscale")->value, 10.f, 0.f, true);
 
-		this->extraPadding();
+		extraPadding();
 
-		this->addHeader("Colors");
-		this->addColorPicker("Default Color", "When the enemy is not in view.", settings.getSettingByName<std::string>("defaultColor")->value, settings.getSettingByName<float>("defaultOpacity")->value, settings.getSettingByName<bool>("defaultColorRGB")->value);
-		if (settings.getSettingByName<bool>("highlightOnEntity")->value) {
-			this->addColorPicker("Enemy Color", "When the enemy is in view.",
-				settings.getSettingByName<std::string>("enemyColor")->value,
-				settings.getSettingByName<float>("enemyOpacity")->value,
-				settings.getSettingByName<bool>("enemyColorRGB")->value);
-		}
+		addHeader("Colors");
+		addColorPicker("Default Color", "When the enemy is not in view.", settings.getSettingByName<std::string>("defaultColor")->value, settings.getSettingByName<float>("defaultOpacity")->value, settings.getSettingByName<bool>("defaultColorRGB")->value);
+		addConditionalColorPicker(settings.getSettingByName<bool>("highlightOnEntity")->value, "Enemy Color", "When the enemy is in view.",
+			settings.getSettingByName<std::string>("enemyColor")->value,
+			settings.getSettingByName<float>("enemyOpacity")->value,
+			settings.getSettingByName<bool>("enemyColorRGB")->value);
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 	}
 
 	void onGetViewPerspective(PerspectiveEvent& event) {

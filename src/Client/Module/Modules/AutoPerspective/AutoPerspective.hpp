@@ -19,7 +19,8 @@ public:
         Module::onDisable();
     }
 
-    void defaultConfig() override { Module::defaultConfig();
+    void defaultConfig() override { 
+        Module::defaultConfig("core");
         if (settings.getSettingByName<bool>("elytra") == nullptr) settings.addSetting("elytra", false);
         if (settings.getSettingByName<std::string>("elytraMode") == nullptr) settings.addSetting("elytraMode", (std::string)"3rd Person back");
 
@@ -42,19 +43,21 @@ public:
         FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
             Constraints::RelativeConstraint(1.0, "width"),
             Constraints::RelativeConstraint(0.88f, "height"));
-        this->addHeader("Perspective Settings");
 
-        this->addToggle("Elytra", "Toggle to change perspective while using elytra to fly.", settings.getSettingByName<bool>("elytra")->value);
-        this->addDropdown("Elytra Perspective", "Your perspective while using elytra to fly", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, settings.getSettingByName<std::string>("elytraMode")->value);
 
-        this->addToggle("Swimming", "Toggle to change perspective while swimming.", settings.getSettingByName<bool>("swimming")->value);
-        this->addDropdown("Swimming Perspective", "Your perspective while swimming.", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, settings.getSettingByName<std::string>("swimmingMode")->value);
+        addHeader("Auto Perspective");
 
-        //this->addToggle("Riding", "Toggle to change perspective while riding a mob.", settings.getSettingByName<bool>("riding")->value);
-        //this->addDropdown("Riding Perspective", "Your perspective while riding a mob", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, settings.getSettingByName<std::string>("ridingMode")->value);
+        addToggle("Elytra", "Toggle to change perspective while using elytra to fly.", settings.getSettingByName<bool>("elytra")->value);
+        addDropdown("Elytra Perspective", "Your perspective while using elytra to fly", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, settings.getSettingByName<std::string>("elytraMode")->value);
+
+        addToggle("Swimming", "Toggle to change perspective while swimming.", settings.getSettingByName<bool>("swimming")->value);
+        addDropdown("Swimming Perspective", "Your perspective while swimming.", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, settings.getSettingByName<std::string>("swimmingMode")->value);
+
+        //addToggle("Riding", "Toggle to change perspective while riding a mob.", settings.getSettingByName<bool>("riding")->value);
+        //addDropdown("Riding Perspective", "Your perspective while riding a mob", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, settings.getSettingByName<std::string>("ridingMode")->value);
         FlarialGUI::UnsetScrollView();
 
-        this->resetPadding();
+        resetPadding();
     }
 
     int OriginalPerspective = -1;

@@ -30,7 +30,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<float>("guiscale") == nullptr) settings.addSetting("guiscale", 2.0f);
 	}
 
@@ -46,12 +46,12 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Settings");
-		this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("guiscale")->value, 4.f, 1.f, false);
+		addHeader("GUI Scale");
+		addSlider("UI Scale", "", settings.getSettingByName<float>("guiscale")->value, 4.f, 1.f, false);
 
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 	}
 
 	void onSetupAndRender(SetupAndRenderEvent& event) {

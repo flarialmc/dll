@@ -11,7 +11,7 @@ public:
 	};
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<float>("health") == nullptr) this->settings.addSetting("health", 12.0f);
 		if (settings.getSettingByName<float>("maxopacity") == nullptr) this->settings.addSetting("maxopacity", 0.7f);
 		if (settings.getSettingByName<std::string>("color") == nullptr) this->settings.addSetting("color", (std::string)"FF0000");
@@ -30,13 +30,13 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 
-		this->addHeader("Misc");
-		this->addSlider("Maximum overlay opacity", "The maximum overlay opacity", this->settings.getSettingByName<float>("maxopacity")->value, 1.0f, 0.0f);
-		this->addColorPicker("color", "", settings.getSettingByName<std::string>("color")->value, this->settings.getSettingByName<float>("maxopacity")->value, this->settings.getSettingByName<bool>("rgb")->value);
-		this->addSlider("Health", "The health at which the overlay will be shown", this->settings.getSettingByName<float>("health")->value, 20.0f, 0.0f);
+		addHeader("Low Health Indicator");
+		addSlider("Maximum overlay opacity", "The maximum overlay opacity", settings.getSettingByName<float>("maxopacity")->value, 1.0f, 0.0f);
+		addColorPicker("Color", "", settings.getSettingByName<std::string>("color")->value, settings.getSettingByName<float>("maxopacity")->value, settings.getSettingByName<bool>("rgb")->value);
+		addSlider("Health", "The health at which the overlay will be shown", settings.getSettingByName<float>("health")->value, 20.0f, 0.0f);
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 	}
 
 	void onEnable() override {

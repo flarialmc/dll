@@ -17,6 +17,10 @@ public:
         Module::onDisable();
     }
 
+    void defaultConfig() override {
+        Module::defaultConfig("core");
+    }
+
     void settingsRender(float settingsOffset) override {
 
         float x = Constraints::PercentageConstraint(0.019, "left");

@@ -4,92 +4,91 @@
 
 class PotCounter : public Module {
 private:
-    int pots = 0;
+	int pots = 0;
 public:
-    PotCounter() : Module("Pot Counter", "Counts how much potions are\nin your inventory.",
-                          IDR_POTION_PNG, "") {
-        Module::setup();
-    };
+	PotCounter() : Module("Pot Counter", "Counts how much potions are\nin your inventory.",
+		IDR_POTION_PNG, "") {
+		Module::setup();
+	};
 
-    void onEnable() override {
-        Listen(this, TickEvent, &PotCounter::onTick)
-        Listen(this, RenderEvent, &PotCounter::onRender)
-        Module::onEnable();
-    }
+	void onEnable() override {
+		Listen(this, TickEvent, &PotCounter::onTick)
+			Listen(this, RenderEvent, &PotCounter::onRender)
+			Module::onEnable();
+	}
 
-    void onDisable() override {
-        Deafen(this, TickEvent, &PotCounter::onTick)
-        Deafen(this, RenderEvent, &PotCounter::onRender)
-        Module::onDisable();
-    }
+	void onDisable() override {
+		Deafen(this, TickEvent, &PotCounter::onTick)
+			Deafen(this, RenderEvent, &PotCounter::onRender)
+			Module::onDisable();
+	}
 
-    void defaultConfig() override { Module::defaultConfig();
-        if (settings.getSettingByName<std::string>("text") == nullptr)
-            settings.addSetting("text", (std::string) "{value} Pots");
+	void defaultConfig() override {
+		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value} Pots");
+		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
+		Module::defaultConfig("all");
+	}
 
-        if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
-    }
+	void settingsRender(float settingsOffset) override {
 
-    void settingsRender(float settingsOffset) override {
+		float x = Constraints::PercentageConstraint(0.019, "left");
+		float y = Constraints::PercentageConstraint(0.10, "top");
 
-        float x = Constraints::PercentageConstraint(0.019, "left");
-        float y = Constraints::PercentageConstraint(0.10, "top");
-
-        const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
-
-
-        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-                                  Constraints::RelativeConstraint(1.0, "width"),
-                                  Constraints::RelativeConstraint(0.88f, "height"));
+		const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
 
 
-        this->addHeader("Main");
-        this->defaultAddSettings("main");
-        this->extraPadding();
+		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+			Constraints::RelativeConstraint(1.0, "width"),
+			Constraints::RelativeConstraint(0.88f, "height"));
 
-        this->addHeader("Text");
-        this->defaultAddSettings("text");
-        this->extraPadding();
 
-        this->addHeader("Colors");
-        this->defaultAddSettings("colors");
-        this->extraPadding();
+		addHeader("Main");
+		defaultAddSettings("main");
+		extraPadding();
 
-        this->addHeader("Misc");
-        this->defaultAddSettings("misc");
+		addHeader("Text");
+		defaultAddSettings("text");
+		extraPadding();
 
-        FlarialGUI::UnsetScrollView();
-        this->resetPadding();
-    }
+		addHeader("Colors");
+		defaultAddSettings("colors");
+		extraPadding();
 
-    void onTick(TickEvent& event) {
-        if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
-            if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-                auto potsCount = 0;
-                if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
-                    auto inventory = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory();
+		addHeader("Misc");
+		defaultAddSettings("misc");
 
-                    if (inventory != nullptr) {
-                        for (int i = 0; i < 36; i++) {
-                            auto item = inventory->getItem(i);
+		FlarialGUI::UnsetScrollView();
+		resetPadding();
+	}
 
-                            if (item->getItem() != nullptr) {
-                                if (item->getItem()->name == "splash_potion") {
-                                    potsCount++;
-                                }
-                            }
-                        }
-                    }
+	void onTick(TickEvent& event) {
+		if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
+			if (SDK::clientInstance->getLocalPlayer() != nullptr) {
+				auto potsCount = 0;
+				if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
+					auto inventory = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory();
 
-                    pots = potsCount;
-                }
-            }
-        }
-    }
+					if (inventory != nullptr) {
+						for (int i = 0; i < 36; i++) {
+							auto item = inventory->getItem(i);
 
-    void onRender(RenderEvent& event) {
-        auto potsStr = FlarialGUI::cached_to_string(pots);
-        this->normalRender(14, potsStr);
-    }
+							if (item->getItem() != nullptr) {
+								if (item->getItem()->name == "splash_potion") {
+									potsCount++;
+								}
+							}
+						}
+					}
+
+					pots = potsCount;
+				}
+			}
+		}
+	}
+
+	void onRender(RenderEvent& event) {
+		auto potsStr = FlarialGUI::cached_to_string(pots);
+		this->normalRender(14, potsStr);
+	}
 };

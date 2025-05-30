@@ -24,8 +24,8 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
 		if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 0.5f);
+		Module::defaultConfig("core");
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -39,11 +39,11 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Main");
-		this->addSlider("Saturation Intensity", "", this->settings.getSettingByName<float>("intensity")->value, 3.0f);
+		addHeader("Saturation");
+		addSlider("Saturation Intensity", "", settings.getSettingByName<float>("intensity")->value, 3.0f);
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 	void onRender(RenderEvent& event) {

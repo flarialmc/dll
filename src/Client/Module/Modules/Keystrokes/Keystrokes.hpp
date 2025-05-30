@@ -32,6 +32,7 @@ public:
 	};
 
 	void onSetup() override {
+		defaultConfig();
 		D2D1_COLOR_F d = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
 		D2D1_COLOR_F e = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textColor")->value);
 		d.a = settings.getSettingByName<float>("bgOpacity")->value;
@@ -52,16 +53,16 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
 		if (settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 11.0f);
-
 		if (settings.getSettingByName<bool>("cps") == nullptr) settings.addSetting("cps", false);
 
-		if (settings.getSettingByName<float>("percentageX") == nullptr) settings.addSetting("percentageX", 0.0f);
-		if (settings.getSettingByName<float>("percentageY") == nullptr) settings.addSetting("percentageY", 0.0f);
-
-		if (settings.getSettingByName<bool>("border") == nullptr) settings.addSetting("border", true);
+		if (settings.getSettingByName<bool>("border") == nullptr) settings.addSetting("border", false);
 		if (settings.getSettingByName<float>("borderWidth") == nullptr) settings.addSetting("borderWidth", 1.0f);
+
+		Module::defaultConfig("core");
+		Module::defaultConfig("pos");
+		Module::defaultConfig("main");
+		Module::defaultConfig("colors");
 
 		if (settings.getSettingByName<std::string>("enabledColor") == nullptr) settings.addSetting("enabledColor", (std::string)"fafafa");
 		if (settings.getSettingByName<bool>("enabledRGB") == nullptr) settings.addSetting("enabledRGB", false);
@@ -104,42 +105,42 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 
-		this->addHeader("Main");
-		this->defaultAddSettings("main");
-		this->addConditionalSlider(this->settings.getSettingByName<bool>("glow")->value, "Glow Speed", "", this->settings.getSettingByName<float>("glowSpeed")->value, 10.f);
-		this->addSlider("Key Spacing", "", this->settings.getSettingByName<float>("keySpacing")->value, 10.00);
-		this->addSlider("Spacebar Width", "", this->settings.getSettingByName<float>("spacebarWidth")->value, 1.00, 0, false);
-		this->addSlider("Spacebar Height", "", this->settings.getSettingByName<float>("spacebarHeight")->value, 1.00, 0, false);
-		this->addSlider("Highlight Speed", "", this->settings.getSettingByName<float>("edSpeed")->value, 10.f);
-		this->extraPadding();
+		addHeader("Keystrokes");
+		defaultAddSettings("main");
+		addConditionalSlider(settings.getSettingByName<bool>("glow")->value, "Glow Speed", "", settings.getSettingByName<float>("glowSpeed")->value, 10.f);
+		addSlider("Key Spacing", "", settings.getSettingByName<float>("keySpacing")->value, 10.00);
+		addSlider("Spacebar Width", "", settings.getSettingByName<float>("spacebarWidth")->value, 1.00, 0, false);
+		addSlider("Spacebar Height", "", settings.getSettingByName<float>("spacebarHeight")->value, 1.00, 0, false);
+		addSlider("Highlight Speed", "", settings.getSettingByName<float>("edSpeed")->value, 10.f);
+		extraPadding();
 
-		this->addHeader("Mouse Buttons");
-		this->addToggle("Show Mouse Buttons", "LMB & RMB", this->settings.getSettingByName<bool>("cps")->value);
-		this->addConditionalSlider(this->settings.getSettingByName<bool>("cps")->value, "CPS Text Scale", "", this->settings.getSettingByName<float>("textscale2")->value, 2.00);
-		this->addToggle("Show LMB & RMB", "", this->settings.getSettingByName<bool>("lmbrmb")->value);
-		this->addToggle("Hide CPS Counter", "", this->settings.getSettingByName<bool>("hidecps")->value);
-		this->addTextBox("LMB Text", "", settings.getSettingByName<std::string>("lmbtext")->value);
-		this->addTextBox("RMB Text", "", settings.getSettingByName<std::string>("rmbtext")->value);
-		this->extraPadding();
+		addHeader("Mouse Buttons");
+		addToggle("Show Mouse Buttons", "LMB & RMB", settings.getSettingByName<bool>("cps")->value);
+		addConditionalSlider(settings.getSettingByName<bool>("cps")->value, "CPS Text Scale", "", settings.getSettingByName<float>("textscale2")->value, 2.00);
+		addToggle("Show LMB & RMB", "", settings.getSettingByName<bool>("lmbrmb")->value);
+		addToggle("Hide CPS Counter", "", settings.getSettingByName<bool>("hidecps")->value);
+		addTextBox("LMB Text", "", settings.getSettingByName<std::string>("lmbtext")->value);
+		addTextBox("RMB Text", "", settings.getSettingByName<std::string>("rmbtext")->value);
+		extraPadding();
 
-		this->addHeader("WASD");
-		this->addSlider("WASD Text Scale", "", this->settings.getSettingByName<float>("textscale")->value, 2.00);
-		this->addTextBox("W Key", "", settings.getSettingByName<std::string>("wText")->value);
-		this->addTextBox("A Key", "", settings.getSettingByName<std::string>("aText")->value);
-		this->addTextBox("S Key", "", settings.getSettingByName<std::string>("sText")->value);
-		this->addTextBox("D Key", "", settings.getSettingByName<std::string>("dText")->value);
-		this->extraPadding();
+		addHeader("WASD");
+		addSlider("WASD Text Scale", "", settings.getSettingByName<float>("textscale")->value, 2.00);
+		addTextBox("W Key", "", settings.getSettingByName<std::string>("wText")->value);
+		addTextBox("A Key", "", settings.getSettingByName<std::string>("aText")->value);
+		addTextBox("S Key", "", settings.getSettingByName<std::string>("sText")->value);
+		addTextBox("D Key", "", settings.getSettingByName<std::string>("dText")->value);
+		extraPadding();
 
-		this->addHeader("Colors");
-		this->addColorPicker("Background Disabled", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
-		this->addColorPicker("Background Enabled", "", settings.getSettingByName<std::string>("enabledColor")->value, settings.getSettingByName<float>("enabledOpacity")->value, settings.getSettingByName<bool>("enabledRGB")->value);
-		this->addColorPicker("Text Disabled", "", settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
-		this->addColorPicker("Text Enabled", "", settings.getSettingByName<std::string>("textEnabledColor")->value, settings.getSettingByName<float>("textEnabledOpacity")->value, settings.getSettingByName<bool>("textEnabledRGB")->value);
-		this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
-		this->addColorPicker("Glow Color", "", settings.getSettingByName<std::string>("glowColor")->value, settings.getSettingByName<float>("glowOpacity")->value, settings.getSettingByName<bool>("glowRGB")->value);
+		addHeader("Colors");
+		addColorPicker("Background Disabled", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
+		addColorPicker("Background Enabled", "", settings.getSettingByName<std::string>("enabledColor")->value, settings.getSettingByName<float>("enabledOpacity")->value, settings.getSettingByName<bool>("enabledRGB")->value);
+		addColorPicker("Text Disabled", "", settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
+		addColorPicker("Text Enabled", "", settings.getSettingByName<std::string>("textEnabledColor")->value, settings.getSettingByName<float>("textEnabledOpacity")->value, settings.getSettingByName<bool>("textEnabledRGB")->value);
+		addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
+		addColorPicker("Glow Color", "", settings.getSettingByName<std::string>("glowColor")->value, settings.getSettingByName<float>("glowOpacity")->value, settings.getSettingByName<bool>("glowRGB")->value);
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 	static std::pair<float, float>
