@@ -96,8 +96,6 @@ void Module::normalRenderCore(int index, std::string& text) {
 		realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x), settingperc.y * (MC::windowSize.y));
 	}*/
 
-	Vec2<float> fakecenter = realcenter;
-
 	if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
 		if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) realcenter.x -= rectWidth;
 		else realcenter.x -= rectWidth / 2.f;
@@ -151,22 +149,6 @@ void Module::normalRenderCore(int index, std::string& text) {
 			rounde.x));
 	}
 
-	if (this->settings.getSettingByName<bool>("textShadow")->value) {
-		D2D_COLOR_F textShadowColor = settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textShadowCol")->value);
-		textShadowColor.a = settings.getSettingByName<float>("textShadowOpacity")->value;
-		FlarialGUI::FlarialTextWithFont(
-			realcenter.x + Constraints::SpacingConstraint(paddingX, textWidth) + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
-			realcenter.y + Constraints::SpacingConstraint(paddingY, textWidth) + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
-			FlarialGUI::to_wide(text).c_str(),
-			rectWidth,
-			rectHeight,
-			alignment,
-			textSize, DWRITE_FONT_WEIGHT_NORMAL,
-			textShadowColor,
-			true
-		);
-	}
-
 	if (this->settings.getSettingByName<bool>("rectShadow")->value) {
 		D2D_COLOR_F rectBgColor = settings.getSettingByName<bool>("rectShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("rectShadowCol")->value);
 		rectBgColor.a = settings.getSettingByName<float>("rectShadowOpacity")->value;
@@ -193,6 +175,23 @@ void Module::normalRenderCore(int index, std::string& text) {
 			rectHeight,
 			rounde.x,
 			rounde.x
+		);
+	}
+
+	if (this->settings.getSettingByName<bool>("textShadow")->value) {
+		D2D_COLOR_F textShadowColor = settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textShadowCol")->value);
+		textShadowColor.a = settings.getSettingByName<float>("textShadowOpacity")->value;
+
+		FlarialGUI::FlarialTextWithFont(
+			realcenter.x + Constraints::SpacingConstraint(paddingX, textWidth) + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * settings.getSettingByName<float>("uiscale")->value,
+			realcenter.y + Constraints::SpacingConstraint(paddingY, textWidth) + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * settings.getSettingByName<float>("uiscale")->value,
+			FlarialGUI::to_wide(text).c_str(),
+			rectWidth,
+			rectHeight,
+			alignment,
+			textSize, DWRITE_FONT_WEIGHT_NORMAL,
+			textShadowColor,
+			true
 		);
 	}
 

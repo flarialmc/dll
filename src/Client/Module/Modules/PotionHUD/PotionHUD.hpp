@@ -45,7 +45,7 @@ public:
 		if (settings.getSettingByName<bool>("colorLow_rgb") == nullptr) settings.addSetting("colorLow_rgb", false);
 		if (settings.getSettingByName<float>("spacing") == nullptr) settings.addSetting("spacing", 1.f);
 		if (settings.getSettingByName<bool>("textShadow") == nullptr) settings.addSetting("textShadow", true);
-		if (settings.getSettingByName<bool>("textShadowOffset") == nullptr) settings.addSetting("textShadowOffset", 0.03f);
+		if (settings.getSettingByName<bool>("textShadowOffset") == nullptr) settings.addSetting("textShadowOffset", 0.003f);
 		if (settings.getSettingByName<float>("textOffsetX") == nullptr) settings.addSetting("textOffsetX", 2.f);
 		if (settings.getSettingByName<bool>("showText") == nullptr) settings.addSetting("showText", true);
 		if (settings.getSettingByName<bool>("textLeft") == nullptr) settings.addSetting("textLeft", false);
@@ -145,8 +145,8 @@ public:
 								D2D_COLOR_F shadowCol = this->settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("textShadowCol")->value);
 								shadowCol.a = this->settings.getSettingByName<float>("textShadowOpacity")->value;
 								FlarialGUI::FlarialTextWithFont(
-									textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
-									textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) - FlarialGUI::getFlarialTextSize(widecstr1, 0,
+									textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
+									textY + (Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale) - FlarialGUI::getFlarialTextSize(widecstr1, 0,
 										16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
 										textSize * guiscale * uiscale,
 										DWRITE_FONT_WEIGHT_BOLD, true).y / 4.f,
@@ -159,8 +159,8 @@ public:
 									true
 								);
 								FlarialGUI::FlarialTextWithFont(
-									textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
-									textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) + FlarialGUI::getFlarialTextSize(widecstr2, 0,
+									textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
+									textY + (Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale) + FlarialGUI::getFlarialTextSize(widecstr2, 0,
 										16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
 										(textSize * guiscale * uiscale) * 0.8f,
 										DWRITE_FONT_WEIGHT_BOLD, true).y / 1.6f,

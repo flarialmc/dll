@@ -62,7 +62,7 @@ public:
 		if (settings.getSettingByName<bool>("specialMaxDurBarColor_rgb") == nullptr) settings.addSetting("specialMaxDurBarColor_rgb", false);
 
 		if (settings.getSettingByName<bool>("textShadow") == nullptr) settings.addSetting("textShadow", true);
-		if (settings.getSettingByName<bool>("textShadowOffset") == nullptr) settings.addSetting("textShadowOffset", 0.03f);
+		if (settings.getSettingByName<bool>("textShadowOffset") == nullptr) settings.addSetting("textShadowOffset", 0.003f);
 
 		if (settings.getSettingByName<std::string>("textShadowCol") == nullptr) settings.addSetting("textShadowCol", (std::string)"00000");
 		if (settings.getSettingByName<float>("textShadowOpacity") == nullptr) settings.addSetting("textShadowOpacity", 0.55f);
@@ -250,8 +250,8 @@ public:
 										D2D_COLOR_F shadowCol = settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textShadowCol")->value);
 										shadowCol.a = settings.getSettingByName<float>("textShadowOpacity")->value;
 										FlarialGUI::FlarialTextWithFont(
-											textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
-											textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
+											textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
+											textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
 											widecstr,
 											vertical ? 0 : 16 * uiscale * guiscale,
 											vertical ? 16 * uiscale * guiscale : 0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
@@ -340,8 +340,8 @@ public:
 									D2D_COLOR_F shadowCol = settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textShadowCol")->value);
 									shadowCol.a = settings.getSettingByName<float>("textShadowOpacity")->value;
 									FlarialGUI::FlarialTextWithFont(
-										textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
-										textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
+										textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
+										textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
 										widecstr,
 										vertical ? 0 : 16 * uiscale * guiscale,
 										vertical ? 16 * uiscale * guiscale : 0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
@@ -428,8 +428,8 @@ public:
 										D2D_COLOR_F shadowCol = settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textShadowCol")->value);
 										shadowCol.a = settings.getSettingByName<float>("textShadowOpacity")->value;
 										FlarialGUI::FlarialTextWithFont(
-											textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
-											textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
+											textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
+											textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
 											widecstr,
 											vertical ? 0 : 16 * uiscale * guiscale,
 											vertical ? 16 * uiscale * guiscale : 0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,

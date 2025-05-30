@@ -229,8 +229,8 @@ public:
 								D2D_COLOR_F shadowCol = settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textShadowCol")->value);
 								shadowCol.a = settings.getSettingByName<float>("textShadowOpacity")->value;
 								FlarialGUI::FlarialTextWithFont(
-									textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
-									textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
+									textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
+									textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
 									wText.c_str(),
 									0,
 									0,
