@@ -708,7 +708,6 @@ public:
 				float originalY = 0.f;
 				if (!settings.getSettingByName<bool>("cps")->value) realcenter.y += (keycardSize + spacing);
 				else {
-
 					originalY = realcenter.y;
 					realcenter.y += (keycardSize + spacing);
 					// LMB
@@ -755,7 +754,7 @@ public:
 							Constraints::SpacingConstraint(hideCPS ? 1.0f : 0.65f, keycardSize - (keycardSize * 0.05f)),
 							DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 + Constraints::SpacingConstraint(0.48, keycardSize),
 							DWRITE_FONT_WEIGHT_NORMAL, textStates[Strokes::LMB], true);
-						if (!hideCPS)
+						if (!hideCPS) {
 							if (enableTextShadow) FlarialGUI::FlarialTextWithFont(
 								realcenter.x + textShadowOffset,
 								realcenter.y + Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)) + textShadowOffset,
@@ -763,13 +762,15 @@ public:
 								Constraints::SpacingConstraint(0.35, keycardSize - (keycardSize * 0.05f)),
 								DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 + Constraints::SpacingConstraint(-0.96f, keycardSize),
 								DWRITE_FONT_WEIGHT_NORMAL, shadowStates[Strokes::LMB], true);
-						FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y +
-							Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)),
-							FlarialGUI::to_wide(lmbText).c_str(), keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
-							Constraints::SpacingConstraint(0.35, keycardSize - (keycardSize * 0.05f)),
-							DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 +
-							Constraints::SpacingConstraint(-0.96f, keycardSize),
-							DWRITE_FONT_WEIGHT_NORMAL, textStates[Strokes::LMB], true);
+
+							FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y +
+								Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)),
+								FlarialGUI::to_wide(lmbText).c_str(), keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
+								Constraints::SpacingConstraint(0.35, keycardSize - (keycardSize * 0.05f)),
+								DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 +
+								Constraints::SpacingConstraint(-0.96f, keycardSize),
+								DWRITE_FONT_WEIGHT_NORMAL, textStates[Strokes::LMB], true);
+						}
 					}
 					else
 						FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
@@ -827,7 +828,7 @@ public:
 							DWRITE_TEXT_ALIGNMENT_CENTER,
 							fontSize2 + Constraints::SpacingConstraint(0.48, keycardSize),
 							DWRITE_FONT_WEIGHT_NORMAL, textStates[Strokes::RMB], true);
-						if (!hideCPS)
+						if (!hideCPS) {
 							if (enableTextShadow) FlarialGUI::FlarialTextWithFont(
 								realcenter.x + textShadowOffset,
 								realcenter.y + Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)) + textShadowOffset,
@@ -837,14 +838,16 @@ public:
 								DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 +
 								Constraints::SpacingConstraint(-0.96f, keycardSize),
 								DWRITE_FONT_WEIGHT_NORMAL, shadowStates[Strokes::RMB], true);
-						FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y +
-							Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)),
-							FlarialGUI::to_wide(rmbText).c_str(),
-							keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
-							Constraints::SpacingConstraint(0.35, keycardSize - (keycardSize * 0.05f)),
-							DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 +
-							Constraints::SpacingConstraint(-0.96f, keycardSize),
-							DWRITE_FONT_WEIGHT_NORMAL, textStates[Strokes::RMB], true);
+
+							FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y +
+								Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)),
+								FlarialGUI::to_wide(rmbText).c_str(),
+								keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
+								Constraints::SpacingConstraint(0.35, keycardSize - (keycardSize * 0.05f)),
+								DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 +
+								Constraints::SpacingConstraint(-0.96f, keycardSize),
+								DWRITE_FONT_WEIGHT_NORMAL, textStates[Strokes::RMB], true);
+						}
 					}
 					else
 						FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
