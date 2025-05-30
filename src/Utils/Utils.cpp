@@ -377,6 +377,7 @@ int Utils::getStringAsKey(const std::string& str) {
 	if (str == "PG UP" || str == "pg up") return 33;
 	if (str == "PG DOWN" || str == "pg down") return 34;
 	if (str == "TAB") return 9;
+	if (str == "-") return 189;
 	if (str == "[" || str == "{") return 219;  // [ and { share the same key
 	if (str == "]" || str == "}") return 221;  // ] and } share the same key
 	if (str == "+" || str == "=") return 187;  // + and = share the same key
