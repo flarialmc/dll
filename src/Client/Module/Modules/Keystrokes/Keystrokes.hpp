@@ -89,7 +89,7 @@ public:
 		if (settings.getSettingByName<bool>("textEnabledRGB") == nullptr) settings.addSetting("textEnabledRGB", false);
 		if (settings.getSettingByName<float>("textEnabledRGBSpeed") == nullptr) settings.addSetting("textEnabledRGBSpeed", 1.0f);
 		if (settings.getSettingByName<float>("enabledOpacity") == nullptr) settings.addSetting("enabledOpacity", 0.55f);
-		if (settings.getSettingByName<float>("textEnabledOpacity") == nullptr) settings.addSetting("textEnabledOpacity", 0.55f);
+		if (settings.getSettingByName<float>("textEnabledOpacity") == nullptr) settings.addSetting("textEnabledOpacity", 1.f);
 		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 1.0f);
 		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.0f);
 		if (settings.getSettingByName<float>("textscale2") == nullptr) settings.addSetting("textscale2", 1.0f);
