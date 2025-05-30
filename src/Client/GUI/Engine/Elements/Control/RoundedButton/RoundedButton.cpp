@@ -17,10 +17,10 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
     }
 
     const bool isAdditionalY = shouldAdditionalY;
+    if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return false;
 
     if (isAdditionalY) UnSetIsInAdditionalYMode();
 
-    if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return false;
 
     D2D1_COLOR_F buttonColor;
 
