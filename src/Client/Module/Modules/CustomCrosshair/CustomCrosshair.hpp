@@ -5,7 +5,43 @@
 #include "../../../../Utils/Render/MaterialUtils.hpp"
 #include "../../../Events/Game/TickEvent.hpp"
 #include "../../../../SDK/Client/GUI/ScreenRenderer.hpp"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
 
+class Crosshair
+{
+public:
+	Crosshair(std::vector<bool> Data, int Size)
+	{
+		this->PixelData = Data;
+		this->Size = Size;
+	};
+	std::vector<bool> PixelData = {};
+	int Size = 16;
+
+	const char* getImageData()
+	{
+		char* data = new char[Size*Size];
+
+		for (int i = 0; i < Size*Size; i++)
+		{
+			if (PixelData[i])
+			{
+				for (int j = 0; j < 4; j++)
+				{
+					data[i*4 + j] = 0xFF;
+				}
+			}
+		}
+
+		return data;
+	}
+
+	void SaveImage(std::string name)
+	{
+		stbi_write_png(name.c_str(), Size, Size, 4, getImageData(), Size * 4);
+	}
+};
 
 class CustomCrosshair : public Module {
 private:
@@ -63,7 +99,7 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		this->addHeader("Main");
-		//this->addToggle("Use Custom Crosshair", "Uses a custom crosshair.", settings.getSettingByName<bool>("CustomCrosshair")->value);
+		this->addToggle("Use Custom Crosshair", "Uses a custom crosshair.", settings.getSettingByName<bool>("CustomCrosshair")->value);
 		this->addToggle("Solid Color", "Make crosshair a solid color / more visible", settings.getSettingByName<bool>("solidColor")->value);
 		this->addToggle("Render in Third Person", "Weather or not to render in third person", settings.getSettingByName<bool>("renderInThirdPerson")->value);
 		this->addToggle("Highlight on Entity", "Highlight when enemy in reach", settings.getSettingByName<bool>("highlightOnEntity")->value);
@@ -73,8 +109,8 @@ public:
 		}
 		this->extraPadding();
 
-		//this->addHeader("Misc");
-		//this->addSlider("UI Scale", "The size of the Crosshair (only for custom)", settings.getSettingByName<float>("uiscale")->value, 10.f, 0.f, true);
+		this->addHeader("Misc");
+		this->addSlider("UI Scale", "The size of the Crosshair (only for custom)", settings.getSettingByName<float>("uiscale")->value, 10.f, 0.f, true);
 
 		this->extraPadding();
 
@@ -131,7 +167,7 @@ public:
 		auto shouldHighlight = settings.getSettingByName<bool>("highlightOnEntity")->value;
 		D2D1_COLOR_F color = isHoveringEnemy && shouldHighlight ? enemyColor : defaultColor;
 
-		bool isDefault = true; //!settings.getSettingByName<bool>("CustomCrosshair")->value;
+		bool isDefault = !settings.getSettingByName<bool>("CustomCrosshair")->value;
 
 		tess->color(color.r, color.g, color.b, color.a);
 
