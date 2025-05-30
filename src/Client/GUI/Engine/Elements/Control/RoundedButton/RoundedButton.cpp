@@ -21,7 +21,6 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
 
     if (isAdditionalY) UnSetIsInAdditionalYMode();
 
-
     D2D1_COLOR_F buttonColor;
 
     if (CursorInRect(x, y, width, height)) {
