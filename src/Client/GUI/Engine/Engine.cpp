@@ -838,6 +838,8 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* tex
 std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* text, const float width, const float height,
 	const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
 	const DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont) {
+
+	if (isInScrollView) y += scrollpos;
 	if (shouldAdditionalY) {
 		for (int i = 0; i < highestAddIndexes + 1; i++) {
 			if (i <= additionalIndex && additionalY[i] > 0.0f) {
@@ -845,8 +847,9 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* tex
 			}
 		}
 	}
-	if (isInScrollView) y += scrollpos;
 	if (isInScrollView && !isRectInRect(ScrollViewRect, D2D1::RectF(x, y, x + width, y + height))) return "no";
+
+
 
 	std::string font = Client::settings.getSettingByName<std::string>(moduleFont ? "mod_fontname" : "fontname")->value;
 
