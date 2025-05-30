@@ -1,4 +1,4 @@
-name: Build Flarial dll and add to newcdn as a release
+name: Build Flarial dll and add to newcdn as a release.
 on:
   push:
     branches: [ "main", "scripting-v2" ]
