@@ -104,8 +104,10 @@ public:
 		if (settings.getSettingByName<std::string>("aText") == nullptr) settings.addSetting("aText", (std::string)"A");
 		if (settings.getSettingByName<std::string>("sText") == nullptr) settings.addSetting("sText", (std::string)"S");
 		if (settings.getSettingByName<std::string>("dText") == nullptr) settings.addSetting("dText", (std::string)"D");
+
 		if (settings.getSettingByName<float>("spacebarWidth") == nullptr) settings.addSetting("spacebarWidth", 0.5f);
 		if (settings.getSettingByName<float>("spacebarHeight") == nullptr) settings.addSetting("spacebarHeight", 0.09f);
+
 		if (settings.getSettingByName<float>("keySpacing") == nullptr) settings.addSetting("keySpacing", 1.63f);
 		if (settings.getSettingByName<float>("edSpeed") == nullptr) settings.addSetting("edSpeed", 1.f);
 
