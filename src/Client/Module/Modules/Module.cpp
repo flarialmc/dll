@@ -30,7 +30,6 @@ void Module::normalRenderCore(int index, std::string& text) {
 
 	float textWidth = Constraints::RelativeConstraint(0.7f * settings.getSettingByName<float>("uiscale")->value);
 	float textHeight = Constraints::RelativeConstraint(0.1f * settings.getSettingByName<float>("uiscale")->value);
-
 	float textSize = Constraints::SpacingConstraint(3.2f, textHeight) * this->settings.getSettingByName<float>("textscale")->value;
 
 	Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value, this->settings.getSettingByName<float>("percentageY")->value);
