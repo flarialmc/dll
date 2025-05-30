@@ -58,9 +58,6 @@ void Module::normalRenderCore(int index, std::string& text) {
 
 	realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x), settingperc.y * (MC::windowSize.y));
 
-	//if (settingperc.x != 0) realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x -	), settingperc.y * (MC::windowSize.y - textHeight));
-	//else realcenter = Constraints::CenterConstraint(rectWidth, rectHeight);
-
 	if (prevAlignment != alignment) {
 		float toAdjust;
 		if (prevAlignment == DWRITE_TEXT_ALIGNMENT_CENTER) {
@@ -83,18 +80,6 @@ void Module::normalRenderCore(int index, std::string& text) {
 	}
 
 	prevAlignment = alignment;
-	/*float b_percX;
-
-	if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
-		b_percX = settingperc.x;
-
-		if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) this->settings.setValue("percentageX", (realcenter.x - rectWidth) / MC::windowSize.x);
-		else this->settings.setValue("percentageX", (realcenter.x - rectWidth / 2.f) / MC::windowSize.x);
-
-		
-		settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value, this->settings.getSettingByName<float>("percentageY")->value);
-		realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x), settingperc.y * (MC::windowSize.y));
-	}*/
 
 	if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
 		if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) realcenter.x -= rectWidth;
