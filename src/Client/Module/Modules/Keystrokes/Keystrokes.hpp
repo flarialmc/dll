@@ -337,7 +337,7 @@ public:
 						Vec2<float>(realcenter.x, realcenter.y),
 						Vec2<float>(keycardSize, keycardSize),
 						glowColor, rounde.x, 
-						this->settings.getSettingByName<float>("glowAmount")->value * glowAmountModifier[0]);
+						(this->settings.getSettingByName<float>("glowAmount")->value/100.f) * Constraints::PercentageConstraint(0.1f, "top") * glowAmountModifier[0]);
 
 				if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
 					if (settings.getSettingByName<bool>("BlurEffect")->value)
@@ -377,7 +377,7 @@ public:
 						Vec2<float>(realcenter.x, realcenter.y),
 						Vec2<float>(keycardSize, keycardSize),
 						glowColor, rounde.x,
-						this->settings.getSettingByName<float>("glowAmount")->value * glowAmountModifier[1]);
+						(this->settings.getSettingByName<float>("glowAmount")->value/100.f) * Constraints::PercentageConstraint(0.1f, "top") * glowAmountModifier[1]);
 
 				if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
 					if (settings.getSettingByName<bool>("BlurEffect")->value)
@@ -414,7 +414,7 @@ public:
 						Vec2<float>(realcenter.x, realcenter.y),
 						Vec2<float>(keycardSize, keycardSize),
 						glowColor, rounde.x,
-						this->settings.getSettingByName<float>("glowAmount")->value * glowAmountModifier[2]);
+						(this->settings.getSettingByName<float>("glowAmount")->value/100.f) * Constraints::PercentageConstraint(0.1f, "top") * glowAmountModifier[2]);
 
 				if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
 					if (settings.getSettingByName<bool>("BlurEffect")->value)
@@ -451,7 +451,7 @@ public:
 						Vec2<float>(realcenter.x, realcenter.y),
 						Vec2<float>(keycardSize, keycardSize),
 						glowColor, rounde.x,
-						this->settings.getSettingByName<float>("glowAmount")->value * glowAmountModifier[3]);
+						(this->settings.getSettingByName<float>("glowAmount")->value/100.f) * Constraints::PercentageConstraint(0.1f, "top") * glowAmountModifier[3]);
 
 				if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
 					if (settings.getSettingByName<bool>("BlurEffect")->value)
@@ -499,7 +499,7 @@ public:
 							Vec2<float>(realcenter.x, realcenter.y),
 							Vec2<float>(keycardSize + (keycardSize / 2.0f) + spacing / 2.0f, keycardSize - (keycardSize * 0.05f)),
 							glowColor, rounde.x,
-							this->settings.getSettingByName<float>("glowAmount")->value * glowAmountModifier[6]);
+							(this->settings.getSettingByName<float>("glowAmount")->value/100.f) * Constraints::PercentageConstraint(0.1f, "top") * glowAmountModifier[6]);
 
 					if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
 						if (settings.getSettingByName<bool>("BlurEffect")->value)
@@ -573,7 +573,7 @@ public:
 							Vec2<float>(realcenter.x, realcenter.y),
 							Vec2<float>(keycardSize + (keycardSize / 2.f) + spacing / 2.0f, keycardSize - (keycardSize * 0.05f)),
 							glowColor, rounde.x,
-							this->settings.getSettingByName<float>("glowAmount")->value * glowAmountModifier[5]);
+							(this->settings.getSettingByName<float>("glowAmount")->value/100.f) * Constraints::PercentageConstraint(0.1f, "top") * glowAmountModifier[5]);
 
 					if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
 						if (settings.getSettingByName<bool>("BlurEffect")->value)
@@ -647,7 +647,7 @@ public:
 						Vec2<float>(realcenter.x, realcenter.y),
 						Vec2<float>(spacebarWidth, spacebarHeight),
 						glowColor, rounde.x,
-						this->settings.getSettingByName<float>("glowAmount")->value * glowAmountModifier[4]);
+						(this->settings.getSettingByName<float>("glowAmount")->value/100.f) * Constraints::PercentageConstraint(0.1f, "top") * glowAmountModifier[4]);
 
 				if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
 					if (settings.getSettingByName<bool>("BlurEffect")->value)

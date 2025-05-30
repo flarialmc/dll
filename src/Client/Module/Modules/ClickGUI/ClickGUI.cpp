@@ -685,6 +685,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 				c->addToggle("Promotions", "To donate & join discord. (pls keep on)", Client::settings.getSettingByName<bool>("promotions")->value);
 				c->addToggle("No Flarial Logo", "No Logo next to Nametag </3", Client::settings.getSettingByName<bool>("nologoicon")->value);
 				c->addToggle("No Flarial Chat Icon", "No [FLARIAL] in chat </3", Client::settings.getSettingByName<bool>("nochaticon")->value);
+				c->addToggle("Clear Text Box When Clicked", "", Client::settings.getSettingByName<bool>("clearTextBoxWhenClicked")->value);
 
 				c->resetPadding();
 
