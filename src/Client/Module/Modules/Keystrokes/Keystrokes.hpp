@@ -142,7 +142,7 @@ public:
 		addConditionalSlider(settings.getSettingByName<bool>("glow")->value, "Glow Amount (Disabled State)", "", settings.getSettingByName<float>("glowAmount")->value, 100.f);
 
 		addToggle("Glow (Enabled State)", "", settings.getSettingByName<bool>("glowEnabled")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("glowEnabled")->value, "Glow Amount (Disabled State)", "", settings.getSettingByName<float>("glowEnabledAmount")->value, 100.f);
+		addConditionalSlider(settings.getSettingByName<bool>("glowEnabled")->value, "Glow Amount (Enabled State)", "", settings.getSettingByName<float>("glowEnabledAmount")->value, 100.f);
 		addConditionalSlider(settings.getSettingByName<bool>("glowEnabled")->value, "Glow Speed", "", settings.getSettingByName<float>("glowSpeed")->value, 10.f);
 
 		addSlider("Key Spacing", "", settings.getSettingByName<float>("keySpacing")->value, 10.00);
