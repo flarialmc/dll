@@ -875,10 +875,14 @@ void ClickGUI::onRender(RenderEvent& event) {
 					auto currentModule = ModuleManager::getModule(page.module);
 					bool wasEnabled = currentModule->isEnabled();
 					currentModule->enabledState = false; // THIS MIGHT BE WITH DELAY !!!
+					currentModule->active = false;
 					currentModule->loadDefaults();
 					FlarialGUI::ResetShit();
-					if (wasEnabled)
+					if (wasEnabled) {
+						currentModule->settings.getSettingByName<bool>("enabled")->value = true;
 						currentModule->enabledState = true;
+						currentModule->active = true;
+					}
 				}
 
 

@@ -675,8 +675,8 @@ void Module::toggle() {
 }
 
 void Module::setup() {
-	if (!isScripting())  defaultConfig();
-	Module::defaultConfig();
+	if (!isScripting()) this->defaultConfig();
+	else Module::defaultConfig();
 	keybindActions.push_back([this](std::vector<std::any> args)-> std::any {
 		this->active = !this->active;
 		return {};
@@ -685,8 +685,7 @@ void Module::setup() {
 	onSetup();
 	// TODO: might call on enable twice
 
-	if (settings.getSettingByName<bool>("enabled")->value)
-		onEnable();
+	if (settings.getSettingByName<bool>("enabled")->value) onEnable();
 }
 
 void Module::onSetup() {}
