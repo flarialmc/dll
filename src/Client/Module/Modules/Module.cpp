@@ -18,8 +18,6 @@ std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {
 
 static std::string Lname = "";
 
-DWRITE_TEXT_ALIGNMENT prevAlignment;
-
 void Module::normalRenderCore(int index, std::string& text) {
 	float rotation = this->settings.getSettingByName<float>("rotation")->value;
 	DWRITE_TEXT_ALIGNMENT alignment = alignments[this->settings.getSettingByName<std::string>("textalignment")->value];
@@ -56,19 +54,20 @@ void Module::normalRenderCore(int index, std::string& text) {
 
 	Vec2<float> realcenter;
 
-	realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x), settingperc.y * (MC::windowSize.y));
+	if (settingperc.x != 0) realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x), settingperc.y * (MC::windowSize.y));
+	else realcenter = Constraints::CenterConstraint(rectWidth, rectHeight);
 
-	/*if (prevAlignment != alignment) {
+	if (prevAlignments[index] != alignment) {
 		float toAdjust;
-		if (prevAlignment == DWRITE_TEXT_ALIGNMENT_CENTER) {
+		if (prevAlignments[index] == DWRITE_TEXT_ALIGNMENT_CENTER) {
 			if (alignment == DWRITE_TEXT_ALIGNMENT_LEADING) toAdjust = rectWidth / -2.f;
 			else toAdjust = rectWidth / 2.f;
 		}
-		else if (prevAlignment == DWRITE_TEXT_ALIGNMENT_LEADING) {
+		else if (prevAlignments[index] == DWRITE_TEXT_ALIGNMENT_LEADING) {
 			if (alignment == DWRITE_TEXT_ALIGNMENT_CENTER) toAdjust = rectWidth / 2.f;
 			else toAdjust = rectWidth;
 		}
-		else if (prevAlignment == DWRITE_TEXT_ALIGNMENT_TRAILING) {
+		else if (prevAlignments[index] == DWRITE_TEXT_ALIGNMENT_TRAILING) {
 			if (alignment == DWRITE_TEXT_ALIGNMENT_CENTER) toAdjust = rectWidth / -2.f;
 			else toAdjust = -rectWidth;
 		}
@@ -79,12 +78,12 @@ void Module::normalRenderCore(int index, std::string& text) {
 		realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x), settingperc.y * (MC::windowSize.y));
 	}
 
-	prevAlignment = alignment;*/
+	prevAlignments[index] = alignment;
 
-	/*if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
+	if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
 		if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) realcenter.x -= rectWidth;
 		else realcenter.x -= rectWidth / 2.f;
-	}*/
+	}
 
 	if (ClickGUI::editmenu) {
 		FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, rectHeight, index);
@@ -93,10 +92,10 @@ void Module::normalRenderCore(int index, std::string& text) {
 
 		checkForRightClickAndOpenSettings(realcenter.x, realcenter.y, rectWidth, rectHeight);
 
-		/*if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
+		if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
 			if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) vec2.x += rectWidth;
 			else vec2.x += rectWidth / 2.f;
-		}*/
+		}
 
 		realcenter.x = vec2.x;
 		realcenter.y = vec2.y;
@@ -107,10 +106,10 @@ void Module::normalRenderCore(int index, std::string& text) {
 		this->settings.setValue("percentageX", percentages.x);
 		this->settings.setValue("percentageY", percentages.y);
 
-		/*if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
+		if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
 			if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) realcenter.x -= rectWidth;
 			else realcenter.x -= rectWidth / 2.f;
-		}*/
+		}
 	}
 
 	Vec2<float> rounde = Constraints::RoundingConstraint(this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value, this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value);
