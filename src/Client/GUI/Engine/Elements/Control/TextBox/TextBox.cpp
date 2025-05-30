@@ -65,6 +65,10 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
     const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
     const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
 
+    ImVec2 TextSize = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(text).c_str(),
+        Constraints::SpacingConstraint(1.85, textWidth), percHeight,
+        DWRITE_TEXT_ALIGNMENT_LEADING, textWidth, DWRITE_FONT_WEIGHT_NORMAL);
+
     y -= percHeight / 2.0f;
 
     if (isAdditionalY) UnSetIsInAdditionalYMode();
@@ -84,11 +88,23 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
     // rectangle bounds
     FlarialGUI::RoundedRect(x, y, col, Constraints::SpacingConstraint(1.85, textWidth), percHeight, round.x, round.x);
 
-    float textSize = Constraints::SpacingConstraint(1.0, textWidth);
+    DWRITE_TEXT_ALIGNMENT alignment = DWRITE_TEXT_ALIGNMENT_LEADING;
+
+    bool exceeding = false;
+
+    if (TextSize.x + Constraints::SpacingConstraint(0.2, textWidth) > Constraints::SpacingConstraint(1.85, textWidth))
+    {
+        alignment = DWRITE_TEXT_ALIGNMENT_TRAILING;
+        exceeding = true;
+    }
+
+    FlarialGUI::PushImClipRect(ImVec2(x + Constraints::SpacingConstraint(0.1, textWidth),  isInScrollView ? y + FlarialGUI::scrollpos : y), ImVec2(Constraints::SpacingConstraint(1.65, textWidth), percHeight));
 
     ttext = FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.1, textWidth), y, FlarialGUI::to_wide(text).c_str(),
-                                    Constraints::SpacingConstraint(1.85, textWidth), percHeight,
-                                    DWRITE_TEXT_ALIGNMENT_LEADING, textSize, DWRITE_FONT_WEIGHT_NORMAL);
+                                    Constraints::SpacingConstraint(1.65, textWidth), percHeight,
+                                    alignment, textWidth, DWRITE_FONT_WEIGHT_NORMAL);
+
+    FlarialGUI::PopImClipRect();
 
     D2D1_COLOR_F cursorCol = colors_primary2_rgb ? rgbColor : colors_primary2;
     cursorCol.a = o_colors_primary2;
@@ -101,15 +117,27 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
 
     // white cursor blinky
     if (FlarialGUI::TextBoxes[index].cursorX > x)
-        FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX,
+    {
+        if (exceeding)
+        {
+            FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.75, textWidth),
                                 y + Constraints::RelativeConstraint(0.035f) / 2.0f, cursorCol,
                                 Constraints::RelativeConstraint(0.005f),
                                 percHeight - Constraints::RelativeConstraint(0.032f), 0, 0);
+        }
+        else
+        {
+            FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX,
+                                y + Constraints::RelativeConstraint(0.035f) / 2.0f, cursorCol,
+                                Constraints::RelativeConstraint(0.005f),
+                                percHeight - Constraints::RelativeConstraint(0.032f), 0, 0);
+        }
+    }
 
     rReal = FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(0.1, textWidth), y,
                                     FlarialGUI::to_wide(real).c_str(),
                                     Constraints::SpacingConstraint(6.9, textWidth), percHeight,
-                                    DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.00, textWidth),
+                                    alignment, Constraints::SpacingConstraint(1.00, textWidth),
                                     DWRITE_FONT_WEIGHT_NORMAL);
 
     if (isAdditionalY) SetIsInAdditionalYMode();
@@ -158,9 +186,9 @@ std::string FlarialGUI::TextBox(int index, std::string& text, int limit, float x
         FlarialGUI::TextBoxes[index].text = text;
     }
 
-    if ((size.x > (width - 0.35 * textWidth)) && !FlarialGUI::TextBoxes[index].text.empty() && !special) FlarialGUI::TextBoxes[index].text.pop_back();
     if (special == 1) FlarialGUI::TextBoxes[index].text = FlarialGUI::TextBoxes[index].text.substr(0, 6);
     if (special == 2) FlarialGUI::TextBoxes[index].text = FlarialGUI::TextBoxes[index].text.substr(0, limit);
+    if ((size.x > (width - 0.35 * textWidth)) && !FlarialGUI::TextBoxes[index].text.empty() && special == 3) FlarialGUI::TextBoxes[index].text.pop_back();
 
     return FlarialGUI::TextBoxes[index].text;
 }

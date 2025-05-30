@@ -78,7 +78,7 @@ std::string ClickGUIElements::SearchBar(int index, std::string &text, int limit,
             const float textWidth = searchBarSizes[index];
             const float percHeight = Constraints::RelativeConstraint(0.42, "height");
 
-            text = FlarialGUI::TextBox(index, text, limit, x - textWidth, y, textWidth, percHeight);
+            text = FlarialGUI::TextBox(index, text, limit, x - textWidth, y, textWidth, percHeight, 3);
 
             if (!text.empty()) FlarialGUI::TextBoxes[index].isActive = true;
 

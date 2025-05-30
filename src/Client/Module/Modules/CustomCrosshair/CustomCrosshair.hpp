@@ -33,6 +33,8 @@ public:
 		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 1.f);
 		Module::defaultConfig("core");
 
+		if (settings.getSettingByName<bool>("CustomCrosshair") == nullptr) settings.addSetting("CustomCrosshair", false);
+
 		if (settings.getSettingByName<bool>("highlightOnEntity") == nullptr) settings.addSetting("highlightOnEntity", false);
 		if (settings.getSettingByName<bool>("solidColorWhenHighlighted") == nullptr) settings.addSetting("solidColorWhenHighlighted", true);
 		if (settings.getSettingByName<bool>("solidColor") == nullptr) settings.addSetting("solidColor", false);
@@ -105,6 +107,11 @@ public:
 		if (ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr) {
 			return;
 		}
+		const ResourceLocation loc2(Utils::getAssetsPath() + "\\ch1.png", true);
+		TexturePtr ptr2 = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc2, false);
+		if (ptr2.clientTexture == nullptr || ptr2.clientTexture->clientTexture.resourcePointerBlock == nullptr) {
+			return;
+		}
 		const auto tess = screenContext->getTessellator();
 
 		tess->begin(mce::PrimitiveMode::QuadList, 4);
@@ -118,17 +125,19 @@ public:
 		auto shouldHighlight = settings.getSettingByName<bool>("highlightOnEntity")->value;
 		D2D1_COLOR_F color = isHoveringEnemy && shouldHighlight ? enemyColor : defaultColor;
 
+		bool isDefault = true; //!settings.getSettingByName<bool>("CustomCrosshair")->value;
+
 		tess->color(color.r, color.g, color.b, color.a);
 
-		Vec2<float> size = Vec2<float>(16, 16);
-		//auto scale = settings.getSettingByName<float>("uiscale")->value;
-		//Vec2<float> sizeOnScale = Vec2(size.x * scale, size.y * scale);
+		Vec2<float> size = Vec2<float>(17, 17);
+		auto scale = settings.getSettingByName<float>("uiscale")->value;
+		Vec2<float> sizeScaled = PositionUtils::getCustomScreenScaledPos(size, scale);
 
 		Vec2<float> sizeUnscaled = PositionUtils::getScreenScaledPos(size);
-		//Vec2<float> sizeScaled = PositionUtils::getScreenScaledPos(sizeOnScale);
 
-		Vec2<float> pos = PositionUtils::getScaledPos(Vec2<float>((MC::windowSize.x / 2) - (sizeUnscaled.x / 2), (MC::windowSize.y / 2) - (sizeUnscaled.y / 2)));
-		//Vec2<float> posSizeScaled = PositionUtils::getScaledPos(Vec2<float>((MC::windowSize.x / 2) - (sizeScaled.x / 2), (MC::windowSize.y / 2) - (sizeScaled.y / 2)));
+		auto SizeToUse = isDefault ? sizeUnscaled : sizeScaled;
+
+		Vec2<float> pos = PositionUtils::getScaledPos(Vec2<float>((MC::windowSize.x / 2) - (SizeToUse.x / 2), (MC::windowSize.y / 2) - (SizeToUse.y / 2)));
 
 		auto useSolidColor = settings.getSettingByName<bool>("solidColor")->value;
 		auto useSolidColorWhenHighlighted = settings.getSettingByName<bool>("solidColorWhenHighlighted")->value;
@@ -141,25 +150,17 @@ public:
 
 		mce::MaterialPtr* material = useSolid ? MaterialUtils::getUITextured() : MaterialUtils::getUICrosshair();
 
-		bool isDefault = true;
-
 		if (isDefault) {
 			// Pack crosshairs have textures placed whereever so this will figure it out
 			IntRectangle rect = IntRectangle(pos.x, pos.y, size.x, size.y);
 			ScreenRenderer::blit(screenContext, &ptr, &rect, material);
 		}
 		else {
-			//auto desc = ptr.clientTexture->textureDescription;
-
-			//float u = size.x / desc.width;
-			//float v = size.x / desc.height;
-
-			//tess->vertexUV(pos.x, pos.y + sizeOnScale.y, 0.f, 0.f, 1.f);
-			//tess->vertexUV(pos.x + sizeOnScale.x, pos.y + sizeOnScale.y, 0.f, 1.f, 1.f);
-			//tess->vertexUV(pos.x + sizeOnScale.x, pos.y, 0.f, 1.f, 0.f);
-			//tess->vertexUV(pos.x, pos.y, 0.f, 0.f, 0.f);
-
-			//MeshHelpers::renderMeshImmediately2(screenContext, tess, material, *ptr.clientTexture);
+			tess->vertexUV(pos.x, pos.y + (sizeScaled.y), 0.f, 0.f, 1.f);
+			tess->vertexUV(pos.x + (sizeScaled.x), pos.y + (sizeScaled.y), 0.f, 1.f, 1.f);
+			tess->vertexUV(pos.x + (sizeScaled.x), pos.y, 0.f, 1.f, 0.f);
+			tess->vertexUV(pos.x, pos.y, 0.f, 0.f, 0.f);
+			MeshHelpers::renderMeshImmediately2(screenContext, tess, material, *ptr2.clientTexture);
 		}
 	}
 };
