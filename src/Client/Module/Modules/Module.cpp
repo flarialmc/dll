@@ -18,6 +18,8 @@ std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {
 
 static std::string Lname = "";
 
+DWRITE_TEXT_ALIGNMENT prevAlignment;
+
 void Module::normalRenderCore(int index, std::string& text) {
 	float rotation = this->settings.getSettingByName<float>("rotation")->value;
 	DWRITE_TEXT_ALIGNMENT alignment = alignments[this->settings.getSettingByName<std::string>("textalignment")->value];
@@ -37,53 +39,102 @@ void Module::normalRenderCore(int index, std::string& text) {
 
 	float realspacing = Constraints::SpacingConstraint(0.05f, textWidth);
 
-	std::string rname = FlarialGUI::FlarialTextWithFont(0, 0,
+	ImVec2 textMetrics = FlarialGUI::getFlarialTextSize(
 		FlarialGUI::to_wide(text).c_str(),
 		1000000,
 		textHeight,
 		alignment,
-		textSize, DWRITE_FONT_WEIGHT_NORMAL,
-		D2D1::ColorF(0, 0, 0, 0),
-		true
+		textSize, DWRITE_FONT_WEIGHT_NORMAL, true
 	);
-
-	Lname = rname;
 
 	float rectWidth = (
 		!responsivewidth
 		? (Constraints::RelativeConstraint(0.225f * settings.getSettingByName<float>("uiscale")->value) * this->settings.getSettingByName<float>("rectwidth")->value)
-		: (FlarialGUI::TextSizes[Lname] + Constraints::SpacingConstraint(2.0, realspacing)) * this->settings.getSettingByName<float>("rectwidth")->value
+		: (textMetrics.x + Constraints::SpacingConstraint(2.0, realspacing)) * this->settings.getSettingByName<float>("rectwidth")->value
 		);
+	float rectHeight = textHeight * this->settings.getSettingByName<float>("rectheight")->value;
 
 	Vec2<float> realcenter;
 
-	if (settingperc.x != 0) realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x - rectWidth), settingperc.y * (MC::windowSize.y - textHeight));
-	else realcenter = Constraints::CenterConstraint(rectWidth, textHeight * this->settings.getSettingByName<float>("rectheight")->value);
+	realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x), settingperc.y * (MC::windowSize.y));
+
+	//if (settingperc.x != 0) realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x -	), settingperc.y * (MC::windowSize.y - textHeight));
+	//else realcenter = Constraints::CenterConstraint(rectWidth, rectHeight);
+
+	if (prevAlignment != alignment) {
+		float toAdjust;
+		if (prevAlignment == DWRITE_TEXT_ALIGNMENT_CENTER) {
+			if (alignment == DWRITE_TEXT_ALIGNMENT_LEADING) toAdjust = rectWidth / -2.f;
+			else toAdjust = rectWidth / 2.f;
+		}
+		else if (prevAlignment == DWRITE_TEXT_ALIGNMENT_LEADING) {
+			if (alignment == DWRITE_TEXT_ALIGNMENT_CENTER) toAdjust = rectWidth / 2.f;
+			else toAdjust = rectWidth;
+		}
+		else if (prevAlignment == DWRITE_TEXT_ALIGNMENT_TRAILING) {
+			if (alignment == DWRITE_TEXT_ALIGNMENT_CENTER) toAdjust = rectWidth / -2.f;
+			else toAdjust = -rectWidth;
+		}
+
+		this->settings.setValue("percentageX", (realcenter.x + toAdjust) / MC::windowSize.x);
+
+		settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value, this->settings.getSettingByName<float>("percentageY")->value);
+		realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x), settingperc.y * (MC::windowSize.y));
+	}
+
+	prevAlignment = alignment;
+	/*float b_percX;
+
+	if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
+		b_percX = settingperc.x;
+
+		if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) this->settings.setValue("percentageX", (realcenter.x - rectWidth) / MC::windowSize.x);
+		else this->settings.setValue("percentageX", (realcenter.x - rectWidth / 2.f) / MC::windowSize.x);
+
+		
+		settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value, this->settings.getSettingByName<float>("percentageY")->value);
+		realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x), settingperc.y * (MC::windowSize.y));
+	}*/
+
+	Vec2<float> fakecenter = realcenter;
+
+	if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
+		if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) realcenter.x -= rectWidth;
+		else realcenter.x -= rectWidth / 2.f;
+	}
 
 	if (ClickGUI::editmenu) {
-		auto height = textHeight * this->settings.getSettingByName<float>("rectheight")->value;
+		FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, rectHeight, index);
 
-		FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, rectWidth, height, index);
+		Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, rectWidth, rectHeight);
 
-		Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, rectWidth, height);
+		checkForRightClickAndOpenSettings(realcenter.x, realcenter.y, rectWidth, rectHeight);
 
-		checkForRightClickAndOpenSettings(realcenter.x, realcenter.y, rectWidth, height);
+		if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
+			if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) vec2.x += rectWidth;
+			else vec2.x += rectWidth / 2.f;
+		}
 
 		realcenter.x = vec2.x;
 		realcenter.y = vec2.y;
 
 		realcenter = realcenter;
 
-		Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y, rectWidth, textHeight);
+		Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y, 0, 0);
 		this->settings.setValue("percentageX", percentages.x);
 		this->settings.setValue("percentageY", percentages.y);
+
+		if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
+			if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) realcenter.x -= rectWidth;
+			else realcenter.x -= rectWidth / 2.f;
+		}
 	}
 
 	Vec2<float> rounde = Constraints::RoundingConstraint(this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value, this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value);
 	ImVec2 rotationCenter;
 
 	if (rotation > 0.0f) {
-		rotationCenter = ImVec2(realcenter.x + rectWidth / 2.0f, realcenter.y + textHeight * this->settings.getSettingByName<float>("rectheight")->value / 2.0f);
+		rotationCenter = ImVec2(realcenter.x + rectWidth / 2.0f, realcenter.y + rectHeight / 2.0f);
 		FlarialGUI::ImRotateStart();
 	}
 
@@ -96,7 +147,7 @@ void Module::normalRenderCore(int index, std::string& text) {
 	if (settings.getSettingByName<bool>("BlurEffect")->value) {
 		FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y,
 			realcenter.x + rectWidth,
-			realcenter.y + (textHeight)*this->settings.getSettingByName<float>("rectheight")->value), rounde.x,
+			realcenter.y + rectHeight), rounde.x,
 			rounde.x));
 	}
 
@@ -108,7 +159,7 @@ void Module::normalRenderCore(int index, std::string& text) {
 			realcenter.y + Constraints::SpacingConstraint(paddingY, textWidth) + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
 			FlarialGUI::to_wide(text).c_str(),
 			rectWidth,
-			textHeight,
+			rectHeight,
 			alignment,
 			textSize, DWRITE_FONT_WEIGHT_NORMAL,
 			textShadowColor,
@@ -125,7 +176,7 @@ void Module::normalRenderCore(int index, std::string& text) {
 			realcenter.y + Constraints::RelativeConstraint(settings.getSettingByName<float>("rectShadowOffset")->value),
 			rectBgColor,
 			rectWidth,
-			textHeight * this->settings.getSettingByName<float>("rectheight")->value,
+			rectHeight,
 			rounde.x,
 			rounde.x
 		);
@@ -139,7 +190,7 @@ void Module::normalRenderCore(int index, std::string& text) {
 			realcenter.y,
 			bgColor,
 			rectWidth,
-			textHeight * this->settings.getSettingByName<float>("rectheight")->value,
+			rectHeight,
 			rounde.x,
 			rounde.x
 		);
@@ -153,7 +204,7 @@ void Module::normalRenderCore(int index, std::string& text) {
 		realcenter.y + Constraints::SpacingConstraint(paddingY, textWidth),
 		FlarialGUI::to_wide(text).c_str(),
 		rectWidth,
-		textHeight,
+		rectHeight,
 		alignment,
 		textSize, DWRITE_FONT_WEIGHT_NORMAL,
 		textColor,
@@ -826,73 +877,9 @@ void Module::defaultConfig(std::string type) {
 void Module::defaultConfig() {
 	getKeybind();
 	defaultConfig("core");
-	/*defaultConfig("pos");
-	defaultConfig("main");
-	defaultConfig("text");
-	defaultConfig("colors");
-	defaultConfig("misc");*/
-
-	/*if (settings.getSettingByName<bool>("enabled") == nullptr) {
-		if (name == "Zoom" or name == "Tab List") settings.addSetting("enabled", true);
-		else settings.addSetting("enabled", false);
-	}
-
-	if (settings.getSettingByName<bool>("showBg") == nullptr) settings.addSetting("showBg", true);
-	if (settings.getSettingByName<bool>("favorite") == nullptr) settings.addSetting("favorite", false);
-	if (settings.getSettingByName<float>("percentageX") == nullptr) settings.addSetting("percentageX", 0.0f);
-	if (settings.getSettingByName<float>("percentageY") == nullptr) settings.addSetting("percentageY", 0.0f);
-
-	if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.0f);
-	if (settings.getSettingByName<bool>("border") == nullptr) settings.addSetting("border", false);
-	if (settings.getSettingByName<float>("borderWidth") == nullptr) settings.addSetting("borderWidth", 1.0f);
-
-	if (settings.getSettingByName<bool>("reversepaddingx") == nullptr) settings.addSetting("reversepaddingx", false);
-	if (settings.getSettingByName<bool>("reversepaddingy") == nullptr) settings.addSetting("reversepaddingy", false);
-	if (settings.getSettingByName<float>("padx") == nullptr) settings.addSetting("padx", 0.0f);
-	if (settings.getSettingByName<float>("pady") == nullptr) settings.addSetting("pady", 0.0f);
-	if (settings.getSettingByName<float>("rectwidth") == nullptr) settings.addSetting("rectwidth", 1.0f);
-	if (settings.getSettingByName<float>("rectheight") == nullptr) settings.addSetting("rectheight", 1.0f);
-	if (settings.getSettingByName<bool>("responsivewidth") == nullptr) settings.addSetting("responsivewidth", false);
-	if (settings.getSettingByName<std::string>("textalignment") == nullptr) settings.addSetting("textalignment", (std::string)"Center");
-	if (settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 32.0f);
-
-	if (settings.getSettingByName<std::string>("bgColor") == nullptr) settings.addSetting("bgColor", (std::string)"000000");
-	if (settings.getSettingByName<std::string>("textColor") == nullptr) settings.addSetting("textColor", (std::string)"fafafa");
-	if (settings.getSettingByName<std::string>("borderColor") == nullptr) settings.addSetting("borderColor", (std::string)"000000");
-	if (settings.getSettingByName<std::string>("glowColor") == nullptr) settings.addSetting("glowColor", (std::string)"F0F0F0");
-
-	if (settings.getSettingByName<bool>("textShadow") == nullptr) settings.addSetting("textShadow", false);
-	if (settings.getSettingByName<bool>("rectShadow") == nullptr) settings.addSetting("rectShadow", false);
-	if (settings.getSettingByName<bool>("textShadowRGB") == nullptr) settings.addSetting("textShadowRGB", false);
-	if (settings.getSettingByName<bool>("rectShadowRGB") == nullptr) settings.addSetting("rectShadowRGB", false);
-	if (settings.getSettingByName<std::string>("textShadowCol") == nullptr) settings.addSetting("textShadowCol", (std::string)"00000");
-	if (settings.getSettingByName<std::string>("rectShadowCol") == nullptr) settings.addSetting("rectShadowCol", (std::string)"00000");
-	if (settings.getSettingByName<float>("textShadowOffset") == nullptr) settings.addSetting("textShadowOffset", 0.003f);
-	if (settings.getSettingByName<float>("rectShadowOffset") == nullptr) settings.addSetting("rectShadowOffset", 0.003f);
-	if (settings.getSettingByName<float>("rectShadowOpacity") == nullptr) settings.addSetting("rectShadowOpacity", 0.55f);
-	if (settings.getSettingByName<float>("textShadowOpacity") == nullptr) settings.addSetting("textShadowOpacity", 0.55f);
-
-	if (settings.getSettingByName<float>("bgOpacity") == nullptr) settings.addSetting("bgOpacity", 0.55f);
-	if (settings.getSettingByName<float>("textOpacity") == nullptr) settings.addSetting("textOpacity", 1.0f);
-	if (settings.getSettingByName<float>("borderOpacity") == nullptr) settings.addSetting("borderOpacity", 1.0f);
-	if (settings.getSettingByName<float>("glowOpacity") == nullptr) settings.addSetting("glowOpacity", 1.0f);
-
-	if (settings.getSettingByName<bool>("bgRGB") == nullptr) settings.addSetting("bgRGB", false);
-	if (settings.getSettingByName<bool>("textRGB") == nullptr) settings.addSetting("textRGB", false);
-	if (settings.getSettingByName<bool>("borderRGB") == nullptr) settings.addSetting("borderRGB", false);
-	if (settings.getSettingByName<bool>("glowRGB") == nullptr) settings.addSetting("glowRGB", false);
-
-	if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 0.65f);
-	if (settings.getSettingByName<float>("rotation") == nullptr) settings.addSetting("rotation", 0.0f);
-	if (settings.getSettingByName<bool>("BlurEffect") == nullptr) settings.addSetting("BlurEffect", false);
-
-	if (settings.getSettingByName<float>("glowAmount") == nullptr) settings.addSetting("glowAmount", 30.0f);
-	if (settings.getSettingByName<bool>("glow") == nullptr) settings.addSetting("glow", false);
-	if (settings.getSettingByName<float>("glowSpeed") == nullptr) settings.addSetting("glowSpeed", 1.0f);*/
 }
 
 bool Module::isKeybind(const std::array<bool, 256>& keys, const int keybindCount) {
-
 	std::string count = "keybind";
 	if (keybindCount > 0) count += "-" + FlarialGUI::cached_to_string(keybindCount);
 	if (!settings.getSettingByName<std::string>(count)) { return false; }
