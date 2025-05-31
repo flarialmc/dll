@@ -16,12 +16,14 @@ public:
 		Listen(this, RenderEvent, &FPS::onRender)
 			Listen(this, RenderUnderUIEvent, &FPS::onRenderUnderUI)
 			Module::onEnable();
+		std::cout << "Enabled" << std::endl;
 	}
 
 	void onDisable() override {
 		Deafen(this, RenderEvent, &FPS::onRender)
 			Deafen(this, RenderUnderUIEvent, &FPS::onRenderUnderUI)
 			Module::onDisable();
+		std::cout << "Disabled" << std::endl;
 	}
 
 	void defaultConfig() override {

@@ -22,6 +22,7 @@ public:
 	}
 
 	void defaultConfig() override {
+		getKeybind();
 		Module::defaultConfig("core");
 	}
 

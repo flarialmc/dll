@@ -114,11 +114,10 @@ public:
 
 		if (settingperc.x != 0)
 			realcenter = Vec2(settingperc.x * (MC::windowSize.x - RectSize.x), settingperc.y * (MC::windowSize.y - RectSize.y));    else
-			realcenter = Constraints::CenterConstraint(RectSize.y, RectSize.y * this->settings.getSettingByName<float>(
-				"rectheight")->value);
+			realcenter = Constraints::CenterConstraint(RectSize.y, RectSize.y);
 
 		if (ClickGUI::editmenu) {
-			auto height = RectSize.y * this->settings.getSettingByName<float>("rectheight")->value;
+			auto height = RectSize.y;
 			FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, RectSize.x,
 				height, index);
 

@@ -127,6 +127,7 @@ public:
 	}
 
 	void defaultConfig() override {
+		getKeybind();
 		Module::defaultConfig("core");
 
 		if (settings.getSettingByName<std::string>("toggle") == nullptr) settings.addSetting("toggle", false);

@@ -874,14 +874,17 @@ void ClickGUI::onRender(RenderEvent& event) {
 					buttonWidth, buttonHeight, round.x, round.x)) {
 					auto currentModule = ModuleManager::getModule(page.module);
 					bool wasEnabled = currentModule->isEnabled();
+					//if (wasEnabled) currentModule->toggle();
 					currentModule->enabledState = false; // THIS MIGHT BE WITH DELAY !!!
 					currentModule->active = false;
 					currentModule->loadDefaults();
 					FlarialGUI::ResetShit();
 					if (wasEnabled) {
+						//currentModule->toggle();
 						currentModule->settings.getSettingByName<bool>("enabled")->value = true;
 						currentModule->enabledState = true;
-						currentModule->active = true;
+						//currentModule->onEnable();
+						//currentModule->active = true;
 					}
 				}
 

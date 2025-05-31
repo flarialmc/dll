@@ -178,7 +178,8 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		getKeybind();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<std::string>("editmenubind") == nullptr)
 			settings.addSetting("editmenubind", (std::string)"L");
 

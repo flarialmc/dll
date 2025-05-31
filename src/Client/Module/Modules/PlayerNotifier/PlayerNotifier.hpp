@@ -17,6 +17,7 @@ public:
 	};
 
 	void defaultConfig() override {
+		getKeybind();
 		Module::defaultConfig("core");
 		if (!this->settings.getSettingByName<float>("duration")) settings.addSetting<float>("duration", 80);
 		if (!this->settings.getSettingByName<std::string>("player0")) settings.addSetting<std::string>("player0", "TheBarii");

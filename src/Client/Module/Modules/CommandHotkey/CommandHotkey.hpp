@@ -51,6 +51,7 @@ public:
 	}
 
 	void defaultConfig() override {
+		getKeybind();
 		Module::defaultConfig("core");
 		if (settings.getSettingByName<std::string>("command") == nullptr) settings.addSetting("command", (std::string)"");
 	}

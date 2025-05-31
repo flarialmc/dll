@@ -49,6 +49,7 @@ public:
 	}
 
 	void defaultConfig() override {
+		getKeybind();
 		Module::defaultConfig("core");
 		Module::defaultConfig("pos");
 		if (settings.getSettingByName<std::string>("Overlay") == nullptr) settings.addSetting("Overlay", (std::string)"O");

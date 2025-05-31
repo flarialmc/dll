@@ -24,6 +24,7 @@ public:
 	}
 
 	void defaultConfig() override {
+		getKeybind();
 		Module::defaultConfig("all");
 		if (settings.getSettingByName<bool>("status") == nullptr) settings.addSetting("status", false);
 		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);

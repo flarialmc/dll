@@ -28,6 +28,7 @@ public:
     }
 
     void defaultConfig() override {
+        getKeybind();
         if (settings.getSettingByName<bool>("enabled") == nullptr) settings.addSetting<bool>("enabled", true);
         if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 0.65f);
         Module::defaultConfig("core");
