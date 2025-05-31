@@ -40,6 +40,8 @@
 void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, bool& rgb) {
 	if (ColorPickers[index].isActive) {
 		// 75% opacity black rect
+
+		FlarialGUI::UnsetScrollView();
 		FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black, 0.75),
 			Constraints::RelativeConstraint(1.5, "width", true),
 			Constraints::RelativeConstraint(1.5, "height", true), 0, 0);
@@ -292,7 +294,8 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
 		if (Toggle(123, x, y, rgb, true)) rgb = !rgb;
 
 		FlarialTextWithFont(
-			x + Constraints::SpacingConstraint(0.60, Constraints::RelativeConstraint(0.12, "height", true)), y,
+			x + Constraints::SpacingConstraint(0.60, Constraints::RelativeConstraint(0.12, "height", true)),
+			y - Constraints::SpacingConstraint(0.10, Constraints::RelativeConstraint(0.12, "height", true)),
 			L"Chroma",
 			Constraints::RelativeConstraint(0.12, "height", true) * 3.0f,
 			Constraints::RelativeConstraint(0.029, "height", true), DWRITE_TEXT_ALIGNMENT_LEADING,
@@ -348,6 +351,9 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
 		FlarialGUI::PopSize();
 
 		FlarialGUI::UnsetWindowRect();
+
+		FlarialGUI::SetScrollView(ScrollViewRect.left, ScrollViewRect.top, ScrollViewRect.right - ScrollViewRect.left, ScrollViewRect.bottom - ScrollViewRect.top);
+
 
 		// rect containing shit
 
