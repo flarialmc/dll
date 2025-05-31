@@ -42,10 +42,15 @@ public:
     void defaultConfig() override {
         getKeybind();
         Module::defaultConfig("core");
-        Module::defaultConfig("main");
-        if (settings.getSettingByName<bool>("textShadow") == nullptr) settings.addSetting("textShadow", false);
-        if (settings.getSettingByName<float>("textShadowOffset") == nullptr) settings.addSetting("textShadowOffset", 0.003f);
-        Module::defaultConfig("colors");
+        if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 0.65f);
+        if (settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 0.0f);
+        if (settings.getSettingByName<bool>("showBg") == nullptr) settings.addSetting("showBg", true);
+        if (settings.getSettingByName<std::string>("textColor") == nullptr) settings.addSetting("textColor", (std::string)"ffffff");
+        if (settings.getSettingByName<float>("textOpacity") == nullptr) settings.addSetting("textOpacity", 1.0f);
+        if (settings.getSettingByName<bool>("textRGB") == nullptr) settings.addSetting("textRGB", false);
+        if (settings.getSettingByName<std::string>("bgColor") == nullptr) settings.addSetting("bgColor", (std::string)"000000");
+        if (settings.getSettingByName<float>("bgOpacity") == nullptr) settings.addSetting("bgOpacity", 0.5f);
+        if (settings.getSettingByName<bool>("bgRGB") == nullptr) settings.addSetting("bgRGB", false);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -62,16 +67,14 @@ public:
 
         this->addHeader("Main");
         addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
-        this->defaultAddSettings("main");
-        this->extraPadding();
-
-        this->addHeader("Text");
-        addToggle("Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
-        addConditionalSlider(settings.getSettingByName<bool>("textShadow")->value, "Shadow Offset", "How far the shadow will be.", settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
+        addSlider("UI Scale", "", settings.getSettingByName<float>("uiscale")->value, 2.0f);
+        addSlider("Rounding", "Rounding of the rectangle", settings.getSettingByName<float>("rounding")->value, 100, 0, false);
+        addToggle("Background", "", settings.getSettingByName<bool>("showBg")->value);
         this->extraPadding();
 
         this->addHeader("Colors");
-        this->defaultAddSettings("colors");
+        addColorPicker("Text Color", "", settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
+        addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
         this->extraPadding();
 
         FlarialGUI::UnsetScrollView();
@@ -215,7 +218,12 @@ public:
             float textHeight = Constraints::RelativeConstraint(0.1f * settings.getSettingByName<float>("uiscale")->value);
             float textSize = Constraints::SpacingConstraint(2.0f, textHeight);
             float yPadding = Constraints::SpacingConstraint(0.025f, textHeight);
-            D2D1_COLOR_F textColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textColor")->value);
+            float rounding = settings.getSettingByName<float>("rounding")->value;
+
+            D2D1_COLOR_F textColor = settings.getSettingByName<bool>("textRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textColor")->value);
+            textColor.a = settings.getSettingByName<float>("textOpacity")->value;
+            D2D1_COLOR_F bgColor = settings.getSettingByName<bool>("bgRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
+            bgColor.a = settings.getSettingByName<float>("bgOpacity")->value;
 
             LocalPlayer* player = SDK::clientInstance->getLocalPlayer();
             BlockPos targetPos = { 0, 0, 0 };
@@ -314,7 +322,7 @@ public:
 
             int leftYoffset = 0.0f;
             for (size_t i = 0; i < left.size(); ++i) {
-                if (!left[i].empty()) {
+                if (settings.getSettingByName<bool>("showBg")->value && !left[i].empty()) {
                     float lineWidth = FlarialGUI::getFlarialTextSize(
                         String::StrToWStr(left[i]).c_str(),
                         30.0f, textHeight / 3.0f,
@@ -325,9 +333,9 @@ public:
                     ).x;
                     FlarialGUI::RoundedRect(
                         0.0f, leftYoffset - yPadding,
-                        D2D_COLOR_F(0, 0, 0, 0.5f),
+                        bgColor,
                         lineWidth, textHeight / 3.0f + yPadding * 2,
-                        0, 0
+                        rounding, rounding
                     );
                 }
                 FlarialGUI::FlarialTextWithFont(
@@ -345,7 +353,7 @@ public:
 
             int rightYoffset = 0.0f;
             for (size_t i = 0; i < right.size(); ++i) {
-                if (!right[i].empty()) {
+                if (settings.getSettingByName<bool>("showBg")->value && !right[i].empty()) {
                     float lineWidth = FlarialGUI::getFlarialTextSize(
                         String::StrToWStr(right[i]).c_str(),
                         30.0f, textHeight / 3.0f,
@@ -356,9 +364,9 @@ public:
                     ).x;
                     FlarialGUI::RoundedRect(
                         MC::windowSize.x - lineWidth, rightYoffset - yPadding,
-                        D2D_COLOR_F(0, 0, 0, 0.5f),
+                        bgColor,
                         lineWidth, textHeight / 3.0f + yPadding * 2,
-                        0, 0
+                        rounding, rounding
                     );
                 }
                 FlarialGUI::FlarialTextWithFont(
@@ -381,9 +389,6 @@ public:
         if (this->isKeyPartOfKeybind(event.key)) {
             if (this->isKeybind(event.keys)) {
                 keybindActions[0]({});
-            }
-            else {
-                keybindActions[1]({});
             }
         }
     };
