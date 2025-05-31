@@ -2,246 +2,94 @@
 
 #include "../Module.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
-#include "../../Manager.hpp"
 #include "../../../Client.hpp"
-#include <vector>
-#include <string>
-#include <sstream>
-#include <iomanip>
-#include <windows.h>
-#include <intrin.h>
-#include <dxgi.h>
 #include "../../Utils/VersionUtils.hpp"
+#include <windows.h>
+#include <chrono>
+
 
 class JavaDebugMenu : public Module {
+
 private:
-    float lastFpsUpdate = 0.0f;
-    int frameCount = 0;
-    int fps = 0;
+    std::string lookingAt = "minecraft:empty";
     Vec3<float> PrevPos{};
-    std::string speed;
+    std::string speed = "0";
+    std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
 
+public:
 
-    ULONGLONG prevKernelTime = 0;
-    ULONGLONG prevUserTime = 0;
-    ULONGLONG prevIdleTime = 0;
-    float lastCpuUpdate = 0.0f;
-    float cpuUsage = 0.0f;
-
-
-    std::vector<float> ticks;
-    float lastTpsUpdate = 0.0f;
-    float tps = 0.0f;
-
-
-    time_t startTime;
-    float lastUptimeUpdate = 0.0f;
-    std::string uptime;
-
-
-    static std::string getBiome() {
-        if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->getBlockSource()) {
-            return "Unknown Biome";
-        }
-
-
-        Vec3<float>* pos = SDK::clientInstance->getLocalPlayer()->getPosition();
-        Vec3<int> blockPos(static_cast<int>(pos->x), static_cast<int>(pos->y), static_cast<int>(pos->z));
-
-
-        Biome* biome = SDK::clientInstance->getBlockSource()->getBiome(blockPos);
-        if (!biome) {
-            return "Unknown Biome";
-        }
-
-        // Try accessing the name field
-        try {
-            return "Unknown";
-        } catch (const std::exception& e) {
-            Logger::error("Failed to get biome name: {}", e.what());
-            return "Unknown Biome";
-        }
+    JavaDebugMenu() : Module("Java Debug Menu", "Displays Java-style debug information.\nSimilar to F3 menu in Minecraft Java Edition.",
+        IDR_F3_PNG, "") {
+        Module::setup();
     }
 
-
-    static std::pair<int, int> getLightLevel() {
-        if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return {0, 0};
-        return {15, 0}; // Placeholder
+    void onEnable() override {
+        Listen(this, SetupAndRenderEvent, &JavaDebugMenu::onSetupAndRender)
+        Listen(this, RenderEvent, &JavaDebugMenu::onRender)
+        Listen(this, TickEvent, &JavaDebugMenu::onTick)
+        Listen(this, KeyEvent, &JavaDebugMenu::onKey)
+            Module::onEnable();
     }
 
+    void onDisable() override {
+        Deafen(this, SetupAndRenderEvent, &JavaDebugMenu::onSetupAndRender)
+        Deafen(this, RenderEvent, &JavaDebugMenu::onRender)
+        Deafen(this, TickEvent, &JavaDebugMenu::onTick)
+        Deafen(this, KeyEvent, &JavaDebugMenu::onKey)
+            Module::onDisable();
+    }
 
-    static std::string getFacingDirection(float yaw, float pitch) {
+    void defaultConfig() override {
+        getKeybind();
+        Module::defaultConfig("core");
+        Module::defaultConfig("main");
+        if (settings.getSettingByName<bool>("textShadow") == nullptr) settings.addSetting("textShadow", false);
+        if (settings.getSettingByName<float>("textShadowOffset") == nullptr) settings.addSetting("textShadowOffset", 0.003f);
+        Module::defaultConfig("colors");
+    }
+
+    void settingsRender(float settingsOffset) override {
+
+        float x = Constraints::PercentageConstraint(0.019, "left");
+        float y = Constraints::PercentageConstraint(0.10, "top");
+
+        const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
+
+        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+            Constraints::RelativeConstraint(1.0, "width"),
+            Constraints::RelativeConstraint(0.88f, "height"));
+
+        this->addHeader("Main");
+        this->defaultAddSettings("main");
+        this->extraPadding();
+
+        this->addHeader("Text");
+        addToggle("Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
+        addConditionalSlider(settings.getSettingByName<bool>("textShadow")->value, "Shadow Offset", "How far the shadow will be.", settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
+        this->extraPadding();
+
+        this->addHeader("Colors");
+        this->defaultAddSettings("colors");
+        this->extraPadding();
+
+        FlarialGUI::UnsetScrollView();
+        this->resetPadding();
+    }
+
+    std::string getFacingDirection(LocalPlayer* player) {
+        auto rotationComponent = player->getActorRotationComponent();
+        yaw = rotationComponent->rot.y;
+        pitch = rotationComponent->rot.x;
         std::string direction;
         if (yaw >= -45 && yaw < 45) direction = "South";
         else if (yaw >= 45 && yaw < 135) direction = "West";
         else if (yaw >= 135 || yaw < -135) direction = "North";
         else direction = "East";
-        return direction + " (Yaw: " + std::to_string(static_cast<int>(yaw)) + ", Pitch: " + std::to_string(static_cast<int>(pitch)) + ")";
+        return std::format("Facing: {} ({:.1f} / {:.1f})", direction, yaw, pitch);
     }
 
-
-    static std::string getCoordinates() {
-        if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return "XYZ: 0.0 / 0.0 / 0.0";
-        Vec3<float> *position = SDK::clientInstance->getLocalPlayer()->getPosition();
-        std::string ln1 = std::format("XYZ: {:.1f} / {:.1f} / {:.1f}", position->x, position->y, position->z);
-        std::string ln2;
-        BlockSource* blocksrc = SDK::clientInstance->getBlockSource();
-        std::string dimName = std::string(blocksrc->getDimension()->getName().data());
-        if (dimName == "Nether") {
-            ln2 = std::format("Overworld: {:.1f} / {:.1f} / {:.1f}", position->x * 8.f, position->y, position->z * 8.f);
-        }
-        return ln1 + (ln2.empty() ? "" : "\n" + ln2);
-    }
-
-
-    void updateSpeed() {
-        if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) {
-            speed = "Speed: 0.00 m/s";
-            return;
-        }
-        auto stateVectorComponent = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent();
-        if (stateVectorComponent != nullptr) {
-            speed = std::format("Speed: {:.2f} m/s", stateVectorComponent->Pos.dist(PrevPos) * 20);
-            PrevPos = stateVectorComponent->Pos;
-        }
-    }
-
-
-    static std::string getLookingAt(bool advanced) {
-        if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return "";
-        if (!SDK::clientInstance->getLocalPlayer()->getLevel()) return "";
-        if (!SDK::clientInstance->getBlockSource()) return "";
-
-        HitResult result = SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult();
-        BlockPos pos = { result.blockPos.x, result.blockPos.y, result.blockPos.z };
-        BlockSource* blockSource = SDK::clientInstance->getBlockSource();
-
-        try {
-            BlockLegacy* block = blockSource->getBlock(pos)->getBlockLegacy();
-            if (!block) return "";
-            try {
-                if (!advanced) return "Looking at: " + block->getName();
-                else return "Looking at: " + block->getNamespace();
-            } catch (const std::exception& e) {
-                Logger::error("Failed to get block name: {}", e.what());
-                return "";
-            }
-        } catch (const std::exception& e) {
-            Logger::error("Failed to get block: {}", e.what());
-            return "";
-        }
-    }
-
-
-    static std::string getWeatherState() {
-        if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || !SDK::clientInstance->getBlockSource()) {
-            return "Weather: Unknown";
-        }
-
-        auto dimension = SDK::clientInstance->getBlockSource()->getDimension();
-        if (!dimension || !dimension->weather) return "Weather: Unknown";
-
-
-        Vec3<float>* pos = SDK::clientInstance->getLocalPlayer()->getPosition();
-        Vec3<int> blockPos(static_cast<int>(pos->x), static_cast<int>(pos->y), static_cast<int>(pos->z));
-        Biome* biome = SDK::clientInstance->getBlockSource()->getBiome(blockPos);
-        if (!biome) return "Weather: Unknown";
-
-
-        float rainLevel = dimension->weather->rainLevel;
-        float lightingLevel = dimension->weather->lightingLevel;
-        float temperature = biome->temparature;
-
-
-        std::string weatherStr = "Weather: ";
-
-        // Handle rain
-        if (rainLevel > 0.0f) {
-            std::string intensity = (rainLevel >= 0.8f) ? " (Heavy)" : (rainLevel <= 0.3f) ? " (Light)" : "";
-            weatherStr += "Rain" + intensity;
-        } else {
-            weatherStr += "Clear";
-        }
-
-        // Handle lighting (ambient darkness)
-        if (lightingLevel > 0.0f) {
-            std::string lightIntensity = (lightingLevel >= 0.8f) ? " (Dark)" : (lightingLevel <= 0.3f) ? " (Dim)" : "";
-            weatherStr += ", Lighting" + lightIntensity;
-        }
-
-        // Handle snow based on biome temperature
-        if (temperature <= 0.0f) {
-            // Map temperature (0.7 to 0.0) back to snow intensity (0.0 to 1.0)
-            float snowLevel = 1.0f - (temperature / 0.7f); // Inverse of WeatherChanger's mapping
-            snowLevel = std::clamp(snowLevel, 0.0f, 1.0f);
-            std::string snowIntensity = (snowLevel >= 0.8f) ? " (Heavy)" : (snowLevel <= 0.3f) ? " (Light)" : "";
-            weatherStr += ", Snow" + snowIntensity;
-        }
-
-        return weatherStr;
-    }
-
-    // Helper function to get local system time in HH:MM:SS AM/PM format
-    std::string getLocalTime() {
-        time_t now = std::time(nullptr);
-        struct tm* localTime = std::localtime(&now);
-        if (!localTime) return "Local Time: Unknown";
-
-        int hours = localTime->tm_hour;
-        int minutes = localTime->tm_min;
-        int seconds = localTime->tm_sec;
-        std::string period = hours >= 12 ? "PM" : "AM";
-        hours = hours % 12;
-        if (hours == 0) hours = 12; // Convert 0 to 12 for 12-hour clock
-        return std::format("Local Time: {:02d}:{:02d}:{:02d} {}", hours, minutes, seconds, period);
-    }
-
-    // Helper function to update and get TPS
-    void updateTPS() {
-        float currentTime = ImGui::GetTime();
-        ticks.push_back(currentTime);
-
-        // Remove ticks older than 0.99 seconds
-        while (!ticks.empty() && ticks.front() < currentTime - 0.99f) {
-            ticks.erase(ticks.begin());
-        }
-
-        // Update TPS every second
-        if (currentTime - lastTpsUpdate >= 1.0f) {
-            tps = static_cast<float>(ticks.size());
-            lastTpsUpdate = currentTime;
-        }
-    }
-
-    std::string getTPS() {
-        return std::format("TPS: {:.1f}", tps);
-    }
-
-    // Helper function to update and get uptime
-    std::string getUptime() {
-        time_t now = std::time(nullptr);
-        long long elapsed = static_cast<long long>(now - startTime);
-        int hours = elapsed / 3600;
-        int minutes = (elapsed % 3600) / 60;
-        int seconds = elapsed % 60;
-        return std::format("Uptime: {}h {}m {}s", hours, minutes, seconds);
-    }
-
-    // Helper function to get memory usage (split into available and used)
-    static std::pair<std::string, std::string> getMemoryInfo() {
-        MEMORYSTATUSEX memStatus;
-        memStatus.dwLength = sizeof(memStatus);
-        GlobalMemoryStatusEx(&memStatus);
-        double usedMemoryGB = static_cast<double>(memStatus.ullTotalPhys - memStatus.ullAvailPhys) / (1024 * 1024 * 1024);
-        double availableMemoryGB = static_cast<double>(memStatus.ullAvailPhys) / (1024 * 1024 * 1024);
-        return {
-            std::format("RAM Used: {:.2f} GB", usedMemoryGB),
-            std::format("RAM Available: {:.2f} GB", availableMemoryGB)
-        };
-    }
-
-    // Helper function to get CPU name
-    static std::string getCpuName() {
+    std::string getCPU() { // AI Slop
         int cpuInfo[4] = { -1 };
         char cpuBrand[0x40] = { 0 };
         __cpuid(cpuInfo, 0x80000002);
@@ -253,316 +101,281 @@ private:
         return std::string(cpuBrand);
     }
 
-    // Helper function to get CPU architecture
-    static std::string getCpuArchitecture() {
-        SYSTEM_INFO sysInfo;
-        GetSystemInfo(&sysInfo);
-        switch (sysInfo.wProcessorArchitecture) {
-        case PROCESSOR_ARCHITECTURE_AMD64: return "x64";
-        case PROCESSOR_ARCHITECTURE_ARM: return "ARM";
-        case PROCESSOR_ARCHITECTURE_ARM64: return "ARM64";
-        case PROCESSOR_ARCHITECTURE_INTEL: return "x86";
-        default: return "Unknown";
-        }
-    }
 
-    // Helper function to get CPU usage using Win32 API
-    void updateCpuUsage() {
-        FILETIME idleTime, kernelTime, userTime;
-        if (!GetSystemTimes(&idleTime, &kernelTime, &userTime)) {
-            Logger::error("Failed to get system times: {}", GetLastError());
-            cpuUsage = 0.0f;
-            return;
-        }
 
-        ULONGLONG currentIdle = (static_cast<ULONGLONG>(idleTime.dwHighDateTime) << 32) | idleTime.dwLowDateTime;
-        ULONGLONG currentKernel = (static_cast<ULONGLONG>(kernelTime.dwHighDateTime) << 32) | kernelTime.dwLowDateTime;
-        ULONGLONG currentUser = (static_cast<ULONGLONG>(userTime.dwHighDateTime) << 32) | userTime.dwLowDateTime;
-
-        if (prevKernelTime != 0 && prevUserTime != 0 && prevIdleTime != 0) {
-            ULONGLONG kernelDiff = currentKernel - prevKernelTime;
-            ULONGLONG userDiff = currentUser - prevUserTime;
-            ULONGLONG idleDiff = currentIdle - prevIdleTime;
-            ULONGLONG totalDiff = kernelDiff + userDiff + idleDiff;
-
-            if (totalDiff > 0) {
-                cpuUsage = static_cast<float>(kernelDiff + userDiff - idleDiff) / totalDiff * 100.0f;
-                cpuUsage = std::clamp(cpuUsage, 0.0f, 100.0f);
-            } else {
-                cpuUsage = 0.0f;
-            }
-        }
-
-        prevIdleTime = currentIdle;
-        prevKernelTime = currentKernel;
-        prevUserTime = currentUser;
-    }
-
-    std::string getCpuUsage() {
-        return std::format("CPU Usage: {:.1f}%", cpuUsage);
-    }
-
-public:
-    JavaDebugMenu() : Module("Java Debug Menu", "Displays Java-style debug information.\nSimilar to F3 menu in Minecraft Java Edition.",
-        IDR_F3_PNG, "F3") {
-        Module::setup();
-        // Initialize CPU usage tracking
-        lastCpuUpdate = ImGui::GetTime();
-        updateCpuUsage(); // Get initial times
-        // Initialize uptime
-        startTime = std::time(nullptr);
-        lastUptimeUpdate = ImGui::GetTime();
-        // Initialize TPS
-        lastTpsUpdate = ImGui::GetTime();
-    }
-
-    void onEnable() override {
-        Listen(this, RenderEvent, &JavaDebugMenu::onRender);
-        Listen(this, KeyEvent, &JavaDebugMenu::onKey);
-        Listen(this, TickEvent, &JavaDebugMenu::onTick);
-        Module::onEnable();
-    }
-
-    void onDisable() override {
-        Deafen(this, RenderEvent, &JavaDebugMenu::onRender);
-        Deafen(this, KeyEvent, &JavaDebugMenu::onKey);
-        Deafen(this, TickEvent, &JavaDebugMenu::onTick);
-        Module::onDisable();
-    }
-
-    void defaultConfig() override {
-        Module::defaultConfig();
-        if (settings.getSettingByName<float>("textSize") == nullptr) settings.addSetting<float>("textSize", 0.3f);
-        if (settings.getSettingByName<bool>("showVersionInfo") == nullptr) settings.addSetting<bool>("showVersionInfo", true);
-        if (settings.getSettingByName<bool>("showFPS") == nullptr) settings.addSetting<bool>("showFPS", true);
-        if (settings.getSettingByName<bool>("showDimension") == nullptr) settings.addSetting<bool>("showDimension", true);
-        if (settings.getSettingByName<bool>("showCoords") == nullptr) settings.addSetting<bool>("showCoords", true);
-        if (settings.getSettingByName<bool>("showSpeed") == nullptr) settings.addSetting<bool>("showSpeed", true);
-        if (settings.getSettingByName<bool>("showFacing") == nullptr) settings.addSetting<bool>("showFacing", true);
-        if (settings.getSettingByName<bool>("showLookingAt") == nullptr) settings.addSetting<bool>("showLookingAt", true);
-        if (settings.getSettingByName<bool>("showAdvancedLookingAt") == nullptr) settings.addSetting<bool>("showAdvancedLookingAt", false);
-        if (settings.getSettingByName<bool>("showBiome") == nullptr) settings.addSetting<bool>("showBiome", true);
-        if (settings.getSettingByName<bool>("showLight") == nullptr) settings.addSetting<bool>("showLight", true);
-        if (settings.getSettingByName<bool>("showWeather") == nullptr) settings.addSetting<bool>("showWeather", true);
-        if (settings.getSettingByName<bool>("showLocalTime") == nullptr) settings.addSetting<bool>("showLocalTime", true);
-        if (settings.getSettingByName<bool>("showTPS") == nullptr) settings.addSetting<bool>("showTPS", true);
-        if (settings.getSettingByName<bool>("showUptime") == nullptr) settings.addSetting<bool>("showUptime", true);
-    }
-
-    void settingsRender(float settingsOffset) override {
-        float x = Constraints::PercentageConstraint(0.019, "left");
-        float y = Constraints::PercentageConstraint(0.10, "top");
-
-        const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
-
-        FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-        FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-            Constraints::RelativeConstraint(1.0, "width"),
-            Constraints::RelativeConstraint(0.88f, "height"));
-
-        this->addHeader("Debug Menu");
-        this->addSlider("Text Size", "", this->settings.getSettingByName<float>("textSize")->value, 5.0f, 0.1f, false);
-        this->addToggle("Show Version Info", "", this->settings.getSettingByName<bool>("showVersionInfo")->value);
-        this->addToggle("Show FPS", "", this->settings.getSettingByName<bool>("showFPS")->value);
-        this->addToggle("Show Dimension", "", this->settings.getSettingByName<bool>("showDimension")->value);
-        this->addToggle("Show Coordinates", "", this->settings.getSettingByName<bool>("showCoords")->value);
-        this->addToggle("Show Speed", "", this->settings.getSettingByName<bool>("showSpeed")->value);
-        this->addToggle("Show Facing", "", this->settings.getSettingByName<bool>("showFacing")->value);
-        this->addToggle("Show Looking At", "", this->settings.getSettingByName<bool>("showLookingAt")->value);
-        this->addToggle("Show Advanced Looking At", "Show block namespace", this->settings.getSettingByName<bool>("showAdvancedLookingAt")->value);
-        this->addToggle("Show Biome", "", this->settings.getSettingByName<bool>("showBiome")->value);
-        this->addToggle("Show Light Level", "", this->settings.getSettingByName<bool>("showLight")->value);
-        this->addToggle("Show Weather", "", this->settings.getSettingByName<bool>("showWeather")->value);
-        this->addToggle("Show TPS", "", this->settings.getSettingByName<bool>("showTPS")->value);
-        this->addToggle("Show Uptime", "", this->settings.getSettingByName<bool>("showUptime")->value);
-        this->extraPadding();
-
-        this->addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
-        this->extraPadding();
-
-        FlarialGUI::UnsetScrollView();
-        this->resetPadding();
-    }
-
-    void normalRender(int index, std::string& value) override {
-        // Calculate FPS
-        frameCount++;
-        float currentTime = ImGui::GetTime();
-        if (currentTime - lastFpsUpdate >= 1.0f) {
-            fps = frameCount;
-            frameCount = 0;
-            lastFpsUpdate = currentTime;
-        }
-
-        // Update CPU usage every second
-        if (currentTime - lastCpuUpdate >= 1.0f) {
-            updateCpuUsage();
-            lastCpuUpdate = currentTime;
-        }
-
-        // Update uptime every second
-        if (currentTime - lastUptimeUpdate >= 1.0f) {
-            uptime = getUptime();
-            lastUptimeUpdate = currentTime;
-        }
-
-        // Gather debug information
-        auto player = SDK::clientInstance->getLocalPlayer();
-        Vec3<float> *pos = player->getPosition();
+    std::string getDimensionName() {
         BlockSource* blocksrc = SDK::clientInstance->getBlockSource();
+        if (!blocksrc) {
+            return "Unknown dimension";
+        }
+        std::string dim = blocksrc->getDimension()->getName();
+        if (dim == "Overworld") {
+            return "minecraft:overworld";
+        }
+        else if (dim == "Nether") {
+            return "minecraft:nether";
+        }
+        else if (dim == "TheEnd") {
+            return "minecraft:the_end";
+        }
+        else {
+            return dim;
+        }
+    }
 
-        std::vector<std::string> leftDebugLines;
-        std::vector<std::string> rightDebugLines;
+    std::string getTime() {
+        const auto now = std::time(nullptr);
+        const std::tm calendarTime = localtime_xp(now);
 
-        // Left column: Minecraft details
-        if (settings.getSettingByName<bool>("showVersionInfo")->value) {
-            leftDebugLines.push_back("Flarial V2 Beta, Minecraft " + VersionUtils::getFormattedVersion());
+        std::string meridiem;
+        std::string seperator;
+
+        int hour = calendarTime.tm_hour;
+        int minute = calendarTime.tm_min;
+
+        if (hour - 12 < 0) {
+            meridiem = "AM";
         }
-        if (settings.getSettingByName<bool>("showFPS")->value) {
-            leftDebugLines.push_back("FPS: " + std::to_string(fps));
+        else if (hour == 0) {
+            hour = 12;
+            meridiem = "AM";
         }
-        if (settings.getSettingByName<bool>("showDimension")->value) {
-            leftDebugLines.push_back("Dimension: " + std::string(blocksrc->getDimension()->getName().data()));
+        else if (hour == 12) {
+            hour = 12;
+            meridiem = "PM";
         }
-        if (settings.getSettingByName<bool>("showCoords")->value) {
-            leftDebugLines.push_back(getCoordinates());
+        else {
+            meridiem = "PM";
+            hour -= 12;
         }
-        if (settings.getSettingByName<bool>("showSpeed")->value) {
-            leftDebugLines.push_back(speed);
+
+        seperator = minute < 10 ? ":0" : ":";
+
+        if (hour == 24) hour = 0;
+
+        return FlarialGUI::cached_to_string(hour) + seperator + FlarialGUI::cached_to_string(minute) + " " + meridiem;
+    }
+
+    std::string getFormattedTime(long long seconds) {
+        std::string text;
+        int days = seconds / 86400;
+        int hours = (seconds % 86400) / 3600;
+        int mins = (seconds % 3600) / 60;
+        int secs = seconds % 60;
+        if (days >= 1) {
+            text += std::format("{} days, ", days);
         }
-        if (settings.getSettingByName<bool>("showFacing")->value) {
-            float yaw = 0.0f, pitch = 0.0f;
-            auto rotationComponent = player->getActorRotationComponent();
-            if (rotationComponent) {
-                yaw = rotationComponent->rot.y;
-                pitch = rotationComponent->rot.x;
+        if (hours >= 1) {
+            text += std::format("{} hours, ", hours);
+        }
+        if (mins >= 1) {
+            text += std::format("{} mins, ", mins);
+        }
+        text += std::format("{} secs", secs);
+        return text;
+    }
+
+    void onTick(TickEvent& event) {
+        if (!SDK::clientInstance->getLocalPlayer())
+            return;
+        auto stateVectorComponent = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent();
+        if (stateVectorComponent != nullptr) {
+            speed = std::format("{:.2f}", stateVectorComponent->Pos.dist(PrevPos) * 20);
+            PrevPos = stateVectorComponent->Pos;
+        }
+    }
+
+    void onSetupAndRender(SetupAndRenderEvent& event) { // WAILA code
+        if (!SDK::clientInstance->getLocalPlayer()) return;
+        if (!SDK::clientInstance->getLocalPlayer()->getLevel()) return;
+        if (!SDK::clientInstance->getBlockSource()) return;
+        HitResult result = SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult();
+
+        BlockPos pos = { result.blockPos.x,
+                         result.blockPos.y ,
+                         result.blockPos.z };
+        BlockSource* blockSource = SDK::clientInstance->getBlockSource();
+        try {
+            BlockLegacy* block = blockSource->getBlock(pos)->getBlockLegacy();
+            if (!block) return;
+            try {
+                lookingAt = block->getNamespace() + ":" + block->getName();
             }
-            leftDebugLines.push_back("Facing: " + getFacingDirection(yaw, pitch));
+            catch (const std::exception& e) { Logger::error("Failed to get block name: {}", e.what()); }
         }
-        if (settings.getSettingByName<bool>("showLookingAt")->value) {
-            bool advanced = settings.getSettingByName<bool>("showAdvancedLookingAt")->value;
-            std::string lookingAt = getLookingAt(advanced);
-            if (!lookingAt.empty()) leftDebugLines.push_back(lookingAt);
-        }
-        if (settings.getSettingByName<bool>("showBiome")->value) {
-            leftDebugLines.push_back("Biome: " + getBiome());
-        }
-        if (settings.getSettingByName<bool>("showLight")->value) {
-            auto [blockLight, skyLight] = getLightLevel();
-            leftDebugLines.push_back("Light: " + std::to_string(blockLight) + " (Block), " + std::to_string(skyLight) + " (Sky)");
-        }
-        if (settings.getSettingByName<bool>("showWeather")->value) {
-            leftDebugLines.push_back(getWeatherState());
-        }
-        if (settings.getSettingByName<bool>("showTPS")->value) {
-            leftDebugLines.push_back(getTPS());
-        }
-        if (settings.getSettingByName<bool>("showUptime")->value) {
-            leftDebugLines.push_back(uptime);
-        }
-
-        // Right column: System info (always render)
-        auto [used, available] = getMemoryInfo();
-        rightDebugLines.push_back(used);
-        rightDebugLines.push_back(available);
-        std::string cpuUsageStr = getCpuUsage();
-        std::string cpuName = "CPU: " + getCpuName();
-        std::string cpuArch = getCpuArchitecture();
-        std::string gpuName = MC::GPU;
-        rightDebugLines.push_back(cpuUsageStr);
-        rightDebugLines.push_back(cpuName);
-        rightDebugLines.push_back(cpuArch);
-        rightDebugLines.push_back(gpuName);
-
-        const float uiscale = 0.5f;
-        const float textsize = this->settings.getSettingByName<float>("textSize")->value;
-        const float textspacing = 0.2f;
-        float fontSize = Constraints::RelativeConstraint(textsize * uiscale, "height", true);
-        float padding = Constraints::SpacingConstraint(0.2f, fontSize);
-        float lineHeight = fontSize * textspacing;
-
-        float posXLeft = padding;  // Default to a small padding from the left edge
-        float posYLeft = padding;  // Default to a small padding from the top edge
-        float posXRight = MC::windowSize.x - 300.0f - padding;
-        float posYRight = posYLeft;
-
-        D2D1_COLOR_F textColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-        // Left column: Render Minecraft details as plain text
-        float yOffsetBaseLeft = posYLeft;
-        for (const auto& line : leftDebugLines) {
-            std::vector<std::string> splitLines;
-            size_t pos = 0;
-            std::string delim = "\n";
-            std::string text = line;
-            while ((pos = text.find(delim)) != std::string::npos) {
-                splitLines.push_back(text.substr(0, pos));
-                text.erase(0, pos + delim.length());
-            }
-            if (!text.empty()) splitLines.push_back(text);
-
-            for (const auto& splitLine : splitLines) {
-                FlarialGUI::FlarialTextWithFont(
-                    posXLeft,
-                    yOffsetBaseLeft,
-                    String::StrToWStr(splitLine).c_str(),
-                    300.0f, // Width for wrapping (arbitrary since no background)
-                    lineHeight,
-                    DWRITE_TEXT_ALIGNMENT_LEADING,
-                    fontSize,
-                    DWRITE_FONT_WEIGHT_NORMAL,
-                    textColor,
-                    true
-                );
-                yOffsetBaseLeft += lineHeight;
-            }
-        }
-
-        // Right column: Render system info as plain text
-        float yOffsetBaseRight = posYRight;
-        for (const auto& line : rightDebugLines) {
-            std::vector<std::string> splitLines;
-            size_t pos = 0;
-            std::string delim = "\n";
-            std::string text = line;
-            while ((pos = text.find(delim)) != std::string::npos) {
-                splitLines.push_back(text.substr(0, pos));
-                text.erase(0, pos + delim.length());
-            }
-            if (!text.empty()) splitLines.push_back(text);
-
-            for (const auto& splitLine : splitLines) {
-                FlarialGUI::FlarialTextWithFont(
-                    posXRight,
-                    yOffsetBaseRight,
-                    String::StrToWStr(splitLine).c_str(),
-                    300.0f, // Width for wrapping (arbitrary since no background)
-                    lineHeight,
-                    DWRITE_TEXT_ALIGNMENT_TRAILING,
-                    fontSize,
-                    DWRITE_FONT_WEIGHT_NORMAL,
-                    textColor,
-                    true
-                );
-                yOffsetBaseRight += lineHeight;
-            }
+        catch (const std::exception& e) {
+            Logger::error("Failed to get block: {}", e.what());
         }
     }
 
     void onRender(RenderEvent& event) {
-        std::string text;
-        this->normalRender(20, text);
-    }
+        if (SDK::clientInstance->getScreenName() == "hud_screen") {
 
-    void onTick(TickEvent& event) {
-        updateSpeed();
-        updateTPS();
-    }
+            float textHeight = Constraints::RelativeConstraint(0.1f * settings.getSettingByName<float>("uiscale")->value);
+            float textSize = Constraints::SpacingConstraint(2.0f, textHeight);
+            float yPadding = Constraints::SpacingConstraint(0.025f, textHeight);
+            D2D1_COLOR_F textColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textColor")->value);
 
-    void onKey(KeyEvent& event) {
-        if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
-            keybindActions[0]({});
+            LocalPlayer* player = SDK::clientInstance->getLocalPlayer();
+            BlockPos targetPos = { 0, 0, 0 };
+
+            std::vector<std::string> left;
+            std::vector<std::string> right;
+
+            left.emplace_back(std::format("Flarial V2 Open Beta, Minecraft {}", VersionUtils::getFormattedVersion()));
+            left.emplace_back(std::format("{} FPS", MC::fps));
+
+            left.emplace_back("");
+
+            if (player) {
+                left.emplace_back(std::format("E: {}", player->getLevel()->getRuntimeActorList().size()));
+                left.emplace_back(getDimensionName());
+            }
+            else {
+                left.emplace_back("E: -1");
+                left.emplace_back("Dimension: Unknown dimension");
+            }
+
+            left.emplace_back("");
+
+            if (player) {
+                Vec3<float> pos = *player->getPosition();
+                left.emplace_back(std::format("XYZ: {:.1f} / {:.1f} / {:.1f}", pos.x, pos.y, pos.z));
+                Vec3<int> blockPos(static_cast<int>(pos.x), static_cast<int>(pos.y), static_cast<int>(pos.z));
+                left.emplace_back(std::format("Block: {} {} {}", blockPos.x, blockPos.y, blockPos.z));
+                left.emplace_back(std::format("Chunk: {} {} {}", static_cast<int>(pos.x / 16), static_cast<int>(pos.y / 16), static_cast<int>(pos.z / 16)));
+                left.emplace_back(std::format("Chunk Coordinate: {} {}", static_cast<int>(pos.x) % 16, static_cast<int>(pos.y) % 16));
+                left.emplace_back(getFacingDirection(player));
+                left.emplace_back("");
+                HitResult target = player->getLevel()->getHitResult();
+                targetPos = { target.blockPos.x, target.blockPos.y, target.blockPos.z };
+                left.emplace_back(std::format("Looking at block: {} {} {}", targetPos.x, targetPos.y, targetPos.z));
+            }
+            else {
+                left.emplace_back("XYZ: 0 / 0 / 0");
+                left.emplace_back("Block: 0 0 0");
+                left.emplace_back("Chunk: 0 0 0");
+                left.emplace_back("Chunk Coordinate: 0 0");
+                left.emplace_back("Facing: nil (0 / 0)");
+                left.emplace_back("");
+                left.emplace_back("Looking at block: 0 0 0");
+            }
+
+
+            right.emplace_back("64bit");
+            MEMORYSTATUSEX memory_status;
+            memory_status.dwLength = sizeof(memory_status);
+            GlobalMemoryStatusEx(&memory_status);
+            int total_memory = static_cast<int>(memory_status.ullTotalPhys / 1000000);
+            int free_memory = static_cast<int>(memory_status.ullAvailPhys / 1000000);
+            int used_memory = total_memory - free_memory;
+            right.emplace_back(std::format("Mem: {}% {}/{} MB", static_cast<int>((used_memory * 100) / total_memory), used_memory, total_memory));
+
+            right.emplace_back("");
+
+            std::string cpuName = getCPU();
+            if (!cpuName.empty()) {
+                right.emplace_back(std::format("CPU: {}", getCPU()));
+            }
+            else {
+                right.emplace_back("CPU: Unknown");
+            }
+
+            right.emplace_back("");
+
+            right.emplace_back(std::format("Display: {}x{}", MC::windowSize.x, MC::windowSize.y));
+            if (!MC::GPU.empty()) {
+                right.emplace_back(MC::GPU);
+            }
+            else {
+                right.emplace_back("Unknown GPU");
+            }
+
+            right.emplace_back("");
+
+            right.emplace_back("Targetted Block");
+            right.emplace_back(lookingAt);
+
+            right.emplace_back("");
+
+            right.emplace_back(std::format("Local Time: {}", getTime()));
+            right.emplace_back(std::format("CPU Uptime: {}", getFormattedTime(static_cast<long long>(GetTickCount64() / 1000))));
+            right.emplace_back(std::format("Minecraft Uptime: {}", getFormattedTime(
+                static_cast<long long>(
+                    std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startTime).count()
+                ) / 1000
+            )));
+
+            right.emplace_back("");
+
+            right.emplace_back(std::format("Speed: {} blocks/s", speed));
+
+
+            int leftYoffset = 0.0f;
+            for (size_t i = 0; i < left.size(); ++i) {
+                if (!left[i].empty()) {
+                    float lineWidth = FlarialGUI::getFlarialTextSize(
+                        String::StrToWStr(left[i]).c_str(),
+                        30.0f, textHeight / 3.0f,
+                        DWRITE_TEXT_ALIGNMENT_LEADING,
+                        textSize,
+                        DWRITE_FONT_WEIGHT_NORMAL,
+                        true
+                    ).x;
+                    FlarialGUI::RoundedRect(
+                        0.0f, leftYoffset - yPadding,
+                        D2D_COLOR_F(0, 0, 0, 0.5f),
+                        lineWidth, textHeight / 3.0f + yPadding * 2,
+                        0, 0
+                    );
+                }
+                FlarialGUI::FlarialTextWithFont(
+                    0.0f,  leftYoffset,
+                    String::StrToWStr(left[i]).c_str(),
+                    30.0f, textHeight / 3.0f,
+                    DWRITE_TEXT_ALIGNMENT_LEADING,
+                    textSize,
+                    DWRITE_FONT_WEIGHT_NORMAL,
+                    textColor,
+                    true
+                );
+                leftYoffset += textHeight / 3.0f + yPadding * 2;
+            }
+
+            int rightYoffset = 0.0f;
+            for (size_t i = 0; i < right.size(); ++i) {
+                if (!right[i].empty()) {
+                    float lineWidth = FlarialGUI::getFlarialTextSize(
+                        String::StrToWStr(right[i]).c_str(),
+                        30.0f, textHeight / 3.0f,
+                        DWRITE_TEXT_ALIGNMENT_TRAILING,
+                        textSize,
+                        DWRITE_FONT_WEIGHT_NORMAL,
+                        true
+                    ).x;
+                    FlarialGUI::RoundedRect(
+                        MC::windowSize.x - lineWidth, rightYoffset - yPadding,
+                        D2D_COLOR_F(0, 0, 0, 0.5f),
+                        lineWidth, textHeight / 3.0f + yPadding * 2,
+                        0, 0
+                    );
+                }
+                FlarialGUI::FlarialTextWithFont(
+                    MC::windowSize.x - 30.0f,  rightYoffset,
+                    String::StrToWStr(right[i]).c_str(),
+                    30.0f, textHeight / 3.0f,
+                    DWRITE_TEXT_ALIGNMENT_TRAILING,
+                    textSize,
+                    DWRITE_FONT_WEIGHT_NORMAL,
+                    textColor,
+                    true
+                );
+                rightYoffset += textHeight / 3.0f + yPadding * 2;
+            }
+
         }
-        if (!this->isKeybind(event.keys)) this->active = false;
     }
+
+    void onKey(KeyEvent& event) {}
+
 };
