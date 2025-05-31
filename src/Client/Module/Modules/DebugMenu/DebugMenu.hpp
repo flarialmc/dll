@@ -19,7 +19,7 @@ private:
 public:
 
     JavaDebugMenu() : Module("Java Debug Menu", "Displays Java-style debug information.\nSimilar to F3 menu in Minecraft Java Edition.",
-        IDR_F3_PNG, "") {
+        IDR_F3_PNG, "F3") {
         Module::setup();
     }
 
@@ -61,6 +61,7 @@ public:
             Constraints::RelativeConstraint(0.88f, "height"));
 
         this->addHeader("Main");
+        addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
         this->defaultAddSettings("main");
         this->extraPadding();
 
@@ -209,7 +210,7 @@ public:
     }
 
     void onRender(RenderEvent& event) {
-        if (SDK::clientInstance->getScreenName() == "hud_screen") {
+        if (this->active && SDK::clientInstance->getScreenName() == "hud_screen") {
 
             float textHeight = Constraints::RelativeConstraint(0.1f * settings.getSettingByName<float>("uiscale")->value);
             float textSize = Constraints::SpacingConstraint(2.0f, textHeight);
@@ -376,6 +377,15 @@ public:
         }
     }
 
-    void onKey(KeyEvent& event) {}
+    void onKey(KeyEvent& event) {
+        if (this->isKeyPartOfKeybind(event.key)) {
+            if (this->isKeybind(event.keys)) {
+                keybindActions[0]({});
+            }
+            else {
+                keybindActions[1]({});
+            }
+        }
+    };
 
 };
