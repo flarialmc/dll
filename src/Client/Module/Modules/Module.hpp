@@ -62,7 +62,7 @@ public:
     std::vector<float> conditionalTextBoxAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
     std::vector<float> conditionalColorPickerAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
 
-    std::vector<DWRITE_TEXT_ALIGNMENT> prevAlignments = std::vector<DWRITE_TEXT_ALIGNMENT>(100);
+    std::vector<DWRITE_TEXT_ALIGNMENT> prevAlignments = std::vector<DWRITE_TEXT_ALIGNMENT>(100, DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
 
     int dropdownIndex = 0;
     int textboxIndex = 300;

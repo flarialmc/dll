@@ -56,6 +56,8 @@ void Module::normalRenderCore(int index, std::string& text) {
 	if (settingperc.x != 0) realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x), settingperc.y * (MC::windowSize.y));
 	else realcenter = Constraints::CenterConstraint(rectWidth, rectHeight);
 
+	if (prevAlignments[index] == DWRITE_TEXT_ALIGNMENT_JUSTIFIED) prevAlignments[index] = alignment;
+
 	if (prevAlignments[index] != alignment) {
 		float toAdjust;
 		if (prevAlignments[index] == DWRITE_TEXT_ALIGNMENT_CENTER) {
