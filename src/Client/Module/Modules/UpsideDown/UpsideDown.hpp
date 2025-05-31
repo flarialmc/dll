@@ -25,5 +25,9 @@ public:
         fov = 360 - fov;
         event.setFOV(fov);
     }
+
+    void defaultConfig() override {
+        Module::defaultConfig("core");
+    }
 };
 

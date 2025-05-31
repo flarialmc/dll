@@ -32,7 +32,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<bool>("horizontal") == nullptr) settings.addSetting("horizontal", true);
 		if (settings.getSettingByName<bool>("vertical") == nullptr) settings.addSetting("vertical", false);
 	}
@@ -50,13 +50,13 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Misc");
-		this->addToggle("Vertical Nulling", "W & S keys", settings.getSettingByName<bool>("vertical")->value);
-		this->addToggle("Horizontal Nulling", "A & D keys", settings.getSettingByName<bool>("horizontal")->value);
+		addHeader("Misc");
+		addToggle("Vertical Nulling", "W & S keys", settings.getSettingByName<bool>("vertical")->value);
+		addToggle("Horizontal Nulling", "A & D keys", settings.getSettingByName<bool>("horizontal")->value);
 
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 
 	}
 

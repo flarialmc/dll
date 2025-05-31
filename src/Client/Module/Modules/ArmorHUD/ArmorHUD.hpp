@@ -37,11 +37,10 @@ public:
 	}
 
 	void defaultConfig() override {
+		Module::defaultConfig("core");
+		Module::defaultConfig("pos");
 		if (settings.getSettingByName<float>("textSize") == nullptr) settings.addSetting("textSize", 0.05f);
-		if (settings.getSettingByName<bool>("textShadow") == nullptr)  settings.addSetting("textShadow", true);
 		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 1.0f);
-		if (settings.getSettingByName<float>("percentageX") == nullptr) settings.addSetting("percentageX", 0.0f);
-		if (settings.getSettingByName<float>("percentageY") == nullptr) settings.addSetting("percentageY", 0.0f);
 
 		if (settings.getSettingByName<bool>("show_offhand") == nullptr) settings.addSetting("show_offhand", true);
 		if (settings.getSettingByName<bool>("vertical") == nullptr) settings.addSetting("vertical", false);
@@ -63,6 +62,11 @@ public:
 		if (settings.getSettingByName<bool>("specialMaxDurBarColor_rgb") == nullptr) settings.addSetting("specialMaxDurBarColor_rgb", false);
 
 		if (settings.getSettingByName<bool>("textShadow") == nullptr) settings.addSetting("textShadow", true);
+		if (settings.getSettingByName<bool>("textShadowOffset") == nullptr) settings.addSetting("textShadowOffset", 0.003f);
+
+		if (settings.getSettingByName<std::string>("textShadowCol") == nullptr) settings.addSetting("textShadowCol", (std::string)"00000");
+		if (settings.getSettingByName<float>("textShadowOpacity") == nullptr) settings.addSetting("textShadowOpacity", 0.55f);
+		if (settings.getSettingByName<bool>("textShadowRGB") == nullptr) settings.addSetting("textShadowRGB", false);
 
 		if (settings.getSettingByName<bool>("fillGaps") == nullptr) settings.addSetting("fillGaps", true);
 
@@ -84,8 +88,6 @@ public:
 
 		if (settings.getSettingByName<float>("100color") == nullptr) settings.addSetting("100color", 120.f);
 		if (settings.getSettingByName<float>("0color") == nullptr) settings.addSetting("0color", 0.f);
-
-		Module::defaultConfig();
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -100,47 +102,47 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Main");
-		this->addSlider("Size", "", this->settings.getSettingByName<float>("uiscale")->value, 5.f, 0.f, true);
-		this->addSlider("Spacing", "", this->settings.getSettingByName<float>("spacing")->value, 10.f, 0.f, true);
-		this->addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", this->settings.getSettingByName<bool>("vertical")->value);
-		this->addConditionalToggle(this->settings.getSettingByName<bool>("vertical")->value, "Durability to the left", "", this->settings.getSettingByName<bool>("durability_left")->value);
-		this->addToggle("Show offhand item", "", this->settings.getSettingByName<bool>("show_offhand")->value);
-		this->addToggle("Fill Empty Slots", "Fill gaps when a piece of armor isn't equipped", this->settings.getSettingByName<bool>("fillGaps")->value);
-		this->addToggle("Change Color", "", this->settings.getSettingByName<bool>("color")->value);
+		addHeader("Armor HUD");
+		addSlider("Size", "", settings.getSettingByName<float>("uiscale")->value, 5.f, 0.f, true);
+		addSlider("Spacing", "", settings.getSettingByName<float>("spacing")->value, 10.f, 0.f, true);
+		addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", settings.getSettingByName<bool>("vertical")->value);
+		addConditionalToggle(settings.getSettingByName<bool>("vertical")->value, "Durability to the left", "", settings.getSettingByName<bool>("durability_left")->value);
+		addToggle("Show offhand item", "", settings.getSettingByName<bool>("show_offhand")->value);
+		addToggle("Fill Empty Slots", "Fill gaps when a piece of armor isn't equipped", settings.getSettingByName<bool>("fillGaps")->value);
+		addToggle("Change Color", "", settings.getSettingByName<bool>("color")->value);
 
-		this->extraPadding();
+		extraPadding();
 
-		this->addHeader("Durability");
-		this->addToggle("Durability Text", "", this->settings.getSettingByName<bool>("showdurability")->value);
-		this->addConditionalSlider(this->settings.getSettingByName<bool>("showdurability")->value && this->settings.getSettingByName<bool>("vertical")->value, "Text Offset X", "", this->settings.getSettingByName<float>("textOffsetX")->value, 50.f, 0.0f, false);
-		this->addConditionalSlider(this->settings.getSettingByName<bool>("showdurability")->value && !this->settings.getSettingByName<bool>("vertical")->value, "Text Offset Y", "", this->settings.getSettingByName<float>("textOffsetY")->value, 50.f, 0.0f, false);
-		this->addConditionalSlider(this->settings.getSettingByName<bool>("showdurability")->value, "Text Size", "", this->settings.getSettingByName<float>("textSize")->value, 0.25f, 0.0f, true);
-		this->addConditionalToggle(this->settings.getSettingByName<bool>("showdurability")->value, "Show Durability in %", "", this->settings.getSettingByName<bool>("percent")->value);
-		this->addConditionalToggle(this->settings.getSettingByName<bool>("showdurability")->value && !this->settings.getSettingByName<bool>("percent")->value, "Hide Max Durability Text", "", this->settings.getSettingByName<bool>("hideMaxDurText")->value);
-		this->addConditionalToggle(this->settings.getSettingByName<bool>("showdurability")->value, "Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
-		this->addConditionalSlider(this->settings.getSettingByName<bool>("showdurability")->value && this->settings.getSettingByName<bool>("textShadow")->value, "Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
-		
-		this->addToggle("Durability Bar", "", this->settings.getSettingByName<bool>("showDurBar")->value);
-		this->addConditionalSlider(this->settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Offset X", "", this->settings.getSettingByName<float>("durBarOffsetX")->value, 50.f, 0.0f, false);
-		this->addConditionalSlider(this->settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Offset Y", "", this->settings.getSettingByName<float>("durBarOffsetY")->value, 50.f, 0.0f, false);
-		this->addConditionalSlider(this->settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Opacity", "", this->settings.getSettingByName<float>("durBarOpacity")->value, 1.f, 0.0f, false);
-		this->addConditionalToggle(this->settings.getSettingByName<bool>("showDurBar")->value, "Show Max Durability Bar", "", this->settings.getSettingByName<bool>("showDurBarMax")->value);
+		addHeader("Durability");
+		addToggle("Durability Text", "", settings.getSettingByName<bool>("showdurability")->value);
+		addConditionalSlider(settings.getSettingByName<bool>("showdurability")->value && settings.getSettingByName<bool>("vertical")->value, "Text Offset X", "", settings.getSettingByName<float>("textOffsetX")->value, 50.f, 0.0f, false);
+		addConditionalSlider(settings.getSettingByName<bool>("showdurability")->value && !settings.getSettingByName<bool>("vertical")->value, "Text Offset Y", "", settings.getSettingByName<float>("textOffsetY")->value, 50.f, 0.0f, false);
+		addConditionalSlider(settings.getSettingByName<bool>("showdurability")->value, "Text Size", "", settings.getSettingByName<float>("textSize")->value, 0.25f, 0.0f, true);
+		addConditionalToggle(settings.getSettingByName<bool>("showdurability")->value, "Show Durability in %", "", settings.getSettingByName<bool>("percent")->value);
+		addConditionalToggle(settings.getSettingByName<bool>("showdurability")->value && !settings.getSettingByName<bool>("percent")->value, "Hide Max Durability Text", "", settings.getSettingByName<bool>("hideMaxDurText")->value);
+		addConditionalToggle(settings.getSettingByName<bool>("showdurability")->value, "Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
+		addConditionalSlider(settings.getSettingByName<bool>("showdurability")->value && settings.getSettingByName<bool>("textShadow")->value, "Shadow Offset", "How far the shadow will be.", settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
 
-		this->extraPadding();
-		this->addHeader("Colors");
-		this->addToggle("Show Special Max Durability Bar Color", "", this->settings.getSettingByName<bool>("showSpecialMaxDurBarCol")->value);
-		this->addConditionalColorPicker(this->settings.getSettingByName<bool>("showSpecialMaxDurBarCol")->value, "Special Max Durability Bar Color", "", settings.getSettingByName<std::string>("specialMaxDurBarColor")->value, settings.getSettingByName<float>("specialMaxDurBarColor_opacity")->value, settings.getSettingByName<bool>("specialMaxDurBarColor_rgb")->value);
-		this->addColorPicker("Normal Color", "", settings.getSettingByName<std::string>("colorMain")->value, settings.getSettingByName<float>("colorMain_opacity")->value, settings.getSettingByName<bool>("colorMain_rgb")->value);
-		this->addConditionalColorPicker(this->settings.getSettingByName<bool>("textShadow")->value, "Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value, settings.getSettingByName<float>("textShadowOpacity")->value, settings.getSettingByName<bool>("textShadowRGB")->value);
-		this->addToggle("Enable Static Durability Bar Color", "", this->settings.getSettingByName<bool>("showStaticDurBarColor")->value);
-		this->addConditionalColorPicker(this->settings.getSettingByName<bool>("showStaticDurBarColor")->value, "Static Durability Bar Color", "", settings.getSettingByName<std::string>("staticDurBarColor")->value, settings.getSettingByName<float>("staticDurBarColor_opacity")->value, settings.getSettingByName<bool>("staticDurBarColor_rgb")->value);
-		this->addConditionalToggle(this->settings.getSettingByName<bool>("showStaticDurBarColor")->value, "Override Special Max Durability Bar Color", "", this->settings.getSettingByName<bool>("overrideSpecialMaxDurBarCol")->value);
-		this->addConditionalSlider(!this->settings.getSettingByName<bool>("showStaticDurBarColor")->value, "100% Durability Bar Color", "Hue in degrees", this->settings.getSettingByName<float>("100color")->value, 360.f, 0.0f, false);
-		this->addConditionalSlider(!this->settings.getSettingByName<bool>("showStaticDurBarColor")->value, "0% Durability Bar Color", "Hue in degrees", this->settings.getSettingByName<float>("0color")->value, 360.f, 0.0f, false);
+		addToggle("Durability Bar", "", settings.getSettingByName<bool>("showDurBar")->value);
+		addConditionalSlider(settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Offset X", "", settings.getSettingByName<float>("durBarOffsetX")->value, 50.f, 0.0f, false);
+		addConditionalSlider(settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Offset Y", "", settings.getSettingByName<float>("durBarOffsetY")->value, 50.f, 0.0f, false);
+		addConditionalSlider(settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Opacity", "", settings.getSettingByName<float>("durBarOpacity")->value, 1.f, 0.0f, false);
+		addConditionalToggle(settings.getSettingByName<bool>("showDurBar")->value, "Show Max Durability Bar", "", settings.getSettingByName<bool>("showDurBarMax")->value);
+
+		extraPadding();
+		addHeader("Colors");
+		addToggle("Show Special Max Durability Bar Color", "", settings.getSettingByName<bool>("showSpecialMaxDurBarCol")->value);
+		addConditionalColorPicker(settings.getSettingByName<bool>("showSpecialMaxDurBarCol")->value, "Special Max Durability Bar Color", "", settings.getSettingByName<std::string>("specialMaxDurBarColor")->value, settings.getSettingByName<float>("specialMaxDurBarColor_opacity")->value, settings.getSettingByName<bool>("specialMaxDurBarColor_rgb")->value);
+		addColorPicker("Normal Color", "", settings.getSettingByName<std::string>("colorMain")->value, settings.getSettingByName<float>("colorMain_opacity")->value, settings.getSettingByName<bool>("colorMain_rgb")->value);
+		addConditionalColorPicker(settings.getSettingByName<bool>("textShadow")->value, "Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value, settings.getSettingByName<float>("textShadowOpacity")->value, settings.getSettingByName<bool>("textShadowRGB")->value);
+		addToggle("Enable Static Durability Bar Color", "", settings.getSettingByName<bool>("showStaticDurBarColor")->value);
+		addConditionalColorPicker(settings.getSettingByName<bool>("showStaticDurBarColor")->value, "Static Durability Bar Color", "", settings.getSettingByName<std::string>("staticDurBarColor")->value, settings.getSettingByName<float>("staticDurBarColor_opacity")->value, settings.getSettingByName<bool>("staticDurBarColor_rgb")->value);
+		addConditionalToggle(settings.getSettingByName<bool>("showStaticDurBarColor")->value, "Override Special Max Durability Bar Color", "", settings.getSettingByName<bool>("overrideSpecialMaxDurBarCol")->value);
+		addConditionalSlider(!settings.getSettingByName<bool>("showStaticDurBarColor")->value, "100% Durability Bar Color", "Hue in degrees", settings.getSettingByName<float>("100color")->value, 360.f, 0.0f, false);
+		addConditionalSlider(!settings.getSettingByName<bool>("showStaticDurBarColor")->value, "0% Durability Bar Color", "Hue in degrees", settings.getSettingByName<float>("0color")->value, 360.f, 0.0f, false);
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 	// TODO: Make it look better
@@ -248,8 +250,8 @@ public:
 										D2D_COLOR_F shadowCol = settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textShadowCol")->value);
 										shadowCol.a = settings.getSettingByName<float>("textShadowOpacity")->value;
 										FlarialGUI::FlarialTextWithFont(
-											textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
-											textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
+											textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
+											textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
 											widecstr,
 											vertical ? 0 : 16 * uiscale * guiscale,
 											vertical ? 16 * uiscale * guiscale : 0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
@@ -338,8 +340,8 @@ public:
 									D2D_COLOR_F shadowCol = settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textShadowCol")->value);
 									shadowCol.a = settings.getSettingByName<float>("textShadowOpacity")->value;
 									FlarialGUI::FlarialTextWithFont(
-										textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
-										textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
+										textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
+										textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
 										widecstr,
 										vertical ? 0 : 16 * uiscale * guiscale,
 										vertical ? 16 * uiscale * guiscale : 0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
@@ -426,8 +428,8 @@ public:
 										D2D_COLOR_F shadowCol = settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textShadowCol")->value);
 										shadowCol.a = settings.getSettingByName<float>("textShadowOpacity")->value;
 										FlarialGUI::FlarialTextWithFont(
-											textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
-											textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
+											textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
+											textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
 											widecstr,
 											vertical ? 0 : 16 * uiscale * guiscale,
 											vertical ? 16 * uiscale * guiscale : 0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,

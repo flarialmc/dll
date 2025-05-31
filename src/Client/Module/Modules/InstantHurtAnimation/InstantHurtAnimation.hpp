@@ -26,7 +26,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<bool>("onlyWithArmor") == nullptr) settings.addSetting("onlyWithArmor", true);
 		if (settings.getSettingByName<bool>("tryToExcludeTeam") == nullptr) settings.addSetting("tryToExcludeTeam", true);
 	}
@@ -42,13 +42,13 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Settings");
-		this->addToggle("Try to exclude team", "", settings.getSettingByName<bool>("tryToExcludeTeam")->value);
-		this->addToggle("Only with armor", "", settings.getSettingByName<bool>("onlyWithArmor")->value);
+		addHeader("Instant Hurt Animation");
+		addToggle("Try to exclude team", "", settings.getSettingByName<bool>("tryToExcludeTeam")->value);
+		addToggle("Only with armor", "", settings.getSettingByName<bool>("onlyWithArmor")->value);
 
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 	}
 
 	void onPacketReceive(PacketEvent& event) {

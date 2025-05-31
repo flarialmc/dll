@@ -23,7 +23,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<bool>("req") == nullptr)settings.addSetting("req", true);
 		if (settings.getSettingByName<bool>("promomessage") == nullptr)settings.addSetting("promomessage", false);
 		if (settings.getSettingByName<bool>("join") == nullptr)settings.addSetting("join", false);
@@ -46,24 +46,22 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 
-		this->addHeader("Auto re queue");
-		this->addToggle("Auto re queue", "Requeue the same ranked/unranked duel after  the current one is over.", this->settings.getSettingByName<bool>("req")->value);
+		addHeader("Auto re queue");
+		addToggle("Auto re queue", "Requeue the same ranked/unranked duel after  the current one is over.", settings.getSettingByName<bool>("req")->value);
 
 
-		this->addHeader("Auto accept");
-		this->addToggle("Friend request", "Automatically accept incoming friend requests.", this->settings.getSettingByName<bool>("friendaccept")->value);
-		this->addToggle("duel request", "Automatically accept incoming duel requests.", this->settings.getSettingByName<bool>("duelaccept")->value);
+		addHeader("Auto accept");
+		addToggle("Friend request", "Automatically accept incoming friend requests.", settings.getSettingByName<bool>("friendaccept")->value);
+		addToggle("duel request", "Automatically accept incoming duel requests.", settings.getSettingByName<bool>("duelaccept")->value);
 
-		this->addHeader("Debloat chat");
-		this->addToggle("Promo message", "Removes all promo/info messages", this->settings.getSettingByName<bool>("promomessage")->value);
-		this->addToggle("player join", "Removes player join message", this->settings.getSettingByName<bool>("join")->value);
-		this->addToggle("player leave", "Removes player leave message", this->settings.getSettingByName<bool>("leave")->value);
-		this->addToggle("Kill streak", "Removes Message indicating a player has gotten a kill streak", this->settings.getSettingByName<bool>("killstreak")->value);
-
-
+		addHeader("Debloat chat");
+		addToggle("Promo message", "Removes all promo/info messages", settings.getSettingByName<bool>("promomessage")->value);
+		addToggle("player join", "Removes player join message", settings.getSettingByName<bool>("join")->value);
+		addToggle("player leave", "Removes player leave message", settings.getSettingByName<bool>("leave")->value);
+		addToggle("Kill streak", "Removes Message indicating a player has gotten a kill streak", settings.getSettingByName<bool>("killstreak")->value);
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 

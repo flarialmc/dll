@@ -26,7 +26,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<float>("fovvalue") == nullptr) settings.addSetting("fovvalue", 60.00f);
 		if (settings.getSettingByName<float>("fovaffectshand") == nullptr) settings.addSetting("fovaffectshand", false);
 
@@ -45,14 +45,13 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Misc");
-		this->addSlider("FOV Value", "", this->settings.getSettingByName<float>("fovvalue")->value, 359.0f,
-			0, false);
-		this->addToggle("Affect Hand Size", "Keep normal hand size or not.", this->settings.getSettingByName<bool>("fovaffectshand")->value);
+		addHeader("FOV Changer");
+		addSlider("FOV Value", "", settings.getSettingByName<float>("fovvalue")->value, 359.0f, 0, false);
+		addToggle("Affect Hand Size", "Keep normal hand size or not.", settings.getSettingByName<bool>("fovaffectshand")->value);
 
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 	}
 
 	void onGetFOV(FOVEvent& event) {

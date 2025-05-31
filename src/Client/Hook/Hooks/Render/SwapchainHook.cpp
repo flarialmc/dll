@@ -320,7 +320,7 @@ void SwapchainHook::DX12Init() {
         fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
         D3D11On12CreateDevice(device,
-                              D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
+                              D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
                               (IUnknown **) &queue, 1, 0, &SwapchainHook::d3d11Device, &context,
                               nullptr);
 
@@ -490,6 +490,7 @@ void SwapchainHook::DX11Render(bool underui) {
 void SwapchainHook::DX12Render(bool underui) {
     currentBitmap = (int) swapchain->GetCurrentBackBufferIndex();
 
+
     ID3D12Fence* fence;
 
     UINT64 fenceValue = 0;
@@ -500,12 +501,12 @@ void SwapchainHook::DX12Render(bool underui) {
 
     SaveBackbuffer();
     D2D::context->SetTarget(D2D1Bitmaps[currentBitmap]);
+    MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
     DX12Blur();
 
     D2D::context->BeginDraw();
 
-    MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
     DXGI_SWAP_CHAIN_DESC sdesc;
     swapchain->GetDesc(&sdesc);

@@ -20,10 +20,9 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value} Ping");
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
-
+		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value}ms");
+		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.8f);
+		Module::defaultConfig("all");
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -39,7 +38,7 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 
-		this->addHeader("Main");
+		this->addHeader("Ping Counter");
 		this->defaultAddSettings("main");
 		this->extraPadding();
 

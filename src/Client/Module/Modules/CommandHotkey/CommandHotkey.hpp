@@ -51,8 +51,8 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
-
+		getKeybind();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<std::string>("command") == nullptr) settings.addSetting("command", (std::string)"");
 	}
 
@@ -67,7 +67,7 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Function");
+		this->addHeader("Command Hotkey");
 		this->addButton("Add another Keybind", "Multi-Keybind command support!", "Add", [&] {
 
 			std::string keybindName = "keybind-" + FlarialGUI::cached_to_string(totalKeybinds);

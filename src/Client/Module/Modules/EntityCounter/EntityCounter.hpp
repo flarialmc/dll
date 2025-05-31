@@ -25,9 +25,9 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
 		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value} Entities");
 		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
+		Module::defaultConfig("all");
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -44,23 +44,23 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 
-		this->addHeader("Main");
-		this->defaultAddSettings("main");
-		this->extraPadding();
+		addHeader("Main");
+		defaultAddSettings("main");
+		extraPadding();
 
-        this->addHeader("Text");
-		this->defaultAddSettings("text");
-		this->extraPadding();
+		addHeader("Text");
+		defaultAddSettings("text");
+		extraPadding();
 
-		this->addHeader("Colors");
-		this->defaultAddSettings("colors");
-		this->extraPadding();
+		addHeader("Colors");
+		defaultAddSettings("colors");
+		extraPadding();
 
-		this->addHeader("Misc");
-		this->defaultAddSettings("misc");
+		addHeader("Misc");
+		defaultAddSettings("misc");
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 	void onSetupAndRender(SetupAndRenderEvent& event) {

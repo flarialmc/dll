@@ -27,7 +27,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<std::string>("map") == nullptr) settings.addSetting("map", (std::string)"");
 		if (settings.getSettingByName<bool>("ReQ") == nullptr) settings.addSetting("ReQ", true);
 		if (settings.getSettingByName<bool>("solo") == nullptr) settings.addSetting("solo", false);

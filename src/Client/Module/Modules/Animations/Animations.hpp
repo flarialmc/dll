@@ -25,13 +25,6 @@ public:
 			Module::onDisable();
 	}
 
-	void defaultConfig() override {
-		Module::defaultConfig();
-
-		if (settings.getSettingByName<float>("hotbarSpeed") == nullptr) settings.addSetting("hotbarSpeed", 7.0f);
-
-	}
-
 	inline static float animate(float endPoint, float current, float speed) {
 		if (speed < 0.0) speed = 0.0;
 		else if (speed > 1.0) speed = 1.0;
@@ -70,6 +63,11 @@ public:
 		}
 	}
 
+	void defaultConfig() override {
+		Module::defaultConfig("core");
+		if (settings.getSettingByName<float>("hotbarSpeed") == nullptr) settings.addSetting("hotbarSpeed", 7.f);
+	}
+
 	void settingsRender(float settingsOffset) override {
 
 		float x = Constraints::PercentageConstraint(0.019, "left");
@@ -83,11 +81,11 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Misc");
-		this->addResettableSlider("Hotbar Selected Slot Speed", "", "hotbarSpeed");
+		addHeader("Animations");
+		addSlider("Hotbar Selected Slot Speed", "", settings.getSettingByName<float>("hotbarSpeed")->value);
 
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 	}
 };

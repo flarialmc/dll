@@ -26,7 +26,8 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		getKeybind();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<bool>("status") == nullptr) settings.addSetting("status", false);
 		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
 		if (settings.getSettingByName<bool>("always") == nullptr)  settings.addSetting("always", false);
@@ -43,12 +44,11 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Misc");
-		this->addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
+		addHeader("Toggle Sneak");
+		addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
-
+		resetPadding();
 	}
 
 	bool toggleSneaking = false;

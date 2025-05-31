@@ -27,9 +27,8 @@ public:
 
 	void defaultConfig() override {
 		if (settings.getSettingByName<bool>("responsivewidth") == nullptr) settings.addSetting("responsivewidth", true);
-		Module::defaultConfig();
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value}");
 		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
+		Module::defaultConfig("all");
 		if (settings.getSettingByName<bool>("port") == nullptr) settings.addSetting("port", false);
 	}
 
@@ -46,24 +45,24 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 
-		this->addHeader("Main");
-		this->defaultAddSettings("main");
-		this->addToggle("Show Port", "", this->settings.getSettingByName<bool>("port")->value);
-		this->extraPadding();
+		addHeader("IP Display");
+		defaultAddSettings("main");
+		addToggle("Show Port", "", settings.getSettingByName<bool>("port")->value);
+		extraPadding();
 
-		this->addHeader("Text");
-		this->defaultAddSettings("text");
-		this->extraPadding();
+		addHeader("Text");
+		defaultAddSettings("text");
+		extraPadding();
 
-		this->addHeader("Colors");
-		this->defaultAddSettings("colors");
-		this->extraPadding();
+		addHeader("Colors");
+		defaultAddSettings("colors");
+		extraPadding();
 
-		this->addHeader("Misc");
-		this->defaultAddSettings("misc");
+		addHeader("Misc");
+		defaultAddSettings("misc");
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 	void onRender(RenderEvent& event) {

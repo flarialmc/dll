@@ -51,7 +51,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<bool>("chunkborders") == nullptr) settings.addSetting("chunkborders", false);
 		if (settings.getSettingByName<bool>("sky") == nullptr) settings.addSetting("sky", true);
 		if (settings.getSettingByName<bool>("weather") == nullptr) settings.addSetting("weather", true);
@@ -75,16 +75,16 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Settings");
-		this->addToggle("Chunk Borders", "", settings.getSettingByName<bool>("chunkborders")->value);
-		this->addToggle("Render Sky", "", settings.getSettingByName<bool>("sky")->value);
-		this->addToggle("Render Entities", "", settings.getSettingByName<bool>("entity")->value);
-		this->addToggle("Render Block Entities", "", settings.getSettingByName<bool>("blockentity")->value);
-		this->addToggle("Render Particles", "", settings.getSettingByName<bool>("particles")->value);
-		this->addToggle("Render Weather", "", settings.getSettingByName<bool>("weather")->value);
+		addHeader("Render Options");
+		addToggle("Chunk Borders", "", settings.getSettingByName<bool>("chunkborders")->value);
+		addToggle("Render Sky", "", settings.getSettingByName<bool>("sky")->value);
+		addToggle("Render Entities", "", settings.getSettingByName<bool>("entity")->value);
+		addToggle("Render Block Entities", "", settings.getSettingByName<bool>("blockentity")->value);
+		addToggle("Render Particles", "", settings.getSettingByName<bool>("particles")->value);
+		addToggle("Render Weather", "", settings.getSettingByName<bool>("weather")->value);
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 	void onSetupAndRender(SetupAndRenderEvent& event) {

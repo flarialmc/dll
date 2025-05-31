@@ -27,17 +27,13 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
-
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<float>("xveloc") == nullptr) settings.addSetting("xveloc", 1.0f);
 		if (settings.getSettingByName<float>("yveloc") == nullptr) settings.addSetting("yveloc", 0.69f);
 		if (settings.getSettingByName<float>("scale") == nullptr) settings.addSetting("scale", 1.0f);
-
 	}
 
 	void settingsRender(float settingsOffset) override {
-
-
 		float x = Constraints::PercentageConstraint(0.019, "left");
 		float y = Constraints::PercentageConstraint(0.10, "top");
 
@@ -49,14 +45,14 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Sizes");
-		this->addSlider("Scale", "", this->settings.getSettingByName<float>("scale")->value);
-		this->addSlider("X Velocity", "", this->settings.getSettingByName<float>("xveloc")->value);
-		this->addSlider("Y Velocity", "", this->settings.getSettingByName<float>("yveloc")->value);
+		addHeader("DVD Screensaver");
+		addSlider("Scale", "", settings.getSettingByName<float>("scale")->value);
+		addSlider("X Velocity", "", settings.getSettingByName<float>("xveloc")->value);
+		addSlider("Y Velocity", "", settings.getSettingByName<float>("yveloc")->value);
 
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 
 	}
 

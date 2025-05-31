@@ -27,9 +27,8 @@ public:
 
 	void defaultConfig() override {
 		if (settings.getSettingByName<bool>("responsivewidth") == nullptr) settings.addSetting("responsivewidth", true);
-		Module::defaultConfig();
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value}");
 		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
+		Module::defaultConfig("all");
 		if (settings.getSettingByName<bool>("advanced") == nullptr) settings.addSetting("advanced", false);
 	}
 
@@ -44,24 +43,24 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Main");
-		this->defaultAddSettings("main");
-		this->addToggle("Advanced Mode", "", this->settings.getSettingByName<bool>("advanced")->value);
-		this->extraPadding();
+		addHeader("Main");
+		defaultAddSettings("main");
+		addToggle("Advanced Mode", "", settings.getSettingByName<bool>("advanced")->value);
+		extraPadding();
 
-		this->addHeader("Text");
-		this->defaultAddSettings("text");
-		this->extraPadding();
+		addHeader("Text");
+		defaultAddSettings("text");
+		extraPadding();
 
-		this->addHeader("Colors");
-		this->defaultAddSettings("colors");
-		this->extraPadding();
+		addHeader("Colors");
+		defaultAddSettings("colors");
+		extraPadding();
 
-		this->addHeader("Misc Customizations");
-		this->defaultAddSettings("misc");
+		addHeader("Misc Customizations");
+		defaultAddSettings("misc");
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 
@@ -81,7 +80,7 @@ public:
 			try {
 
 				if (!this->settings.getSettingByName<bool>("advanced")->value) lookingAt = block->getName();
-				else lookingAt = block->getNamespace();
+				else lookingAt = block->getNamespace() + ":" + block->getName();
 			}
 			catch (const std::exception& e) { Logger::error("Failed to get block name: {}", e.what()); }
 		}

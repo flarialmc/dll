@@ -29,21 +29,15 @@ public:
 
 	void defaultConfig() override {
 		if (settings.getSettingByName<bool>("responsivewidth") == nullptr) settings.addSetting("responsivewidth", true);
-		Module::defaultConfig();
 		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{D}  X: {X} Y: {Y} Z: {Z}");
-
 		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
-
+		Module::defaultConfig("all");
 		if (settings.getSettingByName<bool>("showDecimals") == nullptr) settings.addSetting("showDecimals", false);
 		if (settings.getSettingByName<float>("decimalCount") == nullptr) settings.addSetting("decimalCount", 2.f);
-
 		if (settings.getSettingByName<bool>("showOtherDimCoords") == nullptr) settings.addSetting("showOtherDimCoords", false);
 		if (settings.getSettingByName<bool>("showDimName") == nullptr) settings.addSetting("showDimName", false);
-
 		if (settings.getSettingByName<bool>("useSameDimensionFormat") == nullptr) settings.addSetting("useSameDimensionFormat", true);
-
 		if (settings.getSettingByName<std::string>("defaultDimFormat") == nullptr) settings.addSetting("defaultDimFormat", (std::string)"{dim}");
-
         if (settings.getSettingByName<std::string>("OverworldFormat") == nullptr) settings.addSetting("OverworldFormat", (std::string)"{dim}");
         if (settings.getSettingByName<std::string>("NetherFormat") == nullptr) settings.addSetting("NetherFormat", (std::string)"{dim}");
         if (settings.getSettingByName<std::string>("TheEndFormat") == nullptr) settings.addSetting("TheEndFormat", (std::string)"{dim}");
@@ -60,7 +54,7 @@ public:
             Constraints::RelativeConstraint(1.0, "width"),
             Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Main");
+		this->addHeader("Coordinates");
 		this->defaultAddSettings("main");
 		this->extraPadding();
 

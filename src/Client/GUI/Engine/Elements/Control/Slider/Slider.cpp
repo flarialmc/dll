@@ -139,7 +139,9 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
         TextBoxes[30 + index].text = FlarialGUI::cached_to_string(startingPoint);
     } else if (!text.empty()) startingPoint = std::stof(text);
 
-    std::string ok = FlarialGUI::FlarialTextWithFont(x + (FlarialGUI::TextBoxes[30 + index].isActive ? Constraints::SpacingConstraint(0.1, percWidth) : 0), y, FlarialGUI::to_wide(text).c_str(), percWidth, percHeight,
+    std::string ok = FlarialGUI::FlarialTextWithFont(
+        x + (FlarialGUI::TextBoxes[30 + index].isActive ? Constraints::SpacingConstraint(0.1, percWidth) : 0), 
+        y, FlarialGUI::to_wide(text).c_str(), percWidth, percHeight,
         FlarialGUI::TextBoxes[30 + index].isActive ? DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
                                     Constraints::FontScaler(percWidth * 14.5f), DWRITE_FONT_WEIGHT_NORMAL);
 
@@ -153,11 +155,13 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
         0.420f * FlarialGUI::frameFactor);
 
     // white cursor blinky
-    if (FlarialGUI::TextBoxes[index].cursorX > x)
-    FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[30 + index].cursorX,
-        y + Constraints::RelativeConstraint(0.035f) / 2.0f, cursorCol,
+
+    if (FlarialGUI::TextBoxes[30 + index].cursorX > x)
+    FlarialGUI::RoundedRect(
+        FlarialGUI::TextBoxes[30 + index].cursorX,
+        y + Constraints::RelativeConstraint(0.035f) / 3.0f, cursorCol,
         Constraints::RelativeConstraint(0.005f),
-        percHeight - Constraints::RelativeConstraint(0.032f), 0, 0);
+        percHeight - Constraints::RelativeConstraint(0.025f), 0, 0);
 
     x += Constraints::SpacingConstraint(1.2, percWidth);
     y += Constraints::SpacingConstraint(0.8, percHeight / 2.0f);

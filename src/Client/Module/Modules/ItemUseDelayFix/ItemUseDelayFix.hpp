@@ -29,6 +29,10 @@ public:
         Module::onDisable();
     }
 
+    void defaultConfig() override {
+        Module::defaultConfig("core");
+    }
+
     static void patch() {
         Memory::nopBytes((void *)address, original.size());
     }

@@ -40,9 +40,11 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"FPS: {value}");
 		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
+		Module::defaultConfig("core");
+		Module::defaultConfig("pos");
+		Module::defaultConfig("main");
+		Module::defaultConfig("colors");
 		if (settings.getSettingByName<std::string>("cursorColor") == nullptr) settings.addSetting("cursorColor", (std::string)"ffffff");
 		if (settings.getSettingByName<float>("cursorOpacity") == nullptr) settings.addSetting("cursorOpacity", 1.0f);
 		if (settings.getSettingByName<bool>("cursorRGB") == nullptr) settings.addSetting("cursorRGB", false);
@@ -61,54 +63,17 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 
-		this->addHeader("Main");
-		this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 2.0f);
-		this->addToggle("Border", "", this->settings.getSettingByName<bool>("border")->value);
-		this->addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", this->settings.getSettingByName<bool>(
-			"BlurEffect")->value);
-		this->addConditionalSlider(this->settings.getSettingByName<bool>(
-			"border")->value, "Border Thickness", "", this->settings.getSettingByName<float>("borderWidth")->value,
-			4.f);
-		this->addSlider("Rounding", "Rounding of the rectangle",
-			this->settings.getSettingByName<float>("rounding")->value);
+		addHeader("Main");
+		defaultAddSettings("main");
+		extraPadding();
 
-		this->extraPadding();
-
-		this->addHeader("Colors");
-		this->addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value,
-			settings.getSettingByName<float>("bgOpacity")->value,
-			settings.getSettingByName<bool>("bgRGB")->value);
-		this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value,
-			settings.getSettingByName<float>("borderOpacity")->value,
-			settings.getSettingByName<bool>("borderRGB")->value);
-		this->addColorPicker("Cursor Color", "", settings.getSettingByName<std::string>("cursorColor")->value,
-			settings.getSettingByName<float>("cursorOpacity")->value,
-			settings.getSettingByName<bool>("cursorRGB")->value);
-
-		this->extraPadding();
-
-		this->addHeader("Misc Customizations");
-
-		this->addToggle("Reverse Padding X", "For Text Position", this->settings.getSettingByName<bool>(
-			"reversepaddingx")->value);
-
-		this->addToggle("Reverse Padding Y", "For Text Position", this->settings.getSettingByName<bool>(
-			"reversepaddingy")->value);
-
-		this->addSlider("Padding X", "For Text Position", this->settings.getSettingByName<float>("padx")->value);
-		this->addSlider("Padding Y", "For Text Position", this->settings.getSettingByName<float>("pady")->value);
-
-		this->addSlider("Rectangle Width", "", this->settings.getSettingByName<float>("rectwidth")->value, 2.f, 0.001f);
-		this->addSlider("Rectangle Height", "", this->settings.getSettingByName<float>("rectheight")->value, 2.f, 0.001f);
-
-		this->addToggle("Responsive Rectangle", "Rectangle resizes with text", this->settings.getSettingByName<bool>(
-			"responsivewidth")->value);
-
-		this->addSlider("Rotation", "see for yourself!", this->settings.getSettingByName<float>("rotation")->value,
-			360.f, 0, false);
+		addHeader("Colors");
+		addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
+		addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
+		addColorPicker("Cursor Color", "", settings.getSettingByName<std::string>("cursorColor")->value, settings.getSettingByName<float>("cursorOpacity")->value, settings.getSettingByName<bool>("cursorRGB")->value);
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 	std::chrono::steady_clock::time_point previousFrameTime = std::chrono::high_resolution_clock::now();
@@ -149,11 +114,10 @@ public:
 
 		if (settingperc.x != 0)
 			realcenter = Vec2(settingperc.x * (MC::windowSize.x - RectSize.x), settingperc.y * (MC::windowSize.y - RectSize.y));    else
-			realcenter = Constraints::CenterConstraint(RectSize.y, RectSize.y * this->settings.getSettingByName<float>(
-				"rectheight")->value);
+			realcenter = Constraints::CenterConstraint(RectSize.y, RectSize.y);
 
 		if (ClickGUI::editmenu) {
-			auto height = RectSize.y * this->settings.getSettingByName<float>("rectheight")->value;
+			auto height = RectSize.y;
 			FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, RectSize.x,
 				height, index);
 
@@ -193,21 +157,13 @@ public:
 
 		trails.insert(trails.begin(), balls);
 
-		D2D1_COLOR_F bgColor = settings.getSettingByName<bool>("bgRGB")->value ? FlarialGUI::rgbColor
-			: FlarialGUI::HexToColorF(
-				settings.getSettingByName<std::string>("bgColor")->value);
-
+		D2D1_COLOR_F bgColor = settings.getSettingByName<bool>("bgRGB")->value ? FlarialGUI::rgbColor: FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
 		bgColor.a = settings.getSettingByName<float>("bgOpacity")->value;
 
-		D2D1_COLOR_F CursorColor = settings.getSettingByName<bool>("cursorRGB")->value ? FlarialGUI::rgbColor
-			: FlarialGUI::HexToColorF(
-				settings.getSettingByName<std::string>("cursorColor")->value);
-
+		D2D1_COLOR_F CursorColor = settings.getSettingByName<bool>("cursorRGB")->value ? FlarialGUI::rgbColor: FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("cursorColor")->value);
 		CursorColor.a = settings.getSettingByName<float>("cursorOpacity")->value;
 
-		D2D1_COLOR_F borderColor = settings.getSettingByName<bool>("borderRGB")->value ? FlarialGUI::rgbColor
-			: FlarialGUI::HexToColorF(
-				settings.getSettingByName<std::string>("borderColor")->value);
+		D2D1_COLOR_F borderColor = settings.getSettingByName<bool>("borderRGB")->value ? FlarialGUI::rgbColor: FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
 		borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
 
 

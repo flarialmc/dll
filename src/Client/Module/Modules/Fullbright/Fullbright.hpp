@@ -23,7 +23,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<float>("gamma") == nullptr) settings.addSetting("gamma", 25.0f);
 	}
 
@@ -39,18 +39,16 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Misc");
-		this->addSlider("Brightness", "", this->settings.getSettingByName<float>("gamma")->value, 25.0f);
+		addHeader("Fullbright");
+		addSlider("Brightness", "", settings.getSettingByName<float>("gamma")->value, 25.0f);
 
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
-
-
+		resetPadding();
 	}
 
 	// TODO: Make it changable
 	void onGetGamma(GammaEvent& event) {
-		event.setGamma(this->settings.getSettingByName<float>("gamma")->value);
+		event.setGamma(settings.getSettingByName<float>("gamma")->value);
 	};
 };

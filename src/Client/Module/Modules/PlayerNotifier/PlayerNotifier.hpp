@@ -17,7 +17,8 @@ public:
 	};
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		getKeybind();
+		Module::defaultConfig("core");
 		if (!this->settings.getSettingByName<float>("duration")) settings.addSetting<float>("duration", 80);
 		if (!this->settings.getSettingByName<std::string>("player0")) settings.addSetting<std::string>("player0", "TheBarii");
 		if (!this->settings.getSettingByName<std::string>("player0")) settings.addSetting<bool>("player0Enabled", true);
@@ -112,8 +113,7 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("General");
-
+		this->addHeader("Player Notifier");
 		this->addButton("Add new player", "", "ADD", [&]() {
 			this->settings.addSetting<std::string>("player" + FlarialGUI::cached_to_string(totalPlayers), "player" + FlarialGUI::cached_to_string(totalPlayers));
 			this->settings.addSetting<bool>("player" + FlarialGUI::cached_to_string(totalPlayers) + "Enabled", true);
@@ -121,9 +121,11 @@ public:
 			});
 		this->addSlider("Re-check", "(Seconds) After how long should it re-check for players", this->settings.getSettingByName<float>("duration")->value, 500, 1, true);
 		this->addKeybind("Re-check Keybind", "Hold for 2 seconds!", getKeybind());
+		this->extraPadding();
+
 		for (int i = 0; i < totalPlayers; i++) {
 			this->addHeader(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value);
-			this->addToggle("Enabled", "Should it notify you?", this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i) + "Enabled")->value);
+			this->addToggle("Enabled", "Should it notify you?", this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i))->value);
 			this->addTextBox("Player Name", "", this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value);
 			this->extraPadding();
 		}

@@ -30,7 +30,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<float>("itemfov") == nullptr) settings.addSetting("itemfov", 70.0f);
 		if (settings.getSettingByName<bool>("thirdperson") == nullptr) settings.addSetting("thirdperson", false);
 
@@ -59,21 +59,21 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 
-		this->addHeader("Main");
-		this->addToggle("Third Person", "Transforms the item in third person perspective", this->settings.getSettingByName<bool>("thirdperson")->value);
-		this->addSlider("Item FOV", "Changes the FOV appearance of the item.", this->settings.getSettingByName<float>("itemfov")->value, 180);
+		addHeader("View Model");
+		addToggle("Third Person", "Transforms the item in third person perspective", settings.getSettingByName<bool>("thirdperson")->value);
+		addSlider("Item FOV", "Changes the FOV appearance of the item.", settings.getSettingByName<float>("itemfov")->value, 180);
 
-		this->addSlider("Position X", "Changes the position in the X axis", this->settings.getSettingByName<float>("posx")->value, 12);
-		this->addSlider("Position Y", "Changes the position in the Y axis", this->settings.getSettingByName<float>("posy")->value, 12);
-		this->addSlider("Position Z", "Changes the position in the Z axis", this->settings.getSettingByName<float>("posz")->value, 12);
+		addSlider("Position X", "Changes the position in the X axis", settings.getSettingByName<float>("posx")->value, 12);
+		addSlider("Position Y", "Changes the position in the Y axis", settings.getSettingByName<float>("posy")->value, 12);
+		addSlider("Position Z", "Changes the position in the Z axis", settings.getSettingByName<float>("posz")->value, 12);
 
-		this->addSlider("Rotation Angle", "Changes the rotation angle of the item", this->settings.getSettingByName<float>("rotangle")->value, 360);
-		this->addSlider("Rotation X", "Changes the rotation in the X axis", this->settings.getSettingByName<float>("rotx")->value, 360);
-		this->addSlider("Rotation Y", "Changes the rotation in the Y axis", this->settings.getSettingByName<float>("roty")->value, 360);
-		this->addSlider("Rotation Z", "Changes the rotation in the Z axis", this->settings.getSettingByName<float>("rotz")->value, 360);
+		addSlider("Rotation Angle", "Changes the rotation angle of the item", settings.getSettingByName<float>("rotangle")->value, 360);
+		addSlider("Rotation X", "Changes the rotation in the X axis", settings.getSettingByName<float>("rotx")->value, 360);
+		addSlider("Rotation Y", "Changes the rotation in the Y axis", settings.getSettingByName<float>("roty")->value, 360);
+		addSlider("Rotation Z", "Changes the rotation in the Z axis", settings.getSettingByName<float>("rotz")->value, 360);
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 	void onGetPerspective(PerspectiveEvent& event) {

@@ -19,6 +19,10 @@ public:
         Module::setup();
     };
 
+    void defaultConfig() override {
+        Module::defaultConfig("core");
+    }
+
     void onEnable() override {
         patch();
         Module::onEnable();

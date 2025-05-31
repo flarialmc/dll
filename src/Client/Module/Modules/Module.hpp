@@ -61,6 +61,9 @@ public:
     std::vector<float> conditionalDropdownAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
     std::vector<float> conditionalTextBoxAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
     std::vector<float> conditionalColorPickerAnims = std::vector<float>(100, Constraints::RelativeConstraint(0.05f, "height", true));
+
+    std::vector<DWRITE_TEXT_ALIGNMENT> prevAlignments = std::vector<DWRITE_TEXT_ALIGNMENT>(100, DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
+
     int dropdownIndex = 0;
     int textboxIndex = 300;
     int keybindIndex = 0;
@@ -116,6 +119,7 @@ public:
     void setEnabled(bool enabled);
     void setKeybind(const std::string& newKeybind);
     std::string& getKeybind(const int keybindCount = 0);
+    virtual void defaultConfig(std::string type);
     virtual void defaultConfig();
     virtual void defaultAddSettings(std::string type);
     virtual void settingsRender(float settingsOffset) {}

@@ -20,7 +20,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<float>("rain") == nullptr) settings.addSetting("rain", 1.00f);
 		if (settings.getSettingByName<float>("lighting") == nullptr) settings.addSetting("lighting", 0.00f);
 		if (settings.getSettingByName<bool>("snow") == nullptr) settings.addSetting("snow", false);
@@ -37,13 +37,13 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Misc");
-		this->addSlider("Rain Intensity", "", this->settings.getSettingByName<float>("rain")->value);
-		this->addSlider("Snow Intensity", "", this->settings.getSettingByName<float>("snow")->value);
+		addHeader("Misc");
+		addSlider("Rain Intensity", "", settings.getSettingByName<float>("rain")->value);
+		addSlider("Snow Intensity", "", settings.getSettingByName<float>("snow")->value);
 
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 	}
 
 	void onTick(TickEvent& event) {

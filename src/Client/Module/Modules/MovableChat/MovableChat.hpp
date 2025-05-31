@@ -47,9 +47,8 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
-		if (settings.getSettingByName<float>("percentageX") == nullptr) settings.addSetting("percentageX", 0.0f);
-		if (settings.getSettingByName<float>("percentageY") == nullptr) settings.addSetting("percentageY", 0.0f);
+		Module::defaultConfig("core");
+		Module::defaultConfig("pos");
 		if (settings.getSettingByName<bool>("here") == nullptr) settings.addSetting("here", true);
 		if (settings.getSettingByName<bool>("pingsound") == nullptr) settings.addSetting("pingsound", true);
 		if (this->settings.getSettingByName<std::string>("mode") == nullptr) settings.addSetting("mode", (std::string)"Xp Orb");
@@ -68,7 +67,7 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Misc");
+		this->addHeader("Movable Chat");
 		this->addToggle("Ping Sound", "Plays a sound when you're mentioned in the chat.", settings.getSettingByName<bool>("pingsound")->value);
 		if (settings.getSettingByName<bool>("pingsound"))
 			if (settings.getSettingByName<bool>("pingsound")->value)

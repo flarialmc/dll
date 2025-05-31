@@ -78,7 +78,7 @@ public:
 	};
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<std::string>("nick") == nullptr) settings.addSetting<std::string>("nick", "Flarial User");
 		if (settings.getSettingByName<bool>("bold") == nullptr) settings.addSetting<bool>("bold", false);
 		if (settings.getSettingByName<bool>("obfuscated") == nullptr) settings.addSetting<bool>("obfuscated", false);
@@ -97,11 +97,11 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Misc");
-		this->addTextBox("Nickname", "", settings.getSettingByName<std::string>("nick")->value);
-		this->addToggle("Bold", "", settings.getSettingByName<bool>("bold")->value);
-		this->addToggle("Obfuscated", "", settings.getSettingByName<bool>("obfuscated")->value);
-		this->addDropdown("Text Color", "", std::vector<std::string>{
+		addHeader("Nickname");
+		addTextBox("Nickname", "", settings.getSettingByName<std::string>("nick")->value);
+		addToggle("Bold", "", settings.getSettingByName<bool>("bold")->value);
+		addToggle("Obfuscated", "", settings.getSettingByName<bool>("obfuscated")->value);
+		addDropdown("Text Color", "", std::vector<std::string>{
 			"White",
 				"Black",
 				"Netherite",
@@ -130,7 +130,7 @@ public:
 		}, settings.getSettingByName<std::string>("textColor")->value);
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 	void onRaknetTick(RaknetTickEvent& event) {

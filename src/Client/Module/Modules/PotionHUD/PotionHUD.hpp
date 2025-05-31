@@ -33,6 +33,8 @@ public:
 	}
 
 	void defaultConfig() override {
+		Module::defaultConfig("core");
+		Module::defaultConfig("pos");
 		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 1.0f);
 		if (settings.getSettingByName<float>("textSize") == nullptr) settings.addSetting("textSize", 0.05f);
 		if (settings.getSettingByName<std::string>("colorMain") == nullptr) settings.addSetting("colorMain", (std::string)"FFFFFF");
@@ -41,14 +43,16 @@ public:
 		if (settings.getSettingByName<std::string>("colorLow") == nullptr) settings.addSetting("colorLow", (std::string)"FF0000");
 		if (settings.getSettingByName<float>("colorLow_opacity") == nullptr) settings.addSetting("colorLow_opacity", 1.0f);
 		if (settings.getSettingByName<bool>("colorLow_rgb") == nullptr) settings.addSetting("colorLow_rgb", false);
-		if (settings.getSettingByName<float>("textSize") == nullptr) settings.addSetting("textSize", 0.14f);
 		if (settings.getSettingByName<float>("spacing") == nullptr) settings.addSetting("spacing", 1.f);
 		if (settings.getSettingByName<bool>("textShadow") == nullptr) settings.addSetting("textShadow", true);
+		if (settings.getSettingByName<bool>("textShadowOffset") == nullptr) settings.addSetting("textShadowOffset", 0.003f);
 		if (settings.getSettingByName<float>("textOffsetX") == nullptr) settings.addSetting("textOffsetX", 2.f);
 		if (settings.getSettingByName<bool>("showText") == nullptr) settings.addSetting("showText", true);
 		if (settings.getSettingByName<bool>("textLeft") == nullptr) settings.addSetting("textLeft", false);
 		if (settings.getSettingByName<bool>("bottomUp") == nullptr) settings.addSetting("bottomUp", false);
-		Module::defaultConfig();
+		if (settings.getSettingByName<std::string>("textShadowCol") == nullptr) settings.addSetting("textShadowCol", (std::string)"00000");
+		if (settings.getSettingByName<float>("textShadowOpacity") == nullptr) settings.addSetting("textShadowOpacity", 0.55f);
+		if (settings.getSettingByName<bool>("textShadowRGB") == nullptr) settings.addSetting("textShadowRGB", false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -63,25 +67,25 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Visual");
-		this->addSlider("UI Scale", "", this->settings.getSettingByName<float>("uiscale")->value, 3.f, 0.f, true);
-		this->addToggle("Bottom Up Mode", "New effects appear ontop instead", this->settings.getSettingByName<bool>("bottomUp")->value);
-		this->addSlider("Spacing", "", this->settings.getSettingByName<float>("spacing")->value, 10.f, 0.0f, true);
-		this->addToggle("Show Text", "", this->settings.getSettingByName<bool>("showText")->value);
-		this->addConditionalSlider(this->settings.getSettingByName<bool>("showText")->value, "Text Size", "", this->settings.getSettingByName<float>("textSize")->value, 0.25f, 0.0f, true);
-		this->addConditionalSlider(this->settings.getSettingByName<bool>("showText")->value, "Text Offset X", "", this->settings.getSettingByName<float>("textOffsetX")->value, 50.f, 0.0f, false);
-		this->addConditionalToggle(this->settings.getSettingByName<bool>("showText")->value, "Text to the left", "", this->settings.getSettingByName<bool>("textLeft")->value);
-		this->addConditionalToggle(this->settings.getSettingByName<bool>("showText")->value, "Text Shadow", "Displays a shadow under the text", this->settings.getSettingByName<bool>("textShadow")->value);
-		this->addConditionalSlider(this->settings.getSettingByName<bool>("showText")->value && this->settings.getSettingByName<bool>("textShadow")->value, "Shadow Offset", "How far the shadow will be.", this->settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
-		this->extraPadding();
+		addHeader("Potion HUD");
+		addSlider("UI Scale", "", settings.getSettingByName<float>("uiscale")->value, 3.f, 0.f, true);
+		addToggle("Bottom Up Mode", "New effects appear ontop instead", settings.getSettingByName<bool>("bottomUp")->value);
+		addSlider("Spacing", "", settings.getSettingByName<float>("spacing")->value, 10.f, 0.0f, true);
+		addToggle("Show Text", "", settings.getSettingByName<bool>("showText")->value);
+		addConditionalSlider(settings.getSettingByName<bool>("showText")->value, "Text Size", "", settings.getSettingByName<float>("textSize")->value, 0.25f, 0.0f, true);
+		addConditionalSlider(settings.getSettingByName<bool>("showText")->value, "Text Offset X", "", settings.getSettingByName<float>("textOffsetX")->value, 50.f, 0.0f, false);
+		addConditionalToggle(settings.getSettingByName<bool>("showText")->value, "Text to the left", "", settings.getSettingByName<bool>("textLeft")->value);
+		addConditionalToggle(settings.getSettingByName<bool>("showText")->value, "Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
+		addConditionalSlider(settings.getSettingByName<bool>("showText")->value && settings.getSettingByName<bool>("textShadow")->value, "Shadow Offset", "How far the shadow will be.", settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
+		extraPadding();
 
-		this->addHeader("Colors");
-		this->addColorPicker("Main Color", "", this->settings.getSettingByName<std::string>("colorMain")->value,settings.getSettingByName<float>("colorMain_opacity")->value,settings.getSettingByName<bool>("colorMain_rgb")->value);
-		this->addConditionalColorPicker(this->settings.getSettingByName<bool>("textShadow")->value, "Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value,settings.getSettingByName<float>("textShadowOpacity")->value,settings.getSettingByName<bool>("textShadowRGB")->value);
-		this->addColorPicker("Effect About to Expire", "", settings.getSettingByName<std::string>("colorLow")->value,settings.getSettingByName<float>("colorLow_opacity")->value,settings.getSettingByName<bool>("colorLow_rgb")->value);
+		addHeader("Colors");
+		addColorPicker("Main Color", "", settings.getSettingByName<std::string>("colorMain")->value,settings.getSettingByName<float>("colorMain_opacity")->value,settings.getSettingByName<bool>("colorMain_rgb")->value);
+		addConditionalColorPicker(settings.getSettingByName<bool>("textShadow")->value, "Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value,settings.getSettingByName<float>("textShadowOpacity")->value,settings.getSettingByName<bool>("textShadowRGB")->value);
+		addColorPicker("Effect About to Expire", "", settings.getSettingByName<std::string>("colorLow")->value,settings.getSettingByName<float>("colorLow_opacity")->value,settings.getSettingByName<bool>("colorLow_rgb")->value);
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 	void renderText() {
@@ -141,8 +145,8 @@ public:
 								D2D_COLOR_F shadowCol = this->settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("textShadowCol")->value);
 								shadowCol.a = this->settings.getSettingByName<float>("textShadowOpacity")->value;
 								FlarialGUI::FlarialTextWithFont(
-									textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
-									textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) - FlarialGUI::getFlarialTextSize(widecstr1, 0,
+									textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
+									textY + (Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale) - FlarialGUI::getFlarialTextSize(widecstr1, 0,
 										16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
 										textSize * guiscale * uiscale,
 										DWRITE_FONT_WEIGHT_BOLD, true).y / 4.f,
@@ -155,8 +159,8 @@ public:
 									true
 								);
 								FlarialGUI::FlarialTextWithFont(
-									textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value),
-									textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) + FlarialGUI::getFlarialTextSize(widecstr2, 0,
+									textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
+									textY + (Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale) + FlarialGUI::getFlarialTextSize(widecstr2, 0,
 										16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
 										(textSize * guiscale * uiscale) * 0.8f,
 										DWRITE_FONT_WEIGHT_BOLD, true).y / 1.6f,

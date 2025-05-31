@@ -42,7 +42,9 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		getKeybind();
+		if (settings.getSettingByName<bool>("enabled") == nullptr) settings.addSetting("enabled", true);
+		Module::defaultConfig("core");
 		if (settings.getSettingByName<bool>("alwaysanim") == nullptr) settings.addSetting("alwaysanim", false);
 		if (settings.getSettingByName<bool>("SaveModifier") == nullptr) settings.addSetting("SaveModifier", true);
 		if (settings.getSettingByName<bool>("hidehand") == nullptr) settings.addSetting("hidehand", true);
@@ -70,22 +72,21 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Main");
-		this->addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
-		this->addToggle("Use Scroll", "Allows to adjust zoom with scroll wheel.", this->settings.getSettingByName<bool>("UseScroll")->value);
-		this->addToggle("Toggle Zoom", "No need to hold the keybind to zoom.", this->settings.getSettingByName<bool>("toggleZoom")->value);
-		this->addSlider("Modifier", "How much to Zoom each time you scroll.", this->settings.getSettingByName<float>("modifier")->value, 30, 0, false);
-		this->addToggle("Disable Animation", "The animation when you zoom", this->settings.getSettingByName<bool>("disableanim")->value);
-		this->addSlider("Animation Speed", "Speed at which scroll zoom acts.", this->settings.getSettingByName<float>("anim")->value, 0.40);
-		this->addToggle("Save Modifier", "Saves the last zoom amount.", this->settings.getSettingByName<bool>("SaveModifier")->value);
-		this->addToggle("Hide Hand", "Hide hand when zooming.", this->settings.getSettingByName<bool>("hidehand")->value);
-		this->addToggle("Hide Modules", "Hides other modules when zooming.", this->settings.getSettingByName<bool>("hidemodules")->value);
-		this->addToggle("Always Animate", "Smooth zoom animation while sprinting.", this->settings.getSettingByName<bool>("alwaysanim")->value);
-		this->addToggle("Low Sensitivity", "Lower sensitivity when in zoom.", this->settings.getSettingByName<bool>("lowsens")->value);
+		addHeader("Main");
+		addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
+		addToggle("Use Scroll", "Allows to adjust zoom with scroll wheel.", settings.getSettingByName<bool>("UseScroll")->value);
+		addToggle("Toggle Zoom", "No need to hold the keybind to zoom.", settings.getSettingByName<bool>("toggleZoom")->value);
+		addSlider("Modifier", "How much to Zoom each time you scroll.", settings.getSettingByName<float>("modifier")->value, 30, 0, false);
+		addToggle("Disable Animation", "The animation when you zoom", settings.getSettingByName<bool>("disableanim")->value);
+		addSlider("Animation Speed", "Speed at which scroll zoom acts.", settings.getSettingByName<float>("anim")->value, 0.40);
+		addToggle("Save Modifier", "Saves the last zoom amount.", settings.getSettingByName<bool>("SaveModifier")->value);
+		addToggle("Hide Hand", "Hide hand when zooming.", settings.getSettingByName<bool>("hidehand")->value);
+		addToggle("Hide Modules", "Hides other modules when zooming.", settings.getSettingByName<bool>("hidemodules")->value);
+		addToggle("Always Animate", "Smooth zoom animation while sprinting.", settings.getSettingByName<bool>("alwaysanim")->value);
+		addToggle("Low Sensitivity", "Lower sensitivity when in zoom.", settings.getSettingByName<bool>("lowsens")->value);
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
-
+		resetPadding();
 	}
 
 	void onGetFOV(FOVEvent& event) {

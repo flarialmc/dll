@@ -28,33 +28,15 @@ public:
     }
 
     void defaultConfig() override {
-        Module::defaultConfig();
+        getKeybind();
+        if (settings.getSettingByName<bool>("enabled") == nullptr) settings.addSetting<bool>("enabled", true);
+        if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 0.65f);
+        Module::defaultConfig("core");
+        Module::defaultConfig("pos");
+        Module::defaultConfig("main");
+        Module::defaultConfig("colors");
         if (settings.getSettingByName<bool>("alphaOrder") == nullptr) settings.addSetting<bool>("alphaOrder", true);
         if (settings.getSettingByName<bool>("flarialFirst") == nullptr) settings.addSetting<bool>("flarialFirst", true);
-
-		if (settings.getSettingByName<float>("percentageX") == nullptr) settings.addSetting("percentageX", 0.0f);
-		if (settings.getSettingByName<float>("percentageY") == nullptr) settings.addSetting("percentageY", 0.0f);
-
-		if (settings.getSettingByName<bool>("border") == nullptr) settings.addSetting("border", false);
-		if (settings.getSettingByName<float>("borderWidth") == nullptr) settings.addSetting("borderWidth", 1.0f);
-
-		if (settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 32.0f);
-
-		if (settings.getSettingByName<std::string>("bgColor") == nullptr) settings.addSetting("bgColor", (std::string)"000000");
-		if (settings.getSettingByName<std::string>("textColor") == nullptr) settings.addSetting("textColor", (std::string)"fafafa");
-		if (settings.getSettingByName<std::string>("borderColor") == nullptr) settings.addSetting("borderColor", (std::string)"000000");
-
-		if (settings.getSettingByName<float>("bgOpacity") == nullptr) settings.addSetting("bgOpacity", 0.55f);
-		if (settings.getSettingByName<float>("textOpacity") == nullptr) settings.addSetting("textOpacity", 1.0f);
-		if (settings.getSettingByName<float>("borderOpacity") == nullptr) settings.addSetting("borderOpacity", 1.0f);
-
-		if (settings.getSettingByName<bool>("bgRGB") == nullptr) settings.addSetting("bgRGB", false);
-		if (settings.getSettingByName<bool>("textRGB") == nullptr) settings.addSetting("textRGB", false);
-		if (settings.getSettingByName<bool>("borderRGB") == nullptr) settings.addSetting("borderRGB", false);
-
-		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 0.65f);
-		if (settings.getSettingByName<bool>("BlurEffect") == nullptr) settings.addSetting("BlurEffect", false);
-        if (settings.getSettingByName<bool>("BlurEffect") == nullptr) settings.addSetting("BlurEffect", false);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -68,24 +50,24 @@ public:
             Constraints::RelativeConstraint(1.0, "width"),
             Constraints::RelativeConstraint(0.88f, "height"));
 
-        this->addHeader("Main");
-        this->defaultAddSettings("main");
-		this->extraPadding();
+        addHeader("Tab List");
+        defaultAddSettings("main");
+		extraPadding();
 
-        this->addHeader("Misc");
-        this->addToggle("Alphabetical Order", "", this->settings.getSettingByName<bool>("alphaOrder")->value);
-        this->addToggle("Flarial First", "Prioritize Flarial users (Dev > Gamer > Booster > Supporter > Default) at the top", this->settings.getSettingByName<bool>("flarialFirst")->value);
-        this->addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
-		this->extraPadding();
+        addHeader("Misc");
+        addToggle("Alphabetical Order", "", settings.getSettingByName<bool>("alphaOrder")->value);
+        addToggle("Flarial First", "Prioritize Flarial users (Dev > Gamer > Booster > Supporter > Default) at the top", settings.getSettingByName<bool>("flarialFirst")->value);
+        addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
+		extraPadding();
 
-		this->addHeader("Colors");
-		this->addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
-		this->addColorPicker("Text Color", "", settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
-		this->addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
-        this->addColorPicker("Glow Color", "", settings.getSettingByName<std::string>("glowColor")->value, settings.getSettingByName<float>("glowOpacity")->value, settings.getSettingByName<bool>("glowRGB")->value);
+		addHeader("Colors");
+		addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
+		addColorPicker("Text Color", "", settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
+		addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
+        addColorPicker("Glow Color", "", settings.getSettingByName<std::string>("glowColor")->value, settings.getSettingByName<float>("glowOpacity")->value, settings.getSettingByName<bool>("glowRGB")->value);
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
     // Helper function to assign priority based on role using ApiUtils

@@ -47,6 +47,10 @@ public:
         Module::onDisable();
     }
 
+    void defaultConfig() override {
+        Module::defaultConfig("core");
+    }
+
     static void patch() {
         if(patched) return;
         patched = true;

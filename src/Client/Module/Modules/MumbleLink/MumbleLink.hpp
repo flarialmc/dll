@@ -155,7 +155,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		Module::defaultConfig();
+		Module::defaultConfig("core");
 		if (this->settings.getSettingByName<std::string>("context") == nullptr) settings.addSetting<std::string>("context", (std::string)"");
 	}
 
@@ -165,8 +165,8 @@ public:
 
 		const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
-		this->addHeader("General");
-		this->addTextBox("Channel/Room", "Keep empty to use the Server IP.", this->settings.getSettingByName<std::string>("context")->value);
+		addHeader("Mumble Link");
+		addTextBox("Channel/Room", "Keep empty to use the Server IP.", settings.getSettingByName<std::string>("context")->value);
 
 		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
 		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
@@ -174,6 +174,6 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 	}
 };

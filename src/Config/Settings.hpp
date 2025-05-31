@@ -82,6 +82,16 @@ public:
     }
 
     template<typename T>
+    SettingType<T>* getOrAddSettingByName(const std::string& name, const T& defaultValue) {
+
+        auto it = settings.find(name);
+        if (it != settings.end()) return static_cast<SettingType<T> *>(it->second.get());
+        addSetting(name, defaultValue);
+
+        return getSettingByName<T>(name);
+    }
+
+    template<typename T>
     void setValue(const std::string &name, const T &value) {
         auto setting = getSettingByName<T>(name);
         if (setting) {
