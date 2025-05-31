@@ -26,6 +26,7 @@ public:
     static inline FrameTransform Transform;
     static inline MouseAction mouseAction;
     static inline MouseButton mouseButton;
+    static inline MouseButton lastMouseButton;
     static inline bool held;
 
     static inline std::string GPU;

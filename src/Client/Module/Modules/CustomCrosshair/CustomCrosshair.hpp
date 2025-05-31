@@ -3,55 +3,35 @@
 #include "../Module.hpp"
 #include "../../../../SDK/Client/Render/Tessellator/MeshHelpers.hpp"
 #include "../../../../Utils/Render/MaterialUtils.hpp"
-#include "../../../Events/Game/TickEvent.hpp"
 #include "../../../../SDK/Client/GUI/ScreenRenderer.hpp"
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <stb_image_write.h>
+#include "Events/EventManager.hpp"
+#include "Events/Game/PerspectiveEvent.hpp"
+#include "Utils/Render/PositionUtils.hpp"
 
-class Crosshair
+class CrosshairImage
 {
 public:
-	Crosshair(std::vector<bool> Data, int Size)
-	{
-		this->PixelData = Data;
-		this->Size = Size;
-	};
 	std::vector<bool> PixelData = {};
 	int Size = 16;
-
-	const char* getImageData()
-	{
-		char* data = new char[Size*Size];
-
-		for (int i = 0; i < Size*Size; i++)
-		{
-			if (PixelData[i])
-			{
-				for (int j = 0; j < 4; j++)
-				{
-					data[i*4 + j] = 0xFF;
-				}
-			}
-		}
-
-		return data;
-	}
-
-	void SaveImage(std::string name)
-	{
-		stbi_write_png(name.c_str(), Size, Size, 4, getImageData(), Size * 4);
-	}
+	CrosshairImage(std::vector<bool> Data, int Size);
+	const unsigned char* getImageData();
+	void SaveImage(std::string name);
 };
 
-class CustomCrosshair : public Module {
+class CustomCrosshair : public Module
+{
 private:
 	Perspective currentPerspective;
+	bool blankWindow;
+	bool CrosshairReloaded = false;
 public:
 	CustomCrosshair() : Module("Custom Crosshair", "Allows for dynamic crosshair colors.",
 		IDR_SPEED_PNG, "") {
 
 		Module::setup();
 	};
+
+	void CrosshairEditorWindow();
 
 	void onEnable() override {
 		Listen(this, PerspectiveEvent, &CustomCrosshair::onGetViewPerspective)
@@ -83,6 +63,8 @@ public:
 		if (settings.getSettingByName<std::string>("enemyColor") == nullptr) settings.addSetting("enemyColor", (std::string)"FF0000");
 		if (settings.getSettingByName<bool>("enemyColorRGB") == nullptr) settings.addSetting("enemyColorRGB", false);
 		if (settings.getSettingByName<float>("enemyOpacity") == nullptr) settings.addSetting("enemyOpacity", 1.f);
+
+		if (settings.getSettingByName<std::string>("CurrentCrosshair") == nullptr) settings.addSetting("CurrentCrosshair", (std::string)"");
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -122,9 +104,19 @@ public:
 				settings.getSettingByName<float>("enemyOpacity")->value,
 				settings.getSettingByName<bool>("enemyColorRGB")->value);
 		}
+		this->addButton("Crosshair Editor", "Opens the crosshair editor menu", "open", [&]()
+		{
+			this->blankWindow = !this->blankWindow;
+		});
+		this->addButton("Reload Crosshair", "Reloads Crosshair to apply any changes", "reload", [&]()
+		{
+			this->CrosshairReloaded = true;
+		});
 		FlarialGUI::UnsetScrollView();
 
 		this->resetPadding();
+
+		CrosshairEditorWindow();
 	}
 
 	void onGetViewPerspective(PerspectiveEvent& event) {
@@ -132,7 +124,6 @@ public:
 	}
 
 	void onHudCursorRendererRender(HudCursorRendererRenderEvent& event) {
-		event.cancel();
 		if (!SDK::clientInstance) return;
 		auto player = SDK::clientInstance->getLocalPlayer();
 		if (!player) return;
@@ -150,10 +141,12 @@ public:
 			return;
 		}
 		const ResourceLocation loc2(Utils::getAssetsPath() + "\\ch1.png", true);
-		TexturePtr ptr2 = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc2, false);
+		TexturePtr ptr2 = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc2, CrosshairReloaded);
+		CrosshairReloaded = false;
 		if (ptr2.clientTexture == nullptr || ptr2.clientTexture->clientTexture.resourcePointerBlock == nullptr) {
 			return;
 		}
+		ptr2;
 		const auto tess = screenContext->getTessellator();
 
 		tess->begin(mce::PrimitiveMode::QuadList, 4);
@@ -171,11 +164,12 @@ public:
 
 		tess->color(color.r, color.g, color.b, color.a);
 
-		Vec2<float> size = Vec2<float>(17, 17);
+		Vec2<float> size = Vec2<float>(16, 16);
 		auto scale = settings.getSettingByName<float>("uiscale")->value;
-		Vec2<float> sizeScaled = PositionUtils::getCustomScreenScaledPos(size, scale);
 
 		Vec2<float> sizeUnscaled = PositionUtils::getScreenScaledPos(size);
+
+		Vec2<float> sizeScaled = sizeUnscaled.mul(scale);
 
 		auto SizeToUse = isDefault ? sizeUnscaled : sizeScaled;
 
@@ -198,11 +192,14 @@ public:
 			ScreenRenderer::blit(screenContext, &ptr, &rect, material);
 		}
 		else {
-			tess->vertexUV(pos.x, pos.y + (sizeScaled.y), 0.f, 0.f, 1.f);
-			tess->vertexUV(pos.x + (sizeScaled.x), pos.y + (sizeScaled.y), 0.f, 1.f, 1.f);
-			tess->vertexUV(pos.x + (sizeScaled.x), pos.y, 0.f, 1.f, 0.f);
+			size = size.mul(scale);
+			tess->vertexUV(pos.x, pos.y + size.y, 0.f, 0.f, 1.f);
+			tess->vertexUV(pos.x + size.x, pos.y + size.y, 0.f, 1.f, 1.f);
+			tess->vertexUV(pos.x + size.x, pos.y, 0.f, 1.f, 0.f);
 			tess->vertexUV(pos.x, pos.y, 0.f, 0.f, 0.f);
 			MeshHelpers::renderMeshImmediately2(screenContext, tess, material, *ptr2.clientTexture);
 		}
+
+		event.cancel();
 	}
 };
