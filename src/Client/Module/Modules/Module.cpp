@@ -195,7 +195,6 @@ void Module::normalRenderCore(int index, std::string& text) {
 		true
 	);
 
-
 	if (this->settings.getSettingByName<bool>("border")->value) {
 		D2D1_COLOR_F borderColor = settings.getSettingByName<bool>("borderRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
 		borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
