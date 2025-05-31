@@ -82,6 +82,7 @@ public:
 		if (settings.getSettingByName<float>("0color") == nullptr) settings.addSetting("0color", 0.f);
 
 		if (settings.getSettingByName<bool>("showDurBarMax") == nullptr) settings.addSetting("showDurBarMax", false);
+		if (settings.getSettingByName<float>("textOpacity") == nullptr) settings.addSetting("textOpacity", 1.f);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -247,7 +248,7 @@ public:
 								alignments[this->settings.getSettingByName<std::string>("textalignment")->value],
 								textScale * uiscale * guiscale,
 								DWRITE_FONT_WEIGHT_NORMAL,
-								textColor, textShadow
+								textColor, true
 							);
 						}
 					}
