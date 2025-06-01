@@ -43,10 +43,10 @@ std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
                 }
             }
         } else {
-            Logger::error("Invalid JSON format: expected an array of players.");
+            LOG_ERROR("Invalid JSON format: expected an array of players.");
         }
     } catch (const nlohmann::json::exception& e) {
-        Logger::error("Error parsing players: {}", e.what());
+        LOG_ERROR("Error parsing players: {}", e.what());
     }
 
     if (SDK::clientInstance && SDK::clientInstance->getLocalPlayer()) {
@@ -59,7 +59,7 @@ std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
             }
             allPlayers.push_back(clearedName);
         } catch (const std::exception& e) {
-            Logger::error("Error processing local player name: {}", e.what());
+            LOG_ERROR("Error processing local player name: {}", e.what());
         }
     }
 
@@ -147,7 +147,7 @@ void Client::initialize() {
 
 
     if (!VersionUtils::isSupported(Client::version)) {
-        Logger::fatal("Minecraft version is not supported!");
+        LOG_FATAL("{}", "Unsupported Minecraft version");
         Utils::MessageDialogW(L"Flarial: this version is not supported!", L"VERSION NOT SUPPORTED!");
         ModuleManager::terminate();
         Client::disable = true;
@@ -174,12 +174,12 @@ void Client::initialize() {
         if (!file.is_open()) {
             std::ofstream createFile(filePath);
             if (!createFile.is_open()) {
-               Logger::error("Could not create file: ");
+               LOG_ERROR("Could not create file: ");
             } else {
                 createFile.close();
                 file.open(filePath);
                 if (!file.is_open()) {
-                    Logger::error("Could not open file for reading after creation: ");
+                    LOG_ERROR("Could not open file for reading after creation: ");
                 }
             }
         }

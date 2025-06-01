@@ -43,7 +43,6 @@ public:
 
 	void defaultConfig() override {
 		getKeybind();
-		if (settings.getSettingByName<bool>("enabled") == nullptr) settings.addSetting("enabled", true);
 		Module::defaultConfig("core");
 		if (settings.getSettingByName<bool>("alwaysanim") == nullptr) settings.addSetting("alwaysanim", false);
 		if (settings.getSettingByName<bool>("SaveModifier") == nullptr) settings.addSetting("SaveModifier", true);

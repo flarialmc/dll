@@ -418,7 +418,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 	if(Client::settings.getSettingByName<bool>("noicons")->value) return;
 
 	if (!ImGui::GetBackgroundDrawList()) {
-		Logger::error("BG Drawlist is nullptr");
+		LOG_ERROR("BG Drawlist is nullptr");
 		return;
 	}
 
@@ -452,7 +452,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 			ID3D12Resource* my_texture = NULL;
 
 
-			if (!SwapchainHook::d3d12Device5){ Logger::error("Image device does not exist."); return;}
+			if (!SwapchainHook::d3d12Device5){ LOG_ERROR("Image device does not exist."); return;}
 
 			if(!SwapchainHook::d3d12DescriptorHeapImGuiIMAGE) {
 
@@ -464,7 +464,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 				HRESULT hr = SwapchainHook::d3d12Device5->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&SwapchainHook::d3d12DescriptorHeapImGuiIMAGE));
 
 				if (FAILED(hr)) {
-					Logger::error("Fail at creating d3d12DescriptorHeapImGuiIMAGE: ");
+					LOG_ERROR("Fail at creating d3d12DescriptorHeapImGuiIMAGE: ");
 					return;
 				}
 			}
@@ -494,7 +494,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 														 ImVec2(imageRect.right, imageRect.bottom), ImVec2(0, 0),
 														 ImVec2(1, 1),
 														 col);
-			} catch (std::exception ex) { Logger::error("error addming image: ", ex.what()); }
+			} catch (std::exception ex) { LOG_ERROR("error addming image: ", ex.what()); }
 		}
 }
 

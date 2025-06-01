@@ -82,10 +82,10 @@ public:
 				if (!this->settings.getSettingByName<bool>("advanced")->value) lookingAt = block->getName();
 				else lookingAt = block->getNamespace() + ":" + block->getName();
 			}
-			catch (const std::exception& e) { Logger::error("Failed to get block name: {}", e.what()); }
+			catch (const std::exception& e) { LOG_ERROR("Failed to get block name: {}", e.what()); }
 		}
 		catch (const std::exception& e) {
-			Logger::error("Failed to get block: {}", e.what());
+			LOG_ERROR("Failed to get block: {}", e.what());
 		}
 	}
 

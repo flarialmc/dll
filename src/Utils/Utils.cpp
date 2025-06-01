@@ -462,7 +462,7 @@ void Utils::extractFromFile(const std::string& zipFilePath, const std::string& d
 	mz_zip_archive zip_archive = {};
 
 	if (!mz_zip_reader_init_file(&zip_archive, zipFilePath.c_str(), 0)) {
-		Logger::error("Failed to open zip file: {}", zipFilePath);
+		LOG_ERROR("Failed to open zip file: {}", zipFilePath);
 		return;
 	}
 

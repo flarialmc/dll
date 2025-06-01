@@ -49,10 +49,10 @@ bool unloadDll(const wchar_t *moduleName) {
             Logger::debug("DLL unloaded");
             return true;
         }
-        Logger::error("Failed to FreeLibrary");
+        LOG_ERROR("Failed to FreeLibrary");
         return false;
     }
-    Logger::error("Failed to unload DLL");
+    LOG_ERROR("Failed to unload DLL");
     return false;
 }
 
@@ -118,7 +118,7 @@ void SwapchainHook::enableHook() {
 
     IDXGIFactory2 *pFactory = NULL;
     CreateDXGIFactory(IID_PPV_ARGS(&pFactory));
-    if (!pFactory) Logger::error("Factory not created");
+    if (!pFactory) LOG_ERROR("Factory not created");
 
     CreateSwapchainForCoreWindowHook::hook(pFactory);
 
@@ -253,7 +253,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     try {
         if (init && initImgui && !FlarialGUI::hasLoadedAll) { FlarialGUI::LoadAllImages(); FlarialGUI::hasLoadedAll = true; }
-    } catch (const std::exception &ex) { Logger::error("Fail at loading all images: ", ex.what()); }
+    } catch (const std::exception &ex) { LOG_ERROR("Fail at loading all images: ", ex.what()); }
 
 
     if (currentVsyncState) {

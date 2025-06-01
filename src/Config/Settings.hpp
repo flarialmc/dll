@@ -56,7 +56,7 @@ public:
         if (it != settings.end()) {
             settings.erase(it);
         } else {
-            Logger::error("Setting not found: {}", name);
+            LOG_ERROR("Setting not found: {}", name);
         }
     }
 
@@ -109,7 +109,7 @@ public:
 
     void FromJson(const std::string &jsonString) {
         if (jsonString.empty()) {
-            Logger::error("JSON string is empty");
+            LOG_ERROR("JSON string is empty");
             return;
         }
 
@@ -134,7 +134,7 @@ public:
             settings = std::move(newSettings);
 
         } catch (const json::parse_error &e) {
-            Logger::error("An error occured while parsing settings: {}", e.what());
+            LOG_ERROR("An error occured while parsing settings: {}", e.what());
         }
     }
 

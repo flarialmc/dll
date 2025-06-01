@@ -26,7 +26,7 @@ public:
 
             SDK::clientInstance->getGuiData()->displayClientMessage(formattedMessage);
         } catch (const std::exception& e) {
-            Logger::error("addCommandMessage error: {}", e.what());
+            LOG_ERROR("addCommandMessage error: {}", e.what());
         }
     }
 };

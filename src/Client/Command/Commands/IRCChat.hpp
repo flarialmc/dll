@@ -46,14 +46,14 @@ class IRCChat : public Command {
 public:
     IRCChat() : Command("irc", "Chat With other Flarial sigmas") {
         if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-            Logger::error("WSAStartup failed: {}", WSAGetLastError());
+            LOG_ERROR("WSAStartup failed: {}", WSAGetLastError());
             return;
         }
 
         // Create socket
         clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (clientSocket == INVALID_SOCKET) {
-            Logger::error("Socket creation failed: {}", WSAGetLastError());
+            LOG_ERROR("Socket creation failed: {}", WSAGetLastError());
             WSACleanup();
             return;
         }
@@ -66,7 +66,7 @@ public:
 
         // Connect to server
         if (connect(clientSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
-            Logger::error("Connection failed: {}", WSAGetLastError());
+            LOG_ERROR("Connection failed: {}", WSAGetLastError());
             closesocket(clientSocket);
             WSACleanup();
             return;

@@ -157,6 +157,7 @@ public:
 		scrollInfo["settings"] = { 0, 0 };
 
 		Listen(this, MouseEvent, &ClickGUI::onMouse)
+		//Listen(this, FOVEvent, &ClickGUI::fov)
 			Listen(this, KeyEvent, &ClickGUI::onKey)
 			ListenOrdered(this, PacketEvent, &ClickGUI::onPacketReceive, EventOrder::IMMEDIATE)
 			ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
@@ -520,6 +521,8 @@ public:
 	}
 
 	void onRender(RenderEvent& event);
+
+	//void fov(FOVEvent& event);
 
 	void onKey(KeyEvent& event) {
 
