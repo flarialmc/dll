@@ -23,6 +23,8 @@ private:
     float lerpYaw = 0.0f;
     float lerpPitch = 0.0f;
     static inline std::vector<TickData> tickList;
+    std::string versionName;
+    std::string cpuName;
 
     static double Microtime() {
         return (double(std::chrono::duration_cast<std::chrono::microseconds>(
@@ -271,7 +273,10 @@ public:
             std::vector<std::string> left;
             std::vector<std::string> right;
 
-            left.emplace_back(std::format("Flarial V2 Open Beta, Minecraft {}", VersionUtils::getFormattedVersion()));
+            if (versionName.empty()) {
+                versionName = std::format("Flarial V2 Open Beta, Minecraft {}", VersionUtils::getFormattedVersion());
+            }
+            left.emplace_back(versionName);
             if (settings.getSettingByName<bool>("imPoorButIWannaLookRich")->value) {
                 left.emplace_back(std::format("{} FPS", static_cast<int>(MC::fps * 222.2)));
             }
@@ -345,9 +350,10 @@ public:
                 right.emplace_back("Intel 9 7900X3D ProMax Plus");
             }
             else {
-                std::string cpuName = getCPU();
-                if (!cpuName.empty()) right.emplace_back(std::format("CPU: {}", getCPU()));
-                else right.emplace_back("CPU: Unknown");
+                if (cpuName.empty()) {
+                    std::string cpuName = getCPU();
+                }
+                right.emplace_back(std::format("CPU: {}", getCPU()));
             }
 
             right.emplace_back("");
