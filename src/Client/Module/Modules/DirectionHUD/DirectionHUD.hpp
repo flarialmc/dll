@@ -33,6 +33,7 @@ public:
 
 		if (settings.getSettingByName<float>("pixelsPerDegree") == nullptr) settings.addSetting("pixelsPerDegree", 1.5f);
 		if (settings.getSettingByName<bool>("wrapFade") == nullptr) settings.addSetting("wrapFade", true);
+		if (settings.getSettingByName<float>("fadeDistancePerc") == nullptr) settings.addSetting("fadeDistancePerc", 75.f);
 
 		if (settings.getSettingByName<bool>("showScales") == nullptr) settings.addSetting("showScales", true);
 		if (settings.getSettingByName<bool>("scaleShadow") == nullptr) settings.addSetting("scaleShadow", true);
@@ -105,6 +106,7 @@ public:
 		defaultAddSettings("main");
 		addSlider("Pixels Per Degree", "", settings.getSettingByName<float>("pixelsPerDegree")->value, 20.f, 0.001f);
 		addToggle("Wrap Around Fade", "", settings.getSettingByName<bool>("wrapFade")->value);
+		addConditionalSlider(settings.getSettingByName<bool>("wrapFade")->value, "Fade Distance", "what percentage of the distance from the center will the HUD start fading", settings.getSettingByName<float>("fadeDistancePerc")->value, 99, 1);
 		extraPadding();
 
 		addHeader("Scales");
@@ -315,16 +317,39 @@ public:
 		D2D_COLOR_F ordinalScaleShadowCol = settings.getSettingByName<bool>("ordinalScaleShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("ordinalScaleShadowCol")->value);
 		ordinalScaleShadowCol.a = settings.getSettingByName<float>("ordinalScaleShadowOpacity")->value;
 
-		float fadeStart = 70.f * pixelsPerDegree;
-		float fadeEnd = 120.f * pixelsPerDegree;
-		float fadeRange = fadeEnd - fadeStart;
 
 		for (int i = 0; i < directions.size(); i++) {
 			bool isOrdinal = directions[i].first.length() == 2;
 
-			float fromCenter = std::abs(directions[i].second-hudCenterX);
+			if (settings.getSettingByName<bool>("wrapFade")->value) {
+				float distanceFromCenter = std::abs(directions[i].second-hudCenterX);
+				float maxDistance = fullCirclePixelWidth / 2;
+				float omittedDistance = maxDistance * settings.getSettingByName<float>("fadeDistancePerc")->value / 100;
 
-			// plz make it fade in and out
+				D2D1_COLOR_F* cols[8] = {&ordinalScaleCol, &ordinalScaleShadowCol, &cardinalScaleCol, &cardinalScaleShadowCol, &cardinalTextCol, &cardinalTextShadowCol, &ordinalTextCol, &ordinalTextShadowCol};
+
+				if (distanceFromCenter > omittedDistance) {
+					for (int j = 0; j < 8; j++) {
+						cols[j]->a = 1 - (distanceFromCenter - omittedDistance) / (maxDistance - omittedDistance);
+					}
+				}
+				else {
+					for (int j = 0; j < 8; j++) {
+						cols[j]->a = 1;
+					}
+				}
+			}
+			else {
+				cardinalScaleCol.a = settings.getSettingByName<float>("cardinalScaleOpacity")->value;
+				ordinalScaleCol.a = settings.getSettingByName<float>("ordinalScaleOpacity")->value;
+				cardinalTextCol.a = settings.getSettingByName<float>("cardinalTextOpacity")->value;
+				ordinalTextCol.a = settings.getSettingByName<float>("ordinalTextOpacity")->value;
+				cardinalTextShadowCol.a = settings.getSettingByName<float>("cardinalTextShadowOpacity")->value;
+				ordinalTextShadowCol.a = settings.getSettingByName<float>("ordinalTextShadowOpacity")->value;
+				cardinalScaleShadowCol.a = settings.getSettingByName<float>("cardinalScaleShadowOpacity")->value;
+				ordinalScaleShadowCol.a = settings.getSettingByName<float>("ordinalScaleShadowOpacity")->value;
+			}
+
 
 			if (settings.getSettingByName<bool>("showScales")->value) {
 				if ((!isOrdinal && settings.getSettingByName<bool>("showCardinalScale")->value) ||
