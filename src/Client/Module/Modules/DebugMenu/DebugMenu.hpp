@@ -44,6 +44,7 @@ public:
     void defaultConfig() override {
         getKeybind();
         Module::defaultConfig("core");
+
         if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 0.65f);
         if (settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 0.0f);
         if (settings.getSettingByName<bool>("showBg") == nullptr) settings.addSetting("showBg", true);
@@ -53,6 +54,8 @@ public:
         if (settings.getSettingByName<std::string>("bgColor") == nullptr) settings.addSetting("bgColor", (std::string)"000000");
         if (settings.getSettingByName<float>("bgOpacity") == nullptr) settings.addSetting("bgOpacity", 0.5f);
         if (settings.getSettingByName<bool>("bgRGB") == nullptr) settings.addSetting("bgRGB", false);
+
+        if (settings.getSettingByName<bool>("imPoorButIWannaLookRich") == nullptr) settings.addSetting("imPoorButIWannaLookRich", false);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -78,6 +81,9 @@ public:
         addColorPicker("Text Color", "", settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
         addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
         this->extraPadding();
+
+        this->addHeader("Module Settings");
+        addToggle("I'm broke but I wanna look rich :(", "only for the real broke sigmas", settings.getSettingByName<bool>("imPoorButIWannaLookRich")->value);
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
@@ -237,7 +243,12 @@ public:
             std::vector<std::string> right;
 
             left.emplace_back(std::format("Flarial V2 Open Beta, Minecraft {}", VersionUtils::getFormattedVersion()));
-            left.emplace_back(std::format("{} FPS", MC::fps));
+            if (settings.getSettingByName<bool>("imPoorButIWannaLookRich")->value) {
+                left.emplace_back(std::format("{} FPS", static_cast<int>(MC::fps * 222.2)));
+            }
+            else {
+                left.emplace_back(std::format("{} FPS", MC::fps));
+            }
 
             left.emplace_back("");
 
@@ -283,26 +294,34 @@ public:
             int total_memory = static_cast<int>(memory_status.ullTotalPhys / 1000000);
             int free_memory = static_cast<int>(memory_status.ullAvailPhys / 1000000);
             int used_memory = total_memory - free_memory;
-            right.emplace_back(std::format("Mem: {}% {}/{} MB", static_cast<int>((used_memory * 100) / total_memory), used_memory, total_memory));
+            if (settings.getSettingByName<bool>("imPoorButIWannaLookRich")->value) {
+                int totallyRealTotalMemory = 2097152;
+                right.emplace_back(std::format("Mem: {}% {}/{} MB", static_cast<int>((used_memory * 100) / totallyRealTotalMemory), used_memory, totallyRealTotalMemory));
+            }
+            else {
+                right.emplace_back(std::format("Mem: {}% {}/{} MB", static_cast<int>((used_memory * 100) / total_memory), used_memory, total_memory));
+            }
 
             right.emplace_back("");
 
-            std::string cpuName = getCPU();
-            if (!cpuName.empty()) {
-                right.emplace_back(std::format("CPU: {}", getCPU()));
+            if (settings.getSettingByName<bool>("imPoorButIWannaLookRich")->value) {
+                right.emplace_back("Intel 9 7900X3D ProMax Plus");
             }
             else {
-                right.emplace_back("CPU: Unknown");
+                std::string cpuName = getCPU();
+                if (!cpuName.empty()) right.emplace_back(std::format("CPU: {}", getCPU()));
+                else right.emplace_back("CPU: Unknown");
             }
 
             right.emplace_back("");
 
             right.emplace_back(std::format("Display: {}x{}", MC::windowSize.x, MC::windowSize.y));
-            if (!MC::GPU.empty()) {
-                right.emplace_back(MC::GPU);
+            if (settings.getSettingByName<bool>("imPoorButIWannaLookRich")->value) {
+                right.emplace_back("AMD GFX 5090 Ti AI Accelerated DLSS 12.0");
             }
             else {
-                right.emplace_back("Unknown GPU");
+                if (!MC::GPU.empty()) right.emplace_back(MC::GPU);
+                else right.emplace_back("Unknown GPU");
             }
 
             right.emplace_back("");
