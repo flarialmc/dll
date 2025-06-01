@@ -159,7 +159,16 @@ public:
 		return diff;
 	}
 
-	float targetYaws[8] = { 180.f, 90.f, 0.f, -90.f, -135.f, 135.f, 45.f, -45.f };
+	float targetYaws[8] = {
+		180.f, // N
+		-90.f, // E
+		0.f, // S
+		90.f, // W
+		135.f, // NW
+		-135.f, // NE
+		-45.f, // SE
+		45.f // SW
+	};
 
 	void onRender(RenderEvent& event) {
 		if (!this->isEnabled()) return;
