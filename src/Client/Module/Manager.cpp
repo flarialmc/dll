@@ -103,6 +103,7 @@
 #include "Modules/Lewis/Lewis.hpp"
 #include "Modules/Coordinates/Coordinates.hpp"
 #include "Modules/DisableMouseWheel/DisableMouseWheel.hpp"
+#include "Modules/DirectionHUD/DirectionHUD.hpp"
 // #include "Modules/DebugMenu/DebugMenu.hpp"
 
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
@@ -245,7 +246,8 @@ void ModuleManager::initialize() {
     addModule<Lewis>();
     addModule<Coordinates>();
     addModule<DisableMouseWheel>();
-    // addModule<JavaDebugMenu>();
+    addModule<DirectionHUD>();
+    //addModule<JavaDebugMenu>();
 
     addService<GUIKeyListener>();
     if (!VersionUtils::checkAboveOrEqual(21, 60)) {
