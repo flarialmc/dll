@@ -23,7 +23,7 @@ winrt::Windows::Foundation::IAsyncOperation<bool> extractAutoComplete() {
         winrt::Windows::Web::Http::HttpClient httpClient;
         auto response = co_await httpClient.GetAsync(winrt::Windows::Foundation::Uri(L"https://github.com/flarialmc/scripting-wiki/archive/refs/heads/main.zip"));
         if (response.StatusCode() != winrt::Windows::Web::Http::HttpStatusCode::Ok) {
-            Logger::error("Failed to download repository zip from GitHub");
+            LOG_ERROR("Failed to download repository zip from GitHub");
             co_return false;
         }
 
@@ -42,7 +42,7 @@ winrt::Windows::Foundation::IAsyncOperation<bool> extractAutoComplete() {
 
         mz_zip_archive zipArchive = {};
         if (!mz_zip_reader_init_file(&zipArchive, tempFilePath.c_str(), 0)) {
-            Logger::error("Failed to initialize zip archive from downloaded file");
+            LOG_ERROR("Failed to initialize zip archive from downloaded file");
             co_await tempFile.DeleteAsync();
             co_return false;
         }
@@ -66,7 +66,7 @@ winrt::Windows::Foundation::IAsyncOperation<bool> extractAutoComplete() {
                     // Create the parent directory.
                     create_directories(localPath.parent_path());
                     if (!mz_zip_reader_extract_to_file(&zipArchive, i, localPath.string().c_str(), 0)) {
-                        Logger::error("Failed to extract file: {}", fileName);
+                        LOG_ERROR("Failed to extract file: {}", fileName);
                     }
                 }
             }
@@ -76,7 +76,7 @@ winrt::Windows::Foundation::IAsyncOperation<bool> extractAutoComplete() {
         co_await tempFile.DeleteAsync();
         co_return true;
     } catch (const std::exception& e) {
-        Logger::error("Error extracting AutoComplete: {}", e.what());
+        LOG_ERROR("Error extracting AutoComplete: {}", e.what());
         co_return false;
     }
 }
@@ -108,7 +108,7 @@ winrt::Windows::Foundation::IAsyncAction importScript(std::string category) {
     std::error_code ec;
     std::filesystem::create_directories(targetDir, ec);
     if (ec) {
-        Logger::error("Failed to create directory {}: {}", targetDir, ec.message());
+        LOG_ERROR("Failed to create directory {}: {}", targetDir, ec.message());
         co_return;
     }
 
@@ -121,7 +121,7 @@ winrt::Windows::Foundation::IAsyncAction importScript(std::string category) {
             co_await storageFile.CopyAsync(StorageFolder::GetFolderFromPathAsync(winrt::to_hstring(targetDir)).get(), winrt::to_hstring(fileName), NameCollisionOption::ReplaceExisting);
             Logger::success("Imported script: {}", fileName);
         } catch (const std::exception& e) {
-            Logger::error("Failed to import script: {}", e.what());
+            LOG_ERROR("Failed to import script: {}", e.what());
         }
     }
 }

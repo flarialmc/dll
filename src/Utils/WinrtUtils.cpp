@@ -117,7 +117,7 @@ winrt::Windows::Foundation::IAsyncAction WinrtUtils::pickAndCopyFiles(std::wstri
         co_await file.CopyAsync(targetFolder, file.Name(), NameCollisionOption::ReplaceExisting);
     }
     catch (winrt::hresult_error const& ex) {
-        Logger::error("Failed to copy file {}: {}", winrt::to_string(file.Name()), winrt::to_string(ex.message()));
+        LOG_ERROR("Failed to copy file {}: {}", winrt::to_string(file.Name()), winrt::to_string(ex.message()));
     }
 
     co_return;
@@ -147,7 +147,7 @@ void WinrtUtils::openSubFolder(const std::string& subFolder) {
         // Launch the subfolder in File Explorer
         Launcher::LaunchFolderAsync(folder).get();
     } catch (const winrt::hresult_error& e) {
-        Logger::error("An error occurred while trying to open {}: {} ({})", subFolder, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
+        LOG_ERROR("An error occurred while trying to open {}: {} ({})", subFolder, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
     }
 }
 
@@ -171,7 +171,7 @@ std::string WinrtUtils::getClipboard() {
             return winrt::to_string(text);
         }
     } catch (const winrt::hresult_error& e) {
-        Logger::error("Failed to get text from clipboard: {} ({})", winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
+        LOG_ERROR("Failed to get text from clipboard: {} ({})", winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
     }
     return "";
 }
@@ -181,7 +181,7 @@ void WinrtUtils::showMessageBox(const std::string& title, const std::string& mes
         winrt::Windows::UI::Popups::MessageDialog dialog(winrt::to_hstring(message), winrt::to_hstring(title));
     dialog.ShowAsync();
     } catch (const winrt::hresult_error& e) {
-        Logger::error("Failed to show message box {}: {} ({})", title, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
+        LOG_ERROR("Failed to show message box {}: {} ({})", title, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
     }
 }
 
@@ -196,7 +196,7 @@ void WinrtUtils::showNotification(const std::string& title, const std::string& m
 
         ToastNotificationManager::CreateToastNotifier().Show(notification);
     } catch (const winrt::hresult_error& e) {
-        Logger::error("Failed to show notification {}: {} ({})", title, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
+        LOG_ERROR("Failed to show notification {}: {} ({})", title, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
     }
 }
 

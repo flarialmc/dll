@@ -1135,7 +1135,7 @@ bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
 				int FontDataSize = static_cast<int>(it->first.size());
 
 				if (FontDataSize < 100) {
-					Logger::error("Error Loading Font. Font size is less than 100");
+					LOG_ERROR("Error Loading Font. Font size is less than 100");
 					return false;
 				};
 				const std::vector<int> fontSizeBuckets = { 16, 32, 64, 128, 256 };

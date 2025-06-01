@@ -6,7 +6,7 @@ namespace Audio {
 
     void init() {
         if (ma_engine_init(NULL, &engine) != MA_SUCCESS) {
-            Logger::error("Failed to init sound engine");
+            LOG_ERROR("Failed to init sound engine");
         } else {
             Logger::success("Sound engine was initialized");
         }
@@ -14,7 +14,7 @@ namespace Audio {
 
     void play(std::string audio) {
         if (ma_engine_play_sound(&engine, audio.c_str(), NULL) != MA_SUCCESS) {
-            Logger::error("Failed to play audio file: {}", audio);
+            LOG_ERROR("Failed to play audio file: {}", audio);
             ma_engine_uninit(&engine);
         }
     }

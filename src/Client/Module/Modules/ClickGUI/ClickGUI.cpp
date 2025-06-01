@@ -9,6 +9,38 @@
 std::chrono::time_point<std::chrono::high_resolution_clock> ClickGUI::favoriteStart;
 
 
+//random clickgui fov animation i found cool
+//i guess worth noting, i made this in like 10 minutes
+
+/*float rFov = 70.0f;
+float cFov = 70.0f;
+float maxFov = 110.0f;
+bool firsttime = true;
+
+void ClickGUI::fov(FOVEvent& event) {
+	rFov = event.getFOV();
+	auto player = SDK::clientInstance->getLocalPlayer();
+	if (!player) return;
+
+	if (ModuleManager::getModule("Java Dynamic FOV").get()->isEnabled()) {
+		if (player->getActorFlag(ActorFlags::FLAG_SPRINTING)) {
+			rFov = ModuleManager::getModule("Java Dynamic FOV").get()->settings.getSettingByName<float>("fov_target")->value;
+		}
+	}
+
+
+	if (this->active) {
+		if (firsttime) { cFov = rFov; firsttime = false; maxFov = rFov + 10.0f; }
+
+		FlarialGUI::lerp(cFov, maxFov, 0.20f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+	} else {
+		firsttime = true;
+		FlarialGUI::lerp(cFov, rFov, 0.20f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
+	}
+	event.setFOV(cFov);
+};*/
+
+
 void ClickGUI::onRender(RenderEvent& event) {
 
 	float allahu = Constraints::RelativeConstraint(0.65);

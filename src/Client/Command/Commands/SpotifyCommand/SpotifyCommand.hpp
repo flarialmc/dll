@@ -26,7 +26,7 @@ private:
 
         auto [responseCode, responseBody] = APIUtils::Request(url, method, data, headers);
         if (responseCode < 200 && responseCode >= 300) {
-            Logger::error("Spotify request failed ({}) : {}", responseCode, responseBody);
+            LOG_ERROR("Spotify request failed ({}) : {}", responseCode, responseBody);
         }
     }
 
@@ -112,9 +112,9 @@ public:
                     return songName + " by " + artist;
                 }
             } catch (const json::parse_error& e) {
-                Logger::error("JSON Parse Error: " + std::string(e.what()));
+                LOG_ERROR("JSON Parse Error: " + std::string(e.what()));
             } catch (const json::type_error& e) {
-                Logger::error("JSON Type Error: " + std::string(e.what()));
+                LOG_ERROR("JSON Type Error: " + std::string(e.what()));
             }
         }
 

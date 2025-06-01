@@ -602,14 +602,14 @@ void Module::saveSettings() {
 	try {
 		std::ofstream outputFile(settingspath);
 		if (!outputFile.is_open()) {
-			Logger::error("Failed to open file for writing: {}", settingspath.string());
+			LOG_ERROR("Failed to open file for writing: {}", settingspath.string());
 			return;
 		}
 		outputFile << settings.ToJson();
 		outputFile.close();
 	}
 	catch (const std::exception& e) {
-		Logger::error("An error occurred while saving settings: {}", e.what());
+		LOG_ERROR("An error occurred while saving settings: {}", e.what());
 	}
 }
 
@@ -627,7 +627,7 @@ void Module::loadSettings() {
 
 	std::ifstream inputFile(settingspath);
 	if (!inputFile.is_open()) {
-		Logger::error("Failed to open file: {}", settingspath.string());
+		LOG_ERROR("Failed to open file: {}", settingspath.string());
 		return;
 	}
 
@@ -665,7 +665,7 @@ void Module::checkSettingsFile() {
 		std::filesystem::create_directories(settingspath.parent_path());
 		std::ofstream outputFile(settingspath);
 		if (!outputFile.is_open()) {
-			Logger::error("Failed to create file: {}", settingspath.string());
+			LOG_ERROR("Failed to create file: {}", settingspath.string());
 		}
 		outputFile.close();
 	}

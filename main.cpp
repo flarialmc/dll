@@ -41,7 +41,7 @@ void SavePlayerCache() {
         cacheFile.close();
         Logger::success("Cached player list.");
     } else {
-        Logger::error("Could not open file for writing: " + filePath);
+        LOG_ERROR("Could not open file for writing: " + filePath);
     }
 }
 
@@ -58,6 +58,7 @@ DWORD WINAPI init() {
     Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
 
     Logger::success("Flarial initialized in {:.2f}s", Client::elapsed);
+    LOG_ERROR("{}", "testing");
 
     OptionsParser parser;
     parser.parseOptionsFile();
@@ -108,7 +109,7 @@ DWORD WINAPI init() {
                 SavePlayerCache();
                 lastOnlineUsersFetchTime = now;
             } catch (const std::exception &ex) {
-                Logger::error("An error occurred while parsing online users: {}", ex.what());
+                LOG_ERROR("An error occurred while parsing online users: {}", ex.what());
             }
         }
 
@@ -132,7 +133,7 @@ DWORD WINAPI init() {
                 }
                 lastVipFetchTime = now;
             } catch (const std::exception& e) {
-                Logger::error("An error occurred while parsing VIP users: {}", e.what());
+                LOG_ERROR("An error occurred while parsing VIP users: {}", e.what());
             }
         }
 
