@@ -15,6 +15,8 @@ private:
     Vec3<float> PrevPos{};
     std::string speed = "0";
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
+    float lerpYaw = 0.0f;
+    float lerpPitch = 0.0f;
 
 public:
 
@@ -82,15 +84,12 @@ public:
     }
 
     std::string getFacingDirection(LocalPlayer* player) {
-        auto rotationComponent = player->getActorRotationComponent();
-        yaw = rotationComponent->rot.y;
-        pitch = rotationComponent->rot.x;
         std::string direction;
-        if (yaw >= -45 && yaw < 45) direction = "South";
-        else if (yaw >= 45 && yaw < 135) direction = "West";
-        else if (yaw >= 135 || yaw < -135) direction = "North";
+        if (lerpYaw >= -45 && lerpYaw < 45) direction = "South";
+        else if (lerpYaw >= 45 && lerpYaw < 135) direction = "West";
+        else if (lerpYaw >= 135 || lerpYaw < -135) direction = "North";
         else direction = "East";
-        return std::format("Facing: {} ({:.1f} / {:.1f})", direction, yaw, pitch);
+        return std::format("Facing: {} ({:.1f} / {:.1f})", direction, lerpYaw, lerpPitch);
     }
 
     std::string getCPU() { // AI Slop
@@ -226,7 +225,13 @@ public:
             bgColor.a = settings.getSettingByName<float>("bgOpacity")->value;
 
             LocalPlayer* player = SDK::clientInstance->getLocalPlayer();
+            ActorRotationComponent* rotComponent = player->getActorRotationComponent();
             BlockPos targetPos = { 0, 0, 0 };
+
+            if (rotComponent) {
+                if (rotComponent->rot.x != 0) lerpYaw = rotComponent->rot.x;
+                if (rotComponent->rot.y != 0) lerpPitch = rotComponent->rot.y;
+            }
 
             std::vector<std::string> left;
             std::vector<std::string> right;
