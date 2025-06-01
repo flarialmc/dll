@@ -14,6 +14,7 @@ public:
 	std::vector<bool> PixelData = {};
 	int Size = 16;
 	CrosshairImage(std::vector<bool> Data, int Size);
+	CrosshairImage(std::string Path);
 	const unsigned char* getImageData();
 	void SaveImage(std::string name);
 };
@@ -35,13 +36,15 @@ public:
 
 	void onEnable() override {
 		Listen(this, PerspectiveEvent, &CustomCrosshair::onGetViewPerspective)
-			Listen(this, HudCursorRendererRenderEvent, &CustomCrosshair::onHudCursorRendererRender)
+		Listen(this, HudCursorRendererRenderEvent, &CustomCrosshair::onHudCursorRendererRender)
+		Listen(this, RenderEvent, &CustomCrosshair::onRender)
 			Module::onEnable();
 	}
 
 	void onDisable() override {
 		Deafen(this, PerspectiveEvent, &CustomCrosshair::onGetViewPerspective)
-			Deafen(this, HudCursorRendererRenderEvent, &CustomCrosshair::onHudCursorRendererRender)
+		Deafen(this, HudCursorRendererRenderEvent, &CustomCrosshair::onHudCursorRendererRender)
+		Deafen(this, RenderEvent, &CustomCrosshair::onRender)
 			Module::onDisable();
 	}
 
@@ -115,8 +118,6 @@ public:
 		FlarialGUI::UnsetScrollView();
 
 		this->resetPadding();
-
-		CrosshairEditorWindow();
 	}
 
 	void onGetViewPerspective(PerspectiveEvent& event) {
@@ -201,5 +202,10 @@ public:
 		}
 
 		event.cancel();
+	}
+
+	void onRender(RenderEvent &event)
+	{
+		CrosshairEditorWindow();
 	}
 };

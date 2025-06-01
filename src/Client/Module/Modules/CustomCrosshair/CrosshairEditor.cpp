@@ -3,6 +3,8 @@
 #include "../../../GUI/Engine/Engine.hpp"
 #include "Scripting/ScriptLibs/AudioLib.hpp"
 
+#include <ImGui/stb.h>
+
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
@@ -11,6 +13,30 @@ CrosshairImage::CrosshairImage(std::vector<bool> Data, int Size)
     this->PixelData = Data;
     this->Size = Size;
 };
+
+CrosshairImage::CrosshairImage(std::string Path)
+{
+    int w;
+    int h;
+    int comp;
+    unsigned char* image = stbi_load(Path.c_str(), &w, &h, &comp, STBI_rgb_alpha);
+
+    if (w != 16 or h != 16) return;
+
+    Size = w;
+
+    for (int i = 0; i < Size*Size*4; i+=4)
+    {
+        if (image[i] == 255)
+        {
+            PixelData.push_back(true);
+        }
+        else
+        {
+            PixelData.push_back(false);
+        }
+    }
+}
 
 const unsigned char* CrosshairImage::getImageData()
 {
@@ -51,14 +77,19 @@ void CrosshairImage::SaveImage(std::string name)
 void CustomCrosshair::CrosshairEditorWindow()
 {
     if (blankWindow) {
+        FlarialGUI::PushImClipRect(ImVec2(0, 0), ImVec2(Constraints::RelativeConstraint(1, "width", true), Constraints::RelativeConstraint(1, "height", true)));
+
         // Semi-transparent black background
-        FlarialGUI::RoundedRect(0, 0, D2D1::ColorF(D2D1::ColorF::Black, 0.75),
-            Constraints::RelativeConstraint(1.5, "width", true),
-            Constraints::RelativeConstraint(1.5, "height", true), 0, 0);
+        FlarialGUI::RoundedRect(
+            0,
+            0,
+            D2D1::ColorF(D2D1::ColorF::Black, 0.75),
+            Constraints::RelativeConstraint(1, "width", true),
+            Constraints::RelativeConstraint(1, "height", true), 0, 0);
 
         // Centered window
-        float rectwidth = Constraints::RelativeConstraint(0.55, "height", true);
-        float rectheight = Constraints::RelativeConstraint(0.45, "height", true);
+        float rectwidth = Constraints::RelativeConstraint(0.75, "height", true);
+        float rectheight = Constraints::RelativeConstraint(0.65, "height", true);
         Vec2<float> center = Constraints::CenterConstraint(rectwidth, rectheight);
         Vec2<float> round = Constraints::RoundingConstraint(45, 45);
         float y = Constraints::PercentageConstraint(0.10, "top");
@@ -77,7 +108,7 @@ void CustomCrosshair::CrosshairEditorWindow()
         FlarialGUI::RoundedRect(center.x, center.y, anotherColor, rectwidth, rectheight, round.x, round.x);
 
         // Initialize pixel data if empty
-        static CrosshairImage crosshair(std::vector<bool>(256, false), 16);
+        static CrosshairImage crosshair(Utils::getAssetsPath() + "\\ch1.png");
 
         // 16x16 Grid for editor
         float gridSize = Constraints::RelativeConstraint(0.35, "height", true);
@@ -110,21 +141,24 @@ void CustomCrosshair::CrosshairEditorWindow()
             }
         }
 
+        y += Constraints::RelativeConstraint(0.55, "height");
+
         // Close button
-        float buttonWidth = Constraints::RelativeConstraint(0.25f, "width");
-        float buttonHeight = Constraints::RelativeConstraint(0.13f, "height");
-        if (FlarialGUI::RoundedButton(0, Constraints::PercentageConstraint(0.07, "right") - buttonWidth, y,
-            colorThing, textCol, L"Close", buttonWidth, buttonHeight, round.x, round.x)) {
+        float buttonWidth = Constraints::RelativeConstraint(0.12f, "width", true);
+        float buttonHeight = Constraints::RelativeConstraint(0.06f, "height", true);
+        if (FlarialGUI::RoundedButton(0, center.x + Constraints::RelativeConstraint(0.05, "height", true), y,
+            colorThing, textCol, L"Close", buttonWidth, buttonHeight, round.x/2, round.x/2)) {
             blankWindow = false;
         }
 
         // Save button
-        if (FlarialGUI::RoundedButton(1, Constraints::PercentageConstraint(0.07, "right") - buttonWidth,
+        if (FlarialGUI::RoundedButton(1, center.x + Constraints::RelativeConstraint(0.05, "height", true),
             y + buttonHeight + Constraints::RelativeConstraint(0.02, "height"),
-            colorThing, textCol, L"Save", buttonWidth, buttonHeight, round.x, round.x)) {
+            colorThing, textCol, L"Save", buttonWidth, buttonHeight, round.x/2, round.x/2)) {
             crosshair.SaveImage(Utils::getAssetsPath() + "\\ch1.png");
         }
 
+        FlarialGUI::PopImClipRect();
         FlarialGUI::PushSize(center.x, center.y, rectwidth, rectheight);
         FlarialGUI::PopSize();
         FlarialGUI::UnsetWindowRect();
