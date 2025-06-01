@@ -266,8 +266,8 @@ public:
             BlockPos targetPos = { 0, 0, 0 };
 
             if (rotComponent) {
-                if (rotComponent->rot.x != 0) lerpYaw = rotComponent->rot.x;
-                if (rotComponent->rot.y != 0) lerpPitch = rotComponent->rot.y;
+                if (rotComponent->rot.y != 0) lerpYaw = rotComponent->rot.y;
+                if (rotComponent->rot.x != 0) lerpPitch = rotComponent->rot.x;
             }
 
             std::vector<std::string> left;
