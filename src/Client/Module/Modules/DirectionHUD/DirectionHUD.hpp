@@ -130,6 +130,7 @@ public:
 		addToggle("Wrap Around Fade", "", settings.getSettingByName<bool>("wrapFade")->value);
 		addConditionalSlider(settings.getSettingByName<bool>("wrapFade")->value, "Fade Distance", "what percentage of the distance from the center will the HUD start fading", settings.getSettingByName<float>("fadeDistancePerc")->value, 99, 1);
 
+
 		extraPadding();
 
 		addHeader("Scales");
@@ -158,6 +159,17 @@ public:
 		addConditionalToggle(settings.getSettingByName<bool>("showText")->value, "Show Ordinal Text", "", settings.getSettingByName<bool>("showOrdinalText")->value);
 		addConditionalSlider(settings.getSettingByName<bool>("showText")->value && settings.getSettingByName<bool>("showOrdinalText")->value, "Ordinal Text Size", "", settings.getSettingByName<float>("ordinalTextSize")->value, 5.0f);
 		addConditionalSlider(settings.getSettingByName<bool>("showText")->value && settings.getSettingByName<bool>("showOrdinalText")->value, "Ordinal Text Offset", "", settings.getSettingByName<float>("ordinalTextOffset")->value, 10.0f, 0.0f, false);
+
+		extraPadding();
+
+		addHeader("Degrees");
+		addToggle("Show Degrees", "Display the exact angle (0-360)", settings.getSettingByName<bool>("showDegrees")->value);
+		addConditionalSlider(settings.getSettingByName<bool>("showDegrees")->value, "Degrees Text Size", "", settings.getSettingByName<float>("degreesTextSize")->value, 3.0f, 0.5f);
+		addConditionalSlider(settings.getSettingByName<bool>("showDegrees")->value, "Degrees Text Offset", "", settings.getSettingByName<float>("degreesTextOffset")->value, 5.0f, 0.0f, false);
+		addConditionalToggle(settings.getSettingByName<bool>("showDegrees")->value, "Degrees Text Shadow", "", settings.getSettingByName<bool>("degreesTextShadow")->value);
+		addConditionalColorPicker(settings.getSettingByName<bool>("showDegrees")->value, "Degrees Text Color", "", settings.getSettingByName<std::string>("degreesTextCol")->value, settings.getSettingByName<float>("degreesTextOpacity")->value, settings.getSettingByName<bool>("degreesTextRGB")->value);
+		addConditionalColorPicker(settings.getSettingByName<bool>("showDegrees")->value && settings.getSettingByName<bool>("degreesTextShadow")->value, "Degrees Text Shadow Color", "", settings.getSettingByName<std::string>("degreesTextShadowCol")->value, settings.getSettingByName<float>("degreesTextShadowOpacity")->value, settings.getSettingByName<bool>("degreesTextShadowRGB")->value);
+		
 
 		extraPadding();
 
