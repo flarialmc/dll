@@ -8,6 +8,11 @@
 #include <chrono>
 
 
+class TickData {
+public:
+    double timestamp;
+};
+
 class JavaDebugMenu : public Module {
 
 private:
@@ -17,6 +22,12 @@ private:
     std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
     float lerpYaw = 0.0f;
     float lerpPitch = 0.0f;
+    static inline std::vector<TickData> tickList;
+
+    static double Microtime() {
+        return (double(std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count()) / double(1000000));
+    }
 
 public:
 
@@ -87,6 +98,18 @@ public:
 
         FlarialGUI::UnsetScrollView();
         this->resetPadding();
+    }
+
+    static int GetTicks() {
+        if (tickList.empty()) {
+            return 0;
+        }
+        double currentMicros = Microtime();
+        auto count = std::count_if(tickList.begin(), tickList.end(), [currentMicros](const TickData& click) {
+            return (currentMicros - click.timestamp <= 1.0);
+            });
+
+        return (int)std::round(count);
     }
 
     std::string getFacingDirection(LocalPlayer* player) {
@@ -192,6 +215,12 @@ public:
             speed = std::format("{:.2f}", stateVectorComponent->Pos.dist(PrevPos) * 20);
             PrevPos = stateVectorComponent->Pos;
         }
+        TickData tick{};
+        tick.timestamp = Microtime();
+        tickList.insert(tickList.begin(), tick);
+        if (tickList.size() >= 120) {
+            tickList.pop_back();
+        }
     }
 
     void onSetupAndRender(SetupAndRenderEvent& event) { // WAILA code
@@ -285,6 +314,14 @@ public:
                 left.emplace_back("");
                 left.emplace_back("Looking at block: 0 0 0");
             }
+
+            left.emplace_back("");
+
+            left.emplace_back("Server");
+            left.emplace_back(std::format("IP: {}", SDK::getServerIP()));
+            left.emplace_back(std::format("Port: {}", SDK::getServerPort()));
+            left.emplace_back(std::format("Ping: {} ms", SDK::getServerPing()));
+            left.emplace_back(std::format("TPS: {}", std::to_string(GetTicks())));
 
 
             right.emplace_back("64bit");
