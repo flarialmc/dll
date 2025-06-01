@@ -356,9 +356,9 @@ public:
                         true
                     ).x;
                     FlarialGUI::RoundedRect(
-                        0.0f, leftYoffset - yPadding,
+                        0.0f, leftYoffset - yPadding + 0.05f,
                         bgColor,
-                        lineWidth, textHeight / 3.0f + yPadding * 2,
+                        lineWidth, textHeight / 3.0f + yPadding * 2 - 1.0f,
                         rounding, rounding
                     );
                 }
@@ -387,9 +387,9 @@ public:
                         true
                     ).x;
                     FlarialGUI::RoundedRect(
-                        MC::windowSize.x - lineWidth, rightYoffset - yPadding,
+                        MC::windowSize.x - lineWidth, rightYoffset - yPadding + 0.05f,
                         bgColor,
-                        lineWidth, textHeight / 3.0f + yPadding * 2,
+                        lineWidth, textHeight / 3.0f + yPadding * 2 - 1.0f,
                         rounding, rounding
                     );
                 }
