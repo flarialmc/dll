@@ -11,7 +11,6 @@ public:
 
 
 	DirectionHUD() : Module("DirectionHUD", "Shows a compass showing your direction",
-	DirectionHUD() : Module("DirectionHUD", "Shows a compass showing your direction",
 		IDR_CURSOR_PNG, "") {
 		Module::setup();
 	};
@@ -35,19 +34,6 @@ public:
 		if (settings.getSettingByName<float>("pixelsPerDegree") == nullptr) settings.addSetting("pixelsPerDegree", 1.5f);
 		if (settings.getSettingByName<bool>("wrapFade") == nullptr) settings.addSetting("wrapFade", true);
 		if (settings.getSettingByName<float>("fadeDistancePerc") == nullptr) settings.addSetting("fadeDistancePerc", 75.f);
-		
-		// New settings for displaying the current direction in degrees
-		if (settings.getSettingByName<bool>("showDegrees") == nullptr) settings.addSetting("showDegrees", true);
-		if (settings.getSettingByName<float>("degreesTextSize") == nullptr) settings.addSetting("degreesTextSize", 1.2f);
-		if (settings.getSettingByName<float>("degreesTextOffset") == nullptr) settings.addSetting("degreesTextOffset", 0.5f);
-		if (settings.getSettingByName<std::string>("degreesTextCol") == nullptr) settings.addSetting("degreesTextCol", (std::string)"ffffff");
-		if (settings.getSettingByName<float>("degreesTextOpacity") == nullptr) settings.addSetting("degreesTextOpacity", 1.0f);
-		if (settings.getSettingByName<bool>("degreesTextRGB") == nullptr) settings.addSetting("degreesTextRGB", false);
-		if (settings.getSettingByName<bool>("degreesTextShadow") == nullptr) settings.addSetting("degreesTextShadow", true);
-		if (settings.getSettingByName<std::string>("degreesTextShadowCol") == nullptr) settings.addSetting("degreesTextShadowCol", (std::string)"000000");
-		if (settings.getSettingByName<float>("degreesTextShadowOpacity") == nullptr) settings.addSetting("degreesTextShadowOpacity", 1.0f);
-		if (settings.getSettingByName<bool>("degreesTextShadowRGB") == nullptr) settings.addSetting("degreesTextShadowRGB", false);
-
 		
 		if (settings.getSettingByName<bool>("showScales") == nullptr) settings.addSetting("showScales", true);
 		if (settings.getSettingByName<bool>("scaleShadow") == nullptr) settings.addSetting("scaleShadow", true);
@@ -104,6 +90,17 @@ public:
 		if (settings.getSettingByName<float>("ordinalScaleShadowOpacity") == nullptr) settings.addSetting("ordinalScaleShadowOpacity", 1.0f);
 		if (settings.getSettingByName<bool>("ordinalScaleShadowRGB") == nullptr) settings.addSetting("ordinalScaleShadowRGB", false);
 
+		if (settings.getSettingByName<bool>("showDegrees") == nullptr) settings.addSetting("showDegrees", true);
+		if (settings.getSettingByName<float>("degreesTextSize") == nullptr) settings.addSetting("degreesTextSize", 1.2f);
+		if (settings.getSettingByName<float>("degreesTextOffset") == nullptr) settings.addSetting("degreesTextOffset", 0.5f);
+		if (settings.getSettingByName<std::string>("degreesTextCol") == nullptr) settings.addSetting("degreesTextCol", (std::string)"ffffff");
+		if (settings.getSettingByName<float>("degreesTextOpacity") == nullptr) settings.addSetting("degreesTextOpacity", 1.0f);
+		if (settings.getSettingByName<bool>("degreesTextRGB") == nullptr) settings.addSetting("degreesTextRGB", false);
+		if (settings.getSettingByName<bool>("degreesTextShadow") == nullptr) settings.addSetting("degreesTextShadow", true);
+		if (settings.getSettingByName<std::string>("degreesTextShadowCol") == nullptr) settings.addSetting("degreesTextShadowCol", (std::string)"000000");
+		if (settings.getSettingByName<float>("degreesTextShadowOpacity") == nullptr) settings.addSetting("degreesTextShadowOpacity", 1.0f);
+		if (settings.getSettingByName<bool>("degreesTextShadowRGB") == nullptr) settings.addSetting("degreesTextShadowRGB", false);
+	
 		if (settings.getSettingByName<bool>("showDegrees") == nullptr) settings.addSetting("showDegrees", true);
 		if (settings.getSettingByName<float>("degreesTextSize") == nullptr) settings.addSetting("degreesTextSize", 1.2f);
 		if (settings.getSettingByName<float>("degreesTextOffset") == nullptr) settings.addSetting("degreesTextOffset", 0.5f);
@@ -291,21 +288,12 @@ public:
 		float hudCenterX = realcenter.x + (fullCirclePixelWidth / 2.f);
 
 		// cardinal calc pos
-		// Changed from minus to plus to fix reversed HUD
-		float xPosN = hudCenterX + (deltaYaw_N * pixelsPerDegree);
-		float xPosE = hudCenterX + (deltaYaw_E * pixelsPerDegree);
-		float xPosS = hudCenterX + (deltaYaw_S * pixelsPerDegree);
-		float xPosW = hudCenterX + (deltaYaw_W * pixelsPerDegree);
 		float xPosN = hudCenterX + (deltaYaw_N * pixelsPerDegree);
 		float xPosE = hudCenterX + (deltaYaw_E * pixelsPerDegree);
 		float xPosS = hudCenterX + (deltaYaw_S * pixelsPerDegree);
 		float xPosW = hudCenterX + (deltaYaw_W * pixelsPerDegree);
 
 		// ordinal calc pos
-		float xPosNW = hudCenterX + (deltaYaw_NW * pixelsPerDegree);
-		float xPosNE = hudCenterX + (deltaYaw_NE * pixelsPerDegree);
-		float xPosSE = hudCenterX + (deltaYaw_SE * pixelsPerDegree);
-		float xPosSW = hudCenterX + (deltaYaw_SW * pixelsPerDegree);
 		float xPosNW = hudCenterX + (deltaYaw_NW * pixelsPerDegree);
 		float xPosNE = hudCenterX + (deltaYaw_NE * pixelsPerDegree);
 		float xPosSE = hudCenterX + (deltaYaw_SE * pixelsPerDegree);
@@ -374,60 +362,9 @@ public:
 		D2D_COLOR_F ordinalScaleShadowCol = settings.getSettingByName<bool>("ordinalScaleShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("ordinalScaleShadowCol")->value);
 		ordinalScaleShadowCol.a = settings.getSettingByName<float>("ordinalScaleShadowOpacity")->value;
 
-
-		// Display current direction in degrees at the top-center
+		// degrees text
 		if (settings.getSettingByName<bool>("showDegrees")->value) {
-			// Convert Minecraft's yaw (-180 to 180) to compass degrees (0-360, where 0 is North)
-			float compassDegrees = fmod((-lerpYaw + 180.0f), 360.0f);
-			if (compassDegrees < 0) compassDegrees += 360.0f;
-			
-			// Format the degrees text
-			std::string degreesText = std::to_string(static_cast<int>(compassDegrees));
-			
-			// Get text size for positioning
-			float degreesTextSize = Constraints::SpacingConstraint(5.f, barHeight) * settings.getSettingByName<float>("degreesTextSize")->value;
-			float degreesTextOffset = Constraints::RelativeConstraint(settings.getSettingByName<float>("degreesTextOffset")->value) * uiscale * 0.01f;
-			
-			// Setup colors
-			D2D_COLOR_F degreesTextCol = settings.getSettingByName<bool>("degreesTextRGB")->value ? 
-				FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("degreesTextCol")->value);
-			degreesTextCol.a = settings.getSettingByName<float>("degreesTextOpacity")->value;
-			
-			D2D_COLOR_F degreesTextShadowCol = settings.getSettingByName<bool>("degreesTextShadowRGB")->value ? 
-				FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("degreesTextShadowCol")->value);
-			degreesTextShadowCol.a = settings.getSettingByName<float>("degreesTextShadowOpacity")->value;
-			
-			ImVec2 textMetrics = FlarialGUI::getFlarialTextSize(
-				FlarialGUI::to_wide(degreesText).c_str(),
-				0, 0,
-				DWRITE_TEXT_ALIGNMENT_CENTER, degreesTextSize,
-				DWRITE_FONT_WEIGHT_NORMAL, true);
-			
-			// Draw shadow if enabled
-			if (settings.getSettingByName<bool>("degreesTextShadow")->value) {
-				FlarialGUI::FlarialTextWithFont(
-					hudCenterX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
-					realcenter.y - textMetrics.y - degreesTextOffset + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
-					FlarialGUI::to_wide(degreesText).c_str(),
-					0, 0,
-					DWRITE_TEXT_ALIGNMENT_CENTER, degreesTextSize,
-					DWRITE_FONT_WEIGHT_NORMAL,
-					degreesTextShadowCol, true);
-			}
-			
-			// Draw the degrees text
-			FlarialGUI::FlarialTextWithFont(
-				hudCenterX,
-				realcenter.y - textMetrics.y - degreesTextOffset,
-				FlarialGUI::to_wide(degreesText).c_str(),
-				0, 0,
-				DWRITE_TEXT_ALIGNMENT_CENTER, degreesTextSize,
-				DWRITE_FONT_WEIGHT_NORMAL,
-				degreesTextCol, true);
-		}
-		
-
-		if (settings.getSettingByName<bool>("showDegrees")->value) {
+			// convert to 0-360
 			float compassDegrees = fmod((-lerpYaw + 180.0f), 360.0f);
 			if (compassDegrees < 0) compassDegrees += 360.0f;
 			
@@ -464,7 +401,7 @@ public:
 					degreesTextShadowCol, true);
 			}
 			
-			// draw degree text
+			// draw the text itself
 			FlarialGUI::FlarialTextWithFont(
 				hudCenterX,
 				realcenter.y - textMetrics.y - degreesTextOffset,
