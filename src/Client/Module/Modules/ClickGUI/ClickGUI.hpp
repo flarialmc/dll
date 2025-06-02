@@ -13,6 +13,18 @@
 #define o_colors_text clickgui->settings.getSettingByName<float>("o_colors_text")->value
 #define colors_text_rgb clickgui->settings.getSettingByName<bool>("colors_text_rgb")->value
 
+#define colors_primary1 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary1")->value)
+#define o_colors_primary1 clickgui->settings.getSettingByName<float>("o_colors_primary1")->value
+#define colors_primary1_rgb clickgui->settings.getSettingByName<bool>("colors_primary1_rgb")->value
+
+#define colors_primary3 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary3")->value)
+#define o_colors_primary3 clickgui->settings.getSettingByName<float>("o_colors_primary3")->value
+#define colors_primary3_rgb clickgui->settings.getSettingByName<bool>("colors_primary3_rgb")->value
+
+#define colors_primary4 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary4")->value)
+#define o_colors_primary4 clickgui->settings.getSettingByName<float>("o_colors_primary4")->value
+#define colors_primary4_rgb clickgui->settings.getSettingByName<bool>("colors_primary4_rgb")->value
+
 #define colors_secondary1 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary1")->value)
 #define o_colors_secondary1 clickgui->settings.getSettingByName<float>("o_colors_secondary1")->value
 #define colors_secondary1_rgb clickgui->settings.getSettingByName<bool>("colors_secondary1_rgb")->value

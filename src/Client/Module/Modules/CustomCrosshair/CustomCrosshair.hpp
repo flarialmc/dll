@@ -7,14 +7,17 @@
 #include "Events/EventManager.hpp"
 #include "Events/Game/PerspectiveEvent.hpp"
 #include "Utils/Render/PositionUtils.hpp"
+#include <filesystem>
 
 class CrosshairImage
 {
 public:
-	std::vector<bool> PixelData = {};
+	std::vector<bool> PixelData = std::vector<bool>(256, true);
 	int Size = 16;
+	bool valid = false;
 	CrosshairImage(std::vector<bool> Data, int Size);
 	CrosshairImage(std::string Path);
+	CrosshairImage() {};
 	const unsigned char* getImageData();
 	void SaveImage(std::string name);
 };
@@ -23,8 +26,11 @@ class CustomCrosshair : public Module
 {
 private:
 	Perspective currentPerspective;
-	bool blankWindow;
+	bool blankWindow = false;
 	bool CrosshairReloaded = false;
+	std::map<std::string, CrosshairImage*> crosshairs;
+	std::string CurrentSelectedCrosshair;
+	bool actuallyRenderWindow = false;
 public:
 	CustomCrosshair() : Module("Custom Crosshair", "Allows for dynamic crosshair colors.",
 		IDR_SPEED_PNG, "") {
@@ -39,6 +45,24 @@ public:
 		Listen(this, HudCursorRendererRenderEvent, &CustomCrosshair::onHudCursorRendererRender)
 		Listen(this, RenderEvent, &CustomCrosshair::onRender)
 			Module::onEnable();
+
+		std::string Path = Utils::getClientPath() + "\\Crosshairs";
+
+		for (const auto& entry : std::filesystem::directory_iterator(Path))
+		{
+			auto ch = new CrosshairImage(entry.path().string());
+			Logger::debug("Crosshair: " + entry.path().string());
+
+			std::string name = entry.path().filename().string();
+			crosshairs[name.substr(0, name.size()-4)] = ch;
+
+			Logger::debug("Crosshair loaded: " + name);
+
+		}
+
+		std::cout << crosshairs.empty() << std::endl;
+
+		if (crosshairs.empty()) crosshairs["Crosshair1"] = new CrosshairImage(std::vector<bool>(256, true), 16);
 	}
 
 	void onDisable() override {
@@ -67,10 +91,15 @@ public:
 		if (settings.getSettingByName<bool>("enemyColorRGB") == nullptr) settings.addSetting("enemyColorRGB", false);
 		if (settings.getSettingByName<float>("enemyOpacity") == nullptr) settings.addSetting("enemyOpacity", 1.f);
 
-		if (settings.getSettingByName<std::string>("CurrentCrosshair") == nullptr) settings.addSetting("CurrentCrosshair", (std::string)"");
+		if (settings.getSettingByName<std::string>("CurrentCrosshair") == nullptr) settings.addSetting("CurrentCrosshair", (std::string)"Crosshair1");
 	}
 
 	void settingsRender(float settingsOffset) override {
+
+		actuallyRenderWindow = true;
+		auto button = MC::mouseButton;
+		if (blankWindow)
+			MC::mouseButton = MouseButton::None;
 
 		float x = Constraints::PercentageConstraint(0.019, "left");
 		float y = Constraints::PercentageConstraint(0.10, "top");
@@ -118,6 +147,8 @@ public:
 		FlarialGUI::UnsetScrollView();
 
 		this->resetPadding();
+
+		MC::mouseButton = button;
 	}
 
 	void onGetViewPerspective(PerspectiveEvent& event) {
@@ -134,6 +165,8 @@ public:
 		if (!renderInThirdPerson && currentPerspective != Perspective::FirstPerson) return;
 		bool isHoveringEnemy = (player->getLevel()->getHitResult().type == HitResultType::Entity);
 
+		bool isDefault = !settings.getSettingByName<bool>("CustomCrosshair")->value;
+
 		auto screenContext = event.getMinecraftUIRenderContext()->getScreenContext();
 
 		const ResourceLocation loc("textures/ui/cross_hair", false);
@@ -141,13 +174,23 @@ public:
 		if (ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr) {
 			return;
 		}
-		const ResourceLocation loc2(Utils::getAssetsPath() + "\\ch1.png", true);
-		TexturePtr ptr2 = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc2, CrosshairReloaded);
-		CrosshairReloaded = false;
-		if (ptr2.clientTexture == nullptr || ptr2.clientTexture->clientTexture.resourcePointerBlock == nullptr) {
-			return;
+
+		TexturePtr ptr2;
+
+		if (std::filesystem::exists(Utils::getClientPath() + "//Crosshairs//" + settings.getSettingByName<std::string>("CurrentCrosshair")->value + ".png"))
+		{
+			const ResourceLocation loc2(Utils::getClientPath() + "//Crosshairs//" + settings.getSettingByName<std::string>("CurrentCrosshair")->value + ".png", true);
+			ptr2 = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc2, CrosshairReloaded);
+			CrosshairReloaded = false;
+			if (ptr2.clientTexture == nullptr || ptr2.clientTexture->clientTexture.resourcePointerBlock == nullptr) {
+				isDefault = true;
+			}
 		}
-		ptr2;
+		else
+		{
+			isDefault = true;
+		}
+
 		const auto tess = screenContext->getTessellator();
 
 		tess->begin(mce::PrimitiveMode::QuadList, 4);
@@ -160,8 +203,6 @@ public:
 
 		auto shouldHighlight = settings.getSettingByName<bool>("highlightOnEntity")->value;
 		D2D1_COLOR_F color = isHoveringEnemy && shouldHighlight ? enemyColor : defaultColor;
-
-		bool isDefault = !settings.getSettingByName<bool>("CustomCrosshair")->value;
 
 		tess->color(color.r, color.g, color.b, color.a);
 
@@ -206,6 +247,13 @@ public:
 
 	void onRender(RenderEvent &event)
 	{
-		CrosshairEditorWindow();
+		if (actuallyRenderWindow)
+			CrosshairEditorWindow();
+		else
+		{
+			blankWindow = false;
+		}
+		actuallyRenderWindow = false;
+		if (!blankWindow) CurrentSelectedCrosshair = settings.getSettingByName<std::string>("CurrentCrosshair")->value;
 	}
 };
