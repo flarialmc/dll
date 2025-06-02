@@ -80,6 +80,8 @@ void CrosshairImage::SaveImage(std::string name)
     delete[] data;
 }
 
+bool CreateCrosshairWindow = false;
+
 void CustomCrosshair::CrosshairEditorWindow()
 {
     if (blankWindow) {
@@ -147,22 +149,23 @@ void CustomCrosshair::CrosshairEditorWindow()
                 // Draw cell (white if true, gray if false)
                 D2D1_COLOR_F cellColor = crosshair->PixelData[i * 16 + j] ?
                     D2D1::ColorF(D2D1::ColorF::White, 1.0f) :
-                    D2D1::ColorF(D2D1::ColorF::Gray, 0.5f);
+                    D2D1::ColorF(D2D1::ColorF::Gray, 1.0f);
                 if (locked)
                 {
                     cellColor = D2D1_COLOR_F(0.3, 0.3, 0.3, 1.0);
                 }
                 FlarialGUI::RoundedRect(cellX, cellY, cellColor, cellSize, cellSize, 0, 0);
+                FlarialGUI::RoundedHollowRect(cellX, cellY, 2, D2D1::ColorF(D2D1::ColorF::Black, 1), cellSize, cellSize, 0, 0);
 
                 // Handle left click/drag to set pixel
                 if (FlarialGUI::CursorInRect(cellX, cellY, cellSize, cellSize) &&
-                    MC::lastMouseButton == MouseButton::Left && MC::held and !locked) {
+                    MC::lastMouseButton == MouseButton::Left && MC::held and !locked and !CreateCrosshairWindow) {
                     crosshair->PixelData[i * 16 + j] = true;
                 }
 
                 // Handle right click/drag to clear pixel
                 if (FlarialGUI::CursorInRect(cellX, cellY, cellSize, cellSize) &&
-                    MC::lastMouseButton == MouseButton::Right && MC::held and !locked) {
+                    MC::lastMouseButton == MouseButton::Right && MC::held and !locked and !CreateCrosshairWindow) {
                     crosshair->PixelData[i * 16 + j] = false;
                 }
             }
@@ -174,26 +177,30 @@ void CustomCrosshair::CrosshairEditorWindow()
         float buttonWidth = (gridSize/2) * 0.975;
         float buttonHeight = Constraints::RelativeConstraint(0.05f, "height", true);
 
-        if (FlarialGUI::RoundedButton(0, gridX, y,
+        if (FlarialGUI::RoundedButton(3, gridX, y,
             colorThing, textCol, L"Close", buttonWidth, buttonHeight, round.x/2, round.x/2)) {
+
+            for (const auto& entry : std::filesystem::directory_iterator(Utils::getClientPath() + "//Crosshairs"))
+                std::filesystem::remove_all(entry.path());
 
             for (auto ch : crosshairs)
             {
-                if (ch.second != nullptr)
-                ch.second->SaveImage(ch.first);
+                if (ch.second != nullptr and ch.first != "")
+                    ch.second->SaveImage(ch.first);
             }
 
             blankWindow = false;
         }
 
         // Save button
-        if (FlarialGUI::RoundedButton(1, gridX,
+        if (FlarialGUI::RoundedButton(4, gridX,
             y + buttonHeight + Constraints::RelativeConstraint(0.01, "height"),
             colorThing, textCol, L"Create", buttonWidth, buttonHeight, round.x/2, round.x/2)) {
 
+            CreateCrosshairWindow = true;
         }
 
-        if (FlarialGUI::RoundedButton(0, gridX + buttonWidth + ((gridSize/2) * 0.05), y,
+        if (FlarialGUI::RoundedButton(5, gridX + buttonWidth + ((gridSize/2) * 0.05), y,
             colorThing, textCol, L"Delete", buttonWidth, buttonHeight, round.x/2, round.x/2))
         {
             auto it = crosshairs.find(CurrentSelectedCrosshair);
@@ -210,10 +217,11 @@ void CustomCrosshair::CrosshairEditorWindow()
             }
         }
 
-        if (FlarialGUI::RoundedButton(1, gridX + buttonWidth + ((gridSize/2) * 0.05),
+        if (FlarialGUI::RoundedButton(6, gridX + buttonWidth + ((gridSize/2) * 0.05),
             y + buttonHeight + Constraints::RelativeConstraint(0.01, "height"),
             colorThing, textCol, L"Load", buttonWidth, buttonHeight, round.x/2, round.x/2)) {
 
+            settings.getSettingByName<std::string>("CurrentCrosshair")->value = CurrentSelectedCrosshair;
             crosshair->SaveImage(settings.getSettingByName<std::string>("CurrentCrosshair")->value);
             CrosshairReloaded = true;
             }
@@ -229,12 +237,14 @@ void CustomCrosshair::CrosshairEditorWindow()
 
         FlarialGUI::RoundedRect(CrosshairSelectorX, CrosshairSelectorY, colorThing, CrosshairSelectorSize.x, rectheight - Constraints::RelativeConstraint(0.04, "height", true), round.x/1.5, round.x/1.5);
 
+        FlarialGUI::SetScrollView(CrosshairSelectorX, CrosshairSelectorY, CrosshairSelectorSize.x, rectheight - Constraints::RelativeConstraint(0.04, "height", true));
+
         float MelivnIsGayAsFuckLikeSuckingCocksWhileRidingBigBlackMenDuringThePrideMonthWithAGayFlagUpHisAss = CrosshairSelectorY + Spacing;
 
         for (auto ch : crosshairs)
         {
             if (ch.second == nullptr or ch.first == "") continue;
-            if (FlarialGUI::CursorInRect(CrosshairSelectorX + Spacing, MelivnIsGayAsFuckLikeSuckingCocksWhileRidingBigBlackMenDuringThePrideMonthWithAGayFlagUpHisAss, CrosshairRectWidth, CrosshairRectHeight)  && MC::mouseButton == MouseButton::Left && !MC::held)
+            if (FlarialGUI::CursorInRect(CrosshairSelectorX + Spacing, MelivnIsGayAsFuckLikeSuckingCocksWhileRidingBigBlackMenDuringThePrideMonthWithAGayFlagUpHisAss, CrosshairRectWidth, CrosshairRectHeight)  && MC::mouseButton == MouseButton::Left && !MC::held and !CreateCrosshairWindow)
             {
                 CurrentSelectedCrosshair = ch.first;
             }
@@ -247,6 +257,40 @@ void CustomCrosshair::CrosshairEditorWindow()
             MelivnIsGayAsFuckLikeSuckingCocksWhileRidingBigBlackMenDuringThePrideMonthWithAGayFlagUpHisAss += Spacing + CrosshairRectHeight;
         }
 
+        FlarialGUI::UnsetScrollView();
+
+        if (CreateCrosshairWindow)
+        {
+            FlarialGUI::RoundedRect(
+            0,
+            0,
+            D2D1::ColorF(D2D1::ColorF::Black, 0.75),
+            Constraints::RelativeConstraint(1, "width", true),
+            Constraints::RelativeConstraint(1, "height", true), 0, 0);
+
+            rectwidth = Constraints::RelativeConstraint(0.3, "height", true);
+            rectheight = Constraints::RelativeConstraint(0.168, "height", true);
+            center = Constraints::CenterConstraint(rectwidth, rectheight);
+
+            FlarialGUI::RoundedHollowRect(center.x, center.y, Constraints::RelativeConstraint(0.01, "height", true),
+            colorThing, rectwidth, rectheight, round.x, round.x);
+            FlarialGUI::RoundedRect(center.x, center.y, anotherColor, rectwidth, rectheight, round.x, round.x);
+
+            float TextBoxX = center.x + Constraints::RelativeConstraint(0.03, "height", true);
+            float TextBoxY = center.y + Constraints::RelativeConstraint(0.038, "height", true);
+
+            float TextBoxHeight = Constraints::RelativeConstraint(0.035, "height", true);
+
+            FlarialGUI::TextBoxVisual(6996, CrosshairText, 0, TextBoxX, TextBoxY, "");
+
+            if (FlarialGUI::RoundedButton(7, TextBoxX, TextBoxY + TextBoxHeight + Constraints::RelativeConstraint(0.01, "height", true), colorThing, textCol, L"Create", Constraints::RelativeConstraint(0.15, "height", true), TextBoxHeight*1.8, round.x/2, round.x/2))
+            {
+                crosshairs[CrosshairText] = new CrosshairImage();
+                CurrentSelectedCrosshair = CrosshairText;
+                CrosshairText = "";
+                CreateCrosshairWindow = false;
+            }
+        }
 
         FlarialGUI::PopImClipRect();
         FlarialGUI::PushSize(center.x, center.y, rectwidth, rectheight);

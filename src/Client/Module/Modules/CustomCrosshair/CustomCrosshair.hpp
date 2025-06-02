@@ -12,7 +12,7 @@
 class CrosshairImage
 {
 public:
-	std::vector<bool> PixelData = std::vector<bool>(256, true);
+	std::vector<bool> PixelData = std::vector<bool>(256, false);
 	int Size = 16;
 	bool valid = false;
 	CrosshairImage(std::vector<bool> Data, int Size);
@@ -26,10 +26,11 @@ class CustomCrosshair : public Module
 {
 private:
 	Perspective currentPerspective;
-	bool blankWindow = false;
+	bool blankWindow;
 	bool CrosshairReloaded = false;
 	std::map<std::string, CrosshairImage*> crosshairs;
 	std::string CurrentSelectedCrosshair;
+	std::string CrosshairText = "";
 	bool actuallyRenderWindow = false;
 public:
 	CustomCrosshair() : Module("Custom Crosshair", "Allows for dynamic crosshair colors.",
@@ -62,7 +63,7 @@ public:
 
 		std::cout << crosshairs.empty() << std::endl;
 
-		if (crosshairs.empty()) crosshairs["Crosshair1"] = new CrosshairImage(std::vector<bool>(256, true), 16);
+		if (crosshairs.empty()) crosshairs["Crosshair1"] = new CrosshairImage();
 	}
 
 	void onDisable() override {
@@ -112,6 +113,21 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
+		if (settings.getSettingByName<bool>("CustomCrosshair")->value)
+		{
+			this->addHeader("Crosshair Editor");
+			this->addButton("Crosshair Editor", "Opens the crosshair editor menu", "open", [&]()
+			{
+				this->blankWindow = !this->blankWindow;
+			});
+			this->addButton("Reload Crosshair", "Reloads Crosshair to apply any changes", "reload", [&]()
+			{
+				this->CrosshairReloaded = true;
+			});
+
+			this->extraPadding();
+		}
+
 		this->addHeader("Main");
 		this->addToggle("Use Custom Crosshair", "Uses a custom crosshair.", settings.getSettingByName<bool>("CustomCrosshair")->value);
 		this->addToggle("Solid Color", "Make crosshair a solid color / more visible", settings.getSettingByName<bool>("solidColor")->value);
@@ -124,7 +140,7 @@ public:
 		this->extraPadding();
 
 		this->addHeader("Misc");
-		this->addSlider("UI Scale", "The size of the Crosshair (only for custom)", settings.getSettingByName<float>("uiscale")->value, 10.f, 0.f, true);
+		this->addSlider("Crosshair Scale", "The size of the Crosshair (only for custom)", settings.getSettingByName<float>("uiscale")->value, 10.f, 0.f, true);
 
 		this->extraPadding();
 
@@ -136,19 +152,12 @@ public:
 				settings.getSettingByName<float>("enemyOpacity")->value,
 				settings.getSettingByName<bool>("enemyColorRGB")->value);
 		}
-		this->addButton("Crosshair Editor", "Opens the crosshair editor menu", "open", [&]()
-		{
-			this->blankWindow = !this->blankWindow;
-		});
-		this->addButton("Reload Crosshair", "Reloads Crosshair to apply any changes", "reload", [&]()
-		{
-			this->CrosshairReloaded = true;
-		});
 		FlarialGUI::UnsetScrollView();
 
 		this->resetPadding();
 
-		MC::mouseButton = button;
+		if (blankWindow)
+			MC::mouseButton = button;
 	}
 
 	void onGetViewPerspective(PerspectiveEvent& event) {
