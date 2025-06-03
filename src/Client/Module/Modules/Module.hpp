@@ -5,7 +5,8 @@
 #include "../../../Config/Settings.hpp"
 #include <fstream>
 #include <iostream>
-#include <Windows.h>
+#include <windows.h>
+#include <unknwn.h>
 #include <filesystem>
 #include <sstream>
 #include <utility>

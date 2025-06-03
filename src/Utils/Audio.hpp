@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../lib/miniaudio.h"
+#include "miniaudio.h"
 #include "Utils/Logger/Logger.hpp"
 
 namespace Audio {

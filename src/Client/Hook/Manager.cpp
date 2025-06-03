@@ -34,7 +34,6 @@
 #include "Hooks/Game/ItemInHandRendererRenderItem.hpp"
 #include "Hooks/Visual/RenderOutlineSelectionHook.hpp"
 #include "Hooks/Game/displayClientMessage.hpp"
-#include "Hooks/Game/getTimeOfDayHook.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
@@ -111,7 +110,7 @@ void HookManager::initialize() {
 
     addHook<RenderOutlineSelectionHook>();
 
-    addHook<getTimeOfDayHook>();
+
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();

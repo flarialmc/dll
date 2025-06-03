@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <codecvt>
 #include <windows.h>
+#include <unknwn.h>
 #include <iostream>
 #include <Psapi.h>
 #include <tlhelp32.h>

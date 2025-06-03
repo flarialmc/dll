@@ -5,7 +5,8 @@
 #include "../../../Events/Listener.hpp"
 #include "../Module.hpp"
 #include "../../../GUI/Engine/Engine.hpp"
-#include <Windows.h>
+#include <windows.h>
+#include <unknwn.h>
 
 #include "Events/Render/RenderEvent.hpp"
 

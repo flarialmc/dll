@@ -1,10 +1,10 @@
-#define MINIAUDIO_IMPLEMENTATION // trust needed
+#define MINIAUDIO_IMPLEMENTATION
 #include "Audio.hpp"
+#include "miniaudio.h"
 
-namespace Audio {
-    ma_engine engine;
+    ma_engine Audio::engine;
 
-    void init() {
+    void Audio::init() {
         if (ma_engine_init(NULL, &engine) != MA_SUCCESS) {
             LOG_ERROR("Failed to init sound engine");
         } else {
@@ -12,14 +12,13 @@ namespace Audio {
         }
     }
 
-    void play(std::string audio) {
+    void Audio::play(std::string audio) {
         if (ma_engine_play_sound(&engine, audio.c_str(), NULL) != MA_SUCCESS) {
             LOG_ERROR("Failed to play audio file: {}", audio);
             ma_engine_uninit(&engine);
         }
     }
 
-    void cleanup() {
+    void Audio::cleanup() {
         ma_engine_uninit(&engine);
     }
-}

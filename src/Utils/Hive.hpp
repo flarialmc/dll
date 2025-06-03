@@ -2,6 +2,7 @@
 
 #include <string>
 #include <windows.h>
+#include <unknwn.h>
 #include <wininet.h>
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <ImGui/imgui.h>

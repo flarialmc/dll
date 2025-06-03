@@ -5,6 +5,7 @@
 #include "../../../Client.hpp"
 #include "../../Utils/VersionUtils.hpp"
 #include <windows.h>
+#include <unknwn.h>
 #include <chrono>
 
 

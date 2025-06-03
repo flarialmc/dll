@@ -85,36 +85,40 @@ std::string WinrtUtils::getFormattedVersion() {
 
     return parts[0] + "." + parts[1] + "." + lastPart;
 }
+namespace winrt
+{
+    using namespace Windows::Storage::Pickers;
+    using namespace Windows::Storage;
+    using namespace Windows::Foundation::Collections;
+}
 
 winrt::Windows::Foundation::IAsyncOperation<winrt::Windows::Foundation::Collections::IVector<winrt::Windows::Storage::StorageFile>> WinrtUtils::pickFiles(std::wstring_view fileType) {
-    using namespace winrt::Windows::Storage::Pickers;
-    using namespace winrt::Windows::Storage;
-    using namespace winrt::Windows::Foundation::Collections;
-
-    FileOpenPicker picker;
-    picker.SuggestedStartLocation(PickerLocationId::Downloads);
+    winrt::FileOpenPicker picker;
+    picker.SuggestedStartLocation(winrt::PickerLocationId::Downloads);
     picker.FileTypeFilter().Append(fileType);
 
     auto files = co_await picker.PickMultipleFilesAsync();
 
-    auto result = winrt::single_threaded_vector<StorageFile>();
+    auto result = winrt::single_threaded_vector<winrt::StorageFile>();
     for (auto const& file : files) {
         result.Append(file);
     }
 
     co_return result;
 }
+namespace winrt
+{
+    using namespace Windows::Storage;
+}
 
 winrt::Windows::Foundation::IAsyncAction WinrtUtils::pickAndCopyFiles(std::wstring_view type = L"*", std::string path = "") {
-    using namespace winrt::Windows::Storage;
-    
-    StorageFolder targetFolder = co_await StorageFolder::GetFolderFromPathAsync(FlarialGUI::to_wide(Utils::getClientPath() + path));
+    winrt::StorageFolder targetFolder = co_await winrt::StorageFolder::GetFolderFromPathAsync(FlarialGUI::to_wide(Utils::getClientPath() + path));
     auto pick = co_await WinrtUtils::pickFiles();
 
     winrt::Windows::Storage::StorageFile file = pick.Size() > 0 ? pick.GetAt(0) : nullptr;
 
     try {
-        co_await file.CopyAsync(targetFolder, file.Name(), NameCollisionOption::ReplaceExisting);
+        co_await file.CopyAsync(targetFolder, file.Name(), winrt::NameCollisionOption::ReplaceExisting);
     }
     catch (winrt::hresult_error const& ex) {
         LOG_ERROR("Failed to copy file {}: {}", winrt::to_string(file.Name()), winrt::to_string(ex.message()));
@@ -123,50 +127,65 @@ winrt::Windows::Foundation::IAsyncAction WinrtUtils::pickAndCopyFiles(std::wstri
     co_return;
 }
 
+namespace winrt
+{
+    using namespace Windows::Foundation;
+    using namespace Windows::System;
+}
 
 void WinrtUtils::launchURI(const std::string &uri) {
-    using namespace winrt::Windows::Foundation;
-    using namespace winrt::Windows::System;
+
 
     winrt::Windows::ApplicationModel::Core::CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([uri]() {
-        Launcher::LaunchUriAsync(Uri(winrt::to_hstring(uri))).get();
+        winrt::Launcher::LaunchUriAsync(winrt::Uri(winrt::to_hstring(uri))).get();
     });
+}
+namespace winrt
+{
+    using namespace Windows::Storage;
+    using namespace Windows::System;
 }
 
 void WinrtUtils::openSubFolder(const std::string& subFolder) {
-    using namespace winrt;
-    using namespace Windows::Storage;
-    using namespace Windows::System;
+
 
     try {
-        StorageFolder roamingFolder = ApplicationData::Current().RoamingFolder();
+        winrt::StorageFolder roamingFolder = winrt::ApplicationData::Current().RoamingFolder();
 
         // Get the specified subfolder inside RoamingState
         auto folder = roamingFolder.GetFolderAsync(winrt::hstring(String::StrToWStr(subFolder))).get();
 
         // Launch the subfolder in File Explorer
-        Launcher::LaunchFolderAsync(folder).get();
+        winrt::Launcher::LaunchFolderAsync(folder).get();
     } catch (const winrt::hresult_error& e) {
         LOG_ERROR("An error occurred while trying to open {}: {} ({})", subFolder, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
     }
 }
 
+namespace winrt
+{
+    using namespace Windows::ApplicationModel::DataTransfer;
+}
+
 void WinrtUtils::setClipboard(const std::string& text) {
-    using namespace winrt::Windows::ApplicationModel::DataTransfer;
 
     winrt::Windows::ApplicationModel::Core::CoreApplication::MainView().CoreWindow().DispatcherQueue().TryEnqueue([text]() {
-        DataPackage dataPackage;
+        winrt::DataPackage dataPackage;
         dataPackage.SetText(winrt::to_hstring(text));
-        Clipboard::SetContent(dataPackage);
+        winrt::Clipboard::SetContent(dataPackage);
     });
 }
 
+namespace winrt
+{
+    using namespace Windows::ApplicationModel::DataTransfer;
+}
+
 std::string WinrtUtils::getClipboard() {
-    using namespace winrt::Windows::ApplicationModel::DataTransfer;
 
     try {
-        auto dataPackageView = Clipboard::GetContent();
-        if (dataPackageView.Contains(StandardDataFormats::Text())) {
+        auto dataPackageView = winrt::Clipboard::GetContent();
+        if (dataPackageView.Contains(winrt::StandardDataFormats::Text())) {
             auto text = dataPackageView.GetTextAsync().get();
             return winrt::to_string(text);
         }
@@ -184,17 +203,20 @@ void WinrtUtils::showMessageBox(const std::string& title, const std::string& mes
         LOG_ERROR("Failed to show message box {}: {} ({})", title, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
     }
 }
+namespace winrt
+{
+    using namespace Windows::UI::Notifications;
+}
 
 void WinrtUtils::showNotification(const std::string& title, const std::string& message) {
-    using namespace winrt::Windows::UI::Notifications;
     try {
-        const auto notification = ToastNotification(ToastNotificationManager::GetTemplateContent(ToastTemplateType::ToastImageAndText02));
+        const auto notification = winrt::ToastNotification(winrt::ToastNotificationManager::GetTemplateContent(winrt::ToastTemplateType::ToastImageAndText02));
 
         winrt::Windows::Data::Xml::Dom::IXmlNodeList element = notification.Content().GetElementsByTagName(L"text");
         element.Item(0).InnerText(winrt::to_hstring(title));
         element.Item(1).InnerText(winrt::to_hstring(message));
 
-        ToastNotificationManager::CreateToastNotifier().Show(notification);
+        winrt::ToastNotificationManager::CreateToastNotifier().Show(notification);
     } catch (const winrt::hresult_error& e) {
         LOG_ERROR("Failed to show notification {}: {} ({})", title, winrt::to_string(e.message()), static_cast<uint32_t>(e.code()));
     }

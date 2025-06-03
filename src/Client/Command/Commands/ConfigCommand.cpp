@@ -16,9 +16,12 @@
 #include <Manager.hpp>
 
 #include "Modules/Misc/ScriptMarketplace/ScriptMarketplace.hpp"
-
+namespace winrt
+{
+    using namespace Windows::Storage;
+}
 winrt::Windows::Foundation::IAsyncAction import() {
-    using namespace winrt::Windows::Storage;
+
 
     const auto selectedFiles = co_await WinrtUtils::pickFiles(L".zip");
     if (selectedFiles.Size() == 0) co_return;
@@ -40,8 +43,8 @@ winrt::Windows::Foundation::IAsyncAction import() {
         std::string zipFilePath = winrt::to_string(zipFilePathW);
         mz_zip_archive zip_archive;
         memset(&zip_archive, 0, sizeof(zip_archive));
-        auto stream = co_await zipFile.OpenAsync(FileAccessMode::Read);
-        auto buffer = co_await FileIO::ReadBufferAsync(zipFile);
+        auto stream = co_await zipFile.OpenAsync(winrt::FileAccessMode::Read);
+        auto buffer = co_await winrt::FileIO::ReadBufferAsync(zipFile);
         std::vector<uint8_t> data(buffer.Length());
         winrt::Windows::Storage::Streams::DataReader::FromBuffer(buffer).ReadBytes(data);
 

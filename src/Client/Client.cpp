@@ -18,10 +18,13 @@
 
 #include "Utils/APIUtils.hpp"
 
-using namespace winrt::Windows::UI::Core;
-using namespace winrt::Windows::Foundation;
-using namespace winrt::Windows::ApplicationModel::Activation;
-using namespace winrt::Windows::ApplicationModel::Core;
+namespace winrt
+{
+    using namespace Windows::UI::Core;
+    using namespace Windows::Foundation;
+    using namespace Windows::ApplicationModel::Activation;
+    using namespace Windows::ApplicationModel::Core;
+}
 
 Settings Client::settings = Settings();
 
@@ -72,12 +75,12 @@ winrt::event_token activationToken;
 
 void RegisterActivationHandler()
 {
-    activationToken = CoreApplication::MainView().Activated(
-        [](const auto &, const IActivatedEventArgs &context) {
-            if (context.Kind() != ActivationKind::Protocol)
+    activationToken = winrt::CoreApplication::MainView().Activated(
+        [](const auto &, const winrt::IActivatedEventArgs &context) {
+            if (context.Kind() != winrt::ActivationKind::Protocol)
                 return;
 
-            auto uri = winrt::unbox_value<ProtocolActivatedEventArgs>(context).Uri();
+            auto uri = winrt::unbox_value<winrt::ProtocolActivatedEventArgs>(context).Uri();
             
             std::vector<std::pair<std::wstring, std::wstring>> dataList;
 
@@ -97,7 +100,7 @@ void Client::UnregisterActivationHandler()
 {
     if (activationToken) // Check if the token is valid
     {
-        CoreApplication::MainView().Activated(activationToken); // Unregister using the token
+        winrt::CoreApplication::MainView().Activated(activationToken); // Unregister using the token
     }
 }
 

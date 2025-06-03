@@ -1,3 +1,4 @@
+#pragma once
 #include <dxgi.h>
 #include "kiero/kiero.h"
 #include "../Hook.hpp"

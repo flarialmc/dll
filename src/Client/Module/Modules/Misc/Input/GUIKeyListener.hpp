@@ -2,7 +2,8 @@
 #include "../../../../Events/Input/KeyEvent.hpp"
 #include "../../../../../Utils/Logger/Logger.hpp"
 #include "../../../../Client.hpp"
-#include <Windows.h>
+#include <windows.h>
+#include <unknwn.h>
 
 // TODO: LIKELY REQ A FIX
 class GUIKeyListener : public Listener {

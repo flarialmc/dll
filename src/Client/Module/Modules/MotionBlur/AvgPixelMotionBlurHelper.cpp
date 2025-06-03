@@ -1,6 +1,7 @@
 #include "AvgPixelMotionBlurHelper.hpp"
 #include <d3dcompiler.h>
 #include <windows.h>
+#include <unknwn.h>
 #include <assert.h>
 
 #include "Hook/Hooks/Render/SwapchainHook.hpp"

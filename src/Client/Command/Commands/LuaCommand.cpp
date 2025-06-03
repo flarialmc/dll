@@ -93,9 +93,13 @@ std::string scriptPath(const std::string& category) {
 
     return "";
 }
+namespace winrt
+{
+    using namespace Windows::Storage;
+}
 
 winrt::Windows::Foundation::IAsyncAction importScript(std::string category) {
-    using namespace winrt::Windows::Storage;
+
 
     const auto selectedFiles = co_await WinrtUtils::pickFiles(L".lua");
     if (selectedFiles.Size() == 0) co_return;
@@ -118,7 +122,7 @@ winrt::Windows::Foundation::IAsyncAction importScript(std::string category) {
         std::filesystem::path destination = std::filesystem::path(targetDir) / fileName;
 
         try {
-            co_await storageFile.CopyAsync(StorageFolder::GetFolderFromPathAsync(winrt::to_hstring(targetDir)).get(), winrt::to_hstring(fileName), NameCollisionOption::ReplaceExisting);
+            co_await storageFile.CopyAsync(winrt::StorageFolder::GetFolderFromPathAsync(winrt::to_hstring(targetDir)).get(), winrt::to_hstring(fileName), winrt::NameCollisionOption::ReplaceExisting);
             Logger::success("Imported script: {}", fileName);
         } catch (const std::exception& e) {
             LOG_ERROR("Failed to import script: {}", e.what());
