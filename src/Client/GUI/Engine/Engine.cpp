@@ -1404,29 +1404,59 @@ void FlarialGUI::ImRotateEnd(float angle, ImVec2 center)
 
 /* rotation stuff end */
 
-void FlarialGUI::PushImClipRect(ImVec2 pos, ImVec2 size) {
-	ImVec2 max(pos.x + size.x, pos.y + size.y);
+
+std::vector<D2D_RECT_F> PreviousClippingRects = {};
+
+void FlarialGUI::PushImClipRect(ImVec2 pos, ImVec2 size, bool overridePreviousClipping) {
+    if (!overridePreviousClipping and !PreviousClippingRects.empty())
+    {
+        ImVec2 ClippedPos(PreviousClippingRects.back().left, PreviousClippingRects.back().top);
+        ImVec2 ClippedSize(PreviousClippingRects.back().right - PreviousClippingRects.back().left, PreviousClippingRects.back().bottom - PreviousClippingRects.back().top);
+
+        if (ClippedPos.x >= pos.x) pos.x = ClippedPos.x + 1;
+        if (ClippedPos.y >= pos.y) pos.y = ClippedPos.y + 1;
+        if (ClippedSize.x <= size.x) size.x = ClippedSize.x - 1;
+        if (ClippedSize.y <= size.y) size.x = ClippedSize.y - 1;
+    }
+
+    PreviousClippingRects.push_back(D2D_RECT_F(pos.x, pos.y, pos.x + size.x, pos.y + size.y));
+
+    ImVec2 max(pos.x + size.x, pos.y + size.y);
+
 
 	ImGui::GetBackgroundDrawList()->PushClipRect(pos, max);
 
 }
 
-void FlarialGUI::PushImClipRect(D2D_RECT_F rect) {
-	ImVec2 pos(rect.left, rect.top);
-	ImVec2 size(rect.right - rect.left, rect.bottom - rect.top);
+void FlarialGUI::PushImClipRect(D2D_RECT_F rect, bool overridePreviousClipping) {
+    ImVec2 pos(rect.left, rect.top);
+    ImVec2 size(rect.right - rect.left, rect.bottom - rect.top);
 
-	ImVec2 max(pos.x + size.x, pos.y + size.y);
+    if (!overridePreviousClipping and !PreviousClippingRects.empty())
+    {
+        ImVec2 ClippedPos(PreviousClippingRects.back().left, PreviousClippingRects.back().top);
+        ImVec2 ClippedSize(PreviousClippingRects.back().right - PreviousClippingRects.back().left, PreviousClippingRects.back().bottom - PreviousClippingRects.back().top);
+
+        if (ClippedPos.x >= pos.x) pos.x = ClippedPos.x + 1;
+        if (ClippedPos.y >= pos.y) pos.y = ClippedPos.y + 1;
+        if (ClippedSize.x <= size.x) size.x = ClippedSize.x - 1;
+        if (ClippedSize.y <= size.y) size.x = ClippedSize.y - 1;
+    }
+
+    PreviousClippingRects.push_back(D2D_RECT_F(pos.x, pos.y, pos.x + size.x, pos.y + size.y));
+
+    ImVec2 max(pos.x + size.x, pos.y + size.y);
 
 	ImGui::GetBackgroundDrawList()->PushClipRect(pos, max);
 
 }
 
 void FlarialGUI::PopImClipRect() {
-	ImGui::GetBackgroundDrawList()->PopClipRect();
+    PreviousClippingRects .pop_back();
+    ImGui::GetBackgroundDrawList()->PopClipRect();
 }
 
 void FlarialGUI::Notify(const std::string& text) {
-
 	if (SwapchainHook::init) {
 		Notification e;
 		e.text = text;

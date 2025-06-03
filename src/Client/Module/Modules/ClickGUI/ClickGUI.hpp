@@ -251,7 +251,7 @@ public:
 				this->active = false;
 			else {
 				if (!editmenu) {
-					if (!Client::settings.getSettingByName<bool>("nochaticon")) Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
+					if (!Client::settings.getSettingByName<bool>("nochaticon")->value) Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
 					else Deafen(this, PacketEvent, &ClickGUI::onPacketReceive);
 					ModuleManager::cguiRefresh = true;
 					keybindActions[0]({});
@@ -359,6 +359,7 @@ public:
 
 		if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Press) MC::held = true;
 		if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Release) MC::held = false;
+		if (event.getButton() != MouseButton::None) MC::lastMouseButton = event.getButton();
 
 		if (event.getButton() == MouseButton::Scroll) {
 			accumilatedPos += (event.getAction() == MouseAction::ScrollUp) ? FlarialGUI::scrollposmodifier

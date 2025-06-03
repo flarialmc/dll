@@ -357,7 +357,13 @@ namespace FlarialGUI {
 
 	D2D1::ColorF HexToColorF(const std::string& hexString);
 
+
 	std::wstring to_wide(const std::string& str);
+
+    void PushImClipRect(D2D_RECT_F rect, bool overridePreviousClipping = false);
+    void PushImClipRect(ImVec2 pos, ImVec2 size, bool overridePreviousClipping = false);
+    void PrepareBlur(float intensity);
+
 
 	void PushImClipRect(D2D_RECT_F rect);
 	void PushImClipRect(ImVec2 pos, ImVec2 size);
