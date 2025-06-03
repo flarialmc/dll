@@ -227,9 +227,9 @@ public:
 
 		// handle editing in edit menu
 		if (ClickGUI::editmenu) {
-			FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, fullCirclePixelWidth, barHeight, 31);
+			FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, fullCirclePixelWidth, barHeight, 33);
 
-			Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, 31, fullCirclePixelWidth, barHeight);
+			Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, 33, fullCirclePixelWidth, barHeight);
 
 			checkForRightClickAndOpenSettings(realcenter.x, realcenter.y, fullCirclePixelWidth, barHeight);
 
