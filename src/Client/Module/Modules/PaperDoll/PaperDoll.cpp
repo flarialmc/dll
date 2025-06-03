@@ -1,6 +1,8 @@
 #include "PaperDoll.hpp"
 
 #include "Events/EventManager.hpp"
+#include "Modules/ClickGUI/ClickGUI.hpp"
+#include "Utils/Render/PositionUtils.hpp"
 
 PaperDoll::PaperDoll(): Module("Movable Paperdoll", "Makes the Minecraft paperdoll movable.", IDR_MAN_PNG,
                                "")

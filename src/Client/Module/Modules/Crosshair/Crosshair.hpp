@@ -9,39 +9,11 @@ public:
 		Module::setup();
 	}
 
-	void onEnable() override {
+	void onEnable() override;
 
-		Module::onEnable();
-	}
+	void onDisable() override;
 
-	void onDisable() override {
+	void defaultConfig() override;
 
-		Module::onDisable();
-	}
-
-	void defaultConfig() override {
-		Module::defaultConfig("core");
-		setDef("thirdpersoncrosshair", true);
-	}
-
-	void settingsRender(float settingsOffset) override {
-
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
-
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
-
-
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
-
-		addHeader("Crosshair");
-		addToggle("Third Person Crosshair", "", getOps<bool>("thirdpersoncrosshair"));
-
-		FlarialGUI::UnsetScrollView();
-
-		resetPadding();
-	}
+	void settingsRender(float settingsOffset) override;
 };

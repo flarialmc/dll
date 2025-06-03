@@ -11,46 +11,13 @@ public:
 		Module::setup();
 	};
 
-	void onEnable() override {
-		Listen(this, RenderEvent, &Deepfry::onRender)
-			Module::onEnable();
-	}
+	void onEnable() override;
 
-	void onDisable() override {
-		Deafen(this, RenderEvent, &Deepfry::onRender)
-			Module::onDisable();
-	}
+	void onDisable() override;
 
-	void defaultConfig() override {
-		Module::defaultConfig("core");
-		setDef("paint", false);
-	}
+	void defaultConfig() override;
 
-	void settingsRender(float settingsOffset) override {
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
+	void settingsRender(float settingsOffset) override;
 
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
-
-
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
-
-		addHeader("Deepfry");
-		addToggle("Paint Effect", "", getOps<bool>("paint"));
-
-		FlarialGUI::UnsetScrollView();
-
-		resetPadding();
-	}
-
-	void onRender(RenderEvent& event) {
-		if (this->isEnabled()) {
-			if (getOps<bool>("paint")) FlarialGUI::ApplyPaintEffect(10.0f);
-			else FlarialGUI::ApplyCombinedDeepFry();
-
-		}
-	}
+	void onRender(RenderEvent& event);
 };

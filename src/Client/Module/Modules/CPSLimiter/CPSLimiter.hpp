@@ -10,34 +10,8 @@ public:
 		Module::setup();
 	};
 
-	void defaultConfig() override {
-		Module::defaultConfig("core");
-		setDef("Left", 16.0f);
-		setDef("Right", 24.0f);
-		setDef("legacy", false);
-	}
+	void defaultConfig() override;
 
-	void settingsRender(float settingsOffset) override {
-
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
-
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
-
-
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
-
-		addHeader("CPS Limiter");
-		addSlider("Left Click", "Limit for your LMB.", getOps<float>("Left"));
-		addSlider("Right Click", "Right for your RMB.", getOps<float>("Right"));
-		addToggle("Legacy Mode", "An alternative mode for limiting cps, may not work as expected.", getOps<bool>("legacy"));
-
-		FlarialGUI::UnsetScrollView();
-
-		resetPadding();
-	}
+	void settingsRender(float settingsOffset) override;
 };
 

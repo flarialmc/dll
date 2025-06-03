@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Events/Render/GammaEvent.hpp"
 
 
 class Fullbright : public Module {
@@ -12,43 +13,14 @@ public:
 
 	};
 
-	void onEnable() override {
-		Listen(this, GammaEvent, &Fullbright::onGetGamma)
-			Module::onEnable();
-	}
+	void onEnable() override;
 
-	void onDisable() override {
-		Deafen(this, GammaEvent, &Fullbright::onGetGamma)
-			Module::onDisable();
-	}
+	void onDisable() override;
 
-	void defaultConfig() override {
-		Module::defaultConfig("core");
-		setDef("gamma", 25.f);
-	}
+	void defaultConfig() override;
 
-	void settingsRender(float settingsOffset) override {
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
-
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
-
-
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
-
-		addHeader("Fullbright");
-		addSlider("Brightness", "", getOps<float>("gamma"), 25.0f);
-
-		FlarialGUI::UnsetScrollView();
-
-		resetPadding();
-	}
+	void settingsRender(float settingsOffset) override;
 
 	// TODO: Make it changable
-	void onGetGamma(GammaEvent& event) {
-		event.setGamma(getOps<float>("gamma"));
-	};
+	void onGetGamma(GammaEvent& event);
 };

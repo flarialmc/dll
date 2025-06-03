@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Events/Render/DrawImageEvent.hpp"
+#include "Events/Render/GetTextureEvent.hpp"
 
 
 class Animations : public Module {
@@ -13,17 +15,9 @@ public:
 		Module::setup();
 	};
 
-	void onEnable() override {
-		Listen(this, DrawImageEvent, &Animations::onDrawImage)
-			Listen(this, GetTextureEvent, &Animations::onGetTexture)
-			Module::onEnable();
-	}
+	void onEnable() override;
 
-	void onDisable() override {
-		Deafen(this, DrawImageEvent, &Animations::onDrawImage)
-			Deafen(this, GetTextureEvent, &Animations::onGetTexture)
-			Module::onDisable();
-	}
+	void onDisable() override;
 
 	static float animate(float endPoint, float current, float speed) {
 		if (speed < 0.0) speed = 0.0;
@@ -34,58 +28,11 @@ public:
 		return current + (endPoint > current ? factor : -factor);
 	}
 
-	void onGetTexture(GetTextureEvent& event) {
-		if (event.location->filePath == "textures/ui/selected_hotbar_slot") {
-			selectedHotbarSlotTexturePtr = event.textureData;
-		}
-	}
+	void onGetTexture(GetTextureEvent& event);
 
-	void onDrawImage(DrawImageEvent& event) {
-		bool shouldAnimate = false;
-		if (VersionUtils::checkAboveOrEqual(21, 50)) {
-			if (selectedHotbarSlotTexturePtr == event.getTextureData()) {
-				shouldAnimate = true;
-			}
-		}
-		else {
-			if (event.getTexturePath() == "textures/ui/selected_hotbar_slot") {
-				shouldAnimate = true;
-			}
-		}
+	void onDrawImage(DrawImageEvent& event);
 
-		if (shouldAnimate) {
-			auto pos = event.getImagePos();
-			static float lerpedPos = pos.x; // old pos
-			lerpedPos = animate(pos.x, lerpedPos,
-				(0.016f * getOps<float>("hotbarSpeed")) *
-				FlarialGUI::frameFactor);
-			event.setImagePos(Vec2<float>{lerpedPos, pos.y});
-		}
-	}
+	void defaultConfig() override;
 
-	void defaultConfig() override {
-		Module::defaultConfig("core");
-		if (settings.getSettingByName<float>("hotbarSpeed") == nullptr) settings.addSetting("hotbarSpeed", 7.f);
-	}
-
-	void settingsRender(float settingsOffset) override {
-
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
-
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
-
-
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
-
-		addHeader("Animations");
-		addSlider("Hotbar Selected Slot Speed", "", getOps<float>("hotbarSpeed"));
-
-		FlarialGUI::UnsetScrollView();
-
-		resetPadding();
-	}
+	void settingsRender(float settingsOffset) override;
 };

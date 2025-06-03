@@ -14,6 +14,8 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 			Constraints::RelativeConstraint(1.5, "width", true),
 			Constraints::RelativeConstraint(1.5, "height", true), 0, 0);
 
+		auto module = ModuleManager::getModule(moduleName);
+
 		float rectwidth = Constraints::RelativeConstraint(0.55, "height", true);
 		float rectheight = Constraints::RelativeConstraint(0.45, "height", true);
 		Vec2<float> center = Constraints::CenterConstraint(rectwidth, rectheight);
@@ -43,7 +45,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 		HSV hsv_color{};
 
 		if (ColorPickers[index].shade.x == -1 && ColorPickers[index].shade.y == -1) {
-			hsv_color = RGBtoHSV(HexToColorF(hex));
+			hsv_color = RGBtoHSV(HexToColorF(clickgui->getColor(settingName, moduleName)));
 
 			ColorPickers[index].hueX = (hsv_color.hue / 360.0f) * hlwidth;
 			ColorPickers[index].oldHueX = (hsv_color.hue / 360.0f) * hlwidth;
@@ -229,8 +231,8 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 			1.0f - ColorPickers[index].shade.y / shadePickerHeight
 		);
 
-		hex = ColorFToHex(newColorLol);
-		opacity = ColorPickers[index].opacX / hlwidth;
+		module->settings.getSettingByName<std::string>(settingName + "Col")->value = ColorFToHex(newColorLol);
+		module->settings.getSettingByName<float>(settingName + "Opacity")->value = ColorPickers[index].opacX / hlwidth;
 
 		Circle(ColorPickers[index].shade.x + originalX, ColorPickers[index].shade.y + originalY, hueSelectorerOutline,
 			Constraints::SpacingConstraint(0.125f, hexPreviewSize));
@@ -253,7 +255,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 
 		x = Constraints::PercentageConstraint(0.04, "left");
 
-		if (Toggle(123, x, y, rgb, true)) rgb = !rgb;
+		if (Toggle(123, x, y, rgb, true)) module->settings.getSettingByName<bool>(settingName + "RGB")->value = !module->settings.getSettingByName<bool>(settingName + "RGB")->value;
 
 		FlarialTextWithFont(
 			x + Constraints::SpacingConstraint(0.60, Constraints::RelativeConstraint(0.12, "height", true)),

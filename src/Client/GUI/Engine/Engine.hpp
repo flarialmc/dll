@@ -354,7 +354,7 @@ namespace FlarialGUI {
 
 	void ColorPicker(const int index, float x, float y, std::string moduleName = "", std::string settingName = "");
 
-	void ColorPickerWindow(int index, std::string& hex, float& opacity, bool& rgb);
+	void ColorPickerWindow(int index, std::string moduleName, std::string settingName);
 
 	D2D1::ColorF HexToColorF(const std::string& hexString);
 

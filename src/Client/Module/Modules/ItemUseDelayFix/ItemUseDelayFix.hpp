@@ -19,25 +19,13 @@ public:
         Module::setup();
     };
 
-    void onEnable() override {
-        patch();
-        Module::onEnable();
-    }
+    void onEnable() override;
 
-    void onDisable() override {
-        unpatch();
-        Module::onDisable();
-    }
+    void onDisable() override;
 
-    void defaultConfig() override {
-        Module::defaultConfig("core");
-    }
+    void defaultConfig() override;
 
-    static void patch() {
-        Memory::nopBytes((void *)address, original.size());
-    }
+    static void patch();
 
-    static void unpatch() {
-        Memory::patchBytes((void *)address, original.data(), original.size());
-    }
+    static void unpatch();
 };
