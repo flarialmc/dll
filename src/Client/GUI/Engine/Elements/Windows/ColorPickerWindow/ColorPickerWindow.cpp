@@ -60,9 +60,9 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 		);
 
 		color.a = ColorPickers[index].opacX / hlwidth;
-		ColorPickers[index].opacX = module->settings.getSettingByName<bool>(settingName + "Opacity")->value * hlwidth;
+		ColorPickers[index].opacX = clickgui->getColor(settingName, moduleName).a * hlwidth;
 
-		if (ColorPickers[index].oldHex.empty()) ColorPickers[index].oldHex = ColorFToHex(clickgui->getColor(settingName, moduleName));
+		if (ColorPickers[index].oldHex.empty()) ColorPickers[index].oldHex = module->settings.getSettingByName<std::string>(settingName + "Col")->value;
 		if (ColorPickers[index].oldOpac == NULL) ColorPickers[index].oldOpac = module->settings.getSettingByName<bool>(settingName + "Opacity")->value;
 
 		D2D1_COLOR_F oldColor = HexToColorF(ColorPickers[index].oldHex);

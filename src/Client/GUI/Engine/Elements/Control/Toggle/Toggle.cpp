@@ -14,6 +14,10 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, s
     D2D1_COLOR_F enabledColor = clickgui->getColor("primary1", "ClickGUI");
     D2D1_COLOR_F circleColor = clickgui->getColor("primary2", "ClickGUI");
 
+    enabledColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+    disabledColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+    circleColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+
     if (ClickGUI::settingsOpacity != 1) {
         disabledColor.a = ClickGUI::settingsOpacity;
         enabledColor.a = ClickGUI::settingsOpacity;

@@ -77,7 +77,7 @@ public:
         bool* rgb;
     };
 
-    std::unordered_map<int, ColorPickerStruct> color_pickers;
+    std::unordered_map<int, std::string> color_pickers;
 
     template <typename T>
     T& getOps(std::string setting);

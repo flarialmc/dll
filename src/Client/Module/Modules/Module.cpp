@@ -246,10 +246,10 @@ void Module::resetPadding() {
 	sliderIndex = 0;
 	buttonIndex = 3;
 
-	/*int i = 100;
+	int i = 100;
 	for (int i = 100; i < colorPickerIndex; ++i) {
-		FlarialGUI::ColorPickerWindow(i, *color_pickers[i].value, *color_pickers[i].opacity, *color_pickers[i].rgb);
-	}*/
+		FlarialGUI::ColorPickerWindow(i, this->name, color_pickers[i]);
+	}
 
 	colorPickerIndex = 100;
 	keybindIndex = 0;
@@ -303,8 +303,8 @@ void Module::addElementText(std::string text, std::string subtext) {
 
 	D2D1_COLOR_F textCol = D2D1::ColorF(D2D1::ColorF::White);
 	D2D1_COLOR_F subtextCol = FlarialGUI::HexToColorF("473b3d");
-	textCol.a = clickgui->getColor("globalText", "ClickGUI").a;
-	subtextCol.a = clickgui->getColor("globalText", "ClickGUI").a;
+	textCol.a = clickgui->getColor("globalText", "ClickGUI").a * clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+	subtextCol.a = clickgui->getColor("globalText", "ClickGUI").a * clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 
 	if (ClickGUI::settingsOpacity != 1) {
 		textCol.a = ClickGUI::settingsOpacity;
@@ -351,9 +351,8 @@ void Module::addColorPicker(std::string text, std::string subtext, std::string s
 
 	padding += Constraints::RelativeConstraint(0.05f, "height", true);
 
-	/*ColorPickerStruct respect = { &value, &opac, &rgb };
-	color_pickers[colorPickerIndex] = respect;
-	colorPickerIndex++;*/
+	color_pickers[colorPickerIndex] = settingName;
+	colorPickerIndex++;
 }
 
 void Module::addTextBox(std::string text, std::string subtext, std::string& value, int limit) {

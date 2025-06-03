@@ -91,9 +91,9 @@ void FlarialGUI::resetColorPicker(size_t index) {
 	FlarialGUI::ColorPickers[index].shade = Vec2<float>{ -1, -1 };
 	FlarialGUI::ColorPickers[index].movingShade = false;
 
-	clickgui->color_pickers[index].value = nullptr;
+	/*clickgui->color_pickers[index].value = nullptr;
 	clickgui->color_pickers[index].opacity = nullptr;
-	clickgui->color_pickers[index].rgb = nullptr;
+	clickgui->color_pickers[index].rgb = nullptr;*/
 }
 
 UINT32 ColorValueToUInt(const D3DCOLORVALUE& color) {
@@ -686,8 +686,8 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* tex
 	const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
 	const DWRITE_FONT_WEIGHT weight, bool moduleFont, bool troll) {
 
-
 	D2D1_COLOR_F color = clickgui->getColor("globalText", "ClickGUI");
+	color.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 
 	if (FlarialGUI::inMenu && !troll && ClickGUI::settingsOpacity != 1 && ClickGUI::curr != "modules" && !ClickGUI::editmenu) color.a = ClickGUI::settingsOpacity;
 

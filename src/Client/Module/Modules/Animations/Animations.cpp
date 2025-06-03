@@ -46,7 +46,7 @@ void Animations::onDrawImage(DrawImageEvent &event) {
 
 void Animations::defaultConfig() {
 	Module::defaultConfig("core");
-	if (Client::settings.getSettingByName<float>("hotbarSpeed") == nullptr) Client::settings.addSetting("hotbarSpeed", 7.f);
+	setDef("hotbarSpeed", 7.f);
 }
 
 void Animations::settingsRender(float settingsOffset) {

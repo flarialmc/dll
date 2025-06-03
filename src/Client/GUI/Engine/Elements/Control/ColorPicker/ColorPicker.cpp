@@ -40,6 +40,7 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
     y -= s / 2.f;
 
     D2D1_COLOR_F baseColor = clickgui->getColor("primary4", "ClickGUI");
+    baseColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 
     FlarialGUI::RoundedRect(x, y + s * 0.15f, baseColor, s * 4.125f, s, round.x, round.x);
 
@@ -57,15 +58,16 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
         );
     } else {
         D2D1_COLOR_F color = mod->getColor(settingName);
-        color.a = clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+        color.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
         FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, color, s * 0.85f, s * 0.85f, round.x, round.x);
     }
 
     round = Constraints::RoundingConstraint(11.5, 11.5);
 
     D2D1_COLOR_F col = clickgui->getColor("primary3", "ClickGUI");
-
     if (TextBoxes[index].isActive) col = clickgui->getColor("primary1", "ClickGUI");
+
+    col.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 
     FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, col, s * 3.f, s * 0.82f,
                             round.x, round.x);
@@ -130,9 +132,8 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
         CursorInRect(x + Constraints::SpacingConstraint(0.1, s), clickingY + s * 0.21f, s * 0.85f, s * 0.85f) &&
         MC::mouseButton == MouseButton::Left && !MC::held) {
         MC::mouseButton = MouseButton::None;
-        //ColorPickers[index].isActive = true;
+        ColorPickers[index].isActive = true;
         FlarialGUI::ColorPickerWindow(index, moduleName, settingName);
         activeColorPickerWindows++;
     }
-
 }

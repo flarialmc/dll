@@ -10,6 +10,8 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
     D2D1_COLOR_F circleColor = clickgui->getColor("primary2", "ClickGUI");
 
     color.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+    disabledColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+    circleColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 
     if (ClickGUI::settingsOpacity != 1) {
         color.a = ClickGUI::settingsOpacity;
