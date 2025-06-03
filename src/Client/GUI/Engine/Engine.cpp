@@ -70,6 +70,7 @@ std::unordered_map<int, DropdownStruct> FlarialGUI::DropDownMenus;
 std::unordered_map<int, KeybindSelector> FlarialGUI::KeybindSelectors;
 
 void FlarialGUI::OverrideAlphaValues(float percent) {
+	//FlarialGUI::lerp()
 	clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value = percent;
 }
 

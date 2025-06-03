@@ -1,3 +1,4 @@
+#pragma once
 #include <dxgi1_6.h>
 #include <d2d1_3.h>
 #include <d3d12.h>

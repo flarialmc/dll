@@ -40,8 +40,8 @@ BOOL _ = FALSE, $ = FALSE;
 static std::chrono::high_resolution_clock fpsclock;
 static std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 static std::chrono::steady_clock::time_point previousFrameTime = std::chrono::high_resolution_clock::now();
-//
-auto window = (HWND) FindWindowA(nullptr, (LPCSTR) "Minecraft");
+
+HWND window2 = FindWindowA(nullptr, "Minecraft");
 
 int SwapchainHook::currentBitmap;
 
@@ -103,12 +103,12 @@ void SwapchainHook::enableHook() {
     queueReset = Client::settings.getSettingByName<bool>("recreateAtStart")->value;
     if (Client::settings.getSettingByName<bool>("killdx")->value) queueReset = true;
 
-    if (!window) {
-        window = FindWindowByTitle("Minecraft");
+    if (!window2) {
+        window2 = FindWindowByTitle("Minecraft");
     }
 
-    if (!window) {
-        window = FindWindowByTitle("Flarial");
+    if (!window2) {
+        window2 = FindWindowByTitle("Flarial");
     }
 
     if (kiero::getRenderType() == kiero::RenderType::D3D12) {
@@ -293,7 +293,7 @@ void SwapchainHook::DX11Init() {
         ImGui::CreateContext();
 
         d3d11Device->GetImmediateContext(&context);
-        ImGui_ImplWin32_Init(window);
+        ImGui_ImplWin32_Init(window2);
         ImGui_ImplDX11_Init(d3d11Device, context);
         initImgui = true;
 
@@ -565,7 +565,7 @@ void SwapchainHook::DX12Render(bool underui) {
 
                     ImGui::CreateContext();
 
-                    ImGui_ImplWin32_Init(window);
+                    ImGui_ImplWin32_Init(window2);
 
                     ImGui_ImplDX12_Init(d3d12Device5, buffersCounts,
                                         DXGI_FORMAT_R8G8B8A8_UNORM, d3d12DescriptorHeapImGuiRender,
