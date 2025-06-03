@@ -30,23 +30,15 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 1.f);
+		setDef("uiscale", 1.f);
 		Module::defaultConfig("core");
-
-		if (settings.getSettingByName<bool>("CustomCrosshair") == nullptr) settings.addSetting("CustomCrosshair", false);
-
-		if (settings.getSettingByName<bool>("highlightOnEntity") == nullptr) settings.addSetting("highlightOnEntity", false);
-		if (settings.getSettingByName<bool>("solidColorWhenHighlighted") == nullptr) settings.addSetting("solidColorWhenHighlighted", true);
-		if (settings.getSettingByName<bool>("solidColor") == nullptr) settings.addSetting("solidColor", false);
-		if (settings.getSettingByName<bool>("renderInThirdPerson") == nullptr) settings.addSetting("renderInThirdPerson", false);
-
-		if (settings.getSettingByName<std::string>("defaultColor") == nullptr) settings.addSetting("defaultColor", (std::string)"fafafa");
-		if (settings.getSettingByName<bool>("defaultColorRGB") == nullptr) settings.addSetting("defaultColorRGB", false);
-		if (settings.getSettingByName<float>("defaultOpacity") == nullptr) settings.addSetting("defaultOpacity", 0.55f);
-
-		if (settings.getSettingByName<std::string>("enemyColor") == nullptr) settings.addSetting("enemyColor", (std::string)"FF0000");
-		if (settings.getSettingByName<bool>("enemyColorRGB") == nullptr) settings.addSetting("enemyColorRGB", false);
-		if (settings.getSettingByName<float>("enemyOpacity") == nullptr) settings.addSetting("enemyOpacity", 1.f);
+		setDef("CustomCrosshair", false);
+		setDef("highlightOnEntity", false);
+		setDef("solidColorWhenHighlighted", true);
+		setDef("solidColor", false);
+		setDef("renderInThirdPerson", false);
+		setDef("default", (std::string)"fafafa", 0.55f, false);
+		setDef("enemy", (std::string)"FF0000", 1.f, false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -63,23 +55,20 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Custom Crosshair");
-		addToggle("Solid Color", "Make crosshair a solid color / more visible", settings.getSettingByName<bool>("solidColor")->value);
-		addToggle("Render in Third Person", "Weather or not to render in third person", settings.getSettingByName<bool>("renderInThirdPerson")->value);
-		addToggle("Highlight on Entity", "Highlight when enemy in reach", settings.getSettingByName<bool>("highlightOnEntity")->value);
-		addConditionalToggle(settings.getSettingByName<bool>("highlightOnEntity")->value, "Solid Color When Highlighted", "Use solid color when highlighted", settings.getSettingByName<bool>("solidColorWhenHighlighted")->value);
+		addToggle("Solid Color", "Make crosshair a solid color / more visible", getOps<bool>("solidColor"));
+		addToggle("Render in Third Person", "Weather or not to render in third person", getOps<bool>("renderInThirdPerson"));
+		addToggle("Highlight on Entity", "Highlight when enemy in reach", getOps<bool>("highlightOnEntity"));
+		addConditionalToggle(getOps<bool>("highlightOnEntity"), "Solid Color When Highlighted", "Use solid color when highlighted", getOps<bool>("solidColorWhenHighlighted"));
 		extraPadding();
 
 		// addHeader("Misc");
-		// addSlider("UI Scale", "The size of the Crosshair (only for custom)", settings.getSettingByName<float>("uiscale")->value, 10.f, 0.f, true);
+		// addSlider("UI Scale", "The size of the Crosshair (only for custom)", getOps<float>("uiscale"), 10.f, 0.f, true);
 
 		extraPadding();
 
 		addHeader("Colors");
-		addColorPicker("Default Color", "When the enemy is not in view.", settings.getSettingByName<std::string>("defaultColor")->value, settings.getSettingByName<float>("defaultOpacity")->value, settings.getSettingByName<bool>("defaultColorRGB")->value);
-		addConditionalColorPicker(settings.getSettingByName<bool>("highlightOnEntity")->value, "Enemy Color", "When the enemy is in view.",
-			settings.getSettingByName<std::string>("enemyColor")->value,
-			settings.getSettingByName<float>("enemyOpacity")->value,
-			settings.getSettingByName<bool>("enemyColorRGB")->value);
+		addColorPicker("Default Color", "When the enemy is not in view.", "default");
+		addConditionalColorPicker(getOps<bool>("highlightOnEntity"), "Enemy Color", "When the enemy is in view.", "enemy");
 		FlarialGUI::UnsetScrollView();
 
 		resetPadding();
@@ -96,7 +85,7 @@ public:
 		if (!player) return;
 		if (SDK::getCurrentScreen() != "hud_screen") return;
 
-		auto renderInThirdPerson = settings.getSettingByName<bool>("renderInThirdPerson")->value;
+		auto renderInThirdPerson = getOps<bool>("renderInThirdPerson");
 		if (!renderInThirdPerson && currentPerspective != Perspective::FirstPerson) return;
 		bool isHoveringEnemy = (player->getLevel()->getHitResult().type == HitResultType::Entity);
 
@@ -116,21 +105,15 @@ public:
 
 		tess->begin(mce::PrimitiveMode::QuadList, 4);
 
-		D2D1_COLOR_F enemyColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("enemyColor")->value);
-		enemyColor.a = settings.getSettingByName<float>("enemyOpacity")->value;
+		auto shouldHighlight = getOps<bool>("highlightOnEntity");
+		D2D1_COLOR_F color = isHoveringEnemy && shouldHighlight ? getColor("enemy") : getColor("default");
 
-		D2D1_COLOR_F defaultColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("defaultColor")->value);
-		defaultColor.a = settings.getSettingByName<float>("defaultOpacity")->value;
-
-		auto shouldHighlight = settings.getSettingByName<bool>("highlightOnEntity")->value;
-		D2D1_COLOR_F color = isHoveringEnemy && shouldHighlight ? enemyColor : defaultColor;
-
-		bool isDefault = true; //!settings.getSettingByName<bool>("CustomCrosshair")->value;
+		bool isDefault = true; //!getOps<bool>("CustomCrosshair");
 
 		tess->color(color.r, color.g, color.b, color.a);
 
 		Vec2<float> size = Vec2<float>(17, 17);
-		auto scale = settings.getSettingByName<float>("uiscale")->value;
+		auto scale = getOps<float>("uiscale");
 		Vec2<float> sizeScaled = PositionUtils::getCustomScreenScaledPos(size, scale);
 
 		Vec2<float> sizeUnscaled = PositionUtils::getScreenScaledPos(size);
@@ -139,8 +122,8 @@ public:
 
 		Vec2<float> pos = PositionUtils::getScaledPos(Vec2<float>((MC::windowSize.x / 2) - (SizeToUse.x / 2), (MC::windowSize.y / 2) - (SizeToUse.y / 2)));
 
-		auto useSolidColor = settings.getSettingByName<bool>("solidColor")->value;
-		auto useSolidColorWhenHighlighted = settings.getSettingByName<bool>("solidColorWhenHighlighted")->value;
+		auto useSolidColor = getOps<bool>("solidColor");
+		auto useSolidColorWhenHighlighted = getOps<bool>("solidColorWhenHighlighted");
 
 		bool useSolid = false;
 

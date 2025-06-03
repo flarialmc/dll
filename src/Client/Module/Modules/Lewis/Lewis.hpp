@@ -81,13 +81,13 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<bool>("lewisbounce") == nullptr) settings.addSetting("lewisbounce", false);
-		if (settings.getSettingByName<float>("lewisbouncesize") == nullptr) settings.addSetting("lewisbouncesize", 1.0f);
-		if (settings.getSettingByName<float>("lewisbouncespeed") == nullptr) settings.addSetting("lewisbouncespeed", 1.0f);
-		if (settings.getSettingByName<bool>("lewiscrosshair") == nullptr) settings.addSetting("lewiscrosshair", false);
-		if (settings.getSettingByName<float>("lewiscrosshairsize") == nullptr) settings.addSetting("lewiscrosshairsize", 1.0f);
-		if (settings.getSettingByName<bool>("lewislogo") == nullptr) settings.addSetting("lewislogo", false);
-		if (settings.getSettingByName<bool>("lewisscream") == nullptr) settings.addSetting("lewisscream", false);
+		setDef("lewisbounce", false);
+		setDef("lewisbouncesize", 1.0f);
+		setDef("lewisbouncespeed", 1.0f);
+		setDef("lewiscrosshair", false);
+		setDef("lewiscrosshairsize", 1.0f);
+		setDef("lewislogo", false);
+		setDef("lewisscream", false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -102,26 +102,26 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Lewis");
-		addToggle("Bouncing lewis", "", settings.getSettingByName<bool>("lewisbounce")->value);
-		addSlider("Bouncing lewis size", "", settings.getSettingByName<float>("lewisbouncesize")->value, 5);
-		addSlider("Bouncing lewis speed", "", settings.getSettingByName<float>("lewisbouncespeed")->value, 5);
-		addToggle("Crosshair lewis", "", settings.getSettingByName<bool>("lewiscrosshair")->value);
-		addSlider("Crosshair lewis size", "", settings.getSettingByName<float>("lewiscrosshairsize")->value, 5);
-		addToggle("Lewis Client Icon", "", settings.getSettingByName<bool>("lewislogo")->value);
-		addToggle("Lewis Scream", "", settings.getSettingByName<bool>("lewisscream")->value);
+		addToggle("Bouncing lewis", "", getOps<bool>("lewisbounce"));
+		addSlider("Bouncing lewis size", "", getOps<float>("lewisbouncesize"), 5);
+		addSlider("Bouncing lewis speed", "", getOps<float>("lewisbouncespeed"), 5);
+		addToggle("Crosshair lewis", "", getOps<bool>("lewiscrosshair"));
+		addSlider("Crosshair lewis size", "", getOps<float>("lewiscrosshairsize"), 5);
+		addToggle("Lewis Client Icon", "", getOps<bool>("lewislogo"));
+		addToggle("Lewis Scream", "", getOps<bool>("lewisscream"));
 
 		FlarialGUI::UnsetScrollView();
 		resetPadding();
 	}
 	void onRender(RenderEvent& event) {
 		if (this->isEnabled()) {
-			if (this->settings.getSettingByName<bool>("lewisbounce")->value) {
+			if (getOps<bool>("lewisbounce")) {
 				LPCTSTR mode = "PNG";
-				float s = Constraints::RelativeConstraint(0.35, "height", true) * this->settings.getSettingByName<float>("lewisbouncesize")->value;
+				float s = Constraints::RelativeConstraint(0.35, "height", true) * getOps<float>("lewisbouncesize");
 				FlarialGUI::image(IDR_LEWIS_PNG, D2D1::RectF(x, y, x + s, y + s), mode);
 
-				x += this->settings.getSettingByName<float>("lewisbouncespeed")->value * xv;
-				y += this->settings.getSettingByName<float>("lewisbouncespeed")->value * yv;
+				x += getOps<float>("lewisbouncespeed") * xv;
+				y += getOps<float>("lewisbouncespeed") * yv;
 
 				if (x >= MC::windowSize.x - s) xv = -1;
 				if (x < 0) xv = 1;
@@ -129,14 +129,14 @@ public:
 				if (y < 0) yv = 1;
 			}
 
-			if (this->settings.getSettingByName<bool>("lewiscrosshair")->value)
+			if (getOps<bool>("lewiscrosshair"))
 			{
-				float s = Constraints::RelativeConstraint(0.25, "height", true) * this->settings.getSettingByName<float>("lewiscrosshairsize")->value;
+				float s = Constraints::RelativeConstraint(0.25, "height", true) * getOps<float>("lewiscrosshairsize");
 				Vec2<float> pos((MC::windowSize.x / 2) - (s / 2), (MC::windowSize.y / 2) - (s / 2));
 				FlarialGUI::image(IDR_LEWIS_PNG, D2D1::RectF(pos.x, pos.y, pos.x + s, pos.y + s), "PNG");
 			}
 
-			if (this->settings.getSettingByName<bool>("lewisscream")->value)
+			if (getOps<bool>("lewisscream"))
 			{
 				if ((NextLewisScream - std::chrono::system_clock::now()).count() < 0)
 				{

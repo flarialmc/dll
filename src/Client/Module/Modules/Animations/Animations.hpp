@@ -57,7 +57,7 @@ public:
 			auto pos = event.getImagePos();
 			static float lerpedPos = pos.x; // old pos
 			lerpedPos = animate(pos.x, lerpedPos,
-				(0.016f * this->settings.getSettingByName<float>("hotbarSpeed")->value) *
+				(0.016f * getOps<float>("hotbarSpeed")) *
 				FlarialGUI::frameFactor);
 			event.setImagePos(Vec2<float>{lerpedPos, pos.y});
 		}
@@ -82,7 +82,7 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Animations");
-		addSlider("Hotbar Selected Slot Speed", "", settings.getSettingByName<float>("hotbarSpeed")->value);
+		addSlider("Hotbar Selected Slot Speed", "", getOps<float>("hotbarSpeed"));
 
 		FlarialGUI::UnsetScrollView();
 

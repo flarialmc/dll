@@ -33,13 +33,11 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<std::string>("color") == nullptr) settings.addSetting("color", (std::string)"FFFFFF");
-		if (settings.getSettingByName<bool>("color_rgb") == nullptr) settings.addSetting("color_rgb", false);
-		if (settings.getSettingByName<float>("colorOpacity") == nullptr) settings.addSetting("colorOpacity", 0.6f);
-		if (settings.getSettingByName<bool>("overlay") == nullptr) settings.addSetting("overlay", false);
-		if (settings.getSettingByName<bool>("overlayfullblock") == nullptr) settings.addSetting("overlayfullblock", false);
-		if (settings.getSettingByName<bool>("showfulloutline") == nullptr) settings.addSetting("showfulloutline", false);
-		if (settings.getSettingByName<float>("outlinewidth") == nullptr) settings.addSetting("outlinewidth", 0.01f);
+		setDef("outline", (std::string)"FFFFFF", 0.6f, false);
+		setDef("overlay", false);
+		setDef("overlayfullblock", false);
+		setDef("showfulloutline", false);
+		setDef("outlinewidth", 0.01f);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -57,11 +55,11 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Block Outline");
-		addToggle("Overlay", "Overlays the face of block", settings.getSettingByName<bool>("overlay")->value);
-		addConditionalToggle(settings.getSettingByName<bool>("overlay")->value, "Overlay Full Block", "Overlays the full block", settings.getSettingByName<bool>("overlayfullblock")->value);
-		addConditionalSlider(!settings.getSettingByName<bool>("overlay")->value, "Outline Width", "Thickness of the outline", settings.getSettingByName<float>("outlinewidth")->value, 0.5f);
-		addConditionalToggle(!settings.getSettingByName<bool>("overlay")->value, "3D Outline", "Shows outline through blocks.", settings.getSettingByName<bool>("showfulloutline")->value);
-		addColorPicker((settings.getSettingByName<bool>("overlay")->value ? "Overlay" : "Outline")+ (std::string)" Color", "", settings.getSettingByName<std::string>("color")->value, settings.getSettingByName<float>("colorOpacity")->value, settings.getSettingByName<bool>("color_rgb")->value);
+		addToggle("Overlay", "Overlays the face of block", getOps<bool>("overlay"));
+		addConditionalToggle(getOps<bool>("overlay"), "Overlay Full Block", "Overlays the full block", getOps<bool>("overlayfullblock"));
+		addConditionalSlider(!getOps<bool>("overlay"), "Outline Width", "Thickness of the outline", getOps<float>("outlinewidth"), 0.5f);
+		addConditionalToggle(!getOps<bool>("overlay"), "3D Outline", "Shows outline through blocks.", getOps<bool>("showfulloutline"));
+		addColorPicker((getOps<bool>("overlay") ? "Overlay" : "Outline") + (std::string)" Color", "", "outline");
 
 		FlarialGUI::UnsetScrollView();
 
@@ -70,9 +68,7 @@ public:
 
 	void onOutlineSelection(RenderOutlineSelectionEvent& event) {
 
-		D2D1_COLOR_F color;
-		color = settings.getSettingByName<bool>("color_rgb")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("color")->value);
-		color.a = settings.getSettingByName<float>("colorOpacity")->value;
+		D2D1_COLOR_F color = getColor("outline");
 
 		mce::MaterialPtr* material = MaterialUtils::getNametag();
 
@@ -82,10 +78,10 @@ public:
 
 		auto bp = event.getPos();
 
-		if (!settings.getSettingByName<bool>("overlay")->value) {
+		if (!getOps<bool>("overlay")) {
 
 			/* NORMAL MODE */
-			if (settings.getSettingByName<bool>("showfulloutline")->value) dc.setMaterial(MaterialUtils::getParticlesAlpha());
+			if (getOps<bool>("showfulloutline")) dc.setMaterial(MaterialUtils::getParticlesAlpha());
 			else dc.setMaterial(MaterialUtils::getNametag());
 
 			auto drawUp = [&](float width) {
@@ -193,7 +189,7 @@ public:
 				dc.fillQuad(Vec3<float>(bp.x + 1.002f - w, bp.y + w, z_base), Vec3<float>(bp.x + 1.002f - w, bp.y + 1.002f - w, z_base), Vec3<float>(bp.x + 1.002f, bp.y + 1.002f - w, z_base), Vec3<float>(bp.x + 1.002f, bp.y + w, z_base), color);
 				};
 
-			float width = settings.getSettingByName<float>("outlinewidth")->value;
+			float width = getOps<float>("outlinewidth");
 
 			drawNorth(width);
 			drawEast(width);
@@ -270,7 +266,7 @@ public:
 				);
 				};
 
-			if (!settings.getSettingByName<bool>("overlayfullblock")->value) {
+			if (!getOps<bool>("overlayfullblock")) {
 				switch (face) {
 				case 0:
 					drawDown();

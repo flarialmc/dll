@@ -29,9 +29,8 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"Combo: {value}");
+		setDef("text", (std::string)"Combo: {value}");
 		Module::defaultConfig("all");
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
 	}
 
 	void settingsRender(float settingsOffset) override {

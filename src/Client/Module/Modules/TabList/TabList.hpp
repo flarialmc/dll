@@ -28,15 +28,15 @@ public:
     }
 
     void defaultConfig() override {
+        setDef("enabled", true);
+        setDef("uiscale", 0.65f);
         getKeybind();
-        if (settings.getSettingByName<bool>("enabled") == nullptr) settings.addSetting<bool>("enabled", true);
-        if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 0.65f);
         Module::defaultConfig("core");
         Module::defaultConfig("pos");
         Module::defaultConfig("main");
         Module::defaultConfig("colors");
-        if (settings.getSettingByName<bool>("alphaOrder") == nullptr) settings.addSetting<bool>("alphaOrder", true);
-        if (settings.getSettingByName<bool>("flarialFirst") == nullptr) settings.addSetting<bool>("flarialFirst", true);
+        setDef("alphaOrder", true);
+        setDef("flarialFirst", true);
     }
 
     void settingsRender(float settingsOffset) override {
@@ -55,16 +55,16 @@ public:
 		extraPadding();
 
         addHeader("Misc");
-        addToggle("Alphabetical Order", "", settings.getSettingByName<bool>("alphaOrder")->value);
-        addToggle("Flarial First", "Prioritize Flarial users (Dev > Gamer > Booster > Supporter > Default) at the top", settings.getSettingByName<bool>("flarialFirst")->value);
+        addToggle("Alphabetical Order", "", getOps<bool>("alphaOrder"));
+        addToggle("Flarial First", "Prioritize Flarial users (Dev > Gamer > Booster > Supporter > Default) at the top", getOps<bool>("flarialFirst"));
         addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
 		extraPadding();
 
 		addHeader("Colors");
-		addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
-		addColorPicker("Text Color", "", settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
-		addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
-        addColorPicker("Glow Color", "", settings.getSettingByName<std::string>("glowColor")->value, settings.getSettingByName<float>("glowOpacity")->value, settings.getSettingByName<bool>("glowRGB")->value);
+		addColorPicker("Background Color", "", "bg");
+		addColorPicker("Text Color", "", "text");
+		addColorPicker("Border Color", "", "border");
+        addColorPicker("Glow Color", "", "glow");
 
 		FlarialGUI::UnsetScrollView();
 		resetPadding();
@@ -174,9 +174,9 @@ public:
         if (SDK::hasInstanced && (active || ClickGUI::editmenu)) {
             if (SDK::clientInstance->getLocalPlayer() != nullptr) {
                 float keycardSize = Constraints::RelativeConstraint(
-                    0.05f * this->settings.getSettingByName<float>("uiscale")->value, "height", true);
+                    0.05f * getOps<float>("uiscale"), "height", true);
 
-                Vec2<float> settingperc{ settings.getSettingByName<float>("percentageX")->value, settings.getSettingByName<float>("percentageY")->value };
+                Vec2<float> settingperc{ getOps<float>("percentageX"), getOps<float>("percentageY") };
 
 				int i3 = 0;
 				float i2 = 0;
@@ -197,45 +197,45 @@ public:
                 Vec2<float> vec2 = realcenter;
 
                 Vec2<float> rounde = Constraints::RoundingConstraint(
-                    this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value,
-                    this->settings.getSettingByName<float>("rounding")->value * settings.getSettingByName<float>("uiscale")->value);
+                    getOps<float>("rounding") * getOps<float>("uiscale"),
+                    getOps<float>("rounding") * getOps<float>("uiscale"));
 
                 float totalWidth = i2 * keycardSize;
                 float fontSize = Constraints::SpacingConstraint(3, keycardSize);
 
-				D2D1_COLOR_F disabledColor = settings.getSettingByName<bool>("bgRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
-				D2D1_COLOR_F textColor = settings.getSettingByName<bool>("textRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textColor")->value);
-				D2D1_COLOR_F borderColor = settings.getSettingByName<bool>("borderRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
+				D2D1_COLOR_F disabledColor = getOps<bool>("bgRGB") ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(getOps<std::string>("bgColor"));
+				D2D1_COLOR_F textColor = getOps<bool>("textRGB") ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(getOps<std::string>("textColor"));
+				D2D1_COLOR_F borderColor = getOps<bool>("borderRGB") ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(getOps<std::string>("borderColor"));
 
-                disabledColor.a = settings.getSettingByName<float>("bgOpacity")->value;
-                textColor.a = settings.getSettingByName<float>("textOpacity")->value;
-                borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
+                disabledColor.a = getOps<float>("bgOpacity");
+                textColor.a = getOps<float>("textOpacity");
+                borderColor.a = getOps<float>("borderOpacity");
 
-                if (this->settings.getSettingByName<bool>("glow")->value) {
-                    D2D1_COLOR_F glowColor = settings.getSettingByName<bool>("glowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("glowColor")->value);
-                    glowColor.a = settings.getSettingByName<float>("glowOpacity")->value;
-                    FlarialGUI::ShadowRect(Vec2<float>(fakex, realcenter.y), Vec2<float>(totalWidth, 7.5f * keycardSize), glowColor, rounde.x, (this->settings.getSettingByName<float>("glowAmount")->value/100.f) *  Constraints::PercentageConstraint(0.1f, "top"));
+                if (getOps<bool>("glow")) {
+                    D2D1_COLOR_F glowColor = getOps<bool>("glowRGB") ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(getOps<std::string>("glowColor"));
+                    glowColor.a = getOps<float>("glowOpacity");
+                    FlarialGUI::ShadowRect(Vec2<float>(fakex, realcenter.y), Vec2<float>(totalWidth, 7.5f * keycardSize), glowColor, rounde.x, (getOps<float>("glowAmount")/100.f) *  Constraints::PercentageConstraint(0.1f, "top"));
                 }
 
-                if (settings.getSettingByName<bool>("BlurEffect")->value) {
+                if (getOps<bool>("BlurEffect")) {
                     FlarialGUI::BlurRect(D2D1::RoundedRect(
                         D2D1::RectF(fakex, realcenter.y, fakex + totalWidth, realcenter.y + (7.5f * keycardSize)),
                         rounde.x, rounde.x));
                 }
 
-                if (this->settings.getSettingByName<bool>("border")->value) {
+                if (getOps<bool>("border")) {
                     FlarialGUI::RoundedHollowRect(
                         fakex, realcenter.y,
                         Constraints::RelativeConstraint(
-                            (this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
+                            (getOps<float>("borderWidth") * getOps<float>("uiscale")) / 100.0f, "height", true),
                         borderColor, totalWidth, 7.5f * keycardSize, rounde.x, rounde.x);
                 }
 
                 FlarialGUI::RoundedRect(fakex, realcenter.y, disabledColor, totalWidth, 7.5f * keycardSize, rounde.x, rounde.x);
 
                 int i = 0;
-                bool alphaOrder = settings.getSettingByName<bool>("alphaOrder")->value;
-                bool flarialFirst = settings.getSettingByName<bool>("flarialFirst")->value;
+                bool alphaOrder = getOps<bool>("alphaOrder");
+                bool flarialFirst = getOps<bool>("flarialFirst");
 
                 // Define role logos for reuse in both branches
                 std::map<std::string, int> roleLogos = {
@@ -263,7 +263,7 @@ public:
                         auto module = ModuleManager::getModule("Nick");
                         if (module && module->isEnabled() && !NickModule::backupOri.empty() &&
                             clearedName == String::removeNonAlphanumeric(String::removeColorCodes(NickModule::backupOri))) {
-                            name = module->settings.getSettingByName<std::string>("nick")->value;
+                            name = module->getOps<std::string>("nick");
                             if (name.empty()) name = clearedName;
                         }
 
@@ -332,7 +332,7 @@ public:
                         auto module = ModuleManager::getModule("Nick");
                         if (module && module->isEnabled() && !NickModule::backupOri.empty() &&
                             clearedName == String::removeNonAlphanumeric(String::removeColorCodes(NickModule::backupOri))) {
-                            name = module->settings.getSettingByName<std::string>("nick")->value;
+                            name = module->getOps<std::string>("nick");
                             if (name.empty()) name = clearedName;
                         }
 

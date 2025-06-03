@@ -27,9 +27,9 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"FPS: {value}");
+		setDef("text", (std::string)"FPS: {value}");
 		Module::defaultConfig("all");
-		if (settings.getSettingByName<float>("fpsSpoofer") == nullptr) settings.addSetting("fpsSpoofer", 1.0f);
+		setDef("fpsSpoofer", 1.0f);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -45,7 +45,7 @@ public:
 
 		addHeader("FPS Counter");
 		defaultAddSettings("main");
-		addSlider("FPS Spoofer", "Adjusts the displayed FPS.", settings.getSettingByName<float>("fpsSpoofer")->value, 10.0f);
+		addSlider("FPS Spoofer", "Adjusts the displayed FPS.", getOps<float>("fpsSpoofer"), 10.0f);
 		extraPadding();
 
 		addHeader("Text");
@@ -68,7 +68,7 @@ public:
 	}
 	void onRender(RenderEvent& event) {
 		if (this->isEnabled()) {
-			float fpsSpooferValue = this->settings.getSettingByName<float>("fpsSpoofer")->value;
+			float fpsSpooferValue = getOps<float>("fpsSpoofer");
 
 			if (fpsSpooferValue > 10.0f) {
 				fpsSpooferValue = 10.0f;
@@ -77,7 +77,7 @@ public:
 				fpsSpooferValue = 1.0f;
 			}
 
-			this->settings.getSettingByName<float>("fpsSpoofer")->value = fpsSpooferValue;
+			getOps<float>("fpsSpoofer") = fpsSpooferValue;
 
 			int fps = (int)round(((float)MC::fps * round(fpsSpooferValue)));
 

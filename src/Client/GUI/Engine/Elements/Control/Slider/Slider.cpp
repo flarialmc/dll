@@ -4,45 +4,12 @@
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
-#define colors_text HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_text")->value)
-#define o_colors_text clickgui->settings.getSettingByName<float>("o_colors_text")->value
-#define colors_text_rgb clickgui->settings.getSettingByName<bool>("colors_text_rgb")->value
-
-#define colors_primary1 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary1")->value)
-#define o_colors_primary1 clickgui->settings.getSettingByName<float>("o_colors_primary1")->value
-#define colors_primary1_rgb clickgui->settings.getSettingByName<bool>("colors_primary1_rgb")->value
-
-#define colors_primary2 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary2")->value)
-#define o_colors_primary2 clickgui->settings.getSettingByName<float>("o_colors_primary2")->value
-#define colors_primary2_rgb clickgui->settings.getSettingByName<bool>("colors_primary2_rgb")->value
-
-#define colors_primary3 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary3")->value)
-#define o_colors_primary3 clickgui->settings.getSettingByName<float>("o_colors_primary3")->value
-#define colors_primary3_rgb clickgui->settings.getSettingByName<bool>("colors_primary3_rgb")->value
-
-#define colors_primary4 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary4")->value)
-#define o_colors_primary4 clickgui->settings.getSettingByName<float>("o_colors_primary4")->value
-#define colors_primary4_rgb clickgui->settings.getSettingByName<bool>("colors_primary4_rgb")->value
-
-#define colors_secondary1 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary1")->value)
-#define o_colors_secondary1 clickgui->settings.getSettingByName<float>("o_colors_secondary1")->value
-#define colors_secondary1_rgb clickgui->settings.getSettingByName<bool>("colors_secondary1_rgb")->value
-
-#define colors_secondary2 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary2")->value)
-#define o_colors_secondary2 clickgui->settings.getSettingByName<float>("o_colors_secondary2")->value
-#define colors_secondary2_rgb clickgui->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
-
-#define colors_secondary7 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary7")->value)
-#define o_colors_secondary7 clickgui->settings.getSettingByName<float>("o_colors_secondary7")->value
-#define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
-
 float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, const float maxValue, const float minValue, const bool zerosafe, std::string moduleName, std::string settingName) {
-    D2D1_COLOR_F color = colors_primary1_rgb ? rgbColor : colors_primary1;
-    D2D1_COLOR_F disabledColor = colors_primary3_rgb ? rgbColor : colors_primary3;
-    D2D1_COLOR_F circleColor = colors_primary2_rgb ? rgbColor : colors_primary2;
-    color.a = o_colors_primary1;
-    disabledColor.a = o_colors_primary3;
-    circleColor.a = o_colors_primary2;
+    D2D1_COLOR_F color = clickgui->getColor("primary1", "ClickGUI");
+    D2D1_COLOR_F disabledColor = clickgui->getColor("primary3", "ClickGUI");
+    D2D1_COLOR_F circleColor = clickgui->getColor("primary2", "ClickGUI");
+
+    color.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 
     if (ClickGUI::settingsOpacity != 1) {
         color.a = ClickGUI::settingsOpacity;
@@ -145,8 +112,7 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
         FlarialGUI::TextBoxes[30 + index].isActive ? DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
                                     Constraints::FontScaler(percWidth * 14.5f), DWRITE_FONT_WEIGHT_NORMAL);
 
-    D2D1_COLOR_F cursorCol = colors_primary2_rgb ? rgbColor : colors_primary2;
-    cursorCol.a = o_colors_primary2;
+    D2D1_COLOR_F cursorCol = clickgui->getColor("primary2", "ClickGUI");
 
     cursorCol.a = FlarialGUI::TextBoxes[30 + index].cursorOpac;
 

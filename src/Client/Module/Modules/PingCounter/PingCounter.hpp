@@ -20,8 +20,8 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value}ms");
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.8f);
+		setDef("text", (std::string)"{value}ms");
+		setDef("textscale", 0.8f);
 		Module::defaultConfig("all");
 	}
 
@@ -38,23 +38,23 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 
-		this->addHeader("Ping Counter");
-		this->defaultAddSettings("main");
-		this->extraPadding();
+		addHeader("Ping Counter");
+		defaultAddSettings("main");
+		extraPadding();
 
-        this->addHeader("Text");
-		this->defaultAddSettings("text");
-		this->extraPadding();
+        addHeader("Text");
+		defaultAddSettings("text");
+		extraPadding();
 
-		this->addHeader("Colors");
-		this->defaultAddSettings("colors");
-		this->extraPadding();
+		addHeader("Colors");
+		defaultAddSettings("colors");
+		extraPadding();
 
-		this->addHeader("Misc");
-		this->defaultAddSettings("misc");
+		addHeader("Misc");
+		defaultAddSettings("misc");
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 	void onRender(RenderEvent& event) {

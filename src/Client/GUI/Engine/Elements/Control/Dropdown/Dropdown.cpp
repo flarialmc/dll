@@ -7,38 +7,6 @@
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
-#define colors_text HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_text")->value)
-#define o_colors_text clickgui->settings.getSettingByName<float>("o_colors_text")->value
-#define colors_text_rgb clickgui->settings.getSettingByName<bool>("colors_text_rgb")->value
-
-#define colors_primary1 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary1")->value)
-#define o_colors_primary1 clickgui->settings.getSettingByName<float>("o_colors_primary1")->value
-#define colors_primary1_rgb clickgui->settings.getSettingByName<bool>("colors_primary1_rgb")->value
-
-#define colors_primary2 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary2")->value)
-#define o_colors_primary2 clickgui->settings.getSettingByName<float>("o_colors_primary2")->value
-#define colors_primary2_rgb clickgui->settings.getSettingByName<bool>("colors_primary2_rgb")->value
-
-#define colors_primary3 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary3")->value)
-#define o_colors_primary3 clickgui->settings.getSettingByName<float>("o_colors_primary3")->value
-#define colors_primary3_rgb clickgui->settings.getSettingByName<bool>("colors_primary3_rgb")->value
-
-#define colors_primary4 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary4")->value)
-#define o_colors_primary4 clickgui->settings.getSettingByName<float>("o_colors_primary4")->value
-#define colors_primary4_rgb clickgui->settings.getSettingByName<bool>("colors_primary4_rgb")->value
-
-#define colors_secondary1 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary1")->value)
-#define o_colors_secondary1 clickgui->settings.getSettingByName<float>("o_colors_secondary1")->value
-#define colors_secondary1_rgb clickgui->settings.getSettingByName<bool>("colors_secondary1_rgb")->value
-
-#define colors_secondary2 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary2")->value)
-#define o_colors_secondary2 clickgui->settings.getSettingByName<float>("o_colors_secondary2")->value
-#define colors_secondary2_rgb clickgui->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
-
-#define colors_secondary7 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary7")->value)
-#define o_colors_secondary7 clickgui->settings.getSettingByName<float>("o_colors_secondary7")->value
-#define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
-
 std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<std::string>& options, std::string &value, const std::string& label, std::string moduleName, std::string settingName) {
 
     Vec2<float> round = Constraints::RoundingConstraint(13, 13);
@@ -69,20 +37,19 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
     }
     additionalIndex = index;
 
-    D2D1_COLOR_F unselectedChildCol = colors_primary3_rgb ? rgbColor : colors_primary3;
-    unselectedChildCol.a = o_colors_primary3;
-
-    D2D1_COLOR_F selectedCol = colors_primary1_rgb ? rgbColor : colors_primary1;
-    selectedCol.a = o_colors_primary1;
-
-    D2D1_COLOR_F hoveredChildCol = colors_primary4_rgb ? rgbColor : colors_primary4;
-    hoveredChildCol.a = o_colors_primary4;
+    D2D1_COLOR_F unselectedChildCol = clickgui->getColor("primary3", "ClickGUI");
+    D2D1_COLOR_F selectedCol = clickgui->getColor("primary1", "ClickGUI");
+    D2D1_COLOR_F hoveredChildCol = clickgui->getColor("primary4", "ClickGUI");
 
     if (ClickGUI::settingsOpacity != 1) {
         unselectedChildCol.a = ClickGUI::settingsOpacity;
         selectedCol.a = ClickGUI::settingsOpacity;
         hoveredChildCol.a = ClickGUI::settingsOpacity;
     }
+
+    unselectedChildCol.a = clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+    selectedCol.a = clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+    hoveredChildCol.a = clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 
     float originalY = y;
     if (!FlarialGUI::DropDownMenus[index].curColorDone) {

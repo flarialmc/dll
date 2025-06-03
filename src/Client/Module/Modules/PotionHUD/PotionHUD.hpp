@@ -35,24 +35,18 @@ public:
 	void defaultConfig() override {
 		Module::defaultConfig("core");
 		Module::defaultConfig("pos");
-		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 1.0f);
-		if (settings.getSettingByName<float>("textSize") == nullptr) settings.addSetting("textSize", 0.05f);
-		if (settings.getSettingByName<std::string>("colorMain") == nullptr) settings.addSetting("colorMain", (std::string)"FFFFFF");
-		if (settings.getSettingByName<float>("colorMain_opacity") == nullptr) settings.addSetting("colorMain_opacity", 1.0f);
-		if (settings.getSettingByName<bool>("colorMain_rgb") == nullptr) settings.addSetting("colorMain_rgb", false);
-		if (settings.getSettingByName<std::string>("colorLow") == nullptr) settings.addSetting("colorLow", (std::string)"FF0000");
-		if (settings.getSettingByName<float>("colorLow_opacity") == nullptr) settings.addSetting("colorLow_opacity", 1.0f);
-		if (settings.getSettingByName<bool>("colorLow_rgb") == nullptr) settings.addSetting("colorLow_rgb", false);
-		if (settings.getSettingByName<float>("spacing") == nullptr) settings.addSetting("spacing", 1.f);
-		if (settings.getSettingByName<bool>("textShadow") == nullptr) settings.addSetting("textShadow", true);
-		if (settings.getSettingByName<bool>("textShadowOffset") == nullptr) settings.addSetting("textShadowOffset", 0.003f);
-		if (settings.getSettingByName<float>("textOffsetX") == nullptr) settings.addSetting("textOffsetX", 2.f);
-		if (settings.getSettingByName<bool>("showText") == nullptr) settings.addSetting("showText", true);
-		if (settings.getSettingByName<bool>("textLeft") == nullptr) settings.addSetting("textLeft", false);
-		if (settings.getSettingByName<bool>("bottomUp") == nullptr) settings.addSetting("bottomUp", false);
-		if (settings.getSettingByName<std::string>("textShadowCol") == nullptr) settings.addSetting("textShadowCol", (std::string)"00000");
-		if (settings.getSettingByName<float>("textShadowOpacity") == nullptr) settings.addSetting("textShadowOpacity", 0.55f);
-		if (settings.getSettingByName<bool>("textShadowRGB") == nullptr) settings.addSetting("textShadowRGB", false);
+		setDef("uiscale", 1.0f);
+		setDef("textSize", 0.05f);
+		setDef("main", (std::string)"FFFFFF", 1.f, false);
+		setDef("low", (std::string)"FF0000", 1.f, false);
+		setDef("textShadow", (std::string)"00000", 0.55f, false);
+		setDef("spacing", 1.f);
+		setDef("textShadow", true);
+		setDef("textShadowOffset", 0.003f);
+		setDef("textOffsetX", 2.f);
+		setDef("showText", true);
+		setDef("textLeft", false);
+		setDef("bottomUp", false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -68,53 +62,45 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Potion HUD");
-		addSlider("UI Scale", "", settings.getSettingByName<float>("uiscale")->value, 3.f, 0.f, true);
-		addToggle("Bottom Up Mode", "New effects appear ontop instead", settings.getSettingByName<bool>("bottomUp")->value);
-		addSlider("Spacing", "", settings.getSettingByName<float>("spacing")->value, 10.f, 0.0f, true);
-		addToggle("Show Text", "", settings.getSettingByName<bool>("showText")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("showText")->value, "Text Size", "", settings.getSettingByName<float>("textSize")->value, 0.25f, 0.0f, true);
-		addConditionalSlider(settings.getSettingByName<bool>("showText")->value, "Text Offset X", "", settings.getSettingByName<float>("textOffsetX")->value, 50.f, 0.0f, false);
-		addConditionalToggle(settings.getSettingByName<bool>("showText")->value, "Text to the left", "", settings.getSettingByName<bool>("textLeft")->value);
-		addConditionalToggle(settings.getSettingByName<bool>("showText")->value, "Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("showText")->value && settings.getSettingByName<bool>("textShadow")->value, "Shadow Offset", "How far the shadow will be.", settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
+		addSlider("UI Scale", "", getOps<float>("uiscale"), 3.f, 0.f, true);
+		addToggle("Bottom Up Mode", "New effects appear ontop instead", getOps<bool>("bottomUp"));
+		addSlider("Spacing", "", getOps<float>("spacing"), 10.f, 0.0f, true);
+		addToggle("Show Text", "", getOps<bool>("showText"));
+		addConditionalSlider(getOps<bool>("showText"), "Text Size", "", getOps<float>("textSize"), 0.25f, 0.0f, true);
+		addConditionalSlider(getOps<bool>("showText"), "Text Offset X", "", getOps<float>("textOffsetX"), 50.f, 0.0f, false);
+		addConditionalToggle(getOps<bool>("showText"), "Text to the left", "", getOps<bool>("textLeft"));
+		addConditionalToggle(getOps<bool>("showText"), "Text Shadow", "Displays a shadow under the text", getOps<bool>("textShadow"));
+		addConditionalSlider(getOps<bool>("showText") && getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", getOps<float>("textShadowOffset"), 0.02f, 0.001f);
 		extraPadding();
 
 		addHeader("Colors");
-		addColorPicker("Main Color", "", settings.getSettingByName<std::string>("colorMain")->value,settings.getSettingByName<float>("colorMain_opacity")->value,settings.getSettingByName<bool>("colorMain_rgb")->value);
-		addConditionalColorPicker(settings.getSettingByName<bool>("textShadow")->value, "Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value,settings.getSettingByName<float>("textShadowOpacity")->value,settings.getSettingByName<bool>("textShadowRGB")->value);
-		addColorPicker("Effect About to Expire", "", settings.getSettingByName<std::string>("colorLow")->value,settings.getSettingByName<float>("colorLow_opacity")->value,settings.getSettingByName<bool>("colorLow_rgb")->value);
+		addColorPicker("Main Color", "", "main");
+		addConditionalColorPicker(getOps<bool>("textShadow"), "Shadow Color", "Text Shadow Color", "textShadow");
+		addColorPicker("Effect About to Expire", "", "low");
 
 		FlarialGUI::UnsetScrollView();
 		resetPadding();
 	}
 
 	void renderText() {
-		auto rgb1 = this->settings.getSettingByName<bool>("colorLow_rgb")->value;
-		auto rgb2 = this->settings.getSettingByName<bool>("colorMain_rgb")->value;
-
-		auto rgbColor = FlarialGUI::rgbColor;
-
-		auto lowColor = rgb1 ? rgbColor : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("colorLow")->value);
-		auto mainColor = rgb2 ? rgbColor : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("colorMain")->value);
-
-		lowColor.a = settings.getSettingByName<float>("colorLow_opacity")->value;
-		mainColor.a = settings.getSettingByName<float>("colorMain_opacity")->value;
+		auto lowColor = getColor("low");
+		auto mainColor = getColor("main");
 
 		int warning_seconds = 5;
 
-		float ospacing = this->settings.getSettingByName<float>("spacing")->value;
+		float ospacing = getOps<float>("spacing");
 
-		bool toTheLeft = this->settings.getSettingByName<bool>("textLeft")->value;
-		const float uiscale = this->settings.getSettingByName<float>("uiscale")->value;
+		const bool toTheLeft = getOps<bool>("textLeft");
+		const float uiscale = getOps<float>("uiscale");
 		const float guiscale = SDK::clientInstance->getGuiData()->getGuiScale();
-		const float textSize = this->settings.getSettingByName<float>("textSize")->value * 1080;
-		const float textWidth = Constraints::RelativeConstraint(this->settings.getSettingByName<float>("textSize")->value, "height", true);
+		const float textSize = getOps<float>("textSize") * 1080;
+		const float textWidth = Constraints::RelativeConstraint(getOps<float>("textSize"), "height", true);
 		const float textHeight = Constraints::RelativeConstraint(0.029, "height", true);
 
 		if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
 			if (SDK::clientInstance->getLocalPlayer() != nullptr)
 				if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
-					if (settings.getSettingByName<bool>("showText")->value) {
+					if (getOps<bool>("showText")) {
 						auto scaledPos = PositionUtils::getCustomScreenScaledPos(Vec2<float>{16, 16}, uiscale);
 						float spacing = scaledPos.y * ospacing;
 
@@ -127,7 +113,7 @@ public:
 						std::vector<UnifiedMobEffectData> effects = SDK::clientInstance->getLocalPlayer()->getMobEffects();
 						for (const auto& effect : effects) {
 							if (!effect.isValid()) continue;
-							float textX = currentPos.x + (toTheLeft ? 0 : (16 * uiscale * guiscale)) + (this->settings.getSettingByName<float>("textOffsetX")->value * guiscale * uiscale) * (toTheLeft ? -1 : 1);
+							float textX = currentPos.x + (toTheLeft ? 0 : (16 * uiscale * guiscale)) + (getOps<float>("textOffsetX") * guiscale * uiscale) * (toTheLeft ? -1 : 1);
 							float textY = currentPos.y + ymodifier;
 
 							std::string text = effect.getNameAndTime();
@@ -141,12 +127,12 @@ public:
 							std::wstring widestr2 = std::wstring(effectTImeLeft.begin(), effectTImeLeft.end());
 							const wchar_t* widecstr2 = widestr2.c_str();
 
-							if (this->settings.getSettingByName<bool>("textShadow")->value) {
-								D2D_COLOR_F shadowCol = this->settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("textShadowCol")->value);
-								shadowCol.a = this->settings.getSettingByName<float>("textShadowOpacity")->value;
+							if (getOps<bool>("textShadow")) {
+								D2D_COLOR_F shadowCol = getColor("textShadow");
+
 								FlarialGUI::FlarialTextWithFont(
-									textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
-									textY + (Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale) - FlarialGUI::getFlarialTextSize(widecstr1, 0,
+									textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
+									textY + (Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale) - FlarialGUI::getFlarialTextSize(widecstr1, 0,
 										16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
 										textSize * guiscale * uiscale,
 										DWRITE_FONT_WEIGHT_BOLD, true).y / 4.f,
@@ -159,8 +145,8 @@ public:
 									true
 								);
 								FlarialGUI::FlarialTextWithFont(
-									textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
-									textY + (Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale) + FlarialGUI::getFlarialTextSize(widecstr2, 0,
+									textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
+									textY + (Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale) + FlarialGUI::getFlarialTextSize(widecstr2, 0,
 										16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
 										(textSize * guiscale * uiscale) * 0.8f,
 										DWRITE_FONT_WEIGHT_BOLD, true).y / 1.6f,
@@ -183,6 +169,7 @@ public:
 								16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
 								textSize * guiscale * uiscale,
 								DWRITE_FONT_WEIGHT_BOLD, effect.duration / 20 <= warning_seconds ? lowColor : mainColor, true);
+
 							FlarialGUI::FlarialTextWithFont(
 								textX,
 								textY + FlarialGUI::getFlarialTextSize(widecstr2, 0,
@@ -193,7 +180,7 @@ public:
 								16 * uiscale * guiscale, toTheLeft ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING,
 								(textSize * guiscale * uiscale) * 0.8f,
 								DWRITE_FONT_WEIGHT_NORMAL, effect.duration / 20 <= warning_seconds ? lowColor : mainColor, true);
-							ymodifier += spacing * (this->settings.getSettingByName<bool>("bottomUp")->value ? -1 : 1);
+							ymodifier += spacing * (getOps<bool>("bottomUp") ? -1 : 1);
 						}
 					}
 				}
@@ -203,10 +190,10 @@ public:
 	void onRender(RenderEvent& event) {
 		if (ClientInstance::getTopScreenName() == "hud_screen" && this->isEnabled()) {
 			float guiscale = SDK::clientInstance->getGuiData()->getGuiScale();
-			float uiscale = this->settings.getSettingByName<float>("uiscale")->value;
-			float spacing = this->settings.getSettingByName<float>("spacing")->value;
+			float uiscale = getOps<float>("uiscale");
+			float spacing = getOps<float>("spacing");
 
-			Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value, this->settings.getSettingByName<float>("percentageY")->value);
+			Vec2<float> settingperc = Vec2<float>(getOps<float>("percentageX"), getOps<float>("percentageY"));
 			float s = 16 * uiscale * guiscale;
 
 			float width = s;
@@ -250,11 +237,11 @@ public:
 		if (this->isEnabled())
 			if (ClientInstance::getTopScreenName() == "hud_screen") {
 				Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
-				float uiscale = this->settings.getSettingByName<float>("uiscale")->value;
+				float uiscale = getOps<float>("uiscale");
 
 				if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
 					auto ui_icon_scale = uiscale / 2.f;
-					float spacing = 16 * uiscale * this->settings.getSettingByName<float>("spacing")->value;
+					float spacing = 16 * uiscale * getOps<float>("spacing");
 
 					float xmodifier = 0.0f;
 					float ymodifier = 0.0f;
@@ -273,7 +260,7 @@ public:
 						static auto color = mce::Color();
 						static auto flushLayer = HashedString("ui_flush");
 						muirc->flushImages(color, 1.0f, flushLayer);
-						ymodifier += spacing * (this->settings.getSettingByName<bool>("bottomUp")->value ? -1 : 1);
+						ymodifier += spacing * (getOps<bool>("bottomUp") ? -1 : 1);
 					}
 				}
 			}

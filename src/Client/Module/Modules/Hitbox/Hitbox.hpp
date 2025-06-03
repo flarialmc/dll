@@ -38,12 +38,10 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<std::string>("color") == nullptr) settings.addSetting("color", (std::string)"FFFFFF");
-		if (settings.getSettingByName<bool>("color_rgb") == nullptr) settings.addSetting("color_rgb", false);
-		if (settings.getSettingByName<float>("colorOpacity") == nullptr) settings.addSetting("colorOpacity", 0.6f);
-		if (settings.getSettingByName<float>("thickness") == nullptr) settings.addSetting("thickness", 1.1f);
-		if (settings.getSettingByName<bool>("staticThickness") == nullptr) settings.addSetting("staticThickness", false);
-		if (settings.getSettingByName<bool>("outline") == nullptr) settings.addSetting("outline", false);
+		setDef("hitbox", (std::string)"FFFFFF", 0.6f, false);
+		setDef("thickness", 1.1f);
+		setDef("staticThickness", false);
+		setDef("outline", false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -60,15 +58,13 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Hitbox");
-		addToggle("2D Mode", "", settings.getSettingByName<bool>("outline")->value);
-		addToggle("Static Thickness", "", settings.getSettingByName<bool>("staticThickness")->value);
-		addSlider("Thickness", "", settings.getSettingByName<float>("thickness")->value);
+		addToggle("2D Mode", "", getOps<bool>("outline"));
+		addToggle("Static Thickness", "", getOps<bool>("staticThickness"));
+		addSlider("Thickness", "", getOps<float>("thickness"));
 		extraPadding();
 
 		addHeader("Colors");
-		addColorPicker("Hitbox Color", "", settings.getSettingByName<std::string>("color")->value,
-			settings.getSettingByName<float>("colorOpacity")->value,
-			settings.getSettingByName<bool>("color_rgb")->value);
+		addColorPicker("Hitbox Color", "", "hitbox");
 
 		FlarialGUI::UnsetScrollView();
 
@@ -115,17 +111,12 @@ public:
 		if (FlarialGUI::inMenu || SDK::getCurrentScreen() != "hud_screen") return;
 
 		if (player != nullptr) {
-			D2D1_COLOR_F color2;
-			// TODO: optimize getting colors
-			if (this->settings.getSettingByName<bool>("color_rgb")->value) color2 = FlarialGUI::rgbColor;
-			else color2 = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color")->value);
-
 			std::lock_guard<std::mutex> guard(renderMtx);
 			for (const auto& aabbInfo : aabbsToRender) {
 				// Retrieve the thickness setting value from the module settings
-				float thickness = this->settings.getSettingByName<float>("thickness")->value;
-				bool staticThickness = this->settings.getSettingByName<bool>("staticThickness")->value;
-				bool outline = this->settings.getSettingByName<bool>("outline")->value;
+				float thickness = getOps<float>("thickness");
+				bool staticThickness = getOps<bool>("staticThickness");
+				bool outline = getOps<bool>("outline");
 
 				float lineWidth = thickness;
 
@@ -140,7 +131,7 @@ public:
 					lineWidth = thickness * scaleFactor;
 				}
 
-				DrawUtils::addBox(aabbInfo.aabb.lower, aabbInfo.aabb.upper, staticThickness ? thickness : lineWidth, outline ? 2 : 1, color2);
+				DrawUtils::addBox(aabbInfo.aabb.lower, aabbInfo.aabb.upper, staticThickness ? thickness : lineWidth, outline ? 2 : 1, getColor("hitbox"));
 
 				//DrawUtils::addBox(aabbInfo.hitbox.lower, aabbInfo.hitbox.upper, staticThickness ? thickness : lineWidth, outline ? 2 : 1, aabbInfo.selected ? FlarialGUI::rgbColor :color2);
 			}

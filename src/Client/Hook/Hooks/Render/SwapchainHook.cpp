@@ -167,7 +167,6 @@ bool SwapchainHook::currentVsyncState;
 
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
-
     if (Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
 
     if (currentVsyncState != Client::settings.getSettingByName<bool>("vsync")->value) {
@@ -187,9 +186,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     UnderUIHooks::index = 0;
 
-    if (D2D::context)
-    MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
-
+    if (D2D::context) MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
+    
 
     /* UNDER UI HOOK - CLEARDEPTHSTENCILVIEW */
 

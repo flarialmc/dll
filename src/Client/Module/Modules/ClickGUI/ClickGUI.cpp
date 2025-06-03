@@ -24,7 +24,7 @@ void ClickGUI::fov(FOVEvent& event) {
 
 	if (ModuleManager::getModule("Java Dynamic FOV").get()->isEnabled()) {
 		if (player->getActorFlag(ActorFlags::FLAG_SPRINTING)) {
-			rFov = ModuleManager::getModule("Java Dynamic FOV").get()->settings.getSettingByName<float>("fov_target")->value;
+			rFov = ModuleManager::getModule("Java Dynamic FOV").get()->getOps<float>("fov_target");
 		}
 	}
 
@@ -105,8 +105,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 		Vec2<float> round = Constraints::RoundingConstraint(43, 43);
 		Vec2<float> baseRound = round;
 
-		D2D1_COLOR_F basebaseRectangleColor = colors_secondary3_rgb ? FlarialGUI::rgbColor : colors_secondary3;
-		basebaseRectangleColor.a = o_colors_secondary3;
+		D2D1_COLOR_F basebaseRectangleColor = clickgui->getColor("secondary3", "ClickGUI");
 
 		FlarialGUI::RoundedRect(center.x, center.y,
 			basebaseRectangleColor, baseWidth,
@@ -126,8 +125,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 		float navy = Constraints::PercentageConstraint(0.019f, "top");
 		round = Constraints::RoundingConstraint(28, 28);
 
-		D2D1_COLOR_F navColor = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
-		navColor.a = o_colors_secondary2;
+		D2D1_COLOR_F navColor = clickgui->getColor("secondary2", "ClickGUI");
 
 		FlarialGUI::RoundedRect(navx, navy, navColor,
 			navigationBarWidth, navigationBarHeight, round.x, round.x);
@@ -146,18 +144,17 @@ void ClickGUI::onRender(RenderEvent& event) {
 		float logoX = navx - Constraints::SpacingConstraint(0.05, logoWidthButReal) + (logoWidthButReal * 0.6);
 		float logoY = (navy + navigationBarHeight / 2.0f - logoWidthButReal / 2.0f);
 
-		D2D1_COLOR_F fLARIALlOGO = colors_FlarialLogo_rgb ? FlarialGUI::rgbColor : colors_FlarialLogo;
-		fLARIALlOGO.a = o_colors_FlarialLogo;
+		D2D1_COLOR_F fLARIALlOGO = clickgui->getColor("flariallogo", "ClickGUI");
 
 		if (!Client::settings.getSettingByName<bool>("noicons")->value) {
-			if (this->settings.getSettingByName<bool>("custom_logo")->value && std::filesystem::exists(Utils::getRoamingPath() + "\\Flarial\\assets\\custom-logo.png")) {
+			if (getOps<bool>("custom_logo") && std::filesystem::exists(Utils::getRoamingPath() + "\\Flarial\\assets\\custom-logo.png")) {
 				FlarialGUI::image("Flarial\\assets\\custom-logo.png",
 					D2D1::RectF(logoX, logoY, logoX + logoWidthButReal,
 						logoY + logoWidthButReal));
 
 			}
 			else {
-				if (ModuleManager::getModule("Lewis")->settings.getSettingByName<bool>("lewislogo")->value)
+				if (ModuleManager::getModule("Lewis")->getOps<bool>("lewislogo"))
 				{
 					FlarialGUI::image(IDR_LEWIS_PNG, D2D1::RectF(logoX - (logoWidthButReal * 0.2), logoY - (logoWidthButReal * 0.2), logoX + (logoWidthButReal * 1.4), logoY + (logoWidthButReal * 1.4)), "PNG");
 				}
@@ -171,11 +168,8 @@ void ClickGUI::onRender(RenderEvent& event) {
 
 		/* tab buttons start */
 
-		D2D1_COLOR_F RadioButtonEnabled = colors_radiobutton_enabled_rgb ? FlarialGUI::rgbColor : colors_radiobutton_enabled;
-		RadioButtonEnabled.a = o_colors_radiobutton_enabled;
-
-		D2D1_COLOR_F RadioButtonDisabled = colors_radiobutton_disabled_rgb ? FlarialGUI::rgbColor : colors_radiobutton_disabled;
-		RadioButtonDisabled.a = o_colors_radiobutton_disabled;
+		D2D1_COLOR_F RadioButtonEnabled = clickgui->getColor("enabledRadioButton", "ClickGUI");
+		D2D1_COLOR_F RadioButtonDisabled = clickgui->getColor("disabledRadioButton", "ClickGUI");
 
 		float shit = Constraints::RelativeConstraint(0.448f);
 
@@ -196,31 +190,21 @@ void ClickGUI::onRender(RenderEvent& event) {
 
 		round = Constraints::RoundingConstraint(17.5f, 17.5f);
 
-		D2D1_COLOR_F modTextCol = colors_text_rgb ? FlarialGUI::rgbColor : colors_text;
-		modTextCol.a = o_colors_text;
+		D2D1_COLOR_F modTextCol = clickgui->getColor("globalText", "ClickGUI");
 
-		D2D1_COLOR_F mod6Col = colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6;
-		mod6Col.a = o_colors_secondary6;
-		static D2D1_COLOR_F tabBgCol = colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6;
-		static D2D1_COLOR_F tabBgCol2 = colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6;
-		static D2D1_COLOR_F tabBgCol3 = colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6;
-		static D2D1_COLOR_F tabBgCol4 = colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6;
-
-
-		tabBgCol.a = o_colors_secondary6;
-		tabBgCol2.a = o_colors_secondary6;
-		tabBgCol3.a = o_colors_secondary6;
-		tabBgCol4.a = o_colors_secondary6;
-
+		D2D1_COLOR_F mod6Col = clickgui->getColor("secondary6", "ClickGUI");
+		static D2D1_COLOR_F tabBgCol = clickgui->getColor("secondary6", "ClickGUI");
+		static D2D1_COLOR_F tabBgCol2 = clickgui->getColor("secondary6", "ClickGUI");
+		static D2D1_COLOR_F tabBgCol3 = clickgui->getColor("secondary6", "ClickGUI");
+		static D2D1_COLOR_F tabBgCol4 = clickgui->getColor("secondary6", "ClickGUI");
+		
+		D2D_COLOR_F secondary8 = clickgui->getColor("secondary8", "ClickGUI");
+		D2D_COLOR_F secondary6 = clickgui->getColor("secondary6", "ClickGUI");
 
 		//radiobutton of modules
 
-		if (curr != "modules") {
-			tabBgCol = FlarialGUI::LerpColor(tabBgCol, colors_secondary8_rgb ? FlarialGUI::rgbColor : colors_secondary8, 0.15f * FlarialGUI::frameFactor);
-		}
-		else {
-			tabBgCol = FlarialGUI::LerpColor(tabBgCol, colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6, 0.15f * FlarialGUI::frameFactor);
-		}
+		if (curr != "modules") tabBgCol = FlarialGUI::LerpColor(tabBgCol, secondary8, 0.15f * FlarialGUI::frameFactor);
+		else tabBgCol = FlarialGUI::LerpColor(tabBgCol, secondary6, 0.15f * FlarialGUI::frameFactor);
 
 		FlarialGUI::ShadowRect(Vec2(radioX, radioY + Constraints::SpacingConstraint(0.015f, logoWidth)), Vec2{ width1, RadioButtonHeight + Constraints::SpacingConstraint(0.015f, logoWidth) }, D2D1::ColorF(D2D1::ColorF::Black), round.x, 3);
 
@@ -261,12 +245,9 @@ void ClickGUI::onRender(RenderEvent& event) {
 		radioX = navx - Constraints::SpacingConstraint(-0.36f, logoWidth);
 		radioY = (navy + navigationBarHeight / 2.0f - RadioButtonHeight / 2.0f);
 
-		if (curr != "settings") {
-			tabBgCol2 = FlarialGUI::LerpColor(tabBgCol2, colors_secondary8_rgb ? FlarialGUI::rgbColor : colors_secondary8, 0.15f * FlarialGUI::frameFactor);
-		}
-		else {
-			tabBgCol2 = FlarialGUI::LerpColor(tabBgCol2, colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6, 0.15f * FlarialGUI::frameFactor);
-		}
+		if (curr != "settings") tabBgCol2 = FlarialGUI::LerpColor(tabBgCol2, secondary8, 0.15f * FlarialGUI::frameFactor);
+		else tabBgCol2 = FlarialGUI::LerpColor(tabBgCol2, secondary6, 0.15f * FlarialGUI::frameFactor);
+	
 
 		radioX += Constraints::SpacingConstraint(3.24f, logoWidth);
 		round = Constraints::RoundingConstraint(17.5f, 17.5f);
@@ -323,10 +304,10 @@ void ClickGUI::onRender(RenderEvent& event) {
 		round = Constraints::RoundingConstraint(17.5f, 17.5f);
 
 		if (curr != "scripting") {
-			tabBgCol4 = FlarialGUI::LerpColor(tabBgCol4, colors_secondary8_rgb ? FlarialGUI::rgbColor : colors_secondary8, 0.15f * FlarialGUI::frameFactor);
+			tabBgCol4 = FlarialGUI::LerpColor(tabBgCol4, secondary8, 0.15f * FlarialGUI::frameFactor);
 		}
 		else {
-			tabBgCol4 = FlarialGUI::LerpColor(tabBgCol4, colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6, 0.15f * FlarialGUI::frameFactor);
+			tabBgCol4 = FlarialGUI::LerpColor(tabBgCol4, secondary6, 0.15f * FlarialGUI::frameFactor);
 		}
 
 		FlarialGUI::ShadowRect(Vec2{ radioX, radioY + Constraints::SpacingConstraint(0.115f, logoWidth) }, Vec2{ width3, RadioButtonHeight + Constraints::SpacingConstraint(0.015f, logoWidth) }, D2D1::ColorF(D2D1::ColorF::Black), round.x, 3);
@@ -372,10 +353,10 @@ void ClickGUI::onRender(RenderEvent& event) {
 		round = Constraints::RoundingConstraint(17.5f, 17.5f);
 
 		if (curr != "editmenu") {
-			tabBgCol3 = FlarialGUI::LerpColor(tabBgCol3, colors_secondary8_rgb ? FlarialGUI::rgbColor : colors_secondary8, 0.15f * FlarialGUI::frameFactor);
+			tabBgCol3 = FlarialGUI::LerpColor(tabBgCol3, secondary8, 0.15f * FlarialGUI::frameFactor);
 		}
 		else {
-			tabBgCol3 = FlarialGUI::LerpColor(tabBgCol3, colors_secondary6_rgb ? FlarialGUI::rgbColor : colors_secondary6, 0.15f * FlarialGUI::frameFactor);
+			tabBgCol3 = FlarialGUI::LerpColor(tabBgCol3, secondary6, 0.15f * FlarialGUI::frameFactor);
 		}
 
 		FlarialGUI::ShadowRect(Vec2{ radioX, radioY + Constraints::SpacingConstraint(0.115f, logoWidth) }, Vec2{ shit, RadioButtonHeight + Constraints::SpacingConstraint(0.015f, logoWidth) }, D2D1::ColorF(D2D1::ColorF::Black), round.x, 3);
@@ -388,7 +369,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 			curr)) {
 			this->active = false;
 			FlarialGUI::Notify("Right click a module to directly go to their settings page.");
-			FlarialGUI::Notify("To disable this menu press ESC or " + this->settings.getSettingByName<std::string>("editmenubind")->value);
+			FlarialGUI::Notify("To disable this menu press ESC or " + getOps<std::string>("editmenubind"));
 			editmenu = true;
 		}
 
@@ -564,8 +545,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 				float anotherRectHeight = Constraints::RelativeConstraint(0.8105);
 				float anotherRectWidth = Constraints::RelativeConstraint(0.972, "width");
 
-				D2D1_COLOR_F colorThing = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
-				colorThing.a = o_colors_secondary2;
+				D2D1_COLOR_F colorThing = clickgui->getColor("secondary2", "ClickGUI");
 
 				D2D1_RECT_F rect = { rectXNoOff, rectY, rectXNoOff + anotherRectWidth, rectY + anotherRectHeight };
 				FlarialGUI::PushImClipRect(rect);
@@ -575,11 +555,8 @@ void ClickGUI::onRender(RenderEvent& event) {
 
 				FlarialGUI::PopImClipRect();
 
-				D2D1_COLOR_F bruv = colors_secondary1_rgb ? FlarialGUI::rgbColor : colors_secondary1;
-				bruv.a = o_colors_secondary1;
-
-				D2D1_COLOR_F textCol = colors_text_rgb ? FlarialGUI::rgbColor : colors_text;
-				textCol.a = o_colors_text;
+				D2D1_COLOR_F bruv = clickgui->getColor("secondary1", "ClickGUI");
+				D2D1_COLOR_F textCol = clickgui->getColor("globalText", "ClickGUI");
 
 				FlarialGUI::PopSize();
 
@@ -848,8 +825,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 			float anotherRectHeight = Constraints::RelativeConstraint(0.8105);
 			float anotherRectWidth = Constraints::RelativeConstraint(0.972, "width");
 
-			D2D1_COLOR_F colorThing = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
-			colorThing.a = o_colors_secondary2;
+			D2D1_COLOR_F colorThing = clickgui->getColor("secondary2", "ClickGUI");
 
 			D2D1_RECT_F rect = { rectXNoOff, rectY, rectXNoOff + anotherRectWidth, rectY + anotherRectHeight };
 			FlarialGUI::PushImClipRect(rect);
@@ -859,11 +835,8 @@ void ClickGUI::onRender(RenderEvent& event) {
 
 			FlarialGUI::PopImClipRect();
 
-			D2D1_COLOR_F bruv = colors_secondary1_rgb ? FlarialGUI::rgbColor : colors_secondary1;
-			bruv.a = o_colors_secondary1;
-
-			D2D1_COLOR_F textCol = colors_text_rgb ? FlarialGUI::rgbColor : colors_text;
-			textCol.a = o_colors_text;
+			D2D1_COLOR_F bruv = clickgui->getColor("secondary1", "ClickGUI");
+			D2D1_COLOR_F textCol = clickgui->getColor("globalText", "ClickGUI");
 
 			FlarialGUI::PopSize();
 
@@ -911,7 +884,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 					currentModule->loadDefaults();
 					FlarialGUI::ResetShit();
 					if (wasEnabled) {
-						currentModule->settings.getSettingByName<bool>("enabled")->value = true;
+						currentModule->getOps<bool>("enabled") = true;
 						currentModule->enabledState = true;
 					}
 				}

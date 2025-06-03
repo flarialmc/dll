@@ -37,12 +37,12 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Disable Mouse Wheel");
-		this->addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
+		addHeader("Disable Mouse Wheel");
+		addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
 
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 	}
 
 	bool disableScrolling = true;

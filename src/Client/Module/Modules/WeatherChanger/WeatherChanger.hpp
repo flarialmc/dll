@@ -21,9 +21,9 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<float>("rain") == nullptr) settings.addSetting("rain", 1.00f);
-		if (settings.getSettingByName<float>("lighting") == nullptr) settings.addSetting("lighting", 0.00f);
-		if (settings.getSettingByName<bool>("snow") == nullptr) settings.addSetting("snow", false);
+		setDef("rain", 1.00f);
+		setDef("lighting", 0.00f);
+		setDef("snow", false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -38,8 +38,8 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Misc");
-		addSlider("Rain Intensity", "", settings.getSettingByName<float>("rain")->value);
-		addSlider("Snow Intensity", "", settings.getSettingByName<float>("snow")->value);
+		addSlider("Rain Intensity", "", getOps<float>("rain"));
+		addSlider("Snow Intensity", "", getOps<float>("snow"));
 
 		FlarialGUI::UnsetScrollView();
 
@@ -51,17 +51,17 @@ public:
 			return;
 
 		if (this->isEnabled()) {
-			if (this->settings.getSettingByName<float>("rain")->value > 0.02f)
+			if (getOps<float>("rain") > 0.02f)
 				SDK::clientInstance->getBlockSource()->getDimension()->weather->rainLevel = this->settings.getSettingByName<float>(
 					"rain")->value;
 			else SDK::clientInstance->getBlockSource()->getDimension()->weather->rainLevel = 0.0f;
-			if (this->settings.getSettingByName<float>("lighting")->value < 0.02f)
+			if (getOps<float>("lighting") < 0.02f)
 				SDK::clientInstance->getBlockSource()->getDimension()->weather->lightingLevel = this->settings.getSettingByName<float>(
 					"lighting")->value;
 			else SDK::clientInstance->getBlockSource()->getDimension()->weather->lightingLevel = 0.0f;
 
 			// TODO: When you set snow, it will stay even if on until game reload
-			if (this->settings.getSettingByName<bool>("snow")->value) {
+			if (getOps<bool>("snow")) {
 				Vec3<float>* pos = event.getActor()->getPosition();
 				Vec3<int> e((int)pos->x, (int)pos->y, (int)pos->z);
 

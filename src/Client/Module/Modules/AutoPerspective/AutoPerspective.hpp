@@ -21,14 +21,12 @@ public:
 
     void defaultConfig() override { 
         Module::defaultConfig("core");
-        if (settings.getSettingByName<bool>("elytra") == nullptr) settings.addSetting("elytra", false);
-        if (settings.getSettingByName<std::string>("elytraMode") == nullptr) settings.addSetting("elytraMode", (std::string)"3rd Person back");
-
-        if (settings.getSettingByName<bool>("swimming") == nullptr) settings.addSetting("swimming", false);
-        if (settings.getSettingByName<std::string>("swimmingMode") == nullptr) settings.addSetting("swimmingMode", (std::string)"3rd Person back");
-        
-        if (settings.getSettingByName<bool>("riding") == nullptr) settings.addSetting("riding", false);
-        if (settings.getSettingByName<std::string>("ridingMode") == nullptr) settings.addSetting("ridingMode", (std::string)"3rd Person back");
+        setDef("elytra", false);
+        setDef("elytraMode", (std::string)"3rd Person back");
+        setDef("swimming", false);
+        setDef("swimmingMode", (std::string)"3rd Person back");
+        setDef("riding", false);
+        setDef("ridingMode", (std::string)"3rd Person back");
     }
 
     void settingsRender(float settingsOffset) override {
@@ -47,14 +45,14 @@ public:
 
         addHeader("Auto Perspective");
 
-        addToggle("Elytra", "Toggle to change perspective while using elytra to fly.", settings.getSettingByName<bool>("elytra")->value);
-        addDropdown("Elytra Perspective", "Your perspective while using elytra to fly", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, settings.getSettingByName<std::string>("elytraMode")->value);
+        addToggle("Elytra", "Toggle to change perspective while using elytra to fly.", getOps<bool>("elytra"));
+        addDropdown("Elytra Perspective", "Your perspective while using elytra to fly", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, getOps<std::string>("elytraMode"));
 
-        addToggle("Swimming", "Toggle to change perspective while swimming.", settings.getSettingByName<bool>("swimming")->value);
-        addDropdown("Swimming Perspective", "Your perspective while swimming.", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, settings.getSettingByName<std::string>("swimmingMode")->value);
+        addToggle("Swimming", "Toggle to change perspective while swimming.", getOps<bool>("swimming"));
+        addDropdown("Swimming Perspective", "Your perspective while swimming.", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, getOps<std::string>("swimmingMode"));
 
-        //addToggle("Riding", "Toggle to change perspective while riding a mob.", settings.getSettingByName<bool>("riding")->value);
-        //addDropdown("Riding Perspective", "Your perspective while riding a mob", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, settings.getSettingByName<std::string>("ridingMode")->value);
+        //addToggle("Riding", "Toggle to change perspective while riding a mob.", getOps<bool>("riding"));
+        //addDropdown("Riding Perspective", "Your perspective while riding a mob", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, getOps<std::string>("ridingMode"));
         FlarialGUI::UnsetScrollView();
 
         resetPadding();
@@ -69,9 +67,9 @@ public:
             std::string Mode = "";
 
             if (false) { //Couldn't get this to work for some reason :heartbreak:
-                if (settings.getSettingByName<bool>("Riding")->value) {
+                if (getOps<bool>("Riding")) {
 
-                    Mode = settings.getSettingByName<std::string>("ridingMode")->value;
+                    Mode = getOps<std::string>("ridingMode");
 
                     if (OriginalPerspective == -1) OriginalPerspective = (int)event.getPerspective();
                     else if ((int)event.getPerspective() != OriginalPerspective or Changed) {
@@ -82,9 +80,9 @@ public:
             }
 
             else if (Player->getActorFlag(ActorFlags::FLAG_GLIDING)) {
-                if (settings.getSettingByName<bool>("elytra")->value) {
+                if (getOps<bool>("elytra")) {
 
-                    Mode = settings.getSettingByName<std::string>("elytraMode")->value;
+                    Mode = getOps<std::string>("elytraMode");
 
                     if (OriginalPerspective == -1) OriginalPerspective = (int)event.getPerspective();
                     else if ((int)event.getPerspective() != OriginalPerspective or Changed) {
@@ -95,9 +93,9 @@ public:
             }
 
             else if (Player->getActorFlag(ActorFlags::FLAG_SWIMMING)) {
-                if (settings.getSettingByName<bool>("swimming")->value) {
+                if (getOps<bool>("swimming")) {
 
-                    Mode = settings.getSettingByName<std::string>("swimmingMode")->value;
+                    Mode = getOps<std::string>("swimmingMode");
 
                     if (OriginalPerspective == -1) OriginalPerspective = (int)event.getPerspective();
                     else if ((int)event.getPerspective() != OriginalPerspective or Changed) {

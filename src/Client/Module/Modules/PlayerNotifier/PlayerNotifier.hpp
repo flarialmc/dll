@@ -19,10 +19,10 @@ public:
 	void defaultConfig() override {
 		getKeybind();
 		Module::defaultConfig("core");
-		if (!this->settings.getSettingByName<float>("duration")) settings.addSetting<float>("duration", 80);
-		if (!this->settings.getSettingByName<std::string>("player0")) settings.addSetting<std::string>("player0", "TheBarii");
-		if (!this->settings.getSettingByName<std::string>("player0")) settings.addSetting<bool>("player0Enabled", true);
-		if (!this->settings.getSettingByName<std::string>("keybind")) settings.addSetting<std::string>("keybind", "P");
+		setDef("duration", 80.f);
+		setDef("player0", (std::string)"TheBarii");
+		setDef("player0Enabled", true);
+		setDef("keybind", (std::string)"P");
 	}
 	void onEnable() override {
 		Module::onEnable();
@@ -75,7 +75,7 @@ public:
 	}
 
 	void onTick(TickEvent& event) {
-		double intervalSeconds = this->settings.getSettingByName<float>("duration")->value;
+		double intervalSeconds = getOps<float>("duration");
 
 		auto now = std::chrono::steady_clock::now();
 		std::chrono::duration<double> elapsed = now - lastRun;
@@ -119,7 +119,7 @@ public:
 			this->settings.addSetting<bool>("player" + FlarialGUI::cached_to_string(totalPlayers) + "Enabled", true);
 			totalPlayers++;
 			});
-		this->addSlider("Re-check", "(Seconds) After how long should it re-check for players", this->settings.getSettingByName<float>("duration")->value, 500, 1, true);
+		this->addSlider("Re-check", "(Seconds) After how long should it re-check for players", getOps<float>("duration"), 500, 1, true);
 		this->addKeybind("Re-check Keybind", "Hold for 2 seconds!", getKeybind());
 		this->extraPadding();
 

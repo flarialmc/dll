@@ -28,9 +28,9 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<float>("xveloc") == nullptr) settings.addSetting("xveloc", 1.0f);
-		if (settings.getSettingByName<float>("yveloc") == nullptr) settings.addSetting("yveloc", 0.69f);
-		if (settings.getSettingByName<float>("scale") == nullptr) settings.addSetting("scale", 1.0f);
+		setDef("xveloc", 1.0f);
+		setDef("yveloc", 0.69f);
+		setDef("scale", 1.0f);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -46,9 +46,9 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("DVD Screensaver");
-		addSlider("Scale", "", settings.getSettingByName<float>("scale")->value);
-		addSlider("X Velocity", "", settings.getSettingByName<float>("xveloc")->value);
-		addSlider("Y Velocity", "", settings.getSettingByName<float>("yveloc")->value);
+		addSlider("Scale", "", getOps<float>("scale"));
+		addSlider("X Velocity", "", getOps<float>("xveloc"));
+		addSlider("Y Velocity", "", getOps<float>("yveloc"));
 
 		FlarialGUI::UnsetScrollView();
 
@@ -57,16 +57,16 @@ public:
 	}
 
 	void onRender(RenderEvent& event) {
-		if (this->isEnabled() &&
+		if (isEnabled() &&
 			ClientInstance::getTopScreenName() == "hud_screen") {
-			float height = 83 * this->settings.getSettingByName<float>("scale")->value;
-			float width = 187 * this->settings.getSettingByName<float>("scale")->value;
+			float height = 83 * getOps<float>("scale");
+			float width = 187 * getOps<float>("scale");
 
 			FlarialGUI::image(IDR_DVDLOGO_01_PNG - 1 + color,
 				D2D1::RectF(x, y, x + width, y + height));
 
-			x += this->settings.getSettingByName<float>("xveloc")->value * xv;
-			y += this->settings.getSettingByName<float>("yveloc")->value * yv;
+			x += getOps<float>("xveloc") * xv;
+			y += getOps<float>("yveloc") * yv;
 
 			if (x >= MC::windowSize.x - width) {
 				xv = -1;

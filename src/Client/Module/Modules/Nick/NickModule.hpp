@@ -36,7 +36,7 @@ public:
 					original2 = *SDK::clientInstance->getLocalPlayer()->getNametag();
 					backupOri = *SDK::clientInstance->getLocalPlayer()->getNametag();
 				}
-				if (original2 == this->settings.getSettingByName<std::string>("nick")->value) original2 = backupOri;
+				if (original2 == getOps<std::string>("nick")) original2 = backupOri;
 
 				val2 = original2;
 
@@ -79,11 +79,10 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<std::string>("nick") == nullptr) settings.addSetting<std::string>("nick", "Flarial User");
-		if (settings.getSettingByName<bool>("bold") == nullptr) settings.addSetting<bool>("bold", false);
-		if (settings.getSettingByName<bool>("obfuscated") == nullptr) settings.addSetting<bool>("obfuscated", false);
-		if (settings.getSettingByName<std::string>("textColor") == nullptr) settings.addSetting<std::string>("textColor", "White");
-		else if (settings.getSettingByName<std::string>("textColor")->value == "fafafa") settings.setValue<std::string>("textColor", "White");
+		setDef("nick", (std::string)"Flarial User");
+		setDef("bold", false);
+		setDef("obfuscated", false);
+		setDef("textColor", (std::string)"White");
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -98,9 +97,9 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Nickname");
-		addTextBox("Nickname", "", settings.getSettingByName<std::string>("nick")->value);
-		addToggle("Bold", "", settings.getSettingByName<bool>("bold")->value);
-		addToggle("Obfuscated", "", settings.getSettingByName<bool>("obfuscated")->value);
+		addTextBox("Nickname", "", getOps<std::string>("nick"));
+		addToggle("Bold", "", getOps<bool>("bold"));
+		addToggle("Obfuscated", "", getOps<bool>("obfuscated"));
 		addDropdown("Text Color", "", std::vector<std::string>{
 			"White",
 				"Black",
@@ -127,7 +126,7 @@ public:
 				"Light Purple",
 				"Dark Purple",
 				"Amethyst"
-		}, settings.getSettingByName<std::string>("textColor")->value);
+		}, getOps<std::string>("textColor"));
 
 		FlarialGUI::UnsetScrollView();
 		resetPadding();
@@ -158,23 +157,23 @@ public:
 			const std::string& localPlayerName = original;
 			size_t pos = event.getText()->find(localPlayerName);
 
-			auto it = textColors.find(settings.getSettingByName<std::string>("textColor")->value);
+			auto it = textColors.find(getOps<std::string>("textColor"));
 
 			if (it == textColors.end()) {
 				settings.setValue<std::string>("textColor", "White");
-				it = textColors.find(settings.getSettingByName<std::string>("textColor")->value);
+				it = textColors.find(getOps<std::string>("textColor"));
 			}
 
 			std::string prefix = it->second;
 
 			prefix += "§o";
-			if (settings.getSettingByName<bool>("bold")->value) prefix += "§l";
-			if (settings.getSettingByName<bool>("obfuscated")->value) prefix += "§k";
+			if (getOps<bool>("bold")) prefix += "§l";
+			if (getOps<bool>("obfuscated")) prefix += "§k";
 
 			if (pos != std::string::npos) {
 				std::string faketxt = *event.getText();
 				faketxt.replace(pos, localPlayerName.length(),
-					prefix + String::removeColorCodes(this->settings.getSettingByName<std::string>("nick")->value) + "§r");
+					prefix + String::removeColorCodes(getOps<std::string>("nick")) + "§r");
 				*event.getText() = faketxt;
 			}
 		}
@@ -200,18 +199,18 @@ public:
 		}
 
 		if (enabled && !this->restricted) {
-			std::string prefix = textColors.find(settings.getSettingByName<std::string>("textColor")->value)->second;
+			std::string prefix = textColors.find(getOps<std::string>("textColor"))->second;
 
 			prefix += "§o";
-			if (settings.getSettingByName<bool>("bold")->value) prefix += "§l";
-			if (settings.getSettingByName<bool>("obfuscated")->value) prefix += "§k";
+			if (getOps<bool>("bold")) prefix += "§l";
+			if (getOps<bool>("obfuscated")) prefix += "§k";
 
-			std::string val = prefix + String::removeColorCodes(this->settings.getSettingByName<std::string>("nick")->value) + "§r";
+			std::string val = prefix + String::removeColorCodes(getOps<std::string>("nick")) + "§r";
 			player->setNametag(&val);
 			player->getPlayerName() = val;
 		}
 		else {
-			if (original2 == this->settings.getSettingByName<std::string>("nick")->value)
+			if (original2 == getOps<std::string>("nick"))
 				original2 = backupOri;
 
 			player->setNametag(&original2);

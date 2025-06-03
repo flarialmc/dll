@@ -24,7 +24,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 0.5f);
+		setDef("intensity", 0.5f);
 		Module::defaultConfig("core");
 	}
 
@@ -40,7 +40,7 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Saturation");
-		addSlider("Saturation Intensity", "", settings.getSettingByName<float>("intensity")->value, 3.0f);
+		addSlider("Saturation Intensity", "", getOps<float>("intensity"), 3.0f);
 
 		FlarialGUI::UnsetScrollView();
 		resetPadding();
@@ -48,7 +48,7 @@ public:
 
 	void onRender(RenderEvent& event) {
 		if (this->isEnabled()) {
-			FlarialGUI::ApplyHue(this->settings.getSettingByName<float>("intensity")->value);
+			FlarialGUI::ApplyHue(getOps<float>("intensity"));
 		}
 	}
 };

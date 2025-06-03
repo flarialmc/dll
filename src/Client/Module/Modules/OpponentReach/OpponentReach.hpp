@@ -31,9 +31,9 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
+		setDef("textscale", 0.8f);
 		Module::defaultConfig("all");
-		if (settings.getSettingByName<bool>("tryToExcludeTeam") == nullptr) settings.addSetting("tryToExcludeTeam", true);
+		setDef("tryToExcludeTeam", true);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -80,7 +80,7 @@ public:
 
 				auto id = packet->RuntimeID;
 				if (id == SDK::clientInstance->getLocalPlayer()->getRuntimeIDComponent()->runtimeID) {
-					auto excludeTeam = this->settings.getSettingByName<bool>("tryToExcludeTeam")->value;
+					auto excludeTeam = getOps<bool>("tryToExcludeTeam");
 					// we got hit
 					auto player = SDK::clientInstance->getLocalPlayer();
 					auto actors = SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList();

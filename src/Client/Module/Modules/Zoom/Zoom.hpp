@@ -42,24 +42,23 @@ public:
 	}
 
 	void defaultConfig() override {
+		setDef("enabled", true);
 		getKeybind();
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<bool>("alwaysanim") == nullptr) settings.addSetting("alwaysanim", false);
-		if (settings.getSettingByName<bool>("SaveModifier") == nullptr) settings.addSetting("SaveModifier", true);
-		if (settings.getSettingByName<bool>("hidehand") == nullptr) settings.addSetting("hidehand", true);
-		if (settings.getSettingByName<bool>("hidemodules") == nullptr) settings.addSetting("hidemodules", false);
-		if (settings.getSettingByName<bool>("UseScroll") == nullptr) settings.addSetting("UseScroll", true);
-		if (settings.getSettingByName<bool>("lowsens") == nullptr) settings.addSetting("lowsens", true);
-		if (settings.getSettingByName<bool>("toggleZoom") == nullptr) settings.addSetting("toggleZoom", false);
+		setDef("alwaysanim", false);
+		setDef("SaveModifier", true);
+		setDef("hidehand", true);
+		setDef("hidemodules", false);
+		setDef("UseScroll", true);
+		setDef("lowsens", true);
+		setDef("toggleZoom", false);
 		//if (settings.getSettingByName<bool>("hidehud") == nullptr) settings.addSetting("hidehud", false);
-		if (settings.getSettingByName<float>("modifier") == nullptr) settings.addSetting("modifier", 10.0f);
-		if (settings.getSettingByName<float>("anim") == nullptr) settings.addSetting("anim", 0.20f);
-		if (settings.getSettingByName<float>("disableanim") == nullptr) settings.addSetting("disableanim", false);
+		setDef("modifier", 10.0f);
+		setDef("anim", 0.20f);
+		setDef("disableanim", false);
 	}
 
 	void settingsRender(float settingsOffset) override {
-
-
 		float x = Constraints::PercentageConstraint(0.019, "left");
 		float y = Constraints::PercentageConstraint(0.10, "top");
 
@@ -73,16 +72,16 @@ public:
 
 		addHeader("Main");
 		addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
-		addToggle("Use Scroll", "Allows to adjust zoom with scroll wheel.", settings.getSettingByName<bool>("UseScroll")->value);
-		addToggle("Toggle Zoom", "No need to hold the keybind to zoom.", settings.getSettingByName<bool>("toggleZoom")->value);
-		addSlider("Modifier", "How much to Zoom each time you scroll.", settings.getSettingByName<float>("modifier")->value, 30, 0, false);
-		addToggle("Disable Animation", "The animation when you zoom", settings.getSettingByName<bool>("disableanim")->value);
-		addSlider("Animation Speed", "Speed at which scroll zoom acts.", settings.getSettingByName<float>("anim")->value, 0.40);
-		addToggle("Save Modifier", "Saves the last zoom amount.", settings.getSettingByName<bool>("SaveModifier")->value);
-		addToggle("Hide Hand", "Hide hand when zooming.", settings.getSettingByName<bool>("hidehand")->value);
-		addToggle("Hide Modules", "Hides other modules when zooming.", settings.getSettingByName<bool>("hidemodules")->value);
-		addToggle("Always Animate", "Smooth zoom animation while sprinting.", settings.getSettingByName<bool>("alwaysanim")->value);
-		addToggle("Low Sensitivity", "Lower sensitivity when in zoom.", settings.getSettingByName<bool>("lowsens")->value);
+		addToggle("Use Scroll", "Allows to adjust zoom with scroll wheel.", getOps<bool>("UseScroll"));
+		addToggle("Toggle Zoom", "No need to hold the keybind to zoom.", getOps<bool>("toggleZoom"));
+		addSlider("Modifier", "How much to Zoom each time you scroll.", getOps<float>("modifier"), 30, 0, false);
+		addToggle("Disable Animation", "The animation when you zoom", getOps<bool>("disableanim"));
+		addSlider("Animation Speed", "Speed at which scroll zoom acts.", getOps<float>("anim"), 0.40);
+		addToggle("Save Modifier", "Saves the last zoom amount.", getOps<bool>("SaveModifier"));
+		addToggle("Hide Hand", "Hide hand when zooming.", getOps<bool>("hidehand"));
+		addToggle("Hide Modules", "Hides other modules when zooming.", getOps<bool>("hidemodules"));
+		addToggle("Always Animate", "Smooth zoom animation while sprinting.", getOps<bool>("alwaysanim"));
+		addToggle("Low Sensitivity", "Lower sensitivity when in zoom.", getOps<bool>("lowsens"));
 
 		FlarialGUI::UnsetScrollView();
 		resetPadding();
@@ -97,7 +96,7 @@ public:
 
 		if (ModuleManager::getModule("Java Dynamic FOV").get()->isEnabled()) {
 			if (player->getActorFlag(ActorFlags::FLAG_SPRINTING)) {
-				fov = ModuleManager::getModule("Java Dynamic FOV").get()->settings.getSettingByName<float>("fov_target")->value;
+				fov = ModuleManager::getModule("Java Dynamic FOV").get()->getOps<float>("fov_target");
 			}
 		}
 
@@ -107,9 +106,9 @@ public:
 			return;
 		}
 
-		float animspeed = this->settings.getSettingByName<float>("anim")->value;
-		bool disableanim = this->settings.getSettingByName<bool>("disableanim")->value;
-		bool alwaysanim = this->settings.getSettingByName<bool>("alwaysanim")->value;
+		float animspeed = getOps<float>("anim");
+		bool disableanim = getOps<bool>("disableanim");
+		bool alwaysanim = getOps<bool>("alwaysanim");
 
 		if (this->active) {
 			animationFinished = false;
@@ -149,7 +148,7 @@ public:
 				currentSensitivity = event.getSensitivity();
 			}
 			// TODO: smoothstep
-			if (this->settings.getSettingByName<bool>("lowsens")->value) event.setSensitivity(currentSensitivity - (currentSensitivity * (((realFov - (zoomValue - 1)) / realFov) / 1.0f)));
+			if (getOps<bool>("lowsens")) event.setSensitivity(currentSensitivity - (currentSensitivity * (((realFov - (zoomValue - 1)) / realFov) / 1.0f)));
 		}
 		else if (saved) {
 			saved = false;
@@ -163,20 +162,20 @@ public:
 				//todo make it so that modules work together
 				auto fovchanger = ModuleManager::getModule("FOV Changer");
 				auto upsidedown = ModuleManager::getModule("Upside Down");
-				if (this->settings.getSettingByName<bool>("UseScroll")->value == true) {
+				if (getOps<bool>("UseScroll") == true) {
 					if (event.getAction() == MouseAction::ScrollUp) {
 						if ((fovchanger != nullptr &&
-							fovchanger->settings.getSettingByName<float>("fovvalue")->value > 180) ||
+							fovchanger->getOps<float>("fovvalue") > 180) ||
 							(upsidedown != nullptr && upsidedown->isEnabled()))
-							zoomValue += this->settings.getSettingByName<float>("modifier")->value;
-						else zoomValue -= this->settings.getSettingByName<float>("modifier")->value;
+							zoomValue += getOps<float>("modifier");
+						else zoomValue -= getOps<float>("modifier");
 					}
 					if (event.getAction() != MouseAction::ScrollUp && event.getButton() == MouseButton::Scroll) {
 						if ((fovchanger != nullptr &&
-							fovchanger->settings.getSettingByName<float>("fovvalue")->value > 180) ||
+							fovchanger->getOps<float>("fovvalue") > 180) ||
 							(upsidedown != nullptr && upsidedown->isEnabled()))
-							zoomValue -= this->settings.getSettingByName<float>("modifier")->value;
-						else zoomValue += this->settings.getSettingByName<float>("modifier")->value;
+							zoomValue -= getOps<float>("modifier");
+						else zoomValue += getOps<float>("modifier");
 					}
 
 					if (zoomValue < 1) zoomValue = 1;
@@ -197,11 +196,11 @@ public:
 		
 		if (this->isKeybind(event.keys) && 
 			this->isKeyPartOfKeybind(event.key) && 
-			(this->settings.getSettingByName<bool>("toggleZoom")->value ? event.getAction() == ActionType::Pressed : true)
+			(getOps<bool>("toggleZoom") ? event.getAction() == ActionType::Pressed : true)
 			&& SDK::getCurrentScreen() == "hud_screen") {
 			keybindActions[0]({});
-			if (!this->settings.getSettingByName<bool>("SaveModifier")->value) zoomValue = 30.0f;
-		} else if (this->settings.getSettingByName<bool>("toggleZoom")->value ? (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) : !this->isKeybind(event.keys) && (this->settings.getSettingByName<bool>("toggleZoom")->value ? event.getAction() == ActionType::Pressed : true)) this->active = false;
+			if (!getOps<bool>("SaveModifier")) zoomValue = 30.0f;
+		} else if (getOps<bool>("toggleZoom") ? (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) : !this->isKeybind(event.keys) && (getOps<bool>("toggleZoom") ? event.getAction() == ActionType::Pressed : true)) this->active = false;
 	};
 
 	// TODO: add dolly zoom and world2screen zoom stabilization ?
@@ -210,24 +209,24 @@ public:
 		auto hideHand = Options::getOption("hidehand");
 		auto hideHud = Options::getOption("hidehud");
 		if (this->active) {
-			if (this->settings.getSettingByName<bool>("hidemodules")->value) {
+			if (getOps<bool>("hidemodules")) {
 				event.setCustomLayer("zoom_screen");
 			}
-			//            if (this->settings.getSettingByName<bool>("hidehud")->value) {
+			//            if (getOps<bool>("hidehud")) {
 			//                event.setCustomLayer("zoom_screen");
 			//                if (hideHand != nullptr) hideHand->setvalue(true);
 			//                if (hideHud != nullptr) hideHud->setvalue(true);
 			//            }
-			if (this->settings.getSettingByName<bool>("hidehand")->value) {
+			if (getOps<bool>("hidehand")) {
 				if (hideHand != nullptr) hideHand->setvalue(true);
 			}
 		}
 		else {
-			if (this->settings.getSettingByName<bool>("hidehand")->value) {
+			if (getOps<bool>("hidehand")) {
 				if (hideHand != nullptr) hideHand->setvalue(false);
 			}
 
-			//            if (this->settings.getSettingByName<bool>("hidehud")->value) { // TODO: there is a bug where it wont allow manual F1
+			//            if (getOps<bool>("hidehud")) { // TODO: there is a bug where it wont allow manual F1
 			//                if (hideHud != nullptr) hideHud->setvalue(false);
 			//            }
 

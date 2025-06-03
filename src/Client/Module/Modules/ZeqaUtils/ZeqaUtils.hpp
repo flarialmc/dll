@@ -24,13 +24,13 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<bool>("req") == nullptr)settings.addSetting("req", true);
-		if (settings.getSettingByName<bool>("promomessage") == nullptr)settings.addSetting("promomessage", false);
-		if (settings.getSettingByName<bool>("join") == nullptr)settings.addSetting("join", false);
-		if (settings.getSettingByName<bool>("leave") == nullptr)settings.addSetting("leave", false);
-		if (settings.getSettingByName<bool>("killstreak") == nullptr)settings.addSetting("killstreak", false);
-		if (settings.getSettingByName<bool>("friendaccept") == nullptr)settings.addSetting("friendaccept", false);
-		if (settings.getSettingByName<bool>("duelaccept") == nullptr)settings.addSetting("duelaccept", false);
+		setDef("req", true);
+		setDef("promomessage", false);
+		setDef("join", false);
+		setDef("leave", false);
+		setDef("killstreak", false);
+		setDef("friendaccept", false);
+		setDef("duelaccept", false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -47,18 +47,18 @@ public:
 
 
 		addHeader("Auto re queue");
-		addToggle("Auto re queue", "Requeue the same ranked/unranked duel after  the current one is over.", settings.getSettingByName<bool>("req")->value);
+		addToggle("Auto re queue", "Requeue the same ranked/unranked duel after  the current one is over.", getOps<bool>("req"));
 
 
 		addHeader("Auto accept");
-		addToggle("Friend request", "Automatically accept incoming friend requests.", settings.getSettingByName<bool>("friendaccept")->value);
-		addToggle("duel request", "Automatically accept incoming duel requests.", settings.getSettingByName<bool>("duelaccept")->value);
+		addToggle("Friend request", "Automatically accept incoming friend requests.", getOps<bool>("friendaccept"));
+		addToggle("duel request", "Automatically accept incoming duel requests.", getOps<bool>("duelaccept"));
 
 		addHeader("Debloat chat");
-		addToggle("Promo message", "Removes all promo/info messages", settings.getSettingByName<bool>("promomessage")->value);
-		addToggle("player join", "Removes player join message", settings.getSettingByName<bool>("join")->value);
-		addToggle("player leave", "Removes player leave message", settings.getSettingByName<bool>("leave")->value);
-		addToggle("Kill streak", "Removes Message indicating a player has gotten a kill streak", settings.getSettingByName<bool>("killstreak")->value);
+		addToggle("Promo message", "Removes all promo/info messages", getOps<bool>("promomessage"));
+		addToggle("player join", "Removes player join message", getOps<bool>("join"));
+		addToggle("player leave", "Removes player leave message", getOps<bool>("leave"));
+		addToggle("Kill streak", "Removes Message indicating a player has gotten a kill streak", getOps<bool>("killstreak"));
 
 		FlarialGUI::UnsetScrollView();
 		resetPadding();
@@ -80,7 +80,7 @@ public:
 			if (id == MinecraftPacketIds::Text) {
 				auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
 
-				if (this->settings.getSettingByName<bool>("promomessage")->value) {
+				if (getOps<bool>("promomessage")) {
 					if (pkt->message == " " ||
 						pkt->message == " " ||
 						pkt->message == " " || //onix promotion
@@ -89,24 +89,24 @@ public:
 						event.cancel();
 					}
 				}
-				if (this->settings.getSettingByName<bool>("join")->value) {
+				if (getOps<bool>("join")) {
 
 					if (pkt->message.substr(0, 15) == "§8[§a+§8]§a") {
 						event.cancel();
 					}
 				}
-				if (this->settings.getSettingByName<bool>("leave")->value) {
+				if (getOps<bool>("leave")) {
 
 					if (pkt->message.substr(0, 15) == "§8[§c-§8]§c") {
 						event.cancel();
 					}
 				}
-				if (this->settings.getSettingByName<bool>("killstreak")->value) {
+				if (getOps<bool>("killstreak")) {
 					if (pkt->message.contains("§g has gotten a ") && pkt->message.contains("§g killstreak")) {
 						event.cancel();
 					}
 				}
-				if (this->settings.getSettingByName<bool>("friendaccept")->value) {
+				if (getOps<bool>("friendaccept")) {
 					if (pkt->message.find("§l§q» §r§aYou have received a friend request from ") != std::string::npos) {
 
 						std::shared_ptr<Packet> packet = SDK::createPacket(77);
@@ -121,7 +121,7 @@ public:
 						FlarialGUI::Notify("Accepted friend invite from: " + pkt->message.substr(61, pkt->message.length() - 68));
 					}
 				}
-				if (this->settings.getSettingByName<bool>("duelaccept")->value) {
+				if (getOps<bool>("duelaccept")) {
 					if (pkt->message.find(/*"to accept the invite!" &&*/ " §7Type §g/accept") != std::string::npos) {
 
 						std::shared_ptr<Packet> packet = SDK::createPacket(77);
@@ -138,7 +138,7 @@ public:
 				}
 			}
 			if (id == MinecraftPacketIds::ShowModalForm) {
-				if (this->settings.getSettingByName<bool>("req")->value) { //I know someone is going to copy paste this please leave some credit this took a lot of time
+				if (getOps<bool>("req")) { //I know someone is going to copy paste this please leave some credit this took a lot of time
 					auto* pkt = reinterpret_cast<ModalFormRequestPacket*>(event.getPacket());
 					// ImGui::SetClipboardText(pkt->mFormJSON.c_str());
 

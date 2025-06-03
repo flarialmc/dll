@@ -31,11 +31,11 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<bool>("dvdmode") == nullptr) settings.addSetting("dvdmode", true);
-		if (settings.getSettingByName<float>("xveloc") == nullptr) settings.addSetting("xveloc", 1.0f);
-		if (settings.getSettingByName<float>("yveloc") == nullptr) settings.addSetting("yveloc", 0.69f);
-		if (settings.getSettingByName<float>("scale") == nullptr) settings.addSetting("scale", 1.0f);
-		if (settings.getSettingByName<std::string>("mode") == nullptr) settings.addSetting("mode", (std::string)"Patar");
+		setDef("dvdmode", true);
+		setDef("xveloc", 1.0f);
+		setDef("yveloc", 0.69f);
+		setDef("scale", 1.0f);
+		setDef("mode", (std::string)"Patar");
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -51,11 +51,11 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("PatarHD");
-		addDropdown("Mode", "", std::vector<std::string>{"Patar", "Jqms", "Chyves", "Nikita", "treegfx", "FreezeEngine", "StoneHunter", "beaver"}, settings.getSettingByName<std::string>("mode")->value);
-		addSlider("Scale", "", settings.getSettingByName<float>("scale")->value, 5.0F);
-		addToggle("DVD Mode", "See for yourself", settings.getSettingByName<bool>("dvdmode")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("dvdmode")->value, "X Velocity", "", settings.getSettingByName<float>("xveloc")->value, 25.0f);
-		addConditionalSlider(settings.getSettingByName<bool>("dvdmode")->value, "Y Velocity", "", settings.getSettingByName<float>("yveloc")->value, 25.0f);
+		addDropdown("Mode", "", std::vector<std::string>{"Patar", "Jqms", "Chyves", "Nikita", "treegfx", "FreezeEngine", "StoneHunter", "beaver"}, getOps<std::string>("mode"));
+		addSlider("Scale", "", getOps<float>("scale"), 5.0F);
+		addToggle("DVD Mode", "See for yourself", getOps<bool>("dvdmode"));
+		addConditionalSlider(getOps<bool>("dvdmode"), "X Velocity", "", getOps<float>("xveloc"), 25.0f);
+		addConditionalSlider(getOps<bool>("dvdmode"), "Y Velocity", "", getOps<float>("yveloc"), 25.0f);
 
 		FlarialGUI::UnsetScrollView();
 		resetPadding();
@@ -63,10 +63,10 @@ public:
 
 	void onRender(RenderEvent& event) {
 		if (SDK::currentScreen != "hud_screen") return;
-		float s = Constraints::RelativeConstraint(0.35, "height", true) * this->settings.getSettingByName<float>("scale")->value;
+		float s = Constraints::RelativeConstraint(0.35, "height", true) * getOps<float>("scale");
 		int draw = 165;
 		LPCSTR mode = "JPG";
-		if (this->settings.getSettingByName<std::string>("mode")->value == "Jqms")
+		if (getOps<std::string>("mode") == "Jqms")
 		{
 			mode = "JPG";
 			if (getMs() >= 70) {
@@ -82,23 +82,23 @@ public:
 
 			draw = 184 + pic;
 		}
-		else if (this->settings.getSettingByName<std::string>("mode")->value == "Chyves") {
+		else if (getOps<std::string>("mode") == "Chyves") {
 			mode = "JPG";
 			draw = 216;
 		}
-		else if (this->settings.getSettingByName<std::string>("mode")->value == "treegfx") {
+		else if (getOps<std::string>("mode") == "treegfx") {
 			mode = "JPG";
 			draw = 217;
 		}
-		else if (this->settings.getSettingByName<std::string>("mode")->value == "FreezeEngine") {
+		else if (getOps<std::string>("mode") == "FreezeEngine") {
 			mode = "PNG";
 			draw = 238;
 		}
-		else if (this->settings.getSettingByName<std::string>("mode")->value == "StoneHunter") {
+		else if (getOps<std::string>("mode") == "StoneHunter") {
 			mode = "PNG";
 			draw = 239;
 		}
-		else if (this->settings.getSettingByName<std::string>("mode")->value == "Nikita")
+		else if (getOps<std::string>("mode") == "Nikita")
 		{
 			mode = "PNG";
 			if (getMs() >= 30) {
@@ -113,15 +113,15 @@ public:
 			}
 			draw = 218 + pic;
 		}
-		else if (this->settings.getSettingByName<std::string>("mode")->value == "beaver") {
+		else if (getOps<std::string>("mode") == "beaver") {
 			mode = "PNG";
 			draw = 246;
 		}
-		if (this->settings.getSettingByName<bool>("dvdmode")->value) {
+		if (getOps<bool>("dvdmode")) {
 			FlarialGUI::image(draw, D2D1::RectF(x, y, x + s, y + s), mode);
 
-			x += this->settings.getSettingByName<float>("xveloc")->value * xv;
-			y += this->settings.getSettingByName<float>("yveloc")->value * yv;
+			x += getOps<float>("xveloc") * xv;
+			y += getOps<float>("yveloc") * yv;
 
 			if (x >= MC::windowSize.x - s) xv = -1;
 			if (x < 0) xv = 1;

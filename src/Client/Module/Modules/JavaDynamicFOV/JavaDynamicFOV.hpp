@@ -35,8 +35,8 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<float>("fov_target") == nullptr) settings.addSetting("fov_target", 120.0f);
-		if (settings.getSettingByName<float>("anim") == nullptr) settings.addSetting("anim", 0.40f);
+		setDef("fov_target", 120.0f);
+		setDef("anim", 0.40f);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -52,8 +52,8 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Java Dynamic FOV");
-		addSlider("Altered FOV target", "Target FOV when sprinting.", settings.getSettingByName<float>("fov_target")->value, 175, 0, false);
-		addSlider("Animation Speed", "Speed of FOV change.", settings.getSettingByName<float>("anim")->value, 0.60);
+		addSlider("Altered FOV target", "Target FOV when sprinting.", getOps<float>("fov_target"), 175, 0, false);
+		addSlider("Animation Speed", "Speed of FOV change.", getOps<float>("anim"), 0.60);
 
 		FlarialGUI::UnsetScrollView();
 		resetPadding();
@@ -77,9 +77,9 @@ public:
 		auto player = SDK::clientInstance->getLocalPlayer();
 		if (!player) return;
 
-		auto fovTarget = this->settings.getSettingByName<float>("fov_target")->value;
+		auto fovTarget = getOps<float>("fov_target");
 
-		float animspeed = this->settings.getSettingByName<float>("anim")->value;
+		float animspeed = getOps<float>("anim");
 		bool disableanim = false;
 		bool alwaysanim = false;
 

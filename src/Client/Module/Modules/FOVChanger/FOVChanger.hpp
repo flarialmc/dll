@@ -27,9 +27,8 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<float>("fovvalue") == nullptr) settings.addSetting("fovvalue", 60.00f);
-		if (settings.getSettingByName<float>("fovaffectshand") == nullptr) settings.addSetting("fovaffectshand", false);
-
+		setDef("fovvalue", 60.00f);
+		setDef("fovaffectshand", false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -46,8 +45,8 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("FOV Changer");
-		addSlider("FOV Value", "", settings.getSettingByName<float>("fovvalue")->value, 359.0f, 0, false);
-		addToggle("Affect Hand Size", "Keep normal hand size or not.", settings.getSettingByName<bool>("fovaffectshand")->value);
+		addSlider("FOV Value", "", getOps<float>("fovvalue"), 359.0f, 0, false);
+		addToggle("Affect Hand Size", "Keep normal hand size or not.", getOps<bool>("fovaffectshand"));
 
 		FlarialGUI::UnsetScrollView();
 
@@ -55,7 +54,7 @@ public:
 	}
 
 	void onGetFOV(FOVEvent& event) {
-		if (!this->settings.getSettingByName<bool>("fovaffectshand")->value) {
+		if (!getOps<bool>("fovaffectshand")) {
 			if (event.getFOV() == 70) return;
 		}
 
@@ -66,7 +65,7 @@ public:
 		if (serverIP.find("world") != std::string::npos) inserver = true;
 		else inserver = false;
 
-		auto fovSetting = this->settings.getSettingByName<float>("fovvalue")->value;
+		auto fovSetting = getOps<float>("fovvalue");
 
 		if (inserver) {
 			if (fovSetting > 150) {

@@ -133,12 +133,12 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<float>("speed") == nullptr) settings.addSetting("speed", 8.f);
-		if (settings.getSettingByName<float>("xmul") == nullptr) settings.addSetting("xmul", 18.f);
-		if (settings.getSettingByName<float>("ymul") == nullptr) settings.addSetting("ymul", 16.f);
-		if (settings.getSettingByName<float>("zmul") == nullptr) settings.addSetting("zmul", 18.f);
-		if (settings.getSettingByName<bool>("preserverots") == nullptr) settings.addSetting("preserverots", false);
-		if (settings.getSettingByName<bool>("smoothrots") == nullptr) settings.addSetting("smoothrots", true);
+		setDef("speed", 8.f);
+		setDef("xmul", 18.f);
+		setDef("ymul", 16.f);
+		setDef("zmul", 18.f);
+		setDef("preserverots", false);
+		setDef("smoothrots", true);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -156,12 +156,12 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Item Physics");
-		addSlider("Speed", "", settings.getSettingByName<float>("speed")->value, 15.f, 3.f, false);
-		addSlider("X Multiplier", "", settings.getSettingByName<float>("xmul")->value, 30.f, 7.f, false);
-		addSlider("Y Multiplier", "", settings.getSettingByName<float>("ymul")->value, 30.f, 7.f, false);
-		addSlider("Z Multiplier", "", settings.getSettingByName<float>("zmul")->value, 30.f, 7.f, false);
-		addToggle("Preserve Rotations", "", settings.getSettingByName<bool>("preserverots")->value);
-		addToggle("Smooth Rotations", "", settings.getSettingByName<bool>("smoothrots")->value);
+		addSlider("Speed", "", getOps<float>("speed"), 15.f, 3.f, false);
+		addSlider("X Multiplier", "", getOps<float>("xmul"), 30.f, 7.f, false);
+		addSlider("Y Multiplier", "", getOps<float>("ymul"), 30.f, 7.f, false);
+		addSlider("Z Multiplier", "", getOps<float>("zmul"), 30.f, 7.f, false);
+		addToggle("Preserve Rotations", "", getOps<bool>("preserverots"));
+		addToggle("Smooth Rotations", "", getOps<bool>("smoothrots"));
 
 		FlarialGUI::UnsetScrollView();
 

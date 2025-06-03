@@ -70,13 +70,23 @@ public:
     int colorPickerIndex = 100;
     int buttonIndex = 3;
 
-    struct DrDisrespect {
+    struct ColorPickerStruct {
         std::string* value;
         float* opacity;
         bool* rgb;
     };
 
-    std::unordered_map<int, DrDisrespect> color_pickers;
+    std::unordered_map<int, ColorPickerStruct> color_pickers;
+
+    template <typename T>
+    T& getOps(std::string setting);
+
+    template <typename T>
+    void setDef(std::string setting, T value);
+    void setDef(std::string setting, std::string col, float opac, bool rgb);
+    
+    D2D_COLOR_F getColor(std::string text);
+    D2D_COLOR_F getColor(std::string text, std::string mod);
 
     void resetPadding();
     void extraPadding();
@@ -87,7 +97,7 @@ public:
                    std::function<void()> action);
 
     void addConditionalTextBox(bool condition, std::string text, std::string subtext, std::string& value, int limit = 16);
-    void addConditionalColorPicker(bool condition, std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb);
+    void addConditionalColorPicker(bool condition, std::string text, std::string subtext, std::string settingName);
     void addConditionalDropdown(bool condition, std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value);
     void addConditionalToggle(bool condition, std::string text, std::string subtext, bool& value);
     void addConditionalSlider(bool condition, std::string text, std::string subtext, float& value, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
@@ -102,8 +112,7 @@ public:
     void addResettableTextBox(std::string text, std::string subtext, std::string settingName, int limit = 16);
     void addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value);
     void addResettableDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string settingName);
-    void addColorPicker(std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb);
-    void addResettableColorPicker(std::string text, std::string subtext, std::string settingName, float& opacity, bool& rgb);
+    void addColorPicker(std::string text, std::string subtext, std::string settingName);
     virtual void loadDefaults();
     void saveSettings();
 

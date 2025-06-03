@@ -33,8 +33,8 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<bool>("horizontal") == nullptr) settings.addSetting("horizontal", true);
-		if (settings.getSettingByName<bool>("vertical") == nullptr) settings.addSetting("vertical", false);
+		setDef("horizontal", true);
+		setDef("vertical", false);
 	}
 
 
@@ -51,8 +51,8 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Misc");
-		addToggle("Vertical Nulling", "W & S keys", settings.getSettingByName<bool>("vertical")->value);
-		addToggle("Horizontal Nulling", "A & D keys", settings.getSettingByName<bool>("horizontal")->value);
+		addToggle("Vertical Nulling", "W & S keys", getOps<bool>("vertical"));
+		addToggle("Horizontal Nulling", "A & D keys", getOps<bool>("horizontal"));
 
 		FlarialGUI::UnsetScrollView();
 
@@ -99,10 +99,10 @@ public:
 
 		if (!movementKeyStack.empty()) {
 			int lastKey = movementKeyStack.back();
-			if (lastKey == forwardKey && settings.getSettingByName<bool>("vertical")->value)  KeyHook::funcOriginal(backwardKey, 0);
-			else if (lastKey == backwardKey && settings.getSettingByName<bool>("vertical")->value) KeyHook::funcOriginal(forwardKey, 0);
-			else if (lastKey == leftKey && settings.getSettingByName<bool>("horizontal")->value) KeyHook::funcOriginal(rightKey, 0);
-			else if (lastKey == rightKey && settings.getSettingByName<bool>("horizontal")->value) KeyHook::funcOriginal(leftKey, 0);
+			if (lastKey == forwardKey && getOps<bool>("vertical"))  KeyHook::funcOriginal(backwardKey, 0);
+			else if (lastKey == backwardKey && getOps<bool>("vertical")) KeyHook::funcOriginal(forwardKey, 0);
+			else if (lastKey == leftKey && getOps<bool>("horizontal")) KeyHook::funcOriginal(rightKey, 0);
+			else if (lastKey == rightKey && getOps<bool>("horizontal")) KeyHook::funcOriginal(leftKey, 0);
 		}
 	}
 

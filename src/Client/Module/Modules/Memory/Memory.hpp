@@ -21,7 +21,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
+		setDef("textscale", 0.8f);
 		Module::defaultConfig("all");
 	}
 

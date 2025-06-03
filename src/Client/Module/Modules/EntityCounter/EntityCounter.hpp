@@ -25,8 +25,8 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value} Entities");
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
+		setDef("text", (std::string)"{value} Entities");
+		setDef("textscale", 0.70f);
 		Module::defaultConfig("all");
 	}
 

@@ -60,11 +60,11 @@ public:
 			meridiem = "PM";
 			hour -= 12;
 		}
-		if (this->settings.getSettingByName<bool>("24")->value && meridiem == "PM") {
+		if (getOps<bool>("24") && meridiem == "PM") {
 			hour += 12;
 			meridiem = "";
 		}
-		else if (this->settings.getSettingByName<bool>("24")->value && meridiem == "AM") meridiem = "";
+		else if (getOps<bool>("24") && meridiem == "AM") meridiem = "";
 
 		seperator = minute < 10 ? ":0" : ":";
 
@@ -76,9 +76,9 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
+		setDef("textscale", 0.80f);
 		Module::defaultConfig("all");
-		if (settings.getSettingByName<bool>("24") == nullptr) settings.addSetting("24", false);
+		setDef("24", false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -96,7 +96,7 @@ public:
 
 		addHeader("Time");
 		defaultAddSettings("main");
-		addToggle("24 Hour Format", "", settings.getSettingByName<bool>("24")->value);
+		addToggle("24 Hour Format", "", getOps<bool>("24"));
 		extraPadding();
 
 		addHeader("Text");

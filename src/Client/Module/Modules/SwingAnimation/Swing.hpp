@@ -43,7 +43,7 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<float>("modifier") == nullptr) settings.addSetting("modifier", 10.0f);
+		setDef("modifier", 10.0f);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -59,7 +59,7 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Toggle Sprint");
-		addSlider("Modifier", "", settings.getSettingByName<float>("modifier")->value, 360.f, 0.f, false);
+		addSlider("Modifier", "", getOps<float>("modifier"), 360.f, 0.f, false);
 
 		FlarialGUI::UnsetScrollView();
 		resetPadding();

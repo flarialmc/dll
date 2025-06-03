@@ -23,7 +23,7 @@ class SwingListener : public Listener {
         std::vector<uint8_t> bytes = { 0x90, 0x90, 0x90, 0x90, 0x90 };
 
         Memory::patchBytes(SwingListener::fluxSwingAddr, bytes.data(), 5);
-        *SwingListener::tapSwingVal = -module->settings.getSettingByName<float>("modifier")->value;
+        *SwingListener::tapSwingVal = -module->getOps<float>("modifier");
 
 
         patchAnimFunc(false);

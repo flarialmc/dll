@@ -31,7 +31,7 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<float>("guiscale") == nullptr) settings.addSetting("guiscale", 2.0f);
+		setDef("guiscale", 2.f);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -47,7 +47,7 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("GUI Scale");
-		addSlider("UI Scale", "", settings.getSettingByName<float>("guiscale")->value, 4.f, 1.f, false);
+		addSlider("UI Scale", "", getOps<float>("guiscale"), 4.f, 1.f, false);
 
 		FlarialGUI::UnsetScrollView();
 
@@ -59,7 +59,7 @@ public:
 	};
 
 	void update() {
-		float targetScale = delayDisable ? originalScale : this->settings.getSettingByName<float>("guiscale")->value;
+		float targetScale = delayDisable ? originalScale : getOps<float>("guiscale");
 		auto guiData = SDK::clientInstance->getGuiData();
 		if (targetScale == guiData->GuiScale && !delayDisable && !fixResize) return;
 

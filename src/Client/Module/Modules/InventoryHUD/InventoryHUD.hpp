@@ -40,49 +40,33 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<std::string>("textalignment") == nullptr) settings.addSetting("textalignment", (std::string)"Right");
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.05f);
-
-		if (settings.getSettingByName<bool>("textShadow") == nullptr) settings.addSetting("textShadow", false);
-		if (settings.getSettingByName<float>("textShadowOffset") == nullptr) settings.addSetting("textShadowOffset", 0.003f);
-
-		if (settings.getSettingByName<bool>("showDurBar") == nullptr)  settings.addSetting("showDurBar", true);
-		if (settings.getSettingByName<bool>("showStaticDurBarColor") == nullptr)  settings.addSetting("showStaticDurBarColor", false);
-		if (settings.getSettingByName<bool>("overrideSpecialMaxDurBarCol") == nullptr)  settings.addSetting("overrideSpecialMaxDurBarCol", false);
-		if (settings.getSettingByName<bool>("showSpecialMaxDurBarCol") == nullptr)  settings.addSetting("showSpecialMaxDurBarCol", false);
-		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 1.0f);
+		setDef("textalignment", (std::string)"Right");
+		setDef("textscale", 0.05f);
+		setDef("textShadow", false);
+		setDef("textShadowOffset", 0.003f);
+		setDef("showDurBar", true);
+		setDef("showStaticDurBarColor", false);
+		setDef("overrideSpecialMaxDurBarCol", false);
+		setDef("showSpecialMaxDurBarCol", false);
+		setDef("uiscale", 1.0f);
 
 		Module::defaultConfig("core");
 		Module::defaultConfig("pos");
 
-		if (settings.getSettingByName<std::string>("textColor") == nullptr) settings.addSetting("textColor", (std::string)"FFFFFF");
-		if (settings.getSettingByName<float>("textColor_opacity") == nullptr) settings.addSetting("textColor_opacity", 1.0f);
-		if (settings.getSettingByName<bool>("textColor_rgb") == nullptr) settings.addSetting("textColor_rgb", false);
-
-		if (settings.getSettingByName<std::string>("textShadowCol") == nullptr) settings.addSetting("textShadowCol", (std::string)"00000");
-		if (settings.getSettingByName<float>("textShadowOpacity") == nullptr) settings.addSetting("textShadowOpacity", 0.55f);
-		if (settings.getSettingByName<bool>("textShadowRGB") == nullptr) settings.addSetting("textShadowRGB", false);
-
-		if (settings.getSettingByName<std::string>("staticDurBarColor") == nullptr) settings.addSetting("staticDurBarColor", (std::string)"FFFFFF");
-		if (settings.getSettingByName<float>("staticDurBarColor_opacity") == nullptr) settings.addSetting("staticDurBarColor_opacity", 1.f);
-		if (settings.getSettingByName<bool>("staticDurBarColor_rgb") == nullptr) settings.addSetting("staticDurBarColor_rgb", false);
-
-		if (settings.getSettingByName<std::string>("specialMaxDurBarColor") == nullptr) settings.addSetting("specialMaxDurBarColor", (std::string)"FFFFFF");
-		if (settings.getSettingByName<float>("specialMaxDurBarColor_opacity") == nullptr) settings.addSetting("specialMaxDurBarColor_opacity", 1.f);
-		if (settings.getSettingByName<bool>("specialMaxDurBarColor_rgb") == nullptr) settings.addSetting("specialMaxDurBarColor_rgb", false);
-
-		if (settings.getSettingByName<float>("spacing") == nullptr) settings.addSetting("spacing", 1.f);
-		if (settings.getSettingByName<float>("textOffsetX") == nullptr) settings.addSetting("textOffsetX", 16.19f);
-		if (settings.getSettingByName<float>("textOffsetY") == nullptr) settings.addSetting("textOffsetY", 13.13f);
-		if (settings.getSettingByName<float>("durBarOffsetX") == nullptr) settings.addSetting("durBarOffsetX", 1.92f);
-		if (settings.getSettingByName<float>("durBarOffsetY") == nullptr) settings.addSetting("durBarOffsetY", 12.45f);
-		if (settings.getSettingByName<float>("durBarOpacity") == nullptr) settings.addSetting("durBarOpacity", 1.f);
-
-		if (settings.getSettingByName<float>("100color") == nullptr) settings.addSetting("100color", 120.f);
-		if (settings.getSettingByName<float>("0color") == nullptr) settings.addSetting("0color", 0.f);
-
-		if (settings.getSettingByName<bool>("showDurBarMax") == nullptr) settings.addSetting("showDurBarMax", false);
-		if (settings.getSettingByName<float>("textOpacity") == nullptr) settings.addSetting("textOpacity", 1.f);
+		setDef("text", (std::string)"FFFFFF", 1.f, false);
+		setDef("textShadow", (std::string)"00000", 0.55f, false);
+		setDef("staticDurBar", (std::string)"FFFFFF", 1.f, false);
+		setDef("specialMaxDurBar", (std::string)"FFFFFF", 1.f, false);
+		setDef("spacing", 1.f);
+		setDef("textOffsetX", 16.19f);
+		setDef("textOffsetY", 13.13f);
+		setDef("durBarOffsetX", 1.92f);
+		setDef("durBarOffsetY", 12.45f);
+		setDef("durBarOpacity", 1.f);
+		setDef("100color", 120.f);
+		setDef("0color", 0.f);
+		setDef("showDurBarMax", false);
+		setDef("textOpacity", 1.f);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -99,74 +83,65 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Inventory HUD");
-		addSlider("Size", "", settings.getSettingByName<float>("uiscale")->value, 5.f, 0.f, true);
-		addSlider("Text Size", "", settings.getSettingByName<float>("textscale")->value, 0.25f, 0.0f, true);
-		addSlider("Spacing", "", settings.getSettingByName<float>("spacing")->value, 10.f, 0.0f, true);
-		addToggle("Show Durability", "", settings.getSettingByName<bool>("showDurBar")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Offset X", "", settings.getSettingByName<float>("durBarOffsetX")->value, 50.f, 0.0f, false);
-		addConditionalSlider(settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Offset Y", "", settings.getSettingByName<float>("durBarOffsetY")->value, 50.f, 0.0f, false);
-		addConditionalSlider(settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Opacity", "", settings.getSettingByName<float>("durBarOpacity")->value, 1.f, 0.0f, false);
-		addConditionalToggle(settings.getSettingByName<bool>("showDurBar")->value, "Show Max Durability Bar", "", settings.getSettingByName<bool>("showDurBarMax")->value);
+		addSlider("Size", "", getOps<float>("uiscale"), 5.f, 0.f, true);
+		addSlider("Text Size", "", getOps<float>("textscale"), 0.25f, 0.0f, true);
+		addSlider("Spacing", "", getOps<float>("spacing"), 10.f, 0.0f, true);
+		addToggle("Show Durability", "", getOps<bool>("showDurBar"));
+		addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Offset X", "", getOps<float>("durBarOffsetX"), 50.f, 0.0f, false);
+		addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Offset Y", "", getOps<float>("durBarOffsetY"), 50.f, 0.0f, false);
+		addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Opacity", "", getOps<float>("durBarOpacity"), 1.f, 0.0f, false);
+		addConditionalToggle(getOps<bool>("showDurBar"), "Show Max Durability Bar", "", getOps<bool>("showDurBarMax"));
 
-		//addSlider("Background Padding", "", settings.getSettingByName<float>("bgPadding")->value, 25.f, 0.0f, false);
+		//addSlider("Background Padding", "", getOps<float>("bgPadding"), 25.f, 0.0f, false);
 		extraPadding();
 
 		addHeader("Text");
-		addSlider("Text Offset X", "", settings.getSettingByName<float>("textOffsetX")->value, 50.f, 0.0f, false);
-		addSlider("Text Offset Y", "", settings.getSettingByName<float>("textOffsetY")->value, 50.f, 0.0f, false);
-		addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, settings.getSettingByName<std::string>("textalignment")->value);
-		addToggle("Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("textShadow")->value, "Shadow Offset", "How far the shadow will be.", settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
+		addSlider("Text Offset X", "", getOps<float>("textOffsetX"), 50.f, 0.0f, false);
+		addSlider("Text Offset Y", "", getOps<float>("textOffsetY"), 50.f, 0.0f, false);
+		addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, getOps<std::string>("textalignment"));
+		addToggle("Text Shadow", "Displays a shadow under the text", getOps<bool>("textShadow"));
+		addConditionalSlider(getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", getOps<float>("textShadowOffset"), 0.02f, 0.001f);
 		extraPadding();
 
 		addHeader("Colors");
-		addColorPicker("Text Color", "", settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textColor_opacity")->value, settings.getSettingByName<bool>("textColor_rgb")->value);
-		addConditionalColorPicker(settings.getSettingByName<bool>("textShadow")->value, "Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value, settings.getSettingByName<float>("textShadowOpacity")->value, settings.getSettingByName<bool>("textShadowRGB")->value);
-		addToggle("Show Special Max Durability Bar Color", "", settings.getSettingByName<bool>("showSpecialMaxDurBarCol")->value);
-		addConditionalColorPicker(settings.getSettingByName<bool>("showSpecialMaxDurBarCol")->value, "Special Max Durability Bar Color", "", settings.getSettingByName<std::string>("specialMaxDurBarColor")->value, settings.getSettingByName<float>("specialMaxDurBarColor_opacity")->value, settings.getSettingByName<bool>("specialMaxDurBarColor_rgb")->value);
-		addToggle("Enable Static Durability Bar Color", "", settings.getSettingByName<bool>("showStaticDurBarColor")->value);
-		addConditionalColorPicker(settings.getSettingByName<bool>("showStaticDurBarColor")->value, "Static Durability Bar Color", "", settings.getSettingByName<std::string>("staticDurBarColor")->value, settings.getSettingByName<float>("staticDurBarColor_opacity")->value, settings.getSettingByName<bool>("staticDurBarColor_rgb")->value);
-		addConditionalToggle(settings.getSettingByName<bool>("showStaticDurBarColor")->value, "Override Special Max Durability Bar Color", "", settings.getSettingByName<bool>("overrideSpecialMaxDurBarCol")->value);
-		addConditionalSlider(!settings.getSettingByName<bool>("showStaticDurBarColor")->value, "100% Durability Bar Color", "Hue in degrees", settings.getSettingByName<float>("100color")->value, 360.f, 0.0f, false);
-		addConditionalSlider(!settings.getSettingByName<bool>("showStaticDurBarColor")->value, "0% Durability Bar Color", "Hue in degrees", settings.getSettingByName<float>("0color")->value, 360.f, 0.0f, false);
-		
+		addColorPicker("Text Color", "", "text");
+		addConditionalColorPicker(getOps<bool>("textShadow"), "Shadow Color", "Text Shadow Color", "textShadow");
+		addToggle("Show Special Max Durability Bar Color", "", getOps<bool>("showSpecialMaxDurBarCol"));
+		addConditionalColorPicker(getOps<bool>("showSpecialMaxDurBarCol"), "Special Max Durability Bar Color", "", "specialMaxDurBar");
+		addToggle("Enable Static Durability Bar Color", "", getOps<bool>("showStaticDurBarColor"));
+		addConditionalColorPicker(getOps<bool>("showStaticDurBarColor"), "Static Durability Bar Color", "", "staticDurBar");
+		addConditionalToggle(getOps<bool>("showStaticDurBarColor"), "Override Special Max Durability Bar Color", "", getOps<bool>("overrideSpecialMaxDurBarCol"));
+		addConditionalSlider(!getOps<bool>("showStaticDurBarColor"), "100% Durability Bar Color", "Hue in degrees", getOps<float>("100color"), 360.f, 0.0f, false);
+		addConditionalSlider(!getOps<bool>("showStaticDurBarColor"), "0% Durability Bar Color", "Hue in degrees", getOps<float>("0color"), 360.f, 0.0f, false);
+
 		FlarialGUI::UnsetScrollView();
 		resetPadding();
 	}
 
 	void renderText() {
-		float uiscale = this->settings.getSettingByName<float>("uiscale")->value;
+		float uiscale = getOps<float>("uiscale");
 		float guiscale = SDK::clientInstance->getGuiData()->getGuiScale();
-		float textScale = this->settings.getSettingByName<float>("textscale")->value * 1080;
+		float textScale = getOps<float>("textscale") * 1080;
 
-		D2D_COLOR_F textColor = this->settings.getSettingByName<bool>("textColor_rgb")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("textColor")->value);
-		textColor.a = this->settings.getSettingByName<float>("textColor_opacity")->value;
+		D2D_COLOR_F textColor = getColor("text");
+		D2D1_COLOR_F staticDurBarColor = getColor("staticDurBar");
+		D2D1_COLOR_F specialMaxDurBarColor = getColor("specialMaxDurBar");
 
-		D2D1_COLOR_F staticDurBarColor = this->settings.getSettingByName<bool>("staticDurBarColor_rgb")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("staticDurBarColor")->value);
-		staticDurBarColor.a = this->settings.getSettingByName<float>("staticDurBarColor_opacity")->value;
+		float maxDurCol = getOps<float>("100color");
+		float minDurCol = getOps<float>("0color");
 
-		D2D1_COLOR_F specialMaxDurBarColor = this->settings.getSettingByName<bool>("specialMaxDurBarColor_rgb")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("specialMaxDurBarColor")->value);
-		specialMaxDurBarColor.a = this->settings.getSettingByName<float>("specialMaxDurBarColor_opacity")->value;
+		float textOpacity = getOps<float>("textOpacity");
+		bool textShadow = getOps<bool>("textShadow");
+		float ospacing = getOps<float>("spacing");
+		float textOffsetX = getOps<float>("textOffsetX");
+		float textOffsetY = getOps<float>("textOffsetY");
 
-		// we can't add backgrounds :(
-		//D2D_COLOR_F bg = this->settings.getSettingByName<bool>("bgRGB")->value ? rgb : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("bgColor")->value);
-		//bg.a = this->settings.getSettingByName<float>("bgOpacity")->value;
+		bool showSpecialMaxDurBarCol = getOps<bool>("showSpecialMaxDurBarCol");
+		bool overrideSpecialMaxDurBarCol = getOps<bool>("overrideSpecialMaxDurBarCol");
+		bool showStaticDurBarColor = getOps<bool>("showStaticDurBarColor");
 
-		float maxDurCol = this->settings.getSettingByName<float>("100color")->value;
-		float minDurCol = this->settings.getSettingByName<float>("0color")->value;
-
-		float textOpacity = this->settings.getSettingByName<float>("textOpacity")->value;
-		bool textShadow = this->settings.getSettingByName<bool>("textShadow")->value;
-		float ospacing = this->settings.getSettingByName<float>("spacing")->value;
-		float textOffsetX = this->settings.getSettingByName<float>("textOffsetX")->value;
-		float textOffsetY = this->settings.getSettingByName<float>("textOffsetY")->value;
-
-		bool showSpecialMaxDurBarCol = this->settings.getSettingByName<bool>("showSpecialMaxDurBarCol")->value;
-		bool overrideSpecialMaxDurBarCol = this->settings.getSettingByName<bool>("overrideSpecialMaxDurBarCol")->value;
-		bool showStaticDurBarColor = this->settings.getSettingByName<bool>("showStaticDurBarColor")->value;
-
-		float durBarOffsetX = this->settings.getSettingByName<float>("durBarOffsetX")->value;
-		float durBarOffsetY = this->settings.getSettingByName<float>("durBarOffsetY")->value;
+		float durBarOffsetX = getOps<float>("durBarOffsetX");
+		float durBarOffsetY = getOps<float>("durBarOffsetY");
 
 		if (this->isEnabled() && ClientInstance::getTopScreenName() == "hud_screen") {
 			if (SDK::clientInstance->getLocalPlayer() != nullptr &&
@@ -194,7 +169,7 @@ public:
 
 						float durPerc = (float)durabilities[i][0] / (float)durabilities[i][1];
 
-						if (this->settings.getSettingByName<bool>("showDurBar")->value && (settings.getSettingByName<bool>("showDurBarMax")->value || durabilities[i][0] != durabilities[i][1]) && durabilities[i][1] != 0) {
+						if (getOps<bool>("showDurBar") && (getOps<bool>("showDurBarMax") || durabilities[i][0] != durabilities[i][1]) && durabilities[i][1] != 0) {
 							D2D1_COLOR_F finalColor = D2D_COLOR_F(D2D1::ColorF::White);
 
 							if (durabilities[i][0] != 0 || durabilities[i][1] != 0) finalColor = FlarialGUI::HSVtoColorF(minDurCol + durPerc * (maxDurCol - minDurCol), 1.f, 1.f);
@@ -205,12 +180,12 @@ public:
 								else if (durabilities[i][0] != durabilities[i][1]) finalColor = staticDurBarColor;
 							}
 
-							finalColor.a = this->settings.getSettingByName<float>("durBarOpacity")->value;
+							finalColor.a = getOps<float>("durBarOpacity");
 
 							FlarialGUI::RoundedRect(
 								currentPos.x + xmodifier + (durBarOffsetX * uiscale * guiscale),
 								currentPos.y + ymodifier + (durBarOffsetY * uiscale * guiscale),
-								D2D1::ColorF(D2D1::ColorF::Black, this->settings.getSettingByName<float>("durBarOpacity")->value),
+								D2D1::ColorF(D2D1::ColorF::Black, getOps<float>("durBarOpacity")),
 								guiscale * uiscale * 13.f,
 								guiscale * uiscale * 2.f,
 								0, 0
@@ -226,26 +201,22 @@ public:
 						}
 
 						if ((float)item->count > 1) {
-							if (this->settings.getSettingByName<bool>("textShadow")->value) {
-								D2D_COLOR_F shadowCol = settings.getSettingByName<bool>("textShadowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textShadowCol")->value);
-								shadowCol.a = settings.getSettingByName<float>("textShadowOpacity")->value;
-								FlarialGUI::FlarialTextWithFont(
-									textX + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
-									textY + Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * uiscale,
-									wText.c_str(),
-									0,
-									0,
-									alignments[this->settings.getSettingByName<std::string>("textalignment")->value],
-									textScale * uiscale * guiscale, DWRITE_FONT_WEIGHT_NORMAL,
-									shadowCol,
-									true
-								);
-							}
+							if (getOps<bool>("textShadow"))FlarialGUI::FlarialTextWithFont(
+								textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
+								textY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
+								wText.c_str(),
+								0,
+								0,
+								alignments[getOps<std::string>("textalignment")],
+								textScale * uiscale * guiscale, DWRITE_FONT_WEIGHT_NORMAL,
+								getColor("textShadow"),
+								true
+							);
 
 							FlarialGUI::FlarialTextWithFont(
 								textX, textY, wText.c_str(),
 								0, 0,
-								alignments[this->settings.getSettingByName<std::string>("textalignment")->value],
+								alignments[getOps<std::string>("textalignment")],
 								textScale * uiscale * guiscale,
 								DWRITE_FONT_WEIGHT_NORMAL,
 								textColor, true
@@ -272,11 +243,11 @@ public:
 			this->isEnabled() ||
 			ClientInstance::getTopScreenName() == "pause_screen" &&
 			this->isEnabled()) {
-			float spacing = this->settings.getSettingByName<float>("spacing")->value;
+			float spacing = getOps<float>("spacing");
 
-			Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value, this->settings.getSettingByName<float>("percentageY")->value);
+			Vec2<float> settingperc = Vec2<float>(getOps<float>("percentageX"), getOps<float>("percentageY"));
 
-			float uiscale = this->settings.getSettingByName<float>("uiscale")->value;
+			float uiscale = getOps<float>("uiscale");
 			float guiscale = SDK::clientInstance->getGuiData()->getGuiScale();
 
 			float s = 16 * uiscale * guiscale;
@@ -319,13 +290,13 @@ public:
 			BaseActorRenderContext barc(muirc->getScreenContext(), muirc->getClientInstance(),
 				muirc->getClientInstance()->getMinecraftGame());
 
-			float uiscale = this->settings.getSettingByName<float>("uiscale")->value;
+			float uiscale = getOps<float>("uiscale");
 			Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
 
 			if (SDK::clientInstance->getLocalPlayer() != nullptr &&
 				SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
 
-				float spacing = 16 * uiscale * this->settings.getSettingByName<float>("spacing")->value;
+				float spacing = 16 * uiscale * getOps<float>("spacing");
 				float xmodifier = 0.0f;
 				float ymodifier = 0.0f;
 				int counter = 0;

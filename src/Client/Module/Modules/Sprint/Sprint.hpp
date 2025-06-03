@@ -26,9 +26,9 @@ public:
 	void defaultConfig() override {
 		getKeybind();
 		Module::defaultConfig("all");
-		if (settings.getSettingByName<bool>("status") == nullptr) settings.addSetting("status", false);
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
-		if (settings.getSettingByName<bool>("always") == nullptr) settings.addSetting("always", false);
+		setDef("status", false);
+		setDef("textscale", 0.80f);
+		setDef("always", false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -46,8 +46,8 @@ public:
 
 		addHeader("Toggle Sprint");
 		addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
-		addToggle("Always Sprint", "Also known as auto sprint", settings.getSettingByName<bool>("always")->value);
-		addToggle("Show Status", "", settings.getSettingByName<bool>("status")->value);
+		addToggle("Always Sprint", "Also known as auto sprint", getOps<bool>("always"));
+		addToggle("Show Status", "", getOps<bool>("status"));
 		extraPadding();
 
 		addHeader("Main");
@@ -87,7 +87,7 @@ public:
 	void onRender(RenderEvent& event) {
 		if (!this->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
 
-		if (!this->settings.getSettingByName<bool>("status")->value) return;
+		if (!getOps<bool>("status")) return;
 
 		if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
 
@@ -131,7 +131,7 @@ public:
 				auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
 				if (handler->forward) {
-					if (this->settings.getSettingByName<bool>("always")->value) {
+					if (getOps<bool>("always")) {
 						handler->sprinting = true;
 					}
 					else {

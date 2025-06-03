@@ -61,16 +61,13 @@ public:
 			float height = currentSize.y;
 
 
-			Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
-				this->settings.getSettingByName<float>("percentageY")->value);
+			Vec2<float> settingperc = Vec2<float>(getOps<float>("percentageX"),
+				getOps<float>("percentageY"));
 
-			if (settingperc.x != 0)
-				currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
-			else if (settingperc.x == 0 and originalPos.x != 0.0f)
-				currentPos = Vec2<float>{ originalPos.x, originalPos.y };
+			if (settingperc.x != 0) currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
+			else if (settingperc.x == 0 and originalPos.x != 0.0f) currentPos = Vec2<float>{ originalPos.x, originalPos.y };
 
-			if (ClickGUI::editmenu)
-				FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 28);
+			if (ClickGUI::editmenu) FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 28);
 
 			Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 28, width, height);
 

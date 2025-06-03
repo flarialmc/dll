@@ -23,7 +23,7 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<bool>("paint") == nullptr) settings.addSetting("paint", false);
+		setDef("paint", false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -39,7 +39,7 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Deepfry");
-		addToggle("Paint Effect", "", settings.getSettingByName<bool>("paint")->value);
+		addToggle("Paint Effect", "", getOps<bool>("paint"));
 
 		FlarialGUI::UnsetScrollView();
 
@@ -48,7 +48,7 @@ public:
 
 	void onRender(RenderEvent& event) {
 		if (this->isEnabled()) {
-			if (this->settings.getSettingByName<bool>("paint")->value) FlarialGUI::ApplyPaintEffect(10.0f);
+			if (getOps<bool>("paint")) FlarialGUI::ApplyPaintEffect(10.0f);
 			else FlarialGUI::ApplyCombinedDeepFry();
 
 		}

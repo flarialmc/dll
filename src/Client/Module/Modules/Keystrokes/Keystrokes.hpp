@@ -34,10 +34,8 @@ public:
 
 	void onSetup() override {
 		defaultConfig();
-		D2D1_COLOR_F d = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("bgColor")->value);
-		D2D1_COLOR_F e = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("textColor")->value);
-		d.a = settings.getSettingByName<float>("bgOpacity")->value;
-		e.a = settings.getSettingByName<float>("textOpacity")->value;
+		D2D1_COLOR_F d = getColor("bg");
+		D2D1_COLOR_F e = getColor("text");
 
 		states = std::vector<D2D1_COLOR_F>(7, d);
 		textStates = std::vector<D2D1_COLOR_F>(7, e);
@@ -55,65 +53,46 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<float>("rounding") == nullptr) settings.addSetting("rounding", 11.0f);
-		if (settings.getSettingByName<bool>("cps") == nullptr) settings.addSetting("cps", false);
-
-		if (settings.getSettingByName<bool>("border") == nullptr) settings.addSetting("border", false);
-		if (settings.getSettingByName<float>("borderWidth") == nullptr) settings.addSetting("borderWidth", 1.0f);
+		setDef("rounding", 11.0f);
+		setDef("cps", false);
+		setDef("border", false);
+		setDef("borderWidth", 1.0f);
 
 		Module::defaultConfig("core");
 		Module::defaultConfig("pos");
 		Module::defaultConfig("main");
 		Module::defaultConfig("colors");
 
-		if (settings.getSettingByName<std::string>("glowEnabledColor") == nullptr) settings.addSetting("glowEnabledColor", (std::string)"F0F0F0");
-		if (settings.getSettingByName<float>("glowEnabledOpacity") == nullptr) settings.addSetting("glowEnabledOpacity", 1.0f);
-		if (settings.getSettingByName<bool>("glowEnabledRGB") == nullptr) settings.addSetting("glowEnabledRGB", false);
-
-		if (settings.getSettingByName<std::string>("enabledColor") == nullptr) settings.addSetting("enabledColor", (std::string)"fafafa");
-		if (settings.getSettingByName<bool>("enabledRGB") == nullptr) settings.addSetting("enabledRGB", false);
-		if (settings.getSettingByName<float>("enabledRGBSpeed") == nullptr) settings.addSetting("enabledRGBSpeed", 1.0f);
-
-		if (settings.getSettingByName<std::string>("EtextShadowCol") == nullptr) settings.addSetting("EtextShadowCol", (std::string)"00000");
-		if (settings.getSettingByName<float>("EtextShadowOpacity") == nullptr) settings.addSetting("EtextShadowOpacity", 0.55f);
-		if (settings.getSettingByName<bool>("EtextShadowRGB") == nullptr) settings.addSetting("EtextShadowRGB", false);
-
-		if (settings.getSettingByName<std::string>("DtextShadowCol") == nullptr) settings.addSetting("DtextShadowCol", (std::string)"00000");
-		if (settings.getSettingByName<float>("DtextShadowOpacity") == nullptr) settings.addSetting("DtextShadowOpacity", 0.55f);
-		if (settings.getSettingByName<bool>("DtextShadowRGB") == nullptr) settings.addSetting("DtextShadowRGB", false);
-
-		if (settings.getSettingByName<bool>("textShadow") == nullptr) settings.addSetting("textShadow", false);
-		if (settings.getSettingByName<float>("textShadowOffset") == nullptr) settings.addSetting("textShadowOffset", 0.003f);
-
-		if (settings.getSettingByName<std::string>("textEnabledColor") == nullptr) settings.addSetting("textEnabledColor", (std::string)"fafafa");
-		if (settings.getSettingByName<bool>("textEnabledRGB") == nullptr) settings.addSetting("textEnabledRGB", false);
-		if (settings.getSettingByName<float>("textEnabledRGBSpeed") == nullptr) settings.addSetting("textEnabledRGBSpeed", 1.0f);
-		if (settings.getSettingByName<float>("enabledOpacity") == nullptr) settings.addSetting("enabledOpacity", 0.55f);
-		if (settings.getSettingByName<float>("textEnabledOpacity") == nullptr) settings.addSetting("textEnabledOpacity", 1.f);
-		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 1.0f);
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.0f);
-		if (settings.getSettingByName<float>("textscale2") == nullptr) settings.addSetting("textscale2", 1.0f);
-		if (settings.getSettingByName<bool>("BlurEffect") == nullptr) settings.addSetting("BlurEffect", false);
-		if (settings.getSettingByName<bool>("lmbrmb") == nullptr) settings.addSetting("lmbrmb", true);
-		if (settings.getSettingByName<bool>("hidecps") == nullptr) settings.addSetting("hidecps", true);
-		if (settings.getSettingByName<std::string>("mainlmbtext") == nullptr) settings.addSetting("mainlmbtext", (std::string)"LMB");
-		if (settings.getSettingByName<std::string>("mainrmbtext") == nullptr) settings.addSetting("mainrmbtext", (std::string)"RMB");
-		if (settings.getSettingByName<std::string>("lmbtext") == nullptr) settings.addSetting("lmbtext", (std::string)"{value} CPS");
-		if (settings.getSettingByName<std::string>("rmbtext") == nullptr) settings.addSetting("rmbtext", (std::string)"{value} CPS");
-		if (settings.getSettingByName<std::string>("wText") == nullptr) settings.addSetting("wText", (std::string)"W");
-		if (settings.getSettingByName<std::string>("aText") == nullptr) settings.addSetting("aText", (std::string)"A");
-		if (settings.getSettingByName<std::string>("sText") == nullptr) settings.addSetting("sText", (std::string)"S");
-		if (settings.getSettingByName<std::string>("dText") == nullptr) settings.addSetting("dText", (std::string)"D");
-
-		if (settings.getSettingByName<float>("spacebarWidth") == nullptr) settings.addSetting("spacebarWidth", 0.5f);
-		if (settings.getSettingByName<float>("spacebarHeight") == nullptr) settings.addSetting("spacebarHeight", 0.09f);
-
-		if (settings.getSettingByName<float>("keySpacing") == nullptr) settings.addSetting("keySpacing", 1.63f);
-		if (settings.getSettingByName<float>("edSpeed") == nullptr) settings.addSetting("edSpeed", 1.f);
-
-		if (settings.getSettingByName<float>("glowEnabledAmount") == nullptr) settings.addSetting("glowEnabledAmount", 50.f);
-		if (settings.getSettingByName<float>("glowSpeed") == nullptr) settings.addSetting("glowSpeed", 1.f);
-		if (settings.getSettingByName<bool>("glowEnabled") == nullptr) settings.addSetting("glowEnabled", false);
+		setDef("glowEnabled", (std::string)"F0F0F0", 1.f, false);
+		setDef("enabled", (std::string)"fafafa", 1.f, false);
+		setDef("EtextShadow", (std::string)"00000", 0.55f, false);
+		setDef("DtextShadow", (std::string)"00000", 0.55f, false);
+		setDef("textEnabled", (std::string)"fafafa", 1.f, false);
+		setDef("textShadow", false);
+		setDef("textShadowOffset", 0.003f);
+		setDef("textEnabledRGBSpeed", 1.0f);
+		setDef("enabledOpacity", 0.55f);
+		setDef("uiscale", 1.0f);
+		setDef("textscale", 1.0f);
+		setDef("textscale2", 1.0f);
+		setDef("BlurEffect", false);
+		setDef("lmbrmb", true);
+		setDef("hidecps", true);
+		setDef("mainlmbtext", (std::string)"LMB");
+		setDef("mainrmbtext", (std::string)"RMB");
+		setDef("lmbtext", (std::string)"{value} CPS");
+		setDef("rmbtext", (std::string)"{value} CPS");
+		setDef("wText", (std::string)"W");
+		setDef("aText", (std::string)"A");
+		setDef("sText", (std::string)"S");
+		setDef("dText", (std::string)"D");
+		setDef("spacebarWidth", 0.5f);
+		setDef("spacebarHeight", 0.09f);
+		setDef("keySpacing", 1.63f);
+		setDef("edSpeed", 1.f);
+		setDef("glowEnabledAmount", 50.f);
+		setDef("glowSpeed", 1.f);
+		setDef("glowEnabled", false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -131,62 +110,62 @@ public:
 
 
 		addHeader("Keystrokes");
-		addSlider("UI Scale", "", settings.getSettingByName<float>("uiscale")->value, 2.0f);
-		addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", settings.getSettingByName<bool>("BlurEffect")->value);
-		addSlider("Rounding", "Rounding of the rectangle", settings.getSettingByName<float>("rounding")->value);
-		addToggle("Background", "", settings.getSettingByName<bool>("showBg")->value);
-		addConditionalToggle(settings.getSettingByName<bool>("showBg")->value, "Background Shadow", "Displays a shadow under the background", settings.getSettingByName<bool>("rectShadow")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("showBg")->value && settings.getSettingByName<bool>("rectShadow")->value, "Shadow Offset", "How far the shadow will be.", settings.getSettingByName<float>("rectShadowOffset")->value, 0.02f, 0.001f);
-		addToggle("Border", "", settings.getSettingByName<bool>("border")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("border")->value, "Border Thickness", "", settings.getSettingByName<float>("borderWidth")->value, 4.f);
+		addSlider("UI Scale", "", getOps<float>("uiscale"), 2.0f);
+		addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", getOps<bool>("BlurEffect"));
+		addSlider("Rounding", "Rounding of the rectangle", getOps<float>("rounding"));
+		addToggle("Background", "", getOps<bool>("showBg"));
+		addConditionalToggle(getOps<bool>("showBg"), "Background Shadow", "Displays a shadow under the background", getOps<bool>("rectShadow"));
+		addConditionalSlider(getOps<bool>("showBg") && getOps<bool>("rectShadow"), "Shadow Offset", "How far the shadow will be.", getOps<float>("rectShadowOffset"), 0.02f, 0.001f);
+		addToggle("Border", "", getOps<bool>("border"));
+		addConditionalSlider(getOps<bool>("border"), "Border Thickness", "", getOps<float>("borderWidth"), 4.f);
 
-		addToggle("Glow (Disabled State)", "", settings.getSettingByName<bool>("glow")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("glow")->value, "Glow Amount (Disabled State)", "", settings.getSettingByName<float>("glowAmount")->value, 100.f);
+		addToggle("Glow (Disabled State)", "", getOps<bool>("glow"));
+		addConditionalSlider(getOps<bool>("glow"), "Glow Amount (Disabled State)", "", getOps<float>("glowAmount"), 100.f);
 
-		addToggle("Glow (Enabled State)", "", settings.getSettingByName<bool>("glowEnabled")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("glowEnabled")->value, "Glow Amount (Enabled State)", "", settings.getSettingByName<float>("glowEnabledAmount")->value, 100.f);
-		addConditionalSlider(settings.getSettingByName<bool>("glowEnabled")->value, "Glow Speed", "", settings.getSettingByName<float>("glowSpeed")->value, 10.f);
+		addToggle("Glow (Enabled State)", "", getOps<bool>("glowEnabled"));
+		addConditionalSlider(getOps<bool>("glowEnabled"), "Glow Amount (Enabled State)", "", getOps<float>("glowEnabledAmount"), 100.f);
+		addConditionalSlider(getOps<bool>("glowEnabled"), "Glow Speed", "", getOps<float>("glowSpeed"), 10.f);
 
-		addSlider("Key Spacing", "", settings.getSettingByName<float>("keySpacing")->value, 10.00);
-		addSlider("Spacebar Width", "", settings.getSettingByName<float>("spacebarWidth")->value, 1.00, 0, false);
-		addSlider("Spacebar Height", "", settings.getSettingByName<float>("spacebarHeight")->value, 1.00, 0, false);
-		addSlider("Highlight Speed", "", settings.getSettingByName<float>("edSpeed")->value, 10.f);
+		addSlider("Key Spacing", "", getOps<float>("keySpacing"), 10.00);
+		addSlider("Spacebar Width", "", getOps<float>("spacebarWidth"), 1.00, 0, false);
+		addSlider("Spacebar Height", "", getOps<float>("spacebarHeight"), 1.00, 0, false);
+		addSlider("Highlight Speed", "", getOps<float>("edSpeed"), 10.f);
 		extraPadding();
 
 		addHeader("Text");
-		addToggle("Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("textShadow")->value, "Shadow Offset", "How far the shadow will be.", settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
+		addToggle("Text Shadow", "Displays a shadow under the text", getOps<bool>("textShadow"));
+		addConditionalSlider(getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", getOps<float>("textShadowOffset"), 0.02f, 0.001f);
 		extraPadding();
 
 		addHeader("Mouse Buttons");
-		addToggle("Show Mouse Buttons", "LMB & RMB", settings.getSettingByName<bool>("cps")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("cps")->value, "CPS Text Scale", "", settings.getSettingByName<float>("textscale2")->value, 2.00);
-		addToggle("Show LMB & RMB", "", settings.getSettingByName<bool>("lmbrmb")->value);
-		addToggle("Hide CPS Counter", "", settings.getSettingByName<bool>("hidecps")->value);
-		addTextBox("LMB Text", "", settings.getSettingByName<std::string>("mainlmbtext")->value);
-		addTextBox("RMB Text", "", settings.getSettingByName<std::string>("mainrmbtext")->value);
-		addTextBox("LMB CPS Text", "", settings.getSettingByName<std::string>("lmbtext")->value);
-		addTextBox("RMB CPS Text", "", settings.getSettingByName<std::string>("rmbtext")->value);
+		addToggle("Show Mouse Buttons", "LMB & RMB", getOps<bool>("cps"));
+		addConditionalSlider(getOps<bool>("cps"), "CPS Text Scale", "", getOps<float>("textscale2"), 2.00);
+		addToggle("Show LMB & RMB", "", getOps<bool>("lmbrmb"));
+		addToggle("Hide CPS Counter", "", getOps<bool>("hidecps"));
+		addTextBox("LMB Text", "", getOps<std::string>("mainlmbtext"));
+		addTextBox("RMB Text", "", getOps<std::string>("mainrmbtext"));
+		addTextBox("LMB CPS Text", "", getOps<std::string>("lmbtext"));
+		addTextBox("RMB CPS Text", "", getOps<std::string>("rmbtext"));
 		extraPadding();
 
 		addHeader("WASD");
-		addSlider("WASD Text Scale", "", settings.getSettingByName<float>("textscale")->value, 2.00);
-		addTextBox("W Key", "", settings.getSettingByName<std::string>("wText")->value);
-		addTextBox("A Key", "", settings.getSettingByName<std::string>("aText")->value);
-		addTextBox("S Key", "", settings.getSettingByName<std::string>("sText")->value);
-		addTextBox("D Key", "", settings.getSettingByName<std::string>("dText")->value);
+		addSlider("WASD Text Scale", "", getOps<float>("textscale"), 2.00);
+		addTextBox("W Key", "", getOps<std::string>("wText"));
+		addTextBox("A Key", "", getOps<std::string>("aText"));
+		addTextBox("S Key", "", getOps<std::string>("sText"));
+		addTextBox("D Key", "", getOps<std::string>("dText"));
 		extraPadding();
 
 		addHeader("Colors");
-		addColorPicker("Background Disabled", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
-		addColorPicker("Background Enabled", "", settings.getSettingByName<std::string>("enabledColor")->value, settings.getSettingByName<float>("enabledOpacity")->value, settings.getSettingByName<bool>("enabledRGB")->value);
-		addColorPicker("Text Disabled", "", settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
-		addColorPicker("Text Enabled", "", settings.getSettingByName<std::string>("textEnabledColor")->value, settings.getSettingByName<float>("textEnabledOpacity")->value, settings.getSettingByName<bool>("textEnabledRGB")->value);
-		addConditionalColorPicker(settings.getSettingByName<bool>("textShadow")->value, "Text Shadow Color (Disabled State)", "", settings.getSettingByName<std::string>("DtextShadowCol")->value, settings.getSettingByName<float>("DtextShadowOpacity")->value, settings.getSettingByName<bool>("DtextShadowRGB")->value);
-		addConditionalColorPicker(settings.getSettingByName<bool>("textShadow")->value, "Text Shadow Color (Enabled State)", "", settings.getSettingByName<std::string>("EtextShadowCol")->value, settings.getSettingByName<float>("EtextShadowOpacity")->value, settings.getSettingByName<bool>("EtextShadowRGB")->value);
-		addColorPicker("Border Color", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
-		addColorPicker("Glow Color (Disabled State)", "", settings.getSettingByName<std::string>("glowColor")->value, settings.getSettingByName<float>("glowOpacity")->value, settings.getSettingByName<bool>("glowRGB")->value);
-		addColorPicker("Glow Color (Enabled State)", "", settings.getSettingByName<std::string>("glowEnabledColor")->value, settings.getSettingByName<float>("glowEnabledOpacity")->value, settings.getSettingByName<bool>("glowEnabledRGB")->value);
+		addColorPicker("Background Disabled", "", "bg");
+		addColorPicker("Background Enabled", "", "enabled");
+		addColorPicker("Text Disabled", "", "text");
+		addColorPicker("Text Enabled", "", "textEnabled");
+		addConditionalColorPicker(getOps<bool>("textShadow"), "Text Shadow Color (Disabled State)", "", "DtextShadow");
+		addConditionalColorPicker(getOps<bool>("textShadow"), "Text Shadow Color (Enabled State)", "", "EtextShadow");
+		addColorPicker("Border Color", "", "border");
+		addColorPicker("Glow Color (Disabled State)", "", "glow");
+		addColorPicker("Glow Color (Enabled State)", "", "glowEnabled");
 
 		FlarialGUI::UnsetScrollView();
 		resetPadding();
@@ -200,23 +179,19 @@ public:
 	void normalRender(int index, std::string& value) override {
 		if (SDK::hasInstanced) {
 			if (SDK::clientInstance->getLocalPlayer() != nullptr) {
-				bool enableGlow = settings.getSettingByName<bool>("glowEnabled")->value;
-				bool enableTextShadow = settings.getSettingByName<bool>("textShadow")->value;
-				bool bgGlow = settings.getSettingByName<bool>("glow")->value;
+				bool enableGlow = getOps<bool>("glowEnabled");
+				bool enableTextShadow = getOps<bool>("textShadow");
+				bool bgGlow = getOps<bool>("glow");
+				bool showCPS = getOps<bool>("cps");
 
-				float textShadowOffset = Constraints::RelativeConstraint(settings.getSettingByName<float>("textShadowOffset")->value) * settings.getSettingByName<float>("uiscale")->value;
+				float textShadowOffset = Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale");
 
-				D2D1_COLOR_F borderColor = settings.getSettingByName<bool>("borderRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("borderColor")->value);
-				borderColor.a = settings.getSettingByName<float>("borderOpacity")->value;
-
-				D2D1_COLOR_F glowEnabledColor = settings.getSettingByName<bool>("glowEnabledRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("glowEnabledColor")->value);
-				glowEnabledColor.a = settings.getSettingByName<float>("glowEnabledOpacity")->value;
-
-				D2D1_COLOR_F glowColor = settings.getSettingByName<bool>("glowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("glowColor")->value);
-				glowColor.a = settings.getSettingByName<float>("glowOpacity")->value;
+				D2D1_COLOR_F borderColor = getColor("border");
+				D2D1_COLOR_F glowEnabledColor = getColor("glowEnabled");
+				D2D1_COLOR_F glowColor = getColor("glow");
 
 				// lmb
-				std::string lmbText = settings.getSettingByName<std::string>("lmbtext")->value;
+				std::string lmbText = getOps<std::string>("lmbtext");
 				std::string uppercaseSentence;
 				std::string search = "{VALUE}";
 
@@ -228,7 +203,7 @@ public:
 				}
 
 				// rmb
-				std::string rmbText = settings.getSettingByName<std::string>("rmbtext")->value;
+				std::string rmbText = getOps<std::string>("rmbtext");
 				uppercaseSentence = "";
 				for (char c : rmbText) uppercaseSentence += (char)std::toupper(c);
 
@@ -237,49 +212,41 @@ public:
 					rmbText.replace(pos, search.length(), FlarialGUI::cached_to_string(CPSCounter::GetRightCPS()));
 				}
 
-				float keycardSize = Constraints::RelativeConstraint(
-					0.08f * this->settings.getSettingByName<float>("uiscale")->value, "height", true);
-				float spacing =
-					this->settings.getSettingByName<float>("keySpacing")->value * Constraints::RelativeConstraint(
-						0.0015f * this->settings.getSettingByName<float>("uiscale")->value, "height", true);
-				float textSize = this->settings.getSettingByName<float>("textscale")->value;
-				float textSize2 = this->settings.getSettingByName<float>("textscale2")->value;
+				float keycardSize = Constraints::RelativeConstraint(0.08f * getOps<float>("uiscale"), "height", true);
+				float spacing = getOps<float>("keySpacing") * Constraints::RelativeConstraint(0.0015f * getOps<float>("uiscale"), "height", true);
+				float textSize = getOps<float>("textscale");
+				float textSize2 = getOps<float>("textscale2");
 
-				Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
-					this->settings.getSettingByName<float>("percentageY")->value);
-
+				Vec2<float> settingperc = Vec2<float>(getOps<float>("percentageX"), getOps<float>("percentageY"));
 
 				float totalWidth = keycardSize * 3 + spacing * 2;
 				float totalHeight = keycardSize * 2.0f + keycardSize / 2.0f + spacing * 2;
-				if (settings.getSettingByName<bool>("cps")->value) totalHeight += (keycardSize + spacing);
+				if (getOps<bool>("cps")) totalHeight += (keycardSize + spacing);
 
 				Vec2<float> realcenter;
 
-				if (settingperc.x != 0)
-					realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x - totalWidth), settingperc.y * (MC::windowSize.y - totalHeight));
+				if (settingperc.x != 0) realcenter = Vec2<float>(settingperc.x * (MC::windowSize.x), settingperc.y * (MC::windowSize.y));
 				else realcenter = Constraints::CenterConstraint(keycardSize, keycardSize);
 
 				Vec2<float> rounde = Constraints::RoundingConstraint(
-					this->settings.getSettingByName<float>("rounding")->value *
-					settings.getSettingByName<float>("uiscale")->value,
-					this->settings.getSettingByName<float>("rounding")->value *
-					settings.getSettingByName<float>("uiscale")->value);
+					getOps<float>("rounding") *
+					getOps<float>("uiscale"),
+					getOps<float>("rounding") *
+					getOps<float>("uiscale"));
 
 
 				if (ClickGUI::editmenu) { // makes module movable
-					FlarialGUI::SetWindowRect(realcenter.x - (keycardSize + spacing), realcenter.y, totalWidth,
-						totalHeight, index, keycardSize + spacing);
-					checkForRightClickAndOpenSettings(realcenter.x - (keycardSize + spacing), realcenter.y, totalWidth, totalHeight);
+					FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, totalWidth, totalHeight, index);
+					checkForRightClickAndOpenSettings(realcenter.x, realcenter.y, totalWidth, totalHeight);
 
-					Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, totalWidth,
-						totalHeight);
+					Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, totalWidth, totalHeight);
 
 					realcenter.x = vec2.x;
 					realcenter.y = vec2.y;
 
 					realcenter = realcenter;
 
-					Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y, totalWidth, totalHeight);
+					Vec2<float> percentages = Constraints::CalculatePercentage(realcenter.x, realcenter.y, 0.f, 0.f);
 					this->settings.setValue("percentageX", percentages.x);
 					this->settings.setValue("percentageY", percentages.y);
 				}
@@ -289,279 +256,173 @@ public:
 
 				//todo only resave colors on settings render and once on setup
 
-				D2D1_COLOR_F enabledColor = settings.getSettingByName<bool>("enabledRGB")->value ? FlarialGUI::rgbColor
-					: FlarialGUI::HexToColorF(
-						settings.getSettingByName<std::string>("enabledColor")->value);
-				D2D1_COLOR_F disabledColor = settings.getSettingByName<bool>("bgRGB")->value ? FlarialGUI::rgbColor
-					: FlarialGUI::HexToColorF(
-						settings.getSettingByName<std::string>("bgColor")->value);
-				D2D1_COLOR_F textColor = settings.getSettingByName<bool>("textRGB")->value ? FlarialGUI::rgbColor
-					: FlarialGUI::HexToColorF(
-						settings.getSettingByName<std::string>("textColor")->value);
-				D2D1_COLOR_F EtextShadowColor = settings.getSettingByName<bool>("EtextShadowRGB")->value ? FlarialGUI::rgbColor
-					: FlarialGUI::HexToColorF(
-						settings.getSettingByName<std::string>("EtextShadowCol")->value);
-				D2D1_COLOR_F DtextShadowColor = settings.getSettingByName<bool>("DtextShadowRGB")->value ? FlarialGUI::rgbColor
-					: FlarialGUI::HexToColorF(
-						settings.getSettingByName<std::string>("DtextShadowCol")->value);
-				D2D1_COLOR_F textEnabledColor = settings.getSettingByName<bool>("textEnabledRGB")->value
-					? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(
-						settings.getSettingByName<std::string>("textEnabledColor")->value);
-
-				disabledColor.a = settings.getSettingByName<float>("bgOpacity")->value;
-				textColor.a = settings.getSettingByName<float>("textOpacity")->value;
-				EtextShadowColor.a = settings.getSettingByName<float>("EtextShadowOpacity")->value;
-				DtextShadowColor.a = settings.getSettingByName<float>("DtextShadowOpacity")->value;
-				enabledColor.a = settings.getSettingByName<float>("enabledOpacity")->value;
-				textEnabledColor.a = settings.getSettingByName<float>("textEnabledOpacity")->value;
+				D2D1_COLOR_F enabledColor = getColor("enabled");
+				D2D1_COLOR_F disabledColor = getColor("bg");
+				D2D1_COLOR_F textColor = getColor("text");
+				D2D1_COLOR_F EtextShadowColor = getColor("EtextShadow");
+				D2D1_COLOR_F DtextShadowColor = getColor("DtextShadow");
+				D2D1_COLOR_F textEnabledColor = getColor("textEnabled");
 
 				MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
-				if (handler->forward) {
-					states[Strokes::W] = FlarialGUI::LerpColor(states[Strokes::W], enabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					textStates[Strokes::W] = FlarialGUI::LerpColor(textStates[Strokes::W], textEnabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableTextShadow) shadowStates[Strokes::W] = FlarialGUI::LerpColor(shadowStates[Strokes::W], EtextShadowColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableGlow) FlarialGUI::lerp(glowAmountModifier[0], 1.f, FlarialGUI::frameFactor * settings.getSettingByName<float>("glowSpeed")->value);
-				}
-				else {
-					states[Strokes::W] = FlarialGUI::LerpColor(states[Strokes::W], disabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					textStates[Strokes::W] = FlarialGUI::LerpColor(textStates[Strokes::W], textColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableTextShadow) shadowStates[Strokes::W] = FlarialGUI::LerpColor(shadowStates[Strokes::W], DtextShadowColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableGlow) FlarialGUI::lerp(glowAmountModifier[0], 0.f, FlarialGUI::frameFactor * settings.getSettingByName<float>("glowSpeed")->value);
-				}
+				std::vector<bool> handlerRes = {
+					handler->forward,
+					handler->left,
+					handler->backward,
+					handler->right,
+					CPSCounter::GetLeftHeld(),
+					CPSCounter::GetRightHeld(),
+					handler->jumping
+				};
 
-				if (handler->backward) {
-					states[Strokes::S] = FlarialGUI::LerpColor(states[Strokes::S], enabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					textStates[Strokes::S] = FlarialGUI::LerpColor(textStates[Strokes::S], textEnabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableTextShadow) shadowStates[Strokes::S] = FlarialGUI::LerpColor(shadowStates[Strokes::S], EtextShadowColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableGlow) FlarialGUI::lerp(glowAmountModifier[1], 1.f, FlarialGUI::frameFactor * settings.getSettingByName<float>("glowSpeed")->value);
-				}
-				else {
-					states[Strokes::S] = FlarialGUI::LerpColor(states[Strokes::S], disabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					textStates[Strokes::S] = FlarialGUI::LerpColor(textStates[Strokes::S], textColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableTextShadow) shadowStates[Strokes::S] = FlarialGUI::LerpColor(shadowStates[Strokes::S], DtextShadowColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableGlow) FlarialGUI::lerp(glowAmountModifier[1], 0.f, FlarialGUI::frameFactor * settings.getSettingByName<float>("glowSpeed")->value);
-				}
-
-				if (handler->left) {
-					states[Strokes::A] = FlarialGUI::LerpColor(states[Strokes::A], enabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					textStates[Strokes::A] = FlarialGUI::LerpColor(textStates[Strokes::A], textEnabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableTextShadow) shadowStates[Strokes::A] = FlarialGUI::LerpColor(shadowStates[Strokes::A], EtextShadowColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableGlow) FlarialGUI::lerp(glowAmountModifier[2], 1.f, FlarialGUI::frameFactor * settings.getSettingByName<float>("glowSpeed")->value);
-				}
-				else {
-					states[Strokes::A] = FlarialGUI::LerpColor(states[Strokes::A], disabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					textStates[Strokes::A] = FlarialGUI::LerpColor(textStates[Strokes::A], textColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableTextShadow) shadowStates[Strokes::A] = FlarialGUI::LerpColor(shadowStates[Strokes::A], DtextShadowColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableGlow) FlarialGUI::lerp(glowAmountModifier[2], 0.f, FlarialGUI::frameFactor * settings.getSettingByName<float>("glowSpeed")->value);
-				}
-
-				if (handler->right) {
-					states[Strokes::D] = FlarialGUI::LerpColor(states[Strokes::D], enabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					textStates[Strokes::D] = FlarialGUI::LerpColor(textStates[Strokes::D], textEnabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableTextShadow) shadowStates[Strokes::D] = FlarialGUI::LerpColor(shadowStates[Strokes::D], EtextShadowColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableGlow) FlarialGUI::lerp(glowAmountModifier[3], 1.f, FlarialGUI::frameFactor * settings.getSettingByName<float>("glowSpeed")->value);
-				}
-				else {
-					states[Strokes::D] = FlarialGUI::LerpColor(states[Strokes::D], disabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					textStates[Strokes::D] = FlarialGUI::LerpColor(textStates[Strokes::D], textColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableTextShadow) shadowStates[Strokes::D] = FlarialGUI::LerpColor(shadowStates[Strokes::D], DtextShadowColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableGlow) FlarialGUI::lerp(glowAmountModifier[3], 0.f, FlarialGUI::frameFactor * settings.getSettingByName<float>("glowSpeed")->value);
-				}
-
-				if (handler->jumping) {
-					states[Strokes::SPACEBAR] = FlarialGUI::LerpColor(states[Strokes::SPACEBAR], enabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					textStates[Strokes::SPACEBAR] = FlarialGUI::LerpColor(textStates[Strokes::SPACEBAR], textEnabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableTextShadow) shadowStates[Strokes::SPACEBAR] = FlarialGUI::LerpColor(shadowStates[Strokes::SPACEBAR], EtextShadowColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableGlow) FlarialGUI::lerp(glowAmountModifier[4], 1.f, FlarialGUI::frameFactor * settings.getSettingByName<float>("glowSpeed")->value);
-				}
-				else {
-					states[Strokes::SPACEBAR] = FlarialGUI::LerpColor(states[Strokes::SPACEBAR], disabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					textStates[Strokes::SPACEBAR] = FlarialGUI::LerpColor(textStates[Strokes::SPACEBAR], textColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableTextShadow) shadowStates[Strokes::SPACEBAR] = FlarialGUI::LerpColor(shadowStates[Strokes::SPACEBAR], DtextShadowColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableGlow) FlarialGUI::lerp(glowAmountModifier[4], 0.f, FlarialGUI::frameFactor * settings.getSettingByName<float>("glowSpeed")->value);
-				}
-
-				if (CPSCounter::GetRightHeld()) {
-					states[Strokes::RMB] = FlarialGUI::LerpColor(states[Strokes::RMB], enabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					textStates[Strokes::RMB] = FlarialGUI::LerpColor(textStates[Strokes::RMB], textEnabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableTextShadow) shadowStates[Strokes::RMB] = FlarialGUI::LerpColor(shadowStates[Strokes::RMB], EtextShadowColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableGlow) FlarialGUI::lerp(glowAmountModifier[5], 1.f, FlarialGUI::frameFactor * settings.getSettingByName<float>("glowSpeed")->value);
-				}
-				else {
-					states[Strokes::RMB] = FlarialGUI::LerpColor(states[Strokes::RMB], disabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					textStates[Strokes::RMB] = FlarialGUI::LerpColor(textStates[Strokes::RMB], textColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableTextShadow) shadowStates[Strokes::RMB] = FlarialGUI::LerpColor(shadowStates[Strokes::RMB], DtextShadowColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableGlow) FlarialGUI::lerp(glowAmountModifier[5], 0.f, FlarialGUI::frameFactor * settings.getSettingByName<float>("glowSpeed")->value);
-				}
-
-				if (CPSCounter::GetLeftHeld()) {
-					states[Strokes::LMB] = FlarialGUI::LerpColor(states[Strokes::LMB], enabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					textStates[Strokes::LMB] = FlarialGUI::LerpColor(textStates[Strokes::LMB], textEnabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableTextShadow) shadowStates[Strokes::LMB] = FlarialGUI::LerpColor(shadowStates[Strokes::LMB], EtextShadowColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableGlow) FlarialGUI::lerp(glowAmountModifier[6], 1.f, FlarialGUI::frameFactor * settings.getSettingByName<float>("glowSpeed")->value);
-				}
-				else {
-					states[Strokes::LMB] = FlarialGUI::LerpColor(states[Strokes::LMB], disabledColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					textStates[Strokes::LMB] = FlarialGUI::LerpColor(textStates[Strokes::LMB], textColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableTextShadow) shadowStates[Strokes::LMB] = FlarialGUI::LerpColor(shadowStates[Strokes::LMB], DtextShadowColor, 0.15f * FlarialGUI::frameFactor * settings.getSettingByName<float>("edSpeed")->value);
-					if (enableGlow) FlarialGUI::lerp(glowAmountModifier[6], 0.f, FlarialGUI::frameFactor * settings.getSettingByName<float>("glowSpeed")->value);
+				for (size_t i = 0; i < handlerRes.size(); i++) {
+					if (handlerRes[i]) {
+						states[i] = FlarialGUI::LerpColor(states[i], enabledColor, 0.15f * FlarialGUI::frameFactor * getOps<float>("edSpeed"));
+						textStates[i] = FlarialGUI::LerpColor(textStates[i], textEnabledColor, 0.15f * FlarialGUI::frameFactor * getOps<float>("edSpeed"));
+						if (enableTextShadow) shadowStates[i] = FlarialGUI::LerpColor(shadowStates[i], EtextShadowColor, 0.15f * FlarialGUI::frameFactor * getOps<float>("edSpeed"));
+						if (enableGlow) FlarialGUI::lerp(glowAmountModifier[i], 1.f, FlarialGUI::frameFactor * getOps<float>("glowSpeed"));
+					}
+					else {
+						states[i] = FlarialGUI::LerpColor(states[i], disabledColor, 0.15f * FlarialGUI::frameFactor * getOps<float>("edSpeed"));
+						textStates[i] = FlarialGUI::LerpColor(textStates[i], textColor, 0.15f * FlarialGUI::frameFactor * getOps<float>("edSpeed"));
+						if (enableTextShadow) shadowStates[i] = FlarialGUI::LerpColor(shadowStates[i], DtextShadowColor, 0.15f * FlarialGUI::frameFactor * getOps<float>("edSpeed"));
+						if (enableGlow) FlarialGUI::lerp(glowAmountModifier[i], 0.f, FlarialGUI::frameFactor * getOps<float>("glowSpeed"));
+					}
 				}
 
 				Vec2<float> b_realcenter = realcenter;
 
-				// ======================== START GLOW ========================
+				std::vector<Vec2<float>> positions = {
+					Vec2<float>(realcenter.x + keycardSize + spacing, realcenter.y), // W
+					Vec2<float>(realcenter.x, realcenter.y + keycardSize + spacing), // A
+					Vec2<float>(realcenter.x + keycardSize + spacing, realcenter.y + keycardSize + spacing), // S
+					Vec2<float>(realcenter.x + (keycardSize + spacing) * 2.f, realcenter.y + keycardSize + spacing), // D
+					Vec2<float>(realcenter.x, realcenter.y + (keycardSize + spacing) * 2.f), // LMB
+					Vec2<float>(realcenter.x + (keycardSize + spacing) * 1.5f, realcenter.y + (keycardSize + spacing) * 2.f), // RMB
+					Vec2<float>(realcenter.x, showCPS ? (realcenter.y + (keycardSize + spacing) * 3.f - (keycardSize * 0.05f)) : (realcenter.y + (keycardSize + spacing) * 2.f)) // SPACEBAR
+				};
 
-				// W
+				std::vector<std::string> opString = {
+					getOps<std::string>("wText"),
+					getOps<std::string>("aText"),
+					getOps<std::string>("sText"),
+					getOps<std::string>("dText"),
+					getOps<std::string>("mainlmbtext"),
+					getOps<std::string>("mainrmbtext")
+				};
 
-				if (bgGlow)
-					FlarialGUI::ShadowRect(
-						Vec2<float>(realcenter.x, realcenter.y),
-						Vec2<float>(keycardSize, keycardSize),
+				for (size_t i = 0; i < positions.size(); i++) {
+					if (!showCPS && (i == 4 || i == 5)) continue;
+
+					Vec2<float> keycardDims = (i == 4 || i == 5) ? Vec2<float>(keycardSize + (keycardSize / 2.0f) + spacing / 2.0f, keycardSize - (keycardSize * 0.05f)) : (i == 6 ? Vec2<float>(3 * (keycardSize)+2 * spacing, 0.55f * (keycardSize)) : Vec2<float>(keycardSize, keycardSize));
+
+					// start glow
+
+					if (bgGlow) FlarialGUI::ShadowRect(
+						positions[i],
+						keycardDims,
 						glowColor, rounde.x,
-						(this->settings.getSettingByName<float>("glowAmount")->value / 100.f) * Constraints::PercentageConstraint(0.1f, "top"));
+						(getOps<float>("glowAmount") / 100.f) * Constraints::PercentageConstraint(0.1f, "top"));
 
-				if (enableGlow && glowAmountModifier[0] > 0.05f)
-					FlarialGUI::ShadowRect(
-						Vec2<float>(realcenter.x, realcenter.y),
-						Vec2<float>(keycardSize, keycardSize),
+					if (enableGlow && glowAmountModifier[i] > 0.05f) FlarialGUI::ShadowRect(
+						positions[i],
+						keycardDims,
 						glowEnabledColor, rounde.x,
-						(this->settings.getSettingByName<float>("glowEnabledAmount")->value / 100.f) * Constraints::PercentageConstraint(0.1f, "top") * glowAmountModifier[0]);
+						(getOps<float>("glowEnabledAmount") / 100.f) * Constraints::PercentageConstraint(0.1f, "top") * glowAmountModifier[i]);
 
-				realcenter.y += (keycardSize + spacing);
+					// end glow
 
-				// S
+					if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
+						if (getOps<bool>("BlurEffect"))
+							FlarialGUI::BlurRect(D2D1::RoundedRect(
+								D2D1::RectF(
+									positions[i].x, positions[i].y,
+									positions[i].x + keycardDims.x, positions[i].y + keycardDims.y),
+								rounde.x, rounde.x));
 
-				if (bgGlow)
-					FlarialGUI::ShadowRect(
-						Vec2<float>(realcenter.x, realcenter.y),
-						Vec2<float>(keycardSize, keycardSize),
-						glowColor, rounde.x,
-						(this->settings.getSettingByName<float>("glowAmount")->value / 100.f) * Constraints::PercentageConstraint(0.1f, "top"));
+					if (getOps<bool>("border")) FlarialGUI::RoundedHollowRect(
+						positions[i].x,
+						positions[i].y,
+						Constraints::RelativeConstraint((getOps<float>("borderWidth") * getOps<float>("uiscale")) / 100.0f, "height", true),
+						borderColor,
+						keycardDims.x,
+						keycardDims.y,
+						rounde.x,
+						rounde.x
+					);
 
-				if (enableGlow && glowAmountModifier[1] > 0.05f)
-					FlarialGUI::ShadowRect(
-						Vec2<float>(realcenter.x, realcenter.y),
-						Vec2<float>(keycardSize, keycardSize),
-						glowEnabledColor, rounde.x,
-						(this->settings.getSettingByName<float>("glowEnabledAmount")->value / 100.f) * Constraints::PercentageConstraint(0.1f, "top") * glowAmountModifier[1]);
+					FlarialGUI::RoundedRect(positions[i].x, positions[i].y, states[i], keycardDims.x, keycardDims.y,
+						rounde.x,
+						rounde.x);
 
-				realcenter.x -= (keycardSize + spacing);
+					if (i == 6) {
+						float spacebarWidth = 3 * (keycardSize)+2 * spacing;
+						float spacebarHeight = 0.55f * (keycardSize);
 
-				// A
+						FlarialGUI::RoundedRect(positions[i].x, positions[i].y, states[i], spacebarWidth,
+							spacebarHeight, rounde.x, rounde.x);
+						float childHeight = Constraints::SpacingConstraint(getOps<float>("spacebarHeight"), spacebarHeight);
+						float childWidth = Constraints::SpacingConstraint(getOps<float>("spacebarWidth"), spacebarWidth);
 
-				if (bgGlow)
-					FlarialGUI::ShadowRect(
-						Vec2<float>(realcenter.x, realcenter.y),
-						Vec2<float>(keycardSize, keycardSize),
-						glowColor, rounde.x,
-						(this->settings.getSettingByName<float>("glowAmount")->value / 100.f) * Constraints::PercentageConstraint(0.1f, "top"));
+						std::pair<float, float> centeredChild = centerChildRectangle(spacebarWidth, spacebarHeight, childWidth, childHeight);
 
-				if (enableGlow && glowAmountModifier[2] > 0.05f)
-					FlarialGUI::ShadowRect(
-						Vec2<float>(realcenter.x, realcenter.y),
-						Vec2<float>(keycardSize, keycardSize),
-						glowEnabledColor, rounde.x,
-						(this->settings.getSettingByName<float>("glowEnabledAmount")->value / 100.f) * Constraints::PercentageConstraint(0.1f, "top") * glowAmountModifier[2]);
+						if (enableTextShadow) FlarialGUI::RoundedRect(
+							positions[i].x + centeredChild.first + textShadowOffset,
+							positions[i].y + centeredChild.second + textShadowOffset,
+							shadowStates[i], childWidth, childHeight, 0, 0);
 
-				realcenter.x += 2 * (keycardSize + spacing);
+						FlarialGUI::RoundedRect(positions[i].x + centeredChild.first, positions[i].y + centeredChild.second,
+							textStates[i], childWidth, childHeight, 0, 0);
+					}
+					else if (((i == 4 || i == 5) && getOps<bool>("lmbrmb")) || (i != 4 && i != 5)) {
+						if (enableTextShadow) FlarialGUI::FlarialTextWithFont(
+							positions[i].x + textShadowOffset,
+							positions[i].y + textShadowOffset,
+							FlarialGUI::to_wide(opString[i]).c_str(), keycardDims.x, keycardDims.y,
+							DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL,
+							shadowStates[i], true);
 
+						FlarialGUI::FlarialTextWithFont(positions[i].x, positions[i].y,
+							FlarialGUI::to_wide(opString[i]).c_str(), keycardDims.x, keycardDims.y,
+							DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL,
+							textStates[i], true);
 
-				// D
+						if (showCPS && (i == 4 || i == 5)) {
+							if (enableTextShadow) FlarialGUI::FlarialTextWithFont(
+								positions[i].x + textShadowOffset,
+								positions[i].y + Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)) + textShadowOffset,
+								FlarialGUI::to_wide(lmbText).c_str(), keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
+								Constraints::SpacingConstraint(0.35, keycardSize - (keycardSize * 0.05f)),
+								DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2,
+								DWRITE_FONT_WEIGHT_NORMAL, shadowStates[i], true);
 
-				if (bgGlow)
-					FlarialGUI::ShadowRect(
-						Vec2<float>(realcenter.x, realcenter.y),
-						Vec2<float>(keycardSize, keycardSize),
-						glowColor, rounde.x,
-						(this->settings.getSettingByName<float>("glowAmount")->value / 100.f) * Constraints::PercentageConstraint(0.1f, "top"));
-
-				if (enableGlow && glowAmountModifier[3] > 0.05f)
-					FlarialGUI::ShadowRect(
-						Vec2<float>(realcenter.x, realcenter.y),
-						Vec2<float>(keycardSize, keycardSize),
-						glowEnabledColor, rounde.x,
-						(this->settings.getSettingByName<float>("glowEnabledAmount")->value / 100.f) * Constraints::PercentageConstraint(0.1f, "top") * glowAmountModifier[3]);
-
-				realcenter.x -= 2 * (keycardSize + spacing);
-
-				if (!settings.getSettingByName<bool>("cps")->value) realcenter.y += (keycardSize + spacing);
-				else {
-					// LMB
-					realcenter.y += (keycardSize + spacing);
-
-					if (bgGlow)
-						FlarialGUI::ShadowRect(
-							Vec2<float>(realcenter.x, realcenter.y),
-							Vec2<float>(keycardSize + (keycardSize / 2.0f) + spacing / 2.0f, keycardSize - (keycardSize * 0.05f)),
-							glowColor, rounde.x,
-							(this->settings.getSettingByName<float>("glowAmount")->value / 100.f) * Constraints::PercentageConstraint(0.1f, "top"));
-
-					if (enableGlow && glowAmountModifier[6] > 0.05f)
-						FlarialGUI::ShadowRect(
-							Vec2<float>(realcenter.x, realcenter.y),
-							Vec2<float>(keycardSize + (keycardSize / 2.0f) + spacing / 2.0f, keycardSize - (keycardSize * 0.05f)),
-							glowEnabledColor, rounde.x,
-							(this->settings.getSettingByName<float>("glowEnabledAmount")->value / 100.f) * Constraints::PercentageConstraint(0.1f, "top") * glowAmountModifier[6]);
-
-					realcenter.x += 1.5f * (keycardSize + spacing);
-
-
-					// RMB
-
-					if (bgGlow)
-						FlarialGUI::ShadowRect(
-							Vec2<float>(realcenter.x, realcenter.y),
-							Vec2<float>(keycardSize + (keycardSize / 2.0f) + spacing / 2.0f, keycardSize - (keycardSize * 0.05f)),
-							glowColor, rounde.x,
-							(this->settings.getSettingByName<float>("glowAmount")->value / 100.f) * Constraints::PercentageConstraint(0.1f, "top"));
-
-					if (enableGlow && glowAmountModifier[5] > 0.05f)
-						FlarialGUI::ShadowRect(
-							Vec2<float>(realcenter.x, realcenter.y),
-							Vec2<float>(keycardSize + (keycardSize / 2.0f) + spacing / 2.0f, keycardSize - (keycardSize * 0.05f)),
-							glowEnabledColor, rounde.x,
-							(this->settings.getSettingByName<float>("glowEnabledAmount")->value / 100.f) * Constraints::PercentageConstraint(0.1f, "top") * glowAmountModifier[5]);
-
-
-					realcenter.y += keycardSize - keycardSize * 0.05f + spacing;
-					realcenter.x -= 1.5f * (keycardSize + spacing);
+							FlarialGUI::FlarialTextWithFont(positions[i].x, positions[i].y +
+								Constraints::SpacingConstraint(0.55, keycardSize - (keycardSize * 0.05f)),
+								FlarialGUI::to_wide(lmbText).c_str(), keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
+								Constraints::SpacingConstraint(0.35, keycardSize - (keycardSize * 0.05f)),
+								DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2,
+								DWRITE_FONT_WEIGHT_NORMAL, textStates[i], true);
+						}
+					}
 				}
+				/*
 
-				// SPACEBAR
 
-				if (bgGlow)
-					FlarialGUI::ShadowRect(
-						Vec2<float>(realcenter.x, realcenter.y),
-						Vec2<float>(3 * (keycardSize)+2 * spacing, 0.55f * (keycardSize)),
-						glowColor, rounde.x,
-						(this->settings.getSettingByName<float>("glowAmount")->value / 100.f) * Constraints::PercentageConstraint(0.1f, "top"));
-
-				if (enableGlow && glowAmountModifier[4] > 0.05f)
-					FlarialGUI::ShadowRect(
-						Vec2<float>(realcenter.x, realcenter.y),
-						Vec2<float>(3 * (keycardSize)+2 * spacing, 0.55f * (keycardSize)),
-						glowEnabledColor, rounde.x,
-						(this->settings.getSettingByName<float>("glowEnabledAmount")->value / 100.f) * Constraints::PercentageConstraint(0.1f, "top") * glowAmountModifier[4]);
-
-				realcenter = b_realcenter;
-
-				// ======================== END GLOW ========================
 
 				// W
 
 				if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
-					if (settings.getSettingByName<bool>("BlurEffect")->value)
+					if (getOps<bool>("BlurEffect"))
 						FlarialGUI::BlurRect(D2D1::RoundedRect(
 							D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize,
 								realcenter.y + keycardSize), rounde.x, rounde.x));
 
-				if (this->settings.getSettingByName<bool>("border")->value) {
+				if (getOps<bool>("border")) {
 					FlarialGUI::RoundedHollowRect(
 						realcenter.x,
 						realcenter.y,
-						Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value *
-							settings.getSettingByName<float>("uiscale")->value) / 100.0f,
+						Constraints::RelativeConstraint((getOps<float>("borderWidth") *
+							getOps<float>("uiscale")) / 100.0f,
 							"height", true),
 						borderColor,
 						keycardSize,
@@ -579,12 +440,12 @@ public:
 					realcenter.x + textShadowOffset,
 					realcenter.y + textShadowOffset,
 					FlarialGUI::to_wide(
-						settings.getSettingByName<std::string>("wText")->value).c_str(), keycardSize, keycardSize,
+						getOps<std::string>("wText")).c_str(), keycardSize, keycardSize,
 					DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL,
 					shadowStates[Strokes::W], true);
 
 				FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
-					settings.getSettingByName<std::string>("wText")->value).c_str(), keycardSize, keycardSize,
+					getOps<std::string>("wText")).c_str(), keycardSize, keycardSize,
 					DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL,
 					textStates[Strokes::W], true);
 
@@ -593,15 +454,15 @@ public:
 				// S
 
 				if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
-					if (settings.getSettingByName<bool>("BlurEffect")->value)
+					if (getOps<bool>("BlurEffect"))
 						FlarialGUI::BlurRect(D2D1::RoundedRect(
 							D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize,
 								realcenter.y + keycardSize), rounde.x, rounde.x));
 
-				if (this->settings.getSettingByName<bool>("border")->value) FlarialGUI::RoundedHollowRect(
+				if (getOps<bool>("border")) FlarialGUI::RoundedHollowRect(
 					realcenter.x,
 					realcenter.y,
-					Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
+					Constraints::RelativeConstraint((getOps<float>("borderWidth") * getOps<float>("uiscale")) / 100.0f, "height", true),
 					borderColor,
 					keycardSize,
 					keycardSize,
@@ -616,12 +477,12 @@ public:
 				if (enableTextShadow) FlarialGUI::FlarialTextWithFont(
 					realcenter.x + textShadowOffset,
 					realcenter.y + textShadowOffset,
-					FlarialGUI::to_wide(settings.getSettingByName<std::string>("sText")->value).c_str(), keycardSize, keycardSize,
+					FlarialGUI::to_wide(getOps<std::string>("sText")).c_str(), keycardSize, keycardSize,
 					DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL,
 					shadowStates[Strokes::S], true);
 
 				FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
-					settings.getSettingByName<std::string>("sText")->value).c_str(), keycardSize, keycardSize,
+					getOps<std::string>("sText")).c_str(), keycardSize, keycardSize,
 					DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL,
 					textStates[Strokes::S], true);
 
@@ -629,15 +490,15 @@ public:
 				// A
 
 				if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
-					if (settings.getSettingByName<bool>("BlurEffect")->value)
+					if (getOps<bool>("BlurEffect"))
 						FlarialGUI::BlurRect(D2D1::RoundedRect(
 							D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize,
 								realcenter.y + keycardSize), rounde.x, rounde.x));
 
-				if (this->settings.getSettingByName<bool>("border")->value) FlarialGUI::RoundedHollowRect(
+				if (getOps<bool>("border")) FlarialGUI::RoundedHollowRect(
 					realcenter.x,
 					realcenter.y,
-					Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
+					Constraints::RelativeConstraint((getOps<float>("borderWidth") * getOps<float>("uiscale")) / 100.0f, "height", true),
 					borderColor,
 					keycardSize,
 					keycardSize,
@@ -653,12 +514,12 @@ public:
 					realcenter.x + textShadowOffset,
 					realcenter.y + textShadowOffset,
 					FlarialGUI::to_wide(
-						settings.getSettingByName<std::string>("aText")->value).c_str(), keycardSize, keycardSize,
+						getOps<std::string>("aText")).c_str(), keycardSize, keycardSize,
 					DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL,
 					shadowStates[Strokes::A], true);
 
 				FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
-					settings.getSettingByName<std::string>("aText")->value).c_str(), keycardSize, keycardSize,
+					getOps<std::string>("aText")).c_str(), keycardSize, keycardSize,
 					DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL,
 					textStates[Strokes::A], true);
 
@@ -666,15 +527,15 @@ public:
 				// D
 
 				if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
-					if (settings.getSettingByName<bool>("BlurEffect")->value)
+					if (getOps<bool>("BlurEffect"))
 						FlarialGUI::BlurRect(D2D1::RoundedRect(
 							D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + keycardSize,
 								realcenter.y + keycardSize), rounde.x, rounde.x));
 
-				if (this->settings.getSettingByName<bool>("border")->value) FlarialGUI::RoundedHollowRect(
+				if (getOps<bool>("border")) FlarialGUI::RoundedHollowRect(
 					realcenter.x,
 					realcenter.y,
-					Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
+					Constraints::RelativeConstraint((getOps<float>("borderWidth") * getOps<float>("uiscale")) / 100.0f, "height", true),
 					borderColor,
 					keycardSize,
 					keycardSize,
@@ -691,12 +552,12 @@ public:
 					realcenter.x + textShadowOffset,
 					realcenter.y + textShadowOffset,
 					FlarialGUI::to_wide(
-						settings.getSettingByName<std::string>("dText")->value).c_str(), keycardSize, keycardSize,
+						getOps<std::string>("dText")).c_str(), keycardSize, keycardSize,
 					DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL,
 					shadowStates[Strokes::D], true);
 
 				FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y, FlarialGUI::to_wide(
-					settings.getSettingByName<std::string>("dText")->value).c_str(), keycardSize, keycardSize,
+					getOps<std::string>("dText")).c_str(), keycardSize, keycardSize,
 					DWRITE_TEXT_ALIGNMENT_CENTER, fontSize, DWRITE_FONT_WEIGHT_NORMAL,
 					textStates[Strokes::D], true);
 
@@ -705,16 +566,16 @@ public:
 				float spacebarHeight = 0.55f * (keycardSize);
 				realcenter.x -= 2 * (keycardSize + spacing);
 
-				bool hideCPS = settings.getSettingByName<bool>("hidecps")->value;
+				bool hideCPS = getOps<bool>("hidecps");
 
 				float originalY = 0.f;
-				if (!settings.getSettingByName<bool>("cps")->value) realcenter.y += (keycardSize + spacing);
+				if (!getOps<bool>("cps")) realcenter.y += (keycardSize + spacing);
 				else {
 					originalY = realcenter.y;
 					realcenter.y += (keycardSize + spacing);
 					// LMB
 					if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
-						if (settings.getSettingByName<bool>("BlurEffect")->value)
+						if (getOps<bool>("BlurEffect"))
 							FlarialGUI::BlurRect(
 								D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y,
 									realcenter.x + keycardSize + (keycardSize / 2.0f) +
@@ -722,11 +583,11 @@ public:
 									realcenter.y + keycardSize - (keycardSize * 0.05f)),
 									rounde.x, rounde.x));
 
-					if (this->settings.getSettingByName<bool>("border")->value) {
+					if (getOps<bool>("border")) {
 						FlarialGUI::RoundedHollowRect(
 							realcenter.x,
 							realcenter.y,
-							Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
+							Constraints::RelativeConstraint((getOps<float>("borderWidth") * getOps<float>("uiscale")) / 100.0f, "height", true),
 							borderColor,
 							keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
 							keycardSize - (keycardSize * 0.05f),
@@ -740,18 +601,18 @@ public:
 						keycardSize - (keycardSize * 0.05f),
 						rounde.x,
 						rounde.x);
-					if (settings.getSettingByName<bool>("lmbrmb")->value) {
+					if (getOps<bool>("lmbrmb")) {
 						if (enableTextShadow) FlarialGUI::FlarialTextWithFont(
 							realcenter.x + textShadowOffset,
 							realcenter.y + textShadowOffset,
-							FlarialGUI::to_wide(settings.getSettingByName<std::string>("mainlmbtext")->value).c_str(),
+							FlarialGUI::to_wide(getOps<std::string>("mainlmbtext")).c_str(),
 							keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
 							Constraints::SpacingConstraint(hideCPS ? 1.0f : 0.65f, keycardSize - (keycardSize * 0.05f)),
 							DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 + Constraints::SpacingConstraint(0.48, keycardSize),
 							DWRITE_FONT_WEIGHT_NORMAL, shadowStates[Strokes::LMB], true);
 
 						FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y,
-							FlarialGUI::to_wide(settings.getSettingByName<std::string>("mainlmbtext")->value).c_str(),
+							FlarialGUI::to_wide(getOps<std::string>("mainlmbtext")).c_str(),
 							keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
 							Constraints::SpacingConstraint(hideCPS ? 1.0f : 0.65f, keycardSize - (keycardSize * 0.05f)),
 							DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 + Constraints::SpacingConstraint(0.48, keycardSize),
@@ -788,7 +649,7 @@ public:
 					// RMB
 
 					if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
-						if (settings.getSettingByName<bool>("BlurEffect")->value)
+						if (getOps<bool>("BlurEffect"))
 							FlarialGUI::BlurRect(
 								D2D1::RoundedRect(D2D1::RectF(realcenter.x, realcenter.y,
 									realcenter.x + keycardSize + (keycardSize / 2.0f) +
@@ -796,11 +657,11 @@ public:
 									realcenter.y + keycardSize - (keycardSize * 0.05f)),
 									rounde.x, rounde.x));
 
-					if (this->settings.getSettingByName<bool>("border")->value) {
+					if (getOps<bool>("border")) {
 						FlarialGUI::RoundedHollowRect(
 							realcenter.x,
 							realcenter.y,
-							Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
+							Constraints::RelativeConstraint((getOps<float>("borderWidth") * getOps<float>("uiscale")) / 100.0f, "height", true),
 							borderColor,
 							keycardSize + (keycardSize / 2.f) + spacing / 2.0f,
 							keycardSize - (keycardSize * 0.05f),
@@ -814,17 +675,17 @@ public:
 						keycardSize - (keycardSize * 0.05f),
 						rounde.x,
 						rounde.x);
-					if (settings.getSettingByName<bool>("lmbrmb")->value) {
+					if (getOps<bool>("lmbrmb")) {
 						if (enableTextShadow) FlarialGUI::FlarialTextWithFont(
 							realcenter.x + textShadowOffset,
 							realcenter.y + textShadowOffset,
-							FlarialGUI::to_wide(settings.getSettingByName<std::string>("mainrmbtext")->value).c_str(),
+							FlarialGUI::to_wide(getOps<std::string>("mainrmbtext")).c_str(),
 							keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
 							Constraints::SpacingConstraint(hideCPS ? 1.0f : 0.65f, keycardSize - (keycardSize * 0.05f)),
 							DWRITE_TEXT_ALIGNMENT_CENTER, fontSize2 + Constraints::SpacingConstraint(0.48, keycardSize),
 							DWRITE_FONT_WEIGHT_NORMAL, shadowStates[Strokes::RMB], true);
 						FlarialGUI::FlarialTextWithFont(realcenter.x, realcenter.y,
-							FlarialGUI::to_wide(settings.getSettingByName<std::string>("mainrmbtext")->value).c_str(),
+							FlarialGUI::to_wide(getOps<std::string>("mainrmbtext")).c_str(),
 							keycardSize + (keycardSize / 2.0f) + spacing / 2.0f,
 							Constraints::SpacingConstraint(hideCPS ? 1.0f : 0.65f, keycardSize - (keycardSize * 0.05f)),
 							DWRITE_TEXT_ALIGNMENT_CENTER,
@@ -865,16 +726,16 @@ public:
 				}
 
 				if (settings.getSettingByName<bool>("BlurEffect") != nullptr)
-					if (settings.getSettingByName<bool>("BlurEffect")->value)
+					if (getOps<bool>("BlurEffect"))
 						FlarialGUI::BlurRect(D2D1::RoundedRect(
 							D2D1::RectF(realcenter.x, realcenter.y, realcenter.x + spacebarWidth,
 								realcenter.y + spacebarHeight), rounde.x, rounde.x));
 
-				if (this->settings.getSettingByName<bool>("border")->value) {
+				if (getOps<bool>("border")) {
 					FlarialGUI::RoundedHollowRect(
 						realcenter.x,
 						realcenter.y,
-						Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value * settings.getSettingByName<float>("uiscale")->value) / 100.0f, "height", true),
+						Constraints::RelativeConstraint((getOps<float>("borderWidth") * getOps<float>("uiscale")) / 100.0f, "height", true),
 						borderColor,
 						spacebarWidth,
 						spacebarHeight,
@@ -886,9 +747,9 @@ public:
 				FlarialGUI::RoundedRect(realcenter.x, realcenter.y, states[Strokes::SPACEBAR], spacebarWidth,
 					spacebarHeight, rounde.x, rounde.x);
 				float childHeight = Constraints::SpacingConstraint(
-					this->settings.getSettingByName<float>("spacebarHeight")->value, spacebarHeight);
+					getOps<float>("spacebarHeight"), spacebarHeight);
 				float childWidth = Constraints::SpacingConstraint(
-					this->settings.getSettingByName<float>("spacebarWidth")->value, spacebarWidth);
+					getOps<float>("spacebarWidth"), spacebarWidth);
 
 				std::pair<float, float> centeredChild = centerChildRectangle(spacebarWidth, spacebarHeight, childWidth, childHeight);
 
@@ -898,6 +759,7 @@ public:
 					shadowStates[Strokes::SPACEBAR], childWidth, childHeight, 0, 0);
 				FlarialGUI::RoundedRect(realcenter.x + centeredChild.first, realcenter.y + centeredChild.second,
 					textStates[Strokes::SPACEBAR], childWidth, childHeight, 0, 0);
+					*/
 
 				if (ClickGUI::editmenu)
 					FlarialGUI::UnsetWindowRect();

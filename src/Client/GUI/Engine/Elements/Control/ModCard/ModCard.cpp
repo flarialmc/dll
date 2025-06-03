@@ -4,58 +4,11 @@
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
-#define colors_text FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_text")->value)
-#define o_colors_text clickgui->settings.getSettingByName<float>("o_colors_text")->value
-#define colors_text_rgb clickgui->settings.getSettingByName<bool>("colors_text_rgb")->value
-
-#define colors_primary1 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary1")->value)
-#define o_colors_primary1 clickgui->settings.getSettingByName<float>("o_colors_primary1")->value
-#define colors_primary1_rgb clickgui->settings.getSettingByName<bool>("colors_primary1_rgb")->value
-
-#define colors_secondary4 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary4")->value)
-#define o_colors_secondary4 clickgui->settings.getSettingByName<float>("o_colors_secondary4")->value
-#define colors_secondary4_rgb clickgui->settings.getSettingByName<bool>("colors_secondary4_rgb")->value
-
-#define colors_enabled FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_enabled")->value)
-#define o_colors_enabled clickgui->settings.getSettingByName<float>("o_colors_enabled")->value
-#define colors_enabled_rgb clickgui->settings.getSettingByName<bool>("colors_enabled_rgb")->value
-
-#define colors_disabled FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_disabled")->value)
-#define o_colors_disabled clickgui->settings.getSettingByName<float>("o_colors_disabled")->value
-#define colors_disabled_rgb clickgui->settings.getSettingByName<bool>("colors_disabled_rgb")->value
-
-#define colors_mod1 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_mod1")->value)
-#define o_colors_mod1 clickgui->settings.getSettingByName<float>("o_colors_mod1")->value
-#define colors_mod1_rgb clickgui->settings.getSettingByName<bool>("colors_mod1_rgb")->value
-
-#define colors_mod2 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_mod2")->value)
-#define o_colors_mod2 clickgui->settings.getSettingByName<float>("o_colors_mod2")->value
-#define colors_mod2_rgb clickgui->settings.getSettingByName<bool>("colors_mod2_rgb")->value
-
-#define colors_mod3 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_mod3")->value)
-#define o_colors_mod3 clickgui->settings.getSettingByName<float>("o_colors_mod3")->value
-#define colors_mod3_rgb clickgui->settings.getSettingByName<bool>("colors_mod3_rgb")->value
-
-#define colors_mod4 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_mod4")->value)
-#define o_colors_mod4 clickgui->settings.getSettingByName<float>("o_colors_mod4")->value
-#define colors_mod4_rgb clickgui->settings.getSettingByName<bool>("colors_mod4_rgb")->value
-
-#define colors_modicon FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_modicon")->value)
-#define o_colors_modicon clickgui->settings.getSettingByName<float>("o_colors_modicon")->value
-#define colors_modicon_rgb clickgui->settings.getSettingByName<bool>("colors_modicon_rgb")->value
-
-#define colors_mod_settings_icon FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_mod_settings_icon")->value)
-#define o_colors_mod_settings_icon clickgui->settings.getSettingByName<float>("o_colors_mod_settings_icon")->value
-#define colors_mod_settings_icon_rgb clickgui->settings.getSettingByName<bool>("colors_mod_settings_icon_rgb")->value
-
 std::map<int, ID2D1Bitmap *> ClickGUIElements::images;
 std::vector<Vec2<float>> sizes;
 std::vector<Vec2<float>> shadowSizes;
 
-
 void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const int index, bool visible, float opacity) {
-
-
     if (opacity == -600.f) opacity = ClickGUI::modcardOpacity;
     Vec2<float> round = Constraints::RoundingConstraint(34, 34);
 
@@ -129,12 +82,8 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         );
     }
 
-    D2D1_COLOR_F mod1Col = colors_mod1_rgb ? FlarialGUI::rgbColor : colors_mod1;
-    mod1Col.a = o_colors_mod1;
-
-
-    D2D1_COLOR_F mod2Col = colors_mod2_rgb ? FlarialGUI::rgbColor : colors_mod2;
-    mod2Col.a = o_colors_mod2;
+    D2D1_COLOR_F mod1Col = clickgui->getColor("modcard1", "ClickGUI");
+    D2D1_COLOR_F mod2Col = clickgui->getColor("modcard2", "ClickGUI");
 
     FlarialGUI::RoundedRect(x, y, mod1Col, BottomRoundedWidth, BottomRoundedHeight, round.x, round.x);
     mod->checkForRightClickAndOpenSettings(x, realY, BottomRoundedWidth, BottomRoundedHeight);
@@ -152,7 +101,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     float textWidth = Constraints::RelativeConstraint(1.0);
     float textHeight = Constraints::RelativeConstraint(0.2);
     D2D1_COLOR_F textCol = FlarialGUI::HexToColorF("8b767a");
-    textCol.a = o_colors_text;
+    textCol.a = clickgui->getColor("globalText", "ClickGUI").a;
 
 
 
@@ -163,8 +112,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     // Mod icon
 
-    D2D1_COLOR_F mod3Col = colors_mod3_rgb ? FlarialGUI::rgbColor : colors_mod3;
-    mod3Col.a = o_colors_mod3;
+    D2D1_COLOR_F mod3Col = clickgui->getColor("modcard3", "ClickGUI");
 
     float modiconx = Constraints::PercentageConstraint(0.40, "left");
     float modicony = Constraints::PercentageConstraint(0.11, "top");
@@ -185,13 +133,8 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     std::string text;
     text = mod->isEnabled() ? "Enabled" : "Disabled";
-    D2D1_COLOR_F enabledColor = colors_enabled_rgb ? FlarialGUI::rgbColor : colors_enabled;
-    D2D1_COLOR_F disabledColor = colors_disabled_rgb ? FlarialGUI::rgbColor : colors_disabled;
-
-    enabledColor.a = o_colors_enabled;
-    disabledColor.a = o_colors_disabled;
-
-
+    D2D1_COLOR_F enabledColor = clickgui->getColor("modCardEnabled", "ClickGUI");
+    D2D1_COLOR_F disabledColor = clickgui->getColor("modCardDisabled", "ClickGUI");
 
     float buttonWidth = Constraints::RelativeConstraint(0.68, "width");
     float buttonHeight = Constraints::RelativeConstraint(0.259);
@@ -221,8 +164,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
                             mod3Col, paddingwidth + Constraints::RelativeConstraint(0.26),
                             buttonHeight, round.x, round.x);
 
-    D2D1_COLOR_F mod4Col = colors_mod4_rgb ? FlarialGUI::rgbColor : colors_mod4;
-    mod4Col.a = o_colors_mod4;
+    D2D1_COLOR_F mod4Col = clickgui->getColor("modcard4", "ClickGUI");
 
 
     if (!Client::settings.getSettingByName<bool>("noicons")->value) {
@@ -247,8 +189,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
                                                                     modicony + paddingSize));
     }
     */
-    D2D1_COLOR_F modicon = colors_modicon_rgb ? FlarialGUI::rgbColor : colors_modicon;
-    modicon.a = o_colors_modicon;
+    D2D1_COLOR_F modicon = clickgui->getColor("modicon", "ClickGUI");
 
     if (mod->settings.getSettingByName<bool>("favorite")->value || FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
         if (mod->settings.getSettingByName<bool>("favorite")->value && !FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
@@ -269,7 +210,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     round = Constraints::RoundingConstraint(22, 22);
 
-    D2D1_COLOR_F textCol2 = colors_text_rgb ? FlarialGUI::rgbColor : colors_text;
+    D2D1_COLOR_F textCol2 = clickgui->getColor("globalText", "ClickGUI");
 
 
     D2D1_COLOR_F buttonColor;
@@ -362,8 +303,7 @@ void ClickGUIElements::RotatingGear(int index, float x, float y, float width, fl
         float rotationAngle = FlarialGUI::rotationAngles[index];
         ImVec2 rotationCenter(x + imageWidth / 2.0f, imageY + imageHeight / 2.0f);
 
-        D2D1_COLOR_F settingicon = colors_mod_settings_icon_rgb ? FlarialGUI::rgbColor : colors_mod_settings_icon;
-        settingicon.a = o_colors_mod_settings_icon;
+        D2D1_COLOR_F settingicon = clickgui->getColor("modsettings", "ClickGUI");
 
         FlarialGUI::ImRotateStart();
         FlarialGUI::image(IDR_SETTINGS_WHITE_PNG, imagerectf, "PNG", false, FlarialGUI::D2DColorToImColor(settingicon));

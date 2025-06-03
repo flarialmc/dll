@@ -57,7 +57,7 @@ void SendDataToServer()
 
 
 	// Send data continuously
-	while (ModuleManager::getModule("Mumble Link")->settings.getSettingByName<bool>("enabled")->value) {
+	while (ModuleManager::getModule("Mumble Link")->getOps<bool>("enabled")) {
 		// Send floats
 		if (send(ConnectSocket, (char*)&Pos.x, sizeof(Pos.x), 0) == SOCKET_ERROR) {
 			std::cout << "Send failed. Error: " << WSAGetLastError() << std::endl;
@@ -135,7 +135,7 @@ public:
 					yaw = rot.x;
 					pitch = rot.y;
 					PlayerName = SDK::clientInstance->getLocalPlayer()->getPlayerName();
-					Context = this->settings.getSettingByName<std::string>("context")->value.empty() ? SDK::getServerIP() : this->settings.getSettingByName<std::string>("context")->value;
+					Context = getOps<std::string>("context").empty() ? SDK::getServerIP() : getOps<std::string>("context");
 				}
 				else {
 
@@ -156,7 +156,7 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (this->settings.getSettingByName<std::string>("context") == nullptr) settings.addSetting<std::string>("context", (std::string)"");
+		setDef("context", (std::string)"");
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -166,7 +166,7 @@ public:
 		const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
 		addHeader("Mumble Link");
-		addTextBox("Channel/Room", "Keep empty to use the Server IP.", settings.getSettingByName<std::string>("context")->value);
+		addTextBox("Channel/Room", "Keep empty to use the Server IP.", getOps<std::string>("context"));
 
 		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
 		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),

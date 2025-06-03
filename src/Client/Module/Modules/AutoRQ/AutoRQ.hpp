@@ -28,30 +28,30 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<std::string>("map") == nullptr) settings.addSetting("map", (std::string)"");
-		if (settings.getSettingByName<bool>("ReQ") == nullptr) settings.addSetting("ReQ", true);
-		if (settings.getSettingByName<bool>("solo") == nullptr) settings.addSetting("solo", false);
-		if (settings.getSettingByName<bool>("eliminated") == nullptr) settings.addSetting("eliminated", true);
-		if (settings.getSettingByName<bool>("hub") == nullptr) settings.addSetting("hub", false);
-		if (settings.getSettingByName<bool>("murderer") == nullptr) settings.addSetting("murderer", false);
-		if (settings.getSettingByName<bool>("sheriff") == nullptr) settings.addSetting("sheriff", false);
-		if (settings.getSettingByName<bool>("innocent") == nullptr) settings.addSetting("innocent", false);
-		if (settings.getSettingByName<bool>("hider") == nullptr) settings.addSetting("hider", false);
-		if (settings.getSettingByName<bool>("seeker") == nullptr) settings.addSetting("seeker", false);
-		if (settings.getSettingByName<bool>("death") == nullptr) settings.addSetting("death", false);
-		if (settings.getSettingByName<bool>("runner") == nullptr) settings.addSetting("runner", false);
-		if (settings.getSettingByName<bool>("AutoMapAvoider") == nullptr) settings.addSetting("AutoMapAvoider", false);
-		if (settings.getSettingByName<bool>("replace") == nullptr) settings.addSetting("replace", true);
-		if (settings.getSettingByName<bool>("copyCS") == nullptr) settings.addSetting("copyCS", false);
-		if (settings.getSettingByName<bool>("includecommand") == nullptr) settings.addSetting("includecommand", false);
-		if (settings.getSettingByName<bool>("promomessage") == nullptr) settings.addSetting("promomessage", false);
-		if (settings.getSettingByName<bool>("unlocks") == nullptr) settings.addSetting("unlocks", false);
-		if (settings.getSettingByName<bool>("joined") == nullptr) settings.addSetting("joined", false);
-		if (settings.getSettingByName<bool>("playermessage") == nullptr) settings.addSetting("playermessage", false);
-		if (settings.getSettingByName<bool>("playermessageplus") == nullptr) settings.addSetting("playermessageplus", false);
-		if (settings.getSettingByName<bool>("noteaming") == nullptr) settings.addSetting("noteaming", false);
-		if (settings.getSettingByName<bool>("friendaccept") == nullptr) settings.addSetting("friendaccept", false);
-		if (settings.getSettingByName<bool>("partyaccept") == nullptr) settings.addSetting("partyaccept", false);
+		setDef("map", (std::string)"");
+		setDef("ReQ", true);
+		setDef("solo", false);
+		setDef("eliminated", true);
+		setDef("hub", false);
+		setDef("murderer", false);
+		setDef("sheriff", false);
+		setDef("innocent", false);
+		setDef("hider", false);
+		setDef("seeker", false);
+		setDef("death", false);
+		setDef("runner", false);
+		setDef("AutoMapAvoider", false);
+		setDef("replace", true);
+		setDef("copyCS", false);
+		setDef("includecommand", false);
+		setDef("promomessage", false);
+		setDef("unlocks", false);
+		setDef("joined", false);
+		setDef("playermessage", false);
+		setDef("playermessageplus", false);
+		setDef("noteaming", false);
+		setDef("friendaccept", false);
+		setDef("partyaccept", false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -66,18 +66,18 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 		this->addHeader("General");
-		this->addToggle("Use /hub instead of /q", "", this->settings.getSettingByName<bool>("hub")->value);
-		// this->addDropdown("Command to use", "Command to execute when somthing gets triggered",  std::vector<std::string>{"Re-Q same game", "Q a Random game", "Go back to the hub"}, this->settings.getSettingByName<std::string>("commandtouse")->value);
+		this->addToggle("Use /hub instead of /q", "", getOps<bool>("hub"));
+		// this->addDropdown("Command to use", "Command to execute when somthing gets triggered",  std::vector<std::string>{"Re-Q same game", "Q a Random game", "Go back to the hub"}, getOps<std::string>("commandtouse"));
 
 		this->addHeader("Auto Re Q");
-		this->addToggle("Auto re-queue ", "Find a new game when the current game is over", this->settings.getSettingByName<bool>("ReQ")->value);
-		this->addToggle("Solo mode ", "Re-Q when you finish a game or die and can't respawn.\nNot recomended while in a party.", this->settings.getSettingByName<bool>("solo")->value);
-		this->addToggle("Team Elimination", "Re-Q when the team your on is fully ELIMINATED.", this->settings.getSettingByName<bool>("eliminated")->value);
+		this->addToggle("Auto re-queue ", "Find a new game when the current game is over", getOps<bool>("ReQ"));
+		this->addToggle("Solo mode ", "Re-Q when you finish a game or die and can't respawn.\nNot recomended while in a party.", getOps<bool>("solo"));
+		this->addToggle("Team Elimination", "Re-Q when the team your on is fully ELIMINATED.", getOps<bool>("eliminated"));
 
 		this->addHeader("Map avoider");
 
-		this->addToggle("Map Avoider", "Automatically finds you a new game when a specific map has won the vote", this->settings.getSettingByName<bool>("AutoMapAvoider")->value);
-		// this->addTextBox("Maps", " Input one or more maps using comma's.", settings.getSettingByName<std::string>("text")->value, 100);
+		this->addToggle("Map Avoider", "Automatically finds you a new game when a specific map has won the vote", getOps<bool>("AutoMapAvoider"));
+		// this->addTextBox("Maps", " Input one or more maps using comma's.", getOps<std::string>("text"), 100);
 		this->addButton("Add Map", "Add a map you want to avoid.", "Add Map", [this] {
 
 			// std::string keybindName = "keybind-" + FlarialGUI::cached_to_string(totalKeybinds);
@@ -106,39 +106,39 @@ public:
 			}
 		}
 
-		this->addHeader("Role Avoider");
+		addHeader("Role Avoider");
 
-		this->addHeader("Murder Mystery");
-		this->addToggle("Murderer", "re q when you get murderer", this->settings.getSettingByName<bool>("murderer")->value);
-		this->addToggle("Sheriff", "re q when you get sheriff", this->settings.getSettingByName<bool>("sheriff")->value);
-		this->addToggle("Innocent", "re q when you get innocent", this->settings.getSettingByName<bool>("innocent")->value);
+		addHeader("Murder Mystery");
+		addToggle("Murderer", "re q when you get murderer", getOps<bool>("murderer"));
+		addToggle("Sheriff", "re q when you get sheriff", getOps<bool>("sheriff"));
+		addToggle("Innocent", "re q when you get innocent", getOps<bool>("innocent"));
 
-		this->addHeader("Hide and Seek");
-		this->addToggle("Hider", "re q when you get hider", this->settings.getSettingByName<bool>("hider")->value);
-		this->addToggle("Seeker", "re q when you get seeker", this->settings.getSettingByName<bool>("seeker")->value);
+		addHeader("Hide and Seek");
+		addToggle("Hider", "re q when you get hider", getOps<bool>("hider"));
+		addToggle("Seeker", "re q when you get seeker", getOps<bool>("seeker"));
 
-		this->addHeader("Deathrun");
-		this->addToggle("Death", "re q when you get death", this->settings.getSettingByName<bool>("death")->value);
-		this->addToggle("Runner", "re q when you get runner", this->settings.getSettingByName<bool>("runner")->value);
+		addHeader("Deathrun");
+		addToggle("Death", "re q when you get death", getOps<bool>("death"));
+		addToggle("Runner", "re q when you get runner", getOps<bool>("runner"));
 
-		this->addHeader("Copy Custom Server code");
-		this->addToggle("Copy CS code", "Automatically copy custom server code to your clipboard", this->settings.getSettingByName<bool>("copyCS")->value);
-		this->addToggle("Include command", "Include /cs when copying custom server code", this->settings.getSettingByName<bool>("includecommand")->value);
+		addHeader("Copy Custom Server code");
+		addToggle("Copy CS code", "Automatically copy custom server code to your clipboard", getOps<bool>("copyCS"));
+		addToggle("Include command", "Include /cs when copying custom server code", getOps<bool>("includecommand"));
 
-		this->addHeader("Debloat chat");
-		this->addToggle("Promo message", "Removes all promo/info messages starting with [!]", this->settings.getSettingByName<bool>("promomessage")->value);
-		this->addToggle("Unused Unlocks", "Removes 'You have unused unlocks in your Locker!'", this->settings.getSettingByName<bool>("unlocks")->value);
-		this->addToggle("player joined", "Removes player joined message", this->settings.getSettingByName<bool>("joined")->value);
-		this->addToggle("player message", "Removes all messages by non ranked players", this->settings.getSettingByName<bool>("playermessage")->value);
-		this->addToggle("player message Hive+", "Removes all messages from Hive+ players", this->settings.getSettingByName<bool>("playermessageplus")->value);
-		this->addToggle("No Teaming", "Removes No Teaming!", this->settings.getSettingByName<bool>("noteaming")->value);
+		addHeader("Debloat chat");
+		addToggle("Promo message", "Removes all promo/info messages starting with [!]", getOps<bool>("promomessage"));
+		addToggle("Unused Unlocks", "Removes 'You have unused unlocks in your Locker!'", getOps<bool>("unlocks"));
+		addToggle("player joined", "Removes player joined message", getOps<bool>("joined"));
+		addToggle("player message", "Removes all messages by non ranked players", getOps<bool>("playermessage"));
+		addToggle("player message Hive+", "Removes all messages from Hive+ players", getOps<bool>("playermessageplus"));
+		addToggle("No Teaming", "Removes No Teaming!", getOps<bool>("noteaming"));
 
-		this->addHeader("Auto accept");
-		this->addToggle("Friend request", "Automatically accept incoming friend requests.", this->settings.getSettingByName<bool>("friendaccept")->value);
-		this->addToggle("Party request", "Automatically accept incoming party requests.", this->settings.getSettingByName<bool>("partyaccept")->value);
+		addHeader("Auto accept");
+		addToggle("Friend request", "Automatically accept incoming friend requests.", getOps<bool>("friendaccept"));
+		addToggle("Party request", "Automatically accept incoming party requests.", getOps<bool>("partyaccept"));
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 
@@ -147,8 +147,8 @@ public:
 
 		if (id == MinecraftPacketIds::SetTitle) {
 			auto* pkt = reinterpret_cast<SetTitlePacket*>(event.getPacket());
-			if (this->settings.getSettingByName<bool>("ReQ")->value) {
-				if (this->settings.getSettingByName<bool>("solo")->value) {
+			if (getOps<bool>("ReQ")) {
+				if (getOps<bool>("solo")) {
 
 
 					if (//pkt->text == "§cYou're a spectator!" || //this brobably isn't needed anymore
@@ -159,12 +159,12 @@ public:
 					}
 				}
 			}
-			if (this->settings.getSettingByName<bool>("copyCS")->value)
+			if (getOps<bool>("copyCS"))
 			{
 				if (!pkt->text.empty() && pkt->text.find(Copy_CS) == std::string::npos) {
 					if (pkt->text.length() >= 15 && pkt->text.substr(0, 13) == "§eJoin Code:") {
 						Copy_CS = pkt->text;
-						if (!this->settings.getSettingByName<bool>("includecommand")->value) {
+						if (!getOps<bool>("includecommand")) {
 							ImGui::SetClipboardText(pkt->text.substr(17, pkt->text.length()).c_str());
 						}
 						else {
@@ -177,13 +177,13 @@ public:
 		}
 		if (id == MinecraftPacketIds::Text) {
 			auto* pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-			if (this->settings.getSettingByName<bool>("ReQ")->value) {
-				//if(!module->settings.getSettingByName<bool>("solo")->value) {
+			if (getOps<bool>("ReQ")) {
+				//if(!module->getOps<bool>("solo")) {
 				if (pkt->message == "§c§l» §r§c§lGame OVER!") {
 					reQ();
 					return;
 				}
-				if (this->settings.getSettingByName<bool>("eliminated")->value) {
+				if (getOps<bool>("eliminated")) {
 					if (pkt->message.length() > 27) {
 						if (pkt->message.substr(12, 15) == "You are on the ") {
 							teamcolor = pkt->message.substr(27, pkt->message.length() - 28);
@@ -196,7 +196,7 @@ public:
 						return;
 					}
 				}
-				if (this->settings.getSettingByName<bool>("solo")->value) {
+				if (getOps<bool>("solo")) {
 
 					if (pkt->message.substr(0, 48) == "§a§l» §r§eYou finished all maps and came in" || //gravity
 						pkt->message.substr(0, 30) == "§a§l» §r§eYou finished in") { //deathrun
@@ -205,7 +205,7 @@ public:
 					}
 				}
 			}
-			if (this->settings.getSettingByName<bool>("murderer")->value) {
+			if (getOps<bool>("murderer")) {
 
 				if (pkt->message == "§c§l» §r§c§lMurderer") {
 					reQ();
@@ -213,7 +213,7 @@ public:
 
 				}
 			}
-			if (this->settings.getSettingByName<bool>("sheriff")->value) {
+			if (getOps<bool>("sheriff")) {
 
 				if (pkt->message == "§9§l» §r§9§lSheriff") {
 					reQ();
@@ -221,7 +221,7 @@ public:
 
 				}
 			}
-			if (this->settings.getSettingByName<bool>("innocent")->value) {
+			if (getOps<bool>("innocent")) {
 
 				if (pkt->message == "§a§l» §r§a§lInnocent") {
 					reQ();
@@ -229,7 +229,7 @@ public:
 
 				}
 			}
-			if (this->settings.getSettingByName<bool>("death")->value) {
+			if (getOps<bool>("death")) {
 
 				if (pkt->message == "§d§l» §r§bYou are a §cDeath") {
 					reQ();
@@ -237,7 +237,7 @@ public:
 
 				}
 			}
-			if (this->settings.getSettingByName<bool>("runner")->value) {
+			if (getOps<bool>("runner")) {
 
 				if (pkt->message == "§d§l» §r§bYou are a §aRunner") {
 					reQ();
@@ -245,7 +245,7 @@ public:
 
 				}
 			}
-			if (this->settings.getSettingByName<bool>("hider")->value) {
+			if (getOps<bool>("hider")) {
 
 				if (pkt->message == "§e§l» §rYou are a §eHIDER") {
 					reQ();
@@ -253,7 +253,7 @@ public:
 
 				}
 			}
-			if (this->settings.getSettingByName<bool>("seeker")->value) {
+			if (getOps<bool>("seeker")) {
 
 				if (pkt->message == "§c§l» §rYou are a §cSEEKER") {
 					reQ();
@@ -261,7 +261,7 @@ public:
 
 				}
 			}
-			if (this->settings.getSettingByName<bool>("AutoMapAvoider")->value) {
+			if (getOps<bool>("AutoMapAvoider")) {
 				for (int i = 0; i < totalmaps; ++i)
 				{
 					std::string count;
@@ -288,40 +288,40 @@ public:
 				}
 			}
 
-			if (this->settings.getSettingByName<bool>("promomessage")->value) {
+			if (getOps<bool>("promomessage")) {
 				if (pkt->message.find("§6[§e!§6]") != std::string::npos) {
 					event.cancel();
 				}
 			}
 
-			if (this->settings.getSettingByName<bool>("unlocks")->value) {
+			if (getOps<bool>("unlocks")) {
 				if (pkt->message == "§a§l» §rYou have unused unlocks in your Locker!") {
 					event.cancel();
 				}
 			}
-			if (this->settings.getSettingByName<bool>("joined")->value) {
+			if (getOps<bool>("joined")) {
 				std::regex pattern("joined\\. §8\\[\\d+/\\d+\\]");
 
 				if (std::regex_search(pkt->message, pattern)) {
 					event.cancel();
 				}
 			}
-			if (this->settings.getSettingByName<bool>("playermessage")->value) {
+			if (getOps<bool>("playermessage")) {
 				if (pkt->message.contains(" §7§l» §r") && pkt->message.substr(0, 3) == "§7") {
 					event.cancel();
 				}
 			}
-			if (this->settings.getSettingByName<bool>("playermessageplus")->value) {
+			if (getOps<bool>("playermessageplus")) {
 				if (pkt->message.contains("§8 [§a+§8] §7§l» §r")) {
 					event.cancel();
 				}
 			}
-			if (this->settings.getSettingByName<bool>("noteaming")->value) {
+			if (getOps<bool>("noteaming")) {
 				if (pkt->message == "§c§l» §r§c§lNo teaming! §r§6Teamers will be banned.") {
 					event.cancel();
 				}
 			}
-			if (this->settings.getSettingByName<bool>("friendaccept")->value) {
+			if (getOps<bool>("friendaccept")) {
 				if (pkt->message.substr(0, 40) == "§aYou received a friend invite from §b") {
 
 					std::shared_ptr<Packet> packet = SDK::createPacket(77);
@@ -336,7 +336,7 @@ public:
 					FlarialGUI::Notify("Accepted friend invite from: " + pkt->message.substr(40, pkt->message.length() - 44));
 				}
 			}
-			if (this->settings.getSettingByName<bool>("partyaccept")->value) {
+			if (getOps<bool>("partyaccept")) {
 				if (pkt->message.find("§b wants you to join their party!") != std::string::npos) {
 
 					std::shared_ptr<Packet> packet = SDK::createPacket(77);
@@ -355,7 +355,7 @@ public:
 	}
 
 	void reQ() {
-		if (!this->settings.getSettingByName<bool>("hub")->value) {
+		if (!getOps<bool>("hub")) {
 			FlarialGUI::Notify("Finding a new game of " + HiveModeCatcherListener::fullgamemodename);
 
 			std::shared_ptr<Packet> packet = SDK::createPacket(77);

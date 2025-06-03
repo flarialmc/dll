@@ -52,15 +52,15 @@ public:
 		getKeybind();
 		Module::defaultConfig("core");
 		Module::defaultConfig("pos");
-		if (settings.getSettingByName<std::string>("Overlay") == nullptr) settings.addSetting("Overlay", (std::string)"O");
-		if (settings.getSettingByName<bool>("showFKDR") == nullptr) settings.addSetting("showFKDR", true);
-		if (settings.getSettingByName<bool>("showKD") == nullptr) settings.addSetting("showKD", true);
-		if (settings.getSettingByName<bool>("showWR") == nullptr) settings.addSetting("showWR", true);
-		if (settings.getSettingByName<bool>("showLevel") == nullptr) settings.addSetting("showLevel", true);
-		if (settings.getSettingByName<bool>("showWins") == nullptr) settings.addSetting("showWins", false);
-		if (settings.getSettingByName<bool>("showLosses") == nullptr) settings.addSetting("showLosses", false);
-		if (settings.getSettingByName<bool>("showKills") == nullptr) settings.addSetting("showKills", false);
-		if (settings.getSettingByName<bool>("showDeaths") == nullptr) settings.addSetting("showDeaths", false);
+		setDef("Overlay", (std::string)"O");
+		setDef("showFKDR", true);
+		setDef("showKD", true);
+		setDef("showWR", true);
+		setDef("showLevel", true);
+		setDef("showWins", false);
+		setDef("showLosses", false);
+		setDef("showKills", false);
+		setDef("showDeaths", false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -76,16 +76,16 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Hive Statistics");
-		addKeybind("Toggle Overlay Keybind", "When setting, hold the new bind for 2 seconds", settings.getSettingByName<std::string>("Overlay")->value);
+		addKeybind("Toggle Overlay Keybind", "When setting, hold the new bind for 2 seconds", getOps<std::string>("Overlay"));
 		addHeader("Misc");
-		addToggle("Show FKDR", "Shows final kill final death ratio", settings.getSettingByName<bool>("showFKDR")->value);
-		addToggle("Show KD", "Shows the amount of kills per death", settings.getSettingByName<bool>("showKD")->value);
-		addToggle("Show Win Rate", "Shows the player's win rate as a percentage ", settings.getSettingByName<bool>("showWR")->value);
-		addToggle("Show Level", "Shows the level of a player", settings.getSettingByName<bool>("showLevel")->value);
-		addToggle("Show Victories", "Shows the amount of wins a player has", settings.getSettingByName<bool>("showWins")->value);
-		addToggle("Show Losses", "Shows the amount of losses a player has", settings.getSettingByName<bool>("showLosses")->value);
-		addToggle("Show Kills", "Shows the amount of kills a player has", settings.getSettingByName<bool>("showKills")->value);
-		addToggle("Show Deaths", "Shows the amount of deaths a player has", settings.getSettingByName<bool>("showDeaths")->value);
+		addToggle("Show FKDR", "Shows final kill final death ratio", getOps<bool>("showFKDR"));
+		addToggle("Show KD", "Shows the amount of kills per death", getOps<bool>("showKD"));
+		addToggle("Show Win Rate", "Shows the player's win rate as a percentage ", getOps<bool>("showWR"));
+		addToggle("Show Level", "Shows the level of a player", getOps<bool>("showLevel"));
+		addToggle("Show Victories", "Shows the amount of wins a player has", getOps<bool>("showWins"));
+		addToggle("Show Losses", "Shows the amount of losses a player has", getOps<bool>("showLosses"));
+		addToggle("Show Kills", "Shows the amount of kills a player has", getOps<bool>("showKills"));
+		addToggle("Show Deaths", "Shows the amount of deaths a player has", getOps<bool>("showDeaths"));
 		resetPadding();
 	}
 
@@ -113,8 +113,8 @@ public:
 
 
 
-			Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
-				this->settings.getSettingByName<float>("percentageY")->value);
+			Vec2<float> settingperc = Vec2<float>(getOps<float>("percentageX"),
+				getOps<float>("percentageY"));
 
 
 
@@ -180,40 +180,40 @@ public:
 
 		int columnAmount = 1;
 
-		if (settings.getSettingByName<bool>("showFKDR")->value == true && cg == "bed")
+		if (getOps<bool>("showFKDR") == true && cg == "bed")
 			columnAmount++;
-		if (settings.getSettingByName<bool>("showKD")->value == true)
+		if (getOps<bool>("showKD") == true)
 			columnAmount++;
-		if (settings.getSettingByName<bool>("showWR")->value == true)
+		if (getOps<bool>("showWR") == true)
 			columnAmount++;
-		if (settings.getSettingByName<bool>("showLevel")->value == true)
+		if (getOps<bool>("showLevel") == true)
 			columnAmount++;
-		if (settings.getSettingByName<bool>("showWins")->value == true)
+		if (getOps<bool>("showWins") == true)
 			columnAmount++;
-		if (settings.getSettingByName<bool>("showLosses")->value == true)
+		if (getOps<bool>("showLosses") == true)
 			columnAmount++;
-		if (settings.getSettingByName<bool>("showKills")->value == true)
+		if (getOps<bool>("showKills") == true)
 			columnAmount++;
-		if (settings.getSettingByName<bool>("showDeaths")->value == true)
+		if (getOps<bool>("showDeaths") == true)
 			columnAmount++;
 
 		if (ImGui::BeginTable("Player Stats", columnAmount, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV)) {
 			ImGui::TableSetupColumn("Player Name");
-			if (settings.getSettingByName<bool>("showFKDR")->value == true && cg == "bed")
+			if (getOps<bool>("showFKDR") == true && cg == "bed")
 				ImGui::TableSetupColumn("FKDR");
-			if (settings.getSettingByName<bool>("showKD")->value == true)
+			if (getOps<bool>("showKD") == true)
 				ImGui::TableSetupColumn("KD");
-			if (settings.getSettingByName<bool>("showWR")->value == true)
+			if (getOps<bool>("showWR") == true)
 				ImGui::TableSetupColumn("Win Rate");
-			if (settings.getSettingByName<bool>("showLevel")->value == true)
+			if (getOps<bool>("showLevel") == true)
 				ImGui::TableSetupColumn("Level");
-			if (settings.getSettingByName<bool>("showWins")->value == true)
+			if (getOps<bool>("showWins") == true)
 				ImGui::TableSetupColumn("Victories");
-			if (settings.getSettingByName<bool>("showLosses")->value == true)
+			if (getOps<bool>("showLosses") == true)
 				ImGui::TableSetupColumn("Losses");
-			if (settings.getSettingByName<bool>("showKills")->value == true)
+			if (getOps<bool>("showKills") == true)
 				ImGui::TableSetupColumn("Kills");
-			if (settings.getSettingByName<bool>("showDeaths")->value == true)
+			if (getOps<bool>("showDeaths") == true)
 				ImGui::TableSetupColumn("Deaths");
 
 			ImGui::TableHeadersRow();
@@ -238,7 +238,7 @@ public:
 					if (it != playerStatsList.end()) {
 						if (it->second.getCode() == 0) {
 							{
-								if (settings.getSettingByName<bool>("showFKDR")->value == true && cg == "bed") {
+								if (getOps<bool>("showFKDR") == true && cg == "bed") {
 									std::ostringstream oss;
 									float fkdr = it->second.getFKDR();
 									oss << std::fixed << std::setprecision(2) << fkdr;
@@ -257,7 +257,7 @@ public:
 								}
 							}
 							{
-								if (settings.getSettingByName<bool>("showKD")->value == true) {
+								if (getOps<bool>("showKD") == true) {
 									ImGui::TableSetColumnIndex(columnIndex);
 									float kd = it->second.getKD();
 									std::ostringstream oss;
@@ -283,7 +283,7 @@ public:
 								}
 							}
 							{
-								if (settings.getSettingByName<bool>("showWR")->value == true) {
+								if (getOps<bool>("showWR") == true) {
 									ImGui::TableSetColumnIndex(columnIndex);
 									std::ostringstream oss;
 									float winrate = it->second.getWinRate();
@@ -309,7 +309,7 @@ public:
 								}
 							}
 							{
-								if (settings.getSettingByName<bool>("showLevel")->value == true) {
+								if (getOps<bool>("showLevel") == true) {
 									ImGui::TableSetColumnIndex(columnIndex);
 									std::ostringstream oss;
 									int level = it->second.getLevel();
@@ -345,7 +345,7 @@ public:
 								}
 							}
 							{
-								if (settings.getSettingByName<bool>("showWins")->value == true) {
+								if (getOps<bool>("showWins") == true) {
 									ImGui::TableSetColumnIndex(columnIndex);
 									std::ostringstream oss;
 									int victories = it->second.getVictories();
@@ -381,7 +381,7 @@ public:
 								}
 							}
 							{
-								if (settings.getSettingByName<bool>("showLosses")->value == true) {
+								if (getOps<bool>("showLosses") == true) {
 									ImGui::TableSetColumnIndex(columnIndex);
 									std::ostringstream oss;
 									int losses = it->second.getLosses();
@@ -417,7 +417,7 @@ public:
 								}
 							}
 							{
-								if (settings.getSettingByName<bool>("showKills")->value == true) {
+								if (getOps<bool>("showKills") == true) {
 									ImGui::TableSetColumnIndex(columnIndex);
 									std::ostringstream oss;
 									int kills = it->second.getKills();
@@ -453,7 +453,7 @@ public:
 								}
 							}
 							{
-								if (settings.getSettingByName<bool>("showDeaths")->value == true) {
+								if (getOps<bool>("showDeaths") == true) {
 									ImGui::TableSetColumnIndex(columnIndex);
 									std::ostringstream oss;
 									int deaths = it->second.getDeaths();
@@ -578,7 +578,7 @@ public:
 
 	void onKey(KeyEvent& event) {
 
-		if (event.getKey() == Utils::getStringAsKey(this->settings.getSettingByName<std::string>("Overlay")->value) &&
+		if (event.getKey() == Utils::getStringAsKey(getOps<std::string>("Overlay")) &&
 			static_cast<ActionType>(event.getAction()) == ActionType::Released) {
 			renderOverlay = !renderOverlay;
 			if (renderOverlay) {

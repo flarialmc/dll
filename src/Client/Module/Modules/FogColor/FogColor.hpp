@@ -23,9 +23,7 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<std::string>("color") == nullptr) settings.addSetting("color", (std::string)"FFFFFF");
-		if (settings.getSettingByName<bool>("color_rgb") == nullptr) settings.addSetting("color_rgb", false);
-		if (settings.getSettingByName<float>("colorOpacity") == nullptr) settings.addSetting("colorOpacity", 0.6f);
+		setDef("fog", (std::string)"FFFFFF", 0.6f, false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -40,24 +38,20 @@ public:
 			Constraints::RelativeConstraint(1.0, "width"),
 			Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Colors");
-		this->addColorPicker("Fog Color", "", settings.getSettingByName<std::string>("color")->value,
-			settings.getSettingByName<float>("colorOpacity")->value,
-			settings.getSettingByName<bool>("color_rgb")->value);
+		addHeader("Colors");
+		addColorPicker("Fog Color", "", "fog");
 
 		FlarialGUI::UnsetScrollView();
 
-		this->resetPadding();
+		resetPadding();
 
 	}
 
 	void onGetFogColor(FogColorEvent& event) {
-		D2D1_COLOR_F color;
-		if (this->settings.getSettingByName<bool>("color_rgb")->value)
-			color = FlarialGUI::rgbColor;
-		else
-			color = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color")->value);
+		D2D1_COLOR_F color = getColor("fog");
+		/*if (getOps<bool>("fog")) color = FlarialGUI::rgbColor;
+		else color = FlarialGUI::HexToColorF(getOps<std::string>("color"));*/
 
-		event.setFogColorFromD2DColor(color, this->settings.getSettingByName<float>("colorOpacity")->value);
+		event.setFogColorFromD2DColor(color, getOps<float>("colorOpacity"));
 	}
 };

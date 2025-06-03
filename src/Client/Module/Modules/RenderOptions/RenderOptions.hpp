@@ -21,12 +21,12 @@ public:
 		auto disableParticles = Options::getOption("dev_renderBoundingBox");
 
 		if (isEnabled()) {
-			if (showChunkMap != nullptr) showChunkMap->setvalue(settings.getSettingByName<bool>("chunkborders")->value);
-			if (disableSky != nullptr) disableSky->setvalue(!settings.getSettingByName<bool>("sky")->value);
-			if (disableWeather != nullptr) disableWeather->setvalue(!settings.getSettingByName<bool>("weather")->value);
-			if (disableEntities != nullptr) disableEntities->setvalue(!settings.getSettingByName<bool>("entity")->value);
-			if (disableBlockEntities != nullptr) disableBlockEntities->setvalue(!settings.getSettingByName<bool>("blockentity")->value);
-			if (disableParticles != nullptr) disableParticles->setvalue(!settings.getSettingByName<bool>("particles")->value);
+			if (showChunkMap != nullptr) showChunkMap->setvalue(getOps<bool>("chunkborders"));
+			if (disableSky != nullptr) disableSky->setvalue(!getOps<bool>("sky"));
+			if (disableWeather != nullptr) disableWeather->setvalue(!getOps<bool>("weather"));
+			if (disableEntities != nullptr) disableEntities->setvalue(!getOps<bool>("entity"));
+			if (disableBlockEntities != nullptr) disableBlockEntities->setvalue(!getOps<bool>("blockentity"));
+			if (disableParticles != nullptr) disableParticles->setvalue(!getOps<bool>("particles"));
 		}
 		else {
 			if (showChunkMap != nullptr) showChunkMap->setvalue(false);
@@ -52,12 +52,12 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<bool>("chunkborders") == nullptr) settings.addSetting("chunkborders", false);
-		if (settings.getSettingByName<bool>("sky") == nullptr) settings.addSetting("sky", true);
-		if (settings.getSettingByName<bool>("weather") == nullptr) settings.addSetting("weather", true);
-		if (settings.getSettingByName<bool>("entity") == nullptr) settings.addSetting("entity", true);
-		if (settings.getSettingByName<bool>("blockentity") == nullptr) settings.addSetting("blockentity", true);
-		if (settings.getSettingByName<bool>("particles") == nullptr) settings.addSetting("particles", true);
+		setDef("chunkborders", false);
+		setDef("sky", true);
+		setDef("weather", true);
+		setDef("entity", true);
+		setDef("blockentity", true);
+		setDef("particles", true);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -76,12 +76,12 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Render Options");
-		addToggle("Chunk Borders", "", settings.getSettingByName<bool>("chunkborders")->value);
-		addToggle("Render Sky", "", settings.getSettingByName<bool>("sky")->value);
-		addToggle("Render Entities", "", settings.getSettingByName<bool>("entity")->value);
-		addToggle("Render Block Entities", "", settings.getSettingByName<bool>("blockentity")->value);
-		addToggle("Render Particles", "", settings.getSettingByName<bool>("particles")->value);
-		addToggle("Render Weather", "", settings.getSettingByName<bool>("weather")->value);
+		addToggle("Chunk Borders", "", getOps<bool>("chunkborders"));
+		addToggle("Render Sky", "", getOps<bool>("sky"));
+		addToggle("Render Entities", "", getOps<bool>("entity"));
+		addToggle("Render Block Entities", "", getOps<bool>("blockentity"));
+		addToggle("Render Particles", "", getOps<bool>("particles"));
+		addToggle("Render Weather", "", getOps<bool>("weather"));
 
 		FlarialGUI::UnsetScrollView();
 		resetPadding();

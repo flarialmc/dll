@@ -28,9 +28,9 @@ public:
 	void defaultConfig() override {
 		getKeybind();
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<bool>("status") == nullptr) settings.addSetting("status", false);
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
-		if (settings.getSettingByName<bool>("always") == nullptr)  settings.addSetting("always", false);
+		setDef("status", false);
+		setDef("textscale", 0.80f);
+		setDef("always", false);
 	}
 
 	void settingsRender(float settingsOffset) override {

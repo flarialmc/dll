@@ -36,8 +36,8 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"CPS: {value}");
-		if (settings.getSettingByName<bool>("rightcps") == nullptr) settings.addSetting("rightcps", false);
+		setDef("text", (std::string)"CPS: {value}");
+		setDef("rightcps", false);
 		Module::defaultConfig("all");
 	}
 
@@ -55,24 +55,24 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 
-		this->addHeader("CPS Counter");
-		this->defaultAddSettings("main");
-		this->addToggle("Right Click CPS", "", this->settings.getSettingByName<bool>("rightcps")->value);
-		this->extraPadding();
+		addHeader("CPS Counter");
+		defaultAddSettings("main");
+		addToggle("Right Click CPS", "", getOps<bool>("rightcps"));
+		extraPadding();
 
-        this->addHeader("Text");
-		this->defaultAddSettings("text");
-		this->extraPadding();
+        addHeader("Text");
+		defaultAddSettings("text");
+		extraPadding();
 
-        this->addHeader("Colors");
-		this->defaultAddSettings("colors");
-		this->extraPadding();
+        addHeader("Colors");
+		defaultAddSettings("colors");
+		extraPadding();
 
-		this->addHeader("Misc");
-		this->defaultAddSettings("misc");
+		addHeader("Misc");
+		defaultAddSettings("misc");
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 	static inline double lastLeftAllowed = 0.0;
@@ -96,8 +96,8 @@ public:
 			else {
 				leftClickHeld = true;
 
-				if (limiter->settings.getSettingByName<bool>("enabled")->value) {
-					float leftCpsLimit = limiter->settings.getSettingByName<float>("Left")->value;
+				if (limiter->getOps<bool>("enabled")) {
+					float leftCpsLimit = limiter->getOps<float>("Left");
 					double leftInterval = 1.0 / leftCpsLimit;
 
 					if ((now - lastLeftAllowed) < leftInterval) {
@@ -117,8 +117,8 @@ public:
 			else {
 				rightClickHeld = true;
 
-				if (limiter->settings.getSettingByName<bool>("enabled")->value) {
-					float rightCpsLimit = limiter->settings.getSettingByName<float>("Right")->value;
+				if (limiter->getOps<bool>("enabled")) {
+					float rightCpsLimit = limiter->getOps<float>("Right");
 					double rightInterval = 1.0 / rightCpsLimit;
 
 					if ((now - lastRightAllowed) < rightInterval) {
@@ -134,7 +134,7 @@ public:
 	//
 	void onRender(RenderEvent& event) {
 		if (this->isEnabled()) {
-			if (!this->settings.getSettingByName<bool>("rightcps")->value) {
+			if (!getOps<bool>("rightcps")) {
 				std::string leftCPS = FlarialGUI::cached_to_string(GetLeftCPS());
 				this->normalRender(1, leftCPS);
 			}

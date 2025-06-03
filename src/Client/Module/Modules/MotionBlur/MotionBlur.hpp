@@ -34,11 +34,11 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<float>("intensity") == nullptr) settings.addSetting("intensity", 0.88f);
-		if (settings.getSettingByName<float>("intensity2") == nullptr) settings.addSetting("intensity2", 6.0f);
-		if (settings.getSettingByName<bool>("avgpixel") == nullptr) settings.addSetting("avgpixel", false);
-		if (settings.getSettingByName<bool>("dynamic") == nullptr) settings.addSetting("dynamic", true);
-		if (settings.getSettingByName<float>("samples") == nullptr) settings.addSetting("samples", 64.f);
+		setDef("intensity", 0.88f);
+		setDef("intensity2", 6.0f);
+		setDef("avgpixel", false);
+		setDef("dynamic", true);
+		setDef("samples", 64.f);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -54,13 +54,13 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Motion Blur");
-		addToggle("Average Pixel Mode", "Disabling this will likely look better on high FPS.", settings.getSettingByName<bool>("avgpixel")->value);
+		addToggle("Average Pixel Mode", "Disabling this will likely look better on high FPS.", getOps<bool>("avgpixel"));
 
-		addConditionalToggle(settings.getSettingByName<bool>("avgpixel")->value, "Dynamic Mode", "Automatically adjusts intensity according to FPS", settings.getSettingByName<bool>("dynamic")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("avgpixel")->value && !settings.getSettingByName<bool>("dynamic")->value, "Intensity", "Amount of previous frames to render.", settings.getSettingByName<float>("intensity2")->value, 30, 0, true);
+		addConditionalToggle(getOps<bool>("avgpixel"), "Dynamic Mode", "Automatically adjusts intensity according to FPS", getOps<bool>("dynamic"));
+		addConditionalSlider(getOps<bool>("avgpixel") && !getOps<bool>("dynamic"), "Intensity", "Amount of previous frames to render.", getOps<float>("intensity2"), 30, 0, true);
 
-		addConditionalSlider(!settings.getSettingByName<bool>("avgpixel")->value, "Intensity", "Control how strong the motion blur is.", settings.getSettingByName<float>("intensity")->value, 2, 0.05f, true);
-		addConditionalSlider(!settings.getSettingByName<bool>("avgpixel")->value, "Samples", "", settings.getSettingByName<float>("samples")->value, 256, 8, true);
+		addConditionalSlider(!getOps<bool>("avgpixel"), "Intensity", "Control how strong the motion blur is.", getOps<float>("intensity"), 2, 0.05f, true);
+		addConditionalSlider(!getOps<bool>("avgpixel"), "Samples", "", getOps<float>("samples"), 256, 8, true);
 
 		FlarialGUI::UnsetScrollView();
 
@@ -73,9 +73,9 @@ public:
 
 		if (SwapchainHook::queue) return;
 
-		int maxFrames = (int)round(this->settings.getSettingByName<float>("intensity2")->value);
+		int maxFrames = (int)round(getOps<float>("intensity2"));
 
-		if (this->settings.getSettingByName<bool>("dynamic")->value) {
+		if (getOps<bool>("dynamic")) {
 			if (MC::fps < 75) maxFrames = 1;
 			else if (MC::fps < 100) maxFrames = 2;
 			else if (MC::fps < 180) maxFrames = 3;
@@ -83,7 +83,7 @@ public:
 			else if (MC::fps > 450) maxFrames = 5;
 		}
 
-		if (this->settings.getSettingByName<bool>("avgpixel")->value) maxFrames = 1;
+		if (getOps<bool>("avgpixel")) maxFrames = 1;
 
 		if (SDK::getCurrentScreen() == "hud_screen" && initted && this->isEnabled()) {
 
@@ -98,7 +98,7 @@ public:
 				previousFrames.push_back(std::move(buffer));
 			}
 
-			if (this->settings.getSettingByName<bool>("avgpixel")->value) AvgPixelMotionBlurHelper::Render(event.RTV, previousFrames);
+			if (getOps<bool>("avgpixel")) AvgPixelMotionBlurHelper::Render(event.RTV, previousFrames);
 			else RealMotionBlurHelper::Render(event.RTV, previousFrames.back());
 
 		}

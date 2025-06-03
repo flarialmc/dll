@@ -28,19 +28,19 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<bool>("responsivewidth") == nullptr) settings.addSetting("responsivewidth", true);
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{D}  X: {X} Y: {Y} Z: {Z}");
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
+		setDef("responsivewidth", true);
+		setDef("text", (std::string)"{D} X: {X} Y: {Y} Z: {Z}");
+		setDef("textscale", 0.80f);
 		Module::defaultConfig("all");
-		if (settings.getSettingByName<bool>("showDecimals") == nullptr) settings.addSetting("showDecimals", false);
-		if (settings.getSettingByName<float>("decimalCount") == nullptr) settings.addSetting("decimalCount", 2.f);
-		if (settings.getSettingByName<bool>("showOtherDimCoords") == nullptr) settings.addSetting("showOtherDimCoords", false);
-		if (settings.getSettingByName<bool>("showDimName") == nullptr) settings.addSetting("showDimName", false);
-		if (settings.getSettingByName<bool>("useSameDimensionFormat") == nullptr) settings.addSetting("useSameDimensionFormat", true);
-		if (settings.getSettingByName<std::string>("defaultDimFormat") == nullptr) settings.addSetting("defaultDimFormat", (std::string)"{dim}");
-        if (settings.getSettingByName<std::string>("OverworldFormat") == nullptr) settings.addSetting("OverworldFormat", (std::string)"{dim}");
-        if (settings.getSettingByName<std::string>("NetherFormat") == nullptr) settings.addSetting("NetherFormat", (std::string)"{dim}");
-        if (settings.getSettingByName<std::string>("TheEndFormat") == nullptr) settings.addSetting("TheEndFormat", (std::string)"{dim}");
+		setDef("showDecimals", false);
+		setDef("decimalCount", 2.f);
+		setDef("showOtherDimCoords", false);
+		setDef("showDimName", false);
+		setDef("useSameDimensionFormat", true);
+		setDef("defaultDimFormat", (std::string)"{dim}");
+		setDef("OverworldFormat", (std::string)"{dim}");
+		setDef("NetherFormat", (std::string)"{dim}");
+		setDef("TheEndFormat", (std::string)"{dim}");
     }
 
     void settingsRender(float settingsOffset) override {
@@ -54,41 +54,41 @@ public:
             Constraints::RelativeConstraint(1.0, "width"),
             Constraints::RelativeConstraint(0.88f, "height"));
 
-		this->addHeader("Coordinates");
-		this->defaultAddSettings("main");
-		this->extraPadding();
+		addHeader("Coordinates");
+		defaultAddSettings("main");
+		extraPadding();
 
-		this->addHeader("Text");
-		this->defaultAddSettings("text");
-		this->addToggle("Show Decimals", "", this->settings.getSettingByName<bool>("showDecimals")->value);
-		this->addConditionalSlider(this->settings.getSettingByName<bool>("showDecimals")->value, "Number of Decimals", "", this->settings.getSettingByName<float>("decimalCount")->value, 6.f, 1.f);
-		this->extraPadding();
+		addHeader("Text");
+		defaultAddSettings("text");
+		addToggle("Show Decimals", "", getOps<bool>("showDecimals"));
+		addConditionalSlider(getOps<bool>("showDecimals"), "Number of Decimals", "", getOps<float>("decimalCount"), 6.f, 1.f);
+		extraPadding();
 
-		this->addHeader("Module Settings");
-		this->addToggle("Show Other Dimension Coords", "Shows the other dimension\'s coordinates along with overworld coordinates.", this->settings.getSettingByName<bool>("showOtherDimCoords")->value);
-		this->addToggle("Show Dimension Name", "Shows the dimension name.", this->settings.getSettingByName<bool>("showDimName")->value);
-		this->addToggle("Use Same Dimension Format", "Uses the same format for all dimensions.", this->settings.getSettingByName<bool>("useSameDimensionFormat")->value);
-		this->addConditionalTextBox(this->settings.getSettingByName<bool>("useSameDimensionFormat")->value, "Dimension Format", "", this->settings.getSettingByName<std::string>("defaultDimFormat")->value);
-		this->addConditionalTextBox(!this->settings.getSettingByName<bool>("useSameDimensionFormat")->value, "Overworld Dimension Format", "", this->settings.getSettingByName<std::string>("OverworldFormat")->value);
-		this->addConditionalTextBox(!this->settings.getSettingByName<bool>("useSameDimensionFormat")->value, "Nether Dimension Format", "", this->settings.getSettingByName<std::string>("NetherFormat")->value);
-		this->addConditionalTextBox(!this->settings.getSettingByName<bool>("useSameDimensionFormat")->value, "TheEnd Dimension Format", "", this->settings.getSettingByName<std::string>("TheEndFormat")->value);
-		this->extraPadding();
+		addHeader("Module Settings");
+		addToggle("Show Other Dimension Coords", "Shows the other dimension\'s coordinates along with overworld coordinates.", getOps<bool>("showOtherDimCoords"));
+		addToggle("Show Dimension Name", "Shows the dimension name.", getOps<bool>("showDimName"));
+		addToggle("Use Same Dimension Format", "Uses the same format for all dimensions.", getOps<bool>("useSameDimensionFormat"));
+		addConditionalTextBox(getOps<bool>("useSameDimensionFormat"), "Dimension Format", "", getOps<std::string>("defaultDimFormat"));
+		addConditionalTextBox(!getOps<bool>("useSameDimensionFormat"), "Overworld Dimension Format", "", getOps<std::string>("OverworldFormat"));
+		addConditionalTextBox(!getOps<bool>("useSameDimensionFormat"), "Nether Dimension Format", "", getOps<std::string>("NetherFormat"));
+		addConditionalTextBox(!getOps<bool>("useSameDimensionFormat"), "TheEnd Dimension Format", "", getOps<std::string>("TheEndFormat"));
+		extraPadding();
 
-		this->addHeader("Colors");
-		this->defaultAddSettings("colors");
-		this->extraPadding();
+		addHeader("Colors");
+		defaultAddSettings("colors");
+		extraPadding();
 
-		this->addHeader("Misc");
-		this->defaultAddSettings("misc");
+		addHeader("Misc");
+		defaultAddSettings("misc");
 
 		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
+		resetPadding();
 	}
 
 	StringMap getCoords(float multiplier) {
 		Vec3<float>* pos = SDK::clientInstance->getLocalPlayer()->getPosition();
 
-		int decimalsToShow = this->settings.getSettingByName<bool>("showDecimals")->value ? std::floor(this->settings.getSettingByName<float>("decimalCount")->value) : -1;
+		int decimalsToShow = getOps<bool>("showDecimals") ? std::floor(getOps<float>("decimalCount")) : -1;
 
 		std::string xstr = std::to_string(pos->x * multiplier);
 		std::string ystr = std::to_string(pos->y * multiplier);
@@ -112,7 +112,7 @@ public:
 
 	void onRender(RenderEvent& event) {
 		if (this->isEnabled() && SDK::clientInstance->getLocalPlayer() && SDK::getCurrentScreen() == "hud_screen") {
-			std::string coord = this->settings.getSettingByName<std::string>("text")->value;
+			std::string coord = getOps<std::string>("text");
 			std::string dimension = SDK::clientInstance->getBlockSource()->getDimension()->getName();
 
 			if (dimension == "TheEnd") {
@@ -121,7 +121,7 @@ public:
 				coord = std::regex_replace(coord, std::regex("\\{Y\\}"), pos["y"]);
 				coord = std::regex_replace(coord, std::regex("\\{Z\\}"), pos["z"]);
 
-				if (settings.getSettingByName<bool>("showDimName")->value) {
+				if (getOps<bool>("showDimName")) {
 					coord = std::regex_replace(coord, std::regex("\\{D\\}"), formattedDimension("TheEnd"));
 				}
 				else {
@@ -150,7 +150,7 @@ public:
 				coord = std::regex_replace(coord, std::regex("\\{Y\\}"), defaultPos["y"]);
 				coord = std::regex_replace(coord, std::regex("\\{Z\\}"), defaultPos["z"]);
 
-				if (settings.getSettingByName<bool>("showDimName")->value) {
+				if (getOps<bool>("showDimName")) {
 					coord = std::regex_replace(coord, std::regex("\\{D\\}"), formattedDimension(dimension));
 				}
 				else {
@@ -159,13 +159,13 @@ public:
 
 				std::string text = coord;
 
-				if (settings.getSettingByName<bool>("showOtherDimCoords")->value) {
+				if (getOps<bool>("showOtherDimCoords")) {
 					StringMap otherDimPos = getCoords(otherDimMultiplier);
 					coord2 = std::regex_replace(coord2, std::regex("\\{X\\}"), otherDimPos["x"]);
 					coord2 = std::regex_replace(coord2, std::regex("\\{Y\\}"), otherDimPos["y"]);
 					coord2 = std::regex_replace(coord2, std::regex("\\{Z\\}"), otherDimPos["z"]);
 
-					if (settings.getSettingByName<bool>("showDimName")->value) {
+					if (getOps<bool>("showDimName")) {
 						coord2 = std::regex_replace(coord2, std::regex("\\{D\\}"), formattedDimension(otherDim));
 					}
 					else {

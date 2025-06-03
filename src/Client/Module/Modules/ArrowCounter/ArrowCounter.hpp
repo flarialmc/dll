@@ -25,7 +25,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"Arrows: {value}");
+		setDef("text", (std::string)"Arrows: {value}");
 		Module::defaultConfig("all");
 	}
 

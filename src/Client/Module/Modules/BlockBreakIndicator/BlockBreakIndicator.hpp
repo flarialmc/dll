@@ -24,16 +24,13 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("all");
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value}");
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 1.00f);
-		if (settings.getSettingByName<bool>("pbmode") == nullptr) settings.addSetting("pbmode", true);
-		if (settings.getSettingByName<bool>("onlyShowWhileBreaking") == nullptr) settings.addSetting("onlyShowWhileBreaking", false);
-		if (settings.getSettingByName<std::string>("orientation") == nullptr) settings.addSetting("orientation", (std::string)"Vertical");
-		if (settings.getSettingByName<float>("pbwidth") == nullptr) settings.addSetting("pbwidth", 0.91f);
-		if (settings.getSettingByName<float>("pbheight") == nullptr) settings.addSetting("pbheight", 0.82f);
-		if (settings.getSettingByName<std::string>("barFill") == nullptr) settings.addSetting("barFill", (std::string)"a83232");
-		if (settings.getSettingByName<float>("barFillOpacity") == nullptr) settings.addSetting("barFillOpacity", 1.0f);
-		if (settings.getSettingByName<bool>("barFillRGB") == nullptr) settings.addSetting("barFillRGB", false);
+		setDef("textscale", 1.00f);
+		setDef("pbmode", true);
+		setDef("onlyShowWhileBreaking", false);
+		setDef("orientation", (std::string)"Vertical");
+		setDef("pbwidth", 0.91f);
+		setDef("pbheight", 0.82f);
+		setDef("barFill", (std::string)"a83232", 1.f, false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -51,43 +48,43 @@ public:
 
 
 		addHeader("Block Break Indicator");
-		addToggle("Progress Bar", "Whether to show a Progress Bar or text", settings.getSettingByName<bool>("pbmode")->value);
+		addToggle("Progress Bar", "Whether to show a Progress Bar or text", getOps<bool>("pbmode"));
 		defaultAddSettings("main");
 		extraPadding();
 
-		if (!settings.getSettingByName<bool>("pbmode")->value) {
+		if (!getOps<bool>("pbmode")) {
 			addHeader("Text");
 			defaultAddSettings("text");
 			extraPadding();
 		}
 		else {
 			addHeader("Bar");
-			addToggle("Only show while breaking", "", settings.getSettingByName<bool>("onlyShowWhileBreaking")->value);
-			addDropdown("Orientation", "", std::vector<std::string>{"Vertical", "Horizontal"}, settings.getSettingByName<std::string>("orientation")->value);
-			addColorPicker("Color", "", settings.getSettingByName<std::string>("barFill")->value, settings.getSettingByName<float>("barFillOpacity")->value, settings.getSettingByName<bool>("barFillRGB")->value);
-			addSlider("Width", "", settings.getSettingByName<float>("pbwidth")->value, 20.f);
-			addSlider("Height", "", settings.getSettingByName<float>("pbheight")->value, 10.f);
+			addToggle("Only show while breaking", "", getOps<bool>("onlyShowWhileBreaking"));
+			addDropdown("Orientation", "", std::vector<std::string>{"Vertical", "Horizontal"}, getOps<std::string>("orientation"));
+			addColorPicker("Color", "", "barFill");
+			addSlider("Width", "", getOps<float>("pbwidth"), 20.f);
+			addSlider("Height", "", getOps<float>("pbheight"), 10.f);
 			extraPadding();
 		}
 
 		addHeader("Colors");
-		addConditionalColorPicker(!settings.getSettingByName<bool>("pbmode")->value, "Text Color", "", settings.getSettingByName<std::string>("textColor")->value, settings.getSettingByName<float>("textOpacity")->value, settings.getSettingByName<bool>("textRGB")->value);
-		addColorPicker("Background Color", "", settings.getSettingByName<std::string>("bgColor")->value, settings.getSettingByName<float>("bgOpacity")->value, settings.getSettingByName<bool>("bgRGB")->value);
-		addConditionalColorPicker(settings.getSettingByName<bool>("rectShadow")->value, "Background Shadow Color", "Background Shadow Color", settings.getSettingByName<std::string>("rectShadowCol")->value, settings.getSettingByName<float>("rectShadowOpacity")->value, settings.getSettingByName<bool>("rectShadowRGB")->value);
-		addConditionalColorPicker(settings.getSettingByName<bool>("textShadow")->value, "Text Shadow Color", "Text Shadow Color", settings.getSettingByName<std::string>("textShadowCol")->value, settings.getSettingByName<float>("textShadowOpacity")->value, settings.getSettingByName<bool>("textShadowRGB")->value);
-		addConditionalColorPicker(settings.getSettingByName<bool>("border")->value, "Border Color", "", settings.getSettingByName<std::string>("borderColor")->value, settings.getSettingByName<float>("borderOpacity")->value, settings.getSettingByName<bool>("borderRGB")->value);
-		addConditionalColorPicker(settings.getSettingByName<bool>("glow")->value, "Glow Color", "", settings.getSettingByName<std::string>("glowColor")->value, settings.getSettingByName<float>("glowOpacity")->value, settings.getSettingByName<bool>("glowRGB")->value);
+		addConditionalColorPicker(!getOps<bool>("pbmode"), "Text Color", "", "text");
+		addColorPicker("Background Color", "", "bg");
+		addConditionalColorPicker(getOps<bool>("rectShadow"), "Background Shadow Color", "", "rectShadow");
+		addConditionalColorPicker(getOps<bool>("textShadow"), "Text Shadow Color", "", "textShadow");
+		addConditionalColorPicker(getOps<bool>("border"), "Border Color", "", "border");
+		addConditionalColorPicker(getOps<bool>("glow"), "Glow Color", "", "glow");
 		extraPadding();
 
 		addHeader("Misc");
-		addConditionalToggle(!settings.getSettingByName<bool>("pbmode")->value, "Reverse Padding X", "For Text Position", settings.getSettingByName<bool>("reversepaddingx")->value);
-		addConditionalToggle(!settings.getSettingByName<bool>("pbmode")->value, "Reverse Padding Y", "For Text Position", settings.getSettingByName<bool>("reversepaddingy")->value);
-		addConditionalSlider(!settings.getSettingByName<bool>("pbmode")->value, "Padding X", "For Text Position", settings.getSettingByName<float>("padx")->value);
-		addConditionalSlider(!settings.getSettingByName<bool>("pbmode")->value, "Padding Y", "For Text Position", settings.getSettingByName<float>("pady")->value);
-		addConditionalSlider(!settings.getSettingByName<bool>("pbmode")->value, "Rectangle Width", "", settings.getSettingByName<float>("rectwidth")->value, 2.f, 0.001f);
-		addConditionalSlider(!settings.getSettingByName<bool>("pbmode")->value, "Rectangle Height", "", settings.getSettingByName<float>("rectheight")->value, 2.f, 0.001f);
-		addConditionalToggle(!settings.getSettingByName<bool>("pbmode")->value, "Responsive Rectangle", "Rectangle resizes with text", settings.getSettingByName<bool>("responsivewidth")->value);
-		addSlider("Rotation", "see for yourself!", settings.getSettingByName<float>("rotation")->value, 360.f, 0, false);
+		addConditionalToggle(!getOps<bool>("pbmode"), "Reverse Padding X", "For Text Position", getOps<bool>("reversepaddingx"));
+		addConditionalToggle(!getOps<bool>("pbmode"), "Reverse Padding Y", "For Text Position", getOps<bool>("reversepaddingy"));
+		addConditionalSlider(!getOps<bool>("pbmode"), "Padding X", "For Text Position", getOps<float>("padx"));
+		addConditionalSlider(!getOps<bool>("pbmode"), "Padding Y", "For Text Position", getOps<float>("pady"));
+		addConditionalSlider(!getOps<bool>("pbmode"), "Rectangle Width", "", getOps<float>("rectwidth"), 2.f, 0.001f);
+		addConditionalSlider(!getOps<bool>("pbmode"), "Rectangle Height", "", getOps<float>("rectheight"), 2.f, 0.001f);
+		addConditionalToggle(!getOps<bool>("pbmode"), "Responsive Rectangle", "Rectangle resizes with text", getOps<bool>("responsivewidth"));
+		addSlider("Rotation", "see for yourself!", getOps<float>("rotation"), 360.f, 0, false);
 
 		FlarialGUI::UnsetScrollView();
 		resetPadding();
@@ -98,8 +95,8 @@ public:
 	void normalRender(int index, std::string& value) override {
 		if (SDK::getCurrentScreen() != "hud_screen") return;
 
-		if (settings.getSettingByName<bool>("pbmode")->value) {
-			if (settings.getSettingByName<bool>("onlyShowWhileBreaking")->value && value == "0%") return;
+		if (getOps<bool>("pbmode")) {
+			if (getOps<bool>("onlyShowWhileBreaking") && value == "0%") return;
 
 			value.pop_back();
 			float percent;
@@ -107,46 +104,36 @@ public:
 			percent /= 100.0f;
 
 			float barheight = Constraints::RelativeConstraint(
-				0.5f * settings.getSettingByName<float>("uiscale")->value);
+				0.5f * getOps<float>("uiscale"));
 			float barwidth = Constraints::RelativeConstraint(
-				0.05f * settings.getSettingByName<float>("uiscale")->value);
+				0.05f * getOps<float>("uiscale"));
 
-			D2D1_COLOR_F bgColor = settings.getSettingByName<bool>("bgRGB")->value ? FlarialGUI::rgbColor
-				: FlarialGUI::HexToColorF(
-					settings.getSettingByName<std::string>("bgColor")->value);
-			D2D1_COLOR_F barFill = settings.getSettingByName<bool>("barFillRGB")->value ? FlarialGUI::rgbColor
-				: FlarialGUI::HexToColorF(
-					settings.getSettingByName<std::string>("barFill")->value);
-			D2D1_COLOR_F outline = settings.getSettingByName<bool>("borderRGB")->value ? FlarialGUI::rgbColor
-				: FlarialGUI::HexToColorF(
-					settings.getSettingByName<std::string>("borderColor")->value);
+			D2D1_COLOR_F bgColor = getColor("bg");
+			D2D1_COLOR_F barFill = getColor("barFill");
+			D2D1_COLOR_F outline = getColor("border");
 
-			std::string orientation = settings.getSettingByName<std::string>("orientation")->value;
-
-			bgColor.a = settings.getSettingByName<float>("bgOpacity")->value;
-			barFill.a = settings.getSettingByName<float>("barFillOpacity")->value;
-			outline.a = settings.getSettingByName<float>("borderOpacity")->value;
+			std::string orientation = getOps<std::string>("orientation");
 
 			Vec2<float> settingperc = Vec2<float>(
-				settings.getSettingByName<float>("percentageX")->value,
-				settings.getSettingByName<float>("percentageY")->value
+				getOps<float>("percentageX"),
+				getOps<float>("percentageY")
 			);
 
 			Vec2<float> coord;
 			Vec2<float> rounde = Constraints::RoundingConstraint(
-				this->settings.getSettingByName<float>("rounding")->value *
-				settings.getSettingByName<float>("uiscale")->value,
-				this->settings.getSettingByName<float>("rounding")->value *
-				settings.getSettingByName<float>("uiscale")->value);
+				getOps<float>("rounding") *
+				getOps<float>("uiscale"),
+				getOps<float>("rounding") *
+				getOps<float>("uiscale"));
 
 			if (settingperc.x != 0)
 				coord = Vec2<float>(settingperc.x * MC::windowSize.x, settingperc.y * MC::windowSize.y);
 			else
-				coord = Constraints::CenterConstraint(barwidth * settings.getSettingByName<float>("pbwidth")->value,
-					barheight * settings.getSettingByName<float>("pbheight")->value);
+				coord = Constraints::CenterConstraint(barwidth * getOps<float>("pbwidth"),
+					barheight * getOps<float>("pbheight"));
 
-			float pbwidth = barwidth * settings.getSettingByName<float>("pbwidth")->value;
-			float pbheight = barheight * this->settings.getSettingByName<float>("pbheight")->value;
+			float pbwidth = barwidth * getOps<float>("pbwidth");
+			float pbheight = barheight * getOps<float>("pbheight");
 
 			if (orientation == "Horizontal") {
 				std::swap(pbwidth, pbheight);
@@ -173,13 +160,10 @@ public:
 
 			FlarialGUI::lerp(currentHeight, filledHeight, 0.5f * FlarialGUI::frameFactor);
 
-			if (this->settings.getSettingByName<bool>("glow")->value) {
-				D2D1_COLOR_F glowColor = settings.getSettingByName<bool>("glowRGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("glowColor")->value);
-				glowColor.a = settings.getSettingByName<float>("glowOpacity")->value;
-				FlarialGUI::ShadowRect(Vec2<float>(coord.x, coord.y), Vec2<float>(pbwidth, pbheight), glowColor, rounde.x, (this->settings.getSettingByName<float>("glowAmount")->value/100.f) *  Constraints::PercentageConstraint(0.1f, "top"));
-			}
-				
-			if (settings.getSettingByName<bool>("BlurEffect")->value)
+			if (getOps<bool>("glow"))
+				FlarialGUI::ShadowRect(Vec2<float>(coord.x, coord.y), Vec2<float>(pbwidth, pbheight), getColor("glow"), rounde.x, (getOps<float>("glowAmount") / 100.f) * Constraints::PercentageConstraint(0.1f, "top"));
+			
+			if (getOps<bool>("BlurEffect"))
 				FlarialGUI::BlurRect(
 					D2D1::RoundedRect(D2D1::RectF(coord.x, coord.y, coord.x + pbwidth, coord.y + pbheight),
 						rounde.x, rounde.x));
@@ -195,12 +179,12 @@ public:
 						rounde.x, rounde.y);
 			}
 
-			if (this->settings.getSettingByName<bool>("border")->value) {
+			if (getOps<bool>("border")) {
 				FlarialGUI::RoundedHollowRect(
 					coord.x,
 					coord.y,
-					Constraints::RelativeConstraint((this->settings.getSettingByName<float>("borderWidth")->value *
-						settings.getSettingByName<float>("uiscale")->value) / 100.0f,
+					Constraints::RelativeConstraint((getOps<float>("borderWidth") *
+						getOps<float>("uiscale")) / 100.0f,
 						"height", true),
 					outline,
 					pbwidth,

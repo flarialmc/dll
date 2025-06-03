@@ -26,10 +26,10 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<bool>("responsivewidth") == nullptr) settings.addSetting("responsivewidth", true);
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
+		setDef("responsivewidth", true);
+		setDef("textscale", 0.80f);
 		Module::defaultConfig("all");
-		if (settings.getSettingByName<bool>("port") == nullptr) settings.addSetting("port", false);
+		setDef("port", false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -47,7 +47,7 @@ public:
 
 		addHeader("IP Display");
 		defaultAddSettings("main");
-		addToggle("Show Port", "", settings.getSettingByName<bool>("port")->value);
+		addToggle("Show Port", "", getOps<bool>("port"));
 		extraPadding();
 
 		addHeader("Text");
@@ -69,7 +69,7 @@ public:
 		std::string IPStr = SDK::getServerIP();
 		std::string port = SDK::getServerPort();
 		std::string fullstr = IPStr;
-		if (this->settings.getSettingByName<bool>("port")->value) fullstr += ":" + port;
+		if (getOps<bool>("port")) fullstr += ":" + port;
 		this->normalRender(10, fullstr);
 	}
 };

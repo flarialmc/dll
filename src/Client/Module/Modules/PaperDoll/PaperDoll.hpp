@@ -34,8 +34,8 @@ public:
 	void defaultConfig() override {
 		Module::defaultConfig("core");
 		Module::defaultConfig("pos");
-		if (settings.getSettingByName<float>("uiscale") == nullptr) settings.addSetting("uiscale", 21.0f);
-		if (settings.getSettingByName<bool>("alwaysshow") == nullptr) settings.addSetting("alwaysshow", false);
+		setDef("uiscale", 21.0f);
+		setDef("alwaysshow", false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -50,8 +50,8 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Movable Paperdoll");
-		addSlider("UI Scale", "", settings.getSettingByName<float>("uiscale")->value);
-		addToggle("Always Show", "", settings.getSettingByName<bool>("alwaysshow")->value);
+		addSlider("UI Scale", "", getOps<float>("uiscale"));
+		addToggle("Always Show", "", getOps<bool>("alwaysshow"));
 		FlarialGUI::UnsetScrollView();
 		resetPadding();
 	}
@@ -67,8 +67,8 @@ public:
 			float height = currentSize.y;
 
 
-			Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
-				this->settings.getSettingByName<float>("percentageY")->value);
+			Vec2<float> settingperc = Vec2<float>(getOps<float>("percentageX"),
+				getOps<float>("percentageY"));
 
 			if (settingperc.x != 0)
 				currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
@@ -111,7 +111,7 @@ public:
 
 						control->parentRelativePosition = Vec2<float>{ scaledPos.x, scaledPos.y };
 
-						auto scale = this->settings.getSettingByName<float>("uiscale")->value;
+						auto scale = getOps<float>("uiscale");
 
 						auto size = Vec2<float>{ scale, scale * 2 };
 
@@ -119,7 +119,7 @@ public:
 
 						control->sizeConstrains = Vec2<float>{ scale, scale };
 
-						if (this->settings.getSettingByName<bool>("alwaysshow")->value || ClickGUI::editmenu) {
+						if (getOps<bool>("alwaysshow") || ClickGUI::editmenu) {
 							auto component = reinterpret_cast<CustomRenderComponent*>(control->getComponents()[4].get());
 							component->renderer->state = 1.0f;
 						}

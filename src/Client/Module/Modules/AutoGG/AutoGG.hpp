@@ -26,7 +26,7 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"GG");
+		setDef("text", (std::string)"GG");
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -44,7 +44,7 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		this->addHeader("Auto GG");
-		this->addTextBox("Text", "The text to send.", settings.getSettingByName<std::string>("text")->value);
+		this->addTextBox("Text", "The text to send.", getOps<std::string>("text"));
 
 		FlarialGUI::UnsetScrollView();
 
@@ -74,7 +74,7 @@ public:
 				//Mineville
 				pkt->text == "§aYou Win!" ||
 				pkt->text == "§cGame Over!") {
-
+					
 				SendGG();
 			}
 		}
@@ -89,7 +89,7 @@ public:
 		}
 	}
 	void SendGG() {
-		std::string win_message = this->settings.getSettingByName<std::string>("text")->value;
+		std::string win_message = getOps<std::string>("text");
 		if (!win_message.empty()) {
 			auto player = SDK::clientInstance->getLocalPlayer();
 			std::shared_ptr<Packet> packet = SDK::createPacket(9);

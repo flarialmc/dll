@@ -40,7 +40,7 @@ public:
 			this->settings.addSetting("opacity" + end, (float)opacity);
 			this->settings.addSetting("world" + end, (std::string)SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName());
 			this->settings.addSetting("dimension" + end, (std::string)SDK::clientInstance->getBlockSource()->getDimension()->getName());
-			this->settings.setValue("total", this->settings.getSettingByName<float>("total")->value + 1);
+			this->settings.setValue("total", getOps<float>("total") + 1);
 			this->saveSettings();
 
 			Waypoint wp(position, false, 100.0f, index, state);
@@ -79,8 +79,8 @@ public:
 			return {};
 			});
 
-		if (this->settings.getSettingByName<float>("total")->value > 0)
-			for (int i = 0; i < this->settings.getSettingByName<float>("total")->value; i++) {
+		if (getOps<float>("total") > 0)
+			for (int i = 0; i < getOps<float>("total"); i++) {
 				if (!this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(i))) continue;
 				addWaypoint(
 					i,
@@ -106,30 +106,18 @@ public:
 	void defaultConfig() override {
 		getKeybind();
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<float>("distance") == nullptr) settings.addSetting("distance", 1000.0f);
-		if (settings.getSettingByName<float>("total") == nullptr) settings.addSetting("total", 0.0f);
-
-		if (settings.getSettingByName<std::string>("bgcolor") == nullptr) settings.addSetting("bgcolor", (std::string)"000000");
-		if (settings.getSettingByName<float>("bgopacity") == nullptr) settings.addSetting("bgopacity", 0.25f);
-		if (settings.getSettingByName<float>("bgrounding") == nullptr) settings.addSetting("bgrounding", 10.0f);
-		if (settings.getSettingByName<bool>("bgrgb") == nullptr) settings.addSetting("bgrgb", false);
-
-		if (settings.getSettingByName<std::string>("bordercolor") == nullptr) settings.addSetting("bordercolor", (std::string)"000000");
-		if (settings.getSettingByName<float>("borderthickness") == nullptr) settings.addSetting("borderthickness", 2.5f);
-		if (settings.getSettingByName<bool>("borderrgb") == nullptr) settings.addSetting("borderrgb", false);
-		if (settings.getSettingByName<float>("borderopacity") == nullptr) settings.addSetting("borderopacity", 1.0f);
-
-		if (settings.getSettingByName<std::string>("textcolor") == nullptr) settings.addSetting("textcolor", (std::string)"000000");
-		if (settings.getSettingByName<float>("textopacity") == nullptr) settings.addSetting("textopacity", 1.0f);
-		if (settings.getSettingByName<bool>("textrgb") == nullptr) settings.addSetting("textrgb", false);
-
-		if (settings.getSettingByName<bool>("textuse") == nullptr) settings.addSetting("textuse", true);
-		if (settings.getSettingByName<bool>("bguse") == nullptr) settings.addSetting("bguse", true);
-		if (settings.getSettingByName<bool>("borderuse") == nullptr) settings.addSetting("borderuse", true);
-
-		if (settings.getSettingByName<bool>("border") == nullptr) settings.addSetting("border", true);
-
-		if (this->settings.getSettingByName<bool>("showmeters") == nullptr) settings.addSetting("showmeters", true);
+		setDef("distance", 1000.0f);
+		setDef("total", 0.0f);
+		setDef("bg", (std::string)"000000", 0.25f, false);
+		setDef("border", (std::string)"000000", 1.f, false);
+		setDef("bgrounding", 10.0f);
+		setDef("borderthickness", 2.5f);
+		setDef("text", (std::string)"000000", 1.f, false);
+		setDef("textuse", true);
+		setDef("bguse", true);
+		setDef("borderuse", true);
+		setDef("border", true);
+		setDef("showmeters", true);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -162,37 +150,34 @@ public:
 			FlarialGUI::Notify("Added! Scroll down for options.");
 			});
 		addKeybind("Add waypoint keybind", "Hold for 2 seconds to set bind.", getKeybind());
-		addSlider("Distance", "Change until which distance waypoints will be drawn.", settings.getSettingByName<float>("distance")->value, 10000.f, 0.f, true);
+		addSlider("Distance", "Change until which distance waypoints will be drawn.", getOps<float>("distance"), 10000.f, 0.f, true);
 		extraPadding();
 
 		addHeader("Background");
-		addSlider("Rounding", "", settings.getSettingByName<float>("bgrounding")->value);
-		addToggle("Waypoint color", "Whether the Background should be the waypoint's color.", settings.getSettingByName<bool>("bguse")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("bguse")->value, "Opacity", "", settings.getSettingByName<float>("bgopacity")->value, 1.0f, 0.0f);
-		addConditionalColorPicker(!settings.getSettingByName<bool>("bguse")->value, "Color", "", settings.getSettingByName<std::string>("bgcolor")->value, settings.getSettingByName<float>("bgopacity")->value, settings.getSettingByName<bool>("bgrgb")->value);
-		addToggle("Border", "Draw a Border?", settings.getSettingByName<bool>("border")->value);
+		addSlider("Rounding", "", getOps<float>("bgrounding"));
+		addToggle("Waypoint color", "Whether the Background should be the waypoint's color.", getOps<bool>("bguse"));
+		addConditionalColorPicker(!getOps<bool>("bguse"), "Color", "", "bg");
+		addToggle("Border", "Draw a Border?", getOps<bool>("border"));
 		extraPadding();
 
-		if (settings.getSettingByName<bool>("border")->value) {
+		if (getOps<bool>("border")) {
 			addHeader("Border");
-			addSlider("Thickness", "Change the border thickness", settings.getSettingByName<float>("borderthickness")->value, 15.0f);
-			addToggle("Waypoint color", "Whether the Border should be the waypoint's color.", settings.getSettingByName<bool>("borderuse")->value);
-			addConditionalSlider(settings.getSettingByName<bool>("borderuse")->value, "Opacity", "", settings.getSettingByName<float>("borderopacity")->value, 1.0f, 0.0f);
-			addConditionalColorPicker(!settings.getSettingByName<bool>("borderuse")->value, "Color", "", settings.getSettingByName<std::string>("bordercolor")->value, settings.getSettingByName<float>("borderopacity")->value, settings.getSettingByName<bool>("borderrgb")->value);
+			addSlider("Thickness", "Change the border thickness", getOps<float>("borderthickness"), 15.0f);
+			addToggle("Waypoint color", "Whether the Border should be the waypoint's color.", getOps<bool>("borderuse"));
+			addConditionalColorPicker(!getOps<bool>("borderuse"), "Color", "", "border");
 			extraPadding();
 		}
 
 		addHeader("Text");
-		addToggle("Waypoint color", "Whether the Text should be the waypoint's color.", settings.getSettingByName<bool>("textuse")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("textuse")->value, "Opacity", "", settings.getSettingByName<float>("textopacity")->value, 1.0f, 0.0f);
-		addConditionalColorPicker(!settings.getSettingByName<bool>("textuse")->value, "Color", "", settings.getSettingByName<std::string>("textcolor")->value, settings.getSettingByName<float>("textopacity")->value, settings.getSettingByName<bool>("textrgb")->value);
+		addToggle("Waypoint color", "Whether the Text should be the waypoint's color.", getOps<bool>("textuse"));
+		addConditionalColorPicker(!getOps<bool>("textuse"), "Color", "", "text");
 
 		for (auto pair : WaypointList) {
 			if (!this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(pair.second.index))) continue;
 			if (this->settings.getSettingByName<std::string>("world-" + FlarialGUI::cached_to_string(pair.second.index))->value != SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()) continue;
 			this->addHeader(this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(pair.second.index))->value);
 			this->addToggle("Enabled", "Change if the waypoint should be shown or not.", this->settings.getSettingByName<bool>("state-" + FlarialGUI::cached_to_string(pair.second.index))->value);
-			this->addColorPicker("Color", "Change the color of the waypoint.", this->settings.getSettingByName<std::string>("color-" + FlarialGUI::cached_to_string(pair.second.index))->value, this->settings.getSettingByName<float>("opacity-" + FlarialGUI::cached_to_string(pair.second.index))->value, this->settings.getSettingByName<bool>("rgb-" + FlarialGUI::cached_to_string(pair.second.index))->value);
+			this->addColorPicker("Color", "Change the color of the waypoint.", "waypoint" + FlarialGUI::cached_to_string(pair.second.index));
 			this->addTextBox("Name", "Change the name of the waypoint.", this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(pair.second.index))->value);
 			this->addButton("Delete Waypoint", "", "Delete", [this, index = pair.second.index]() {
 				std::string end = "-" + FlarialGUI::cached_to_string(index);
@@ -253,83 +238,29 @@ public:
 					//calculate font size
 					float minFontSize = Constraints::RelativeConstraint(0.09f, "height", true);
 					float maxFontSize = Constraints::RelativeConstraint(0.14f, "height", true);
-					float fontSize = maxFontSize - (maxFontSize - minFontSize) * (distance / this->settings.getSettingByName<float>("distance")->value);
+					float fontSize = maxFontSize - (maxFontSize - minFontSize) * (distance / getOps<float>("distance"));
 					fontSize = std::max(minFontSize, std::min(fontSize, maxFontSize));
 
 					//check distance
-					if (distance < this->settings.getSettingByName<float>("distance")->value)
+					if (distance < getOps<float>("distance"))
 					{
 						//################ COLORS
 
 						//get the bg color
 						D2D1_COLOR_F rect;
-						if (this->settings.getSettingByName<bool>("bguse")->value)
-						{
-							if (this->settings.getSettingByName<bool>("rgb-" + FlarialGUI::cached_to_string(pair.second.index))->value)
-							{
-								rect = FlarialGUI::rgbColor;
-							}
-							else {
-								rect = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + FlarialGUI::cached_to_string(pair.second.index))->value);
-							}
-
-						}
-						else {
-							if (this->settings.getSettingByName<bool>("bgrgb")->value)
-							{
-								rect = FlarialGUI::rgbColor;
-							}
-							else {
-								rect = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("bgcolor")->value);
-							}
-						}
-						rect.a = this->settings.getSettingByName<float>("bgopacity")->value;
+						if (getOps<bool>("bguse")) rect = getColor("waypoint" + FlarialGUI::cached_to_string(pair.second.index));
+						else rect = getColor("bg");
 
 						//get the border color
 						D2D1_COLOR_F border;
-						if (this->settings.getSettingByName<bool>("borderuse")->value)
-						{
-							if (this->settings.getSettingByName<bool>("rgb-" + FlarialGUI::cached_to_string(pair.second.index))->value)
-							{
-								border = FlarialGUI::rgbColor;
-							}
-							else {
-								border = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + FlarialGUI::cached_to_string(pair.second.index))->value);
-							}
-						}
-						else {
-							if (this->settings.getSettingByName<bool>("borderrgb")->value)
-							{
-								border = FlarialGUI::rgbColor;
-							}
-							else {
-								border = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("bordercolor")->value);
-							}
-						}
-						border.a = this->settings.getSettingByName<float>("borderopacity")->value;
+						if (getOps<bool>("borderuse")) border = getColor("waypoint" + FlarialGUI::cached_to_string(pair.second.index));
+						else border = getColor("border");
 
 						//get the text color
 						D2D1_COLOR_F text;
-						if (this->settings.getSettingByName<bool>("textuse")->value)
-						{
-							if (this->settings.getSettingByName<bool>("rgb-" + FlarialGUI::cached_to_string(pair.second.index))->value)
-							{
-								text = FlarialGUI::rgbColor;
-							}
-							else {
-								text = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color-" + FlarialGUI::cached_to_string(pair.second.index))->value);
-							}
-						}
-						else {
-							if (this->settings.getSettingByName<bool>("textrgb")->value)
-							{
-								text = FlarialGUI::rgbColor;
-							}
-							else {
-								text = FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("textcolor")->value);
-							}
-						}
-						text.a = this->settings.getSettingByName<float>("textopacity")->value;
+						if (getOps<bool>("textuse")) text = getColor("waypoint" + FlarialGUI::cached_to_string(pair.second.index));
+						else text = getColor("text");
+						text.a = getOps<float>("textopacity");
 
 
 						//################ DRAWING
@@ -344,22 +275,22 @@ public:
 							rect,
 							FlarialGUI::TextSizes[name] + 10.0F,
 							40.0F,
-							this->settings.getSettingByName<float>("bgrounding")->value,
-							this->settings.getSettingByName<float>("bgrounding")->value
+							getOps<float>("bgrounding"),
+							getOps<float>("bgrounding")
 						);
 
 						//draw border
-						if (this->settings.getSettingByName<bool>("border")->value)
+						if (getOps<bool>("border"))
 						{
 							FlarialGUI::RoundedHollowRect(
 								screen.x - 5.0F,
 								screen.y - 20.0F,
-								this->settings.getSettingByName<float>("borderthickness")->value,
+								getOps<float>("borderthickness"),
 								border,
 								FlarialGUI::TextSizes[name] + 10.0F,
 								40.0F,
-								this->settings.getSettingByName<float>("bgrounding")->value,
-								this->settings.getSettingByName<float>("bgrounding")->value
+								getOps<float>("bgrounding"),
+								getOps<float>("bgrounding")
 							);
 						}
 						//draw actual text

@@ -26,7 +26,7 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value} m/s");
+		setDef("text", (std::string)"{value} m/s");
 		Module::defaultConfig("all");
 	}
 

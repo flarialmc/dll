@@ -27,8 +27,8 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<bool>("onlyWithArmor") == nullptr) settings.addSetting("onlyWithArmor", true);
-		if (settings.getSettingByName<bool>("tryToExcludeTeam") == nullptr) settings.addSetting("tryToExcludeTeam", true);
+		setDef("onlyWithArmor", true);
+		setDef("tryToExcludeTeam", true);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -43,8 +43,8 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Instant Hurt Animation");
-		addToggle("Try to exclude team", "", settings.getSettingByName<bool>("tryToExcludeTeam")->value);
-		addToggle("Only with armor", "", settings.getSettingByName<bool>("onlyWithArmor")->value);
+		addToggle("Try to exclude team", "", getOps<bool>("tryToExcludeTeam"));
+		addToggle("Only with armor", "", getOps<bool>("onlyWithArmor"));
 
 		FlarialGUI::UnsetScrollView();
 
@@ -80,7 +80,7 @@ public:
 		if (!event.getActor()->isValid()) return;
 		if (!event.getActor()->isValidAABB()) return;
 		if (!event.getActor()->hasCategory(ActorCategory::Player)) return;
-		if (this->settings.getSettingByName<bool>("onlyWithArmor")->value) {
+		if (getOps<bool>("onlyWithArmor")) {
 			auto armorContainer = event.getActor()->getArmorContainer();
 			if (armorContainer == nullptr) return;
 
@@ -91,7 +91,7 @@ public:
 
 			if (!helmetItem->item || !chestplateItem->item || !leggingsItem->item || !bootsItem->item) return;
 		}
-		if (this->settings.getSettingByName<bool>("tryToExcludeTeam")->value)
+		if (getOps<bool>("tryToExcludeTeam"))
 			if (event.getActor()->IsOnSameTeam(SDK::clientInstance->getLocalPlayer())) return;
 
 		ClearOldHits();

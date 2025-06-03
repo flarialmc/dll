@@ -9,50 +9,6 @@
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
-#define colors_text FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_text")->value)
-#define o_colors_text clickgui->settings.getSettingByName<float>("o_colors_text")->value
-#define colors_text_rgb clickgui->settings.getSettingByName<bool>("colors_text_rgb")->value
-
-#define colors_secondary1 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary1")->value)
-#define o_colors_secondary1 clickgui->settings.getSettingByName<float>("o_colors_secondary1")->value
-#define colors_secondary1_rgb clickgui->settings.getSettingByName<bool>("colors_secondary1_rgb")->value
-
-#define colors_secondary2 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary2")->value)
-#define o_colors_secondary2 clickgui->settings.getSettingByName<float>("o_colors_secondary2")->value
-#define colors_secondary2_rgb clickgui->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
-
-#define colors_secondary3 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary3")->value)
-#define o_colors_secondary3 clickgui->settings.getSettingByName<float>("o_colors_secondary3")->value
-#define colors_secondary3_rgb clickgui->settings.getSettingByName<bool>("colors_secondary3_rgb")->value
-
-#define colors_secondary5 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary5")->value)
-#define o_colors_secondary5 clickgui->settings.getSettingByName<float>("o_colors_secondary5")->value
-#define colors_secondary5_rgb clickgui->settings.getSettingByName<bool>("colors_secondary5_rgb")->value
-
-#define colors_secondary6 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary6")->value)
-#define o_colors_secondary6 clickgui->settings.getSettingByName<float>("o_colors_secondary6")->value
-#define colors_secondary6_rgb clickgui->settings.getSettingByName<bool>("colors_secondary6_rgb")->value
-
-#define colors_secondary7 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary7")->value)
-#define o_colors_secondary7 clickgui->settings.getSettingByName<float>("o_colors_secondary7")->value
-#define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
-
-#define colors_secondary8 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary8")->value)
-#define o_colors_secondary8 clickgui->settings.getSettingByName<float>("o_colors_secondary8")->value
-#define colors_secondary8_rgb clickgui->settings.getSettingByName<bool>("colors_secondary8_rgb")->value
-
-#define colors_FlarialLogo FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_FlarialLogo")->value)
-#define o_colors_FlarialLogo clickgui->settings.getSettingByName<float>("o_colors_FlarialLogo")->value
-#define colors_FlarialLogo_rgb clickgui->settings.getSettingByName<bool>("colors_FlarialLogo_rgb")->value
-
-#define colors_radiobutton_enabled FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_radiobutton_enabled")->value)
-#define o_colors_radiobutton_enabled clickgui->settings.getSettingByName<float>("o_colors_radiobutton_enabled")->value
-#define colors_radiobutton_enabled_rgb clickgui->settings.getSettingByName<bool>("colors_radiobutton_enabled_rgb")->value
-
-#define colors_radiobutton_disabled FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_radiobutton_disabled")->value)
-#define o_colors_radiobutton_disabled clickgui->settings.getSettingByName<float>("o_colors_radiobutton_disabled")->value
-#define colors_radiobutton_disabled_rgb clickgui->settings.getSettingByName<bool>("colors_radiobutton_disabled_rgb")->value
-
 class TextPacket;
 
 struct PageType {
@@ -92,6 +48,12 @@ public:
 	static float inline accumilatedBarPos = 1;
 	static bool inline isAnimatingModSet = false;
 	static std::chrono::time_point<std::chrono::high_resolution_clock> favoriteStart;
+
+	D2D_COLOR_F getColor(std::string text) {
+		D2D_COLOR_F col = this->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>(text + "Col")->value);
+		col.a = this->settings.getSettingByName<float>(text + "Opacity")->value;
+		return col;
+	}
 
 	static bool containsAny(const std::string& str) {
 		return std::any_of(APIUtils::onlineUsers.begin(), APIUtils::onlineUsers.end(),
@@ -181,187 +143,38 @@ public:
 	void defaultConfig() override {
 		getKeybind();
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<std::string>("editmenubind") == nullptr)
-			settings.addSetting("editmenubind", (std::string)"L");
-
-		if (settings.getSettingByName<bool>("custom_logo") == nullptr)
-			settings.addSetting("custom_logo", false);
-
-		if (settings.getSettingByName<std::string>("colors_text") == nullptr)
-			settings.addSetting("colors_text", (std::string)"ffffff");
-		if (settings.getSettingByName<float>("o_colors_text") == nullptr)
-			settings.addSetting("o_colors_text", 1.0f);
-		if (settings.getSettingByName<bool>("colors_text_rgb") == nullptr)
-			settings.addSetting("colors_text_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_enabled") == nullptr)
-			settings.addSetting("colors_enabled", (std::string)"188830");
-		if (settings.getSettingByName<float>("o_colors_enabled") == nullptr)
-			settings.addSetting("o_colors_enabled", 1.0f);
-		if (settings.getSettingByName<bool>("colors_enabled_rgb") == nullptr)
-			settings.addSetting("colors_enabled_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_disabled") == nullptr)
-			settings.addSetting("colors_disabled", (std::string)"7d1820");
-		if (settings.getSettingByName<float>("o_colors_disabled") == nullptr)
-			settings.addSetting("o_colors_disabled", 1.0f);
-		if (settings.getSettingByName<bool>("colors_disabled_rgb") == nullptr)
-			settings.addSetting("colors_disabled_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_primary1") == nullptr)
-			settings.addSetting("colors_primary1", (std::string)"ff233a");
-		if (settings.getSettingByName<float>("o_colors_primary1") == nullptr)
-			settings.addSetting("o_colors_primary1", 1.0f);
-		if (settings.getSettingByName<bool>("colors_primary1_rgb") == nullptr)
-			settings.addSetting("colors_primary1_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_primary2") == nullptr)
-			settings.addSetting("colors_primary2", (std::string)"ffffff");
-		if (settings.getSettingByName<float>("o_colors_primary2") == nullptr)
-			settings.addSetting("o_colors_primary2", 1.0f);
-		if (settings.getSettingByName<bool>("colors_primary2_rgb") == nullptr)
-			settings.addSetting("colors_primary2_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_primary3") == nullptr)
-			settings.addSetting("colors_primary3", (std::string)"9a6b72");
-		if (settings.getSettingByName<float>("o_colors_primary3") == nullptr)
-			settings.addSetting("o_colors_primary3", 1.0f);
-		if (settings.getSettingByName<bool>("colors_primary3_rgb") == nullptr)
-			settings.addSetting("colors_primary3_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_primary4") == nullptr)
-			settings.addSetting("colors_primary4", (std::string)"704b52");
-		if (settings.getSettingByName<float>("o_colors_primary4") == nullptr)
-			settings.addSetting("o_colors_primary4", 1.0f);
-		if (settings.getSettingByName<bool>("colors_primary4_rgb") == nullptr)
-			settings.addSetting("colors_primary4_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_secondary1") == nullptr)
-			settings.addSetting("colors_secondary1", (std::string)"3f2a2d");
-		if (settings.getSettingByName<float>("o_colors_secondary1") == nullptr)
-			settings.addSetting("o_colors_secondary1", 1.0f);
-		if (settings.getSettingByName<bool>("colors_secondary1_rgb") == nullptr)
-			settings.addSetting("colors_secondary1_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_secondary2") == nullptr)
-			settings.addSetting("colors_secondary2", (std::string)"201a1b");
-		if (settings.getSettingByName<float>("o_colors_secondary2") == nullptr)
-			settings.addSetting("o_colors_secondary2", 1.0f);
-		if (settings.getSettingByName<bool>("colors_secondary2_rgb") == nullptr)
-			settings.addSetting("colors_secondary2_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_secondary3") == nullptr)
-			settings.addSetting("colors_secondary3", (std::string)"120e0f");
-		if (settings.getSettingByName<float>("o_colors_secondary3") == nullptr)
-			settings.addSetting("o_colors_secondary3", 1.0f);
-		if (settings.getSettingByName<bool>("colors_secondary3_rgb") == nullptr)
-			settings.addSetting("colors_secondary3_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_secondary4") == nullptr)
-			settings.addSetting("colors_secondary4", (std::string)"1c1616");
-		if (settings.getSettingByName<float>("o_colors_secondary4") == nullptr)
-			settings.addSetting("o_colors_secondary4", 1.0f);
-		if (settings.getSettingByName<bool>("colors_secondary4_rgb") == nullptr)
-			settings.addSetting("colors_secondary4_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_secondary5") == nullptr)
-			settings.addSetting("colors_secondary5", (std::string)"8b1b25");
-		if (settings.getSettingByName<float>("o_colors_secondary5") == nullptr)
-			settings.addSetting("o_colors_secondary5", 1.0f);
-		if (settings.getSettingByName<bool>("colors_secondary5_rgb") == nullptr)
-			settings.addSetting("colors_secondary5_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_secondary6") == nullptr)
-			settings.addSetting("colors_secondary6", (std::string)"ff2438");
-		if (settings.getSettingByName<float>("o_colors_secondary6") == nullptr)
-			settings.addSetting("o_colors_secondary6", 1.0f);
-		if (settings.getSettingByName<bool>("colors_secondary6_rgb") == nullptr)
-			settings.addSetting("colors_secondary6_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_secondary7") == nullptr)
-			settings.addSetting("colors_secondary7", (std::string)"943c3c");
-		if (settings.getSettingByName<float>("o_colors_secondary7") == nullptr)
-			settings.addSetting("o_colors_secondary7", 1.0f);
-		if (settings.getSettingByName<bool>("colors_secondary7_rgb") == nullptr)
-			settings.addSetting("colors_secondary7_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_secondary8") == nullptr)
-			settings.addSetting("colors_secondary8", (std::string)"302728");
-		if (settings.getSettingByName<float>("o_colors_secondary8") == nullptr)
-			settings.addSetting("o_colors_secondary8", 1.0f);
-		if (settings.getSettingByName<bool>("colors_secondary8_rgb") == nullptr)
-			settings.addSetting("colors_secondary8_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_mod1") == nullptr)
-			settings.addSetting("colors_mod1", (std::string)"201a1b");
-		if (settings.getSettingByName<float>("o_colors_mod1") == nullptr)
-			settings.addSetting("o_colors_mod1", 1.0f);
-		if (settings.getSettingByName<bool>("colors_mod1_rgb") == nullptr)
-			settings.addSetting("colors_mod1_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_mod2") == nullptr)
-			settings.addSetting("colors_mod2", (std::string)"2f2022");
-		if (settings.getSettingByName<float>("o_colors_mod2") == nullptr)
-			settings.addSetting("o_colors_mod2", 1.0f);
-		if (settings.getSettingByName<bool>("colors_mod2_rgb") == nullptr)
-			settings.addSetting("colors_mod2_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_mod3") == nullptr)
-			settings.addSetting("colors_mod3", (std::string)"3f2a2d");
-		if (settings.getSettingByName<float>("o_colors_mod3") == nullptr)
-			settings.addSetting("o_colors_mod3", 1.0f);
-		if (settings.getSettingByName<bool>("colors_mod3_rgb") == nullptr)
-			settings.addSetting("colors_mod3_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_mod4") == nullptr)
-			settings.addSetting("colors_mod4", (std::string)"705d60");
-		if (settings.getSettingByName<float>("o_colors_mod4") == nullptr)
-			settings.addSetting("o_colors_mod4", 1.0f);
-		if (settings.getSettingByName<bool>("colors_mod4_rgb") == nullptr)
-			settings.addSetting("colors_mod4_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_modicon") == nullptr)
-			settings.addSetting("colors_modicon", (std::string)"1A1313");
-		if (settings.getSettingByName<float>("o_colors_modicon") == nullptr)
-			settings.addSetting("o_colors_modicon", 1.0f);
-		if (settings.getSettingByName<bool>("colors_modicon_rgb") == nullptr)
-			settings.addSetting("colors_modicon_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_FlarialLogo") == nullptr)
-			settings.addSetting("colors_FlarialLogo", (std::string)"FE4443");
-		if (settings.getSettingByName<float>("o_colors_FlarialLogo") == nullptr)
-			settings.addSetting("o_colors_FlarialLogo", 1.0f);
-		if (settings.getSettingByName<bool>("colors_FlarialLogo_rgb") == nullptr)
-			settings.addSetting("colors_FlarialLogo_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_mod_settings_icon") == nullptr)
-			settings.addSetting("colors_mod_settings_icon", (std::string)"FFFFFF");
-		if (settings.getSettingByName<float>("o_colors_mod_settings_icon") == nullptr)
-			settings.addSetting("o_colors_mod_settings_icon", 1.0f);
-		if (settings.getSettingByName<bool>("colors_mod_settings_icon_rgb") == nullptr)
-			settings.addSetting("colors_mod_settings_icon_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_radiobutton_enabled") == nullptr)
-			settings.addSetting("colors_radiobutton_enabled", (std::string)"D0A0A8");
-		if (settings.getSettingByName<float>("o_colors_radiobutton_enabled") == nullptr)
-			settings.addSetting("o_colors_radiobutton_enabled", 1.0f);
-		if (settings.getSettingByName<bool>("colors_radiobutton_enabled_rgb") == nullptr)
-			settings.addSetting("colors_radiobutton_enabled_rgb", false);
-
-		if (settings.getSettingByName<std::string>("colors_radiobutton_disabled") == nullptr)
-			settings.addSetting("colors_radiobutton_disabled", (std::string)"FFFFFF");
-		if (settings.getSettingByName<float>("o_colors_radiobutton_disabled") == nullptr)
-			settings.addSetting("o_colors_radiobutton_disabled", 1.0f);
-		if (settings.getSettingByName<bool>("colors_radiobutton_disabled_rgb") == nullptr)
-			settings.addSetting("colors_radiobutton_disabled_rgb", false);
-
-		if (settings.getSettingByName<float>("_overrideAlphaValues_") == nullptr)
-			settings.addSetting("_overrideAlphaValues_", 1.0f);
+		setDef("editmenubind", (std::string)"L");
+		setDef("custom_logo", false);
+		setDef("globalText", (std::string)"ffffff", 1.f, false);
+		setDef("modCardEnabled", (std::string)"188830", 1.f, false);
+		setDef("modCardDisabled", (std::string)"7d1820", 1.f, false);
+		setDef("primary1", (std::string)"ff233a", 1.f, false);
+		setDef("primary2", (std::string)"ffffff", 1.f, false);
+		setDef("primary3", (std::string)"9a6b72", 1.f, false);
+		setDef("primary4", (std::string)"704b52", 1.f, false);
+		setDef("secondary1", (std::string)"3f2a2d", 1.f, false);
+		setDef("secondary2", (std::string)"201a1b", 1.f, false);
+		setDef("secondary3", (std::string)"120e0f", 1.f, false);
+		setDef("secondary4", (std::string)"1c1616", 1.f, false);
+		setDef("secondary5", (std::string)"8b1b25", 1.f, false);
+		setDef("secondary6", (std::string)"ff2438", 1.f, false);
+		setDef("secondary7", (std::string)"943c3c", 1.f, false);
+		setDef("secondary8", (std::string)"302728", 1.0f, false);
+		setDef("modcard1", (std::string)"201a1b", 1.0f, false);
+		setDef("modcard2", (std::string)"2f2022", 1.0f, false);
+		setDef("modcard3", (std::string)"3f2a2d", 1.0f, false);
+		setDef("modcard4", (std::string)"705d60", 1.0f, false);
+		setDef("modicon", (std::string)"1A1313", 1.0f, false);
+		setDef("flariallogo", (std::string)"FE4443", 1.0f, false);
+		setDef("modsettings", (std::string)"FFFFFF", 1.0f, false);
+		setDef("enabledRadioButton", (std::string)"D0A0A8", 1.0f, false);
+		setDef("disabledRadioButton", (std::string)"FFFFFF", 1.0f, false);
+		setDef("_overrideAlphaValues_", 1.f);
 	}
 
 	void settingsRender(float settingsOffset) override {
-		if (settings.getSettingByName<std::string>("editmenubind")->value.empty())
-			settings.getSettingByName<std::string>("editmenubind")->value = "L";
+		if (getOps<std::string>("editmenubind").empty())
+			getOps<std::string>("editmenubind") = "L";
 
 		float x = Constraints::PercentageConstraint(0.019, "left");
 		float y = Constraints::PercentageConstraint(0.10, "top");
@@ -374,141 +187,45 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		this->addHeader("Keybinds");
-		this->addKeybind("Open Menu Bind", "", settings.getSettingByName<std::string>("keybind")->value);
-		this->addKeybind("Edit Menu Bind", "", settings.getSettingByName<std::string>("editmenubind")->value);
+		this->addKeybind("Open Menu Bind", "", getOps<std::string>("keybind"));
+		this->addKeybind("Edit Menu Bind", "", getOps<std::string>("editmenubind"));
 
 		this->extraPadding();
 
 		this->addHeader("Logo");
-		// this->addToggle("Custom logo", "", this->settings.getSettingByName<bool>("custom_logo")->value);
-		// if (!this->settings.getSettingByName<bool>("custom_logo")->value) {
-		this->addColorPicker("Logo Color", "Color of the client's logo",
-			this->settings.getSettingByName<std::string>("colors_FlarialLogo")->value,
-			this->settings.getSettingByName<float>("o_colors_FlarialLogo")->value,
-			this->settings.getSettingByName<bool>("colors_FlarialLogo_rgb")->value
-		);
+		// this->addToggle("Custom logo", "", getOps<bool>("custom_logo"));
+		// if (!getOps<bool>("custom_logo")) {
+		this->addColorPicker("Logo Color", "Color of the client's logo", "flariallogo");
 		// } else {
 		//     this->addButton("", "To customize the logo, change the 'custom-logo.png' file in Flarial's Assets folder.", "Open Subfolder", [this]() {
 		//         WinrtUtils::openSubFolder("Flarial\\assets");
 		//     });
 		// }
 
-		this->addHeader("Colors");
-		this->addColorPicker("Radio Button Icon Disabled", "",
-			this->settings.getSettingByName<std::string>("colors_radiobutton_enabled")->value,
-			this->settings.getSettingByName<float>("o_colors_radiobutton_enabled")->value,
-			this->settings.getSettingByName<bool>("colors_radiobutton_enabled_rgb")->value
-		);
-		this->addColorPicker("Radio Button Icon Enabled", "",
-			this->settings.getSettingByName<std::string>("colors_radiobutton_disabled")->value,
-			this->settings.getSettingByName<float>("o_colors_radiobutton_disabled")->value,
-			this->settings.getSettingByName<bool>("colors_radiobutton_disabled_rgb")->value
-		);
-		this->addColorPicker("Text Color", "",
-			this->settings.getSettingByName<std::string>("colors_text")->value,
-			this->settings.getSettingByName<float>("o_colors_text")->value,
-			this->settings.getSettingByName<bool>("colors_text_rgb")->value
-		);
-		this->addColorPicker("Enabled", "",
-			this->settings.getSettingByName<std::string>("colors_enabled")->value,
-			this->settings.getSettingByName<float>("o_colors_enabled")->value,
-			this->settings.getSettingByName<bool>("colors_enabled_rgb")->value
-		);
-		this->addColorPicker("Disabled", "",
-			this->settings.getSettingByName<std::string>("colors_disabled")->value,
-			this->settings.getSettingByName<float>("o_colors_disabled")->value,
-			this->settings.getSettingByName<bool>("colors_enabled_rgb")->value
-		);
-		this->addColorPicker("Primary 1", "Color of active elements, main color of sliders , background color of enabled toggles",
-			this->settings.getSettingByName<std::string>("colors_primary1")->value,
-			this->settings.getSettingByName<float>("o_colors_primary1")->value,
-			this->settings.getSettingByName<bool>("colors_primary1_rgb")->value
-		);
-		this->addColorPicker("Primary 2", "Minor color of toggles and sliders, text Indicator color",
-			this->settings.getSettingByName<std::string>("colors_primary2")->value,
-			this->settings.getSettingByName<float>("o_colors_primary2")->value,
-			this->settings.getSettingByName<bool>("colors_primary2_rgb")->value
-		);
-		this->addColorPicker("Primary 3", "Color of inactive elements, unfilled slider bar color, inner color of color pickers, background color of disabled toggles",
-			this->settings.getSettingByName<std::string>("colors_primary3")->value,
-			this->settings.getSettingByName<float>("o_colors_primary3")->value,
-			this->settings.getSettingByName<bool>("colors_primary3_rgb")->value
-		);
-		this->addColorPicker("Primary 4", "Base color of color pickers, hover color of dropdown childrens",
-			this->settings.getSettingByName<std::string>("colors_primary4")->value,
-			this->settings.getSettingByName<float>("o_colors_primary4")->value,
-			this->settings.getSettingByName<bool>("colors_primary4_rgb")->value
-		);
-		this->addColorPicker("Secondary 1", "Background color of settings",
-			this->settings.getSettingByName<std::string>("colors_secondary1")->value,
-			this->settings.getSettingByName<float>("o_colors_secondary1")->value,
-			this->settings.getSettingByName<bool>("colors_secondary1_rgb")->value
-		);
-		this->addColorPicker("Secondary 2", "Background color of navigation bar, tooltips, and buttons",
-			this->settings.getSettingByName<std::string>("colors_secondary2")->value,
-			this->settings.getSettingByName<float>("o_colors_secondary2")->value,
-			this->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
-		);
-		this->addColorPicker("Secondary 3", "Background color of base Click GUI rectangle",
-			this->settings.getSettingByName<std::string>("colors_secondary3")->value,
-			this->settings.getSettingByName<float>("o_colors_secondary3")->value,
-			this->settings.getSettingByName<bool>("colors_secondary3_rgb")->value
-		);
-		this->addColorPicker("Secondary 4", "Background color of active Modules search bar",
-			this->settings.getSettingByName<std::string>("colors_secondary4")->value,
-			this->settings.getSettingByName<float>("o_colors_secondary4")->value,
-			this->settings.getSettingByName<bool>("colors_secondary4_rgb")->value
-		);
-		this->addColorPicker("Secondary 5", "Background color of navigation bar icons",
-			this->settings.getSettingByName<std::string>("colors_secondary5")->value,
-			this->settings.getSettingByName<float>("o_colors_secondary5")->value,
-			this->settings.getSettingByName<bool>("colors_secondary5_rgb")->value
-		);
-		this->addColorPicker("Secondary 6", "Background color of active navigation bar buttons",
-			this->settings.getSettingByName<std::string>("colors_secondary6")->value,
-			this->settings.getSettingByName<float>("o_colors_secondary6")->value,
-			this->settings.getSettingByName<bool>("colors_secondary6_rgb")->value
-		);
-		this->addColorPicker("Secondary 7", "Outline color of tooltips",
-			this->settings.getSettingByName<std::string>("colors_secondary7")->value,
-			this->settings.getSettingByName<float>("o_colors_secondary7")->value,
-			this->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
-		);
-		this->addColorPicker("Secondary 8", "Navigation bar background deactivated Color",
-			this->settings.getSettingByName<std::string>("colors_secondary8")->value,
-			this->settings.getSettingByName<float>("o_colors_secondary8")->value,
-			this->settings.getSettingByName<bool>("colors_secondary8_rgb")->value
-		);
-		this->addColorPicker("Modcard 1", "Color of top rounded rectangle",
-			this->settings.getSettingByName<std::string>("colors_mod1")->value,
-			this->settings.getSettingByName<float>("o_colors_mod1")->value,
-			this->settings.getSettingByName<bool>("colors_mod1_rgb")->value
-		);
-		this->addColorPicker("Modcard 2", "Color of bottom rounded rectangle",
-			this->settings.getSettingByName<std::string>("colors_mod2")->value,
-			this->settings.getSettingByName<float>("o_colors_mod2")->value,
-			this->settings.getSettingByName<bool>("colors_mod2_rgb")->value
-		);
-		this->addColorPicker("Modcard 3", "Background color of module icons, outer color of module settings icon",
-			this->settings.getSettingByName<std::string>("colors_mod3")->value,
-			this->settings.getSettingByName<float>("o_colors_mod3")->value,
-			this->settings.getSettingByName<bool>("colors_mod3_rgb")->value
-		);
-		this->addColorPicker("Modcard 4", "Inner color of module settings icon",
-			this->settings.getSettingByName<std::string>("colors_mod4")->value,
-			this->settings.getSettingByName<float>("o_colors_mod4")->value,
-			this->settings.getSettingByName<bool>("colors_mod4_rgb")->value
-		);
-		this->addColorPicker("Modcard Icon", "Color of the mod's icon",
-			this->settings.getSettingByName<std::string>("colors_modicon")->value,
-			this->settings.getSettingByName<float>("o_colors_modicon")->value,
-			this->settings.getSettingByName<bool>("colors_modicon_rgb")->value
-		);
-		this->addColorPicker("Setting Icon Color", "Color of the mod's settings icon",
-			this->settings.getSettingByName<std::string>("colors_mod_settings_icon")->value,
-			this->settings.getSettingByName<float>("o_colors_mod_settings_icon")->value,
-			this->settings.getSettingByName<bool>("colors_mod_settings_icon_rgb")->value
-		);
+		addHeader("Colors");
+		addColorPicker("Radio Button Icon Disabled", "", "enabledRadioButton");
+		addColorPicker("Radio Button Icon Enabled", "", "disabledRadioButton");
+		addColorPicker("Text Color", "", "globalText");
+		addColorPicker("Enabled", "", "modCardEnabled");
+		addColorPicker("Disabled", "", "modCardDisabled");
+		addColorPicker("Primary 1", "Active elements, main color of sliders, bg color of enabled toggles", "primary1");
+		addColorPicker("Primary 2", "Minor color of toggles and sliders, text Indicator color", "primary2");
+		addColorPicker("Primary 3", "Color of inactive elements, unfilled slider bar color, inner color of color pickers, background color of disabled toggles","primary3");
+		addColorPicker("Primary 4", "Base color of color pickers, hover color of dropdown childrens", "primary4");
+		addColorPicker("Secondary 1", "Background color of settings", "secondary1");
+		addColorPicker("Secondary 2", "Background color of navigation bar, tooltips, and buttons", "secondary2");
+		addColorPicker("Secondary 3", "Background color of base Click GUI rectangle", "secondary3");
+		addColorPicker("Secondary 4", "Background color of active Modules search bar", "secondary4");
+		addColorPicker("Secondary 5", "Background color of navigation bar icons", "secondary5");
+		addColorPicker("Secondary 6", "Background color of active navigation bar buttons", "secondary6");
+		addColorPicker("Secondary 7", "Outline color of tooltips", "secondary7");
+		addColorPicker("Secondary 8", "Navigation bar background deactivated Color", "secondary8");
+		addColorPicker("Modcard 1", "Color of top rounded rectangle", "modcard1");
+		addColorPicker("Modcard 2", "Color of bottom rounded rectangle", "modcard2");
+		addColorPicker("Modcard 3", "Background color of module icons, outer color of module settings icon", "modcard3");
+		addColorPicker("Modcard 4", "Inner color of module settings icon", "modcard4");
+		addColorPicker("Modcard Icon", "Color of the mod's icon", "modicon");
+		addColorPicker("Setting Icon Color", "Color of the mod's settings icon", "modsettings");
 		FlarialGUI::UnsetScrollView();
 		this->resetPadding();
 	}
@@ -534,7 +251,7 @@ public:
 				this->active = false;
 			else {
 				if (!editmenu) {
-					if (!Client::settings.getSettingByName<bool>("nochaticon")->value) Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
+					if (!Client::settings.getSettingByName<bool>("nochaticon")) Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
 					else Deafen(this, PacketEvent, &ClickGUI::onPacketReceive);
 					ModuleManager::cguiRefresh = true;
 					keybindActions[0]({});
@@ -597,7 +314,7 @@ public:
 			}
 
 			if (this->isAdditionalKeybind(event.keys,
-				this->settings.getSettingByName<std::string>("editmenubind")->value) &&
+				getOps<std::string>("editmenubind")) &&
 				Module::isKeyPartOfAdditionalKeybind(event.key, this->settings.getSettingByName<std::string>(
 					"editmenubind")->value)) {
 
@@ -605,7 +322,7 @@ public:
 					this->active = false;
 					FlarialGUI::Notify("Right click a module to directly go to their settings page.");
 					FlarialGUI::Notify("To disable this menu press ESC or " +
-						this->settings.getSettingByName<std::string>("editmenubind")->value);
+						getOps<std::string>("editmenubind"));
 					editmenu = true;
 				}
 

@@ -31,18 +31,15 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<float>("itemfov") == nullptr) settings.addSetting("itemfov", 70.0f);
-		if (settings.getSettingByName<bool>("thirdperson") == nullptr) settings.addSetting("thirdperson", false);
-
-		if (settings.getSettingByName<float>("posx") == nullptr) settings.addSetting("posx", 4.0f);
-		if (settings.getSettingByName<float>("posy") == nullptr) settings.addSetting("posy", 4.0f);
-		if (settings.getSettingByName<float>("posz") == nullptr) settings.addSetting("posz", 4.0f);
-
-		if (settings.getSettingByName<float>("rotangle") == nullptr) settings.addSetting("rotangle", 0.0f);
-
-		if (settings.getSettingByName<float>("rotx") == nullptr) settings.addSetting("rotx", 0.0f);
-		if (settings.getSettingByName<float>("roty") == nullptr) settings.addSetting("roty", 0.0f);
-		if (settings.getSettingByName<float>("rotz") == nullptr) settings.addSetting("rotz", 0.0f);
+		setDef("itemfov", 70.0f);
+		setDef("thirdperson", false);
+		setDef("posx", 4.0f);
+		setDef("posy", 4.0f);
+		setDef("posz", 4.0f);
+		setDef("rotangle", 0.0f);
+		setDef("rotx", 0.0f);
+		setDef("roty", 0.0f);
+		setDef("rotz", 0.0f);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -60,17 +57,17 @@ public:
 
 
 		addHeader("View Model");
-		addToggle("Third Person", "Transforms the item in third person perspective", settings.getSettingByName<bool>("thirdperson")->value);
-		addSlider("Item FOV", "Changes the FOV appearance of the item.", settings.getSettingByName<float>("itemfov")->value, 180);
+		addToggle("Third Person", "Transforms the item in third person perspective", getOps<bool>("thirdperson"));
+		addSlider("Item FOV", "Changes the FOV appearance of the item.", getOps<float>("itemfov"), 180);
 
-		addSlider("Position X", "Changes the position in the X axis", settings.getSettingByName<float>("posx")->value, 12);
-		addSlider("Position Y", "Changes the position in the Y axis", settings.getSettingByName<float>("posy")->value, 12);
-		addSlider("Position Z", "Changes the position in the Z axis", settings.getSettingByName<float>("posz")->value, 12);
+		addSlider("Position X", "Changes the position in the X axis", getOps<float>("posx"), 12);
+		addSlider("Position Y", "Changes the position in the Y axis", getOps<float>("posy"), 12);
+		addSlider("Position Z", "Changes the position in the Z axis", getOps<float>("posz"), 12);
 
-		addSlider("Rotation Angle", "Changes the rotation angle of the item", settings.getSettingByName<float>("rotangle")->value, 360);
-		addSlider("Rotation X", "Changes the rotation in the X axis", settings.getSettingByName<float>("rotx")->value, 360);
-		addSlider("Rotation Y", "Changes the rotation in the Y axis", settings.getSettingByName<float>("roty")->value, 360);
-		addSlider("Rotation Z", "Changes the rotation in the Z axis", settings.getSettingByName<float>("rotz")->value, 360);
+		addSlider("Rotation Angle", "Changes the rotation angle of the item", getOps<float>("rotangle"), 360);
+		addSlider("Rotation X", "Changes the rotation in the X axis", getOps<float>("rotx"), 360);
+		addSlider("Rotation Y", "Changes the rotation in the Y axis", getOps<float>("roty"), 360);
+		addSlider("Rotation Z", "Changes the rotation in the Z axis", getOps<float>("rotz"), 360);
 
 		FlarialGUI::UnsetScrollView();
 		resetPadding();
@@ -85,23 +82,23 @@ public:
 		auto fov = event.getFOV();
 		if (fov != 70) return;
 
-		event.setFOV(this->settings.getSettingByName<float>("itemfov")->value);
+		event.setFOV(getOps<float>("itemfov"));
 	}
 
 	void onRenderItemInHand(RenderItemInHandEvent& event) {
-		if (thirdperson && this->settings.getSettingByName<bool>("thirdperson")->value || !thirdperson) {
+		if (thirdperson && getOps<bool>("thirdperson") || !thirdperson) {
 			auto& matrix = SDK::clientInstance->getCamera().getWorldMatrixStack().top().matrix;
 			if (!Matrixed) OriginalMatrix = matrix;
 
-			auto posx = this->settings.getSettingByName<float>("posx")->value;
-			auto posy = this->settings.getSettingByName<float>("posy")->value;
-			auto posz = this->settings.getSettingByName<float>("posz")->value;
+			auto posx = getOps<float>("posx");
+			auto posy = getOps<float>("posy");
+			auto posz = getOps<float>("posz");
 
-			auto rotx = this->settings.getSettingByName<float>("rotx")->value;
-			auto roty = this->settings.getSettingByName<float>("roty")->value;
-			auto rotz = this->settings.getSettingByName<float>("rotz")->value;
+			auto rotx = getOps<float>("rotx");
+			auto roty = getOps<float>("roty");
+			auto rotz = getOps<float>("rotz");
 
-			auto rotAngle = this->settings.getSettingByName<float>("rotangle")->value;
+			auto rotAngle = getOps<float>("rotangle");
 
 			matrix = glm::translate<float>(matrix, glm::vec3(posx - 4, posy - 4, posz - 4));
 			matrix = glm::rotate<float>(matrix, glm::radians(rotAngle), glm::vec3(rotx, roty, rotz));

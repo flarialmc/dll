@@ -55,7 +55,7 @@ public:
 				this->restricted = false;
 			}
 			if (!this->restricted) {
-				if (this->settings.getSettingByName<bool>("toggle")->value) {
+				if (getOps<bool>("toggle")) {
 					if (!this->active) {
 						patch();
 					}
@@ -79,7 +79,7 @@ public:
 		//disable action (key release)
 		keybindActions.push_back([this](std::vector<std::any> args) -> std::any {
 
-			if (!this->settings.getSettingByName<bool>("toggle")->value)
+			if (!getOps<bool>("toggle"))
 				unpatch();
 
 			return {};
@@ -129,9 +129,8 @@ public:
 	void defaultConfig() override {
 		getKeybind();
 		Module::defaultConfig("core");
-
-		if (settings.getSettingByName<std::string>("toggle") == nullptr) settings.addSetting("toggle", false);
-		if (settings.getSettingByName<std::string>("mode") == nullptr) settings.addSetting("mode", (std::string)"3rd Person back");
+		setDef("toggle", false);
+		setDef("mode", (std::string)"3rd Person back");
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -149,8 +148,8 @@ public:
 
 		addHeader("Freelook");
 		addKeybind("Freelook Keybind", "Hold for 2 seconds!", getKeybind());
-		addToggle("Toggleable Mode", "Click to toggle or Hold to keep enabled", settings.getSettingByName<bool>("toggle")->value);
-		addDropdown("Freelook View Mode", "",std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"},settings.getSettingByName<std::string>("mode")->value);
+		addToggle("Toggleable Mode", "Click to toggle or Hold to keep enabled", getOps<bool>("toggle"));
+		addDropdown("Freelook View Mode", "",std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"},getOps<std::string>("mode"));
 
 		FlarialGUI::UnsetScrollView();
 
@@ -165,7 +164,7 @@ public:
 
 	void onGetViewPerspective(PerspectiveEvent& event) {
 		if (this->active) {
-			std::string setting = this->settings.getSettingByName<std::string>("mode")->value;
+			std::string setting = getOps<std::string>("mode");
 			// TODO: Let use F5 (perspective switch key)
 			if (setting == "1st Person") {
 				event.setPerspective(Perspective::FirstPerson);

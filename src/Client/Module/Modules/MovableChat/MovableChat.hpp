@@ -49,9 +49,9 @@ public:
 	void defaultConfig() override {
 		Module::defaultConfig("core");
 		Module::defaultConfig("pos");
-		if (settings.getSettingByName<bool>("here") == nullptr) settings.addSetting("here", true);
-		if (settings.getSettingByName<bool>("pingsound") == nullptr) settings.addSetting("pingsound", true);
-		if (this->settings.getSettingByName<std::string>("mode") == nullptr) settings.addSetting("mode", (std::string)"Xp Orb");
+		setDef("here", true);
+		setDef("pingsound", true);
+		setDef("mode", (std::string)"Xp Orb");
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -68,17 +68,17 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		this->addHeader("Movable Chat");
-		this->addToggle("Ping Sound", "Plays a sound when you're mentioned in the chat.", settings.getSettingByName<bool>("pingsound")->value);
+		this->addToggle("Ping Sound", "Plays a sound when you're mentioned in the chat.", getOps<bool>("pingsound"));
 		if (settings.getSettingByName<bool>("pingsound"))
-			if (settings.getSettingByName<bool>("pingsound")->value)
+			if (getOps<bool>("pingsound"))
 			{
 				this->addHeader("Ping Sound");
-				this->addDropdown("Sound", "Choose which sound to play", std::vector<std::string>{"Xp Orb", "Custom"}, this->settings.getSettingByName<std::string>("mode")->value);
+				this->addDropdown("Sound", "Choose which sound to play", std::vector<std::string>{"Xp Orb", "Custom"}, getOps<std::string>("mode"));
 
 				this->addButton("Choose Sound", "Choose a custom sound", "Choose", [this] {
 					WinrtUtils::pickAndCopyFiles(L"*", "\\assets");
 					});
-				this->addToggle("@here", "Plays the sound when you are mentioned via @here", settings.getSettingByName<bool>("here")->value);
+				this->addToggle("@here", "Plays the sound when you are mentioned via @here", getOps<bool>("here"));
 			}
 		FlarialGUI::UnsetScrollView();
 		this->resetPadding();
@@ -105,8 +105,8 @@ public:
 			float height = currentSize.y;
 
 
-			Vec2<float> settingperc = Vec2<float>(this->settings.getSettingByName<float>("percentageX")->value,
-				this->settings.getSettingByName<float>("percentageY")->value);
+			Vec2<float> settingperc = Vec2<float>(getOps<float>("percentageX"),
+				getOps<float>("percentageY"));
 
 			if (settingperc.x != 0)
 				currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));

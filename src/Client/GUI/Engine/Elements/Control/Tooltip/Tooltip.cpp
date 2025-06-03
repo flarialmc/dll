@@ -4,38 +4,6 @@
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
-#define colors_text HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_text")->value)
-#define o_colors_text clickgui->settings.getSettingByName<float>("o_colors_text")->value
-#define colors_text_rgb clickgui->settings.getSettingByName<bool>("colors_text_rgb")->value
-
-#define colors_primary1 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary1")->value)
-#define o_colors_primary1 clickgui->settings.getSettingByName<float>("o_colors_primary1")->value
-#define colors_primary1_rgb clickgui->settings.getSettingByName<bool>("colors_primary1_rgb")->value
-
-#define colors_primary2 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary2")->value)
-#define o_colors_primary2 clickgui->settings.getSettingByName<float>("o_colors_primary2")->value
-#define colors_primary2_rgb clickgui->settings.getSettingByName<bool>("colors_primary2_rgb")->value
-
-#define colors_primary3 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary3")->value)
-#define o_colors_primary3 clickgui->settings.getSettingByName<float>("o_colors_primary3")->value
-#define colors_primary3_rgb clickgui->settings.getSettingByName<bool>("colors_primary3_rgb")->value
-
-#define colors_primary4 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary4")->value)
-#define o_colors_primary4 clickgui->settings.getSettingByName<float>("o_colors_primary4")->value
-#define colors_primary4_rgb clickgui->settings.getSettingByName<bool>("colors_primary4_rgb")->value
-
-#define colors_secondary1 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary1")->value)
-#define o_colors_secondary1 clickgui->settings.getSettingByName<float>("o_colors_secondary1")->value
-#define colors_secondary1_rgb clickgui->settings.getSettingByName<bool>("colors_secondary1_rgb")->value
-
-#define colors_secondary2 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary2")->value)
-#define o_colors_secondary2 clickgui->settings.getSettingByName<float>("o_colors_secondary2")->value
-#define colors_secondary2_rgb clickgui->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
-
-#define colors_secondary7 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary7")->value)
-#define o_colors_secondary7 clickgui->settings.getSettingByName<float>("o_colors_secondary7")->value
-#define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
-
 std::unordered_map<std::string, ToolTipParams> tooltipsList;
 
 void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::string& text, float width, float height, bool push, bool relative, std::chrono::milliseconds duration) {
@@ -50,12 +18,12 @@ void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::str
     //IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, fontSize, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_LEADING);
     //textLayout->Release();
 
-    D2D1_COLOR_F bgCol = colors_secondary2_rgb ? rgbColor : colors_secondary2;
-    bgCol.a = o_colors_secondary2 * tooltips[id].opac;
-    D2D1_COLOR_F outlineCol = colors_secondary7_rgb ? rgbColor : colors_secondary7;
-    outlineCol.a = o_colors_secondary7 * tooltips[id].opac;
-    D2D1_COLOR_F textCol = colors_text_rgb ? rgbColor : colors_text;
-    textCol.a = o_colors_text * tooltips[id].opac;
+    D2D1_COLOR_F bgCol = clickgui->getColor("secondary2", "ClickGUI");
+    bgCol.a *= tooltips[id].opac;
+    D2D1_COLOR_F outlineCol = clickgui->getColor("secondary7", "ClickGUI");
+    outlineCol.a *= tooltips[id].opac;
+    D2D1_COLOR_F textCol = clickgui->getColor("globalText", "ClickGUI");
+    textCol.a *= tooltips[id].opac;
 
 
     float spacing = Constraints::RelativeConstraint(0.01f, "height", true);

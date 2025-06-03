@@ -12,10 +12,8 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<float>("health") == nullptr) this->settings.addSetting("health", 12.0f);
-		if (settings.getSettingByName<float>("maxopacity") == nullptr) this->settings.addSetting("maxopacity", 0.7f);
-		if (settings.getSettingByName<std::string>("color") == nullptr) this->settings.addSetting("color", (std::string)"FF0000");
-		if (settings.getSettingByName<bool>("rgb") == nullptr) this->settings.addSetting("rgb", false);
+		setDef("health", 12.0f);
+		setDef("lowHealth", (std::string)"FF0000", 0.7f, false);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -31,9 +29,9 @@ public:
 
 
 		addHeader("Low Health Indicator");
-		addSlider("Maximum overlay opacity", "The maximum overlay opacity", settings.getSettingByName<float>("maxopacity")->value, 1.0f, 0.0f);
-		addColorPicker("Color", "", settings.getSettingByName<std::string>("color")->value, settings.getSettingByName<float>("maxopacity")->value, settings.getSettingByName<bool>("rgb")->value);
-		addSlider("Health", "The health at which the overlay will be shown", settings.getSettingByName<float>("health")->value, 20.0f, 0.0f);
+		addSlider("Maximum overlay opacity", "The maximum overlay opacity", getOps<float>("maxopacity"), 1.0f, 0.0f);
+		addSlider("Health", "The health at which the overlay will be shown", getOps<float>("health"), 20.0f, 0.0f);
+		addColorPicker("Color", "", "lowHealth");
 		FlarialGUI::UnsetScrollView();
 
 		resetPadding();
@@ -57,17 +55,15 @@ public:
 	}
 
 	void onRender(RenderEvent& event) {
-		if (this->isEnabled() && this->health <= this->settings.getSettingByName<float>("health")->value &&
+		if (this->isEnabled() && this->health <= getOps<float>("health") &&
 			SDK::currentScreen == "hud_screen" && !ModuleManager::getModule("ClickGUI")->isEnabled()) {
 
-			float maxOpacity = this->settings.getSettingByName<float>("maxopacity")->value;
+			float maxOpacity = getOps<float>("maxopacity");
 
 			float maxHealth = 20.0f;
 			float opacity = maxOpacity * (1.0f - (this->health / maxHealth));
 
-			D2D1_COLOR_F color2 = this->settings.getSettingByName<bool>("rgb")->value ?
-				FlarialGUI::rgbColor :
-				FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>("color")->value);
+			D2D1_COLOR_F color2 = getColor("lowHealth");
 			color2.a = std::clamp(opacity, 0.0f, maxOpacity);
 
 			//FlarialGUI::RoundedRect(0, 0, color2, MC::windowSize.x, MC::windowSize.y, 0, 0);

@@ -21,7 +21,7 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<bool>("thirdpersoncrosshair") == nullptr) settings.addSetting("thirdpersoncrosshair", true);
+		setDef("thirdpersoncrosshair", true);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -38,7 +38,7 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Crosshair");
-		addToggle("Third Person Crosshair", "", settings.getSettingByName<bool>("thirdpersoncrosshair")->value);
+		addToggle("Third Person Crosshair", "", getOps<bool>("thirdpersoncrosshair"));
 
 		FlarialGUI::UnsetScrollView();
 

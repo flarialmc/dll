@@ -21,7 +21,7 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig("core");
-		if (settings.getSettingByName<float>("time") == nullptr) settings.addSetting("time", 0.5f);
+		setDef("time", 0.5f);
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -37,7 +37,7 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		addHeader("Time Changer");
-		addSlider("Time Slider", "", settings.getSettingByName<float>("time")->value, 1.f, 0.f, true);
+		addSlider("Time Slider", "", getOps<float>("time"), 1.f, 0.f, true);
 
 		FlarialGUI::UnsetScrollView();
 
@@ -45,6 +45,6 @@ public:
 	}
 
 	void onTimeEvent(TimeEvent& event) {
-		event.setTime(this->settings.getSettingByName<float>("time")->value);
+		event.setTime(getOps<float>("time"));
 	}
 };

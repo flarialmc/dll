@@ -43,8 +43,8 @@ public:
 	}
 
 	void defaultConfig() override {
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value} ms");
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
+		setDef("text", (std::string)"{value} ms");
+		setDef("textscale", 0.80f);
 		Module::defaultConfig("all");
 	}
 

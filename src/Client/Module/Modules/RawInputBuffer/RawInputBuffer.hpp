@@ -33,11 +33,11 @@ public:
         FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
             Constraints::RelativeConstraint(1.0, "width"),
             Constraints::RelativeConstraint(0.88f, "height"));
-        this->addHeader("troll");
+        addHeader("troll");
         std::string troll("troll");
-        this->addDropdown("troll", "the voices", std::vector<std::string>{ "troll", "troll", "troll even more", "most troll"}, troll);
+        addDropdown("troll", "the voices", std::vector<std::string>{ "troll", "troll", "troll even more", "most troll"}, troll);
         FlarialGUI::UnsetScrollView();
 
-        this->resetPadding();
+        resetPadding();
     }
 };

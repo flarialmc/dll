@@ -4,42 +4,10 @@
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
-#define colors_text HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_text")->value)
-#define o_colors_text clickgui->settings.getSettingByName<float>("o_colors_text")->value
-#define colors_text_rgb clickgui->settings.getSettingByName<bool>("colors_text_rgb")->value
-
-#define colors_primary1 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary1")->value)
-#define o_colors_primary1 clickgui->settings.getSettingByName<float>("o_colors_primary1")->value
-#define colors_primary1_rgb clickgui->settings.getSettingByName<bool>("colors_primary1_rgb")->value
-
-#define colors_primary2 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary2")->value)
-#define o_colors_primary2 clickgui->settings.getSettingByName<float>("o_colors_primary2")->value
-#define colors_primary2_rgb clickgui->settings.getSettingByName<bool>("colors_primary2_rgb")->value
-
-#define colors_primary3 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary3")->value)
-#define o_colors_primary3 clickgui->settings.getSettingByName<float>("o_colors_primary3")->value
-#define colors_primary3_rgb clickgui->settings.getSettingByName<bool>("colors_primary3_rgb")->value
-
-#define colors_primary4 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary4")->value)
-#define o_colors_primary4 clickgui->settings.getSettingByName<float>("o_colors_primary4")->value
-#define colors_primary4_rgb clickgui->settings.getSettingByName<bool>("colors_primary4_rgb")->value
-
-#define colors_secondary1 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary1")->value)
-#define o_colors_secondary1 clickgui->settings.getSettingByName<float>("o_colors_secondary1")->value
-#define colors_secondary1_rgb clickgui->settings.getSettingByName<bool>("colors_secondary1_rgb")->value
-
-#define colors_secondary2 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary2")->value)
-#define o_colors_secondary2 clickgui->settings.getSettingByName<float>("o_colors_secondary2")->value
-#define colors_secondary2_rgb clickgui->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
-
-#define colors_secondary7 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary7")->value)
-#define o_colors_secondary7 clickgui->settings.getSettingByName<float>("o_colors_secondary7")->value
-#define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
-
 static std::map<std::string, std::string> sizes;
 
-void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex, bool &rgb, std::string moduleName, std::string settingName) {
-
+void FlarialGUI::ColorPicker(const int index, float x, float y, std::string moduleName, std::string settingName) {
+    auto mod = ModuleManager::getModule(moduleName);
     // Accepts hex, so for e.g. fps counter bg color wants to be changed then you'd have to give a modifyable hex value
     // Preferably save every color in config as a hex (string)
     // before rendering just convert the config's color to hex and yeah do it dat way.
@@ -71,14 +39,13 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex
 
     y -= s / 2.f;
 
-    D2D1_COLOR_F baseColor = colors_primary4_rgb ? rgbColor : colors_primary4;
-    baseColor.a = o_colors_primary4;
+    D2D1_COLOR_F baseColor = clickgui->getColor("primary4", "ClickGUI");
 
     FlarialGUI::RoundedRect(x, y + s * 0.15f, baseColor, s * 4.125f, s, round.x, round.x);
 
     round = Constraints::RoundingConstraint(10, 10);
 
-    if (rgb) {
+    if (mod->getOps<bool>(settingName + "RGB")) {
         FlarialGUI::image(
                 IDR_RGB_PNG,
                 D2D1::RectF(
@@ -89,31 +56,28 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex
                 )
         );
     } else {
-        D2D1_COLOR_F color = FlarialGUI::HexToColorF(hex);
+        D2D1_COLOR_F color = mod->getColor(settingName);
         color.a = clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
         FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, color, s * 0.85f, s * 0.85f, round.x, round.x);
     }
 
     round = Constraints::RoundingConstraint(11.5, 11.5);
 
-    D2D1_COLOR_F col = colors_primary3_rgb ? rgbColor : colors_primary3;
+    D2D1_COLOR_F col = clickgui->getColor("primary3", "ClickGUI");
 
-    if (TextBoxes[index].isActive) col = colors_primary1_rgb ? rgbColor : colors_primary1;
-
-    col.a = TextBoxes[index].isActive ? o_colors_primary1 : o_colors_primary3;
+    if (TextBoxes[index].isActive) col = clickgui->getColor("primary1", "ClickGUI");
 
     FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, col, s * 3.f, s * 0.82f,
                             round.x, round.x);
 
     std::string text;
-    hex = FlarialGUI::TextBox(index, hex, 6, x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, s * 3.f,
+    mod->getOps<std::string>(settingName + "Col") = FlarialGUI::TextBox(index, mod->getOps<std::string>(settingName + "Col"), 6, x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, s * 3.f,
                               s * 0.82f, 1);
 
-    text = "#" + hex;
+    text = "#" + mod->getOps<std::string>(settingName + "Col");
     //textLayout->Release();
 
-    D2D1_COLOR_F cursorCol = colors_primary2_rgb ? rgbColor : colors_primary2;
-    cursorCol.a = o_colors_primary2;
+    D2D1_COLOR_F cursorCol = clickgui->getColor("primary2", "ClickGUI");
 
     cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
 
@@ -152,11 +116,13 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex
     if (CursorInRect(x + Constraints::SpacingConstraint(0.1, s), clickingY + s * 0.21f, s * 0.85f, s * 0.85f) && MC::mouseButton == MouseButton::Right && !MC::held) {
         bool resettableSettingsEnabled = Client::settings.getSettingByName<bool>("resettableSettings")->value;
         if (resettableSettingsEnabled && moduleName != "" && settingName != "") {
-            auto mod = ModuleManager::getModule(moduleName);
-            mod->settings.deleteSetting(settingName);
+            activeColorPickerWindows = 0;
+            mod->settings.deleteSetting(settingName + "Col");
+            mod->settings.deleteSetting(settingName + "Opacity");
+            mod->settings.deleteSetting(settingName + "RGB");
+            resetColorPicker(index);
             mod->defaultConfig();
-            hex = mod->settings.getSettingByName<std::string>(settingName)->value;
-            text = "#" + hex;
+            text = "#" + mod->getOps<std::string>(settingName + "Col");
         }
     }
 
@@ -164,7 +130,8 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex
         CursorInRect(x + Constraints::SpacingConstraint(0.1, s), clickingY + s * 0.21f, s * 0.85f, s * 0.85f) &&
         MC::mouseButton == MouseButton::Left && !MC::held) {
         MC::mouseButton = MouseButton::None;
-        ColorPickers[index].isActive = true;
+        //ColorPickers[index].isActive = true;
+        FlarialGUI::ColorPickerWindow(index, )
         activeColorPickerWindows++;
     }
 

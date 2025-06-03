@@ -21,7 +21,6 @@ void CommandManager::initialize() {
     Commands.push_back(std::make_unique<TestCommand>());
     Commands.push_back(std::make_unique<BindCommand>());
 #endif
-
     Commands.push_back(std::make_unique<HelpCommand>());
     Commands.push_back(std::make_unique<PrefixCommand>());
     Commands.push_back(std::make_unique<LuaCommand>());

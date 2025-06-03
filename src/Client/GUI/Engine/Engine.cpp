@@ -33,82 +33,6 @@
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
-#define colors_text HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_text")->value)
-#define o_colors_text clickgui->settings.getSettingByName<float>("o_colors_text")->value
-#define colors_text_rgb clickgui->settings.getSettingByName<bool>("colors_text_rgb")->value
-
-#define colors_enabled HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_enabled")->value)
-#define o_colors_enabled clickgui->settings.getSettingByName<float>("o_colors_enabled")->value
-#define colors_enabled_rgb clickgui->settings.getSettingByName<bool>("colors_enabled_rgb")->value
-
-#define colors_disabled HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_disabled")->value)
-#define o_colors_disabled clickgui->settings.getSettingByName<float>("o_colors_disabled")->value
-#define colors_disabled_rgb clickgui->settings.getSettingByName<bool>("colors_disabled_rgb")->value
-
-#define colors_primary1 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary1")->value)
-#define o_colors_primary1 clickgui->settings.getSettingByName<float>("o_colors_primary1")->value
-#define colors_primary1_rgb clickgui->settings.getSettingByName<bool>("colors_primary1_rgb")->value
-
-#define colors_primary2 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary2")->value)
-#define o_colors_primary2 clickgui->settings.getSettingByName<float>("o_colors_primary2")->value
-#define colors_primary2_rgb clickgui->settings.getSettingByName<bool>("colors_primary2_rgb")->value
-
-#define colors_primary3 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary3")->value)
-#define o_colors_primary3 clickgui->settings.getSettingByName<float>("o_colors_primary3")->value
-#define colors_primary3_rgb clickgui->settings.getSettingByName<bool>("colors_primary3_rgb")->value
-
-#define colors_primary4 HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_primary4")->value)
-#define o_colors_primary4 clickgui->settings.getSettingByName<float>("o_colors_primary4")->value
-#define colors_primary4_rgb clickgui->settings.getSettingByName<bool>("colors_primary4_rgb")->value
-
-#define colors_secondary1 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary1")->value)
-#define o_colors_secondary1 clickgui->settings.getSettingByName<float>("o_colors_secondary1")->value
-#define colors_secondary1_rgb clickgui->settings.getSettingByName<bool>("colors_secondary1_rgb")->value
-
-#define colors_secondary2 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary2")->value)
-#define o_colors_secondary2 clickgui->settings.getSettingByName<float>("o_colors_secondary2")->value
-#define colors_secondary2_rgb clickgui->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
-
-#define colors_secondary3 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary4")->value)
-#define o_colors_secondary3 clickgui->settings.getSettingByName<float>("o_colors_secondary3")->value
-#define colors_secondary3_rgb clickgui->settings.getSettingByName<bool>("colors_secondary4_rgb")->value
-
-#define colors_secondary4 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary3")->value)
-#define o_colors_secondary4 clickgui->settings.getSettingByName<float>("o_colors_secondary4")->value
-#define colors_secondary4_rgb clickgui->settings.getSettingByName<bool>("colors_secondary3_rgb")->value
-
-#define colors_secondary5 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary5")->value)
-#define o_colors_secondary5 clickgui->settings.getSettingByName<float>("o_colors_secondary5")->value
-#define colors_secondary5_rgb clickgui->settings.getSettingByName<bool>("colors_secondary5_rgb")->value
-
-#define colors_secondary6 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary6")->value)
-#define o_colors_secondary6 clickgui->settings.getSettingByName<float>("o_colors_secondary6")->value
-#define colors_secondary6_rgb clickgui->settings.getSettingByName<bool>("colors_secondary6_rgb")->value
-
-#define colors_secondary7 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary7")->value)
-#define o_colors_secondary7 clickgui->settings.getSettingByName<float>("o_colors_secondary7")->value
-#define colors_secondary7_rgb clickgui->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
-
-#define colors_secondary8 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_secondary8")->value)
-#define o_colors_secondary8 clickgui->settings.getSettingByName<float>("o_colors_secondary8")->value
-#define colors_secondary8_rgb clickgui->settings.getSettingByName<bool>("colors_secondary8_rgb")->value
-
-#define colors_mod1 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_mod1")->value)
-#define o_colors_mod1 clickgui->settings.getSettingByName<float>("o_colors_mod1")->value
-#define colors_mod1_rgb clickgui->settings.getSettingByName<bool>("colors_mod1_rgb")->value
-
-#define colors_mod2 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_mod2")->value)
-#define o_colors_mod2 clickgui->settings.getSettingByName<float>("o_colors_mod2")->value
-#define colors_mod2_rgb clickgui->settings.getSettingByName<bool>("colors_mod2_rgb")->value
-
-#define colors_mod3 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_mod3")->value)
-#define o_colors_mod3 clickgui->settings.getSettingByName<float>("o_colors_mod3")->value
-#define colors_mod3_rgb clickgui->settings.getSettingByName<bool>("colors_mod3_rgb")->value
-
-#define colors_mod4 FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>("colors_mod4")->value)
-#define o_colors_mod4 clickgui->settings.getSettingByName<float>("o_colors_mod4")->value
-#define colors_mod4_rgb clickgui->settings.getSettingByName<bool>("colors_mod4_rgb")->value
-
 std::map<std::string, ID2D1Bitmap*> ImagesClass::eimages;
 std::map<int, ID2D1Bitmap*> ImagesClass::images;
 
@@ -144,92 +68,30 @@ std::unordered_map<int, ColorPicker> FlarialGUI::ColorPickers;
 std::unordered_map<int, DropdownStruct> FlarialGUI::DropDownMenus;
 std::unordered_map<int, KeybindSelector> FlarialGUI::KeybindSelectors;
 
-float b_o_colors_text;
-float b_o_colors_enabled;
-float b_o_colors_disabled;
-float b_o_colors_primary1;
-float b_o_colors_primary2;
-float b_o_colors_primary3;
-float b_o_colors_primary4;
-float b_o_colors_secondary1;
-float b_o_colors_secondary2;
-float b_o_colors_secondary3;
-float b_o_colors_secondary4;
-float b_o_colors_secondary5;
-float b_o_colors_secondary6;
-float b_o_colors_secondary7;
-float b_o_colors_secondary8;
-float b_o_colors_mod1;
-float b_o_colors_mod2;
-float b_o_colors_mod3;
-float b_o_colors_mod4;
-
 void FlarialGUI::OverrideAlphaValues(float percent) {
-	b_o_colors_text = o_colors_text;
-	b_o_colors_enabled = o_colors_enabled;
-	b_o_colors_disabled = o_colors_disabled;
-	b_o_colors_primary1 = o_colors_primary1;
-	b_o_colors_primary2 = o_colors_primary2;
-	b_o_colors_primary3 = o_colors_primary3;
-	b_o_colors_primary4 = o_colors_primary4;
-	b_o_colors_secondary1 = o_colors_secondary1;
-	b_o_colors_secondary2 = o_colors_secondary2;
-	b_o_colors_secondary3 = o_colors_secondary3;
-	b_o_colors_secondary4 = o_colors_secondary4;
-	b_o_colors_secondary5 = o_colors_secondary5;
-	b_o_colors_secondary6 = o_colors_secondary6;
-	b_o_colors_secondary7 = o_colors_secondary7;
-	b_o_colors_secondary8 = o_colors_secondary8;
-	b_o_colors_mod1 = o_colors_mod1;
-	b_o_colors_mod2 = o_colors_mod2;
-	b_o_colors_mod3 = o_colors_mod3;
-	b_o_colors_mod4 = o_colors_mod4;
-
-	o_colors_text = percent * b_o_colors_text;
-	o_colors_enabled = percent * b_o_colors_enabled;
-	o_colors_disabled = percent * b_o_colors_disabled;
-	o_colors_primary1 = percent * b_o_colors_primary1;
-	o_colors_primary2 = percent * b_o_colors_primary2;
-	o_colors_primary3 = percent * b_o_colors_primary3;
-	o_colors_primary4 = percent * b_o_colors_primary4;
-	o_colors_secondary1 = percent * b_o_colors_secondary1;
-	o_colors_secondary2 = percent * b_o_colors_secondary2;
-	o_colors_secondary3 = percent * b_o_colors_secondary3;
-	o_colors_secondary4 = percent * b_o_colors_secondary4;
-	o_colors_secondary5 = percent * b_o_colors_secondary5;
-	o_colors_secondary6 = percent * b_o_colors_secondary6;
-	o_colors_secondary7 = percent * b_o_colors_secondary7;
-	o_colors_secondary8 = percent * b_o_colors_secondary8;
-	o_colors_mod1 = percent * b_o_colors_mod1;
-	o_colors_mod2 = percent * b_o_colors_mod2;
-	o_colors_mod3 = percent * b_o_colors_mod3;
-	o_colors_mod4 = percent * b_o_colors_mod4;
-
 	clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value = percent;
 }
 
 void FlarialGUI::ResetOverrideAlphaValues() {
-	o_colors_text = b_o_colors_text;
-	o_colors_enabled = b_o_colors_enabled;
-	o_colors_disabled = b_o_colors_disabled;
-	o_colors_primary1 = b_o_colors_primary1;
-	o_colors_primary2 = b_o_colors_primary2;
-	o_colors_primary3 = b_o_colors_primary3;
-	o_colors_primary4 = b_o_colors_primary4;
-	o_colors_secondary1 = b_o_colors_secondary1;
-	o_colors_secondary2 = b_o_colors_secondary2;
-	o_colors_secondary3 = b_o_colors_secondary3;
-	o_colors_secondary4 = b_o_colors_secondary4;
-	o_colors_secondary5 = b_o_colors_secondary5;
-	o_colors_secondary6 = b_o_colors_secondary6;
-	o_colors_secondary7 = b_o_colors_secondary7;
-	o_colors_secondary8 = b_o_colors_secondary8;
-	o_colors_mod1 = b_o_colors_mod1;
-	o_colors_mod2 = b_o_colors_mod2;
-	o_colors_mod3 = b_o_colors_mod3;
-	o_colors_mod4 = b_o_colors_mod4;
-
 	clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value = 1.f;
+}
+
+void FlarialGUI::resetColorPicker(size_t index) {
+	FlarialGUI::ColorPickers[index].oldHex = "";
+	FlarialGUI::ColorPickers[index].oldOpac = 0.0f;
+	FlarialGUI::ColorPickers[index].newHex = "";
+	FlarialGUI::ColorPickers[index].isActive = false;
+	FlarialGUI::ColorPickers[index].hueX = 0.0f;
+	FlarialGUI::ColorPickers[index].oldHueX = 0.0f;
+	FlarialGUI::ColorPickers[index].movingHueX = false;
+	FlarialGUI::ColorPickers[index].opacX = 0.0f;
+	FlarialGUI::ColorPickers[index].movingOpacX = false;
+	FlarialGUI::ColorPickers[index].shade = Vec2<float>{ -1, -1 };
+	FlarialGUI::ColorPickers[index].movingShade = false;
+
+	clickgui->color_pickers[index].value = nullptr;
+	clickgui->color_pickers[index].opacity = nullptr;
+	clickgui->color_pickers[index].rgb = nullptr;
 }
 
 UINT32 ColorValueToUInt(const D3DCOLORVALUE& color) {
@@ -658,8 +520,7 @@ std::string FlarialGUI::ColorFToHex(const D2D1_COLOR_F& color) {
 
 void FlarialGUI::FlarialText(float x, float y, const wchar_t* text, float width, const float height,
 	const DWRITE_TEXT_ALIGNMENT alignment) {
-	D2D1_COLOR_F color = colors_text_rgb ? rgbColor : colors_text;
-	color.a = o_colors_text;
+	D2D1_COLOR_F color = clickgui->getColor("globalText", "ClickGUI");
 
 	if (isInScrollView) y += scrollpos;
 
@@ -824,9 +685,7 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* tex
 	const DWRITE_FONT_WEIGHT weight, bool moduleFont, bool troll) {
 
 
-	D2D1_COLOR_F color = colors_text_rgb ? rgbColor : colors_text;
-
-	color.a = o_colors_text;
+	D2D1_COLOR_F color = clickgui->getColor("globalText", "ClickGUI");
 
 	if (FlarialGUI::inMenu && !troll && ClickGUI::settingsOpacity != 1 && ClickGUI::curr != "modules" && !ClickGUI::editmenu) color.a = ClickGUI::settingsOpacity;
 
@@ -1593,7 +1452,7 @@ void FlarialGUI::NotifyHeartbeat() {
 	float posxModif = 0;
 	float fontSize = Constraints::RelativeConstraint(0.128, "height", true);
 	float textposyModif = Constraints::RelativeConstraint(0.0045f, "height", true);
-	D2D1::ColorF col = colors_primary1;
+	D2D_COLOR_F col = clickgui->getColor("primary1", "ClickGUI");
 
 	int i = 0;
 	for (Notification& n : notifications) {
