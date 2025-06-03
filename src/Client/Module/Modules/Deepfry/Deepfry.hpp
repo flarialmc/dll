@@ -2,6 +2,7 @@
 
 #include "../Module.hpp"
 
+#include "Events/EventManager.hpp"
 
 class Deepfry : public Module {
 

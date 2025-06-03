@@ -1,6 +1,6 @@
 #pragma once
 
-#include <winrt/Windows.UI.Core.h>
+
 #include <winrt/Windows.Storage.h>
 #include <winrt/Windows.System.h>
 

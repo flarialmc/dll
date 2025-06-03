@@ -1390,7 +1390,6 @@ ImVec2 FlarialGUI::ImRotationCenter()
 	return ImVec2((l.x + u.x) / 2, (l.y + u.y) / 2); // or use _ClipRectStack?
 }
 
-ImVec2 operator-(const ImVec2& l, const ImVec2& r) { return{ l.x - r.x, l.y - r.y }; }
 
 void FlarialGUI::ImRotateEnd(float angle, ImVec2 center)
 {

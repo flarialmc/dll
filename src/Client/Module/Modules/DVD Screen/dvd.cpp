@@ -1,5 +1,6 @@
 #include "dvd.hpp"
 
+#include "Events/EventManager.hpp"
 
 void DVD::onEnable() {
     Listen(this, RenderEvent, &DVD::onRender)

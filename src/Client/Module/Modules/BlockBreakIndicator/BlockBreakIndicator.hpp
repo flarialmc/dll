@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Events/EventManager.hpp"
 
 class BlockBreakIndicator : public Module {
 private:

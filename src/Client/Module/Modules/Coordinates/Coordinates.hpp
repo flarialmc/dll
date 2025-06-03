@@ -1,10 +1,8 @@
 #pragma once
 
-#include <cmath>
-#include <sstream>
-#include <iomanip>
+
 #include "../Module.hpp"
-#include "Events/Render/RenderUnderUIEvent.hpp"
+#include "Events/EventManager.hpp"
 
 typedef std::unordered_map<std::string, std::string> StringMap;
 

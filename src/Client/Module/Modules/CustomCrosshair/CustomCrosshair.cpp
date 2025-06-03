@@ -1,6 +1,7 @@
 #include "CustomCrosshair.hpp"
 
 #include "Events/EventManager.hpp"
+#include "Utils/Render/PositionUtils.hpp"
 
 void CustomCrosshair::onEnable() {
     Listen(this, PerspectiveEvent, &CustomCrosshair::onGetViewPerspective)

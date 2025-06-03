@@ -1,6 +1,7 @@
 #include "AutoRQ.hpp"
 
 #include "Events/EventManager.hpp"
+#include "SDK/Client/Network/Packet/SetTitlePacket.hpp"
 
 void AutoRQ::onEnable() {
     Listen(this, PacketEvent, &AutoRQ::onPacketReceive)

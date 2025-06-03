@@ -3,6 +3,8 @@
 #include "../Module.hpp"
 #include "Events/Render/RenderEvent.hpp"
 #include "Events/Render/RenderPotionHUDEvent.hpp"
+#include "Events/Render/SetupAndRenderEvent.hpp"
+#include "Utils/Render/PositionUtils.hpp"
 
 class PotionHUD : public Module {
 private:
@@ -26,9 +28,9 @@ public:
 
 	void onRender(RenderEvent& event);
 
-	static void onRenderPotionHUD(RenderPotionHUDEvent& event);
+	void onRenderPotionHUD(RenderPotionHUDEvent& event);
 
-	void onSetupAndRender(SetupAndRenderEvent& event) {
+	void onSetupAndRender(const SetupAndRenderEvent& event) {
 		if (this->isEnabled())
 			if (ClientInstance::getTopScreenName() == "hud_screen") {
 				Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);

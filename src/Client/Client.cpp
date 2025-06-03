@@ -2,8 +2,6 @@
 
 #include <filesystem>
 #include <thread>
-#include <wingdi.h>
-#include <wininet.h>
 
 #include <Utils/VersionUtils.hpp>
 #include <Utils/WinrtUtils.hpp>
@@ -14,8 +12,9 @@
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.ApplicationModel.Core.h>
 #include <winrt/Windows.ApplicationModel.Activation.h>
-#include <winrt/Windows.Foundation.Collections.h>
 #include <Scripting/ScriptManager.hpp>
+#include <winrt/Windows.Foundation.Collections.h>
+#include <winrt/Windows.Foundation.h>
 
 #include "Utils/APIUtils.hpp"
 

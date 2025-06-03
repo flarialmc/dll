@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Client.hpp"
+#include "Events/Game/FOVEvent.hpp"
 
 class UpsideDown : public Module {
 
@@ -12,7 +12,7 @@ public:
 
     void onDisable() override;
 
-    static void onGetFOV(FOVEvent &event);
+    void onGetFOV(FOVEvent &event);
 
     void defaultConfig() override;
 };

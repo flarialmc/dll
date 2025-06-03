@@ -3,6 +3,7 @@
 #include <string>
 #include <windows.h>
 #include <wininet.h>
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <ImGui/imgui.h>
 #include <lib/json/json.hpp>
 #include <Utils/Logger/Logger.hpp>
@@ -372,8 +373,10 @@ namespace Hive {
         int prestige = 0;
 
     public:
-        PlayerStats(float fkdr = 0.0f, float kd = 0.0f, float winRate = 0.0f)
-                : fkdr(fkdr), kd(kd), winRate(winRate) {}
+        explicit PlayerStats(float fkdr = 0.0f, float kd = 0.0f, float winRate = 0.0f)
+            : fkdr(fkdr), kd(kd), winRate(winRate), level(0), victories(0), losses(0), kills(0), deaths(0)
+        {
+        }
 
         void setFKDR(double fkdrValue) { fkdr = fkdrValue; }
         void setKD(double kdValue) { kd = kdValue; }
@@ -409,11 +412,11 @@ namespace Hive {
         };
     };
 
-    double roundToSecond(float value) {
+    inline double roundToSecond(float value) {
         return std::round(value * 100.0f) / 100.0f;
     }
 
-    httpResponse GetString(const std::string &URL) {
+    inline httpResponse GetString(const std::string &URL) {
         HINTERNET interwebs = InternetOpenA("Samsung Smart Fridge", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, NULL);
         HINTERNET urlFile;
         std::string rtn;
@@ -440,7 +443,7 @@ namespace Hive {
         return {rtn, (int)statusCode};
     }
 
-    std::string replaceAll(std::string subject, const std::string &search, const std::string &replace) {
+    inline std::string replaceAll(std::string subject, const std::string &search, const std::string &replace) {
         size_t pos = 0;
         while ((pos = subject.find(search, pos)) != std::string::npos) {
             subject.replace(pos, search.length(), replace);
@@ -449,7 +452,7 @@ namespace Hive {
         return subject;
     }
 
-    int getLevelForXP(int xp, const std::map<int, int>& xpToLevel) {
+    inline int getLevelForXP(int xp, const std::map<int, int>& xpToLevel) {
         auto it = xpToLevel.lower_bound(xp);
 
         if (it == xpToLevel.end()) {
@@ -468,7 +471,7 @@ namespace Hive {
         return prev->second + 1;
     }
 
-    Hive::PlayerStats GetStats(const std::string &gameId, const std::string &username) {
+    inline Hive::PlayerStats GetStats(const std::string &gameId, const std::string &username) {
 
         PlayerStats stats;
 

@@ -11,15 +11,17 @@
 #include <iostream>
 #include <Psapi.h>
 #include <tlhelp32.h>
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_dx11.h>
 #include <imgui/imgui_impl_dx12.h>
 #include <imgui/imgui_impl_win32.h>
 #include <imgui/imgui_freetype.h>
-
+#include "unknwnbase.h"
 #include "UnderUIHooks.hpp"
 #include "CreateSwapchainForCoreWindowHook.hpp"
 #include "ResizeHook.hpp"
+using ::IUnknown;
 
 #include "../../../Module/Modules/MotionBlur/MotionBlur.hpp"
 

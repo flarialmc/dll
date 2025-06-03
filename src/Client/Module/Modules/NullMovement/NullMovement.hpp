@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "SDK/Client/Options/OptionsParser.hpp"
 
 
 class NullMovement : public Module {

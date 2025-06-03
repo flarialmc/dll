@@ -2,6 +2,8 @@
 
 #include "Events/EventManager.hpp"
 #include "Events/Render/RenderEvent.hpp"
+#include "Modules/ClickGUI/ClickGUI.hpp"
+#include "Modules/CPS/CPSCounter.hpp"
 
 void BlockBreakIndicator::onEnable() {
     Listen(this, RenderEvent, &BlockBreakIndicator::onRender)

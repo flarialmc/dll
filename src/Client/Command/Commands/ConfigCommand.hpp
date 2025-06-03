@@ -1,6 +1,5 @@
 #pragma once
 #include <Command/Command.hpp>
-#include <winrt/impl/Windows.Foundation.1.h>
 
 
 class ConfigCommand : public Command {

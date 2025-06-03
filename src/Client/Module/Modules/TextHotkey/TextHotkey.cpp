@@ -1,6 +1,7 @@
 #include "TextHotkey.hpp"
 
 #include "Events/EventManager.hpp"
+#include "SDK/Client/Network/Packet/TextPacket.hpp"
 
 TextHotkey::TextHotkey(): Module("Text Hotkey", "Send something in chat with a\nclick of a button!",
                                  IDR_TEXT_BOX_PNG, "")

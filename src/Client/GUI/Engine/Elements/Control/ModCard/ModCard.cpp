@@ -5,30 +5,30 @@
 #define clickgui ModuleManager::getModule("ClickGUI")
 
 std::map<int, ID2D1Bitmap *> ClickGUIElements::images;
-std::vector<Vec2<float>> sizes;
-std::vector<Vec2<float>> shadowSizes;
+std::vector<Vec2<float>> sizesr;
+std::vector<Vec2<float>> shadowsizesr;
 
 void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const int index, bool visible, float opacity) {
     if (opacity == -600.f) opacity = ClickGUI::modcardOpacity;
     Vec2<float> round = Constraints::RoundingConstraint(34, 34);
 
-    if (index > sizes.size() - 1 || index == 0) {
+    if (index > sizesr.size() - 1 || index == 0) {
         float nigga = Constraints::RelativeConstraint(0.19f, "height", true);
         float gaynigga = Constraints::RelativeConstraint(0.141f, "height", true);
 
-        sizes.emplace_back(nigga, gaynigga);
+        sizesr.emplace_back(nigga, gaynigga);
     }
 
-    if (index > shadowSizes.size() - 1 || index == 0) {
-        shadowSizes.emplace_back(0.01, 0.01);
+    if (index > shadowsizesr.size() - 1 || index == 0) {
+        shadowsizesr.emplace_back(0.01, 0.01);
     }
 
     if (!visible)
         return;
 
     // Bottom rounded rect
-    float BottomRoundedWidth = sizes[index].x;
-    float BottomRoundedHeight = sizes[index].y;
+    float BottomRoundedWidth = sizesr[index].x;
+    float BottomRoundedHeight = sizesr[index].y;
 
     float realY = y;
     float diffX;
@@ -38,40 +38,40 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     if (FlarialGUI::CursorInRect(x, realY, BottomRoundedWidth, BottomRoundedHeight)) {
 
-        FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.186f, "height", true),
+        FlarialGUI::lerp(sizesr[index].x, Constraints::RelativeConstraint(0.186f, "height", true),
                          0.15f * FlarialGUI::frameFactor);
-        FlarialGUI::lerp(sizes[index].y, Constraints::RelativeConstraint(0.149f, "height", true),
+        FlarialGUI::lerp(sizesr[index].y, Constraints::RelativeConstraint(0.149f, "height", true),
                          0.15f * FlarialGUI::frameFactor);
 
-        diffX = (sizes[index].x - Constraints::RelativeConstraint(0.178f, "height", true)) / 2.0f;
-        diffY = (sizes[index].y - Constraints::RelativeConstraint(0.141f, "height", true)) / 2.0f;
+        diffX = (sizesr[index].x - Constraints::RelativeConstraint(0.178f, "height", true)) / 2.0f;
+        diffY = (sizesr[index].y - Constraints::RelativeConstraint(0.141f, "height", true)) / 2.0f;
 
-        FlarialGUI::lerp(shadowSizes[index].x, BottomRoundedWidth, 0.25f * FlarialGUI::frameFactor);
-        FlarialGUI::lerp(shadowSizes[index].y, BottomRoundedHeight, 0.25f * FlarialGUI::frameFactor);
+        FlarialGUI::lerp(shadowsizesr[index].x, BottomRoundedWidth, 0.25f * FlarialGUI::frameFactor);
+        FlarialGUI::lerp(shadowsizesr[index].y, BottomRoundedHeight, 0.25f * FlarialGUI::frameFactor);
 
     } else {
 
-        FlarialGUI::lerp(sizes[index].x, Constraints::RelativeConstraint(0.178f, "height", true),
+        FlarialGUI::lerp(sizesr[index].x, Constraints::RelativeConstraint(0.178f, "height", true),
                          0.15f * FlarialGUI::frameFactor);
-        FlarialGUI::lerp(sizes[index].y, Constraints::RelativeConstraint(0.141f, "height", true),
+        FlarialGUI::lerp(sizesr[index].y, Constraints::RelativeConstraint(0.141f, "height", true),
                          0.15f * FlarialGUI::frameFactor);
 
-        FlarialGUI::lerp(shadowSizes[index].x, 0.01f, 0.01f * FlarialGUI::frameFactor);
-        FlarialGUI::lerp(shadowSizes[index].y, 0.01f, 0.01f * FlarialGUI::frameFactor);
+        FlarialGUI::lerp(shadowsizesr[index].x, 0.01f, 0.01f * FlarialGUI::frameFactor);
+        FlarialGUI::lerp(shadowsizesr[index].y, 0.01f, 0.01f * FlarialGUI::frameFactor);
 
-        diffX = (sizes[index].x - Constraints::RelativeConstraint(0.178f, "height", true)) / 2.0f;
-        diffY = (sizes[index].y - Constraints::RelativeConstraint(0.141f, "height", true)) / 2.0f;
+        diffX = (sizesr[index].x - Constraints::RelativeConstraint(0.178f, "height", true)) / 2.0f;
+        diffY = (sizesr[index].y - Constraints::RelativeConstraint(0.141f, "height", true)) / 2.0f;
 
     }
 
     x -= diffX;
     y -= diffY;
 
-    if (shadowSizes[index].x > Constraints::RelativeConstraint(0.255f, "height")) {
+    if (shadowsizesr[index].x > Constraints::RelativeConstraint(0.255f, "height")) {
 
 
-        float diffX2 = (shadowSizes[index].x - BottomRoundedWidth) / 2.0f;
-        float diffY2 = (shadowSizes[index].y - BottomRoundedHeight) / 2.0f;
+        float diffX2 = (shadowsizesr[index].x - BottomRoundedWidth) / 2.0f;
+        float diffY2 = (shadowsizesr[index].y - BottomRoundedHeight) / 2.0f;
 
         FlarialGUI::ShadowRect(
             Vec2<float>(x, y),
@@ -91,7 +91,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     // Top rounded rect
 
-    float TopRoundedHeight = Constraints::SpacingConstraint(sizes[index].y, 0.635f);
+    float TopRoundedHeight = Constraints::SpacingConstraint(sizesr[index].y, 0.635f);
 
     FlarialGUI::PushSize(x, y, BottomRoundedWidth, BottomRoundedHeight);
 

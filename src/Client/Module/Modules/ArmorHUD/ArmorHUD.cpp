@@ -2,6 +2,7 @@
 
 #include "Manager.hpp"
 #include "Events/EventManager.hpp"
+#include "Modules/ClickGUI/ClickGUI.hpp"
 
 void ArmorHUD::onEnable() {
     if (FlarialGUI::inMenu) {
@@ -56,40 +57,43 @@ void ArmorHUD::defaultConfig() {
 }
 
 void ArmorHUD::settingsRender(float settingsOffset) {
-	const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
+		float x = Constraints::PercentageConstraint(0.019, "left");
+		float y = Constraints::PercentageConstraint(0.10, "top");
+
+		const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
 
-	FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-	FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-	                          Constraints::RelativeConstraint(1.0, "width"),
-	                          Constraints::RelativeConstraint(0.88f, "height"));
+		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+			Constraints::RelativeConstraint(1.0, "width"),
+			Constraints::RelativeConstraint(0.88f, "height"));
 
-	addHeader("Armor HUD");
-	addSlider("Size", "", getOps<float>("uiscale"), 5.f, 0.f, true);
-	addSlider("Spacing", "", getOps<float>("spacing"), 10.f, 0.f, true);
-	addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", getOps<bool>("vertical"));
-	addConditionalToggle(getOps<bool>("vertical"), "Durability to the left", "", getOps<bool>("durability_left"));
-	addToggle("Show offhand item", "", getOps<bool>("show_offhand"));
-	addToggle("Fill Empty Slots", "Fill gaps when a piece of armor isn't equipped", getOps<bool>("fillGaps"));
-	addToggle("Change Color", "", getOps<bool>("color"));
+		addHeader("Armor HUD");
+		addSlider("Size", "", settings.getSettingByName<float>("uiscale")->value, 5.f, 0.f, true);
+		addSlider("Spacing", "", settings.getSettingByName<float>("spacing")->value, 10.f, 0.f, true);
+		addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", settings.getSettingByName<bool>("vertical")->value);
+		addConditionalToggle(settings.getSettingByName<bool>("vertical")->value, "Durability to the left", "", settings.getSettingByName<bool>("durability_left")->value);
+		addToggle("Show offhand item", "", settings.getSettingByName<bool>("show_offhand")->value);
+		addToggle("Fill Empty Slots", "Fill gaps when a piece of armor isn't equipped", settings.getSettingByName<bool>("fillGaps")->value);
+		addToggle("Change Color", "", settings.getSettingByName<bool>("color")->value);
 
-	extraPadding();
+		extraPadding();
 
-	addHeader("Durability");
-	addToggle("Durability Text", "", getOps<bool>("showdurability"));
-	addConditionalSlider(getOps<bool>("showdurability") && getOps<bool>("vertical"), "Text Offset X", "", getOps<float>("textOffsetX"), 50.f, 0.0f, false);
-	addConditionalSlider(getOps<bool>("showdurability") && !getOps<bool>("vertical"), "Text Offset Y", "", getOps<float>("textOffsetY"), 50.f, 0.0f, false);
-	addConditionalSlider(getOps<bool>("showdurability"), "Text Size", "", getOps<float>("textSize"), 0.25f, 0.0f, true);
-	addConditionalToggle(getOps<bool>("showdurability"), "Show Durability in %", "", getOps<bool>("percent"));
-	addConditionalToggle(getOps<bool>("showdurability") && !getOps<bool>("percent"), "Hide Max Durability Text", "", getOps<bool>("hideMaxDurText"));
-	addConditionalToggle(getOps<bool>("showdurability"), "Text Shadow", "Displays a shadow under the text", getOps<bool>("textShadow"));
-	addConditionalSlider(getOps<bool>("showdurability") && getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", getOps<float>("textShadowOffset"), 0.02f, 0.001f);
+		addHeader("Durability");
+		addToggle("Durability Text", "", settings.getSettingByName<bool>("showdurability")->value);
+		addConditionalSlider(settings.getSettingByName<bool>("showdurability")->value && settings.getSettingByName<bool>("vertical")->value, "Text Offset X", "", settings.getSettingByName<float>("textOffsetX")->value, 50.f, 0.0f, false);
+		addConditionalSlider(settings.getSettingByName<bool>("showdurability")->value && !settings.getSettingByName<bool>("vertical")->value, "Text Offset Y", "", settings.getSettingByName<float>("textOffsetY")->value, 50.f, 0.0f, false);
+		addConditionalSlider(settings.getSettingByName<bool>("showdurability")->value, "Text Size", "", settings.getSettingByName<float>("textSize")->value, 0.25f, 0.0f, true);
+		addConditionalToggle(settings.getSettingByName<bool>("showdurability")->value, "Show Durability in %", "", settings.getSettingByName<bool>("percent")->value);
+		addConditionalToggle(settings.getSettingByName<bool>("showdurability")->value && !settings.getSettingByName<bool>("percent")->value, "Hide Max Durability Text", "", settings.getSettingByName<bool>("hideMaxDurText")->value);
+		addConditionalToggle(settings.getSettingByName<bool>("showdurability")->value, "Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
+		addConditionalSlider(settings.getSettingByName<bool>("showdurability")->value && settings.getSettingByName<bool>("textShadow")->value, "Shadow Offset", "How far the shadow will be.", settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
 
-	addToggle("Durability Bar", "", getOps<bool>("showDurBar"));
-	addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Offset X", "", getOps<float>("durBarOffsetX"), 50.f, 0.0f, false);
-	addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Offset Y", "", getOps<float>("durBarOffsetY"), 50.f, 0.0f, false);
-	addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Opacity", "", getOps<float>("durBarOpacity"), 1.f, 0.0f, false);
-	addConditionalToggle(getOps<bool>("showDurBar"), "Show Max Durability Bar", "", getOps<bool>("showDurBarMax"));
+		addToggle("Durability Bar", "", settings.getSettingByName<bool>("showDurBar")->value);
+		addConditionalSlider(settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Offset X", "", settings.getSettingByName<float>("durBarOffsetX")->value, 50.f, 0.0f, false);
+		addConditionalSlider(settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Offset Y", "", settings.getSettingByName<float>("durBarOffsetY")->value, 50.f, 0.0f, false);
+		addConditionalSlider(settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Opacity", "", settings.getSettingByName<float>("durBarOpacity")->value, 1.f, 0.0f, false);
+		addConditionalToggle(settings.getSettingByName<bool>("showDurBar")->value, "Show Max Durability Bar", "", settings.getSettingByName<bool>("showDurBarMax")->value);
 
 	extraPadding();
 	addHeader("Colors");
@@ -103,64 +107,9 @@ void ArmorHUD::settingsRender(float settingsOffset) {
 	addConditionalSlider(!getOps<bool>("showStaticDurBarCol"), "100% Durability Bar Color", "Hue in degrees", getOps<float>("100color"), 360.f, 0.0f, false);
 	addConditionalSlider(!getOps<bool>("showStaticDurBarCol"), "0% Durability Bar Color", "Hue in degrees", getOps<float>("0color"), 360.f, 0.0f, false);
 
-	FlarialGUI::UnsetScrollView();
-	resetPadding();
-}
-
-void ArmorHUD::onRender() {
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
-
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
-
-
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
-
-		addHeader("Armor HUD");
-		addSlider("Size", "", getOps<float>("uiscale"), 5.f, 0.f, true);
-		addSlider("Spacing", "", getOps<float>("spacing"), 10.f, 0.f, true);
-		addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", getOps<bool>("vertical"));
-		addConditionalToggle(getOps<bool>("vertical"), "Durability to the left", "", getOps<bool>("durability_left"));
-		addToggle("Show offhand item", "", getOps<bool>("show_offhand"));
-		addToggle("Fill Empty Slots", "Fill gaps when a piece of armor isn't equipped", getOps<bool>("fillGaps"));
-		addToggle("Change Color", "", getOps<bool>("color"));
-
-		extraPadding();
-
-		addHeader("Durability");
-		addToggle("Durability Text", "", getOps<bool>("showdurability"));
-		addConditionalSlider(getOps<bool>("showdurability") && getOps<bool>("vertical"), "Text Offset X", "", getOps<float>("textOffsetX"), 50.f, 0.0f, false);
-		addConditionalSlider(getOps<bool>("showdurability") && !getOps<bool>("vertical"), "Text Offset Y", "", getOps<float>("textOffsetY"), 50.f, 0.0f, false);
-		addConditionalSlider(getOps<bool>("showdurability"), "Text Size", "", getOps<float>("textSize"), 0.25f, 0.0f, true);
-		addConditionalToggle(getOps<bool>("showdurability"), "Show Durability in %", "", getOps<bool>("percent"));
-		addConditionalToggle(getOps<bool>("showdurability") && !getOps<bool>("percent"), "Hide Max Durability Text", "", getOps<bool>("hideMaxDurText"));
-		addConditionalToggle(getOps<bool>("showdurability"), "Text Shadow", "Displays a shadow under the text", getOps<bool>("textShadow"));
-		addConditionalSlider(getOps<bool>("showdurability") && getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", getOps<float>("textShadowOffset"), 0.02f, 0.001f);
-
-		addToggle("Durability Bar", "", getOps<bool>("showDurBar"));
-		addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Offset X", "", getOps<float>("durBarOffsetX"), 50.f, 0.0f, false);
-		addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Offset Y", "", getOps<float>("durBarOffsetY"), 50.f, 0.0f, false);
-		addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Opacity", "", getOps<float>("durBarOpacity"), 1.f, 0.0f, false);
-		addConditionalToggle(getOps<bool>("showDurBar"), "Show Max Durability Bar", "", getOps<bool>("showDurBarMax"));
-
-		extraPadding();
-		addHeader("Colors");
-		addToggle("Show Special Max Durability Bar Color", "", getOps<bool>("showSpecialMaxDurBarCol"));
-		addConditionalColorPicker(getOps<bool>("showSpecialMaxDurBarCol"), "Special Max Durability Bar Color", "", "specialMaxDurBar");
-		addColorPicker("Normal Color", "", "main");
-		addConditionalColorPicker(getOps<bool>("textShadow"), "Shadow Color", "", "textShadow");
-		addToggle("Enable Static Durability Bar Color", "", getOps<bool>("showStaticDurBarCol"));
-		addConditionalColorPicker(getOps<bool>("showStaticDurBarCol"), "Static Durability Bar Color", "", "staticDurBar");
-		addConditionalToggle(getOps<bool>("showStaticDurBarCol"), "Override Special Max Durability Bar Color", "", getOps<bool>("overrideSpecialMaxDurBarCol"));
-		addConditionalSlider(!getOps<bool>("showStaticDurBarCol"), "100% Durability Bar Color", "Hue in degrees", getOps<float>("100color"), 360.f, 0.0f, false);
-		addConditionalSlider(!getOps<bool>("showStaticDurBarCol"), "0% Durability Bar Color", "Hue in degrees", getOps<float>("0color"), 360.f, 0.0f, false);
-
 		FlarialGUI::UnsetScrollView();
 		resetPadding();
-	}
+}
 
 void ArmorHUD::renderDurability() {
 		bool showOffhand = getOps<bool>("show_offhand");

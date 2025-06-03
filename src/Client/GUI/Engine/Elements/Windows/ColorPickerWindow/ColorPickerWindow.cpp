@@ -45,7 +45,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 		HSV hsv_color{};
 
 		if (ColorPickers[index].shade.x == -1 && ColorPickers[index].shade.y == -1) {
-			hsv_color = RGBtoHSV(HexToColorF(clickgui->getColor(settingName, moduleName)));
+			hsv_color = RGBtoHSV(clickgui->getColor(settingName, moduleName));
 
 			ColorPickers[index].hueX = (hsv_color.hue / 360.0f) * hlwidth;
 			ColorPickers[index].oldHueX = (hsv_color.hue / 360.0f) * hlwidth;
@@ -60,10 +60,10 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 		);
 
 		color.a = ColorPickers[index].opacX / hlwidth;
-		ColorPickers[index].opacX = opacity * hlwidth;
+		ColorPickers[index].opacX = module->settings.getSettingByName<bool>(settingName + "Opacity")->value * hlwidth;
 
-		if (ColorPickers[index].oldHex.empty()) ColorPickers[index].oldHex = hex;
-		if (ColorPickers[index].oldOpac == NULL) ColorPickers[index].oldOpac = opacity;
+		if (ColorPickers[index].oldHex.empty()) ColorPickers[index].oldHex = ColorFToHex(clickgui->getColor(settingName, moduleName));
+		if (ColorPickers[index].oldOpac == NULL) ColorPickers[index].oldOpac = module->settings.getSettingByName<bool>(settingName + "Opacity")->value;
 
 		D2D1_COLOR_F oldColor = HexToColorF(ColorPickers[index].oldHex);
 		oldColor.a = ColorPickers[index].oldOpac;
@@ -255,7 +255,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 
 		x = Constraints::PercentageConstraint(0.04, "left");
 
-		if (Toggle(123, x, y, rgb, true)) module->settings.getSettingByName<bool>(settingName + "RGB")->value = !module->settings.getSettingByName<bool>(settingName + "RGB")->value;
+		if (Toggle(123, x, y, module->settings.getSettingByName<bool>(settingName + "RGB")->value, true)) module->settings.getSettingByName<bool>(settingName + "RGB")->value = !module->settings.getSettingByName<bool>(settingName + "RGB")->value;
 
 		FlarialTextWithFont(
 			x + Constraints::SpacingConstraint(0.60, Constraints::RelativeConstraint(0.12, "height", true)),

@@ -120,7 +120,7 @@ double CPSCounter::Microtime() {
                 std::chrono::system_clock::now().time_since_epoch()).count()) / double(1000000));
 }
 
-void onMouse(MouseEvent& event) {
+void CPSCounter::onMouse(MouseEvent& event) {
     auto limiter = ModuleManager::getModule("CPS Limiter");
     if (limiter == nullptr) return;
 
@@ -147,7 +147,7 @@ void onMouse(MouseEvent& event) {
         }
     }
 
-    if (event.getButton() == MouseButton::Right) {
+    if (event.getButton() == Right) {
         if (!MC::held) {
             rightClickHeld = false;
         }

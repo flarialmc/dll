@@ -131,7 +131,7 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
         MC::mouseButton == MouseButton::Left && !MC::held) {
         MC::mouseButton = MouseButton::None;
         //ColorPickers[index].isActive = true;
-        FlarialGUI::ColorPickerWindow(index, )
+        FlarialGUI::ColorPickerWindow(index, moduleName, settingName);
         activeColorPickerWindows++;
     }
 

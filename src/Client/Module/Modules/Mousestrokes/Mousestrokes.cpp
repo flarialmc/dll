@@ -1,5 +1,8 @@
 #include "Mousestrokes.hpp"
 
+#include "Client.hpp"
+#include "Modules/ClickGUI/ClickGUI.hpp"
+
 Mousestrokes::Mousestrokes(): Module("Mouse Strokes", "Visualizes the position of your mouse.",
                                      IDR_CURSOR_PNG, "")
 {

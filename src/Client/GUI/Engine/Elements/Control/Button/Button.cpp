@@ -1,4 +1,5 @@
 #include "../../../Engine.hpp"
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui.h>
 
 bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor, const wchar_t *text,

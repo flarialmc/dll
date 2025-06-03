@@ -4,7 +4,6 @@
 #include "../D2D.hpp"
 #include <wincodec.h>
 #include <stack>
-#include <map>
 #include <vector>
 #include <winrt/base.h>
 #include <imgui/imgui.h>

@@ -1,6 +1,5 @@
 #include "DebugMenu.hpp"
 
-#include <cpuid.h>
 
 #include "Modules/Time/Time.hpp"
 #include "SDK/Client/Block/BlockLegacy.hpp"

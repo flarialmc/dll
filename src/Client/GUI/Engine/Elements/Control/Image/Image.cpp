@@ -3,6 +3,7 @@
 #include "../../Structs/ImagesClass.hpp"
 #include "../../../../../../Assets/Assets.hpp"
 #include "../../../../../Client.hpp"
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui.h>
 
 #define STB_IMAGE_IMPLEMENTATION

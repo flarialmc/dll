@@ -115,8 +115,6 @@ set_target_properties(zlib PROPERTIES
 )
 set_target_properties(zlib PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/curl/zlib.lib")
 
-target_precompile_headers(Flarial PRIVATE "src/PCH.cpp")
-
 include(FetchContent)
 
 FetchContent_Declare(
@@ -160,4 +158,5 @@ FetchContent_MakeAvailable(libhat entt nes fmt magic_enum LuaBridge)
 target_link_libraries(Flarial PRIVATE libcurl ws2_32.lib crypt32.lib normaliz.lib wldap32.lib LuaBridge lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType magic_enum)
 target_link_libraries(Flarial PUBLIC MinHook)
 
-set_target_properties(Flarial PROPERTIES UNITY_BUILD ON)
+
+target_precompile_headers(Flarial PRIVATE "src/PCH.hpp")
