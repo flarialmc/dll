@@ -1418,7 +1418,7 @@ void FlarialGUI::PushImClipRect(ImVec2 pos, ImVec2 size, bool overridePreviousCl
         if (ClippedPos.x >= pos.x) pos.x = ClippedPos.x + 1;
         if (ClippedPos.y >= pos.y) pos.y = ClippedPos.y + 1;
         if (ClippedSize.x <= size.x) size.x = ClippedSize.x - 1;
-        if (ClippedSize.y <= size.y) size.x = ClippedSize.y - 1;
+        if (ClippedSize.y <= size.y) size.y = ClippedSize.y - 1;
     }
 
     PreviousClippingRects.push_back(D2D_RECT_F(pos.x, pos.y, pos.x + size.x, pos.y + size.y));
@@ -1442,7 +1442,7 @@ void FlarialGUI::PushImClipRect(D2D_RECT_F rect, bool overridePreviousClipping) 
         if (ClippedPos.x >= pos.x) pos.x = ClippedPos.x + 1;
         if (ClippedPos.y >= pos.y) pos.y = ClippedPos.y + 1;
         if (ClippedSize.x <= size.x) size.x = ClippedSize.x - 1;
-        if (ClippedSize.y <= size.y) size.x = ClippedSize.y - 1;
+        if (ClippedSize.y <= size.y) size.y = ClippedSize.y - 1;
     }
 
     PreviousClippingRects.push_back(D2D_RECT_F(pos.x, pos.y, pos.x + size.x, pos.y + size.y));
