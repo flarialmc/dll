@@ -9,26 +9,14 @@
 class getGammaHook : public Hook {
 private:
 
-    static float getGammaCallback(uintptr_t a1) {
-
-        if (!Options::isInitialized()) {
-            Options::initialize(a1);
-        }
-
-        auto event = nes::make_holder<GammaEvent>(funcOriginal(a1));
-        eventMgr.trigger(event);
-
-        return event->getGamma();
-    }
+    static float getGammaCallback(uintptr_t a1);
 
 public:
     typedef float(__thiscall *getGammaOriginal)(uintptr_t);
 
     static inline getGammaOriginal funcOriginal = nullptr;
 
-    getGammaHook() : Hook("getGammaHook",GET_SIG_ADDRESS("Options::getGamma")) {}
+    getGammaHook();
 
-    void enableHook() override {
-        this->autoHook((void *) getGammaCallback, (void **) &funcOriginal);
-    }
+    void enableHook() override;
 };
