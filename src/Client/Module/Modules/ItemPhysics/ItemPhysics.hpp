@@ -25,7 +25,7 @@ public:
 
 static char data[0x5], data2[0x5];
 
-std::unique_ptr<INeedADecentHookClassForMemory> ItemRenderer_renderHook, glm_rotateHook;
+inline std::unique_ptr<INeedADecentHookClassForMemory> ItemRenderer_renderHook, glm_rotateHook;
 
 class ItemPhysics : public Module {
 private:

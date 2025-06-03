@@ -364,12 +364,6 @@ namespace FlarialGUI {
     void PushImClipRect(ImVec2 pos, ImVec2 size, bool overridePreviousClipping = false);
     void PrepareBlur(float intensity);
 
-
-	void PushImClipRect(D2D_RECT_F rect);
-	void PushImClipRect(ImVec2 pos, ImVec2 size);
-	void PrepareBlur(float intensity);
-
-
 	void PopImClipRect();
 
 	ImVec2 getFlarialTextSize(const wchar_t* text, const float width, const float height,

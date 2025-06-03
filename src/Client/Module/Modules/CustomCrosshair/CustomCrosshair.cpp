@@ -6,12 +6,14 @@
 void CustomCrosshair::onEnable() {
     Listen(this, PerspectiveEvent, &CustomCrosshair::onGetViewPerspective)
     Listen(this, HudCursorRendererRenderEvent, &CustomCrosshair::onHudCursorRendererRender)
+    Listen(this, RenderEvent, &CustomCrosshair::onRender)
     Module::onEnable();
 }
 
 void CustomCrosshair::onDisable() {
     Deafen(this, PerspectiveEvent, &CustomCrosshair::onGetViewPerspective)
     Deafen(this, HudCursorRendererRenderEvent, &CustomCrosshair::onHudCursorRendererRender)
+    Deafen(this, RenderEvent, &CustomCrosshair::onRender)
     Module::onDisable();
 }
 
@@ -23,11 +25,16 @@ void CustomCrosshair::defaultConfig() {
     setDef("solidColorWhenHighlighted", true);
     setDef("solidColor", false);
     setDef("renderInThirdPerson", false);
-    setDef("default", (std::string)"fafafa", 0.55f, false);
-    setDef("enemy", (std::string)"FF0000", 1.f, false);
+    setDef("default", (std::string) "fafafa", 0.55f, false);
+    setDef("enemy", (std::string) "FF0000", 1.f, false);
+    setDef("CurrentCrosshair", (std::string)"Crosshair1");
 }
 
 void CustomCrosshair::settingsRender(float settingsOffset) {
+    actuallyRenderWindow = true;
+    auto button = MC::mouseButton;
+    if (blankWindow)
+        MC::mouseButton = MouseButton::None;
 
     float x = Constraints::PercentageConstraint(0.019, "left");
     float y = Constraints::PercentageConstraint(0.10, "top");
@@ -40,24 +47,49 @@ void CustomCrosshair::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(1.0, "width"),
                               Constraints::RelativeConstraint(0.88f, "height"));
 
-    addHeader("Custom Crosshair");
-    addToggle("Solid Color", "Make crosshair a solid color / more visible", getOps<bool>("solidColor"));
-    addToggle("Render in Third Person", "Weather or not to render in third person", getOps<bool>("renderInThirdPerson"));
-    addToggle("Highlight on Entity", "Highlight when enemy in reach", getOps<bool>("highlightOnEntity"));
-    addConditionalToggle(getOps<bool>("highlightOnEntity"), "Solid Color When Highlighted", "Use solid color when highlighted", getOps<bool>("solidColorWhenHighlighted"));
-    extraPadding();
+    if (settings.getSettingByName<bool>("CustomCrosshair")->value) {
+        this->addHeader("Crosshair Editor");
+        this->addButton("Crosshair Editor", "Opens the crosshair editor menu", "open", [&]() {
+            this->blankWindow = !this->blankWindow;
+        });
+        this->addButton("Reload Crosshair", "Reloads Crosshair to apply any changes", "reload", [&]() {
+            this->CrosshairReloaded = true;
+        });
 
-    // addHeader("Misc");
-    // addSlider("UI Scale", "The size of the Crosshair (only for custom)", getOps<float>("uiscale"), 10.f, 0.f, true);
+        this->extraPadding();
+    }
 
-    extraPadding();
+    this->addHeader("Main");
+    this->addToggle("Use Custom Crosshair", "Uses a custom crosshair.",
+                    settings.getSettingByName<bool>("CustomCrosshair")->value);
+    this->addToggle("Solid Color", "Make crosshair a solid color / more visible",
+                    settings.getSettingByName<bool>("solidColor")->value);
+    this->addToggle("Render in Third Person", "Weather or not to render in third person",
+                    settings.getSettingByName<bool>("renderInThirdPerson")->value);
+    this->addToggle("Highlight on Entity", "Highlight when enemy in reach",
+                    settings.getSettingByName<bool>("highlightOnEntity")->value);
+    if (settings.getSettingByName<bool>("highlightOnEntity")->value) {
+        this->addToggle("Solid Color When Highlighted", "Use solid color when highlighted",
+                        settings.getSettingByName<bool>("solidColorWhenHighlighted")->value);
+    }
+    this->extraPadding();
 
-    addHeader("Colors");
-    addColorPicker("Default Color", "When the enemy is not in view.", "default");
-    addConditionalColorPicker(getOps<bool>("highlightOnEntity"), "Enemy Color", "When the enemy is in view.", "enemy");
+    this->addHeader("Misc");
+    this->addSlider("Crosshair Scale", "The size of the Crosshair (only for custom)",
+                    settings.getSettingByName<float>("uiscale")->value, 10.f, 0.f, true);
+
+    this->extraPadding();
+
+    this->addHeader("Colors");
+    this->addColorPicker("Default Color", "When the enemy is not in view.", "default");
+    if (settings.getSettingByName<bool>("highlightOnEntity")->value) {
+        this->addColorPicker("Enemy Color", "When the enemy is in view.", "enemy");
+    }
     FlarialGUI::UnsetScrollView();
 
-    resetPadding();
+    this->resetPadding();
+
+    if (blankWindow) MC::mouseButton = button;
 }
 
 void CustomCrosshair::onGetViewPerspective(PerspectiveEvent &event) {
@@ -65,15 +97,16 @@ void CustomCrosshair::onGetViewPerspective(PerspectiveEvent &event) {
 }
 
 void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &event) {
-    event.cancel();
     if (!SDK::clientInstance) return;
     auto player = SDK::clientInstance->getLocalPlayer();
     if (!player) return;
     if (SDK::getCurrentScreen() != "hud_screen") return;
 
-    auto renderInThirdPerson = getOps<bool>("renderInThirdPerson");
+    auto renderInThirdPerson = settings.getSettingByName<bool>("renderInThirdPerson")->value;
     if (!renderInThirdPerson && currentPerspective != Perspective::FirstPerson) return;
     bool isHoveringEnemy = (player->getLevel()->getHitResult().type == HitResultType::Entity);
+
+    bool isDefault = !settings.getSettingByName<bool>("CustomCrosshair")->value;
 
     auto screenContext = event.getMinecraftUIRenderContext()->getScreenContext();
 
@@ -82,34 +115,53 @@ void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &ev
     if (ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr) {
         return;
     }
-    const ResourceLocation loc2(Utils::getAssetsPath() + "\\ch1.png", true);
-    TexturePtr ptr2 = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc2, false);
-    if (ptr2.clientTexture == nullptr || ptr2.clientTexture->clientTexture.resourcePointerBlock == nullptr) {
-        return;
+
+    TexturePtr ptr2;
+
+    if (std::filesystem::exists(
+        Utils::getClientPath() + "//Crosshairs//" + settings.getSettingByName<std::string>("CurrentCrosshair")->value +
+        ".png")) {
+        const ResourceLocation loc2(
+            Utils::getClientPath() + "//Crosshairs//" + settings.getSettingByName<std::string>("CurrentCrosshair")->
+            value + ".png", true);
+        ptr2 = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc2, CrosshairReloaded);
+        CrosshairReloaded = false;
+        if (ptr2.clientTexture == nullptr || ptr2.clientTexture->clientTexture.resourcePointerBlock == nullptr) {
+            isDefault = true;
+        }
+    } else {
+        isDefault = true;
     }
+
     const auto tess = screenContext->getTessellator();
 
     tess->begin(mce::PrimitiveMode::QuadList, 4);
 
-    auto shouldHighlight = getOps<bool>("highlightOnEntity");
-    D2D1_COLOR_F color = isHoveringEnemy && shouldHighlight ? getColor("enemy") : getColor("default");
+    D2D1_COLOR_F enemyColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("enemyColor")->value);
+    enemyColor.a = settings.getSettingByName<float>("enemyOpacity")->value;
 
-    bool isDefault = true; //!getOps<bool>("CustomCrosshair");
+    D2D1_COLOR_F defaultColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("defaultColor")->value);
+    defaultColor.a = settings.getSettingByName<float>("defaultOpacity")->value;
+
+    auto shouldHighlight = settings.getSettingByName<bool>("highlightOnEntity")->value;
+    D2D1_COLOR_F color = isHoveringEnemy && shouldHighlight ? enemyColor : defaultColor;
 
     tess->color(color.r, color.g, color.b, color.a);
 
-    Vec2<float> size = Vec2<float>(17, 17);
-    auto scale = getOps<float>("uiscale");
-    Vec2<float> sizeScaled = PositionUtils::getCustomScreenScaledPos(size, scale);
+    Vec2<float> size = Vec2<float>(16, 16);
+    auto scale = settings.getSettingByName<float>("uiscale")->value;
 
     Vec2<float> sizeUnscaled = PositionUtils::getScreenScaledPos(size);
 
+    Vec2<float> sizeScaled = sizeUnscaled.mul(scale);
+
     auto SizeToUse = isDefault ? sizeUnscaled : sizeScaled;
 
-    Vec2<float> pos = PositionUtils::getScaledPos(Vec2<float>((MC::windowSize.x / 2) - (SizeToUse.x / 2), (MC::windowSize.y / 2) - (SizeToUse.y / 2)));
+    Vec2<float> pos = PositionUtils::getScaledPos(Vec2<float>((MC::windowSize.x / 2) - (SizeToUse.x / 2),
+                                                              (MC::windowSize.y / 2) - (SizeToUse.y / 2)));
 
-    auto useSolidColor = getOps<bool>("solidColor");
-    auto useSolidColorWhenHighlighted = getOps<bool>("solidColorWhenHighlighted");
+    auto useSolidColor = settings.getSettingByName<bool>("solidColor")->value;
+    auto useSolidColorWhenHighlighted = settings.getSettingByName<bool>("solidColorWhenHighlighted")->value;
 
     bool useSolid = false;
 
@@ -117,18 +169,30 @@ void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &ev
         useSolid = true;
     }
 
-    mce::MaterialPtr* material = useSolid ? MaterialUtils::getUITextured() : MaterialUtils::getUICrosshair();
+    mce::MaterialPtr *material = useSolid ? MaterialUtils::getUITextured() : MaterialUtils::getUICrosshair();
 
     if (isDefault) {
         // Pack crosshairs have textures placed whereever so this will figure it out
         IntRectangle rect = IntRectangle(pos.x, pos.y, size.x, size.y);
         ScreenRenderer::blit(screenContext, &ptr, &rect, material);
-    }
-    else {
-        tess->vertexUV(pos.x, pos.y + (sizeScaled.y), 0.f, 0.f, 1.f);
-        tess->vertexUV(pos.x + (sizeScaled.x), pos.y + (sizeScaled.y), 0.f, 1.f, 1.f);
-        tess->vertexUV(pos.x + (sizeScaled.x), pos.y, 0.f, 1.f, 0.f);
+    } else {
+        size = size.mul(scale);
+        tess->vertexUV(pos.x, pos.y + size.y, 0.f, 0.f, 1.f);
+        tess->vertexUV(pos.x + size.x, pos.y + size.y, 0.f, 1.f, 1.f);
+        tess->vertexUV(pos.x + size.x, pos.y, 0.f, 1.f, 0.f);
         tess->vertexUV(pos.x, pos.y, 0.f, 0.f, 0.f);
         MeshHelpers::renderMeshImmediately2(screenContext, tess, material, *ptr2.clientTexture);
     }
+
+    event.cancel();
+}
+
+void CustomCrosshair::onRender(RenderEvent &event) {
+    if (actuallyRenderWindow)
+        CrosshairEditorWindow();
+    else {
+        blankWindow = false;
+    }
+    actuallyRenderWindow = false;
+    if (!blankWindow) CurrentSelectedCrosshair = settings.getSettingByName<std::string>("CurrentCrosshair")->value;
 }

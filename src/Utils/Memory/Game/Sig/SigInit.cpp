@@ -18,7 +18,7 @@ void SigInit::init2180() {
     //ADD_SIG("ResourcePackManager::_composeFullStack", "");
     //ADD_SIG("GeneralSettingsScreenController::GeneralSettingsScreenController", "");
     ADD_SIG("mce::TextureGroup::getTexture", "40 53 55 56 57 41 54 41 55 41 56 41 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 41 0F B6 E9");
-
+    ADD_SIG("LevelUtils::getTimeOfDay", "44 8B C1 B8 ? ? ? ? F7 E9 8B C2 C1 F8 ? 8B D0 C1 EA ? 03 C2 99 33 C2");
 }
 
 void SigInit::init2170() {
