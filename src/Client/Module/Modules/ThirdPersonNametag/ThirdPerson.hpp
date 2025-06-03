@@ -8,36 +8,15 @@ private:
     static inline std::vector<uint8_t> original;
     static inline uintptr_t address;
 public:
-    ThirdPerson() : Module("Nametag", "Shows your nametag for you while\nin 3rd person mode.",
-                           IDR_NAMETAG_PNG, "") {
+    ThirdPerson();;
 
-        address = GET_SIG_ADDRESS("ThirdPersonNametag");
+    void defaultConfig() override;
 
-        original.resize(6);
-        Memory::copyBytes((LPVOID) address, original.data(), 6);
+    void onEnable() override;
 
-        Module::setup();
-    };
+    void onDisable() override;
 
-    void defaultConfig() override {
-        Module::defaultConfig("core");
-    }
+    static void patch();
 
-    void onEnable() override {
-        patch();
-        Module::onEnable();
-    }
-
-    void onDisable() override {
-        unpatch();
-        Module::onDisable();
-    }
-
-    static void patch() {
-        Memory::nopBytes((void *)address, 6);
-    }
-
-    static void unpatch() {
-        Memory::patchBytes((void *)address, original.data(), original.size());
-    }
+    static void unpatch();
 };

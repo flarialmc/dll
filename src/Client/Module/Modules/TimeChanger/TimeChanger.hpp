@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Events/Game/TimeEvent.hpp"
 
 
 class TimeChanger : public Module {
@@ -9,42 +10,13 @@ public:
 		Module::setup();
 	};
 
-	void onEnable() override {
-		Listen(this, TimeEvent, &TimeChanger::onTimeEvent)
-			Module::onEnable();
-	}
+	void onEnable() override;
 
-	void onDisable() override {
-		Deafen(this, TimeEvent, &TimeChanger::onTimeEvent)
-			Module::onDisable();
-	}
+	void onDisable() override;
 
-	void defaultConfig() override {
-		Module::defaultConfig("core");
-		setDef("time", 0.5f);
-	}
+	void defaultConfig() override;
 
-	void settingsRender(float settingsOffset) override {
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
+	void settingsRender(float settingsOffset) override;
 
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
-
-
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
-
-		addHeader("Time Changer");
-		addSlider("Time Slider", "", getOps<float>("time"), 1.f, 0.f, true);
-
-		FlarialGUI::UnsetScrollView();
-
-		resetPadding();
-	}
-
-	void onTimeEvent(TimeEvent& event) {
-		event.setTime(getOps<float>("time"));
-	}
+	void onTimeEvent(TimeEvent& event);
 };

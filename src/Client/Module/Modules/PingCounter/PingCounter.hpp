@@ -1,64 +1,19 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Events/Render/RenderEvent.hpp"
 
 class PingCounter : public Module {
 public:
-	PingCounter() : Module("Ping Counter", "Displays your current latency to the server.",
-		IDR_PING_PNG, "") {
-		Module::setup();
-	};
+	PingCounter();;
 
-	void onEnable() override {
-		Listen(this, RenderEvent, &PingCounter::onRender)
-			Module::onEnable();
-	}
+	void onEnable() override;
 
-	void onDisable() override {
-		Deafen(this, RenderEvent, &PingCounter::onRender)
-			Module::onDisable();
-	}
+	void onDisable() override;
 
-	void defaultConfig() override {
-		setDef("text", (std::string)"{value}ms");
-		setDef("textscale", 0.8f);
-		Module::defaultConfig("all");
-	}
+	void defaultConfig() override;
 
-	void settingsRender(float settingsOffset) override {
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
+	void settingsRender(float settingsOffset) override;
 
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
-
-
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
-
-
-		addHeader("Ping Counter");
-		defaultAddSettings("main");
-		extraPadding();
-
-        addHeader("Text");
-		defaultAddSettings("text");
-		extraPadding();
-
-		addHeader("Colors");
-		defaultAddSettings("colors");
-		extraPadding();
-
-		addHeader("Misc");
-		defaultAddSettings("misc");
-
-		FlarialGUI::UnsetScrollView();
-		resetPadding();
-	}
-
-	void onRender(RenderEvent& event) {
-		auto pingStr = FlarialGUI::cached_to_string(SDK::getServerPing());
-		this->normalRender(11, pingStr);
-	}
+	void onRender(RenderEvent& event);
 };

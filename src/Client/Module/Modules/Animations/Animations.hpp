@@ -25,7 +25,7 @@ public:
 			Module::onDisable();
 	}
 
-	inline static float animate(float endPoint, float current, float speed) {
+	static float animate(float endPoint, float current, float speed) {
 		if (speed < 0.0) speed = 0.0;
 		else if (speed > 1.0) speed = 1.0;
 

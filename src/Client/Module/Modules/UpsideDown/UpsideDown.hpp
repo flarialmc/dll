@@ -6,28 +6,14 @@
 class UpsideDown : public Module {
 
 public:
-    UpsideDown() : Module("Upside Down", "No need to flip your monitor!!", IDR_UPSIDE_DOWN_PNG, "") {
-        Module::setup();
-    };
+    UpsideDown();;
 
-    void onEnable() override {
-        Listen(this, FOVEvent, &UpsideDown::onGetFOV)
-        Module::onEnable();
-    }
+    void onEnable() override;
 
-    void onDisable() override {
-        Deafen(this, FOVEvent, &UpsideDown::onGetFOV)
-        Module::onDisable();
-    }
+    void onDisable() override;
 
-    void onGetFOV(FOVEvent &event) {
-        auto fov = event.getFOV();
-        fov = 360 - fov;
-        event.setFOV(fov);
-    }
+    static void onGetFOV(FOVEvent &event);
 
-    void defaultConfig() override {
-        Module::defaultConfig("core");
-    }
+    void defaultConfig() override;
 };
 

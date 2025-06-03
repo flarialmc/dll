@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Events/Render/RenderEvent.hpp"
 
 inline std::tm localtime_xp(std::time_t timer) {
 	std::tm bt{};
@@ -19,99 +20,16 @@ inline std::tm localtime_xp(std::time_t timer) {
 class Time : public Module {
 
 public:
-	Time() : Module("Clock", "Displays your current local time.", IDR_TIME_PNG, "") {
+	Time();;
 
-		Module::setup();
+	void onEnable() override;
 
-	};
+	void onDisable() override;
 
-	void onEnable() override {
-		Listen(this, RenderEvent, &Time::onRender)
-			Module::onEnable();
-	}
+	void onRender(RenderEvent& event);
 
-	void onDisable() override {
-		Deafen(this, RenderEvent, &Time::onRender)
-			Module::onDisable();
-	}
+	void defaultConfig() override;
 
-	void onRender(RenderEvent& event) {
-		const auto now = std::time(nullptr);
-		const std::tm calendarTime = localtime_xp(now);
-
-		std::string meridiem;
-		std::string seperator;
-
-		int hour = calendarTime.tm_hour;
-		int minute = calendarTime.tm_min;
-
-		if (hour - 12 < 0) {
-			meridiem = "AM";
-		}
-		else if (hour == 0) {
-			hour = 12;
-			meridiem = "AM";
-		}
-		else if (hour == 12) {
-			hour = 12;
-			meridiem = "PM";
-		}
-		else {
-			meridiem = "PM";
-			hour -= 12;
-		}
-		if (getOps<bool>("24") && meridiem == "PM") {
-			hour += 12;
-			meridiem = "";
-		}
-		else if (getOps<bool>("24") && meridiem == "AM") meridiem = "";
-
-		seperator = minute < 10 ? ":0" : ":";
-
-		if (hour == 24) hour = 0;
-
-		std::string time = FlarialGUI::cached_to_string(hour) + seperator + FlarialGUI::cached_to_string(minute) + " " + meridiem;
-
-		this->normalRender(3, time);
-	}
-
-	void defaultConfig() override {
-		setDef("textscale", 0.80f);
-		Module::defaultConfig("all");
-		setDef("24", false);
-	}
-
-	void settingsRender(float settingsOffset) override {
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
-
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
-
-
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
-
-
-		addHeader("Time");
-		defaultAddSettings("main");
-		addToggle("24 Hour Format", "", getOps<bool>("24"));
-		extraPadding();
-
-		addHeader("Text");
-		defaultAddSettings("text");
-		extraPadding();
-
-		addHeader("Colors");
-		defaultAddSettings("colors");
-		extraPadding();
-
-		addHeader("Misc");
-		defaultAddSettings("misc");
-
-		FlarialGUI::UnsetScrollView();
-		resetPadding();
-	}
+	void settingsRender(float settingsOffset) override;
 };
 
