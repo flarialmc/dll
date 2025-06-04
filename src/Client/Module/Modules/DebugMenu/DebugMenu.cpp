@@ -1,4 +1,5 @@
 #include "DebugMenu.hpp"
+#include "Tags.hpp"
 #include <numbers>
 #include "Modules/Time/Time.hpp"
 #include "SDK/Client/Block/BlockLegacy.hpp"
@@ -31,6 +32,19 @@ void JavaDebugMenu::defaultConfig() {
 	setDef("text", (std::string)"ffffff", 1.f, false);
 	setDef("bg", (std::string)"000000", 0.5f, false);
 	setDef("imPoorButIWannaLookRich", false);
+	setDef("showFPS", true);
+	setDef("showDim", true);
+	setDef("showCoords", true);
+	setDef("showServer", true);
+	setDef("showMemory", true);
+	setDef("showCpuGpu", true);
+	setDef("showTime", true);
+	setDef("showUptime", true);
+	setDef("showSpeed", true);
+	setDef("showTargetedBlock", true);
+	setDef("showTargetedBlockTags", true);
+	setDef("showMaxTags", true);
+	setDef("noOfTags", 10);
 }
 
 void JavaDebugMenu::settingsRender(float settingsOffset) {
@@ -59,6 +73,19 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
 
 	addHeader("Module Settings");
 	addToggle("I'm broke but I wanna look rich :(", "only for the real broke sigmas", "imPoorButIWannaLookRich");
+	addToggle("Show FPS and Frametime", "", "showFPS");
+	addToggle("Show Entity Counter and Dimension", "", "showDim");
+	addToggle("Show Coordinates Section", "", "showCoords");
+	addToggle("Show Server Section", "", "showServer");
+	addToggle("Show Memory", "", "showMemory");
+	addToggle("Show CPU, GPU and Renderer", "", "showCpuGpu");
+	addToggle("Show Time", "", "showTime");
+	addToggle("Show Uptime", "", "showUptime");
+	addToggle("Show Speed", "", "showSpeed");
+	addToggle("Show Targeted Block", "", "showTargetedBlock");
+	addConditionalToggle(getOps<bool>("showTargetedBlock"), "Show Targeted Block Tags", "", "showTargetedBlockTags");
+	addConditionalToggle(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags"), "Show Maximum Number Of Block Tags", "", "showMaxTags");
+	addConditionalSlider(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags") && !getOps<bool>("showMaxTags"), "Number Of Tags To Be Show", "", "noOfTags", 20, 1, true);
 
 	FlarialGUI::UnsetScrollView();
 	resetPadding();
@@ -180,6 +207,18 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) { // WAILA code
 		if (!block) return;
 		try {
 			lookingAt = block->getNamespace() + ":" + block->getName();
+
+			if (lookingAt != lastLookingAt) {
+				lastLookingAt = lookingAt;
+				std::vector<std::string> tags = {};
+				for (auto i: tagMap) {
+					if (std::find(i.second.begin(), i.second.end(), block->getName()) != i.second.end()) {
+						tags.emplace_back(i.first);
+					}
+				}
+				lookingAtTags = tags;
+			}
+
 		}
 		catch (const std::exception& e) { LOG_ERROR("Failed to get block name: {}", e.what()); }
 	}
@@ -214,28 +253,25 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			versionName = std::format("Flarial V2 Open Beta, Minecraft {}", VersionUtils::getFormattedVersion());
 		}
 		left.emplace_back(versionName);
-		if (getOps<bool>("imPoorButIWannaLookRich")) {
-			left.emplace_back(std::format("{} FPS", static_cast<int>(MC::fps * 222.2)));
-		}
-		else {
-			left.emplace_back(std::format("{} FPS", MC::fps));
-			left.emplace_back(std::format("Frametime: {:.2f}ms", MC::frameTime));
+		if (getOps<bool>("showFPS")) {
+			if (getOps<bool>("imPoorButIWannaLookRich")) {
+				left.emplace_back(std::format("{} FPS", static_cast<int>(MC::fps * 222.2)));
+			}
+			else {
+				left.emplace_back(std::format("{} FPS", MC::fps));
+				left.emplace_back(std::format("Frametime: {:.2f}ms", MC::frameTime));
+			}
 		}
 
 		left.emplace_back("");
 
-		if (player) {
+		if (getOps<bool>("showDim")) {
 			left.emplace_back(std::format("E: {}", player->getLevel()->getRuntimeActorList().size()));
 			left.emplace_back(getDimensionName());
-		}
-		else {
-			left.emplace_back("E: -1");
-			left.emplace_back("Dimension: Unknown dimension");
+			left.emplace_back("");
 		}
 
-		left.emplace_back("");
-
-		if (player) {
+		if (getOps<bool>("showCoords")) {
 			Vec3<float> pos = *player->getPosition();
 			left.emplace_back(std::format("XYZ: {:.1f} / {:.1f} / {:.1f}", pos.x, pos.y, pos.z));
 			Vec3<int> blockPos(static_cast<int>(pos.x), static_cast<int>(pos.y), static_cast<int>(pos.z));
@@ -247,82 +283,106 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			HitResult target = player->getLevel()->getHitResult();
 			targetPos = { target.blockPos.x, target.blockPos.y, target.blockPos.z };
 			left.emplace_back(std::format("Looking at block: {} {} {}", targetPos.x, targetPos.y, targetPos.z));
-		}
-		else {
-			left.emplace_back("XYZ: 0 / 0 / 0");
-			left.emplace_back("Block: 0 0 0");
-			left.emplace_back("Chunk: 0 0 0");
-			left.emplace_back("Chunk Coordinate: 0 0");
-			left.emplace_back("Facing: nil (0 / 0)");
 			left.emplace_back("");
-			left.emplace_back("Looking at block: 0 0 0");
 		}
 
-		left.emplace_back("");
-
-		left.emplace_back("Server");
-		left.emplace_back(std::format("IP: {}", SDK::getServerIP()));
-		left.emplace_back(std::format("Port: {}", SDK::getServerPort()));
-		left.emplace_back(std::format("Ping: {} ms", SDK::getServerPing()));
-		left.emplace_back(std::format("TPS: {}", std::to_string(GetTicks())));
+		if (getOps<bool>("showServer")) {
+			left.emplace_back("Server:");
+			left.emplace_back(std::format("IP: {}", SDK::getServerIP()));
+			left.emplace_back(std::format("Port: {}", SDK::getServerPort()));
+			left.emplace_back(std::format("Ping: {} ms", SDK::getServerPing()));
+			left.emplace_back(std::format("TPS: {}", std::to_string(GetTicks())));
+		}
 
 
 		right.emplace_back("64bit");
-		MEMORYSTATUSEX memory_status;
-		memory_status.dwLength = sizeof(memory_status);
-		GlobalMemoryStatusEx(&memory_status);
-		int total_memory = static_cast<int>(memory_status.ullTotalPhys / 1000000);
-		int free_memory = static_cast<int>(memory_status.ullAvailPhys / 1000000);
-		int used_memory = total_memory - free_memory;
-		if (getOps<bool>("imPoorButIWannaLookRich")) {
-			int totallyRealTotalMemory = 2097152;
-			right.emplace_back(std::format("Mem: {}% {}/{} MB", static_cast<int>((used_memory * 100) / totallyRealTotalMemory), used_memory, totallyRealTotalMemory));
-		}
-		else right.emplace_back(std::format("Mem: {}% {}/{} MB", static_cast<int>((used_memory * 100) / total_memory), used_memory, total_memory));
-
-
-		right.emplace_back("");
-
-		if (getOps<bool>("imPoorButIWannaLookRich")) right.emplace_back("Intel 9 7900X3D ProMax Plus");
-		else {
-			if (cpuName.empty()) std::string cpuName = getCPU();
-			right.emplace_back(std::format("CPU: {}", getCPU()));
+		if (getOps<bool>("showMemory")) {
+			MEMORYSTATUSEX memory_status;
+			memory_status.dwLength = sizeof(memory_status);
+			GlobalMemoryStatusEx(&memory_status);
+			int total_memory = static_cast<int>(memory_status.ullTotalPhys / 1000000);
+			int free_memory = static_cast<int>(memory_status.ullAvailPhys / 1000000);
+			int used_memory = total_memory - free_memory;
+			if (getOps<bool>("imPoorButIWannaLookRich")) {
+				int totallyRealTotalMemory = 2097152;
+				right.emplace_back(std::format("Mem: {}% {}/{} MB", static_cast<int>((used_memory * 100) / totallyRealTotalMemory), used_memory, totallyRealTotalMemory));
+			}
+			else right.emplace_back(std::format("Mem: {}% {}/{} MB", static_cast<int>((used_memory * 100) / total_memory), used_memory, total_memory));
+			right.emplace_back("");
 		}
 
-		right.emplace_back("");
+		if (getOps<bool>("showCpuGpu")) {
+			if (getOps<bool>("imPoorButIWannaLookRich")) right.emplace_back("Intel 9 7900X3D ProMax Plus");
+			else {
+				if (cpuName.empty()) std::string cpuName = getCPU();
+				right.emplace_back(std::format("CPU: {}", getCPU()));
+			}
 
-		right.emplace_back(std::format("Display: {}x{}", MC::windowSize.x, MC::windowSize.y));
-		if (getOps<bool>("imPoorButIWannaLookRich")) right.emplace_back("AMD GFX 5090 Ti AI Accelerated DLSS 12.0");
-		else {
-			if (!MC::GPU.empty()) right.emplace_back(MC::GPU);
-			else right.emplace_back("Unknown GPU");
+			right.emplace_back("");
+
+			right.emplace_back(std::format("Display: {}x{}", MC::windowSize.x, MC::windowSize.y));
+			right.emplace_back(std::format("Active Renderer: {}", std::array<std::string, 5>{"Couldn't initialize", "DX9", "DX10", "DX11", "DX12"}[kiero::getRenderType()]));
+			if (getOps<bool>("imPoorButIWannaLookRich")) right.emplace_back("AMD GFX 5090 Ti AI Accelerated DLSS 12.0");
+			else {
+				if (!MC::GPU.empty()) right.emplace_back(MC::GPU);
+				else right.emplace_back("Unknown GPU");
+			}
+
+			right.emplace_back("");
 		}
 
-		right.emplace_back("");
+		if (getOps<bool>("showTime")) {
+			right.emplace_back(std::format("Local Time: {}", getTime()));
+		}
+		if (getOps<bool>("showUptime")) {
+			right.emplace_back(std::format("CPU Uptime: {}", getFormattedTime(static_cast<long long>(GetTickCount64() / 1000))));
+			right.emplace_back(std::format("Minecraft Uptime: {}", getFormattedTime(
+				static_cast<long long>(
+					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startTime).count()
+					) / 1000
+			)));
+			right.emplace_back("");
+		}
 
-		right.emplace_back("Targetted Block");
-		right.emplace_back(lookingAt);
+		if (getOps<bool>("showSpeed")) {
+			right.emplace_back(std::format("Speed: {} blocks/s", speed));
+			right.emplace_back("");
+		}
 
-		right.emplace_back("");
-
-		right.emplace_back(std::format("Local Time: {}", getTime()));
-		right.emplace_back(std::format("CPU Uptime: {}", getFormattedTime(static_cast<long long>(GetTickCount64() / 1000))));
-		right.emplace_back(std::format("Minecraft Uptime: {}", getFormattedTime(
-			static_cast<long long>(
-				std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startTime).count()
-				) / 1000
-		)));
-
-		right.emplace_back("");
-
-		right.emplace_back(std::format("Speed: {} blocks/s", speed));
+		if (getOps<bool>("showTargetedBlock")) {
+			right.emplace_back("Targeted Block:");
+			right.emplace_back(lookingAt);
+			right.emplace_back("");
+			if (getOps<bool>("showTargetedBlockTags")) {
+				bool showMax = getOps<bool>("showMaxTags");
+				int maxAllowedTags = static_cast<int>(getOps<float>("noOfTags"));
+				int maxFittableTags = static_cast<int>(MC::windowSize.y / (textHeight / 3.0f + yPadding * 2)) - right.size();
+				if (lookingAtTags.size() >= maxFittableTags && (showMax || maxAllowedTags >= maxFittableTags)) {
+					for (int i = 0; i < maxFittableTags; i++ ) {
+						right.emplace_back('#' + lookingAtTags[i]);
+					}
+					right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxFittableTags));
+				}
+				else if (showMax) {
+					for (const auto & i: lookingAtTags) {
+						right.emplace_back('#' + i);
+					}
+				}
+				else {
+					for (int i = 0; i < maxAllowedTags; i++ ) {
+						right.emplace_back('#' + lookingAtTags[i]);
+					}
+					right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxAllowedTags));
+				}
+			}
+		}
 
 
 		int leftYoffset = 0.0f;
-		for (size_t i = 0; i < left.size(); ++i) {
-			if (getOps<bool>("showBg") && !left[i].empty()) {
+		for (const auto & i : left) {
+			if (getOps<bool>("showBg") && !i.empty()) {
 				float lineWidth = FlarialGUI::getFlarialTextSize(
-					String::StrToWStr(left[i]).c_str(),
+					String::StrToWStr(i).c_str(),
 					30.0f, textHeight / 3.0f,
 					DWRITE_TEXT_ALIGNMENT_LEADING,
 					textSize,
@@ -338,7 +398,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			}
 			FlarialGUI::FlarialTextWithFont(
 				0.0f, leftYoffset,
-				String::StrToWStr(left[i]).c_str(),
+				String::StrToWStr(i).c_str(),
 				30.0f, textHeight / 3.0f,
 				DWRITE_TEXT_ALIGNMENT_LEADING,
 				textSize,
@@ -350,10 +410,10 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 		}
 
 		int rightYoffset = 0.0f;
-		for (size_t i = 0; i < right.size(); ++i) {
-			if (getOps<bool>("showBg") && !right[i].empty()) {
+		for (const auto & i : right) {
+			if (getOps<bool>("showBg") && !i.empty()) {
 				float lineWidth = FlarialGUI::getFlarialTextSize(
-					String::StrToWStr(right[i]).c_str(),
+					String::StrToWStr(i).c_str(),
 					30.0f, textHeight / 3.0f,
 					DWRITE_TEXT_ALIGNMENT_TRAILING,
 					textSize,
@@ -369,7 +429,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			}
 			FlarialGUI::FlarialTextWithFont(
 				MC::windowSize.x - 30.0f, rightYoffset,
-				String::StrToWStr(right[i]).c_str(),
+				String::StrToWStr(i).c_str(),
 				30.0f, textHeight / 3.0f,
 				DWRITE_TEXT_ALIGNMENT_TRAILING,
 				textSize,
