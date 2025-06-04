@@ -444,7 +444,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 		float guiscale = SDK::clientInstance->getGuiData()->getGuiScale();
 
-		float lineWidth = 2;
+		float lineWidth = 2.5f;
 		float lineLength = guiscale * 8.f;
 
 		float yaw360 = fmod((-lerpYaw + 180.0f), 360.0f);

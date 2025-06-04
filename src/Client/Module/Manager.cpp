@@ -229,7 +229,7 @@ void ModuleManager::initialize() {
     addModule<Waypoints>();
 
     addModule<NullMovement>();
-    addModule<CustomCrosshair>();
+    //addModule<CustomCrosshair>();
     addModule<Waila>();
 
     addModule<RawInputBuffer>();
