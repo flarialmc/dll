@@ -44,7 +44,7 @@ void PatarHD::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("PatarHD");
-    addDropdown("Mode", "", std::vector<std::string>{"Patar", "Jqms", "Chyves", "Nikita", "treegfx", "FreezeEngine", "StoneHunter", "beaver"}, getOps<std::string>("mode"));
+    addDropdown("Mode", "", std::vector<std::string>{"Patar", "Jqms", "Chyves", "Nikita", "treegfx", "FreezeEngine", "StoneHunter", "beaver"}, "mode", true);
     addSlider("Scale", "", "scale", 5.0F);
     addToggle("DVD Mode", "See for yourself", "dvdmode");
     addConditionalSlider(getOps<bool>("dvdmode"), "X Velocity", "", "xveloc", 25.0f);

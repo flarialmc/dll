@@ -51,8 +51,7 @@ void BlockBreakIndicator::settingsRender(float settingsOffset) {
     } else {
         addHeader("Bar");
         addToggle("Only show while breaking", "", "onlyShowWhileBreaking");
-        addDropdown("Orientation", "", std::vector<std::string>{"Vertical", "Horizontal"},
-                    getOps<std::string>("orientation"));
+        addDropdown("Orientation", "", std::vector<std::string>{"Vertical", "Horizontal"}, "orientation", true);
         addColorPicker("Color", "", "barFill");
         addSlider("Width", "", "pbwidth", 20.f);
         addSlider("Height", "", "pbheight", 10.f);

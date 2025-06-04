@@ -92,7 +92,7 @@ void NickModule::settingsRender(float settingsOffset)
                     "Light Purple",
                     "Dark Purple",
                     "Amethyst"
-                }, getOps<std::string>("textColor"));
+                }, "textColor", true);
 
     FlarialGUI::UnsetScrollView();
     resetPadding();

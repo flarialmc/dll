@@ -381,6 +381,20 @@ void Module::addTextBox(std::string text, std::string subtext, int limit, std::s
 	textboxIndex++;
 }
 
+void Module::addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string settingName, bool resettable) {
+	float x = Constraints::PercentageConstraint(0.33f, "right");
+	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+	Module::addElementText(text, subtext);
+
+	FlarialGUI::Dropdown(dropdownIndex, x, y, options, getOps<std::string>(settingName), "", this->name, settingName);
+
+	if (FlarialGUI::additionalY[dropdownIndex] > 0.f) FlarialGUI::SetIsInAdditionalYMode();
+
+	padding += Constraints::RelativeConstraint(0.05f, "height", true);
+	dropdownIndex++;
+}
+
 void Module::addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value) {
 	float x = Constraints::PercentageConstraint(0.33f, "right");
 	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
@@ -784,7 +798,7 @@ void Module::defaultAddSettings(std::string type) {
 	else if (type == "text") {
 		addTextBox("Format", "", 0, "text");
 		addSlider("Text Scale", "", "textscale", 2.0f);
-		addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, getOps<std::string>("textalignment"));
+		addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, "textalignment", true);
 		addToggle("Text Shadow", "Displays a shadow under the text", "textShadow");
 		addConditionalSlider(getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", "textShadowOffset", 0.02f, 0.001f);
 	}

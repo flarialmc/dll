@@ -113,7 +113,7 @@ void FreeLook::settingsRender(float settingsOffset) {
     addHeader("Freelook");
     addKeybind("Freelook Keybind", "Hold for 2 seconds!", getKeybind());
     addToggle("Toggleable Mode", "Click to toggle or Hold to keep enabled", "toggle");
-    addDropdown("Freelook View Mode", "",std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"},getOps<std::string>("mode"));
+    addDropdown("Freelook View Mode", "",std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, "mode", true);
 
     FlarialGUI::UnsetScrollView();
 

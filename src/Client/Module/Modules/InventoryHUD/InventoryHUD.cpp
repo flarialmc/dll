@@ -81,7 +81,7 @@ void InventoryHUD::settingsRender(float settingsOffset) {
     addHeader("Text");
     addSlider("Text Offset X", "", "textOffsetX", 50.f, 0.0f, false);
     addSlider("Text Offset Y", "", "textOffsetY", 50.f, 0.0f, false);
-    addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, getOps<std::string>("textalignment"));
+    addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, "textalignment", true);
     addToggle("Text Shadow", "Displays a shadow under the text", "textShadow");
     addConditionalSlider(getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", "textShadowOffset", 0.02f, 0.001f);
     extraPadding();

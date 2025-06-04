@@ -68,7 +68,7 @@ void MovableChat::settingsRender(float settingsOffset)
         if (getOps<bool>("pingsound"))
         {
             this->addHeader("Ping Sound");
-            this->addDropdown("Sound", "Choose which sound to play", std::vector<std::string>{"Xp Orb", "Custom"}, getOps<std::string>("mode"));
+            this->addDropdown("Sound", "Choose which sound to play", std::vector<std::string>{"Xp Orb", "Custom"}, "mode", true);
 
             this->addButton("Choose Sound", "Choose a custom sound", "Choose", [this] {
                 WinrtUtils::pickAndCopyFiles(L"*", "\\assets");
