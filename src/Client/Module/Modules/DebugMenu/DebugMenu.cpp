@@ -178,6 +178,18 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) { // WAILA code
 		if (!block) return;
 		try {
 			lookingAt = block->getNamespace() + ":" + block->getName();
+
+			if (lookingAt != lastLookingAt) {
+				lastLookingAt = lookingAt;
+				std::vector<std::string> tags = {};
+				for (auto i: tagMap) {
+					if (std::find(i.second.begin(), i.second.end(), block->getName()) != i.second.end()) {
+						tags.emplace_back(i.first);
+					}
+				}
+				lookingAtTags = tags;
+			}
+
 		}
 		catch (const std::exception& e) { LOG_ERROR("Failed to get block name: {}", e.what()); }
 	}
@@ -241,7 +253,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 		left.emplace_back("");
 
-		left.emplace_back("Server");
+		left.emplace_back("Server:");
 		left.emplace_back(std::format("IP: {}", SDK::getServerIP()));
 		left.emplace_back(std::format("Port: {}", SDK::getServerPort()));
 		left.emplace_back(std::format("Ping: {} ms", SDK::getServerPing()));
@@ -282,11 +294,6 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 		right.emplace_back("");
 
-		right.emplace_back("Targetted Block");
-		right.emplace_back(lookingAt);
-
-		right.emplace_back("");
-
 		right.emplace_back(std::format("Local Time: {}", getTime()));
 		right.emplace_back(std::format("CPU Uptime: {}", getFormattedTime(static_cast<long long>(GetTickCount64() / 1000))));
 		right.emplace_back(std::format("Minecraft Uptime: {}", getFormattedTime(
@@ -299,12 +306,29 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 		right.emplace_back(std::format("Speed: {} blocks/s", speed));
 
+		right.emplace_back("");
+
+		right.emplace_back("Targetted Block:");
+		right.emplace_back(lookingAt);
+		right.emplace_back("");
+		if (lookingAtTags.size() <= 10) {
+			for (const auto & i: lookingAtTags) {
+				right.emplace_back('#' + i);
+			}
+		}
+		else {
+			for (int i = 0; i < 9; i++) {
+				right.emplace_back('#' + lookingAtTags[i]);
+			}
+			right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - 9));
+		}
+
 
 		int leftYoffset = 0.0f;
-		for (size_t i = 0; i < left.size(); ++i) {
-			if (getOps<bool>("showBg") && !left[i].empty()) {
+		for (const auto & i : left) {
+			if (getOps<bool>("showBg") && !i.empty()) {
 				float lineWidth = FlarialGUI::getFlarialTextSize(
-					String::StrToWStr(left[i]).c_str(),
+					String::StrToWStr(i).c_str(),
 					30.0f, textHeight / 3.0f,
 					DWRITE_TEXT_ALIGNMENT_LEADING,
 					textSize,
@@ -320,7 +344,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			}
 			FlarialGUI::FlarialTextWithFont(
 				0.0f, leftYoffset,
-				String::StrToWStr(left[i]).c_str(),
+				String::StrToWStr(i).c_str(),
 				30.0f, textHeight / 3.0f,
 				DWRITE_TEXT_ALIGNMENT_LEADING,
 				textSize,
@@ -332,10 +356,10 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 		}
 
 		int rightYoffset = 0.0f;
-		for (size_t i = 0; i < right.size(); ++i) {
-			if (getOps<bool>("showBg") && !right[i].empty()) {
+		for (const auto & i : right) {
+			if (getOps<bool>("showBg") && !i.empty()) {
 				float lineWidth = FlarialGUI::getFlarialTextSize(
-					String::StrToWStr(right[i]).c_str(),
+					String::StrToWStr(i).c_str(),
 					30.0f, textHeight / 3.0f,
 					DWRITE_TEXT_ALIGNMENT_TRAILING,
 					textSize,
@@ -351,7 +375,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			}
 			FlarialGUI::FlarialTextWithFont(
 				MC::windowSize.x - 30.0f, rightYoffset,
-				String::StrToWStr(right[i]).c_str(),
+				String::StrToWStr(i).c_str(),
 				30.0f, textHeight / 3.0f,
 				DWRITE_TEXT_ALIGNMENT_TRAILING,
 				textSize,
