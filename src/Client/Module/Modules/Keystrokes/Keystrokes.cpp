@@ -114,18 +114,18 @@ void Keystrokes::settingsRender(float settingsOffset) {
 	addConditionalSlider(getOps<bool>("cps"), "CPS Text Scale", "", "textscale2", 2.00);
 	addToggle("Show LMB & RMB", "", "lmbrmb");
 	addToggle("Hide CPS Counter", "", "hidecps");
-	addTextBox("LMB Text", "", getOps<std::string>("mainlmbtext"));
-	addTextBox("RMB Text", "", getOps<std::string>("mainrmbtext"));
-	addTextBox("LMB CPS Text", "", getOps<std::string>("lmbtext"));
-	addTextBox("RMB CPS Text", "", getOps<std::string>("rmbtext"));
+	addTextBox("LMB Text", "", 0, "mainlmbtext");
+	addTextBox("RMB Text", "", 0, "mainrmbtext");
+	addTextBox("LMB CPS Text", "", 0, "lmbtext");
+	addTextBox("RMB CPS Text", "", 0, "rmbtext");
 	extraPadding();
 
 	addHeader("WASD");
 	addSlider("WASD Text Scale", "", "textscale", 2.00);
-	addTextBox("W Key", "", getOps<std::string>("wText"));
-	addTextBox("A Key", "", getOps<std::string>("aText"));
-	addTextBox("S Key", "", getOps<std::string>("sText"));
-	addTextBox("D Key", "", getOps<std::string>("dText"));
+	addTextBox("W Key", "", 0, "wText");
+	addTextBox("A Key", "", 0, "aText");
+	addTextBox("S Key", "", 0, "sText");
+	addTextBox("D Key", "", 0, "dText");
 	extraPadding();
 
 	addHeader("Colors");

@@ -367,7 +367,7 @@ void Module::addTextBox(std::string text, std::string subtext, std::string& valu
 	textboxIndex++;
 }
 
-void Module::addResettableTextBox(std::string text, std::string subtext, std::string settingName, int limit) {
+void Module::addTextBox(std::string text, std::string subtext, int limit, std::string settingName) {
 	float x = Constraints::PercentageConstraint(0.33f, "right");
 	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
@@ -782,7 +782,7 @@ void Module::defaultAddSettings(std::string type) {
 		addConditionalSlider(getOps<bool>("glow"), "Glow Amount", "", "glowAmount", 100.f);
 	}
 	else if (type == "text") {
-		addTextBox("Format", "", getOps<std::string>("text"));
+		addTextBox("Format", "", 0, "text");
 		addSlider("Text Scale", "", "textscale", 2.0f);
 		addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, getOps<std::string>("textalignment"));
 		addToggle("Text Shadow", "Displays a shadow under the text", "textShadow");

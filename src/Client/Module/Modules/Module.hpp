@@ -116,10 +116,14 @@ public:
 	void addKeybind(std::string text, std::string subtext, std::string& keybind);
 
 	void addTextBox(std::string text, std::string subtext, std::string& value, int limit = 16);
-	void addResettableTextBox(std::string text, std::string subtext, std::string settingName, int limit = 16);
+	void addTextBox(std::string text, std::string subtext, int limit, std::string settingName);
+
+
 	void addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value);
 	void addResettableDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string settingName);
+
 	void addColorPicker(std::string text, std::string subtext, std::string settingName);
+
 	virtual void loadDefaults();
 	void saveSettings();
 

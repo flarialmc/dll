@@ -63,7 +63,7 @@ void NickModule::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Nickname");
-    addTextBox("Nickname", "", getOps<std::string>("nick"));
+    addTextBox("Nickname", "", 0, "nick");
     addToggle("Bold", "", "bold");
     addToggle("Obfuscated", "", "obfuscated");
     addDropdown("Text Color", "", std::vector<std::string>{

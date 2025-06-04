@@ -32,12 +32,12 @@ void AutoGG::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(1.0, "width"),
                               Constraints::RelativeConstraint(0.88f, "height"));
 
-    this->addHeader("Auto GG");
-    this->addTextBox("Text", "The text to send.", getOps<std::string>("text"));
+    addHeader("Auto GG");
+    addTextBox("Text", "The text to send.", 0, "text");
 
     FlarialGUI::UnsetScrollView();
 
-    this->resetPadding();
+    resetPadding();
 }
 
 void AutoGG::onPacketReceive(PacketEvent& event) {
