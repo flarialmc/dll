@@ -41,7 +41,7 @@ void JavaDebugMenu::defaultConfig() {
 	setDef("showTargetedBlock", true);
 	setDef("showTargetedBlockTags", true);
 	setDef("showMaxTags", true);
-	setDef("noOfTags", 10);
+	setDef("noOfTags", 10.0f);
 }
 
 void JavaDebugMenu::settingsRender(float settingsOffset) {
@@ -82,7 +82,7 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
 	addToggle("Show Targeted Block", "", "showTargetedBlock");
 	addConditionalToggle(getOps<bool>("showTargetedBlock"), "Show Targeted Block Tags", "", "showTargetedBlockTags");
 	addConditionalToggle(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags"), "Show Maximum Number Of Block Tags", "", "showMaxTags");
-	addConditionalSlider(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags") && !getOps<bool>("showMaxTags"), "Number Of Tags To Be Show", "", "noOfTags", 20, 1, true);
+	addConditionalSlider(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags") && !getOps<bool>("showMaxTags"), "Number Of Tags To Be Show", "", "noOfTags", 20.0f, 1.0f, true);
 
 	FlarialGUI::UnsetScrollView();
 	resetPadding();
