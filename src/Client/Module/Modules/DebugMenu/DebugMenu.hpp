@@ -1,12 +1,9 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../GUI/Engine/Engine.hpp"
 #include "../../../Client.hpp"
-#include "../../Utils/VersionUtils.hpp"
-#include <windows.h>
-#include <unknwn.h>
 #include <chrono>
+#include <vector>
 
 
 class TickData {
@@ -18,6 +15,8 @@ class JavaDebugMenu : public Module {
 
 private:
 	std::string lookingAt = "minecraft:empty";
+	std::string lastLookingAt = "";
+	std::vector<std::string> lookingAtTags = {};
 	Vec3<float> PrevPos{};
 	std::string speed = "0";
 	std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
