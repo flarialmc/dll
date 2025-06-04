@@ -41,7 +41,7 @@ void SnapLook::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("SnapLook");
-    addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
+    addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
 
     FlarialGUI::UnsetScrollView();
 

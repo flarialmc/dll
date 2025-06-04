@@ -59,8 +59,7 @@ void HiveStat::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Hive Statistics");
-    addKeybind("Toggle Overlay Keybind", "When setting, hold the new bind for 2 seconds",
-               getOps<std::string>("Overlay"));
+    addKeybind("Toggle Overlay Keybind", "When setting, hold the new bind for 2 seconds", "Overlay", true);
     addHeader("Misc");
     addToggle("Show FKDR", "Shows final kill final death ratio", "showFKDR");
     addToggle("Show KD", "Shows the amount of kills per death", "showKD");

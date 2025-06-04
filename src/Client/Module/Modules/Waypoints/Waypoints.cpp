@@ -144,7 +144,7 @@ void Waypoints::settingsRender(float settingsOffset)
         );
         FlarialGUI::Notify("Added! Scroll down for options.");
     });
-    addKeybind("Add waypoint keybind", "Hold for 2 seconds to set bind.", getKeybind());
+    addKeybind("Add waypoint keybind", "Hold for 2 seconds to set bind.", "keybind", true);
     addSlider("Distance", "Change until which distance waypoints will be drawn.", "distance", 10000.f, 0.f, true);
     extraPadding();
 

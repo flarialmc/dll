@@ -620,6 +620,18 @@ void Module::addKeybind(std::string text, std::string subtext, std::string& keyb
 	keybindIndex++;
 }
 
+void Module::addKeybind(std::string text, std::string subtext, std::string settingName, bool resettable) {
+	float elementX = Constraints::PercentageConstraint(0.13f, "right");
+	float y = Constraints::PercentageConstraint(0.08, "top") + padding;
+
+	FlarialGUI::KeybindSelector(keybindIndex, elementX, y, getOps<std::string>(settingName), this->name, settingName);
+
+	Module::addElementText(text, subtext);
+
+	padding += Constraints::RelativeConstraint(0.05f, "height", true);
+	keybindIndex++;
+}
+
 void Module::loadDefaults() {
 	settings.reset();
 	setup();

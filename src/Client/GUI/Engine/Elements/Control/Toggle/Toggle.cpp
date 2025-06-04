@@ -85,8 +85,7 @@ void FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, s
             //return true;
         }
         else if (MC::mouseButton == MouseButton::Right && !MC::held && (!activeColorPickerWindows || index == 123)) {
-			bool resettableSettingsEnabled = Client::settings.getSettingByName<bool>("resettableSettings")->value;
-			if (resettableSettingsEnabled && moduleName != "" && settingName != "") {
+			if (Client::settings.getSettingByName<bool>("resettableSettings")->value && moduleName != "" && settingName != "") {
                 auto mod = ModuleManager::getModule(moduleName);
                 mod->settings.deleteSetting(settingName);
 				mod->defaultConfig();

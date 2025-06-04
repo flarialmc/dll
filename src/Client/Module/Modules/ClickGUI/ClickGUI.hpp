@@ -187,8 +187,8 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		this->addHeader("Keybinds");
-		this->addKeybind("Open Menu Bind", "", getOps<std::string>("keybind"));
-		this->addKeybind("Edit Menu Bind", "", getOps<std::string>("editmenubind"));
+		this->addKeybind("Open Menu Bind", "", "keybind", true);
+		this->addKeybind("Edit Menu Bind", "", "editmenubind", true);
 
 		this->extraPadding();
 

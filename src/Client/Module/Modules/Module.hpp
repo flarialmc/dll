@@ -114,6 +114,7 @@ public:
 	void addToggle(std::string text, std::string subtext, std::string settingName);
 
 	void addKeybind(std::string text, std::string subtext, std::string& keybind);
+	void addKeybind(std::string text, std::string subtext, std::string settingName, bool resettable);
 
 	void addTextBox(std::string text, std::string subtext, std::string& value, int limit = 16);
 	void addTextBox(std::string text, std::string subtext, int limit, std::string settingName);

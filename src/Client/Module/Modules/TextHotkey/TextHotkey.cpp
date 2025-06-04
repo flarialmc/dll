@@ -93,7 +93,7 @@ void TextHotkey::settingsRender(float settingsOffset)
         if (settings.getSettingByName<std::string>(commandSettingName) != nullptr) {
             this->addHeader(header);
 
-            this->addKeybind("Text Hotkey", "Hold for 2 seconds!", getKeybind(i));
+            this->addKeybind("Text Hotkey", "Hold for 2 seconds!", "keybind" + i, true);
 
             this->addTextBox(
                 "Text to Send",

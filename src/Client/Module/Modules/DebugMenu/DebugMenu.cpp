@@ -45,7 +45,7 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Main");
-    addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
+    addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
     addSlider("UI Scale", "", "uiscale", 2.0f);
     addSlider("Rounding", "Rounding of the rectangle", "rounding", 100, 0, false);
     addToggle("Background", "", "showBg");

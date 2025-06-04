@@ -54,7 +54,7 @@ void TabList::settingsRender(float settingsOffset)
     addHeader("Misc");
     addToggle("Alphabetical Order", "", "alphaOrder");
     addToggle("Flarial First", "Prioritize Flarial users (Dev > Gamer > Booster > Supporter > Default) at the top", "flarialFirst");
-    addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
+    addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
     extraPadding();
 
     addHeader("Colors");

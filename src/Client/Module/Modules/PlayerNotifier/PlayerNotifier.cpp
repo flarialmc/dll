@@ -106,7 +106,7 @@ void PlayerNotifier::settingsRender(float settingsOffset)
         totalPlayers++;
     });
     this->addSlider("Re-check", "(Seconds) After how long should it re-check for players", "duration", 500, 1, true);
-    this->addKeybind("Re-check Keybind", "Hold for 2 seconds!", getKeybind());
+    this->addKeybind("Re-check Keybind", "Hold for 2 seconds!", "keybind", true);
     this->extraPadding();
 
     for (int i = 0; i < totalPlayers; i++) {

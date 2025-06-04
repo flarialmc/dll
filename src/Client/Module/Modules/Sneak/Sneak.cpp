@@ -45,7 +45,7 @@ void Sneak::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Toggle Sneak");
-    addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
+    addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
 
     FlarialGUI::UnsetScrollView();
     resetPadding();

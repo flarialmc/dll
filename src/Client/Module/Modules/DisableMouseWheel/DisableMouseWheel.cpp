@@ -31,7 +31,7 @@ void DisableMouseWheel::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Disable Mouse Wheel");
-    addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
+    addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
 
     FlarialGUI::UnsetScrollView();
 

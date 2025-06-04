@@ -387,7 +387,7 @@ namespace FlarialGUI {
 	void AddShadowRect(const D2D1_POINT_2F& obj_min, const D2D1_POINT_2F& obj_max, D2D1_COLOR_F shadow_col,
 		float shadow_thickness, const D2D1_POINT_2F& shadow_offset, float obj_rounding);
 
-	void KeybindSelector(int index, float x, float y, std::string& keybind);
+	void KeybindSelector(int index, float x, float y, std::string& keybind, std::string moduleName = "", std::string settingName = "");
 
 	void Notify(const std::string& text);
 
