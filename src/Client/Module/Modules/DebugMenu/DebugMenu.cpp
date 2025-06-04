@@ -1,4 +1,5 @@
 #include "DebugMenu.hpp"
+#include <numbers>
 #include "Modules/Time/Time.hpp"
 #include "SDK/Client/Block/BlockLegacy.hpp"
 
@@ -7,6 +8,7 @@ void JavaDebugMenu::onEnable() {
 		Listen(this, RenderEvent, &JavaDebugMenu::onRender)
 		Listen(this, TickEvent, &JavaDebugMenu::onTick)
 		Listen(this, KeyEvent, &JavaDebugMenu::onKey)
+		Listen(this, HudCursorRendererRenderEvent, &JavaDebugMenu::onHudCursorRendererRender)
 		Module::onEnable();
 }
 
@@ -15,6 +17,7 @@ void JavaDebugMenu::onDisable() {
 		Deafen(this, RenderEvent, &JavaDebugMenu::onRender)
 		Deafen(this, TickEvent, &JavaDebugMenu::onTick)
 		Deafen(this, KeyEvent, &JavaDebugMenu::onKey)
+		Deafen(this, HudCursorRendererRenderEvent, &JavaDebugMenu::onHudCursorRendererRender)
 		Module::onDisable();
 }
 
@@ -377,6 +380,59 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			rightYoffset += textHeight / 3.0f + yPadding * 2;
 		}
 
+		// debug menu crosshair start
+
+		float guiscale = SDK::clientInstance->getGuiData()->getGuiScale();
+
+		float lineWidth = 2;
+		float lineLength = guiscale * 8.f;
+
+		float yaw360 = fmod((-lerpYaw + 180.0f), 360.0f);
+		if (yaw360 < 0) yaw360 += 360.0f;
+
+		ImVec2 center = ImVec2(MC::windowSize.x / 2.0f, MC::windowSize.y / 2.0f);
+
+		float yawRad = (180.f + lerpYaw) * (std::numbers::pi / 180.f);
+		float pitchRad = (-lerpPitch) * (std::numbers::pi / 180.f);
+
+		ImDrawList* drawList = ImGui::GetBackgroundDrawList();
+
+		ImU32 black = IM_COL32(0, 0, 0, 255);
+		ImU32 red = IM_COL32(255, 0, 0, 255);
+		ImU32 green = IM_COL32(0, 255, 0, 255);
+		ImU32 blue = IM_COL32(0, 0, 255, 255);
+
+		ImVec2 redPos(
+			center.x + lineLength * cos(yawRad),
+			center.y + lineLength * sin(yawRad) * sin(pitchRad)
+		);
+
+		ImVec2 greenPos(center.x, center.y - ((90.f - abs(lerpPitch)) / 90.f) * lineLength);
+
+		ImVec2 bluePos(
+			center.x + lineLength * sin(yawRad),
+			center.y - lineLength * cos(yawRad) * sin(pitchRad)
+		);
+
+		// red line
+		drawList->AddLine(center, redPos, black, lineWidth + (guiscale * 0.3));
+		drawList->AddLine(center, redPos, red, lineWidth);
+
+		// green line
+		drawList->AddLine(center, greenPos, black, lineWidth + (guiscale * 0.3));
+		drawList->AddLine(center, greenPos, green, lineWidth);
+
+		// blue line
+		drawList->AddLine(center, bluePos, black, lineWidth + (guiscale * 0.3));
+		drawList->AddLine(center, bluePos, blue, lineWidth);
+
+		// debug menu crosshair end
+	}
+}
+
+void JavaDebugMenu::onHudCursorRendererRender(HudCursorRendererRenderEvent& event) {
+	if (this->active && SDK::clientInstance && SDK::clientInstance->getScreenName() == "hud_screen" && SDK::clientInstance->getLocalPlayer() != nullptr) {
+		event.cancel();
 	}
 }
 

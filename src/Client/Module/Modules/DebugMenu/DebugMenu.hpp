@@ -66,4 +66,6 @@ public:
 	void onRender(RenderEvent& event);
 
 	void onKey(KeyEvent& event);
+
+	void onHudCursorRendererRender(HudCursorRendererRenderEvent& event);
 };
