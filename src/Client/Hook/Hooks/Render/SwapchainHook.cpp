@@ -794,6 +794,8 @@ void SwapchainHook::FPSMeasure() {
     std::chrono::duration<float> frameTime = std::chrono::high_resolution_clock::now() - previousFrameTime;
     previousFrameTime = std::chrono::high_resolution_clock::now();
 
+    MC::frameTime = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(frameTime).count();
+
     float currentFrameRate = 1.0f / frameTime.count();
 
     FlarialGUI::frameFactor = targetFrameRate / currentFrameRate;

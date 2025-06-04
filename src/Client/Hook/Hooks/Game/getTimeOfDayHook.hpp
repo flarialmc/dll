@@ -5,10 +5,10 @@
 class getTimeOfDayHook : public Hook {
 
 private:
-    static int callback(void* a1);
+    static float callback(__int64 a1, int a2, float a3);
 
 public:
-    typedef int(__thiscall* original)(void* a1);
+    typedef float(__thiscall* original)(__int64 a1, int a2, float a3);
 
     static inline original funcOriginal = nullptr;
 

@@ -3,15 +3,17 @@
 #include "../../../Client.hpp"
 
 void getTimeOfDayHook::enableHook() {
-    this->autoHook(callback, (void**)&funcOriginal);
+	this->autoHook(callback, (void**)&funcOriginal);
 }
 
 getTimeOfDayHook::getTimeOfDayHook() : Hook("getTimeOfDayHook", GET_SIG_ADDRESS("LevelUtils::getTimeOfDay")) {}
 
-int getTimeOfDayHook::callback(void* a1) {
-    int something = funcOriginal(a1);
+float getTimeOfDayHook::callback(__int64 a1, int a2, float a3) {
+	std::cout << "HELLOOOOO" << std::endl;
 
-    Logger::debug("{}", something);
+	float something = funcOriginal(a1, a2, a3);
 
-    return something;
+	Logger::debug("{}", something);
+
+	return something;
 }

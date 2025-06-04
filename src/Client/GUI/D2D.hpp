@@ -32,5 +32,6 @@ public:
     static inline std::string GPU;
 
     static inline int frames;
+    static inline float frameTime;
     static inline int fps;
 };
