@@ -40,8 +40,8 @@ void WeatherChanger::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Misc");
-    addSlider("Rain Intensity", "", getOps<float>("rain"));
-    addSlider("Snow Intensity", "", getOps<float>("snow"));
+    addSlider("Rain Intensity", "", "rain");
+    addSlider("Snow Intensity", "", "snow");
 
     FlarialGUI::UnsetScrollView();
 

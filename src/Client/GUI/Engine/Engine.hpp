@@ -316,9 +316,11 @@ namespace FlarialGUI {
 
 	void CopyBitmap(ID2D1Bitmap1* from, ID2D1Bitmap** to);
 
-	bool Toggle(int index, float x, float y, bool isEnabled);
+	void Toggle(int index, float x, float y, bool isEnabled);
 
-	bool Toggle(int index, float x, float y, bool isEnabled, bool rgb, std::string moduleName = "", std::string settingName = "");
+	void Toggle(int index, float x, float y, bool isEnabled, bool rgb, std::string moduleName, std::string settingName);
+
+	bool Toggle(int index, float x, float y, bool isEnabled, bool rgb);
 
 	float Slider(int index, float x, float y, float& value, float maxValue = 100.0f, float minValue = 0.0f, bool zerosafe = true, std::string moduleName = "", std::string settingName = "");
 

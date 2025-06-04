@@ -40,7 +40,7 @@ void BlockBreakIndicator::settingsRender(float settingsOffset) {
 
 
     addHeader("Block Break Indicator");
-    addToggle("Progress Bar", "Whether to show a Progress Bar or text", getOps<bool>("pbmode"));
+    addToggle("Progress Bar", "Whether to show a Progress Bar or text", "pbmode");
     defaultAddSettings("main");
     extraPadding();
 
@@ -50,12 +50,12 @@ void BlockBreakIndicator::settingsRender(float settingsOffset) {
         extraPadding();
     } else {
         addHeader("Bar");
-        addToggle("Only show while breaking", "", getOps<bool>("onlyShowWhileBreaking"));
+        addToggle("Only show while breaking", "", "onlyShowWhileBreaking");
         addDropdown("Orientation", "", std::vector<std::string>{"Vertical", "Horizontal"},
                     getOps<std::string>("orientation"));
         addColorPicker("Color", "", "barFill");
-        addSlider("Width", "", getOps<float>("pbwidth"), 20.f);
-        addSlider("Height", "", getOps<float>("pbheight"), 10.f);
+        addSlider("Width", "", "pbwidth", 20.f);
+        addSlider("Height", "", "pbheight", 10.f);
         extraPadding();
     }
 
@@ -69,17 +69,14 @@ void BlockBreakIndicator::settingsRender(float settingsOffset) {
     extraPadding();
 
     addHeader("Misc");
-    addConditionalToggle(!getOps<bool>("pbmode"), "Reverse Padding X", "For Text Position",
-                         getOps<bool>("reversepaddingx"));
-    addConditionalToggle(!getOps<bool>("pbmode"), "Reverse Padding Y", "For Text Position",
-                         getOps<bool>("reversepaddingy"));
-    addConditionalSlider(!getOps<bool>("pbmode"), "Padding X", "For Text Position", getOps<float>("padx"));
-    addConditionalSlider(!getOps<bool>("pbmode"), "Padding Y", "For Text Position", getOps<float>("pady"));
-    addConditionalSlider(!getOps<bool>("pbmode"), "Rectangle Width", "", getOps<float>("rectwidth"), 2.f, 0.001f);
-    addConditionalSlider(!getOps<bool>("pbmode"), "Rectangle Height", "", getOps<float>("rectheight"), 2.f, 0.001f);
-    addConditionalToggle(!getOps<bool>("pbmode"), "Responsive Rectangle", "Rectangle resizes with text",
-                         getOps<bool>("responsivewidth"));
-    addSlider("Rotation", "see for yourself!", getOps<float>("rotation"), 360.f, 0, false);
+    addConditionalToggle(!getOps<bool>("pbmode"), "Reverse Padding X", "For Text Position", "reversepaddingx");
+    addConditionalToggle(!getOps<bool>("pbmode"), "Reverse Padding Y", "For Text Position", "reversepaddingy");
+    addConditionalSlider(!getOps<bool>("pbmode"), "Padding X", "For Text Position", "padx");
+    addConditionalSlider(!getOps<bool>("pbmode"), "Padding Y", "For Text Position", "pady");
+    addConditionalSlider(!getOps<bool>("pbmode"), "Rectangle Width", "", "rectwidth", 2.f, 0.001f);
+    addConditionalSlider(!getOps<bool>("pbmode"), "Rectangle Height", "", "rectheight", 2.f, 0.001f);
+    addConditionalToggle(!getOps<bool>("pbmode"), "Responsive Rectangle", "Rectangle resizes with text", "responsivewidth");
+    addSlider("Rotation", "see for yourself!", "rotation", 360.f, 0, false);
 
     FlarialGUI::UnsetScrollView();
     resetPadding();

@@ -42,7 +42,7 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		this->addHeader("Main");
-		this->addToggle("Extreme Mode", "", getOps<bool>("extreme"));
+		this->addToggle("Extreme Mode", "", "extreme");
 
 		FlarialGUI::UnsetScrollView();
 		this->resetPadding();

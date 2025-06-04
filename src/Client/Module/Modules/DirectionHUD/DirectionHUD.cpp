@@ -68,49 +68,49 @@ void DirectionHUD::settingsRender(float settingsOffset) {
 
     addHeader("Direction HUD");
     defaultAddSettings("main");
-    addSlider("Pixels Per Degree", "", getOps<float>("pixelsPerDegree"), 20.f, 0.001f);
-    addToggle("Wrap Around Fade", "", getOps<bool>("wrapFade"));
-    addConditionalSlider(getOps<bool>("wrapFade"), "Fade Distance", "", getOps<float>("fadeDistancePerc"), 99, 1);
+    addSlider("Pixels Per Degree", "", "pixelsPerDegree", 20.f, 0.001f);
+    addToggle("Wrap Around Fade", "", "wrapFade");
+    addConditionalSlider(getOps<bool>("wrapFade"), "Fade Distance", "", "fadeDistancePerc", 99, 1);
 
 
     extraPadding();
 
     addHeader("Scales");
-    addToggle("Show Scales", "Lines indicating N, E, S, W", getOps<bool>("showScales"));
-    addConditionalToggle(getOps<bool>("showScales"), "MORE SCALES!!", "", getOps<bool>("moreScales"));
+    addToggle("Show Scales", "Lines indicating N, E, S, W", "showScales");
+    addConditionalToggle(getOps<bool>("showScales"), "MORE SCALES!!", "", "moreScales");
 
-    addConditionalToggle(getOps<bool>("showScales"), "Scale Shadow", "", getOps<bool>("scaleShadow"));
-    addConditionalSlider(getOps<bool>("showScales") && getOps<bool>("scaleShadow"), "Scale Shadow Offset", "How far the shadow will be.", getOps<float>("scaleShadowOffset"), 0.02f, 0.001f);
+    addConditionalToggle(getOps<bool>("showScales"), "Scale Shadow", "", "scaleShadow");
+    addConditionalSlider(getOps<bool>("showScales") && getOps<bool>("scaleShadow"), "Scale Shadow Offset", "How far the shadow will be.", "scaleShadowOffset", 0.02f, 0.001f);
 
-    addConditionalToggle(getOps<bool>("showScales"), "Show Cardinal Scales", "", getOps<bool>("showCardinalScale"));
-    addConditionalSlider(getOps<bool>("showScales") && getOps<bool>("showCardinalScale"), "Cardinal Scale Width", "", getOps<float>("cardinalScaleWidth"), 10.0f);
+    addConditionalToggle(getOps<bool>("showScales"), "Show Cardinal Scales", "", "showCardinalScale");
+    addConditionalSlider(getOps<bool>("showScales") && getOps<bool>("showCardinalScale"), "Cardinal Scale Width", "", "cardinalScaleWidth", 10.0f);
 
-    addConditionalToggle(getOps<bool>("showScales"), "Show Ordinal Scales", "", getOps<bool>("showOrdinalScale"));
-    addConditionalSlider(getOps<bool>("showScales") && getOps<bool>("showOrdinalScale"), "Ordinal Scale Width", "", getOps<float>("ordinalScaleWidth"), 10.0f);
+    addConditionalToggle(getOps<bool>("showScales"), "Show Ordinal Scales", "", "showOrdinalScale");
+    addConditionalSlider(getOps<bool>("showScales") && getOps<bool>("showOrdinalScale"), "Ordinal Scale Width", "", "ordinalScaleWidth", 10.0f);
     extraPadding();
 
     addHeader("Text");
-    addToggle("Show Text", "Text indicating N, E, S, W", getOps<bool>("showText"));
-    addConditionalToggle(getOps<bool>("showText"), "Text Shadow", "", getOps<bool>("textShadow"));
-    addConditionalSlider(getOps<bool>("showText") && getOps<bool>("textShadow"), "Text Shadow Offset", "How far the shadow will be.", getOps<float>("textShadowOffset"), 0.02f, 0.001f);
+    addToggle("Show Text", "Text indicating N, E, S, W", "showText");
+    addConditionalToggle(getOps<bool>("showText"), "Text Shadow", "", "textShadow");
+    addConditionalSlider(getOps<bool>("showText") && getOps<bool>("textShadow"), "Text Shadow Offset", "How far the shadow will be.", "textShadowOffset", 0.02f, 0.001f);
 
-    addConditionalToggle(getOps<bool>("showText"), "Show Cardinal Text", "", getOps<bool>("showCardinalText"));
-    addConditionalSlider(getOps<bool>("showText") && getOps<bool>("showCardinalText"), "Cardinal Text Size", "", getOps<float>("cardinalTextSize"), 5.0f);
-    addConditionalSlider(getOps<bool>("showText") && getOps<bool>("showCardinalText"), "Cardinal Text Offset", "", getOps<float>("cardinalTextOffset"), 10.0f, 0.0f, false);
+    addConditionalToggle(getOps<bool>("showText"), "Show Cardinal Text", "", "showCardinalText");
+    addConditionalSlider(getOps<bool>("showText") && getOps<bool>("showCardinalText"), "Cardinal Text Size", "", "cardinalTextSize", 5.0f);
+    addConditionalSlider(getOps<bool>("showText") && getOps<bool>("showCardinalText"), "Cardinal Text Offset", "", "cardinalTextOffset", 10.0f, 0.0f, false);
 
-    addConditionalToggle(getOps<bool>("showText"), "Show Ordinal Text", "", getOps<bool>("showOrdinalText"));
-    addConditionalSlider(getOps<bool>("showText") && getOps<bool>("showOrdinalText"), "Ordinal Text Size", "", getOps<float>("ordinalTextSize"), 5.0f);
-    addConditionalSlider(getOps<bool>("showText") && getOps<bool>("showOrdinalText"), "Ordinal Text Offset", "", getOps<float>("ordinalTextOffset"), 10.0f, 0.0f, false);
+    addConditionalToggle(getOps<bool>("showText"), "Show Ordinal Text", "", "showOrdinalText");
+    addConditionalSlider(getOps<bool>("showText") && getOps<bool>("showOrdinalText"), "Ordinal Text Size", "", "ordinalTextSize", 5.0f);
+    addConditionalSlider(getOps<bool>("showText") && getOps<bool>("showOrdinalText"), "Ordinal Text Offset", "", "ordinalTextOffset", 10.0f, 0.0f, false);
 
     extraPadding();
 
     addHeader("Degrees");
-    addToggle("Show Degrees", "Display the exact angle (0-360)", getOps<bool>("showDegrees"));
-    addConditionalToggle(getOps<bool>("showDegrees"), "Degrees Symbol", "", getOps<bool>("degreeSymbol"));
-    addConditionalSlider(getOps<bool>("showDegrees"), "Degrees Decimal Count", "", getOps<float>("degreesDecimalCount"), 5.0f, 0.0f, false);
-    addConditionalSlider(getOps<bool>("showDegrees"), "Degrees Text Size", "", getOps<float>("degreesTextSize"), 3.0f, 0.5f);
-    addConditionalSlider(getOps<bool>("showDegrees"), "Degrees Text Offset", "", getOps<float>("degreesTextOffset"), 10.0f, 0.0f, false);
-    addConditionalToggle(getOps<bool>("showDegrees"), "Degrees Text Shadow", "", getOps<bool>("degreesTextShadow"));
+    addToggle("Show Degrees", "Display the exact angle (0-360)", "showDegrees");
+    addConditionalToggle(getOps<bool>("showDegrees"), "Degrees Symbol", "", "degreeSymbol");
+    addConditionalSlider(getOps<bool>("showDegrees"), "Degrees Decimal Count", "", "degreesDecimalCount", 5.0f, 0.0f, false);
+    addConditionalSlider(getOps<bool>("showDegrees"), "Degrees Text Size", "", "degreesTextSize", 3.0f, 0.5f);
+    addConditionalSlider(getOps<bool>("showDegrees"), "Degrees Text Offset", "", "degreesTextOffset", 10.0f, 0.0f, false);
+    addConditionalToggle(getOps<bool>("showDegrees"), "Degrees Text Shadow", "", "degreesTextShadow");
 
     extraPadding();
 

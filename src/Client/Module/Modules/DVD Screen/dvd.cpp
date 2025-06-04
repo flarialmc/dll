@@ -32,9 +32,9 @@ void DVD::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("DVD Screensaver");
-    addSlider("Scale", "", getOps<float>("scale"));
-    addSlider("X Velocity", "", getOps<float>("xveloc"));
-    addSlider("Y Velocity", "", getOps<float>("yveloc"));
+    addSlider("Scale", "", "scale");
+    addSlider("X Velocity", "", "xveloc");
+    addSlider("Y Velocity", "", "yveloc");
 
     FlarialGUI::UnsetScrollView();
 

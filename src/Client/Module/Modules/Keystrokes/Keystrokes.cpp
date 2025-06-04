@@ -82,38 +82,38 @@ void Keystrokes::settingsRender(float settingsOffset) {
 
 
 	addHeader("Keystrokes");
-	addSlider("UI Scale", "", getOps<float>("uiscale"), 2.0f);
-	addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", getOps<bool>("BlurEffect"));
-	addSlider("Rounding", "Rounding of the rectangle", getOps<float>("rounding"));
-	addToggle("Background", "", getOps<bool>("showBg"));
-	addConditionalToggle(getOps<bool>("showBg"), "Background Shadow", "Displays a shadow under the background", getOps<bool>("rectShadow"));
-	addConditionalSlider(getOps<bool>("showBg") && getOps<bool>("rectShadow"), "Shadow Offset", "How far the shadow will be.", getOps<float>("rectShadowOffset"), 0.02f, 0.001f);
-	addToggle("Border", "", getOps<bool>("border"));
-	addConditionalSlider(getOps<bool>("border"), "Border Thickness", "", getOps<float>("borderWidth"), 4.f);
+	addSlider("UI Scale", "", "uiscale", 2.0f);
+	addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", "BlurEffect");
+	addSlider("Rounding", "Rounding of the rectangle", "rounding");
+	addToggle("Background", "", "showBg");
+	addConditionalToggle(getOps<bool>("showBg"), "Background Shadow", "Displays a shadow under the background", "rectShadow");
+	addConditionalSlider(getOps<bool>("showBg") && getOps<bool>("rectShadow"), "Shadow Offset", "How far the shadow will be.", "rectShadowOffset", 0.02f, 0.001f);
+	addToggle("Border", "", "border");
+	addConditionalSlider(getOps<bool>("border"), "Border Thickness", "", "borderWidth", 4.f);
 
-	addToggle("Glow (Disabled State)", "", getOps<bool>("glow"));
-	addConditionalSlider(getOps<bool>("glow"), "Glow Amount (Disabled State)", "", getOps<float>("glowAmount"), 100.f);
+	addToggle("Glow (Disabled State)", "", "glow");
+	addConditionalSlider(getOps<bool>("glow"), "Glow Amount (Disabled State)", "", "glowAmount", 100.f);
 
-	addToggle("Glow (Enabled State)", "", getOps<bool>("glowEnabled"));
-	addConditionalSlider(getOps<bool>("glowEnabled"), "Glow Amount (Enabled State)", "", getOps<float>("glowEnabledAmount"), 100.f);
-	addConditionalSlider(getOps<bool>("glowEnabled"), "Glow Speed", "", getOps<float>("glowSpeed"), 10.f);
+	addToggle("Glow (Enabled State)", "", "glowEnabled");
+	addConditionalSlider(getOps<bool>("glowEnabled"), "Glow Amount (Enabled State)", "", "glowEnabledAmount", 100.f);
+	addConditionalSlider(getOps<bool>("glowEnabled"), "Glow Speed", "", "glowSpeed", 10.f);
 
-	addSlider("Key Spacing", "", getOps<float>("keySpacing"), 10.00);
-	addSlider("Spacebar Width", "", getOps<float>("spacebarWidth"), 1.00, 0, false);
-	addSlider("Spacebar Height", "", getOps<float>("spacebarHeight"), 1.00, 0, false);
-	addSlider("Highlight Speed", "", getOps<float>("edSpeed"), 10.f);
+	addSlider("Key Spacing", "", "keySpacing", 10.00);
+	addSlider("Spacebar Width", "", "spacebarWidth", 1.00, 0, false);
+	addSlider("Spacebar Height", "", "spacebarHeight", 1.00, 0, false);
+	addSlider("Highlight Speed", "", "edSpeed", 10.f);
 	extraPadding();
 
 	addHeader("Text");
-	addToggle("Text Shadow", "Displays a shadow under the text", getOps<bool>("textShadow"));
-	addConditionalSlider(getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", getOps<float>("textShadowOffset"), 0.02f, 0.001f);
+	addToggle("Text Shadow", "Displays a shadow under the text", "textShadow");
+	addConditionalSlider(getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", "textShadowOffset", 0.02f, 0.001f);
 	extraPadding();
 
 	addHeader("Mouse Buttons");
-	addToggle("Show Mouse Buttons", "LMB & RMB", getOps<bool>("cps"));
-	addConditionalSlider(getOps<bool>("cps"), "CPS Text Scale", "", getOps<float>("textscale2"), 2.00);
-	addToggle("Show LMB & RMB", "", getOps<bool>("lmbrmb"));
-	addToggle("Hide CPS Counter", "", getOps<bool>("hidecps"));
+	addToggle("Show Mouse Buttons", "LMB & RMB", "cps");
+	addConditionalSlider(getOps<bool>("cps"), "CPS Text Scale", "", "textscale2", 2.00);
+	addToggle("Show LMB & RMB", "", "lmbrmb");
+	addToggle("Hide CPS Counter", "", "hidecps");
 	addTextBox("LMB Text", "", getOps<std::string>("mainlmbtext"));
 	addTextBox("RMB Text", "", getOps<std::string>("mainrmbtext"));
 	addTextBox("LMB CPS Text", "", getOps<std::string>("lmbtext"));
@@ -121,7 +121,7 @@ void Keystrokes::settingsRender(float settingsOffset) {
 	extraPadding();
 
 	addHeader("WASD");
-	addSlider("WASD Text Scale", "", getOps<float>("textscale"), 2.00);
+	addSlider("WASD Text Scale", "", "textscale", 2.00);
 	addTextBox("W Key", "", getOps<std::string>("wText"));
 	addTextBox("A Key", "", getOps<std::string>("aText"));
 	addTextBox("S Key", "", getOps<std::string>("sText"));

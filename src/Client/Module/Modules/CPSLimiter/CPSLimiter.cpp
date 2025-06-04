@@ -21,9 +21,9 @@ void CPSLimiter::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("CPS Limiter");
-    addSlider("Left Click", "Limit for your LMB.", getOps<float>("Left"));
-    addSlider("Right Click", "Right for your RMB.", getOps<float>("Right"));
-    addToggle("Legacy Mode", "An alternative mode for limiting cps, may not work as expected.", getOps<bool>("legacy"));
+    addSlider("Left Click", "Limit for your LMB.", "Left");
+    addSlider("Right Click", "Right for your RMB.", "Right");
+    addToggle("Legacy Mode", "An alternative mode for limiting cps, may not work as expected.", "legacy");
 
     FlarialGUI::UnsetScrollView();
 

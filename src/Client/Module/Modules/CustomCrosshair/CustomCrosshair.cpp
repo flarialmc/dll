@@ -48,46 +48,39 @@ void CustomCrosshair::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     if (settings.getSettingByName<bool>("CustomCrosshair")->value) {
-        this->addHeader("Crosshair Editor");
-        this->addButton("Crosshair Editor", "Opens the crosshair editor menu", "open", [&]() {
-            this->blankWindow = !this->blankWindow;
+        addHeader("Crosshair Editor");
+        addButton("Crosshair Editor", "Opens the crosshair editor menu", "open", [&]() {
+            blankWindow = !blankWindow;
         });
-        this->addButton("Reload Crosshair", "Reloads Crosshair to apply any changes", "reload", [&]() {
-            this->CrosshairReloaded = true;
+        addButton("Reload Crosshair", "Reloads Crosshair to apply any changes", "reload", [&]() {
+            CrosshairReloaded = true;
         });
 
-        this->extraPadding();
+        extraPadding();
     }
 
-    this->addHeader("Main");
-    this->addToggle("Use Custom Crosshair", "Uses a custom crosshair.",
-                    settings.getSettingByName<bool>("CustomCrosshair")->value);
-    this->addToggle("Solid Color", "Make crosshair a solid color / more visible",
-                    settings.getSettingByName<bool>("solidColor")->value);
-    this->addToggle("Render in Third Person", "Weather or not to render in third person",
-                    settings.getSettingByName<bool>("renderInThirdPerson")->value);
-    this->addToggle("Highlight on Entity", "Highlight when enemy in reach",
-                    settings.getSettingByName<bool>("highlightOnEntity")->value);
-    if (settings.getSettingByName<bool>("highlightOnEntity")->value) {
-        this->addToggle("Solid Color When Highlighted", "Use solid color when highlighted",
-                        settings.getSettingByName<bool>("solidColorWhenHighlighted")->value);
-    }
-    this->extraPadding();
+    addHeader("Main");
+    addToggle("Use Custom Crosshair", "Uses a custom crosshair.","CustomCrosshair");
+    addToggle("Solid Color", "Make crosshair a solid color / more visible", "solidColor");
+    addToggle("Render in Third Person", "Weather or not to render in third person", "renderInThirdPerson");
+    addToggle("Highlight on Entity", "Highlight when enemy in reach", "highlightOnEntity");
+    addConditionalToggle(getOps<bool>("highlightOnEntity"), "Solid Color When Highlighted", "Use solid color when highlighted", "solidColorWhenHighlighted");
 
-    this->addHeader("Misc");
-    this->addSlider("Crosshair Scale", "The size of the Crosshair (only for custom)",
-                    settings.getSettingByName<float>("uiscale")->value, 10.f, 0.f, true);
+    extraPadding();
 
-    this->extraPadding();
+    addHeader("Misc");
+    addSlider("Crosshair Scale", "The size of the Crosshair (only for custom)", "uiscale", 10.f, 0.f, true);
 
-    this->addHeader("Colors");
-    this->addColorPicker("Default Color", "When the enemy is not in view.", "default");
-    if (settings.getSettingByName<bool>("highlightOnEntity")->value) {
-        this->addColorPicker("Enemy Color", "When the enemy is in view.", "enemy");
-    }
+    extraPadding();
+
+    addHeader("Colors");
+    addColorPicker("Default Color", "When the enemy is not in view.", "default");
+    addConditionalColorPicker(getOps<bool>("highlightOnEntity"), "Enemy Color", "When the enemy is in view.", "enemy");
+
+
     FlarialGUI::UnsetScrollView();
 
-    this->resetPadding();
+    resetPadding();
 
     if (blankWindow) MC::mouseButton = button;
 }

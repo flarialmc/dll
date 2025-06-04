@@ -44,8 +44,8 @@ void Waila::settingsRender(float settingsOffset)
 
     addHeader("Main");
     defaultAddSettings("main");
-    addToggle("Advanced Mode", "", getOps<bool>("advanced"));
-    addToggle("Show Air", "", getOps<bool>("showAir"));
+    addToggle("Advanced Mode", "", "advanced");
+    addToggle("Show Air", "", "showAir");
     extraPadding();
 
     addHeader("Text");

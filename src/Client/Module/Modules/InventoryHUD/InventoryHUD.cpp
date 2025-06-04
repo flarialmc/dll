@@ -66,36 +66,36 @@ void InventoryHUD::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Inventory HUD");
-    addSlider("Size", "", getOps<float>("uiscale"), 5.f, 0.f, true);
-    addSlider("Text Size", "", getOps<float>("textscale"), 0.25f, 0.0f, true);
-    addSlider("Spacing", "", getOps<float>("spacing"), 10.f, 0.0f, true);
-    addToggle("Show Durability", "", getOps<bool>("showDurBar"));
-    addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Offset X", "", getOps<float>("durBarOffsetX"), 50.f, 0.0f, false);
-    addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Offset Y", "", getOps<float>("durBarOffsetY"), 50.f, 0.0f, false);
-    addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Opacity", "", getOps<float>("durBarOpacity"), 1.f, 0.0f, false);
-    addConditionalToggle(getOps<bool>("showDurBar"), "Show Max Durability Bar", "", getOps<bool>("showDurBarMax"));
+    addSlider("Size", "", "uiscale", 5.f, 0.f, true);
+    addSlider("Text Size", "", "textscale", 0.25f, 0.0f, true);
+    addSlider("Spacing", "", "spacing", 10.f, 0.0f, true);
+    addToggle("Show Durability", "", "showDurBar");
+    addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Offset X", "", "durBarOffsetX", 50.f, 0.0f, false);
+    addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Offset Y", "", "durBarOffsetY", 50.f, 0.0f, false);
+    addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Opacity", "", "durBarOpacity", 1.f, 0.0f, false);
+    addConditionalToggle(getOps<bool>("showDurBar"), "Show Max Durability Bar", "", "showDurBarMax");
 
-    //addSlider("Background Padding", "", getOps<float>("bgPadding"), 25.f, 0.0f, false);
+    //addSlider("Background Padding", "", "bgPadding", 25.f, 0.0f, false);
     extraPadding();
 
     addHeader("Text");
-    addSlider("Text Offset X", "", getOps<float>("textOffsetX"), 50.f, 0.0f, false);
-    addSlider("Text Offset Y", "", getOps<float>("textOffsetY"), 50.f, 0.0f, false);
+    addSlider("Text Offset X", "", "textOffsetX", 50.f, 0.0f, false);
+    addSlider("Text Offset Y", "", "textOffsetY", 50.f, 0.0f, false);
     addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, getOps<std::string>("textalignment"));
-    addToggle("Text Shadow", "Displays a shadow under the text", getOps<bool>("textShadow"));
-    addConditionalSlider(getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", getOps<float>("textShadowOffset"), 0.02f, 0.001f);
+    addToggle("Text Shadow", "Displays a shadow under the text", "textShadow");
+    addConditionalSlider(getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", "textShadowOffset", 0.02f, 0.001f);
     extraPadding();
 
     addHeader("Colors");
     addColorPicker("Text Color", "", "text");
     addConditionalColorPicker(getOps<bool>("textShadow"), "Shadow Color", "Text Shadow Color", "textShadow");
-    addToggle("Show Special Max Durability Bar Color", "", getOps<bool>("showSpecialMaxDurBarCol"));
+    addToggle("Show Special Max Durability Bar Color", "", "showSpecialMaxDurBarCol");
     addConditionalColorPicker(getOps<bool>("showSpecialMaxDurBarCol"), "Special Max Durability Bar Color", "", "specialMaxDurBar");
-    addToggle("Enable Static Durability Bar Color", "", getOps<bool>("showStaticDurBarColor"));
+    addToggle("Enable Static Durability Bar Color", "", "showStaticDurBarColor");
     addConditionalColorPicker(getOps<bool>("showStaticDurBarColor"), "Static Durability Bar Color", "", "staticDurBar");
-    addConditionalToggle(getOps<bool>("showStaticDurBarColor"), "Override Special Max Durability Bar Color", "", getOps<bool>("overrideSpecialMaxDurBarCol"));
-    addConditionalSlider(!getOps<bool>("showStaticDurBarColor"), "100% Durability Bar Color", "Hue in degrees", getOps<float>("100color"), 360.f, 0.0f, false);
-    addConditionalSlider(!getOps<bool>("showStaticDurBarColor"), "0% Durability Bar Color", "Hue in degrees", getOps<float>("0color"), 360.f, 0.0f, false);
+    addConditionalToggle(getOps<bool>("showStaticDurBarColor"), "Override Special Max Durability Bar Color", "", "overrideSpecialMaxDurBarCol");
+    addConditionalSlider(!getOps<bool>("showStaticDurBarColor"), "100% Durability Bar Color", "Hue in degrees", "100color", 360.f, 0.0f, false);
+    addConditionalSlider(!getOps<bool>("showStaticDurBarColor"), "0% Durability Bar Color", "Hue in degrees", "0color", 360.f, 0.0f, false);
 
     FlarialGUI::UnsetScrollView();
     resetPadding();

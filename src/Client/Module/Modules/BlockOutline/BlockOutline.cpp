@@ -38,13 +38,10 @@ void BlockOutline::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Block Outline");
-    addToggle("Overlay", "Overlays the face of block", getOps<bool>("overlay"));
-    addConditionalToggle(getOps<bool>("overlay"), "Overlay Full Block", "Overlays the full block",
-                         getOps<bool>("overlayfullblock"));
-    addConditionalSlider(!getOps<bool>("overlay"), "Outline Width", "Thickness of the outline",
-                         getOps<float>("outlinewidth"), 0.5f);
-    addConditionalToggle(!getOps<bool>("overlay"), "3D Outline", "Shows outline through blocks.",
-                         getOps<bool>("showfulloutline"));
+    addToggle("Overlay", "Overlays the face of block", "overlay");
+    addConditionalToggle(getOps<bool>("overlay"), "Overlay Full Block", "Overlays the full block", "overlayfullblock");
+    addConditionalSlider(!getOps<bool>("overlay"), "Outline Width", "Thickness of the outline", "outlinewidth", 0.5f);
+    addConditionalToggle(!getOps<bool>("overlay"), "3D Outline", "Shows outline through blocks.", "showfulloutline");
     addColorPicker((getOps<bool>("overlay") ? "Overlay" : "Outline") + (std::string) " Color", "", "outline");
 
     FlarialGUI::UnsetScrollView();

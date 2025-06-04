@@ -49,18 +49,18 @@ void ZeqaUtils::settingsRender(float settingsOffset)
 
 
     addHeader("Auto re queue");
-    addToggle("Auto re queue", "Requeue the same ranked/unranked duel after  the current one is over.", getOps<bool>("req"));
+    addToggle("Auto re queue", "Requeue the same ranked/unranked duel after  the current one is over.", "req");
 
 
     addHeader("Auto accept");
-    addToggle("Friend request", "Automatically accept incoming friend requests.", getOps<bool>("friendaccept"));
-    addToggle("duel request", "Automatically accept incoming duel requests.", getOps<bool>("duelaccept"));
+    addToggle("Friend request", "Automatically accept incoming friend requests.", "friendaccept");
+    addToggle("duel request", "Automatically accept incoming duel requests.", "duelaccept");
 
     addHeader("Debloat chat");
-    addToggle("Promo message", "Removes all promo/info messages", getOps<bool>("promomessage"));
-    addToggle("player join", "Removes player join message", getOps<bool>("join"));
-    addToggle("player leave", "Removes player leave message", getOps<bool>("leave"));
-    addToggle("Kill streak", "Removes Message indicating a player has gotten a kill streak", getOps<bool>("killstreak"));
+    addToggle("Promo message", "Removes all promo/info messages", "promomessage");
+    addToggle("player join", "Removes player join message", "join");
+    addToggle("player leave", "Removes player leave message", "leave");
+    addToggle("Kill streak", "Removes Message indicating a player has gotten a kill streak", "killstreak");
 
     FlarialGUI::UnsetScrollView();
     resetPadding();

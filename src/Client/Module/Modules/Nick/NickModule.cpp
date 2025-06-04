@@ -64,8 +64,8 @@ void NickModule::settingsRender(float settingsOffset)
 
     addHeader("Nickname");
     addTextBox("Nickname", "", getOps<std::string>("nick"));
-    addToggle("Bold", "", getOps<bool>("bold"));
-    addToggle("Obfuscated", "", getOps<bool>("obfuscated"));
+    addToggle("Bold", "", "bold");
+    addToggle("Obfuscated", "", "obfuscated");
     addDropdown("Text Color", "", std::vector<std::string>{
                     "White",
                     "Black",

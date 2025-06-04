@@ -45,18 +45,16 @@ void Coordinates::settingsRender(float settingsOffset) {
 
     addHeader("Text");
     defaultAddSettings("text");
-    addToggle("Show Decimals", "", getOps<bool>("showDecimals"));
+    addToggle("Show Decimals", "", "showDecimals");
     addConditionalSlider(getOps<bool>("showDecimals"), "Number of Decimals", "", getOps<float>("decimalCount"), 6.f,
                          1.f);
     extraPadding();
 
     addHeader("Module Settings");
     addToggle("Show Other Dimension Coords",
-              "Shows the other dimension\'s coordinates along with overworld coordinates.",
-              getOps<bool>("showOtherDimCoords"));
-    addToggle("Show Dimension Name", "Shows the dimension name.", getOps<bool>("showDimName"));
-    addToggle("Use Same Dimension Format", "Uses the same format for all dimensions.",
-              getOps<bool>("useSameDimensionFormat"));
+              "Shows the other dimension\'s coordinates along with overworld coordinates.", "showOtherDimCoords");
+    addToggle("Show Dimension Name", "Shows the dimension name.", "showDimName");
+    addToggle("Use Same Dimension Format", "Uses the same format for all dimensions.", "useSameDimensionFormat");
     addConditionalTextBox(getOps<bool>("useSameDimensionFormat"), "Dimension Format", "",
                           getOps<std::string>("defaultDimFormat"));
     addConditionalTextBox(!getOps<bool>("useSameDimensionFormat"), "Overworld Dimension Format", "",

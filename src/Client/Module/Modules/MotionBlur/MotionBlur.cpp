@@ -48,13 +48,13 @@ void MotionBlur::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Motion Blur");
-    addToggle("Average Pixel Mode", "Disabling this will likely look better on high FPS.", getOps<bool>("avgpixel"));
+    addToggle("Average Pixel Mode", "Disabling this will likely look better on high FPS.", "avgpixel");
 
-    addConditionalToggle(getOps<bool>("avgpixel"), "Dynamic Mode", "Automatically adjusts intensity according to FPS", getOps<bool>("dynamic"));
-    addConditionalSlider(getOps<bool>("avgpixel") && !getOps<bool>("dynamic"), "Intensity", "Amount of previous frames to render.", getOps<float>("intensity2"), 30, 0, true);
+    addConditionalToggle(getOps<bool>("avgpixel"), "Dynamic Mode", "Automatically adjusts intensity according to FPS", "dynamic");
+    addConditionalSlider(getOps<bool>("avgpixel") && !getOps<bool>("dynamic"), "Intensity", "Amount of previous frames to render.", "intensity2", 30, 0, true);
 
-    addConditionalSlider(!getOps<bool>("avgpixel"), "Intensity", "Control how strong the motion blur is.", getOps<float>("intensity"), 2, 0.05f, true);
-    addConditionalSlider(!getOps<bool>("avgpixel"), "Samples", "", getOps<float>("samples"), 256, 8, true);
+    addConditionalSlider(!getOps<bool>("avgpixel"), "Intensity", "Control how strong the motion blur is.", "intensity", 2, 0.05f, true);
+    addConditionalSlider(!getOps<bool>("avgpixel"), "Samples", "", "samples", 256, 8, true);
 
     FlarialGUI::UnsetScrollView();
 

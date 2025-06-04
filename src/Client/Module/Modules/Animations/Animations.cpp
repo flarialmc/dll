@@ -63,7 +63,7 @@ void Animations::settingsRender(float settingsOffset) {
 		Constraints::RelativeConstraint(0.88f, "height"));
 
 	addHeader("Animations");
-	addSlider("Hotbar Selected Slot Speed", "", getOps<float>("hotbarSpeed"));
+	addSlider("Hotbar Selected Slot Speed", "", "hotbarSpeed");
 
 	FlarialGUI::UnsetScrollView();
 

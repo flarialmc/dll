@@ -61,15 +61,15 @@ void PotionHUD::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Potion HUD");
-    addSlider("UI Scale", "", getOps<float>("uiscale"), 3.f, 0.f, true);
-    addToggle("Bottom Up Mode", "New effects appear ontop instead", getOps<bool>("bottomUp"));
-    addSlider("Spacing", "", getOps<float>("spacing"), 10.f, 0.0f, true);
-    addToggle("Show Text", "", getOps<bool>("showText"));
-    addConditionalSlider(getOps<bool>("showText"), "Text Size", "", getOps<float>("textSize"), 0.25f, 0.0f, true);
-    addConditionalSlider(getOps<bool>("showText"), "Text Offset X", "", getOps<float>("textOffsetX"), 50.f, 0.0f, false);
-    addConditionalToggle(getOps<bool>("showText"), "Text to the left", "", getOps<bool>("textLeft"));
-    addConditionalToggle(getOps<bool>("showText"), "Text Shadow", "Displays a shadow under the text", getOps<bool>("textShadow"));
-    addConditionalSlider(getOps<bool>("showText") && getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", getOps<float>("textShadowOffset"), 0.02f, 0.001f);
+    addSlider("UI Scale", "", "uiscale", 3.f, 0.f, true);
+    addToggle("Bottom Up Mode", "New effects appear ontop instead", "bottomUp");
+    addSlider("Spacing", "", "spacing", 10.f, 0.0f, true);
+    addToggle("Show Text", "", "showText");
+    addConditionalSlider(getOps<bool>("showText"), "Text Size", "", "textSize", 0.25f, 0.0f, true);
+    addConditionalSlider(getOps<bool>("showText"), "Text Offset X", "", "textOffsetX", 50.f, 0.0f, false);
+    addConditionalToggle(getOps<bool>("showText"), "Text to the left", "", "textLeft");
+    addConditionalToggle(getOps<bool>("showText"), "Text Shadow", "Displays a shadow under the text", "textShadow");
+    addConditionalSlider(getOps<bool>("showText") && getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", "textShadowOffset", 0.02f, 0.001f);
     extraPadding();
 
     addHeader("Colors");

@@ -34,7 +34,7 @@ void TimeChanger::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Time Changer");
-    addSlider("Time Slider", "", getOps<float>("time"), 1.f, 0.f, true);
+    addSlider("Time Slider", "", "time", 1.f, 0.f, true);
 
     FlarialGUI::UnsetScrollView();
 

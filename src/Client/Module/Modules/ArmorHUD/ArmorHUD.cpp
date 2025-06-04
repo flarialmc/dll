@@ -5,251 +5,165 @@
 #include "Modules/ClickGUI/ClickGUI.hpp"
 
 void ArmorHUD::onEnable() {
-    if (FlarialGUI::inMenu) {
-        std::string s = "To change the position of ArmorHUD, Please click " + ModuleManager::getModule("ClickGUI")->getOps<std::string>("editmenubind") + " in the settings tab.";
-        std::cout << s << std::endl;
-        FlarialGUI::Notify(s);
-    }
-    Listen(this, RenderEvent, &ArmorHUD::onRender)
-        Listen(this, SetupAndRenderEvent, &ArmorHUD::onSetupAndRender)
-        Module::onEnable();
+	if (FlarialGUI::inMenu) {
+		std::string s = "To change the position of ArmorHUD, Please click " + ModuleManager::getModule("ClickGUI")->getOps<std::string>("editmenubind") + " in the settings tab.";
+		std::cout << s << std::endl;
+		FlarialGUI::Notify(s);
+	}
+	Listen(this, RenderEvent, &ArmorHUD::onRender)
+		Listen(this, SetupAndRenderEvent, &ArmorHUD::onSetupAndRender)
+		Module::onEnable();
 }
 
 void ArmorHUD::onDisable() {
-    Deafen(this, RenderEvent, &ArmorHUD::onRender)
-        Deafen(this, SetupAndRenderEvent, &ArmorHUD::onSetupAndRender)
-        Module::onDisable();
+	Deafen(this, RenderEvent, &ArmorHUD::onRender)
+		Deafen(this, SetupAndRenderEvent, &ArmorHUD::onSetupAndRender)
+		Module::onDisable();
 }
 
 void ArmorHUD::defaultConfig() {
-    Module::defaultConfig("core");
-    Module::defaultConfig("pos");
-    setDef("textSize", 0.05f);
-    setDef("uiscale", 1.0f);
-    setDef("show_offhand", true);
-    setDef("vertical", false);
-    setDef("durability_left", false);
-    setDef("percent", false);
-    setDef("color", false);
-    setDef("showdurability", false);
-    setDef("main", (std::string)"FFFFFF", 1.f, false);
-    setDef("staticDurBar", (std::string)"FFFFFF", 1.f, false);
-    setDef("specialMaxDurBar", (std::string)"FFFFFF", 1.f, false);
-    setDef("textShadow", true);
-    setDef("textShadowOffset", 0.003f);
-    setDef("textShadow", (std::string)"00000", 0.55f, false);
-    setDef("fillGaps", true);
-    setDef("colorFull_rgb", false);
-    setDef("textOffsetX", 17.55f);
-    setDef("textOffsetY", 7.697f);
-    setDef("showDurBar", true);
-    setDef("durBarOffsetX", 1.92f);
-    setDef("durBarOffsetY", 12.45f);
-    setDef("durBarOpacity", 1.f);
-    setDef("spacing", 1.f);
-    setDef("hideMaxDurText", false);
-    setDef("showSpecialMaxDurBarCol", false);
-    setDef("showStaticDurBarCol", false);
-    setDef("overrideSpecialMaxDurBarCol", false);
-    setDef("showDurBarMax", false);
-    setDef("100color", 120.f);
-    setDef("0color", 0.f);
+	Module::defaultConfig("core");
+	Module::defaultConfig("pos");
+	setDef("textSize", 0.05f);
+	setDef("uiscale", 1.0f);
+	setDef("show_offhand", true);
+	setDef("vertical", false);
+	setDef("durability_left", false);
+	setDef("percent", false);
+	setDef("color", false);
+	setDef("showdurability", false);
+	setDef("main", (std::string)"FFFFFF", 1.f, false);
+	setDef("staticDurBar", (std::string)"FFFFFF", 1.f, false);
+	setDef("specialMaxDurBar", (std::string)"FFFFFF", 1.f, false);
+	setDef("textShadow", true);
+	setDef("textShadowOffset", 0.003f);
+	setDef("textShadow", (std::string)"00000", 0.55f, false);
+	setDef("fillGaps", true);
+	setDef("colorFull_rgb", false);
+	setDef("textOffsetX", 17.55f);
+	setDef("textOffsetY", 7.697f);
+	setDef("showDurBar", true);
+	setDef("durBarOffsetX", 1.92f);
+	setDef("durBarOffsetY", 12.45f);
+	setDef("durBarOpacity", 1.f);
+	setDef("spacing", 1.f);
+	setDef("hideMaxDurText", false);
+	setDef("showSpecialMaxDurBarCol", false);
+	setDef("showStaticDurBarCol", false);
+	setDef("overrideSpecialMaxDurBarCol", false);
+	setDef("showDurBarMax", false);
+	setDef("100color", 120.f);
+	setDef("0color", 0.f);
 }
 
 void ArmorHUD::settingsRender(float settingsOffset) {
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
+	float x = Constraints::PercentageConstraint(0.019, "left");
+	float y = Constraints::PercentageConstraint(0.10, "top");
 
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
+	const float scrollviewWidth = Constraints::RelativeConstraint(0.12, "height", true);
 
 
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
+	FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
+	FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
+		Constraints::RelativeConstraint(1.0, "width"),
+		Constraints::RelativeConstraint(0.88f, "height"));
 
-		addHeader("Armor HUD");
-		addSlider("Size", "", settings.getSettingByName<float>("uiscale")->value, 5.f, 0.f, true);
-		addSlider("Spacing", "", settings.getSettingByName<float>("spacing")->value, 10.f, 0.f, true);
-		addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", settings.getSettingByName<bool>("vertical")->value);
-		addConditionalToggle(settings.getSettingByName<bool>("vertical")->value, "Durability to the left", "", settings.getSettingByName<bool>("durability_left")->value);
-		addToggle("Show offhand item", "", settings.getSettingByName<bool>("show_offhand")->value);
-		addToggle("Fill Empty Slots", "Fill gaps when a piece of armor isn't equipped", settings.getSettingByName<bool>("fillGaps")->value);
-		addToggle("Change Color", "", settings.getSettingByName<bool>("color")->value);
+	addHeader("Armor HUD");
+	addSlider("Size", "", "uiscale", 5.f, 0.f, true);
+	addSlider("Spacing", "", "spacing", 10.f, 0.f, true);
+	addToggle("Vertical ArmorHUD", "To switch between a vertical or horizontal layout", "vertical");
+	addConditionalToggle(getOps<bool>("vertical"), "Durability to the left", "", "durability_left");
+	addToggle("Show offhand item", "", "show_offhand");
+	addToggle("Fill Empty Slots", "Fill gaps when a piece of armor isn't equipped", "fillGaps");
+	addToggle("Change Color", "", "color");
 
-		extraPadding();
+	extraPadding();
 
-		addHeader("Durability");
-		addToggle("Durability Text", "", settings.getSettingByName<bool>("showdurability")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("showdurability")->value && settings.getSettingByName<bool>("vertical")->value, "Text Offset X", "", settings.getSettingByName<float>("textOffsetX")->value, 50.f, 0.0f, false);
-		addConditionalSlider(settings.getSettingByName<bool>("showdurability")->value && !settings.getSettingByName<bool>("vertical")->value, "Text Offset Y", "", settings.getSettingByName<float>("textOffsetY")->value, 50.f, 0.0f, false);
-		addConditionalSlider(settings.getSettingByName<bool>("showdurability")->value, "Text Size", "", settings.getSettingByName<float>("textSize")->value, 0.25f, 0.0f, true);
-		addConditionalToggle(settings.getSettingByName<bool>("showdurability")->value, "Show Durability in %", "", settings.getSettingByName<bool>("percent")->value);
-		addConditionalToggle(settings.getSettingByName<bool>("showdurability")->value && !settings.getSettingByName<bool>("percent")->value, "Hide Max Durability Text", "", settings.getSettingByName<bool>("hideMaxDurText")->value);
-		addConditionalToggle(settings.getSettingByName<bool>("showdurability")->value, "Text Shadow", "Displays a shadow under the text", settings.getSettingByName<bool>("textShadow")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("showdurability")->value && settings.getSettingByName<bool>("textShadow")->value, "Shadow Offset", "How far the shadow will be.", settings.getSettingByName<float>("textShadowOffset")->value, 0.02f, 0.001f);
+	addHeader("Durability");
+	addToggle("Durability Text", "", "showdurability");
+	addSlider("Text Offset X", "", "textOffsetX", 50.f, 0.0f, false);
+	//addConditionalSlider(getOps<bool>("showdurability") && getOps<bool>("vertical"), "Text Offset X", "", "textOffsetX", 50.f, 0.0f, false);
+	addConditionalSlider(getOps<bool>("showdurability") && !getOps<bool>("vertical"), "Text Offset Y", "", "textOffsetY", 50.f, 0.0f, false);
+	addConditionalSlider(getOps<bool>("showdurability"), "Text Size", "", "textSize", 0.25f, 0.0f, true);
+	addConditionalToggle(getOps<bool>("showdurability"), "Show Durability in %", "", "percent");
+	addConditionalToggle(getOps<bool>("showdurability") && !getOps<bool>("percent"), "Hide Max Durability Text", "", "hideMaxDurText");
+	addConditionalToggle(getOps<bool>("showdurability"), "Text Shadow", "Displays a shadow under the text", "textShadow");
+	addConditionalSlider(getOps<bool>("showdurability") && getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", "textShadowOffset", 0.02f, 0.001f);
 
-		addToggle("Durability Bar", "", settings.getSettingByName<bool>("showDurBar")->value);
-		addConditionalSlider(settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Offset X", "", settings.getSettingByName<float>("durBarOffsetX")->value, 50.f, 0.0f, false);
-		addConditionalSlider(settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Offset Y", "", settings.getSettingByName<float>("durBarOffsetY")->value, 50.f, 0.0f, false);
-		addConditionalSlider(settings.getSettingByName<bool>("showDurBar")->value, "Durability Bar Opacity", "", settings.getSettingByName<float>("durBarOpacity")->value, 1.f, 0.0f, false);
-		addConditionalToggle(settings.getSettingByName<bool>("showDurBar")->value, "Show Max Durability Bar", "", settings.getSettingByName<bool>("showDurBarMax")->value);
+	addToggle("Durability Bar", "", "showDurBar");
+	addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Offset X", "", "durBarOffsetX", 50.f, 0.0f, false);
+	addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Offset Y", "", "durBarOffsetY", 50.f, 0.0f, false);
+	addConditionalSlider(getOps<bool>("showDurBar"), "Durability Bar Opacity", "", "durBarOpacity", 1.f, 0.0f, false);
+	addConditionalToggle(getOps<bool>("showDurBar"), "Show Max Durability Bar", "", "showDurBarMax");
 
 	extraPadding();
 	addHeader("Colors");
-	addToggle("Show Special Max Durability Bar Color", "", getOps<bool>("showSpecialMaxDurBarCol"));
+	addToggle("Show Special Max Durability Bar Color", "", "showSpecialMaxDurBarCol");
 	addConditionalColorPicker(getOps<bool>("showSpecialMaxDurBarCol"), "Special Max Durability Bar Color", "", "specialMaxDurBar");
 	addColorPicker("Normal Color", "", "main");
 	addConditionalColorPicker(getOps<bool>("textShadow"), "Shadow Color", "", "textShadow");
-	addToggle("Enable Static Durability Bar Color", "", getOps<bool>("showStaticDurBarCol"));
+	addToggle("Enable Static Durability Bar Color", "", "showStaticDurBarCol");
 	addConditionalColorPicker(getOps<bool>("showStaticDurBarCol"), "Static Durability Bar Color", "", "staticDurBar");
-	addConditionalToggle(getOps<bool>("showStaticDurBarCol"), "Override Special Max Durability Bar Color", "", getOps<bool>("overrideSpecialMaxDurBarCol"));
-	addConditionalSlider(!getOps<bool>("showStaticDurBarCol"), "100% Durability Bar Color", "Hue in degrees", getOps<float>("100color"), 360.f, 0.0f, false);
-	addConditionalSlider(!getOps<bool>("showStaticDurBarCol"), "0% Durability Bar Color", "Hue in degrees", getOps<float>("0color"), 360.f, 0.0f, false);
+	addConditionalToggle(getOps<bool>("showStaticDurBarCol"), "Override Special Max Durability Bar Color", "", "overrideSpecialMaxDurBarCol");
+	addConditionalSlider(!getOps<bool>("showStaticDurBarCol"), "100% Durability Bar Color", "Hue in degrees", "100color", 360.f, 0.0f, false);
+	addConditionalSlider(!getOps<bool>("showStaticDurBarCol"), "0% Durability Bar Color", "Hue in degrees", "0color", 360.f, 0.0f, false);
 
-		FlarialGUI::UnsetScrollView();
-		resetPadding();
+	FlarialGUI::UnsetScrollView();
+	resetPadding();
 }
 
 void ArmorHUD::renderDurability() {
-		bool showOffhand = getOps<bool>("show_offhand");
+	bool showOffhand = getOps<bool>("show_offhand");
 
-		D2D1_COLOR_F mainColor = getColor("main");
-		D2D1_COLOR_F staticDurBarColor = getColor("staticDurBar");
-		D2D1_COLOR_F specialMaxDurBarColor = getColor("specialMaxDurBar");
+	D2D1_COLOR_F mainColor = getColor("main");
+	D2D1_COLOR_F staticDurBarColor = getColor("staticDurBar");
+	D2D1_COLOR_F specialMaxDurBarColor = getColor("specialMaxDurBar");
 
-		const float textSize = getOps<float>("textSize") * 1080;
+	const float textSize = getOps<float>("textSize") * 1080;
 
-		bool vertical = getOps<bool>("vertical");
-		bool durability_left = getOps<bool>("durability_left");
-		bool fillGaps = getOps<bool>("fillGaps");
-		bool hideMaxDurText = getOps<bool>("hideMaxDurText");
+	bool vertical = getOps<bool>("vertical");
+	bool durability_left = getOps<bool>("durability_left");
+	bool fillGaps = getOps<bool>("fillGaps");
+	bool hideMaxDurText = getOps<bool>("hideMaxDurText");
 
-		float maxDurCol = getOps<float>("100color");
-		float minDurCol = getOps<float>("0color");
+	float maxDurCol = getOps<float>("100color");
+	float minDurCol = getOps<float>("0color");
 
-		float textOffsetX = getOps<float>("textOffsetX");
-		float textOffsetY = getOps<float>("textOffsetY");
-		float durBarOffsetX = getOps<float>("durBarOffsetX");
-		float durBarOffsetY = getOps<float>("durBarOffsetY");
-		float ospacing = getOps<float>("spacing");
-		float uiscale = getOps<float>("uiscale");
-		float guiscale = SDK::clientInstance->getGuiData()->getGuiScale();
+	float textOffsetX = getOps<float>("textOffsetX");
+	float textOffsetY = getOps<float>("textOffsetY");
+	float durBarOffsetX = getOps<float>("durBarOffsetX");
+	float durBarOffsetY = getOps<float>("durBarOffsetY");
+	float ospacing = getOps<float>("spacing");
+	float uiscale = getOps<float>("uiscale");
+	float guiscale = SDK::clientInstance->getGuiData()->getGuiScale();
 
-		bool showSpecialMaxDurBarCol = getOps<bool>("showSpecialMaxDurBarCol");
-		bool overrideSpecialMaxDurBarCol = getOps<bool>("overrideSpecialMaxDurBarCol");
-		bool showStaticDurBarColor = getOps<bool>("showStaticDurBarCol");
-		bool showTextShadow = getOps<bool>("textShadow");
+	bool showSpecialMaxDurBarCol = getOps<bool>("showSpecialMaxDurBarCol");
+	bool overrideSpecialMaxDurBarCol = getOps<bool>("overrideSpecialMaxDurBarCol");
+	bool showStaticDurBarColor = getOps<bool>("showStaticDurBarCol");
+	bool showTextShadow = getOps<bool>("textShadow");
 
-		if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
-			if (SDK::clientInstance->getLocalPlayer() != nullptr)
-				if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
-					if (getOps<bool>("showdurability") || getOps<bool>("showDurBar")) {
-						auto scaledPos = PositionUtils::getCustomScreenScaledPos(Vec2<float>{16, 16}, uiscale);
-						float spacing = (vertical ? scaledPos.y : scaledPos.x) * ospacing;
+	if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
+		if (SDK::clientInstance->getLocalPlayer() != nullptr)
+			if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
+				if (getOps<bool>("showdurability") || getOps<bool>("showDurBar")) {
+					auto scaledPos = PositionUtils::getCustomScreenScaledPos(Vec2<float>{16, 16}, uiscale);
+					float spacing = (vertical ? scaledPos.y : scaledPos.x) * ospacing;
 
-						float xmodifier = 0.0f;
-						float ymodifier = 0.0f;
+					float xmodifier = 0.0f;
+					float ymodifier = 0.0f;
 
-						for (int i = 2; i < 6; i++) {
-							if (SDK::clientInstance->getLocalPlayer()->getArmor(i - 2)->getItem() != nullptr) {
-
-								std::string text;
-
-								float durPerc = (float)durabilities[i][0] / (float)durabilities[i][1];
-
-								if (durabilities[i][1] != 0) {
-									if (getOps<bool>("percent")) text = FlarialGUI::cached_to_string((int)std::round(durPerc * 100)) + "%";
-									else text = FlarialGUI::cached_to_string(durabilities[i][0]) + (hideMaxDurText ? "" : ("/" + FlarialGUI::cached_to_string(durabilities[i][1])));
-								}
-								else text = FlarialGUI::cached_to_string(SDK::clientInstance->getLocalPlayer()->getArmor(i - 2)->getcount());
-
-								std::wstring widestr = std::wstring(text.begin(), text.end());
-
-								const wchar_t* widecstr = widestr.c_str();
-
-								D2D1_COLOR_F finalColor = mainColor;
-
-								if (durabilities[i][0] != 0 || durabilities[i][1] != 0) finalColor = FlarialGUI::HSVtoColorF(minDurCol + durPerc * (maxDurCol - minDurCol), 1.f, 1.f);
-								if (durabilities[i][0] == durabilities[i][1] && durabilities[i][1] != 0 && showSpecialMaxDurBarCol) finalColor = specialMaxDurBarColor;
-								if (showStaticDurBarColor) {
-									if (durabilities[i][0] == durabilities[i][1] && durabilities[i][1] != 0 && overrideSpecialMaxDurBarCol) finalColor = staticDurBarColor;
-									else if (durabilities[i][0] == durabilities[i][1] && !showSpecialMaxDurBarCol) finalColor = staticDurBarColor;
-									else if (durabilities[i][0] != durabilities[i][1]) finalColor = staticDurBarColor;
-								}
-
-								finalColor.a = getOps<float>("durBarOpacity");
-
-								if (getOps<bool>("showDurBar") && (getOps<bool>("showDurBarMax") || durabilities[i][0] != durabilities[i][1]) && durabilities[i][1] != 0) {
-									FlarialGUI::RoundedRect(
-										currentPos.x + xmodifier + (durBarOffsetX * uiscale * guiscale),
-										currentPos.y + ymodifier + (durBarOffsetY * uiscale * guiscale),
-										D2D1::ColorF(D2D1::ColorF::Black, getOps<float>("durBarOpacity")),
-										guiscale * uiscale * 13.f,
-										guiscale * uiscale * 2.f,
-										0, 0
-									);
-									FlarialGUI::RoundedRect(
-										currentPos.x + xmodifier + (durBarOffsetX * uiscale * guiscale),
-										currentPos.y + ymodifier + (durBarOffsetY * uiscale * guiscale),
-										finalColor,
-										durPerc * (guiscale * uiscale * 13.f),
-										guiscale * uiscale * 1.f,
-										0, 0
-									);
-								}
-
-								float textX = currentPos.x + (xmodifier + (vertical ? (textOffsetX * uiscale * guiscale) : 0)) * (durability_left ? -1 : 1);
-								float textY = currentPos.y + ymodifier + (vertical ? 0 : (textOffsetY * uiscale * guiscale));
-
-								// armor
-								if (getOps<bool>("showdurability")) {
-									if (showTextShadow) FlarialGUI::FlarialTextWithFont(
-											textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
-											textY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
-											widecstr,
-											vertical ? 0 : 16 * uiscale * guiscale,
-											vertical ? 16 * uiscale * guiscale : 0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
-											textSize * uiscale * guiscale, DWRITE_FONT_WEIGHT_NORMAL,
-											getColor("textShadow"),
-											true
-										);
-
-									FlarialGUI::FlarialTextWithFont(
-										textX,
-										textY, widecstr,
-										vertical ? 0 : 16 * uiscale * guiscale,
-										vertical ? 16 * uiscale * guiscale : 0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
-										textSize * uiscale * guiscale,
-										DWRITE_FONT_WEIGHT_NORMAL, finalColor, true);
-								}
-								if (fillGaps) {
-									if (vertical) ymodifier += spacing;
-									else xmodifier += spacing;
-								}
-
-							}
-							if (!fillGaps) {
-								if (vertical) ymodifier += spacing;
-								else xmodifier += spacing;
-							}
-						}
-
-						if (SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
-							SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot())->getItem() !=
-							nullptr) {
-							ItemStack* currentItem = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
-								SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot());
+					for (int i = 2; i < 6; i++) {
+						if (SDK::clientInstance->getLocalPlayer()->getArmor(i - 2)->getItem() != nullptr) {
 
 							std::string text;
 
-							float durPerc = (float)durabilities[0][0] / (float)durabilities[0][1];
+							float durPerc = (float)durabilities[i][0] / (float)durabilities[i][1];
 
-							if (durabilities[0][1] != 0) {
+							if (durabilities[i][1] != 0) {
 								if (getOps<bool>("percent")) text = FlarialGUI::cached_to_string((int)std::round(durPerc * 100)) + "%";
-								else text = FlarialGUI::cached_to_string(durabilities[0][0]) + (hideMaxDurText ? "" : ("/" + FlarialGUI::cached_to_string(durabilities[0][1])));
+								else text = FlarialGUI::cached_to_string(durabilities[i][0]) + (hideMaxDurText ? "" : ("/" + FlarialGUI::cached_to_string(durabilities[i][1])));
 							}
-							else text = FlarialGUI::cached_to_string(currentItem->getcount());
+							else text = FlarialGUI::cached_to_string(SDK::clientInstance->getLocalPlayer()->getArmor(i - 2)->getcount());
 
 							std::wstring widestr = std::wstring(text.begin(), text.end());
 
@@ -257,17 +171,17 @@ void ArmorHUD::renderDurability() {
 
 							D2D1_COLOR_F finalColor = mainColor;
 
-							if (durabilities[0][0] != 0 || durabilities[0][1] != 0) finalColor = FlarialGUI::HSVtoColorF(minDurCol + durPerc * (maxDurCol - minDurCol), 1.f, 1.f);
-							if (durabilities[0][0] == durabilities[0][1] && durabilities[0][1] != 0 && showSpecialMaxDurBarCol) finalColor = specialMaxDurBarColor;
+							if (durabilities[i][0] != 0 || durabilities[i][1] != 0) finalColor = FlarialGUI::HSVtoColorF(minDurCol + durPerc * (maxDurCol - minDurCol), 1.f, 1.f);
+							if (durabilities[i][0] == durabilities[i][1] && durabilities[i][1] != 0 && showSpecialMaxDurBarCol) finalColor = specialMaxDurBarColor;
 							if (showStaticDurBarColor) {
-								if (durabilities[0][0] == durabilities[0][1] && durabilities[0][1] != 0 && overrideSpecialMaxDurBarCol) finalColor = staticDurBarColor;
-								else if (durabilities[0][0] == durabilities[0][1] && !showSpecialMaxDurBarCol) finalColor = staticDurBarColor;
-								else if (durabilities[0][0] != durabilities[0][1]) finalColor = staticDurBarColor;
+								if (durabilities[i][0] == durabilities[i][1] && durabilities[i][1] != 0 && overrideSpecialMaxDurBarCol) finalColor = staticDurBarColor;
+								else if (durabilities[i][0] == durabilities[i][1] && !showSpecialMaxDurBarCol) finalColor = staticDurBarColor;
+								else if (durabilities[i][0] != durabilities[i][1]) finalColor = staticDurBarColor;
 							}
 
 							finalColor.a = getOps<float>("durBarOpacity");
 
-							if (getOps<bool>("showDurBar") && (getOps<bool>("showDurBarMax") || durabilities[0][0] != durabilities[0][1]) && durabilities[0][1] != 0) {
+							if (getOps<bool>("showDurBar") && (getOps<bool>("showDurBarMax") || durabilities[i][0] != durabilities[i][1]) && durabilities[i][1] != 0) {
 								FlarialGUI::RoundedRect(
 									currentPos.x + xmodifier + (durBarOffsetX * uiscale * guiscale),
 									currentPos.y + ymodifier + (durBarOffsetY * uiscale * guiscale),
@@ -289,7 +203,7 @@ void ArmorHUD::renderDurability() {
 							float textX = currentPos.x + (xmodifier + (vertical ? (textOffsetX * uiscale * guiscale) : 0)) * (durability_left ? -1 : 1);
 							float textY = currentPos.y + ymodifier + (vertical ? 0 : (textOffsetY * uiscale * guiscale));
 
-							// main hand
+							// armor
 							if (getOps<bool>("showdurability")) {
 								if (showTextShadow) FlarialGUI::FlarialTextWithFont(
 									textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
@@ -310,100 +224,187 @@ void ArmorHUD::renderDurability() {
 									textSize * uiscale * guiscale,
 									DWRITE_FONT_WEIGHT_NORMAL, finalColor, true);
 							}
-
 							if (fillGaps) {
 								if (vertical) ymodifier += spacing;
 								else xmodifier += spacing;
 							}
+
 						}
 						if (!fillGaps) {
 							if (vertical) ymodifier += spacing;
 							else xmodifier += spacing;
 						}
-						if (showOffhand) {
-							if (SDK::clientInstance->getLocalPlayer()->getOffhandSlot() != nullptr &&
-								SDK::clientInstance->getLocalPlayer()->getOffhandSlot()->getItem() != nullptr) {
+					}
 
-								ItemStack* offhandItem = SDK::clientInstance->getLocalPlayer()->getOffhandSlot();
+					if (SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
+						SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot())->getItem() !=
+						nullptr) {
+						ItemStack* currentItem = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
+							SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot());
 
-								std::string text;
+						std::string text;
 
-								float durPerc = (float)durabilities[1][0] / (float)durabilities[1][1];
+						float durPerc = (float)durabilities[0][0] / (float)durabilities[0][1];
 
-								if (durabilities[1][1] != 0) {
-									if (getOps<bool>("percent")) text = FlarialGUI::cached_to_string((int)std::round(durPerc * 100)) + "%";
-									else text = FlarialGUI::cached_to_string(durabilities[1][0]) + (hideMaxDurText ? "" : ("/" + FlarialGUI::cached_to_string(durabilities[1][1])));
-								}
-								else text = FlarialGUI::cached_to_string(offhandItem->getcount());
+						if (durabilities[0][1] != 0) {
+							if (getOps<bool>("percent")) text = FlarialGUI::cached_to_string((int)std::round(durPerc * 100)) + "%";
+							else text = FlarialGUI::cached_to_string(durabilities[0][0]) + (hideMaxDurText ? "" : ("/" + FlarialGUI::cached_to_string(durabilities[0][1])));
+						}
+						else text = FlarialGUI::cached_to_string(currentItem->getcount());
 
-								std::wstring widestr = std::wstring(text.begin(), text.end());
+						std::wstring widestr = std::wstring(text.begin(), text.end());
 
-								const wchar_t* widecstr = widestr.c_str();
+						const wchar_t* widecstr = widestr.c_str();
 
-								D2D1_COLOR_F finalColor = mainColor;
+						D2D1_COLOR_F finalColor = mainColor;
 
-								if (durabilities[1][0] != 0 || durabilities[1][1] != 0) finalColor = FlarialGUI::HSVtoColorF(minDurCol + durPerc * (maxDurCol - minDurCol), 1.f, 1.f);
-								if (durabilities[1][0] == durabilities[1][1] && durabilities[1][1] != 0 && showSpecialMaxDurBarCol) finalColor = specialMaxDurBarColor;
-								if (showStaticDurBarColor) {
-									if (durabilities[1][0] == durabilities[1][1] && durabilities[1][1] != 0 && overrideSpecialMaxDurBarCol) finalColor = staticDurBarColor;
-									else if (durabilities[1][0] == durabilities[1][1] && !showSpecialMaxDurBarCol) finalColor = staticDurBarColor;
-									else if (durabilities[1][0] != durabilities[1][1]) finalColor = staticDurBarColor;
-								}
+						if (durabilities[0][0] != 0 || durabilities[0][1] != 0) finalColor = FlarialGUI::HSVtoColorF(minDurCol + durPerc * (maxDurCol - minDurCol), 1.f, 1.f);
+						if (durabilities[0][0] == durabilities[0][1] && durabilities[0][1] != 0 && showSpecialMaxDurBarCol) finalColor = specialMaxDurBarColor;
+						if (showStaticDurBarColor) {
+							if (durabilities[0][0] == durabilities[0][1] && durabilities[0][1] != 0 && overrideSpecialMaxDurBarCol) finalColor = staticDurBarColor;
+							else if (durabilities[0][0] == durabilities[0][1] && !showSpecialMaxDurBarCol) finalColor = staticDurBarColor;
+							else if (durabilities[0][0] != durabilities[0][1]) finalColor = staticDurBarColor;
+						}
 
-								finalColor.a = getOps<float>("durBarOpacity");
+						finalColor.a = getOps<float>("durBarOpacity");
 
-								if (getOps<bool>("showDurBar") && (getOps<bool>("showDurBarMax") || durabilities[1][0] != durabilities[1][1]) && durabilities[1][1] != 0) {
-									FlarialGUI::RoundedRect(
-										currentPos.x + xmodifier + (durBarOffsetX * uiscale * guiscale),
-										currentPos.y + ymodifier + (durBarOffsetY * uiscale * guiscale),
-										D2D1::ColorF(D2D1::ColorF::Black, getOps<float>("durBarOpacity")),
-										guiscale * uiscale * 13.f,
-										guiscale * uiscale * 2.f,
-										0, 0
-									);
-									FlarialGUI::RoundedRect(
-										currentPos.x + xmodifier + (durBarOffsetX * uiscale * guiscale),
-										currentPos.y + ymodifier + (durBarOffsetY * uiscale * guiscale),
-										finalColor,
-										durPerc * (guiscale * uiscale * 13.f),
-										guiscale * uiscale * 1.f,
-										0, 0
-									);
-								}
+						if (getOps<bool>("showDurBar") && (getOps<bool>("showDurBarMax") || durabilities[0][0] != durabilities[0][1]) && durabilities[0][1] != 0) {
+							FlarialGUI::RoundedRect(
+								currentPos.x + xmodifier + (durBarOffsetX * uiscale * guiscale),
+								currentPos.y + ymodifier + (durBarOffsetY * uiscale * guiscale),
+								D2D1::ColorF(D2D1::ColorF::Black, getOps<float>("durBarOpacity")),
+								guiscale * uiscale * 13.f,
+								guiscale * uiscale * 2.f,
+								0, 0
+							);
+							FlarialGUI::RoundedRect(
+								currentPos.x + xmodifier + (durBarOffsetX * uiscale * guiscale),
+								currentPos.y + ymodifier + (durBarOffsetY * uiscale * guiscale),
+								finalColor,
+								durPerc * (guiscale * uiscale * 13.f),
+								guiscale * uiscale * 1.f,
+								0, 0
+							);
+						}
 
-								float textX = currentPos.x + (xmodifier + (vertical ? (textOffsetX * uiscale * guiscale) : 0)) * (durability_left ? -1 : 1);
-								float textY = currentPos.y + ymodifier + (vertical ? 0 : (textOffsetY * uiscale * guiscale));
+						float textX = currentPos.x + (xmodifier + (vertical ? (textOffsetX * uiscale * guiscale) : 0)) * (durability_left ? -1 : 1);
+						float textY = currentPos.y + ymodifier + (vertical ? 0 : (textOffsetY * uiscale * guiscale));
 
-								// offhand
-								if (getOps<bool>("showdurability")) {
-									if (showTextShadow) FlarialGUI::FlarialTextWithFont(
-										textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
-										textY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
-										widecstr,
-										vertical ? 0 : 16 * uiscale * guiscale,
-										vertical ? 16 * uiscale * guiscale : 0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
-										textSize * uiscale * guiscale, DWRITE_FONT_WEIGHT_NORMAL,
-										getColor("textShadow"),
-										true
-									);
+						// main hand
+						if (getOps<bool>("showdurability")) {
+							if (showTextShadow) FlarialGUI::FlarialTextWithFont(
+								textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
+								textY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
+								widecstr,
+								vertical ? 0 : 16 * uiscale * guiscale,
+								vertical ? 16 * uiscale * guiscale : 0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
+								textSize * uiscale * guiscale, DWRITE_FONT_WEIGHT_NORMAL,
+								getColor("textShadow"),
+								true
+							);
 
-									FlarialGUI::FlarialTextWithFont(
-										textX,
-										textY, widecstr,
-										vertical ? 0 : 16 * uiscale * guiscale,
-										vertical ? 16 * uiscale * guiscale : 0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
-										textSize * uiscale * guiscale,
-										DWRITE_FONT_WEIGHT_NORMAL, finalColor, true);
-								}
+							FlarialGUI::FlarialTextWithFont(
+								textX,
+								textY, widecstr,
+								vertical ? 0 : 16 * uiscale * guiscale,
+								vertical ? 16 * uiscale * guiscale : 0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
+								textSize * uiscale * guiscale,
+								DWRITE_FONT_WEIGHT_NORMAL, finalColor, true);
+						}
+
+						if (fillGaps) {
+							if (vertical) ymodifier += spacing;
+							else xmodifier += spacing;
+						}
+					}
+					if (!fillGaps) {
+						if (vertical) ymodifier += spacing;
+						else xmodifier += spacing;
+					}
+					if (showOffhand) {
+						if (SDK::clientInstance->getLocalPlayer()->getOffhandSlot() != nullptr &&
+							SDK::clientInstance->getLocalPlayer()->getOffhandSlot()->getItem() != nullptr) {
+
+							ItemStack* offhandItem = SDK::clientInstance->getLocalPlayer()->getOffhandSlot();
+
+							std::string text;
+
+							float durPerc = (float)durabilities[1][0] / (float)durabilities[1][1];
+
+							if (durabilities[1][1] != 0) {
+								if (getOps<bool>("percent")) text = FlarialGUI::cached_to_string((int)std::round(durPerc * 100)) + "%";
+								else text = FlarialGUI::cached_to_string(durabilities[1][0]) + (hideMaxDurText ? "" : ("/" + FlarialGUI::cached_to_string(durabilities[1][1])));
+							}
+							else text = FlarialGUI::cached_to_string(offhandItem->getcount());
+
+							std::wstring widestr = std::wstring(text.begin(), text.end());
+
+							const wchar_t* widecstr = widestr.c_str();
+
+							D2D1_COLOR_F finalColor = mainColor;
+
+							if (durabilities[1][0] != 0 || durabilities[1][1] != 0) finalColor = FlarialGUI::HSVtoColorF(minDurCol + durPerc * (maxDurCol - minDurCol), 1.f, 1.f);
+							if (durabilities[1][0] == durabilities[1][1] && durabilities[1][1] != 0 && showSpecialMaxDurBarCol) finalColor = specialMaxDurBarColor;
+							if (showStaticDurBarColor) {
+								if (durabilities[1][0] == durabilities[1][1] && durabilities[1][1] != 0 && overrideSpecialMaxDurBarCol) finalColor = staticDurBarColor;
+								else if (durabilities[1][0] == durabilities[1][1] && !showSpecialMaxDurBarCol) finalColor = staticDurBarColor;
+								else if (durabilities[1][0] != durabilities[1][1]) finalColor = staticDurBarColor;
+							}
+
+							finalColor.a = getOps<float>("durBarOpacity");
+
+							if (getOps<bool>("showDurBar") && (getOps<bool>("showDurBarMax") || durabilities[1][0] != durabilities[1][1]) && durabilities[1][1] != 0) {
+								FlarialGUI::RoundedRect(
+									currentPos.x + xmodifier + (durBarOffsetX * uiscale * guiscale),
+									currentPos.y + ymodifier + (durBarOffsetY * uiscale * guiscale),
+									D2D1::ColorF(D2D1::ColorF::Black, getOps<float>("durBarOpacity")),
+									guiscale * uiscale * 13.f,
+									guiscale * uiscale * 2.f,
+									0, 0
+								);
+								FlarialGUI::RoundedRect(
+									currentPos.x + xmodifier + (durBarOffsetX * uiscale * guiscale),
+									currentPos.y + ymodifier + (durBarOffsetY * uiscale * guiscale),
+									finalColor,
+									durPerc * (guiscale * uiscale * 13.f),
+									guiscale * uiscale * 1.f,
+									0, 0
+								);
+							}
+
+							float textX = currentPos.x + (xmodifier + (vertical ? (textOffsetX * uiscale * guiscale) : 0)) * (durability_left ? -1 : 1);
+							float textY = currentPos.y + ymodifier + (vertical ? 0 : (textOffsetY * uiscale * guiscale));
+
+							// offhand
+							if (getOps<bool>("showdurability")) {
+								if (showTextShadow) FlarialGUI::FlarialTextWithFont(
+									textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
+									textY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
+									widecstr,
+									vertical ? 0 : 16 * uiscale * guiscale,
+									vertical ? 16 * uiscale * guiscale : 0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
+									textSize * uiscale * guiscale, DWRITE_FONT_WEIGHT_NORMAL,
+									getColor("textShadow"),
+									true
+								);
+
+								FlarialGUI::FlarialTextWithFont(
+									textX,
+									textY, widecstr,
+									vertical ? 0 : 16 * uiscale * guiscale,
+									vertical ? 16 * uiscale * guiscale : 0, vertical ? durability_left ? DWRITE_TEXT_ALIGNMENT_TRAILING : DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
+									textSize * uiscale * guiscale,
+									DWRITE_FONT_WEIGHT_NORMAL, finalColor, true);
 							}
 						}
 					}
 				}
-		}
+			}
 	}
+}
 
 
-void ArmorHUD::onRender(RenderEvent &event) {
+void ArmorHUD::onRender(RenderEvent& event) {
 	if (ClientInstance::getTopScreenName() == "hud_screen" &&
 		isEnabled()) {
 
@@ -456,17 +457,17 @@ void ArmorHUD::onRender(RenderEvent &event) {
 		}
 
 		renderDurability();
-		}
+	}
 
 	if (SDK::getCurrentScreen() != "hud_screen") ClickGUI::editmenu = false;
 }
 
-void ArmorHUD::onSetupAndRender(SetupAndRenderEvent &event) {
+void ArmorHUD::onSetupAndRender(SetupAndRenderEvent& event) {
 	if (isEnabled())
 		if (ClientInstance::getTopScreenName() == "hud_screen") {
 			auto muirc = event.getMuirc();
 			BaseActorRenderContext barc(muirc->getScreenContext(), muirc->getClientInstance(),
-			                            muirc->getClientInstance()->getMinecraftGame());
+				muirc->getClientInstance()->getMinecraftGame());
 
 			Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
 
@@ -496,20 +497,20 @@ void ArmorHUD::onSetupAndRender(SetupAndRenderEvent &event) {
 								durabilities[i][0] = durabilityLeft;
 
 								barc.itemRenderer->renderGuiItemNew(&barc,
-								                                    armorSlot,
-								                                    0,
-								                                    scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
-								                                    settings.getSettingByName<float>(
-									                                    "uiscale")->value, false);
+									armorSlot,
+									0,
+									scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
+									settings.getSettingByName<float>(
+										"uiscale")->value, false);
 
 								if (armorSlot->isEnchanted()) {
 									barc.itemRenderer->renderGuiItemNew(&barc,
-									                                    armorSlot,
-									                                    0,
-									                                    scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
-									                                    settings.getSettingByName<float>(
-										                                    "uiscale")->value,
-									                                    true);
+										armorSlot,
+										0,
+										scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
+										settings.getSettingByName<float>(
+											"uiscale")->value,
+										true);
 								}
 
 								if (fillGaps) {
@@ -524,8 +525,8 @@ void ArmorHUD::onSetupAndRender(SetupAndRenderEvent &event) {
 						}
 
 						if (SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
-							    SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot())->getItem() !=
-						    nullptr) {
+							SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot())->getItem() !=
+							nullptr) {
 							auto item = SDK::clientInstance->getLocalPlayer()->getSupplies()->getInventory()->getItem(
 								SDK::clientInstance->getLocalPlayer()->getSupplies()->getSelectedSlot());
 
@@ -536,19 +537,19 @@ void ArmorHUD::onSetupAndRender(SetupAndRenderEvent &event) {
 							durabilities[0][0] = durabilityLeft;
 
 							barc.itemRenderer->renderGuiItemNew(&barc,
-							                                    item,
-							                                    0, scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
-							                                    settings.getSettingByName<float>(
-								                                    "uiscale")->value,
-							                                    false);
+								item,
+								0, scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
+								settings.getSettingByName<float>(
+									"uiscale")->value,
+								false);
 
 							if (item->isEnchanted()) {
 								barc.itemRenderer->renderGuiItemNew(&barc,
-								                                    item,
-								                                    0, scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
-								                                    settings.getSettingByName<float>(
-									                                    "uiscale")->value,
-								                                    true);
+									item,
+									0, scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
+									settings.getSettingByName<float>(
+										"uiscale")->value,
+									true);
 							}
 							if (fillGaps) {
 								if (vertical) ymodifier += spacing;
@@ -564,7 +565,7 @@ void ArmorHUD::onSetupAndRender(SetupAndRenderEvent &event) {
 						auto showOffhand = getOps<bool>("show_offhand");
 						if (showOffhand) {
 							if (SDK::clientInstance->getLocalPlayer()->getOffhandSlot() != nullptr &&
-							    SDK::clientInstance->getLocalPlayer()->getOffhandSlot()->getItem() != nullptr) {
+								SDK::clientInstance->getLocalPlayer()->getOffhandSlot()->getItem() != nullptr) {
 								auto item = SDK::clientInstance->getLocalPlayer()->getOffhandSlot();
 
 								auto maxDamage = item->getMaxDamage();
@@ -574,19 +575,19 @@ void ArmorHUD::onSetupAndRender(SetupAndRenderEvent &event) {
 								durabilities[1][0] = durabilityLeft;
 
 								barc.itemRenderer->renderGuiItemNew(&barc,
-								                                    item,
-								                                    0, scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
-								                                    settings.getSettingByName<float>(
-									                                    "uiscale")->value,
-								                                    false);
+									item,
+									0, scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
+									settings.getSettingByName<float>(
+										"uiscale")->value,
+									false);
 
 								if (item->isEnchanted()) {
 									barc.itemRenderer->renderGuiItemNew(&barc,
-									                                    item,
-									                                    0, scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
-									                                    settings.getSettingByName<float>(
-										                                    "uiscale")->value,
-									                                    true);
+										item,
+										0, scaledPos.x + xmodifier, scaledPos.y + ymodifier, 1.0f,
+										settings.getSettingByName<float>(
+											"uiscale")->value,
+										true);
 								}
 							}
 						}

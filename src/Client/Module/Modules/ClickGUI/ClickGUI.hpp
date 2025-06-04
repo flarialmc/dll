@@ -193,7 +193,7 @@ public:
 		this->extraPadding();
 
 		this->addHeader("Logo");
-		// this->addToggle("Custom logo", "", getOps<bool>("custom_logo"));
+		// this->addToggle("Custom logo", "", "custom_logo");
 		// if (!getOps<bool>("custom_logo")) {
 		this->addColorPicker("Logo Color", "Color of the client's logo", "flariallogo");
 		// } else {

@@ -31,8 +31,8 @@ void FOVChanger::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("FOV Changer");
-    addSlider("FOV Value", "", getOps<float>("fovvalue"), 359.0f, 0, false);
-    addToggle("Affect Hand Size", "Keep normal hand size or not.", getOps<bool>("fovaffectshand"));
+    addSlider("FOV Value", "", "fovvalue", 359.0f, 0, false);
+    addToggle("Affect Hand Size", "Keep normal hand size or not.", "fovaffectshand");
 
     FlarialGUI::UnsetScrollView();
 

@@ -62,14 +62,14 @@ void HiveStat::settingsRender(float settingsOffset) {
     addKeybind("Toggle Overlay Keybind", "When setting, hold the new bind for 2 seconds",
                getOps<std::string>("Overlay"));
     addHeader("Misc");
-    addToggle("Show FKDR", "Shows final kill final death ratio", getOps<bool>("showFKDR"));
-    addToggle("Show KD", "Shows the amount of kills per death", getOps<bool>("showKD"));
-    addToggle("Show Win Rate", "Shows the player's win rate as a percentage ", getOps<bool>("showWR"));
-    addToggle("Show Level", "Shows the level of a player", getOps<bool>("showLevel"));
-    addToggle("Show Victories", "Shows the amount of wins a player has", getOps<bool>("showWins"));
-    addToggle("Show Losses", "Shows the amount of losses a player has", getOps<bool>("showLosses"));
-    addToggle("Show Kills", "Shows the amount of kills a player has", getOps<bool>("showKills"));
-    addToggle("Show Deaths", "Shows the amount of deaths a player has", getOps<bool>("showDeaths"));
+    addToggle("Show FKDR", "Shows final kill final death ratio", "showFKDR");
+    addToggle("Show KD", "Shows the amount of kills per death", "showKD");
+    addToggle("Show Win Rate", "Shows the player's win rate as a percentage ", "showWR");
+    addToggle("Show Level", "Shows the level of a player", "showLevel");
+    addToggle("Show Victories", "Shows the amount of wins a player has", "showWins");
+    addToggle("Show Losses", "Shows the amount of losses a player has", "showLosses");
+    addToggle("Show Kills", "Shows the amount of kills a player has", "showKills");
+    addToggle("Show Deaths", "Shows the amount of deaths a player has", "showDeaths");
     resetPadding();
 }
 

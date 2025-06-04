@@ -46,9 +46,9 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
 
     addHeader("Main");
     addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
-    addSlider("UI Scale", "", getOps<float>("uiscale"), 2.0f);
-    addSlider("Rounding", "Rounding of the rectangle", getOps<float>("rounding"), 100, 0, false);
-    addToggle("Background", "", getOps<bool>("showBg"));
+    addSlider("UI Scale", "", "uiscale", 2.0f);
+    addSlider("Rounding", "Rounding of the rectangle", "rounding", 100, 0, false);
+    addToggle("Background", "", "showBg");
     extraPadding();
 
     addHeader("Colors");
@@ -57,7 +57,7 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
     extraPadding();
 
     addHeader("Module Settings");
-    addToggle("I'm broke but I wanna look rich :(", "only for the real broke sigmas", getOps<bool>("imPoorButIWannaLookRich"));
+    addToggle("I'm broke but I wanna look rich :(", "only for the real broke sigmas", "imPoorButIWannaLookRich");
 
     FlarialGUI::UnsetScrollView();
     resetPadding();

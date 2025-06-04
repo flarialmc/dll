@@ -105,13 +105,13 @@ void PlayerNotifier::settingsRender(float settingsOffset)
         this->settings.addSetting<bool>("player" + FlarialGUI::cached_to_string(totalPlayers) + "Enabled", true);
         totalPlayers++;
     });
-    this->addSlider("Re-check", "(Seconds) After how long should it re-check for players", getOps<float>("duration"), 500, 1, true);
+    this->addSlider("Re-check", "(Seconds) After how long should it re-check for players", "duration", 500, 1, true);
     this->addKeybind("Re-check Keybind", "Hold for 2 seconds!", getKeybind());
     this->extraPadding();
 
     for (int i = 0; i < totalPlayers; i++) {
         this->addHeader(this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value);
-        this->addToggle("Enabled", "Should it notify you?", this->settings.getSettingByName<bool>("player" + FlarialGUI::cached_to_string(i))->value);
+        this->addToggle("Enabled", "Should it notify you?", "player" + FlarialGUI::cached_to_string(i));
         this->addTextBox("Player Name", "", this->settings.getSettingByName<std::string>("player" + FlarialGUI::cached_to_string(i))->value);
         this->extraPadding();
     }

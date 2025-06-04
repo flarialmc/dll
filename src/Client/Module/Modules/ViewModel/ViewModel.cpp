@@ -59,17 +59,17 @@ void ViewModel::settingsRender(float settingsOffset)
 
 
     addHeader("View Model");
-    addToggle("Third Person", "Transforms the item in third person perspective", getOps<bool>("thirdperson"));
-    addSlider("Item FOV", "Changes the FOV appearance of the item.", getOps<float>("itemfov"), 180);
+    addToggle("Third Person", "Transforms the item in third person perspective", "thirdperson");
+    addSlider("Item FOV", "Changes the FOV appearance of the item.", "itemfov", 180);
 
-    addSlider("Position X", "Changes the position in the X axis", getOps<float>("posx"), 12);
-    addSlider("Position Y", "Changes the position in the Y axis", getOps<float>("posy"), 12);
-    addSlider("Position Z", "Changes the position in the Z axis", getOps<float>("posz"), 12);
+    addSlider("Position X", "Changes the position in the X axis", "posx", 12);
+    addSlider("Position Y", "Changes the position in the Y axis", "posy", 12);
+    addSlider("Position Z", "Changes the position in the Z axis", "posz", 12);
 
-    addSlider("Rotation Angle", "Changes the rotation angle of the item", getOps<float>("rotangle"), 360);
-    addSlider("Rotation X", "Changes the rotation in the X axis", getOps<float>("rotx"), 360);
-    addSlider("Rotation Y", "Changes the rotation in the Y axis", getOps<float>("roty"), 360);
-    addSlider("Rotation Z", "Changes the rotation in the Z axis", getOps<float>("rotz"), 360);
+    addSlider("Rotation Angle", "Changes the rotation angle of the item", "rotangle", 360);
+    addSlider("Rotation X", "Changes the rotation in the X axis", "rotx", 360);
+    addSlider("Rotation Y", "Changes the rotation in the Y axis", "roty", 360);
+    addSlider("Rotation Z", "Changes the rotation in the Z axis", "rotz", 360);
 
     FlarialGUI::UnsetScrollView();
     resetPadding();

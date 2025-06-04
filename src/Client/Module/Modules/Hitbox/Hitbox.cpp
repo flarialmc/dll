@@ -34,9 +34,9 @@ void Hitbox::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Hitbox");
-    addToggle("2D Mode", "", getOps<bool>("outline"));
-    addToggle("Static Thickness", "", getOps<bool>("staticThickness"));
-    addSlider("Thickness", "", getOps<float>("thickness"));
+    addToggle("2D Mode", "", "outline");
+    addToggle("Static Thickness", "", "staticThickness");
+    addSlider("Thickness", "", "thickness");
     extraPadding();
 
     addHeader("Colors");

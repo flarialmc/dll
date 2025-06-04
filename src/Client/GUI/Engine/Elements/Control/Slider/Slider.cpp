@@ -56,16 +56,6 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 
     if (isAdditionalY) UnSetIsInAdditionalYMode();
 
-    if (CursorInRect(x, y, percWidth, percHeight) && TextBoxes[30 + index].isActive && MC::mouseButton == MouseButton::Right && !MC::held) {
-        bool resettableSettingsEnabled = Client::settings.getSettingByName<bool>("resettableSettings")->value;
-        if (resettableSettingsEnabled && moduleName != "" && settingName != "") {
-            auto mod = ModuleManager::getModule(moduleName);
-            mod->settings.deleteSetting(settingName);
-            mod->defaultConfig();
-            text = std::to_string(mod->settings.getSettingByName<float>(settingName)->value);
-        }
-    }
-
     if (!TextBoxes[30 + index].isActive) {
         std::stringstream stream;
 
@@ -77,12 +67,14 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
         text = stream.str();
     }
 
+    float oriX = x;
+
     FlarialGUI::RoundedRect(x, y, TextBoxes[30 + index].isActive ? color : disabledColor, percWidth, percHeight, round.x, round.x);
 
     int limit = 5;
     if (text.find('-') != std::string::npos) limit = 6;
     
-    text = FlarialGUI::TextBox(30 + index, text, limit, x, y, percWidth, percHeight, 2);
+    text = FlarialGUI::TextBox(30 + index, text, limit, x, y, percWidth, percHeight, 2, moduleName, settingName);
     text = String::removeNonNumeric(text);
     if (text == ".") {
         if (zerosafe) text = "0.01";
@@ -203,6 +195,15 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
         SliderRects[index].percentageX = percentage;
 
     }
+
+   /* if (CursorInRect(oriX, y, percWidth, percHeight) && TextBoxes[30 + index].isActive && MC::mouseButton == MouseButton::Right && !MC::held && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
+        if (Client::settings.getSettingByName<bool>("resettableSettings")->value && moduleName != "" && settingName != "") {
+            auto mod = ModuleManager::getModule(moduleName);
+            mod->settings.deleteSetting(settingName);
+            mod->defaultConfig();
+            text = std::to_string(mod->settings.getSettingByName<float>(settingName)->value);
+        }
+    }*/
 
     if (Utils::CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.5f), Constraints::SpacingConstraint(circleRadius, 1.5f)) && MC::held &&
         (activeSliders == 0 || SliderRects[index].isMovingElement) && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {

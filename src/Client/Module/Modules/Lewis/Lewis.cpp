@@ -49,13 +49,13 @@ void Lewis::onDisable()
 void Lewis::defaultConfig()
 {
     Module::defaultConfig("core");
-    if (settings.getSettingByName<bool>("lewisbounce") == nullptr) settings.addSetting("lewisbounce", false);
-    if (settings.getSettingByName<float>("lewisbouncesize") == nullptr) settings.addSetting("lewisbouncesize", 1.0f);
-    if (settings.getSettingByName<float>("lewisbouncespeed") == nullptr) settings.addSetting("lewisbouncespeed", 1.0f);
-    if (settings.getSettingByName<bool>("lewiscrosshair") == nullptr) settings.addSetting("lewiscrosshair", false);
-    if (settings.getSettingByName<float>("lewiscrosshairsize") == nullptr) settings.addSetting("lewiscrosshairsize", 1.0f);
-    if (settings.getSettingByName<bool>("lewislogo") == nullptr) settings.addSetting("lewislogo", false);
-    if (settings.getSettingByName<bool>("lewisscream") == nullptr) settings.addSetting("lewisscream", false);
+    setDef("lewisbounce", false);
+    setDef("lewisbouncesize", 1.0f);
+    setDef("lewisbouncespeed", 1.0f);
+    setDef("lewiscrosshair", false);
+    setDef("lewiscrosshairsize", 1.0f);
+    setDef("lewislogo", false);
+    setDef("lewisscream", false);
 }
 
 void Lewis::settingsRender(float settingsOffset)
@@ -71,13 +71,13 @@ void Lewis::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Lewis");
-    addToggle("Bouncing lewis", "", settings.getSettingByName<bool>("lewisbounce")->value);
-    addSlider("Bouncing lewis size", "", settings.getSettingByName<float>("lewisbouncesize")->value, 5);
-    addSlider("Bouncing lewis speed", "", settings.getSettingByName<float>("lewisbouncespeed")->value, 5);
-    addToggle("Crosshair lewis", "", settings.getSettingByName<bool>("lewiscrosshair")->value);
-    addSlider("Crosshair lewis size", "", settings.getSettingByName<float>("lewiscrosshairsize")->value, 5);
-    addToggle("Lewis Client Icon", "", settings.getSettingByName<bool>("lewislogo")->value);
-    addToggle("Lewis Scream", "", settings.getSettingByName<bool>("lewisscream")->value);
+    addToggle("Bouncing lewis", "", "lewisbounce");
+    addSlider("Bouncing lewis size", "", "lewisbouncesize", 5);
+    addSlider("Bouncing lewis speed", "", "lewisbouncespeed", 5);
+    addToggle("Crosshair lewis", "", "lewiscrosshair");
+    addSlider("Crosshair lewis size", "", "lewiscrosshairsize", 5);
+    addToggle("Lewis Client Icon", "", "lewislogo");
+    addToggle("Lewis Scream", "", "lewisscream");
 
     FlarialGUI::UnsetScrollView();
     resetPadding();

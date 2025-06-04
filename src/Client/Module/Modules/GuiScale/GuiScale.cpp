@@ -36,7 +36,7 @@ void GuiScale::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("GUI Scale");
-    addSlider("UI Scale", "", getOps<float>("guiscale"), 4.f, 1.f, false);
+    addSlider("UI Scale", "", "guiscale", 4.f, 1.f, false);
 
     FlarialGUI::UnsetScrollView();
 

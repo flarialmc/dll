@@ -145,33 +145,33 @@ void Waypoints::settingsRender(float settingsOffset)
         FlarialGUI::Notify("Added! Scroll down for options.");
     });
     addKeybind("Add waypoint keybind", "Hold for 2 seconds to set bind.", getKeybind());
-    addSlider("Distance", "Change until which distance waypoints will be drawn.", getOps<float>("distance"), 10000.f, 0.f, true);
+    addSlider("Distance", "Change until which distance waypoints will be drawn.", "distance", 10000.f, 0.f, true);
     extraPadding();
 
     addHeader("Background");
-    addSlider("Rounding", "", getOps<float>("bgrounding"));
-    addToggle("Waypoint color", "Whether the Background should be the waypoint's color.", getOps<bool>("bguse"));
+    addSlider("Rounding", "", "bgrounding");
+    addToggle("Waypoint color", "Whether the Background should be the waypoint's color.", "bguse");
     addConditionalColorPicker(!getOps<bool>("bguse"), "Color", "", "bg");
-    addToggle("Border", "Draw a Border?", getOps<bool>("border"));
+    addToggle("Border", "Draw a Border?", "border");
     extraPadding();
 
     if (getOps<bool>("border")) {
         addHeader("Border");
-        addSlider("Thickness", "Change the border thickness", getOps<float>("borderthickness"), 15.0f);
-        addToggle("Waypoint color", "Whether the Border should be the waypoint's color.", getOps<bool>("borderuse"));
+        addSlider("Thickness", "Change the border thickness", "borderthickness", 15.0f);
+        addToggle("Waypoint color", "Whether the Border should be the waypoint's color.", "borderuse");
         addConditionalColorPicker(!getOps<bool>("borderuse"), "Color", "", "border");
         extraPadding();
     }
 
     addHeader("Text");
-    addToggle("Waypoint color", "Whether the Text should be the waypoint's color.", getOps<bool>("textuse"));
+    addToggle("Waypoint color", "Whether the Text should be the waypoint's color.", "textuse");
     addConditionalColorPicker(!getOps<bool>("textuse"), "Color", "", "text");
 
     for (auto pair : WaypointList) {
         if (!this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(pair.second.index))) continue;
         if (this->settings.getSettingByName<std::string>("world-" + FlarialGUI::cached_to_string(pair.second.index))->value != SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()) continue;
         this->addHeader(this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(pair.second.index))->value);
-        this->addToggle("Enabled", "Change if the waypoint should be shown or not.", this->settings.getSettingByName<bool>("state-" + FlarialGUI::cached_to_string(pair.second.index))->value);
+        this->addToggle("Enabled", "Change if the waypoint should be shown or not.", "state-" + FlarialGUI::cached_to_string(pair.second.index));
         this->addColorPicker("Color", "Change the color of the waypoint.", "waypoint" + FlarialGUI::cached_to_string(pair.second.index));
         this->addTextBox("Name", "Change the name of the waypoint.", this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(pair.second.index))->value);
         this->addButton("Delete Waypoint", "", "Delete", [this, index = pair.second.index]() {

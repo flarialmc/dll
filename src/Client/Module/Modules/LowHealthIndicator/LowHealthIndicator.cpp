@@ -27,9 +27,9 @@ void LowHealthIndicator::settingsRender(float settingsOffset)
 
 
     addHeader("Low Health Indicator");
-    addSlider("Maximum overlay opacity", "The maximum overlay opacity", getOps<float>("maxopacity"), 1.0f, 0.0f);
+    addSlider("Maximum overlay opacity", "The maximum overlay opacity", "maxopacity", 1.0f, 0.0f);
     addColorPicker("Color", "", "health");
-    addSlider("Health", "The health at which the overlay will be shown", getOps<float>("health"), 20.0f, 0.0f);
+    addSlider("Health", "The health at which the overlay will be shown", "health", 20.0f, 0.0f);
     FlarialGUI::UnsetScrollView();
 
     resetPadding();

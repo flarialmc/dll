@@ -456,19 +456,19 @@ void Module::addConditionalDropdown(bool condition, std::string text, std::strin
 	FlarialGUI::ResetOverrideAlphaValues();
 }
 
-void Module::addConditionalToggle(bool condition, std::string text, std::string subtext, bool& value) {
+void Module::addConditionalToggle(bool condition, std::string text, std::string subtext, std::string settingName) {
 	FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalToggleAnims[toggleIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
 
 	if (condition) {
 		padding -= conditionalToggleAnims[toggleIndex];
 		FlarialGUI::lerp(conditionalToggleAnims[toggleIndex], 0.0f, 0.25f * FlarialGUI::frameFactor);
-		Module::addToggle(text, subtext, value);
+		Module::addToggle(text, subtext, settingName);
 	}
 	else {
 		FlarialGUI::lerp(conditionalToggleAnims[toggleIndex], Constraints::RelativeConstraint(0.05f, "height", true), 0.25f * FlarialGUI::frameFactor);
 		if (conditionalToggleAnims[toggleIndex] < Constraints::RelativeConstraint(0.0499f, "height", true)) {
 			padding -= conditionalToggleAnims[toggleIndex];
-			Module::addToggle(text, subtext, value);
+			Module::addToggle(text, subtext, settingName);
 		}
 		else toggleIndex++;
 	}
@@ -496,6 +496,25 @@ void Module::addConditionalSlider(bool condition, std::string text, std::string 
 	FlarialGUI::ResetOverrideAlphaValues();
 }
 
+void Module::addConditionalSlider(bool condition, std::string text, std::string subtext, std::string settingName, float maxVal, float minVal, bool zerosafe) {
+	FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalSliderAnims[sliderIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
+
+	if (condition) {
+		padding -= conditionalSliderAnims[sliderIndex];
+		FlarialGUI::lerp(conditionalSliderAnims[sliderIndex], 0.0f, 0.25f * FlarialGUI::frameFactor);
+		Module::addSlider(text, subtext, settingName, maxVal, minVal, zerosafe);
+	}
+	else {
+		FlarialGUI::lerp(conditionalSliderAnims[sliderIndex], Constraints::RelativeConstraint(0.05f, "height", true), 0.25f * FlarialGUI::frameFactor);
+		if (conditionalSliderAnims[sliderIndex] < Constraints::RelativeConstraint(0.0499f, "height", true)) {
+			padding -= conditionalSliderAnims[sliderIndex];
+			Module::addSlider(text, subtext, settingName, maxVal, minVal, zerosafe);
+		}
+		else sliderIndex++;
+	}
+
+	FlarialGUI::ResetOverrideAlphaValues();
+}
 
 void Module::addSlider(std::string text, std::string subtext, float& value, float maxVal, float minVal, bool zerosafe) {
 	float elementX = Constraints::PercentageConstraint(0.33f, "right");
@@ -512,7 +531,7 @@ void Module::addSlider(std::string text, std::string subtext, float& value, floa
 	sliderIndex++;
 }
 
-void Module::addResettableSlider(std::string text, std::string subtext, std::string settingName, float maxVal, float minVal, bool zerosafe) {
+void Module::addSlider(std::string text, std::string subtext, std::string settingName, float maxVal, float minVal, bool zerosafe) {
 	float elementX = Constraints::PercentageConstraint(0.33f, "right");
 	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
@@ -529,12 +548,32 @@ void Module::addResettableSlider(std::string text, std::string subtext, std::str
 	sliderIndex++;
 }
 
-void Module::addToggle(std::string text, std::string subtext, bool& value) {
+void Module::addConditionalToggle(bool condition, std::string text, std::string subtext, bool& value) {
+	FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalToggleAnims[toggleIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
+
+	if (condition) {
+		padding -= conditionalToggleAnims[toggleIndex];
+		FlarialGUI::lerp(conditionalToggleAnims[toggleIndex], 0.0f, 0.25f * FlarialGUI::frameFactor);
+		Module::addToggle(text, subtext, value);
+	}
+	else {
+		FlarialGUI::lerp(conditionalToggleAnims[toggleIndex], Constraints::RelativeConstraint(0.05f, "height", true), 0.25f * FlarialGUI::frameFactor);
+		if (conditionalToggleAnims[toggleIndex] < Constraints::RelativeConstraint(0.0499f, "height", true)) {
+			padding -= conditionalToggleAnims[toggleIndex];
+			Module::addToggle(text, subtext, value);
+		}
+		else toggleIndex++;
+	}
+
+	FlarialGUI::ResetOverrideAlphaValues();
+}
+
+void Module::addToggle(std::string text, std::string subtext, std::string settingName) {
 	float x = Constraints::PercentageConstraint(0.019, "left");
 	float elementX = Constraints::PercentageConstraint(0.119f, "right");
 	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-	if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false)) value = !value;
+	FlarialGUI::Toggle(toggleIndex, elementX, y, getOps<bool>(settingName), false, this->name, settingName);
 
 	Module::addElementText(text, subtext);
 
@@ -542,14 +581,12 @@ void Module::addToggle(std::string text, std::string subtext, bool& value) {
 	toggleIndex++;
 }
 
-void Module::addResettableToggle(std::string text, std::string subtext, std::string settingName) {
+void Module::addToggle(std::string text, std::string subtext, bool& value) {
 	float x = Constraints::PercentageConstraint(0.019, "left");
 	float elementX = Constraints::PercentageConstraint(0.119f, "right");
 	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
-	bool& value = settings.getSettingByName<bool>(settingName)->value;
-
-	if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false, this->name, settingName)) value = !value;
+	if (FlarialGUI::Toggle(toggleIndex, elementX, y, value, false)) value = !value;
 
 	Module::addElementText(text, subtext);
 
@@ -733,23 +770,23 @@ std::string& Module::getKeybind(const int keybindCount) {
 
 void Module::defaultAddSettings(std::string type) {
 	if (type == "main") {
-		addSlider("UI Scale", "", getOps<float>("uiscale"), 2.0f);
-		addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", getOps<bool>("BlurEffect"));
-		addSlider("Rounding", "Rounding of the rectangle", getOps<float>("rounding"));
-		addToggle("Background", "", getOps<bool>("showBg"));
-		addConditionalToggle(getOps<bool>("showBg"), "Background Shadow", "Displays a shadow under the background", getOps<bool>("rectShadow"));
-		addConditionalSlider(getOps<bool>("showBg") && getOps<bool>("rectShadow"), "Shadow Offset", "How far the shadow will be.", getOps<float>("rectShadowOffset"), 0.02f, 0.001f);
-		addToggle("Border", "", getOps<bool>("border"));
-		addConditionalSlider(getOps<bool>("border"), "Border Thickness", "", getOps<float>("borderWidth"), 4.f);
-		addToggle("Glow", "", getOps<bool>("glow"));
-		addConditionalSlider(getOps<bool>("glow"), "Glow Amount", "", getOps<float>("glowAmount"), 100.f);
+		addSlider("UI Scale", "", "uiscale", 2.0f);
+		addToggle("Translucency", "A blur effect, MAY BE PERFORMANCE HEAVY!", "BlurEffect");
+		addSlider("Rounding", "Rounding of the rectangle", "rounding");
+		addToggle("Background", "", "showBg");
+		addConditionalToggle(getOps<bool>("showBg"), "Background Shadow", "Displays a shadow under the background", "rectShadow");
+		addConditionalSlider(getOps<bool>("showBg") && getOps<bool>("rectShadow"), "Shadow Offset", "How far the shadow will be.", "rectShadowOffset", 0.02f, 0.001f);
+		addToggle("Border", "", "border");
+		addConditionalSlider(getOps<bool>("border"), "Border Thickness", "", "borderWidth", 4.f);
+		addToggle("Glow", "", "glow");
+		addConditionalSlider(getOps<bool>("glow"), "Glow Amount", "", "glowAmount", 100.f);
 	}
 	else if (type == "text") {
 		addTextBox("Format", "", getOps<std::string>("text"));
-		addSlider("Text Scale", "", getOps<float>("textscale"), 2.0f);
+		addSlider("Text Scale", "", "textscale", 2.0f);
 		addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center", "Right"}, getOps<std::string>("textalignment"));
-		addToggle("Text Shadow", "Displays a shadow under the text", getOps<bool>("textShadow"));
-		addConditionalSlider(getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", getOps<float>("textShadowOffset"), 0.02f, 0.001f);
+		addToggle("Text Shadow", "Displays a shadow under the text", "textShadow");
+		addConditionalSlider(getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", "textShadowOffset", 0.02f, 0.001f);
 	}
 	else if (type == "colors") {
 		addColorPicker("Text Color", "", "text");
@@ -760,14 +797,14 @@ void Module::defaultAddSettings(std::string type) {
 		addConditionalColorPicker(getOps<bool>("glow"), "Glow Color", "", "glow");
 	}
 	else if (type == "misc") {
-		addToggle("Responsive Rectangle", "Rectangle resizes with text", getOps<bool>("responsivewidth"));
-		addToggle("Reverse Padding X", "For Text Position", getOps<bool>("reversepaddingx"));
-		addToggle("Reverse Padding Y", "For Text Position", getOps<bool>("reversepaddingy"));
-		addSlider("Padding X", "For Text Position", getOps<float>("padx"), 1.f);
-		addSlider("Padding Y", "For Text Position", getOps<float>("pady"), 1.f);
-		addSlider("Rectangle Width", "", getOps<float>("rectwidth"), 2.f, 0.001f);
-		addSlider("Rectangle Height", "", getOps<float>("rectheight"), 2.f, 0.001f);
-		addSlider("Rotation", "", getOps<float>("rotation"), 360.f, 0, false);
+		addToggle("Responsive Rectangle", "Rectangle resizes with text", "responsivewidth");
+		addToggle("Reverse Padding X", "For Text Position", "reversepaddingx");
+		addToggle("Reverse Padding Y", "For Text Position", "reversepaddingy");
+		addSlider("Padding X", "For Text Position", "padx", 1.f);
+		addSlider("Padding Y", "For Text Position", "pady", 1.f);
+		addSlider("Rectangle Width", "", "rectwidth", 2.f, 0.001f);
+		addSlider("Rectangle Height", "", "rectheight", 2.f, 0.001f);
+		addSlider("Rotation", "", "rotation", 360.f, 0, false);
 	}
 }
 

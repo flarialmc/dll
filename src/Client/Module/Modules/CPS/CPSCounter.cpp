@@ -37,7 +37,7 @@ void CPSCounter::settingsRender(float settingsOffset) {
 
     addHeader("CPS Counter");
     defaultAddSettings("main");
-    addToggle("Right Click CPS", "", getOps<bool>("rightcps"));
+    addToggle("Right Click CPS", "", "rightcps");
     extraPadding();
 
     addHeader("Text");

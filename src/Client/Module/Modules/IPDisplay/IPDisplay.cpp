@@ -32,7 +32,7 @@ void IPDisplay::settingsRender(float settingsOffset) {
 
     addHeader("IP Display");
     defaultAddSettings("main");
-    addToggle("Show Port", "", getOps<bool>("port"));
+    addToggle("Show Port", "", "port");
     extraPadding();
 
     addHeader("Text");

@@ -36,7 +36,7 @@ void FPS::settingsRender(float settingsOffset) {
 
     addHeader("FPS Counter");
     defaultAddSettings("main");
-    addSlider("FPS Spoofer", "Adjusts the displayed FPS.", getOps<float>("fpsSpoofer"), 10.0f);
+    addSlider("FPS Spoofer", "Adjusts the displayed FPS.", "fpsSpoofer", 10.0f);
     extraPadding();
 
     addHeader("Text");

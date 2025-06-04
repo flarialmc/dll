@@ -128,7 +128,8 @@ std::string FlarialGUI::TextBox(int index, std::string& text, int limit, float x
             auto mod = ModuleManager::getModule(moduleName);
             mod->settings.deleteSetting(settingName);
             mod->defaultConfig();
-            text = mod->settings.getSettingByName<std::string>(settingName)->value;
+            if (special == 2) text = std::to_string(mod->settings.getSettingByName<float>(settingName)->value);
+            else text = mod->settings.getSettingByName<std::string>(settingName)->value;
             FlarialGUI::TextBoxes[index].text = text;
         }
     }

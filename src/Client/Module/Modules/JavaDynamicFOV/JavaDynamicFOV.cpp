@@ -33,8 +33,8 @@ void JavaDynamicFOV::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Java Dynamic FOV");
-    addSlider("Altered FOV target", "Target FOV when sprinting.", getOps<float>("fov_target"), 175, 0, false);
-    addSlider("Animation Speed", "Speed of FOV change.", getOps<float>("anim"), 0.60);
+    addSlider("Altered FOV target", "Target FOV when sprinting.", "fov_target", 175, 0, false);
+    addSlider("Animation Speed", "Speed of FOV change.", "anim", 0.60);
 
     FlarialGUI::UnsetScrollView();
     resetPadding();

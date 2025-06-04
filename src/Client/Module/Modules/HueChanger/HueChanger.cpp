@@ -29,7 +29,7 @@ void HueChanger::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Saturation");
-    addSlider("Saturation Intensity", "", getOps<float>("intensity"), 3.0f);
+    addSlider("Saturation Intensity", "", "intensity", 3.0f);
 
     FlarialGUI::UnsetScrollView();
     resetPadding();

@@ -32,8 +32,8 @@ void InstantHurtAnimation::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Instant Hurt Animation");
-    addToggle("Try to exclude team", "", getOps<bool>("tryToExcludeTeam"));
-    addToggle("Only with armor", "", getOps<bool>("onlyWithArmor"));
+    addToggle("Try to exclude team", "", "tryToExcludeTeam");
+    addToggle("Only with armor", "", "onlyWithArmor");
 
     FlarialGUI::UnsetScrollView();
 

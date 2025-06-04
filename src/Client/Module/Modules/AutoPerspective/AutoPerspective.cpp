@@ -38,13 +38,13 @@ void AutoPerspective::settingsRender(float settingsOffset) {
 
     addHeader("Auto Perspective");
 
-    addToggle("Elytra", "Toggle to change perspective while using elytra to fly.", getOps<bool>("elytra"));
+    addToggle("Elytra", "Toggle to change perspective while using elytra to fly.", "elytra");
     addDropdown("Elytra Perspective", "Your perspective while using elytra to fly", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, getOps<std::string>("elytraMode"));
 
-    addToggle("Swimming", "Toggle to change perspective while swimming.", getOps<bool>("swimming"));
+    addToggle("Swimming", "Toggle to change perspective while swimming.", "swimming");
     addDropdown("Swimming Perspective", "Your perspective while swimming.", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, getOps<std::string>("swimmingMode"));
 
-    //addToggle("Riding", "Toggle to change perspective while riding a mob.", getOps<bool>("riding"));
+    //addToggle("Riding", "Toggle to change perspective while riding a mob.", "riding");
     //addDropdown("Riding Perspective", "Your perspective while riding a mob", std::vector<std::string>{"1st Person", "3rd Person back", "3rd Person front"}, getOps<std::string>("ridingMode"));
     FlarialGUI::UnsetScrollView();
 

@@ -30,7 +30,7 @@ void Fullbright::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Fullbright");
-    addSlider("Brightness", "", getOps<float>("gamma"), 25.0f);
+    addSlider("Brightness", "", "gamma", 25.0f);
 
     FlarialGUI::UnsetScrollView();
 

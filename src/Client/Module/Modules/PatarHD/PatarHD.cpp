@@ -45,10 +45,10 @@ void PatarHD::settingsRender(float settingsOffset)
 
     addHeader("PatarHD");
     addDropdown("Mode", "", std::vector<std::string>{"Patar", "Jqms", "Chyves", "Nikita", "treegfx", "FreezeEngine", "StoneHunter", "beaver"}, getOps<std::string>("mode"));
-    addSlider("Scale", "", getOps<float>("scale"), 5.0F);
-    addToggle("DVD Mode", "See for yourself", getOps<bool>("dvdmode"));
-    addConditionalSlider(getOps<bool>("dvdmode"), "X Velocity", "", getOps<float>("xveloc"), 25.0f);
-    addConditionalSlider(getOps<bool>("dvdmode"), "Y Velocity", "", getOps<float>("yveloc"), 25.0f);
+    addSlider("Scale", "", "scale", 5.0F);
+    addToggle("DVD Mode", "See for yourself", "dvdmode");
+    addConditionalSlider(getOps<bool>("dvdmode"), "X Velocity", "", "xveloc", 25.0f);
+    addConditionalSlider(getOps<bool>("dvdmode"), "Y Velocity", "", "yveloc", 25.0f);
 
     FlarialGUI::UnsetScrollView();
     resetPadding();

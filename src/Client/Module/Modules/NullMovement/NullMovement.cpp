@@ -45,8 +45,8 @@ void NullMovement::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Misc");
-    addToggle("Vertical Nulling", "W & S keys", getOps<bool>("vertical"));
-    addToggle("Horizontal Nulling", "A & D keys", getOps<bool>("horizontal"));
+    addToggle("Vertical Nulling", "W & S keys", "vertical");
+    addToggle("Horizontal Nulling", "A & D keys", "horizontal");
 
     FlarialGUI::UnsetScrollView();
 

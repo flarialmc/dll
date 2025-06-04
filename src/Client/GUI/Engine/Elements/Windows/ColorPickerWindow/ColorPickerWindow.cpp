@@ -231,8 +231,8 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 			1.0f - ColorPickers[index].shade.y / shadePickerHeight
 		);
 
-		module->settings.getSettingByName<std::string>(settingName + "Col")->value = ColorFToHex(newColorLol);
-		module->settings.getSettingByName<float>(settingName + "Opacity")->value = ColorPickers[index].opacX / hlwidth;
+		module->getOps<std::string>(settingName + "Col") = ColorFToHex(newColorLol);
+		module->getOps<float>(settingName + "Opacity") = ColorPickers[index].opacX / hlwidth;
 
 		Circle(ColorPickers[index].shade.x + originalX, ColorPickers[index].shade.y + originalY, hueSelectorerOutline,
 			Constraints::SpacingConstraint(0.125f, hexPreviewSize));
@@ -255,7 +255,9 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 
 		x = Constraints::PercentageConstraint(0.04, "left");
 
-		if (Toggle(123, x, y, module->settings.getSettingByName<bool>(settingName + "RGB")->value, true)) module->settings.getSettingByName<bool>(settingName + "RGB")->value = !module->settings.getSettingByName<bool>(settingName + "RGB")->value;
+		Toggle(123, x, y, module->getOps<bool>(settingName + "RGB"), true, moduleName, settingName);
+
+		/*if (module->getOps<bool>(settingName + "RGB")) module->getOps<bool>(settingName + "RGB") = !module->getOps<bool>(settingName + "RGB");*/
 
 		FlarialTextWithFont(
 			x + Constraints::SpacingConstraint(0.60, Constraints::RelativeConstraint(0.12, "height", true)),

@@ -58,16 +58,16 @@ void Zoom::settingsRender(float settingsOffset)
 
     addHeader("Main");
     addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
-    addToggle("Use Scroll", "Allows to adjust zoom with scroll wheel.", getOps<bool>("UseScroll"));
-    addToggle("Toggle Zoom", "No need to hold the keybind to zoom.", getOps<bool>("toggleZoom"));
-    addSlider("Modifier", "How much to Zoom each time you scroll.", getOps<float>("modifier"), 30, 0, false);
-    addToggle("Disable Animation", "The animation when you zoom", getOps<bool>("disableanim"));
-    addSlider("Animation Speed", "Speed at which scroll zoom acts.", getOps<float>("anim"), 0.40);
-    addToggle("Save Modifier", "Saves the last zoom amount.", getOps<bool>("SaveModifier"));
-    addToggle("Hide Hand", "Hide hand when zooming.", getOps<bool>("hidehand"));
-    addToggle("Hide Modules", "Hides other modules when zooming.", getOps<bool>("hidemodules"));
-    addToggle("Always Animate", "Smooth zoom animation while sprinting.", getOps<bool>("alwaysanim"));
-    addToggle("Low Sensitivity", "Lower sensitivity when in zoom.", getOps<bool>("lowsens"));
+    addToggle("Use Scroll", "Allows to adjust zoom with scroll wheel.", "UseScroll");
+    addToggle("Toggle Zoom", "No need to hold the keybind to zoom.", "toggleZoom");
+    addSlider("Modifier", "How much to Zoom each time you scroll.", "modifier", 30, 0, false);
+    addToggle("Disable Animation", "The animation when you zoom", "disableanim");
+    addSlider("Animation Speed", "Speed at which scroll zoom acts.", "anim", 0.40);
+    addToggle("Save Modifier", "Saves the last zoom amount.", "SaveModifier");
+    addToggle("Hide Hand", "Hide hand when zooming.", "hidehand");
+    addToggle("Hide Modules", "Hides other modules when zooming.", "hidemodules");
+    addToggle("Always Animate", "Smooth zoom animation while sprinting.", "alwaysanim");
+    addToggle("Low Sensitivity", "Lower sensitivity when in zoom.", "lowsens");
 
     FlarialGUI::UnsetScrollView();
     resetPadding();

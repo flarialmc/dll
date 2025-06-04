@@ -85,7 +85,7 @@ void Time::settingsRender(float settingsOffset)
 
     addHeader("Time");
     defaultAddSettings("main");
-    addToggle("24 Hour Format", "", getOps<bool>("24"));
+    addToggle("24 Hour Format", "", "24");
     extraPadding();
 
     addHeader("Text");

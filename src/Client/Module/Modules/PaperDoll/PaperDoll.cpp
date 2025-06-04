@@ -50,8 +50,8 @@ void PaperDoll::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Movable Paperdoll");
-    addSlider("UI Scale", "", getOps<float>("uiscale"));
-    addToggle("Always Show", "", getOps<bool>("alwaysshow"));
+    addSlider("UI Scale", "", "uiscale");
+    addToggle("Always Show", "", "alwaysshow");
     FlarialGUI::UnsetScrollView();
     resetPadding();
 }

@@ -78,12 +78,12 @@ void RenderOptions::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Render Options");
-    addToggle("Chunk Borders", "", getOps<bool>("chunkborders"));
-    addToggle("Render Sky", "", getOps<bool>("sky"));
-    addToggle("Render Entities", "", getOps<bool>("entity"));
-    addToggle("Render Block Entities", "", getOps<bool>("blockentity"));
-    addToggle("Render Particles", "", getOps<bool>("particles"));
-    addToggle("Render Weather", "", getOps<bool>("weather"));
+    addToggle("Chunk Borders", "", "chunkborders");
+    addToggle("Render Sky", "", "sky");
+    addToggle("Render Entities", "", "entity");
+    addToggle("Render Block Entities", "", "blockentity");
+    addToggle("Render Particles", "", "particles");
+    addToggle("Render Weather", "", "weather");
 
     FlarialGUI::UnsetScrollView();
     resetPadding();

@@ -128,12 +128,12 @@ void ItemPhysics::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Item Physics");
-    addSlider("Speed", "", getOps<float>("speed"), 15.f, 3.f, false);
-    addSlider("X Multiplier", "", getOps<float>("xmul"), 30.f, 7.f, false);
-    addSlider("Y Multiplier", "", getOps<float>("ymul"), 30.f, 7.f, false);
-    addSlider("Z Multiplier", "", getOps<float>("zmul"), 30.f, 7.f, false);
-    addToggle("Preserve Rotations", "", getOps<bool>("preserverots"));
-    addToggle("Smooth Rotations", "", getOps<bool>("smoothrots"));
+    addSlider("Speed", "", "speed", 15.f, 3.f, false);
+    addSlider("X Multiplier", "", "xmul", 30.f, 7.f, false);
+    addSlider("Y Multiplier", "", "ymul", 30.f, 7.f, false);
+    addSlider("Z Multiplier", "", "zmul", 30.f, 7.f, false);
+    addToggle("Preserve Rotations", "", "preserverots");
+    addToggle("Smooth Rotations", "", "smoothrots");
 
     FlarialGUI::UnsetScrollView();
 

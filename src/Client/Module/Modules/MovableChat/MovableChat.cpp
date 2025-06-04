@@ -63,7 +63,7 @@ void MovableChat::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     this->addHeader("Movable Chat");
-    this->addToggle("Ping Sound", "Plays a sound when you're mentioned in the chat.", getOps<bool>("pingsound"));
+    this->addToggle("Ping Sound", "Plays a sound when you're mentioned in the chat.", "pingsound");
     if (settings.getSettingByName<bool>("pingsound"))
         if (getOps<bool>("pingsound"))
         {
@@ -73,7 +73,7 @@ void MovableChat::settingsRender(float settingsOffset)
             this->addButton("Choose Sound", "Choose a custom sound", "Choose", [this] {
                 WinrtUtils::pickAndCopyFiles(L"*", "\\assets");
             });
-            this->addToggle("@here", "Plays the sound when you are mentioned via @here", getOps<bool>("here"));
+            this->addToggle("@here", "Plays the sound when you are mentioned via @here", "here");
         }
     FlarialGUI::UnsetScrollView();
     this->resetPadding();

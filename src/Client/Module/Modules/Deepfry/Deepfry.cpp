@@ -30,7 +30,7 @@ void Deepfry::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Deepfry");
-    addToggle("Paint Effect", "", getOps<bool>("paint"));
+    addToggle("Paint Effect", "", "paint");
 
     FlarialGUI::UnsetScrollView();
 

@@ -48,8 +48,8 @@ void Sprint::settingsRender(float settingsOffset)
 
     addHeader("Toggle Sprint");
     addKeybind("Keybind", "Hold for 2 seconds!", getKeybind());
-    addToggle("Always Sprint", "Also known as auto sprint", getOps<bool>("always"));
-    addToggle("Show Status", "", getOps<bool>("status"));
+    addToggle("Always Sprint", "Also known as auto sprint", "always");
+    addToggle("Show Status", "", "status");
     extraPadding();
 
     addHeader("Main");
