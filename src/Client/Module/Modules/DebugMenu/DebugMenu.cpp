@@ -40,7 +40,7 @@ void JavaDebugMenu::defaultConfig() {
 	setDef("showSpeed", true);
 	setDef("showTargetedBlock", true);
 	setDef("showTargetedBlockTags", true);
-	setDef("showAllTags", true);
+	setDef("showMaxTags", true);
 	setDef("noOfTags", 10);
 }
 
@@ -81,8 +81,8 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
 	addToggle("Show Speed", "", "showSpeed");
 	addToggle("Show Targeted Block", "", "showTargetedBlock");
 	addConditionalToggle(getOps<bool>("showTargetedBlock"), "Show Targeted Block Tags", "", "showTargetedBlockTags");
-	addConditionalToggle(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags"), "Show All Block Tags", "", "showAllTags");
-	addConditionalSlider(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags") && !getOps<bool>("showAllTags"), "Number of tags to show", "", "noOfTags", 20, 1, true);
+	addConditionalToggle(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags"), "Show Maximum Number Of Block Tags", "", "showMaxTags");
+	addConditionalSlider(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags") && !getOps<bool>("showMaxTags"), "Number Of Tags To Be Show", "", "noOfTags", 20, 1, true);
 
 	FlarialGUI::UnsetScrollView();
 	resetPadding();
@@ -351,17 +351,25 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			right.emplace_back(lookingAt);
 			right.emplace_back("");
 			if (getOps<bool>("showTargetedBlockTags")) {
-				int maxTags = static_cast<int>(getOps<float>("noOfTags"));
-				if (getOps<bool>("showAllTags") || maxTags >= lookingAtTags.size()) {
+				bool showMax = getOps<bool>("showMaxTags");
+				int maxAllowedTags = static_cast<int>(getOps<float>("noOfTags"));
+				int maxFittableTags = static_cast<int>(MC::windowSize.y / (textHeight / 3.0f + yPadding * 2)) - right.size();
+				if (lookingAtTags.size() >= maxFittableTags && (showMax || maxAllowedTags >= maxFittableTags)) {
+					for (int i = 0; i < maxFittableTags; i++ ) {
+						right.emplace_back('#' + lookingAtTags[i]);
+					}
+					right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxFittableTags));
+				}
+				else if (showMax) {
 					for (const auto & i: lookingAtTags) {
 						right.emplace_back('#' + i);
 					}
 				}
 				else {
-					for (int i = 0; i < maxTags; i++ ) {
+					for (int i = 0; i < maxAllowedTags; i++ ) {
 						right.emplace_back('#' + lookingAtTags[i]);
 					}
-					right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxTags));
+					right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxAllowedTags));
 				}
 			}
 		}
