@@ -222,39 +222,22 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 		left.emplace_back("");
 
-		if (player) {
-			left.emplace_back(std::format("E: {}", player->getLevel()->getRuntimeActorList().size()));
-			left.emplace_back(getDimensionName());
-		}
-		else {
-			left.emplace_back("E: -1");
-			left.emplace_back("Dimension: Unknown dimension");
-		}
+		left.emplace_back(std::format("E: {}", player->getLevel()->getRuntimeActorList().size()));
+		left.emplace_back(getDimensionName());
 
 		left.emplace_back("");
 
-		if (player) {
-			Vec3<float> pos = *player->getPosition();
-			left.emplace_back(std::format("XYZ: {:.1f} / {:.1f} / {:.1f}", pos.x, pos.y, pos.z));
-			Vec3<int> blockPos(static_cast<int>(pos.x), static_cast<int>(pos.y), static_cast<int>(pos.z));
-			left.emplace_back(std::format("Block: {} {} {}", blockPos.x, blockPos.y, blockPos.z));
-			left.emplace_back(std::format("Chunk: {} {} {}", static_cast<int>(pos.x / 16), static_cast<int>(pos.y / 16), static_cast<int>(pos.z / 16)));
-			left.emplace_back(std::format("Chunk Coordinate: {} {}", static_cast<int>(pos.x) % 16, static_cast<int>(pos.y) % 16));
-			left.emplace_back(getFacingDirection(player));
-			left.emplace_back("");
-			HitResult target = player->getLevel()->getHitResult();
-			targetPos = { target.blockPos.x, target.blockPos.y, target.blockPos.z };
-			left.emplace_back(std::format("Looking at block: {} {} {}", targetPos.x, targetPos.y, targetPos.z));
-		}
-		else {
-			left.emplace_back("XYZ: 0 / 0 / 0");
-			left.emplace_back("Block: 0 0 0");
-			left.emplace_back("Chunk: 0 0 0");
-			left.emplace_back("Chunk Coordinate: 0 0");
-			left.emplace_back("Facing: nil (0 / 0)");
-			left.emplace_back("");
-			left.emplace_back("Looking at block: 0 0 0");
-		}
+		Vec3<float> pos = *player->getPosition();
+		left.emplace_back(std::format("XYZ: {:.1f} / {:.1f} / {:.1f}", pos.x, pos.y, pos.z));
+		Vec3<int> blockPos(static_cast<int>(pos.x), static_cast<int>(pos.y), static_cast<int>(pos.z));
+		left.emplace_back(std::format("Block: {} {} {}", blockPos.x, blockPos.y, blockPos.z));
+		left.emplace_back(std::format("Chunk: {} {} {}", static_cast<int>(pos.x / 16), static_cast<int>(pos.y / 16), static_cast<int>(pos.z / 16)));
+		left.emplace_back(std::format("Chunk Coordinate: {} {}", static_cast<int>(pos.x) % 16, static_cast<int>(pos.y) % 16));
+		left.emplace_back(getFacingDirection(player));
+		left.emplace_back("");
+		HitResult target = player->getLevel()->getHitResult();
+		targetPos = { target.blockPos.x, target.blockPos.y, target.blockPos.z };
+		left.emplace_back(std::format("Looking at block: {} {} {}", targetPos.x, targetPos.y, targetPos.z));
 
 		left.emplace_back("");
 
