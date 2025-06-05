@@ -28,8 +28,6 @@ void CommandHotkey::onSetup() {
 
 			});
 	}
-
-	//Logger::debug("{} after the size of this shit", keybindActions.size());
 }
 
 void CommandHotkey::onEnable() {
@@ -98,14 +96,17 @@ void CommandHotkey::settingsRender(float settingsOffset) {
 
 		if (settings.getSettingByName<std::string>(commandSettingName) != nullptr) {
 			this->addHeader(header);
-
 			this->addKeybind("Command Keybind", "Hold for 2 seconds!", getKeybind(i, true));
-
 			this->addTextBox(
 				"Command to Send",
 				"No need for /, And there's a spam limit!",
 				settings.getSettingByName<std::string>(commandSettingName)->value
 			);
+			this->addButton("Delete Hotkey", "", "Delete", [this, i]() {
+				this->settings.deleteSetting("command-" + FlarialGUI::cached_to_string(i));
+				this->settings.deleteSetting("keybind-" + FlarialGUI::cached_to_string(i));
+				this->saveSettings();
+				});
 			this->extraPadding();
 		}
 	}
@@ -116,7 +117,6 @@ void CommandHotkey::settingsRender(float settingsOffset) {
 }
 
 void CommandHotkey::onKey(KeyEvent& event) {
-	Logger::debug("{}", totalKeybinds);
 	if (!SDK::clientInstance->getLocalPlayer()) return;
 	if (isEnabled() && SDK::getCurrentScreen() == "hud_screen" && totalKeybinds > 0) {
 		for (size_t i = 0; i < totalKeybinds - 1; ++i) {
