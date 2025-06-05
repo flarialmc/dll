@@ -479,6 +479,7 @@ void HiveStat::onRender(RenderEvent &event) {
 }
 
 void HiveStat::onPacketReceive(PacketEvent &event) {
+    if (!this->isEnabled()) return;
     if (SDK::getServerIP().find("hive") == std::string::npos) return;
     MinecraftPacketIds id = event.getPacket()->getId();
 
@@ -496,7 +497,7 @@ void HiveStat::onPacketReceive(PacketEvent &event) {
 }
 
 void HiveStat::onKey(KeyEvent &event) {
-
+    if (!this->isEnabled()) return;
     if (event.getKey() == Utils::getStringAsKey(getOps<std::string>("Overlay")) &&
         static_cast<ActionType>(event.getAction()) == ActionType::Released) {
         renderOverlay = !renderOverlay;

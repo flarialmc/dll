@@ -44,7 +44,7 @@ void MovableHotbar::settingsRender(float settingsOffset)
 
 void MovableHotbar::onRender(RenderEvent& event)
 {
-
+    if (!this->isEnabled()) return;
     auto name = SDK::getCurrentScreen();
 
     if (name == "hud_screen" || name == "pause_screen") {
@@ -81,9 +81,9 @@ void MovableHotbar::onRender(RenderEvent& event)
 
 void MovableHotbar::onUIControlGetPosition(UIControlGetPositionEvent& event) const
 { // happens when game updates control position
+    if (!enabledState) return;
     auto control = event.getControl();
     if (control->getLayerName() == layerName) {
-        if (!enabledState) return;
         Vec2<float> scaledPos = PositionUtils::getScaledPos(currentPos);
         if (event.getPosition() == nullptr) { // 1.21.30 and below
             control->parentRelativePosition = scaledPos;
@@ -100,6 +100,7 @@ void MovableHotbar::onUIControlGetPosition(UIControlGetPositionEvent& event) con
 
 void MovableHotbar::onSetupAndRender(SetupAndRenderEvent& event)
 {
+    if (!this->isEnabled()) return;
     update();
 }
 

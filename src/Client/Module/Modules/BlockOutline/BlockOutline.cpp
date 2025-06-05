@@ -50,6 +50,7 @@ void BlockOutline::settingsRender(float settingsOffset) {
 }
 
 void BlockOutline::onOutlineSelection(RenderOutlineSelectionEvent &event) {
+    if (!this->isEnabled()) return;
     D2D1_COLOR_F color = getColor("outline");
 
     mce::MaterialPtr *material = MaterialUtils::getNametag();

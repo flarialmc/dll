@@ -44,6 +44,7 @@ void GuiScale::settingsRender(float settingsOffset) {
 }
 
 void GuiScale::onSetupAndRender(SetupAndRenderEvent &event) {
+    if (!this->isEnabled()) return;
     update();
 }
 

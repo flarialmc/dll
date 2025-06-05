@@ -19,7 +19,8 @@ private:
 public:
 	static inline bool animationFinished = true;
 	static inline bool jdfAnimationFinished = true;
-	Zoom();;
+	Zoom();
+
 
 	void onEnable() override;
 

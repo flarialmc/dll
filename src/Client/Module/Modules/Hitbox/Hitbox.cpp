@@ -49,6 +49,7 @@ void Hitbox::settingsRender(float settingsOffset) {
 }
 
 void Hitbox::onSetupAndRender(SetupAndRenderEvent &event) {
+    if (!this->isEnabled()) return;
     std::lock_guard<std::mutex> guard(renderMtx);
     aabbsToRender.clear();
     if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
@@ -77,7 +78,7 @@ void Hitbox::onSetupAndRender(SetupAndRenderEvent &event) {
 }
 
 void Hitbox::onRender(RenderEvent &event) {
-
+    if (!this->isEnabled()) return;
     if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
         !SDK::clientInstance->getLocalPlayer()->getLevel())
         return;

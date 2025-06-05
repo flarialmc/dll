@@ -41,7 +41,7 @@ void MovableTitle::settingsRender(float settingsOffset)
 
 void MovableTitle::onRender(RenderEvent& event)
 {
-
+    if (!this->isEnabled()) return;
     auto name = SDK::getCurrentScreen();
 
     if (name == "hud_screen" || name == "pause_screen") {
@@ -80,6 +80,7 @@ void MovableTitle::onRender(RenderEvent& event)
 
 void MovableTitle::onUIControlGetPosition(UIControlGetPositionEvent& event)
 { // happens when game updates control position
+    if (!this->isEnabled()) return;
     auto control = event.getControl();
     if (control->getLayerName() == layerName) {
         if (!isEnabled()) return;
@@ -103,6 +104,7 @@ void MovableTitle::onUIControlGetPosition(UIControlGetPositionEvent& event)
 
 void MovableTitle::onSetupAndRender(SetupAndRenderEvent& event)
 {
+    if (!this->isEnabled()) return;
     update();
 }
 

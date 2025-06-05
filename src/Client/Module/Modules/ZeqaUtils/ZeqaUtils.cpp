@@ -68,6 +68,7 @@ void ZeqaUtils::settingsRender(float settingsOffset)
 
 void ZeqaUtils::onPacketReceive(PacketEvent& event)
 {
+    if (!this->isEnabled()) return;
     MinecraftPacketIds id = event.getPacket()->getId();
     std::string ip = SDK::getServerIP();
     std::transform(ip.begin(), ip.end(), ip.begin(), ::tolower);

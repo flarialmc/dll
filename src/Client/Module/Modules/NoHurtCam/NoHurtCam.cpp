@@ -96,6 +96,7 @@ void NoHurtCam::onRaknetTick(RaknetTickEvent& event)
 
 void NoHurtCam::onTick(TickEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (!this->restricted) {
         patch();
     } else {

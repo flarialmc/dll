@@ -41,6 +41,7 @@ void InstantHurtAnimation::settingsRender(float settingsOffset) {
 }
 
 void InstantHurtAnimation::onPacketReceive(PacketEvent& event)  {
+    if (!this->isEnabled()) return;
     auto player = SDK::clientInstance->getLocalPlayer();
     if (!SDK::clientInstance->getLocalPlayer()) return;
     if (event.getPacket()->getId() == MinecraftPacketIds::ActorEvent) {
@@ -66,6 +67,7 @@ void InstantHurtAnimation::onPacketReceive(PacketEvent& event)  {
 }
 
 void InstantHurtAnimation::onAttack(AttackEvent &event) {
+    if (!this->isEnabled()) return;
     if (!event.getActor()->isValid()) return;
     if (!event.getActor()->isValidAABB()) return;
     if (!event.getActor()->hasCategory(ActorCategory::Player)) return;

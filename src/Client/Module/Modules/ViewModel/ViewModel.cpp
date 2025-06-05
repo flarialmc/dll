@@ -77,12 +77,14 @@ void ViewModel::settingsRender(float settingsOffset)
 
 void ViewModel::onGetPerspective(PerspectiveEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (event.getPerspective() == Perspective::FirstPerson) thirdperson = false;
     else thirdperson = true;
 }
 
 void ViewModel::onGetFOV(FOVEvent& event)
 {
+    if (!this->isEnabled()) return;
     auto fov = event.getFOV();
     if (fov != 70) return;
 
@@ -91,6 +93,7 @@ void ViewModel::onGetFOV(FOVEvent& event)
 
 void ViewModel::onRenderItemInHand(RenderItemInHandEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (thirdperson && getOps<bool>("thirdperson") || !thirdperson) {
         auto& matrix = SDK::clientInstance->getCamera().getWorldMatrixStack().top().matrix;
         if (!Matrixed) OriginalMatrix = matrix;

@@ -43,5 +43,6 @@ void TimeChanger::settingsRender(float settingsOffset)
 
 void TimeChanger::onTimeEvent(TimeEvent& event)
 {
+    if (!this->isEnabled()) return;
     event.setTime(getOps<float>("time"));
 }

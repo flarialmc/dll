@@ -65,6 +65,7 @@ void Waila::settingsRender(float settingsOffset)
 
 void Waila::onSetupAndRender(SetupAndRenderEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (!SDK::clientInstance->getLocalPlayer()) return;
     if (!SDK::clientInstance->getLocalPlayer()->getLevel()) return;
     if (!SDK::clientInstance->getBlockSource()) return;

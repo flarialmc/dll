@@ -72,6 +72,7 @@ void OpponentReach::onRender(RenderEvent& event)
 
 void OpponentReach::onPacketReceive(PacketEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (event.getPacket()->getId() == MinecraftPacketIds::ActorEvent) {
         auto packet = (EntityEventPacket*)event.getPacket();
         if (packet->EventID == ActorEvent::Hurt) {
@@ -124,6 +125,7 @@ void OpponentReach::onPacketReceive(PacketEvent& event)
 
 void OpponentReach::onTick(TickEvent& event)
 {
+    if (!this->isEnabled()) return;
     std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_hit;
     if (duration.count() >= 15) {
         opponentReach = 0;

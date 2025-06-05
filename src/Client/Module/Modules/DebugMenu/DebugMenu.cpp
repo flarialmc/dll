@@ -180,6 +180,7 @@ std::string JavaDebugMenu::getFormattedTime(long long seconds) {
 }
 
 void JavaDebugMenu::onTick(TickEvent& event) {
+	if (!this->isEnabled()) return;
 	if (!SDK::clientInstance->getLocalPlayer()) return;
 	auto stateVectorComponent = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent();
 	if (stateVectorComponent != nullptr) {
@@ -193,6 +194,7 @@ void JavaDebugMenu::onTick(TickEvent& event) {
 }
 
 void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) { // WAILA code
+	if (!this->isEnabled()) return;
 	if (!SDK::clientInstance->getLocalPlayer()) return;
 	if (!SDK::clientInstance->getLocalPlayer()->getLevel()) return;
 	if (!SDK::clientInstance->getBlockSource()) return;
@@ -228,6 +230,7 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) { // WAILA code
 }
 
 void JavaDebugMenu::onRender(RenderEvent& event) {
+	if (!this->isEnabled()) return;
 	if (this->active && SDK::clientInstance->getScreenName() == "hud_screen") {
 		float textHeight = Constraints::RelativeConstraint(0.1f * getOps<float>("uiscale"));
 		float textSize = Constraints::SpacingConstraint(2.0f, textHeight);
@@ -478,25 +481,27 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 		drawList->AddLine(center, redPos, black, lineWidth + (guiscale * 0.3));
 		drawList->AddLine(center, redPos, red, lineWidth);
 
-		// green line
-		drawList->AddLine(center, greenPos, black, lineWidth + (guiscale * 0.3));
-		drawList->AddLine(center, greenPos, green, lineWidth);
-
 		// blue line
 		drawList->AddLine(center, bluePos, black, lineWidth + (guiscale * 0.3));
 		drawList->AddLine(center, bluePos, blue, lineWidth);
+
+		// green line should be rendered last
+		drawList->AddLine(center, greenPos, black, lineWidth + (guiscale * 0.3));
+		drawList->AddLine(center, greenPos, green, lineWidth);
 
 		// debug menu crosshair end
 	}
 }
 
 void JavaDebugMenu::onHudCursorRendererRender(HudCursorRendererRenderEvent& event) {
+	if (!this->isEnabled()) return;
 	if (this->active && SDK::clientInstance && SDK::clientInstance->getScreenName() == "hud_screen" && SDK::clientInstance->getLocalPlayer() != nullptr) {
 		event.cancel();
 	}
 }
 
 void JavaDebugMenu::onKey(KeyEvent& event) {
+	if (!this->isEnabled()) return;
 	if (this->isKeyPartOfKeybind(event.key)) {
 		if (this->isKeybind(event.keys)) {
 			keybindActions[0]({});

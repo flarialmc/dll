@@ -171,6 +171,7 @@ std::vector<std::string> TabList::copyMapInAlphabeticalOrder(
 
 void TabList::normalRender(int index, std::string& value)
 {
+    if (!this->isEnabled()) return;
     if (SDK::hasInstanced && (active || ClickGUI::editmenu)) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             float keycardSize = Constraints::RelativeConstraint(
@@ -203,19 +204,17 @@ void TabList::normalRender(int index, std::string& value)
             float totalWidth = i2 * keycardSize;
             float fontSize = Constraints::SpacingConstraint(3, keycardSize);
 
-            D2D1_COLOR_F disabledColor = getOps<bool>("bgRGB") ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(getOps<std::string>("bgColor"));
-            D2D1_COLOR_F textColor = getOps<bool>("textRGB") ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(getOps<std::string>("textColor"));
-            D2D1_COLOR_F borderColor = getOps<bool>("borderRGB") ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(getOps<std::string>("borderColor"));
+            D2D1_COLOR_F disabledColor = getColor("bg");
+            D2D1_COLOR_F textColor = getColor("text");
+            D2D1_COLOR_F borderColor = getColor("border");
 
             disabledColor.a = getOps<float>("bgOpacity");
             textColor.a = getOps<float>("textOpacity");
             borderColor.a = getOps<float>("borderOpacity");
 
-            if (getOps<bool>("glow")) {
-                D2D1_COLOR_F glowColor = getOps<bool>("glowRGB") ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(getOps<std::string>("glowColor"));
-                glowColor.a = getOps<float>("glowOpacity");
-                FlarialGUI::ShadowRect(Vec2<float>(fakex, realcenter.y), Vec2<float>(totalWidth, 7.5f * keycardSize), glowColor, rounde.x, (getOps<float>("glowAmount")/100.f) *  Constraints::PercentageConstraint(0.1f, "top"));
-            }
+            if (getOps<bool>("glow")) 
+                FlarialGUI::ShadowRect(Vec2<float>(fakex, realcenter.y), Vec2<float>(totalWidth, 7.5f * keycardSize), getColor("glow"), rounde.x, (getOps<float>("glowAmount") / 100.f) * Constraints::PercentageConstraint(0.1f, "top"));
+            
 
             if (getOps<bool>("BlurEffect")) {
                 FlarialGUI::BlurRect(D2D1::RoundedRect(
@@ -303,7 +302,7 @@ void TabList::normalRender(int index, std::string& value)
                         realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize),
                         String::StrToWStr(name).c_str(),
                         keycardSize * 5, keycardSize,
-                        DWRITE_TEXT_ALIGNMENT_LEADING, fontSize,
+                        DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize),
                         DWRITE_FONT_WEIGHT_NORMAL, textColor, true
                     );
 
@@ -372,7 +371,7 @@ void TabList::normalRender(int index, std::string& value)
                         realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize),
                         String::StrToWStr(name).c_str(),
                         keycardSize * 5, keycardSize,
-                        DWRITE_TEXT_ALIGNMENT_LEADING, fontSize,
+                        DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize),
                         DWRITE_FONT_WEIGHT_NORMAL, textColor, true
                     );
 
@@ -390,12 +389,14 @@ void TabList::normalRender(int index, std::string& value)
 
 void TabList::onRender(RenderEvent& event)
 {
+    if (!this->isEnabled()) return;
     std::string text;
     this->normalRender(20, text);
 }
 
 void TabList::onKey(const KeyEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
         keybindActions[0]({});
     }

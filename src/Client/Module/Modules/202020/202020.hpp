@@ -49,6 +49,7 @@ public:
 	}
 
 	void onRender(RenderEvent& event) {
+		if (!this->isEnabled()) return;
 		now = std::chrono::steady_clock::now();
 		elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - last);
 

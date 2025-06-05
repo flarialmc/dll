@@ -56,6 +56,7 @@ void NullMovement::settingsRender(float settingsOffset)
 
 void NullMovement::onKey(KeyEvent& event)
 {
+    if (!this->isEnabled()) return;
     lastKey = event.getKey();
     lastKeys = event.keys;
     lastAction = event.getAction();

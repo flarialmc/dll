@@ -129,6 +129,7 @@ void AutoRQ::settingsRender(float settingsOffset) {
 }
 
 void AutoRQ::onPacketReceive(PacketEvent &event) {
+    if (!this->isEnabled()) return;
     MinecraftPacketIds id = event.getPacket()->getId();
 
     if (id == MinecraftPacketIds::SetTitle) {
@@ -341,6 +342,7 @@ void AutoRQ::onPacketReceive(PacketEvent &event) {
 }
 
 void AutoRQ::reQ() {
+    if (!this->isEnabled()) return;
     if (!getOps<bool>("hub")) {
         FlarialGUI::Notify("Finding a new game of " + HiveModeCatcherListener::fullgamemodename);
 

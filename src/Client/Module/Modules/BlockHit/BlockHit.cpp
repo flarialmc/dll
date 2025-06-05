@@ -16,7 +16,7 @@ void BlockHit::onDisable() {
 }
 
 void BlockHit::onItemInHandRender(RenderItemInHandEvent &event) {
-
+    if (!this->isEnabled()) return;
     auto& matrix = SDK::clientInstance->getCamera().getWorldMatrixStack().top().matrix;
     auto itemStack = event.itemStack;
 
@@ -58,5 +58,6 @@ void BlockHit::defaultConfig() {
 }
 
 void BlockHit::onPerspectiveChange(PerspectiveEvent &event)  {
+    if (!this->isEnabled()) return;
     this->perspective = event.getPerspective();
 }

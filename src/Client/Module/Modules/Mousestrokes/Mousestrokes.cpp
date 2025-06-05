@@ -79,12 +79,14 @@ void Mousestrokes::onRender(RenderEvent& event)
 
 void Mousestrokes::onMouse(MouseEvent& event)
 {
+    if (!this->isEnabled()) return;
     X += event.getMouseMovementX();
     Y += event.getMouseMovementY();
 }
 
 void Mousestrokes::normalRender(int index, std::string& value)
 {
+    if (!this->isEnabled()) return;
     if (!SDK::hasInstanced) return;
     if (SDK::clientInstance->getLocalPlayer() == nullptr) return;
 

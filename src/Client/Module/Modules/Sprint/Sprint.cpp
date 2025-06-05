@@ -82,6 +82,7 @@ void Sprint::onSetup()
 
 void Sprint::onKey(KeyEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
         keybindActions[0]({});
     }
@@ -89,6 +90,7 @@ void Sprint::onKey(KeyEvent& event)
 
 void Sprint::onRender(RenderEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (!this->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
 
     if (!getOps<bool>("status")) return;
@@ -131,6 +133,7 @@ void Sprint::onRender(RenderEvent& event)
 
 void Sprint::onTick(TickEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();

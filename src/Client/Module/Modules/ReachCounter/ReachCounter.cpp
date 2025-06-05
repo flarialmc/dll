@@ -64,12 +64,14 @@ void ReachCounter::settingsRender(float settingsOffset)
 
 void ReachCounter::onAttack(AttackEvent& event)
 {
+    if (!this->isEnabled()) return;
     Reach = event.getActor()->getLevel()->getHitResult().distance();
     last_hit = std::chrono::high_resolution_clock::now();
 }
 
 void ReachCounter::onTick(TickEvent& event)
 {
+    if (!this->isEnabled()) return;
     std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_hit;
     if (duration.count() >= 15) Reach = 0.0f;
 

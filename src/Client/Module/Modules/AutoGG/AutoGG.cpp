@@ -41,6 +41,7 @@ void AutoGG::settingsRender(float settingsOffset) {
 }
 
 void AutoGG::onPacketReceive(PacketEvent& event) {
+    if (!this->isEnabled()) return;
     MinecraftPacketIds id = event.getPacket()->getId();
 
     // TODO: add support for other servers (look for "won the game" text)
@@ -79,6 +80,7 @@ void AutoGG::onPacketReceive(PacketEvent& event) {
 }
 
 void AutoGG::SendGG() {
+    if (!this->isEnabled()) return;
     std::string win_message = getOps<std::string>("text");
     if (!win_message.empty()) {
         auto player = SDK::clientInstance->getLocalPlayer();

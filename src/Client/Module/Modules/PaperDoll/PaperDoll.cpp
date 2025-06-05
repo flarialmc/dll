@@ -58,7 +58,7 @@ void PaperDoll::settingsRender(float settingsOffset)
 
 void PaperDoll::onRender(RenderEvent& event)
 {
-
+    if (!this->isEnabled()) return;
     if (ClientInstance::getTopScreenName() == "hud_screen" &&
         this->isEnabled() ||
         ClientInstance::getTopScreenName() == "pause_screen" &&

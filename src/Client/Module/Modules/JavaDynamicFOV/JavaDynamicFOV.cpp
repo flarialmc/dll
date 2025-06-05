@@ -41,6 +41,7 @@ void JavaDynamicFOV::settingsRender(float settingsOffset) {
 }
 
 void JavaDynamicFOV::onGetFOV(FOVEvent &event) {
+    if (!this->isEnabled()) return;
     auto fov = event.getFOV();
     if (fov == 70) return;
     realFov = fov;

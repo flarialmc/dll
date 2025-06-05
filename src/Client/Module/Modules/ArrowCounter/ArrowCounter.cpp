@@ -52,6 +52,7 @@ void ArrowCounter::settingsRender(float settingsOffset) {
 }
 
 void ArrowCounter::onTick(TickEvent& event) {
+    if (!this->isEnabled()) return;
     if (SDK::hasInstanced && SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             if (SDK::clientInstance->getLocalPlayer()->getSupplies() != nullptr) {
@@ -86,6 +87,7 @@ void ArrowCounter::onTick(TickEvent& event) {
 }
 
 void ArrowCounter::onRender(RenderEvent& event) {
+    if (!this->isEnabled()) return;
     auto arrowsStr = FlarialGUI::cached_to_string(arrows);
     this->normalRender(13, arrowsStr);
 }

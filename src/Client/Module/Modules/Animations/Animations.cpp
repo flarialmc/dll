@@ -16,12 +16,14 @@ void Animations::onDisable() {
 }
 
 void Animations::onGetTexture(GetTextureEvent &event) {
+	if (!this->isEnabled()) return;
 	if (event.location->filePath == "textures/ui/selected_hotbar_slot") {
 		selectedHotbarSlotTexturePtr = event.textureData;
 	}
 }
 
 void Animations::onDrawImage(DrawImageEvent &event) {
+	if (!this->isEnabled()) return;
 	bool shouldAnimate = false;
 	if (VersionUtils::checkAboveOrEqual(21, 50)) {
 		if (selectedHotbarSlotTexturePtr == event.getTextureData()) {

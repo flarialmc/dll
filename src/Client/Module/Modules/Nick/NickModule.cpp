@@ -115,6 +115,7 @@ void NickModule::onRaknetTick(RaknetTickEvent& event)
 
 void NickModule::onDrawText(DrawTextEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer())
         return;
 
@@ -149,6 +150,7 @@ void NickModule::onDrawText(DrawTextEvent& event)
 
 void NickModule::onTick(TickEvent& event)
 {
+    if (!this->isEnabled()) return;
     auto player = SDK::clientInstance->getLocalPlayer();
     if (!player) return;
 

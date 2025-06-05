@@ -62,6 +62,7 @@ void PingCounter::settingsRender(float settingsOffset)
 
 void PingCounter::onRender(RenderEvent& event)
 {
+    if (!this->isEnabled()) return;
     auto pingStr = FlarialGUI::cached_to_string(SDK::getServerPing());
     this->normalRender(11, pingStr);
 }

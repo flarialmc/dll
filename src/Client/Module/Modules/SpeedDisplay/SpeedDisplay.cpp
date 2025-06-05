@@ -60,11 +60,13 @@ void SpeedDisplay::settingsRender(float settingsOffset)
 
 void SpeedDisplay::onRender(RenderEvent& event)
 {
+    if (!this->isEnabled()) return;
     this->normalRender(15, speed);
 }
 
 void SpeedDisplay::onTick(TickEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (!SDK::clientInstance->getLocalPlayer())
         return;
     auto stateVectorComponent = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent();

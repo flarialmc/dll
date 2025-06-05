@@ -53,6 +53,7 @@ void Sneak::settingsRender(float settingsOffset)
 
 void Sneak::onKey(KeyEvent& event)
 { // TODO: it lets sneak key up through (flickers sneak once)
+    if (!this->isEnabled()) return;
     if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
         toggleSneaking = !toggleSneaking;
     }
@@ -60,6 +61,7 @@ void Sneak::onKey(KeyEvent& event)
 
 void Sneak::onTick(TickEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (SDK::clientInstance != nullptr) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();

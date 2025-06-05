@@ -50,6 +50,7 @@ void WeatherChanger::settingsRender(float settingsOffset)
 
 void WeatherChanger::onTick(TickEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (!SDK::clientInstance->getBlockSource())
         return;
 

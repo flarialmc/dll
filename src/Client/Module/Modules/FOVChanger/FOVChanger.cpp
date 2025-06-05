@@ -40,6 +40,7 @@ void FOVChanger::settingsRender(float settingsOffset) {
 }
 
 void FOVChanger::onGetFOV(FOVEvent &event) {
+    if (!this->isEnabled()) return;
     if (!getOps<bool>("fovaffectshand")) {
         if (event.getFOV() == 70) return;
     }

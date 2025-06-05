@@ -51,6 +51,7 @@ void LowHealthIndicator::onDisable()
 
 void LowHealthIndicator::onTick(TickEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (SDK::clientInstance) if (SDK::clientInstance->getLocalPlayer())
         health = SDK::clientInstance->getLocalPlayer()->getHealth();
 }

@@ -121,6 +121,7 @@ void FreeLook::settingsRender(float settingsOffset) {
 }
 
 void FreeLook::onKey(KeyEvent &event) {
+    if (!this->isEnabled()) return;
     if (this->isKeyPartOfKeybind(event.key)) {
         if (this->isKeybind(event.keys)) { // key is defo pressed
             keybindActions[0]({});
@@ -139,6 +140,7 @@ void FreeLook::onUpdatePlayer(UpdatePlayerEvent& event) {
 }
 
 void FreeLook::onGetViewPerspective(PerspectiveEvent &event) {
+    if (!this->isEnabled()) return;
     if (this->active) {
         std::string setting = getOps<std::string>("mode");
         // TODO: Let use F5 (perspective switch key)

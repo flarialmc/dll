@@ -53,12 +53,14 @@ void EntityCounter::settingsRender(float settingsOffset) {
 }
 
 void EntityCounter::onSetupAndRender(SetupAndRenderEvent &event) {
+    if (!this->isEnabled()) return;
     if (SDK::clientInstance->getLocalPlayer()) {
         entityCount = (int)SDK::clientInstance->getLocalPlayer()->getLevel()->getRuntimeActorList().size();
     }
 }
 
 void EntityCounter::onRender(RenderEvent &event) {
+    if (!this->isEnabled()) return;
     if (SDK::clientInstance->getLocalPlayer() && SDK::getCurrentScreen() == "hud_screen") {
 
         std::string str = std::format("{}", entityCount);

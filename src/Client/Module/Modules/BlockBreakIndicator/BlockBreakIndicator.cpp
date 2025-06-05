@@ -82,6 +82,7 @@ void BlockBreakIndicator::settingsRender(float settingsOffset) {
 }
 
 void BlockBreakIndicator::normalRender(int index, std::string &value) {
+    if (!this->isEnabled()) return;
     if (SDK::getCurrentScreen() != "hud_screen") return;
 
     if (getOps<bool>("pbmode")) {
@@ -195,6 +196,7 @@ void BlockBreakIndicator::normalRender(int index, std::string &value) {
 }
 
 void BlockBreakIndicator::onRender(RenderEvent &event) {
+    if (!this->isEnabled()) return;
     if (
         SDK::hasInstanced && SDK::clientInstance != nullptr &&
         SDK::clientInstance->getLocalPlayer() != nullptr &&

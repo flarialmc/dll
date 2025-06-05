@@ -56,6 +56,7 @@ void PatarHD::settingsRender(float settingsOffset)
 
 void PatarHD::onRender(RenderEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (SDK::currentScreen != "hud_screen") return;
     float s = Constraints::RelativeConstraint(0.35, "height", true) * getOps<float>("scale");
     int draw = 165;

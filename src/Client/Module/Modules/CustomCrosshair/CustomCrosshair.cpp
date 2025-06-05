@@ -86,10 +86,12 @@ void CustomCrosshair::settingsRender(float settingsOffset) {
 }
 
 void CustomCrosshair::onGetViewPerspective(PerspectiveEvent &event) {
+    if (!this->isEnabled()) return;
     currentPerspective = event.getPerspective();
 }
 
 void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &event) {
+    if (!this->isEnabled()) return;
     if (!SDK::clientInstance) return;
     auto player = SDK::clientInstance->getLocalPlayer();
     if (!player) return;
@@ -130,14 +132,9 @@ void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &ev
 
     tess->begin(mce::PrimitiveMode::QuadList, 4);
 
-    D2D1_COLOR_F enemyColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("enemyColor")->value);
-    enemyColor.a = settings.getSettingByName<float>("enemyOpacity")->value;
-
-    D2D1_COLOR_F defaultColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("defaultColor")->value);
-    defaultColor.a = settings.getSettingByName<float>("defaultOpacity")->value;
-
     auto shouldHighlight = settings.getSettingByName<bool>("highlightOnEntity")->value;
-    D2D1_COLOR_F color = isHoveringEnemy && shouldHighlight ? enemyColor : defaultColor;
+
+    D2D1_COLOR_F color = isHoveringEnemy && shouldHighlight ? getColor("enemy") : getColor("default");
 
     tess->color(color.r, color.g, color.b, color.a);
 
@@ -181,6 +178,7 @@ void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &ev
 }
 
 void CustomCrosshair::onRender(RenderEvent &event) {
+    if (!this->isEnabled()) return;
     if (actuallyRenderWindow)
         CrosshairEditorWindow();
     else {

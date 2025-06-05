@@ -50,6 +50,7 @@ void SnapLook::settingsRender(float settingsOffset)
 
 void SnapLook::onKey(KeyEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key))
         keybindActions[0]({});
 
@@ -58,6 +59,7 @@ void SnapLook::onKey(KeyEvent& event)
 
 void SnapLook::onGetViewPerspective(PerspectiveEvent& event) const
 {
+    if (!this->enabledState) return;
     if (this->active)
         event.setPerspective(Perspective::ThirdPersonFront);
 }

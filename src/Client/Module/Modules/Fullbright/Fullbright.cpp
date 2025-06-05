@@ -38,5 +38,6 @@ void Fullbright::settingsRender(float settingsOffset) {
 }
 
 void Fullbright::onGetGamma(GammaEvent &event) {
+    if (!this->isEnabled()) return;
     event.setGamma(getOps<float>("gamma"));
 }

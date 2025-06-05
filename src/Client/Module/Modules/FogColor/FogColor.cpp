@@ -39,6 +39,7 @@ void FogColor::settingsRender(float settingsOffset) {
 }
 
 void FogColor::onGetFogColor(FogColorEvent &event) {
+    if (!this->isEnabled()) return;
     D2D1_COLOR_F color = getColor("fog");
     /*if (getOps<bool>("fog")) color = FlarialGUI::rgbColor;
 		else color = FlarialGUI::HexToColorF(getOps<std::string>("color"));*/

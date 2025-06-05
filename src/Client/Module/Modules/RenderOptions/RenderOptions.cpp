@@ -91,6 +91,7 @@ void RenderOptions::settingsRender(float settingsOffset)
 
 void RenderOptions::onSetupAndRender(SetupAndRenderEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (Options::isInitialized()) {
         updateSetings();
     };

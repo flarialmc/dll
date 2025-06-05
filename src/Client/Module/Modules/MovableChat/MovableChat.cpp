@@ -81,6 +81,7 @@ void MovableChat::settingsRender(float settingsOffset)
 
 void MovableChat::onPacket(PacketEvent& event)
 {
+    if (!this->isEnabled()) return;
     Packet* packet = event.getPacket();
     if (packet->getId() != MinecraftPacketIds::Text) return;
 
@@ -93,7 +94,7 @@ void MovableChat::onPacket(PacketEvent& event)
 
 void MovableChat::onRender(RenderEvent& event)
 {
-
+    if (!this->isEnabled()) return;
     auto name = SDK::getCurrentScreen();
 
     if (name == "hud_screen" || name == "pause_screen") {
@@ -134,6 +135,7 @@ void MovableChat::onRender(RenderEvent& event)
 
 void MovableChat::onUIControlGetPosition(UIControlGetPositionEvent& event)
 { // happens when game updates control position
+    if (!this->isEnabled()) return;
     auto control = event.getControl();
     if (control->getLayerName() == layerName) {
         if (!enabledState) return;
@@ -157,6 +159,7 @@ void MovableChat::onUIControlGetPosition(UIControlGetPositionEvent& event)
 
 void MovableChat::onSetupAndRender(SetupAndRenderEvent& event)
 {
+    if (!this->isEnabled()) return;
     update();
 }
 

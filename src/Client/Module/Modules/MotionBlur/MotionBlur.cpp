@@ -4,7 +4,7 @@ MotionBlur::MotionBlur(): Module("Motion Blur",
                                  "Make fast movements appear smoother and more realistic by\nblurring the image slightly in the direction of motion.",
                                  IDR_BLUR_PNG, "")
 {
-    Module::setup();
+    this->setup();
 
 }
 
@@ -63,7 +63,7 @@ void MotionBlur::settingsRender(float settingsOffset)
 
 void MotionBlur::onRender(RenderUnderUIEvent& event)
 {
-
+    if (!this->isEnabled()) return;
     if (SwapchainHook::queue) return;
 
     int maxFrames = (int)round(getOps<float>("intensity2"));

@@ -41,7 +41,7 @@ void MovableBossbar::defaultConfig()
 
 void MovableBossbar::onRender(RenderEvent& event)
 {
-
+    if (!this->isEnabled()) return;
     auto name = SDK::getCurrentScreen();
     if (name == "hud_screen" || name == "pause_screen") {
         float width = currentSize.x;
@@ -77,6 +77,7 @@ void MovableBossbar::onRender(RenderEvent& event)
 
 void MovableBossbar::onUIControlGetPosition(UIControlGetPositionEvent& event)
 { // happens when game updates control position
+    if (!this->isEnabled()) return;
     auto control = event.getControl();
     if (control->getLayerName() == layerName) {
         if (!isEnabled()) return;
@@ -96,6 +97,7 @@ void MovableBossbar::onUIControlGetPosition(UIControlGetPositionEvent& event)
 
 void MovableBossbar::onSetupAndRender(SetupAndRenderEvent& event)
 {
+    if (!this->isEnabled()) return;
     update();
 }
 

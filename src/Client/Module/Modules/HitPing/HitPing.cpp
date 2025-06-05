@@ -64,6 +64,7 @@ void HitPing::onRender(RenderEvent &event) {
 }
 
 void HitPing::onAttack(AttackEvent &event) { // only calculate ping on first hit
+    if (!this->isEnabled()) return;
     if (!event.getActor()->isValid()) return;
     if (!event.getActor()->isValidAABB()) return;
     ClearOldHits();
@@ -97,6 +98,7 @@ void HitPing::onAttack(AttackEvent &event) { // only calculate ping on first hit
 }
 
 void HitPing::onPacketReceive(PacketEvent &event) {
+    if (!this->isEnabled()) return;
     if (event.getPacket()->getId() == MinecraftPacketIds::ActorEvent) {
         auto packet = (EntityEventPacket*)event.getPacket();
         if (packet->EventID == ActorEvent::Hurt) {
@@ -148,6 +150,7 @@ void HitPing::onPacketReceive(PacketEvent &event) {
 }
 
 void HitPing::onTick(TickEvent &event) {
+    if (!this->isEnabled()) return;
     std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_hit;
     if (duration.count() >= 15) {
         pingReach = 0;

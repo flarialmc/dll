@@ -23,6 +23,7 @@ void Time::onDisable()
 
 void Time::onRender(RenderEvent& event)
 {
+    if (!this->isEnabled()) return;
     const auto now = std::time(nullptr);
     const std::tm calendarTime = localtime_xp(now);
 

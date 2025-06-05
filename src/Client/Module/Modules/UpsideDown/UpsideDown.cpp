@@ -21,6 +21,7 @@ void UpsideDown::onDisable()
 
 void UpsideDown::onGetFOV(FOVEvent& event)
 {
+    if (!this->isEnabled()) return;
     auto fov = event.getFOV();
     fov = 360 - fov;
     event.setFOV(fov);

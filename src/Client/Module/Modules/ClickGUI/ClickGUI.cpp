@@ -598,7 +598,6 @@ void ClickGUI::onRender(RenderEvent& event) {
 				c->addDropdown("Selected Config", "", Client::availableConfigs, Client::settings.getSettingByName<std::string>("currentConfig")->value);
 
 				c->addButton("Add a new config", "", "ADD", []() {
-
 					std::random_device rd;
 					std::mt19937 gen(rd());
 
@@ -610,7 +609,6 @@ void ClickGUI::onRender(RenderEvent& event) {
 					Client::settings.getSettingByName<std::string>("currentConfig")->value = configname;
 					FlarialGUI::Notify("Created & loaded: " + configname);
 					ScriptMarketplace::reloadAllConfigs();
-
 					});
 				c->addButton("Remove selected config", "DELETES YOUR CURRENT CONFIG", "DELETE", []() {
 					if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
@@ -639,6 +637,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 				c->extraPadding();
 
 				c->addHeader("Fonts");
+				c->addToggle("Pixelate Fonts (Enable For MC Font)", "Reload Minecraft to take full effect", Client::settings.getSettingByName<bool>("pixelateFonts")->value);
 				c->addTextBox("ClickGUI", "", Client::settings.getSettingByName<std::string>("fontname")->value, 48);
 				c->addSlider("Universal Font Scale", "", Client::settings.getSettingByName<float>("gui_font_scale")->value, 2.f, 0.5f, true);
 				c->addTextBox("Modules", "", Client::settings.getSettingByName<std::string>("mod_fontname")->value, 48);
@@ -886,6 +885,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 					if (wasEnabled) {
 						currentModule->getOps<bool>("enabled") = true;
 						currentModule->enabledState = true;
+						saveSettings();
 					}
 				}
 

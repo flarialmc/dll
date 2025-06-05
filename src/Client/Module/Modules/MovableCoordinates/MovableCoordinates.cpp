@@ -47,7 +47,7 @@ void MovableCoordinates::settingsRender(float settingsOffset)
 
 void MovableCoordinates::onRender(RenderEvent& event)
 {
-
+    if (!this->isEnabled()) return;
     auto name = SDK::getCurrentScreen();
 
     if (name == "hud_screen" || name == "pause_screen") {
@@ -86,6 +86,7 @@ void MovableCoordinates::onRender(RenderEvent& event)
 
 void MovableCoordinates::onUIControlGetPosition(UIControlGetPositionEvent& event)
 { // happens when game updates control position
+    if (!this->isEnabled()) return;
     auto control = event.getControl();
     if (control->getLayerName() == layerName) {
         if (!enabledState) return;
@@ -109,6 +110,7 @@ void MovableCoordinates::onUIControlGetPosition(UIControlGetPositionEvent& event
 
 void MovableCoordinates::onSetupAndRender(SetupAndRenderEvent& event)
 {
+    if (!this->isEnabled()) return;
     update();
 }
 

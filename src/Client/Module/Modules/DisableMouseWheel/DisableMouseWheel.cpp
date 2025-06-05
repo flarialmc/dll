@@ -44,6 +44,7 @@ void DisableMouseWheel::onMouse(MouseEvent &event) {
 }
 
 void DisableMouseWheel::onKey(KeyEvent &event) {
+    if (!this->isEnabled()) return;
     if (this->isKeybind(event.keys) &&
         this->isKeyPartOfKeybind(event.key) &&
         event.getAction() == ActionType::Pressed
