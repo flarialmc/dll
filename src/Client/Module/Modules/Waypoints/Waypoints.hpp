@@ -17,7 +17,7 @@ private:
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_used;
 	std::unordered_map<std::string, Waypoint> WaypointList;
 public:
-	Waypoints();;
+	Waypoints();
 
 	void onEnable() override;
 

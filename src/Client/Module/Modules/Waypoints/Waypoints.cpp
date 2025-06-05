@@ -4,7 +4,7 @@
 
 Waypoints::Waypoints(): Module("Waypoints", "Allows you to mark points in your world.", IDR_WAYPOINTS_PNG, "")
 {
-    Module::setup();
+    //Module::setup();
 }
 
 void Waypoints::onEnable()
@@ -20,18 +20,19 @@ void Waypoints::addWaypoint(int index, std::string name, std::string color, Vec3
     if (config)
     {
         std::string end = "-" + FlarialGUI::cached_to_string(index);
-        this->settings.addSetting("waypoint" + end, (std::string)name);
-        this->settings.addSetting("color" + end, (std::string)color);
-        this->settings.addSetting("x" + end, position.x);
-        this->settings.addSetting("y" + end, position.y);
-        this->settings.addSetting("z" + end, position.z);
-        this->settings.addSetting("state" + end, (bool)state);
-        this->settings.addSetting("rgb" + end, (bool)rgb);
-        this->settings.addSetting("opacity" + end, (float)opacity);
-        this->settings.addSetting("world" + end, (std::string)SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName());
-        this->settings.addSetting("dimension" + end, (std::string)SDK::clientInstance->getBlockSource()->getDimension()->getName());
-        this->settings.setValue("total", getOps<float>("total") + 1);
-        this->saveSettings();
+        settings.addSetting("waypoint" + end, (std::string)name);
+        setDef("wp" + end, (std::string)color, opacity, rgb);
+        //settings.addSetting("waypoint-" + end + "Col", (std::string)color);
+        settings.addSetting("x" + end, position.x);
+        settings.addSetting("y" + end, position.y);
+        settings.addSetting("z" + end, position.z);
+        settings.addSetting("state" + end, (bool)state);
+        //settings.addSetting("rgb" + end, (bool)rgb);
+        //settings.addSetting("opacity" + end, (float)opacity);
+        settings.addSetting("world" + end, (std::string)SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName());
+        settings.addSetting("dimension" + end, (std::string)SDK::clientInstance->getBlockSource()->getDimension()->getName());
+        settings.setValue("total", getOps<float>("total") + 1);
+        saveSettings();
 
         Waypoint wp(position, false, 100.0f, index, state);
         WaypointList[name] = wp;
@@ -58,12 +59,12 @@ void Waypoints::onSetup()
             addWaypoint(
                 index,
                 "waypoint-" + FlarialGUI::cached_to_string(index),
-                "FFFFFF",
+                "000000",
                 Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y - 1, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
                 true,
                 true,
                 false,
-                100.0f
+                0.55f
             );
             FlarialGUI::Notify("Added waypoint!");
             last_used = std::chrono::high_resolution_clock::now();
@@ -77,14 +78,14 @@ void Waypoints::onSetup()
             addWaypoint(
                 i,
                 this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(i))->value,
-                this->settings.getSettingByName<std::string>("color-" + FlarialGUI::cached_to_string(i))->value,
+                this->settings.getSettingByName<std::string>("wp-" + FlarialGUI::cached_to_string(i) + "Col")->value,
                 Vec3 {
                     this->settings.getSettingByName<float>("x-" + FlarialGUI::cached_to_string(i))->value, this->settings.getSettingByName<float>("y-" + FlarialGUI::cached_to_string(i))->value, this->settings.getSettingByName<float>("z-" + FlarialGUI::cached_to_string(i))->value
                 },
                 this->settings.getSettingByName<bool>("state-" + FlarialGUI::cached_to_string(i))->value,
                 false,
-                this->settings.getSettingByName<bool>("rgb-" + FlarialGUI::cached_to_string(i))->value,
-                this->settings.getSettingByName<float>("opacity-" + FlarialGUI::cached_to_string(i))->value
+                this->settings.getSettingByName<bool>("wp-" + FlarialGUI::cached_to_string(i) + "RGB")->value,
+                this->settings.getSettingByName<float>("wp-" + FlarialGUI::cached_to_string(i) + "Opacity")->value
             );
         }
 }
@@ -106,8 +107,8 @@ void Waypoints::defaultConfig()
     setDef("border", (std::string)"000000", 1.f, false);
     setDef("bgrounding", 10.0f);
     setDef("borderthickness", 2.5f);
-    setDef("text", (std::string)"000000", 1.f, false);
-    setDef("textuse", true);
+    setDef("text", (std::string)"FFFFFF", 1.f, false);
+    setDef("textuse", false);
     setDef("bguse", true);
     setDef("borderuse", true);
     setDef("border", true);
@@ -135,12 +136,12 @@ void Waypoints::settingsRender(float settingsOffset)
         addWaypoint(
             index,
             "waypoint-" + FlarialGUI::cached_to_string(index),
-            "FFFFFF",
+            "000000",
             Vec3{ SDK::clientInstance->getLocalPlayer()->getPosition()->x, SDK::clientInstance->getLocalPlayer()->getPosition()->y - 1, SDK::clientInstance->getLocalPlayer()->getPosition()->z },
             true,
             true,
             false,
-            100.0f
+            0.55f
         );
         FlarialGUI::Notify("Added! Scroll down for options.");
     });
@@ -172,18 +173,18 @@ void Waypoints::settingsRender(float settingsOffset)
         if (this->settings.getSettingByName<std::string>("world-" + FlarialGUI::cached_to_string(pair.second.index))->value != SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()) continue;
         this->addHeader(this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(pair.second.index))->value);
         this->addToggle("Enabled", "Change if the waypoint should be shown or not.", "state-" + FlarialGUI::cached_to_string(pair.second.index));
-        this->addColorPicker("Color", "Change the color of the waypoint.", "waypoint" + FlarialGUI::cached_to_string(pair.second.index));
+        this->addColorPicker("Color", "Change the color of the waypoint.", "wp-" + FlarialGUI::cached_to_string(pair.second.index));
         this->addTextBox("Name", "Change the name of the waypoint.", this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(pair.second.index))->value);
         this->addButton("Delete Waypoint", "", "Delete", [this, index = pair.second.index]() {
             std::string end = "-" + FlarialGUI::cached_to_string(index);
             this->settings.deleteSetting("waypoint" + end);
-            this->settings.deleteSetting("color" + end);
+            this->settings.deleteSetting("wp-" + end + "Col");
             this->settings.deleteSetting("x" + end);
             this->settings.deleteSetting("y" + end);
             this->settings.deleteSetting("z" + end);
             this->settings.deleteSetting("state" + end);
-            this->settings.deleteSetting("rgb" + end);
-            this->settings.deleteSetting("opacity" + end);
+            this->settings.deleteSetting("wp-" + end + "RGB");
+            this->settings.deleteSetting("wp-" + end + "Opacity");
             this->saveSettings();
         });
     }
@@ -195,6 +196,7 @@ void Waypoints::settingsRender(float settingsOffset)
 
 void Waypoints::onRender(RenderEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer() || SDK::getCurrentScreen() != "hud_screen" ||
         !SDK::clientInstance->getLocalPlayer()->getLevel() || !SDK::clientInstance->getBlockSource()->getDimension())
         return;
@@ -244,19 +246,18 @@ void Waypoints::onRender(RenderEvent& event)
 
                     //get the bg color
                     D2D1_COLOR_F rect;
-                    if (getOps<bool>("bguse")) rect = getColor("waypoint" + FlarialGUI::cached_to_string(pair.second.index));
+                    if (getOps<bool>("bguse")) rect = getColor("wp-" + FlarialGUI::cached_to_string(pair.second.index));
                     else rect = getColor("bg");
 
                     //get the border color
                     D2D1_COLOR_F border;
-                    if (getOps<bool>("borderuse")) border = getColor("waypoint" + FlarialGUI::cached_to_string(pair.second.index));
+                    if (getOps<bool>("borderuse")) border = getColor("wp-" + FlarialGUI::cached_to_string(pair.second.index));
                     else border = getColor("border");
 
                     //get the text color
                     D2D1_COLOR_F text;
-                    if (getOps<bool>("textuse")) text = getColor("waypoint" + FlarialGUI::cached_to_string(pair.second.index));
+                    if (getOps<bool>("textuse")) text = getColor("wp-" + FlarialGUI::cached_to_string(pair.second.index));
                     else text = getColor("text");
-                    text.a = getOps<float>("textopacity");
 
 
                     //################ DRAWING
