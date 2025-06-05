@@ -637,12 +637,16 @@ ImVec2 FlarialGUI::getFlarialTextSize(const wchar_t* text, const float width, co
 	const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
 	const DWRITE_FONT_WEIGHT weight, bool moduleFont, bool troll) {
 
+	bool pixelate = Client::settings.getSettingByName<bool>("pixelateFonts")->value;
+
 	std::string font = Client::settings.getSettingByName<std::string>(moduleFont ? "mod_fontname" : "fontname")->value;
 
 	const std::vector<int> fontSizeBuckets = { 16, 32, 64, 128, 256 };
 	float guiScale = Client::settings.getSettingByName<float>(moduleFont ? "modules_font_scale" : "gui_font_scale")->value;
 	float targetFontSize = (fontSize * guiScale) * 0.18f;
 	int baseFontSize = fontSizeBuckets.back();
+
+	if (pixelate && targetFontSize > 1.f) targetFontSize = floor(targetFontSize);
 
 	float scaleFactor = targetFontSize / static_cast<float>(baseFontSize);
 
@@ -670,6 +674,12 @@ ImVec2 FlarialGUI::getFlarialTextSize(const wchar_t* text, const float width, co
 	if (!FontMap[fontK]) return ImVec2{ 0, 0 };
 	if (FontMap[fontK]->Scale <= 0.0f || !FontMap[fontK]->IsLoaded()) return ImVec2{ 0, 0 };
 
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (pixelate) {
+		style.AntiAliasedLines = false; // Default is true
+		style.AntiAliasedFill = false;  // Default is true
+	}
+
 	ImGui::PushFont(FontMap[fontK]);
 	ImGui::SetWindowFontScale(scaleFactor);
 
@@ -678,6 +688,11 @@ ImVec2 FlarialGUI::getFlarialTextSize(const wchar_t* text, const float width, co
 
 	ImGui::SetWindowFontScale(1.0);
 	ImGui::PopFont();
+
+	if (pixelate) {
+		style.AntiAliasedLines = true; // Default is true
+		style.AntiAliasedFill = true;  // Default is true
+	}
 
 	return size;
 }
@@ -700,6 +715,8 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* tex
 	const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
 	const DWRITE_FONT_WEIGHT weight, D2D1_COLOR_F color, bool moduleFont) {
 
+	bool pixelate = Client::settings.getSettingByName<bool>("pixelateFonts")->value;
+
 	if (isInScrollView) y += scrollpos;
 	if (shouldAdditionalY) {
 		for (int i = 0; i < highestAddIndexes + 1; i++) {
@@ -716,6 +733,8 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* tex
 
 	float guiScale = Client::settings.getSettingByName<float>(moduleFont ? "modules_font_scale" : "gui_font_scale")->value;
 	float targetFontSize = (fontSize * guiScale) * 0.18f;
+
+	if (pixelate && targetFontSize > 1.f) targetFontSize = floor(targetFontSize);
 
 	const std::vector<int> fontSizeBuckets = { 16, 32, 64, 128, 256 };
 
@@ -753,6 +772,12 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* tex
 	if (!FontMap[fontK]) return "";
 	if (FontMap[fontK]->Scale <= 0.0f || !FontMap[fontK]->IsLoaded()) return "";
 
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (pixelate) {
+		style.AntiAliasedLines = false; // Default is true
+		style.AntiAliasedFill = false;  // Default is true
+	}
+	
 	ImGui::PushFont(FontMap[fontK]);
 	ImGui::SetWindowFontScale(scaleFactor);
 
@@ -778,11 +803,16 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* tex
 	TextSizesXY[fontedName] = Vec2<float>(size.x, size.y);
 	y += (height / 2) - (size.y / 2);
 
-	ImGui::GetBackgroundDrawList()->AddText(ImVec2(x, y), ImColor(color.r, color.g, color.b, color.a), stringText.c_str());
+	ImGui::GetBackgroundDrawList()->AddText(ImVec2(pixelate ? floor(x) : x, pixelate ? floor(y) : y), ImColor(color.r, color.g, color.b, color.a), stringText.c_str());
 
 	ImGui::SetWindowFontScale(1.0);
 	ImGui::PopFont();
 
+	if (pixelate) {
+		style.AntiAliasedLines = true; // Default is true
+		style.AntiAliasedFill = true;  // Default is true
+	}
+	
 	return fontedName;
 }
 
@@ -991,7 +1021,12 @@ bool FlarialGUI::LoadFontFromFontFamily(FontKey fontK) {
 			{
 
 				ImFontConfig config;
-				config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
+				if (Client::settings.getSettingByName<bool>("pixelateFonts")->value) {
+					config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_Monochrome;
+					config.OversampleH = 1;
+					config.OversampleV = 1;
+				} else config.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_MonoHinting;
+
 				config.FontDataOwnedByAtlas = false;
 				int FontDataSize = static_cast<int>(it->first.size());
 

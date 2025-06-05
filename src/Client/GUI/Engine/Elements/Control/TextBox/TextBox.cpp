@@ -77,9 +77,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
 
     cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
 
-    FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorX,
-                     x + FlarialGUI::TextSizes[ttext] + Constraints::SpacingConstraint(0.11, textWidth),
-                     0.420f * FlarialGUI::frameFactor);
+    FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorX, x + FlarialGUI::TextSizes[ttext] + Constraints::SpacingConstraint(0.11, textWidth), 0.420f * FlarialGUI::frameFactor);
 
     // white cursor blinky
     if (FlarialGUI::TextBoxes[index].cursorX > x)

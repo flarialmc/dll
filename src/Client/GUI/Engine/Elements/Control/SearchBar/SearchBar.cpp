@@ -94,9 +94,15 @@ std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit,
 
 			cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
 
-			FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorX,
-				(x - textWidth) + Constraints::RelativeConstraint(0.38, "height") +
-				FlarialGUI::TextSizes[name], 0.420f * FlarialGUI::frameFactor);
+			FlarialGUI::lerp(
+				FlarialGUI::TextBoxes[index].cursorX,
+				(x - textWidth) + Constraints::RelativeConstraint(0.38, "height") + 
+				FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(text).c_str(),
+					textWidth, percHeight,
+					DWRITE_TEXT_ALIGNMENT_LEADING,
+					Constraints::SpacingConstraint(0.60f, textWidth),
+					DWRITE_FONT_WEIGHT_NORMAL).x,
+				0.420f * FlarialGUI::frameFactor);
 
 			FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX,
 				y + Constraints::RelativeConstraint(0.2f) / 2.0f, cursorCol,
