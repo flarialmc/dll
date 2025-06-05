@@ -131,7 +131,7 @@ public:
                 }
             }
 
-            settings = std::move(newSettings);
+            this->settings = std::move(newSettings);
 
         } catch (const json::parse_error &e) {
             LOG_ERROR("An error occured while parsing settings: {}", e.what());

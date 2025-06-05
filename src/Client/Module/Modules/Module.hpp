@@ -43,8 +43,13 @@ public:
 		settings = Settings();
 		settingspath = isScripting ? Utils::getClientPath() + "\\Scripts\\Configs\\" + name + ".flarial" : Utils::getConfigsPath() + "\\" + name + ".flarial";
 
-		checkSettingsFile();
-		loadSettings();
+		//checkSettingsFile();
+		//loadSettings();
+	}
+
+	void postConstructInitialize() {
+		this->checkSettingsFile();
+		this->loadSettings();
 	}
 
 	bool active = false;
@@ -84,6 +89,7 @@ public:
 
 	template <typename T>
 	void setDef(std::string setting, T value);
+
 	void setDef(std::string setting, std::string col, float opac, bool rgb);
 
 	D2D_COLOR_F getColor(std::string text);
@@ -138,6 +144,7 @@ public:
 	bool isEnabled();
 	void setEnabled(bool enabled);
 	void setKeybind(const std::string& newKeybind);
+	std::string& getKeybind(const int keybindCount, bool whoCaresIfItsZeroOrNotTf);
 	std::string& getKeybind(const int keybindCount = 0);
 	virtual void defaultConfig(std::string type);
 	virtual void defaultConfig();

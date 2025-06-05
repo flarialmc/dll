@@ -46,6 +46,7 @@ T& Module::getOps(std::string setting) {
 }
 
 void Module::normalRenderCore(int index, std::string& text) {
+	if (!this->isEnabled()) return;
 	float rotation = getOps<float>("rotation");
 	DWRITE_TEXT_ALIGNMENT alignment = alignments[getOps<std::string>("textalignment")];
 	bool responsivewidth = getOps<bool>("responsivewidth");
@@ -317,7 +318,7 @@ void Module::addElementText(std::string text, std::string subtext) {
 }
 
 void Module::addButton(const std::string& text, const std::string& subtext, const std::string& buttonText, std::function<void()> action) {
-	float elementX = Constraints::PercentageConstraint(0.15f, "right");
+	float elementX = Constraints::PercentageConstraint(0.161f, "right");
 	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 	const float width = Constraints::RelativeConstraint(0.09f, "height", true);
 	const float height = Constraints::RelativeConstraint(0.035, "height", true);
@@ -327,7 +328,7 @@ void Module::addButton(const std::string& text, const std::string& subtext, cons
 	D2D1_COLOR_F f = D2D1::ColorF(D2D1::ColorF::White);
 	f.a = ClickGUI::settingsOpacity;
 
-	if (FlarialGUI::RoundedButton(buttonIndex, elementX, y, col, f, FlarialGUI::to_wide(buttonText).c_str(), width, height, round.x, round.y)) {
+	if (FlarialGUI::RoundedButton(buttonIndex, elementX, y - height / 2.f, col, f, FlarialGUI::to_wide(buttonText).c_str(), width, height, round.x, round.y)) {
 		action();
 	}
 
@@ -609,7 +610,7 @@ void Module::addToggle(std::string text, std::string subtext, bool& value) {
 }
 
 void Module::addKeybind(std::string text, std::string subtext, std::string& keybind) {
-	float elementX = Constraints::PercentageConstraint(0.13f, "right");
+	float elementX = Constraints::PercentageConstraint(0.134f, "right");
 	float y = Constraints::PercentageConstraint(0.08, "top") + padding;
 
 	FlarialGUI::KeybindSelector(keybindIndex, elementX, y, keybind);
@@ -621,7 +622,7 @@ void Module::addKeybind(std::string text, std::string subtext, std::string& keyb
 }
 
 void Module::addKeybind(std::string text, std::string subtext, std::string settingName, bool resettable) {
-	float elementX = Constraints::PercentageConstraint(0.13f, "right");
+	float elementX = Constraints::PercentageConstraint(0.134f, "right");
 	float y = Constraints::PercentageConstraint(0.08, "top") + padding;
 
 	FlarialGUI::KeybindSelector(keybindIndex, elementX, y, getOps<std::string>(settingName), this->name, settingName);
@@ -633,8 +634,39 @@ void Module::addKeybind(std::string text, std::string subtext, std::string setti
 }
 
 void Module::loadDefaults() {
-	settings.reset();
-	setup();
+	this->settings.reset();
+	this->saveSettings();
+	//this->loadSettings();
+	this->totalKeybinds = 0;
+	this->totalWaypoints = 0;
+	this->totalmaps = 0;
+
+	if (!isScripting()) this->defaultConfig();
+	else this->defaultConfig();
+
+	keybindActions.push_back([this](std::vector<std::any> args)-> std::any {
+		this->active = !this->active;
+		return {};
+		});
+
+	for (const auto& settingPair : settings.settings) {
+		const std::string& name = settingPair.first;
+		if (!ModuleManager::restartModules && name == "enabled" && this->settings.getSettingByName<bool>("enabled")->value) this->onEnable();
+
+		if (name.find("keybind") != std::string::npos) {
+			++totalKeybinds;
+		}
+		else if (name.find("waypoint") != std::string::npos) {
+			++totalWaypoints;
+		}
+		else if (name.find("map-") != std::string::npos) {
+			++totalmaps;
+		}
+	}
+
+	this->onSetup();
+	
+	this->saveSettings();
 }
 
 void Module::saveSettings() {
@@ -665,19 +697,19 @@ void Module::saveSettings() {
 
 void Module::loadSettings() {
 	if (isScripting()) {
-		settingspath = fmt::format("{}\\Scripts\\Configs\\{}.flarial", Utils::getClientPath(), name);
+		this->settingspath = fmt::format("{}\\Scripts\\Configs\\{}.flarial", Utils::getClientPath(), name);
 	}
 	else if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
-		settingspath = fmt::format("{}\\{}\\{}.flarial", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
+		this->settingspath = fmt::format("{}\\{}\\{}.flarial", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
 	}
 	else {
-		settingspath = fmt::format("{}\\{}.flarial", Utils::getConfigsPath(), name);
+		this->settingspath = fmt::format("{}\\{}.flarial", Utils::getConfigsPath(), name);
 	}
 	checkSettingsFile();
 
-	std::ifstream inputFile(settingspath);
+	std::ifstream inputFile(this->settingspath);
 	if (!inputFile.is_open()) {
-		LOG_ERROR("Failed to open file: {}", settingspath.string());
+		LOG_ERROR("Failed to open file: {}", this->settingspath.string());
 		return;
 	}
 
@@ -686,7 +718,7 @@ void Module::loadSettings() {
 	inputFile.close();
 
 	if (!ss.str().empty() && ss.str() != "null") {
-		settings.FromJson(ss.str());
+		this->settings.FromJson(ss.str());
 	}
 	else {
 		this->loadDefaults();
@@ -698,6 +730,8 @@ void Module::loadSettings() {
 
 	for (const auto& settingPair : settings.settings) {
 		const std::string& name = settingPair.first;
+		if (!ModuleManager::restartModules && name == "enabled" && this->settings.getSettingByName<bool>("enabled")->value) this->onEnable();
+
 		if (name.find("keybind") != std::string::npos) {
 			++totalKeybinds;
 		}
@@ -708,6 +742,8 @@ void Module::loadSettings() {
 			++totalmaps;
 		}
 	}
+
+	this->onSetup();
 }
 
 void Module::checkSettingsFile() {
@@ -727,7 +763,8 @@ void Module::toggle() {
 
 void Module::setup() {
 	if (!isScripting()) this->defaultConfig();
-	else Module::defaultConfig();
+	else this->defaultConfig();
+
 	keybindActions.push_back([this](std::vector<std::any> args)-> std::any {
 		this->active = !this->active;
 		return {};
@@ -736,7 +773,7 @@ void Module::setup() {
 	onSetup();
 	// TODO: might call on enable twice
 
-	if (getOps<bool>("enabled")) onEnable();
+	//if (!ModuleManager::initialized && !ModuleManager::restartModules) if (getOps<bool>("enabled")) onEnable();
 }
 
 void Module::onSetup() {}
@@ -744,8 +781,7 @@ void Module::onSetup() {}
 // TODO: rename to Enable/Disable?
 void Module::onEnable() {
 	enabledState = true;
-	if (settings.getSettingByName<bool>("enabled"))
-		getOps<bool>("enabled") = true;
+	if (settings.getSettingByName<bool>("enabled")) getOps<bool>("enabled") = true;
 	saveSettings();
 }
 
@@ -753,8 +789,7 @@ void Module::onDisable() {
 	enabledState = false;
 	active = false;
 	if (!terminating) {
-		if (settings.getSettingByName<bool>("enabled"))
-			getOps<bool>("enabled") = false;
+		if (settings.getSettingByName<bool>("enabled")) getOps<bool>("enabled") = false;
 	}
 	saveSettings();
 }
@@ -789,8 +824,14 @@ std::string& Module::getKeybind(const int keybindCount) {
 	std::string count;
 	if (keybindCount > 0) count = "-" + FlarialGUI::cached_to_string(keybindCount);
 	auto key = settings.getSettingByName<std::string>("keybind" + count);
-	if (key == nullptr)
-		settings.addSetting("keybind", defaultKeybind);
+	if (key == nullptr) settings.addSetting("keybind", defaultKeybind);
+	return key->value;
+}
+
+std::string& Module::getKeybind(const int keybindCount, bool whoCaresIfItsZeroOrNotTf) {
+	std::string count = "-" + FlarialGUI::cached_to_string(keybindCount);
+	auto key = settings.getSettingByName<std::string>("keybind" + count);
+	if (key == nullptr) settings.addSetting("keybind", defaultKeybind);
 	return key->value;
 }
 
@@ -891,11 +932,15 @@ void Module::defaultConfig(std::string type) {
 }
 
 void Module::defaultConfig() {
+	//Logger::debug("{}", this->name);
+	//this->defaultConfig();
+	//if (this->name == "Zoom") Logger::debug("idk man");
 	getKeybind();
 	defaultConfig("core");
 }
 
 bool Module::isKeybind(const std::array<bool, 256>& keys, const int keybindCount) {
+	getKeybind();
 	std::string count = "keybind";
 	if (keybindCount > 0) count += "-" + FlarialGUI::cached_to_string(keybindCount);
 	if (!settings.getSettingByName<std::string>(count)) { return false; }

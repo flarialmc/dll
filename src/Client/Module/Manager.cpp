@@ -278,15 +278,17 @@ void ModuleManager::terminate() {
 
 
 void ModuleManager::restart(){
+    ModuleManager::restartModules = true;
     initialized = false;
     for (const auto& pair : moduleMap) {
         if (pair.second) {
             std::shared_ptr mod = getModule(pair.second->name);
             if (mod != nullptr) {
+                bool old = mod->enabledState;
                 mod->settings.reset();
+                if (mod->isEnabled()) mod->onDisable();
                 mod->loadSettings();
                 mod->defaultConfig();
-                bool old = mod->enabledState;
                 mod->enabledState = mod->isEnabled();
                 if (old != mod->enabledState) {
                     if (mod->enabledState) mod->onEnable();
@@ -295,6 +297,7 @@ void ModuleManager::restart(){
             }
         }
     }
+    ModuleManager::restartModules = false;
     initialized = true;
 
     ScriptManager::reloadScripts();

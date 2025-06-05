@@ -146,8 +146,6 @@ void Client::initialize() {
     VersionUtils::initialize();
     version = VersionUtils::getFormattedVersion();
 
-
-
     if (!VersionUtils::isSupported(Client::version)) {
         LOG_FATAL("{}", "Unsupported Minecraft version");
         Utils::MessageDialogW(L"Flarial: this version is not supported!", L"VERSION NOT SUPPORTED!");
@@ -237,6 +235,7 @@ void Client::initialize() {
     ADD_SETTING("rgb_speed", 1.0f);
     ADD_SETTING("rgb_saturation", 1.0f);
     ADD_SETTING("rgb_value", 1.0f);
+    ADD_SETTING("pixelateFonts", false);
     ADD_SETTING("modules_font_scale", 1.0f);
     ADD_SETTING("gui_font_scale", 1.0f);
     ADD_SETTING("overrideFontWeight", false);
