@@ -6,7 +6,7 @@
 TextHotkey::TextHotkey(): Module("Text Hotkey", "Send something in chat with a\nclick of a button!",
                                  IDR_TEXT_BOX_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void TextHotkey::onEnable()
@@ -55,8 +55,6 @@ void TextHotkey::settingsRender(float settingsOffset)
             KeyEvent event = std::any_cast<KeyEvent>(args[0]);
             std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
             if (duration.count() >= 2.5) {
-                std::string count;
-                if (i > 0) count = "-" + FlarialGUI::cached_to_string(i);
                 if (this->isKeybind(event.keys, i) && this->isKeyPartOfKeybind(event.key, i)) {
                     auto player = SDK::clientInstance->getLocalPlayer();
                     //std::string xuid = *player->getXuid(&xuid);
@@ -65,7 +63,7 @@ void TextHotkey::settingsRender(float settingsOffset)
 
                     akbar->type = TextPacketType::CHAT;
                     akbar->message = std::regex_replace(
-                        this->settings.getSettingByName<std::string>("text" + count)->value, std::regex("�"), "§");
+                        this->settings.getSettingByName<std::string>("text-" + FlarialGUI::cached_to_string(i))->value, std::regex("�"), "§");
                     akbar->platformId = "";
                     akbar->translationNeeded = false;
                     //akbar->xuid = xuid;
@@ -85,15 +83,15 @@ void TextHotkey::settingsRender(float settingsOffset)
     });
 
 
-    for (int i = 0; i < totalKeybinds; ++i) {
+    for (size_t i = 1; i < totalKeybinds; ++i) {
 
-        std::string header = (i == 0) ? "Text" : "Text " + FlarialGUI::cached_to_string(i);
-        std::string commandSettingName = (i == 0) ? "text" : "text-" + FlarialGUI::cached_to_string(i);
+        std::string header = "Text " + FlarialGUI::cached_to_string(i);
+        std::string commandSettingName =  "text-" + FlarialGUI::cached_to_string(i);
 
         if (settings.getSettingByName<std::string>(commandSettingName) != nullptr) {
             this->addHeader(header);
 
-            this->addKeybind("Text Hotkey", "Hold for 2 seconds!", "keybind" + i, true);
+            this->addKeybind("Text Hotkey", "Hold for 2 seconds!", getKeybind(i, true));
 
             this->addTextBox(
                 "Text to Send",
@@ -111,15 +109,12 @@ void TextHotkey::settingsRender(float settingsOffset)
 
 void TextHotkey::onSetup()
 {
-
-    for (int i = 0; i < totalKeybinds; ++i) {
+    for (size_t i = 1; i < totalKeybinds; ++i) {
         keybindActions.push_back([this, i](std::vector<std::any> args) -> std::any {
-
+            
             KeyEvent event = std::any_cast<KeyEvent>(args[0]);
             std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
             if (duration.count() >= 2.5) {
-                std::string count;
-                if (i > 0) count = "-" + FlarialGUI::cached_to_string(i);
                 if (this->isKeybind(event.keys, i) && this->isKeyPartOfKeybind(event.key, i)) {
                     auto player = SDK::clientInstance->getLocalPlayer();
                     //std::string xuid = *player->getXuid(&xuid);
@@ -128,7 +123,7 @@ void TextHotkey::onSetup()
 
                     akbar->type = TextPacketType::CHAT;
                     akbar->message = std::regex_replace(
-                        this->settings.getSettingByName<std::string>("text" + count)->value, std::regex("�"), "§");
+                        this->settings.getSettingByName<std::string>("text-" + FlarialGUI::cached_to_string(i))->value, std::regex("�"), "§");
                     akbar->platformId = "";
                     akbar->translationNeeded = false;
                     //akbar->xuid = xuid;
@@ -148,9 +143,10 @@ void TextHotkey::onSetup()
 
 void TextHotkey::onKey(KeyEvent& event)
 {
+    if (!this->isEnabled()) return;
     if (!SDK::clientInstance->getLocalPlayer()) return;
-    if (this->isEnabled()) {
-        for (int i = 0; i <= totalKeybinds; ++i) {
+    if (this->isEnabled() && totalKeybinds > 0) {
+        for (size_t i = 0; i < totalKeybinds - 1; ++i) {
             keybindActions[i]({ std::any(event) });
         }
     }
