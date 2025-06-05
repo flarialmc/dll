@@ -443,6 +443,8 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			rightYoffset += textHeight / 3.0f + yPadding * 2;
 		}
 
+		if (ModuleManager::getModule("ClickGUI")->active) return;
+
 		// debug menu crosshair start
 
 		float guiscale = SDK::clientInstance->getGuiData()->getGuiScale();
@@ -460,7 +462,6 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 		ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 
-		ImU32 black = IM_COL32(0, 0, 0, 255);
 		ImU32 red = IM_COL32(255, 0, 0, 255);
 		ImU32 green = IM_COL32(0, 255, 0, 255);
 		ImU32 blue = IM_COL32(0, 0, 255, 255);
@@ -477,20 +478,29 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			center.y - lineLength * cos(yawRad) * sin(pitchRad)
 		);
 
-		// red line
-		drawList->AddLine(center, redPos, black, lineWidth + (guiscale * 0.3));
-		drawList->AddLine(center, redPos, red, lineWidth);
+		// red line (-yaw)
+		if (lerpYaw < 0.0f) drawVector(drawList, center, redPos, red, lineWidth, lineLength, guiscale);
 
-		// blue line
-		drawList->AddLine(center, bluePos, black, lineWidth + (guiscale * 0.3));
-		drawList->AddLine(center, bluePos, blue, lineWidth);
+		// blue line (< 90abs yaw)
+		if (abs(lerpYaw) < 90.f) drawVector(drawList, center, bluePos, blue, lineWidth, lineLength, guiscale);
 
-		// green line should be rendered last
-		drawList->AddLine(center, greenPos, black, lineWidth + (guiscale * 0.3));
-		drawList->AddLine(center, greenPos, green, lineWidth);
+		// green line
+		drawVector(drawList, center, greenPos, green, lineWidth, lineLength, guiscale);
+
+		// red line (+yaw)
+		if (lerpYaw > 0.0f) drawVector(drawList, center, redPos, red, lineWidth, lineLength, guiscale);
+
+		// blue line (> 90abs yaw)
+		if (abs(lerpYaw) > 90.f) drawVector(drawList, center, bluePos, blue, lineWidth, lineLength, guiscale);
 
 		// debug menu crosshair end
 	}
+}
+
+void JavaDebugMenu::drawVector(ImDrawList* drawList, ImVec2 center, ImVec2 endPos, ImU32 col, float lineWidth, float lineLength, float guiscale) {
+	ImU32 black = IM_COL32(0, 0, 0, 255);
+	drawList->AddLine(center, endPos, black, lineWidth + (guiscale * 0.3));
+	drawList->AddLine(center, endPos, col, lineWidth);
 }
 
 void JavaDebugMenu::onHudCursorRendererRender(HudCursorRendererRenderEvent& event) {

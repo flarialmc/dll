@@ -67,4 +67,6 @@ public:
 	void onKey(KeyEvent& event);
 
 	void onHudCursorRendererRender(HudCursorRendererRenderEvent& event);
+
+	void drawVector(ImDrawList* drawList, ImVec2 center, ImVec2 endPos, ImU32 col, float lineWidth, float lineLength, float guiscale);
 };
