@@ -9,8 +9,7 @@ private:
 public:
 	CommandHotkey() : Module("Command Hotkey", "Send command with a\nclick of a button!",
 		IDR_TEXT_BOX_PNG, "") {
-
-		Module::setup();
+		
 	};
 	void onSetup() override;
 
