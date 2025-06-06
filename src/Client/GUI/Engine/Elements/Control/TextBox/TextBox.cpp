@@ -111,6 +111,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string &text, int limit, f
 
 std::string FlarialGUI::TextBox(int index, std::string& text, int limit, float x, float y, float width, float height, int special, std::string moduleName, std::string settingName) {
     if (isInScrollView) y += scrollpos;
+    if (!clickgui->active) return text;
 
     const float textWidth = Constraints::RelativeConstraint(0.12, "height", true);
     float textSize = Constraints::SpacingConstraint(1.0, textWidth);

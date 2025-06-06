@@ -76,6 +76,8 @@ void FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, s
 
     if (isAdditionalY) SetIsInAdditionalYMode();
 
+    if (!clickgui->active) return;
+
     if (isInScrollView) y += FlarialGUI::scrollpos;
 
     if (CursorInRect(x, y, rectWidth, rectHeight) && clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value > 0.95f) {
