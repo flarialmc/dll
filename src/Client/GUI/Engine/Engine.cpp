@@ -1192,7 +1192,8 @@ void FlarialGUI::UnsetScrollView() {
 	D2D::context->PopAxisAlignedClip();
 }
 
-void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int currentNum, float fixer) {
+void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int currentNum) {
+	float fixer = 0;
 	isInWindowRect = true;
 
 	D2D1_COLOR_F c = D2D1::ColorF(D2D1::ColorF::White);

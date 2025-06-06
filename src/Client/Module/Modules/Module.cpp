@@ -5,6 +5,7 @@
 #include "ClickGUI/ClickGUI.hpp"
 #include "Scripting/ScriptManager.hpp"
 #include <vector>
+#include <cmath>
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -219,7 +220,6 @@ void Module::normalRenderCore(int index, std::string& text) {
 }
 
 void Module::normalRender(int index, std::string& value) {
-	Logger::debug("{}", SDK::getCurrentScreen());
 	if (!isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
 
 	std::string text{};
@@ -666,7 +666,7 @@ void Module::loadDefaults() {
 	}
 
 	this->onSetup();
-	
+
 	this->saveSettings();
 }
 
@@ -991,11 +991,26 @@ bool Module::isKeyPartOfAdditionalKeybind(int keyCode, const std::string& bind) 
 	return std::find(keyCodes.begin(), keyCodes.end(), keyCode) != keyCodes.end();
 }
 
+long long _lastScrollId = 0;
+
 void Module::checkForRightClickAndOpenSettings(float x, float y, float width, float height) {
+	if (MC::scrollId != _lastScrollId) {
+		if (FlarialGUI::CursorInRect(x, y, width, height)) {
+			if (MC::lastMouseScroll == MouseAction::ScrollUp) {
+				auto uiscale = this->settings.getSettingByName<float>("uiscale");
+				if (uiscale != nullptr) uiscale->value = std::min(5.f, uiscale->value + 0.05f);
+				_lastScrollId = MC::scrollId;
+			}
+			else {
+				auto uiscale = this->settings.getSettingByName<float>("uiscale");
+				if (uiscale != nullptr) uiscale->value = std::max(0.01f, uiscale->value - 0.05f);
+				_lastScrollId = MC::scrollId;
+			}
+		}
+	}
 	if (FlarialGUI::CursorInRect(x, y, width, height) && MC::mouseButton == MouseButton::Right && MC::held) {
 		auto module = ModuleManager::getModule("ClickGUI");
 		if (module != nullptr) {
-
 			module->active = true;
 			ClickGUI::editmenu = false;
 			FlarialGUI::TextBoxes[0].isActive = false;

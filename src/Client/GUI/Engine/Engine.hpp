@@ -18,6 +18,7 @@
 #include "Elements/Windows/WindowRect.hpp"
 #include "Elements/Control/Tooltip/ToolTipStruct.hpp"
 #include "Elements/Structs/HSV.hpp"
+#include "../../../Config/Settings.hpp"
 
 using namespace DirectX;
 
@@ -287,7 +288,7 @@ namespace FlarialGUI {
 
 	void ScrollBar(float x, float y, float width, float height, float radius);
 
-	void SetWindowRect(float x, float y, float width, float height, int currentNum, float fixer = 0);
+	void SetWindowRect(float x, float y, float width, float height, int currentNum);
 
 	void UnsetWindowRect();
 
@@ -362,9 +363,9 @@ namespace FlarialGUI {
 
 	std::wstring to_wide(const std::string& str);
 
-    void PushImClipRect(D2D_RECT_F rect, bool overridePreviousClipping = false);
-    void PushImClipRect(ImVec2 pos, ImVec2 size, bool overridePreviousClipping = false);
-    void PrepareBlur(float intensity);
+	void PushImClipRect(D2D_RECT_F rect, bool overridePreviousClipping = false);
+	void PushImClipRect(ImVec2 pos, ImVec2 size, bool overridePreviousClipping = false);
+	void PrepareBlur(float intensity);
 
 	void PopImClipRect();
 

@@ -108,8 +108,7 @@ void Mousestrokes::normalRender(int index, std::string& value)
 
     if (ClickGUI::editmenu) {
         auto height = RectSize.y;
-        FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, RectSize.x,
-                                  height, index);
+        FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, RectSize.x, height, index);
 
         Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, RectSize.x, height);
         checkForRightClickAndOpenSettings(realcenter.x, realcenter.y, RectSize.x, height);

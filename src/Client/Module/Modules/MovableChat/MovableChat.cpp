@@ -112,8 +112,7 @@ void MovableChat::onRender(RenderEvent& event)
         else if (settingperc.x == 0 and originalPos.x != 0.0f)
             currentPos = Vec2<float>{ originalPos.x, originalPos.y };
 
-        if (ClickGUI::editmenu)
-            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 26);
+        if (ClickGUI::editmenu) FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 26);
 
         Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 26, width, height);
 

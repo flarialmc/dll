@@ -25,8 +25,11 @@ public:
     static inline Vec2<float> windowSize;
     static inline FrameTransform Transform;
     static inline MouseAction mouseAction;
+    static inline MouseAction lastMouseScroll;
     static inline MouseButton mouseButton;
     static inline MouseButton lastMouseButton;
+    static inline long long scrollId;
+    static inline long long lastScrollId;
     static inline bool held;
 
     static inline std::string GPU;
