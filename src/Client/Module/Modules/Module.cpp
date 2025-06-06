@@ -781,6 +781,7 @@ void Module::loadSettings() {
 
 
 		if (this->name == "ClickGUI") {
+			// Migrate flarial logo color
 			if (this->settings.getSettingByName<std::string>("colors_FlarialLogo") != nullptr) {
 				this->forceDef(
 					"flariallogo",
