@@ -147,7 +147,7 @@ void Client::initialize() {
     version = VersionUtils::getFormattedVersion();
     if (!VersionUtils::isSupported(Client::version)) {
         LOG_FATAL("{}", "Unsupported Minecraft version");
-        Utils::MessageDialogW(L"Flarial: this version is not supported!", FlarialGUI::to_wide("VERSION " + version + " NOT SUPPORTED!").c_str());
+        Utils::MessageDialogW(FlarialGUI::to_wide("Flarial: version " + version + " is not supported!").c_str(), L"VERSION NOT SUPPORTED!");
         ModuleManager::terminate();
         Client::disable = true;
         return;
