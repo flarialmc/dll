@@ -7,7 +7,7 @@
 ZeqaUtils::ZeqaUtils(): Module("Zeqa Utils", "Handy utilities for Zeqa",
                                IDR_ZEQA_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void ZeqaUtils::onEnable()
@@ -32,6 +32,7 @@ void ZeqaUtils::defaultConfig()
     setDef("killstreak", false);
     setDef("friendaccept", false);
     setDef("duelaccept", false);
+    saveSettings();
 }
 
 void ZeqaUtils::settingsRender(float settingsOffset)

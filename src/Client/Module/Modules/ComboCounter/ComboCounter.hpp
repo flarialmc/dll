@@ -13,7 +13,7 @@ public:
 
 	ComboCounter() : Module("Combo", "Keeps track of consecutive hits.", IDR_COMBO_PNG, "") {
 
-		Module::setup();
+		
 
 	};
 

@@ -9,12 +9,13 @@ ThirdPerson::ThirdPerson(): Module("Nametag", "Shows your nametag for you while\
     original.resize(6);
     Memory::copyBytes((LPVOID) address, original.data(), 6);
 
-    Module::setup();
+    
 }
 
 void ThirdPerson::defaultConfig()
 {
     Module::defaultConfig("core");
+    saveSettings();
 }
 
 void ThirdPerson::onEnable()

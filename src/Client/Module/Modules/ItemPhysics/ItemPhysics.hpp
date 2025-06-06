@@ -37,7 +37,7 @@ private:
 	ActorRenderData* renderData = nullptr;
 public:
 	ItemPhysics() : Module("Item Physics", "Changes rotation behavior of dropped items", IDR_ITEM_PHYSICS_PNG, "") {
-		Module::setup();
+		
 	}
 
 	void onEnable() override;

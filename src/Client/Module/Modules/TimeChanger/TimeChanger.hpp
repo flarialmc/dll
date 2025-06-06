@@ -7,7 +7,7 @@
 class TimeChanger : public Module {
 public:
 	TimeChanger() : Module("Time Changer", "Changes the ingame time.", IDR_TIME_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override;

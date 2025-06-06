@@ -19,7 +19,7 @@ private:
 	static inline std::chrono::time_point<std::chrono::high_resolution_clock> lastLeftClick;
 public:
 	CPSCounter() : Module("CPS", "Counts your Clicks per second.", IDR_CURSOR_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onSetup() override;

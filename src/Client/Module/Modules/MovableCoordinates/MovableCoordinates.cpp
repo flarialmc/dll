@@ -5,7 +5,7 @@
 
 MovableCoordinates::MovableCoordinates(): Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void MovableCoordinates::onEnable()
@@ -40,6 +40,7 @@ void MovableCoordinates::defaultConfig()
 {
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
+    saveSettings();
 }
 
 void MovableCoordinates::settingsRender(float settingsOffset)

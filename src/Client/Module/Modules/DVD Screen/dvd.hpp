@@ -14,7 +14,7 @@ private:
 public:
 
 	DVD() : Module("DVD Screen", "Overlays the DVD Screensaver", IDR_SKULL_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override;

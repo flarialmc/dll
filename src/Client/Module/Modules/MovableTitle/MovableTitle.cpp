@@ -6,7 +6,7 @@
 MovableTitle::MovableTitle(): Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "")
 {
     Listen(this, SetupAndRenderEvent, &MovableTitle::onSetupAndRender)
-    Module::setup();
+    
 }
 
 void MovableTitle::onEnable()
@@ -34,6 +34,7 @@ void MovableTitle::defaultConfig()
 {
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
+    saveSettings();
 }
 
 void MovableTitle::settingsRender(float settingsOffset)

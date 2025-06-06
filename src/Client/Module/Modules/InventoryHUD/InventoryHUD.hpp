@@ -15,7 +15,7 @@ public:
 	InventoryHUD() : Module("Inventory HUD", "Displays your inventory\non your HUD",
 		IDR_CHESTPLATE_PNG, "") {
 		currentPos = Vec2<float>{ 0, 0 };
-		Module::setup();
+		
 	};
 
 	std::map<std::string, DWRITE_TEXT_ALIGNMENT> alignments = {

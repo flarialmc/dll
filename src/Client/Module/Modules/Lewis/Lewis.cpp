@@ -3,7 +3,7 @@
 Lewis::Lewis(): Module("Lewis", "Lewis, king of Hippos. (Brought to you by the one and only, Oblitqrated) ",
                        IDR_FPS_PNG, "")
 {
-    Module::setup();
+    
 
     HRSRC imageResHandle = nullptr;
     HGLOBAL imageResDataHandle = nullptr;
@@ -56,6 +56,7 @@ void Lewis::defaultConfig()
     setDef("lewiscrosshairsize", 1.0f);
     setDef("lewislogo", false);
     setDef("lewisscream", false);
+    saveSettings();
 }
 
 void Lewis::settingsRender(float settingsOffset)

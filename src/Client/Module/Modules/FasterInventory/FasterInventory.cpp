@@ -21,6 +21,7 @@ void FasterInventory::onDisable() {
 
 void FasterInventory::defaultConfig() {
     Module::defaultConfig("core");
+    saveSettings();
 }
 
 void FasterInventory::onRaknetTick(RaknetTickEvent &event) {

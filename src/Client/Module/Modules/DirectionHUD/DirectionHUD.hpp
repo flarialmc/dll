@@ -14,7 +14,7 @@ public:
 
 	DirectionHUD() : Module("DirectionHUD", "Shows a compass showing your direction",
 		IDR_CURSOR_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override;

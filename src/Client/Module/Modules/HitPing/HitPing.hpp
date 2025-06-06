@@ -27,7 +27,7 @@ private:
 public:
 	HitPing() : Module("Hit Ping", "Measures your hit delay!",
 		IDR_PING_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override;

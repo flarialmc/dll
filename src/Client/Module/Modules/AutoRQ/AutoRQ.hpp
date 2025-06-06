@@ -12,7 +12,7 @@ private:
 public:
 	AutoRQ() : Module("Hive Utils", "Handy utilities for The Hive partnered server",
 		IDR_HIVE_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override;

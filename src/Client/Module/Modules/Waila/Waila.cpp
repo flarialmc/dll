@@ -4,7 +4,7 @@
 
 Waila::Waila(): Module("Waila", "Shows what you are looking at.", IDR_WAILA_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void Waila::onEnable()
@@ -28,6 +28,7 @@ void Waila::defaultConfig()
     Module::defaultConfig("all");
     setDef("advanced", false);
     setDef("showAir", false);
+    saveSettings();
 }
 
 void Waila::settingsRender(float settingsOffset)

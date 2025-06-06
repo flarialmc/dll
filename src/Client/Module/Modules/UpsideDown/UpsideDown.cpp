@@ -4,7 +4,7 @@
 
 UpsideDown::UpsideDown(): Module("Upside Down", "No need to flip your monitor!!", IDR_UPSIDE_DOWN_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void UpsideDown::onEnable()
@@ -30,4 +30,5 @@ void UpsideDown::onGetFOV(FOVEvent& event)
 void UpsideDown::defaultConfig()
 {
     Module::defaultConfig("core");
+    saveSettings();
 }

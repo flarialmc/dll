@@ -2,7 +2,7 @@
 
 MovableScoreboard::MovableScoreboard(): Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void MovableScoreboard::onEnable()
@@ -37,6 +37,7 @@ void MovableScoreboard::defaultConfig()
 {
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
+    saveSettings();
 }
 
 void MovableScoreboard::settingsRender(float settingsOffset)

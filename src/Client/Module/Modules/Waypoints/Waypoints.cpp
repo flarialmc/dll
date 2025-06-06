@@ -4,7 +4,7 @@
 
 Waypoints::Waypoints(): Module("Waypoints", "Allows you to mark points in your world.", IDR_WAYPOINTS_PNG, "")
 {
-    //Module::setup();
+    //
 }
 
 void Waypoints::onEnable()
@@ -113,6 +113,7 @@ void Waypoints::defaultConfig()
     setDef("borderuse", true);
     setDef("border", true);
     setDef("showmeters", true);
+    saveSettings();
 }
 
 void Waypoints::settingsRender(float settingsOffset)

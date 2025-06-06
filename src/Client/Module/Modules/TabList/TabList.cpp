@@ -5,7 +5,7 @@
 TabList::TabList(): Module("Tab List", "Java-like tab list.\nLists the current online players on the server.",
                            IDR_LIST_PNG, "TAB")
 {
-    Module::setup();
+    
 }
 
 void TabList::onEnable()
@@ -33,6 +33,7 @@ void TabList::defaultConfig()
     Module::defaultConfig("colors");
     setDef("alphaOrder", true);
     setDef("flarialFirst", true);
+    saveSettings();
 }
 
 void TabList::settingsRender(float settingsOffset)

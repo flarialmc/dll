@@ -23,6 +23,7 @@ void BlockOutline::defaultConfig() {
     setDef("overlayfullblock", false);
     setDef("showfulloutline", false);
     setDef("outlinewidth", 0.01f);
+    saveSettings();
 }
 
 void BlockOutline::settingsRender(float settingsOffset) {

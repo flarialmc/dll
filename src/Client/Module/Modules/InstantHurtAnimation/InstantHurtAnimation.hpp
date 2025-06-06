@@ -10,7 +10,7 @@ private:
 public:
 	InstantHurtAnimation() : Module("Insta Hurt Animation", "Hurt animation becomes ping independent, helps time hits.",
 		IDR_COMBO_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override;

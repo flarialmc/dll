@@ -11,7 +11,7 @@ public:
 
 	ArrowCounter() : Module("Arrow Counter", "Counts how many arrows you have\nin your inventory.",
 		IDR_ARROW_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override;

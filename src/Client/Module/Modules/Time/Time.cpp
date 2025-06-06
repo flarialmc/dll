@@ -5,7 +5,7 @@
 Time::Time(): Module("Clock", "Displays your current local time.", IDR_TIME_PNG, "")
 {
 
-    Module::setup();
+    
 
 }
 
@@ -68,6 +68,7 @@ void Time::defaultConfig()
     setDef("textscale", 0.80f);
     Module::defaultConfig("all");
     setDef("24", false);
+    saveSettings();
 }
 
 void Time::settingsRender(float settingsOffset)

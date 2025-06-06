@@ -2,7 +2,7 @@
 
 MumbleLink::MumbleLink(): Module("Mumble Link", "Use proximity chat in Flarial with the help of Mumble", IDR_MUMBLE_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void MumbleLink::onEnable()
@@ -46,6 +46,7 @@ void MumbleLink::defaultConfig()
 {
     Module::defaultConfig("core");
     setDef("context", (std::string)"");
+    saveSettings();
 }
 
 void MumbleLink::settingsRender(float settingsOffset)

@@ -65,6 +65,7 @@ void Keystrokes::defaultConfig() {
 	setDef("glowEnabledAmount", 50.f);
 	setDef("glowSpeed", 1.f);
 	setDef("glowEnabled", false);
+	saveSettings();
 }
 
 void Keystrokes::settingsRender(float settingsOffset) {

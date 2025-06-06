@@ -5,7 +5,7 @@
 PingCounter::PingCounter(): Module("Ping Counter", "Displays your current latency to the server.",
                                    IDR_PING_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void PingCounter::onEnable()
@@ -25,6 +25,7 @@ void PingCounter::defaultConfig()
     setDef("text", (std::string)"{value}ms");
     setDef("textscale", 0.8f);
     Module::defaultConfig("all");
+    saveSettings();
 }
 
 void PingCounter::settingsRender(float settingsOffset)

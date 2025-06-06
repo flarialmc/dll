@@ -10,7 +10,7 @@ public:
 	FOVChanger() : Module("FOV Changer", "Change your FOV beyond Minecraft's limits.",
 		IDR_FIELD_OF_VIEW_PNG, "") {
 
-		Module::setup();
+		
 
 	};
 

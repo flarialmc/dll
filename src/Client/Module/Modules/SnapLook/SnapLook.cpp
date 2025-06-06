@@ -4,7 +4,7 @@
 
 SnapLook::SnapLook(): Module("SnapLook", "Quickly look behind you.", IDR_EYE_PNG, "V")
 {
-    Module::setup();
+    
 }
 
 void SnapLook::onEnable()
@@ -25,6 +25,7 @@ void SnapLook::defaultConfig()
 {
     getKeybind();
     Module::defaultConfig("core");
+    saveSettings();
 }
 
 void SnapLook::settingsRender(float settingsOffset)

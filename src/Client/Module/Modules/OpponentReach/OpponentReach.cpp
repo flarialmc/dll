@@ -5,7 +5,7 @@
 OpponentReach::OpponentReach(): Module("Opponent Reach", "Shows your opponent's last hit range!",
                                        IDR_REACH_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void OpponentReach::onEnable()
@@ -29,6 +29,7 @@ void OpponentReach::defaultConfig()
     setDef("textscale", 0.8f);
     Module::defaultConfig("all");
     setDef("tryToExcludeTeam", true);
+    saveSettings();
 }
 
 void OpponentReach::settingsRender(float settingsOffset)

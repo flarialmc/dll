@@ -7,20 +7,19 @@ void FPS::onEnable() {
     Listen(this, RenderEvent, &FPS::onRender)
     Listen(this, RenderUnderUIEvent, &FPS::onRenderUnderUI)
     Module::onEnable();
-    std::cout << "Enabled" << std::endl;
 }
 
 void FPS::onDisable() {
     Deafen(this, RenderEvent, &FPS::onRender)
     Deafen(this, RenderUnderUIEvent, &FPS::onRenderUnderUI)
     Module::onDisable();
-    std::cout << "Disabled" << std::endl;
 }
 
 void FPS::defaultConfig() {
     setDef("text", (std::string)"FPS: {value}");
     Module::defaultConfig("all");
     setDef("fpsSpoofer", 1.0f);
+    saveSettings();
 }
 
 void FPS::settingsRender(float settingsOffset) {

@@ -2,7 +2,7 @@
 
 LowHealthIndicator::LowHealthIndicator(): Module("Low Health", "Warns you when you are at low health.", IDR_HEART_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void LowHealthIndicator::defaultConfig()
@@ -11,6 +11,7 @@ void LowHealthIndicator::defaultConfig()
     setDef("health", 12.f);
     setDef("maxopacity", 0.7f);
     setDef("health", (std::string)"FF0000", 1.f, false);
+    saveSettings();
 }
 
 void LowHealthIndicator::settingsRender(float settingsOffset)

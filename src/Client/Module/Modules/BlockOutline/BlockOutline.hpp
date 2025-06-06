@@ -15,7 +15,7 @@ class BlockOutline : public Module {
 public:
 	OptionsParser options;
 	BlockOutline() : Module("Block Outline", "Changes the block outline color", IDR_BLOCK_PNG, "") {
-		Module::setup();
+		
 		options.parseOptionsFile();
 
 	};

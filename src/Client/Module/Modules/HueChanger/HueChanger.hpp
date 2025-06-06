@@ -10,7 +10,7 @@ public:
 
 	HueChanger() : Module("Saturation", "A filter to saturate or\ndesaturate Minecraft.",
 		IDR_FULLBRIGHT_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override;

@@ -4,7 +4,7 @@
 
 Sprint::Sprint(): Module("Toggle Sprint", "Automatically sprints for you!!!", IDR_AUTO_SPRINT_PNG, "CTRL")
 {
-    Module::setup();
+    
 }
 
 void Sprint::onEnable()
@@ -30,6 +30,7 @@ void Sprint::defaultConfig()
     setDef("status", false);
     setDef("textscale", 0.80f);
     setDef("always", false);
+    saveSettings();
 }
 
 void Sprint::settingsRender(float settingsOffset)

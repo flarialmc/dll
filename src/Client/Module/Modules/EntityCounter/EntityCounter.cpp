@@ -17,6 +17,7 @@ void EntityCounter::defaultConfig() {
     setDef("text", (std::string)"{value} Entities");
     setDef("textscale", 0.70f);
     Module::defaultConfig("all");
+    saveSettings();
 }
 
 void EntityCounter::settingsRender(float settingsOffset) {

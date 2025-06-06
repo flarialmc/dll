@@ -7,7 +7,7 @@
 PaperDoll::PaperDoll(): Module("Movable Paperdoll", "Makes the Minecraft paperdoll movable.", IDR_MAN_PNG,
                                "")
 {
-    Module::setup();
+    
 }
 
 void PaperDoll::onEnable()
@@ -35,6 +35,7 @@ void PaperDoll::defaultConfig()
     Module::defaultConfig("pos");
     setDef("uiscale", 21.0f);
     setDef("alwaysshow", false);
+    saveSettings();
 }
 
 void PaperDoll::settingsRender(float settingsOffset)

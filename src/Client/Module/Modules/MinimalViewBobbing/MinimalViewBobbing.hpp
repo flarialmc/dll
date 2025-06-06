@@ -16,7 +16,7 @@ public:
         original.resize(6);
         Memory::copyBytes((LPVOID) address, original.data(), 6);
 
-        Module::setup();
+        
     };
 
     void onEnable() override {
@@ -31,6 +31,7 @@ public:
 
     void defaultConfig() override {
         Module::defaultConfig("core");
+        saveSettings();
     }
 
     static void patch() {

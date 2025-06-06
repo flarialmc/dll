@@ -7,7 +7,7 @@
 class AutoPerspective : public Module {
 public:
     AutoPerspective() : Module("Auto Perspective", "Changes your perspective on specific events.", IDR_PERSPECTIVE_PNG, "") {
-        Module::setup();
+        
     };
 
     void onEnable() override;

@@ -43,6 +43,7 @@ void CommandHotkey::onDisable() {
 void CommandHotkey::defaultConfig() {
 	getKeybind();
 	Module::defaultConfig("core");
+	saveSettings();
 }
 
 void CommandHotkey::settingsRender(float settingsOffset) {

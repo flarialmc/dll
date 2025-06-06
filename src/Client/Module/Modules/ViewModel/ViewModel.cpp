@@ -5,7 +5,7 @@
 
 ViewModel::ViewModel(): Module("View Model", "Allows you to modify how item in hand looks.", IDR_EYE_PNG, "C")
 {
-    Module::setup();
+    
 }
 
 void ViewModel::onEnable()
@@ -41,6 +41,7 @@ void ViewModel::defaultConfig()
     setDef("rotx", 0.0f);
     setDef("roty", 0.0f);
     setDef("rotz", 0.0f);
+    saveSettings();
 }
 
 void ViewModel::settingsRender(float settingsOffset)

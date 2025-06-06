@@ -18,7 +18,7 @@ public:
 
 	ArmorHUD() : Module("ArmorHUD", "Displays the armor you're\ncurrently wearing.",
 		IDR_CHESTPLATE_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override;

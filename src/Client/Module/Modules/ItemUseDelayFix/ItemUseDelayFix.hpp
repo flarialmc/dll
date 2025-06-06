@@ -16,7 +16,7 @@ public:
         original.resize(6);
         Memory::copyBytes((LPVOID) address, original.data(), 6);
 
-        Module::setup();
+        
     };
 
     void onEnable() override;

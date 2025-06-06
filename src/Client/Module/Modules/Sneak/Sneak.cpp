@@ -5,7 +5,7 @@
 Sneak::Sneak(): Module("Toggle Sneak", "No need to hold down your sneak key.", IDR_SLOWLY_PNG, "SHIFT")
 {
 
-    Module::setup();
+    
 
 }
 
@@ -30,6 +30,7 @@ void Sneak::defaultConfig()
     setDef("status", false);
     setDef("textscale", 0.80f);
     setDef("always", false);
+    saveSettings();
 }
 
 void Sneak::settingsRender(float settingsOffset)

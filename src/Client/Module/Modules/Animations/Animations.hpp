@@ -12,7 +12,7 @@ public:
 
 	Animations() : Module("Animations", "Animate your selected slot square\nwhile you switch slots.",
 		IDR_ANIMATIONS_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override;

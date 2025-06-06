@@ -15,6 +15,7 @@ void FogColor::onDisable() {
 void FogColor::defaultConfig() {
     Module::defaultConfig("core");
     setDef("fog", (std::string)"FFFFFF", 0.6f, false);
+    saveSettings();
 }
 
 void FogColor::settingsRender(float settingsOffset) {

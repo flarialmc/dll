@@ -5,7 +5,7 @@
 PotCounter::PotCounter(): Module("Pot Counter", "Counts how much potions are\nin your inventory.",
                                  IDR_POTION_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void PotCounter::onEnable()
@@ -27,6 +27,7 @@ void PotCounter::defaultConfig()
     setDef("text", (std::string)"{value} Pots");
     setDef("textscale", 0.70f);
     Module::defaultConfig("all");
+    saveSettings();
 }
 
 void PotCounter::settingsRender(float settingsOffset)

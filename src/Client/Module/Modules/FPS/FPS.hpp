@@ -10,7 +10,6 @@ public:
 
 	FPS() : Module("FPS", "Shows how much Frames Per Second (FPS)\nyour device is rendering.",
 		IDR_FPS_PNG, "") {
-		Module::setup();
 	};
 
 	void onEnable() override;

@@ -18,6 +18,7 @@ void ArrowCounter::onDisable() {
 void ArrowCounter::defaultConfig() {
     setDef("text", (std::string)"Arrows: {value}");
     Module::defaultConfig("all");
+    saveSettings();
 }
 
 void ArrowCounter::settingsRender(float settingsOffset) {

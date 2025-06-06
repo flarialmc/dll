@@ -21,7 +21,7 @@ private:
 public:
 	HiveStat() : Module("Hive Statistics", "Show players statistics in game",
 		IDR_HIVE_STATS_PNG, "O") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override;

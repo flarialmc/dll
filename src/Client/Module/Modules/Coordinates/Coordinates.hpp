@@ -12,7 +12,7 @@ public:
 
 	Coordinates() : Module("Coordinates", "Shows your XYZ position in game.",
 		IDR_COORDINATES_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override;

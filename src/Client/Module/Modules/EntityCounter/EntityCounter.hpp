@@ -11,7 +11,7 @@ public:
 
 	EntityCounter() : Module("Entity Counter", "Counts the entities in the surrounding area",
 		IDR_ENTITYCOUNTER_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override;

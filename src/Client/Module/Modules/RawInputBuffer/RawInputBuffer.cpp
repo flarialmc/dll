@@ -2,7 +2,7 @@
 
 RawInputBuffer::RawInputBuffer(): Module("Raw Input Buffer", "Fixes Minecraft's default input delay", IDR_CURSOR_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void RawInputBuffer::onEnable()
@@ -18,6 +18,7 @@ void RawInputBuffer::onDisable()
 void RawInputBuffer::defaultConfig()
 {
     Module::defaultConfig("core");
+    saveSettings();
 }
 
 void RawInputBuffer::settingsRender(float settingsOffset)

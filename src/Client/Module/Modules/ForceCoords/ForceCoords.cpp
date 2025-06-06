@@ -33,6 +33,7 @@ void ForceCoords::defaultConfig() {
     Module::defaultConfig("all");
     setDef("MojangStyle", false);
     setDef("textscale", 1.00f);
+    saveSettings();
 }
 
 void ForceCoords::settingsRender(float settingsOffset) {

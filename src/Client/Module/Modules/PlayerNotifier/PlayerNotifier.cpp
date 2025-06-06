@@ -2,7 +2,7 @@
 
 PlayerNotifier::PlayerNotifier() : Module("Player Notifier", "Notifies you when a player is in the server.", IDR_CURSOR_PNG, "P")
 {
-	Module::setup();
+	
 	PlayerNotifier::defaultConfig();
 	PlayerNotifier::loadSettings();
 }
@@ -15,6 +15,7 @@ void PlayerNotifier::defaultConfig()
 	setDef("player0", (std::string)"TheBarii");
 	setDef("player0Enabled", true);
 	setDef("keybind", (std::string)"P");
+	saveSettings();
 }
 
 void PlayerNotifier::onEnable()

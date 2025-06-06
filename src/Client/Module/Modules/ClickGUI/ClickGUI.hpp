@@ -112,7 +112,7 @@ public:
 	}
 
 	ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {
-		Module::setup();
+		
 		this->ghostMainModule = new Module("main", "troll", IDR_COMBO_PNG, "");
 		scrollInfo["modules"] = { 0, 0 };
 		scrollInfo["scripting"] = { 0, 0 };
@@ -170,6 +170,7 @@ public:
 		setDef("enabledRadioButton", (std::string)"D0A0A8", 1.0f, false);
 		setDef("disabledRadioButton", (std::string)"FFFFFF", 1.0f, false);
 		setDef("_overrideAlphaValues_", 1.f);
+		saveSettings();
 	}
 
 	void settingsRender(float settingsOffset) override {

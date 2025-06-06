@@ -4,7 +4,7 @@
 
 WeatherChanger::WeatherChanger(): Module("Weather Changer", "Changes the weather ingame.", IDR_CLOUDY_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void WeatherChanger::onEnable()
@@ -25,6 +25,7 @@ void WeatherChanger::defaultConfig()
     setDef("rain", 1.00f);
     setDef("lighting", 0.00f);
     setDef("snow", false);
+    saveSettings();
 }
 
 void WeatherChanger::settingsRender(float settingsOffset)

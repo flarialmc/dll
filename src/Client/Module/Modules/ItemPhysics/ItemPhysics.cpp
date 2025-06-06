@@ -111,6 +111,7 @@ void ItemPhysics::defaultConfig() {
     setDef("zmul", 18.f);
     setDef("preserverots", false);
     setDef("smoothrots", true);
+    saveSettings();
 }
 
 void ItemPhysics::settingsRender(float settingsOffset) {

@@ -219,6 +219,7 @@ void Module::normalRenderCore(int index, std::string& text) {
 }
 
 void Module::normalRender(int index, std::string& value) {
+	Logger::debug("{}", SDK::getCurrentScreen());
 	if (!isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
 
 	std::string text{};
@@ -732,18 +733,18 @@ void Module::loadSettings() {
 		const std::string& name = settingPair.first;
 		if (!ModuleManager::restartModules && name == "enabled" && this->settings.getSettingByName<bool>("enabled")->value) this->onEnable();
 
-		if (name.find("keybind") != std::string::npos) {
+		if (name.contains("keybind")) {
 			++totalKeybinds;
 		}
-		else if (name.find("waypoint") != std::string::npos) {
+		else if (name.contains("waypoint")) {
 			++totalWaypoints;
 		}
-		else if (name.find("map-") != std::string::npos) {
+		else if (name.contains("map-")) {
 			++totalmaps;
 		}
 	}
 
-	this->onSetup();
+	this->setup();
 }
 
 void Module::checkSettingsFile() {

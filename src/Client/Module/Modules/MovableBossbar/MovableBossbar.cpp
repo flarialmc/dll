@@ -2,7 +2,7 @@
 
 MovableBossbar::MovableBossbar(): Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void MovableBossbar::onEnable()
@@ -37,6 +37,7 @@ void MovableBossbar::defaultConfig()
 {
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
+    saveSettings();
 }
 
 void MovableBossbar::onRender(RenderEvent& event)

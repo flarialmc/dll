@@ -2,7 +2,7 @@
 
 MovableHUD::MovableHUD(): Module("Movable HUD", "Makes everything on screen movable!", IDR_MOVABLE_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void MovableHUD::onEnable()
@@ -17,6 +17,7 @@ void MovableHUD::defaultConfig()
 {
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
+    saveSettings();
 }
 
 void MovableHUD::settingsRender(float settingsOffset)

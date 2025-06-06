@@ -18,7 +18,7 @@ public:
 
 	Hitbox() : Module("Hitbox", "Displays hitboxes of entities", IDR_BLOCK_PNG, "") {
 
-		Module::setup();
+		
 
 	};
 

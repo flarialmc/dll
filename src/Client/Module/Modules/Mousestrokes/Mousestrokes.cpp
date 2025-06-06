@@ -6,7 +6,7 @@
 Mousestrokes::Mousestrokes(): Module("Mouse Strokes", "Visualizes the position of your mouse.",
                                      IDR_CURSOR_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void Mousestrokes::onEnable()
@@ -42,6 +42,7 @@ void Mousestrokes::defaultConfig()
     Module::defaultConfig("main");
     Module::defaultConfig("colors");
     setDef("cursor", (std::string)"ffffff", 1.f, false);
+    saveSettings();
 }
 
 void Mousestrokes::settingsRender(float settingsOffset)

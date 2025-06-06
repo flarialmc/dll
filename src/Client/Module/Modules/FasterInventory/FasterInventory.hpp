@@ -19,7 +19,7 @@ private:
 public:
 
 	FasterInventory() : Module("Faster Inventory", "Makes inventory opening ping-independent", IDR_INVENTORY_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override;

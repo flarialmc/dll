@@ -16,6 +16,7 @@ void AutoGG::onDisable() {
 void AutoGG::defaultConfig() {
     Module::defaultConfig("core");
     setDef("text", (std::string)"GG");
+    saveSettings();
 }
 
 void AutoGG::settingsRender(float settingsOffset) {

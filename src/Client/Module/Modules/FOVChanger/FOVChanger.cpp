@@ -15,6 +15,7 @@ void FOVChanger::defaultConfig() {
     Module::defaultConfig("core");
     setDef("fovvalue", 60.00f);
     setDef("fovaffectshand", false);
+    saveSettings();
 }
 
 void FOVChanger::settingsRender(float settingsOffset) {

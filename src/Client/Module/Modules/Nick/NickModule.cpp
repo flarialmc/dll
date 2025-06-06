@@ -6,7 +6,7 @@ NickModule::NickModule(): Module("Nick",
                                  "Hides your username and replace it with something else.\nWorks everywhere (chat, pause, third person, etc)\nOther people will not be able to see your nick.",
                                  IDR_ICOGNITO_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void NickModule::onEnable()
@@ -48,6 +48,7 @@ void NickModule::defaultConfig()
     setDef("bold", false);
     setDef("obfuscated", false);
     setDef("textColor", (std::string)"White");
+    saveSettings();
 }
 
 void NickModule::settingsRender(float settingsOffset)

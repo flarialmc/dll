@@ -26,7 +26,7 @@ public:
 	JavaInventoryHotkeys() : Module("Java Hotkeys",
 		"Allows to swap items in your inventory java-like.",
 		IDR_KEYBOARD_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override;

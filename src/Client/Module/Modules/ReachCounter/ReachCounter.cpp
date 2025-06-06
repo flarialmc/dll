@@ -5,7 +5,7 @@
 ReachCounter::ReachCounter(): Module("Reach Counter", "Displays your last hit range in blocks.", IDR_REACH_PNG,
                                      "")
 {
-    Module::setup();
+    
 }
 
 void ReachCounter::onEnable()
@@ -29,6 +29,7 @@ void ReachCounter::defaultConfig()
     setDef("text", (std::string)"Reach: {value}");
     setDef("textscale", 0.70f);
     Module::defaultConfig("all");
+    saveSettings();
 }
 
 void ReachCounter::settingsRender(float settingsOffset)

@@ -7,7 +7,7 @@ NullMovement::NullMovement(): Module("Null Movement", "Only registers the latest
                                      IDR_SPEED_PNG, "")
 {
 
-    Module::setup();
+    
 }
 
 void NullMovement::onEnable()
@@ -29,6 +29,7 @@ void NullMovement::defaultConfig()
     Module::defaultConfig("core");
     setDef("horizontal", true);
     setDef("vertical", false);
+    saveSettings();
 }
 
 void NullMovement::settingsRender(float settingsOffset)

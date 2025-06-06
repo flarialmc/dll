@@ -50,6 +50,7 @@ void InventoryHUD::defaultConfig() {
     setDef("0color", 0.f);
     setDef("showDurBarMax", false);
     setDef("textOpacity", 1.f);
+    saveSettings();
 }
 
 void InventoryHUD::settingsRender(float settingsOffset) {

@@ -6,7 +6,7 @@
 
 MovableChat::MovableChat(): Module("Movable Chat", "Ability to move the chat.", IDR_MOVABLE_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void MovableChat::onEnable()
@@ -46,6 +46,7 @@ void MovableChat::defaultConfig()
     setDef("here", true);
     setDef("pingsound", true);
     setDef("mode", (std::string)"Xp Orb");
+    saveSettings();
 }
 
 void MovableChat::settingsRender(float settingsOffset)

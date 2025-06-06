@@ -2,7 +2,7 @@
 
 MovableHotbar::MovableHotbar(): Module("Movable " + mname, "Makes the Minecraft " + mname + " movable.", IDR_MOVABLE_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void MovableHotbar::onEnable()
@@ -37,6 +37,7 @@ void MovableHotbar::defaultConfig()
 {
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
+    saveSettings();
 }
 
 void MovableHotbar::settingsRender(float settingsOffset)

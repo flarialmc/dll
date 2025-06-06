@@ -6,7 +6,7 @@ class DisableMouseWheel : public Module {
 public:
 	DisableMouseWheel() : Module("Disable Mouse Wheel", "Prevents you from accidentally scrolling through your hotbar",
 		IDR_CURSOR_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override;

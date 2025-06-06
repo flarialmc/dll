@@ -39,6 +39,7 @@ void AutoRQ::defaultConfig() {
     setDef("noteaming", false);
     setDef("friendaccept", false);
     setDef("partyaccept", false);
+    saveSettings();
 }
 
 void AutoRQ::settingsRender(float settingsOffset) {

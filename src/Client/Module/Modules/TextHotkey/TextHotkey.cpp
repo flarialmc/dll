@@ -25,6 +25,7 @@ void TextHotkey::defaultConfig()
 {
 	getKeybind();
 	Module::defaultConfig("core");
+	saveSettings();
 }
 
 void TextHotkey::settingsRender(float settingsOffset)

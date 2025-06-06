@@ -11,7 +11,7 @@ private:
 public:
     BlockBreakIndicator() : Module("Break Progress", "Visual indicator to show the progress\nof breaking a block.",
                                    IDR_BLOCK_BREAK_INDICATOR_PNG, "") {
-        Module::setup();
+        
     };
 
     void onEnable() override;

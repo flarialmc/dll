@@ -7,7 +7,7 @@
 PotionHUD::PotionHUD(): Module("PotionHUD", "Displays your potion effects",
                                IDR_POTION_PNG, "")
 {
-    Module::setup();
+    
 }
 
 void PotionHUD::onEnable()
@@ -45,6 +45,7 @@ void PotionHUD::defaultConfig()
     setDef("showText", true);
     setDef("textLeft", false);
     setDef("bottomUp", false);
+    saveSettings();
 }
 
 void PotionHUD::settingsRender(float settingsOffset)
