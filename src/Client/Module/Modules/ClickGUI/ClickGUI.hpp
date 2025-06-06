@@ -124,7 +124,7 @@ public:
 			Listen(this, KeyEvent, &ClickGUI::onKey)
 			ListenOrdered(this, PacketEvent, &ClickGUI::onPacketReceive, EventOrder::IMMEDIATE)
 			ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
-			//Module::onEnable();
+			Module::onEnable();
 	};
 
 	void onSetup() override {}
