@@ -281,6 +281,7 @@ void Module::addHeader(std::string text) {
 				y += FlarialGUI::additionalY[i];
 			}
 		}
+
 	FlarialGUI::RoundedRect(x, y + Constraints::RelativeConstraint(0.023f, "width"), col, FlarialGUI::TextSizes[name] + Constraints::RelativeConstraint(0.01f, "width"), 3.0f, 0, 0);
 
 	padding += Constraints::RelativeConstraint(0.055f, "height", true);
