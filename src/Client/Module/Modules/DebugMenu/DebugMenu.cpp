@@ -3,6 +3,7 @@
 #include <numbers>
 #include "Modules/Time/Time.hpp"
 #include "SDK/Client/Block/BlockLegacy.hpp"
+#include "Modules/CPS/CPSCounter.hpp"
 
 void JavaDebugMenu::onEnable() {
 	Listen(this, SetupAndRenderEvent, &JavaDebugMenu::onSetupAndRender)
@@ -38,9 +39,14 @@ void JavaDebugMenu::defaultConfig() {
 	setDef("text", (std::string)"ffffff", 1.f, false);
 	setDef("bg", (std::string)"000000", 0.5f, false);
 	setDef("imPoorButIWannaLookRich", false);
+	setDef("f5crosshair", false);
+	setDef("enableEverything", true);
+
 	setDef("showFPS", true);
 	setDef("showDim", true);
 	setDef("showCoords", true);
+	setDef("showBreakProg", true);
+	setDef("alwaysShowBreakProg", true);
 	setDef("showServer", true);
 	setDef("showMemory", true);
 	setDef("showCpuGpu", true);
@@ -52,6 +58,18 @@ void JavaDebugMenu::defaultConfig() {
 	setDef("showMaxTags", true);
 	setDef("noOfTags", 10.0f);
 	saveSettings();
+}
+
+void JavaDebugMenu::sigmaToggle(std::string text, std::string subtext, std::string settingName) {
+	addConditionalToggle(!getOps<bool>("enableEverything"), text, subtext, settingName);
+}
+
+void JavaDebugMenu::skibidiToggle(bool condition, std::string text, std::string subtext, std::string settingName) {
+	addConditionalToggle(!getOps<bool>("enableEverything") && condition, text, subtext, settingName);
+}
+
+void JavaDebugMenu::skibidiSlider(bool condition, std::string text, std::string subtext, std::string settingName, float maxVal, float minVal, bool zerosafe) {
+	addConditionalSlider(!getOps<bool>("enableEverything") && condition, text, subtext, settingName, maxVal, minVal, zerosafe);
 }
 
 void JavaDebugMenu::settingsRender(float settingsOffset) {
@@ -81,22 +99,35 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
 
 	addHeader("Module Settings");
 	addToggle("I'm broke but I wanna look rich :(", "only for the real broke sigmas", "imPoorButIWannaLookRich");
-	addToggle("Show FPS and Frametime", "", "showFPS");
-	addToggle("Show Entity Counter and Dimension", "", "showDim");
-	addToggle("Show Coordinates Section", "", "showCoords");
-	addToggle("Show Server Section", "", "showServer");
-	addToggle("Show Memory", "", "showMemory");
-	addToggle("Show CPU, GPU and Renderer", "", "showCpuGpu");
-	addToggle("Show Time", "", "showTime");
-	addToggle("Show Uptime", "", "showUptime");
-	addToggle("Show Speed", "", "showSpeed");
-	addToggle("Show Targeted Block", "", "showTargetedBlock");
-	addConditionalToggle(getOps<bool>("showTargetedBlock"), "Show Targeted Block Tags", "", "showTargetedBlockTags");
-	addConditionalToggle(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags"), "Show Maximum Number Of Block Tags", "", "showMaxTags");
-	addConditionalSlider(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags") && !getOps<bool>("showMaxTags"), "Number Of Tags To Be Show", "", "noOfTags", 20.0f, 1.0f, true);
+	addToggle("Show Debug Crosshair In F5", "", "f5crosshair");
+	addToggle("Enable All Text", "", "enableEverything");
+
+	if (!getOps<bool>("enableEverything")) {
+		extraPadding();
+	}
+
+	sigmaToggle("Show FPS and Frametime", "", "showFPS");
+	sigmaToggle("Show Entity Counter and Dimension", "", "showDim");
+	sigmaToggle("Show Coordinates Section", "", "showCoords");
+	sigmaToggle("Show Break Progress", "", "showBreakProg");
+	skibidiToggle(getOps<bool>("showBreakProg"), "Always Show Break Progress", "", "alwaysShowBreakProg");
+	sigmaToggle("Show Server Section", "", "showServer");
+	sigmaToggle("Show Memory", "", "showMemory");
+	sigmaToggle("Show CPU, GPU and Renderer", "", "showCpuGpu");
+	sigmaToggle("Show Time", "", "showTime");
+	sigmaToggle("Show Uptime", "", "showUptime");
+	sigmaToggle("Show Speed", "", "showSpeed");
+	sigmaToggle("Show Targeted Block", "", "showTargetedBlock");
+	skibidiToggle(getOps<bool>("showTargetedBlock"), "Show Targeted Block Tags", "", "showTargetedBlockTags");
+	skibidiToggle(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags"), "Show Maximum Number Of Block Tags", "", "showMaxTags");
+	skibidiSlider(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags") && !getOps<bool>("showMaxTags"), "Number Of Tags To Be Show", "", "noOfTags", 20.0f, 1.0f, true);
 
 	FlarialGUI::UnsetScrollView();
 	resetPadding();
+}
+
+bool JavaDebugMenu::isOn(std::string settingName) {
+	return getOps<bool>("enableEverything") || getOps<bool>(settingName);
 }
 
 int JavaDebugMenu::GetTicks() {
@@ -104,19 +135,19 @@ int JavaDebugMenu::GetTicks() {
 		return 0;
 	}
 	double currentMicros = Microtime();
-	auto count = std::count_if(tickList.begin(), tickList.end(), [currentMicros](const TickData& click) {
+	auto count = std::ranges::count_if(tickList, [currentMicros](const TickData& click) {
 		return (currentMicros - click.timestamp <= 1.0);
-		});
+	});
 
 	return (int)std::round(count);
 }
 
 std::string JavaDebugMenu::getFacingDirection(LocalPlayer* player) {
 	std::string direction;
-	if (lerpYaw >= -45 && lerpYaw < 45) direction = "South";
-	else if (lerpYaw >= 45 && lerpYaw < 135) direction = "West";
-	else if (lerpYaw >= 135 || lerpYaw < -135) direction = "North";
-	else direction = "East";
+	if (lerpYaw >= -45 && lerpYaw < 45) direction = "South (Towards positive Z)";
+	else if (lerpYaw >= 45 && lerpYaw < 135) direction = "West (Towards negative X)";
+	else if (lerpYaw >= 135 || lerpYaw < -135) direction = "North (Towards negative Z)";
+	else direction = "East (Towards positive X)";
 	return std::format("Facing: {} ({:.1f} / {:.1f})", direction, lerpYaw, lerpPitch);
 }
 
@@ -157,7 +188,6 @@ std::string JavaDebugMenu::getTime() {
 	const std::tm calendarTime = localtime_xp(now);
 
 	std::string meridiem;
-	std::string seperator;
 
 	int hour = calendarTime.tm_hour;
 	int minute = calendarTime.tm_min;
@@ -167,7 +197,7 @@ std::string JavaDebugMenu::getTime() {
 	else if (hour == 12) hour = 12, meridiem = "PM";
 	else meridiem = "PM", hour -= 12;
 
-	seperator = minute < 10 ? ":0" : ":";
+	std::string seperator = minute < 10 ? ":0" : ":";
 
 	if (hour == 24) hour = 0;
 
@@ -201,7 +231,7 @@ void JavaDebugMenu::onTick(TickEvent& event) {
 	if (tickList.size() >= 120) tickList.pop_back();
 }
 
-void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) { // WAILA code
+void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) {
 	if (!this->isEnabled()) return;
 	if (!SDK::clientInstance->getLocalPlayer()) return;
 	if (!SDK::clientInstance->getLocalPlayer()->getLevel()) return;
@@ -222,7 +252,7 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) { // WAILA code
 				lastLookingAt = lookingAt;
 				std::vector<std::string> tags = {};
 				for (auto i : tagMap) {
-					if (std::find(i.second.begin(), i.second.end(), block->getName()) != i.second.end()) {
+					if (std::ranges::find(i.second, block->getName()) != i.second.end()) {
 						tags.emplace_back(i.first);
 					}
 				}
@@ -234,6 +264,19 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) { // WAILA code
 	}
 	catch (const std::exception& e) {
 		LOG_ERROR("Failed to get block: {}", e.what());
+	}
+
+	if (CPSCounter::GetLeftHeld()) {
+		Gamemode *gm = SDK::clientInstance->getLocalPlayer()->getGamemode();
+		float breakProgress = gm->getLastBreakProgress() * 100;
+		if (lastBreakProgress != breakProgress) {
+			if (lastBreakProgress < breakProgress || breakProgress == 0.f) {
+				currentBreakProgress = breakProgress;
+			}
+			lastBreakProgress = breakProgress;
+		}
+	} else {
+		currentBreakProgress = 0.0f;
 	}
 }
 
@@ -250,7 +293,6 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 		LocalPlayer* player = SDK::clientInstance->getLocalPlayer();
 		ActorRotationComponent* rotComponent = player->getActorRotationComponent();
-		BlockPos targetPos = { 0, 0, 0 };
 
 		if (rotComponent) {
 			if (rotComponent->rot.y != 0) lerpYaw = rotComponent->rot.y;
@@ -264,7 +306,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			versionName = std::format("Flarial V2 Open Beta, Minecraft {}", VersionUtils::getFormattedVersion());
 		}
 		left.emplace_back(versionName);
-		if (getOps<bool>("showFPS")) {
+		if (isOn("showFPS")) {
 			if (getOps<bool>("imPoorButIWannaLookRich")) {
 				left.emplace_back(std::format("{} FPS", static_cast<int>(MC::fps * 222.2)));
 			}
@@ -276,13 +318,13 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 		left.emplace_back("");
 
-		if (getOps<bool>("showDim")) {
+		if (isOn("showDim")) {
 			left.emplace_back(std::format("E: {}", player->getLevel()->getRuntimeActorList().size()));
 			left.emplace_back(getDimensionName());
 			left.emplace_back("");
 		}
 
-		if (getOps<bool>("showCoords")) {
+		if (isOn("showCoords")) {
 			Vec3<float> pos = *player->getPosition();
 			left.emplace_back(std::format("XYZ: {:.1f} / {:.1f} / {:.1f}", pos.x, pos.y, pos.z));
 			Vec3<int> blockPos(static_cast<int>(pos.x), static_cast<int>(pos.y), static_cast<int>(pos.z));
@@ -292,12 +334,21 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			left.emplace_back(getFacingDirection(player));
 			left.emplace_back("");
 			HitResult target = player->getLevel()->getHitResult();
-			targetPos = { target.blockPos.x, target.blockPos.y, target.blockPos.z };
+			BlockPos targetPos = { target.blockPos.x, target.blockPos.y, target.blockPos.z };
 			left.emplace_back(std::format("Looking at block: {} {} {}", targetPos.x, targetPos.y, targetPos.z));
+		}
+
+		bool renderBreakProg = isOn("showBreakProg") && (getOps<bool>("alwaysShowBreakProg") || currentBreakProgress != 0.0f);
+
+		if (renderBreakProg) {
+			left.emplace_back(std::format("Break Progress: {}%", static_cast<int>(currentBreakProgress)));
+		}
+
+		if (isOn("showCoords") || renderBreakProg) {
 			left.emplace_back("");
 		}
 
-		if (getOps<bool>("showServer")) {
+		if (isOn("showServer")) {
 			left.emplace_back("Server:");
 			left.emplace_back(std::format("IP: {}", SDK::getServerIP()));
 			left.emplace_back(std::format("Port: {}", SDK::getServerPort()));
@@ -307,7 +358,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 
 		right.emplace_back("64bit");
-		if (getOps<bool>("showMemory")) {
+		if (isOn("showMemory")) {
 			MEMORYSTATUSEX memory_status;
 			memory_status.dwLength = sizeof(memory_status);
 			GlobalMemoryStatusEx(&memory_status);
@@ -322,7 +373,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			right.emplace_back("");
 		}
 
-		if (getOps<bool>("showCpuGpu")) {
+		if (isOn("showCpuGpu")) {
 			if (getOps<bool>("imPoorButIWannaLookRich")) right.emplace_back("Intel 9 7900X3D ProMax Plus");
 			else {
 				if (cpuName.empty()) std::string cpuName = getCPU();
@@ -342,10 +393,10 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			right.emplace_back("");
 		}
 
-		if (getOps<bool>("showTime")) {
+		if (isOn("showTime")) {
 			right.emplace_back(std::format("Local Time: {}", getTime()));
 		}
-		if (getOps<bool>("showUptime")) {
+		if (isOn("showUptime")) {
 			right.emplace_back(std::format("CPU Uptime: {}", getFormattedTime(static_cast<long long>(GetTickCount64() / 1000))));
 			right.emplace_back(std::format("Minecraft Uptime: {}", getFormattedTime(
 				static_cast<long long>(
@@ -355,16 +406,16 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			right.emplace_back("");
 		}
 
-		if (getOps<bool>("showSpeed")) {
+		if (isOn("showSpeed")) {
 			right.emplace_back(std::format("Speed: {} blocks/s", speed));
 			right.emplace_back("");
 		}
 
-		if (getOps<bool>("showTargetedBlock")) {
+		if (isOn("showTargetedBlock")) {
 			right.emplace_back("Targeted Block:");
 			right.emplace_back(lookingAt);
 			right.emplace_back("");
-			if (getOps<bool>("showTargetedBlockTags")) {
+			if (isOn("showTargetedBlockTags")) {
 				bool showMax = getOps<bool>("showMaxTags");
 				int maxAllowedTags = static_cast<int>(getOps<float>("noOfTags"));
 				int maxFittableTags = static_cast<int>(MC::windowSize.y / (textHeight / 3.0f + yPadding * 2)) - right.size();
@@ -451,7 +502,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			rightYoffset += textHeight / 3.0f + yPadding * 2;
 		}
 
-		if (ModuleManager::getModule("ClickGUI")->active || curPerspective == Perspective::ThirdPersonBack) return;
+		if (ModuleManager::getModule("ClickGUI")->active || (!getOps<bool>("f5crosshair") && curPerspective == Perspective::ThirdPersonBack)) return;
 
 		// debug menu crosshair start
 
@@ -459,9 +510,6 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 		float lineWidth = 2.5f;
 		float lineLength = guiscale * 8.f;
-
-		float yaw360 = fmod((-lerpYaw + 180.0f), 360.0f);
-		if (yaw360 < 0) yaw360 += 360.0f;
 
 		ImVec2 center = ImVec2(MC::windowSize.x / 2.0f, MC::windowSize.y / 2.0f);
 

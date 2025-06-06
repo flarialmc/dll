@@ -26,6 +26,8 @@ private:
 	std::string versionName;
 	std::string cpuName;
 	Perspective curPerspective;
+	float lastBreakProgress = 0.0f;
+	float currentBreakProgress = 0.0f;
 
 	static double Microtime() {
 		return (double(std::chrono::duration_cast<std::chrono::microseconds>(
@@ -44,7 +46,15 @@ public:
 
 	void defaultConfig() override;
 
+	void sigmaToggle(std::string text, std::string subtext, std::string settingName);
+
+	void skibidiToggle(bool condition, std::string text, std::string subtext, std::string settingName);
+
+	void skibidiSlider(bool condition, std::string text, std::string subtext, std::string settingName, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
+
 	void settingsRender(float settingsOffset) override;
+
+	bool isOn(std::string settingName);
 
 	static int GetTicks();
 
