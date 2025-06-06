@@ -6,6 +6,7 @@
 #include "SDK/Client/Network/Packet/TextPacket.hpp"
 #include "Utils/APIUtils.hpp"
 #include "Utils/WinrtUtils.hpp"
+#include <chrono>
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -248,7 +249,7 @@ public:
 
 		if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key) && event.getAction() == ActionType::Pressed) {
 
-			if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen")
+			if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen" && SDK::getCurrentScreen() != "f3_screen")
 				this->active = false;
 			else {
 				if (!editmenu) {
@@ -353,16 +354,22 @@ public:
 	}
 
 	void onMouse(MouseEvent& event) {
-		MC::mousePos.x = event.getMouseX();
-		MC::mousePos.y = event.getMouseY();
+		if (event.getMouseX() != 0) MC::mousePos.x = event.getMouseX();
+		if (event.getMouseX() != 0) MC::mousePos.y = event.getMouseY();
 		MC::mouseButton = event.getButton();
 		MC::mouseAction = event.getAction();
 
 		if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Press) MC::held = true;
 		if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Release) MC::held = false;
 		if (event.getButton() != MouseButton::None) MC::lastMouseButton = event.getButton();
-
+		
 		if (event.getButton() == MouseButton::Scroll) {
+			if (!MC::scrollId) MC::scrollId = -1;
+			MC::lastScrollId = MC::scrollId;
+			MC::scrollId = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+			MC::lastMouseScroll = event.getAction();
+
 			accumilatedPos += (event.getAction() == MouseAction::ScrollUp) ? FlarialGUI::scrollposmodifier
 				: -FlarialGUI::scrollposmodifier;
 			accumilatedBarPos += (event.getAction() == MouseAction::ScrollUp) ? FlarialGUI::barscrollposmodifier
