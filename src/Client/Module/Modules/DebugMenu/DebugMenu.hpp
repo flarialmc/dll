@@ -25,6 +25,7 @@ private:
 	static inline std::vector<TickData> tickList;
 	std::string versionName;
 	std::string cpuName;
+	Perspective curPerspective;
 
 	static double Microtime() {
 		return (double(std::chrono::duration_cast<std::chrono::microseconds>(
@@ -35,7 +36,6 @@ public:
 
 	JavaDebugMenu() : Module("Java Debug Menu", "Displays Java-style debug information.\nSimilar to F3 menu in Minecraft Java Edition.",
 		IDR_F3_PNG, "F3") {
-		Module::setup();
 	}
 
 	void onEnable() override;
@@ -67,6 +67,10 @@ public:
 	void onKey(KeyEvent& event);
 
 	void onHudCursorRendererRender(HudCursorRendererRenderEvent& event);
+
+	void onSetTopScreenName(SetTopScreenNameEvent& event);
+
+	void onGetViewPerspective(PerspectiveEvent& event);
 
 	void drawVector(ImDrawList* drawList, ImVec2 center, ImVec2 endPos, ImU32 col, float lineWidth, float lineLength, float guiscale);
 };

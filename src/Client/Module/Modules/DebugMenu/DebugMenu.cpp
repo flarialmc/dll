@@ -10,6 +10,8 @@ void JavaDebugMenu::onEnable() {
 		Listen(this, TickEvent, &JavaDebugMenu::onTick)
 		Listen(this, KeyEvent, &JavaDebugMenu::onKey)
 		Listen(this, HudCursorRendererRenderEvent, &JavaDebugMenu::onHudCursorRendererRender)
+		Listen(this, SetTopScreenNameEvent, &JavaDebugMenu::onSetTopScreenName)
+		Listen(this, PerspectiveEvent, &JavaDebugMenu::onGetViewPerspective)
 		Module::onEnable();
 }
 
@@ -19,14 +21,18 @@ void JavaDebugMenu::onDisable() {
 		Deafen(this, TickEvent, &JavaDebugMenu::onTick)
 		Deafen(this, KeyEvent, &JavaDebugMenu::onKey)
 		Deafen(this, HudCursorRendererRenderEvent, &JavaDebugMenu::onHudCursorRendererRender)
+		Deafen(this, SetTopScreenNameEvent, &JavaDebugMenu::onSetTopScreenName)
+		Deafen(this, PerspectiveEvent, &JavaDebugMenu::onGetViewPerspective)
 		Module::onDisable();
 }
 
 void JavaDebugMenu::defaultConfig() {
+	setDef("keybind", (std::string)"F3");
 	getKeybind();
 	Module::defaultConfig("core");
 
 	setDef("uiscale", 0.65f);
+	setDef("hideModules", true);
 	setDef("rounding", 0.0f);
 	setDef("showBg", true);
 	setDef("text", (std::string)"ffffff", 1.f, false);
@@ -45,6 +51,7 @@ void JavaDebugMenu::defaultConfig() {
 	setDef("showTargetedBlockTags", true);
 	setDef("showMaxTags", true);
 	setDef("noOfTags", 10.0f);
+	saveSettings();
 }
 
 void JavaDebugMenu::settingsRender(float settingsOffset) {
@@ -62,6 +69,7 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
 	addHeader("Main");
 	addKeybind("Keybind", "Hold for 2 seconds!", "keybind", true);
 	addSlider("UI Scale", "", "uiscale", 2.0f);
+	addToggle("Hide Modules", "", "hideModules");
 	addSlider("Rounding", "Rounding of the rectangle", "rounding", 100, 0, false);
 	addToggle("Background", "", "showBg");
 	extraPadding();
@@ -213,7 +221,7 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) { // WAILA code
 			if (lookingAt != lastLookingAt) {
 				lastLookingAt = lookingAt;
 				std::vector<std::string> tags = {};
-				for (auto i: tagMap) {
+				for (auto i : tagMap) {
 					if (std::find(i.second.begin(), i.second.end(), block->getName()) != i.second.end()) {
 						tags.emplace_back(i.first);
 					}
@@ -231,7 +239,7 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) { // WAILA code
 
 void JavaDebugMenu::onRender(RenderEvent& event) {
 	if (!this->isEnabled()) return;
-	if (this->active && SDK::clientInstance->getScreenName() == "hud_screen") {
+	if (this->active && (SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "hud_screen")) {
 		float textHeight = Constraints::RelativeConstraint(0.1f * getOps<float>("uiscale"));
 		float textSize = Constraints::SpacingConstraint(2.0f, textHeight);
 		float yPadding = Constraints::SpacingConstraint(0.025f, textHeight);
@@ -361,18 +369,18 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 				int maxAllowedTags = static_cast<int>(getOps<float>("noOfTags"));
 				int maxFittableTags = static_cast<int>(MC::windowSize.y / (textHeight / 3.0f + yPadding * 2)) - right.size();
 				if (lookingAtTags.size() >= maxFittableTags && (showMax || maxAllowedTags >= maxFittableTags)) {
-					for (int i = 0; i < maxFittableTags; i++ ) {
+					for (int i = 0; i < maxFittableTags; i++) {
 						right.emplace_back('#' + lookingAtTags[i]);
 					}
 					right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxFittableTags));
 				}
 				else if (showMax) {
-					for (const auto & i: lookingAtTags) {
+					for (const auto& i : lookingAtTags) {
 						right.emplace_back('#' + i);
 					}
 				}
 				else {
-					for (int i = 0; i < maxAllowedTags; i++ ) {
+					for (int i = 0; i < maxAllowedTags; i++) {
 						right.emplace_back('#' + lookingAtTags[i]);
 					}
 					right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxAllowedTags));
@@ -382,7 +390,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 
 		int leftYoffset = 0.0f;
-		for (const auto & i : left) {
+		for (const auto& i : left) {
 			if (getOps<bool>("showBg") && !i.empty()) {
 				float lineWidth = FlarialGUI::getFlarialTextSize(
 					String::StrToWStr(i).c_str(),
@@ -413,7 +421,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 		}
 
 		int rightYoffset = 0.0f;
-		for (const auto & i : right) {
+		for (const auto& i : right) {
 			if (getOps<bool>("showBg") && !i.empty()) {
 				float lineWidth = FlarialGUI::getFlarialTextSize(
 					String::StrToWStr(i).c_str(),
@@ -443,7 +451,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			rightYoffset += textHeight / 3.0f + yPadding * 2;
 		}
 
-		if (ModuleManager::getModule("ClickGUI")->active) return;
+		if (ModuleManager::getModule("ClickGUI")->active || curPerspective == Perspective::ThirdPersonBack) return;
 
 		// debug menu crosshair start
 
@@ -471,7 +479,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			center.y + lineLength * sin(yawRad) * sin(pitchRad)
 		);
 
-		ImVec2 greenPos(center.x, center.y - ((90.f - abs(lerpPitch)) / 90.f) * lineLength);
+		ImVec2 greenPos(center.x, center.y - lineLength * cos(pitchRad));
 
 		ImVec2 bluePos(
 			center.x + lineLength * sin(yawRad),
@@ -498,8 +506,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 }
 
 void JavaDebugMenu::drawVector(ImDrawList* drawList, ImVec2 center, ImVec2 endPos, ImU32 col, float lineWidth, float lineLength, float guiscale) {
-	ImU32 black = IM_COL32(0, 0, 0, 255);
-	drawList->AddLine(center, endPos, black, lineWidth + (guiscale * 0.3));
+	drawList->AddLine(center, endPos, IM_COL32(0, 0, 0, 255), lineWidth + (guiscale * 0.3));
 	drawList->AddLine(center, endPos, col, lineWidth);
 }
 
@@ -517,4 +524,14 @@ void JavaDebugMenu::onKey(KeyEvent& event) {
 			keybindActions[0]({});
 		}
 	}
+}
+
+void JavaDebugMenu::onSetTopScreenName(SetTopScreenNameEvent& event) {
+	if (!this->isEnabled()) return;
+	if (this->active && getOps<bool>("hideModules") && event.getLayer() == "hud_screen") event.setCustomLayer("f3_screen");
+}
+
+void JavaDebugMenu::onGetViewPerspective(PerspectiveEvent& event) {
+	if (!this->active || !this->isEnabled() || !SDK::clientInstance->getLocalPlayer()) return;
+	curPerspective = event.getPerspective();
 }

@@ -42,6 +42,7 @@ void Zoom::defaultConfig()
 	setDef("modifier", 10.0f);
 	setDef("anim", 0.20f);
 	setDef("disableanim", false);
+	saveSettings();
 }
 
 void Zoom::settingsRender(float settingsOffset)
@@ -190,8 +191,7 @@ void Zoom::onKey(KeyEvent& event)
 	if (this->isKeybind(event.keys) &&
 		this->isKeyPartOfKeybind(event.key) &&
 		(getOps<bool>("toggleZoom") ? event.getAction() == ActionType::Pressed : true)
-		&& SDK::getCurrentScreen() == "hud_screen") {
-		std::cout << "test" << std::endl;
+		&& (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f3_screen")) {
 		keybindActions[0]({});
 		if (!getOps<bool>("SaveModifier")) zoomValue = 30.0f;
 	}
