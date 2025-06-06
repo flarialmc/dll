@@ -1,11 +1,9 @@
 #include "CommandHotkey.hpp"
 
-#include "Events/EventManager.hpp"
-
 void CommandHotkey::onSetup() {
-	keybindActions.clear();
-	for (size_t i = 1; i < this->totalKeybinds; ++i) {
-		this->keybindActions.push_back([this, i](std::vector<std::any> args) -> std::any {
+
+	for (int i = 0; i < totalKeybinds; ++i) {
+		keybindActions.push_back([this, i](std::vector<std::any> args) -> std::any {
 
 			KeyEvent event = std::any_cast<KeyEvent>(args[0]);
 			std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
@@ -43,7 +41,7 @@ void CommandHotkey::onDisable() {
 void CommandHotkey::defaultConfig() {
 	getKeybind();
 	Module::defaultConfig("core");
-	saveSettings();
+	if (settings.getSettingByName<std::string>("command") == nullptr) settings.addSetting("command", (std::string)"");
 }
 
 void CommandHotkey::settingsRender(float settingsOffset) {
@@ -66,15 +64,18 @@ void CommandHotkey::settingsRender(float settingsOffset) {
 		this->settings.addSetting(keybindName, (std::string)"");
 		this->settings.addSetting(commandName, (std::string)"");
 
+
 		int i = totalKeybinds;
 		keybindActions.push_back([this, i](std::vector<std::any> args) -> std::any {
 			KeyEvent event = std::any_cast<KeyEvent>(args[0]);
 			std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
 			if (duration.count() >= 2.5) {
+				std::string count;
+				if (i > 0) count = "-" + FlarialGUI::cached_to_string(i);
 				if (this->isKeybind(event.keys, i) && this->isKeyPartOfKeybind(event.key, i)) {
 					std::shared_ptr<Packet> packet = SDK::createPacket(77);
 					auto* command_packet = reinterpret_cast<CommandRequestPacket*>(packet.get());
-					command_packet->command = this->settings.getSettingByName<std::string>("command-" + FlarialGUI::cached_to_string(i))->value;
+					command_packet->command = this->settings.getSettingByName<std::string>("command" + count)->value;
 					command_packet->origin.type = CommandOriginType::Player;
 					command_packet->InternalSource = true;
 					SDK::clientInstance->getPacketSender()->sendToServer(command_packet);
@@ -91,20 +92,21 @@ void CommandHotkey::settingsRender(float settingsOffset) {
 		});
 
 
-	for (size_t i = 1; i < totalKeybinds; ++i) {
-		std::string header = "Command " + FlarialGUI::cached_to_string(i + 1);
-		std::string commandSettingName = "command-" + FlarialGUI::cached_to_string(i);
+	for (int i = 0; i < totalKeybinds; ++i) {
+
+		std::string header = (i == 0) ? "Command" : "Command " + FlarialGUI::cached_to_string(i);
+		std::string commandSettingName = (i == 0) ? "command" : "command-" + FlarialGUI::cached_to_string(i);
 
 		if (settings.getSettingByName<std::string>(commandSettingName) != nullptr) {
 			this->addHeader(header);
-			this->addKeybind("Command Keybind", "Hold for 2 seconds!", getKeybind(i, true));
+			this->addKeybind("Command Keybind", "Hold for 2 seconds!", getKeybind(i));
 			this->addTextBox(
 				"Command to Send",
 				"No need for /, And there's a spam limit!",
 				settings.getSettingByName<std::string>(commandSettingName)->value
 			);
-			this->addButton("Delete Hotkey", "", "Delete", [this, i]() {
-				this->settings.deleteSetting("command-" + FlarialGUI::cached_to_string(i));
+			this->addButton("Delete Hotkey", "", "Delete", [this, i, commandSettingName]() {
+				this->settings.deleteSetting(commandSettingName);
 				this->settings.deleteSetting("keybind-" + FlarialGUI::cached_to_string(i));
 				this->saveSettings();
 				});
@@ -119,8 +121,8 @@ void CommandHotkey::settingsRender(float settingsOffset) {
 
 void CommandHotkey::onKey(KeyEvent& event) {
 	if (!SDK::clientInstance->getLocalPlayer()) return;
-	if (isEnabled() && SDK::getCurrentScreen() == "hud_screen" && totalKeybinds > 0) {
-		for (size_t i = 0; i < totalKeybinds - 1; ++i) {
+	if (this->isEnabled() && SDK::getCurrentScreen() == "hud_screen") {
+		for (int i = 0; i <= totalKeybinds; ++i) {
 			keybindActions[i]({ std::any(event) });
 		}
 	}

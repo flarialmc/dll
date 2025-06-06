@@ -1,35 +1,21 @@
 #include "TextHotkey.hpp"
 
-#include "Events/EventManager.hpp"
-#include "SDK/Client/Network/Packet/TextPacket.hpp"
-
-TextHotkey::TextHotkey() : Module("Text Hotkey", "Send something in chat with a\nclick of a button!",
-	IDR_TEXT_BOX_PNG, "")
-{
-
-}
-
-void TextHotkey::onEnable()
-{
+void TextHotkey::onEnable() {
 	Listen(this, KeyEvent, &TextHotkey::onKey)
 		Module::onEnable();
 }
 
-void TextHotkey::onDisable()
-{
+void TextHotkey::onDisable() {
 	Deafen(this, KeyEvent, &TextHotkey::onKey)
 		Module::onDisable();
 }
 
-void TextHotkey::defaultConfig()
-{
+void TextHotkey::defaultConfig() {
 	getKeybind();
 	Module::defaultConfig("core");
-	saveSettings();
 }
 
-void TextHotkey::settingsRender(float settingsOffset)
-{
+void TextHotkey::settingsRender(float settingsOffset) {
 	float x = Constraints::PercentageConstraint(0.019, "left");
 	float y = Constraints::PercentageConstraint(0.10, "top");
 
@@ -56,6 +42,8 @@ void TextHotkey::settingsRender(float settingsOffset)
 			KeyEvent event = std::any_cast<KeyEvent>(args[0]);
 			std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
 			if (duration.count() >= 2.5) {
+				std::string count;
+				if (i > 0) count = "-" + FlarialGUI::cached_to_string(i);
 				if (this->isKeybind(event.keys, i) && this->isKeyPartOfKeybind(event.key, i)) {
 					auto player = SDK::clientInstance->getLocalPlayer();
 					//std::string xuid = *player->getXuid(&xuid);
@@ -64,7 +52,7 @@ void TextHotkey::settingsRender(float settingsOffset)
 
 					akbar->type = TextPacketType::CHAT;
 					akbar->message = std::regex_replace(
-						this->settings.getSettingByName<std::string>("text-" + FlarialGUI::cached_to_string(i))->value, std::regex("�"), "§");
+						this->settings.getSettingByName<std::string>("text" + count)->value, std::regex("�"), "§");
 					akbar->platformId = "";
 					akbar->translationNeeded = false;
 					//akbar->xuid = xuid;
@@ -84,21 +72,23 @@ void TextHotkey::settingsRender(float settingsOffset)
 		});
 
 
-	for (size_t i = 1; i < totalKeybinds; ++i) {
+	for (int i = 0; i < totalKeybinds; ++i) {
 
-		std::string header = "Text " + FlarialGUI::cached_to_string(i);
-		std::string commandSettingName = "text-" + FlarialGUI::cached_to_string(i);
+		std::string header = (i == 0) ? "Text" : "Text " + FlarialGUI::cached_to_string(i);
+		std::string commandSettingName = (i == 0) ? "text" : "text-" + FlarialGUI::cached_to_string(i);
 
 		if (settings.getSettingByName<std::string>(commandSettingName) != nullptr) {
 			this->addHeader(header);
-			this->addKeybind("Text Hotkey", "Hold for 2 seconds!", getKeybind(i, true));
+
+			this->addKeybind("Text Hotkey", "Hold for 2 seconds!", getKeybind(i));
+
 			this->addTextBox(
 				"Text to Send",
 				"There's a spam limit!",
 				settings.getSettingByName<std::string>(commandSettingName)->value
 			);
-			this->addButton("Delete Hotkey", "", "Delete", [this, i]() {
-				this->settings.deleteSetting("text-" + FlarialGUI::cached_to_string(i));
+			this->addButton("Delete Hotkey", "", "Delete", [this, i, commandSettingName]() {
+				this->settings.deleteSetting(commandSettingName);
 				this->settings.deleteSetting("keybind-" + FlarialGUI::cached_to_string(i));
 				this->saveSettings();
 				});
@@ -111,14 +101,16 @@ void TextHotkey::settingsRender(float settingsOffset)
 	this->resetPadding();
 }
 
-void TextHotkey::onSetup()
-{
-	for (size_t i = 1; i < totalKeybinds; ++i) {
+void TextHotkey::onSetup() {
+
+	for (int i = 0; i < totalKeybinds; ++i) {
 		keybindActions.push_back([this, i](std::vector<std::any> args) -> std::any {
 
 			KeyEvent event = std::any_cast<KeyEvent>(args[0]);
 			std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - last_used;
 			if (duration.count() >= 2.5) {
+				std::string count;
+				if (i > 0) count = "-" + FlarialGUI::cached_to_string(i);
 				if (this->isKeybind(event.keys, i) && this->isKeyPartOfKeybind(event.key, i)) {
 					auto player = SDK::clientInstance->getLocalPlayer();
 					//std::string xuid = *player->getXuid(&xuid);
@@ -127,7 +119,7 @@ void TextHotkey::onSetup()
 
 					akbar->type = TextPacketType::CHAT;
 					akbar->message = std::regex_replace(
-						this->settings.getSettingByName<std::string>("text-" + FlarialGUI::cached_to_string(i))->value, std::regex("�"), "§");
+						this->settings.getSettingByName<std::string>("text" + count)->value, std::regex("�"), "§");
 					akbar->platformId = "";
 					akbar->translationNeeded = false;
 					//akbar->xuid = xuid;
@@ -145,12 +137,10 @@ void TextHotkey::onSetup()
 	}
 }
 
-void TextHotkey::onKey(KeyEvent& event)
-{
-	if (!this->isEnabled()) return;
+void TextHotkey::onKey(KeyEvent& event) {
 	if (!SDK::clientInstance->getLocalPlayer()) return;
-	if (this->isEnabled() && totalKeybinds > 0) {
-		for (size_t i = 0; i < totalKeybinds - 1; ++i) {
+	if (this->isEnabled()) {
+		for (int i = 0; i <= totalKeybinds; ++i) {
 			keybindActions[i]({ std::any(event) });
 		}
 	}

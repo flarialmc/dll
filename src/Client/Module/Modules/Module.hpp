@@ -42,9 +42,6 @@ public:
 		isScriptingModule = isScripting;
 		settings = Settings();
 		settingspath = isScripting ? Utils::getClientPath() + "\\Scripts\\Configs\\" + name + ".flarial" : Utils::getConfigsPath() + "\\" + name + ".flarial";
-
-		//checkSettingsFile();
-		//loadSettings();
 	}
 
 	void postConstructInitialize() {
@@ -83,6 +80,7 @@ public:
 	};
 
 	std::unordered_map<int, std::string> color_pickers;
+	std::unordered_map<int, ColorPickerStruct> color_pickers2;
 
 	template <typename T>
 	T& getOps(std::string setting);
@@ -104,7 +102,11 @@ public:
 		std::function<void()> action);
 
 	void addConditionalTextBox(bool condition, std::string text, std::string subtext, std::string& value, int limit = 16);
+
+	void addConditionalColorPicker(bool condition, std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb);
 	void addConditionalColorPicker(bool condition, std::string text, std::string subtext, std::string settingName);
+
+
 	void addConditionalDropdown(bool condition, std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value);
 
 	void addConditionalToggle(bool condition, std::string text, std::string subtext, bool& value);
@@ -128,6 +130,7 @@ public:
 	void addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string& value);
 	void addDropdown(std::string text, std::string subtext, const std::vector<std::string>& options, std::string settingName, bool resettable);
 
+	void addColorPicker(std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb);
 	void addColorPicker(std::string text, std::string subtext, std::string settingName);
 
 	virtual void loadDefaults();

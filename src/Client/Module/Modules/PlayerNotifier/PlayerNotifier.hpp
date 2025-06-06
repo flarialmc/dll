@@ -10,10 +10,13 @@
 class PlayerNotifier : public Module {
 	int totalPlayers = 0;
 public:
-	PlayerNotifier();;
+	PlayerNotifier() : Module("Player Notifier", "Notifies you when a player is in the server.", IDR_CURSOR_PNG, "P") {
+		/*Module::setup();
+		defaultConfig();
+		loadSettings();*/
+	};
 
 	void defaultConfig() override;
-
 	void onEnable() override;
 
 	void onDisable() override;
@@ -41,6 +44,5 @@ public:
 	*/
 
 	void settingsRender(float settingsOffset) override;
-
 	void onKey(KeyEvent& event);;
 };

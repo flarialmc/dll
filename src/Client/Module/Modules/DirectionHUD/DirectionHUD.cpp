@@ -239,7 +239,7 @@ void DirectionHUD::onRender(RenderEvent &event) {
 
         std::stringstream ss;
         ss << std::fixed << std::setprecision(floor(getOps<float>("degreesDecimalCount"))) << compassDegrees;
-        std::string degreesText = ss.str() + (getOps<bool>("degreeSymbol") ? "�" : "");
+        std::string degreesText = ss.str() + (getOps<bool>("degreeSymbol") ? "°" : "");
 
         // get text size for positioning
         float degreesTextSize = Constraints::SpacingConstraint(5.f, barHeight) * getOps<float>("degreesTextSize");

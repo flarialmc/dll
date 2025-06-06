@@ -250,7 +250,8 @@ void Module::resetPadding() {
 
 	int i = 100;
 	for (int i = 100; i < colorPickerIndex; ++i) {
-		FlarialGUI::ColorPickerWindow(i, this->name, color_pickers[i]);
+		if (color_pickers2.count(i)) FlarialGUI::ColorPickerWindow(i, *color_pickers2[i].value, *color_pickers2[i].opacity, *color_pickers2[i].rgb);
+		else FlarialGUI::ColorPickerWindow(i, this->name, color_pickers[i]);
 	}
 
 	colorPickerIndex = 100;
@@ -446,6 +447,41 @@ void Module::addConditionalColorPicker(bool condition, std::string text, std::st
 		if (conditionalColorPickerAnims[colorPickerIndex] < Constraints::RelativeConstraint(0.0499f, "height", true)) {
 			padding -= conditionalColorPickerAnims[colorPickerIndex];
 			Module::addColorPicker(text, subtext, settingName);
+		}
+		else colorPickerIndex++;
+	}
+
+	FlarialGUI::ResetOverrideAlphaValues();
+}
+
+void Module::addColorPicker(std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb) {
+	float elementX = Constraints::PercentageConstraint(0.195f, "right");
+	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
+
+	FlarialGUI::ColorPicker(colorPickerIndex, elementX, y, value, rgb);
+
+	Module::addElementText(text, subtext);
+
+	padding += Constraints::RelativeConstraint(0.05f, "height", true);
+
+	ColorPickerStruct respect = { &value, &opacity, &rgb };
+	color_pickers2[colorPickerIndex] = respect;
+	colorPickerIndex++;
+}
+
+void Module::addConditionalColorPicker(bool condition, std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb) {
+	FlarialGUI::OverrideAlphaValues((Constraints::RelativeConstraint(0.05f, "height", true) - conditionalColorPickerAnims[colorPickerIndex]) / Constraints::RelativeConstraint(0.05f, "height", true));
+
+	if (condition) {
+		padding -= conditionalColorPickerAnims[colorPickerIndex];
+		FlarialGUI::lerp(conditionalColorPickerAnims[colorPickerIndex], 0.0f, 0.25f * FlarialGUI::frameFactor);
+		Module::addColorPicker(text, subtext, value, opacity, rgb);
+	}
+	else {
+		FlarialGUI::lerp(conditionalColorPickerAnims[colorPickerIndex], Constraints::RelativeConstraint(0.05f, "height", true), 0.25f * FlarialGUI::frameFactor);
+		if (conditionalColorPickerAnims[colorPickerIndex] < Constraints::RelativeConstraint(0.0499f, "height", true)) {
+			padding -= conditionalColorPickerAnims[colorPickerIndex];
+			Module::addColorPicker(text, subtext, value, opacity, rgb);
 		}
 		else colorPickerIndex++;
 	}

@@ -9,7 +9,6 @@ private:
 public:
 	CommandHotkey() : Module("Command Hotkey", "Send command with a\nclick of a button!",
 		IDR_TEXT_BOX_PNG, "") {
-		
 	};
 	void onSetup() override;
 
@@ -23,4 +22,3 @@ public:
 
 	void onKey(KeyEvent& event);
 };
-
