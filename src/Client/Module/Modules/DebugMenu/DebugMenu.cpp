@@ -113,10 +113,10 @@ int JavaDebugMenu::GetTicks() {
 
 std::string JavaDebugMenu::getFacingDirection(LocalPlayer* player) {
 	std::string direction;
-	if (lerpYaw >= -45 && lerpYaw < 45) direction = "South";
-	else if (lerpYaw >= 45 && lerpYaw < 135) direction = "West";
-	else if (lerpYaw >= 135 || lerpYaw < -135) direction = "North";
-	else direction = "East";
+	if (lerpYaw >= -45 && lerpYaw < 45) direction = "South (Towards positive Z)";
+	else if (lerpYaw >= 45 && lerpYaw < 135) direction = "West (Towards negative X)";
+	else if (lerpYaw >= 135 || lerpYaw < -135) direction = "North (Towards negative Z)";
+	else direction = "East (Towards positive X)";
 	return std::format("Facing: {} ({:.1f} / {:.1f})", direction, lerpYaw, lerpPitch);
 }
 
