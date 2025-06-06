@@ -113,14 +113,14 @@ public:
 	}
 
 	ClickGUI() : Module("ClickGUI", "What do you think it is?", IDR_CLICKGUI_PNG, "K") {
-		
+
 		this->ghostMainModule = new Module("main", "troll", IDR_COMBO_PNG, "");
 		scrollInfo["modules"] = { 0, 0 };
 		scrollInfo["scripting"] = { 0, 0 };
 		scrollInfo["settings"] = { 0, 0 };
 
 		Listen(this, MouseEvent, &ClickGUI::onMouse)
-		//Listen(this, FOVEvent, &ClickGUI::fov)
+			//Listen(this, FOVEvent, &ClickGUI::fov)
 			Listen(this, KeyEvent, &ClickGUI::onKey)
 			ListenOrdered(this, PacketEvent, &ClickGUI::onPacketReceive, EventOrder::IMMEDIATE)
 			ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
@@ -212,7 +212,7 @@ public:
 		addColorPicker("Disabled", "", "modCardDisabled");
 		addColorPicker("Primary 1", "Active elements, main color of sliders, bg color of enabled toggles", "primary1");
 		addColorPicker("Primary 2", "Minor color of toggles and sliders, text Indicator color", "primary2");
-		addColorPicker("Primary 3", "Color of inactive elements, unfilled slider bar color, inner color of color pickers, background color of disabled toggles","primary3");
+		addColorPicker("Primary 3", "Color of inactive elements, unfilled slider bar color, inner color of color pickers, background color of disabled toggles", "primary3");
 		addColorPicker("Primary 4", "Base color of color pickers, hover color of dropdown childrens", "primary4");
 		addColorPicker("Secondary 1", "Background color of settings", "secondary1");
 		addColorPicker("Secondary 2", "Background color of navigation bar, tooltips, and buttons", "secondary2");
@@ -246,6 +246,8 @@ public:
 	void onKey(KeyEvent& event) {
 
 		//TODO: MAKE module->setActive() module->isActive() module->isRestricted()
+		if (event.getKey() == VK_CONTROL && event.getAction() == ActionType::Pressed) MC::holdingCTRL = true;
+		else if (event.getKey() == VK_CONTROL && event.getAction() == ActionType::Released) MC::holdingCTRL = false;
 
 		if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key) && event.getAction() == ActionType::Pressed) {
 
@@ -261,6 +263,7 @@ public:
 			}
 
 			if (this->active) {
+				MC::lastMouseScroll = MouseAction::Release;
 				accumilatedPos = 0;
 				accumilatedBarPos = 0;
 
@@ -282,6 +285,7 @@ public:
 					// exit ClickGUI
 					SDK::clientInstance->grabMouse(); // let mouse control the view
 
+					MC::lastMouseScroll = MouseAction::Release;
 					this->active = false;
 					page.type = "normal";
 					curr = "modules";
@@ -293,6 +297,8 @@ public:
 			}
 			else {
 				// switch from edit mode back to ClickGUI
+				MC::lastMouseScroll = MouseAction::Release;
+				ModuleManager::SaveModulesConfig();
 				editmenu = false;
 				this->active = true;
 			}
@@ -321,6 +327,8 @@ public:
 					"editmenubind")->value)) {
 
 				if (!editmenu) {
+					ModuleManager::SaveModulesConfig();
+					MC::lastMouseScroll = MouseAction::Release;
 					this->active = false;
 					FlarialGUI::Notify("Right click a module to directly go to their settings page.");
 					FlarialGUI::Notify("To disable this menu press ESC or " +
@@ -338,10 +346,10 @@ public:
 			editmenu && this->isKeybind(event.keys) && Module::isKeyPartOfAdditionalKeybind(event.key,
 				this->settings.getSettingByName<std::string>(
 					"editmenubind")->value)) {
-
+			ModuleManager::SaveModulesConfig();
+			MC::lastMouseScroll = MouseAction::Release;
 			editmenu = false;
 			this->active = true;
-
 		}
 
 		if (this->active || editmenu && SDK::getCurrentScreen() == "hud_screen")
@@ -362,13 +370,19 @@ public:
 		if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Press) MC::held = true;
 		if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Release) MC::held = false;
 		if (event.getButton() != MouseButton::None) MC::lastMouseButton = event.getButton();
-		
-		if (event.getButton() == MouseButton::Scroll) {
-			if (!MC::scrollId) MC::scrollId = -1;
-			MC::lastScrollId = MC::scrollId;
-			MC::scrollId = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-			MC::lastMouseScroll = event.getAction();
+		if (event.getButton() == MouseButton::Scroll) {
+			if (editmenu == true) {
+				if (!MC::scrollId) MC::scrollId = -1;
+				MC::lastScrollId = MC::scrollId;
+				MC::scrollId = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+				MC::lastMouseScroll = event.getAction();
+			}
+			else {
+				MC::lastMouseScroll = MouseAction::Release;
+			}
+
 
 			accumilatedPos += (event.getAction() == MouseAction::ScrollUp) ? FlarialGUI::scrollposmodifier
 				: -FlarialGUI::scrollposmodifier;

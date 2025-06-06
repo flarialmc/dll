@@ -368,6 +368,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 			round.x, "editmenu",
 			curr)) {
 			this->active = false;
+			ModuleManager::SaveModulesConfig();
 			FlarialGUI::Notify("Right click a module to directly go to their settings page.");
 			FlarialGUI::Notify("To disable this menu press ESC or " + getOps<std::string>("editmenubind"));
 			editmenu = true;
@@ -897,8 +898,8 @@ void ClickGUI::onRender(RenderEvent& event) {
 					L"RESET POS", buttonWidth, buttonHeight, round.x, round.x)) {
 					auto currentModule = ModuleManager::getModule(page.module);
 					if (currentModule != nullptr) {
-						currentModule->settings.getSettingByName<float>("percentageX")->value = 0.0f;
-						currentModule->settings.getSettingByName<float>("percentageY")->value = 0.0f;
+						if (currentModule->settings.getSettingByName<float>("percentageX") != nullptr) currentModule->settings.getSettingByName<float>("percentageX")->value = 0.0f;
+						if (currentModule->settings.getSettingByName<float>("percentageY") != nullptr) currentModule->settings.getSettingByName<float>("percentageY")->value = 0.0f;
 						FlarialGUI::ResetShit();
 					}
 				}

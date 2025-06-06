@@ -88,7 +88,7 @@ void Module::normalRenderCore(int index, std::string& text) {
 	if (prevAlignments[index] == DWRITE_TEXT_ALIGNMENT_JUSTIFIED) prevAlignments[index] = alignment;
 
 	if (prevAlignments[index] != alignment) {
-		float toAdjust;
+		float toAdjust = 0;
 		if (prevAlignments[index] == DWRITE_TEXT_ALIGNMENT_CENTER) {
 			if (alignment == DWRITE_TEXT_ALIGNMENT_LEADING) toAdjust = rectWidth / -2.f;
 			else toAdjust = rectWidth / 2.f;

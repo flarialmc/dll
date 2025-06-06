@@ -31,6 +31,7 @@ public:
     static inline long long scrollId;
     static inline long long lastScrollId;
     static inline bool held;
+    static inline bool holdingCTRL;
 
     static inline std::string GPU;
 

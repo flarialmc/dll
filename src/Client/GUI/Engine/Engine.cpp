@@ -1193,6 +1193,7 @@ void FlarialGUI::UnsetScrollView() {
 }
 
 void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int currentNum) {
+	if (MC::mouseButton == MouseButton::Right) return;
 	float fixer = 0;
 	isInWindowRect = true;
 
@@ -1254,7 +1255,7 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 	WindowRects[currentNum].percentageX = WindowRects[currentNum].movedX / MC::windowSize.x;
 	WindowRects[currentNum].percentageY = WindowRects[currentNum].movedY / MC::windowSize.y;
 
-	if (WindowRects[currentNum].isMovingElement && Client::settings.getSettingByName<bool>("snappinglines")->value) {
+	if (WindowRects[currentNum].isMovingElement && Client::settings.getSettingByName<bool>("snappinglines")->value && !MC::holdingCTRL) {
 		const float alignmentThreshold = 10.0f;
 		const ImColor pink(1.0f, 0.0f, 1.0f, 1.0f);
 
