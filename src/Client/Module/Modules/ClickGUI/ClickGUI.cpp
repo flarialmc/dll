@@ -54,7 +54,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 	Vec2<float> allahuakbar = Constraints::CenterConstraint(allahu, akbar, "y", 1.175, 1.175);
 	// TODO: add inventory screen to onRender?
 	// watermark
-	if (SDK::getCurrentScreen() == "inventory_screen" || SDK::getCurrentScreen().find("chest") != std::string::npos)
+	if (SDK::getCurrentScreen() == "inventory_screen" || SDK::getCurrentScreen().contains("chest"))
 		if (Client::settings.getSettingByName<bool>("watermark")->value)
 			FlarialGUI::image(IDR_FLARIAL_TITLE_PNG, D2D1::RectF(allahuakbar.x, allahuakbar.y, allahuakbar.x + allahu, allahuakbar.y + akbar));
 
@@ -874,26 +874,33 @@ void ClickGUI::onRender(RenderEvent& event) {
 
 				textCol.a = settingsOpacity;
 				if (FlarialGUI::RoundedButton(0, spacingX + centered.first + rectX - settingsOffset,
-					thingYes.second + rectHeight + rectY - Constraints::RelativeConstraint(0.06f), colorThing, textCol, L"Reset",
+					thingYes.second + rectHeight + rectY - Constraints::RelativeConstraint(0.06f), colorThing, textCol, L"RESET ALL",
 					buttonWidth, buttonHeight, round.x, round.x)) {
 					auto currentModule = ModuleManager::getModule(page.module);
-					bool wasEnabled = currentModule->isEnabled();
-					currentModule->enabledState = false; // THIS MIGHT BE WITH DELAY !!!
-					currentModule->active = false;
-					currentModule->loadDefaults();
-					FlarialGUI::ResetShit();
-					if (wasEnabled) {
-						currentModule->getOps<bool>("enabled") = true;
-						currentModule->enabledState = true;
-						saveSettings();
+					if (currentModule != nullptr) {
+						bool wasEnabled = currentModule->isEnabled();
+						currentModule->enabledState = false; // THIS MIGHT BE WITH DELAY !!!
+						currentModule->active = false;
+						currentModule->loadDefaults();
+						FlarialGUI::ResetShit();
+						if (wasEnabled) {
+							currentModule->getOps<bool>("enabled") = true;
+							currentModule->enabledState = true;
+							saveSettings();
+						}
 					}
 				}
 
 
 				if (FlarialGUI::RoundedButton(1, -spacingX + centered.first + rectX + childWidth - buttonWidth - settingsOffset,
 					thingYes.second + rectHeight + rectY - Constraints::RelativeConstraint(0.06f), colorThing, textCol,
-					L"Copy From", buttonWidth, buttonHeight, round.x, round.x)) {
-
+					L"RESET POS", buttonWidth, buttonHeight, round.x, round.x)) {
+					auto currentModule = ModuleManager::getModule(page.module);
+					if (currentModule != nullptr) {
+						currentModule->settings.getSettingByName<float>("percentageX")->value = 0.0f;
+						currentModule->settings.getSettingByName<float>("percentageY")->value = 0.0f;
+						FlarialGUI::ResetShit();
+					}
 				}
 			}
 		}
