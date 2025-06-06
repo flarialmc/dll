@@ -62,7 +62,6 @@ void Waypoints::onSetup() {
 	if (this->settings.getSettingByName<float>("total")->value > 0)
 		for (int i = 0; i < this->settings.getSettingByName<float>("total")->value; i++) {
 			if (!this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(i))) continue;
-			Logger::debug("added this shit {}", i);
 			addWaypoint(
 				i,
 				this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(i))->value,
