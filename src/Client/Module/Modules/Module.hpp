@@ -88,6 +88,7 @@ public:
 	template <typename T>
 	void setDef(std::string setting, T value);
 
+	void forceDef(std::string setting, std::string col, float opac, bool rgb);
 	void setDef(std::string setting, std::string col, float opac, bool rgb);
 
 	D2D_COLOR_F getColor(std::string text);
