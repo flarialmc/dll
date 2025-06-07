@@ -17,10 +17,10 @@
 class CrosshairImage
 {
 public:
-	std::vector<bool> PixelData = std::vector<bool>(256, false);
+	std::vector<Vec4<int>> PixelData = std::vector<Vec4<int>>(256, Vec4<int>(0, 0, 0, 0));
 	int Size = 16;
 	bool valid = false;
-	CrosshairImage(std::vector<bool> Data, int Size);
+	CrosshairImage(int Size);
 	CrosshairImage(std::string Path);
 	CrosshairImage() {};
 	const unsigned char* getImageData();

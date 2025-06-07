@@ -255,7 +255,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 
 		x = Constraints::PercentageConstraint(0.04, "left");
 
-		Toggle(123, x, y, module->getOps<bool>(settingName + "RGB"), true, moduleName, settingName);
+		Toggle(123, x, y, module->getOps<bool>(settingName + "RGB"), true, moduleName, settingName + "RGB");
 
 		/*if (module->getOps<bool>(settingName + "RGB")) module->getOps<bool>(settingName + "RGB") = !module->getOps<bool>(settingName + "RGB");*/
 

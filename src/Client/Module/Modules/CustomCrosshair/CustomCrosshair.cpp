@@ -8,6 +8,24 @@ void CustomCrosshair::onEnable() {
     Listen(this, HudCursorRendererRenderEvent, &CustomCrosshair::onHudCursorRendererRender)
     Listen(this, RenderEvent, &CustomCrosshair::onRender)
     Module::onEnable();
+
+    std::string Path = Utils::getClientPath() + "\\Crosshairs";
+
+    for (const auto& entry : std::filesystem::directory_iterator(Path))
+    {
+        auto ch = new CrosshairImage(entry.path().string());
+        Logger::debug("Crosshair: " + entry.path().string());
+
+        std::string name = entry.path().filename().string();
+        crosshairs[name.substr(0, name.size()-4)] = ch;
+
+        Logger::debug("Crosshair loaded: " + name);
+
+    }
+
+    std::cout << crosshairs.empty() << std::endl;
+
+    if (crosshairs.empty()) crosshairs["Crosshair1"] = new CrosshairImage();
 }
 
 void CustomCrosshair::onDisable() {
@@ -27,7 +45,13 @@ void CustomCrosshair::defaultConfig() {
     setDef("renderInThirdPerson", false);
     setDef("default", (std::string) "fafafa", 0.55f, false);
     setDef("enemy", (std::string) "FF0000", 1.f, false);
+    setDef("CurrentSelectedColor", (std::string)"FFFFFF", 1.f, false);
     setDef("CurrentCrosshair", (std::string)"Crosshair1");
+    setDef("ShowGridLines", true);
+    setDef("HighlightMiddleLine", true);
+
+    getOps<std::string>("CurrentSelectedColorCol") = "FFFFFF";
+    getOps<float>("CurrentSelectedColorOpacity") = 1.f;
 }
 
 void CustomCrosshair::settingsRender(float settingsOffset) {
@@ -55,6 +79,9 @@ void CustomCrosshair::settingsRender(float settingsOffset) {
         addButton("Reload Crosshair", "Reloads Crosshair to apply any changes", "reload", [&]() {
             CrosshairReloaded = true;
         });
+
+        addToggle("Show Grid Lines", "Shows the grid of the canvas.", "ShowGridLines");
+        addToggle("Highlight Middle Line", "Adds 2 red lines to show the middle of the canvas", "HighlightMiddleLine");
 
         extraPadding();
     }
@@ -130,10 +157,10 @@ void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &ev
 
     tess->begin(mce::PrimitiveMode::QuadList, 4);
 
-    D2D1_COLOR_F enemyColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("enemyColor")->value);
+    D2D1_COLOR_F enemyColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("enemyCol")->value);
     enemyColor.a = settings.getSettingByName<float>("enemyOpacity")->value;
 
-    D2D1_COLOR_F defaultColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("defaultColor")->value);
+    D2D1_COLOR_F defaultColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("defaultCol")->value);
     defaultColor.a = settings.getSettingByName<float>("defaultOpacity")->value;
 
     auto shouldHighlight = settings.getSettingByName<bool>("highlightOnEntity")->value;
