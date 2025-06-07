@@ -108,10 +108,7 @@ public:
 		try {
 			json jsonData = json::parse(jsonString);
 
-			if (!jsonData.is_object()) {
-				Logger::error("JSON must be an object");
-				return;
-			}
+			if (!jsonData.is_object()) return;
 
 			std::unordered_map<std::string, std::unique_ptr<Setting>> newSettings;
 

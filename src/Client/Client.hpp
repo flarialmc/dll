@@ -11,6 +11,8 @@ if (Client::settings.getSettingByName<decltype(value)>(setting) == nullptr) \
 Client::settings.addSetting(setting, value);
 
 class Client {
+private:
+	inline static std::string privatePath = Utils::getConfigsPath() + "\\PRIVATE";
 public:
 	static std::string current_commit;
 	static float elapsed;
@@ -23,6 +25,7 @@ public:
 	static void createConfig(std::string name);
 
 	static void deleteConfig(std::string name);
+	static void switchConfig(std::string name, bool reload = true);
 
 	static void loadAvailableConfigs();
 
@@ -37,18 +40,32 @@ public:
 	inline static std::string version;
 	inline static HMODULE currentModule = nullptr;
 
-	inline static std::string path = Utils::getConfigsPath() + "\\main.json";
+	inline static std::string path = Utils::getConfigsPath() + "\\default.json";
 	static void SaveSettings() {
 
 		try {
-			std::ofstream cls(path, std::ofstream::out | std::ofstream::trunc); cls.close(); //clearAdd commentMore actions
+			// clear files
+			std::ofstream cls(path, std::ofstream::out | std::ofstream::trunc); cls.close();
+			std::ofstream pCls(privatePath, std::ofstream::out | std::ofstream::trunc); pCls.close();
 
+			// open for writing
 			std::ofstream cFile(path, std::ios::app);
-			cFile << "{ \n";
-			for (const auto& pair : ModuleManager::moduleMap) {
-				cFile << '"' << pair.second->name << "\": " << pair.second->settings.ToJson() << ", \n";
+
+			std::ofstream pFile(privatePath, std::ios::app);
+
+			//write configs
+			pFile << settings.ToJson();
+			pFile.close();
+			cFile << "{";
+
+			auto it = ModuleManager::moduleMap.begin();
+			while (it != ModuleManager::moduleMap.end()) {
+				cFile << "\n  \"" << it->second->name << "\": " << it->second->settings.ToJson();
+				++it;
+				if (it != ModuleManager::moduleMap.end()) { cFile << ","; }
 			}
-			cFile << "\"main\":" << settings.ToJson() << "\n }";
+			cFile << "\n}";
+			cFile.close();
 		}
 		catch (const std::exception& e) {
 			LOG_ERROR("An error occurred while trying to save settings: {}", e.what());
@@ -63,7 +80,6 @@ public:
 
 		std::stringstream ss;
 		ss << inputFile.rdbuf();
-		inputFile.close();
 		std::string str = ss.str();
 
 		if (str.empty()) {
@@ -75,10 +91,21 @@ public:
 		catch (const nlohmann::json::parse_error& e) {
 			Logger::error("Failed to parse JSON: {}", e.what());
 		}
-		try {
-			settings.FromJson(globalSettings["main"].dump());
+		// load private client settingsAdd commentMore actions
+
+		std::ifstream privateFile(privatePath);
+		if (!privateFile) return;
+
+		std::stringstream pSS;
+		pSS << privateFile.rdbuf();
+		std::string pStr = pSS.str();
+
+		if (pStr.empty()) return;
+
+		try { settings.FromJson(pStr); }
+		catch (const nlohmann::json::parse_error& e) {
+			Logger::error("Failed to parse JSON: {}", e.what());
 		}
-		catch (const std::exception& e) { Logger::error(e.what()); }
 	}
 
 	static void CheckSettingsFile() {
@@ -86,7 +113,9 @@ public:
 			std::filesystem::create_directories(std::filesystem::path(path).parent_path());
 
 			std::ofstream file(path, std::ios::app);
-			if (!file) {
+			std::ofstream pFile(privatePath, std::ios::app);
+			//SetFileAttributes(privatePath, FILE_ATTRIBUTE_HIDDEN);    idk, might actually do this in the future
+			if (!file || !pFile) {
 				LOG_ERROR("Failed to create settings file: {}", path);
 			}
 		}

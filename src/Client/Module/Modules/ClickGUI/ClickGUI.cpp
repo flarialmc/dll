@@ -147,20 +147,8 @@ void ClickGUI::onRender(RenderEvent& event) {
 		D2D1_COLOR_F fLARIALlOGO = clickgui->getColor("flariallogo", "ClickGUI");
 
 		if (!Client::settings.getSettingByName<bool>("noicons")->value) {
-			if (getOps<bool>("custom_logo") && std::filesystem::exists(Utils::getRoamingPath() + "\\Flarial\\assets\\custom-logo.png")) {
-				FlarialGUI::image("Flarial\\assets\\custom-logo.png",
-					D2D1::RectF(logoX, logoY, logoX + logoWidthButReal,
-						logoY + logoWidthButReal));
-
-			}
-			else {
-				if (ModuleManager::getModule("Lewis")->getOps<bool>("lewislogo"))
-				{
-					FlarialGUI::image(IDR_LEWIS_PNG, D2D1::RectF(logoX - (logoWidthButReal * 0.2), logoY - (logoWidthButReal * 0.2), logoX + (logoWidthButReal * 1.4), logoY + (logoWidthButReal * 1.4)), "PNG");
-				}
-				else
-					FlarialGUI::image(IDR_WHITE_LOGO_PNG, D2D1::RectF(logoX, logoY, logoX + logoWidthButReal, logoY + logoWidthButReal), "PNG", true, FlarialGUI::D2DColorToImColor(fLARIALlOGO));
-			}
+			if (ModuleManager::getModule("Lewis")->getOps<bool>("lewislogo")) FlarialGUI::image(IDR_LEWIS_PNG, D2D1::RectF(logoX - (logoWidthButReal * 0.2), logoY - (logoWidthButReal * 0.2), logoX + (logoWidthButReal * 1.4), logoY + (logoWidthButReal * 1.4)), "PNG");
+			else FlarialGUI::image(IDR_WHITE_LOGO_PNG, D2D1::RectF(logoX, logoY, logoX + logoWidthButReal, logoY + logoWidthButReal), "PNG", true, FlarialGUI::D2DColorToImColor(fLARIALlOGO));
 		}
 		FlarialGUI::Tooltip("easter egg", logoX, logoY, "Never gonna give you up", logoWidthButReal, logoWidthButReal);
 
@@ -197,7 +185,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 		static D2D1_COLOR_F tabBgCol2 = clickgui->getColor("secondary6", "ClickGUI");
 		static D2D1_COLOR_F tabBgCol3 = clickgui->getColor("secondary6", "ClickGUI");
 		static D2D1_COLOR_F tabBgCol4 = clickgui->getColor("secondary6", "ClickGUI");
-		
+
 		D2D_COLOR_F secondary8 = clickgui->getColor("secondary8", "ClickGUI");
 		D2D_COLOR_F secondary6 = clickgui->getColor("secondary6", "ClickGUI");
 
@@ -247,7 +235,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 
 		if (curr != "settings") tabBgCol2 = FlarialGUI::LerpColor(tabBgCol2, secondary8, 0.15f * FlarialGUI::frameFactor);
 		else tabBgCol2 = FlarialGUI::LerpColor(tabBgCol2, secondary6, 0.15f * FlarialGUI::frameFactor);
-	
+
 
 		radioX += Constraints::SpacingConstraint(3.24f, logoWidth);
 		round = Constraints::RoundingConstraint(17.5f, 17.5f);
@@ -368,7 +356,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 			round.x, "editmenu",
 			curr)) {
 			this->active = false;
-			ModuleManager::SaveModulesConfig();
+			Client::SaveSettings();	
 			FlarialGUI::Notify("Right click a module to directly go to their settings page.");
 			FlarialGUI::Notify("To disable this menu press ESC or " + getOps<std::string>("editmenubind"));
 			editmenu = true;
@@ -607,14 +595,12 @@ void ClickGUI::onRender(RenderEvent& event) {
 					int random_number = distrib(gen);
 					std::string configname = "config-" + std::to_string(random_number);
 					Client::createConfig(configname);
-					Client::settings.getSettingByName<std::string>("currentConfig")->value = configname;
 					FlarialGUI::Notify("Created & loaded: " + configname);
 					ScriptMarketplace::reloadAllConfigs();
 					});
 				c->addButton("Remove selected config", "DELETES YOUR CURRENT CONFIG", "DELETE", []() {
 					if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
 						std::string to = Client::settings.getSettingByName<std::string>("currentConfig")->value;
-						Client::settings.getSettingByName<std::string>("currentConfig")->value = "default";
 						Client::deleteConfig(to);
 						ScriptMarketplace::reloadAllConfigs();
 						FlarialGUI::Notify("Deleted " + to);
@@ -887,7 +873,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 						if (wasEnabled) {
 							currentModule->getOps<bool>("enabled") = true;
 							currentModule->enabledState = true;
-							currentModule->Client::SaveSettings();
+							Client::SaveSettings();
 						}
 					}
 				}
