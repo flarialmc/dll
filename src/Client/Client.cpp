@@ -129,7 +129,6 @@ void Client::switchConfig(std::string name, bool reload) {
 }
 
 void Client::loadAvailableConfigs() {
-	availableConfigs.push_back("default");
 	const std::string directoryPath = Utils::getConfigsPath();
 	if (std::filesystem::exists(directoryPath) && std::filesystem::is_directory(directoryPath)) {
 		for (const auto& entry : std::filesystem::directory_iterator(directoryPath)) {

@@ -599,7 +599,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 					ScriptMarketplace::reloadAllConfigs();
 					});
 				c->addButton("Remove selected config", "DELETES YOUR CURRENT CONFIG", "DELETE", []() {
-					if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
+					if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default.json") {
 						std::string to = Client::settings.getSettingByName<std::string>("currentConfig")->value;
 						Client::deleteConfig(to);
 						ScriptMarketplace::reloadAllConfigs();
