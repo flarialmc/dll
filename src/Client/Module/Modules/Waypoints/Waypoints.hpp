@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../../Client/GUI/Engine/Engine.hpp"
 
 struct Waypoint {
 	Vec3<float> position;
@@ -14,8 +13,11 @@ struct Waypoint {
 class Waypoints : public Module {
 private:
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_used;
-	std::unordered_map<std::string, Waypoint> WaypointList;
+
 public:
+
+	std::unordered_map<std::string, Waypoint> WaypointList;
+
 	Waypoints() : Module("Waypoints", "Allows you to mark points in your world.", IDR_WAYPOINTS_PNG, "") {
 		//Module::setup();
 	};

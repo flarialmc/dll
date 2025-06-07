@@ -129,6 +129,12 @@ void Waypoints::settingsRender(float settingsOffset) {
 	addButton("Add another Waypoint", "", "Add", [this] {
 
 		int index = WaypointList.size();
+		while (true) {
+			SettingType<std::string>* s = this->settings.getSettingByName<std::string>("waypoint-" + FlarialGUI::cached_to_string(index));
+			if (s == nullptr) break;
+			index++;
+		}
+		Logger::debug(std::to_string(index));
 		addWaypoint(
 			index,
 			"waypoint-" + FlarialGUI::cached_to_string(index),
