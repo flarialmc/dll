@@ -44,13 +44,12 @@ public:
 	static void SaveSettings() {
 		path = Utils::getConfigsPath() + "\\" + settings.getSettingByName<std::string>("currentConfig")->value;
 		try {
-			// clear files
+			//clear files
 			std::ofstream cls(path, std::ofstream::out | std::ofstream::trunc); cls.close();
 			std::ofstream pCls(privatePath, std::ofstream::out | std::ofstream::trunc); pCls.close();
 
-			// open for writing
+			//open for writing
 			std::ofstream cFile(path, std::ios::app);
-
 			std::ofstream pFile(privatePath, std::ios::app);
 
 			//write configs
@@ -68,7 +67,7 @@ public:
 			cFile.close();
 		}
 		catch (const std::exception& e) {
-			LOG_ERROR("An error occurred while trying to save settings: {}", e.what());
+			Logger::error("An error occurred while trying to save settings: {}", e.what());
 		}
 
 		ScriptManager::saveSettings();

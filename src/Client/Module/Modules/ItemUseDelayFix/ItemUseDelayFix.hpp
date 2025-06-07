@@ -9,7 +9,7 @@ private:
     static inline uintptr_t address;
 public:
     ItemUseDelayFix() : Module("Item Use Delay Fix", "Removes 200ms delay after attack on using items (e.g projectiles).",
-                           IDR_NAMETAG_PNG, "", false, false) {
+                           IDR_NAMETAG_PNG, "") {
 
         address = GET_SIG_ADDRESS("ClientInputCallbacks::handleBuildAction_onAttack_setNoBlockBreakUntil_CallPatch");
 
