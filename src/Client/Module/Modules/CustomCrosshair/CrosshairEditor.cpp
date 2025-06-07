@@ -102,20 +102,11 @@ void CustomCrosshair::CrosshairEditorWindow()
         Vec2<float> round = Constraints::RoundingConstraint(45, 45);
         float y = Constraints::PercentageConstraint(0.10, "top");
 
-        D2D1_COLOR_F colorThing = colors_secondary2_rgb ? FlarialGUI::rgbColor : colors_secondary2;
-        colorThing.a = o_colors_secondary2;
-
-        D2D1_COLOR_F anotherColor = colors_secondary1_rgb ? FlarialGUI::rgbColor : colors_secondary1;
-        anotherColor.a = o_colors_secondary1;
-
-        D2D1_COLOR_F anotheranotherColorthing = colors_primary1_rgb ? FlarialGUI::rgbColor : colors_primary1;
-        anotheranotherColorthing.a = o_colors_primary1;
-
-        D2D1_COLOR_F anotheranotheranotherColorthing = colors_primary3_rgb ? FlarialGUI::rgbColor : colors_primary3;
-        anotheranotherColorthing.a = o_colors_primary3;
-
-        D2D1_COLOR_F textCol = colors_text_rgb ? FlarialGUI::rgbColor : colors_text;
-        textCol.a = o_colors_text;
+        D2D1_COLOR_F colorThing = clickgui->getColor("secondary8", "ClickGUI");
+        D2D1_COLOR_F anotherColor = clickgui->getColor("secondary2", "ClickGUI");
+        D2D1_COLOR_F anotheranotherColorthing = clickgui->getColor("primary1", "ClickGUI");
+        D2D1_COLOR_F anotheranotheranotherColorthing = clickgui->getColor("primary3", "ClickGUI");
+        D2D1_COLOR_F textCol = clickgui->getColor("globalText", "ClickGUI");
 
         FlarialGUI::RoundedHollowRect(center.x, center.y, Constraints::RelativeConstraint(0.01, "height", true),
             colorThing, rectwidth, rectheight, round.x, round.x);

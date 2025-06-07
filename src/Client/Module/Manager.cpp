@@ -103,7 +103,8 @@
 #include "Modules/Lewis/Lewis.hpp"
 #include "Modules/Coordinates/Coordinates.hpp"
 #include "Modules/DisableMouseWheel/DisableMouseWheel.hpp"
-// #include "Modules/DebugMenu/DebugMenu.hpp"
+#include "Modules/DebugMenu/DebugMenu.hpp"
+#include "Modules/DirectionHUD/DirectionHUD.hpp"
 
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
     for (const auto& pair : moduleMap) {
@@ -228,7 +229,7 @@ void ModuleManager::initialize() {
     addModule<Waypoints>();
 
     addModule<NullMovement>();
-    addModule<CustomCrosshair>();
+    //addModule<CustomCrosshair>();
     addModule<Waila>();
 
     addModule<RawInputBuffer>();
@@ -245,7 +246,8 @@ void ModuleManager::initialize() {
     addModule<Lewis>();
     addModule<Coordinates>();
     addModule<DisableMouseWheel>();
-    // addModule<JavaDebugMenu>();
+    addModule<JavaDebugMenu>();
+    addModule<DirectionHUD>();
 
     addService<GUIKeyListener>();
     if (!VersionUtils::checkAboveOrEqual(21, 60)) {
@@ -276,15 +278,17 @@ void ModuleManager::terminate() {
 
 
 void ModuleManager::restart(){
+    ModuleManager::restartModules = true;
     initialized = false;
     for (const auto& pair : moduleMap) {
         if (pair.second) {
             std::shared_ptr mod = getModule(pair.second->name);
             if (mod != nullptr) {
+                bool old = mod->enabledState;
                 mod->settings.reset();
+                if (mod->isEnabled()) mod->onDisable();
                 mod->loadSettings();
                 mod->defaultConfig();
-                bool old = mod->enabledState;
                 mod->enabledState = mod->isEnabled();
                 if (old != mod->enabledState) {
                     if (mod->enabledState) mod->onEnable();
@@ -293,6 +297,7 @@ void ModuleManager::restart(){
             }
         }
     }
+    ModuleManager::restartModules = false;
     initialized = true;
 
     ScriptManager::reloadScripts();

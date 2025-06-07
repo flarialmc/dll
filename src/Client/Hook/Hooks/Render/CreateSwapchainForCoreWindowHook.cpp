@@ -1,7 +1,8 @@
 
 #include "CreateSwapchainForCoreWindowHook.hpp"
+using ::IUnknown;
 
-HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(IDXGIFactory2 *This, IUnknown *pDevice, IUnknown *pWindow,
+HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(IDXGIFactory2 *This, ::IUnknown *pDevice, IUnknown *pWindow,
                                                     DXGI_SWAP_CHAIN_DESC1 *pDesc, IDXGIOutput *pRestrictToOutput,
                                                     IDXGISwapChain1 **ppSwapChain) {
 

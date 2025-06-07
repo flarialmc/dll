@@ -42,7 +42,7 @@ public:
             InternetCloseHandle(interwebs);
             return String::replaceAll(rtn, "|n", "\r\n");
         } catch (const std::exception &e) {
-            Logger::error(e.what());
+            LOG_ERROR(e.what());
         }
         return "";
     }
@@ -57,7 +57,7 @@ public:
         }
 
         if (scriptNameW.empty() || scriptTypeW.empty()) {
-            Logger::error("Missing scriptName or type in protocol event");
+            LOG_ERROR("Missing scriptName or type in protocol event");
             return;
         }
 
@@ -69,7 +69,7 @@ public:
             std::string data = GetString(url);
 
             if (data.empty()) {
-                Logger::error("Failed to download script content for {}", scriptName);
+                LOG_ERROR("Failed to download script content for {}", scriptName);
                 FlarialGUI::Notify("Failed to import script '" + scriptName + "'");
                 return;
             }
@@ -80,7 +80,7 @@ public:
             } else if (scriptType == "command") {
                 destinationFolder = "\\Scripts\\Commands\\";
             } else {
-                Logger::error("Invalid script type: {}", scriptType);
+                LOG_ERROR("Invalid script type: {}", scriptType);
                 FlarialGUI::Notify("Failed to import script '" + scriptName + "'");
                 return;
             }
@@ -90,7 +90,7 @@ public:
             std::filesystem::create_directories(dirPath, ec);
 
             if (ec) {
-                Logger::error("Failed to create directory {}: {}", dirPath.string(), ec.message());
+                LOG_ERROR("Failed to create directory {}: {}", dirPath.string(), ec.message());
                 FlarialGUI::Notify("Failed to import script '" + scriptName + "'");
                 return;
             }
@@ -100,7 +100,7 @@ public:
             std::ofstream file(filePath, std::ios::binary);
 
             if (!file.is_open()) {
-                Logger::error("Failed to open file for writing: {}", filePath);
+                LOG_ERROR("Failed to open file for writing: {}", filePath);
                 FlarialGUI::Notify("Failed to import script '" + scriptName + "'");
                 return;
             }
@@ -183,7 +183,7 @@ public:
                     std::filesystem::path tempZipPath = std::filesystem::temp_directory_path() / (id + ".zip");
 
                     if (!ScriptMarketplace::DownloadFile(url, tempZipPath.string())) {
-                        Logger::error("Failed to download config {} to temporary location", id);
+                        LOG_ERROR("Failed to download config {} to temporary location", id);
                         return;
                     }
 
@@ -194,14 +194,14 @@ public:
                     std::error_code ec;
                     std::filesystem::create_directories(extractionDir, ec);
                     if (ec) {
-                        Logger::error("Failed to create extraction directory {}: {}", extractionDir.string(), ec.message());
+                        LOG_ERROR("Failed to create extraction directory {}: {}", extractionDir.string(), ec.message());
                         return;
                     }
 
                     mz_zip_archive zip_archive;
                     memset(&zip_archive, 0, sizeof(zip_archive));
                     if (!mz_zip_reader_init_file(&zip_archive, tempZipPath.string().c_str(), 0)) {
-                        Logger::error("Failed to initialize zip archive from file for config {}", configname);
+                        LOG_ERROR("Failed to initialize zip archive from file for config {}", configname);
                         return;
                     }
 
@@ -209,30 +209,30 @@ public:
                     for (int j = 0; j < fileCount; j++) {
                         mz_zip_archive_file_stat file_stat;
                         if (!mz_zip_reader_file_stat(&zip_archive, j, &file_stat)) {
-                            Logger::error("Failed to get file stat for file index {} in config {}", j, configname);
+                            LOG_ERROR("Failed to get file stat for file index {} in config {}", j, configname);
                             continue;
                         }
                         std::filesystem::path destPath = extractionDir / file_stat.m_filename;
                         if (mz_zip_reader_is_file_a_directory(&zip_archive, j)) {
                             std::filesystem::create_directories(destPath, ec);
                             if (ec) {
-                                Logger::error("Failed to create directory {}: {}", destPath.string(), ec.message());
+                                LOG_ERROR("Failed to create directory {}: {}", destPath.string(), ec.message());
                             }
                         } else {
                             std::filesystem::create_directories(destPath.parent_path(), ec);
                             if (ec) {
-                                Logger::error("Failed to create directory {}: {}", destPath.parent_path().string(), ec.message());
+                                LOG_ERROR("Failed to create directory {}: {}", destPath.parent_path().string(), ec.message());
                                 continue;
                             }
                             if (!mz_zip_reader_extract_to_file(&zip_archive, j, destPath.string().c_str(), 0)) {
-                                Logger::error("Failed to extract file {} in config {}", file_stat.m_filename, configname);
+                                LOG_ERROR("Failed to extract file {} in config {}", file_stat.m_filename, configname);
                             }
                         }
                     }
                     mz_zip_reader_end(&zip_archive);
 
                     if (!std::filesystem::remove(tempZipPath, ec)) {
-                        Logger::error("Failed to delete temporary zip file {}: {}", tempZipPath.string(), ec.message());
+                        LOG_ERROR("Failed to delete temporary zip file {}: {}", tempZipPath.string(), ec.message());
                     }
 
                     Logger::success("Extracted config zip for {} to {}", configname, extractionDir.string());

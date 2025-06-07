@@ -59,16 +59,17 @@ public:
         try {
             std::ofstream outputFile(settingspath);
             if (!outputFile.is_open()) {
-                Logger::error("Failed to open file: {}", settingspath.string());
+                LOG_ERROR("Failed to open file: {}", settingspath.string());
                 return;
             }
             outputFile << settings.ToJson();
         } catch (const std::exception& e) {
-            Logger::error("An error occurred while saving settings: {}", e.what());
+            LOG_ERROR("An error occurred while saving settings: {}", e.what());
         }
     }
 
-    void defaultConfig() override { Module::defaultConfig();
+    void defaultConfig() override { 
+        Module::defaultConfig();
         if (const auto script = linkedScript.lock()) {
             gScriptSettingManager.loadSettings(script.get());
         }

@@ -25,12 +25,17 @@ public:
     static inline Vec2<float> windowSize;
     static inline FrameTransform Transform;
     static inline MouseAction mouseAction;
+    static inline MouseAction lastMouseScroll;
     static inline MouseButton mouseButton;
     static inline MouseButton lastMouseButton;
+    static inline long long scrollId;
+    static inline long long lastScrollId;
     static inline bool held;
+    static inline bool holdingCTRL;
 
     static inline std::string GPU;
 
     static inline int frames;
+    static inline float frameTime;
     static inline int fps;
 };

@@ -377,6 +377,7 @@ int Utils::getStringAsKey(const std::string& str) {
 	if (str == "PG UP" || str == "pg up") return 33;
 	if (str == "PG DOWN" || str == "pg down") return 34;
 	if (str == "TAB") return 9;
+	if (str == "-") return 189;
 	if (str == "[" || str == "{") return 219;  // [ and { share the same key
 	if (str == "]" || str == "}") return 221;  // ] and } share the same key
 	if (str == "+" || str == "=") return 187;  // + and = share the same key
@@ -461,7 +462,7 @@ void Utils::extractFromFile(const std::string& zipFilePath, const std::string& d
 	mz_zip_archive zip_archive = {};
 
 	if (!mz_zip_reader_init_file(&zip_archive, zipFilePath.c_str(), 0)) {
-		Logger::error("Failed to open zip file: {}", zipFilePath);
+		LOG_ERROR("Failed to open zip file: {}", zipFilePath);
 		return;
 	}
 

@@ -2,8 +2,6 @@
 
 #include <filesystem>
 #include <thread>
-#include <wingdi.h>
-#include <wininet.h>
 
 #include <Utils/VersionUtils.hpp>
 #include <Utils/WinrtUtils.hpp>
@@ -14,15 +12,19 @@
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.ApplicationModel.Core.h>
 #include <winrt/Windows.ApplicationModel.Activation.h>
-#include <winrt/Windows.Foundation.Collections.h>
 #include <Scripting/ScriptManager.hpp>
+#include <winrt/Windows.Foundation.Collections.h>
+#include <winrt/Windows.Foundation.h>
 
 #include "Utils/APIUtils.hpp"
 
-using namespace winrt::Windows::UI::Core;
-using namespace winrt::Windows::Foundation;
-using namespace winrt::Windows::ApplicationModel::Activation;
-using namespace winrt::Windows::ApplicationModel::Core;
+namespace winrt
+{
+    using namespace Windows::UI::Core;
+    using namespace Windows::Foundation;
+    using namespace Windows::ApplicationModel::Activation;
+    using namespace Windows::ApplicationModel::Core;
+}
 
 Settings Client::settings = Settings();
 
@@ -43,10 +45,10 @@ std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
                 }
             }
         } else {
-            Logger::error("Invalid JSON format: expected an array of players.");
+            LOG_ERROR("Invalid JSON format: expected an array of players.");
         }
     } catch (const nlohmann::json::exception& e) {
-        Logger::error("Error parsing players: {}", e.what());
+        LOG_ERROR("Error parsing players: {}", e.what());
     }
 
     if (SDK::clientInstance && SDK::clientInstance->getLocalPlayer()) {
@@ -59,7 +61,7 @@ std::vector<std::string> Client::getPlayersVector(const nlohmann::json& data) {
             }
             allPlayers.push_back(clearedName);
         } catch (const std::exception& e) {
-            Logger::error("Error processing local player name: {}", e.what());
+            LOG_ERROR("Error processing local player name: {}", e.what());
         }
     }
 
@@ -73,12 +75,12 @@ winrt::event_token activationToken;
 
 void RegisterActivationHandler()
 {
-    activationToken = CoreApplication::MainView().Activated(
-        [](const auto &, const IActivatedEventArgs &context) {
-            if (context.Kind() != ActivationKind::Protocol)
+    activationToken = winrt::CoreApplication::MainView().Activated(
+        [](const auto &, const winrt::IActivatedEventArgs &context) {
+            if (context.Kind() != winrt::ActivationKind::Protocol)
                 return;
 
-            auto uri = winrt::unbox_value<ProtocolActivatedEventArgs>(context).Uri();
+            auto uri = winrt::unbox_value<winrt::ProtocolActivatedEventArgs>(context).Uri();
             
             std::vector<std::pair<std::wstring, std::wstring>> dataList;
 
@@ -98,7 +100,7 @@ void Client::UnregisterActivationHandler()
 {
     if (activationToken) // Check if the token is valid
     {
-        CoreApplication::MainView().Activated(activationToken); // Unregister using the token
+        winrt::CoreApplication::MainView().Activated(activationToken); // Unregister using the token
     }
 }
 
@@ -143,12 +145,9 @@ void Client::initialize() {
 
     VersionUtils::initialize();
     version = VersionUtils::getFormattedVersion();
-
-
-
     if (!VersionUtils::isSupported(Client::version)) {
-        Logger::fatal("Minecraft version is not supported!");
-        Utils::MessageDialogW(L"Flarial: this version is not supported!", L"VERSION NOT SUPPORTED!");
+        LOG_FATAL("{}", "Unsupported Minecraft version");
+        Utils::MessageDialogW(L"Flarial: this version is not supported!", FlarialGUI::to_wide("VERSION " + version + " NOT SUPPORTED!").c_str());
         ModuleManager::terminate();
         Client::disable = true;
         return;
@@ -174,12 +173,12 @@ void Client::initialize() {
         if (!file.is_open()) {
             std::ofstream createFile(filePath);
             if (!createFile.is_open()) {
-               Logger::error("Could not create file: ");
+               LOG_ERROR("Could not create file: ");
             } else {
                 createFile.close();
                 file.open(filePath);
                 if (!file.is_open()) {
-                    Logger::error("Could not open file for reading after creation: ");
+                    LOG_ERROR("Could not open file for reading after creation: ");
                 }
             }
         }
@@ -235,6 +234,7 @@ void Client::initialize() {
     ADD_SETTING("rgb_speed", 1.0f);
     ADD_SETTING("rgb_saturation", 1.0f);
     ADD_SETTING("rgb_value", 1.0f);
+    ADD_SETTING("pixelateFonts", false);
     ADD_SETTING("modules_font_scale", 1.0f);
     ADD_SETTING("gui_font_scale", 1.0f);
     ADD_SETTING("overrideFontWeight", false);

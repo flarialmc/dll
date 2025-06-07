@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Events/EventManager.hpp"
 
 class ClickData {
 public:
@@ -18,193 +19,40 @@ private:
 	static inline std::chrono::time_point<std::chrono::high_resolution_clock> lastLeftClick;
 public:
 	CPSCounter() : Module("CPS", "Counts your Clicks per second.", IDR_CURSOR_PNG, "") {
-		Module::setup();
+		
 	};
 
-	void onSetup() override {
-		Listen(this, MouseEvent, &CPSCounter::onMouse)
-	}
+	void onSetup() override;
 
-	void onEnable() override {
-		Listen(this, RenderEvent, &CPSCounter::onRender)
-			Module::onEnable();
-	}
+	void onEnable() override;
 
-	void onDisable() override {
-		Deafen(this, RenderEvent, &CPSCounter::onRender)
-			Module::onDisable();
-	}
+	void onDisable() override;
 
-	void defaultConfig() override {
-		Module::defaultConfig();
-		if (settings.getSettingByName<bool>("rightcps") == nullptr) settings.addSetting("rightcps", false);
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"CPS: {value}");
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.70f);
-	}
+	void defaultConfig() override;
 
-	void settingsRender(float settingsOffset) override {
-
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
-
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
-
-
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
-
-
-		this->addHeader("Main");
-		this->defaultAddSettings("main");
-		this->addToggle("Right Click CPS", "", this->settings.getSettingByName<bool>("rightcps")->value);
-		this->extraPadding();
-
-        this->addHeader("Text");
-		this->defaultAddSettings("text");
-		this->extraPadding();
-
-        this->addHeader("Colors");
-		this->defaultAddSettings("colors");
-		this->extraPadding();
-
-		this->addHeader("Misc");
-		this->defaultAddSettings("misc");
-
-		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
-	}
+	void settingsRender(float settingsOffset) override;
 
 	static inline double lastLeftAllowed = 0.0;
 	static inline double lastRightAllowed = 0.0;
 
-	double getCurrentTime() {
-		using namespace std::chrono;
-		return duration<double>(high_resolution_clock::now().time_since_epoch()).count();
-	}
+	double getCurrentTime();
 
-	void onMouse(MouseEvent& event) {
-		auto limiter = ModuleManager::getModule("CPS Limiter");
-		if (limiter == nullptr) return;
+	void onMouse(MouseEvent& event);
 
-		double now = getCurrentTime();
+	void onRender(RenderEvent& event);
 
-		if (event.getButton() == MouseButton::Left) {
-			if (!MC::held) {
-				leftClickHeld = false;
-			}
-			else {
-				leftClickHeld = true;
+	static void AddLeftClick();
 
-				if (limiter->settings.getSettingByName<bool>("enabled")->value) {
-					float leftCpsLimit = limiter->settings.getSettingByName<float>("Left")->value;
-					double leftInterval = 1.0 / leftCpsLimit;
+	static void AddRightClick();
 
-					if ((now - lastLeftAllowed) < leftInterval) {
-						event.cancel();
-						return;
-					}
-					lastLeftAllowed = now;
-				}
-				AddLeftClick();
-			}
-		}
+	[[nodiscard]] static int GetLeftCPS();
 
-		if (event.getButton() == MouseButton::Right) {
-			if (!MC::held) {
-				rightClickHeld = false;
-			}
-			else {
-				rightClickHeld = true;
+	[[nodiscard]] static int GetRightCPS();
 
-				if (limiter->settings.getSettingByName<bool>("enabled")->value) {
-					float rightCpsLimit = limiter->settings.getSettingByName<float>("Right")->value;
-					double rightInterval = 1.0 / rightCpsLimit;
+	[[nodiscard]] static bool GetLeftHeld();
 
-					if ((now - lastRightAllowed) < rightInterval) {
-						event.cancel();
-						return;
-					}
-					lastRightAllowed = now;
-				}
-				AddRightClick();
-			}
-		}
-	}
-	//
-	void onRender(RenderEvent& event) {
-		if (this->isEnabled()) {
-			if (!this->settings.getSettingByName<bool>("rightcps")->value) {
-				std::string leftCPS = FlarialGUI::cached_to_string(GetLeftCPS());
-				this->normalRender(1, leftCPS);
-			}
-			else {
-				std::string leftAndRightCPS = FlarialGUI::cached_to_string(GetLeftCPS()) + " | " + FlarialGUI::cached_to_string(GetRightCPS());
-				this->normalRender(1, leftAndRightCPS);
-			}
-
-		}
-	}
-
-	static void AddLeftClick() {
-		ClickData click{};
-		click.timestamp = Microtime();
-		leftClickList.insert(leftClickList.begin(), click);
-
-		if (leftClickList.size() >= 100) {
-			leftClickList.pop_back();
-		}
-	}
-
-	static void AddRightClick() {
-		ClickData click{};
-		click.timestamp = Microtime();
-		rightClickList.insert(rightClickList.begin(), click);
-
-		if (rightClickList.size() >= 100) {
-			rightClickList.pop_back();
-		}
-	}
-
-	[[nodiscard]] static int GetLeftCPS() {
-		if (leftClickList.empty()) {
-			return 0;
-		}
-
-		double currentMicros = Microtime();
-		auto count = std::count_if(leftClickList.begin(), leftClickList.end(), [currentMicros](const ClickData& click) {
-			return (currentMicros - click.timestamp <= 1.0);
-			});
-
-		return (int)std::round(count);
-	}
-
-	[[nodiscard]] static int GetRightCPS() {
-		if (rightClickList.empty()) {
-			return 0;
-		}
-
-		double currentMicros = Microtime();
-		auto count = std::count_if(rightClickList.begin(), rightClickList.end(),
-			[currentMicros](const ClickData& click) {
-				return (currentMicros - click.timestamp <= 1.0);
-			});
-
-		return (int)std::round(count);
-	}
-
-	[[nodiscard]] static bool GetLeftHeld() {
-		return leftClickHeld;
-	}
-
-	[[nodiscard]] static bool GetRightHeld() {
-		return rightClickHeld;
-	}
+	[[nodiscard]] static bool GetRightHeld();
 
 private:
-	[[nodiscard]] static double Microtime() {
-		return (double(std::chrono::duration_cast<std::chrono::microseconds>(
-			std::chrono::system_clock::now().time_since_epoch()).count()) / double(1000000));
-	}
+	[[nodiscard]] static double Microtime();
 };

@@ -155,7 +155,7 @@ ID3DBlob *TryCompileShader(const char *pSrcData, const char *pTarget)
 
     if (FAILED(hr))
     {
-        Logger::error("[Blur] Failed to compile shader");
+        LOG_ERROR("[Blur] Failed to compile shader");
         errorBlob->Release();
         throw std::logic_error("Failed to compile shader!");
     }

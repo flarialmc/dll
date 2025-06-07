@@ -56,7 +56,7 @@ public:
         if (it != settings.end()) {
             settings.erase(it);
         } else {
-            Logger::error("Setting not found: {}", name);
+            LOG_ERROR("Setting not found: {}", name);
         }
     }
 
@@ -82,6 +82,16 @@ public:
     }
 
     template<typename T>
+    SettingType<T>* getOrAddSettingByName(const std::string& name, const T& defaultValue) {
+
+        auto it = settings.find(name);
+        if (it != settings.end()) return static_cast<SettingType<T> *>(it->second.get());
+        addSetting(name, defaultValue);
+
+        return getSettingByName<T>(name);
+    }
+
+    template<typename T>
     void setValue(const std::string &name, const T &value) {
         auto setting = getSettingByName<T>(name);
         if (setting) {
@@ -99,7 +109,7 @@ public:
 
     void FromJson(const std::string &jsonString) {
         if (jsonString.empty()) {
-            Logger::error("JSON string is empty");
+            LOG_ERROR("JSON string is empty");
             return;
         }
 
@@ -121,10 +131,10 @@ public:
                 }
             }
 
-            settings = std::move(newSettings);
+            this->settings = std::move(newSettings);
 
         } catch (const json::parse_error &e) {
-            Logger::error("An error occured while parsing settings: {}", e.what());
+            LOG_ERROR("An error occured while parsing settings: {}", e.what());
         }
     }
 

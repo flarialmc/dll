@@ -8,18 +8,21 @@
 #include <algorithm>
 #include <codecvt>
 #include <windows.h>
+#include <unknwn.h>
 #include <iostream>
 #include <Psapi.h>
 #include <tlhelp32.h>
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_dx11.h>
 #include <imgui/imgui_impl_dx12.h>
 #include <imgui/imgui_impl_win32.h>
 #include <imgui/imgui_freetype.h>
-
+#include "unknwnbase.h"
 #include "UnderUIHooks.hpp"
 #include "CreateSwapchainForCoreWindowHook.hpp"
 #include "ResizeHook.hpp"
+using ::IUnknown;
 
 #include "../../../Module/Modules/MotionBlur/MotionBlur.hpp"
 
@@ -37,8 +40,8 @@ BOOL _ = FALSE, $ = FALSE;
 static std::chrono::high_resolution_clock fpsclock;
 static std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 static std::chrono::steady_clock::time_point previousFrameTime = std::chrono::high_resolution_clock::now();
-//
-auto window = (HWND) FindWindowA(nullptr, (LPCSTR) "Minecraft");
+
+HWND window2 = FindWindowA(nullptr, "Minecraft");
 
 int SwapchainHook::currentBitmap;
 
@@ -49,10 +52,10 @@ bool unloadDll(const wchar_t *moduleName) {
             Logger::debug("DLL unloaded");
             return true;
         }
-        Logger::error("Failed to FreeLibrary");
+        LOG_ERROR("Failed to FreeLibrary");
         return false;
     }
-    Logger::error("Failed to unload DLL");
+    LOG_ERROR("Failed to unload DLL");
     return false;
 }
 
@@ -100,12 +103,12 @@ void SwapchainHook::enableHook() {
     queueReset = Client::settings.getSettingByName<bool>("recreateAtStart")->value;
     if (Client::settings.getSettingByName<bool>("killdx")->value) queueReset = true;
 
-    if (!window) {
-        window = FindWindowByTitle("Minecraft");
+    if (!window2) {
+        window2 = FindWindowByTitle("Minecraft");
     }
 
-    if (!window) {
-        window = FindWindowByTitle("Flarial");
+    if (!window2) {
+        window2 = FindWindowByTitle("Flarial");
     }
 
     if (kiero::getRenderType() == kiero::RenderType::D3D12) {
@@ -118,7 +121,7 @@ void SwapchainHook::enableHook() {
 
     IDXGIFactory2 *pFactory = NULL;
     CreateDXGIFactory(IID_PPV_ARGS(&pFactory));
-    if (!pFactory) Logger::error("Factory not created");
+    if (!pFactory) LOG_ERROR("Factory not created");
 
     CreateSwapchainForCoreWindowHook::hook(pFactory);
 
@@ -167,7 +170,6 @@ bool SwapchainHook::currentVsyncState;
 
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
-
     if (Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
 
     if (currentVsyncState != Client::settings.getSettingByName<bool>("vsync")->value) {
@@ -187,9 +189,8 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     UnderUIHooks::index = 0;
 
-    if (D2D::context)
-    MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
-
+    if (D2D::context) MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
+    
 
     /* UNDER UI HOOK - CLEARDEPTHSTENCILVIEW */
 
@@ -253,7 +254,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     try {
         if (init && initImgui && !FlarialGUI::hasLoadedAll) { FlarialGUI::LoadAllImages(); FlarialGUI::hasLoadedAll = true; }
-    } catch (const std::exception &ex) { Logger::error("Fail at loading all images: ", ex.what()); }
+    } catch (const std::exception &ex) { LOG_ERROR("Fail at loading all images: ", ex.what()); }
 
 
     if (currentVsyncState) {
@@ -292,7 +293,7 @@ void SwapchainHook::DX11Init() {
         ImGui::CreateContext();
 
         d3d11Device->GetImmediateContext(&context);
-        ImGui_ImplWin32_Init(window);
+        ImGui_ImplWin32_Init(window2);
         ImGui_ImplDX11_Init(d3d11Device, context);
         initImgui = true;
 
@@ -320,7 +321,7 @@ void SwapchainHook::DX12Init() {
         fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
         D3D11On12CreateDevice(device,
-                              D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
+                              D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
                               (IUnknown **) &queue, 1, 0, &SwapchainHook::d3d11Device, &context,
                               nullptr);
 
@@ -490,6 +491,7 @@ void SwapchainHook::DX11Render(bool underui) {
 void SwapchainHook::DX12Render(bool underui) {
     currentBitmap = (int) swapchain->GetCurrentBackBufferIndex();
 
+
     ID3D12Fence* fence;
 
     UINT64 fenceValue = 0;
@@ -500,12 +502,12 @@ void SwapchainHook::DX12Render(bool underui) {
 
     SaveBackbuffer();
     D2D::context->SetTarget(D2D1Bitmaps[currentBitmap]);
+    MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
     DX12Blur();
 
     D2D::context->BeginDraw();
 
-    MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
     DXGI_SWAP_CHAIN_DESC sdesc;
     swapchain->GetDesc(&sdesc);
@@ -563,7 +565,7 @@ void SwapchainHook::DX12Render(bool underui) {
 
                     ImGui::CreateContext();
 
-                    ImGui_ImplWin32_Init(window);
+                    ImGui_ImplWin32_Init(window2);
 
                     ImGui_ImplDX12_Init(d3d12Device5, buffersCounts,
                                         DXGI_FORMAT_R8G8B8A8_UNORM, d3d12DescriptorHeapImGuiRender,
@@ -791,6 +793,8 @@ void SwapchainHook::FPSMeasure() {
 
     std::chrono::duration<float> frameTime = std::chrono::high_resolution_clock::now() - previousFrameTime;
     previousFrameTime = std::chrono::high_resolution_clock::now();
+
+    MC::frameTime = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(frameTime).count();
 
     float currentFrameRate = 1.0f / frameTime.count();
 

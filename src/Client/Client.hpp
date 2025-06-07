@@ -15,9 +15,7 @@ public:
     static std::string current_commit;
     static float elapsed;
     static uint64_t start;
-
     static std::vector<std::string> availableConfigs;
-
     static std::vector<std::string> getPlayersVector(const nlohmann::json &data);
 
     static void UnregisterActivationHandler();
@@ -46,10 +44,10 @@ public:
             if (outputFile) {
                 outputFile << settings.ToJson();
             } else {
-                Logger::error("Failed to open settings file: {}", path);
+                LOG_ERROR("Failed to open settings file: {}", path);
             }
         } catch (const std::exception& e) {
-            Logger::error("An error occurred while trying to save settings to {}: {}", path, e.what());
+            LOG_ERROR("An error occurred while trying to save settings to {}: {}", path, e.what());
         }
     }
 
@@ -57,7 +55,7 @@ public:
         std::ifstream inputFile(path);
 
         if (!inputFile) {
-            Logger::error("Failed to open settings file: {}", path);
+            LOG_ERROR("Failed to open settings file: {}", path);
             return;
         }
 
@@ -72,7 +70,7 @@ public:
 
             std::ofstream file(path, std::ios::app);
             if (!file) {
-                Logger::error("Failed to create settings file: {}", path);
+                LOG_ERROR("Failed to create settings file: {}", path);
             }
         }
     }
