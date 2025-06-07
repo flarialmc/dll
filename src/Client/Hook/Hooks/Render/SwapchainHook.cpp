@@ -266,7 +266,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 }
 
 void SwapchainHook::DX11Init() {
-    Logger::debug("Not a DX12 device, running DX11 procedures");
+    Logger::debug("Initializing for DX11");   //this pmo it logs so much at the start
 
     const D2D1_CREATION_PROPERTIES properties
             {
@@ -311,6 +311,7 @@ void SwapchainHook::DX11Init() {
 
 
 void SwapchainHook::DX12Init() {
+    Logger::debug("Initializing for DX12");
 
     ID3D12Device5 *device;
     swapchain->GetDevice(IID_PPV_ARGS(&d3d12Device5));
