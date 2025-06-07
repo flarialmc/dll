@@ -116,13 +116,15 @@ void Client::createConfig(std::string name) {
 }
 
 void Client::deleteConfig(std::string name) {
+	Client::settings.getSettingByName<std::string>("currentConfig")->value = "default.json";
+	std::string to = Utils::getConfigsPath() + "\\" + name + ".json";
 	if (std::filesystem::exists(to)) {
 		std::filesystem::remove_all(to);
 	}
 }
 
 void Client::switchConfig(std::string name, bool reload) {
-	path = Utils::getConfigsPath() + "\\" + settings.getSettingByName<std::string>("currentConfig")->value + ".json";
+	path = Utils::getConfigsPath() + "\\" + settings.getSettingByName<std::string>("currentConfig")->value;
 	if (reload) Client::LoadSettings();
 }
 
@@ -131,7 +133,7 @@ void Client::loadAvailableConfigs() {
 	const std::string directoryPath = Utils::getConfigsPath();
 	if (std::filesystem::exists(directoryPath) && std::filesystem::is_directory(directoryPath)) {
 		for (const auto& entry : std::filesystem::directory_iterator(directoryPath)) {
-			if (entry.path().string().contains(".json")) {
+			if (entry.path().extension() == ".json") {
 				availableConfigs.push_back(entry.path().filename().string());
 			}
 		}
@@ -247,7 +249,7 @@ void Client::initialize() {
 	ADD_SETTING("fontWeight", std::string("Normal"));
 	ADD_SETTING("nologoicon", false);
 	ADD_SETTING("nochaticon", false);
-	ADD_SETTING("currentConfig", std::string("default"));
+	ADD_SETTING("currentConfig", std::string("default.json"));
 	ADD_SETTING("resettableSettings", true);
 	ADD_SETTING("clearTextBoxWhenClicked", true);
 

@@ -42,7 +42,7 @@ public:
 
 	inline static std::string path = Utils::getConfigsPath() + "\\default.json";
 	static void SaveSettings() {
-
+		path = Utils::getConfigsPath() + "\\" + settings.getSettingByName<std::string>("currentConfig")->value;
 		try {
 			// clear files
 			std::ofstream cls(path, std::ofstream::out | std::ofstream::trunc); cls.close();
@@ -75,6 +75,24 @@ public:
 	}
 
 	static void LoadSettings() {
+		// load private client settings
+
+		std::ifstream privateFile(privatePath);
+		if (!privateFile) return;
+
+		std::stringstream pSS;
+		pSS << privateFile.rdbuf();
+		std::string pStr = pSS.str();
+
+		if (pStr.empty()) return;
+
+		try { settings.FromJson(pStr); }
+		catch (const nlohmann::json::parse_error& e) {
+			Logger::error("Failed to parse JSON: {}", e.what());
+		}
+
+		path = Utils::getConfigsPath() + "\\" + Client::settings.getSettingByName<std::string>("currentConfig")->value;
+
 		std::ifstream inputFile(path);
 		if (!inputFile) return;
 
@@ -88,21 +106,6 @@ public:
 		}
 
 		try { globalSettings = nlohmann::json::parse(str); }
-		catch (const nlohmann::json::parse_error& e) {
-			Logger::error("Failed to parse JSON: {}", e.what());
-		}
-		// load private client settingsAdd commentMore actions
-
-		std::ifstream privateFile(privatePath);
-		if (!privateFile) return;
-
-		std::stringstream pSS;
-		pSS << privateFile.rdbuf();
-		std::string pStr = pSS.str();
-
-		if (pStr.empty()) return;
-
-		try { settings.FromJson(pStr); }
 		catch (const nlohmann::json::parse_error& e) {
 			Logger::error("Failed to parse JSON: {}", e.what());
 		}
