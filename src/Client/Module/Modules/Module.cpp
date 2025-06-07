@@ -32,6 +32,7 @@ D2D_COLOR_F Module::getColor(std::string text, std::string mod) {
 
 template <typename T>
 void Module::setDef(std::string setting, T value) {
+	//settings.setValue()
 	this->settings.getOrAddSettingByName<T>(setting, value);
 }
 
@@ -682,7 +683,7 @@ void Module::addKeybind(std::string text, std::string subtext, std::string setti
 
 void Module::loadDefaults() {
 	this->settings.reset();
-	this->Client::SaveSettings();
+	Client::SaveSettings();
 	//this->loadSettings();
 	this->totalKeybinds = 0;
 	this->totalWaypoints = 0;
@@ -713,7 +714,7 @@ void Module::loadDefaults() {
 
 	this->onSetup();
 
-	this->Client::SaveSettings();
+	Client::SaveSettings();
 }
 
 void Module::loadSettings() {

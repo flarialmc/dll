@@ -1,5 +1,5 @@
 #include "Waila.hpp"
-
+#include "Client.hpp"
 #include "Events/EventManager.hpp"
 
 Waila::Waila(): Module("Waila", "Shows what you are looking at.", IDR_WAILA_PNG, "")

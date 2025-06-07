@@ -1,5 +1,5 @@
 #include "WeatherChanger.hpp"
-
+#include "Client.hpp"
 #include "Events/EventManager.hpp"
 
 WeatherChanger::WeatherChanger(): Module("Weather Changer", "Changes the weather ingame.", IDR_CLOUDY_PNG, "")

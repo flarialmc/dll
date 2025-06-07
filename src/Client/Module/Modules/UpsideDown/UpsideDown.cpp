@@ -1,5 +1,5 @@
 #include "UpsideDown.hpp"
-
+#include "Client.hpp"
 #include "Events/EventManager.hpp"
 
 UpsideDown::UpsideDown(): Module("Upside Down", "No need to flip your monitor!!", IDR_UPSIDE_DOWN_PNG, "")

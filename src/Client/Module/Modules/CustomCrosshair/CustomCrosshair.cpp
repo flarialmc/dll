@@ -1,5 +1,5 @@
 #include "CustomCrosshair.hpp"
-
+#include "Client.hpp"
 #include "Events/EventManager.hpp"
 #include "Utils/Render/PositionUtils.hpp"
 
