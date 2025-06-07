@@ -134,7 +134,6 @@ void Waypoints::settingsRender(float settingsOffset) {
 			if (s == nullptr) break;
 			index++;
 		}
-		Logger::debug(std::to_string(index));
 		addWaypoint(
 			index,
 			"waypoint-" + FlarialGUI::cached_to_string(index),
