@@ -718,13 +718,13 @@ void Module::loadDefaults() {
 
 void Module::saveSettings() {
 	if (isScripting()) {
-		settingspath = fmt::format("{}\\Scripts\\Configs\\{}.flarial", Utils::getClientPath(), name);
+		settingspath = fmt::format("{}\\Scripts\\Configs\\{}.json", Utils::getClientPath(), name);
 	}
 	else if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
-		settingspath = fmt::format("{}\\{}\\{}.flarial", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
+		settingspath = fmt::format("{}\\{}\\{}.json", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
 	}
 	else {
-		settingspath = fmt::format("{}\\{}.flarial", Utils::getConfigsPath(), name);
+		settingspath = fmt::format("{}\\{}.json", Utils::getConfigsPath(), name);
 	}
 	checkSettingsFile();
 
@@ -744,13 +744,13 @@ void Module::saveSettings() {
 
 void Module::loadSettings() {
 	if (isScripting()) {
-		this->settingspath = fmt::format("{}\\Scripts\\Configs\\{}.flarial", Utils::getClientPath(), name);
+		this->settingspath = fmt::format("{}\\Scripts\\Configs\\{}.json", Utils::getClientPath(), name);
 	}
 	else if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
-		this->settingspath = fmt::format("{}\\{}\\{}.flarial", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
+		this->settingspath = fmt::format("{}\\{}\\{}.json", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
 	}
 	else {
-		this->settingspath = fmt::format("{}\\{}.flarial", Utils::getConfigsPath(), name);
+		this->settingspath = fmt::format("{}\\{}.json", Utils::getConfigsPath(), name);
 	}
 	checkSettingsFile();
 
