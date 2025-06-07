@@ -30,7 +30,7 @@ void Sneak::defaultConfig()
     setDef("status", false);
     setDef("textscale", 0.80f);
     setDef("always", false);
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void Sneak::settingsRender(float settingsOffset)

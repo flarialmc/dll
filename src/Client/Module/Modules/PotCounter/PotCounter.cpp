@@ -27,7 +27,7 @@ void PotCounter::defaultConfig()
     setDef("text", (std::string)"{value} Pots");
     setDef("textscale", 0.70f);
     Module::defaultConfig("all");
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void PotCounter::settingsRender(float settingsOffset)

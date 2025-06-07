@@ -32,7 +32,7 @@ void ZeqaUtils::defaultConfig()
     setDef("killstreak", false);
     setDef("friendaccept", false);
     setDef("duelaccept", false);
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void ZeqaUtils::settingsRender(float settingsOffset)

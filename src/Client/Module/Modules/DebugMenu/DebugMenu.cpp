@@ -57,7 +57,7 @@ void JavaDebugMenu::defaultConfig() {
 	setDef("showTargetedBlockTags", true);
 	setDef("showMaxTags", true);
 	setDef("noOfTags", 10.0f);
-	saveSettings();
+	Client::SaveSettings();
 }
 
 void JavaDebugMenu::sigmaToggle(std::string text, std::string subtext, std::string settingName) {

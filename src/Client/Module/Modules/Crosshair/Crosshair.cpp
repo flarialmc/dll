@@ -11,7 +11,7 @@ void Crosshair::onDisable() {
 void Crosshair::defaultConfig() {
     Module::defaultConfig("core");
     setDef("thirdpersoncrosshair", true);
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void Crosshair::settingsRender(float settingsOffset) {

@@ -32,7 +32,7 @@ void MotionBlur::defaultConfig()
     setDef("avgpixel", false);
     setDef("dynamic", true);
     setDef("samples", 64.f);
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void MotionBlur::settingsRender(float settingsOffset)

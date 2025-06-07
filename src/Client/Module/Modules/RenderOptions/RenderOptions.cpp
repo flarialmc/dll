@@ -59,7 +59,7 @@ void RenderOptions::defaultConfig()
     setDef("entity", true);
     setDef("blockentity", true);
     setDef("particles", true);
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void RenderOptions::settingsRender(float settingsOffset)

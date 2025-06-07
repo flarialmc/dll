@@ -42,7 +42,7 @@ void NoHurtCam::onDisable()
 void NoHurtCam::defaultConfig()
 {
     Module::defaultConfig("core");
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void NoHurtCam::patch()

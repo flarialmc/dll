@@ -45,7 +45,7 @@ void PotionHUD::defaultConfig()
     setDef("showText", true);
     setDef("textLeft", false);
     setDef("bottomUp", false);
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void PotionHUD::settingsRender(float settingsOffset)

@@ -29,7 +29,7 @@ void NullMovement::defaultConfig()
     Module::defaultConfig("core");
     setDef("horizontal", true);
     setDef("vertical", false);
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void NullMovement::settingsRender(float settingsOffset)

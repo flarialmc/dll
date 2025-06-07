@@ -27,7 +27,6 @@ public:
 		patched_option.push_back(0x90);
 		
 
-		checkSettingsFile();
 		loadSettings();
 	};
 

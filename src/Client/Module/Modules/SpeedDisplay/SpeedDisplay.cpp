@@ -24,7 +24,7 @@ void SpeedDisplay::defaultConfig()
 {
     setDef("text", (std::string)"{value} m/s");
     Module::defaultConfig("all");
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void SpeedDisplay::settingsRender(float settingsOffset)

@@ -15,7 +15,7 @@ void IPDisplay::defaultConfig() {
     setDef("textscale", 0.80f);
     Module::defaultConfig("all");
     setDef("port", false);
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void IPDisplay::settingsRender(float settingsOffset) {

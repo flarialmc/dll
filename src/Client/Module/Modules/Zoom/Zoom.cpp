@@ -42,7 +42,7 @@ void Zoom::defaultConfig()
 	setDef("modifier", 10.0f);
 	setDef("anim", 0.20f);
 	setDef("disableanim", false);
-	saveSettings();
+	Client::SaveSettings();
 }
 
 void Zoom::settingsRender(float settingsOffset)

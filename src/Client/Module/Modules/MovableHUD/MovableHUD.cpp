@@ -17,7 +17,7 @@ void MovableHUD::defaultConfig()
 {
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void MovableHUD::settingsRender(float settingsOffset)

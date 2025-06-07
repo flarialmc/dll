@@ -887,7 +887,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 						if (wasEnabled) {
 							currentModule->getOps<bool>("enabled") = true;
 							currentModule->enabledState = true;
-							currentModule->saveSettings();
+							currentModule->Client::SaveSettings();
 						}
 					}
 				}

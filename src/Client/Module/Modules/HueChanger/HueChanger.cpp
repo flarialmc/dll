@@ -15,7 +15,7 @@ void HueChanger::onDisable() {
 void HueChanger::defaultConfig() {
     setDef("intensity", 0.5f);
     Module::defaultConfig("core");
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void HueChanger::settingsRender(float settingsOffset) {

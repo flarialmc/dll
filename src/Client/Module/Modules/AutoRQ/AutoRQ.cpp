@@ -39,7 +39,7 @@ void AutoRQ::defaultConfig() {
     setDef("noteaming", false);
     setDef("friendaccept", false);
     setDef("partyaccept", false);
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void AutoRQ::settingsRender(float settingsOffset) {
@@ -77,7 +77,7 @@ void AutoRQ::settingsRender(float settingsOffset) {
 
         int i = totalmaps;
 
-        this->saveSettings();
+        Client::SaveSettings();
         FlarialGUI::Notify("New textbox created, input a map to avoid!");
         totalmaps++;
     });

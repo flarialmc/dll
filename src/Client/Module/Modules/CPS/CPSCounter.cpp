@@ -19,7 +19,7 @@ void CPSCounter::defaultConfig() {
     setDef("text", (std::string)"CPS: {value}");
     setDef("rightcps", false);
     Module::defaultConfig("all");
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void CPSCounter::settingsRender(float settingsOffset) {

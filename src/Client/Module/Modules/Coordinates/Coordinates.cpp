@@ -26,7 +26,7 @@ void Coordinates::defaultConfig() {
     setDef("OverworldFormat", (std::string) "{dim}");
     setDef("NetherFormat", (std::string) "{dim}");
     setDef("TheEndFormat", (std::string) "{dim}");
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void Coordinates::settingsRender(float settingsOffset) {

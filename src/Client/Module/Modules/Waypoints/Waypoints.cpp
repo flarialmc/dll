@@ -21,7 +21,7 @@ void Waypoints::addWaypoint(int index, std::string name, std::string color, Vec3
 		this->settings.addSetting("world" + end, (std::string)SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName());
 		this->settings.addSetting("dimension" + end, (std::string)SDK::clientInstance->getBlockSource()->getDimension()->getName());
 		this->settings.setValue("total", this->settings.getSettingByName<float>("total")->value + 1);
-		this->saveSettings();
+		this->Client::SaveSettings();
 
 		Waypoint wp(position, false, 100.0f, index, state);
 		WaypointList[name] = wp;
@@ -184,7 +184,7 @@ void Waypoints::settingsRender(float settingsOffset) {
 			this->settings.deleteSetting("state" + end);
 			this->settings.deleteSetting("rgb" + end);
 			this->settings.deleteSetting("opacity" + end);
-			this->saveSettings();
+			this->Client::SaveSettings();
 			});
 	}
 

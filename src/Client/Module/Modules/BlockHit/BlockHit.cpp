@@ -55,7 +55,7 @@ void BlockHit::onItemInHandRender(RenderItemInHandEvent &event) {
 
 void BlockHit::defaultConfig() {
     Module::defaultConfig("core");
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void BlockHit::onPerspectiveChange(PerspectiveEvent &event)  {

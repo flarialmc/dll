@@ -171,7 +171,7 @@ public:
 		setDef("enabledRadioButton", (std::string)"D0A0A8", 1.0f, false);
 		setDef("disabledRadioButton", (std::string)"FFFFFF", 1.0f, false);
 		setDef("_overrideAlphaValues_", 1.f);
-		saveSettings();
+		Client::SaveSettings();
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -273,7 +273,6 @@ public:
 			else {
 				SDK::clientInstance->grabMouse();
 				FlarialGUI::ResetShit();
-				ModuleManager::SaveModulesConfig();
 				Client::SaveSettings();
 			}
 		}
@@ -291,14 +290,12 @@ public:
 					curr = "modules";
 
 					FlarialGUI::ResetShit();
-					ModuleManager::SaveModulesConfig();
 					Client::SaveSettings();
 				}
 			}
 			else {
 				// switch from edit mode back to ClickGUI
 				MC::lastMouseScroll = MouseAction::Release;
-				ModuleManager::SaveModulesConfig();
 				editmenu = false;
 				this->active = true;
 			}
@@ -327,7 +324,6 @@ public:
 					"editmenubind")->value)) {
 
 				if (!editmenu) {
-					ModuleManager::SaveModulesConfig();
 					MC::lastMouseScroll = MouseAction::Release;
 					this->active = false;
 					FlarialGUI::Notify("Right click a module to directly go to their settings page.");
@@ -346,7 +342,6 @@ public:
 			editmenu && this->isKeybind(event.keys) && Module::isKeyPartOfAdditionalKeybind(event.key,
 				this->settings.getSettingByName<std::string>(
 					"editmenubind")->value)) {
-			ModuleManager::SaveModulesConfig();
 			MC::lastMouseScroll = MouseAction::Release;
 			editmenu = false;
 			this->active = true;

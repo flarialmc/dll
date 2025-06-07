@@ -48,7 +48,7 @@ void NickModule::defaultConfig()
     setDef("bold", false);
     setDef("obfuscated", false);
     setDef("textColor", (std::string)"White");
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void NickModule::settingsRender(float settingsOffset)

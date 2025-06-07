@@ -18,7 +18,7 @@ void RawInputBuffer::onDisable()
 void RawInputBuffer::defaultConfig()
 {
     Module::defaultConfig("core");
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void RawInputBuffer::settingsRender(float settingsOffset)

@@ -37,7 +37,7 @@ void MovableScoreboard::defaultConfig()
 {
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void MovableScoreboard::settingsRender(float settingsOffset)

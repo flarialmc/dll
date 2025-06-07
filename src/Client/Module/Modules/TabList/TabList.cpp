@@ -33,7 +33,7 @@ void TabList::defaultConfig()
     Module::defaultConfig("colors");
     setDef("alphaOrder", true);
     setDef("flarialFirst", true);
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void TabList::settingsRender(float settingsOffset)

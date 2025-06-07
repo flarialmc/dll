@@ -3,7 +3,7 @@
 #include "Hook/Manager.hpp"
 #include "Module/Manager.hpp"
 #include <vector>
-
+#include "Scripting/ScriptManager.hpp"
 #include "Utils/APIUtils.hpp"
 
 #define ADD_SETTING(setting, value) \
@@ -12,66 +12,83 @@ Client::settings.addSetting(setting, value);
 
 class Client {
 public:
-    static std::string current_commit;
-    static float elapsed;
-    static uint64_t start;
-    static std::vector<std::string> availableConfigs;
-    static std::vector<std::string> getPlayersVector(const nlohmann::json &data);
+	static std::string current_commit;
+	static float elapsed;
+	static uint64_t start;
+	static std::vector<std::string> availableConfigs;
+	static std::vector<std::string> getPlayersVector(const nlohmann::json& data);
 
-    static void UnregisterActivationHandler();
+	static void UnregisterActivationHandler();
 
-    static void createConfig(std::string name);
+	static void createConfig(std::string name);
 
-    static void deleteConfig(std::string name);
+	static void deleteConfig(std::string name);
 
-    static void loadAvailableConfigs();
+	static void loadAvailableConfigs();
 
-    static void initialize();
+	static void initialize();
 
-    static bool disable;
+	static bool disable;
 
-    static void centerCursor();
+	static void centerCursor();
 
-    static Settings settings;
-    inline static std::string version;
-    inline static HMODULE currentModule = nullptr;
+	static Settings settings;
+	inline static nlohmann::json globalSettings;
+	inline static std::string version;
+	inline static HMODULE currentModule = nullptr;
 
-    inline static std::string path = Utils::getConfigsPath() + "\\main.json";
-    static void SaveSettings() {
+	inline static std::string path = Utils::getConfigsPath() + "\\main.json";
+	static void SaveSettings() {
 
-        try {
-            std::ofstream outputFile(path);
-            if (outputFile) {
-                outputFile << settings.ToJson();
-            } else {
-                LOG_ERROR("Failed to open settings file: {}", path);
-            }
-        } catch (const std::exception& e) {
-            LOG_ERROR("An error occurred while trying to save settings to {}: {}", path, e.what());
-        }
-    }
+		try {
+			std::ofstream cls(path, std::ofstream::out | std::ofstream::trunc); cls.close(); //clearAdd commentMore actions
 
-    static void LoadSettings() {
-        std::ifstream inputFile(path);
+			std::ofstream cFile(path, std::ios::app);
+			cFile << "{ \n";
+			for (const auto& pair : ModuleManager::moduleMap) {
+				cFile << '"' << pair.second->name << "\": " << pair.second->settings.ToJson() << ", \n";
+			}
+			cFile << "\"main\":" << settings.ToJson() << "\n }";
+		}
+		catch (const std::exception& e) {
+			LOG_ERROR("An error occurred while trying to save settings: {}", e.what());
+		}
 
-        if (!inputFile) {
-            LOG_ERROR("Failed to open settings file: {}", path);
-            return;
-        }
+		ScriptManager::saveSettings();
+	}
 
-        std::stringstream ss;
-        ss << inputFile.rdbuf();
-        settings.FromJson(ss.str());
-    }
+	static void LoadSettings() {
+		std::ifstream inputFile(path);
+		if (!inputFile) return;
 
-    static void CheckSettingsFile() {
-        if (!std::filesystem::exists(path)) {
-            std::filesystem::create_directories(std::filesystem::path(path).parent_path());
+		std::stringstream ss;
+		ss << inputFile.rdbuf();
+		inputFile.close();
+		std::string str = ss.str();
 
-            std::ofstream file(path, std::ios::app);
-            if (!file) {
-                LOG_ERROR("Failed to create settings file: {}", path);
-            }
-        }
-    }
+		if (str.empty()) {
+			Logger::error("Settings String is empty");
+			return;
+		}
+
+		try { globalSettings = nlohmann::json::parse(str); }
+		catch (const nlohmann::json::parse_error& e) {
+			Logger::error("Failed to parse JSON: {}", e.what());
+		}
+		try {
+			settings.FromJson(globalSettings["main"].dump());
+		}
+		catch (const std::exception& e) { Logger::error(e.what()); }
+	}
+
+	static void CheckSettingsFile() {
+		if (!std::filesystem::exists(path)) {
+			std::filesystem::create_directories(std::filesystem::path(path).parent_path());
+
+			std::ofstream file(path, std::ios::app);
+			if (!file) {
+				LOG_ERROR("Failed to create settings file: {}", path);
+			}
+		}
+	}
 };

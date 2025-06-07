@@ -13,6 +13,7 @@ void TextHotkey::onDisable() {
 void TextHotkey::defaultConfig() {
 	getKeybind();
 	Module::defaultConfig("core");
+	Client::SaveSettings();
 }
 
 void TextHotkey::settingsRender(float settingsOffset) {
@@ -68,7 +69,7 @@ void TextHotkey::settingsRender(float settingsOffset) {
 
 		totalKeybinds++;
 		FlarialGUI::Notify("Added! Scroll down for options.");
-		this->saveSettings();
+		Client::SaveSettings();
 		});
 
 
@@ -90,7 +91,7 @@ void TextHotkey::settingsRender(float settingsOffset) {
 			this->addButton("Delete Hotkey", "", "Delete", [this, i, commandSettingName]() {
 				this->settings.deleteSetting(commandSettingName);
 				this->settings.deleteSetting("keybind-" + FlarialGUI::cached_to_string(i));
-				this->saveSettings();
+				Client::SaveSettings();
 				});
 			this->extraPadding();
 		}

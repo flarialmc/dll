@@ -28,7 +28,7 @@ void Waila::defaultConfig()
     Module::defaultConfig("all");
     setDef("advanced", false);
     setDef("showAir", false);
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void Waila::settingsRender(float settingsOffset)

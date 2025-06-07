@@ -7,7 +7,7 @@
 class LowHealthIndicator : public Module {
 	int health = 20.f;
 public:
-	LowHealthIndicator();;
+	LowHealthIndicator();
 
 	void defaultConfig() override;
 

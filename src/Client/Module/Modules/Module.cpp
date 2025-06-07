@@ -682,7 +682,7 @@ void Module::addKeybind(std::string text, std::string subtext, std::string setti
 
 void Module::loadDefaults() {
 	this->settings.reset();
-	this->saveSettings();
+	this->Client::SaveSettings();
 	//this->loadSettings();
 	this->totalKeybinds = 0;
 	this->totalWaypoints = 0;
@@ -713,63 +713,12 @@ void Module::loadDefaults() {
 
 	this->onSetup();
 
-	this->saveSettings();
-}
-
-void Module::saveSettings() {
-	if (isScripting()) {
-		settingspath = fmt::format("{}\\Scripts\\Configs\\{}.json", Utils::getClientPath(), name);
-	}
-	else if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
-		settingspath = fmt::format("{}\\{}\\{}.json", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
-	}
-	else {
-		settingspath = fmt::format("{}\\{}.json", Utils::getConfigsPath(), name);
-	}
-	checkSettingsFile();
-
-	try {
-		std::ofstream outputFile(settingspath);
-		if (!outputFile.is_open()) {
-			LOG_ERROR("Failed to open file for writing: {}", settingspath.string());
-			return;
-		}
-		outputFile << settings.ToJson();
-		outputFile.close();
-	}
-	catch (const std::exception& e) {
-		LOG_ERROR("An error occurred while saving settings: {}", e.what());
-	}
+	this->Client::SaveSettings();
 }
 
 void Module::loadSettings() {
-	if (isScripting()) {
-		this->settingspath = fmt::format("{}\\Scripts\\Configs\\{}.json", Utils::getClientPath(), name);
-	}
-	else if (Client::settings.getSettingByName<std::string>("currentConfig")->value != "default") {
-		this->settingspath = fmt::format("{}\\{}\\{}.json", Utils::getConfigsPath(), Client::settings.getSettingByName<std::string>("currentConfig")->value, name);
-	}
-	else {
-		this->settingspath = fmt::format("{}\\{}.json", Utils::getConfigsPath(), name);
-	}
-	checkSettingsFile();
-
-	std::ifstream inputFile(this->settingspath);
-	if (!inputFile.is_open()) {
-		LOG_ERROR("Failed to open file: {}", this->settingspath.string());
-		return;
-	}
-
-	std::stringstream ss;
-	ss << inputFile.rdbuf();
-	inputFile.close();
-
-	if (!ss.str().empty() && ss.str() != "null") {
-		this->settings.FromJson(ss.str());
-	}
-	else {
-		this->loadDefaults();
-	}
+	try { settings.FromJson(Client::globalSettings[name].dump()); }
+	catch (std::exception& e) { Logger::error("Couldn't load module settings: {}", e.what()); }
 
 	totalKeybinds = 0;
 	totalWaypoints = 0;
@@ -1109,17 +1058,6 @@ void Module::loadSettings() {
 	this->setup();
 }
 
-void Module::checkSettingsFile() {
-	if (!std::filesystem::exists(settingspath)) {
-		std::filesystem::create_directories(settingspath.parent_path());
-		std::ofstream outputFile(settingspath);
-		if (!outputFile.is_open()) {
-			LOG_ERROR("Failed to create file: {}", settingspath.string());
-		}
-		outputFile.close();
-	}
-}
-
 void Module::toggle() {
 	enabledState = !enabledState;
 }
@@ -1145,7 +1083,7 @@ void Module::onSetup() {}
 void Module::onEnable() {
 	enabledState = true;
 	if (settings.getSettingByName<bool>("enabled")) getOps<bool>("enabled") = true;
-	saveSettings();
+	Client::SaveSettings();
 }
 
 void Module::onDisable() {
@@ -1154,7 +1092,7 @@ void Module::onDisable() {
 	if (!terminating) {
 		if (settings.getSettingByName<bool>("enabled")) getOps<bool>("enabled") = false;
 	}
-	saveSettings();
+	Client::SaveSettings();
 }
 
 void Module::terminate() {
@@ -1179,8 +1117,7 @@ void Module::setEnabled(bool enabled) {
 
 void Module::setKeybind(const std::string& newKeybind) {
 	auto key = settings.getSettingByName<std::string>("keybind");
-	if (key == nullptr)
-		settings.addSetting("keybind", newKeybind);
+	if (key == nullptr) settings.addSetting("keybind", newKeybind);
 }
 
 std::string& Module::getKeybind(const int keybindCount) {
@@ -1243,7 +1180,7 @@ void Module::defaultConfig(std::string type) {
 		setDef("enabled", false);
 		setDef("favorite", false);
 	}
-	else if (type == "pos") {
+	if (type == "pos") {
 		setDef("percentageX", 0.0f);
 		setDef("percentageY", 0.0f);
 	}

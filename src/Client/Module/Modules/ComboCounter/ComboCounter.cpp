@@ -21,7 +21,7 @@ void ComboCounter::onDisable() {
 void ComboCounter::defaultConfig() {
     setDef("text", (std::string)"Combo: {value}");
     Module::defaultConfig("all");
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void ComboCounter::settingsRender(float settingsOffset) {

@@ -24,7 +24,7 @@ void BlockBreakIndicator::defaultConfig() {
     setDef("pbwidth", 0.91f);
     setDef("pbheight", 0.82f);
     setDef("barFill", (std::string) "a83232", 1.f, false);
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void BlockBreakIndicator::settingsRender(float settingsOffset) {

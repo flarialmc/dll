@@ -18,7 +18,7 @@ void Hitbox::defaultConfig() {
     setDef("thickness", 1.1f);
     setDef("staticThickness", false);
     setDef("outline", false);
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void Hitbox::settingsRender(float settingsOffset) {

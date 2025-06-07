@@ -37,7 +37,7 @@ void MovableHotbar::defaultConfig()
 {
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void MovableHotbar::settingsRender(float settingsOffset)

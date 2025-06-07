@@ -46,7 +46,7 @@ void MumbleLink::defaultConfig()
 {
     Module::defaultConfig("core");
     setDef("context", (std::string)"");
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void MumbleLink::settingsRender(float settingsOffset)

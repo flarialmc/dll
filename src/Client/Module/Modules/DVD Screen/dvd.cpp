@@ -17,7 +17,7 @@ void DVD::defaultConfig() {
     setDef("xveloc", 1.0f);
     setDef("yveloc", 0.69f);
     setDef("scale", 1.0f);
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void DVD::settingsRender(float settingsOffset) {

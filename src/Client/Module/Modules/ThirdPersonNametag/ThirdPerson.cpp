@@ -15,7 +15,7 @@ ThirdPerson::ThirdPerson(): Module("Nametag", "Shows your nametag for you while\
 void ThirdPerson::defaultConfig()
 {
     Module::defaultConfig("core");
-    saveSettings();
+    Client::SaveSettings();
 }
 
 void ThirdPerson::onEnable()

@@ -41,11 +41,11 @@ public:
 		defaultKeybind = ekey;
 		isScriptingModule = isScripting;
 		settings = Settings();
+
 		settingspath = isScripting ? Utils::getClientPath() + "\\Scripts\\Configs\\" + name + ".json" : Utils::getConfigsPath() + "\\" + name + ".json";
 	}
 
 	void postConstructInitialize() {
-		this->checkSettingsFile();
 		this->loadSettings();
 	}
 
@@ -135,10 +135,8 @@ public:
 	void addColorPicker(std::string text, std::string subtext, std::string settingName);
 
 	virtual void loadDefaults();
-	void saveSettings();
 
 	virtual void loadSettings();
-	void checkSettingsFile();
 	virtual void toggle();
 	virtual void setup();
 	virtual void onSetup();
