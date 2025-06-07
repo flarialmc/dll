@@ -148,11 +148,9 @@ void Client::initialize() {
     VersionUtils::initialize();
     version = VersionUtils::getFormattedVersion();
 
-
-
     if (!VersionUtils::isSupported(Client::version)) {
-        Logger::fatal("Minecraft version is not supported!");
-        Utils::MessageDialogW(L"Flarial: this version is not supported!", L"VERSION NOT SUPPORTED!");
+        Logger::fatal("Minecraft version " + version + " is not supported!");
+        Utils::MessageDialogW(L"Flarial: This version is not supported!", L"VERSION NOT SUPPORTED!");
         ModuleManager::terminate();
         Client::disable = true;
         return;
