@@ -33,6 +33,7 @@ public:
 	int totalKeybinds = 0;
 	int totalWaypoints = 0;
 	int totalmaps = 0;
+	std::filesystem::path legacySettingsPath;
 
 	Module(const std::string& ename, const std::string& edescription, int eicon, const std::string& ekey, bool isScripting = false) {
 		name = ename;
@@ -47,6 +48,7 @@ public:
 
 	void postConstructInitialize() {
 		this->loadSettings();
+		this->loadLegacySettings();
 	}
 
 	bool active = false;
@@ -135,7 +137,10 @@ public:
 	void addColorPicker(std::string text, std::string subtext, std::string settingName);
 
 	virtual void postLoad(bool softLoad = false);
+
+	virtual void loadLegacySettings();
 	virtual void loadSettings(bool softLoad = false);
+
 	virtual void toggle();
 	virtual void setup();
 	virtual void onSetup();

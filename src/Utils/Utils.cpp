@@ -29,7 +29,7 @@ std::string Utils::getClientPath() {
 }
 
 std::string Utils::getConfigsPath() {
-	std::filesystem::path path(Utils::getRoamingPath() + "\\Flarial\\Config");
+	std::filesystem::path path(Utils::getClientPath() + "\\Config");
 	return path.string();
 }
 
@@ -47,12 +47,12 @@ void Utils::MessageDialogW(PCWSTR pText, PCWSTR pTitle)
 }
 
 std::string Utils::getAssetsPath() {
-	std::filesystem::path path(Utils::getRoamingPath() + "\\Flarial\\assets");
+	std::filesystem::path path(Utils::getClientPath() + "\\assets");
 	return path.string();
 }
 
 std::string Utils::getLogsPath() {
-	std::filesystem::path path(Utils::getRoamingPath() + "\\Flarial\\logs");
+	std::filesystem::path path(Utils::getClientPath() + "\\logs");
 	return path.string();
 }
 

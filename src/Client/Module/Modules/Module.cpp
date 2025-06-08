@@ -717,6 +717,26 @@ void Module::postLoad(bool softLoad) {
 	Client::SaveSettings();
 }
 
+void Module::loadLegacySettings() {
+	if (isScripting() || !Client::legacySettings.getSettingByName<std::string>("currentConfig")) return;
+	if (Client::legacySettings.getSettingByName<std::string>("currentConfig")->value != "default") legacySettingsPath = fmt::format("{}\\{}\\{}.flarial", Client::legacyDir, Client::legacySettings.getSettingByName<std::string>("currentConfig")->value, name);
+	else legacySettingsPath = fmt::format("{}\\{}.flarial", Client::legacyDir, name);
+
+	if (!std::filesystem::exists(legacySettingsPath)) return;
+
+	std::ifstream inputFile(legacySettingsPath);
+	if (!inputFile.is_open()) {
+		Logger::error("Failed to open legacy settings file: {}", legacySettingsPath.string());
+		return;
+	}
+
+	std::stringstream ss;
+	ss << inputFile.rdbuf();
+	inputFile.close();
+
+	if (!ss.str().empty() && ss.str() != "null") this->settings.AppendFromJson(ss.str(), this->settings);
+}
+
 void Module::loadSettings(bool softLoad) {
 	try { settings.FromJson(Client::globalSettings[name].dump()); }
 	catch (std::exception& e) { Logger::error("Couldn't load module settings: {}", e.what()); }

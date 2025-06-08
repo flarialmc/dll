@@ -61,7 +61,7 @@ public:
 		else {
 			Logger::error("Setting not found: {}", name);
 		}
-	}	
+	}
 
 	void reset() {
 		settings.clear();
@@ -80,6 +80,48 @@ public:
 			return static_cast<SettingType<T> *>(it->second.get());
 		}
 		return nullptr;
+	}
+
+	void renameSetting(std::string oldName, std::string newName, bool clickguiColor = false) {
+		if (clickguiColor) {
+			renameSetting(oldName, "o_" + oldName, oldName + "_rgb", newName);
+			return;
+		}
+		auto check = settings.find(newName);
+		if (check != settings.end()) return;
+
+		auto it = settings.find(oldName);
+		if (it != settings.end()) {
+			settings[newName] = std::move(it->second);
+			settings.erase(it);
+		}
+	}
+
+	void renameSetting(std::string oldCol, std::string oldOpacity, std::string oldRGB, std::string newName) {
+		auto checkCol = settings.find(newName + "Col");
+		if (checkCol == settings.end()) {
+			auto itCol = settings.find(oldCol);
+			if (itCol != settings.end()) {
+				settings[newName + "Col"] = std::move(itCol->second);
+				settings.erase(itCol);
+			}
+		}
+		auto checkOpacity = settings.find(newName + "Opacity");
+		if (checkOpacity == settings.end()) {
+			auto itOpacity = settings.find(oldOpacity);
+			if (itOpacity != settings.end()) {
+				settings[newName + "Opacity"] = std::move(itOpacity->second);
+				settings.erase(itOpacity);
+			}
+		}
+		auto checkRGB = settings.find(newName + "RGB");
+		if (checkRGB == settings.end()) {
+			auto itRGB = settings.find(oldRGB);
+			if (itRGB != settings.end()) {
+				settings[newName + "RGB"] = std::move(itRGB->second);
+				settings.erase(itRGB);
+			}
+		}
 	}
 
 	template<typename T>
@@ -107,6 +149,29 @@ public:
 		}
 		auto dump = jsonData.dump(4);
 		return dump;
+	}
+
+	void AppendFromJson(const std::string& jsonString, Settings& toSetting) {
+		if (jsonString.empty()) {
+			Logger::error("JSON string is empty");
+			return;
+		}
+
+		try {
+			json jsonData = json::parse(jsonString);
+
+			if (!jsonData.is_object()) return;
+
+			for (const auto& [key, value] : jsonData.items()) {
+				if (value.is_boolean()) toSetting.settings[key] = std::make_unique<SettingType<bool>>(key, value.get<bool>());
+				else if (value.is_number_float()) toSetting.settings[key] = std::make_unique<SettingType<float>>(key, value.get<float>());
+				else if (value.is_string()) toSetting.settings[key] = std::make_unique<SettingType<std::string>>(key, value.get<std::string>());
+				else Logger::warn("Unsupported JSON value type for setting '{}' during append. Skipping.", key);
+			}
+		}
+		catch (const json::parse_error& e) {
+			Logger::error("An error occurred while parsing settings: {}", e.what());
+		}
 	}
 
 	void FromJson(const std::string& jsonString) {

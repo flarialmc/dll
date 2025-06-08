@@ -575,8 +575,8 @@ void ClickGUI::onRender(RenderEvent& event) {
 				if (troll.empty()) troll = Client::settings.getSettingByName<std::string>("currentConfig")->value;
 
 				if (troll != Client::settings.getSettingByName<std::string>("currentConfig")->value && troll != "") {
-					Client::SavePrivate();
 					Client::SaveSettings();
+					Client::SavePrivate();
 					Client::LoadPrivate();
 					troll = Client::settings.getSettingByName<std::string>("currentConfig")->value;
 					FlarialGUI::UnsetScrollView();
