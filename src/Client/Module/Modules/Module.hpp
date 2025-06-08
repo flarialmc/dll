@@ -85,7 +85,6 @@ public:
 	template <typename T>
 	T& getOps(std::string setting);
 
-	void setDef(std::string setting, bool value, bool optionIsEnable);
 	template <typename T>
 	void setDef(std::string setting, T value);
 

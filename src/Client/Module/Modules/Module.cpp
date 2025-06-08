@@ -30,13 +30,6 @@ D2D_COLOR_F Module::getColor(std::string text, std::string mod) {
 	return col;
 };
 
-void Module::setDef(std::string setting, bool value, bool optionIsEnable) {
-	if (this->settings.getSettingByName<bool>("enabled") == nullptr) {
-		this->settings.addSetting("enabled", value);
-		this->enabledState = value;
-	}
-}
-
 template <typename T>
 void Module::setDef(std::string setting, T value) {
 	this->settings.getOrAddSettingByName<T>(setting, value);

@@ -27,7 +27,7 @@ void Zoom::onDisable()
 
 void Zoom::defaultConfig()
 {
-	setDef("enabled", true, true);
+	setDef("enabled", true);
 	setDef("keybind", (std::string)"C");
 	getKeybind();
 	Module::defaultConfig("core");
