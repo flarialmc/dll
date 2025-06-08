@@ -189,7 +189,6 @@ DWORD WINAPI init() {
     WinrtUtils::setWindowTitle("");
 
     Logger::shutdown();
-
     CloseHandle(mutex);
     FreeLibraryAndExitThread(Client::currentModule, 0);
 }

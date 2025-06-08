@@ -42,7 +42,7 @@ public:
 		isScriptingModule = isScripting;
 		settings = Settings();
 
-		settingspath = isScripting ? Utils::getClientPath() + "\\Scripts\\Configs\\" + name + ".json" : Utils::getConfigsPath() + "\\" + name + ".json";
+		settingspath = isScripting ? Utils::getClientPath() + "\\Scripts\\Configs\\" + name + ".json" : "this is unused for non scripting modules";
 	}
 
 	void postConstructInitialize() {
@@ -85,6 +85,7 @@ public:
 	template <typename T>
 	T& getOps(std::string setting);
 
+	void setDef(std::string setting, bool value, bool optionIsEnable);
 	template <typename T>
 	void setDef(std::string setting, T value);
 

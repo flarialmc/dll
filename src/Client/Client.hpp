@@ -41,6 +41,7 @@ public:
 	inline static HMODULE currentModule = nullptr;
 
 	inline static std::string path = Utils::getConfigsPath() + "\\default.json";
+
 	static void SaveSettings() {
 		path = Utils::getConfigsPath() + "\\" + settings.getSettingByName<std::string>("currentConfig")->value;
 		try {
@@ -59,9 +60,13 @@ public:
 
 			auto it = ModuleManager::moduleMap.begin();
 			while (it != ModuleManager::moduleMap.end()) {
+				if (it->second == nullptr) {
+					++it;
+					continue;
+				}
 				cFile << "\n  \"" << it->second->name << "\": " << it->second->settings.ToJson();
 				++it;
-				if (it != ModuleManager::moduleMap.end()) { cFile << ","; }
+				if (it != ModuleManager::moduleMap.end()) cFile << ",";
 			}
 			cFile << "\n}";
 			cFile.close();
@@ -75,6 +80,7 @@ public:
 
 	static void LoadSettings() {
 		// load private client settings
+		Logger::info("Loading settings");
 
 		std::ifstream privateFile(privatePath);
 		if (!privateFile) return;
@@ -108,6 +114,8 @@ public:
 		catch (const nlohmann::json::parse_error& e) {
 			Logger::error("Failed to parse JSON: {}", e.what());
 		}
+
+		Logger::info("Done loading settings");
 	}
 
 	static void CheckSettingsFile() {

@@ -11,7 +11,9 @@ class Waila : public Module {
 public:
 	std::string lookingAt;
 
-	Waila();;
+	Waila() : Module("Waila", "Shows what you are looking at.", IDR_WAILA_PNG, "") {
+		//Module::setup();
+	};
 
 	void onEnable() override;
 

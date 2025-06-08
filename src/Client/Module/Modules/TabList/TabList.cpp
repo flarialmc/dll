@@ -24,7 +24,7 @@ void TabList::onDisable()
 
 void TabList::defaultConfig()
 {
-    setDef("enabled", true);
+    setDef("enabled", true, true);
     setDef("uiscale", 0.65f);
     getKeybind();
     Module::defaultConfig("core");

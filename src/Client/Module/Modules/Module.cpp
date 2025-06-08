@@ -30,9 +30,15 @@ D2D_COLOR_F Module::getColor(std::string text, std::string mod) {
 	return col;
 };
 
+void Module::setDef(std::string setting, bool value, bool optionIsEnable) {
+	if (this->settings.getSettingByName<bool>("enabled") == nullptr) {
+		this->settings.addSetting("enabled", value);
+		this->enabledState = value;
+	}
+}
+
 template <typename T>
 void Module::setDef(std::string setting, T value) {
-	//settings.setValue()
 	this->settings.getOrAddSettingByName<T>(setting, value);
 }
 
@@ -720,6 +726,10 @@ void Module::loadDefaults() {
 void Module::loadSettings() {
 	try { settings.FromJson(Client::globalSettings[name].dump()); }
 	catch (std::exception& e) { Logger::error("Couldn't load module settings: {}", e.what()); }
+	if (this->settings.getSettingByName<bool>("enabled") && getOps<bool>("enabled")) {
+		this->onEnable();
+		this->enabledState = true;
+	}
 
 	totalKeybinds = 0;
 	totalWaypoints = 0;
@@ -727,334 +737,347 @@ void Module::loadSettings() {
 
 	for (const auto& settingPair : settings.settings) {
 		const std::string& name = settingPair.first;
-		if (!ModuleManager::restartModules && name == "enabled" && this->settings.getSettingByName<bool>("enabled")->value) this->onEnable();
-
-
-		if (this->name == "ClickGUI") {
-			// Migrate flarial logo color
-			if (this->settings.getSettingByName<std::string>("colors_FlarialLogo") != nullptr) {
-				this->forceDef(
-					"flariallogo",
-					this->settings.getSettingByName<std::string>("colors_FlarialLogo")->value,
-					this->settings.getSettingByName<float>("o_colors_FlarialLogo")->value,
-					this->settings.getSettingByName<bool>("colors_FlarialLogo_rgb")->value
-				);
-				this->settings.deleteSetting("colors_FlarialLogo");
-				this->settings.deleteSetting("o_colors_FlarialLogo");
-				this->settings.deleteSetting("colors_FlarialLogo_rgb");
-			}
-
-			// Migration for "Radio Button Icon Disabled" (colors_radiobutton_enabled -> enabledRadioButton)
-			if (this->settings.getSettingByName<std::string>("colors_radiobutton_enabled") != nullptr) {
-				this->forceDef(
-					"enabledRadioButton",
-					this->settings.getSettingByName<std::string>("colors_radiobutton_enabled")->value,
-					this->settings.getSettingByName<float>("o_colors_radiobutton_enabled")->value,
-					this->settings.getSettingByName<bool>("colors_radiobutton_enabled_rgb")->value
-				);
-				this->settings.deleteSetting("colors_radiobutton_enabled");
-				this->settings.deleteSetting("o_colors_radiobutton_enabled");
-				this->settings.deleteSetting("colors_radiobutton_enabled_rgb");
-			}
-
-			// Migration for "Radio Button Icon Enabled" (colors_radiobutton_disabled -> disabledRadioButton)
-			if (this->settings.getSettingByName<std::string>("colors_radiobutton_disabled") != nullptr) {
-				this->forceDef(
-					"disabledRadioButton",
-					this->settings.getSettingByName<std::string>("colors_radiobutton_disabled")->value,
-					this->settings.getSettingByName<float>("o_colors_radiobutton_disabled")->value,
-					this->settings.getSettingByName<bool>("colors_radiobutton_disabled_rgb")->value
-				);
-				this->settings.deleteSetting("colors_radiobutton_disabled");
-				this->settings.deleteSetting("o_colors_radiobutton_disabled");
-				this->settings.deleteSetting("colors_radiobutton_disabled_rgb");
-			}
-
-			// Migration for "Text Color" (colors_text -> globalText)
-			if (this->settings.getSettingByName<std::string>("colors_text") != nullptr) {
-				this->forceDef(
-					"globalText",
-					this->settings.getSettingByName<std::string>("colors_text")->value,
-					this->settings.getSettingByName<float>("o_colors_text")->value,
-					this->settings.getSettingByName<bool>("colors_text_rgb")->value
-				);
-				this->settings.deleteSetting("colors_text");
-				this->settings.deleteSetting("o_colors_text");
-				this->settings.deleteSetting("colors_text_rgb");
-			}
-
-			// Migration for "Enabled" (colors_enabled -> modCardEnabled)
-			if (this->settings.getSettingByName<std::string>("colors_enabled") != nullptr) {
-				this->forceDef(
-					"modCardEnabled",
-					this->settings.getSettingByName<std::string>("colors_enabled")->value,
-					this->settings.getSettingByName<float>("o_colors_enabled")->value,
-					this->settings.getSettingByName<bool>("colors_enabled_rgb")->value
-				);
-				this->settings.deleteSetting("colors_enabled");
-				this->settings.deleteSetting("o_colors_enabled");
-				this->settings.deleteSetting("colors_enabled_rgb");
-			}
-
-			// Migration for "Disabled" (colors_disabled -> modCardDisabled)
-			// Corrected to use "colors_disabled_rgb" as assumed.
-			if (this->settings.getSettingByName<std::string>("colors_disabled") != nullptr) {
-				this->forceDef(
-					"modCardDisabled",
-					this->settings.getSettingByName<std::string>("colors_disabled")->value,
-					this->settings.getSettingByName<float>("o_colors_disabled")->value,
-					this->settings.getSettingByName<bool>("colors_disabled_rgb")->value
-				);
-				this->settings.deleteSetting("colors_disabled");
-				this->settings.deleteSetting("o_colors_disabled");
-				this->settings.deleteSetting("colors_disabled_rgb");
-			}
-
-			// Migration for "Primary 1" (colors_primary1 -> primary1)
-			if (this->settings.getSettingByName<std::string>("colors_primary1") != nullptr) {
-				this->forceDef(
-					"primary1",
-					this->settings.getSettingByName<std::string>("colors_primary1")->value,
-					this->settings.getSettingByName<float>("o_colors_primary1")->value,
-					this->settings.getSettingByName<bool>("colors_primary1_rgb")->value
-				);
-				this->settings.deleteSetting("colors_primary1");
-				this->settings.deleteSetting("o_colors_primary1");
-				this->settings.deleteSetting("colors_primary1_rgb");
-			}
-
-			// Migration for "Primary 2" (colors_primary2 -> primary2)
-			if (this->settings.getSettingByName<std::string>("colors_primary2") != nullptr) {
-				this->forceDef(
-					"primary2",
-					this->settings.getSettingByName<std::string>("colors_primary2")->value,
-					this->settings.getSettingByName<float>("o_colors_primary2")->value,
-					this->settings.getSettingByName<bool>("colors_primary2_rgb")->value
-				);
-				this->settings.deleteSetting("colors_primary2");
-				this->settings.deleteSetting("o_colors_primary2");
-				this->settings.deleteSetting("colors_primary2_rgb");
-			}
-
-			// Migration for "Primary 3" (colors_primary3 -> primary3)
-			if (this->settings.getSettingByName<std::string>("colors_primary3") != nullptr) {
-				this->forceDef(
-					"primary3",
-					this->settings.getSettingByName<std::string>("colors_primary3")->value,
-					this->settings.getSettingByName<float>("o_colors_primary3")->value,
-					this->settings.getSettingByName<bool>("colors_primary3_rgb")->value
-				);
-				this->settings.deleteSetting("colors_primary3");
-				this->settings.deleteSetting("o_colors_primary3");
-				this->settings.deleteSetting("colors_primary3_rgb");
-			}
-
-			// Migration for "Primary 4" (colors_primary4 -> primary4)
-			if (this->settings.getSettingByName<std::string>("colors_primary4") != nullptr) {
-				this->forceDef(
-					"primary4",
-					this->settings.getSettingByName<std::string>("colors_primary4")->value,
-					this->settings.getSettingByName<float>("o_colors_primary4")->value,
-					this->settings.getSettingByName<bool>("colors_primary4_rgb")->value
-				);
-				this->settings.deleteSetting("colors_primary4");
-				this->settings.deleteSetting("o_colors_primary4");
-				this->settings.deleteSetting("colors_primary4_rgb");
-			}
-
-			// Migration for "Secondary 1" (colors_secondary1 -> secondary1)
-			if (this->settings.getSettingByName<std::string>("colors_secondary1") != nullptr) {
-				this->forceDef(
-					"secondary1",
-					this->settings.getSettingByName<std::string>("colors_secondary1")->value,
-					this->settings.getSettingByName<float>("o_colors_secondary1")->value,
-					this->settings.getSettingByName<bool>("colors_secondary1_rgb")->value
-				);
-				this->settings.deleteSetting("colors_secondary1");
-				this->settings.deleteSetting("o_colors_secondary1");
-				this->settings.deleteSetting("colors_secondary1_rgb");
-			}
-
-			// Migration for "Secondary 2" (colors_secondary2 -> secondary2)
-			if (this->settings.getSettingByName<std::string>("colors_secondary2") != nullptr) {
-				this->forceDef(
-					"secondary2",
-					this->settings.getSettingByName<std::string>("colors_secondary2")->value,
-					this->settings.getSettingByName<float>("o_colors_secondary2")->value,
-					this->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
-				);
-				this->settings.deleteSetting("colors_secondary2");
-				this->settings.deleteSetting("o_colors_secondary2");
-				this->settings.deleteSetting("colors_secondary2_rgb");
-			}
-
-			// Migration for "Secondary 3" (colors_secondary3 -> secondary3)
-			if (this->settings.getSettingByName<std::string>("colors_secondary3") != nullptr) {
-				this->forceDef(
-					"secondary3",
-					this->settings.getSettingByName<std::string>("colors_secondary3")->value,
-					this->settings.getSettingByName<float>("o_colors_secondary3")->value,
-					this->settings.getSettingByName<bool>("colors_secondary3_rgb")->value
-				);
-				this->settings.deleteSetting("colors_secondary3");
-				this->settings.deleteSetting("o_colors_secondary3");
-				this->settings.deleteSetting("colors_secondary3_rgb");
-			}
-
-			// Migration for "Secondary 4" (colors_secondary4 -> secondary4)
-			if (this->settings.getSettingByName<std::string>("colors_secondary4") != nullptr) {
-				this->forceDef(
-					"secondary4",
-					this->settings.getSettingByName<std::string>("colors_secondary4")->value,
-					this->settings.getSettingByName<float>("o_colors_secondary4")->value,
-					this->settings.getSettingByName<bool>("colors_secondary4_rgb")->value
-				);
-				this->settings.deleteSetting("colors_secondary4");
-				this->settings.deleteSetting("o_colors_secondary4");
-				this->settings.deleteSetting("colors_secondary4_rgb");
-			}
-
-			// Migration for "Secondary 5" (colors_secondary5 -> secondary5)
-			if (this->settings.getSettingByName<std::string>("colors_secondary5") != nullptr) {
-				this->forceDef(
-					"secondary5",
-					this->settings.getSettingByName<std::string>("colors_secondary5")->value,
-					this->settings.getSettingByName<float>("o_colors_secondary5")->value,
-					this->settings.getSettingByName<bool>("colors_secondary5_rgb")->value
-				);
-				this->settings.deleteSetting("colors_secondary5");
-				this->settings.deleteSetting("o_colors_secondary5");
-				this->settings.deleteSetting("colors_secondary5_rgb");
-			}
-
-			// Migration for "Secondary 6" (colors_secondary6 -> secondary6)
-			if (this->settings.getSettingByName<std::string>("colors_secondary6") != nullptr) {
-				this->forceDef(
-					"secondary6",
-					this->settings.getSettingByName<std::string>("colors_secondary6")->value,
-					this->settings.getSettingByName<float>("o_colors_secondary6")->value,
-					this->settings.getSettingByName<bool>("colors_secondary6_rgb")->value
-				);
-				this->settings.deleteSetting("colors_secondary6");
-				this->settings.deleteSetting("o_colors_secondary6");
-				this->settings.deleteSetting("colors_secondary6_rgb");
-			}
-
-			// Migration for "Secondary 7" (colors_secondary7 -> secondary7)
-			if (this->settings.getSettingByName<std::string>("colors_secondary7") != nullptr) {
-				this->forceDef(
-					"secondary7",
-					this->settings.getSettingByName<std::string>("colors_secondary7")->value,
-					this->settings.getSettingByName<float>("o_colors_secondary7")->value,
-					this->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
-				);
-				this->settings.deleteSetting("colors_secondary7");
-				this->settings.deleteSetting("o_colors_secondary7");
-				this->settings.deleteSetting("colors_secondary7_rgb");
-			}
-
-			// Migration for "Secondary 8" (colors_secondary8 -> secondary8)
-			if (this->settings.getSettingByName<std::string>("colors_secondary8") != nullptr) {
-				this->forceDef(
-					"secondary8",
-					this->settings.getSettingByName<std::string>("colors_secondary8")->value,
-					this->settings.getSettingByName<float>("o_colors_secondary8")->value,
-					this->settings.getSettingByName<bool>("colors_secondary8_rgb")->value
-				);
-				this->settings.deleteSetting("colors_secondary8");
-				this->settings.deleteSetting("o_colors_secondary8");
-				this->settings.deleteSetting("colors_secondary8_rgb");
-			}
-
-			// Migration for "Modcard 1" (colors_mod1 -> modcard1)
-			if (this->settings.getSettingByName<std::string>("colors_mod1") != nullptr) {
-				this->forceDef(
-					"modcard1",
-					this->settings.getSettingByName<std::string>("colors_mod1")->value,
-					this->settings.getSettingByName<float>("o_colors_mod1")->value,
-					this->settings.getSettingByName<bool>("colors_mod1_rgb")->value
-				);
-				this->settings.deleteSetting("colors_mod1");
-				this->settings.deleteSetting("o_colors_mod1");
-				this->settings.deleteSetting("colors_mod1_rgb");
-			}
-
-			// Migration for "Modcard 2" (colors_mod2 -> modcard2)
-			if (this->settings.getSettingByName<std::string>("colors_mod2") != nullptr) {
-				this->forceDef(
-					"modcard2",
-					this->settings.getSettingByName<std::string>("colors_mod2")->value,
-					this->settings.getSettingByName<float>("o_colors_mod2")->value,
-					this->settings.getSettingByName<bool>("colors_mod2_rgb")->value
-				);
-				this->settings.deleteSetting("colors_mod2");
-				this->settings.deleteSetting("o_colors_mod2");
-				this->settings.deleteSetting("colors_mod2_rgb");
-			}
-
-			// Migration for "Modcard 3" (colors_mod3 -> modcard3)
-			if (this->settings.getSettingByName<std::string>("colors_mod3") != nullptr) {
-				this->forceDef(
-					"modcard3",
-					this->settings.getSettingByName<std::string>("colors_mod3")->value,
-					this->settings.getSettingByName<float>("o_colors_mod3")->value,
-					this->settings.getSettingByName<bool>("colors_mod3_rgb")->value
-				);
-				this->settings.deleteSetting("colors_mod3");
-				this->settings.deleteSetting("o_colors_mod3");
-				this->settings.deleteSetting("colors_mod3_rgb");
-			}
-
-			// Migration for "Modcard 4" (colors_mod4 -> modcard4)
-			if (this->settings.getSettingByName<std::string>("colors_mod4") != nullptr) {
-				this->forceDef(
-					"modcard4",
-					this->settings.getSettingByName<std::string>("colors_mod4")->value,
-					this->settings.getSettingByName<float>("o_colors_mod4")->value,
-					this->settings.getSettingByName<bool>("colors_mod4_rgb")->value
-				);
-				this->settings.deleteSetting("colors_mod4");
-				this->settings.deleteSetting("o_colors_mod4");
-				this->settings.deleteSetting("colors_mod4_rgb");
-			}
-
-			// Migration for "Modcard Icon" (colors_modicon -> modicon)
-			if (this->settings.getSettingByName<std::string>("colors_modicon") != nullptr) {
-				this->forceDef(
-					"modicon",
-					this->settings.getSettingByName<std::string>("colors_modicon")->value,
-					this->settings.getSettingByName<float>("o_colors_modicon")->value,
-					this->settings.getSettingByName<bool>("colors_modicon_rgb")->value
-				);
-				this->settings.deleteSetting("colors_modicon");
-				this->settings.deleteSetting("o_colors_modicon");
-				this->settings.deleteSetting("colors_modicon_rgb");
-			}
-
-			// Migration for "Setting Icon Color" (colors_mod_settings_icon -> modsettings)
-			if (this->settings.getSettingByName<std::string>("colors_mod_settings_icon") != nullptr) {
-				this->forceDef(
-					"modsettings",
-					this->settings.getSettingByName<std::string>("colors_mod_settings_icon")->value,
-					this->settings.getSettingByName<float>("o_colors_mod_settings_icon")->value,
-					this->settings.getSettingByName<bool>("colors_mod_settings_icon_rgb")->value
-				);
-				this->settings.deleteSetting("colors_mod_settings_icon");
-				this->settings.deleteSetting("o_colors_mod_settings_icon");
-				this->settings.deleteSetting("colors_mod_settings_icon_rgb");
-			}
-		}
-
-		if (name.contains("keybind")) {
+		if (name.find("keybind") != std::string::npos) {
 			++totalKeybinds;
 		}
-		else if (name.contains("waypoint")) {
+		else if (name.find("waypoint") != std::string::npos) {
 			++totalWaypoints;
 		}
-		else if (name.contains("map-")) {
+		else if (name.find("map-") != std::string::npos) {
 			++totalmaps;
 		}
 	}
+
+	//for (const auto& settingPair : settings.settings) {
+	//	const std::string& name = settingPair.first;
+	//	if (!ModuleManager::restartModules && name == "enabled" && this->settings.getSettingByName<bool>("enabled")->value) this->onEnable();
+
+
+	//	if (this->name == "ClickGUI") {
+	//		// Migrate flarial logo color
+	//		if (this->settings.getSettingByName<std::string>("colors_FlarialLogo") != nullptr) {
+	//			this->forceDef(
+	//				"flariallogo",
+	//				this->settings.getSettingByName<std::string>("colors_FlarialLogo")->value,
+	//				this->settings.getSettingByName<float>("o_colors_FlarialLogo")->value,
+	//				this->settings.getSettingByName<bool>("colors_FlarialLogo_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_FlarialLogo");
+	//			this->settings.deleteSetting("o_colors_FlarialLogo");
+	//			this->settings.deleteSetting("colors_FlarialLogo_rgb");
+	//		}
+
+	//		// Migration for "Radio Button Icon Disabled" (colors_radiobutton_enabled -> enabledRadioButton)
+	//		if (this->settings.getSettingByName<std::string>("colors_radiobutton_enabled") != nullptr) {
+	//			this->forceDef(
+	//				"enabledRadioButton",
+	//				this->settings.getSettingByName<std::string>("colors_radiobutton_enabled")->value,
+	//				this->settings.getSettingByName<float>("o_colors_radiobutton_enabled")->value,
+	//				this->settings.getSettingByName<bool>("colors_radiobutton_enabled_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_radiobutton_enabled");
+	//			this->settings.deleteSetting("o_colors_radiobutton_enabled");
+	//			this->settings.deleteSetting("colors_radiobutton_enabled_rgb");
+	//		}
+
+	//		// Migration for "Radio Button Icon Enabled" (colors_radiobutton_disabled -> disabledRadioButton)
+	//		if (this->settings.getSettingByName<std::string>("colors_radiobutton_disabled") != nullptr) {
+	//			this->forceDef(
+	//				"disabledRadioButton",
+	//				this->settings.getSettingByName<std::string>("colors_radiobutton_disabled")->value,
+	//				this->settings.getSettingByName<float>("o_colors_radiobutton_disabled")->value,
+	//				this->settings.getSettingByName<bool>("colors_radiobutton_disabled_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_radiobutton_disabled");
+	//			this->settings.deleteSetting("o_colors_radiobutton_disabled");
+	//			this->settings.deleteSetting("colors_radiobutton_disabled_rgb");
+	//		}
+
+	//		// Migration for "Text Color" (colors_text -> globalText)
+	//		if (this->settings.getSettingByName<std::string>("colors_text") != nullptr) {
+	//			this->forceDef(
+	//				"globalText",
+	//				this->settings.getSettingByName<std::string>("colors_text")->value,
+	//				this->settings.getSettingByName<float>("o_colors_text")->value,
+	//				this->settings.getSettingByName<bool>("colors_text_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_text");
+	//			this->settings.deleteSetting("o_colors_text");
+	//			this->settings.deleteSetting("colors_text_rgb");
+	//		}
+
+	//		// Migration for "Enabled" (colors_enabled -> modCardEnabled)
+	//		if (this->settings.getSettingByName<std::string>("colors_enabled") != nullptr) {
+	//			this->forceDef(
+	//				"modCardEnabled",
+	//				this->settings.getSettingByName<std::string>("colors_enabled")->value,
+	//				this->settings.getSettingByName<float>("o_colors_enabled")->value,
+	//				this->settings.getSettingByName<bool>("colors_enabled_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_enabled");
+	//			this->settings.deleteSetting("o_colors_enabled");
+	//			this->settings.deleteSetting("colors_enabled_rgb");
+	//		}
+
+	//		// Migration for "Disabled" (colors_disabled -> modCardDisabled)
+	//		// Corrected to use "colors_disabled_rgb" as assumed.
+	//		if (this->settings.getSettingByName<std::string>("colors_disabled") != nullptr) {
+	//			this->forceDef(
+	//				"modCardDisabled",
+	//				this->settings.getSettingByName<std::string>("colors_disabled")->value,
+	//				this->settings.getSettingByName<float>("o_colors_disabled")->value,
+	//				this->settings.getSettingByName<bool>("colors_disabled_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_disabled");
+	//			this->settings.deleteSetting("o_colors_disabled");
+	//			this->settings.deleteSetting("colors_disabled_rgb");
+	//		}
+
+	//		// Migration for "Primary 1" (colors_primary1 -> primary1)
+	//		if (this->settings.getSettingByName<std::string>("colors_primary1") != nullptr) {
+	//			this->forceDef(
+	//				"primary1",
+	//				this->settings.getSettingByName<std::string>("colors_primary1")->value,
+	//				this->settings.getSettingByName<float>("o_colors_primary1")->value,
+	//				this->settings.getSettingByName<bool>("colors_primary1_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_primary1");
+	//			this->settings.deleteSetting("o_colors_primary1");
+	//			this->settings.deleteSetting("colors_primary1_rgb");
+	//		}
+
+	//		// Migration for "Primary 2" (colors_primary2 -> primary2)
+	//		if (this->settings.getSettingByName<std::string>("colors_primary2") != nullptr) {
+	//			this->forceDef(
+	//				"primary2",
+	//				this->settings.getSettingByName<std::string>("colors_primary2")->value,
+	//				this->settings.getSettingByName<float>("o_colors_primary2")->value,
+	//				this->settings.getSettingByName<bool>("colors_primary2_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_primary2");
+	//			this->settings.deleteSetting("o_colors_primary2");
+	//			this->settings.deleteSetting("colors_primary2_rgb");
+	//		}
+
+	//		// Migration for "Primary 3" (colors_primary3 -> primary3)
+	//		if (this->settings.getSettingByName<std::string>("colors_primary3") != nullptr) {
+	//			this->forceDef(
+	//				"primary3",
+	//				this->settings.getSettingByName<std::string>("colors_primary3")->value,
+	//				this->settings.getSettingByName<float>("o_colors_primary3")->value,
+	//				this->settings.getSettingByName<bool>("colors_primary3_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_primary3");
+	//			this->settings.deleteSetting("o_colors_primary3");
+	//			this->settings.deleteSetting("colors_primary3_rgb");
+	//		}
+
+	//		// Migration for "Primary 4" (colors_primary4 -> primary4)
+	//		if (this->settings.getSettingByName<std::string>("colors_primary4") != nullptr) {
+	//			this->forceDef(
+	//				"primary4",
+	//				this->settings.getSettingByName<std::string>("colors_primary4")->value,
+	//				this->settings.getSettingByName<float>("o_colors_primary4")->value,
+	//				this->settings.getSettingByName<bool>("colors_primary4_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_primary4");
+	//			this->settings.deleteSetting("o_colors_primary4");
+	//			this->settings.deleteSetting("colors_primary4_rgb");
+	//		}
+
+	//		// Migration for "Secondary 1" (colors_secondary1 -> secondary1)
+	//		if (this->settings.getSettingByName<std::string>("colors_secondary1") != nullptr) {
+	//			this->forceDef(
+	//				"secondary1",
+	//				this->settings.getSettingByName<std::string>("colors_secondary1")->value,
+	//				this->settings.getSettingByName<float>("o_colors_secondary1")->value,
+	//				this->settings.getSettingByName<bool>("colors_secondary1_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_secondary1");
+	//			this->settings.deleteSetting("o_colors_secondary1");
+	//			this->settings.deleteSetting("colors_secondary1_rgb");
+	//		}
+
+	//		// Migration for "Secondary 2" (colors_secondary2 -> secondary2)
+	//		if (this->settings.getSettingByName<std::string>("colors_secondary2") != nullptr) {
+	//			this->forceDef(
+	//				"secondary2",
+	//				this->settings.getSettingByName<std::string>("colors_secondary2")->value,
+	//				this->settings.getSettingByName<float>("o_colors_secondary2")->value,
+	//				this->settings.getSettingByName<bool>("colors_secondary2_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_secondary2");
+	//			this->settings.deleteSetting("o_colors_secondary2");
+	//			this->settings.deleteSetting("colors_secondary2_rgb");
+	//		}
+
+	//		// Migration for "Secondary 3" (colors_secondary3 -> secondary3)
+	//		if (this->settings.getSettingByName<std::string>("colors_secondary3") != nullptr) {
+	//			this->forceDef(
+	//				"secondary3",
+	//				this->settings.getSettingByName<std::string>("colors_secondary3")->value,
+	//				this->settings.getSettingByName<float>("o_colors_secondary3")->value,
+	//				this->settings.getSettingByName<bool>("colors_secondary3_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_secondary3");
+	//			this->settings.deleteSetting("o_colors_secondary3");
+	//			this->settings.deleteSetting("colors_secondary3_rgb");
+	//		}
+
+	//		// Migration for "Secondary 4" (colors_secondary4 -> secondary4)
+	//		if (this->settings.getSettingByName<std::string>("colors_secondary4") != nullptr) {
+	//			this->forceDef(
+	//				"secondary4",
+	//				this->settings.getSettingByName<std::string>("colors_secondary4")->value,
+	//				this->settings.getSettingByName<float>("o_colors_secondary4")->value,
+	//				this->settings.getSettingByName<bool>("colors_secondary4_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_secondary4");
+	//			this->settings.deleteSetting("o_colors_secondary4");
+	//			this->settings.deleteSetting("colors_secondary4_rgb");
+	//		}
+
+	//		// Migration for "Secondary 5" (colors_secondary5 -> secondary5)
+	//		if (this->settings.getSettingByName<std::string>("colors_secondary5") != nullptr) {
+	//			this->forceDef(
+	//				"secondary5",
+	//				this->settings.getSettingByName<std::string>("colors_secondary5")->value,
+	//				this->settings.getSettingByName<float>("o_colors_secondary5")->value,
+	//				this->settings.getSettingByName<bool>("colors_secondary5_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_secondary5");
+	//			this->settings.deleteSetting("o_colors_secondary5");
+	//			this->settings.deleteSetting("colors_secondary5_rgb");
+	//		}
+
+	//		// Migration for "Secondary 6" (colors_secondary6 -> secondary6)
+	//		if (this->settings.getSettingByName<std::string>("colors_secondary6") != nullptr) {
+	//			this->forceDef(
+	//				"secondary6",
+	//				this->settings.getSettingByName<std::string>("colors_secondary6")->value,
+	//				this->settings.getSettingByName<float>("o_colors_secondary6")->value,
+	//				this->settings.getSettingByName<bool>("colors_secondary6_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_secondary6");
+	//			this->settings.deleteSetting("o_colors_secondary6");
+	//			this->settings.deleteSetting("colors_secondary6_rgb");
+	//		}
+
+	//		// Migration for "Secondary 7" (colors_secondary7 -> secondary7)
+	//		if (this->settings.getSettingByName<std::string>("colors_secondary7") != nullptr) {
+	//			this->forceDef(
+	//				"secondary7",
+	//				this->settings.getSettingByName<std::string>("colors_secondary7")->value,
+	//				this->settings.getSettingByName<float>("o_colors_secondary7")->value,
+	//				this->settings.getSettingByName<bool>("colors_secondary7_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_secondary7");
+	//			this->settings.deleteSetting("o_colors_secondary7");
+	//			this->settings.deleteSetting("colors_secondary7_rgb");
+	//		}
+
+	//		// Migration for "Secondary 8" (colors_secondary8 -> secondary8)
+	//		if (this->settings.getSettingByName<std::string>("colors_secondary8") != nullptr) {
+	//			this->forceDef(
+	//				"secondary8",
+	//				this->settings.getSettingByName<std::string>("colors_secondary8")->value,
+	//				this->settings.getSettingByName<float>("o_colors_secondary8")->value,
+	//				this->settings.getSettingByName<bool>("colors_secondary8_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_secondary8");
+	//			this->settings.deleteSetting("o_colors_secondary8");
+	//			this->settings.deleteSetting("colors_secondary8_rgb");
+	//		}
+
+	//		// Migration for "Modcard 1" (colors_mod1 -> modcard1)
+	//		if (this->settings.getSettingByName<std::string>("colors_mod1") != nullptr) {
+	//			this->forceDef(
+	//				"modcard1",
+	//				this->settings.getSettingByName<std::string>("colors_mod1")->value,
+	//				this->settings.getSettingByName<float>("o_colors_mod1")->value,
+	//				this->settings.getSettingByName<bool>("colors_mod1_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_mod1");
+	//			this->settings.deleteSetting("o_colors_mod1");
+	//			this->settings.deleteSetting("colors_mod1_rgb");
+	//		}
+
+	//		// Migration for "Modcard 2" (colors_mod2 -> modcard2)
+	//		if (this->settings.getSettingByName<std::string>("colors_mod2") != nullptr) {
+	//			this->forceDef(
+	//				"modcard2",
+	//				this->settings.getSettingByName<std::string>("colors_mod2")->value,
+	//				this->settings.getSettingByName<float>("o_colors_mod2")->value,
+	//				this->settings.getSettingByName<bool>("colors_mod2_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_mod2");
+	//			this->settings.deleteSetting("o_colors_mod2");
+	//			this->settings.deleteSetting("colors_mod2_rgb");
+	//		}
+
+	//		// Migration for "Modcard 3" (colors_mod3 -> modcard3)
+	//		if (this->settings.getSettingByName<std::string>("colors_mod3") != nullptr) {
+	//			this->forceDef(
+	//				"modcard3",
+	//				this->settings.getSettingByName<std::string>("colors_mod3")->value,
+	//				this->settings.getSettingByName<float>("o_colors_mod3")->value,
+	//				this->settings.getSettingByName<bool>("colors_mod3_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_mod3");
+	//			this->settings.deleteSetting("o_colors_mod3");
+	//			this->settings.deleteSetting("colors_mod3_rgb");
+	//		}
+
+	//		// Migration for "Modcard 4" (colors_mod4 -> modcard4)
+	//		if (this->settings.getSettingByName<std::string>("colors_mod4") != nullptr) {
+	//			this->forceDef(
+	//				"modcard4",
+	//				this->settings.getSettingByName<std::string>("colors_mod4")->value,
+	//				this->settings.getSettingByName<float>("o_colors_mod4")->value,
+	//				this->settings.getSettingByName<bool>("colors_mod4_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_mod4");
+	//			this->settings.deleteSetting("o_colors_mod4");
+	//			this->settings.deleteSetting("colors_mod4_rgb");
+	//		}
+
+	//		// Migration for "Modcard Icon" (colors_modicon -> modicon)
+	//		if (this->settings.getSettingByName<std::string>("colors_modicon") != nullptr) {
+	//			this->forceDef(
+	//				"modicon",
+	//				this->settings.getSettingByName<std::string>("colors_modicon")->value,
+	//				this->settings.getSettingByName<float>("o_colors_modicon")->value,
+	//				this->settings.getSettingByName<bool>("colors_modicon_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_modicon");
+	//			this->settings.deleteSetting("o_colors_modicon");
+	//			this->settings.deleteSetting("colors_modicon_rgb");
+	//		}
+
+	//		// Migration for "Setting Icon Color" (colors_mod_settings_icon -> modsettings)
+	//		if (this->settings.getSettingByName<std::string>("colors_mod_settings_icon") != nullptr) {
+	//			this->forceDef(
+	//				"modsettings",
+	//				this->settings.getSettingByName<std::string>("colors_mod_settings_icon")->value,
+	//				this->settings.getSettingByName<float>("o_colors_mod_settings_icon")->value,
+	//				this->settings.getSettingByName<bool>("colors_mod_settings_icon_rgb")->value
+	//			);
+	//			this->settings.deleteSetting("colors_mod_settings_icon");
+	//			this->settings.deleteSetting("o_colors_mod_settings_icon");
+	//			this->settings.deleteSetting("colors_mod_settings_icon_rgb");
+	//		}
+	//	}
+
+	//	if (name.contains("keybind")) {
+	//		++totalKeybinds;
+	//	}
+	//	else if (name.contains("waypoint")) {
+	//		++totalWaypoints;
+	//	}
+	//	else if (name.contains("map-")) {
+	//		++totalmaps;
+	//	}
+	//}
 
 	this->setup();
 }

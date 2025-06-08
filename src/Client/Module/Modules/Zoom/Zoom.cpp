@@ -2,7 +2,7 @@
 
 Zoom::Zoom() : Module("Zoom", "Allows you to see distant places.", IDR_MAGNIFY_PNG, "C")
 {
-	this->setup();
+	//this->setup();
 }
 
 void Zoom::onEnable()
@@ -27,7 +27,7 @@ void Zoom::onDisable()
 
 void Zoom::defaultConfig()
 {
-	setDef("enabled", true);
+	setDef("enabled", true, true);
 	setDef("keybind", (std::string)"C");
 	getKeybind();
 	Module::defaultConfig("core");

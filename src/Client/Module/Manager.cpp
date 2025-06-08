@@ -107,200 +107,200 @@
 #include "Modules/DirectionHUD/DirectionHUD.hpp"
 
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
-    for (const auto& pair : moduleMap) {
-        if(pair.second == nullptr) continue;
-        modulesVector.push_back(pair.second);
-    }
+	for (const auto& pair : moduleMap) {
+		if (pair.second == nullptr) continue;
+		modulesVector.push_back(pair.second);
+	}
 }
 
 bool compareEnabled(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
-    return obj1->isEnabled() >
-           obj2->isEnabled();
+	return obj1->isEnabled() >
+		obj2->isEnabled();
 }
 
 bool compareFavorite(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
-    return obj1->settings.getSettingByName<bool>("favorite")->value >
-           obj2->settings.getSettingByName<bool>("favorite")->value;
+	return obj1->settings.getSettingByName<bool>("favorite")->value >
+		obj2->settings.getSettingByName<bool>("favorite")->value;
 }
 
 
 bool compareNames(std::shared_ptr<Module>& obj1, std::shared_ptr<Module>& obj2) {
-    return obj1->name < obj2->name;
+	return obj1->name < obj2->name;
 }
 
 
 void ModuleManager::updateModulesVector() {
-    if (modulesVector.empty()) getModules();
-    if (Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value)
-        std::sort(modulesVector.begin(), modulesVector.end(), compareEnabled);
-    else std::sort(modulesVector.begin(), modulesVector.end(), compareNames);
-    std::sort(modulesVector.begin(), modulesVector.end(), compareFavorite);
+	if (modulesVector.empty()) getModules();
+	if (Client::settings.getSettingByName<bool>("enabledModulesOnTop")->value)
+		std::sort(modulesVector.begin(), modulesVector.end(), compareEnabled);
+	else std::sort(modulesVector.begin(), modulesVector.end(), compareNames);
+	std::sort(modulesVector.begin(), modulesVector.end(), compareFavorite);
 }
 
 
 void ModuleManager::initialize() {
+	
+	addModule<MotionBlur>();
 
-    addModule<MotionBlur>();
+	// Screen effects
+	addModule<Deepfry>();
+	addModule<HueChanger>();
+	addModule<PatarHD>();
+	addModule<DVD>();
 
-    // Screen effects
-    addModule<Deepfry>();
-    addModule<HueChanger>();
-    addModule<PatarHD>();
-    addModule<DVD>();
+	// FOV Changers
+	addModule<FOVChanger>(); //1
+	addModule<Zoom>(); //2
+	addModule<UpsideDown>(); //3
 
-    // FOV Changers
-    addModule<FOVChanger>(); //1
-    addModule<Zoom>(); //2
-    addModule<UpsideDown>(); //3
+	addModule<ClickGUI>();
+	addModule<Module202020>();
+	addModule<FPS>();
+	addModule<CPSCounter>();
+	addModule<IPDisplay>();
+	addModule<ReachCounter>();
+	addModule<ComboCounter>();
+	addModule<PingCounter>();
+	addModule<PotCounter>();
+	addModule<ArrowCounter>();
+	addModule<EntityCounter>();
+	addModule<Time>();
+	addModule<MEM>();
+	addModule<Fullbright>();
+	addModule<Keystrokes>();
+	addModule<Sneak>();
+	addModule<Sprint>();
+	addModule<Hitbox>();
+	addModule<HurtColor>();
+	addModule<ThirdPerson>();
+	addModule<JavaDynamicFOV>();
 
-    addModule<ClickGUI>();
-    addModule<Module202020>();
-    addModule<FPS>();
-    addModule<CPSCounter>();
-    addModule<IPDisplay>();
-    addModule<ReachCounter>();
-    addModule<ComboCounter>();
-    addModule<PingCounter>();
-    addModule<PotCounter>();
-    addModule<ArrowCounter>();
-    addModule<EntityCounter>();
-    addModule<Time>();
-    addModule<MEM>();
-    addModule<Fullbright>();
-    addModule<Keystrokes>();
-    addModule<Sneak>();
-    addModule<Sprint>();
-    addModule<Hitbox>();
-    addModule<HurtColor>();
-    addModule<ThirdPerson>();
-    addModule<JavaDynamicFOV>();
+	addModule<SnapLook>();
+	addModule<FogColor>();
+	addModule<ArmorHUD>();
+	addModule<TimeChanger>();
+	addModule<RenderOptions>();
+	addModule<PaperDoll>();
+	addModule<GuiScale>();
+	addModule<TabList>();
+	addModule<WeatherChanger>();
+	addModule<NickModule>();
+	addModule<FreeLook>();
 
-    addModule<SnapLook>();
-    addModule<FogColor>();
-    addModule<ArmorHUD>();
-    addModule<TimeChanger>();
-    addModule<RenderOptions>();
-    addModule<PaperDoll>();
-    addModule<GuiScale>();
-    addModule<TabList>();
-    addModule<WeatherChanger>();
-    addModule<NickModule>();
-    addModule<FreeLook>();
+	addModule<AutoPerspective>();
 
-    addModule<AutoPerspective>();
+	addModule<AutoGG>();
+	addModule<TextHotkey>();
+	addModule<SpeedDisplay>();
+	addModule<CPSLimiter>();
+	addModule<BlockBreakIndicator>();
+	addModule<Animations>();
 
-    addModule<AutoGG>();
-    addModule<TextHotkey>();
-    addModule<SpeedDisplay>();
-    addModule<CPSLimiter>();
-    addModule<BlockBreakIndicator>();
-    addModule<Animations>();
+	addModule<BlockOutline>();
+	addModule<CommandHotkey>();
+	addModule<NoHurtCam>();
+	addModule<InventoryHUD>();
+	addModule<AutoRQ>();
+	addModule<HitPing>();
+	addModule<InstantHurtAnimation>();
+	addModule<OpponentReach>();
+	addModule<ViewModel>();
+	addModule<PotionHUD>();
+	addModule<FasterInventory>();
+	//addModule<MovableHUD>();
+	addModule<MovableScoreboard>();
+	addModule<MovableTitle>();
+	addModule<MovableBossbar>();
+	addModule<MovableChat>();
+	addModule<MovableCoordinates>();
+	addModule<MovableHotbar>();
+	// addModule<CompactChat>();
+	addModule<ItemPhysics>();
 
-    addModule<BlockOutline>();
-    addModule<CommandHotkey>();
-    addModule<NoHurtCam>();
-    addModule<InventoryHUD>();
-    addModule<AutoRQ>();
-    addModule<HitPing>();
-    addModule<InstantHurtAnimation>();
-    addModule<OpponentReach>();
-    addModule<ViewModel>();
-    addModule<PotionHUD>();
-    addModule<FasterInventory>();
-    //addModule<MovableHUD>();
-    addModule<MovableScoreboard>();
-    addModule<MovableTitle>();
-    addModule<MovableBossbar>();
-    addModule<MovableChat>();
-    addModule<MovableCoordinates>();
-    addModule<MovableHotbar>();
-    // addModule<CompactChat>();
-    addModule<ItemPhysics>();
+	addModule<Mousestrokes>();
 
-    addModule<Mousestrokes>();
-
-    if (VersionUtils::checkAboveOrEqual(21, 40)) {
-        addModule<JavaInventoryHotkeys>();
-        addModule<BlockHit>();
-    }
+	if (VersionUtils::checkAboveOrEqual(21, 40)) {
+		addModule<JavaInventoryHotkeys>();
+		addModule<BlockHit>();
+	}
 
 
-    addModule<HiveStat>();
-    addModule<Waypoints>();
+	addModule<HiveStat>();
+	addModule<Waypoints>();
 
-    addModule<NullMovement>();
-    //addModule<CustomCrosshair>();
-    addModule<Waila>();
+	addModule<NullMovement>();
+	//addModule<CustomCrosshair>();
+	addModule<Waila>();
 
-    addModule<RawInputBuffer>();
-    if (VersionUtils::checkAboveOrEqual(21, 00)) { // Due to entt
-        addModule<LowHealthIndicator>();
-    }
-    addModule<PlayerNotifier>();
-    //addModule<ItemUseDelayFix>();
-    addModule<ZeqaUtils>();
-    addModule<MumbleLink>();
+	addModule<RawInputBuffer>();
+	if (VersionUtils::checkAboveOrEqual(21, 00)) { // Due to entt
+		addModule<LowHealthIndicator>();
+	}
+	addModule<PlayerNotifier>();
+	//addModule<ItemUseDelayFix>();
+	addModule<ZeqaUtils>();
+	addModule<MumbleLink>();
 
-    addModule<MinimalViewBobbing>();
+	addModule<MinimalViewBobbing>();
 
-    addModule<Lewis>();
-    addModule<Coordinates>();
-    addModule<DisableMouseWheel>();
-    addModule<JavaDebugMenu>();
-    addModule<DirectionHUD>();
+	addModule<Lewis>();
+	addModule<Coordinates>();
+	addModule<DisableMouseWheel>();
+	addModule<JavaDebugMenu>();
+	addModule<DirectionHUD>();
 
-    addService<GUIKeyListener>();
-    if (!VersionUtils::checkAboveOrEqual(21, 60)) {
-        addService<PackChanger>();
-    }
-    addService<DiscordRPCListener>();
-    addService<UninjectListener>();
-    addService<SaveConfigListener>();
-    addService<CentreCursorListener>();
-    addService<rgbListener>();
-    addService<HiveModeCatcherListener>();
-    addService<ImGUIMouseListener>();
-    addService<ImGUIKeyListener>();
-    addService<ScriptMarketplace>();
+	addService<GUIKeyListener>();
+	if (!VersionUtils::checkAboveOrEqual(21, 60)) {
+		addService<PackChanger>();
+	}
+	addService<DiscordRPCListener>();
+	addService<UninjectListener>();
+	addService<SaveConfigListener>();
+	addService<CentreCursorListener>();
+	addService<rgbListener>();
+	addService<HiveModeCatcherListener>();
+	addService<ImGUIMouseListener>();
+	addService<ImGUIKeyListener>();
+	addService<ScriptMarketplace>();
 
-    initialized = true;
+	initialized = true;
 }
 
 void ModuleManager::terminate() {
-    initialized = false;
-    for (const auto& pair : moduleMap) {
-        if (pair.second != nullptr)
-            pair.second->terminate();
-    }
-    moduleMap.clear();
-    services.clear();
+	initialized = false;
+	for (const auto& pair : moduleMap) {
+		if (pair.second != nullptr)
+			pair.second->terminate();
+	}
+	moduleMap.clear();
+	services.clear();
 }
 
 
-void ModuleManager::restart(){
-    ModuleManager::restartModules = true;
-    initialized = false;
-    for (const auto& pair : moduleMap) {
-        if (pair.second) {
-            std::shared_ptr mod = getModule(pair.second->name);
-            if (mod != nullptr) {
-                bool old = mod->enabledState;
-                mod->settings.reset();
-                if (mod->isEnabled()) mod->onDisable();
-                mod->loadSettings();
-                mod->defaultConfig();
-                mod->enabledState = mod->isEnabled();
-                if (old != mod->enabledState) {
-                    if (mod->enabledState) mod->onEnable();
-                    else mod->onDisable();
-                }
-            }
-        }
-    }
-    ModuleManager::restartModules = false;
-    initialized = true;
+void ModuleManager::restart() {
+	ModuleManager::restartModules = true;
+	initialized = false;
+	for (const auto& pair : moduleMap) {
+		if (pair.second) {
+			std::shared_ptr mod = getModule(pair.second->name);
+			if (mod != nullptr) {
+				bool old = mod->enabledState;
+				mod->settings.reset();
+				if (mod->isEnabled()) mod->onDisable();
+				mod->loadSettings();
+				mod->defaultConfig();
+				mod->enabledState = mod->isEnabled();
+				if (old != mod->enabledState) {
+					if (mod->enabledState) mod->onEnable();
+					else mod->onDisable();
+				}
+			}
+		}
+	}
+	ModuleManager::restartModules = false;
+	initialized = true;
 
-    ScriptManager::reloadScripts();
+	ScriptManager::reloadScripts();
 }
 
 
@@ -330,27 +330,30 @@ void ModuleManager::syncState() {
 // TODO: use enums?
 bool ModuleManager::doesAnyModuleHave(const std::string& settingName) {
 
-    bool result = false;
+	bool result = false;
 
-    if(!ModuleManager::initialized) return false;
+	if (!ModuleManager::initialized) return false;
 
-    for (const auto& pair : moduleMap) {
-        if(!pair.second) continue;
+	for (const auto& pair : moduleMap) {
+		if (!pair.second) continue;
 
-        if (pair.second->settings.getSettingByName<bool>(settingName) != nullptr)
-            if (pair.second->settings.getSettingByName<bool>(settingName)->value &&
-                pair.second->isEnabled() && (pair.second->active || pair.second->defaultKeybind.empty())) {
-                result = true;
-                break;
-            }
-    }
+		if (pair.second->settings.getSettingByName<bool>(settingName) != nullptr)
+			if (pair.second->settings.getSettingByName<bool>(settingName)->value &&
+				pair.second->isEnabled() && (pair.second->active || pair.second->defaultKeybind.empty())) {
+				result = true;
+				break;
+			}
+	}
 
-    return result;
+	return result;
 
 }
 
 std::shared_ptr<Module> ModuleManager::getModule(const std::string& name) {
-    size_t hash = std::hash<std::string>{}(name);
+	size_t hash = std::hash<std::string>{}(name);
 
-    return moduleMap[hash];
+	auto it = moduleMap.find(hash);
+
+	if (it != moduleMap.end()) return moduleMap[hash];
+	else return nullptr;
 }
