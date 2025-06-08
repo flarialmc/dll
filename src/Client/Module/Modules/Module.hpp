@@ -134,9 +134,8 @@ public:
 	void addColorPicker(std::string text, std::string subtext, std::string& value, float& opacity, bool& rgb);
 	void addColorPicker(std::string text, std::string subtext, std::string settingName);
 
-	virtual void loadDefaults();
-
-	virtual void loadSettings();
+	virtual void postLoad(bool softLoad = false);
+	virtual void loadSettings(bool softLoad = false);
 	virtual void toggle();
 	virtual void setup();
 	virtual void onSetup();

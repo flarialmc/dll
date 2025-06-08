@@ -278,29 +278,22 @@ void ModuleManager::terminate() {
 
 
 void ModuleManager::restart() {
-	ModuleManager::restartModules = true;
 	initialized = false;
+	Client::LoadSettings();
 	for (const auto& pair : moduleMap) {
 		if (pair.second) {
 			std::shared_ptr mod = getModule(pair.second->name);
 			if (mod != nullptr) {
 				bool old = mod->enabledState;
-				mod->settings.reset();
 				if (mod->isEnabled()) mod->onDisable();
 				mod->loadSettings();
-				mod->defaultConfig();
-				mod->enabledState = mod->isEnabled();
-				if (old != mod->enabledState) {
-					if (mod->enabledState) mod->onEnable();
-					else mod->onDisable();
-				}
 			}
 		}
 	}
-	ModuleManager::restartModules = false;
 	initialized = true;
 
 	ScriptManager::reloadScripts();
+	Client::SaveSettings();
 }
 
 

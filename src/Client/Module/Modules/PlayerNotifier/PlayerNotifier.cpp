@@ -29,7 +29,7 @@ void PlayerNotifier::onSetup() {
 		});
 }
 
-void PlayerNotifier::loadSettings() {
+void PlayerNotifier::loadSettings(bool softLoad) {
 
 	Module::loadSettings();
 	for (const auto& settingPair : settings.settings) {

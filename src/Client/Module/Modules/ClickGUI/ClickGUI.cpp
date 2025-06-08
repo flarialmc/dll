@@ -575,6 +575,9 @@ void ClickGUI::onRender(RenderEvent& event) {
 				if (troll.empty()) troll = Client::settings.getSettingByName<std::string>("currentConfig")->value;
 
 				if (troll != Client::settings.getSettingByName<std::string>("currentConfig")->value && troll != "") {
+					Client::SavePrivate();
+					Client::SaveSettings();
+					Client::LoadPrivate();
 					troll = Client::settings.getSettingByName<std::string>("currentConfig")->value;
 					FlarialGUI::UnsetScrollView();
 					ModuleManager::restartModules = true;
@@ -604,7 +607,6 @@ void ClickGUI::onRender(RenderEvent& event) {
 						Client::deleteConfig(to);
 						ScriptMarketplace::reloadAllConfigs();
 						FlarialGUI::Notify("Deleted " + to);
-
 					}
 					else {
 						FlarialGUI::Notify("Cannot delete default config.");
@@ -868,13 +870,16 @@ void ClickGUI::onRender(RenderEvent& event) {
 						bool wasEnabled = currentModule->isEnabled();
 						currentModule->enabledState = false; // THIS MIGHT BE WITH DELAY !!!
 						currentModule->active = false;
-						currentModule->loadDefaults();
+						currentModule->settings.reset();
+						currentModule->defaultConfig();
+						currentModule->postLoad(true);
 						FlarialGUI::ResetShit();
 						if (wasEnabled) {
 							currentModule->getOps<bool>("enabled") = true;
 							currentModule->enabledState = true;
-							Client::SaveSettings();
 						}
+						Client::SaveSettings();
+						Client::LoadSettings();
 					}
 				}
 

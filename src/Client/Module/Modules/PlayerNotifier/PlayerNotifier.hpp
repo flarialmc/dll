@@ -23,7 +23,7 @@ public:
 
 	void onSetup() override;
 
-	void loadSettings() override;
+	void loadSettings(bool softLoad) override;
 
 	std::chrono::time_point<std::chrono::high_resolution_clock> lastRun = std::chrono::steady_clock::now();
 	bool first = true;

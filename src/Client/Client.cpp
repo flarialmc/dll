@@ -108,23 +108,32 @@ void Client::UnregisterActivationHandler()
 }
 
 void Client::createConfig(std::string name) {
-	std::ofstream file(Utils::getConfigsPath() + "\\" + name + ".json", std::ios::app);
+	std::string newpath = Utils::getConfigsPath() + "\\" + name + ".json";
+	std::ofstream file(newpath, std::ios::app);
 	if (!file) Logger::error("Failed to create new config file '{}'", name);
-	Client::switchConfig(name, false);
-	Client::SaveSettings();
-	Client::LoadSettings();
+	else {
+		Client::settings.getSettingByName<std::string>("currentConfig")->value = name + ".json";
+
+		Client::SavePrivate();
+		Client::SaveSettings();
+
+		Client::LoadPrivate();
+		Client::LoadSettings();
+	}
 }
 
 void Client::deleteConfig(std::string name) {
 	Client::settings.getSettingByName<std::string>("currentConfig")->value = "default.json";
-	std::string to = Utils::getConfigsPath() + "\\" + name + ".json";
+	std::string to = Utils::getConfigsPath() + "\\" + name;
 	if (std::filesystem::exists(to)) {
 		std::filesystem::remove_all(to);
 	}
 }
 
 void Client::switchConfig(std::string name, bool reload) {
-	path = Utils::getConfigsPath() + "\\" + settings.getSettingByName<std::string>("currentConfig")->value;
+	path = Utils::getConfigsPath() + "\\" + name + ".json";
+	Client::SavePrivate();
+	Client::LoadPrivate();
 	if (reload) Client::LoadSettings();
 }
 
@@ -210,6 +219,7 @@ void Client::initialize() {
 	}
 
 	Client::CheckSettingsFile();
+	Client::LoadPrivate();
 	Client::LoadSettings();
 
 	Logger::success("4");
