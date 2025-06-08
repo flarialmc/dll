@@ -124,6 +124,11 @@ void Client::createConfig(std::string name) {
 
 void Client::deleteConfig(std::string name) {
 	Client::settings.getSettingByName<std::string>("currentConfig")->value = "default.json";
+	
+	Client::SavePrivate();
+	Client::LoadPrivate();
+	Client::LoadSettings();
+	ModuleManager::restartModules = true;
 	std::string to = Utils::getConfigsPath() + "\\" + name;
 	if (std::filesystem::exists(to)) {
 		std::filesystem::remove_all(to);

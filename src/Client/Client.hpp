@@ -57,7 +57,7 @@ public:
 	}
 
 	static void LoadPrivate() {
-		Logger::info("Loading PRIATE");
+		Logger::info("Loading PRIVATE");
 
 		std::ifstream privateFile(privatePath);
 		if (!privateFile) return;

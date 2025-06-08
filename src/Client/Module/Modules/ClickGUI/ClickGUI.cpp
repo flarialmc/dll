@@ -871,7 +871,6 @@ void ClickGUI::onRender(RenderEvent& event) {
 						currentModule->enabledState = false; // THIS MIGHT BE WITH DELAY !!!
 						currentModule->active = false;
 						currentModule->settings.reset();
-						currentModule->defaultConfig();
 						currentModule->postLoad(true);
 						FlarialGUI::ResetShit();
 						if (wasEnabled) {
