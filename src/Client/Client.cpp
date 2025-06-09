@@ -236,7 +236,6 @@ void Client::initialize() {
 	Client::CheckSettingsFile();
 	if (Client::privateInit) {
 		Client::LoadPrivate();
-		Client::SavePrivate();
 		Client::LoadSettings();
 	}
 
@@ -280,13 +279,11 @@ void Client::initialize() {
 	ADD_SETTING("resettableSettings", true);
 	ADD_SETTING("clearTextBoxWhenClicked", true);
 
-	if (Client::hasLegacySettings) Client::settings.getSettingByName<std::string>("currentConfig")->value = Client::legacySettings.getSettingByName<std::string>("currentConfig")->value + ".json";
+	if (Client::hasLegacySettings && !Client::softLoadLegacy) Client::settings.getSettingByName<std::string>("currentConfig")->value = Client::legacySettings.getSettingByName<std::string>("currentConfig")->value + ".json";
 
 	Client::loadAvailableConfigs();
 	Client::SavePrivate();
-	if (Client::hasLegacySettings) {
-		Client::LoadPrivate();
-	}
+	if (Client::hasLegacySettings) Client::LoadPrivate();
 
 	Logger::success("5");
 

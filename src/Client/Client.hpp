@@ -38,6 +38,7 @@ public:
 
 	inline static std::string activeConfig;
 	inline static bool hasLegacySettings = false;
+	inline static bool softLoadLegacy = false;
 	inline static bool privateInit = false;
 
 	static Settings settings;
@@ -55,6 +56,7 @@ public:
 		if (fs::exists(legacyDir) && fs::is_directory(legacyDir)) {
 			Client::legacySettings.addSetting("currentConfig", (std::string)"default");
 			Client::hasLegacySettings = true;
+			Client::softLoadLegacy = true;
 			return Logger::custom(fg(fmt::color::dark_magenta), "Config", "Legacy dir already exists... aborting");
 		}
 
@@ -138,7 +140,7 @@ public:
 		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Loading PRIVATE");
 
 		std::ifstream privateFile(privatePath);
-		if (!privateFile) return;
+		if (!privateFile) return Logger::warn("Client PRIVATE not found");
 
 		std::stringstream pSS;
 
@@ -155,8 +157,6 @@ public:
 		}
 
 		path = Utils::getConfigsPath() + "\\" + settings.getSettingByName<std::string>("currentConfig")->value;
-
-		Client::privateInit = true;
 
 		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Loaded PRIVATE");
 	}
@@ -197,7 +197,7 @@ public:
 		if (path.empty()) path = Utils::getConfigsPath() + "\\" + Client::settings.getSettingByName<std::string>("currentConfig")->value;
 
 		std::ifstream inputFile(path);
-		if (!inputFile) return;
+		if (!inputFile) return LOG_ERROR("Config file could not be loaded {}", GetLastError());
 
 		std::stringstream ss;
 		ss << inputFile.rdbuf();
