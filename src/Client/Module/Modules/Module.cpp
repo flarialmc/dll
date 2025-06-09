@@ -4,6 +4,7 @@
 #include "../../Events/Events.hpp"
 #include "ClickGUI/ClickGUI.hpp"
 #include "Scripting/ScriptManager.hpp"
+#include "../../../Utils/Telemetry.hpp"
 #include <vector>
 
 #define clickgui ModuleManager::getModule("ClickGUI")
@@ -743,6 +744,8 @@ void Module::onSetup() {}
 
 // TODO: rename to Enable/Disable?
 void Module::onEnable() {
+	Telemetry::sendModuleEvent(this->name, "enable");
+	
 	enabledState = true;
 	if (settings.getSettingByName<bool>("enabled"))
 		getOps<bool>("enabled") = true;
@@ -750,6 +753,8 @@ void Module::onEnable() {
 }
 
 void Module::onDisable() {
+	Telemetry::sendModuleEvent(this->name, "disable");
+	
 	enabledState = false;
 	active = false;
 	if (!terminating) {
