@@ -736,7 +736,7 @@ void Module::loadLegacySettings() {
 	ss << inputFile.rdbuf();
 	inputFile.close();
 
-	if (!ss.str().empty() && ss.str() != "null") this->settings.AppendFromJson(ss.str(), this->settings, true);
+	if (!ss.str().empty() && ss.str() != "null") this->settings.AppendFromJson(ss.str(), true);
 }
 
 void Module::loadSettings(bool softLoad) {

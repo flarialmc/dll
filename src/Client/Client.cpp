@@ -109,23 +109,31 @@ void Client::UnregisterActivationHandler()
 }
 
 void Client::createConfig(std::string name) {
-	std::string newpath = Utils::getConfigsPath() + "\\" + name + ".json";
-	std::ofstream file(newpath, std::ios::app);
+	// name is with .json extension
+	std::ofstream file(Utils::getConfigsPath() + "\\" + name, std::ios::app);
 	if (!file) LOG_ERROR("Failed to create new config file '{}'", name);
-	else {
-		Client::settings.getSettingByName<std::string>("currentConfig")->value = name + ".json";
-		Client::activeConfig = Client::settings.getSettingByName<std::string>("currentConfig")->value;
-		Client::SaveSettings();
-		Client::SavePrivate();
-		Client::LoadPrivate();
+	else Client::switchConfig(name);
+}
+
+void Client::switchConfig(std::string name, bool deleting) {
+	// name is with .json extension
+	if (!std::filesystem::exists(Utils::getConfigsPath() + "\\" + name)) return Client::createConfig(name);
+
+	Client::settings.getSettingByName<std::string>("currentConfig")->value = name;
+	Client::activeConfig = name;
+
+	if (Client::hasLegacySettings) {
+		name.resize(name.length() - 5); // remove .json extension for legacy settings
+		Client::legacySettings.getSettingByName<std::string>("currentConfig")->value = name;
 	}
+
+	if (!deleting) Client::SaveSettings();
+	Client::SavePrivate();
+	Client::LoadPrivate();
 }
 
 void Client::deleteConfig(std::string name) {
-	Client::settings.getSettingByName<std::string>("currentConfig")->value = "default.json";
-	Client::activeConfig = "default.json";
-	Client::SavePrivate();
-	Client::LoadPrivate();
+	Client::switchConfig("default.json", true);
 	std::string to = Utils::getConfigsPath() + "\\" + name;
 	if (std::filesystem::exists(to)) {
 		std::filesystem::remove_all(to);
@@ -138,6 +146,17 @@ void Client::loadAvailableConfigs() {
 		for (const auto& entry : std::filesystem::directory_iterator(directoryPath)) {
 			if (entry.path().extension() == ".json") {
 				availableConfigs.push_back(entry.path().filename().string());
+			}
+		}
+	}
+	if (Client::hasLegacySettings) {
+		const std::string directoryPath = Client::legacyDir;
+		if (!std::filesystem::exists(directoryPath) || !std::filesystem::is_directory(directoryPath)) return;
+
+		for (const auto& entry : std::filesystem::directory_iterator(directoryPath)) {
+			if (is_directory(entry.path())) {
+				std::string configName = entry.path().filename().string() + ".json";
+				if (std::find(availableConfigs.begin(), availableConfigs.end(), configName) == availableConfigs.end()) availableConfigs.push_back(configName);
 			}
 		}
 	}
@@ -215,9 +234,11 @@ void Client::initialize() {
 
 	Client::LoadLegacySettings();
 	Client::CheckSettingsFile();
-	Client::LoadPrivate();
-	Client::SavePrivate();
-	Client::LoadSettings();
+	if (Client::privateInit) {
+		Client::LoadPrivate();
+		Client::SavePrivate();
+		Client::LoadSettings();
+	}
 
 	Logger::success("4");
 
@@ -259,8 +280,13 @@ void Client::initialize() {
 	ADD_SETTING("resettableSettings", true);
 	ADD_SETTING("clearTextBoxWhenClicked", true);
 
-	loadAvailableConfigs();
+	if (Client::hasLegacySettings) Client::settings.getSettingByName<std::string>("currentConfig")->value = Client::legacySettings.getSettingByName<std::string>("currentConfig")->value + ".json";
+
+	Client::loadAvailableConfigs();
 	Client::SavePrivate();
+	if (Client::hasLegacySettings) {
+		Client::LoadPrivate();
+	}
 
 	Logger::success("5");
 
@@ -273,13 +299,10 @@ void Client::initialize() {
 	FlarialGUI::ExtractImageResource(IDR_SUPPORTER_LOGO_PNG, "supporter-logo.png", "PNG");
 
 	FlarialGUI::LoadFont(IDR_FONT_TTF);
-
 	FlarialGUI::LoadFont(IDR_FONT_BOLD_TTF);
-
 	FlarialGUI::LoadFont(IDR_MINECRAFTIA_TTF);
 
 	Logger::success("6");
-
 
 	RegisterActivationHandler();
 	HookManager::initialize();

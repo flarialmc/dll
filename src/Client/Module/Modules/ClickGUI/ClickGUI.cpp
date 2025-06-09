@@ -574,10 +574,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 				if (Client::activeConfig.empty()) Client::activeConfig = Client::settings.getSettingByName<std::string>("currentConfig")->value;
 
 				if (Client::activeConfig != Client::settings.getSettingByName<std::string>("currentConfig")->value && Client::activeConfig != "") {
-					Client::SaveSettings();
-					Client::SavePrivate();
-					Client::LoadPrivate();
-					Client::activeConfig = Client::settings.getSettingByName<std::string>("currentConfig")->value;
+					Client::switchConfig(Client::settings.getSettingByName<std::string>("currentConfig")->value);
 					ModuleManager::restartModules = true;
 					FlarialGUI::UnsetScrollView();
 					FlarialGUI::PopSize();
@@ -594,7 +591,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 					std::uniform_int_distribution<> distrib(1000, 9000);
 
 					int random_number = distrib(gen);
-					std::string configname = "config-" + std::to_string(random_number);
+					std::string configname = "config-" + std::to_string(random_number) + ".json";
 					Client::createConfig(configname);
 					FlarialGUI::Notify("Created & loaded: " + configname);
 					ScriptMarketplace::reloadAllConfigs();

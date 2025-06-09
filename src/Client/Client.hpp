@@ -25,7 +25,7 @@ public:
 	static void UnregisterActivationHandler();
 
 	static void createConfig(std::string name);
-
+	static void switchConfig(std::string name, bool deleting = false);
 	static void deleteConfig(std::string name);
 
 	static void loadAvailableConfigs();
@@ -38,6 +38,7 @@ public:
 
 	inline static std::string activeConfig;
 	inline static bool hasLegacySettings = false;
+	inline static bool privateInit = false;
 
 	static Settings settings;
 	static Settings legacySettings;
@@ -98,8 +99,9 @@ public:
 		ss << legacyFile.rdbuf();
 		legacyFile.close();
 		legacySettings.FromJson(ss.str(), true);
+		settings.AppendFromJson(ss.str(), true);
 
-		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Writing \"{}\" to default.json", legacySettings.getSettingByName<std::string>("currentConfig")->value);
+		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Set config to {}", legacySettings.getSettingByName<std::string>("currentConfig")->value);
 	}
 
 	static void SavePrivate() {
@@ -154,6 +156,8 @@ public:
 		}
 
 		path = Utils::getConfigsPath() + "\\" + settings.getSettingByName<std::string>("currentConfig")->value;
+
+		Client::privateInit = true;
 
 		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Loaded PRIVATE");
 	}
@@ -216,20 +220,28 @@ public:
 	}
 
 	static void CheckSettingsFile() {
-		if (!fs::exists(path)) {
-			fs::create_directories(fs::path(path).parent_path());
+		if (!fs::exists(Utils::getConfigsPath())) fs::create_directory(Utils::getConfigsPath());
 
-			std::ofstream file(path, std::ios::app);
-			std::ofstream pFile(privatePath, std::ios::app);
+		// if no config file
+		if (!fs::exists(path)) {
+			std::ofstream def(path, std::ios::app);
+
+			if (!def) LOG_ERROR("Failed to create config: {}", GetLastError());
+			else def.close();
+		}
+
+		// if no PRIVATE
+		if (!fs::exists(privatePath)) {
+			std::ofstream priv(privatePath, std::ios::app);
 
 			DWORD attributes = GetFileAttributesA(privatePath.c_str());
 
 			if (SetFileAttributesA(privatePath.c_str(), attributes | FILE_ATTRIBUTE_HIDDEN)) Logger::custom(fg(fmt::color::dark_magenta), "Config", "PRIVATE is now a hidden file");
 			else LOG_ERROR("Failed to set PRIVATE as a hidden file");
-			if (!file || !pFile) LOG_ERROR("Failed to create settings file: {}", path);
 
-			file.close();
-			pFile.close();
+			if (!priv) LOG_ERROR("Failed to create PRIVATE: {}", GetLastError());
+			else priv.close();
 		}
+		else Client::privateInit = true;
 	}
 };
