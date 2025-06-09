@@ -28,7 +28,7 @@ public:
 	void defaultConfig() override {
 		Module::defaultConfig();
 		setDef("extreme", false);
-		Client::SaveSettings();
+		if (ModuleManager::initialized) Client::SaveSettings();
 	}
 
 	void settingsRender(float settingsOffset) override {

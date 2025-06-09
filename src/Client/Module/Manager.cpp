@@ -139,7 +139,6 @@ void ModuleManager::updateModulesVector() {
 
 
 void ModuleManager::initialize() {
-	
 	addModule<MotionBlur>();
 
 	// Screen effects
@@ -286,6 +285,7 @@ void ModuleManager::restart() {
 			if (mod != nullptr) {
 				bool old = mod->enabledState;
 				if (mod->isEnabled()) mod->onDisable();
+				mod->settings.reset();
 				mod->loadSettings();
 			}
 		}
@@ -298,26 +298,21 @@ void ModuleManager::restart() {
 
 
 void ModuleManager::syncState() {
-    if (!initialized) return;
+	if (!initialized) return;
 
-    ScriptManager::_reloadScripts();
+	ScriptManager::_reloadScripts();
 
-    if (restartModules) {
-        restartModules = false;
-        restart();
-        return;
-    }
-    for (const auto& [key, module] : moduleMap) {
-        if (!module || module->enabledState == module->isEnabled() || module->delayDisable) {
-            continue;
-        }
+	if (restartModules) {
+		restartModules = false;
+		restart();
+		return;
+	}
+	for (const auto& [key, module] : moduleMap) {
+		if (!module || module->enabledState == module->isEnabled() || module->delayDisable) continue;
 
-        if (module->enabledState) {
-            module->onEnable();
-        } else {
-            module->onDisable();
-        }
-    }
+		if (module->enabledState) module->onEnable();
+		else module->onDisable();
+	}
 }
 
 // TODO: use enums?

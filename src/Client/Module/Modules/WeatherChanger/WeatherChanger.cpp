@@ -25,7 +25,7 @@ void WeatherChanger::defaultConfig()
     setDef("rain", 1.00f);
     setDef("lighting", 0.00f);
     setDef("snow", false);
-    Client::SaveSettings();
+    if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void WeatherChanger::settingsRender(float settingsOffset)

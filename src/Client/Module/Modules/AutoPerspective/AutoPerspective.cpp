@@ -20,7 +20,7 @@ void AutoPerspective::defaultConfig() {
     setDef("swimmingMode", (std::string)"3rd Person back");
     setDef("riding", false);
     setDef("ridingMode", (std::string)"3rd Person back");
-    Client::SaveSettings();
+    if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void AutoPerspective::settingsRender(float settingsOffset) {

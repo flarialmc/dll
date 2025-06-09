@@ -88,7 +88,7 @@ void CommandHotkey::settingsRender(float settingsOffset) {
 
 		totalKeybinds++;
 		FlarialGUI::Notify("Added! Scroll down for options.");
-		Client::SaveSettings();
+		if (ModuleManager::initialized) Client::SaveSettings();
 		});
 
 

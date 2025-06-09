@@ -2,6 +2,7 @@
 
 #include "Events/EventManager.hpp"
 #include "Events/Game/TickEvent.hpp"
+#include <Client.hpp>
 
 void ArrowCounter::onEnable() {
     Listen(this, TickEvent, &ArrowCounter::onTick)
@@ -18,7 +19,7 @@ void ArrowCounter::onDisable() {
 void ArrowCounter::defaultConfig() {
     setDef("text", (std::string)"Arrows: {value}");
     Module::defaultConfig("all");
-    Client::SaveSettings();
+    if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void ArrowCounter::settingsRender(float settingsOffset) {

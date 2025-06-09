@@ -36,6 +36,8 @@ public:
 
 	static void centerCursor();
 
+	inline static std::string activeConfig;
+
 	static Settings settings;
 	static inline Settings legacySettings;
 
@@ -127,7 +129,7 @@ public:
 	}
 
 	static void LoadPrivate() {
-		Logger::info("Loading PRIVATE");
+		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Loading PRIVATE");
 
 		std::ifstream privateFile(privatePath);
 		if (!privateFile) return;
@@ -148,7 +150,7 @@ public:
 
 		path = Utils::getConfigsPath() + "\\" + settings.getSettingByName<std::string>("currentConfig")->value;
 
-		Logger::success("PRIVATE loaded");
+		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Loaded PRIVATE");
 	}
 
 	static void SaveSettings() {
@@ -182,11 +184,9 @@ public:
 
 	static void LoadSettings() {
 		if (!settings.getSettingByName<std::string>("currentConfig")) return LOG_ERROR("No PRIVATE settings found");
-		Logger::info("Loading config: {}", settings.getSettingByName<std::string>("currentConfig")->value);
+		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Loading {}", Client::settings.getSettingByName<std::string>("currentConfig")->value);
 
 		if (path.empty()) path = Utils::getConfigsPath() + "\\" + Client::settings.getSettingByName<std::string>("currentConfig")->value;
-
-		Logger::debug("{}", path);
 
 		std::ifstream inputFile(path);
 		if (!inputFile) return;
@@ -207,7 +207,7 @@ public:
 			LOG_ERROR("Failed to parse JSON: {}", e.what());
 		}
 
-		Logger::success("Loaded {} successfully", settings.getSettingByName<std::string>("currentConfig")->value);
+		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Loaded {}", Client::settings.getSettingByName<std::string>("currentConfig")->value);
 	}
 
 	static void CheckSettingsFile() {

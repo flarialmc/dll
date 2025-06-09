@@ -13,7 +13,7 @@ void TextHotkey::onDisable() {
 void TextHotkey::defaultConfig() {
 	getKeybind();
 	Module::defaultConfig("core");
-	Client::SaveSettings();
+	if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void TextHotkey::settingsRender(float settingsOffset) {

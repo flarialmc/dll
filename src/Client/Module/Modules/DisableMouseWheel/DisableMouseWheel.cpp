@@ -17,7 +17,7 @@ void DisableMouseWheel::onDisable() {
 void DisableMouseWheel::defaultConfig() {
     getKeybind();
     Module::defaultConfig("core");
-    Client::SaveSettings();
+    if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void DisableMouseWheel::settingsRender(float settingsOffset) {

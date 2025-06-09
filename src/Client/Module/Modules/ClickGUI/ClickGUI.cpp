@@ -571,16 +571,15 @@ void ClickGUI::onRender(RenderEvent& event) {
 					rectY + Constraints::SpacingConstraint(0.01, rectWidth), rectWidth,
 					rectHeight);
 
-				static std::string troll = "";
-				if (troll.empty()) troll = Client::settings.getSettingByName<std::string>("currentConfig")->value;
+				if (Client::activeConfig.empty()) Client::activeConfig = Client::settings.getSettingByName<std::string>("currentConfig")->value;
 
-				if (troll != Client::settings.getSettingByName<std::string>("currentConfig")->value && troll != "") {
+				if (Client::activeConfig != Client::settings.getSettingByName<std::string>("currentConfig")->value && Client::activeConfig != "") {
 					Client::SaveSettings();
 					Client::SavePrivate();
 					Client::LoadPrivate();
-					troll = Client::settings.getSettingByName<std::string>("currentConfig")->value;
-					FlarialGUI::UnsetScrollView();
+					Client::activeConfig = Client::settings.getSettingByName<std::string>("currentConfig")->value;
 					ModuleManager::restartModules = true;
+					FlarialGUI::UnsetScrollView();
 					FlarialGUI::PopSize();
 					FlarialGUI::PopSize();
 					return;
@@ -588,7 +587,6 @@ void ClickGUI::onRender(RenderEvent& event) {
 				Module* c = this->ghostMainModule;
 				c->addHeader("Config Manager");
 				c->addDropdown("Selected Config", "", Client::availableConfigs, Client::settings.getSettingByName<std::string>("currentConfig")->value);
-
 				c->addButton("Add a new config", "", "ADD", []() {
 					std::random_device rd;
 					std::mt19937 gen(rd());

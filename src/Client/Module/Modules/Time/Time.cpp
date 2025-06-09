@@ -68,7 +68,7 @@ void Time::defaultConfig()
     setDef("textscale", 0.80f);
     Module::defaultConfig("all");
     setDef("24", false);
-    Client::SaveSettings();
+    if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void Time::settingsRender(float settingsOffset)

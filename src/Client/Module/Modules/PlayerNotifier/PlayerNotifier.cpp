@@ -7,6 +7,7 @@ void PlayerNotifier::defaultConfig() {
 	if (!this->settings.getSettingByName<std::string>("player0")) settings.addSetting<std::string>("player0", "TheBarii");
 	if (!this->settings.getSettingByName<std::string>("player0")) settings.addSetting<bool>("player0Enabled", true);
 	if (!this->settings.getSettingByName<std::string>("keybind")) settings.addSetting<std::string>("keybind", "P");
+	if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void PlayerNotifier::onEnable() {

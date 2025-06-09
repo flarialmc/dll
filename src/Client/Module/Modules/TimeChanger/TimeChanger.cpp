@@ -18,7 +18,7 @@ void TimeChanger::defaultConfig()
 {
     Module::defaultConfig("core");
     setDef("time", 0.5f);
-    Client::SaveSettings();
+    if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void TimeChanger::settingsRender(float settingsOffset)

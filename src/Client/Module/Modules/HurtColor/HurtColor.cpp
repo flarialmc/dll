@@ -15,7 +15,7 @@ void HurtColor::onDisable() {
 void HurtColor::defaultConfig() {
     Module::defaultConfig("core");
     setDef("hurt", (std::string)"FFFFFF", 0.65f, false);
-    Client::SaveSettings();
+    if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void HurtColor::settingsRender(float settingsOffset) {

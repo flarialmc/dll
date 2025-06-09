@@ -5,7 +5,7 @@ void CPSLimiter::defaultConfig() {
     setDef("Left", 16.0f);
     setDef("Right", 24.0f);
     setDef("legacy", false);
-    Client::SaveSettings();
+    if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void CPSLimiter::settingsRender(float settingsOffset) {

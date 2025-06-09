@@ -25,7 +25,7 @@ void SnapLook::defaultConfig()
 {
     getKeybind();
     Module::defaultConfig("core");
-    Client::SaveSettings();
+    if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void SnapLook::settingsRender(float settingsOffset)

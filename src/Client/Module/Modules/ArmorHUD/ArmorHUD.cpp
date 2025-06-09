@@ -54,7 +54,7 @@ void ArmorHUD::defaultConfig() {
 	setDef("showDurBarMax", false);
 	setDef("100color", 120.f);
 	setDef("0color", 0.f);
-	Client::SaveSettings();
+	if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void ArmorHUD::settingsRender(float settingsOffset) {

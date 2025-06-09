@@ -28,7 +28,7 @@ void CustomCrosshair::defaultConfig() {
     setDef("default", (std::string) "fafafa", 0.55f, false);
     setDef("enemy", (std::string) "FF0000", 1.f, false);
     setDef("CurrentCrosshair", (std::string)"Crosshair1");
-    Client::SaveSettings();
+    if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void CustomCrosshair::settingsRender(float settingsOffset) {

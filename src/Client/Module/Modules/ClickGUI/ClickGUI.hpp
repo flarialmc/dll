@@ -171,7 +171,7 @@ public:
 		setDef("enabledRadioButton", (std::string)"D0A0A8", 1.0f, false);
 		setDef("disabledRadioButton", (std::string)"FFFFFF", 1.0f, false);
 		setDef("_overrideAlphaValues_", 1.f);
-		Client::SaveSettings();
+		if (ModuleManager::initialized) Client::SaveSettings();
 	}
 
 	void settingsRender(float settingsOffset) override {

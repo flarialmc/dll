@@ -56,7 +56,7 @@ void Lewis::defaultConfig()
     setDef("lewiscrosshairsize", 1.0f);
     setDef("lewislogo", false);
     setDef("lewisscream", false);
-    Client::SaveSettings();
+    if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void Lewis::settingsRender(float settingsOffset)

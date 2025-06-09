@@ -15,7 +15,7 @@ void Deepfry::onDisable() {
 void Deepfry::defaultConfig() {
     Module::defaultConfig("core");
     setDef("paint", false);
-    Client::SaveSettings();
+    if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void Deepfry::settingsRender(float settingsOffset) {

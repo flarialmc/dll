@@ -113,16 +113,18 @@ void Client::createConfig(std::string name) {
 	if (!file) LOG_ERROR("Failed to create new config file '{}'", name);
 	else {
 		Client::settings.getSettingByName<std::string>("currentConfig")->value = name + ".json";
-		Client::SavePrivate();
+		Client::activeConfig = Client::settings.getSettingByName<std::string>("currentConfig")->value;
 		Client::SaveSettings();
-
+		Client::SavePrivate();
 		Client::LoadPrivate();
-		Client::LoadSettings();
 	}
 }
 
 void Client::deleteConfig(std::string name) {
 	Client::settings.getSettingByName<std::string>("currentConfig")->value = "default.json";
+	Client::activeConfig = "default.json";
+	Client::SavePrivate();
+	Client::LoadPrivate();
 	std::string to = Utils::getConfigsPath() + "\\" + name;
 	if (std::filesystem::exists(to)) {
 		std::filesystem::remove_all(to);

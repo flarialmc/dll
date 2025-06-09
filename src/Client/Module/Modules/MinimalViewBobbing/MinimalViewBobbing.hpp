@@ -31,7 +31,7 @@ public:
 
     void defaultConfig() override {
         Module::defaultConfig("core");
-        Client::SaveSettings();
+        if (ModuleManager::initialized) Client::SaveSettings();
     }
 
     static void patch() {

@@ -95,7 +95,7 @@ void FreeLook::defaultConfig() {
     Module::defaultConfig("core");
     setDef("toggle", false);
     setDef("mode", (std::string)"3rd Person back");
-    Client::SaveSettings();
+    if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void FreeLook::settingsRender(float settingsOffset) {

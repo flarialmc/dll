@@ -21,7 +21,7 @@ void GuiScale::onDisable() {
 void GuiScale::defaultConfig() {
     Module::defaultConfig("core");
     setDef("guiscale", 2.f);
-    Client::SaveSettings();
+    if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void GuiScale::settingsRender(float settingsOffset) {
