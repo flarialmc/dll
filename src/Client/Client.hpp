@@ -52,14 +52,13 @@ public:
 	inline static std::string legacyDir = Utils::getConfigsPath() + "\\Legacy";
 
 	static void LoadLegacySettings() {
-		std::ifstream inputFile(legacyPath);
-
-		if (!inputFile) {
-			Logger::custom(fg(fmt::color::dark_magenta), "Config", "No legacy settings found");
-			return;
+		if (fs::exists(legacyDir) && fs::is_directory(legacyDir)) {
+			Client::legacySettings.addSetting("currentConfig", (std::string)"default");
+			Client::hasLegacySettings = true;
+			return Logger::custom(fg(fmt::color::dark_magenta), "Config", "Legacy dir already exists... aborting");
 		}
 
-		inputFile.close();
+		if (!fs::exists(legacyPath)) return Logger::custom(fg(fmt::color::dark_magenta), "Config", "No legacy settings found");
 
 		Client::hasLegacySettings = true;
 		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Legacy settings found");
