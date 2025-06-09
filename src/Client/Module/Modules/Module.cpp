@@ -716,7 +716,7 @@ void Module::postLoad(bool softLoad) {
 
 	this->onSetup();
 
-	Client::SaveSettings();
+	if (ModuleManager::initialized) Client::SaveSettings();
 }
 
 void Module::loadLegacySettings() {
