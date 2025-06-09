@@ -686,6 +686,8 @@ void Module::postLoad(bool softLoad) {
 	this->totalmaps = 0;
 	keybindActions.clear();
 
+	if (Client::hasLegacySettings) this->loadLegacySettings();
+
 	if (!isScripting()) this->defaultConfig();
 	else this->defaultConfig();
 
@@ -734,7 +736,7 @@ void Module::loadLegacySettings() {
 	ss << inputFile.rdbuf();
 	inputFile.close();
 
-	if (!ss.str().empty() && ss.str() != "null") this->settings.AppendFromJson(ss.str(), this->settings);
+	if (!ss.str().empty() && ss.str() != "null") this->settings.AppendFromJson(ss.str(), this->settings, true);
 }
 
 void Module::loadSettings(bool softLoad) {
@@ -859,6 +861,9 @@ void Module::defaultAddSettings(std::string type) {
 }
 
 void Module::defaultConfig(std::string type) {
+	settings.renameSetting("bgColor", "bgCol");
+	settings.renameSetting("textColor", "textCol");
+	settings.renameSetting("borderColor", "borderCol");
 	if (type == "core") {
 		setDef("enabled", false);
 		setDef("favorite", false);
@@ -915,9 +920,6 @@ void Module::defaultConfig(std::string type) {
 }
 
 void Module::defaultConfig() {
-	//Logger::debug("{}", this->name);
-	//this->defaultConfig();
-	//if (this->name == "Zoom") Logger::debug("idk man");
 	getKeybind();
 	defaultConfig("core");
 }

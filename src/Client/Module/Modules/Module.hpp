@@ -48,7 +48,6 @@ public:
 
 	void postConstructInitialize() {
 		this->loadSettings();
-		this->loadLegacySettings();
 	}
 
 	bool active = false;

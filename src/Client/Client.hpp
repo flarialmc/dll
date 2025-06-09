@@ -37,9 +37,10 @@ public:
 	static void centerCursor();
 
 	inline static std::string activeConfig;
+	inline static bool hasLegacySettings = false;
 
 	static Settings settings;
-	static inline Settings legacySettings;
+	static Settings legacySettings;
 
 	inline static nlohmann::json globalSettings;
 	inline static std::string version;
@@ -53,11 +54,14 @@ public:
 		std::ifstream inputFile(legacyPath);
 
 		if (!inputFile) {
-			Logger::info("No legacy settings found");
+			Logger::custom(fg(fmt::color::dark_magenta), "Config", "No legacy settings found");
 			return;
 		}
 
 		inputFile.close();
+
+		Client::hasLegacySettings = true;
+		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Legacy settings found");
 
 		std::error_code ec_rename;
 		fs::rename(Utils::getConfigsPath(), Utils::getClientPath() + "\\Legacy", ec_rename);
@@ -66,9 +70,9 @@ public:
 			LOG_ERROR("Failed to rename Config directory to Legacy: {}", ec_rename.message());
 			return;
 		}
-		else Logger::success("Renamed Config directory to Legacy");
+		else Logger::custom(fg(fmt::color::dark_magenta), "Config", "Renamed Config directory to Legacy");
 
-		if (fs::create_directory(Utils::getConfigsPath())) LOG_ERROR("Config directory successfully created");
+		if (fs::create_directory(Utils::getConfigsPath())) Logger::custom(fg(fmt::color::dark_magenta), "Config", "Config directory successfully created");
 		else {
 			LOG_ERROR("Failed to create Config directory");
 			return;
@@ -79,22 +83,23 @@ public:
 			LOG_ERROR("Failed to move Legacy folder to Config: {}", ec_rename.message());
 			return;
 		}
-		else Logger::success("Moved Legacy dir to Config dir");
-
+		else Logger::custom(fg(fmt::color::dark_magenta), "Config", "Moved Legacy dir to Config dir");
 
 		legacyPath = legacyDir + "\\main.flarial";
 
 		std::ifstream legacyFile(legacyPath);
 
 		if (!legacyFile) {
-			Logger::info("No legacy settings found");
+			Logger::custom(fg(fmt::color::dark_magenta), "Config", "No legacy settings found");
 			return;
 		}
 
 		std::stringstream ss;
 		ss << legacyFile.rdbuf();
 		legacyFile.close();
-		legacySettings.FromJson(ss.str());
+		legacySettings.FromJson(ss.str(), true);
+
+		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Writing \"{}\" to default.json", legacySettings.getSettingByName<std::string>("currentConfig")->value);
 	}
 
 	static void SavePrivate() {
@@ -176,7 +181,7 @@ public:
 			cFile.close();
 		}
 		catch (const std::exception& e) {
-			Logger::error("An error occurred while trying to save settings: {}", e.what());
+			LOG_ERROR("An error occurred while trying to save settings: {}", e.what());
 		}
 
 		ScriptManager::saveSettings();
@@ -219,7 +224,7 @@ public:
 
 			DWORD attributes = GetFileAttributesA(privatePath.c_str());
 
-			if (SetFileAttributesA(privatePath.c_str(), attributes | FILE_ATTRIBUTE_HIDDEN)) Logger::success("PRIVATE is now a hidden file");
+			if (SetFileAttributesA(privatePath.c_str(), attributes | FILE_ATTRIBUTE_HIDDEN)) Logger::custom(fg(fmt::color::dark_magenta), "Config", "PRIVATE is now a hidden file");
 			else LOG_ERROR("Failed to set PRIVATE as a hidden file");
 			if (!file || !pFile) LOG_ERROR("Failed to create settings file: {}", path);
 

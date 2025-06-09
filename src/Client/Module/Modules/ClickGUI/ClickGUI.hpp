@@ -142,6 +142,30 @@ public:
 	}
 
 	void defaultConfig() override {
+		settings.renameSetting("colors_FlarialLogo", "o_colors_FlarialLogo", "colors_FlarialLogo_rgb", "flariallogo");
+		settings.renameSetting("colors_radiobutton_enabled", "o_colors_radiobutton_enabled", "colors_radiobutton_enabled_rgb", "enabledRadioButton");
+		settings.renameSetting("colors_radiobutton_disabled", "o_colors_radiobutton_disabled", "colors_radiobutton_disabled_rgb", "disabledRadioButton");
+		settings.renameSetting("colors_text", "o_colors_text", "colors_text_rgb", "globalText");
+		settings.renameSetting("colors_enabled", "o_colors_enabled", "colors_enabled_rgb", "modCardEnabled");
+		settings.renameSetting("colors_disabled", "o_colors_disabled", "colors_disabled_rgb", "modCardDisabled");
+		settings.renameSetting("colors_primary1", "o_colors_primary1", "colors_primary1_rgb", "primary1");
+		settings.renameSetting("colors_primary2", "o_colors_primary2", "colors_primary2_rgb", "primary2");
+		settings.renameSetting("colors_primary3", "o_colors_primary3", "colors_primary3_rgb", "primary3");
+		settings.renameSetting("colors_primary4", "o_colors_primary4", "colors_primary4_rgb", "primary4");
+		settings.renameSetting("colors_secondary1", "o_colors_secondary1", "colors_secondary1_rgb", "secondary1");
+		settings.renameSetting("colors_secondary2", "o_colors_secondary2", "colors_secondary2_rgb", "secondary2");
+		settings.renameSetting("colors_secondary3", "o_colors_secondary3", "colors_secondary3_rgb", "secondary3");
+		settings.renameSetting("colors_secondary4", "o_colors_secondary4", "colors_secondary4_rgb", "secondary4");
+		settings.renameSetting("colors_secondary5", "o_colors_secondary5", "colors_secondary5_rgb", "secondary5");
+		settings.renameSetting("colors_secondary6", "o_colors_secondary6", "colors_secondary6_rgb", "secondary6");
+		settings.renameSetting("colors_secondary7", "o_colors_secondary7", "colors_secondary7_rgb", "secondary7");
+		settings.renameSetting("colors_secondary8", "o_colors_secondary8", "colors_secondary8_rgb", "secondary8");
+		settings.renameSetting("colors_mod1", "o_colors_mod1", "colors_mod1_rgb", "modcard1");
+		settings.renameSetting("colors_mod2", "o_colors_mod2", "colors_mod2_rgb", "modcard2");
+		settings.renameSetting("colors_mod3", "o_colors_mod3", "colors_mod3_rgb", "modcard3");
+		settings.renameSetting("colors_mod4", "o_colors_mod4", "colors_mod4_rgb", "modcard4");
+		settings.renameSetting("colors_modicon", "o_colors_modicon", "colors_modicon_rgb", "modicon");
+		settings.renameSetting("colors_mod_settings_icon", "o_colors_mod_settings_icon", "colors_mod_settings_icon_rgb", "modsettings");
 		getKeybind();
 		Module::defaultConfig("core");
 		setDef("editmenubind", (std::string)"L");

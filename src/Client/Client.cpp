@@ -27,6 +27,7 @@ namespace winrt
 }
 
 Settings Client::settings = Settings();
+Settings Client::legacySettings = Settings();
 
 bool notifiedOfConnectionIssue = false;
 

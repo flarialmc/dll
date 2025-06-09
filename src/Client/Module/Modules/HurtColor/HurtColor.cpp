@@ -13,6 +13,7 @@ void HurtColor::onDisable() {
 }
 
 void HurtColor::defaultConfig() {
+    settings.renameSetting("color", "colorOpacity", "color_rgb", "hurt");
     Module::defaultConfig("core");
     setDef("hurt", (std::string)"FFFFFF", 0.65f, false);
     if (ModuleManager::initialized) Client::SaveSettings();
