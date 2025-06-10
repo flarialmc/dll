@@ -186,13 +186,14 @@ void Client::initialize() {
 	VersionUtils::addData();
 
 
-	std::vector<std::filesystem::path> directories = {
-		Utils::getRoamingPath() + "\\Flarial",
-		Utils::getRoamingPath() + "\\Flarial\\assets",
-		Utils::getRoamingPath() + "\\Flarial\\logs",
-		Utils::getRoamingPath() + "\\Flarial\\Config",
-		Utils::getRoamingPath() + "\\Flarial\\Scripts",
-	};
+    std::vector<std::filesystem::path> directories = {
+        Utils::getRoamingPath() + "\\Flarial",
+        Utils::getRoamingPath() + "\\Flarial\\assets",
+        Utils::getRoamingPath() + "\\Flarial\\logs",
+        Utils::getRoamingPath() + "\\Flarial\\Config",
+        Utils::getRoamingPath() + "\\Flarial\\Scripts",
+        Utils::getRoamingPath() + "\\Flarial\\Crosshairs"
+    };
 
 
 	std::thread updateThread([]() {

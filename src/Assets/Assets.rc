@@ -162,4 +162,5 @@ IDR_STONEHUNTER_PNG       PNG "Data\\stonehunter.png"
 IDR_BEAVER_PNG            PNG "Data\\beaver.png"
 IDR_LEWIS_PNG             PNG "Data\\lewis.png"
 IDR_LEWIS_MP3             MP3 "Data\\Audio\\Lewis.mp3"
+IDR_DELETE_PNG            PNG "Data\\delete.png"
 

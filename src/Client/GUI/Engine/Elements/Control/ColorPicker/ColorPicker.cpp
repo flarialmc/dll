@@ -130,7 +130,7 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
 
     if (!activeColorPickerWindows &&
         CursorInRect(x + Constraints::SpacingConstraint(0.1, s), clickingY + s * 0.21f, s * 0.85f, s * 0.85f) &&
-        MC::mouseButton == MouseButton::Left && !MC::held) {
+        MC::mouseButton == MouseButton::Left && MC::held) {
         MC::mouseButton = MouseButton::None;
         ColorPickers[index].isActive = true;
         FlarialGUI::ColorPickerWindow(index, moduleName, settingName);
