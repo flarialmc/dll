@@ -242,7 +242,7 @@ void ModuleManager::initialize() {
 
 	addModule<MinimalViewBobbing>();
 
-	addModule<Lewis>();
+	//addModule<Lewis>();
 	addModule<Coordinates>();
 	addModule<DisableMouseWheel>();
 	addModule<JavaDebugMenu>();
