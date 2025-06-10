@@ -117,6 +117,7 @@ void Client::createConfig(std::string name) {
 
 void Client::switchConfig(std::string name, bool deleting) {
 	// name is with .json extension
+	if (name.empty()) name = "default.json";
 	if (!std::filesystem::exists(Utils::getConfigsPath() + "\\" + name)) return Client::createConfig(name);
 
 	Client::settings.getSettingByName<std::string>("currentConfig")->value = name;

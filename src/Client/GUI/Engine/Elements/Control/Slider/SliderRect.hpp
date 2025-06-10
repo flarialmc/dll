@@ -6,4 +6,5 @@ struct SliderRect {
     float movedX = 0;
     float movedY = 0;
     float percentageX = 0;
+    float hoveredAnim = 0;
 };

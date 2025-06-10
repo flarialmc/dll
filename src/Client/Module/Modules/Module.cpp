@@ -304,7 +304,7 @@ void Module::addElementText(std::string text, std::string subtext) {
 
 	float subtextY;
 	float fontSize = Constraints::RelativeConstraint(0.140f, "height", true);
-	float fontSize2 = Constraints::RelativeConstraint(0.132f, "height", true);
+	float fontSize2 = Constraints::RelativeConstraint(0.12f, "height", true);
 
 	if (!subtext.empty()) {
 		subtextY = y;

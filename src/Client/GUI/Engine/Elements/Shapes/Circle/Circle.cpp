@@ -17,7 +17,7 @@ void FlarialGUI::Circle(float x, float y, const D2D1_COLOR_F &color, float radiu
     */
 
     //ImGui::GetBackgroundDrawList()->AddCircleFilled(ImVec2(x, y), radius, D2DColorToImColor(color));
-    ImGui::GetBackgroundDrawList()->AddEllipseFilled(ImVec2(x, y), ImVec2(radius, radius), D2DColorToImColor(color), 0, 12);
+    ImGui::GetBackgroundDrawList()->AddEllipseFilled(ImVec2(x, y), ImVec2(radius, radius), D2DColorToImColor(color), 0, 0);
 
     // Draw the ellipse using the device context and brush
     // D2D::context->FillEllipse(ellipse, brush);

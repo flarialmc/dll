@@ -8,4 +8,6 @@ struct TextBoxStruct {
     float cursorOpac = 1.0f;
     float cursorX = 0.0f;
     bool isAt1 = false;
+    bool noCursorBgCol = true;
+    D2D_COLOR_F curBgCol;
 };

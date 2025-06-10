@@ -133,7 +133,7 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 	float farRightX = x + totalWidth;
 
 	// Calculate the position of the circle in the middle of the slider rect
-	const float circleRadius = Constraints::RelativeConstraint(0.008, "height", true);
+	float circleRadius = Constraints::RelativeConstraint(0.008, "height", true);
 
 	float circleX = x + totalWidth / 2.0f;
 
@@ -172,9 +172,12 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 	// Draw the enabled portion rect
 	RoundedRect(farLeftX, y, color, enabledWidth, height, round.x, round.x);
 
+	if (SliderRects[index].isMovingElement || Utils::CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.5f), Constraints::SpacingConstraint(circleRadius, 1.5f))) FlarialGUI::lerp(SliderRects[index].hoveredAnim, 1.f, 0.25f * FlarialGUI::frameFactor);
+	else FlarialGUI::lerp(SliderRects[index].hoveredAnim, 0.f, 0.25f * FlarialGUI::frameFactor);
+
 	// Draw the circle in the middle
-	FlarialGUI::Circle(circleX, circleY, color, Constraints::SpacingConstraint(circleRadius, 1.1));
-	FlarialGUI::Circle(circleX, circleY, circleColor, Constraints::SpacingConstraint(circleRadius, 0.55));
+	FlarialGUI::Circle(circleX, circleY, color, Constraints::SpacingConstraint(circleRadius, 1.1f + (1.1f * 0.35f * SliderRects[index].hoveredAnim)));
+	FlarialGUI::Circle(circleX, circleY, circleColor, Constraints::SpacingConstraint(circleRadius, 0.55f + (0.55f * 0.35f * SliderRects[index].hoveredAnim)));
 
 	// Calculate the percentage
 	float percentage = ((circleX - rectangleLeft) / rectangleWidth) * (maxValue - minValue) + minValue;
