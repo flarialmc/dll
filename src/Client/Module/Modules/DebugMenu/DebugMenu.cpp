@@ -331,7 +331,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			Vec3<int> blockPos(static_cast<int>(pos.x), static_cast<int>(pos.y), static_cast<int>(pos.z));
 			left.emplace_back(std::format("Block: {} {} {}", blockPos.x, blockPos.y, blockPos.z));
 			left.emplace_back(std::format("Chunk: {} {} {}", static_cast<int>(pos.x / 16), static_cast<int>(pos.y / 16), static_cast<int>(pos.z / 16)));
-			left.emplace_back(std::format("Chunk Coordinate: {} {}", static_cast<int>(pos.x) % 16, static_cast<int>(pos.y) % 16));
+			left.emplace_back(std::format("Chunk Coordinate: {} {}", static_cast<int>(pos.x) % 16, static_cast<int>(pos.z) % 16));
 			left.emplace_back(getFacingDirection(player));
 			left.emplace_back("");
 			HitResult target = player->getLevel()->getHitResult();
