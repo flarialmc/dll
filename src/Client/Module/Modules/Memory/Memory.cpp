@@ -20,7 +20,7 @@ void MEM::onDisable()
 
 void MEM::defaultConfig()
 {
-    if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
+    setDef("textscale", 0.8f);
     Module::defaultConfig("all");
     if (ModuleManager::initialized) Client::SaveSettings();
 }

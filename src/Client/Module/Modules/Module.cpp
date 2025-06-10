@@ -863,6 +863,7 @@ void Module::defaultAddSettings(std::string type) {
 void Module::defaultConfig(std::string type) {
 	settings.renameSetting("bgColor", "bgCol");
 	settings.renameSetting("textColor", "textCol");
+	settings.renameSetting("glowColor", "glowCol");
 	settings.renameSetting("borderColor", "borderCol");
 	if (type == "core") {
 		setDef("enabled", false);

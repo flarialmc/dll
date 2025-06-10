@@ -13,6 +13,7 @@ void Hitbox::onDisable() {
 }
 
 void Hitbox::defaultConfig() {
+    settings.renameSetting("color", "colorOpacity", "color_rgb", "hitbox");
     Module::defaultConfig("core");
     setDef("hitbox", (std::string)"FFFFFF", 0.6f, false);
     setDef("thickness", 1.1f);

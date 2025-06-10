@@ -22,6 +22,9 @@ void ArmorHUD::onDisable() {
 }
 
 void ArmorHUD::defaultConfig() {
+	settings.renameSetting("colorMain", "colorMain_opacity", "colorMain_rgb", "main");
+	settings.renameSetting("staticDurBarColor", "staticDurBarColor_opacity", "staticDurBarColor_rgb", "staticDurBar");
+	settings.renameSetting("specialMaxDurBarColor", "specialMaxDurBarColor_opacity", "specialMaxDurBarColor_rgb", "specialMaxDurBar");
 	Module::defaultConfig("core");
 	Module::defaultConfig("pos");
 	setDef("textSize", 0.05f);
@@ -39,7 +42,6 @@ void ArmorHUD::defaultConfig() {
 	setDef("textShadowOffset", 0.003f);
 	setDef("textShadow", (std::string)"00000", 0.55f, false);
 	setDef("fillGaps", true);
-	setDef("colorFull_rgb", false);
 	setDef("textOffsetX", 17.55f);
 	setDef("textOffsetY", 7.697f);
 	setDef("showDurBar", true);

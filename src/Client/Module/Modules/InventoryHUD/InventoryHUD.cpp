@@ -23,6 +23,10 @@ void InventoryHUD::onDisable() {
 }
 
 void InventoryHUD::defaultConfig() {
+    settings.renameSetting("textColor", "textColor_opacity", "textColor_rgb", "text");
+    settings.renameSetting("staticDurBarColor", "staticDurBarColor_opacity", "staticDurBarColor_rgb", "staticDurBar");
+    settings.renameSetting("specialMaxDurBarColor", "specialMaxDurBarColor_opacity", "specialMaxDurBarColor_rgb", "specialMaxDurBar");
+
     setDef("textalignment", (std::string)"Right");
     setDef("textscale", 0.05f);
     setDef("textShadow", false);

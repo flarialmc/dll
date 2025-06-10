@@ -18,6 +18,8 @@ void CustomCrosshair::onDisable() {
 }
 
 void CustomCrosshair::defaultConfig() {
+    settings.renameSetting("defaultColor", "defaultOpacity", "defaultColorRGB", "default");
+    settings.renameSetting("enemyColor", "enemyOpacity", "enemyColorRGB", "enemy");
     setDef("uiscale", 1.f);
     Module::defaultConfig("core");
     setDef("CustomCrosshair", false);

@@ -28,6 +28,7 @@ void JavaDebugMenu::onDisable() {
 }
 
 void JavaDebugMenu::defaultConfig() {
+	settings.renameSetting("textColor", "textCol");
 	setDef("keybind", (std::string)"F3");
 	getKeybind();
 	Module::defaultConfig("core");

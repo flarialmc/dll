@@ -7,6 +7,7 @@ LowHealthIndicator::LowHealthIndicator(): Module("Low Health", "Warns you when y
 
 void LowHealthIndicator::defaultConfig()
 {
+    settings.renameSetting("color", "", "rgb", "health");
     Module::defaultConfig("core");
     setDef("health", 12.f);
     setDef("maxopacity", 0.7f);

@@ -36,6 +36,7 @@ void Mousestrokes::onDisable()
 
 void Mousestrokes::defaultConfig()
 {
+    settings.renameSetting("cursorColor", "cursorCol");
     setDef("textscale", 0.8f);
     Module::defaultConfig("core");
     Module::defaultConfig("pos");

@@ -31,6 +31,8 @@ void PotionHUD::onDisable()
 
 void PotionHUD::defaultConfig()
 {
+    settings.renameSetting("colorMain", "colorMain_opacity", "colorMain_rgb", "main");
+    settings.renameSetting("colorLow", "colorLow_opacity", "colorLow_rgb", "low");
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
     setDef("uiscale", 1.0f);

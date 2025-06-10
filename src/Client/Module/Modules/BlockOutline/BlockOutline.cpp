@@ -17,6 +17,7 @@ void BlockOutline::onDisable() {
 }
 
 void BlockOutline::defaultConfig() {
+    settings.renameSetting("color", "colorOpacity", "color_rgb", "outline");
     Module::defaultConfig("core");
     setDef("outline", (std::string) "FFFFFF", 0.6f, false);
     setDef("overlay", false);

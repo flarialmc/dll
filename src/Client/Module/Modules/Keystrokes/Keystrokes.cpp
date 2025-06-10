@@ -25,6 +25,10 @@ void Keystrokes::onDisable() {
 }
 
 void Keystrokes::defaultConfig() {
+	settings.renameSetting("glowEnabledColor", "glowEnabledOpacity", "glowEnabledRGB", "glowEnabled");
+	settings.renameSetting("enabledColor", "enabledOpacity", "enabledRGB", "enabled");
+	settings.renameSetting("textEnabledColor", "textEnabledOpacity", "textEnabledRGB", "textEnabled");
+
 	setDef("rounding", 11.0f);
 	setDef("cps", false);
 	setDef("border", false);

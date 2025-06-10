@@ -42,5 +42,5 @@ void HurtColor::onGetHurtColor(HurtColorEvent &event) {
     if (!this->isEnabled()) return;
     D2D1_COLOR_F color = getColor("hurt");
 
-    event.setHurtColorFromD2DColor(color, getOps<float>("colorOpacity"));
+    event.setHurtColorFromD2DColor(color, getOps<float>("hurtOpacity"));
 }

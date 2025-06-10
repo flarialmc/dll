@@ -16,6 +16,7 @@ void BlockBreakIndicator::onDisable() {
 }
 
 void BlockBreakIndicator::defaultConfig() {
+    settings.renameSetting("barFill", "barFillOpacity", "barFillRGB", "barFill");
     Module::defaultConfig("all");
     setDef("textscale", 1.00f);
     setDef("pbmode", true);
