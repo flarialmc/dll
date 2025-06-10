@@ -162,13 +162,7 @@ void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &ev
 
     tess->begin(mce::PrimitiveMode::QuadList, 4);
 
-    D2D1_COLOR_F enemyColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("enemyCol")->value);
-    enemyColor.a = settings.getSettingByName<float>("enemyOpacity")->value;
-
-    D2D1_COLOR_F defaultColor = FlarialGUI::HexToColorF(settings.getSettingByName<std::string>("defaultCol")->value);
-    defaultColor.a = settings.getSettingByName<float>("defaultOpacity")->value;
-
-    D2D1_COLOR_F color = isHoveringEnemy && shouldHighlight ? getColor("enemy") : getColor("default");
+    D2D1_COLOR_F color = isHoveringEnemy && getOps<bool>("highlightOnEntity") ? getColor("enemy") : getColor("default");
 
     tess->color(color.r, color.g, color.b, color.a);
 
@@ -189,7 +183,7 @@ void CustomCrosshair::onHudCursorRendererRender(HudCursorRendererRenderEvent &ev
 
     bool useSolid = false;
 
-    if (isHoveringEnemy && shouldHighlight && useSolidColorWhenHighlighted || (!isHoveringEnemy && useSolidColor)) {
+    if (isHoveringEnemy && getOps<bool>("highlightOnEntity") && useSolidColorWhenHighlighted || (!isHoveringEnemy && useSolidColor)) {
         useSolid = true;
     }
 

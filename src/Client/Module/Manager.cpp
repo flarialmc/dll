@@ -228,7 +228,7 @@ void ModuleManager::initialize() {
 	addModule<Waypoints>();
 
 	addModule<NullMovement>();
-	//addModule<CustomCrosshair>();
+	addModule<CustomCrosshair>();
 	addModule<Waila>();
 
 	addModule<RawInputBuffer>();
@@ -242,7 +242,7 @@ void ModuleManager::initialize() {
 
 	addModule<MinimalViewBobbing>();
 
-	//addModule<Lewis>();
+	addModule<Lewis>();
 	addModule<Coordinates>();
 	addModule<DisableMouseWheel>();
 	addModule<JavaDebugMenu>();

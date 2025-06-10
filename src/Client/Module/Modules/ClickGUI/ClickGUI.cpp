@@ -147,8 +147,8 @@ void ClickGUI::onRender(RenderEvent& event) {
 		D2D1_COLOR_F fLARIALlOGO = clickgui->getColor("flariallogo", "ClickGUI");
 
 		if (!Client::settings.getSettingByName<bool>("noicons")->value) {
-			if (ModuleManager::getModule("Lewis")->getOps<bool>("lewislogo")) FlarialGUI::image(IDR_LEWIS_PNG, D2D1::RectF(logoX - (logoWidthButReal * 0.2), logoY - (logoWidthButReal * 0.2), logoX + (logoWidthButReal * 1.4), logoY + (logoWidthButReal * 1.4)), "PNG");
-			else FlarialGUI::image(IDR_WHITE_LOGO_PNG, D2D1::RectF(logoX, logoY, logoX + logoWidthButReal, logoY + logoWidthButReal), "PNG", true, FlarialGUI::D2DColorToImColor(fLARIALlOGO));
+			/*if (ModuleManager::getModule("Lewis")->getOps<bool>("lewislogo")) FlarialGUI::image(IDR_LEWIS_PNG, D2D1::RectF(logoX - (logoWidthButReal * 0.2), logoY - (logoWidthButReal * 0.2), logoX + (logoWidthButReal * 1.4), logoY + (logoWidthButReal * 1.4)), "PNG");
+			else */FlarialGUI::image(IDR_WHITE_LOGO_PNG, D2D1::RectF(logoX, logoY, logoX + logoWidthButReal, logoY + logoWidthButReal), "PNG", true, FlarialGUI::D2DColorToImColor(fLARIALlOGO));
 		}
 		FlarialGUI::Tooltip("easter egg", logoX, logoY, "Never gonna give you up", logoWidthButReal, logoWidthButReal);
 
