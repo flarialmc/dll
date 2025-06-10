@@ -98,30 +98,9 @@ public:
 	}
 
 	void renameSetting(std::string oldCol, std::string oldOpacity, std::string oldRGB, std::string newName) {
-		auto checkCol = settings.find(newName + "Col");
-		if (checkCol == settings.end()) {
-			auto itCol = settings.find(oldCol);
-			if (itCol != settings.end()) {
-				settings[newName + "Col"] = std::move(itCol->second);
-				settings.erase(itCol);
-			}
-		}
-		auto checkOpacity = settings.find(newName + "Opacity");
-		if (checkOpacity == settings.end()) {
-			auto itOpacity = settings.find(oldOpacity);
-			if (itOpacity != settings.end()) {
-				settings[newName + "Opacity"] = std::move(itOpacity->second);
-				settings.erase(itOpacity);
-			}
-		}
-		auto checkRGB = settings.find(newName + "RGB");
-		if (checkRGB == settings.end()) {
-			auto itRGB = settings.find(oldRGB);
-			if (itRGB != settings.end()) {
-				settings[newName + "RGB"] = std::move(itRGB->second);
-				settings.erase(itRGB);
-			}
-		}
+		renameSetting(oldCol, newName + "Col");
+		renameSetting(oldOpacity, newName + "Opacity");
+		renameSetting(oldRGB, newName + "RGB");
 	}
 
 	template<typename T>
