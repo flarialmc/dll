@@ -4,6 +4,7 @@
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
+using namespace winrt::Windows::UI::Core;
 float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, const float maxValue, const float minValue, const bool zerosafe, std::string moduleName, std::string settingName) {
 	D2D1_COLOR_F color = clickgui->getColor("primary1", "ClickGUI");
 	D2D1_COLOR_F disabledColor = clickgui->getColor("primary3", "ClickGUI");
@@ -172,8 +173,22 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 	// Draw the enabled portion rect
 	RoundedRect(farLeftX, y, color, enabledWidth, height, round.x, round.x);
 
-	if (SliderRects[index].isMovingElement || Utils::CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.5f), Constraints::SpacingConstraint(circleRadius, 1.5f))) FlarialGUI::lerp(SliderRects[index].hoveredAnim, 1.f, 0.25f * FlarialGUI::frameFactor);
-	else FlarialGUI::lerp(SliderRects[index].hoveredAnim, 0.f, 0.25f * FlarialGUI::frameFactor);
+	if (SliderRects[index].isMovingElement || Utils::CursorInEllipse(circleX, circleY, Constraints::SpacingConstraint(circleRadius, 1.5f), Constraints::SpacingConstraint(circleRadius, 1.5f))) { 
+		FlarialGUI::lerp(SliderRects[index].hoveredAnim, 1.f, 0.25f * FlarialGUI::frameFactor); 
+		if (!SliderRects[index].firstHover) {
+
+			WinrtUtils::setCursorTypeThreaded(CoreCursorType::SizeWestEast);
+			
+			SliderRects[index].firstHover = true;
+		}
+	}
+	else {
+		if (SliderRects[index].firstHover) {
+			WinrtUtils::setCursorTypeThreaded(CoreCursorType::Arrow);
+			SliderRects[index].firstHover = false;
+		}
+		FlarialGUI::lerp(SliderRects[index].hoveredAnim, 0.f, 0.25f * FlarialGUI::frameFactor);
+	}
 
 	// Draw the circle in the middle
 	FlarialGUI::Circle(circleX, circleY, color, Constraints::SpacingConstraint(circleRadius, 1.1f + (1.1f * 0.35f * SliderRects[index].hoveredAnim)));

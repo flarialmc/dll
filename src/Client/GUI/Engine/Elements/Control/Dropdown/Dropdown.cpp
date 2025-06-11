@@ -71,22 +71,36 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 		}
 	}
 
-	if (!activeColorPickerWindows &&
-		CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), percHeight + maxHeight)) {
+	if (!activeColorPickerWindows && CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), percHeight + maxHeight)) {
 		if (MC::mouseButton == MouseButton::Left &&
 			CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), percHeight)) {
 			//MC::mouseButton = MouseButton::None;
 			FlarialGUI::DropDownMenus[index].isActive = true;
 			value = FlarialGUI::DropDownMenus[index].selected;
 		}
+		if (DropDownMenus[index].firstHover) {
+			WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Hand);
+			DropDownMenus[index].firstHover = false;
+		}
 	}
 	else if (!CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), percHeight + maxHeight)) {
 		if (MC::mouseButton == MouseButton::Left) {
-			//MC::mouseButton = MouseButton::None;
 			FlarialGUI::DropDownMenus[index].isActive = false;
 			value = FlarialGUI::DropDownMenus[index].selected;
+			WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+			DropDownMenus[index].firstHover = true;
 		}
-		FlarialGUI::lerp(FlarialGUI::DropDownMenus[index].opacityHover, 0.0f, 0.25f * FlarialGUI::frameFactor);
+		else {
+			FlarialGUI::lerp(FlarialGUI::DropDownMenus[index].opacityHover, 0.0f, 0.25f * FlarialGUI::frameFactor);
+			if (!DropDownMenus[index].firstHover && !DropDownMenus[index].isActive) {
+				WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+				DropDownMenus[index].firstHover = true;
+			}
+			else if (!DropDownMenus[index].firstHover && DropDownMenus[index].isActive) {
+				WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::UniversalNo);
+				DropDownMenus[index].firstHover = true;
+			}
+		}
 	}
 	else if (!FlarialGUI::DropDownMenus[index].isActive) {
 		if (FlarialGUI::DropDownMenus[index].firstTime) {
@@ -94,6 +108,9 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 			FlarialGUI::DropDownMenus[index].firstTime = false;
 		}
 		value = FlarialGUI::DropDownMenus[index].selected;
+		if (!DropDownMenus[index].firstHover) {
+			DropDownMenus[index].firstHover = true;
+		}
 	}
 
 	if (FlarialGUI::DropDownMenus[index].isActive) {

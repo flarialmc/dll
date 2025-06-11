@@ -36,7 +36,7 @@ public:
 
     BlockSource *getBlockSource();
 
-    void grabMouse();
+    void grabMouse(int delay = 0);
 
     void releaseMouse();
 
