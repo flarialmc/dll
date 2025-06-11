@@ -1,4 +1,5 @@
 #include "../../../Engine.hpp"
+#include "../Utils/WinrtUtils.hpp"
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui.h>
 
@@ -13,7 +14,6 @@ bool FlarialGUI::Button(float x, float y, const D2D_COLOR_F color, const D2D_COL
                                                                  : color;
 
     //D2D_RECT_F rect = D2D1::RectF(x, y, x + width, y + height);
-
 
     //D2D::context->FillRectangle(rect, FlarialGUI::getBrush(buttonColor).get());
 

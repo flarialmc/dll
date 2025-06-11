@@ -13,10 +13,10 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     Vec2<float> round = Constraints::RoundingConstraint(34, 34);
 
     if (index > sizesr.size() - 1 || index == 0) {
-        float nigga = Constraints::RelativeConstraint(0.19f, "height", true);
-        float gaynigga = Constraints::RelativeConstraint(0.141f, "height", true);
+        float h1 = Constraints::RelativeConstraint(0.19f, "height", true);
+        float h2 = Constraints::RelativeConstraint(0.141f, "height", true);
 
-        sizesr.emplace_back(nigga, gaynigga);
+        sizesr.emplace_back(h1, h2);
     }
 
     if (index > shadowsizesr.size() - 1 || index == 0) {
@@ -298,7 +298,6 @@ void ClickGUIElements::RotatingGear(int index, float x, float y, float width, fl
         if (FlarialGUI::CursorInRect(x, y, width, height)) {
             FlarialGUI::lerp(FlarialGUI::rotationAngles[index], FlarialGUI::rotationAngles[index] + 15, 0.24f * FlarialGUI::frameFactor);
         }
-
 
         float rotationAngle = FlarialGUI::rotationAngles[index];
         ImVec2 rotationCenter(x + imageWidth / 2.0f, imageY + imageHeight / 2.0f);

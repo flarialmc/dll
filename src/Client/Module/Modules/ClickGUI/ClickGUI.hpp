@@ -24,6 +24,7 @@ struct ScrollInfo {
 
 class ClickGUI : public Module {
 private:
+	bool grab = false;
 	float baseHeightReal = 0.f;
 	float baseHeightActual = 0.00001f;
 	float realBlurAmount = 0.00001f;
@@ -295,7 +296,8 @@ public:
 				curr = "modules";
 			}
 			else {
-				SDK::clientInstance->grabMouse();
+
+				SDK::clientInstance->grabMouse(10);
 				FlarialGUI::ResetShit();
 				Client::SaveSettings();
 			}
@@ -306,7 +308,7 @@ public:
 			if (!editmenu) {
 				if (this->active) {
 					// exit ClickGUI
-					SDK::clientInstance->grabMouse(); // let mouse control the view
+					SDK::clientInstance->grabMouse(10); // let mouse control the view
 
 					MC::lastMouseScroll = MouseAction::Release;
 					this->active = false;
