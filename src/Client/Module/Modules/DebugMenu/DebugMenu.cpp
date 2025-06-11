@@ -313,8 +313,8 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			}
 			else {
 				left.emplace_back(std::format("{} FPS", MC::fps));
-				left.emplace_back(std::format("Frametime: {:.2f}ms", MC::frameTime));
 			}
+			left.emplace_back(std::format("Frametime: {:.2f}ms", MC::frameTime));
 		}
 
 		left.emplace_back("");
