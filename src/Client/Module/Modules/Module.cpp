@@ -128,9 +128,9 @@ void Module::normalRenderCore(int index, std::string& text) {
 	if (ClickGUI::editmenu) {
 		FlarialGUI::SetWindowRect(topleft.x, topleft.y, rectWidth, rectHeight, index);
 
-		Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(topleft.x, topleft.y, index, rectWidth, rectHeight);
-
 		checkForRightClickAndOpenSettings(topleft.x, topleft.y, rectWidth, rectHeight);
+
+		Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(topleft.x, topleft.y, index, rectWidth, rectHeight);
 
 		if (alignment != DWRITE_TEXT_ALIGNMENT_LEADING) {
 			if (alignment == DWRITE_TEXT_ALIGNMENT_TRAILING) vec2.x += rectWidth;

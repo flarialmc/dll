@@ -286,6 +286,7 @@ void ModuleManager::restart() {
 				bool old = mod->enabledState;
 				if (mod->isEnabled()) mod->onDisable();
 				mod->settings.reset();
+				mod->prevAlignments = std::vector<DWRITE_TEXT_ALIGNMENT>(100, DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
 				mod->loadSettings();
 			}
 		}
