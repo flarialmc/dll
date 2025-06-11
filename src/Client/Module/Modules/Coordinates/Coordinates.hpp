@@ -27,6 +27,8 @@ public:
 
 	std::string formattedDimension(std::string dimension);
 
+	std::string sigma(float val);
+
 	void onRender(RenderEvent& event);
 
 };
