@@ -149,6 +149,7 @@ void Client::loadAvailableConfigs() {
 				availableConfigs.push_back(entry.path().filename().string());
 			}
 		}
+		//
 	}
 	if (Client::hasLegacySettings) {
 		const std::string directoryPath = Client::legacyDir;
@@ -176,7 +177,7 @@ void Client::initialize() {
 	VersionUtils::initialize();
 	version = VersionUtils::getFormattedVersion();
 	if (!VersionUtils::isSupported(Client::version)) {
-		LOG_FATAL("{}", "Unsupported Minecraft version");
+		LOG_FATAL("{} Unsupported Minecraft version", Client::version);
 		Utils::MessageDialogW(L"Flarial: this version is not supported!", FlarialGUI::to_wide("VERSION " + version + " NOT SUPPORTED!").c_str());
 		ModuleManager::terminate();
 		Client::disable = true;
