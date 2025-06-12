@@ -167,6 +167,30 @@ public:
         return true;
     }
 
+
+
+    bool hasFlarialExtension(mz_zip_archive& zip) {
+        // Get the number of files in the archive
+        mz_uint numFiles = mz_zip_reader_get_num_files(&zip);
+
+        for (mz_uint i = 0; i < numFiles; ++i) {
+            mz_zip_archive_file_stat file_stat;
+            if (!mz_zip_reader_file_stat(&zip, i, &file_stat)) {
+                std::cerr << "Failed to get file stat for index " << i << "\n";
+                continue;
+            }
+
+            std::string filename(file_stat.m_filename);
+            // Check if the filename ends with ".flarial"
+            if (filename.size() >= 8 && filename.substr(filename.size() - 8) == ".flarial") {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
     void onProtocolConfig(ProtocolEvent event) {
         if (event.getPath() != std::wstring(L"flarial-configs")) return;
 
@@ -188,7 +212,6 @@ public:
                     }
 
                     std::string configname = id;
-                    Client::createConfig(configname);
 
                     std::filesystem::path extractionDir = std::filesystem::path(Utils::getConfigsPath()) / configname;
                     std::error_code ec;
@@ -205,6 +228,14 @@ public:
                         return;
                     }
 
+                    bool isLegacy = hasFlarialExtension(zip_archive);
+                    if (isLegacy)
+                    {
+                        Logger::info("IMPORTING LEGACY CONFIG {}", configname);
+                        extractionDir = std::filesystem::path(Utils::getConfigsPath()) / "Legacy" / configname;
+                    }
+
+
                     int fileCount = static_cast<int>(mz_zip_reader_get_num_files(&zip_archive));
                     for (int j = 0; j < fileCount; j++) {
                         mz_zip_archive_file_stat file_stat;
@@ -212,23 +243,36 @@ public:
                             LOG_ERROR("Failed to get file stat for file index {} in config {}", j, configname);
                             continue;
                         }
+
+                        std::string filename = file_stat.m_filename;
+                        std::transform(filename.begin(), filename.end(), filename.begin(), ::tolower);
                         std::filesystem::path destPath = extractionDir / file_stat.m_filename;
+
                         if (mz_zip_reader_is_file_a_directory(&zip_archive, j)) {
                             std::filesystem::create_directories(destPath, ec);
                             if (ec) {
                                 LOG_ERROR("Failed to create directory {}: {}", destPath.string(), ec.message());
                             }
                         } else {
+                            
+                                if (filename == "main.json" || filename == "manifest.json" ||
+                                    std::filesystem::path(filename).extension() == ".png") {
+                                    continue;
+                                }
+
                             std::filesystem::create_directories(destPath.parent_path(), ec);
                             if (ec) {
                                 LOG_ERROR("Failed to create directory {}: {}", destPath.parent_path().string(), ec.message());
                                 continue;
                             }
+
+                            // Extract the file
                             if (!mz_zip_reader_extract_to_file(&zip_archive, j, destPath.string().c_str(), 0)) {
                                 LOG_ERROR("Failed to extract file {} in config {}", file_stat.m_filename, configname);
                             }
                         }
                     }
+
                     mz_zip_reader_end(&zip_archive);
 
                     if (!std::filesystem::remove(tempZipPath, ec)) {

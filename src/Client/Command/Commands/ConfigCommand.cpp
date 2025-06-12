@@ -31,7 +31,7 @@ winrt::Windows::Foundation::IAsyncAction import() {
         auto zipFileName = to_string(zipFile.Name());
         std::filesystem::path zipPath(zipFileName);
         std::string folderName = zipPath.stem().string();
-        std::filesystem::path extractionDir = std::filesystem::path(Utils::getConfigsPath()) / folderName;
+        std::filesystem::path extractionDir = std::filesystem::path(Utils::getConfigsPath()) / "Legacy" / folderName;
         std::error_code ec;
         std::filesystem::create_directories(extractionDir, ec);
         if (ec)
