@@ -152,10 +152,9 @@ void Client::loadAvailableConfigs() {
 		//
 	}
 	if (Client::hasLegacySettings) {
-		const std::string directoryPath = Client::legacyDir;
-		if (!std::filesystem::exists(directoryPath) || !std::filesystem::is_directory(directoryPath)) return;
+		if (!std::filesystem::exists(Client::legacyDir) || !std::filesystem::is_directory(Client::legacyDir)) return;
 
-		for (const auto& entry : std::filesystem::directory_iterator(directoryPath)) {
+		for (const auto& entry : std::filesystem::directory_iterator(Client::legacyDir)) {
 			if (is_directory(entry.path())) {
 				std::string configName = entry.path().filename().string() + ".json";
 				if (std::find(availableConfigs.begin(), availableConfigs.end(), configName) == availableConfigs.end()) availableConfigs.push_back(configName);
