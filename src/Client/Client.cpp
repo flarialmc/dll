@@ -149,6 +149,7 @@ void Client::loadAvailableConfigs() {
 				availableConfigs.push_back(entry.path().filename().string());
 			}
 		}
+		//
 	}
 	if (Client::hasLegacySettings) {
 		const std::string directoryPath = Client::legacyDir;
