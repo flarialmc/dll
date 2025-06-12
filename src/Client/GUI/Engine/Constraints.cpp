@@ -17,6 +17,9 @@ float Constraints::PercentageConstraint(float percentage, const std::string &edg
         y = top.y;
     }
 
+
+
+
     float position;
 
     if (edge == "top") {
