@@ -6,9 +6,9 @@
 
 using namespace winrt::Windows::UI::Core;
 float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, const float maxValue, const float minValue, const bool zerosafe, std::string moduleName, std::string settingName) {
-	D2D1_COLOR_F color = clickgui->getColor("primary1", "ClickGUI");
-	D2D1_COLOR_F disabledColor = clickgui->getColor("primary3", "ClickGUI");
-	D2D1_COLOR_F circleColor = clickgui->getColor("primary2", "ClickGUI");
+	D2D1_COLOR_F color = ClickGUI::getColor("primary1");
+	D2D1_COLOR_F disabledColor = ClickGUI::getColor("primary3");
+	D2D1_COLOR_F circleColor = ClickGUI::getColor("primary2");
 
 	color.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 	disabledColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
@@ -70,7 +70,16 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 
 	float oriX = x;
 
-	FlarialGUI::RoundedRect(x, y, TextBoxes[30 + index].isActive ? color : disabledColor, percWidth, percHeight, round.x, round.x);
+	if (TextBoxes[30 + index].noCursorBgCol) {
+		TextBoxes[30 + index].curBgCol = disabledColor;
+		TextBoxes[30 + index].noCursorBgCol = false;
+	}
+
+	D2D_COLOR_F colToSet = TextBoxes[30 + index].isActive ? color : disabledColor;
+
+	TextBoxes[30 + index].curBgCol = FlarialGUI::LerpColor(TextBoxes[30 + index].curBgCol, CursorInRect(x, y + (isInScrollView ? scrollpos : 0), percWidth, percHeight) ? D2D1::ColorF(colToSet.r * 0.8, colToSet.g * 0.8, colToSet.b * 0.8, colToSet.a) : colToSet, 0.1f * FlarialGUI::frameFactor);
+
+	FlarialGUI::RoundedRect(x, y, TextBoxes[30 + index].curBgCol, percWidth, percHeight, round.x, round.x);
 
 	int limit = 5;
 	if (text.find('-') != std::string::npos) limit = 6;
@@ -109,7 +118,7 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 		FlarialGUI::TextBoxes[30 + index].isActive ? DWRITE_TEXT_ALIGNMENT_LEADING : DWRITE_TEXT_ALIGNMENT_CENTER,
 		Constraints::FontScaler(percWidth * 14.5f), DWRITE_FONT_WEIGHT_NORMAL);
 
-	D2D1_COLOR_F cursorCol = clickgui->getColor("primary2", "ClickGUI");
+	D2D1_COLOR_F cursorCol = ClickGUI::getColor("primary2");
 
 	cursorCol.a = FlarialGUI::TextBoxes[30 + index].cursorOpac;
 

@@ -12,16 +12,12 @@ void FlarialGUI::Toggle(int index, float x, float y, bool isEnabled) {
 void FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, std::string moduleName, std::string settingName) {
 	auto mod = ModuleManager::getModule(moduleName);
 
-	D2D1_COLOR_F disabledColor = clickgui->getColor("primary3", "ClickGUI");
-	D2D1_COLOR_F hovered_disabledColor = clickgui->getColor("primary4", "ClickGUI");
-	D2D1_COLOR_F enabledColor = clickgui->getColor("primary1", "ClickGUI");
-	D2D1_COLOR_F hovered_enabledColor = clickgui->getColor("secondary5", "ClickGUI");
-	D2D1_COLOR_F circleColor = clickgui->getColor("primary2", "ClickGUI");
+	D2D1_COLOR_F disabledColor = ClickGUI::getColor("primary3");
+	D2D1_COLOR_F enabledColor = ClickGUI::getColor("primary1");
+	D2D1_COLOR_F circleColor = ClickGUI::getColor("primary2");
 
 	enabledColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
-	hovered_enabledColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 	disabledColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
-	hovered_disabledColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 	circleColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 
 	if (ClickGUI::settingsOpacity != 1) {
@@ -50,8 +46,8 @@ void FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, s
 	if (isAdditionalY) UnSetIsInAdditionalYMode();
 
 	if (isInScrollView) y += FlarialGUI::scrollpos;
-	if (settingName != "" ? mod->getOps<bool>(settingName) : isEnabled) toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], CursorInRect(x, y, rectWidth, rectHeight) ? hovered_enabledColor : enabledColor, 0.10f * FlarialGUI::frameFactor);
-	else toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], CursorInRect(x, y, rectWidth, rectHeight) ? hovered_disabledColor : disabledColor, 0.10f * FlarialGUI::frameFactor);
+	if (settingName != "" ? mod->getOps<bool>(settingName) : isEnabled) toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], CursorInRect(x, y, rectWidth, rectHeight) ? D2D1::ColorF(enabledColor.r * 0.8, enabledColor.g * 0.8, enabledColor.b * 0.8, enabledColor.a) : enabledColor, 0.10f * FlarialGUI::frameFactor);
+	else toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], CursorInRect(x, y, rectWidth, rectHeight) ? D2D1::ColorF(disabledColor.r * 0.8, disabledColor.g * 0.8, disabledColor.b * 0.8, disabledColor.a) : disabledColor, 0.10f * FlarialGUI::frameFactor);
 	if (isInScrollView) y -= FlarialGUI::scrollpos;
 
 	FlarialGUI::RoundedRect(x, y, rgb ? rgbColor : toggleColors[index], rectWidth, rectHeight, round.x, round.x);
@@ -110,9 +106,9 @@ void FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, s
 
 
 bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb) {
-	D2D1_COLOR_F disabledColor = clickgui->getColor("primary3", "ClickGUI");
-	D2D1_COLOR_F enabledColor = clickgui->getColor("primary1", "ClickGUI");
-	D2D1_COLOR_F circleColor = clickgui->getColor("primary2", "ClickGUI");
+	D2D1_COLOR_F disabledColor = ClickGUI::getColor("primary3");
+	D2D1_COLOR_F enabledColor = ClickGUI::getColor("primary1");
+	D2D1_COLOR_F circleColor = ClickGUI::getColor("primary2");
 
 	enabledColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 	disabledColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
@@ -143,8 +139,8 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb) {
 
 	if (isAdditionalY) UnSetIsInAdditionalYMode();
 
-	if (isEnabled) toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], enabledColor, 0.10f * FlarialGUI::frameFactor);
-	else toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], disabledColor, 0.10f * FlarialGUI::frameFactor);
+	if (isEnabled) toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) ? D2D1::ColorF(enabledColor.r * 0.8, enabledColor.g * 0.8, enabledColor.b * 0.8, enabledColor.a) : enabledColor, 0.10f * FlarialGUI::frameFactor);
+	else toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) ? D2D1::ColorF(disabledColor.r * 0.8, disabledColor.g * 0.8, disabledColor.b * 0.8, disabledColor.a) : disabledColor, 0.10f * FlarialGUI::frameFactor);
 
 	FlarialGUI::RoundedRect(x, y, rgb ? rgbColor : toggleColors[index], rectWidth, rectHeight, round.x, round.x);
 

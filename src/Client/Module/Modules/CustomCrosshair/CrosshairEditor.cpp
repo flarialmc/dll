@@ -107,11 +107,11 @@ void CustomCrosshair::CrosshairEditorWindow()
         Vec2<float> round = Constraints::RoundingConstraint(45, 45);
         float y = Constraints::PercentageConstraint(0.10, "top");
 
-        D2D1_COLOR_F colorThing = clickgui->getColor("secondary8", "ClickGUI");
-        D2D1_COLOR_F anotherColor = clickgui->getColor("secondary2", "ClickGUI");
-        D2D1_COLOR_F anotheranotherColorthing = clickgui->getColor("primary1", "ClickGUI");
-        D2D1_COLOR_F anotheranotheranotherColorthing = clickgui->getColor("primary3", "ClickGUI");
-        D2D1_COLOR_F textCol = clickgui->getColor("globalText", "ClickGUI");
+        D2D1_COLOR_F colorThing = ClickGUI::getColor("secondary8");
+        D2D1_COLOR_F anotherColor = ClickGUI::getColor("secondary2");
+        D2D1_COLOR_F anotheranotherColorthing = ClickGUI::getColor("primary1");
+        D2D1_COLOR_F anotheranotheranotherColorthing = ClickGUI::getColor("primary3");
+        D2D1_COLOR_F textCol = ClickGUI::getColor("globalText");
 
         FlarialGUI::RoundedHollowRect(center.x, center.y, Constraints::RelativeConstraint(0.01, "height", true),
             colorThing, rectwidth, rectheight, round.x, round.x);

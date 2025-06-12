@@ -19,7 +19,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 
 	if (FlarialGUI::TextBoxes[index].noCursorBgCol) {
 		FlarialGUI::TextBoxes[index].noCursorBgCol = false;
-		FlarialGUI::TextBoxes[index].curBgCol = clickgui->getColor("primary3", "ClickGUI");
+		FlarialGUI::TextBoxes[index].curBgCol = ClickGUI::getColor("primary3");
 	}
 
 	if (FlarialGUI::TextBoxes[index].isActive) {
@@ -49,12 +49,12 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 
 	text = FlarialGUI::TextBox(index, text, limit, x, y, Constraints::SpacingConstraint(1.85, textWidth), percHeight, 0, moduleName, settingName);
 
-	if (isInScrollView) y += scrollpos;
-	if (TextBoxes[index].isActive) TextBoxes[index].curBgCol = FlarialGUI::LerpColor(TextBoxes[index].curBgCol, CursorInRect(x, y, Constraints::SpacingConstraint(1.85, textWidth), percHeight) ? clickgui->getColor("secondary5", "ClickGUI") : clickgui->getColor("primary1", "ClickGUI"), 0.10f * FlarialGUI::frameFactor);
-	else TextBoxes[index].curBgCol = FlarialGUI::LerpColor(TextBoxes[index].curBgCol, CursorInRect(x, y, Constraints::SpacingConstraint(1.85, textWidth), percHeight) ? clickgui->getColor("primary4", "ClickGUI") : clickgui->getColor("primary3", "ClickGUI"), 0.10f * FlarialGUI::frameFactor);
-	if (isInScrollView) y -= scrollpos;
+	D2D_COLOR_F bgCol = TextBoxes[index].isActive ? ClickGUI::getColor("primary1") : ClickGUI::getColor("primary3");
+
+	TextBoxes[index].curBgCol = FlarialGUI::LerpColor(TextBoxes[index].curBgCol, CursorInRect(x, y + (isInScrollView ? scrollpos: 0), Constraints::SpacingConstraint(1.85, textWidth), percHeight) ? D2D1::ColorF(bgCol.r * 0.8, bgCol.g * 0.8, bgCol.b * 0.8, bgCol.a) : bgCol, 0.10f * FlarialGUI::frameFactor);
 
 	TextBoxes[index].curBgCol.a = clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+
 	if (ClickGUI::settingsOpacity != 1) col.a = ClickGUI::settingsOpacity;
 
 	// rectangle bounds
@@ -78,7 +78,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 
 	FlarialGUI::PopImClipRect();
 
-	D2D1_COLOR_F cursorCol = clickgui->getColor("primary2", "ClickGUI");
+	D2D1_COLOR_F cursorCol = ClickGUI::getColor("primary2");
 
 	cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
 

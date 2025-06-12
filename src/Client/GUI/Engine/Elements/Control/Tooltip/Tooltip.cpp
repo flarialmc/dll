@@ -18,11 +18,11 @@ void FlarialGUI::Tooltip(const std::string& id, float x, float y, const std::str
     //IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, fontSize, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_LEADING);
     //textLayout->Release();
 
-    D2D1_COLOR_F bgCol = clickgui->getColor("secondary2", "ClickGUI");
+    D2D1_COLOR_F bgCol = ClickGUI::getColor("secondary2");
     bgCol.a *= tooltips[id].opac;
-    D2D1_COLOR_F outlineCol = clickgui->getColor("secondary7", "ClickGUI");
+    D2D1_COLOR_F outlineCol = ClickGUI::getColor("secondary7");
     outlineCol.a *= tooltips[id].opac;
-    D2D1_COLOR_F textCol = clickgui->getColor("globalText", "ClickGUI");
+    D2D1_COLOR_F textCol = ClickGUI::getColor("globalText");
     textCol.a *= tooltips[id].opac;
 
 

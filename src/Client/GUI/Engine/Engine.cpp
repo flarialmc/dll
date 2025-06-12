@@ -523,7 +523,7 @@ std::string FlarialGUI::ColorFToHex(const D2D1_COLOR_F& color) {
 
 void FlarialGUI::FlarialText(float x, float y, const wchar_t* text, float width, const float height,
 	const DWRITE_TEXT_ALIGNMENT alignment) {
-	D2D1_COLOR_F color = clickgui->getColor("globalText", "ClickGUI");
+	D2D1_COLOR_F color = ClickGUI::getColor("globalText");
 
 	if (isInScrollView) y += scrollpos;
 
@@ -702,7 +702,7 @@ std::string FlarialGUI::FlarialTextWithFont(float x, float y, const wchar_t* tex
 	const DWRITE_TEXT_ALIGNMENT alignment, const float fontSize,
 	const DWRITE_FONT_WEIGHT weight, bool moduleFont, bool troll) {
 
-	D2D1_COLOR_F color = clickgui->getColor("globalText", "ClickGUI");
+	D2D1_COLOR_F color = ClickGUI::getColor("globalText");
 	color.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 
 	if (FlarialGUI::inMenu && !troll && ClickGUI::settingsOpacity != 1 && ClickGUI::curr != "modules" && !ClickGUI::editmenu) color.a = ClickGUI::settingsOpacity;
@@ -1522,7 +1522,7 @@ void FlarialGUI::NotifyHeartbeat() {
 	float posxModif = 0;
 	float fontSize = Constraints::RelativeConstraint(0.128, "height", true);
 	float textposyModif = Constraints::RelativeConstraint(0.0045f, "height", true);
-	D2D_COLOR_F col = clickgui->getColor("primary1", "ClickGUI");
+	D2D_COLOR_F col = ClickGUI::getColor("primary1");
 
 	int i = 0;
 	for (Notification& n : notifications) {

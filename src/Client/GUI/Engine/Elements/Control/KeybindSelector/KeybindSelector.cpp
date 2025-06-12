@@ -28,11 +28,11 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string&
 	const float percHeight = Constraints::RelativeConstraint(0.035, "height", true);
 
 	if (!KeybindSelectors[index].curColorDone) {
-		KeybindSelectors[index].curColor = clickgui->getColor("primary3", "ClickGUI");
+		KeybindSelectors[index].curColor = ClickGUI::getColor("primary3");
 		KeybindSelectors[index].curColorDone = true;
 	}
 
-	D2D1_COLOR_F col = KeybindSelectors[index].isActive ? clickgui->getColor("primary1", "ClickGUI") : clickgui->getColor("primary3", "ClickGUI");
+	D2D1_COLOR_F col = KeybindSelectors[index].isActive ? clickgui->getColor("primary1", "ClickGUI") : ClickGUI::getColor("primary3");
 
 	clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 	if (ClickGUI::settingsOpacity != 1) col.a = ClickGUI::settingsOpacity;
@@ -48,7 +48,7 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string&
 		if (timeDifference.count() > 2000) KeybindSelectors[index].isActive = false;
 	}
 
-	KeybindSelectors[index].curColor = FlarialGUI::LerpColor(KeybindSelectors[index].curColor, col, 2.0f * FlarialGUI::frameFactor);
+	KeybindSelectors[index].curColor = FlarialGUI::LerpColor(KeybindSelectors[index].curColor, CursorInRect(x, y + (isInScrollView ? scrollpos : 0), percWidth, percHeight) ? D2D1::ColorF(col.r * 0.8, col.g * 0.8, col.b * 0.8, col.a) : col, 0.1f * FlarialGUI::frameFactor);
 
 	KeybindSelectors[index].curColor.a = ClickGUI::settingsOpacity;
 

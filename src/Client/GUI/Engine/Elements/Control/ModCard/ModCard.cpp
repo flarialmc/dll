@@ -82,8 +82,8 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         );
     }
 
-    D2D1_COLOR_F mod1Col = clickgui->getColor("modcard1", "ClickGUI");
-    D2D1_COLOR_F mod2Col = clickgui->getColor("modcard2", "ClickGUI");
+    D2D1_COLOR_F mod1Col = ClickGUI::getColor("modcard1");
+    D2D1_COLOR_F mod2Col = ClickGUI::getColor("modcard2");
 
     FlarialGUI::RoundedRect(x, y, mod1Col, BottomRoundedWidth, BottomRoundedHeight, round.x, round.x);
     mod->checkForRightClickAndOpenSettings(x, realY, BottomRoundedWidth, BottomRoundedHeight);
@@ -112,7 +112,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     // Mod icon
 
-    D2D1_COLOR_F mod3Col = clickgui->getColor("modcard3", "ClickGUI");
+    D2D1_COLOR_F mod3Col = ClickGUI::getColor("modcard3");
 
     float modiconx = Constraints::PercentageConstraint(0.40, "left");
     float modicony = Constraints::PercentageConstraint(0.11, "top");
@@ -133,8 +133,8 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     std::string text;
     text = mod->isEnabled() ? "Enabled" : "Disabled";
-    D2D1_COLOR_F enabledColor = clickgui->getColor("modCardEnabled", "ClickGUI");
-    D2D1_COLOR_F disabledColor = clickgui->getColor("modCardDisabled", "ClickGUI");
+    D2D1_COLOR_F enabledColor = ClickGUI::getColor("modCardEnabled");
+    D2D1_COLOR_F disabledColor = ClickGUI::getColor("modCardDisabled");
 
     float buttonWidth = Constraints::RelativeConstraint(0.68, "width");
     float buttonHeight = Constraints::RelativeConstraint(0.259);
@@ -164,7 +164,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
                             mod3Col, paddingwidth + Constraints::RelativeConstraint(0.26),
                             buttonHeight, round.x, round.x);
 
-    D2D1_COLOR_F mod4Col = clickgui->getColor("modcard4", "ClickGUI");
+    D2D1_COLOR_F mod4Col = ClickGUI::getColor("modcard4");
 
 
     if (!Client::settings.getSettingByName<bool>("noicons")->value) {
@@ -189,7 +189,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
                                                                     modicony + paddingSize));
     }
     */
-    D2D1_COLOR_F modicon = clickgui->getColor("modicon", "ClickGUI");
+    D2D1_COLOR_F modicon = ClickGUI::getColor("modicon");
 
     if (mod->settings.getSettingByName<bool>("favorite")->value || FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
         if (mod->settings.getSettingByName<bool>("favorite")->value && !FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
@@ -210,7 +210,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     round = Constraints::RoundingConstraint(22, 22);
 
-    D2D1_COLOR_F textCol2 = clickgui->getColor("globalText", "ClickGUI");
+    D2D1_COLOR_F textCol2 = ClickGUI::getColor("globalText");
 
 
     D2D1_COLOR_F buttonColor;
@@ -302,7 +302,7 @@ void ClickGUIElements::RotatingGear(int index, float x, float y, float width, fl
         float rotationAngle = FlarialGUI::rotationAngles[index];
         ImVec2 rotationCenter(x + imageWidth / 2.0f, imageY + imageHeight / 2.0f);
 
-        D2D1_COLOR_F settingicon = clickgui->getColor("modsettings", "ClickGUI");
+        D2D1_COLOR_F settingicon = ClickGUI::getColor("modsettings");
 
         FlarialGUI::ImRotateStart();
         FlarialGUI::image(IDR_SETTINGS_WHITE_PNG, imagerectf, "PNG", false, FlarialGUI::D2DColorToImColor(settingicon));

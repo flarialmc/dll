@@ -39,7 +39,7 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
 
     y -= s / 2.f;
 
-    D2D1_COLOR_F baseColor = clickgui->getColor("primary4", "ClickGUI");
+    D2D1_COLOR_F baseColor = ClickGUI::getColor("primary4");
     baseColor.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 
     FlarialGUI::RoundedRect(x, y + s * 0.15f, baseColor, s * 4.125f, s, round.x, round.x);
@@ -64,13 +64,19 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
 
     round = Constraints::RoundingConstraint(11.5, 11.5);
 
-    D2D1_COLOR_F col = clickgui->getColor("primary3", "ClickGUI");
-    if (TextBoxes[index].isActive) col = clickgui->getColor("primary1", "ClickGUI");
+    if (TextBoxes[index].noCursorBgCol) {
+        TextBoxes[index].curBgCol = ClickGUI::getColor("primary3");
+        TextBoxes[index].noCursorBgCol = false;
+    }
+
+    D2D1_COLOR_F col = ClickGUI::getColor("primary3");
+    if (TextBoxes[index].isActive) col = ClickGUI::getColor("primary1");
+
+    TextBoxes[index].curBgCol = FlarialGUI::LerpColor(TextBoxes[index].curBgCol, CursorInRect(x, y + (isInScrollView ? scrollpos : 0), s * 3.f, s * 0.82f) ? D2D1::ColorF(col.r * 0.8, col.g * 0.8, col.b * 0.8, col.a) : col, 0.1f * FlarialGUI::frameFactor);
 
     col.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 
-    FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, col, s * 3.f, s * 0.82f,
-                            round.x, round.x);
+    FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, TextBoxes[index].curBgCol, s * 3.f, s * 0.82f, round.x, round.x);
 
     std::string text;
     mod->getOps<std::string>(settingName + "Col") = FlarialGUI::TextBox(index, mod->getOps<std::string>(settingName + "Col"), 6, x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, s * 3.f,
@@ -79,7 +85,7 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
     text = "#" + mod->getOps<std::string>(settingName + "Col");
     //textLayout->Release();
 
-    D2D1_COLOR_F cursorCol = clickgui->getColor("primary2", "ClickGUI");
+    D2D1_COLOR_F cursorCol = ClickGUI::getColor("primary2");
 
     cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
 
@@ -172,7 +178,7 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string& hex
 
     y -= s / 2.f;
 
-    D2D1_COLOR_F baseColor = clickgui->getColor("primary4", "ClickGUI");
+    D2D1_COLOR_F baseColor = ClickGUI::getColor("primary4");
 
     FlarialGUI::RoundedRect(x, y + s * 0.15f, baseColor, s * 4.125f, s, round.x, round.x);
 
@@ -197,9 +203,9 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string& hex
 
     round = Constraints::RoundingConstraint(11.5, 11.5);
 
-    D2D1_COLOR_F col = clickgui->getColor("primary3", "ClickGUI");
+    D2D1_COLOR_F col = ClickGUI::getColor("primary3");
 
-    if (TextBoxes[index].isActive) col = clickgui->getColor("primary1", "ClickGUI");
+    if (TextBoxes[index].isActive) col = ClickGUI::getColor("primary1");
 
     FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, col, s * 3.f, s * 0.82f,
         round.x, round.x);
@@ -211,7 +217,7 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string& hex
     text = "#" + hex;
     //textLayout->Release();
 
-    D2D1_COLOR_F cursorCol = clickgui->getColor("primary2", "ClickGUI");
+    D2D1_COLOR_F cursorCol = ClickGUI::getColor("primary2");
 
     cursorCol.a = FlarialGUI::TextBoxes[index].cursorOpac;
 

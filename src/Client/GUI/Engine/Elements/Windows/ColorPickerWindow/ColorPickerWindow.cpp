@@ -22,9 +22,9 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 		Vec2<float> center = Constraints::CenterConstraint(rectwidth, rectheight);
 		Vec2<float> round = Constraints::RoundingConstraint(45, 45);
 
-		D2D1_COLOR_F colorThing = clickgui->getColor("secondary2", "ClickGUI");
-		D2D1_COLOR_F anotherColor = clickgui->getColor("secondary1", "ClickGUI");
-		D2D1_COLOR_F textCol = clickgui->getColor("globalText", "ClickGUI");
+		D2D1_COLOR_F colorThing = ClickGUI::getColor("secondary2");
+		D2D1_COLOR_F anotherColor = ClickGUI::getColor("secondary1");
+		D2D1_COLOR_F textCol = ClickGUI::getColor("globalText");
 
 		FlarialGUI::RoundedHollowRect(center.x, center.y, Constraints::RelativeConstraint(0.01, "height", true), colorThing, rectwidth, rectheight, round.x, round.x);
 		FlarialGUI::RoundedRect(center.x, center.y, anotherColor, rectwidth, rectheight, round.x, round.x);
@@ -145,7 +145,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 
 		y = Constraints::PercentageConstraint(0.10, "top");
 
-		D2D1_COLOR_F hueSelectorerOutline = clickgui->getColor("primary2", "ClickGUI");
+		D2D1_COLOR_F hueSelectorerOutline = ClickGUI::getColor("primary2");
 
 		float circleX = x + ColorPickers[index].oldHueX;
 		float circleY = y + hexPreviewSize * 2 + Constraints::SpacingConstraint(0.35f, hexPreviewSize);
@@ -366,11 +366,11 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
 		Vec2<float> center = Constraints::CenterConstraint(rectwidth, rectheight);
 		Vec2<float> round = Constraints::RoundingConstraint(45, 45);
 
-		D2D1_COLOR_F colorThing = clickgui->getColor("secondary2", "ClickGUI");
+		D2D1_COLOR_F colorThing = ClickGUI::getColor("secondary2");
 
-		D2D1_COLOR_F anotherColor = clickgui->getColor("secondary1", "ClickGUI");
+		D2D1_COLOR_F anotherColor = ClickGUI::getColor("secondary1");
 
-		D2D1_COLOR_F textCol = clickgui->getColor("globalText", "ClickGUI");
+		D2D1_COLOR_F textCol = ClickGUI::getColor("globalText");
 
 		FlarialGUI::RoundedHollowRect(center.x, center.y, Constraints::RelativeConstraint(0.01, "height", true),
 			colorThing, rectwidth, rectheight, round.x, round.x);
@@ -494,7 +494,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string& hex, float& opacity, 
 
 		y = Constraints::PercentageConstraint(0.10, "top");
 
-		D2D1_COLOR_F hueSelectorerOutline = clickgui->getColor("primary2", "ClickGUI");
+		D2D1_COLOR_F hueSelectorerOutline = ClickGUI::getColor("primary2");
 
 		float circleX = x + ColorPickers[index].oldHueX;
 		float circleY = y + hexPreviewSize * 2 + Constraints::SpacingConstraint(0.35f, hexPreviewSize);

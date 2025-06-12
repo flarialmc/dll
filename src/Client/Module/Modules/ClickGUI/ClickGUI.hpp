@@ -51,9 +51,9 @@ public:
 	static bool inline isAnimatingModSet = false;
 	static std::chrono::time_point<std::chrono::high_resolution_clock> favoriteStart;
 
-	D2D_COLOR_F getColor(std::string text) {
-		D2D_COLOR_F col = this->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(this->settings.getSettingByName<std::string>(text + "Col")->value);
-		col.a = this->settings.getSettingByName<float>(text + "Opacity")->value;
+	static inline D2D_COLOR_F getColor(std::string text) {
+		D2D_COLOR_F col = clickgui->settings.getSettingByName<bool>(text + "RGB")->value ? FlarialGUI::rgbColor : FlarialGUI::HexToColorF(clickgui->settings.getSettingByName<std::string>(text + "Col")->value);
+		col.a = clickgui->settings.getSettingByName<float>(text + "Opacity")->value;
 		return col;
 	}
 

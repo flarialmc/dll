@@ -105,7 +105,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 		Vec2<float> round = Constraints::RoundingConstraint(43, 43);
 		Vec2<float> baseRound = round;
 
-		D2D1_COLOR_F basebaseRectangleColor = clickgui->getColor("secondary3", "ClickGUI");
+		D2D1_COLOR_F basebaseRectangleColor = ClickGUI::getColor("secondary3");
 
 		FlarialGUI::RoundedRect(center.x, center.y,
 			basebaseRectangleColor, baseWidth,
@@ -125,7 +125,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 		float navy = Constraints::PercentageConstraint(0.019f, "top");
 		round = Constraints::RoundingConstraint(28, 28);
 
-		D2D1_COLOR_F navColor = clickgui->getColor("secondary2", "ClickGUI");
+		D2D1_COLOR_F navColor = ClickGUI::getColor("secondary2");
 
 		FlarialGUI::RoundedRect(navx, navy, navColor,
 			navigationBarWidth, navigationBarHeight, round.x, round.x);
@@ -144,7 +144,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 		float logoX = navx - Constraints::SpacingConstraint(0.05, logoWidthButReal) + (logoWidthButReal * 0.6);
 		float logoY = (navy + navigationBarHeight / 2.0f - logoWidthButReal / 2.0f);
 
-		D2D1_COLOR_F fLARIALlOGO = clickgui->getColor("flariallogo", "ClickGUI");
+		D2D1_COLOR_F fLARIALlOGO = ClickGUI::getColor("flariallogo");
 
 		if (!Client::settings.getSettingByName<bool>("noicons")->value) {
 			if (ModuleManager::getModule("Lewis")->getOps<bool>("lewislogo")) FlarialGUI::image(IDR_LEWIS_PNG, D2D1::RectF(logoX - (logoWidthButReal * 0.2), logoY - (logoWidthButReal * 0.2), logoX + (logoWidthButReal * 1.4), logoY + (logoWidthButReal * 1.4)), "PNG");
@@ -156,8 +156,8 @@ void ClickGUI::onRender(RenderEvent& event) {
 
 		/* tab buttons start */
 
-		D2D1_COLOR_F RadioButtonEnabled = clickgui->getColor("enabledRadioButton", "ClickGUI");
-		D2D1_COLOR_F RadioButtonDisabled = clickgui->getColor("disabledRadioButton", "ClickGUI");
+		D2D1_COLOR_F RadioButtonEnabled = ClickGUI::getColor("enabledRadioButton");
+		D2D1_COLOR_F RadioButtonDisabled = ClickGUI::getColor("disabledRadioButton");
 
 		float shit = Constraints::RelativeConstraint(0.448f);
 
@@ -178,16 +178,16 @@ void ClickGUI::onRender(RenderEvent& event) {
 
 		round = Constraints::RoundingConstraint(17.5f, 17.5f);
 
-		D2D1_COLOR_F modTextCol = clickgui->getColor("globalText", "ClickGUI");
+		D2D1_COLOR_F modTextCol = ClickGUI::getColor("globalText");
 
-		D2D1_COLOR_F mod6Col = clickgui->getColor("secondary6", "ClickGUI");
-		static D2D1_COLOR_F tabBgCol = clickgui->getColor("secondary6", "ClickGUI");
-		static D2D1_COLOR_F tabBgCol2 = clickgui->getColor("secondary6", "ClickGUI");
-		static D2D1_COLOR_F tabBgCol3 = clickgui->getColor("secondary6", "ClickGUI");
-		static D2D1_COLOR_F tabBgCol4 = clickgui->getColor("secondary6", "ClickGUI");
+		D2D1_COLOR_F mod6Col = ClickGUI::getColor("secondary6");
+		static D2D1_COLOR_F tabBgCol = ClickGUI::getColor("secondary6");
+		static D2D1_COLOR_F tabBgCol2 = ClickGUI::getColor("secondary6");
+		static D2D1_COLOR_F tabBgCol3 = ClickGUI::getColor("secondary6");
+		static D2D1_COLOR_F tabBgCol4 = ClickGUI::getColor("secondary6");
 
-		D2D_COLOR_F secondary8 = clickgui->getColor("secondary8", "ClickGUI");
-		D2D_COLOR_F secondary6 = clickgui->getColor("secondary6", "ClickGUI");
+		D2D_COLOR_F secondary8 = ClickGUI::getColor("secondary8");
+		D2D_COLOR_F secondary6 = ClickGUI::getColor("secondary6");
 
 		//radiobutton of modules
 
@@ -534,7 +534,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 				float anotherRectHeight = Constraints::RelativeConstraint(0.8105);
 				float anotherRectWidth = Constraints::RelativeConstraint(0.972, "width");
 
-				D2D1_COLOR_F colorThing = clickgui->getColor("secondary2", "ClickGUI");
+				D2D1_COLOR_F colorThing = ClickGUI::getColor("secondary2");
 
 				D2D1_RECT_F rect = { rectXNoOff, rectY, rectXNoOff + anotherRectWidth, rectY + anotherRectHeight };
 				FlarialGUI::PushImClipRect(rect);
@@ -544,8 +544,8 @@ void ClickGUI::onRender(RenderEvent& event) {
 
 				FlarialGUI::PopImClipRect();
 
-				D2D1_COLOR_F bruv = clickgui->getColor("secondary1", "ClickGUI");
-				D2D1_COLOR_F textCol = clickgui->getColor("globalText", "ClickGUI");
+				D2D1_COLOR_F bruv = ClickGUI::getColor("secondary1");
+				D2D1_COLOR_F textCol = ClickGUI::getColor("globalText");
 
 				FlarialGUI::PopSize();
 
@@ -808,7 +808,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 			float anotherRectHeight = Constraints::RelativeConstraint(0.8105);
 			float anotherRectWidth = Constraints::RelativeConstraint(0.972, "width");
 
-			D2D1_COLOR_F colorThing = clickgui->getColor("secondary2", "ClickGUI");
+			D2D1_COLOR_F colorThing = ClickGUI::getColor("secondary2");
 
 			D2D1_RECT_F rect = { rectXNoOff, rectY, rectXNoOff + anotherRectWidth, rectY + anotherRectHeight };
 			FlarialGUI::PushImClipRect(rect);
@@ -818,8 +818,8 @@ void ClickGUI::onRender(RenderEvent& event) {
 
 			FlarialGUI::PopImClipRect();
 
-			D2D1_COLOR_F bruv = clickgui->getColor("secondary1", "ClickGUI");
-			D2D1_COLOR_F textCol = clickgui->getColor("globalText", "ClickGUI");
+			D2D1_COLOR_F bruv = ClickGUI::getColor("secondary1");
+			D2D1_COLOR_F textCol = ClickGUI::getColor("globalText");
 
 			FlarialGUI::PopSize();
 

@@ -67,9 +67,9 @@ std::string ClickGUIElements::SearchBar(int index, std::string& text, int limit,
 				FlarialGUI::lerp(searchCutOutHeights[index], -0.5f, 0.12f * FlarialGUI::frameFactor);
 			}
 
-			col = clickgui->getColor("primary1", "ClickGUI");
+			col = ClickGUI::getColor("primary1");
 
-			D2D1_COLOR_F searchbg = clickgui->getColor("secondary4", "ClickGUI");
+			D2D1_COLOR_F searchbg = ClickGUI::getColor("secondary4");
 
 
 			if (FlarialGUI::TextBoxes[index].isActive) FlarialGUI::RoundedRect(x - textWidth, y, searchbg, textWidth, percHeight, round.x, round.x, ImDrawFlags_RoundCornersBottom);

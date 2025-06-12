@@ -37,9 +37,9 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 	}
 	additionalIndex = index;
 
-	D2D1_COLOR_F unselectedChildCol = clickgui->getColor("primary3", "ClickGUI");
-	D2D1_COLOR_F selectedCol = clickgui->getColor("primary1", "ClickGUI");
-	D2D1_COLOR_F hoveredChildCol = clickgui->getColor("primary4", "ClickGUI");
+	D2D1_COLOR_F unselectedChildCol = ClickGUI::getColor("primary3");
+	D2D1_COLOR_F selectedCol = ClickGUI::getColor("primary1");
+	D2D1_COLOR_F hoveredChildCol = ClickGUI::getColor("primary4");
 
 	if (ClickGUI::settingsOpacity != 1) {
 		unselectedChildCol.a = ClickGUI::settingsOpacity;
@@ -121,8 +121,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 		FlarialGUI::lerp(additionalY[additionalIndex], addYVal, 0.25f * FlarialGUI::frameFactor);
 
 		FlarialGUI::lerp(y, originalY, 0.25f * FlarialGUI::frameFactor);
-		FlarialGUI::DropDownMenus[index].curColor = FlarialGUI::LerpColor(FlarialGUI::DropDownMenus[index].curColor,
-			selectedCol, 0.1f * FlarialGUI::frameFactor);
+		FlarialGUI::DropDownMenus[index].curColor = FlarialGUI::LerpColor(FlarialGUI::DropDownMenus[index].curColor, CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), percHeight) ? D2D1::ColorF(selectedCol.r * 0.8, selectedCol.g * 0.8, selectedCol.b * 0.8, selectedCol.a) : selectedCol, 0.1f * FlarialGUI::frameFactor);
 
 		FlarialGUI::lerp(
 			FlarialGUI::DropDownMenus[index].rotation,
@@ -136,9 +135,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 		FlarialGUI::lerp(additionalY[additionalIndex], -50.f, 0.1f * FlarialGUI::frameFactor);
 
 		FlarialGUI::lerp(y, originalY - maxHeight, 0.25f * FlarialGUI::frameFactor);
-		FlarialGUI::DropDownMenus[index].curColor = FlarialGUI::LerpColor(FlarialGUI::DropDownMenus[index].curColor,
-			unselectedChildCol,
-			0.1f * FlarialGUI::frameFactor);
+		FlarialGUI::DropDownMenus[index].curColor = FlarialGUI::LerpColor(FlarialGUI::DropDownMenus[index].curColor, CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), percHeight) ? D2D1::ColorF(unselectedChildCol.r * 0.8, unselectedChildCol.g * 0.8, unselectedChildCol.b * 0.8, unselectedChildCol.a) : unselectedChildCol, 0.1f * FlarialGUI::frameFactor);
 		FlarialGUI::lerp(
 			FlarialGUI::DropDownMenus[index].rotation,
 			90.f,

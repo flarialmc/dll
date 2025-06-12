@@ -279,7 +279,7 @@ void Module::addHeader(std::string text) {
 	float y = Constraints::PercentageConstraint(0.10, "top") + padding;
 
 
-	D2D1_COLOR_F col = clickgui->getColor("secondary6", "ClickGUI");
+	D2D1_COLOR_F col = ClickGUI::getColor("secondary6");
 	col.a = ClickGUI::settingsOpacity;
 	D2D1_COLOR_F textCol = D2D1::ColorF(D2D1::ColorF::White);
 	textCol.a = ClickGUI::settingsOpacity;;
@@ -336,7 +336,7 @@ void Module::addButton(const std::string& text, const std::string& subtext, cons
 	const float width = Constraints::RelativeConstraint(0.09f, "height", true);
 	const float height = Constraints::RelativeConstraint(0.035, "height", true);
 	Vec2<float> round = Constraints::RoundingConstraint(13, 13);
-	D2D1_COLOR_F col = clickgui->getColor("primary1", "ClickGUI");
+	D2D1_COLOR_F col = ClickGUI::getColor("primary1");
 	col.a = ClickGUI::settingsOpacity;
 	D2D1_COLOR_F f = D2D1::ColorF(D2D1::ColorF::White);
 	f.a = ClickGUI::settingsOpacity;
