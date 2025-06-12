@@ -245,6 +245,12 @@ public:
     }
 
     static void reloadAllConfigs() {
+        if (fs::exists(Client::legacyDir) && fs::is_directory(Client::legacyDir)) {
+            Client::legacySettings.addSetting("currentConfig", (std::string)"default");
+            Client::hasLegacySettings = true;
+            Client::softLoadLegacy = true;
+            return Logger::custom(fg(fmt::color::dark_magenta), "Config", "Legacy dir already exists... aborting");
+        }
         Client::availableConfigs.clear();
         Client::loadAvailableConfigs();
         ModuleManager::restartModules = true;
