@@ -2,6 +2,7 @@
 
 #include "../Module.hpp"
 #include "Events/Render/RenderEvent.hpp"
+#include <Events/Game/TimeEvent.hpp>
 
 inline std::tm localtime_xp(std::time_t timer) {
 	std::tm bt{};
@@ -20,9 +21,13 @@ inline std::tm localtime_xp(std::time_t timer) {
 class Time : public Module {
 
 public:
-	Time();;
+	Time();
+
+	static inline float curTime;
 
 	void onEnable() override;
+
+	void onSetup() override;
 
 	void onDisable() override;
 
@@ -31,5 +36,8 @@ public:
 	void defaultConfig() override;
 
 	void settingsRender(float settingsOffset) override;
-};
 
+	void onTimeEvent(TimeEvent& event);
+
+	[[nodiscard]] static std::string formatMCTime(float time, bool military);
+};

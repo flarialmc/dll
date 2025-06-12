@@ -52,6 +52,7 @@ void JavaDebugMenu::defaultConfig() {
 	setDef("showMemory", true);
 	setDef("showCpuGpu", true);
 	setDef("showTime", true);
+	setDef("showInGameTime", true);
 	setDef("showUptime", true);
 	setDef("showSpeed", true);
 	setDef("showTargetedBlock", true);
@@ -115,7 +116,8 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
 	sigmaToggle("Show Server Section", "", "showServer");
 	sigmaToggle("Show Memory", "", "showMemory");
 	sigmaToggle("Show CPU, GPU and Renderer", "", "showCpuGpu");
-	sigmaToggle("Show Time", "", "showTime");
+	sigmaToggle("Show Local Time", "", "showTime");
+	sigmaToggle("Show Ingame Time", "", "showInGameTime");
 	sigmaToggle("Show Uptime", "", "showUptime");
 	sigmaToggle("Show Speed", "", "showSpeed");
 	sigmaToggle("Show Targeted Block", "", "showTargetedBlock");
@@ -346,6 +348,11 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 		}
 
 		if (isOn("showCoords") || renderBreakProg) {
+			left.emplace_back("");
+		}
+
+		if (isOn("showInGameTime")) {
+			left.emplace_back(std::format("World Time: {}", Time::formatMCTime(curTime, false)));
 			left.emplace_back("");
 		}
 

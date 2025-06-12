@@ -2,11 +2,8 @@
 #include "Client.hpp"
 #include "Events/EventManager.hpp"
 
-Time::Time(): Module("Clock", "Displays your current local time.", IDR_TIME_PNG, "")
+Time::Time(): Module("Clock", "Displays your current local or ingame time.", IDR_TIME_PNG, "")
 {
-
-    
-
 }
 
 void Time::onEnable()
@@ -21,44 +18,56 @@ void Time::onDisable()
     Module::onDisable();
 }
 
+void Time::onSetup() {
+    Listen(this, TimeEvent, &Time::onTimeEvent)
+}
+
 void Time::onRender(RenderEvent& event)
 {
     if (!this->isEnabled()) return;
-    const auto now = std::time(nullptr);
-    const std::tm calendarTime = localtime_xp(now);
 
-    std::string meridiem;
-    std::string seperator;
+    std::string time;
 
-    int hour = calendarTime.tm_hour;
-    int minute = calendarTime.tm_min;
-
-    if (hour - 12 < 0) {
-        meridiem = "AM";
-    }
-    else if (hour == 0) {
-        hour = 12;
-        meridiem = "AM";
-    }
-    else if (hour == 12) {
-        hour = 12;
-        meridiem = "PM";
+    if (getOps<bool>("igTime")) {
+        time = formatMCTime(Time::curTime, getOps<bool>("24"));
     }
     else {
-        meridiem = "PM";
-        hour -= 12;
+        const auto now = std::time(nullptr);
+        const std::tm calendarTime = localtime_xp(now);
+
+        std::string meridiem;
+        std::string seperator;
+
+        int hour = calendarTime.tm_hour;
+        int minute = calendarTime.tm_min;
+
+        if (hour - 12 < 0) {
+            meridiem = "AM";
+        }
+        else if (hour == 0) {
+            hour = 12;
+            meridiem = "AM";
+        }
+        else if (hour == 12) {
+            hour = 12;
+            meridiem = "PM";
+        }
+        else {
+            meridiem = "PM";
+            hour -= 12;
+        }
+        if (getOps<bool>("24") && meridiem == "PM") {
+            hour += 12;
+            meridiem = "";
+        }
+        else if (getOps<bool>("24") && meridiem == "AM") meridiem = "";
+
+        seperator = minute < 10 ? ":0" : ":";
+
+        if (hour == 24) hour = 0;
+
+        time = FlarialGUI::cached_to_string(hour) + seperator + FlarialGUI::cached_to_string(minute) + " " + meridiem;
     }
-    if (getOps<bool>("24") && meridiem == "PM") {
-        hour += 12;
-        meridiem = "";
-    }
-    else if (getOps<bool>("24") && meridiem == "AM") meridiem = "";
-
-    seperator = minute < 10 ? ":0" : ":";
-
-    if (hour == 24) hour = 0;
-
-    std::string time = FlarialGUI::cached_to_string(hour) + seperator + FlarialGUI::cached_to_string(minute) + " " + meridiem;
 
     this->normalRender(3, time);
 }
@@ -68,6 +77,7 @@ void Time::defaultConfig()
     setDef("textscale", 0.80f);
     Module::defaultConfig("all");
     setDef("24", false);
+    setDef("igTime", false);
     if (ModuleManager::initialized) Client::SaveSettings();
 }
 
@@ -88,6 +98,7 @@ void Time::settingsRender(float settingsOffset)
     addHeader("Time");
     defaultAddSettings("main");
     addToggle("24 Hour Format", "", "24");
+    addToggle("In Game Time Mode", "", "igTime");
     extraPadding();
 
     addHeader("Text");
@@ -103,4 +114,18 @@ void Time::settingsRender(float settingsOffset)
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
+}
+
+void Time::onTimeEvent(TimeEvent& event) {
+    Time::curTime = event.getTime();
+}
+
+std::string Time::formatMCTime(float time, bool military) {
+    int hour = floor(time * 24) - 12;
+    while (hour <= 0) hour += 12;
+    int minute = floor(static_cast<int>(time * 1440) % 60);
+
+    if (military && time < 0.5f) hour += 12;
+
+    return std::format("{}:{:02} {}", hour, minute, military ? "" : time < 0.5f ? "PM" : "AM");
 }
