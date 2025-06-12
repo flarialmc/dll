@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <thread>
 #include <mutex>
 #include <json/json.hpp>
 
