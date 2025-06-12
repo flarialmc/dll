@@ -48,12 +48,12 @@ jobs:
         run: |
           #echo 'hi'
           
-          cmake -S . -B build -G "Ninja" -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_STANDARD=23 -DCMAKE_BUILD_TYPE=Release
+          cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
 
 
       - name: Build DLL
         run: |
-           cmake --build build
+           cmake --build build --target Flarial
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.6.1
         with:
