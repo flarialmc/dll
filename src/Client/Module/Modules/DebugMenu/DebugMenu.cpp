@@ -352,7 +352,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 		}
 
 		if (isOn("showInGameTime")) {
-			left.emplace_back(std::format("World Time: {}", Time::formatMCTime(curTime, false)));
+			left.emplace_back(std::format("World Time: {}", Time::formatMCTime(Time::curTime, false)));
 			left.emplace_back("");
 		}
 
