@@ -98,6 +98,7 @@
 #include "Modules/PlayerNotifier/PlayerNotifier.hpp"
 #include "Modules/ZeqaUtils/ZeqaUtils.hpp"
 #include "Modules/MumbleLink/MumbleLink.hpp"
+#include "Modules/MaterialBinLoader/MaterialBinLoader.hpp"
 
 #include "Modules/MinimalViewBobbing/MinimalViewBobbing.hpp"
 #include "Modules/Lewis/Lewis.hpp"
@@ -239,6 +240,9 @@ void ModuleManager::initialize() {
 	//addModule<ItemUseDelayFix>();
 	addModule<ZeqaUtils>();
 	addModule<MumbleLink>();
+	if(VersionUtils::checkAboveOrEqual(21, 50) && !VersionUtils::checkAboveOrEqual(21, 80)) {
+	    addModule<MaterialBinLoader>();
+	}
 
 	addModule<MinimalViewBobbing>();
 
