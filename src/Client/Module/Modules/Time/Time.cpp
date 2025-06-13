@@ -26,10 +26,10 @@ void Time::onRender(RenderEvent& event)
 {
     if (!this->isEnabled()) return;
 
-    std::string time;
+    std::string text;
 
     if (getOps<bool>("igTime")) {
-        time = formatMCTime(Time::curTime, getOps<bool>("24"));
+        text = formatMCTime(Time::curTime, getOps<bool>("24"));
     }
     else {
         const auto now = std::time(nullptr);
@@ -66,10 +66,28 @@ void Time::onRender(RenderEvent& event)
 
         if (hour == 24) hour = 0;
 
-        time = FlarialGUI::cached_to_string(hour) + seperator + FlarialGUI::cached_to_string(minute) + " " + meridiem;
+        text = FlarialGUI::cached_to_string(hour) + seperator + FlarialGUI::cached_to_string(minute) + " " + meridiem;
+
+        if (getOps<bool>("showDate")) {
+            struct tm date;
+            localtime_s(&date, &now);
+            std::string dateStr;
+
+            int sub;
+            if (getOps<bool>("4letterYear")) sub = 1900;
+            else sub = -100;
+
+            if (getOps<bool>("donaldTrumpMode")) dateStr = std::format("{}/{}/{}", date.tm_mon, date.tm_mday, date.tm_year + sub);
+            else dateStr = std::format("{}/{}/{}", date.tm_mday, date.tm_mon, date.tm_year + sub);
+
+            if (getOps<bool>("timeBeforeDate")) text += "\n" + dateStr;
+            else text = dateStr + "\n" + text;
+            Logger::debug(text);
+        }
+
     }
 
-    this->normalRender(3, time);
+    this->normalRender(3, text);
 }
 
 void Time::defaultConfig()
@@ -78,6 +96,10 @@ void Time::defaultConfig()
     Module::defaultConfig("all");
     setDef("24", false);
     setDef("igTime", false);
+    setDef("showDate", true);
+    setDef("4letterYear", false);
+    setDef("timeBeforeDate", false);
+    setDef("donaldTrumpMode", false);
     if (ModuleManager::initialized) Client::SaveSettings();
 }
 
@@ -95,10 +117,17 @@ void Time::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
 
-    addHeader("Time");
+    addHeader("Main");
     defaultAddSettings("main");
+    extraPadding();
+
+    addHeader("Module Settings");
     addToggle("24 Hour Format", "", "24");
     addToggle("In Game Time Mode", "", "igTime");
+    addConditionalToggle(!getOps<bool>("igTime"), "Show Date", "", "showDate");
+    addConditionalToggle(!getOps<bool>("igTime"), "4 Letter Year", "2025 instead of 25", "4letterYear");
+    addConditionalToggle(!getOps<bool>("igTime"), "Show Time Before Date", "", "timeBeforeDate");
+    addConditionalToggle(!getOps<bool>("igTime") && getOps<bool>("showDate"), "mm/dd/yyyy mode", "", "donaldTrumpMode");
     extraPadding();
 
     addHeader("Text");
