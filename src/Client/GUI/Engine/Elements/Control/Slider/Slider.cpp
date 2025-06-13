@@ -280,14 +280,9 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 
 	if (percentage < 0.002f && zerosafe) percentage = 0.001f;
 
-
 	if (isAdditionalY) SetIsInAdditionalYMode();
 
-	std::stringstream adjustedFloat;
+	startingPoint = percentage;
 
-	adjustedFloat << std::fixed << std::setprecision(3) << percentage;
-
-	startingPoint = std::stof(adjustedFloat.str());
-
-	return std::stof(adjustedFloat.str());
+	return percentage;
 }

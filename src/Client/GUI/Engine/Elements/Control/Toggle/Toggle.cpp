@@ -45,10 +45,17 @@ void FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, s
 
 	if (isAdditionalY) UnSetIsInAdditionalYMode();
 
-	if (isInScrollView) y += FlarialGUI::scrollpos;
-	if (settingName != "" ? mod->getOps<bool>(settingName) : isEnabled) toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], CursorInRect(x, y, rectWidth, rectHeight) ? D2D1::ColorF(enabledColor.r * 0.8, enabledColor.g * 0.8, enabledColor.b * 0.8, enabledColor.a) : enabledColor, 0.10f * FlarialGUI::frameFactor);
-	else toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], CursorInRect(x, y, rectWidth, rectHeight) ? D2D1::ColorF(disabledColor.r * 0.8, disabledColor.g * 0.8, disabledColor.b * 0.8, disabledColor.a) : disabledColor, 0.10f * FlarialGUI::frameFactor);
-	if (isInScrollView) y -= FlarialGUI::scrollpos;
+	if (settingName != "" ? mod->getOps<bool>(settingName) : isEnabled) toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) ? D2D1::ColorF(enabledColor.r * 0.8, enabledColor.g * 0.8, enabledColor.b * 0.8, enabledColor.a) : enabledColor, 0.10f * FlarialGUI::frameFactor);
+	else toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) ? D2D1::ColorF(disabledColor.r * 0.8, disabledColor.g * 0.8, disabledColor.b * 0.8, disabledColor.a) : disabledColor, 0.10f * FlarialGUI::frameFactor);
+
+	if (CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) && !ToggleIsHovering[index]) {
+		ToggleIsHovering[index] = true;
+		WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Hand);
+	}
+	else if (!CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) && ToggleIsHovering[index]) {
+		ToggleIsHovering[index] = false;
+		WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+	}
 
 	FlarialGUI::RoundedRect(x, y, rgb ? rgbColor : toggleColors[index], rectWidth, rectHeight, round.x, round.x);
 
@@ -87,7 +94,6 @@ void FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, s
 		if (MC::mouseButton == MouseButton::Left && !MC::held && (!activeColorPickerWindows || index == 123)) {
 			MC::mouseButton = MouseButton::None;
 			if (settingName != "") mod->getOps<bool>(settingName) = !mod->getOps<bool>(settingName);
-			//return true;
 		}
 		else if (MC::mouseButton == MouseButton::Right && !MC::held && (!activeColorPickerWindows || index == 123)) {
 			if (Client::settings.getSettingByName<bool>("resettableSettings")->value && moduleName != "" && settingName != "") {
@@ -97,6 +103,7 @@ void FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb, s
 				mod->settings.getSettingByName<bool>(settingName)->value;
 			}
 		}
+		if (ToggleIsHovering[index]) WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Hand);
 	}
 
 	//if (settingName != "") mod->getOps<bool>(settingName) = false;

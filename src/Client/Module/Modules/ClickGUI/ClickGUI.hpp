@@ -276,8 +276,10 @@ public:
 
 		if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key) && event.getAction() == ActionType::Pressed) {
 
-			if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen" && SDK::getCurrentScreen() != "f3_screen")
+			if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen" && SDK::getCurrentScreen() != "f3_screen") {
+				
 				this->active = false;
+			}
 			else {
 				if (!editmenu) {
 					if (!Client::settings.getSettingByName<bool>("nochaticon")->value) Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
@@ -308,6 +310,7 @@ public:
 			if (!editmenu) {
 				if (this->active) {
 					// exit ClickGUI
+					//WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
 					SDK::clientInstance->grabMouse(10); // let mouse control the view
 
 					MC::lastMouseScroll = MouseAction::Release;
