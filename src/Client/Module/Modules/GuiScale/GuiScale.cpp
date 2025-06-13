@@ -72,6 +72,9 @@ void GuiScale::updateScale(float newScale) {
     static auto safeZone = Vec2<float>{ 0.f, 0.f };
 
     SDK::clientInstance->_updateScreenSizeVariables(&screenSize, &safeZone, newScale < 1.f ? 1.f : newScale);
+    SDK::screenView->VisualTree->root->forEachChild([this](std::shared_ptr<UIControl>& control) {
+    control->updatePosition();
+    });
 
     if (delayDisable) {
         delayDisable = false;

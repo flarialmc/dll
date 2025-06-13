@@ -19,6 +19,8 @@
 #include "Elements/Control/Tooltip/ToolTipStruct.hpp"
 #include "Elements/Structs/HSV.hpp"
 #include "../../../Config/Settings.hpp"
+#include <string>
+#include <mutex>
 
 using namespace DirectX;
 
@@ -71,6 +73,7 @@ public:
 	static inline ID3D11Buffer* pVertexBuffer = nullptr;
 	static inline ID3D11Buffer* pConstantBuffer = nullptr;
 	static inline BlurInputBuffer constantBuffer;
+
 
 	// RAII
 	static void InitializePipeline();
@@ -151,7 +154,7 @@ namespace FlarialGUI {
 	extern std::unordered_map<int, KeybindSelector> KeybindSelectors;
 	extern std::unordered_map<int, bool> ToggleIsHovering;
 	extern std::unordered_map<int, bool> gears;
-	extern std::unordered_map<int, bool> buttons;
+	extern std::unordered_map<int, bool> buttonsHovered;
 
 	inline int maxRect = 0;
 
@@ -201,12 +204,9 @@ namespace FlarialGUI {
 	std::wstring GetFontFilePath(const std::wstring& fontName, DWRITE_FONT_WEIGHT weight);
 	std::string WideToNarrow(const std::wstring& wideStr);
 
-#ifndef CACHED_TO_STRING_HPP
-#define CACHED_TO_STRING_HPP
 
-#include <string>
-#include <unordered_map>
-#include <mutex>
+
+
 
 	namespace detail {
 		template<typename T>
@@ -240,7 +240,7 @@ namespace FlarialGUI {
 		return result;
 	}
 
-#endif
+
 
 	void PopSize();
 

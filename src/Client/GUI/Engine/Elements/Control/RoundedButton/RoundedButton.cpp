@@ -1,13 +1,14 @@
 #include "../../../Engine.hpp"
 #include "../../../animations/fadeinout.hpp"
+#include "Utils/WinrtUtils.hpp"
 
 static float maxDarkenAmount = 0.1;
+bool once;
 
 bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor,
                                const wchar_t *text, const float width, const float height, float radiusX, float radiusY,
                                bool glow) {
 
-    if (!FlarialGUI::buttons[index]) FlarialGUI::buttons[index] = true;
 
     if (isInScrollView) y += scrollpos;
     if (shouldAdditionalY) {
@@ -15,6 +16,29 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
             if (i <= additionalIndex && additionalY[i] > 0.0f) {
                 y += additionalY[i];
             }
+        }
+    }
+
+    bool anyHovered = false;
+    for (const auto& isHovered : buttonsHovered | std::views::values) {
+        if (isHovered) {
+            anyHovered = true;
+            break;
+        }
+    }
+
+    if (anyHovered) {
+        if (!once)
+        {
+            WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Hand);
+            once = true;
+        }
+    }
+    else {
+        if (once)
+        {
+            WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+            once = false;
         }
     }
 
@@ -33,6 +57,8 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
         }*/
         buttonColor = D2D1::ColorF(color.r - darkenAmounts[index], color.g - darkenAmounts[index],
                                    color.b - darkenAmounts[index], color.a);
+
+        buttonsHovered[index] = true;
         FadeEffect::ApplyFadeInEffect(0.0055f * FlarialGUI::frameFactor, maxDarkenAmount, darkenAmounts[index]);
     } else {
         /*if (!FlarialGUI::buttons[index] == false) {
@@ -42,6 +68,8 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
         }*/
         buttonColor = D2D1::ColorF(color.r - darkenAmounts[index], color.g - darkenAmounts[index],
                                    color.b - darkenAmounts[index], color.a);
+
+        buttonsHovered[index] = false;
         FadeEffect::ApplyFadeOutEffect(0.0055f * FlarialGUI::frameFactor, darkenAmounts[index]);
     }
 
@@ -54,13 +82,10 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
 */
 
     if (CursorInRect(x, y, width, height) && glow) {
-
         FadeEffect::ApplyFadeInEffect(0.09f * FlarialGUI::frameFactor, 1.0f, glowAlphas[index]);
 
     } else {
-
         FadeEffect::ApplyFadeOutEffect(0.09f * FlarialGUI::frameFactor, glowAlphas[index]);
-
     }
     //IDWriteTextFormat* textFormat = FlarialGUI::getTextFormat(Client::settings.getSettingByName<std::string>("fontname")->value, Constraints::FontScaler(width), DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_CENTER);
     FlarialGUI::FlarialTextWithFont(x, isInScrollView ? y - scrollpos : y, text, width, height,
@@ -70,7 +95,6 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
 
     if (CursorInRect(x, y, width, height) && MC::mouseButton == MouseButton::Left && !MC::held) {
         MC::mouseButton = MouseButton::None;
-        WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
         return true;
     }
 
