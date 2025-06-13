@@ -165,8 +165,18 @@ public:
 		if (path.empty()) path = Utils::getConfigsPath() + "\\" + settings.getSettingByName<std::string>("currentConfig")->value;
 
 		try {
-			std::ofstream cls(path, std::ofstream::out | std::ofstream::trunc); cls.close();
+			std::error_code ec_rename;
+			fs::rename(path, path + ".bak", ec_rename);
+
+			if (ec_rename) {
+				LOG_ERROR("Failed to make backup of config: {}", ec_rename.message());
+				return;
+			}
+			else Logger::custom(fg(fmt::color::dark_magenta), "Config", "Made backup of config");
+
 			std::ofstream cFile(path, std::ios::app);
+			if (!cFile) LOG_ERROR("Failed to create config: {}", GetLastError());
+			else cFile.close();
 
 			cFile << "{";
 
@@ -197,7 +207,17 @@ public:
 		if (path.empty()) path = Utils::getConfigsPath() + "\\" + Client::settings.getSettingByName<std::string>("currentConfig")->value;
 
 		std::ifstream inputFile(path);
-		if (!inputFile) return LOG_ERROR("Config file could not be loaded {}", GetLastError());
+		if (!inputFile) {
+			LOG_ERROR("Config file could not be loaded, trying backup config {}", GetLastError());
+			try {
+				fs::copy_file(path + ".bak", path);
+				return LoadSettings();
+			}
+			catch (const fs::filesystem_error& e) {
+				LOG_ERROR("Failed to bring bak file for {}: {}", path, e.what());
+				return;
+			}
+		}
 
 		std::stringstream ss;
 		ss << inputFile.rdbuf();
@@ -212,7 +232,15 @@ public:
 
 		try { globalSettings = nlohmann::json::parse(str); }
 		catch (const nlohmann::json::parse_error& e) {
-			LOG_ERROR("Failed to parse JSON: {}", e.what());
+			LOG_ERROR("Failed to parse JSON, trying backup config: {}", e.what());
+			try {
+				fs::copy_file(path + ".bak", path);
+				return LoadSettings();
+			}
+			catch (const fs::filesystem_error& e) {
+				LOG_ERROR("Failed to bring bak file for {}: {}", path, e.what());
+				return;
+			}
 		}
 
 		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Loaded {}", Client::settings.getSettingByName<std::string>("currentConfig")->value);
