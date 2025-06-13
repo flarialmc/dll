@@ -63,8 +63,10 @@ void WinrtUtils::setCursor(winrt::Windows::UI::Core::CoreCursor cursor) {
 }
 
 void WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType cursor, int resId) {
-    std::thread troll([cursor, resId]() { WinrtUtils::setCursor(winrt::Windows::UI::Core::CoreCursor(cursor, resId)); });
-    troll.detach();
+    if (ModuleManager::getModule("ClickGUI")->active) {
+        std::thread troll([cursor, resId]() { WinrtUtils::setCursor(winrt::Windows::UI::Core::CoreCursor(cursor, resId)); });
+        troll.detach();
+    }
 }
 
 void WinrtUtils::setWindowTitle(const std::string& title) {
