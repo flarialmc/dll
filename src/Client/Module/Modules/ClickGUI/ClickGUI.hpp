@@ -26,7 +26,6 @@ class ClickGUI : public Module {
 private:
 	bool grab = false;
 	float baseHeightReal = 0.f;
-	float baseHeightActual = 0.00001f;
 	float realBlurAmount = 0.00001f;
 	float radioPushAmount1 = 0.0000001f;
 	float radioPushAmount2 = 0.0000001f;
@@ -36,6 +35,7 @@ private:
 	std::string searchBarString;
 	Module* ghostMainModule;
 public:
+	static inline float baseHeightActual = 0.00001f;
 	static inline float modcardOpacity = 1.f;
 	static inline float settingsOpacity = 0.f;
 	static inline float scriptingOpacity = 0.f;
@@ -277,7 +277,7 @@ public:
 		if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key) && event.getAction() == ActionType::Pressed) {
 
 			if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen" && SDK::getCurrentScreen() != "f3_screen") {
-				
+				WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
 				this->active = false;
 			}
 			else {
@@ -298,7 +298,6 @@ public:
 				curr = "modules";
 			}
 			else {
-
 				SDK::clientInstance->grabMouse(10);
 				FlarialGUI::ResetShit();
 				Client::SaveSettings();
@@ -326,6 +325,7 @@ public:
 			}
 			else {
 				// switch from edit mode back to ClickGUI
+				WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
 				MC::lastMouseScroll = MouseAction::Release;
 				editmenu = false;
 				this->active = true;
@@ -356,6 +356,7 @@ public:
 
 				if (!editmenu) {
 					MC::lastMouseScroll = MouseAction::Release;
+					WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
 					this->active = false;
 					FlarialGUI::Notify("Right click a module to directly go to their settings page.");
 					FlarialGUI::Notify("To disable this menu press ESC or " +

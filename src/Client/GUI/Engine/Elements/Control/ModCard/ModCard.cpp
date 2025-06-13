@@ -244,18 +244,20 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
                                   FlarialGUI::buttonColors[index], textCol2,
                                   L"", buttonWidth, buttonHeight, round.x,
                                   round.x)) {
-
-        if (mod->isScriptingModule) {
-            bool newState = !mod->settings.getSettingByName<bool>("enabled")->value;
-            if (newState) {
-                mod->onEnable();
-                mod->settings.getSettingByName<bool>("enabled")->value = newState;
-            } else {
-                mod->onDisable();
-                mod->settings.getSettingByName<bool>("enabled")->value = newState;
+        if (ClickGUI::baseHeightActual > 0.6f) {
+            if (mod->isScriptingModule) {
+                bool newState = !mod->settings.getSettingByName<bool>("enabled")->value;
+                if (newState) {
+                    mod->onEnable();
+                    mod->settings.getSettingByName<bool>("enabled")->value = newState;
+                }
+                else {
+                    mod->onDisable();
+                    mod->settings.getSettingByName<bool>("enabled")->value = newState;
+                }
             }
+            mod->toggle();
         }
-        mod->toggle();
     }
 
     FlarialGUI::FlarialTextWithFont((buttonx - buttonWidth) - Constraints::SpacingConstraint(0.15f, paddingwidth), buttony - buttonHeight, FlarialGUI::to_wide(text).c_str(), buttonWidth, buttonHeight, DWRITE_TEXT_ALIGNMENT_CENTER, buttonWidth * 1.08, DWRITE_FONT_WEIGHT_NORMAL, textCol2, false);

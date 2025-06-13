@@ -79,7 +79,7 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
 
     if (CursorInRect(x, y + (isInScrollView ? scrollpos : 0), s * 3.f, s * 0.82f) && !TextBoxes[index].isHovering) {
         TextBoxes[index].isHovering = true;
-        WinrtUtils::setCursorTypeThreaded(CoreCursorType::Hand);
+        WinrtUtils::setCursorTypeThreaded(CoreCursorType::IBeam);
     }
     else if (!CursorInRect(x, y + (isInScrollView ? scrollpos : 0), s * 3.f, s * 0.82f) && TextBoxes[index].isHovering) {
         TextBoxes[index].isHovering = false;

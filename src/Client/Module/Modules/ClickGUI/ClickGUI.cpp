@@ -355,10 +355,12 @@ void ClickGUI::onRender(RenderEvent& event) {
 			RadioButtonHeight, round.x,
 			round.x, "editmenu",
 			curr)) {
+			WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
 			this->active = false;
 			Client::SaveSettings();	
 			FlarialGUI::Notify("Right click a module to directly go to their settings page.");
 			FlarialGUI::Notify("To disable this menu press ESC or " + getOps<std::string>("editmenubind"));
+			
 			editmenu = true;
 		}
 

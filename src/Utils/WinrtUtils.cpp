@@ -63,7 +63,7 @@ void WinrtUtils::setCursor(winrt::Windows::UI::Core::CoreCursor cursor) {
 }
 
 void WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType cursor, int resId) {
-    if (ModuleManager::getModule("ClickGUI")->active) {
+    if (ModuleManager::getModule("ClickGUI")->active || ClickGUI::editmenu) {
         std::thread troll([cursor, resId]() { WinrtUtils::setCursor(winrt::Windows::UI::Core::CoreCursor(cursor, resId)); });
         troll.detach();
     }

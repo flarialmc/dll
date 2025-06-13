@@ -1220,6 +1220,15 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 	WindowRects[currentNum].width = width;
 	WindowRects[currentNum].height = height;
 
+	if (CursorInRect(x, y + (isInScrollView ? scrollpos : 0), width, height) && !WindowRects[currentNum].isHovering) {
+		WindowRects[currentNum].isHovering = true;
+		WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::SizeAll);
+	}
+	else if (!CursorInRect(x, y + (isInScrollView ? scrollpos : 0), width, height) && WindowRects[currentNum].isHovering) {
+		WindowRects[currentNum].isHovering = false;
+		WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+	}
+
 	if (!ye) {
 		if ((CursorInRect(x, y, width, height) || WindowRects[currentNum].isMovingElement) && MC::held) {
 			if (!WindowRects[currentNum].isMovingElement) {
