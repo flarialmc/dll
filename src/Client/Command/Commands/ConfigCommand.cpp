@@ -89,6 +89,7 @@ winrt::Windows::Foundation::IAsyncAction import() {
         Logger::success("Extracted zip file: {} to {}", zipFileName, extractionDir.string());
         FlarialGUI::Notify("Created & loaded: " + zipFileName);
         ModuleManager::restartModules = true;
+        ScriptMarketplace::reloadAllConfigs();
     }
     co_return;
 }
