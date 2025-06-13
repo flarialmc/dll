@@ -1,5 +1,6 @@
 #include "../../../Engine.hpp"
 #include "../../../animations/fadeinout.hpp"
+#include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Utils/WinrtUtils.hpp"
 
 static float maxDarkenAmount = 0.1;
@@ -27,18 +28,23 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
         }
     }
 
-    if (anyHovered) {
-        if (!once)
+    if (clickgui->active)
+    {
+        if (anyHovered)
         {
-            WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Hand);
-            once = true;
+            if (!once)
+            {
+                WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Hand);
+                once = true;
+            }
         }
-    }
-    else {
-        if (once)
+        else
         {
-            WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
-            once = false;
+            if (once)
+            {
+                WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+                once = false;
+            }
         }
     }
 
