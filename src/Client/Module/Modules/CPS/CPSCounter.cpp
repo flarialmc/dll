@@ -110,14 +110,6 @@ int CPSCounter::GetRightCPS() {
     return (int)std::round(count);
 }
 
-bool CPSCounter::GetLeftHeld() {
-    return leftClickHeld;
-}
-
-bool CPSCounter::GetRightHeld() {
-    return rightClickHeld;
-}
-
 double CPSCounter::Microtime() {
     return (double(std::chrono::duration_cast<std::chrono::microseconds>(
                 std::chrono::system_clock::now().time_since_epoch()).count()) / double(1000000));

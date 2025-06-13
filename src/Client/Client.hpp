@@ -102,6 +102,8 @@ public:
 		legacySettings.FromJson(ss.str(), true);
 		settings.AppendFromJson(ss.str(), true);
 
+		if (legacySettings.getSettingByName<std::string>("currentConfig") == nullptr) legacySettings.addSetting("currentConfig", (std::string)"default");
+
 		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Set config to {}", legacySettings.getSettingByName<std::string>("currentConfig")->value);
 	}
 

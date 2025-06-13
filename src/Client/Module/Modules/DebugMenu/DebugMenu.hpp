@@ -4,7 +4,7 @@
 #include "../../../Client.hpp"
 #include <chrono>
 #include <vector>
-
+#include <deque>
 
 class TickData {
 public:
@@ -28,7 +28,7 @@ private:
 	Perspective curPerspective;
 	float lastBreakProgress = 0.0f;
 	float currentBreakProgress = 0.0f;
-	//CircularBuffer<int> myBuffer(5);
+	std::deque<int> prevFrameTimes;
 
 	static double Microtime() {
 		return (double(std::chrono::duration_cast<std::chrono::microseconds>(

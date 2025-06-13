@@ -269,7 +269,7 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) {
 		LOG_ERROR("Failed to get block: {}", e.what());
 	}
 
-	if (CPSCounter::GetLeftHeld()) {
+	if (MC::heldLeft) {
 		Gamemode *gm = SDK::clientInstance->getLocalPlayer()->getGamemode();
 		float breakProgress = gm->getLastBreakProgress() * 100;
 		if (lastBreakProgress != breakProgress) {

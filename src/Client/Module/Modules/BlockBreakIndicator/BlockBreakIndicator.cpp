@@ -206,7 +206,7 @@ void BlockBreakIndicator::onRender(RenderEvent &event) {
     ) {
         if (SDK::getCurrentScreen() != "hud_screen") return;
 
-        if (CPSCounter::GetLeftHeld()) {
+        if (MC::heldLeft) {
             Gamemode *gamemode = SDK::clientInstance->getLocalPlayer()->getGamemode();
             auto progress = gamemode->getLastBreakProgress() * 100;
             if (lastProgress != progress) {

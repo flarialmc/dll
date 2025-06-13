@@ -85,10 +85,6 @@ public:
 
 	[[nodiscard]] static int GetRightCPS();
 
-	[[nodiscard]] static bool GetLeftHeld();
-
-	[[nodiscard]] static bool GetRightHeld();
-
 private:
 	[[nodiscard]] static double Microtime();
 };
