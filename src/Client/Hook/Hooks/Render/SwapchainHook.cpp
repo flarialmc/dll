@@ -190,7 +190,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
     UnderUIHooks::index = 0;
 
     if (D2D::context) MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
-    
+
 
     /* UNDER UI HOOK - CLEARDEPTHSTENCILVIEW */
 
@@ -211,11 +211,15 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
         if (queue == nullptr) {
 
+
             DX11Init();
+
 
         } else {
 
+
             DX12Init();
+
 
         }
 
@@ -311,6 +315,8 @@ void SwapchainHook::DX11Init() {
 
 
 void SwapchainHook::DX12Init() {
+
+
     Logger::debug("Initializing for DX12");
     ID3D12Device5 *device;
     swapchain->GetDevice(IID_PPV_ARGS(&d3d12Device5));
@@ -740,6 +746,7 @@ void SwapchainHook::Fonts() {
 
         if (FlarialGUI::DoLoadFontLater) {
 
+
             FontKey fontK = FlarialGUI::LoadFontLater;
             if (Client::settings.getSettingByName<bool>("overrideFontWeight")->value) fontK.weight = FlarialGUI::GetFontWeightFromString(Client::settings.getSettingByName<std::string>("fontWeight")->value);
                 if (!FlarialGUI::FontMap[fontK]) {
@@ -773,6 +780,7 @@ void SwapchainHook::Fonts() {
 
             FlarialGUI::HasAFontLoaded = false;
         }
+
     }
 
     /* IMPORTANT FONT STUFF */

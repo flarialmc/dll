@@ -21,6 +21,8 @@
 #include "../../../Config/Settings.hpp"
 #include <string>
 #include <mutex>
+#include <thread>
+#include <future>
 
 using namespace DirectX;
 
@@ -448,7 +450,7 @@ namespace FlarialGUI {
 		const float imageWidth, const float imageHeight);
 
 	void LoadAllImages();
-
+	std::future<void> LoadImagesAsync();
 	std::string Dropdown(int index, float x, float y, const std::vector<std::string>& options, std::string& value, const std::string& label, std::string moduleName = "", std::string settingName = "");
 
 	void image(int resourceId, D2D1_RECT_F rect, LPCTSTR type = "PNG", bool shouldadd = true, ImColor col = IM_COL32_WHITE);

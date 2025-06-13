@@ -37,379 +37,264 @@ void FlarialGUI::image(const std::string& imageName, D2D1_RECT_F rect) {
         interpolationMode = D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR;
 }
 
-bool FlarialGUI::LoadImageFromResource(int resourceId, ID3D11ShaderResourceView** out_srv, LPCTSTR type) {
+struct ImageDataDX11 {
+    int width;
+    int height;
+    std::vector<unsigned char> data;
+};
 
-    HRSRC imageResHandle = nullptr;
-    HGLOBAL imageResDataHandle = nullptr;
-    const unsigned char* pImageFile = nullptr;
-    DWORD imageFileSize = 0;
+std::optional<ImageDataDX11> LoadImageDataDX11FromResource(int resourceId, LPCTSTR type) {
+    HRSRC imageResHandle = FindResource(Client::currentModule, MAKEINTRESOURCE(resourceId), type);
+    if (!imageResHandle) return std::nullopt;
 
-    // Locate the resource
-    imageResHandle = FindResource(Client::currentModule, MAKEINTRESOURCE(resourceId), type);
+    HGLOBAL imageResDataHandle = LoadResource(Client::currentModule, imageResHandle);
+    if (!imageResDataHandle) return std::nullopt;
 
-    // Load the resource
-    imageResDataHandle = LoadResource(Client::currentModule, imageResHandle);
+    const unsigned char* pImageFile = (const unsigned char*)LockResource(imageResDataHandle);
+    if (!pImageFile) return std::nullopt;
 
-    // Lock the resource to get a pointer to the image data
-    pImageFile = (const unsigned char*)LockResource(imageResDataHandle);
-    imageFileSize = SizeofResource(Client::currentModule, imageResHandle);
-
+    DWORD imageFileSize = SizeofResource(Client::currentModule, imageResHandle);
+    if (imageFileSize == 0) return std::nullopt;
 
     int width, height, channels;
-	unsigned char* image_data = stbi_load_from_memory(pImageFile, imageFileSize, &width, &height, &channels, 4);
-	if (image_data == NULL) {
-		return false;
-	}
+    unsigned char* image_data = stbi_load_from_memory(pImageFile, imageFileSize, &width, &height, &channels, 4);
+    if (!image_data) return std::nullopt;
 
-	// Create texture
-	D3D11_TEXTURE2D_DESC desc;
-	ZeroMemory(&desc, sizeof(desc));
-	desc.Width = width;
-	desc.Height = height;
-	desc.MipLevels = 1;
-	desc.ArraySize = 1;
-	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	desc.SampleDesc.Count = 1;
-	desc.Usage = D3D11_USAGE_DEFAULT;
-	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	desc.CPUAccessFlags = 0;
-
-	ID3D11Texture2D* pTexture = nullptr;
-	D3D11_SUBRESOURCE_DATA subResource;
-	subResource.pSysMem = image_data;
-	subResource.SysMemPitch = desc.Width * 4;
-	subResource.SysMemSlicePitch = 0;
-	HRESULT r = SwapchainHook::d3d11Device->CreateTexture2D(&desc, &subResource, &pTexture);
-
-	// Create texture view
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-	ZeroMemory(&srvDesc, sizeof(srvDesc));
-	srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = desc.MipLevels;
-	srvDesc.Texture2D.MostDetailedMip = 0;
-	r = SwapchainHook::d3d11Device->CreateShaderResourceView(pTexture, &srvDesc, out_srv);
-	pTexture->Release();
-    
-	return true;
+    ImageDataDX11 result;
+    result.width = width;
+    result.height = height;
+    result.data.assign(image_data, image_data + (width * height * 4));
+    stbi_image_free(image_data);
+    return result;
 }
 
+bool FlarialGUI::LoadImageFromResource(int resourceId, ID3D11ShaderResourceView** out_srv, LPCTSTR type) {
+    // Load image data on a background thread
+    auto future = std::async(std::launch::async, LoadImageDataDX11FromResource, resourceId, type);
+    auto image_data_opt = future.get();
+    if (!image_data_opt) return false;
+    const auto& image_data = *image_data_opt;
+
+    // Create texture on main thread
+    D3D11_TEXTURE2D_DESC desc;
+    ZeroMemory(&desc, sizeof(desc));
+    desc.Width = image_data.width;
+    desc.Height = image_data.height;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    desc.CPUAccessFlags = 0;
+
+    ID3D11Texture2D* pTexture = nullptr;
+    D3D11_SUBRESOURCE_DATA subResource;
+    subResource.pSysMem = image_data.data.data();
+    subResource.SysMemPitch = desc.Width * 4;
+    subResource.SysMemSlicePitch = 0;
+    HRESULT r = SwapchainHook::d3d11Device->CreateTexture2D(&desc, &subResource, &pTexture);
+    if (FAILED(r)) return false;
+
+    // Create shader resource view
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+    ZeroMemory(&srvDesc, sizeof(srvDesc));
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = desc.MipLevels;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    r = SwapchainHook::d3d11Device->CreateShaderResourceView(pTexture, &srvDesc, out_srv);
+    pTexture->Release();
+    if (FAILED(r)) return false;
+
+    return true;
+}
+
+#include <future>
+
+struct ImageData {
+    int width;
+    int height;
+    std::vector<unsigned char> data;
+    ID3D12Resource* uploadBuffer;
+    UINT uploadPitch;
+    UINT uploadSize;
+};
+
+std::optional<ImageData> LoadImageDataFromResource(int resourceId, LPCTSTR type, ID3D12Device* device) {
+    HRSRC imageResHandle = FindResource(Client::currentModule, MAKEINTRESOURCE(resourceId), type);
+    if (!imageResHandle) return std::nullopt;
+
+    HGLOBAL imageResDataHandle = LoadResource(Client::currentModule, imageResHandle);
+    if (!imageResDataHandle) return std::nullopt;
+
+    const unsigned char* pImageFile = (const unsigned char*)LockResource(imageResDataHandle);
+    if (!pImageFile) return std::nullopt;
+
+    DWORD imageFileSize = SizeofResource(Client::currentModule, imageResHandle);
+    if (imageFileSize == 0) return std::nullopt;
+
+    int width, height, channels;
+    unsigned char* image_data = stbi_load_from_memory(pImageFile, imageFileSize, &width, &height, &channels, 4);
+    if (!image_data) return std::nullopt;
+
+    // Prepare upload buffer
+    UINT uploadPitch = (width * 4 + D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u);
+    UINT uploadSize = height * uploadPitch;
+
+    D3D12_RESOURCE_DESC desc = {};
+    desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    desc.Alignment = 0;
+    desc.Width = uploadSize;
+    desc.Height = 1;
+    desc.DepthOrArraySize = 1;
+    desc.MipLevels = 1;
+    desc.Format = DXGI_FORMAT_UNKNOWN;
+    desc.SampleDesc.Count = 1;
+    desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    D3D12_HEAP_PROPERTIES props = {};
+    props.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+    ID3D12Resource* uploadBuffer = nullptr;
+    HRESULT hr = device->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&uploadBuffer));
+    if (FAILED(hr) || !uploadBuffer) {
+        stbi_image_free(image_data);
+        return std::nullopt;
+    }
+
+    void* mapped = nullptr;
+    D3D12_RANGE range = { 0, uploadSize };
+    if (FAILED(uploadBuffer->Map(0, &range, &mapped)) || !mapped) {
+        uploadBuffer->Release();
+        stbi_image_free(image_data);
+        return std::nullopt;
+    }
+
+    for (int y = 0; y < height; y++)
+        memcpy((void*)((uintptr_t)mapped + y * uploadPitch), image_data + y * width * 4, width * 4);
+    uploadBuffer->Unmap(0, &range);
+
+    ImageData result;
+    result.width = width;
+    result.height = height;
+    result.data.assign(image_data, image_data + (width * height * 4));
+    result.uploadBuffer = uploadBuffer;
+    result.uploadPitch = uploadPitch;
+    result.uploadSize = uploadSize;
+    stbi_image_free(image_data);
+    return result;
+}
+
+static ID3D12CommandQueue* uploadCommandQueue = nullptr;
+static ID3D12CommandAllocator* uploadCommandAllocator = nullptr;
+static ID3D12Fence* uploadFence = nullptr;
+static UINT64 uploadFenceValue = 0;
+static HANDLE uploadEvent = nullptr;
+
 bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HANDLE srv_cpu_handle, ID3D12Resource** out_tex_resource, LPCTSTR type) {
+    if (!SwapchainHook::swapchain || !SwapchainHook::d3d12Device5) return false;
 
-	HRSRC imageResHandle = nullptr;
- HGLOBAL imageResDataHandle = nullptr;
- const unsigned char* pImageFile = nullptr;
- DWORD imageFileSize = 0;
+    // Initialize static resources
+    if (!uploadCommandQueue) {
+        D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+        queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+        queueDesc.NodeMask = 1;
+        if (FAILED(SwapchainHook::d3d12Device5->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&uploadCommandQueue)))) return false;
+    }
+    if (!uploadCommandAllocator) {
+        if (FAILED(SwapchainHook::d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&uploadCommandAllocator)))) return false;
+    }
+    if (!uploadFence) {
+        if (FAILED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&uploadFence)))) return false;
+    }
+    if (!uploadEvent) {
+        uploadEvent = CreateEvent(0, 0, 0, 0);
+        if (!uploadEvent) return false;
+    }
 
+    // Load image data and prepare upload buffer on background thread
+    auto future = std::async(std::launch::async, LoadImageDataFromResource, resourceId, type, SwapchainHook::d3d12Device5);
+    auto image_data_opt = future.get();
+    if (!image_data_opt) return false;
+    const auto& image_data = *image_data_opt;
 
-	if (!SwapchainHook::swapchain) {
-		return false;
-	}
+    // Create texture resource
+    D3D12_HEAP_PROPERTIES props = {};
+    props.Type = D3D12_HEAP_TYPE_DEFAULT;
 
+    D3D12_RESOURCE_DESC desc = {};
+    desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    desc.Width = image_data.width;
+    desc.Height = image_data.height;
+    desc.DepthOrArraySize = 1;
+    desc.MipLevels = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-    if (!SwapchainHook::d3d12Device5) {
+    ID3D12Resource* pTexture = nullptr;
+    HRESULT hr = SwapchainHook::d3d12Device5->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_COPY_DEST, NULL, IID_PPV_ARGS(&pTexture));
+    if (FAILED(hr) || !pTexture) {
+        image_data.uploadBuffer->Release();
         return false;
     }
 
-
- imageResHandle = FindResource(Client::currentModule, MAKEINTRESOURCE(resourceId), type);
-	if (imageResHandle == nullptr) {
-		return false;
-	}
-
- imageResDataHandle = LoadResource(Client::currentModule, imageResHandle);
-	if (imageResDataHandle == nullptr) {
-		return false;
-	}
-
- pImageFile = (const unsigned char*)LockResource(imageResDataHandle);
-	if (pImageFile == nullptr) {
-		return false;
-	}
-
- imageFileSize = SizeofResource(Client::currentModule, imageResHandle);
-	if (imageFileSize == 0) {
-		return false;
-	}
-
- int image_width = 0;
-	int image_height = 0;
-	unsigned char* image_data = stbi_load_from_memory(pImageFile, imageFileSize, &image_width, &image_height, NULL, 4);
-	if (image_data == nullptr) {
-		return false;
-	}
-
-	D3D12_HEAP_PROPERTIES props = {};
-	props.Type = D3D12_HEAP_TYPE_DEFAULT;
-	props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-
-	D3D12_RESOURCE_DESC desc = {};
-	desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	desc.Alignment = 0;
-	desc.Width = image_width;
-	desc.Height = image_height;
-	desc.DepthOrArraySize = 1;
-	desc.MipLevels = 1;
-	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	desc.SampleDesc.Count = 1;
-	desc.SampleDesc.Quality = 0;
-	desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-	ID3D12Resource* pTexture = nullptr;
-	HRESULT hrCreateTexture = SwapchainHook::d3d12Device5->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
-		D3D12_RESOURCE_STATE_COPY_DEST, NULL, IID_PPV_ARGS(&pTexture));
-	if (FAILED(hrCreateTexture)) {
-		stbi_image_free(image_data);
-		return false;
-	}
-    if (!pTexture) {
-        stbi_image_free(image_data);
-        return false;
-    }
-
-
-	UINT uploadPitch = (image_width * 4 + D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u);
-	UINT uploadSize = image_height * uploadPitch;
-	desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	desc.Alignment = 0;
-	desc.Width = uploadSize;
-	desc.Height = 1;
-	desc.DepthOrArraySize = 1;
-	desc.MipLevels = 1;
-	desc.Format = DXGI_FORMAT_UNKNOWN;
-	desc.SampleDesc.Count = 1;
-	desc.SampleDesc.Quality = 0;
-	desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-	props.Type = D3D12_HEAP_TYPE_UPLOAD;
-	props.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	props.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-
-	ID3D12Resource* uploadBuffer = nullptr;
-	HRESULT hrCreateUploadBuffer = SwapchainHook::d3d12Device5->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
-		D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&uploadBuffer));
-	if (FAILED(hrCreateUploadBuffer)) {
-		pTexture->Release();
-		stbi_image_free(image_data);
-		return false;
-	}
-    if (!uploadBuffer) {
+    // Set up command list
+    uploadCommandAllocator->Reset();
+    ID3D12GraphicsCommandList* cmdList = nullptr;
+    hr = SwapchainHook::d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, uploadCommandAllocator, NULL, IID_PPV_ARGS(&cmdList));
+    if (FAILED(hr) || !cmdList) {
         pTexture->Release();
-        stbi_image_free(image_data);
+        image_data.uploadBuffer->Release();
         return false;
     }
 
+    D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
+    srcLocation.pResource = image_data.uploadBuffer;
+    srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+    srcLocation.PlacedFootprint.Footprint.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srcLocation.PlacedFootprint.Footprint.Width = image_data.width;
+    srcLocation.PlacedFootprint.Footprint.Height = image_data.height;
+    srcLocation.PlacedFootprint.Footprint.Depth = 1;
+    srcLocation.PlacedFootprint.Footprint.RowPitch = image_data.uploadPitch;
 
-	void* mapped = nullptr;
-	D3D12_RANGE range = { 0, uploadSize };
-	HRESULT hrMap = uploadBuffer->Map(0, &range, &mapped);
-	if (FAILED(hrMap)) {
-		uploadBuffer->Release();
-		pTexture->Release();
-		stbi_image_free(image_data);
-		return false;
-	}
-    if (!mapped) {
-        uploadBuffer->Release();
-        pTexture->Release();
-        stbi_image_free(image_data);
-        return false;
-    }
+    D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
+    dstLocation.pResource = pTexture;
+    dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+    dstLocation.SubresourceIndex = 0;
 
-	for (int y = 0; y < image_height; y++)
-		memcpy((void*)((uintptr_t)mapped + y * uploadPitch), image_data + y * image_width * 4, image_width * 4);
-	uploadBuffer->Unmap(0, &range);
+    D3D12_RESOURCE_BARRIER barrier = {};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Transition.pResource = pTexture;
+    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 
-	D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
-	srcLocation.pResource = uploadBuffer;
-	srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-	srcLocation.PlacedFootprint.Footprint.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	srcLocation.PlacedFootprint.Footprint.Width = image_width;
-	srcLocation.PlacedFootprint.Footprint.Height = image_height;
-	srcLocation.PlacedFootprint.Footprint.Depth = 1;
-	srcLocation.PlacedFootprint.Footprint.RowPitch = uploadPitch;
+    cmdList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, NULL);
+    cmdList->ResourceBarrier(1, &barrier);
+    cmdList->Close();
 
-	D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
-	dstLocation.pResource = pTexture;
-	dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-	dstLocation.SubresourceIndex = 0;
+    uploadCommandQueue->ExecuteCommandLists(1, (ID3D12CommandList* const*)&cmdList);
+    uploadCommandQueue->Signal(uploadFence, ++uploadFenceValue);
+    uploadFence->SetEventOnCompletion(uploadFenceValue, uploadEvent);
+    WaitForSingleObject(uploadEvent, INFINITE);
 
-	D3D12_RESOURCE_BARRIER barrier = {};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = pTexture;
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    // Create shader resource view
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = desc.MipLevels;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    SwapchainHook::d3d12Device5->CreateShaderResourceView(pTexture, &srvDesc, srv_cpu_handle);
 
-	ID3D12Fence* fence = nullptr;
-	HRESULT hrCreateFence = SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-	if (FAILED(hrCreateFence)) {
-		uploadBuffer->Release();
-		pTexture->Release();
-		stbi_image_free(image_data);
-		return false;
-	}
-    if (!fence) {
-        uploadBuffer->Release();
-        pTexture->Release();
-        stbi_image_free(image_data);
-        return false;
-    }
-
-
-	HANDLE event = CreateEvent(0, 0, 0, 0);
-	if (event == nullptr) {
-		std::cout << "Error: CreateEvent failed." << std::endl;
-		fence->Release();
-		uploadBuffer->Release();
-		pTexture->Release();
-		stbi_image_free(image_data);
-		return false;
-	}
-
-	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
-	queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-	queueDesc.NodeMask = 1;
-
-	ID3D12CommandQueue* cmdQueue = nullptr;
-	HRESULT hrCreateCommandQueue = SwapchainHook::d3d12Device5->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cmdQueue));
-	if (FAILED(hrCreateCommandQueue)) {
-		CloseHandle(event);
-		fence->Release();
-		uploadBuffer->Release();
-		pTexture->Release();
-		stbi_image_free(image_data);
-		return false;
-	}
-    if (!cmdQueue) {
-        CloseHandle(event);
-        fence->Release();
-        uploadBuffer->Release();
-        pTexture->Release();
-        stbi_image_free(image_data);
-        return false;
-    }
-
-
-	ID3D12CommandAllocator* cmdAlloc = nullptr;
-	HRESULT hrCreateCommandAllocator = SwapchainHook::d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAlloc));
-	if (FAILED(hrCreateCommandAllocator)) {
-		cmdQueue->Release();
-		CloseHandle(event);
-		fence->Release();
-		uploadBuffer->Release();
-		pTexture->Release();
-		stbi_image_free(image_data);
-		return false;
-	}
-    if (!cmdAlloc) {
-        cmdQueue->Release();
-        CloseHandle(event);
-        fence->Release();
-        uploadBuffer->Release();
-        pTexture->Release();
-        stbi_image_free(image_data);
-        return false;
-    }
-
-
-	ID3D12GraphicsCommandList* cmdList = nullptr;
-	HRESULT hrCreateCommandList = SwapchainHook::d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAlloc, NULL, IID_PPV_ARGS(&cmdList));
-	if (FAILED(hrCreateCommandList)) {
-		cmdAlloc->Release();
-		cmdQueue->Release();
-		CloseHandle(event);
-		fence->Release();
-		uploadBuffer->Release();
-		pTexture->Release();
-		stbi_image_free(image_data);
-		return false;
-	}
-    if (!cmdList) {
-        cmdAlloc->Release();
-        cmdQueue->Release();
-        CloseHandle(event);
-        fence->Release();
-        uploadBuffer->Release();
-        pTexture->Release();
-        stbi_image_free(image_data);
-        return false;
-    }
-
-
-	cmdList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, NULL);
-	cmdList->ResourceBarrier(1, &barrier);
-
-	HRESULT hrCloseCommandList = cmdList->Close();
-	if (FAILED(hrCloseCommandList)) {
-		cmdList->Release();
-		cmdAlloc->Release();
-		cmdQueue->Release();
-		CloseHandle(event);
-		fence->Release();
-		uploadBuffer->Release();
-		pTexture->Release();
-		stbi_image_free(image_data);
-		return false;
-	}
-
-	cmdQueue->ExecuteCommandLists(1, (ID3D12CommandList* const*)&cmdList);
-	HRESULT hrSignal = cmdQueue->Signal(fence, 1);
-	if (FAILED(hrSignal)) {
-		cmdList->Release();
-		cmdAlloc->Release();
-		cmdQueue->Release();
-		CloseHandle(event);
-		fence->Release();
-		uploadBuffer->Release();
-		pTexture->Release();
-		stbi_image_free(image_data);
-		return false;
-	}
-
-	fence->SetEventOnCompletion(1, event);
-	WaitForSingleObject(event, INFINITE);
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-	srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = desc.MipLevels;
-	srvDesc.Texture2D.MostDetailedMip = 0;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-
-	SwapchainHook::d3d12Device5->CreateShaderResourceView(pTexture, &srvDesc, srv_cpu_handle);
-    if (!srv_cpu_handle.ptr) {
-    }
-
-
-	*out_tex_resource = pTexture;
-    if (!*out_tex_resource) {
-        cmdList->Release();
-        cmdAlloc->Release();
-        cmdQueue->Release();
-        CloseHandle(event);
-        fence->Release();
-        uploadBuffer->Release();
-        pTexture->Release(); // Redundant but safe in case of logic error.
-        stbi_image_free(image_data);
-        return false;
-    }
-
-
+    *out_tex_resource = pTexture;
     cmdList->Release();
- cmdAlloc->Release();
- cmdQueue->Release();
- CloseHandle(event);
- fence->Release();
- uploadBuffer->Release();
-	stbi_image_free(image_data);
+    image_data.uploadBuffer->Release();
 
-	return true;
+    return true;
 }
 
 //void FlarialGUI::LoadImageFromResource()
@@ -538,8 +423,21 @@ void FlarialGUI::LoadAllImages() {
 
 	} else {
 		for(int i = 100; i <= MAX_IMAGE_ID; i++) {
-			if(i != IDR_PATAR_JPG) LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "PNG");
+			if(i != IDR_PATAR_JPG)
+				LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "PNG");
 			else LoadImageFromResource(i, &ImagesClass::ImguiDX11Images[i], "JPG");
 		}
 	}
+}
+
+
+std::future<void> FlarialGUI::LoadImagesAsync() {
+	std::promise<void> promise;
+	auto future = promise.get_future();
+	std::thread loadThread([promise = std::move(promise)]() mutable {
+		FlarialGUI::LoadAllImages();
+		promise.set_value();
+	});
+	loadThread.detach();
+	return future;
 }
