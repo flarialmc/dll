@@ -1,5 +1,7 @@
 #include "CPSCounter.hpp"
 
+#include "Client.hpp"
+
 
 void CPSCounter::onSetup() {
     Listen(this, MouseEvent, &CPSCounter::onMouse)
@@ -121,54 +123,52 @@ double CPSCounter::Microtime() {
                 std::chrono::system_clock::now().time_since_epoch()).count()) / double(1000000));
 }
 
-void CPSCounter::onMouse(MouseEvent& event) {
-    auto limiter = ModuleManager::getModule("CPS Limiter");
-    if (limiter == nullptr) return;
+std::deque<std::chrono::steady_clock::time_point> leftClicks;
+std::deque<std::chrono::steady_clock::time_point> rightClicks;
 
-    double now = getCurrentTime();
+// Helper to try a click against a given deque + limit.
+bool tryLimit(std::deque<std::chrono::steady_clock::time_point>& q, float cpsLimit) {
+    using Clock = std::chrono::steady_clock;
+    auto now = Clock::now();
+    auto oneSecAgo = now - std::chrono::seconds(1);
 
-    if (event.getButton() == MouseButton::Left) {
-        if (!MC::held) {
-            leftClickHeld = false;
-        }
-        else {
-            leftClickHeld = true;
-
-            if (limiter->getOps<bool>("enabled")) {
-                float leftCpsLimit = limiter->getOps<float>("Left");
-                double leftInterval = 1.0 / leftCpsLimit;
-
-                if ((now - lastLeftAllowed) < leftInterval) {
-                    event.cancel();
-                    return;
-                }
-                lastLeftAllowed = now;
-            }
-            AddLeftClick();
-        }
+    while (!q.empty() && q.front() < oneSecAgo) {
+        q.pop_front();
     }
 
-    if (event.getButton() == Right) {
-        if (!MC::held) {
-            rightClickHeld = false;
-        }
-        else {
-            rightClickHeld = true;
+    if (static_cast<int>(q.size()) >= static_cast<int>(cpsLimit)) {
+        return false;
+    }
 
-            if (limiter->getOps<bool>("enabled")) {
-                float rightCpsLimit = limiter->getOps<float>("Right");
-                double rightInterval = 1.0 / rightCpsLimit;
+    q.push_back(now);
+    return true;
+}
 
-                if ((now - lastRightAllowed) < rightInterval) {
-                    event.cancel();
-                    return;
-                }
-                lastRightAllowed = now;
-            }
-            AddRightClick();
+void CPSCounter::onMouse(MouseEvent& event) {
+    auto limiterMod = ModuleManager::getModule("CPS Limiter");
+    if (!limiterMod)
+        return;
+
+    leftLimiter .setRate(limiterMod->getOps<float>("Left") + 3.f);
+    rightLimiter.setRate(limiterMod->getOps<float>("Right") + 3.f);
+
+    using MB = MouseButton;
+    if (event.getButton() == MB::Left && MC::held) {
+        if (!leftLimiter.allow() && limiterMod->getOps<bool>("enabled")) {
+            //event.cancel();
+            return;
         }
+        AddLeftClick();
+    }
+    else if (event.getButton() == MB::Right && MC::held) {
+        if (!rightLimiter.allow() && limiterMod->getOps<bool>("enabled")) {
+            //event.cancel();
+            return;
+        }
+        AddRightClick();
     }
 }
+
 
 void CPSCounter::onRender(RenderEvent& event)  {
     if (this->isEnabled()) {

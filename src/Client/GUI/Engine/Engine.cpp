@@ -68,7 +68,7 @@ std::unordered_map<int, TextBoxStruct> FlarialGUI::TextBoxes;
 std::unordered_map<int, ColorPicker> FlarialGUI::ColorPickers;
 std::unordered_map<int, DropdownStruct> FlarialGUI::DropDownMenus;
 std::unordered_map<int, KeybindSelector> FlarialGUI::KeybindSelectors;
-std::unordered_map<int, bool> FlarialGUI::buttons;
+std::unordered_map<int, bool> FlarialGUI::buttonsHovered;
 
 void FlarialGUI::OverrideAlphaValues(float percent) {
 	//FlarialGUI::lerp()

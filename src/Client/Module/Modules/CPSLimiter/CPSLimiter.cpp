@@ -1,5 +1,8 @@
 #include "CPSLimiter.hpp"
 
+#include "Client.hpp"
+#include "Manager.hpp"
+
 void CPSLimiter::defaultConfig() {
     Module::defaultConfig("core");
     setDef("Left", 16.0f);
