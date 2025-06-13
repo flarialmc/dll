@@ -28,6 +28,7 @@ private:
 	Perspective curPerspective;
 	float lastBreakProgress = 0.0f;
 	float currentBreakProgress = 0.0f;
+	//CircularBuffer<int> myBuffer(5);
 
 	static double Microtime() {
 		return (double(std::chrono::duration_cast<std::chrono::microseconds>(

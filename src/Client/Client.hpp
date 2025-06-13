@@ -183,7 +183,6 @@ public:
 					LOG_ERROR("Failed to make backup of config: {}", ec_rename.message());
 					return;
 				}
-				else Logger::custom(fg(fmt::color::dark_magenta), "Config", "Made backup of config");
 			}
 			catch (const nlohmann::json::parse_error& e) {
 				LOG_ERROR("Failed to parse JSON, couldn't create backup, using current backup to save...", e.what());

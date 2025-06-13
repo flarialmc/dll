@@ -14,8 +14,16 @@ public:
         MC::mouseButton = event.getButton();
         MC::mouseAction = event.getAction();
 
-        if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Press) MC::held = true;
-        if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Release) MC::held = false;
+        if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Press) {
+            MC::held = true;
+            if (event.getButton() == MouseButton::Left) MC::heldLeft = true;
+            if (event.getButton() == MouseButton::Right) MC::heldRight = true;
+        }
+        if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Release) {
+            MC::held = false;
+            if (event.getButton() == MouseButton::Left) MC::heldLeft = false;
+            if (event.getButton() == MouseButton::Right) MC::heldRight = false;
+        }
 
     };
 

@@ -250,8 +250,8 @@ void Keystrokes::normalRender(int index, std::string& value) {
 				handler->left,
 				handler->backward,
 				handler->right,
-				CPSCounter::GetLeftHeld(),
-				CPSCounter::GetRightHeld(),
+				MC::heldLeft,
+				MC::heldRight,
 				handler->jumping
 			};
 
