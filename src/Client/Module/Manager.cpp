@@ -105,6 +105,7 @@
 #include "Modules/DisableMouseWheel/DisableMouseWheel.hpp"
 #include "Modules/DebugMenu/DebugMenu.hpp"
 #include "Modules/DirectionHUD/DirectionHUD.hpp"
+#include "Modules/Misc/AntiCheat/AntiCheat.hpp"
 
 void ModuleManager::getModules() { // TODO: some module is null here for some reason, investigation required
 	for (const auto& pair : moduleMap) {
@@ -261,6 +262,7 @@ void ModuleManager::initialize() {
 	addService<ImGUIMouseListener>();
 	addService<ImGUIKeyListener>();
 	addService<ScriptMarketplace>();
+	addService<AntiCheat>();
 
 	initialized = true;
 }

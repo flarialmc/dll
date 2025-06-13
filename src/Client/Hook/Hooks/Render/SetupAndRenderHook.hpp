@@ -175,6 +175,17 @@ private:
         SDK::clientInstance = muirc->getClientInstance();
         SDK::hasInstanced = true;
 
+		/*if (SDK::clientInstance and SDK::clientInstance->getMinecraftGame() and SDK::clientInstance->getMinecraftGame()->getThirdPartyServerRepository())
+		{
+			auto TPSR = SDK::clientInstance->getMinecraftGame()->getThirdPartyServerRepository();
+
+
+			for (auto ss : TPSR->mThirdPartyServers)
+			{
+				std::cout << ss.first << std::endl;
+			}
+		}*/
+
         if(funcOriginalText == nullptr || oDrawImage == nullptr)
             hookDrawTextAndDrawImage(muirc);
 

@@ -40,3 +40,4 @@
 #include "Misc/ProtocolEvent.hpp"
 #include "Game/RenderItemInHandEvent.hpp"
 #include "Render/RenderOutlineSelectionEvent.hpp"
+#include "Render/Render3D.hpp"

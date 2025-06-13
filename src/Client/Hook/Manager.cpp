@@ -35,6 +35,7 @@
 #include "Hooks/Visual/RenderOutlineSelectionHook.hpp"
 #include "Hooks/Game/displayClientMessage.hpp"
 #include "Hooks/Game/getTimeOfDayHook.hpp"
+#include "Hooks/Render/RenderLevelHook.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
@@ -112,7 +113,7 @@ void HookManager::initialize() {
     addHook<RenderOutlineSelectionHook>();
     addHook<getTimeOfDayHook>();
 
-
+    addHook<RenderLevelHook>();
 
     if(VersionUtils::checkAboveOrEqual(21, 40)) {
         addHook<UpdatePlayerHook>();

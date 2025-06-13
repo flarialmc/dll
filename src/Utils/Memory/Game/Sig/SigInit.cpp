@@ -18,7 +18,8 @@ void SigInit::init2180() {
     //ADD_SIG("ResourcePackManager::_composeFullStack", "");
     //ADD_SIG("GeneralSettingsScreenController::GeneralSettingsScreenController", "");
     ADD_SIG("mce::TextureGroup::getTexture", "40 53 55 56 57 41 54 41 55 41 56 41 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 41 0F B6 E9");
-    //ADD_SIG("LevelUtils::getTimeOfDay", "? ? ? ? ? ? ?");
+    ADD_SIG("LevelRenderer::renderlevel", "48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 ? ? 44 0F 29 ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 89 44 24 ? 4C 8B EA");
+    ADD_SIG("InGamePlayScreen::_pick::gSurvivalPickRange", "f3 0f 10 05 ? ? ? ? 44 0f 2f f8");
 }
 
 void SigInit::init2170() {

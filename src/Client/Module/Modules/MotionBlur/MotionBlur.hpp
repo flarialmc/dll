@@ -25,8 +25,9 @@ public:
 
 	static inline std::vector<winrt::com_ptr<ID3D11ShaderResourceView>> previousFrames;
 
-	void onRender(RenderUnderUIEvent& event);
+	void onRenderUnderUI(RenderUnderUIEvent& event);
 
+	void onRender(RenderEvent& event);
 
 	void ImageWithOpacity(const winrt::com_ptr<ID3D11ShaderResourceView>& srv, ImVec2 size, float opacity);
 
