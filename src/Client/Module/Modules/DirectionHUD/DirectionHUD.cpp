@@ -54,6 +54,7 @@ void DirectionHUD::defaultConfig() {
     setDef("degreesText", (std::string)"ffffff", 1.f, false);
     setDef("degreesTextShadow", true);
     setDef("degreesTextShadow", (std::string)"000000", 1.f, false);
+    setDef("degreesTextShadowOffset", 0.003f);
     if (ModuleManager::initialized) Client::SaveSettings();
 }
 
@@ -117,6 +118,7 @@ void DirectionHUD::settingsRender(float settingsOffset) {
     addConditionalSlider(getOps<bool>("showDegrees"), "Degrees Text Size", "", "degreesTextSize", 3.0f, 0.5f);
     addConditionalSlider(getOps<bool>("showDegrees"), "Degrees Text Offset", "", "degreesTextOffset", 10.0f, 0.0f, false);
     addConditionalToggle(getOps<bool>("showDegrees"), "Degrees Text Shadow", "", "degreesTextShadow");
+    addConditionalSlider(getOps<bool>("showDegrees") && getOps<bool>("degreesTextShadow"), "Degrees Text Shadow Offset", "", "degreesTextShadowOffset", 0.02f, 0.001f);
 
     extraPadding();
 
@@ -269,8 +271,8 @@ void DirectionHUD::onRender(RenderEvent &event) {
         // shadow
         if (getOps<bool>("degreesTextShadow")) {
             FlarialGUI::FlarialTextWithFont(
-                hudCenterX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
-                realcenter.y + degreesTextOffset + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * uiscale,
+                hudCenterX + Constraints::RelativeConstraint(getOps<float>("degreesTextShadowOffset")) * uiscale,
+                realcenter.y + degreesTextOffset + Constraints::RelativeConstraint(getOps<float>("degreesTextShadowOffset")) * uiscale,
                 FlarialGUI::to_wide(degreesText).c_str(),
                 0, 0,
                 DWRITE_TEXT_ALIGNMENT_CENTER, degreesTextSize,
