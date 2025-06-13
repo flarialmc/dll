@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../Module.hpp"
-#include "../../../Client.hpp"
 #include <chrono>
 #include <vector>
 #include <deque>
+
 
 class TickData {
 public:
@@ -18,7 +18,9 @@ private:
 	std::string lastLookingAt = "";
 	std::vector<std::string> lookingAtTags = {};
 	Vec3<float> PrevPos{};
-	std::string speed = "0";
+	float xVelo = 0.f;
+	float yVelo = 0.f;
+	float zVelo = 0.f;
 	std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
 	float lerpYaw = 0.0f;
 	float lerpPitch = 0.0f;
