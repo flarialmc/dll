@@ -30,7 +30,6 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
     if (anyHovered) {
         if (!once)
         {
-            Logger::debug("trollings");
             WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Hand);
             once = true;
         }
@@ -38,7 +37,6 @@ bool FlarialGUI::RoundedButton(const int index, float x, float y, const D2D_COLO
     else {
         if (once)
         {
-            Logger::debug("trollings 2");
             WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
             once = false;
         }
