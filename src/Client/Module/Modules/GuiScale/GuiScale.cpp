@@ -75,7 +75,7 @@ void GuiScale::updateScale(float newScale) {
     SDK::screenView->VisualTree->root->forEachChild([this](std::shared_ptr<UIControl>& control) {
     control->updatePosition();
     });
-    
+
     if (delayDisable) {
         delayDisable = false;
         restored = true;

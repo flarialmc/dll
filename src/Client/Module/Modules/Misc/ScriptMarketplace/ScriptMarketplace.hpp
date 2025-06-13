@@ -63,7 +63,7 @@ public:
 
         std::string scriptName = String::WStrToStr(scriptNameW);
         std::string scriptType = String::WStrToStr(scriptTypeW);
-
+        FlarialGUI::Notify("Importing script '" + scriptName + "'... this may take a while.");
         std::thread([this, scriptName, scriptType]() {
             std::string url = fmt::format("https://1klcjc8um5aq.flarial.xyz/api/scripts/{}/{}/download", scriptType, scriptName);
             std::string data = GetString(url);
@@ -196,9 +196,9 @@ public:
 
         for (const auto &pair : event.getProtocolArgs()) {
             if (pair.first == std::wstring(L"configName")) {
-                FlarialGUI::Notify("Importing...");
-                std::thread([this, pair]() {
-                    std::string id = String::WStrToStr(pair.second);
+                std::string id = String::WStrToStr(pair.second);
+                FlarialGUI::Notify("Importing config ..." + id + " this may take a while.");
+                std::thread([this, pair, id]() {
                     Logger::info("config name {}", id);
 
                     std::string url = "https://1klcjc8um5aq.flarial.xyz/api/configs/" + id + "/download";
