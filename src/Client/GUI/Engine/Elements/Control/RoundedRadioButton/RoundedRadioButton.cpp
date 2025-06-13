@@ -1,6 +1,8 @@
 #include "../../../Engine.hpp"
 #include "../../../animations/fadeinout.hpp"
 
+bool once2 = false;
+
 bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR_F color, const D2D_COLOR_F textColor,
                                     const wchar_t *text, const float width, const float height, float radiusX,
                                     float radiusY, const std::string &radioNum, const std::string &currentNum) {
@@ -30,6 +32,32 @@ bool FlarialGUI::RoundedRadioButton(int index, float x, float y, const D2D_COLOR
                                     DWRITE_FONT_WEIGHT_REGULAR, textColor);
 
     if (isAdditionalY) SetIsInAdditionalYMode();
+
+    bool anyHovered = false;
+    for (const auto& isHovered : radioButtonsHovered | std::views::values) {
+        if (isHovered) {
+            anyHovered = true;
+            break;
+        }
+    }
+
+    if (anyHovered) {
+        if (!once2)
+        {
+            WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Hand);
+            once2 = true;
+        }
+    }
+    else {
+        if (once2)
+        {
+            WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+            once2 = false;
+        }
+    }
+
+    if (CursorInRect(x, y, width, height)) radioButtonsHovered[index] = true;
+    else radioButtonsHovered[index] = false;
 
     if (CursorInRect(x, y, width, height) && MC::mouseButton == MouseButton::Left && !MC::held) {
         MC::mouseButton = MouseButton::None;

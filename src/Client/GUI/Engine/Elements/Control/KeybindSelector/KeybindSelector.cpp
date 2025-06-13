@@ -5,6 +5,7 @@
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
+using namespace winrt::Windows::UI::Core;
 std::wstring formatDuration(long ms) {
 	std::wostringstream woss;
 	woss << ms / 1000 << L"." << (ms % 1000) / 100;
@@ -51,6 +52,15 @@ void FlarialGUI::KeybindSelector(const int index, float x, float y, std::string&
 	KeybindSelectors[index].curColor = FlarialGUI::LerpColor(KeybindSelectors[index].curColor, CursorInRect(x, y + (isInScrollView ? scrollpos : 0), percWidth, percHeight) ? D2D1::ColorF(col.r * 0.8, col.g * 0.8, col.b * 0.8, col.a) : col, 0.1f * FlarialGUI::frameFactor);
 
 	KeybindSelectors[index].curColor.a = ClickGUI::settingsOpacity;
+
+	if (CursorInRect(x, y + (isInScrollView ? scrollpos : 0), percWidth, percHeight) && !KeybindSelectors[index].isHovering) {
+		KeybindSelectors[index].isHovering = true;
+		WinrtUtils::setCursorTypeThreaded(CoreCursorType::Hand);
+	}
+	else if (!CursorInRect(x, y + (isInScrollView ? scrollpos : 0), percWidth, percHeight) && KeybindSelectors[index].isHovering) {
+		KeybindSelectors[index].isHovering = false;
+		WinrtUtils::setCursorTypeThreaded(CoreCursorType::Arrow);
+	}
 
 	std::string text;
 

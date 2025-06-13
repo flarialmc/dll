@@ -155,6 +155,7 @@ namespace FlarialGUI {
 	extern std::unordered_map<int, bool> ToggleIsHovering;
 	extern std::unordered_map<int, bool> gears;
 	extern std::unordered_map<int, bool> buttonsHovered;
+	extern std::unordered_map<int, bool> radioButtonsHovered;
 
 	inline int maxRect = 0;
 

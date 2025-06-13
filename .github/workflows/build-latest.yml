@@ -76,11 +76,19 @@ jobs:
           token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
       - name: Download dll
         uses: actions/download-artifact@v4.1.9
-      - name: setup nightly tag
+      - name: setup tags
         id: tag
         run: |
-          echo "TAG_NAME=nightly-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
-      - name: Nightly Release
+          if [[ "${{ env.OUTPUT1 }}" == "0" ]]; then
+            echo "TAG_NAME=nightly-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ env.OUTPUT1 }}" == "1" ]]; then
+            echo "TAG_NAME=release-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ env.OUTPUT1 }}" == "2" ]]; then
+            echo "TAG_NAME=beta-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          OUTPUT1: ${{ needs.windows-build.outputs.type}}
+      - name: Nightly Release (CDN)
         uses: softprops/action-gh-release@v2
         with:
           files:
@@ -94,7 +102,20 @@ jobs:
         env:
           OUTPUT1: ${{ needs.windows-build.outputs.type}}
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
-      - name: Release
+      - name: Nightly Release (Main Repo)
+        uses: softprops/action-gh-release@v2
+        with:
+          files:
+            Flarial_DLL/Flarial.dll
+          tag_name: ${{ env.TAG_NAME}}
+          body: ${{ github.event.head_commit.message }}
+          name: "Nightly Release"
+          token: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ env.OUTPUT1 == 0 }}
+        env:
+          OUTPUT1: ${{ needs.windows-build.outputs.type}}
+          TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
+      - name: Release (CDN)
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@example.com"
@@ -107,7 +128,20 @@ jobs:
         env:
           OUTPUT1: ${{ needs.windows-build.outputs.type}}
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
-      - name: Release as beta
+      - name: Release (Main Repo)
+        uses: softprops/action-gh-release@v2
+        with:
+          files:
+            Flarial_DLL/Flarial.dll
+          tag_name: ${{ env.TAG_NAME}}
+          body: ${{ github.event.head_commit.message }}
+          name: "Release"
+          token: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ env.OUTPUT1 == 1 }}
+        env:
+          OUTPUT1: ${{ needs.windows-build.outputs.type}}
+          TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
+      - name: Beta Release (CDN)
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@example.com"
@@ -116,6 +150,19 @@ jobs:
           git commit -m "Add Beta for Beta Commit: '${{ github.event.head_commit.message }}'"
           git push origin main
           echo "uploading as beta"
+        if: ${{ env.OUTPUT1 == 2 }}
+        env:
+          OUTPUT1: ${{ needs.windows-build.outputs.type}}
+          TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
+      - name: Beta Release (Main Repo)
+        uses: softprops/action-gh-release@v2
+        with:
+          files:
+            Flarial_DLL/Flarial.dll
+          tag_name: ${{ env.TAG_NAME}}
+          body: ${{ github.event.head_commit.message }}
+          name: "Beta Release"
+          token: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ env.OUTPUT1 == 2 }}
         env:
           OUTPUT1: ${{ needs.windows-build.outputs.type}}

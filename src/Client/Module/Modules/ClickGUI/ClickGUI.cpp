@@ -368,7 +368,6 @@ void ClickGUI::onRender(RenderEvent& event) {
 		if (!Client::settings.getSettingByName<bool>("noicons")->value) {
 			if (curr == "editmenu") FlarialGUI::image(IDR_STYLUS_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth), "PNG", true, FlarialGUI::D2DColorToImColor(RadioButtonDisabled));
 			else FlarialGUI::image(IDR_STYLUS_WHITE_PNG, D2D1::RectF(radioX, radioY, radioX + logoWidth, radioY + logoWidth), "PNG", true, FlarialGUI::D2DColorToImColor(RadioButtonEnabled));
-
 		}
 
 		/* tab buttons end */

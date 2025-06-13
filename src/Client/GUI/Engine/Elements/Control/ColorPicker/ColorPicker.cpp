@@ -4,6 +4,7 @@
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
+using namespace winrt::Windows::UI::Core;
 static std::map<std::string, std::string> sizes;
 
 void FlarialGUI::ColorPicker(const int index, float x, float y, std::string moduleName, std::string settingName) {
@@ -75,6 +76,15 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
     TextBoxes[index].curBgCol = FlarialGUI::LerpColor(TextBoxes[index].curBgCol, CursorInRect(x, y + (isInScrollView ? scrollpos : 0), s * 3.f, s * 0.82f) ? D2D1::ColorF(col.r * 0.8, col.g * 0.8, col.b * 0.8, col.a) : col, 0.1f * FlarialGUI::frameFactor);
 
     col.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
+
+    if (CursorInRect(x, y + (isInScrollView ? scrollpos : 0), s * 3.f, s * 0.82f) && !TextBoxes[index].isHovering) {
+        TextBoxes[index].isHovering = true;
+        WinrtUtils::setCursorTypeThreaded(CoreCursorType::Hand);
+    }
+    else if (!CursorInRect(x, y + (isInScrollView ? scrollpos : 0), s * 3.f, s * 0.82f) && TextBoxes[index].isHovering) {
+        TextBoxes[index].isHovering = false;
+        WinrtUtils::setCursorTypeThreaded(CoreCursorType::Arrow);
+    }
 
     FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, TextBoxes[index].curBgCol, s * 3.f, s * 0.82f, round.x, round.x);
 

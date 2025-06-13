@@ -79,6 +79,15 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 
 	TextBoxes[30 + index].curBgCol = FlarialGUI::LerpColor(TextBoxes[30 + index].curBgCol, CursorInRect(x, y + (isInScrollView ? scrollpos : 0), percWidth, percHeight) ? D2D1::ColorF(colToSet.r * 0.8, colToSet.g * 0.8, colToSet.b * 0.8, colToSet.a) : colToSet, 0.1f * FlarialGUI::frameFactor);
 
+	if (CursorInRect(x, y + (isInScrollView ? scrollpos : 0), percWidth, percHeight) && !TextBoxes[30 + index].isHovering) {
+		TextBoxes[30 + index].isHovering = true;
+		WinrtUtils::setCursorTypeThreaded(CoreCursorType::Hand);
+	}
+	else if (!CursorInRect(x, y + (isInScrollView ? scrollpos : 0), percWidth, percHeight) && TextBoxes[30 + index].isHovering) {
+		TextBoxes[30 + index].isHovering = false;
+		WinrtUtils::setCursorTypeThreaded(CoreCursorType::Arrow);
+	}
+
 	FlarialGUI::RoundedRect(x, y, TextBoxes[30 + index].curBgCol, percWidth, percHeight, round.x, round.x);
 
 	int limit = 5;

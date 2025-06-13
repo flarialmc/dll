@@ -55,6 +55,15 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 
 	TextBoxes[index].curBgCol.a = clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 
+	if (CursorInRect(x, y + (isInScrollView ? scrollpos : 0), Constraints::SpacingConstraint(1.85, textWidth), percHeight) && !TextBoxes[index].isHovering) {
+		TextBoxes[index].isHovering = true;
+		WinrtUtils::setCursorTypeThreaded(CoreCursorType::Hand);
+	}
+	else if (!CursorInRect(x, y + (isInScrollView ? scrollpos : 0), Constraints::SpacingConstraint(1.85, textWidth), percHeight) && TextBoxes[index].isHovering) {
+		TextBoxes[index].isHovering = false;
+		WinrtUtils::setCursorTypeThreaded(CoreCursorType::Arrow);
+	}
+
 	if (ClickGUI::settingsOpacity != 1) col.a = ClickGUI::settingsOpacity;
 
 	// rectangle bounds
