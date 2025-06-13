@@ -72,6 +72,10 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 	}
 
 	if (!activeColorPickerWindows && CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), FlarialGUI::DropDownMenus[index].isActive ? percHeight + maxHeight : percHeight)) {
+		if (MC::mouseButton == MouseButton::Left && MC::held &&
+			CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), percHeight)) {
+			WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Hand);
+		}
 		if (MC::mouseButton == MouseButton::Left && !MC::held &&
 			CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), percHeight)) {
 			MC::mouseButton = MouseButton::None;
