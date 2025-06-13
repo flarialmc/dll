@@ -13,8 +13,7 @@ void HiveStat::onEnable() {
     Module::onEnable();
     FlarialGUI::Notify("Hive Overlay works only in sky, bed, mm, ctf");
     FlarialGUI::Notify("To change the position of Hive Overlay, Please click " +
-                       ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>(
-                           "editmenubind")->value + " in the settings tab.");
+                       ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("editmenubind")->value + " in the settings tab.");
 }
 
 void HiveStat::onDisable() {
