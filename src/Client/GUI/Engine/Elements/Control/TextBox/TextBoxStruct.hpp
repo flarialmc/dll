@@ -10,4 +10,5 @@ struct TextBoxStruct {
     bool isAt1 = false;
     bool noCursorBgCol = true;
     D2D_COLOR_F curBgCol;
+    bool isHovering = false;
 };
