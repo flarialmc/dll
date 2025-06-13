@@ -286,6 +286,7 @@ void Client::initialize() {
 
 	Client::loadAvailableConfigs();
 	Client::SavePrivate();
+	if (!Client::privateInit) Client::LoadSettings();
 	if (Client::hasLegacySettings) Client::LoadPrivate();
 
 	Logger::success("5");
