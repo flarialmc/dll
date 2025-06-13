@@ -11,4 +11,5 @@ struct KeybindSelector {
     std::chrono::steady_clock::time_point currentOnKeyTime = std::chrono::steady_clock::now();
     D2D1_COLOR_F curColor{};
     bool curColorDone = false;
+    bool isHovering = false;
 };
