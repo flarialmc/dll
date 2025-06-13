@@ -110,6 +110,7 @@ void Client::UnregisterActivationHandler()
 
 void Client::createConfig(std::string name) {
 	// name is with .json extension
+	if (name.empty()) return;
 	std::ofstream file(Utils::getConfigsPath() + "\\" + name, std::ios::app);
 	if (!file) LOG_ERROR("Failed to create new config file '{}'", name);
 	else Client::switchConfig(name);
@@ -145,11 +146,10 @@ void Client::loadAvailableConfigs() {
 	const std::string directoryPath = Utils::getConfigsPath();
 	if (std::filesystem::exists(directoryPath) && std::filesystem::is_directory(directoryPath)) {
 		for (const auto& entry : std::filesystem::directory_iterator(directoryPath)) {
-			if (entry.path().extension() == ".json") {
+			if (entry.path().extension() == ".json" && !entry.path().filename().empty()) {
 				availableConfigs.push_back(entry.path().filename().string());
 			}
 		}
-		//
 	}
 	if (Client::hasLegacySettings) {
 		if (!std::filesystem::exists(Client::legacyDir) || !std::filesystem::is_directory(Client::legacyDir)) return;
