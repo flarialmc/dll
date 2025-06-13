@@ -302,6 +302,7 @@ public:
 				SDK::clientInstance->grabMouse(10);
 				FlarialGUI::ResetShit();
 				Client::SaveSettings();
+				Client::SavePrivate();
 			}
 		}
 
@@ -320,6 +321,7 @@ public:
 
 					FlarialGUI::ResetShit();
 					Client::SaveSettings();
+					Client::SavePrivate();
 				}
 			}
 			else {
