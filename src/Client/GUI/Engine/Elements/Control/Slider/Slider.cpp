@@ -293,5 +293,7 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 
 	startingPoint = percentage;
 
+	if (settingName == "uiscale") ModuleManager::getModule(moduleName)->prevAlignments = std::vector<DWRITE_TEXT_ALIGNMENT>(100, DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
+
 	return percentage;
 }
