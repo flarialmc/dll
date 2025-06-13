@@ -873,6 +873,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 						}
 						Client::SaveSettings();
 						Client::LoadSettings();
+						FlarialGUI::Notify("Reset all settings of " + currentModule->name);
 					}
 				}
 

@@ -248,6 +248,7 @@ void CustomCrosshair::CrosshairEditorWindow()
                 crosshair->SaveImage(settings.getSettingByName<std::string>("CurrentCrosshair")->value);
             }
             CrosshairReloaded = true;
+            FlarialGUI::Notify("Loaded the crosshair: " + CurrentSelectedCrosshair);
         }
 
         float CrosshairSelectorX = gridX + gridSize + Constraints::RelativeConstraint(0.022, "height", true);
