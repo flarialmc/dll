@@ -2,6 +2,9 @@ name: Build Flarial dll and add to newcdn as a release
 on:
   push:
     branches: [ "main", "scripting-v2" ]
+    tags:
+      - 'beta-*'
+      - 'release-*'
   pull_request:
     branches: [ "main", "scripting-v2" ]
   workflow_dispatch:
@@ -22,7 +25,20 @@ jobs:
       - name: "Check commit type"
         id: type
         run: |
-          if [[ "${{ github.event.head_commit.message }}" == *"nightly:"* ]]; then
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+              if [[ "${{ github.ref_name }}" == beta-* ]]; then
+                  echo "Continuing to build as beta (tag)"
+                  echo "status=2" >> "$GITHUB_OUTPUT"
+              elif [[ "${{ github.ref_name }}" == release-* ]]; then
+                  echo "Continuing to build as release (tag)"
+                  echo "status=1" >> "$GITHUB_OUTPUT"
+              else
+                  echo "Unknown tag type, exiting"
+                  gh run cancel ${{ github.run_id }}
+                  gh run watch ${{ github.run_id }}f
+                  exit 0
+              fi
+          elif [[ "${{ github.event.head_commit.message }}" == *"nightly:"* ]]; then
               echo "Continuing to build as nightly"
               echo "status=0" >> "$GITHUB_OUTPUT"
           elif [[ "${{ github.event.head_commit.message }}" == *"release:"* ]]; then
@@ -79,7 +95,9 @@ jobs:
       - name: setup tags
         id: tag
         run: |
-          if [[ "${{ env.OUTPUT1 }}" == "0" ]]; then
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "TAG_NAME=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ env.OUTPUT1 }}" == "0" ]]; then
             echo "TAG_NAME=nightly-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
           elif [[ "${{ env.OUTPUT1 }}" == "1" ]]; then
             echo "TAG_NAME=release-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
@@ -115,7 +133,7 @@ jobs:
         env:
           OUTPUT1: ${{ needs.windows-build.outputs.type}}
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
-      - name: Release (CDN)
+      - name: Release (CDN) - File Upload
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@example.com"
@@ -124,6 +142,20 @@ jobs:
           git commit -m "Add Release for Release Commit: '${{ github.event.head_commit.message }}'"
           git push origin main
           echo "uploading as release"
+        if: ${{ env.OUTPUT1 == 1 }}
+        env:
+          OUTPUT1: ${{ needs.windows-build.outputs.type}}
+          TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
+      - name: Release (CDN) - GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files:
+            Flarial_DLL/Flarial.dll
+          tag_name: ${{ env.TAG_NAME}}
+          body: ${{ github.event.head_commit.message }}
+          name: "Release"
+          repository: flarialmc/newcdn
+          token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
         if: ${{ env.OUTPUT1 == 1 }}
         env:
           OUTPUT1: ${{ needs.windows-build.outputs.type}}
@@ -141,7 +173,7 @@ jobs:
         env:
           OUTPUT1: ${{ needs.windows-build.outputs.type}}
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
-      - name: Beta Release (CDN)
+      - name: Beta Release (CDN) - File Upload
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@example.com"
@@ -150,6 +182,20 @@ jobs:
           git commit -m "Add Beta for Beta Commit: '${{ github.event.head_commit.message }}'"
           git push origin main
           echo "uploading as beta"
+        if: ${{ env.OUTPUT1 == 2 }}
+        env:
+          OUTPUT1: ${{ needs.windows-build.outputs.type}}
+          TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
+      - name: Beta Release (CDN) - GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files:
+            Flarial_DLL/Flarial.dll
+          tag_name: ${{ env.TAG_NAME}}
+          body: ${{ github.event.head_commit.message }}
+          name: "Beta Release"
+          repository: flarialmc/newcdn
+          token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
         if: ${{ env.OUTPUT1 == 2 }}
         env:
           OUTPUT1: ${{ needs.windows-build.outputs.type}}
