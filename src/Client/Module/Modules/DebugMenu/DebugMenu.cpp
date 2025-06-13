@@ -1,6 +1,7 @@
+#include <numbers>
+#include <cmath>
 #include "DebugMenu.hpp"
 #include "Tags.hpp"
-#include <numbers>
 #include "Modules/Time/Time.hpp"
 #include "SDK/Client/Block/BlockLegacy.hpp"
 #include "Modules/CPS/CPSCounter.hpp"
@@ -46,6 +47,8 @@ void JavaDebugMenu::defaultConfig() {
 	setDef("showFPS", true);
 	setDef("showDim", true);
 	setDef("showCoords", true);
+	setDef("showSpeed", true);
+	setDef("showVelocity", true);
 	setDef("showBreakProg", true);
 	setDef("alwaysShowBreakProg", true);
 	setDef("showServer", true);
@@ -54,7 +57,6 @@ void JavaDebugMenu::defaultConfig() {
 	setDef("showTime", true);
 	setDef("showInGameTime", true);
 	setDef("showUptime", true);
-	setDef("showSpeed", true);
 	setDef("showTargetedBlock", true);
 	setDef("showTargetedBlockTags", true);
 	setDef("showMaxTags", true);
@@ -111,6 +113,8 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
 	sigmaToggle("Show FPS and Frametime", "", "showFPS");
 	sigmaToggle("Show Entity Counter and Dimension", "", "showDim");
 	sigmaToggle("Show Coordinates Section", "", "showCoords");
+	sigmaToggle("Show Speed", "", "showSpeed");
+	sigmaToggle("Show Velocity", "", "showVelocity");
 	sigmaToggle("Show Break Progress", "", "showBreakProg");
 	skibidiToggle(getOps<bool>("showBreakProg"), "Always Show Break Progress", "", "alwaysShowBreakProg");
 	sigmaToggle("Show Server Section", "", "showServer");
@@ -119,7 +123,6 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
 	sigmaToggle("Show Local Time", "", "showTime");
 	sigmaToggle("Show Ingame Time", "", "showInGameTime");
 	sigmaToggle("Show Uptime", "", "showUptime");
-	sigmaToggle("Show Speed", "", "showSpeed");
 	sigmaToggle("Show Targeted Block", "", "showTargetedBlock");
 	skibidiToggle(getOps<bool>("showTargetedBlock"), "Show Targeted Block Tags", "", "showTargetedBlockTags");
 	skibidiToggle(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags"), "Show Maximum Number Of Block Tags", "", "showMaxTags");
@@ -225,7 +228,9 @@ void JavaDebugMenu::onTick(TickEvent& event) {
 	if (!SDK::clientInstance->getLocalPlayer()) return;
 	auto stateVectorComponent = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent();
 	if (stateVectorComponent != nullptr) {
-		speed = std::format("{:.2f}", stateVectorComponent->Pos.dist(PrevPos) * 20);
+		xVelo = (stateVectorComponent->Pos.x - PrevPos.x) * 20;
+		yVelo = (stateVectorComponent->Pos.y - PrevPos.y) * 20;
+		zVelo = (stateVectorComponent->Pos.z - PrevPos.z) * 20;
 		PrevPos = stateVectorComponent->Pos;
 	}
 	TickData tick{};
@@ -341,13 +346,20 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			left.emplace_back(std::format("Looking at block: {} {} {}", targetPos.x, targetPos.y, targetPos.z));
 		}
 
-		bool renderBreakProg = isOn("showBreakProg") && (getOps<bool>("alwaysShowBreakProg") || currentBreakProgress != 0.0f);
+		if (isOn("showSpeed")) {
+			left.emplace_back(std::format("Speed: {:.2f} blocks/s", sqrt(std::pow(xVelo, 2) + std::pow(yVelo, 2) + std::pow(zVelo, 2))));
+		}
 
+		if (isOn("showVelocity")) {
+			left.emplace_back(std::format("Velocity: {:.2f} / {:.2f} / {:.2f} blocks/s", xVelo, yVelo, zVelo));
+		}
+
+		bool renderBreakProg = isOn("showBreakProg") && (getOps<bool>("alwaysShowBreakProg") || currentBreakProgress != 0.0f);
 		if (renderBreakProg) {
 			left.emplace_back(std::format("Break Progress: {}%", static_cast<int>(currentBreakProgress)));
 		}
 
-		if (isOn("showCoords") || renderBreakProg) {
+		if (isOn("showCoords") || isOn("showSpeed") || isOn("showVelocity") || renderBreakProg) {
 			left.emplace_back("");
 		}
 
@@ -411,11 +423,6 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startTime).count()
 					) / 1000
 			)));
-			right.emplace_back("");
-		}
-
-		if (isOn("showSpeed")) {
-			right.emplace_back(std::format("Speed: {} blocks/s", speed));
 			right.emplace_back("");
 		}
 
