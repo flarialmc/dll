@@ -290,7 +290,6 @@ void Client::initialize() {
 
 	Logger::success("5");
 
-
 	FlarialGUI::ExtractImageResource(IDR_RED_LOGO_PNG, "red-logo.png", "PNG");
 	FlarialGUI::ExtractImageResource(IDR_CYAN_LOGO_PNG, "dev-logo.png", "PNG");
 	FlarialGUI::ExtractImageResource(IDR_GAMER_LOGO_PNG, "gamer-logo.png", "PNG");
