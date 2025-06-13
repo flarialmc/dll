@@ -81,7 +81,7 @@ float FlarialGUI::Slider(int index, float x, float y, float& startingPoint, cons
 
 	if (CursorInRect(x, y + (isInScrollView ? scrollpos : 0), percWidth, percHeight) && !TextBoxes[30 + index].isHovering) {
 		TextBoxes[30 + index].isHovering = true;
-		WinrtUtils::setCursorTypeThreaded(CoreCursorType::Hand);
+		WinrtUtils::setCursorTypeThreaded(CoreCursorType::IBeam);
 	}
 	else if (!CursorInRect(x, y + (isInScrollView ? scrollpos : 0), percWidth, percHeight) && TextBoxes[30 + index].isHovering) {
 		TextBoxes[30 + index].isHovering = false;

@@ -57,7 +57,7 @@ std::string FlarialGUI::TextBoxVisual(int index, std::string& text, int limit, f
 
 	if (CursorInRect(x, y + (isInScrollView ? scrollpos : 0), Constraints::SpacingConstraint(1.85, textWidth), percHeight) && !TextBoxes[index].isHovering) {
 		TextBoxes[index].isHovering = true;
-		WinrtUtils::setCursorTypeThreaded(CoreCursorType::Hand);
+		WinrtUtils::setCursorTypeThreaded(CoreCursorType::IBeam);
 	}
 	else if (!CursorInRect(x, y + (isInScrollView ? scrollpos : 0), Constraints::SpacingConstraint(1.85, textWidth), percHeight) && TextBoxes[index].isHovering) {
 		TextBoxes[index].isHovering = false;

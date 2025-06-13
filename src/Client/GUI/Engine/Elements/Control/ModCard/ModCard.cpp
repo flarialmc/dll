@@ -1,13 +1,16 @@
 #include "../../../../../Module/Modules/ClickGUI/Elements/ClickGUIElements.hpp"
 #include "../../../../../../Assets/Assets.hpp"
 #include "../../../../../Module/Modules/ClickGUI/ClickGUI.hpp"
+#include "../Utils/WinrtUtils.hpp"
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
 std::map<int, ID2D1Bitmap *> ClickGUIElements::images;
 std::vector<Vec2<float>> sizesr;
 std::vector<Vec2<float>> shadowsizesr;
+std::vector<bool> hoveringFav;
 
+using namespace winrt::Windows::UI::Core;
 void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const int index, bool visible, float opacity) {
     if (opacity == -600.f) opacity = ClickGUI::modcardOpacity;
     Vec2<float> round = Constraints::RoundingConstraint(34, 34);
@@ -23,8 +26,11 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         shadowsizesr.emplace_back(0.01, 0.01);
     }
 
-    if (!visible)
-        return;
+    if (index > hoveringFav.size() - 1 || index == 0) {
+        hoveringFav.emplace_back(false);
+    }
+
+    if (!visible) return;
 
     // Bottom rounded rect
     float BottomRoundedWidth = sizesr[index].x;
@@ -119,7 +125,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
 
     float paddingSize = Constraints::RelativeConstraint(0.28);
     if (!FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize) && !FlarialGUI::CursorInRect(Constraints::PercentageConstraint(0.43, "left"), Constraints::PercentageConstraint(0.15, "top") + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
-        FlarialGUI::Tooltip("mod_" + FlarialGUI::cached_to_string(index), x, realY, mod->description, BottomRoundedWidth, TopRoundedHeight);
+        FlarialGUI::Tooltip("mod_" + FlarialGUI::cached_to_string(index), x, realY, mod->description, BottomRoundedWidth, TopRoundedHeight, true, false, std::chrono::milliseconds(3000));
     }
 
     FlarialGUI::RoundedRect(modiconx, modicony, mod3Col,
@@ -192,11 +198,22 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     D2D1_COLOR_F modicon = ClickGUI::getColor("modicon");
 
     if (mod->settings.getSettingByName<bool>("favorite")->value || FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
-        if (mod->settings.getSettingByName<bool>("favorite")->value && !FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
+        if (mod->settings.getSettingByName<bool>("favorite")->value/* && !FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)*/) {
             modicon = D2D1::ColorF(D2D1::ColorF::Gold);
         }
         if (FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
             FlarialGUI::Tooltip("favorite_" + FlarialGUI::cached_to_string(index), x, realY, mod->settings.getSettingByName<bool>("favorite")->value ? "Unfavorite?" : "Favorite?", BottomRoundedWidth, TopRoundedHeight, true, false, std::chrono::milliseconds(1));
+        }
+    }
+    if (FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
+        if (!hoveringFav[index]) {
+            WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Hand);
+            hoveringFav[index] = true;
+        }
+    } else if (!FlarialGUI::CursorInRect(modiconx, modicony + FlarialGUI::scrollpos, paddingSize, paddingSize)) {
+        if (hoveringFav[index]) {
+            WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+            hoveringFav[index] = false;
         }
     }
     FlarialGUI::image(iconId, D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize), "PNG", true, FlarialGUI::D2DColorToImColor(modicon)); //, FlarialGUI::D2DColorToImColor(modicon)
