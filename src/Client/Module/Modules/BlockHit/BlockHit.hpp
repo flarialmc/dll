@@ -10,9 +10,7 @@ public:
 	Perspective perspective;
 
 	BlockHit() : Module("Block Hit", "Sword Blocking Animation like Java (visual only)",
-		IDR_SWORD_PNG, "") {
-		
-	};
+		IDR_SWORD_PNG, "") {};
 
 	void onEnable() override;
 
