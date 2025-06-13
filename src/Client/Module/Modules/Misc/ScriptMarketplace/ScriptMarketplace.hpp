@@ -201,7 +201,7 @@ public:
                     std::string id = String::WStrToStr(pair.second);
                     Logger::info("config name {}", id);
 
-                    std::string url = "http://node2.sear.host:5019/api/configs/" + id + "/download";
+                    std::string url = "https://1klcjc8um5aq.flarial.xyz/api/configs/" + id + "/download";
                     url.erase(std::remove(url.begin(), url.end(), ' '), url.end());
 
                     std::filesystem::path tempZipPath = std::filesystem::temp_directory_path() / (id + ".zip");
