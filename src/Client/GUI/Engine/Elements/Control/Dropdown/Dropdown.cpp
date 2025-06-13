@@ -71,11 +71,11 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 		}
 	}
 
-	if (!activeColorPickerWindows && CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), percHeight + maxHeight)) {
-		if (MC::mouseButton == MouseButton::Left &&
+	if (!activeColorPickerWindows && CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), FlarialGUI::DropDownMenus[index].isActive ? percHeight + maxHeight : percHeight)) {
+		if (MC::mouseButton == MouseButton::Left && !MC::held &&
 			CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), percHeight)) {
-			//MC::mouseButton = MouseButton::None;
-			FlarialGUI::DropDownMenus[index].isActive = true;
+			MC::mouseButton = MouseButton::None;
+			FlarialGUI::DropDownMenus[index].isActive = !FlarialGUI::DropDownMenus[index].isActive;
 			value = FlarialGUI::DropDownMenus[index].selected;
 		}
 		if (DropDownMenus[index].firstHover) {
@@ -83,7 +83,7 @@ std::string FlarialGUI::Dropdown(int index, float x, float y, const std::vector<
 			DropDownMenus[index].firstHover = false;
 		}
 	}
-	else if (!CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), percHeight + maxHeight)) {
+	else if (!CursorInRect(x, clickingY, Constraints::SpacingConstraint(1.85, textWidth), FlarialGUI::DropDownMenus[index].isActive ? percHeight + maxHeight : percHeight)) {
 		if (MC::mouseButton == MouseButton::Left) {
 			FlarialGUI::DropDownMenus[index].isActive = false;
 			value = FlarialGUI::DropDownMenus[index].selected;
