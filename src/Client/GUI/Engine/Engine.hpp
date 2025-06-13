@@ -149,6 +149,7 @@ namespace FlarialGUI {
 	extern std::unordered_map<int, ColorPicker> ColorPickers;
 	extern std::unordered_map<int, DropdownStruct> DropDownMenus;
 	extern std::unordered_map<int, KeybindSelector> KeybindSelectors;
+	extern std::unordered_map<int, bool> ToggleIsHovering;
 	extern std::unordered_map<int, bool> gears;
 	extern std::unordered_map<int, bool> buttons;
 
