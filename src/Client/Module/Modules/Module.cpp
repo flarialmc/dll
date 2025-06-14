@@ -166,8 +166,11 @@ void Module::normalRenderCore(int index, std::string& text) {
 		getColor("glow"), rounde.x,
 		(getOps<float>("glowAmount") / 100.f) * Constraints::PercentageConstraint(0.1f, "top"));
 
+	float blur = Client::settings.getSettingByName<float>("blurintensity")->value;
 	if (getOps<bool>("BlurEffect"))
 		FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(topleft.x, topleft.y, topleft.x + rectWidth, topleft.y + rectHeight), rounde.x, rounde.x));
+		//Blur::RenderBlur(SwapchainHook::mainRenderTargetView, 3, blur, topleft.x, topleft.y, rectWidth, rectHeight, rounde.x);
+
 
 	if (getOps<bool>("rectShadow")) FlarialGUI::RoundedRect(
 		topleft.x + Constraints::RelativeConstraint(getOps<float>("rectShadowOffset")),

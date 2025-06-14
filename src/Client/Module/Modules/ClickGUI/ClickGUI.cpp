@@ -893,7 +893,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 		FlarialGUI::PopSize(); // Pops base rect
 	}
 
-	if (realBlurAmount < 0.01f) setEnabled(false);
+	if (realBlurAmount < 0.1f) setEnabled(false);
 
 	FlarialGUI::inMenu = this->enabledState;
 
