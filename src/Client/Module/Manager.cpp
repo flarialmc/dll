@@ -296,7 +296,40 @@ void ModuleManager::restart() {
 		}
 	}
 	initialized = true;
+	if (Client::hasLegacySettings) {
+		fs::path pathToCheck;
+		if (Client::legacySettings.getSettingByName<std::string>("currentConfig")->value != "default") pathToCheck = fs::path(Client::legacyDir) / fmt::format("{}\\{}", Client::legacyDir, Client::legacySettings.getSettingByName<std::string>("currentConfig")->value);
+		else pathToCheck = Client::legacyDir;
 
+		if (fs::exists(pathToCheck) && fs::is_directory(pathToCheck) && pathToCheck.filename().string()[0] != '!') {
+			if (Client::legacySettings.getSettingByName<std::string>("currentConfig")->value == "default") {
+				if (!fs::exists(Client::legacyDir + "\\!default")) {
+					if (fs::create_directory(Client::legacyDir + "\\!default")) {} 
+					else return LOG_ERROR("Failed to create new default directory for Legacy");
+				}
+
+				for (const auto& entry : fs::directory_iterator(Client::legacyDir)) {
+					if (entry.is_regular_file() && entry.path().extension() == ".flarial") {
+						try {
+							fs::rename(entry.path(), (Client::legacyDir + "\\!default") / entry.path().filename());
+						}
+						catch (fs::filesystem_error& e) {
+							return LOG_ERROR("Failed to move file {} to legacy default folder", entry.path().filename().string());
+						}
+					}
+				}
+			}
+			else {
+				std::error_code ec_rename;
+				fs::rename(pathToCheck, pathToCheck.parent_path().string() + "\\!" + pathToCheck.filename().string(), ec_rename);
+
+				if (ec_rename) {
+					LOG_ERROR("Failed to exclude legacy setting: {}", ec_rename.message());
+					return;
+				}
+			}
+		}
+	}
 	ScriptManager::reloadScripts();
 	Client::SaveSettings();
 }

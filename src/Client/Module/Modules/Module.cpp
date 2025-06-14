@@ -173,8 +173,8 @@ void Module::normalRenderCore(int index, std::string& text) {
 
 
 	if (getOps<bool>("rectShadow")) FlarialGUI::RoundedRect(
-		topleft.x + Constraints::RelativeConstraint(getOps<float>("rectShadowOffset")),
-		topleft.y + Constraints::RelativeConstraint(getOps<float>("rectShadowOffset")),
+		topleft.x + Constraints::RelativeConstraint(getOps<float>("rectShadowOffset")) * getOps<float>("uiscale"),
+		topleft.y + Constraints::RelativeConstraint(getOps<float>("rectShadowOffset")) * getOps<float>("uiscale"),
 		getColor("rectShadow"),
 		rectWidth,
 		rectHeight,
@@ -725,8 +725,9 @@ void Module::postLoad(bool softLoad) {
 
 void Module::loadLegacySettings() {
 	if (isScripting() || !Client::legacySettings.getSettingByName<std::string>("currentConfig")) return;
-	if (Client::legacySettings.getSettingByName<std::string>("currentConfig")->value != "default") legacySettingsPath = fmt::format("{}\\{}\\{}.flarial", Client::legacyDir, Client::legacySettings.getSettingByName<std::string>("currentConfig")->value, name);
-	else legacySettingsPath = fmt::format("{}\\{}.flarial", Client::legacyDir, name);
+	if (Client::legacySettings.getSettingByName<std::string>("currentConfig")->value != "default") legacySettingsPath = std::filesystem::path(Client::legacyDir) / Client::legacySettings.getSettingByName<std::string>("currentConfig")->value / (name + ".flarial");
+	else if (std::filesystem::exists(Client::legacyDir + "\\default") && std::filesystem::is_directory(Client::legacyDir + "\\default")) legacySettingsPath = std::filesystem::path(Client::legacyDir) / "default" / (name + ".flarial");
+	else legacySettingsPath = std::filesystem::path(Client::legacyDir) / (name + ".flarial");
 
 	if (!std::filesystem::exists(legacySettingsPath)) return;
 
@@ -850,7 +851,7 @@ void Module::defaultAddSettings(std::string type) {
 	}
 	else if (type == "colors") {
 		addColorPicker("Text Color", "", "text");
-		addColorPicker("Background Color", "", "bg");
+		addConditionalColorPicker(getOps<bool>("showBg"), "Background Color", "", "bg");
 		addConditionalColorPicker(getOps<bool>("rectShadow"), "Background Shadow Color", "", "rectShadow");
 		addConditionalColorPicker(getOps<bool>("textShadow"), "Text Shadow Color", "", "textShadow");
 		addConditionalColorPicker(getOps<bool>("border"), "Border Color", "", "border");

@@ -82,7 +82,6 @@ void Time::onRender(RenderEvent& event)
 
             if (getOps<bool>("timeBeforeDate")) text += "\n" + dateStr;
             else text = dateStr + "\n" + text;
-            Logger::debug(text);
         }
 
     }
