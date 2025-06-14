@@ -539,6 +539,10 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			rightYoffset += textHeight / 3.0f + yPadding * 2;
 		}
 
+		// other cool stuff
+
+		ImDrawList* drawList = ImGui::GetBackgroundDrawList();
+
 		// frametime graph start
 
 		if (getOps<bool>("showFTgraph")) {
@@ -554,6 +558,13 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 			while (prevFrameTimes.size() >= graphLen) prevFrameTimes.pop_front();
 			prevFrameTimes.push_back(MC::frameTime);
+
+			FlarialGUI::RoundedRect(
+				borderSize, startHeight,
+				D2D1_COLOR_F(0.5, 0.5, 0.5, 0.2),
+				barWidth * graphLen - borderSize, maxRectHeight - borderSize,
+				0, 0
+			);
 
 			for (float ft: prevFrameTimes) {
 				D2D1_COLOR_F barCol;
@@ -616,11 +627,11 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			}
 
 			if (getOps<bool>("showThreshold")) {
-				FlarialGUI::RoundedRect(
-					borderSize, startHeight + maxRectHeight / 2,
-					D2D1_COLOR_F(1, 1, 1, 1),
-					barWidth * graphLen - borderSize, borderSize,
-					0, 0
+				drawList->AddLine(
+					ImVec2(borderSize, startHeight + maxRectHeight / 2),
+					ImVec2(barWidth * graphLen, startHeight + maxRectHeight / 2 + borderSize),
+					IM_COL32(255, 255, 255, 255),
+					borderSize
 				);
 
 				FlarialGUI::FlarialTextWithFont(
@@ -662,8 +673,6 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 		float yawRad = (180.f + lerpYaw) * (std::numbers::pi / 180.f);
 		float pitchRad = (-lerpPitch) * (std::numbers::pi / 180.f);
-
-		ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 
 		ImU32 red = IM_COL32(255, 0, 0, 255);
 		ImU32 green = IM_COL32(0, 255, 0, 255);
