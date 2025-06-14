@@ -743,46 +743,47 @@ void SwapchainHook::prepareBlur() {
 void SwapchainHook::Fonts() {
     /* IMPORTANT FONT STUFF */
     if (ImGui::GetCurrentContext()) {
+        static bool fontRebuildQueued = false;
 
         if (FlarialGUI::DoLoadFontLater) {
-
-
             FontKey fontK = FlarialGUI::LoadFontLater;
-            if (Client::settings.getSettingByName<bool>("overrideFontWeight")->value) fontK.weight = FlarialGUI::GetFontWeightFromString(Client::settings.getSettingByName<std::string>("fontWeight")->value);
-                if (!FlarialGUI::FontMap[fontK]) {
-                    FlarialGUI::LoadFontFromFontFamily(fontK);
-                }
+            if (Client::settings.getSettingByName<bool>("overrideFontWeight")->value) {
+                fontK.weight = FlarialGUI::GetFontWeightFromString(Client::settings.getSettingByName<std::string>("fontWeight")->value);
+            }
+            
+            if (!FlarialGUI::FontMap[fontK]) {
+                FlarialGUI::LoadFontFromFontFamily(fontK);
+            }
             FlarialGUI::DoLoadFontLater = false;
-
         }
-
-        //std::cout << FlarialGUI::WideToNarrow(FlarialGUI::GetFontFilePath(L"Dosis", DWRITE_FONT_WEIGHT_EXTRA_BLACK)).c_str() << std::endl;
-        /*
-        if(!allfontloaded) {
-            FlarialGUI::LoadFonts(FlarialGUI::FontMap);
-
-            allfontloaded = true;
-        }
-        */
 
         auto& io = ImGui::GetIO();
 
+        // Batch font operations to reduce expensive device object recreation
         if (FlarialGUI::HasAFontLoaded) {
-            io.Fonts->Build();
-            if (!queue) {
-                ImGui_ImplDX11_InvalidateDeviceObjects();
-                ImGui_ImplDX11_CreateDeviceObjects();
-            }
-            else {
-                ImGui_ImplDX12_InvalidateDeviceObjects();
-                ImGui_ImplDX12_CreateDeviceObjects();
-            }
-
+            fontRebuildQueued = true;
             FlarialGUI::HasAFontLoaded = false;
         }
 
+        // Only rebuild when actually needed and defer expensive operations
+        if (fontRebuildQueued) {
+            io.Fonts->Build();
+            
+            // Use a static frame counter to defer expensive device object recreation
+            static int frameDelay = 0;
+            if (++frameDelay >= 3) { // Wait 3 frames to batch multiple font loads
+                if (!queue) {
+                    ImGui_ImplDX11_InvalidateDeviceObjects();
+                    ImGui_ImplDX11_CreateDeviceObjects();
+                } else {
+                    ImGui_ImplDX12_InvalidateDeviceObjects();
+                    ImGui_ImplDX12_CreateDeviceObjects();
+                }
+                fontRebuildQueued = false;
+                frameDelay = 0;
+            }
+        }
     }
-
     /* IMPORTANT FONT STUFF */
 }
 void SwapchainHook::FPSMeasure() {
@@ -818,44 +819,53 @@ ID3D11Texture2D *SwapchainHook::GetBackbuffer() {
 }
 
 void SwapchainHook::SaveBackbuffer(bool underui) {
-
+    // Only release SavedD3D11BackBuffer, keep ExtraSavedD3D11BackBuffer persistent
     Memory::SafeRelease(SavedD3D11BackBuffer);
-    Memory::SafeRelease(ExtraSavedD3D11BackBuffer);
+    
     if (!SwapchainHook::queue) {
-
         SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&SavedD3D11BackBuffer));
 
         if (FlarialGUI::needsBackBuffer) {
-
-            if (!ExtraSavedD3D11BackBuffer) {
-                D3D11_TEXTURE2D_DESC textureDesc = {};
-                SavedD3D11BackBuffer->GetDesc(&textureDesc);
+            // Check if we need to recreate ExtraSavedD3D11BackBuffer due to size change
+            D3D11_TEXTURE2D_DESC currentDesc = {};
+            SavedD3D11BackBuffer->GetDesc(&currentDesc);
+            
+            bool needsRecreate = !ExtraSavedD3D11BackBuffer || 
+                               lastBackbufferWidth != currentDesc.Width || 
+                               lastBackbufferHeight != currentDesc.Height;
+            
+            if (needsRecreate) {
+                Memory::SafeRelease(ExtraSavedD3D11BackBuffer);
+                
+                D3D11_TEXTURE2D_DESC textureDesc = currentDesc;
                 textureDesc.Usage = D3D11_USAGE_DEFAULT;
                 textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
                 textureDesc.CPUAccessFlags = 0;
+                textureDesc.MiscFlags = 0; // Ensure no unnecessary flags
 
-                SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
+                HRESULT hr = SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
+                if (SUCCEEDED(hr)) {
+                    lastBackbufferWidth = currentDesc.Width;
+                    lastBackbufferHeight = currentDesc.Height;
+                }
             }
 
-            if (underui) {
-
-                if (UnderUIHooks::bgfxCtx->m_msaart) {
-                    context->ResolveSubresource(ExtraSavedD3D11BackBuffer, 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+            // Only copy if we have a valid ExtraSavedD3D11BackBuffer
+            if (ExtraSavedD3D11BackBuffer) {
+                if (underui) {
+                    if (UnderUIHooks::bgfxCtx->m_msaart) {
+                        context->ResolveSubresource(ExtraSavedD3D11BackBuffer, 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+                    } else {
+                        context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
+                    }
                 } else {
                     context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
                 }
-
-            } else {
-                context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
             }
         }
-
-
     }
     else {
-        HRESULT hr;
-
-        hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&SavedD3D11BackBuffer));
+        HRESULT hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&SavedD3D11BackBuffer));
         if (FAILED(hr)) std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
     }
 }
