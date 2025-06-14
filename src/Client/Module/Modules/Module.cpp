@@ -722,8 +722,9 @@ void Module::postLoad(bool softLoad) {
 
 void Module::loadLegacySettings() {
 	if (isScripting() || !Client::legacySettings.getSettingByName<std::string>("currentConfig")) return;
-	if (Client::legacySettings.getSettingByName<std::string>("currentConfig")->value != "default") legacySettingsPath = fmt::format("{}\\{}\\{}.flarial", Client::legacyDir, Client::legacySettings.getSettingByName<std::string>("currentConfig")->value, name);
-	else legacySettingsPath = fmt::format("{}\\{}.flarial", Client::legacyDir, name);
+	if (Client::legacySettings.getSettingByName<std::string>("currentConfig")->value != "default") legacySettingsPath = std::filesystem::path(Client::legacyDir) / Client::legacySettings.getSettingByName<std::string>("currentConfig")->value / (name + ".flarial");
+	else if (std::filesystem::exists(Client::legacyDir + "\\default") && std::filesystem::is_directory(Client::legacyDir + "\\default")) legacySettingsPath = std::filesystem::path(Client::legacyDir) / "default" / (name + ".flarial");
+	else legacySettingsPath = std::filesystem::path(Client::legacyDir) / (name + ".flarial");
 
 	if (!std::filesystem::exists(legacySettingsPath)) return;
 

@@ -290,7 +290,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
 void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iterations, float intensity)
 {
 
-    if(intensity < 0) return;
+    if (intensity < 0) return;
 
     if (!SwapchainHook::GetBackbuffer()) return;
 
@@ -349,7 +349,7 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 
     hasDoneFrames = true;
 
-    constantBuffer.offset = XMFLOAT2(intensity * 3, intensity * 3);
+    constantBuffer.offset = XMFLOAT2(intensity, intensity);
     pContext->PSSetShader(pDownsampleShader, nullptr, 0);
     RenderToRTV(renderTargetViews[1], pOrigShaderResourceView.get(), fbSizes[1]);
 
