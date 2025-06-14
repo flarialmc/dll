@@ -1,78 +1,21 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Events/EventManager.hpp"
 
 
 class MEM : public Module {
 public:
-	MEM() : Module("Memory", "Shows your current system RAM usage.", IDR_MEMORY_PNG, "") {
+	MEM();;
 
-		Module::setup();
-	};
+	void onEnable() override;
 
-	void onEnable() override {
-		Listen(this, RenderEvent, &MEM::onRender)
-			Module::onEnable();
-	}
+	void onDisable() override;
 
-	void onDisable() override {
-		Deafen(this, RenderEvent, &MEM::onRender)
-			Module::onDisable();
-	}
+	void defaultConfig() override;
 
-	void defaultConfig() override {
-		Module::defaultConfig();
-		if (settings.getSettingByName<float>("textscale") == nullptr) settings.addSetting("textscale", 0.80f);
-		if (settings.getSettingByName<std::string>("text") == nullptr) settings.addSetting("text", (std::string)"{value}");
-	}
+	void settingsRender(float settingsOffset) override;
 
-	void settingsRender(float settingsOffset) override {
-		float x = Constraints::PercentageConstraint(0.019, "left");
-		float y = Constraints::PercentageConstraint(0.10, "top");
-
-		const float scrollviewWidth = Constraints::RelativeConstraint(0.5, "height", true);
-
-
-		FlarialGUI::ScrollBar(x, y, 140, Constraints::SpacingConstraint(5.5, scrollviewWidth), 2);
-		FlarialGUI::SetScrollView(x - settingsOffset, Constraints::PercentageConstraint(0.00, "top"),
-			Constraints::RelativeConstraint(1.0, "width"),
-			Constraints::RelativeConstraint(0.88f, "height"));
-
-		this->addHeader("Main");
-		this->defaultAddSettings("main");
-		this->extraPadding();
-
-		this->addHeader("Text");
-		this->defaultAddSettings("text");
-		this->extraPadding();
-
-		this->addHeader("Colors");
-		this->defaultAddSettings("colors");
-		this->extraPadding();
-
-		this->addHeader("Misc");
-		this->defaultAddSettings("misc");
-
-		FlarialGUI::UnsetScrollView();
-		this->resetPadding();
-	}
-
-	void onRender(RenderEvent& event) {
-		if (isEnabled()) {
-			//TODO: (Memory module) Do megabytes mode
-			MEMORYSTATUSEX memory_status;
-			memory_status.dwLength = sizeof(memory_status);
-			GlobalMemoryStatusEx(&memory_status);
-			DWORDLONG total_memory = memory_status.ullTotalPhys;
-			DWORDLONG free_memory = memory_status.ullAvailPhys;
-			DWORDLONG used_memory = total_memory - free_memory;
-
-			int sussymem = static_cast<int>((used_memory * 100) / total_memory);
-
-			std::string text = FlarialGUI::cached_to_string(sussymem) + "%";
-
-			this->normalRender(4, text);
-		}
-	}
+	void onRender(RenderEvent& event);
 };
 

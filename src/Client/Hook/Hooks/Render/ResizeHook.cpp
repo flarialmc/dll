@@ -64,9 +64,9 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(SwapchainHook::ExtraSavedD3D11BackBuffer);
     Memory::SafeRelease(Blur::pConstantBuffer);
     Memory::SafeRelease(Blur::pSampler);
-    Memory::SafeRelease(Blur::pDownsampleShader);
+    Memory::SafeRelease(Blur::pGaussianBlurHorizontalShader);
     Memory::SafeRelease(Blur::pInputLayout);
-    Memory::SafeRelease(Blur::pUpsampleShader);
+    Memory::SafeRelease(Blur::pGaussianBlurVerticalShader);
     Memory::SafeRelease(Blur::pVertexBuffer);
     Memory::SafeRelease(Blur::pVertexShader);
     Memory::SafeRelease(SwapchainHook::d3d11Device);
@@ -85,10 +85,6 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(RealMotionBlurHelper::m_vertexShader);
     Memory::SafeRelease(RealMotionBlurHelper::m_vertexBuffer);
     MotionBlur::initted = false;
-
-
-    Blur::hasDoneFrames = false;
-    for (ID3D11Texture2D* tex : Blur::framebuffers) { Memory::SafeRelease(tex); Blur::framebuffers.clear(); }
 
     for (auto& i : ClickGUIElements::images) {
         Memory::SafeRelease(i.second);

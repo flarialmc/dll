@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ScriptLib.hpp"
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <ImGui/imgui.h>
 
 class ImGuiLib : public ScriptLib {

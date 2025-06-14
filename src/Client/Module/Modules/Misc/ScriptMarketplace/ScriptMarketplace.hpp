@@ -42,7 +42,7 @@ public:
             InternetCloseHandle(interwebs);
             return String::replaceAll(rtn, "|n", "\r\n");
         } catch (const std::exception &e) {
-            Logger::error(e.what());
+            LOG_ERROR(e.what());
         }
         return "";
     }
@@ -57,19 +57,19 @@ public:
         }
 
         if (scriptNameW.empty() || scriptTypeW.empty()) {
-            Logger::error("Missing scriptName or type in protocol event");
+            LOG_ERROR("Missing scriptName or type in protocol event");
             return;
         }
 
         std::string scriptName = String::WStrToStr(scriptNameW);
         std::string scriptType = String::WStrToStr(scriptTypeW);
-
+        FlarialGUI::Notify("Importing script '" + scriptName + "'... this may take a while.");
         std::thread([this, scriptName, scriptType]() {
             std::string url = fmt::format("https://1klcjc8um5aq.flarial.xyz/api/scripts/{}/{}/download", scriptType, scriptName);
             std::string data = GetString(url);
 
             if (data.empty()) {
-                Logger::error("Failed to download script content for {}", scriptName);
+                LOG_ERROR("Failed to download script content for {}", scriptName);
                 FlarialGUI::Notify("Failed to import script '" + scriptName + "'");
                 return;
             }
@@ -80,7 +80,7 @@ public:
             } else if (scriptType == "command") {
                 destinationFolder = "\\Scripts\\Commands\\";
             } else {
-                Logger::error("Invalid script type: {}", scriptType);
+                LOG_ERROR("Invalid script type: {}", scriptType);
                 FlarialGUI::Notify("Failed to import script '" + scriptName + "'");
                 return;
             }
@@ -90,7 +90,7 @@ public:
             std::filesystem::create_directories(dirPath, ec);
 
             if (ec) {
-                Logger::error("Failed to create directory {}: {}", dirPath.string(), ec.message());
+                LOG_ERROR("Failed to create directory {}: {}", dirPath.string(), ec.message());
                 FlarialGUI::Notify("Failed to import script '" + scriptName + "'");
                 return;
             }
@@ -100,7 +100,7 @@ public:
             std::ofstream file(filePath, std::ios::binary);
 
             if (!file.is_open()) {
-                Logger::error("Failed to open file for writing: {}", filePath);
+                LOG_ERROR("Failed to open file for writing: {}", filePath);
                 FlarialGUI::Notify("Failed to import script '" + scriptName + "'");
                 return;
             }
@@ -167,72 +167,116 @@ public:
         return true;
     }
 
+
+
+    bool hasFlarialExtension(mz_zip_archive& zip) {
+        // Get the number of files in the archive
+        mz_uint numFiles = mz_zip_reader_get_num_files(&zip);
+
+        for (mz_uint i = 0; i < numFiles; ++i) {
+            mz_zip_archive_file_stat file_stat;
+            if (!mz_zip_reader_file_stat(&zip, i, &file_stat)) {
+                std::cerr << "Failed to get file stat for index " << i << "\n";
+                continue;
+            }
+
+            std::string filename(file_stat.m_filename);
+            // Check if the filename ends with ".flarial"
+            if (filename.size() >= 8 && filename.substr(filename.size() - 8) == ".flarial") {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
     void onProtocolConfig(ProtocolEvent event) {
         if (event.getPath() != std::wstring(L"flarial-configs")) return;
 
         for (const auto &pair : event.getProtocolArgs()) {
             if (pair.first == std::wstring(L"configName")) {
-                FlarialGUI::Notify("Importing...");
-                std::thread([this, pair]() {
-                    std::string id = String::WStrToStr(pair.second);
+                std::string id = String::WStrToStr(pair.second);
+                FlarialGUI::Notify("Importing config ..." + id + " this may take a while.");
+                std::thread([this, pair, id]() {
                     Logger::info("config name {}", id);
 
-                    std::string url = "http://node2.sear.host:5019/api/configs/" + id + "/download";
+                    std::string url = "https://1klcjc8um5aq.flarial.xyz/api/configs/" + id + "/download";
                     url.erase(std::remove(url.begin(), url.end(), ' '), url.end());
 
                     std::filesystem::path tempZipPath = std::filesystem::temp_directory_path() / (id + ".zip");
 
                     if (!ScriptMarketplace::DownloadFile(url, tempZipPath.string())) {
-                        Logger::error("Failed to download config {} to temporary location", id);
+                        LOG_ERROR("Failed to download config {} to temporary location", id);
                         return;
                     }
 
                     std::string configname = id;
-                    Client::createConfig(configname);
 
                     std::filesystem::path extractionDir = std::filesystem::path(Utils::getConfigsPath()) / configname;
                     std::error_code ec;
                     std::filesystem::create_directories(extractionDir, ec);
                     if (ec) {
-                        Logger::error("Failed to create extraction directory {}: {}", extractionDir.string(), ec.message());
+                        LOG_ERROR("Failed to create extraction directory {}: {}", extractionDir.string(), ec.message());
                         return;
                     }
 
                     mz_zip_archive zip_archive;
                     memset(&zip_archive, 0, sizeof(zip_archive));
                     if (!mz_zip_reader_init_file(&zip_archive, tempZipPath.string().c_str(), 0)) {
-                        Logger::error("Failed to initialize zip archive from file for config {}", configname);
+                        LOG_ERROR("Failed to initialize zip archive from file for config {}", configname);
                         return;
                     }
+
+                    bool isLegacy = hasFlarialExtension(zip_archive);
+                    if (isLegacy)
+                    {
+                        Logger::info("IMPORTING LEGACY CONFIG {}", configname);
+                        extractionDir = std::filesystem::path(Utils::getConfigsPath()) / "Legacy" / configname;
+                    }
+
 
                     int fileCount = static_cast<int>(mz_zip_reader_get_num_files(&zip_archive));
                     for (int j = 0; j < fileCount; j++) {
                         mz_zip_archive_file_stat file_stat;
                         if (!mz_zip_reader_file_stat(&zip_archive, j, &file_stat)) {
-                            Logger::error("Failed to get file stat for file index {} in config {}", j, configname);
+                            LOG_ERROR("Failed to get file stat for file index {} in config {}", j, configname);
                             continue;
                         }
+
+                        std::string filename = file_stat.m_filename;
+                        std::transform(filename.begin(), filename.end(), filename.begin(), ::tolower);
                         std::filesystem::path destPath = extractionDir / file_stat.m_filename;
+
                         if (mz_zip_reader_is_file_a_directory(&zip_archive, j)) {
                             std::filesystem::create_directories(destPath, ec);
                             if (ec) {
-                                Logger::error("Failed to create directory {}: {}", destPath.string(), ec.message());
+                                LOG_ERROR("Failed to create directory {}: {}", destPath.string(), ec.message());
                             }
                         } else {
+                            
+                                if (filename == "main.json" || filename == "manifest.json" ||
+                                    std::filesystem::path(filename).extension() == ".png") {
+                                    continue;
+                                }
+
                             std::filesystem::create_directories(destPath.parent_path(), ec);
                             if (ec) {
-                                Logger::error("Failed to create directory {}: {}", destPath.parent_path().string(), ec.message());
+                                LOG_ERROR("Failed to create directory {}: {}", destPath.parent_path().string(), ec.message());
                                 continue;
                             }
+
+                            // Extract the file
                             if (!mz_zip_reader_extract_to_file(&zip_archive, j, destPath.string().c_str(), 0)) {
-                                Logger::error("Failed to extract file {} in config {}", file_stat.m_filename, configname);
+                                LOG_ERROR("Failed to extract file {} in config {}", file_stat.m_filename, configname);
                             }
                         }
                     }
+
                     mz_zip_reader_end(&zip_archive);
 
                     if (!std::filesystem::remove(tempZipPath, ec)) {
-                        Logger::error("Failed to delete temporary zip file {}: {}", tempZipPath.string(), ec.message());
+                        LOG_ERROR("Failed to delete temporary zip file {}: {}", tempZipPath.string(), ec.message());
                     }
 
                     Logger::success("Extracted config zip for {} to {}", configname, extractionDir.string());
@@ -245,6 +289,12 @@ public:
     }
 
     static void reloadAllConfigs() {
+        if (fs::exists(Client::legacyDir) && fs::is_directory(Client::legacyDir)) {
+            Client::legacySettings.addSetting("currentConfig", (std::string)"default");
+            Client::hasLegacySettings = true;
+            Client::softLoadLegacy = true;
+            Logger::custom(fg(fmt::color::dark_magenta), "Config", "Legacy dir already exists... aborting");
+        }
         Client::availableConfigs.clear();
         Client::loadAvailableConfigs();
         ModuleManager::restartModules = true;
