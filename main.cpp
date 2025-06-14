@@ -153,14 +153,19 @@ DWORD WINAPI init() {
     while (!Client::disable) {
         ModuleManager::syncState();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
     }
 
-    Client::SaveSettings();
-
-    Client::UnregisterActivationHandler();
-    ScriptManager::shutdown();
     ModuleManager::terminate();
     Logger::custom(fmt::fg(fmt::color::pink), "ModuleManager", "Shut down");
+
+    Client::SaveSettings();
+    Logger::custom(fmt::fg(fmt::color::pink), "Saving", "CONFIG");
+    Client::UnregisterActivationHandler();
+    Logger::custom(fmt::fg(fmt::color::pink), "UnregisterActivationHandler", "Shut down");
+    ScriptManager::shutdown();
+    Logger::custom(fmt::fg(fmt::color::pink), "ScriptManager", "Shut down");
+
     HookManager::terminate();
     Logger::custom(fmt::fg(fmt::color::pink), "HookManager", "Shut down");
     CommandManager::terminate();
