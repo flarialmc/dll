@@ -150,7 +150,10 @@ void Zoom::onGetSensitivity(SensitivityEvent& event)
 void Zoom::onMouse(MouseEvent& event)
 {
 	if (!this->isEnabled()) return;
-	if (SDK::getCurrentScreen() == "hud_screen" || SDK::getCurrentScreen() == "f1_screen" || SDK::getCurrentScreen() == "zoom_screen")
+	if (SDK::getCurrentScreen() == "hud_screen" || 
+		SDK::getCurrentScreen() == "f1_screen" || 
+		SDK::getCurrentScreen() == "zoom_screen" || 
+		SDK::getCurrentScreen() == "f3_screen")
 		if (this->active) {
 			//todo make it so that modules work together
 			auto fovchanger = ModuleManager::getModule("FOV Changer");
