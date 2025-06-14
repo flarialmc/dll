@@ -1,5 +1,7 @@
 #include <numbers>
 #include <cmath>
+#include <algorithm>
+#include <deque>
 #include "DebugMenu.hpp"
 #include "Tags.hpp"
 #include "Modules/Time/Time.hpp"
@@ -40,10 +42,18 @@ void JavaDebugMenu::defaultConfig() {
 	setDef("showBg", true);
 	setDef("text", (std::string)"ffffff", 1.f, false);
 	setDef("bg", (std::string)"000000", 0.5f, false);
+
 	setDef("imPoorButIWannaLookRich", false);
 	setDef("f5crosshair", false);
-	setDef("enableEverything", true);
 
+	setDef("showFTgraph", true);
+	setDef("showMinMaxFT", true);
+	setDef("showThreshold", true);
+	setDef("FTgraphHeight", 25.f);
+	setDef("FTgraphWidth", 100.f);
+	setDef("FTbarWidth", 6.f);
+
+	setDef("enableEverything", true);
 	setDef("showFPS", true);
 	setDef("showDim", true);
 	setDef("showCoords", true);
@@ -104,6 +114,16 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
 	addHeader("Module Settings");
 	addToggle("I'm broke but I wanna look rich :(", "only for the real broke sigmas", "imPoorButIWannaLookRich");
 	addToggle("Show Debug Crosshair In F5", "", "f5crosshair");
+	extraPadding();
+
+	addToggle("Show FrameTime Graph", "nerdy stats!", "showFTgraph");
+	addConditionalToggle(getOps<bool>("showFTgraph"), "Show Min/Max FrameTime", "", "showMinMaxFT");
+	addConditionalToggle(getOps<bool>("showFTgraph"), "Show 30/60FPS Lines And Text", "", "showThreshold");
+	addConditionalSlider(getOps<bool>("showFTgraph"), "Graph Height", "", "FTgraphHeight", 50.f, 10.f);
+	addConditionalSlider(getOps<bool>("showFTgraph"), "Graph Width", "", "FTgraphWidth", 200.f, 40.f);
+	addConditionalSlider(getOps<bool>("showFTgraph"), "Bar Width", "", "FTbarWidth", 15.f, 1.f);
+	extraPadding();
+
 	addToggle("Enable All Text", "", "enableEverything");
 
 	if (!getOps<bool>("enableEverything")) {
@@ -291,7 +311,9 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) {
 void JavaDebugMenu::onRender(RenderEvent& event) {
 	if (!this->isEnabled()) return;
 	if (this->active && (SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "hud_screen")) {
-		float textHeight = Constraints::RelativeConstraint(0.1f * getOps<float>("uiscale"));
+		float uiscale = getOps<float>("uiscale");
+		float uiscaleConst = Constraints::RelativeConstraint(0.001f * uiscale);
+		float textHeight = Constraints::RelativeConstraint(0.1f * uiscale);
 		float textSize = Constraints::SpacingConstraint(2.0f, textHeight);
 		float yPadding = Constraints::SpacingConstraint(0.025f, textHeight);
 		float rounding = getOps<float>("rounding");
@@ -517,6 +539,127 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			rightYoffset += textHeight / 3.0f + yPadding * 2;
 		}
 
+		// other cool stuff
+
+		ImDrawList* drawList = ImGui::GetBackgroundDrawList();
+
+		// frametime graph start
+
+		if (getOps<bool>("showFTgraph")) {
+			float max = 1000.f / 30;
+			float maxRectHeight = Constraints::SpacingConstraint(getOps<float>("FTgraphHeight") * 10, uiscaleConst);
+			float maxRectWidth = Constraints::SpacingConstraint(getOps<float>("FTgraphWidth") * 10, uiscaleConst);
+			float startHeight = MC::windowSize.y - maxRectHeight;
+			float barWidth = Constraints::SpacingConstraint(getOps<float>("FTbarWidth"), uiscaleConst);
+			float borderSize = Constraints::SpacingConstraint(4.f, uiscaleConst);
+			float startX = borderSize;
+
+			int graphLen = static_cast<int>(maxRectWidth / barWidth);
+
+			while (prevFrameTimes.size() >= graphLen) prevFrameTimes.pop_front();
+			prevFrameTimes.push_back(MC::frameTime);
+
+			FlarialGUI::RoundedRect(
+				borderSize, startHeight,
+				D2D1_COLOR_F(0.5, 0.5, 0.5, 0.2),
+				barWidth * graphLen - borderSize, maxRectHeight - borderSize,
+				0, 0
+			);
+
+			for (float ft: prevFrameTimes) {
+				D2D1_COLOR_F barCol;
+				if (ft / max >= 1) barCol = D2D1_COLOR_F(1, 0, 0, 1);
+				else barCol = FlarialGUI::HSVtoColorF(120.f * (1 - ft / max), 1.f, 1.f);
+				FlarialGUI::RoundedRect(
+					startX, startHeight + maxRectHeight * (1 - ft / max) - borderSize,
+					barCol,
+					barWidth, maxRectHeight * (ft / max),
+					0, 0
+				);
+				startX += barWidth;
+			}
+
+			FlarialGUI::RoundedHollowRect(
+				borderSize, startHeight,
+				borderSize,
+				D2D1_COLOR_F(1, 1, 1, 1),
+				barWidth * graphLen - borderSize, maxRectHeight - borderSize,
+				0, 0
+			);
+
+			float minFT = *std::ranges::min_element(prevFrameTimes);
+			float maxFT = *std::ranges::max_element(prevFrameTimes);
+			float avgFT = std::accumulate(prevFrameTimes.begin(), prevFrameTimes.end(), 0.f) / prevFrameTimes.size();
+
+			if (getOps<bool>("showMinMaxFT")) {
+				FlarialGUI::FlarialTextWithFont(
+					borderSize * 2, startHeight - textHeight / 3.0f,
+					String::StrToWStr(std::format("{:.1f} ms min", minFT)).c_str(),
+					0.f, textHeight / 3.0f,
+					DWRITE_TEXT_ALIGNMENT_LEADING,
+					textSize,
+					DWRITE_FONT_WEIGHT_NORMAL,
+					textColor,
+					true
+				);
+
+				FlarialGUI::FlarialTextWithFont(
+					barWidth * graphLen / 2, startHeight - textHeight / 3.0f,
+					String::StrToWStr(std::format("{:.1f} ms avg", avgFT)).c_str(),
+					0.f, textHeight / 3.0f,
+					DWRITE_TEXT_ALIGNMENT_CENTER,
+					textSize,
+					DWRITE_FONT_WEIGHT_NORMAL,
+					textColor,
+					true
+				);
+
+				FlarialGUI::FlarialTextWithFont(
+					barWidth * graphLen, startHeight - textHeight / 3.0f,
+					String::StrToWStr(std::format("{:.1f} ms max", maxFT)).c_str(),
+					0.f, textHeight / 3.0f,
+					DWRITE_TEXT_ALIGNMENT_TRAILING,
+					textSize,
+					DWRITE_FONT_WEIGHT_NORMAL,
+					textColor,
+					true
+				);
+			}
+
+			if (getOps<bool>("showThreshold")) {
+				drawList->AddLine(
+					ImVec2(borderSize, startHeight + maxRectHeight / 2),
+					ImVec2(barWidth * graphLen, startHeight + maxRectHeight / 2 + borderSize),
+					IM_COL32(255, 255, 255, 255),
+					borderSize
+				);
+
+				FlarialGUI::FlarialTextWithFont(
+					borderSize * 2, startHeight,
+					String::StrToWStr(std::format("30 FPS", minFT)).c_str(),
+					0.f, textHeight / 3.0f,
+					DWRITE_TEXT_ALIGNMENT_LEADING,
+					textSize,
+					DWRITE_FONT_WEIGHT_NORMAL,
+					textColor,
+					true
+				);
+
+				FlarialGUI::FlarialTextWithFont(
+					borderSize * 2, startHeight + maxRectHeight / 2 + borderSize,
+					String::StrToWStr(std::format("60 FPS", minFT)).c_str(),
+					0.f, textHeight / 3.0f,
+					DWRITE_TEXT_ALIGNMENT_LEADING,
+					textSize,
+					DWRITE_FONT_WEIGHT_NORMAL,
+					textColor,
+					true
+				);
+			}
+		}
+
+		// frametime graph end
+
 		if (ModuleManager::getModule("ClickGUI")->active || (!getOps<bool>("f5crosshair") && curPerspective == Perspective::ThirdPersonBack)) return;
 
 		// debug menu crosshair start
@@ -530,8 +673,6 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 		float yawRad = (180.f + lerpYaw) * (std::numbers::pi / 180.f);
 		float pitchRad = (-lerpPitch) * (std::numbers::pi / 180.f);
-
-		ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 
 		ImU32 red = IM_COL32(255, 0, 0, 255);
 		ImU32 green = IM_COL32(0, 255, 0, 255);
@@ -565,6 +706,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 		if (abs(lerpYaw) > 90.f) drawVector(drawList, center, bluePos, blue, lineWidth, lineLength, guiscale);
 
 		// debug menu crosshair end
+
 	}
 }
 
