@@ -49,8 +49,8 @@ void JavaDebugMenu::defaultConfig() {
 	setDef("showFTgraph", true);
 	setDef("showMinMaxFT", true);
 	setDef("showThreshold", true);
-	setDef("FTgraphHeight", 30.f);
-	setDef("FTgraphWidth", 120.f);
+	setDef("FTgraphHeight", 25.f);
+	setDef("FTgraphWidth", 100.f);
 	setDef("FTbarWidth", 6.f);
 
 	setDef("enableEverything", true);
@@ -312,6 +312,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 	if (!this->isEnabled()) return;
 	if (this->active && (SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "hud_screen")) {
 		float uiscale = getOps<float>("uiscale");
+		float uiscaleConst = Constraints::RelativeConstraint(0.001f * uiscale);
 		float textHeight = Constraints::RelativeConstraint(0.1f * uiscale);
 		float textSize = Constraints::SpacingConstraint(2.0f, textHeight);
 		float yPadding = Constraints::SpacingConstraint(0.025f, textHeight);
@@ -542,22 +543,22 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 		if (getOps<bool>("showFTgraph")) {
 			float max = 1000.f / 30;
-			float maxRectHeight = Constraints::SpacingConstraint(getOps<float>("FTgraphHeight") * 10, uiscale);
-			float maxRectWidth = Constraints::SpacingConstraint(getOps<float>("FTgraphWidth") * 10, uiscale);
+			float maxRectHeight = Constraints::SpacingConstraint(getOps<float>("FTgraphHeight") * 10, uiscaleConst);
+			float maxRectWidth = Constraints::SpacingConstraint(getOps<float>("FTgraphWidth") * 10, uiscaleConst);
 			float startHeight = MC::windowSize.y - maxRectHeight;
-			float barWidth = Constraints::SpacingConstraint(getOps<float>("FTbarWidth"), uiscale);
-			float borderSize = Constraints::SpacingConstraint(4.f, uiscale);
+			float barWidth = Constraints::SpacingConstraint(getOps<float>("FTbarWidth"), uiscaleConst);
+			float borderSize = Constraints::SpacingConstraint(4.f, uiscaleConst);
 			float startX = borderSize;
 
-			int graphLen = static_cast<int>(maxRectWidth / barWidth) - 1;
+			int graphLen = static_cast<int>(maxRectWidth / barWidth);
 
 			while (prevFrameTimes.size() >= graphLen) prevFrameTimes.pop_front();
 			prevFrameTimes.push_back(MC::frameTime);
 
 			for (float ft: prevFrameTimes) {
 				D2D1_COLOR_F barCol;
-				if (ft/max >= 1) barCol = D2D1_COLOR_F(1, 0, 0, 1);
-				else barCol = FlarialGUI::HSVtoColorF(120.f * (1 - ft/max), 1.f, 1.f);
+				if (ft / max >= 1) barCol = D2D1_COLOR_F(1, 0, 0, 1);
+				else barCol = FlarialGUI::HSVtoColorF(120.f * (1 - ft / max), 1.f, 1.f);
 				FlarialGUI::RoundedRect(
 					startX, startHeight + maxRectHeight * (1 - ft / max) - borderSize,
 					barCol,
@@ -577,6 +578,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 			float minFT = *std::ranges::min_element(prevFrameTimes);
 			float maxFT = *std::ranges::max_element(prevFrameTimes);
+			float avgFT = std::accumulate(prevFrameTimes.begin(), prevFrameTimes.end(), 0.f) / prevFrameTimes.size();
 
 			if (getOps<bool>("showMinMaxFT")) {
 				FlarialGUI::FlarialTextWithFont(
@@ -584,6 +586,17 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 					String::StrToWStr(std::format("{:.1f} ms min", minFT)).c_str(),
 					0.f, textHeight / 3.0f,
 					DWRITE_TEXT_ALIGNMENT_LEADING,
+					textSize,
+					DWRITE_FONT_WEIGHT_NORMAL,
+					textColor,
+					true
+				);
+
+				FlarialGUI::FlarialTextWithFont(
+					barWidth * graphLen / 2, startHeight - textHeight / 3.0f,
+					String::StrToWStr(std::format("{:.1f} ms avg", avgFT)).c_str(),
+					0.f, textHeight / 3.0f,
+					DWRITE_TEXT_ALIGNMENT_CENTER,
 					textSize,
 					DWRITE_FONT_WEIGHT_NORMAL,
 					textColor,
