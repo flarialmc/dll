@@ -30,7 +30,7 @@ private:
 	Perspective curPerspective;
 	float lastBreakProgress = 0.0f;
 	float currentBreakProgress = 0.0f;
-	std::deque<int> prevFrameTimes;
+	std::deque<float> prevFrameTimes;
 
 	static double Microtime() {
 		return (double(std::chrono::duration_cast<std::chrono::microseconds>(
