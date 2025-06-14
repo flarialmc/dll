@@ -19,6 +19,8 @@ void SigInit::init2180() {
     //ADD_SIG("GeneralSettingsScreenController::GeneralSettingsScreenController", "");
     ADD_SIG("mce::TextureGroup::getTexture", "40 53 55 56 57 41 54 41 55 41 56 41 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 41 0F B6 E9");
     //ADD_SIG("LevelUtils::getTimeOfDay", "? ? ? ? ? ? ?");
+    ADD_SIG("Item::appendFormattedHovertext", "48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 20 49 8B F1 4D 8B E0 4C 89 44 24 ? 4C 8B EA 48 89 54 24 ? 48 8B D9 45 33 F6");
+
 }
 
 void SigInit::init2170() {
@@ -70,6 +72,9 @@ void SigInit::init2160() {
 void SigInit::init2150() {
     Logger::custom(fg(fmt::color::gold), "Signatures", "Loading sigs for 1.21.5X");
     ADD_SIG("AppPlatform::readAssetFile", "48 89 5C 24 ? 55 56 57 48 8D 6C 24 ? 48 81 EC 50 01 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 49 8B F0");
+    
+    // BetterInventory signatures
+    ADD_SIG("Item::appendFormattedHovertext", "48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 20 49 8B F1 4D 8B E0 4C 89 44 24 ? 4C 8B EA 48 89 54 24 ? 48 8B D9 45 33 F6");
 
     ADD_SIG("Actor::baseTick", "48 8D 05 ? ? ? ? 48 89 01 BA 31 00 00 00 44 8D 4A 04 44 8D 42 02 66 C7 44 24 20 37 00 E8 ? ? ? ? 48 8B 8F 70 11 00 00");
 
