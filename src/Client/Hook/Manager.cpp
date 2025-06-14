@@ -100,13 +100,17 @@ void HookManager::initialize() {
         addHook<ContainerScreenControllerHook>();
     }
 
-    addHook<isPreGameHook>();
-    addHook<_composeFullStackHook>();
+    // likely packchanger hooks, im not sure!
+    if(!VersionUtils::checkAboveOrEqual(21, 60))
+    {
+        addHook<isPreGameHook>();
+        addHook<_composeFullStackHook>();
 
-    addHook<RenderOrderExecuteHook>();
-    addHook<RenderChunkCoordinatorHandleVisibilityUpdatesHook>();
+        addHook<RenderOrderExecuteHook>();
+        addHook<RenderChunkCoordinatorHandleVisibilityUpdatesHook>();
 
-    addHook<SettingsScreenOnExitHook>();
+        addHook<SettingsScreenOnExitHook>();
+    }
 
     addHook<ItemInHandRendererRenderItem>();
 
