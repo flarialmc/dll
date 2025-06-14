@@ -28,12 +28,14 @@ float4 main(VS_INPUT input) : SV_POSITION {\
     return input.pos;\
 }";
 
-const char *downsampleShaderSrc = R"(
+const char *gaussianBlurHorizontalShaderSrc = R"(
 cbuffer BlurInputBuffer : register(b0)
 {
     float2 resolution;
     float2 offset;
     float2 halfPixel;
+    float intensity;
+    float _padding;
 };
 
 sampler sampler0 : register(s0);
@@ -43,46 +45,39 @@ float4 main(float4 screenSpace : SV_Position) : SV_TARGET
 {
     float2 uv = screenSpace.xy / resolution;
     float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
-
-    static const float2 offsets[9] = {
-        float2(-1.0, -1.0) * halfPixel * offset,
-        float2(0.0, -1.0) * halfPixel * offset,
-        float2(1.0, -1.0) * halfPixel * offset,
-        float2(-1.0, 0.0) * halfPixel * offset,
-        float2(0.0, 0.0) * halfPixel * offset,
-        float2(1.0, 0.0) * halfPixel * offset,
-        float2(-1.0, 1.0) * halfPixel * offset,
-        float2(0.0, 1.0) * halfPixel * offset,
-        float2(1.0, 1.0) * halfPixel * offset
-    };
-
-    static const float weights[9] = {
-        0.06136, 0.12245, 0.06136,
-        0.12245, 0.24477, 0.12245,
-        0.06136, 0.12245, 0.06136
-    };
-
+    
+    // Adaptive sampling based on intensity
+    int sampleCount = clamp((int)(intensity * 4.0 + 5.0), 5, 15);
     float weightSum = 0.0;
-    for (int i = 0; i < 9; i++)
+    
+    // Calculate gaussian weights dynamically
+    float sigma = intensity * 1.5 + 0.5;
+    float twoSigmaSq = 2.0 * sigma * sigma;
+    
+    int halfSamples = sampleCount / 2;
+    
+    for (int i = -halfSamples; i <= halfSamples; i++)
     {
-        weightSum += weights[i];
+        float x = (float)i;
+        float weight = exp(-(x * x) / twoSigmaSq);
+        float2 sampleOffset = float2(x * halfPixel.x * intensity, 0.0);
+        
+        colorSum += texture0.Sample(sampler0, uv + sampleOffset) * weight;
+        weightSum += weight;
     }
-
-    for (int i = 0; i < 9; i++)
-    {
-        colorSum += texture0.Sample(sampler0, uv + offsets[i]) * (weights[i] / weightSum);
-    }
-
-    return colorSum;
+    
+    return colorSum / weightSum;
 }
 )";
 
-const char *upsampleShaderSrc = R"(
+const char *gaussianBlurVerticalShaderSrc = R"(
 cbuffer BlurInputBuffer : register(b0)
 {
     float2 resolution;
     float2 offset;
     float2 halfPixel;
+    float intensity;
+    float _padding;
 };
 
 sampler sampler0 : register(s0);
@@ -92,37 +87,28 @@ float4 main(float4 screenSpace : SV_Position) : SV_TARGET
 {
     float2 uv = screenSpace.xy / resolution;
     float4 colorSum = float4(0.0, 0.0, 0.0, 0.0);
-
-    static const float2 offsets[9] = {
-        float2(-1.0, -1.0) * halfPixel * offset,
-        float2(0.0, -1.0) * halfPixel * offset,
-        float2(1.0, -1.0) * halfPixel * offset,
-        float2(-1.0, 0.0) * halfPixel * offset,
-        float2(0.0, 0.0) * halfPixel * offset,
-        float2(1.0, 0.0) * halfPixel * offset,
-        float2(-1.0, 1.0) * halfPixel * offset,
-        float2(0.0, 1.0) * halfPixel * offset,
-        float2(1.0, 1.0) * halfPixel * offset
-    };
-
-    static const float weights[9] = {
-        0.06136, 0.12245, 0.06136,
-        0.12245, 0.24477, 0.12245,
-        0.06136, 0.12245, 0.06136
-    };
-
+    
+    // Adaptive sampling based on intensity
+    int sampleCount = clamp((int)(intensity * 4.0 + 5.0), 5, 15);
     float weightSum = 0.0;
-    for (int i = 0; i < 9; i++)
+    
+    // Calculate gaussian weights dynamically
+    float sigma = intensity * 1.5 + 0.5;
+    float twoSigmaSq = 2.0 * sigma * sigma;
+    
+    int halfSamples = sampleCount / 2;
+    
+    for (int i = -halfSamples; i <= halfSamples; i++)
     {
-        weightSum += weights[i];
+        float y = (float)i;
+        float weight = exp(-(y * y) / twoSigmaSq);
+        float2 sampleOffset = float2(0.0, y * halfPixel.y * intensity);
+        
+        colorSum += texture0.Sample(sampler0, uv + sampleOffset) * weight;
+        weightSum += weight;
     }
-
-    for (int i = 0; i < 9; i++)
-    {
-        colorSum += texture0.Sample(sampler0, uv + offsets[i]) * (weights[i] / weightSum);
-    }
-
-    return colorSum;
+    
+    return colorSum / weightSum;
 }
 )";
 
@@ -190,11 +176,11 @@ void Blur::InitializePipeline()
         &vertexBufferData,
         &pVertexBuffer);
 
-    ID3DBlob *shaderBlob = TryCompileShader(upsampleShaderSrc, "ps_4_0");
-    SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pUpsampleShader);
+    ID3DBlob *shaderBlob = TryCompileShader(gaussianBlurHorizontalShaderSrc, "ps_4_0");
+    SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pGaussianBlurHorizontalShader);
 
-    shaderBlob = TryCompileShader(downsampleShaderSrc, "ps_4_0");
-    SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pDownsampleShader);
+    shaderBlob = TryCompileShader(gaussianBlurVerticalShaderSrc, "ps_4_0");
+    SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pGaussianBlurVerticalShader);
 
     shaderBlob = TryCompileShader(vertexShaderSrc, "vs_4_0");
     SwapchainHook::d3d11Device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pVertexShader);
@@ -230,6 +216,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
 
     constantBuffer.resolution = rtvSize;
     constantBuffer.halfpixel = XMFLOAT2(0.5 / rtvSize.x, 0.5 / rtvSize.y);
+    // Note: intensity and offset are preserved from previous setting
     pContext->UpdateSubresource(pConstantBuffer, 0, nullptr, &constantBuffer, 0, 0);
 
     pContext->IASetInputLayout(pInputLayout);
@@ -289,8 +276,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
 
 void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iterations, float intensity)
 {
-
-    if(intensity < 0) return;
+    if(intensity <= 0) return;
 
     if (!SwapchainHook::GetBackbuffer()) return;
 
@@ -302,80 +288,68 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
     ID3D11DeviceContext* pContext = SwapchainHook::context;
     if (!pContext) return;
 
-    std::vector<ID3D11RenderTargetView *> renderTargetViews;
-    std::vector<ID3D11ShaderResourceView *> shaderResourceViews;
-    std::vector<XMFLOAT2> fbSizes;
     D3D11_TEXTURE2D_DESC desc;
     SwapchainHook::GetBackbuffer()->GetDesc(&desc);
-
-    if(!hasDoneFrames)
-    framebuffers.reserve((size_t)iterations);
-    renderTargetViews.reserve((size_t)iterations);
-
-    D3D11_SHADER_RESOURCE_VIEW_DESC srvd{};
-    srvd.Format = desc.Format;
-    srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-    srvd.Texture2D.MipLevels = 1;
-
-    desc.BindFlags |= D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+    
+    // Create two intermediate textures for ping-pong rendering
+    desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
     desc.CPUAccessFlags = 0;
+    
+    ID3D11Texture2D *pIntermediateTexture1, *pIntermediateTexture2;
+    ID3D11RenderTargetView *pIntermediateRTV1, *pIntermediateRTV2;
+    ID3D11ShaderResourceView *pIntermediateSRV1, *pIntermediateSRV2;
+    
+    SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pIntermediateTexture1);
+    SwapchainHook::d3d11Device->CreateRenderTargetView(pIntermediateTexture1, nullptr, &pIntermediateRTV1);
+    SwapchainHook::d3d11Device->CreateShaderResourceView(pIntermediateTexture1, nullptr, &pIntermediateSRV1);
+    
+    SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pIntermediateTexture2);
+    SwapchainHook::d3d11Device->CreateRenderTargetView(pIntermediateTexture2, nullptr, &pIntermediateRTV2);
+    SwapchainHook::d3d11Device->CreateShaderResourceView(pIntermediateTexture2, nullptr, &pIntermediateSRV2);
 
-    for (int i = 0; i <= iterations; i++)
+    XMFLOAT2 renderSize = XMFLOAT2(desc.Width, desc.Height);
+
+    // Setup intensity and offset for blur (RenderToRTV will handle resolution/halfpixel)
+    constantBuffer.intensity = intensity;
+    constantBuffer.offset = XMFLOAT2(1.0f, 1.0f);
+
+    // Use iterations parameter like original implementation
+    int actualIterations = std::max(1, iterations);
+    
+    ID3D11ShaderResourceView* currentSRV = pOrigShaderResourceView.get();
+    
+    for (int i = 0; i < actualIterations; i++)
     {
-        ID3D11Texture2D *pFrameBuffer;
-        ID3D11RenderTargetView *pRenderTargetView;
-        ID3D11ShaderResourceView *pShaderResourceView;
-
-
-        // create texture2d for each size and simply reuse to create rtvs & srvs
-        if(!hasDoneFrames)
-        SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pFrameBuffer);
-        else pFrameBuffer = framebuffers[i];
-        if (i == 0)
-            pRenderTargetView = pDstRenderTargetView;
-        else
-            SwapchainHook::d3d11Device->CreateRenderTargetView(pFrameBuffer, nullptr, &pRenderTargetView);
-        SwapchainHook::d3d11Device->CreateShaderResourceView(pFrameBuffer, nullptr, &pShaderResourceView);
-
-        if(!hasDoneFrames)
-        framebuffers.push_back(pFrameBuffer);
-        renderTargetViews.push_back(pRenderTargetView);
-        shaderResourceViews.push_back(pShaderResourceView);
-        fbSizes.push_back(XMFLOAT2(desc.Width, desc.Height));
-
-        desc.Width /= 2;
-        desc.Height /= 2;
+        // Clear shader resource binding to avoid conflicts
+        ID3D11ShaderResourceView* nullSRV = nullptr;
+        pContext->PSSetShaderResources(0, 1, &nullSRV);
+        
+        // Horizontal pass
+        pContext->PSSetShader(pGaussianBlurHorizontalShader, nullptr, 0);
+        RenderToRTV(pIntermediateRTV1, currentSRV, renderSize);
+        
+        // Clear binding again
+        pContext->PSSetShaderResources(0, 1, &nullSRV);
+        
+        // Vertical pass
+        pContext->PSSetShader(pGaussianBlurVerticalShader, nullptr, 0);
+        if (i == actualIterations - 1) {
+            // Last iteration: render to final destination
+            RenderToRTV(pDstRenderTargetView, pIntermediateSRV1, renderSize);
+        } else {
+            // Intermediate iteration: render to second buffer for next iteration
+            RenderToRTV(pIntermediateRTV2, pIntermediateSRV1, renderSize);
+            currentSRV = pIntermediateSRV2;
+        }
     }
 
-    hasDoneFrames = true;
-
-    constantBuffer.offset = XMFLOAT2(intensity * 3, intensity * 3);
-    pContext->PSSetShader(pDownsampleShader, nullptr, 0);
-    RenderToRTV(renderTargetViews[1], pOrigShaderResourceView.get(), fbSizes[1]);
-
-    for (int i = 1; i < iterations; i++)
-    {
-        RenderToRTV(renderTargetViews[i + 1], shaderResourceViews[i], fbSizes[i + 1]);
-    }
-
-    pContext->PSSetShader(pUpsampleShader, nullptr, 0);
-
-    for (int i = iterations; i > 0; i--)
-    {
-        RenderToRTV(renderTargetViews[i - 1], shaderResourceViews[i], fbSizes[i - 1]);
-    }
-
-    for (int i = 0; i < iterations; i++)
-    {
-
-        if (i != 0)
-            renderTargetViews[i]->Release();
-        shaderResourceViews[i]->Release();
-
-        renderTargetViews.clear();
-        shaderResourceViews.clear();
-        fbSizes.clear();
-    }
+    // Cleanup
+    pIntermediateTexture1->Release();
+    pIntermediateRTV1->Release();
+    pIntermediateSRV1->Release();
+    pIntermediateTexture2->Release();
+    pIntermediateRTV2->Release();
+    pIntermediateSRV2->Release();
 }
 
 static std::chrono::steady_clock::time_point frameTimestamp = std::chrono::high_resolution_clock::now();

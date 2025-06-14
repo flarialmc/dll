@@ -20,6 +20,8 @@
 #include <winrt/Windows.UI.ViewManagement.h>
 #include <winrt/Windows.Data.Xml.Dom.h>
 
+#include "Modules/ClickGUI/ClickGUI.hpp"
+
 Version WinrtUtils::impl::getGameVersion() {
     static Version version;
     try {

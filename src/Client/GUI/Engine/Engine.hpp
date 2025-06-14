@@ -31,7 +31,8 @@ struct BlurInputBuffer
 	XMFLOAT2 resolution;
 	XMFLOAT2 offset;
 	XMFLOAT2 halfpixel;
-	XMFLOAT2 _dummy;
+	float intensity;
+	float _padding;
 };
 
 
@@ -39,8 +40,8 @@ class Blur
 {
 public:
 
-	static inline ID3D11PixelShader* pUpsampleShader = nullptr;
-	static inline ID3D11PixelShader* pDownsampleShader = nullptr;
+	static inline ID3D11PixelShader* pGaussianBlurHorizontalShader = nullptr;
+	static inline ID3D11PixelShader* pGaussianBlurVerticalShader = nullptr;
 	static inline ID3D11VertexShader* pVertexShader = nullptr;
 	static inline ID3D11InputLayout* pInputLayout = nullptr;
 
@@ -54,10 +55,6 @@ public:
 	//static void Cleanup();
 
 	static void RenderToRTV(ID3D11RenderTargetView*, ID3D11ShaderResourceView*, XMFLOAT2);
-
-	static inline std::vector<ID3D11Texture2D*> framebuffers;
-
-	static inline bool hasDoneFrames = false;
 
 	static void RenderBlur(ID3D11RenderTargetView*, int, float);
 };

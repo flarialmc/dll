@@ -1,5 +1,6 @@
 #include "InstantHurtAnimation.hpp"
 
+#include "Client.hpp"
 #include "SDK/Client/Network/Packet/EntityEventPacket.hpp"
 
 void InstantHurtAnimation::onEnable() {

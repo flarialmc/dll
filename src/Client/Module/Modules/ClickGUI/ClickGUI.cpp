@@ -64,25 +64,24 @@ void ClickGUI::onRender(RenderEvent& event) {
 	}
 
 	if (this->active) {
-
+		setEnabled(true);
 		FlarialGUI::lerp(baseHeightActual, 0.64f, 0.18f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
 		FlarialGUI::lerp(realBlurAmount, Client::settings.getSettingByName<float>("blurintensity")->value,
-			0.15f * FlarialGUI::frameFactor);
-
+			0.1f * FlarialGUI::frameFactor);
 	}
 	else {
 
 		FlarialGUI::lerp(baseHeightReal, 0.0001f, 0.22f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
 		FlarialGUI::lerp(baseHeightActual, 0.00001f, 0.30f * floorf(FlarialGUI::frameFactor * 100.0f) / 100.0f);
-		FlarialGUI::lerp(realBlurAmount, 0.00001f, 0.15f * FlarialGUI::frameFactor);
+		FlarialGUI::lerp(realBlurAmount, 0.00001f, 0.1f * FlarialGUI::frameFactor);
 
 		for (auto& box : FlarialGUI::TextBoxes) box.second.isActive = false;
 
 	}
 
-	if (SwapchainHook::init && baseHeightActual > 0.1f) {
+	Blur::RenderBlur(event.RTV, 3, realBlurAmount);
 
-		setEnabled(true);
+	if (SwapchainHook::init && baseHeightActual > 0.1f) {
 
 		/* Base Rectangle Start */
 
@@ -94,8 +93,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 
 		}
 
-		if (Client::settings.getSettingByName<float>("blurintensity")->value > 0.01f)
-			Blur::RenderBlur(event.RTV, 3, realBlurAmount / 2);
+
 
 		float baseHeight = Constraints::RelativeConstraint(baseHeightReal);
 
@@ -895,7 +893,9 @@ void ClickGUI::onRender(RenderEvent& event) {
 		FlarialGUI::PopSize(); // Pops base rect
 	}
 
-	if (realBlurAmount < 0.5f) setEnabled(false);
+	if (realBlurAmount < 0.01f) setEnabled(false);
+
+	FlarialGUI::inMenu = this->enabledState;
 
 	FlarialGUI::displayToolTips();
 	FlarialGUI::NotifyHeartbeat();

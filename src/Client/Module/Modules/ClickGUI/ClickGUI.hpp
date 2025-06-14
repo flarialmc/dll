@@ -385,7 +385,6 @@ public:
 		if (this->active || editmenu)
 			event.cancel(); // do not pass key event to the game
 
-		FlarialGUI::inMenu = this->active;
 	}
 
 	void onMouse(MouseEvent& event) {
