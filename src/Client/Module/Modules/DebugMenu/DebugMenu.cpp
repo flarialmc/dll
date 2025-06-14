@@ -561,7 +561,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 			FlarialGUI::RoundedRect(
 				borderSize, startHeight,
-				D2D1_COLOR_F(0, 0, 0, 0.25),
+				D2D1_COLOR_F(0.5, 0.5, 0.5, 0.2),
 				barWidth * graphLen - borderSize, maxRectHeight - borderSize,
 				0, 0
 			);
