@@ -53,7 +53,6 @@ void GuiScale::update() {
     float targetScale = delayDisable ? originalScale : getOps<float>("guiscale");
     auto guiData = SDK::clientInstance->getGuiData();
     if (targetScale == guiData->GuiScale && !delayDisable && !fixResize) return;
-
     updateScale(targetScale);
 }
 
@@ -63,9 +62,9 @@ void GuiScale::updateScale(float newScale) {
     fixResize = false;
     auto guiData = SDK::clientInstance->getGuiData();
 
-    if (originalScale == 0) {
-        originalScale = guiData->GuiScale;
-    }
+    if (originalScale == 0) originalScale = guiData->GuiScale;
+    if (newScale == 0) newScale = getOps<float>("guiscale");
+    
     float oldScale = guiData->GuiScale;
 
     auto screenSize = guiData->ScreenSize;
