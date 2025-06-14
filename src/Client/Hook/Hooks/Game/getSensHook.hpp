@@ -17,7 +17,8 @@ private:
         auto event = nes::make_holder<SensitivityEvent>(sensitivity);
         eventMgr.trigger(event);
 
-        return event->getSensitivity();
+        Logger::debug("{}", event->getSensitivity());
+        return sensitivity;
     }
 
 public:
@@ -28,7 +29,7 @@ public:
     getSensHook() : Hook("getSensHook", GET_SIG_ADDRESS("Options::getSensitivity")) {}
 
     void enableHook() override {
-        this->autoHook((void *) getSensCallback, (void **) &funcOriginal);
+        //this->autoHook((void *) getSensCallback, (void **) &funcOriginal);
     }
 };
 
