@@ -7,6 +7,7 @@
 #include "Utils/APIUtils.hpp"
 #include "Utils/WinrtUtils.hpp"
 #include <chrono>
+#include <Modules/Misc/Input/GUIMouseListener.hpp>
 
 #define clickgui ModuleManager::getModule("ClickGUI")
 
@@ -388,7 +389,8 @@ public:
 	}
 
 	void onMouse(MouseEvent& event) {
-		if (event.getMouseX() != 0) MC::mousePos.x = event.getMouseX();
+		GUIMouseListener::handleMouse(event);
+		/*if (event.getMouseX() != 0) MC::mousePos.x = event.getMouseX();
 		if (event.getMouseX() != 0) MC::mousePos.y = event.getMouseY();
 		MC::mouseButton = event.getButton();
 		MC::mouseAction = event.getAction();
@@ -403,7 +405,7 @@ public:
 			if (event.getButton() == MouseButton::Left) MC::heldLeft = false;
 			if (event.getButton() == MouseButton::Right) MC::heldRight = false;
 		}
-		if (event.getButton() != MouseButton::None) MC::lastMouseButton = event.getButton();
+		if (event.getButton() != MouseButton::None) MC::lastMouseButton = event.getButton();*/
 
 		if (event.getButton() == MouseButton::Scroll) {
 			if (editmenu == true) {

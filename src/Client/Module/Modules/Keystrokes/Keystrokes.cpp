@@ -3,6 +3,7 @@
 #include "Events/EventManager.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 #include "Modules/CPS/CPSCounter.hpp"
+#include <Modules/Misc/Input/GUIMouseListener.hpp>
 
 void Keystrokes::onSetup() {
 	defaultConfig();
@@ -180,7 +181,7 @@ void Keystrokes::normalRender(int index, std::string& value) {
 
 			size_t pos = uppercaseSentence.find(search);
 			if (pos != std::string::npos) {
-				lmbText.replace(pos, search.length(), FlarialGUI::cached_to_string(CPSCounter::GetLeftCPS()));
+				lmbText.replace(pos, search.length(), FlarialGUI::cached_to_string(GUIMouseListener::GetLeftCPS()));
 			}
 
 			// rmb
@@ -190,7 +191,7 @@ void Keystrokes::normalRender(int index, std::string& value) {
 
 			pos = uppercaseSentence.find(search);
 			if (pos != std::string::npos) {
-				rmbText.replace(pos, search.length(), FlarialGUI::cached_to_string(CPSCounter::GetRightCPS()));
+				rmbText.replace(pos, search.length(), FlarialGUI::cached_to_string(GUIMouseListener::GetRightCPS()));
 			}
 
 			float keycardSize = Constraints::RelativeConstraint(0.08f * getOps<float>("uiscale"), "height", true);
