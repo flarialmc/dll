@@ -312,14 +312,11 @@ void Client::initialize() {
 
 	ModuleManager::initialize();
 
-	ModuleManager::restartModules = true;
-
-
 	CommandManager::initialize();
-
 
 	ScriptManager::initialize();
 
+	ModuleManager::restartModules = true;
 }
 
 std::string window = "Minecraft";
