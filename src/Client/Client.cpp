@@ -308,23 +308,18 @@ void Client::initialize() {
 	HookManager::initialize();
 	MH_ApplyQueued();
 
-	Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
-	Logger::success("Time rn {:.2f}s", Client::elapsed);
+
 
 	ModuleManager::initialize();
 
 	ModuleManager::restartModules = true;
 
-	Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
-	Logger::success("Time rn {:.2f}s", Client::elapsed);
 
 	CommandManager::initialize();
 
-	Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
-	Logger::success("Time rn {:.2f}s", Client::elapsed);
+
 	ScriptManager::initialize();
-	Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
-	Logger::success("Time rn {:.2f}s", Client::elapsed);
+
 }
 
 std::string window = "Minecraft";

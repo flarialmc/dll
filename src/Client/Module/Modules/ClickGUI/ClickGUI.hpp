@@ -277,18 +277,23 @@ public:
 
 		if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key) && event.getAction() == ActionType::Pressed) {
 
+#if !defined(__DEBUG__)
 			if (SDK::getCurrentScreen() != "hud_screen" && SDK::getCurrentScreen() != "pause_screen" && SDK::getCurrentScreen() != "f3_screen") {
 				WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
 				this->active = false;
 			}
 			else {
+#endif
 				if (!editmenu) {
 					if (!Client::settings.getSettingByName<bool>("nochaticon")->value) Listen(this, PacketEvent, &ClickGUI::onPacketReceive)
 					else Deafen(this, PacketEvent, &ClickGUI::onPacketReceive);
 					ModuleManager::cguiRefresh = true;
 					keybindActions[0]({});
 				}
-			}
+			#if !defined(__DEBUG__)
+				}
+			#endif
+
 
 			if (this->active) {
 				MC::lastMouseScroll = MouseAction::Release;

@@ -79,28 +79,34 @@ void ItemPhysics::onEnable() {
 void ItemPhysics::onDisable() {
     Deafen(this, SetupAndRenderEvent, &ItemPhysics::onSetupAndRender)
 
-    if (patched) {
-        static auto posAddr = GET_SIG_ADDRESS("ItemPositionConst") + 4;
+    if (!Client::disable)
+    {
+        if (patched)
+        {
+            static auto posAddr = GET_SIG_ADDRESS("ItemPositionConst") + 4;
 
-        Memory::patchBytes(reinterpret_cast<void*>(posAddr), &origPosRel, 4);
-        if (newPosRel) FreeBuffer(newPosRel);
+            Memory::patchBytes(reinterpret_cast<void*>(posAddr), &origPosRel, 4);
+            if (newPosRel) FreeBuffer(newPosRel);
+        }
+
+        if (glm_rotateHook)
+            glm_rotateHook->disable();
+        if (ItemRenderer_renderHook)
+            ItemRenderer_renderHook->disable();
+
+
+        static auto translateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef"));
+        Memory::patchBytes(translateAddr, data, 5);
+
+        if (VersionUtils::checkAboveOrEqual(21, 0))
+        {
+            static auto translateAddr2 = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef2"));
+            Memory::patchBytes(translateAddr2, data2, 5);
+        }
+
+        actorData.clear();
+        Module::onDisable();
     }
-
-    if (glm_rotateHook)
-        glm_rotateHook->disable();
-    if (ItemRenderer_renderHook)
-        ItemRenderer_renderHook->disable();
-
-    static auto translateAddr = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef"));
-    Memory::patchBytes(translateAddr, data, 5);
-
-    if (VersionUtils::checkAboveOrEqual(21, 0)) {
-        static auto translateAddr2 = reinterpret_cast<void*>(GET_SIG_ADDRESS("glm_translateRef2"));
-        Memory::patchBytes(translateAddr2, data2, 5);
-    }
-
-    actorData.clear();
-    Module::onDisable();
 }
 
 void ItemPhysics::defaultConfig() {
