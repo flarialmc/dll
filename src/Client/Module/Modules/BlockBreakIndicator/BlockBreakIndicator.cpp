@@ -163,6 +163,16 @@ void BlockBreakIndicator::normalRender(int index, std::string &value) {
                 D2D1::RoundedRect(D2D1::RectF(coord.x, coord.y, coord.x + pbwidth, coord.y + pbheight),
                                   rounde.x, rounde.x));
 
+        if (getOps<bool>("rectShadow")) FlarialGUI::RoundedRect(
+            coord.x + Constraints::RelativeConstraint(getOps<float>("rectShadowOffset")) * getOps<float>("uiscale"),
+            coord.y + Constraints::RelativeConstraint(getOps<float>("rectShadowOffset")) * getOps<float>("uiscale"),
+            getColor("rectShadow"),
+            pbwidth,
+            pbheight,
+            rounde.x,
+            rounde.y
+        );
+
         FlarialGUI::RoundedRect(coord.x, coord.y, bgColor, pbwidth, pbheight, rounde.x, rounde.y);
 
         if (currentHeight > 0.5f) {

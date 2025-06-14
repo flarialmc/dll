@@ -138,6 +138,7 @@ void Keystrokes::settingsRender(float settingsOffset) {
 	addColorPicker("Background Enabled", "", "enabled");
 	addColorPicker("Text Disabled", "", "text");
 	addColorPicker("Text Enabled", "", "textEnabled");
+	addConditionalColorPicker(getOps<bool>("rectShadow"), "Background Shadow Color", "", "rectShadow");
 	addConditionalColorPicker(getOps<bool>("textShadow"), "Text Shadow Color (Disabled State)", "", "DtextShadow");
 	addConditionalColorPicker(getOps<bool>("textShadow"), "Text Shadow Color (Enabled State)", "", "EtextShadow");
 	addColorPicker("Border Color", "", "border");
@@ -318,6 +319,16 @@ void Keystrokes::normalRender(int index, std::string& value) {
 							positions[i].x, positions[i].y,
 							positions[i].x + keycardDims.x, positions[i].y + keycardDims.y),
 						rounde.x, rounde.x));
+
+				if (getOps<bool>("rectShadow")) FlarialGUI::RoundedRect(
+					positions[i].x + Constraints::RelativeConstraint(getOps<float>("rectShadowOffset")) * getOps<float>("uiscale"),
+					positions[i].y + Constraints::RelativeConstraint(getOps<float>("rectShadowOffset")) * getOps<float>("uiscale"),
+					getColor("rectShadow"),
+					keycardDims.x,
+					keycardDims.y,
+					rounde.x,
+					rounde.x
+				);
 
 				if (getOps<bool>("border")) FlarialGUI::RoundedHollowRect(
 					positions[i].x,

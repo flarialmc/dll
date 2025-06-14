@@ -121,7 +121,11 @@ void CommandHotkey::settingsRender(float settingsOffset) {
 
 void CommandHotkey::onKey(KeyEvent& event) {
 	if (!SDK::clientInstance->getLocalPlayer()) return;
-	if (this->isEnabled() && SDK::getCurrentScreen() == "hud_screen") {
+	if (this->isEnabled() && (
+		SDK::getCurrentScreen() == "hud_screen" ||
+		SDK::getCurrentScreen() == "zoom_screen" ||
+		SDK::getCurrentScreen() == "f3_screen"
+		)) {
 		for (int i = 0; i <= totalKeybinds; ++i) {
 			keybindActions[i]({ std::any(event) });
 		}

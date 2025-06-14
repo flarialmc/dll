@@ -170,8 +170,8 @@ void Module::normalRenderCore(int index, std::string& text) {
 		FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(topleft.x, topleft.y, topleft.x + rectWidth, topleft.y + rectHeight), rounde.x, rounde.x));
 
 	if (getOps<bool>("rectShadow")) FlarialGUI::RoundedRect(
-		topleft.x + Constraints::RelativeConstraint(getOps<float>("rectShadowOffset")),
-		topleft.y + Constraints::RelativeConstraint(getOps<float>("rectShadowOffset")),
+		topleft.x + Constraints::RelativeConstraint(getOps<float>("rectShadowOffset")) * getOps<float>("uiscale"),
+		topleft.y + Constraints::RelativeConstraint(getOps<float>("rectShadowOffset")) * getOps<float>("uiscale"),
 		getColor("rectShadow"),
 		rectWidth,
 		rectHeight,
@@ -848,7 +848,7 @@ void Module::defaultAddSettings(std::string type) {
 	}
 	else if (type == "colors") {
 		addColorPicker("Text Color", "", "text");
-		addColorPicker("Background Color", "", "bg");
+		addConditionalColorPicker(getOps<bool>("showBg"), "Background Color", "", "bg");
 		addConditionalColorPicker(getOps<bool>("rectShadow"), "Background Shadow Color", "", "rectShadow");
 		addConditionalColorPicker(getOps<bool>("textShadow"), "Text Shadow Color", "", "textShadow");
 		addConditionalColorPicker(getOps<bool>("border"), "Border Color", "", "border");
