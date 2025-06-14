@@ -559,6 +559,13 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			while (prevFrameTimes.size() >= graphLen) prevFrameTimes.pop_front();
 			prevFrameTimes.push_back(MC::frameTime);
 
+			FlarialGUI::RoundedRect(
+				borderSize, startHeight,
+				D2D1_COLOR_F(0, 0, 0, 0.25),
+				barWidth * graphLen - borderSize, maxRectHeight - borderSize,
+				0, 0
+			);
+
 			for (float ft: prevFrameTimes) {
 				D2D1_COLOR_F barCol;
 				if (ft / max >= 1) barCol = D2D1_COLOR_F(1, 0, 0, 1);
