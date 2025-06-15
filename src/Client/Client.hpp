@@ -30,6 +30,8 @@ public:
 
 	static void loadAvailableConfigs();
 
+	static void PerformPostLegacySetup();
+
 	static void initialize();
 
 	static bool disable;

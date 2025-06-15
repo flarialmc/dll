@@ -316,6 +316,20 @@ void Client::initialize() {
 
 	ScriptManager::initialize();
 
+	Client::PerformPostLegacySetup();
+}
+
+std::string window = "Minecraft";
+
+HWND hWnd = FindWindow(nullptr, window.c_str());
+RECT currentRect = { 0 };
+RECT clientRect = { 0 };
+RECT previousRect = { 0 };
+bool InHudScreen = false;
+
+bool toes = false;
+
+void Client::PerformPostLegacySetup() {
 	if (Client::hasLegacySettings) {
 		fs::path pathToCheck;
 		if (Client::legacySettings.getSettingByName<std::string>("currentConfig")->value != "default") pathToCheck = fs::path(Client::legacyDir) / fmt::format("{}\\{}", Client::legacyDir, Client::legacySettings.getSettingByName<std::string>("currentConfig")->value);
@@ -351,16 +365,6 @@ void Client::initialize() {
 		}
 	}
 }
-
-std::string window = "Minecraft";
-
-HWND hWnd = FindWindow(nullptr, window.c_str());
-RECT currentRect = { 0 };
-RECT clientRect = { 0 };
-RECT previousRect = { 0 };
-bool InHudScreen = false;
-
-bool toes = false;
 
 void Client::centerCursor() {
 	if (Client::disable) return;
