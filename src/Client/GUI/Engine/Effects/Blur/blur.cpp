@@ -220,12 +220,15 @@ void Blur::InitializePipeline()
     rd.DepthClipEnable = false;
     rd.ScissorEnable = false;
     hr = SwapchainHook::d3d11Device->CreateRasterizerState(&rd, &pRasterizerState);
+
+    // Pre-allocate intermediate textures with common screen resolution to reduce first-frame lag
+    EnsureIntermediateTextures(MC::windowSize.x, MC::windowSize.y);
 }
 void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderResourceView *pShaderResourceView, XMFLOAT2 rtvSize)
 {
     ID3D11DeviceContext* pContext = SwapchainHook::context;
     if (!pContext) return;
-
+//
     // Use cached render states (no recreation overhead)
     pContext->OMSetDepthStencilState(pDepthStencilState, 0);
     pContext->OMSetBlendState(pBlendState, NULL, 0xffffffff);
@@ -276,56 +279,59 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
 
 bool Blur::EnsureIntermediateTextures(UINT width, UINT height)
 {
-    // Check if we need to recreate textures due to size change
-    if (currentTextureWidth != width || currentTextureHeight != height || 
-        !pIntermediateTexture1 || !pIntermediateTexture2) {
-        
-        // Release existing textures
-        ReleaseIntermediateTextures();
-        
-        // Create new textures with correct dimensions
-        D3D11_TEXTURE2D_DESC desc = {};
-        desc.Width = width;
-        desc.Height = height;
-        desc.MipLevels = 1;
-        desc.ArraySize = 1;
-        desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        desc.SampleDesc.Count = 1;
-        desc.SampleDesc.Quality = 0;
-        desc.Usage = D3D11_USAGE_DEFAULT;
-        desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-        desc.CPUAccessFlags = 0;
-        desc.MiscFlags = 0;
-        
-        HRESULT hr1 = SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pIntermediateTexture1);
-        HRESULT hr2 = SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pIntermediateTexture2);
-        
-        if (FAILED(hr1) || FAILED(hr2)) {
-            ReleaseIntermediateTextures();
-            return false;
-        }
-        
-        // Create render target views
-        hr1 = SwapchainHook::d3d11Device->CreateRenderTargetView(pIntermediateTexture1, nullptr, &pIntermediateRTV1);
-        hr2 = SwapchainHook::d3d11Device->CreateRenderTargetView(pIntermediateTexture2, nullptr, &pIntermediateRTV2);
-        
-        if (FAILED(hr1) || FAILED(hr2)) {
-            ReleaseIntermediateTextures();
-            return false;
-        }
-        
-        // Create shader resource views
-        hr1 = SwapchainHook::d3d11Device->CreateShaderResourceView(pIntermediateTexture1, nullptr, &pIntermediateSRV1);
-        hr2 = SwapchainHook::d3d11Device->CreateShaderResourceView(pIntermediateTexture2, nullptr, &pIntermediateSRV2);
-        
-        if (FAILED(hr1) || FAILED(hr2)) {
-            ReleaseIntermediateTextures();
-            return false;
-        }
-        
-        currentTextureWidth = width;
-        currentTextureHeight = height;
+    // Fast path: if textures exist and size matches, return immediately
+    if (currentTextureWidth == width && currentTextureHeight == height && 
+        pIntermediateTexture1 && pIntermediateTexture2 && 
+        pIntermediateRTV1 && pIntermediateRTV2 && 
+        pIntermediateSRV1 && pIntermediateSRV2) {
+        return true;
     }
+        
+    // Release existing textures
+    ReleaseIntermediateTextures();
+    
+    // Create new textures with correct dimensions
+    D3D11_TEXTURE2D_DESC desc = {};
+    desc.Width = width;
+    desc.Height = height;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.SampleDesc.Quality = 0;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+    desc.CPUAccessFlags = 0;
+    desc.MiscFlags = 0;
+    
+    HRESULT hr1 = SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pIntermediateTexture1);
+    HRESULT hr2 = SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pIntermediateTexture2);
+    
+    if (FAILED(hr1) || FAILED(hr2)) {
+        ReleaseIntermediateTextures();
+        return false;
+    }
+    
+    // Create render target views
+    hr1 = SwapchainHook::d3d11Device->CreateRenderTargetView(pIntermediateTexture1, nullptr, &pIntermediateRTV1);
+    hr2 = SwapchainHook::d3d11Device->CreateRenderTargetView(pIntermediateTexture2, nullptr, &pIntermediateRTV2);
+    
+    if (FAILED(hr1) || FAILED(hr2)) {
+        ReleaseIntermediateTextures();
+        return false;
+    }
+    
+    // Create shader resource views
+    hr1 = SwapchainHook::d3d11Device->CreateShaderResourceView(pIntermediateTexture1, nullptr, &pIntermediateSRV1);
+    hr2 = SwapchainHook::d3d11Device->CreateShaderResourceView(pIntermediateTexture2, nullptr, &pIntermediateSRV2);
+    
+    if (FAILED(hr1) || FAILED(hr2)) {
+        ReleaseIntermediateTextures();
+        return false;
+    }
+    
+    currentTextureWidth = width;
+    currentTextureHeight = height;
     
     return true;
 }

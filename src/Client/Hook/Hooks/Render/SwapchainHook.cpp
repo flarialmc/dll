@@ -140,11 +140,6 @@ void SwapchainHook::enableHook() {
     std::string gpuName = converter.to_bytes(gpuNameW);
     MC::GPU = gpuName;
     Logger::info("GPU name: {}", gpuName.c_str());
-    if (gpuName.contains("Intel") && Client::settings.getSettingByName<bool>("forceIntel")->value) {
-        queueReset = true;
-        Client::settings.getSettingByName<bool>("killdx")->value = true;
-    }
-    /* FORCE DX11 ON INTEL DEVICES */
 
 
     Memory::SafeRelease(pFactory);
@@ -952,8 +947,7 @@ bool SwapchainHook::AllocateImageDescriptor(UINT imageId, D3D12_CPU_DESCRIPTOR_H
         nextAvailableDescriptorIndex = descriptorIndex + 1;
     }
     
-    Logger::custom(fg(fmt::color::green), "DescriptorAlloc", "Allocated descriptor for image ID {} at index {} (CPU: 0x{:X}, GPU: 0x{:X})", 
-                   imageId, descriptorIndex, cpu.ptr, gpu.ptr);
+
     return true;
 }
 
