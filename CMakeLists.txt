@@ -3,6 +3,15 @@ project(Flarial)
 
 set(CMAKE_CXX_STANDARD 23)
 
+# Enable parallel builds and faster configuration
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_VERBOSE_MAKEFILE OFF)
+
+# Enable parallel processing for MSVC
+if(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+endif()
+
 set(CLIENT_VERSION "2.00") # Update this for every new release
 
 set(CLIENT_BUILD_TYPE "Release")
@@ -17,43 +26,26 @@ else()
     add_compile_definitions(__RELEASE__)
 endif()
 
-execute_process(
-        COMMAND git rev-parse --short HEAD
-        OUTPUT_VARIABLE COMMIT_HASH
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+# Cache git hash to avoid running git command every configure
+if(NOT DEFINED COMMIT_HASH OR COMMIT_HASH STREQUAL "")
+    execute_process(
+            COMMAND git rev-parse --short HEAD
+            OUTPUT_VARIABLE COMMIT_HASH
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+    )
+    set(COMMIT_HASH "${COMMIT_HASH}" CACHE STRING "Git commit hash")
+endif()
 
 add_compile_definitions(COMMIT_HASH="${COMMIT_HASH}")
 
-# Optimize for speed
-add_compile_options($<$<CONFIG:Release>:/O2>)
-add_compile_options($<$<CONFIG:Release>:/Ot>)
-add_compile_options($<$<CONFIG:Release>:/Ox>)
-add_compile_options($<$<CONFIG:Release>:/Oy>)
+# Common compile options
+add_compile_options(/bigobj /utf-8)
 
-# Enable intrinsic functions
-add_compile_options($<$<CONFIG:Release>:/Oi>)
-
-# Separate functions for the linker to improve the optimization process
-add_compile_options($<$<CONFIG:Release>:/Gy>)
-
-# Optimize global data to reduce the binary size
-add_compile_options($<$<CONFIG:Release>:/Gw>)
-
-# Enable string pooling to reduce binary size by consolidating duplicate strings
-add_compile_options($<$<CONFIG:Release>:/GF>)
-
-# Optimize floating point operations for speed (may introduce minor precision differences)
-# add_compile_options($<$<CONFIG:Release>:/fp:fast>)
-
-# Inline any suitable function to improve performance by reducing function call overhead
-add_compile_options($<$<CONFIG:Release>:/Ob2>)
-
-add_compile_options(/bigobj)
-add_compile_options(/utf-8)
+# Build type specific optimizations
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "Test")
-    # Optimize for performance
-    add_compile_options(/O2 /Oi /Gy /Gw /GF /fp:fast /Gd /MT /Ob2)
+    # Optimize for performance - consolidated flags
+    add_compile_options(/O2 /Oi /Ot /Ox /Oy /Gy /Gw /GF /fp:fast /Gd /MT /Ob2)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 elseif (CMAKE_BUILD_TYPE STREQUAL "Debug")
     # Optimize for build time
@@ -61,9 +53,11 @@ elseif (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 endif()
 
-# Generate version and build date
-string(TIMESTAMP BUILD_DATE "%Y %b %d %H:%M:%S")
-set(FLARIAL_BUILD_DATE "${BUILD_DATE}")
+# Cache build date to avoid regenerating every configure (optional for development speed)
+if(NOT DEFINED FLARIAL_BUILD_DATE OR FLARIAL_BUILD_DATE STREQUAL "")
+    string(TIMESTAMP BUILD_DATE "%Y %b %d %H:%M:%S")
+    set(FLARIAL_BUILD_DATE "${BUILD_DATE}" CACHE STRING "Build date")
+endif()
 
 add_compile_definitions(
         FLARIAL_VERSION=\"${CLIENT_VERSION}\"
@@ -71,8 +65,9 @@ add_compile_definitions(
         FLARIAL_BUILD_DATE=\"${FLARIAL_BUILD_DATE}\"
 )
 
-file(GLOB_RECURSE SOURCE_FILES "src/*.cpp" "src/*.hpp")
-file(GLOB_RECURSE LIB_FILES "lib/*.cpp" "lib/*.h")
+# Use CONFIGURE_DEPENDS for better performance but still track changes
+file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "src/*.cpp" "src/*.hpp")
+file(GLOB_RECURSE LIB_FILES CONFIGURE_DEPENDS "lib/*.cpp" "lib/*.h")
 add_library(Flarial SHARED main.cpp ${SOURCE_FILES} ${LIB_FILES} src/Assets/Assets.rc)
 
 target_include_directories(Flarial PRIVATE
@@ -117,43 +112,87 @@ set_target_properties(zlib PROPERTIES IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DI
 
 include(FetchContent)
 
-FetchContent_Declare(
-        entt
-        GIT_REPOSITORY https://github.com/skypjack/entt.git
-        GIT_TAG        f931687ff04d435871ac9664bb299f71f2a8fafc
-)
+# Enable persistent caching for FetchContent
+set(FETCHCONTENT_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/_deps" CACHE STRING "Base directory for FetchContent")
+set(FETCHCONTENT_QUIET ON)  # Reduce configure output noise
 
-FetchContent_Declare(
-        nes
-        GIT_REPOSITORY https://github.com/DisabledMallis/NuvolaEventSystem.git
-        GIT_TAG        main
-)
+# Enable fully disconnected builds after first download
+set(FETCHCONTENT_FULLY_DISCONNECTED ON CACHE BOOL "Disable all attempts to download or update content and assume source dirs already exist")
 
-FetchContent_Declare(
-        libhat
-        GIT_REPOSITORY https://github.com/BasedInc/libhat.git
-        GIT_TAG        d6297514b05fd238f5b46d003325f108c22741e3
-)
+# Create cache directory if it doesn't exist
+file(MAKE_DIRECTORY "${FETCHCONTENT_BASE_DIR}")
 
-FetchContent_Declare(
-        fmt
-        GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-        GIT_TAG        master
-)
+# Check if dependencies are already populated to skip FetchContent entirely
+set(SKIP_FETCHCONTENT FALSE)
+if(EXISTS "${FETCHCONTENT_BASE_DIR}/entt-src" AND 
+   EXISTS "${FETCHCONTENT_BASE_DIR}/nes-src" AND 
+   EXISTS "${FETCHCONTENT_BASE_DIR}/libhat-src" AND 
+   EXISTS "${FETCHCONTENT_BASE_DIR}/fmt-src" AND 
+   EXISTS "${FETCHCONTENT_BASE_DIR}/magic_enum-src" AND 
+   EXISTS "${FETCHCONTENT_BASE_DIR}/luabridge-src")
+    set(SKIP_FETCHCONTENT TRUE)
+    message(STATUS "All dependencies found in cache, skipping FetchContent")
+endif()
 
-FetchContent_Declare(
-        magic_enum
-        GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
-        GIT_TAG        master
-)
+if(NOT SKIP_FETCHCONTENT)
+    FetchContent_Declare(
+            entt
+            GIT_REPOSITORY https://github.com/skypjack/entt.git
+            GIT_TAG        f931687ff04d435871ac9664bb299f71f2a8fafc
+            GIT_SHALLOW    ON
+            GIT_PROGRESS   ON
+    )
 
-FetchContent_Declare(
-        LuaBridge
-        GIT_REPOSITORY https://github.com/kunitoki/LuaBridge3.git
-        GIT_TAG        master
-)
+    FetchContent_Declare(
+            nes
+            GIT_REPOSITORY https://github.com/DisabledMallis/NuvolaEventSystem.git
+            GIT_TAG        main
+            GIT_SHALLOW    ON
+            GIT_PROGRESS   ON
+    )
 
-FetchContent_MakeAvailable(libhat entt nes fmt magic_enum LuaBridge)
+    FetchContent_Declare(
+            libhat
+            GIT_REPOSITORY https://github.com/BasedInc/libhat.git
+            GIT_TAG        d6297514b05fd238f5b46d003325f108c22741e3
+            GIT_SHALLOW    ON
+            GIT_PROGRESS   ON
+    )
+
+    FetchContent_Declare(
+            fmt
+            GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+            GIT_TAG        master
+            GIT_SHALLOW    ON
+            GIT_PROGRESS   ON
+    )
+
+    FetchContent_Declare(
+            magic_enum
+            GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
+            GIT_TAG        master
+            GIT_SHALLOW    ON
+            GIT_PROGRESS   ON
+    )
+
+    FetchContent_Declare(
+            LuaBridge
+            GIT_REPOSITORY https://github.com/kunitoki/LuaBridge3.git
+            GIT_TAG        master
+            GIT_SHALLOW    ON
+            GIT_PROGRESS   ON
+    )
+
+    FetchContent_MakeAvailable(libhat entt nes fmt magic_enum LuaBridge)
+else()
+    # Manually add the cached directories as subdirectories
+    add_subdirectory("${FETCHCONTENT_BASE_DIR}/entt-src" "${FETCHCONTENT_BASE_DIR}/entt-build")
+    add_subdirectory("${FETCHCONTENT_BASE_DIR}/nes-src" "${FETCHCONTENT_BASE_DIR}/nes-build")
+    add_subdirectory("${FETCHCONTENT_BASE_DIR}/libhat-src" "${FETCHCONTENT_BASE_DIR}/libhat-build")
+    add_subdirectory("${FETCHCONTENT_BASE_DIR}/fmt-src" "${FETCHCONTENT_BASE_DIR}/fmt-build")
+    add_subdirectory("${FETCHCONTENT_BASE_DIR}/magic_enum-src" "${FETCHCONTENT_BASE_DIR}/magic_enum-build")
+    add_subdirectory("${FETCHCONTENT_BASE_DIR}/luabridge-src" "${FETCHCONTENT_BASE_DIR}/luabridge-build")
+endif()
 
 target_link_libraries(Flarial PRIVATE libcurl ws2_32.lib crypt32.lib normaliz.lib wldap32.lib LuaBridge lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType magic_enum)
 target_link_libraries(Flarial PUBLIC MinHook)
