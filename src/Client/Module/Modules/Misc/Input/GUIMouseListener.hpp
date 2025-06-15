@@ -66,6 +66,7 @@ public:
         if (event.getMouseY() != 0) MC::mousePos.y = event.getMouseY();
         MC::mouseButton = event.getButton();
         MC::mouseAction = event.getAction();
+        if (event.getButton() != MouseButton::None) MC::lastMouseButton = event.getButton();
 
         if (event.getButton() != MouseButton::None && event.getAction() == MouseAction::Press) {
             MC::held = true;

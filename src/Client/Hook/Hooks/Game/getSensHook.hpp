@@ -10,26 +10,27 @@ class getSensHook : public Hook {
 private:
     // max sens = 0.858693;
 
-    static float getSensCallback(unsigned int *a1, unsigned int a2) {
+    static float getSensCallback(void* options, unsigned int a2, int a3, int a4, int a5) {
 
-        float sensitivity = funcOriginal(a1, a2);
+        float sensitivity = funcOriginal(options, a2, a3, a4, a5);
 
         auto event = nes::make_holder<SensitivityEvent>(sensitivity);
         eventMgr.trigger(event);
 
-        Logger::debug("{}", event->getSensitivity());
+        Logger::debug("acc sens {}", sensitivity);
+        Logger::debug("event sens {}", event->getSensitivity());
         return sensitivity;
     }
 
 public:
-    typedef float(__thiscall *getSensOriginal)(unsigned int *, unsigned int);
+    typedef float(__thiscall *getSensOriginal)(void* options, unsigned int a2, int a3, int a4, int a5);
 
     static inline getSensOriginal funcOriginal = nullptr;
 
     getSensHook() : Hook("getSensHook", GET_SIG_ADDRESS("Options::getSensitivity")) {}
 
     void enableHook() override {
-        //this->autoHook((void *) getSensCallback, (void **) &funcOriginal);
+        this->autoHook((void *) getSensCallback, (void **) &funcOriginal);
     }
 };
 

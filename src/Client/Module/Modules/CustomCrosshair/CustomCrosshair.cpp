@@ -74,7 +74,7 @@ void CustomCrosshair::settingsRender(float settingsOffset) {
                               Constraints::RelativeConstraint(1.0, "width"),
                               Constraints::RelativeConstraint(0.88f, "height"));
 
-    if (settings.getSettingByName<bool>("CustomCrosshair")->value) {
+
         addHeader("Crosshair Editor");
         addButton("Crosshair Editor", "Opens the crosshair editor menu", "open", [&]() {
             blankWindow = !blankWindow;
@@ -87,7 +87,7 @@ void CustomCrosshair::settingsRender(float settingsOffset) {
         addToggle("Highlight Middle Line", "Adds 2 red lines to show the middle of the canvas", "HighlightMiddleLine");
 
         extraPadding();
-    }
+
 
     addHeader("Main");
     addToggle("Use Custom Crosshair", "Uses a custom crosshair.","CustomCrosshair");
