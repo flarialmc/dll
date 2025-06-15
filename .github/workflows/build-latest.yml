@@ -25,6 +25,7 @@ jobs:
           fetch-depth: 1
           show-progress: false
           filter: blob:none
+          path: C:\a\dll\dll
 
       - name: "Check commit type"
         id: type
@@ -84,6 +85,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set working directory to C drive
+        run: |
+          cd C:\a\dll\dll
+          echo "GITHUB_WORKSPACE=C:\a\dll\dll" >> $env:GITHUB_ENV
+        shell: pwsh
+
       - name: Set Up MSVC Environment (Fast)
         uses: ilammy/msvc-dev-cmd@v1
         with:
@@ -94,8 +101,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            build/
-          key: build-cache-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ hashFiles('CMakeLists.txt', 'src/**/*.cpp', 'src/**/*.hpp', 'src/**/*.h', 'main.cpp') }}
+            C:\a\dll\dll\build\
+          key: build-cache-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ hashFiles('C:\a\dll\dll\CMakeLists.txt', 'C:\a\dll\dll\src\**\*.cpp', 'C:\a\dll\dll\src\**\*.hpp', 'C:\a\dll\dll\src\**\*.h', 'C:\a\dll\dll\main.cpp') }}
           restore-keys: |
             ${{ steps.type.outputs.reset_cache == 'false' && format('build-cache-{0}-normal-', runner.os) || '' }}
 
@@ -103,39 +110,26 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            _deps
-            build/_deps
-          key: cmake-deps-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ hashFiles('CMakeLists.txt') }}
+            C:\a\dll\dll\_deps
+          key: cmake-deps-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ hashFiles('C:\a\dll\dll\CMakeLists.txt') }}
           restore-keys: |
             ${{ steps.type.outputs.reset_cache == 'false' && format('cmake-deps-{0}-normal-', runner.os) || '' }}
 
-
-      - name: Create build directory
-        run: |
-          if (!(Test-Path "build")) { New-Item -ItemType Directory -Path "build" }
-        shell: pwsh
-
       - name: Configure CMake
         run: |
-          # Handle drive letter mismatch by cleaning problematic cache files
-          if (Test-Path "build/CMakeCache.txt") {
-            $cacheContent = Get-Content "build/CMakeCache.txt" -Raw
-            $currentPath = (Get-Location).Path
-            if ($cacheContent -notmatch [regex]::Escape($currentPath)) {
-              Write-Host "Drive letter mismatch detected, cleaning CMake cache..."
-              Remove-Item "build/CMakeCache.txt" -Force -ErrorAction SilentlyContinue
-              Remove-Item "build/CMakeFiles" -Force -Recurse -ErrorAction SilentlyContinue
-            }
-          }
+          cd C:\a\dll\dll
           cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DFETCHCONTENT_FULLY_DISCONNECTED=OFF -DCMAKE_BUILD_PARALLEL_LEVEL=4
         shell: pwsh
 
       - name: Build DLL
         run: |
+           cd C:\a\dll\dll
            cmake --build build --target Flarial --parallel 4
+        shell: pwsh
 
       - name: Show cache efficiency
         run: |
+          cd C:\a\dll\dll
           echo "Build cache statistics:"
           $objFiles = Get-ChildItem -Path "build" -Recurse -Include "*.obj" -ErrorAction SilentlyContinue | Measure-Object
           $totalSize = Get-ChildItem -Path "build" -Recurse -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum
