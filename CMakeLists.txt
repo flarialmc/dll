@@ -7,9 +7,11 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
-# Enable parallel processing for MSVC
+# Enable parallel processing for MSVC with optimized settings
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /FS /Zf")
+    # Enable faster incremental linking
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /INCREMENTAL:NO /OPT:REF /OPT:ICF")
 endif()
 
 set(CLIENT_VERSION "2.00") # Update this for every new release
@@ -61,6 +63,16 @@ if(NOT DEFINED FLARIAL_BUILD_DATE OR FLARIAL_BUILD_DATE STREQUAL "")
         string(TIMESTAMP FLARIAL_BUILD_DATE "%Y %b %d %H:%M:%S")
         set(FLARIAL_BUILD_DATE "${FLARIAL_BUILD_DATE}" CACHE STRING "Build date")
     endif()
+endif()
+
+# Improve incremental build performance
+set(CMAKE_CXX_FLAGS_INIT "${CMAKE_CXX_FLAGS_INIT} /Zi /FS")
+set(CMAKE_EXE_LINKER_FLAGS_INIT "${CMAKE_EXE_LINKER_FLAGS_INIT} /DEBUG:FASTLINK")
+set(CMAKE_SHARED_LINKER_FLAGS_INIT "${CMAKE_SHARED_LINKER_FLAGS_INIT} /DEBUG:FASTLINK")
+
+# Enable faster PDB generation for better incremental builds
+if(MSVC)
+    add_link_options(/DEBUG:FASTLINK /OPT:REF /OPT:ICF)
 endif()
 
 add_compile_definitions(
@@ -260,7 +272,14 @@ endif()
 target_link_libraries(Flarial PRIVATE libcurl ws2_32.lib crypt32.lib normaliz.lib wldap32.lib LuaBridge lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType magic_enum)
 target_link_libraries(Flarial PUBLIC MinHook)
 
+# Optimize Unity build for faster compilation
 set_property(TARGET Flarial PROPERTY UNITY_BUILD ON)
-set_property(TARGET Flarial PROPERTY UNITY_BUILD_BATCH_SIZE 32)
+set_property(TARGET Flarial PROPERTY UNITY_BUILD_BATCH_SIZE 16)  # Smaller batches for better incremental builds
+set_property(TARGET Flarial PROPERTY UNITY_BUILD_MODE BATCH)
+
+# Enable faster symbol generation
+if(MSVC)
+    target_compile_options(Flarial PRIVATE /Zf /FS)
+endif()
 
 target_precompile_headers(Flarial PRIVATE "src/PCH.hpp")

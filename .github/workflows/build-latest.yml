@@ -62,20 +62,68 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          submodules: false
+          fetch-depth: 1
 
       - name: Set Up MSVC Environment
         uses: ilammy/msvc-dev-cmd@v1
 
+      - name: Setup Ninja
+        uses: ashutoshvarma/setup-ninja@master
+        with:
+          version: 1.11.1
+
+      - name: Cache CMake build directory
+        uses: actions/cache@v4
+        with:
+          path: |
+            build
+            !build/Flarial.dll
+            !build/**/*.pdb
+            !build/**/*.log
+          key: cmake-build-${{ runner.os }}-${{ hashFiles('CMakeLists.txt', 'src/**/*.cpp', 'src/**/*.hpp') }}
+          restore-keys: |
+            cmake-build-${{ runner.os }}-
+
+      - name: Cache FetchContent dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            _deps
+            !_deps/**/*.log
+            !_deps/**/CMakeFiles/CMakeOutput.log
+            !_deps/**/CMakeFiles/CMakeError.log
+          key: fetchcontent-${{ runner.os }}-${{ hashFiles('CMakeLists.txt') }}
+          restore-keys: |
+            fetchcontent-${{ runner.os }}-
+
+      - name: Cache compiled object files
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/**/*.obj
+            build/**/*.pch
+            build/CMakeFiles/Flarial.dir/**
+            !build/CMakeFiles/Flarial.dir/*.log
+          key: obj-cache-${{ runner.os }}-${{ hashFiles('src/**/*.cpp', 'src/**/*.hpp', 'lib/**/*.cpp', 'lib/**/*.h') }}
+          restore-keys: |
+            obj-cache-${{ runner.os }}-
+
       - name: Configure CMake
         run: |
-          #echo 'hi'
-          
-          cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
-
+          # Set cache variables for faster builds
+          cmake -S . -B build -G "Ninja" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -DCMAKE_BUILD_PARALLEL_LEVEL=%NUMBER_OF_PROCESSORS% \
+            -DFETCHCONTENT_BASE_DIR="${{ github.workspace }}/_deps" \
+            -DFETCHCONTENT_QUIET=ON \
+            -DBUILD_DATE="${{ github.run_id }}-${{ github.run_number }}"
 
       - name: Build DLL
         run: |
-           cmake --build build --target Flarial
+          cmake --build build --target Flarial --parallel %NUMBER_OF_PROCESSORS%
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.6.1
         with:
