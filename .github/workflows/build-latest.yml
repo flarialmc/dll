@@ -19,8 +19,12 @@ jobs:
       type: ${{ steps.type.outputs.status }}
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout Repository (Fast)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          show-progress: false
+          filter: blob:none
 
       - name: "Check commit type"
         id: type
@@ -84,8 +88,6 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
-          toolset: 14.39
-          sdk: 10.0.22621.0
           spectre: false
 
       - name: Cache sccache binary
