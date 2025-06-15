@@ -121,7 +121,7 @@ void Zoom::onGetFOV(FOVEvent& event)
 				// Set animationFinished to true only when reaching original fov
 				animationFinished = true;
 			}
-		}//..
+		}//
 		else {
 			// Once animation finished, set current zoom to fov
 			currentZoomVal = fov;
