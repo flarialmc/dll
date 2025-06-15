@@ -646,9 +646,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 
 				c->addToggle("Better Frames", "RTX Disabled, Restart Required.", Client::settings.getSettingByName<bool>("killdx")->value);
 				c->addToggle("V-SYNC Disabler", "Works on all devices.", Client::settings.getSettingByName<bool>("vsync")->value);
-				if (MC::GPU.contains("Intel")) {
-					c->addToggle("Force Intel DX11", "May help with Better RenderDragon", Client::settings.getSettingByName<bool>("forceIntel")->value);
-				}
+
 				c->addToggle("Recreate Swapchain At Start", "May help with Better RenderDragon", Client::settings.getSettingByName<bool>("recreateAtStart")->value);
 				c->extraPadding();
 

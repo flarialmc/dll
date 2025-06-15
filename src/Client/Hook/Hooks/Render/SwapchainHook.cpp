@@ -140,11 +140,6 @@ void SwapchainHook::enableHook() {
     std::string gpuName = converter.to_bytes(gpuNameW);
     MC::GPU = gpuName;
     Logger::info("GPU name: {}", gpuName.c_str());
-    if (gpuName.contains("Intel") && Client::settings.getSettingByName<bool>("forceIntel")->value) {
-        queueReset = true;
-        Client::settings.getSettingByName<bool>("killdx")->value = true;
-    }
-    /* FORCE DX11 ON INTEL DEVICES */
 
 
     Memory::SafeRelease(pFactory);
