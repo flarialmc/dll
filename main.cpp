@@ -57,7 +57,7 @@ DWORD WINAPI init() {
 
     Client::elapsed = (Utils::getCurrentMs() - Client::start) / 1000.0;
 
-    Logger::success("Flarial troll initialized in {:.2f}s", Client::elapsed);
+    Logger::success("Flarial initialized in {:.2f}s", Client::elapsed);
 
     OptionsParser parser;
     parser.parseOptionsFile();
