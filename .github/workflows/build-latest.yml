@@ -97,12 +97,25 @@ jobs:
           arch: x64
           spectre: false
 
-      - name: Cache Build Directory (like CLion)
+      - name: Cache Dependencies (Lua, miniz, etc.)
         uses: actions/cache@v4
         with:
           path: |
-            C:\a\dll\dll\build\
-          key: build-cache-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ hashFiles('C:\a\dll\dll\CMakeLists.txt', 'C:\a\dll\dll\src\**\*.cpp', 'C:\a\dll\dll\src\**\*.hpp', 'C:\a\dll\dll\src\**\*.h', 'C:\a\dll\dll\main.cpp') }}
+            C:\a\dll\dll\build\lib\
+            C:\a\dll\dll\build\CMakeFiles\miniz.dir\
+            C:\a\dll\dll\build\CMakeFiles\lua_static.dir\
+          key: deps-cache-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ hashFiles('C:\a\dll\dll\CMakeLists.txt', 'C:\a\dll\dll\lib\**') }}
+          restore-keys: |
+            ${{ steps.type.outputs.reset_cache == 'false' && format('deps-cache-{0}-normal-', runner.os) || '' }}
+
+      - name: Cache Build Objects
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\a\dll\dll\build\CMakeFiles\Flarial.dir\
+            C:\a\dll\dll\build\*.ninja*
+            C:\a\dll\dll\build\CMakeCache.txt
+          key: build-cache-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ hashFiles('C:\a\dll\dll\src\**\*.cpp', 'C:\a\dll\dll\src\**\*.hpp', 'C:\a\dll\dll\src\**\*.h', 'C:\a\dll\dll\main.cpp') }}
           restore-keys: |
             ${{ steps.type.outputs.reset_cache == 'false' && format('build-cache-{0}-normal-', runner.os) || '' }}
 
@@ -118,6 +131,7 @@ jobs:
       - name: Configure CMake
         run: |
           cd C:\a\dll\dll
+          $env:BUILD_DATE = Get-Date -Format "yyyy MMM dd HH:mm:ss"
           cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DFETCHCONTENT_FULLY_DISCONNECTED=OFF -DCMAKE_BUILD_PARALLEL_LEVEL=4
         shell: pwsh
 

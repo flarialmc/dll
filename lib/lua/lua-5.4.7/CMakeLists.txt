@@ -75,6 +75,7 @@ add_library(lua_static STATIC ${LUA_LIB_SRCS})
 target_link_libraries(lua_static PRIVATE lua_internal PUBLIC lua_include)
 set_target_properties(lua_static PROPERTIES
     VERSION "${PACKAGE_VERSION}"
+    EXCLUDE_FROM_ALL ON
 )
 list(APPEND TARGETS_TO_INSTALL lua_static)
 if(NOT BUILD_SHARED_LIBS OR NOT LUA_ENABLE_SHARED)

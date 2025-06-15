@@ -55,8 +55,12 @@ endif()
 
 # Cache build date to avoid regenerating every configure (optional for development speed)
 if(NOT DEFINED FLARIAL_BUILD_DATE OR FLARIAL_BUILD_DATE STREQUAL "")
-    string(TIMESTAMP BUILD_DATE "%Y %b %d %H:%M:%S")
-    set(FLARIAL_BUILD_DATE "${BUILD_DATE}" CACHE STRING "Build date")
+    # Use environment variable if available (set by CI), otherwise generate timestamp
+    set(FLARIAL_BUILD_DATE "$ENV{BUILD_DATE}" CACHE STRING "Build date")
+    if(FLARIAL_BUILD_DATE STREQUAL "")
+        string(TIMESTAMP FLARIAL_BUILD_DATE "%Y %b %d %H:%M:%S")
+        set(FLARIAL_BUILD_DATE "${FLARIAL_BUILD_DATE}" CACHE STRING "Build date")
+    endif()
 endif()
 
 add_compile_definitions(
@@ -86,6 +90,7 @@ target_link_libraries(Flarial PRIVATE miniz)
 
 set_target_properties(miniz PROPERTIES
         MSVC_RUNTIME_LIBRARY "MultiThreaded"
+        EXCLUDE_FROM_ALL ON
 )
 
 add_subdirectory(lib/lua)
