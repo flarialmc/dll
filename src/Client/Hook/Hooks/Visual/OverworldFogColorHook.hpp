@@ -8,26 +8,16 @@ class OverworldFogColorHook : public Hook {
 private:
 
     static MCCColor &
-    OverworldFogColorCallback(Dimension *_this, MCCColor &result, MCCColor const &baseColor, float brightness) {
-
-        auto event = nes::make_holder<FogColorEvent>(funcOriginal(_this, result, baseColor, brightness));
-        eventMgr.trigger(event);
-
-        return event->getFogColor();
-    }
+    OverworldFogColorCallback(Dimension *_this, MCCColor &result, MCCColor const &baseColor, float brightness);
 
 public:
     typedef MCCColor &(__thiscall *OverworldFogColorOriginal)(Dimension *, MCCColor &, MCCColor const &, float);
 
     static inline OverworldFogColorOriginal funcOriginal = nullptr;
 
-    OverworldFogColorHook() : Hook("Overworld Fog Color Hook",GET_SIG_ADDRESS("OverworldDimension::getBrightnessDependentFogColor")) {}
+    OverworldFogColorHook();
 
-    void enableHook() override {
-
-        this->autoHook((void *) OverworldFogColorCallback, (void **) &funcOriginal);
-
-    }
+    void enableHook() override;
 };
 
 

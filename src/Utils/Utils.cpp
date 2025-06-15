@@ -29,7 +29,7 @@ std::string Utils::getClientPath() {
 }
 
 std::string Utils::getConfigsPath() {
-	std::filesystem::path path(Utils::getRoamingPath() + "\\Flarial\\Config");
+	std::filesystem::path path(Utils::getClientPath() + "\\Config");
 	return path.string();
 }
 
@@ -47,12 +47,12 @@ void Utils::MessageDialogW(PCWSTR pText, PCWSTR pTitle)
 }
 
 std::string Utils::getAssetsPath() {
-	std::filesystem::path path(Utils::getRoamingPath() + "\\Flarial\\assets");
+	std::filesystem::path path(Utils::getClientPath() + "\\assets");
 	return path.string();
 }
 
 std::string Utils::getLogsPath() {
-	std::filesystem::path path(Utils::getRoamingPath() + "\\Flarial\\logs");
+	std::filesystem::path path(Utils::getClientPath() + "\\logs");
 	return path.string();
 }
 
@@ -377,6 +377,7 @@ int Utils::getStringAsKey(const std::string& str) {
 	if (str == "PG UP" || str == "pg up") return 33;
 	if (str == "PG DOWN" || str == "pg down") return 34;
 	if (str == "TAB") return 9;
+	if (str == "-") return 189;
 	if (str == "[" || str == "{") return 219;  // [ and { share the same key
 	if (str == "]" || str == "}") return 221;  // ] and } share the same key
 	if (str == "+" || str == "=") return 187;  // + and = share the same key
@@ -461,7 +462,7 @@ void Utils::extractFromFile(const std::string& zipFilePath, const std::string& d
 	mz_zip_archive zip_archive = {};
 
 	if (!mz_zip_reader_init_file(&zip_archive, zipFilePath.c_str(), 0)) {
-		Logger::error("Failed to open zip file: {}", zipFilePath);
+		LOG_ERROR("Failed to open zip file: {}", zipFilePath);
 		return;
 	}
 

@@ -10,7 +10,7 @@ public:
 	std::chrono::seconds elapsed;
 
 	Module202020() : Module("Meds", "Implements the medical 202020 rule\ninto minecraft.", IDR_TIME_PNG, "") {
-		Module::setup();
+		
 	};
 
 	void onEnable() override {
@@ -27,8 +27,8 @@ public:
 
 	void defaultConfig() override {
 		Module::defaultConfig();
-
-		if (settings.getSettingByName<bool>("extreme") == nullptr) settings.addSetting("extreme", false);
+		setDef("extreme", false);
+		if (ModuleManager::initialized) Client::SaveSettings();
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -43,23 +43,24 @@ public:
 			Constraints::RelativeConstraint(0.88f, "height"));
 
 		this->addHeader("Main");
-		this->addToggle("Extreme Mode", "", this->settings.getSettingByName<bool>("extreme")->value);
+		this->addToggle("Extreme Mode", "", "extreme");
 
 		FlarialGUI::UnsetScrollView();
 		this->resetPadding();
 	}
 
 	void onRender(RenderEvent& event) {
+		if (!this->isEnabled()) return;
 		now = std::chrono::steady_clock::now();
 		elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - last);
 
 		if (elapsed >= std::chrono::minutes(20)) {
-			if (!this->settings.getSettingByName<bool>("extreme")->value) FlarialGUI::Notify("Look at something 20 feet away for 20 seconds!");
+			if (!getOps<bool>("extreme")) FlarialGUI::Notify("Look at something 20 feet away for 20 seconds!");
 			last = now;
 			blackscreen = now;
 		}
 
-		if (this->settings.getSettingByName<bool>("extreme")->value and std::chrono::duration_cast<std::chrono::seconds>(now - last) < std::chrono::seconds(20) and elapsed >= std::chrono::minutes(20)) {
+		if (getOps<bool>("extreme") and std::chrono::duration_cast<std::chrono::seconds>(now - last) < std::chrono::seconds(20) and elapsed >= std::chrono::minutes(20)) {
 			FlarialGUI::RoundedRect(0, 0, { 0.f, 0.f, 0.f, 1.f }, Constraints::PercentageConstraint(1, "left"), Constraints::PercentageConstraint(1, "top"), 0, 0);
 		}
 	}

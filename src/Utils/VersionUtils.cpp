@@ -70,10 +70,22 @@ void VersionUtils::initialize() {
 }
 
 bool VersionUtils::isSupported(const std::string& version) {
-    return std::ranges::any_of(versions, [&version](const auto& p) {
+    if (std::ranges::any_of(versions, [&version](const auto& p) {
         return p.first == version;
-    });
+    })) {
+        return true;
+    }
+
+    std::string supported;
+    for (const auto& [v, _] : versions) {
+        if (!supported.empty()) supported += ", ";
+        supported += v;
+    }
+    Logger::debug("unsupported {} vs supported {}", version, supported);
+    return false;
+
 }
+
 
 void VersionUtils::addData() {
     std::thread t1([&](){
