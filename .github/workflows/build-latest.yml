@@ -1,7 +1,7 @@
 name: Build Flarial dll and add to newcdn as a release
 on:
   push:
-    branches: [ "main", "scripting-v2" ]
+    branches: [ "*" ]
     tags:
       - 'beta-*'
       - 'release-*'
