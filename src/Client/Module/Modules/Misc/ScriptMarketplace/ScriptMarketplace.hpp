@@ -1,10 +1,18 @@
 #pragma once
 
 #include <random>
-#include <wininet.h>
+#include <filesystem>
+#include <fstream>
+#include <thread>
+#include <algorithm>
+#include <vector>
+#include <sstream>
+#include <iomanip>
 
+#include <fmt/format.h>
 #include "miniz.h"
 #include "../../../../Client.hpp"
+#include "../../../../../Utils/Logger/Logger.hpp"
 #include "curl/curl/curl.h"
 #include <Scripting/ScriptManager.hpp>
 
@@ -21,28 +29,90 @@ public:
         Deafen(this, ProtocolEvent, &ScriptMarketplace::onProtocolConfig);
     }
 
+    static size_t WriteStringCallback(void* contents, size_t size, size_t nmemb, void* userp) {
+        std::string* response = static_cast<std::string*>(userp);
+        size_t totalSize = size * nmemb;
+        response->append(static_cast<const char*>(contents), totalSize);
+        return totalSize;
+    }
+
+    static std::string base64_decode(const std::string& encoded) {
+        const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        std::string decoded;
+        std::vector<int> T(256, -1);
+        
+        for (int i = 0; i < 64; i++) T[chars[i]] = i;
+
+        int val = 0, valb = -8;
+        for (unsigned char c : encoded) {
+            if (T[c] == -1) break;
+            val = (val << 6) + T[c];
+            valb += 6;
+            if (valb >= 0) {
+                decoded.push_back(char((val >> valb) & 0xFF));
+                valb -= 8;
+            }
+        }
+        return decoded;
+    }
+
+    static std::string url_encode(const std::string& value) {
+        std::ostringstream escaped;
+        escaped.fill('0');
+        escaped << std::hex;
+
+        for (std::string::const_iterator i = value.begin(), n = value.end(); i != n; ++i) {
+            std::string::value_type c = (*i);
+            
+            // Keep alphanumeric and other accepted characters intact
+            if (std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+                escaped << c;
+                continue;
+            }
+
+            // Any other characters are percent-encoded
+            escaped << std::uppercase;
+            escaped << '%' << std::setw(2) << int((unsigned char)c);
+            escaped << std::nouppercase;
+        }
+
+        return escaped.str();
+    }
+
     static std::string GetString(const std::string &URL) {
         try {
-            HINTERNET interwebs = InternetOpenA("Samsung Smart Fridge", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
-            if (!interwebs) {
+            CURL* curl = curl_easy_init();
+            if (!curl) {
+                LOG_ERROR("Failed to initialize cURL");
                 return "";
             }
 
-            std::string rtn;
-            HINTERNET urlFile = InternetOpenUrlA(interwebs, URL.c_str(), NULL, 0, INTERNET_FLAG_RELOAD, 0);
-            if (urlFile) {
-                char buffer[2000];
-                DWORD bytesRead;
-                while (InternetReadFile(urlFile, buffer, sizeof(buffer), &bytesRead) && bytesRead > 0) {
-                    rtn.append(buffer, bytesRead);
-                }
-                InternetCloseHandle(urlFile);
+            std::string response;
+            curl_easy_setopt(curl, CURLOPT_URL, URL.c_str());
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteStringCallback);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+            curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+            curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30L);
+            curl_easy_setopt(curl, CURLOPT_USERAGENT, "Flarial Client/1.0");
+
+            CURLcode res = curl_easy_perform(curl);
+            long httpCode = 0;
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+            curl_easy_cleanup(curl);
+
+            if (res != CURLE_OK) {
+                LOG_ERROR("cURL error: {}", curl_easy_strerror(res));
+                return "";
             }
 
-            InternetCloseHandle(interwebs);
-            return String::replaceAll(rtn, "|n", "\r\n");
+            if (httpCode != 200) {
+                LOG_ERROR("HTTP error: {}", httpCode);
+                return "";
+            }
+
+            return response;
         } catch (const std::exception &e) {
-            LOG_ERROR(e.what());
+            LOG_ERROR("Exception in GetString: {}", e.what());
         }
         return "";
     }
@@ -65,12 +135,67 @@ public:
         std::string scriptType = String::WStrToStr(scriptTypeW);
         FlarialGUI::Notify("Importing script '" + scriptName + "'... this may take a while.");
         std::thread([this, scriptName, scriptType]() {
-            std::string url = fmt::format("https://1klcjc8um5aq.flarial.xyz/api/scripts/{}/{}/download", scriptType, scriptName);
+            // First, get the script index to find the correct path
+            std::string indexUrl = fmt::format("https://cdn.statically.io/gh/flarialmc/scripts/main/{}-index.json", scriptType);
+            Logger::info("Fetching script index from: {}", indexUrl);
+            
+            std::string indexData = GetString(indexUrl);
+            if (indexData.empty()) {
+                LOG_ERROR("Failed to download script index for type {}", scriptType);
+                FlarialGUI::Notify("Failed to import script '" + scriptName + "': Could not access script index");
+                return;
+            }
+
+            // Parse the JSON to find the script path
+            // Look for the script with matching name
+            std::string searchPattern = fmt::format("\"name\": \"{}\"", scriptName);
+            size_t namePos = indexData.find(searchPattern);
+            if (namePos == std::string::npos) {
+                LOG_ERROR("Script '{}' not found in {} index", scriptName, scriptType);
+                FlarialGUI::Notify("Failed to import script '" + scriptName + "': Script not found in index");
+                return;
+            }
+
+            // Find the path field for this script
+            size_t pathStart = indexData.find("\"path\": \"", namePos);
+            if (pathStart == std::string::npos) {
+                LOG_ERROR("Path field not found for script '{}'", scriptName);
+                FlarialGUI::Notify("Failed to import script '" + scriptName + "': Invalid script index format");
+                return;
+            }
+            
+            pathStart += 9; // Skip "path": "
+            size_t pathEnd = indexData.find("\"", pathStart);
+            if (pathEnd == std::string::npos) {
+                LOG_ERROR("Path field malformed for script '{}'", scriptName);
+                FlarialGUI::Notify("Failed to import script '" + scriptName + "': Invalid script path format");
+                return;
+            }
+
+            std::string scriptPath = indexData.substr(pathStart, pathEnd - pathStart);
+            
+            // Now download the script using the correct path
+            std::string url = fmt::format("https://cdn.statically.io/gh/flarialmc/scripts/main/{}", scriptPath);
+            Logger::info("Downloading script '{}' from URL: {}", scriptName, url);
+            
             std::string data = GetString(url);
 
             if (data.empty()) {
-                LOG_ERROR("Failed to download script content for {}", scriptName);
-                FlarialGUI::Notify("Failed to import script '" + scriptName + "'");
+                LOG_ERROR("Failed to download script content for {} from URL: {}", scriptName, url);
+                FlarialGUI::Notify("Failed to import script '" + scriptName + "': No content received");
+                return;
+            }
+
+            if (data.length() < 10) {
+                LOG_ERROR("Downloaded script content too short for {}: {} characters", scriptName, data.length());
+                FlarialGUI::Notify("Failed to import script '" + scriptName + "': Invalid content");
+                return;
+            }
+
+            // Basic validation for Lua content
+            if (data.find("function") == std::string::npos && data.find("local") == std::string::npos && data.find("--") == std::string::npos) {
+                LOG_ERROR("Downloaded content doesn't appear to be valid Lua script for {}", scriptName);
+                FlarialGUI::Notify("Failed to import script '" + scriptName + "': Invalid Lua content");
                 return;
             }
 
@@ -95,19 +220,32 @@ public:
                 return;
             }
 
-            // Write the script file
+            // Check if script already exists
             std::string filePath = dirPath.string() + scriptName + ".lua";
-            std::ofstream file(filePath, std::ios::binary);
+            if (std::filesystem::exists(filePath)) {
+                Logger::info("Overwriting existing script: {}", scriptName);
+                FlarialGUI::Notify("Overwriting existing script '" + scriptName + "'");
+            }
+
+            // Write the script file
+            std::ofstream file(filePath, std::ios::out | std::ios::trunc);
 
             if (!file.is_open()) {
                 LOG_ERROR("Failed to open file for writing: {}", filePath);
-                FlarialGUI::Notify("Failed to import script '" + scriptName + "'");
+                FlarialGUI::Notify("Failed to import script '" + scriptName + "': File creation failed");
                 return;
             }
 
-            file.write(data.c_str(), data.size());
+            file << data;
             file.close();
 
+            if (file.fail()) {
+                LOG_ERROR("Failed to write script content to file: {}", filePath);
+                FlarialGUI::Notify("Failed to import script '" + scriptName + "': Write failed");
+                return;
+            }
+
+            Logger::info("Successfully imported {} script: {} to {}", scriptType, scriptName, filePath);
             FlarialGUI::Notify("Successfully imported script '" + scriptName + "'");
             ModuleManager::restartModules = true;
             ScriptManager::reloadScripts();
@@ -201,14 +339,63 @@ public:
                 std::thread([this, pair, id]() {
                     Logger::info("config name {}", id);
 
-                    std::string url = "https://1klcjc8um5aq.flarial.xyz/api/configs/" + id + "/download";
-                    url.erase(std::remove(url.begin(), url.end(), ' '), url.end());
+                    // Convert to lowercase for GitHub CDN compatibility  
+                    std::string configId = id;
+                    std::transform(configId.begin(), configId.end(), configId.begin(), ::tolower);
+                    
+                    // Use direct GitHub CDN URL (marketplace API has CORS restrictions)
+                    std::string url = fmt::format("https://cdn.statically.io/gh/flarialmc/configs/main/{}.zip", configId);
+                    Logger::info("Downloading config from URL: {}", url);
 
                     std::filesystem::path tempZipPath = std::filesystem::temp_directory_path() / (id + ".zip");
 
-                    if (!ScriptMarketplace::DownloadFile(url, tempZipPath.string())) {
-                        LOG_ERROR("Failed to download config {} to temporary location", id);
+                    // Download directly as binary since GitHub CDN serves raw files
+                    if (!DownloadFile(url, tempZipPath.string())) {
+                        LOG_ERROR("Failed to download config {} from URL: {}", id, url);
+                        FlarialGUI::Notify("Failed to import config '" + id + "': Download failed");
                         return;
+                    }
+
+                    if (!std::filesystem::exists(tempZipPath)) {
+                        LOG_ERROR("Temporary zip file does not exist after creation for config {}", id);
+                        FlarialGUI::Notify("Failed to import config '" + id + "': Zip file not created");
+                        return;
+                    }
+
+                    std::uintmax_t fileSize = std::filesystem::file_size(tempZipPath);
+                    if (fileSize == 0) {
+                        LOG_ERROR("Temporary zip file is empty for config {}", id);
+                        FlarialGUI::Notify("Failed to import config '" + id + "': Empty zip file");
+                        return;
+                    }
+
+                    Logger::info("Created temporary zip file for config {} with size: {} bytes", id, fileSize);
+
+                    // Debug: Check the first few bytes of the file to see if it's actually a zip
+                    std::ifstream debugFile(tempZipPath, std::ios::binary);
+                    if (debugFile.is_open()) {
+                        char header[4];
+                        debugFile.read(header, 4);
+                        Logger::info("File header bytes: 0x{:02X} 0x{:02X} 0x{:02X} 0x{:02X}", 
+                                   (unsigned char)header[0], (unsigned char)header[1], 
+                                   (unsigned char)header[2], (unsigned char)header[3]);
+                        debugFile.close();
+                        
+                        // ZIP files should start with "PK" (0x50 0x4B)
+                        if (header[0] != 0x50 || header[1] != 0x4B) {
+                            LOG_ERROR("Downloaded file is not a valid ZIP archive for config {}", id);
+                            
+                            // Read a bit more to see what we actually got
+                            std::ifstream contentFile(tempZipPath);
+                            std::string content((std::istreambuf_iterator<char>(contentFile)), std::istreambuf_iterator<char>());
+                            contentFile.close();
+                            Logger::info("First 200 chars of downloaded content: {}", content.substr(0, 200));
+                            
+                            FlarialGUI::Notify("Failed to import config '" + id + "': Invalid file format");
+                            std::error_code cleanup_ec;
+                            std::filesystem::remove(tempZipPath, cleanup_ec);
+                            return;
+                        }
                     }
 
                     std::string configname = id;
@@ -224,7 +411,13 @@ public:
                     mz_zip_archive zip_archive;
                     memset(&zip_archive, 0, sizeof(zip_archive));
                     if (!mz_zip_reader_init_file(&zip_archive, tempZipPath.string().c_str(), 0)) {
-                        LOG_ERROR("Failed to initialize zip archive from file for config {}", configname);
+                        LOG_ERROR("Failed to initialize zip archive from file for config {}: File path: {}, Size: {} bytes", 
+                                 configname, tempZipPath.string(), fileSize);
+                        FlarialGUI::Notify("Failed to import config '" + id + "': Invalid zip format");
+                        
+                        // Clean up temp file
+                        std::error_code cleanup_ec;
+                        std::filesystem::remove(tempZipPath, cleanup_ec);
                         return;
                     }
 
@@ -279,8 +472,8 @@ public:
                         LOG_ERROR("Failed to delete temporary zip file {}: {}", tempZipPath.string(), ec.message());
                     }
 
-                    Logger::success("Extracted config zip for {} to {}", configname, extractionDir.string());
-                    FlarialGUI::Notify("Imported Config as: " + configname);
+                    Logger::success("Successfully extracted config zip for {} to {}", configname, extractionDir.string());
+                    FlarialGUI::Notify("Successfully imported config: " + configname);
                     ModuleManager::restartModules = true;
                     reloadAllConfigs();
                 }).detach();
