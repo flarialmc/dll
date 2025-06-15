@@ -568,7 +568,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 		}
 		else {
             Logger::custom(fg(fmt::color::cyan), "Image", "Using cached D3D12 image for resource {}, GPU handle: 0x{:X}", 
-                           resourceId, reinterpret_cast<uintptr_t>(ImagesClass::ImguiDX12Images[resourceId]));
+                           resourceId, static_cast<uint64_t>(reinterpret_cast<uintptr_t>(ImagesClass::ImguiDX12Images[resourceId])));
 			try {
 				ImGui::GetBackgroundDrawList()->AddImage(ImagesClass::ImguiDX12Images[resourceId],
 														 ImVec2(imageRect.left, imageRect.top),
