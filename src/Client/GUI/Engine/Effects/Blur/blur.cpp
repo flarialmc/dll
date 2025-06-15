@@ -228,7 +228,7 @@ void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderRe
 {
     ID3D11DeviceContext* pContext = SwapchainHook::context;
     if (!pContext) return;
-
+//
     // Use cached render states (no recreation overhead)
     pContext->OMSetDepthStencilState(pDepthStencilState, 0);
     pContext->OMSetBlendState(pBlendState, NULL, 0xffffffff);
