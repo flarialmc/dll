@@ -25,6 +25,14 @@ jobs:
       - name: "Check commit type"
         id: type
         run: |
+          # Check for reset-cache tag
+          if [[ "${{ github.event.head_commit.message }}" == *"reset-cache:"* ]]; then
+              echo "Cache reset requested"
+              echo "reset_cache=true" >> "$GITHUB_OUTPUT"
+          else
+              echo "reset_cache=false" >> "$GITHUB_OUTPUT"
+          fi
+          
           # Check if we're on main or scripting-v2 branch
           if [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "scripting-v2" ]]; then
               # Main branches can use all build types
@@ -87,9 +95,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/sccache
-          key: sccache-${{ runner.os }}-${{ github.sha }}
+          key: sccache-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ github.sha }}
           restore-keys: |
-            sccache-${{ runner.os }}-
+            ${{ steps.type.outputs.reset_cache == 'false' && format('sccache-{0}-normal-', runner.os) || '' }}
 
       - name: Cache CMake dependencies
         uses: actions/cache@v4
@@ -97,9 +105,9 @@ jobs:
           path: |
             _deps
             build/_deps
-          key: cmake-deps-${{ runner.os }}-${{ hashFiles('CMakeLists.txt') }}
+          key: cmake-deps-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ hashFiles('CMakeLists.txt') }}
           restore-keys: |
-            cmake-deps-${{ runner.os }}-
+            ${{ steps.type.outputs.reset_cache == 'false' && format('cmake-deps-{0}-normal-', runner.os) || '' }}
 
       - name: Cache CMake build
         uses: actions/cache@v4
@@ -112,10 +120,10 @@ jobs:
             build/**/*.dll
             build/**/*.exe
             build/CMakeFiles
-          key: cmake-build-${{ runner.os }}-${{ github.sha }}-${{ hashFiles('CMakeLists.txt', 'src/**/*.cpp', 'src/**/*.hpp', 'src/**/*.h') }}
+          key: cmake-build-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ github.sha }}-${{ hashFiles('CMakeLists.txt', 'src/**/*.cpp', 'src/**/*.hpp', 'src/**/*.h') }}
           restore-keys: |
-            cmake-build-${{ runner.os }}-${{ github.sha }}-
-            cmake-build-${{ runner.os }}-
+            ${{ steps.type.outputs.reset_cache == 'false' && format('cmake-build-{0}-normal-{1}-', runner.os, github.sha) || '' }}
+            ${{ steps.type.outputs.reset_cache == 'false' && format('cmake-build-{0}-normal-', runner.os) || '' }}
 
       - name: Configure CMake
         run: |
