@@ -112,11 +112,11 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_PARALLEL_LEVEL=%NUMBER_OF_PROCESSORS% -DFETCHCONTENT_BASE_DIR="${{ github.workspace }}/_deps" -DFETCHCONTENT_QUIET=ON -DBUILD_DATE="${{ github.run_id }}-${{ github.run_number }}"
+          cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DFETCHCONTENT_BASE_DIR="${{ github.workspace }}/_deps" -DFETCHCONTENT_QUIET=ON -DBUILD_DATE="${{ github.run_id }}-${{ github.run_number }}"
 
       - name: Build DLL
         run: |
-          cmake --build build --target Flarial --parallel %NUMBER_OF_PROCESSORS%
+          cmake --build build --target Flarial --parallel
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.6.1
         with:
