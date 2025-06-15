@@ -108,7 +108,7 @@ void HookManager::initialize() {
 
         addHook<RenderOrderExecuteHook>();
         addHook<RenderChunkCoordinatorHandleVisibilityUpdatesHook>();
-
+//
         addHook<SettingsScreenOnExitHook>();
     }
 
