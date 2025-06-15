@@ -116,11 +116,37 @@ include(FetchContent)
 set(FETCHCONTENT_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/_deps" CACHE STRING "Base directory for FetchContent")
 set(FETCHCONTENT_QUIET ON)  # Reduce configure output noise
 
-# Enable fully disconnected builds after first download
-set(FETCHCONTENT_FULLY_DISCONNECTED ON CACHE BOOL "Disable all attempts to download or update content and assume source dirs already exist")
+# Enable fully disconnected builds after first download - but only after cache exists
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/_deps/libhat-src")
+    set(FETCHCONTENT_FULLY_DISCONNECTED ON CACHE BOOL "Disable all attempts to download or update content and assume source dirs already exist")
+else()
+    set(FETCHCONTENT_FULLY_DISCONNECTED OFF CACHE BOOL "Disable all attempts to download or update content and assume source dirs already exist")
+endif()
+
+# Optimize git for faster downloads
+execute_process(
+    COMMAND git config --global pack.windowMemory 512m
+    COMMAND git config --global pack.packSizeLimit 2g
+    COMMAND git config --global pack.threads 0
+    COMMAND git config --global core.preloadindex true
+    COMMAND git config --global core.fscache true
+    ERROR_QUIET
+)
 
 # Create cache directory if it doesn't exist
 file(MAKE_DIRECTORY "${FETCHCONTENT_BASE_DIR}")
+
+# Enable parallel processing for dependencies
+include(ProcessorCount)
+ProcessorCount(N)
+if(NOT N EQUAL 0)
+    set(CMAKE_BUILD_PARALLEL_LEVEL ${N} CACHE STRING "Number of parallel build jobs")
+    math(EXPR PARALLEL_DOWNLOADS "${N} / 2")
+    if(PARALLEL_DOWNLOADS LESS 2)
+        set(PARALLEL_DOWNLOADS 2)
+    endif()
+    set(FETCHCONTENT_PARALLEL ${PARALLEL_DOWNLOADS} CACHE STRING "Number of parallel FetchContent downloads")
+endif()
 
 # Check if dependencies are already populated to skip FetchContent entirely
 set(SKIP_FETCHCONTENT FALSE)
@@ -135,12 +161,15 @@ if(EXISTS "${FETCHCONTENT_BASE_DIR}/entt-src" AND
 endif()
 
 if(NOT SKIP_FETCHCONTENT)
+    # Optimized FetchContent declarations with git config optimizations
     FetchContent_Declare(
             entt
             GIT_REPOSITORY https://github.com/skypjack/entt.git
             GIT_TAG        f931687ff04d435871ac9664bb299f71f2a8fafc
-            GIT_SHALLOW    ON
             GIT_PROGRESS   ON
+            GIT_SHALLOW    OFF
+            GIT_SUBMODULES ""  # Skip submodules
+            GIT_CONFIG     "advice.detachedHead=false;core.autocrlf=false;core.eol=lf"
     )
 
     FetchContent_Declare(
@@ -149,14 +178,18 @@ if(NOT SKIP_FETCHCONTENT)
             GIT_TAG        main
             GIT_SHALLOW    ON
             GIT_PROGRESS   ON
+            GIT_SUBMODULES ""
+            GIT_CONFIG     "advice.detachedHead=false;core.autocrlf=false;core.eol=lf"
     )
 
     FetchContent_Declare(
             libhat
             GIT_REPOSITORY https://github.com/BasedInc/libhat.git
             GIT_TAG        d6297514b05fd238f5b46d003325f108c22741e3
-            GIT_SHALLOW    ON
+            GIT_SHALLOW    OFF
             GIT_PROGRESS   ON
+            GIT_SUBMODULES ""
+            GIT_CONFIG     "advice.detachedHead=false;core.autocrlf=false;core.eol=lf"
     )
 
     FetchContent_Declare(
@@ -165,6 +198,8 @@ if(NOT SKIP_FETCHCONTENT)
             GIT_TAG        master
             GIT_SHALLOW    ON
             GIT_PROGRESS   ON
+            GIT_SUBMODULES ""
+            GIT_CONFIG     "advice.detachedHead=false;core.autocrlf=false;core.eol=lf"
     )
 
     FetchContent_Declare(
@@ -173,6 +208,8 @@ if(NOT SKIP_FETCHCONTENT)
             GIT_TAG        master
             GIT_SHALLOW    ON
             GIT_PROGRESS   ON
+            GIT_SUBMODULES ""
+            GIT_CONFIG     "advice.detachedHead=false;core.autocrlf=false;core.eol=lf"
     )
 
     FetchContent_Declare(
@@ -181,9 +218,30 @@ if(NOT SKIP_FETCHCONTENT)
             GIT_TAG        master
             GIT_SHALLOW    ON
             GIT_PROGRESS   ON
+            GIT_SUBMODULES ""
+            GIT_CONFIG     "advice.detachedHead=false;core.autocrlf=false;core.eol=lf"
     )
 
-    FetchContent_MakeAvailable(libhat entt nes fmt magic_enum LuaBridge)
+    # Use parallel processing for FetchContent
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.24")
+        # Enable parallel population for CMake 3.24+
+        FetchContent_MakeAvailable(libhat entt nes fmt magic_enum LuaBridge)
+    else()
+        # Manual parallel downloads for older CMake versions
+        FetchContent_Populate(libhat)
+        FetchContent_Populate(entt)
+        FetchContent_Populate(nes)
+        FetchContent_Populate(fmt)
+        FetchContent_Populate(magic_enum)
+        FetchContent_Populate(LuaBridge)
+        
+        add_subdirectory(${libhat_SOURCE_DIR} ${libhat_BINARY_DIR})
+        add_subdirectory(${entt_SOURCE_DIR} ${entt_BINARY_DIR})
+        add_subdirectory(${nes_SOURCE_DIR} ${nes_BINARY_DIR})
+        add_subdirectory(${fmt_SOURCE_DIR} ${fmt_BINARY_DIR})
+        add_subdirectory(${magic_enum_SOURCE_DIR} ${magic_enum_BINARY_DIR})
+        add_subdirectory(${luabridge_SOURCE_DIR} ${luabridge_BINARY_DIR})
+    endif()
 else()
     # Manually add the cached directories as subdirectories
     add_subdirectory("${FETCHCONTENT_BASE_DIR}/entt-src" "${FETCHCONTENT_BASE_DIR}/entt-build")
