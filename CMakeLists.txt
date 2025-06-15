@@ -57,10 +57,15 @@ endif()
 
 # Cache build date to avoid regenerating every configure (optional for development speed)
 if(NOT DEFINED FLARIAL_BUILD_DATE OR FLARIAL_BUILD_DATE STREQUAL "")
-    # Use environment variable if available (set by CI), otherwise generate timestamp
+    # Use environment variable if available (set by CI), otherwise use cached date
     set(FLARIAL_BUILD_DATE "$ENV{BUILD_DATE}" CACHE STRING "Build date")
     if(FLARIAL_BUILD_DATE STREQUAL "")
-        string(TIMESTAMP FLARIAL_BUILD_DATE "%Y %b %d %H:%M:%S")
+        # For local builds, use a fixed date to enable better caching
+        if(DEFINED ENV{CI})
+            string(TIMESTAMP FLARIAL_BUILD_DATE "%Y %b %d %H:%M:%S")
+        else()
+            set(FLARIAL_BUILD_DATE "Development Build")
+        endif()
         set(FLARIAL_BUILD_DATE "${FLARIAL_BUILD_DATE}" CACHE STRING "Build date")
     endif()
 endif()

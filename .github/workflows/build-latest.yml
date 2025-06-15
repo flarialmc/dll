@@ -74,18 +74,6 @@ jobs:
         with:
           version: 1.11.1
 
-      - name: Cache CMake build directory
-        uses: actions/cache@v4
-        with:
-          path: |
-            build
-            !build/Flarial.dll
-            !build/**/*.pdb
-            !build/**/*.log
-          key: cmake-build-${{ runner.os }}-${{ hashFiles('CMakeLists.txt', 'src/**/*.cpp', 'src/**/*.hpp') }}
-          restore-keys: |
-            cmake-build-${{ runner.os }}-
-
       - name: Cache FetchContent dependencies
         uses: actions/cache@v4
         with:
@@ -98,21 +86,37 @@ jobs:
           restore-keys: |
             fetchcontent-${{ runner.os }}-
 
-      - name: Cache compiled object files
+      - name: Cache CMake build directory
         uses: actions/cache@v4
         with:
           path: |
-            build/**/*.obj
-            build/**/*.pch
-            build/CMakeFiles/Flarial.dir/**
-            !build/CMakeFiles/Flarial.dir/*.log
-          key: obj-cache-${{ runner.os }}-${{ hashFiles('src/**/*.cpp', 'src/**/*.hpp', 'lib/**/*.cpp', 'lib/**/*.h') }}
+            build
+            !build/Flarial.dll
+            !build/**/*.pdb
+            !build/**/*.exe
+            !build/**/*.log
+          key: cmake-build-${{ runner.os }}-${{ hashFiles('CMakeLists.txt', 'src/PCH.hpp', 'lib/**/*.h', 'lib/**/*.hpp') }}-${{ hashFiles('src/**/*.cpp', 'src/**/*.hpp') }}
           restore-keys: |
-            obj-cache-${{ runner.os }}-
+            cmake-build-${{ runner.os }}-${{ hashFiles('CMakeLists.txt', 'src/PCH.hpp', 'lib/**/*.h', 'lib/**/*.hpp') }}-
+            cmake-build-${{ runner.os }}-
+
+      - name: Check cache status
+        run: |
+          echo "Checking build directory status..."
+          if (Test-Path "build") {
+            echo "Build directory exists"
+            echo "Build directory contents:"
+            Get-ChildItem build -Recurse -Name | Select-Object -First 20
+            if (Test-Path "build/CMakeCache.txt") {
+              echo "CMakeCache.txt exists - build is configured"
+            }
+          } else {
+            echo "Build directory does not exist"
+          }
 
       - name: Configure CMake
         run: |
-          cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DFETCHCONTENT_BASE_DIR="${{ github.workspace }}/_deps" -DFETCHCONTENT_QUIET=ON -DBUILD_DATE="${{ github.run_id }}-${{ github.run_number }}"
+          cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DFETCHCONTENT_BASE_DIR="${{ github.workspace }}/_deps" -DFETCHCONTENT_QUIET=ON -DBUILD_DATE="${{ github.run_id }}-${{ github.run_number }}" -DCI=ON
 
       - name: Build DLL
         run: |
