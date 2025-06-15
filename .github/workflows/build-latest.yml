@@ -106,9 +106,17 @@ jobs:
           if (Test-Path "build") {
             echo "Build directory exists"
             echo "Build directory contents:"
-            Get-ChildItem build -Recurse -Name | Select-Object -First 20
+            Get-ChildItem build -Recurse -Name | Select-Object -First 30
             if (Test-Path "build/CMakeCache.txt") {
               echo "CMakeCache.txt exists - build is configured"
+            }
+            if (Test-Path "build/CMakeFiles/Flarial.dir") {
+              echo "Flarial.dir exists:"
+              Get-ChildItem "build/CMakeFiles/Flarial.dir" -Recurse -Name | Select-Object -First 20
+            }
+            if (Test-Path "build/CMakeFiles/Flarial.dir/Unity") {
+              echo "Unity directory exists with files:"
+              Get-ChildItem "build/CMakeFiles/Flarial.dir/Unity" -Name
             }
           } else {
             echo "Build directory does not exist"
@@ -117,6 +125,13 @@ jobs:
       - name: Configure CMake
         run: |
           cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DFETCHCONTENT_BASE_DIR="${{ github.workspace }}/_deps" -DFETCHCONTENT_QUIET=ON -DBUILD_DATE="${{ github.run_id }}-${{ github.run_number }}" -DCI=ON
+
+      - name: Check Ninja build state
+        run: |
+          if (Test-Path "build/build.ninja") {
+            echo "build.ninja exists"
+            ninja -C build -t query Flarial 2>$null || echo "Flarial target not found"
+          }
 
       - name: Build DLL
         run: |

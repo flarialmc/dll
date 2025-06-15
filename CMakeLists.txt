@@ -277,10 +277,11 @@ endif()
 target_link_libraries(Flarial PRIVATE libcurl ws2_32.lib crypt32.lib normaliz.lib wldap32.lib LuaBridge lua_static libhat fmt::fmt EnTT::EnTT NES windowscodecs.lib urlmon.lib dwrite.lib d3d12.lib dxgi.lib d3d11.lib d2d1.lib wininet.lib version FreeType magic_enum)
 target_link_libraries(Flarial PUBLIC MinHook)
 
-# Optimize Unity build for faster compilation
-set_property(TARGET Flarial PROPERTY UNITY_BUILD ON)
-set_property(TARGET Flarial PROPERTY UNITY_BUILD_BATCH_SIZE 16)  # Smaller batches for better incremental builds
-set_property(TARGET Flarial PROPERTY UNITY_BUILD_MODE BATCH)
+# Optimize Unity build for faster compilation - disabled for better caching
+# Unity builds invalidate caches too easily, trading compile speed for cache effectiveness
+set_property(TARGET Flarial PROPERTY UNITY_BUILD OFF)
+# set_property(TARGET Flarial PROPERTY UNITY_BUILD_BATCH_SIZE 16)  # Smaller batches for better incremental builds
+# set_property(TARGET Flarial PROPERTY UNITY_BUILD_MODE BATCH)
 
 # Enable faster symbol generation
 if(MSVC)
