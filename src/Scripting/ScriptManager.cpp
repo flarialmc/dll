@@ -62,7 +62,7 @@ void ScriptManager::loadModuleScripts() {
             script);
 
         mLoadedModules.emplace_back(mod);
-        mod->defaultConfig();
+        mod->loadSettings();
         ModuleManager::cguiRefresh = true;
         Logger::script(false, "Loaded module script '{}'", script->getName());
 
