@@ -1,7 +1,7 @@
 name: Build Flarial dll and add to newcdn as a release
 on:
   push:
-    branches: [ "main", "scripting-v2" ]
+    branches: [ "main", "scripting-v2", "**" ]  # Allow all branches
     tags:
       - 'beta-*'
       - 'release-*'
@@ -25,33 +25,48 @@ jobs:
       - name: "Check commit type"
         id: type
         run: |
-          if [[ "${{ github.ref_type }}" == "tag" ]]; then
-              if [[ "${{ github.ref_name }}" == beta-* ]]; then
-                  echo "Continuing to build as beta (tag)"
-                  echo "status=2" >> "$GITHUB_OUTPUT"
-              elif [[ "${{ github.ref_name }}" == release-* ]]; then
-                  echo "Continuing to build as release (tag)"
+          # Check if we're on main or scripting-v2 branch
+          if [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "scripting-v2" ]]; then
+              # Main branches can use all build types
+              if [[ "${{ github.ref_type }}" == "tag" ]]; then
+                  if [[ "${{ github.ref_name }}" == beta-* ]]; then
+                      echo "Continuing to build as beta (tag)"
+                      echo "status=2" >> "$GITHUB_OUTPUT"
+                  elif [[ "${{ github.ref_name }}" == release-* ]]; then
+                      echo "Continuing to build as release (tag)"
+                      echo "status=1" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "Unknown tag type, exiting"
+                      gh run cancel ${{ github.run_id }}
+                      gh run watch ${{ github.run_id }}f
+                      exit 0
+                  fi
+              elif [[ "${{ github.event.head_commit.message }}" == *"nightly:"* ]]; then
+                  echo "Continuing to build as nightly"
+                  echo "status=0" >> "$GITHUB_OUTPUT"
+              elif [[ "${{ github.event.head_commit.message }}" == *"release:"* ]]; then
+                  echo "Continuing to build as release"
                   echo "status=1" >> "$GITHUB_OUTPUT"
+              elif [[ "${{ github.event.head_commit.message }}" == *"beta:"* ]]; then
+                  echo "Continuing to build as beta"
+                  echo "status=2" >> "$GITHUB_OUTPUT"
               else
-                  echo "Unknown tag type, exiting"
+                  echo "Not a build commit, exiting"
                   gh run cancel ${{ github.run_id }}
                   gh run watch ${{ github.run_id }}f
                   exit 0
               fi
-          elif [[ "${{ github.event.head_commit.message }}" == *"nightly:"* ]]; then
-              echo "Continuing to build as nightly"
-              echo "status=0" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.head_commit.message }}" == *"release:"* ]]; then
-              echo "Continuing to build as release"
-              echo "status=1" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.head_commit.message }}" == *"beta:"* ]]; then
-              echo "Continuing to build as beta"
-              echo "status=2" >> "$GITHUB_OUTPUT"
           else
-              echo "Not a build commit, exiting"
-              gh run cancel ${{ github.run_id }}
-              gh run watch ${{ github.run_id }}f
-              exit 0
+              # Other branches can only use nightly builds
+              if [[ "${{ github.event.head_commit.message }}" == *"nightly:"* ]]; then
+                  echo "Branch '${{ github.ref_name }}' building as nightly"
+                  echo "status=0" >> "$GITHUB_OUTPUT"
+              else
+                  echo "Branch '${{ github.ref_name }}' can only build with 'nightly:' prefix. Exiting."
+                  gh run cancel ${{ github.run_id }}
+                  gh run watch ${{ github.run_id }}f
+                  exit 0
+              fi
           fi
         shell: bash
         env:
