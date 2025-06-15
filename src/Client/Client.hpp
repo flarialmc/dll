@@ -113,6 +113,7 @@ public:
 		try {
 			if (!settings.getSettingByName<std::string>("currentConfig")) return Logger::warn("No Client Settings to save to PRIVATE");
 
+
 			// for some reason u cant directly clear file content when its hidden??? ok then
 			DWORD originalAttributes = INVALID_FILE_ATTRIBUTES;
 			originalAttributes = GetFileAttributesA(privatePath.c_str());
