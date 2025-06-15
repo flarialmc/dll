@@ -294,6 +294,7 @@ void ModuleManager::restart() {
 			}
 		}
 	}
+	
 	initialized = true;
 	Client::PerformPostLegacySetup();
 	ScriptManager::reloadScripts();
