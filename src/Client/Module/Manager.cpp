@@ -279,7 +279,6 @@ void ModuleManager::terminate() {
 	services.clear();
 }
 
-
 void ModuleManager::restart() {
 	initialized = false;
 	Client::LoadSettings();
