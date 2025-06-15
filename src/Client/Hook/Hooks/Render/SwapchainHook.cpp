@@ -642,7 +642,23 @@ void SwapchainHook::DX12Render(bool underui) {
                 d3d12CommandList->OMSetRenderTargets(1,
                                                      &frameContexts[currentBitmap].main_render_target_descriptor,
                                                      FALSE, nullptr);
-                d3d12CommandList->SetDescriptorHeaps(1, &d3d12DescriptorHeapImGuiRender);
+                // Bind both ImGui render heap and image heap if it exists
+                if (d3d12DescriptorHeapImGuiIMAGE) {
+                    ID3D12DescriptorHeap* heaps[] = { d3d12DescriptorHeapImGuiRender, d3d12DescriptorHeapImGuiIMAGE };
+                    d3d12CommandList->SetDescriptorHeaps(2, heaps);
+                    static bool loggedOnce = false;
+                    if (!loggedOnce) {
+                        loggedOnce = true;
+                        Logger::custom(fg(fmt::color::green), "D3D12Render", "Binding both ImGui render heap and image heap to command list");
+                    }
+                } else {
+                    d3d12CommandList->SetDescriptorHeaps(1, &d3d12DescriptorHeapImGuiRender);
+                    static bool loggedOnce = false;
+                    if (!loggedOnce) {
+                        loggedOnce = true;
+                        Logger::custom(fg(fmt::color::yellow), "D3D12Render", "Only binding ImGui render heap - image heap not available yet");
+                    }
+                }
 
                 ImGui::End();
                 ImGui::EndFrame();
