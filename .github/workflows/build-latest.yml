@@ -13,49 +13,55 @@ env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
+  check-commit:
+    runs-on: ubuntu-latest
+    outputs:
+      should_build: ${{ steps.check.outputs.should_build }}
+      type: ${{ steps.check.outputs.type }}
+    steps:
+      - name: Check if build is needed
+        id: check
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+              if [[ "${{ github.ref_name }}" == beta-* ]]; then
+                  echo "Build needed for beta tag"
+                  echo "should_build=true" >> "$GITHUB_OUTPUT"
+                  echo "type=2" >> "$GITHUB_OUTPUT"
+              elif [[ "${{ github.ref_name }}" == release-* ]]; then
+                  echo "Build needed for release tag"
+                  echo "should_build=true" >> "$GITHUB_OUTPUT"
+                  echo "type=1" >> "$GITHUB_OUTPUT"
+              else
+                  echo "Unknown tag type, skipping build"
+                  echo "should_build=false" >> "$GITHUB_OUTPUT"
+              fi
+          elif [[ "${{ github.event.head_commit.message }}" == *"nightly:"* ]]; then
+              echo "Build needed for nightly"
+              echo "should_build=true" >> "$GITHUB_OUTPUT"
+              echo "type=0" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event.head_commit.message }}" == *"release:"* ]]; then
+              echo "Build needed for release"
+              echo "should_build=true" >> "$GITHUB_OUTPUT"
+              echo "type=1" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event.head_commit.message }}" == *"beta:"* ]]; then
+              echo "Build needed for beta"
+              echo "should_build=true" >> "$GITHUB_OUTPUT"
+              echo "type=2" >> "$GITHUB_OUTPUT"
+          else
+              echo "No build needed, skipping"
+              echo "should_build=false" >> "$GITHUB_OUTPUT"
+          fi
+
   windows-build:
     runs-on: windows-latest
+    needs: check-commit
+    if: needs.check-commit.outputs.should_build == 'true'
     outputs:
-      type: ${{ steps.type.outputs.status }}
+      type: ${{ needs.check-commit.outputs.type }}
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
-      - name: "Check commit type"
-        id: type
-        run: |
-          if [[ "${{ github.ref_type }}" == "tag" ]]; then
-              if [[ "${{ github.ref_name }}" == beta-* ]]; then
-                  echo "Continuing to build as beta (tag)"
-                  echo "status=2" >> "$GITHUB_OUTPUT"
-              elif [[ "${{ github.ref_name }}" == release-* ]]; then
-                  echo "Continuing to build as release (tag)"
-                  echo "status=1" >> "$GITHUB_OUTPUT"
-              else
-                  echo "Unknown tag type, exiting"
-                  gh run cancel ${{ github.run_id }}
-                  gh run watch ${{ github.run_id }}f
-                  exit 0
-              fi
-          elif [[ "${{ github.event.head_commit.message }}" == *"nightly:"* ]]; then
-              echo "Continuing to build as nightly"
-              echo "status=0" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.head_commit.message }}" == *"release:"* ]]; then
-              echo "Continuing to build as release"
-              echo "status=1" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.head_commit.message }}" == *"beta:"* ]]; then
-              echo "Continuing to build as beta"
-              echo "status=2" >> "$GITHUB_OUTPUT"
-          else
-              echo "Not a build commit, exiting"
-              gh run cancel ${{ github.run_id }}
-              gh run watch ${{ github.run_id }}f
-              exit 0
-          fi
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set Up MSVC Environment
         uses: ilammy/msvc-dev-cmd@v1
@@ -78,7 +84,8 @@ jobs:
 
   upload-to-cdn:
     runs-on: ubuntu-latest
-    needs: windows-build
+    needs: [check-commit, windows-build]
+    if: needs.check-commit.outputs.should_build == 'true'
     steps:
       - name: Output commit type
         run: echo " ${{env.OUTPUT1}} $OUTPUT1"
