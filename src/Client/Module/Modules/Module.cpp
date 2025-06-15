@@ -745,8 +745,33 @@ void Module::loadLegacySettings() {
 }
 
 void Module::loadSettings(bool softLoad) {
-	try { settings.FromJson(Client::globalSettings[name].dump()); }
-	catch (std::exception& e) { Logger::error("Couldn't load module settings: {}", e.what()); }
+	if (this->isScripting()) {
+		if (!std::filesystem::exists(settingspath)) {
+			std::filesystem::create_directories(settingspath.parent_path());
+			std::ofstream outputFile(settingspath);
+			if (!outputFile.is_open()) {
+				LOG_ERROR("Failed to create file: {}", settingspath.string());
+			}
+			outputFile.close();
+		}
+		std::ifstream inputFile(this->settingspath);
+		if (!inputFile.is_open()) {
+			LOG_ERROR("Failed to open file: {}", this->settingspath.string());
+			return;
+		}
+
+		std::stringstream ss;
+		ss << inputFile.rdbuf();
+		inputFile.close();
+
+		if (!ss.str().empty() && ss.str() != "null") this->settings.FromJson(ss.str());
+		else this->defaultConfig("all");
+	}
+	else {
+		try { settings.FromJson(Client::globalSettings[name].dump()); }
+		catch (std::exception& e) { Logger::error("Couldn't load module settings: {}", e.what()); }
+	}
+	
 
 	this->postLoad(softLoad);
 }
