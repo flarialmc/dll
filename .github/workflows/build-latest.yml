@@ -131,15 +131,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            build/CMakeCache.txt
             build/cmake_install.cmake
             build/build.ninja
             build/rules.ninja
             build/.ninja_deps
             build/.ninja_log
-          key: cmake-minimal-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ hashFiles('CMakeLists.txt') }}
+          key: cmake-minimal-v2-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ hashFiles('CMakeLists.txt') }}
           restore-keys: |
-            ${{ steps.type.outputs.reset_cache == 'false' && format('cmake-minimal-{0}-normal-', runner.os) || '' }}
+            ${{ steps.type.outputs.reset_cache == 'false' && format('cmake-minimal-v2-{0}-normal-', runner.os) || '' }}
 
       - name: Create build directory
         run: |
@@ -148,9 +147,19 @@ jobs:
 
       - name: Configure CMake
         run: |
+          # Clean CMake cache if drive letter mismatch detected
+          if (Test-Path "build/CMakeCache.txt") {
+            $cacheContent = Get-Content "build/CMakeCache.txt" -Raw
+            $currentPath = (Get-Location).Path
+            if ($cacheContent -notmatch [regex]::Escape($currentPath)) {
+              Write-Host "Drive letter mismatch detected, cleaning CMake cache..."
+              Remove-Item "build/CMakeCache.txt" -Force -ErrorAction SilentlyContinue
+            }
+          }
           cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DFETCHCONTENT_FULLY_DISCONNECTED=OFF -DCMAKE_BUILD_PARALLEL_LEVEL=4 -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
         env:
           SCCACHE_DIR: ~/.cache/sccache
+        shell: pwsh
 
       - name: Build DLL
         run: |
