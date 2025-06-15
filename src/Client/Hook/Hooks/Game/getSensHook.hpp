@@ -17,7 +17,7 @@ private:
         auto event = nes::make_holder<SensitivityEvent>(sensitivity);
         eventMgr.trigger(event);
 
-
+        sensitivity = event->getSensitivity();
         return sensitivity;
     }
 

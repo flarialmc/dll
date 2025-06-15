@@ -85,7 +85,7 @@ void HookManager::initialize() {
     addHook<OverworldFogColorHook>();
     addHook<TimeChangerHook>();
     addHook<SendPacketHook>();
-    addHook<getSensHook>();
+    //addHook<getSensHook>();
     addHook<HudMobEffectsRendererHook>();
     if(VersionUtils::checkAboveOrEqual(20, 60)) { // due to texture group offset
         addHook<HudCursorRendererHook>();
