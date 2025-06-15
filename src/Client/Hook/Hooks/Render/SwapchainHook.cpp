@@ -416,6 +416,8 @@ void SwapchainHook::DX11Render(bool underui) {
 
     SaveBackbuffer(underui);
 
+    if (!D2D::context) return;
+
     D2D::context->BeginDraw();
 
     ID3D11RenderTargetView *mainRenderTargetView = nullptr;
@@ -512,6 +514,7 @@ void SwapchainHook::DX12Render(bool underui) {
 
     DX12Blur();
 
+    if (!D2D::context) return;
     D2D::context->BeginDraw();
 
 
