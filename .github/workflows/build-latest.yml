@@ -112,14 +112,7 @@ jobs:
 
       - name: Configure CMake
         run: |
-          # Set cache variables for faster builds
-          cmake -S . -B build -G "Ninja" \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-            -DCMAKE_BUILD_PARALLEL_LEVEL=%NUMBER_OF_PROCESSORS% \
-            -DFETCHCONTENT_BASE_DIR="${{ github.workspace }}/_deps" \
-            -DFETCHCONTENT_QUIET=ON \
-            -DBUILD_DATE="${{ github.run_id }}-${{ github.run_number }}"
+          cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_PARALLEL_LEVEL=%NUMBER_OF_PROCESSORS% -DFETCHCONTENT_BASE_DIR="${{ github.workspace }}/_deps" -DFETCHCONTENT_QUIET=ON -DBUILD_DATE="${{ github.run_id }}-${{ github.run_number }}"
 
       - name: Build DLL
         run: |
