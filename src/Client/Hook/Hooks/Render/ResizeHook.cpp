@@ -210,7 +210,8 @@ void ResizeHook::cleanShit(bool isResize) {
         FlarialGUI::CleanupImageResources();
 
         Memory::SafeRelease(SwapchainHook::D3D12DescriptorHeap);         Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapBackBuffers);
-        Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapImGuiRender); Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapImGuiIMAGE);
+        Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapImGuiRender); // Consolidated heap contains both ImGui and images
+        SwapchainHook::ResetDescriptorAllocation(); // Reset consolidated descriptor allocation state
 
 
         if (ImGui::GetCurrentContext()) {

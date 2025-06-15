@@ -521,39 +521,27 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
                 return;
             }
 
-			if(!SwapchainHook::d3d12DescriptorHeapImGuiIMAGE) {
-                Logger::custom(fg(fmt::color::yellow), "Image", "Creating D3D12 descriptor heap for images...");
-
-				D3D12_DESCRIPTOR_HEAP_DESC descriptorImGuiRender = {};
-				descriptorImGuiRender.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-				descriptorImGuiRender.NumDescriptors = MAX_IMAGE_ID;
-				descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-
-                Logger::custom(fg(fmt::color::cyan), "Image", "Descriptor heap config: Type=CBV_SRV_UAV, NumDescriptors={}, Flags=SHADER_VISIBLE", MAX_IMAGE_ID);
-
-				HRESULT hr = SwapchainHook::d3d12Device5->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&SwapchainHook::d3d12DescriptorHeapImGuiIMAGE));
-
-				if (FAILED(hr)) {
-					Logger::custom(fg(fmt::color::red), "Image", "ERROR: Failed to create d3d12DescriptorHeapImGuiIMAGE. HRESULT: 0x{:X}", static_cast<uint32_t>(hr));
-					return;
-				}
-                Logger::custom(fg(fmt::color::green), "Image", "D3D12 descriptor heap created successfully");
-			} else {
-                Logger::custom(fg(fmt::color::cyan), "Image", "Using existing D3D12 descriptor heap");
+            // Check if consolidated descriptor heap is available
+			if(!SwapchainHook::d3d12DescriptorHeapImGuiRender) {
+                Logger::custom(fg(fmt::color::red), "Image", "ERROR: Consolidated descriptor heap not available for resource {}", resourceId);
+                return;
             }
+            
+            Logger::custom(fg(fmt::color::cyan), "Image", "Using consolidated descriptor heap for resource {}", resourceId);
 
 			bool ret = false;
-
-			UINT handle_increment = SwapchainHook::d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			int descriptor_index = resourceId - 100;
-			D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetCPUDescriptorHandleForHeapStart();
-			cpu.ptr += (handle_increment * descriptor_index);
-
-			D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetGPUDescriptorHandleForHeapStart();
-			gpu.ptr += (handle_increment * descriptor_index);
-
-            Logger::custom(fg(fmt::color::cyan), "Image", "Descriptor handles for resource {}: CPU=0x{:X}, GPU=0x{:X}, Index={}, Increment={}", 
-                           resourceId, cpu.ptr, gpu.ptr, descriptor_index, handle_increment);
+            
+            // Allocate descriptor from consolidated heap
+            D3D12_CPU_DESCRIPTOR_HANDLE cpu;
+            D3D12_GPU_DESCRIPTOR_HANDLE gpu;
+            
+            if (!SwapchainHook::AllocateImageDescriptor(resourceId, &cpu, &gpu)) {
+                Logger::custom(fg(fmt::color::red), "Image", "ERROR: Failed to allocate descriptor for resource {}", resourceId);
+                return;
+            }
+            
+            Logger::custom(fg(fmt::color::cyan), "Image", "Allocated consolidated descriptor for resource {}: CPU=0x{:X}, GPU=0x{:X}", 
+                           resourceId, cpu.ptr, gpu.ptr);
 
 			ret = LoadImageFromResource(resourceId, cpu, &my_texture, type);
 			if (!ret) {
@@ -586,44 +574,47 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 
 void FlarialGUI::LoadAllImages() {
 	if(SwapchainHook::queue) {
+        // Check if consolidated descriptor heap is available
+        if(!SwapchainHook::d3d12DescriptorHeapImGuiRender) {
+            Logger::custom(fg(fmt::color::red), "LoadAllImages", "ERROR: Consolidated descriptor heap not available");
+            return;
+        }
 
-		if(!SwapchainHook::d3d12DescriptorHeapImGuiIMAGE) {
-
-			D3D12_DESCRIPTOR_HEAP_DESC descriptorImGuiRender = {};
-			descriptorImGuiRender.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-			descriptorImGuiRender.NumDescriptors = MAX_IMAGE_ID;
-			descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-
-			SwapchainHook::d3d12Device5->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&SwapchainHook::d3d12DescriptorHeapImGuiIMAGE));
-		}
+        Logger::custom(fg(fmt::color::cyan), "LoadAllImages", "Loading all images using consolidated descriptor heap");
 
 		for(int i = 100; i <= MAX_IMAGE_ID; i++) {
 			if(i != IDR_PATAR_JPG) {
 				ID3D12Resource* my_texture = nullptr;
 
-				UINT handle_increment = SwapchainHook::d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-				int descriptor_index = i - 100;
-				D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetCPUDescriptorHandleForHeapStart();
-				cpu.ptr += (handle_increment * descriptor_index);
-				D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetGPUDescriptorHandleForHeapStart();
-				gpu.ptr += (handle_increment * descriptor_index);
+                // Allocate descriptor from consolidated heap
+                D3D12_CPU_DESCRIPTOR_HANDLE cpu;
+                D3D12_GPU_DESCRIPTOR_HANDLE gpu;
+                
+                if (!SwapchainHook::AllocateImageDescriptor(i, &cpu, &gpu)) {
+                    Logger::custom(fg(fmt::color::red), "LoadAllImages", "ERROR: Failed to allocate descriptor for resource {}", i);
+                    continue;
+                }
+
 				if(LoadImageFromResource(i, cpu, &my_texture, "PNG")) {
-				ImagesClass::ImguiDX12Images[i] = (ImTextureID)gpu.ptr;
-				ImagesClass::ImguiDX12Textures[i] = my_texture;
-			}
+                    ImagesClass::ImguiDX12Images[i] = (ImTextureID)gpu.ptr;
+                    ImagesClass::ImguiDX12Textures[i] = my_texture;
+                }
 			} else {
 				ID3D12Resource* my_texture = nullptr;
 
-				UINT handle_increment = SwapchainHook::d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-				int descriptor_index = i - 100;
-				D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetCPUDescriptorHandleForHeapStart();
-				cpu.ptr += (handle_increment * descriptor_index);
-				D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetGPUDescriptorHandleForHeapStart();
-				gpu.ptr += (handle_increment * descriptor_index);
+                // Allocate descriptor from consolidated heap
+                D3D12_CPU_DESCRIPTOR_HANDLE cpu;
+                D3D12_GPU_DESCRIPTOR_HANDLE gpu;
+                
+                if (!SwapchainHook::AllocateImageDescriptor(i, &cpu, &gpu)) {
+                    Logger::custom(fg(fmt::color::red), "LoadAllImages", "ERROR: Failed to allocate descriptor for resource {}", i);
+                    continue;
+                }
+
 				if(LoadImageFromResource(i, cpu, &my_texture, "JPG")) {
-				ImagesClass::ImguiDX12Images[i] = (ImTextureID)gpu.ptr;
-				ImagesClass::ImguiDX12Textures[i] = my_texture;
-			}
+                    ImagesClass::ImguiDX12Images[i] = (ImTextureID)gpu.ptr;
+                    ImagesClass::ImguiDX12Textures[i] = my_texture;
+                }
 			}
 		}
 
