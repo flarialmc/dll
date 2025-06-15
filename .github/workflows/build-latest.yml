@@ -90,32 +90,14 @@ jobs:
           arch: x64
           spectre: false
 
-      - name: Cache sccache binary
-        uses: actions/cache@v4
-        id: sccache-binary
-        with:
-          path: sccache.exe
-          key: sccache-binary-v0.7.4
-
-      - name: Install sccache
-        if: steps.sccache-binary.outputs.cache-hit != 'true'
-        run: |
-          Invoke-WebRequest -Uri "https://github.com/mozilla/sccache/releases/download/v0.7.4/sccache-v0.7.4-x86_64-pc-windows-msvc.tar.gz" -OutFile "sccache.tar.gz"
-          tar -xzf sccache.tar.gz
-          move sccache-*/sccache.exe .
-        shell: pwsh
-
-      - name: Add sccache to PATH
-        run: echo "$PWD" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        shell: pwsh
-
-      - name: Cache sccache (primary build cache)
+      - name: Cache Build Directory (like CLion)
         uses: actions/cache@v4
         with:
-          path: ~/.cache/sccache
-          key: sccache-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ hashFiles('src/**/*.cpp', 'src/**/*.hpp', 'src/**/*.h', 'main.cpp') }}
+          path: |
+            build/
+          key: build-cache-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ hashFiles('CMakeLists.txt', 'src/**/*.cpp', 'src/**/*.hpp', 'src/**/*.h', 'main.cpp') }}
           restore-keys: |
-            ${{ steps.type.outputs.reset_cache == 'false' && format('sccache-{0}-normal-', runner.os) || '' }}
+            ${{ steps.type.outputs.reset_cache == 'false' && format('build-cache-{0}-normal-', runner.os) || '' }}
 
       - name: Cache CMake dependencies
         uses: actions/cache@v4
@@ -127,18 +109,6 @@ jobs:
           restore-keys: |
             ${{ steps.type.outputs.reset_cache == 'false' && format('cmake-deps-{0}-normal-', runner.os) || '' }}
 
-      - name: Cache CMake build (minimal)
-        uses: actions/cache@v4
-        with:
-          path: |
-            build/cmake_install.cmake
-            build/build.ninja
-            build/rules.ninja
-            build/.ninja_deps
-            build/.ninja_log
-          key: cmake-minimal-v2-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ hashFiles('CMakeLists.txt') }}
-          restore-keys: |
-            ${{ steps.type.outputs.reset_cache == 'false' && format('cmake-minimal-v2-{0}-normal-', runner.os) || '' }}
 
       - name: Create build directory
         run: |
@@ -147,36 +117,35 @@ jobs:
 
       - name: Configure CMake
         run: |
-          # Clean CMake cache if drive letter mismatch detected
+          # Handle drive letter mismatch by cleaning problematic cache files
           if (Test-Path "build/CMakeCache.txt") {
             $cacheContent = Get-Content "build/CMakeCache.txt" -Raw
             $currentPath = (Get-Location).Path
             if ($cacheContent -notmatch [regex]::Escape($currentPath)) {
               Write-Host "Drive letter mismatch detected, cleaning CMake cache..."
               Remove-Item "build/CMakeCache.txt" -Force -ErrorAction SilentlyContinue
+              Remove-Item "build/CMakeFiles" -Force -Recurse -ErrorAction SilentlyContinue
             }
           }
-          cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DFETCHCONTENT_FULLY_DISCONNECTED=OFF -DCMAKE_BUILD_PARALLEL_LEVEL=4 -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
-        env:
-          SCCACHE_DIR: ~/.cache/sccache
+          cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DFETCHCONTENT_FULLY_DISCONNECTED=OFF -DCMAKE_BUILD_PARALLEL_LEVEL=4
         shell: pwsh
 
       - name: Build DLL
         run: |
-           sccache --start-server
            cmake --build build --target Flarial --parallel 4
-           sccache --show-stats
-        env:
-          SCCACHE_DIR: ~/.cache/sccache
 
       - name: Show cache efficiency
         run: |
-          echo "sccache statistics (compilation cache):"
-          sccache --show-stats
+          echo "Build cache statistics:"
+          $objFiles = Get-ChildItem -Path "build" -Recurse -Include "*.obj" -ErrorAction SilentlyContinue | Measure-Object
+          $totalSize = Get-ChildItem -Path "build" -Recurse -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum
+          echo "Object files: $($objFiles.Count)"
+          echo "Total build cache size: $([math]::Round($totalSize.Sum/1MB, 2)) MB"
           echo ""
-          echo "CMake cache files:"
+          echo "Key cache files:"
           if (Test-Path "build/CMakeCache.txt") { echo "✓ CMakeCache.txt exists" } else { echo "✗ CMakeCache.txt missing" }
           if (Test-Path "build/.ninja_deps") { echo "✓ Ninja dependencies cached" } else { echo "✗ Ninja deps missing" }
+          if (Test-Path "build/Flarial.dll") { echo "✓ Flarial.dll built successfully" } else { echo "✗ Flarial.dll missing" }
         shell: pwsh
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.6.1
