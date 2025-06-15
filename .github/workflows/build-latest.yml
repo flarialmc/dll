@@ -1,7 +1,7 @@
 name: Build Flarial dll and add to newcdn as a release
 on:
   push:
-    branches: [ "main", "scripting-v2", "**" ]  # Allow all branches
+    branches: [ "*" ]
     tags:
       - 'beta-*'
       - 'release-*'
@@ -13,148 +13,69 @@ env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
+  check-commit:
+    runs-on: ubuntu-latest
+    outputs:
+      should_build: ${{ steps.check.outputs.should_build }}
+      type: ${{ steps.check.outputs.type }}
+    steps:
+      - name: Check if build is needed
+        id: check
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+              if [[ "${{ github.ref_name }}" == beta-* ]]; then
+                  echo "Build needed for beta tag"
+                  echo "should_build=true" >> "$GITHUB_OUTPUT"
+                  echo "type=2" >> "$GITHUB_OUTPUT"
+              elif [[ "${{ github.ref_name }}" == release-* ]]; then
+                  echo "Build needed for release tag"
+                  echo "should_build=true" >> "$GITHUB_OUTPUT"
+                  echo "type=1" >> "$GITHUB_OUTPUT"
+              else
+                  echo "Unknown tag type, skipping build"
+                  echo "should_build=false" >> "$GITHUB_OUTPUT"
+              fi
+          elif [[ "${{ github.event.head_commit.message }}" == *"nightly:"* ]]; then
+              echo "Build needed for nightly"
+              echo "should_build=true" >> "$GITHUB_OUTPUT"
+              echo "type=0" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event.head_commit.message }}" == *"release:"* ]]; then
+              echo "Build needed for release"
+              echo "should_build=true" >> "$GITHUB_OUTPUT"
+              echo "type=1" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event.head_commit.message }}" == *"beta:"* ]]; then
+              echo "Build needed for beta"
+              echo "should_build=true" >> "$GITHUB_OUTPUT"
+              echo "type=2" >> "$GITHUB_OUTPUT"
+          else
+              echo "No build needed, skipping"
+              echo "should_build=false" >> "$GITHUB_OUTPUT"
+          fi
+
   windows-build:
     runs-on: windows-latest
+    needs: check-commit
+    if: needs.check-commit.outputs.should_build == 'true'
     outputs:
-      type: ${{ steps.type.outputs.status }}
+      type: ${{ needs.check-commit.outputs.type }}
 
     steps:
-      - name: Checkout Repository (Fast)
+      - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-          show-progress: false
-          filter: blob:none
-          path: C:\a\dll\dll
 
-      - name: "Check commit type"
-        id: type
-        run: |
-          # Check for reset-cache tag
-          if [[ "${{ github.event.head_commit.message }}" == *"reset-cache:"* ]]; then
-              echo "Cache reset requested"
-              echo "reset_cache=true" >> "$GITHUB_OUTPUT"
-          else
-              echo "reset_cache=false" >> "$GITHUB_OUTPUT"
-          fi
-          
-          # Check if we're on main or scripting-v2 branch
-          if [[ "${{ github.ref_name }}" == "main" || "${{ github.ref_name }}" == "scripting-v2" ]]; then
-              # Main branches can use all build types
-              if [[ "${{ github.ref_type }}" == "tag" ]]; then
-                  if [[ "${{ github.ref_name }}" == beta-* ]]; then
-                      echo "Continuing to build as beta (tag)"
-                      echo "status=2" >> "$GITHUB_OUTPUT"
-                  elif [[ "${{ github.ref_name }}" == release-* ]]; then
-                      echo "Continuing to build as release (tag)"
-                      echo "status=1" >> "$GITHUB_OUTPUT"
-                  else
-                      echo "Unknown tag type, exiting"
-                      gh run cancel ${{ github.run_id }}
-                      gh run watch ${{ github.run_id }}f
-                      exit 0
-                  fi
-              elif [[ "${{ github.event.head_commit.message }}" == *"nightly:"* ]]; then
-                  echo "Continuing to build as nightly"
-                  echo "status=0" >> "$GITHUB_OUTPUT"
-              elif [[ "${{ github.event.head_commit.message }}" == *"release:"* ]]; then
-                  echo "Continuing to build as release"
-                  echo "status=1" >> "$GITHUB_OUTPUT"
-              elif [[ "${{ github.event.head_commit.message }}" == *"beta:"* ]]; then
-                  echo "Continuing to build as beta"
-                  echo "status=2" >> "$GITHUB_OUTPUT"
-              else
-                  echo "Not a build commit, exiting"
-                  gh run cancel ${{ github.run_id }}
-                  gh run watch ${{ github.run_id }}f
-                  exit 0
-              fi
-          else
-              # Other branches can only use nightly builds
-              if [[ "${{ github.event.head_commit.message }}" == *"nightly:"* ]]; then
-                  echo "Branch '${{ github.ref_name }}' building as nightly"
-                  echo "status=0" >> "$GITHUB_OUTPUT"
-              else
-                  echo "Branch '${{ github.ref_name }}' can only build with 'nightly:' prefix. Exiting."
-                  gh run cancel ${{ github.run_id }}
-                  gh run watch ${{ github.run_id }}f
-                  exit 0
-              fi
-          fi
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set working directory to C drive
-        run: |
-          cd C:\a\dll\dll
-          echo "GITHUB_WORKSPACE=C:\a\dll\dll" >> $env:GITHUB_ENV
-        shell: pwsh
-
-      - name: Set Up MSVC Environment (Fast)
+      - name: Set Up MSVC Environment
         uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x64
-          spectre: false
-
-      - name: Cache Dependencies (Lua, miniz, etc.)
-        uses: actions/cache@v4
-        with:
-          path: |
-            C:\a\dll\dll\build\lib\
-            C:\a\dll\dll\build\CMakeFiles\miniz.dir\
-            C:\a\dll\dll\build\CMakeFiles\lua_static.dir\
-          key: deps-cache-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ hashFiles('C:\a\dll\dll\CMakeLists.txt', 'C:\a\dll\dll\lib\**') }}
-          restore-keys: |
-            ${{ steps.type.outputs.reset_cache == 'false' && format('deps-cache-{0}-normal-', runner.os) || '' }}
-
-      - name: Cache Build Objects
-        uses: actions/cache@v4
-        with:
-          path: |
-            C:\a\dll\dll\build\CMakeFiles\Flarial.dir\
-            C:\a\dll\dll\build\*.ninja*
-            C:\a\dll\dll\build\CMakeCache.txt
-          key: build-cache-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ hashFiles('C:\a\dll\dll\src\**\*.cpp', 'C:\a\dll\dll\src\**\*.hpp', 'C:\a\dll\dll\src\**\*.h', 'C:\a\dll\dll\main.cpp') }}
-          restore-keys: |
-            ${{ steps.type.outputs.reset_cache == 'false' && format('build-cache-{0}-normal-', runner.os) || '' }}
-
-      - name: Cache CMake dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            C:\a\dll\dll\_deps
-          key: cmake-deps-${{ runner.os }}-${{ steps.type.outputs.reset_cache == 'true' && github.run_number || 'normal' }}-${{ hashFiles('C:\a\dll\dll\CMakeLists.txt') }}
-          restore-keys: |
-            ${{ steps.type.outputs.reset_cache == 'false' && format('cmake-deps-{0}-normal-', runner.os) || '' }}
 
       - name: Configure CMake
         run: |
-          cd C:\a\dll\dll
-          $env:BUILD_DATE = Get-Date -Format "yyyy MMM dd HH:mm:ss"
-          cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DFETCHCONTENT_FULLY_DISCONNECTED=OFF -DCMAKE_BUILD_PARALLEL_LEVEL=4
-        shell: pwsh
+          #echo 'hi'
+          
+          cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+
 
       - name: Build DLL
         run: |
-           cd C:\a\dll\dll
-           cmake --build build --target Flarial --parallel 4
-        shell: pwsh
-
-      - name: Show cache efficiency
-        run: |
-          cd C:\a\dll\dll
-          echo "Build cache statistics:"
-          $objFiles = Get-ChildItem -Path "build" -Recurse -Include "*.obj" -ErrorAction SilentlyContinue | Measure-Object
-          $totalSize = Get-ChildItem -Path "build" -Recurse -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum
-          echo "Object files: $($objFiles.Count)"
-          echo "Total build cache size: $([math]::Round($totalSize.Sum/1MB, 2)) MB"
-          echo ""
-          echo "Key cache files:"
-          if (Test-Path "build/CMakeCache.txt") { echo "✓ CMakeCache.txt exists" } else { echo "✗ CMakeCache.txt missing" }
-          if (Test-Path "build/.ninja_deps") { echo "✓ Ninja dependencies cached" } else { echo "✗ Ninja deps missing" }
-          if (Test-Path "build/Flarial.dll") { echo "✓ Flarial.dll built successfully" } else { echo "✗ Flarial.dll missing" }
-        shell: pwsh
+           cmake --build build --target Flarial
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.6.1
         with:
@@ -163,7 +84,8 @@ jobs:
 
   upload-to-cdn:
     runs-on: ubuntu-latest
-    needs: windows-build
+    needs: [check-commit, windows-build]
+    if: needs.check-commit.outputs.should_build == 'true'
     steps:
       - name: Output commit type
         run: echo " ${{env.OUTPUT1}} $OUTPUT1"
@@ -177,6 +99,8 @@ jobs:
           token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
       - name: Download dll
         uses: actions/download-artifact@v4.1.9
+        with:
+          name: Flarial_DLL
       - name: setup tags
         id: tag
         run: |
