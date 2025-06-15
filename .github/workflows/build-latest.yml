@@ -92,6 +92,8 @@ jobs:
           token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
       - name: Download dll
         uses: actions/download-artifact@v4.1.9
+        with:
+          name: Flarial_DLL
       - name: setup tags
         id: tag
         run: |
