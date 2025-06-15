@@ -113,6 +113,7 @@ public:
 		try {
 			if (!settings.getSettingByName<std::string>("currentConfig")) return Logger::warn("No Client Settings to save to PRIVATE");
 
+
 			// for some reason u cant directly clear file content when its hidden??? ok then
 			DWORD originalAttributes = INVALID_FILE_ATTRIBUTES;
 			originalAttributes = GetFileAttributesA(privatePath.c_str());
@@ -168,33 +169,8 @@ public:
 		if (path.empty()) path = Utils::getConfigsPath() + "\\" + settings.getSettingByName<std::string>("currentConfig")->value;
 
 		try {
-			// check if its valid json
-			std::ifstream inputFile(path);
-			if (!inputFile) return Client::createConfig(settings.getSettingByName<std::string>("currentConfig")->value);
-			std::stringstream ss;
-			ss << inputFile.rdbuf();
-			inputFile.close();
-			std::string str = ss.str();
-
-			try { 
-				nlohmann::json::parse(str);
-
-				std::error_code ec_rename;
-				fs::rename(path, path + ".bak", ec_rename);
-
-				if (ec_rename) {
-					LOG_ERROR("Failed to make backup of config: {}", ec_rename.message());
-					return;
-				}
-			}
-			catch (const nlohmann::json::parse_error& e) {
-				LOG_ERROR("Failed to parse JSON, couldn't create backup, using current backup to save...", e.what());
-				Client::LoadSettings();
-
-			}
-
+			std::ofstream cls(path, std::ofstream::out | std::ofstream::trunc); cls.close();
 			std::ofstream cFile(path, std::ios::app);
-			if (!cFile) LOG_ERROR("Failed to access config: {}", GetLastError());
 
 			cFile << "{";
 
@@ -225,17 +201,7 @@ public:
 		if (path.empty()) path = Utils::getConfigsPath() + "\\" + Client::settings.getSettingByName<std::string>("currentConfig")->value;
 
 		std::ifstream inputFile(path);
-		if (!inputFile) {
-			LOG_ERROR("Config file could not be loaded, trying backup config {}", GetLastError());
-			try {
-				fs::copy_file(path + ".bak", path, fs::copy_options::overwrite_existing);
-				return LoadSettings();
-			}
-			catch (const fs::filesystem_error& e) {
-				LOG_ERROR("Failed to get bak file for {}: {}", path, e.what());
-				return;
-			}
-		}
+		if (!inputFile) return LOG_ERROR("Config file could not be loaded {}", GetLastError());
 
 		std::stringstream ss;
 		ss << inputFile.rdbuf();
@@ -250,15 +216,7 @@ public:
 
 		try { globalSettings = nlohmann::json::parse(str); }
 		catch (const nlohmann::json::parse_error& e) {
-			LOG_ERROR("Failed to parse JSON, trying backup config: {}", e.what());
-			try {
-				fs::copy_file(path + ".bak", path, fs::copy_options::overwrite_existing);
-				return LoadSettings();
-			}
-			catch (const fs::filesystem_error& e) {
-				LOG_ERROR("Failed to bring bak file for {}: {}", path, e.what());
-				return;
-			}
+			LOG_ERROR("Failed to parse JSON: {}", e.what());
 		}
 
 		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Loaded {}", Client::settings.getSettingByName<std::string>("currentConfig")->value);
