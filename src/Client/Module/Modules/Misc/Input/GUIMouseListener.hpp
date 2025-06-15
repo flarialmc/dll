@@ -14,22 +14,24 @@ public:
     
 class RateLimiter {
 public:
-    RateLimiter(float cps)
-        : tokens(0.0), maxTokens(1.0), rate(cps),
-        last(std::chrono::steady_clock::now()) {
+    RateLimiter(float cps) : rate(cps) {
     }
 
     bool allow() {
+        if (rate <= 0.0f) return true;
+
         using Clock = std::chrono::steady_clock;
         auto now = Clock::now();
-        std::chrono::duration<double> dt = now - last;
-        last = now;
+        auto oneSecondAgo = now - std::chrono::seconds(1);
 
-        tokens += rate * dt.count();
-        if (tokens > maxTokens) tokens = maxTokens;
+        // Remove clicks older than 1 second
+        while (!clickTimes.empty() && clickTimes.front() < oneSecondAgo) {
+            clickTimes.pop_front();
+        }
 
-        if (tokens >= 1.0) {
-            tokens -= 1.0;
+        // Check if we can allow another click
+        if (clickTimes.size() < static_cast<size_t>(rate)) {
+            clickTimes.push_back(now);
             return true;
         }
         return false;
@@ -40,10 +42,8 @@ public:
     }
 
 private:
-    double tokens;
-    const double maxTokens;
-    double rate;
-    std::chrono::steady_clock::time_point last;
+    float rate;
+    std::deque<std::chrono::steady_clock::time_point> clickTimes;
 };
 
 class GUIMouseListener : public Listener {
@@ -82,8 +82,8 @@ public:
         auto limiterMod = ModuleManager::getModule("CPS Limiter");
         //if (!limiterMod) return;
 
-        GUIMouseListener::leftLimiter.setRate(limiterMod->getOps<float>("Left") + 3.f);
-        GUIMouseListener::rightLimiter.setRate(limiterMod->getOps<float>("Right") + 3.f);
+        GUIMouseListener::leftLimiter.setRate(limiterMod->getOps<float>("Left"));
+        GUIMouseListener::rightLimiter.setRate(limiterMod->getOps<float>("Right"));
 
         using MB = MouseButton;
 

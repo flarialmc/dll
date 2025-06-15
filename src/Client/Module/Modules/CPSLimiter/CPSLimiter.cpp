@@ -7,7 +7,6 @@ void CPSLimiter::defaultConfig() {
     Module::defaultConfig("core");
     setDef("Left", 16.0f);
     setDef("Right", 24.0f);
-    setDef("legacy", false);
     if (ModuleManager::initialized) Client::SaveSettings();
 }
 
@@ -27,7 +26,6 @@ void CPSLimiter::settingsRender(float settingsOffset) {
     addHeader("CPS Limiter");
     addSlider("Left Click", "Limit for your LMB.", "Left");
     addSlider("Right Click", "Right for your RMB.", "Right");
-    addToggle("Legacy Mode", "An alternative mode for limiting cps, may not work as expected.", "legacy");
 
     FlarialGUI::UnsetScrollView();
 
