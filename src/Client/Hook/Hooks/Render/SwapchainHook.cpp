@@ -642,14 +642,32 @@ void SwapchainHook::DX12Render(bool underui) {
                 d3d12CommandList->OMSetRenderTargets(1,
                                                      &frameContexts[currentBitmap].main_render_target_descriptor,
                                                      FALSE, nullptr);
-                // Bind both ImGui render heap and image heap if it exists
+                // Bind descriptor heaps with validation
                 if (d3d12DescriptorHeapImGuiIMAGE) {
-                    ID3D12DescriptorHeap* heaps[] = { d3d12DescriptorHeapImGuiRender, d3d12DescriptorHeapImGuiIMAGE };
-                    d3d12CommandList->SetDescriptorHeaps(2, heaps);
                     static bool loggedOnce = false;
                     if (!loggedOnce) {
                         loggedOnce = true;
-                        Logger::custom(fg(fmt::color::green), "D3D12Render", "Binding both ImGui render heap and image heap to command list");
+                        Logger::custom(fg(fmt::color::yellow), "D3D12Render", "Attempting to bind both descriptor heaps...");
+                        Logger::custom(fg(fmt::color::cyan), "D3D12Render", "Render heap: 0x{:X}, Image heap: 0x{:X}", 
+                                       reinterpret_cast<uintptr_t>(d3d12DescriptorHeapImGuiRender),
+                                       reinterpret_cast<uintptr_t>(d3d12DescriptorHeapImGuiIMAGE));
+                    }
+                    
+                    // For now, let's try binding them separately to avoid conflicts
+                    try {
+                        d3d12CommandList->SetDescriptorHeaps(1, &d3d12DescriptorHeapImGuiRender);
+                        Logger::custom(fg(fmt::color::green), "D3D12Render", "ImGui render heap bound successfully");
+                        
+                        // TODO: Intel GPU might not support multiple descriptor heaps properly
+                        // For safety, commenting out the dual heap binding for now
+                        /*
+                        ID3D12DescriptorHeap* heaps[] = { d3d12DescriptorHeapImGuiRender, d3d12DescriptorHeapImGuiIMAGE };
+                        d3d12CommandList->SetDescriptorHeaps(2, heaps);
+                        Logger::custom(fg(fmt::color::green), "D3D12Render", "Both heaps bound successfully");
+                        */
+                    } catch (...) {
+                        Logger::custom(fg(fmt::color::red), "D3D12Render", "Exception caught during descriptor heap binding");
+                        d3d12CommandList->SetDescriptorHeaps(1, &d3d12DescriptorHeapImGuiRender);
                     }
                 } else {
                     d3d12CommandList->SetDescriptorHeaps(1, &d3d12DescriptorHeapImGuiRender);
