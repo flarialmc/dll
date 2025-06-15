@@ -952,8 +952,7 @@ bool SwapchainHook::AllocateImageDescriptor(UINT imageId, D3D12_CPU_DESCRIPTOR_H
         nextAvailableDescriptorIndex = descriptorIndex + 1;
     }
     
-    Logger::custom(fg(fmt::color::green), "DescriptorAlloc", "Allocated descriptor for image ID {} at index {} (CPU: 0x{:X}, GPU: 0x{:X})", 
-                   imageId, descriptorIndex, cpu.ptr, gpu.ptr);
+
     return true;
 }
 

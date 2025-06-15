@@ -217,7 +217,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
         }
     }
 
-    Logger::debug("Called this!!!!!!!!!!!!!!!!!!!");
+
     FlarialGUI::image(iconId, D2D1::RectF(modiconx, modicony, modiconx + paddingSize, modicony + paddingSize), "PNG", true, FlarialGUI::D2DColorToImColor(modicon)); //, FlarialGUI::D2DColorToImColor(modicon)
 
     // actually button
