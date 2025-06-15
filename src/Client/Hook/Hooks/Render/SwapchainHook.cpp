@@ -507,14 +507,14 @@ void SwapchainHook::DX12Render(bool underui) {
 
     ID3D11Resource *resource = D3D11Resources[currentBitmap];
     d3d11On12Device->AcquireWrappedResources(&resource, 1);
-
+    if (!D2D::context) return;
     SaveBackbuffer();
     D2D::context->SetTarget(D2D1Bitmaps[currentBitmap]);
     MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
     DX12Blur();
 
-    if (!D2D::context) return;
+
     D2D::context->BeginDraw();
 
 
