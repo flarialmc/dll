@@ -91,7 +91,6 @@ void Sprint::onKey(KeyEvent& event)
 
 void Sprint::onRender(RenderEvent& event)
 {
-    Logger::debug("{}", this->toggleSprinting);
     if (!this->isEnabled()) return;
     if (!this->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
 
