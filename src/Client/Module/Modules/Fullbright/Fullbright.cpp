@@ -15,7 +15,7 @@ void Fullbright::onDisable() {
 void Fullbright::defaultConfig() {
     Module::defaultConfig("core");
     setDef("gamma", 25.f);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void Fullbright::settingsRender(float settingsOffset) {

@@ -19,7 +19,7 @@ void FPS::defaultConfig() {
     setDef("text", (std::string)"FPS: {value}");
     Module::defaultConfig("all");
     setDef("fpsSpoofer", 1.0f);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void FPS::settingsRender(float settingsOffset) {

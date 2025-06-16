@@ -38,7 +38,7 @@ void MotionBlur::defaultConfig()
     setDef("dynamic", false);
     setDef("samples", 64.f);
     setDef("renderUnderUI", true);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void MotionBlur::settingsRender(float settingsOffset)

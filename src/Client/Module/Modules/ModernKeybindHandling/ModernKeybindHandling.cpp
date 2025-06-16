@@ -40,7 +40,7 @@ void ModernKeybindHandling::defaultConfig()
     setDef("fixPauseMovement", true);
     setDef("fixChatMovement", true);
     setDef("fixAllScreens", false);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void ModernKeybindHandling::settingsRender(float settingsOffset)
@@ -98,8 +98,6 @@ void ModernKeybindHandling::onTick(TickEvent& event)
         }
     }
     auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
-
-
 
     if (currentlyInGame) {
         updateMovementInputHandler();

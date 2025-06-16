@@ -41,7 +41,7 @@ void ViewModel::defaultConfig()
     setDef("rotx", 0.0f);
     setDef("roty", 0.0f);
     setDef("rotz", 0.0f);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void ViewModel::settingsRender(float settingsOffset)

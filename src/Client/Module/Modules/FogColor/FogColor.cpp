@@ -16,7 +16,7 @@ void FogColor::defaultConfig() {
     settings.renameSetting("color", "colorOpacity", "color_rgb", "fog");
     Module::defaultConfig("core");
     setDef("fog", (std::string)"FFFFFF", 0.6f, false);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void FogColor::settingsRender(float settingsOffset) {

@@ -43,7 +43,7 @@ void Mousestrokes::defaultConfig()
 	Module::defaultConfig("main");
 	Module::defaultConfig("colors");
 	setDef("cursor", (std::string)"ffffff", 1.f, false);
-	if (ModuleManager::initialized) Client::SaveSettings();
+	
 }
 
 void Mousestrokes::settingsRender(float settingsOffset)

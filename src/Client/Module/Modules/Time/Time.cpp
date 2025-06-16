@@ -99,7 +99,7 @@ void Time::defaultConfig()
     setDef("4letterYear", false);
     setDef("timeBeforeDate", false);
     setDef("donaldTrumpMode", false);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void Time::settingsRender(float settingsOffset)

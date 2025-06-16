@@ -46,7 +46,7 @@ void Zoom::defaultConfig()
 	setDef("modifier", 10.0f);
 	setDef("anim", 0.20f);
 	setDef("disableanim", false);
-	if (ModuleManager::initialized) Client::SaveSettings();
+	
 }
 
 void Zoom::settingsRender(float settingsOffset)
@@ -246,8 +246,10 @@ void Zoom::onTurnDeltaEvent(TurnDeltaEvent& event) {
 	if (!this->isEnabled() || !this->active) return;
 	float oSens = 1.f;
 	if (getOps<bool>("lowsens")) {
-		oSens = std::min(oSens, oSens * (2 / (zoomValue - realFov)));
+		oSens = std::min(oSens, oSens * (2.f / (zoomValue - realFov)));
 	}
+
+	if (oSens < -1.f || oSens > 0) oSens = -1.f;
 
 	event.delta.x *= -oSens;
 	event.delta.y *= -oSens;

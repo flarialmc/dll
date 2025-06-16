@@ -49,7 +49,7 @@ void Animations::onDrawImage(DrawImageEvent &event) {
 void Animations::defaultConfig() {
 	Module::defaultConfig("core");
 	setDef("hotbarSpeed", 7.f);
-	if (ModuleManager::initialized) Client::SaveSettings();
+	
 }
 
 void Animations::settingsRender(float settingsOffset) {

@@ -112,7 +112,7 @@ void Waypoints::defaultConfig() {
 
 	if (settings.getSettingByName<bool>("showmeters") == nullptr) settings.addSetting("showmeters", true);
 
-	if (ModuleManager::initialized) Client::SaveSettings();
+	
 }
 
 void Waypoints::settingsRender(float settingsOffset) {
