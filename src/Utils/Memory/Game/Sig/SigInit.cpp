@@ -17,6 +17,7 @@ void SigInit::init2180() {
     //ADD_SIG("ResourcePackManager::_composeFullStack_Patch", "");
     //ADD_SIG("ResourcePackManager::_composeFullStack", "");
     //ADD_SIG("GeneralSettingsScreenController::GeneralSettingsScreenController", "");
+    ADD_SIG("LocalPlayer::applyTurnDelta", "48 8B C4 48 89 58 ? 48 89 70 ? 55 57 41 54 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 58");
     ADD_SIG("mce::TextureGroup::getTexture", "40 53 55 56 57 41 54 41 55 41 56 41 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 41 0F B6 E9");
     //ADD_SIG("LevelUtils::getTimeOfDay", "? ? ? ? ? ? ?");
 }

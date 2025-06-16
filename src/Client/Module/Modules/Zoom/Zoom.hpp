@@ -1,5 +1,5 @@
 #pragma once
-
+#include "../../../Events/Events.hpp"
 #include "../Module.hpp"
 #include "../../../../SDK/Client/Core/Options.hpp"
 
@@ -42,4 +42,5 @@ public:
 	// TODO: add dolly zoom and world2screen zoom stabilization ?
 	// TODO: if someone has disabled hand this will enable it unless changed in settings
 	void onSetTopScreenName(SetTopScreenNameEvent& event);
+	void onTurnDeltaEvent(TurnDeltaEvent& event);
 };
