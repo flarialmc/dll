@@ -13,11 +13,10 @@ void MotionBlur::onEnable()
 {
     if (SwapchainHook::queue) { if (!once) { FlarialGUI::Notify("Please turn on Better Frames in Settings!"); once = true; } }
     else {
-        if (getOps<bool>("renderUnderUI")) {
-            ListenOrdered(this, RenderUnderUIEvent, &MotionBlur::onRender, EventOrder::IMMEDIATE)
-        } else {
-            ListenOrdered(this, RenderEvent, &MotionBlur::onRenderNormal, EventOrder::IMMEDIATE)
-        }
+
+        ListenOrdered(this, RenderUnderUIEvent, &MotionBlur::onRender, EventOrder::IMMEDIATE)
+        ListenOrdered(this, RenderEvent, &MotionBlur::onRenderNormal, EventOrder::IMMEDIATE)
+
         Module::onEnable();
     }
 }
@@ -75,6 +74,11 @@ void MotionBlur::onRender(RenderUnderUIEvent& event)
     if (!this->isEnabled()) return;
     if (SwapchainHook::queue) return;
 
+
+    if (!getOps<bool>("renderUnderUI")) {
+        return;
+    }
+
     int maxFrames = (int)round(getOps<float>("intensity2"));
 
     if (getOps<bool>("dynamic")) {
@@ -85,7 +89,7 @@ void MotionBlur::onRender(RenderUnderUIEvent& event)
         else if (MC::fps > 450) maxFrames = 5;
     }
 
-    if (getOps<bool>("avgpixel")) maxFrames = 1;
+    if (!getOps<bool>("avgpixel")) maxFrames = 1;
 
     if (SDK::getCurrentScreen() == "hud_screen" && initted && this->isEnabled()) {
 
@@ -114,6 +118,10 @@ void MotionBlur::onRenderNormal(RenderEvent& event)
     if (!this->isEnabled()) return;
     if (SwapchainHook::queue) return;
 
+    if (getOps<bool>("renderUnderUI")) {
+        return;
+    }
+
     int maxFrames = (int)round(getOps<float>("intensity2"));
 
     if (getOps<bool>("dynamic")) {
@@ -124,7 +132,7 @@ void MotionBlur::onRenderNormal(RenderEvent& event)
         else if (MC::fps > 450) maxFrames = 5;
     }
 
-    if (getOps<bool>("avgpixel")) maxFrames = 1;
+    if (!getOps<bool>("avgpixel")) maxFrames = 1;
 
     if (SDK::getCurrentScreen() == "hud_screen" && initted && this->isEnabled()) {
 

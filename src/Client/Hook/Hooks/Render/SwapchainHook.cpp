@@ -862,53 +862,44 @@ ID3D11Texture2D *SwapchainHook::GetBackbuffer() {
 }
 
 void SwapchainHook::SaveBackbuffer(bool underui) {
-    // Only release SavedD3D11BackBuffer, keep ExtraSavedD3D11BackBuffer persistent
+
     Memory::SafeRelease(SavedD3D11BackBuffer);
-    
+    Memory::SafeRelease(ExtraSavedD3D11BackBuffer);
     if (!SwapchainHook::queue) {
+
         SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&SavedD3D11BackBuffer));
 
         if (FlarialGUI::needsBackBuffer) {
-            // Check if we need to recreate ExtraSavedD3D11BackBuffer due to size change
-            D3D11_TEXTURE2D_DESC currentDesc = {};
-            SavedD3D11BackBuffer->GetDesc(&currentDesc);
-            
-            bool needsRecreate = !ExtraSavedD3D11BackBuffer || 
-                               lastBackbufferWidth != currentDesc.Width || 
-                               lastBackbufferHeight != currentDesc.Height;
-            
-            if (needsRecreate) {
-                Memory::SafeRelease(ExtraSavedD3D11BackBuffer);
-                
-                D3D11_TEXTURE2D_DESC textureDesc = currentDesc;
+
+            if (!ExtraSavedD3D11BackBuffer) {
+                D3D11_TEXTURE2D_DESC textureDesc = {};
+                SavedD3D11BackBuffer->GetDesc(&textureDesc);
                 textureDesc.Usage = D3D11_USAGE_DEFAULT;
                 textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
                 textureDesc.CPUAccessFlags = 0;
-                textureDesc.MiscFlags = 0; // Ensure no unnecessary flags
 
-                HRESULT hr = SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
-                if (SUCCEEDED(hr)) {
-                    lastBackbufferWidth = currentDesc.Width;
-                    lastBackbufferHeight = currentDesc.Height;
-                }
+                SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
             }
 
-            // Only copy if we have a valid ExtraSavedD3D11BackBuffer
-            if (ExtraSavedD3D11BackBuffer) {
-                if (underui) {
-                    if (UnderUIHooks::bgfxCtx->m_msaart) {
-                        context->ResolveSubresource(ExtraSavedD3D11BackBuffer, 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
-                    } else {
-                        context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
-                    }
+            if (underui) {
+
+                if (UnderUIHooks::bgfxCtx->m_msaart) {
+                    context->ResolveSubresource(ExtraSavedD3D11BackBuffer, 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
                 } else {
                     context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
                 }
+
+            } else {
+                context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
             }
         }
+
+
     }
     else {
-        HRESULT hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&SavedD3D11BackBuffer));
+        HRESULT hr;
+
+        hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&SavedD3D11BackBuffer));
         if (FAILED(hr)) std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
     }
 }
