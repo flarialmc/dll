@@ -142,9 +142,14 @@ void Sprint::onTick(TickEvent& event)
 
                 if (getOps<bool>("always")) {
                     handler->sprinting = true;
+                    handler->mInputState.mSprintDown = true;
+                    handler->mRawInputState.mSprintDown = true;
                 }
                 else {
+                    Logger::debug("calling");
                     handler->sprinting = toggleSprinting;
+                    handler->mInputState.mSprintDown = toggleSprinting;
+                    handler->mRawInputState.mSprintDown = toggleSprinting;
                 }
         }
     }
