@@ -667,6 +667,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 				c->extraPadding();
 
 				c->addHeader("Misc");
+				c->addToggle("Auto Search ClickGUI", "Start searching for modules already when you press a key in ClickGUI", Client::settings.getSettingByName<bool>("autosearch")->value);
 				c->addToggle("Resettable Settings", "Allows settings to be reset by left clicking and then right clicking", Client::settings.getSettingByName<bool>("resettableSettings")->value);
 				c->addToggle("Snapping Lines", "Y'know, those pink lines in edit mode.", Client::settings.getSettingByName<bool>("snappinglines")->value);
 				c->addToggle("Center Cursor", "Centers your cursor everytime you open your inventory, etc.", Client::settings.getSettingByName<bool>("centreCursor")->value);

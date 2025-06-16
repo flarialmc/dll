@@ -341,11 +341,10 @@ public:
 		if (this->active) {
 			SDK::clientInstance->releaseMouse(); // release mouse lets cursor move
 
-			// auto search? TODO: make it optional
 			if (page.type == "normal" && curr == "modules" &&
 				event.getAction() == ActionType::Pressed) {
 
-				//FlarialGUI::TextBoxes[0].isActive = true;
+				if (Client::settings.getSettingByName<bool>("autosearch")->value) FlarialGUI::TextBoxes[0].isActive = true;
 				// you searching
 				if (FlarialGUI::TextBoxes[0].isActive) {
 					FlarialGUI::scrollpos = 0;
