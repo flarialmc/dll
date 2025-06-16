@@ -69,6 +69,8 @@ void HiveStat::settingsRender(float settingsOffset) {
     addToggle("Show Losses", "Shows the amount of losses a player has", "showLosses");
     addToggle("Show Kills", "Shows the amount of kills a player has", "showKills");
     addToggle("Show Deaths", "Shows the amount of deaths a player has", "showDeaths");
+
+    FlarialGUI::UnsetScrollView();
     resetPadding();
 }
 
