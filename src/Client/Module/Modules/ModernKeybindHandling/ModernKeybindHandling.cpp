@@ -56,10 +56,10 @@ void ModernKeybindHandling::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Modern Keybind Handling");
-    addToggle("Fix Inventory Movement", "Restore movement input after exiting inventory screens", "fixInventoryMovement");
-    addToggle("Fix Pause Movement", "Restore movement input after exiting pause menu", "fixPauseMovement");
-    addToggle("Fix Chat Movement", "Restore movement input after exiting chat screen", "fixChatMovement");
-    addToggle("Fix All Screens", "Restore movement input after exiting any GUI screen", "fixAllScreens");
+    addToggle("Fix Inventory Movement", "Restore movement and sprint input after exiting inventory screens", "fixInventoryMovement");
+    addToggle("Fix Pause Movement", "Restore movement and sprint input after exiting pause menu", "fixPauseMovement");
+    addToggle("Fix Chat Movement", "Restore movement and sprint input after exiting chat screen", "fixChatMovement");
+    addToggle("Fix All Screens", "Restore movement and sprint input after exiting any GUI screen", "fixAllScreens");
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
@@ -175,9 +175,18 @@ void ModernKeybindHandling::updateMovementInputHandler()
         }
         else if (i == 4) {
             handler->jumping = isKeyHeld;
+            handler->mInputState.mJumpDown = isKeyHeld;
+            handler->mRawInputState.mJumpDown = isKeyHeld;
         }
         else if (i == 5) {
             handler->sneaking = isKeyHeld;
+            handler->mInputState.mSneakDown = isKeyHeld;
+            handler->mRawInputState.mSneakDown = isKeyHeld;
+        }
+        else if (i == 6) {
+            handler->sprinting = isKeyHeld;
+            handler->mInputState.mSprintDown = isKeyHeld;
+            handler->mRawInputState.mSprintDown = isKeyHeld;
         }
     }
 }
