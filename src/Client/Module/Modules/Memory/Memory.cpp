@@ -22,7 +22,7 @@ void MEM::defaultConfig()
 {
     setDef("textscale", 0.8f);
     Module::defaultConfig("all");
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void MEM::settingsRender(float settingsOffset)

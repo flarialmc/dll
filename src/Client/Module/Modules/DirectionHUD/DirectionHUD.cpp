@@ -55,7 +55,7 @@ void DirectionHUD::defaultConfig() {
     setDef("degreesTextShadow", true);
     setDef("degreesTextShadow", (std::string)"000000", 1.f, false);
     setDef("degreesTextShadowOffset", 0.003f);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void DirectionHUD::settingsRender(float settingsOffset) {

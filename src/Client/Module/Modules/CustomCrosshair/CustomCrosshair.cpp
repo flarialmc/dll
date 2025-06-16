@@ -54,7 +54,7 @@ void CustomCrosshair::defaultConfig() {
 
     getOps<std::string>("CurrentSelectedColorCol") = "FFFFFF";
     getOps<float>("CurrentSelectedColorOpacity") = 1.f;
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void CustomCrosshair::settingsRender(float settingsOffset) {

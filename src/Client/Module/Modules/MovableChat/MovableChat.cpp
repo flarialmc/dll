@@ -46,7 +46,7 @@ void MovableChat::defaultConfig()
     setDef("here", true);
     setDef("pingsound", true);
     setDef("mode", (std::string)"Xp Orb");
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void MovableChat::settingsRender(float settingsOffset)

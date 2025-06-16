@@ -43,7 +43,7 @@ void HiveStat::defaultConfig() {
     setDef("showLosses", false);
     setDef("showKills", false);
     setDef("showDeaths", false);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void HiveStat::settingsRender(float settingsOffset) {

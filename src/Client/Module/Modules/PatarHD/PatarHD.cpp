@@ -28,7 +28,7 @@ void PatarHD::defaultConfig()
     setDef("yveloc", 0.69f);
     setDef("scale", 1.0f);
     setDef("mode", (std::string)"Patar");
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void PatarHD::settingsRender(float settingsOffset)

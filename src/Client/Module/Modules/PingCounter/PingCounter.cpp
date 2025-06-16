@@ -25,7 +25,7 @@ void PingCounter::defaultConfig()
     setDef("text", (std::string)"{value}ms");
     setDef("textscale", 0.8f);
     Module::defaultConfig("all");
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void PingCounter::settingsRender(float settingsOffset)

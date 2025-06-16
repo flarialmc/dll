@@ -870,6 +870,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 							currentModule->settings.setValue("enabled", true);
 							currentModule->enabledState = true;
 						}
+						Client::SaveSettings();
 						Client::LoadSettings();
 						FlarialGUI::Notify("Reset all settings of " + currentModule->name);
 					}

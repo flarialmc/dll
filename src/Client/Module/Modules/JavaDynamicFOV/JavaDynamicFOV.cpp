@@ -18,7 +18,7 @@ void JavaDynamicFOV::defaultConfig() {
     Module::defaultConfig("core");
     setDef("fov_target", 120.0f);
     setDef("anim", 0.40f);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void JavaDynamicFOV::settingsRender(float settingsOffset) {

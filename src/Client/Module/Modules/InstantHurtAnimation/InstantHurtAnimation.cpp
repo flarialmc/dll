@@ -19,7 +19,7 @@ void InstantHurtAnimation::defaultConfig() {
     Module::defaultConfig("core");
     setDef("onlyWithArmor", true);
     setDef("tryToExcludeTeam", true);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void InstantHurtAnimation::settingsRender(float settingsOffset) {

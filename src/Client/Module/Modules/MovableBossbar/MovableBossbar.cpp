@@ -37,7 +37,7 @@ void MovableBossbar::defaultConfig()
 {
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void MovableBossbar::onRender(RenderEvent& event)
