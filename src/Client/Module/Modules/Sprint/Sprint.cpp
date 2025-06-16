@@ -91,6 +91,7 @@ void Sprint::onKey(KeyEvent& event)
 
 void Sprint::onRender(RenderEvent& event)
 {
+    Logger::debug("{}", this->toggleSprinting);
     if (!this->isEnabled()) return;
     if (!this->isEnabled() || SDK::getCurrentScreen() != "hud_screen") return;
 
@@ -139,14 +140,12 @@ void Sprint::onTick(TickEvent& event)
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
-            if (handler->mInputState.forward) {
                 if (getOps<bool>("always")) {
                     handler->sprinting = true;
                 }
                 else {
-                    if (toggleSprinting) handler->sprinting = toggleSprinting;
+                    handler->sprinting = toggleSprinting;
                 }
-            }
         }
     }
 }
