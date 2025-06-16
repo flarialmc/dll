@@ -120,7 +120,12 @@ void ModernKeybindHandling::onKey(KeyEvent& event)
         updateMovementKeys();
         
         if (key == movementKeys[6] && action == ActionType::Pressed) {
-            sprintToggleState = !sprintToggleState;
+            if (SDK::clientInstance != nullptr && SDK::clientInstance->getLocalPlayer() != nullptr) {
+                auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
+                if (handler != nullptr) {
+                    sprintToggleState = !handler->sprinting;
+                }
+            }
         }
         else if (key != movementKeys[6]) {
             if (action == ActionType::Pressed) {
@@ -161,8 +166,6 @@ void ModernKeybindHandling::updateMovementInputHandler()
     
     updateMovementKeys();
     
-    bool isMovingForward = false;
-    
     for (int i = 0; i < movementKeys.size(); i++) {
         int key = movementKeys[i];
         bool isKeyHeld = heldKeys[key];
@@ -170,7 +173,6 @@ void ModernKeybindHandling::updateMovementInputHandler()
         if (i == 0) {
             handler->mInputState.forward = isKeyHeld;
             handler->mRawInputState.forward = isKeyHeld;
-            isMovingForward = isKeyHeld;
         }
         else if (i == 1) {
             handler->mInputState.backward = isKeyHeld;
@@ -195,10 +197,9 @@ void ModernKeybindHandling::updateMovementInputHandler()
             handler->mRawInputState.mSneakDown = isKeyHeld;
         }
         else if (i == 6) {
-            bool shouldSprint = sprintToggleState && isMovingForward;
-            handler->sprinting = shouldSprint;
-            handler->mInputState.mSprintDown = shouldSprint;
-            handler->mRawInputState.mSprintDown = shouldSprint;
+            handler->sprinting = sprintToggleState;
+            handler->mInputState.mSprintDown = sprintToggleState;
+            handler->mRawInputState.mSprintDown = sprintToggleState;
         }
     }
 }
