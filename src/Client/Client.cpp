@@ -280,6 +280,7 @@ void Client::initialize() {
 	ADD_SETTING("currentConfig", std::string("default.json"));
 	ADD_SETTING("resettableSettings", true);
 	ADD_SETTING("clearTextBoxWhenClicked", true);
+	ADD_SETTING("dotcmdprefix", std::string("."));
 
 	if (Client::hasLegacySettings && !Client::softLoadLegacy) Client::settings.getSettingByName<std::string>("currentConfig")->value = Client::legacySettings.getSettingByName<std::string>("currentConfig")->value + ".json";
 
