@@ -99,8 +99,7 @@ void ModernKeybindHandling::onTick(TickEvent& event)
     }
     auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
-    Logger::debug("FORWARD {} BACKWARD {} LEFT {} RIGHT {} JUMPING {} SNEAKING {}", handler->mInputState.forward, handler->mInputState.backward,
-                  handler->mInputState.left, handler->mInputState.right, handler->jumping, handler->sneaking);
+
 
     if (currentlyInGame) {
         updateMovementInputHandler();
