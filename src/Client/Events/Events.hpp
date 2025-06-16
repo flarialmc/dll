@@ -12,6 +12,7 @@
 #include "Game/AfterSettingsScreenOnExitEvent.hpp"
 #include "Game/BeforeSettingsScreenOnExitEvent.hpp"
 #include "Game/displayClientMessageEvent.hpp"
+#include "Game/TurnDeltaEvent.hpp"
 
 #include "Input/KeyEvent.hpp"
 #include "Input/MouseEvent.hpp"

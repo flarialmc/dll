@@ -1,5 +1,6 @@
 #include "Zoom.hpp"
 
+
 Zoom::Zoom() : Module("Zoom", "Allows you to see distant places.", IDR_MAGNIFY_PNG, "C")
 {
 	//this->setup();
@@ -12,6 +13,7 @@ void Zoom::onEnable()
 		Listen(this, MouseEvent, &Zoom::onMouse)
 		Listen(this, KeyEvent, &Zoom::onKey)
 		Listen(this, SetTopScreenNameEvent, &Zoom::onSetTopScreenName)
+		Listen(this, TurnDeltaEvent, &Zoom::onTurnDeltaEvent)
 		Module::onEnable();
 }
 
@@ -21,7 +23,7 @@ void Zoom::onDisable()
 		Deafen(this, SensitivityEvent, &Zoom::onGetSensitivity)
 		Deafen(this, MouseEvent, &Zoom::onMouse)
 		Deafen(this, KeyEvent, &Zoom::onKey)
-		Deafen(this, SetTopScreenNameEvent, &Zoom::onSetTopScreenName)
+		Deafen(this, TurnDeltaEvent, &Zoom::onTurnDeltaEvent)
 		Module::onDisable();
 }
 
@@ -230,4 +232,15 @@ void Zoom::onSetTopScreenName(SetTopScreenNameEvent& event)
 			event.setCustomLayer("f1_screen");
 		}
 	}
+}
+
+void Zoom::onTurnDeltaEvent(TurnDeltaEvent& event) {
+	if (!this->isEnabled() || !this->active) return;
+	float oSens = 1.f;
+	if (getOps<bool>("lowsens")) {
+		oSens = std::min(oSens, oSens * (2 / (zoomValue - realFov)));
+	}
+
+	event.delta.x *= -oSens;
+	event.delta.y *= -oSens;
 }
