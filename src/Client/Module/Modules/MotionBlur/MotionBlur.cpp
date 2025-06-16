@@ -34,8 +34,8 @@ void MotionBlur::defaultConfig()
     Module::defaultConfig("core");
     setDef("intensity", 0.88f);
     setDef("intensity2", 6.0f);
-    setDef("avgpixel", false);
-    setDef("dynamic", true);
+    setDef("avgpixel", true);
+    setDef("dynamic", false);
     setDef("samples", 64.f);
     setDef("renderUnderUI", true);
     if (ModuleManager::initialized) Client::SaveSettings();
