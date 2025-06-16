@@ -169,14 +169,14 @@ void Zoom::onMouse(MouseEvent& event)
 			auto fovchanger = ModuleManager::getModule("FOV Changer");
 			auto upsidedown = ModuleManager::getModule("Upside Down");
 			if (getOps<bool>("UseScroll") == true) {
-				if (MC::mouseAction == MouseAction::ScrollUp) {
+				if (event.getAction() == MouseAction::ScrollUp) {
 					if ((fovchanger != nullptr &&
 						fovchanger->getOps<float>("fovvalue") > 180) ||
 						(upsidedown != nullptr && upsidedown->isEnabled()))
 						zoomValue += getOps<float>("modifier");
 					else zoomValue -= getOps<float>("modifier");
 				}
-				if (MC::mouseAction != MouseAction::ScrollUp && MC::mouseButton == MouseButton::Scroll) {
+				if (event.getAction() != MouseAction::ScrollUp && event.getButton() == MouseButton::Scroll) {
 					if ((fovchanger != nullptr &&
 						fovchanger->getOps<float>("fovvalue") > 180) ||
 						(upsidedown != nullptr && upsidedown->isEnabled()))
@@ -187,8 +187,8 @@ void Zoom::onMouse(MouseEvent& event)
 				if (zoomValue < 1) zoomValue = 1;
 				else if (zoomValue > realFov) zoomValue = realFov;
 
-				if (MC::mouseAction == MouseAction::ScrollUp ||
-					MC::mouseAction != MouseAction::ScrollUp && MC::mouseButton == MouseButton::Scroll) {
+				if (event.getAction() == MouseAction::ScrollUp ||
+					event.getAction() != MouseAction::ScrollUp && event.getButton() == MouseButton::Scroll) {
 					event.setButton(MouseButton::None);
 					event.setAction(MouseAction::Release);
 				}
