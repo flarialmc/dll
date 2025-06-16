@@ -13,7 +13,6 @@ private:
     std::array<bool, 256> heldKeys;
     std::vector<int> movementKeys;
     bool wasInGame;
-    bool sprintToggleState;
     
     void restoreMovementInput();
     void updateMovementInputHandler();

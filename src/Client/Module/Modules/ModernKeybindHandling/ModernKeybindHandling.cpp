@@ -10,7 +10,6 @@ ModernKeybindHandling::ModernKeybindHandling() : Module("Modern Handling",
     heldKeys.fill(false);
     wasInGame = true;
     lastScreen = "";
-    sprintToggleState = false;
 }
 
 void ModernKeybindHandling::onEnable()
@@ -117,22 +116,10 @@ void ModernKeybindHandling::onKey(KeyEvent& event)
     ActionType action = event.getAction();
     
     if (isMovementKey(key)) {
-        updateMovementKeys();
-        
-        if (key == movementKeys[6] && action == ActionType::Pressed) {
-            if (SDK::clientInstance != nullptr && SDK::clientInstance->getLocalPlayer() != nullptr) {
-                auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
-                if (handler != nullptr) {
-                    sprintToggleState = !handler->sprinting;
-                }
-            }
-        }
-        else if (key != movementKeys[6]) {
-            if (action == ActionType::Pressed) {
-                heldKeys[key] = true;
-            } else if (action == ActionType::Released) {
-                heldKeys[key] = false;
-            }
+        if (action == ActionType::Pressed) {
+            heldKeys[key] = true;
+        } else if (action == ActionType::Released) {
+            heldKeys[key] = false;
         }
     }
 }
@@ -197,9 +184,9 @@ void ModernKeybindHandling::updateMovementInputHandler()
             handler->mRawInputState.mSneakDown = isKeyHeld;
         }
         else if (i == 6) {
-            handler->sprinting = sprintToggleState;
-            handler->mInputState.mSprintDown = sprintToggleState;
-            handler->mRawInputState.mSprintDown = sprintToggleState;
+            handler->sprinting = isKeyHeld;
+            handler->mInputState.mSprintDown = isKeyHeld;
+            handler->mRawInputState.mSprintDown = isKeyHeld;
         }
     }
 }
