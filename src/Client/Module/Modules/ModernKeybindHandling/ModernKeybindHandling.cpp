@@ -142,6 +142,7 @@ void ModernKeybindHandling::restoreMovementInput()
             updateMovementInputHandler();
         }
     }
+    //
 }
 
 void ModernKeybindHandling::updateMovementInputHandler()
