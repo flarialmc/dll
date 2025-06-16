@@ -79,6 +79,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 
 	}
 
+	if (realBlurAmount > 0.05f)
 	Blur::RenderBlur(event.RTV, 3, realBlurAmount);
 
 	if (SwapchainHook::init && baseHeightActual > 0.1f) {
