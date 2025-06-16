@@ -41,6 +41,7 @@ void Zoom::defaultConfig()
 	setDef("hidemodules", false);
 	setDef("UseScroll", true);
 	setDef("lowsens", true);
+	setDef("lowsensStrength", 1.f);
 	setDef("toggleZoom", false);
 	//if (settings.getSettingByName<bool>("hidehud") == nullptr) settings.addSetting("hidehud", false);
 	setDef("modifier", 10.0f);
@@ -74,6 +75,7 @@ void Zoom::settingsRender(float settingsOffset)
 	addToggle("Hide Modules", "Hides other modules when zooming.", "hidemodules");
 	addToggle("Always Animate", "Smooth zoom animation while sprinting.", "alwaysanim");
 	addToggle("Low Sensitivity", "Lower sensitivity when in zoom.", "lowsens");
+	addConditionalSlider(getOps<bool>("lowsens"), "Low Sensitivity Strength", "", "lowsensStrength", 1.f, 0.f, false);
 
 	FlarialGUI::UnsetScrollView();
 	resetPadding();
@@ -246,7 +248,7 @@ void Zoom::onTurnDeltaEvent(TurnDeltaEvent& event) {
 	if (!this->isEnabled() || !this->active) return;
 	float oSens = 1.f;
 	if (getOps<bool>("lowsens")) {
-		oSens = std::min(oSens, oSens * (2.f / (zoomValue - realFov)));
+		oSens = std::min(oSens, oSens * (1 + getOps<float>("lowsensStrength") * ((2.f / (zoomValue - realFov)) - 1)));
 	}
 
 	if (oSens < -1.f || oSens > 0) oSens = -1.f;
