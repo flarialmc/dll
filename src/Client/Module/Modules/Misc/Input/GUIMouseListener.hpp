@@ -26,9 +26,11 @@ public:
         // Calculate time elapsed since last refill
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastRefill).count();
         
-        // Refill tokens based on elapsed time
+        // Refill tokens based on elapsed time, but limit refill to prevent bursts
         if (elapsed > 0) {
-            double tokensToAdd = (static_cast<double>(rate) * elapsed) / 1000.0; // rate per second converted to per millisecond
+            // Limit the elapsed time to prevent large token refills after inactivity
+            double cappedElapsed = std::min(static_cast<double>(elapsed), 1000.0 / rate); // Max 1 second worth of tokens
+            double tokensToAdd = (static_cast<double>(rate) * cappedElapsed) / 1000.0;
             tokens = std::min(static_cast<double>(rate), tokens + tokensToAdd);
             lastRefill = now;
         }
