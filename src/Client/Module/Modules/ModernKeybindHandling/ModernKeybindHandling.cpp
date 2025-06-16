@@ -98,7 +98,6 @@ void ModernKeybindHandling::onTick(TickEvent& event)
             restoreMovementInput();
         }
     }
-    auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
 
 
@@ -112,7 +111,7 @@ void ModernKeybindHandling::onTick(TickEvent& event)
 void ModernKeybindHandling::onKey(KeyEvent& event)
 {
     if (!this->isEnabled()) return;
-    
+
     int key = event.getKey();
     ActionType action = event.getAction();
     
@@ -154,14 +153,14 @@ void ModernKeybindHandling::restoreMovementInput()
 
 void ModernKeybindHandling::updateMovementInputHandler()
 {
+    if (FlarialGUI::inMenu) return;
+
     if (SDK::clientInstance == nullptr || SDK::clientInstance->getLocalPlayer() == nullptr) return;
     
     auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
     if (handler == nullptr) return;
     
     updateMovementKeys();
-    
-    bool isMovingForward = false;
     
     for (int i = 0; i < movementKeys.size(); i++) {
         int key = movementKeys[i];
@@ -170,7 +169,6 @@ void ModernKeybindHandling::updateMovementInputHandler()
         if (i == 0) {
             handler->mInputState.forward = isKeyHeld;
             handler->mRawInputState.forward = isKeyHeld;
-            isMovingForward = isKeyHeld;
         }
         else if (i == 1) {
             handler->mInputState.backward = isKeyHeld;
@@ -195,10 +193,8 @@ void ModernKeybindHandling::updateMovementInputHandler()
             handler->mRawInputState.mSneakDown = isKeyHeld;
         }
         else if (i == 6) {
-            bool shouldSprint = sprintToggleState && isMovingForward;
-            handler->sprinting = shouldSprint;
-            handler->mInputState.mSprintDown = shouldSprint;
-            handler->mRawInputState.mSprintDown = shouldSprint;
+            handler->mInputState.mSprintDown = sprintToggleState;
+            handler->mRawInputState.mSprintDown = sprintToggleState;
         }
     }
 }
