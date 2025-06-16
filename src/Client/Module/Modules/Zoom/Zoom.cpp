@@ -10,6 +10,7 @@ void Zoom::onEnable()
 {
 	Listen(this, FOVEvent, &Zoom::onGetFOV)
 		Listen(this, SensitivityEvent, &Zoom::onGetSensitivity)
+		Listen(this, RenderEvent, &Zoom::onRender)
 		Listen(this, MouseEvent, &Zoom::onMouse)
 		Listen(this, KeyEvent, &Zoom::onKey)
 		Listen(this, SetTopScreenNameEvent, &Zoom::onSetTopScreenName)
@@ -21,6 +22,7 @@ void Zoom::onDisable()
 {
 	Deafen(this, FOVEvent, &Zoom::onGetFOV)
 		Deafen(this, SensitivityEvent, &Zoom::onGetSensitivity)
+		Deafen(this, RenderEvent, &Zoom::onRender)
 		Deafen(this, MouseEvent, &Zoom::onMouse)
 		Deafen(this, KeyEvent, &Zoom::onKey)
 		Deafen(this, TurnDeltaEvent, &Zoom::onTurnDeltaEvent)
@@ -77,23 +79,15 @@ void Zoom::settingsRender(float settingsOffset)
 	resetPadding();
 }
 
-void Zoom::onGetFOV(FOVEvent& event)
+void Zoom::onRender(RenderEvent& event)
 {
 	if (!this->isEnabled()) return;
-	auto fov = event.getFOV();
-	if (fov == 70) return;
-
+	
 	auto player = SDK::clientInstance->getLocalPlayer();
 	if (!player) return;
 
-	if (ModuleManager::getModule("Java Dynamic FOV").get()->isEnabled()) {
-		if (player->getActorFlag(ActorFlags::FLAG_SPRINTING)) {
-			fov = ModuleManager::getModule("Java Dynamic FOV").get()->getOps<float>("fov_target");
-		}
-	}
-
-	if (fisrtTime) { // so that it doesn't unzoom on module load
-		currentZoomVal = fov;
+	if (fisrtTime) {
+		currentZoomVal = currentFov;
 		fisrtTime = false;
 		return;
 	}
@@ -104,8 +98,8 @@ void Zoom::onGetFOV(FOVEvent& event)
 
 	if (this->active) {
 		animationFinished = false;
-		if (fov > 180) {
-			currentZoomVal = disableanim ? fov + zoomValue : std::lerp(currentZoomVal, fov + zoomValue, animspeed * FlarialGUI::frameFactor);
+		if (currentFov > 180) {
+			currentZoomVal = disableanim ? currentFov + zoomValue : std::lerp(currentZoomVal, currentFov + zoomValue, animspeed * FlarialGUI::frameFactor);
 		}
 		else {
 			currentZoomVal = disableanim ? zoomValue : std::lerp(currentZoomVal, zoomValue, animspeed * FlarialGUI::frameFactor);
@@ -113,20 +107,34 @@ void Zoom::onGetFOV(FOVEvent& event)
 	}
 	else {
 		if ((!animationFinished || alwaysanim) && !disableanim) {
-			// Only lerp if animation hasn't finished
 			if (!jdfAnimationFinished)
 			{
 				jdfAnimationFinished = true;
 			}
-			currentZoomVal = std::lerp(currentZoomVal, fov, animspeed * FlarialGUI::frameFactor);
-			if (currentZoomVal == zoomValue || std::abs(fov - currentZoomVal) < animspeed + unzoomAnimDisableTreshold) { // when fov changes due to sprinting animation used to play
-				// Set animationFinished to true only when reaching original fov
+			currentZoomVal = std::lerp(currentZoomVal, currentFov, animspeed * FlarialGUI::frameFactor);
+			if (currentZoomVal == zoomValue || std::abs(currentFov - currentZoomVal) < animspeed + unzoomAnimDisableTreshold) {
 				animationFinished = true;
 			}
 		}
 		else {
-			// Once animation finished, set current zoom to fov
-			currentZoomVal = fov;
+			currentZoomVal = currentFov;
+		}
+	}
+}
+
+void Zoom::onGetFOV(FOVEvent& event)
+{
+	if (!this->isEnabled()) return;
+	auto fov = event.getFOV();
+	if (fov == 70) return;
+
+	auto player = SDK::clientInstance->getLocalPlayer();
+	if (player) {
+		currentFov = fov;
+		if (ModuleManager::getModule("Java Dynamic FOV").get()->isEnabled()) {
+			if (player->getActorFlag(ActorFlags::FLAG_SPRINTING)) {
+				currentFov = ModuleManager::getModule("Java Dynamic FOV").get()->getOps<float>("fov_target");
+			}
 		}
 	}
 

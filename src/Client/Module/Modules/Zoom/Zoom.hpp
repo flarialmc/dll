@@ -11,6 +11,7 @@ private:
 	static float inline realFov = 70.0f;
 	static inline float currentSensitivity = 0.0f;
 	static inline bool saved = false;
+	static inline float currentFov = 70.0f;
 
 	static inline float unzoomAnimDisableTreshold = 0.2;
 
@@ -33,6 +34,8 @@ public:
 	void onGetFOV(FOVEvent& event);
 
 	void onGetSensitivity(SensitivityEvent& event);
+
+	void onRender(RenderEvent& event);
 
 	//TODO: RE CHECK
 	void onMouse(MouseEvent& event);
