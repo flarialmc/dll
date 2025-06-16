@@ -363,7 +363,6 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
 
     if (!SwapchainHook::GetBackbuffer()) return;
 
-    Logger::debug("trolling");
 
     winrt::com_ptr<ID3D11ShaderResourceView> pOrigShaderResourceView = MotionBlur::BackbufferToSRVExtraMode();
     if (!pOrigShaderResourceView) {

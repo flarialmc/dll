@@ -85,6 +85,7 @@
 #include "Modules/MovableCoordinates/MovableCoordinates.hpp"
 #include "Modules/MovableHotbar/MovableHotbar.hpp"
 #include "Modules/NullMovement/NullMovement.hpp"
+#include "Modules/ModernKeybindHandling/ModernKeybindHandling.hpp"
 
 #include "Modules/RawInputBuffer/RawInputBuffer.hpp"
 #include "Modules/JavaDynamicFOV/JavaDynamicFOV.hpp"
@@ -229,6 +230,7 @@ void ModuleManager::initialize() {
 	addModule<Waypoints>();
 
 	addModule<NullMovement>();
+	addModule<ModernKeybindHandling>();
 	addModule<CustomCrosshair>();
 	addModule<Waila>();
 

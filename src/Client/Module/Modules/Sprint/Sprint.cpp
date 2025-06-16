@@ -139,7 +139,7 @@ void Sprint::onTick(TickEvent& event)
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
-            if (handler->forward) {
+            if (handler->mInputState.forward) {
                 if (getOps<bool>("always")) {
                     handler->sprinting = true;
                 }

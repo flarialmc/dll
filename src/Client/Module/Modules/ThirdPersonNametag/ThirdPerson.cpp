@@ -1,5 +1,7 @@
 #include "ThirdPerson.hpp"
 
+#include "Client.hpp"
+
 ThirdPerson::ThirdPerson(): Module("Nametag", "Shows your nametag for you while\nin 3rd person mode.",
                                    IDR_NAMETAG_PNG, "")
 {
