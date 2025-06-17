@@ -86,9 +86,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [check-commit, windows-build]
     if: needs.check-commit.outputs.should_build == 'true'
-    permissions:
-      contents: read
-      actions: read
     steps:
       - name: Output commit type
         run: echo " ${{env.OUTPUT1}} $OUTPUT1"
@@ -102,8 +99,6 @@ jobs:
           token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
       - name: Configure Git credentials
         run: |
-          git config --global user.name "GitHub Actions Bot"
-          git config --global user.email "actions@example.com"
           git config --global url."https://x-access-token:${{ secrets.ACTIONS_GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
       - name: Download dll
         uses: actions/download-artifact@v4.1.9
@@ -143,7 +138,7 @@ jobs:
           tag_name: ${{ env.TAG_NAME}}
           body: ${{ github.event.head_commit.message }}
           name: "Nightly Release"
-          token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ env.OUTPUT1 == 0 }}
         env:
           OUTPUT1: ${{ needs.windows-build.outputs.type}}
@@ -181,7 +176,7 @@ jobs:
           tag_name: ${{ env.TAG_NAME}}
           body: ${{ github.event.head_commit.message }}
           name: "Release"
-          token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ env.OUTPUT1 == 1 }}
         env:
           OUTPUT1: ${{ needs.windows-build.outputs.type}}
@@ -219,7 +214,7 @@ jobs:
           tag_name: ${{ env.TAG_NAME}}
           body: ${{ github.event.head_commit.message }}
           name: "Beta Release"
-          token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ env.OUTPUT1 == 2 }}
         env:
           OUTPUT1: ${{ needs.windows-build.outputs.type}}
