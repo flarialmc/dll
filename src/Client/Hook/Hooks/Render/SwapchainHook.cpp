@@ -254,51 +254,40 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 void SwapchainHook::DX11Init() {
     Logger::debug("Initializing for DX11");
 
+    const D2D1_CREATION_PROPERTIES properties {
+        D2D1_THREADING_MODE_MULTI_THREADED,
+        D2D1_DEBUG_LEVEL_NONE,
+        D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS
+    };
+
     ID3D11Device* rawDevice = nullptr;
-    if (FAILED(swapchain->GetDevice(IID_PPV_ARGS(&rawDevice))) || !rawDevice) {
-        Logger::debug("Failed to get DX11 device");
-        return;
-    }
+    swapchain->GetDevice(IID_PPV_ARGS(&rawDevice));
     d3d11Device = MakeShared(rawDevice);
 
-    IDXGISurface1* backBuffer = nullptr;
-    if (FAILED(swapchain->GetBuffer(0, IID_PPV_ARGS(&backBuffer))) || !backBuffer) {
-        Logger::debug("Failed to get back buffer");
-        return;
-    }
+    IDXGISurface1 *eBackBuffer;
+    swapchain->GetBuffer(0, IID_PPV_ARGS(&eBackBuffer));
+    if(!eBackBuffer) return;
 
-    D2D1_CREATION_PROPERTIES properties = {};
-    properties.threadingMode = D2D1_THREADING_MODE_MULTI_THREADED;
-    properties.debugLevel = D2D1_DEBUG_LEVEL_NONE;
-    properties.options = D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS;
+    D2D1CreateDeviceContext(eBackBuffer, properties, &D2D::context);
 
-    if (FAILED(D2D1CreateDeviceContext(backBuffer, properties, &D2D::context))) {
-        Logger::debug("Failed to create D2D device context");
-        Memory::SafeRelease(backBuffer);
-        return;
-    }
-
-    const D2D1_BITMAP_PROPERTIES1 bitmapProps = D2D1::BitmapProperties1(
+    D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(
         D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
-        D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), 96.0f, 96.0f);
+        D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), 96.0, 96.0);
     
     ID2D1Bitmap1* rawBitmap = nullptr;
-    if (SUCCEEDED(D2D::context->CreateBitmapFromDxgiSurface(backBuffer, bitmapProps, &rawBitmap))) {
-        D2D1Bitmap = MakeShared(rawBitmap);
-    }
+    D2D::context->CreateBitmapFromDxgiSurface(eBackBuffer, props, &rawBitmap);
+    D2D1Bitmap = MakeShared(rawBitmap);
 
     if (!initImgui) {
         ImGui::CreateContext();
         
         ID3D11DeviceContext* rawContext = nullptr;
         d3d11Device->GetImmediateContext(&rawContext);
-        if (rawContext) {
-            context = MakeShared(rawContext);
-            
-            ImGui_ImplWin32_Init(window2);
-            ImGui_ImplDX11_Init(d3d11Device.get(), context.get());
-            initImgui = true;
-        }
+        context = MakeShared(rawContext);
+        
+        ImGui_ImplWin32_Init(window2);
+        ImGui_ImplDX11_Init(d3d11Device.get(), context.get());
+        initImgui = true;
     }
 
     SaveBackbuffer();
@@ -306,198 +295,196 @@ void SwapchainHook::DX11Init() {
     MotionBlur::initted = AvgPixelMotionBlurHelper::Initialize();
     MotionBlur::initted = RealMotionBlurHelper::Initialize();
 
-    Memory::SafeRelease(backBuffer);
+    Memory::SafeRelease(eBackBuffer);
     init = true;
 }
 
 void SwapchainHook::DX12Init() {
     Logger::debug("Initializing for DX12");
     
-    ID3D12Device5* rawDevice = nullptr;
-    if (FAILED(swapchain->GetDevice(IID_PPV_ARGS(&rawDevice))) || !rawDevice) {
-        Logger::debug("Failed to get DX12 device");
-        return;
-    }
+    ID3D12Device5 *rawDevice;
+    swapchain->GetDevice(IID_PPV_ARGS(&rawDevice));
     d3d12Device5 = MakeShared(rawDevice);
 
-    fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-    if (!fenceEvent) {
-        Logger::debug("Failed to create fence event");
-        return;
-    }
+    if (SUCCEEDED(swapchain->GetDevice(IID_PPV_ARGS(&rawDevice))) &&
+        kiero::getRenderType() == kiero::RenderType::D3D12) {
 
-    ID3D11Device* raw11Device = nullptr;
-    ID3D11DeviceContext* raw11Context = nullptr;
-    IUnknown* rawQueues[] = { queue.get() };
-    
-    if (FAILED(D3D11On12CreateDevice(rawDevice, D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
-                                    rawQueues, 1, 0, &raw11Device, &raw11Context, nullptr)) || !raw11Device) {
-        Logger::debug("Failed to create D3D11On12 device");
-        return;
-    }
-    
-    d3d11Device = MakeShared(raw11Device);
-    context = MakeShared(raw11Context);
+        fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
-    ID3D11On12Device* rawOn12Device = nullptr;
-    if (SUCCEEDED(d3d11Device->QueryInterface(IID_PPV_ARGS(&rawOn12Device)))) {
-        d3d11On12Device = MakeShared(rawOn12Device);
-    }
-
-    ID2D1Factory7* d2dFactory = nullptr;
-    D2D1_FACTORY_OPTIONS factoryOptions = {};
-    if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, __uuidof(ID2D1Factory7), 
-                                &factoryOptions, (void**)&d2dFactory))) {
-        Logger::debug("Failed to create D2D1 factory");
-        return;
-    }
-
-    IDXGIDevice* dxgiDevice = nullptr;
-    ID2D1Device6* d2dDevice = nullptr;
-    if (SUCCEEDED(d3d11On12Device->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice)) &&
-        SUCCEEDED(d2dFactory->CreateDevice(dxgiDevice, &d2dDevice))) {
-        d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS, &D2D::context);
-    }
-
-    DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
-    swapchain->GetDesc1(&swapChainDesc);
-    bufferCount = swapChainDesc.BufferCount;
-
-    DXGISurfaces.resize(bufferCount);
-    D3D11Resources.resize(bufferCount);
-    D2D1Bitmaps.resize(bufferCount);
-
-    const float dpi = static_cast<float>(GetDpiForSystem());
-    const D2D1_BITMAP_PROPERTIES1 bitmapProps = D2D1::BitmapProperties1(
-        D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
-        D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), dpi, dpi);
-
-    D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
-    heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-    heapDesc.NumDescriptors = static_cast<UINT>(bufferCount);
-    heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    heapDesc.NodeMask = 1;
-
-    ID3D12DescriptorHeap* rawHeap = nullptr;
-    if (SUCCEEDED(rawDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&rawHeap)))) {
-        D3D12DescriptorHeap = MakeShared(rawHeap);
-    }
-
-    const UINT rtvDescriptorSize = rawDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = D3D12DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-
-    for (UINT i = 0; i < bufferCount; i++) {
-        ID3D12Resource* backBuffer = nullptr;
-        if (FAILED(swapchain->GetBuffer(i, IID_PPV_ARGS(&backBuffer)))) continue;
-        
-        rawDevice->CreateRenderTargetView(backBuffer, nullptr, rtvHandle);
-        rtvHandle.ptr += rtvDescriptorSize;
-
-        D3D11_RESOURCE_FLAGS d3d11Flags = {};
-        d3d11Flags.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-
-        ID3D11Resource* wrapped11Resource = nullptr;
-        if (SUCCEEDED(d3d11On12Device->CreateWrappedResource(backBuffer, &d3d11Flags,
-                                                            D3D12_RESOURCE_STATE_RENDER_TARGET,
-                                                            D3D12_RESOURCE_STATE_PRESENT, 
-                                                            IID_PPV_ARGS(&wrapped11Resource)))) {
-            D3D11Resources[i] = MakeShared(wrapped11Resource);
-            
-            IDXGISurface1* surface = nullptr;
-            if (SUCCEEDED(D3D11Resources[i]->QueryInterface(&surface))) {
-                DXGISurfaces[i] = MakeShared(surface);
-                
-                ID2D1Bitmap1* bitmap = nullptr;
-                if (SUCCEEDED(D2D::context->CreateBitmapFromDxgiSurface(surface, bitmapProps, &bitmap))) {
-                    D2D1Bitmaps[i] = MakeShared(bitmap);
-                }
-            }
+        // Get the command queue from the device if we don't have one yet
+        if (!queue) {
+            ID3D12CommandQueue* rawQueue = nullptr;
+            D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+            queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+            queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+            rawDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&rawQueue));
+            queue = MakeShared(rawQueue);
         }
-        
-        Memory::SafeRelease(backBuffer);
+
+        ID3D11Device* raw11Device = nullptr;
+        ID3D11DeviceContext* raw11Context = nullptr;
+        IUnknown* rawQueues[] = { queue.get() };
+
+        D3D11On12CreateDevice(rawDevice,
+                              D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
+                              rawQueues, 1, 0, &raw11Device, &raw11Context,
+                              nullptr);
+
+        if(!raw11Device) return;
+
+        d3d11Device = MakeShared(raw11Device);
+        context = MakeShared(raw11Context);
+
+        ID3D11On12Device* rawOn12Device = nullptr;
+        d3d11Device->QueryInterface(IID_PPV_ARGS(&rawOn12Device));
+        d3d11On12Device = MakeShared(rawOn12Device);
+
+        D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS;
+        ID2D1Factory7 *d2dFactory;
+        D2D1_FACTORY_OPTIONS factoryOptions{};
+        D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, __uuidof(ID2D1Factory7), &factoryOptions,
+                          (void **) &d2dFactory);
+
+        IDXGIDevice *dxgiDevice;
+        d3d11On12Device->QueryInterface(__uuidof(IDXGIDevice), (void **) &dxgiDevice);
+
+        ID2D1Device6 *device2;
+        d2dFactory->CreateDevice(dxgiDevice, &device2);
+        device2->CreateDeviceContext(deviceOptions, &D2D::context);
+
+        DXGI_SWAP_CHAIN_DESC1 swapChainDescription;
+        swapchain->GetDesc1(&swapChainDescription);
+        bufferCount = swapChainDescription.BufferCount;
+
+        DXGISurfaces.resize(bufferCount);
+        D3D11Resources.resize(bufferCount);
+        D2D1Bitmaps.resize(bufferCount);
+
+        auto dpi = (float) GetDpiForSystem();
+        D2D1_BITMAP_PROPERTIES1 props = D2D1::BitmapProperties1(
+            D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
+            D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), dpi, dpi);
+
+        D3D12_DESCRIPTOR_HEAP_DESC heapDescriptorBackBuffers = {};
+        heapDescriptorBackBuffers.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+        heapDescriptorBackBuffers.NumDescriptors = bufferCount;
+        heapDescriptorBackBuffers.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+        heapDescriptorBackBuffers.NodeMask = 1;
+
+        ID3D12DescriptorHeap* rawHeap = nullptr;
+        rawDevice->CreateDescriptorHeap(&heapDescriptorBackBuffers, IID_PPV_ARGS(&rawHeap));
+        D3D12DescriptorHeap = MakeShared(rawHeap);
+
+        uintptr_t rtvDescriptorSize = rawDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = D3D12DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
+        for (int i = 0; i < bufferCount; i++) {
+            ID3D12Resource *backBufferPtr;
+            swapchain->GetBuffer(i, IID_PPV_ARGS(&backBufferPtr));
+            rawDevice->CreateRenderTargetView(backBufferPtr, nullptr, rtvHandle);
+            rtvHandle.ptr += rtvDescriptorSize;
+
+            D3D11_RESOURCE_FLAGS d3d11_flags = {D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE};
+
+            ID3D11Resource* raw11Resource = nullptr;
+            d3d11On12Device->CreateWrappedResource(backBufferPtr, &d3d11_flags,
+                                               D3D12_RESOURCE_STATE_RENDER_TARGET,
+                                               D3D12_RESOURCE_STATE_PRESENT, IID_PPV_ARGS(&raw11Resource));
+            D3D11Resources[i] = MakeShared(raw11Resource);
+            
+            IDXGISurface1* rawSurface = nullptr;
+            D3D11Resources[i]->QueryInterface(&rawSurface);
+            DXGISurfaces[i] = MakeShared(rawSurface);
+
+            ID2D1Bitmap1* rawBitmap = nullptr;
+            D2D::context->CreateBitmapFromDxgiSurface(DXGISurfaces[i].get(), props, &rawBitmap);
+            D2D1Bitmaps[i] = MakeShared(rawBitmap);
+            
+            Memory::SafeRelease(backBufferPtr);
+        }
+
+        Memory::SafeRelease(rawDevice);
+        Memory::SafeRelease(device2);
+        Memory::SafeRelease(dxgiDevice);
+        Memory::SafeRelease(d2dFactory);
+
+        Blur::InitializePipeline();
+        init = true;
     }
-
-    Memory::SafeRelease(d2dDevice);
-    Memory::SafeRelease(dxgiDevice);
-    Memory::SafeRelease(d2dFactory);
-
-    Blur::InitializePipeline();
-    init = true;
 }
 
 void SwapchainHook::DX11Render(bool underui) {
-    if (!D2D::context || !context || !d3d11Device) return;
-    
     DX11Blur();
     SaveBackbuffer(underui);
+
+    if (!D2D::context) return;
+
     D2D::context->BeginDraw();
 
-    ID3D11RenderTargetView* originalRTVs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { nullptr };
-    ID3D11DepthStencilView* originalDSV = nullptr;
-    UINT numRTVs = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;
-    context->OMGetRenderTargets(numRTVs, originalRTVs, &originalDSV);
+    ID3D11RenderTargetView *mainRenderTargetView = nullptr;
+    ID3D11Texture2D *pBackBuffer = nullptr;
 
-    ID3D11Texture2D* backBuffer = nullptr;
-    ID3D11RenderTargetView* mainRTV = nullptr;
-    
-    if (SUCCEEDED(swapchain->GetBuffer(0, IID_PPV_ARGS(&backBuffer))) && backBuffer &&
-        SUCCEEDED(d3d11Device->CreateRenderTargetView(backBuffer, nullptr, &mainRTV)) && mainRTV) {
-        
-        ImGui_ImplDX11_NewFrame();
-        ImGui_ImplWin32_NewFrame();
-        ImGui::NewFrame();
-        ImGui::Begin("t", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | 
-                     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
+    ID3D11RenderTargetView* originalRenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { nullptr };
+    UINT numRenderTargets = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;
+    ID3D11DepthStencilView* originalDepthStencilView = nullptr;
+    context->OMGetRenderTargets(numRenderTargets, originalRenderTargetViews, &originalDepthStencilView);
 
-        if (!underui) {
-            auto event = nes::make_holder<RenderEvent>();
-            event->RTV = mainRTV;
-            eventMgr.trigger(event);
-        } else {
-            auto event = nes::make_holder<RenderUnderUIEvent>();
-            event->RTV = mainRTV;
-            eventMgr.trigger(event);
+    if (context) {
+        if (SUCCEEDED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID *) &pBackBuffer))) {
+            if (SUCCEEDED(d3d11Device->CreateRenderTargetView(pBackBuffer, nullptr, &mainRenderTargetView))) {
+                ImGui_ImplDX11_NewFrame();
+                ImGui_ImplWin32_NewFrame();
+                ImGui::NewFrame();
+                ImGui::Begin("t", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
+
+                if (!underui) {
+                    auto event = nes::make_holder<RenderEvent>();
+                    event->RTV = mainRenderTargetView;
+                    eventMgr.trigger(event);
+                } else {
+                    auto event = nes::make_holder<RenderUnderUIEvent>();
+                    event->RTV = mainRenderTargetView;
+                    eventMgr.trigger(event);
+                }
+
+                if (!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
+                    FlarialGUI::Notify(
+                        "Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("keybind")->value + " to open the menu in-game.");
+                    FlarialGUI::Notify("Join our discord! https://flarial.xyz/discord");
+                    first = true;
+                }
+
+                D2D::context->EndDraw();
+                ImGui::End();
+                ImGui::EndFrame();
+                ImGui::Render();
+
+                context->OMSetRenderTargets(1, &mainRenderTargetView, originalDepthStencilView);
+                ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+            }
         }
-
-        if (!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
-            FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("keybind")->value + " to open the menu in-game.");
-            FlarialGUI::Notify("Join our discord! https://flarial.xyz/discord");
-            first = true;
-        }
-
-        D2D::context->EndDraw();
-        ImGui::End();
-        ImGui::EndFrame();
-        ImGui::Render();
-
-        context->OMSetRenderTargets(1, &mainRTV, originalDSV);
-        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
     }
 
-    context->OMSetRenderTargets(numRTVs, originalRTVs, originalDSV);
+    if (pBackBuffer) pBackBuffer->Release();
+    if (mainRenderTargetView) mainRenderTargetView->Release();
+    context->OMSetRenderTargets(numRenderTargets, originalRenderTargetViews, originalDepthStencilView);
 
-    Memory::SafeRelease(backBuffer);
-    Memory::SafeRelease(mainRTV);
-    Memory::SafeRelease(originalDSV);
-    for (UINT i = 0; i < numRTVs; ++i) {
-        Memory::SafeRelease(originalRTVs[i]);
+    if (originalDepthStencilView) originalDepthStencilView->Release();
+    for (UINT i = 0; i < numRenderTargets; ++i) {
+        if (originalRenderTargetViews[i]) originalRenderTargetViews[i]->Release();
     }
 }
 
 void SwapchainHook::DX12Render(bool underui) {
-    if (!D2D::context || !d3d12Device5 || !queue || !d3d11On12Device) return;
-    
-    currentBitmap = static_cast<int>(swapchain->GetCurrentBackBufferIndex());
-    if (currentBitmap >= D3D11Resources.size() || !D3D11Resources[currentBitmap]) return;
+    currentBitmap = (int) swapchain->GetCurrentBackBufferIndex();
 
-    ID3D12Fence* fence = nullptr;
-    UINT64 fenceValue = 1;
-    if (FAILED(d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)))) {
-        return;
-    }
+    ID3D12Fence* fence;
+    UINT64 fenceValue = 0;
+    d3d12Device5->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 
-    ID3D11Resource* resource = D3D11Resources[currentBitmap].get();
+    ID3D11Resource *resource = D3D11Resources[currentBitmap].get();
     d3d11On12Device->AcquireWrappedResources(&resource, 1);
+    if (!D2D::context) return;
     
     SaveBackbuffer();
     D2D::context->SetTarget(D2D1Bitmaps[currentBitmap].get());
@@ -506,149 +493,190 @@ void SwapchainHook::DX12Render(bool underui) {
     DX12Blur();
     D2D::context->BeginDraw();
 
-    if (!d3d12DescriptorHeapImGuiRender) {
-        D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
-        heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-        heapDesc.NumDescriptors = TOTAL_CONSOLIDATED_DESCRIPTORS;
-        heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-        
-        ID3D12DescriptorHeap* rawHeap = nullptr;
-        if (SUCCEEDED(d3d12Device5->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&rawHeap)))) {
-            d3d12DescriptorHeapImGuiRender = MakeShared(rawHeap);
-        }
-    }
+    DXGI_SWAP_CHAIN_DESC sdesc;
+    swapchain->GetDesc(&sdesc);
+    buffersCounts = sdesc.BufferCount;
+    frameContexts.resize(buffersCounts);
 
-    if (!allocator) {
-        ID3D12CommandAllocator* rawAllocator = nullptr;
-        if (SUCCEEDED(d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&rawAllocator)))) {
+    D3D12_DESCRIPTOR_HEAP_DESC descriptorImGuiRender = {};
+    descriptorImGuiRender.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+    descriptorImGuiRender.NumDescriptors = TOTAL_CONSOLIDATED_DESCRIPTORS;
+    descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+
+    ID3D12DescriptorHeap* rawImGuiHeap = nullptr;
+    if (d3d12DescriptorHeapImGuiRender || SUCCEEDED(d3d12Device5->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&rawImGuiHeap)))) {
+        if (rawImGuiHeap && !d3d12DescriptorHeapImGuiRender) {
+            d3d12DescriptorHeapImGuiRender = MakeShared(rawImGuiHeap);
+        }
+        if (!allocator) {
+            ID3D12CommandAllocator* rawAllocator = nullptr;
+            d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&rawAllocator));
             allocator = MakeShared(rawAllocator);
         }
-    }
 
-    if (!d3d12CommandList && allocator) {
-        ID3D12GraphicsCommandList* rawCommandList = nullptr;
-        if (SUCCEEDED(d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator.get(), nullptr, IID_PPV_ARGS(&rawCommandList)))) {
+        for (size_t i = 0; i < buffersCounts; i++) {
+            frameContexts[i].commandAllocator = allocator;
+        }
+
+        if (!d3d12CommandList) {
+            ID3D12GraphicsCommandList* rawCommandList = nullptr;
+            d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator.get(), NULL, IID_PPV_ARGS(&rawCommandList));
             d3d12CommandList = MakeShared(rawCommandList);
         }
-    }
 
-    if (!initImgui && d3d12DescriptorHeapImGuiRender) {
-        ImGui::CreateContext();
-        ImGui_ImplWin32_Init(window2);
+        if (d3d12CommandList) {
+            D3D12_DESCRIPTOR_HEAP_DESC descriptorBackBuffers;
+            descriptorBackBuffers.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+            descriptorBackBuffers.NumDescriptors = buffersCounts;
+            descriptorBackBuffers.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+            descriptorBackBuffers.NodeMask = 1;
 
-        ImGui_ImplDX12_InitInfo initInfo = {};
-        initInfo.Device = d3d12Device5.get();
-        initInfo.CommandQueue = queue.get();
-        initInfo.NumFramesInFlight = static_cast<int>(bufferCount);
-        initInfo.RTVFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-        initInfo.DSVFormat = DXGI_FORMAT_UNKNOWN;
-        initInfo.SrvDescriptorHeap = d3d12DescriptorHeapImGuiRender.get();
-        initInfo.SrvDescriptorAllocFn = [](ImGui_ImplDX12_InitInfo*, D3D12_CPU_DESCRIPTOR_HANDLE* cpu, D3D12_GPU_DESCRIPTOR_HANDLE* gpu) {
-            const UINT increment = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-            *cpu = d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
-            *gpu = d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
-        };
-        initInfo.SrvDescriptorFreeFn = [](ImGui_ImplDX12_InitInfo*, D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE) {};
+            ID3D12DescriptorHeap* rawBackBufferHeap = nullptr;
+            if (SUCCEEDED(d3d12Device5->CreateDescriptorHeap(&descriptorBackBuffers, IID_PPV_ARGS(&rawBackBufferHeap)))) {
+                d3d12DescriptorHeapBackBuffers = MakeShared(rawBackBufferHeap);
+                const auto rtvDescriptorSize = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+                D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = d3d12DescriptorHeapBackBuffers->GetCPUDescriptorHandleForHeapStart();
 
-        initImgui = ImGui_ImplDX12_Init(&initInfo);
-    }
+                for (size_t i = 0; i < buffersCounts; i++) {
+                    ID3D12Resource *pBackBuffer = nullptr;
+                    frameContexts[i].main_render_target_descriptor = rtvHandle;
+                    swapchain->GetBuffer(i, IID_PPV_ARGS(&pBackBuffer));
+                    d3d12Device5->CreateRenderTargetView(pBackBuffer, nullptr, rtvHandle);
+                    frameContexts[i].main_render_target_resource = MakeShared(pBackBuffer);
+                    rtvHandle.ptr += rtvDescriptorSize;
+                    pBackBuffer->Release();
+                }
 
-    if (!initImgui || !d3d12CommandList || !allocator) {
-        d3d11On12Device->ReleaseWrappedResources(&resource, 1);
-        Memory::SafeRelease(fence);
-        return;
-    }
+                if (!initImgui) {
+                    initImgui = true;
+                    ImGui::CreateContext();
+                    ImGui_ImplWin32_Init(window2);
 
-    ImGui_ImplDX12_NewFrame();
-    ImGui_ImplWin32_NewFrame();
-    ImGui::NewFrame();
-    ImGui::Begin("t", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | 
-                 ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
+                    ImGui_ImplDX12_InitInfo init_info = {};
+                    init_info.Device = d3d12Device5.get();
+                    init_info.CommandQueue = queue.get();
+                    init_info.NumFramesInFlight = buffersCounts;
+                    init_info.RTVFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+                    init_info.DSVFormat = DXGI_FORMAT_UNKNOWN;
+                    init_info.SrvDescriptorHeap = d3d12DescriptorHeapImGuiRender.get();
+                    
+                    init_info.SrvDescriptorAllocFn = [](ImGui_ImplDX12_InitInfo* info, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle) {
+                        std::lock_guard<std::mutex> lock(descriptorAllocationMutex);
+                        UINT fontDescriptorIndex = 0;
+                        UINT handle_increment = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+                        
+                        D3D12_CPU_DESCRIPTOR_HANDLE cpu = d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
+                        cpu.ptr += (handle_increment * fontDescriptorIndex);
+                        
+                        D3D12_GPU_DESCRIPTOR_HANDLE gpu = d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
+                        gpu.ptr += (handle_increment * fontDescriptorIndex);
+                        
+                        *out_cpu_handle = cpu;
+                        *out_gpu_handle = gpu;
+                        
+                        Logger::custom(fg(fmt::color::green), "DescriptorAlloc", "Allocated ImGui font descriptor at reserved index {}", fontDescriptorIndex);
+                    };
+                    
+                    init_info.SrvDescriptorFreeFn = [](ImGui_ImplDX12_InitInfo* info, D3D12_CPU_DESCRIPTOR_HANDLE cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE gpu_handle) {
+                        Logger::custom(fg(fmt::color::cyan), "DescriptorFree", "ImGui font descriptor freed (no-op)");
+                    };
 
-    ID3D11Texture2D* buffer2D = nullptr;
-    ID3D11RenderTargetView* mainRTV = nullptr;
-    
-    if (SUCCEEDED(D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&buffer2D))) &&
-        SUCCEEDED(d3d11Device->CreateRenderTargetView(buffer2D, nullptr, &mainRTV))) {
-        
-        if (!underui) {
-            auto event = nes::make_holder<RenderEvent>();
-            event->RTV = mainRTV;
-            eventMgr.trigger(event);
-        } else {
-            auto event = nes::make_holder<RenderUnderUIEvent>();
-            event->RTV = mainRTV;
-            eventMgr.trigger(event);
-        }
+                    if (!ImGui_ImplDX12_Init(&init_info)) {
+                        Logger::custom(fg(fmt::color::red), "ImGui", "ERROR: Failed to initialize ImGui DX12 backend with consolidated heap");
+                    } else {
+                        Logger::custom(fg(fmt::color::green), "ImGui", "ImGui DX12 backend initialized successfully with consolidated heap");
+                    }
+                }
 
-        if (!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
-            FlarialGUI::Notify("Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("keybind")->value + " to open the menu in-game.");
-            FlarialGUI::Notify("Join our discord! https://flarial.xyz/discord");
-            first = true;
-        }
-    }
+                ImGui_ImplDX12_NewFrame();
+                ImGui_ImplWin32_NewFrame();
+                ImGui::NewFrame();
+                ImGui::Begin("t", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);
 
-    D2D::context->EndDraw();
-    D2D::context->SetTarget(nullptr);
-    d3d11On12Device->ReleaseWrappedResources(&resource, 1);
-    context->Flush();
+                ID3D11Texture2D *buffer2D = nullptr;
+                D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&buffer2D));
 
-    if (allocator) allocator->Reset();
-    if (d3d12CommandList) {
-        d3d12CommandList->Reset(allocator.get(), nullptr);
-        
-        ID3D12Resource* backBuffer = nullptr;
-        if (SUCCEEDED(swapchain->GetBuffer(currentBitmap, IID_PPV_ARGS(&backBuffer)))) {
-            D3D12_RESOURCE_BARRIER barrier = {};
-            barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-            barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-            barrier.Transition.pResource = backBuffer;
-            barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-            barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-            barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-            
-            d3d12CommandList->ResourceBarrier(1, &barrier);
-            
-            if (D3D12DescriptorHeap) {
-                const UINT rtvSize = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-                D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = D3D12DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-                rtvHandle.ptr += currentBitmap * rtvSize;
-                
-                d3d12CommandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
-            }
-            
-            if (d3d12DescriptorHeapImGuiRender) {
+                ID3D11RenderTargetView *mainRenderTargetView;
+                d3d11Device->CreateRenderTargetView(buffer2D, NULL, &mainRenderTargetView);
+
+                if (!underui) {
+                    auto event = nes::make_holder<RenderEvent>();
+                    event->RTV = mainRenderTargetView;
+                    eventMgr.trigger(event);
+                } else {
+                    auto event = nes::make_holder<RenderUnderUIEvent>();
+                    event->RTV = mainRenderTargetView;
+                    eventMgr.trigger(event);
+                }
+
+                if (!first && SwapchainHook::init && ModuleManager::getModule("ClickGUI")) {
+                    FlarialGUI::Notify(
+                        "Click " + ModuleManager::getModule("ClickGUI")->settings.getSettingByName<std::string>("keybind")->value + " to open the menu in-game.");
+                    FlarialGUI::Notify("Join our discord! https://flarial.xyz/discord");
+                    first = true;
+                }
+
+                D2D::context->EndDraw();
+                D2D::context->SetTarget(nullptr);
+                d3d11On12Device->ReleaseWrappedResources(&resource, 1);
+                context->Flush();
+
+                frameContexts[currentBitmap].commandAllocator->Reset();
+
+                D3D12_RESOURCE_BARRIER barrier;
+                barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+                barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+                barrier.Transition.pResource = frameContexts[currentBitmap].main_render_target_resource.get();
+                barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+                barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+                barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+                d3d12CommandList->ResourceBarrier(1, &barrier);
+
+                d3d12CommandList->Reset(frameContexts[swapchain->GetCurrentBackBufferIndex()].commandAllocator.get(), nullptr);
+                d3d12CommandList->ResourceBarrier(1, &barrier);
+                d3d12CommandList->OMSetRenderTargets(1, &frameContexts[currentBitmap].main_render_target_descriptor, FALSE, nullptr);
                 ID3D12DescriptorHeap* heaps[] = { d3d12DescriptorHeapImGuiRender.get() };
                 d3d12CommandList->SetDescriptorHeaps(1, heaps);
+                
+                static bool loggedOnce = false;
+                if (!loggedOnce) {
+                    loggedOnce = true;
+                    Logger::custom(fg(fmt::color::green), "D3D12Render", "Using consolidated descriptor heap for Intel GPU compatibility");
+                    Logger::custom(fg(fmt::color::cyan), "D3D12Render", "Consolidated heap: 0x{:X}, Total descriptors: {}", 
+                                   reinterpret_cast<uintptr_t>(d3d12DescriptorHeapImGuiRender.get()), TOTAL_CONSOLIDATED_DESCRIPTORS);
+                }
+
+                ImGui::End();
+                ImGui::EndFrame();
+                ImGui::Render();
+
+                ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), d3d12CommandList.get());
+
+                barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+                barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+
+                d3d12CommandList->ResourceBarrier(1, &barrier);
+                d3d12CommandList->Close();
+
+                ID3D12CommandList* commandLists[] = { d3d12CommandList.get() };
+                queue->ExecuteCommandLists(1, commandLists);
+
+                UINT64 currentFenceValue = ++fenceValue;
+                queue->Signal(fence, currentFenceValue);
+                if (fence->GetCompletedValue() < currentFenceValue) {
+                    fence->SetEventOnCompletion(currentFenceValue, fenceEvent);
+                    WaitForSingleObject(fenceEvent, INFINITE);
+                }
+
+                Memory::SafeRelease(mainRenderTargetView);
+                Memory::SafeRelease(buffer2D);
+                Memory::SafeRelease(fence);
             }
-            
-            ImGui::End();
-            ImGui::EndFrame();
-            ImGui::Render();
-            
-            ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), d3d12CommandList.get());
-            
-            barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-            barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-            d3d12CommandList->ResourceBarrier(1, &barrier);
-            d3d12CommandList->Close();
-            
-            ID3D12CommandList* commandLists[] = { d3d12CommandList.get() };
-            queue->ExecuteCommandLists(1, commandLists);
-            
-            queue->Signal(fence, fenceValue);
-            if (fence->GetCompletedValue() < fenceValue) {
-                fence->SetEventOnCompletion(fenceValue, fenceEvent);
-                WaitForSingleObject(fenceEvent, INFINITE);
-            }
-            
-            Memory::SafeRelease(backBuffer);
         }
     }
 
-    Memory::SafeRelease(mainRTV);
-    Memory::SafeRelease(buffer2D);
-    Memory::SafeRelease(fence);
+    SafeReset(d3d12DescriptorHeapBackBuffers);
+    frameContexts.clear();
 }
 
 void SwapchainHook::DX11Blur() {
@@ -881,6 +909,7 @@ void SwapchainHook::Cleanup() {
     SafeReset(D2D1Bitmap);
     
     SafeReset(d3d12Device5);
+    SafeReset(queue);
     SafeReset(allocator);
     SafeReset(d3d12CommandList);
     SafeReset(d3d11On12Device);
