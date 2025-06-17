@@ -195,8 +195,17 @@ void Zoom::onKey(KeyEvent& event)
 void Zoom::onSetTopScreenName(SetTopScreenNameEvent& event)
 {
 	if (!this->isEnabled()) return;
-	auto hideHand = Options::getOption("hidehand");
-	auto hideHud = Options::getOption("hidehud");
+
+	Option* hideHand = nullptr;
+	Option* hideHud = nullptr;
+
+
+	hideHand = Options::getOption("dev_disableRenderItemInHand");
+	hideHud = Options::getOption("dev_disableRenderHud");
+
+
+
+
 	if (this->active) {
 		if (getOps<bool>("hidemodules")) {
 			event.setCustomLayer("zoom_screen");
