@@ -128,8 +128,6 @@ void Zoom::onGetFOV(FOVEvent& event)
 	auto fov = event.getFOV();
 	if (fov == 70 || fov == 60) return;
 
-	Logger::debug("{}", fov);
-
 	auto player = SDK::clientInstance->getLocalPlayer();
 	if (player) {
 		currentFov = fov;
