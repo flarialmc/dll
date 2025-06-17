@@ -9,7 +9,6 @@ Zoom::Zoom() : Module("Zoom", "Allows you to see distant places.", IDR_MAGNIFY_P
 void Zoom::onEnable()
 {
 	Listen(this, FOVEvent, &Zoom::onGetFOV)
-		Listen(this, SensitivityEvent, &Zoom::onGetSensitivity)
 		Listen(this, RenderEvent, &Zoom::onRender)
 		Listen(this, MouseEvent, &Zoom::onMouse)
 		Listen(this, KeyEvent, &Zoom::onKey)
@@ -21,7 +20,6 @@ void Zoom::onEnable()
 void Zoom::onDisable()
 {
 	Deafen(this, FOVEvent, &Zoom::onGetFOV)
-		Deafen(this, SensitivityEvent, &Zoom::onGetSensitivity)
 		Deafen(this, RenderEvent, &Zoom::onRender)
 		Deafen(this, MouseEvent, &Zoom::onMouse)
 		Deafen(this, KeyEvent, &Zoom::onKey)
@@ -128,7 +126,9 @@ void Zoom::onGetFOV(FOVEvent& event)
 {
 	if (!this->isEnabled()) return;
 	auto fov = event.getFOV();
-	if (fov == 70) return;
+	if (fov == 70 || fov == 60) return;
+
+	Logger::debug("{}", fov);
 
 	auto player = SDK::clientInstance->getLocalPlayer();
 	if (player) {
@@ -142,23 +142,6 @@ void Zoom::onGetFOV(FOVEvent& event)
 
 	event.setFOV(currentZoomVal);
 }
-
-void Zoom::onGetSensitivity(SensitivityEvent& event)
-{
-	if (!this->isEnabled()) return;
-	if (this->active) {
-		if (!saved) {
-			saved = true;
-			currentSensitivity = event.getSensitivity();
-		}
-		// TODO: smoothstep
-		if (getOps<bool>("lowsens")) event.setSensitivity(currentSensitivity - (currentSensitivity * (((realFov - (zoomValue - 1)) / realFov) / 1.0f)));
-	}
-	else if (saved) {
-		saved = false;
-	}
-}
-
 void Zoom::onMouse(MouseEvent& event)
 {
 	if (!this->isEnabled()) return;

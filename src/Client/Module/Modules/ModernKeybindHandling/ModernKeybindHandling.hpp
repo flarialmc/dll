@@ -13,6 +13,8 @@ private:
     std::array<bool, 256> heldKeys;
     std::vector<int> movementKeys;
     bool wasInGame;
+    bool restoreQueued;
+    bool shouldContinueTracking;
     
     void restoreMovementInput();
     void updateMovementInputHandler();

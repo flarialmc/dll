@@ -33,7 +33,7 @@ public:
 
 	void onGetFOV(FOVEvent& event);
 
-	void onGetSensitivity(SensitivityEvent& event);
+
 
 	void onRender(RenderEvent& event);
 

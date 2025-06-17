@@ -10,6 +10,8 @@ ModernKeybindHandling::ModernKeybindHandling() : Module("Modern Handling",
     heldKeys.fill(false);
     wasInGame = true;
     lastScreen = "";
+    restoreQueued = false;
+    shouldContinueTracking = false;
 }
 
 void ModernKeybindHandling::onEnable()
@@ -71,36 +73,26 @@ void ModernKeybindHandling::onTick(TickEvent& event)
     
     bool currentlyInGame = isInGameScreen();
     
-    if (!wasInGame && currentlyInGame) {
-        std::string currentScreen = SDK::getCurrentScreen();
-        bool shouldRestore = false;
-        
-        if (getOps<bool>("fixAllScreens")) {
-            shouldRestore = true;
-        } else {
-            if (getOps<bool>("fixInventoryMovement") && 
-                (lastScreen.find("inventory") != std::string::npos || 
-                 lastScreen.find("chest") != std::string::npos ||
-                 lastScreen.find("furnace") != std::string::npos ||
-                 lastScreen.find("crafting") != std::string::npos)) {
-                shouldRestore = true;
-            }
-            if (getOps<bool>("fixPauseMovement") && lastScreen.find("pause") != std::string::npos) {
-                shouldRestore = true;
-            }
-            if (getOps<bool>("fixChatMovement") && lastScreen.find("chat") != std::string::npos) {
-                shouldRestore = true;
-            }
-        }
-        
-        if (shouldRestore) {
-            restoreMovementInput();
-        }
+    if (restoreQueued && currentlyInGame) {
+        restoreMovementInput();
+        restoreQueued = false;
+        shouldContinueTracking = true;
     }
-    auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
-
-    if (currentlyInGame) {
+    
+    if (shouldContinueTracking && currentlyInGame) {
         updateMovementInputHandler();
+        
+        bool anyKeyHeld = false;
+        for (int key : movementKeys) {
+            if (heldKeys[key]) {
+                anyKeyHeld = true;
+                break;
+            }
+        }
+        
+        if (!anyKeyHeld) {
+            shouldContinueTracking = false;
+        }
     }
     
     wasInGame = currentlyInGame;
@@ -127,7 +119,35 @@ void ModernKeybindHandling::onSetTopScreenName(SetTopScreenNameEvent& event)
     if (!this->isEnabled()) return;
     
     std::string newScreen = event.getLayer();
+    std::string previousScreen = lastScreen;
     lastScreen = newScreen;
+    
+    // Check if changing from a non-game screen to hud_screen (game)
+    if (previousScreen != "hud_screen" && newScreen == "hud_screen") {
+        bool shouldRestore = false;
+        
+        if (getOps<bool>("fixAllScreens")) {
+            shouldRestore = true;
+        } else {
+            if (getOps<bool>("fixInventoryMovement") && 
+                (previousScreen.find("inventory") != std::string::npos || 
+                 previousScreen.find("chest") != std::string::npos ||
+                 previousScreen.find("furnace") != std::string::npos ||
+                 previousScreen.find("crafting") != std::string::npos)) {
+                shouldRestore = true;
+            }
+            if (getOps<bool>("fixPauseMovement") && previousScreen.find("pause") != std::string::npos) {
+                shouldRestore = true;
+            }
+            if (getOps<bool>("fixChatMovement") && previousScreen.find("chat") != std::string::npos) {
+                shouldRestore = true;
+            }
+        }
+        
+        if (shouldRestore) {
+            restoreQueued = true;
+        }
+    }
 }
 
 void ModernKeybindHandling::restoreMovementInput()
@@ -140,7 +160,6 @@ void ModernKeybindHandling::restoreMovementInput()
             updateMovementInputHandler();
         }
     }
-    //
 }
 
 void ModernKeybindHandling::updateMovementInputHandler()
@@ -149,6 +168,9 @@ void ModernKeybindHandling::updateMovementInputHandler()
     
     auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
     if (handler == nullptr) return;
+
+    auto module = ModuleManager::getModule("Toggle Sprint");
+    if (module == nullptr) return;
     
     updateMovementKeys();
     
@@ -182,7 +204,7 @@ void ModernKeybindHandling::updateMovementInputHandler()
             handler->mInputState.mSneakDown = isKeyHeld;
             handler->mRawInputState.mSneakDown = isKeyHeld;
         }
-        else if (i == 6) {
+        else if (i == 6 && !module->isEnabled()) {
             handler->sprinting = isKeyHeld;
             handler->mInputState.mSprintDown = isKeyHeld;
             handler->mRawInputState.mSprintDown = isKeyHeld;
@@ -215,7 +237,7 @@ bool ModernKeybindHandling::isMovementKey(int key)
 bool ModernKeybindHandling::isInGameScreen()
 {
     std::string currentScreen = SDK::getCurrentScreen();
-    return currentScreen == "hud_screen" || currentScreen == "ingame_screen" || currentScreen.empty();
+    return currentScreen == "hud_screen";
 }
 
 int ModernKeybindHandling::safe_stoi(const std::string& str)
