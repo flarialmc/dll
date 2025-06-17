@@ -880,8 +880,9 @@ void SwapchainHook::Cleanup() {
     if (ImGui::GetCurrentContext()) {
         Logger::debug("Shutting down ImGui");
         
-        // Clear font atlas
+        // Clear font atlas and FlarialGUI font cache
         ImGui::GetIO().Fonts->Clear();
+        FlarialGUI::FontMap.clear();
         
         // Shutdown platform/renderer backends
         ImGui_ImplWin32_Shutdown();
@@ -935,8 +936,33 @@ void SwapchainHook::Cleanup() {
         FrameTransforms.pop();
     }
     
+    // Clean up UI images and reset image loading state
+    Logger::debug("Cleaning up UI images");
+    
+    // Clean up static image upload resources (important for D3D12)
+    try {
+        FlarialGUI::CleanupImageResources();
+    } catch (const std::exception &ex) {
+        Logger::debug("Exception during image resource cleanup: {}", ex.what());
+    }
+    
+    // Clear all image caches - they'll be reloaded after swapchain recreation
+    FlarialGUI::cachedBitmaps.clear();
+    
+    // Clear ImGui texture containers
+    ImagesClass::ImguiDX11Images.clear();
+    ImagesClass::ImguiDX12Images.clear();
+    ImagesClass::ImguiDX12Textures.clear();
+    ImagesClass::eimages.clear();
+    ImagesClass::images.clear();
+    
+    // Reset image loading state so images get reloaded after recreation
+    FlarialGUI::hasLoadedAll = false;
+    Logger::debug("Image loading state reset - images will reload after swapchain recreation");
+    
     // Reset state flags
     initImgui = false;
+    first = false; // Reset first-time notification flag
     
     ResetDescriptorAllocation();
 }
