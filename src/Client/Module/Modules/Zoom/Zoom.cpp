@@ -210,7 +210,11 @@ void Zoom::onSetTopScreenName(SetTopScreenNameEvent& event)
 		if (getOps<bool>("hidemodules")) {
 			event.setCustomLayer("zoom_screen");
 		}
-
+		//            if (getOps<bool>("hidehud")) {
+		//                event.setCustomLayer("zoom_screen");
+		//                if (hideHand != nullptr) hideHand->setvalue(true);
+		//                if (hideHud != nullptr) hideHud->setvalue(true);
+		//            }
 		if (getOps<bool>("hidehand")) {
 			if (hideHand != nullptr) hideHand->setvalue(true);
 		}
