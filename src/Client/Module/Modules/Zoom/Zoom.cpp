@@ -45,7 +45,7 @@ void Zoom::defaultConfig()
 	setDef("modifier", 10.0f);
 	setDef("anim", 0.20f);
 	setDef("disableanim", false);
-	
+
 }
 
 void Zoom::settingsRender(float settingsOffset)
@@ -82,7 +82,7 @@ void Zoom::settingsRender(float settingsOffset)
 void Zoom::onRender(RenderEvent& event)
 {
 	if (!this->isEnabled()) return;
-	
+
 	auto player = SDK::clientInstance->getLocalPlayer();
 	if (!player) return;
 
@@ -143,9 +143,9 @@ void Zoom::onGetFOV(FOVEvent& event)
 void Zoom::onMouse(MouseEvent& event)
 {
 	if (!this->isEnabled()) return;
-	if (SDK::getCurrentScreen() == "hud_screen" || 
-		SDK::getCurrentScreen() == "f1_screen" || 
-		SDK::getCurrentScreen() == "zoom_screen" || 
+	if (SDK::getCurrentScreen() == "hud_screen" ||
+		SDK::getCurrentScreen() == "f1_screen" ||
+		SDK::getCurrentScreen() == "zoom_screen" ||
 		SDK::getCurrentScreen() == "f3_screen")
 		if (this->active) {
 			//todo make it so that modules work together
@@ -233,12 +233,8 @@ void Zoom::onSetTopScreenName(SetTopScreenNameEvent& event)
 void Zoom::onTurnDeltaEvent(TurnDeltaEvent& event) {
 	if (!this->isEnabled() || !this->active) return;
 	float oSens = 1.f;
-	if (getOps<bool>("lowsens")) {
-		oSens = std::min(oSens, oSens * (1 + getOps<float>("lowsensStrength") * ((2.f / (zoomValue - realFov)) - 1)));
-	}
+	if (getOps<bool>("lowsens")) oSens = std::min(oSens, oSens * (1.0f + (((zoomValue / 2) / realFov) - 1.0f) * getOps<float>("lowsensStrength")));
 
-	if (oSens < -1.f || oSens > 0) oSens = -1.f;
-
-	event.delta.x *= -oSens;
-	event.delta.y *= -oSens;
+	event.delta.x *= oSens;
+	event.delta.y *= oSens;
 }
