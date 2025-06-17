@@ -153,7 +153,6 @@ ID3D11PixelShader *dbgShader;
 void Blur::InitializePipeline()
 {
 
-    HRESULT hr;
     // byteWidth has to be a multiple of 32, BlurInputBuffer has a size of 24
     CD3D11_BUFFER_DESC cbd(
         sizeof(BlurInputBuffer),
