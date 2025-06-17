@@ -197,7 +197,7 @@ public:
 		setDef("enabledRadioButton", (std::string)"D0A0A8", 1.0f, false);
 		setDef("disabledRadioButton", (std::string)"FFFFFF", 1.0f, false);
 		setDef("_overrideAlphaValues_", 1.f);
-		
+
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -290,9 +290,9 @@ public:
 					ModuleManager::cguiRefresh = true;
 					keybindActions[0]({});
 				}
-			#if !defined(__DEBUG__)
-				}
-			#endif
+#if !defined(__DEBUG__)
+			}
+#endif
 
 
 			if (this->active) {
@@ -344,7 +344,11 @@ public:
 			if (page.type == "normal" && curr == "modules" &&
 				event.getAction() == ActionType::Pressed) {
 
-				if (Client::settings.getSettingByName<bool>("autosearch")->value) FlarialGUI::TextBoxes[0].isActive = true;
+				if (Client::settings.getSettingByName<bool>("autosearch")->value && !FlarialGUI::TextBoxes[0].isActive) {
+					FlarialGUI::TextBoxes[0].isActive = true;
+					event.setKey(MouseButton::None);
+					event.setAction(MouseAction::Release);
+				}
 				// you searching
 				if (FlarialGUI::TextBoxes[0].isActive) {
 					FlarialGUI::scrollpos = 0;
