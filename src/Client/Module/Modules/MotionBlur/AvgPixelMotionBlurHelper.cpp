@@ -66,7 +66,7 @@ bool AvgPixelMotionBlurHelper::Initialize()
 
     if (!CompileShader(drawTextureVertexShaderSrc, "mainVS", "vs_5_0", &vsBlob))
         return false;
-    ID3D11Device* m_device = SwapchainHook::d3d11Device.get();
+    ID3D11Device* m_device = SwapchainHook::d3d11Device;
     if (!m_device) { Logger::debug("Device is nullptr"); return false;}
     Logger::debug("ye");
     hr = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &m_vertexShader);
@@ -147,8 +147,8 @@ bool AvgPixelMotionBlurHelper::CompileShader(const char* srcData, const char* en
 
 void AvgPixelMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, std::vector<winrt::com_ptr<ID3D11ShaderResourceView>>& frames)
 {
-    ID3D11DeviceContext* context = SwapchainHook::context.get();
-    ID3D11Device* device = SwapchainHook::d3d11Device.get();
+    ID3D11DeviceContext* context = SwapchainHook::context;
+    ID3D11Device* device = SwapchainHook::d3d11Device;
     if (!context || !device || !rtv) {
         return;
     }

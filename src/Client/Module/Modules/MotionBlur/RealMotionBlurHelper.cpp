@@ -95,7 +95,7 @@ bool RealMotionBlurHelper::Initialize()
 
     if (!CompileShader(realDrawTextureVertexShaderSrc, "mainVS", "vs_5_0", &vsBlob))
         return false;
-    ID3D11Device* m_device = SwapchainHook::d3d11Device.get();
+    ID3D11Device* m_device = SwapchainHook::d3d11Device;
     if (!m_device) {
         Logger::debug("Device is nullptr");
         return false;
@@ -185,8 +185,8 @@ bool RealMotionBlurHelper::CompileShader(const char* srcData, const char* entryP
 
 void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID3D11ShaderResourceView>& frame)
 {
-    ID3D11DeviceContext* context = SwapchainHook::context.get();
-    ID3D11Device* device = SwapchainHook::d3d11Device.get();
+    ID3D11DeviceContext* context = SwapchainHook::context;
+    ID3D11Device* device = SwapchainHook::d3d11Device;
     if (!context || !device || !rtv)
     {
         return;

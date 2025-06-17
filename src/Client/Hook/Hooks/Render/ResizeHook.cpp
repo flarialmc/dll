@@ -38,7 +38,7 @@ void
 ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UINT width, UINT height, DXGI_FORMAT newFormat,
     UINT flags) {
 
-    SwapchainHook::Cleanup();
+    ResizeHook::cleanShit(true);
 
     SwapchainHook::init = false;
     // F11 on loading screen fix?//
@@ -54,18 +54,14 @@ ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UINT wi
     return funcOriginal(pSwapChain, bufferCount, width, height, newFormat, SwapchainHook::currentVsyncState ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : flags);
 }
 
-// Updated to work with new shared_ptr architecture
+// TODO: get back to this to check
 void ResizeHook::cleanShit(bool isResize) {
 
     bool isDX12 = false;
-    if (SwapchainHook::queue.get()) isDX12 = true;
-    
-    // Reset shared_ptr resources using the new SwapchainHook::SafeReset method
-    SwapchainHook::SafeReset(SwapchainHook::stageTex);
-    SwapchainHook::SafeReset(SwapchainHook::SavedD3D11BackBuffer);
-    SwapchainHook::SafeReset(SwapchainHook::ExtraSavedD3D11BackBuffer);
-    
-    // Legacy raw pointer resources still use Memory::SafeRelease
+    if (SwapchainHook::queue) isDX12 = true;
+    Memory::SafeRelease(SwapchainHook::stageTex);
+    Memory::SafeRelease(SwapchainHook::SavedD3D11BackBuffer);
+    Memory::SafeRelease(SwapchainHook::ExtraSavedD3D11BackBuffer);
     Memory::SafeRelease(Blur::pConstantBuffer);
     Memory::SafeRelease(Blur::pSampler);
     Memory::SafeRelease(Blur::pGaussianBlurHorizontalShader);
@@ -73,10 +69,8 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(Blur::pGaussianBlurVerticalShader);
     Memory::SafeRelease(Blur::pVertexBuffer);
     Memory::SafeRelease(Blur::pVertexShader);
-    
-    // Reset shared_ptr resources
-    SwapchainHook::SafeReset(SwapchainHook::d3d11Device);
-    SwapchainHook::SafeReset(SwapchainHook::D2D1Bitmap);
+    Memory::SafeRelease(SwapchainHook::d3d11Device);
+    Memory::SafeRelease(SwapchainHook::D2D1Bitmap);
     Memory::SafeRelease(D2D::context);
 
     Memory::SafeRelease(AvgPixelMotionBlurHelper::m_constantBuffer);
@@ -153,40 +147,43 @@ void ResizeHook::cleanShit(bool isResize) {
     FlarialGUI::textFormatCache.clear();
     FlarialGUI::textLayoutCache.clear();
 
-    if (SwapchainHook::init && SwapchainHook::d3d11On12Device.get() != nullptr) {
+    if (SwapchainHook::init && SwapchainHook::d3d11On12Device != nullptr) {
 
-        SwapchainHook::SafeReset(SwapchainHook::D3D12DescriptorHeap);
+        Memory::SafeRelease(SwapchainHook::D3D12DescriptorHeap);
 
-        // Clear shared_ptr vectors - no need to manually release, shared_ptr handles it
-        SwapchainHook::D2D1Bitmaps.clear();
-
-        if (!isResize && SwapchainHook::queue.get() != nullptr) {
-            std::vector<ID3D11Resource*> rawResources;
-            for (const auto& resource : SwapchainHook::D3D11Resources) {
-                rawResources.push_back(resource.get());
-            }
-            SwapchainHook::d3d11On12Device->ReleaseWrappedResources(rawResources.data(),
-                static_cast<UINT>(rawResources.size()));
+        for (ID2D1Bitmap1* bitmap : SwapchainHook::D2D1Bitmaps) {
+            Memory::SafeRelease(bitmap);
         }
 
-        // Clear shared_ptr vectors - automatic cleanup
+        if (!isResize && SwapchainHook::queue != nullptr) {
+            SwapchainHook::d3d11On12Device->ReleaseWrappedResources(SwapchainHook::D3D11Resources.data(),
+                static_cast<UINT>(SwapchainHook::D3D11Resources.size()));
+        }
+
+        for (ID3D11Resource* resource : SwapchainHook::D3D11Resources) {
+            Memory::SafeRelease(resource);
+        }
+
+        for (IDXGISurface* surface : SwapchainHook::DXGISurfaces) {
+            Memory::SafeRelease(surface);
+        }
+
+        SwapchainHook::D2D1Bitmaps.clear();
         SwapchainHook::D3D11Resources.clear();
         SwapchainHook::DXGISurfaces.clear();
 
-        if (SwapchainHook::context.get()) {
-            SwapchainHook::context->Flush();
-        }
-        // Reset shared_ptr resources
-        SwapchainHook::SafeReset(SwapchainHook::context);
+        SwapchainHook::context->Flush();
+        // TODO: release all render effects here
+        Memory::SafeRelease(SwapchainHook::context);
         Memory::SafeRelease(D2D::surface);
 
         Memory::SafeRelease(FlarialGUI::factory);
         Memory::SafeRelease(FlarialGUI::writeFactory);
 
 
-        SwapchainHook::SafeReset(SwapchainHook::d3d11On12Device);
+        Memory::SafeRelease(SwapchainHook::d3d11On12Device);
 
-        if (!isResize) SwapchainHook::SafeReset(SwapchainHook::queue);
+        if (!isResize) Memory::SafeRelease(SwapchainHook::queue);
 
     }
 
@@ -196,7 +193,7 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(FlarialGUI::screen_bitmap_cache);
     Memory::SafeRelease(FlarialGUI::blur_bitmap_cache);
 
-    SwapchainHook::SafeReset(SwapchainHook::D2D1Bitmap);
+    Memory::SafeRelease(SwapchainHook::D2D1Bitmap);
 
     if (SwapchainHook::init) {
 
@@ -212,9 +209,8 @@ void ResizeHook::cleanShit(bool isResize) {
         // Clean up static image upload resources
         FlarialGUI::CleanupImageResources();
 
-        SwapchainHook::SafeReset(SwapchainHook::D3D12DescriptorHeap);
-        SwapchainHook::SafeReset(SwapchainHook::d3d12DescriptorHeapBackBuffers);
-        SwapchainHook::SafeReset(SwapchainHook::d3d12DescriptorHeapImGuiRender); // Consolidated heap contains both ImGui and images
+        Memory::SafeRelease(SwapchainHook::D3D12DescriptorHeap);         Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapBackBuffers);
+        Memory::SafeRelease(SwapchainHook::d3d12DescriptorHeapImGuiRender); // Consolidated heap contains both ImGui and images
         SwapchainHook::ResetDescriptorAllocation(); // Reset consolidated descriptor allocation state
 
 

@@ -11,9 +11,9 @@ void FlarialGUI::ApplyDeepFry(float intensity) {
 
         ID2D1Bitmap *bitmap = nullptr;
 
-        if (SwapchainHook::queue.get() != nullptr)
-            FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap].get(), &bitmap);
-        else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap.get(), &bitmap);
+        if (SwapchainHook::queue != nullptr)
+            FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap], &bitmap);
+        else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap, &bitmap);
 
         cum->SetInput(0, bitmap);
 
