@@ -99,6 +99,8 @@ jobs:
           token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
       - name: Configure Git credentials
         run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@example.com"
           git config --global url."https://x-access-token:${{ secrets.ACTIONS_GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
       - name: Download dll
         uses: actions/download-artifact@v4.1.9
