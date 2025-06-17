@@ -11,7 +11,7 @@ MotionBlur::MotionBlur(): Module("Motion Blur",
 
 void MotionBlur::onEnable()
 {
-    if (SwapchainHook::queue) { if (!once) { FlarialGUI::Notify("Please turn on Better Frames in Settings!"); once = true; } }
+    if (SwapchainHook::queue.get()) { if (!once) { FlarialGUI::Notify("Please turn on Better Frames in Settings!"); once = true; } }
     else {
 
         ListenOrdered(this, RenderUnderUIEvent, &MotionBlur::onRender, EventOrder::IMMEDIATE)
@@ -72,7 +72,7 @@ void MotionBlur::settingsRender(float settingsOffset)
 void MotionBlur::onRender(RenderUnderUIEvent& event)
 {
     if (!this->isEnabled()) return;
-    if (SwapchainHook::queue) return;
+    if (SwapchainHook::queue.get()) return;
 
 
     if (!getOps<bool>("renderUnderUI")) {
@@ -116,7 +116,7 @@ void MotionBlur::onRender(RenderUnderUIEvent& event)
 void MotionBlur::onRenderNormal(RenderEvent& event)
 {
     if (!this->isEnabled()) return;
-    if (SwapchainHook::queue) return;
+    if (SwapchainHook::queue.get()) return;
 
     if (getOps<bool>("renderUnderUI")) {
         return;
@@ -175,11 +175,11 @@ winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRVExtraMode()
 {
 
     if (!FlarialGUI::needsBackBuffer) return nullptr;
-    if (SwapchainHook::queue) return BackbufferToSRV();
+    if (SwapchainHook::queue.get()) return BackbufferToSRV();
     HRESULT hr;
 
     D3D11_TEXTURE2D_DESC d;
-    SwapchainHook::ExtraSavedD3D11BackBuffer->GetDesc(&d);
+    SwapchainHook::ExtraSavedD3D11BackBuffer.get()->GetDesc(&d);
     winrt::com_ptr<ID3D11ShaderResourceView> outSRV;
     D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
     srvDesc.Format = d.Format;
@@ -187,7 +187,7 @@ winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRVExtraMode()
     srvDesc.Texture2D.MipLevels = d.MipLevels;
     srvDesc.Texture2D.MostDetailedMip = 0;
 
-    if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::ExtraSavedD3D11BackBuffer, &srvDesc, outSRV.put())))
+    if (FAILED(hr = SwapchainHook::d3d11Device.get()->CreateShaderResourceView(SwapchainHook::ExtraSavedD3D11BackBuffer.get(), &srvDesc, outSRV.put())))
     {
         std::cout << "Failed to create shader resource view: " << std::hex << hr << std::endl;
     }
@@ -201,7 +201,7 @@ winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRV()
     HRESULT hr;
 
     D3D11_TEXTURE2D_DESC d;
-    SwapchainHook::SavedD3D11BackBuffer->GetDesc(&d);
+    SwapchainHook::SavedD3D11BackBuffer.get()->GetDesc(&d);
     winrt::com_ptr<ID3D11ShaderResourceView> outSRV;
     D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
     srvDesc.Format = d.Format;
@@ -210,7 +210,7 @@ winrt::com_ptr<ID3D11ShaderResourceView> MotionBlur::BackbufferToSRV()
     srvDesc.Texture2D.MipLevels = d.MipLevels;
     srvDesc.Texture2D.MostDetailedMip = 0;
 
-    if (FAILED(hr = SwapchainHook::d3d11Device->CreateShaderResourceView(SwapchainHook::SavedD3D11BackBuffer, &srvDesc, outSRV.put())))
+    if (FAILED(hr = SwapchainHook::d3d11Device.get()->CreateShaderResourceView(SwapchainHook::SavedD3D11BackBuffer.get(), &srvDesc, outSRV.put())))
     {
         std::cout << "Failed to create shader resource view: " << std::hex << hr << std::endl;
     }

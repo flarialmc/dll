@@ -425,7 +425,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			right.emplace_back("");
 
 			right.emplace_back(std::format("Display: {}x{}", MC::windowSize.x, MC::windowSize.y));
-			right.emplace_back(std::format("Active Renderer: {}", SwapchainHook::queue == nullptr ? "DirectX11" : "DirectX12"));
+			right.emplace_back(std::format("Active Renderer: {}", SwapchainHook::queue.get() == nullptr ? "DirectX11" : "DirectX12"));
 			if (getOps<bool>("imPoorButIWannaLookRich")) right.emplace_back("AMD GFX 5090 Ti AI Accelerated DLSS 12.0");
 			else {
 				if (!MC::GPU.empty()) right.emplace_back(MC::GPU);

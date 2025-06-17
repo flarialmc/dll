@@ -41,30 +41,32 @@ void Time::onRender(RenderEvent& event)
         int hour = calendarTime.tm_hour;
         int minute = calendarTime.tm_min;
 
-        if (hour - 12 < 0) {
+        if (hour == 0) {
+            hour = 12;
             meridiem = "AM";
         }
-        else if (hour == 0) {
-            hour = 12;
+        else if (hour < 12) {
             meridiem = "AM";
         }
         else if (hour == 12) {
-            hour = 12;
             meridiem = "PM";
         }
         else {
             meridiem = "PM";
             hour -= 12;
         }
-        if (getOps<bool>("24") && meridiem == "PM") {
-            hour += 12;
+        
+        if (getOps<bool>("24")) {
+            if (meridiem == "PM" && hour != 12) {
+                hour += 12;
+            }
+            else if (meridiem == "AM" && hour == 12) {
+                hour = 0;
+            }
             meridiem = "";
         }
-        else if (getOps<bool>("24") && meridiem == "AM") meridiem = "";
 
         seperator = minute < 10 ? ":0" : ":";
-
-        if (hour == 24) hour = 0;
 
         text = FlarialGUI::cached_to_string(hour) + seperator + FlarialGUI::cached_to_string(minute) + " " + meridiem;
 
@@ -77,8 +79,8 @@ void Time::onRender(RenderEvent& event)
             if (getOps<bool>("4letterYear")) sub = 1900;
             else sub = -100;
 
-            if (getOps<bool>("donaldTrumpMode")) dateStr = std::format("{}/{}/{}", date.tm_mon, date.tm_mday, date.tm_year + sub);
-            else dateStr = std::format("{}/{}/{}", date.tm_mday, date.tm_mon, date.tm_year + sub);
+            if (getOps<bool>("donaldTrumpMode")) dateStr = std::format("{}/{}/{}", date.tm_mon + 1, date.tm_mday, date.tm_year + sub);
+            else dateStr = std::format("{}/{}/{}", date.tm_mday, date.tm_mon + 1, date.tm_year + sub);
 
             if (getOps<bool>("timeBeforeDate")) text += "\n" + dateStr;
             else text = dateStr + "\n" + text;

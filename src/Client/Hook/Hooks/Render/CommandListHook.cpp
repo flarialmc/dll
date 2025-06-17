@@ -16,10 +16,10 @@ void CommandListHook::enableHook() {
                              (void **) &funcOriginal);
         else if (kiero::getRenderType() == 0) {
             kiero::init(kiero::RenderType::D3D11);
-            SwapchainHook::queue = nullptr;
+            SwapchainHook::queue.reset();
         }
     } else {
-        SwapchainHook::queue = nullptr;
+        SwapchainHook::queue.reset();
     }
 
 }
@@ -29,8 +29,8 @@ CommandListHook::CommandListHook() : Hook("CommandListHook", 0) {}
 void CommandListHook::listCallback(ID3D12CommandQueue *queue, UINT numCommandLists,
                                    const ID3D12CommandList **ppCommandLists) {
 
-    SwapchainHook::queue = queue;
-    SwapchainHook::DX12CommandLists = (ID3D12GraphicsCommandList*)*ppCommandLists;
+    SwapchainHook::queue = SwapchainHook::MakeShared(queue);
+    queue->AddRef(); // Add reference since we're storing it
 
 
     return funcOriginal(queue, numCommandLists, ppCommandLists);

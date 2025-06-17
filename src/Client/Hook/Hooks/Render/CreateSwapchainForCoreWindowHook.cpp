@@ -8,10 +8,10 @@ HRESULT CreateSwapchainForCoreWindowHook::CreateSwapChainForCoreWindowCallback(I
 
 
     ID3D12CommandQueue* pCommandQueue = NULL;
-    if (Client::settings.getSettingByName<bool>("killdx")->value) SwapchainHook::queue = nullptr;
+    if (Client::settings.getSettingByName<bool>("killdx")->value) SwapchainHook::queue.reset();
     if (Client::settings.getSettingByName<bool>("killdx")->value && SUCCEEDED(pDevice->QueryInterface(IID_PPV_ARGS(&pCommandQueue)))) {
         pCommandQueue->Release();
-        SwapchainHook::queue = nullptr;
+        SwapchainHook::queue.reset();
         Logger::success("Fell back to DX11");
         return DXGI_ERROR_INVALID_CALL;
     }

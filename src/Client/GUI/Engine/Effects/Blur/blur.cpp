@@ -152,8 +152,6 @@ ID3D11PixelShader *dbgShader;
 
 void Blur::InitializePipeline()
 {
-    HRESULT hr;
-    ID3D11DeviceContext* pContext = SwapchainHook::context;
 
     // byteWidth has to be a multiple of 32, BlurInputBuffer has a size of 24
     CD3D11_BUFFER_DESC cbd(
@@ -163,44 +161,44 @@ void Blur::InitializePipeline()
         sizeof(quadVertices),
         D3D11_BIND_VERTEX_BUFFER);
 
-    SwapchainHook::d3d11Device->CreateBuffer(
+    SwapchainHook::d3d11Device.get()->CreateBuffer(
         &cbd,
         nullptr,
         &pConstantBuffer);
 
     D3D11_SUBRESOURCE_DATA vertexBufferData = {quadVertices, 0, 0};
 
-    SwapchainHook::d3d11Device->CreateBuffer(
+    SwapchainHook::d3d11Device.get()->CreateBuffer(
         &cbdVertex,
         &vertexBufferData,
         &pVertexBuffer);
 
     ID3DBlob *shaderBlob = TryCompileShader(gaussianBlurHorizontalShaderSrc, "ps_4_0");
-    SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pGaussianBlurHorizontalShader);
+    SwapchainHook::d3d11Device.get()->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pGaussianBlurHorizontalShader);
 
     shaderBlob = TryCompileShader(gaussianBlurVerticalShaderSrc, "ps_4_0");
-    SwapchainHook::d3d11Device->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pGaussianBlurVerticalShader);
+    SwapchainHook::d3d11Device.get()->CreatePixelShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pGaussianBlurVerticalShader);
 
     shaderBlob = TryCompileShader(vertexShaderSrc, "vs_4_0");
-    SwapchainHook::d3d11Device->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pVertexShader);
+    SwapchainHook::d3d11Device.get()->CreateVertexShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), nullptr, &pVertexShader);
 
     D3D11_INPUT_ELEMENT_DESC ied =
         {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,
          0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0};
-    SwapchainHook::d3d11Device->CreateInputLayout(&ied, 1, shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), &pInputLayout);
+    SwapchainHook::d3d11Device.get()->CreateInputLayout(&ied, 1, shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), &pInputLayout);
     
     D3D11_SAMPLER_DESC sd{};
     sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
     sd.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
     sd.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
     sd.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-    SwapchainHook::d3d11Device->CreateSamplerState(&sd, &pSampler);
+    SwapchainHook::d3d11Device.get()->CreateSamplerState(&sd, &pSampler);
     
     // Initialize cached render states
     D3D11_DEPTH_STENCIL_DESC dsd{};
     dsd.DepthEnable = false;
     dsd.StencilEnable = false;
-    hr = SwapchainHook::d3d11Device->CreateDepthStencilState(&dsd, &pDepthStencilState);
+    hr = SwapchainHook::d3d11Device.get()->CreateDepthStencilState(&dsd, &pDepthStencilState);
     
     D3D11_BLEND_DESC bd{};
     bd.AlphaToCoverageEnable = false;
@@ -212,21 +210,21 @@ void Blur::InitializePipeline()
     bd.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
     bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
     bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-    hr = SwapchainHook::d3d11Device->CreateBlendState(&bd, &pBlendState);
+    hr = SwapchainHook::d3d11Device.get()->CreateBlendState(&bd, &pBlendState);
     
     D3D11_RASTERIZER_DESC rd{};
     rd.FillMode = D3D11_FILL_SOLID;
     rd.CullMode = D3D11_CULL_NONE;
     rd.DepthClipEnable = false;
     rd.ScissorEnable = false;
-    hr = SwapchainHook::d3d11Device->CreateRasterizerState(&rd, &pRasterizerState);
+    hr = SwapchainHook::d3d11Device.get()->CreateRasterizerState(&rd, &pRasterizerState);
 
     // Pre-allocate intermediate textures with common screen resolution to reduce first-frame lag
     EnsureIntermediateTextures(MC::windowSize.x, MC::windowSize.y);
 }
 void Blur::RenderToRTV(ID3D11RenderTargetView *pRenderTargetView, ID3D11ShaderResourceView *pShaderResourceView, XMFLOAT2 rtvSize)
 {
-    ID3D11DeviceContext* pContext = SwapchainHook::context;
+    ID3D11DeviceContext* pContext = SwapchainHook::context.get();
     if (!pContext) return;
 //
     // Use cached render states (no recreation overhead)
@@ -304,8 +302,8 @@ bool Blur::EnsureIntermediateTextures(UINT width, UINT height)
     desc.CPUAccessFlags = 0;
     desc.MiscFlags = 0;
     
-    HRESULT hr1 = SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pIntermediateTexture1);
-    HRESULT hr2 = SwapchainHook::d3d11Device->CreateTexture2D(&desc, nullptr, &pIntermediateTexture2);
+    HRESULT hr1 = SwapchainHook::d3d11Device.get()->CreateTexture2D(&desc, nullptr, &pIntermediateTexture1);
+    HRESULT hr2 = SwapchainHook::d3d11Device.get()->CreateTexture2D(&desc, nullptr, &pIntermediateTexture2);
     
     if (FAILED(hr1) || FAILED(hr2)) {
         ReleaseIntermediateTextures();
@@ -313,8 +311,8 @@ bool Blur::EnsureIntermediateTextures(UINT width, UINT height)
     }
     
     // Create render target views
-    hr1 = SwapchainHook::d3d11Device->CreateRenderTargetView(pIntermediateTexture1, nullptr, &pIntermediateRTV1);
-    hr2 = SwapchainHook::d3d11Device->CreateRenderTargetView(pIntermediateTexture2, nullptr, &pIntermediateRTV2);
+    hr1 = SwapchainHook::d3d11Device.get()->CreateRenderTargetView(pIntermediateTexture1, nullptr, &pIntermediateRTV1);
+    hr2 = SwapchainHook::d3d11Device.get()->CreateRenderTargetView(pIntermediateTexture2, nullptr, &pIntermediateRTV2);
     
     if (FAILED(hr1) || FAILED(hr2)) {
         ReleaseIntermediateTextures();
@@ -322,8 +320,8 @@ bool Blur::EnsureIntermediateTextures(UINT width, UINT height)
     }
     
     // Create shader resource views
-    hr1 = SwapchainHook::d3d11Device->CreateShaderResourceView(pIntermediateTexture1, nullptr, &pIntermediateSRV1);
-    hr2 = SwapchainHook::d3d11Device->CreateShaderResourceView(pIntermediateTexture2, nullptr, &pIntermediateSRV2);
+    hr1 = SwapchainHook::d3d11Device.get()->CreateShaderResourceView(pIntermediateTexture1, nullptr, &pIntermediateSRV1);
+    hr2 = SwapchainHook::d3d11Device.get()->CreateShaderResourceView(pIntermediateTexture2, nullptr, &pIntermediateSRV2);
     
     if (FAILED(hr1) || FAILED(hr2)) {
         ReleaseIntermediateTextures();
@@ -369,7 +367,7 @@ void Blur::RenderBlur(ID3D11RenderTargetView *pDstRenderTargetView, int iteratio
         return;
     }
 
-    ID3D11DeviceContext* pContext = SwapchainHook::context;
+    ID3D11DeviceContext* pContext = SwapchainHook::context.get();
     if (!pContext) return;
 
     D3D11_TEXTURE2D_DESC desc;
@@ -473,10 +471,10 @@ void FlarialGUI::PrepareBlur(float intensity) {
         auto isLerping = delta > 0.001 || delta < -0.1;
 
         if (isLerping || shouldUpdate || FlarialGUI::blur_bitmap_cache) {
-            if (SwapchainHook::queue != nullptr)
-                FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap],
+            if (SwapchainHook::queue.get() != nullptr)
+                FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmaps[SwapchainHook::currentBitmap].get(),
                                        &FlarialGUI::screen_bitmap_cache);
-            else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap, &FlarialGUI::screen_bitmap_cache);
+            else FlarialGUI::CopyBitmap(SwapchainHook::D2D1Bitmap.get(), &FlarialGUI::screen_bitmap_cache);
 
             FlarialGUI::blur->SetInput(0, FlarialGUI::screen_bitmap_cache);
             FlarialGUI::blur->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, intensity);
