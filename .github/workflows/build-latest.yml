@@ -97,6 +97,11 @@ jobs:
           repository: 'flarialmc/newcdn'
           ref: 'main'
           token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
+      - name: Configure Git credentials
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@example.com"
+          git config --global url."https://x-access-token:${{ secrets.ACTIONS_GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
       - name: Download dll
         uses: actions/download-artifact@v4.1.9
       - name: setup tags
@@ -142,8 +147,6 @@ jobs:
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
       - name: Release (CDN) - File Upload
         run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "actions@example.com"
           mv -f Flarial_DLL/Flarial.dll "./dll/latest.dll"
           git add ./dll/latest.dll
           git commit -m "Add Release for Release Commit: '${{ github.event.head_commit.message }}'"
@@ -182,8 +185,6 @@ jobs:
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
       - name: Beta Release (CDN) - File Upload
         run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "actions@example.com"
           mv -f Flarial_DLL/Flarial.dll "./dll/beta.dll"
           git add ./dll/beta.dll
           git commit -m "Add Beta for Beta Commit: '${{ github.event.head_commit.message }}'"
@@ -222,10 +223,7 @@ jobs:
           TAG_NAME: ${{ steps.tag.outputs.TAG_NAME }}
       - name: Cache Github API
         run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "actions@example.com"
           curl https://api.github.com/repos/TTF-fog/newcdn/tags > cache.txt
-  
           git add cache.txt
           git commit -m "Add Cache for Tags (API)"
           git push origin main
