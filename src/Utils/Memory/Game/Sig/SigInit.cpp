@@ -4,6 +4,21 @@
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
+void SigInit::init2190() {
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading sigs for 1.21.9X");
+
+    // these sigs are what broke:
+    /*
+    CameraYaw2
+    ItemInHandRenderer::renderItem
+    HurtColor
+    Options::getGamma
+    ThirdPersonNametag
+    Actor::baseTick
+    GeneralSettingsScreenController::GeneralSettingsScreenController
+    */
+}
+
 void SigInit::init2180() {
     Logger::custom(fg(fmt::color::gold), "Signatures", "Loading sigs for 1.21.8X");
 

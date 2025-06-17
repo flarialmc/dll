@@ -4,6 +4,10 @@
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
+void OffsetInit::init2190() {
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.9X");
+}
+
 void OffsetInit::init2180() {
     Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.8X");
     ADD_OFFSET("ClientInstance::getBlockSource", 31);
