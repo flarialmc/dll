@@ -68,10 +68,14 @@ void Sneak::onTick(TickEvent& event)
             auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
             if (toggleSneaking) {
                 handler->sneaking = true;
+                handler->mInputState.mSneakDown = true;
+                handler->mRawInputState.mSneakDown = true;
                 toggled = true;
             }
             if (!toggleSneaking and toggled) {
                 handler->sneaking = false;
+                handler->mInputState.mSneakDown = false;
+                handler->mRawInputState.mSneakDown = false;
                 toggled = false;
             }
         }
