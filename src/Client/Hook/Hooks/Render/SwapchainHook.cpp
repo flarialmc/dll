@@ -796,6 +796,7 @@ void SwapchainHook::DX12Render(bool underui) {
     queue->Signal(cachedDX12Fence, currentFenceValue);
     
     // Wait if necessary
+    if (cachedDX12Fence->GetCompletedValue() < currentFenceValue) {
         cachedDX12Fence->SetEventOnCompletion(currentFenceValue, fenceEvent);
         WaitForSingleObject(fenceEvent, INFINITE);
     }
