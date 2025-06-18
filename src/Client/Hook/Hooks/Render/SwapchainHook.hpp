@@ -74,7 +74,7 @@ public:
     static inline std::vector<winrt::com_ptr<IDXGISurface1>> DXGISurfaces;
     static inline std::vector<winrt::com_ptr<ID2D1Bitmap1>> D2D1Bitmaps;
     static inline std::vector<winrt::com_ptr<ID3D11Resource>> D3D11Resources;
-    static inline IDXGISwapChain3* swapchain;
+    static inline winrt::com_ptr<IDXGISwapChain3> swapchain;
     static inline winrt::com_ptr<ID3D12DescriptorHeap> D3D12DescriptorHeap;
     static inline winrt::com_ptr<ID3D11On12Device> d3d11On12Device;
     static inline winrt::com_ptr<ID2D1Bitmap1> D2D1Bitmap;
