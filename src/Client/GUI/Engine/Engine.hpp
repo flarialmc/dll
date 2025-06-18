@@ -40,30 +40,30 @@ class Blur
 {
 public:
 
-	static inline ID3D11PixelShader* pGaussianBlurHorizontalShader = nullptr;
-	static inline ID3D11PixelShader* pGaussianBlurVerticalShader = nullptr;
-	static inline ID3D11VertexShader* pVertexShader = nullptr;
-	static inline ID3D11InputLayout* pInputLayout = nullptr;
+	static inline winrt::com_ptr<ID3D11PixelShader> pGaussianBlurHorizontalShader = nullptr;
+	static inline winrt::com_ptr<ID3D11PixelShader> pGaussianBlurVerticalShader = nullptr;
+	static inline winrt::com_ptr<ID3D11VertexShader> pVertexShader = nullptr;
+	static inline winrt::com_ptr<ID3D11InputLayout> pInputLayout = nullptr;
 
-	static inline ID3D11SamplerState* pSampler = nullptr;
-	static inline ID3D11Buffer* pVertexBuffer = nullptr;
-	static inline ID3D11Buffer* pConstantBuffer = nullptr;
+	static inline winrt::com_ptr<ID3D11SamplerState> pSampler = nullptr;
+	static inline winrt::com_ptr<ID3D11Buffer> pVertexBuffer = nullptr;
+	static inline winrt::com_ptr<ID3D11Buffer> pConstantBuffer = nullptr;
 	static inline BlurInputBuffer constantBuffer;
 
 	// Persistent intermediate textures
-	static inline ID3D11Texture2D* pIntermediateTexture1 = nullptr;
-	static inline ID3D11Texture2D* pIntermediateTexture2 = nullptr;
-	static inline ID3D11RenderTargetView* pIntermediateRTV1 = nullptr;
-	static inline ID3D11RenderTargetView* pIntermediateRTV2 = nullptr;
-	static inline ID3D11ShaderResourceView* pIntermediateSRV1 = nullptr;
-	static inline ID3D11ShaderResourceView* pIntermediateSRV2 = nullptr;
+	static inline winrt::com_ptr<ID3D11Texture2D> pIntermediateTexture1 = nullptr;
+	static inline winrt::com_ptr<ID3D11Texture2D> pIntermediateTexture2 = nullptr;
+	static inline winrt::com_ptr<ID3D11RenderTargetView> pIntermediateRTV1 = nullptr;
+	static inline winrt::com_ptr<ID3D11RenderTargetView> pIntermediateRTV2 = nullptr;
+	static inline winrt::com_ptr<ID3D11ShaderResourceView> pIntermediateSRV1 = nullptr;
+	static inline winrt::com_ptr<ID3D11ShaderResourceView> pIntermediateSRV2 = nullptr;
 	static inline UINT currentTextureWidth = 0;
 	static inline UINT currentTextureHeight = 0;
 
 	// Cached render states
-	static inline ID3D11DepthStencilState* pDepthStencilState = nullptr;
-	static inline ID3D11BlendState* pBlendState = nullptr;
-	static inline ID3D11RasterizerState* pRasterizerState = nullptr;
+	static inline winrt::com_ptr<ID3D11DepthStencilState> pDepthStencilState = nullptr;
+	static inline winrt::com_ptr<ID3D11BlendState> pBlendState = nullptr;
+	static inline winrt::com_ptr<ID3D11RasterizerState> pRasterizerState = nullptr;
 
 	// RAII
 	static void InitializePipeline();
@@ -82,14 +82,14 @@ class BlurDX12
 {
 public:
 
-	static inline ID3D11PixelShader* pUpsampleShader = nullptr;
-	static inline ID3D11PixelShader* pDownsampleShader = nullptr;
-	static inline ID3D11VertexShader* pVertexShader = nullptr;
-	static inline ID3D11InputLayout* pInputLayout = nullptr;
+	static inline winrt::com_ptr<ID3D11PixelShader> pUpsampleShader = nullptr;
+	static inline winrt::com_ptr<ID3D11PixelShader> pDownsampleShader = nullptr;
+	static inline winrt::com_ptr<ID3D11VertexShader> pVertexShader = nullptr;
+	static inline winrt::com_ptr<ID3D11InputLayout> pInputLayout = nullptr;
 
-	static inline ID3D11SamplerState* pSampler = nullptr;
-	static inline ID3D11Buffer* pVertexBuffer = nullptr;
-	static inline ID3D11Buffer* pConstantBuffer = nullptr;
+	static inline winrt::com_ptr<ID3D11SamplerState> pSampler = nullptr;
+	static inline winrt::com_ptr<ID3D11Buffer> pVertexBuffer = nullptr;
+	static inline winrt::com_ptr<ID3D11Buffer> pConstantBuffer = nullptr;
 	static inline BlurInputBuffer constantBuffer;
 
 

@@ -1,4 +1,5 @@
 #include "ResizeHook.hpp"
+#include <winrt/base.h>
 
 #include <imgui/imgui_impl_dx11.h>
 #include <imgui/imgui_impl_dx12.h>
@@ -58,11 +59,19 @@ ResizeHook::resizeCallback(IDXGISwapChain* pSwapChain, UINT bufferCount, UINT wi
 void ResizeHook::cleanShit(bool isResize) {
 
     bool isDX12 = false;
-    if (SwapchainHook::queue) isDX12 = true;
+    if (SwapchainHook::queue.get()) isDX12 = true;
+    
+    // CRITICAL: Clear all render target bindings FIRST to prevent access denied errors
+    if (SwapchainHook::context.get()) {
+        // Clear all render targets and shader resource bindings immediately
+        SwapchainHook::context->ClearState();
+        SwapchainHook::context->Flush();
+    }
     
     // For swapchain reset, we need to preserve certain resources
     bool isSwapchainReset = !isResize && SwapchainHook::queueReset;
 
+    // Crude release for swapchain reset - using SafeRelease for proper COM cleanup
     Memory::SafeRelease(SwapchainHook::stageTex);
     Memory::SafeRelease(SwapchainHook::SavedD3D11BackBuffer);
     Memory::SafeRelease(SwapchainHook::ExtraSavedD3D11BackBuffer);
@@ -88,7 +97,7 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(D2D::context);
     
     // For DX11 path, release the device here
-    if (!SwapchainHook::queue) {
+    if (!SwapchainHook::queue.get()) {
         Memory::SafeRelease(SwapchainHook::d3d11Device);
     }
 
@@ -103,6 +112,17 @@ void ResizeHook::cleanShit(bool isResize) {
     Memory::SafeRelease(RealMotionBlurHelper::m_pixelShader);
     Memory::SafeRelease(RealMotionBlurHelper::m_vertexShader);
     Memory::SafeRelease(RealMotionBlurHelper::m_vertexBuffer);
+    Memory::SafeRelease(RealMotionBlurHelper::m_depthStencilState);
+    Memory::SafeRelease(RealMotionBlurHelper::m_blendState);
+    Memory::SafeRelease(RealMotionBlurHelper::m_rasterizerState);
+    Memory::SafeRelease(RealMotionBlurHelper::m_samplerState);
+    
+    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_depthStencilState);
+    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_blendState);
+    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_rasterizerState);
+    Memory::SafeRelease(AvgPixelMotionBlurHelper::m_samplerState);
+    AvgPixelMotionBlurHelper::m_srvCache.clear();
+    AvgPixelMotionBlurHelper::m_nullSRVCache.clear();
     MotionBlur::initted = false;
 
     for (auto& i : ClickGUIElements::images) {
@@ -171,19 +191,24 @@ void ResizeHook::cleanShit(bool isResize) {
         Memory::SafeRelease(SwapchainHook::D3D12DescriptorHeap);
 
         // First, release D2D1 bitmaps
-        for (ID2D1Bitmap1* bitmap : SwapchainHook::D2D1Bitmaps) {
+        for (winrt::com_ptr<ID2D1Bitmap1> bitmap : SwapchainHook::D2D1Bitmaps) {
             Memory::SafeRelease(bitmap);
         }
         SwapchainHook::D2D1Bitmaps.clear();
 
-        // Remove this extra GPU sync - it might be causing issues
-
         // Release wrapped resources BEFORE releasing the D3D11 resources themselves
         if (SwapchainHook::queue != nullptr && SwapchainHook::d3d11On12Device && !SwapchainHook::D3D11Resources.empty()) {
+            // Create array of raw pointers from smart pointers
+            std::vector<ID3D11Resource*> rawResources;
+            rawResources.reserve(SwapchainHook::D3D11Resources.size());
+            for (const auto& resource : SwapchainHook::D3D11Resources) {
+                rawResources.push_back(resource.get());
+            }
+            
             // Always release wrapped resources
             SwapchainHook::d3d11On12Device->ReleaseWrappedResources(
-                SwapchainHook::D3D11Resources.data(),
-                static_cast<UINT>(SwapchainHook::D3D11Resources.size())
+                rawResources.data(),
+                static_cast<UINT>(rawResources.size())
             );
             
             // Flush the D3D11 context to ensure all commands are submitted
@@ -192,10 +217,10 @@ void ResizeHook::cleanShit(bool isResize) {
             }
             
             // For DX12, we MUST wait for GPU to complete all work with these resources
-            if (SwapchainHook::cachedDX12Fence && SwapchainHook::queue) {
+            if (SwapchainHook::cachedDX12Fence.get() && SwapchainHook::queue.get()) {
                 // Signal and wait for fence to ensure GPU is done
                 const UINT64 fenceValueForSignal = ++SwapchainHook::cachedDX12FenceValue;
-                SwapchainHook::queue->Signal(SwapchainHook::cachedDX12Fence, fenceValueForSignal);
+                SwapchainHook::queue->Signal(SwapchainHook::cachedDX12Fence.get(), fenceValueForSignal);
                 if (SwapchainHook::cachedDX12Fence->GetCompletedValue() < fenceValueForSignal) {
                     if (SwapchainHook::fenceEvent) {
                         SwapchainHook::cachedDX12Fence->SetEventOnCompletion(fenceValueForSignal, SwapchainHook::fenceEvent);
@@ -206,13 +231,13 @@ void ResizeHook::cleanShit(bool isResize) {
         }
 
         // Now release the D3D11 resources
-        for (ID3D11Resource* resource : SwapchainHook::D3D11Resources) {
+        for (auto& resource : SwapchainHook::D3D11Resources) {
             Memory::SafeRelease(resource);
         }
         SwapchainHook::D3D11Resources.clear();
 
         // Release DXGI surfaces
-        for (IDXGISurface* surface : SwapchainHook::DXGISurfaces) {
+        for (auto& surface : SwapchainHook::DXGISurfaces) {
             Memory::SafeRelease(surface);
         }
         SwapchainHook::DXGISurfaces.clear();
@@ -224,11 +249,7 @@ void ResizeHook::cleanShit(bool isResize) {
         }
         SwapchainHook::frameContexts.clear();
 
-        // Clear all render targets from context before releasing
-        if (SwapchainHook::context) {
-            SwapchainHook::context->ClearState();
-            SwapchainHook::context->Flush();
-        }
+        // Context already cleared at the beginning of cleanShit()
         
         // Release D2D/DXGI resources
         Memory::SafeRelease(SwapchainHook::context);

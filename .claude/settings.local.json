@@ -4,7 +4,10 @@
       "Bash(grep:*)",
       "Bash(find:*)",
       "Bash(rg:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(./build.bat)",
+      "Bash(ninja --version)",
+      "Bash(sed:*)"
     ],
     "deny": []
   }

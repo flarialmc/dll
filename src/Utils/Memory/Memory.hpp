@@ -7,6 +7,7 @@
 #include <vector>
 #include <type_traits>
 #include <format>
+#include <winrt/base.h>
 
 #include <Utils//Logger/Logger.hpp>
 #include <minhook/MinHook.h>
@@ -114,6 +115,12 @@ public:
             pPtr->Release();
             pPtr = nullptr;
         }
+    }
+
+    // Overload for winrt::com_ptr - smart pointer handles Release() automatically
+    template<typename T>
+    static void SafeRelease(winrt::com_ptr<T> &pPtr) {
+        pPtr = nullptr;  // Smart pointer automatically calls Release()
     }
 
     static uintptr_t findDMAAddy(uintptr_t ptr, const std::vector<unsigned int>& offsets) {

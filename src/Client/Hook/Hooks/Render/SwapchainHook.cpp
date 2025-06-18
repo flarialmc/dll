@@ -1,4 +1,5 @@
 #include "SwapchainHook.hpp"
+#include <winrt/base.h>
 #include "../../../GUI/D2D.hpp"
 #include "../../../Events/Render/RenderEvent.hpp"
 #include "../../../Events/Render/RenderUnderUIEvent.hpp"
@@ -29,7 +30,7 @@ using ::IUnknown;
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
 
-ID3D12CommandQueue *SwapchainHook::queue = nullptr;
+winrt::com_ptr<ID3D12CommandQueue> SwapchainHook::queue = nullptr;
 HANDLE SwapchainHook::fenceEvent = nullptr;
 
 bool SwapchainHook::initImgui = false;
@@ -120,11 +121,11 @@ void SwapchainHook::enableHook() {
 
     /* CREATE SWAPCHAIN FOR CORE WINDOW HOOK */
 
-    IDXGIFactory2 *pFactory = NULL;
-    CreateDXGIFactory(IID_PPV_ARGS(&pFactory));
-    if (!pFactory) LOG_ERROR("Factory not created");
+    winrt::com_ptr<IDXGIFactory2> pFactory;
+    CreateDXGIFactory(IID_PPV_ARGS(pFactory.put()));
+    if (!pFactory.get()) LOG_ERROR("Factory not created");
 
-    CreateSwapchainForCoreWindowHook::hook(pFactory);
+    CreateSwapchainForCoreWindowHook::hook(pFactory.get());
 
     /* CREATE SWAPCHAIN FOR CORE WINDOW HOOK */
 
@@ -142,7 +143,7 @@ void SwapchainHook::enableHook() {
     Logger::info("GPU name: {}", gpuName.c_str());
 
 
-    Memory::SafeRelease(pFactory);
+    // pFactory is now a smart pointer, no manual release needed
 
     /* OVERLAYS CHECK */
 
@@ -181,7 +182,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         return DXGI_ERROR_DEVICE_RESET;
     }
 
-    swapchain = pSwapChain;
+    swapchain.copy_from(pSwapChain);
     flagsreal = flags;
 
     UnderUIHooks::index = 0;
@@ -270,14 +271,14 @@ void SwapchainHook::DX11Init() {
     Logger::debug("Initializing for DX11");
 
     // Get D3D11 device from swapchain
-    if (FAILED(swapchain->GetDevice(IID_PPV_ARGS(&d3d11Device)))) {
+    if (FAILED(swapchain->GetDevice(IID_PPV_ARGS(d3d11Device.put())))) {
         Logger::error("Failed to get D3D11 device from swapchain");
         return;
     }
 
     // Get device context once
-    d3d11Device->GetImmediateContext(&context);
-    if (!context) {
+    d3d11Device->GetImmediateContext(context.put());
+    if (!context.get()) {
         Logger::error("Failed to get D3D11 immediate context");
         return;
     }
@@ -289,17 +290,17 @@ void SwapchainHook::DX11Init() {
         D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS
     };
 
-    IDXGISurface1* backBuffer = nullptr;
-    if (FAILED(swapchain->GetBuffer(0, IID_PPV_ARGS(&backBuffer))) || !backBuffer) {
+    winrt::com_ptr<IDXGISurface1> backBuffer;
+    if (FAILED(swapchain->GetBuffer(0, IID_PPV_ARGS(backBuffer.put())))) {
         Logger::error("Failed to get backbuffer");
         return;
     }
 
     // Create D2D context
-    HRESULT hr = D2D1CreateDeviceContext(backBuffer, properties, &D2D::context);
+    HRESULT hr = D2D1CreateDeviceContext(backBuffer.get(), properties, &D2D::context);
     if (FAILED(hr) || !D2D::context) {
         Logger::error("Failed to create D2D1 device context: {}", Logger::getHRESULTError(hr));
-        Memory::SafeRelease(backBuffer);
+        backBuffer = nullptr;
         return;
     }
 
@@ -310,8 +311,8 @@ void SwapchainHook::DX11Init() {
         96.0f, 96.0f
     );
     
-    D2D::context->CreateBitmapFromDxgiSurface(backBuffer, bitmapProps, &D2D1Bitmap);
-    Memory::SafeRelease(backBuffer);
+    D2D::context->CreateBitmapFromDxgiSurface(backBuffer.get(), bitmapProps, D2D1Bitmap.put());
+    // backBuffer is now a smart pointer, no manual release needed
 
     // Initialize ImGui once
     if (!initImgui && !imguiCleanupInProgress) {
@@ -332,7 +333,7 @@ void SwapchainHook::DX11Init() {
         
         // Check if DX11 backend is already initialized
         if (!io.BackendRendererUserData) {
-            ImGui_ImplDX11_Init(d3d11Device, context);
+            ImGui_ImplDX11_Init(d3d11Device.get(), context.get());
         }
         
         initImgui = true;
@@ -351,13 +352,10 @@ void SwapchainHook::DX12Init() {
     Logger::debug("Initializing for DX12");
     
     // Get D3D12 device
-    ID3D12Device5* device = nullptr;
-    if (FAILED(swapchain->GetDevice(IID_PPV_ARGS(&device))) || !device) {
+    if (FAILED(swapchain->GetDevice(IID_PPV_ARGS(d3d12Device5.put())))) {
         Logger::error("Failed to get D3D12 device from swapchain");
         return;
     }
-    
-    d3d12Device5 = device;
     
     // Create fence event for synchronization
     if (!fenceEvent) {
@@ -369,21 +367,22 @@ void SwapchainHook::DX12Init() {
     }
     
     // Create D3D11on12 device for compatibility
+    IUnknown* queueAsUnknown = queue.get();
     HRESULT hr = D3D11On12CreateDevice(
-        device,
+        d3d12Device5.get(),
         D3D11_CREATE_DEVICE_BGRA_SUPPORT,
         nullptr, 0,
-        (IUnknown**)&queue, 1, 0,
-        &d3d11Device, &context, nullptr
+        &queueAsUnknown, 1, 0,
+        d3d11Device.put(), context.put(), nullptr
     );
     
-    if (FAILED(hr) || !d3d11Device) {
+    if (FAILED(hr) || !d3d11Device.get()) {
         Logger::error("Failed to create D3D11on12 device: {}", Logger::getHRESULTError(hr));
         return;
     }
     
     // Get D3D11on12 interface
-    d3d11Device->QueryInterface(IID_PPV_ARGS(&d3d11On12Device));
+    d3d11Device->QueryInterface(IID_PPV_ARGS(d3d11On12Device.put()));
     
     // Create D2D resources
     ID2D1Factory7* d2dFactory = nullptr;
@@ -423,40 +422,40 @@ void SwapchainHook::DX12Init() {
     frameContexts.resize(bufferCount);
     
     // Create persistent descriptor heaps
-    if (!D3D12DescriptorHeap) {
+    if (!D3D12DescriptorHeap.get()) {
         D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
         rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
         rtvHeapDesc.NumDescriptors = bufferCount;
         rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
         rtvHeapDesc.NodeMask = 0;
         
-        device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&D3D12DescriptorHeap));
+        d3d12Device5->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(D3D12DescriptorHeap.put()));
     }
     
     // Create consolidated descriptor heap for ImGui and images
-    if (!d3d12DescriptorHeapImGuiRender) {
+    if (!d3d12DescriptorHeapImGuiRender.get()) {
         D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
         srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
         srvHeapDesc.NumDescriptors = TOTAL_CONSOLIDATED_DESCRIPTORS;
         srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
         srvHeapDesc.NodeMask = 0;
         
-        device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&d3d12DescriptorHeapImGuiRender));
+        d3d12Device5->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(d3d12DescriptorHeapImGuiRender.put()));
     }
     
     // Create command allocator
-    if (!allocator) {
-        device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&allocator));
+    if (!allocator.get()) {
+        d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(allocator.put()));
     }
     
     // Create command list
-    if (!d3d12CommandList) {
-        device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator, nullptr, IID_PPV_ARGS(&d3d12CommandList));
+    if (!d3d12CommandList.get()) {
+        d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator.get(), nullptr, IID_PPV_ARGS(d3d12CommandList.put()));
         d3d12CommandList->Close(); // Close it immediately as it starts in recording state
     }
     
     // Setup render targets and wrapped resources
-    const UINT rtvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    const UINT rtvDescriptorSize = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = D3D12DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
     
     const float dpi = static_cast<float>(GetDpiForSystem());
@@ -467,11 +466,11 @@ void SwapchainHook::DX12Init() {
     );
     
     for (UINT i = 0; i < bufferCount; i++) {
-        ID3D12Resource* backBuffer = nullptr;
-        swapchain->GetBuffer(i, IID_PPV_ARGS(&backBuffer));
+        winrt::com_ptr<ID3D12Resource> backBuffer;
+        swapchain->GetBuffer(i, IID_PPV_ARGS(backBuffer.put()));
         
         // Create RTV
-        device->CreateRenderTargetView(backBuffer, nullptr, rtvHandle);
+        d3d12Device5->CreateRenderTargetView(backBuffer.get(), nullptr, rtvHandle);
         frameContexts[i].main_render_target_descriptor = rtvHandle;
         frameContexts[i].main_render_target_resource = backBuffer;
         frameContexts[i].commandAllocator = allocator; // Share allocator
@@ -480,17 +479,17 @@ void SwapchainHook::DX12Init() {
         // Create wrapped D3D11 resource
         D3D11_RESOURCE_FLAGS d3d11Flags = { D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE };
         d3d11On12Device->CreateWrappedResource(
-            backBuffer, &d3d11Flags,
+            backBuffer.get(), &d3d11Flags,
             D3D12_RESOURCE_STATE_RENDER_TARGET,
             D3D12_RESOURCE_STATE_PRESENT,
-            IID_PPV_ARGS(&D3D11Resources[i])
+            IID_PPV_ARGS(D3D11Resources[i].put())
         );
         
         // Get DXGI surface
-        D3D11Resources[i]->QueryInterface(&DXGISurfaces[i]);
+        D3D11Resources[i]->QueryInterface(IID_PPV_ARGS(DXGISurfaces[i].put()));
         
         // Create D2D bitmap
-        D2D::context->CreateBitmapFromDxgiSurface(DXGISurfaces[i], bitmapProps, &D2D1Bitmaps[i]);
+        D2D::context->CreateBitmapFromDxgiSurface(DXGISurfaces[i].get(), bitmapProps, D2D1Bitmaps[i].put());
         
         // Note: We don't release backBuffer here because frameContexts[i].main_render_target_resource holds a reference
     }
@@ -514,12 +513,12 @@ void SwapchainHook::DX12Init() {
         
         // Modern ImGui D3D12 initialization
         ImGui_ImplDX12_InitInfo initInfo = {};
-        initInfo.Device = device;
-        initInfo.CommandQueue = queue;
+        initInfo.Device = d3d12Device5.get();
+        initInfo.CommandQueue = queue.get();
         initInfo.NumFramesInFlight = bufferCount;
         initInfo.RTVFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
         initInfo.DSVFormat = DXGI_FORMAT_UNKNOWN;
-        initInfo.SrvDescriptorHeap = d3d12DescriptorHeapImGuiRender;
+        initInfo.SrvDescriptorHeap = d3d12DescriptorHeapImGuiRender.get();
         
         // Set up descriptor allocation callbacks
         initInfo.SrvDescriptorAllocFn = [](ImGui_ImplDX12_InitInfo* info, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu) {
@@ -563,7 +562,7 @@ void SwapchainHook::DX12Init() {
 }
 
 void SwapchainHook::DX11Render(bool underui) {
-    if (!D2D::context || !context) return;
+    if (!D2D::context || !context.get()) return;
 
     // Handle blur if needed
     DX11Blur();
@@ -575,8 +574,8 @@ void SwapchainHook::DX11Render(bool underui) {
     static UINT lastBufferWidth = 0, lastBufferHeight = 0;
     
     // Get current backbuffer dimensions
-    ID3D11Texture2D* backBuffer = nullptr;
-    if (FAILED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBuffer))) {
+    winrt::com_ptr<ID3D11Texture2D> backBuffer;
+    if (FAILED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), backBuffer.put_void()))) {
         return;
     }
     
@@ -584,17 +583,16 @@ void SwapchainHook::DX11Render(bool underui) {
     backBuffer->GetDesc(&desc);
     
     // Only recreate RTV if dimensions changed
-    if (!cachedDX11RTV || desc.Width != lastBufferWidth || desc.Height != lastBufferHeight) {
-        Memory::SafeRelease(cachedDX11RTV);
-        if (FAILED(d3d11Device->CreateRenderTargetView(backBuffer, nullptr, &cachedDX11RTV))) {
-            Memory::SafeRelease(backBuffer);
+    if (!cachedDX11RTV.get() || desc.Width != lastBufferWidth || desc.Height != lastBufferHeight) {
+        cachedDX11RTV = nullptr;
+        if (FAILED(d3d11Device->CreateRenderTargetView(backBuffer.get(), nullptr, cachedDX11RTV.put()))) {
             return;
         }
         lastBufferWidth = desc.Width;
         lastBufferHeight = desc.Height;
     }
     
-    Memory::SafeRelease(backBuffer);
+    // backBuffer is now a smart pointer, no manual release needed
 
     // Save current render state
     ID3D11RenderTargetView* originalRTVs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { nullptr };
@@ -617,11 +615,11 @@ void SwapchainHook::DX11Render(bool underui) {
     // Trigger render events
     if (!underui) {
         auto event = nes::make_holder<RenderEvent>();
-        event->RTV = cachedDX11RTV;
+        event->RTV = cachedDX11RTV.get();
         eventMgr.trigger(event);
     } else {
         auto event = nes::make_holder<RenderUnderUIEvent>();
-        event->RTV = cachedDX11RTV;
+        event->RTV = cachedDX11RTV.get();
         eventMgr.trigger(event);
     }
 
@@ -646,7 +644,8 @@ void SwapchainHook::DX11Render(bool underui) {
     ImGui::Render();
 
     // Render ImGui draw data
-    context->OMSetRenderTargets(1, &cachedDX11RTV, originalDSV);
+    ID3D11RenderTargetView* rtvPtr = cachedDX11RTV.get();
+    context->OMSetRenderTargets(1, &rtvPtr, originalDSV);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
     // Restore original render targets
@@ -661,16 +660,16 @@ void SwapchainHook::DX11Render(bool underui) {
 
 
 void SwapchainHook::DX12Render(bool underui) {
-    if (!D2D::context || !d3d11On12Device || !queue) return;
+    if (!D2D::context || !d3d11On12Device.get() || !queue.get()) return;
     
     currentBitmap = swapchain->GetCurrentBackBufferIndex();
     
     // Acquire wrapped resources
-    ID3D11Resource* resource = D3D11Resources[currentBitmap];
+    ID3D11Resource* resource = D3D11Resources[currentBitmap].get();
     d3d11On12Device->AcquireWrappedResources(&resource, 1);
     
     // Set D2D render target
-    D2D::context->SetTarget(D2D1Bitmaps[currentBitmap]);
+    D2D::context->SetTarget(D2D1Bitmaps[currentBitmap].get());
     MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
     
     // Save backbuffer and handle blur
@@ -692,28 +691,27 @@ void SwapchainHook::DX12Render(bool underui) {
     
     // Create RTV for events (cache per buffer)
     if (cachedDX12RTVs.size() != bufferCount) {
-        // Clean up old RTVs
+
         for (auto rtv : cachedDX12RTVs) {
-            Memory::SafeRelease(rtv);
+            rtv = nullptr;
         }
         cachedDX12RTVs.resize(bufferCount, nullptr);
     }
     
-    if (!cachedDX12RTVs[currentBitmap]) {
-        ID3D11Texture2D* buffer2D = nullptr;
-        D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&buffer2D));
-        d3d11Device->CreateRenderTargetView(buffer2D, nullptr, &cachedDX12RTVs[currentBitmap]);
-        Memory::SafeRelease(buffer2D);
+    if (!cachedDX12RTVs[currentBitmap].get()) {
+        winrt::com_ptr<ID3D11Texture2D> buffer2D;
+        D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(buffer2D.put()));
+        d3d11Device->CreateRenderTargetView(buffer2D.get(), nullptr, cachedDX12RTVs[currentBitmap].put());
     }
     
     // Trigger render events
     if (!underui) {
         auto event = nes::make_holder<RenderEvent>();
-        event->RTV = cachedDX12RTVs[currentBitmap];
+        event->RTV = cachedDX12RTVs[currentBitmap].get();
         eventMgr.trigger(event);
     } else {
         auto event = nes::make_holder<RenderUnderUIEvent>();
-        event->RTV = cachedDX12RTVs[currentBitmap];
+        event->RTV = cachedDX12RTVs[currentBitmap].get();
         eventMgr.trigger(event);
     }
     
@@ -741,13 +739,13 @@ void SwapchainHook::DX12Render(bool underui) {
     frameContexts[currentBitmap].commandAllocator->Reset();
     
     // Reset command list
-    d3d12CommandList->Reset(frameContexts[currentBitmap].commandAllocator, nullptr);
+    d3d12CommandList->Reset(frameContexts[currentBitmap].commandAllocator.get(), nullptr);
     
     // Transition resource to render target
     D3D12_RESOURCE_BARRIER barrier = {};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-    barrier.Transition.pResource = frameContexts[currentBitmap].main_render_target_resource;
+    barrier.Transition.pResource = frameContexts[currentBitmap].main_render_target_resource.get();
     barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -769,14 +767,15 @@ void SwapchainHook::DX12Render(bool underui) {
     }
     
     // Set descriptor heap
-    d3d12CommandList->SetDescriptorHeaps(1, &d3d12DescriptorHeapImGuiRender);
+    ID3D12DescriptorHeap* heapPtr = d3d12DescriptorHeapImGuiRender.get();
+    d3d12CommandList->SetDescriptorHeaps(1, &heapPtr);
     
     // End ImGui frame and render
     ImGui::End();
     ImGui::EndFrame();
     ImGui::Render();
     
-    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), d3d12CommandList);
+    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), d3d12CommandList.get());
     
     // Transition back to present
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -785,15 +784,16 @@ void SwapchainHook::DX12Render(bool underui) {
     
     // Close and execute command list
     d3d12CommandList->Close();
-    queue->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList* const*>(&d3d12CommandList));
+    ID3D12CommandList* cmdListPtr = d3d12CommandList.get();
+    queue->ExecuteCommandLists(1, &cmdListPtr);
     
     // Use cached fence for synchronization
-    if (!cachedDX12Fence) {
-        d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&cachedDX12Fence));
+    if (!cachedDX12Fence.get()) {
+        d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(cachedDX12Fence.put()));
     }
     
     const UINT64 currentFenceValue = ++cachedDX12FenceValue;
-    queue->Signal(cachedDX12Fence, currentFenceValue);
+    queue->Signal(cachedDX12Fence.get(), currentFenceValue);
     
     // Wait if necessary
     if (cachedDX12Fence->GetCompletedValue() < currentFenceValue) {
@@ -930,40 +930,40 @@ void SwapchainHook::FPSMeasure() {
 }
 
 
-ID3D11Texture2D *SwapchainHook::GetBackbuffer() {
+winrt::com_ptr<ID3D11Texture2D> SwapchainHook::GetBackbuffer() {
     return SavedD3D11BackBuffer;
 }
 
 void SwapchainHook::SaveBackbuffer(bool underui) {
 
-    Memory::SafeRelease(SavedD3D11BackBuffer);
-    Memory::SafeRelease(ExtraSavedD3D11BackBuffer);
-    if (!SwapchainHook::queue) {
+    SavedD3D11BackBuffer = nullptr;
+    ExtraSavedD3D11BackBuffer = nullptr;
+    if (!SwapchainHook::queue.get()) {
 
-        SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&SavedD3D11BackBuffer));
+        SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(SavedD3D11BackBuffer.put()));
 
         if (FlarialGUI::needsBackBuffer) {
 
-            if (!ExtraSavedD3D11BackBuffer) {
+            if (!ExtraSavedD3D11BackBuffer.get()) {
                 D3D11_TEXTURE2D_DESC textureDesc = {};
                 SavedD3D11BackBuffer->GetDesc(&textureDesc);
                 textureDesc.Usage = D3D11_USAGE_DEFAULT;
                 textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
                 textureDesc.CPUAccessFlags = 0;
 
-                SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
+                SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, ExtraSavedD3D11BackBuffer.put());
             }
 
             if (underui) {
 
                 if (UnderUIHooks::bgfxCtx->m_msaart) {
-                    context->ResolveSubresource(ExtraSavedD3D11BackBuffer, 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+                    context->ResolveSubresource(ExtraSavedD3D11BackBuffer.get(), 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
                 } else {
-                    context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
+                    context->CopyResource(ExtraSavedD3D11BackBuffer.get(), SavedD3D11BackBuffer.get());
                 }
 
             } else {
-                context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
+                context->CopyResource(ExtraSavedD3D11BackBuffer.get(), SavedD3D11BackBuffer.get());
             }
         }
 
@@ -972,7 +972,7 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
     else {
         HRESULT hr;
 
-        hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&SavedD3D11BackBuffer));
+        hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(SavedD3D11BackBuffer.put()));
         if (FAILED(hr)) std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
     }
 }
@@ -981,7 +981,7 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
 bool SwapchainHook::AllocateImageDescriptor(UINT imageId, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle) {
     std::lock_guard<std::mutex> lock(descriptorAllocationMutex);
     
-    if (!d3d12DescriptorHeapImGuiRender || !d3d12Device5) {
+    if (!d3d12DescriptorHeapImGuiRender.get() || !d3d12Device5.get()) {
         Logger::custom(fg(fmt::color::red), "DescriptorAlloc", "ERROR: Consolidated descriptor heap or device not available");
         return false;
     }

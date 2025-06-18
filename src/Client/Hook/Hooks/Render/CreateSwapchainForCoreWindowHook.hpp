@@ -1,4 +1,5 @@
 #pragma once
+#include <winrt/base.h>
 #include "Client.hpp"
 #include "SwapchainHook.hpp"
 #include "unknwnbase.h"

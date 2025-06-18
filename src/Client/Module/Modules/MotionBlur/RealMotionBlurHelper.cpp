@@ -95,12 +95,12 @@ bool RealMotionBlurHelper::Initialize()
 
     if (!CompileShader(realDrawTextureVertexShaderSrc, "mainVS", "vs_5_0", &vsBlob))
         return false;
-    ID3D11Device* m_device = SwapchainHook::d3d11Device;
+    ID3D11Device* m_device = SwapchainHook::d3d11Device.get();
     if (!m_device) {
         Logger::debug("Device is nullptr");
         return false;
     }
-    hr = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &m_vertexShader);
+    hr = m_device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, m_vertexShader.put());
     if (FAILED(hr))
     {
         vsBlob->Release();
@@ -111,14 +111,14 @@ bool RealMotionBlurHelper::Initialize()
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,                           D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, sizeof(float)*3,             D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
-    hr = m_device->CreateInputLayout(layoutDesc, 2, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &m_inputLayout);
+    hr = m_device->CreateInputLayout(layoutDesc, 2, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), m_inputLayout.put());
     vsBlob->Release();
     if (FAILED(hr))
         return false;
 
     if (!CompileShader(realMotionBlurPixelShaderSrc, "mainPS", "ps_5_0", &psBlob))
         return false;
-    hr = m_device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &m_pixelShader);
+    hr = m_device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, m_pixelShader.put());
     psBlob->Release();
     if (FAILED(hr))
         return false;
@@ -128,7 +128,7 @@ bool RealMotionBlurHelper::Initialize()
     cbDesc.ByteWidth = sizeof(CameraDataBuffer);
     cbDesc.Usage = D3D11_USAGE_DYNAMIC;
     cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    hr = m_device->CreateBuffer(&cbDesc, nullptr, &m_constantBuffer);
+    hr = m_device->CreateBuffer(&cbDesc, nullptr, m_constantBuffer.put());
     if (FAILED(hr))
     {
         char errorMsg[256];
@@ -151,9 +151,56 @@ bool RealMotionBlurHelper::Initialize()
     vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     D3D11_SUBRESOURCE_DATA initData = {};
     initData.pSysMem = vertices;
-    hr = m_device->CreateBuffer(&vbDesc, &initData, &m_vertexBuffer);
+    hr = m_device->CreateBuffer(&vbDesc, &initData, m_vertexBuffer.put());
     if (FAILED(hr))
         return false;
+
+    // Create cached render states
+    D3D11_DEPTH_STENCIL_DESC dsd{};
+    dsd.DepthEnable = false;
+    dsd.StencilEnable = false;
+    hr = m_device->CreateDepthStencilState(&dsd, m_depthStencilState.put());
+    if (FAILED(hr))
+        return false;
+
+    D3D11_BLEND_DESC bd{};
+    bd.AlphaToCoverageEnable = false;
+    bd.RenderTarget[0].BlendEnable = true;
+    bd.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    bd.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+    bd.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    bd.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+    bd.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+    bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    hr = m_device->CreateBlendState(&bd, m_blendState.put());
+    if (FAILED(hr))
+        return false;
+
+    D3D11_RASTERIZER_DESC rd{};
+    rd.FillMode = D3D11_FILL_SOLID;
+    rd.CullMode = D3D11_CULL_NONE;
+    rd.DepthClipEnable = false;
+    rd.ScissorEnable = false;
+    hr = m_device->CreateRasterizerState(&rd, m_rasterizerState.put());
+    if (FAILED(hr))
+        return false;
+
+    // Create cached sampler state
+    D3D11_SAMPLER_DESC sampDesc{};
+    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+    sampDesc.MinLOD = 0;
+    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+    hr = m_device->CreateSamplerState(&sampDesc, m_samplerState.put());
+    if (FAILED(hr))
+        return false;
+
+    // Initialize cached viewport to zero to ensure first update
+    memset(&m_cachedViewport, 0, sizeof(m_cachedViewport));
 
     memset(&m_prevWorldMatrix, 0, sizeof(m_prevWorldMatrix));
     m_prevWorldMatrix[0] = m_prevWorldMatrix[5] = m_prevWorldMatrix[10] = m_prevWorldMatrix[15] = 1.0f;
@@ -185,8 +232,8 @@ bool RealMotionBlurHelper::CompileShader(const char* srcData, const char* entryP
 
 void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID3D11ShaderResourceView>& frame)
 {
-    ID3D11DeviceContext* context = SwapchainHook::context;
-    ID3D11Device* device = SwapchainHook::d3d11Device;
+    ID3D11DeviceContext* context = SwapchainHook::context.get();
+    ID3D11Device* device = SwapchainHook::d3d11Device.get();
     if (!context || !device || !rtv)
     {
         return;
@@ -206,74 +253,27 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     context->OMGetRenderTargets(numRenderTargets, originalRenderTargetViews, &originalDepthStencilView);
 
 
-    D3D11_VIEWPORT viewport = {};
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-    viewport.Width    = static_cast<float>(desc.Width);
-    viewport.Height   = static_cast<float>(desc.Height);
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
-    context->RSSetViewports(1, &viewport);
+    // Only update viewport if RTV dimensions changed
+    float currentWidth = static_cast<float>(desc.Width);
+    float currentHeight = static_cast<float>(desc.Height);
+    if (m_cachedViewport.Width != currentWidth || m_cachedViewport.Height != currentHeight) {
+        m_cachedViewport.TopLeftX = 0;
+        m_cachedViewport.TopLeftY = 0;
+        m_cachedViewport.Width = currentWidth;
+        m_cachedViewport.Height = currentHeight;
+        m_cachedViewport.MinDepth = 0.0f;
+        m_cachedViewport.MaxDepth = 1.0f;
+    }
+    context->RSSetViewports(1, &m_cachedViewport);
 
-    FLOAT backgroundColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    context->ClearRenderTargetView(rtv, backgroundColor);
+    context->ClearRenderTargetView(rtv, BACKGROUND_COLOR);
 
     context->OMSetRenderTargets(1, &rtv, originalDepthStencilView);
 
-    // -------------------------------
-    // Create and set Depth–Stencil State
-    // -------------------------------
-    D3D11_DEPTH_STENCIL_DESC dsd = {};
-    dsd.DepthEnable = false;
-    dsd.StencilEnable = false;
-    ID3D11DepthStencilState* pDepthStencilState = nullptr;
-    HRESULT hr = device->CreateDepthStencilState(&dsd, &pDepthStencilState);
-    if (FAILED(hr))
-    {
-        return;
-    }
-    context->OMSetDepthStencilState(pDepthStencilState, 0);
-
-    // -------------------------------
-    // Create and set Blend State
-    // -------------------------------
-    D3D11_BLEND_DESC bd = {};
-    ZeroMemory(&bd, sizeof(bd));
-    bd.AlphaToCoverageEnable = false;
-    bd.RenderTarget[0].BlendEnable = true;
-    bd.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-    bd.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-    bd.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-    bd.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-    bd.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
-    bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-    bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-    ID3D11BlendState* pBlendState = nullptr;
-    hr = device->CreateBlendState(&bd, &pBlendState);
-    if (FAILED(hr))
-    {
-        pDepthStencilState->Release();
-        return;
-    }
-    context->OMSetBlendState(pBlendState, nullptr, 0xffffffff);
-
-    // -------------------------------
-    // Create and set Rasterizer State
-    // -------------------------------
-    D3D11_RASTERIZER_DESC rd = {};
-    rd.FillMode = D3D11_FILL_SOLID;
-    rd.CullMode = D3D11_CULL_NONE;
-    rd.DepthClipEnable = false;
-    rd.ScissorEnable = false;
-    ID3D11RasterizerState* pRasterizerState = nullptr;
-    hr = device->CreateRasterizerState(&rd, &pRasterizerState);
-    if (FAILED(hr))
-    {
-        pDepthStencilState->Release();
-        pBlendState->Release();
-        return;
-    }
-    context->RSSetState(pRasterizerState);
+    // Use cached render states (no recreation overhead)
+    context->OMSetDepthStencilState(m_depthStencilState.get(), 0);
+    context->OMSetBlendState(m_blendState.get(), nullptr, 0xffffffff);
+    context->RSSetState(m_rasterizerState.get());
 
     // -------------------------------
     // Process scene and update constant buffer.
@@ -292,45 +292,34 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
 
     auto module = ModuleManager::getModule("Motion Blur");
     D3D11_MAPPED_SUBRESOURCE mappedResource;
-    if (SUCCEEDED(context->Map(m_constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+    if (SUCCEEDED(context->Map(m_constantBuffer.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
     {
         CameraDataBuffer* pData = (CameraDataBuffer*)mappedResource.pData;
         pData->intensity = module->getOps<float>("intensity");
         memcpy(pData->preWorldViewProjection, m_prevWorldMatrix, sizeof(pData->preWorldViewProjection));
         memcpy(pData->invWorldViewProjection, &invCurrWVP[0][0], sizeof(pData->invWorldViewProjection));
-        context->Unmap(m_constantBuffer, 0);
+        context->Unmap(m_constantBuffer.get(), 0);
     }
 
     // -------------------------------
     // Set up pipeline states.
     // -------------------------------
-    context->IASetInputLayout(m_inputLayout);
-    UINT stride = sizeof(float) * 5;
-    UINT offset = 0;
-    context->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
+    context->IASetInputLayout(m_inputLayout.get());
+    ID3D11Buffer* vertexBuffer = m_vertexBuffer.get();
+    context->IASetVertexBuffers(0, 1, &vertexBuffer, &VERTEX_STRIDE, &VERTEX_OFFSET);
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-    context->VSSetShader(m_vertexShader, nullptr, 0);
-    context->PSSetShader(m_pixelShader, nullptr, 0);
-    context->PSSetConstantBuffers(0, 1, &m_constantBuffer);
+    context->VSSetShader(m_vertexShader.get(), nullptr, 0);
+    context->PSSetShader(m_pixelShader.get(), nullptr, 0);
+    ID3D11Buffer* constantBuffer = m_constantBuffer.get();
+    context->PSSetConstantBuffers(0, 1, &constantBuffer);
 
     context->PSSetShaderResources(0, 1, &sceneSRV);
 
-    ID3D11SamplerState* sampler = nullptr;
-    D3D11_SAMPLER_DESC sampDesc = {};
-    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-    sampDesc.MinLOD = 0;
-    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-    hr = device->CreateSamplerState(&sampDesc, &sampler);
-    if (SUCCEEDED(hr))
-    {
-        context->PSSetSamplers(0, 1, &sampler);
-        // Also set the same sampler for the depth SRV on slot 1.
-        context->PSSetSamplers(1, 1, &sampler);
-    }
+    // Use cached sampler state
+    ID3D11SamplerState* samplerPtr = m_samplerState.get();
+    context->PSSetSamplers(0, 1, &samplerPtr);
+    // Also set the same sampler for the depth SRV on slot 1.
+    context->PSSetSamplers(1, 1, &samplerPtr);
 
     // -------------------------------
     // Draw the geometry.
@@ -341,11 +330,7 @@ void RealMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, winrt::com_ptr<ID
     context->PSSetShaderResources(0, 1, nullSRV);
     context->PSSetShaderResources(1, 1, nullSRV);
 
-    if (sampler)
-        sampler->Release();
-    pRasterizerState->Release();
-    pBlendState->Release();
-    pDepthStencilState->Release();
+    // Cached states are cleaned up in ResizeHook::cleanShit
     if (originalDepthStencilView) originalDepthStencilView->Release();
     for (UINT i = 0; i < numRenderTargets; ++i) {
         if (originalRenderTargetViews[i]) originalRenderTargetViews[i]->Release();
