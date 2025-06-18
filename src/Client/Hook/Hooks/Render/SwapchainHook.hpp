@@ -10,6 +10,7 @@
 
 #include "kiero/kiero.h"
 #include "../../../../SDK/Client/Render/FrameTransform.hpp"
+#include <atomic>
 
 struct FrameContext {
 	ID3D12CommandAllocator* commandAllocator = nullptr;
@@ -55,6 +56,9 @@ public:
     static inline bool queueReset = true;
 
     SwapchainHook();
+    static bool initImgui;
+    static inline std::atomic<bool> imguiCleanupInProgress{false};
+    static inline int dx12FrameCount = 0;
 
     void enableHook() override;
 
@@ -106,6 +110,14 @@ public:
     static inline int transformDelay = 3;
 
     static inline UINT flagsreal;
+    
+    // Cached resources for DX11
+    static inline ID3D11RenderTargetView* cachedDX11RTV = nullptr;
+    
+    // Cached resources for DX12
+    static inline std::vector<ID3D11RenderTargetView*> cachedDX12RTVs;
+    static inline ID3D12Fence* cachedDX12Fence = nullptr;
+    static inline UINT64 cachedDX12FenceValue = 0;
 
     // Consolidated descriptor heap management functions
     static bool AllocateImageDescriptor(UINT imageId, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle);

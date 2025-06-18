@@ -32,7 +32,7 @@ SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
 ID3D12CommandQueue *SwapchainHook::queue = nullptr;
 HANDLE SwapchainHook::fenceEvent = nullptr;
 
-bool initImgui = false;
+bool SwapchainHook::initImgui = false;
 bool allfontloaded = false;
 bool first = false;
 bool imguiWindowInit = false;
@@ -177,6 +177,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         initImgui = false;
         Logger::debug("Resetting SwapChain");
         ResizeHook::cleanShit(false);
+        queueReset = false;
         return DXGI_ERROR_DEVICE_RESET;
     }
 
@@ -297,7 +298,7 @@ void SwapchainHook::DX11Init() {
     // Create D2D context
     HRESULT hr = D2D1CreateDeviceContext(backBuffer, properties, &D2D::context);
     if (FAILED(hr) || !D2D::context) {
-        Logger::error("Failed to create D2D1 device context: 0x{:X}", hr);
+        Logger::error("Failed to create D2D1 device context: {}", Logger::getHRESULTError(hr));
         Memory::SafeRelease(backBuffer);
         return;
     }
@@ -313,10 +314,27 @@ void SwapchainHook::DX11Init() {
     Memory::SafeRelease(backBuffer);
 
     // Initialize ImGui once
-    if (!initImgui) {
-        ImGui::CreateContext();
-        ImGui_ImplWin32_Init(window2);
-        ImGui_ImplDX11_Init(d3d11Device, context);
+    if (!initImgui && !imguiCleanupInProgress) {
+        // Wait for any ongoing cleanup to complete
+        while (imguiCleanupInProgress) {
+            Sleep(1);
+        }
+        
+        if (!ImGui::GetCurrentContext()) {
+            ImGui::CreateContext();
+        }
+        
+        // Check if Win32 backend is already initialized
+        auto& io = ImGui::GetIO();
+        if (!io.BackendPlatformUserData) {
+            ImGui_ImplWin32_Init(window2);
+        }
+        
+        // Check if DX11 backend is already initialized
+        if (!io.BackendRendererUserData) {
+            ImGui_ImplDX11_Init(d3d11Device, context);
+        }
+        
         initImgui = true;
     }
 
@@ -360,7 +378,7 @@ void SwapchainHook::DX12Init() {
     );
     
     if (FAILED(hr) || !d3d11Device) {
-        Logger::error("Failed to create D3D11on12 device: 0x{:X}", hr);
+        Logger::error("Failed to create D3D11on12 device: {}", Logger::getHRESULTError(hr));
         return;
     }
     
@@ -378,7 +396,7 @@ void SwapchainHook::DX12Init() {
     );
     
     if (FAILED(hr) || !d2dFactory) {
-        Logger::error("Failed to create D2D1 factory: 0x{:X}", hr);
+        Logger::error("Failed to create D2D1 factory: {}", Logger::getHRESULTError(hr));
         return;
     }
     
@@ -473,12 +491,26 @@ void SwapchainHook::DX12Init() {
         
         // Create D2D bitmap
         D2D::context->CreateBitmapFromDxgiSurface(DXGISurfaces[i], bitmapProps, &D2D1Bitmaps[i]);
+        
+        // Note: We don't release backBuffer here because frameContexts[i].main_render_target_resource holds a reference
     }
     
     // Initialize ImGui for DX12
-    if (!initImgui) {
-        ImGui::CreateContext();
-        ImGui_ImplWin32_Init(window2);
+    if (!initImgui && !imguiCleanupInProgress) {
+        // Wait for any ongoing cleanup to complete
+        while (imguiCleanupInProgress) {
+            Sleep(1);
+        }
+        
+        if (!ImGui::GetCurrentContext()) {
+            ImGui::CreateContext();
+        }
+        
+        // Check if Win32 backend is already initialized
+        auto& io = ImGui::GetIO();
+        if (!io.BackendPlatformUserData) {
+            ImGui_ImplWin32_Init(window2);
+        }
         
         // Modern ImGui D3D12 initialization
         ImGui_ImplDX12_InitInfo initInfo = {};
@@ -506,7 +538,13 @@ void SwapchainHook::DX12Init() {
             // No-op for persistent font descriptor
         };
         
-        ImGui_ImplDX12_Init(&initInfo);
+        // Check if DX12 backend is already initialized
+        if (!io.BackendRendererUserData) {
+            if (!ImGui_ImplDX12_Init(&initInfo)) {
+                Logger::error("Failed to initialize ImGui DX12 backend");
+                return;
+            }
+        }
         initImgui = true;
     }
     
@@ -517,6 +555,10 @@ void SwapchainHook::DX12Init() {
     
     // Initialize blur and motion blur
     Blur::InitializePipeline();
+    
+    // Reset frame counter for clearing
+    dx12FrameCount = 0;
+    
     init = true;
 }
 
@@ -529,8 +571,7 @@ void SwapchainHook::DX11Render(bool underui) {
     // Save backbuffer for effects
     SaveBackbuffer(underui);
 
-    // Cache for RTV to avoid recreation each frame
-    static ID3D11RenderTargetView* cachedRTV = nullptr;
+    // Use static cached RTV from header
     static UINT lastBufferWidth = 0, lastBufferHeight = 0;
     
     // Get current backbuffer dimensions
@@ -543,9 +584,9 @@ void SwapchainHook::DX11Render(bool underui) {
     backBuffer->GetDesc(&desc);
     
     // Only recreate RTV if dimensions changed
-    if (!cachedRTV || desc.Width != lastBufferWidth || desc.Height != lastBufferHeight) {
-        Memory::SafeRelease(cachedRTV);
-        if (FAILED(d3d11Device->CreateRenderTargetView(backBuffer, nullptr, &cachedRTV))) {
+    if (!cachedDX11RTV || desc.Width != lastBufferWidth || desc.Height != lastBufferHeight) {
+        Memory::SafeRelease(cachedDX11RTV);
+        if (FAILED(d3d11Device->CreateRenderTargetView(backBuffer, nullptr, &cachedDX11RTV))) {
             Memory::SafeRelease(backBuffer);
             return;
         }
@@ -576,11 +617,11 @@ void SwapchainHook::DX11Render(bool underui) {
     // Trigger render events
     if (!underui) {
         auto event = nes::make_holder<RenderEvent>();
-        event->RTV = cachedRTV;
+        event->RTV = cachedDX11RTV;
         eventMgr.trigger(event);
     } else {
         auto event = nes::make_holder<RenderUnderUIEvent>();
-        event->RTV = cachedRTV;
+        event->RTV = cachedDX11RTV;
         eventMgr.trigger(event);
     }
 
@@ -605,7 +646,7 @@ void SwapchainHook::DX11Render(bool underui) {
     ImGui::Render();
 
     // Render ImGui draw data
-    context->OMSetRenderTargets(1, &cachedRTV, originalDSV);
+    context->OMSetRenderTargets(1, &cachedDX11RTV, originalDSV);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
     // Restore original render targets
@@ -650,30 +691,29 @@ void SwapchainHook::DX12Render(bool underui) {
         ImGuiWindowFlags_NoDecoration);
     
     // Create RTV for events (cache per buffer)
-    static std::vector<ID3D11RenderTargetView*> cachedRTVs;
-    if (cachedRTVs.size() != bufferCount) {
+    if (cachedDX12RTVs.size() != bufferCount) {
         // Clean up old RTVs
-        for (auto rtv : cachedRTVs) {
+        for (auto rtv : cachedDX12RTVs) {
             Memory::SafeRelease(rtv);
         }
-        cachedRTVs.resize(bufferCount, nullptr);
+        cachedDX12RTVs.resize(bufferCount, nullptr);
     }
     
-    if (!cachedRTVs[currentBitmap]) {
+    if (!cachedDX12RTVs[currentBitmap]) {
         ID3D11Texture2D* buffer2D = nullptr;
         D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&buffer2D));
-        d3d11Device->CreateRenderTargetView(buffer2D, nullptr, &cachedRTVs[currentBitmap]);
+        d3d11Device->CreateRenderTargetView(buffer2D, nullptr, &cachedDX12RTVs[currentBitmap]);
         Memory::SafeRelease(buffer2D);
     }
     
     // Trigger render events
     if (!underui) {
         auto event = nes::make_holder<RenderEvent>();
-        event->RTV = cachedRTVs[currentBitmap];
+        event->RTV = cachedDX12RTVs[currentBitmap];
         eventMgr.trigger(event);
     } else {
         auto event = nes::make_holder<RenderUnderUIEvent>();
-        event->RTV = cachedRTVs[currentBitmap];
+        event->RTV = cachedDX12RTVs[currentBitmap];
         eventMgr.trigger(event);
     }
     
@@ -719,6 +759,15 @@ void SwapchainHook::DX12Render(bool underui) {
         &frameContexts[currentBitmap].main_render_target_descriptor,
         FALSE, nullptr);
     
+    // Clear render target on first few frames to avoid garbage data
+    if (dx12FrameCount < 5) {
+        const float clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        d3d12CommandList->ClearRenderTargetView(
+            frameContexts[currentBitmap].main_render_target_descriptor,
+            clearColor, 0, nullptr);
+        dx12FrameCount++;
+    }
+    
     // Set descriptor heap
     d3d12CommandList->SetDescriptorHeaps(1, &d3d12DescriptorHeapImGuiRender);
     
@@ -739,19 +788,15 @@ void SwapchainHook::DX12Render(bool underui) {
     queue->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList* const*>(&d3d12CommandList));
     
     // Use cached fence for synchronization
-    static ID3D12Fence* fence = nullptr;
-    static UINT64 fenceValue = 0;
-    
-    if (!fence) {
-        d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+    if (!cachedDX12Fence) {
+        d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&cachedDX12Fence));
     }
     
-    const UINT64 currentFenceValue = ++fenceValue;
-    queue->Signal(fence, currentFenceValue);
+    const UINT64 currentFenceValue = ++cachedDX12FenceValue;
+    queue->Signal(cachedDX12Fence, currentFenceValue);
     
     // Wait if necessary
-    if (fence->GetCompletedValue() < currentFenceValue) {
-        fence->SetEventOnCompletion(currentFenceValue, fenceEvent);
+        cachedDX12Fence->SetEventOnCompletion(currentFenceValue, fenceEvent);
         WaitForSingleObject(fenceEvent, INFINITE);
     }
 }
