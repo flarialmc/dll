@@ -4,6 +4,18 @@
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
+void OffsetInit::init2190() {
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.9X");
+
+    ADD_OFFSET("Actor::baseTickVft", 25);
+
+    ADD_OFFSET("Level::hitResult", 0x1E0);
+    ADD_OFFSET("Level::getPlayerMap", 0x4E0);
+
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x3F0);
+    ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x664);
+}
+
 void OffsetInit::init2180() {
     Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.8X");
     ADD_OFFSET("ClientInstance::getBlockSource", 31);
