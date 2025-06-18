@@ -186,6 +186,11 @@ void ResizeHook::cleanShit(bool isResize) {
     FlarialGUI::textFormatCache.clear();
     FlarialGUI::textLayoutCache.clear();
 
+    for (auto& frameContext : SwapchainHook::frameContexts) {
+        Memory::SafeRelease(frameContext.main_render_target_resource);
+    }
+    SwapchainHook::frameContexts.clear();
+
     if (SwapchainHook::init && SwapchainHook::d3d11On12Device != nullptr) {
         // Release RTV descriptor heap first - it has references to backbuffers
         Memory::SafeRelease(SwapchainHook::D3D12DescriptorHeap);
@@ -241,15 +246,9 @@ void ResizeHook::cleanShit(bool isResize) {
             Memory::SafeRelease(surface);
         }
         SwapchainHook::DXGISurfaces.clear();
-        
-        // Clean up frame contexts resources
-        for (auto& frameContext : SwapchainHook::frameContexts) {
-            // Don't release commandAllocator here as it's shared
-            Memory::SafeRelease(frameContext.main_render_target_resource);
-        }
-        SwapchainHook::frameContexts.clear();
 
-        // Context already cleared at the beginning of cleanShit()
+        // Clean up frame contexts resources
+
         
         // Release D2D/DXGI resources
         Memory::SafeRelease(SwapchainHook::context);

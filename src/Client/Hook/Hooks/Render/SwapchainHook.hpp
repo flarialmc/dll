@@ -14,8 +14,8 @@
 #include <atomic>
 
 struct FrameContext {
-	winrt::com_ptr<ID3D12CommandAllocator> commandAllocator = nullptr;
-	winrt::com_ptr<ID3D12Resource> main_render_target_resource = nullptr;
+	winrt::com_ptr<ID3D12CommandAllocator> commandAllocator;
+	winrt::com_ptr<ID3D12Resource> main_render_target_resource;
 	D3D12_CPU_DESCRIPTOR_HANDLE main_render_target_descriptor;
 };
 
