@@ -182,7 +182,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         return DXGI_ERROR_DEVICE_RESET;
     }
 
-    swapchain.copy_from(pSwapChain);
+    swapchain = pSwapChain;
     flagsreal = flags;
 
     UnderUIHooks::index = 0;
@@ -464,7 +464,8 @@ void SwapchainHook::DX12Init() {
         D2D1::PixelFormat(DXGI_FORMAT_R8G8B8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
         dpi, dpi
     );
-    
+
+    frameContexts.reserve(bufferCount);
     for (UINT i = 0; i < bufferCount; i++) {
         winrt::com_ptr<ID3D12Resource> backBuffer;
         swapchain->GetBuffer(i, IID_PPV_ARGS(backBuffer.put()));

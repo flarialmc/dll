@@ -245,7 +245,7 @@ void ResizeHook::cleanShit(bool isResize) {
         // Clean up frame contexts resources
         for (auto& frameContext : SwapchainHook::frameContexts) {
             // Don't release commandAllocator here as it's shared
-            Memory::SafeRelease(frameContext.main_render_target_resource);
+            frameContext.main_render_target_resource = nullptr;
         }
         SwapchainHook::frameContexts.clear();
 
