@@ -182,7 +182,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
         return DXGI_ERROR_DEVICE_RESET;
     }
 
-    swapchain.copy_from(pSwapChain);
+    swapchain = pSwapChain;
     flagsreal = flags;
 
     UnderUIHooks::index = 0;
