@@ -64,6 +64,11 @@ public:
         return std::make_pair((parentWidth - childWidth) / 2, (parentHeight - childHeight) / 2);
     }
 
+    void onSetupAndRender(SetupAndRenderEvent &event) override {
+        if (module->active)
+            SDK::clientInstance->releaseMouse();
+
+    }
     void onRender(RenderEvent &event) override {
         float allahu = Constraints::RelativeConstraint(0.65);
         float akbar = Constraints::RelativeConstraint(0.25);
