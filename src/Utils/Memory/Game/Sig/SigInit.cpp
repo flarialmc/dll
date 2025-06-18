@@ -3,6 +3,15 @@
 
 #include "../SignatureAndOffsetManager.hpp"
 
+void SigInit::init2190() {
+    Logger::debug("[Signatures] Loading sigs for 1.21.9X");
+    ADD_SIG("ThirdPersonNametag", "0F 84 24 05 00 00 49 8B 45 00");
+    ADD_SIG("Options::getGamma", "48 83 EC 28 80 B9 48 19 00 00 00 48 8D 54 24 30 48 8B 01 48 8B 40 60 74 38 41 B8 1A");
+    ADD_SIG("HurtColor", "E8 ? ? ? ? 0F 28 05 ? ? ? ? 0F 11 85 F8 01 00 00"); // RenderController::getOverlayColor
+    ADD_SIG("Actor::baseTick", "48 8D 05 ? ? ? ? 48 89 01 BA 33 00 00 00 44 8D 4A 04 44 8D 42 02 66 C7 44 24 20 39 00 E8 ? ? ? ? 48 8D 8F E0 0D 00 00");
+    ADD_SIG("CameraYaw2", "F3 0F 11 40 ? 48 8D 9F");
+}
+
 void SigInit::init2180() {
     Logger::debug("[Signatures] Loading sigs for 1.21.8X");
     ADD_SIG("Options::getGamma", "48 83 EC ? 80 B9 00 19 00 00 ? 48 8D ? ? ? 48 8B ? 48 8B ? ? 74 ? 41 B8 ? ? ? ? FF 15 ? ? ? ? 48 8B ? 48 85 ? 74 ? 48 8B ? ? 48 8B ? ? ? ? ? 48 85 ? 74 ? E8 ? ? ? ? 48 83 C4 ? C3 F3 0F ? ? ? 48 83 C4 ? C3 41 B8 ? ? ? ? FF 15 ? ? ? ? 48 8B ? 48 85 ? 75 ? E8 ? ? ? ? CC E8 ? ? ? ? CC CC CC CC CC CC CC CC CC CC CC CC CC CC CC CC 48 89");
