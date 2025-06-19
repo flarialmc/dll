@@ -19,6 +19,7 @@ void DirectionHUD::defaultConfig() {
     Module::defaultConfig("pos");
     Module::defaultConfig("main");
     setDef("moreScales", true);
+    setDef("hideWhenTabList", true);
     setDef("pixelsPerDegree", 1.5f);
     setDef("wrapFade", true);
     setDef("fadeDistancePerc", 75.f);
@@ -55,7 +56,6 @@ void DirectionHUD::defaultConfig() {
     setDef("degreesTextShadow", true);
     setDef("degreesTextShadow", (std::string)"000000", 1.f, false);
     setDef("degreesTextShadowOffset", 0.003f);
-    
 }
 
 void DirectionHUD::settingsRender(float settingsOffset) {
@@ -71,10 +71,10 @@ void DirectionHUD::settingsRender(float settingsOffset) {
 
     addHeader("Direction HUD");
     defaultAddSettings("main");
+    addToggle("Hide on TabList enable", "", "hideWhenTabList");
     addSlider("Pixels Per Degree", "", "pixelsPerDegree", 20.f, 0.001f);
     addToggle("Wrap Around Fade", "", "wrapFade");
     addConditionalSlider(getOps<bool>("wrapFade"), "Fade Distance", "", "fadeDistancePerc", 99, 1);
-
 
     extraPadding();
 
@@ -160,6 +160,7 @@ void DirectionHUD::onRender(RenderEvent &event) {
     if (!this->isEnabled()) return;
     if (!SDK::clientInstance || !SDK::clientInstance->getLocalPlayer()) return;
     if (SDK::getCurrentScreen() != "hud_screen") return;
+    if (getOps<bool>("hideWhenTabList") && ModuleManager::getModule("Tab List") != nullptr && ModuleManager::getModule("Tab List")->active) return;
 
     LocalPlayer* player = SDK::clientInstance->getLocalPlayer();
     ActorRotationComponent* rotationComponent = player->getActorRotationComponent();

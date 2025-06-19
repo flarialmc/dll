@@ -72,7 +72,7 @@ void JavaDebugMenu::defaultConfig() {
 	setDef("showTargetedBlockTags", true);
 	setDef("showMaxTags", true);
 	setDef("noOfTags", 10.0f);
-	
+
 }
 
 void JavaDebugMenu::customToggle(std::string text, std::string subtext, std::string settingName) {
@@ -367,7 +367,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 						getOnePercLows();
 						last1PercLowUpdate = now;
 					}
-					left.emplace_back(std::format("1% Lows: {:.2f} FPS", cached1PercLow));
+					left.emplace_back(std::format("1% Lows: {:.0f} FPS", cached1PercLow));
 				}
 			}
 			left.emplace_back(std::format("Frametime: {:.2f}ms", MC::frameTime));
@@ -561,6 +561,11 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 		// frametime graph start
 
+		if (isOn("showFTgraph") || isOn("showOnePercLows")) {
+			while (prevFrameTimes.size() >= static_cast<int>(Constraints::SpacingConstraint(getOps<float>("FTgraphWidth") * 10, uiscaleConst) / Constraints::SpacingConstraint(getOps<float>("FTbarWidth"), uiscaleConst))) prevFrameTimes.pop_front();
+			prevFrameTimes.push_back(MC::frameTime);
+		}
+
 		if (getOps<bool>("showFTgraph")) {
 			float max = 1000.f / 30;
 			float maxRectHeight = Constraints::SpacingConstraint(getOps<float>("FTgraphHeight") * 10, uiscaleConst);
@@ -571,9 +576,6 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			float startX = borderSize;
 
 			int graphLen = static_cast<int>(maxRectWidth / barWidth);
-
-			while (prevFrameTimes.size() >= graphLen) prevFrameTimes.pop_front();
-			prevFrameTimes.push_back(MC::frameTime);
 
 			FlarialGUI::RoundedRect(
 				borderSize, startHeight,
