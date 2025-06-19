@@ -678,7 +678,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 
 		// frametime graph end
 
-		if (ModuleManager::getModule("ClickGUI")->active || (!getOps<bool>("f5crosshair") && curPerspective == Perspective::ThirdPersonBack)) return;
+		if (ModuleManager::getModule("ClickGUI")->active || (!getOps<bool>("f5crosshair") && curPerspective != Perspective::FirstPerson)) return;
 
 		// debug menu crosshair start
 
