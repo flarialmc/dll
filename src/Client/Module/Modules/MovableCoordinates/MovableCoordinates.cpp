@@ -40,7 +40,7 @@ void MovableCoordinates::defaultConfig()
 {
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void MovableCoordinates::settingsRender(float settingsOffset)

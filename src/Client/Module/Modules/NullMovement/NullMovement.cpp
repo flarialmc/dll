@@ -14,6 +14,7 @@ void NullMovement::onEnable()
 {
     parser.parseOptionsFile();
     Listen(this, KeyEvent, &NullMovement::onKey)
+    Listen(this, TickEvent, &NullMovement::onTick)
 
     Module::onEnable();
 }
@@ -21,6 +22,7 @@ void NullMovement::onEnable()
 void NullMovement::onDisable()
 {
     Deafen(this, KeyEvent, &NullMovement::onKey)
+    Deafen(this, TickEvent, &NullMovement::onTick)
     Module::onDisable();
 }
 
@@ -29,7 +31,7 @@ void NullMovement::defaultConfig()
     Module::defaultConfig("core");
     setDef("horizontal", true);
     setDef("vertical", false);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void NullMovement::settingsRender(float settingsOffset)
@@ -55,6 +57,67 @@ void NullMovement::settingsRender(float settingsOffset)
 
 }
 
+void NullMovement::onTick(TickEvent& event)
+{
+    if (!this->isEnabled()) return;
+    
+    static int forwardKey = safe_stoi(parser.options["keyboard_type_0_key.forward"]);
+    static int backwardKey = safe_stoi(parser.options["keyboard_type_0_key.back"]);
+    static int leftKey = safe_stoi(parser.options["keyboard_type_0_key.left"]);
+    static int rightKey = safe_stoi(parser.options["keyboard_type_0_key.right"]);
+
+    if (SDK::clientInstance != nullptr && SDK::clientInstance->getLocalPlayer() != nullptr) {
+        auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
+        if (handler != nullptr) {
+            if (!movementKeyStack.empty()) {
+                int lastKey = movementKeyStack.back();
+                
+                if (getOps<bool>("vertical")) {
+                    if (lastKey == forwardKey) {
+                        handler->mInputState.forward = true;
+                        handler->mRawInputState.forward = true;
+                        handler->mInputState.backward = false;
+                        handler->mRawInputState.backward = false;
+                    } else if (lastKey == backwardKey) {
+                        handler->mInputState.forward = false;
+                        handler->mRawInputState.forward = false;
+                        handler->mInputState.backward = true;
+                        handler->mRawInputState.backward = true;
+                    }
+                }
+                
+                if (getOps<bool>("horizontal")) {
+                    if (lastKey == leftKey) {
+                        handler->mInputState.left = true;
+                        handler->mRawInputState.left = true;
+                        handler->mInputState.right = false;
+                        handler->mRawInputState.right = false;
+                    } else if (lastKey == rightKey) {
+                        handler->mInputState.left = false;
+                        handler->mRawInputState.left = false;
+                        handler->mInputState.right = true;
+                        handler->mRawInputState.right = true;
+                    }
+                }
+            } else {
+                if (getOps<bool>("vertical")) {
+                    handler->mInputState.forward = false;
+                    handler->mRawInputState.forward = false;
+                    handler->mInputState.backward = false;
+                    handler->mRawInputState.backward = false;
+                }
+                
+                if (getOps<bool>("horizontal")) {
+                    handler->mInputState.left = false;
+                    handler->mRawInputState.left = false;
+                    handler->mInputState.right = false;
+                    handler->mRawInputState.right = false;
+                }
+            }
+        }
+    }
+}
+
 void NullMovement::onKey(KeyEvent& event)
 {
     if (!this->isEnabled()) return;
@@ -62,12 +125,10 @@ void NullMovement::onKey(KeyEvent& event)
     lastKeys = event.keys;
     lastAction = event.getAction();
 
-
     static int forwardKey = safe_stoi(parser.options["keyboard_type_0_key.forward"]);
     static int backwardKey = safe_stoi(parser.options["keyboard_type_0_key.back"]);
     static int leftKey = safe_stoi(parser.options["keyboard_type_0_key.left"]);
     static int rightKey = safe_stoi(parser.options["keyboard_type_0_key.right"]);
-
 
     bool isMovementKey = (lastKey == forwardKey ||
         lastKey == backwardKey ||
@@ -78,6 +139,7 @@ void NullMovement::onKey(KeyEvent& event)
 
     if (!isMovementKey)
         return;
+        
     if (lastAction == ActionType::Pressed) {
         auto it = std::find(movementKeyStack.begin(), movementKeyStack.end(), lastKey);
         if (it != movementKeyStack.end()) {
@@ -90,14 +152,6 @@ void NullMovement::onKey(KeyEvent& event)
             std::remove(movementKeyStack.begin(), movementKeyStack.end(), lastKey),
             movementKeyStack.end()
         );
-    }
-
-    if (!movementKeyStack.empty()) {
-        int lastKey = movementKeyStack.back();
-        if (lastKey == forwardKey && getOps<bool>("vertical"))  KeyHook::funcOriginal(backwardKey, 0);
-        else if (lastKey == backwardKey && getOps<bool>("vertical")) KeyHook::funcOriginal(forwardKey, 0);
-        else if (lastKey == leftKey && getOps<bool>("horizontal")) KeyHook::funcOriginal(rightKey, 0);
-        else if (lastKey == rightKey && getOps<bool>("horizontal")) KeyHook::funcOriginal(leftKey, 0);
     }
 }
 

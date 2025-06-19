@@ -12,7 +12,7 @@ void LowHealthIndicator::defaultConfig()
     setDef("health", 12.f);
     setDef("maxopacity", 0.7f);
     setDef("health", (std::string)"FF0000", 1.f, false);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void LowHealthIndicator::settingsRender(float settingsOffset)

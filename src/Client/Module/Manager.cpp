@@ -85,6 +85,7 @@
 #include "Modules/MovableCoordinates/MovableCoordinates.hpp"
 #include "Modules/MovableHotbar/MovableHotbar.hpp"
 #include "Modules/NullMovement/NullMovement.hpp"
+#include "Modules/ModernKeybindHandling/ModernKeybindHandling.hpp"
 
 #include "Modules/RawInputBuffer/RawInputBuffer.hpp"
 #include "Modules/JavaDynamicFOV/JavaDynamicFOV.hpp"
@@ -229,7 +230,8 @@ void ModuleManager::initialize() {
 	addModule<Waypoints>();
 
 	addModule<NullMovement>();
-	addModule<CustomCrosshair>();
+	addModule<ModernKeybindHandling>();
+	if (!VersionUtils::checkAboveOrEqual(21, 90)) addModule<CustomCrosshair>();
 	addModule<Waila>();
 
 	addModule<RawInputBuffer>();
@@ -279,7 +281,6 @@ void ModuleManager::terminate() {
 	services.clear();
 }
 
-
 void ModuleManager::restart() {
 	initialized = false;
 	Client::LoadSettings();
@@ -295,6 +296,7 @@ void ModuleManager::restart() {
 			}
 		}
 	}
+	
 	initialized = true;
 	Client::PerformPostLegacySetup();
 	ScriptManager::reloadScripts();

@@ -13,7 +13,10 @@ void MotionBlur::onEnable()
 {
     if (SwapchainHook::queue) { if (!once) { FlarialGUI::Notify("Please turn on Better Frames in Settings!"); once = true; } }
     else {
+
         ListenOrdered(this, RenderUnderUIEvent, &MotionBlur::onRender, EventOrder::IMMEDIATE)
+        ListenOrdered(this, RenderEvent, &MotionBlur::onRenderNormal, EventOrder::IMMEDIATE)
+
         Module::onEnable();
     }
 }
@@ -21,6 +24,7 @@ void MotionBlur::onEnable()
 void MotionBlur::onDisable()
 {
     Deafen(this, RenderUnderUIEvent, &MotionBlur::onRender)
+    Deafen(this, RenderEvent, &MotionBlur::onRenderNormal)
     previousFrames.clear();
     Module::onDisable();
 }
@@ -30,10 +34,11 @@ void MotionBlur::defaultConfig()
     Module::defaultConfig("core");
     setDef("intensity", 0.88f);
     setDef("intensity2", 6.0f);
-    setDef("avgpixel", false);
-    setDef("dynamic", true);
+    setDef("avgpixel", true);
+    setDef("dynamic", false);
     setDef("samples", 64.f);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    setDef("renderUnderUI", true);
+    
 }
 
 void MotionBlur::settingsRender(float settingsOffset)
@@ -50,6 +55,7 @@ void MotionBlur::settingsRender(float settingsOffset)
                               Constraints::RelativeConstraint(0.88f, "height"));
 
     addHeader("Motion Blur");
+    addToggle("Render Under UI", "When enabled, renders motion blur under the UI. When disabled, renders over the UI.", "renderUnderUI");
     addToggle("Average Pixel Mode", "Disabling this will likely look better on high FPS.", "avgpixel");
 
     addConditionalToggle(getOps<bool>("avgpixel"), "Dynamic Mode", "Automatically adjusts intensity according to FPS", "dynamic");
@@ -68,6 +74,11 @@ void MotionBlur::onRender(RenderUnderUIEvent& event)
     if (!this->isEnabled()) return;
     if (SwapchainHook::queue) return;
 
+
+    if (!getOps<bool>("renderUnderUI")) {
+        return;
+    }
+
     int maxFrames = (int)round(getOps<float>("intensity2"));
 
     if (getOps<bool>("dynamic")) {
@@ -78,7 +89,50 @@ void MotionBlur::onRender(RenderUnderUIEvent& event)
         else if (MC::fps > 450) maxFrames = 5;
     }
 
-    if (getOps<bool>("avgpixel")) maxFrames = 1;
+    if (!getOps<bool>("avgpixel")) maxFrames = 1;
+
+    if (SDK::getCurrentScreen() == "hud_screen" && initted && this->isEnabled()) {
+
+        // Remove excess frames if maxFrames is reduced
+        if (previousFrames.size() > static_cast<size_t>(maxFrames)) {
+            previousFrames.erase(previousFrames.begin(),
+                                 previousFrames.begin() + (previousFrames.size() - maxFrames));
+        }
+
+        auto buffer = BackbufferToSRVExtraMode();
+        if (buffer) {
+            previousFrames.push_back(std::move(buffer));
+        }
+
+        if (getOps<bool>("avgpixel")) AvgPixelMotionBlurHelper::Render(event.RTV, previousFrames);
+        else RealMotionBlurHelper::Render(event.RTV, previousFrames.back());
+
+    }
+    else {
+        previousFrames.clear();
+    }
+}
+
+void MotionBlur::onRenderNormal(RenderEvent& event)
+{
+    if (!this->isEnabled()) return;
+    if (SwapchainHook::queue) return;
+
+    if (getOps<bool>("renderUnderUI")) {
+        return;
+    }
+
+    int maxFrames = (int)round(getOps<float>("intensity2"));
+
+    if (getOps<bool>("dynamic")) {
+        if (MC::fps < 75) maxFrames = 1;
+        else if (MC::fps < 100) maxFrames = 2;
+        else if (MC::fps < 180) maxFrames = 3;
+        else if (MC::fps > 300) maxFrames = 4;
+        else if (MC::fps > 450) maxFrames = 5;
+    }
+
+    if (!getOps<bool>("avgpixel")) maxFrames = 1;
 
     if (SDK::getCurrentScreen() == "hud_screen" && initted && this->isEnabled()) {
 

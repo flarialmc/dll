@@ -22,7 +22,7 @@ void HitPing::defaultConfig() {
     setDef("text", (std::string)"{value} ms");
     setDef("textscale", 0.80f);
     Module::defaultConfig("all");
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void HitPing::settingsRender(float settingsOffset) {

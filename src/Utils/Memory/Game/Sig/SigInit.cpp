@@ -4,6 +4,17 @@
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
+void SigInit::init2190() {
+    Logger::custom(fg(fmt::color::gold), "Signatures", "Loading sigs for 1.21.9X");
+    ADD_SIG("ThirdPersonNametag", "0F 84 24 05 00 00 49 8B 45 00");
+    ADD_SIG("Options::getGamma", "48 83 EC 28 80 B9 48 19 00 00 00 48 8D 54 24 30 48 8B 01 48 8B 40 60 74 38 41 B8 1A");
+    ADD_SIG("HurtColor", "E8 ? ? ? ? 0F 28 05 ? ? ? ? 0F 11 85 F8 01 00 00"); // RenderController::getOverlayColor
+    ADD_SIG("Actor::baseTick", "48 8D 05 ? ? ? ? 48 89 01 BA 33 00 00 00 44 8D 4A 04 44 8D 42 02 66 C7 44 24 20 39 00 E8 ? ? ? ? 48 8D 8F E0 0D 00 00");
+    ADD_SIG("CameraYaw2", "F3 0F 11 40 ? 48 8D 9F");
+    ADD_SIG("ItemInHandRenderer::renderItem", "E8 ? ? ? ? 41 0F 11 B6 ? ? ? ? C6 47");
+    ADD_SIG("LocalPlayer::applyTurnDelta", "48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 50");
+}
+
 void SigInit::init2180() {
     Logger::custom(fg(fmt::color::gold), "Signatures", "Loading sigs for 1.21.8X");
 
@@ -17,6 +28,7 @@ void SigInit::init2180() {
     //ADD_SIG("ResourcePackManager::_composeFullStack_Patch", "");
     //ADD_SIG("ResourcePackManager::_composeFullStack", "");
     //ADD_SIG("GeneralSettingsScreenController::GeneralSettingsScreenController", "");
+    ADD_SIG("LocalPlayer::applyTurnDelta", "48 8B C4 48 89 58 ? 48 89 70 ? 55 57 41 54 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 58");
     ADD_SIG("mce::TextureGroup::getTexture", "40 53 55 56 57 41 54 41 55 41 56 41 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 41 0F B6 E9");
     //ADD_SIG("LevelUtils::getTimeOfDay", "? ? ? ? ? ? ?");
 }

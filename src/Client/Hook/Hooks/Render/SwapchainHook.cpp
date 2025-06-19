@@ -25,6 +25,7 @@
 using ::IUnknown;
 
 #include "../../../Module/Modules/MotionBlur/MotionBlur.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
 
@@ -139,11 +140,6 @@ void SwapchainHook::enableHook() {
     std::string gpuName = converter.to_bytes(gpuNameW);
     MC::GPU = gpuName;
     Logger::info("GPU name: {}", gpuName.c_str());
-    if (gpuName.contains("Intel") && Client::settings.getSettingByName<bool>("forceIntel")->value) {
-        queueReset = true;
-        Client::settings.getSettingByName<bool>("killdx")->value = true;
-    }
-    /* FORCE DX11 ON INTEL DEVICES */
 
 
     Memory::SafeRelease(pFactory);
@@ -416,6 +412,8 @@ void SwapchainHook::DX11Render(bool underui) {
 
     SaveBackbuffer(underui);
 
+    if (!D2D::context) return;
+
     D2D::context->BeginDraw();
 
     ID3D11RenderTargetView *mainRenderTargetView = nullptr;
@@ -505,12 +503,13 @@ void SwapchainHook::DX12Render(bool underui) {
 
     ID3D11Resource *resource = D3D11Resources[currentBitmap];
     d3d11On12Device->AcquireWrappedResources(&resource, 1);
-
+    if (!D2D::context) return;
     SaveBackbuffer();
     D2D::context->SetTarget(D2D1Bitmaps[currentBitmap]);
     MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
     DX12Blur();
+
 
     D2D::context->BeginDraw();
 
@@ -523,7 +522,7 @@ void SwapchainHook::DX12Render(bool underui) {
 
     D3D12_DESCRIPTOR_HEAP_DESC descriptorImGuiRender = {};
     descriptorImGuiRender.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    descriptorImGuiRender.NumDescriptors = buffersCounts;
+    descriptorImGuiRender.NumDescriptors = TOTAL_CONSOLIDATED_DESCRIPTORS; // Consolidated heap for ImGui + Images
     descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
     if (d3d12DescriptorHeapImGuiRender or SUCCEEDED(d3d12Device5->CreateDescriptorHeap(&descriptorImGuiRender,
@@ -573,10 +572,45 @@ void SwapchainHook::DX12Render(bool underui) {
 
                     ImGui_ImplWin32_Init(window2);
 
-                    ImGui_ImplDX12_Init(d3d12Device5, buffersCounts,
-                                        DXGI_FORMAT_R8G8B8A8_UNORM, d3d12DescriptorHeapImGuiRender,
-                                        d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart(),
-                                        d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart());
+                    // Set up modern ImGui D3D12 initialization with consolidated descriptor heap
+                    ImGui_ImplDX12_InitInfo init_info = {};
+                    init_info.Device = d3d12Device5;
+                    init_info.CommandQueue = queue;
+                    init_info.NumFramesInFlight = buffersCounts;
+                    init_info.RTVFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+                    init_info.DSVFormat = DXGI_FORMAT_UNKNOWN;
+                    init_info.SrvDescriptorHeap = d3d12DescriptorHeapImGuiRender;
+                    
+                    // Set up descriptor allocation callbacks for consolidated heap
+                    init_info.SrvDescriptorAllocFn = [](ImGui_ImplDX12_InitInfo* info, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle) {
+                        std::lock_guard<std::mutex> lock(descriptorAllocationMutex);
+                        
+                        // ImGui font descriptor is always allocated at index 0 (reserved)
+                        UINT fontDescriptorIndex = 0;
+                        UINT handle_increment = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+                        
+                        D3D12_CPU_DESCRIPTOR_HANDLE cpu = d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
+                        cpu.ptr += (handle_increment * fontDescriptorIndex);
+                        
+                        D3D12_GPU_DESCRIPTOR_HANDLE gpu = d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
+                        gpu.ptr += (handle_increment * fontDescriptorIndex);
+                        
+                        *out_cpu_handle = cpu;
+                        *out_gpu_handle = gpu;
+                        
+                        Logger::custom(fg(fmt::color::green), "DescriptorAlloc", "Allocated ImGui font descriptor at reserved index {}", fontDescriptorIndex);
+                    };
+                    
+                    init_info.SrvDescriptorFreeFn = [](ImGui_ImplDX12_InitInfo* info, D3D12_CPU_DESCRIPTOR_HANDLE cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE gpu_handle) {
+                        // ImGui font descriptor is persistent, no need to free
+                        Logger::custom(fg(fmt::color::cyan), "DescriptorFree", "ImGui font descriptor freed (no-op)");
+                    };
+
+                    if (!ImGui_ImplDX12_Init(&init_info)) {
+                        Logger::custom(fg(fmt::color::red), "ImGui", "ERROR: Failed to initialize ImGui DX12 backend with consolidated heap");
+                    } else {
+                        Logger::custom(fg(fmt::color::green), "ImGui", "ImGui DX12 backend initialized successfully with consolidated heap");
+                    }
                 }
 
                 ImGui_ImplDX12_NewFrame();
@@ -639,7 +673,16 @@ void SwapchainHook::DX12Render(bool underui) {
                 d3d12CommandList->OMSetRenderTargets(1,
                                                      &frameContexts[currentBitmap].main_render_target_descriptor,
                                                      FALSE, nullptr);
+                // Bind consolidated descriptor heap (contains both ImGui and image descriptors)
                 d3d12CommandList->SetDescriptorHeaps(1, &d3d12DescriptorHeapImGuiRender);
+                
+                static bool loggedOnce = false;
+                if (!loggedOnce) {
+                    loggedOnce = true;
+                    Logger::custom(fg(fmt::color::green), "D3D12Render", "Using consolidated descriptor heap for Intel GPU compatibility");
+                    Logger::custom(fg(fmt::color::cyan), "D3D12Render", "Consolidated heap: 0x{:X}, Total descriptors: {}", 
+                                   reinterpret_cast<uintptr_t>(d3d12DescriptorHeapImGuiRender), TOTAL_CONSOLIDATED_DESCRIPTORS);
+                }
 
                 ImGui::End();
                 ImGui::EndFrame();
@@ -819,53 +862,97 @@ ID3D11Texture2D *SwapchainHook::GetBackbuffer() {
 }
 
 void SwapchainHook::SaveBackbuffer(bool underui) {
-    // Only release SavedD3D11BackBuffer, keep ExtraSavedD3D11BackBuffer persistent
+
     Memory::SafeRelease(SavedD3D11BackBuffer);
-    
+    Memory::SafeRelease(ExtraSavedD3D11BackBuffer);
     if (!SwapchainHook::queue) {
+
         SwapchainHook::swapchain->GetBuffer(0, IID_PPV_ARGS(&SavedD3D11BackBuffer));
 
         if (FlarialGUI::needsBackBuffer) {
-            // Check if we need to recreate ExtraSavedD3D11BackBuffer due to size change
-            D3D11_TEXTURE2D_DESC currentDesc = {};
-            SavedD3D11BackBuffer->GetDesc(&currentDesc);
-            
-            bool needsRecreate = !ExtraSavedD3D11BackBuffer || 
-                               lastBackbufferWidth != currentDesc.Width || 
-                               lastBackbufferHeight != currentDesc.Height;
-            
-            if (needsRecreate) {
-                Memory::SafeRelease(ExtraSavedD3D11BackBuffer);
-                
-                D3D11_TEXTURE2D_DESC textureDesc = currentDesc;
+
+            if (!ExtraSavedD3D11BackBuffer) {
+                D3D11_TEXTURE2D_DESC textureDesc = {};
+                SavedD3D11BackBuffer->GetDesc(&textureDesc);
                 textureDesc.Usage = D3D11_USAGE_DEFAULT;
                 textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
                 textureDesc.CPUAccessFlags = 0;
-                textureDesc.MiscFlags = 0; // Ensure no unnecessary flags
 
-                HRESULT hr = SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
-                if (SUCCEEDED(hr)) {
-                    lastBackbufferWidth = currentDesc.Width;
-                    lastBackbufferHeight = currentDesc.Height;
-                }
+                SwapchainHook::d3d11Device->CreateTexture2D(&textureDesc, nullptr, &ExtraSavedD3D11BackBuffer);
             }
 
-            // Only copy if we have a valid ExtraSavedD3D11BackBuffer
-            if (ExtraSavedD3D11BackBuffer) {
-                if (underui) {
-                    if (UnderUIHooks::bgfxCtx->m_msaart) {
-                        context->ResolveSubresource(ExtraSavedD3D11BackBuffer, 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
-                    } else {
-                        context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
-                    }
+            if (underui) {
+
+                if (UnderUIHooks::bgfxCtx->m_msaart) {
+                    context->ResolveSubresource(ExtraSavedD3D11BackBuffer, 0, UnderUIHooks::bgfxCtx->m_msaart, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
                 } else {
                     context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
                 }
+
+            } else {
+                context->CopyResource(ExtraSavedD3D11BackBuffer, SavedD3D11BackBuffer);
             }
         }
+
+
     }
     else {
-        HRESULT hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&SavedD3D11BackBuffer));
+        HRESULT hr;
+
+        hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&SavedD3D11BackBuffer));
         if (FAILED(hr)) std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
     }
+}
+
+// Consolidated descriptor heap management functions
+bool SwapchainHook::AllocateImageDescriptor(UINT imageId, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle) {
+    std::lock_guard<std::mutex> lock(descriptorAllocationMutex);
+    
+    if (!d3d12DescriptorHeapImGuiRender || !d3d12Device5) {
+        Logger::custom(fg(fmt::color::red), "DescriptorAlloc", "ERROR: Consolidated descriptor heap or device not available");
+        return false;
+    }
+    
+    // Calculate descriptor index for this image (imageId - 100 + IMGUI_FONT_DESCRIPTORS)
+    UINT descriptorIndex = (imageId - 100) + IMGUI_FONT_DESCRIPTORS;
+    
+    if (descriptorIndex >= TOTAL_CONSOLIDATED_DESCRIPTORS) {
+        Logger::custom(fg(fmt::color::red), "DescriptorAlloc", "ERROR: Image ID {} would exceed descriptor heap capacity (index {} >= {})", 
+                       imageId, descriptorIndex, TOTAL_CONSOLIDATED_DESCRIPTORS);
+        return false;
+    }
+    
+    UINT handle_increment = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    
+    D3D12_CPU_DESCRIPTOR_HANDLE cpu = d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
+    cpu.ptr += (handle_increment * descriptorIndex);
+    
+    D3D12_GPU_DESCRIPTOR_HANDLE gpu = d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
+    gpu.ptr += (handle_increment * descriptorIndex);
+    
+    *out_cpu_handle = cpu;
+    *out_gpu_handle = gpu;
+    
+    // Update next available index if this is beyond current usage
+    if (descriptorIndex >= nextAvailableDescriptorIndex) {
+        nextAvailableDescriptorIndex = descriptorIndex + 1;
+    }
+    
+
+    return true;
+}
+
+void SwapchainHook::FreeImageDescriptor(UINT imageId) {
+    std::lock_guard<std::mutex> lock(descriptorAllocationMutex);
+    
+    // For now, we don't actually free descriptors as images are persistent
+    // This could be enhanced later with proper free list management
+    Logger::custom(fg(fmt::color::cyan), "DescriptorFree", "Freed descriptor for image ID {} (no-op for persistent images)", imageId);
+}
+
+void SwapchainHook::ResetDescriptorAllocation() {
+    std::lock_guard<std::mutex> lock(descriptorAllocationMutex);
+    
+    nextAvailableDescriptorIndex = IMGUI_FONT_DESCRIPTORS; // Reset to start after ImGui font
+    Logger::custom(fg(fmt::color::yellow), "DescriptorAlloc", "Reset descriptor allocation, next available index: {}", nextAvailableDescriptorIndex);
 }

@@ -153,38 +153,40 @@ void AvgPixelMotionBlurHelper::Render(ID3D11RenderTargetView* rtv, std::vector<w
         return;
     }
 
-    // Set up viewport based on window size
-    D3D11_VIEWPORT viewport = {};
-    viewport.TopLeftX = 0;
-    viewport.TopLeftY = 0;
-    viewport.Width = MC::windowSize.x;
-    viewport.Height = MC::windowSize.y;
-    viewport.MaxDepth = 1.0f;
-    context->RSSetViewports(1, &viewport);
-
-    // Clear render target and set it
-    FLOAT backgroundColor[4] = {0.0f, 0.0f, 0.0f, 1.0f};
-    context->ClearRenderTargetView(rtv, backgroundColor);
-
     ID3D11RenderTargetView* originalRenderTargetViews[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = { nullptr };
     UINT numRenderTargets = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;
     ID3D11DepthStencilView* originalDepthStencilView = nullptr;
     context->OMGetRenderTargets(numRenderTargets, originalRenderTargetViews, &originalDepthStencilView);
 
+
+    D3D11_VIEWPORT viewport = {};
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width    = static_cast<float>(MC::windowSize.x);
+    viewport.Height   = static_cast<float>(MC::windowSize.y);
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+    context->RSSetViewports(1, &viewport);
+
+    FLOAT backgroundColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    context->ClearRenderTargetView(rtv, backgroundColor);
+
     context->OMSetRenderTargets(1, &rtv, originalDepthStencilView);
 
     // -------------------------------
-    // Create and set Depth-Stencil State
+    // Create and set Depth–Stencil State
     // -------------------------------
-    D3D11_DEPTH_STENCIL_DESC dsd{};
+    D3D11_DEPTH_STENCIL_DESC dsd = {};
     dsd.DepthEnable = false;
     dsd.StencilEnable = false;
     ID3D11DepthStencilState* pDepthStencilState = nullptr;
     HRESULT hr = device->CreateDepthStencilState(&dsd, &pDepthStencilState);
-    if (FAILED(hr)) {
+    if (FAILED(hr))
+    {
         return;
     }
     context->OMSetDepthStencilState(pDepthStencilState, 0);
+
 
     // -------------------------------
     // Create and set Blend State

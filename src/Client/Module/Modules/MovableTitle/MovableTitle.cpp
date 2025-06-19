@@ -34,7 +34,7 @@ void MovableTitle::defaultConfig()
 {
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void MovableTitle::settingsRender(float settingsOffset)

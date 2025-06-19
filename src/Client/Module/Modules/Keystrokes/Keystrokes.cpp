@@ -70,7 +70,7 @@ void Keystrokes::defaultConfig() {
 	setDef("glowEnabledAmount", 50.f);
 	setDef("glowSpeed", 1.f);
 	setDef("glowEnabled", false);
-	if (ModuleManager::initialized) Client::SaveSettings();
+	
 }
 
 void Keystrokes::settingsRender(float settingsOffset) {
@@ -248,10 +248,10 @@ void Keystrokes::normalRender(int index, std::string& value) {
 			MoveInputComponent* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
 			std::vector<bool> handlerRes = {
-				handler->forward,
-				handler->left,
-				handler->backward,
-				handler->right,
+				handler->mInputState.forward,
+				handler->mInputState.left,
+				handler->mInputState.backward,
+				handler->mInputState.right,
 				MC::heldLeft,
 				MC::heldRight,
 				handler->jumping

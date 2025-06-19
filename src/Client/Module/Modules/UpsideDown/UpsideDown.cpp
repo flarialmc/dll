@@ -30,5 +30,5 @@ void UpsideDown::onGetFOV(FOVEvent& event)
 void UpsideDown::defaultConfig()
 {
     Module::defaultConfig("core");
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Module.hpp"
+#include "Events/Game/TickEvent.hpp"
 #include "SDK/Client/Options/OptionsParser.hpp"
 
 
@@ -25,7 +26,7 @@ public:
 
 	void settingsRender(float settingsOffset) override;
 
-
+	void onTick(TickEvent& event);
 	void onKey(KeyEvent& event);
 
 	static int safe_stoi(const std::string& str);

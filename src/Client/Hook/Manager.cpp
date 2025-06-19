@@ -36,6 +36,7 @@
 #include "Hooks/Game/displayClientMessage.hpp"
 #include "Hooks/Game/getTimeOfDayHook.hpp"
 #include "Hooks/game/ReadFileHook.hpp"
+#include "Hooks/Game/ApplyTurnDeltaHook.hpp"
 
 std::vector<std::shared_ptr<Hook>> HookManager::hooks;
 
@@ -85,6 +86,7 @@ void HookManager::initialize() {
     addHook<OverworldFogColorHook>();
     addHook<TimeChangerHook>();
     addHook<SendPacketHook>();
+    addHook<ApplyTurnDeltaHook>();
     //addHook<getSensHook>();
     addHook<HudMobEffectsRendererHook>();
     if(VersionUtils::checkAboveOrEqual(20, 60)) { // due to texture group offset

@@ -171,23 +171,45 @@ public:
 		if (path.empty()) path = Utils::getConfigsPath() + "\\" + settings.getSettingByName<std::string>("currentConfig")->value;
 
 		try {
-			std::ofstream cls(path, std::ofstream::out | std::ofstream::trunc); cls.close();
-			std::ofstream cFile(path, std::ios::app);
-
-			cFile << "{";
-
-			auto it = ModuleManager::moduleMap.begin();
-			while (it != ModuleManager::moduleMap.end()) {
-				if (it->second == nullptr) {
-					++it;
-					continue;
+			// Build JSON object safely using nlohmann::json
+			nlohmann::json configJson;
+			
+			for (const auto& [key, module] : ModuleManager::moduleMap) {
+				if (module == nullptr) continue;
+				
+				// Parse module's JSON settings safely
+				try {
+					std::string moduleSettingsStr = module->settings.ToJson();
+					if (!moduleSettingsStr.empty()) {
+						nlohmann::json moduleSettings = nlohmann::json::parse(moduleSettingsStr);
+						configJson[module->name] = moduleSettings;
+					}
 				}
-				cFile << "\n  \"" << it->second->name << "\": " << it->second->settings.ToJson();
-				++it;
-				if (it != ModuleManager::moduleMap.end()) cFile << ",";
+				catch (const nlohmann::json::parse_error& e) {
+					LOG_ERROR("Failed to parse settings for module '{}': {}", module->name, e.what());
+					continue; // Skip this module but continue with others
+				}
 			}
-			cFile << "\n}";
-			cFile.close();
+			
+			// Write atomically to prevent corruption
+			std::string tempPath = path + ".tmp";
+			std::ofstream tempFile(tempPath, std::ofstream::out | std::ofstream::trunc);
+			if (!tempFile.is_open()) {
+				LOG_ERROR("Could not open temporary config file for writing");
+				return;
+			}
+			
+			tempFile << configJson.dump(2); // Pretty print with 2-space indent
+			tempFile.close();
+			
+			// Atomic move - this prevents corruption if interrupted
+			std::error_code ec;
+			std::filesystem::rename(tempPath, path, ec);
+			if (ec) {
+				LOG_ERROR("Failed to rename temporary config file: {}", ec.message());
+				std::filesystem::remove(tempPath, ec); // Cleanup temp file
+				return;
+			}
 		}
 		catch (const std::exception& e) {
 			LOG_ERROR("An error occurred while trying to save settings: {}", e.what());

@@ -1,5 +1,6 @@
 #include "Zoom.hpp"
 
+
 Zoom::Zoom() : Module("Zoom", "Allows you to see distant places.", IDR_MAGNIFY_PNG, "C")
 {
 	//this->setup();
@@ -8,20 +9,21 @@ Zoom::Zoom() : Module("Zoom", "Allows you to see distant places.", IDR_MAGNIFY_P
 void Zoom::onEnable()
 {
 	Listen(this, FOVEvent, &Zoom::onGetFOV)
-		Listen(this, SensitivityEvent, &Zoom::onGetSensitivity)
+		Listen(this, RenderEvent, &Zoom::onRender)
 		Listen(this, MouseEvent, &Zoom::onMouse)
 		Listen(this, KeyEvent, &Zoom::onKey)
 		Listen(this, SetTopScreenNameEvent, &Zoom::onSetTopScreenName)
+		Listen(this, TurnDeltaEvent, &Zoom::onTurnDeltaEvent)
 		Module::onEnable();
 }
 
 void Zoom::onDisable()
 {
 	Deafen(this, FOVEvent, &Zoom::onGetFOV)
-		Deafen(this, SensitivityEvent, &Zoom::onGetSensitivity)
+		Deafen(this, RenderEvent, &Zoom::onRender)
 		Deafen(this, MouseEvent, &Zoom::onMouse)
 		Deafen(this, KeyEvent, &Zoom::onKey)
-		Deafen(this, SetTopScreenNameEvent, &Zoom::onSetTopScreenName)
+		Deafen(this, TurnDeltaEvent, &Zoom::onTurnDeltaEvent)
 		Module::onDisable();
 }
 
@@ -37,12 +39,13 @@ void Zoom::defaultConfig()
 	setDef("hidemodules", false);
 	setDef("UseScroll", true);
 	setDef("lowsens", true);
+	setDef("lowsensStrength", 1.f);
 	setDef("toggleZoom", false);
 	//if (settings.getSettingByName<bool>("hidehud") == nullptr) settings.addSetting("hidehud", false);
 	setDef("modifier", 10.0f);
 	setDef("anim", 0.20f);
 	setDef("disableanim", false);
-	if (ModuleManager::initialized) Client::SaveSettings();
+
 }
 
 void Zoom::settingsRender(float settingsOffset)
@@ -70,28 +73,21 @@ void Zoom::settingsRender(float settingsOffset)
 	addToggle("Hide Modules", "Hides other modules when zooming.", "hidemodules");
 	addToggle("Always Animate", "Smooth zoom animation while sprinting.", "alwaysanim");
 	addToggle("Low Sensitivity", "Lower sensitivity when in zoom.", "lowsens");
+	addConditionalSlider(getOps<bool>("lowsens"), "Low Sensitivity Strength", "", "lowsensStrength", 1.f, 0.f, false);
 
 	FlarialGUI::UnsetScrollView();
 	resetPadding();
 }
 
-void Zoom::onGetFOV(FOVEvent& event)
+void Zoom::onRender(RenderEvent& event)
 {
 	if (!this->isEnabled()) return;
-	auto fov = event.getFOV();
-	if (fov == 70) return;
 
 	auto player = SDK::clientInstance->getLocalPlayer();
 	if (!player) return;
 
-	if (ModuleManager::getModule("Java Dynamic FOV").get()->isEnabled()) {
-		if (player->getActorFlag(ActorFlags::FLAG_SPRINTING)) {
-			fov = ModuleManager::getModule("Java Dynamic FOV").get()->getOps<float>("fov_target");
-		}
-	}
-
-	if (fisrtTime) { // so that it doesn't unzoom on module load
-		currentZoomVal = fov;
+	if (fisrtTime) {
+		currentZoomVal = currentFov;
 		fisrtTime = false;
 		return;
 	}
@@ -102,8 +98,8 @@ void Zoom::onGetFOV(FOVEvent& event)
 
 	if (this->active) {
 		animationFinished = false;
-		if (fov > 180) {
-			currentZoomVal = disableanim ? fov + zoomValue : std::lerp(currentZoomVal, fov + zoomValue, animspeed * FlarialGUI::frameFactor);
+		if (currentFov > 180) {
+			currentZoomVal = disableanim ? currentFov + zoomValue : std::lerp(currentZoomVal, currentFov + zoomValue, animspeed * FlarialGUI::frameFactor);
 		}
 		else {
 			currentZoomVal = disableanim ? zoomValue : std::lerp(currentZoomVal, zoomValue, animspeed * FlarialGUI::frameFactor);
@@ -111,62 +107,59 @@ void Zoom::onGetFOV(FOVEvent& event)
 	}
 	else {
 		if ((!animationFinished || alwaysanim) && !disableanim) {
-			// Only lerp if animation hasn't finished
 			if (!jdfAnimationFinished)
 			{
 				jdfAnimationFinished = true;
 			}
-			currentZoomVal = std::lerp(currentZoomVal, fov, animspeed * FlarialGUI::frameFactor);
-			if (currentZoomVal == zoomValue || std::abs(fov - currentZoomVal) < animspeed + unzoomAnimDisableTreshold) { // when fov changes due to sprinting animation used to play
-				// Set animationFinished to true only when reaching original fov
+			currentZoomVal = std::lerp(currentZoomVal, currentFov, animspeed * FlarialGUI::frameFactor);
+			if (currentZoomVal == zoomValue || std::abs(currentFov - currentZoomVal) < animspeed + unzoomAnimDisableTreshold) {
 				animationFinished = true;
 			}
 		}
 		else {
-			// Once animation finished, set current zoom to fov
-			currentZoomVal = fov;
+			currentZoomVal = currentFov;
+		}
+	}
+}
+
+void Zoom::onGetFOV(FOVEvent& event)
+{
+	if (!this->isEnabled()) return;
+	auto fov = event.getFOV();
+	if (fov == 70 || fov == 60) return;
+
+	auto player = SDK::clientInstance->getLocalPlayer();
+	if (player) {
+		currentFov = fov;
+		if (ModuleManager::getModule("Java Dynamic FOV").get()->isEnabled()) {
+			if (player->getActorFlag(ActorFlags::FLAG_SPRINTING)) {
+				currentFov = ModuleManager::getModule("Java Dynamic FOV").get()->getOps<float>("fov_target");
+			}
 		}
 	}
 
 	event.setFOV(currentZoomVal);
 }
-
-void Zoom::onGetSensitivity(SensitivityEvent& event)
-{
-	if (!this->isEnabled()) return;
-	if (this->active) {
-		if (!saved) {
-			saved = true;
-			currentSensitivity = event.getSensitivity();
-		}
-		// TODO: smoothstep
-		if (getOps<bool>("lowsens")) event.setSensitivity(currentSensitivity - (currentSensitivity * (((realFov - (zoomValue - 1)) / realFov) / 1.0f)));
-	}
-	else if (saved) {
-		saved = false;
-	}
-}
-
 void Zoom::onMouse(MouseEvent& event)
 {
 	if (!this->isEnabled()) return;
-	if (SDK::getCurrentScreen() == "hud_screen" || 
-		SDK::getCurrentScreen() == "f1_screen" || 
-		SDK::getCurrentScreen() == "zoom_screen" || 
+	if (SDK::getCurrentScreen() == "hud_screen" ||
+		SDK::getCurrentScreen() == "f1_screen" ||
+		SDK::getCurrentScreen() == "zoom_screen" ||
 		SDK::getCurrentScreen() == "f3_screen")
 		if (this->active) {
 			//todo make it so that modules work together
 			auto fovchanger = ModuleManager::getModule("FOV Changer");
 			auto upsidedown = ModuleManager::getModule("Upside Down");
 			if (getOps<bool>("UseScroll") == true) {
-				if (MC::mouseAction == MouseAction::ScrollUp) {
+				if (event.getAction() == MouseAction::ScrollUp) {
 					if ((fovchanger != nullptr &&
 						fovchanger->getOps<float>("fovvalue") > 180) ||
 						(upsidedown != nullptr && upsidedown->isEnabled()))
 						zoomValue += getOps<float>("modifier");
 					else zoomValue -= getOps<float>("modifier");
 				}
-				if (MC::mouseAction != MouseAction::ScrollUp && MC::mouseButton == MouseButton::Scroll) {
+				if (event.getAction() != MouseAction::ScrollUp && event.getButton() == MouseButton::Scroll) {
 					if ((fovchanger != nullptr &&
 						fovchanger->getOps<float>("fovvalue") > 180) ||
 						(upsidedown != nullptr && upsidedown->isEnabled()))
@@ -177,8 +170,8 @@ void Zoom::onMouse(MouseEvent& event)
 				if (zoomValue < 1) zoomValue = 1;
 				else if (zoomValue > realFov) zoomValue = realFov;
 
-				if (MC::mouseAction == MouseAction::ScrollUp ||
-					MC::mouseAction != MouseAction::ScrollUp && MC::mouseButton == MouseButton::Scroll) {
+				if (event.getAction() == MouseAction::ScrollUp ||
+					event.getAction() != MouseAction::ScrollUp && event.getButton() == MouseButton::Scroll) {
 					event.setButton(MouseButton::None);
 					event.setAction(MouseAction::Release);
 				}
@@ -202,17 +195,22 @@ void Zoom::onKey(KeyEvent& event)
 void Zoom::onSetTopScreenName(SetTopScreenNameEvent& event)
 {
 	if (!this->isEnabled()) return;
-	auto hideHand = Options::getOption("hidehand");
-	auto hideHud = Options::getOption("hidehud");
+
+	Option* hideHand = nullptr;
+	Option* hideHud = nullptr;
+
+
+	hideHand = Options::getOption("dev_disableRenderItemInHand");
+	hideHud = Options::getOption("dev_disableRenderHud");
+
+
+
+
 	if (this->active) {
 		if (getOps<bool>("hidemodules")) {
 			event.setCustomLayer("zoom_screen");
 		}
-		//            if (getOps<bool>("hidehud")) {
-		//                event.setCustomLayer("zoom_screen");
-		//                if (hideHand != nullptr) hideHand->setvalue(true);
-		//                if (hideHud != nullptr) hideHud->setvalue(true);
-		//            }
+
 		if (getOps<bool>("hidehand")) {
 			if (hideHand != nullptr) hideHand->setvalue(true);
 		}
@@ -230,4 +228,13 @@ void Zoom::onSetTopScreenName(SetTopScreenNameEvent& event)
 			event.setCustomLayer("f1_screen");
 		}
 	}
+}
+
+void Zoom::onTurnDeltaEvent(TurnDeltaEvent& event) {
+	if (!this->isEnabled() || !this->active) return;
+	float oSens = 1.f;
+	if (getOps<bool>("lowsens")) oSens = std::min(oSens, oSens * (1.0f + (((zoomValue / 2) / realFov) - 1.0f) * getOps<float>("lowsensStrength")));
+
+	event.delta.x *= oSens;
+	event.delta.y *= oSens;
 }

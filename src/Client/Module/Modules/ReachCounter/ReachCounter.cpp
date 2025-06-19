@@ -29,7 +29,7 @@ void ReachCounter::defaultConfig()
     setDef("text", (std::string)"Reach: {value}");
     setDef("textscale", 0.70f);
     Module::defaultConfig("all");
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void ReachCounter::settingsRender(float settingsOffset)

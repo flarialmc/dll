@@ -29,7 +29,7 @@ void Coordinates::defaultConfig() {
     setDef("NetherFormat", (std::string) "{dim}");
     setDef("TheEndFormat", (std::string) "{dim}");
     setDef("showOtherDimCoords", false);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void Coordinates::settingsRender(float settingsOffset) {

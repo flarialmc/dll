@@ -14,7 +14,7 @@ public:
     
 class RateLimiter {
 public:
-    RateLimiter(float cps) : rate(cps) {
+    RateLimiter(float cps) : rate(cps), tokens(cps), lastRefill(std::chrono::steady_clock::now()) {
     }
 
     bool allow() {
@@ -22,28 +22,40 @@ public:
 
         using Clock = std::chrono::steady_clock;
         auto now = Clock::now();
-        auto oneSecondAgo = now - std::chrono::seconds(1);
-
-        // Remove clicks older than 1 second
-        while (!clickTimes.empty() && clickTimes.front() < oneSecondAgo) {
-            clickTimes.pop_front();
+        
+        // Calculate time elapsed since last refill
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastRefill).count();
+        
+        // Refill tokens based on elapsed time, but limit refill to prevent bursts
+        if (elapsed > 0) {
+            // Limit the elapsed time to prevent large token refills after inactivity
+            double cappedElapsed = std::min(static_cast<double>(elapsed), 1000.0 / rate); // Max 1 second worth of tokens
+            double tokensToAdd = (static_cast<double>(rate) * cappedElapsed) / 1000.0;
+            tokens = std::min(static_cast<double>(rate), tokens + tokensToAdd);
+            lastRefill = now;
         }
 
-        // Check if we can allow another click
-        if (clickTimes.size() < static_cast<size_t>(rate)) {
-            clickTimes.push_back(now);
+        // Check if we have enough tokens
+        if (tokens >= 1.0) {
+            tokens -= 1.0;
             return true;
         }
+        
         return false;
     }
 
     void setRate(float cps) {
         rate = cps;
+        // Don't reset tokens to avoid sudden bursts when rate changes
+        if (tokens > static_cast<double>(rate)) {
+            tokens = static_cast<double>(rate); // Cap tokens to new rate
+        }
     }
 
 private:
     float rate;
-    std::deque<std::chrono::steady_clock::time_point> clickTimes;
+    double tokens;
+    std::chrono::steady_clock::time_point lastRefill;
 };
 
 class GUIMouseListener : public Listener {
@@ -89,14 +101,14 @@ public:
 
         if (event.getButton() == MB::Left && MC::held) {
             if (!GUIMouseListener::leftLimiter.allow() && limiterMod->getOps<bool>("enabled")) {
-                //event.cancel();
+                event.cancel();
                 return;
             }
             GUIMouseListener::AddLeftClick();
         }
         else if (event.getButton() == MB::Right && MC::held) {
             if (!GUIMouseListener::rightLimiter.allow() && limiterMod->getOps<bool>("enabled")) {
-                //event.cancel();
+                event.cancel();
                 return;
             }
             GUIMouseListener::AddRightClick();

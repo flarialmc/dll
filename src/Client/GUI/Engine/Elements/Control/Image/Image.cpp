@@ -8,6 +8,8 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <imgui/stb.h>
+#include <winrt/base.h>
+#include <memory>
 
 
 void FlarialGUI::image(const std::string& imageName, D2D1_RECT_F rect) {
@@ -88,12 +90,12 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, ID3D11ShaderResourceView*
     desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     desc.CPUAccessFlags = 0;
 
-    ID3D11Texture2D* pTexture = nullptr;
+    winrt::com_ptr<ID3D11Texture2D> pTexture;
     D3D11_SUBRESOURCE_DATA subResource;
     subResource.pSysMem = image_data.data.data();
     subResource.SysMemPitch = desc.Width * 4;
     subResource.SysMemSlicePitch = 0;
-    HRESULT r = SwapchainHook::d3d11Device->CreateTexture2D(&desc, &subResource, &pTexture);
+    HRESULT r = SwapchainHook::d3d11Device->CreateTexture2D(&desc, &subResource, pTexture.put());
     if (FAILED(r)) return false;
 
     // Create shader resource view
@@ -103,8 +105,7 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, ID3D11ShaderResourceView*
     srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Texture2D.MipLevels = desc.MipLevels;
     srvDesc.Texture2D.MostDetailedMip = 0;
-    r = SwapchainHook::d3d11Device->CreateShaderResourceView(pTexture, &srvDesc, out_srv);
-    pTexture->Release();
+    r = SwapchainHook::d3d11Device->CreateShaderResourceView(pTexture.get(), &srvDesc, out_srv);
     if (FAILED(r)) return false;
 
     return true;
@@ -116,7 +117,7 @@ struct ImageData {
     int width;
     int height;
     std::vector<unsigned char> data;
-    ID3D12Resource* uploadBuffer;
+    winrt::com_ptr<ID3D12Resource> uploadBuffer;
     UINT uploadPitch;
     UINT uploadSize;
 };
@@ -157,8 +158,8 @@ std::optional<ImageData> LoadImageDataFromResource(int resourceId, LPCTSTR type,
     D3D12_HEAP_PROPERTIES props = {};
     props.Type = D3D12_HEAP_TYPE_UPLOAD;
 
-    ID3D12Resource* uploadBuffer = nullptr;
-    HRESULT hr = device->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&uploadBuffer));
+    winrt::com_ptr<ID3D12Resource> uploadBuffer;
+    HRESULT hr = device->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(uploadBuffer.put()));
     if (FAILED(hr) || !uploadBuffer) {
         stbi_image_free(image_data);
         return std::nullopt;
@@ -167,7 +168,6 @@ std::optional<ImageData> LoadImageDataFromResource(int resourceId, LPCTSTR type,
     void* mapped = nullptr;
     D3D12_RANGE range = { 0, uploadSize };
     if (FAILED(uploadBuffer->Map(0, &range, &mapped)) || !mapped) {
-        uploadBuffer->Release();
         stbi_image_free(image_data);
         return std::nullopt;
     }
@@ -180,16 +180,16 @@ std::optional<ImageData> LoadImageDataFromResource(int resourceId, LPCTSTR type,
     result.width = width;
     result.height = height;
     result.data.assign(image_data, image_data + (width * height * 4));
-    result.uploadBuffer = uploadBuffer;
+    result.uploadBuffer = std::move(uploadBuffer);
     result.uploadPitch = uploadPitch;
     result.uploadSize = uploadSize;
     stbi_image_free(image_data);
     return result;
 }
 
-static ID3D12CommandQueue* uploadCommandQueue = nullptr;
-static ID3D12CommandAllocator* uploadCommandAllocator = nullptr;
-static ID3D12Fence* uploadFence = nullptr;
+static winrt::com_ptr<ID3D12CommandQueue> uploadCommandQueue = nullptr;
+static winrt::com_ptr<ID3D12CommandAllocator> uploadCommandAllocator = nullptr;
+static winrt::com_ptr<ID3D12Fence> uploadFence = nullptr;
 static UINT64 uploadFenceValue = 0;
 static HANDLE uploadEvent = nullptr;
 
@@ -201,13 +201,13 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
         D3D12_COMMAND_QUEUE_DESC queueDesc = {};
         queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
         queueDesc.NodeMask = 1;
-        if (FAILED(SwapchainHook::d3d12Device5->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&uploadCommandQueue)))) return false;
+        if (FAILED(SwapchainHook::d3d12Device5->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(uploadCommandQueue.put())))) return false;
     }
     if (!uploadCommandAllocator) {
-        if (FAILED(SwapchainHook::d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&uploadCommandAllocator)))) return false;
+        if (FAILED(SwapchainHook::d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(uploadCommandAllocator.put())))) return false;
     }
     if (!uploadFence) {
-        if (FAILED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&uploadFence)))) return false;
+        if (FAILED(SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(uploadFence.put())))) return false;
     }
     if (!uploadEvent) {
         uploadEvent = CreateEvent(0, 0, 0, 0);
@@ -235,25 +235,22 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
     desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
     desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-    ID3D12Resource* pTexture = nullptr;
-    HRESULT hr = SwapchainHook::d3d12Device5->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_COPY_DEST, NULL, IID_PPV_ARGS(&pTexture));
+    winrt::com_ptr<ID3D12Resource> pTexture;
+    HRESULT hr = SwapchainHook::d3d12Device5->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_COPY_DEST, NULL, IID_PPV_ARGS(pTexture.put()));
     if (FAILED(hr) || !pTexture) {
-        image_data.uploadBuffer->Release();
         return false;
     }
 
     // Set up command list
     uploadCommandAllocator->Reset();
-    ID3D12GraphicsCommandList* cmdList = nullptr;
-    hr = SwapchainHook::d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, uploadCommandAllocator, NULL, IID_PPV_ARGS(&cmdList));
+    winrt::com_ptr<ID3D12GraphicsCommandList> cmdList;
+    hr = SwapchainHook::d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, uploadCommandAllocator.get(), NULL, IID_PPV_ARGS(cmdList.put()));
     if (FAILED(hr) || !cmdList) {
-        pTexture->Release();
-        image_data.uploadBuffer->Release();
         return false;
     }
 
     D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
-    srcLocation.pResource = image_data.uploadBuffer;
+    srcLocation.pResource = image_data.uploadBuffer.get();
     srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
     srcLocation.PlacedFootprint.Footprint.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     srcLocation.PlacedFootprint.Footprint.Width = image_data.width;
@@ -262,13 +259,13 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
     srcLocation.PlacedFootprint.Footprint.RowPitch = image_data.uploadPitch;
 
     D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
-    dstLocation.pResource = pTexture;
+    dstLocation.pResource = pTexture.get();
     dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
     dstLocation.SubresourceIndex = 0;
 
     D3D12_RESOURCE_BARRIER barrier = {};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-    barrier.Transition.pResource = pTexture;
+    barrier.Transition.pResource = pTexture.get();
     barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
@@ -277,8 +274,9 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
     cmdList->ResourceBarrier(1, &barrier);
     cmdList->Close();
 
-    uploadCommandQueue->ExecuteCommandLists(1, (ID3D12CommandList* const*)&cmdList);
-    uploadCommandQueue->Signal(uploadFence, ++uploadFenceValue);
+    ID3D12CommandList* cmdListPtr = cmdList.get();
+    uploadCommandQueue->ExecuteCommandLists(1, &cmdListPtr);
+    uploadCommandQueue->Signal(uploadFence.get(), ++uploadFenceValue);
     uploadFence->SetEventOnCompletion(uploadFenceValue, uploadEvent);
     WaitForSingleObject(uploadEvent, INFINITE);
 
@@ -288,11 +286,9 @@ bool FlarialGUI::LoadImageFromResource(int resourceId, D3D12_CPU_DESCRIPTOR_HAND
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Texture2D.MipLevels = desc.MipLevels;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    SwapchainHook::d3d12Device5->CreateShaderResourceView(pTexture, &srvDesc, srv_cpu_handle);
+    SwapchainHook::d3d12Device5->CreateShaderResourceView(pTexture.get(), &srvDesc, srv_cpu_handle);
 
-    *out_tex_resource = pTexture;
-    cmdList->Release();
-    image_data.uploadBuffer->Release();
+    *out_tex_resource = pTexture.detach();
 
     return true;
 }
@@ -326,7 +322,7 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 
     if (SwapchainHook::queue == nullptr) {
 		if (ImagesClass::ImguiDX11Images[resourceId] == nullptr) {
-            if (!LoadImageFromResource(resourceId, &ImagesClass::ImguiDX11Images[resourceId], type)) Logger::custom(fg(fmt::color::crimson), "Image", "Failed to load image");
+            LoadImageFromResource(resourceId, &ImagesClass::ImguiDX11Images[resourceId], type);
 		} else  {
 			ImGui::GetBackgroundDrawList()->AddImage(ImTextureID(ImagesClass::ImguiDX11Images[resourceId]), ImVec2(imageRect.left, imageRect.top), ImVec2(imageRect.right, imageRect.bottom), ImVec2(0, 0), ImVec2(1, 1), col);
 		}
@@ -334,90 +330,65 @@ void FlarialGUI::image(int resourceId, D2D1_RECT_F rect, LPCTSTR type, bool shou
 	}
 
 		if (!ImagesClass::ImguiDX12Images[resourceId]) {
+			ID3D12Resource* my_texture = nullptr;
 
-			ID3D12Resource* my_texture = NULL;
+			if (!SwapchainHook::d3d12Device5) return;
 
-
-			if (!SwapchainHook::d3d12Device5){ LOG_ERROR("Image device does not exist."); return;}
-
-			if(!SwapchainHook::d3d12DescriptorHeapImGuiIMAGE) {
-
-				D3D12_DESCRIPTOR_HEAP_DESC descriptorImGuiRender = {};
-				descriptorImGuiRender.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-				descriptorImGuiRender.NumDescriptors = MAX_IMAGE_ID;
-				descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-
-				HRESULT hr = SwapchainHook::d3d12Device5->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&SwapchainHook::d3d12DescriptorHeapImGuiIMAGE));
-
-				if (FAILED(hr)) {
-					LOG_ERROR("Fail at creating d3d12DescriptorHeapImGuiIMAGE: ");
-					return;
-				}
-			}
+            if(!SwapchainHook::d3d12DescriptorHeapImGuiRender) return;
 
 			bool ret = false;
-
-			UINT handle_increment = SwapchainHook::d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			int descriptor_index = ImagesClass::ImguiDX12Images.size();
-			D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetCPUDescriptorHandleForHeapStart();
-			cpu.ptr += (handle_increment * descriptor_index);
-
-			D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetGPUDescriptorHandleForHeapStart();
-			gpu.ptr += (handle_increment * descriptor_index);
-
-			//Memory::SafeRelease(SwapchainHook::d3d12Device5);
+            
+            D3D12_CPU_DESCRIPTOR_HANDLE cpu;
+            D3D12_GPU_DESCRIPTOR_HANDLE gpu;
+            
+            if (!SwapchainHook::AllocateImageDescriptor(resourceId, &cpu, &gpu)) return;
 
 			ret = LoadImageFromResource(resourceId, cpu, &my_texture, type);
-			if (!ret)
-				return;
+			if (!ret) return;
+            
 			ImagesClass::ImguiDX12Images[resourceId] = (ImTextureID)gpu.ptr;
+			ImagesClass::ImguiDX12Textures[resourceId] = my_texture;
 
 		}
 		else {
-			try {
-				ImGui::GetBackgroundDrawList()->AddImage(ImagesClass::ImguiDX12Images[resourceId],
+			ImGui::GetBackgroundDrawList()->AddImage(ImagesClass::ImguiDX12Images[resourceId],
 														 ImVec2(imageRect.left, imageRect.top),
 														 ImVec2(imageRect.right, imageRect.bottom), ImVec2(0, 0),
 														 ImVec2(1, 1),
 														 col);
-			} catch (std::exception ex) { LOG_ERROR("error addming image: ", ex.what()); }
 		}
 }
 
 void FlarialGUI::LoadAllImages() {
 	if(SwapchainHook::queue) {
-
-		if(!SwapchainHook::d3d12DescriptorHeapImGuiIMAGE) {
-
-			D3D12_DESCRIPTOR_HEAP_DESC descriptorImGuiRender = {};
-			descriptorImGuiRender.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-			descriptorImGuiRender.NumDescriptors = MAX_IMAGE_ID;
-			descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-
-			SwapchainHook::d3d12Device5->CreateDescriptorHeap(&descriptorImGuiRender, IID_PPV_ARGS(&SwapchainHook::d3d12DescriptorHeapImGuiIMAGE));
-		}
+        // Check if consolidated descriptor heap is available
+        if(!SwapchainHook::d3d12DescriptorHeapImGuiRender) return;
 
 		for(int i = 100; i <= MAX_IMAGE_ID; i++) {
 			if(i != IDR_PATAR_JPG) {
-				ID3D12Resource* my_texture = NULL;
+				ID3D12Resource* my_texture = nullptr;
 
-				UINT handle_increment = SwapchainHook::d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-				int descriptor_index = ImagesClass::ImguiDX12Images.size();
-				D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetCPUDescriptorHandleForHeapStart();
-				cpu.ptr += (handle_increment * descriptor_index);
-				D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetGPUDescriptorHandleForHeapStart();
-				gpu.ptr += (handle_increment * descriptor_index);
-				if(LoadImageFromResource(i, cpu, &my_texture, "PNG")) ImagesClass::ImguiDX12Images[i] = (ImTextureID)gpu.ptr;
+                D3D12_CPU_DESCRIPTOR_HANDLE cpu;
+                D3D12_GPU_DESCRIPTOR_HANDLE gpu;
+                
+                if (!SwapchainHook::AllocateImageDescriptor(i, &cpu, &gpu)) continue;
+
+				if(LoadImageFromResource(i, cpu, &my_texture, "PNG")) {
+                    ImagesClass::ImguiDX12Images[i] = (ImTextureID)gpu.ptr;
+                    ImagesClass::ImguiDX12Textures[i] = my_texture;
+                }
 			} else {
-				ID3D12Resource* my_texture = NULL;
+				ID3D12Resource* my_texture = nullptr;
 
-				UINT handle_increment = SwapchainHook::d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-				int descriptor_index = ImagesClass::ImguiDX12Images.size();
-				D3D12_CPU_DESCRIPTOR_HANDLE cpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetCPUDescriptorHandleForHeapStart();
-				cpu.ptr += (handle_increment * descriptor_index);
-				D3D12_GPU_DESCRIPTOR_HANDLE gpu = SwapchainHook::d3d12DescriptorHeapImGuiIMAGE->GetGPUDescriptorHandleForHeapStart();
-				gpu.ptr += (handle_increment * descriptor_index);
-				if(LoadImageFromResource(i, cpu, &my_texture, "JPG")) ImagesClass::ImguiDX12Images[i] = (ImTextureID)gpu.ptr;
+                D3D12_CPU_DESCRIPTOR_HANDLE cpu;
+                D3D12_GPU_DESCRIPTOR_HANDLE gpu;
+                
+                if (!SwapchainHook::AllocateImageDescriptor(i, &cpu, &gpu)) continue;
+
+				if(LoadImageFromResource(i, cpu, &my_texture, "JPG")) {
+                    ImagesClass::ImguiDX12Images[i] = (ImTextureID)gpu.ptr;
+                    ImagesClass::ImguiDX12Textures[i] = my_texture;
+                }
 			}
 		}
 
@@ -440,4 +411,16 @@ std::future<void> FlarialGUI::LoadImagesAsync() {
 	});
 	loadThread.detach();
 	return future;
+}
+
+void FlarialGUI::CleanupImageResources() {
+	// Clean up static D3D12 upload resources
+	uploadCommandQueue = nullptr;
+	uploadCommandAllocator = nullptr;
+	uploadFence = nullptr;
+	uploadFenceValue = 0;
+	if (uploadEvent) {
+		CloseHandle(uploadEvent);
+		uploadEvent = nullptr;
+	}
 }

@@ -30,7 +30,7 @@ void Sprint::defaultConfig()
     setDef("status", false);
     setDef("textscale", 0.80f);
     setDef("always", false);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void Sprint::settingsRender(float settingsOffset)
@@ -139,14 +139,16 @@ void Sprint::onTick(TickEvent& event)
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
 
-            if (handler->forward) {
                 if (getOps<bool>("always")) {
                     handler->sprinting = true;
+                    handler->mInputState.mSprintDown = true;
+                    handler->mRawInputState.mSprintDown = true;
                 }
                 else {
-                    if (toggleSprinting) handler->sprinting = toggleSprinting;
+                    handler->sprinting = toggleSprinting;
+                    handler->mInputState.mSprintDown = toggleSprinting;
+                    handler->mRawInputState.mSprintDown = toggleSprinting;
                 }
-            }
         }
     }
 }

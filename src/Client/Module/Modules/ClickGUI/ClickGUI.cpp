@@ -79,6 +79,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 
 	}
 
+	if (realBlurAmount > 0.05f)
 	Blur::RenderBlur(event.RTV, 3, realBlurAmount);
 
 	if (SwapchainHook::init && baseHeightActual > 0.1f) {
@@ -646,9 +647,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 
 				c->addToggle("Better Frames", "RTX Disabled, Restart Required.", Client::settings.getSettingByName<bool>("killdx")->value);
 				c->addToggle("V-SYNC Disabler", "Works on all devices.", Client::settings.getSettingByName<bool>("vsync")->value);
-				if (MC::GPU.contains("Intel")) {
-					c->addToggle("Force Intel DX11", "May help with Better RenderDragon", Client::settings.getSettingByName<bool>("forceIntel")->value);
-				}
+
 				c->addToggle("Recreate Swapchain At Start", "May help with Better RenderDragon", Client::settings.getSettingByName<bool>("recreateAtStart")->value);
 				c->extraPadding();
 
@@ -668,6 +667,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 				c->extraPadding();
 
 				c->addHeader("Misc");
+				c->addToggle("Auto Search ClickGUI", "Start searching for modules already when you press a key in ClickGUI", Client::settings.getSettingByName<bool>("autosearch")->value);
 				c->addToggle("Resettable Settings", "Allows settings to be reset by left clicking and then right clicking", Client::settings.getSettingByName<bool>("resettableSettings")->value);
 				c->addToggle("Snapping Lines", "Y'know, those pink lines in edit mode.", Client::settings.getSettingByName<bool>("snappinglines")->value);
 				c->addToggle("Center Cursor", "Centers your cursor everytime you open your inventory, etc.", Client::settings.getSettingByName<bool>("centreCursor")->value);
@@ -871,6 +871,7 @@ void ClickGUI::onRender(RenderEvent& event) {
 							currentModule->settings.setValue("enabled", true);
 							currentModule->enabledState = true;
 						}
+						Client::SaveSettings();
 						Client::LoadSettings();
 						FlarialGUI::Notify("Reset all settings of " + currentModule->name);
 					}

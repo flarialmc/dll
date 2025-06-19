@@ -12,7 +12,7 @@ void ItemUseDelayFix::onDisable() {
 
 void ItemUseDelayFix::defaultConfig() {
     Module::defaultConfig("core");
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void ItemUseDelayFix::patch() {

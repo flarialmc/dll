@@ -29,7 +29,7 @@ void OpponentReach::defaultConfig()
     setDef("textscale", 0.8f);
     Module::defaultConfig("all");
     setDef("tryToExcludeTeam", true);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void OpponentReach::settingsRender(float settingsOffset)

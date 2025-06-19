@@ -35,7 +35,7 @@ void PaperDoll::defaultConfig()
     Module::defaultConfig("pos");
     setDef("uiscale", 21.0f);
     setDef("alwaysshow", false);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void PaperDoll::settingsRender(float settingsOffset)

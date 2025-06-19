@@ -30,7 +30,7 @@ void Sneak::defaultConfig()
     setDef("status", false);
     setDef("textscale", 0.80f);
     setDef("always", false);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void Sneak::settingsRender(float settingsOffset)
@@ -68,10 +68,14 @@ void Sneak::onTick(TickEvent& event)
             auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
             if (toggleSneaking) {
                 handler->sneaking = true;
+                handler->mInputState.mSneakDown = true;
+                handler->mRawInputState.mSneakDown = true;
                 toggled = true;
             }
             if (!toggleSneaking and toggled) {
                 handler->sneaking = false;
+                handler->mInputState.mSneakDown = false;
+                handler->mRawInputState.mSneakDown = false;
                 toggled = false;
             }
         }

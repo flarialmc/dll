@@ -4,6 +4,7 @@
 #include "RealMotionBlurHelper.hpp"
 #include "../Module.hpp"
 #include "Events/Render/RenderUnderUIEvent.hpp"
+#include "Events/Render/RenderEvent.hpp"
 #include "Hook/Hooks/Render/SwapchainHook.hpp"
 
 
@@ -26,6 +27,8 @@ public:
 	static inline std::vector<winrt::com_ptr<ID3D11ShaderResourceView>> previousFrames;
 
 	void onRender(RenderUnderUIEvent& event);
+
+	void onRenderNormal(RenderEvent& event);
 
 
 	void ImageWithOpacity(const winrt::com_ptr<ID3D11ShaderResourceView>& srv, ImVec2 size, float opacity);

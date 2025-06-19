@@ -39,6 +39,7 @@ std::map<int, ID2D1Bitmap*> ImagesClass::images;
 
 std::map<int, ID3D11ShaderResourceView*> ImagesClass::ImguiDX11Images;
 std::map<int, ImTextureID> ImagesClass::ImguiDX12Images;
+std::map<int, ID3D12Resource*> ImagesClass::ImguiDX12Textures;
 
 // TODO: release it !!!
 ID2D1Factory* FlarialGUI::factory;

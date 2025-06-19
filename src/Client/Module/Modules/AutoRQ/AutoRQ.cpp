@@ -39,7 +39,7 @@ void AutoRQ::defaultConfig() {
     setDef("noteaming", false);
     setDef("friendaccept", false);
     setDef("partyaccept", false);
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void AutoRQ::settingsRender(float settingsOffset) {

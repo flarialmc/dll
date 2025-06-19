@@ -1,5 +1,7 @@
 #include "ThirdPerson.hpp"
 
+#include "Client.hpp"
+
 ThirdPerson::ThirdPerson(): Module("Nametag", "Shows your nametag for you while\nin 3rd person mode.",
                                    IDR_NAMETAG_PNG, "")
 {
@@ -15,7 +17,7 @@ ThirdPerson::ThirdPerson(): Module("Nametag", "Shows your nametag for you while\
 void ThirdPerson::defaultConfig()
 {
     Module::defaultConfig("core");
-    if (ModuleManager::initialized) Client::SaveSettings();
+    
 }
 
 void ThirdPerson::onEnable()

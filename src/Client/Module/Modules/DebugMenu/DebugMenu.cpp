@@ -72,7 +72,7 @@ void JavaDebugMenu::defaultConfig() {
 	setDef("showTargetedBlockTags", true);
 	setDef("showMaxTags", true);
 	setDef("noOfTags", 10.0f);
-	if (ModuleManager::initialized) Client::SaveSettings();
+	
 }
 
 void JavaDebugMenu::customToggle(std::string text, std::string subtext, std::string settingName) {
@@ -466,7 +466,7 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			right.emplace_back("");
 
 			right.emplace_back(std::format("Display: {}x{}", MC::windowSize.x, MC::windowSize.y));
-			right.emplace_back(std::format("Active Renderer: {}", std::array<std::string, 5>{"Couldn't initialize", "DX9", "DX10", "DX11", "DX12"}[kiero::getRenderType()]));
+			right.emplace_back(std::format("Active Renderer: {}", SwapchainHook::queue == nullptr ? "DirectX11" : "DirectX12"));
 			if (getOps<bool>("imPoorButIWannaLookRich")) right.emplace_back("AMD GFX 5090 Ti AI Accelerated DLSS 12.0");
 			else {
 				if (!MC::GPU.empty()) right.emplace_back(MC::GPU);

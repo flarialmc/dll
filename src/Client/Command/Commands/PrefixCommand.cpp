@@ -1,4 +1,5 @@
 #include "PrefixCommand.hpp"
+#include "../../Client.hpp"
 
 void PrefixCommand::execute(const std::vector<std::string> &args) {
     if (args.size() != 1) {
@@ -11,6 +12,8 @@ void PrefixCommand::execute(const std::vector<std::string> &args) {
         return;
     }
 
-    prefix = args[0];
-    addCommandMessage("§aYour prefix has been set to §b{}", prefix);
+    Client::settings.setValue("dotcmdprefix", std::string(args[0]));
+    addCommandMessage("§aYour prefix has been set to §b{}", Client::settings.getSettingByName<std::string>("dotcmdprefix")->value);
+    Client::SavePrivate();
+    Client::LoadPrivate();
 }

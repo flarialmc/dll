@@ -7,6 +7,7 @@ void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, con
                                                const Vec3<float>& cameraTargetPos, const std::string& nameTag, const Vec3<float>& tagPos, Font* font)
 {
 
+    return;
     std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(nameTag));
     if (clearedName.empty()) clearedName = String::removeColorCodes(nameTag); // nametag might contain some unclearable stuff
 
