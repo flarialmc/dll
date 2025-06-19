@@ -14,7 +14,7 @@ void OffsetInit::init2190() {
 
     ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x3F0);
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x664);
-
+    ADD_OFFSET("ClientInstance::getBlockSource", 30);
 
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x3E0);
 }
