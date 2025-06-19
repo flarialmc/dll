@@ -142,6 +142,7 @@ public:
 			Deafen(this, RenderEvent, &ClickGUI::onRender)
 			Deafen(this, PacketEvent, &ClickGUI::onPacketReceive)
 			Module::terminate();
+		//
 	}
 
 	void defaultConfig() override {
