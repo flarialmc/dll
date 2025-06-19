@@ -228,7 +228,6 @@ void ModuleManager::initialize() {
 
 
 	addModule<HiveStat>();
-	if (!VersionUtils::checkAboveOrEqual(21, 90))
 	addModule<Waypoints>();
 
 	addModule<NullMovement>();
