@@ -355,7 +355,6 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) {
 
 void JavaDebugMenu::onRender(RenderEvent& event) {
 	if (!this->isEnabled()) return;
-	Logger::debug(SDK::getCurrentScreen());
 	if (this->active && (SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "hud_screen")) {
 		float uiscale = getOps<float>("uiscale");
 		float uiscaleConst = Constraints::RelativeConstraint(0.001f * uiscale);
