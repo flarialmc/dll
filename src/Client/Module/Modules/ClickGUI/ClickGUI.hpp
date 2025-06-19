@@ -126,6 +126,7 @@ public:
 			Listen(this, KeyEvent, &ClickGUI::onKey)
 			ListenOrdered(this, PacketEvent, &ClickGUI::onPacketReceive, EventOrder::IMMEDIATE)
 			ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
+		Listen(this, SetupAndRenderEvent, &ClickGUI::onSetupAndRender)
 			//Module::onEnable();
 	};
 
@@ -393,6 +394,13 @@ public:
 
 		if (this->active || editmenu)
 			event.cancel(); // do not pass key event to the game
+
+	}
+
+	void onSetupAndRender(SetupAndRenderEvent &event) const
+	{
+		if (this->active)
+			SDK::clientInstance->releaseMouse();
 
 	}
 
