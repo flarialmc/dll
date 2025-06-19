@@ -6,9 +6,10 @@
 #include <deque>
 
 
-class TickData {
+class TimedObj {
 public:
 	double timestamp;
+	int value;
 };
 
 class JavaDebugMenu : public Module {
@@ -17,19 +18,28 @@ private:
 	std::string lookingAt = "minecraft:empty";
 	std::string lastLookingAt = "";
 	std::vector<std::string> lookingAtTags = {};
+
 	Vec3<float> PrevPos{};
 	float xVelo = 0.f;
 	float yVelo = 0.f;
 	float zVelo = 0.f;
+
 	std::chrono::steady_clock::time_point startTime = std::chrono::steady_clock::now();
+
 	float lerpYaw = 0.0f;
 	float lerpPitch = 0.0f;
-	static inline std::vector<TickData> tickList;
+
+	static inline std::vector<TimedObj> tickList;
+	double lastFrameAdded = 0;
+	std::vector<int> tempFrameList;
+	static inline std::vector<TimedObj> frameList;
+
 	std::string versionName;
 	std::string cpuName;
 	Perspective curPerspective;
 	float lastBreakProgress = 0.0f;
 	float currentBreakProgress = 0.0f;
+
 	std::deque<float> prevFrameTimes;
 
 	static double Microtime() {
@@ -50,17 +60,21 @@ public:
 
 	void defaultConfig() override;
 
-	void sigmaToggle(std::string text, std::string subtext, std::string settingName);
+	void customToggle(std::string text, std::string subtext, std::string settingName);
 
-	void skibidiToggle(bool condition, std::string text, std::string subtext, std::string settingName);
+	void customConditionalToggle(bool condition, std::string text, std::string subtext, std::string settingName);
 
-	void skibidiSlider(bool condition, std::string text, std::string subtext, std::string settingName, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
+	void customConditionalSlider(bool condition, std::string text, std::string subtext, std::string settingName, float maxVal = 100.0f, float minVal = 0.0f, bool zerosafe = true);
 
 	void settingsRender(float settingsOffset) override;
 
 	bool isOn(std::string settingName);
 
+	void updateTimedVector(std::vector<TimedObj>& vec, float diff);
+
 	static int GetTicks();
+
+	std::string getOnePercLows();
 
 	std::string getFacingDirection(LocalPlayer* player);
 

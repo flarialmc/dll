@@ -55,6 +55,7 @@ void JavaDebugMenu::defaultConfig() {
 
 	setDef("enableEverything", true);
 	setDef("showFPS", true);
+	setDef("showOnePercLows", true);
 	setDef("showDim", true);
 	setDef("showCoords", true);
 	setDef("showSpeed", true);
@@ -74,15 +75,15 @@ void JavaDebugMenu::defaultConfig() {
 	
 }
 
-void JavaDebugMenu::sigmaToggle(std::string text, std::string subtext, std::string settingName) {
+void JavaDebugMenu::customToggle(std::string text, std::string subtext, std::string settingName) {
 	addConditionalToggle(!getOps<bool>("enableEverything"), text, subtext, settingName);
 }
 
-void JavaDebugMenu::skibidiToggle(bool condition, std::string text, std::string subtext, std::string settingName) {
+void JavaDebugMenu::customConditionalToggle(bool condition, std::string text, std::string subtext, std::string settingName) {
 	addConditionalToggle(!getOps<bool>("enableEverything") && condition, text, subtext, settingName);
 }
 
-void JavaDebugMenu::skibidiSlider(bool condition, std::string text, std::string subtext, std::string settingName, float maxVal, float minVal, bool zerosafe) {
+void JavaDebugMenu::customConditionalSlider(bool condition, std::string text, std::string subtext, std::string settingName, float maxVal, float minVal, bool zerosafe) {
 	addConditionalSlider(!getOps<bool>("enableEverything") && condition, text, subtext, settingName, maxVal, minVal, zerosafe);
 }
 
@@ -130,23 +131,24 @@ void JavaDebugMenu::settingsRender(float settingsOffset) {
 		extraPadding();
 	}
 
-	sigmaToggle("Show FPS and Frametime", "", "showFPS");
-	sigmaToggle("Show Entity Counter and Dimension", "", "showDim");
-	sigmaToggle("Show Coordinates Section", "", "showCoords");
-	sigmaToggle("Show Speed", "", "showSpeed");
-	sigmaToggle("Show Velocity", "", "showVelocity");
-	sigmaToggle("Show Break Progress", "", "showBreakProg");
-	skibidiToggle(getOps<bool>("showBreakProg"), "Always Show Break Progress", "", "alwaysShowBreakProg");
-	sigmaToggle("Show Server Section", "", "showServer");
-	sigmaToggle("Show Memory", "", "showMemory");
-	sigmaToggle("Show CPU, GPU and Renderer", "", "showCpuGpu");
-	sigmaToggle("Show Local Time", "", "showTime");
-	sigmaToggle("Show Ingame Time", "", "showInGameTime");
-	sigmaToggle("Show Uptime", "", "showUptime");
-	sigmaToggle("Show Targeted Block", "", "showTargetedBlock");
-	skibidiToggle(getOps<bool>("showTargetedBlock"), "Show Targeted Block Tags", "", "showTargetedBlockTags");
-	skibidiToggle(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags"), "Show Maximum Number Of Block Tags", "", "showMaxTags");
-	skibidiSlider(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags") && !getOps<bool>("showMaxTags"), "Number Of Tags To Be Show", "", "noOfTags", 20.0f, 1.0f, true);
+	customToggle("Show FPS and Frametime", "", "showFPS");
+	customToggle("Show 1% Low FPS", "", "showOnePercLows");
+	customToggle("Show Entity Counter and Dimension", "", "showDim");
+	customToggle("Show Coordinates Section", "", "showCoords");
+	customToggle("Show Speed", "", "showSpeed");
+	customToggle("Show Velocity", "", "showVelocity");
+	customToggle("Show Break Progress", "", "showBreakProg");
+	customConditionalToggle(getOps<bool>("showBreakProg"), "Always Show Break Progress", "", "alwaysShowBreakProg");
+	customToggle("Show Server Section", "", "showServer");
+	customToggle("Show Memory", "", "showMemory");
+	customToggle("Show CPU, GPU and Renderer", "", "showCpuGpu");
+	customToggle("Show Local Time", "", "showTime");
+	customToggle("Show Ingame Time", "", "showInGameTime");
+	customToggle("Show Uptime", "", "showUptime");
+	customToggle("Show Targeted Block", "", "showTargetedBlock");
+	customConditionalToggle(getOps<bool>("showTargetedBlock"), "Show Targeted Block Tags", "", "showTargetedBlockTags");
+	customConditionalToggle(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags"), "Show Maximum Number Of Block Tags", "", "showMaxTags");
+	customConditionalSlider(getOps<bool>("showTargetedBlock") && getOps<bool>("showTargetedBlockTags") && !getOps<bool>("showMaxTags"), "Number Of Tags To Be Show", "", "noOfTags", 20.0f, 1.0f, true);
 
 	FlarialGUI::UnsetScrollView();
 	resetPadding();
@@ -156,16 +158,36 @@ bool JavaDebugMenu::isOn(std::string settingName) {
 	return getOps<bool>("enableEverything") || getOps<bool>(settingName);
 }
 
-int JavaDebugMenu::GetTicks() {
-	if (tickList.empty()) {
-		return 0;
-	}
-	double currentMicros = Microtime();
-	auto count = std::ranges::count_if(tickList, [currentMicros](const TickData& click) {
-		return (currentMicros - click.timestamp <= 1.0);
-	});
+void JavaDebugMenu::updateTimedVector(std::vector<TimedObj>& vec, float diff) {
+	double microTime = Microtime();
+	vec.erase(
+	std::remove_if(vec.begin(), vec.end(), [microTime, diff](const TimedObj& obj) {
+			return (microTime - obj.timestamp) > diff;
+		}), vec.end()
+	);
+}
 
-	return (int)std::round(count);
+std::string JavaDebugMenu::getOnePercLows() {
+	if (frameList.empty()) return "0 (empty)";
+
+	std::vector<int> values;
+	for (const auto& g : frameList) values.push_back(g.value);
+	std::ranges::sort(values);
+
+	int count;
+	std::string txt;
+
+	if (frameList.size() < 100) {
+		count = frameList.size();
+		txt = std::format("avg, {}s", frameList.size() / 2);
+	}
+	else {
+		count = std::floor(frameList.size() / 100);
+		txt = std::to_string(count);
+	}
+
+	int sum = std::accumulate(values.begin(), values.begin() + count, 0);
+	return std::format("{} ({})", sum / count, txt);
 }
 
 std::string JavaDebugMenu::getFacingDirection(LocalPlayer* player) {
@@ -191,22 +213,14 @@ std::string JavaDebugMenu::getCPU() { // AI Slop
 
 std::string JavaDebugMenu::getDimensionName() {
 	BlockSource* blocksrc = SDK::clientInstance->getBlockSource();
-	if (!blocksrc) {
-		return "Unknown dimension";
-	}
+	if (!blocksrc) return "Unknown dimension";
+
 	std::string dim = blocksrc->getDimension()->getName();
-	if (dim == "Overworld") {
-		return "minecraft:overworld";
-	}
-	else if (dim == "Nether") {
-		return "minecraft:nether";
-	}
-	else if (dim == "TheEnd") {
-		return "minecraft:the_end";
-	}
-	else {
-		return dim;
-	}
+
+	if (dim == "Overworld") return "minecraft:overworld";
+	else if (dim == "Nether") return "minecraft:nether";
+	else if (dim == "TheEnd") return "minecraft:the_end";
+	else return dim;
 }
 
 std::string JavaDebugMenu::getTime() {
@@ -232,31 +246,39 @@ std::string JavaDebugMenu::getTime() {
 
 std::string JavaDebugMenu::getFormattedTime(long long seconds) {
 	std::string text;
+
 	int days = seconds / 86400;
 	int hours = (seconds % 86400) / 3600;
 	int mins = (seconds % 3600) / 60;
 	int secs = seconds % 60;
+
 	if (days >= 1) text += std::format("{} days, ", days);
 	if (hours >= 1) text += std::format("{} hours, ", hours);
 	if (mins >= 1) text += std::format("{} mins, ", mins);
 	text += std::format("{} secs", secs);
+
 	return text;
 }
 
 void JavaDebugMenu::onTick(TickEvent& event) {
 	if (!this->isEnabled()) return;
 	if (!SDK::clientInstance->getLocalPlayer()) return;
-	auto stateVectorComponent = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent();
-	if (stateVectorComponent != nullptr) {
-		xVelo = (stateVectorComponent->Pos.x - PrevPos.x) * 20;
-		yVelo = (stateVectorComponent->Pos.y - PrevPos.y) * 20;
-		zVelo = (stateVectorComponent->Pos.z - PrevPos.z) * 20;
-		PrevPos = stateVectorComponent->Pos;
+
+	if (isOn("showSpeed") || isOn("showVelocity")) {
+		auto stateVectorComponent = SDK::clientInstance->getLocalPlayer()->getStateVectorComponent();
+		if (stateVectorComponent != nullptr) {
+			xVelo = (stateVectorComponent->Pos.x - PrevPos.x) * 20;
+			yVelo = (stateVectorComponent->Pos.y - PrevPos.y) * 20;
+			zVelo = (stateVectorComponent->Pos.z - PrevPos.z) * 20;
+			PrevPos = stateVectorComponent->Pos;
+		}
 	}
-	TickData tick{};
-	tick.timestamp = Microtime();
-	tickList.insert(tickList.begin(), tick);
-	if (tickList.size() >= 120) tickList.pop_back();
+
+	if (isOn("showServer")) {
+		TimedObj tick {};
+		tick.timestamp = Microtime();
+		tickList.insert(tickList.begin(), tick);
+	}
 }
 
 void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) {
@@ -264,37 +286,39 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) {
 	if (!SDK::clientInstance->getLocalPlayer()) return;
 	if (!SDK::clientInstance->getLocalPlayer()->getLevel()) return;
 	if (!SDK::clientInstance->getBlockSource()) return;
-	HitResult result = SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult();
 
-	BlockPos pos = { result.blockPos.x,
-					 result.blockPos.y ,
-					 result.blockPos.z };
-	BlockSource* blockSource = SDK::clientInstance->getBlockSource();
-	try {
-		BlockLegacy* block = blockSource->getBlock(pos)->getBlockLegacy();
-		if (!block) return;
+	if (isOn("showTargetedBlock")) {
+		HitResult result = SDK::clientInstance->getLocalPlayer()->getLevel()->getHitResult();
+		BlockPos pos = { result.blockPos.x,
+						 result.blockPos.y ,
+						 result.blockPos.z };
+		BlockSource* blockSource = SDK::clientInstance->getBlockSource();
 		try {
-			lookingAt = block->getNamespace() + ":" + block->getName();
+			BlockLegacy* block = blockSource->getBlock(pos)->getBlockLegacy();
+			if (!block) return;
+			try {
+				lookingAt = block->getNamespace() + ":" + block->getName();
 
-			if (lookingAt != lastLookingAt) {
-				lastLookingAt = lookingAt;
-				std::vector<std::string> tags = {};
-				for (auto i : tagMap) {
-					if (std::ranges::find(i.second, block->getName()) != i.second.end()) {
-						tags.emplace_back(i.first);
+				if (isOn("showTargetedBlockTags") && lookingAt != lastLookingAt) {
+					lastLookingAt = lookingAt;
+					std::vector<std::string> tags = {};
+					for (auto i : tagMap) {
+						if (std::ranges::find(i.second, block->getName()) != i.second.end()) {
+							tags.emplace_back(i.first);
+						}
 					}
+					lookingAtTags = tags;
 				}
-				lookingAtTags = tags;
+
 			}
-
+			catch (const std::exception& e) { LOG_ERROR("Failed to get block name: {}", e.what()); }
 		}
-		catch (const std::exception& e) { LOG_ERROR("Failed to get block name: {}", e.what()); }
-	}
-	catch (const std::exception& e) {
-		LOG_ERROR("Failed to get block: {}", e.what());
+		catch (const std::exception& e) {
+			LOG_ERROR("Failed to get block: {}", e.what());
+		}
 	}
 
-	if (MC::heldLeft) {
+	if (isOn("showBreakProg") && MC::heldLeft) {
 		Gamemode *gm = SDK::clientInstance->getLocalPlayer()->getGamemode();
 		float breakProgress = gm->getLastBreakProgress() * 100;
 		if (lastBreakProgress != breakProgress) {
@@ -306,10 +330,32 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) {
 	} else {
 		currentBreakProgress = 0.0f;
 	}
+
+	if (isOn("showFPS")) {
+		double microTime = Microtime();
+		if (lastFrameAdded == 0) lastFrameAdded = microTime;
+		else if (microTime - lastFrameAdded >= 0.5f) {
+			if (tempFrameList.empty()) {
+				lastFrameAdded = microTime;
+				return;
+			}
+			TimedObj frame {};
+			frame.timestamp = microTime;
+			frame.value = *std::ranges::min_element(tempFrameList);
+			frameList.push_back(frame);
+			lastFrameAdded = microTime;
+			tempFrameList.clear();
+		}
+		else {
+			tempFrameList.push_back(MC::fps);
+		}
+	}
+
 }
 
 void JavaDebugMenu::onRender(RenderEvent& event) {
 	if (!this->isEnabled()) return;
+	Logger::debug(SDK::getCurrentScreen());
 	if (this->active && (SDK::getCurrentScreen() == "f3_screen" || SDK::getCurrentScreen() == "hud_screen")) {
 		float uiscale = getOps<float>("uiscale");
 		float uiscaleConst = Constraints::RelativeConstraint(0.001f * uiscale);
@@ -339,9 +385,11 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 		if (isOn("showFPS")) {
 			if (getOps<bool>("imPoorButIWannaLookRich")) {
 				left.emplace_back(std::format("{} FPS", static_cast<int>(MC::fps * 222.2)));
+				if (isOn("showOnePercLows")) left.emplace_back("1% Lows: \u221E");
 			}
 			else {
 				left.emplace_back(std::format("{} FPS", MC::fps));
+				if (isOn("showOnePercLows")) left.emplace_back(std::format("1% Lows: {}", getOnePercLows()));
 			}
 			left.emplace_back(std::format("Frametime: {:.2f}ms", MC::frameTime));
 		}
@@ -368,22 +416,14 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			left.emplace_back(std::format("Looking at block: {} {} {}", targetPos.x, targetPos.y, targetPos.z));
 		}
 
-		if (isOn("showSpeed")) {
-			left.emplace_back(std::format("Speed: {:.2f} blocks/s", sqrt(std::pow(xVelo, 2) + std::pow(yVelo, 2) + std::pow(zVelo, 2))));
-		}
+		if (isOn("showSpeed")) left.emplace_back(std::format("Speed: {:.2f} blocks/s", sqrt(std::pow(xVelo, 2) + std::pow(yVelo, 2) + std::pow(zVelo, 2))));
 
-		if (isOn("showVelocity")) {
-			left.emplace_back(std::format("Velocity: {:.2f} / {:.2f} / {:.2f} blocks/s", xVelo, yVelo, zVelo));
-		}
+		if (isOn("showVelocity")) left.emplace_back(std::format("Velocity: {:.2f} / {:.2f} / {:.2f} blocks/s", xVelo, yVelo, zVelo));
 
 		bool renderBreakProg = isOn("showBreakProg") && (getOps<bool>("alwaysShowBreakProg") || currentBreakProgress != 0.0f);
-		if (renderBreakProg) {
-			left.emplace_back(std::format("Break Progress: {}%", static_cast<int>(currentBreakProgress)));
-		}
+		if (renderBreakProg) left.emplace_back(std::format("Break Progress: {}%", static_cast<int>(currentBreakProgress)));
 
-		if (isOn("showCoords") || isOn("showSpeed") || isOn("showVelocity") || renderBreakProg) {
-			left.emplace_back("");
-		}
+		if (isOn("showCoords") || isOn("showSpeed") || isOn("showVelocity") || renderBreakProg) left.emplace_back("");
 
 		if (isOn("showInGameTime")) {
 			left.emplace_back(std::format("World Time: {}", Time::formatMCTime(Time::curTime, false)));
@@ -395,7 +435,8 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			left.emplace_back(std::format("IP: {}", SDK::getServerIP()));
 			left.emplace_back(std::format("Port: {}", SDK::getServerPort()));
 			left.emplace_back(std::format("Ping: {} ms", SDK::getServerPing()));
-			left.emplace_back(std::format("TPS: {}", std::to_string(GetTicks())));
+			updateTimedVector(tickList, 1.0f);
+			left.emplace_back(std::format("TPS: {}", std::to_string(tickList.size())));
 		}
 
 
@@ -435,9 +476,8 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			right.emplace_back("");
 		}
 
-		if (isOn("showTime")) {
-			right.emplace_back(std::format("Local Time: {}", getTime()));
-		}
+		if (isOn("showTime")) right.emplace_back(std::format("Local Time: {}", getTime()));
+
 		if (isOn("showUptime")) {
 			right.emplace_back(std::format("CPU Uptime: {}", getFormattedTime(static_cast<long long>(GetTickCount64() / 1000))));
 			right.emplace_back(std::format("Minecraft Uptime: {}", getFormattedTime(
@@ -452,27 +492,24 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 			right.emplace_back("Targeted Block:");
 			right.emplace_back(lookingAt);
 			right.emplace_back("");
+
 			if (isOn("showTargetedBlockTags")) {
 				bool showMax = getOps<bool>("showMaxTags");
 				int maxAllowedTags = static_cast<int>(getOps<float>("noOfTags"));
 				int maxFittableTags = static_cast<int>(MC::windowSize.y / (textHeight / 3.0f + yPadding * 2)) - right.size();
+
 				if (lookingAtTags.size() >= maxFittableTags && (showMax || maxAllowedTags >= maxFittableTags)) {
-					for (int i = 0; i < maxFittableTags; i++) {
-						right.emplace_back('#' + lookingAtTags[i]);
-					}
+					for (int i = 0; i < maxFittableTags; i++) right.emplace_back('#' + lookingAtTags[i]);
 					right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxFittableTags));
 				}
 				else if (showMax) {
-					for (const auto& i : lookingAtTags) {
-						right.emplace_back('#' + i);
-					}
+					for (const auto& i : lookingAtTags) right.emplace_back('#' + i);
 				}
 				else {
-					for (int i = 0; i < maxAllowedTags; i++) {
-						right.emplace_back('#' + lookingAtTags[i]);
-					}
+					for (int i = 0; i < maxAllowedTags; i++) right.emplace_back('#' + lookingAtTags[i]);
 					right.emplace_back(std::format("{} more tags...", lookingAtTags.size() - maxAllowedTags));
 				}
+
 			}
 		}
 
