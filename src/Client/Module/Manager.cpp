@@ -231,7 +231,7 @@ void ModuleManager::initialize() {
 
 	addModule<NullMovement>();
 	addModule<ModernKeybindHandling>();
-	addModule<CustomCrosshair>();
+	if (!VersionUtils::checkAboveOrEqual(21, 90)) addModule<CustomCrosshair>();
 	addModule<Waila>();
 
 	addModule<RawInputBuffer>();
