@@ -220,7 +220,7 @@ std::string JavaDebugMenu::getDimensionName() {
 	if (dim == "Overworld") return "minecraft:overworld";
 	else if (dim == "Nether") return "minecraft:nether";
 	else if (dim == "TheEnd") return "minecraft:the_end";
-	else return dim;
+	else return "Unknown dimension";
 }
 
 std::string JavaDebugMenu::getTime() {

@@ -17,6 +17,8 @@ void OffsetInit::init2190() {
     ADD_OFFSET("ClientInstance::getBlockSource", 30);
 
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x3E0);
+
+    ADD_OFFSET("ClientInstance::getBlockSource", 30);
 }
 
 void OffsetInit::init2180() {
