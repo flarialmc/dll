@@ -167,27 +167,21 @@ void JavaDebugMenu::updateTimedVector(std::vector<TimedObj>& vec, float diff) {
 	);
 }
 
-std::string JavaDebugMenu::getOnePercLows() {
-	if (frameList.empty()) return "0 (empty)";
-
-	std::vector<int> values;
-	for (const auto& g : frameList) values.push_back(g.value);
-	std::ranges::sort(values);
-
-	int count;
-	std::string txt;
-
-	if (frameList.size() < 100) {
-		count = frameList.size();
-		txt = std::format("avg, {}s", frameList.size() / 2);
+void JavaDebugMenu::getOnePercLows() {
+	if (!prevFrameTimes.size()) {
+		cached1PercLow = 0.f;
+		return;
 	}
-	else {
-		count = std::floor(frameList.size() / 100);
-		txt = std::to_string(count);
-	}
+	std::vector<float> sorted(prevFrameTimes.begin(), prevFrameTimes.end());
+	std::sort(sorted.begin(), sorted.end(), std::greater<float>());
 
-	int sum = std::accumulate(values.begin(), values.begin() + count, 0);
-	return std::format("{} ({})", sum / count, txt);
+	size_t count = std::max<size_t>(1, sorted.size() / 100);
+
+	std::vector<float> worst1Percent(sorted.begin(), sorted.begin() + count);
+	std::vector<float> fpsValues;
+	for (float ms : worst1Percent) fpsValues.push_back(1000.0f / ms);
+
+	cached1PercLow = std::accumulate(fpsValues.begin(), fpsValues.end(), 0.0f) / fpsValues.size();
 }
 
 std::string JavaDebugMenu::getFacingDirection(LocalPlayer* player) {
@@ -330,27 +324,6 @@ void JavaDebugMenu::onSetupAndRender(SetupAndRenderEvent& event) {
 	} else {
 		currentBreakProgress = 0.0f;
 	}
-
-	if (isOn("showFPS")) {
-		double microTime = Microtime();
-		if (lastFrameAdded == 0) lastFrameAdded = microTime;
-		else if (microTime - lastFrameAdded >= 0.5f) {
-			if (tempFrameList.empty()) {
-				lastFrameAdded = microTime;
-				return;
-			}
-			TimedObj frame {};
-			frame.timestamp = microTime;
-			frame.value = *std::ranges::min_element(tempFrameList);
-			frameList.push_back(frame);
-			lastFrameAdded = microTime;
-			tempFrameList.clear();
-		}
-		else {
-			tempFrameList.push_back(MC::fps);
-		}
-	}
-
 }
 
 void JavaDebugMenu::onRender(RenderEvent& event) {
@@ -384,11 +357,18 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 		if (isOn("showFPS")) {
 			if (getOps<bool>("imPoorButIWannaLookRich")) {
 				left.emplace_back(std::format("{} FPS", static_cast<int>(MC::fps * 222.2)));
-				if (isOn("showOnePercLows")) left.emplace_back("1% Lows: \u221E");
+				if (isOn("showOnePercLows")) left.emplace_back("1% Lows: \u221E FPS");
 			}
 			else {
 				left.emplace_back(std::format("{} FPS", MC::fps));
-				if (isOn("showOnePercLows")) left.emplace_back(std::format("1% Lows: {}", getOnePercLows()));
+				if (isOn("showOnePercLows")) {
+					auto now = std::chrono::steady_clock::now();
+					if (std::chrono::duration_cast<std::chrono::seconds>(now - last1PercLowUpdate).count() >= 1) {
+						getOnePercLows();
+						last1PercLowUpdate = now;
+					}
+					left.emplace_back(std::format("1% Lows: {:.2f} FPS", cached1PercLow));
+				}
 			}
 			left.emplace_back(std::format("Frametime: {:.2f}ms", MC::frameTime));
 		}

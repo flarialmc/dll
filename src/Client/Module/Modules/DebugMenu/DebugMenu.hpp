@@ -30,15 +30,14 @@ private:
 	float lerpPitch = 0.0f;
 
 	static inline std::vector<TimedObj> tickList;
-	double lastFrameAdded = 0;
-	std::vector<int> tempFrameList;
-	static inline std::vector<TimedObj> frameList;
 
 	std::string versionName;
 	std::string cpuName;
 	Perspective curPerspective;
 	float lastBreakProgress = 0.0f;
 	float currentBreakProgress = 0.0f;
+	float cached1PercLow = 0.f;
+	static inline auto last1PercLowUpdate = std::chrono::steady_clock::now();
 
 	std::deque<float> prevFrameTimes;
 
@@ -74,7 +73,7 @@ public:
 
 	static int GetTicks();
 
-	std::string getOnePercLows();
+	void getOnePercLows();
 
 	std::string getFacingDirection(LocalPlayer* player);
 
