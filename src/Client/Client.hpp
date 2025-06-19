@@ -113,6 +113,8 @@ public:
 	static void SavePrivate() {
 		// save PRIVATE
 		try {
+			Logger::custom(fg(fmt::color::dark_magenta), "Config", "Saving PRIVATE");
+
 			if (!settings.getSettingByName<std::string>("currentConfig")) return Logger::warn("No Client Settings to save to PRIVATE");
 
 
@@ -136,6 +138,8 @@ public:
 
 			pFile << settings.ToJson();
 			pFile.close();
+
+			Logger::custom(fg(fmt::color::dark_magenta), "Config", "Saved PRIVATE");
 		}
 		catch (const std::exception& e) {
 			LOG_ERROR("An error occurred while trying to save settings: {}", e.what());
@@ -168,6 +172,7 @@ public:
 	}
 
 	static void SaveSettings() {
+		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Saving {}", Client::settings.getSettingByName<std::string>("currentConfig")->value);
 		if (path.empty()) path = Utils::getConfigsPath() + "\\" + settings.getSettingByName<std::string>("currentConfig")->value;
 
 		try {
@@ -216,6 +221,8 @@ public:
 		}
 
 		ScriptManager::saveSettings();
+
+		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Saved {}", Client::settings.getSettingByName<std::string>("currentConfig")->value);
 	}
 
 	static void LoadSettings() {
