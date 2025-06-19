@@ -102,7 +102,7 @@ void HookManager::initialize() {
         addHook<ContainerScreenControllerHook>();
     }
 
-    if(!VersionUtils::checkAboveOrEqual(21, 80)) { //needed for ShaderLoader aka MaterialBinLoader
+    if(!VersionUtils::checkAboveOrEqual(21, 80)) { //needed for MaterialBinLoader/shader loader
         addHook<_composeFullStackHook>();
     }
 
