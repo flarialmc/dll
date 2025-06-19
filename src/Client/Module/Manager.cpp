@@ -186,7 +186,7 @@ void ModuleManager::initialize() {
 	addModule<TabList>();
 	addModule<WeatherChanger>();
 	addModule<NickModule>();
-	if (!VersionUtils::checkAboveOrEqual(21, 90))
+
 	addModule<FreeLook>();
 
 	addModule<AutoPerspective>();
