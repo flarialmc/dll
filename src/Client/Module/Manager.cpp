@@ -232,7 +232,7 @@ void ModuleManager::initialize() {
 
 	addModule<NullMovement>();
 	addModule<ModernKeybindHandling>();
-	if (!VersionUtils::checkAboveOrEqual(21, 90)) addModule<CustomCrosshair>();
+	addModule<CustomCrosshair>();
 	addModule<Waila>();
 
 	addModule<RawInputBuffer>();

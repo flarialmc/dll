@@ -7,7 +7,6 @@ void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, con
                                                const Vec3<float>& cameraTargetPos, const std::string& nameTag, const Vec3<float>& tagPos, Font* font)
 {
 
-    return;
     std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(nameTag));
     if (clearedName.empty()) clearedName = String::removeColorCodes(nameTag); // nametag might contain some unclearable stuff
 
@@ -40,6 +39,10 @@ void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, con
         }
     }
 
+    if (!SDK::clientInstance->getMinecraftGame()->textureGroup)
+    {
+        return;
+    }
     TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
 
     if(ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr)

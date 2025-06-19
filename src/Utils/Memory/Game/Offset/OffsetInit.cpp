@@ -16,6 +16,7 @@ void OffsetInit::init2190() {
     ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x664);
     ADD_OFFSET("ClientInstance::getBlockSource", 30);
 
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x6D8);
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x3E0);
 }
 
@@ -29,7 +30,7 @@ void OffsetInit::init2180() {
     ADD_OFFSET("RaknetConnector::getPeer", 0x48);
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x3E8);
 
-    ADD_OFFSET("MinecraftGame::textureGroup", 0x6C8);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x6C8); // sig in 1.21.90: 49 8B 87 ? ? ? ? 48 85 C0 74 ? F0 FF 40 ? 4D 8B 87
 
     ADD_OFFSET("Player::gamemode", 0xA88);
     ADD_OFFSET("Player::playerName", 0xC08);
