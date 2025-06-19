@@ -400,7 +400,7 @@ public:
 
 	void onSetupAndRender(SetupAndRenderEvent &event) const
 	{
-		if (this->active)
+		if (this->active || editmenu)
 			SDK::clientInstance->releaseMouse();
 
 	}
