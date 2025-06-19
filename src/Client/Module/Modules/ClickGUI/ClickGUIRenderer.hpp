@@ -65,7 +65,7 @@ public:
     }
 
     void onSetupAndRender(SetupAndRenderEvent &event) override {
-        if (module->active)
+        if (module->active or ClickGUIRenderer::editmenu)
             SDK::clientInstance->releaseMouse();
 
     }
