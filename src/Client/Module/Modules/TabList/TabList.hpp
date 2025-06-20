@@ -24,7 +24,7 @@ public:
     static int getRolePriority(const std::string& name);
 
     // Helper function to sort players by Flarial hierarchy
-    static std::vector<std::pair<mcUUID, PlayerListEntry>> sortByFlarialHierarchy(const std::unordered_map<mcUUID, PlayerListEntry>& sourceMap);
+    static std::vector<std::string> sortByFlarialHierarchy(const std::unordered_map<mcUUID, PlayerListEntry>& sourceMap);
 
     // Updated function to handle Flarial First in alphabetical order
     static std::vector<std::string> copyMapInAlphabeticalOrder(const std::unordered_map<mcUUID, PlayerListEntry>& sourceMap, bool flarialFirst);
