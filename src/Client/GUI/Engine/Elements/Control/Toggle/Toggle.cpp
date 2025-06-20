@@ -149,6 +149,15 @@ bool FlarialGUI::Toggle(int index, float x, float y, bool isEnabled, bool rgb) {
 	if (isEnabled) toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) ? D2D1::ColorF(enabledColor.r * 0.8, enabledColor.g * 0.8, enabledColor.b * 0.8, enabledColor.a) : enabledColor, 0.10f * FlarialGUI::frameFactor);
 	else toggleColors[index] = FlarialGUI::LerpColor(toggleColors[index], CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) ? D2D1::ColorF(disabledColor.r * 0.8, disabledColor.g * 0.8, disabledColor.b * 0.8, disabledColor.a) : disabledColor, 0.10f * FlarialGUI::frameFactor);
 
+	if (CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) && !ToggleIsHovering[index]) {
+		ToggleIsHovering[index] = true;
+		WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Hand);
+	}
+	else if (!CursorInRect(x, y + (isInScrollView ? scrollpos : 0), rectWidth, rectHeight) && ToggleIsHovering[index]) {
+		ToggleIsHovering[index] = false;
+		WinrtUtils::setCursorTypeThreaded(winrt::Windows::UI::Core::CoreCursorType::Arrow);
+	}
+
 	FlarialGUI::RoundedRect(x, y, rgb ? rgbColor : toggleColors[index], rectWidth, rectHeight, round.x, round.x);
 
 	// the circle (I KNOW IM USING A RECT LOL)
