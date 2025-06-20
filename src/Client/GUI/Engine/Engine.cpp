@@ -1196,7 +1196,7 @@ void FlarialGUI::UnsetScrollView() {
 	D2D::context->PopAxisAlignedClip();
 }
 
-void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int currentNum) {
+void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int currentNum, std::string modname) {
 	if (MC::mouseButton == MouseButton::Right) return;
 	float fixer = 0;
 	isInWindowRect = true;
@@ -1206,6 +1206,7 @@ void FlarialGUI::SetWindowRect(float x, float y, float width, float height, int 
 	FlarialGUI::RoundedRect(x, y, c, width, height, 0, 0);
 	c.a = 1.f;
 	FlarialGUI::RoundedHollowRect(x, y, Constraints::RelativeConstraint(0.003f, "height", true), c, width, height, 0, 0);
+	FlarialGUI::FlarialTextWithFont(x, y + 0.005f * MC::windowSize.y, FlarialGUI::to_wide(modname).c_str(), 0, 0, DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::RelativeConstraint(0.1f, "height", true), DWRITE_FONT_WEIGHT_NORMAL, false);
 
 	if (currentNum > maxRect) maxRect = currentNum;
 

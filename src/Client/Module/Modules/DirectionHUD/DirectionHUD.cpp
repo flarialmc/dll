@@ -205,7 +205,7 @@ void DirectionHUD::onRender(RenderEvent &event) {
 
     // handle editing in edit menu
     if (ClickGUI::editmenu) {
-        FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, fullCirclePixelWidth, barHeight, 34);
+        FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, fullCirclePixelWidth, barHeight, 34, this->name);
 
         Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, 34, fullCirclePixelWidth, barHeight);
 

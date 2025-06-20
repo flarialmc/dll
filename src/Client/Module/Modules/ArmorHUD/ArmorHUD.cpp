@@ -438,7 +438,7 @@ void ArmorHUD::onRender(RenderEvent& event) {
 
 		if (ClickGUI::editmenu) {
 			// bounding boxes
-			FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 18);
+			FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 18, this->name);
 			checkForRightClickAndOpenSettings(currentPos.x, currentPos.y, width, height);
 		}
 

@@ -78,7 +78,7 @@ void PaperDoll::onRender(RenderEvent& event)
             currentPos = Vec2<float>{ originalPos.x, originalPos.y };
 
         if (ClickGUI::editmenu)
-            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 19);
+            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 19, this->name);
 
         Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 19, width, height);
 

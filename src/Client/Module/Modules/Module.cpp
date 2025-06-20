@@ -126,7 +126,7 @@ void Module::normalRenderCore(int index, std::string& text) {
 	}
 
 	if (ClickGUI::editmenu) {
-		FlarialGUI::SetWindowRect(topleft.x, topleft.y, rectWidth, rectHeight, index);
+		FlarialGUI::SetWindowRect(topleft.x, topleft.y, rectWidth, rectHeight, index, this->name);
 
 		checkForRightClickAndOpenSettings(topleft.x, topleft.y, rectWidth, rectHeight);
 
