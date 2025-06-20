@@ -115,7 +115,7 @@ void FlarialGUI::ColorPickerWindow(int index, std::string moduleName, std::strin
 		float currentHue = (ColorPickers[index].hueX / hlwidth) * 360.0f;
 
 		D2D1_COLOR_F lol = HSVtoColorF(currentHue, 1.0f, 1.0f);
-		ImColor hueColor = ImColor(lol.r, lol.g, lol.g, lol.a);
+		ImColor hueColor = ImColor(lol.r, lol.g, lol.b, lol.a);
 
 		ImU32 col_left = IM_COL32((int)(hueColor.Value.x * 255), (int)(hueColor.Value.y * 255), (int)(hueColor.Value.z * 255), 0);
 		ImU32 col_right = IM_COL32((int)(hueColor.Value.x * 255), (int)(hueColor.Value.y * 255), (int)(hueColor.Value.z * 255), 255);
