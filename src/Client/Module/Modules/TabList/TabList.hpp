@@ -9,7 +9,10 @@
 #include <algorithm>
 
 class TabList : public Module {
+
 public:
+
+
     TabList();;
 
     void onEnable() override;
