@@ -186,31 +186,44 @@ void ProcessReadyPlayerHeadTextures() {
     auto frameDuration = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - lastFrameTime);
     lastFrameTime = currentTime;
     
-    // If last frame took longer than 16.67ms (60fps), skip texture processing
-    if (frameDuration.count() > 16670) {
+    // More aggressive loading - only skip if frame time is really bad (40fps or worse)
+    if (frameDuration.count() > 25000) {
         return;
     }
     
-    // Very conservative - only process 1 texture per frame to maintain 60fps
-    PlayerHeadReadyTexture ready;
-    
-    // Get next ready texture
-    {
-        std::lock_guard<std::mutex> lock(g_readyQueueMutex);
-        if (g_readyQueue.empty()) return;
-        
-        ready = std::move(g_readyQueue.front());
-        g_readyQueue.pop();
-    }
-    
-    // Create the actual D3D texture on main thread
-    if (ready.isDX12) {
-        CreateTextureFromBytesDX12Sync(ready.playerName, ready.processedData.data(), ready.width, ready.height);
+    // Process multiple textures per frame based on performance
+    int maxPerFrame;
+    if (frameDuration.count() < 10000) {
+        maxPerFrame = 3; // Very fast frame, process 3
+    } else if (frameDuration.count() < 16670) {
+        maxPerFrame = 2; // Good frame, process 2
     } else {
-        CreateTextureFromBytesDX11Sync(ready.playerName, ready.processedData.data(), ready.width, ready.height);
+        maxPerFrame = 1; // Slower frame, process 1
     }
     
-    if (logDebug) Logger::debug("Main thread created D3D texture for player {}", ready.playerName);
+    int processed = 0;
+    while (processed < maxPerFrame) {
+        PlayerHeadReadyTexture ready;
+        
+        // Get next ready texture
+        {
+            std::lock_guard<std::mutex> lock(g_readyQueueMutex);
+            if (g_readyQueue.empty()) break;
+            
+            ready = std::move(g_readyQueue.front());
+            g_readyQueue.pop();
+        }
+        
+        // Create the actual D3D texture on main thread
+        if (ready.isDX12) {
+            CreateTextureFromBytesDX12Sync(ready.playerName, ready.processedData.data(), ready.width, ready.height);
+        } else {
+            CreateTextureFromBytesDX11Sync(ready.playerName, ready.processedData.data(), ready.width, ready.height);
+        }
+        
+        processed++;
+        if (logDebug) Logger::debug("Main thread created D3D texture for player {} ({}/{})", ready.playerName, processed, maxPerFrame);
+    }
 }
 
 // Periodic cleanup to free unused descriptors (updated to use new system)
@@ -762,11 +775,8 @@ ID3D11ShaderResourceView* CreateTextureFromBytesDX11(
 void TabList::normalRender(int index, std::string &value) {
     if (!this->isEnabled()) return;
     if (SDK::hasInstanced && (active || ClickGUI::editmenu)) {
-        // Process ready textures from background threads (every other frame for performance)
-        static int processCounter = 0;
-        if (++processCounter % 2 == 0) {
-            ProcessReadyPlayerHeadTextures();
-        }
+        // Process ready textures from background threads (adaptive rate based on performance)
+        ProcessReadyPlayerHeadTextures();
         
         // Periodically clean up unused descriptors (every ~5 seconds at 60fps)
         static int cleanupCounter = 0;
