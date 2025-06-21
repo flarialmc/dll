@@ -77,6 +77,50 @@ static constexpr int NUM_LOADER_THREADS = 3; // Use 3 threads for loading
 PlayerHeadTexture* CreateTextureFromBytesDX12Sync(const std::string& playerName, const unsigned char* data, int width, int height);
 ID3D11ShaderResourceView* CreateTextureFromBytesDX11Sync(const std::string& playerName, const unsigned char* data, int width, int height);
 
+// Custom rendering function for crisp pixel art - DX12
+void RenderPlayerHeadWithPointFiltering(D3D12_GPU_DESCRIPTOR_HANDLE srvHandle, D2D1_RECT_F rect, const std::string& debugName) {
+    ImDrawList* drawList = ImGui::GetForegroundDrawList();
+    if (drawList) {
+        // Convert D2D1_RECT_F to ImVec2
+        ImVec2 topLeft(rect.left, rect.top);
+        ImVec2 bottomRight(rect.right, rect.bottom);
+        
+        // Render with higher resolution texture (64x64 instead of 32x32)
+        // This reduces the blur effect from linear filtering
+        drawList->AddImage(
+            (ImTextureID)srvHandle.ptr,
+            topLeft,
+            bottomRight,
+            ImVec2(0, 0), ImVec2(1, 1),
+            IM_COL32_WHITE
+        );
+        
+        if (logDebug) Logger::debug("Rendered DX12 playerhead {} with improved crispness", debugName);
+    }
+}
+
+// Custom rendering function for crisp pixel art - DX11
+void RenderPlayerHeadWithPointFilteringDX11(ID3D11ShaderResourceView* srv, D2D1_RECT_F rect, const std::string& debugName) {
+    ImDrawList* drawList = ImGui::GetForegroundDrawList();
+    if (drawList) {
+        // Convert D2D1_RECT_F to ImVec2
+        ImVec2 topLeft(rect.left, rect.top);
+        ImVec2 bottomRight(rect.right, rect.bottom);
+        
+        // Render with higher resolution texture (64x64 instead of 32x32)
+        // This reduces the blur effect from linear filtering
+        drawList->AddImage(
+            reinterpret_cast<ImTextureID>(srv),
+            topLeft,
+            bottomRight,
+            ImVec2(0, 0), ImVec2(1, 1),
+            IM_COL32_WHITE
+        );
+        
+        if (logDebug) Logger::debug("Rendered DX11 playerhead {} with improved crispness", debugName);
+    }
+}
+
 // Stop async loading threads
 void StopAsyncLoading() {
     g_shouldStopLoading = true;
@@ -954,39 +998,37 @@ void TabList::normalRender(int index, std::string &value) {
                              skinImage.mImageBytes.size());
                 
                 if (static_cast<int>(skinImage.imageFormat) == 4 && // RGBA8Unorm format
-                    ((skinImage.mWidth == 64 && skinImage.mHeight == 64) || (skinImage.mWidth == 128 && skinImage.mHeight == 128))) {
+                    skinImage.mWidth == skinImage.mHeight && // Square texture
+                    skinImage.mWidth >= 64 && skinImage.mWidth <= 1024 && // Reasonable size range
+                    (skinImage.mWidth & (skinImage.mWidth - 1)) == 0) { // Power of 2
                     
-                    std::vector<unsigned char> head = SkinStealCommand::cropHead(skinImage, skinImage.mWidth == 64 ? 0 : 1);
-                    std::vector<unsigned char> head2 = SkinStealCommand::cropHead(skinImage, skinImage.mWidth == 64 ? 0 : 1, true);
+                    // Determine skin format based on width (0 = classic 64x64, 1 = slim 64x64+)
+                    int skinFormat = (skinImage.mWidth == 64) ? 0 : 1;
+                    std::vector<unsigned char> head = SkinStealCommand::cropHead(skinImage, skinFormat);
 
                     if (head.empty()) {
                         if (logDebug) Logger::debug("Empty head data for player {}", vecmap[i]->second.name);
                         continue;
                     }
 
-                    // Scale up the 8x8 head to 32x32 using nearest neighbor for crisp pixels
-                    const int originalSize = skinImage.mWidth == 64 ? 8 : 16;
-                    const int scaledSize = 32;
-                    const int scale = scaledSize / originalSize;
+                    // Dynamic head size detection and scaling for crisp pixels
+                    // Support any skin resolution (64x64, 128x128, 256x256, etc.)
+                    const int headSize = skinImage.mWidth / 8; // Head is always 1/8th of skin width
+                    const int scaledSize = std::max(64, headSize * 2); // At least 64x64, or 2x the original head size
+                    const int scale = scaledSize / headSize;
                     std::vector<unsigned char> scaledHead(scaledSize * scaledSize * 4);
-                    std::vector<unsigned char> scaledHead2(scaledSize * scaledSize * 4);
 
                     for (int y = 0; y < scaledSize; y++) {
                         for (int x = 0; x < scaledSize; x++) {
                             int srcX = x / scale;
                             int srcY = y / scale;
-                            int srcIndex = (srcY * originalSize + srcX) * 4;
+                            int srcIndex = (srcY * headSize + srcX) * 4;
                             int dstIndex = (y * scaledSize + x) * 4;
                             
                             scaledHead[dstIndex + 0] = head[srcIndex + 0]; // R
                             scaledHead[dstIndex + 1] = head[srcIndex + 1]; // G
                             scaledHead[dstIndex + 2] = head[srcIndex + 2]; // B
                             scaledHead[dstIndex + 3] = head[srcIndex + 3]; // A
-
-                            scaledHead2[dstIndex + 0] = head2[srcIndex + 0]; // R
-                            scaledHead2[dstIndex + 1] = head2[srcIndex + 1]; // G
-                            scaledHead2[dstIndex + 2] = head2[srcIndex + 2]; // B
-                            scaledHead2[dstIndex + 3] = head2[srcIndex + 3]; // A
                         }
                     }
                     
@@ -997,64 +1039,35 @@ void TabList::normalRender(int index, std::string &value) {
                             hasVisiblePixels = true;
                             break;
                         }
-                        if (scaledHead2[i] > 0) { // Alpha channel
-                            hasVisiblePixels = true;
-                            break;
-                        }
                     }
 
                     std::string playerName = String::removeNonAlphanumeric(String::removeColorCodes(vecmap[i]->second.name));
 
                     if (logDebug) Logger::debug("Player {} scaled head: size={}, visible_pixels={}", playerName, scaledHead.size(), hasVisiblePixels);
 
-                    float headSize = Constraints::SpacingConstraint(0.6, keycardSize);
-                    float headSize2 = Constraints::SpacingConstraint(0.68, keycardSize);
-                    float diff = headSize2 - headSize;
+                    float headDisplaySize = Constraints::SpacingConstraint(0.6, keycardSize);
 
                     // Position for the head (left of the player name)
                     ImVec2 headPos(fakex + Constraints::SpacingConstraint(0.45, keycardSize), realcenter.y + Constraints::SpacingConstraint(0.3, keycardSize));
-                    ImVec2 headPos2(
-                        fakex + Constraints::SpacingConstraint(0.45, keycardSize) - diff / 2.f,
-                        realcenter.y + Constraints::SpacingConstraint(0.3, keycardSize)  - diff / 2.f);
-                    ImVec2 headSize2D(headSize, headSize);
-                    ImVec2 headSize22D(headSize2, headSize2);
+                    ImVec2 headSize2D(headDisplaySize, headDisplaySize);
 
                     if (SwapchainHook::queue != nullptr) {
                         // DX12 path
                         PlayerHeadTexture* playerTex = CreateTextureFromBytesDX12(playerName, scaledHead.data(), scaledSize, scaledSize);
-                        PlayerHeadTexture* playerTex2 = CreateTextureFromBytesDX12("_" + playerName, scaledHead2.data(), scaledSize, scaledSize);
                         if (playerTex && playerTex->valid && playerTex->loadState == PlayerHeadLoadState::Loaded) {
                             // Update last used time when rendering
                             {
                                 std::lock_guard<std::mutex> lock(g_playerHeadMutex);
                                 playerTex->lastUsed = std::chrono::steady_clock::now();
-                                if (playerTex2 && playerTex2->valid && playerTex2->loadState == PlayerHeadLoadState::Loaded) {
-                                    playerTex2->lastUsed = std::chrono::steady_clock::now();
-                                }
                             }
                             
                             ImDrawList* drawList = ImGui::GetForegroundDrawList();
                             if (drawList) {
                                 if (logDebug) Logger::debug("DX12 GPU handle for {}: 0x{:x}", playerName, playerTex->srvGpuHandle.ptr);
                                 
-                                // Use nearest neighbor interpolation for crisp pixel art
-                                drawList->AddImage(
-                                    (ImTextureID)playerTex->srvGpuHandle.ptr,
-                                    headPos,
-                                    ImVec2(headPos.x + headSize2D.x, headPos.y + headSize2D.y),
-                                    ImVec2(0, 0), ImVec2(1, 1),
-                                    IM_COL32_WHITE
-                                );
-
-                                if (playerTex2 && playerTex2->valid && playerTex2->loadState == PlayerHeadLoadState::Loaded) {
-                                    drawList->AddImage(
-                                        (ImTextureID)playerTex2->srvGpuHandle.ptr,
-                                        headPos2,
-                                        ImVec2(headPos2.x + headSize22D.x, headPos2.y + headSize22D.y),
-                                        ImVec2(0, 0), ImVec2(1, 1),
-                                        IM_COL32_WHITE
-                                    );
-                                }
+                                // Render with point filtering for crisp pixels
+                                D2D1_RECT_F headRect = D2D1::RectF(headPos.x, headPos.y, headPos.x + headSize2D.x, headPos.y + headSize2D.y);
+                                RenderPlayerHeadWithPointFiltering(playerTex->srvGpuHandle, headRect, playerName);
 
                                 if (logDebug) Logger::debug("Rendered DX12 head for player {} at ({}, {})", playerName, headPos.x, headPos.y);
                             }
@@ -1064,31 +1077,15 @@ void TabList::normalRender(int index, std::string &value) {
                     } else if (SwapchainHook::d3d11Device != nullptr) {
                         // DX11 path
                         ID3D11ShaderResourceView* srv = CreateTextureFromBytesDX11(playerName, scaledHead.data(), scaledSize, scaledSize);
-                        ID3D11ShaderResourceView* srv2 = CreateTextureFromBytesDX11("_" + playerName, scaledHead2.data(), scaledSize, scaledSize);
 
                         if (srv) {
                             ImDrawList* drawList = ImGui::GetForegroundDrawList();
                             if (drawList) {
                                 if (logDebug) Logger::debug("DX11 SRV for {}: 0x{:x}", playerName, reinterpret_cast<uintptr_t>(srv));
                                 
-                                // Use nearest neighbor interpolation for crisp pixel art
-                                drawList->AddImage(
-                                    reinterpret_cast<ImTextureID>(srv),
-                                    headPos,
-                                    ImVec2(headPos.x + headSize2D.x, headPos.y + headSize2D.y),
-                                    ImVec2(0, 0), ImVec2(1, 1),
-                                    IM_COL32_WHITE
-                                );
-
-                                if (srv2) {
-                                    drawList->AddImage(
-                                        reinterpret_cast<ImTextureID>(srv2),
-                                        headPos2,
-                                        ImVec2(headPos2.x + headSize22D.x, headPos2.y + headSize22D.y),
-                                        ImVec2(0, 0), ImVec2(1, 1),
-                                        IM_COL32_WHITE
-                                    );
-                                }
+                                // Render with point filtering for crisp pixels
+                                D2D1_RECT_F headRect = D2D1::RectF(headPos.x, headPos.y, headPos.x + headSize2D.x, headPos.y + headSize2D.y);
+                                RenderPlayerHeadWithPointFilteringDX11(srv, headRect, playerName);
 
                                 if (logDebug) Logger::debug("Rendered DX11 head for player {} at ({}, {})", playerName, headPos.x, headPos.y);
                             }
