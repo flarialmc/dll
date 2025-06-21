@@ -16,7 +16,7 @@ void TabList::onDisable() {
     Deafen(this, RenderEvent, &TabList::onRender)
     Deafen(this, KeyEvent, &TabList::onKey)
     Deafen(this, MouseEvent, &TabList::onMouse)
-    CleanupPlayerHeadTextures();
+    //CleanupPlayerHeadTextures();
     Module::onDisable();
 }
 
@@ -237,7 +237,7 @@ void TabList::normalRender(int index, std::string &value) {
             }
 
             if (getOps<bool>("playerCount")) {
-                countTxt = std::to_string(validPlayers) + " player(s) online";
+                countTxt = std::to_string(validPlayers) + (validPlayers > 1 ? " players online" : " player online");
                 curPlayer = module && module->isEnabled() && !NickModule::backupOri.empty() ? module->getOps<std::string>("nick") : SDK::clientInstance->getLocalPlayer()->getPlayerName();
                 ImVec2 countTxtMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(countTxt).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
                 curPlayerMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide("Player:__" + curPlayer).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
