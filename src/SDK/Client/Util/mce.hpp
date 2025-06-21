@@ -8,6 +8,25 @@ enum class ImageFormat : int {
     RGBA8Unorm = 0x3,
 };
 
+namespace Bedrock::Application {
+
+    template <typename T0>
+    class ThreadOwner {
+    public:
+        T0              mObject;
+        bool            mThreadIdInitialized{};
+        std::thread::id mThreadId;
+        u_int            mThreadCheckIndex{};
+
+    public:
+        // prevent constructor by default
+        ThreadOwner& operator=(ThreadOwner const&) = delete;
+        ThreadOwner(ThreadOwner const&)            = delete;
+        ThreadOwner()                              = delete;
+    };
+
+}
+
 class Blob {
 public:
     using value_type = unsigned char;
@@ -108,7 +127,31 @@ public:
     Image                                                mCapeImage;                      // this+0xC0
 };
 
+class PlayerSkin_1_21_90 {
+public:
+    std::shared_ptr<Bedrock::Application::ThreadOwner<PlayerSkin>> impl;
+
+};
+
 class mcUUID {
 public:
     uint64_t mostSig, leastSig;
+    
+    bool operator==(const mcUUID& other) const {
+        return mostSig == other.mostSig && leastSig == other.leastSig;
+    }
+    
+    bool operator!=(const mcUUID& other) const {
+        return !(*this == other);
+    }
 };
+
+namespace std {
+    template<>
+    struct hash<mcUUID> {
+        size_t operator()(const mcUUID& uuid) const {
+            // Combine the two 64-bit values using a simple hash combination
+            return hash<uint64_t>{}(uuid.mostSig) ^ (hash<uint64_t>{}(uuid.leastSig) << 1);
+        }
+    };
+}
