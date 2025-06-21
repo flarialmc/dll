@@ -1,13 +1,83 @@
 #include "TabList.hpp"
 
 #include <wrl/client.h>
+#include <unordered_map>
+#include <mutex>
+#include <set>
+#include <winrt/base.h>
 
 #include "Command/Commands/SkinStealCommand.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 
 TabList::TabList(): Module("Tab List", "Java-like tab list.\nLists the current online players on the server.", IDR_LIST_PNG, "TAB") {
 }
+// DX12 texture creation from raw bytes
+struct PlayerHeadTexture {
+    winrt::com_ptr<ID3D12Resource> texture;
+    D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle;
+    D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle;
+    UINT descriptorIndex = UINT_MAX;
+    bool valid = false;
+};
+struct PlayerHeadTextureDX11 {
+    winrt::com_ptr<ID3D11ShaderResourceView> srv;
+    bool valid = false;
+};
 
+static std::unordered_map<std::string, PlayerHeadTextureDX11> g_playerHeadTexturesDX11;
+static std::unordered_map<std::string, PlayerHeadTexture> g_playerHeadTextures;
+static UINT g_nextPlayerHeadId = 200;  // Start from 200, can go much higher
+static std::mutex g_idMutex;
+static std::set<UINT> g_usedIds;
+
+// Cleanup function for player head textures
+void CleanupPlayerHeadTextures() {
+    Logger::debug("Cleaning up player head textures - DX12: {}, DX11: {}", g_playerHeadTextures.size(), g_playerHeadTexturesDX11.size());
+    
+    // Clear DX12 textures and used IDs
+    {
+        std::lock_guard<std::mutex> lock(g_idMutex);
+        g_usedIds.clear();
+        g_nextPlayerHeadId = 200; // Reset counter
+    }
+    
+    for (auto& pair : g_playerHeadTextures) {
+        if (pair.second.valid && pair.second.descriptorIndex != UINT_MAX) {
+            SwapchainHook::FreeImageDescriptor(pair.second.descriptorIndex);
+        }
+    }
+    g_playerHeadTextures.clear();
+    
+    // Clear DX11 textures
+    g_playerHeadTexturesDX11.clear();
+}
+
+// Periodic cleanup to free unused descriptors
+void CleanupUnusedPlayerHeadDescriptors() {
+    std::lock_guard<std::mutex> lock(g_idMutex);
+    
+    std::vector<UINT> toRemove;
+    for (UINT id : g_usedIds) {
+        bool inUse = false;
+        for (const auto& pair : g_playerHeadTextures) {
+            if (pair.second.descriptorIndex == id && pair.second.valid) {
+                inUse = true;
+                break;
+            }
+        }
+        if (!inUse) {
+            toRemove.push_back(id);
+        }
+    }
+    
+    if (!toRemove.empty()) {
+        Logger::debug("Cleaning up {} unused descriptors", toRemove.size());
+        for (UINT id : toRemove) {
+            g_usedIds.erase(id);
+            SwapchainHook::FreeImageDescriptor(id);
+        }
+    }
+}
 void TabList::onEnable() {
     Listen(this, RenderEvent, &TabList::onRender)
     Listen(this, KeyEvent, &TabList::onKey)
@@ -17,6 +87,7 @@ void TabList::onEnable() {
 void TabList::onDisable() {
     Deafen(this, RenderEvent, &TabList::onRender)
     Deafen(this, KeyEvent, &TabList::onKey)
+    CleanupPlayerHeadTextures();
     Module::onDisable();
 }
 
@@ -162,11 +233,27 @@ std::vector<const std::pair<const mcUUID, PlayerListEntry> *> TabList::copyMapIn
     return result;
 }
 
-ID3D11ShaderResourceView *CreateTextureFromBytes(
-    ID3D11Device *device,
+// DX11 player head texture storage
+
+
+// DX11 texture creation from raw bytes
+ID3D11ShaderResourceView *CreateTextureFromBytesDX11(
+    const std::string& playerName,
     const unsigned char *data,
     int width,
     int height) {
+    if (!SwapchainHook::d3d11Device || !data || width <= 0 || height <= 0) {
+        return nullptr;
+    }
+
+    // Check if texture already exists
+    auto it = g_playerHeadTexturesDX11.find(playerName);
+    if (it != g_playerHeadTexturesDX11.end() && it->second.valid) {
+        return it->second.srv.get();
+    }
+
+    PlayerHeadTextureDX11& playerTex = g_playerHeadTexturesDX11[playerName];
+
     D3D11_TEXTURE2D_DESC desc = {};
     desc.Width = width;
     desc.Height = height;
@@ -176,25 +263,281 @@ ID3D11ShaderResourceView *CreateTextureFromBytes(
     desc.SampleDesc.Count = 1;
     desc.Usage = D3D11_USAGE_DEFAULT;
     desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    desc.CPUAccessFlags = 0;
 
     D3D11_SUBRESOURCE_DATA initData = {};
     initData.pSysMem = data;
     initData.SysMemPitch = width * 4;
+    initData.SysMemSlicePitch = 0;
 
-    ID3D11Texture2D *texture = nullptr;
-    HRESULT hr = device->CreateTexture2D(&desc, &initData, &texture);
-    if (FAILED(hr) || !texture) return nullptr;
+    winrt::com_ptr<ID3D11Texture2D> texture;
+    HRESULT hr = SwapchainHook::d3d11Device->CreateTexture2D(&desc, &initData, texture.put());
+    if (FAILED(hr)) {
+        Logger::debug("Failed to create DX11 texture: 0x{:x}", hr);
+        return nullptr;
+    }
 
-    ID3D11ShaderResourceView *srv = nullptr;
-    hr = device->CreateShaderResourceView(texture, nullptr, &srv);
-    texture->Release(); // Release after SRV is created
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = desc.MipLevels;
+    srvDesc.Texture2D.MostDetailedMip = 0;
 
-    return srv;
+    hr = SwapchainHook::d3d11Device->CreateShaderResourceView(texture.get(), &srvDesc, playerTex.srv.put());
+    if (FAILED(hr)) {
+        Logger::debug("Failed to create DX11 SRV: 0x{:x}", hr);
+        return nullptr;
+    }
+
+    playerTex.valid = true;
+    Logger::debug("Successfully created DX11 player head texture for {}", playerName);
+    return playerTex.srv.get();
+}
+
+
+
+PlayerHeadTexture* CreateTextureFromBytesDX12(
+    const std::string& playerName,
+    const unsigned char* data,
+    int width,
+    int height) {
+    // Check minimal requirements for DX12
+    if (!SwapchainHook::d3d12Device5 || !SwapchainHook::d3d12DescriptorHeapImGuiRender || !data || width <= 0 || height <= 0) {
+        Logger::debug("DX12 minimal requirements not met - device: {}, heap: {}, data: {}, size: {}x{}", 
+                     SwapchainHook::d3d12Device5 ? "valid" : "null",
+                     SwapchainHook::d3d12DescriptorHeapImGuiRender ? "valid" : "null",
+                     data ? "valid" : "null", width, height);
+        return nullptr;
+    }
+
+    // Check if texture already exists
+    auto it = g_playerHeadTextures.find(playerName);
+    if (it != g_playerHeadTextures.end() && it->second.valid) {
+        return &it->second;
+    }
+
+    PlayerHeadTexture& playerTex = g_playerHeadTextures[playerName];
+    
+    // If this player already has a descriptor index allocated, reuse it
+    if (playerTex.descriptorIndex != UINT_MAX) {
+        Logger::debug("Reusing existing descriptor {} for player {}", playerTex.descriptorIndex, playerName);
+    } else {
+        // Dynamic ID allocation - just use the next available ID
+        std::lock_guard<std::mutex> lock(g_idMutex);
+        playerTex.descriptorIndex = g_nextPlayerHeadId++;
+        g_usedIds.insert(playerTex.descriptorIndex);
+        Logger::debug("Allocated new descriptor {} for player {}", playerTex.descriptorIndex, playerName);
+    }
+    
+    // Allocate descriptor
+    if (!SwapchainHook::AllocateImageDescriptor(playerTex.descriptorIndex, 
+                                               &playerTex.srvCpuHandle, &playerTex.srvGpuHandle)) {
+        Logger::debug("Failed to allocate DX12 descriptor for ID {}", playerTex.descriptorIndex);
+        // Remove from used IDs since allocation failed
+        {
+            std::lock_guard<std::mutex> lock(g_idMutex);
+            g_usedIds.erase(playerTex.descriptorIndex);
+        }
+        return nullptr;
+    }
+
+    // Create texture resource
+    D3D12_HEAP_PROPERTIES heapProps = {};
+    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+    D3D12_RESOURCE_DESC textureDesc = {};
+    textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    textureDesc.Width = width;
+    textureDesc.Height = height;
+    textureDesc.DepthOrArraySize = 1;
+    textureDesc.MipLevels = 1;
+    textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    textureDesc.SampleDesc.Count = 1;
+    textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    HRESULT hr = SwapchainHook::d3d12Device5->CreateCommittedResource(
+        &heapProps, D3D12_HEAP_FLAG_NONE, &textureDesc,
+        D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
+        IID_PPV_ARGS(playerTex.texture.put()));
+
+    if (FAILED(hr)) {
+        Logger::debug("Failed to create DX12 texture: 0x{:x}", hr);
+        return nullptr;
+    }
+
+    // Create upload buffer
+    UINT uploadPitch = (width * 4 + D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u) & ~(D3D12_TEXTURE_DATA_PITCH_ALIGNMENT - 1u);
+    UINT uploadSize = height * uploadPitch;
+
+    D3D12_HEAP_PROPERTIES uploadHeapProps = {};
+    uploadHeapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+    D3D12_RESOURCE_DESC uploadBufferDesc = {};
+    uploadBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    uploadBufferDesc.Width = uploadSize;
+    uploadBufferDesc.Height = 1;
+    uploadBufferDesc.DepthOrArraySize = 1;
+    uploadBufferDesc.MipLevels = 1;
+    uploadBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+    uploadBufferDesc.SampleDesc.Count = 1;
+    uploadBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    uploadBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    winrt::com_ptr<ID3D12Resource> uploadBuffer;
+    hr = SwapchainHook::d3d12Device5->CreateCommittedResource(
+        &uploadHeapProps, D3D12_HEAP_FLAG_NONE, &uploadBufferDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
+        IID_PPV_ARGS(uploadBuffer.put()));
+
+    if (FAILED(hr)) {
+        Logger::debug("Failed to create DX12 upload buffer: 0x{:x}", hr);
+        return nullptr;
+    }
+
+    // Map and copy data
+    void* mapped = nullptr;
+    D3D12_RANGE range = { 0, uploadSize };
+    hr = uploadBuffer->Map(0, &range, &mapped);
+    if (FAILED(hr)) {
+        Logger::debug("Failed to map DX12 upload buffer: 0x{:x}", hr);
+        return nullptr;
+    }
+
+    for (int y = 0; y < height; ++y) {
+        memcpy(
+            static_cast<unsigned char*>(mapped) + y * uploadPitch,
+            data + y * width * 4,
+            width * 4
+        );
+    }
+    uploadBuffer->Unmap(0, &range);
+
+    // Create a simple command queue and command list for upload
+    winrt::com_ptr<ID3D12CommandQueue> tempQueue;
+    D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+    queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+    queueDesc.NodeMask = 1;
+    hr = SwapchainHook::d3d12Device5->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(tempQueue.put()));
+    if (FAILED(hr)) {
+        Logger::debug("Failed to create temporary command queue: 0x{:x}", hr);
+        return nullptr;
+    }
+
+    winrt::com_ptr<ID3D12CommandAllocator> tempAllocator;
+    hr = SwapchainHook::d3d12Device5->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(tempAllocator.put()));
+    if (FAILED(hr)) {
+        Logger::debug("Failed to create command allocator: 0x{:x}", hr);
+        return nullptr;
+    }
+
+    winrt::com_ptr<ID3D12GraphicsCommandList> cmdList;
+    hr = SwapchainHook::d3d12Device5->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, tempAllocator.get(), nullptr, IID_PPV_ARGS(cmdList.put()));
+    if (FAILED(hr)) {
+        Logger::debug("Failed to create command list: 0x{:x}", hr);
+        return nullptr;
+    }
+
+    // Copy texture
+    D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
+    srcLocation.pResource = uploadBuffer.get();
+    srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+    srcLocation.PlacedFootprint.Offset = 0;
+    srcLocation.PlacedFootprint.Footprint.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srcLocation.PlacedFootprint.Footprint.Width = width;
+    srcLocation.PlacedFootprint.Footprint.Height = height;
+    srcLocation.PlacedFootprint.Footprint.Depth = 1;
+    srcLocation.PlacedFootprint.Footprint.RowPitch = uploadPitch;
+
+    D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
+    dstLocation.pResource = playerTex.texture.get();
+    dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+    dstLocation.SubresourceIndex = 0;
+
+    cmdList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
+
+    // Transition to shader resource
+    D3D12_RESOURCE_BARRIER barrier = {};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    barrier.Transition.pResource = playerTex.texture.get();
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+    cmdList->ResourceBarrier(1, &barrier);
+    cmdList->Close();
+
+    // Execute and wait for completion
+    ID3D12CommandList* cmdLists[] = { cmdList.get() };
+    tempQueue->ExecuteCommandLists(1, cmdLists);
+
+    // Create fence and wait
+    winrt::com_ptr<ID3D12Fence> fence;
+    hr = SwapchainHook::d3d12Device5->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.put()));
+    if (FAILED(hr)) {
+        Logger::debug("Failed to create fence: 0x{:x}", hr);
+        return nullptr;
+    }
+
+    HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+    if (!fenceEvent) {
+        Logger::debug("Failed to create fence event");
+        return nullptr;
+    }
+
+    const UINT64 fenceValue = 1;
+    hr = tempQueue->Signal(fence.get(), fenceValue);
+    if (FAILED(hr)) {
+        Logger::debug("Failed to signal fence: 0x{:x}", hr);
+        CloseHandle(fenceEvent);
+        return nullptr;
+    }
+
+    // Wait for completion
+    if (fence->GetCompletedValue() < fenceValue) {
+        hr = fence->SetEventOnCompletion(fenceValue, fenceEvent);
+        if (FAILED(hr)) {
+            Logger::debug("Failed to set fence event: 0x{:x}", hr);
+            CloseHandle(fenceEvent);
+            return nullptr;
+        }
+        DWORD waitResult = WaitForSingleObject(fenceEvent, 5000); // 5 second timeout
+        if (waitResult != WAIT_OBJECT_0) {
+            Logger::debug("Fence wait timed out or failed: {}", waitResult);
+            CloseHandle(fenceEvent);
+            return nullptr;
+        }
+    }
+    CloseHandle(fenceEvent);
+    
+    Logger::debug("DX12 texture upload completed successfully for {}", playerName);
+
+    // Create SRV
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.Format = textureDesc.Format;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = 1;
+
+    SwapchainHook::d3d12Device5->CreateShaderResourceView(playerTex.texture.get(), &srvDesc, playerTex.srvCpuHandle);
+
+    playerTex.valid = true;
+    Logger::debug("Successfully created DX12 player head texture for {}", playerName);
+    return &playerTex;
 }
 
 void TabList::normalRender(int index, std::string &value) {
     if (!this->isEnabled()) return;
     if (SDK::hasInstanced && (active || ClickGUI::editmenu)) {
+        // Periodically clean up unused descriptors (every ~5 seconds at 60fps)
+        static int cleanupCounter = 0;
+        if (++cleanupCounter > 300) {
+            cleanupCounter = 0;
+            CleanupUnusedPlayerHeadDescriptors();
+            Logger::debug("Descriptor usage: {} used IDs, {} DX12 textures, {} DX11 textures", 
+                         g_usedIds.size(), g_playerHeadTextures.size(), g_playerHeadTexturesDX11.size());
+        }
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             float keycardSize = Constraints::RelativeConstraint(0.05f * getOps<float>("uiscale"), "height", true);
 
@@ -350,47 +693,131 @@ void TabList::normalRender(int index, std::string &value) {
 
                     xx = Constraints::SpacingConstraint(0.5, keycardSize);
                 }
+
+
                 // PLAYER HEAD START
+                const auto& skinImage = vecmap[i]->second.playerSkin.mSkinImage;
+                
+                Logger::debug("Player {} skin: format={}, size={}x{}, data_size={}", 
+                             vecmap[i]->second.name, 
+                             static_cast<int>(skinImage.imageFormat),
+                             skinImage.mWidth, skinImage.mHeight,
+                             skinImage.mImageBytes.size());
+                
+                if (static_cast<int>(skinImage.imageFormat) == 4 && // RGBA8Unorm format
+                    skinImage.mWidth >= 64 && skinImage.mHeight >= 64) {
+                    
+                    std::vector<unsigned char> head = SkinStealCommand::cropHead(skinImage);
+                    if (head.empty()) {
+                        Logger::debug("Empty head data for player {}", vecmap[i]->second.name);
+                        continue;
+                    }
 
-                Logger::debug("{}x{}", vecmap[i]->second.playerSkin.mSkinImage.mWidth, vecmap[i]->second.playerSkin.mSkinImage.mHeight);
-                std::cout << static_cast<int>(vecmap[i]->second.playerSkin.mSkinImage.imageFormat) << std::endl;
-
-                if (static_cast<int>(vecmap[i]->second.playerSkin.mSkinImage.imageFormat) == 4) {
-                    std::vector<unsigned char> head = SkinStealCommand::cropHead(vecmap[i]->second.playerSkin.mSkinImage);
-
-                    // Microsoft::WRL::ComPtr<ID3D11Device> d3d11Device;
-
-                    // if (SwapchainHook::queue != nullptr) {
-                    //     Logger::debug("using dx12");
-                    //     SwapchainHook::d3d11On12Device->QueryInterface(IID_PPV_ARGS(&d3d11Device));
-                    // }
-
-                    if (SwapchainHook::d3d11Device != nullptr) {
-                        Logger::debug("d3d11device not null");
-                        ID3D11ShaderResourceView *srv = CreateTextureFromBytes(
-                            SwapchainHook::d3d11Device,
-                            head.data(),
-                            8, 8
-                        );
-
-                        if (srv) {
-                            Logger::debug("resource loaded!");
-                            ImDrawList *drawList = ImGui::GetForegroundDrawList();
-                            if (drawList != nullptr) {
-                                Logger::debug("drawing!");
-                                drawList->AddImage(
-                                    reinterpret_cast<ImTextureID>(srv),
-                                    ImVec2(fakex + keycardSize / 2.f, realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize)), // Top-left corner (x, y)
-                                    ImVec2((fakex + keycardSize / 2.f) + 8, (realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize)) + 8) // Bottom-right corner (x + width, y + height)
-                                );
-                            }
-
-                            srv->Release();
-                            Logger::debug("released");
+                    // Scale up the 8x8 head to 32x32 using nearest neighbor for crisp pixels
+                    const int originalSize = 8;
+                    const int scaledSize = 32;
+                    const int scale = scaledSize / originalSize;
+                    std::vector<unsigned char> scaledHead(scaledSize * scaledSize * 4);
+                    
+                    for (int y = 0; y < scaledSize; y++) {
+                        for (int x = 0; x < scaledSize; x++) {
+                            int srcX = x / scale;
+                            int srcY = y / scale;
+                            int srcIndex = (srcY * originalSize + srcX) * 4;
+                            int dstIndex = (y * scaledSize + x) * 4;
+                            
+                            scaledHead[dstIndex + 0] = head[srcIndex + 0]; // R
+                            scaledHead[dstIndex + 1] = head[srcIndex + 1]; // G
+                            scaledHead[dstIndex + 2] = head[srcIndex + 2]; // B
+                            scaledHead[dstIndex + 3] = head[srcIndex + 3]; // A
                         }
                     }
-                }
+                    
+                    // Debug: Check if the scaled head has any non-transparent pixels
+                    bool hasVisiblePixels = false;
+                    for (int i = 3; i < scaledHead.size(); i += 4) {
+                        if (scaledHead[i] > 0) { // Alpha channel
+                            hasVisiblePixels = true;
+                            break;
+                        }
+                    }
+                    std::string playerName = String::removeNonAlphanumeric(String::removeColorCodes(vecmap[i]->second.name));
 
+                    Logger::debug("Player {} scaled head: size={}, visible_pixels={}", playerName, scaledHead.size(), hasVisiblePixels);
+
+                    float headSize = Constraints::SpacingConstraint(0.4, keycardSize);
+                    
+                    // Position for the head (left of the player name)
+                    ImVec2 headPos(fakex + Constraints::SpacingConstraint(0.1, keycardSize), 
+                                  realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize));
+                    ImVec2 headSize2D(headSize, headSize);
+
+                    if (SwapchainHook::queue != nullptr) {
+                        // DX12 path
+                        PlayerHeadTexture* playerTex = CreateTextureFromBytesDX12(playerName, scaledHead.data(), scaledSize, scaledSize);
+                        if (playerTex && playerTex->valid) {
+                            ImDrawList* drawList = ImGui::GetForegroundDrawList();
+                            if (drawList) {
+                                Logger::debug("DX12 GPU handle for {}: 0x{:x}", playerName, playerTex->srvGpuHandle.ptr);
+                                
+                                // Use nearest neighbor interpolation for crisp pixel art
+                                drawList->AddImage(
+                                    (ImTextureID)playerTex->srvGpuHandle.ptr,
+                                    headPos,
+                                    ImVec2(headPos.x + headSize2D.x, headPos.y + headSize2D.y),
+                                    ImVec2(0, 0), ImVec2(1, 1),
+                                    IM_COL32_WHITE
+                                );
+                                Logger::debug("Rendered DX12 head for player {} at ({}, {})", playerName, headPos.x, headPos.y);
+                                
+                                // Debug: Also draw a simple colored rectangle to verify positioning
+                                drawList->AddRectFilled(
+                                    ImVec2(headPos.x - 2, headPos.y - 2),
+                                    ImVec2(headPos.x + headSize2D.x + 2, headPos.y + headSize2D.y + 2),
+                                    IM_COL32(255, 0, 0, 100) // Semi-transparent red border
+                                );
+                            }
+                        } else {
+                            Logger::debug("Failed to create/get DX12 texture for player {}", playerName);
+                        }
+                    } else if (SwapchainHook::d3d11Device != nullptr) {
+                        // DX11 path
+                        ID3D11ShaderResourceView* srv = CreateTextureFromBytesDX11(
+                            playerName, scaledHead.data(), scaledSize, scaledSize);
+                        
+                        if (srv) {
+                            ImDrawList* drawList = ImGui::GetForegroundDrawList();
+                            if (drawList) {
+                                Logger::debug("DX11 SRV for {}: 0x{:x}", playerName, reinterpret_cast<uintptr_t>(srv));
+                                
+                                // Use nearest neighbor interpolation for crisp pixel art
+                                drawList->AddImage(
+                                    reinterpret_cast<ImTextureID>(srv),
+                                    headPos,
+                                    ImVec2(headPos.x + headSize2D.x, headPos.y + headSize2D.y),
+                                    ImVec2(0, 0), ImVec2(1, 1),
+                                    IM_COL32_WHITE
+                                );
+                                Logger::debug("Rendered DX11 head for player {} at ({}, {})", playerName, headPos.x, headPos.y);
+                                
+                                // Debug: Also draw a simple colored rectangle to verify positioning
+                                drawList->AddRectFilled(
+                                    ImVec2(headPos.x - 2, headPos.y - 2),
+                                    ImVec2(headPos.x + headSize2D.x + 2, headPos.y + headSize2D.y + 2),
+                                    IM_COL32(0, 255, 0, 100) // Semi-transparent green border
+                                );
+                            }
+                            // Don't release - it's managed by the cache now
+                        } else {
+                            Logger::debug("Failed to create/get DX11 texture for player {}", playerName);
+                        }
+                    } else {
+                        Logger::debug("No DirectX device available for player {}", playerName);
+                    }
+                    
+                    // Adjust text position to account for head
+                    xx += headSize + Constraints::SpacingConstraint(0.1, keycardSize);
+                }
                 // PLAYER HEAD END
 
                 FlarialGUI::FlarialTextWithFont(fakex + xx + Constraints::SpacingConstraint(0.5, keycardSize), realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize), String::StrToWStr(name).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
