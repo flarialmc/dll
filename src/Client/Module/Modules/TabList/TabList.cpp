@@ -98,6 +98,7 @@ void TabList::defaultConfig() {
     setDef("uiscale", 0.65f);
     setDef("playerCount", true);
     setDef("serverIP", true);
+    setDef("maxColumn", 10.f);
     getKeybind();
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
@@ -122,6 +123,7 @@ void TabList::settingsRender(float settingsOffset) {
 
     addHeader("Misc");
     addToggle("Player Count", "", "playerCount");
+    addSlider("Max Players Column", "", "maxColumn", 30.f, 1.f);
     addToggle("Server IP", "", "serverIP");
     addToggle("Alphabetical Order", "", "alphaOrder");
     addToggle("Flarial First", "Prioritize Flarial users (Dev > Gamer > Booster > Supporter > Default) at the top", "flarialFirst");
@@ -566,6 +568,7 @@ void TabList::normalRender(int index, std::string &value) {
 
             float totalWidth = keycardSize * 0.8f;
             float totalHeight = keycardSize * 0.5f;
+            int maxColumn = floor(getOps<float>("maxColumn"));
 
             float fontSize = Constraints::SpacingConstraint(3, keycardSize);
             std::vector<float> columnx = {};
@@ -592,11 +595,11 @@ void TabList::normalRender(int index, std::string &value) {
                 if (it != APIUtils::onlineUsers.end()) textMetric.x += Constraints::SpacingConstraint(0.5, keycardSize);
 
                 if (textMetric.x > curMax) curMax = textMetric.x;
-                if (i < 10) totalHeight += keycardSize * 0.7f;
+                if (i < maxColumn) totalHeight += keycardSize * 0.7f;
 
                 validPlayers++;
 
-                if ((i + 1) % 10 == 0 || i == vecmap.size() - 1) {
+                if ((i + 1) % maxColumn == 0 || i == vecmap.size() - 1) {
                     totalWidth += curMax + keycardSize * 0.8f;
                     columnx.push_back(curMax + keycardSize * 0.8f);
                     curMax = 0;
@@ -849,9 +852,9 @@ void TabList::normalRender(int index, std::string &value) {
 
                 realcenter.y += Constraints::SpacingConstraint(0.70, keycardSize);
 
-                if ((i + 1) % 10 == 0) {
-                    realcenter.y -= Constraints::SpacingConstraint(0.70, keycardSize) * 10;
-                    fakex += columnx[i / 10];
+                if ((i + 1) % maxColumn == 0) {
+                    realcenter.y -= Constraints::SpacingConstraint(0.70, keycardSize) * maxColumn;
+                    fakex += columnx[i / maxColumn];
                 }
             }
 
