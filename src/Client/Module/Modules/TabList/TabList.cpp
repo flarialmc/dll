@@ -56,9 +56,19 @@ struct PlayerHeadLoadTask {
     bool isDX12;
 };
 
+struct PlayerHeadReadyTexture {
+    std::string playerName;
+    std::vector<unsigned char> processedData;
+    int width;
+    int height;
+    bool isDX12;
+};
+
 static std::queue<PlayerHeadLoadTask> g_loadQueue;
 static std::mutex g_loadQueueMutex;
 static std::condition_variable g_loadQueueCV;
+static std::queue<PlayerHeadReadyTexture> g_readyQueue; // Textures ready for main thread processing
+static std::mutex g_readyQueueMutex;
 static std::atomic<bool> g_shouldStopLoading{false};
 static std::vector<std::thread> g_loaderThreads;
 static constexpr int NUM_LOADER_THREADS = 3; // Use 3 threads for loading
@@ -79,10 +89,18 @@ void StopAsyncLoading() {
     }
     g_loaderThreads.clear();
     
-    // Clear remaining queue
-    std::lock_guard<std::mutex> lock(g_loadQueueMutex);
-    while (!g_loadQueue.empty()) {
-        g_loadQueue.pop();
+    // Clear remaining queues
+    {
+        std::lock_guard<std::mutex> lock(g_loadQueueMutex);
+        while (!g_loadQueue.empty()) {
+            g_loadQueue.pop();
+        }
+    }
+    {
+        std::lock_guard<std::mutex> lock(g_readyQueueMutex);
+        while (!g_readyQueue.empty()) {
+            g_readyQueue.pop();
+        }
     }
 }
 
@@ -111,7 +129,7 @@ void CleanupPlayerHeadTextures() {
     SwapchainHook::ResetPlayerHeadDescriptors();
 }
 
-// Worker thread function for loading textures
+// Worker thread function for processing image data (no D3D operations)
 void PlayerHeadLoaderWorker() {
     while (!g_shouldStopLoading) {
         PlayerHeadLoadTask task;
@@ -129,12 +147,20 @@ void PlayerHeadLoaderWorker() {
             g_loadQueue.pop();
         }
         
-        // Process the task
-        if (task.isDX12) {
-            CreateTextureFromBytesDX12Sync(task.playerName, task.imageData.data(), task.width, task.height);
-        } else {
-            CreateTextureFromBytesDX11Sync(task.playerName, task.imageData.data(), task.width, task.height);
+        // Process the image data (CPU work only, no D3D operations)
+        // The data is already processed, so we just move it to the ready queue
+        {
+            std::lock_guard<std::mutex> readyLock(g_readyQueueMutex);
+            g_readyQueue.push({
+                task.playerName,
+                std::move(task.imageData),
+                task.width,
+                task.height,
+                task.isDX12
+            });
         }
+        
+        if (logDebug) Logger::debug("Background thread processed playerhead data for {}", task.playerName);
     }
 }
 
@@ -150,6 +176,41 @@ void InitializeAsyncLoading() {
     }
     
     if (logDebug) Logger::debug("Initialized {} playerhead loader threads", NUM_LOADER_THREADS);
+}
+
+// Process ready textures on main thread (called each frame)
+void ProcessReadyPlayerHeadTextures() {
+    // Skip processing if we're already running slow (adaptive throttling)
+    static auto lastFrameTime = std::chrono::high_resolution_clock::now();
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    auto frameDuration = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - lastFrameTime);
+    lastFrameTime = currentTime;
+    
+    // If last frame took longer than 16.67ms (60fps), skip texture processing
+    if (frameDuration.count() > 16670) {
+        return;
+    }
+    
+    // Very conservative - only process 1 texture per frame to maintain 60fps
+    PlayerHeadReadyTexture ready;
+    
+    // Get next ready texture
+    {
+        std::lock_guard<std::mutex> lock(g_readyQueueMutex);
+        if (g_readyQueue.empty()) return;
+        
+        ready = std::move(g_readyQueue.front());
+        g_readyQueue.pop();
+    }
+    
+    // Create the actual D3D texture on main thread
+    if (ready.isDX12) {
+        CreateTextureFromBytesDX12Sync(ready.playerName, ready.processedData.data(), ready.width, ready.height);
+    } else {
+        CreateTextureFromBytesDX11Sync(ready.playerName, ready.processedData.data(), ready.width, ready.height);
+    }
+    
+    if (logDebug) Logger::debug("Main thread created D3D texture for player {}", ready.playerName);
 }
 
 // Periodic cleanup to free unused descriptors (updated to use new system)
@@ -701,6 +762,12 @@ ID3D11ShaderResourceView* CreateTextureFromBytesDX11(
 void TabList::normalRender(int index, std::string &value) {
     if (!this->isEnabled()) return;
     if (SDK::hasInstanced && (active || ClickGUI::editmenu)) {
+        // Process ready textures from background threads (every other frame for performance)
+        static int processCounter = 0;
+        if (++processCounter % 2 == 0) {
+            ProcessReadyPlayerHeadTextures();
+        }
+        
         // Periodically clean up unused descriptors (every ~5 seconds at 60fps)
         static int cleanupCounter = 0;
         if (++cleanupCounter > 300) {
