@@ -16,6 +16,5 @@ void KeyHook::keyCallback(int key, bool state) {
 
     eventMgr.trigger(event);
 
-    if (!event->isCancelled())
-        funcOriginal(event->getKey(), state);
+    if (!event->isCancelled()) funcOriginal(event->getKey(), state);
 }

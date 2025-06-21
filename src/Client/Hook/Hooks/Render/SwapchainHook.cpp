@@ -8,20 +8,24 @@
 #include <algorithm>
 #include <codecvt>
 #include <windows.h>
+#include <unknwn.h>
 #include <iostream>
 #include <Psapi.h>
 #include <tlhelp32.h>
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_dx11.h>
 #include <imgui/imgui_impl_dx12.h>
 #include <imgui/imgui_impl_win32.h>
 #include <imgui/imgui_freetype.h>
-
+#include "unknwnbase.h"
 #include "UnderUIHooks.hpp"
 #include "CreateSwapchainForCoreWindowHook.hpp"
 #include "ResizeHook.hpp"
+using ::IUnknown;
 
 #include "../../../Module/Modules/MotionBlur/MotionBlur.hpp"
+#include "../../../../Assets/Assets.hpp"
 
 SwapchainHook::SwapchainHook() : Hook("swapchain_hook", 0) {}
 
@@ -37,8 +41,8 @@ BOOL _ = FALSE, $ = FALSE;
 static std::chrono::high_resolution_clock fpsclock;
 static std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 static std::chrono::steady_clock::time_point previousFrameTime = std::chrono::high_resolution_clock::now();
-//
-auto window = (HWND) FindWindowA(nullptr, (LPCSTR) "Minecraft");
+
+HWND window2 = FindWindowA(nullptr, "Minecraft");
 
 int SwapchainHook::currentBitmap;
 
@@ -49,10 +53,10 @@ bool unloadDll(const wchar_t *moduleName) {
             Logger::debug("DLL unloaded");
             return true;
         }
-        Logger::error("Failed to FreeLibrary");
+        LOG_ERROR("Failed to FreeLibrary");
         return false;
     }
-    Logger::error("Failed to unload DLL");
+    LOG_ERROR("Failed to unload DLL");
     return false;
 }
 
@@ -100,12 +104,12 @@ void SwapchainHook::enableHook() {
     queueReset = Client::settings.getSettingByName<bool>("recreateAtStart")->value;
     if (Client::settings.getSettingByName<bool>("killdx")->value) queueReset = true;
 
-    if (!window) {
-        window = FindWindowByTitle("Minecraft");
+    if (!window2) {
+        window2 = FindWindowByTitle("Minecraft");
     }
 
-    if (!window) {
-        window = FindWindowByTitle("Flarial");
+    if (!window2) {
+        window2 = FindWindowByTitle("Flarial");
     }
 
     if (kiero::getRenderType() == kiero::RenderType::D3D12) {
@@ -118,7 +122,7 @@ void SwapchainHook::enableHook() {
 
     IDXGIFactory2 *pFactory = NULL;
     CreateDXGIFactory(IID_PPV_ARGS(&pFactory));
-    if (!pFactory) Logger::error("Factory not created");
+    if (!pFactory) LOG_ERROR("Factory not created");
 
     CreateSwapchainForCoreWindowHook::hook(pFactory);
 
@@ -136,11 +140,6 @@ void SwapchainHook::enableHook() {
     std::string gpuName = converter.to_bytes(gpuNameW);
     MC::GPU = gpuName;
     Logger::info("GPU name: {}", gpuName.c_str());
-    if (gpuName.contains("Intel") && Client::settings.getSettingByName<bool>("forceIntel")->value) {
-        queueReset = true;
-        Client::settings.getSettingByName<bool>("killdx")->value = true;
-    }
-    /* FORCE DX11 ON INTEL DEVICES */
 
 
     Memory::SafeRelease(pFactory);
@@ -167,7 +166,6 @@ bool SwapchainHook::currentVsyncState;
 
 
 HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncInterval, UINT flags) {
-
     if (Client::disable) return funcOriginal(pSwapChain, syncInterval, flags);
 
     if (currentVsyncState != Client::settings.getSettingByName<bool>("vsync")->value) {
@@ -187,8 +185,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     UnderUIHooks::index = 0;
 
-    if (D2D::context)
-    MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
+    if (D2D::context) MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
 
     /* UNDER UI HOOK - CLEARDEPTHSTENCILVIEW */
@@ -210,11 +207,15 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
         if (queue == nullptr) {
 
+
             DX11Init();
+
 
         } else {
 
+
             DX12Init();
+
 
         }
 
@@ -253,7 +254,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 
     try {
         if (init && initImgui && !FlarialGUI::hasLoadedAll) { FlarialGUI::LoadAllImages(); FlarialGUI::hasLoadedAll = true; }
-    } catch (const std::exception &ex) { Logger::error("Fail at loading all images: ", ex.what()); }
+    } catch (const std::exception &ex) { LOG_ERROR("Fail at loading all images: ", ex.what()); }
 
 
     if (currentVsyncState) {
@@ -265,7 +266,7 @@ HRESULT SwapchainHook::swapchainCallback(IDXGISwapChain3 *pSwapChain, UINT syncI
 }
 
 void SwapchainHook::DX11Init() {
-    Logger::debug("Not a DX12 device, running DX11 procedures");
+    Logger::debug("Initializing for DX11");
 
     const D2D1_CREATION_PROPERTIES properties
             {
@@ -292,7 +293,7 @@ void SwapchainHook::DX11Init() {
         ImGui::CreateContext();
 
         d3d11Device->GetImmediateContext(&context);
-        ImGui_ImplWin32_Init(window);
+        ImGui_ImplWin32_Init(window2);
         ImGui_ImplDX11_Init(d3d11Device, context);
         initImgui = true;
 
@@ -311,6 +312,8 @@ void SwapchainHook::DX11Init() {
 
 void SwapchainHook::DX12Init() {
 
+
+    Logger::debug("Initializing for DX12");
     ID3D12Device5 *device;
     swapchain->GetDevice(IID_PPV_ARGS(&d3d12Device5));
 
@@ -320,7 +323,7 @@ void SwapchainHook::DX12Init() {
         fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
         D3D11On12CreateDevice(device,
-                              D3D11_CREATE_DEVICE_FLAG::D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
+                              D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0,
                               (IUnknown **) &queue, 1, 0, &SwapchainHook::d3d11Device, &context,
                               nullptr);
 
@@ -409,6 +412,8 @@ void SwapchainHook::DX11Render(bool underui) {
 
     SaveBackbuffer(underui);
 
+    if (!D2D::context) return;
+
     D2D::context->BeginDraw();
 
     ID3D11RenderTargetView *mainRenderTargetView = nullptr;
@@ -490,6 +495,7 @@ void SwapchainHook::DX11Render(bool underui) {
 void SwapchainHook::DX12Render(bool underui) {
     currentBitmap = (int) swapchain->GetCurrentBackBufferIndex();
 
+
     ID3D12Fence* fence;
 
     UINT64 fenceValue = 0;
@@ -497,15 +503,16 @@ void SwapchainHook::DX12Render(bool underui) {
 
     ID3D11Resource *resource = D3D11Resources[currentBitmap];
     d3d11On12Device->AcquireWrappedResources(&resource, 1);
-
+    if (!D2D::context) return;
     SaveBackbuffer();
     D2D::context->SetTarget(D2D1Bitmaps[currentBitmap]);
+    MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
     DX12Blur();
 
+
     D2D::context->BeginDraw();
 
-    MC::windowSize = Vec2(D2D::context->GetSize().width, D2D::context->GetSize().height);
 
     DXGI_SWAP_CHAIN_DESC sdesc;
     swapchain->GetDesc(&sdesc);
@@ -515,7 +522,7 @@ void SwapchainHook::DX12Render(bool underui) {
 
     D3D12_DESCRIPTOR_HEAP_DESC descriptorImGuiRender = {};
     descriptorImGuiRender.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    descriptorImGuiRender.NumDescriptors = buffersCounts;
+    descriptorImGuiRender.NumDescriptors = TOTAL_CONSOLIDATED_DESCRIPTORS; // Consolidated heap for ImGui + Images
     descriptorImGuiRender.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
     if (d3d12DescriptorHeapImGuiRender or SUCCEEDED(d3d12Device5->CreateDescriptorHeap(&descriptorImGuiRender,
@@ -563,12 +570,47 @@ void SwapchainHook::DX12Render(bool underui) {
 
                     ImGui::CreateContext();
 
-                    ImGui_ImplWin32_Init(window);
+                    ImGui_ImplWin32_Init(window2);
 
-                    ImGui_ImplDX12_Init(d3d12Device5, buffersCounts,
-                                        DXGI_FORMAT_R8G8B8A8_UNORM, d3d12DescriptorHeapImGuiRender,
-                                        d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart(),
-                                        d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart());
+                    // Set up modern ImGui D3D12 initialization with consolidated descriptor heap
+                    ImGui_ImplDX12_InitInfo init_info = {};
+                    init_info.Device = d3d12Device5;
+                    init_info.CommandQueue = queue;
+                    init_info.NumFramesInFlight = buffersCounts;
+                    init_info.RTVFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+                    init_info.DSVFormat = DXGI_FORMAT_UNKNOWN;
+                    init_info.SrvDescriptorHeap = d3d12DescriptorHeapImGuiRender;
+                    
+                    // Set up descriptor allocation callbacks for consolidated heap
+                    init_info.SrvDescriptorAllocFn = [](ImGui_ImplDX12_InitInfo* info, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle) {
+                        std::lock_guard<std::mutex> lock(descriptorAllocationMutex);
+                        
+                        // ImGui font descriptor is always allocated at index 0 (reserved)
+                        UINT fontDescriptorIndex = 0;
+                        UINT handle_increment = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+                        
+                        D3D12_CPU_DESCRIPTOR_HANDLE cpu = d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
+                        cpu.ptr += (handle_increment * fontDescriptorIndex);
+                        
+                        D3D12_GPU_DESCRIPTOR_HANDLE gpu = d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
+                        gpu.ptr += (handle_increment * fontDescriptorIndex);
+                        
+                        *out_cpu_handle = cpu;
+                        *out_gpu_handle = gpu;
+                        
+                        Logger::custom(fg(fmt::color::green), "DescriptorAlloc", "Allocated ImGui font descriptor at reserved index {}", fontDescriptorIndex);
+                    };
+                    
+                    init_info.SrvDescriptorFreeFn = [](ImGui_ImplDX12_InitInfo* info, D3D12_CPU_DESCRIPTOR_HANDLE cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE gpu_handle) {
+                        // ImGui font descriptor is persistent, no need to free
+                        Logger::custom(fg(fmt::color::cyan), "DescriptorFree", "ImGui font descriptor freed (no-op)");
+                    };
+
+                    if (!ImGui_ImplDX12_Init(&init_info)) {
+                        Logger::custom(fg(fmt::color::red), "ImGui", "ERROR: Failed to initialize ImGui DX12 backend with consolidated heap");
+                    } else {
+                        Logger::custom(fg(fmt::color::green), "ImGui", "ImGui DX12 backend initialized successfully with consolidated heap");
+                    }
                 }
 
                 ImGui_ImplDX12_NewFrame();
@@ -631,7 +673,16 @@ void SwapchainHook::DX12Render(bool underui) {
                 d3d12CommandList->OMSetRenderTargets(1,
                                                      &frameContexts[currentBitmap].main_render_target_descriptor,
                                                      FALSE, nullptr);
+                // Bind consolidated descriptor heap (contains both ImGui and image descriptors)
                 d3d12CommandList->SetDescriptorHeaps(1, &d3d12DescriptorHeapImGuiRender);
+                
+                static bool loggedOnce = false;
+                if (!loggedOnce) {
+                    loggedOnce = true;
+                    Logger::custom(fg(fmt::color::green), "D3D12Render", "Using consolidated descriptor heap for Intel GPU compatibility");
+                    Logger::custom(fg(fmt::color::cyan), "D3D12Render", "Consolidated heap: 0x{:X}, Total descriptors: {}", 
+                                   reinterpret_cast<uintptr_t>(d3d12DescriptorHeapImGuiRender), TOTAL_CONSOLIDATED_DESCRIPTORS);
+                }
 
                 ImGui::End();
                 ImGui::EndFrame();
@@ -735,44 +786,47 @@ void SwapchainHook::prepareBlur() {
 void SwapchainHook::Fonts() {
     /* IMPORTANT FONT STUFF */
     if (ImGui::GetCurrentContext()) {
+        static bool fontRebuildQueued = false;
 
         if (FlarialGUI::DoLoadFontLater) {
-
             FontKey fontK = FlarialGUI::LoadFontLater;
-            if (Client::settings.getSettingByName<bool>("overrideFontWeight")->value) fontK.weight = FlarialGUI::GetFontWeightFromString(Client::settings.getSettingByName<std::string>("fontWeight")->value);
-                if (!FlarialGUI::FontMap[fontK]) {
-                    FlarialGUI::LoadFontFromFontFamily(fontK);
-                }
+            if (Client::settings.getSettingByName<bool>("overrideFontWeight")->value) {
+                fontK.weight = FlarialGUI::GetFontWeightFromString(Client::settings.getSettingByName<std::string>("fontWeight")->value);
+            }
+            
+            if (!FlarialGUI::FontMap[fontK]) {
+                FlarialGUI::LoadFontFromFontFamily(fontK);
+            }
             FlarialGUI::DoLoadFontLater = false;
-
         }
-
-        //std::cout << FlarialGUI::WideToNarrow(FlarialGUI::GetFontFilePath(L"Dosis", DWRITE_FONT_WEIGHT_EXTRA_BLACK)).c_str() << std::endl;
-        /*
-        if(!allfontloaded) {
-            FlarialGUI::LoadFonts(FlarialGUI::FontMap);
-
-            allfontloaded = true;
-        }
-        */
 
         auto& io = ImGui::GetIO();
 
+        // Batch font operations to reduce expensive device object recreation
         if (FlarialGUI::HasAFontLoaded) {
-            io.Fonts->Build();
-            if (!queue) {
-                ImGui_ImplDX11_InvalidateDeviceObjects();
-                ImGui_ImplDX11_CreateDeviceObjects();
-            }
-            else {
-                ImGui_ImplDX12_InvalidateDeviceObjects();
-                ImGui_ImplDX12_CreateDeviceObjects();
-            }
-
+            fontRebuildQueued = true;
             FlarialGUI::HasAFontLoaded = false;
         }
-    }
 
+        // Only rebuild when actually needed and defer expensive operations
+        if (fontRebuildQueued) {
+            io.Fonts->Build();
+            
+            // Use a static frame counter to defer expensive device object recreation
+            static int frameDelay = 0;
+            if (++frameDelay >= 3) { // Wait 3 frames to batch multiple font loads
+                if (!queue) {
+                    ImGui_ImplDX11_InvalidateDeviceObjects();
+                    ImGui_ImplDX11_CreateDeviceObjects();
+                } else {
+                    ImGui_ImplDX12_InvalidateDeviceObjects();
+                    ImGui_ImplDX12_CreateDeviceObjects();
+                }
+                fontRebuildQueued = false;
+                frameDelay = 0;
+            }
+        }
+    }
     /* IMPORTANT FONT STUFF */
 }
 void SwapchainHook::FPSMeasure() {
@@ -791,6 +845,8 @@ void SwapchainHook::FPSMeasure() {
 
     std::chrono::duration<float> frameTime = std::chrono::high_resolution_clock::now() - previousFrameTime;
     previousFrameTime = std::chrono::high_resolution_clock::now();
+
+    MC::frameTime = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(frameTime).count();
 
     float currentFrameRate = 1.0f / frameTime.count();
 
@@ -846,4 +902,57 @@ void SwapchainHook::SaveBackbuffer(bool underui) {
         hr = D3D11Resources[currentBitmap]->QueryInterface(IID_PPV_ARGS(&SavedD3D11BackBuffer));
         if (FAILED(hr)) std::cout << "Failed to query interface: " << std::hex << hr << std::endl;
     }
+}
+
+// Consolidated descriptor heap management functions
+bool SwapchainHook::AllocateImageDescriptor(UINT imageId, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle) {
+    std::lock_guard<std::mutex> lock(descriptorAllocationMutex);
+    
+    if (!d3d12DescriptorHeapImGuiRender || !d3d12Device5) {
+        Logger::custom(fg(fmt::color::red), "DescriptorAlloc", "ERROR: Consolidated descriptor heap or device not available");
+        return false;
+    }
+    
+    // Calculate descriptor index for this image (imageId - 100 + IMGUI_FONT_DESCRIPTORS)
+    UINT descriptorIndex = (imageId - 100) + IMGUI_FONT_DESCRIPTORS;
+    
+    if (descriptorIndex >= TOTAL_CONSOLIDATED_DESCRIPTORS) {
+        Logger::custom(fg(fmt::color::red), "DescriptorAlloc", "ERROR: Image ID {} would exceed descriptor heap capacity (index {} >= {})", 
+                       imageId, descriptorIndex, TOTAL_CONSOLIDATED_DESCRIPTORS);
+        return false;
+    }
+    
+    UINT handle_increment = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    
+    D3D12_CPU_DESCRIPTOR_HANDLE cpu = d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
+    cpu.ptr += (handle_increment * descriptorIndex);
+    
+    D3D12_GPU_DESCRIPTOR_HANDLE gpu = d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
+    gpu.ptr += (handle_increment * descriptorIndex);
+    
+    *out_cpu_handle = cpu;
+    *out_gpu_handle = gpu;
+    
+    // Update next available index if this is beyond current usage
+    if (descriptorIndex >= nextAvailableDescriptorIndex) {
+        nextAvailableDescriptorIndex = descriptorIndex + 1;
+    }
+    
+
+    return true;
+}
+
+void SwapchainHook::FreeImageDescriptor(UINT imageId) {
+    std::lock_guard<std::mutex> lock(descriptorAllocationMutex);
+    
+    // For now, we don't actually free descriptors as images are persistent
+    // This could be enhanced later with proper free list management
+    Logger::custom(fg(fmt::color::cyan), "DescriptorFree", "Freed descriptor for image ID {} (no-op for persistent images)", imageId);
+}
+
+void SwapchainHook::ResetDescriptorAllocation() {
+    std::lock_guard<std::mutex> lock(descriptorAllocationMutex);
+    
+    nextAvailableDescriptorIndex = IMGUI_FONT_DESCRIPTORS; // Reset to start after ImGui font
+    Logger::custom(fg(fmt::color::yellow), "DescriptorAlloc", "Reset descriptor allocation, next available index: {}", nextAvailableDescriptorIndex);
 }

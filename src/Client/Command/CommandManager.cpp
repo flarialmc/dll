@@ -12,6 +12,7 @@
 #include "Commands/SkinStealCommand.hpp"
 #include "Commands/SpotifyCommand/SpotifyCommand.hpp"
 #include "Commands/IRCChat.hpp"
+#include "../Client.hpp"
 
 std::vector<std::shared_ptr<Command>> CommandManager::Commands = std::vector<std::shared_ptr<Command>>();
 CommandManager CommandManager::instance;
@@ -21,7 +22,6 @@ void CommandManager::initialize() {
     Commands.push_back(std::make_unique<TestCommand>());
     Commands.push_back(std::make_unique<BindCommand>());
 #endif
-
     Commands.push_back(std::make_unique<HelpCommand>());
     Commands.push_back(std::make_unique<PrefixCommand>());
     Commands.push_back(std::make_unique<LuaCommand>());
@@ -39,7 +39,7 @@ void CommandManager::onPacket(PacketSendEvent &event) {
     if (id != MinecraftPacketIds::Text) return;
 
     auto pkt = reinterpret_cast<TextPacket*>(event.getPacket());
-    if (!pkt || pkt->message.empty() || pkt->message[0] != Command::prefix[0]) return;
+    if (!pkt || pkt->message.empty() || pkt->message[0] != Client::settings.getSettingByName<std::string>("dotcmdprefix")->value[0]) return;
 
     event.setCancelled(true);
 
@@ -63,7 +63,7 @@ void CommandManager::onPacket(PacketSendEvent &event) {
     });
 
     if (it == Commands.end()) {
-        SDK::clientInstance->getGuiData()->displayClientMessage("§cInvalid command. Use §b.help §cto see all available commands.");
+        SDK::clientInstance->getGuiData()->displayClientMessage("§cInvalid command. Use §b" + Client::settings.getSettingByName<std::string>("dotcmdprefix")->value + "help §cto see all available commands.");
         return;
     }
 
