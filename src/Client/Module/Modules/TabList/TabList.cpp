@@ -566,7 +566,7 @@ void TabList::normalRender(int index, std::string &value) {
                                                                                                   return v;
                                                                                               }());
 
-            float totalWidth = keycardSize * 0.8f;
+            float totalWidth = keycardSize * 0.9f;
             float totalHeight = keycardSize * 0.5f;
             int maxColumn = floor(getOps<float>("maxColumn"));
 
@@ -600,8 +600,8 @@ void TabList::normalRender(int index, std::string &value) {
                 validPlayers++;
 
                 if ((i + 1) % maxColumn == 0 || i == vecmap.size() - 1) {
-                    totalWidth += curMax + keycardSize * 0.8f;
-                    columnx.push_back(curMax + keycardSize * 0.8f);
+                    totalWidth += curMax + keycardSize * 0.9f;
+                    columnx.push_back(curMax + keycardSize * 0.9f);
                     curMax = 0;
                 }
             }
@@ -691,12 +691,12 @@ void TabList::normalRender(int index, std::string &value) {
                     }
 
                     FlarialGUI::image(imageResource, D2D1::RectF(
-                                          fakex + Constraints::SpacingConstraint(p1, keycardSize) + Constraints::SpacingConstraint(0.65f, keycardSize),
+                                          fakex + Constraints::SpacingConstraint(p1, keycardSize) + keycardSize,
                                           realcenter.y + Constraints::SpacingConstraint(p2, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
-                                          fakex + Constraints::SpacingConstraint(p3, keycardSize) + Constraints::SpacingConstraint(0.65f, keycardSize),
+                                          fakex + Constraints::SpacingConstraint(p3, keycardSize) + keycardSize,
                                           realcenter.y + Constraints::SpacingConstraint(p4, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize)));
 
-                    xx = Constraints::SpacingConstraint(0.5, keycardSize);
+                    xx = Constraints::SpacingConstraint(0.67, keycardSize);
                 }
 
 
