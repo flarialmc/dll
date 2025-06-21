@@ -1,5 +1,8 @@
 #include "TabList.hpp"
 
+#include <wrl/client.h>
+
+#include "Command/Commands/SkinStealCommand.hpp"
 #include "Modules/ClickGUI/ClickGUI.hpp"
 
 TabList::TabList(): Module("Tab List", "Java-like tab list.\nLists the current online players on the server.", IDR_LIST_PNG, "TAB") {
@@ -77,35 +80,38 @@ int TabList::getRolePriority(const std::string &name) {
     return 4; // Default Flarial user (in onlineUsers but no specific role)
 }
 
-std::vector<std::string> TabList::sortByFlarialHierarchy(const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap) {
-    std::vector<std::pair<mcUUID, PlayerListEntry> > players(sourceMap.begin(), sourceMap.end());
+std::vector<const std::pair<const mcUUID, PlayerListEntry> *> TabList::sortByFlarialHierarchy(
+    const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap) {
+    std::vector<const std::pair<const mcUUID, PlayerListEntry> *> players;
+    players.reserve(sourceMap.size());
 
-    std::sort(players.begin(), players.end(), [](const auto &a, const auto &b) {
-        int priorityA = getRolePriority(a.second.name);
-        int priorityB = getRolePriority(b.second.name);
-        if (priorityA != priorityB) return priorityA < priorityB;
-        return std::lexicographical_compare(a.second.name.begin(), a.second.name.end(), b.second.name.begin(), b.second.name.end(), [](char c1, char c2) {
-            return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
-        });
-    });
-
-    std::vector<std::string> sortedNames;
-    sortedNames.reserve(players.size());
-    for (const auto &[uuid, entry]: players) {
-        sortedNames.push_back(entry.name);
+    for (const auto &pair: sourceMap) {
+        players.push_back(&pair);
     }
 
-    return sortedNames;
+    std::sort(players.begin(), players.end(), [](const auto *a, const auto *b) {
+        int priorityA = getRolePriority(a->second.name);
+        int priorityB = getRolePriority(b->second.name);
+        if (priorityA != priorityB) return priorityA < priorityB;
+
+        return std::lexicographical_compare(
+            a->second.name.begin(), a->second.name.end(),
+            b->second.name.begin(), b->second.name.end(),
+            [](char c1, char c2) {
+                return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
+            });
+    });
+
+    return players;
 }
 
-std::vector<std::string> TabList::copyMapInAlphabeticalOrder(const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap, bool flarialFirst) {
-    std::vector<std::string> names;
-    std::vector<std::string> flarialNames;
-    std::vector<std::string> nonFlarialNames;
+std::vector<const std::pair<const mcUUID, PlayerListEntry> *> TabList::copyMapInAlphabeticalOrder(
+    const std::unordered_map<mcUUID, PlayerListEntry> &sourceMap, bool flarialFirst) {
+    std::vector<const std::pair<const mcUUID, PlayerListEntry> *> flarialEntries;
+    std::vector<const std::pair<const mcUUID, PlayerListEntry> *> nonFlarialEntries;
 
-    // Split players into Flarial and non-Flarial groups
     for (const auto &pair: sourceMap) {
-        std::string name = pair.second.name;
+        const std::string &name = pair.second.name;
         if (name.empty()) continue;
 
         std::string clearedName = String::removeNonAlphanumeric(String::removeColorCodes(name));
@@ -113,46 +119,77 @@ std::vector<std::string> TabList::copyMapInAlphabeticalOrder(const std::unordere
 
         auto it = std::ranges::find(APIUtils::onlineUsers, clearedName);
         if (flarialFirst && it != APIUtils::onlineUsers.end()) {
-            flarialNames.push_back(name);
+            flarialEntries.push_back(&pair);
         } else {
-            nonFlarialNames.push_back(name);
+            nonFlarialEntries.push_back(&pair);
         }
     }
 
+    auto sortByRoleAndName = [](const auto *a, const auto *b) {
+        int priorityA = getRolePriority(a->second.name);
+        int priorityB = getRolePriority(b->second.name);
+        if (priorityA != priorityB) return priorityA < priorityB;
+        return std::lexicographical_compare(
+            a->second.name.begin(), a->second.name.end(),
+            b->second.name.begin(), b->second.name.end(),
+            [](char c1, char c2) {
+                return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
+            });
+    };
+
+    auto sortByName = [](const auto *a, const auto *b) {
+        return std::lexicographical_compare(
+            a->second.name.begin(), a->second.name.end(),
+            b->second.name.begin(), b->second.name.end(),
+            [](char c1, char c2) {
+                return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
+            });
+    };
+
+    std::vector<const std::pair<const mcUUID, PlayerListEntry> *> result;
+
     if (flarialFirst) {
-        // Sort Flarial users by hierarchy using ApiUtils
-        std::sort(flarialNames.begin(), flarialNames.end(), [](const auto &a, const auto &b) {
-            int priorityA = getRolePriority(a);
-            int priorityB = getRolePriority(b);
-            if (priorityA != priorityB) return priorityA < priorityB;
-            // If priorities are equal, sort alphabetically
-            return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), [](char c1, char c2) {
-                return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
-            });
-        });
-
-        // Sort non-Flarial users alphabetically
-        std::sort(nonFlarialNames.begin(), nonFlarialNames.end(), [](const auto &a, const auto &b) {
-            return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), [](char c1, char c2) {
-                return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
-            });
-        });
-
-        // Combine: Flarial users first, then non-Flarial
-        names.insert(names.end(), flarialNames.begin(), flarialNames.end());
-        names.insert(names.end(), nonFlarialNames.begin(), nonFlarialNames.end());
+        std::sort(flarialEntries.begin(), flarialEntries.end(), sortByRoleAndName);
+        std::sort(nonFlarialEntries.begin(), nonFlarialEntries.end(), sortByName);
+        result.insert(result.end(), flarialEntries.begin(), flarialEntries.end());
+        result.insert(result.end(), nonFlarialEntries.begin(), nonFlarialEntries.end());
     } else {
-        // Standard alphabetical sort for all players
-        names = nonFlarialNames;
-        names.insert(names.end(), flarialNames.begin(), flarialNames.end());
-        std::sort(names.begin(), names.end(), [](const auto &a, const auto &b) {
-            return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), [](char c1, char c2) {
-                return std::tolower(static_cast<unsigned char>(c1)) < std::tolower(static_cast<unsigned char>(c2));
-            });
-        });
+        result = flarialEntries;
+        result.insert(result.end(), nonFlarialEntries.begin(), nonFlarialEntries.end());
+        std::sort(result.begin(), result.end(), sortByName);
     }
 
-    return names;
+    return result;
+}
+
+ID3D11ShaderResourceView *CreateTextureFromBytes(
+    ID3D11Device *device,
+    const unsigned char *data,
+    int width,
+    int height) {
+    D3D11_TEXTURE2D_DESC desc = {};
+    desc.Width = width;
+    desc.Height = height;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+    D3D11_SUBRESOURCE_DATA initData = {};
+    initData.pSysMem = data;
+    initData.SysMemPitch = width * 4;
+
+    ID3D11Texture2D *texture = nullptr;
+    HRESULT hr = device->CreateTexture2D(&desc, &initData, &texture);
+    if (FAILED(hr) || !texture) return nullptr;
+
+    ID3D11ShaderResourceView *srv = nullptr;
+    hr = device->CreateShaderResourceView(texture, nullptr, &srv);
+    texture->Release(); // Release after SRV is created
+
+    return srv;
 }
 
 void TabList::normalRender(int index, std::string &value) {
@@ -161,7 +198,7 @@ void TabList::normalRender(int index, std::string &value) {
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             float keycardSize = Constraints::RelativeConstraint(0.05f * getOps<float>("uiscale"), "height", true);
 
-            Vec2<float> settingperc{getOps<float>("percentageX"), getOps<float>("percentageY")};
+            Vec2<float> settingperc{0.0, 0.0};
 
             bool alphaOrder = getOps<bool>("alphaOrder");
             bool flarialFirst = getOps<bool>("flarialFirst");
@@ -170,15 +207,17 @@ void TabList::normalRender(int index, std::string &value) {
             std::map<std::string, int> roleLogos = {{"Dev", IDR_CYAN_LOGO_PNG}, {"Staff", IDR_WHITE_LOGO_PNG}, {"Gamer", IDR_GAMER_LOGO_PNG}, {"Booster", IDR_BOOSTER_LOGO_PNG}, {"Supporter", IDR_SUPPORTER_LOGO_PNG}, {"Default", IDR_RED_LOGO_PNG}};
             auto module = ModuleManager::getModule("Nick");
 
-            auto vecmap = alphaOrder
-                              ? copyMapInAlphabeticalOrder(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap(), flarialFirst)
-                              : (flarialFirst
-                                     ? sortByFlarialHierarchy(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap())
-                                     : [] {
-                                         std::vector<std::string> result;
-                                         std::transform(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap().begin(), SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap().end(), std::back_inserter(result), [](const auto &p) { return p.second.name; });
-                                         return result;
-                                     }());
+            std::vector<const std::pair<const mcUUID, PlayerListEntry> *> vecmap = alphaOrder
+                                                                                       ? copyMapInAlphabeticalOrder(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap(), flarialFirst)
+                                                                                       : (flarialFirst
+                                                                                              ? sortByFlarialHierarchy(SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap())
+                                                                                              : [] {
+                                                                                                  const auto &map = SDK::clientInstance->getLocalPlayer()->getLevel()->getPlayerMap();
+                                                                                                  std::vector<const std::pair<const mcUUID, PlayerListEntry> *> v;
+                                                                                                  v.reserve(map.size());
+                                                                                                  for (const auto &pair: map) v.push_back(&pair);
+                                                                                                  return v;
+                                                                                              }());
 
             float totalWidth = keycardSize * 0.4f;
             float totalHeight = keycardSize * 0.5f;
@@ -189,9 +228,9 @@ void TabList::normalRender(int index, std::string &value) {
             size_t validPlayers = 0;
 
             for (size_t i = 0; i < vecmap.size(); i++) {
-                if (vecmap[i].empty()) continue;
+                if (vecmap[i]->second.name.empty()) continue;
 
-                std::string name = String::removeColorCodes(vecmap[i]);
+                std::string name = String::removeColorCodes(vecmap[i]->second.name);
                 if (name.empty()) continue;
 
                 std::string clearedName = String::removeNonAlphanumeric(name);
@@ -273,9 +312,9 @@ void TabList::normalRender(int index, std::string &value) {
             }
 
             for (size_t i = 0; i < vecmap.size(); i++) {
-                if (vecmap[i].empty()) continue;
+                if (vecmap[i]->second.name.empty()) continue;
 
-                std::string name = String::removeColorCodes(vecmap[i]);
+                std::string name = String::removeColorCodes(vecmap[i]->second.name);
                 if (name.empty()) continue;
 
                 std::string clearedName = String::removeNonAlphanumeric(name);
@@ -304,13 +343,55 @@ void TabList::normalRender(int index, std::string &value) {
                     }
 
                     FlarialGUI::image(imageResource, D2D1::RectF(
-                        fakex + Constraints::SpacingConstraint(p1, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
-                        realcenter.y + Constraints::SpacingConstraint(p2, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
-                        fakex + Constraints::SpacingConstraint(p3, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
-                        realcenter.y + Constraints::SpacingConstraint(p4, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize)));
+                                          fakex + Constraints::SpacingConstraint(p1, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
+                                          realcenter.y + Constraints::SpacingConstraint(p2, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
+                                          fakex + Constraints::SpacingConstraint(p3, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
+                                          realcenter.y + Constraints::SpacingConstraint(p4, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize)));
 
                     xx = Constraints::SpacingConstraint(0.5, keycardSize);
                 }
+                // PLAYER HEAD START
+
+                Logger::debug("{}x{}", vecmap[i]->second.playerSkin.mSkinImage.mWidth, vecmap[i]->second.playerSkin.mSkinImage.mHeight);
+                std::cout << static_cast<int>(vecmap[i]->second.playerSkin.mSkinImage.imageFormat) << std::endl;
+
+                if (static_cast<int>(vecmap[i]->second.playerSkin.mSkinImage.imageFormat) == 4) {
+                    std::vector<unsigned char> head = SkinStealCommand::cropHead(vecmap[i]->second.playerSkin.mSkinImage);
+
+                    // Microsoft::WRL::ComPtr<ID3D11Device> d3d11Device;
+
+                    // if (SwapchainHook::queue != nullptr) {
+                    //     Logger::debug("using dx12");
+                    //     SwapchainHook::d3d11On12Device->QueryInterface(IID_PPV_ARGS(&d3d11Device));
+                    // }
+
+                    if (SwapchainHook::d3d11Device != nullptr) {
+                        Logger::debug("d3d11device not null");
+                        ID3D11ShaderResourceView *srv = CreateTextureFromBytes(
+                            SwapchainHook::d3d11Device,
+                            head.data(),
+                            8, 8
+                        );
+
+                        if (srv) {
+                            Logger::debug("resource loaded!");
+                            ImDrawList *drawList = ImGui::GetForegroundDrawList();
+                            if (drawList != nullptr) {
+                                Logger::debug("drawing!");
+                                drawList->AddImage(
+                                    reinterpret_cast<ImTextureID>(srv),
+                                    ImVec2(fakex + keycardSize / 2.f, realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize)), // Top-left corner (x, y)
+                                    ImVec2((fakex + keycardSize / 2.f) + 8, (realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize)) + 8) // Bottom-right corner (x + width, y + height)
+                                );
+                            }
+
+                            srv->Release();
+                            Logger::debug("released");
+                        }
+                    }
+                }
+
+                // PLAYER HEAD END
 
                 FlarialGUI::FlarialTextWithFont(fakex + xx + Constraints::SpacingConstraint(0.5, keycardSize), realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize), String::StrToWStr(name).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
 
