@@ -4,6 +4,12 @@
 #include <unordered_map>
 #include <mutex>
 #include <set>
+#include <chrono>
+#include <atomic>
+#include <thread>
+#include <future>
+#include <queue>
+#include <condition_variable>
 #include <winrt/base.h>
 
 #include "Command/Commands/SkinStealCommand.hpp"
@@ -14,75 +20,148 @@ bool logDebug = false;
 TabList::TabList(): Module("Tab List", "Java-like tab list.\nLists the current online players on the server.", IDR_LIST_PNG, "TAB") {
 }
 // DX12 texture creation from raw bytes
+enum class PlayerHeadLoadState {
+    NotLoaded,
+    Loading,
+    Loaded,
+    Failed
+};
+
 struct PlayerHeadTexture {
     winrt::com_ptr<ID3D12Resource> texture;
     D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle;
     D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle;
-    UINT descriptorIndex = UINT_MAX;
+    UINT descriptorId = UINT_MAX;
+    std::chrono::steady_clock::time_point lastUsed;
+    std::atomic<PlayerHeadLoadState> loadState{PlayerHeadLoadState::NotLoaded};
     bool valid = false;
 };
+
 struct PlayerHeadTextureDX11 {
     winrt::com_ptr<ID3D11ShaderResourceView> srv;
+    std::atomic<PlayerHeadLoadState> loadState{PlayerHeadLoadState::NotLoaded};
     bool valid = false;
 };
 
 static std::unordered_map<std::string, PlayerHeadTextureDX11> g_playerHeadTexturesDX11;
 static std::unordered_map<std::string, PlayerHeadTexture> g_playerHeadTextures;
-static UINT g_nextPlayerHeadId = 200;  // Start from 200, can go much higher
-static std::mutex g_idMutex;
-static std::set<UINT> g_usedIds;
+static std::mutex g_playerHeadMutex;
+
+// Async loading infrastructure
+struct PlayerHeadLoadTask {
+    std::string playerName;
+    std::vector<unsigned char> imageData;
+    int width;
+    int height;
+    bool isDX12;
+};
+
+static std::queue<PlayerHeadLoadTask> g_loadQueue;
+static std::mutex g_loadQueueMutex;
+static std::condition_variable g_loadQueueCV;
+static std::atomic<bool> g_shouldStopLoading{false};
+static std::vector<std::thread> g_loaderThreads;
+static constexpr int NUM_LOADER_THREADS = 3; // Use 3 threads for loading
+
+// Forward declarations for sync functions
+PlayerHeadTexture* CreateTextureFromBytesDX12Sync(const std::string& playerName, const unsigned char* data, int width, int height);
+ID3D11ShaderResourceView* CreateTextureFromBytesDX11Sync(const std::string& playerName, const unsigned char* data, int width, int height);
+
+// Stop async loading threads
+void StopAsyncLoading() {
+    g_shouldStopLoading = true;
+    g_loadQueueCV.notify_all();
+    
+    for (auto& thread : g_loaderThreads) {
+        if (thread.joinable()) {
+            thread.join();
+        }
+    }
+    g_loaderThreads.clear();
+    
+    // Clear remaining queue
+    std::lock_guard<std::mutex> lock(g_loadQueueMutex);
+    while (!g_loadQueue.empty()) {
+        g_loadQueue.pop();
+    }
+}
 
 // Cleanup function for player head textures
 void CleanupPlayerHeadTextures() {
     if (logDebug) Logger::debug("Cleaning up player head textures - DX12: {}, DX11: {}", g_playerHeadTextures.size(), g_playerHeadTexturesDX11.size());
     
-    // Clear DX12 textures and used IDs
-    {
-        std::lock_guard<std::mutex> lock(g_idMutex);
-        g_usedIds.clear();
-        g_nextPlayerHeadId = 200; // Reset counter
-    }
+    // Stop async loading first
+    StopAsyncLoading();
     
-    for (auto& pair : g_playerHeadTextures) {
-        if (pair.second.valid && pair.second.descriptorIndex != UINT_MAX) {
-            SwapchainHook::FreeImageDescriptor(pair.second.descriptorIndex);
+    // Clear DX12 textures and free descriptors
+    {
+        std::lock_guard<std::mutex> lock(g_playerHeadMutex);
+        for (auto& pair : g_playerHeadTextures) {
+            if (pair.second.valid && pair.second.descriptorId != UINT_MAX) {
+                SwapchainHook::FreePlayerHeadDescriptor(pair.second.descriptorId);
+            }
         }
+        g_playerHeadTextures.clear();
     }
-    g_playerHeadTextures.clear();
     
     // Clear DX11 textures
     g_playerHeadTexturesDX11.clear();
+    
+    // Reset the playerhead descriptor system
+    SwapchainHook::ResetPlayerHeadDescriptors();
 }
 
-// Periodic cleanup to free unused descriptors
+// Worker thread function for loading textures
+void PlayerHeadLoaderWorker() {
+    while (!g_shouldStopLoading) {
+        PlayerHeadLoadTask task;
+        
+        // Wait for a task
+        {
+            std::unique_lock<std::mutex> lock(g_loadQueueMutex);
+            g_loadQueueCV.wait(lock, [] { return !g_loadQueue.empty() || g_shouldStopLoading; });
+            
+            if (g_shouldStopLoading) break;
+            
+            if (g_loadQueue.empty()) continue;
+            
+            task = std::move(g_loadQueue.front());
+            g_loadQueue.pop();
+        }
+        
+        // Process the task
+        if (task.isDX12) {
+            CreateTextureFromBytesDX12Sync(task.playerName, task.imageData.data(), task.width, task.height);
+        } else {
+            CreateTextureFromBytesDX11Sync(task.playerName, task.imageData.data(), task.width, task.height);
+        }
+    }
+}
+
+// Initialize async loading system
+void InitializeAsyncLoading() {
+    if (!g_loaderThreads.empty()) return; // Already initialized
+    
+    g_shouldStopLoading = false;
+    g_loaderThreads.reserve(NUM_LOADER_THREADS);
+    
+    for (int i = 0; i < NUM_LOADER_THREADS; ++i) {
+        g_loaderThreads.emplace_back(PlayerHeadLoaderWorker);
+    }
+    
+    if (logDebug) Logger::debug("Initialized {} playerhead loader threads", NUM_LOADER_THREADS);
+}
+
+// Periodic cleanup to free unused descriptors (updated to use new system)
 void CleanupUnusedPlayerHeadDescriptors() {
-    std::lock_guard<std::mutex> lock(g_idMutex);
-    
-    std::vector<UINT> toRemove;
-    for (UINT id : g_usedIds) {
-        bool inUse = false;
-        for (const auto& pair : g_playerHeadTextures) {
-            if (pair.second.descriptorIndex == id && pair.second.valid) {
-                inUse = true;
-                break;
-            }
-        }
-        if (!inUse) {
-            toRemove.push_back(id);
-        }
-    }
-    
-    if (!toRemove.empty()) {
-        if (logDebug) Logger::debug("Cleaning up {} unused descriptors", toRemove.size());
-        for (UINT id : toRemove) {
-            g_usedIds.erase(id);
-            SwapchainHook::FreeImageDescriptor(id);
-        }
-    }
+    // The new system automatically handles cleanup in SwapchainHook::CleanupOldPlayerHeads
+    // We call it with a reasonable limit to keep memory usage under control
+    SwapchainHook::CleanupOldPlayerHeads(500); // Keep at most 500 cached playerheads
 }
 void TabList::onEnable() {
     Listen(this, RenderEvent, &TabList::onRender)
     Listen(this, KeyEvent, &TabList::onKey)
+    InitializeAsyncLoading();
     Module::onEnable();
 }
 
@@ -241,7 +320,8 @@ std::vector<const std::pair<const mcUUID, PlayerListEntry> *> TabList::copyMapIn
 
 
 // DX11 texture creation from raw bytes
-ID3D11ShaderResourceView *CreateTextureFromBytesDX11(
+// Synchronous DX11 texture creation (called from worker threads)
+ID3D11ShaderResourceView *CreateTextureFromBytesDX11Sync(
     const std::string& playerName,
     const unsigned char *data,
     int width,
@@ -250,6 +330,8 @@ ID3D11ShaderResourceView *CreateTextureFromBytesDX11(
         return nullptr;
     }
 
+    std::lock_guard<std::mutex> lock(g_playerHeadMutex);
+
     // Check if texture already exists
     auto it = g_playerHeadTexturesDX11.find(playerName);
     if (it != g_playerHeadTexturesDX11.end() && it->second.valid) {
@@ -257,6 +339,7 @@ ID3D11ShaderResourceView *CreateTextureFromBytesDX11(
     }
 
     PlayerHeadTextureDX11& playerTex = g_playerHeadTexturesDX11[playerName];
+    playerTex.loadState = PlayerHeadLoadState::Loading;
 
     D3D11_TEXTURE2D_DESC desc = {};
     desc.Width = width;
@@ -278,6 +361,7 @@ ID3D11ShaderResourceView *CreateTextureFromBytesDX11(
     HRESULT hr = SwapchainHook::d3d11Device->CreateTexture2D(&desc, &initData, texture.put());
     if (FAILED(hr)) {
         if (logDebug) Logger::debug("Failed to create DX11 texture: 0x{:x}", hr);
+        playerTex.loadState = PlayerHeadLoadState::Failed;
         return nullptr;
     }
 
@@ -290,17 +374,20 @@ ID3D11ShaderResourceView *CreateTextureFromBytesDX11(
     hr = SwapchainHook::d3d11Device->CreateShaderResourceView(texture.get(), &srvDesc, playerTex.srv.put());
     if (FAILED(hr)) {
         if (logDebug) Logger::debug("Failed to create DX11 SRV: 0x{:x}", hr);
+        playerTex.loadState = PlayerHeadLoadState::Failed;
         return nullptr;
     }
 
     playerTex.valid = true;
+    playerTex.loadState = PlayerHeadLoadState::Loaded;
     if (logDebug) Logger::debug("Successfully created DX11 player head texture for {}", playerName);
     return playerTex.srv.get();
 }
 
 
 
-PlayerHeadTexture* CreateTextureFromBytesDX12(
+// Synchronous DX12 texture creation (called from worker threads)
+PlayerHeadTexture* CreateTextureFromBytesDX12Sync(
     const std::string& playerName,
     const unsigned char* data,
     int width,
@@ -314,34 +401,28 @@ PlayerHeadTexture* CreateTextureFromBytesDX12(
         return nullptr;
     }
 
-    // Check if texture already exists
+    std::lock_guard<std::mutex> lock(g_playerHeadMutex);
+
+    // Check if texture already exists and update its last used time
     auto it = g_playerHeadTextures.find(playerName);
     if (it != g_playerHeadTextures.end() && it->second.valid) {
+        it->second.lastUsed = std::chrono::steady_clock::now();
+        if (logDebug) Logger::debug("Reusing existing texture for player {}", playerName);
         return &it->second;
     }
 
     PlayerHeadTexture& playerTex = g_playerHeadTextures[playerName];
     
-    // If this player already has a descriptor index allocated, reuse it
-    if (playerTex.descriptorIndex != UINT_MAX) {
-        if (logDebug) Logger::debug("Reusing existing descriptor {} for player {}", playerTex.descriptorIndex, playerName);
-    } else {
-        // Dynamic ID allocation - just use the next available ID
-        std::lock_guard<std::mutex> lock(g_idMutex);
-        playerTex.descriptorIndex = g_nextPlayerHeadId++;
-        g_usedIds.insert(playerTex.descriptorIndex);
-        if (logDebug) Logger::debug("Allocated new descriptor {} for player {}", playerTex.descriptorIndex, playerName);
-    }
+    // Mark as loading
+    playerTex.loadState = PlayerHeadLoadState::Loading;
     
-    // Allocate descriptor
-    if (!SwapchainHook::AllocateImageDescriptor(playerTex.descriptorIndex, 
-                                               &playerTex.srvCpuHandle, &playerTex.srvGpuHandle)) {
-        if (logDebug) Logger::debug("Failed to allocate DX12 descriptor for ID {}", playerTex.descriptorIndex);
-        // Remove from used IDs since allocation failed
-        {
-            std::lock_guard<std::mutex> lock(g_idMutex);
-            g_usedIds.erase(playerTex.descriptorIndex);
-        }
+    // Allocate descriptor using new system
+    if (!SwapchainHook::AllocatePlayerHeadDescriptor(playerName, 
+                                                    &playerTex.srvCpuHandle, 
+                                                    &playerTex.srvGpuHandle, 
+                                                    &playerTex.descriptorId)) {
+        if (logDebug) Logger::debug("Failed to allocate DX12 playerhead descriptor for {}", playerName);
+        playerTex.loadState = PlayerHeadLoadState::Failed;
         return nullptr;
     }
 
@@ -367,6 +448,7 @@ PlayerHeadTexture* CreateTextureFromBytesDX12(
 
     if (FAILED(hr)) {
         if (logDebug) Logger::debug("Failed to create DX12 texture: 0x{:x}", hr);
+        playerTex.loadState = PlayerHeadLoadState::Failed;
         return nullptr;
     }
 
@@ -510,6 +592,7 @@ PlayerHeadTexture* CreateTextureFromBytesDX12(
         if (waitResult != WAIT_OBJECT_0) {
             if (logDebug) Logger::debug("Fence wait timed out or failed: {}", waitResult);
             CloseHandle(fenceEvent);
+            playerTex.loadState = PlayerHeadLoadState::Failed;
             return nullptr;
         }
     }
@@ -527,8 +610,92 @@ PlayerHeadTexture* CreateTextureFromBytesDX12(
     SwapchainHook::d3d12Device5->CreateShaderResourceView(playerTex.texture.get(), &srvDesc, playerTex.srvCpuHandle);
 
     playerTex.valid = true;
+    playerTex.lastUsed = std::chrono::steady_clock::now();
+    playerTex.loadState = PlayerHeadLoadState::Loaded;
     if (logDebug) Logger::debug("Successfully created DX12 player head texture for {}", playerName);
     return &playerTex;
+}
+
+// Async DX12 texture creation (queues loading, returns immediately)
+PlayerHeadTexture* CreateTextureFromBytesDX12(
+    const std::string& playerName,
+    const unsigned char* data,
+    int width,
+    int height) {
+    
+    std::lock_guard<std::mutex> lock(g_playerHeadMutex);
+    
+    // Check if texture already exists or is loading
+    auto it = g_playerHeadTextures.find(playerName);
+    if (it != g_playerHeadTextures.end()) {
+        if (it->second.valid && it->second.loadState == PlayerHeadLoadState::Loaded) {
+            it->second.lastUsed = std::chrono::steady_clock::now();
+            return &it->second;
+        }
+        if (it->second.loadState == PlayerHeadLoadState::Loading) {
+            return &it->second; // Already loading
+        }
+    }
+    
+    // Create entry and mark as loading
+    PlayerHeadTexture& playerTex = g_playerHeadTextures[playerName];
+    playerTex.loadState = PlayerHeadLoadState::Loading;
+    playerTex.lastUsed = std::chrono::steady_clock::now();
+    
+    // Queue the loading task
+    {
+        std::lock_guard<std::mutex> queueLock(g_loadQueueMutex);
+        g_loadQueue.push({
+            playerName,
+            std::vector<unsigned char>(data, data + (width * height * 4)),
+            width,
+            height,
+            true // isDX12
+        });
+    }
+    g_loadQueueCV.notify_one();
+    
+    return &playerTex;
+}
+
+// Async DX11 texture creation (queues loading, returns immediately)  
+ID3D11ShaderResourceView* CreateTextureFromBytesDX11(
+    const std::string& playerName,
+    const unsigned char* data,
+    int width,
+    int height) {
+    
+    std::lock_guard<std::mutex> lock(g_playerHeadMutex);
+    
+    // Check if texture already exists or is loading
+    auto it = g_playerHeadTexturesDX11.find(playerName);
+    if (it != g_playerHeadTexturesDX11.end()) {
+        if (it->second.valid && it->second.loadState == PlayerHeadLoadState::Loaded) {
+            return it->second.srv.get();
+        }
+        if (it->second.loadState == PlayerHeadLoadState::Loading) {
+            return nullptr; // Still loading, return null for now
+        }
+    }
+    
+    // Create entry and mark as loading
+    PlayerHeadTextureDX11& playerTex = g_playerHeadTexturesDX11[playerName];
+    playerTex.loadState = PlayerHeadLoadState::Loading;
+    
+    // Queue the loading task
+    {
+        std::lock_guard<std::mutex> queueLock(g_loadQueueMutex);
+        g_loadQueue.push({
+            playerName,
+            std::vector<unsigned char>(data, data + (width * height * 4)),
+            width,
+            height,
+            false // isDX12
+        });
+    }
+    g_loadQueueCV.notify_one();
+    
+    return nullptr; // Will be available next frame
 }
 
 void TabList::normalRender(int index, std::string &value) {
@@ -539,8 +706,8 @@ void TabList::normalRender(int index, std::string &value) {
         if (++cleanupCounter > 300) {
             cleanupCounter = 0;
             CleanupUnusedPlayerHeadDescriptors();
-            if (logDebug) Logger::debug("Descriptor usage: {} used IDs, {} DX12 textures, {} DX11 textures",
-                         g_usedIds.size(), g_playerHeadTextures.size(), g_playerHeadTexturesDX11.size());
+            if (logDebug) Logger::debug("PlayerHead usage: {} DX12 textures, {} DX11 textures",
+                         g_playerHeadTextures.size(), g_playerHeadTexturesDX11.size());
         }
         if (SDK::clientInstance->getLocalPlayer() != nullptr) {
             float keycardSize = Constraints::RelativeConstraint(0.05f * getOps<float>("uiscale"), "height", true);
@@ -779,7 +946,16 @@ void TabList::normalRender(int index, std::string &value) {
                         // DX12 path
                         PlayerHeadTexture* playerTex = CreateTextureFromBytesDX12(playerName, scaledHead.data(), scaledSize, scaledSize);
                         PlayerHeadTexture* playerTex2 = CreateTextureFromBytesDX12("_" + playerName, scaledHead2.data(), scaledSize, scaledSize);
-                        if (playerTex && playerTex->valid) {
+                        if (playerTex && playerTex->valid && playerTex->loadState == PlayerHeadLoadState::Loaded) {
+                            // Update last used time when rendering
+                            {
+                                std::lock_guard<std::mutex> lock(g_playerHeadMutex);
+                                playerTex->lastUsed = std::chrono::steady_clock::now();
+                                if (playerTex2 && playerTex2->valid && playerTex2->loadState == PlayerHeadLoadState::Loaded) {
+                                    playerTex2->lastUsed = std::chrono::steady_clock::now();
+                                }
+                            }
+                            
                             ImDrawList* drawList = ImGui::GetForegroundDrawList();
                             if (drawList) {
                                 if (logDebug) Logger::debug("DX12 GPU handle for {}: 0x{:x}", playerName, playerTex->srvGpuHandle.ptr);
@@ -793,13 +969,15 @@ void TabList::normalRender(int index, std::string &value) {
                                     IM_COL32_WHITE
                                 );
 
-                                drawList->AddImage(
-                                    (ImTextureID)playerTex2->srvGpuHandle.ptr,
-                                    headPos2,
-                                    ImVec2(headPos2.x + headSize22D.x, headPos2.y + headSize22D.y),
-                                    ImVec2(0, 0), ImVec2(1, 1),
-                                    IM_COL32_WHITE
-                                );
+                                if (playerTex2 && playerTex2->valid && playerTex2->loadState == PlayerHeadLoadState::Loaded) {
+                                    drawList->AddImage(
+                                        (ImTextureID)playerTex2->srvGpuHandle.ptr,
+                                        headPos2,
+                                        ImVec2(headPos2.x + headSize22D.x, headPos2.y + headSize22D.y),
+                                        ImVec2(0, 0), ImVec2(1, 1),
+                                        IM_COL32_WHITE
+                                    );
+                                }
 
                                 if (logDebug) Logger::debug("Rendered DX12 head for player {} at ({}, {})", playerName, headPos.x, headPos.y);
                             }
@@ -825,13 +1003,15 @@ void TabList::normalRender(int index, std::string &value) {
                                     IM_COL32_WHITE
                                 );
 
-                                drawList->AddImage(
-                                    reinterpret_cast<ImTextureID>(srv2),
-                                    headPos2,
-                                    ImVec2(headPos2.x + headSize22D.x, headPos2.y + headSize22D.y),
-                                    ImVec2(0, 0), ImVec2(1, 1),
-                                    IM_COL32_WHITE
-                                );
+                                if (srv2) {
+                                    drawList->AddImage(
+                                        reinterpret_cast<ImTextureID>(srv2),
+                                        headPos2,
+                                        ImVec2(headPos2.x + headSize22D.x, headPos2.y + headSize22D.y),
+                                        ImVec2(0, 0), ImVec2(1, 1),
+                                        IM_COL32_WHITE
+                                    );
+                                }
 
                                 if (logDebug) Logger::debug("Rendered DX11 head for player {} at ({}, {})", playerName, headPos.x, headPos.y);
                             }

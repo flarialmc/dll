@@ -956,3 +956,158 @@ void SwapchainHook::ResetDescriptorAllocation() {
     nextAvailableDescriptorIndex = IMGUI_FONT_DESCRIPTORS; // Reset to start after ImGui font
     Logger::custom(fg(fmt::color::yellow), "DescriptorAlloc", "Reset descriptor allocation, next available index: {}", nextAvailableDescriptorIndex);
 }
+
+// PlayerHead Descriptor Management Functions
+
+bool SwapchainHook::AllocatePlayerHeadDescriptor(const std::string& playerName, D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle, UINT* out_descriptor_id) {
+    std::lock_guard<std::mutex> lock(playerHeadDescriptorMutex);
+    
+    if (!d3d12DescriptorHeapImGuiRender || !d3d12Device5) {
+        Logger::custom(fg(fmt::color::red), "PlayerHeadDescriptor", "ERROR: Descriptor heap or device not available");
+        return false;
+    }
+    
+    // Check if we already have a descriptor for this player
+    for (auto& [descriptorId, info] : playerHeadDescriptors) {
+        if (info.playerName == playerName && info.inUse) {
+            info.lastUsed = std::chrono::steady_clock::now();
+            
+            // Calculate descriptor handles - convert playerhead ID to heap index
+            UINT heapIndex = descriptorId - PLAYERHEAD_DESCRIPTOR_START + IMGUI_FONT_DESCRIPTORS + MAX_IMAGE_DESCRIPTORS;
+            
+            UINT handle_increment = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+            
+            D3D12_CPU_DESCRIPTOR_HANDLE cpu = d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
+            cpu.ptr += (handle_increment * heapIndex);
+            
+            D3D12_GPU_DESCRIPTOR_HANDLE gpu = d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
+            gpu.ptr += (handle_increment * heapIndex);
+            
+            *out_cpu_handle = cpu;
+            *out_gpu_handle = gpu;
+            *out_descriptor_id = descriptorId;
+            
+            Logger::custom(fg(fmt::color::green), "PlayerHeadDescriptor", "Reusing descriptor {} (heap index {}) for player '{}'", descriptorId, heapIndex, playerName);
+            return true;
+        }
+    }
+    
+    UINT descriptorId;
+    
+    // Try to reuse a freed descriptor first
+    if (!freePlayerHeadDescriptors.empty()) {
+        descriptorId = freePlayerHeadDescriptors.front();
+        freePlayerHeadDescriptors.pop();
+        Logger::custom(fg(fmt::color::cyan), "PlayerHeadDescriptor", "Reusing freed descriptor {} for player '{}'", descriptorId, playerName);
+    } else {
+        // Allocate new descriptor
+        static bool initialized = false;
+        if (!initialized) {
+            nextPlayerHeadDescriptorId = PLAYERHEAD_DESCRIPTOR_START;
+            initialized = true;
+        }
+        
+        if (nextPlayerHeadDescriptorId >= PLAYERHEAD_DESCRIPTOR_END) {
+            Logger::custom(fg(fmt::color::red), "PlayerHeadDescriptor", "ERROR: No more playerhead descriptors available (reached limit of {})", MAX_PLAYERHEAD_DESCRIPTORS);
+            return false;
+        }
+        
+        descriptorId = nextPlayerHeadDescriptorId++;
+        Logger::custom(fg(fmt::color::blue), "PlayerHeadDescriptor", "Allocating new descriptor {} for player '{}'", descriptorId, playerName);
+    }
+    
+    // Calculate descriptor handles - convert playerhead ID to heap index
+    UINT heapIndex = descriptorId - PLAYERHEAD_DESCRIPTOR_START + IMGUI_FONT_DESCRIPTORS + MAX_IMAGE_DESCRIPTORS;
+    
+    if (heapIndex >= TOTAL_CONSOLIDATED_DESCRIPTORS) {
+        Logger::custom(fg(fmt::color::red), "PlayerHeadDescriptor", "ERROR: Calculated heap index {} exceeds total descriptors {} (descriptor ID {})", heapIndex, TOTAL_CONSOLIDATED_DESCRIPTORS, descriptorId);
+        return false;
+    }
+    
+    Logger::custom(fg(fmt::color::cyan), "PlayerHeadDescriptor", "Using descriptor {} -> heap index {} for player '{}'", descriptorId, heapIndex, playerName);
+    
+    UINT handle_increment = d3d12Device5->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    
+    D3D12_CPU_DESCRIPTOR_HANDLE cpu = d3d12DescriptorHeapImGuiRender->GetCPUDescriptorHandleForHeapStart();
+    cpu.ptr += (handle_increment * heapIndex);
+    
+    D3D12_GPU_DESCRIPTOR_HANDLE gpu = d3d12DescriptorHeapImGuiRender->GetGPUDescriptorHandleForHeapStart();
+    gpu.ptr += (handle_increment * heapIndex);
+    
+    // Store descriptor info
+    playerHeadDescriptors[descriptorId] = {
+        playerName,
+        std::chrono::steady_clock::now(),
+        true
+    };
+    
+    *out_cpu_handle = cpu;
+    *out_gpu_handle = gpu;
+    *out_descriptor_id = descriptorId;
+    
+    return true;
+}
+
+void SwapchainHook::FreePlayerHeadDescriptor(UINT descriptorId) {
+    std::lock_guard<std::mutex> lock(playerHeadDescriptorMutex);
+    
+    auto it = playerHeadDescriptors.find(descriptorId);
+    if (it != playerHeadDescriptors.end()) {
+        Logger::custom(fg(fmt::color::yellow), "PlayerHeadDescriptor", "Freeing descriptor {} for player '{}'", descriptorId, it->second.playerName);
+        it->second.inUse = false;
+        freePlayerHeadDescriptors.push(descriptorId);
+        playerHeadDescriptors.erase(it);
+    }
+}
+
+void SwapchainHook::CleanupOldPlayerHeads(size_t maxCached) {
+    std::lock_guard<std::mutex> lock(playerHeadDescriptorMutex);
+    
+    if (playerHeadDescriptors.size() <= maxCached) {
+        return; // No need to cleanup
+    }
+    
+    // Collect descriptors sorted by last used time
+    std::vector<std::pair<UINT, std::chrono::steady_clock::time_point>> descriptorAges;
+    for (const auto& [descriptorId, info] : playerHeadDescriptors) {
+        if (info.inUse) {
+            descriptorAges.emplace_back(descriptorId, info.lastUsed);
+        }
+    }
+    
+    // Sort by oldest first
+    std::sort(descriptorAges.begin(), descriptorAges.end(),
+        [](const auto& a, const auto& b) {
+            return a.second < b.second;
+        });
+    
+    // Free oldest descriptors to get under the limit
+    size_t toRemove = playerHeadDescriptors.size() - maxCached;
+    size_t removed = 0;
+    
+    for (const auto& [descriptorId, _] : descriptorAges) {
+        if (removed >= toRemove) break;
+        
+        auto it = playerHeadDescriptors.find(descriptorId);
+        if (it != playerHeadDescriptors.end()) {
+            Logger::custom(fg(fmt::color::orange), "PlayerHeadDescriptor", "Cleaning up old descriptor {} for player '{}'", descriptorId, it->second.playerName);
+            freePlayerHeadDescriptors.push(descriptorId);
+            playerHeadDescriptors.erase(it);
+            removed++;
+        }
+    }
+    
+    Logger::custom(fg(fmt::color::green), "PlayerHeadDescriptor", "Cleaned up {} old playerhead descriptors, {} remaining", removed, playerHeadDescriptors.size());
+}
+
+void SwapchainHook::ResetPlayerHeadDescriptors() {
+    std::lock_guard<std::mutex> lock(playerHeadDescriptorMutex);
+    
+    playerHeadDescriptors.clear();
+    while (!freePlayerHeadDescriptors.empty()) {
+        freePlayerHeadDescriptors.pop();
+    }
+    nextPlayerHeadDescriptorId = PLAYERHEAD_DESCRIPTOR_START;
+    
+    Logger::custom(fg(fmt::color::cyan), "PlayerHeadDescriptor", "Reset all playerhead descriptors");
+}
