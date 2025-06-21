@@ -10,6 +10,7 @@ Sprint::Sprint(): Module("Toggle Sprint", "Automatically sprints for you!!!", ID
 void Sprint::onEnable()
 {
     Listen(this, KeyEvent, &Sprint::onKey)
+    Listen(this, MouseEvent, &Sprint::onMouse)
     Listen(this, RenderEvent, &Sprint::onRender)
     Listen(this, TickEvent, &Sprint::onTick)
     Module::onEnable();
@@ -18,6 +19,7 @@ void Sprint::onEnable()
 void Sprint::onDisable()
 {
     Deafen(this, KeyEvent, &Sprint::onKey)
+    Deafen(this, MouseEvent, &Sprint::onMouse)
     Deafen(this, RenderEvent, &Sprint::onRender)
     Deafen(this, TickEvent, &Sprint::onTick)
     Module::onDisable();
@@ -85,6 +87,13 @@ void Sprint::onKey(KeyEvent& event)
 {
     if (!this->isEnabled()) return;
     if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
+        keybindActions[0]({});
+    }
+}
+
+void Sprint::onMouse(MouseEvent &event) {
+    if (!this->isEnabled()) return;
+    if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Press) {
         keybindActions[0]({});
     }
 }

@@ -55,6 +55,7 @@ void FreeLook::onEnable() {
     Listen(this, PerspectiveEvent, &FreeLook::onGetViewPerspective)
     Listen(this, UpdatePlayerEvent, &FreeLook::onUpdatePlayer)
     Listen(this, KeyEvent, &FreeLook::onKey)
+    Listen(this, MouseEvent, &FreeLook::onMouse)
     Module::onEnable();
 
 }
@@ -65,6 +66,7 @@ void FreeLook::onDisable() {
     Deafen(this, PerspectiveEvent, &FreeLook::onGetViewPerspective)
     Deafen(this, UpdatePlayerEvent, &FreeLook::onUpdatePlayer)
     Deafen(this, KeyEvent, &FreeLook::onKey)
+    Deafen(this, MouseEvent, &FreeLook::onMouse)
     Module::onDisable();
 }
 
@@ -132,6 +134,12 @@ void FreeLook::onKey(KeyEvent &event) {
         }
     }
 
+}
+
+void FreeLook::onMouse(MouseEvent &event) {
+    if (!this->isEnabled()) return;
+    if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Press) keybindActions[0]({});
+    else if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Release) keybindActions[1]({});
 }
 
 void FreeLook::onUpdatePlayer(UpdatePlayerEvent& event) {

@@ -33,7 +33,7 @@ public:
 
 	void onGetFOV(FOVEvent& event);
 
-
+	void checkKeybind(int key);
 
 	void onRender(RenderEvent& event);
 

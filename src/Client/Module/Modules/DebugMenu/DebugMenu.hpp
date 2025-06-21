@@ -93,6 +93,8 @@ public:
 
 	void onKey(KeyEvent& event);
 
+	void onMouse(MouseEvent& event);
+
 	void onHudCursorRendererRender(HudCursorRendererRenderEvent& event);
 
 	void onSetTopScreenName(SetTopScreenNameEvent& event);

@@ -12,6 +12,7 @@ Sneak::Sneak(): Module("Toggle Sneak", "No need to hold down your sneak key.", I
 void Sneak::onEnable()
 {
     Listen(this, KeyEvent, &Sneak::onKey)
+    Listen(this, MouseEvent, &Sneak::onMouse)
     Listen(this, TickEvent, &Sneak::onTick)
     Module::onEnable();
 }
@@ -19,6 +20,7 @@ void Sneak::onEnable()
 void Sneak::onDisable()
 {
     Deafen(this, KeyEvent, &Sneak::onKey)
+    Deafen(this, MouseEvent, &Sneak::onMouse)
     Deafen(this, TickEvent, &Sneak::onTick)
     Module::onDisable();
 }
@@ -56,6 +58,13 @@ void Sneak::onKey(KeyEvent& event)
 { // TODO: it lets sneak key up through (flickers sneak once)
     if (!this->isEnabled()) return;
     if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
+        toggleSneaking = !toggleSneaking;
+    }
+}
+
+void Sneak::onMouse(MouseEvent &event) {
+    if (!this->isEnabled()) return;
+    if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Press) {
         toggleSneaking = !toggleSneaking;
     }
 }

@@ -21,7 +21,9 @@ public:
 
 	void onSetup() override;
 
-	void onKey(KeyEvent& event);;
+	void onKey(KeyEvent& event);
+
+	void onMouse(MouseEvent& event);
 
 	void onRender(RenderEvent& event);
 

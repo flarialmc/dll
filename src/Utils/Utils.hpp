@@ -268,6 +268,7 @@ public:
 	static std::string getLogsPath();
 
 	static std::string getKeyAsString(int key, bool isCapital = false, bool isKeybind = true);
+	static std::string getMouseAsString(int key);
 
 	static int getStringAsKey(const std::string& str);
 

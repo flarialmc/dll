@@ -21,7 +21,9 @@ public:
 	bool toggleSneaking = false;
 	bool toggled = false;
 
-	void onKey(KeyEvent& event);;
+	void onKey(KeyEvent& event);
+
+	void onMouse(MouseEvent& event);
 
 	void onTick(TickEvent& event);
 };

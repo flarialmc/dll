@@ -33,5 +33,7 @@ public:
 
     void onRender(RenderEvent& event);
 
+    void onMouse(const MouseEvent& event);
+
     void onKey(const KeyEvent& event);
 };

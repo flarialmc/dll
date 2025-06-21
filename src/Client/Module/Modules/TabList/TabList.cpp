@@ -8,12 +8,15 @@ TabList::TabList(): Module("Tab List", "Java-like tab list.\nLists the current o
 void TabList::onEnable() {
     Listen(this, RenderEvent, &TabList::onRender)
     Listen(this, KeyEvent, &TabList::onKey)
+    Listen(this, MouseEvent, &TabList::onMouse)
     Module::onEnable();
 }
 
 void TabList::onDisable() {
     Deafen(this, RenderEvent, &TabList::onRender)
     Deafen(this, KeyEvent, &TabList::onKey)
+    Deafen(this, MouseEvent, &TabList::onMouse)
+    CleanupPlayerHeadTextures();
     Module::onDisable();
 }
 
@@ -22,6 +25,8 @@ void TabList::defaultConfig() {
     setDef("uiscale", 0.65f);
     setDef("playerCount", true);
     setDef("serverIP", true);
+    setDef("maxColumn", 10.f);
+    setDef("togglable", false);
     getKeybind();
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
@@ -45,6 +50,7 @@ void TabList::settingsRender(float settingsOffset) {
     extraPadding();
 
     addHeader("Misc");
+    addToggle("Togglable", "", "togglable");
     addToggle("Player Count", "", "playerCount");
     addToggle("Server IP", "", "serverIP");
     addToggle("Alphabetical Order", "", "alphaOrder");
@@ -360,11 +366,17 @@ void TabList::onRender(RenderEvent &event) {
     this->normalRender(20, text);
 }
 
+void TabList::onMouse(const MouseEvent &event) {
+    if (!this->isEnabled()) return;
+    if (Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Press)
+        keybindActions[0]({});
+    if (!getOps<bool>("togglable") && Utils::getMouseAsString(event.getButton()) == getOps<std::string>("keybind") && event.getAction() == MouseAction::Release)
+        this->active = false;
+}
+
 void TabList::onKey(const KeyEvent &event) {
     if (!this->isEnabled()) return;
-    if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) {
-        keybindActions[0]({});
-    }
+    if (this->isKeybind(event.keys) && this->isKeyPartOfKeybind(event.key)) keybindActions[0]({});
 
-    if (!this->isKeybind(event.keys)) this->active = false;
+    if (!getOps<bool>("togglable") && !this->isKeybind(event.keys)) this->active = false;
 }

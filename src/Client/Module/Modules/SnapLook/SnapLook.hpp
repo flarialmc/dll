@@ -16,7 +16,9 @@ public:
 	void settingsRender(float settingsOffset) override;
 
 	// TODO: make it togglable
-	void onKey(KeyEvent& event);;
+	void onKey(KeyEvent& event);
+
+	void onMouse(MouseEvent& event);
 
 	void onGetViewPerspective(PerspectiveEvent& event) const;
 };
