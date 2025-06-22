@@ -84,7 +84,7 @@ void RenderPlayerHeadWithPointFiltering(D3D12_GPU_DESCRIPTOR_HANDLE srvHandle, D
         // Convert D2D1_RECT_F to ImVec2
         ImVec2 topLeft(rect.left, rect.top);
         ImVec2 bottomRight(rect.right, rect.bottom);
-        
+
         // Render with higher resolution texture (64x64 instead of 32x32)
         // This reduces the blur effect from linear filtering
         drawList->AddImage(
@@ -94,7 +94,7 @@ void RenderPlayerHeadWithPointFiltering(D3D12_GPU_DESCRIPTOR_HANDLE srvHandle, D
             ImVec2(0, 0), ImVec2(1, 1),
             IM_COL32_WHITE
         );
-        
+
         if (logDebug) Logger::debug("Rendered DX12 playerhead {} with improved crispness", debugName);
     }
 }
@@ -106,7 +106,7 @@ void RenderPlayerHeadWithPointFilteringDX11(ID3D11ShaderResourceView* srv, D2D1_
         // Convert D2D1_RECT_F to ImVec2
         ImVec2 topLeft(rect.left, rect.top);
         ImVec2 bottomRight(rect.right, rect.bottom);
-        
+
         // Render with higher resolution texture (64x64 instead of 32x32)
         // This reduces the blur effect from linear filtering
         drawList->AddImage(
@@ -116,7 +116,7 @@ void RenderPlayerHeadWithPointFilteringDX11(ID3D11ShaderResourceView* srv, D2D1_
             ImVec2(0, 0), ImVec2(1, 1),
             IM_COL32_WHITE
         );
-        
+
         if (logDebug) Logger::debug("Rendered DX11 playerhead {} with improved crispness", debugName);
     }
 }
@@ -125,14 +125,14 @@ void RenderPlayerHeadWithPointFilteringDX11(ID3D11ShaderResourceView* srv, D2D1_
 void StopAsyncLoading() {
     g_shouldStopLoading = true;
     g_loadQueueCV.notify_all();
-    
+
     for (auto& thread : g_loaderThreads) {
         if (thread.joinable()) {
             thread.join();
         }
     }
     g_loaderThreads.clear();
-    
+
     // Clear remaining queues
     {
         std::lock_guard<std::mutex> lock(g_loadQueueMutex);
@@ -151,10 +151,10 @@ void StopAsyncLoading() {
 // Cleanup function for player head textures
 void CleanupPlayerHeadTextures() {
     if (logDebug) Logger::debug("Cleaning up player head textures - DX12: {}, DX11: {}", g_playerHeadTextures.size(), g_playerHeadTexturesDX11.size());
-    
+
     // Stop async loading first
     StopAsyncLoading();
-    
+
     // Clear DX12 textures and free descriptors
     {
         std::lock_guard<std::mutex> lock(g_playerHeadMutex);
@@ -165,10 +165,10 @@ void CleanupPlayerHeadTextures() {
         }
         g_playerHeadTextures.clear();
     }
-    
+
     // Clear DX11 textures
     g_playerHeadTexturesDX11.clear();
-    
+
     // Reset the playerhead descriptor system
     SwapchainHook::ResetPlayerHeadDescriptors();
 }
@@ -177,20 +177,20 @@ void CleanupPlayerHeadTextures() {
 void PlayerHeadLoaderWorker() {
     while (!g_shouldStopLoading) {
         PlayerHeadLoadTask task;
-        
+
         // Wait for a task
         {
             std::unique_lock<std::mutex> lock(g_loadQueueMutex);
             g_loadQueueCV.wait(lock, [] { return !g_loadQueue.empty() || g_shouldStopLoading; });
-            
+
             if (g_shouldStopLoading) break;
-            
+
             if (g_loadQueue.empty()) continue;
-            
+
             task = std::move(g_loadQueue.front());
             g_loadQueue.pop();
         }
-        
+
         // Process the image data (CPU work only, no D3D operations)
         // The data is already processed, so we just move it to the ready queue
         {
@@ -203,7 +203,7 @@ void PlayerHeadLoaderWorker() {
                 task.isDX12
             });
         }
-        
+
         if (logDebug) Logger::debug("Background thread processed playerhead data for {}", task.playerName);
     }
 }
@@ -211,14 +211,14 @@ void PlayerHeadLoaderWorker() {
 // Initialize async loading system
 void InitializeAsyncLoading() {
     if (!g_loaderThreads.empty()) return; // Already initialized
-    
+
     g_shouldStopLoading = false;
     g_loaderThreads.reserve(NUM_LOADER_THREADS);
-    
+
     for (int i = 0; i < NUM_LOADER_THREADS; ++i) {
         g_loaderThreads.emplace_back(PlayerHeadLoaderWorker);
     }
-    
+
     if (logDebug) Logger::debug("Initialized {} playerhead loader threads", NUM_LOADER_THREADS);
 }
 
@@ -229,12 +229,12 @@ void ProcessReadyPlayerHeadTextures() {
     auto currentTime = std::chrono::high_resolution_clock::now();
     auto frameDuration = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - lastFrameTime);
     lastFrameTime = currentTime;
-    
+
     // More aggressive loading - only skip if frame time is really bad (40fps or worse)
     if (frameDuration.count() > 25000) {
         return;
     }
-    
+
     // Process multiple textures per frame based on performance
     int maxPerFrame;
     if (frameDuration.count() < 10000) {
@@ -244,27 +244,27 @@ void ProcessReadyPlayerHeadTextures() {
     } else {
         maxPerFrame = 1; // Slower frame, process 1
     }
-    
+
     int processed = 0;
     while (processed < maxPerFrame) {
         PlayerHeadReadyTexture ready;
-        
+
         // Get next ready texture
         {
             std::lock_guard<std::mutex> lock(g_readyQueueMutex);
             if (g_readyQueue.empty()) break;
-            
+
             ready = std::move(g_readyQueue.front());
             g_readyQueue.pop();
         }
-        
+
         // Create the actual D3D texture on main thread
         if (ready.isDX12) {
             CreateTextureFromBytesDX12Sync(ready.playerName, ready.processedData.data(), ready.width, ready.height);
         } else {
             CreateTextureFromBytesDX11Sync(ready.playerName, ready.processedData.data(), ready.width, ready.height);
         }
-        
+
         processed++;
         if (logDebug) Logger::debug("Main thread created D3D texture for player {} ({}/{})", ready.playerName, processed, maxPerFrame);
     }
@@ -512,7 +512,7 @@ PlayerHeadTexture* CreateTextureFromBytesDX12Sync(
     int height) {
     // Check minimal requirements for DX12
     if (!SwapchainHook::d3d12Device5 || !SwapchainHook::d3d12DescriptorHeapImGuiRender || !data || width <= 0 || height <= 0) {
-        if (logDebug) Logger::debug("DX12 minimal requirements not met - device: {}, heap: {}, data: {}, size: {}x{}", 
+        if (logDebug) Logger::debug("DX12 minimal requirements not met - device: {}, heap: {}, data: {}, size: {}x{}",
                      SwapchainHook::d3d12Device5 ? "valid" : "null",
                      SwapchainHook::d3d12DescriptorHeapImGuiRender ? "valid" : "null",
                      data ? "valid" : "null", width, height);
@@ -530,14 +530,14 @@ PlayerHeadTexture* CreateTextureFromBytesDX12Sync(
     }
 
     PlayerHeadTexture& playerTex = g_playerHeadTextures[playerName];
-    
+
     // Mark as loading
     playerTex.loadState = PlayerHeadLoadState::Loading;
-    
+
     // Allocate descriptor using new system
-    if (!SwapchainHook::AllocatePlayerHeadDescriptor(playerName, 
-                                                    &playerTex.srvCpuHandle, 
-                                                    &playerTex.srvGpuHandle, 
+    if (!SwapchainHook::AllocatePlayerHeadDescriptor(playerName,
+                                                    &playerTex.srvCpuHandle,
+                                                    &playerTex.srvGpuHandle,
                                                     &playerTex.descriptorId)) {
         if (logDebug) Logger::debug("Failed to allocate DX12 playerhead descriptor for {}", playerName);
         playerTex.loadState = PlayerHeadLoadState::Failed;
@@ -715,7 +715,7 @@ PlayerHeadTexture* CreateTextureFromBytesDX12Sync(
         }
     }
     CloseHandle(fenceEvent);
-    
+
     if (logDebug) Logger::debug("DX12 texture upload completed successfully for {}", playerName);
 
     // Create SRV
@@ -740,9 +740,9 @@ PlayerHeadTexture* CreateTextureFromBytesDX12(
     const unsigned char* data,
     int width,
     int height) {
-    
+
     std::lock_guard<std::mutex> lock(g_playerHeadMutex);
-    
+
     // Check if texture already exists or is loading
     auto it = g_playerHeadTextures.find(playerName);
     if (it != g_playerHeadTextures.end()) {
@@ -754,12 +754,12 @@ PlayerHeadTexture* CreateTextureFromBytesDX12(
             return &it->second; // Already loading
         }
     }
-    
+
     // Create entry and mark as loading
     PlayerHeadTexture& playerTex = g_playerHeadTextures[playerName];
     playerTex.loadState = PlayerHeadLoadState::Loading;
     playerTex.lastUsed = std::chrono::steady_clock::now();
-    
+
     // Queue the loading task
     {
         std::lock_guard<std::mutex> queueLock(g_loadQueueMutex);
@@ -772,19 +772,19 @@ PlayerHeadTexture* CreateTextureFromBytesDX12(
         });
     }
     g_loadQueueCV.notify_one();
-    
+
     return &playerTex;
 }
 
-// Async DX11 texture creation (queues loading, returns immediately)  
+// Async DX11 texture creation (queues loading, returns immediately)
 ID3D11ShaderResourceView* CreateTextureFromBytesDX11(
     const std::string& playerName,
     const unsigned char* data,
     int width,
     int height) {
-    
+
     std::lock_guard<std::mutex> lock(g_playerHeadMutex);
-    
+
     // Check if texture already exists or is loading
     auto it = g_playerHeadTexturesDX11.find(playerName);
     if (it != g_playerHeadTexturesDX11.end()) {
@@ -795,11 +795,11 @@ ID3D11ShaderResourceView* CreateTextureFromBytesDX11(
             return nullptr; // Still loading, return null for now
         }
     }
-    
+
     // Create entry and mark as loading
     PlayerHeadTextureDX11& playerTex = g_playerHeadTexturesDX11[playerName];
     playerTex.loadState = PlayerHeadLoadState::Loading;
-    
+
     // Queue the loading task
     {
         std::lock_guard<std::mutex> queueLock(g_loadQueueMutex);
@@ -812,7 +812,7 @@ ID3D11ShaderResourceView* CreateTextureFromBytesDX11(
         });
     }
     g_loadQueueCV.notify_one();
-    
+
     return nullptr; // Will be available next frame
 }
 
@@ -821,7 +821,7 @@ void TabList::normalRender(int index, std::string &value) {
     if (SDK::hasInstanced && (active || ClickGUI::editmenu)) {
         // Process ready textures from background threads (adaptive rate based on performance)
         ProcessReadyPlayerHeadTextures();
-        
+
         // Periodically clean up unused descriptors (every ~5 seconds at 60fps)
         static int cleanupCounter = 0;
         if (++cleanupCounter > 300) {
@@ -854,7 +854,7 @@ void TabList::normalRender(int index, std::string &value) {
                                                                                                   return v;
                                                                                               }());
 
-            float totalWidth = keycardSize * 0.9f;
+            float totalWidth = keycardSize;
             float totalHeight = keycardSize * 0.5f;
             int maxColumn = floor(getOps<float>("maxColumn"));
 
@@ -888,8 +888,8 @@ void TabList::normalRender(int index, std::string &value) {
                 validPlayers++;
 
                 if ((i + 1) % maxColumn == 0 || i == vecmap.size() - 1) {
-                    totalWidth += curMax + keycardSize * 0.9f;
-                    columnx.push_back(curMax + keycardSize * 0.9f);
+                    totalWidth += curMax + keycardSize;
+                    columnx.push_back(curMax + keycardSize);
                     curMax = 0;
                 }
             }
@@ -899,7 +899,7 @@ void TabList::normalRender(int index, std::string &value) {
             ImVec2 curPlayerMetrics;
 
             if (getOps<bool>("serverIP")) {
-                ImVec2 serverIpMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
+                ImVec2 serverIpMetrics = FlarialGUI::getFlarialTextSize(FlarialGUI::to_wide(SDK::getServerIP()).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
                 if (totalWidth < serverIpMetrics.x + keycardSize) totalWidth = serverIpMetrics.x + keycardSize;
 
                 totalHeight += keycardSize * 1.25f;
@@ -943,7 +943,7 @@ void TabList::normalRender(int index, std::string &value) {
             FlarialGUI::RoundedRect(fakex, realcenter.y, disabledColor, totalWidth, totalHeight, rounde.x, rounde.x);
 
             if (getOps<bool>("serverIP")) {
-                FlarialGUI::FlarialTextWithFont(MC::windowSize.x / 2.f, realcenter.y, FlarialGUI::to_wide(SDK::clientInstance->getLocalPlayer()->getLevel()->getWorldFolderName()).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+                FlarialGUI::FlarialTextWithFont(MC::windowSize.x / 2.f, realcenter.y, FlarialGUI::to_wide(SDK::getServerIP()).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
                 realcenter.y += keycardSize * 1.25f;
             }
 
@@ -984,31 +984,46 @@ void TabList::normalRender(int index, std::string &value) {
                                           fakex + Constraints::SpacingConstraint(p3, keycardSize) + keycardSize,
                                           realcenter.y + Constraints::SpacingConstraint(p4, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize)));
 
-                    xx = Constraints::SpacingConstraint(0.67, keycardSize);
+                    xx += Constraints::SpacingConstraint(0.6, keycardSize);
                 }
 
 
                 // PLAYER HEAD START
                 const auto& skinImage = vecmap[i]->second.playerSkin.mSkinImage;
-                
-                if (logDebug) Logger::debug("Player {} skin: format={}, size={}x{}, data_size={}", 
-                             vecmap[i]->second.name, 
+
+                if (logDebug) Logger::debug("Player {} skin: format={}, size={}x{}, data_size={}",
+                             vecmap[i]->second.name,
                              static_cast<int>(skinImage.imageFormat),
                              skinImage.mWidth, skinImage.mHeight,
                              skinImage.mImageBytes.size());
-                
+
                 if (static_cast<int>(skinImage.imageFormat) == 4 && // RGBA8Unorm format
                     skinImage.mWidth == skinImage.mHeight && // Square texture
-                    skinImage.mWidth >= 64 && skinImage.mWidth <= 1024 && // Reasonable size range
+                    skinImage.mWidth == 64 || skinImage.mWidth == 128 && // 64x64 or 128x128
                     (skinImage.mWidth & (skinImage.mWidth - 1)) == 0) { // Power of 2
-                    
+
                     // Determine skin format based on width (0 = classic 64x64, 1 = slim 64x64+)
                     int skinFormat = (skinImage.mWidth == 64) ? 0 : 1;
                     std::vector<unsigned char> head = SkinStealCommand::cropHead(skinImage, skinFormat);
+                    std::vector<unsigned char> head2 = SkinStealCommand::cropHead(skinImage, skinFormat, true);
 
-                    if (head.empty()) {
+                    if (head.empty() && head2.empty()) {
                         if (logDebug) Logger::debug("Empty head data for player {}", vecmap[i]->second.name);
                         continue;
+                    }
+
+                    std::string_view skinDataView(reinterpret_cast<const char*>(skinImage.mImageBytes.data()), skinImage.mImageBytes.size());
+                    size_t skinHash = std::hash<std::string_view>{}(skinDataView);
+                    std::string uniqueTextureKey = std::to_string(skinHash);
+
+                    bool alrExists = false;
+
+                    if (SwapchainHook::queue != nullptr) {
+                        auto it = g_playerHeadTextures.find(uniqueTextureKey);
+                        if (it != g_playerHeadTextures.end()) alrExists = true;
+                    } else {
+                        auto it = g_playerHeadTexturesDX11.find(uniqueTextureKey);
+                        if (it != g_playerHeadTexturesDX11.end()) alrExists = true;
                     }
 
                     // Dynamic head size detection and scaling for crisp pixels
@@ -1017,57 +1032,78 @@ void TabList::normalRender(int index, std::string &value) {
                     const int scaledSize = std::max(64, headSize * 2); // At least 64x64, or 2x the original head size
                     const int scale = scaledSize / headSize;
                     std::vector<unsigned char> scaledHead(scaledSize * scaledSize * 4);
+                    std::vector<unsigned char> scaledHead2(scaledSize * scaledSize * 4);
 
-                    for (int y = 0; y < scaledSize; y++) {
-                        for (int x = 0; x < scaledSize; x++) {
-                            int srcX = x / scale;
-                            int srcY = y / scale;
-                            int srcIndex = (srcY * headSize + srcX) * 4;
-                            int dstIndex = (y * scaledSize + x) * 4;
-                            
-                            scaledHead[dstIndex + 0] = head[srcIndex + 0]; // R
-                            scaledHead[dstIndex + 1] = head[srcIndex + 1]; // G
-                            scaledHead[dstIndex + 2] = head[srcIndex + 2]; // B
-                            scaledHead[dstIndex + 3] = head[srcIndex + 3]; // A
-                        }
-                    }
-                    
-                    // Debug: Check if the scaled head has any non-transparent pixels
-                    bool hasVisiblePixels = false;
-                    for (int i = 3; i < scaledHead.size(); i += 4) {
-                        if (scaledHead[i] > 0) { // Alpha channel
-                            hasVisiblePixels = true;
-                            break;
+                    if (!alrExists) {
+                        for (int y = 0; y < scaledSize; y++) {
+                            for (int x = 0; x < scaledSize; x++) {
+                                int srcX = x / scale;
+                                int srcY = y / scale;
+                                int srcIndex = (srcY * headSize + srcX) * 4;
+                                int dstIndex = (y * scaledSize + x) * 4;
+
+                                scaledHead[dstIndex + 0] = head[srcIndex + 0]; // R
+                                scaledHead[dstIndex + 1] = head[srcIndex + 1]; // G
+                                scaledHead[dstIndex + 2] = head[srcIndex + 2]; // B
+                                scaledHead[dstIndex + 3] = head[srcIndex + 3]; // A
+
+                                scaledHead2[dstIndex + 0] = head2[srcIndex + 0]; // R
+                                scaledHead2[dstIndex + 1] = head2[srcIndex + 1]; // G
+                                scaledHead2[dstIndex + 2] = head2[srcIndex + 2]; // B
+                                scaledHead2[dstIndex + 3] = head2[srcIndex + 3]; // A
+                            }
                         }
                     }
 
                     std::string playerName = String::removeNonAlphanumeric(String::removeColorCodes(vecmap[i]->second.name));
+                    if (logDebug) {
+                        // Debug: Check if the scaled head has any non-transparent pixels
+                        bool hasVisiblePixels = false;
+                        for (size_t j = 3; j < scaledHead.size(); j += 4) {
+                            if (scaledHead[j] > 0) { // Alpha channel
+                                hasVisiblePixels = true;
+                                break;
+                            }
+                            if (scaledHead2[j] > 0) { // Alpha channel
+                                hasVisiblePixels = true;
+                                break;
+                            }
+                        }
 
-                    if (logDebug) Logger::debug("Player {} scaled head: size={}, visible_pixels={}", playerName, scaledHead.size(), hasVisiblePixels);
+                        Logger::debug("Player {} scaled head: size={}, visible_pixels={}", playerName, scaledHead.size(), hasVisiblePixels);
+                    }
 
                     float headDisplaySize = Constraints::SpacingConstraint(0.6, keycardSize);
+                    float headDisplaySize2 = Constraints::SpacingConstraint(0.68, keycardSize);
+                    float diff = headDisplaySize2 - headDisplaySize;
 
                     // Position for the head (left of the player name)
                     ImVec2 headPos(fakex + Constraints::SpacingConstraint(0.45, keycardSize), realcenter.y + Constraints::SpacingConstraint(0.3, keycardSize));
+                    ImVec2 headPos2(
+                        fakex + Constraints::SpacingConstraint(0.45, keycardSize) - diff / 2.f,
+                        realcenter.y + Constraints::SpacingConstraint(0.3, keycardSize)  - diff / 2.f);
                     ImVec2 headSize2D(headDisplaySize, headDisplaySize);
+                    ImVec2 headSize22D(headDisplaySize2, headDisplaySize2);
 
                     if (SwapchainHook::queue != nullptr) {
                         // DX12 path
-                        PlayerHeadTexture* playerTex = CreateTextureFromBytesDX12(playerName, scaledHead.data(), scaledSize, scaledSize);
+                        PlayerHeadTexture* playerTex = CreateTextureFromBytesDX12(uniqueTextureKey, scaledHead.data(), scaledSize, scaledSize);
+                        PlayerHeadTexture* playerTex2 = CreateTextureFromBytesDX12("_" + uniqueTextureKey, scaledHead2.data(), scaledSize, scaledSize);
+
                         if (playerTex && playerTex->valid && playerTex->loadState == PlayerHeadLoadState::Loaded) {
                             // Update last used time when rendering
                             {
                                 std::lock_guard<std::mutex> lock(g_playerHeadMutex);
                                 playerTex->lastUsed = std::chrono::steady_clock::now();
                             }
-                            
+
                             ImDrawList* drawList = ImGui::GetForegroundDrawList();
                             if (drawList) {
                                 if (logDebug) Logger::debug("DX12 GPU handle for {}: 0x{:x}", playerName, playerTex->srvGpuHandle.ptr);
-                                
+
                                 // Render with point filtering for crisp pixels
-                                D2D1_RECT_F headRect = D2D1::RectF(headPos.x, headPos.y, headPos.x + headSize2D.x, headPos.y + headSize2D.y);
-                                RenderPlayerHeadWithPointFiltering(playerTex->srvGpuHandle, headRect, playerName);
+                                RenderPlayerHeadWithPointFiltering(playerTex->srvGpuHandle, D2D1::RectF(headPos.x, headPos.y, headPos.x + headSize2D.x, headPos.y + headSize2D.y), playerName);
+                                RenderPlayerHeadWithPointFiltering(playerTex2->srvGpuHandle, D2D1::RectF(headPos2.x, headPos2.y, headPos2.x + headSize22D.x, headPos2.y + headSize22D.y), "_" + playerName);
 
                                 if (logDebug) Logger::debug("Rendered DX12 head for player {} at ({}, {})", playerName, headPos.x, headPos.y);
                             }
@@ -1076,16 +1112,17 @@ void TabList::normalRender(int index, std::string &value) {
                         }
                     } else if (SwapchainHook::d3d11Device != nullptr) {
                         // DX11 path
-                        ID3D11ShaderResourceView* srv = CreateTextureFromBytesDX11(playerName, scaledHead.data(), scaledSize, scaledSize);
+                        ID3D11ShaderResourceView* srv = CreateTextureFromBytesDX11(uniqueTextureKey, scaledHead.data(), scaledSize, scaledSize);
+                        ID3D11ShaderResourceView* srv2 = CreateTextureFromBytesDX11("_" + uniqueTextureKey, scaledHead2.data(), scaledSize, scaledSize);
 
                         if (srv) {
                             ImDrawList* drawList = ImGui::GetForegroundDrawList();
                             if (drawList) {
                                 if (logDebug) Logger::debug("DX11 SRV for {}: 0x{:x}", playerName, reinterpret_cast<uintptr_t>(srv));
-                                
+
                                 // Render with point filtering for crisp pixels
-                                D2D1_RECT_F headRect = D2D1::RectF(headPos.x, headPos.y, headPos.x + headSize2D.x, headPos.y + headSize2D.y);
-                                RenderPlayerHeadWithPointFilteringDX11(srv, headRect, playerName);
+                                RenderPlayerHeadWithPointFilteringDX11(srv, D2D1::RectF(headPos.x, headPos.y, headPos.x + headSize2D.x, headPos.y + headSize2D.y), playerName);
+                                RenderPlayerHeadWithPointFilteringDX11(srv2, D2D1::RectF(headPos2.x, headPos2.y, headPos2.x + headSize22D.x, headPos2.y + headSize22D.y), "_" + playerName);
 
                                 if (logDebug) Logger::debug("Rendered DX11 head for player {} at ({}, {})", playerName, headPos.x, headPos.y);
                             }
@@ -1096,13 +1133,10 @@ void TabList::normalRender(int index, std::string &value) {
                     } else {
                         if (logDebug) Logger::debug("No DirectX device available for player {}", playerName);
                     }
-                    
-                    // Adjust text position to account for head
-                    xx += headSize + Constraints::SpacingConstraint(0.1, keycardSize);
                 }
                 // PLAYER HEAD END
 
-                FlarialGUI::FlarialTextWithFont(fakex + xx + Constraints::SpacingConstraint(0.5, keycardSize), realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize), String::StrToWStr(name).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+                FlarialGUI::FlarialTextWithFont(fakex + xx + keycardSize * 1.2f, realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize), String::StrToWStr(name).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
 
                 realcenter.y += Constraints::SpacingConstraint(0.70, keycardSize);
 
