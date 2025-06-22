@@ -85,11 +85,11 @@ public:
             {EffectType::VillageHero, "village_hero_effect"},
             {EffectType::Darkness, "darkness_effect"},
             {EffectType::TrialOmen, "trial_omen_effect"},
-            {EffectType::RaidOmen, "raid_omen_effect"},
             {EffectType::WindCharged, "wind_charged_effect"},
             {EffectType::Weaving, "weaving_effect"},
             {EffectType::Oozing, "oozing_effect"},
-            {EffectType::Infested, "infested_effect"}
+            {EffectType::Infested, "infested_effect"},
+            {EffectType::RaidOmen, "raid_omen_effect"},
         };
 
         auto it = effectToTexture.find(type);
@@ -133,11 +133,11 @@ public:
             case EffectType::VillageHero: return "Village Hero";
             case EffectType::Darkness: return "Darkness";
             case EffectType::TrialOmen: return "Trial Omen";
-            case EffectType::RaidOmen: return "Raid Omen";
             case EffectType::WindCharged: return "Wind Charged";
             case EffectType::Weaving: return "Weaving";
             case EffectType::Oozing: return "Oozing";
             case EffectType::Infested: return "Infested";
+            case EffectType::RaidOmen: return "Raid Omen";
             default: return "Unknown Effect";
         }
     }
