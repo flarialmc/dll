@@ -299,6 +299,9 @@ void TabList::defaultConfig() {
     setDef("serverIP", true);
     setDef("maxColumn", 10.f);
     setDef("showHeads", true);
+    setDef("textalignment", (std::string) "Left");
+    setDef("textShadow", false);
+    setDef("textShadowOffset", 0.003f);
     getKeybind();
     Module::defaultConfig("core");
     Module::defaultConfig("pos");
@@ -321,8 +324,14 @@ void TabList::settingsRender(float settingsOffset) {
     defaultAddSettings("main");
     extraPadding();
 
+    addHeader("Text");
+    addDropdown("Text Alignment", "", std::vector<std::string>{"Left", "Center"}, "textalignment", true);
+    addToggle("Text Shadow", "Displays a shadow under the text", "textShadow");
+    addConditionalSlider(getOps<bool>("textShadow"), "Shadow Offset", "How far the shadow will be.", "textShadowOffset", 0.02f, 0.001f);
+    extraPadding();
+
     addHeader("Misc");
-    addToggle("Show Heads", "", "showHeads");
+    addToggle("Show Heads", "Requires BetterFrames to be enabled!", "showHeads");
     addToggle("Player Count", "", "playerCount");
     addSlider("Max Players Column", "", "maxColumn", 30.f, 1.f);
     addToggle("Server IP", "", "serverIP");
@@ -332,10 +341,12 @@ void TabList::settingsRender(float settingsOffset) {
     extraPadding();
 
     addHeader("Colors");
-    addColorPicker("Background Color", "", "bg");
+    addConditionalColorPicker(getOps<bool>("showBg"), "Background Color", "", "bg");
+    addConditionalColorPicker(getOps<bool>("rectShadow"), "Background Shadow Color", "", "rectShadow");
     addColorPicker("Text Color", "", "text");
-    addColorPicker("Border Color", "", "border");
-    addColorPicker("Glow Color", "", "glow");
+    addConditionalColorPicker(getOps<bool>("textShadow"), "Text Shadow Color", "", "textShadow");
+    addConditionalColorPicker(getOps<bool>("border"), "Border Color", "", "border");
+    addConditionalColorPicker(getOps<bool>("glow"), "Glow Color", "", "glow");
 
     FlarialGUI::UnsetScrollView();
     resetPadding();
@@ -838,9 +849,12 @@ void TabList::normalRender(int index, std::string &value) {
 
             Vec2<float> settingperc{0.0, 0.0};
 
+            std::string textAlignment = getOps<std::string>("textalignment");
             bool showHeads = getOps<bool>("showHeads");
             bool alphaOrder = getOps<bool>("alphaOrder");
             bool flarialFirst = getOps<bool>("flarialFirst");
+
+            if (SwapchainHook::queue != nullptr) showHeads = false;
 
             // Define role logos for reuse in both branches
             std::map<std::string, int> roleLogos = {{"Dev", IDR_CYAN_LOGO_PNG}, {"Staff", IDR_WHITE_LOGO_PNG}, {"Gamer", IDR_GAMER_LOGO_PNG}, {"Booster", IDR_BOOSTER_LOGO_PNG}, {"Supporter", IDR_SUPPORTER_LOGO_PNG}, {"Default", IDR_RED_LOGO_PNG}};
@@ -936,18 +950,26 @@ void TabList::normalRender(int index, std::string &value) {
             D2D1_COLOR_F textColor = getColor("text");
             D2D1_COLOR_F borderColor = getColor("border");
 
-            disabledColor.a = getOps<float>("bgOpacity");
-            textColor.a = getOps<float>("textOpacity");
-            borderColor.a = getOps<float>("borderOpacity");
-
             if (getOps<bool>("glow")) FlarialGUI::ShadowRect(Vec2<float>(fakex, realcenter.y), Vec2<float>(totalWidth, totalHeight), getColor("glow"), rounde.x, (getOps<float>("glowAmount") / 100.f) * Constraints::PercentageConstraint(0.1f, "top"));
             if (getOps<bool>("BlurEffect")) FlarialGUI::BlurRect(D2D1::RoundedRect(D2D1::RectF(fakex, realcenter.y, fakex + totalWidth, realcenter.y + totalHeight), rounde.x, rounde.x));
             if (getOps<bool>("border")) FlarialGUI::RoundedHollowRect(fakex, realcenter.y, Constraints::RelativeConstraint((getOps<float>("borderWidth") * getOps<float>("uiscale")) / 100.0f, "height", true), borderColor, totalWidth, totalHeight, rounde.x, rounde.x);
-
-            FlarialGUI::RoundedRect(fakex, realcenter.y, disabledColor, totalWidth, totalHeight, rounde.x, rounde.x);
+            if (getOps<bool>("showBg")) {
+                if (getOps<bool>("rectShadow")) FlarialGUI::RoundedRect(fakex + Constraints::RelativeConstraint(getOps<float>("rectShadowOffset")) * getOps<float>("uiscale"), realcenter.y + Constraints::RelativeConstraint(getOps<float>("rectShadowOffset")) * getOps<float>("uiscale"), getColor("rectShadow"), totalWidth, totalHeight, rounde.x, rounde.x);
+                FlarialGUI::RoundedRect(fakex, realcenter.y, disabledColor, totalWidth, totalHeight, rounde.x, rounde.x);
+            }
 
             if (getOps<bool>("serverIP")) {
-                FlarialGUI::FlarialTextWithFont(MC::windowSize.x / 2.f, realcenter.y, FlarialGUI::to_wide(SDK::getServerIP()).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+                float textX = MC::windowSize.x / 2.f;
+                float textY = realcenter.y;
+
+                if (getOps<bool>("textShadow"))
+                    FlarialGUI::FlarialTextWithFont(
+                        textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
+                        textY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
+                        FlarialGUI::to_wide(SDK::getServerIP()).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
+
+                FlarialGUI::FlarialTextWithFont(textX, textY, FlarialGUI::to_wide(SDK::getServerIP()).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+
                 realcenter.y += keycardSize * 1.25f;
             }
 
@@ -967,31 +989,7 @@ void TabList::normalRender(int index, std::string &value) {
 
                 float xx = 0;
 
-                auto it = std::ranges::find(APIUtils::onlineUsers, clearedName);
-                if (it != APIUtils::onlineUsers.end()) {
-                    static float p1 = 0.175;
-                    static float p2 = 0.196;
-                    static float p3 = 0.7;
-                    static float p4 = 0.77;
-
-                    int imageResource = roleLogos["Default"];
-                    for (const auto &[role, resource]: roleLogos) {
-                        if (APIUtils::hasRole(role, clearedName)) {
-                            imageResource = resource;
-                            break;
-                        }
-                    }
-
-                    FlarialGUI::image(imageResource, D2D1::RectF(
-                                          fakex + Constraints::SpacingConstraint(p1, keycardSize) + keycardSize * (showHeads ? 1 : 0.17f),
-                                          realcenter.y + Constraints::SpacingConstraint(p2, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
-                                          fakex + Constraints::SpacingConstraint(p3, keycardSize) + keycardSize * (showHeads ? 1 : 0.17f),
-                                          realcenter.y + Constraints::SpacingConstraint(p4, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize)));
-
-                    xx += Constraints::SpacingConstraint(0.6, keycardSize);
-                }
-
-                if (getOps<bool>("showHeads")) {
+                if (showHeads) {
                     // PLAYER HEAD START
                     const auto &skinImage = vecmap[i]->second.playerSkin.mSkinImage;
 
@@ -1022,13 +1020,8 @@ void TabList::normalRender(int index, std::string &value) {
 
                         bool alrExists = false;
 
-                        if (SwapchainHook::queue != nullptr) {
-                            auto it = g_playerHeadTextures.find(uniqueTextureKey);
-                            if (it != g_playerHeadTextures.end()) alrExists = true;
-                        } else {
-                            auto it = g_playerHeadTexturesDX11.find(uniqueTextureKey);
-                            if (it != g_playerHeadTexturesDX11.end()) alrExists = true;
-                        }
+                        if (SwapchainHook::queue != nullptr && g_playerHeadTextures.contains(uniqueTextureKey)) alrExists = true;
+                        else if (g_playerHeadTexturesDX11.contains(uniqueTextureKey)) alrExists = true;
 
                         // Dynamic head size detection and scaling for crisp pixels
                         // Support any skin resolution (64x64, 128x128, 256x256, etc.)
@@ -1143,8 +1136,59 @@ void TabList::normalRender(int index, std::string &value) {
                     // PLAYER HEAD END
                 }
 
-                FlarialGUI::FlarialTextWithFont(fakex + xx + keycardSize * (showHeads ? 1.2f : 0.5f), realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize), String::StrToWStr(name).c_str(), keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+                auto pit = std::ranges::find(APIUtils::onlineUsers, clearedName);
+                ImVec2 pNameMetrics = FlarialGUI::getFlarialTextSize(String::StrToWStr(name).c_str(), columnx[i / maxColumn] - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
 
+                if (pit != APIUtils::onlineUsers.end()) {
+                    // FLARIAL TAG START
+                    static float p1 = 0.175;
+                    static float p2 = 0.196;
+                    static float p3 = 0.7;
+                    static float p4 = 0.77;
+
+                    int imageResource = roleLogos["Default"];
+                    for (const auto &[role, resource]: roleLogos) {
+                        if (APIUtils::hasRole(role, clearedName)) {
+                            imageResource = resource;
+                            break;
+                        }
+                    }
+
+                    float lol = columnx[i / maxColumn] - pNameMetrics.x;
+                    float trollOffset = keycardSize * (showHeads ? 1 : 0.3f);
+
+                    if (!showHeads && textAlignment == "Center") trollOffset -= keycardSize * 1.75f;
+
+                    FlarialGUI::image(imageResource, D2D1::RectF(
+                                          fakex + Constraints::SpacingConstraint(p1, keycardSize) + trollOffset + (textAlignment == "Center" ? (lol / 2.f) - trollOffset * 0.75f : 0.f),
+                                          realcenter.y + Constraints::SpacingConstraint(p2, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize),
+                                          fakex + Constraints::SpacingConstraint(p3, keycardSize) + trollOffset + (textAlignment == "Center" ? (lol / 2.f) - trollOffset * 0.75f : 0.f),
+                                          realcenter.y + Constraints::SpacingConstraint(p4, keycardSize) + Constraints::SpacingConstraint(0.17f, keycardSize)));
+
+                    xx += Constraints::SpacingConstraint(0.6, keycardSize);
+
+                    // FLARIAL TAG END
+
+                    float textX = fakex + (textAlignment == "Center" ? xx / 2.f : textAlignment == "Right" ? 0 : xx) + keycardSize * (showHeads ? 1.2f : 0.5f);
+                    float textY = realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize);
+
+                    if (getOps<bool>("textShadow"))
+                        FlarialGUI::FlarialTextWithFont(
+                            textX + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
+                            textY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
+                            String::StrToWStr(name).c_str(), columnx[i / maxColumn] - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
+
+                    FlarialGUI::FlarialTextWithFont(textX, textY, String::StrToWStr(name).c_str(), columnx[i / maxColumn] - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+
+                } else {
+                    if (getOps<bool>("textShadow"))
+                        FlarialGUI::FlarialTextWithFont(
+                            (fakex + xx + keycardSize * (showHeads ? 1.2f : 0.5f)) + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
+                            (realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize)) + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
+                            String::StrToWStr(name).c_str(), columnx[i / maxColumn] - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
+
+                    FlarialGUI::FlarialTextWithFont(fakex + xx + keycardSize * (showHeads ? 1.2f : 0.5f), realcenter.y + Constraints::SpacingConstraint(0.12, keycardSize), String::StrToWStr(name).c_str(), columnx[i / maxColumn] - (0.825 * keycardSize), keycardSize, alignments[getOps<std::string>("textalignment")], floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+                }
                 realcenter.y += Constraints::SpacingConstraint(0.70, keycardSize);
 
                 if ((i + 1) % maxColumn == 0) {
@@ -1169,17 +1213,45 @@ void TabList::normalRender(int index, std::string &value) {
                     }
                 }
 
-                FlarialGUI::FlarialTextWithFont((MC::windowSize.x / 2.f) - (curPlayerMetrics.x / 2.2f), curY, L"Player:", 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+                float textX1 = (MC::windowSize.x / 2.f) - (curPlayerMetrics.x / 2.2f);
+
+                if (getOps<bool>("textShadow"))
+                    FlarialGUI::FlarialTextWithFont(
+                        textX1 + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
+                        curY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
+                        L"Player:", 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
+
+                FlarialGUI::FlarialTextWithFont(textX1, curY, L"Player:", 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+
                 ImVec2 part1Metrics = FlarialGUI::getFlarialTextSize(L"Player:_", keycardSize * 5, keycardSize, DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, true);
                 FlarialGUI::image(imageResource, D2D1::RectF(
                                       (MC::windowSize.x / 2.f) - (curPlayerMetrics.x / 2.f) + part1Metrics.x + Constraints::SpacingConstraint(p1, keycardSize) - Constraints::SpacingConstraint(0.1f, keycardSize),
                                       curY + Constraints::SpacingConstraint(p2, keycardSize) + Constraints::SpacingConstraint(p2, keycardSize) - Constraints::SpacingConstraint(0.05f, keycardSize),
                                       ((MC::windowSize.x / 2.f) - (curPlayerMetrics.x / 2.f) + part1Metrics.x) + Constraints::SpacingConstraint(p3, keycardSize) - Constraints::SpacingConstraint(0.1f, keycardSize),
                                       (curY + Constraints::SpacingConstraint(p2, keycardSize) + Constraints::SpacingConstraint(p4, keycardSize) - Constraints::SpacingConstraint(0.05f, keycardSize))));
-                FlarialGUI::FlarialTextWithFont((MC::windowSize.x / 2.f) - (curPlayerMetrics.x / 2.2f) + part1Metrics.x + Constraints::SpacingConstraint(0.5, keycardSize), curY, FlarialGUI::to_wide(curPlayer).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+
+                float textX2 = (MC::windowSize.x / 2.f) - (curPlayerMetrics.x / 2.2f) + part1Metrics.x + Constraints::SpacingConstraint(0.5, keycardSize);
+
+                if (getOps<bool>("textShadow"))
+                    FlarialGUI::FlarialTextWithFont(
+                        textX2 + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
+                        curY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
+                        FlarialGUI::to_wide(curPlayer).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
+
+                FlarialGUI::FlarialTextWithFont(textX2, curY, FlarialGUI::to_wide(curPlayer).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_LEADING, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
 
                 curY += Constraints::SpacingConstraint(0.70, keycardSize);
-                FlarialGUI::FlarialTextWithFont(MC::windowSize.x / 2.f, curY, FlarialGUI::to_wide(countTxt).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+
+                float textX3 = MC::windowSize.x / 2.f;
+
+                if (getOps<bool>("textShadow"))
+                    FlarialGUI::FlarialTextWithFont(
+                        textX3 + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
+                        curY + Constraints::RelativeConstraint(getOps<float>("textShadowOffset")) * getOps<float>("uiscale"),
+                        FlarialGUI::to_wide(countTxt).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, getColor("textShadow"), true);
+
+                FlarialGUI::FlarialTextWithFont(textX3, curY, FlarialGUI::to_wide(countTxt).c_str(), 0, keycardSize * 0.5f + Constraints::SpacingConstraint(0.70, keycardSize), DWRITE_TEXT_ALIGNMENT_CENTER, floor(fontSize), DWRITE_FONT_WEIGHT_NORMAL, textColor, true);
+
             }
         }
     }
