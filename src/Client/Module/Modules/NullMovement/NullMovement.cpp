@@ -66,7 +66,11 @@ void NullMovement::onTick(TickEvent& event)
     static int leftKey = safe_stoi(parser.options["keyboard_type_0_key.left"]);
     static int rightKey = safe_stoi(parser.options["keyboard_type_0_key.right"]);
 
-    if (SDK::clientInstance != nullptr && SDK::clientInstance->getLocalPlayer() != nullptr) {
+    if (SDK::clientInstance != nullptr && SDK::clientInstance->getLocalPlayer() != nullptr && (
+        SDK::getCurrentScreen() == "hud_screen" ||
+        SDK::getCurrentScreen() == "zoom_screen" ||
+        SDK::getCurrentScreen() == "f3_screen"
+        )) {
         auto* handler = SDK::clientInstance->getLocalPlayer()->getMoveInputHandler();
         if (handler != nullptr) {
             if (!movementKeyStack.empty()) {
@@ -120,7 +124,11 @@ void NullMovement::onTick(TickEvent& event)
 
 void NullMovement::onKey(KeyEvent& event)
 {
-    if (!this->isEnabled()) return;
+    if (!this->isEnabled() && (
+        SDK::getCurrentScreen() != "hud_screen" &&
+        SDK::getCurrentScreen() != "zoom_screen" &&
+        SDK::getCurrentScreen() != "f3_screen"
+        )) return;
     lastKey = event.getKey();
     lastKeys = event.keys;
     lastAction = event.getAction();
