@@ -71,13 +71,13 @@ void saveImage(const char* filename, const unsigned char* img, int width, int he
     fclose(fp);
 }
 
-std::vector<unsigned char> cropHead(const Image& originalImage) {
+std::vector<unsigned char> SkinStealCommand::cropHead(const Image &originalImage, int type, bool head2) {
     // Assuming originalImage.mWidth and originalImage.mHeight are 64x64
     // Head location: (8, 8) with width and height of 8
-    const int headX = 8;
-    const int headY = 8;
-    const int headWidth = 8;
-    const int headHeight = 8;
+    const int headX = head2 ? (type == 0 ? 40 : 80) : (type == 0 ? 8 : 16);
+    const int headY = type == 0 ? 8 : 16;
+    const int headWidth = type == 0 ? 8 : 16;
+    const int headHeight = type == 0 ? 8 : 16;
     const int bytesPerPixel = 4; // RGBA
 
     // Check if the original image is large enough to contain the head
