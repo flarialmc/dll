@@ -310,7 +310,7 @@ namespace FlarialGUI {
 
 	void ScrollBar(float x, float y, float width, float height, float radius);
 
-	void SetWindowRect(float x, float y, float width, float height, int currentNum);
+	void SetWindowRect(float x, float y, float width, float height, int currentNum, std::string modname);
 
 	void UnsetWindowRect();
 

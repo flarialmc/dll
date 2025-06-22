@@ -208,7 +208,7 @@ void PotionHUD::onRender(RenderEvent& event)
 
         if (ClickGUI::editmenu) {
             // bounding boxes
-            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 23);
+            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 23, this->name);
             checkForRightClickAndOpenSettings(currentPos.x, currentPos.y, width, height);
         }
 

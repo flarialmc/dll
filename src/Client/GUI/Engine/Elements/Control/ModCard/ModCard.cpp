@@ -106,10 +106,7 @@ void ClickGUIElements::ModCard(float x, float y, Module *mod, int iconId, const 
     float texty = Constraints::PercentageConstraint(0.415, "top");
     float textWidth = Constraints::RelativeConstraint(1.0);
     float textHeight = Constraints::RelativeConstraint(0.2);
-    D2D1_COLOR_F textCol = FlarialGUI::HexToColorF("8b767a");
-    textCol.a = clickgui->getColor("globalText", "ClickGUI").a;
-
-
+    D2D1_COLOR_F textCol = ClickGUI::getColor("modNameText");
 
     FlarialGUI::FlarialTextWithFont(textx, texty, FlarialGUI::to_wide(mod->name).c_str(), textWidth, textHeight,
                                     DWRITE_TEXT_ALIGNMENT_CENTER,

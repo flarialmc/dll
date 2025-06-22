@@ -26,8 +26,7 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
     }
 
     if (FlarialGUI::TextBoxes[index].isActive) {
-        if (FlarialGUI::TextBoxes[index].isAt1)
-            FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, -1.0f, 0.05f * FlarialGUI::frameFactor);
+        if (FlarialGUI::TextBoxes[index].isAt1) FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, -1.0f, 0.05f * FlarialGUI::frameFactor);
         else FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, 2.0f, 0.05f * FlarialGUI::frameFactor);
     } else FlarialGUI::TextBoxes[index].cursorOpac = 0;
 
@@ -49,13 +48,13 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
 
     if (mod->getOps<bool>(settingName + "RGB")) {
         FlarialGUI::image(
-                IDR_RGB_PNG,
-                D2D1::RectF(
-                        x + Constraints::SpacingConstraint(0.1, s),
-                        y + s * 0.21f,
-                        x + Constraints::SpacingConstraint(0.1, s) + s * 0.85f,
-                        y + s * 0.21f + s * 0.85f
-                )
+            IDR_RGB_PNG,
+            D2D1::RectF(
+                x + Constraints::SpacingConstraint(0.1, s),
+                y + s * 0.21f,
+                x + Constraints::SpacingConstraint(0.1, s) + s * 0.85f,
+                y + s * 0.21f + s * 0.85f
+            )
         );
     } else {
         D2D1_COLOR_F color = mod->getColor(settingName);
@@ -77,12 +76,19 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
 
     col.a *= clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
 
-    if (CursorInRect(x, y + (isInScrollView ? scrollpos : 0), s * 3.f, s * 0.82f) && !TextBoxes[index].isHovering) {
+    if (CursorInRect(x + Constraints::SpacingConstraint(1.05, s), y + (isInScrollView ? scrollpos : 0), s * 3.f, s * 0.82f) && !TextBoxes[index].isHovering) {
         TextBoxes[index].isHovering = true;
         WinrtUtils::setCursorTypeThreaded(CoreCursorType::IBeam);
-    }
-    else if (!CursorInRect(x, y + (isInScrollView ? scrollpos : 0), s * 3.f, s * 0.82f) && TextBoxes[index].isHovering) {
+    } else if (!CursorInRect(x + Constraints::SpacingConstraint(1.05, s), y + (isInScrollView ? scrollpos : 0), s * 3.f, s * 0.82f) && TextBoxes[index].isHovering) {
         TextBoxes[index].isHovering = false;
+        WinrtUtils::setCursorTypeThreaded(CoreCursorType::Arrow);
+    }
+
+    if (CursorInRect(x, y + (isInScrollView ? scrollpos : 0) + s * 0.21f, s * 0.85f, s * 0.85f) && !ColorPickers[index].isHovering) {
+        ColorPickers[index].isHovering = true;
+        WinrtUtils::setCursorTypeThreaded(CoreCursorType::Hand);
+    } else if (!CursorInRect(x, y + (isInScrollView ? scrollpos : 0) + s * 0.21f, s * 0.85f, s * 0.85f) && ColorPickers[index].isHovering) {
+        ColorPickers[index].isHovering = false;
         WinrtUtils::setCursorTypeThreaded(CoreCursorType::Arrow);
     }
 
@@ -90,7 +96,7 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
 
     std::string text;
     mod->getOps<std::string>(settingName + "Col") = FlarialGUI::TextBox(index, mod->getOps<std::string>(settingName + "Col"), 6, x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, s * 3.f,
-                              s * 0.82f, 1);
+                                                                        s * 0.82f, 1);
 
     text = "#" + mod->getOps<std::string>(settingName + "Col");
     //textLayout->Release();
@@ -108,8 +114,8 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
     }
 
     sizes[text] = FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.0025f,
-                                    FlarialGUI::to_wide(text).c_str(), s * 4.3f, s * 1.1f,
-                                    DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f, DWRITE_FONT_WEIGHT_NORMAL);
+                                                  FlarialGUI::to_wide(text).c_str(), s * 4.3f, s * 1.1f,
+                                                  DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f, DWRITE_FONT_WEIGHT_NORMAL);
 
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
@@ -120,8 +126,8 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
     }
 
     FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorX,
-                 x + Constraints::SpacingConstraint(0.555f, s) + TextSizes[sizes[text]] +
-                 Constraints::RelativeConstraint(0.055f), 0.420f * FlarialGUI::frameFactor);
+                     x + Constraints::SpacingConstraint(0.555f, s) + TextSizes[sizes[text]] +
+                     Constraints::RelativeConstraint(0.055f), 0.420f * FlarialGUI::frameFactor);
 
     if (FlarialGUI::TextBoxes[index].cursorX > x)
         FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX, y + Constraints::RelativeConstraint(0.05f) / 2.0f,
@@ -154,8 +160,7 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string modu
     }
 }
 
-void FlarialGUI::ColorPicker(const int index, float x, float y, std::string& hex, bool& rgb, std::string moduleName, std::string settingName) {
-
+void FlarialGUI::ColorPicker(const int index, float x, float y, std::string &hex, bool &rgb, std::string moduleName, std::string settingName) {
     // Accepts hex, so for e.g. fps counter bg color wants to be changed then you'd have to give a modifyable hex value
     // Preferably save every color in config as a hex (string)
     // before rendering just convert the config's color to hex and yeah do it dat way.
@@ -173,11 +178,9 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string& hex
     }
 
     if (FlarialGUI::TextBoxes[index].isActive) {
-        if (FlarialGUI::TextBoxes[index].isAt1)
-            FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, -1.0f, 0.05f * FlarialGUI::frameFactor);
+        if (FlarialGUI::TextBoxes[index].isAt1) FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, -1.0f, 0.05f * FlarialGUI::frameFactor);
         else FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorOpac, 2.0f, 0.05f * FlarialGUI::frameFactor);
-    }
-    else FlarialGUI::TextBoxes[index].cursorOpac = 0;
+    } else FlarialGUI::TextBoxes[index].cursorOpac = 0;
 
     if (FlarialGUI::TextBoxes[index].cursorOpac > 1) FlarialGUI::TextBoxes[index].isAt1 = true;
     if (FlarialGUI::TextBoxes[index].cursorOpac < 0) FlarialGUI::TextBoxes[index].isAt1 = false;
@@ -204,8 +207,7 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string& hex
                 y + s * 0.21f + s * 0.85f
             )
         );
-    }
-    else {
+    } else {
         D2D1_COLOR_F color = FlarialGUI::HexToColorF(hex);
         color.a = clickgui->settings.getSettingByName<float>("_overrideAlphaValues_")->value;
         FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(0.1, s), y + s * 0.21f, color, s * 0.85f, s * 0.85f, round.x, round.x);
@@ -218,11 +220,11 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string& hex
     if (TextBoxes[index].isActive) col = ClickGUI::getColor("primary1");
 
     FlarialGUI::RoundedRect(x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, col, s * 3.f, s * 0.82f,
-        round.x, round.x);
+                            round.x, round.x);
 
     std::string text;
     hex = FlarialGUI::TextBox(index, hex, 6, x + Constraints::SpacingConstraint(1.05, s), y + s * 0.23f, s * 3.f,
-        s * 0.82f, 1);
+                              s * 0.82f, 1);
 
     text = "#" + hex;
     //textLayout->Release();
@@ -240,8 +242,8 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string& hex
     }
 
     sizes[text] = FlarialGUI::FlarialTextWithFont(x + Constraints::SpacingConstraint(1.35f, s), y * 1.0025f,
-        FlarialGUI::to_wide(text).c_str(), s * 4.3f, s * 1.1f,
-        DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f, DWRITE_FONT_WEIGHT_NORMAL);
+                                                  FlarialGUI::to_wide(text).c_str(), s * 4.3f, s * 1.1f,
+                                                  DWRITE_TEXT_ALIGNMENT_LEADING, s * 4.0f, DWRITE_FONT_WEIGHT_NORMAL);
 
     if (shouldAdditionalY) {
         for (int i = 0; i < highestAddIndexes + 1; i++) {
@@ -252,13 +254,13 @@ void FlarialGUI::ColorPicker(const int index, float x, float y, std::string& hex
     }
 
     FlarialGUI::lerp(FlarialGUI::TextBoxes[index].cursorX,
-        x + Constraints::SpacingConstraint(0.555f, s) + TextSizes[sizes[text]] +
-        Constraints::RelativeConstraint(0.055f), 0.420f * FlarialGUI::frameFactor);
+                     x + Constraints::SpacingConstraint(0.555f, s) + TextSizes[sizes[text]] +
+                     Constraints::RelativeConstraint(0.055f), 0.420f * FlarialGUI::frameFactor);
 
     if (FlarialGUI::TextBoxes[index].cursorX > x)
         FlarialGUI::RoundedRect(FlarialGUI::TextBoxes[index].cursorX, y + Constraints::RelativeConstraint(0.05f) / 2.0f,
-            cursorCol, Constraints::RelativeConstraint(0.005f),
-            s * 0.82f - Constraints::RelativeConstraint(0.025f), 0, 0);
+                                cursorCol, Constraints::RelativeConstraint(0.005f),
+                                s * 0.82f - Constraints::RelativeConstraint(0.025f), 0, 0);
 
     float clickingY = y;
     if (isInScrollView) clickingY += scrollpos;

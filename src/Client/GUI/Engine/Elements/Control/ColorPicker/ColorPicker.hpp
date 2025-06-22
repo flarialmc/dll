@@ -15,4 +15,5 @@ struct ColorPicker {
     Vec2<float> shade = Vec2<float>{-1, -1};
     bool movingShade = false;
     float openProgress = 0.0f;
+    bool isHovering = false;
 };

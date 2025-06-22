@@ -186,6 +186,7 @@ void ModuleManager::initialize() {
 	addModule<TabList>();
 	addModule<WeatherChanger>();
 	addModule<NickModule>();
+
 	addModule<FreeLook>();
 
 	addModule<AutoPerspective>();

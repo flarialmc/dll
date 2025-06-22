@@ -132,7 +132,7 @@ void BlockBreakIndicator::normalRender(int index, std::string &value) {
         }
 
         if (ClickGUI::editmenu) {
-            FlarialGUI::SetWindowRect(coord.x, coord.y, pbwidth, pbheight, index);
+            FlarialGUI::SetWindowRect(coord.x, coord.y, pbwidth, pbheight, index, this->name);
             checkForRightClickAndOpenSettings(coord.x, coord.y, pbwidth, pbheight);
 
             Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(coord.x, coord.y, index, pbwidth, pbheight);

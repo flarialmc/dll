@@ -4,6 +4,25 @@
 #include <Utils/Logger/Logger.hpp>
 #include <Utils/Memory/Game/SignatureAndOffsetManager.hpp>
 
+void OffsetInit::init2190() {
+    Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.9X");
+
+    ADD_OFFSET("Actor::baseTickVft", 25);
+
+    ADD_OFFSET("Level::hitResult", 0x1E0);
+    ADD_OFFSET("Level::getPlayerMap", 0x4E0);
+
+    ADD_OFFSET("LevelRender::getLevelRendererPlayer", 0x3F0);
+    ADD_OFFSET("LevelRendererPlayer::cameraPos", 0x664);
+    ADD_OFFSET("ClientInstance::getBlockSource", 30);
+
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x6D8);
+    ADD_OFFSET("RaknetConnector::JoinedIp", 0x3E0);
+    ADD_OFFSET("Attribute::Health", 7);
+    ADD_OFFSET("ClientInstance::getBlockSource", 30);
+    ADD_OFFSET("Level::worldFolderName", 0x250);
+}
+
 void OffsetInit::init2180() {
     Logger::custom(fg(fmt::color::golden_rod), "Offsets", "Loading offsets for 1.21.8X");
     ADD_OFFSET("ClientInstance::getBlockSource", 31);
@@ -14,7 +33,7 @@ void OffsetInit::init2180() {
     ADD_OFFSET("RaknetConnector::getPeer", 0x48);
     ADD_OFFSET("RaknetConnector::JoinedIp", 0x3E8);
 
-    ADD_OFFSET("MinecraftGame::textureGroup", 0x6C8);
+    ADD_OFFSET("MinecraftGame::textureGroup", 0x6C8); // sig in 1.21.90: 49 8B 87 ? ? ? ? 48 85 C0 74 ? F0 FF 40 ? 4D 8B 87, string around: "world_loading_progress_screen"
 
     ADD_OFFSET("Player::gamemode", 0xA88);
     ADD_OFFSET("Player::playerName", 0xC08);

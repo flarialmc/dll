@@ -218,7 +218,7 @@ void Keystrokes::normalRender(int index, std::string& value) {
 
 
 			if (ClickGUI::editmenu) { // makes module movable
-				FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, totalWidth, totalHeight, index);
+				FlarialGUI::SetWindowRect(realcenter.x, realcenter.y, totalWidth, totalHeight, index, this->name);
 				checkForRightClickAndOpenSettings(realcenter.x, realcenter.y, totalWidth, totalHeight);
 
 				Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(realcenter.x, realcenter.y, index, totalWidth, totalHeight);

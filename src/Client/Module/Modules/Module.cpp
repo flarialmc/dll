@@ -126,7 +126,7 @@ void Module::normalRenderCore(int index, std::string& text) {
 	}
 
 	if (ClickGUI::editmenu) {
-		FlarialGUI::SetWindowRect(topleft.x, topleft.y, rectWidth, rectHeight, index);
+		FlarialGUI::SetWindowRect(topleft.x, topleft.y, rectWidth, rectHeight, index, this->name);
 
 		checkForRightClickAndOpenSettings(topleft.x, topleft.y, rectWidth, rectHeight);
 
@@ -800,7 +800,7 @@ void Module::onEnable() {
 	
 	enabledState = true;
 	if (settings.getSettingByName<bool>("enabled")) getOps<bool>("enabled") = true;
-	Client::SaveSettings();
+	// Client::SaveSettings();
 }
 
 void Module::onDisable() {
@@ -811,7 +811,7 @@ void Module::onDisable() {
 	if (!terminating) {
 		if (settings.getSettingByName<bool>("enabled")) getOps<bool>("enabled") = false;
 	}
-	Client::SaveSettings();
+	// Client::SaveSettings();
 }
 
 void Module::terminate() {

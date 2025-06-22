@@ -10,6 +10,7 @@ void Waypoints::onEnable() {
 void Waypoints::addWaypoint(int index, std::string name, std::string color, Vec3<float> position, bool state, bool config, bool rgb, float opacity) {
 	if (config)
 	{
+
 		std::string end = "-" + FlarialGUI::cached_to_string(index);
 		this->settings.addSetting("waypoint" + end, (std::string)name);
 		this->settings.addSetting("color" + end, (std::string)color);

@@ -102,11 +102,14 @@ void HookManager::initialize() {
         addHook<ContainerScreenControllerHook>();
     }
 
+    if(!VersionUtils::checkAboveOrEqual(21, 80)) { //needed for MaterialBinLoader/shader loader
+        addHook<_composeFullStackHook>();
+    }
+
     // likely packchanger hooks, im not sure!
     if(!VersionUtils::checkAboveOrEqual(21, 60))
     {
         addHook<isPreGameHook>();
-        addHook<_composeFullStackHook>();
 
         addHook<RenderOrderExecuteHook>();
         addHook<RenderChunkCoordinatorHandleVisibilityUpdatesHook>();

@@ -42,6 +42,8 @@ public:
 	inline static bool hasLegacySettings = false;
 	inline static bool softLoadLegacy = false;
 	inline static bool privateInit = false;
+	inline static bool savingSettings = false;
+	inline static bool savingPrivate = false;
 
 	static Settings settings;
 	static Settings legacySettings;
@@ -112,7 +114,12 @@ public:
 
 	static void SavePrivate() {
 		// save PRIVATE
+		if (savingPrivate) return;
+		else savingPrivate = true;
+
 		try {
+			Logger::custom(fg(fmt::color::dark_magenta), "Config", "Saving PRIVATE");
+
 			if (!settings.getSettingByName<std::string>("currentConfig")) return Logger::warn("No Client Settings to save to PRIVATE");
 
 
@@ -136,9 +143,13 @@ public:
 
 			pFile << settings.ToJson();
 			pFile.close();
+
+			Logger::custom(fg(fmt::color::dark_magenta), "Config", "Saved PRIVATE");
+			savingPrivate = false;
 		}
 		catch (const std::exception& e) {
 			LOG_ERROR("An error occurred while trying to save settings: {}", e.what());
+			savingPrivate = false;
 		}
 	}
 
@@ -168,7 +179,11 @@ public:
 	}
 
 	static void SaveSettings() {
+		if (savingSettings) return;
+		else savingSettings = true;
+
 		if (path.empty()) path = Utils::getConfigsPath() + "\\" + settings.getSettingByName<std::string>("currentConfig")->value;
+		Logger::custom(fg(fmt::color::dark_magenta), "Config", "Saving {}", Client::settings.getSettingByName<std::string>("currentConfig")->value);
 
 		try {
 			// Build JSON object safely using nlohmann::json
@@ -196,6 +211,7 @@ public:
 			std::ofstream tempFile(tempPath, std::ofstream::out | std::ofstream::trunc);
 			if (!tempFile.is_open()) {
 				LOG_ERROR("Could not open temporary config file for writing");
+				savingSettings = false;
 				return;
 			}
 			
@@ -208,11 +224,16 @@ public:
 			if (ec) {
 				LOG_ERROR("Failed to rename temporary config file: {}", ec.message());
 				std::filesystem::remove(tempPath, ec); // Cleanup temp file
+				savingSettings = false;
 				return;
 			}
+
+			Logger::custom(fg(fmt::color::dark_magenta), "Config", "Saved {}", Client::settings.getSettingByName<std::string>("currentConfig")->value);
+			savingSettings = false;
 		}
 		catch (const std::exception& e) {
 			LOG_ERROR("An error occurred while trying to save settings: {}", e.what());
+			savingSettings = false;
 		}
 
 		ScriptManager::saveSettings();

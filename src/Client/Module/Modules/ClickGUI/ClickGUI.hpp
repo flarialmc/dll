@@ -126,6 +126,7 @@ public:
 			Listen(this, KeyEvent, &ClickGUI::onKey)
 			ListenOrdered(this, PacketEvent, &ClickGUI::onPacketReceive, EventOrder::IMMEDIATE)
 			ListenOrdered(this, RenderEvent, &ClickGUI::onRender, EventOrder::IMMEDIATE)
+		Listen(this, SetupAndRenderEvent, &ClickGUI::onSetupAndRender)
 			//Module::onEnable();
 	};
 
@@ -141,6 +142,7 @@ public:
 			Deafen(this, RenderEvent, &ClickGUI::onRender)
 			Deafen(this, PacketEvent, &ClickGUI::onPacketReceive)
 			Module::terminate();
+		//
 	}
 
 	void defaultConfig() override {
@@ -173,6 +175,7 @@ public:
 		setDef("editmenubind", (std::string)"L");
 		setDef("custom_logo", false);
 		setDef("globalText", (std::string)"ffffff", 1.f, false);
+		setDef("modNameText", (std::string)"8b767a", 1.f, false);
 		setDef("modCardEnabled", (std::string)"188830", 1.f, false);
 		setDef("modCardDisabled", (std::string)"7d1820", 1.f, false);
 		setDef("primary1", (std::string)"ff233a", 1.f, false);
@@ -197,7 +200,7 @@ public:
 		setDef("enabledRadioButton", (std::string)"D0A0A8", 1.0f, false);
 		setDef("disabledRadioButton", (std::string)"FFFFFF", 1.0f, false);
 		setDef("_overrideAlphaValues_", 1.f);
-		
+
 	}
 
 	void settingsRender(float settingsOffset) override {
@@ -234,6 +237,7 @@ public:
 		addColorPicker("Radio Button Icon Disabled", "", "enabledRadioButton");
 		addColorPicker("Radio Button Icon Enabled", "", "disabledRadioButton");
 		addColorPicker("Text Color", "", "globalText");
+		addColorPicker("Module Name Text Color", "", "modNameText");
 		addColorPicker("Enabled", "", "modCardEnabled");
 		addColorPicker("Disabled", "", "modCardDisabled");
 		addColorPicker("Primary 1", "Active elements, main color of sliders, bg color of enabled toggles", "primary1");
@@ -290,9 +294,9 @@ public:
 					ModuleManager::cguiRefresh = true;
 					keybindActions[0]({});
 				}
-			#if !defined(__DEBUG__)
-				}
-			#endif
+#if !defined(__DEBUG__)
+			}
+#endif
 
 
 			if (this->active) {
@@ -344,7 +348,11 @@ public:
 			if (page.type == "normal" && curr == "modules" &&
 				event.getAction() == ActionType::Pressed) {
 
-				if (Client::settings.getSettingByName<bool>("autosearch")->value) FlarialGUI::TextBoxes[0].isActive = true;
+				if (Client::settings.getSettingByName<bool>("autosearch")->value && !FlarialGUI::TextBoxes[0].isActive) {
+					FlarialGUI::TextBoxes[0].isActive = true;
+					event.setKey(MouseButton::None);
+					event.setAction(MouseAction::Release);
+				}
 				// you searching
 				if (FlarialGUI::TextBoxes[0].isActive) {
 					FlarialGUI::scrollpos = 0;
@@ -389,6 +397,13 @@ public:
 
 		if (this->active || editmenu)
 			event.cancel(); // do not pass key event to the game
+
+	}
+
+	void onSetupAndRender(SetupAndRenderEvent &event) const
+	{
+		if (this->active || editmenu)
+			SDK::clientInstance->releaseMouse();
 
 	}
 

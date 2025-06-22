@@ -39,6 +39,10 @@ void BaseActorRendererRenderTextHook::drawLogo(ScreenContext* screenContext, con
         }
     }
 
+    if (!SDK::clientInstance->getMinecraftGame()->textureGroup)
+    {
+        return;
+    }
     TexturePtr ptr = SDK::clientInstance->getMinecraftGame()->textureGroup->getTexture(loc, false);
 
     if(ptr.clientTexture == nullptr || ptr.clientTexture->clientTexture.resourcePointerBlock == nullptr)

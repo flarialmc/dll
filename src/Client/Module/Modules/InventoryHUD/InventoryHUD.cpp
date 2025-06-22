@@ -247,7 +247,7 @@ void InventoryHUD::onRender(RenderEvent &event) {
         else currentPos = Constraints::CenterConstraint(width, height);
 
         if (ClickGUI::editmenu) {
-            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 40);
+            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 40, this->name);
             checkForRightClickAndOpenSettings(currentPos.x, currentPos.y, width, height);
         }
 

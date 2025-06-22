@@ -61,7 +61,7 @@ void MovableHotbar::onRender(RenderEvent& event)
 		if (settingperc.x != 0) currentPos = Vec2<float>(settingperc.x * (MC::windowSize.x - width), settingperc.y * (MC::windowSize.y - height));
 		else if (settingperc.x == 0 and originalPos.x != 0.0f) currentPos = Vec2<float>{ originalPos.x, originalPos.y };
 
-		if (ClickGUI::editmenu) FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 28);
+		if (ClickGUI::editmenu) FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, width, height, 28, this->name);
 
 		Vec2<float> vec2 = FlarialGUI::CalculateMovedXY(currentPos.x, currentPos.y, 28, width, height);
 

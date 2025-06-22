@@ -102,7 +102,7 @@ void HiveStat::onRender(RenderEvent &event) {
             currentPos = Constraints::CenterConstraint(150, 150);
 
         if (ClickGUI::editmenu) {
-            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, 150, 50, 123);
+            FlarialGUI::SetWindowRect(currentPos.x, currentPos.y, 150, 50, 123, this->name);
             FlarialGUI::FlarialTextWithFont(currentPos.x, currentPos.y,
                                             L"Overlay", 150, 50,
                                             DWRITE_TEXT_ALIGNMENT_LEADING, Constraints::SpacingConstraint(1.05, 150),
