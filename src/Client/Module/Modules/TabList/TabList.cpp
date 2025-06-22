@@ -1012,9 +1012,7 @@ void TabList::normalRender(int index, std::string &value) {
                         continue;
                     }
 
-                    std::string_view skinDataView(reinterpret_cast<const char*>(skinImage.mImageBytes.data()), skinImage.mImageBytes.size());
-                    size_t skinHash = std::hash<std::string_view>{}(skinDataView);
-                    std::string uniqueTextureKey = std::to_string(skinHash);
+                    std::string uniqueTextureKey = vecmap[i]->second.playerSkin.mId;
 
                     bool alrExists = false;
 

@@ -27,7 +27,7 @@ void CommandManager::initialize() {
     Commands.push_back(std::make_unique<LuaCommand>());
     Commands.push_back(std::make_unique<PathCommand>());
     Commands.push_back(std::make_unique<EjectCommand>());
-    if (!VersionUtils::checkAboveOrEqual(21, 90)) Commands.push_back(std::make_unique<SkinStealCommand>());
+    Commands.push_back(std::make_unique<SkinStealCommand>());
     Commands.push_back(std::make_unique<ConfigCommand>());
     Commands.push_back(std::make_unique<SpotifyCommand>());
     //Commands.push_back(std::make_unique<IRCChat>());
