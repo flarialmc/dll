@@ -339,7 +339,9 @@ void JavaDebugMenu::onRender(RenderEvent& event) {
 		D2D1_COLOR_F textColor = getColor("text");
 		D2D1_COLOR_F bgColor = getColor("bg");
 
+		if (SDK::clientInstance == nullptr) return;
 		LocalPlayer* player = SDK::clientInstance->getLocalPlayer();
+		if (player == nullptr) return;
 		ActorRotationComponent* rotComponent = player->getActorRotationComponent();
 
 		if (rotComponent) {
